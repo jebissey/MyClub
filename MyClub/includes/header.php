@@ -18,6 +18,22 @@ echo '<title>' . $row['Value'] .'</title>';
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <link rel="stylesheet" type="text/css" href="https://npmcdn.com/flatpickr/dist/themes/material_blue.css">
+    <style>
+        /* Custom styles to ensure footer stays at bottom */
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        main {
+            flex: 1 0 auto;
+        }
+
+        footer {
+            flex-shrink: 0;
+        }
+    </style>
   </head>
   <body>
 
@@ -38,7 +54,7 @@ while ($row = $stmt->fetch())
 {
     print '<li class="nav-item">';
     $href = 'Page.php?n=' .$row['Id']; 
-    print '<a class="nav-link ' . (($currentPage == $href) ? 'active' : '') . '" href="' . $href . '"><h3>' . $row['Name'] . '</h3></a>';
+    print '<a class="nav-link ' . (($currentPage == $href) ? 'active' : '') . '" href="' . $href . '"><h5>' . $row['Name'] . '</h5></a>';
     print "</li>\n";
 }
 ?>
