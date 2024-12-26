@@ -9,9 +9,6 @@ if($id != null) {
   $row = $stmt->fetch();
   echo $row['Content'] ."\n";
 }
-else {
-  echo 'toto';
-}
 
 echo "</main>\n";
 include 'includes/footer.php';

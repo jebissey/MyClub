@@ -10,7 +10,7 @@ $pdo = new PDO("sqlite:data/MyClub.sqlite") or die("cannot open the database");
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <?php
-$stmt = $pdo->query('SELECT Value FROM SiteData WHERE name ="Title"');
+$stmt = $pdo->query('SELECT Value FROM SiteData WHERE name = "Title"');
 $row = $stmt->fetch();
 echo '<title>' . $row['Value'] .'</title>';
 ?>
@@ -38,27 +38,45 @@ echo '<title>' . $row['Value'] .'</title>';
   <body>
 
     <header>
-        <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4>
+        <nav class="navbar navbar-expand-sm navbar-dark bg-dark mb-4>
             <div class="container-fluid">
                 <a href="Page.php?n=1">
-                    <img src="agenda.png" alt="Site logo"/>
+                    <img src="images/agenda.png" alt="Site logo"/>
                 </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="navbarNav">
-                  <ul class="navbar-nav">
+                    <ul class="navbar-nav">
 <?php
-$stmt = $pdo->query('SELECT Name, Id FROM Page ORDER BY Position');
+$stmt = $pdo->query('SELECT Name, File FROM Page ORDER BY Position');
 while ($row = $stmt->fetch())
 {
     print '<li class="nav-item">';
-    $href = 'Page.php?n=' .$row['Id']; 
+    $href = $row['File']; 
     print '<a class="nav-link ' . (($currentPage == $href) ? 'active' : '') . '" href="' . $href . '"><h5>' . $row['Name'] . '</h5></a>';
     print "</li>\n";
 }
 ?>
-                  </ul>
+                    </ul>
+                    <div class="d-lg-flex col-lg-3 justify-content-lg-end">
+                        <a href="SignIn/Person.php">
+<?php
+if($_SESSION['user']){
+    $user = $_SESSION['user'];
+    $stmt = $pdo->prepare('SELECT Avatar FROM Person WHERE Email = :email');
+    $stmt->execute(['email' => $user = $user['Email']]);
+    $avatar = $stmt->fetch();
+    if($avatar == null){
+        $avatar = 'images/emojiPensif.png';
+    }
+    echo '<img src="images/'. $avatar . '" alt="User avatar"/>';
+} else {
+    echo '<img src="images/anonymat.png" alt="User avatar"/>';
+}
+?>
+                        </a>
+                    </div>
                 </div>
             </div>
         </nav>
