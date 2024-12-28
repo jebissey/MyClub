@@ -21,6 +21,8 @@ var_dump($user);
 
 
 require_once __DIR__ . '/lib/Database/Database.php';
+require_once __DIR__ . '/lib/Database/Tables/Page.php';
+require_once __DIR__ . '/lib/Database/Tables/Person.php';
 require_once __DIR__ . '/lib/Database/Tables/SiteData.php';
 
 /*
@@ -43,7 +45,41 @@ echo __DIR__ . "\n";
 echo getcwd() . "\n";
 */
 
+
+echo '<p />';
+$result = (new Person)->getByName('JEB');
+var_dump($result);
+
+echo '<p>=============</p>';
+
 $siteData = new SiteData();
+var_dump($siteData);
+echo '<p />';
 $result = $siteData->getById(1);
 var_dump($result);
+
+echo '<p>--------</p>';
+
+$result = $siteData->getById(2);
+var_dump($result);
+
+echo '<p>--------</p>';
+
+$result = $siteData->getByName('Title');
+var_dump($result);
+
+echo '<p>--------</p>';
+
+$result = $siteData->getByName('absent');
+var_dump($result);
+
+echo '<p>=============</p>';
+
+/*
+$person = new Person();
+$result = $person->getById(1);
+var_dump($result);
+$result = $person->getByName('JEB');
+var_dump($result);
+*/
 ?>

@@ -9,21 +9,34 @@ abstract class BaseTable {
     public function __construct() {
         $this->pdo = Database::getInstance()->getPDO();
         $reflection = new ReflectionClass($this);
-        $this->tableName = '"' . $reflection->getShortName() . '"';
+        $this->tableName = $reflection->getShortName();
     }
     
     public function getById($id) {
-        $query = $this->pdo->prepare("SELECT * FROM {$this->tableName} WHERE \"Id\" = :id");
+        $query = $this->pdo->prepare("SELECT * FROM {$this->tableName} WHERE Id = :id");
         $query->execute(array('id' => $id));
         return $query->fetch(PDO::FETCH_ASSOC);
     }
     
     public function getByName($name) {
-        $query = $this->pdo->prepare("SELECT * FROM {$this->tableName} WHERE \"FirstName\" = :name OR \"LastName\" = :name OR \"NickName\" = :name");
+        $query = $this->pdo->prepare("SELECT * FROM {$this->tableName} WHERE Name = :name");
         $query->execute(array('name' => $name));
         return $query->fetch(PDO::FETCH_ASSOC);
     }
+        
+    public function getOrdered($orderBy) {
+        $query = $this->pdo->prepare("SELECT * FROM {$this->tableName} ORDER BY :orderBy");
+        $query->execute(array('orderBy' => $orderBy));
+        return $query->fetch(PDO::FETCH_ASSOC);
+    }
+
+    public function removeById($id) {
+        $query = $this->pdo->prepare("DELETE FROM {$this->tableName} WHERE Id = :id");
+        return $query->execute(array('id' => $id));
+    }
     
+/*
+      
     public function setByEmail($email, array $data) {
         $tableColumns = $this->getTableColumns();
         $validData = $this->filterValidFields($data, $tableColumns);
@@ -32,12 +45,7 @@ abstract class BaseTable {
             ? $this->updateExistingRecord($email, $validData)
             : $this->createNewRecord($email, $validData);
     }
-    
-    public function removeByName($name) {
-        $query = $this->pdo->prepare("DELETE FROM {$this->tableName} WHERE \"FirstName\" = :name OR \"LastName\" = :name");
-        return $query->execute(array('name' => $name));
-    }
-    
+
     protected function getTableColumns() {
         $query = $this->pdo->prepare("PRAGMA table_info({$this->tableName})");
         $query->execute();
@@ -55,7 +63,7 @@ abstract class BaseTable {
     }
 
     protected function recordExistsByEmail($email) {
-        $query = $this->pdo->prepare("SELECT \"Id\" FROM {$this->tableName} WHERE \"Email\" = :email");
+        $query = $this->pdo->prepare("SELECT Id FROM {$this->tableName} WHERE Email = :email");
         $query->execute(array('email' => $email));
         return (bool) $query->fetch(PDO::FETCH_ASSOC);
     }
@@ -79,7 +87,7 @@ abstract class BaseTable {
         
         foreach ($validData as $field => $value) {
             if ($this->isUpdatableField($field)) {
-                $fields[] = "\"$field\" = :$field";
+                $fields[] = "$field = :$field";
                 $params[$field] = $value;
             }
         }
@@ -96,7 +104,7 @@ abstract class BaseTable {
     }
     
     protected function buildUpdateQuery(array $fields) {
-        return "UPDATE {$this->tableName} SET " . implode(', ', $fields) . " WHERE \"Email\" = :email";
+        return "UPDATE {$this->tableName} SET " . implode(', ', $fields) . " WHERE Email = :email";
     }
     
     protected function prepareUpdateParameters($email, array $params) {
@@ -120,7 +128,7 @@ abstract class BaseTable {
         
         foreach ($fields as $field) {
             $values[] = ":$field";
-            $quotedFields[] = "\"$field\"";
+            $quotedFields[] = "$field";
         }
         
         return "INSERT INTO {$this->tableName} (" . 
@@ -134,5 +142,6 @@ abstract class BaseTable {
         $query = $this->pdo->prepare($sql);
         return $query->execute($params);
     }
+        */
 }
 ?>

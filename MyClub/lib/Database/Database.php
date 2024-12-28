@@ -1,6 +1,9 @@
 <?php
 
+require_once __DIR__ . '/../File.php';
+
 class Database {
+    const SQLITE_PATH = __DIR__ . '/../../../Data/';
     const SQLITE_FILE = 'MyClub.sqlite';
     const APPLICATION = 'MyClub';
     const VERSION = 1;      //Don't forget to update when database structure is modified
@@ -30,7 +33,10 @@ class Database {
 
     private function check(){
         try {
-            $sqliteFile = __DIR__ . '/' . self::SQLITE_FILE;
+            $sqliteFile = self::SQLITE_PATH . self::SQLITE_FILE;
+            if(!is_file($sqliteFile)) {
+                (new File())->copy(self::SQLITE_FILE, $sqliteFile);
+            }
             $pdo = new PDO('sqlite:' . $sqliteFile);
 
             $query = "SELECT * FROM Metadata LIMIT 1";
@@ -63,6 +69,5 @@ class Database {
 
 
 }
-
 
 ?>
