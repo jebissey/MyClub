@@ -1,10 +1,4 @@
 <?php
-try {
-    $pdo = new PDO("sqlite:../data/MyClub.sqlite");
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-} catch (Exception $e) {
-    die("Cannot open the database: " . $e->getMessage());
-}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $token = $_POST['token'];
@@ -12,26 +6,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $confirmPassword = $_POST['confirm_password'];
 
     if ($password !== $confirmPassword) {
-        die("Les mots de passe ne correspondent pas.");
+        die("<h1>Les mots de passe ne correspondent pas.</h1>");
     }
 
-    // Vérifiez si le jeton existe
-    $stmt = $pdo->prepare('SELECT Email FROM Person WHERE token = :token');
-    $stmt->execute(['token' => $token]);
-    $reset = $stmt->fetch();
+    $person = new Person();
+    $personFound = $person->getByToken($token);
+    
+    if ($personFound) {
+        if ($personFound['TokenCreatedAt'] === null || (new DateTime($personFound['TokenCreatedAt']))->diff(new DateTime())->h >= 1 ) {
+            die("<h1>Lien de réinitialisation expiré ou invalide.</h1>");
+        }
 
-    if ($reset) {
-        $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-
-        $stmt = $pdo->prepare('UPDATE Person SET Password = :password WHERE Email = :email');
-        $stmt->execute(['password' => $hashedPassword, 'email' => $reset['email']]);
-
-        $stmt = $pdo->prepare('UPDATE Person SET Token = null, TokenCreatedAt = null WHERE email = :email');
-        $stmt->execute(['email' => $reset['email']]);
-
-        echo "Votre mot de passe a été mis à jour.";
+        $person->setByEmail($personFound['Email'], array(
+            'Password' => password_hash($password, PASSWORD_DEFAULT),
+            'Token' => null,
+            'TokenCreatedAt' => null,
+        ));
+        echo "<h1>Le mot de passe a été mis à jour.</h1>";
     } else {
-        echo "Lien de réinitialisation invalide.";
+        echo "<h1>Lien de réinitialisation invalide.</h1>";
     }
 } else {
     echo "Méthode non autorisée.";

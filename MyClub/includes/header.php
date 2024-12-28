@@ -1,6 +1,6 @@
 <?php
 session_start();
-$pdo = new PDO("sqlite:data/MyClub.sqlite") or die("cannot open the database");
+require_once 'data/SiteData.php';
 ?>
 
 <!doctype html>
@@ -10,9 +10,9 @@ $pdo = new PDO("sqlite:data/MyClub.sqlite") or die("cannot open the database");
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <?php
-$stmt = $pdo->query('SELECT Value FROM SiteData WHERE name = "Title"');
-$row = $stmt->fetch();
-echo '<title>' . $row['Value'] .'</title>';
+$siteData = new SiteData();
+$title = $siteData->getByName('Title');
+echo '<title>' . $title['Value'] .'</title>';
 ?>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
@@ -49,12 +49,13 @@ echo '<title>' . $row['Value'] .'</title>';
                 <div class="collapse navbar-collapse" id="navbarNav">
                     <ul class="navbar-nav">
 <?php
-$stmt = $pdo->query('SELECT Name, File FROM Page ORDER BY Position');
-while ($row = $stmt->fetch())
+$page = new Page();
+$pages = $page->getOrdered('Position');
+foreach ($pages as $p)
 {
     print '<li class="nav-item">';
-    $href = $row['File']; 
-    print '<a class="nav-link ' . (($currentPage == $href) ? 'active' : '') . '" href="' . $href . '"><h5>' . $row['Name'] . '</h5></a>';
+    $href = $p['File']; 
+    print '<a class="nav-link ' . (($currentPage == $href) ? 'active' : '') . '" href="' . $href . '"><h5>' . $p['Name'] . '</h5></a>';
     print "</li>\n";
 }
 ?>
@@ -64,11 +65,12 @@ while ($row = $stmt->fetch())
 <?php
 if($_SESSION['user']){
     $user = $_SESSION['user'];
-    $stmt = $pdo->prepare('SELECT Avatar FROM Person WHERE Email = :email');
-    $stmt->execute(['email' => $user = $user['Email']]);
-    $avatar = $stmt->fetch();
-    if($avatar == null){
+    $person = new Person();
+    $personFound = $person->getByEmail($user['Email']);
+    if($personFound['Avatar'] == null){
         $avatar = 'images/emojiPensif.png';
+    } else {
+        $avatar = $personFound['Avatar'];
     }
     echo '<img src="images/'. $avatar . '" alt="User avatar"/>';
 } else {
