@@ -1,85 +1,14 @@
 <?php
 
-/*
-// Inclure d'abord les fichiers nécessaires
-require_once __DIR__ . '/data/DatabaseConnection.php';
-require_once __DIR__ . '/data/BaseTable.php';
-require_once __DIR__ . '/data/Tables/Person.php';
+require_once __DIR__ . '/lib/Backup.php';
 
-// Code de test pour vérifier la structure de la base
-$pdo = DatabaseConnection::getInstance()->getPDO();
-var_dump($pdo);
-$query = $pdo->query("SELECT name FROM sqlite_master WHERE type='table'");
-$tables = $query->fetchAll(PDO::FETCH_COLUMN);
-var_dump($tables);
+$backup = new Backup();
 
-// Votre code original
-$person = new Person();
-$user = $person->getByName('Toto');
-var_dump($user);
-*/
-
-
-require_once __DIR__ . '/lib/Database/Database.php';
-require_once __DIR__ . '/lib/Database/Tables/Page.php';
-require_once __DIR__ . '/lib/Database/Tables/Person.php';
-require_once __DIR__ . '/lib/Database/Tables/SiteData.php';
-
-/*
-$pdo = Database::getInstance()->getPDO();
-
-$query = "SELECT * FROM metadata LIMIT 1";
-$stmt = $pdo->query($query);
-
-// Récupérer le résultat
-$row = $stmt->fetch(PDO::FETCH_ASSOC);
-
-if ($row) {
-    // Afficher le premier élément
-    print_r($row);
+if ($backup->save()) {
+    echo "Backup created successfully -> ";
+    echo $backup->getLastBackupFolder();
 } else {
-    echo "Aucun élément trouvé dans la table metadata.";
+    echo "Backup failed";
 }
 
-echo __DIR__ . "\n";
-echo getcwd() . "\n";
-*/
-
-
-echo '<p />';
-$result = (new Person)->getByName('JEB');
-var_dump($result);
-
-echo '<p>=============</p>';
-
-$siteData = new SiteData();
-var_dump($siteData);
-echo '<p />';
-$result = $siteData->getById(1);
-var_dump($result);
-
-echo '<p>--------</p>';
-
-$result = $siteData->getById(2);
-var_dump($result);
-
-echo '<p>--------</p>';
-
-$result = $siteData->getByName('Title');
-var_dump($result);
-
-echo '<p>--------</p>';
-
-$result = $siteData->getByName('absent');
-var_dump($result);
-
-echo '<p>=============</p>';
-
-/*
-$person = new Person();
-$result = $person->getById(1);
-var_dump($result);
-$result = $person->getByName('JEB');
-var_dump($result);
-*/
 ?>
