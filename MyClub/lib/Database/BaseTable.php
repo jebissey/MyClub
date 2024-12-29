@@ -4,10 +4,12 @@ require_once 'Database.php';
 
 abstract class BaseTable {
     protected $pdo;
+    protected $pdoForLog;
     protected $tableName;
     
     public function __construct() {
         $this->pdo = Database::getInstance()->getPDO();
+        $this->pdoForLog = Database::getInstance()->getPdoForLog();
         $reflection = new ReflectionClass($this);
         $this->tableName = $reflection->getShortName();
     }
@@ -25,25 +27,57 @@ abstract class BaseTable {
     }
         
     public function getOrdered($orderBy) {
-        $query = $this->pdo->prepare("SELECT * FROM {$this->tableName} ORDER BY :orderBy");
-        $query->execute(array('orderBy' => $orderBy));
-        return $query->fetch(PDO::FETCH_ASSOC);
+        $allowedColumns = ['Position', 'Name'];
+        if (!in_array($orderBy, $allowedColumns)) {
+            die('Invalid order by column');
+        }
+        $query = $this->pdo->prepare("SELECT * FROM {$this->tableName} ORDER BY $orderBy");
+        $query->execute();
+        return $query->fetchAll(PDO::FETCH_ASSOC);
     }
 
     public function removeById($id) {
         $query = $this->pdo->prepare("DELETE FROM {$this->tableName} WHERE Id = :id");
         return $query->execute(array('id' => $id));
     }
-    
-/*
-      
-    public function setByEmail($email, array $data) {
+
+    public function set(array $data) {
         $tableColumns = $this->getTableColumns();
         $validData = $this->filterValidFields($data, $tableColumns);
+        return $this->createNewRecord($validData);
+    }
+
+
+
+    protected function buildInsertQuery(array $data) {
+        $fields = array_keys($data);
+        $values = array();
+        $quotedFields = array();
         
-        return $this->recordExistsByEmail($email) 
-            ? $this->updateExistingRecord($email, $validData)
-            : $this->createNewRecord($email, $validData);
+        foreach ($fields as $field) {
+            $values[] = ":$field";
+            $quotedFields[] = "$field";
+        }
+        
+        return "INSERT INTO {$this->tableName} (" . 
+               implode(', ', $quotedFields) . 
+               ") VALUES (" . 
+               implode(', ', $values) . 
+               ")";
+    }
+    
+    protected function createNewRecord(array $validData) {
+        $sql = $this->buildInsertQuery($validData);
+        return $this->executeQuery($sql, $validData);
+    }
+
+    protected function executeQuery($sql, array $params) {
+        $query = $this->pdo->prepare($sql);
+        return $query->execute($params);
+    }
+
+    protected function filterValidFields(array $data, array $tableColumns) {
+        return array_intersect_key($data, array_flip($tableColumns));
     }
 
     protected function getTableColumns() {
@@ -57,10 +91,24 @@ abstract class BaseTable {
         }
         return $columnNames;
     }
-    
-    protected function filterValidFields(array $data, array $tableColumns) {
-        return array_intersect_key($data, array_flip($tableColumns));
+
+/*
+    protected function prepareInsertData($email, array $validData) {
+        return array_merge($validData, array('Email' => $email));
     }
+
+      
+    public function setByEmail($email, array $data) {
+        $tableColumns = $this->getTableColumns();
+        $validData = $this->filterValidFields($data, $tableColumns);
+        
+        return $this->recordExistsByEmail($email) 
+            ? $this->updateExistingRecord($email, $validData)
+            : $this->createNewRecord($email, $validData);
+    }
+
+
+
 
     protected function recordExistsByEmail($email) {
         $query = $this->pdo->prepare("SELECT Id FROM {$this->tableName} WHERE Email = :email");
@@ -110,38 +158,12 @@ abstract class BaseTable {
     protected function prepareUpdateParameters($email, array $params) {
         return array_merge(array('email' => $email), $params);
     }
+
+
     
-    protected function createNewRecord($email, array $validData) {
-        $recordData = $this->prepareInsertData($email, $validData);
-        $sql = $this->buildInsertQuery($recordData);
-        return $this->executeQuery($sql, $recordData);
-    }
+
     
-    protected function prepareInsertData($email, array $validData) {
-        return array_merge($validData, array('Email' => $email));
-    }
-    
-    protected function buildInsertQuery(array $data) {
-        $fields = array_keys($data);
-        $values = array();
-        $quotedFields = array();
-        
-        foreach ($fields as $field) {
-            $values[] = ":$field";
-            $quotedFields[] = "$field";
-        }
-        
-        return "INSERT INTO {$this->tableName} (" . 
-               implode(', ', $quotedFields) . 
-               ") VALUES (" . 
-               implode(', ', $values) . 
-               ")";
-    }
-    
-    protected function executeQuery($sql, array $params) {
-        $query = $this->pdo->prepare($sql);
-        return $query->execute($params);
-    }
+
         */
 }
 ?>

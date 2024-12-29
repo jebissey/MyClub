@@ -1,6 +1,14 @@
 <?php
 session_start();
-require_once 'data/SiteData.php';
+
+const ONE_DAY = 86400;
+if(isset($_COOKIE['token'])) {
+    $token = $_COOKIE['token'];
+} else {
+    $token = bin2hex(openssl_random_pseudo_bytes(32));
+}
+setcookie("token", $token, time() + (ONE_DAY * 365), "/");
+
 ?>
 
 <!doctype html>
@@ -10,8 +18,10 @@ require_once 'data/SiteData.php';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <?php
-$siteData = new SiteData();
-$title = $siteData->getByName('Title');
+
+require_once 'lib/Database/Tables/SiteData.php';
+
+$title = (new SiteData())->getByName('Title');
 echo '<title>' . $title['Value'] .'</title>';
 ?>
 
@@ -49,8 +59,10 @@ echo '<title>' . $title['Value'] .'</title>';
                 <div class="collapse navbar-collapse" id="navbarNav">
                     <ul class="navbar-nav">
 <?php
-$page = new Page();
-$pages = $page->getOrdered('Position');
+
+require_once 'lib/Database/Tables/Page.php';
+
+$pages = (new Page())->getOrdered('Position');
 foreach ($pages as $p)
 {
     print '<li class="nav-item">';

@@ -3,13 +3,15 @@
 require_once __DIR__ . '/../File.php';
 
 class Database {
-    const SQLITE_PATH = __DIR__ . '/../../../Data/';
+    const SQLITE_DEST_PATH = __DIR__ . '/../../../Data/';
     const SQLITE_FILE = 'MyClub.sqlite';
+    const SQLITE_LOG_FILE = 'LogMyClub.sqlite';
     const APPLICATION = 'MyClub';
     const VERSION = 1;      //Don't forget to update when database structure is modified
 
     private static $instance = null;
     private static $pdo = null;
+    private static $pdoForLog = null;
 
     public function __construct() {
         if(self::$pdo === null){
@@ -31,11 +33,25 @@ class Database {
         return self::$pdo;
     }
 
+    public function getPdoForLog() {
+        if(self::$pdoForLog === null){
+            die('Fatal program exception');
+        }
+        return self::$pdoForLog;
+    }
+
     private function check(){
         try {
-            $sqliteFile = self::SQLITE_PATH . self::SQLITE_FILE;
+            $sqliteLogFile = self::SQLITE_DEST_PATH . self::SQLITE_LOG_FILE;
+            if(!is_file($sqliteLogFile)) {
+                (new File())->copy(__DIR__ . '/' . self::SQLITE_LOG_FILE, self::SQLITE_DEST_PATH);
+            }
+            self::$pdoForLog = new PDO('sqlite:' . $sqliteLogFile);
+            self::$pdoForLog->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+            $sqliteFile = self::SQLITE_DEST_PATH . self::SQLITE_FILE;
             if(!is_file($sqliteFile)) {
-                (new File())->copy(self::SQLITE_FILE, $sqliteFile);
+                (new File())->copy(__DIR__ . '/' . self::SQLITE_FILE, self::SQLITE_DEST_PATH);
             }
             $pdo = new PDO('sqlite:' . $sqliteFile);
 

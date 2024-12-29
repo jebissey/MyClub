@@ -5,9 +5,8 @@ echo "<main>\n";
 
 $id=$_GET['n'];
 if($id != null) {
-  $stmt = $pdo->query('SELECT Content FROM Page WHERE Id = ' . $id .';');
-  $row = $stmt->fetch();
-  echo $row['Content'] ."\n";
+  $page = (new Page())->getById($id);
+  echo $page['Content'] ."\n";
 }
 
 echo "</main>\n";
