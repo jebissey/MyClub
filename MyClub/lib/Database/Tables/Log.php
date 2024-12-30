@@ -8,8 +8,7 @@ class Log{
         try {
             $this->pdo = Database::getInstance()->getPdoForLog();
         } catch (PDOException $e) {
-            error_log("Database connection failed: " . $e->getMessage());
-            throw new Exception("Failed to initialize logging system");
+            throw new Exception("Database connection failed: " . $e->getMessage());
         }
     }
 

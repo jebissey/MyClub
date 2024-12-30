@@ -9,6 +9,9 @@ if(isset($_COOKIE['token'])) {
 }
 setcookie("token", $token, time() + (ONE_DAY * 365), "/");
 
+require_once 'lib/Error/ErrorHandler.php';
+$errorHandler = new ErrorHandler(true);
+
 ?>
 
 <!doctype html>
