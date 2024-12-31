@@ -7,7 +7,7 @@ if(isset($_COOKIE['token'])) {
 } else {
     $token = bin2hex(openssl_random_pseudo_bytes(32));
 }
-setcookie("token", $token, time() + (ONE_DAY * 365), "/");
+setcookie("token", $token, time() + (ONE_DAY * 7 * 13), "/");
 
 require_once 'lib/Error/ErrorHandler.php';
 $errorHandler = new ErrorHandler(true);
@@ -15,7 +15,7 @@ $errorHandler = new ErrorHandler(true);
 ?>
 
 <!doctype html>
-<html lang="en">
+<html lang="fr">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -23,7 +23,6 @@ $errorHandler = new ErrorHandler(true);
 <?php
 
 require_once 'lib/Database/Tables/SiteData.php';
-
 $title = (new SiteData())->getByName('Title');
 echo '<title>' . $title['Value'] .'</title>';
 ?>
@@ -64,7 +63,6 @@ echo '<title>' . $title['Value'] .'</title>';
 <?php
 
 require_once 'lib/Database/Tables/Page.php';
-
 $pages = (new Page())->getOrdered('Position');
 foreach ($pages as $p)
 {
@@ -76,9 +74,9 @@ foreach ($pages as $p)
 ?>
                     </ul>
                     <div class="d-lg-flex col-lg-3 justify-content-lg-end">
-                        <a href="SignIn/Person.php">
+                        <a href="lib/SignIn/Form.php">
 <?php
-if($_SESSION['user']){
+if(isset($_SESSION['user'])){
     $user = $_SESSION['user'];
     $person = new Person();
     $personFound = $person->getByEmail($user['Email']);

@@ -1,5 +1,5 @@
 <?php
-include 'includes/header.php';
+require 'includes/header.php';
 echo "<main>\n";
 
 $id=$_GET['n'];
@@ -19,5 +19,5 @@ echo '<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>';
 echo '<script src="https://npmcdn.com/flatpickr/dist/l10n/fr.js"></script>';
 echo '<script src="js/reservation.js"></script>';
 
-include 'includes/footer.php';
+require 'includes/footer.php';
 ?>

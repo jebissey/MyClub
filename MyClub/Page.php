@@ -1,6 +1,6 @@
 <?php 
 $currentPage = basename($_SERVER['REQUEST_URI']);
-include 'includes/header.php';
+require 'includes/header.php';
 echo "<main>\n";
 
 $id=$_GET['n'];
@@ -10,5 +10,5 @@ if($id != null) {
 }
 
 echo "</main>\n";
-include 'includes/footer.php';
+require 'includes/footer.php';
 ?>

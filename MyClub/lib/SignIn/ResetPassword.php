@@ -26,7 +26,7 @@ if ($personFound) {
     <body>
         <div class="container mt-5">
             <h2>Réinitialisation du mot de passe</h2>
-            <form action="SignInProcessResetPassword.php" method="POST">
+            <form action="ProcessResetPassword.php" method="POST">
                 <input type="hidden" name="token" value="<?= htmlspecialchars($token) ?>">
                 <div class="mb-3">
                     <label for="password" class="form-label">Nouveau mot de passe</label>

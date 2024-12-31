@@ -17,11 +17,13 @@ document.addEventListener("DOMContentLoaded", function() {
 </html>
 
 <?php
-require_once 'lib/Client.php';
-require_once 'lib/Database/Tables/Log.php';
+require_once __DIR__ . '/../lib/Client.php';
+require_once __DIR__ . '/../lib/Database/Tables/Log.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = filter_var($_POST['email'], FILTER_VALIDATE_EMAIL);
+} else {
+    $email = '';
 }
 $client = new Client();
 (new Log())->set($client->getIp(), $client->getOs(), $client->getBrowser(), $client->getScreenResolution(), $client->getType(), $client->getUri(), $client->getToken(), $email);

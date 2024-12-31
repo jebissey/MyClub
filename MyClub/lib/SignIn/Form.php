@@ -9,7 +9,7 @@
 <body>
     <div class="container mt-5">
         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#loginModal">
-            <img src="../images/SignIn.png" alt="Sign In logo"/>'
+            <img src="../../images/SignIn.png" alt="Sign In logo"/>'
         </button>
 
         <!-- Modal Connection -->
@@ -20,7 +20,7 @@
                         <h5 class="modal-title" id="loginModalLabel">Connexion</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-                    <form id="loginForm" action="SignInCheck.php" method="POST" novalidate>
+                    <form id="loginForm" action="Check.php" method="POST" novalidate>
                         <div class="modal-body">
                             <div class="mb-3">
                                 <label for="email" class="form-label">Adresse email</label>
@@ -55,7 +55,7 @@
                         <h5 class="modal-title" id="forgotPasswordModalLabel">Réinitialisation du mot de passe</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-                    <form id="forgotPasswordForm" action="SignInForgotPassword.php" method="POST" novalidate>
+                    <form id="forgotPasswordForm" action="ForgotPassword.php" method="POST" novalidate>
                         <div class="modal-body">
                             <div class="mb-3">
                                 <label for="forgotEmail" class="form-label">Adresse email</label>

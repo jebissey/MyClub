@@ -21,9 +21,6 @@ class ErrorHandler {
             touch($logFile);
             chmod($logFile, 0664); 
         }
-
-        echo '<h3>' . $this->logFile . '</h3>';
-        
         set_error_handler([$this, 'handleError']);
         set_exception_handler([$this, 'handleException']);
         register_shutdown_function([$this, 'handleFatalError']);

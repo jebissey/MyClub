@@ -6,6 +6,6 @@ if($_SESSION['user']){
 
 
 } else {
-    include('SignIn/SignInForm.php');
+    require('SignIn/Form.php');
 }
 ?>

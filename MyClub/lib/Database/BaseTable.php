@@ -42,12 +42,19 @@ abstract class BaseTable {
     }
 
     public function set(array $data) {
-        $tableColumns = $this->getTableColumns();
-        $validData = $this->filterValidFields($data, $tableColumns);
+        $validData = $this->filterValidFields($data, $this->getTableColumns());
         return $this->createNewRecord($validData);
     }
 
+    public function setById($id, array $data) {
+        $validData = $this->filterValidFields($data, $this->getTableColumns());
+        return $this->updateExistingRecordById($id, $validData);
+    }
 
+    public function getMax($field){
+        $query = $this->pdo->prepare("SELECT MAX(:field) as max FROM {$this->tableName}");
+        return $query->execute(array('field' => $field));
+    }
 
     protected function buildInsertQuery(array $data) {
         $fields = array_keys($data);
@@ -92,7 +99,41 @@ abstract class BaseTable {
         return $columnNames;
     }
 
-/*
+    protected function updateExistingRecordById($id, array $validData) {
+        $updateData = $this->prepareUpdateData($validData);
+        
+        if (empty($updateData['fields'])) {
+            return true;
+        }
+        
+        $sql = "UPDATE {$this->tableName} SET " . implode(', ', $updateData['fields']) . " WHERE Id = :id";
+        $params = array_merge(array('id' => $id), $updateData['params']);
+        return $this->executeQuery($sql, $params);
+    }
+    
+    protected function prepareUpdateData(array $validData) {
+        $fields = array();
+        $params = array();
+        
+        foreach ($validData as $field => $value) {
+            if ($this->isUpdatableField($field)) {
+                $fields[] = "$field = :$field";
+                $params[$field] = $value;
+            }
+        }
+        return array(
+            'fields' => $fields, 
+            'params' => $params
+        );
+    }
+
+    protected function isUpdatableField($field) {
+        $protectedFields = array('Id');
+        return !in_array($field, $protectedFields);
+    }
+
+
+    /*
     protected function prepareInsertData($email, array $validData) {
         return array_merge($validData, array('Email' => $email));
     }
@@ -116,48 +157,14 @@ abstract class BaseTable {
         return (bool) $query->fetch(PDO::FETCH_ASSOC);
     }
     
-    protected function updateExistingRecord($email, array $validData) {
-        $updateData = $this->prepareUpdateData($validData);
-        
-        if (empty($updateData['fields'])) {
-            return true;
-        }
-        
-        $sql = $this->buildUpdateQuery($updateData['fields']);
-        $params = $this->prepareUpdateParameters($email, $updateData['params']);
-        
-        return $this->executeQuery($sql, $params);
-    }
+
+
     
-    protected function prepareUpdateData(array $validData) {
-        $fields = array();
-        $params = array();
-        
-        foreach ($validData as $field => $value) {
-            if ($this->isUpdatableField($field)) {
-                $fields[] = "$field = :$field";
-                $params[$field] = $value;
-            }
-        }
-        
-        return array(
-            'fields' => $fields, 
-            'params' => $params
-        );
-    }
+
     
-    protected function isUpdatableField($field) {
-        $protectedFields = array('Id');
-        return !in_array($field, $protectedFields);
-    }
+
     
-    protected function buildUpdateQuery(array $fields) {
-        return "UPDATE {$this->tableName} SET " . implode(', ', $fields) . " WHERE Email = :email";
-    }
-    
-    protected function prepareUpdateParameters($email, array $params) {
-        return array_merge(array('email' => $email), $params);
-    }
+
 
 
     
