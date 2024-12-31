@@ -61,7 +61,7 @@ class VisitorGraph{
         $bar->SetWidth(0.7);
         
         $graph->Add($bar);
-        $graph->Stroke("OS_GRAPH");
+        $graph->Stroke(OS_GRAPH);
     }
 }
 ?>
