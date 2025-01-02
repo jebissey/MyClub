@@ -1,25 +1,19 @@
 <?php
+require_once __DIR__ . '/../../includes/Globals.php';
 
 class ErrorHandler {
-    private $developmentMode;
-    private $logFile;
+    private $developmentMode = true;
+    private $logFile = ERROR_FILE;
+
     
-    public function __construct($developmentMode = false, $logFile = null) {
-        $this->developmentMode = $developmentMode;
-        
-        if ($logFile === null) {
-            $this->logFile = dirname(__DIR__) . '/../logs/errors.log';
-        } else {
-            $this->logFile = $logFile;
-        }
-        
+    public function __construct() {
         $logDir = dirname($this->logFile);
         if (!is_dir($logDir)) {
             mkdir($logDir, 0755, true);
         }
-        if (!file_exists($logFile)) {
-            touch($logFile);
-            chmod($logFile, 0664); 
+        if (!file_exists($this->logFile)) {
+            touch($this->logFile);
+            chmod($this->logFile, 0664); 
         }
         set_error_handler([$this, 'handleError']);
         set_exception_handler([$this, 'handleException']);
@@ -70,10 +64,10 @@ class ErrorHandler {
         }
         
         echo "\n\n<div style='background-color: #fff; color: #333; padding: 20px; margin: 20px; border: 2px solid #f00; border-radius: 5px;'>";
-        echo "<h1 style='color: #f00;'>Une erreur est survenue</h1>";
+        echo "<h1 style='color: #f00;'>An error has occurred</h1>";
         echo "<p><strong>Message:</strong> " . htmlspecialchars($exception->getMessage()) . "</p>";
-        echo "<p><strong>Fichier:</strong> " . htmlspecialchars($exception->getFile()) . "</p>";
-        echo "<p><strong>Ligne:</strong> " . $exception->getLine() . "</p>";
+        echo "<p><strong>File:</strong> " . htmlspecialchars($exception->getFile()) . "</p>";
+        echo "<p><strong>Line:</strong> " . $exception->getLine() . "</p>";
         echo "<p><strong>Log file:</strong> " . htmlspecialchars($this->logFile) . "</p>";
         echo "<h2>Trace:</h2>";
         echo "<pre style='background: #f5f5f5; padding: 10px; overflow: auto;'>" . 
@@ -84,6 +78,7 @@ class ErrorHandler {
             echo "<pre style='background: #f5f5f5; padding: 10px; overflow: auto;'>" . 
                  htmlspecialchars(print_r($exception->getContext(), true)) . "</pre>";
         }
+        echo 'Consider du create an <a href ="https://github.com/jebissey/MyClub/issues">insue</a>';
         echo "</div>";
     }
     

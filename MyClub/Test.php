@@ -2,7 +2,7 @@
 
 require_once 'lib/Error/CustomException.php';
 require_once 'lib/Error/ErrorHandler.php';
-$errorHandler = new ErrorHandler(true);
+$errorHandler = new ErrorHandler();
 
 require_once __DIR__ . '/lib/Backup.php';
 $backup = new Backup();
@@ -14,6 +14,10 @@ if ($backup->save()) {
     throw new CustomException("Backup failed");
 }
 
-throw new CustomException("Test", ['user_id' => 123, 'toto_id' => 321]);
 
+require_once 'lib/Error/ErrorLogViewer.php';
+$viewer = new ErrorLogViewer();
+$viewer->render();
+
+//throw new CustomException("Test error", ['user_id' => 123, 'toto_id' => 321]);
 ?>

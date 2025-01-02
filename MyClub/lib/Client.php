@@ -72,6 +72,9 @@ class Client{
         if(isset($_COOKIE['screen_resolution'])) {
             $resolution = $_COOKIE['screen_resolution'];
         }
+        else {
+            $resolution = '';
+        }
         return $resolution;
     }
 

@@ -10,7 +10,7 @@ if(isset($_COOKIE['token'])) {
 setcookie("token", $token, time() + (ONE_DAY * 7 * 13), "/");
 
 require_once 'lib/Error/ErrorHandler.php';
-$errorHandler = new ErrorHandler(true);
+$errorHandler = new ErrorHandler();
 
 ?>
 
