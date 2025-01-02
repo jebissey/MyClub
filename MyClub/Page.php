@@ -3,8 +3,11 @@ $currentPage = basename($_SERVER['REQUEST_URI']);
 require 'includes/header.php';
 echo "<main>\n";
 
-if (isset($_POST['n'])){
-  $id=$_GET['n'];
+if (isset($_GET['n'])) {
+  $id = trim($_GET['n']);
+  if (!is_numeric($id)) {
+    $id=1;
+  }
 } else {
   $id = 1;
 }
