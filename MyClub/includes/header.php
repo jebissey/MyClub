@@ -1,17 +1,5 @@
 <?php
-session_start();
-
-const ONE_DAY = 86400;
-if(isset($_COOKIE['token'])) {
-    $token = $_COOKIE['token'];
-} else {
-    $token = bin2hex(openssl_random_pseudo_bytes(32));
-}
-setcookie("token", $token, time() + (ONE_DAY * 7 * 13), "/");
-
-require_once 'lib/Error/ErrorHandler.php';
-$errorHandler = new ErrorHandler();
-
+require_once 'beforeFooter.php';
 ?>
 
 <!doctype html>
@@ -76,6 +64,9 @@ foreach ($pages as $p)
                     <div class="d-lg-flex col-lg-3 justify-content-lg-end">
                         <a href="lib/SignIn/Form.php">
 <?php
+
+//echo '<p>' . var_dump($_SESSION) . '</p>';
+
 if(isset($_SESSION['user'])){
     $user = $_SESSION['user'];
     $person = new Person();

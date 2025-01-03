@@ -15,8 +15,7 @@ document.addEventListener("DOMContentLoaded", function() {
     var height = screen.height;
     document.cookie = "screen_resolution=" + width + "x" + height;
 });
-</script>
-
+    </script>
 </body>
 </html>
 
