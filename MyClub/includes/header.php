@@ -1,5 +1,5 @@
 <?php
-require_once 'beforeFooter.php';
+require_once 'beforeHeader.php';
 ?>
 
 <!doctype html>

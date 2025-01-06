@@ -1,6 +1,8 @@
 <?php
-require_once '../../includes/beforeFooter.php';
-$currentUrl = $_SERVER['REQUEST_URI'];
+require_once '../../includes/beforeHeader.php';
+if (preg_match('/[?&]l=([^&]+)/', $_SERVER['REQUEST_URI'], $matches)) {
+    $currentPage = $matches[1];
+} else $currentPage = '';
 ?>
 
 <!DOCTYPE html>
@@ -20,13 +22,13 @@ $currentUrl = $_SERVER['REQUEST_URI'];
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav">
                 <li class="nav-item">
-                    <a class="nav-link" href="Logs.php?l=V"><h5>Visitors</h5></a>';
+                    <a class="nav-link <?php echo ($currentPage == 'V') ? 'active' : ''; ?>" href="Logs.php?l=V"><h5>Visitors</h5></a>';
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="Logs.php?l=E"><h5>Errors</h5></a>';
+                    <a class="nav-link <?php echo ($currentPage == 'E') ? 'active' : ''; ?>" href="Logs.php?l=E"><h5>Errors</h5></a>';
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="Logs.php?l=D"><h5>Debug</h5></a>';
+                    <a class="nav-link <?php echo ($currentPage == 'D') ? 'active' : ''; ?>" href="Logs.php?l=D"><h5>Debug</h5></a>';
                 </li>
             </ul>
         </div>
@@ -34,22 +36,27 @@ $currentUrl = $_SERVER['REQUEST_URI'];
 </nav>
 
 <?php
-if(isset($_GET['l'])){
-    $logToDisplay = $_GET['l'];
-} else {
-    $logToDisplay = '';
-}
+$logToDisplay = $_GET['l'] ?? '';
+
 echo '<div class="container mt-4">';
 if($logToDisplay == 'E'){
-    require_once '../Error/ErrorLogViewer.php';
-    $viewer = new ErrorLogViewer($_GET['page'] ?? 1);
-    echo $viewer->render('&l=E');
+    require_once '../Error/ErrorDisplay.php';
+    $viewer = new ErrorDisplay($_GET['page'] ?? 1);
+    echo $viewer->render([], []);
 }
 if($logToDisplay == 'V'){
-    require_once '../Visitor/LogDisplay.php';
+    require_once 'Visitor/LogDisplay.php';
+    $filters = [
+        'os' => 'Filter OS',
+        'browser' => 'Filter Browser',
+        'type' => 'Filter Client Type',
+        'uri' => 'Filter URI',
+        'email' => 'Filter Email'
+    ];
+    $additionalGets = ['l' => 'V'];
     $viewer = new LogDisplay($_GET['page'] ?? 1);
-    echo $viewer->render('&l=V');
+    echo $viewer->render($filters, $additionalGets);
 }
 echo '</div>';
-require_once '../../includes/beforeFooter.php';
+require_once __DIR__ . '/../../includes/footer.php';
 ?>
