@@ -10,9 +10,10 @@ require_once 'beforeHeader.php';
 
 <?php
 
-require_once 'lib/Database/Tables/SiteData.php';
+require_once __DIR__ .  '/../lib/Database/Tables/SiteData.php';
 $title = (new SiteData())->getByName('Title');
 echo '<title>' . $title['Value'] .'</title>';
+$currentPage = basename($_SERVER['REQUEST_URI']);
 ?>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
@@ -50,7 +51,7 @@ echo '<title>' . $title['Value'] .'</title>';
                     <ul class="navbar-nav">
 <?php
 
-require_once 'lib/Database/Tables/Page.php';
+require_once __DIR__. '/../lib/Database/Tables/Page.php';
 $pages = (new Page())->getOrdered('Position');
 foreach ($pages as $p)
 {
@@ -62,7 +63,7 @@ foreach ($pages as $p)
 ?>
                     </ul>
                     <div class="d-lg-flex col-lg-3 justify-content-lg-end">
-                        <a href="lib/SignIn/Form.php">
+                        <a href="Person.php">
 <?php
 
 //echo '<p>' . var_dump($_SESSION) . '</p>';

@@ -1,61 +1,43 @@
 
 <?php
-/*
-require_once 'lib/Error/CustomException.php';
-require_once 'lib/Error/ErrorHandler.php';
-$errorHandler = new ErrorHandler();
 
-require_once __DIR__ . '/lib/Backup.php';
-$backup = new Backup();
+class PasswordManager {
+    private const HASH_ALGORITHM = PASSWORD_DEFAULT;
+    private const HASH_OPTIONS = ['cost' => 12 ];
 
-if ($backup->save()) {
-    echo "Backup created successfully -> ";
-    echo $backup->getLastBackupFolder();
-} else {
-    throw new CustomException("Backup failed");
+    public static function hashPassword(string $password): string {
+        return password_hash(
+            $password,
+            self::HASH_ALGORITHM,
+            self::HASH_OPTIONS
+        );
+    }
+
+    public static function verifyPassword(string $password, string $hashedPassword): bool {
+        return password_verify($password, $hashedPassword);
+    }
 }
 
+// Exemple d'utilisation :
 
-require_once 'lib/Error/ErrorLogViewer.php';
-$viewer = new ErrorLogViewer();
-echo $viewer->render();
+// 1. Lors de l'enregistrement du mot de passe
+$password = "admin_";
+$hashedPassword = PasswordManager::hashPassword($password);
+// Stocker $hashedPassword dans la base de données
+echo "<p>password = $password</p>";
+echo "<p>hashedPassword = $hashedPassword</p>";
 
-//require_once 'lib/Visitor/Filter.php';
-*/
+// 2. Lors de la vérification du mot de passe
+$userInputPassword = "admin_";
+$storedHash = $hashedPassword; // Récupéré depuis la base de données
+$isValid = PasswordManager::verifyPassword($userInputPassword, $storedHash);
+
+if ($isValid) {
+    echo "Mot de passe correct !";
+} else {
+    echo "Mot de passe incorrect !";
+}
 ?>
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Error Log Viewer</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body>
-    <nav class="navbar navbar-dark bg-dark">
-        <div class="container">
-            <span class="navbar-brand mb-0 h1">System Logs</span>
-        </div>
-    </nav>
 
-    <div class="container mt-4">
-        <?php
-        require_once 'lib/Error/ErrorLogViewer.php';
-        $viewer = new ErrorLogViewer($_GET['page'] ?? 1);
-        echo $viewer->render();
-        ?>
-    </div>
-
-    <div class="container mt-4">
-        <?php
-        require_once 'lib/Visitor/LogDisplay.php';
-        $viewer = new LogDisplay($_GET['page'] ?? 1);
-        echo $viewer->render();
-        ?>
-    </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
 

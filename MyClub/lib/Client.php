@@ -94,10 +94,7 @@ class Client{
     }
 
     function getToken(){
-        if(isset($_COOKIE['token'])) {
-            $token = $_COOKIE['token'];
-        }
-        return $token;
+        return $_SESSION['token'] ?? '';
     }
 }
 

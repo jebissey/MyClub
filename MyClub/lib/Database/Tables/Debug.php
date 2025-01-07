@@ -16,8 +16,7 @@ class Debug{
 
     public function set($message) {
         try {
-            $params = array(
-                'message' => $message);
+            $params = array('message' => $message);
             $query = $this->pdo->prepare("INSERT INTO Debug(Message) VALUES(:message)");
             $query->execute($params);
         } catch (PDOException $e) {
@@ -32,9 +31,9 @@ class Debug{
         $query->execute();
         $total = $query->fetch(PDO::FETCH_ASSOC)['total'];
         
-        $query = $this->pdo->prepare("SELECT Message, CreatedAt as Timestamp 
+        $query = $this->pdo->prepare("SELECT Message, Timestamp 
                  FROM Debug
-                 ORDER BY CreatedAt DESC 
+                 ORDER BY Timestamp 
                  LIMIT ? OFFSET ?");
         $params[] = $take;
         $params[] = $skip;
@@ -46,6 +45,15 @@ class Debug{
         ];
     }
 
+    public function del() {
+        try {
+            $query = $this->pdo->prepare("DELETE FROM Debug");
+            $query->execute();
+        } catch (PDOException $e) {
+            die("Database error while debuging: " . $e->getMessage());
+            return false;
+        }
+    }
 }
 
 ?>

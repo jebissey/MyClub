@@ -1,5 +1,4 @@
 <?php 
-$currentPage = basename($_SERVER['REQUEST_URI']);
 require 'includes/header.php';
 echo "<main>\n";
 

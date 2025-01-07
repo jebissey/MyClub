@@ -4,7 +4,7 @@ require_once 'Globals.php';
     
     <footer "class="bg-dark text-white py-4 mt-auto">
         <div class="container">
-            <p class="mb-0"><?php echo VERSION; ?> &#169; JEB</p>
+            <p class="mb-0"><?php echo VERSION; ?> &#169; JEB <a href="<?php echo "/b.nw/includes/LegalNotices.php" ?>">Mentions légales</a></p>
         </div>
     </footer>
 

@@ -1,5 +1,6 @@
 <?php
 require_once '../../includes/beforeHeader.php';
+
 if (preg_match('/[?&]l=([^&]+)/', $_SERVER['REQUEST_URI'], $matches)) {
     $currentPage = $matches[1];
 } else $currentPage = '';
@@ -56,6 +57,11 @@ if($logToDisplay == 'V'){
     $additionalGets = ['l' => 'V'];
     $viewer = new LogDisplay($_GET['page'] ?? 1);
     echo $viewer->render($filters, $additionalGets);
+}
+if($logToDisplay == 'D'){
+    require_once 'DebugDisplay.php';
+    $viewer = new DebugDisplay($_GET['page'] ?? 1);
+    echo $viewer->render([], []);
 }
 echo '</div>';
 require_once __DIR__ . '/../../includes/footer.php';
