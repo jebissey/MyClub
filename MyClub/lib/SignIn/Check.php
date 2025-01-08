@@ -1,19 +1,17 @@
 <?php
 require_once __DIR__ . '/../../includes/header.php';
 
+require_once  __DIR__ . '/../Database/Tables/Debug.php';
+(new Debug())->set("check password");
+
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $email = filter_var($_POST['email'], FILTER_VALIDATE_EMAIL) ?? '';
     $password = $_POST['password'] ?? '';
 
-    require_once  __DIR__ . '/../Database/Tables/Person.php';
-    $personFound = (new Person())->getByEmail($email);
     if($personFound){
         require_once __DIR__ . '/../PasswordManager.php';
         if(PasswordManager::verifyPassword($password, $personFound['Password'])){
-            
-            require_once  __DIR__ . '/../Database/Tables/Debug.php';
-            (new Debug())->set("person password OK");
-
             $_SESSION['user'] = $personFound['Email'];
             header('Location:../../Person.php?p=' . $personFound['Id']);
             exit();

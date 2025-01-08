@@ -63,7 +63,7 @@ foreach ($pages as $p)
 ?>
                     </ul>
                     <div class="d-lg-flex col-lg-3 justify-content-lg-end">
-                        <a href="Person.php">
+                        <a href="Person.php?si=1">
 <?php
 
 if(isset($_SESSION['user'])){

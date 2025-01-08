@@ -52,7 +52,7 @@ class ErrorDisplay extends PagedDataDisplay {
             </button>
         </form></div>';
 
-        $headers = ['Date Time', 'File', 'Line', 'Stack'];
+        $headers = ['Date Time', 'Message', 'File', 'Line', 'Stack'];
         $table = '<div class="table-responsive"><table class="table table-striped table-bordered"><thead><tr>';
         foreach ($headers as $header) {
             $table .= '<th>' . $header . '</th>';
