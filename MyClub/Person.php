@@ -11,6 +11,7 @@ if($user != ''){
 
 } else {
    // require_once  __DIR__ . '/lib/SignIn/Form.php';
+   $personId=$_GET['p'] ?? 0;
 
 ?>
     <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">

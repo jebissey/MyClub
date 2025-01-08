@@ -1,42 +1,24 @@
 <?php
 require_once __DIR__ . '/../../includes/header.php';
 
-require_once  __DIR__ . '/../Database/Tables/Debug.php';
-
-
-
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $email = filter_var($_POST['email'], FILTER_VALIDATE_EMAIL) ?? '';
     $password = $_POST['password'] ?? '';
 
-(new Debug())->set("email=$email");
-(new Debug())->set("password=$password");
-
-
     require_once  __DIR__ . '/../Database/Tables/Person.php';
     $personFound = (new Person())->getByEmail($email);
     if($personFound){
-
-(new Debug())->set("personFound['Email']=" . $personFound['Email']);
-(new Debug())->set("personFound['Password']=" . $personFound['Password']);
-
-require_once __DIR__ . '/Lib/PasswordManager.php';
-$userInputPassword = $password;
-$storedHash = $hashedPassword; // Récupéré depuis la base de données
-$isValid = PasswordManager::verifyPassword($userInputPassword, $storedHash);
-
-        if(password_verify($password, $personFound['Password'])){
+        require_once __DIR__ . '/../PasswordManager.php';
+        if(PasswordManager::verifyPassword($password, $personFound['Password'])){
             
-(new Debug())->set("personFound OK");
+            require_once  __DIR__ . '/../Database/Tables/Debug.php';
+            (new Debug())->set("person password OK");
 
             $_SESSION['user'] = $personFound['Email'];
-            header('Location:../Person.php');
+            header('Location:../../Person.php?p=' . $personFound['Id']);
             exit();
         }
     } else {
-
-(new Debug())->set("person not found");
-
 ?>
 <div class="modal fade" id="popUpModal" data-bs-backdrop="static" tabindex="-1" aria-labelledby="popUpModalLabel" aria-hidden="true">
     <div class="modal-dialog">

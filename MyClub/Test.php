@@ -1,36 +1,25 @@
 
 <?php
 
-class PasswordManager {
-    private const HASH_ALGORITHM = PASSWORD_DEFAULT;
-    private const HASH_OPTIONS = ['cost' => 12 ];
-
-    public static function hashPassword(string $password): string {
-        return password_hash(
-            $password,
-            self::HASH_ALGORITHM,
-            self::HASH_OPTIONS
-        );
-    }
-
-    public static function verifyPassword(string $password, string $hashedPassword): bool {
-        return password_verify($password, $hashedPassword);
-    }
+require_once __DIR__ . '/lib/Backup.php';
+$backup = new Backup();
+if ($backup->save()) {
+    echo "Backup created successfully -> ";
+    echo $backup->getLastBackupFolder();
+} else {
+    echo "Backup failed";
 }
 
-// Exemple d'utilisation :
 
-// 1. Lors de l'enregistrement du mot de passe
+
+require_once __DIR__ . '/lib/PasswordManager.php';
 $password = "admin_";
-$hashedPassword = PasswordManager::hashPassword($password);
-// Stocker $hashedPassword dans la base de données
+$signedPassword = PasswordManager::signPassword($password);
 echo "<p>password = $password</p>";
-echo "<p>hashedPassword = $hashedPassword</p>";
+echo "<p>signedPassword = $signedPassword</p>";
 
-// 2. Lors de la vérification du mot de passe
 $userInputPassword = "admin_";
-$storedHash = $hashedPassword; // Récupéré depuis la base de données
-$isValid = PasswordManager::verifyPassword($userInputPassword, $storedHash);
+$isValid = PasswordManager::verifyPassword($userInputPassword, $signedPassword);
 
 if ($isValid) {
     echo "Mot de passe correct !";

@@ -23,7 +23,7 @@ document.addEventListener("DOMContentLoaded", function() {
 require_once __DIR__ . '/../lib/Client.php';
 require_once __DIR__ . '/../lib/Database/Tables/Log.php';
 
-$email = ($_SERVER['REQUEST_METHOD'] === 'POST')? (filter_var($_POST['email'] ?? '', FILTER_VALIDATE_EMAIL)) : '';
+$email = filter_var($_SESSION['user'] ?? '', FILTER_VALIDATE_EMAIL);
 $client = new Client();
 (new Log())->set($client->getIp(), $client->getOs(), $client->getBrowser(), $client->getScreenResolution(), $client->getType(), $client->getUri(), $client->getToken(), $email);
 ?>

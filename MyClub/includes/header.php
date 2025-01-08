@@ -66,23 +66,25 @@ foreach ($pages as $p)
                         <a href="Person.php">
 <?php
 
-//echo '<p>' . var_dump($_SESSION) . '</p>';
-
 if(isset($_SESSION['user'])){
-    $user = $_SESSION['user'];
+    $userEmail = $_SESSION['user'];
+    require_once __DIR__. '/../lib/Database/Tables/Person.php';
     $person = new Person();
-    $personFound = $person->getByEmail($user['Email']);
-    if($personFound['Avatar'] == null){
-        $avatar = 'images/emojiPensif.png';
+    $personFound = $person->getByEmail($userEmail);
+    if(empty($personFound['Avatar'])){
+        $avatar = '../images/emojiPensif.png';
     } else {
         $avatar = $personFound['Avatar'];
     }
     echo '<img src="images/'. $avatar . '" alt="User avatar"/>';
+    $signOut = '<a href ="lib/SignIn/SignOut.php"><img src="images/SignOut.png" alt="Sign out"/></a>';
 } else {
     echo '<img src="images/anonymat.png" alt="User avatar"/>';
+    $signOut = '';
 }
 ?>
                         </a>
+<?php echo $signOut;?>
                     </div>
                 </div>
             </div>

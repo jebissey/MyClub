@@ -1,18 +1,14 @@
 <?php
 
 class PasswordManager {
-    private const HASH_ALGORITHM = PASSWORD_DEFAULT;
-    private const HASH_OPTIONS = ['cost' => 12 ];
+    private const SECRET_KEY = "MyClubSecretKeyForPasswordSignature";
+    private const ALGO = 'sha256';
 
-    public static function hashPassword(string $password): string {
-        return password_hash(
-            $password,
-            self::HASH_ALGORITHM,
-            self::HASH_OPTIONS
-        );
+    public static function signPassword(string $password): string {
+        return hash_hmac(self::ALGO, $password, self::SECRET_KEY);
     }
 
-    public static function verifyPassword(string $password, string $hashedPassword): bool {
-        return password_verify($password, $hashedPassword);
+    public static function verifyPassword(string $password, string $signedPassword): bool {
+        return hash_hmac(self::ALGO, $password, self::SECRET_KEY) == $signedPassword;
     }
 }
