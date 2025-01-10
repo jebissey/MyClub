@@ -18,7 +18,8 @@ if($userEmail != ''){
         exit();
     }
 
-    $emojiFiles = glob("images/emoji*");
+    $emojiPath = 'images/';
+    $emojiFiles = glob($emojiPath . "emoji*");
     $emojis = array_map(function($path) {return basename($path);}, $emojiFiles);
 
     $currentAvailability = [];
@@ -63,59 +64,22 @@ if($userEmail != ''){
     $userData = $person->getById($id);
 ?>
     <style>
-        .custom-select-wrapper {
-            position: relative;
-        }
-        .custom-select-trigger {
-            padding: 8px 12px;
-            border: 1px solid #ced4da;
-            border-radius: 4px;
-            background: white;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            height: 60px;
-        }
-        .custom-select-trigger img {
-            width: 48px;
-            height: 48px;
-            margin-right: 10px;
-        }
-        .custom-options {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            right: 0;
-            background: white;
-            border: 1px solid #ced4da;
-            border-radius: 4px;
+        .dropdown-menu {
             max-height: 300px;
             overflow-y: auto;
-            z-index: 1000;
-            display: none;
+            width: 250px;
         }
-        .custom-option {
-            padding: 8px 12px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            height: 64px;
-        }
-        .custom-option:hover {
-            background-color: #f8f9fa;
-        }
-        .custom-option img {
-            width: 48px;
-            height: 48px;
+        .dropdown-item img {
+            width: 30px;
+            height: 30px;
             margin-right: 10px;
         }
-        .custom-option.selected {
-            background-color: #e9ecef;
+        .dropdown-item {
+            display: flex;
+            align-items: center;
         }
-        input[readonly] {
-            background-color: #e9ecef !important;
-            opacity: 1;
-            cursor: not-allowed;
+        .dropdown-toggle::after {
+            display: none;
         }
     </style>
     <div class="accordion" id="accordionPerson">
@@ -172,20 +136,17 @@ if($userEmail != ''){
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label">Avatar</label>
-                            <input type="hidden" name="avatar" id="avatar" value="<?php echo htmlspecialchars($userData['Avatar'] ?? ''); ?>">
-                            <div class="custom-select-wrapper">
-                                <div class="custom-select-trigger" id="avatarTrigger">
-                                    <img src="images/<?php echo htmlspecialchars($userData['Avatar'] ?? ''); ?>" alt="Selected emoji">
-                                </div>
-                                <div class="custom-options">
-                                    <?php foreach ($emojis as $emoji): ?>
-                                        <div class="custom-option <?php echo $userData['Avatar'] === $emoji ? 'selected' : ''; ?>" 
-                                            data-value="<?php echo htmlspecialchars($emoji); ?>">
-                                            <img src="images/<?php echo htmlspecialchars($emoji); ?>" alt="emoji">
-                                        </div>
-                                    <?php endforeach; ?>
-                                </div>
+                            <div class="dropdown">
+                                <button class="btn btn-outline-primary dropdown-toggle" type="button" id="emojiSelect" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Sélectionnez un Emoji
+                                </button>
+                                <ul class="dropdown-menu" id="emojiList">
+                                    <?php 
+                                    foreach ($emojis as $emoji): 
+                                        echo '<li><a class="dropdown-item" href="#" data-img="'.$emojiPath.$emoji.'"><img src="'.$emojiPath.$emoji.'" alt="emoji"> '.$emoji.'</a></li>';
+                                    endforeach; 
+                                    ?>
+                                </ul>
                             </div>
                         </div>
 
@@ -273,7 +234,16 @@ if($userEmail != ''){
         </div>
     </div>
 
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
+$('#emojiList').on('click', '.dropdown-item', function(e) {
+    e.preventDefault();
+    var imageUrl = $(this).data('img');
+    $('#userAvatar').attr('src', imageUrl);
+});
+
+
+
     document.addEventListener('DOMContentLoaded', function() {
 
         const wrapper = document.querySelector('.custom-select-wrapper');
@@ -304,6 +274,8 @@ if($userEmail != ''){
         });
     });
 
+
+    // submits {
     const profilForm = document.querySelector('form[data-form="profil"]');
     if (profilForm) {
         profilForm.addEventListener('submit', function(e) {
@@ -311,7 +283,6 @@ if($userEmail != ''){
             this.submit();
         });
     }
-
 
     const availabilityForm = document.querySelector('form[data-form="availability"]');
     if (availabilityForm) {
@@ -340,7 +311,6 @@ if($userEmail != ''){
         });
     }
 
-
     const preferenceForm = document.querySelector('form[data-form="preference"]');
     if (preferenceForm) {
         preferenceForm.addEventListener('submit', function(e) {
@@ -363,7 +333,7 @@ if($userEmail != ''){
             this.submit();
         });
     }
-});
+    // } (submits)
     </script>
 <?php
 } else {

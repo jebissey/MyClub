@@ -1,7 +1,8 @@
 <?php
 require_once 'beforeHeader.php';
-require_once __DIR__ .  '/../lib/Database/Tables/SiteData.php';
 require_once __DIR__ . '/../lib/Database/Tables/Page.php';
+require_once __DIR__ . '/../lib/Database/Tables/Person.php';
+require_once __DIR__ . '/../lib/Database/Tables/SiteData.php';
 ?>
 
 <!doctype html>
@@ -39,10 +40,10 @@ $currentPage = basename($_SERVER['REQUEST_URI']);
   </head>
   <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-dark bg-dark mb-4>
+        <nav class="navbar navbar-expand-sm navbar-dark bg-dark mb-4">
             <div class="container-fluid">
                 <a href="Page.php?n=1">
-                    <img src="images/agenda.png" alt="Site logo"/>
+                    <img src="images/agenda.png" alt="Site logo">
                 </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                     <span class="navbar-toggler-icon"></span>
@@ -63,27 +64,26 @@ foreach ($pages as $p)
                     </ul>
                     <div class="d-lg-flex col-lg-3 justify-content-lg-end">
                         <a href="Person.php?si=1">
-<?php
+    <?php
 
-if(isset($_SESSION['user'])){
-    $userEmail = $_SESSION['user'];
-    require_once __DIR__. '/../lib/Database/Tables/Person.php';
-    $person = new Person();
-    $personFound = $person->getByEmail($userEmail);
-    if(empty($personFound['Avatar'])){
-        $avatar = '../images/emojiPensif.png';
+    if(isset($_SESSION['user'])){
+        $userEmail = $_SESSION['user'];
+        $person = new Person();
+        $personFound = $person->getByEmail($userEmail);
+        if(empty($personFound['Avatar'])){
+            $avatar = '../images/emojiPensif.png';
+        } else {
+            $avatar = $personFound['Avatar'];
+        }
+        echo '<img id="userAvatar" src="images/'. $avatar . '" alt="User avatar"/>';
+        $signOut = '<a href ="lib/SignIn/SignOut.php"><img src="images/SignOut.png" alt="Sign out"></a>';
     } else {
-        $avatar = $personFound['Avatar'];
+        echo '<img src="images/anonymat.png" alt="User avatar">';
+        $signOut = '';
     }
-    echo '<img src="images/'. $avatar . '" alt="User avatar"/>';
-    $signOut = '<a href ="lib/SignIn/SignOut.php"><img src="images/SignOut.png" alt="Sign out"/></a>';
-} else {
-    echo '<img src="images/anonymat.png" alt="User avatar"/>';
-    $signOut = '';
-}
-?>
+    ?>
                         </a>
-<?php echo $signOut;?>
+    <?php echo $signOut;?>
                     </div>
                 </div>
             </div>
