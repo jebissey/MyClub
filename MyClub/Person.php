@@ -31,36 +31,6 @@ if($userEmail != ''){
     }
     
 
-    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        $id = $_POST['id'];
-        $update = $_POST['u'];
-        if($update =='profil'){
-            $email = $_POST['email'];
-            $password = $_POST['password'];
-            $firstName = $_POST['firstName'];
-            $lastName = $_POST['lastName'];
-            $nickName = $_POST['nickName'];
-            $avatar = $_POST['avatar'];
-        
-            $updateData = [
-                'Email' => $email,
-                'FirstName' => $firstName,
-                'LastName' => $lastName,
-                'NickName' => $nickName,
-                'Avatar' => $avatar,
-            ];
-            if (!empty($password)) {
-                $updateData['Password'] = PasswordManager::signPassword($password);
-            }
-        } elseif($update =='availability'){
-            $availability = $_POST['availability'];
-            $updateData = ['Availability' => $availability];
-        } elseif($update =='preference'){
-            $preference = $_POST['preference'];
-            $updateData = ['Preference' => $preference];
-        }
-    $person->setById($id, $updateData);
-    }
     $userData = $person->getById($id);
 ?>
     <style>
@@ -91,7 +61,7 @@ if($userEmail != ''){
             </h3>
             <div id="collapseOne" class="accordion-collapse collapse" data-bs-parent="#accordionPerson">
                 <div class="accordion-body">
-                    <form method="POST" class="needs-validation" novalidate data-form="profil">
+                    <form method="POST" action="PersonUpdate.php" class="needs-validation" novalidate data-form="profil">
                         <input type="hidden" name="id" value="<?php echo htmlspecialchars($userData['Id']); ?>">
                         <input type="hidden" name="u" value="profil">
                         
@@ -147,6 +117,8 @@ if($userEmail != ''){
                                     endforeach; 
                                     ?>
                                 </ul>
+                                <input type="text" class="form-control" id="avatar" name="avatar" 
+                                    value="<?php echo htmlspecialchars($userData['Avatar']); ?>">
                             </div>
                         </div>
 
@@ -163,7 +135,7 @@ if($userEmail != ''){
             </h3>
             <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#accordionPerson">
                 <div class="accordion-body">
-                    <form method="POST" class="needs-validation" novalidate data-form="availability">
+                    <form method="POST" action="PersonUpdate.php" class="needs-validation" novalidate data-form="availability">
                         <input type="hidden" name="id" value="<?php echo htmlspecialchars($userData['Id']); ?>">
                         <input type="hidden" name="u" value="availability">
                         
@@ -223,7 +195,7 @@ if($userEmail != ''){
             </h3>
             <div id="collapseThree" class="accordion-collapse collapse" data-bs-parent="#accordionPerson">
                 <div class="accordion-body">
-                    <form method="POST" class="needs-validation" novalidate data-form="preferences">
+                    <form method="POST" action="PersonUpdate.php" class="needs-validation" novalidate data-form="preferences">
                         <input type="hidden" name="id" value="<?php echo htmlspecialchars($userData['Id']); ?>">
                         <input type="hidden" name="u" value="preferences">
 
@@ -240,6 +212,7 @@ $('#emojiList').on('click', '.dropdown-item', function(e) {
     e.preventDefault();
     var imageUrl = $(this).data('img');
     $('#userAvatar').attr('src', imageUrl);
+    $('#avatar').attr('value', imageUrl);
 });
 
 
@@ -289,6 +262,8 @@ $('#emojiList').on('click', '.dropdown-item', function(e) {
         availabilityForm.addEventListener('submit', function(e) {
             e.preventDefault();
             
+            alert("I am an alert box!");
+
             const availabilityData = [];
             for(let i = 0; i < 7; i++) {
                 availabilityData[i] = {
