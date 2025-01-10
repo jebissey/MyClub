@@ -1,20 +1,11 @@
 <?php
-require_once '../../includes/beforeHeader.php';
+require_once '../../includes/tinyHeader.php';
 
 if (preg_match('/[?&]l=([^&]+)/', $_SERVER['REQUEST_URI'], $matches)) {
     $currentPage = $matches[1];
 } else $currentPage = '';
 ?>
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Error Log Viewer</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body>
 <nav class="navbar navbar-expand-sm navbar-dark bg-dark mb-4>
     <div class="container-fluid">
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -64,5 +55,5 @@ if($logToDisplay == 'D'){
     echo $viewer->render([], []);
 }
 echo '</div>';
-require_once __DIR__ . '/../../includes/footer.php';
+require_once __DIR__ . '/../../includes/tinyFooter.php';
 ?>

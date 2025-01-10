@@ -12,7 +12,6 @@ $personId=$_GET['p'] ?? 0; // la personne demadée future use pour personal mana
 
 $userEmail = $_SESSION['user'] ?? '';
 if($userEmail != ''){
-    $personFound = (new Person())->getByEmail($userEmail);
     $id = $personFound['Id'] ?? -1;
     if($id == -1){
         header('Location:lib/SignIn/SignOut.php');
@@ -21,27 +20,45 @@ if($userEmail != ''){
 
     $emojiFiles = glob("images/emoji*");
     $emojis = array_map(function($path) {return basename($path);}, $emojiFiles);
+
+    $currentAvailability = [];
+    if ($personFound && !empty($personFound['Availability'])) {
+        $currentAvailability = json_decode($personFound['Availability'], true);
+    }
+    if (empty($currentAvailability)) {
+        $currentAvailability = array_fill(0, 7, ['morning' => false, 'afternoon' => false]);
+    }
     
+
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $id = $_POST['id'];
-        $email = $_POST['email'];
-        $password = $_POST['password'];
-        $firstName = $_POST['firstName'];
-        $lastName = $_POST['lastName'];
-        $nickName = $_POST['nickName'];
-        $avatar = $_POST['avatar'];
-    
-        $updateData = [
-            'Email' => $email,
-            'FirstName' => $firstName,
-            'LastName' => $lastName,
-            'NickName' => $nickName,
-            'Avatar' => $avatar,
-        ];
-        if (!empty($password)) {
-            $updateData['Password'] = PasswordManager::signPassword($password);
+        $update = $_POST['u'];
+        if($update =='profil'){
+            $email = $_POST['email'];
+            $password = $_POST['password'];
+            $firstName = $_POST['firstName'];
+            $lastName = $_POST['lastName'];
+            $nickName = $_POST['nickName'];
+            $avatar = $_POST['avatar'];
+        
+            $updateData = [
+                'Email' => $email,
+                'FirstName' => $firstName,
+                'LastName' => $lastName,
+                'NickName' => $nickName,
+                'Avatar' => $avatar,
+            ];
+            if (!empty($password)) {
+                $updateData['Password'] = PasswordManager::signPassword($password);
+            }
+        } elseif($update =='availability'){
+            $availability = $_POST['availability'];
+            $updateData = ['Availability' => $availability];
+        } elseif($update =='preference'){
+            $preference = $_POST['preference'];
+            $updateData = ['Preference' => $preference];
         }
-        $person->setById($id, $updateData);
+    $person->setById($id, $updateData);
     }
     $userData = $person->getById($id);
 ?>
@@ -110,8 +127,9 @@ if($userEmail != ''){
             </h3>
             <div id="collapseOne" class="accordion-collapse collapse" data-bs-parent="#accordionPerson">
                 <div class="accordion-body">
-                    <form method="POST" class="needs-validation" novalidate>
+                    <form method="POST" class="needs-validation" novalidate data-form="profil">
                         <input type="hidden" name="id" value="<?php echo htmlspecialchars($userData['Id']); ?>">
+                        <input type="hidden" name="u" value="profil">
                         
                         <div class="mb-3">
                             <label for="email" class="form-label">Email</label>
@@ -179,11 +197,77 @@ if($userEmail != ''){
         <div class="accordion-item">
             <h3 class="accordion-header">
               <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
-                <b>Mise à jour des préférences</b>
+                <b>Mise à jour des disponibilités</b>
               </button>
             </h3>
             <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#accordionPerson">
                 <div class="accordion-body">
+                    <form method="POST" class="needs-validation" novalidate data-form="availability">
+                        <input type="hidden" name="id" value="<?php echo htmlspecialchars($userData['Id']); ?>">
+                        <input type="hidden" name="u" value="availability">
+                        
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th>Lundi</th>
+                                    <th>Mardi</th>
+                                    <th>Mercredi</th>
+                                    <th>Jeudi</th>
+                                    <th>Vendredi</th>
+                                    <th>Samedi</th>
+                                    <th>Dimanche</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Matin</td>
+                                    <?php for($i = 0; $i < 7; $i++): ?>
+                                    <td>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" 
+                                                name="availability[<?php echo $i; ?>][morning]" 
+                                                id="morning_<?php echo $i; ?>"
+                                                <?php echo (isset($currentAvailability[$i]['morning']) && $currentAvailability[$i]['morning']) ? 'checked' : ''; ?>>
+                                        </div>
+                                    </td>
+                                    <?php endfor; ?>
+                                </tr>
+                                <tr>
+                                    <td>Après-midi</td>
+                                    <?php for($i = 0; $i < 7; $i++): ?>
+                                    <td>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" 
+                                                name="availability[<?php echo $i; ?>][afternoon]" 
+                                                id="afternoon_<?php echo $i; ?>"
+                                                <?php echo (isset($currentAvailability[$i]['afternoon']) && $currentAvailability[$i]['afternoon']) ? 'checked' : ''; ?>>
+                                        </div>
+                                    </td>
+                                    <?php endfor; ?>
+                                </tr>
+                            </tbody>
+                        </table>
+                        
+                        <button type="submit" class="btn btn-primary">Valider</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="accordion-item">
+            <h3 class="accordion-header">
+              <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="true" aria-controls="collapseThree">
+                <b>Mise à jour des préférences</b>
+              </button>
+            </h3>
+            <div id="collapseThree" class="accordion-collapse collapse" data-bs-parent="#accordionPerson">
+                <div class="accordion-body">
+                    <form method="POST" class="needs-validation" novalidate data-form="preferences">
+                        <input type="hidden" name="id" value="<?php echo htmlspecialchars($userData['Id']); ?>">
+                        <input type="hidden" name="u" value="preferences">
+
+                        <button type="submit" class="btn btn-primary">Valider</button>
+                    </form>
                 </div>
             </div>
         </div>
@@ -191,6 +275,7 @@ if($userEmail != ''){
 
     <script>
     document.addEventListener('DOMContentLoaded', function() {
+
         const wrapper = document.querySelector('.custom-select-wrapper');
         const trigger = wrapper.querySelector('.custom-select-trigger');
         const options = wrapper.querySelector('.custom-options');
@@ -219,20 +304,66 @@ if($userEmail != ''){
         });
     });
 
-    (function () {
-        'use strict'
-        var forms = document.querySelectorAll('.needs-validation')
-        Array.prototype.slice.call(forms)
-            .forEach(function (form) {
-                form.addEventListener('submit', function (event) {
-                    if (!form.checkValidity()) {
-                        event.preventDefault()
-                        event.stopPropagation()
-                    }
-                    form.classList.add('was-validated')
-                }, false)
-            })
-    })()
+    const profilForm = document.querySelector('form[data-form="profil"]');
+    if (profilForm) {
+        profilForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            this.submit();
+        });
+    }
+
+
+    const availabilityForm = document.querySelector('form[data-form="availability"]');
+    if (availabilityForm) {
+        availabilityForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const availabilityData = [];
+            for(let i = 0; i < 7; i++) {
+                availabilityData[i] = {
+                    morning: document.querySelector(`input[name="morning_${i}"]`).checked,
+                    afternoon: document.querySelector(`input[name="afternoon_${i}"]`).checked
+                };
+            }
+            
+            // Création/mise à jour du champ caché pour les disponibilités
+            let hiddenAvailability = this.querySelector('input[name="availability"]');
+            if (!hiddenAvailability) {
+                hiddenAvailability = document.createElement('input');
+                hiddenAvailability.type = 'hidden';
+                hiddenAvailability.name = 'availability';
+                this.appendChild(hiddenAvailability);
+            }
+            hiddenAvailability.value = JSON.stringify(availabilityData);
+            
+            this.submit();
+        });
+    }
+
+
+    const preferenceForm = document.querySelector('form[data-form="preference"]');
+    if (preferenceForm) {
+        preferenceForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const preferenceData = {
+                theme: document.querySelector('input[name="theme"]:checked')?.value,
+                language: document.querySelector('input[name="language"]:checked')?.value,
+                // Ajoutez d'autres champs selon vos besoins
+            };
+            
+            let hiddenPreference = this.querySelector('input[name="preference"]');
+            if (!hiddenPreference) {
+                hiddenPreference = document.createElement('input');
+                hiddenPreference.type = 'hidden';
+                hiddenPreference.name = 'preference';
+                this.appendChild(hiddenPreference);
+            }
+            hiddenPreference.value = JSON.stringify(preferenceData);
+            this.submit();
+        });
+    }
+});
     </script>
 <?php
 } else {

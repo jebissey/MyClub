@@ -1,5 +1,7 @@
 <?php
 require_once 'beforeHeader.php';
+require_once __DIR__ .  '/../lib/Database/Tables/SiteData.php';
+require_once __DIR__ . '/../lib/Database/Tables/Page.php';
 ?>
 
 <!doctype html>
@@ -10,7 +12,6 @@ require_once 'beforeHeader.php';
 
 <?php
 
-require_once __DIR__ .  '/../lib/Database/Tables/SiteData.php';
 $title = (new SiteData())->getByName('Title');
 echo '<title>' . $title['Value'] .'</title>';
 $currentPage = basename($_SERVER['REQUEST_URI']);
@@ -37,7 +38,6 @@ $currentPage = basename($_SERVER['REQUEST_URI']);
     </style>
   </head>
   <body>
-
     <header>
         <nav class="navbar navbar-expand-sm navbar-dark bg-dark mb-4>
             <div class="container-fluid">
@@ -51,7 +51,6 @@ $currentPage = basename($_SERVER['REQUEST_URI']);
                     <ul class="navbar-nav">
 <?php
 
-require_once __DIR__. '/../lib/Database/Tables/Page.php';
 $pages = (new Page())->getOrdered('Position');
 foreach ($pages as $p)
 {

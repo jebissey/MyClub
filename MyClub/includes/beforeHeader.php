@@ -10,5 +10,4 @@ $_SESSION['token'] = $token;
 
 require_once  __DIR__. '/../lib/Error/ErrorHandler.php';
 $errorHandler = new ErrorHandler();
-
 ?>
