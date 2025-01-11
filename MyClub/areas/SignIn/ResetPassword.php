@@ -1,4 +1,5 @@
 <?php
+require __DIR__ . '/../../lib/Database/Tables/Person.php';
 
 $token = $_GET['token'];
 if (empty($token)) {

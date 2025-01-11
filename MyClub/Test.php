@@ -28,9 +28,9 @@ if ($isValid) {
 }
 
 
-require_once __DIR__ . '/../../lib/Database/Tables/Debug.php';
+require_once __DIR__ . '/lib/Database/Tables/Debug.php';
 (new Debug())->set("Test debug");
-
+/*
 //envoi d'un rdv dans un agenda
 ?>
 
@@ -54,6 +54,11 @@ require_once __DIR__ . '/../../lib/Database/Tables/Debug.php';
         </figcaption>
     </figure>
 </div>
+
+*/
+
+$message = "Line 1\r\nLine 2\r\nLine 3";
+mail('je.bissey@gmail.com', 'Mon Sujet', $message);
 
 
 

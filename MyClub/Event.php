@@ -2,8 +2,9 @@
 require 'includes/header.php';
 echo "<main>\n";
 
-$id=$_GET['n'];
-if($id != null) {
+$id=$_GET['n'] ?? '';
+/*
+if($id) {
   $stmt = $pdo->query('SELECT Content FROM Page WHERE Id = ' . $id .';');
   $row = $stmt->fetch();
   echo $row['Content'];
@@ -13,6 +14,7 @@ else {
   $stmt = $pdo->query('SELECT * FROM Event WHERE StartTime > ' . $id .';');
   echo 'toto';
 }
+  */
 
 echo "</main>\n";
 echo '<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>';

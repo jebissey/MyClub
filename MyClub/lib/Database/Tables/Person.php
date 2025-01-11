@@ -35,25 +35,6 @@ WHERE Person.Id = :id");
         $query->execute(array('id' => $id));
         return $query->fetchAll(PDO::FETCH_ASSOC);
     }
-
-    public function setByEmail($email, array $data) {
-        $validData = $this->filterValidFields($data, $this->getTableColumns());
-        return $this->updateExistingRecordByEmail($email, $validData);
-    }
-
-
-    
-    protected function updateExistingRecordByEmail($id, array $validData) {
-        $updateData = $this->prepareUpdateData($validData);
-        
-        if (empty($updateData['fields'])) {
-            return true;
-        }
-        
-        $sql = "UPDATE {$this->tableName} SET " . implode(', ', $updateData['fields']) . " WHERE Email = :email";
-        $params = array_merge(array('id' => $id), $updateData['params']);
-        return $this->executeQuery($sql, $params);
-    }
 }
 
 ?>

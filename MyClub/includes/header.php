@@ -85,12 +85,6 @@ foreach ($pages as $p)
     } else {
         echo '<img src="images/anonymat.png" alt="User avatar">';
     }
-
-
-    require_once __DIR__ . '/../lib/Database/Tables/Debug.php';
-    (new Debug())->set($keySet);
-
-
     ?>
                         </a>
     <?php echo $keySet . $signOut;?>

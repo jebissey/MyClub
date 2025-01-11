@@ -1,4 +1,5 @@
 <?php
+require __DIR__ . '/../../lib/Database/Tables/Person.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $token = $_POST['token'];
@@ -17,7 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             die("<h1>Lien de réinitialisation expiré ou invalide.</h1>");
         }
 
-        $person->setByEmail($personFound['Email'], array(
+        $person->setById($personFound['Id'], array(
             'Password' => password_hash($password, PASSWORD_DEFAULT),
             'Token' => null,
             'TokenCreatedAt' => null,

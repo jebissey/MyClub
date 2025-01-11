@@ -1,6 +1,7 @@
 <?php
-require '../lib/Email.php';
-require '../lib/Database/Tables/Person.php';
+require_once __DIR__. '/../../includes/tinyHeader.php';
+
+require __DIR__ . '/../../lib/Database/Tables/Person.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = filter_var($_POST['email'], FILTER_VALIDATE_EMAIL);
@@ -13,23 +14,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $token = bin2hex(openssl_random_pseudo_bytes(32));
                 $tokenCreatedAt = (new DateTime())->format('Y-m-d H:i:s');
 
-                $person->setByEmail($email, array(
+                $result = $person->setById($personFound['Id'], array(
                     'token' => $token,
                     'tokenCreatedAt' => $tokenCreatedAt,
                 ));
 
-                $resetLink = "http://cihy21.free.fr/MyClub/areas/SignIn/ResetPassword.php?token=" . $token;
+                $resetLink = "https://myclub.alwaysdata.net/b.nw/areas/SignIn/ResetPassword.php?token=" . $token;
                 $to = $email;
-                $subject = "Réinitialisation du mot de passe";
-                $message = "Cliquez sur ce lien pour réinitialiser votre mot de passe : " . $resetLink;
-                $from = "b.nw.invitation@free.fr";
+                $subject = "Initialisation du mot de passe";
+                $message = "Cliquez sur ce lien pour initialiser votre mot de passe : " . $resetLink;
 
-                $mail = new Email();
-                $result = $mail->Send($to, $subject, $message, $from);
-                if ($result === true) {
-                    echo "<h1>Un email a été envoyé à votre adresse.</h1>";
+                if (mail($to, $subject, $message)) {
+                    echo '<h1>Un email a été envoyé à votre adresse.</h1>';
                 } else {
-                    echo "Une erreur est survenue lors de l'envoi de l'email. ($result)";
+                    echo "Une erreur est survenue lors de l'envoi de l'email.";
                 }
             } else {
                 echo "<h1>Un email de réinitialisation a déjà été envoyé à " . substr($user['TokenCreatedAt'],10) . ". Il est valide pendant 1 heure.</h1>";
@@ -43,5 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 } else {
     echo "<h1>Méthode non autorisée.</h1>";
 }
+
+require_once __DIR__ . '/../../includes/tinyFooter.php';
 ?>
 

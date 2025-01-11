@@ -131,46 +131,5 @@ abstract class BaseTable {
         $protectedFields = array('Id');
         return !in_array($field, $protectedFields);
     }
-
-
-    /*
-    protected function prepareInsertData($email, array $validData) {
-        return array_merge($validData, array('Email' => $email));
-    }
-
-      
-    public function setByEmail($email, array $data) {
-        $tableColumns = $this->getTableColumns();
-        $validData = $this->filterValidFields($data, $tableColumns);
-        
-        return $this->recordExistsByEmail($email) 
-            ? $this->updateExistingRecord($email, $validData)
-            : $this->createNewRecord($email, $validData);
-    }
-
-
-
-
-    protected function recordExistsByEmail($email) {
-        $query = $this->pdo->prepare("SELECT Id FROM {$this->tableName} WHERE Email = :email");
-        $query->execute(array('email' => $email));
-        return (bool) $query->fetch(PDO::FETCH_ASSOC);
-    }
-    
-
-
-    
-
-    
-
-    
-
-
-
-    
-
-    
-
-        */
 }
 ?>
