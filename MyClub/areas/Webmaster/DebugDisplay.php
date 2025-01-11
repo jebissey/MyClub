@@ -1,7 +1,7 @@
 <?php
 
-require_once __DIR__ . '/../PageDataDisplay.php';
-require_once __DIR__ . '/../Database/Tables/Debug.php';
+require_once __DIR__ . '/../../lib/PageDataDisplay.php';
+require_once __DIR__ . '/../../lib/Database/Tables/Debug.php';
 
 class DebugDisplay extends PagedDataDisplay {
     private $debug;

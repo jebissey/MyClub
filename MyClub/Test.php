@@ -27,6 +27,10 @@ if ($isValid) {
     echo "Mot de passe incorrect !";
 }
 
+
+require_once __DIR__ . '/../../lib/Database/Tables/Debug.php';
+(new Debug())->set("Test debug");
+
 //envoi d'un rdv dans un agenda
 ?>
 

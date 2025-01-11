@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__ . '/../PageDataDisplay.php';
+require_once __DIR__ . '/../../lib/PageDataDisplay.php';
 require_once __DIR__ . '/../../includes/Globals.php';
 
 class ErrorDisplay extends PagedDataDisplay {

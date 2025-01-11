@@ -23,6 +23,18 @@ class Person extends BaseTable {
         return $query->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    public function getKeys($id)
+    {
+        $query = $this->pdo->prepare("
+SELECT Authorization.Id, Authorization.Name FROM Person 
+INNER JOIN PersonGroup ON Person.Id = PersonGroup.IdPerson
+INNER JOIN `Group` ON PersonGroup.IdGroup = `Group`.Id
+INNER JOIN GroupAuthorisation on `Group`.Id = GroupAuthorisation.IdGroup
+INNER JOIN Authorization on GroupAuthorisation.IdAuthorisation = Authorization.Id 
+WHERE Person.Id = :id");
+        $query->execute(array('id' => $id));
+        return $query->fetchAll(PDO::FETCH_ASSOC);
+    }
 
     public function setByEmail($email, array $data) {
         $validData = $this->filterValidFields($data, $this->getTableColumns());

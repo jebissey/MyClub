@@ -1,12 +1,17 @@
 <?php
-require_once '../../includes/tinyHeader.php';
+require_once __DIR__. '/../../includes/tinyHeader.php';
+require_once __DIR__. '/ErrorDisplay.php';
 
 if (preg_match('/[?&]l=([^&]+)/', $_SERVER['REQUEST_URI'], $matches)) {
     $currentPage = $matches[1];
 } else $currentPage = '';
+
+$areaCurrentPage = "Webmaster";
+$areaPath = "..";
+require_once "../breadcrumb.php";
 ?>
 
-<nav class="navbar navbar-expand-sm navbar-dark bg-dark mb-4>
+<nav class="navbar navbar-expand-sm navbar-dark bg-dark mb-4">
     <div class="container-fluid">
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
             <span class="navbar-toggler-icon"></span>
@@ -14,13 +19,13 @@ if (preg_match('/[?&]l=([^&]+)/', $_SERVER['REQUEST_URI'], $matches)) {
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav">
                 <li class="nav-item">
-                    <a class="nav-link <?php echo ($currentPage == 'V') ? 'active' : ''; ?>" href="Logs.php?l=V"><h5>Visitors</h5></a>';
+                    <a class="nav-link <?php echo ($currentPage == 'V') ? 'active' : ''; ?>" href="menu.php?l=V"><h5>Visitors</h5></a>';
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link <?php echo ($currentPage == 'E') ? 'active' : ''; ?>" href="Logs.php?l=E"><h5>Errors</h5></a>';
+                    <a class="nav-link <?php echo ($currentPage == 'E') ? 'active' : ''; ?>" href="menu.php?l=E"><h5>Errors</h5></a>';
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link <?php echo ($currentPage == 'D') ? 'active' : ''; ?>" href="Logs.php?l=D"><h5>Debug</h5></a>';
+                    <a class="nav-link <?php echo ($currentPage == 'D') ? 'active' : ''; ?>" href="menu.php?l=D"><h5>Debug</h5></a>';
                 </li>
             </ul>
         </div>
@@ -32,7 +37,6 @@ $logToDisplay = $_GET['l'] ?? '';
 
 echo '<div class="container mt-4">';
 if($logToDisplay == 'E'){
-    require_once '../Error/ErrorDisplay.php';
     $viewer = new ErrorDisplay($_GET['page'] ?? 1);
     echo $viewer->render([], []);
 }

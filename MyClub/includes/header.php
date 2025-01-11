@@ -66,10 +66,12 @@ foreach ($pages as $p)
                         <a href="Person.php?si=1">
     <?php
 
+    $keySet = $signOut = '';
     if(isset($_SESSION['user'])){
         $userEmail = $_SESSION['user'];
         $person = new Person();
         $personFound = $person->getByEmail($userEmail);
+        $keys = $person->getKeys($personFound['Id']);
         if(empty($personFound['Avatar'])){
             $avatar = '../images/emojiPensif.png';
         } else {
@@ -77,13 +79,21 @@ foreach ($pages as $p)
         }
         echo '<img id="userAvatar" src="'. $avatar . '" alt="User avatar"/>';
         $signOut = '<a href ="areas/SignIn/SignOut.php"><img src="images/SignOut.png" alt="Sign out"></a>';
+        if($keys){
+            $keySet = '<a href ="areas/menu.php"><img src="images/keySet.png" alt="Key set"></a>';
+        }
     } else {
         echo '<img src="images/anonymat.png" alt="User avatar">';
-        $signOut = '';
     }
+
+
+    require_once __DIR__ . '/../lib/Database/Tables/Debug.php';
+    (new Debug())->set($keySet);
+
+
     ?>
                         </a>
-    <?php echo $signOut;?>
+    <?php echo $keySet . $signOut;?>
                     </div>
                 </div>
             </div>

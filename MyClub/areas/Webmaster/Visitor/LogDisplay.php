@@ -1,7 +1,7 @@
 <?php
 
-require_once __DIR__ . '/../../PageDataDisplay.php';
-require_once __DIR__ . '/../../Database/Tables/Log.php';
+require_once __DIR__ . '/../../../lib/PageDataDisplay.php';
+require_once __DIR__ . '/../../../lib/Database/Tables/Log.php';
 
 class LogDisplay extends PagedDataDisplay {
     private $log;
