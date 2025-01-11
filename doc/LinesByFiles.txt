@@ -1,11 +1,13 @@
+   25 ../MyClub/modals/wrongPassword.php
+   25 ../MyClub/modals/userUnknown.php
    14 ../MyClub/lib/PasswordManager.php
    88 ../MyClub/lib/Database/Database.php
     9 ../MyClub/lib/Database/Tables/Page.php
    76 ../MyClub/lib/Database/Tables/Log.php
-   58 ../MyClub/lib/Database/Tables/Person.php
+   39 ../MyClub/lib/Database/Tables/Person.php
     9 ../MyClub/lib/Database/Tables/SiteData.php
-   58 ../MyClub/lib/Database/Tables/Debug.php
-  175 ../MyClub/lib/Database/BaseTable.php
+   59 ../MyClub/lib/Database/Tables/Debug.php
+  136 ../MyClub/lib/Database/BaseTable.php
   100 ../MyClub/lib/Client.php
    93 ../MyClub/lib/Backup.php
    73 ../MyClub/lib/ICSGenerator.php
@@ -13,19 +15,18 @@
    15 ../MyClub/lib/File.php
    15 ../MyClub/lib/Error/CustomException.php
    94 ../MyClub/lib/Error/ErrorHandler.php
-   49 ../MyClub/lib/Email.php
    20 ../MyClub/Page.php
     8 ../MyClub/LegalNotices.php
    43 ../MyClub/PersonUpdate.php
    29 ../MyClub/areas/breadcrumb.php
     8 ../MyClub/areas/EventManager/menu.php
     8 ../MyClub/areas/PersonManager/menu.php
-   42 ../MyClub/areas/SignIn/ResetPassword.php
-   50 ../MyClub/areas/SignIn/Check.php
+   43 ../MyClub/areas/SignIn/ResetPassword.php
+   23 ../MyClub/areas/SignIn/Check.php
     7 ../MyClub/areas/SignIn/SignOut.php
    47 ../MyClub/areas/SignIn/ForgotPassword.php
-   33 ../MyClub/areas/SignIn/ProcessResetPassword.php
-   48 ../MyClub/areas/Menu.php
+   46 ../MyClub/areas/SignIn/ProcessResetPassword.php
+   39 ../MyClub/areas/menu.php
     8 ../MyClub/areas/Redactor/menu.php
    41 ../MyClub/areas/Webmaster/Visitor/LogDisplay.php
    66 ../MyClub/areas/Webmaster/Visitor/VisitorGraphs.php
@@ -36,17 +37,17 @@
    54 ../MyClub/areas/Webmaster/NavBarManager/save_item.php
     0 ../MyClub/areas/Webmaster/NavBarManager/upload_image.php
    56 ../MyClub/areas/Webmaster/DebugDisplay.php
-   64 ../MyClub/areas/Webmaster/menu.php
+   62 ../MyClub/areas/Webmaster/menu.php
    73 ../MyClub/areas/Webmaster/ErrorDisplay.php
-   23 ../MyClub/Event.php
+   25 ../MyClub/Event.php
    16 ../MyClub/includes/tinyHeader.php
-    4 ../MyClub/includes/tinyFooter.php
+    5 ../MyClub/includes/tinyFooter.php
     7 ../MyClub/includes/afterFooter.php
-  101 ../MyClub/includes/header.php
+   95 ../MyClub/includes/header.php
    26 ../MyClub/includes/modal.php
    12 ../MyClub/includes/beforeHeader.php
    22 ../MyClub/includes/footer.php
     8 ../MyClub/includes/Globals.php
   352 ../MyClub/Person.php
-   59 ../MyClub/Test.php
- 2691 total
+   64 ../MyClub/Test.php
+ 2613 total

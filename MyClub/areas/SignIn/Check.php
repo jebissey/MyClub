@@ -8,7 +8,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     $personFound = (new Person())->getByEmail($email);
     if($personFound){
-        if(PasswordManager::verifyPassword($password, $personFound['Password'])){
+        if(PasswordManager::verifyPassword($password, $personFound['Password'] ?? '')){
             $_SESSION['user'] = $personFound['Email'];
             header('Location:../../Person.php?p=' . $personFound['Id']);
             exit();
