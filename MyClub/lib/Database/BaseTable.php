@@ -48,6 +48,10 @@ abstract class BaseTable {
 
     public function setById($id, array $data) {
         $validData = $this->filterValidFields($data, $this->getTableColumns());
+        if(count($data) != count($validData)){
+            require_once __DIR__ . '/Tables/Debug.php';
+            (new Debug())->set("data=". json_encode( $data). " ; validData=" . json_encode($validData));
+        }
         return $this->updateExistingRecordById($id, $validData);
     }
 
@@ -101,11 +105,9 @@ abstract class BaseTable {
 
     protected function updateExistingRecordById($id, array $validData) {
         $updateData = $this->prepareUpdateData($validData);
-        
         if (empty($updateData['fields'])) {
             return true;
         }
-        
         $sql = "UPDATE {$this->tableName} SET " . implode(', ', $updateData['fields']) . " WHERE Id = :id";
         $params = array_merge(array('id' => $id), $updateData['params']);
         return $this->executeQuery($sql, $params);

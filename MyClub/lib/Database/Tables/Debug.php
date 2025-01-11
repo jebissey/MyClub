@@ -31,10 +31,11 @@ class Debug{
         $query->execute();
         $total = $query->fetch(PDO::FETCH_ASSOC)['total'];
         
-        $query = $this->pdo->prepare("SELECT Message, Timestamp 
-                 FROM Debug
-                 ORDER BY Timestamp 
-                 LIMIT ? OFFSET ?");
+        $query = $this->pdo->prepare("
+            SELECT Timestamp, Message 
+            FROM Debug
+            ORDER BY Timestamp 
+            LIMIT ? OFFSET ?");
         $params[] = $take;
         $params[] = $skip;
         $query->execute($params);

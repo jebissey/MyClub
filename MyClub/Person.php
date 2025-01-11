@@ -100,7 +100,7 @@ if($userEmail != ''){
                         <div class="mb-3">
                             <label for="nickName" class="form-label">Pseudo</label>
                             <input type="text" class="form-control" id="nickName" name="nickName" 
-                                value="<?php echo htmlspecialchars($userData['NickName']); ?>">
+                                value="<?php echo htmlspecialchars($userData['NickName'] ?? ''); ?>">
                         </div>
 
                         <div class="mb-3">
@@ -116,7 +116,7 @@ if($userEmail != ''){
                                     ?>
                                 </ul>
                                 <input type="text" class="form-control" id="avatar" name="avatar" 
-                                    value="<?php echo htmlspecialchars($userData['Avatar']); ?>">
+                                    value="<?php echo htmlspecialchars($userData['Avatar'] ?? ''); ?>">
                             </div>
                         </div>
 

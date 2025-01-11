@@ -73,7 +73,7 @@ foreach ($pages as $p)
         $personFound = $person->getByEmail($userEmail);
         $keys = $person->getKeys($personFound['Id']);
         if(empty($personFound['Avatar'])){
-            $avatar = '../images/emojiPensif.png';
+            $avatar = 'images/emojiPensif.png';
         } else {
             $avatar = $personFound['Avatar'];
         }

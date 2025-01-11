@@ -14,10 +14,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $token = bin2hex(openssl_random_pseudo_bytes(32));
                 $tokenCreatedAt = (new DateTime())->format('Y-m-d H:i:s');
 
-                $result = $person->setById($personFound['Id'], array(
-                    'token' => $token,
-                    'tokenCreatedAt' => $tokenCreatedAt,
-                ));
+                $result = $person->setById($personFound['Id'], [
+                    'Token' => $token,
+                    'TokenCreatedAt' => $tokenCreatedAt,
+                ]);
 
                 $resetLink = "https://myclub.alwaysdata.net/b.nw/areas/SignIn/ResetPassword.php?token=" . $token;
                 $to = $email;
