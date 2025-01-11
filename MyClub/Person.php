@@ -5,7 +5,7 @@ require_once  __DIR__ . '/lib/PasswordManager.php';
 echo "<main>\n";
 
 
-$personId=$_GET['p'] ?? 0; // la personne demadée future use pour personal manager group
+$personId=$_GET['p'] ?? 0;
 
 //$emailReadOnly = true;
 
@@ -14,7 +14,7 @@ $userEmail = $_SESSION['user'] ?? '';
 if($userEmail != ''){
     $id = $personFound['Id'] ?? -1;
     if($id == -1){
-        header('Location:lib/SignIn/SignOut.php');
+        header('Location:areas/SignIn/SignOut.php');
         exit();
     }
 
@@ -29,8 +29,6 @@ if($userEmail != ''){
     if (empty($currentAvailability)) {
         $currentAvailability = array_fill(0, 7, ['morning' => false, 'afternoon' => false]);
     }
-    
-
     $userData = $person->getById($id);
 ?>
     <style>
@@ -215,39 +213,6 @@ $('#emojiList').on('click', '.dropdown-item', function(e) {
     $('#avatar').attr('value', imageUrl);
 });
 
-
-
-    document.addEventListener('DOMContentLoaded', function() {
-
-        const wrapper = document.querySelector('.custom-select-wrapper');
-        const trigger = wrapper.querySelector('.custom-select-trigger');
-        const options = wrapper.querySelector('.custom-options');
-        const hiddenInput = document.getElementById('avatar');
-
-        trigger.addEventListener('click', function() {
-            options.style.display = options.style.display === 'block' ? 'none' : 'block';
-        });
-
-        document.addEventListener('click', function(e) {
-            if (!wrapper.contains(e.target)) {
-                options.style.display = 'none';
-            }
-        });
-
-        options.querySelectorAll('.custom-option').forEach(option => {
-            option.addEventListener('click', function() {
-                const value = this.dataset.value;
-                const img = this.querySelector('img').src;
-                trigger.querySelector('img').src = img;
-                hiddenInput.value = value;
-                options.querySelector('.selected')?.classList.remove('selected');
-                this.classList.add('selected');
-                options.style.display = 'none';
-            });
-        });
-    });
-
-
     // submits {
     const profilForm = document.querySelector('form[data-form="profil"]');
     if (profilForm) {
@@ -322,7 +287,7 @@ $('#emojiList').on('click', '.dropdown-item', function(e) {
                     <h5 class="modal-title" id="loginModalLabel">Connexion</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form id="loginForm" action="lib/SignIn/Check.php" method="POST" novalidate>
+                <form id="loginForm" action="areas/SignIn/Check.php" method="POST" novalidate>
                     <div class="modal-body">
                         <div class="mb-3">
                             <label for="email" class="form-label">Adresse email</label>
@@ -356,7 +321,7 @@ $('#emojiList').on('click', '.dropdown-item', function(e) {
                     <h5 class="modal-title" id="forgotPasswordModalLabel">Réinitialisation du mot de passe</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form id="forgotPasswordForm" action="lib/SignIn/ForgotPassword.php" method="POST" novalidate>
+                <form id="forgotPasswordForm" action="areas/SignIn/ForgotPassword.php" method="POST" novalidate>
                     <div class="modal-body">
                         <div class="mb-3">
                             <label for="forgotEmail" class="form-label">Adresse email</label>

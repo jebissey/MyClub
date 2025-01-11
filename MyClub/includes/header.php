@@ -76,7 +76,7 @@ foreach ($pages as $p)
             $avatar = $personFound['Avatar'];
         }
         echo '<img id="userAvatar" src="'. $avatar . '" alt="User avatar"/>';
-        $signOut = '<a href ="lib/SignIn/SignOut.php"><img src="images/SignOut.png" alt="Sign out"></a>';
+        $signOut = '<a href ="areas/SignIn/SignOut.php"><img src="images/SignOut.png" alt="Sign out"></a>';
     } else {
         echo '<img src="images/anonymat.png" alt="User avatar">';
         $signOut = '';

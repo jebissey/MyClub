@@ -18,7 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     'tokenCreatedAt' => $tokenCreatedAt,
                 ));
 
-                $resetLink = "http://cihy21.free.fr/MyClub/SignIn/ResetPassword.php?token=" . $token;
+                $resetLink = "http://cihy21.free.fr/MyClub/areas/SignIn/ResetPassword.php?token=" . $token;
                 $to = $email;
                 $subject = "Réinitialisation du mot de passe";
                 $message = "Cliquez sur ce lien pour réinitialiser votre mot de passe : " . $resetLink;
