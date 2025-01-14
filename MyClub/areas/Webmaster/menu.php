@@ -27,6 +27,9 @@ require_once "../breadcrumb.php";
                 <li class="nav-item">
                     <a class="nav-link <?php echo ($currentPage == 'D') ? 'active' : ''; ?>" href="menu.php?l=D"><h5>Debug</h5></a>';
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link <?php echo ($currentPage == 'A') ? 'active' : ''; ?>" href="menu.php?l=A"><h5>Arwards</h5></a>';
+                </li>
             </ul>
         </div>
     </div>
@@ -57,6 +60,9 @@ if($logToDisplay == 'D'){
     require_once 'DebugDisplay.php';
     $viewer = new DebugDisplay($_GET['page'] ?? 1);
     echo $viewer->render([], []);
+}
+if($logToDisplay == 'A'){
+    require_once 'Awards.php';
 }
 echo '</div>';
 require_once __DIR__ . '/../../includes/tinyFooter.php';

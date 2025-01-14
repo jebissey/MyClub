@@ -22,12 +22,12 @@ if($userEmail != ''){
     $emojiFiles = glob($emojiPath . "emoji*");
     $emojis = array_map(function($path) {return basename($path);}, $emojiFiles);
 
-    $currentAvailability = [];
-    if ($personFound && !empty($personFound['Availability'])) {
-        $currentAvailability = json_decode($personFound['Availability'], true);
+    $currentAvailabilities = [];
+    if ($personFound && !empty($personFound['Availabilities'])) {
+        $currentAvailabilities = json_decode($personFound['Availabilities'], true);
     }
-    if (empty($currentAvailability)) {
-        $currentAvailability = array_fill(0, 7, ['morning' => false, 'afternoon' => false]);
+    if (empty($currentAvailabilities)) {
+        $currentAvailabilities = array_fill(0, 7, ['morning' => false, 'afternoon' => false]);
     }
     $userData = $person->getById($id);
 ?>
@@ -133,9 +133,9 @@ if($userEmail != ''){
             </h3>
             <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#accordionPerson">
                 <div class="accordion-body">
-                    <form method="POST" action="PersonUpdate.php" class="needs-validation" novalidate data-form="availability">
+                    <form method="POST" action="PersonUpdate.php" class="needs-validation" novalidate data-form="availabilities">
                         <input type="hidden" name="id" value="<?php echo htmlspecialchars($userData['Id']); ?>">
-                        <input type="hidden" name="u" value="availability">
+                        <input type="hidden" name="u" value="availabilities">
                         
                         <table class="table table-bordered">
                             <thead>
@@ -157,9 +157,9 @@ if($userEmail != ''){
                                     <td>
                                         <div class="form-check">
                                             <input class="form-check-input" type="checkbox" 
-                                                name="availability[<?php echo $i; ?>][morning]" 
+                                                name="availabilities[<?php echo $i; ?>][morning]" 
                                                 id="morning_<?php echo $i; ?>"
-                                                <?php echo (isset($currentAvailability[$i]['morning']) && $currentAvailability[$i]['morning']) ? 'checked' : ''; ?>>
+                                                <?php echo (isset($currentAvailabilities[$i]['morning']) && $currentAvailabilities[$i]['morning']) ? 'checked' : ''; ?>>
                                         </div>
                                     </td>
                                     <?php endfor; ?>
@@ -170,9 +170,22 @@ if($userEmail != ''){
                                     <td>
                                         <div class="form-check">
                                             <input class="form-check-input" type="checkbox" 
-                                                name="availability[<?php echo $i; ?>][afternoon]" 
+                                                name="availabilities[<?php echo $i; ?>][afternoon]" 
                                                 id="afternoon_<?php echo $i; ?>"
-                                                <?php echo (isset($currentAvailability[$i]['afternoon']) && $currentAvailability[$i]['afternoon']) ? 'checked' : ''; ?>>
+                                                <?php echo (isset($currentAvailabilities[$i]['afternoon']) && $currentAvailabilities[$i]['afternoon']) ? 'checked' : ''; ?>>
+                                        </div>
+                                    </td>
+                                    <?php endfor; ?>
+                                </tr>
+                                <tr>
+                                    <td>Soir</td>
+                                    <?php for($i = 0; $i < 7; $i++): ?>
+                                    <td>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" 
+                                                name="ies[<?php echo $i; ?>][evening]" 
+                                                id="evening_<?php echo $i; ?>"
+                                                <?php echo (isset($currentAvailabilities[$i]['evening']) && $currentAvailabilities[$i]['evening']) ? 'checked' : ''; ?>>
                                         </div>
                                     </td>
                                     <?php endfor; ?>
@@ -222,54 +235,56 @@ $('#emojiList').on('click', '.dropdown-item', function(e) {
         });
     }
 
-    const availabilityForm = document.querySelector('form[data-form="availability"]');
-    if (availabilityForm) {
-        availabilityForm.addEventListener('submit', function(e) {
+    const availabilitiesForm = document.querySelector('form[data-form="availabilities"]');
+    if (availabilitiesForm) {
+        availabilitiesForm.addEventListener('submit', function(e) {
             e.preventDefault();
             
-            alert("I am an alert box!");
+            alert("In availabilites form");
 
-            const availabilityData = [];
+            const availabilitiesData = [];
             for(let i = 0; i < 7; i++) {
-                availabilityData[i] = {
+                availabilitiesData[i] = {
                     morning: document.querySelector(`input[name="morning_${i}"]`).checked,
                     afternoon: document.querySelector(`input[name="afternoon_${i}"]`).checked
                 };
             }
             
             // Création/mise à jour du champ caché pour les disponibilités
-            let hiddenAvailability = this.querySelector('input[name="availability"]');
-            if (!hiddenAvailability) {
-                hiddenAvailability = document.createElement('input');
-                hiddenAvailability.type = 'hidden';
-                hiddenAvailability.name = 'availability';
-                this.appendChild(hiddenAvailability);
+            let hiddenAvailabilities = this.querySelector('input[name="availabilities"]');
+            if (!hiddenAvailabilities) {
+                hiddenAvailabilities = document.createElement('input');
+                hiddenAvailabilities.type = 'hidden';
+                hiddenAvailabilities.name = 'availabilities';
+                this.appendChild(hiddenAvailabilities);
             }
-            hiddenAvailability.value = JSON.stringify(availabilityData);
+            hiddenAvailabilities.value = JSON.stringify(availabilitiesData);
             
             this.submit();
         });
     }
 
-    const preferenceForm = document.querySelector('form[data-form="preference"]');
-    if (preferenceForm) {
-        preferenceForm.addEventListener('submit', function(e) {
+    const preferencesForm = document.querySelector('form[data-form="preferences"]');
+    if (preferencesForm) {
+        preferencesForm.addEventListener('submit', function(e) {
             e.preventDefault();
+
+            alert("In preferences form");
             
-            const preferenceData = {
+            const preferencesData = {
                 theme: document.querySelector('input[name="theme"]:checked')?.value,
                 language: document.querySelector('input[name="language"]:checked')?.value,
                 // Ajoutez d'autres champs selon vos besoins
             };
             
-            let hiddenPreference = this.querySelector('input[name="preference"]');
-            if (!hiddenPreference) {
-                hiddenPreference = document.createElement('input');
-                hiddenPreference.type = 'hidden';
-                hiddenPreference.name = 'preference';
-                this.appendChild(hiddenPreference);
+            let hiddenPreferences = this.querySelector('input[name="preferences"]');
+            if (!hiddenPreferences) {
+                hiddenPreferences = document.createElement('input');
+                hiddenPreferences.type = 'hidden';
+                hiddenPreferences.name = 'preferences';
+                this.appendChild(hiddenPreferences);
             }
-            hiddenPreference.value = JSON.stringify(preferenceData);
+            hiddenPreferences.value = JSON.stringify(preferencesData);
             this.submit();
         });
     }

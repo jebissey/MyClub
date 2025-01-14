@@ -25,12 +25,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (!empty($password)) {
             $updateData['Password'] = PasswordManager::signPassword($password);
         }
-    } elseif($update =='availability'){
-        $availability = $_POST['availability'];
-        $updateData = ['Availability' => $availability];
-    } elseif($update =='preference'){
-        $preference = $_POST['preference'];
-        $updateData = ['Preference' => $preference];
+    } elseif($update =='availabilities'){
+        $availabilities = $_POST['availabilities'];
+        $updateData = ['Availabilities' => $availabilities];
+    } elseif($update =='preferences'){
+        $preferences = $_POST['preferences'];
+        $updateData = ['Preferences' => $preferences];
+    }
+    else {
+        die("Fatal error");
     }
     (new Person())->setById($id, $updateData);
 
