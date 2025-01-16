@@ -57,6 +57,7 @@ foreach ($results as $row) {
             </table>
         </div>
     </div>
+    <p>(1 bonus = 1pt,  1 bug = 2pt, 1 suggestion = 3pt, 1 visio = 1pt)</p>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
@@ -68,10 +69,8 @@ foreach ($results as $row) {
 
         headers.forEach((header, index) => {
             header.addEventListener('click', () => {
-                // Réinitialiser les icônes de tri
                 headers.forEach(h => h.querySelector('.sort-icon').textContent = '');
                 
-                // Changer la direction du tri si on clique sur la même colonne
                 if (currentSortCol === index) {
                     ascending = !ascending;
                 } else {
@@ -79,16 +78,13 @@ foreach ($results as $row) {
                     currentSortCol = index;
                 }
 
-                // Mettre à jour l'icône de tri
                 header.querySelector('.sort-icon').textContent = ascending ? '↑' : '↓';
 
-                // Trier le tableau
                 const rows = Array.from(table.querySelectorAll('tbody tr'));
                 rows.sort((a, b) => {
                     let aVal = a.cells[index].textContent.trim();
                     let bVal = b.cells[index].textContent.trim();
                     
-                    // Utiliser la valeur numérique si disponible
                     if (a.cells[index].hasAttribute('data-value')) {
                         aVal = parseFloat(a.cells[index].getAttribute('data-value'));
                         bVal = parseFloat(b.cells[index].getAttribute('data-value'));
@@ -103,7 +99,6 @@ foreach ($results as $row) {
                     }
                 });
 
-                // Réorganiser les lignes
                 const tbody = table.querySelector('tbody');
                 rows.forEach(row => tbody.appendChild(row));
             });

@@ -14,10 +14,11 @@ class Log{
         }
     }
 
-    public function set($ipAddress, $os, $browser, $screenResolution, $type, $uri, $token, $who) {
+    public function set($ipAddress, $referer, $os, $browser, $screenResolution, $type, $uri, $token, $who) {
         try {
             $params = array(
                 'ipAddress' => $ipAddress,
+                'referer' => $referer,
                 'os' => $os,
                 'browser' => $browser,
                 'screenResolution' => $screenResolution,
@@ -25,8 +26,8 @@ class Log{
                 'uri' => $uri,
                 'token' => $token,
                 'who' => "$who");
-            $query = $this->pdo->prepare("INSERT INTO Log(IpAddress, Os, Browser, ScreenResolution, Type, Uri, Token, Who) 
-                                           VALUES(:ipAddress, :os, :browser, :screenResolution, :type, :uri, :token, :who)");
+            $query = $this->pdo->prepare("INSERT INTO Log(IpAddress, Referer, Os, Browser, ScreenResolution, Type, Uri, Token, Who) 
+                                          VALUES(:ipAddress, :referer, :os, :browser, :screenResolution, :type, :uri, :token, :who)");
             $query->execute($params);
         } catch (PDOException $e) {
             die("Database error while logging: " . $e->getMessage());

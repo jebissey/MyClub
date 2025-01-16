@@ -68,7 +68,7 @@ foreach ($pages as $p)
 
     $keySet = $signOut = '';
     if(isset($_SESSION['user'])){
-        $userEmail = $_SESSION['user'];
+        $userEmail = $_SESSION['user'] ?? '';
         $person = new Person();
         $personFound = $person->getByEmail($userEmail);
         $keys = $person->getKeys($personFound['Id']);
@@ -84,6 +84,7 @@ foreach ($pages as $p)
         }
     } else {
         echo '<img src="images/anonymat.png" alt="User avatar">';
+        $userEmail = '';
     }
     ?>
                         </a>

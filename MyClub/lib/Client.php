@@ -96,6 +96,10 @@ class Client{
     function getToken(){
         return $_SESSION['token'] ?? '';
     }
+
+    function getReferer(){
+        return $_SERVER['HTTP_REFERER'] ?? '';
+    }
 }
 
 ?>
