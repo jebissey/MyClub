@@ -30,6 +30,9 @@ require_once "../breadcrumb.php";
                 <li class="nav-item">
                     <a class="nav-link <?php echo ($currentPage == 'A') ? 'active' : ''; ?>" href="menu.php?l=A"><h5>Arwards</h5></a>';
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link <?php echo ($currentPage == 'R') ? 'active' : ''; ?>" href="menu.php?l=R"><h5>Referers</h5></a>';
+                </li>
             </ul>
         </div>
     </div>
@@ -63,6 +66,9 @@ if($logToDisplay == 'D'){
 }
 if($logToDisplay == 'A'){
     require_once 'Awards.php';
+}
+if($logToDisplay == 'R'){
+    require_once 'Referer.php';
 }
 echo '</div>';
 require_once __DIR__ . '/../../includes/tinyFooter.php';
