@@ -14,6 +14,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $lastName = $_POST['lastName'];
         $nickName = $_POST['nickName'];
         $avatar = $_POST['avatar'];
+        $useGravatar = $_POST['useGravatar'] ?? 'no';
     
         $updateData = [
             'Email' => $email,
@@ -21,6 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'LastName' => $lastName,
             'NickName' => $nickName,
             'Avatar' => $avatar,
+            'UseGravatar' => $useGravatar,
         ];
         if (!empty($password)) {
             $updateData['Password'] = PasswordManager::signPassword($password);

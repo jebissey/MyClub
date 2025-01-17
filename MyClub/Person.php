@@ -1,9 +1,12 @@
 <?php
 require_once 'includes/header.php';
-require_once  __DIR__ . '/lib/Database/Tables/Person.php';
-require_once  __DIR__ . '/lib/PasswordManager.php';
-echo "<main>\n";
+require_once __DIR__ . '/lib/Database/Tables/Person.php';
+require_once __DIR__ . '/lib/PasswordManager.php';
+require_once __DIR__ . '/lib/GravatarHandler.php';
 
+echo '<script src="https://cdnjs.cloudflare.com/ajax/libs/blueimp-md5/2.19.0/js/md5.min.js"></script>';
+
+echo "<main>\n";
 
 $personId=$_GET['p'] ?? 0;
 
@@ -30,6 +33,10 @@ if($userEmail != ''){
         $currentAvailabilities = array_fill(0, 7, ['morning' => false, 'afternoon' => false]);
     }
     $userData = $person->getById($id);
+
+
+    $gravatar = new GravatarHandler();
+    $userHasGravatar = $gravatar->hasGravatar($userData['Email']);
 ?>
     <style>
         .dropdown-menu {
@@ -115,9 +122,12 @@ if($userEmail != ''){
                                     endforeach; 
                                     ?>
                                 </ul>
-                                <input type="text" class="form-control" id="avatar" name="avatar" 
-                                    value="<?php echo htmlspecialchars($userData['Avatar'] ?? ''); ?>">
+                                <input type="text" class="form-control" id="avatar" name="avatar" value="<?php echo htmlspecialchars($userData['Avatar'] ?? ''); ?>">
                             </div>
+                            <label for="gravatar"> 
+                                <input type="checkbox" id="useGravatar" name="useGravatar" <?php echo ($userData['UseGravatar'] === 'yes') ? 'checked' : ''; ?> value="yes"> 
+                                Utiliser mon <a href="https://gravatar.com/"> gravatar</a>
+                            </label>
                         </div>
 
                         <button type="submit" class="btn btn-primary">Valider</button>
@@ -219,13 +229,6 @@ if($userEmail != ''){
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
-$('#emojiList').on('click', '.dropdown-item', function(e) {
-    e.preventDefault();
-    var imageUrl = $(this).data('img');
-    $('#userAvatar').attr('src', imageUrl);
-    $('#avatar').attr('value', imageUrl);
-});
-
     // submits {
     const profilForm = document.querySelector('form[data-form="profil"]');
     if (profilForm) {
@@ -289,6 +292,52 @@ $('#emojiList').on('click', '.dropdown-item', function(e) {
         });
     }
     // } (submits)
+
+
+function getGravatarUrl(email) {
+    var hash = md5(email.toLowerCase().trim());
+    return `https://www.gravatar.com/avatar/${hash}?s=64&d=mp`;
+}
+
+function toggleEmojiSelector(checked) {
+    if (checked) {
+        $('.emoji-selector-container').hide(); 
+        const emailValue = $('#email').val();
+        const gravatarUrl = getGravatarUrl(emailValue);
+        $('#userAvatar').attr('src', gravatarUrl);
+        $('#avatar').attr('value', '');
+    } else {
+        $('.emoji-selector-container').show(); 
+        const savedAvatar = $('#avatar').attr('value');
+        if (savedAvatar) {
+            $('#userAvatar').attr('src', savedAvatar);
+        }
+    }
+}
+
+$(document).ready(function() {
+    $('#emojiSelect').closest('.dropdown').wrap('<div class="emoji-selector-container"></div>');
+    $('#useGravatar').on('change', function() {
+        toggleEmojiSelector(this.checked);
+    });
+
+    $('#emojiList').on('click', '.dropdown-item', function(e) {
+        e.preventDefault();
+        var imageUrl = $(this).data('img');
+        $('#userAvatar').attr('src', imageUrl);
+        $('#avatar').attr('value', imageUrl);
+    });
+
+    const useGravatar = $('#useGravatar').prop('checked');
+    toggleEmojiSelector(useGravatar);
+
+    $('#email').on('change', function() {
+        if ($('#useGravatar').prop('checked')) {
+            const gravatarUrl = getGravatarUrl(this.value);
+            $('#userAvatar').attr('src', gravatarUrl);
+        }
+    });
+});
     </script>
 <?php
 } else {

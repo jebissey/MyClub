@@ -12,20 +12,20 @@ if ($backup->save()) {
 
 
 
-require_once __DIR__ . '/lib/PasswordManager.php';
-$password = "admin_";
-$signedPassword = PasswordManager::signPassword($password);
-echo "<p>password = $password</p>";
-echo "<p>signedPassword = $signedPassword</p>";
+require_once __DIR__ . '/lib/GravatarHandler.php';
+$gravatar = new GravatarHandler();
 
-$userInputPassword = "admin_";
-$isValid = PasswordManager::verifyPassword($userInputPassword, $signedPassword);
-
-if ($isValid) {
-    echo "Mot de passe correct !";
-} else {
-    echo "Mot de passe incorrect !";
+// Option 1 : Simplement vérifier si un Gravatar existe
+$email = "je.bissey@gmail.com";
+if ($gravatar->hasGravatar($email)) {
+    echo "L'utilisateur a un Gravatar";
 }
+
+// Option 2 : Afficher le Gravatar avec les paramètres par défaut
+echo $gravatar->displayGravatar($email);
+
+
+
 
 
 require_once __DIR__ . '/lib/Database/Tables/Debug.php';
@@ -57,8 +57,6 @@ require_once __DIR__ . '/lib/Database/Tables/Debug.php';
 
 */
 
-$message = "Line 1\r\nLine 2\r\nLine 3";
-mail('je.bissey@gmail.com', 'Mon Sujet', $message);
 
 
 

@@ -13,41 +13,33 @@ CREATE TABLE IF NOT EXISTS "PersonGroup" (
 	"Id"	INTEGER,
 	"IdPerson"	INTEGER NOT NULL,
 	"IdGroup"	INTEGER NOT NULL,
-	FOREIGN KEY("IdGroup") REFERENCES "Group"("Id"),
+	FOREIGN KEY("IdPerson") REFERENCES "Person"("Id"),
 	PRIMARY KEY("Id"),
-	FOREIGN KEY("IdPerson") REFERENCES "Person"("Id")
-);
-CREATE TABLE IF NOT EXISTS "EventTypeAttribue" (
-	"Id"	INTEGER,
-	"IdEventType"	INTEGER NOT NULL,
-	"IdAttribute"	INTEGER NOT NULL,
-	FOREIGN KEY("IdAttribute") REFERENCES "Attribute"("Id"),
-	PRIMARY KEY("Id"),
-	FOREIGN KEY("IdEventType") REFERENCES "EventType"("Id")
+	FOREIGN KEY("IdGroup") REFERENCES "Group"("Id")
 );
 CREATE TABLE IF NOT EXISTS "Article" (
 	"Id"	INTEGER,
 	"Title"	TEXT NOT NULL,
 	"Content"	TEXT NOT NULL,
 	"CreatedBy"	INTEGER NOT NULL,
-	FOREIGN KEY("CreatedBy") REFERENCES "Person"("Id"),
-	PRIMARY KEY("Id")
+	PRIMARY KEY("Id"),
+	FOREIGN KEY("CreatedBy") REFERENCES "Person"("Id")
 );
 CREATE TABLE IF NOT EXISTS "GroupAuthorisation" (
 	"Id"	INTEGER,
 	"IdGroup"	INTEGER NOT NULL,
 	"IdAuthorisation"	INTEGER NOT NULL,
-	FOREIGN KEY("IdGroup") REFERENCES "Group"("Id"),
 	FOREIGN KEY("IdAuthorisation") REFERENCES "Authorization"("Id"),
+	FOREIGN KEY("IdGroup") REFERENCES "Group"("Id"),
 	PRIMARY KEY("Id")
 );
 CREATE TABLE IF NOT EXISTS "Participant" (
 	"Id"	INTEGER,
 	"IdEvent"	INTEGER NOT NULL,
 	"IdPerson"	INTEGER NOT NULL,
-	FOREIGN KEY("IdPerson") REFERENCES "Person"("Id"),
+	PRIMARY KEY("Id"),
 	FOREIGN KEY("IdEvent") REFERENCES "Event"("Id"),
-	PRIMARY KEY("Id")
+	FOREIGN KEY("IdPerson") REFERENCES "Person"("Id")
 );
 CREATE TABLE IF NOT EXISTS "SiteData" (
 	"Id"	INTEGER,
@@ -64,9 +56,9 @@ CREATE TABLE IF NOT EXISTS "Event" (
 	"EndTime"	TEXT NOT NULL,
 	"IdEventType"	INTEGER NOT NULL,
 	"CreatedBy"	INTEGER NOT NULL,
-	FOREIGN KEY("IdEventType") REFERENCES "EventType"("Id"),
+	FOREIGN KEY("CreatedBy") REFERENCES "Person"("Id"),
 	PRIMARY KEY("Id"),
-	FOREIGN KEY("CreatedBy") REFERENCES "Person"("Id")
+	FOREIGN KEY("IdEventType") REFERENCES "EventType"("Id")
 );
 CREATE TABLE IF NOT EXISTS "Contact" (
 	"Id"	INTEGER,
@@ -86,20 +78,12 @@ CREATE TABLE IF NOT EXISTS "Authorization" (
 	"Name"	TEXT NOT NULL,
 	PRIMARY KEY("Id")
 );
-CREATE TABLE IF NOT EXISTS "EventGroup" (
-	"Id"	INTEGER,
-	"IdEvent"	INTEGER NOT NULL,
-	"IdGroup"	INTEGER NOT NULL,
-	FOREIGN KEY("IdEvent") REFERENCES "Event"("Id"),
-	PRIMARY KEY("Id"),
-	FOREIGN KEY("IdGroup") REFERENCES "Group"("Id")
-);
 CREATE TABLE IF NOT EXISTS "ArticleGroup" (
 	"Id"	INTEGER,
 	"IdArticle"	INTEGER NOT NULL,
 	"IdGroup"	INTEGER NOT NULL,
-	FOREIGN KEY("IdArticle") REFERENCES "Article"("Id"),
 	PRIMARY KEY("Id"),
+	FOREIGN KEY("IdArticle") REFERENCES "Article"("Id"),
 	FOREIGN KEY("IdGroup") REFERENCES "Group"("Id")
 );
 CREATE TABLE IF NOT EXISTS "Page" (
@@ -117,6 +101,39 @@ CREATE TABLE IF NOT EXISTS "Attribute" (
 	"Color"	TEXT NOT NULL,
 	PRIMARY KEY("Id")
 );
+CREATE TABLE IF NOT EXISTS "Counter" (
+	"Id"	INTEGER,
+	"Name"	TEXT NOT NULL,
+	"Value"	INTEGER NOT NULL,
+	"IdPerson"	INTEGER NOT NULL,
+	"Timestamp"	TEXT NOT NULL DEFAULT current_timestamp,
+	FOREIGN KEY("IdPerson") REFERENCES "Person"("Id"),
+	PRIMARY KEY("Id")
+);
+CREATE TABLE IF NOT EXISTS "EventTypeGroup" (
+	"Id"	INTEGER,
+	"IdEventType"	INTEGER NOT NULL,
+	"IdGroup"	INTEGER NOT NULL,
+	PRIMARY KEY("Id"),
+	FOREIGN KEY("IdGroup") REFERENCES "Group"("Id"),
+	FOREIGN KEY("IdEventType") REFERENCES "EventType"("Id")
+);
+CREATE TABLE IF NOT EXISTS "EventTypeAttribute" (
+	"Id"	INTEGER,
+	"IdEventType"	INTEGER NOT NULL,
+	"IdAttribute"	INTEGER NOT NULL,
+	FOREIGN KEY("IdAttribute") REFERENCES "Attribute"("Id"),
+	PRIMARY KEY("Id"),
+	FOREIGN KEY("IdEventType") REFERENCES "EventType"("Id")
+);
+CREATE TABLE IF NOT EXISTS "EventAttribute" (
+	"Id"	INTEGER,
+	"IdEvent"	INTEGER NOT NULL,
+	"IdAttribute"	INTEGER NOT NULL,
+	PRIMARY KEY("Id"),
+	FOREIGN KEY("IdAttribute") REFERENCES "Attribute"("Id"),
+	FOREIGN KEY("IdEvent") REFERENCES "Event"("Id")
+);
 CREATE TABLE IF NOT EXISTS "Person" (
 	"Id"	INTEGER,
 	"Email"	TEXT NOT NULL UNIQUE,
@@ -125,9 +142,11 @@ CREATE TABLE IF NOT EXISTS "Person" (
 	"LastName"	TEXT NOT NULL,
 	"NickName"	TEXT,
 	"Avatar"	TEXT,
+	"UseGravatar"	TEXT NOT NULL DEFAULT 'no',
 	"Token"	TEXT,
 	"TokenCreatedAt"	TEXT,
-	"Availability"	TEXT,
+	"Availabilities"	TEXT,
+	"Preferences"	TEXT,
 	PRIMARY KEY("Id")
 );
 INSERT INTO "Group" VALUES (1,'Webmaster');
@@ -140,5 +159,5 @@ INSERT INTO "Authorization" VALUES (1,'Webmaster');
 INSERT INTO "Authorization" VALUES (2,'PersonManager');
 INSERT INTO "Authorization" VALUES (3,'EventManager');
 INSERT INTO "Authorization" VALUES (4,'Redactor');
-INSERT INTO "Person" VALUES (1,'webmaster@myclub.foo','613cbc51f1650fb264beaad127efc1a5da0f96a96d4da7c440dc01a9e5299910','my first name','my last name','my nick name or nothing',NULL,NULL,NULL,NULL);
+INSERT INTO "Person" VALUES (1,'webmaster@myclub.foo','613cbc51f1650fb264beaad127efc1a5da0f96a96d4da7c440dc01a9e5299910','my first name','my last name','my nick name or nothing',NULL,'0',NULL,NULL,NULL,NULL);
 COMMIT;

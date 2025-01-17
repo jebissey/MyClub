@@ -3,6 +3,8 @@ require_once 'beforeHeader.php';
 require_once __DIR__ . '/../lib/Database/Tables/Page.php';
 require_once __DIR__ . '/../lib/Database/Tables/Person.php';
 require_once __DIR__ . '/../lib/Database/Tables/SiteData.php';
+require_once __DIR__ . '/../lib/GravatarHandler.php';
+
 ?>
 
 <!doctype html>
@@ -72,13 +74,18 @@ foreach ($pages as $p)
         $person = new Person();
         $personFound = $person->getByEmail($userEmail);
         $keys = $person->getKeys($personFound['Id']);
-        if(empty($personFound['Avatar'])){
-            $avatar = 'images/emojiPensif.png';
-        } else {
-            $avatar = $personFound['Avatar'];
+        if($personFound['UseGravatar'] == 'yes'){
+            echo (new GravatarHandler())->displayGravatar($userEmail);
         }
-        echo '<img id="userAvatar" src="'. $avatar . '" alt="User avatar"/>';
-        $signOut = '<a href ="areas/SignIn/SignOut.php"><img src="images/SignOut.png" alt="Sign out"></a>';
+        else {
+            if(empty($personFound['Avatar'])){
+                $avatar = 'images/emojiPensif.png';
+            } else {
+                $avatar = $personFound['Avatar'];
+            }
+            echo '<img id="userAvatar" src="'. $avatar . '" alt="User avatar"/>';
+        }
+    $signOut = '<a href ="areas/SignIn/SignOut.php"><img src="images/SignOut.png" alt="Sign out"></a>';
         if($keys){
             $keySet = '<a href ="areas/menu.php"><img src="images/keySet.png" alt="Key set"></a>';
         }
