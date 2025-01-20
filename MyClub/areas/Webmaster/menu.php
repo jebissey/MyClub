@@ -33,7 +33,10 @@ require_once "../breadcrumb.php";
                 <li class="nav-item">
                     <a class="nav-link <?php echo ($currentPage == 'R') ? 'active' : ''; ?>" href="menu.php?l=R"><h5>Referers</h5></a>';
                 </li>
-            </ul>
+                <li class="nav-item">
+                    <a class="nav-link <?php echo ($currentPage == 'G') ? 'active' : ''; ?>" href="menu.php?l=G"><h5>Groups</h5></a>';
+                </li>
+        </ul>
         </div>
     </div>
 </nav>
@@ -69,6 +72,9 @@ if($logToDisplay == 'A'){
 }
 if($logToDisplay == 'R'){
     require_once 'Referer.php';
+}
+if($logToDisplay == 'G'){
+    require_once 'Groups/group_list.php';
 }
 echo '</div>';
 require_once __DIR__ . '/../../includes/tinyFooter.php';

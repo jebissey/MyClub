@@ -15,13 +15,13 @@ abstract class BaseTable {
     }
     
     public function getById($id) {
-        $query = $this->pdo->prepare("SELECT * FROM {$this->tableName} WHERE Id = :id");
+        $query = $this->pdo->prepare("SELECT * FROM \"{$this->tableName}\" WHERE Id = :id");
         $query->execute(array('id' => $id));
         return $query->fetch(PDO::FETCH_ASSOC);
     }
     
     public function getByName($name) {
-        $query = $this->pdo->prepare("SELECT * FROM {$this->tableName} WHERE Name = :name");
+        $query = $this->pdo->prepare("SELECT * FROM \"{$this->tableName}\" WHERE Name = :name");
         $query->execute(array('name' => $name));
         return $query->fetch(PDO::FETCH_ASSOC);
     }
@@ -31,13 +31,13 @@ abstract class BaseTable {
         if (!in_array($orderBy, $allowedColumns)) {
             die('Invalid order by column');
         }
-        $query = $this->pdo->prepare("SELECT * FROM {$this->tableName} ORDER BY $orderBy");
+        $query = $this->pdo->prepare("SELECT * FROM \"{$this->tableName}\" ORDER BY $orderBy");
         $query->execute();
         return $query->fetchAll(PDO::FETCH_ASSOC);
     }
 
     public function removeById($id) {
-        $query = $this->pdo->prepare("DELETE FROM {$this->tableName} WHERE Id = :id");
+        $query = $this->pdo->prepare("DELETE FROM \"{$this->tableName}\" WHERE Id = :id");
         return $query->execute(array('id' => $id));
     }
 
@@ -56,7 +56,7 @@ abstract class BaseTable {
     }
 
     public function getMax($field){
-        $query = $this->pdo->prepare("SELECT MAX(:field) as max FROM {$this->tableName}");
+        $query = $this->pdo->prepare("SELECT MAX(:field) as max FROM \"{$this->tableName}\"");
         return $query->execute(array('field' => $field));
     }
 
@@ -70,7 +70,7 @@ abstract class BaseTable {
             $quotedFields[] = "$field";
         }
         
-        return "INSERT INTO {$this->tableName} (" . 
+        return "INSERT INTO \"{$this->tableName}\" (" . 
                implode(', ', $quotedFields) . 
                ") VALUES (" . 
                implode(', ', $values) . 
@@ -92,7 +92,7 @@ abstract class BaseTable {
     }
 
     protected function getTableColumns() {
-        $query = $this->pdo->prepare("PRAGMA table_info({$this->tableName})");
+        $query = $this->pdo->prepare("PRAGMA table_info(\"{$this->tableName}\")");
         $query->execute();
         $columns = $query->fetchAll(PDO::FETCH_ASSOC);
         
@@ -108,7 +108,7 @@ abstract class BaseTable {
         if (empty($updateData['fields'])) {
             return true;
         }
-        $sql = "UPDATE {$this->tableName} SET " . implode(', ', $updateData['fields']) . " WHERE Id = :id";
+        $sql = "UPDATE \"{$this->tableName}\" SET " . implode(', ', $updateData['fields']) . " WHERE Id = :id";
         $params = array_merge(array('id' => $id), $updateData['params']);
         return $this->executeQuery($sql, $params);
     }
