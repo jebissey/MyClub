@@ -35,12 +35,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $updateData = ['Preferences' => $preferences];
     }
     else {
-        die("Fatal error");
+        die('Fatal error in file ' . __FILE__ . ' at line ' . __LINE__);
     }
     (new Person())->setById($id, $updateData);
 
 } else {
-    die("Fatal error");
+    die('Fatal error in file ' . __FILE__ . ' at line ' . __LINE__);
 }
 
 require_once __DIR__ . '/includes/tinyFooter.php';

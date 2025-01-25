@@ -1,11 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+
+	<!-- BOOTSTRAP-->
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" media='all' integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
+</head>
+
+<body>
+
 
 <?php
+
+echo '<h1>REQUEST_METHOD = ' . $_SERVER['REQUEST_METHOD'] . '</h1>'; 
+if($_SERVER['REQUEST_METHOD'] == 'GET'){
+    echo '<p>_GET = ' . json_encode($_GET ). '</p>'; 
+    echo '<p>_POST = ' . json_encode($_POST ). '</p>'; 
+} else if($_SERVER['REQUEST_METHOD'] == 'POST'){
+    echo '<p>_POST = ' . json_encode($_POST ). '</p>'; 
+    echo '<p>_GET = ' . json_encode($_GET ). '</p>'; 
+}
+echo '<p>REQUEST_URI = ' . $_SERVER['REQUEST_URI'] . '</p>'; 
 
 require_once __DIR__ . '/lib/Backup.php';
 $backup = new Backup();
 if ($backup->save()) {
-    echo "Backup created successfully -> ";
-    echo $backup->getLastBackupFolder();
+    echo '<p>Backup created successfully -> ' . $backup->getLastBackupFolder() . '</p>';
 } else {
     echo "Backup failed";
 }
@@ -15,22 +38,69 @@ if ($backup->save()) {
 require_once __DIR__ . '/lib/GravatarHandler.php';
 $gravatar = new GravatarHandler();
 
-// Option 1 : Simplement vérifier si un Gravatar existe
 $email = "je.bissey@gmail.com";
 if ($gravatar->hasGravatar($email)) {
-    echo "L'utilisateur a un Gravatar";
+    echo "<p>L'utilisateur a un Gravatar : " . $gravatar->displayGravatar($email) . '</p>';
 }
+?>
+<h1>form with method post</h1> 
+<form method="post">
+    <input type="hidden" name="step" value="import">
 
-// Option 2 : Afficher le Gravatar avec les paramètres par défaut
-echo $gravatar->displayGravatar($email);
+    <div class="mb-3">
+        <label for="headerRow" class="form-label">Numéro de la ligne d'en-tête</label>
+        <input type="number" class="form-control" id="headerRow" name="headerRow" value="1" min="1" required>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+
+<h1>form with method get</h1> 
+<form method="get">
+    <input type="hidden" name="step" value="import">
+
+    <div class="mb-3">
+        <label for="headerRow" class="form-label">Numéro de la ligne d'en-tête</label>
+        <input type="number" class="form-control" id="headerRow" name="headerRow" value="1" min="1" required>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Submit</button>
+    <button type="reset" value="Reset">Reset</button>
+</form>
 
 
+<div class="row m-0 p-0">
+	<div class="col-6 p-5">
+		<div class="container mx-5 mt-3">
+			<h2 class="display-4"> <small>Make your life <span class="text-primary">memorable</span></small> </h2>
+			<p class="lead">Keep your life organized. We are the solution that you need.</p>
+		</div>
+		<div class="container mx-5 mr-5 mt-3 d-inline-block">
+			<h4 class="text-primary pr-5"><i class="fas fa-rocket pr-3"></i>TAKE OFF YOUR BUSSINESS</h3>
+			<p class="text-muted pr-5">Keep all your projects in one place. We offer you a simple Kanban board where you will be able to add as many projects and tasks as you want.</p>
+			<h4 class="text-primary pr-5"><i class="far fa-calendar-check pr-3"></i>FORGET ABOUT FORGETTING</h3>
+			<p class="text-muted pr-5">Always late? Let us take your agenda for you. We offer you a completely scalable calendar where you can schedule all your events and see them easily. </p>
+				
+		</div>
+		<div class="container d-flex justify-content-center mt-4">
+			<a href="register.php" class="btn btn-sign-up">GET STARTED <i class="fas fa-arrow-circle-right pl-2"></i></a>
+		</div>
+	</div>
+	<div class="col-6">
+		<img class="img-fluid" src="img/1.jpg" alt="project_management">		
+	</div>	
+</div>
 
 
+</body>
+</html>
 
+<?php
+
+/*
 require_once __DIR__ . '/lib/Database/Tables/Debug.php';
 (new Debug())->set("Test debug");
-/*
+
 //envoi d'un rdv dans un agenda
 ?>
 

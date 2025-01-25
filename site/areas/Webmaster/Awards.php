@@ -57,7 +57,7 @@ foreach ($results as $row) {
             </table>
         </div>
     </div>
-    <p>(1 bonus = 1pt,  1 bug = 2pt, 1 suggestion = 3pt, 1 visio = 1pt)</p>
+    <p>(1 bonus (404, gravatar, 403...) = 1pt,  1 bug = 2pt, 1 suggestion = 3pt, 1 visio = 1pt)</p>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>

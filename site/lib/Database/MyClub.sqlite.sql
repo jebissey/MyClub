@@ -1,20 +1,10 @@
 BEGIN TRANSACTION;
-CREATE TABLE IF NOT EXISTS "EventType" (
-	"Id"	INTEGER,
-	"Name"	TEXT NOT NULL,
-	PRIMARY KEY("Id")
-);
-CREATE TABLE IF NOT EXISTS "Group" (
-	"Id"	INTEGER,
-	"Name"	TEXT NOT NULL,
-	PRIMARY KEY("Id")
-);
 CREATE TABLE IF NOT EXISTS "PersonGroup" (
 	"Id"	INTEGER,
 	"IdPerson"	INTEGER NOT NULL,
 	"IdGroup"	INTEGER NOT NULL,
-	FOREIGN KEY("IdGroup") REFERENCES "Group"("Id"),
 	FOREIGN KEY("IdPerson") REFERENCES "Person"("Id"),
+	FOREIGN KEY("IdGroup") REFERENCES "Group"("Id"),
 	PRIMARY KEY("Id")
 );
 CREATE TABLE IF NOT EXISTS "Article" (
@@ -49,8 +39,8 @@ CREATE TABLE IF NOT EXISTS "Event" (
 	"IdEventType"	INTEGER NOT NULL,
 	"CreatedBy"	INTEGER NOT NULL,
 	FOREIGN KEY("CreatedBy") REFERENCES "Person"("Id"),
-	PRIMARY KEY("Id"),
-	FOREIGN KEY("IdEventType") REFERENCES "EventType"("Id")
+	FOREIGN KEY("IdEventType") REFERENCES "EventType"("Id"),
+	PRIMARY KEY("Id")
 );
 CREATE TABLE IF NOT EXISTS "Contact" (
 	"Id"	INTEGER,
@@ -106,8 +96,8 @@ CREATE TABLE IF NOT EXISTS "EventTypeGroup" (
 	"Id"	INTEGER,
 	"IdEventType"	INTEGER NOT NULL,
 	"IdGroup"	INTEGER NOT NULL,
-	FOREIGN KEY("IdEventType") REFERENCES "EventType"("Id"),
 	PRIMARY KEY("Id"),
+	FOREIGN KEY("IdEventType") REFERENCES "EventType"("Id"),
 	FOREIGN KEY("IdGroup") REFERENCES "Group"("Id")
 );
 CREATE TABLE IF NOT EXISTS "EventTypeAttribute" (
@@ -124,21 +114,6 @@ CREATE TABLE IF NOT EXISTS "EventAttribute" (
 	"IdAttribute"	INTEGER NOT NULL,
 	FOREIGN KEY("IdEvent") REFERENCES "Event"("Id"),
 	FOREIGN KEY("IdAttribute") REFERENCES "Attribute"("Id"),
-	PRIMARY KEY("Id")
-);
-CREATE TABLE IF NOT EXISTS "Person" (
-	"Id"	INTEGER,
-	"Email"	TEXT NOT NULL UNIQUE,
-	"Password"	TEXT,
-	"FirstName"	TEXT NOT NULL,
-	"LastName"	TEXT NOT NULL,
-	"NickName"	TEXT,
-	"Avatar"	TEXT,
-	"UseGravatar"	TEXT NOT NULL DEFAULT 'no',
-	"Token"	TEXT,
-	"TokenCreatedAt"	TEXT,
-	"Availabilities"	TEXT,
-	"Preferences"	TEXT,
 	PRIMARY KEY("Id")
 );
 CREATE TABLE IF NOT EXISTS "GroupAuthorization" (
@@ -166,11 +141,40 @@ CREATE TABLE IF NOT EXISTS "PageGroup" (
 	"Id"	INTEGER,
 	"IdPage"	INTEGER NOT NULL,
 	"IdGroup"	INTEGER NOT NULL,
-	FOREIGN KEY("IdPage") REFERENCES "Page"("Id"),
 	PRIMARY KEY("Id"),
-	FOREIGN KEY("IdGroup") REFERENCES "Group"("Id")
+	FOREIGN KEY("IdGroup") REFERENCES "Group"("Id"),
+	FOREIGN KEY("IdPage") REFERENCES "Page"("Id")
 );
-INSERT INTO "Group" VALUES (1,'Webmaster');
+CREATE TABLE IF NOT EXISTS "Person" (
+	"Id"	INTEGER,
+	"Email"	TEXT NOT NULL UNIQUE,
+	"Password"	TEXT,
+	"FirstName"	TEXT NOT NULL,
+	"LastName"	TEXT NOT NULL,
+	"NickName"	TEXT,
+	"Avatar"	TEXT,
+	"UseGravatar"	TEXT NOT NULL DEFAULT 'no',
+	"Token"	TEXT,
+	"TokenCreatedAt"	TEXT,
+	"Availabilities"	TEXT,
+	"Preferences"	TEXT,
+	"Imported"	INTEGER NOT NULL DEFAULT 0,
+	"Inactivated"	INTEGER NOT NULL DEFAULT 0,
+	"Phone"	TEXT,
+	PRIMARY KEY("Id")
+);
+CREATE TABLE IF NOT EXISTS "Group" (
+	"Id"	INTEGER,
+	"Name"	TEXT NOT NULL,
+	"Inactivated"	INTEGER NOT NULL DEFAULT 0,
+	PRIMARY KEY("Id")
+);
+CREATE TABLE IF NOT EXISTS "EventType" (
+	"Id"	INTEGER,
+	"Name"	TEXT NOT NULL,
+	"Inactivated"	INTEGER NOT NULL DEFAULT 0,
+	PRIMARY KEY("Id")
+);
 INSERT INTO "PersonGroup" VALUES (1,1,1);
 INSERT INTO "SiteData" VALUES (1,'Title','My Club');
 INSERT INTO "SiteData" VALUES (2,'LegalNotices','Legal notices');
@@ -179,6 +183,7 @@ INSERT INTO "Authorization" VALUES (1,'Webmaster');
 INSERT INTO "Authorization" VALUES (2,'PersonManager');
 INSERT INTO "Authorization" VALUES (3,'EventManager');
 INSERT INTO "Authorization" VALUES (4,'Redactor');
-INSERT INTO "Person" VALUES (1,'webmaster@myclub.foo','613cbc51f1650fb264beaad127efc1a5da0f96a96d4da7c440dc01a9e5299910','my first name','my last name','my nick name or nothing',NULL,'0',NULL,NULL,NULL,NULL);
 INSERT INTO "GroupAuthorization" VALUES (1,1,1);
+INSERT INTO "Person" VALUES (1,'webmaster@myclub.foo','613cbc51f1650fb264beaad127efc1a5da0f96a96d4da7c440dc01a9e5299910','my first name','my last name','my nick name or nothing',NULL,'0',NULL,NULL,NULL,NULL,0,0,NULL);
+INSERT INTO "Group" VALUES (1,'Webmaster',0);
 COMMIT;

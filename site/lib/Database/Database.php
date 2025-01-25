@@ -28,14 +28,14 @@ class Database {
 
     public function getPdo() {
         if(self::$pdo === null){
-            die('Fatal program exception');
+            die('Fatal error in file ' . __FILE__ . ' at line ' . __LINE__);
         }
         return self::$pdo;
     }
 
     public function getPdoForLog() {
         if(self::$pdoForLog === null){
-            die('Fatal program exception');
+            die('Fatal error in file ' . __FILE__ . ' at line ' . __LINE__);
         }
         return self::$pdoForLog;
     }

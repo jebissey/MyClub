@@ -27,10 +27,6 @@ abstract class BaseTable {
     }
         
     public function getOrdered($orderBy) {
-        $allowedColumns = ['Position', 'Name'];
-        if (!in_array($orderBy, $allowedColumns)) {
-            die('Invalid order by column');
-        }
         $query = $this->pdo->prepare("SELECT * FROM \"{$this->tableName}\" ORDER BY $orderBy");
         $query->execute();
         return $query->fetchAll(PDO::FETCH_ASSOC);
