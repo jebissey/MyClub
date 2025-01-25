@@ -1,11 +1,1 @@
-<IfDefine Free>
-    php56 1
-</IfDefine>
-
-Options -Indexes
-
-<Files ".htaccess">
-    Order Allow,Deny
-        Deny from all 
-</Files>
-
+ErrorDocument 404 /404.html
