@@ -17,3 +17,8 @@ It behaves like a **mini CMS** with artiles and events.
 
 All data is stored in a **SQLight** database.
 
+**How to install**
+From source: 
+- clone WebSite folder
+- update references with "composer update"
+
