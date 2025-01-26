@@ -19,8 +19,7 @@ All data is stored in a **SQLight** database.
 
 ## How to install
 
-From source: 
-------------
+### From source: 
 
 - clone
 - copy WebSite folder to your local home test
