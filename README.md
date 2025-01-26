@@ -19,6 +19,11 @@ All data is stored in a **SQLight** database.
 
 **How to install**
 From source: 
-- clone WebSite folder
-- update references with "composer update"
+------------
+- clone
+- copy WebSite folder to your local home test
+- update references with ```composer update```
+- test localy with ```php -S localhost:8000```
+- upload to the cloud
+- enjoy
 
