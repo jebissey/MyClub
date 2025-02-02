@@ -1,0 +1,61 @@
+{extends "layout.latte"}
+
+{block title}Liste des groupes{/block}
+
+{block content}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 m-0">Liste des groupes</h1>
+    <a href="/groups/create" class="btn btn-primary">
+        <i class="bi bi-plus-lg"></i> Nouveau groupe
+    </a>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        {if count($groups) === 0}
+        <div class="alert alert-info mb-0">
+            Aucun groupe n'a été créé pour le moment.
+        </div>
+        {else}
+        <div class="table-responsive">
+            <table class="table table-striped table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nom</th>
+                        <th>Auto-inscription</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {foreach $groups as $group}
+                    <tr>
+                        <td>{$group['Id']}</td>
+                        <td>{$group['Name']}</td>
+                        <td>
+                            <span class="badge {$group['SelfRegistration'] ? 'bg-success' : 'bg-secondary'}">
+                                {$group['SelfRegistration'] ? 'Oui' : 'Non'}
+                            </span>
+                        </td>
+                        <td class="text-end">
+                            <div class="btn-group btn-group-sm">
+                                <a href="/groups/edit/{$group['Id']}" class="btn btn-outline-primary">
+                                    Modifier
+                                </a>
+                                <form method="POST" action="/groups/delete/{$group['Id']}" class="d-inline">
+                                    <button type="submit" class="btn btn-outline-danger" 
+                                            onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce groupe ?')">
+                                        Supprimer
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {/foreach}
+                </tbody>
+            </table>
+        </div>
+        {/if}
+    </div>
+</div>
+{/block}

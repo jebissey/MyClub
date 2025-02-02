@@ -1,0 +1,47 @@
+{extends "layout.latte"}
+
+{block title}Éditer une personne{/block}
+
+{block content}
+<div class="container">
+    <h1>Éditer une personne</h1>
+    
+    <form method="POST">
+        {if isset($errors)}
+        <div class="alert alert-danger">
+            {foreach $errors as $field => $error}
+                <p>{$error}</p>
+            {/foreach}
+        </div>
+        {/if}
+
+        {if isset($editableFields['Email'])}
+        <div class="mb-3">
+            <label for="Email" class="form-label">Email</label>
+            <input type="email" class="form-control" id="Email" name="Email" value="{$person['Email']}">
+        </div>
+        {/if}
+
+        {if isset($editableFields['FirstName'])}
+        <div class="mb-3">
+            <label for="FirstName" class="form-label">Prénom</label>
+            <input type="text" class="form-control" id="FirstName" name="FirstName" value="{$person['FirstName']}">
+        </div>
+        {/if}
+
+        {if isset($editableFields['LastName'])}
+        <div class="mb-3">
+            <label for="LastName" class="form-label">Nom</label>
+            <input type="text" class="form-control" id="LastName" name="LastName" value="{$person['LastName']}">
+        </div>
+        {/if}
+
+        {if isset($editableFields['NickName'])}
+        <div class="mb-3">
+            <label for="NickName" class="form-label">Surnom</label>
+            <input type="text" class="form-control" id="NickName" name="NickName" value="{$person['NickName'] ?? ''}">
+        </div>
+        {/if}
+
+        {if isset($editableFields['Phone'])}
+        <div class="mb-3

@@ -1,9 +1,12 @@
 <?php
 
-require_once __DIR__ . '/../File.php';
+namespace app\helpers\database;
+
+use PDO;
+use PDOException;
 
 class Database {
-    const SQLITE_DEST_PATH = __DIR__ . '/../../../Data/';
+    const SQLITE_DEST_PATH = __DIR__ . '/../../../data/';
     const SQLITE_FILE = 'MyClub.sqlite';
     const SQLITE_LOG_FILE = 'LogMyClub.sqlite';
     const APPLICATION = 'MyClub';
