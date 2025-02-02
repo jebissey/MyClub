@@ -13,7 +13,7 @@ This web application is designed to make life easier for members of an associati
 
 This is a generic application.
 
-It behaves like a **mini CMS** with artiles and events.
+It behaves like a **mini CMS** with articles and events.
 
 All data is stored in a **SQLight** database.
 
@@ -22,9 +22,8 @@ All data is stored in a **SQLight** database.
 ### From source: 
 
 - clone
-- copy WebSite folder to your local home test
 - update references with ```composer update```
-- test localy with ```php -S localhost:8000```
+- test localy from WebSite folder with ```php -S localhost:8000 ../dev/router.php```
 - upload to the cloud
 - enjoy
 
