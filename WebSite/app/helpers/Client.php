@@ -2,48 +2,54 @@
 
 namespace app\helpers;
 
-class Client{
+class Client
+{
 
-    function getBrowser() {
+    function getBrowser()
+    {
         $user_agent = $_SERVER['HTTP_USER_AGENT'];
         $browser        = 'Inconnu';
-        $browser_array = array( '/mobile/i'    => 'Handheld Browser',
-                    '/msie/i'      => 'Internet Explorer',
-                    '/trident/i'   => 'Internet Explorer',
-                    '/firefox/i'   => 'Firefox',
-                    '/safari/i'    => 'Safari',
-                    '/chrome/i'    => 'Chrome',
-                    '/edg/i'      => 'Edge',
-                    '/opera/i'     => 'Opera',
-                    '/netscape/i'  => 'Netscape',
-                    '/maxthon/i'   => 'Maxthon',
-                    '/konqueror/i' => 'Konqueror'
+        $browser_array = array(
+            '/mobile/i'    => 'Handheld Browser',
+            '/msie/i'      => 'Internet Explorer',
+            '/trident/i'   => 'Internet Explorer',
+            '/firefox/i'   => 'Firefox',
+            '/safari/i'    => 'Safari',
+            '/chrome/i'    => 'Chrome',
+            '/edg/i'      => 'Edge',
+            '/opera/i'     => 'Opera',
+            '/netscape/i'  => 'Netscape',
+            '/maxthon/i'   => 'Maxthon',
+            '/konqueror/i' => 'Konqueror'
         );
         foreach ($browser_array as $regex => $value)
-        if (preg_match($regex, $user_agent))
-            $browser = $value;
+            if (preg_match($regex, $user_agent))
+                $browser = $value;
         return $browser;
     }
 
-    function getIp() {
-        if(!empty($_SERVER['HTTP_CLIENT_IP'])){
+    function getIp()
+    {
+        if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
             $ip = $_SERVER['HTTP_CLIENT_IP'];
-        }elseif(!empty($_SERVER['HTTP_X_FORWARDED_FOR'])){
+        } elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
             $ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
-        }else{
+        } else {
             $ip = $_SERVER['REMOTE_ADDR'];
         }
         return $ip;
     }
 
-    function getReferer(){
+    function getReferer()
+    {
         return $_SERVER['HTTP_REFERER'] ?? '';
-    }    
-    
-    function getOs() {
+    }
+
+    function getOs()
+    {
         $user_agent = $_SERVER['HTTP_USER_AGENT'];
         $os_platform  = "Inconnu";
-        $os_array     = array(  
+        $os_array     = array(
             '/windows nt 10/i'      =>  'Windows 10',
             '/windows nt 6.3/i'     =>  'Windows 8.1',
             '/windows nt 6.2/i'     =>  'Windows 8',
@@ -69,26 +75,28 @@ class Client{
             '/webos/i'              =>  'Mobile'
         );
         foreach ($os_array as $regex => $value)
-        if (preg_match($regex, $user_agent))
-            $os_platform = $value;
+            if (preg_match($regex, $user_agent))
+                $os_platform = $value;
         return $os_platform;
     }
 
-    function getScreenResolution(){
-        if(isset($_COOKIE['screen_resolution'])) {
+    function getScreenResolution()
+    {
+        if (isset($_COOKIE['screen_resolution'])) {
             $resolution = $_COOKIE['screen_resolution'];
-        }
-        else {
+        } else {
             $resolution = '';
         }
         return $resolution;
     }
 
-    function getToken(){
+    function getToken()
+    {
         return $_SESSION['token'] ?? '';
     }
 
-    function getType(){
+    function getType()
+    {
         $useragent = $_SERVER['HTTP_USER_AGENT'];
         if (preg_match('/(android|bb\\d+|meego).+mobile|avantgo|bada\\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\\.(browser|link)|vodafone|wap|windows (ce|phone)|xda|xiino/i', $useragent)) {
             return 'Mobile';
@@ -99,9 +107,8 @@ class Client{
         return 'PC';
     }
 
-    function getUri(){
+    function getUri()
+    {
         return $_SERVER['REQUEST_URI'];
     }
 }
-
-?>

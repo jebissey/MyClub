@@ -38,6 +38,11 @@ $containerBuilder->addDefinitions([
             $container->get(PDO::class),
             $container->get(Engine::class)
         );
+    },
+    'app\helpers\Application' => function (Container $container) {
+        return new \app\helpers\Application(
+            $container->get(Engine::class)
+        );
     }
 ]);
 $container = $containerBuilder->build();
@@ -45,7 +50,7 @@ $container = $containerBuilder->build();
 $flight = $container->get(Engine::class);
 
 
-// Add a custom URL parser
+// Add a custom URL parser to fix issue with URL with encoded email address
 $flight->map('pass', function($str) {
     return $str;
 });
@@ -77,7 +82,7 @@ Flight::map('getData', function ($key) {
     return Flight::get($key);
 });
 
-$flight->route('GET /', function()  { include __DIR__.'/app/views/layout.latte'; });
+
 
 $groupController = $container->get('app\controllers\GroupController');
 $flight->route('GET  /groups',            function()    use ($groupController) { $groupController->index(); });
@@ -96,13 +101,16 @@ $flight->route('POST /persons/edit/@id',   function($id) use ($personController)
 $flight->route('POST /persons/delete/@id', function($id) use ($personController) { $personController->delete($id); });
 
 $userController = $container->get('app\controllers\UserController');
-$flight->route('GET /user/resetPassword/@encodedEmail', function($encodedEmail) use ($userController) { $userController->resetPassword($encodedEmail); });
-$flight->route('/*', function() use ($userController) { $userController->error404(); });
+$flight->route('GET /',                                   function()              use ($userController) { $userController->home(); });
+$flight->route('GET  /user/signIn',                       function()              use ($userController) { $userController->signIn(); });
+$flight->route('POST /user/signIn',                       function()              use ($userController) { $userController->signIn(); });
+$flight->route('GET  /user/forgotPassword/@encodedEmail', function($encodedEmail) use ($userController) { $userController->forgotPassword($encodedEmail); });
+
+$applicationHelper = $container->get('app\helpers\Application');
+$flight->route('/*', function() use ($applicationHelper) { $applicationHelper->error404(); });
+
 
 $flight->after('start', function() use ($userController) { $userController->log(Flight::getData('code'), Flight::getData('message')); });
-
-
-
 $flight->start();
 
 Debugger::$email = $personController->getWebmasterEmail();

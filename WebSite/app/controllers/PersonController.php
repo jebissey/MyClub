@@ -1,11 +1,14 @@
 <?php
+
 namespace app\controllers;
 
 use PDO;
 
-class PersonController extends BaseController {
-    
-    private function getCurrentUser() {
+class PersonController extends BaseController
+{
+
+    private function getCurrentUser()
+    {
         $userEmail = $_SESSION['userEmail'] ?? '';
         if (empty($userEmail)) {
             return null;
@@ -16,7 +19,8 @@ class PersonController extends BaseController {
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    public function getWebmasterEmail() {
+    public function getWebmasterEmail()
+    {
         $stmt = $this->pdo->query('
             SELECT Email FROM Person
             INNER JOIN PersonGroup on Person.Id = PersonGroup.IdPerson
@@ -27,7 +31,8 @@ class PersonController extends BaseController {
         return $stmt->fetchColumn();
     }
 
-    private function hasPersonManagerAuthorization() {
+    private function hasPersonManagerAuthorization()
+    {
         $currentUser = $this->getCurrentUser();
         if (!$currentUser) return false;
 
@@ -41,11 +46,12 @@ class PersonController extends BaseController {
         return $stmt->fetchColumn() ? true : false;
     }
 
-    public function index() {
+    public function index()
+    {
         // Vérifier l'accès
         $currentUser = $this->getCurrentUser();
         $hasPersonManagerAuth = $this->hasPersonManagerAuthorization();
-        
+
         if (!$currentUser || !$hasPersonManagerAuth) {
             $this->flight->redirect('/');
             return;
@@ -59,7 +65,8 @@ class PersonController extends BaseController {
         ]);
     }
 
-    public function edit($id) {
+    public function edit($id)
+    {
         $currentUser = $this->getCurrentUser();
         $hasPersonManagerAuth = $this->hasPersonManagerAuthorization();
 
@@ -114,10 +121,10 @@ class PersonController extends BaseController {
                 $updateValues = array_values($updateData['update']);
                 $updateValues[] = $id;
 
-                $updateQuery = 'UPDATE "Person" SET ' . 
+                $updateQuery = 'UPDATE "Person" SET ' .
                     implode(' = ?, ', $updateFields) . ' = ? ' .
                     'WHERE Id = ?';
-                
+
                 $stmt = $this->pdo->prepare($updateQuery);
                 $stmt->execute($updateValues);
 
@@ -151,7 +158,8 @@ class PersonController extends BaseController {
         ]);
     }
 
-    private function determineEditableFields($isEditingSelf, $hasPersonManagerAuth, $isImported) {
+    private function determineEditableFields($isEditingSelf, $hasPersonManagerAuth, $isImported)
+    {
         $editableFields = [];
 
         if ($isEditingSelf) {
@@ -179,7 +187,8 @@ class PersonController extends BaseController {
         return $editableFields;
     }
 
-    private function validateAndPrepareUpdate($person, $editableFields) {
+    private function validateAndPrepareUpdate($person, $editableFields)
+    {
         $update = [];
         $errors = [];
 
@@ -214,7 +223,8 @@ class PersonController extends BaseController {
         ];
     }
 
-    public function create() {
+    public function create()
+    {
         $currentUser = $this->getCurrentUser();
         $hasPersonManagerAuth = $this->hasPersonManagerAuthorization();
 
@@ -282,7 +292,8 @@ class PersonController extends BaseController {
         ]);
     }
 
-    private function validateNewPerson() {
+    private function validateNewPerson()
+    {
         $errors = [];
         $data = [];
 
@@ -324,7 +335,8 @@ class PersonController extends BaseController {
         ];
     }
 
-    public function delete($id) {
+    public function delete($id)
+    {
         $currentUser = $this->getCurrentUser();
         $hasPersonManagerAuth = $this->hasPersonManagerAuthorization();
 

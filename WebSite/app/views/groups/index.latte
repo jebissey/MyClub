@@ -38,6 +38,7 @@
                             </span>
                         </td>
                         <td class="text-end">
+                        {if $group['Id'] != 1}
                             <div class="btn-group btn-group-sm">
                                 <a href="/groups/edit/{$group['Id']}" class="btn btn-outline-primary">
                                     Modifier
@@ -49,6 +50,7 @@
                                     </button>
                                 </form>
                             </div>
+                        {/if}
                         </td>
                     </tr>
                     {/foreach}

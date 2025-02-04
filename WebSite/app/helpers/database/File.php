@@ -2,9 +2,11 @@
 
 namespace app\helpers\database;
 
-class File {
+class File
+{
 
-    function copy($sourceFile, $destinationDir) {
+    function copy($sourceFile, $destinationDir)
+    {
         $destinationFile = $destinationDir . basename($sourceFile);
         if (!is_dir($destinationDir)) {
             if (!mkdir($destinationDir, 0777, true)) {

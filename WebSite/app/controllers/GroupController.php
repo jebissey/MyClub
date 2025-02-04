@@ -1,12 +1,15 @@
 <?php
+
 namespace app\controllers;
 
 use PDO;
 use Flight;
 
-class GroupController extends BaseController {
+class GroupController extends BaseController
+{
 
-    public function index() {
+    public function index()
+    {
         $stmt = $this->pdo->query('SELECT * FROM "Group" WHERE Inactivated = 0');
         $groups = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -15,7 +18,8 @@ class GroupController extends BaseController {
         ]);
     }
 
-    public function create() {
+    public function create()
+    {
         $stmtAuthorizations = $this->pdo->query('SELECT * FROM "Authorization"');
         $availableAuthorizations = $stmtAuthorizations->fetchAll(PDO::FETCH_ASSOC);
 
@@ -56,7 +60,8 @@ class GroupController extends BaseController {
         ]);
     }
 
-    public function edit($id) {
+    public function edit($id)
+    {
         $stmtAuthorizations = $this->pdo->query('SELECT * FROM "Authorization"');
         $availableAuthorizations = $stmtAuthorizations->fetchAll(PDO::FETCH_ASSOC);
 
@@ -70,7 +75,7 @@ class GroupController extends BaseController {
                 $stmt->execute([$id]);
                 $group = $stmt->fetch(PDO::FETCH_ASSOC);
 
-                echo $this->latte->render('app//edit.latte', [
+                echo $this->latte->render('app/views/groups/edit.latte', [
                     'group' => $group,
                     'availableAuthorizations' => $availableAuthorizations,
                     'error' => 'Le nom du groupe est requis'
@@ -119,10 +124,11 @@ class GroupController extends BaseController {
         ]);
     }
 
-    public function delete($id) {
+    public function delete($id)
+    {
         $stmt = $this->pdo->prepare('UPDATE "Group" SET Inactivated = 1 WHERE Id = ?');
         $stmt->execute([$id]);
-        
+
         $this->flight->redirect('/groups');
     }
 }
