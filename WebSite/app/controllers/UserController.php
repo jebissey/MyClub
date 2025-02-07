@@ -6,18 +6,17 @@ use DateTime;
 use flight\Engine;
 use PDO;
 use app\helpers\Client;
-use app\helpers\Application;
+use app\helpers\Params;
+use app\helpers\PasswordManager;
 
 class UserController extends BaseController
 {
     private PDO $pdoForLog;
-    private Application $application;
 
     public function __construct(PDO $pdo, Engine $flight)
     {
         parent::__construct($pdo, $flight);
         $this->pdoForLog = \app\helpers\database\Database::getInstance()->getPdoForLog();
-        $this->application = new Application($flight);
     }
 
 
@@ -77,7 +76,7 @@ class UserController extends BaseController
                 $this->application->error497($token, __FILE__, __LINE__);
             }
             $stmt = $this->pdo->prepare('UPDATE Person SET Password = ?, Token = null, TokenCreatedAt = null WHERE Id = ?');
-            $stmt->execute([$_POST['signedPassword'], $person['Id']]);
+            $stmt->execute([PasswordManager::signPassword($_POST['password']), $person['Id']]);
 
             $this->application->message('Votre mot de passe est réinitialisé');
         } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
@@ -109,14 +108,19 @@ class UserController extends BaseController
                 $this->application->error480($email, __FILE__, __LINE__);
             }
 
-            if (\PasswordManager::verifyPassword($password, $person['Password'] ?? '')) {
+            if (PasswordManager::verifyPassword($password, $person['Password'] ?? '')) {
                 $_SESSION['user'] = $email;
-                $this->application->message("sign in succeeded with $email address");
+                $this->application->message("Sign in succeeded with $email", 1);
             } else {
                 $this->application->error482("sign in failed with $email address", __FILE__, __LINE__);
             }
         } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-            echo $this->latte->render('app/views/user/signIn.latte');
+            echo $this->latte->render('app/views/user/signIn.latte', [
+                'href' => '/user/sign/in',
+                'userImg' => '../../app/images/anonymat.png',
+                'userEmail' => '',
+                'keys' => false
+            ]);
         } else {
             $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
         }
@@ -124,7 +128,7 @@ class UserController extends BaseController
 
     public function signOut()
     {
-        $this->log(200, 'SignOut');
+        $this->log(200, 'Sign out succeeded with with ' . $_SESSION['user'] ?? '');
         unset($_SESSION['user']);
         header('Location:/');
         exit();
@@ -133,7 +137,89 @@ class UserController extends BaseController
 
     public function home()
     {
-        echo $this->latte->render('app/views/user/home.latte');
+        $userEmail = $_SESSION['user'] ?? '';
+        if ($userEmail) {
+            $person = $this->getPerson();
+            if (!$person) {
+                unset($_SESSION['user']);
+                $this->application->error480($userEmail, __FILE__, __LINE__);
+                exit();
+            }
+        } else {
+            $this->params = new Params([
+                'href' => '/user/sign/in',
+                'userImg' => '../../app/images/anonymat.png',
+                'userEmail' => '',
+                'keys' => false
+            ]);
+        }
+        echo $this->latte->render('app/views/user/home.latte', $this->params->getAll([]));
+    }
+
+    public function user()
+    {
+        $this->getPerson();
+
+        if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+            echo $this->latte->render('app/views/user/user.latte', $this->params->getAll([]));
+        } else {
+            $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
+        }
+    }
+
+    public function account()
+    {
+        $person = $this->getPerson();
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $email = filter_var($_POST['email'], FILTER_VALIDATE_EMAIL) ?? '';
+            $password = $_POST['password'];
+            $firstName = $_POST['firstName'];
+            $lastName = $_POST['lastName'];
+            $nickName = $_POST['nickName'];
+            $avatar = $_POST['avatar'];
+            $useGravatar = $_POST['useGravatar'] ?? 'no';
+            $stmt = $this->pdo->prepare('UPDATE Person SET FirstName = ?, LastName = ?, NickName = ?, Avatar = ?, useGravatar = ? WHERE Id = ' . $person['Id']);
+            $stmt->execute([$firstName, $lastName, $nickName, $avatar, $useGravatar]);
+            
+            if (!empty($password)) {
+                $stmt = $this->pdo->prepare('UPDATE Person SET Password = ? WHERE Id = ' . $person['Id']);
+                $stmt->execute([PasswordManager::signPassword($password)]);
+            }
+            
+            if ($person['Imported'] == 0) {
+                $stmt = $this->pdo->prepare('UPDATE Person SET Email = ? WHERE Id = ' . $person['Id']);
+                $stmt->execute([$email]);
+                $_SESSION['user'] = $email;
+            }
+            $this->flight->redirect('/user');
+        } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+            $email = filter_var($person['Email'], FILTER_VALIDATE_EMAIL) ?? '';
+            $firstName = $this->sanitizeInput($person['FirstName']);
+            $lastName = $this->sanitizeInput($person['LastName']);
+            $nickName = $this->sanitizeInput($person['NickName']);
+            $avatar = $this->sanitizeInput($person['Avatar']);
+            $useGravatar = $this->sanitizeInput($person['UseGravatar']) ?? 'no';
+
+            $emojiFiles = glob(__DIR__ . '/../images/emoji*');
+            $emojis = array_map(function($path) {return basename($path);}, $emojiFiles);
+
+            //var_dump($emojis);
+
+            echo $this->latte->render('app/views/user/account.latte', $this->params->getAll([
+                'emailReadOnly' => $person['Imported'] == 1 ? true : false,
+                'email' => $email,
+                'firstName' => $firstName,
+                'lastName' => $lastName,
+                'nickName' => $nickName,
+                'avatar' => $avatar,
+                'useGravatar' => $useGravatar,
+                'emojis' => $emojis,
+                'emojiPath' => '../images/'
+            ]));
+        } else {
+            $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
+        }
     }
 
 
@@ -145,4 +231,10 @@ class UserController extends BaseController
         VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ? ,?)');
         $stmt->execute([$client->getIp(), $client->getReferer(), $client->getOs(), $client->getBrowser(), $client->getScreenResolution(), $client->getType(), $client->getUri(), $client->getToken(), $email, $code, $message]);
     }
+
+
+
+
+
+
 }

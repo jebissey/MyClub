@@ -20,9 +20,9 @@ class Application
     }
 
 
-    public function error403($timeout = 1000)
+    public function error403($file, $line, $timeout = 1000)
     {
-        $this->error(403, 'Not allowed', $timeout);
+        $this->error(403, "Page not allowed in file $file at line $line", $timeout);
     }
 
     public function error404($timeout = 1000)

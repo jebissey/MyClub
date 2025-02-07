@@ -84,6 +84,16 @@ Flight::map('getData', function ($key) {
 
 
 
+$userController = $container->get('app\controllers\UserController');
+$flight->route('GET  /',                                  function()              use ($userController) { $userController->home(); });
+$flight->route('GET  /user',                              function()              use ($userController) { $userController->user(); });
+$flight->route('GET  /user/sign/in',                      function()              use ($userController) { $userController->signIn(); });
+$flight->route('POST /user/sign/in',                      function()              use ($userController) { $userController->signIn(); });
+$flight->route('GET  /user/sign/out',                     function()              use ($userController) { $userController->signOut(); });
+$flight->route('GET  /user/forgotPassword/@encodedEmail', function($encodedEmail) use ($userController) { $userController->forgotPassword($encodedEmail); });
+$flight->route('GET  /user/account',                      function()              use ($userController) { $userController->account(); });
+$flight->route('POST /user/account',                      function()              use ($userController) { $userController->account(); });
+
 $groupController = $container->get('app\controllers\GroupController');
 $flight->route('GET  /groups',            function()    use ($groupController) { $groupController->index(); });
 $flight->route('GET  /groups/create',     function()    use ($groupController) { $groupController->create(); });
@@ -100,11 +110,6 @@ $flight->route('GET  /persons/edit/@id',   function($id) use ($personController)
 $flight->route('POST /persons/edit/@id',   function($id) use ($personController) { $personController->edit($id); });
 $flight->route('POST /persons/delete/@id', function($id) use ($personController) { $personController->delete($id); });
 
-$userController = $container->get('app\controllers\UserController');
-$flight->route('GET /',                                   function()              use ($userController) { $userController->home(); });
-$flight->route('GET  /user/signIn',                       function()              use ($userController) { $userController->signIn(); });
-$flight->route('POST /user/signIn',                       function()              use ($userController) { $userController->signIn(); });
-$flight->route('GET  /user/forgotPassword/@encodedEmail', function($encodedEmail) use ($userController) { $userController->forgotPassword($encodedEmail); });
 
 $applicationHelper = $container->get('app\helpers\Application');
 $flight->route('/*', function() use ($applicationHelper) { $applicationHelper->error404(); });

@@ -2,10 +2,10 @@
 
 namespace app\controllers;
 
+use app\helpers\Application;
 use PDO;
-use Flight;
 
-class GroupController extends BaseController
+class GroupController extends BaseController implements CrudControllerInterface 
 {
 
     public function index()
@@ -103,25 +103,28 @@ class GroupController extends BaseController
             }
             return;
         }
+        if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+            $stmt = $this->pdo->prepare('SELECT * FROM "Group" WHERE Id = ?');
+            $stmt->execute([$id]);
+            $group = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        $stmt = $this->pdo->prepare('SELECT * FROM "Group" WHERE Id = ?');
-        $stmt->execute([$id]);
-        $group = $stmt->fetch(PDO::FETCH_ASSOC);
+            if (!$group) {
+                $this->flight->redirect('/groups');
+                return;
+            }
 
-        if (!$group) {
-            $this->flight->redirect('/groups');
-            return;
+            $stmtGroupAuth = $this->pdo->prepare('SELECT IdAuthorization FROM "GroupAuthorization" WHERE IdGroup = ?');
+            $stmtGroupAuth->execute([$id]);
+            $currentAuthorizations = $stmtGroupAuth->fetchAll(PDO::FETCH_COLUMN);
+
+            echo $this->latte->render('app/views/groups/edit.latte', [
+                'group' => $group,
+                'availableAuthorizations' => $availableAuthorizations,
+                'currentAuthorizations' => $currentAuthorizations
+            ]);
+        } else {
+            (new Application($this->flight))->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
         }
-
-        $stmtGroupAuth = $this->pdo->prepare('SELECT IdAuthorization FROM "GroupAuthorization" WHERE IdGroup = ?');
-        $stmtGroupAuth->execute([$id]);
-        $currentAuthorizations = $stmtGroupAuth->fetchAll(PDO::FETCH_COLUMN);
-
-        echo $this->latte->render('app/views/groups/edit.latte', [
-            'group' => $group,
-            'availableAuthorizations' => $availableAuthorizations,
-            'currentAuthorizations' => $currentAuthorizations
-        ]);
     }
 
     public function delete($id)

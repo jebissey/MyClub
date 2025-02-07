@@ -1,0 +1,77 @@
+{layout "user.latte"}
+
+{block content}
+    <form method="POST" class="needs-validation" novalidate data-form="profil">
+        <input type="hidden" name="id" value="<?php echo htmlspecialchars($userData['Id']); ?>">
+        <input type="hidden" name="u" value="profil">
+        
+        <div class="mb-3">
+            <label for="email" class="form-label">Email</label>
+            <input type="email" class="form-control" id="email" name="email" 
+                value="{$email}" 
+                {if $emailReadOnly}
+                    readonly
+                {else}
+                    required
+                {/if}>
+            <div class="invalid-feedback">
+                Veuillez saisir une adresse email valide.
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label for="password" class="form-label">Mot de passe</label>
+            <input type="password" class="form-control" id="password" name="password" 
+                placeholder="Laissez vide pour ne pas modifier">
+        </div>
+
+        <div class="mb-3">
+            <label for="firstName" class="form-label">Prénom</label>
+            <input type="text" class="form-control" id="firstName" name="firstName" 
+                value="{$firstName}" required>
+            <div class="invalid-feedback">
+                Le prénom est requis.
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label for="lastName" class="form-label">Nom</label>
+            <input type="text" class="form-control" id="lastName" name="lastName" 
+                value="{$lastName}" required>
+            <div class="invalid-feedback">
+                Le nom est requis.
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label for="nickName" class="form-label">Pseudo</label>
+            <input type="text" class="form-control" id="nickName" name="nickName" 
+                value="{$nickName}">
+        </div>
+
+        <div class="mb-3">
+            {if $useGravatar == 'no'}
+            <div class="dropdown">
+                <button class="btn btn-outline-primary dropdown-toggle" type="button" id="emojiSelect" data-bs-toggle="dropdown" aria-expanded="false">
+                    Sélectionnez un Emoji
+                </button>
+                <ul class="dropdown-menu" id="emojiList">
+                    {foreach $emojis as $emoji}<li><a class="dropdown-item" href="#" data-img="{$emojiPath}{$emoji}"><img src="{$emojiPath}{$emoji}" alt="emoji"> {$emoji}</a></li>
+                    {/foreach}                
+                </ul>
+                <input type="text" class="form-control" id="avatar" name="avatar" value="{$avatar}">
+            </div>
+            {/if}
+            <label for="gravatar"> 
+                <input type="checkbox" id="useGravatar" name="useGravatar" 
+                {if $useGravatar == 'yes'}
+                    checked
+                {/if}
+                value="yes"> 
+                Utiliser mon <a href="https://gravatar.com/"> gravatar</a>
+            </label>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Valider</button>
+    </form>
+{/block}

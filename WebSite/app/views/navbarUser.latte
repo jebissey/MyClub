@@ -1,6 +1,6 @@
   <div class="container-fluid">
     <a class="navbar-brand" href="/">
-      <img src="/app/images/agenda.png" alt="Agenda" height="30">
+      <img src="../../app/images/agenda.png" alt="Agenda">
     </a>
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -9,12 +9,16 @@
 
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav me-auto">
-        <li class="nav-item">
-          <a class="nav-link" href="/groups">Groups</a>
-        </li>
+        {block navbarOptions}{/block}
       </ul>
-      <a class="nav-link" href="#" onclick="window.location.href='/user/signIn'">
-        <img src="/app/images/anonymat.png" alt="Sign In" height="30">
+      <a class="nav-link" href="{$href}">
+        <img src="{$userImg}" >
       </a>
+      {if $keys}
+        <a href ="/admin"><img src="../../app/images/keySet.png" alt="Key set"></a>
+      {/if}
+      {if $userEmail != ''}
+        <a href ="/user/sign/out"><img src="../../app/images/SignOut.png" alt="Sign out"></a>
+      {/if}
     </div>
   </div>
