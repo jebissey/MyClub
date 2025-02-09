@@ -43,26 +43,27 @@ abstract class BaseController
         $userEmail = $_SESSION['user'] ?? '';
         if (!$userEmail) {
             $this->application->error403(__FILE__, __LINE__);
-            exit();
+        } else {
+            $stmt = $this->pdo->prepare('SELECT * FROM Person WHERE Email = ?');
+            $stmt->execute([$userEmail]);
+            $person = $stmt->fetch(PDO::FETCH_ASSOC);
+            if (!$person) {
+                $this->application->error480($userEmail, __FILE__, __LINE__);
+            } else {
+                $authorizations = $this->authorizations->get($person['Id']);
+                $this->params = new Params([
+                    'href' => $this->getHref($person['Email']),
+                    'userImg' => $this->getUserImg($person),
+                    'userEmail' => $person['Email'],
+                    'keys' => count($authorizations) ?? 0 > 0 ? true : false,
+                    'isEventManager' => $this->authorizations->isEventManager(),
+                    'isPersonManager' => $this->authorizations->isPersonManager(),
+                    'isRedactor' => $this->authorizations->isRedactor(),
+                    'isWebmaster' => $this->authorizations->isWebmaster(),
+                ]);
+                return $person;
+            }
         }
-        $stmt = $this->pdo->prepare('SELECT * FROM Person WHERE Email = ?');
-        $stmt->execute([$userEmail]);
-        $person = $stmt->fetch(PDO::FETCH_ASSOC);
-        if (!$person) {
-            $this->application->error480($userEmail, __FILE__, __LINE__);
-        }
-        $authorizations = $this->authorizations->get($person['Id']);
-        $this->params = new Params([
-            'href' => $this->getHref($person['Email']),
-            'userImg' => $this->getUserImg($person),
-            'userEmail' => $person['Email'],
-            'keys' => count($authorizations) ?? 0 > 0 ? true : false,
-            'isEventManager' => $this->authorizations->isEventManager(),
-            'isPersonManager' => $this->authorizations->isPersonManager(),
-            'isRedactor' => $this->authorizations->isRedactor(),
-            'isWebmaster' => $this->authorizations->isWebmaster(),
-        ]);
-        return $person;
     }
 
     private function getHref($userEmail)

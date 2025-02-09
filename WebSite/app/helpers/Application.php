@@ -58,19 +58,19 @@ class Application
         $this->error(470, "Method $requestMethod invalid in file $file at line $line", $timeout);
     }
 
-    public function error480($email, $timeout = 1000)
+    public function error480($email, $file, $line, $timeout = 1000)
     {
-        $this->error(480, "Unknown user with this email address: $email", $timeout);
+        $this->error(480, "Unknown user with this email address: $email in file $file at line $line", $timeout);
     }
 
-    public function error481($email, $timeout = 1000)
+    public function error481($email, $file, $line, $timeout = 1000)
     {
-        $this->error(481, "Invalid email address: $email", $timeout);
+        $this->error(481, "Invalid email address: $email in file $file at line $line", $timeout);
     }
 
-    public function error482($message, $timeout = 1000)
+    public function error482($message, $file, $line, $timeout = 1000)
     {
-        $this->error(482, "Invalid password: $message", $timeout);
+        $this->error(482, "Invalid password: $message in file $file at line $line", $timeout);
     }
 
 
@@ -96,12 +96,10 @@ class Application
         $this->flight->setData('message', $message);
 
         echo "<h1>$code</h1><h2>$message</h2>";
-?>
-        <script>
+        echo "<script>
             setTimeout(function() {
                 window.location.href = '/';
-            }, <?php echo $timeout; ?>);
-        </script>
-<?php
+            }, $timeout);
+        </script>";
     }
 }

@@ -18,8 +18,8 @@
 
         <div class="mb-3">
             <label for="password" class="form-label">Mot de passe</label>
-            <input type="password" class="form-control" id="password" name="password" 
-                placeholder="Laissez vide pour ne pas modifier">
+            <input type="password" class="form-control" id="password" name="password" placeholder="Laissez vide pour ne pas modifier">
+            <div class="invalid-feedback">Le mot de passe doit contenir au moins 6 caractères</div>
         </div>
 
         <div class="mb-3">
@@ -47,18 +47,22 @@
         </div>
 
         <div class="mb-3">
-            {if $useGravatar == 'no'}
-            <div class="dropdown">
+            <div class="dropdown" id="emojiDropdown">
                 <button class="btn btn-outline-primary dropdown-toggle" type="button" id="emojiSelect" data-bs-toggle="dropdown" aria-expanded="false">
                     Sélectionnez un Emoji
                 </button>
                 <ul class="dropdown-menu" id="emojiList">
-                    {foreach $emojis as $emoji}<li><a class="dropdown-item" href="#" data-img="{$emojiPath}{$emoji}"><img src="{$emojiPath}{$emoji}" alt="emoji"> {$emoji}</a></li>
+                    {foreach $emojis as $emoji}
+                    <li>
+                    <a class="dropdown-item d-flex align-items-center" href="#" data-img="{$emojiPath}{$emoji}">
+                        <img src="{$emojiPath}{$emoji}" alt="emoji" width="32" height="32" class="me-2">
+                        <span class="visually-hidden">Emoji</span>
+                    </a>
+                    </li>
                     {/foreach}                
                 </ul>
-                <input type="text" class="form-control" id="avatar" name="avatar" value="{$avatar}">
+                <input type="hidden" class="form-control" id="avatar" name="avatar" value="{$avatar}">
             </div>
-            {/if}
             <label for="gravatar"> 
                 <input type="checkbox" id="useGravatar" name="useGravatar" 
                 {if $useGravatar == 'yes'}
@@ -71,4 +75,38 @@
 
         <button type="submit" class="btn btn-primary">Valider</button>
     </form>
+{/block}
+
+{block scripts}
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const emojiLinks = document.querySelectorAll("#emojiList a");
+    const userAvatar = document.getElementById("userAvatar");
+    const avatarInput = document.getElementById("avatar");
+    const emaiValue = document.getElementById("email");
+    const useGravatarCheckbox = document.getElementById("useGravatar");
+    const emojiDropdown = document.querySelector(".dropdown");
+
+    function toggleEmojiSelector() {
+        if (useGravatarCheckbox.checked) {
+            emojiDropdown.style.display = "none";
+        } else {
+            emojiDropdown.style.display = "block";
+        }
+    }
+
+
+    toggleEmojiSelector();
+    useGravatarCheckbox.addEventListener("change", toggleEmojiSelector);
+
+    emojiLinks.forEach(link => {
+        link.addEventListener("click", function(event) {
+            event.preventDefault();
+            const emojiImg = this.querySelector("img").src;
+            userAvatar.src = emojiImg;
+            avatarInput.value = emojiImg;
+        });
+    });
+});
+</script>
 {/block}

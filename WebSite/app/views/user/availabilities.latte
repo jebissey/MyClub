@@ -17,11 +17,11 @@
         </thead>
         <tbody>
             <tr>
-                <td>Matin</td>
+                <td><div class="form-check d-flex align-items-center"><input class="form-check-input row-selector me-2" type="checkbox" id="morning_selector">Matin</div></td>
                 {for $i = 0; $i < 7; $i++}                
                 <td>
                     <div class="form-check">
-                        <input class="form-check-input" type="checkbox" 
+                        <input class="form-check-input morning" type="checkbox" 
                             name="availabilities[{$i}][morning]" 
                             id="morning_{$i}"
                             {isset($currentAvailabilities[$i][morning]) ? checked : ''}>
@@ -30,11 +30,11 @@
                 {/for}            
             </tr>
             <tr>
-                <td>Après-midi</td>
+                <td><div class="form-check d-flex align-items-center"><input class="form-check-input row-selector me-2" type="checkbox" id="afternoon_selector">Après-midi</div></td>
                 {for $i = 0; $i < 7; $i++}                
                 <td>
                     <div class="form-check">
-                        <input class="form-check-input" type="checkbox" 
+                        <input class="form-check-input afternoon" type="checkbox" 
                             name="availabilities[{$i}][afternoon]" 
                             id="afternoon_{$i}"
                             {isset($currentAvailabilities[$i][afternoon]) ? checked : ''}>
@@ -43,11 +43,11 @@
                 {/for}            
             </tr>
             <tr>
-                <td>Soir</td>
+                <td><div class="form-check d-flex align-items-center"><input class="form-check-input row-selector me-2" type="checkbox" id="evening_selector">Soir</div></td>
                 {for $i = 0; $i < 7; $i++}                
                 <td>
                     <div class="form-check">
-                        <input class="form-check-input" type="checkbox" 
+                        <input class="form-check-input evening" type="checkbox" 
                             name="availabilities[{$i}][evening]" 
                             id="evening_{$i}"
                             {isset($currentAvailabilities[$i][evening]) ? checked : ''}>
@@ -60,4 +60,37 @@
     
     <button type="submit" class="btn btn-primary">Valider</button>
 </form>
+{/block}
+
+{block scripts}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  function updateRowSelector(rowType) {
+    const checkboxes = document.querySelectorAll('.' + rowType);
+    const selector = document.getElementById(rowType + '_selector');
+    const allChecked = Array.from(checkboxes).every(checkbox => checkbox.checked);
+    selector.checked = allChecked;
+  }
+
+  document.querySelectorAll('.row-selector').forEach(selector => {
+    selector.addEventListener('change', function() {
+      const rowType = this.id.split('_')[0]; 
+      const checkboxes = document.querySelectorAll('.' + rowType);
+      checkboxes.forEach(checkbox => {
+        checkbox.checked = this.checked;
+      });
+    });
+  });
+
+  ['morning', 'afternoon', 'evening'].forEach(rowType => {
+    document.querySelectorAll('.' + rowType).forEach(checkbox => {
+      checkbox.addEventListener('change', function() {
+        updateRowSelector(rowType);
+      });
+    });
+    
+    updateRowSelector(rowType);
+  });
+});
+</script>
 {/block}
