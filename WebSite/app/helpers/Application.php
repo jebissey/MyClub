@@ -2,15 +2,38 @@
 
 namespace app\helpers;
 
+use PDO;
 use flight\Engine;
+use Latte\Engine as LatteEngine;
 
 class Application
 {
+    private PDO $pdo;
     private Engine $flight;
+    private Settings $settings;
+    private $latte;
 
-    public function __construct(Engine $flight)
+    public function __construct(PDO $pdo, Engine $flight)
     {
+        $this->pdo = $pdo;
         $this->flight = $flight;
+        $this->settings = new Settings($this->pdo);
+        $this->latte = new LatteEngine();
+    }
+
+
+    public function help() 
+    {
+        echo $this->latte->render('app/views/info.latte', [
+            'content' => $this->settings->getHelp()
+        ]);
+    }
+
+    public function legalNotice() 
+    {
+        echo $this->latte->render('app/views/info.latte', [
+            'content' => $this->settings->getLegalNotices()
+        ]);
     }
 
 

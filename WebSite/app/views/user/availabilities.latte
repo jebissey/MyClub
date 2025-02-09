@@ -1,0 +1,63 @@
+{layout "user.latte"}
+
+{block content}
+<form method="POST" class="needs-validation" novalidate data-form="availabilities">
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th></th>
+                <th>Lundi</th>
+                <th>Mardi</th>
+                <th>Mercredi</th>
+                <th>Jeudi</th>
+                <th>Vendredi</th>
+                <th>Samedi</th>
+                <th>Dimanche</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Matin</td>
+                {for $i = 0; $i < 7; $i++}                
+                <td>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" 
+                            name="availabilities[{$i}][morning]" 
+                            id="morning_{$i}"
+                            {isset($currentAvailabilities[$i][morning]) ? checked : ''}>
+                    </div>
+                </td>
+                {/for}            
+            </tr>
+            <tr>
+                <td>Après-midi</td>
+                {for $i = 0; $i < 7; $i++}                
+                <td>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" 
+                            name="availabilities[{$i}][afternoon]" 
+                            id="afternoon_{$i}"
+                            {isset($currentAvailabilities[$i][afternoon]) ? checked : ''}>
+                    </div>
+                </td>
+                {/for}            
+            </tr>
+            <tr>
+                <td>Soir</td>
+                {for $i = 0; $i < 7; $i++}                
+                <td>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" 
+                            name="availabilities[{$i}][evening]" 
+                            id="evening_{$i}"
+                            {isset($currentAvailabilities[$i][evening]) ? checked : ''}>
+                    </div>
+                </td>
+                {/for}            
+            </tr>
+        </tbody>
+    </table>
+    
+    <button type="submit" class="btn btn-primary">Valider</button>
+</form>
+{/block}

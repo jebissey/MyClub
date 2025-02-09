@@ -1,0 +1,13 @@
+{layout 'layout.latte'}
+
+{block title}home{/block}
+
+{block navbar}
+    {include 'navbarHome.latte'}
+{/block}
+
+{block content}
+    {ifset $content}
+        {$content}
+    {/ifset}
+{/block}

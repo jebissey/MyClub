@@ -9,7 +9,7 @@ use Latte\Engine as LatteEngine;
 use app\helpers\Application;
 use app\helpers\GravatarHandler;
 use app\helpers\Params;
-
+use app\helpers\Authorization;
 
 abstract class BaseController
 {
@@ -18,7 +18,7 @@ abstract class BaseController
     protected $latte;
     protected Application $application;
     protected Params $params;
-
+    private $authorizations;
 
     public function __construct(PDO $pdo, Engine $flight)
     {
@@ -28,7 +28,8 @@ abstract class BaseController
         $this->latte = new LatteEngine();
         $this->latte->setTempDirectory(__DIR__ . '/../../var/latte/temp');
         $this->latte->addExtension(new \Latte\Bridges\Tracy\TracyExtension);
-        $this->application = new Application($flight);
+        $this->application = new Application($pdo, $flight);
+        $this->authorizations = new Authorization($this->pdo);
     }
 
 
@@ -50,18 +51,23 @@ abstract class BaseController
         if (!$person) {
             $this->application->error480($userEmail, __FILE__, __LINE__);
         }
+        $authorizations = $this->authorizations->get($person['Id']);
         $this->params = new Params([
             'href' => $this->getHref($person['Email']),
             'userImg' => $this->getUserImg($person),
             'userEmail' => $person['Email'],
-            'keys' => count($this->getAuthorizations($person['Id'])) ?? 0 > 0 ? true : false
+            'keys' => count($authorizations) ?? 0 > 0 ? true : false,
+            'isEventManager' => $this->authorizations->isEventManager(),
+            'isPersonManager' => $this->authorizations->isPersonManager(),
+            'isRedactor' => $this->authorizations->isRedactor(),
+            'isWebmaster' => $this->authorizations->isWebmaster(),
         ]);
         return $person;
     }
 
     private function getHref($userEmail)
     {
-        return $userEmail == '' ? '/user/sign/in' : '/user/account';
+        return $userEmail == '' ? '/user/sign/in' : '/user';
     }
 
     private function getUserImg($person)
@@ -77,18 +83,5 @@ abstract class BaseController
                 return '../../app/images/' . $person['Avatar'];
             }
         }
-    }
-
-    private function getAuthorizations($id)
-    {
-        $query = $this->pdo->prepare("
-            SELECT Authorization.Id, Authorization.Name FROM Person 
-            INNER JOIN PersonGroup ON Person.Id = PersonGroup.IdPerson
-            INNER JOIN `Group` ON PersonGroup.IdGroup = `Group`.Id
-            INNER JOIN GroupAuthorization on `Group`.Id = GroupAuthorization.IdGroup
-            INNER JOIN Authorization on GroupAuthorization.IdAuthorization = Authorization.Id 
-            WHERE Person.Id = ?");
-        $query->execute([$id]);
-        return $query->fetchAll(PDO::FETCH_ASSOC);
     }
 }

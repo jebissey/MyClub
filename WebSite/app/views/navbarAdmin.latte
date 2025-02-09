@@ -5,12 +5,26 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav">
-                <li class="nav-item">
-                    <a class="nav-link" href="/groups">Groupes</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/persons">Personnes</a>
-                </li>
+                {if $isEventManager}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/events">Evènements</a>
+                    </li>
+                {/if}
+                {if $isPersonManager}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/persons">Personnes</a>
+                    </li>
+                {/if}
+                {if $isRedactor}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/articles">Rédacteur</a>
+                    </li>
+                {/if}
+                {if $isWebmaster}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/webmaster">Webmaster</a>
+                    </li>
+                {/if}
             </ul>
         </div>
     </div>

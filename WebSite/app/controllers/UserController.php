@@ -119,7 +119,8 @@ class UserController extends BaseController
                 'href' => '/user/sign/in',
                 'userImg' => '../../app/images/anonymat.png',
                 'userEmail' => '',
-                'keys' => false
+                'keys' => false,
+                'page' => basename($_SERVER['REQUEST_URI'])
             ]);
         } else {
             $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
@@ -153,7 +154,7 @@ class UserController extends BaseController
                 'keys' => false
             ]);
         }
-        echo $this->latte->render('app/views/user/home.latte', $this->params->getAll([]));
+        echo $this->latte->render('app/views/home.latte', $this->params->getAll([]));
     }
 
     public function user()
@@ -161,7 +162,9 @@ class UserController extends BaseController
         $this->getPerson();
 
         if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-            echo $this->latte->render('app/views/user/user.latte', $this->params->getAll([]));
+            echo $this->latte->render('app/views/user/user.latte', $this->params->getAll([
+                'page' => basename($_SERVER['REQUEST_URI'])
+            ]));
         } else {
             $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
         }
@@ -177,7 +180,7 @@ class UserController extends BaseController
             $firstName = $_POST['firstName'];
             $lastName = $_POST['lastName'];
             $nickName = $_POST['nickName'];
-            $avatar = $_POST['avatar'];
+            $avatar = $_POST['avatar'] ?? '';
             $useGravatar = $_POST['useGravatar'] ?? 'no';
             $stmt = $this->pdo->prepare('UPDATE Person SET FirstName = ?, LastName = ?, NickName = ?, Avatar = ?, useGravatar = ? WHERE Id = ' . $person['Id']);
             $stmt->execute([$firstName, $lastName, $nickName, $avatar, $useGravatar]);
@@ -215,7 +218,109 @@ class UserController extends BaseController
                 'avatar' => $avatar,
                 'useGravatar' => $useGravatar,
                 'emojis' => $emojis,
-                'emojiPath' => '../images/'
+                'emojiPath' => '../images/',
+                'page' => basename($_SERVER['REQUEST_URI'])
+            ]));
+        } else {
+            $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
+        }
+    }
+
+    public function availabilities()
+    {
+        $person = $this->getPerson();
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $availabilities = $_POST['availabilities'];
+            $query = $this->pdo->prepare('UPDATE Person SET availabilities = ? WHERE Id = ' . $person['Id']);
+            $query->execute([json_encode($availabilities)]);
+            $this->flight->redirect('/user');
+        } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+            $currentAvailabilities = json_decode($person['Availabilities'] ?? '', true);
+            echo $this->latte->render('app/views/user/availabilities.latte', $this->params->getAll([
+                'currentAvailabilities' => $currentAvailabilities,
+                'page' => basename($_SERVER['REQUEST_URI'])
+            ]));
+        } else {
+            $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
+        }
+    }
+
+    public function preferences()
+    {
+        $person = $this->getPerson();
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $preferences = $_POST['preferences'];
+            $query = $this->pdo->prepare('UPDATE Person SET preferences = ? WHERE Id = ' . $person['Id']);
+            $query->execute([json_encode($preferences)]);
+            $this->flight->redirect('/user');
+        } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+            $currentPreferences = json_decode($person['Preferences'] ?? '', true);
+            $query = $this ->pdo->prepare("
+                SELECT DISTINCT et.*
+                FROM EventType et
+                WHERE et.Inactivated = 0 
+                AND (
+                    et.Id IN (
+                        SELECT DISTINCT etg.IdEventType
+                        FROM EventTypeGroup etg
+                        JOIN `Group` g ON etg.IdGroup = g.Id
+                        JOIN PersonGroup pg ON g.Id = pg.IdGroup
+                        WHERE pg.IdPerson = ?
+                    )
+                    OR
+                    et.Id NOT IN (
+                        SELECT DISTINCT IdEventType 
+                        FROM EventTypeGroup
+                    )
+                )
+                ORDER BY et.Name
+            ");
+            $query->execute([$person['Id']]);
+            $eventTypes = $query->fetchAll(PDO::FETCH_ASSOC);
+            echo $this->latte->render('app/views/user/preferences.latte', $this->params->getAll([
+                'currentPreferences' => $currentPreferences,
+                'page' => basename($_SERVER['REQUEST_URI']),
+                'eventTypes' => $eventTypes
+            ]));
+        } else {
+            $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
+        }
+    }
+
+    public function groups()
+    {
+        $person = $this->getPerson();
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $groups = $_POST['groups'] ?? [];
+            $idPerson = $person['Id'];
+            $query = $this->pdo->prepare("
+                DELETE FROM PersonGroup 
+                WHERE IdPerson = $idPerson 
+                AND IdGroup IN (SELECT Id FROM `Group` WHERE SelfRegistration = 1)");
+            $query->execute();
+            
+            $query = $this->pdo->prepare('INSERT INTO PersonGroup (IdPerson, IdGroup) VALUES (?, ?)');
+            foreach ($groups as $groupId) {
+                $query->execute([$idPerson, $groupId]);
+            }
+            $this->flight->redirect('/user');
+        } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+            $query = $this->pdo->prepare('
+                SELECT g.*, 
+                    CASE WHEN pg.Id IS NOT NULL THEN 1 ELSE 0 END as isMember,
+                    g.SelfRegistration as canToggle
+                FROM `Group` g 
+                LEFT JOIN PersonGroup pg ON pg.IdGroup = g.Id AND pg.IdPerson = ?
+                WHERE g.Inactivated = 0 AND (g.SelfRegistration = 1 OR pg.Id IS NOT NULL)
+                ORDER BY g.Name');
+                $query->execute([$person['Id']]);
+            $currentGroups = $query->fetchAll(PDO::FETCH_ASSOC);
+            echo $this->latte->render('app/views/user/groups.latte', $this->params->getAll([
+                'groups' => $currentGroups,
+                'page' => basename($_SERVER['REQUEST_URI'])
             ]));
         } else {
             $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);

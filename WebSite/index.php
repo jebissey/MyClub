@@ -41,6 +41,7 @@ $containerBuilder->addDefinitions([
     },
     'app\helpers\Application' => function (Container $container) {
         return new \app\helpers\Application(
+            $container->get(PDO::class),
             $container->get(Engine::class)
         );
     }
@@ -93,6 +94,15 @@ $flight->route('GET  /user/sign/out',                     function()            
 $flight->route('GET  /user/forgotPassword/@encodedEmail', function($encodedEmail) use ($userController) { $userController->forgotPassword($encodedEmail); });
 $flight->route('GET  /user/account',                      function()              use ($userController) { $userController->account(); });
 $flight->route('POST /user/account',                      function()              use ($userController) { $userController->account(); });
+$flight->route('GET  /user/availabilities',               function()              use ($userController) { $userController->availabilities(); });
+$flight->route('POST /user/availabilities',               function()              use ($userController) { $userController->availabilities(); });
+$flight->route('GET  /user/preferences',                  function()              use ($userController) { $userController->preferences(); });
+$flight->route('POST /user/preferences',                  function()              use ($userController) { $userController->preferences(); });
+$flight->route('GET  /user/groups',                       function()              use ($userController) { $userController->groups(); });
+$flight->route('POST /user/groups',                       function()              use ($userController) { $userController->groups(); });
+
+$adminController = $container->get('app\controllers\AdminController');
+$flight->route('GET  /admin',                              function()             use ($adminController) { $adminController->root(); });
 
 $groupController = $container->get('app\controllers\GroupController');
 $flight->route('GET  /groups',            function()    use ($groupController) { $groupController->index(); });
@@ -112,7 +122,9 @@ $flight->route('POST /persons/delete/@id', function($id) use ($personController)
 
 
 $applicationHelper = $container->get('app\helpers\Application');
-$flight->route('/*', function() use ($applicationHelper) { $applicationHelper->error404(); });
+$flight->route('/help',         function() use ($applicationHelper) { $applicationHelper->help(); });
+$flight->route('/legal/notice', function() use ($applicationHelper) { $applicationHelper->legalNotice(); });
+$flight->route('/*',            function() use ($applicationHelper) { $applicationHelper->error404(); });
 
 
 $flight->after('start', function() use ($userController) { $userController->log(Flight::getData('code'), Flight::getData('message')); });

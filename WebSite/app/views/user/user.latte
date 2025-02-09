@@ -1,18 +1,10 @@
-{layout "userLayout.latte"}
+{layout '../layout.latte'}
 
 {block title}MC - user{/block}
 
-{block navbarOptions}
-    <li class="nav-item">
-        <a class="nav-link" href="/user/acount">Compte</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link" href="/user/availabilities">Disponibilités</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link" href="/user/preferences">Préférences</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link" href="/user/groups">Groupes</a>
-    </li>
+{block navbar}
+    {include '../navbarUser.latte'}
 {/block}
+
+
+

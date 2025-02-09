@@ -1,20 +1,20 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" class="min-vh-100">
 <head>
     <title>{block title}{/block}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     {php Tracy\Debugger::renderLoader()}
 </head>
-<body>
+<body class="d-flex flex-column min-vh-100">
+<main class="flex-grow-1">
+    <nav class="navbar navbar-expand-sm navbar-dark bg-dark">
+        {block navbar}{/block}
+    </nav>
 
-<nav class="navbar navbar-expand-sm navbar-dark bg-dark">
-    {block navbar}{/block}
-</nav>
-
-<div class="container mt-4">
-    {block content}{/block}
-</div>
-
+    <div class="container mt-4">
+        {block content}{/block}
+    </div>
+</main>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
 document.addEventListener("DOMContentLoaded", function() {
@@ -24,6 +24,11 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 </script>
 
+<footer class="bg-dark text-white">
+    <div class="container">
+        <p class="mb-0"><a href ="https://github.com/jebissey/MyClub/releases/tag/V0.1">V0.2</a> &#169; JEB <a href="/legal/notice">Mentions légales</a></p>
+    </div>
+</footer>
 {block scripts}{/block}
 </body>
 </html>

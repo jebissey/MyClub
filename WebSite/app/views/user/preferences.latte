@@ -1,0 +1,68 @@
+{layout "user.latte"}
+
+{block content}
+    <form method="POST">
+        <div class="row">
+            <div class="col-md-8">
+                <div class="list-group">
+                <p class="card-text">Sélectionnez les type d'évènement pour lesquels vous souhaitez recevoir une alerte :</p>
+                    {foreach $eventTypes as $eventType}
+                        <div class="list-group-item">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input event-type-checkbox" 
+                                               id="eventType{$eventType['Id']}"
+                                               name="preferences[eventTypes][{$eventType['Id']}][enabled]"
+                                               {isset($currentPreferences['eventTypes'][$eventType['Id']]['enabled']) ? checked : ''}>
+                                        <label class="form-check-label" for="eventType{$eventType['Id']}">
+                                            {$eventType['Name']}
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="availability-options" 
+                                     id="availabilityOptions{$eventType['Id']}" 
+                                     {if !isset($currentPreferences['eventTypes'][$eventType['Id']]['enabled']) || !$currentPreferences['eventTypes'][$eventType['Id']]['enabled']}style="display: none;"{/if}>
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" 
+                                               id="availability{$eventType['Id']}"
+                                               name="preferences[eventTypes][{$eventType['Id']}][available]"
+                                               {isset($currentPreferences['eventTypes'][$eventType['Id']]['available']) ? checked : '' }>
+                                        <label class="form-check-label" for="availability{$eventType['Id']}">
+                                            Si je suis disponible
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {/foreach}
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-4">
+            <button type="submit" class="btn btn-primary">Valider</button>
+        </div>
+    </form>
+{/block}
+
+{block scripts}
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const eventTypeCheckboxes = document.querySelectorAll('.event-type-checkbox');
+        
+        eventTypeCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                const eventTypeId = this.id.replace('eventType', '');
+                const availabilityOptions = document.getElementById('availabilityOptions' + eventTypeId);
+                
+                if (this.checked) {
+                    availabilityOptions.style.display = 'block';
+                } else {
+                    availabilityOptions.style.display = 'none';
+                }
+            });
+        });
+    });
+    </script>
+{/block}

@@ -9,18 +9,7 @@
 
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav me-auto">
-          <li class="nav-item">
-            <a class="nav-link {if $page == 'account'}active{/if}" href="/user/account">Compte</a>
-          </li>
-          <li class="nav-item">
-              <a class="nav-link {if $page == 'availabilities'}active{/if}" href="/user/availabilities">Disponibilités</a>
-          </li>
-          <li class="nav-item">
-              <a class="nav-link {if $page == 'preferences'}active{/if}" href="/user/preferences">Préférences</a>
-          </li>
-          <li class="nav-item">
-              <a class="nav-link {if $page == 'groups'}active{/if}" href="/user/groups">Groupes</a>
-          </li>
+{* add pages here *}
       </ul>
       <a class="nav-link" href="{$href}">
         <img src="{$userImg}" >
@@ -31,5 +20,7 @@
       {if $userEmail != ''}
         <a href ="/user/sign/out"><img src="../../app/images/SignOut.png" alt="Sign out"></a>
       {/if}
+      <a href ="/help"><img src="../../app/images/help.png" alt="Help"></a>
+      </a>
     </div>
   </div>

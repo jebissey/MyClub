@@ -123,7 +123,7 @@ class GroupController extends BaseController implements CrudControllerInterface
                 'currentAuthorizations' => $currentAuthorizations
             ]);
         } else {
-            (new Application($this->flight))->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
+            (new Application($this->pdo, $this->flight))->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
         }
     }
 
