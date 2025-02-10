@@ -329,6 +329,7 @@ class UserController extends BaseController
 
     public function help() 
     {
+        $this->getPerson();
         echo $this->latte->render('app/views/info.latte', [
             'content' => $this->settings->getHelpUser(),
             'hasAuthorization' => $this->authorizations->hasAutorization()
