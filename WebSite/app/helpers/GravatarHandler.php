@@ -5,7 +5,7 @@ namespace app\helpers;
 class GravatarHandler
 {
     private string $defaultImage = 'mp';    // 'mp' pour un placeholder générique
-    private int $size = 64;                 // Taille par défaut en pixels
+    private int $size = 48;                 // Taille par défaut en pixels
     private string $rating = 'g';           // Note 'g' pour tout public
 
     public function hasGravatar(string $email): bool

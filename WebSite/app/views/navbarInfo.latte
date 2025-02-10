@@ -1,7 +1,12 @@
   <div class="container-fluid">
     <a class="navbar-brand" href="/">
-      <img src="../../app/images/agenda.png" alt="Agenda">
+      <img src="../../app/images/agenda.png" alt="Home">
     </a>
+    {if $hasAuthorization}
+      <a class="navbar-brand" href="/admin">
+        <img src="../../app/images/admin.png" alt="Admin">
+      </a>
+    {/if}
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
       <span class="navbar-toggler-icon"></span>

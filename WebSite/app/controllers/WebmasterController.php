@@ -7,9 +7,10 @@ use flight\Engine;
 use PDO;
 use app\helpers\Client;
 use app\helpers\Params;
+use app\helpers\PasswordManager;
 use app\helpers\Settings;
 
-class AdminController extends BaseController
+class WebmasterController extends BaseController
 {
     private PDO $pdoForLog;
     private Settings $settings;
@@ -21,12 +22,13 @@ class AdminController extends BaseController
         $this->settings = new Settings($this->pdo);
     }
 
-
     public function help() 
     {
+        $this->getPerson();
+
         echo $this->latte->render('app/views/info.latte', [
-            'content' => $this->settings->getHelpAdmin(),
-            'hasAuthorization' => $this->authorizations->isEventManager()
+            'content' => $this->settings->getHelpWebmaster(),
+            'hasAuthorization' => $this->authorizations->hasAutorization()
         ]);
     }
 
@@ -35,7 +37,7 @@ class AdminController extends BaseController
         $this->getPerson();
 
         if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-            echo $this->latte->render('app/views/admin/admin.latte', $this->params->getAll([]));
+            echo $this->latte->render('app/views/admin/webmaster.latte', $this->params->getAll([]));
         } else {
             $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
         }

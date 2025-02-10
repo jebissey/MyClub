@@ -12,6 +12,7 @@ class Application
     private Engine $flight;
     private Settings $settings;
     private $latte;
+    private $authorizations;
 
     public function __construct(PDO $pdo, Engine $flight)
     {
@@ -19,20 +20,23 @@ class Application
         $this->flight = $flight;
         $this->settings = new Settings($this->pdo);
         $this->latte = new LatteEngine();
+        $this->authorizations = new Authorization($this->pdo);
     }
 
 
     public function help() 
     {
         echo $this->latte->render('app/views/info.latte', [
-            'content' => $this->settings->getHelp()
+            'content' => $this->settings->getHelpHome(),
+            'hasAuthorization' => $this->authorizations->hasAutorization()
         ]);
     }
 
     public function legalNotice() 
     {
         echo $this->latte->render('app/views/info.latte', [
-            'content' => $this->settings->getLegalNotices()
+            'content' => $this->settings->getLegalNotices(),
+            'hasAuthorization' => $this->authorizations->hasAutorization()
         ]);
     }
 

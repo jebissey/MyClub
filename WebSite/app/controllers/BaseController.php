@@ -18,7 +18,7 @@ abstract class BaseController
     protected $latte;
     protected Application $application;
     protected Params $params;
-    private $authorizations;
+    protected $authorizations;
 
     public function __construct(PDO $pdo, Engine $flight)
     {
@@ -44,9 +44,9 @@ abstract class BaseController
         if (!$userEmail) {
             $this->application->error403(__FILE__, __LINE__);
         } else {
-            $stmt = $this->pdo->prepare('SELECT * FROM Person WHERE Email = ?');
-            $stmt->execute([$userEmail]);
-            $person = $stmt->fetch(PDO::FETCH_ASSOC);
+            $query = $this->pdo->prepare('SELECT * FROM Person WHERE Email = ?');
+            $query->execute([$userEmail]);
+            $person = $query->fetch(PDO::FETCH_ASSOC);
             if (!$person) {
                 $this->application->error480($userEmail, __FILE__, __LINE__);
             } else {

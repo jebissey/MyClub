@@ -27,9 +27,30 @@ class Settings
     }
 
 
-    public function getHelp()
+    public function getHelpHome()
     {
-        $query = $this->pdo->prepare('SELECT Value FROM Settings WHERE Name = "Help"');
+        $query = $this->pdo->prepare('SELECT Value FROM Settings WHERE Name = "Help_home"');
+        $query->execute();
+        return $query->fetch(PDO::FETCH_ASSOC)['Value'];
+    }
+
+    public function getHelpUser()
+    {
+        $query = $this->pdo->prepare('SELECT Value FROM Settings WHERE Name = "Help_user"');
+        $query->execute();
+        return $query->fetch(PDO::FETCH_ASSOC)['Value'];
+    }
+
+    public function getHelpAdmin()
+    {
+        $query = $this->pdo->prepare('SELECT Value FROM Settings WHERE Name = "Help_admin"');
+        $query->execute();
+        return $query->fetch(PDO::FETCH_ASSOC)['Value'];
+    }
+
+    public function getHelpWebmaster()
+    {
+        $query = $this->pdo->prepare('SELECT Value FROM Settings WHERE Name = "Help_webmaster"');
         $query->execute();
         return $query->fetch(PDO::FETCH_ASSOC)['Value'];
     }

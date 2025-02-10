@@ -17,34 +17,39 @@ class Authorization
     public function get($idPerson)
     {
         $query = $this->pdo->prepare("
-            SELECT Authorization.Name FROM Person 
+            SELECT DISTINCT Authorization.Name FROM Person 
             INNER JOIN PersonGroup ON Person.Id = PersonGroup.IdPerson
             INNER JOIN `Group` ON PersonGroup.IdGroup = `Group`.Id
             INNER JOIN GroupAuthorization on `Group`.Id = GroupAuthorization.IdGroup
             INNER JOIN Authorization on GroupAuthorization.IdAuthorization = Authorization.Id 
             WHERE Person.Id = ?");
         $query->execute([$idPerson]);
-        return $this->authorizations = $query->fetchAll(PDO::FETCH_ASSOC);
+        return $this->authorizations = array_column($query->fetchAll(), 'Name');
     }
 
 
-    public function isEventManager()
+    public function isEventManager(): bool
     {
         return in_array('EvnetManager', $this->authorizations);
     }
 
-    public function isPersonManager()
+    public function isPersonManager(): bool
     {
         return in_array('PersonManager', $this->authorizations);
     }
 
-    public function isRedactor()
+    public function isRedactor(): bool
     {
         return in_array('Redactor', $this->authorizations);
     }
 
-    public function isWebmaster()
+    public function isWebmaster(): bool
     {
         return in_array('Webmaster', $this->authorizations);
+    }
+
+    public function hasAutorization() : bool
+    {
+        return count($this->authorizations) > 0;
     }
 }

@@ -39,6 +39,12 @@ $containerBuilder->addDefinitions([
             $container->get(Engine::class)
         );
     },
+    'app\controllers\WebmasterController' => function (Container $container) {
+        return new \app\controllers\WebmasterController(
+            $container->get(PDO::class),
+            $container->get(Engine::class)
+        );
+    },
     'app\helpers\Application' => function (Container $container) {
         return new \app\helpers\Application(
             $container->get(PDO::class),
@@ -55,16 +61,6 @@ $flight = $container->get(Engine::class);
 $flight->map('pass', function($str) {
     return $str;
 });
-
-// Add debugging middleware
-//$flight->before('start', function() use ($flight) {
-//    file_put_contents("php://stderr", 
-//        "Debug Info:\n" .
-//        "REQUEST_URI: " . $_SERVER['REQUEST_URI'] . "\n" .
-//        "Flight URL: " . $flight->request()->url . "\n"
-//    );
-//});
-
 
 
 $flight->before('start', function () {
@@ -100,9 +96,15 @@ $flight->route('GET  /user/preferences',                  function()            
 $flight->route('POST /user/preferences',                  function()              use ($userController) { $userController->preferences(); });
 $flight->route('GET  /user/groups',                       function()              use ($userController) { $userController->groups(); });
 $flight->route('POST /user/groups',                       function()              use ($userController) { $userController->groups(); });
+$flight->route('GET  /user/help',                         function()              use ($userController) { $userController->help(); });
 
 $adminController = $container->get('app\controllers\AdminController');
-$flight->route('GET  /admin',                              function()             use ($adminController) { $adminController->root(); });
+$flight->route('GET  /admin',            function() use ($adminController) { $adminController->home(); });
+$flight->route('GET  /admin/help',       function() use ($adminController) { $adminController->help(); });
+
+$webmasterController = $container->get('app\controllers\WebmasterController');
+$flight->route('GET  /admin/webmaster',            function() use ($webmasterController) { $webmasterController->home(); });
+$flight->route('GET  /admin/webmaster/help',       function() use ($webmasterController) { $webmasterController->help(); });
 
 $groupController = $container->get('app\controllers\GroupController');
 $flight->route('GET  /groups',            function()    use ($groupController) { $groupController->index(); });

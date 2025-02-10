@@ -8,15 +8,18 @@ use PDO;
 use app\helpers\Client;
 use app\helpers\Params;
 use app\helpers\PasswordManager;
+use app\helpers\Settings;
 
 class UserController extends BaseController
 {
     private PDO $pdoForLog;
+    private Settings $settings;
 
     public function __construct(PDO $pdo, Engine $flight)
     {
         parent::__construct($pdo, $flight);
         $this->pdoForLog = \app\helpers\database\Database::getInstance()->getPdoForLog();
+        $this->settings = new Settings($this->pdo);
     }
 
 
@@ -324,6 +327,13 @@ class UserController extends BaseController
         }
     }
 
+    public function help() 
+    {
+        echo $this->latte->render('app/views/info.latte', [
+            'content' => $this->settings->getHelpUser(),
+            'hasAuthorization' => $this->authorizations->hasAutorization()
+        ]);
+    }
 
     public function log($code = '', $message = '')
     {
@@ -333,10 +343,4 @@ class UserController extends BaseController
         VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ? ,?)');
         $stmt->execute([$client->getIp(), $client->getReferer(), $client->getOs(), $client->getBrowser(), $client->getScreenResolution(), $client->getType(), $client->getUri(), $client->getToken(), $email, $code, $message]);
     }
-
-
-
-
-
-
 }

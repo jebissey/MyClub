@@ -1,8 +1,12 @@
     <div class="container">
-        <a class="navbar-brand" href="/groups">Gestion</a>
+        <a class="navbar-brand" href="/">
+            <img src="../../app/images/agenda.png" alt="Agenda">
+        </a>
+
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
             <span class="navbar-toggler-icon"></span>
         </button>
+
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav">
                 {if $isEventManager}
@@ -26,5 +30,6 @@
                     </li>
                 {/if}
             </ul>
+            <a href ="/admin/help"><img src="../../app/images/help.png" alt="Help"></a>
         </div>
     </div>
