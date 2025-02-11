@@ -104,6 +104,7 @@ $flight->route('GET  /admin/help',       function() use ($adminController) { $ad
 
 $webmasterController = $container->get('app\controllers\WebmasterController');
 $flight->route('GET  /admin/webmaster',            function() use ($webmasterController) { $webmasterController->home(); });
+$flight->route('GET  /admin/webmaster/arwards',    function() use ($webmasterController) { $webmasterController->arwards(); });
 $flight->route('GET  /admin/webmaster/help',       function() use ($webmasterController) { $webmasterController->help(); });
 
 $groupController = $container->get('app\controllers\GroupController');

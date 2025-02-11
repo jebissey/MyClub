@@ -185,17 +185,17 @@ class UserController extends BaseController
             $nickName = $_POST['nickName'];
             $avatar = pathinfo($_POST['avatar'], PATHINFO_BASENAME) ?? '';
             $useGravatar = $_POST['useGravatar'] ?? 'no';
-            $stmt = $this->pdo->prepare('UPDATE Person SET FirstName = ?, LastName = ?, NickName = ?, Avatar = ?, useGravatar = ? WHERE Id = ' . $person['Id']);
-            $stmt->execute([$firstName, $lastName, $nickName, $avatar, $useGravatar]);
+            $query = $this->pdo->prepare('UPDATE Person SET FirstName = ?, LastName = ?, NickName = ?, Avatar = ?, useGravatar = ? WHERE Id = ' . $person['Id']);
+            $query->execute([$firstName, $lastName, $nickName, $avatar, $useGravatar]);
             
             if (!empty($password)) {
-                $stmt = $this->pdo->prepare('UPDATE Person SET Password = ? WHERE Id = ' . $person['Id']);
-                $stmt->execute([PasswordManager::signPassword($password)]);
+                $query = $this->pdo->prepare('UPDATE Person SET Password = ? WHERE Id = ' . $person['Id']);
+                $query->execute([PasswordManager::signPassword($password)]);
             }
             
             if ($person['Imported'] == 0) {
-                $stmt = $this->pdo->prepare('UPDATE Person SET Email = ? WHERE Id = ' . $person['Id']);
-                $stmt->execute([$email]);
+                $query = $this->pdo->prepare('UPDATE Person SET Email = ? WHERE Id = ' . $person['Id']);
+                $query->execute([$email]);
                 $_SESSION['user'] = $email;
             }
             $this->flight->redirect('/user');

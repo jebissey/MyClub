@@ -10,8 +10,8 @@ class GroupController extends BaseController implements CrudControllerInterface
 
     public function index()
     {
-        $stmt = $this->pdo->query('SELECT * FROM "Group" WHERE Inactivated = 0');
-        $groups = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $query = $this->pdo->query('SELECT * FROM "Group" WHERE Inactivated = 0');
+        $groups = $query->fetchAll(PDO::FETCH_ASSOC);
 
         echo $this->latte->render('app/views/groups/index.latte', [
             'groups' => $groups
@@ -38,13 +38,13 @@ class GroupController extends BaseController implements CrudControllerInterface
 
             $this->pdo->beginTransaction();
             try {
-                $stmt = $this->pdo->prepare('INSERT INTO "Group" (Name, SelfRegistration) VALUES (?, ?)');
-                $stmt->execute([$name, $selfRegistration]);
+                $query = $this->pdo->prepare('INSERT INTO "Group" (Name, SelfRegistration) VALUES (?, ?)');
+                $query->execute([$name, $selfRegistration]);
                 $groupId = $this->pdo->lastInsertId();
 
-                $stmt = $this->pdo->prepare('INSERT INTO "GroupAuthorization" (IdGroup, IdAuthorization) VALUES (?, ?)');
+                $query = $this->pdo->prepare('INSERT INTO "GroupAuthorization" (IdGroup, IdAuthorization) VALUES (?, ?)');
                 foreach ($selectedAuthorizations as $authId) {
-                    $stmt->execute([$groupId, $authId]);
+                    $query->execute([$groupId, $authId]);
                 }
                 $this->pdo->commit();
                 $this->flight->redirect('/groups');
@@ -71,9 +71,9 @@ class GroupController extends BaseController implements CrudControllerInterface
             $selectedAuthorizations = isset($_POST['authorizations']) ? $_POST['authorizations'] : [];
 
             if (empty($name)) {
-                $stmt = $this->pdo->prepare('SELECT * FROM "Group" WHERE Id = ?');
-                $stmt->execute([$id]);
-                $group = $stmt->fetch(PDO::FETCH_ASSOC);
+                $query = $this->pdo->prepare('SELECT * FROM "Group" WHERE Id = ?');
+                $query->execute([$id]);
+                $group = $query->fetch(PDO::FETCH_ASSOC);
 
                 echo $this->latte->render('app/views/groups/edit.latte', [
                     'group' => $group,
@@ -85,15 +85,15 @@ class GroupController extends BaseController implements CrudControllerInterface
 
             $this->pdo->beginTransaction();
             try {
-                $stmt = $this->pdo->prepare('UPDATE "Group" SET Name = ?, SelfRegistration = ? WHERE Id = ?');
-                $stmt->execute([$name, $selfRegistration, $id]);
+                $query = $this->pdo->prepare('UPDATE "Group" SET Name = ?, SelfRegistration = ? WHERE Id = ?');
+                $query->execute([$name, $selfRegistration, $id]);
 
-                $stmt = $this->pdo->prepare('DELETE FROM "GroupAuthorization" WHERE IdGroup = ?');
-                $stmt->execute([$id]);
+                $query = $this->pdo->prepare('DELETE FROM "GroupAuthorization" WHERE IdGroup = ?');
+                $query->execute([$id]);
 
-                $stmt = $this->pdo->prepare('INSERT INTO "GroupAuthorization" (IdGroup, IdAuthorization) VALUES (?, ?)');
+                $query = $this->pdo->prepare('INSERT INTO "GroupAuthorization" (IdGroup, IdAuthorization) VALUES (?, ?)');
                 foreach ($selectedAuthorizations as $authId) {
-                    $stmt->execute([$id, $authId]);
+                    $query->execute([$id, $authId]);
                 }
                 $this->pdo->commit();
                 $this->flight->redirect('/groups');
@@ -104,9 +104,9 @@ class GroupController extends BaseController implements CrudControllerInterface
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-            $stmt = $this->pdo->prepare('SELECT * FROM "Group" WHERE Id = ?');
-            $stmt->execute([$id]);
-            $group = $stmt->fetch(PDO::FETCH_ASSOC);
+            $query = $this->pdo->prepare('SELECT * FROM "Group" WHERE Id = ?');
+            $query->execute([$id]);
+            $group = $query->fetch(PDO::FETCH_ASSOC);
 
             if (!$group) {
                 $this->flight->redirect('/groups');
