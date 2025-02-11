@@ -2,12 +2,8 @@
 
 namespace app\controllers;
 
-use DateTime;
 use flight\Engine;
 use PDO;
-use app\helpers\Client;
-use app\helpers\Params;
-use app\helpers\PasswordManager;
 use app\helpers\Settings;
 
 class WebmasterController extends BaseController
@@ -22,7 +18,7 @@ class WebmasterController extends BaseController
         $this->settings = new Settings($this->pdo);
     }
 
-    public function help()
+    public function help(): void 
     {
         $this->getPerson();
 
@@ -32,7 +28,7 @@ class WebmasterController extends BaseController
         ]);
     }
 
-    public function home()
+    public function home(): void 
     {
         $this->getPerson();
 

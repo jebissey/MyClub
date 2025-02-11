@@ -2,22 +2,17 @@
 
 namespace app\controllers;
 
-use DateTime;
 use flight\Engine;
 use PDO;
-use app\helpers\Client;
-use app\helpers\Params;
 use app\helpers\Settings;
 
 class AdminController extends BaseController
 {
-    private PDO $pdoForLog;
     private Settings $settings;
 
     public function __construct(PDO $pdo, Engine $flight)
     {
         parent::__construct($pdo, $flight);
-        $this->pdoForLog = \app\helpers\database\Database::getInstance()->getPdoForLog();
         $this->settings = new Settings($this->pdo);
     }
 

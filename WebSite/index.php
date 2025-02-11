@@ -50,6 +50,12 @@ $containerBuilder->addDefinitions([
             $container->get(PDO::class),
             $container->get(Engine::class)
         );
+    },
+    'app\controllers\LogController' => function (Container $container) {
+        return new \app\controllers\LogController(
+            $container->get(PDO::class),
+            $container->get(Engine::class)
+        );
     }
 ]);
 $container = $containerBuilder->build();
@@ -106,6 +112,9 @@ $webmasterController = $container->get('app\controllers\WebmasterController');
 $flight->route('GET  /admin/webmaster',            function() use ($webmasterController) { $webmasterController->home(); });
 $flight->route('GET  /admin/webmaster/arwards',    function() use ($webmasterController) { $webmasterController->arwards(); });
 $flight->route('GET  /admin/webmaster/help',       function() use ($webmasterController) { $webmasterController->help(); });
+
+$logController = $container->get('app\controllers\LogController');
+$flight->route('GET  /admin/webmaster/logs',   function() use ($logController) { $logController->index(); });
 
 $groupController = $container->get('app\controllers\GroupController');
 $flight->route('GET  /groups',            function()    use ($groupController) { $groupController->index(); });
