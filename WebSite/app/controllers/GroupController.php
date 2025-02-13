@@ -11,7 +11,10 @@ class GroupController extends BaseController implements CrudControllerInterface
     public function index()
     {
         if ($this->getPerson(['PersonManager', 'Webmaster'])) {
-
+            $having = '';
+            if($this->authorizations->isPersonManager() && !$this->authorizations->isWebmaster()){
+                $having = "HAVING Authorizations = ''";
+            }
             $query = $this->pdo->query("
                 SELECT 
                     g.Id, 
@@ -21,8 +24,10 @@ class GroupController extends BaseController implements CrudControllerInterface
                 FROM 'Group' g
                 LEFT JOIN GroupAuthorization ga ON g.Id = ga.IdGroup
                 LEFT JOIN Authorization a ON ga.IdAuthorization = a.Id
-                GROUP BY g.Id, g.Name; 
-                WHERE Inactivated = 0");
+                WHERE Inactivated = 0
+                GROUP BY g.Id, g.Name
+                $having
+            ");
             $groups = $query->fetchAll(PDO::FETCH_ASSOC);
 
             echo $this->latte->render('app/views/groups/index.latte', $this->params->getAll([
@@ -67,12 +72,14 @@ class GroupController extends BaseController implements CrudControllerInterface
                     $this->pdo->rollBack();
                     throw $e;
                 }
-                return;
+            } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+                echo $this->latte->render('app/views/groups/create.latte', $this->params->getAll([
+                    'availableAuthorizations' => $availableAuthorizations
+                ]));
             }
-
-            echo $this->latte->render('app/views/groups/create.latte', $this->params->getAll([
-                'availableAuthorizations' => $availableAuthorizations
-            ]));
+            else {
+                $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
+            }
         }
     }
 
@@ -98,47 +105,45 @@ class GroupController extends BaseController implements CrudControllerInterface
                         'availableAuthorizations' => $availableAuthorizations,
                         'error' => 'Le nom du groupe est requis'
                     ]));
-                    return;
-                }
+                } else {
+                    $this->pdo->beginTransaction();
+                    try {
+                        $query = $this->pdo->prepare('UPDATE "Group" SET Name = ?, SelfRegistration = ? WHERE Id = ?');
+                        $query->execute([$name, $selfRegistration, $id]);
 
-                $this->pdo->beginTransaction();
-                try {
-                    $query = $this->pdo->prepare('UPDATE "Group" SET Name = ?, SelfRegistration = ? WHERE Id = ?');
-                    $query->execute([$name, $selfRegistration, $id]);
+                        $query = $this->pdo->prepare('DELETE FROM "GroupAuthorization" WHERE IdGroup = ?');
+                        $query->execute([$id]);
 
-                    $query = $this->pdo->prepare('DELETE FROM "GroupAuthorization" WHERE IdGroup = ?');
-                    $query->execute([$id]);
-
-                    $query = $this->pdo->prepare('INSERT INTO "GroupAuthorization" (IdGroup, IdAuthorization) VALUES (?, ?)');
-                    foreach ($selectedAuthorizations as $authId) {
-                        $query->execute([$id, $authId]);
+                        $query = $this->pdo->prepare('INSERT INTO "GroupAuthorization" (IdGroup, IdAuthorization) VALUES (?, ?)');
+                        foreach ($selectedAuthorizations as $authId) {
+                            $query->execute([$id, $authId]);
+                        }
+                        $this->pdo->commit();
+                        $this->flight->redirect('/groups');
+                    } catch (\Exception $e) {
+                        $this->pdo->rollBack();
+                        throw $e;
                     }
-                    $this->pdo->commit();
-                    $this->flight->redirect('/groups');
-                } catch (\Exception $e) {
-                    $this->pdo->rollBack();
-                    throw $e;
                 }
-                return;
             } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $query = $this->pdo->prepare('SELECT * FROM "Group" WHERE Id = ?');
                 $query->execute([$id]);
                 $group = $query->fetch(PDO::FETCH_ASSOC);
 
                 if (!$group) {
-                    $this->flight->redirect('/groups');
-                    return;
+                    $this->application->error499('Group', $id, __FILE__, __LINE__);
+                } else {
+
+                    $query = $this->pdo->prepare('SELECT IdAuthorization FROM "GroupAuthorization" WHERE IdGroup = ?');
+                    $query->execute([$id]);
+                    $currentAuthorizations = $query->fetchAll(PDO::FETCH_COLUMN);
+
+                    echo $this->latte->render('app/views/groups/edit.latte', $this->params->getAll([
+                        'group' => $group,
+                        'availableAuthorizations' => $availableAuthorizations,
+                        'currentAuthorizations' => $currentAuthorizations
+                    ]));
                 }
-
-                $query = $this->pdo->prepare('SELECT IdAuthorization FROM "GroupAuthorization" WHERE IdGroup = ?');
-                $query->execute([$id]);
-                $currentAuthorizations = $query->fetchAll(PDO::FETCH_COLUMN);
-
-                echo $this->latte->render('app/views/groups/edit.latte', $this->params->getAll([
-                    'group' => $group,
-                    'availableAuthorizations' => $availableAuthorizations,
-                    'currentAuthorizations' => $currentAuthorizations
-                ]));
             } else {
                 (new Application($this->pdo, $this->flight))->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
             }

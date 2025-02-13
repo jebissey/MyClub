@@ -62,6 +62,12 @@ $containerBuilder->addDefinitions([
             $container->get(PDO::class),
             $container->get(Engine::class)
         );
+    },
+    'app\controllers\ImportController' => function (Container $container) {
+        return new \app\controllers\ImportController(
+            $container->get(PDO::class),
+            $container->get(Engine::class)
+        );
     }
 ]);
 $container = $containerBuilder->build();
@@ -137,19 +143,22 @@ $flight->route('POST /registration/add/@personId/@groupId',    function($personI
 $flight->route('POST /registration/remove/@personId/@groupId', function($personId, $groupId) use ($registrationController) { $registrationController->removeFromGroup($personId, $groupId); });
 
 $personController = $container->get('app\controllers\PersonController');
+$flight->route('GET  /personManager',      function()    use ($personController) { $personController->home(); });
 $flight->route('GET  /persons',            function()    use ($personController) { $personController->index(); });
 $flight->route('GET  /persons/create',     function()    use ($personController) { $personController->create(); });
-$flight->route('POST /persons/create',     function()    use ($personController) { $personController->create(); });
 $flight->route('GET  /persons/edit/@id',   function($id) use ($personController) { $personController->edit($id); });
 $flight->route('POST /persons/edit/@id',   function($id) use ($personController) { $personController->edit($id); });
 $flight->route('POST /persons/delete/@id', function($id) use ($personController) { $personController->delete($id); });
 
+$importController = $container->get('app\controllers\ImportController');
+$flight->route('GET  /import',         function() use ($importController) { $importController->showImportForm(); });
+$flight->route('POST /import',         function() use ($importController) { $importController->processImport(); });
+$flight->route('POST /import/headers', function() use ($importController) { $importController->getHeadersFromCSV(); });
 
 $applicationHelper = $container->get('app\helpers\Application');
 $flight->route('/help',         function() use ($applicationHelper) { $applicationHelper->help(); });
 $flight->route('/legal/notice', function() use ($applicationHelper) { $applicationHelper->legalNotice(); });
 $flight->route('/*',            function() use ($applicationHelper) { $applicationHelper->error404(); });
-
 
 
 $flight->map('error', function  (Throwable $ex) use ($userController, $applicationHelper){

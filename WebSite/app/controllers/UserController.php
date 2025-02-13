@@ -210,6 +210,7 @@ class UserController extends BaseController
                 $emojis = array_map(function ($path) {
                     return basename($path);
                 }, $emojiFiles);
+
                 echo $this->latte->render('app/views/user/account.latte', $this->params->getAll([
                     'emailReadOnly' => $person['Imported'] == 1 ? true : false,
                     'email' => $email,
@@ -219,7 +220,8 @@ class UserController extends BaseController
                     'avatar' => $avatar,
                     'useGravatar' => $useGravatar,
                     'emojis' => $emojis,
-                    'emojiPath' => '../../app/images/'
+                    'emojiPath' => '../../app/images/',
+                    'isSelfEdit'=> true
                 ]));
             } else {
                 $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);

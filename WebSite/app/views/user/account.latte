@@ -5,22 +5,19 @@
         <div class="mb-3">
             <label for="email" class="form-label">Email</label>
             <input type="email" class="form-control" id="email" name="email" 
-                value="{$email}" 
-                {if $emailReadOnly}
-                    readonly
-                {else}
-                    required
-                {/if}>
+                value="{$email}" {if $emailReadOnly}readonly{else}required{/if}>
             <div class="invalid-feedback">
                 Veuillez saisir une adresse email valide.
             </div>
         </div>
 
+        {if $isSelfEdit}
         <div class="mb-3">
             <label for="password" class="form-label">Mot de passe</label>
             <input type="password" class="form-control" id="password" name="password" placeholder="Laissez vide pour ne pas modifier">
             <div class="invalid-feedback">Le mot de passe doit contenir au moins 6 caractères</div>
         </div>
+        {/if}
 
         <div class="mb-3">
             <label for="firstName" class="form-label">Prénom</label>
@@ -40,6 +37,7 @@
             </div>
         </div>
 
+        {if $isSelfEdit}
         <div class="mb-3">
             <label for="nickName" class="form-label">Pseudo</label>
             <input type="text" class="form-control" id="nickName" name="nickName" 
@@ -53,26 +51,28 @@
                 </button>
                 <ul class="dropdown-menu" id="emojiList">
                     {foreach $emojis as $emoji}
-                    <li>
-                    <a class="dropdown-item d-flex align-items-center" href="#" data-img="{$emojiPath}{$emoji}">
-                        <img src="{$emojiPath}{$emoji}" alt="emoji" width="32" height="32" class="me-2">
-                        <span class="visually-hidden">Emoji</span>
-                    </a>
-                    </li>
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center" href="#" data-img="{$emojiPath}{$emoji}">
+                                <img src="{$emojiPath}{$emoji}" alt="emoji" width="32" height="32" class="me-2">
+                                <span class="visually-hidden">Emoji</span>
+                            </a>
+                        </li>
                     {/foreach}                
                 </ul>
                 <input type="hidden" class="form-control" id="avatar" name="avatar" value="{$avatar}">
             </div>
             <label for="gravatar"> 
-                <input type="checkbox" id="useGravatar" name="useGravatar" 
-                {if $useGravatar == 'yes'}
-                    checked
-                {/if}
-                value="yes"> 
+                <input type="checkbox" id="useGravatar" name="useGravatar" {if $useGravatar == 'yes'}checked{/if} value="yes"> 
                 Utiliser mon <a href="https://gravatar.com/"> gravatar</a>
             </label>
         </div>
+        {/if}
 
+        {php $uriParts = explode('/', trim($_SERVER['REQUEST_URI'], '/'))}
+        {if isset($uriParts[0])}
+            {php $uriRoot = '/' . $uriParts[0]}
+        {/if}
+        <a href="{$uriRoot}" class="btn btn-secondary">Annuler</a>
         <button type="submit" class="btn btn-primary">Valider</button>
     </form>
 {/block}

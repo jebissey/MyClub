@@ -1,0 +1,169 @@
+{layout '../admin/personManager.latte'}
+
+{block content}
+<div class="container">
+    <h2>Import CSV</h2>
+    
+    {if $results}
+        <div class="container mt-5">
+            {if $results['errors'] > 0}
+                <div class="alert alert-danger">{$error}</div>
+                    <div class="alert alert-warning">
+                        <h4>Résultat de l'import :</h4>
+                        <ul>
+                            <li>Nouveaux enregistrements : {$results['created']}</li>
+                            <li>Enregistrements mis à jour : {$results['updated']}</li>
+                            <li>Enregistrements inactivé : {$results['inactivated']}</li>
+                            <li>Erreurs : {$results['errors']}</li>
+                        </ul>
+                        <h4>Détail des erreurs :</h4>
+                        <ul>
+                            {foreach $results['messages'] as $message}
+                                <li>{$message}</li>
+                            {/foreach}
+                        </ul>
+                    </div>
+                </div>
+            {else}
+                <div class="alert alert-success">
+                    <h4>Import terminé avec succès :</h4>
+                    <ul>
+                        <li>Nouveaux enregistrements : {$results['created']}</li>
+                        <li>Enregistrements mis à jour : {$results['updated']}</li>
+                        <li>Enregistrements inactivés : {$results['inactivated']}</li>
+                    </ul>
+                </div>
+            {/if}
+        </div>
+    {/if}
+
+    <form method="post" enctype="multipart/form-data" class="mb-4" id="importForm">
+        <div class="mb-3">
+            <label for="csvFile" class="form-label">Fichier CSV</label>
+            <input type="file" class="form-control" id="csvFile" name="csvFile" accept=".csv" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="headerRow" class="form-label">Ligne des en-têtes</label>
+            <input type="number" class="form-control w-auto" id="headerRow" name="headerRow" 
+                   value="{$settings['headerRow']}" min="1" required>
+        </div>
+
+        <div id="mappingSection" style="display: none;">
+            <h4 class="mt-4">Mapping des colonnes</h4>
+            
+            <div class="mb-3 d-flex align-items-end">
+                <label for="emailColumn" class="form-label me-2">Email</label>
+                <select class="form-control w-auto" id="emailColumn" name="emailColumn" required>
+                    <option value="">Sélectionnez une colonne</option>
+                </select>
+            </div>
+
+            <div class="mb-3 d-flex align-items-end">
+                <label for="firstNameColumn" class="form-label me-2">Prénom</label>
+                <select class="form-control w-auto" id="firstNameColumn" name="firstNameColumn" required>
+                    <option value="">Sélectionnez une colonne</option>
+                </select>
+            </div>
+
+            <div class="mb-3 d-flex align-items-end">
+                <label for="lastNameColumn" class="form-label me-2">Nom</label>
+                <select class="form-control w-auto" id="lastNameColumn" name="lastNameColumn" required>
+                    <option value="">Sélectionnez une colonne</option>
+                </select>
+            </div>
+
+            <div class="mb-3 d-flex align-items-end">
+                <label for="phoneColumn" class="form-label me-2">Téléphone</label>
+                <select class="form-control w-auto" id="phoneColumn" name="phoneColumn" required>
+                    <option value="">Sélectionnez une colonne</option>
+                </select>
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary" id="submitBtn" style="display: none;">Importer</button>
+    </form>
+</div>
+{/block}
+
+{block scripts}
+<script n:syntax="off">
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('importForm');
+    const headerRowInput = document.getElementById('headerRow');
+    const csvFileInput = document.getElementById('csvFile');
+    const mappingSection = document.getElementById('mappingSection');
+    const submitBtn = document.getElementById('submitBtn');
+    
+    function canUpdateHeaders() {
+        return csvFileInput.files.length > 0 && headerRowInput.value !== '';
+    }
+
+    function updateHeaders() {
+        if (!canUpdateHeaders()) {
+            mappingSection.style.display = 'none';
+            submitBtn.style.display = 'none';
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('csvFile', csvFileInput.files[0]);
+        formData.append('headerRow', headerRowInput.value);
+
+        headerRowInput.disabled = true;
+
+        fetch('/import/headers', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                alert(data.error);
+                return;
+            }
+
+            const headers = data.headers;
+            const selects = ['emailColumn', 'firstNameColumn', 'lastNameColumn', 'phoneColumn'];
+            
+            selects.forEach(selectId => {
+                const select = document.getElementById(selectId);
+                select.innerHTML = '<option value="">Sélectionnez une colonne</option>';
+                
+                headers.forEach((header, index) => {
+                    const option = document.createElement('option');
+                    option.value = index;
+                    option.textContent = `${header} (colonne ${index + 1})`;
+                    select.appendChild(option);
+                });
+
+                // Restaurer les valeurs précédemment sélectionnées si elles existent
+                const savedMapping = document.querySelector(`input[name="${selectId}"]`);
+                if (savedMapping && savedMapping.value !== '') {
+                    select.value = savedMapping.value;
+                }
+            });
+
+            mappingSection.style.display = 'block';
+            submitBtn.style.display = 'block';
+        })
+        .catch(error => {
+            console.error('Erreur:', error);
+            alert('Erreur lors de la lecture du fichier: ' + error.message);
+        })
+        .finally(() => {
+            headerRowInput.disabled = false;
+        });
+    }
+
+    csvFileInput.addEventListener('change', updateHeaders);
+    headerRowInput.addEventListener('input', updateHeaders);  // Changé de 'change' à 'input'
+    headerRowInput.addEventListener('change', updateHeaders); // Gardé aussi 'change' pour plus de réactivité
+
+    if (canUpdateHeaders()) {
+        updateHeaders();
+    }
+});
+</script>
+{/block}
+ 

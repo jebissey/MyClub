@@ -1,0 +1,30 @@
+    <div class="container">
+        <a class="navbar-brand" href="/">
+            <img src="../../app/images/agenda.png" alt="Home">
+        </a>
+        <a class="navbar-brand" href="/admin">
+            <img src="../../app/images/admin.png" alt="Admin">
+        </a>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link {if $page == 'persons'}active{/if}" href="/persons">Personnes</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {if $page == 'groups'}active{/if}" href="/groups">Groupes</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {if $page == 'registration'}active{/if}" href="/registration">Inscriptions</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {if $page == 'import'}active{/if}" href="/import">Importer</a>
+                </li>
+            </ul>
+            <a href ="/admin/webmaster/help"><img src="../../app/images/help.png" alt="Help"></a>
+        </div>
+    </div>
