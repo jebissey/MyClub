@@ -1,4 +1,4 @@
-{layout "groupsLayout.latte"}
+{layout '../admin/webmaster.latte'}
 
 {block title}Créer un groupe{/block}
 
@@ -29,6 +29,7 @@
                             name="selfRegistration" value="1">
                         <label class="form-check-label" for="selfRegistration">Auto-inscription autorisée</label>
                     </div>
+                    {if $isWebmaster}
                     <div class="mb-3">
                         <label class="form-label">Autorisations</label>
                         {if $availableAuthorizations}
@@ -47,6 +48,7 @@
                             <p>Aucune autorisation disponible</p>
                         {/if}
                     </div>
+                    {/if}
                     <div class="d-flex justify-content-between">
                         <a href="/groups" class="btn btn-secondary">Annuler</a>
                         <button type="submit" class="btn btn-primary">Enregistrer</button>

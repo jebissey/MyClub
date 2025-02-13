@@ -38,19 +38,25 @@ abstract class BaseController
         return htmlspecialchars(trim($data), ENT_QUOTES, 'UTF-8');
     }
 
-    protected function getPerson()
+    protected function getPerson($requiredAuthorisations = [])
     {
         $userEmail = $_SESSION['user'] ?? '';
         if (!$userEmail) {
             $this->application->error403(__FILE__, __LINE__);
+            return false;
         } else {
             $query = $this->pdo->prepare('SELECT * FROM Person WHERE Email = ?');
             $query->execute([$userEmail]);
             $person = $query->fetch(PDO::FETCH_ASSOC);
             if (!$person) {
                 $this->application->error480($userEmail, __FILE__, __LINE__);
+                return false;
             } else {
                 $authorizations = $this->authorizations->get($person['Id']);
+                if ($requiredAuthorisations != [] && empty(array_intersect($authorizations, $requiredAuthorisations))) {
+                    $this->application->error403(__FILE__, __LINE__);
+                    return false;
+                }
                 $this->params = new Params([
                     'href' => $this->getHref($person['Email']),
                     'userImg' => $this->getUserImg($person),
@@ -60,6 +66,7 @@ abstract class BaseController
                     'isPersonManager' => $this->authorizations->isPersonManager(),
                     'isRedactor' => $this->authorizations->isRedactor(),
                     'isWebmaster' => $this->authorizations->isWebmaster(),
+                    'page' => basename(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH))
                 ]);
                 return $person;
             }

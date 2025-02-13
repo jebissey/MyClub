@@ -93,6 +93,10 @@ class Application
         $this->error(499, "Record $id not found in table $table in file $file at line $line", $timeout);
     }
 
+    public function error500($message, $file, $line, $timeout = 5000)
+    {
+        $this->error(500, "Internal error: $message in file $file at line $line", $timeout);
+    }
 
     private function error($code, $message, $timeout = 1000)
     {

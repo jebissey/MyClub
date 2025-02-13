@@ -56,6 +56,12 @@ $containerBuilder->addDefinitions([
             $container->get(PDO::class),
             $container->get(Engine::class)
         );
+    },
+    'app\controllers\RegistrationController' => function (Container $container) {
+        return new \app\controllers\RegistrationController(
+            $container->get(PDO::class),
+            $container->get(Engine::class)
+        );
     }
 ]);
 $container = $containerBuilder->build();
@@ -109,12 +115,12 @@ $flight->route('GET  /admin',            function() use ($adminController) { $ad
 $flight->route('GET  /admin/help',       function() use ($adminController) { $adminController->help(); });
 
 $webmasterController = $container->get('app\controllers\WebmasterController');
-$flight->route('GET  /admin/webmaster',            function() use ($webmasterController) { $webmasterController->home(); });
-$flight->route('GET  /admin/webmaster/arwards',    function() use ($webmasterController) { $webmasterController->arwards(); });
-$flight->route('GET  /admin/webmaster/help',       function() use ($webmasterController) { $webmasterController->help(); });
+$flight->route('GET  /webmaster',            function() use ($webmasterController) { $webmasterController->home(); });
+$flight->route('GET  /arwards',              function() use ($webmasterController) { $webmasterController->arwards(); });
+$flight->route('GET  /admin/webmaster/help', function() use ($webmasterController) { $webmasterController->help(); });
 
 $logController = $container->get('app\controllers\LogController');
-$flight->route('GET  /admin/webmaster/logs',   function() use ($logController) { $logController->index(); });
+$flight->route('GET  /logs',   function() use ($logController) { $logController->index(); });
 
 $groupController = $container->get('app\controllers\GroupController');
 $flight->route('GET  /groups',            function()    use ($groupController) { $groupController->index(); });
@@ -123,6 +129,12 @@ $flight->route('POST /groups/create',     function()    use ($groupController) {
 $flight->route('GET  /groups/edit/@id',   function($id) use ($groupController) { $groupController->edit($id); });
 $flight->route('POST /groups/edit/@id',   function($id) use ($groupController) { $groupController->edit($id); });
 $flight->route('POST /groups/delete/@id', function($id) use ($groupController) { $groupController->delete($id); });
+
+$registrationController = $container->get('app\controllers\RegistrationController');
+$flight->route('GET  /registration',                           function()                    use ($registrationController) { $registrationController->index(); });
+$flight->route('GET  /registration/groups/@id',                function($id)                 use ($registrationController) { $registrationController->getGroups($id); });
+$flight->route('POST /registration/add/@personId/@groupId',    function($personId, $groupId) use ($registrationController) { $registrationController->addToGroup($personId, $groupId); });
+$flight->route('POST /registration/remove/@personId/@groupId', function($personId, $groupId) use ($registrationController) { $registrationController->removeFromGroup($personId, $groupId); });
 
 $personController = $container->get('app\controllers\PersonController');
 $flight->route('GET  /persons',            function()    use ($personController) { $personController->index(); });
@@ -138,6 +150,12 @@ $flight->route('/help',         function() use ($applicationHelper) { $applicati
 $flight->route('/legal/notice', function() use ($applicationHelper) { $applicationHelper->legalNotice(); });
 $flight->route('/*',            function() use ($applicationHelper) { $applicationHelper->error404(); });
 
+
+
+$flight->map('error', function  (Throwable $ex) use ($userController, $applicationHelper){
+    $userController->log(500, 'Internal error: ' . $ex->getMessage() .' in file ' . $ex->getFile() . ' at line' . $ex->getLine());
+    $applicationHelper->error500($ex->getMessage(), $ex->getFile(), $ex->getLine());
+});
 
 $flight->after('start', function() use ($userController) { $userController->log(Flight::getData('code'), Flight::getData('message')); });
 $flight->start();

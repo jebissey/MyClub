@@ -60,9 +60,9 @@ class PersonController extends BaseController
         $stmt = $this->pdo->query('SELECT * FROM "Person" WHERE Inactivated = 0');
         $persons = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        echo $this->latte->render('views/persons/index.latte', [
+        echo $this->latte->render('views/persons/index.latte', $this->params->getAll([
             'persons' => $persons
-        ]);
+        ]));
     }
 
     public function edit($id)
@@ -102,13 +102,13 @@ class PersonController extends BaseController
             $updateData = $this->validateAndPrepareUpdate($person, $editableFields);
 
             if (!empty($updateData['errors'])) {
-                echo $this->latte->render('views/persons/edit.latte', [
+                echo $this->latte->render('views/persons/edit.latte', $this->params->getAll([
                     'person' => $person,
                     'errors' => $updateData['errors'],
                     'availableGroups' => $availableGroups,
                     'currentGroups' => $currentGroups,
                     'editableFields' => $editableFields
-                ]);
+                ]));
                 return;
             }
 
@@ -150,12 +150,12 @@ class PersonController extends BaseController
             return;
         }
 
-        echo $this->latte->render('views/persons/edit.latte', [
+        echo $this->latte->render('views/persons/edit.latte', $this->params->getAll([
             'person' => $person,
             'availableGroups' => $availableGroups,
             'currentGroups' => $currentGroups,
             'editableFields' => $editableFields
-        ]);
+        ]));
     }
 
     private function determineEditableFields($isEditingSelf, $hasPersonManagerAuth, $isImported)
@@ -287,9 +287,9 @@ class PersonController extends BaseController
             return;
         }
 
-        echo $this->latte->render('views/persons/create.latte', [
+        echo $this->latte->render('views/persons/create.latte', $this->params->getAll([
             'availableGroups' => $availableGroups
-        ]);
+        ]));
     }
 
     private function validateNewPerson()

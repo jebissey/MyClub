@@ -1,4 +1,4 @@
-{layout "groupsLayout.latte"}
+{layout '../admin/webmaster.latte'}
 
 {block title}Modifier le groupe{/block}
 
@@ -29,6 +29,7 @@
                             name="selfRegistration" value="1" {if $group['SelfRegistration']}checked{/if}>
                         <label class="form-check-label" for="selfRegistration">Auto-inscription autorisée</label>
                     </div>
+                    {if $isWebmaster}
                     <div class="mb-3">
                         <label class="form-label">Autorisations</label>
                         {foreach $availableAuthorizations as $authorization}
@@ -44,6 +45,7 @@
                         </div>
                         {/foreach}
                     </div>
+                    {/if}
                     <div class="d-flex justify-content-between">
                         <a href="/groups" class="btn btn-secondary">Annuler</a>
                         <button type="submit" class="btn btn-primary">Enregistrer</button>

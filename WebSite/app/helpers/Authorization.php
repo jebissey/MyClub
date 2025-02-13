@@ -30,7 +30,7 @@ class Authorization
 
     public function isEventManager(): bool
     {
-        return in_array('EvnetManager', $this->authorizations);
+        return in_array('EventManager', $this->authorizations);
     }
 
     public function isPersonManager(): bool

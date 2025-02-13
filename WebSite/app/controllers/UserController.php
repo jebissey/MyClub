@@ -83,9 +83,9 @@ class UserController extends BaseController
                     $this->application->message('Votre mot de passe est réinitialisé');
                 }
             } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-                echo $this->latte->render('app/views/user/setPassword.latte', [
+                echo $this->latte->render('app/views/user/setPassword.latte', $this->params->getAll([
                     'token' => $token
-                ]);
+                ]));
             } else {
                 $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
             }
@@ -124,7 +124,7 @@ class UserController extends BaseController
                 'userImg' => '../../app/images/anonymat.png',
                 'userEmail' => '',
                 'keys' => false,
-                'page' => basename($_SERVER['REQUEST_URI'])
+                'page' => basename(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH))
             ]);
         } else {
             $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
@@ -162,102 +162,103 @@ class UserController extends BaseController
 
     public function user()
     {
-        $this->getPerson();
+        if ($this->getPerson()) {
 
-        if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-            echo $this->latte->render('app/views/user/user.latte', $this->params->getAll([
-                'page' => basename($_SERVER['REQUEST_URI'])
-            ]));
-        } else {
-            $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
+            if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+                echo $this->latte->render('app/views/user/user.latte', $this->params->getAll([]));
+            } else {
+                $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
+            }
         }
     }
 
     public function account()
     {
-        $person = $this->getPerson();
+        if ($person = $this->getPerson()) {
 
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $email = filter_var($_POST['email'], FILTER_VALIDATE_EMAIL) ?? '';
-            $password = $_POST['password'];
-            $firstName = $_POST['firstName'];
-            $lastName = $_POST['lastName'];
-            $nickName = $_POST['nickName'];
-            $avatar = pathinfo($_POST['avatar'], PATHINFO_BASENAME) ?? '';
-            $useGravatar = $_POST['useGravatar'] ?? 'no';
-            $query = $this->pdo->prepare('UPDATE Person SET FirstName = ?, LastName = ?, NickName = ?, Avatar = ?, useGravatar = ? WHERE Id = ' . $person['Id']);
-            $query->execute([$firstName, $lastName, $nickName, $avatar, $useGravatar]);
-            
-            if (!empty($password)) {
-                $query = $this->pdo->prepare('UPDATE Person SET Password = ? WHERE Id = ' . $person['Id']);
-                $query->execute([PasswordManager::signPassword($password)]);
-            }
-            
-            if ($person['Imported'] == 0) {
-                $query = $this->pdo->prepare('UPDATE Person SET Email = ? WHERE Id = ' . $person['Id']);
-                $query->execute([$email]);
-                $_SESSION['user'] = $email;
-            }
-            $this->flight->redirect('/user');
-        } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-            $email = filter_var($person['Email'], FILTER_VALIDATE_EMAIL) ?? '';
-            $firstName = $this->sanitizeInput($person['FirstName']);
-            $lastName = $this->sanitizeInput($person['LastName']);
-            $nickName = $this->sanitizeInput($person['NickName']);
-            $avatar = $this->sanitizeInput($person['Avatar']);
-            $useGravatar = $this->sanitizeInput($person['UseGravatar']) ?? 'no';
+            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                $email = filter_var($_POST['email'], FILTER_VALIDATE_EMAIL) ?? '';
+                $password = $_POST['password'];
+                $firstName = $_POST['firstName'];
+                $lastName = $_POST['lastName'];
+                $nickName = $_POST['nickName'];
+                $avatar = pathinfo($_POST['avatar'], PATHINFO_BASENAME) ?? '';
+                $useGravatar = $_POST['useGravatar'] ?? 'no';
+                $query = $this->pdo->prepare('UPDATE Person SET FirstName = ?, LastName = ?, NickName = ?, Avatar = ?, useGravatar = ? WHERE Id = ' . $person['Id']);
+                $query->execute([$firstName, $lastName, $nickName, $avatar, $useGravatar]);
 
-            $emojiFiles = glob(__DIR__ . '/../images/emoji*');
-            $emojis = array_map(function($path) {return basename($path);}, $emojiFiles);
-            echo $this->latte->render('app/views/user/account.latte', $this->params->getAll([
-                'emailReadOnly' => $person['Imported'] == 1 ? true : false,
-                'email' => $email,
-                'firstName' => $firstName,
-                'lastName' => $lastName,
-                'nickName' => $nickName,
-                'avatar' => $avatar,
-                'useGravatar' => $useGravatar,
-                'emojis' => $emojis,
-                'emojiPath' => '../../app/images/',
-                'page' => basename($_SERVER['REQUEST_URI'])
-            ]));
-        } else {
-            $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
+                if (!empty($password)) {
+                    $query = $this->pdo->prepare('UPDATE Person SET Password = ? WHERE Id = ' . $person['Id']);
+                    $query->execute([PasswordManager::signPassword($password)]);
+                }
+
+                if ($person['Imported'] == 0) {
+                    $query = $this->pdo->prepare('UPDATE Person SET Email = ? WHERE Id = ' . $person['Id']);
+                    $query->execute([$email]);
+                    $_SESSION['user'] = $email;
+                }
+                $this->flight->redirect('/user');
+            } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+                $email = filter_var($person['Email'], FILTER_VALIDATE_EMAIL) ?? '';
+                $firstName = $this->sanitizeInput($person['FirstName']);
+                $lastName = $this->sanitizeInput($person['LastName']);
+                $nickName = $this->sanitizeInput($person['NickName']);
+                $avatar = $this->sanitizeInput($person['Avatar']);
+                $useGravatar = $this->sanitizeInput($person['UseGravatar']) ?? 'no';
+
+                $emojiFiles = glob(__DIR__ . '/../images/emoji*');
+                $emojis = array_map(function ($path) {
+                    return basename($path);
+                }, $emojiFiles);
+                echo $this->latte->render('app/views/user/account.latte', $this->params->getAll([
+                    'emailReadOnly' => $person['Imported'] == 1 ? true : false,
+                    'email' => $email,
+                    'firstName' => $firstName,
+                    'lastName' => $lastName,
+                    'nickName' => $nickName,
+                    'avatar' => $avatar,
+                    'useGravatar' => $useGravatar,
+                    'emojis' => $emojis,
+                    'emojiPath' => '../../app/images/'
+                ]));
+            } else {
+                $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
+            }
         }
     }
 
     public function availabilities()
     {
-        $person = $this->getPerson();
+        if ($person = $this->getPerson()) {
 
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $availabilities = $_POST['availabilities'];
-            $query = $this->pdo->prepare('UPDATE Person SET availabilities = ? WHERE Id = ' . $person['Id']);
-            $query->execute([json_encode($availabilities)]);
-            $this->flight->redirect('/user');
-        } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-            $currentAvailabilities = json_decode($person['Availabilities'] ?? '', true);
-            echo $this->latte->render('app/views/user/availabilities.latte', $this->params->getAll([
-                'currentAvailabilities' => $currentAvailabilities,
-                'page' => basename($_SERVER['REQUEST_URI'])
-            ]));
-        } else {
-            $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
+            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                $availabilities = $_POST['availabilities'];
+                $query = $this->pdo->prepare('UPDATE Person SET availabilities = ? WHERE Id = ' . $person['Id']);
+                $query->execute([json_encode($availabilities)]);
+                $this->flight->redirect('/user');
+            } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+                $currentAvailabilities = json_decode($person['Availabilities'] ?? '', true);
+                echo $this->latte->render('app/views/user/availabilities.latte', $this->params->getAll([
+                    'currentAvailabilities' => $currentAvailabilities
+                ]));
+            } else {
+                $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
+            }
         }
     }
 
     public function preferences()
     {
-        $person = $this->getPerson();
+        if ($person = $this->getPerson()) {
 
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $preferences = $_POST['preferences'];
-            $query = $this->pdo->prepare('UPDATE Person SET preferences = ? WHERE Id = ' . $person['Id']);
-            $query->execute([json_encode($preferences)]);
-            $this->flight->redirect('/user');
-        } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-            $currentPreferences = json_decode($person['Preferences'] ?? '', true);
-            $query = $this ->pdo->prepare("
+            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                $preferences = $_POST['preferences'];
+                $query = $this->pdo->prepare('UPDATE Person SET preferences = ? WHERE Id = ' . $person['Id']);
+                $query->execute([json_encode($preferences)]);
+                $this->flight->redirect('/user');
+            } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+                $currentPreferences = json_decode($person['Preferences'] ?? '', true);
+                $query = $this->pdo->prepare("
                 SELECT DISTINCT et.*
                 FROM EventType et
                 WHERE et.Inactivated = 0 
@@ -277,38 +278,38 @@ class UserController extends BaseController
                 )
                 ORDER BY et.Name
             ");
-            $query->execute([$person['Id']]);
-            $eventTypes = $query->fetchAll(PDO::FETCH_ASSOC);
-            echo $this->latte->render('app/views/user/preferences.latte', $this->params->getAll([
-                'currentPreferences' => $currentPreferences,
-                'page' => basename($_SERVER['REQUEST_URI']),
-                'eventTypes' => $eventTypes
-            ]));
-        } else {
-            $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
+                $query->execute([$person['Id']]);
+                $eventTypes = $query->fetchAll(PDO::FETCH_ASSOC);
+                echo $this->latte->render('app/views/user/preferences.latte', $this->params->getAll([
+                    'currentPreferences' => $currentPreferences,
+                    'eventTypes' => $eventTypes
+                ]));
+            } else {
+                $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
+            }
         }
     }
 
     public function groups()
     {
-        $person = $this->getPerson();
+        if ($person = $this->getPerson()) {
 
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $groups = $_POST['groups'] ?? [];
-            $idPerson = $person['Id'];
-            $query = $this->pdo->prepare("
+            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                $groups = $_POST['groups'] ?? [];
+                $idPerson = $person['Id'];
+                $query = $this->pdo->prepare("
                 DELETE FROM PersonGroup 
                 WHERE IdPerson = $idPerson 
                 AND IdGroup IN (SELECT Id FROM `Group` WHERE SelfRegistration = 1)");
-            $query->execute();
-            
-            $query = $this->pdo->prepare('INSERT INTO PersonGroup (IdPerson, IdGroup) VALUES (?, ?)');
-            foreach ($groups as $groupId) {
-                $query->execute([$idPerson, $groupId]);
-            }
-            $this->flight->redirect('/user');
-        } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-            $query = $this->pdo->prepare('
+                $query->execute();
+
+                $query = $this->pdo->prepare('INSERT INTO PersonGroup (IdPerson, IdGroup) VALUES (?, ?)');
+                foreach ($groups as $groupId) {
+                    $query->execute([$idPerson, $groupId]);
+                }
+                $this->flight->redirect('/user');
+            } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+                $query = $this->pdo->prepare('
                 SELECT g.*, 
                     CASE WHEN pg.Id IS NOT NULL THEN 1 ELSE 0 END as isMember,
                     g.SelfRegistration as canToggle
@@ -317,23 +318,24 @@ class UserController extends BaseController
                 WHERE g.Inactivated = 0 AND (g.SelfRegistration = 1 OR pg.Id IS NOT NULL)
                 ORDER BY g.Name');
                 $query->execute([$person['Id']]);
-            $currentGroups = $query->fetchAll(PDO::FETCH_ASSOC);
-            echo $this->latte->render('app/views/user/groups.latte', $this->params->getAll([
-                'groups' => $currentGroups,
-                'page' => basename($_SERVER['REQUEST_URI'])
-            ]));
-        } else {
-            $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
+                $currentGroups = $query->fetchAll(PDO::FETCH_ASSOC);
+                echo $this->latte->render('app/views/user/groups.latte', $this->params->getAll([
+                    'groups' => $currentGroups
+                ]));
+            } else {
+                $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
+            }
         }
     }
 
-    public function help() 
+    public function help()
     {
-        $this->getPerson();
-        echo $this->latte->render('app/views/info.latte', [
-            'content' => $this->settings->getHelpUser(),
-            'hasAuthorization' => $this->authorizations->hasAutorization()
-        ]);
+        if ($this->getPerson()) {
+            echo $this->latte->render('app/views/info.latte', $this->params->getAll([
+                'content' => $this->settings->getHelpUser(),
+                'hasAuthorization' => $this->authorizations->hasAutorization()
+            ]));
+        }
     }
 
     public function log($code = '', $message = '')

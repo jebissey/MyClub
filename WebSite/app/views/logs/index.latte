@@ -20,6 +20,10 @@
                        value="{$filters['os'] ?? ''}">
             </div>
             <div class="col-md-3">
+                <input type="text" name="who" class="form-control" placeholder="Filtrer par Utilisateur" 
+                       value="{$filters['who'] ?? ''}">
+            </div>
+            <div class="col-md-3">
                 <input type="text" name="code" class="form-control" placeholder="Filtrer par Code" 
                        value="{$filters['code'] ?? ''}">
             </div>
@@ -39,6 +43,7 @@
                     <th>Browser</th>
                     <th>OS</th>
                     <th>URI</th>
+                    <th>Who</th>
                     <th>Code</th>
                     <th>Message</th>
                 </tr>
@@ -51,6 +56,7 @@
                     <td>{$log['Browser']}</td>
                     <td>{$log['Os']}</td>
                     <td>{$log['Uri']}</td>
+                    <td>{$log['Who']}</td>
                     <td>{$log['Code']}</td>
                     <td>{$log['Message']}</td>
                 </tr>

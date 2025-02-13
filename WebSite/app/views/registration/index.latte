@@ -1,0 +1,137 @@
+{layout '../admin/webmaster.latte'}
+
+{block content}
+<div class="container mt-4">
+    <h2>Inscription aux groupes</h2>
+    
+    <form method="get" class="row g-3 mb-4">
+        <div class="col-md-4">
+            <label for="firstName" class="form-label">Prénom</label>
+            <input type="text" class="form-control" id="firstName" name="firstName" 
+                   value="{$filters['firstName'] ?? ''}">
+        </div>
+        <div class="col-md-4">
+            <label for="lastName" class="form-label">Nom</label>
+            <input type="text" class="form-control" id="lastName" name="lastName" 
+                   value="{$filters['lastName'] ?? ''}">
+        </div>
+        <div class="col-md-4">
+            <label for="nickName" class="form-label">Surnom</label>
+            <input type="text" class="form-control" id="nickName" name="nickName" 
+                   value="{$filters['nickName'] ?? ''}">
+        </div>
+        <div class="col-12">
+            <button type="submit" class="btn btn-primary">Filtrer</button>
+            <a href="/registration" class="btn btn-secondary">Réinitialiser</a>
+        </div>
+    </form>
+
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Nom</th>
+                    <th>Prénom</th>
+                    <th>Surnom</th>
+                    <th>Email</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {foreach $persons as $person}
+                <tr>
+                    <td>{$person['LastName']}</td>
+                    <td>{$person['FirstName']}</td>
+                    <td>{$person['NickName']}</td>
+                    <td>{$person['Email']}</td>
+                    <td>
+                        <button class="btn btn-primary btn-sm" 
+                                onclick="showGroups({$person['Id']})">
+                            Gérer les groupes
+                        </button>
+                    </td>
+                </tr>
+                {/foreach}
+            </tbody>
+        </table>
+    </div>
+
+    {if $totalPages > 1}
+    <nav>
+        <ul class="pagination">
+            {for $i = 1; $i <= $totalPages; $i++}
+            <li class="page-item {if $i == $currentPage}active{/if}">
+                <a class="page-link" href="?page={$i}&firstName={$filters['firstName'] ?? ''}&lastName={$filters['lastName'] ?? ''}&nickName={$filters['nickName'] ?? ''}">{$i}</a>
+            </li>
+            {/for}
+        </ul>
+    </nav>
+    {/if}
+</div>
+
+<div class="modal fade" id="groupsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Gestion des groupes</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="groupsContent">
+            </div>
+        </div>
+    </div>
+</div>
+{/block}
+
+{block scripts}
+<script n:syntax="off">
+let groupsModal;
+
+document.addEventListener('DOMContentLoaded', function() {
+    groupsModal = new bootstrap.Modal(document.getElementById('groupsModal'));
+});
+
+function showGroups(personId) {
+    fetch(`/registration/groups/${personId}`)
+        .then(response => response.text())
+        .then(html => {
+            document.getElementById('groupsContent').innerHTML = html;
+            groupsModal.show();
+        });
+}
+
+function addToGroup(personId, groupId) {
+    fetch(`/registration/add/${personId}/${groupId}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showGroups(personId);
+        } else {
+            alert(data.message || 'Une erreur est survenue');
+        }
+    });
+}
+
+function removeFromGroup(personId, groupId) {
+    fetch(`/registration/remove/${personId}/${groupId}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showGroups(personId);
+        } else {
+            alert(data.message || 'Une erreur est survenue');
+        }
+    });
+}
+</script>
+{/block}
