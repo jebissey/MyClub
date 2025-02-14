@@ -14,6 +14,7 @@ use app\helpers\Authorization;
 abstract class BaseController
 {
     protected PDO $pdo;
+    protected $fluent;
     protected Engine $flight;
     protected $latte;
     protected Application $application;
@@ -23,11 +24,13 @@ abstract class BaseController
     public function __construct(PDO $pdo, Engine $flight)
     {
         $this->pdo = $pdo;
+        $this->fluent = new \Envms\FluentPDO\Query($pdo);
         $this->flight = $flight;
 
         $this->latte = new LatteEngine();
         $this->latte->setTempDirectory(__DIR__ . '/../../var/latte/temp');
         $this->latte->addExtension(new \Latte\Bridges\Tracy\TracyExtension);
+
         $this->application = new Application($pdo, $flight);
         $this->authorizations = new Authorization($this->pdo);
     }

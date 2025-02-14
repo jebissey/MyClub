@@ -119,12 +119,10 @@ class ImportController extends BaseController
                     }
                 }
                 fclose($file);
-                $query = $this->pdo->prepare("SELECT Id, Email FROM Person WHERE Inactivated = 0 ORDER BY Email");
-                $query->execute();
-                foreach ($query->fetchAll(PDO::FETCH_ASSOC) as $person) {
+                $query = $this->fluent->from('Person')->where('Inactivated', 0)->select(['Id', 'Email'])->fetchAll();
+                foreach ($query as $person) {
                     if (!in_array($person['Email'], $this->foundEmails)) {
-                        $query = $this->pdo->prepare("UPDATE Person SET Inactivated = 1 WHERE Id = " . $person['Id']);
-                        $query->execute();
+                        $this->fluent->update('Person', ['Inactivated' => 1], $person['Id'])->execute();
                         $this->results['inactivated']++;
                     }
                 }
