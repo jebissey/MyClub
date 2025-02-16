@@ -1,0 +1,27 @@
+{layout '../admin/eventManager.latte'}
+
+{block content}
+<div class="container mt-4">
+    <h1>Liste des adresses email</h1>
+    <ul>
+        {foreach $emails as $email}
+            <li>{$email}</li>
+        {/foreach}
+    </ul>
+</div>
+{/block}
+
+{block scripts}
+<script>
+    function copyToClipboard() {
+        var emailsArray = JSON.parse({$emailsJson});
+        var emailsString = emailsArray.join(', ');
+        navigator.clipboard.writeText(emailsString).then(function() {
+            alert('Les emails ont été copiés dans le presse-papiers !');
+        }, function(err) {
+            alert('Erreur lors de la copie dans le presse-papiers: ' + err);
+        });
+    }
+    copyToClipboard();
+</script>
+{/block}

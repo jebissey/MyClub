@@ -7,7 +7,7 @@ use flight\Engine;
 
 class ImportController extends BaseController
 {
-    private $settings;
+    private $importSettings;
     private $settingsFile = 'var/tmp/import_settings.json';
     private $results;
     private array $foundEmails = [];
@@ -21,9 +21,9 @@ class ImportController extends BaseController
     private function loadSettings()
     {
         if (file_exists($this->settingsFile)) {
-            $this->settings = json_decode(file_get_contents($this->settingsFile), true);
+            $this->importSettings = json_decode(file_get_contents($this->settingsFile), true);
         } else {
-            $this->settings = [
+            $this->importSettings = [
                 'headerRow' => 1,
                 'mapping' => [
                     'email' => null,
@@ -37,15 +37,15 @@ class ImportController extends BaseController
 
     private function saveSettings()
     {
-        file_put_contents($this->settingsFile, json_encode($this->settings));
+        file_put_contents($this->settingsFile, json_encode($this->importSettings));
     }
 
     public function showImportForm()
     {
         if ($this->getPerson(['PersonManager'])) {
-            $this->flight->set('settings', $this->settings);
+            $this->flight->set('importSettings', $this->importSettings);
             echo $this->latte->render('app/views/import/form.latte', $this->params->getAll([
-                'settings' => $this->settings,
+                'importSettings' => $this->importSettings,
                 'results' => $this->results
             ]));
         }
@@ -59,7 +59,7 @@ class ImportController extends BaseController
                 $this->results['messages'][] = 'Veuillez sélectionner un fichier CSV valide';
 
                 echo $this->latte->render('app/views/import/form.latte', $this->params->getAll([
-                    'settings' => $this->settings,
+                    'importSettings' => $this->importSettings,
                     'results' => $this->results
                 ]));
             } else {
@@ -77,8 +77,8 @@ class ImportController extends BaseController
                     'lastName' => $_POST['lastNameColumn'],
                     'phone' => $_POST['phoneColumn']
                 ];
-                $this->settings['headerRow'] = $headerRow;
-                $this->settings['mapping'] = $mapping;
+                $this->importSettings['headerRow'] = $headerRow;
+                $this->importSettings['mapping'] = $mapping;
                 $this->saveSettings();
 
                 $file = fopen($_FILES['csvFile']['tmp_name'], 'r');
@@ -119,8 +119,8 @@ class ImportController extends BaseController
                     }
                 }
                 fclose($file);
-                $query = $this->fluent->from('Person')->where('Inactivated', 0)->select(['Id', 'Email'])->fetchAll();
-                foreach ($query as $person) {
+                $persons = $this->fluent->from('Person')->where('Inactivated', 0)->fetchAll('Id', 'Email');
+                foreach ($persons as $person) {
                     if (!in_array($person['Email'], $this->foundEmails)) {
                         $this->fluent->update('Person', ['Inactivated' => 1], $person['Id'])->execute();
                         $this->results['inactivated']++;
@@ -128,7 +128,7 @@ class ImportController extends BaseController
                 }
 
                 echo $this->latte->render('app/views/import/form.latte', $this->params->getAll([
-                    'settings' => $this->settings,
+                    'importSettings' => $this->importSettings,
                     'results' => $this->results
                 ]));
             }

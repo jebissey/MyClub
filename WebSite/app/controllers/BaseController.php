@@ -7,9 +7,10 @@ use flight\Engine;
 use Latte\Engine as LatteEngine;
 
 use app\helpers\Application;
+use app\helpers\Authorization;
 use app\helpers\GravatarHandler;
 use app\helpers\Params;
-use app\helpers\Authorization;
+use app\helpers\Settings;
 
 abstract class BaseController
 {
@@ -20,6 +21,7 @@ abstract class BaseController
     protected Application $application;
     protected Params $params;
     protected $authorizations;
+    protected $settings;
 
     public function __construct(PDO $pdo, Engine $flight)
     {
@@ -33,6 +35,7 @@ abstract class BaseController
 
         $this->application = new Application($pdo, $flight);
         $this->authorizations = new Authorization($this->pdo);
+        $this->settings = new Settings($this->pdo);
     }
 
 

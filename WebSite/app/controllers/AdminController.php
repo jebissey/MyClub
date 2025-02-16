@@ -2,21 +2,8 @@
 
 namespace app\controllers;
 
-use flight\Engine;
-use PDO;
-use app\helpers\Settings;
-
 class AdminController extends BaseController
 {
-    private Settings $settings;
-
-    public function __construct(PDO $pdo, Engine $flight)
-    {
-        parent::__construct($pdo, $flight);
-        $this->settings = new Settings($this->pdo);
-    }
-
-
     public function help()
     {
         if ($this->getPerson(['EventManager', 'PersonManager', 'Redactor', 'Webmaster'])) {

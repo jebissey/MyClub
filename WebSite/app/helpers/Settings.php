@@ -29,35 +29,43 @@ class Settings
 
     public function getHelpHome()
     {
-        $query = $this->pdo->prepare('SELECT Value FROM Settings WHERE Name = "Help_home"');
-        $query->execute();
-        return $query->fetch(PDO::FETCH_ASSOC)['Value'];
+        return $this->getFromSettings('Help_home');
     }
 
     public function getHelpUser()
     {
-        $query = $this->pdo->prepare('SELECT Value FROM Settings WHERE Name = "Help_user"');
-        $query->execute();
-        return $query->fetch(PDO::FETCH_ASSOC)['Value'];
+        return $this->getFromSettings('Help_user');
     }
 
     public function getHelpAdmin()
     {
-        $query = $this->pdo->prepare('SELECT Value FROM Settings WHERE Name = "Help_admin"');
-        $query->execute();
-        return $query->fetch(PDO::FETCH_ASSOC)['Value'];
+        return $this->getFromSettings('Help_admin');
     }
 
     public function getHelpWebmaster()
     {
-        $query = $this->pdo->prepare('SELECT Value FROM Settings WHERE Name = "Help_webmaster"');
-        $query->execute();
-        return $query->fetch(PDO::FETCH_ASSOC)['Value'];
+        return $this->getFromSettings('Help_webmaster');
+    }
+
+    public function getHelpEventManager()
+    {
+        return $this->getFromSettings('Help_eventManager');
+    }
+
+    public function getHelpPersonManager()
+    {
+        return $this->getFromSettings('Help_personManager');
     }
 
     public function getLegalNotices()
     {
-        $query = $this->pdo->prepare('SELECT Value FROM Settings WHERE Name = "LegalNotices"');
+        return $this->getFromSettings('LegalNotices');
+    }
+
+    
+    private function getFromSettings($name)
+    {
+        $query = $this->pdo->prepare("SELECT Value FROM Settings WHERE Name = '$name'");
         $query->execute();
         return $query->fetch(PDO::FETCH_ASSOC)['Value'];
     }

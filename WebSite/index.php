@@ -68,6 +68,12 @@ $containerBuilder->addDefinitions([
             $container->get(PDO::class),
             $container->get(Engine::class)
         );
+    },
+    'app\controllers\EmailController' => function (Container $container) {
+        return new \app\controllers\EmailController(
+            $container->get(PDO::class),
+            $container->get(Engine::class)
+        );
     }
 ]);
 $container = $containerBuilder->build();
@@ -144,16 +150,27 @@ $flight->route('POST /registration/remove/@personId/@groupId', function($personI
 
 $personController = $container->get('app\controllers\PersonController');
 $flight->route('GET  /personManager',      function()    use ($personController) { $personController->home(); });
+$flight->route('GET  /personManager/help', function()    use ($personController) { $personController->help(); });
 $flight->route('GET  /persons',            function()    use ($personController) { $personController->index(); });
 $flight->route('GET  /persons/create',     function()    use ($personController) { $personController->create(); });
 $flight->route('GET  /persons/edit/@id',   function($id) use ($personController) { $personController->edit($id); });
 $flight->route('POST /persons/edit/@id',   function($id) use ($personController) { $personController->edit($id); });
 $flight->route('POST /persons/delete/@id', function($id) use ($personController) { $personController->delete($id); });
 
+$eventController = $container->get('app\controllers\EventController');
+$flight->route('GET  /eventManager',      function()    use ($eventController) { $eventController->home(); });
+$flight->route('GET  /eventManager/help', function()    use ($eventController) { $eventController->help(); });
+$flight->route('GET  /events',            function()    use ($eventController) { $eventController->index(); });
+
 $importController = $container->get('app\controllers\ImportController');
 $flight->route('GET  /import',         function() use ($importController) { $importController->showImportForm(); });
 $flight->route('POST /import',         function() use ($importController) { $importController->processImport(); });
 $flight->route('POST /import/headers', function() use ($importController) { $importController->getHeadersFromCSV(); });
+
+$emailController = $container->get('app\controllers\EmailController');
+$flight->route('GET  /emails',          function() use ($emailController) { $emailController->fetchEmails(); });
+$flight->route('POST /emails',          function() use ($emailController) { $emailController->fetchEmails(); });
+$flight->route('GET  /copyToClipBoard', function() use ($emailController) { $emailController->copyToClipBoard(); });
 
 $applicationHelper = $container->get('app\helpers\Application');
 $flight->route('/help',         function() use ($applicationHelper) { $applicationHelper->help(); });

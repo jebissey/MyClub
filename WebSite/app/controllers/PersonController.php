@@ -6,6 +6,16 @@ use PDO;
 
 class PersonController extends BaseController implements CrudControllerInterface
 {
+    public function help(): void
+    {
+        $this->getPerson();
+
+        echo $this->latte->render('app/views/info.latte', [
+            'content' => $this->settings->getHelpPersonManager(),
+            'hasAuthorization' => $this->authorizations->hasAutorization()
+        ]);
+    }
+
     public function home(): void
     {
         if ($this->getPerson(['EventManager', 'PersonManager', 'Redactor', 'Webmaster'])) {
