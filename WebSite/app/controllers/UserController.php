@@ -24,26 +24,23 @@ class UserController extends BaseController
     {
         $email = urldecode($encodedEmail);
 
-        //echo "<h1>Reset password for email: " . $email . "</h1>";
-
         if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            $stmt = $this->pdo->prepare('SELECT * FROM "Person" WHERE Email = ?');
-            $stmt->execute([$email]);
-            $person = $stmt->fetch(PDO::FETCH_ASSOC);
+            $query = $this->pdo->prepare('SELECT * FROM "Person" WHERE Email = ?');
+            $query->execute([$email]);
+            $person = $query->fetch(PDO::FETCH_ASSOC);
 
             if ($person) {
                 if ($person['TokenCreatedAt'] === null || (new DateTime($person['TokenCreatedAt']))->diff(new DateTime())->h >= 1) {
                     $token = bin2hex(openssl_random_pseudo_bytes(32));
                     $tokenCreatedAt = (new DateTime())->format('Y-m-d H:i:s');
 
-                    $stmt = $this->pdo->prepare('UPDATE Person SET Token = ?, TokenCreatedAt = ? WHERE Id = ?');
-                    $stmt->execute([$token, $tokenCreatedAt, $person['Id']]);
+                    $query = $this->pdo->prepare('UPDATE Person SET Token = ?, TokenCreatedAt = ? WHERE Id = ?');
+                    $query->execute([$token, $tokenCreatedAt, $person['Id']]);
+                    $resetLink = 'https://' . $_SERVER['HTTP_HOST'] . '/user/setPassword/' . $token;
 
-                    $newUrl = preg_replace('/forgotPassword.*$/', 'setPassword', $this->flight->request()->url);
-                    $resetLink = 'https://' . $newUrl . '/' . $token;
                     $to = $email;
                     $subject = "Initialisation du mot de passe";
-                    $message = "Cliquez sur ce lien pour initialiser votre mot de passe : " . $resetLink;
+                    $message = "Cliquez sur ce lien pour initialiser votre mot de passe : $resetLink";
 
                     if (mail($to, $subject, $message)) {
                         $this->application->message('Un email a été envoyé pour réinitialiser votre mot de passe');
@@ -63,9 +60,9 @@ class UserController extends BaseController
 
     public function setPassword($token)
     {
-        $stmt = $this->pdo->prepare('SELECT * FROM "Person" WHERE Token = ?');
-        $stmt->execute([$token]);
-        $person = $stmt->fetch(PDO::FETCH_ASSOC);
+        $query = $this->pdo->prepare('SELECT * FROM "Person" WHERE Token = ?');
+        $query->execute([$token]);
+        $person = $query->fetch(PDO::FETCH_ASSOC);
 
         if (!$person) {
             $this->application->error498('Person', $token, __FILE__, __LINE__);
@@ -80,9 +77,14 @@ class UserController extends BaseController
                     $this->application->message('Votre mot de passe est réinitialisé');
                 }
             } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-                echo $this->latte->render('app/views/user/setPassword.latte', $this->params->getAll([
+                echo $this->latte->render('app/views/user/setPassword.latte', [
+                    'href' => '/user/sign/in',
+                    'userImg' => '../../app/images/anonymat.png',
+                    'userEmail' => '',
+                    'keys' => false,
+                    'page' => basename(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH)),
                     'token' => $token
-                ]));
+                ]);
             } else {
                 $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
             }

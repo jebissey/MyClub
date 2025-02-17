@@ -50,6 +50,6 @@ class Authorization
 
     public function hasAutorization() : bool
     {
-        return count($this->authorizations) > 0;
+        return count($this->authorizations ?? []) > 0;
     }
 }

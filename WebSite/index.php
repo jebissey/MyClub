@@ -112,6 +112,8 @@ $flight->route('GET  /user/sign/in',                      function()            
 $flight->route('POST /user/sign/in',                      function()              use ($userController) { $userController->signIn(); });
 $flight->route('GET  /user/sign/out',                     function()              use ($userController) { $userController->signOut(); });
 $flight->route('GET  /user/forgotPassword/@encodedEmail', function($encodedEmail) use ($userController) { $userController->forgotPassword($encodedEmail); });
+$flight->route('GET  /user/setPassword/@token',           function($token)        use ($userController) { $userController->setPassword($token); });
+$flight->route('POST /user/setPassword/@token',           function($token)        use ($userController) { $userController->setPassword($token); });
 $flight->route('GET  /user/account',                      function()              use ($userController) { $userController->account(); });
 $flight->route('POST /user/account',                      function()              use ($userController) { $userController->account(); });
 $flight->route('GET  /user/availabilities',               function()              use ($userController) { $userController->availabilities(); });
@@ -132,7 +134,8 @@ $flight->route('GET  /arwards',              function() use ($webmasterControlle
 $flight->route('GET  /admin/webmaster/help', function() use ($webmasterController) { $webmasterController->help(); });
 
 $logController = $container->get('app\controllers\LogController');
-$flight->route('GET  /logs',   function() use ($logController) { $logController->index(); });
+$flight->route('GET  /logs',     function() use ($logController) { $logController->index(); });
+$flight->route('GET  /referers', function() use ($logController) { $logController->referers(); });
 
 $groupController = $container->get('app\controllers\GroupController');
 $flight->route('GET  /groups',            function()    use ($groupController) { $groupController->index(); });

@@ -68,7 +68,7 @@ class RegistrationController extends BaseController
                 SELECT 
                     g.Id,
                     g.Name,
-                    GROUP_CONCAT(a.Name ORDER BY a.Name) AS Authorizations
+                    GROUP_CONCAT(a.Name) AS Authorizations
                 FROM `Group` g
                 INNER JOIN PersonGroup pg ON pg.IdGroup = g.Id
                 INNER JOIN GroupAuthorization ga ON g.Id = ga.IdGroup
@@ -92,7 +92,7 @@ class RegistrationController extends BaseController
                 SELECT 
 					g.Id,
 					g.Name,
-					GROUP_CONCAT(a.Name ORDER BY a.Name) AS Authorizations
+					GROUP_CONCAT(a.Name) AS Authorizations
                 FROM 'Group' g
                 INNER JOIN GroupAuthorization ga ON g.Id = ga.IdGroup
 				INNER JOIN Authorization a ON ga.IdAuthorization = a.Id
@@ -115,7 +115,7 @@ class RegistrationController extends BaseController
                     SELECT 
 						g.Id,
 						g.Name,
-						GROUP_CONCAT(a.Name ORDER BY a.Name) AS Authorizations
+						GROUP_CONCAT(a.Name) AS Authorizations
                     FROM 'Group' g
                     INNER JOIN PersonGroup pg ON g.Id = pg.IdGroup
 					INNER JOIN GroupAuthorization ga ON g.Id = ga.IdGroup

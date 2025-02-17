@@ -3,9 +3,9 @@ CREATE TABLE IF NOT EXISTS "PersonGroup" (
 	"Id"	INTEGER,
 	"IdPerson"	INTEGER NOT NULL,
 	"IdGroup"	INTEGER NOT NULL,
+	FOREIGN KEY("IdGroup") REFERENCES "Group"("Id"),
 	FOREIGN KEY("IdPerson") REFERENCES "Person"("Id"),
-	PRIMARY KEY("Id"),
-	FOREIGN KEY("IdGroup") REFERENCES "Group"("Id")
+	PRIMARY KEY("Id")
 );
 CREATE TABLE IF NOT EXISTS "Article" (
 	"Id"	INTEGER,
@@ -20,8 +20,8 @@ CREATE TABLE IF NOT EXISTS "Participant" (
 	"IdEvent"	INTEGER NOT NULL,
 	"IdPerson"	INTEGER NOT NULL,
 	PRIMARY KEY("Id"),
-	FOREIGN KEY("IdPerson") REFERENCES "Person"("Id"),
-	FOREIGN KEY("IdEvent") REFERENCES "Event"("Id")
+	FOREIGN KEY("IdEvent") REFERENCES "Event"("Id"),
+	FOREIGN KEY("IdPerson") REFERENCES "Person"("Id")
 );
 CREATE TABLE IF NOT EXISTS "Event" (
 	"Id"	INTEGER,
@@ -32,8 +32,8 @@ CREATE TABLE IF NOT EXISTS "Event" (
 	"EndTime"	TEXT NOT NULL,
 	"IdEventType"	INTEGER NOT NULL,
 	"CreatedBy"	INTEGER NOT NULL,
-	FOREIGN KEY("CreatedBy") REFERENCES "Person"("Id"),
 	PRIMARY KEY("Id"),
+	FOREIGN KEY("CreatedBy") REFERENCES "Person"("Id"),
 	FOREIGN KEY("IdEventType") REFERENCES "EventType"("Id")
 );
 CREATE TABLE IF NOT EXISTS "Contact" (
@@ -58,9 +58,9 @@ CREATE TABLE IF NOT EXISTS "ArticleGroup" (
 	"Id"	INTEGER,
 	"IdArticle"	INTEGER NOT NULL,
 	"IdGroup"	INTEGER NOT NULL,
-	FOREIGN KEY("IdGroup") REFERENCES "Group"("Id"),
 	FOREIGN KEY("IdArticle") REFERENCES "Article"("Id"),
-	PRIMARY KEY("Id")
+	PRIMARY KEY("Id"),
+	FOREIGN KEY("IdGroup") REFERENCES "Group"("Id")
 );
 CREATE TABLE IF NOT EXISTS "Page" (
 	"Id"	INTEGER,
@@ -81,33 +81,33 @@ CREATE TABLE IF NOT EXISTS "EventTypeGroup" (
 	"Id"	INTEGER,
 	"IdEventType"	INTEGER NOT NULL,
 	"IdGroup"	INTEGER NOT NULL,
+	FOREIGN KEY("IdEventType") REFERENCES "EventType"("Id"),
 	FOREIGN KEY("IdGroup") REFERENCES "Group"("Id"),
-	PRIMARY KEY("Id"),
-	FOREIGN KEY("IdEventType") REFERENCES "EventType"("Id")
+	PRIMARY KEY("Id")
 );
 CREATE TABLE IF NOT EXISTS "EventTypeAttribute" (
 	"Id"	INTEGER,
 	"IdEventType"	INTEGER NOT NULL,
 	"IdAttribute"	INTEGER NOT NULL,
 	FOREIGN KEY("IdEventType") REFERENCES "EventType"("Id"),
-	PRIMARY KEY("Id"),
-	FOREIGN KEY("IdAttribute") REFERENCES "Attribute"("Id")
+	FOREIGN KEY("IdAttribute") REFERENCES "Attribute"("Id"),
+	PRIMARY KEY("Id")
 );
 CREATE TABLE IF NOT EXISTS "EventAttribute" (
 	"Id"	INTEGER,
 	"IdEvent"	INTEGER NOT NULL,
 	"IdAttribute"	INTEGER NOT NULL,
-	FOREIGN KEY("IdEvent") REFERENCES "Event"("Id"),
 	FOREIGN KEY("IdAttribute") REFERENCES "Attribute"("Id"),
-	PRIMARY KEY("Id")
+	PRIMARY KEY("Id"),
+	FOREIGN KEY("IdEvent") REFERENCES "Event"("Id")
 );
 CREATE TABLE IF NOT EXISTS "GroupAuthorization" (
 	"Id"	INTEGER,
 	"IdGroup"	INTEGER NOT NULL,
 	"IdAuthorization"	INTEGER NOT NULL,
-	FOREIGN KEY("IdAuthorization") REFERENCES "Authorization"("Id"),
 	FOREIGN KEY("IdGroup") REFERENCES "Group"("Id"),
-	PRIMARY KEY("Id")
+	PRIMARY KEY("Id"),
+	FOREIGN KEY("IdAuthorization") REFERENCES "Authorization"("Id")
 );
 CREATE TABLE IF NOT EXISTS "Settings" (
 	"Id"	INTEGER,
@@ -126,8 +126,8 @@ CREATE TABLE IF NOT EXISTS "PageGroup" (
 	"Id"	INTEGER,
 	"IdPage"	INTEGER NOT NULL,
 	"IdGroup"	INTEGER NOT NULL,
-	FOREIGN KEY("IdPage") REFERENCES "Page"("Id"),
 	PRIMARY KEY("Id"),
+	FOREIGN KEY("IdPage") REFERENCES "Page"("Id"),
 	FOREIGN KEY("IdGroup") REFERENCES "Group"("Id")
 );
 CREATE TABLE IF NOT EXISTS "Person" (
@@ -179,8 +179,8 @@ CREATE TABLE IF NOT EXISTS "Reply" (
 	"IdSurvey"	INTEGER NOT NULL,
 	"Answers"	TEXT NOT NULL,
 	PRIMARY KEY("Id"),
-	FOREIGN KEY("IdPerson") REFERENCES "Person"("Id"),
-	FOREIGN KEY("IdSurvey") REFERENCES "Survey"("Id")
+	FOREIGN KEY("IdSurvey") REFERENCES "Survey"("Id"),
+	FOREIGN KEY("IdPerson") REFERENCES "Person"("Id")
 );
 CREATE TABLE IF NOT EXISTS "Survey" (
 	"Id"	INTEGER,
@@ -201,18 +201,18 @@ CREATE TABLE IF NOT EXISTS "EventNeed" (
 	"IdEvent"	INTEGER NOT NULL,
 	"IdNeed"	INTEGER NOT NULL,
 	"Counter"	INTEGER,
+	FOREIGN KEY("IdEvent") REFERENCES "Event"("Id"),
 	FOREIGN KEY("IdNeed") REFERENCES "Need"("Id"),
-	PRIMARY KEY("Id"),
-	FOREIGN KEY("IdEvent") REFERENCES "Event"("Id")
+	PRIMARY KEY("Id")
 );
 CREATE TABLE IF NOT EXISTS "ParticipantSupply" (
 	"Id"	INTEGER,
 	"IdParticipant"	INTEGER NOT NULL,
 	"IdNeed"	INTEGER NOT NULL,
 	"Supply"	INTEGER NOT NULL DEFAULT 0,
+	PRIMARY KEY("Id"),
 	FOREIGN KEY("IdNeed") REFERENCES "Need"("Id"),
-	FOREIGN KEY("IdParticipant") REFERENCES "Participant"("Id"),
-	PRIMARY KEY("Id")
+	FOREIGN KEY("IdParticipant") REFERENCES "Participant"("Id")
 );
 INSERT INTO "PersonGroup" VALUES (1,1,1);
 INSERT INTO "Metadata" VALUES (1,'MyClub',1);

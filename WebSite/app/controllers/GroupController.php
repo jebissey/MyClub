@@ -20,7 +20,7 @@ class GroupController extends BaseController implements CrudControllerInterface
                     g.Id, 
 	                g.Name, 
                     g.SelfRegistration,
-                    COALESCE(GROUP_CONCAT(a.Name, ', ' ORDER BY a.Name), '') AS Authorizations
+                    GROUP_CONCAT(a.Name) AS Authorizations
                 FROM 'Group' g
                 LEFT JOIN GroupAuthorization ga ON g.Id = ga.IdGroup
                 LEFT JOIN Authorization a ON ga.IdAuthorization = a.Id
