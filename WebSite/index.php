@@ -144,6 +144,7 @@ $flight->route('POST /groups/create',     function()    use ($groupController) {
 $flight->route('GET  /groups/edit/@id',   function($id) use ($groupController) { $groupController->edit($id); });
 $flight->route('POST /groups/edit/@id',   function($id) use ($groupController) { $groupController->edit($id); });
 $flight->route('POST /groups/delete/@id', function($id) use ($groupController) { $groupController->delete($id); });
+$flight->route('GET  /groups/users/@id',  function($id) use ($groupController) { $groupController->getGroupUsers($id); });
 
 $registrationController = $container->get('app\controllers\RegistrationController');
 $flight->route('GET  /registration',                           function()                    use ($registrationController) { $registrationController->index(); });

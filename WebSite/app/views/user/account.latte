@@ -4,12 +4,13 @@
     <form method="POST" class="needs-validation" novalidate data-form="account">
         <div class="mb-3">
             <label for="email" class="form-label">Email</label>
-            <input type="email" class="form-control" id="email" name="email" 
+            <input type="email" class="form-control {if $emailReadOnly}bg-light text-muted{/if}" id="email" name="email" 
                 value="{$email}" {if $emailReadOnly}readonly{else}required{/if}>
             <div class="invalid-feedback">
                 Veuillez saisir une adresse email valide.
             </div>
         </div>
+
 
         {if $isSelfEdit}
         <div class="mb-3">

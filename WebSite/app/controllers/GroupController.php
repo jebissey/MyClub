@@ -3,6 +3,7 @@
 namespace app\controllers;
 
 use app\helpers\Application;
+use Exception;
 use PDO;
 
 class GroupController extends BaseController implements CrudControllerInterface
@@ -12,7 +13,7 @@ class GroupController extends BaseController implements CrudControllerInterface
     {
         if ($this->getPerson(['PersonManager', 'Webmaster'])) {
             $having = '';
-            if($this->authorizations->isPersonManager() && !$this->authorizations->isWebmaster()){
+            if ($this->authorizations->isPersonManager() && !$this->authorizations->isWebmaster()) {
                 $having = "HAVING Authorizations = ''";
             }
             $query = $this->pdo->query("
@@ -76,8 +77,7 @@ class GroupController extends BaseController implements CrudControllerInterface
                 echo $this->latte->render('app/views/groups/create.latte', $this->params->getAll([
                     'availableAuthorizations' => $availableAuthorizations
                 ]));
-            }
-            else {
+            } else {
                 $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
             }
         }
@@ -158,6 +158,31 @@ class GroupController extends BaseController implements CrudControllerInterface
             $query->execute([$id]);
 
             $this->flight->redirect('/groups');
+        }
+    }
+
+    public function getGroupUsers($id)
+    {
+        try {
+            $users = $this->fluent
+                ->from('PersonGroup')
+                ->select('Person.Id, Person.FirstName, Person.LastName, Person.Email')
+                ->leftJoin('Person ON PersonGroup.IdPerson = Person.Id')
+                ->where('PersonGroup.IdGroup', $id)
+                ->orderBy('Person.FirstName ASC, Person.LastName ASC')
+                ->fetchAll();
+
+            if (!$users) {
+                $users = [];
+            }
+
+            header('Content-Type: application/json');
+            echo json_encode($users);
+            exit;
+        } catch (Exception $e) {
+            header('Content-Type: application/json', true, 500);
+            echo json_encode(['error' => $e->getMessage()]);
+            exit;
         }
     }
 }

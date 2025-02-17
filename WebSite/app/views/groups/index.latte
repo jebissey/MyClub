@@ -38,19 +38,27 @@
                         </td>
                         <td>{$group['Authorizations']}</td>
                         <td class="text-end">
-                        {if $group['Id'] != 1}
-                            <div class="btn-group btn-group-sm">
-                                <a href="/groups/edit/{$group['Id']}" class="btn btn-outline-primary">
-                                    Modifier
-                                </a>
-                                <form method="POST" action="/groups/delete/{$group['Id']}" class="d-inline">
-                                    <button type="submit" class="btn btn-outline-danger" 
-                                            onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce groupe ?')">
-                                        Supprimer
-                                    </button>
-                                </form>
-                            </div>
-                        {/if}
+                            {if $group['Id'] != 1}
+                                <div class="btn-group btn-group-sm">
+                                    <a href="/groups/edit/{$group['Id']}" class="btn btn-outline-primary">
+                                        Modifier
+                                    </a>
+                                    <form method="POST" action="/groups/delete/{$group['Id']}" class="d-inline">
+                                        <button type="submit" class="btn btn-outline-danger" 
+                                                onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce groupe ?')">
+                                            Supprimer
+                                        </button>
+                                    </form>
+                                </div>
+                            {/if}
+                            <button class="btn btn-outline-info btn-sm" onclick="loadGroupUsers({$group['Id']})">
+                                Voir utilisateurs
+                            </button>
+                        </td>
+                    </tr>
+                    <tr id="users-group-{$group['Id']}" class="d-none">
+                        <td colspan="4">
+                            <div id="user-list-{$group['Id']}">Chargement...</div>
                         </td>
                     </tr>
                     {/foreach}
@@ -60,4 +68,35 @@
         {/if}
     </div>
 </div>
+{/block}
+
+{block scripts}
+<script n:syntax="off">
+function loadGroupUsers(groupId) {
+    let userRow = document.getElementById(`users-group-${groupId}`);
+    let userList = document.getElementById(`user-list-${groupId}`);
+
+    if (userRow.classList.contains("d-none")) {
+        userList.innerHTML = "Chargement...";
+        fetch(`/groups/users/${groupId}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.length === 0) {
+                    userList.innerHTML = "<p>Aucun utilisateur dans ce groupe.</p>";
+                } else {
+                    userList.innerHTML = "<ul class='list-unstyled'>" + data.map(user => 
+                        `<li>${user.FirstName} ${user.LastName} (${user.Email})</li>`
+                    ).join('') + "</ul>";
+                }
+            })
+            .catch(error => {
+                userList.innerHTML = "<p class='text-danger'>Erreur lors du chargement.</p>";
+            });
+
+        userRow.classList.remove("d-none");
+    } else {
+        userRow.classList.add("d-none");
+    }
+}
+</script>
 {/block}
