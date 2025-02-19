@@ -27,3 +27,10 @@ All data is stored in a **SQLight** database.
 - upload to the cloud
 - enjoy
 
+## How to customize
+
+- Change WebSite/app/Images/home.png with your 48x48 image.
+- Change WebSite/app/Images/logo.png with yours.
+- Change WebSite/app/Images/favicon.ico with yours.
+- You can add, change or remove emoji files. 48x48 image with name emoji...
+- You can also change the other images. Keep size and name.
