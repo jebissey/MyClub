@@ -1,0 +1,66 @@
+{layout "../admin/webmaster.latte"}
+
+{block content}
+<div class="container mt-4">
+    <h1>Créer un enregistrement dans {$table}</h1>
+    
+    <div class="row mb-3">
+        <div class="col">
+            <a href="/dbbrowser/{$table}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Retour à la table
+            </a>
+        </div>
+    </div>
+    
+    <div class="card">
+        <div class="card-header bg-success text-white">
+            <h5 class="mb-0">Nouveau enregistrement</h5>
+        </div>
+        <div class="card-body">
+            <form method="POST" action="/dbbrowser/{$table}/create">
+                {foreach $columns as $column}
+                {var $columnInfo = $columnTypes[$column]}
+                <div class="form-group">
+                    <label for="{$column}">
+                        {$column}
+                        {if $columnInfo['notnull'] && !$columnInfo['pk']}
+                            <span class="text-danger">*</span>
+                        {/if}
+                    </label>
+                    
+                    {if $columnInfo['pk']}
+                        <input type="text" class="form-control" id="{$column}" name="{$column}" 
+                               placeholder="Généré automatiquement" disabled>
+                        <small class="form-text text-muted">Ce champ est une clé primaire et sera généré automatiquement.</small>
+                    {elseif strpos($columnInfo['type'], 'TEXT') !== false && strpos($columnInfo['type'], 'BLOB') === false}
+                        <textarea class="form-control" id="{$column}" name="{$column}" rows="3"
+                                 {if $columnInfo['notnull']}required{/if}>{$columnInfo['dflt_value']}</textarea>
+                    {elseif strpos($columnInfo['type'], 'INT') !== false}
+                        <input type="number" class="form-control" id="{$column}" name="{$column}" 
+                               value="{$columnInfo['dflt_value']}" {if $columnInfo['notnull']}required{/if}>
+                    {elseif strpos($columnInfo['type'], 'REAL') !== false || strpos($columnInfo['type'], 'FLOA') !== false}
+                        <input type="number" step="0.01" class="form-control" id="{$column}" name="{$column}" 
+                               value="{$columnInfo['dflt_value']}" {if $columnInfo['notnull']}required{/if}>
+                    {elseif strpos($columnInfo['type'], 'BOOL') !== false}
+                        <select class="form-control" id="{$column}" name="{$column}" {if $columnInfo['notnull']}required{/if}>
+                            <option value="0" {if $columnInfo['dflt_value'] == '0'}selected{/if}>Faux (0)</option>
+                            <option value="1" {if $columnInfo['dflt_value'] == '1'}selected{/if}>Vrai (1)</option>
+                        </select>
+                    {elseif strpos(strtoupper($column), 'DATE') !== false || strpos($columnInfo['type'], 'DATE') !== false}
+                        <input type="date" class="form-control" id="{$column}" name="{$column}" 
+                               value="{$columnInfo['dflt_value']}" {if $columnInfo['notnull']}required{/if}>
+                    {else}
+                        <input type="text" class="form-control" id="{$column}" name="{$column}" 
+                               value="{$columnInfo['dflt_value']}" {if $columnInfo['notnull']}required{/if}>
+                    {/if}
+                    
+                    <small class="form-text text-muted">Type: {$columnInfo['type']}</small>
+                </div>
+                {/foreach}
+                
+                <button type="submit" class="btn btn-success">Créer</button>
+            </form>
+        </div>
+    </div>
+</div>
+{/block}

@@ -80,6 +80,12 @@ $containerBuilder->addDefinitions([
             $container->get(PDO::class),
             $container->get(Engine::class)
         );
+    },
+    'app\controllers\DbBrowserController' => function (Container $container) {
+        return new \app\controllers\DbBrowserController(
+            $container->get(PDO::class),
+            $container->get(Engine::class)
+        );
     }
 ]);
 $container = $containerBuilder->build();
@@ -181,6 +187,16 @@ $emailController = $container->get('app\controllers\EmailController');
 $flight->route('GET  /emails',          function() use ($emailController) { $emailController->fetchEmails(); });
 $flight->route('POST /emails',          function() use ($emailController) { $emailController->fetchEmails(); });
 $flight->route('GET  /copyToClipBoard', function() use ($emailController) { $emailController->copyToClipBoard(); });
+
+$dbBrowserController = $container->get('app\controllers\DbBrowserController');
+$flight->route('GET  /dbbrowser',                   function()            use ($dbBrowserController) { $dbBrowserController->index(); });
+$flight->route('GET  /dbbrowser/tables',            function()            use ($dbBrowserController) { $dbBrowserController->getTables(); });
+$flight->route('GET  /dbbrowser/@table',            function($table)      use ($dbBrowserController) { $dbBrowserController->showTable($table); });
+$flight->route('GET  /dbbrowser/@table/create',     function($table)      use ($dbBrowserController) { $dbBrowserController->showCreateForm($table); });
+$flight->route('POST /dbbrowser/@table/create',     function($table)      use ($dbBrowserController) { $dbBrowserController->createRecord($table); });
+$flight->route('GET  /dbbrowser/@table/edit/@id',   function($table, $id) use ($dbBrowserController) { $dbBrowserController->showEditForm($table, $id); });
+$flight->route('POST /dbbrowser/@table/edit/@id',   function($table, $id) use ($dbBrowserController) { $dbBrowserController->updateRecord($table, $id); });
+$flight->route('POST /dbbrowser/@table/delete/@id', function($table, $id) use ($dbBrowserController) { $dbBrowserController->deleteRecord($table, $id); });
 
 $apiController = $container->get('app\controllers\ApiController');
 $flight->route('GET  /api/persons-by-group/@id', function($id) use ($apiController) { $apiController->getPersonsByGroup($id); });

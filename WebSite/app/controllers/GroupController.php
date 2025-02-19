@@ -3,7 +3,6 @@
 namespace app\controllers;
 
 use app\helpers\Application;
-use Exception;
 use PDO;
 
 class GroupController extends BaseController implements CrudControllerInterface

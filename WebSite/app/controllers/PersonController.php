@@ -8,12 +8,12 @@ class PersonController extends BaseController implements CrudControllerInterface
 {
     public function help(): void
     {
-        $this->getPerson();
-
-        echo $this->latte->render('app/views/info.latte', [
-            'content' => $this->settings->getHelpPersonManager(),
-            'hasAuthorization' => $this->authorizations->hasAutorization()
-        ]);
+        if ($this->getPerson(['PersonManager', 'Webmaster'])) {
+            echo $this->latte->render('app/views/info.latte', [
+                'content' => $this->settings->getHelpPersonManager(),
+                'hasAuthorization' => $this->authorizations->hasAutorization()
+            ]);
+        }
     }
 
     public function home(): void
