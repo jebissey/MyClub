@@ -6,6 +6,37 @@
     <title>{block title}{/block}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     {php Tracy\Debugger::renderLoader()}
+    <style>
+        body {
+            position: relative;
+        }
+        
+        main.flex-grow-1 {
+            position: relative;
+            z-index: 1;
+        }
+        
+        body::before {
+            content: "";
+            background-image: url('/app/images/logo.png');
+            background-repeat: no-repeat;
+            background-position: center center;
+            background-size: 75%;
+            opacity: 0.1;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        nav, footer {
+            position: relative;
+            z-index: 2;
+        }
+    </style>
 </head>
 <body class="d-flex flex-column min-vh-100">
 <main class="flex-grow-1">
