@@ -7,73 +7,76 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     {php Tracy\Debugger::renderLoader()}
     <style>
-        body {
+        .content-wrapper {
             position: relative;
+            min-height: 100%;
         }
         
-        main.flex-grow-1 {
-            position: relative;
-            z-index: 1;
-        }
-        
-        body::before {
+        .content-wrapper::before {
             content: "";
             background-image: url('/app/images/logo.png');
             background-repeat: no-repeat;
             background-position: center center;
-            background-size: 75%;
-            opacity: 0.1;
+            background-size: 50%;
+            opacity: 0.2;
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             pointer-events: none;
-            z-index: 0;
+            z-index: -1; /* Valeur négative pour être sous le contenu */
         }
         
-        nav, footer {
-            position: relative;
-            z-index: 2;
+        /* Assurer que les modales Bootstrap restent au-dessus */
+        .modal {
+            z-index: 1055 !important; /* Valeur par défaut de Bootstrap */
+        }
+        
+        .modal-backdrop {
+            z-index: 1050 !important; /* Valeur par défaut de Bootstrap */
         }
     </style>
 </head>
 <body class="d-flex flex-column min-vh-100">
-<main class="flex-grow-1">
-    <nav class="navbar navbar-expand-sm navbar-dark bg-dark">
-        {block navbar}{/block}
-    </nav>
+    <div class="content-wrapper d-flex flex-column min-vh-100">
+        <main class="flex-grow-1">
+            <nav class="navbar navbar-expand-sm navbar-dark bg-dark">
+                {block navbar}{/block}
+            </nav>
 
-    <div class="container mt-4">
-        {block content}{/block}
+            <div class="container mt-4">
+                {block content}{/block}
+            </div>
+            </div>
+        </main>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        <script n:syntax="off">
+        document.addEventListener("DOMContentLoaded", function() {
+            var width = screen.width;
+            var height = screen.height;
+            document.cookie = "screen_resolution=" + width + "x" + height;
+        });
+
+        const alertPlaceholder = document.getElementById('liveAlertPlaceholder');
+        const appendAlert = (message, type) => {
+        const wrapper = document.createElement('div');
+        wrapper.innerHTML = [
+            `<div class="alert alert-${type} alert-dismissible" role="alert">`,
+            `  <div>${message}</div>`,
+            '  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>',
+            '</div>'
+        ].join('');
+        alertPlaceholder.append(wrapper);
+        };
+        </script>
+
+        <footer class="bg-dark text-white">
+            <div class="container">
+                <p class="mb-0"><a href ="https://github.com/jebissey/MyClub/releases/tag/V0.1">V0.2</a> &#169; JEB <a href="/legal/notice">Mentions légales</a></p>
+            </div>
+        </footer>
     </div>
-</main>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script n:syntax="off">
-document.addEventListener("DOMContentLoaded", function() {
-    var width = screen.width;
-    var height = screen.height;
-    document.cookie = "screen_resolution=" + width + "x" + height;
-});
-
-const alertPlaceholder = document.getElementById('liveAlertPlaceholder');
-const appendAlert = (message, type) => {
-  const wrapper = document.createElement('div');
-  wrapper.innerHTML = [
-    `<div class="alert alert-${type} alert-dismissible" role="alert">`,
-    `  <div>${message}</div>`,
-    '  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>',
-    '</div>'
-  ].join('');
-  alertPlaceholder.append(wrapper);
-};
-</script>
-
-<footer class="bg-dark text-white">
-    <div class="container">
-        <p class="mb-0"><a href ="https://github.com/jebissey/MyClub/releases/tag/V0.1">V0.2</a> &#169; JEB <a href="/legal/notice">Mentions légales</a></p>
-    </div>
-</footer>
-{block scripts}{/block}
+    {block scripts}{/block}
 </body>
 </html>
