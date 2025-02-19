@@ -1,6 +1,6 @@
   <div class="container-fluid">
     <a class="navbar-brand" href="/">
-      <img src="../../app/images/home.png" alt="Agenda">
+      <img src="../../app/images/home.png" alt="Home" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Accueil">
     </a>
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -12,14 +12,14 @@
 {* add pages here *}
       </ul>
       <a class="nav-link" href="{$href}">
-        <img src="{$userImg}" >
+        <img src="{$userImg}" alt="User avatar" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Mes données">
       </a>
       {if $keys}
-        <a href ="/admin"><img src="../../app/images/keySet.png" alt="Key set"></a>
+        <a href ="/admin"><img src="../../app/images/keySet.png" alt="Key set" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Zone admin"></a>
       {/if}
       {if $userEmail != ''}
-        <a href ="/user/sign/out"><img src="../../app/images/SignOut.png" alt="Sign out"></a>
+        <a href ="/user/sign/out"><img src="../../app/images/SignOut.png" alt="Sign out" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Déconnexion"></a>
       {/if}
-      <a href ="/help"><img src="../../app/images/help.png" alt="Help"></a>
+      <a href ="/help"><img src="../../app/images/help.png" alt="Help" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Aide contextuelle"></a>
     </div>
   </div>

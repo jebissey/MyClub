@@ -204,6 +204,7 @@ class DbBrowserController extends BaseController
         }
     }
 
+    
     private function getTableColumns($table)
     {
         $this->validateTableName($table);
