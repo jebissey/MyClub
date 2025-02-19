@@ -74,6 +74,12 @@ $containerBuilder->addDefinitions([
             $container->get(PDO::class),
             $container->get(Engine::class)
         );
+    },
+    'app\controllers\ApiController' => function (Container $container) {
+        return new \app\controllers\ApiController(
+            $container->get(PDO::class),
+            $container->get(Engine::class)
+        );
     }
 ]);
 $container = $containerBuilder->build();
@@ -131,6 +137,7 @@ $flight->route('GET  /admin/help',       function() use ($adminController) { $ad
 $webmasterController = $container->get('app\controllers\WebmasterController');
 $flight->route('GET  /webmaster',            function() use ($webmasterController) { $webmasterController->home(); });
 $flight->route('GET  /arwards',              function() use ($webmasterController) { $webmasterController->arwards(); });
+$flight->route('POST /arwards',              function() use ($webmasterController) { $webmasterController->arwards(); });
 $flight->route('GET  /admin/webmaster/help', function() use ($webmasterController) { $webmasterController->help(); });
 
 $logController = $container->get('app\controllers\LogController');
@@ -144,7 +151,6 @@ $flight->route('POST /groups/create',     function()    use ($groupController) {
 $flight->route('GET  /groups/edit/@id',   function($id) use ($groupController) { $groupController->edit($id); });
 $flight->route('POST /groups/edit/@id',   function($id) use ($groupController) { $groupController->edit($id); });
 $flight->route('POST /groups/delete/@id', function($id) use ($groupController) { $groupController->delete($id); });
-$flight->route('GET  /groups/users/@id',  function($id) use ($groupController) { $groupController->getGroupUsers($id); });
 
 $registrationController = $container->get('app\controllers\RegistrationController');
 $flight->route('GET  /registration',                           function()                    use ($registrationController) { $registrationController->index(); });
@@ -176,11 +182,13 @@ $flight->route('GET  /emails',          function() use ($emailController) { $ema
 $flight->route('POST /emails',          function() use ($emailController) { $emailController->fetchEmails(); });
 $flight->route('GET  /copyToClipBoard', function() use ($emailController) { $emailController->copyToClipBoard(); });
 
+$apiController = $container->get('app\controllers\ApiController');
+$flight->route('GET  /api/persons-by-group/@id', function($id) use ($apiController) { $apiController->getPersonsByGroup($id); });
+
 $applicationHelper = $container->get('app\helpers\Application');
 $flight->route('/help',         function() use ($applicationHelper) { $applicationHelper->help(); });
 $flight->route('/legal/notice', function() use ($applicationHelper) { $applicationHelper->legalNotice(); });
 $flight->route('/*',            function() use ($applicationHelper) { $applicationHelper->error404(); });
-
 
 $flight->map('error', function  (Throwable $ex) use ($userController, $applicationHelper){
     $userController->log(500, 'Internal error: ' . $ex->getMessage() .' in file ' . $ex->getFile() . ' at line' . $ex->getLine());

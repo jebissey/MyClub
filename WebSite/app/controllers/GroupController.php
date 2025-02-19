@@ -161,28 +161,5 @@ class GroupController extends BaseController implements CrudControllerInterface
         }
     }
 
-    public function getGroupUsers($id)
-    {
-        try {
-            $users = $this->fluent
-                ->from('PersonGroup')
-                ->select('Person.Id, Person.FirstName, Person.LastName, Person.Email')
-                ->leftJoin('Person ON PersonGroup.IdPerson = Person.Id')
-                ->where('PersonGroup.IdGroup', $id)
-                ->orderBy('Person.FirstName ASC, Person.LastName ASC')
-                ->fetchAll();
 
-            if (!$users) {
-                $users = [];
-            }
-
-            header('Content-Type: application/json');
-            echo json_encode($users);
-            exit;
-        } catch (Exception $e) {
-            header('Content-Type: application/json', true, 500);
-            echo json_encode(['error' => $e->getMessage()]);
-            exit;
-        }
-    }
 }

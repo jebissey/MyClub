@@ -41,7 +41,7 @@ abstract class BaseController
 
     protected function sanitizeInput($data)
     {
-        return htmlspecialchars(trim($data), ENT_QUOTES, 'UTF-8');
+        return htmlspecialchars(trim($data ?? ''), ENT_QUOTES, 'UTF-8');
     }
 
     protected function getPerson($requiredAuthorisations = [])

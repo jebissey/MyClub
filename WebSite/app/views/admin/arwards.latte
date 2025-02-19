@@ -2,6 +2,15 @@
 
 {block content}
     <h2>Tableau des compteurs par personne</h2>
+    
+    <div id="liveAlertPlaceholder"></div>
+
+    <div class="mb-3">
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCounterModal">
+        <i class="fas fa-plus"></i> Ajouter un compteur
+    </button>
+    </div>
+
     <div class="table-responsive">
         <table class="table table-striped table-hover" id="dataTable">
             <thead class="table-dark">
@@ -34,6 +43,61 @@
         </table>
     </div>
     <p>(1 visio = 1pt, 1 bonus (404, gravatar) = 1pt,  1 bug = 2pt, 1 suggestion = 3pt, 1 super bonus (403) = 5pt)</p>
+
+    <div class="modal fade" id="addCounterModal" tabindex="-1" aria-labelledby="addCounterModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addCounterModalLabel">Ajouter un compteur</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addCounterForm" method="post">
+                    <div class="mb-3">
+                        <label for="counterName" class="form-label">Nom du compteur</label>
+                        <select class="form-select" id="counterName" name="name" required>
+                        <option value="" selected disabled>Choisir un nom de compteur</option>
+                        {foreach $counterNames as $name}
+                            <option value="{$name}">{$name}</option>
+                        {/foreach}
+                        <option value="new">Nouveau nom...</option>
+                        </select>
+                        <div id="newNameContainer" class="mt-2 d-none">
+                        <input type="text" class="form-control" id="newCounterName" placeholder="Entrez un nouveau nom">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="counterDetail" class="form-label">Détail</label>
+                        <textarea class="form-control" id="counterDetail" name="detail" rows="3"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="counterValue" class="form-label">Valeur</label>
+                        <input type="number" class="form-control" id="counterValue" name="value" required min="0">
+                    </div>
+                    <div class="mb-3">
+                        <label for="counterGroup" class="form-label">Groupe</label>
+                        <select class="form-select" id="counterGroup" name="idGroup" required>
+                        <option value="" selected disabled>Choisir un groupe</option>
+                        {foreach $groups as $group}
+                            <option value="{$group['Id']}">{$group['Name']}</option>
+                        {/foreach}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="counterPerson" class="form-label">Personne</label>
+                        <select class="form-select" id="counterPerson" name="idPerson" required disabled>
+                        <option value="" selected disabled>Choisir une personne</option>
+                        </select>
+                    </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="button" class="btn btn-primary" id="submitCounter">Enregistrer</button>
+                </div>
+            </div>
+        </div>
+    </div>
 {/block}
 
 {block scripts}
@@ -81,5 +145,118 @@
             });
         });
     });
+
+// Script pour gérer le modal d'ajout de compteur
+document.addEventListener('DOMContentLoaded', function() {
+  // Fonction pour afficher les alertes
+  const alertPlaceholder = document.getElementById('liveAlertPlaceholder');
+  const appendAlert = (message, type) => {
+    const wrapper = document.createElement('div');
+    wrapper.innerHTML = [
+      `<div class="alert alert-${type} alert-dismissible" role="alert">`,
+      `  <div>${message}</div>`,
+      '  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>',
+      '</div>'
+    ].join('');
+    alertPlaceholder.append(wrapper);
+  };
+
+  // Gestion de l'option "Nouveau nom..."
+  const counterNameSelect = document.getElementById('counterName');
+  const newNameContainer = document.getElementById('newNameContainer');
+  const newCounterNameInput = document.getElementById('newCounterName');
+  
+  counterNameSelect.addEventListener('change', function() {
+    if (this.value === 'new') {
+      newNameContainer.classList.remove('d-none');
+      newCounterNameInput.setAttribute('required', 'required');
+    } else {
+      newNameContainer.classList.add('d-none');
+      newCounterNameInput.removeAttribute('required');
+    }
+  });
+  
+  // Chargement dynamique des personnes en fonction du groupe sélectionné
+  const groupSelect = document.getElementById('counterGroup');
+  const personSelect = document.getElementById('counterPerson');
+  
+  groupSelect.addEventListener('change', function() {
+    const groupId = this.value;
+    if (groupId) {
+      fetch(`/api/persons-by-group/${groupId}`)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Erreur réseau ou serveur');
+          }
+          return response.json();
+        })
+        .then(data => {
+          personSelect.innerHTML = '<option value="" selected disabled>Choisir une personne</option>';
+          data.forEach(person => {
+            const option = document.createElement('option');
+            option.value = person.Id;
+            option.textContent = `${person.FirstName} ${person.LastName}`;
+            personSelect.appendChild(option);
+          });
+          personSelect.disabled = false;
+        })
+        .catch(error => {
+          console.error('Erreur lors du chargement des personnes:', error);
+          appendAlert('Erreur lors du chargement des personnes: ' + error.message, 'danger');
+          personSelect.disabled = true;
+        });
+    } else {
+      personSelect.innerHTML = '<option value="" selected disabled>Choisir une personne</option>';
+      personSelect.disabled = true;
+    }
+  });
+  
+  // Soumission du formulaire
+  const submitButton = document.getElementById('submitCounter');
+  const addCounterForm = document.getElementById('addCounterForm');
+  const modal = new bootstrap.Modal(document.getElementById('addCounterModal'));
+
+  submitButton.addEventListener('click', function() {
+    // Gestion du cas "nouveau nom"
+    if (counterNameSelect.value === 'new') {
+      const newName = newCounterNameInput.value.trim();
+      if (newName) {
+        // Créer un champ caché pour le nom personnalisé
+        let customNameInput = addCounterForm.querySelector('input[name="customName"]');
+        if (!customNameInput) {
+          customNameInput = document.createElement('input');
+          customNameInput.type = 'hidden';
+          customNameInput.name = 'customName';
+          addCounterForm.appendChild(customNameInput);
+        }
+        customNameInput.value = newName;
+      } else {
+        appendAlert('Veuillez entrer un nom pour le compteur', 'danger');
+        return;
+      }
+    }
+    
+    // Vérification des champs obligatoires
+    if (!addCounterForm.checkValidity()) {
+      addCounterForm.reportValidity();
+      return;
+    }
+    
+  // Soumettre le formulaire normalement
+  addCounterForm.submit();
+  
+  // Fermer le modal
+  const modal = bootstrap.Modal.getInstance(document.getElementById('addCounterModal'));
+  modal.hide();
+  });
+  
+  // Réinitialiser le formulaire quand le modal est fermé
+  document.getElementById('addCounterModal').addEventListener('hidden.bs.modal', function () {
+    addCounterForm.reset();
+    newNameContainer.classList.add('d-none');
+    personSelect.innerHTML = '<option value="" selected disabled>Choisir une personne</option>';
+    personSelect.disabled = true;
+  });
+});
 </script>
 {/block}

@@ -152,9 +152,7 @@ class RegistrationController extends BaseController
                 return;
             }
 
-            $insert = $this->pdo->prepare("
-                INSERT INTO PersonGroup (IdPerson, IdGroup) VALUES (?, ?)
-            ");
+            $insert = $this->pdo->prepare("INSERT INTO PersonGroup (IdPerson, IdGroup) VALUES (?, ?)");
             $success = $insert->execute([$personId, $groupId]);
 
             echo json_encode(['success' => $success]);
@@ -164,10 +162,7 @@ class RegistrationController extends BaseController
     public function removeFromGroup($personId, $groupId)
     {
         if ($person = $this->getPerson(['PersonManager', 'Webmaster'])) {
-            // Même vérification que pour l'ajout
-            $checkAuth = $this->pdo->prepare("
-                SELECT COUNT(*) FROM GroupAuthorization WHERE IdGroup = ?
-            ");
+            $checkAuth = $this->pdo->prepare("SELECT COUNT(*) FROM GroupAuthorization WHERE IdGroup = ?");
             $checkAuth->execute([$groupId]);
             $hasAuthorizations = $checkAuth->fetchColumn() > 0;
 
@@ -177,9 +172,7 @@ class RegistrationController extends BaseController
                 return;
             }
 
-            $delete = $this->pdo->prepare("
-                DELETE FROM PersonGroup WHERE IdPerson = ? AND IdGroup = ?
-            ");
+            $delete = $this->pdo->prepare("DELETE FROM PersonGroup WHERE IdPerson = ? AND IdGroup = ?");
             $success = $delete->execute([$personId, $groupId]);
 
             echo json_encode(['success' => $success]);
