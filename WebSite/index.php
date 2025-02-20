@@ -204,7 +204,18 @@ $flight->route('GET  /api/persons-by-group/@id', function($id) use ($apiControll
 $applicationHelper = $container->get('app\helpers\Application');
 $flight->route('/help',         function() use ($applicationHelper) { $applicationHelper->help(); });
 $flight->route('/legal/notice', function() use ($applicationHelper) { $applicationHelper->legalNotice(); });
+
+$flight->route('/favicon.ico', function() {
+    $path = __DIR__ . '/app/images/favicon.ico';
+    if (file_exists($path)) {
+        header('Content-Type: image/x-icon');
+        readfile($path);
+        exit;
+    }
+});
+
 $flight->route('/*',            function() use ($applicationHelper) { $applicationHelper->error404(); });
+
 
 $flight->map('error', function  (Throwable $ex) use ($userController, $applicationHelper){
     $userController->log(500, 'Internal error: ' . $ex->getMessage() .' in file ' . $ex->getFile() . ' at line' . $ex->getLine());
