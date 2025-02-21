@@ -3,31 +3,31 @@
 {block title}Personnes{/block}
 
 {block content}
-<div class="container">
-    <h1>Personnes</h1>
-    <a href="/persons/create" class="btn btn-primary mb-3">Créer une personne</a>
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Email</th>
-                <th>Nom</th>
-                <th>Prénom</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {foreach $persons as $person}
-            <tr>
-                <td>{$person['Email']}</td>
-                <td>{$person['LastName']}</td>
-                <td>{$person['FirstName']}</td>
-                <td>
-                    <a href="/persons/edit/{$person['Id']}" class="btn btn-sm btn-warning">Éditer</a>
-                    <a href="/persons/delete/{$person['Id']}" class="btn btn-sm btn-danger" onclick="return confirm('Voulez-vous vraiment supprimer cette personne ?')">Supprimer</a>
-                </td>
-            </tr>
-            {/foreach}
-        </tbody>
-    </table>
-</div>
+    {include '../common/dataTable.latte',
+        'createButton' => [
+            'url' => '/persons/create',
+            'label' => 'Créer une personne'
+        ],
+        'columns' => [
+            ['field' => 'Email', 'label' => 'Email'],
+            ['field' => 'LastName', 'label' => 'Nom'],
+            ['field' => 'FirstName', 'label' => 'Prénom']
+        ],
+        'items' => $persons,
+        'actions' => [
+            [
+                'type' => 'link',
+                'label' => 'Éditer',
+                'url' => '/persons/edit/{id}',
+                'class' => 'btn-warning'
+            ],
+            [
+                'type' => 'link',
+                'label' => 'Supprimer',
+                'url' => '/persons/delete/{id}',
+                'class' => 'btn-danger',
+                'confirm' => 'Voulez-vous vraiment supprimer cette personne ?'
+            ]
+        ]
+    }
 {/block}

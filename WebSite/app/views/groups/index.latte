@@ -10,6 +10,7 @@
     </a>
 </div>
 
+
 <div class="card">
     <div class="card-body">
         {if count($groups) === 0}
@@ -37,22 +38,18 @@
                             </span>
                         </td>
                         <td>{$group['Authorizations']}</td>
-                        <td class="text-end">
+                        <td class="text-nowrap">
                             {if $group['Id'] != 1}
-                                <div class="btn-group btn-group-sm">
-                                    <a href="/groups/edit/{$group['Id']}" class="btn btn-outline-primary">
-                                        Modifier
-                                    </a>
-                                    <form method="POST" action="/groups/delete/{$group['Id']}" class="d-inline">
-                                        <button type="submit" class="btn btn-outline-danger" 
-                                                onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce groupe ?')">
-                                            Supprimer
-                                        </button>
-                                    </form>
-                                </div>
+                                <a href="/groups/edit/{$group['Id']}" class="btn btn-sm btn-primary">
+                                    <i class="fas fa-edit"></i>Modifier
+                                </a>
+                                <button type="button" class="btn btn-sm btn-danger" 
+                                        onclick="confirmDelete({$group['Id']})">
+                                    <i class="fas fa-trash"></i>Supprimer
+                                </button>
                             {/if}
-                            <button class="btn btn-outline-info btn-sm" onclick="loadGroupUsers({$group['Id']})">
-                                Voir utilisateurs
+                            <button class="btn btn-sm btn-success" onclick="loadGroupUsers({$group['Id']})">
+                                <i class="fas fa-plus"></i>Membres
                             </button>
                         </td>
                     </tr>
@@ -67,6 +64,26 @@
         </div>
         {/if}
     </div>
+</div>
+
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteModalLabel">Confirmation de suppression</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+      </div>
+      <div class="modal-body">
+        Êtes-vous sûr de vouloir supprimer ce groupe ?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+        <form id="deleteForm" method="POST">
+          <button type="submit" class="btn btn-danger">Supprimer</button>
+        </form>
+      </div>
+    </div>
+  </div>
 </div>
 {/block}
 
@@ -97,6 +114,13 @@ function loadGroupUsers(groupId) {
     } else {
         userRow.classList.add("d-none");
     }
+}
+
+function confirmDelete(id) {
+    document.getElementById('deleteForm').action = '/groups/delete/' + id;
+    const deleteModal = document.getElementById('deleteModal');
+    const modal = new bootstrap.Modal(deleteModal);
+    modal.show();
 }
 </script>
 {/block}

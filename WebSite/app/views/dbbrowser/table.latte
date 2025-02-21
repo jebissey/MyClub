@@ -60,7 +60,7 @@
                             <i class="fas fa-edit"></i> Modifier
                         </a>
                         <button type="button" class="btn btn-sm btn-danger" 
-                                onclick="confirmDelete('{$table}', {$record[$primaryKey]})">
+                                onclick="confirmDelete({$table}, {$record[$primaryKey]})">
                             <i class="fas fa-trash"></i> Supprimer
                         </button>
                     </td>
@@ -103,26 +103,24 @@
     {/if}
 </div>
 
-<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="deleteModalLabel">Confirmer la suppression</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                Êtes-vous sûr de vouloir supprimer cet enregistrement? Cette action est irréversible.
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
-                <form id="deleteForm" method="POST">
-                    <button type="submit" class="btn btn-danger">Supprimer</button>
-                </form>
-            </div>
-        </div>
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteModalLabel">Confirmation de suppression</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+      </div>
+      <div class="modal-body">
+        Êtes-vous sûr de vouloir supprimer cet enregistrement?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+        <form id="deleteForm" method="POST">
+          <button type="submit" class="btn btn-danger">Supprimer</button>
+        </form>
+      </div>
     </div>
+  </div>
 </div>
 {/block}
 
@@ -130,7 +128,9 @@
 <script>
     function confirmDelete(table, id) {
         document.getElementById('deleteForm').action = '/dbbrowser/' + table + '/delete/' + id;
-        $('#deleteModal').modal('show');
+        const deleteModal = document.getElementById('deleteModal');
+        const modal = new bootstrap.Modal(deleteModal);
+    modal.show();
     }
 </script>
 {/block}

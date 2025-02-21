@@ -26,7 +26,6 @@
 {block scripts}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Si l'URL contient déjà une table, la sélectionner dans la combobox
         const pathParts = window.location.pathname.split('/');
         if (pathParts.length > 3) {
             const tableName = pathParts[3];

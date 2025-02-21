@@ -4,7 +4,7 @@ namespace app\controllers;
 
 use PDO;
 
-class PersonController extends BaseController implements CrudControllerInterface
+class PersonController extends TableController implements CrudControllerInterface
 {
     public function help(): void
     {
@@ -31,11 +31,41 @@ class PersonController extends BaseController implements CrudControllerInterface
     public function index()
     {
         if ($this->getPerson(['PersonManager', 'Webmaster'])) {
-            $query = $this->pdo->query('SELECT * FROM Person WHERE Inactivated = 0');
-            $persons = $query->fetchAll(PDO::FETCH_ASSOC);
+            $filterValues = [
+                'firstName' => $_GET['firstName'] ?? '',
+                'lastName' => $_GET['lastName'] ?? '',
+                'nickName' => $_GET['nickName'] ?? '',
+                'email' => $_GET['email'] ?? ''
+            ];
+
+            $filterConfig = [
+                ['name' => 'firstName', 'label' => 'Prénom'],
+                ['name' => 'lastName', 'label' => 'Nom'],
+                ['name' => 'nickName', 'label' => 'Surnom'],
+                ['name' => 'email', 'label' => 'Email']
+            ];
+
+            $columns = [
+                ['field' => 'Email', 'label' => 'Email'],
+                ['field' => 'LastName', 'label' => 'Nom'],
+                ['field' => 'FirstName', 'label' => 'Prénom']
+            ];
+
+            $query = $this->fluent->from('Person')
+                ->select('Id, FirstName, LastName, Email')
+                ->orderBy('LastName')
+                ->where('Inactivated', 0);
+
+            $data = $this->prepareTableData($query, $filterValues, $_GET['tablePage'] ?? null);
 
             echo $this->latte->render('app/views/persons/index.latte', $this->params->getAll([
-                'persons' => $persons
+                'persons' => $data['items'],
+                'currentPage' => $data['currentPage'],
+                'totalPages' => $data['totalPages'],
+                'filterValues' => $filterValues,
+                'filters' => $filterConfig,
+                'columns' => $columns,
+                'resetUrl' => '/persons' 
             ]));
         }
     }
@@ -46,7 +76,7 @@ class PersonController extends BaseController implements CrudControllerInterface
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $query = $this->pdo->prepare("SELECT Id FROM Person WHERE Email = ''");
                 $query->execute();
-                $id = $query->fetch(PDO::FETCH_ASSOC)['Id'];
+                $id = $query->fetch(PDO::FETCH_ASSOC)['Id'] ?? null;
                 if ($id == null) {
                     $query = $this->pdo->prepare("
                         INSERT INTO Person (Email, FirstName, LastName, Imported) 

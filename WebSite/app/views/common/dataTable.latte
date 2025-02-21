@@ -1,0 +1,91 @@
+<div class="container mt-4">
+
+    {if isset($filters) && count($filters) > 0}
+        <form method="get" class="row g-3 mb-4">
+            {foreach $filters as $filter}
+                <div class="col-md-4">
+                    <label for="{$filter['name']}" class="form-label">{$filter['label']}</label>
+                    <input type="text" class="form-control" id="{$filter['name']}" name="{$filter['name']}" 
+                        value="{$filterValues[$filter['name']] ?? ''}">
+                </div>
+            {/foreach}
+            <div class="col-12">
+                <button type="submit" class="btn btn-primary">Filtrer</button>
+                <a href="{$resetUrl}" class="btn btn-secondary">Réinitialiser</a>
+            </div>
+        </form>
+    {/if}
+    
+    {if isset($createButton)}
+        <a href="{$createButton['url']}" class="btn btn-primary mb-3">{$createButton['label']}</a>
+    {/if}
+    
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    {foreach $columns as $column}
+                        <th>{$column['label']}</th>
+                    {/foreach}
+                    {if isset($actions) && count($actions) > 0}
+                        <th>Actions</th>
+                    {/if}
+                </tr>
+            </thead>
+            <tbody>
+                {foreach $items as $item}
+                    <tr>
+                        {foreach $columns as $column}
+                            <td>{$item[$column['field']]}</td>
+                        {/foreach}
+                        {if isset($actions) && count($actions) > 0}
+                            <td>
+                                {foreach $actions as $action}
+                                    {if $action['type'] == 'link'}
+                                        <a href="{str_replace('{id}', $item['Id'], $action['url'])}" 
+                                           class="btn btn-sm {$action['class']}"
+                                           {if isset($action['confirm'])}onclick="return confirm('{$action['confirm']}')"{/if}>
+                                            {$action['label']}
+                                        </a>
+                                    {elseif $action['type'] == 'button'}
+                                        <button class="btn btn-sm {$action['class']}" 
+                                                onclick="{str_replace('{id}', $item['Id'], $action['onClick'])}">
+                                            {$action['label']}
+                                        </button>
+                                    {/if}
+                                {/foreach}
+                            </td>
+                        {/if}
+                    </tr>
+                {/foreach}
+            </tbody>
+        </table>
+    </div>
+    
+    {if isset($totalPages) && $totalPages > 1}
+        <nav>
+            <ul class="pagination">
+                {for $i = 1; $i <= $totalPages; $i++}
+                    <li class="page-item {if $i == $currentPage}active{/if}">
+                        <a class="page-link" href="?tablePage={$i}{if isset($filterValues)}{foreach $filterValues as $key => $value}&{$key}={$value}{/foreach}{/if}">{$i}</a>
+                    </li>
+                {/for}
+            </ul>
+        </nav>
+    {/if}
+</div>
+
+{if isset($modal)}
+    <div class="modal fade" id="{$modal['id']}" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">{$modal['title']}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="{$modal['contentId']}">
+                </div>
+            </div>
+        </div>
+    </div>
+{/if}

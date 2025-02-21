@@ -244,23 +244,13 @@ class LogController extends BaseController
             $offset = (int)($this->flight->request()->query->offset ?? 0);
             $data = $this->getStatisticsData($periodType, $offset);
 
-
-            $labels = [
-                '08/02/2025', '09/02/2025', '10/02/2025', '11/02/2025', 
-                '12/02/2025', '13/02/2025', '14/02/2025', '15/02/2025', 
-                '16/02/2025', '17/02/2025', '18/02/2025', '19/02/2025', '20/02/2025'
-            ];
-
-
             echo $this->latte->render('app/views/logs/statistics.latte', $this->params->getAll([
                 'periodTypes' => $this->periodTypes,
                 'currentPeriodType' => $periodType,
                 'currentOffset' => $offset,
                 'data' => $data,
                 'chartData' => $this->formatDataForChart($data),
-                'periodLabel' => $this->getPeriodLabel($periodType),
-
-                'labels' => json_encode($labels, JSON_UNESCAPED_SLASHES),
+                'periodLabel' => $this->getPeriodLabel($periodType)
             ]));
         }
     }
