@@ -1,0 +1,166 @@
+{layout '../admin/webmaster.latte'}
+
+{block content}
+<div class="container">
+    <h1 class="my-4">Statistiques des visiteurs</h1>
+    
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div class="btn-group" role="group">
+                    {foreach $periodTypes as $type}
+                        <a href="?periodType={$type}&offset={$currentOffset}" 
+                           class="btn {$type === $currentPeriodType ? 'btn-primary' : 'btn-outline-secondary'}">
+                            Par {$type === 'day' ? 'jour' : ($type === 'week' ? 'semaine' : ($type === 'month' ? 'mois' : 'année'))}
+                        </a>
+                    {/foreach}
+                </div>
+                
+                <div class="btn-group" role="group">
+                    <a href="?periodType={$currentPeriodType}&offset={$currentOffset + 13}" class="btn btn-outline-secondary">
+                        <i class="bi bi-chevron-double-left"></i>
+                    </a>
+                    <a href="?periodType={$currentPeriodType}&offset={$currentOffset + 1}" class="btn btn-outline-secondary">
+                        <i class="bi bi-chevron-left"></i>
+                    </a>
+                    <a href="?periodType={$currentPeriodType}&offset=0" class="btn {$currentOffset === 0 ? 'btn-primary' : 'btn-outline-secondary'}">
+                        Aujourd'hui
+                    </a>
+                    <a href="?periodType={$currentPeriodType}&offset={max(0, $currentOffset - 1)}" class="btn btn-outline-secondary" {if $currentOffset <= 0}disabled{/if}>
+                        <i class="bi bi-chevron-right"></i>
+                    </a>
+                    <a href="?periodType={$currentPeriodType}&offset={max(0, $currentOffset - 13)}" class="btn btn-outline-secondary" {if $currentOffset <= 0}disabled{/if}>
+                        <i class="bi bi-chevron-double-right"></i>
+                    </a>
+                </div>
+            </div>
+            
+            <div class="chart-container" style="position: relative; height:26vh; width:100%">
+                <canvas id="visitorStatsChart"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0">Détails des {$periodLabel}</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>{$periodLabel}</th>
+                            <th class="text-end">Visiteurs uniques</th>
+                            <th class="text-end">Pages vues</th>
+                            <th class="text-end">Pages/Visiteur</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {foreach $data as $item}
+                            <tr>
+                                <td>{$item['label']}</td>
+                                <td class="text-end">{$item['uniqueVisitors']}</td>
+                                <td class="text-end">{$item['pageViews']}</td>
+                                <td class="text-end">
+                                    {if $item['uniqueVisitors'] > 0}
+                                        {number_format($item['pageViews'] / $item['uniqueVisitors'], 2)}
+                                    {else}
+                                        0
+                                    {/if}
+                                </td>
+                            </tr>
+                        {/foreach}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}
+
+{block scripts}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const ctx = document.getElementById('visitorStatsChart').getContext('2d');
+    const chartData = {$chartData};
+    
+    const chart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: chartData.labels,
+            datasets: [
+                {
+                    label: 'Visiteurs uniques',
+                    data: chartData.uniqueVisitors,
+                    type: 'line',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    borderWidth: 2,
+                    tension: 0.1,
+                    yAxisID: 'y',
+                    pointRadius: 4,
+                    pointHoverRadius: 6,
+                    fill: true
+                },
+                {
+                    label: 'Pages vues',
+                    data: chartData.pageViews,
+                    backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1,
+                    yAxisID: 'y1'
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                x: {
+                    grid: {
+                        display: false
+                    }
+                },
+                y: {
+                    position: 'left',
+                    title: {
+                        display: true,
+                        text: 'Visiteurs uniques'
+                    },
+                    beginAtZero: true
+                },
+                y1: {
+                    position: 'right',
+                    title: {
+                        display: true,
+                        text: 'Pages vues'
+                    },
+                    beginAtZero: true,
+                    grid: {
+                        drawOnChartArea: false
+                    }
+                }
+            },
+            interaction: {
+                mode: 'index',
+                intersect: false,
+            },
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        title: function(tooltipItems) {
+                            return tooltipItems[0].label;
+                        }
+                    }
+                },
+                legend: {
+                    position: 'top',
+                }
+            }
+        }
+    });
+});
+</script>
+{/block}

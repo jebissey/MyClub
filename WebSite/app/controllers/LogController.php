@@ -15,7 +15,7 @@ class LogController extends BaseController
     {
         parent::__construct($pdo, $flight);
         $this->pdoForLog = \app\helpers\database\Database::getInstance()->getPdoForLog();
-        $this->host = 'https://' .$_SERVER['HTTP_HOST'] .'%';
+        $this->host = 'https://' . $_SERVER['HTTP_HOST'] . '%';
     }
 
     public function index()
@@ -84,12 +84,13 @@ class LogController extends BaseController
                 'currentDate' => $currentDate,
                 'nav' => $this->getRefererNavigation($period, $currentDate),
                 'externalRefs' => $this->getExternalRefererStats($period, $currentDate),
-                'control'=> $this
+                'control' => $this
             ]));
         }
     }
 
-    function buildUrl($newParams) {
+    public function buildUrl($newParams)
+    {
         $params = array_merge($_GET, $newParams);
         return '?' . http_build_query($params);
     }
@@ -227,5 +228,226 @@ class LogController extends BaseController
         ]);
 
         return $query->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+
+    private $periodTypes = ['day', 'week', 'month', 'year'];
+    private $defaultPeriodType = 'day';
+    private $periodsToShow = 13;
+
+    public function visitorsGraf()
+    {
+        if ($this->getPerson(['Webmaster'])) {
+            $periodType = $this->flight->request()->query->periodType ?? $this->defaultPeriodType;
+            $periodType = in_array($periodType, $this->periodTypes) ? $periodType : $this->defaultPeriodType;
+
+            $offset = (int)($this->flight->request()->query->offset ?? 0);
+            $data = $this->getStatisticsData($periodType, $offset);
+
+
+            $labels = [
+                '08/02/2025', '09/02/2025', '10/02/2025', '11/02/2025', 
+                '12/02/2025', '13/02/2025', '14/02/2025', '15/02/2025', 
+                '16/02/2025', '17/02/2025', '18/02/2025', '19/02/2025', '20/02/2025'
+            ];
+
+
+            echo $this->latte->render('app/views/logs/statistics.latte', $this->params->getAll([
+                'periodTypes' => $this->periodTypes,
+                'currentPeriodType' => $periodType,
+                'currentOffset' => $offset,
+                'data' => $data,
+                'chartData' => $this->formatDataForChart($data),
+                'periodLabel' => $this->getPeriodLabel($periodType),
+
+                'labels' => json_encode($labels, JSON_UNESCAPED_SLASHES),
+            ]));
+        }
+    }
+
+    private function getStatisticsData($periodType, $offset)
+    {
+        $periods = $this->generatePeriods($periodType, $offset);
+        $result = [];
+
+        foreach ($periods as $period) {
+            $startDate = $period['start'];
+            $endDate = $period['end'];
+
+            $uniqueVisitorsQuery = $this->pdoForLog->prepare("
+                SELECT COUNT(DISTINCT Token) as count
+                FROM Log
+                WHERE CreatedAt BETWEEN :startDate AND :endDate
+                AND Token IS NOT NULL AND Token != ''
+            ");
+            $uniqueVisitorsQuery->execute([
+                ':startDate' => $startDate,
+                ':endDate' => $endDate
+            ]);
+            $uniqueVisitors = $uniqueVisitorsQuery->fetch(PDO::FETCH_ASSOC)['count'] ?? 0;
+
+            $pageViewsQuery = $this->pdoForLog->prepare("
+                SELECT COUNT(*) as count
+                FROM Log
+                WHERE CreatedAt BETWEEN :startDate AND :endDate
+            ");
+            $pageViewsQuery->execute([
+                ':startDate' => $startDate,
+                ':endDate' => $endDate
+            ]);
+            $pageViews = $pageViewsQuery->fetch(PDO::FETCH_ASSOC)['count'] ?? 0;
+
+            $result[] = [
+                'label' => $this->formatPeriodLabel($period, $periodType),
+                'start' => $startDate,
+                'end' => $endDate,
+                'uniqueVisitors' => $uniqueVisitors,
+                'pageViews' => $pageViews
+            ];
+        }
+
+        return $result;
+    }
+
+    private function generatePeriods($periodType, $offset)
+    {
+        $today = new \DateTime();
+        $periods = [];
+
+        switch ($periodType) {
+            case 'day':
+                // Calculer la date de départ (aujourd'hui - offset jours)
+                $startPoint = (clone $today)->modify(sprintf('-%d days', $offset));
+
+                // Générer les 13 jours précédents
+                for ($i = 0; $i < $this->periodsToShow; $i++) {
+                    $currentDate = (clone $startPoint)->modify(sprintf('-%d days', $this->periodsToShow - $i - 1));
+                    $startDate = (clone $currentDate)->setTime(0, 0, 0);
+                    $endDate = (clone $currentDate)->setTime(23, 59, 59);
+                    $periods[] = [
+                        'start' => $startDate->format('Y-m-d H:i:s'),
+                        'end' => $endDate->format('Y-m-d H:i:s'),
+                        'dateObj' => clone $currentDate
+                    ];
+                }
+                break;
+
+            case 'week':
+                // Trouver le lundi de la semaine en cours
+                $currentMonday = (clone $today)->modify('monday this week');
+                if ($today->format('N') == 1) { // Si aujourd'hui est lundi
+                    $currentMonday = clone $today;
+                }
+
+                // Calculer le point de départ (lundi courant - offset semaines)
+                $startPoint = (clone $currentMonday)->modify(sprintf('-%d weeks', $offset));
+
+                // Générer les 13 semaines
+                for ($i = 0; $i < $this->periodsToShow; $i++) {
+                    $weekStart = (clone $startPoint)->modify(sprintf('-%d weeks', $this->periodsToShow - $i - 1));
+                    $weekEnd = (clone $weekStart)->modify('+6 days');
+                    $periods[] = [
+                        'start' => $weekStart->setTime(0, 0, 0)->format('Y-m-d H:i:s'),
+                        'end' => $weekEnd->setTime(23, 59, 59)->format('Y-m-d H:i:s'),
+                        'dateObj' => clone $weekStart
+                    ];
+                }
+                break;
+
+            case 'month':
+                // Premier jour du mois en cours
+                $firstDayCurrentMonth = (clone $today)->modify('first day of this month');
+
+                // Calculer le point de départ (premier jour du mois courant - offset mois)
+                $startPoint = (clone $firstDayCurrentMonth)->modify(sprintf('-%d months', $offset));
+
+                // Générer les 13 mois
+                for ($i = 0; $i < $this->periodsToShow; $i++) {
+                    $monthStart = (clone $startPoint)->modify(sprintf('-%d months', $this->periodsToShow - $i - 1));
+                    $monthEnd = (clone $monthStart)->modify('last day of this month');
+                    $periods[] = [
+                        'start' => $monthStart->setTime(0, 0, 0)->format('Y-m-d H:i:s'),
+                        'end' => $monthEnd->setTime(23, 59, 59)->format('Y-m-d H:i:s'),
+                        'dateObj' => clone $monthStart
+                    ];
+                }
+                break;
+
+            case 'year':
+                // Premier jour de l'année en cours
+                $firstDayCurrentYear = (clone $today)->modify('first day of January this year');
+
+                // Calculer le point de départ (premier jour de l'année courante - offset années)
+                $startPoint = (clone $firstDayCurrentYear)->modify(sprintf('-%d years', $offset));
+
+                // Générer les 13 années
+                for ($i = 0; $i < $this->periodsToShow; $i++) {
+                    $yearStart = (clone $startPoint)->modify(sprintf('-%d years', $this->periodsToShow - $i - 1));
+                    $yearEnd = (clone $yearStart)->modify('last day of December this year');
+                    $periods[] = [
+                        'start' => $yearStart->setTime(0, 0, 0)->format('Y-m-d H:i:s'),
+                        'end' => $yearEnd->setTime(23, 59, 59)->format('Y-m-d H:i:s'),
+                        'dateObj' => clone $yearStart
+                    ];
+                }
+                break;
+        }
+
+        return $periods;
+    }
+
+    private function formatPeriodLabel($period, $periodType)
+    {
+        $date = $period['dateObj'];
+
+        switch ($periodType) {
+            case 'day':
+                return $date->format('d/m/Y');
+            case 'week':
+                $weekStart = (clone $date)->modify('monday this week');
+                $weekEnd = (clone $weekStart)->modify('+6 days');
+                return $weekStart->format('d/m') . ' - ' . $weekEnd->format('d/m/Y');
+            case 'month':
+                return $date->format('M Y');
+            case 'year':
+                return $date->format('Y');
+            default:
+                return '';
+        }
+    }
+
+    private function formatDataForChart($data)
+    {
+        $labels = [];
+        $uniqueVisitors = [];
+        $pageViews = [];
+
+        foreach ($data as $item) {
+            $labels[] = $item['label'];
+            $uniqueVisitors[] = $item['uniqueVisitors'];
+            $pageViews[] = $item['pageViews'];
+        }
+
+        return [
+            'labels' => $labels,
+            'uniqueVisitors' => $uniqueVisitors,
+            'pageViews' => $pageViews
+        ];
+    }
+
+    private function getPeriodLabel($periodType)
+    {
+        switch ($periodType) {
+            case 'day':
+                return 'Jours';
+            case 'week':
+                return 'Semaines';
+            case 'month':
+                return 'Mois';
+            case 'year':
+                return 'Années';
+            default:
+                return '';
+        }
     }
 }

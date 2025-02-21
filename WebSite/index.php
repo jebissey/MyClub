@@ -147,8 +147,9 @@ $flight->route('POST /arwards',              function() use ($webmasterControlle
 $flight->route('GET  /admin/webmaster/help', function() use ($webmasterController) { $webmasterController->help(); });
 
 $logController = $container->get('app\controllers\LogController');
-$flight->route('GET  /logs',     function() use ($logController) { $logController->index(); });
-$flight->route('GET  /referers', function() use ($logController) { $logController->referers(); });
+$flight->route('GET  /logs',          function() use ($logController) { $logController->index(); });
+$flight->route('GET  /referers',      function() use ($logController) { $logController->referers(); });
+$flight->route('GET  /visitors/graf', function() use ($logController) { $logController->visitorsGraf(); });
 
 $groupController = $container->get('app\controllers\GroupController');
 $flight->route('GET  /groups',            function()    use ($groupController) { $groupController->index(); });
