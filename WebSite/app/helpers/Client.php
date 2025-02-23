@@ -4,11 +4,10 @@ namespace app\helpers;
 
 class Client
 {
-
     function getBrowser()
     {
-        $user_agent = $_SERVER['HTTP_USER_AGENT'];
-        $browser        = 'Inconnu';
+        $userAgent = $_SERVER['HTTP_USER_AGENT'];
+        $browser = 'Inconnu';
         $browser_array = array(
             '/mobile/i'    => 'Handheld Browser',
             '/msie/i'      => 'Internet Explorer',
@@ -16,15 +15,18 @@ class Client
             '/firefox/i'   => 'Firefox',
             '/safari/i'    => 'Safari',
             '/chrome/i'    => 'Chrome',
-            '/edg/i'      => 'Edge',
+            '/edg/i'       => 'Edge',
             '/opera/i'     => 'Opera',
             '/netscape/i'  => 'Netscape',
             '/maxthon/i'   => 'Maxthon',
             '/konqueror/i' => 'Konqueror'
         );
-        foreach ($browser_array as $regex => $value)
-            if (preg_match($regex, $user_agent))
+        foreach ($browser_array as $regex => $value) {
+            if (preg_match($regex, $userAgent)) {
                 $browser = $value;
+                break;
+            }
+        }
         return $browser;
     }
 
@@ -47,9 +49,9 @@ class Client
 
     function getOs()
     {
-        $user_agent = $_SERVER['HTTP_USER_AGENT'];
-        $os_platform  = "Inconnu";
-        $os_array     = array(
+        $userAgent = $_SERVER['HTTP_USER_AGENT'];
+        $osPlatform  = "Inconnu";
+        $osArray     = array(
             '/windows nt 10/i'      =>  'Windows 10',
             '/windows nt 6.3/i'     =>  'Windows 8.1',
             '/windows nt 6.2/i'     =>  'Windows 8',
@@ -74,10 +76,13 @@ class Client
             '/blackberry/i'         =>  'BlackBerry',
             '/webos/i'              =>  'Mobile'
         );
-        foreach ($os_array as $regex => $value)
-            if (preg_match($regex, $user_agent))
-                $os_platform = $value;
-        return $os_platform;
+        foreach ($osArray as $regex => $value) {
+            if (preg_match($regex, $userAgent)) {
+                $osPlatform = $value;
+                break;
+            }
+        }
+        return $osPlatform;
     }
 
     function getScreenResolution()
@@ -97,11 +102,11 @@ class Client
 
     function getType()
     {
-        $useragent = $_SERVER['HTTP_USER_AGENT'];
-        if (preg_match('/(android|bb\\d+|meego).+mobile|avantgo|bada\\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\\.(browser|link)|vodafone|wap|windows (ce|phone)|xda|xiino/i', $useragent)) {
+        $userAgent = $_SERVER['HTTP_USER_AGENT'];
+        if (preg_match('/(android|bb\\d+|meego).+mobile|avantgo|bada\\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\\.(browser|link)|vodafone|wap|windows (ce|phone)|xda|xiino/i', $userAgent)) {
             return 'Mobile';
         }
-        if (preg_match('/(tablet|ipad|playbook|silk)|(android(?!.*mobile))/i', $useragent)) {
+        if (preg_match('/(tablet|ipad|playbook|silk)|(android(?!.*mobile))/i', $userAgent)) {
             return 'Tablette';
         }
         return 'PC';

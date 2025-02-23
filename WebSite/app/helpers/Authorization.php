@@ -52,4 +52,9 @@ class Authorization
     {
         return count($this->authorizations ?? []) > 0;
     }
+
+    public function hasOnlyOneAutorization() : bool
+    {
+        return count($this->authorizations ?? []) == 1;
+    }
 }
