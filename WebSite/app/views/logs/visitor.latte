@@ -32,6 +32,47 @@
             <div class="col-12">
                 <button type="submit" class="btn btn-primary">Filtrer</button>
                 <a href="/admin/webmaster/logs" class="btn btn-secondary">Réinitialiser</a>
+
+                <nav aria-label="Page navigation">
+                    <ul class="pagination justify-content-center">
+                        {var $filterString = ""}
+                        {foreach $filters as $key => $value}
+                            {if $value && $key !== 'logPage'}
+                                {var $filterString = $filterString . "&$key=" . urlencode($value)}
+                            {/if}
+                        {/foreach}
+                        
+                        <li class="page-item {if $currentPage == 1}disabled{/if}">
+                            <a class="page-link" href="?logPage=1{$filterString}" aria-label="First">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                        
+                        <li class="page-item {if $currentPage == 1}disabled{/if}">
+                            <a class="page-link" href="?logPage={max(1, $currentPage - 1)}{$filterString}" aria-label="Previous">
+                                <span aria-hidden="true">&lsaquo;</span>
+                            </a>
+                        </li>
+                        
+                        {for $i = max(1, $currentPage - 2); $i <= min($totalPages, $currentPage + 2); $i++}
+                            <li class="page-item {if $i == $currentPage}active{/if}">
+                                <a class="page-link" href="?logPage={$i}{$filterString}">{$i}</a>
+                            </li>
+                        {/for}
+                        
+                        <li class="page-item {if $currentPage == $totalPages}disabled{/if}">
+                            <a class="page-link" href="?logPage={min($totalPages, $currentPage + 1)}{$filterString}" aria-label="Next">
+                                <span aria-hidden="true">&rsaquo;</span>
+                            </a>
+                        </li>
+                        
+                        <li class="page-item {if $currentPage == $totalPages}disabled{/if}">
+                            <a class="page-link" href="?logPage={$totalPages}{$filterString}" aria-label="Last">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
             </div>
         </div>
     </form>
@@ -66,45 +107,4 @@
             </tbody>
         </table>
     </div>
-
-    <nav aria-label="Page navigation">
-        <ul class="pagination justify-content-center">
-            {var $filterString = ""}
-            {foreach $filters as $key => $value}
-                {if $value && $key !== 'logPage'}
-                    {var $filterString = $filterString . "&$key=" . urlencode($value)}
-                {/if}
-            {/foreach}
-            
-            <li class="page-item {if $currentPage == 1}disabled{/if}">
-                <a class="page-link" href="?logPage=1{$filterString}" aria-label="First">
-                    <span aria-hidden="true">&laquo;</span>
-                </a>
-            </li>
-            
-            <li class="page-item {if $currentPage == 1}disabled{/if}">
-                <a class="page-link" href="?logPage={max(1, $currentPage - 1)}{$filterString}" aria-label="Previous">
-                    <span aria-hidden="true">&lsaquo;</span>
-                </a>
-            </li>
-            
-            {for $i = max(1, $currentPage - 2); $i <= min($totalPages, $currentPage + 2); $i++}
-                <li class="page-item {if $i == $currentPage}active{/if}">
-                    <a class="page-link" href="?logPage={$i}{$filterString}">{$i}</a>
-                </li>
-            {/for}
-            
-            <li class="page-item {if $currentPage == $totalPages}disabled{/if}">
-                <a class="page-link" href="?logPage={min($totalPages, $currentPage + 1)}{$filterString}" aria-label="Next">
-                    <span aria-hidden="true">&rsaquo;</span>
-                </a>
-            </li>
-            
-            <li class="page-item {if $currentPage == $totalPages}disabled{/if}">
-                <a class="page-link" href="?logPage={$totalPages}{$filterString}" aria-label="Last">
-                    <span aria-hidden="true">&raquo;</span>
-                </a>
-            </li>
-        </ul>
-    </nav>
 </div>
