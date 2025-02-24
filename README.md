@@ -17,6 +17,8 @@ It behaves like a **mini CMS** with articles and events.
 
 All data is stored in a **SQLight** database.
 
+Security is based on groups. There are three types of group. Groups with authorisation, groups without authorisation and self-registration groups. There are four different authorisations: event manager, person manager, redactor and webmaster.
+
 ## How to install
 
 ### From source: 
