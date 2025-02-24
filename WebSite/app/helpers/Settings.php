@@ -25,48 +25,4 @@ class Settings
         $query = $this->pdo->prepare('UPDATE Settings SET Value = ? WHERE Name = ?');
         $query->execute([$value, $name]);
     }
-
-
-    public function getHelpHome()
-    {
-        return $this->getFromSettings('Help_home');
-    }
-
-    public function getHelpUser()
-    {
-        return $this->getFromSettings('Help_user');
-    }
-
-    public function getHelpAdmin()
-    {
-        return $this->getFromSettings('Help_admin');
-    }
-
-    public function getHelpWebmaster()
-    {
-        return $this->getFromSettings('Help_webmaster');
-    }
-
-    public function getHelpEventManager()
-    {
-        return $this->getFromSettings('Help_eventManager');
-    }
-
-    public function getHelpPersonManager()
-    {
-        return $this->getFromSettings('Help_personManager');
-    }
-
-    public function getLegalNotices()
-    {
-        return $this->getFromSettings('LegalNotices');
-    }
-
-    
-    private function getFromSettings($name)
-    {
-        $query = $this->pdo->prepare("SELECT Value FROM Settings WHERE Name = '$name'");
-        $query->execute();
-        return $query->fetch(PDO::FETCH_ASSOC)['Value'];
-    }
 }

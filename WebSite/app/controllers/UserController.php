@@ -333,7 +333,7 @@ class UserController extends BaseController
     {
         if ($this->getPerson()) {
             echo $this->latte->render('app/views/info.latte', $this->params->getAll([
-                'content' => $this->settings->getHelpUser(),
+                'content' => $this->settings->get('Help_user'),
                 'hasAuthorization' => $this->authorizations->hasAutorization()
             ]));
         }

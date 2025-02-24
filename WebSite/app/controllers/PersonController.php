@@ -10,7 +10,7 @@ class PersonController extends TableController implements CrudControllerInterfac
     {
         if ($this->getPerson(['PersonManager', 'Webmaster'])) {
             echo $this->latte->render('app/views/info.latte', [
-                'content' => $this->settings->getHelpPersonManager(),
+                'content' => $this->settings->get('Help_personManager'),
                 'hasAuthorization' => $this->authorizations->hasAutorization()
             ]);
         }

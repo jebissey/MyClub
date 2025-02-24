@@ -8,7 +8,6 @@ use flight\Engine;
 class ImportController extends BaseController
 {
     private $importSettings;
-    private $settingsFile = 'var/tmp/import_settings.json';
     private $results;
     private array $foundEmails = [];
 
@@ -20,9 +19,8 @@ class ImportController extends BaseController
 
     private function loadSettings()
     {
-        if (file_exists($this->settingsFile)) {
-            $this->importSettings = json_decode(file_get_contents($this->settingsFile), true);
-        } else {
+        $this->importSettings = json_decode($this->settings->get('ImportPersonParameters'), true);
+        if($this->importSettings = ['headerRow'] == null){
             $this->importSettings = [
                 'headerRow' => 1,
                 'mapping' => [
@@ -37,7 +35,7 @@ class ImportController extends BaseController
 
     private function saveSettings()
     {
-        file_put_contents($this->settingsFile, json_encode($this->importSettings));
+        $this->settings->set('ImportPersonParameters', json_encode($this->importSettings));
     }
 
     public function showImportForm()

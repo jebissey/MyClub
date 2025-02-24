@@ -27,7 +27,7 @@ class Application
     public function help() 
     {
         echo $this->latte->render('app/views/info.latte', [
-            'content' => $this->settings->getHelpHome(),
+            'content' => $this->settings->get('Help_home'),
             'hasAuthorization' => $this->authorizations->hasAutorization()
         ]);
     }
@@ -35,7 +35,7 @@ class Application
     public function legalNotice() 
     {
         echo $this->latte->render('app/views/info.latte', [
-            'content' => $this->settings->getLegalNotices(),
+            'content' => $this->settings->get('LegalNotices'),
             'hasAuthorization' => $this->authorizations->hasAutorization()
         ]);
     }

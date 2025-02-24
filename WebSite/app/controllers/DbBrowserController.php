@@ -122,7 +122,7 @@ class DbBrowserController extends BaseController
             }
 
             $stmt->execute();
-            $this->flight->redirect('/dbbrowser' . urlencode($table));
+            $this->flight->redirect('/dbbrowser/' . urlencode($table));
         }
     }
 

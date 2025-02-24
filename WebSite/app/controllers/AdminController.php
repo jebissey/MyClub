@@ -9,7 +9,7 @@ class AdminController extends BaseController
         if ($this->getPerson(['EventManager', 'PersonManager', 'Redactor', 'Webmaster'])) {
 
             echo $this->latte->render('app/views/info.latte', $this->params->getAll([
-                'content' => $this->settings->getHelpAdmin(),
+                'content' => $this->settings->get('Help_admin'),
                 'hasAuthorization' => $this->authorizations->isEventManager()
             ]));
         }
