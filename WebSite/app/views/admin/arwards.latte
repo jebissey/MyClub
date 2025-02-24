@@ -146,22 +146,8 @@
         });
     });
 
-// Script pour gérer le modal d'ajout de compteur
 document.addEventListener('DOMContentLoaded', function() {
-  // Fonction pour afficher les alertes
-  const alertPlaceholder = document.getElementById('liveAlertPlaceholder');
-  const appendAlert = (message, type) => {
-    const wrapper = document.createElement('div');
-    wrapper.innerHTML = [
-      `<div class="alert alert-${type} alert-dismissible" role="alert">`,
-      `  <div>${message}</div>`,
-      '  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>',
-      '</div>'
-    ].join('');
-    alertPlaceholder.append(wrapper);
-  };
 
-  // Gestion de l'option "Nouveau nom..."
   const counterNameSelect = document.getElementById('counterName');
   const newNameContainer = document.getElementById('newNameContainer');
   const newCounterNameInput = document.getElementById('newCounterName');
@@ -170,16 +156,15 @@ document.addEventListener('DOMContentLoaded', function() {
     if (this.value === 'new') {
       newNameContainer.classList.remove('d-none');
       newCounterNameInput.setAttribute('required', 'required');
+      appendAlert('Nouveau nom', 'danger');
     } else {
       newNameContainer.classList.add('d-none');
       newCounterNameInput.removeAttribute('required');
     }
   });
   
-  // Chargement dynamique des personnes en fonction du groupe sélectionné
   const groupSelect = document.getElementById('counterGroup');
   const personSelect = document.getElementById('counterPerson');
-  
   groupSelect.addEventListener('change', function() {
     const groupId = this.value;
     if (groupId) {
@@ -211,17 +196,13 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
   
-  // Soumission du formulaire
   const submitButton = document.getElementById('submitCounter');
   const addCounterForm = document.getElementById('addCounterForm');
   const modal = new bootstrap.Modal(document.getElementById('addCounterModal'));
-
   submitButton.addEventListener('click', function() {
-    // Gestion du cas "nouveau nom"
     if (counterNameSelect.value === 'new') {
       const newName = newCounterNameInput.value.trim();
       if (newName) {
-        // Créer un champ caché pour le nom personnalisé
         let customNameInput = addCounterForm.querySelector('input[name="customName"]');
         if (!customNameInput) {
           customNameInput = document.createElement('input');
@@ -236,21 +217,16 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     }
     
-    // Vérification des champs obligatoires
     if (!addCounterForm.checkValidity()) {
       addCounterForm.reportValidity();
       return;
     }
     
-  // Soumettre le formulaire normalement
   addCounterForm.submit();
-  
-  // Fermer le modal
   const modal = bootstrap.Modal.getInstance(document.getElementById('addCounterModal'));
   modal.hide();
   });
   
-  // Réinitialiser le formulaire quand le modal est fermé
   document.getElementById('addCounterModal').addEventListener('hidden.bs.modal', function () {
     addCounterForm.reset();
     newNameContainer.classList.add('d-none');

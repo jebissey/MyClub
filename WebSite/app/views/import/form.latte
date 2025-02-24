@@ -7,7 +7,8 @@
     {if $results}
         <div class="container mt-5">
             {if $results['errors'] > 0}
-                <div class="alert alert-danger">{$error}</div>
+                <div class="alert alert-danger alert-dismissible">{$error}</div>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     <div class="alert alert-warning">
                         <h4>Résultat de l'import :</h4>
                         <ul>
@@ -25,7 +26,8 @@
                     </div>
                 </div>
             {else}
-                <div class="alert alert-success">
+                <div class="alert alert-success alert-dismissible">
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     <h4>Import terminé avec succès :</h4>
                     <ul>
                         <li>Nouveaux enregistrements : {$results['created']}</li>
