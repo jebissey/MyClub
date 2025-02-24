@@ -3,7 +3,6 @@
 namespace app\controllers;
 
 use PDO;
-use flight\Engine;
 
 class ImportController extends BaseController
 {
@@ -11,16 +10,9 @@ class ImportController extends BaseController
     private $results;
     private array $foundEmails = [];
 
-    public function __construct(PDO $pdo, Engine $flight)
-    {
-        parent::__construct($pdo, $flight);
-        $this->loadSettings();
-    }
-
     private function loadSettings()
     {
-        $this->importSettings = json_decode($this->settings->get('ImportPersonParameters'), true);
-        if($this->importSettings = ['headerRow'] == null){
+        if(!$this->importSettings = json_decode($this->settings->get('ImportPersonParameters'), true)){
             $this->importSettings = [
                 'headerRow' => 1,
                 'mapping' => [
@@ -33,15 +25,10 @@ class ImportController extends BaseController
         }
     }
 
-    private function saveSettings()
-    {
-        $this->settings->set('ImportPersonParameters', json_encode($this->importSettings));
-    }
-
     public function showImportForm()
     {
         if ($this->getPerson(['PersonManager'])) {
-            $this->flight->set('importSettings', $this->importSettings);
+            $this->loadSettings();
             echo $this->latte->render('app/views/import/form.latte', $this->params->getAll([
                 'importSettings' => $this->importSettings,
                 'results' => $this->results
@@ -77,7 +64,7 @@ class ImportController extends BaseController
                 ];
                 $this->importSettings['headerRow'] = $headerRow;
                 $this->importSettings['mapping'] = $mapping;
-                $this->saveSettings();
+                $this->settings->set('ImportPersonParameters', json_encode($this->importSettings));
 
                 $file = fopen($_FILES['csvFile']['tmp_name'], 'r');
                 $currentRow = 0;

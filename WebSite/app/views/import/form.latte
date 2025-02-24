@@ -43,9 +43,9 @@
             <input type="file" class="form-control" id="csvFile" name="csvFile" accept=".csv" required>
         </div>
 
-        <div class="mb-3">
+        <div id="headerRow" class="mb-3" style="display: none;">
             <label for="headerRow" class="form-label">Ligne des en-têtes</label>
-            <input type="number" class="form-control w-auto" id="headerRow" name="headerRow" 
+            <input type="number" class="form-control w-auto" name="headerRow" id="headerRowInput"
                    value="{$importSettings['headerRow']}" min="1" required>
         </div>
 
@@ -87,20 +87,43 @@
 {/block}
 
 {block scripts}
+<script>
+    const importSettings = {$importSettings};
+</script>
 <script n:syntax="off">
 document.addEventListener('DOMContentLoaded', function() {
-    const form = document.getElementById('importForm');
-    const headerRowInput = document.getElementById('headerRow');
     const csvFileInput = document.getElementById('csvFile');
+    const headerRowSection = document.getElementById('headerRow');
     const mappingSection = document.getElementById('mappingSection');
     const submitBtn = document.getElementById('submitBtn');
-    
-    function canUpdateHeaders() {
-        return csvFileInput.files.length > 0 && headerRowInput.value !== '';
-    }
+    const headerRowInput = headerRowSection.querySelector('input[name="headerRow"]');
+
+    csvFileInput.addEventListener('change', function() {
+        if (this.files.length > 0) {
+            headerRowSection.style.display = 'block';
+            mappingSection.style.display = 'none';
+            submitBtn.style.display = 'none';
+            updateHeaders();
+        } else {
+            headerRowSection.style.display = 'none';
+            mappingSection.style.display = 'none';
+            submitBtn.style.display = 'none';
+        }
+    });
+
+    headerRowInput.addEventListener('input', function() {
+        if (this.value.trim() !== '') {
+            mappingSection.style.display = 'block';
+            submitBtn.style.display = 'block';
+            updateHeaders();
+        } else {
+            mappingSection.style.display = 'none';
+            submitBtn.style.display = 'none';
+        }
+    });
 
     function updateHeaders() {
-        if (!canUpdateHeaders()) {
+        if (!csvFileInput.files.length > 0 ) {
             mappingSection.style.display = 'none';
             submitBtn.style.display = 'none';
             return;
@@ -137,10 +160,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     select.appendChild(option);
                 });
 
-                // Restaurer les valeurs précédemment sélectionnées si elles existent
-                const savedMapping = document.querySelector(`input[name="${selectId}"]`);
-                if (savedMapping && savedMapping.value !== '') {
-                    select.value = savedMapping.value;
+                if (importSettings && importSettings.mapping) {
+                    const mappingKey = selectId.replace('Column', '');
+                    if (importSettings.mapping[mappingKey] !== undefined) {
+                        select.value = importSettings.mapping[mappingKey];
+                    }
                 }
             });
 
@@ -154,14 +178,6 @@ document.addEventListener('DOMContentLoaded', function() {
         .finally(() => {
             headerRowInput.disabled = false;
         });
-    }
-
-    csvFileInput.addEventListener('change', updateHeaders);
-    headerRowInput.addEventListener('input', updateHeaders);  // Changé de 'change' à 'input'
-    headerRowInput.addEventListener('change', updateHeaders); // Gardé aussi 'change' pour plus de réactivité
-
-    if (canUpdateHeaders()) {
-        updateHeaders();
     }
 });
 </script>
