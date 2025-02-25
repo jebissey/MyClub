@@ -15,7 +15,7 @@
 <script>
     function copyToClipboard() {
         var emailsArray = JSON.parse({$emailsJson});
-        var emailsString = emailsArray.join(', ');
+        var emailsString = emailsArray.join(' , ');
         navigator.clipboard.writeText(emailsString).then(function() {
             alert('Les emails ont été copiés dans le presse-papiers !');
         }, function(err) {

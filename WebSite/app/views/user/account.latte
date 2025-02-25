@@ -1,13 +1,40 @@
-{layout "user.latte"}
+{layout $layout}
 
 {block content}
+    {if $readOnly}
+        {if $layout == '../admin/personManager.latte'}
+            <div class="alert alert-success alert-dismissible">
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                <h4>Compte importé</h4>
+                <p>
+                    Il faut mettre à jour les informations du compte dans le système externe.
+                    <b>En cas de changement d'adresse courriel</b>, il faut d'abord la mettre à jour ici avant de faire une nouvelle importation.
+                </p>
+            </div>
+        {else}
+            <div class="alert alert-success alert-dismissible">
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                <h4>Compte importé</h4>
+                <p>
+                    Les champs grisés ne sont pas modifiables ici. Ils sont synchronisés avec le système externe.
+                </p>
+            </div>
+        {/if}
+    {/if}
     <form method="POST" class="needs-validation" data-form="account">
-        <div class="mb-3">
-            <label for="email" class="form-label">Email</label>
-            <input type="email" class="form-control {if $emailReadOnly}bg-light text-muted{/if}" id="email" name="email" 
-                value="{$email}" {if $emailReadOnly}readonly{else}required{/if}>
-            <div class="invalid-feedback">Veuillez saisir une adresse email valide</div>
-        </div>
+        {if $layout == '../admin/personManager.latte'}
+            <div class="mb-3">
+                <label for="email" class="form-label">Email</label>
+                <<input type="email" class="form-control" id="email" name="email" value="{$email}" required>
+                <div class="invalid-feedback">Veuillez saisir une adresse email valide</div>
+            </div>
+        {else}
+            <div class="mb-3">
+                <label for="email" class="form-label">Email</label>
+                <input type="email" class="form-control {if $readOnly}bg-light text-muted{/if}" id="email" name="email" value="{$email}" {if $readOnly}readonly{else}required{/if}>
+                <div class="invalid-feedback">Veuillez saisir une adresse email valide</div>
+            </div>
+        {/if}
 
         {if $isSelfEdit}
             <div class="mb-3">
@@ -19,8 +46,8 @@
 
         <div class="mb-3">
             <label for="firstName" class="form-label">Prénom</label>
-            <input type="text" class="form-control" id="firstName" name="firstName" 
-                value="{$firstName}" required>
+            <input type="text" class="form-control {if $readOnly}bg-light text-muted{/if}" id="firstName" name="firstName" 
+                value="{$firstName}" {if $readOnly}readonly{else}required{/if}>
             <div class="invalid-feedback">
                 Le prénom est requis.
             </div>
@@ -28,8 +55,8 @@
 
         <div class="mb-3">
             <label for="lastName" class="form-label">Nom</label>
-            <input type="text" class="form-control" id="lastName" name="lastName" 
-                value="{$lastName}" required>
+            <input type="text" class="form-control {if $readOnly}bg-light text-muted{/if}" id="lastName" name="lastName" 
+                value="{$lastName}" {if $readOnly}readonly{else}required{/if}>
             <div class="invalid-feedback">
                 Le nom est requis.
             </div>

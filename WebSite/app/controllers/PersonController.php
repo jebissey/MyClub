@@ -116,11 +116,12 @@ class PersonController extends TableController implements CrudControllerInterfac
                     $this->flight->redirect('/persons');
                 } else if (($_SERVER['REQUEST_METHOD'] === 'GET')) {
                     echo $this->latte->render('app/views/user/account.latte', $this->params->getAll([
-                        'emailReadOnly' => $person['Imported'] == 1 ? true : false,
+                        'readOnly' => $person['Imported'] == 1 ? true : false,
                         'email' => $person['Email'],
                         'firstName' => $person['FirstName'],
                         'lastName' => $person['LastName'],
-                        'isSelfEdit' => false
+                        'isSelfEdit' => false,
+                        'layout' => $this->getFirstPathSegment($_SERVER['HTTP_REFERER'])
                     ]));
                 } else {
                     $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);

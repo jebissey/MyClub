@@ -79,6 +79,17 @@ abstract class BaseController
         }
     }
 
+    protected function getFirstPathSegment($url) {
+        $parsedUrl = parse_url($url, PHP_URL_PATH); 
+        $segments = explode('/', trim($parsedUrl, '/')); 
+        if($segments[0] == 'user') {
+            return 'user.latte';
+        } else if($segments[0] == 'persons'){
+            return '../admin/personManager.latte';
+        }
+        die('Invalid URL: ' . $segments[0]);
+    }
+
     private function getHref($userEmail)
     {
         return $userEmail == '' ? '/user/sign/in' : '/user';

@@ -211,7 +211,7 @@ class UserController extends BaseController
                 }, $emojiFiles);
 
                 echo $this->latte->render('app/views/user/account.latte', $this->params->getAll([
-                    'emailReadOnly' => $person['Imported'] == 1 ? true : false,
+                    'readOnly' => $person['Imported'] == 1 ? true : false,
                     'email' => $email,
                     'firstName' => $firstName,
                     'lastName' => $lastName,
@@ -220,7 +220,8 @@ class UserController extends BaseController
                     'useGravatar' => $useGravatar,
                     'emojis' => $emojis,
                     'emojiPath' => '../../app/images/',
-                    'isSelfEdit'=> true
+                    'isSelfEdit'=> true,
+                    'layout' => $this->getFirstPathSegment($_SERVER['HTTP_REFERER'])
                 ]));
             } else {
                 $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
