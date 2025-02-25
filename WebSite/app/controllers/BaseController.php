@@ -86,6 +86,10 @@ abstract class BaseController
             return 'user.latte';
         } else if($segments[0] == 'persons'){
             return '../admin/personManager.latte';
+        } else if($segments[0] == 'personManager'){
+            return '../admin/personManager.latte';
+        } else if($segments[0] == 'registration'){
+            return '../admin/personManager.latte';
         }
         die('Invalid URL: ' . $segments[0]);
     }

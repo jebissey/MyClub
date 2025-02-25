@@ -89,7 +89,7 @@
                                         </a>
                                     {elseif $action['type'] == 'button'}
                                         <button class="btn btn-sm {$action['class']}" 
-                                                onclick="{str_replace('{id}', $item['Id'], $action['onClick'])}">
+                                                onclick={str_replace('{id}', $item['Id'], $action['onClick']) | noescape}>
                                             {$action['label']}
                                         </button>
                                     {/if}
