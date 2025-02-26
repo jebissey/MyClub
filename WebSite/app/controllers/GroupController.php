@@ -30,7 +30,7 @@ class GroupController extends BaseController implements CrudControllerInterface
             $groups = $query->fetchAll(PDO::FETCH_ASSOC);
             echo $this->latte->render('app/views/groups/index.latte', $this->params->getAll([
                 'groups' => $groups,
-                'layout' => $this->getLayout('group')
+                'layout' => $this->getLayout()
             ]));
         }
     }
@@ -74,7 +74,7 @@ class GroupController extends BaseController implements CrudControllerInterface
             } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 echo $this->latte->render('app/views/groups/create.latte', $this->params->getAll([
                     'availableAuthorizations' => $availableAuthorizations,
-                    'layout' => $this->getLayout('group')
+                    'layout' => $this->getLayout()
                 ]));
             } else {
                 $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);

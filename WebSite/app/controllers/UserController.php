@@ -223,7 +223,7 @@ class UserController extends BaseController
                     'emojis' => $emojis,
                     'emojiPath' => '../../app/images/',
                     'isSelfEdit' => true,
-                    'layout' => $this->getLayout('account')
+                    'layout' => $this->getLayout()
                 ]));
             } else {
                 $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
@@ -325,7 +325,7 @@ class UserController extends BaseController
                 $currentGroups = $query->fetchAll(PDO::FETCH_ASSOC);
                 echo $this->latte->render('app/views/user/groups.latte', $this->params->getAll([
                     'groups' => $currentGroups,
-                    'layout' => $this->getLayout('account')
+                    'layout' => $this->getLayout()
                 ]));
             } else {
                 $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);

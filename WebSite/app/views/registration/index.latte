@@ -1,17 +1,10 @@
 {layout $layout}
 
+{block title}Inscriptions{/block}
+
 {block content}
-<div class="container mt-4">
-    <h2>Inscription aux groupes</h2>
-    
+    <h2>Inscription aux groupes</h2>    
     {include '../common/dataTable.latte',
-        'filters' => [
-            ['name' => 'firstName', 'label' => 'Prénom'],
-            ['name' => 'lastName', 'label' => 'Nom'],
-            ['name' => 'nickName', 'label' => 'Surnom']
-        ],
-        'filterValues' => $filters ?? [],
-        'resetUrl' => '/registration',
         'columns' => [
             ['field' => 'LastName', 'label' => 'Nom'],
             ['field' => 'FirstName', 'label' => 'Prénom'],
@@ -26,15 +19,12 @@
                 'onClick' => 'showGroups({id})'
             ]
         ],
-        'currentPage' => $currentPage ?? 1,
-        'totalPages' => $totalPages ?? 1,
         'modal' => [
             'id' => 'groupsModal',
             'title' => 'Gestion des groupes',
             'contentId' => 'groupsContent'
         ]
     }
-</div>
 {/block}
 
 {block scripts}

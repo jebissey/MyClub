@@ -79,26 +79,13 @@ abstract class BaseController
         }
     }
 
-    protected function getLayout($page) {
-        if($page == 'account') {
-            if($_SESSION['navbar'] == 'user') return 'user.latte';
-            else if($_SESSION['navbar'] == 'eventManager') return 'user.latte';
-            else if($_SESSION['navbar'] == 'personManager') return '../admin/personManager.latte';
-            else if($_SESSION['navbar'] == 'webmaster') return 'user.latte';
-        } 
-        else if($page == 'group') {
-            if($_SESSION['navbar'] == 'user') return 'user.latte';
-            else if($_SESSION['navbar'] == 'eventManager') return 'user.latte';
-            else if($_SESSION['navbar'] == 'personManager') return '../admin/personManager.latte';
-            else if($_SESSION['navbar'] == 'webmaster') return 'user.latte';
-        } 
-        else if($page == 'registration') {
-            if($_SESSION['navbar'] == 'user') return 'user.latte';
-            else if($_SESSION['navbar'] == 'eventManager') return 'user.latte';
-            else if($_SESSION['navbar'] == 'personManager') return '../admin/personManager.latte';
-            else if($_SESSION['navbar'] == 'webmaster') return 'user.latte';
-        }
-        die('Fatal error in file ' . __FILE__ . ' at line ' . __LINE__ . " with page=$page and navbar=" . $_SESSION['navbar']);
+    protected function getLayout() {
+        if($_SESSION['navbar'] == 'user') return 'user.latte';
+        else if($_SESSION['navbar'] == 'eventManager') return '../admin/eventManager.latte';
+        else if($_SESSION['navbar'] == 'personManager') return '../admin/personManager.latte';
+        else if($_SESSION['navbar'] == 'webmaster') return '../admin/webmaster.latte';
+        
+        die('Fatal error in file ' . __FILE__ . ' at line ' . __LINE__ . " with navbar=" . $_SESSION['navbar']);
     }
 
     private function getHref($userEmail)
