@@ -102,14 +102,15 @@ class UserController extends BaseController
                 if (strlen($password) < 6 || strlen($password) > 20) {
                     $this->application->error482('password rules are not respected', __FILE__, __LINE__);
                 } else {
-                    $stmt = $this->pdo->prepare('SELECT Password FROM Person WHERE Email = ?');
-                    $stmt->execute([$email]);
-                    $person = $stmt->fetch(PDO::FETCH_ASSOC);
+                    $query = $this->pdo->prepare('SELECT Password FROM Person WHERE Email = ?');
+                    $query->execute([$email]);
+                    $person = $query->fetch(PDO::FETCH_ASSOC);
                     if (!$person) {
                         $this->application->error480($email, __FILE__, __LINE__);
                     } else {
                         if (PasswordManager::verifyPassword($password, $person['Password'] ?? '')) {
                             $_SESSION['user'] = $email;
+                            $_SESSION['navbar'] = 'user';
                             $this->application->message("Sign in succeeded with $email", 1);
                         } else {
                             $this->application->error482("sign in failed with $email address", __FILE__, __LINE__);
@@ -134,6 +135,7 @@ class UserController extends BaseController
     {
         $this->log(200, 'Sign out succeeded with with ' . $_SESSION['user'] ?? '');
         unset($_SESSION['user']);
+        $_SESSION['navbar'] = '';
         header('Location:/');
         exit();
     }
@@ -162,7 +164,7 @@ class UserController extends BaseController
     public function user()
     {
         if ($this->getPerson()) {
-
+            $_SESSION['navbar'] = 'user';
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 echo $this->latte->render('app/views/user/user.latte', $this->params->getAll([]));
             } else {
@@ -173,7 +175,7 @@ class UserController extends BaseController
 
     public function account()
     {
-        if ($person = $this->getPerson()) {
+        if ($person = $this->getPerson([], 1)) {
 
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $email = filter_var($_POST['email'], FILTER_VALIDATE_EMAIL) ?? '';
@@ -220,8 +222,8 @@ class UserController extends BaseController
                     'useGravatar' => $useGravatar,
                     'emojis' => $emojis,
                     'emojiPath' => '../../app/images/',
-                    'isSelfEdit'=> true,
-                    'layout' => $this->getFirstPathSegment($_SERVER['HTTP_REFERER'])
+                    'isSelfEdit' => true,
+                    'layout' => $this->getLayout('account')
                 ]));
             } else {
                 $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
@@ -231,7 +233,7 @@ class UserController extends BaseController
 
     public function availabilities()
     {
-        if ($person = $this->getPerson()) {
+        if ($person = $this->getPerson([], 1)) {
 
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $availabilities = $_POST['availabilities'];
@@ -251,7 +253,7 @@ class UserController extends BaseController
 
     public function preferences()
     {
-        if ($person = $this->getPerson()) {
+        if ($person = $this->getPerson([], 1)) {
 
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $preferences = $_POST['preferences'];
@@ -294,7 +296,7 @@ class UserController extends BaseController
 
     public function groups()
     {
-        if ($person = $this->getPerson()) {
+        if ($person = $this->getPerson([], 1)) {
 
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $groups = $_POST['groups'] ?? [];
@@ -322,7 +324,8 @@ class UserController extends BaseController
                 $query->execute([$person['Id']]);
                 $currentGroups = $query->fetchAll(PDO::FETCH_ASSOC);
                 echo $this->latte->render('app/views/user/groups.latte', $this->params->getAll([
-                    'groups' => $currentGroups
+                    'groups' => $currentGroups,
+                    'layout' => $this->getLayout('account')
                 ]));
             } else {
                 $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);

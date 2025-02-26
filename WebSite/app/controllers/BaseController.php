@@ -44,7 +44,7 @@ abstract class BaseController
         return htmlspecialchars(trim($data ?? ''), ENT_QUOTES, 'UTF-8');
     }
 
-    protected function getPerson($requiredAuthorisations = [])
+    protected function getPerson($requiredAuthorisations = [], $segment = 0)
     {
         $userEmail = $_SESSION['user'] ?? '';
         if (!$userEmail) {
@@ -72,26 +72,33 @@ abstract class BaseController
                     'isPersonManager' => $this->authorizations->isPersonManager(),
                     'isRedactor' => $this->authorizations->isRedactor(),
                     'isWebmaster' => $this->authorizations->isWebmaster(),
-                    'page' => basename(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH))
+                    'page' => explode('/', trim(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/'))[$segment]
                 ]);
                 return $person;
             }
         }
     }
 
-    protected function getFirstPathSegment($url) {
-        $parsedUrl = parse_url($url, PHP_URL_PATH); 
-        $segments = explode('/', trim($parsedUrl, '/')); 
-        if($segments[0] == 'user') {
-            return 'user.latte';
-        } else if($segments[0] == 'persons'){
-            return '../admin/personManager.latte';
-        } else if($segments[0] == 'personManager'){
-            return '../admin/personManager.latte';
-        } else if($segments[0] == 'registration'){
-            return '../admin/personManager.latte';
+    protected function getLayout($page) {
+        if($page == 'account') {
+            if($_SESSION['navbar'] == 'user') return 'user.latte';
+            else if($_SESSION['navbar'] == 'eventManager') return 'user.latte';
+            else if($_SESSION['navbar'] == 'personManager') return '../admin/personManager.latte';
+            else if($_SESSION['navbar'] == 'webmaster') return 'user.latte';
+        } 
+        else if($page == 'group') {
+            if($_SESSION['navbar'] == 'user') return 'user.latte';
+            else if($_SESSION['navbar'] == 'eventManager') return 'user.latte';
+            else if($_SESSION['navbar'] == 'personManager') return '../admin/personManager.latte';
+            else if($_SESSION['navbar'] == 'webmaster') return 'user.latte';
+        } 
+        else if($page == 'registration') {
+            if($_SESSION['navbar'] == 'user') return 'user.latte';
+            else if($_SESSION['navbar'] == 'eventManager') return 'user.latte';
+            else if($_SESSION['navbar'] == 'personManager') return '../admin/personManager.latte';
+            else if($_SESSION['navbar'] == 'webmaster') return 'user.latte';
         }
-        die('Invalid URL: ' . $segments[0]);
+        die('Fatal error in file ' . __FILE__ . ' at line ' . __LINE__ . " with page=$page and navbar=" . $_SESSION['navbar']);
     }
 
     private function getHref($userEmail)

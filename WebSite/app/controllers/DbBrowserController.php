@@ -41,6 +41,9 @@ class DbBrowserController extends BaseController
             if (!empty($filters)) {
                 $whereConditions = [];
                 foreach ($filters as $column => $value) {
+                    if ($value === '') {
+                        continue;
+                    }
                     $whereConditions[] = $this->quoteName($column) . " LIKE :filter_" . $column;
                     $params["filter_" . $column] = '%' . $value . '%';
                 }
@@ -67,13 +70,11 @@ class DbBrowserController extends BaseController
 
             $records = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-            $primaryKey = $this->getPrimaryKey($table);
-
             echo $this->latte->render('app/views/dbbrowser/table.latte', $this->params->getAll([
                 'table' => $table,
                 'columns' => $columns,
                 'records' => $records,
-                'primaryKey' => $primaryKey,
+                'primaryKey' => $this->getPrimaryKey($table),
                 'currentPage' => $dbbPage,
                 'totalPages' => $totalPages,
                 'filters' => $filters
@@ -185,7 +186,7 @@ class DbBrowserController extends BaseController
             $stmt->bindValue(':id', $id);
 
             $stmt->execute();
-            $this->flight->redirect('/dbbrowser' . urlencode($table));
+            $this->flight->redirect('/dbbrowser/' . urlencode($table));
         }
     }
 
@@ -279,5 +280,4 @@ class DbBrowserController extends BaseController
         $stmt = $this->pdo->query("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' ORDER BY name");
         return $stmt->fetchAll(PDO::FETCH_COLUMN);
     }
-
 }

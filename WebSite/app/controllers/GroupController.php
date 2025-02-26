@@ -7,13 +7,12 @@ use PDO;
 
 class GroupController extends BaseController implements CrudControllerInterface
 {
-
     public function index()
     {
         if ($this->getPerson(['PersonManager', 'Webmaster'])) {
             $having = '';
             if ($this->authorizations->isPersonManager() && !$this->authorizations->isWebmaster()) {
-                $having = "HAVING Authorizations = ''";
+                $having = "HAVING Authorizations IS NULL";
             }
             $query = $this->pdo->query("
                 SELECT 
@@ -29,10 +28,9 @@ class GroupController extends BaseController implements CrudControllerInterface
                 $having
             ");
             $groups = $query->fetchAll(PDO::FETCH_ASSOC);
-
             echo $this->latte->render('app/views/groups/index.latte', $this->params->getAll([
                 'groups' => $groups,
-                'layout' => $this->getFirstPathSegment($_SERVER['HTTP_REFERER'])
+                'layout' => $this->getLayout('group')
             ]));
         }
     }
@@ -76,7 +74,7 @@ class GroupController extends BaseController implements CrudControllerInterface
             } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 echo $this->latte->render('app/views/groups/create.latte', $this->params->getAll([
                     'availableAuthorizations' => $availableAuthorizations,
-                    'layout' => $this->getFirstPathSegment($_SERVER['HTTP_REFERER'])
+                    'layout' => $this->getLayout('group')
                 ]));
             } else {
                 $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);

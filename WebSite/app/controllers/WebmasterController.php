@@ -21,6 +21,7 @@ class WebmasterController extends BaseController
         if ($this->getPerson(['EventManager', 'PersonManager', 'Redactor', 'Webmaster'])) {
 
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+                $_SESSION['navbar'] = 'webmaster';
                 echo $this->latte->render('app/views/admin/webmaster.latte', $this->params->getAll([]));
             } else {
                 $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);

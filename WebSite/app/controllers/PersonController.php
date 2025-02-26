@@ -21,6 +21,7 @@ class PersonController extends TableController implements CrudControllerInterfac
         if ($this->getPerson(['EventManager', 'PersonManager', 'Redactor', 'Webmaster'])) {
 
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+                $_SESSION['navbar'] = 'personManager';
                 echo $this->latte->render('app/views/admin/personManager.latte', $this->params->getAll([]));
             } else {
                 $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
@@ -37,27 +38,22 @@ class PersonController extends TableController implements CrudControllerInterfac
                 'nickName' => $_GET['nickName'] ?? '',
                 'email' => $_GET['email'] ?? ''
             ];
-
             $filterConfig = [
                 ['name' => 'firstName', 'label' => 'Prénom'],
                 ['name' => 'lastName', 'label' => 'Nom'],
                 ['name' => 'nickName', 'label' => 'Surnom'],
                 ['name' => 'email', 'label' => 'Email']
             ];
-
             $columns = [
                 ['field' => 'Email', 'label' => 'Email'],
                 ['field' => 'LastName', 'label' => 'Nom'],
                 ['field' => 'FirstName', 'label' => 'Prénom']
             ];
-
             $query = $this->fluent->from('Person')
                 ->select('Id, FirstName, LastName, Email')
                 ->orderBy('LastName')
                 ->where('Inactivated', 0);
-
             $data = $this->prepareTableData($query, $filterValues, $_GET['tablePage'] ?? null);
-
             echo $this->latte->render('app/views/persons/index.latte', $this->params->getAll([
                 'persons' => $data['items'],
                 'currentPage' => $data['currentPage'],
@@ -121,7 +117,7 @@ class PersonController extends TableController implements CrudControllerInterfac
                         'firstName' => $person['FirstName'],
                         'lastName' => $person['LastName'],
                         'isSelfEdit' => false,
-                        'layout' => $this->getFirstPathSegment($_SERVER['HTTP_REFERER'])
+                        'layout' => $this->getLayout('account')
                     ]));
                 } else {
                     $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);

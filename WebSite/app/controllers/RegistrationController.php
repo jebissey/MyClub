@@ -4,11 +4,42 @@ namespace app\controllers;
 
 use PDO;
 
-class RegistrationController extends BaseController
+class RegistrationController extends TableController
 {
     public function index()
     {
         if ($this->getPerson(['PersonManager', 'Webmaster'])) {
+            /*$filterValues = [
+                'lastName' => $_GET['lastName'] ?? '',
+                'firstName' => $_GET['firstName'] ?? '',
+                'nickName' => $_GET['nickName'] ?? ''
+            ];
+            $filterConfig = [
+                ['name' => 'lastName', 'label' => 'Nom'],
+                ['name' => 'firstName', 'label' => 'Prénom'],
+                ['name' => 'nickName', 'label' => 'Surnom']
+            ];
+            $columns = [
+                ['field' => 'LastName', 'label' => 'Nom'],
+                ['field' => 'FirstName', 'label' => 'Prénom'],
+                ['field' => 'NickName', 'label' => 'Surnom']
+            ];
+            $query = $this->fluent->from('Person')
+                ->select('Id, FirstName, LastName, NickName')
+                ->orderBy('LastName')
+                ->where('Inactivated', 0);
+            $data = $this->prepareTableData($query, $filterValues, $_GET['tablePage'] ?? null);
+            echo $this->latte->render('app/views/registration/index.latte', $this->params->getAll([
+                'persons' => $data['items'],
+                'currentPage' => $data['currentPage'],
+                'totalPages' => $data['totalPages'],
+                'filterValues' => $filterValues,
+                'filters' => $filterConfig,
+                'columns' => $columns,
+                'resetUrl' => '/registration',
+                'layout' => $this->getLayout('registration')
+            ]));*/
+
             $page = $_GET['page'] ?? 1;
             $limit = 10;
             $offset = ($page - 1) * $limit;
@@ -56,8 +87,11 @@ class RegistrationController extends BaseController
                 'persons' => $persons,
                 'totalPages' => $totalPages,
                 'currentPage' => $page,
-                'filters' => $_GET
+                'filters' => $_GET,
+                'layout' => $this->getLayout('registration')
             ]));
+
+
         }
     }
 
@@ -137,15 +171,13 @@ class RegistrationController extends BaseController
 
     public function addToGroup($personId, $groupId)
     {
-        if ($person = $this->getPerson(['PersonManager', 'Webmaster'])) {
-            // Vérifier si le groupe a des autorisations
+        if ($this->getPerson(['PersonManager', 'Webmaster'])) {
             $checkAuth = $this->pdo->prepare("
                 SELECT COUNT(*) FROM GroupAuthorization WHERE IdGroup = ?
             ");
             $checkAuth->execute([$groupId]);
             $hasAuthorizations = $checkAuth->fetchColumn() > 0;
 
-            // Vérifier les droits d'accès
             if ($hasAuthorizations && !$this->authorizations->isWebmaster()) {
                 http_response_code(403);
                 echo json_encode(['success' => false, 'message' => 'Unauthorized']);
@@ -161,7 +193,7 @@ class RegistrationController extends BaseController
 
     public function removeFromGroup($personId, $groupId)
     {
-        if ($person = $this->getPerson(['PersonManager', 'Webmaster'])) {
+        if ($this->getPerson(['PersonManager', 'Webmaster'])) {
             $checkAuth = $this->pdo->prepare("SELECT COUNT(*) FROM GroupAuthorization WHERE IdGroup = ?");
             $checkAuth->execute([$groupId]);
             $hasAuthorizations = $checkAuth->fetchColumn() > 0;

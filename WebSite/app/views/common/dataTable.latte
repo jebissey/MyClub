@@ -20,13 +20,23 @@
                         <nav aria-label="Navigation des pages">
                             <ul class="pagination mb-0">
                                 <li class="page-item {if $currentPage == 1}disabled{/if}">
-                                    <a class="page-link" href="?tablePage=1{if isset($filterValues)}{foreach $filterValues as $key => $value}&{$key}={$value}{/foreach}{/if}" aria-label="Première page">
-                                        <span aria-hidden="true">&laquo;</span>
+                                    <a class="page-link" href="?tablePage=1
+                                        {if isset($filterValues)}
+                                            {foreach $filterValues as $key => $value}
+                                                &{$key}={$value}
+                                            {/foreach}
+                                        {/if}
+                                        " aria-label="Première page"><span aria-hidden="true">&laquo;</span>
                                     </a>
                                 </li>
                                 <li class="page-item {if $currentPage == 1}disabled{/if}">
-                                    <a class="page-link" href="?tablePage={max(1, $currentPage - 1)}{if isset($filterValues)}{foreach $filterValues as $key => $value}&{$key}={$value}{/foreach}{/if}" aria-label="Page précédente">
-                                        <span aria-hidden="true">&lsaquo;</span>
+                                    <a class="page-link" href="?tablePage={max(1, $currentPage - 1)}
+                                        {if isset($filterValues)}
+                                            {foreach $filterValues as $key => $value}
+                                                &{$key}={$value}
+                                            {/foreach}
+                                        {/if}
+                                        " aria-label="Page précédente"><span aria-hidden="true">&lsaquo;</span>
                                     </a>
                                 </li>
                                 {php $visiblePages = 3}
@@ -35,17 +45,34 @@
                                 {php $endPage = min($totalPages, $startPage + $visiblePages - 1)}
                                 {for $i = $startPage; $i <= $endPage; $i++}
                                     <li class="page-item {if $i == $currentPage}active{/if}">
-                                        <a class="page-link" href="?tablePage={$i}{if isset($filterValues)}{foreach $filterValues as $key => $value}&{$key}={$value}{/foreach}{/if}">{$i}</a>
+                                        <a class="page-link" href="?tablePage={$i}
+                                            {if isset($filterValues)}
+                                                {foreach $filterValues as $key => $value}
+                                                    &{$key}={$value}
+                                                {/foreach}
+                                            {/if}
+                                            ">{$i}
+                                        </a>
                                     </li>
                                 {/for}
                                 <li class="page-item {if $currentPage == $totalPages}disabled{/if}">
-                                    <a class="page-link" href="?tablePage={min($totalPages, $currentPage + 1)}{if isset($filterValues)}{foreach $filterValues as $key => $value}&{$key}={$value}{/foreach}{/if}" aria-label="Page suivante">
-                                        <span aria-hidden="true">&rsaquo;</span>
+                                    <a class="page-link" href="?tablePage={min($totalPages, $currentPage + 1)}
+                                        {if isset($filterValues)}
+                                            {foreach $filterValues as $key => $value}
+                                                &{$key}={$value}
+                                            {/foreach}
+                                        {/if}
+                                        " aria-label="Page suivante"><span aria-hidden="true">&rsaquo;</span>
                                     </a>
                                 </li>
                                 <li class="page-item {if $currentPage == $totalPages}disabled{/if}">
-                                    <a class="page-link" href="?tablePage={$totalPages}{if isset($filterValues)}{foreach $filterValues as $key => $value}&{$key}={$value}{/foreach}{/if}" aria-label="Dernière page">
-                                        <span aria-hidden="true">&raquo;</span>
+                                    <a class="page-link" href="?tablePage={$totalPages}
+                                        {if isset($filterValues)}
+                                            {foreach $filterValues as $key => $value}
+                                                &{$key}={$value}
+                                            {/foreach}
+                                        {/if}
+                                        " aria-label="Dernière page"><span aria-hidden="true">&raquo;</span>
                                     </a>
                                 </li>
                             </ul>
