@@ -261,7 +261,7 @@ class UserController extends BaseController
                 $query->execute([json_encode($preferences)]);
                 $this->flight->redirect('/user');
             } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-                $currentPreferences = json_decode($person['Preferences'] ?? '', true);
+                $preferences = json_decode($person['Preferences'] ?? '', true);
                 $query = $this->pdo->prepare("
                 SELECT DISTINCT et.*
                 FROM EventType et
@@ -282,12 +282,12 @@ class UserController extends BaseController
                 )
                 ORDER BY et.Name
             ");
-                $query->execute([$person['Id']]);
-                $eventTypes = $query->fetchAll(PDO::FETCH_ASSOC);
-                echo $this->latte->render('app/views/user/preferences.latte', $this->params->getAll([
-                    'currentPreferences' => $currentPreferences,
-                    'eventTypes' => $eventTypes
-                ]));
+            $query->execute([$person['Id']]);
+            $eventTypes = $query->fetchAll(PDO::FETCH_ASSOC);
+            echo $this->latte->render('app/views/user/preferences.latte', $this->params->getAll([
+                'currentPreferences' => $preferences,
+                'eventTypes' => $eventTypes
+            ]));
             } else {
                 $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
             }
