@@ -45,9 +45,10 @@ class PersonController extends TableController implements CrudControllerInterfac
                 ['name' => 'email', 'label' => 'Email']
             ];
             $columns = [
-                ['field' => 'Email', 'label' => 'Email'],
                 ['field' => 'LastName', 'label' => 'Nom'],
-                ['field' => 'FirstName', 'label' => 'Prénom']
+                ['field' => 'FirstName', 'label' => 'Prénom'],
+                ['field' => 'Email', 'label' => 'Email'],
+                ['field' => 'Phone', 'label' => 'Téléphone']
             ];
             $query = $this->fluent->from('Person')
                 ->select('Id, FirstName, LastName, Email')
@@ -139,7 +140,6 @@ class PersonController extends TableController implements CrudControllerInterfac
             }
         }
     }
-
 
     public function getWebmasterEmail()
     {

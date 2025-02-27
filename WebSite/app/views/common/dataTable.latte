@@ -81,26 +81,32 @@
             <tbody>
                 {foreach $items as $item}
                     <tr>
+                        {php $actionDisplayed = !isset($conditionValue)}
                         {foreach $columns as $column}
                             <td>{$item[$column['field']]}</td>
+                            {if isset($conditionValue) && $column['field'] == $conditionColumn && $item[$column['field']] == $conditionValue}
+                                {php $actionDisplayed = true}
+                            {/if}
                         {/foreach}
                         {if isset($actions) && count($actions) > 0}
-                            <td>
-                                {foreach $actions as $action}
-                                    {if $action['type'] == 'link'}
-                                        <a href="{str_replace('{id}', $item['Id'], $action['url'])}" 
-                                           class="btn btn-sm {$action['class']}"
-                                           {if isset($action['confirm'])}onclick="return confirm('{$action['confirm']}')"{/if}>
-                                            {$action['label']}
-                                        </a>
-                                    {elseif $action['type'] == 'button'}
-                                        <button class="btn btn-sm {$action['class']}" 
-                                                onclick={str_replace('{id}', $item['Id'], $action['onClick']) | noescape}>
-                                            {$action['label']}
-                                        </button>
-                                    {/if}
-                                {/foreach}
-                            </td>
+                            {if $actionDisplayed}
+                                <td>
+                                    {foreach $actions as $action}
+                                        {if $action['type'] == 'link'}
+                                            <a href="{str_replace('{id}', $item['Id'], $action['url'])}" 
+                                            class="btn btn-sm {$action['class']}"
+                                            {if isset($action['confirm'])}onclick="return confirm('{$action['confirm']}')"{/if}>
+                                                {$action['label']}
+                                            </a>
+                                        {elseif $action['type'] == 'button'}
+                                            <button class="btn btn-sm {$action['class']}" 
+                                                    onclick={str_replace('{id}', $item['Id'], $action['onClick']) | noescape}>
+                                                {$action['label']}
+                                            </button>
+                                        {/if}
+                                    {/foreach}
+                                </td>
+                            {/if}
                         {/if}
                     </tr>
                 {/foreach}

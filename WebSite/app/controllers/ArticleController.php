@@ -5,8 +5,50 @@ namespace app\controllers;
 use PDO;
 
 
-class ArticleController extends BaseController
+class ArticleController extends TableController
 {
+    public function index()
+    {
+        if ($person = $this->getPerson(['Redactor'])) {
+            $filterValues = [
+                'createdBy' => $_GET['createdBy'] ?? '',
+                'title' => $_GET['title'] ?? '',
+                'timestamp' => $_GET['timestamp'] ?? '',
+                'published' => $_GET['published'] ?? ''
+            ];
+            $filterConfig = [
+                ['name' => 'createdBy', 'label' => 'Créé par'],
+                ['name' => 'title', 'label' => 'Titre'],
+                ['name' => 'timestamp', 'label' => 'Date de création'],
+                ['name' => 'published', 'label' => 'Publié']
+            ];
+            $columns = [
+                ['field' => 'CreatedBy', 'label' => 'Créé par'],
+                ['field' => 'LastName', 'label' => 'Nom'],
+                ['field' => 'FirstName', 'label' => 'Prénom'],
+                ['field' => 'Title', 'label' => 'Titre'],
+                ['field' => 'Timestamp', 'label' => 'Date de création'],
+                ['field' => 'Published', 'label' => 'Publié']
+            ];
+            $query = $this->fluent->from('Article')
+                ->select('Article.Id, Article.CreatedBy, Article.Title, Article.Timestamp, Article.Published, Person.FirstName, Person.LastName')
+                ->innerJoin('Person ON Article.CreatedBy = Person.Id')
+                ->orderBy('Article.Timestamp DESC');
+            $data = $this->prepareTableData($query, $filterValues, $_GET['tablePage'] ?? null);
+            echo $this->latte->render('app/views/user/articles.latte', $this->params->getAll([
+                'articles' => $data['items'],
+                'currentPage' => $data['currentPage'],
+                'totalPages' => $data['totalPages'],
+                'filterValues' => $filterValues,
+                'filters' => $filterConfig,
+                'columns' => $columns,
+                'resetUrl' => '/articles',
+                'conditionValue' => $person['Id'],
+                'conditionColumn' => 'CreatedBy'
+            ]));
+        }
+    }
+
     public function getLatestArticles(?string $userEmail = null): array
     {
         $articleIds = $this->getArticleIdsBasedOnAccess($userEmail);
@@ -54,29 +96,58 @@ class ArticleController extends BaseController
         if ($person = $this->getPerson(['Redactor'])) {
             $article = $this->getLatestArticle([$id]);
             if (!$article || $person['Id'] != $article->CreatedBy) {
-                $this->flight->redirect('/article/' . $id);
+                $this->application->error403(__FILE__, __LINE__);
                 return;
             }
             $title = $this->flight->request()->data['title'] ?? '';
             $content = $this->flight->request()->data['content'] ?? '';
             if (empty($title) || empty($content)) {
                 $_SESSION['error'] = "Le titre et le contenu sont obligatoires";
-                $this->flight->redirect('/article/' . $id);
+                $this->flight->redirect('/articles/' . $id);
                 return;
             }
 
-            $query = $this->pdo->prepare("
-                UPDATE Article 
-                SET Title = ?, Content = ? 
-                WHERE Id = ?
-            ");
+            $query = $this->pdo->prepare("UPDATE Article SET Title = ?, Content = ? WHERE Id = ?");
             $result = $query->execute([$title, $content, $id]);
             if ($result) {
                 $_SESSION['success'] = "L'article a été mis à jour avec succès";
             } else {
                 $_SESSION['error'] = "Une erreur est survenue lors de la mise à jour de l'article";
             }
-            $this->flight->redirect('/article/' . $id);
+            $this->flight->redirect('/articles/' . $id);
+        }
+    }
+
+    public function create()
+    {
+        if ($person = $this->getPerson(['Redactor'])) {
+            if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+                $query = $this->pdo->prepare("INSERT INTO Article (Title, Content, CreatedBy) VALUES ('', '', ?)");
+                $query->execute([$person['Id']]);
+                $id = $this->pdo->lastInsertId();
+                $this->flight->redirect('/articles/edit/' . $id);
+            } else {
+                $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
+            }
+        }
+    }
+
+    public function delete($id)
+    {
+        if ($person = $this->getPerson(['Redactor'])) {
+            if (($_SERVER['REQUEST_METHOD'] === 'GET')) {
+                $article = $this->getLatestArticle([$id]);
+                if (!$article || $person['Id'] != $article->CreatedBy) {
+                    $this->application->error403(__FILE__, __LINE__);
+                    return;
+                }
+                $query = $this->pdo->prepare('DELETE FROM Article WHERE Id = ?');
+                $query->execute([$id]);
+
+                $this->flight->redirect('/articles');
+            } else {
+                $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
+            }
         }
     }
 
@@ -143,7 +214,6 @@ class ArticleController extends BaseController
             FROM Article 
             LEFT JOIN Person ON Person.Id = Article.CreatedBy 
             WHERE Article.Id IN ($placeholders)
-            AND Article.published = 1 
             ORDER BY Article.Timestamp DESC 
             LIMIT 1");
         $query->execute($articleIds);

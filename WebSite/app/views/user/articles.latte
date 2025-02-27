@@ -1,27 +1,27 @@
-{layout '../admin/personManager.latte'}
+{layout '../admin/redactor.latte'}
 
 {block title}Personnes{/block}
 
 {block content}
     {include '../common/dataTable.latte',
         'createButton' => [
-            'url' => '/persons/create',
-            'label' => 'Créer une personne'
+            'url' => '/articles/create',
+            'label' => 'Créer un article'
         ],
-        'items' => $persons,
+        'items' => $articles,
         'actions' => [
             [
                 'type' => 'link',
                 'label' => 'Éditer',
-                'url' => '/persons/edit/{id}',
+                'url' => '/articles/{id}',
                 'class' => 'btn-warning'
             ],
             [
                 'type' => 'link',
                 'label' => 'Supprimer',
-                'url' => '/persons/delete/{id}',
+                'url' => '/articles/delete/{id}',
                 'class' => 'btn-danger',
-                'confirm' => 'Voulez-vous vraiment supprimer cette personne ?'
+                'confirm' => 'Voulez-vous vraiment supprimer cet article ?'
             ]
         ]
     }
