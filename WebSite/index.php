@@ -92,6 +92,12 @@ $containerBuilder->addDefinitions([
             $container->get(PDO::class),
             $container->get(Engine::class)
         );
+    },
+    'app\controllers\ArticleController' => function (Container $container) {
+        return new \app\controllers\ArticleController(
+            $container->get(PDO::class),
+            $container->get(Engine::class)
+        );
     }
 ]);
 $container = $containerBuilder->build();
@@ -122,9 +128,11 @@ Flight::map('getData', function ($key) {
 });
 
 
-
+$articleController = $container->get('app\controllers\ArticleController');
+$flight->route('GET  /article/@id',   function($id) use ($articleController) { $articleController->show($id); });
+$flight->route('POST /article/@id',   function($id) use ($articleController) { $articleController->update($id); });
 $userController = $container->get('app\controllers\UserController');
-$flight->route('GET  /',                                  function()              use ($userController) { $userController->home(); });
+$flight->route('GET  /',                                  function()              use ($userController, $articleController) { $userController->home($articleController); });
 $flight->route('GET  /user',                              function()              use ($userController) { $userController->user(); });
 $flight->route('GET  /user/sign/in',                      function()              use ($userController) { $userController->signIn(); });
 $flight->route('POST /user/sign/in',                      function()              use ($userController) { $userController->signIn(); });

@@ -141,7 +141,7 @@ class UserController extends BaseController
     }
 
 
-    public function home()
+    public function home(ArticleController $articleController)
     {
         $userEmail = $_SESSION['user'] ?? '';
         if ($userEmail) {
@@ -158,7 +158,11 @@ class UserController extends BaseController
                 'keys' => false
             ]);
         }
-        echo $this->latte->render('app/views/home.latte', $this->params->getAll([]));
+        $articles = $articleController->getLatestArticles($userEmail);
+        echo $this->latte->render('app/views/home.latte', $this->params->getAll([
+            'latestArticle' => $articles['latestArticle'],
+            'latestArticleTitles' => $articles['latestArticleTitles']
+        ]));
     }
 
     public function user()

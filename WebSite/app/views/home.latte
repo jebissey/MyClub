@@ -7,7 +7,38 @@
 {/block}
 
 {block content}
-    {ifset $content}
-        {$content}
-    {/ifset}
+    <div class="container">
+        {if $latestArticle}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h2 class="card-title">{$latestArticle->Title}</h2>
+                    <small class="text-muted">
+                        Publié par {$latestArticle->FirstName} {$latestArticle->LastName} 
+                        le {date('d/m/Y', strtotime($latestArticle->Timestamp))}
+                    </small>
+                </div>
+                <div class="card-body">
+                    {$latestArticle->Content|noescape}
+                </div>
+            </div>
+        {else}
+            <div class="alert alert-info">
+                Aucun article disponible.
+            </div>
+        {/if}
+        
+        {if count($latestArticleTitles) > 0}
+            <h3>Articles récents</h3>
+            <ul class="list-group">
+                {foreach $latestArticleTitles as $article}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <a href="/article/{$article->Id}">{$article->Title}</a>
+                        <span class="badge bg-secondary rounded-pill">
+                            {date('d/m/Y', strtotime($article->Timestamp))}
+                        </span>
+                    </li>
+                {/foreach}
+            </ul>
+        {/if}
+    </div>
 {/block}
