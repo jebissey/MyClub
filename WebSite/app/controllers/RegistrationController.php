@@ -39,6 +39,8 @@ class RegistrationController extends TableController
                 'resetUrl' => '/registration',
                 'layout' => $this->getLayout()
             ]));
+        } else {
+            $this->application->error403(__FILE__, __LINE__);
         }
     }
 
@@ -130,6 +132,8 @@ class RegistrationController extends TableController
                 'availableGroups' => $availableGroups,
                 'personId' => $personId
             ]));
+        } else {
+            $this->application->error403(__FILE__, __LINE__);
         }
     }
 
@@ -152,6 +156,8 @@ class RegistrationController extends TableController
             $success = $insert->execute([$personId, $groupId]);
 
             echo json_encode(['success' => $success]);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Unauthorized']);
         }
     }
 
@@ -172,6 +178,8 @@ class RegistrationController extends TableController
             $success = $delete->execute([$personId, $groupId]);
 
             echo json_encode(['success' => $success]);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Unauthorized']);
         }
     }
 }

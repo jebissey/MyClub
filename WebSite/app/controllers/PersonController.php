@@ -13,6 +13,8 @@ class PersonController extends TableController implements CrudControllerInterfac
                 'content' => $this->settings->get('Help_personManager'),
                 'hasAuthorization' => $this->authorizations->hasAutorization()
             ]);
+        } else {
+            $this->application->error403(__FILE__, __LINE__);
         }
     }
 
@@ -26,6 +28,8 @@ class PersonController extends TableController implements CrudControllerInterfac
             } else {
                 $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
             }
+        } else {
+            $this->application->error403(__FILE__, __LINE__);
         }
     }
 
@@ -64,6 +68,8 @@ class PersonController extends TableController implements CrudControllerInterfac
                 'columns' => $columns,
                 'resetUrl' => '/persons' 
             ]));
+        } else {
+            $this->application->error403(__FILE__, __LINE__);
         }
     }
 
@@ -86,6 +92,8 @@ class PersonController extends TableController implements CrudControllerInterfac
             } else {
                 $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
             }
+        } else {
+            $this->application->error403(__FILE__, __LINE__);
         }
     }
 
@@ -124,6 +132,8 @@ class PersonController extends TableController implements CrudControllerInterfac
                     $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
                 }
             }
+        } else {
+            $this->application->error403(__FILE__, __LINE__);
         }
     }
 
@@ -138,6 +148,8 @@ class PersonController extends TableController implements CrudControllerInterfac
             } else {
                 $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
             }
+        } else {
+            $this->application->error403(__FILE__, __LINE__);
         }
     }
 

@@ -26,6 +26,8 @@ class WebmasterController extends BaseController
             } else {
                 $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
             }
+        } else {
+            $this->application->error403(__FILE__, __LINE__);
         }
     }
 
@@ -103,6 +105,8 @@ class WebmasterController extends BaseController
             } else {
                 $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
             }
+        } else {
+            $this->application->error403(__FILE__, __LINE__);
         }
     }
 }

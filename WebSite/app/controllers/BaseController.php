@@ -48,7 +48,17 @@ abstract class BaseController
     {
         $userEmail = $_SESSION['user'] ?? '';
         if (!$userEmail) {
-            $this->application->error403(__FILE__, __LINE__);
+            $this->params = new Params([
+                'href' => '/user/sign/in',
+                'userImg' => '../../app/images/anonymat.png',
+                'userEmail' => '',
+                'keys' => false,
+                'isEventManager' => false,
+                'isPersonManager' => false,
+                'isRedactor' => false,
+                'isWebmaster' => false,
+                'page' => explode('/', trim(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/'))[$segment]
+            ]);
             return false;
         } else {
             $query = $this->pdo->prepare('SELECT * FROM Person WHERE Email = ?');

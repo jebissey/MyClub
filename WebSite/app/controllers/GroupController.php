@@ -32,6 +32,8 @@ class GroupController extends BaseController implements CrudControllerInterface
                 'groups' => $groups,
                 'layout' => $this->getLayout()
             ]));
+        } else {
+            $this->application->error403(__FILE__, __LINE__);
         }
     }
 
@@ -79,6 +81,8 @@ class GroupController extends BaseController implements CrudControllerInterface
             } else {
                 $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
             }
+        } else {
+            $this->application->error403(__FILE__, __LINE__);
         }
     }
 
@@ -146,6 +150,8 @@ class GroupController extends BaseController implements CrudControllerInterface
             } else {
                 (new Application($this->pdo, $this->flight))->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
             }
+        } else {
+            $this->application->error403(__FILE__, __LINE__);
         }
     }
 
@@ -157,8 +163,8 @@ class GroupController extends BaseController implements CrudControllerInterface
             $query->execute([$id]);
 
             $this->flight->redirect('/groups');
+        } else {
+            $this->application->error403(__FILE__, __LINE__);
         }
     }
-
-
 }

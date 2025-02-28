@@ -16,6 +16,8 @@ class DbBrowserController extends BaseController
             echo $this->latte->render('app/views/dbbrowser/index.latte', $this->params->getAll([
                 'tables' => $tables
             ]));
+        } else {
+            $this->application->error403(__FILE__, __LINE__);
         }
     }
 
@@ -79,6 +81,8 @@ class DbBrowserController extends BaseController
                 'totalPages' => $totalPages,
                 'filters' => $filters
             ]));
+        } else {
+            $this->application->error403(__FILE__, __LINE__);
         }
     }
 
@@ -94,6 +98,8 @@ class DbBrowserController extends BaseController
                 'columns' => $columns,
                 'columnTypes' => $columnTypes
             ]));
+        } else {
+            $this->application->error403(__FILE__, __LINE__);
         }
     }
 
@@ -124,6 +130,8 @@ class DbBrowserController extends BaseController
 
             $stmt->execute();
             $this->flight->redirect('/dbbrowser/' . urlencode($table));
+        } else {
+            $this->application->error403(__FILE__, __LINE__);
         }
     }
 
@@ -153,6 +161,8 @@ class DbBrowserController extends BaseController
                 'primaryKey' => $primaryKey,
                 'columnTypes' => $columnTypes
             ]));
+        } else {
+            $this->application->error403(__FILE__, __LINE__);
         }
     }
 
@@ -187,6 +197,8 @@ class DbBrowserController extends BaseController
 
             $stmt->execute();
             $this->flight->redirect('/dbbrowser/' . urlencode($table));
+        } else {
+            $this->application->error403(__FILE__, __LINE__);
         }
     }
 
@@ -202,6 +214,8 @@ class DbBrowserController extends BaseController
 
             $stmt->execute();
             $this->flight->redirect('/dbbrowser/' . urlencode($table));
+        } else {
+            $this->application->error403(__FILE__, __LINE__);
         }
     }
 

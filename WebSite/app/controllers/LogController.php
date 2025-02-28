@@ -66,6 +66,8 @@ class LogController extends BaseController
                 'totalPages' => $totalPages,
                 'filters' => $_GET
             ]));
+        } else {
+            $this->application->error403(__FILE__, __LINE__);
         }
     }
 
@@ -86,6 +88,8 @@ class LogController extends BaseController
                 'externalRefs' => $this->getExternalRefererStats($period, $currentDate),
                 'control' => $this
             ]));
+        } else {
+            $this->application->error403(__FILE__, __LINE__);
         }
     }
 
@@ -252,6 +256,8 @@ class LogController extends BaseController
                 'chartData' => $this->formatDataForChart($data),
                 'periodLabel' => $this->getPeriodLabel($periodType)
             ]));
+        } else {
+            $this->application->error403(__FILE__, __LINE__);
         }
     }
 

@@ -46,6 +46,8 @@ class ArticleController extends TableController
                 'conditionValue' => $person['Id'],
                 'conditionColumn' => 'CreatedBy'
             ]));
+        } else {
+            $this->application->error403(__FILE__, __LINE__);
         }
     }
 
@@ -115,6 +117,8 @@ class ArticleController extends TableController
                 $_SESSION['error'] = "Une erreur est survenue lors de la mise à jour de l'article";
             }
             $this->flight->redirect('/articles/' . $id);
+        } else {
+            $this->application->error403(__FILE__, __LINE__);
         }
     }
 
@@ -129,6 +133,8 @@ class ArticleController extends TableController
             } else {
                 $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
             }
+        } else {
+            $this->application->error403(__FILE__, __LINE__);
         }
     }
 
@@ -148,6 +154,8 @@ class ArticleController extends TableController
             } else {
                 $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
             }
+        } else {
+            $this->application->error403(__FILE__, __LINE__);
         }
     }
 

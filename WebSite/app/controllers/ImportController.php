@@ -33,6 +33,8 @@ class ImportController extends BaseController
                 'importSettings' => $this->importSettings,
                 'results' => $this->results
             ]));
+        } else {
+            $this->application->error403(__FILE__, __LINE__);
         }
     }
 
@@ -117,6 +119,8 @@ class ImportController extends BaseController
                     'results' => $this->results
                 ]));
             }
+        } else {
+            $this->application->error403(__FILE__, __LINE__);
         }
     }
 
