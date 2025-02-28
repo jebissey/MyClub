@@ -11,18 +11,87 @@
         <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
         <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
         <style>
-            .ql-editor {
-                min-height: 300px;
-            }
-            #editor-container {
-                display: none;
-            }
-            .card-body img {
-                max-width: 100%;
-                height: auto;
-                display: block;
-                margin: 0 auto;
-            }
+
+/* Styles pour l'éditeur */
+.ql-clearbreak {
+    clear: both !important;
+    display: block !important;
+    width: 100% !important;
+    height: 1px !important; 
+    margin: 10px 0 !important;
+    border-bottom: 1px dashed #ccc !important;
+    padding: 0 !important;
+    float: none !important;
+    position: relative !important;
+}
+
+/* Style pour le bouton dans la toolbar */
+button.ql-clearbreak {
+    font-weight: bold;
+    font-size: 16px;
+}
+
+/* Styles pour la page d'affichage */
+.clearbreak-display {
+    clear: both !important;
+    display: block !important;
+    width: 100% !important;
+    height: 1px !important; 
+    margin: 10px 0 !important;
+    padding: 0 !important;
+    float: none !important;
+    position: relative !important;
+}
+
+/* Assurez-vous que tous les éléments après un clearbreak commencent sur une nouvelle ligne */
+.clearbreak-display + * {
+    clear: both !important;
+}
+
+/* Styles existants */
+.ql-editor {
+    min-height: 300px;
+}
+
+#editor-container {
+    display: none;
+}
+
+.card-body img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+}
+
+.ql-editor img {
+    float: left; 
+    margin-right: 10px;
+    max-width: 200px;
+}
+
+/* Styles globaux pour les images */
+        /* Styles CSS ici */
+        #content-display img {
+            float: left;
+            margin-right: 10px;
+            max-width: 200px;
+            height: auto;
+        }
+        .ql-clearbreak {
+            clear: both;
+            display: block;
+            width: 100%;
+            height: 1px;
+            margin: 10px 0;
+            border-bottom: 1px dashed #ccc;
+            padding: 0;
+            float: none;
+            position: relative;
+        }
+        .ql-clearbreak + * {
+            clear: both;
+        }
         </style>
     {/if}
 {/block}
@@ -106,20 +175,69 @@
     {if $canEdit}
         <script>
             document.addEventListener('DOMContentLoaded', function() {
-                var quill = new Quill('#quill-editor', {
-                    theme: 'snow',
-                    modules: {
-                        toolbar: [
-                            [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
-                            ['bold', 'italic', 'underline', 'strike'],
-                            [{ 'color': [] }, { 'background': [] }],
-                            [{ 'list': 'ordered' }, { 'list': 'bullet' }],
-                            ['link', 'image'],
-                            ['clean']
-                        ]
-                    }
-                });
-                
+    const BlockEmbed = Quill.import('blots/block/embed');
+    
+    // Définir notre Blot personnalisé correctement
+    class ClearBreakBlot extends BlockEmbed {
+        static create() {
+            const node = super.create();
+            // Ajouter un attribut data pour l'identifier facilement
+            node.setAttribute('data-clearbreak', 'true');
+            return node;
+        }
+    }
+    
+    ClearBreakBlot.blotName = 'clearBreak';
+    ClearBreakBlot.tagName = 'DIV';
+    ClearBreakBlot.className = 'ql-clearbreak';
+    
+    // Enregistrer notre Blot avant d'initialiser l'éditeur
+    Quill.register(ClearBreakBlot);
+
+    var quill = new Quill('#quill-editor', {
+        theme: 'snow',
+        modules: {
+            toolbar: [
+                [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+                ['bold', 'italic', 'underline', 'strike'],
+                [{ 'color': [] }, { 'background': [] }],
+                [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                ['link', 'image'],
+                ['clean'],
+            ]
+        }
+    });
+
+    // Ajouter manuellement un bouton personnalisé à la barre d'outils
+    const toolbar = quill.getModule('toolbar');
+    const toolbarEl = toolbar.container;
+    
+    // Trouver le groupe qui contient le bouton d'image
+    const imageGroup = toolbarEl.querySelector('.ql-image').parentNode;
+    
+    // Créer notre nouveau bouton
+    const clearBreakButton = document.createElement('button');
+    clearBreakButton.className = 'ql-clearbreak';
+    clearBreakButton.type = 'button';
+    clearBreakButton.title = 'Saut après image';
+    clearBreakButton.innerHTML = '↵';
+    clearBreakButton.style.fontWeight = 'bold';
+    
+    // Ajouter notre bouton après le bouton d'image
+    imageGroup.appendChild(clearBreakButton);
+    
+    // Ajouter l'écouteur d'événement directement sur notre bouton
+    clearBreakButton.addEventListener('click', function() {
+        const range = quill.getSelection();
+        if (range) {
+            // Insérer directement un élément HTML avec clear:both
+            const clearBreakHtml = '<div class="ql-clearbreak" data-clearbreak="true"></div>';
+            quill.clipboard.dangerouslyPasteHTML(range.index, clearBreakHtml);
+            
+            // Mettre à jour la sélection
+            quill.setSelection(range.index + 1, 0);
+        }
+    });
                 var contentDisplay = document.getElementById('content-display');
                 var initialContent = contentDisplay.innerHTML;
                 
@@ -211,6 +329,18 @@
                     reader.readAsDataURL(file);
                 });
             }
+
+            clearBreakButton.addEventListener('click', function() {
+    const range = quill.getSelection();
+    if (range) {
+        // Insérer directement un élément HTML avec clear:both
+        const clearBreakHtml = '<div class="clearbreak-display" data-clearbreak="true"></div>';
+        quill.clipboard.dangerouslyPasteHTML(range.index, clearBreakHtml);
+        
+        // Mettre à jour la sélection
+        quill.setSelection(range.index + 1, 0);
+    }
+});
         </script>
     {/if}
 {/block}
