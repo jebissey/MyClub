@@ -6,15 +6,9 @@ CREATE TABLE IF NOT EXISTS "Article" (
 	"CreatedBy"	INTEGER NOT NULL,
 	"Timestamp"	TEXT NOT NULL DEFAULT current_timestamp,
 	"Published"	INTEGER NOT NULL DEFAULT 0,
+	"IdGroup"	INTEGER,
 	PRIMARY KEY("Id"),
-	FOREIGN KEY("CreatedBy") REFERENCES "Person"("Id")
-);
-CREATE TABLE IF NOT EXISTS "ArticleGroup" (
-	"Id"	INTEGER,
-	"IdArticle"	INTEGER NOT NULL,
-	"IdGroup"	INTEGER NOT NULL,
-	PRIMARY KEY("Id"),
-	FOREIGN KEY("IdArticle") REFERENCES "Article"("Id"),
+	FOREIGN KEY("CreatedBy") REFERENCES "Person"("Id"),
 	FOREIGN KEY("IdGroup") REFERENCES "Group"("Id")
 );
 CREATE TABLE IF NOT EXISTS "Attribute" (

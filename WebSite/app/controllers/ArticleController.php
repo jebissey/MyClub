@@ -20,7 +20,8 @@ class ArticleController extends TableController
                 ['name' => 'createdBy', 'label' => 'Créé par'],
                 ['name' => 'title', 'label' => 'Titre'],
                 ['name' => 'timestamp', 'label' => 'Date de création'],
-                ['name' => 'published', 'label' => 'Publié']
+                ['name' => 'published', 'label' => 'Publié'],
+                ['name' => 'groupName', 'label' => 'N° du groupe']
             ];
             $columns = [
                 ['field' => 'CreatedBy', 'label' => 'Créé par'],
@@ -28,7 +29,8 @@ class ArticleController extends TableController
                 ['field' => 'FirstName', 'label' => 'Prénom'],
                 ['field' => 'Title', 'label' => 'Titre'],
                 ['field' => 'Timestamp', 'label' => 'Date de création'],
-                ['field' => 'Published', 'label' => 'Publié']
+                ['field' => 'Published', 'label' => 'Publié'],
+                ['field' => 'IdGroup', 'label' => 'Groupe(n°)']
             ];
             $query = $this->fluent->from('Article')
                 ->select('Article.Id, Article.CreatedBy, Article.Title, Article.Timestamp, Article.Published, Person.FirstName, Person.LastName')
@@ -85,11 +87,11 @@ class ArticleController extends TableController
             $messages['success'] = $_SESSION['success'];
             $_SESSION['success'] = null;
         }
-
         echo $this->latte->render('app/views/user/article.latte', $this->params->getAll([
             'chosenArticle' => $chosenArticle,
             'latestArticleTitles' => $this->getLatestArticleTitles($articleIds),
-            'canEdit' => $canEdit
+            'canEdit' => $canEdit,
+            'groups' => $this->getGroups()
         ]));
     }
 
@@ -103,14 +105,15 @@ class ArticleController extends TableController
             }
             $title = $this->flight->request()->data['title'] ?? '';
             $content = $this->flight->request()->data['content'] ?? '';
+            $published = $this->flight->request()->data['published'] ?? 0;
             if (empty($title) || empty($content)) {
                 $_SESSION['error'] = "Le titre et le contenu sont obligatoires";
                 $this->flight->redirect('/articles/' . $id);
                 return;
             }
 
-            $query = $this->pdo->prepare("UPDATE Article SET Title = ?, Content = ? WHERE Id = ?");
-            $result = $query->execute([$title, $content, $id]);
+            $query = $this->pdo->prepare("UPDATE Article SET Title = ?, Content = ?, Published = ? WHERE Id = ?");
+            $result = $query->execute([$title, $content, $id, $published]);
             if ($result) {
                 $_SESSION['success'] = "L'article a été mis à jour avec succès";
             } else {
@@ -179,11 +182,7 @@ class ArticleController extends TableController
     {
         $query = $this->pdo->prepare("
             SELECT Article.Id FROM Article 
-            WHERE Article.published = 1 
-            AND NOT EXISTS (
-                SELECT 1 FROM ArticleGroup 
-                WHERE ArticleGroup.IdArticle = Article.Id
-            )");
+            WHERE Article.published = 1 AND Article.IdGroup IS NULL");
         $query->execute();
         return $query->fetchAll(PDO::FETCH_COLUMN);
     }
@@ -207,9 +206,8 @@ class ArticleController extends TableController
         $placeholders = implode(',', array_fill(0, count($groupIds), '?'));
         $query = $this->pdo->prepare("
             SELECT DISTINCT Article.Id FROM Article 
-            JOIN ArticleGroup ON ArticleGroup.IdArticle = Article.Id 
             WHERE Article.published = 1 
-            AND ArticleGroup.IdGroup IN ($placeholders)");
+            AND Article.IdGroup IN ($placeholders)");
         $query->execute($groupIds);
         return $query->fetchAll(PDO::FETCH_COLUMN);
     }
@@ -218,9 +216,10 @@ class ArticleController extends TableController
     {
         $placeholders = implode(',', array_fill(0, count($articleIds), '?'));
         $query = $this->pdo->prepare("
-            SELECT Article.*, Person.FirstName, Person.LastName 
+            SELECT Article.*, Person.FirstName, Person.LastName, 'Group'.Name || '(' || 'Group'.Id || ')' AS GroupName
             FROM Article 
             LEFT JOIN Person ON Person.Id = Article.CreatedBy 
+            LEFT JOIN 'Group' ON Article.IdGroup = 'Group'.Id
             WHERE Article.Id IN ($placeholders)
             ORDER BY Article.Timestamp DESC 
             LIMIT 1");
@@ -240,5 +239,11 @@ class ArticleController extends TableController
             LIMIT 10");
         $query->execute($articleIds);
         return $query->fetchAll(PDO::FETCH_OBJ) ?: [];
+    }
+
+    private function getGroups()
+    {
+        $query = $this->pdo->query("SELECT Id, Name FROM 'Group' WHERE Inactivated=0 ORDER BY Name");
+        return $query->fetchAll(PDO::FETCH_ASSOC);
     }
 }
