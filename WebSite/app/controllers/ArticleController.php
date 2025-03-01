@@ -137,7 +137,7 @@ class ArticleController extends TableController
                 $query = $this->pdo->prepare("INSERT INTO Article (Title, Content, CreatedBy) VALUES ('', '', ?)");
                 $query->execute([$person['Id']]);
                 $id = $this->pdo->lastInsertId();
-                $this->flight->redirect('/articles/edit/' . $id);
+                $this->flight->redirect('/articles/' . $id);
             } else {
                 $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
             }

@@ -15,7 +15,7 @@
                 font-weight: bold;
                 font-size: 16px;
             }
-            .clearbreak-display {
+            .clearbreak-display, .ql-clearbreak {
                 clear: both !important;
                 display: block !important;
                 width: 100% !important;
@@ -24,9 +24,12 @@
                 padding: 0 !important;
                 float: none !important;
                 position: relative !important;
+                border-bottom: none !important; 
+                background-color: transparent; 
             }
             .clearbreak-display + * {
                 clear: both !important;
+                display: block;
             }
             .ql-editor {
                 min-height: 300px;
@@ -40,16 +43,16 @@
                 display: block;
                 margin: 0 auto;
             }
-            .ql-editor img {
-                float: left; 
-                margin-right: 10px;
-                max-width: 200px;
-            }
-            #content-display img {
+            .ql-editor img, #content-display img {
                 float: left;
                 margin-right: 10px;
-                max-width: 200px;
+                margin-bottom: 5px;
+                max-width: 100%;
                 height: auto;
+            }
+            #content-display p, .ql-editor p {
+                margin-top: 0;
+                margin-bottom: 1em;
             }
             .ql-clearbreak {
                 clear: both !important;
@@ -64,6 +67,9 @@
             }
             .ql-clearbreak + * {
                 clear: both;
+            }
+            button.ql-clearbreak:hover {
+                background-color: #f0f0f0;
             }
         </style>
     {/if}
@@ -104,6 +110,7 @@
                     </div>
                     {if $canEdit}
                         <button id="edit-toggle-btn" class="btn btn-primary">Modifier</button>
+                        <a href="/articles" class="btn btn-secondary">Retour à la liste</a>
                     {/if}
                 </div>
                 <div class="card-body">
@@ -192,7 +199,7 @@
                 }
                 ClearBreakBlot.blotName = 'clearBreak';
                 ClearBreakBlot.tagName = 'DIV';
-                ClearBreakBlot.className = 'ql-clearbreak';
+                ClearBreakBlot.className = 'clearbreak-display';
                 Quill.register(ClearBreakBlot);
 
                 var quill = new Quill('#quill-editor', {
@@ -219,14 +226,80 @@
                 clearBreakButton.innerHTML = '↵';
                 clearBreakButton.style.fontWeight = 'bold';
                 imageGroup.appendChild(clearBreakButton);
+                
                 clearBreakButton.addEventListener('click', function() {
                     const range = quill.getSelection();
                     if (range) {
-                        const clearBreakHtml = '<div class="ql-clearbreak" data-clearbreak="true"></div>';
-                        quill.clipboard.dangerouslyPasteHTML(range.index, clearBreakHtml);
+                        quill.insertEmbed(range.index, 'clearBreak', true);
                         quill.setSelection(range.index + 1, 0);
                     }
                 });
+                
+                quill.getModule("toolbar").addHandler("image", function () {
+                    const input = document.createElement("input");
+                    input.setAttribute("type", "file");
+                    input.setAttribute("accept", "image/*");
+                    input.click();
+
+                    input.onchange = async function () {
+                        const file = input.files[0];
+                        if (file) {
+                            const resizedImage = await resizeImage(file);
+                            const range = quill.getSelection();
+                            if (range) {
+                                quill.insertEmbed(range.index, "image", resizedImage);
+                                quill.setSelection(range.index + 1, 0);
+                            }
+                        }
+                    };
+                });
+
+                quill.root.addEventListener('click', function(event) {
+                    const images = quill.root.querySelectorAll('img');
+                    for (const img of images) {
+                        const rect = img.getBoundingClientRect();
+                        
+                        if (event.clientX > rect.right && event.clientX < rect.right + 20 && 
+                            event.clientY >= rect.top && event.clientY <= rect.bottom) {
+                            const imageIndex = getImageIndexInQuill(quill, img);
+                            if (imageIndex !== -1) {
+                                quill.setSelection(imageIndex + 1, 0);
+                                event.preventDefault();
+                                return;
+                            }
+                        }
+                        
+                        if (event.clientY > rect.bottom && event.clientY < rect.bottom + 20 &&
+                            event.clientX >= rect.left && event.clientX <= rect.right) {
+                            const imageIndex = getImageIndexInQuill(quill, img);
+                            if (imageIndex !== -1) {
+                                quill.setSelection(imageIndex + 1, 0);
+                                event.preventDefault();
+                                return;
+                            }
+                        }
+                    }
+                });
+
+                function getImageIndexInQuill(quill, imgElement) {
+                    const ops = quill.getContents().ops;
+                    let currentIndex = 0;
+                    let imgSrc = imgElement.getAttribute('src');
+                    
+                    for (const op of ops) {
+                        if (op.insert && op.insert.image) {
+                            if (op.insert.image === imgSrc) {
+                                return currentIndex;
+                            }
+                            currentIndex++;
+                        } else if (op.insert) {
+                            currentIndex += op.insert.length || 1;
+                        }
+                    }
+                    
+                    return -1; // Image non trouvée
+                }
+
                 var contentDisplay = document.getElementById('content-display');
                 var initialContent = contentDisplay.innerHTML;
                 
@@ -253,7 +326,6 @@
                 saveBtn.addEventListener('click', function() {
                     var content = quill.root.innerHTML;
                     contentInput.value = content;
-                    
                     editForm.submit();
                 });
                 
@@ -267,31 +339,6 @@
                     
                     quill.clipboard.dangerouslyPasteHTML(initialContent);
                     titleInput.value = titleDisplay.textContent;
-                });
-
-                quill.getModule("toolbar").addHandler("image", function () {
-                    const input = document.createElement("input");
-                    input.setAttribute("type", "file");
-                    input.setAttribute("accept", "image/*");
-                    input.click();
-
-                    input.onchange = async function () {
-                        const file = input.files[0];
-                        if (file) {
-                            const resizedImage = await resizeImage(file);
-                            const range = quill.getSelection();
-                            quill.insertEmbed(range.index, "image", resizedImage);
-                        }
-                    };
-                });
-                
-                clearBreakButton.addEventListener('click', function() {
-                    const range = quill.getSelection();
-                    if (range) {
-                        const clearBreakHtml = '<div class="clearbreak-display" data-clearbreak="true"></div>';
-                        quill.clipboard.dangerouslyPasteHTML(range.index, clearBreakHtml);
-                        quill.setSelection(range.index + 1, 0);
-                    }
                 });
             });
 
@@ -326,6 +373,7 @@
                     reader.readAsDataURL(file);
                 });
             }
+
         </script>
     {/if}
 {/block}

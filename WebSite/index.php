@@ -130,10 +130,10 @@ Flight::map('getData', function ($key) {
 
 $articleController = $container->get('app\controllers\ArticleController');
 $flight->route('GET  /articles',            function()    use ($articleController) { $articleController->index(); });
-$flight->route('GET  /articles/@id',        function($id) use ($articleController) { $articleController->show($id); });
-$flight->route('POST /articles/@id',        function($id) use ($articleController) { $articleController->update($id); });
 $flight->route('GET  /articles/create',     function()    use ($articleController) { $articleController->create(); });
 $flight->route('GET  /articles/delete/@id', function($id) use ($articleController) { $articleController->delete($id); });
+$flight->route('GET  /articles/@id',        function($id) use ($articleController) { $articleController->show($id); });
+$flight->route('POST /articles/@id',        function($id) use ($articleController) { $articleController->update($id); });
 
 $userController = $container->get('app\controllers\UserController');
 $flight->route('GET  /',                                  function()              use ($userController, $articleController) { $userController->home($articleController); });

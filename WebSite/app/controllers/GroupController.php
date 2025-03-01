@@ -52,7 +52,8 @@ class GroupController extends BaseController implements CrudControllerInterface
                 if (empty($name)) {
                     echo $this->latte->render('app/views/groups/create.latte', $this->params->getAll([
                         'availableAuthorizations' => $availableAuthorizations,
-                        'error' => 'Le nom du groupe est requis'
+                        'error' => 'Le nom du groupe est requis',
+                        'layout' => $this->getLayout()
                     ]));
                     return;
                 }
@@ -106,7 +107,8 @@ class GroupController extends BaseController implements CrudControllerInterface
                     echo $this->latte->render('app/views/groups/edit.latte', $this->params->getAll([
                         'group' => $group,
                         'availableAuthorizations' => $availableAuthorizations,
-                        'error' => 'Le nom du groupe est requis'
+                        'error' => 'Le nom du groupe est requis',
+                        'layout' => $this->getLayout()
                     ]));
                 } else {
                     $this->pdo->beginTransaction();
@@ -144,7 +146,8 @@ class GroupController extends BaseController implements CrudControllerInterface
                     echo $this->latte->render('app/views/groups/edit.latte', $this->params->getAll([
                         'group' => $group,
                         'availableAuthorizations' => $availableAuthorizations,
-                        'currentAuthorizations' => $currentAuthorizations
+                        'currentAuthorizations' => $currentAuthorizations,
+                        'layout' => $this->getLayout()
                     ]));
                 }
             } else {
