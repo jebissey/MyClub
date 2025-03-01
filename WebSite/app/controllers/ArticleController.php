@@ -98,28 +98,33 @@ class ArticleController extends TableController
     public function update($id): void
     {
         if ($person = $this->getPerson(['Redactor'])) {
-            $article = $this->getLatestArticle([$id]);
-            if (!$article || $person['Id'] != $article->CreatedBy) {
-                $this->application->error403(__FILE__, __LINE__);
-                return;
-            }
-            $title = $this->flight->request()->data['title'] ?? '';
-            $content = $this->flight->request()->data['content'] ?? '';
-            $published = $this->flight->request()->data['published'] ?? 0;
-            if (empty($title) || empty($content)) {
-                $_SESSION['error'] = "Le titre et le contenu sont obligatoires";
-                $this->flight->redirect('/articles/' . $id);
-                return;
-            }
+            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                $article = $this->getLatestArticle([$id]);
+                if (!$article || $person['Id'] != $article->CreatedBy) {
+                    $this->application->error403(__FILE__, __LINE__);
+                    return;
+                }
+                $title = $_POST['title'] ?? '';
+                $content = $_POST['content'] ?? '';
+                $published = $_POST['published'] ?? 0;
+                $idGroup = $_POST['idGroup'] ?? null;
+                if (empty($title) || empty($content)) {
+                    $_SESSION['error'] = "Le titre et le contenu sont obligatoires";
+                    $this->flight->redirect('/articles/' . $id);
+                    return;
+                }
 
-            $query = $this->pdo->prepare("UPDATE Article SET Title = ?, Content = ?, Published = ? WHERE Id = ?");
-            $result = $query->execute([$title, $content, $id, $published]);
-            if ($result) {
-                $_SESSION['success'] = "L'article a été mis à jour avec succès";
+                $query = $this->pdo->prepare("UPDATE Article SET Title = ?, Content = ?, Published = ?, IdGroup = ? WHERE Id = ?");
+                $result = $query->execute([$title, $content, $published, $idGroup, $id]);
+                if ($result) {
+                    $_SESSION['success'] = "L'article a été mis à jour avec succès";
+                } else {
+                    $_SESSION['error'] = "Une erreur est survenue lors de la mise à jour de l'article";
+                }
+                $this->flight->redirect('/articles/' . $id);
             } else {
-                $_SESSION['error'] = "Une erreur est survenue lors de la mise à jour de l'article";
+                $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
             }
-            $this->flight->redirect('/articles/' . $id);
         } else {
             $this->application->error403(__FILE__, __LINE__);
         }

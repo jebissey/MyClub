@@ -125,7 +125,7 @@
 
                                     <div class="d-flex align-items-center gap-2">
                                         <label for="group-select" class="form-label mb-0 text-nowrap">Groupe associé</label>
-                                        <select class="form-select" id="group-select" name="group_id">
+                                        <select class="form-select" id="group-select" name="idGroup">
                                             <option value="">-- Aucun groupe --</option>
                                             {foreach $groups as $group}
                                                 <option value="{$group['Id']}" {if isset($chosenArticle->IdGroup) && $chosenArticle->IdGroup == $group['Id']}selected{/if}>{$group['Name']}</option>
