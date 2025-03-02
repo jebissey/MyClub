@@ -1,28 +1,35 @@
 {layout '../admin/redactor.latte'}
 
-{block title}Personnes{/block}
+{block title}Articles{/block}
 
 {block content}
-    {include '../common/dataTable.latte',
-        'createButton' => [
-            'url' => '/articles/create',
-            'label' => 'Créer un article'
-        ],
-        'items' => $articles,
-        'actions' => [
-            [
-                'type' => 'link',
-                'label' => 'Voir',
-                'url' => '/articles/{id}',
-                'class' => 'btn-info'
+    {if $isRedactor}
+        {include '../common/dataTable.latte',
+            'createButton' => [
+                'url' => '/articles/create',
+                'label' => 'Créer un article'
             ],
-            [
-                'type' => 'link',
-                'label' => 'Supprimer',
-                'url' => '/articles/delete/{id}',
-                'class' => 'btn-danger',
-                'confirm' => 'Voulez-vous vraiment supprimer cet article ?'
+            'items' => $articles,
+            'actions' => [
+                [
+                    'type' => 'link',
+                    'label' => 'Voir',
+                    'url' => '/articles/{id}',
+                    'class' => 'btn-info'
+                ]
             ]
-        ]
-    }
+        }
+    {else}
+        {include '../common/dataTable.latte',
+            'items' => $articles,
+            'actions' => [
+                [
+                    'type' => 'link',
+                    'label' => 'Voir',
+                    'url' => '/articles/{id}',
+                    'class' => 'btn-info'
+                ]
+            ]
+        }
+    {/if}
 {/block}

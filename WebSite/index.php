@@ -98,6 +98,12 @@ $containerBuilder->addDefinitions([
             $container->get(PDO::class),
             $container->get(Engine::class)
         );
+    },
+    'app\controllers\SurveyController' => function (Container $container) {
+        return new \app\controllers\SurveyController(
+            $container->get(PDO::class),
+            $container->get(Engine::class)
+        );
     }
 ]);
 $container = $containerBuilder->build();
@@ -134,6 +140,13 @@ $flight->route('GET  /articles/create',     function()    use ($articleControlle
 $flight->route('GET  /articles/delete/@id', function($id) use ($articleController) { $articleController->delete($id); });
 $flight->route('GET  /articles/@id',        function($id) use ($articleController) { $articleController->show($id); });
 $flight->route('POST /articles/@id',        function($id) use ($articleController) { $articleController->update($id); });
+
+$surveyController = $container->get('app\controllers\SurveyController');
+$flight->route('GET  /surveys/add/@id',     function($id) use ($surveyController) { $surveyController->add($id); });
+$flight->route('POST /surveys/create',      function()    use ($surveyController) { $surveyController->create(); });
+$flight->route('GET  /surveys/reply/@id',   function($id) use ($surveyController) { $surveyController->showReplyForm($id); });
+$flight->route('POST /surveys/reply',       function()    use ($surveyController) { $surveyController->saveReply(); });
+$flight->route('GET  /surveys/results/@id', function($id) use ($surveyController) { $surveyController->viewResults($id); });
 
 $userController = $container->get('app\controllers\UserController');
 $flight->route('GET  /',                                  function()              use ($userController, $articleController) { $userController->home($articleController); });

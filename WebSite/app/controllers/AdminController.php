@@ -26,7 +26,7 @@ class AdminController extends BaseController
                 } else if ($this->authorizations->isPersonManager()) {
                     $this->flight->redirect('/personManager');
                 } else if ($this->authorizations->isRedactor()) {
-                    $this->flight->redirect('/articleManager');
+                    $this->flight->redirect('/articles');
                 } else if ($this->authorizations->isWebmaster()) {
                     $this->flight->redirect('/webmaster');
                 }

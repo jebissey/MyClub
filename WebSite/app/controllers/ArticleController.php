@@ -9,48 +9,49 @@ class ArticleController extends TableController
 {
     public function index()
     {
-        if ($person = $this->getPerson(['Redactor'])) {
-            $filterValues = [
-                'createdBy' => $_GET['createdBy'] ?? '',
-                'title' => $_GET['title'] ?? '',
-                'timestamp' => $_GET['timestamp'] ?? '',
-                'published' => $_GET['published'] ?? ''
-            ];
-            $filterConfig = [
-                ['name' => 'createdBy', 'label' => 'Créé par'],
-                ['name' => 'title', 'label' => 'Titre'],
-                ['name' => 'timestamp', 'label' => 'Date de création'],
-                ['name' => 'published', 'label' => 'Publié'],
-                ['name' => 'groupName', 'label' => 'N° du groupe']
-            ];
-            $columns = [
-                ['field' => 'CreatedBy', 'label' => 'Créé par'],
-                ['field' => 'LastName', 'label' => 'Nom'],
-                ['field' => 'FirstName', 'label' => 'Prénom'],
-                ['field' => 'Title', 'label' => 'Titre'],
-                ['field' => 'Timestamp', 'label' => 'Date de création'],
-                ['field' => 'Published', 'label' => 'Publié'],
-                ['field' => 'IdGroup', 'label' => 'Groupe(n°)']
-            ];
-            $query = $this->fluent->from('Article')
-                ->select('Article.Id, Article.CreatedBy, Article.Title, Article.Timestamp, Article.Published, Person.FirstName, Person.LastName')
-                ->innerJoin('Person ON Article.CreatedBy = Person.Id')
-                ->orderBy('Article.Timestamp DESC');
-            $data = $this->prepareTableData($query, $filterValues, $_GET['tablePage'] ?? null);
-            echo $this->latte->render('app/views/user/articles.latte', $this->params->getAll([
-                'articles' => $data['items'],
-                'currentPage' => $data['currentPage'],
-                'totalPages' => $data['totalPages'],
-                'filterValues' => $filterValues,
-                'filters' => $filterConfig,
-                'columns' => $columns,
-                'resetUrl' => '/articles',
-                'conditionValue' => $person['Id'],
-                'conditionColumn' => 'CreatedBy'
-            ]));
-        } else {
-            $this->application->error403(__FILE__, __LINE__);
+        $person = $this->getPerson([]);
+        $filterValues = [
+            'createdBy' => $_GET['createdBy'] ?? '',
+            'title' => $_GET['title'] ?? '',
+            'timestamp' => $_GET['timestamp'] ?? '',
+            'published' => $_GET['published'] ?? ''
+        ];
+        $filterConfig = [
+            ['name' => 'createdBy', 'label' => 'Créé par'],
+            ['name' => 'title', 'label' => 'Titre'],
+            ['name' => 'timestamp', 'label' => 'Date de création'],
+            ['name' => 'published', 'label' => 'Publié'],
+            ['name' => 'groupName', 'label' => 'N° du groupe']
+        ];
+        $columns = [
+            ['field' => 'CreatedBy', 'label' => 'Créé par'],
+            ['field' => 'LastName', 'label' => 'Nom'],
+            ['field' => 'FirstName', 'label' => 'Prénom'],
+            ['field' => 'Title', 'label' => 'Titre'],
+            ['field' => 'Timestamp', 'label' => 'Date de création'],
+            ['field' => 'Published', 'label' => 'Publié'],
+            ['field' => 'IdGroup', 'label' => 'Groupe(n°)']
+        ];
+        $query = $this->fluent->from('Article')
+            ->select('Article.Id, Article.CreatedBy, Article.Title, Article.Timestamp, Article.Published, Person.FirstName, Person.LastName')
+            ->innerJoin('Person ON Article.CreatedBy = Person.Id')
+            ->where('(Article.IdGroup IS NULL)');
+        if ($person) {
+            $query = $query->whereOr('Article.CreatedBy = ' . $person['Id'])
+                ->whereOr('Article.IdGroup IN (SELECT IdGroup FROM PersonGroup WHERE IdPerson = ' . $person['Id'] . ')'); 
         }
+        $query = $query->orderBy('Article.Timestamp DESC');
+        $data = $this->prepareTableData($query, $filterValues, $_GET['tablePage'] ?? null);
+        echo $this->latte->render('app/views/user/articles.latte', $this->params->getAll([
+            'articles' => $data['items'],
+            'currentPage' => $data['currentPage'],
+            'totalPages' => $data['totalPages'],
+            'filterValues' => $filterValues,
+            'filters' => $filterConfig,
+            'columns' => $columns,
+            'resetUrl' => '/articles',
+            'isRedactor' => $person ? $this->authorizations->isRedactor() : false
+        ]));
     }
 
     public function getLatestArticles(?string $userEmail = null): array
@@ -87,11 +88,17 @@ class ArticleController extends TableController
             $messages['success'] = $_SESSION['success'];
             $_SESSION['success'] = null;
         }
+
+        $survey = $this->fluent->from('Survey')
+            ->where('IdArticle', $id)
+            ->fetch();
+
         echo $this->latte->render('app/views/user/article.latte', $this->params->getAll([
             'chosenArticle' => $chosenArticle,
             'latestArticleTitles' => $this->getLatestArticleTitles($articleIds),
             'canEdit' => $canEdit,
-            'groups' => $this->getGroups()
+            'groups' => $this->getGroups(),
+            'hasSurvey' => $survey ? true : false
         ]));
     }
 
