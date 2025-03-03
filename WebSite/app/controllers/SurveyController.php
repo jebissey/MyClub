@@ -2,26 +2,36 @@
 
 namespace app\controllers;
 
+use Exception;
+
 class SurveyController extends BaseController
 {
     public function add($articleId)
     {
-        $article = $this->fluent->from('Article')
-            ->where('Id', $articleId)
-            ->fetch();
+        if ($this->getPerson(['Redactor'])) {
+            if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+                $article = $this->fluent->from('Article')
+                    ->where('Id', $articleId)
+                    ->fetch();
 
-        if (!$article) {
-            $this->flight->redirect('/articles');
+                if (!$article) {
+                    $this->flight->redirect('/articles');
+                }
+
+                $this->latte->render('app/views/survey/add.latte', $this->params->getAll([
+                    'article' => $article
+                ]));
+            } else {
+                $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
+            }
+        } else {
+            $this->application->error403(__FILE__, __LINE__);
         }
-
-        $this->latte->render('surveys/add.latte', [
-            'article' => $article
-        ]);
     }
 
     public function create()
     {
-        if ($person = $this->getPerson(['Redactor'])) {
+        if ($this->getPerson(['Redactor'])) {
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $articleId = $_POST['article_id'] ?? null;
                 $question = $_POST['question'] ?? '';
@@ -46,24 +56,47 @@ class SurveyController extends BaseController
 
     public function showReplyForm($articleId)
     {
+        // Désactiver tout output buffering potentiel
+        while (ob_get_level()) {
+            ob_end_clean();
+        }
+        
         $survey = $this->fluent->from('Survey')
             ->where('IdArticle', $articleId)
             ->fetch();
-
+    
         if (!$survey) {
-            return json_encode(['success' => false, 'message' => 'Aucun sondage trouvé']);
+            // Définir manuellement les en-têtes
+            header('Content-Type: application/json');
+            echo json_encode(['success' => false, 'message' => 'Aucun sondage trouvé']);
+            exit; // Important pour arrêter l'exécution
         }
-
-        $options = json_decode($survey->Options);
-
-        return json_encode([
-            'success' => true,
-            'survey' => [
-                'id' => $survey->Id,
-                'question' => $survey->Question,
-                'options' => $options
-            ]
-        ]);
+        
+        try {
+            $options = json_decode($survey->Options);
+            
+            // Vérifier si le décodage a réussi
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                throw new Exception("Erreur de décodage JSON : " . json_last_error_msg());
+            }
+            
+            // Définir manuellement les en-têtes
+            header('Content-Type: application/json');
+            echo json_encode([
+                'success' => true,
+                'survey' => [
+                    'id' => $survey->Id,
+                    'question' => $survey->Question,
+                    'options' => $options
+                ]
+            ]);
+        } catch (Exception $e) {
+            // En cas d'erreur, renvoyer un message d'erreur
+            header('Content-Type: application/json');
+            echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+        }
+        
+        exit; // Important pour arrêter l'exécution
     }
 
     public function saveReply()
@@ -86,20 +119,16 @@ class SurveyController extends BaseController
                     return json_encode(['success' => false, 'message' => 'Utilisateur non trouvé']);
                 }
 
-                // Vérifier si l'utilisateur a déjà répondu
                 $existingReply = $this->fluent->from('Reply')
                     ->where('IdPerson', $person->Id)
                     ->where('IdSurvey', $surveyId)
                     ->fetch();
-
                 if ($existingReply) {
-                    // Mettre à jour la réponse existante
                     $this->fluent->update('Reply')
                         ->set(['Answers' => $answers])
                         ->where('Id', $existingReply->Id)
                         ->execute();
                 } else {
-                    // Créer une nouvelle réponse
                     $this->fluent->insertInto('Reply')
                         ->values([
                             'IdPerson' => $person->Id,
@@ -129,12 +158,12 @@ class SurveyController extends BaseController
         }
 
         $replies = $this->fluent->from('Reply')
-            ->where('IdSurvey', $survey->Id)
+            ->where('IdSurvey', $survey['Id'])
             ->fetchAll();
 
         $participants = [];
         $results = [];
-        $options = json_decode($survey->Options);
+        $options = json_decode($survey['Options']);
 
         foreach ($options as $option) {
             $results[$option] = 0;
@@ -158,7 +187,7 @@ class SurveyController extends BaseController
             }
         }
 
-        $this->latte->render('surveys/results.latte', [
+        $this->latte->render('app/views/survey/results.latte', [
             'survey' => $survey,
             'options' => $options,
             'results' => $results,

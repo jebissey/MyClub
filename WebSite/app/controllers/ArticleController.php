@@ -30,12 +30,16 @@ class ArticleController extends TableController
             ['field' => 'Title', 'label' => 'Titre'],
             ['field' => 'Timestamp', 'label' => 'Date de création'],
             ['field' => 'Published', 'label' => 'Publié'],
-            ['field' => 'IdGroup', 'label' => 'Groupe(n°)']
+            ['field' => 'IdGroup', 'label' => 'Groupe(n°)'],
+            ['field' => 'HasSurvey', 'label' => 'Sondage']
         ];
         $query = $this->fluent->from('Article')
             ->select('Article.Id, Article.CreatedBy, Article.Title, Article.Timestamp, Article.Published, Person.FirstName, Person.LastName')
+            ->select('CASE WHEN Survey.IdArticle IS NOT NULL THEN "oui" ELSE "non" END AS HasSurvey')
             ->innerJoin('Person ON Article.CreatedBy = Person.Id')
-            ->where('(Article.IdGroup IS NULL)');
+            ->leftJoin('Survey ON Article.Id = Survey.IdArticle')
+            ->where('(Article.IdGroup IS NULL)')
+            ->where('(Article.Published = 1)');
         if ($person) {
             $query = $query->whereOr('Article.CreatedBy = ' . $person['Id'])
                 ->whereOr('Article.IdGroup IN (SELECT IdGroup FROM PersonGroup WHERE IdPerson = ' . $person['Id'] . ')'); 
@@ -50,7 +54,9 @@ class ArticleController extends TableController
             'filters' => $filterConfig,
             'columns' => $columns,
             'resetUrl' => '/articles',
-            'isRedactor' => $person ? $this->authorizations->isRedactor() : false
+            'isRedactor' => $person ? $this->authorizations->isRedactor() : false,
+            'userConnected' => $person,
+            'layout' => $this->getLayout()
         ]));
     }
 
@@ -98,7 +104,9 @@ class ArticleController extends TableController
             'latestArticleTitles' => $this->getLatestArticleTitles($articleIds),
             'canEdit' => $canEdit,
             'groups' => $this->getGroups(),
-            'hasSurvey' => $survey ? true : false
+            'hasSurvey' => $survey ? true : false,
+            'id' => $id,
+            'userConnected' => $person
         ]));
     }
 

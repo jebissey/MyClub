@@ -78,16 +78,16 @@
 {block content}
     <div class="container">
         {if isset($messages['success'])}
-            <div class="alert alert-success alert-dismissible">
-                {$messages['success']}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
+        <div class="alert alert-success alert-dismissible">
+            {$messages['success']}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
         {/if}
         {if isset($messages['error'])}
-            <div class="alert alert-danger alert-dismissible">
-                {$messages['error']}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
+        <div class="alert alert-danger alert-dismissible">
+            {$messages['error']}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
         {/if}
 
         {if $chosenArticle}
@@ -109,12 +109,13 @@
                         </small>
                     </div>
                     {if $canEdit}
-                        <button id="edit-toggle-btn" class="btn btn-primary">Modifier</button>
+                    <button id="edit-toggle-btn" class="btn btn-primary">Modifier</button>
+                    <a href="/surveys/add/{$id}" class="btn btn-success">Ajouter un sondage</a>
                         {if $hasSurvey}
-                            <button id="show-survey-results-btn" class="btn btn-info" onclick="window.location.href='/surveys/results/{$chosenArticle->Id}'">Voir résultats sondage</button>
+                    <button id="show-survey-results-btn" class="btn btn-info" onclick="window.location.href='/surveys/results/{$chosenArticle->Id}'">Voir résultats sondage</button>
                         {/if}
-                        <a href="/articles" class="btn btn-secondary">Retour à la liste</a>
                     {/if}
+                    <a href="/articles" class="btn btn-secondary">Retour à la liste</a>
                 </div>
                 <div class="card-body">
                     <div id="content-display">
@@ -122,46 +123,49 @@
                     </div>
                     
                     {if $canEdit}
-                        <div id="editor-container">
-                            <form id="edit-form" method="post">
-                                <div class="d-flex align-items-center gap-4">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" id="published-input" name="published" value="1" 
-                                            {if isset($chosenArticle->Published) && $chosenArticle->Published}checked{/if}>
-                                        <label class="form-check-label" for="published-input">
-                                            Publier
-                                        </label>
-                                    </div>
+                    <div id="editor-container">
+                        <form id="edit-form" method="post">
+                            <div class="d-flex align-items-center gap-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="published-input" name="published" value="1" 
+                                        {if isset($chosenArticle->Published) && $chosenArticle->Published}checked{/if}>
+                                    <label class="form-check-label" for="published-input">
+                                        Publier
+                                    </label>
+                                </div>
 
-                                    <div class="d-flex align-items-center gap-2">
-                                        <label for="group-select" class="form-label mb-0 text-nowrap">Groupe associé</label>
-                                        <select class="form-select" id="group-select" name="idGroup">
-                                            <option value="">-- Aucun groupe --</option>
-                                            {foreach $groups as $group}
-                                                <option value="{$group['Id']}" {if isset($chosenArticle->IdGroup) && $chosenArticle->IdGroup == $group['Id']}selected{/if}>{$group['Name']}</option>
-                                            {/foreach}
-                                        </select>
-                                    </div>
+                                <div class="d-flex align-items-center gap-2">
+                                    <label for="group-select" class="form-label mb-0 text-nowrap">Groupe associé</label>
+                                    <select class="form-select" id="group-select" name="idGroup">
+                                        <option value="">-- Aucun groupe --</option>
+                                        {foreach $groups as $group}
+                                        <option value="{$group['Id']}" {if isset($chosenArticle->IdGroup) && $chosenArticle->IdGroup == $group['Id']}selected{/if}>{$group['Name']}</option>
+                                        {/foreach}
+                                    </select>
+                                </div>
 
-                                    {if $canEdit}
-                                        <div class="d-flex gap-2 ms-auto">
-                                            <button id="save-btn" class="btn btn-success" style="display: none;">Enregistrer</button>
-                                            <button id="cancel-btn" class="btn btn-secondary" style="display: none;">Annuler</button>
-                                        </div>
-                                    {/if}
-                                </div>
-                                <hr class="w-100 my-3">
-                                <div class="d-flex gap-2 align-items-end">
-                                    <label for="title-input" class="form-label">Titre</label>
-                                    <input type="text" class="form-control" id="title-input" name="title" value="{$chosenArticle->Title}">
-                                </div>
-                                <div class="mb-3">
-                                    <label for="quill-editor" class="form-label">Contenu</label>
-                                    <div id="quill-editor"></div>
-                                    <input type="hidden" name="content" id="content-input">
-                                </div>
-                            </form>
-                        </div>
+                                {if $canEdit}
+                                    <div class="d-flex gap-2 ms-auto">
+                                        <button id="save-btn" class="btn btn-success" style="display: none;">Enregistrer</button>
+                                        <button id="cancel-btn" class="btn btn-secondary" style="display: none;">Annuler</button>
+                                    </div>
+                                {/if}
+                            </div>
+                            <hr class="w-100 my-3">
+                            <div class="d-flex gap-2 align-items-end">
+                                <label for="title-input" class="form-label">Titre</label>
+                                <input type="text" class="form-control" id="title-input" name="title" value="{$chosenArticle->Title}">
+                            </div>
+                            <div class="mb-3">
+                                <label for="quill-editor" class="form-label">Contenu</label>
+                                <div id="quill-editor"></div>
+                                <input type="hidden" name="content" id="content-input">
+                            </div>
+                        </form>
+                    </div>
+                    {/if}
+                    {if $hasSurvey && $userConnected}
+                    <button id="reply-survey-btn" class="btn btn-success">Répondre au sondage</button>
                     {/if}
                 </div>
             </div>
@@ -232,7 +236,6 @@
                             [{ 'color': [] }, { 'background': [] }],
                             [{ 'list': 'ordered' }, { 'list': 'bullet' }],
                             ['link', 'image'],
-                            ['clean'],
                         ]
                     }
                 });
@@ -404,7 +407,6 @@
                 replySurveyBtn.addEventListener('click', function() {
                     const surveyModal = new bootstrap.Modal(document.getElementById('surveyModal'));
                     
-                    // Charger le sondage
                     fetch('/surveys/reply/{$chosenArticle->Id}')
                         .then(response => response.json())
                         .then(data => {
@@ -417,7 +419,6 @@
                                         <h4>${data.survey.question}</h4>
                                         <div class="mb-3">
                                 `;
-                                
                                 data.survey.options.forEach(option => {
                                     html += `
                                         <div class="form-check">
@@ -428,12 +429,10 @@
                                         </div>
                                     `;
                                 });
-                                
                                 html += `
                                         </div>
                                     </form>
                                 `;
-                                
                                 container.innerHTML = html;
                                 surveyModal.show();
                             } else {
@@ -446,7 +445,6 @@
                         });
                 });
                 
-                // Gestion de la soumission du sondage
                 document.getElementById('submit-survey').addEventListener('click', function() {
                     const form = document.getElementById('survey-form');
                     const surveyId = form.querySelector('input[name="survey_id"]').value;

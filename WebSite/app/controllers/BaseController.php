@@ -94,6 +94,8 @@ abstract class BaseController
         else if($_SESSION['navbar'] == 'eventManager') return '../admin/eventManager.latte';
         else if($_SESSION['navbar'] == 'personManager') return '../admin/personManager.latte';
         else if($_SESSION['navbar'] == 'webmaster') return '../admin/webmaster.latte';
+        else if($_SESSION['navbar'] == 'redactor') return '../admin/redactor.latte';
+        else if($_SESSION['navbar'] == '') return '../home.latte';
         
         die('Fatal error in file ' . __FILE__ . ' at line ' . __LINE__ . " with navbar=" . $_SESSION['navbar']);
     }

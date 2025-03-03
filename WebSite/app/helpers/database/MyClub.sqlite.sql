@@ -214,6 +214,7 @@ INSERT INTO "Authorization" VALUES (1,'Webmaster');
 INSERT INTO "Authorization" VALUES (2,'PersonManager');
 INSERT INTO "Authorization" VALUES (3,'EventManager');
 INSERT INTO "Authorization" VALUES (4,'Redactor');
+INSERT INTO "Authorization" VALUES (5,'Editor');
 INSERT INTO "Group" VALUES (1,'Webmaster',0,0);
 INSERT INTO "GroupAuthorization" VALUES (1,1,1);
 INSERT INTO "Metadata" VALUES (1,'MyClub',1);

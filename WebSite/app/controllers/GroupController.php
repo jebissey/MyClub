@@ -26,6 +26,7 @@ class GroupController extends BaseController implements CrudControllerInterface
                 WHERE Inactivated = 0
                 GROUP BY g.Id, g.Name
                 $having
+                ORDER BY g.Name
             ");
             $groups = $query->fetchAll(PDO::FETCH_ASSOC);
             echo $this->latte->render('app/views/groups/index.latte', $this->params->getAll([

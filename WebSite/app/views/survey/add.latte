@@ -1,11 +1,11 @@
-{extends '../layout.latte'}
+{extends '../admin/redactor.latte'}
 
 {block content}
 <div class="container mt-4">
-    <h1>Ajouter un sondage à l'article: {$article->Title}</h1>
+    <h1>Ajouter un sondage à l'article: {$article['Title']}</h1>
     
     <form action="/surveys/create" method="POST">
-        <input type="hidden" name="article_id" value="{$article->Id}">
+        <input type="hidden" name="article_id" value="{$article['Id']}">
         
         <div class="mb-3">
             <label for="question" class="form-label">Question du sondage</label>
@@ -29,11 +29,13 @@
         
         <div class="mb-3">
             <button type="submit" class="btn btn-primary">Créer le sondage</button>
-            <a href="/articles/{$article->Id}" class="btn btn-secondary">Annuler</a>
+            <a href="/articles/{$article['Id']}" class="btn btn-secondary">Annuler</a>
         </div>
     </form>
 </div>
+{/block}
 
+{block scripts}
 <script>
     document.getElementById('add-option').addEventListener('click', function() {
         const container = document.getElementById('options-container');
@@ -49,7 +51,6 @@
             
             container.querySelector('.mb-3').appendChild(newOption);
             
-            // Enable all remove buttons if we have more than 2 options
             if (optionCount + 1 > 2) {
                 const removeButtons = document.querySelectorAll('.remove-option');
                 removeButtons.forEach(button => {
@@ -67,7 +68,6 @@
             if (options.length > 2) {
                 e.target.parentNode.remove();
                 
-                // Disable remove buttons if we only have 2 options left
                 if (options.length - 1 <= 2) {
                     const removeButtons = document.querySelectorAll('.remove-option');
                     removeButtons.forEach(button => {
