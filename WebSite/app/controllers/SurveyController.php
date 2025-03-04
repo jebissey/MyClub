@@ -56,47 +56,52 @@ class SurveyController extends BaseController
 
     public function showReplyForm($articleId)
     {
-        // Désactiver tout output buffering potentiel
-        while (ob_get_level()) {
-            ob_end_clean();
-        }
-        
-        $survey = $this->fluent->from('Survey')
-            ->where('IdArticle', $articleId)
-            ->fetch();
-    
-        if (!$survey) {
-            // Définir manuellement les en-têtes
-            header('Content-Type: application/json');
-            echo json_encode(['success' => false, 'message' => 'Aucun sondage trouvé']);
-            exit; // Important pour arrêter l'exécution
-        }
-        
-        try {
-            $options = json_decode($survey->Options);
-            
-            // Vérifier si le décodage a réussi
-            if (json_last_error() !== JSON_ERROR_NONE) {
-                throw new Exception("Erreur de décodage JSON : " . json_last_error_msg());
+        if ($person = $this->getPerson([])) {
+            if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+                $survey = $this->fluent->from('Survey')
+                    ->where('IdArticle', $articleId)
+                    ->fetch();
+
+                if (!$survey) {
+                    header('Content-Type: application/json');
+                    echo json_encode(['success' => false, 'message' => "Aucun sondage trouvé pour l'article $articleId"]);
+                    exit;
+                }
+
+                try {
+                    $options = json_decode($survey['Options']);
+                    if (json_last_error() !== JSON_ERROR_NONE) {
+                        throw new Exception("Erreur de décodage JSON : " . json_last_error_msg());
+                    }
+
+                    $previousReply = $this->fluent->from('Reply')
+                        ->where('IdSurvey', $survey['Id'])
+                        ->where('IdPerson', $person['Id'])
+                        ->fetch();
+
+                    $previousAnswers = $previousReply ? json_decode($previousReply['Answers'], true) : null;
+
+                    header('Content-Type: application/json');
+                    echo json_encode([
+                        'success' => true,
+                        'survey' => [
+                            'id' => $survey['Id'],
+                            'question' => $survey['Question'],
+                            'options' => $options,
+                            'previousAnswers' => $previousAnswers
+                        ]
+                    ]);
+                } catch (Exception $e) {
+                    header('Content-Type: application/json');
+                    echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+                }
+                exit;
+            } else {
+                $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
             }
-            
-            // Définir manuellement les en-têtes
-            header('Content-Type: application/json');
-            echo json_encode([
-                'success' => true,
-                'survey' => [
-                    'id' => $survey->Id,
-                    'question' => $survey->Question,
-                    'options' => $options
-                ]
-            ]);
-        } catch (Exception $e) {
-            // En cas d'erreur, renvoyer un message d'erreur
-            header('Content-Type: application/json');
-            echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+        } else {
+            $this->application->error403(__FILE__, __LINE__);
         }
-        
-        exit; // Important pour arrêter l'exécution
     }
 
     public function saveReply()
@@ -105,45 +110,45 @@ class SurveyController extends BaseController
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $json = file_get_contents('php://input');
                 $data = json_decode($json, true);
-
                 $surveyId = $data['survey_id'] ?? null;
-                $userEmail = $data['user_email'] ?? '';
-                $answers = isset($data['answers']) ? json_encode($data['answers']) : '[]';
-
-                if (!$surveyId || empty($userEmail)) {
+                if (!$surveyId) {
+                    http_response_code(400);
+                    header('Content-Type: application/json');
                     echo json_encode(['success' => false, 'message' => 'Données manquantes']);
-                    return;
+                    exit;
                 }
-
-                if (!$person) {
-                    return json_encode(['success' => false, 'message' => 'Utilisateur non trouvé']);
-                }
+                $answers = isset($data['survey_answers']) ? json_encode($data['survey_answers']) : '[]';
 
                 $existingReply = $this->fluent->from('Reply')
-                    ->where('IdPerson', $person->Id)
+                    ->where('IdPerson', $person['Id'])
                     ->where('IdSurvey', $surveyId)
                     ->fetch();
                 if ($existingReply) {
                     $this->fluent->update('Reply')
                         ->set(['Answers' => $answers])
-                        ->where('Id', $existingReply->Id)
+                        ->where('Id', $existingReply['Id'])
                         ->execute();
                 } else {
                     $this->fluent->insertInto('Reply')
                         ->values([
-                            'IdPerson' => $person->Id,
+                            'IdPerson' => $person['Id'],
                             'IdSurvey' => $surveyId,
                             'Answers' => $answers
                         ])
                         ->execute();
                 }
-
-                return json_encode(['success' => true]);
+                header('Content-Type: application/json');
+                echo json_encode(['success' => true]);
+                exit;
             } else {
-                $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
+                http_response_code(470);
+                header('Content-Type: application/json');
+                echo json_encode(['success' => false, 'message' => 'Bad request method']);
             }
         } else {
-            $this->application->error403(__FILE__, __LINE__);
+            http_response_code(403);
+            header('Content-Type: application/json');
+            echo json_encode(['success' => false, 'message' => 'Utilisateur non trouvé']);
         }
     }
 

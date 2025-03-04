@@ -76,6 +76,7 @@
 {/block}
 
 {block content}
+    <div id="liveAlertPlaceholder"></div>
     <div class="container">
         {if isset($messages['success'])}
         <div class="alert alert-success alert-dismissible">
@@ -91,88 +92,88 @@
         {/if}
 
         {if $chosenArticle}
-            <div class="card mb-4">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <div>
-                        <h2 class="card-title" id="article-title-display">{$chosenArticle->Title}</h2>
-                        <small class="text-muted">
-                            Publié par {$chosenArticle->FirstName} {$chosenArticle->LastName} 
-                            le {date('d/m/Y', strtotime($chosenArticle->Timestamp))}
-                            {if isset($chosenArticle->Published) && $chosenArticle->Published}
-                                <span class="badge bg-success">Publié</span>
-                            {else}
-                                <span class="badge bg-secondary">Non publié</span>
-                            {/if}
-                            {if isset($chosenArticle->GroupName) && $chosenArticle->GroupName}
-                                <span class="badge bg-info">Groupe: {$chosenArticle->GroupName}</span>
-                            {/if}
-                        </small>
-                    </div>
-                    {if $canEdit}
-                    <button id="edit-toggle-btn" class="btn btn-primary">Modifier</button>
-                    <a href="/surveys/add/{$id}" class="btn btn-success">Ajouter un sondage</a>
-                        {if $hasSurvey}
-                    <button id="show-survey-results-btn" class="btn btn-info" onclick="window.location.href='/surveys/results/{$chosenArticle->Id}'">Voir résultats sondage</button>
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <div>
+                    <h2 class="card-title" id="article-title-display">{$chosenArticle->Title}</h2>
+                    <small class="text-muted">
+                        Publié par {$chosenArticle->FirstName} {$chosenArticle->LastName} 
+                        le {date('d/m/Y', strtotime($chosenArticle->Timestamp))}
+                        {if isset($chosenArticle->Published) && $chosenArticle->Published}
+                            <span class="badge bg-success">Publié</span>
+                        {else}
+                            <span class="badge bg-secondary">Non publié</span>
                         {/if}
-                    {/if}
-                    <a href="/articles" class="btn btn-secondary">Retour à la liste</a>
+                        {if isset($chosenArticle->GroupName) && $chosenArticle->GroupName}
+                            <span class="badge bg-info">Groupe: {$chosenArticle->GroupName}</span>
+                        {/if}
+                    </small>
                 </div>
-                <div class="card-body">
-                    <div id="content-display">
-                        {$chosenArticle->Content|noescape}
-                    </div>
-                    
-                    {if $canEdit}
-                    <div id="editor-container">
-                        <form id="edit-form" method="post">
-                            <div class="d-flex align-items-center gap-4">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="published-input" name="published" value="1" 
-                                        {if isset($chosenArticle->Published) && $chosenArticle->Published}checked{/if}>
-                                    <label class="form-check-label" for="published-input">
-                                        Publier
-                                    </label>
-                                </div>
-
-                                <div class="d-flex align-items-center gap-2">
-                                    <label for="group-select" class="form-label mb-0 text-nowrap">Groupe associé</label>
-                                    <select class="form-select" id="group-select" name="idGroup">
-                                        <option value="">-- Aucun groupe --</option>
-                                        {foreach $groups as $group}
-                                        <option value="{$group['Id']}" {if isset($chosenArticle->IdGroup) && $chosenArticle->IdGroup == $group['Id']}selected{/if}>{$group['Name']}</option>
-                                        {/foreach}
-                                    </select>
-                                </div>
-
-                                {if $canEdit}
-                                    <div class="d-flex gap-2 ms-auto">
-                                        <button id="save-btn" class="btn btn-success" style="display: none;">Enregistrer</button>
-                                        <button id="cancel-btn" class="btn btn-secondary" style="display: none;">Annuler</button>
-                                    </div>
-                                {/if}
-                            </div>
-                            <hr class="w-100 my-3">
-                            <div class="d-flex gap-2 align-items-end">
-                                <label for="title-input" class="form-label">Titre</label>
-                                <input type="text" class="form-control" id="title-input" name="title" value="{$chosenArticle->Title}">
-                            </div>
-                            <div class="mb-3">
-                                <label for="quill-editor" class="form-label">Contenu</label>
-                                <div id="quill-editor"></div>
-                                <input type="hidden" name="content" id="content-input">
-                            </div>
-                        </form>
-                    </div>
+                {if $canEdit}
+                <button id="edit-toggle-btn" class="btn btn-primary">Modifier</button>
+                <a href="/surveys/add/{$id}" class="btn btn-success">Ajouter un sondage</a>
+                    {if $hasSurvey}
+                <button id="show-survey-results-btn" class="btn btn-info" onclick="window.location.href='/surveys/results/{$chosenArticle->Id}'">Voir résultats sondage</button>
                     {/if}
-                    {if $hasSurvey && $userConnected}
-                    <button id="reply-survey-btn" class="btn btn-success">Répondre au sondage</button>
-                    {/if}
-                </div>
+                {/if}
+                <a href="/articles" class="btn btn-secondary">Retour à la liste</a>
             </div>
+            <div class="card-body">
+                <div id="content-display">
+                    {$chosenArticle->Content|noescape}
+                </div>
+                
+                {if $canEdit}
+                <div id="editor-container">
+                    <form id="edit-form" method="post">
+                        <div class="d-flex align-items-center gap-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="published-input" name="published" value="1" 
+                                    {if isset($chosenArticle->Published) && $chosenArticle->Published}checked{/if}>
+                                <label class="form-check-label" for="published-input">
+                                    Publier
+                                </label>
+                            </div>
+
+                            <div class="d-flex align-items-center gap-2">
+                                <label for="group-select" class="form-label mb-0 text-nowrap">Groupe associé</label>
+                                <select class="form-select" id="group-select" name="idGroup">
+                                    <option value="">-- Aucun groupe --</option>
+                                    {foreach $groups as $group}
+                                    <option value="{$group['Id']}" {if isset($chosenArticle->IdGroup) && $chosenArticle->IdGroup == $group['Id']}selected{/if}>{$group['Name']}</option>
+                                    {/foreach}
+                                </select>
+                            </div>
+
+                            {if $canEdit}
+                                <div class="d-flex gap-2 ms-auto">
+                                    <button id="save-btn" class="btn btn-success" style="display: none;">Enregistrer</button>
+                                    <button id="cancel-btn" class="btn btn-secondary" style="display: none;">Annuler</button>
+                                </div>
+                            {/if}
+                        </div>
+                        <hr class="w-100 my-3">
+                        <div class="d-flex gap-2 align-items-end">
+                            <label for="title-input" class="form-label">Titre</label>
+                            <input type="text" class="form-control" id="title-input" name="title" value="{$chosenArticle->Title}">
+                        </div>
+                        <div class="mb-3">
+                            <label for="quill-editor" class="form-label">Contenu</label>
+                            <div id="quill-editor"></div>
+                            <input type="hidden" name="content" id="content-input">
+                        </div>
+                    </form>
+                </div>
+                {/if}
+                {if $hasSurvey && $userConnected}
+                <button id="reply-survey-btn" class="btn btn-success">Répondre au sondage</button>
+                {/if}
+            </div>
+        </div>
         {else}
-            <div class="alert alert-info">
-                Aucun article disponible.
-            </div>
+        <div class="alert alert-info">
+            Aucun article disponible.
+        </div>
         {/if}
         
         {if count($latestArticleTitles) > 0}
@@ -191,22 +192,22 @@
     </div>
 
     <div class="modal fade" id="surveyModal" tabindex="-1" aria-labelledby="surveyModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="surveyModalLabel">Répondre au sondage</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body" id="survey-form-container">
-                <p>Chargement du sondage...</p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
-                <button type="button" class="btn btn-primary" id="submit-survey">Envoyer</button>
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="surveyModalLabel">Répondre au sondage</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="survey-form-container">
+                    <p>Chargement du sondage...</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                    <button type="button" class="btn btn-primary" id="submit-survey">Envoyer</button>
+                </div>
             </div>
         </div>
     </div>
-</div>
 {/block}
 
 {block scripts}
@@ -399,6 +400,7 @@
             }
 
         {/if}
+        const ARTICLE_ID = {$chosenArticle->Id};
     </script>
     <script n:syntax="off">
         document.addEventListener('DOMContentLoaded', function() {
@@ -407,7 +409,7 @@
                 replySurveyBtn.addEventListener('click', function() {
                     const surveyModal = new bootstrap.Modal(document.getElementById('surveyModal'));
                     
-                    fetch('/surveys/reply/{$chosenArticle->Id}')
+                    fetch(`/surveys/reply/${ARTICLE_ID}`)
                         .then(response => response.json())
                         .then(data => {
                             if (data.success) {
@@ -420,9 +422,15 @@
                                         <div class="mb-3">
                                 `;
                                 data.survey.options.forEach(option => {
+                                    const isChecked = data.survey.previousAnswers && 
+                                        data.survey.previousAnswers.includes(option) ? 'checked' : '';
                                     html += `
                                         <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" name="survey_answers" value="${option}" id="option-${option.replace(/\s+/g, '-')}">
+                                            <input class="form-check-input" type="checkbox" 
+                                                name="survey_answers" 
+                                                value="${option}" 
+                                                id="option-${option.replace(/\s+/g, '-')}"
+                                                ${isChecked}>
                                             <label class="form-check-label" for="option-${option.replace(/\s+/g, '-')}">
                                                 ${option}
                                             </label>
@@ -431,24 +439,62 @@
                                 });
                                 html += `
                                         </div>
+                                        <div class="text-center">
+                                            <button type="button" id="submit-survey" class="btn btn-primary">
+                                                ${data.survey.previousAnswers ? 'Mettre à jour' : 'Répondre'}
+                                            </button>
+                                        </div>
                                     </form>
                                 `;
                                 container.innerHTML = html;
+
+                                document.getElementById('submit-survey').addEventListener('click', function() {
+                                    const selectedOptions = Array.from(
+                                        document.querySelectorAll('input[name="survey_answers"]:checked')
+                                    ).map(checkbox => checkbox.value);
+                                    
+                                    if (selectedOptions.length === 0) {
+                                        alert('Veuillez sélectionner au moins une option.');
+                                        return;
+                                    }
+                                    const formData = {
+                                        survey_id: document.querySelector('input[name="survey_id"]').value,
+                                        survey_answers: selectedOptions,
+                                    };
+                                    fetch('/surveys/reply', {
+                                        method: 'POST',
+                                        headers: {
+                                            'Content-Type': 'application/json'
+                                        },
+                                        body: JSON.stringify(formData)
+                                    })
+                                    .then(response => response.json())
+                                    .then(result => {
+                                        if (result.success) {
+                                            appendAlert('Votre réponse a été enregistrée avec succès.', 'info');
+                                            surveyModal.hide();
+                                        } else {
+                                            appendAlert('Erreur_1 : '+ result.message, 'danger');
+                                        }
+                                    })
+                                    .catch(error => {
+                                        appendAlert('Erreur_2 : ' + error, 'danger');
+                                    });
+                                });
+                                
                                 surveyModal.show();
                             } else {
-                                alert('Erreur: ' + data.message);
+                                appendAlert('Erreur_3 : ' + data.message, 'danger');
                             }
                         })
                         .catch(error => {
-                            console.error('Erreur:', error);
-                            alert('Une erreur est survenue lors du chargement du sondage.');
+                            appendAlert('Erreur_4 : ', error, 'danger');
                         });
                 });
                 
                 document.getElementById('submit-survey').addEventListener('click', function() {
                     const form = document.getElementById('survey-form');
                     const surveyId = form.querySelector('input[name="survey_id"]').value;
-                    const userEmail = form.querySelector('input[name="user_email"]').value;
                     
                     const checkboxes = form.querySelectorAll('input[name="survey_answers"]:checked');
                     const answers = Array.from(checkboxes).map(checkbox => checkbox.value);
@@ -465,7 +511,6 @@
                         },
                         body: JSON.stringify({
                             survey_id: surveyId,
-                            user_email: userEmail,
                             answers: answers
                         }),
                     })
@@ -473,9 +518,9 @@
                     .then(data => {
                         if (data.success) {
                             bootstrap.Modal.getInstance(document.getElementById('surveyModal')).hide();
-                            alert('Votre réponse a été enregistrée. Merci!');
+                            appendAlert('Votre réponse a été enregistrée. Merci!', 'info');
                         } else {
-                            alert('Erreur: ' + data.message);
+                            appendAlert('Erreur: ' + data.message, 'danger');
                         }
                     })
                     .catch(error => {
