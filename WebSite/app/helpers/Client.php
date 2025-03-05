@@ -2,32 +2,38 @@
 
 namespace app\helpers;
 
+use UAParser\Parser;
+
 class Client
 {
-    function getBrowser()
+    private $browser;
+    private $version;
+    private $os;
+    private $device;
+
+    public function __construct() {
+        $parser = Parser::create();
+        $result = $parser->parse($_SERVER['HTTP_USER_AGENT']);
+
+        $this->browser = $result->ua->family;
+        $this->version = $result->ua->major;
+        $this->os = $result->os->family;
+        $this->device = $result->device->family;
+    }
+
+    public function getBrowser()
     {
-        $userAgent = $_SERVER['HTTP_USER_AGENT'];
-        $browser = 'Inconnu';
-        $browser_array = array(
-            '/mobile/i'    => 'Handheld Browser',
-            '/msie/i'      => 'Internet Explorer',
-            '/trident/i'   => 'Internet Explorer',
-            '/firefox/i'   => 'Firefox',
-            '/safari/i'    => 'Safari',
-            '/chrome/i'    => 'Chrome',
-            '/edg/i'       => 'Edge',
-            '/opera/i'     => 'Opera',
-            '/netscape/i'  => 'Netscape',
-            '/maxthon/i'   => 'Maxthon',
-            '/konqueror/i' => 'Konqueror'
-        );
-        foreach ($browser_array as $regex => $value) {
-            if (preg_match($regex, $userAgent)) {
-                $browser = $value;
-                break;
-            }
-        }
-        return $browser;
+        return $this->browser . " " . $this->version;
+    }
+
+    public function getOS()
+    {
+        return $this->os;
+    }
+
+    function getType()
+    {
+        return $this->device;
     }
 
     function getIp()
@@ -47,44 +53,6 @@ class Client
         return $_SERVER['HTTP_REFERER'] ?? '';
     }
 
-    function getOs()
-    {
-        $userAgent = $_SERVER['HTTP_USER_AGENT'];
-        $osPlatform  = "Inconnu";
-        $osArray     = array(
-            '/windows nt 10/i'      =>  'Windows 10',
-            '/windows nt 6.3/i'     =>  'Windows 8.1',
-            '/windows nt 6.2/i'     =>  'Windows 8',
-            '/windows nt 6.1/i'     =>  'Windows 7',
-            '/windows nt 6.0/i'     =>  'Windows Vista',
-            '/windows nt 5.2/i'     =>  'Windows Server 2003/XP x64',
-            '/windows nt 5.1/i'     =>  'Windows XP',
-            '/windows xp/i'         =>  'Windows XP',
-            '/windows nt 5.0/i'     =>  'Windows 2000',
-            '/windows me/i'         =>  'Windows ME',
-            '/win98/i'              =>  'Windows 98',
-            '/win95/i'              =>  'Windows 95',
-            '/win16/i'              =>  'Windows 3.11',
-            '/macintosh|mac os x/i' =>  'Mac OS X',
-            '/mac_powerpc/i'        =>  'Mac OS 9',
-            '/linux/i'              =>  'Linux',
-            '/ubuntu/i'             =>  'Ubuntu',
-            '/iphone/i'             =>  'iPhone',
-            '/ipod/i'               =>  'iPod',
-            '/ipad/i'               =>  'iPad',
-            '/android/i'            =>  'Android',
-            '/blackberry/i'         =>  'BlackBerry',
-            '/webos/i'              =>  'Mobile'
-        );
-        foreach ($osArray as $regex => $value) {
-            if (preg_match($regex, $userAgent)) {
-                $osPlatform = $value;
-                break;
-            }
-        }
-        return $osPlatform;
-    }
-
     function getScreenResolution()
     {
         if (isset($_COOKIE['screen_resolution'])) {
@@ -98,18 +66,6 @@ class Client
     function getToken()
     {
         return $_SESSION['token'] ?? '';
-    }
-
-    function getType()
-    {
-        $userAgent = $_SERVER['HTTP_USER_AGENT'];
-        if (preg_match('/(android|bb\\d+|meego).+mobile|avantgo|bada\\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\\.(browser|link)|vodafone|wap|windows (ce|phone)|xda|xiino/i', $userAgent)) {
-            return 'Mobile';
-        }
-        if (preg_match('/(tablet|ipad|playbook|silk)|(android(?!.*mobile))/i', $userAgent)) {
-            return 'Tablette';
-        }
-        return 'PC';
     }
 
     function getUri()

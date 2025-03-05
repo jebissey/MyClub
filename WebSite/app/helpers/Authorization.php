@@ -43,6 +43,11 @@ class Authorization
         return in_array('Redactor', $this->authorizations);
     }
 
+    public function isEditor(): bool
+    {
+        return in_array('Editor', $this->authorizations);
+    }
+
     public function isWebmaster(): bool
     {
         return in_array('Webmaster', $this->authorizations);

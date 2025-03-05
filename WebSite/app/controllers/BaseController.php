@@ -81,6 +81,7 @@ abstract class BaseController
                     'isEventManager' => $this->authorizations->isEventManager(),
                     'isPersonManager' => $this->authorizations->isPersonManager(),
                     'isRedactor' => $this->authorizations->isRedactor(),
+                    'isEditor' => $this->authorizations->isEditor(),
                     'isWebmaster' => $this->authorizations->isWebmaster(),
                     'page' => explode('/', trim(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/'))[$segment]
                 ]);

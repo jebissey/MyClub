@@ -97,7 +97,7 @@
                 <div>
                     <h2 class="card-title" id="article-title-display">{$chosenArticle->Title}</h2>
                     <small class="text-muted">
-                        Publié par {$chosenArticle->FirstName} {$chosenArticle->LastName} 
+                        Créé par {$chosenArticle->FirstName} {$chosenArticle->LastName} 
                         le {date('d/m/Y', strtotime($chosenArticle->Timestamp))}
                         {if isset($chosenArticle->Published) && $chosenArticle->Published}
                             <span class="badge bg-success">Publié</span>
@@ -165,7 +165,7 @@
                     </form>
                 </div>
                 {/if}
-                {if $hasSurvey && $userConnected}
+                {if $hasSurvey && $userConnected && isset($chosenArticle->Published) && $chosenArticle->Published}
                 <button id="reply-survey-btn" class="btn btn-success">Répondre au sondage</button>
                 {/if}
             </div>

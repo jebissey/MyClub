@@ -161,7 +161,9 @@ class UserController extends BaseController
         $articles = $articleController->getLatestArticles($userEmail);
         echo $this->latte->render('app/views/home.latte', $this->params->getAll([
             'latestArticle' => $articles['latestArticle'],
-            'latestArticleTitles' => $articles['latestArticleTitles']
+            'latestArticleTitles' => $articles['latestArticleTitles'],
+            'greatings' => $this->settings->get('Greatings'),
+            'link' => $this->settings->get('Link')
         ]));
     }
 
