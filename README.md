@@ -36,3 +36,9 @@ Security is based on groups. There are three types of group. Groups with authori
 - Change WebSite/app/Images/favicon.ico with yours.
 - You can add, change or remove emoji files. 48x48 image with name emoji...
 - You can also change the other images. Keep size and name.
+
+## How to fix
+If you have this : "Error : could not find driverFatal error in file .../app/helpers/database/Database.php at line 38", you have to had "extension=pdo_sqlite.so" in your php.ini
+
+## How to test
+https://myclub.alwaysdata.net/
