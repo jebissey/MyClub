@@ -204,7 +204,7 @@ $flight->route('GET  /persons',            function()    use ($personController)
 $flight->route('GET  /persons/create',     function()    use ($personController) { $personController->create(); });
 $flight->route('GET  /persons/edit/@id',   function($id) use ($personController) { $personController->edit($id); });
 $flight->route('POST /persons/edit/@id',   function($id) use ($personController) { $personController->edit($id); });
-$flight->route('POST /persons/delete/@id', function($id) use ($personController) { $personController->delete($id); });
+$flight->route('GET  /persons/delete/@id', function($id) use ($personController) { $personController->delete($id); });
 
 $eventController = $container->get('app\controllers\EventController');
 $flight->route('GET  /eventManager',      function()    use ($eventController) { $eventController->home(); });
