@@ -109,4 +109,64 @@ class WebmasterController extends BaseController
             $this->application->error403(__FILE__, __LINE__);
         }
     }
+
+    public function rssGenerator()
+    {
+        $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https://' : 'http://';
+        $domain = $_SERVER['HTTP_HOST'];
+        $base_url = $protocol . $domain;
+        
+        $site_title = "Liste d'articles";
+        $site_url = $base_url;
+        $feed_url = $base_url . "/rss.xml";
+        $feed_description = "Mises à jour de la liste d'articles";
+    
+        $query = $this->fluent->from('Article')
+            ->select('Article.Id, Article.Title, Article.Timestamp')
+            ->select('CASE WHEN Survey.IdArticle IS NOT NULL THEN "oui" ELSE "non" END AS HasSurvey')
+            ->innerJoin('Person ON Article.CreatedBy = Person.Id')
+            ->leftJoin('Survey ON Article.Id = Survey.IdArticle')
+            ->where('(Article.IdGroup IS NULL)')
+            ->where('(Article.Published = 1)');
+        if ($person = $this->getPerson([])) {
+            $query = $query->whereOr('Article.IdGroup IN (SELECT IdGroup FROM PersonGroup WHERE IdPerson = ' . $person['Id'] . ')');
+        }
+        $query = $query->orderBy('Article.Timestamp DESC');
+        $articles = $query->fetchAll();
+    
+        $rss_content = $this->generateRSS($articles, $site_title, $site_url, $feed_url, $feed_description);
+        
+        $rss_file_path = $_SERVER['DOCUMENT_ROOT'] . '/rss.xml';
+        file_put_contents($rss_file_path, $rss_content);
+        
+        header("Refresh: 2; URL=$site_url/articles");
+    }
+
+    private function generateRSS($articles, $site_title, $site_url, $feed_url, $feed_description)
+    {
+        $rss = '<?xml version="1.0" encoding="UTF-8"?>';
+        $rss .= '<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">';
+        $rss .= '<channel>';
+        $rss .= '<title>' . htmlspecialchars($site_title) . '</title>';
+        $rss .= '<link>' . htmlspecialchars($site_url) . '</link>';
+        $rss .= '<description>' . htmlspecialchars($feed_description) . '</description>';
+        $rss .= '<language>fr-fr</language>';
+        $rss .= '<lastBuildDate>' . date(DATE_RSS) . '</lastBuildDate>';
+        $rss .= '<atom:link href="' . htmlspecialchars($feed_url) . '" rel="self" type="application/rss+xml" />';
+    
+        foreach ($articles as $article) {
+            $rss .= '<item>';
+            $rss .= '<title>' . htmlspecialchars($article['Title']) . '</title>';
+            $rss .= '<link>' . htmlspecialchars($site_url . '/articles/' . $article['Id']) . '</link>';
+            $rss .= '<guid>' . htmlspecialchars($site_url . '/articles/' . $article['Id']) . '</guid>';
+            $rss .= '<pubDate>' . date(DATE_RSS, strtotime($article['Timestamp'])) . '</pubDate>';
+            $rss .= '<description>Article' . ($article['HasSurvey'] === 'oui' ? ' avec sondage' : '') . '</description>';
+            $rss .= '</item>';
+        }
+    
+        $rss .= '</channel>';
+        $rss .= '</rss>';
+    
+        return $rss;
+    }
 }

@@ -2,6 +2,10 @@
 
 {block title}Articles{/block}
 
+{block head}
+<link rel="alternate" type="application/rss+xml" title="Flux RSS des articles" href="/rss.xml" />
+{/block}
+
 {block content}
     {if $isRedactor}
         {include '../common/dataTable.latte',
@@ -32,4 +36,7 @@
             ]
         }
     {/if}
+    <a href="/rss.xml" class="rss-link">
+        <img src="app/images/Feed-icon.svg" alt="RSS" width="16" height="16"> S'abonner au flux RSS
+    </a>
 {/block}

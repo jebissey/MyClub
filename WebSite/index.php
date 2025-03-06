@@ -176,6 +176,7 @@ $flight->route('GET  /webmaster',            function() use ($webmasterControlle
 $flight->route('GET  /arwards',              function() use ($webmasterController) { $webmasterController->arwards(); });
 $flight->route('POST /arwards',              function() use ($webmasterController) { $webmasterController->arwards(); });
 $flight->route('GET  /admin/webmaster/help', function() use ($webmasterController) { $webmasterController->help(); });
+$flight->route('GET  /rss.xml',              function() use ($webmasterController) { $webmasterController->rssGenerator(); });
 
 $logController = $container->get('app\controllers\LogController');
 $flight->route('GET  /logs',          function() use ($logController) { $logController->index(); });

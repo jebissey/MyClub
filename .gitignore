@@ -3,3 +3,4 @@ WebSite/var/*
 WebSite/data/*
 WebSite/backup/*
 doc/*.pdf
+WebSite/rss.xml
