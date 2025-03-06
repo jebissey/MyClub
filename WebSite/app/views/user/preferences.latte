@@ -15,38 +15,75 @@
                 </div>
 
                 <div id="alertOptions">
-                    <div class="list-group">
-                    <p class="card-text">Sélectionnez les type d'évènement pour lesquels vous souhaitez recevoir une alerte :</p>
-                        {foreach $eventTypes as $eventType}
-                            <div class="list-group-item">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <div class="form-check">
-                                            <input type="checkbox" class="form-check-input event-type-checkbox" 
-                                                id="eventType{$eventType['Id']}"
-                                                name="preferences[eventTypes][{$eventType['Id']}][enabled]"
-                                                {isset($currentPreferences['eventTypes'][$eventType['Id']]['enabled']) ? checked : ''}>
-                                            <label class="form-check-label" for="eventType{$eventType['Id']}">
-                                                {$eventType['Name']}
-                                            </label>
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">Sélectionnez les type d'évènement pour lesquels vous souhaitez recevoir une alerte :</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="list-group">
+                                {foreach $eventTypes as $eventType}
+                                <div class="list-group-item">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <div class="form-check">
+                                                <input type="checkbox" class="form-check-input event-type-checkbox" 
+                                                    id="eventType{$eventType['Id']}"
+                                                    name="preferences[eventTypes][{$eventType['Id']}][enabled]"
+                                                    {isset($currentPreferences['eventTypes'][$eventType['Id']]['enabled']) ? checked : ''}>
+                                                <label class="form-check-label" for="eventType{$eventType['Id']}">
+                                                    {$eventType['Name']}
+                                                </label>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="availability-options" 
-                                        id="availabilityOptions{$eventType['Id']}" 
-                                        {if !isset($currentPreferences['eventTypes'][$eventType['Id']]['enabled']) || !$currentPreferences['eventTypes'][$eventType['Id']]['enabled']}style="display: none;"{/if}>
-                                        <div class="form-check">
-                                            <input type="checkbox" class="form-check-input" 
-                                                id="availability{$eventType['Id']}"
-                                                name="preferences[eventTypes][{$eventType['Id']}][available]"
-                                                {isset($currentPreferences['eventTypes'][$eventType['Id']]['available']) ? checked : '' }>
-                                            <label class="form-check-label" for="availability{$eventType['Id']}">
-                                                Si je suis disponible
-                                            </label>
+                                        <div class="availability-options" 
+                                            id="availabilityOptions{$eventType['Id']}" 
+                                            {if !isset($currentPreferences['eventTypes'][$eventType['Id']]['enabled']) || !$currentPreferences['eventTypes'][$eventType['Id']]['enabled']}style="display: none;"{/if}>
+                                            <div class="form-check">
+                                                <input type="checkbox" class="form-check-input" 
+                                                    id="availability{$eventType['Id']}"
+                                                    name="preferences[eventTypes][{$eventType['Id']}][available]"
+                                                    {isset($currentPreferences['eventTypes'][$eventType['Id']]['available']) ? checked : '' }>
+                                                <label class="form-check-label" for="availability{$eventType['Id']}">
+                                                    Si je suis disponible
+                                                </label>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
+                                {/foreach}
                             </div>
-                        {/foreach}
+                        </div>
+                    </div>
+
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <div>
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input event-type-checkbox" 
+                                            id="eventTypeNewArticle"
+                                            name="preferences[eventTypes][newArticle][enabled]"
+                                            {isset($currentPreferences['eventTypes']['newArticle']['enabled']) ? checked : ''}>
+                                        <label class="form-check-label" for="eventTypeNewArticle">
+                                            Recevoir une alerte lorsqu'un nouvel article est publié
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="availability-options" 
+                                    id="availabilityOptionsNewArticle" 
+                                    {if !isset($currentPreferences['eventTypes']['newArticle']['enabled']) || !$currentPreferences['eventTypes']['newArticle']['enabled']}style="display: none;"{/if}>
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" 
+                                            id="pollOnlyNewArticle"
+                                            name="preferences[eventTypes][newArticle][pollOnly]"
+                                            {isset($currentPreferences['eventTypes']['newArticle']['pollOnly']) ? checked : '' }>
+                                        <label class="form-check-label" for="pollOnlyNewArticle">
+                                            Uniquement s'il y a un sondage
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -59,7 +96,7 @@
 {/block}
 
 {block scripts}
-    <script>
+<script>
     document.addEventListener('DOMContentLoaded', function() {
         const noAlertsCheckbox = document.getElementById('noAlerts');
         const alertOptionsContainer = document.getElementById('alertOptions');
@@ -82,7 +119,9 @@
                     
                     const eventTypeId = checkbox.id.replace('eventType', '');
                     const availabilityOptions = document.getElementById('availabilityOptions' + eventTypeId);
-                    availabilityOptions.style.display = 'none';
+                    if (availabilityOptions) {
+                        availabilityOptions.style.display = 'none';
+                    }
                 });
             } else {
                 alertOptionsContainer.style.display = 'block';
@@ -91,7 +130,6 @@
         
         eventTypeCheckboxes.forEach(checkbox => {
             checkbox.addEventListener('change', function() {
-                // Si une case de type d'événement est cochée, décocher "Ne recevoir aucune alerte"
                 if (this.checked) {
                     noAlertsCheckbox.checked = false;
                 }
@@ -106,6 +144,18 @@
                 }
             });
         });
+        
+        const newArticleCheckbox = document.getElementById('eventTypeNewArticle');
+        const pollOnlyOptions = document.getElementById('availabilityOptionsNewArticle');
+        
+        newArticleCheckbox.addEventListener('change', function() {
+            if (this.checked) {
+                noAlertsCheckbox.checked = false;
+                pollOnlyOptions.style.display = 'block';
+            } else {
+                pollOnlyOptions.style.display = 'none';
+            }
+        });
     });
-    </script>
+</script>
 {/block}
