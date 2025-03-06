@@ -3,7 +3,7 @@
 namespace app\controllers;
 
 use PDO;
-
+use app\helpers\Backup;
 
 class ArticleController extends TableController
 {
@@ -42,7 +42,7 @@ class ArticleController extends TableController
             ->where('(Article.Published = 1)');
         if ($person) {
             $query = $query->whereOr('Article.CreatedBy = ' . $person['Id'])
-                ->whereOr('Article.IdGroup IN (SELECT IdGroup FROM PersonGroup WHERE IdPerson = ' . $person['Id'] . ')'); 
+                ->whereOr('Article.IdGroup IN (SELECT IdGroup FROM PersonGroup WHERE IdPerson = ' . $person['Id'] . ')');
         }
         $query = $query->orderBy('Article.Timestamp DESC');
         $data = $this->prepareTableData($query, $filterValues, $_GET['tablePage'] ?? null);
@@ -133,6 +133,7 @@ class ArticleController extends TableController
                 $result = $query->execute([$title, $content, $published, $idGroup, $id]);
                 if ($result) {
                     $_SESSION['success'] = "L'article a été mis à jour avec succès";
+                    (new Backup())->save();
                 } else {
                     $_SESSION['error'] = "Une erreur est survenue lors de la mise à jour de l'article";
                 }
