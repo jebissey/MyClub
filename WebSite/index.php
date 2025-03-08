@@ -179,9 +179,11 @@ $flight->route('GET  /admin/webmaster/help', function() use ($webmasterControlle
 $flight->route('GET  /rss.xml',              function() use ($webmasterController) { $webmasterController->rssGenerator(); });
 
 $logController = $container->get('app\controllers\LogController');
-$flight->route('GET  /logs',          function() use ($logController) { $logController->index(); });
-$flight->route('GET  /referers',      function() use ($logController) { $logController->referers(); });
-$flight->route('GET  /visitors/graf', function() use ($logController) { $logController->visitorsGraf(); });
+$flight->route('GET  /logs',                       function() use ($logController) { $logController->index(); });
+$flight->route('GET  /referers',                   function() use ($logController) { $logController->referers(); });
+$flight->route('GET  /visitors/graf',              function() use ($logController) { $logController->visitorsGraf(); });
+$flight->route('GET  /analytics',                  function() use ($logController) { $logController->analytics(); });
+$flight->route('GET  /analytics/visitorsByDate',   function() use ($logController) { $logController->getVisitorsByDate(); });
 
 $groupController = $container->get('app\controllers\GroupController');
 $flight->route('GET  /groups',            function()    use ($groupController) { $groupController->index(); });

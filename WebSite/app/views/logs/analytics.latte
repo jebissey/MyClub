@@ -1,0 +1,247 @@
+{layout '../admin/webmaster.latte'}
+
+{block content}
+<div class="container mt-4">
+    <h1>{$title}</h1>
+    
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title">Systèmes d'exploitation</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="osChart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title">Navigateurs</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="browserChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title">Résolutions d'écran</h5>
+                </div>
+                <div class="card-body" style="height: 330px;">
+                    <canvas id="resolutionChart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title">Matériel</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="typeChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title">Visiteurs par jour</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="visitorsTimeChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}
+
+{block scripts}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Configuration des couleurs
+    const colorPalette = [
+        '#36A2EB', '#FF6384', '#4BC0C0', '#FFCE56', '#9966FF',
+        '#FF9F40', '#8BC34A', '#FF5722', '#607D8B', '#009688'
+    ];
+    
+    const commonOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'right',
+                labels: {
+                    boxWidth: 10,
+                    padding: 10,
+                    font: {
+                        size: 10
+                    }
+                }
+            },
+            title: {
+                display: false
+            }
+        }
+    };
+    
+    const osData = {
+        labels: {$osData['labels']},
+        data: {$osData['data']}
+    };
+    new Chart(document.getElementById('osChart'), {
+        type: 'pie',
+        data: {
+            labels: osData.labels,
+            datasets: [{
+                data: osData.data,
+                backgroundColor: colorPalette,
+                borderWidth: 1
+            }]
+        },
+        options: commonOptions
+    });
+    
+    const browserData = {
+        labels: {$browserData['labels']},
+        data: {$browserData['data']}
+    };
+    new Chart(document.getElementById('browserChart'), {
+        type: 'pie',
+        data: {
+            labels: browserData.labels,
+            datasets: [{
+                data: browserData.data,
+                backgroundColor: colorPalette,
+                borderWidth: 1
+            }]
+        },
+        options: commonOptions
+    });
+    
+    const resolutionData = {
+        labels: {$screenResolutionData['labels']},
+        data: {$screenResolutionData['data']}
+    };
+    new Chart(document.getElementById('resolutionChart'), {
+        type: 'bar',
+        data: {
+            labels: resolutionData.labels,
+            datasets: [{
+                label: 'Visiteurs',
+                data: resolutionData.data,
+                backgroundColor: colorPalette[0],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            ...commonOptions,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        font: {
+                            size: 10
+                        }
+                    }
+                },
+                x: {
+                    ticks: {
+                        font: {
+                            size: 12
+                        },
+                        maxRotation: 45,
+                        minRotation: 45
+                    }
+                }
+            }
+        }
+    });
+    
+    // Graphique des types
+    const typeData = {
+        labels: {$typeData['labels']},
+        data: {$typeData['data']}
+    };
+    
+    new Chart(document.getElementById('typeChart'), {
+        type: 'doughnut',
+        data: {
+            labels: typeData.labels,
+            datasets: [{
+                data: typeData.data,
+                backgroundColor: colorPalette,
+                borderWidth: 1
+            }]
+        },
+        options: commonOptions
+    });
+    
+    // Charger les données de visiteurs par jour via AJAX
+    fetch('/analytics/visitorsByDate')
+        .then(response => response.json())
+        .then(data => {
+            new Chart(document.getElementById('visitorsTimeChart'), {
+                type: 'line',
+                data: {
+                    labels: data.labels,
+                    datasets: [{
+                        label: 'Nombre de visiteurs',
+                        data: data.data,
+                        borderColor: colorPalette[0],
+                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                        borderWidth: 2,
+                        fill: true
+                    }]
+                },
+                options: {
+                    ...commonOptions,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                boxWidth: 10,
+                                font: {
+                                    size: 10
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                font: {
+                                    size: 10
+                                }
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                font: {
+                                    size: 8
+                                },
+                                maxRotation: 45,
+                                minRotation: 45
+                            }
+                        }
+                    }
+                }
+            });
+        })
+        .catch(error => {
+            console.error('Erreur lors du chargement des données chronologiques:', error);
+        });
+});
+</script>
+{/block}

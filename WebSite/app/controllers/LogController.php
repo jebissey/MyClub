@@ -9,12 +9,14 @@ use PDO;
 class LogController extends BaseController
 {
     private PDO $pdoForLog;
+    private $fluentForLog;
     private string $host;
 
     public function __construct(PDO $pdo, Engine $flight)
     {
         parent::__construct($pdo, $flight);
         $this->pdoForLog = \app\helpers\database\Database::getInstance()->getPdoForLog();
+        $this->fluentForLog = new \Envms\FluentPDO\Query($this->pdoForLog);
         $this->host = 'https://' . $_SERVER['HTTP_HOST'] . '%';
     }
 
@@ -446,5 +448,147 @@ class LogController extends BaseController
             default:
                 return '';
         }
+    }
+
+
+
+
+
+    public function analytics()
+    {
+        if ($this->getPerson(['Webmaster'])) {
+
+            $this->latte->render('app/views/logs/analytics.latte', $this->params->getAll([
+                'osData' => $this->getOsDistribution(),
+                'browserData' => $this->getBrowserDistribution(),
+                'screenResolutionData' => $this->getScreenResolutionDistribution(),
+                'typeData' => $this->getTypeDistribution(),
+                'title' => 'Synthèse des visiteurs'
+            ]));
+        } else {
+            $this->application->error403(__FILE__, __LINE__);
+        }
+    }
+
+    private function getOsDistribution()
+    {
+        $query = $this->fluentForLog
+            ->from('Log')
+            ->select('Os, COUNT(*) as count')
+            ->groupBy('Os')
+            ->orderBy('count DESC');
+
+        $results = $query->fetchAll();
+
+        $labels = [];
+        $data = [];
+
+        foreach ($results as $row) {
+            $labels[] = $row['Os'] ?: 'Inconnu';
+            $data[] = $row['count'];
+        }
+        return [
+            'labels' => $labels,
+            'data' => $data
+        ];
+    }
+
+    private function getBrowserDistribution()
+    {
+        $query = $this->fluentForLog
+            ->from('Log')
+            ->select('Browser, COUNT(*) as count')
+            ->groupBy('Browser')
+            ->orderBy('count DESC');
+
+        $results = $query->fetchAll();
+
+        $labels = [];
+        $data = [];
+
+        foreach ($results as $row) {
+            $labels[] = $row['Browser'] ?: 'Inconnu';
+            $data[] = $row['count'];
+        }
+
+        return [
+            'labels' => $labels,
+            'data' => $data
+        ];
+    }
+
+    private function getScreenResolutionDistribution()
+    {
+        $query = $this->fluentForLog
+            ->from('Log')
+            ->select('ScreenResolution, COUNT(*) as count')
+            ->groupBy('ScreenResolution')
+            ->orderBy('count DESC');
+
+        $results = $query->fetchAll();
+
+        $labels = [];
+        $data = [];
+
+        foreach ($results as $row) {
+            $labels[] = $row['ScreenResolution'] ?: 'Inconnu';
+            $data[] = $row['count'];
+        }
+
+        return [
+            'labels' => $labels,
+            'data' => $data
+        ];
+    }
+
+    private function getTypeDistribution()
+    {
+        $query = $this->fluentForLog
+            ->from('Log')
+            ->select('Type, COUNT(*) as count')
+            ->groupBy('Type')
+            ->orderBy('count DESC');
+
+        $results = $query->fetchAll();
+
+        $labels = [];
+        $data = [];
+
+        foreach ($results as $row) {
+            $labels[] = $row['Type'] ?: 'Inconnu';
+            $data[] = $row['count'];
+        }
+
+        return [
+            'labels' => $labels,
+            'data' => $data
+        ];
+    }
+
+    public function getVisitorsByDate()
+    {
+        // Format date: utilise strftime ou datetime selon votre configuration
+        $query = $this->fluentForLog
+            ->from('Log')
+            ->select('date(CreatedAt) as date, COUNT(*) as count')
+            ->groupBy('date(CreatedAt)')
+            ->orderBy('date');
+
+        $results = $query->fetchAll();
+
+        $dates = [];
+        $counts = [];
+
+        foreach ($results as $row) {
+            $dates[] = $row['date'];
+            $counts[] = $row['count'];
+        }
+
+        header('Content-Type: application/json');
+        echo json_encode([
+            'labels' => $dates,
+            'data' => $counts
+        ]);
+        exit;
     }
 }
