@@ -29,6 +29,10 @@
                 <input type="text" name="code" class="form-control" placeholder="Filtrer par Code" 
                        value="{$filters['code'] ?? ''}">
             </div>
+            <div class="col-md-3">
+                <input type="text" name="uri" class="form-control" placeholder="Filtrer par URI" 
+                       value="{$filters['uri'] ?? ''}">
+            </div>
             <div class="col-12">
                 <button type="submit" class="btn btn-primary">Filtrer</button>
                 <a href="/admin/webmaster/logs" class="btn btn-secondary">Réinitialiser</a>
