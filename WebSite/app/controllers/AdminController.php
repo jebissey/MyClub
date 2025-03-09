@@ -45,10 +45,11 @@ class AdminController extends BaseController
         $pdoForLog = \app\helpers\database\Database::getInstance()->getPdoForLog();
         $query = $pdoForLog->prepare('INSERT INTO Log(IpAddress, Referer, Os, Browser, ScreenResolution, Type, Uri, Token, Who, Code, Message) 
         VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ? ,?)');
-        $query->execute([$_SERVER['REMOTE_ADDR'], $_SERVER['HTTP_REFERER'] ?? '', '', '', '', '', $_SERVER['REQUEST_URI'], '', '', '', '']);
+        $query->execute([$_SERVER['REMOTE_ADDR'], $_SERVER['HTTP_REFERER'] ?? '', '', '', '', '', $_SERVER['REQUEST_URI'], '', '', '', $_SERVER['HTTP_USER_AGENT']]);
 
 
         header('Content-Type: application/json');
         echo json_encode(['lastVersion' => self::VERSION]);
+        exit();
     }
 }

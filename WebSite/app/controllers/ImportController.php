@@ -128,7 +128,7 @@ class ImportController extends BaseController
     {
         if (!isset($_FILES['csvFile']) || $_FILES['csvFile']['error'] != 0) {
             echo json_encode(['error' => 'Fichier non valide']);
-            return;
+            exit();
         }
 
         $headerRow = intval($_POST['headerRow']);
@@ -147,5 +147,6 @@ class ImportController extends BaseController
         fclose($file);
 
         echo json_encode(['headers' => $headers]);
+        exit();
     }
 }

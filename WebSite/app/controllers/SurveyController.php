@@ -80,7 +80,7 @@ class SurveyController extends BaseController
                 if (!$survey) {
                     header('Content-Type: application/json');
                     echo json_encode(['success' => false, 'message' => "Aucun sondage trouvé pour l'article $articleId"]);
-                    exit;
+                    exit();
                 }
 
                 try {
@@ -110,7 +110,6 @@ class SurveyController extends BaseController
                     header('Content-Type: application/json');
                     echo json_encode(['success' => false, 'message' => $e->getMessage()]);
                 }
-                exit;
             } else {
                 header('Content-Type: application/json', true, 470);
                 echo json_encode(['success' => false, 'message' => 'Bad request method']);
@@ -119,6 +118,7 @@ class SurveyController extends BaseController
             header('Content-Type: application/json', true, 403);
             echo json_encode(['success' => false, 'message' => 'User not found']);
         }
+        exit();
     }
 
     public function saveReply()
@@ -131,7 +131,7 @@ class SurveyController extends BaseController
                 if (!$surveyId) {
                     header('Content-Type: application/json', true, 400);
                     echo json_encode(['success' => false, 'message' => 'Données manquantes']);
-                    exit;
+                    exit();
                 }
                 $answers = isset($data['survey_answers']) ? json_encode($data['survey_answers']) : '[]';
 
@@ -155,7 +155,6 @@ class SurveyController extends BaseController
                 }
                 header('Content-Type: application/json');
                 echo json_encode(['success' => true]);
-                exit;
             } else {
                 header('Content-Type: application/json', true, 470);
                 echo json_encode(['success' => false, 'message' => 'Bad request method']);
@@ -164,6 +163,7 @@ class SurveyController extends BaseController
             header('Content-Type: application/json', true, 403);
             echo json_encode(['success' => false, 'message' => 'User not found']);
         }
+        exit();
     }
 
     public function viewResults($articleId)

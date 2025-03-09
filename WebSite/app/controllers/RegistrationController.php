@@ -149,7 +149,7 @@ class RegistrationController extends TableController
             if ($hasAuthorizations && !$this->authorizations->isWebmaster() && !$this->authorizations->isPersonManager()) {
                 http_response_code(403);
                 echo json_encode(['success' => false, 'message' => 'Unauthorized']);
-                return;
+                exit();
             }
 
             $insert = $this->pdo->prepare("INSERT INTO PersonGroup (IdPerson, IdGroup) VALUES (?, ?)");
@@ -159,6 +159,7 @@ class RegistrationController extends TableController
         } else {
             echo json_encode(['success' => false, 'message' => 'Unauthorized']);
         }
+        exit();
     }
 
     public function removeFromGroup($personId, $groupId)
@@ -171,7 +172,7 @@ class RegistrationController extends TableController
             if ($hasAuthorizations && !$this->authorizations->isWebmaster() && !$this->authorizations->isPersonManager()) {
                 http_response_code(403);
                 echo json_encode(['success' => false, 'message' => 'Unauthorized']);
-                return;
+                exit();
             }
 
             $delete = $this->pdo->prepare("DELETE FROM PersonGroup WHERE IdPerson = ? AND IdGroup = ?");
@@ -181,5 +182,6 @@ class RegistrationController extends TableController
         } else {
             echo json_encode(['success' => false, 'message' => 'Unauthorized']);
         }
+        exit();
     }
 }

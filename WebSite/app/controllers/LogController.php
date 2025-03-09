@@ -590,7 +590,6 @@ class LogController extends BaseController
                     'labels' => $dates,
                     'data' => $counts
                 ]);
-                exit;
             } else {
                 header('Content-Type: application/json', true, 470);
                 echo json_encode(['success' => false, 'message' => 'Bad request method']);
@@ -599,5 +598,6 @@ class LogController extends BaseController
             header('Content-Type: application/json', true, 403);
             echo json_encode(['success' => false, 'message' => 'User not found']);
         }
+        exit();
     }
 }
