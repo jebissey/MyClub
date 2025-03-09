@@ -2,10 +2,12 @@
 
 {block navbar}
     {include '../navbar/webmaster.latte'}
+{/block}
 
+{block content}
     {if isset($newVersion)}
     <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        {$newVersion}
+        <h3><a href="https://github.com/jebissey/MyClub/releases">{$newVersion}</a></h3>
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
     {/if}

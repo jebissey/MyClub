@@ -15,6 +15,7 @@ use app\helpers\Settings;
 abstract class BaseController
 {
     protected const VERSION = 0.3;
+
     protected PDO $pdo;
     protected $fluent;
     protected Engine $flight;

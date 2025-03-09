@@ -25,14 +25,11 @@ class WebmasterController extends BaseController
                 $_SESSION['navbar'] = 'webmaster';
 
                 $newVersion = null;
-                try {
-                    $lastVersion = file_get_contents('https://myclub.alwaysdata.net/api/lastVersion');
+                if ($lastVersion = $this->getLastVersion()) {
                     if ($lastVersion != self::VERSION) {
                         $newVersion = "A new version is available (V$lastVersion)";
                     }
-                } catch (Exception) {
                 }
-
                 echo $this->latte->render('app/views/admin/webmaster.latte', $this->params->getAll(['newVersion' => $newVersion]));
             } else {
                 $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
@@ -179,5 +176,29 @@ class WebmasterController extends BaseController
         $rss .= '</rss>';
 
         return $rss;
+    }
+
+    private function getLastVersion()
+    {
+        $options = [
+            "http" => [
+                "method" => "GET",
+                "header" => "User-Agent: PHP/" . PHP_VERSION . "\r\nAccept: application/json\r\n",
+            ],
+            "ssl" => [
+                "verify_peer" => false,
+                "verify_peer_name" => false,
+            ],
+        ];
+        $url = "https://myclub.alwaysdata.net/api/lastVersion";
+        $response = file_get_contents($url, false, stream_context_create($options));
+
+        if ($response !== false) {
+            $data = json_decode($response, true);
+            if ($data !== null) {
+                return $data["lastVersion"];
+            }
+        }
+        return false;
     }
 }
