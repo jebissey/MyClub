@@ -110,7 +110,7 @@
                     </small>
                 </div>
                 {if $canEdit}
-                <button id="edit-toggle-btn" class="btn btn-primary">Modifier</button>
+                <button id="edit-toggle-btn" class="btn btn-primary">Modifier l'article</button>
                     {if $hasSurvey}
                 <a href="/surveys/add/{$id}" class="btn btn-success">Modifier le sondage</a>
                 <button id="show-survey-results-btn" class="btn btn-info" onclick="window.location.href='/surveys/results/{$chosenArticle->Id}'">Voir résultats sondage</button>

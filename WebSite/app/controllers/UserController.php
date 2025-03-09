@@ -83,7 +83,8 @@ class UserController extends BaseController
                     'userEmail' => '',
                     'keys' => false,
                     'page' => basename(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH)),
-                    'token' => $token
+                    'token' => $token,
+                    'currentVersion' => self::VERSION
                 ]);
             } else {
                 $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
@@ -124,7 +125,8 @@ class UserController extends BaseController
                 'userImg' => '../../app/images/anonymat.png',
                 'userEmail' => '',
                 'keys' => false,
-                'page' => basename(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH))
+                'page' => basename(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH)),
+                'currentVersion' => self::VERSION
             ]);
         } else {
             $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
@@ -155,7 +157,8 @@ class UserController extends BaseController
                 'href' => '/user/sign/in',
                 'userImg' => '../../app/images/anonymat.png',
                 'userEmail' => '',
-                'keys' => false
+                'keys' => false,
+                'currentVersion' => self::VERSION
             ]);
         }
         $articles = $articleController->getLatestArticles($userEmail);

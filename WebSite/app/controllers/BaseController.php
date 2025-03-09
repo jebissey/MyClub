@@ -14,6 +14,7 @@ use app\helpers\Settings;
 
 abstract class BaseController
 {
+    protected const VERSION = 0.3;
     protected PDO $pdo;
     protected $fluent;
     protected Engine $flight;
@@ -57,7 +58,8 @@ abstract class BaseController
                 'isPersonManager' => false,
                 'isRedactor' => false,
                 'isWebmaster' => false,
-                'page' => explode('/', trim(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/'))[$segment]
+                'page' => explode('/', trim(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/'))[$segment],
+                'currentVersion' => self::VERSION
             ]);
             return false;
         } else {
@@ -83,7 +85,8 @@ abstract class BaseController
                     'isRedactor' => $this->authorizations->isRedactor(),
                     'isEditor' => $this->authorizations->isEditor(),
                     'isWebmaster' => $this->authorizations->isWebmaster(),
-                    'page' => explode('/', trim(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/'))[$segment]
+                    'page' => explode('/', trim(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/'))[$segment],
+                    'currentVersion' => self::VERSION
                 ]);
                 return $person;
             }

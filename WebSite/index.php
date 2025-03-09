@@ -168,8 +168,9 @@ $flight->route('POST /user/groups',                       function()            
 $flight->route('GET  /user/help',                         function()              use ($userController) { $userController->help(); });
 
 $adminController = $container->get('app\controllers\AdminController');
-$flight->route('GET  /admin',      function() use ($adminController) { $adminController->home(); });
-$flight->route('GET  /admin/help', function() use ($adminController) { $adminController->help(); });
+$flight->route('GET  /admin',           function() use ($adminController) { $adminController->home(); });
+$flight->route('GET  /admin/help',      function() use ($adminController) { $adminController->help(); });
+$flight->route('GET  /api/lastVersion', function() use ($adminController) { $adminController->lastVersion(); });
 
 $webmasterController = $container->get('app\controllers\WebmasterController');
 $flight->route('GET  /webmaster',            function() use ($webmasterController) { $webmasterController->home(); });
