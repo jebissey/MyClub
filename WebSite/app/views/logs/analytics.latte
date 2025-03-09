@@ -54,7 +54,7 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-header">
-                    <h5 class="card-title">Visiteurs par jour</h5>
+                    <h5 class="card-title">Visites par jour</h5>
                 </div>
                 <div class="card-body">
                     <canvas id="visitorsTimeChart"></canvas>
@@ -138,7 +138,7 @@ document.addEventListener('DOMContentLoaded', function() {
         data: {
             labels: resolutionData.labels,
             datasets: [{
-                label: 'Visiteurs',
+                label: 'Visites',
                 data: resolutionData.data,
                 backgroundColor: colorPalette[0],
                 borderWidth: 1
@@ -187,8 +187,7 @@ document.addEventListener('DOMContentLoaded', function() {
         options: commonOptions
     });
     
-    // Charger les données de visiteurs par jour via AJAX
-    fetch('/analytics/visitorsByDate')
+    fetch('/api/analytics/visitorsByDate')
         .then(response => response.json())
         .then(data => {
             new Chart(document.getElementById('visitorsTimeChart'), {
@@ -196,7 +195,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 data: {
                     labels: data.labels,
                     datasets: [{
-                        label: 'Nombre de visiteurs',
+                        label: 'Nombre de visites',
                         data: data.data,
                         borderColor: colorPalette[0],
                         backgroundColor: 'rgba(54, 162, 235, 0.2)',

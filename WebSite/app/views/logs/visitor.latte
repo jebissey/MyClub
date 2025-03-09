@@ -2,10 +2,12 @@
 
 {block content}
 <div class="container mt-4">
-    <div class="d-flex align-items-center justify-content-between">
+    <div class="d-flex align-items-center justify-content-between pb-2">
         <h2 class="mb-0">Logs</h2>
-        <a href="/visitors/graf" class="btn btn-primary">Graphes</a>
-        <a href="/analytics" class="btn btn-secondary">Synthèse</a>
+        <div class="ms-auto">
+            <a href="/visitors/graf" class="btn btn-primary ms-2">Graphes</a>
+            <a href="/analytics" class="btn btn-secondary ms-2">Synthèse</a>
+        </div>
     </div>
     
     <form method="GET" class="mb-4">
@@ -36,7 +38,7 @@
             </div>
             <div class="col-12">
                 <button type="submit" class="btn btn-primary">Filtrer</button>
-                <a href="/admin/webmaster/logs" class="btn btn-secondary">Réinitialiser</a>
+                <a href="/logs" class="btn btn-secondary">Réinitialiser</a>
 
                 <nav aria-label="Page navigation">
                     <ul class="pagination justify-content-center">

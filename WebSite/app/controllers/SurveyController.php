@@ -13,13 +13,16 @@ class SurveyController extends BaseController
                 $article = $this->fluent->from('Article')
                     ->where('Id', $articleId)
                     ->fetch();
-
                 if (!$article) {
                     $this->flight->redirect('/articles');
                 }
+                $survey = $this->fluent->from('Survey')
+                ->where('IdArticle', $article['Id'])
+                ->fetch();
 
                 $this->latte->render('app/views/survey/add.latte', $this->params->getAll([
-                    'article' => $article
+                    'article' => $article,
+                    'survey' => $survey
                 ]));
             } else {
                 $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
@@ -29,7 +32,7 @@ class SurveyController extends BaseController
         }
     }
 
-    public function create()
+    public function createOrUpdate()
     {
         if ($this->getPerson(['Redactor'])) {
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -37,13 +40,25 @@ class SurveyController extends BaseController
                 $question = $_POST['question'] ?? '';
                 $options = isset($_POST['options']) ? json_encode($_POST['options']) : '[]';
 
-                $this->fluent->insertInto('Survey')
-                    ->values([
-                        'Question' => $question,
-                        'Options' => $options,
-                        'IdArticle' => $articleId
-                    ])
-                    ->execute();
+                $survey = $this->fluent->from('Survey')
+                    ->where('IdArticle', $articleId)
+                    ->fetch();
+                if ($survey) {
+                    $this->fluent->update('Survey')
+                        ->set(['Question' => $question])
+                        ->set(['Options' => $options])
+                        ->where('Id', $survey['Id'])
+                        ->execute();
+                } else {
+
+                    $this->fluent->insertInto('Survey')
+                        ->values([
+                            'Question' => $question,
+                            'Options' => $options,
+                            'IdArticle' => $articleId
+                        ])
+                        ->execute();
+                }
 
                 $this->flight->redirect('/articles/' . $articleId);
             } else {
@@ -97,10 +112,12 @@ class SurveyController extends BaseController
                 }
                 exit;
             } else {
-                $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
+                header('Content-Type: application/json', true, 470);
+                echo json_encode(['success' => false, 'message' => 'Bad request method']);
             }
         } else {
-            $this->application->error403(__FILE__, __LINE__);
+            header('Content-Type: application/json', true, 403);
+            echo json_encode(['success' => false, 'message' => 'User not found']);
         }
     }
 
@@ -112,8 +129,7 @@ class SurveyController extends BaseController
                 $data = json_decode($json, true);
                 $surveyId = $data['survey_id'] ?? null;
                 if (!$surveyId) {
-                    http_response_code(400);
-                    header('Content-Type: application/json');
+                    header('Content-Type: application/json', true, 400);
                     echo json_encode(['success' => false, 'message' => 'Données manquantes']);
                     exit;
                 }
@@ -141,14 +157,12 @@ class SurveyController extends BaseController
                 echo json_encode(['success' => true]);
                 exit;
             } else {
-                http_response_code(470);
-                header('Content-Type: application/json');
+                header('Content-Type: application/json', true, 470);
                 echo json_encode(['success' => false, 'message' => 'Bad request method']);
             }
         } else {
-            http_response_code(403);
-            header('Content-Type: application/json');
-            echo json_encode(['success' => false, 'message' => 'Utilisateur non trouvé']);
+            header('Content-Type: application/json', true, 403);
+            echo json_encode(['success' => false, 'message' => 'User not found']);
         }
     }
 
@@ -175,13 +189,13 @@ class SurveyController extends BaseController
         }
 
         foreach ($replies as $reply) {
-            $answers = json_decode($reply->Answers);
+            $answers = json_decode($reply['Answers']);
             $person = $this->fluent->from('Person')
-                ->where('Id', $reply->IdPerson)
+                ->where('Id', $reply['IdPerson'])
                 ->fetch();
 
             $participants[] = [
-                'name' => $person->FirstName . ' ' . $person->LastName,
+                'name' => $person['FirstName'] . ' ' . $person['LastName'],
                 'answers' => $answers
             ];
 

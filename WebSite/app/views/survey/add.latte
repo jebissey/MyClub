@@ -2,33 +2,50 @@
 
 {block content}
 <div class="container mt-4">
+    {if $survey}
+    <h1>Modifier le sondage de l'article: {$article['Title']}</h1>
+    {else}
     <h1>Ajouter un sondage à l'article: {$article['Title']}</h1>
-    
+    {/if}
     <form action="/surveys/create" method="POST">
         <input type="hidden" name="article_id" value="{$article['Id']}">
         
         <div class="mb-3">
             <label for="question" class="form-label">Question du sondage</label>
-            <input type="text" class="form-control" id="question" name="question" required>
+            <input type="text" class="form-control" id="question" name="question" value="{if $survey}{$survey['Question']}{/if}" required>
         </div>
         
         <div id="options-container">
             <div class="mb-3">
                 <label class="form-label">Options (réponses possibles)</label>
-                <div class="d-flex mb-2">
-                    <input type="text" class="form-control me-2" name="options[]" required>
-                    <button type="button" class="btn btn-danger remove-option" disabled>-</button>
-                </div>
-                <div class="d-flex mb-2">
-                    <input type="text" class="form-control me-2" name="options[]" required>
-                    <button type="button" class="btn btn-danger remove-option" disabled>-</button>
-                </div>
+                {if $survey}
+                    {var $surveyOptions = json_decode($survey['Options'], true)}
+                    {foreach $surveyOptions as $optionText}
+                    <div class="d-flex mb-2">
+                        <input type="text" class="form-control me-2" name="options[]" value="{$optionText}" required>
+                        <button type="button" class="btn btn-danger remove-option" {if count($surveyOptions) <= 2}disabled{/if}>-</button>
+                    </div>
+                    {/foreach}
+                {else}
+                    <div class="d-flex mb-2">
+                        <input type="text" class="form-control me-2" name="options[]" required>
+                        <button type="button" class="btn btn-danger remove-option" disabled>-</button>
+                    </div>
+                    <div class="d-flex mb-2">
+                        <input type="text" class="form-control me-2" name="options[]" required>
+                        <button type="button" class="btn btn-danger remove-option" disabled>-</button>
+                    </div>
+                {/if}
             </div>
             <button type="button" id="add-option" class="btn btn-secondary mb-3">Ajouter une option</button>
         </div>
         
         <div class="mb-3">
+            {if $survey}
+            <button type="submit" class="btn btn-primary">Modifier le sondage</button>
+            {else}
             <button type="submit" class="btn btn-primary">Créer le sondage</button>
+            {/if}
             <a href="/articles/{$article['Id']}" class="btn btn-secondary">Annuler</a>
         </div>
     </form>

@@ -142,11 +142,11 @@ $flight->route('GET  /articles/@id',        function($id) use ($articleControlle
 $flight->route('POST /articles/@id',        function($id) use ($articleController) { $articleController->update($id); });
 
 $surveyController = $container->get('app\controllers\SurveyController');
-$flight->route('GET  /surveys/add/@id',     function($id) use ($surveyController) { $surveyController->add($id); });
-$flight->route('POST /surveys/create',      function()    use ($surveyController) { $surveyController->create(); });
-$flight->route('POST /surveys/reply',       function()    use ($surveyController) { $surveyController->saveReply(); });
-$flight->route('GET  /surveys/reply/@id',   function($id) use ($surveyController) { $surveyController->showReplyForm($id); });
-$flight->route('GET  /surveys/results/@id', function($id) use ($surveyController) { $surveyController->viewResults($id); });
+$flight->route('GET  /surveys/add/@id',       function($id) use ($surveyController) { $surveyController->add($id); });
+$flight->route('POST /surveys/create',        function()    use ($surveyController) { $surveyController->createOrUpdate(); });
+$flight->route('POST /api/surveys/reply',     function()    use ($surveyController) { $surveyController->saveReply(); });
+$flight->route('GET  /api/surveys/reply/@id', function($id) use ($surveyController) { $surveyController->showReplyForm($id); });
+$flight->route('GET  /surveys/results/@id',   function($id) use ($surveyController) { $surveyController->viewResults($id); });
 
 $userController = $container->get('app\controllers\UserController');
 $flight->route('GET  /',                                  function()              use ($userController, $articleController) { $userController->home($articleController); });
@@ -168,8 +168,8 @@ $flight->route('POST /user/groups',                       function()            
 $flight->route('GET  /user/help',                         function()              use ($userController) { $userController->help(); });
 
 $adminController = $container->get('app\controllers\AdminController');
-$flight->route('GET  /admin',            function() use ($adminController) { $adminController->home(); });
-$flight->route('GET  /admin/help',       function() use ($adminController) { $adminController->help(); });
+$flight->route('GET  /admin',      function() use ($adminController) { $adminController->home(); });
+$flight->route('GET  /admin/help', function() use ($adminController) { $adminController->help(); });
 
 $webmasterController = $container->get('app\controllers\WebmasterController');
 $flight->route('GET  /webmaster',            function() use ($webmasterController) { $webmasterController->home(); });
@@ -179,11 +179,11 @@ $flight->route('GET  /admin/webmaster/help', function() use ($webmasterControlle
 $flight->route('GET  /rss.xml',              function() use ($webmasterController) { $webmasterController->rssGenerator(); });
 
 $logController = $container->get('app\controllers\LogController');
-$flight->route('GET  /logs',                       function() use ($logController) { $logController->index(); });
-$flight->route('GET  /referers',                   function() use ($logController) { $logController->referers(); });
-$flight->route('GET  /visitors/graf',              function() use ($logController) { $logController->visitorsGraf(); });
-$flight->route('GET  /analytics',                  function() use ($logController) { $logController->analytics(); });
-$flight->route('GET  /analytics/visitorsByDate',   function() use ($logController) { $logController->getVisitorsByDate(); });
+$flight->route('GET  /logs',                         function() use ($logController) { $logController->index(); });
+$flight->route('GET  /referers',                     function() use ($logController) { $logController->referers(); });
+$flight->route('GET  /visitors/graf',                function() use ($logController) { $logController->visitorsGraf(); });
+$flight->route('GET  /analytics',                    function() use ($logController) { $logController->analytics(); });
+$flight->route('GET  /api/analytics/visitorsByDate', function() use ($logController) { $logController->getVisitorsByDate(); });
 
 $groupController = $container->get('app\controllers\GroupController');
 $flight->route('GET  /groups',            function()    use ($groupController) { $groupController->index(); });

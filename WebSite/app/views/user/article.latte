@@ -111,9 +111,11 @@
                 </div>
                 {if $canEdit}
                 <button id="edit-toggle-btn" class="btn btn-primary">Modifier</button>
-                <a href="/surveys/add/{$id}" class="btn btn-success">Ajouter un sondage</a>
                     {if $hasSurvey}
+                <a href="/surveys/add/{$id}" class="btn btn-success">Modifier le sondage</a>
                 <button id="show-survey-results-btn" class="btn btn-info" onclick="window.location.href='/surveys/results/{$chosenArticle->Id}'">Voir résultats sondage</button>
+                    {else}
+                <a href="/surveys/add/{$id}" class="btn btn-success">Ajouter un sondage</a>
                     {/if}
                 {/if}
                 <a href="/articles" class="btn btn-secondary">Retour à la liste</a>
@@ -409,7 +411,7 @@
                 replySurveyBtn.addEventListener('click', function() {
                     const surveyModal = new bootstrap.Modal(document.getElementById('surveyModal'));
                     
-                    fetch(`/surveys/reply/${ARTICLE_ID}`)
+                    fetch(`/api/surveys/reply/${ARTICLE_ID}`)
                         .then(response => response.json())
                         .then(data => {
                             if (data.success) {
@@ -461,7 +463,7 @@
                                         survey_id: document.querySelector('input[name="survey_id"]').value,
                                         survey_answers: selectedOptions,
                                     };
-                                    fetch('/surveys/reply', {
+                                    fetch('/api/surveys/reply', {
                                         method: 'POST',
                                         headers: {
                                             'Content-Type': 'application/json'
@@ -504,7 +506,7 @@
                         return;
                     }
                     
-                    fetch('/surveys/reply', {
+                    fetch('/api/surveys/reply', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
