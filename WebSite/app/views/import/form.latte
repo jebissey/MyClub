@@ -1,11 +1,11 @@
 {layout '../admin/personManager.latte'}
 
 {block content}
-<div class="container">
+<div class="container-fluid">
     <h2>Import CSV</h2>
     
     {if $results}
-        <div class="container mt-5">
+        <div class="container-fluid">
             {if $results['errors'] > 0}
                 <div class="alert alert-danger alert-dismissible">{$error}</div>
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
