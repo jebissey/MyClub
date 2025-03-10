@@ -224,11 +224,11 @@ class ArticleController extends TableController
         if (empty($groupIds)) {
             return [];
         }
-        $placeholders = implode(',', array_fill(0, count($groupIds), '?'));
+        $groups = implode(',', array_fill(0, count($groupIds), '?'));
         $query = $this->pdo->prepare("
             SELECT DISTINCT Article.Id FROM Article 
             WHERE Article.published = 1 
-            AND Article.IdGroup IN ($placeholders)");
+            AND Article.IdGroup IN ($groups)");
         $query->execute($groupIds);
         return $query->fetchAll(PDO::FETCH_COLUMN);
     }

@@ -13,7 +13,8 @@ class WebmasterController extends BaseController
 
         echo $this->latte->render('app/views/info.latte', [
             'content' => $this->settings->get('Help_webmaster'),
-            'hasAuthorization' => $this->authorizations->hasAutorization()
+            'hasAuthorization' => $this->authorizations->hasAutorization(),
+            'currentVersion' => self::VERSION
         ]);
     }
 

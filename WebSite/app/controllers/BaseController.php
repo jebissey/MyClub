@@ -40,6 +40,10 @@ abstract class BaseController
         $this->settings = new Settings($this->pdo);
     }
 
+    public static function GetVersion()
+    {
+        return self::VERSION;
+    }
 
     protected function sanitizeInput($data)
     {
@@ -95,14 +99,15 @@ abstract class BaseController
     }
 
     protected function getLayout() {
-        if($_SESSION['navbar'] == 'user') return 'user.latte';
-        else if($_SESSION['navbar'] == 'eventManager') return '../admin/eventManager.latte';
-        else if($_SESSION['navbar'] == 'personManager') return '../admin/personManager.latte';
-        else if($_SESSION['navbar'] == 'webmaster') return '../admin/webmaster.latte';
-        else if($_SESSION['navbar'] == 'redactor') return '../admin/redactor.latte';
-        else if($_SESSION['navbar'] == '') return '../home.latte';
+        $navbar = $_SESSION['navbar'] ?? '';
+        if($navbar == 'user') return 'user.latte';
+        else if($navbar == 'eventManager') return '../admin/eventManager.latte';
+        else if($navbar == 'personManager') return '../admin/personManager.latte';
+        else if($navbar == 'webmaster') return '../admin/webmaster.latte';
+        else if($navbar == 'redactor') return '../admin/redactor.latte';
+        else if($navbar == '') return '../home.latte';
         
-        die('Fatal error in file ' . __FILE__ . ' at line ' . __LINE__ . " with navbar=" . $_SESSION['navbar']);
+        die('Fatal error in file ' . __FILE__ . ' at line ' . __LINE__ . " with navbar=" . $navbar);
     }
 
     private function getHref($userEmail)

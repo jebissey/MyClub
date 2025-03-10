@@ -2,6 +2,7 @@
 
 namespace app\helpers;
 
+use app\controllers\BaseController;
 use PDO;
 use flight\Engine;
 use Latte\Engine as LatteEngine;
@@ -13,6 +14,7 @@ class Application
     private Settings $settings;
     private $latte;
     private $authorizations;
+    private $version;
 
     public function __construct(PDO $pdo, Engine $flight)
     {
@@ -21,6 +23,7 @@ class Application
         $this->settings = new Settings($this->pdo);
         $this->latte = new LatteEngine();
         $this->authorizations = new Authorization($this->pdo);
+        $this->version = BaseController::GetVersion();
     }
 
 
@@ -28,7 +31,8 @@ class Application
     {
         echo $this->latte->render('app/views/info.latte', [
             'content' => $this->settings->get('Help_home'),
-            'hasAuthorization' => $this->authorizations->hasAutorization()
+            'hasAuthorization' => $this->authorizations->hasAutorization(),
+            'currentVersion' => $this->version
         ]);
     }
 
@@ -36,7 +40,8 @@ class Application
     {
         echo $this->latte->render('app/views/info.latte', [
             'content' => $this->settings->get('LegalNotices'),
-            'hasAuthorization' => $this->authorizations->hasAutorization()
+            'hasAuthorization' => $this->authorizations->hasAutorization(),
+            'currentVersion' => $this->version
         ]);
     }
 

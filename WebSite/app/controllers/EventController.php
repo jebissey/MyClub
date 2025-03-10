@@ -12,7 +12,8 @@ class EventController extends BaseController
 
         echo $this->latte->render('app/views/info.latte', [
             'content' => $this->settings->get('Help_eventManager'),
-            'hasAuthorization' => $this->authorizations->hasAutorization()
+            'hasAuthorization' => $this->authorizations->hasAutorization(),
+            'currentVersion' => self::VERSION
         ]);
     }
 

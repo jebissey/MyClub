@@ -10,7 +10,8 @@ class AdminController extends BaseController
 
             echo $this->latte->render('app/views/info.latte', $this->params->getAll([
                 'content' => $this->settings->get('Help_admin'),
-                'hasAuthorization' => $this->authorizations->isEventManager()
+                'hasAuthorization' => $this->authorizations->isEventManager(),
+                'currentVersion' => self::VERSION
             ]));
         } else {
             $this->application->error403(__FILE__, __LINE__);
@@ -45,7 +46,7 @@ class AdminController extends BaseController
         $pdoForLog = \app\helpers\database\Database::getInstance()->getPdoForLog();
         $query = $pdoForLog->prepare('INSERT INTO Log(IpAddress, Referer, Os, Browser, ScreenResolution, Type, Uri, Token, Who, Code, Message) 
         VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ? ,?)');
-        $query->execute([$_SERVER['REMOTE_ADDR'], $_SERVER['HTTP_REFERER'] ?? '', '', '', '', '', $_SERVER['REQUEST_URI'], '', '', '', $_SERVER['HTTP_USER_AGENT']]);
+        $query->execute([$_SERVER['REMOTE_ADDR'], $_SERVER['HTTP_REFERER'] ?? '', '', '', '', '', $_SERVER['REQUEST_URI'], '', gethostbyaddr($_SERVER['REMOTE_ADDR']) ??'', '', $_SERVER['HTTP_USER_AGENT']]);
 
 
         header('Content-Type: application/json');

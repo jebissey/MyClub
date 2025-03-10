@@ -353,7 +353,8 @@ class UserController extends BaseController
         if ($this->getPerson()) {
             echo $this->latte->render('app/views/info.latte', $this->params->getAll([
                 'content' => $this->settings->get('Help_user'),
-                'hasAuthorization' => $this->authorizations->hasAutorization()
+                'hasAuthorization' => $this->authorizations->hasAutorization(),
+                'currentVersion' => self::VERSION
             ]));
         } else {
             $this->application->error403(__FILE__, __LINE__);
@@ -364,8 +365,8 @@ class UserController extends BaseController
     {
         $email = filter_var($_SESSION['user'] ?? '', FILTER_VALIDATE_EMAIL);
         $client = new Client();
-        $stmt = $this->pdoForLog->prepare('INSERT INTO Log(IpAddress, Referer, Os, Browser, ScreenResolution, Type, Uri, Token, Who, Code, Message) 
+        $query = $this->pdoForLog->prepare('INSERT INTO Log(IpAddress, Referer, Os, Browser, ScreenResolution, Type, Uri, Token, Who, Code, Message) 
         VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ? ,?)');
-        $stmt->execute([$client->getIp(), $client->getReferer(), $client->getOs(), $client->getBrowser(), $client->getScreenResolution(), $client->getType(), $client->getUri(), $client->getToken(), $email, $code, $message]);
+        $query->execute([$client->getIp(), $client->getReferer(), $client->getOs(), $client->getBrowser(), $client->getScreenResolution(), $client->getType(), $client->getUri(), $client->getToken(), $email, $code, $message]);
     }
 }
