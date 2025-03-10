@@ -109,16 +109,19 @@
                         {/if}
                     </small>
                 </div>
-                {if $canEdit}
-                <button id="edit-toggle-btn" class="btn btn-primary">Modifier l'article</button>
-                    {if $hasSurvey}
-                <a href="/surveys/add/{$id}" class="btn btn-success">Modifier le sondage</a>
-                <button id="show-survey-results-btn" class="btn btn-info" onclick="window.location.href='/surveys/results/{$chosenArticle->Id}'">Voir résultats sondage</button>
-                    {else}
-                <a href="/surveys/add/{$id}" class="btn btn-success">Ajouter un sondage</a>
+                <div class="d-flex justify-content-end">
+                    {if $canEdit}
+                    <a href="/emails/article/{$id}" class="btn btn-warning ms-2">Prévenir les abonnés</a>
+                    <button id="edit-toggle-btn" class="btn btn-primary ms-2">Modifier l'article</button>
+                        {if $hasSurvey}
+                    <a href="/surveys/add/{$id}" class="btn btn-success ms-2">Modifier le sondage</a>
+                    <button id="show-survey-results-btn" class="btn btn-info ms-2" onclick="window.location.href='/surveys/results/{$chosenArticle->Id}'">Voir résultats sondage</button>
+                        {else}
+                    <a href="/surveys/add/{$id}" class="btn btn-success">Ajouter un sondage</a>
+                        {/if}
                     {/if}
-                {/if}
-                <a href="/articles" class="btn btn-secondary">Retour à la liste</a>
+                    <a href="/articles" class="btn btn-secondary ms-2">Retour à la liste</a>
+                </div>
             </div>
             <div class="card-body">
                 <div id="content-display">

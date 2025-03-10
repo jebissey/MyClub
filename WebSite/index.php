@@ -220,9 +220,10 @@ $flight->route('POST /import',         function() use ($importController) { $imp
 $flight->route('POST /import/headers', function() use ($importController) { $importController->getHeadersFromCSV(); });
 
 $emailController = $container->get('app\controllers\EmailController');
-$flight->route('GET  /emails',          function() use ($emailController) { $emailController->fetchEmails(); });
-$flight->route('POST /emails',          function() use ($emailController) { $emailController->fetchEmails(); });
-$flight->route('GET  /copyToClipBoard', function() use ($emailController) { $emailController->copyToClipBoard(); });
+$flight->route('GET  /emails',             function()    use ($emailController) { $emailController->fetchEmails(); });
+$flight->route('POST /emails',             function()    use ($emailController) { $emailController->fetchEmails(); });
+$flight->route('GET  /copyToClipBoard',    function()    use ($emailController) { $emailController->copyToClipBoard(); });
+$flight->route('GET  /emails/article/@id', function($id) use ($emailController) { $emailController->fetchEmailsForArticle($id); });
 
 $dbBrowserController = $container->get('app\controllers\DbBrowserController');
 $flight->route('GET  /dbbrowser',                   function()            use ($dbBrowserController) { $dbBrowserController->index(); });

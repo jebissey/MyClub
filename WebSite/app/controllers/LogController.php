@@ -477,7 +477,6 @@ class LogController extends BaseController
             ->select('Os, COUNT(*) as count')
             ->groupBy('Os')
             ->orderBy('count DESC');
-
         $results = $query->fetchAll();
 
         $labels = [];
