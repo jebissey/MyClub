@@ -140,23 +140,12 @@ class RegistrationController extends TableController
     public function addToGroup($personId, $groupId)
     {
         if ($this->getPerson(['PersonManager', 'Webmaster'])) {
-            $checkAuth = $this->pdo->prepare("
-                SELECT COUNT(*) FROM GroupAuthorization WHERE IdGroup = ?
-            ");
-            $checkAuth->execute([$groupId]);
-            $hasAuthorizations = $checkAuth->fetchColumn() > 0;
-
-            if ($hasAuthorizations && !$this->authorizations->isWebmaster() && !$this->authorizations->isPersonManager()) {
-                http_response_code(403);
-                echo json_encode(['success' => false, 'message' => 'Unauthorized']);
-                exit();
-            }
-
             $insert = $this->pdo->prepare("INSERT INTO PersonGroup (IdPerson, IdGroup) VALUES (?, ?)");
             $success = $insert->execute([$personId, $groupId]);
 
             echo json_encode(['success' => $success]);
         } else {
+            header('Content-Type: application/json', true, 403);
             echo json_encode(['success' => false, 'message' => 'Unauthorized']);
         }
         exit();
@@ -165,21 +154,12 @@ class RegistrationController extends TableController
     public function removeFromGroup($personId, $groupId)
     {
         if ($this->getPerson(['PersonManager', 'Webmaster'])) {
-            $checkAuth = $this->pdo->prepare("SELECT COUNT(*) FROM GroupAuthorization WHERE IdGroup = ?");
-            $checkAuth->execute([$groupId]);
-            $hasAuthorizations = $checkAuth->fetchColumn() > 0;
-
-            if ($hasAuthorizations && !$this->authorizations->isWebmaster() && !$this->authorizations->isPersonManager()) {
-                http_response_code(403);
-                echo json_encode(['success' => false, 'message' => 'Unauthorized']);
-                exit();
-            }
-
             $delete = $this->pdo->prepare("DELETE FROM PersonGroup WHERE IdPerson = ? AND IdGroup = ?");
             $success = $delete->execute([$personId, $groupId]);
 
             echo json_encode(['success' => $success]);
         } else {
+            header('Content-Type: application/json', true, 403);
             echo json_encode(['success' => false, 'message' => 'Unauthorized']);
         }
         exit();

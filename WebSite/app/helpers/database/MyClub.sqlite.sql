@@ -132,9 +132,8 @@ CREATE TABLE IF NOT EXISTS "Page" (
 	"Id"	INTEGER,
 	"Name"	TEXT NOT NULL,
 	"Position"	INTEGER NOT NULL,
-	"File"	TEXT NOT NULL,
-	"Content"	TEXT NOT NULL,
-	"IdGroup"	INTEGER,
+	"Route"	TEXT NOT NULL,
+	"IdGroup"	INTEGER DEFAULT NULL,
 	PRIMARY KEY("Id"),
 	FOREIGN KEY("IdGroup") REFERENCES "Group"("Id")
 );

@@ -1,35 +1,35 @@
-    <div class="container-fluid">
-        <a class="navbar-brand" href="/">
-            <img src="../../app/images/home.png" alt="Home" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Accueil">
-        </a>
+                <div class="container-fluid">
+                    <a class="navbar-brand" href="/">
+                        <img src="../../app/images/home.png" alt="Home" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Accueil">
+                    </a>
 
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-            <span class="navbar-toggler-icon"></span>
-        </button>
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
 
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav">
-                {if $isEventManager}
-                    <li class="nav-item">
-                        <a class="nav-link" href="/eventManager"> Gérer les évènements</a>
-                    </li>
-                {/if}
-                {if $isPersonManager}
-                    <li class="nav-item">
-                        <a class="nav-link" href="/personManager">Gérer les personnes</a>
-                    </li>
-                {/if}
-                {if $isRedactor}
-                    <li class="nav-item">
-                        <a class="nav-link" href="/articles">Rédacteur</a>
-                    </li>
-                {/if}
-                {if $isWebmaster}
-                    <li class="nav-item">
-                        <a class="nav-link" href="/webmaster">Webmaster</a>
-                    </li>
-                {/if}
-            </ul>
-            <a href ="/admin/help"><img src="../../app/images/help.png" alt="Help" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Aide contextuelle"></a>
-        </div>
-    </div>
+                    <div class="collapse navbar-collapse" id="navbarNav">
+                        <ul class="navbar-nav">
+                            {if $isEventManager}
+                            <li class="nav-item">
+                                <a class="nav-link" href="/eventManager"> Gérer les évènements</a>
+                            </li>
+                            {/if}
+                            {if $isPersonManager}
+                            <li class="nav-item">
+                                <a class="nav-link" href="/personManager">Gérer les personnes</a>
+                            </li>
+                            {/if}
+                            {if $isRedactor}
+                            <li class="nav-item">
+                                <a class="nav-link" href="/articles">Rédacteur</a>
+                            </li>
+                            {/if}
+                            {if $isWebmaster}
+                            <li class="nav-item">
+                                <a class="nav-link" href="/webmaster">Webmaster</a>
+                            </li>
+                            {/if}
+                        </ul>
+                        <a href ="/admin/help"><img src="../../app/images/help.png" alt="Help" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Aide contextuelle"></a>
+                    </div>
+                </div>

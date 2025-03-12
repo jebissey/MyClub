@@ -43,12 +43,12 @@ class UserController extends BaseController
                     $message = "Cliquez sur ce lien pour initialiser votre mot de passe : $resetLink";
 
                     if (mail($to, $subject, $message)) {
-                        $this->application->message('Un email a été envoyé pour réinitialiser votre mot de passe');
+                        $this->application->message('Un courriel a été envoyé pour réinitialiser votre mot de passe');
                     } else {
                         $this->application->message("Une erreur est survenue lors de l'envoi de l'email");
                     }
                 } else {
-                    $this->application->message("Un email de réinitialisation a déjà été envoyé à " . substr($person['TokenCreatedAt'], 10) . ". Il est valide pendant 1 heure.");
+                    $this->application->message("Un courriel de réinitialisation a déjà été envoyé à " . substr($person['TokenCreatedAt'], 10) . ". Il est valide pendant 1 heure.");
                 }
             } else {
                 $this->application->error480($email, __FILE__, __LINE__);

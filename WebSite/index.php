@@ -195,10 +195,10 @@ $flight->route('POST /groups/edit/@id',   function($id) use ($groupController) {
 $flight->route('POST /groups/delete/@id', function($id) use ($groupController) { $groupController->delete($id); });
 
 $registrationController = $container->get('app\controllers\RegistrationController');
-$flight->route('GET  /registration',                           function()                    use ($registrationController) { $registrationController->index(); });
-$flight->route('GET  /registration/groups/@id',                function($id)                 use ($registrationController) { $registrationController->getGroups($id); });
-$flight->route('POST /registration/add/@personId/@groupId',    function($personId, $groupId) use ($registrationController) { $registrationController->addToGroup($personId, $groupId); });
-$flight->route('POST /registration/remove/@personId/@groupId', function($personId, $groupId) use ($registrationController) { $registrationController->removeFromGroup($personId, $groupId); });
+$flight->route('GET  /registration',                               function()                    use ($registrationController) { $registrationController->index(); });
+$flight->route('GET  /registration/groups/@id',                    function($id)                 use ($registrationController) { $registrationController->getGroups($id); });
+$flight->route('POST /api/registration/add/@personId/@groupId',    function($personId, $groupId) use ($registrationController) { $registrationController->addToGroup($personId, $groupId); });
+$flight->route('POST /api/registration/remove/@personId/@groupId', function($personId, $groupId) use ($registrationController) { $registrationController->removeFromGroup($personId, $groupId); });
 
 $personController = $container->get('app\controllers\PersonController');
 $flight->route('GET  /personManager',      function()    use ($personController) { $personController->home(); });
@@ -234,6 +234,13 @@ $flight->route('POST /dbbrowser/@table/create',     function($table)      use ($
 $flight->route('GET  /dbbrowser/@table/edit/@id',   function($table, $id) use ($dbBrowserController) { $dbBrowserController->showEditForm($table, $id); });
 $flight->route('POST /dbbrowser/@table/edit/@id',   function($table, $id) use ($dbBrowserController) { $dbBrowserController->updateRecord($table, $id); });
 $flight->route('POST /dbbrowser/@table/delete/@id', function($table, $id) use ($dbBrowserController) { $dbBrowserController->deleteRecord($table, $id); });
+
+$navBarController = $container->get('app\controllers\navBarController');
+$flight->route('GET  /navBar',                     function()    use ($navBarController) { $navBarController->index(); });
+$flight->route('POST /navBar/update',              function()    use ($navBarController) { $navBarController->updatePositions(); });
+$flight->route('POST /api/navBar/saveItem',        function()    use ($navBarController) { $navBarController->saveItem(); });
+$flight->route('GET  /api/navBar/getItem/@id',     function($id) use ($navBarController) { $navBarController->getItem($id); });
+$flight->route('POST /api/navBar/updatePositions', function()    use ($navBarController) { $navBarController->updatePositions(); });
 
 $apiController = $container->get('app\controllers\ApiController');
 $flight->route('GET  /api/persons-by-group/@id', function($id) use ($apiController) { $apiController->getPersonsByGroup($id); });

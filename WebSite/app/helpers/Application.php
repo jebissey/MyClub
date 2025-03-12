@@ -46,7 +46,7 @@ class Application
     }
 
 
-    public function message($message, $timeout = 3000)
+    public function message($message, $timeout = 5000)
     {
         $this->error(200, $message, $timeout);
     }

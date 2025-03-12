@@ -45,7 +45,7 @@ function showGroups(personId) {
 }
 
 function addToGroup(personId, groupId) {
-    fetch(`/registration/add/${personId}/${groupId}`, {
+    fetch(`/api/registration/add/${personId}/${groupId}`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -62,7 +62,7 @@ function addToGroup(personId, groupId) {
 }
 
 function removeFromGroup(personId, groupId) {
-    fetch(`/registration/remove/${personId}/${groupId}`, {
+    fetch(`/api/registration/remove/${personId}/${groupId}`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
