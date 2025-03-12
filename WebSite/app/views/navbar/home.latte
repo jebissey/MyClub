@@ -9,7 +9,11 @@
 
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav me-auto">
-{* add pages here *}
+        {foreach $navItems as $navItem}
+        <li class="nav-item">
+          <a class="nav-link" href="{$navItem['Route']}">{$navItem['Name']|noescape}</a>
+        </li>
+        {/foreach}
       </ul>
       <a class="nav-link" href="{$href}">
         <img src="{$userImg}" alt="User avatar" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Mes données">

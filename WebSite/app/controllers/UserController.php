@@ -166,7 +166,8 @@ class UserController extends BaseController
             'latestArticle' => $articles['latestArticle'],
             'latestArticleTitles' => $articles['latestArticleTitles'],
             'greatings' => $this->settings->get('Greatings'),
-            'link' => $this->settings->get('Link')
+            'link' => $this->settings->get('Link'),
+            'navItems' => $this->getNavItems()
         ]));
     }
 
@@ -368,5 +369,26 @@ class UserController extends BaseController
         $query = $this->pdoForLog->prepare('INSERT INTO Log(IpAddress, Referer, Os, Browser, ScreenResolution, Type, Uri, Token, Who, Code, Message) 
         VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ? ,?)');
         $query->execute([$client->getIp(), $client->getReferer(), $client->getOs(), $client->getBrowser(), $client->getScreenResolution(), $client->getType(), $client->getUri(), $client->getToken(), $email, $code, $message]);
+    }
+
+    private function getNavItems()
+    {
+        $query = $this->pdo->query("
+            SELECT Route, Name, IdGroup
+            FROM Page
+            ORDER by Position
+        ");
+        $navItems = $query->fetchAll(PDO::FETCH_ASSOC);
+        $person = $this->getPerson();
+        if(!$person) $userGroups = [];
+        else         $userGroups = $this->getUserGroups($person['Email']);
+        
+        $filteredNavItems = [];
+        foreach($navItems as $navItem){
+            if($navItem['IdGroup'] == null || !empty(array_intersect([$navItem['IdGroup']], $userGroups))){
+                $filteredNavItems[] = $navItem;
+            }
+        }
+        return $filteredNavItems;
     }
 }

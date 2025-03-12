@@ -183,7 +183,6 @@ class ArticleController extends TableController
         }
     }
 
-
     private function getArticleIdsBasedOnAccess(?string $userEmail): array
     {
         $noGroupArticleIds = $this->getNoGroupArticleIds();
@@ -205,17 +204,6 @@ class ArticleController extends TableController
             SELECT Article.Id FROM Article 
             WHERE Article.published = 1 AND Article.IdGroup IS NULL");
         $query->execute();
-        return $query->fetchAll(PDO::FETCH_COLUMN);
-    }
-
-    private function getUserGroups(string $userEmail): array
-    {
-        $query = $this->pdo->prepare("
-            SELECT PersonGroup.IdGroup 
-            FROM PersonGroup 
-            LEFT JOIN Person ON Person.Id = PersonGroup.IdPerson 
-            WHERE Person.Email = ?");
-        $query->execute([$userEmail]);
         return $query->fetchAll(PDO::FETCH_COLUMN);
     }
 

@@ -110,6 +110,17 @@ abstract class BaseController
         die('Fatal error in file ' . __FILE__ . ' at line ' . __LINE__ . " with navbar=" . $navbar);
     }
 
+    protected function getUserGroups(string $userEmail): array
+    {
+        $query = $this->pdo->prepare("
+            SELECT PersonGroup.IdGroup 
+            FROM PersonGroup 
+            LEFT JOIN Person ON Person.Id = PersonGroup.IdPerson 
+            WHERE Person.Email = ?");
+        $query->execute([$userEmail]);
+        return $query->fetchAll(PDO::FETCH_COLUMN);
+    }
+
     private function getHref($userEmail)
     {
         return $userEmail == '' ? '/user/sign/in' : '/user';

@@ -27,7 +27,6 @@ class Authorization
         return $this->authorizations = array_column($query->fetchAll(), 'Name');
     }
 
-
     public function isEventManager(): bool
     {
         return in_array('EventManager', $this->authorizations);

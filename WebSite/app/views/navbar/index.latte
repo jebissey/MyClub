@@ -33,12 +33,24 @@
                         <span>
                             {$item['Name']}
                             <small class="text-muted ms-2">{$item['Route']}</small>
+                            {if isset($item['GroupName'])}
+                            <small class="badge bg-info ms-2">{$item['GroupName']}</small>
+                            {/if}
                         </span>
-                        <button class="btn btn-sm btn-primary edit-btn">Edit</button>
+                        <div class="ms-auto">
+                            <button class="btn btn-sm btn-primary edit-btn">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                            <button class="btn btn-sm btn-danger delete-btn">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
                     </li>
                     {/foreach}
                 </ul>
-                <button id="addNew" class="btn btn-success">Add New Navigation Item</button>
+                <button id="addNew" class="btn btn-success">
+                    <i class="bi bi-plus-lg"></i>
+                </button>
             </div>
         </div>
         
@@ -65,7 +77,6 @@
                                     {/foreach}
                                 </select>
                             </div>
-                            <!-- New ID Parameter field that will show/hide based on route selection -->
                             <div class="mb-3 param-input" id="idParamContainer">
                                 <label for="idParam" class="form-label">ID Parameter:</label>
                                 <input type="number" class="form-control" id="idParam" min="1">
@@ -170,7 +181,31 @@
                     });
             });
         });
-        
+
+        const deleteButtons = document.querySelectorAll('.delete-btn');
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const id = this.closest('li').dataset.id;
+                
+                if (confirm('Êtes-vous sûr de vouloir supprimer cet élément de navigation ?')) {
+                    fetch(`/api/navBar/deleteItem/${id}`, {
+                        method: 'DELETE'
+                    })
+                    .then(response => response.json())
+                    .then(result => {
+                        if (result.success) {
+                            this.closest('li').remove();
+                        } else {
+                            alert(result.message || 'Échec de la suppression de l\'élément de navigation.');
+                        }
+                    })
+                    .catch(error => {
+                        alert('Une erreur s\'est produite lors de la suppression de l\'élément de navigation.');
+                    });
+                }
+            });
+        });
+
         document.getElementById('saveChanges').addEventListener('click', function() {
             const name = document.getElementById('itemName').value.trim();
             let route = document.getElementById('itemRoute').value;
