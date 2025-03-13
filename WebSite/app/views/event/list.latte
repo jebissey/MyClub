@@ -1,0 +1,45 @@
+{layout $layout}
+
+{block title}Liste des évènements{/block}
+
+{block content}
+<div class="events-container">
+    <h3>Événements du {$date|date:'d/m/Y'}</h3>
+    
+    {if count($events) > 0}
+        <div class="list-group">
+            {foreach $events as $event}
+                <div class="list-group-item event-row" data-event-id="{$event['Id']}">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="badge" style="background-color: {$event['Color'] ?? '#007bff'}">
+                                {$event['EventTypeName']}
+                            </span>
+                            <strong>{$event['Title']}</strong>
+                            <span class="text-muted ml-2">
+                                {$event['StartTime']|date:'H:i'} - {$event['EndTime']|date:'H:i'}
+                            </span>
+                        </div>
+                        <div>
+                            {if $isRegistered($event['Id'])}
+                                <button class="btn btn-outline-danger btn-sm unregister-event" data-event-id="{$event['Id']}">
+                                    Se désinscrire
+                                </button>
+                            {else}
+                                <button class="btn btn-outline-success btn-sm register-event" data-event-id="{$event['Id']}">
+                                    S'inscrire
+                                </button>
+                            {/if}
+                        </div>
+                    </div>
+                </div>
+                <div id="event-{$event['Id']}-detail" class="collapse"></div>
+            {/foreach}
+        </div>
+    {else}
+        <div class="alert alert-info">
+            Aucun événement pour cette date.
+        </div>
+    {/if}
+</div>
+{/block}

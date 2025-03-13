@@ -1,0 +1,163 @@
+{layout $layout}
+
+{block title}Gérer les évènements{/block}
+
+{block content}
+<div class="container mt-4">
+    <div class="row align-items-center mb-3">
+        <div class="col-auto">
+            <button type="button" class="btn btn-secondary move-week" data-days="-7">&laquo;</button>
+            <button type="button" class="btn btn-secondary move-day" data-days="-1">&lsaquo;</button>
+        </div>
+        
+        <div class="col">
+            <div class="table-responsive">
+                <table class="table table-bordered text-center">
+                    <thead>
+                        <tr id="weekdays-header">
+                            {* JavaScript add here *}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr id="events-row">
+                            {* JavaScript add here *}
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div class="col-auto">
+            <button type="button" class="btn btn-secondary move-day" data-days="1">&rsaquo;</button>
+            <button type="button" class="btn btn-secondary move-week" data-days="7">&raquo;</button>
+        </div>
+    </div>
+
+    {if $isEventManager}
+    <div class="ms-auto">
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#eventModal">
+            <i class="bi bi-plus-lg"></i>
+        </button>
+    </div>
+    {/if}
+    
+    <div id="events-detail" class="mt-4"></div>
+
+    <div class="modal fade" id="eventModal" tabindex="-1" aria-labelledby="eventModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="eventModalLabel">Créer un événement</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="eventForm">
+                        <div class="mb-3">
+                            <label for="summaryInput" class="form-label">Résumé</label>
+                            <input type="text" class="form-control" id="summaryInput" name="summary" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="descriptionInput" class="form-label">Description</label>
+                            <textarea class="form-control" id="descriptionInput" name="description" required></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="locationInput" class="form-label">Lieu</label>
+                            <input type="text" class="form-control" id="locationInput" name="location" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="eventTypeInput" class="form-label">Type d'événement</label>
+                            <select class="form-control" id="eventTypeInput" name="eventType" required>
+                                {foreach $eventTypes as $eventType}
+                                    <option value="{$eventType['Id']}">{$eventType['Name']}</option>
+                                {/foreach}
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="dateInput" class="form-label">Date</label>
+                            <input type="date" class="form-control" id="dateInput" name="date" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="startTimeInput" class="form-label">Heure de début</label>
+                            <input type="time" class="form-control" id="startTimeInput" name="startTime" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="durationInput" class="form-label">Durée (en heures)</label>
+                            <input type="number" class="form-control" id="durationInput" name="duration" min="0.5" step="0.5" required>
+                        </div>
+
+                        <button type="submit" class="btn btn-success">Créer</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}
+
+{block scripts}
+<script src="/app/js/eventManager.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        initEventManager();
+    });
+
+    document.getElementById('eventForm').addEventListener('submit', function(event) {
+        event.preventDefault(); // Empêcher le rechargement de la page
+
+        let summary = document.getElementById('summaryInput').value.trim();
+        let description = document.getElementById('descriptionInput').value.trim();
+        let location = document.getElementById('locationInput').value.trim();
+        let eventType = document.getElementById('eventTypeInput').value;
+        let date = document.getElementById('dateInput').value;
+        let startTime = document.getElementById('startTimeInput').value;
+        let duration = parseFloat(document.getElementById('durationInput').value);
+
+        if (!summary || !description || !location || !eventType || !date || !startTime || isNaN(duration) || duration <= 0) {
+            alert("Veuillez remplir tous les champs correctement.");
+            return;
+        }
+
+        let startDate = new Date(date + "T" + startTime + ":00Z");
+        let endDate = new Date(startDate);
+        endDate.setHours(endDate.getHours() + duration);
+
+        // Conversion en format iCal (YYYYMMDDTHHMMSSZ)
+        function toICalFormat(date) {
+            return date.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
+        }
+
+        let eventData = {
+            summary: summary,
+            description: description,
+            location: location,
+            idEventType: eventType,
+            startTime: toICalFormat(startDate),
+            endTime: toICalFormat(endDate)
+        };
+
+        fetch('/api/event/create', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(eventData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert("Événement créé avec succès !");
+                document.getElementById('eventForm').reset();
+                var modal = bootstrap.Modal.getInstance(document.getElementById('eventModal'));
+                modal.hide();
+            } else {
+                alert("Erreur: " + data.message);
+            }
+        })
+        .catch(error => alert('Erreur:' + error));
+    });
+</script>
+{/block}
