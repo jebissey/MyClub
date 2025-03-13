@@ -129,7 +129,8 @@ class NavBarController extends BaseController
                 echo $this->latte->render('app/views/admin/arwards.latte', $this->params->getAll([
                     'counterNames' => $counterNames = $arwards->getCounterNames(),
                     'data' => $arwards->getData($counterNames),
-                    'groups' => $arwards->getGroups()
+                    'groups' => $arwards->getGroups(),
+                    'layout' => $this->getLayout()
                 ]));
         } else {
             $this->application->error403(__FILE__, __LINE__);

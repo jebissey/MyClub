@@ -48,7 +48,8 @@ class WebmasterController extends BaseController
                 echo $this->latte->render('app/views/admin/arwards.latte', $this->params->getAll([
                     'counterNames' => $counterNames = $arwards->getCounterNames(),
                     'data' => $arwards->getData($counterNames),
-                    'groups' => $arwards->getGroups()
+                    'groups' => $arwards->getGroups(),
+                    'layout' => $this->getLayout()
                 ]));
             } else if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $request = $this->flight->request();

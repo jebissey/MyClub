@@ -100,7 +100,7 @@ abstract class BaseController
 
     protected function getLayout() {
         $navbar = $_SESSION['navbar'] ?? '';
-        if($navbar == 'user') return 'user.latte';
+        if($navbar == 'user') return '../user/user.latte';
         else if($navbar == 'eventManager') return '../admin/eventManager.latte';
         else if($navbar == 'personManager') return '../admin/personManager.latte';
         else if($navbar == 'webmaster') return '../admin/webmaster.latte';

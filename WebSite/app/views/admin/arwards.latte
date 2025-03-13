@@ -1,15 +1,17 @@
-{layout "webmaster.latte"}
+{layout $layout}
 
 {block content}
     <h2>Tableau des compteurs par personne</h2>
     
     <div id="liveAlertPlaceholder"></div>
 
+    {if $isWebmaster}
     <div class="mb-3">
     <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCounterModal">
         <i class="fas fa-plus"></i> Ajouter un compteur
     </button>
     </div>
+    {/if}
 
     <div class="table-responsive">
         <table class="table table-striped table-hover" id="dataTable">
