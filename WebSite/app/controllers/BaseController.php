@@ -14,7 +14,7 @@ use app\helpers\Settings;
 
 abstract class BaseController
 {
-    protected const VERSION = 0.3;
+    protected const VERSION = 0.4;
 
     protected PDO $pdo;
     protected $fluent;
@@ -119,6 +119,27 @@ abstract class BaseController
             WHERE Person.Email = ?");
         $query->execute([$userEmail]);
         return $query->fetchAll(PDO::FETCH_COLUMN);
+    }
+
+    protected function getNavItems()
+    {
+        $query = $this->pdo->query("
+            SELECT Route, Name, IdGroup
+            FROM Page
+            ORDER by Position
+        ");
+        $navItems = $query->fetchAll(PDO::FETCH_ASSOC);
+        $person = $this->getPerson();
+        if(!$person) $userGroups = [];
+        else         $userGroups = $this->getUserGroups($person['Email']);
+        
+        $filteredNavItems = [];
+        foreach($navItems as $navItem){
+            if($navItem['IdGroup'] == null || !empty(array_intersect([$navItem['IdGroup']], $userGroups))){
+                $filteredNavItems[] = $navItem;
+            }
+        }
+        return $filteredNavItems;
     }
 
     private function getHref($userEmail)

@@ -106,7 +106,8 @@ class ArticleController extends TableController
             'groups' => $this->getGroups(),
             'hasSurvey' => $survey ? true : false,
             'id' => $id,
-            'userConnected' => $person
+            'userConnected' => $person,
+            'navItems' => $this->getNavItems()
         ]));
     }
 
