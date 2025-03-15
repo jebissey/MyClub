@@ -1,80 +1,88 @@
 === Détail par fichier ===
-   262 ../WebSite/index.php
+   283 ../WebSite/index.php
     65 ../WebSite/app/views/dbbrowser/edit.latte
     43 ../WebSite/app/views/dbbrowser/index.latte
    135 ../WebSite/app/views/dbbrowser/table.latte
     65 ../WebSite/app/views/dbbrowser/create.latte
-    89 ../WebSite/app/views/layout.latte
-    45 ../WebSite/app/views/home.latte
+   152 ../WebSite/app/views/layout.latte
+    50 ../WebSite/app/views/home.latte
     89 ../WebSite/app/views/groups/edit.latte
    125 ../WebSite/app/views/groups/index.latte
     93 ../WebSite/app/views/groups/create.latte
     27 ../WebSite/app/views/persons/index.latte
     20 ../WebSite/app/views/navbar/redactor.latte
     35 ../WebSite/app/views/navbar/user.latte
-    24 ../WebSite/app/views/navbar/home.latte
-    20 ../WebSite/app/views/navbar/eventManager.latte
+    28 ../WebSite/app/views/navbar/home.latte
+   320 ../WebSite/app/views/navbar/index.latte
+    23 ../WebSite/app/views/navbar/eventManager.latte
     29 ../WebSite/app/views/navbar/personManager.latte
-    35 ../WebSite/app/views/navbar/webmaster.latte
+    38 ../WebSite/app/views/navbar/webmaster.latte
     18 ../WebSite/app/views/navbar/info.latte
     34 ../WebSite/app/views/navbar/admin.latte
     38 ../WebSite/app/views/registration/groups.latte
     80 ../WebSite/app/views/registration/index.latte
+    71 ../WebSite/app/views/event/detail.latte
+    44 ../WebSite/app/views/event/list.latte
+   162 ../WebSite/app/views/event/manager.latte
     60 ../WebSite/app/views/logs/referer.latte
-   109 ../WebSite/app/views/logs/visitor.latte
+   245 ../WebSite/app/views/logs/analytics.latte
+   116 ../WebSite/app/views/logs/visitor.latte
    165 ../WebSite/app/views/logs/statistics.latte
      5 ../WebSite/app/views/admin/redactor.latte
      8 ../WebSite/app/views/admin/eventManager.latte
-   237 ../WebSite/app/views/admin/arwards.latte
+   239 ../WebSite/app/views/admin/arwards.latte
      8 ../WebSite/app/views/admin/personManager.latte
-     8 ../WebSite/app/views/admin/webmaster.latte
+    17 ../WebSite/app/views/admin/webmaster.latte
      8 ../WebSite/app/views/admin/admin.latte
-    80 ../WebSite/app/views/survey/add.latte
+    97 ../WebSite/app/views/survey/add.latte
     50 ../WebSite/app/views/survey/results.latte
      8 ../WebSite/app/views/user/user.latte
-    34 ../WebSite/app/views/user/articles.latte
+    41 ../WebSite/app/views/user/articles.latte
     30 ../WebSite/app/views/user/groups.latte
-    95 ../WebSite/app/views/user/availabilities.latte
+    94 ../WebSite/app/views/user/availabilities.latte
    112 ../WebSite/app/views/user/signIn.latte
     36 ../WebSite/app/views/user/setPassword.latte
-   110 ../WebSite/app/views/user/preferences.latte
+   160 ../WebSite/app/views/user/preferences.latte
    136 ../WebSite/app/views/user/account.latte
-   533 ../WebSite/app/views/user/article.latte
+   538 ../WebSite/app/views/user/article.latte
     26 ../WebSite/app/views/emails/copyToClipBoard.latte
     76 ../WebSite/app/views/emails/getEmails.latte
    130 ../WebSite/app/views/common/dataTable.latte
     12 ../WebSite/app/views/info.latte
    187 ../WebSite/app/views/import/form.latte
-    42 ../WebSite/app/controllers/AdminController.php
-    86 ../WebSite/app/controllers/EmailController.php
+    56 ../WebSite/app/controllers/AdminController.php
+   130 ../WebSite/app/controllers/EmailController.php
    297 ../WebSite/app/controllers/DbBrowserController.php
-   123 ../WebSite/app/controllers/BaseController.php
-   366 ../WebSite/app/controllers/UserController.php
-   112 ../WebSite/app/controllers/WebmasterController.php
-   203 ../WebSite/app/controllers/SurveyController.php
-    34 ../WebSite/app/controllers/EventController.php
-   151 ../WebSite/app/controllers/ImportController.php
-   169 ../WebSite/app/controllers/PersonController.php
-   449 ../WebSite/app/controllers/LogController.php
-   185 ../WebSite/app/controllers/RegistrationController.php
-    34 ../WebSite/app/controllers/ApiController.php
-   269 ../WebSite/app/controllers/ArticleController.php
+   164 ../WebSite/app/controllers/BaseController.php
+   375 ../WebSite/app/controllers/UserController.php
+   171 ../WebSite/app/controllers/WebmasterController.php
+   217 ../WebSite/app/controllers/SurveyController.php
+   281 ../WebSite/app/controllers/EventController.php
+   152 ../WebSite/app/controllers/ImportController.php
+   170 ../WebSite/app/controllers/PersonController.php
+   602 ../WebSite/app/controllers/LogController.php
+   167 ../WebSite/app/controllers/RegistrationController.php
+    42 ../WebSite/app/controllers/ApiController.php
+   259 ../WebSite/app/controllers/ArticleController.php
     42 ../WebSite/app/controllers/TableController.php
+   184 ../WebSite/app/controllers/navBarController.php
     11 ../WebSite/app/controllers/CrudControllerInterface.php
    174 ../WebSite/app/controllers/GroupController.php
     28 ../WebSite/app/helpers/Settings.php
-    65 ../WebSite/app/helpers/Authorization.php
+    64 ../WebSite/app/helpers/Authorization.php
     19 ../WebSite/app/helpers/PasswordManager.php
+    58 ../WebSite/app/helpers/Arwards.php
     91 ../WebSite/app/helpers/database/Database.php
     18 ../WebSite/app/helpers/database/File.php
-   119 ../WebSite/app/helpers/Client.php
+    75 ../WebSite/app/helpers/Client.php
+   102 ../WebSite/app/helpers/Backup.php
     36 ../WebSite/app/helpers/GravatarHandler.php
-   113 ../WebSite/app/helpers/Application.php
+   118 ../WebSite/app/helpers/Application.php
     14 ../WebSite/app/helpers/Params.php
-  6884 total
+  8788 total
 
 === Total par type de fichier ===
 Fichiers PHP :
-3512
+4400
 Fichiers Latte :
-3372
+4388
