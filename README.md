@@ -31,6 +31,7 @@ user@myclub.foo : user1234
 - clone
 - update references with ```composer update``` from WebSite folder
 - test locally from WebSite folder with ```php -S localhost:8000 ../dev/router.php```
+- and in your browser http://localhost:8000/
 - upload to the cloud to your host
 - enjoy
 
