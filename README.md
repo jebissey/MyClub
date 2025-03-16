@@ -19,14 +19,19 @@ All data is stored in a **SQLight** database.
 
 Security is based on groups. There are three types of group. Groups with authorisation, groups without authorisation and self-registration groups. There are five different authorisations: event manager, person manager, redactor, editor and webmaster.
 
+## How to test
+https://myclub.alwaysdata.net/
+
+user@myclub.foo : user1234
+
 ## How to install
 
 ### From source: 
 
 - clone
-- update references with ```composer update```
-- test localy from WebSite folder with ```php -S localhost:8000 ../dev/router.php```
-- upload to the cloud
+- update references with ```composer update``` from WebSite folder
+- test locally from WebSite folder with ```php -S localhost:8000 ../dev/router.php```
+- upload to the cloud to your host
 - enjoy
 
 ## How to customize
@@ -40,8 +45,3 @@ Security is based on groups. There are three types of group. Groups with authori
 
 ## How to fix
 If you have this : "Error : could not find driverFatal error in file .../app/helpers/database/Database.php at line 38", you must add "extension=pdo_sqlite.so" in your php.ini
-
-## How to test
-https://myclub.alwaysdata.net/
-
-user@myclub.foo : user1234
