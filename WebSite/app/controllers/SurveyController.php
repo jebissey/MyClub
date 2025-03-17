@@ -211,7 +211,8 @@ class SurveyController extends BaseController
             'options' => $options,
             'results' => $results,
             'participants' => $participants,
-            'articleId' => $articleId
+            'articleId' => $articleId,
+            'currentVersion' => self::VERSION
         ]);
     }
 }

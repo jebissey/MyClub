@@ -120,6 +120,9 @@
                     <a href="/surveys/add/{$id}" class="btn btn-success ms-2">Ajouter un sondage</a>
                         {/if}
                     {/if}
+                    {if $hasSurvey && $userConnected && isset($chosenArticle->Published) && $chosenArticle->Published}
+                    <button id="reply-survey-btn" class="btn btn-success ms-2">Répondre au sondage</button>
+                    {/if}
                     <a href="/articles" class="btn btn-secondary ms-2">Retour à la liste</a>
                 </div>
             </div>
@@ -170,9 +173,6 @@
                     </form>
                 </div>
                 {/if}
-                {if $hasSurvey && $userConnected && isset($chosenArticle->Published) && $chosenArticle->Published}
-                <button id="reply-survey-btn" class="btn btn-success">Répondre au sondage</button>
-                {/if}
             </div>
         </div>
         {else}
@@ -205,10 +205,6 @@
                 </div>
                 <div class="modal-body" id="survey-form-container">
                     <p>Chargement du sondage...</p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
-                    <button type="button" class="btn btn-primary" id="submit-survey">Envoyer</button>
                 </div>
             </div>
         </div>
