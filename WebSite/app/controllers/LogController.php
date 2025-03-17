@@ -315,10 +315,7 @@ class LogController extends BaseController
 
         switch ($periodType) {
             case 'day':
-                // Calculer la date de départ (aujourd'hui - offset jours)
                 $startPoint = (clone $today)->modify(sprintf('-%d days', $offset));
-
-                // Générer les 13 jours précédents
                 for ($i = 0; $i < $this->periodsToShow; $i++) {
                     $currentDate = (clone $startPoint)->modify(sprintf('-%d days', $this->periodsToShow - $i - 1));
                     $startDate = (clone $currentDate)->setTime(0, 0, 0);
@@ -332,16 +329,11 @@ class LogController extends BaseController
                 break;
 
             case 'week':
-                // Trouver le lundi de la semaine en cours
                 $currentMonday = (clone $today)->modify('monday this week');
-                if ($today->format('N') == 1) { // Si aujourd'hui est lundi
+                if ($today->format('N') == 1) {
                     $currentMonday = clone $today;
                 }
-
-                // Calculer le point de départ (lundi courant - offset semaines)
                 $startPoint = (clone $currentMonday)->modify(sprintf('-%d weeks', $offset));
-
-                // Générer les 13 semaines
                 for ($i = 0; $i < $this->periodsToShow; $i++) {
                     $weekStart = (clone $startPoint)->modify(sprintf('-%d weeks', $this->periodsToShow - $i - 1));
                     $weekEnd = (clone $weekStart)->modify('+6 days');
@@ -354,13 +346,8 @@ class LogController extends BaseController
                 break;
 
             case 'month':
-                // Premier jour du mois en cours
                 $firstDayCurrentMonth = (clone $today)->modify('first day of this month');
-
-                // Calculer le point de départ (premier jour du mois courant - offset mois)
                 $startPoint = (clone $firstDayCurrentMonth)->modify(sprintf('-%d months', $offset));
-
-                // Générer les 13 mois
                 for ($i = 0; $i < $this->periodsToShow; $i++) {
                     $monthStart = (clone $startPoint)->modify(sprintf('-%d months', $this->periodsToShow - $i - 1));
                     $monthEnd = (clone $monthStart)->modify('last day of this month');
@@ -373,13 +360,8 @@ class LogController extends BaseController
                 break;
 
             case 'year':
-                // Premier jour de l'année en cours
                 $firstDayCurrentYear = (clone $today)->modify('first day of January this year');
-
-                // Calculer le point de départ (premier jour de l'année courante - offset années)
                 $startPoint = (clone $firstDayCurrentYear)->modify(sprintf('-%d years', $offset));
-
-                // Générer les 13 années
                 for ($i = 0; $i < $this->periodsToShow; $i++) {
                     $yearStart = (clone $startPoint)->modify(sprintf('-%d years', $this->periodsToShow - $i - 1));
                     $yearEnd = (clone $yearStart)->modify('last day of December this year');
@@ -598,5 +580,184 @@ class LogController extends BaseController
             echo json_encode(['success' => false, 'message' => 'User not found']);
         }
         exit();
+    }
+
+
+
+    const TOP = 50;
+    public function topPagesByPeriod()
+    {
+        if ($this->getPerson(['Webmaster'])) {
+            $period = $_GET['period'] ?? 'week';
+
+            $dateCondition = '';
+            switch ($period) {
+                case 'today':
+                    $dateCondition = "date(CreatedAt) = date('now')";
+                    break;
+                case 'week':
+                    $dateCondition = "date(CreatedAt) >= date('now', '-7 days')";
+                    break;
+                case 'month':
+                    $dateCondition = "date(CreatedAt) >= date('now', '-30 days')";
+                    break;
+                default:
+                    $dateCondition = "1=1";
+            }
+
+            $query = $this->fluentForLog
+                ->from('Log')
+                ->select('Uri, COUNT(*) AS visits')
+                ->where($dateCondition)
+                ->groupBy('Uri')
+                ->orderBy('visits DESC')
+                ->limit(self::TOP);
+
+            $this->latte->render('app/views/logs/topPages.latte', $this->params->getAll([
+                'title' => 'Top des pages visitées',
+                'period' => $period,
+                'topPages' => $query->fetchAll()
+            ]));
+        } else {
+            $this->application->error403(__FILE__, __LINE__);
+        }
+    }
+
+
+
+    public function crossTab()
+    {
+        if ($this->getPerson(['Webmaster'])) {
+            $uriFilter = $_GET['uri'] ?? '';
+            $emailFilter = $_GET['email'] ?? '';
+            $groupFilter = $_GET['group'] ?? '';
+            $period = $_GET['period'] ?? 'week';
+            $dateCondition = '';
+            switch ($period) {
+                case 'today':
+                    $dateCondition = "date(CreatedAt) = date('now')";
+                    break;
+                case 'week':
+                    $dateCondition = "date(CreatedAt) >= date('now', '-7 days')";
+                    break;
+                case 'month':
+                    $dateCondition = "date(CreatedAt) >= date('now', '-30 days')";
+                    break;
+                default:
+                    $dateCondition = "1=1";
+            }
+
+            $query = "SELECT DISTINCT Uri FROM Log";
+            $params = [];
+            if (!empty($uriFilter)) {
+                $query .= " WHERE Uri LIKE ?";
+                $params[] = '%' . $uriFilter . '%';
+            }
+            $stmt = $this->pdoForLog->prepare($query);
+            $stmt->execute($params);
+            $uris = $stmt->fetchAll(PDO::FETCH_COLUMN);
+
+            $sql = "SELECT Person.Id, Person.Email, Person.FirstName, Person.LastName FROM Person";
+            $params = [];
+            $conditions = [];
+            if (!empty($emailFilter)) {
+                $conditions[] = "Person.Email LIKE ?";
+                $params[] = '%' . $emailFilter . '%';
+            }
+            if (!empty($groupFilter)) {
+                $sql .= ' LEFT JOIN PersonGroup ON Person.Id = PersonGroup.IdPerson
+                      LEFT JOIN "Group" ON PersonGroup.IdGroup = Group.Id';
+                $conditions[] = "Group.Name LIKE ?";
+                $params[] = '%' . $groupFilter . '%';
+                $sql .= " GROUP BY Person.Id";
+            }
+            if (!empty($conditions)) {
+                $sql .= " WHERE " . implode(" AND ", $conditions);
+                $sql .= " AND $dateCondition";
+            }
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute($params);
+            $persons = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            $sql = "SELECT Person.Id, Person.Email, Person.FirstName, Person.LastName FROM Person";
+            $params = [];
+            if (!empty($emailFilter)) {
+                $sql .= " WHERE Person.Email LIKE ?";
+                $params[] = '%' . $emailFilter . '%';
+            }
+            if (!empty($groupFilter)) {
+                $sql .= " LEFT JOIN PersonGroup ON Person.Id = PersonGroup.IdPerson";
+                $sql .= ' LEFT JOIN "Group" ON PersonGroup.IdGroup = Group.Id';
+                $sql .= " WHERE Group.Name LIKE ?";
+                $params[] = '%' . $groupFilter . '%';
+                $sql .= " GROUP BY Person.Id";
+            }
+
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute($params);
+            $persons = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            $stmt = $this->pdo->prepare('SELECT Id, Name FROM "Group" WHERE Inactivated = 0 ORDER BY Name');
+            $stmt->execute();
+            $groups = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            $crossTabData = [];
+            $columnTotals = [];
+            $rowTotals = [];
+            $grandTotal = 0;
+            $personEmails = [];
+            foreach ($persons as $person) {
+                $personEmails[] = $person['Email'];
+                $columnTotals[$person['Email']] = 0;
+            }
+
+            foreach ($uris as $uri) {
+                $uriVisits = [];
+                $rowTotal = 0;
+
+                if (!empty($personEmails)) {
+                    $stmt = $this->pdoForLog->prepare('SELECT Who, COUNT(*) AS visit_count FROM Log WHERE URI = ? AND Who IN(?) GROUP BY Who');
+                    $stmt->execute([$uri, implode(',', $personEmails)]);
+                    $counts = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                    foreach ($counts as $count) {
+                        if (!empty($count['Email'])) {
+                            $uriVisits[$count['Email']] = $count['visit_count'];
+                            $rowTotal += $count['visit_count'];
+                            $columnTotals[$count['Email']] += $count['visit_count'];
+                            $grandTotal += $count['visit_count'];
+                        }
+                    }
+                }
+
+                $crossTabData[$uri] = [
+                    'visits' => $uriVisits,
+                    'total' => $rowTotal
+                ];
+                $rowTotals[$uri] = $rowTotal;
+            }
+            arsort($rowTotals);
+
+            $sortedCrossTabData = [];
+            foreach (array_keys($rowTotals) as $uri) {
+                $sortedCrossTabData[$uri] = $crossTabData[$uri];
+            }
+
+            $this->latte->render('app/views/logs/crossTab.latte', $this->params->getAll([
+                'title' => 'Tableau croisé dynamique des visites',
+                'period' => $period,
+                'uris' => $sortedCrossTabData,
+                'persons' => $persons,
+                'rowTotals' => $rowTotals,
+                'columnTotals' => $columnTotals,
+                'grandTotal' => $grandTotal,
+                'groups' => $groups,
+                'uriFilter' => $uriFilter,
+                'emailFilter' => $emailFilter,
+                'groupFilter' => $groupFilter
+            ]));
+        } else {
+            $this->application->error403(__FILE__, __LINE__);
+        }
     }
 }

@@ -1,0 +1,155 @@
+{layout '../admin/webmaster.latte'}
+
+{block head}
+    <style>
+        .rotate {
+            writing-mode: vertical-rl; 
+            transform: rotate(180deg); 
+            white-space: nowrap; 
+            text-align: center;
+            vertical-align: top;
+            height: 150px;
+        }
+    </style>
+{/block}
+
+{block content}
+<div class="container-fluid mt-4">
+    <h1>{$title}</h1>
+    
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="card-title mb-0">Filtres</h5>
+        </div>
+        <div class="card-body">
+            <form method="get" class="row">
+                <div class="col-md-3 mb-3">
+                    <label for="period" class="mr-2">Période:</label>
+                    <select class="form-control" id="period" name="period" onchange="this.form.submit()">
+                        <option value="all" {if $period == 'all'}selected{/if}>Tout</option>
+                        <option value="today" {if $period == 'today'}selected{/if}>Aujourd'hui</option>
+                        <option value="week" {if $period == 'week'}selected{/if}>7 derniers jours</option>
+                        <option value="month" {if $period == 'month'}selected{/if}>30 derniers jours</option>
+                        <option value="quarter" {if $period == 'quarter'}selected{/if}>Dernier trimestre</option>
+                        <option value="year" {if $period == 'year'}selected{/if}>Dernière année</option>
+                    </select>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label for="uri">Filtrer par URI:</label>
+                    <input type="text" class="form-control" id="uri" name="uri" value="{$uriFilter}">
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label for="email">Filtrer par Email:</label>
+                    <input type="text" class="form-control" id="email" name="email" value="{$emailFilter}">
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label for="group">Filtrer par Groupe:</label>
+                    <select class="form-control" id="group" name="group">
+                        <option value="">Tous les groupes</option>
+                        {foreach $groups as $group}
+                        <option value="{$group['Name']}" {if $groupFilter == $group['Name']}selected{/if}>{$group['Name']}</option>
+                        {/foreach}
+                    </select>
+                </div>
+                <div class="col-md-3 mb-3 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary me-2">Filtrer</button>
+                    <a href="?/crossTab" class="btn btn-secondary">Réinitialiser</a>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    {if count($persons) > 0 && count($uris) > 0}
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h5 class="card-title mb-0">Tableau croisé des visites (URI × Utilisateur)</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive" style="overflow-x: auto; overflow-y: auto;">
+                <table class="table table-striped table-bordered">
+                    <thead>
+                        <tr>
+                            <th>URI</th>
+                            {foreach $persons as $person}
+                            <th class="text-center rotate" title="{$person['FirstName']} {$person['LastName']}">
+                                {$person['Email']|truncate:30}
+                            </th>
+                            {/foreach}
+                            <th class="text-center bg-light">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {foreach $uris as $uri => $data}
+                            <tr>
+                                <td>{$uri}</td>
+                                {foreach $persons as $person}
+                                    <td class="text-center">
+                                        {if isset($data['visits'][$person['Email']])}
+                                            {$data['visits'][$person['Email']]}
+                                        {else}
+                                            0
+                                        {/if}
+                                    </td>
+                                {/foreach}
+                                <td class="text-center font-weight-bold bg-light">{$data['total']}</td>
+                            </tr>
+                        {/foreach}
+                    </tbody>
+                    <tfoot class="bg-light">
+                        <tr>
+                            <th>Total</th>
+                            {foreach $persons as $person}
+                                <th class="text-center">
+                                    {if isset($columnTotals[$person['Email']])}
+                                        {$columnTotals[$person['Email']]}
+                                    {else}
+                                        0
+                                    {/if}
+                                </th>
+                            {/foreach}
+                            <th class="text-center font-weight-bold">{$grandTotal}</th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+    {else}
+    <div class="alert alert-info">
+        Aucune donnée ne correspond aux critères de filtrage sélectionnés.
+    </div>
+    {/if}
+</div>
+{/block}
+
+{block scripts}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const table = document.querySelector('table');
+    if (table) {
+        table.addEventListener('mouseover', function(e) {
+            if (e.target.tagName === 'TD') {
+                const index = e.target.cellIndex;
+                if (index > 0) {
+                    const rows = table.querySelectorAll('tr');
+                    rows.forEach(row => {
+                        if (row.cells[index]) {
+                            row.cells[index].classList.add('table-active');
+                        }
+                    });
+                }
+            }
+        });
+        
+        table.addEventListener('mouseout', function(e) {
+            if (e.target.tagName === 'TD') {
+                const cells = table.querySelectorAll('.table-active');
+                cells.forEach(cell => {
+                    cell.classList.remove('table-active');
+                });
+            }
+        });
+    }
+});
+</script>
+{/block}

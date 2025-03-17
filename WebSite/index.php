@@ -185,6 +185,9 @@ $flight->route('GET  /referers',                     function() use ($logControl
 $flight->route('GET  /visitors/graf',                function() use ($logController) { $logController->visitorsGraf(); });
 $flight->route('GET  /analytics',                    function() use ($logController) { $logController->analytics(); });
 $flight->route('GET  /api/analytics/visitorsByDate', function() use ($logController) { $logController->getVisitorsByDate(); });
+$flight->route('GET  /topPages',                     function() use ($logController) { $logController->topPagesByPeriod(); });
+$flight->route('GET  /crossTab',                     function() use ($logController) { $logController->crossTab(); });
+
 
 $groupController = $container->get('app\controllers\GroupController');
 $flight->route('GET  /groups',            function()    use ($groupController) { $groupController->index(); });
