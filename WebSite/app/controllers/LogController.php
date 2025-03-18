@@ -643,21 +643,29 @@ class LogController extends BaseController
                 case 'month':
                     $dateCondition = "date(CreatedAt) >= date('now', '-30 days')";
                     break;
+                case 'quarter':
+                    $dateCondition = "date(CreatedAt) >= date('now', '-3 months')";
+                    break;
+                case 'year':
+                    $dateCondition = "date(CreatedAt) >= date('now', '-1 years')";
+                    break;
                 default:
                     $dateCondition = "1=1";
             }
-
             $query = "SELECT DISTINCT Uri FROM Log";
             $params = [];
             if (!empty($uriFilter)) {
                 $query .= " WHERE Uri LIKE ?";
+                $query .= " AND $dateCondition";
                 $params[] = '%' . $uriFilter . '%';
+            } else {
+                $query .= " WHERE $dateCondition";
             }
             $stmt = $this->pdoForLog->prepare($query);
             $stmt->execute($params);
             $uris = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
-            $sql = "SELECT Person.Id, Person.Email, Person.FirstName, Person.LastName FROM Person";
+            $sql = "SELECT Person.Email, Person.FirstName, Person.LastName FROM Person";
             $params = [];
             $conditions = [];
             if (!empty($emailFilter)) {
@@ -666,33 +674,16 @@ class LogController extends BaseController
             }
             if (!empty($groupFilter)) {
                 $sql .= ' LEFT JOIN PersonGroup ON Person.Id = PersonGroup.IdPerson
-                      LEFT JOIN "Group" ON PersonGroup.IdGroup = Group.Id';
-                $conditions[] = "Group.Name LIKE ?";
+                          LEFT JOIN "Group" ON PersonGroup.IdGroup = "Group".Id';
+                $conditions[] = '"Group".Name LIKE ?';
                 $params[] = '%' . $groupFilter . '%';
-                $sql .= " GROUP BY Person.Id";
             }
             if (!empty($conditions)) {
                 $sql .= " WHERE " . implode(" AND ", $conditions);
-                $sql .= " AND $dateCondition";
-            }
-            $stmt = $this->pdo->prepare($sql);
-            $stmt->execute($params);
-            $persons = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-            $sql = "SELECT Person.Id, Person.Email, Person.FirstName, Person.LastName FROM Person";
-            $params = [];
-            if (!empty($emailFilter)) {
-                $sql .= " WHERE Person.Email LIKE ?";
-                $params[] = '%' . $emailFilter . '%';
             }
             if (!empty($groupFilter)) {
-                $sql .= " LEFT JOIN PersonGroup ON Person.Id = PersonGroup.IdPerson";
-                $sql .= ' LEFT JOIN "Group" ON PersonGroup.IdGroup = Group.Id';
-                $sql .= " WHERE Group.Name LIKE ?";
-                $params[] = '%' . $groupFilter . '%';
                 $sql .= " GROUP BY Person.Id";
             }
-
             $stmt = $this->pdo->prepare($sql);
             $stmt->execute($params);
             $persons = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -710,21 +701,24 @@ class LogController extends BaseController
                 $personEmails[] = $person['Email'];
                 $columnTotals[$person['Email']] = 0;
             }
+            $placeholders = rtrim(str_repeat('?,', count($personEmails)), ',');
 
             foreach ($uris as $uri) {
                 $uriVisits = [];
                 $rowTotal = 0;
-
                 if (!empty($personEmails)) {
-                    $stmt = $this->pdoForLog->prepare('SELECT Who, COUNT(*) AS visit_count FROM Log WHERE URI = ? AND Who IN(?) GROUP BY Who');
-                    $stmt->execute([$uri, implode(',', $personEmails)]);
+                    $stmt = $this->pdoForLog->prepare("
+                        SELECT Who, COUNT(*) AS visit_count 
+                        FROM Log 
+                        WHERE URI = ? AND Who IN($placeholders) AND $dateCondition GROUP BY Who");
+                    $params = array_merge([$uri], $personEmails);
+                    $stmt->execute($params);
                     $counts = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
                     foreach ($counts as $count) {
-                        if (!empty($count['Email'])) {
-                            $uriVisits[$count['Email']] = $count['visit_count'];
+                        if (!empty($count['Who'])) {
+                            $uriVisits[$count['Who']] = $count['visit_count'];
                             $rowTotal += $count['visit_count'];
-                            $columnTotals[$count['Email']] += $count['visit_count'];
+                            $columnTotals[$count['Who']] += $count['visit_count'];
                             $grandTotal += $count['visit_count'];
                         }
                     }
@@ -737,11 +731,26 @@ class LogController extends BaseController
                 $rowTotals[$uri] = $rowTotal;
             }
             arsort($rowTotals);
-
             $sortedCrossTabData = [];
             foreach (array_keys($rowTotals) as $uri) {
                 $sortedCrossTabData[$uri] = $crossTabData[$uri];
             }
+
+
+            $personsAssoc = [];
+            foreach ($persons as $person) {
+                $personsAssoc[$person["Email"]] = $person;
+            }
+            $filteredPersons = [];
+            $filteredColumnTotals = [];
+            foreach ($columnTotals as $person => $total) {
+                if ($total > 0) {
+                    $filteredPersons[$person] = $personsAssoc[$person];
+                    $filteredColumnTotals[$person] = $total;
+                }
+            }
+            $persons = $filteredPersons;
+            $columnTotals = $filteredColumnTotals;
 
             $this->latte->render('app/views/logs/crossTab.latte', $this->params->getAll([
                 'title' => 'Tableau croisé dynamique des visites',

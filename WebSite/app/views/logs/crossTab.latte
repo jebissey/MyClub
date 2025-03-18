@@ -5,10 +5,7 @@
         .rotate {
             writing-mode: vertical-rl; 
             transform: rotate(180deg); 
-            white-space: nowrap; 
-            text-align: center;
             vertical-align: top;
-            height: 150px;
         }
     </style>
 {/block}
@@ -81,7 +78,7 @@
                     <tbody>
                         {foreach $uris as $uri => $data}
                             <tr>
-                                <td>{$uri}</td>
+                                <td>{$uri|truncate:50}</td>
                                 {foreach $persons as $person}
                                     <td class="text-center">
                                         {if isset($data['visits'][$person['Email']])}
