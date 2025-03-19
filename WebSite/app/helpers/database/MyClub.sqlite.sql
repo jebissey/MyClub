@@ -5,11 +5,12 @@ CREATE TABLE IF NOT EXISTS "Article" (
 	"Content"	TEXT NOT NULL,
 	"CreatedBy"	INTEGER NOT NULL,
 	"Timestamp"	TEXT NOT NULL DEFAULT current_timestamp,
-	"Published"	INTEGER NOT NULL DEFAULT 0,
+	"PublishedBy"	INTEGER DEFAULT NULL,
 	"IdGroup"	INTEGER DEFAULT NULL,
 	PRIMARY KEY("Id"),
 	FOREIGN KEY("CreatedBy") REFERENCES "Person"("Id"),
-	FOREIGN KEY("IdGroup") REFERENCES "Group"("Id")
+	FOREIGN KEY("IdGroup") REFERENCES "Group"("Id"),
+	FOREIGN KEY("PublishedBy") REFERENCES "Person"("Id")
 );
 CREATE TABLE IF NOT EXISTS "Attribute" (
 	"Id"	INTEGER,

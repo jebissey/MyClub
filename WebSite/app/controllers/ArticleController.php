@@ -34,15 +34,19 @@ class ArticleController extends TableController
             ['field' => 'HasSurvey', 'label' => 'Sondage']
         ];
         $query = $this->fluent->from('Article')
-            ->select('Article.Id, Article.CreatedBy, Article.Title, Article.Timestamp, Article.Published, Person.FirstName, Person.LastName')
+            ->select('Article.Id, Article.CreatedBy, Article.Title, Article.Timestamp, CASE WHEN Article.PublishedBy IS NULL THEN "non" ELSE "oui" END AS Published, Person.FirstName, Person.LastName')
             ->select('CASE WHEN Survey.IdArticle IS NOT NULL THEN "oui" ELSE "non" END AS HasSurvey')
             ->innerJoin('Person ON Article.CreatedBy = Person.Id')
             ->leftJoin('Survey ON Article.Id = Survey.IdArticle')
             ->where('(Article.IdGroup IS NULL)')
-            ->where('(Article.Published = 1)');
+            ->where('(Article.PublishedBy IS NOT NULL)');
         if ($person) {
-            $query = $query->whereOr('Article.CreatedBy = ' . $person['Id'])
-                ->whereOr('Article.IdGroup IN (SELECT IdGroup FROM PersonGroup WHERE IdPerson = ' . $person['Id'] . ')');
+            if ($this->authorizations->isEditor()) {
+                $query = $query->whereOr('1=1');
+            } else {
+                $query = $query->whereOr('Article.CreatedBy = ' . $person['Id'])
+                    ->whereOr('Article.IdGroup IN (SELECT IdGroup FROM PersonGroup WHERE IdPerson = ' . $person['Id'] . ')');
+            }
         }
         $query = $query->orderBy('Article.Timestamp DESC');
         $data = $this->prepareTableData($query, $filterValues, $_GET['tablePage'] ?? null);
@@ -123,15 +127,15 @@ class ArticleController extends TableController
                 $title = $_POST['title'] ?? '';
                 $content = $_POST['content'] ?? '';
                 $published = $_POST['published'] ?? 0;
-                $idGroup = $_POST['idGroup'] ?? null;
+                $idGroup = $_POST['idGroup'] === '' ? null : ($_POST['idGroup'] ?? null);
                 if (empty($title) || empty($content)) {
                     $_SESSION['error'] = "Le titre et le contenu sont obligatoires";
                     $this->flight->redirect('/articles/' . $id);
                     return;
                 }
 
-                $query = $this->pdo->prepare("UPDATE Article SET Title = ?, Content = ?, Published = ?, IdGroup = ? WHERE Id = ?");
-                $result = $query->execute([$title, $content, $published, $idGroup, $id]);
+                $query = $this->pdo->prepare("UPDATE Article SET Title = ?, Content = ?, PublishedBy = ?, IdGroup = ? WHERE Id = ?");
+                $result = $query->execute([$title, $content, $published == 1 ? $person['Id'] : NULL, $idGroup, $id]);
                 if ($result) {
                     $_SESSION['success'] = "L'article a été mis à jour avec succès";
                     (new Backup())->save();
@@ -139,6 +143,38 @@ class ArticleController extends TableController
                     $_SESSION['error'] = "Une erreur est survenue lors de la mise à jour de l'article";
                 }
                 $this->flight->redirect('/articles/' . $id);
+            } else {
+                $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
+            }
+        } else {
+            $this->application->error403(__FILE__, __LINE__);
+        }
+    }
+
+    public function publish($id): void
+    {
+        if ($person = $this->getPerson(['Editor'])) {
+            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                $article = $this->getLatestArticle([$id]);
+                if (!$article || ($person['Id'] != $article->CreatedBy && !$this->authorizations->isEditor())) {
+                    $this->application->error403(__FILE__, __LINE__);
+                    return;
+                }
+                $published = $_POST['published'] ?? 0;
+
+                $query = $this->pdo->prepare("UPDATE Article SET PublishedBy = ? WHERE Id = ?");
+                $result = $query->execute([$published == 1 ? $person['Id'] : NULL, $id]);
+                if ($result) {
+                    $_SESSION['success'] = "L'article a été mis à jour avec succès";
+                    (new Backup())->save();
+                } else {
+                    $_SESSION['error'] = "Une erreur est survenue lors de la mise à jour de l'article";
+                }
+                $this->flight->redirect('/articles/' . $id);
+            } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+                echo $this->latte->render('app/views/user/publish.latte', $this->params->getAll([
+                    'article' => $this->getArticle($id),
+                ]));
             } else {
                 $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
             }
@@ -203,7 +239,7 @@ class ArticleController extends TableController
     {
         $query = $this->pdo->prepare("
             SELECT Article.Id FROM Article 
-            WHERE Article.published = 1 AND Article.IdGroup IS NULL");
+            WHERE Article.publishedBy IS NOT NULL AND Article.IdGroup IS NULL");
         $query->execute();
         return $query->fetchAll(PDO::FETCH_COLUMN);
     }
@@ -216,7 +252,7 @@ class ArticleController extends TableController
         $groups = implode(',', array_fill(0, count($groupIds), '?'));
         $query = $this->pdo->prepare("
             SELECT DISTINCT Article.Id FROM Article 
-            WHERE Article.published = 1 
+            WHERE Article.publishedBy IS NOT NULL
             AND Article.IdGroup IN ($groups)");
         $query->execute($groupIds);
         return $query->fetchAll(PDO::FETCH_COLUMN);
@@ -244,7 +280,7 @@ class ArticleController extends TableController
             SELECT Article.Id, Article.Title, Article.Timestamp 
             FROM Article 
             WHERE Article.Id IN ($placeholders)
-            AND Article.published = 1 
+            AND Article.publishedBy IS NOT NULL 
             ORDER BY Article.Timestamp DESC 
             LIMIT 10");
         $query->execute($articleIds);
@@ -255,5 +291,16 @@ class ArticleController extends TableController
     {
         $query = $this->pdo->query("SELECT Id, Name FROM 'Group' WHERE Inactivated=0 ORDER BY Name");
         return $query->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    private function getArticle($id)
+    {
+        $query = $this->pdo->prepare("
+        SELECT a.*, p.FirstName, p.LastName, p.NickName
+        FROM Article a
+        LEFT JOIN Person p ON a.CreatedBy = p.Id
+        WHERE a.Id = ?");
+        $query->execute([$id]);
+        return $query->fetch(PDO::FETCH_ASSOC);
     }
 }

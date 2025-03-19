@@ -7,7 +7,7 @@
 {/block}
 
 {block content}
-    {if $isRedactor}
+    {if $isEditor && $isRedactor}
         {include '../common/dataTable.latte',
             'createButton' => [
                 'url' => '/articles/create',
@@ -20,6 +20,46 @@
                     'label' => 'Voir',
                     'url' => '/articles/{id}',
                     'class' => 'btn-info'
+                ],
+                [
+                    'type' => 'button',
+                    'label' => 'Gérer la publication',
+                    'class' => 'btn-primary',
+                    'onClick' => 'showPublish({id})'
+                ]
+            ]
+        }
+    {elseif $isRedactor}
+        {include '../common/dataTable.latte',
+            'createButton' => [
+                'url' => '/articles/create',
+                'label' => 'Créer un article'
+            ],
+            'items' => $articles,
+            'actions' => [
+                [
+                    'type' => 'link',
+                    'label' => 'Voir',
+                    'url' => '/articles/{id}',
+                    'class' => 'btn-info'
+                ]
+            ]
+        }
+    {elseif $isEditor}
+        {include '../common/dataTable.latte',
+            'items' => $articles,
+            'actions' => [
+                [
+                    'type' => 'link',
+                    'label' => 'Voir',
+                    'url' => '/articles/{id}',
+                    'class' => 'btn-info'
+                ],
+                [
+                    'type' => 'button',
+                    'label' => 'Gérer la publication',
+                    'class' => 'btn-primary',
+                    'onClick' => 'showPublish({id})'
                 ]
             ]
         }
@@ -39,4 +79,39 @@
     <a href="/rss.xml" class="rss-link">
         <img src="app/images/Feed-icon.svg" alt="RSS" width="16" height="16"> S'abonner au flux RSS
     </a>
+
+    <div class="modal fade" id="publishModal" tabindex="-1" aria-labelledby="publishModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="publishModalLabel">Gérer la publication</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="publishContent">
+                </div>
+                <div class="modal-footer">
+                    <!-- Boutons de la modale -->
+                </div>
+            </div>
+        </div>
+    </div>
+{/block}
+
+{block scripts}
+<script n:syntax="off">
+    let publishModal;
+
+    document.addEventListener('DOMContentLoaded', function() {
+        publishModal = new bootstrap.Modal(document.getElementById('publishModal'));
+    });
+
+    function showPublish(articleId) {
+        fetch(`/publish/article/${articleId}`)
+            .then(response => response.text())
+            .then(html => {
+                document.getElementById('publishContent').innerHTML = html;
+                publishModal.show();
+            });
+    }
+</script>
 {/block}

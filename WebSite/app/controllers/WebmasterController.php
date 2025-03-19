@@ -102,7 +102,7 @@ class WebmasterController extends BaseController
             ->innerJoin('Person ON Article.CreatedBy = Person.Id')
             ->leftJoin('Survey ON Article.Id = Survey.IdArticle')
             ->where('(Article.IdGroup IS NULL)')
-            ->where('(Article.Published = 1)');
+            ->where('(Article.Published IN NOT NULL)');
         if ($person = $this->getPerson([])) {
             $query = $query->whereOr('Article.IdGroup IN (SELECT IdGroup FROM PersonGroup WHERE IdPerson = ' . $person['Id'] . ')');
         }

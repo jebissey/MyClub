@@ -99,7 +99,7 @@
                     <small class="text-muted">
                         Créé par {$chosenArticle->FirstName} {$chosenArticle->LastName} 
                         le {date('d/m/Y', strtotime($chosenArticle->Timestamp))}
-                        {if isset($chosenArticle->Published) && $chosenArticle->Published}
+                        {if isset($chosenArticle->PublishedBy) && $chosenArticle->PublishedBy !== null}
                             <span class="badge bg-success">Publié</span>
                         {else}
                             <span class="badge bg-secondary">Non publié</span>
@@ -120,7 +120,7 @@
                     <a href="/surveys/add/{$id}" class="btn btn-success ms-2">Ajouter un sondage</a>
                         {/if}
                     {/if}
-                    {if $hasSurvey && $userConnected && isset($chosenArticle->Published) && $chosenArticle->Published}
+                    {if $hasSurvey && $userConnected && isset($chosenArticle->PublishedBy) && $chosenArticle->PublishedBy !== null}
                     <button id="reply-survey-btn" class="btn btn-success ms-2">Répondre au sondage</button>
                     {/if}
                     <a href="/articles" class="btn btn-secondary ms-2">Retour à la liste</a>
@@ -137,7 +137,7 @@
                         <div class="d-flex align-items-center gap-4">
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox" id="published-input" name="published" value="1" 
-                                    {if isset($chosenArticle->Published) && $chosenArticle->Published}checked{/if}>
+                                    {if isset($chosenArticle->PublishedBy) && $chosenArticle->PublishedBy !== null}checked{/if}>
                                 <label class="form-check-label" for="published-input">
                                     Publier
                                 </label>
@@ -366,6 +366,21 @@
                     quill.clipboard.dangerouslyPasteHTML(initialContent);
                     titleInput.value = titleDisplay.textContent;
                 });
+
+
+
+                const groupSelect = document.getElementById('group-select');
+                const publishedInput = document.getElementById('published-input');
+                function updateCheckboxState() {
+                    if (groupSelect.value === "") {
+                        publishedInput.disabled = true;
+                        publishedInput.checked = false;
+                    } else {
+                        publishedInput.disabled = false;
+                    }
+                }
+                updateCheckboxState();
+                groupSelect.addEventListener('change', updateCheckboxState);
             });
 
             function resizeImage(file, maxWidth = 1024, maxHeight = 1024) {

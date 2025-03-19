@@ -140,6 +140,8 @@ $flight->route('GET  /articles/create',     function()    use ($articleControlle
 $flight->route('GET  /articles/delete/@id', function($id) use ($articleController) { $articleController->delete($id); });
 $flight->route('GET  /articles/@id',        function($id) use ($articleController) { $articleController->show($id); });
 $flight->route('POST /articles/@id',        function($id) use ($articleController) { $articleController->update($id); });
+$flight->route('GET  /publish/article/@id', function($id) use ($articleController) { $articleController->publish($id); });
+$flight->route('POST /publish/article/@id', function($id) use ($articleController) { $articleController->publish($id); });
 
 $surveyController = $container->get('app\controllers\SurveyController');
 $flight->route('GET  /surveys/add/@id',       function($id) use ($surveyController) { $surveyController->add($id); });
