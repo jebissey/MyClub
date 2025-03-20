@@ -4,7 +4,6 @@ namespace app\helpers\database;
 
 class File
 {
-
     function copy($sourceFile, $destinationDir)
     {
         $destinationFile = $destinationDir . basename($sourceFile);

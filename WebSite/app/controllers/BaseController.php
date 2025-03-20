@@ -142,6 +142,13 @@ abstract class BaseController
         return $filteredNavItems;
     }
 
+    protected function getGroup($id)
+    {
+        $query = $this->pdo->prepare('SELECT * FROM "Group" WHERE Id = ?');
+        $query->execute([$id]);
+        return $query->fetch(PDO::FETCH_ASSOC);
+    }
+
     private function getHref($userEmail)
     {
         return $userEmail == '' ? '/user/sign/in' : '/user';

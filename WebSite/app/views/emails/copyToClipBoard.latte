@@ -2,7 +2,7 @@
 
 {block content}
 <div class="container-fluid">
-    <h1>Liste des adresses email</h1>
+    <h2>Liste des adresses email ({count($emails)}) avec {$filters}</h2>
     <ul>
         {foreach $emails as $email}
             <li>{$email}</li>

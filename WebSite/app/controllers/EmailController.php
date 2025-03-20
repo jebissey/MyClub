@@ -55,9 +55,13 @@ class EmailController extends BaseController
                         $filteredEmails[] = $person['Email'];
                     }
                 }
+                $groupName = $idGroup !='' ? $this->getGroup($idGroup)['Name'] : '';
+                $eventTypeName = $idEventType !='' ? $this->fluent->from('EventType')->where('Id', $idEventType)->fetch('Name') : '';
+                $dayOfWeekName = $dayOfWeek !='' ? ['Lu.', 'Ma.', 'Me.', 'Je.', 'Ve.', 'Sa.', 'Di.', ''][$dayOfWeek] : '';
                 echo $this->latte->render('app/views/emails/copyToClipBoard.latte', $this->params->getAll([
                     'emailsJson' => json_encode($filteredEmails),
-                    'emails' => $filteredEmails
+                    'emails' => $filteredEmails,
+                    'filters' => "$groupName / $eventTypeName / $dayOfWeekName / $timeOfDay"
                 ]));
             } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 

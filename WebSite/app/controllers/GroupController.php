@@ -101,9 +101,7 @@ class GroupController extends BaseController implements CrudControllerInterface
                 $selectedAuthorizations = isset($_POST['authorizations']) ? $_POST['authorizations'] : [];
 
                 if (empty($name)) {
-                    $query = $this->pdo->prepare('SELECT * FROM "Group" WHERE Id = ?');
-                    $query->execute([$id]);
-                    $group = $query->fetch(PDO::FETCH_ASSOC);
+                    $group = $this->getGroup($id);
 
                     echo $this->latte->render('app/views/groups/edit.latte', $this->params->getAll([
                         'group' => $group,
@@ -132,10 +130,7 @@ class GroupController extends BaseController implements CrudControllerInterface
                     }
                 }
             } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-                $query = $this->pdo->prepare('SELECT * FROM "Group" WHERE Id = ?');
-                $query->execute([$id]);
-                $group = $query->fetch(PDO::FETCH_ASSOC);
-
+                $group = $this->getGroup($id);
                 if (!$group) {
                     $this->application->error499('Group', $id, __FILE__, __LINE__);
                 } else {
