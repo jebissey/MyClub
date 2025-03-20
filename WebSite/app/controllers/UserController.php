@@ -167,7 +167,8 @@ class UserController extends BaseController
             'latestArticleTitles' => $articles['latestArticleTitles'],
             'greatings' => $this->settings->get('Greatings'),
             'link' => $this->settings->get('Link'),
-            'navItems' => $this->getNavItems()
+            'navItems' => $this->getNavItems(),
+            'publishedBy' => $articles['latestArticle'] && $articles['latestArticle']->PublishedBy != $articles['latestArticle']->CreatedBy ? $this->getPublisher($articles['latestArticle']->PublishedBy) : '',
         ]));
     }
 
@@ -296,12 +297,12 @@ class UserController extends BaseController
                 )
                 ORDER BY et.Name
             ");
-            $query->execute([$person['Id']]);
-            $eventTypes = $query->fetchAll(PDO::FETCH_ASSOC);
-            echo $this->latte->render('app/views/user/preferences.latte', $this->params->getAll([
-                'currentPreferences' => $preferences,
-                'eventTypes' => $eventTypes
-            ]));
+                $query->execute([$person['Id']]);
+                $eventTypes = $query->fetchAll(PDO::FETCH_ASSOC);
+                echo $this->latte->render('app/views/user/preferences.latte', $this->params->getAll([
+                    'currentPreferences' => $preferences,
+                    'eventTypes' => $eventTypes
+                ]));
             } else {
                 $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
             }
@@ -370,6 +371,4 @@ class UserController extends BaseController
         VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ? ,?)');
         $query->execute([$client->getIp(), $client->getReferer(), $client->getOs(), $client->getBrowser(), $client->getScreenResolution(), $client->getType(), $client->getUri(), $client->getToken(), $email, $code, $message]);
     }
-
-
 }

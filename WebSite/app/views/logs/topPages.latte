@@ -46,7 +46,7 @@
                         {foreach $topPages as $index => $pageData}
                         <tr>
                             <td>{$index + 1}</td>
-                            <td>{$pageData['Uri']}</td>
+                            <td>{$pageData['Uri']|truncate:80}</td>
                             <td>{$pageData['visits']}</td>
                             <td>
                                 {var $percentage = ($pageData['visits'] / $totalVisits) * 100}

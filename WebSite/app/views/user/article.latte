@@ -99,6 +99,7 @@
                     <small class="text-muted">
                         Créé par {$chosenArticle->FirstName} {$chosenArticle->LastName} 
                         le {date('d/m/Y', strtotime($chosenArticle->Timestamp))}
+                        {$publishedBy}
                         {if isset($chosenArticle->PublishedBy) && $chosenArticle->PublishedBy !== null}
                             <span class="badge bg-success">Publié</span>
                         {else}

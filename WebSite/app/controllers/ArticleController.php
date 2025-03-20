@@ -111,7 +111,8 @@ class ArticleController extends TableController
             'hasSurvey' => $survey ? true : false,
             'id' => $id,
             'userConnected' => $person,
-            'navItems' => $this->getNavItems()
+            'navItems' => $this->getNavItems(),
+            'publishedBy' => $chosenArticle->PublishedBy && $chosenArticle->PublishedBy != $chosenArticle->CreatedBy ? $this->getPublisher($chosenArticle->PublishedBy) : '',
         ]));
     }
 

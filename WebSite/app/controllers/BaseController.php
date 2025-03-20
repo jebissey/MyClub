@@ -149,6 +149,18 @@ abstract class BaseController
         return $query->fetch(PDO::FETCH_ASSOC);
     }
 
+
+    protected function getPublisher($id)
+    {
+        if ($id == null) {
+            return null;
+        }
+        $query = $this->pdo->prepare('SELECT FirstName, LastName FROM Person  WHERE Id = ?');
+        $query->execute([$id]);
+        $person = $query->fetch(PDO::FETCH_ASSOC);
+        return "publié par " . $person['FirstName'] . " " . $person['LastName'];
+    }
+
     private function getHref($userEmail)
     {
         return $userEmail == '' ? '/user/sign/in' : '/user';
