@@ -61,7 +61,8 @@ class EmailController extends BaseController
                 echo $this->latte->render('app/views/emails/copyToClipBoard.latte', $this->params->getAll([
                     'emailsJson' => json_encode($filteredEmails),
                     'emails' => $filteredEmails,
-                    'filters' => "$groupName / $eventTypeName / $dayOfWeekName / $timeOfDay"
+                    'filters' => "$groupName / $eventTypeName / $dayOfWeekName / $timeOfDay",
+                    'phones' => $this->fluent->from('Person')->where('Inactivated', 0)->fetchAll('Email', 'Phone'),
                 ]));
             } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 

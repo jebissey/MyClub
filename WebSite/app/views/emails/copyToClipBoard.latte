@@ -5,7 +5,7 @@
     <h2>Liste des adresses email ({count($emails)}) avec {$filters}</h2>
     <ul>
         {foreach $emails as $email}
-            <li>{$email}</li>
+            <li>{$email} ({$phones[$email]['Phone']})</li>
         {/foreach}
     </ul>
 </div>
