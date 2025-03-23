@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS "Article" (
 	"Timestamp"	TEXT NOT NULL DEFAULT current_timestamp,
 	"PublishedBy"	INTEGER DEFAULT NULL,
 	"IdGroup"	INTEGER DEFAULT NULL,
+	"LastUpdate"	TEXT NOT NULL DEFAULT current_timestamp,
 	PRIMARY KEY("Id"),
 	FOREIGN KEY("CreatedBy") REFERENCES "Person"("Id"),
 	FOREIGN KEY("IdGroup") REFERENCES "Group"("Id"),

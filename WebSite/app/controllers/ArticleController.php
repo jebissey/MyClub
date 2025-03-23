@@ -14,12 +14,14 @@ class ArticleController extends TableController
             'createdBy' => $_GET['createdBy'] ?? '',
             'title' => $_GET['title'] ?? '',
             'timestamp' => $_GET['timestamp'] ?? '',
+            'lastUpdate' => $_GET['lastUpdate'] ?? '',
             'published' => $_GET['published'] ?? ''
         ];
         $filterConfig = [
             ['name' => 'createdBy', 'label' => 'Créé par'],
             ['name' => 'title', 'label' => 'Titre'],
             ['name' => 'timestamp', 'label' => 'Date de création'],
+            ['name' => 'lastUpdate', 'label' => 'Dernière modification'],
             ['name' => 'published', 'label' => 'Publié'],
             ['name' => 'groupName', 'label' => 'N° du groupe']
         ];
@@ -29,7 +31,8 @@ class ArticleController extends TableController
             ['field' => 'FirstName', 'label' => 'Prénom'],
             ['field' => 'Title', 'label' => 'Titre'],
             ['field' => 'Timestamp', 'label' => 'Date de création'],
-            ['field' => 'Published', 'label' => 'Publié'],
+            ['field' => 'LastUpdate', 'label' => 'Dernière modification'],
+            ['field' => 'PublishedBy', 'label' => 'Publié'],
             ['field' => 'IdGroup', 'label' => 'Groupe(n°)'],
             ['field' => 'HasSurvey', 'label' => 'Sondage']
         ];
@@ -135,8 +138,8 @@ class ArticleController extends TableController
                     return;
                 }
 
-                $query = $this->pdo->prepare("UPDATE Article SET Title = ?, Content = ?, PublishedBy = ?, IdGroup = ? WHERE Id = ?");
-                $result = $query->execute([$title, $content, $published == 1 ? $person['Id'] : NULL, $idGroup, $id]);
+                $query = $this->pdo->prepare("UPDATE Article SET Title = ?, Content = ?, PublishedBy = ?, IdGroup = ?, LastUpdate = ? WHERE Id = ?");
+                $result = $query->execute([$title, $content, $published == 1 ? $person['Id'] : NULL, $idGroup, date('Y-m-d H:i:s'), $id]);
                 if ($result) {
                     $_SESSION['success'] = "L'article a été mis à jour avec succès";
                     (new Backup())->save();
@@ -163,8 +166,8 @@ class ArticleController extends TableController
                 }
                 $published = $_POST['published'] ?? 0;
 
-                $query = $this->pdo->prepare("UPDATE Article SET PublishedBy = ? WHERE Id = ?");
-                $result = $query->execute([$published == 1 ? $person['Id'] : NULL, $id]);
+                $query = $this->pdo->prepare("UPDATE Article SET PublishedBy = ?, LastUpdate = ?  WHERE Id = ?");
+                $result = $query->execute([$published == 1 ? $person['Id'] : NULL, date('Y-m-d H:i:s'), $id]);
                 if ($result) {
                     $_SESSION['success'] = "L'article a été mis à jour avec succès";
                     (new Backup())->save();
@@ -268,7 +271,7 @@ class ArticleController extends TableController
             LEFT JOIN Person ON Person.Id = Article.CreatedBy 
             LEFT JOIN 'Group' ON Article.IdGroup = 'Group'.Id
             WHERE Article.Id IN ($placeholders)
-            ORDER BY Article.Timestamp DESC 
+            ORDER BY Article.LastUpdate DESC 
             LIMIT 1");
         $query->execute($articleIds);
         return $query->fetch(PDO::FETCH_OBJ) ?: null;
@@ -278,11 +281,11 @@ class ArticleController extends TableController
     {
         $placeholders = implode(',', array_fill(0, count($articleIds), '?'));
         $query = $this->pdo->prepare("
-            SELECT Article.Id, Article.Title, Article.Timestamp 
+            SELECT Id, Title, Timestamp, LastUpdate 
             FROM Article 
             WHERE Article.Id IN ($placeholders)
             AND Article.publishedBy IS NOT NULL 
-            ORDER BY Article.Timestamp DESC 
+            ORDER BY Article.LastUpdate DESC 
             LIMIT 10");
         $query->execute($articleIds);
         return $query->fetchAll(PDO::FETCH_OBJ) ?: [];

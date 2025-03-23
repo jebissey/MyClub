@@ -17,6 +17,9 @@
                         Créé par {$latestArticle->FirstName} {$latestArticle->LastName} 
                         le {date('d/m/Y', strtotime($latestArticle->Timestamp))}
                         {$publishedBy}
+                        {if date('Y-m-d', strtotime($latestArticle->Timestamp)) !== date('Y-m-d', strtotime($latestArticle->LastUpdate))}
+                        modifié le {date('d/m/Y', strtotime($latestArticle->LastUpdate))}
+                        {/if}
                     </small>
                 </div>
                 <div class="card-body">

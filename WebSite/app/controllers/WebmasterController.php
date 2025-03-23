@@ -97,7 +97,7 @@ class WebmasterController extends BaseController
         $feed_description = "Mises à jour de la liste d'articles";
 
         $query = $this->fluent->from('Article')
-            ->select('Article.Id, Article.Title, Article.Timestamp')
+            ->select('Article.Id, Article.Title, Article.Timestamp, Article.LastUpdate')
             ->select('CASE WHEN Survey.IdArticle IS NOT NULL THEN "oui" ELSE "non" END AS HasSurvey')
             ->innerJoin('Person ON Article.CreatedBy = Person.Id')
             ->leftJoin('Survey ON Article.Id = Survey.IdArticle')
@@ -106,7 +106,7 @@ class WebmasterController extends BaseController
         if ($person = $this->getPerson([])) {
             $query = $query->whereOr('Article.IdGroup IN (SELECT IdGroup FROM PersonGroup WHERE IdPerson = ' . $person['Id'] . ')');
         }
-        $query = $query->orderBy('Article.Timestamp DESC');
+        $query = $query->orderBy('Article.LastUpdate DESC');
         $articles = $query->fetchAll();
 
         $rss_content = $this->generateRSS($articles, $site_title, $site_url, $feed_url, $feed_description);
@@ -134,7 +134,7 @@ class WebmasterController extends BaseController
             $rss .= '<title>' . htmlspecialchars($article['Title']) . '</title>';
             $rss .= '<link>' . htmlspecialchars($site_url . '/articles/' . $article['Id']) . '</link>';
             $rss .= '<guid>' . htmlspecialchars($site_url . '/articles/' . $article['Id']) . '</guid>';
-            $rss .= '<pubDate>' . date(DATE_RSS, strtotime($article['Timestamp'])) . '</pubDate>';
+            $rss .= '<pubDate>' . date(DATE_RSS, strtotime($article['LastUpdate'])) . '</pubDate>';
             $rss .= '<description>Article' . ($article['HasSurvey'] === 'oui' ? ' avec sondage' : '') . '</description>';
             $rss .= '</item>';
         }

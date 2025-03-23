@@ -100,6 +100,9 @@
                         Créé par {$chosenArticle->FirstName} {$chosenArticle->LastName} 
                         le {date('d/m/Y', strtotime($chosenArticle->Timestamp))}
                         {$publishedBy}
+                        {if date('Y-m-d', strtotime($chosenArticle->Timestamp)) !== date('Y-m-d', strtotime($chosenArticle->LastUpdate))}
+                        modifié le {date('d/m/Y', strtotime($chosenArticle->LastUpdate))}
+                        {/if}
                         {if isset($chosenArticle->PublishedBy) && $chosenArticle->PublishedBy !== null}
                             <span class="badge bg-success">Publié</span>
                         {else}
