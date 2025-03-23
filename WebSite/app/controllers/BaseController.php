@@ -56,7 +56,7 @@ abstract class BaseController
         if (!$userEmail) {
             $this->params = new Params([
                 'href' => '/user/sign/in',
-                'userImg' => '../../app/images/anonymat.png',
+                'userImg' => '/app/images/anonymat.png',
                 'userEmail' => '',
                 'keys' => false,
                 'isEventManager' => false,
@@ -169,14 +169,14 @@ abstract class BaseController
     private function getUserImg($person)
     {
         if ($person === null) {
-            return '../../app/images/anonymat.png';
+            return '/app/images/anonymat.png';
         } else if ($person['UseGravatar'] === 'yes') {
             return (new GravatarHandler())->getGravatar($person['Email']);
         } else {
             if (empty($person['Avatar'])) {
-                return '../../app/images/emojiPensif.png';
+                return '/app/images/emojiPensif.png';
             } else {
-                return '../../app/images/' . $person['Avatar'];
+                return '/app/images/' . $person['Avatar'];
             }
         }
     }

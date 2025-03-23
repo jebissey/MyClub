@@ -1,0 +1,11 @@
+{layout '../layout.latte'}      
+
+{block navbar}
+    {include 'home.latte'}
+{/block}
+
+{block content}
+    <div id="content-display">
+        {$chosenArticle['Content']|noescape}
+    </div>
+{/block}

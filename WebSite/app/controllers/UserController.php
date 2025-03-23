@@ -79,7 +79,7 @@ class UserController extends BaseController
             } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 echo $this->latte->render('app/views/user/setPassword.latte', [
                     'href' => '/user/sign/in',
-                    'userImg' => '../../app/images/anonymat.png',
+                    'userImg' => '/app/images/anonymat.png',
                     'userEmail' => '',
                     'keys' => false,
                     'page' => basename(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH)),
@@ -122,7 +122,7 @@ class UserController extends BaseController
         } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             echo $this->latte->render('app/views/user/signIn.latte', [
                 'href' => '/user/sign/in',
-                'userImg' => '../../app/images/anonymat.png',
+                'userImg' => '/app/images/anonymat.png',
                 'userEmail' => '',
                 'keys' => false,
                 'page' => basename(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH)),
@@ -155,7 +155,7 @@ class UserController extends BaseController
         } else {
             $this->params = new Params([
                 'href' => '/user/sign/in',
-                'userImg' => '../../app/images/anonymat.png',
+                'userImg' => '/app/images/anonymat.png',
                 'userEmail' => '',
                 'keys' => false,
                 'currentVersion' => self::VERSION
@@ -234,7 +234,7 @@ class UserController extends BaseController
                     'avatar' => $avatar,
                     'useGravatar' => $useGravatar,
                     'emojis' => $emojis,
-                    'emojiPath' => '../../app/images/',
+                    'emojiPath' => '/app/images/',
                     'isSelfEdit' => true,
                     'layout' => $this->getLayout()
                 ]));

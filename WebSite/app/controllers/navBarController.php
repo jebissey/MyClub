@@ -140,7 +140,13 @@ class NavBarController extends BaseController
     public function showArticle($id) 
     {
         if ($this->authorizedUser("/navbar/show/article/$id")) {
-            
+            $this->getPerson();
+            $chosenArticle = $this->fluent->from('Article')->where('Id', $id)->fetch();
+            echo $this->latte->render('app/views/navbar/article.latte', $this->params->getAll([
+                'navItems' => $this->getNavItems(),
+                'chosenArticle' => $chosenArticle,
+                'hasAuthorization' => $this->authorizations->hasAutorization()
+            ]));
         } else {
             $this->application->error403(__FILE__, __LINE__);
         }
@@ -176,7 +182,7 @@ class NavBarController extends BaseController
     private function getAvailableRoutes()
     {
         return [
-            '/navbar/show/articles/@id',
+            '/navbar/show/article/@id',
             '/navbar/show/arwards',
             '/navbar/show/events'
         ];
