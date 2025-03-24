@@ -104,6 +104,12 @@ $containerBuilder->addDefinitions([
             $container->get(PDO::class),
             $container->get(Engine::class)
         );
+    },
+    'app\controllers\MediaController' => function (Container $container) {
+        return new \app\controllers\MediaController(
+            $container->get(PDO::class),
+            $container->get(Engine::class)
+        );
     }
 ]);
 $container = $containerBuilder->build();
@@ -135,6 +141,7 @@ Flight::map('getData', function ($key) {
 
 
 $articleController = $container->get('app\controllers\ArticleController');
+$flight->route('GET  /redactor',            function()    use ($articleController) { $articleController->home(); });
 $flight->route('GET  /articles',            function()    use ($articleController) { $articleController->index(); });
 $flight->route('GET  /articles/create',     function()    use ($articleController) { $articleController->create(); });
 $flight->route('GET  /articles/delete/@id', function($id) use ($articleController) { $articleController->delete($id); });
@@ -245,7 +252,7 @@ $flight->route('GET  /dbbrowser/@table/edit/@id',   function($table, $id) use ($
 $flight->route('POST /dbbrowser/@table/edit/@id',   function($table, $id) use ($dbBrowserController) { $dbBrowserController->updateRecord($table, $id); });
 $flight->route('POST /dbbrowser/@table/delete/@id', function($table, $id) use ($dbBrowserController) { $dbBrowserController->deleteRecord($table, $id); });
 
-$navBarController = $container->get('app\controllers\navBarController');
+$navBarController = $container->get('app\controllers\NavBarController');
 $flight->route('GET    /navBar',                     function()    use ($navBarController) { $navBarController->index(); });
 $flight->route('POST   /navBar/update',              function()    use ($navBarController) { $navBarController->updatePositions(); });
 $flight->route('POST   /api/navBar/saveItem',        function()    use ($navBarController) { $navBarController->saveItem(); });
@@ -255,6 +262,13 @@ $flight->route('DELETE /api/navBar/deleteItem/@id',  function($id) use ($navBarC
 $flight->route('GET    /navBar/show/article/@id',    function($id) use ($navBarController) { $navBarController->showArticle($id); });
 $flight->route('GET    /navBar/show/arwards',        function()    use ($navBarController) { $navBarController->showArwards(); });
 $flight->route('GET    /navBar/show/events',         function()    use ($navBarController) { $navBarController->showEvents(); });
+
+$mediaController = $container->get('app\controllers\MediaController');
+$flight->route('GET  /data/media/@year/@month/@filename',       function($year, $month, $filename) use ($mediaController) { $mediaController->viewFile($year,$month,$filename); });
+$flight->route('GET  /media/upload',                            function()                         use ($mediaController) { $mediaController->showUploadForm(); });
+$flight->route('POST /api/media/upload',                        function()                         use ($mediaController) { $mediaController->uploadFile(); });
+$flight->route('POST /api/media/delete/@year/@month/@filename', function($year, $month, $filename) use ($mediaController) { $mediaController->deleteFile($year,$month,$filename); });
+$flight->route('GET  /media/list',                              function()                         use ($mediaController) { $mediaController->listFiles(); });
 
 $apiController = $container->get('app\controllers\ApiController');
 $flight->route('GET  /api/persons-by-group/@id', function($id) use ($apiController) { $apiController->getPersonsByGroup($id); });

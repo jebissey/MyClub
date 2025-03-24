@@ -7,6 +7,22 @@ use app\helpers\Backup;
 
 class ArticleController extends TableController
 {
+    public function home(): void
+    {
+        if ($this->getPerson(['Redactor'])) {
+
+            if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+                $_SESSION['navbar'] = 'redactor';
+
+                echo $this->latte->render('app/views/admin/redactor.latte', $this->params->getAll([]));
+            } else {
+                $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
+            }
+        } else {
+            $this->application->error403(__FILE__, __LINE__);
+        }
+    }
+
     public function index()
     {
         $person = $this->getPerson([]);
@@ -32,7 +48,7 @@ class ArticleController extends TableController
             ['field' => 'Title', 'label' => 'Titre'],
             ['field' => 'Timestamp', 'label' => 'Date de création'],
             ['field' => 'LastUpdate', 'label' => 'Dernière modification'],
-            ['field' => 'PublishedBy', 'label' => 'Publié'],
+            ['field' => 'Published', 'label' => 'Publié'],
             ['field' => 'IdGroup', 'label' => 'Groupe(n°)'],
             ['field' => 'HasSurvey', 'label' => 'Sondage']
         ];

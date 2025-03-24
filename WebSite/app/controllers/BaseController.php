@@ -149,7 +149,6 @@ abstract class BaseController
         return $query->fetch(PDO::FETCH_ASSOC);
     }
 
-
     protected function getPublisher($id)
     {
         if ($id == null) {
@@ -161,6 +160,7 @@ abstract class BaseController
         return "publié par " . $person['FirstName'] . " " . $person['LastName'];
     }
 
+    
     private function getHref($userEmail)
     {
         return $userEmail == '' ? '/user/sign/in' : '/user';
