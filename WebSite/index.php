@@ -269,6 +269,7 @@ $flight->route('GET  /media/upload',                            function()      
 $flight->route('POST /api/media/upload',                        function()                         use ($mediaController) { $mediaController->uploadFile(); });
 $flight->route('POST /api/media/delete/@year/@month/@filename', function($year, $month, $filename) use ($mediaController) { $mediaController->deleteFile($year,$month,$filename); });
 $flight->route('GET  /media/list',                              function()                         use ($mediaController) { $mediaController->listFiles(); });
+$flight->route('GET  /media/gpxViewer',                         function()                         use ($mediaController) { $mediaController->gpxViewer(); });
 
 $apiController = $container->get('app\controllers\ApiController');
 $flight->route('GET  /api/persons-by-group/@id', function($id) use ($apiController) { $apiController->getPersonsByGroup($id); });

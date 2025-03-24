@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visualisation GPX</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-gpx/1.5.0/gpx.min.js"></script>
+    <style>
+        body { margin: 0; font-family: Arial, sans-serif; }
+        #map { height: 100vh; position: relative; } /* Important pour positionner les statistiques */
+        #stats {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 10px;
+            border-radius: 5px;
+            z-index: 401; /* Assure que les stats sont au-dessus des contrôles de zoom */
+        }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+    <div id="stats" class="alert alert-info"></div>
+
+    <script n:syntax="off">
+        document.addEventListener("DOMContentLoaded", function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const gpxUrl = urlParams.get("file");
+
+            if (!gpxUrl) {
+                document.getElementById("stats").innerHTML = "Aucun fichier GPX sélectionné.";
+                return;
+            }
+
+            let map = L.map("map").setView([48.8566, 2.3522], 13);
+            L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+                attribution: "&copy; OpenStreetMap contributors"
+            }).addTo(map);
+
+            new L.GPX(gpxUrl, {
+                async: true,
+                marker_options: {
+                    startIconUrl: "https://unpkg.com/leaflet-gpx@1.5.0/pin-icon-start.png",
+                    endIconUrl: "https://unpkg.com/leaflet-gpx@1.5.0/pin-icon-end.png",
+                    shadowUrl: "https://unpkg.com/leaflet-gpx@1.5.0/pin-shadow.png"
+                }
+            })
+            .on("loaded", function(e) {
+                const gpxLayer = e.target;
+                map.fitBounds(gpxLayer.getBounds());
+
+                const totalDistance = gpxLayer.get_distance() ? (gpxLayer.get_distance() / 1000).toFixed(2) : "N/A";
+                const totalElevation = gpxLayer.get_elevation_gain() ? gpxLayer.get_elevation_gain().toFixed(2) : "N/A";
+
+                document.getElementById("stats").innerHTML = `
+                    <strong>Distance :</strong> ${totalDistance} km<br>
+                    <strong>Dénivelé :</strong> ${totalElevation} m
+                `;
+            })
+            .on("error", function(e) {
+                document.getElementById("stats").innerHTML = "Erreur lors du chargement du fichier GPX.";
+            })
+            .addTo(map);
+        });
+    </script>
+</body>
+</html>

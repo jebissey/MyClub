@@ -164,6 +164,19 @@ class MediaController extends BaseController
         }
     }
 
+    public function gpxViewer()
+    {
+        if ($this->getPerson(['Redactor'])) {
+            if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+                $this->latte->render('app/views/media/gpxViewer.latte', $this->params->getAll([]));
+            } else {
+                $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
+            }
+        } else {
+            $this->application->error403(__FILE__, __LINE__);
+        }
+    }
+
     public function deleteFile($year, $month, $filename)
     {
         $filePath = $this->mediaPath . $year . '/' . $month . '/' . $filename;

@@ -57,9 +57,15 @@
                             <td>{$file['size']|formatFileSize}</td>
                             <td>
                                 <div class="btn-group" role="group">
+                                {if strpos($file['name'], '.gpx') !== false}
+                                    <a href="/media/gpxViewer?file={$file['url']}" target="_blank" class="btn btn-sm btn-primary me-2" title="Voir sur carte">
+                                        <i class="bi bi-map"></i>
+                                    </a>
+                                {else}
                                     <a href="{$file['url']}" target="_blank" class="btn btn-sm btn-primary me-2" title="Voir">
                                         <i class="bi bi-eye"></i>
                                     </a>
+                                {/if}
                                     <button type="button" class="btn btn-sm btn-success copy-url-btn me-2" 
                                             data-url="{$file['url']}" title="Copier l'URL">
                                         <i class="bi bi-clipboard"></i>
