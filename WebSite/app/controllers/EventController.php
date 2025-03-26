@@ -2,6 +2,7 @@
 
 namespace app\controllers;
 
+use app\helpers\Event;
 use Exception;
 use PDO;
 
@@ -39,14 +40,16 @@ class EventController extends BaseController
         if ($person = $this->getPerson()) {
             $date = $_GET['date'] ?? date('Y-m-d');
             $userEmail = $person['Email'];
+            $event = new Event($this->pdo);
 
-            $events = $this->getEventsForDay($date, $userEmail);
+            $events = $event->getEventsForDay($date, $userEmail);
             $count = count($events);
 
             header('Content-Type: application/json');
             echo json_encode($count);
         } else {
-            $this->application->error403(__FILE__, __LINE__);
+            header('Content-Type: application/json', true, 403);
+            echo json_encode(['success' => false, 'message' => 'User not found']);
         }
     }
 
@@ -55,15 +58,17 @@ class EventController extends BaseController
         if ($person = $this->getPerson()) {
             $date = $_GET['date'] ?? date('Y-m-d');
             $userEmail = $person['Email'];
+            $event = new Event($this->pdo);
 
             echo $this->latte->render('app/views/event/manager.latte', $this->params->getAll([
-                'events' => $this->getEventsForDay($date, $userEmail),
+                'events' => $event->getEventsForDay($date, $userEmail),
                 'date' => $date,
                 'userEmail' => $userEmail,
-                'isRegistered' => function ($eventId) use ($userEmail) {
-                    return $this->isUserRegistered($eventId, $userEmail);
+                'isRegistered' => function ($eventId) use ($userEmail, $event) {
+                    return $event->isUserRegistered($eventId, $userEmail);
                 },
                 'eventTypes' => $this->fluent->from('EventType')->where('Inactivated', 0)->orderBy('Name')->fetchAll('Id', 'Name'),
+                'eventAttributes' => $this->fluent->from('Attribute')->fetchAll('Id', ['Name', 'Detail', 'Color']),
                 'layout' => $this->getLayout()
             ]));
         } else {
@@ -76,13 +81,14 @@ class EventController extends BaseController
         if ($person = $this->getPerson()) {
             $eventId = $_GET['eventId'] ?? 0;
             $userEmail = $person['Email'];
+            $event = new Event($this->pdo);
 
             echo $this->latte->render('app/views/event/eventDetail.latte', $this->params->getAll([
                 'event' => $this->getEvent($eventId),
                 'attributes' => $$this->getEventAttributes($eventId),
                 'participants' => $this->getEventParticipants($eventId),
                 'userEmail' => $userEmail,
-                'isRegistered' => $this->isUserRegistered($eventId, $userEmail)
+                'isRegistered' => $event->isUserRegistered($eventId, $userEmail)
             ]));
         } else {
             $this->application->error403(__FILE__, __LINE__);
@@ -95,8 +101,9 @@ class EventController extends BaseController
             $eventId = $_POST['eventId'] ?? 0;
             $userEmail = $person['Email'];
             $userId = $person['Id'];
+            $event = new Event($this->pdo);
 
-            if ($eventId > 0 && !$this->isUserRegistered($eventId, $userEmail)) {
+            if ($eventId > 0 && !$event->isUserRegistered($eventId, $userEmail)) {
                 try {
                     $stmt = $this->pdo->prepare(
                         "INSERT INTO EventParticipant (IdEvent, IdPerson, RegistrationDate) 
@@ -127,8 +134,9 @@ class EventController extends BaseController
             $eventId = $_POST['eventId'] ?? 0;
             $userEmail = $person['Email'];
             $userId = $person['Id'];
+            $event = new Event($this->pdo);
 
-            if ($eventId > 0 && $this->isUserRegistered($eventId, $userEmail)) {
+            if ($eventId > 0 && $event->isUserRegistered($eventId, $userEmail)) {
                 try {
                     $stmt = $this->pdo->prepare(
                         "DELETE FROM EventParticipant 
@@ -158,19 +166,31 @@ class EventController extends BaseController
         if ($person = $this->getPerson(['EventManager'])) {
             $data = json_decode(file_get_contents('php://input'), true);
 
-            if (!isset($data['summary'], $data['description'], $data['location'], $data['idEventType'], $data['startTime'], $data['endTime'])) {
+            if (!isset(
+                $data['summary'],
+                $data['description'],
+                $data['location'],
+                $data['idEventType'],
+                $data['startTime'],
+                $data['endTime']
+            )) {
                 header('Content-Type: application/json', true, 400);
                 echo json_encode(['success' => false, 'message' => 'Données incomplètes']);
                 exit();
             }
-            if (empty($data['summary']) || empty($data['description']) || empty($data['location']) || !is_numeric($data['idEventType'])) {
+
+            if (
+                empty($data['summary']) || empty($data['description']) ||
+                empty($data['location']) || !is_numeric($data['idEventType'])
+            ) {
                 header('Content-Type: application/json', true, 400);
                 echo json_encode(['success' => false, 'message' => 'Données invalides']);
                 exit();
             }
 
             try {
-                $this->fluent->insertInto('Event')
+                $this->pdo->beginTransaction();
+                $eventId = $this->fluent->insertInto('Event')
                     ->values([
                         'Summary' => $data['summary'],
                         'Description' => $data['description'],
@@ -181,47 +201,35 @@ class EventController extends BaseController
                         'CreatedBy' => $person['Id']
                     ])
                     ->execute();
+                if (isset($data['attributes']) && is_array($data['attributes'])) {
+                    foreach ($data['attributes'] as $attributeId) {
+                        $this->fluent->insertInto('EventAttribute')
+                            ->values([
+                                'IdEvent' => $eventId,
+                                'IdAttribute' => $attributeId
+                            ])
+                            ->execute();
+                    }
+                }
+                $this->pdo->commit();
 
                 header('Content-Type: application/json');
-                echo json_encode(['success' => true]);
+                echo json_encode(['success' => true, 'eventId' => $eventId]);
             } catch (Exception $e) {
+                $this->pdo->rollBack();
+
                 header('Content-Type: application/json', true, 500);
-                echo json_encode(['success' => false, 'message' => 'Erreur lors de l\'insertion en base de données']);
+                echo json_encode([
+                    'success' => false,
+                    'message' => 'Erreur lors de l\'insertion en base de données',
+                    'error' => $e->getMessage()
+                ]);
             }
         } else {
             header('Content-Type: application/json', true, 403);
             echo json_encode(['success' => false, 'message' => 'Non autorisé']);
         }
         exit();
-    }
-
-    public function getEventsForDay($date, $userEmail)
-    {
-        $query = $this->pdo->prepare("
-            SELECT DISTINCT e.*, et.Name as EventTypeName
-            FROM Event e
-            JOIN EventType et ON e.IdEventType = et.Id
-            LEFT JOIN EventTypeGroup etg ON et.Id = etg.IdEventType
-            LEFT JOIN Person p ON p.Email = :userEmail
-            LEFT JOIN PersonGroup pg ON pg.IdPerson = p.Id
-            WHERE DATE(e.StartTime) = :date
-            AND (
-                NOT EXISTS (SELECT 1 FROM EventTypeGroup WHERE IdEventType = et.Id)
-                OR EXISTS (
-                    SELECT 1 
-                    FROM EventTypeGroup etg2 
-                    JOIN PersonGroup pg2 ON etg2.IdGroup = pg2.IdGroup 
-                    WHERE etg2.IdEventType = et.Id 
-                    AND pg2.IdPerson = p.Id
-                )
-            )
-            ORDER BY e.StartTime");
-        $query->execute([
-            'date' => $date,
-            'userEmail' => $userEmail
-        ]);
-
-        return $query->fetchAll(PDO::FETCH_ASSOC);
     }
 
     public function getEvent($eventId)
@@ -261,21 +269,142 @@ class EventController extends BaseController
         return $query->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function isUserRegistered($eventId, $userEmail)
+    public function getEventsForWeek(): void
     {
-        $query = $this->pdo->prepare("
-            SELECT COUNT(*) as count
-            FROM EventParticipant ep
-            JOIN Person p ON ep.IdPerson = p.Id
-            WHERE ep.IdEvent = :eventId
-            AND p.Email = :userEmail");
+        if ($person = $this->getPerson()) {
+            $date = $_GET['date'] ?? date('Y-m-d');
+            $userEmail = $person['Email'];
 
-        $query->execute([
-            'eventId' => $eventId,
-            'userEmail' => $userEmail
-        ]);
+            $query = $this->pdo->prepare("
+                WITH WeekDays AS (
+                    SELECT date(:date, '-' || (CAST(strftime('%w', :date) AS INTEGER)) || ' days') as Monday
+                )
+                SELECT 
+                    e.*,
+                    et.Name as EventTypeName,
+                    json_group_array(
+                        json_object(
+                            'Id', a.Id, 
+                            'Name', a.Name, 
+                            'Detail', a.Detail, 
+                            'Color', a.Color
+                        )
+                    ) as Attributes
+                FROM Event e
+                JOIN EventType et ON e.IdEventType = et.Id
+                LEFT JOIN EventAttribute ea ON ea.IdEvent = e.Id
+                LEFT JOIN Attribute a ON a.Id = ea.IdAttribute
+                JOIN WeekDays
+                WHERE 
+                    date(e.StartTime) BETWEEN 
+                    date(WeekDays.Monday) AND 
+                    date(WeekDays.Monday, '+6 days')
+                AND (
+                    NOT EXISTS (SELECT 1 FROM EventTypeGroup WHERE IdEventType = et.Id)
+                    OR EXISTS (
+                        SELECT 1 
+                        FROM EventTypeGroup etg2 
+                        JOIN PersonGroup pg2 ON etg2.IdGroup = pg2.IdGroup 
+                        JOIN Person p ON pg2.IdPerson = p.Id
+                        WHERE etg2.IdEventType = et.Id 
+                        AND p.Email = :userEmail
+                    )
+                )
+                GROUP BY e.Id, e.Summary, e.Description, e.Location, e.StartTime, e.EndTime, e.IdEventType, e.CreatedBy, et.Name
+                ORDER BY e.StartTime
+            ");
+            $query->execute([
+                'date' => $date,
+                'userEmail' => $userEmail
+            ]);
+            $events = $query->fetchAll(PDO::FETCH_ASSOC);
+            $events = array_map(function ($event) {
+                $event['attributes'] = json_decode($event['Attributes'], true);
+                if ($event['attributes'][0]['Id'] === null) {
+                    $event['attributes'] = [];
+                }
+                return $event;
+            }, $events);
 
-        $result = $query->fetch(PDO::FETCH_ASSOC);
-        return ($result['count'] > 0);
+            header('Content-Type: application/json');
+            echo json_encode($events);
+        } else {
+            header('Content-Type: application/json', true, 403);
+            echo json_encode(['success' => false, 'message' => 'User not found']);
+        }
+    }
+
+    public function checkEventManager(): void
+    {
+        $isEventManager = $this->getPerson(['EventManager']) !== false;
+
+        header('Content-Type: application/json');
+        echo json_encode(['isEventManager' => $isEventManager]);
+    }
+
+    public function update(): void
+    {
+        if ($this->getPerson(['EventManager'])) {
+            $data = json_decode(file_get_contents('php://input'), true);
+
+            if (!isset(
+                $data['id'],
+                $data['summary'],
+                $data['description'],
+                $data['location'],
+                $data['idEventType'],
+                $data['startTime'],
+                $data['endTime']
+            )) {
+                header('Content-Type: application/json', true, 400);
+                echo json_encode(['success' => false, 'message' => 'Données incomplètes']);
+                exit();
+            }
+
+            try {
+                $this->pdo->beginTransaction();
+                $this->fluent->update('Event')
+                    ->set([
+                        'Summary' => $data['summary'],
+                        'Description' => $data['description'],
+                        'Location' => $data['location'],
+                        'StartTime' => $data['startTime'],
+                        'EndTime' => $data['endTime'],
+                        'IdEventType' => $data['idEventType']
+                    ])
+                    ->where('Id', $data['id'])
+                    ->execute();
+                $this->fluent->deleteFrom('EventAttribute')
+                    ->where('IdEvent', $data['id'])
+                    ->execute();
+                if (isset($data['attributes']) && is_array($data['attributes'])) {
+                    foreach ($data['attributes'] as $attributeId) {
+                        $this->fluent->insertInto('EventAttribute')
+                            ->values([
+                                'IdEvent' => $data['id'],
+                                'IdAttribute' => $attributeId
+                            ])
+                            ->execute();
+                    }
+                }
+                $this->pdo->commit();
+
+                header('Content-Type: application/json');
+                echo json_encode(['success' => true]);
+            } catch (Exception $e) {
+                $this->pdo->rollBack();
+
+                header('Content-Type: application/json', true, 500);
+                echo json_encode([
+                    'success' => false,
+                    'message' => 'Erreur lors de la mise à jour',
+                    'error' => $e->getMessage()
+                ]);
+            }
+        } else {
+            header('Content-Type: application/json', true, 403);
+            echo json_encode(['success' => false, 'message' => 'Non autorisé']);
+        }
+        exit();
     }
 }

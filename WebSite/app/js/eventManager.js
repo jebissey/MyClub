@@ -67,7 +67,6 @@ function toISODateString(date) {
 }
 
 function updateCalendar() {
-    // Désactiver les boutons si on est à la date courante
     const prevWeekBtn = document.querySelector('.move-week[data-days="-7"]');
     const prevDayBtn = document.querySelector('.move-day[data-days="-1"]');
 

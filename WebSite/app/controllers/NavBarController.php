@@ -4,6 +4,7 @@ namespace app\controllers;
 
 use PDO;
 use app\helpers\Arwards;
+use app\helpers\Event;
 
 class NavBarController extends BaseController
 {
@@ -154,8 +155,21 @@ class NavBarController extends BaseController
 
     public function showEvents()
     {
-        if ($this->authorizedUser('/navbar/show/events')) {
-
+        if ($person = $this->getPerson()) {
+            $date = $_GET['date'] ?? date('Y-m-d');
+            $userEmail = $person['Email'];
+            $event = new Event($this->pdo);
+            echo $this->latte->render('app/views/event/manager.latte', $this->params->getAll([
+                'events' => $event->getEventsForDay($date, $userEmail),
+                'date' => $date,
+                'userEmail' => $userEmail,
+                'isRegistered' => function ($eventId) use ($userEmail, $event) {
+                    return $event->isUserRegistered($eventId, $userEmail);
+                },
+                'eventTypes' => $this->fluent->from('EventType')->where('Inactivated', 0)->orderBy('Name')->fetchAll('Id', 'Name'),
+                'eventAttributes' => $this->fluent->from('Attribute')->fetchAll('Id', 'Name, Detail, Color'),
+                'layout' => $this->getLayout()
+            ]));
         } else {
             $this->application->error403(__FILE__, __LINE__);
         }

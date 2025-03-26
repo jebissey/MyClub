@@ -222,14 +222,17 @@ $flight->route('POST /persons/edit/@id',   function($id) use ($personController)
 $flight->route('GET  /persons/delete/@id', function($id) use ($personController) { $personController->delete($id); });
 
 $eventController = $container->get('app\controllers\EventController');
-$flight->route('GET  /eventManager',         function()    use ($eventController) { $eventController->home(); });
-$flight->route('GET  /eventManager/help',    function()    use ($eventController) { $eventController->help(); });
-$flight->route('GET  /events',               function()    use ($eventController) { $eventController->index(); });
-$flight->route('GET  /api/event/count',      function()    use ($eventController) { $eventController->getEventCount(); });
-$flight->route('GET  /event/detail',         function()    use ($eventController) { $eventController->getEventDetail(); });
-$flight->route('GET  /api/event/register',   function()    use ($eventController) { $eventController->registerForEvent(); });
-$flight->route('GET  /api/event/unregister', function()    use ($eventController) { $eventController->unregisterFromEvent(); });
-$flight->route('POST /api/event/create',     function()    use ($eventController) { $eventController->create(); });
+$flight->route('GET  /eventManager',            function() use ($eventController) { $eventController->home(); });
+$flight->route('GET  /eventManager/help',       function() use ($eventController) { $eventController->help(); });
+$flight->route('GET  /events',                  function() use ($eventController) { $eventController->index(); });
+$flight->route('GET  /api/event/count',         function() use ($eventController) { $eventController->getEventCount(); });
+$flight->route('GET  /event/detail',            function() use ($eventController) { $eventController->getEventDetail(); });
+$flight->route('GET  /api/event/register',      function() use ($eventController) { $eventController->registerForEvent(); });
+$flight->route('GET  /api/event/unregister',    function() use ($eventController) { $eventController->unregisterFromEvent(); });
+$flight->route('POST /api/event/create',        function() use ($eventController) { $eventController->create(); });
+$flight->route('GET  /api/events/week',         function() use ($eventController) { $eventController->getEventsForWeek(); });
+$flight->route('GET  /api/check-event-manager', function() use ($eventController) { $eventController->checkEventManager(); });
+$flight->route('POST /api/event/update',        function() use ($eventController) { $eventController->update(); });
 
 $importController = $container->get('app\controllers\ImportController');
 $flight->route('GET  /import',         function() use ($importController) { $importController->showImportForm(); });
