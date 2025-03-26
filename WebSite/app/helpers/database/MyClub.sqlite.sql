@@ -50,12 +50,15 @@ CREATE TABLE IF NOT EXISTS "Event" (
 	"Description"	TEXT NOT NULL,
 	"Location"	TEXT NOT NULL,
 	"StartTime"	TEXT NOT NULL,
-	"EndTime"	TEXT NOT NULL,
+	"Duration"	INTEGER NOT NULL DEFAULT 3600,
 	"IdEventType"	INTEGER NOT NULL,
 	"CreatedBy"	INTEGER NOT NULL,
+	"IdGroup"	INTEGER,
+	"ForClubMembersOnly"	INTEGER NOT NULL DEFAULT 1,
 	PRIMARY KEY("Id"),
 	FOREIGN KEY("CreatedBy") REFERENCES "Person"("Id"),
-	FOREIGN KEY("IdEventType") REFERENCES "EventType"("Id")
+	FOREIGN KEY("IdEventType") REFERENCES "EventType"("Id"),
+	FOREIGN KEY("IdGroup") REFERENCES "Group"("Id")
 );
 CREATE TABLE IF NOT EXISTS "EventAttribute" (
 	"Id"	INTEGER,
