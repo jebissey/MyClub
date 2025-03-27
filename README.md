@@ -13,7 +13,9 @@ This web application is designed to make life easier for members of an associati
 
 This is a generic application.
 
-It behaves like a **mini CMS** with articles and events.
+It behaves like a **mini CMS** with articles.
+
+But there are also events.
 
 All data is stored in a **SQLight** database.
 
@@ -37,6 +39,10 @@ user@myclub.foo : user1234
 
 ## How to customize
 
+- You must update the webmaster accout (webmaster@myclub.foo : admin1234)
+- Create your grouups with their authorizations
+- Create your event types with their attributes
+- Create your navigation bar
 - Change WebSite/app/Images/home.png with your 48x48 image.
 - Change WebSite/app/Images/logo.png with yours.
 - Change WebSite/app/Images/favicon.ico with yours.
