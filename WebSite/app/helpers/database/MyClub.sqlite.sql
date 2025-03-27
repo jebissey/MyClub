@@ -53,12 +53,10 @@ CREATE TABLE IF NOT EXISTS "Event" (
 	"Duration"	INTEGER NOT NULL DEFAULT 3600,
 	"IdEventType"	INTEGER NOT NULL,
 	"CreatedBy"	INTEGER NOT NULL,
-	"IdGroup"	INTEGER,
 	"ForClubMembersOnly"	INTEGER NOT NULL DEFAULT 1,
 	PRIMARY KEY("Id"),
 	FOREIGN KEY("CreatedBy") REFERENCES "Person"("Id"),
-	FOREIGN KEY("IdEventType") REFERENCES "EventType"("Id"),
-	FOREIGN KEY("IdGroup") REFERENCES "Group"("Id")
+	FOREIGN KEY("IdEventType") REFERENCES "EventType"("Id")
 );
 CREATE TABLE IF NOT EXISTS "EventAttribute" (
 	"Id"	INTEGER,
@@ -81,7 +79,9 @@ CREATE TABLE IF NOT EXISTS "EventType" (
 	"Id"	INTEGER,
 	"Name"	TEXT NOT NULL,
 	"Inactivated"	INTEGER NOT NULL DEFAULT 0,
-	PRIMARY KEY("Id")
+	"IdGroup"	INTEGER DEFAULT NULL,
+	PRIMARY KEY("Id"),
+	FOREIGN KEY("IdGroup") REFERENCES "Group"("Id")
 );
 CREATE TABLE IF NOT EXISTS "EventTypeAttribute" (
 	"Id"	INTEGER,
@@ -90,14 +90,6 @@ CREATE TABLE IF NOT EXISTS "EventTypeAttribute" (
 	PRIMARY KEY("Id"),
 	FOREIGN KEY("IdAttribute") REFERENCES "Attribute"("Id"),
 	FOREIGN KEY("IdEventType") REFERENCES "EventType"("Id")
-);
-CREATE TABLE IF NOT EXISTS "EventTypeGroup" (
-	"Id"	INTEGER,
-	"IdEventType"	INTEGER NOT NULL,
-	"IdGroup"	INTEGER NOT NULL,
-	PRIMARY KEY("Id"),
-	FOREIGN KEY("IdEventType") REFERENCES "EventType"("Id"),
-	FOREIGN KEY("IdGroup") REFERENCES "Group"("Id")
 );
 CREATE TABLE IF NOT EXISTS "Group" (
 	"Id"	INTEGER,

@@ -146,7 +146,7 @@ class RegistrationController extends TableController
             echo json_encode(['success' => $success]);
         } else {
             header('Content-Type: application/json', true, 403);
-            echo json_encode(['success' => false, 'message' => 'Unauthorized']);
+            echo json_encode(['success' => false, 'message' => 'User not allowed']);
         }
         exit();
     }
@@ -160,7 +160,7 @@ class RegistrationController extends TableController
             echo json_encode(['success' => $success]);
         } else {
             header('Content-Type: application/json', true, 403);
-            echo json_encode(['success' => false, 'message' => 'Unauthorized']);
+            echo json_encode(['success' => false, 'message' => 'User not allowed']);
         }
         exit();
     }

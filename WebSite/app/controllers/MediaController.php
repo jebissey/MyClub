@@ -102,7 +102,7 @@ class MediaController extends BaseController
             echo json_encode($response);
         } else {
             header('Content-Type: application/json', true, 403);
-            echo json_encode(['success' => false, 'message' => 'Unauthorized']);
+            echo json_encode(['success' => false, 'message' => 'User not allowed']);
         }
         exit();
     }

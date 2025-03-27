@@ -39,7 +39,7 @@ class NavBarController extends BaseController
             echo json_encode($item);
         } else {
             header('Content-Type: application/json', true, 403);
-            echo json_encode(['success' => false, 'message' => 'Unauthorized']);
+            echo json_encode(['success' => false, 'message' => 'User not allowed']);
         }
         exit();
     }
@@ -83,7 +83,7 @@ class NavBarController extends BaseController
             }
         } else {
             header('Content-Type: application/json', true, 403);
-            echo json_encode(['success' => false, 'message' => 'Unauthorized']);
+            echo json_encode(['success' => false, 'message' => 'User not allowed']);
         }
         exit();
     }
@@ -104,7 +104,7 @@ class NavBarController extends BaseController
             echo json_encode(['success' => true]);
         } else {
             header('Content-Type: application/json', true, 403);
-            echo json_encode(['success' => false, 'message' => 'Unauthorized']);
+            echo json_encode(['success' => false, 'message' => 'User not allowed']);
         }
         exit();
     }
@@ -117,7 +117,7 @@ class NavBarController extends BaseController
             echo json_encode(['success' => $result == 1]);
         } else {
             header('Content-Type: application/json', true, 403);
-            echo json_encode(['success' => false, 'message' => 'Unauthorized']);
+            echo json_encode(['success' => false, 'message' => 'User not allowed']);
         }
         exit();
     }

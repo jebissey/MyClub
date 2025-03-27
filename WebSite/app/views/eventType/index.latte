@@ -1,0 +1,159 @@
+{layout '../admin/webmaster.latte'}
+
+{block title}Types d'évènement et leurs attributs{/block}
+
+{block content}
+<div class="row">
+    <div class="col-md-8">
+        {include '../common/dataTable.latte',
+            'createButton' => [
+                'url' => '/eventTypes/create',
+                'label' => "Créer un type d'évènement"
+            ],
+            'items' => $eventTypes,
+            'actions' => [
+                [
+                    'type' => 'link',
+                    'label' => 'Éditer',
+                    'url' => '/eventTypes/edit/{id}',
+                    'class' => 'btn-warning'
+                ],
+                [
+                    'type' => 'link',
+                    'label' => 'Supprimer',
+                    'url' => '/eventTypes/delete/{id}',
+                    'class' => 'btn-danger',
+                    'confirm' => "Voulez-vous vraiment supprimer ce type d'évènement ?"
+                ]
+            ]
+        }
+    </div>
+      <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseAttributes" aria-expanded="false" aria-controls="collapseAttributes">
+        Gestions des attributs
+    </button>
+    <div class="collapse" id="collapseAttributes">
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title h5 m-0">Gestion des Attributs</h2>
+            </div>
+            <div class="card-body">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="mb-3 d-flex align-items-center gap-2">
+                            <input type="text" id="newAttributeName" class="form-control flex-grow-1" placeholder="Nom de l'attribut" required>
+                            <input type="color" id="newAttributeColor" class="form-control form-control-color" value="#563d7c" style="width: 100px;">
+                            <textarea id="newAttributeDetail" class="form-control flex-grow-1" placeholder="Détail" rows="1" style="resize: none;"></textarea>
+                            <button onclick="createAttribute_()" class="btn btn-primary"><i class="bi bi-plus"></i></button>
+                        </div>
+                    </div>
+                </div>
+                <div id="attributesList">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}
+
+{block scripts}
+<script n:syntax="off">
+    document.addEventListener("DOMContentLoaded", function () {
+        loadAttributesList();
+    });
+
+    function createAttribute_() {
+        const name = document.getElementById('newAttributeName').value;
+        const detail = document.getElementById('newAttributeDetail').value;
+        const color = document.getElementById('newAttributeColor').value;
+
+        if (!name) {
+            alert('Le nom de l\'attribut est requis');
+            return;
+        }
+
+        fetch('/api/attributes/create', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ name, detail, color })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                loadAttributesList();
+                document.getElementById('newAttributeName').value = '';
+                document.getElementById('newAttributeDetail').value = '';
+                document.getElementById('newAttributeColor').value = '#563d7c';
+            } else {
+                alert(data.message || 'Une erreur est survenue');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Une erreur est survenue');
+        });
+    }
+
+    function editAttribute(id) {
+        const name = document.getElementById(`attributeName${id}`).value;
+        const detail = document.getElementById(`attributeDetail${id}`).value;
+        const color = document.getElementById(`attributeColor${id}`).value;
+
+        fetch('/api/attributes/update', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ id, name, detail, color })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                loadAttributesList();
+            } else {
+                alert(data.message || 'Une erreur est survenue');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Une erreur est survenue');
+        });
+    }
+
+    function deleteAttribute(id) {
+        if (confirm('Êtes-vous sûr de vouloir supprimer cet attribut ?')) {
+            fetch(`/api/attributes/delete/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    loadAttributesList();
+                } else {
+                    alert(data.message || 'Une erreur est survenue');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Une erreur est survenue');
+            });
+        }
+    }
+
+    function loadAttributesList() {
+        fetch('/api/attributes/list')
+        .then(response => response.text())
+        .then(html => {
+            document.getElementById('attributesList').innerHTML = html;
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Impossible de charger la liste des attributs');
+        });
+    }
+</script>
+{/block}

@@ -1,0 +1,41 @@
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Nom</th>
+            <th>Détail</th>
+            <th>Couleur</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {foreach $attributes as $attribute}
+        <tr>
+            <td>
+                <input type="text" class="form-control form-control-sm" 
+                       id="attributeName{$attribute['Id']}" 
+                       value="{$attribute['Name']|noescape}">
+            </td>
+            <td>
+                <input type="text" class="form-control form-control-sm" 
+                       id="attributeDetail{$attribute['Id']}" 
+                       value="{$attribute['Detail']|noescape}">
+            </td>
+            <td>
+                <input type="color" class="form-control form-control-color" 
+                       id="attributeColor{$attribute['Id']}" 
+                       value="{$attribute['Color']|noescape}">
+            </td>
+            <td>
+                <div class="btn-group" role="group">
+                    <button onclick="editAttribute({$attribute['Id']})" class="btn btn-sm btn-primary me-2">
+                        <i class="bi bi-pencil"></i>
+                    </button>
+                    <button onclick="deleteAttribute({$attribute['Id']})" class="btn btn-sm btn-danger">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
+            </td>
+        </tr>
+        {/foreach}
+    </tbody>
+</table>

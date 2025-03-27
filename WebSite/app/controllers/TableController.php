@@ -13,6 +13,9 @@ abstract class TableController extends BaseController
                 $query = $query->where("$key LIKE ?", "%$value%");
             }
         }
+
+        //var_dump($query->getQuery());
+        //die();
         
         $totalItems = $query->count();
         $totalPages = ceil($totalItems / $this->itemsPerPage);

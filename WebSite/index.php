@@ -110,6 +110,12 @@ $containerBuilder->addDefinitions([
             $container->get(PDO::class),
             $container->get(Engine::class)
         );
+    },
+    'app\controllers\eventTypeController' => function (Container $container) {
+        return new \app\controllers\EventTypeController(
+            $container->get(PDO::class),
+            $container->get(Engine::class)
+        );
     }
 ]);
 $container = $containerBuilder->build();
@@ -273,6 +279,17 @@ $flight->route('POST /api/media/upload',                        function()      
 $flight->route('POST /api/media/delete/@year/@month/@filename', function($year, $month, $filename) use ($mediaController) { $mediaController->deleteFile($year,$month,$filename); });
 $flight->route('GET  /media/list',                              function()                         use ($mediaController) { $mediaController->listFiles(); });
 $flight->route('GET  /media/gpxViewer',                         function()                         use ($mediaController) { $mediaController->gpxViewer(); });
+
+$eventTypeController = $container->get('app\controllers\EventTypeController');
+$flight->route('GET    /eventTypes',                function()    use ($eventTypeController) { $eventTypeController->index(); });
+$flight->route('GET    /eventTypes/create',         function()    use ($eventTypeController) { $eventTypeController->create(); });
+$flight->route('GET    /eventTypes/edit/@id',       function($id) use ($eventTypeController) { $eventTypeController->edit($id); });
+$flight->route('POST   /eventTypes/edit/@id',       function($id) use ($eventTypeController) { $eventTypeController->edit($id); });
+$flight->route('GET    /eventTypes/delete/@id',     function($id) use ($eventTypeController) { $eventTypeController->delete($id); });
+$flight->route('POST   /api/attributes/create',     function()    use ($eventTypeController) { $eventTypeController->createAttribute(); });
+$flight->route('POST   /api/attributes/update',     function()    use ($eventTypeController) { $eventTypeController->updateAttribute(); });
+$flight->route('DELETE /api/attributes/delete/@id', function($id) use ($eventTypeController) { $eventTypeController->deleteAttribute($id); });
+$flight->route('GET    /api/attributes/list',       function()    use ($eventTypeController) { $eventTypeController->getAttributes(); });
 
 $apiController = $container->get('app\controllers\ApiController');
 $flight->route('GET  /api/persons-by-group/@id', function($id) use ($apiController) { $apiController->getPersonsByGroup($id); });

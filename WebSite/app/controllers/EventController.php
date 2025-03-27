@@ -227,7 +227,7 @@ class EventController extends BaseController
             }
         } else {
             header('Content-Type: application/json', true, 403);
-            echo json_encode(['success' => false, 'message' => 'Non autorisé']);
+            echo json_encode(['success' => false, 'message' => 'User not allowed']);
         }
         exit();
     }
@@ -403,7 +403,7 @@ class EventController extends BaseController
             }
         } else {
             header('Content-Type: application/json', true, 403);
-            echo json_encode(['success' => false, 'message' => 'Non autorisé']);
+            echo json_encode(['success' => false, 'message' => 'User not allowed']);
         }
         exit();
     }
