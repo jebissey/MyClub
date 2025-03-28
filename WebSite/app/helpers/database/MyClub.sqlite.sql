@@ -28,6 +28,7 @@ CREATE TABLE IF NOT EXISTS "Authorization" (
 CREATE TABLE IF NOT EXISTS "Contact" (
 	"Id"	INTEGER,
 	"Email"	TEXT NOT NULL,
+	"NickName"	TEXT,
 	"Token"	TEXT,
 	"TokenCreatedAt"	TEXT,
 	PRIMARY KEY("Id")
@@ -137,8 +138,10 @@ CREATE TABLE IF NOT EXISTS "Page" (
 CREATE TABLE IF NOT EXISTS "Participant" (
 	"Id"	INTEGER,
 	"IdEvent"	INTEGER NOT NULL,
-	"IdPerson"	INTEGER NOT NULL,
+	"IdPerson"	INTEGER,
+	"IdContact"	INTEGER,
 	PRIMARY KEY("Id"),
+	FOREIGN KEY("IdContact") REFERENCES "Contact"("Id"),
 	FOREIGN KEY("IdEvent") REFERENCES "Event"("Id"),
 	FOREIGN KEY("IdPerson") REFERENCES "Person"("Id")
 );

@@ -122,23 +122,23 @@ class NavBarController extends BaseController
         exit();
     }
 
-    public function showArwards() 
+    public function showArwards()
     {
         if ($this->authorizedUser('/navbar/show/arwards')) {
             $this->getPerson();
             $arwards = new Arwards($this->pdo);
-                echo $this->latte->render('app/views/admin/arwards.latte', $this->params->getAll([
-                    'counterNames' => $counterNames = $arwards->getCounterNames(),
-                    'data' => $arwards->getData($counterNames),
-                    'groups' => $arwards->getGroups(),
-                    'layout' => $this->getLayout()
-                ]));
+            echo $this->latte->render('app/views/admin/arwards.latte', $this->params->getAll([
+                'counterNames' => $counterNames = $arwards->getCounterNames(),
+                'data' => $arwards->getData($counterNames),
+                'groups' => $arwards->getGroups(),
+                'layout' => $this->getLayout()
+            ]));
         } else {
             $this->application->error403(__FILE__, __LINE__);
         }
     }
 
-    public function showArticle($id) 
+    public function showArticle($id)
     {
         if ($this->authorizedUser("/navbar/show/article/$id")) {
             $this->getPerson();
@@ -175,6 +175,17 @@ class NavBarController extends BaseController
         }
     }
 
+    public function showNextEvents()
+    {
+        $event = new Event($this->pdo);
+        $person = $this->getPerson();
+
+        echo $this->latte->render('app/views/event/nextEvents.latte', $this->params->getAll([
+            'navItems' => $this->getNavItems(),
+            'events' => $event->getNextEvents($person)
+        ]));
+    }
+
     private function authorizedUser($page)
     {
         $query = $this->pdo->query("
@@ -184,11 +195,11 @@ class NavBarController extends BaseController
             WHERE Page.Name = '$page'
         ");
         $groups = $query->fetchAll(PDO::FETCH_COLUMN);
-        if(!$groups) return true;
-        
+        if (!$groups) return true;
+
         $person = $this->getPerson();
-        if(!$person) return false;
-        
+        if (!$person) return false;
+
         $userGroups = $this->getUserGroups($person['Email']);
         return !empty(array_intersect($groups, $userGroups));
     }
@@ -198,7 +209,8 @@ class NavBarController extends BaseController
         return [
             '/navbar/show/article/@id',
             '/navbar/show/arwards',
-            '/navbar/show/events'
+            '/navbar/show/events',
+            '/navbar/show/nextEvents'
         ];
     }
 }

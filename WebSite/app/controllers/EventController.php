@@ -76,6 +76,17 @@ class EventController extends BaseController
         }
     }
 
+    public function nextEvents(): void
+    {
+        $event = new Event($this->pdo);
+        $person = $this->getPerson();
+
+        echo $this->latte->render('app/views/event/nextEvents.latte', $this->params->getAll([
+            'navItems' => $this->getNavItems(),
+            'events' => $event->getNextEvents($person)
+        ]));
+    }
+
     public function getEventDetail(): void
     {
         if ($person = $this->getPerson()) {

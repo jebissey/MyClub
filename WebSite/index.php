@@ -228,6 +228,7 @@ $flight->route('POST /persons/edit/@id',   function($id) use ($personController)
 $flight->route('GET  /persons/delete/@id', function($id) use ($personController) { $personController->delete($id); });
 
 $eventController = $container->get('app\controllers\EventController');
+$flight->route('GET  /nextEvents',              function() use ($eventController) { $eventController->nextEvents(); });
 $flight->route('GET  /eventManager',            function() use ($eventController) { $eventController->home(); });
 $flight->route('GET  /eventManager/help',       function() use ($eventController) { $eventController->help(); });
 $flight->route('GET  /events',                  function() use ($eventController) { $eventController->index(); });
@@ -271,6 +272,7 @@ $flight->route('DELETE /api/navBar/deleteItem/@id',  function($id) use ($navBarC
 $flight->route('GET    /navBar/show/article/@id',    function($id) use ($navBarController) { $navBarController->showArticle($id); });
 $flight->route('GET    /navBar/show/arwards',        function()    use ($navBarController) { $navBarController->showArwards(); });
 $flight->route('GET    /navBar/show/events',         function()    use ($navBarController) { $navBarController->showEvents(); });
+$flight->route('GET    /navBar/show/nextEvents',     function()    use ($navBarController) { $navBarController->showNextEvents(); });
 
 $mediaController = $container->get('app\controllers\MediaController');
 $flight->route('GET  /data/media/@year/@month/@filename',       function($year, $month, $filename) use ($mediaController) { $mediaController->viewFile($year,$month,$filename); });

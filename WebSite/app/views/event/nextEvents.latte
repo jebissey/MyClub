@@ -1,0 +1,60 @@
+{layout '../layout.latte'}
+
+{block title}Evènements{/block}
+
+{block head}
+<style>
+.attribute-badge {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    margin-right: 5px;
+    border-radius: 4px;
+    cursor: help;
+    border: 1px solid rgba(0,0,0,0.2);
+}
+</style>
+{/block}
+
+{block navbar}
+    {include '../navbar/home.latte'}
+{/block}
+
+{block content}
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Type</th>
+            <th>Sommaire</th>
+            <th>Lieu</th>
+            <th>Date et Heure</th>
+            <th>Durée</th>
+            <th>Attributs</th>
+        </tr>
+    </thead>
+    <tbody>
+        {foreach $events as $event}
+        <tr>
+            <td>{$event['eventTypeName']}</td>
+            <td>{$event['summary']}</td>
+            <td>{$event['location']}</td>
+            <td>{$event['startTime']|date:'d/m/Y H:i'}</td>
+            <td>{$event['duration']}</td>
+            <td>
+    {if count($event['attributes']) > 0}
+        {foreach $event['attributes'] as $attribute}
+        <span 
+            class="attribute-badge" 
+            style="background-color: {$attribute['color']|noescape};"
+            title="{$attribute['name']} - {$attribute['detail']}"
+        ></span>
+        {/foreach}
+    {else}
+        Aucun attribut
+    {/if}
+            </td>
+        </tr>
+        {/foreach}
+    </tbody>
+</table>
+{/block}
