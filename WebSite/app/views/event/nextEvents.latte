@@ -38,7 +38,7 @@
             <td>{$event['eventTypeName']}</td>
             <td>{$event['summary']}</td>
             <td>{$event['location']}</td>
-            <td>{$event['startTime']|date:'d/m/Y H:i'}</td>
+            <td>{$event['startTime']|date:'l d M Y H:i'}</td>
             <td>{$event['duration']}</td>
             <td>
     {if count($event['attributes']) > 0}

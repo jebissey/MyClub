@@ -11,6 +11,7 @@ use app\helpers\Authorization;
 use app\helpers\GravatarHandler;
 use app\helpers\Params;
 use app\helpers\Settings;
+use app\helpers\TranslationManager;
 
 abstract class BaseController
 {
@@ -25,15 +26,21 @@ abstract class BaseController
     protected $authorizations;
     protected $settings;
 
+    private $translationManager;
+
     public function __construct(PDO $pdo, Engine $flight)
     {
         $this->pdo = $pdo;
         $this->fluent = new \Envms\FluentPDO\Query($pdo);
         $this->flight = $flight;
 
+        $this->translationManager = new TranslationManager($pdo);
         $this->latte = new LatteEngine();
         $this->latte->setTempDirectory(__DIR__ . '/../../var/latte/temp');
         $this->latte->addExtension(new \Latte\Bridges\Tracy\TracyExtension);
+        $this->latte->addFilter('translate', function ($key) {
+            return $this->translationManager->translate($key);
+        });
 
         $this->application = new Application($pdo, $flight);
         $this->authorizations = new Authorization($this->pdo);

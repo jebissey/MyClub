@@ -8,6 +8,7 @@ use PDO;
 use app\helpers\Client;
 use app\helpers\Params;
 use app\helpers\PasswordManager;
+use app\helpers\TranslationManager;
 
 class UserController extends BaseController
 {
@@ -161,6 +162,7 @@ class UserController extends BaseController
                 'currentVersion' => self::VERSION
             ]);
         }
+        $translationManager = new TranslationManager($this->pdo);
         $articles = $articleController->getLatestArticles($userEmail);
         echo $this->latte->render('app/views/home.latte', $this->params->getAll([
             'latestArticle' => $articles['latestArticle'],
@@ -169,6 +171,8 @@ class UserController extends BaseController
             'link' => $this->settings->get('Link'),
             'navItems' => $this->getNavItems(),
             'publishedBy' => $articles['latestArticle'] && $articles['latestArticle']->PublishedBy != $articles['latestArticle']->CreatedBy ? $this->getPublisher($articles['latestArticle']->PublishedBy) : '',
+            'currentLanguage' => $translationManager->getCurrentLanguage(),
+            'supportedLanguages' => $translationManager->getSupportedLanguages(),
         ]));
     }
 
