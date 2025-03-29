@@ -21,7 +21,7 @@
                         modifié le {date('d/m/Y', strtotime($latestArticle->LastUpdate))}
                         {/if}
                         {if $latestArticleHasSurvey}
-                        <a href="/articles/{$latestArticle->Id}" class="btn btn-success ms-2">Voter</a>
+                        <a href="/articles/{$latestArticle->Id}" class="btn btn-success ms-2">Voter (il faut être connecté)</a>
                         {/if}
                     </small>
                 </div>

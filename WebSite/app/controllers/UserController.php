@@ -154,15 +154,17 @@ class UserController extends BaseController
                 $this->application->error480($userEmail, __FILE__, __LINE__);
             }
         } else {
+            $translationManager = new TranslationManager($this->pdo);
             $this->params = new Params([
                 'href' => '/user/sign/in',
                 'userImg' => '/app/images/anonymat.png',
                 'userEmail' => '',
                 'keys' => false,
-                'currentVersion' => self::VERSION
+                'currentVersion' => self::VERSION,
+                'currentLanguage' => $translationManager->getCurrentLanguage(),
+                'supportedLanguages' => $translationManager->getSupportedLanguages(),
             ]);
         }
-        $translationManager = new TranslationManager($this->pdo);
         $articles = $articleController->getLatestArticles($userEmail);
         echo $this->latte->render('app/views/home.latte', $this->params->getAll([
             'latestArticle' => $articles['latestArticle'],
@@ -171,9 +173,7 @@ class UserController extends BaseController
             'link' => $this->settings->get('Link'),
             'navItems' => $this->getNavItems(),
             'publishedBy' => $articles['latestArticle'] && $articles['latestArticle']->PublishedBy != $articles['latestArticle']->CreatedBy ? $this->getPublisher($articles['latestArticle']->PublishedBy) : '',
-            'currentLanguage' => $translationManager->getCurrentLanguage(),
-            'supportedLanguages' => $translationManager->getSupportedLanguages(),
-            'latestArticleHasSurvey' => (new Article($this->pdo))->hasSurvey($articles['latestArticle']->Id),
+            'latestArticleHasSurvey' => (new Article($this->pdo))->hasSurvey($articles['latestArticle']->Id ?? 0),
         ]));
     }
 

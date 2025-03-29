@@ -107,7 +107,9 @@ class EmailController extends BaseController
                 }
                 echo $this->latte->render('app/views/emails/copyToClipBoard.latte', $this->params->getAll([
                     'emailsJson' => json_encode($filteredEmails),
-                    'emails' => $filteredEmails
+                    'emails' => $filteredEmails,
+                    'filters' => "subcription to new article",
+                    'phones' => $this->fluent->from('Person')->where('Inactivated', 0)->fetchAll('Email', 'Phone'),
                 ]));
             } else {
                 $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);

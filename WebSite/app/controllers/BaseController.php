@@ -59,6 +59,7 @@ abstract class BaseController
 
     protected function getPerson($requiredAuthorisations = [], $segment = 0)
     {
+        $translationManager = new TranslationManager($this->pdo);
         $userEmail = $_SESSION['user'] ?? '';
         if (!$userEmail) {
             $this->params = new Params([
@@ -71,7 +72,9 @@ abstract class BaseController
                 'isRedactor' => false,
                 'isWebmaster' => false,
                 'page' => explode('/', trim(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/'))[$segment],
-                'currentVersion' => self::VERSION
+                'currentVersion' => self::VERSION,
+                'currentLanguage' => $translationManager->getCurrentLanguage(),
+                'supportedLanguages' => $translationManager->getSupportedLanguages(),
             ]);
             return false;
         } else {
@@ -98,7 +101,9 @@ abstract class BaseController
                     'isEditor' => $this->authorizations->isEditor(),
                     'isWebmaster' => $this->authorizations->isWebmaster(),
                     'page' => explode('/', trim(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/'))[$segment],
-                    'currentVersion' => self::VERSION
+                    'currentVersion' => self::VERSION,
+                    'currentLanguage' => $translationManager->getCurrentLanguage(),
+                    'supportedLanguages' => $translationManager->getSupportedLanguages(),
                 ]);
                 return $person;
             }

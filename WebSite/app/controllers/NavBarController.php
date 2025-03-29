@@ -181,13 +181,10 @@ class NavBarController extends BaseController
     {
         $event = new Event($this->pdo);
         $person = $this->getPerson();
-        $translationManager = new TranslationManager($this->pdo);
 
         echo $this->latte->render('app/views/event/nextEvents.latte', $this->params->getAll([
             'navItems' => $this->getNavItems(),
-            'events' => $event->getNextEvents($person),
-            'currentLanguage' => $translationManager->getCurrentLanguage(),
-            'supportedLanguages' => $translationManager->getSupportedLanguages(),
+            'events' => $event->getNextEvents($person),           
         ]));
     }
 
