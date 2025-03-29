@@ -3,6 +3,7 @@
 namespace app\controllers;
 
 use PDO;
+use app\helpers\Article;
 use app\helpers\Backup;
 
 class ArticleController extends TableController
@@ -121,7 +122,7 @@ class ArticleController extends TableController
         $survey = $this->fluent->from('Survey')
             ->where('IdArticle', $id)
             ->fetch();
-
+        
         echo $this->latte->render('app/views/user/article.latte', $this->params->getAll([
             'chosenArticle' => $chosenArticle,
             'latestArticleTitles' => $this->getLatestArticleTitles($articleIds),
@@ -132,6 +133,7 @@ class ArticleController extends TableController
             'userConnected' => $person,
             'navItems' => $this->getNavItems(),
             'publishedBy' => $chosenArticle->PublishedBy && $chosenArticle->PublishedBy != $chosenArticle->CreatedBy ? $this->getPublisher($chosenArticle->PublishedBy) : '',
+            'latestArticleHasSurvey' => (new Article($this->pdo))->hasSurvey($id),
         ]));
     }
 

@@ -21,20 +21,11 @@ class Event
             SELECT DISTINCT e.*, et.Name as EventTypeName
             FROM Event e
             JOIN EventType et ON e.IdEventType = et.Id
-            LEFT JOIN EventTypeGroup etg ON et.Id = etg.IdEventType
             LEFT JOIN Person p ON p.Email = :userEmail
             LEFT JOIN PersonGroup pg ON pg.IdPerson = p.Id
             WHERE DATE(e.StartTime) = :date
-            AND (
-                NOT EXISTS (SELECT 1 FROM EventTypeGroup WHERE IdEventType = et.Id)
-                OR EXISTS (
-                    SELECT 1 
-                    FROM EventTypeGroup etg2 
-                    JOIN PersonGroup pg2 ON etg2.IdGroup = pg2.IdGroup 
-                    WHERE etg2.IdEventType = et.Id 
-                    AND pg2.IdPerson = p.Id
-                )
-            )
+            AND (  et.IdGroup IN (SELECT pg.IdGroup FROM PersonGroup pg WHERE pg.IdPerson = ? AND pg.IdGroup = et.IdGroup)
+                OR et.IdGroup is NULL)
             ORDER BY e.StartTime");
         $query->execute([
             'date' => $date,

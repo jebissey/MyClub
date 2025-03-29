@@ -5,6 +5,7 @@ namespace app\controllers;
 use DateTime;
 use flight\Engine;
 use PDO;
+use app\helpers\Article;
 use app\helpers\Client;
 use app\helpers\Params;
 use app\helpers\PasswordManager;
@@ -143,7 +144,6 @@ class UserController extends BaseController
         exit();
     }
 
-
     public function home(ArticleController $articleController)
     {
         $userEmail = $_SESSION['user'] ?? '';
@@ -173,6 +173,7 @@ class UserController extends BaseController
             'publishedBy' => $articles['latestArticle'] && $articles['latestArticle']->PublishedBy != $articles['latestArticle']->CreatedBy ? $this->getPublisher($articles['latestArticle']->PublishedBy) : '',
             'currentLanguage' => $translationManager->getCurrentLanguage(),
             'supportedLanguages' => $translationManager->getSupportedLanguages(),
+            'latestArticleHasSurvey' => (new Article($this->pdo))->hasSurvey($articles['latestArticle']->Id),
         ]));
     }
 
@@ -282,25 +283,19 @@ class UserController extends BaseController
             } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $preferences = json_decode($person['Preferences'] ?? '', true);
                 $query = $this->pdo->prepare("
-                SELECT DISTINCT et.*
-                FROM EventType et
-                WHERE et.Inactivated = 0 
-                AND (
-                    et.Id IN (
-                        SELECT DISTINCT etg.IdEventType
-                        FROM EventTypeGroup etg
-                        JOIN `Group` g ON etg.IdGroup = g.Id
-                        JOIN PersonGroup pg ON g.Id = pg.IdGroup
-                        WHERE pg.IdPerson = ?
-                    )
-                    OR
-                    et.Id NOT IN (
-                        SELECT DISTINCT IdEventType 
-                        FROM EventTypeGroup
-                    )
-                )
-                ORDER BY et.Name
-            ");
+                    SELECT et.*
+                    FROM EventType et
+                    LEFT JOIN `Group` g ON et.IdGroup = g.Id
+                    WHERE et.Inactivated = 0 
+                    AND (
+                        g.Id IN (
+                            SELECT pg.IdGroup
+                            FROM PersonGroup pg
+                            WHERE pg.IdPerson = ? AND pg.IdGroup = g.Id
+                        )
+                        OR et.IdGroup is NULL)
+                    ORDER BY et.Name
+                ");
                 $query->execute([$person['Id']]);
                 $eventTypes = $query->fetchAll(PDO::FETCH_ASSOC);
                 echo $this->latte->render('app/views/user/preferences.latte', $this->params->getAll([

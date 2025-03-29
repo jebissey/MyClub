@@ -5,6 +5,7 @@ namespace app\controllers;
 use PDO;
 use app\helpers\Arwards;
 use app\helpers\Event;
+use app\helpers\TranslationManager;
 
 class NavBarController extends BaseController
 {
@@ -159,6 +160,7 @@ class NavBarController extends BaseController
             $date = $_GET['date'] ?? date('Y-m-d');
             $userEmail = $person['Email'];
             $event = new Event($this->pdo);
+
             echo $this->latte->render('app/views/event/manager.latte', $this->params->getAll([
                 'events' => $event->getEventsForDay($date, $userEmail),
                 'date' => $date,
@@ -179,10 +181,13 @@ class NavBarController extends BaseController
     {
         $event = new Event($this->pdo);
         $person = $this->getPerson();
+        $translationManager = new TranslationManager($this->pdo);
 
         echo $this->latte->render('app/views/event/nextEvents.latte', $this->params->getAll([
             'navItems' => $this->getNavItems(),
-            'events' => $event->getNextEvents($person)
+            'events' => $event->getNextEvents($person),
+            'currentLanguage' => $translationManager->getCurrentLanguage(),
+            'supportedLanguages' => $translationManager->getSupportedLanguages(),
         ]));
     }
 

@@ -20,6 +20,9 @@
                         {if date('Y-m-d', strtotime($latestArticle->Timestamp)) !== date('Y-m-d', strtotime($latestArticle->LastUpdate))}
                         modifié le {date('d/m/Y', strtotime($latestArticle->LastUpdate))}
                         {/if}
+                        {if $latestArticleHasSurvey}
+                        <a href="/articles/{$latestArticle->Id}" class="btn btn-success ms-2">Voter</a>
+                        {/if}
                     </small>
                 </div>
                 <div class="card-body">

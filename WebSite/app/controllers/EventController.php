@@ -68,7 +68,7 @@ class EventController extends BaseController
                     return $event->isUserRegistered($eventId, $userEmail);
                 },
                 'eventTypes' => $this->fluent->from('EventType')->where('Inactivated', 0)->orderBy('Name')->fetchAll('Id', 'Name'),
-                'eventAttributes' => $this->fluent->from('Attribute')->fetchAll('Id', ['Name', 'Detail', 'Color']),
+                'eventAttributes' => $this->fluent->from('Attribute')->fetchAll('Id', 'Name', 'Detail', 'Color'),
                 'layout' => $this->getLayout()
             ]));
         } else {
