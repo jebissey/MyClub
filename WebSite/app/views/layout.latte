@@ -88,7 +88,9 @@
             document.addEventListener("DOMContentLoaded", function() {
                 var width = screen.width;
                 var height = screen.height;
-                document.cookie = "screen_resolution=" + width + "x" + height;
+                let expiration = new Date();
+                expiration.setDate(expiration.getDate() + 30);
+                document.cookie = "screen_resolution=" + width + "x" + height + "; path=/; expires=" + expiration.toUTCString();
 
                 var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
                 var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {

@@ -110,8 +110,8 @@ CREATE TABLE IF NOT EXISTS "GroupAuthorization" (
 CREATE TABLE IF NOT EXISTS "Languages" (
 	"Id"	INTEGER,
 	"Name"	TEXT NOT NULL,
-	"en_us"	TEXT NOT NULL,
-	"fr_fr"	TEXT NOT NULL,
+	"en_US"	TEXT NOT NULL,
+	"fr_FR"	TEXT NOT NULL,
 	PRIMARY KEY("Id")
 );
 CREATE TABLE IF NOT EXISTS "Metadata" (
@@ -211,6 +211,12 @@ INSERT INTO "Authorization" VALUES (4,'Redactor');
 INSERT INTO "Authorization" VALUES (5,'Editor');
 INSERT INTO "Group" VALUES (1,'Webmaster',0,0);
 INSERT INTO "GroupAuthorization" VALUES (1,1,1);
+INSERT INTO "Languages" VALUES (1,'select_language','Select language','Sélectionner la langue');
+INSERT INTO "Languages" VALUES (2,'language','Language','Langue');
+INSERT INTO "Languages" VALUES (3,'my_data','My ddata','Mes données');
+INSERT INTO "Languages" VALUES (4,'admin_zone','Admin zone','Zone d''administration');
+INSERT INTO "Languages" VALUES (5,'logout','Logout','Déconnexion');
+INSERT INTO "Languages" VALUES (6,'contextual_help','Contextual help','Aide contextuelle');
 INSERT INTO "Metadata" VALUES (1,'MyClub',1);
 INSERT INTO "Person" VALUES (1,'webmaster@myclub.foo','613cbc51f1650fb264beaad127efc1a5da0f96a96d4da7c440dc01a9e5299910','my first name','my last name','my nick name or nothing',NULL,'0',NULL,NULL,NULL,NULL,0,0,NULL);
 INSERT INTO "PersonGroup" VALUES (1,1,1);

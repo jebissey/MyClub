@@ -8,6 +8,10 @@ class TranslationManager
 {
     private $fluent;
     const SUPPORTED_LANGUAGES = ['en_US', 'fr_FR'];
+    const FLAGS = [
+        'en_US' => '🇺🇸',
+        'fr_FR' => '🇫🇷',
+    ];
     const DEFAULT_LANGUAGE = 'fr_FR';
     const COOKIE_NAME = 'user_language';
     const COOKIE_EXPIRATION = 86400 * 30; // 30 days
@@ -43,5 +47,10 @@ class TranslationManager
     public function getSupportedLanguages()
     {
         return self::SUPPORTED_LANGUAGES;
+    }
+
+    public function getFlag(string $locale): string
+    {
+        return self::FLAGS[$locale] ?? '🏳️';
     }
 }

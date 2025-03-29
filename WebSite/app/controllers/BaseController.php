@@ -75,6 +75,7 @@ abstract class BaseController
                 'currentVersion' => self::VERSION,
                 'currentLanguage' => $translationManager->getCurrentLanguage(),
                 'supportedLanguages' => $translationManager->getSupportedLanguages(),
+                'flag' => $translationManager->getFlag($translationManager->getCurrentLanguage()),
             ]);
             return false;
         } else {
@@ -104,6 +105,7 @@ abstract class BaseController
                     'currentVersion' => self::VERSION,
                     'currentLanguage' => $translationManager->getCurrentLanguage(),
                     'supportedLanguages' => $translationManager->getSupportedLanguages(),
+                    'flag' => $translationManager->getFlag($translationManager->getCurrentLanguage()),
                 ]);
                 return $person;
             }
