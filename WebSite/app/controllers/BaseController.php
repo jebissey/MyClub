@@ -70,6 +70,7 @@ abstract class BaseController
                 'isEventManager' => false,
                 'isPersonManager' => false,
                 'isRedactor' => false,
+                'isEditor' => false,
                 'isWebmaster' => false,
                 'page' => explode('/', trim(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/'))[$segment],
                 'currentVersion' => self::VERSION,

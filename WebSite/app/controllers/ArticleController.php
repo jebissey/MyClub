@@ -80,7 +80,8 @@ class ArticleController extends TableController
             'resetUrl' => '/articles',
             'isRedactor' => $person ? $this->authorizations->isRedactor() : false,
             'userConnected' => $person,
-            'layout' => $this->getLayout()
+            'layout' => $this->getLayout(),
+            'navItems' => $this->getNavItems(),
         ]));
     }
 

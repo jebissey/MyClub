@@ -310,18 +310,17 @@ class EventController extends BaseController
                     date(e.StartTime) BETWEEN 
                     date(WeekDays.Monday) AND 
                     date(WeekDays.Monday, '+6 days')
-                AND (
-                    NOT EXISTS (SELECT 1 FROM EventTypeGroup WHERE IdEventType = et.Id)
-                    OR EXISTS (
+				AND (
+					EXISTS (
                         SELECT 1 
-                        FROM EventTypeGroup etg2 
-                        JOIN PersonGroup pg2 ON etg2.IdGroup = pg2.IdGroup 
-                        JOIN Person p ON pg2.IdPerson = p.Id
-                        WHERE etg2.IdEventType = et.Id 
+                        FROM PersonGroup pg 
+                        JOIN Person p ON pg.IdPerson = p.Id
                         AND p.Email = :userEmail
                     )
-                )
-                GROUP BY e.Id, e.Summary, e.Description, e.Location, e.StartTime, e.EndTime, e.IdEventType, e.CreatedBy, et.Name
+					OR et.IdGroup is NULL
+					)
+
+                GROUP BY e.Id, e.Summary, e.Description, e.Location, e.StartTime, e.Duration, e.IdEventType, e.CreatedBy, et.Name
                 ORDER BY e.StartTime
             ");
             $query->execute([

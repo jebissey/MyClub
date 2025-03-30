@@ -163,6 +163,7 @@ class UserController extends BaseController
                 'currentVersion' => self::VERSION,
                 'currentLanguage' => $translationManager->getCurrentLanguage(),
                 'supportedLanguages' => $translationManager->getSupportedLanguages(),
+                'flag' => $translationManager->getFlag($translationManager->getCurrentLanguage()),
             ]);
         }
         $articles = $articleController->getLatestArticles($userEmail);
