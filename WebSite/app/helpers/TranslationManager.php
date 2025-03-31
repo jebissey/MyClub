@@ -2,6 +2,8 @@
 
 namespace app\helpers;
 
+use DateTime;
+use IntlDateFormatter;
 use PDO;
 
 class TranslationManager
@@ -52,5 +54,18 @@ class TranslationManager
     public function getFlag(string $locale): string
     {
         return self::FLAGS[$locale] ?? '🏳️';
+    }
+
+
+    public function getShortDate($date)
+    {
+        $formatter = new IntlDateFormatter($this->getCurrentLanguage(), IntlDateFormatter::SHORT, IntlDateFormatter::NONE);
+        return $formatter->format(new DateTime($date));
+    }
+
+    public function getLongDate($date)
+    {
+        $formatter = new IntlDateFormatter($this->getCurrentLanguage(), IntlDateFormatter::FULL, IntlDateFormatter::NONE);
+        return $formatter->format(new DateTime($date));
     }
 }

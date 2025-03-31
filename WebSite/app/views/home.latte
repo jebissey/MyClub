@@ -1,6 +1,6 @@
 {layout 'layout.latte'}
 
-{block title}Accueil{/block}
+{block title}{='home'|translate}{/block}
 
 {block navbar}
     {include 'navbar/home.latte'}
@@ -14,14 +14,14 @@
                 <div class="card-header">
                     <h2 class="card-title">{$latestArticle->Title}</h2>
                     <small class="text-muted">
-                        Créé par {$latestArticle->FirstName} {$latestArticle->LastName} 
-                        le {date('d/m/Y', strtotime($latestArticle->Timestamp))}
+                        {='created_by'|translate} {$latestArticle->FirstName} {$latestArticle->LastName} 
+                        {='on'|translate} {=$latestArticle->Timestamp|shortDate}
                         {$publishedBy}
                         {if date('Y-m-d', strtotime($latestArticle->Timestamp)) !== date('Y-m-d', strtotime($latestArticle->LastUpdate))}
-                        modifié le {date('d/m/Y', strtotime($latestArticle->LastUpdate))}
+                        {='modified_on'|translate} {=$latestArticle->LastUpdate|shortDate}
                         {/if}
                         {if $latestArticleHasSurvey}
-                        <a href="/articles/{$latestArticle->Id}" class="btn btn-success ms-2">Voter (il faut être connecté)</a>
+                        <a href="/articles/{$latestArticle->Id}" class="btn btn-success ms-2">{='vote'|translate}{if $userEmail == ''} {='connection_required'|translate}{/if}</a>
                         {/if}
                     </small>
                 </div>
