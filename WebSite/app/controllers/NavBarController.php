@@ -184,7 +184,8 @@ class NavBarController extends BaseController
 
         echo $this->latte->render('app/views/event/nextEvents.latte', $this->params->getAll([
             'navItems' => $this->getNavItems(),
-            'events' => $event->getNextEvents($person),           
+            'events' => $event->getNextEvents($person),
+            'person' => $person,
         ]));
     }
 

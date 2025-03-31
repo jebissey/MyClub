@@ -47,6 +47,12 @@ abstract class BaseController
         $this->latte->addFilter('longDate', function ($date) {
             return $this->translationManager->getLongDate($date);
         });
+        $this->latte->addFilter('longDateTime', function ($date) {
+            return $this->translationManager->getLongDateTime($date);
+        });
+        $this->latte->addFilter('readableDuration', function ($duration) {
+            return $this->translationManager->getReadableDuration($duration);
+        });
 
         $this->application = new Application($pdo, $flight);
         $this->authorizations = new Authorization($this->pdo);

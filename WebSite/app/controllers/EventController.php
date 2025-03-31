@@ -8,6 +8,40 @@ use PDO;
 
 class EventController extends BaseController
 {
+    public function nextEvents(): void
+    {
+        $event = new Event($this->pdo);
+        $person = $this->getPerson();
+
+        echo $this->latte->render('app/views/event/nextEvents.latte', $this->params->getAll([
+            'navItems' => $this->getNavItems(),
+            'events' => $event->getNextEvents($person),
+            'person' => $person,
+        ]));
+    }
+
+    public function show($eventId): void
+    {
+        if ($person = $this->getPerson()) {
+            $userEmail = $person['Email'];
+            $event = new Event($this->pdo);
+
+            echo $this->latte->render('app/views/event/detail.latte', $this->params->getAll([
+                'event' => $this->getEvent($eventId),
+                'attributes' => $this->getEventAttributes($eventId),
+                'participants' => $this->getEventParticipants($eventId),
+                'userEmail' => $userEmail,
+                'isRegistered' => $event->isUserRegistered($eventId, $userEmail),
+                'navItems' => $this->getNavItems(),
+            ]));
+        } else {
+            $this->application->error403(__FILE__, __LINE__);
+        }
+    }
+
+
+
+
     public function help(): void
     {
         $this->getPerson();
@@ -76,17 +110,6 @@ class EventController extends BaseController
         }
     }
 
-    public function nextEvents(): void
-    {
-        $event = new Event($this->pdo);
-        $person = $this->getPerson();
-
-        echo $this->latte->render('app/views/event/nextEvents.latte', $this->params->getAll([
-            'navItems' => $this->getNavItems(),
-            'events' => $event->getNextEvents($person)
-        ]));
-    }
-
     public function getEventDetail(): void
     {
         if ($person = $this->getPerson()) {
@@ -94,12 +117,12 @@ class EventController extends BaseController
             $userEmail = $person['Email'];
             $event = new Event($this->pdo);
 
-            echo $this->latte->render('app/views/event/eventDetail.latte', $this->params->getAll([
+            echo $this->latte->render('app/views/event/detail.latte', $this->params->getAll([
                 'event' => $this->getEvent($eventId),
                 'attributes' => $$this->getEventAttributes($eventId),
                 'participants' => $this->getEventParticipants($eventId),
                 'userEmail' => $userEmail,
-                'isRegistered' => $event->isUserRegistered($eventId, $userEmail)
+                'isRegistered' => $event->isUserRegistered($eventId, $userEmail),
             ]));
         } else {
             $this->application->error403(__FILE__, __LINE__);
@@ -270,11 +293,11 @@ class EventController extends BaseController
     public function getEventParticipants($eventId)
     {
         $query = $this->pdo->prepare("
-            SELECT p.FirstName, p.LastName, p.Email, ep.RegistrationDate
-            FROM EventParticipant ep
-            JOIN Person p ON ep.IdPerson = p.Id
-            WHERE ep.IdEvent = :eventId
-            ORDER BY ep.RegistrationDate");
+            SELECT pe.FirstName, pe.LastName, pe.NickName, pe.Email
+            FROM Participant pa
+            JOIN Person pe ON pa.IdPerson = pe.Id
+            WHERE pa.IdEvent = :eventId
+            ORDER BY pe.FirstName, pe.LastName");
 
         $query->execute(['eventId' => $eventId]);
         return $query->fetchAll(PDO::FETCH_ASSOC);

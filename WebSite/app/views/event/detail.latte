@@ -1,54 +1,80 @@
-{* Event Detail View *}
+{layout '../layout.latte'}
+
+{block title}{='summary'|translate}{/block}
+
+{block head}
+<style>
+.attribute-badge {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    margin-right: 5px;
+    border-radius: 4px;
+    cursor: help;
+    border: 1px solid rgba(0,0,0,0.2);
+}
+</style>
+{/block}
+
+{block navbar}
+    {include '../navbar/home.latte'}
+{/block}
+
+{block content}
 <div class="card">
+    <div class="card-header"><strong>{$event['Summary']}</strong></div>
     <div class="card-body">
-        <h5 class="card-title">{$event['Title']}</h5>
-        
         <div class="row">
             <div class="col-md-6">
-                <p><strong>Type:</strong> {$event['EventTypeName']}</p>
-                <p><strong>Date:</strong> {$event['StartTime']|date:'d/m/Y'}</p>
-                <p><strong>Horaire:</strong> {$event['StartTime']|date:'H:i'} - {$event['EndTime']|date:'H:i'}</p>
-                <p><strong>Lieu:</strong> {$event['Location']}</p>
-                
+                <p><strong>{='type'|translate}</strong> {$event['EventTypeName']}</p>
                 {if count($attributes) > 0}
-                    <div class="mt-3">
-                        <h6>Attributs:</h6>
-                        <div class="d-flex flex-wrap">
-                            {foreach $attributes as $attr}
-                                <span class="badge me-1 mb-1" style="background-color: {$attr['Color']}">
-                                    {$attr['Name']}: {$attr['Detail']}
-                                </span>
-                            {/foreach}
-                        </div>
-                    </div>
+                <p><strong>{='attributes'|translate}</strong>
+                    {foreach $attributes as $attribute}
+                    <span 
+                        class="attribute-badge" 
+                        style="background-color: {$attribute['Color']|noescape};"
+                        title="{$attribute['Name']} - {$attribute['Detail']}">
+                    </span>
+                    {/foreach}
+                </p>
+                {else}
+                    <p>Aucun attribut</p>
                 {/if}
+                <p><strong>{='date_time'|translate}</strong> {=$event['StartTime']|longDateTime}</p>
+                <p><strong>{='duration'|translate}</strong> {=$event['Duration']|readableDuration}</p>
+                <p><strong>{='location'|translate}</strong> {$event['Location']}</p>
+                <div class="card mb-3">
+                    <div class="card-header"><strong>{='description'|translate}</strong></div>
+                    <div class="card-body">            
+                        <p>{$event['Description']}</p>
+                    </div>
+                </div>
             </div>
             
             <div class="col-md-6">
-                <h6>Description:</h6>
-                <p>{$event['Description']}</p>
-                
                 {if $event['MaxParticipants'] > 0}
-                    <p>
-                        <strong>Participants:</strong> 
-                        {count($participants)} / {$event['MaxParticipants']}
-                    </p>
-                    
-                    {if count($participants) > 0}
-                        <div class="mt-3">
-                            <h6>Liste des participants:</h6>
-                            <ul class="list-group">
-                                {foreach $participants as $participant}
-                                    <li class="list-group-item">
-                                        {$participant['FirstName']} {$participant['LastName']}
-                                        {if $participant['Email'] === $userEmail}
-                                            <span class="badge bg-primary ms-2">Vous</span>
-                                        {/if}
-                                    </li>
-                                {/foreach}
-                            </ul>
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <strong>Participants:</strong> 
+                            {count($participants)} / {$event['MaxParticipants']}
                         </div>
-                    {/if}
+                        <div class="card-body">
+                            {if count($participants) > 0}
+                                <ul class="list-group">
+                                    {foreach $participants as $participant}
+                                        <li class="list-group-item">
+                                            {$participant['FirstName']} {$participant['LastName']}
+                                            {if $participant['Email'] === $userEmail}
+                                                <span class="badge bg-primary ms-2">Vous</span>
+                                            {/if}
+                                        </li>
+                                    {/foreach}
+                                </ul>
+                            {else}
+                                <p>Aucun participant pour le moment</p>
+                            {/if}
+                        </div>
+                    </div>
                 {/if}
                 
                 <div class="mt-3">
@@ -70,3 +96,4 @@
         </div>
     </div>
 </div>
+{/block}

@@ -54,7 +54,8 @@ CREATE TABLE IF NOT EXISTS "Event" (
 	"Duration"	INTEGER NOT NULL DEFAULT 3600,
 	"IdEventType"	INTEGER NOT NULL,
 	"CreatedBy"	INTEGER NOT NULL,
-	"ForClubMembersOnly"	INTEGER NOT NULL DEFAULT 1,
+	"MaxParticipants"	INTEGER NOT NULL DEFAULT 0,
+	"Audience"	TEXT NOT NULL DEFAULT 'ClubMembersOnly',
 	PRIMARY KEY("Id"),
 	FOREIGN KEY("CreatedBy") REFERENCES "Person"("Id"),
 	FOREIGN KEY("IdEventType") REFERENCES "EventType"("Id")
@@ -223,6 +224,16 @@ INSERT INTO "Languages" VALUES (9,'home','Home','Accueil');
 INSERT INTO "Languages" VALUES (10,'created_by','Created by','Créé par');
 INSERT INTO "Languages" VALUES (11,'modified_on','modified on','modifié le');
 INSERT INTO "Languages" VALUES (12,'on','on','le');
+INSERT INTO "Languages" VALUES (13,'eventsAvailableForYou','Available events for you','Événements disponibles pour vous');
+INSERT INTO "Languages" VALUES (14,'eventsAvailableForAll','Available events for you','Événements disponibles pour tous');
+INSERT INTO "Languages" VALUES (15,'type','Type','Type');
+INSERT INTO "Languages" VALUES (16,'summary','Summary','Sommaire');
+INSERT INTO "Languages" VALUES (17,'location','Location','Lieu');
+INSERT INTO "Languages" VALUES (18,'date_time','Date and time','Date et heure');
+INSERT INTO "Languages" VALUES (19,'duration','Duration','Durée');
+INSERT INTO "Languages" VALUES (20,'attributes','Attributes','Attribut');
+INSERT INTO "Languages" VALUES (21,'description','Description','Description');
+INSERT INTO "Languages" VALUES (22,'participants','Participants','Participants');
 INSERT INTO "Metadata" VALUES (1,'MyClub',1);
 INSERT INTO "Person" VALUES (1,'webmaster@myclub.foo','613cbc51f1650fb264beaad127efc1a5da0f96a96d4da7c440dc01a9e5299910','my first name','my last name','my nick name or nothing',NULL,'0',NULL,NULL,NULL,NULL,0,0,NULL);
 INSERT INTO "PersonGroup" VALUES (1,1,1);

@@ -68,4 +68,17 @@ class TranslationManager
         $formatter = new IntlDateFormatter($this->getCurrentLanguage(), IntlDateFormatter::FULL, IntlDateFormatter::NONE);
         return $formatter->format(new DateTime($date));
     }
+
+    public function getLongDateTime($date)
+    {
+        $formatter = new IntlDateFormatter($this->getCurrentLanguage(), IntlDateFormatter::FULL, IntlDateFormatter::SHORT);
+        return $formatter->format(new DateTime($date));
+    }
+
+    public function getReadableDuration($duration)
+    {
+        $durationHours = floor($duration / 3600);
+        $durationMinutes = floor(($duration % 3600) / 60);
+        return ($durationHours > 0 ? "$durationHours h " : '') . ($durationMinutes > 0 ? "$durationMinutes min" : '');
+    }
 }

@@ -4,6 +4,13 @@ namespace app\helpers;
 
 use PDO;
 
+enum EventAudience: string
+{
+    case ForClubMembersOnly = 'ClubMembersOnly';
+    case ForGuest = 'Guest';
+    case ForAll = 'All';
+}
+
 class Event
 {
     private PDO $pdo;
@@ -39,10 +46,10 @@ class Event
     {
         $query = $this->pdo->prepare("
             SELECT COUNT(*) as count
-            FROM EventParticipant ep
-            JOIN Person p ON ep.IdPerson = p.Id
-            WHERE ep.IdEvent = :eventId
-            AND p.Email = :userEmail");
+            FROM Participant pa
+            JOIN Person pe ON pa.IdPerson = pe.Id
+            WHERE pa.IdEvent = :eventId
+            AND pe.Email = :userEmail");
 
         $query->execute([
             'eventId' => $eventId,
@@ -61,24 +68,20 @@ class Event
             ->leftJoin('EventType et ON e.IdEventType = et.Id')
             ->where('e.StartTime > ?', $now)
             ->groupBy('e.Id');
-        
-        if ($person === null) {
-            $query->where('e.ForClubMembersOnly = 0');
+
+        if ($person === false) {
+            $query->where("e.Audience = '" . EventAudience::ForAll->value . "'");
         } else {
-            $query->leftJoin('PersonGroup pg ON pg.IdPerson = ?', $person['Id'])
-                ->where('(e.ForClubMembersOnly = 0 OR 
-                          et.IdGroup IS NULL OR 
-                          et.IdGroup IN (SELECT IdGroup FROM PersonGroup WHERE IdPerson = ?))', $person['Id']);
+            $query->where("(e.Audience = '" . EventAudience::ForClubMembersOnly->value . "' 
+                         OR et.IdGroup IS NULL 
+                         OR et.IdGroup IN (SELECT IdGroup FROM PersonGroup WHERE IdPerson = ?))", $person['Id']);
         }
-        
-        $events = $query
-            ->select('e.*, et.Name AS EventTypeName')
-            ->orderBy('e.StartTime')
-            ->fetchAll();
-        
+        $query->select('et.Name AS EventTypeName, et.IdGroup AS EventTypeIdGroup')->orderBy('e.StartTime');
+        $events = $query->fetchAll();
+
         $eventIds = array_column($events, 'Id');
         $attributes = [];
-    
+
         if (!empty($eventIds)) {
             $placeholders = implode(',', array_fill(0, count($eventIds), '?'));
             $attributeQuery = $this->pdo->prepare("
@@ -88,7 +91,7 @@ class Event
                 WHERE ea.IdEvent IN ($placeholders)
             ");
             $attributeQuery->execute($eventIds);
-    
+
             while ($row = $attributeQuery->fetch(PDO::FETCH_ASSOC)) {
                 $attributes[$row['IdEvent']][] = [
                     'id' => $row['Id'],
@@ -98,18 +101,19 @@ class Event
                 ];
             }
         }
-        
+
         return array_map(function ($event) use ($attributes) {
-            $durationHours = floor($event['Duration'] / 3600);
-            $durationMinutes = floor(($event['Duration'] % 3600) / 60);
-            $readableDuration = ($durationHours > 0 ? "$durationHours h " : '') . ($durationMinutes > 0 ? "$durationMinutes min" : '');
             return [
+                'id' => $event['Id'],
                 'eventTypeName' => $event['EventTypeName'],
+                'groupName' => $event['EventTypeIdGroup'] ? $this->fluent->from("'Group'")->where('Id', $event['EventTypeIdGroup'])->fetch('Name') : '',
                 'summary' => $event['Summary'],
                 'location' => $event['Location'],
                 'startTime' => $event['StartTime'],
-                'duration' => $readableDuration,
-                'attributes' => $attributes[$event['Id']] ?? []
+                'duration' => (new TranslationManager($this->pdo))->getReadableDuration($event['Duration']),
+                'attributes' => $attributes[$event['Id']] ?? [],
+                'participants' => $this->fluent->from('Participant')->where('IdEvent', $event['Id'])->count(),
+                'maxParticipants' => $event['MaxParticipants'],
             ];
         }, $events);
     }

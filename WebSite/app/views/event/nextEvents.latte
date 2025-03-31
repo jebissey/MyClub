@@ -21,24 +21,26 @@
 {/block}
 
 {block content}
+<h1>{if $person != false}{='eventsAvailableForYou'|translate}{else}{='eventsAvailableForAll'|translate}{/if}</h1>
 <table class="table table-striped">
     <thead>
         <tr>
-            <th>Type</th>
-            <th>Sommaire</th>
-            <th>Lieu</th>
-            <th>Date et Heure</th>
-            <th>Durée</th>
-            <th>Attributs</th>
+            <th>{='type'|translate}</th>
+            <th>{='summary'|translate}</th>
+            <th>{='location'|translate}</th>
+            <th>{='date_time'|translate}</th>
+            <th>{='duration'|translate}</th>
+            <th>{='attributes'|translate}</th>
+            <th>{='participants'|translate}</th>
         </tr>
     </thead>
     <tbody>
         {foreach $events as $event}
-        <tr>
-            <td>{$event['eventTypeName']}</td>
+        <tr onclick="window.location.href='/events/{$event['id']}';" style="cursor: pointer;">
+            <td>{$event['eventTypeName']} {if $event['groupName']}({$event['groupName']}){/if}</td>
             <td>{$event['summary']}</td>
             <td>{$event['location']}</td>
-            <td>{$event['startTime']|date:'l d M Y H:i'}</td>
+            <td>{=$event['startTime']|longDateTime}</td>
             <td>{$event['duration']}</td>
             <td>
     {if count($event['attributes']) > 0}
@@ -53,6 +55,7 @@
         Aucun attribut
     {/if}
             </td>
+            <td>{$event['participants']}{if $event['maxParticipants'] > 0} / {$event['maxParticipants']}{/if}</td>
         </tr>
         {/foreach}
     </tbody>
