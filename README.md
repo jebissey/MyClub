@@ -40,7 +40,7 @@ user@myclub.foo : user1234
 ## How to customize
 
 - You must update the webmaster accout (webmaster@myclub.foo : admin1234)
-- Create your grouups with their authorizations
+- Create your groups with their authorizations
 - Create your event types with their attributes
 - Create your navigation bar
 - Change WebSite/app/Images/home.png with your 48x48 image.
@@ -51,4 +51,6 @@ user@myclub.foo : user1234
 - Update records in Settings table.
 
 ## How to fix
-If you have this : "Error : could not find driverFatal error in file .../app/helpers/database/Database.php at line 38", you must add "extension=pdo_sqlite.so" in your php.ini
+
+- If you have this : "Error : could not find driverFatal error in file .../app/helpers/database/Database.php at line 38", you must add "extension=pdo_sqlite.so" in your php.ini
+- If you have this : "Internal error: Class "IntlDateFormatter" not found", you must add "extension=intl" in your php.ini
