@@ -32,6 +32,7 @@
             <th>{='duration'|translate}</th>
             <th>{='attributes'|translate}</th>
             <th>{='participants'|translate}</th>
+            <th>{='audience'|translate}</th>
         </tr>
     </thead>
     <tbody>
@@ -56,6 +57,7 @@
     {/if}
             </td>
             <td>{$event['participants']}{if $event['maxParticipants'] > 0} / {$event['maxParticipants']}{/if}</td>
+            <td>{=$event['audience']|translate}</td>
         </tr>
         {/foreach}
     </tbody>

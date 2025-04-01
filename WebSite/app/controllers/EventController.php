@@ -22,22 +22,56 @@ class EventController extends BaseController
 
     public function show($eventId): void
     {
-        if ($person = $this->getPerson()) {
-            $userEmail = $person['Email'];
-            $event = new Event($this->pdo);
-
-            echo $this->latte->render('app/views/event/detail.latte', $this->params->getAll([
-                'event' => $this->getEvent($eventId),
-                'attributes' => $this->getEventAttributes($eventId),
-                'participants' => $this->getEventParticipants($eventId),
-                'userEmail' => $userEmail,
-                'isRegistered' => $event->isUserRegistered($eventId, $userEmail),
-                'navItems' => $this->getNavItems(),
-            ]));
-        } else {
-            $this->application->error403(__FILE__, __LINE__);
+        $userEmail = $this->getPerson()['Email'] ?? '';
+        if ($userEmail === '') {
+            $this->setDefaultParams();
         }
+        $event = new Event($this->pdo);
+
+        echo $this->latte->render('app/views/event/detail.latte', $this->params->getAll([
+            'eventId' => $eventId,
+            'event' => $this->getEvent($eventId),
+            'attributes' => $this->getEventAttributes($eventId),
+            'participants' => $this->getEventParticipants($eventId),
+            'userEmail' => $userEmail,
+            'isRegistered' => $event->isUserRegistered($eventId, $userEmail),
+            'navItems' => $this->getNavItems(),
+        ]));
     }
+
+    public function register($eventId, bool $set): void
+    {
+        $person = $this->getPerson();
+        if ($person) {
+            $userId = $person['Id'];
+            if ($set) {
+                $event = new Event($this->pdo);
+
+                if ($eventId > 0 && !$event->isUserRegistered($eventId, $person['Email'] ?? '')) {
+                    $query = $this->pdo->prepare(
+                        "INSERT INTO Participant (IdEvent, IdPerson, IdContact) 
+                         VALUES (:eventId, :userId, NULL)"
+                    );
+                    $query->execute([
+                        'eventId' => $eventId,
+                        'userId' => $userId
+                    ]);
+                }
+            } else{
+                $query = $this->pdo->prepare(
+                    "DELETE FROM Participant 
+                     WHERE IdEvent = :eventId AND IdPerson = :userId"
+                );
+                $query->execute([
+                    'eventId' => $eventId,
+                    'userId' => $userId
+                ]);
+            }
+        }
+        $this->flight->redirect('/events/' . $eventId);
+    }
+
+
 
 
 
@@ -119,7 +153,7 @@ class EventController extends BaseController
 
             echo $this->latte->render('app/views/event/detail.latte', $this->params->getAll([
                 'event' => $this->getEvent($eventId),
-                'attributes' => $$this->getEventAttributes($eventId),
+                'attributes' => $this->getEventAttributes($eventId),
                 'participants' => $this->getEventParticipants($eventId),
                 'userEmail' => $userEmail,
                 'isRegistered' => $event->isUserRegistered($eventId, $userEmail),
@@ -129,71 +163,8 @@ class EventController extends BaseController
         }
     }
 
-    public function registerForEvent(): void
-    {
-        if ($person = $this->getPerson() && $_SERVER['REQUEST_METHOD'] === 'POST') {
-            $eventId = $_POST['eventId'] ?? 0;
-            $userEmail = $person['Email'];
-            $userId = $person['Id'];
-            $event = new Event($this->pdo);
 
-            if ($eventId > 0 && !$event->isUserRegistered($eventId, $userEmail)) {
-                try {
-                    $stmt = $this->pdo->prepare(
-                        "INSERT INTO EventParticipant (IdEvent, IdPerson, RegistrationDate) 
-                         VALUES (:eventId, :userId, NOW())"
-                    );
-                    $stmt->execute([
-                        'eventId' => $eventId,
-                        'userId' => $userId
-                    ]);
 
-                    echo json_encode(['success' => true]);
-                } catch (\Exception $e) {
-                    header('HTTP/1.1 500 Internal Server Error');
-                    echo json_encode(['error' => $e->getMessage()]);
-                }
-            } else {
-                header('HTTP/1.1 400 Bad Request');
-                echo json_encode(['error' => 'Inscription impossible']);
-            }
-        } else {
-            $this->application->error403(__FILE__, __LINE__);
-        }
-    }
-
-    public function unregisterFromEvent(): void
-    {
-        if ($person = $this->getPerson() && $_SERVER['REQUEST_METHOD'] === 'POST') {
-            $eventId = $_POST['eventId'] ?? 0;
-            $userEmail = $person['Email'];
-            $userId = $person['Id'];
-            $event = new Event($this->pdo);
-
-            if ($eventId > 0 && $event->isUserRegistered($eventId, $userEmail)) {
-                try {
-                    $stmt = $this->pdo->prepare(
-                        "DELETE FROM EventParticipant 
-                         WHERE IdEvent = :eventId AND IdPerson = :userId"
-                    );
-                    $stmt->execute([
-                        'eventId' => $eventId,
-                        'userId' => $userId
-                    ]);
-
-                    echo json_encode(['success' => true]);
-                } catch (\Exception $e) {
-                    header('HTTP/1.1 500 Internal Server Error');
-                    echo json_encode(['error' => $e->getMessage()]);
-                }
-            } else {
-                header('HTTP/1.1 400 Bad Request');
-                echo json_encode(['error' => 'Désinscription impossible']);
-            }
-        } else {
-            $this->application->error403(__FILE__, __LINE__);
-        }
-    }
 
     public function create(): void
     {

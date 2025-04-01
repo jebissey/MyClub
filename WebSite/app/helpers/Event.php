@@ -71,10 +71,9 @@ class Event
 
         if ($person === false) {
             $query->where("e.Audience = '" . EventAudience::ForAll->value . "'");
+            $query->where("et.IdGroup IS NULL");
         } else {
-            $query->where("(e.Audience = '" . EventAudience::ForClubMembersOnly->value . "' 
-                         OR et.IdGroup IS NULL 
-                         OR et.IdGroup IN (SELECT IdGroup FROM PersonGroup WHERE IdPerson = ?))", $person['Id']);
+            $query->where("et.IdGroup IS NULL OR et.IdGroup IN (SELECT IdGroup FROM PersonGroup WHERE IdPerson = ?)", $person['Id']);
         }
         $query->select('et.Name AS EventTypeName, et.IdGroup AS EventTypeIdGroup')->orderBy('e.StartTime');
         $events = $query->fetchAll();
@@ -114,6 +113,7 @@ class Event
                 'attributes' => $attributes[$event['Id']] ?? [],
                 'participants' => $this->fluent->from('Participant')->where('IdEvent', $event['Id'])->count(),
                 'maxParticipants' => $event['MaxParticipants'],
+                'audience' => $event['Audience'],
             ];
         }, $events);
     }

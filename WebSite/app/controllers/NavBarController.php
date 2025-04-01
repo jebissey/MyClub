@@ -30,6 +30,7 @@ class NavBarController extends BaseController
         }
     }
 
+
     public function getItem($id)
     {
         if ($this->getPerson(['Webmaster'])) {
@@ -189,6 +190,7 @@ class NavBarController extends BaseController
         ]));
     }
 
+    
     private function authorizedUser($page)
     {
         $query = $this->pdo->query("

@@ -53,7 +53,9 @@ abstract class BaseController
         $this->latte->addFilter('readableDuration', function ($duration) {
             return $this->translationManager->getReadableDuration($duration);
         });
-
+        $this->latte->addFilter('json', function ($value) {
+            return json_encode($value, JSON_HEX_APOS | JSON_HEX_QUOT);
+        });
         $this->application = new Application($pdo, $flight);
         $this->authorizations = new Authorization($this->pdo);
         $this->settings = new Settings($this->pdo);
@@ -74,22 +76,7 @@ abstract class BaseController
         $translationManager = new TranslationManager($this->pdo);
         $userEmail = $_SESSION['user'] ?? '';
         if (!$userEmail) {
-            $this->params = new Params([
-                'href' => '/user/sign/in',
-                'userImg' => '/app/images/anonymat.png',
-                'userEmail' => '',
-                'keys' => false,
-                'isEventManager' => false,
-                'isPersonManager' => false,
-                'isRedactor' => false,
-                'isEditor' => false,
-                'isWebmaster' => false,
-                'page' => explode('/', trim(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/'))[$segment],
-                'currentVersion' => self::VERSION,
-                'currentLanguage' => $translationManager->getCurrentLanguage(),
-                'supportedLanguages' => $translationManager->getSupportedLanguages(),
-                'flag' => $translationManager->getFlag($translationManager->getCurrentLanguage()),
-            ]);
+            $this->setDefaultParams();
             return false;
         } else {
             $query = $this->pdo->prepare('SELECT * FROM Person WHERE Email = ?');
@@ -125,15 +112,16 @@ abstract class BaseController
         }
     }
 
-    protected function getLayout() {
+    protected function getLayout()
+    {
         $navbar = $_SESSION['navbar'] ?? '';
-        if($navbar == 'user') return '../user/user.latte';
-        else if($navbar == 'eventManager') return '../admin/eventManager.latte';
-        else if($navbar == 'personManager') return '../admin/personManager.latte';
-        else if($navbar == 'webmaster') return '../admin/webmaster.latte';
-        else if($navbar == 'redactor') return '../admin/redactor.latte';
-        else if($navbar == '') return '../home.latte';
-        
+        if ($navbar == 'user') return '../user/user.latte';
+        else if ($navbar == 'eventManager') return '../admin/eventManager.latte';
+        else if ($navbar == 'personManager') return '../admin/personManager.latte';
+        else if ($navbar == 'webmaster') return '../admin/webmaster.latte';
+        else if ($navbar == 'redactor') return '../admin/redactor.latte';
+        else if ($navbar == '') return '../home.latte';
+
         die('Fatal error in file ' . __FILE__ . ' at line ' . __LINE__ . " with navbar=" . $navbar);
     }
 
@@ -157,12 +145,12 @@ abstract class BaseController
         ");
         $navItems = $query->fetchAll(PDO::FETCH_ASSOC);
         $person = $this->getPerson();
-        if(!$person) $userGroups = [];
+        if (!$person) $userGroups = [];
         else         $userGroups = $this->getUserGroups($person['Email']);
-        
+
         $filteredNavItems = [];
-        foreach($navItems as $navItem){
-            if($navItem['IdGroup'] == null || !empty(array_intersect([$navItem['IdGroup']], $userGroups))){
+        foreach ($navItems as $navItem) {
+            if ($navItem['IdGroup'] == null || !empty(array_intersect([$navItem['IdGroup']], $userGroups))) {
                 $filteredNavItems[] = $navItem;
             }
         }
@@ -187,7 +175,27 @@ abstract class BaseController
         return "publié par " . $person['FirstName'] . " " . $person['LastName'];
     }
 
-    
+    protected function setDefaultParams()
+    {
+        $translationManager = new TranslationManager($this->pdo);
+        $this->params = new Params([
+            'href' => '/user/sign/in',
+            'userImg' => '/app/images/anonymat.png',
+            'userEmail' => '',
+            'keys' => false,
+            'isEventManager' => false,
+            'isPersonManager' => false,
+            'isRedactor' => false,
+            'isEditor' => false,
+            'isWebmaster' => false,
+            'page' => explode('/', trim(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/'))[0],
+            'currentVersion' => self::VERSION,
+            'currentLanguage' => $translationManager->getCurrentLanguage(),
+            'supportedLanguages' => $translationManager->getSupportedLanguages(),
+            'flag' => $translationManager->getFlag($translationManager->getCurrentLanguage()),
+        ]);
+    }
+
     private function getHref($userEmail)
     {
         return $userEmail == '' ? '/user/sign/in' : '/user';
