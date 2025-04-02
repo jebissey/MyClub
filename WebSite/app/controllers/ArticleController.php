@@ -44,22 +44,27 @@ class ArticleController extends TableController
         ];
         $columns = [
             ['field' => 'CreatedBy', 'label' => 'Créé par'],
-            ['field' => 'LastName', 'label' => 'Nom'],
-            ['field' => 'FirstName', 'label' => 'Prénom'],
+            ['field' => 'PersonName', 'label' => 'Nom'],
             ['field' => 'Title', 'label' => 'Titre'],
             ['field' => 'Timestamp', 'label' => 'Date de création'],
             ['field' => 'LastUpdate', 'label' => 'Dernière modification'],
             ['field' => 'Published', 'label' => 'Publié'],
             ['field' => 'IdGroup', 'label' => 'Groupe(n°)'],
-            ['field' => 'HasSurvey', 'label' => 'Sondage']
+            ['field' => 'HasSurvey', 'label' => 'Sondage'],
+            ['field' => 'Votes', 'label' => 'Votes']
         ];
         $query = $this->fluent->from('Article')
-            ->select('Article.Id, Article.CreatedBy, Article.Title, Article.Timestamp, CASE WHEN Article.PublishedBy IS NULL THEN "non" ELSE "oui" END AS Published, Person.FirstName, Person.LastName')
+            ->select('Article.Id, Article.CreatedBy, Article.Title, Article.Timestamp, CASE WHEN Article.PublishedBy IS NULL THEN "non" ELSE "oui" END AS Published')
             ->select('CASE WHEN Survey.IdArticle IS NOT NULL THEN "oui" ELSE "non" END AS HasSurvey')
+            ->select('CASE WHEN Person.NickName != "" THEN Person.FirstName || " " || Person.LastName || " (" || Person.NickName || ")" ELSE Person.FirstName || " " || Person.LastName END AS PersonName')
+            ->select('COUNT(Reply.Id) AS Votes')
             ->innerJoin('Person ON Article.CreatedBy = Person.Id')
             ->leftJoin('Survey ON Article.Id = Survey.IdArticle')
+            ->leftJoin('Reply ON Survey.Id = Reply.IdSurvey')
             ->where('(Article.IdGroup IS NULL)')
-            ->where('(Article.PublishedBy IS NOT NULL)');
+            ->where('(Article.PublishedBy IS NOT NULL)')
+            ->groupBy('Article.Id, Article.CreatedBy, Article.Title, Article.Timestamp, Article.PublishedBy, Person.FirstName, Person.LastName, Person.NickName, Survey.IdArticle');
+        
         if ($person) {
             if ($this->authorizations->isEditor()) {
                 $query = $query->whereOr('1=1');
