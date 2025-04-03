@@ -67,7 +67,7 @@
                                     </a>
                                 {/if}
                                     <button type="button" class="btn btn-sm btn-success copy-url-btn me-2" 
-                                            data-url="{$file['url']}" title="Copier l'URL">
+                                            data-url="{if strpos($file['name'], '.gpx') !== false}/media/gpxViewer?file={/if}{$file['url']}" title="Copier l'URL">
                                         <i class="bi bi-clipboard"></i>
                                     </button>
                                     <button type="button" class="btn btn-sm btn-danger delete-file-btn" 

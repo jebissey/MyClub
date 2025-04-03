@@ -190,7 +190,19 @@ class NavBarController extends BaseController
         ]));
     }
 
-    
+    public function showGetEmails()
+    {
+        if ($this->getPerson(['EventManager'])) {
+            echo $this->latte->render('app/views/emails/getEmails.latte', $this->params->getAll([
+                'groups' => $this->fluent->from("'Group'")->where('Inactivated', 0)->orderBy('Name')->fetchAll('Id', 'Name'),
+                'eventTypes' => $this->fluent->from('EventType')->where('Inactivated', 0)->orderBy('Name')->fetchAll('Id', 'Name'),
+            ]));
+        } else {
+            $this->application->error403(__FILE__, __LINE__);
+        }
+    }
+
+
     private function authorizedUser($page)
     {
         $query = $this->pdo->query("
@@ -215,7 +227,8 @@ class NavBarController extends BaseController
             '/navbar/show/article/@id',
             '/navbar/show/arwards',
             '/navbar/show/events',
-            '/navbar/show/nextEvents'
+            '/navbar/show/nextEvents',
+            '/navbar/show/getEmails'
         ];
     }
 }

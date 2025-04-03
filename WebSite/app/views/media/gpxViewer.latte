@@ -54,11 +54,9 @@
                 map.fitBounds(gpxLayer.getBounds());
 
                 const totalDistance = gpxLayer.get_distance() ? (gpxLayer.get_distance() / 1000).toFixed(2) : "N/A";
-                const totalElevation = gpxLayer.get_elevation_gain() ? gpxLayer.get_elevation_gain().toFixed(2) : "N/A";
 
                 document.getElementById("stats").innerHTML = `
                     <strong>Distance :</strong> ${totalDistance} km<br>
-                    <strong>Dénivelé :</strong> ${totalElevation} m
                 `;
             })
             .on("error", function(e) {

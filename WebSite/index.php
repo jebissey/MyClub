@@ -277,6 +277,7 @@ $flight->route('GET    /navBar/show/article/@id',    function($id) use ($navBarC
 $flight->route('GET    /navBar/show/arwards',        function()    use ($navBarController) { $navBarController->showArwards(); });
 $flight->route('GET    /navBar/show/events',         function()    use ($navBarController) { $navBarController->showEvents(); });
 $flight->route('GET    /navBar/show/nextEvents',     function()    use ($navBarController) { $navBarController->showNextEvents(); });
+$flight->route('GET    /navBar/show/getEmails',      function()    use ($navBarController) { $navBarController->showGetEmails(); });
 
 $mediaController = $container->get('app\controllers\MediaController');
 $flight->route('GET  /data/media/@year/@month/@filename',       function($year, $month, $filename) use ($mediaController) { $mediaController->viewFile($year,$month,$filename); });
