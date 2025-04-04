@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS "Article" (
 	"PublishedBy"	INTEGER DEFAULT NULL,
 	"IdGroup"	INTEGER DEFAULT NULL,
 	"LastUpdate"	TEXT NOT NULL DEFAULT current_timestamp,
+	"OnlyForMembers"	INTEGER NOT NULL DEFAULT 1,
 	PRIMARY KEY("Id"),
 	FOREIGN KEY("CreatedBy") REFERENCES "Person"("Id"),
 	FOREIGN KEY("IdGroup") REFERENCES "Group"("Id"),
@@ -43,6 +44,28 @@ CREATE TABLE IF NOT EXISTS "Counter" (
 	"Timestamp"	TEXT NOT NULL DEFAULT current_timestamp,
 	PRIMARY KEY("Id"),
 	FOREIGN KEY("IdGroup") REFERENCES "Group"("Id"),
+	FOREIGN KEY("IdPerson") REFERENCES "Person"("Id")
+);
+CREATE TABLE IF NOT EXISTS "Design" (
+	"Id"	INTEGER,
+	"IdPerson"	INTEGER NOT NULL,
+	"IdGroup"	INTEGER NOT NULL,
+	"OnlyForMembers"	INTEGER NOT NULL DEFAULT 1,
+	"Name"	TEXT,
+	"Detail"	TEXT,
+	"NavBar"	TEXT,
+	"Status"	TEXT NOT NULL DEFAULT 'UnderReview',
+	PRIMARY KEY("Id"),
+	FOREIGN KEY("IdGroup") REFERENCES "Group"("Id"),
+	FOREIGN KEY("IdPerson") REFERENCES "Person"("Id")
+);
+CREATE TABLE IF NOT EXISTS "DesignVote" (
+	"Id"	INTEGER,
+	"IdDesign"	INTEGER NOT NULL,
+	"IdPerson"	INTEGER NOT NULL,
+	"Vote"	INTEGER NOT NULL DEFAULT 0,
+	PRIMARY KEY("Id"),
+	FOREIGN KEY("IdDesign") REFERENCES "Design"("Id"),
 	FOREIGN KEY("IdPerson") REFERENCES "Person"("Id")
 );
 CREATE TABLE IF NOT EXISTS "Event" (

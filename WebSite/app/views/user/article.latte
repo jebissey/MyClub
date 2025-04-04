@@ -127,7 +127,7 @@
                     {if $hasSurvey && $userConnected && isset($chosenArticle->PublishedBy) && $chosenArticle->PublishedBy !== null}
                     <button id="reply-survey-btn" class="btn btn-success ms-2">Répondre au sondage</button>
                     {/if}
-                    <a href="/articles" class="btn btn-secondary ms-2">Retour à la liste</a>
+                    <a href="/articles" class="btn btn-secondary ms-2">Liste des articles</a>
                 </div>
             </div>
             <div class="card-body">
@@ -155,6 +155,12 @@
                                     <option value="{$group['Id']}" {if isset($chosenArticle->IdGroup) && $chosenArticle->IdGroup == $group['Id']}selected{/if}>{$group['Name']}</option>
                                     {/foreach}
                                 </select>
+                            </div>
+                            <div class="d-flex align-items-center gap-2 mt-2">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="members-only-checkbox" name="membersOnly" {if isset($chosenArticle->IdGroup) && $chosenArticle->IdGroup}checked{/if}>
+                                    <label class="form-check-label" for="members-only-checkbox">Pour les membres du club uniquement</label>
+                                </div>
                             </div>
 
                             {if $canEdit}
@@ -375,13 +381,16 @@
 
                 const groupSelect = document.getElementById('group-select');
                 const publishedInput = document.getElementById('published-input');
+                const membersOnlyCheckbox = document.getElementById('members-only-checkbox');
                 function updateCheckboxState() {
                     if (groupSelect.value === "") {
                         publishedInput.disabled = true;
                         publishedInput.checked = false;
+                        membersOnlyCheckbox.disabled = false;
                     } else {
                         publishedInput.disabled = false;
-                    }
+                        membersOnlyCheckbox.checked = true;
+                        membersOnlyCheckbox.disabled = true;                    }
                 }
                 updateCheckboxState();
                 groupSelect.addEventListener('change', updateCheckboxState);

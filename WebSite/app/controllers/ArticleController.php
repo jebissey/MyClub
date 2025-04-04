@@ -50,11 +50,13 @@ class ArticleController extends TableController
             ['field' => 'LastUpdate', 'label' => 'Dernière modification'],
             ['field' => 'Published', 'label' => 'Publié'],
             ['field' => 'IdGroup', 'label' => 'Groupe(n°)'],
+            ['field' => 'ForMembers', 'label' => 'Club'],
             ['field' => 'HasSurvey', 'label' => 'Sondage'],
             ['field' => 'Votes', 'label' => 'Votes']
         ];
         $query = $this->fluent->from('Article')
             ->select('Article.Id, Article.CreatedBy, Article.Title, Article.Timestamp, CASE WHEN Article.PublishedBy IS NULL THEN "non" ELSE "oui" END AS Published')
+            ->select('CASE WHEN Article.OnlyForMembers = 1 THEN "oui" ELSE "non" END AS ForMembers')
             ->select('CASE WHEN Survey.IdArticle IS NOT NULL THEN "oui" ELSE "non" END AS HasSurvey')
             ->select('CASE WHEN Person.NickName != "" THEN Person.FirstName || " " || Person.LastName || " (" || Person.NickName || ")" ELSE Person.FirstName || " " || Person.LastName END AS PersonName')
             ->select('COUNT(Reply.Id) AS Votes')
@@ -62,6 +64,7 @@ class ArticleController extends TableController
             ->leftJoin('Survey ON Article.Id = Survey.IdArticle')
             ->leftJoin('Reply ON Survey.Id = Reply.IdSurvey')
             ->where('(Article.IdGroup IS NULL)')
+            ->where('(Article.OnlyForMembers = 0)')
             ->where('(Article.PublishedBy IS NOT NULL)')
             ->groupBy('Article.Id, Article.CreatedBy, Article.Title, Article.Timestamp, Article.PublishedBy, Person.FirstName, Person.LastName, Person.NickName, Survey.IdArticle');
         
@@ -156,14 +159,15 @@ class ArticleController extends TableController
                 $content = $_POST['content'] ?? '';
                 $published = $_POST['published'] ?? 0;
                 $idGroup = $_POST['idGroup'] === '' ? null : ($_POST['idGroup'] ?? null);
+                $membersOnly = $_POST['membersOnly'] ?? 0;
                 if (empty($title) || empty($content)) {
                     $_SESSION['error'] = "Le titre et le contenu sont obligatoires";
                     $this->flight->redirect('/articles/' . $id);
                     return;
                 }
 
-                $query = $this->pdo->prepare("UPDATE Article SET Title = ?, Content = ?, PublishedBy = ?, IdGroup = ?, LastUpdate = ? WHERE Id = ?");
-                $result = $query->execute([$title, $content, $published == 1 ? $person['Id'] : NULL, $idGroup, date('Y-m-d H:i:s'), $id]);
+                $query = $this->pdo->prepare("UPDATE Article SET Title = ?, Content = ?, PublishedBy = ?, IdGroup = ?, OnlyForMembers = ?, LastUpdate = ? WHERE Id = ?");
+                $result = $query->execute([$title, $content, $published == 1 ? $person['Id'] : NULL, $idGroup, $membersOnly, date('Y-m-d H:i:s'), $id]);
                 if ($result) {
                     $_SESSION['success'] = "L'article a été mis à jour avec succès";
                     (new Backup())->save();
@@ -255,19 +259,35 @@ class ArticleController extends TableController
             return $noGroupArticleIds;
         }
 
+        $forMembersOnlyArticleIds = $this->getArticleIdsForMembers([$userEmail]);
+        if (empty($forMembersOnlyArticleIds)) {
+            $articleIds = $noGroupArticleIds;
+        } else {
+            $articleIds = array_merge($noGroupArticleIds, $forMembersOnlyArticleIds);
+        }
+
         $userGroups = $this->getUserGroups($userEmail);
         if (empty($userGroups)) {
-            return $noGroupArticleIds;
+            return $articleIds;
         }
         $groupArticleIds = $this->getArticleIdsByGroups($userGroups);
-        return array_unique(array_merge($noGroupArticleIds, $groupArticleIds));
+        return array_unique(array_merge($articleIds, $groupArticleIds));
     }
 
     private function getNoGroupArticleIds(): array
     {
         $query = $this->pdo->prepare("
             SELECT Article.Id FROM Article 
-            WHERE Article.publishedBy IS NOT NULL AND Article.IdGroup IS NULL");
+            WHERE Article.publishedBy IS NOT NULL AND Article.IdGroup IS NULL AND Article.OnlyForMembers = 0");
+        $query->execute();
+        return $query->fetchAll(PDO::FETCH_COLUMN);
+    }
+
+    private function getArticleIdsForMembers(): array
+    {
+        $query = $this->pdo->prepare("
+            SELECT Article.Id FROM Article 
+            WHERE Article.publishedBy IS NOT NULL AND Article.IdGroup IS NULL AND Article.OnlyForMembers = 1");
         $query->execute();
         return $query->fetchAll(PDO::FETCH_COLUMN);
     }
