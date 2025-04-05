@@ -280,17 +280,18 @@ $flight->route('POST /dbbrowser/@table/edit/@id',   function($table, $id) use ($
 $flight->route('POST /dbbrowser/@table/delete/@id', function($table, $id) use ($dbBrowserController) { $dbBrowserController->deleteRecord($table, $id); });
 
 $navBarController = $container->get('app\controllers\NavBarController');
-$flight->route('GET    /navBar',                     function()    use ($navBarController) { $navBarController->index(); });
-$flight->route('POST   /navBar/update',              function()    use ($navBarController) { $navBarController->updatePositions(); });
-$flight->route('POST   /api/navBar/saveItem',        function()    use ($navBarController) { $navBarController->saveItem(); });
-$flight->route('GET    /api/navBar/getItem/@id',     function($id) use ($navBarController) { $navBarController->getItem($id); });
-$flight->route('POST   /api/navBar/updatePositions', function()    use ($navBarController) { $navBarController->updatePositions(); });
-$flight->route('DELETE /api/navBar/deleteItem/@id',  function($id) use ($navBarController) { $navBarController->deleteItem($id); });
-$flight->route('GET    /navBar/show/article/@id',    function($id) use ($navBarController) { $navBarController->showArticle($id); });
-$flight->route('GET    /navBar/show/arwards',        function()    use ($navBarController) { $navBarController->showArwards(); });
-$flight->route('GET    /navBar/show/events',         function()    use ($navBarController) { $navBarController->showEvents(); });
-$flight->route('GET    /navBar/show/nextEvents',     function()    use ($navBarController) { $navBarController->showNextEvents(); });
-$flight->route('GET    /navBar/show/getEmails',      function()    use ($navBarController) { $navBarController->showGetEmails(); });
+$flight->route('GET    /navBar',                       function()    use ($navBarController) { $navBarController->index(); });
+$flight->route('POST   /navBar/update',                function()    use ($navBarController) { $navBarController->updatePositions(); });
+$flight->route('POST   /api/navBar/saveItem',          function()    use ($navBarController) { $navBarController->saveItem(); });
+$flight->route('GET    /api/navBar/getItem/@id',       function($id) use ($navBarController) { $navBarController->getItem($id); });
+$flight->route('POST   /api/navBar/updatePositions',   function()    use ($navBarController) { $navBarController->updatePositions(); });
+$flight->route('DELETE /api/navBar/deleteItem/@id',    function($id) use ($navBarController) { $navBarController->deleteItem($id); });
+$flight->route('GET    /navBar/show/article/@id',      function($id) use ($navBarController) { $navBarController->showArticle($id); });
+$flight->route('GET    /navBar/show/arwards',          function()    use ($navBarController) { $navBarController->showArwards(); });
+$flight->route('GET    /navBar/show/events',           function()    use ($navBarController) { $navBarController->showEvents(); });
+$flight->route('GET    /navBar/show/nextEvents',       function()    use ($navBarController) { $navBarController->showNextEvents(); });
+$flight->route('GET    /navBar/show/getEmails',        function()    use ($navBarController) { $navBarController->showGetEmails(); });
+$flight->route('GET    /navBar/show/personStatistics', function()    use ($navBarController) { $navBarController->showPersonStatistics(); });
 
 $mediaController = $container->get('app\controllers\MediaController');
 $flight->route('GET  /data/media/@year/@month/@filename',       function($year, $month, $filename) use ($mediaController) { $mediaController->viewFile($year,$month,$filename); });
@@ -318,7 +319,7 @@ $flight->route('POST /designs/store',    function() use ($designController) { $d
 $flight->route('POST /api/designs/vote', function() use ($designController) { $designController->vote(); });
 
 $personStatisticsController = $container->get('app\controllers\PersonStatisticsController');
-$flight->route('GET /statistics/person/@id', function($id) use ($personStatisticsController) {$personStatisticsController->showStatistics($id);});
+$flight->route('GET /statistics/person', function() use ($personStatisticsController) {$personStatisticsController->showStatistics();});
 
 $apiController = $container->get('app\controllers\ApiController');
 $flight->route('GET  /api/persons-by-group/@id', function($id) use ($apiController) { $apiController->getPersonsByGroup($id); });

@@ -8,7 +8,7 @@
 
 {block content}
 <div class="container mt-4">
-    <h1>Statistiques pour {$stats['person']->Firstname} {$stats['person']->Lastname}</h1>
+    <h1>Statistiques pour {$stats['person']['FirstName']} {$stats['person']['LastName']}</h1>
     
     <div class="card mb-4">
         <div class="card-header">
@@ -40,7 +40,7 @@
                 <div class="col-md-6">
                     <h3>Activités éditoriales</h3>
                     
-                    <!-- Articles -->
+                    {if $isRedactor}
                     <div class="mb-3">
                         <h5>Articles</h5>
                         <div class="progress" style="height: 25px;">
@@ -54,9 +54,8 @@
                         </small>
                     </div>
                     
-                    <!-- Sondages -->
                     <div class="mb-3">
-                        <h5>Sondages créés</h5>
+                        <h5>Sondages</h5>
                         <div class="progress" style="height: 25px;">
                             <div class="progress-bar bg-info" role="progressbar" style="width: {$stats['surveys']['percentage']}%;" 
                                 aria-valuenow="{$stats['surveys']['percentage']}" aria-valuemin="0" aria-valuemax="100">
@@ -67,8 +66,8 @@
                             {$stats['surveys']['user']} sondage(s) sur un total de {$stats['surveys']['total']}
                         </small>
                     </div>
-                    
-                    <!-- Réponses aux sondages -->
+                    {/if}
+
                     <div class="mb-3">
                         <h5>Réponses aux sondages</h5>
                         <div class="progress" style="height: 25px;">
@@ -86,7 +85,7 @@
                 <div class="col-md-6">
                     <h3>Designs et votes</h3>
                     
-                    <!-- Designs -->
+                    {if $isRedactor}
                     <div class="mb-3">
                         <h5>Designs créés</h5>
                         <div class="progress" style="height: 25px;">
@@ -99,8 +98,8 @@
                             {$stats['designs']['user']} design(s) sur un total de {$stats['designs']['total']}
                         </small>
                     </div>
+                    {/if}
                     
-                    <!-- Votes sur les designs -->
                     <div class="mb-3">
                         <h5>Votes sur les designs</h5>
                         <div class="progress" style="height: 25px;">
@@ -119,6 +118,7 @@
             <hr>
             
             <div class="row mt-4">
+            {if $isEventManager}
                 <div class="col-md-6">
                     <h3>Événements créés</h3>
                     <table class="table table-striped">
@@ -151,7 +151,8 @@
                         </tbody>
                     </table>
                 </div>
-                
+            {/if}
+
                 <div class="col-md-6">
                     <h3>Participations aux événements</h3>
                     <table class="table table-striped">
@@ -190,7 +191,7 @@
             
             <div class="row mt-4">
                 <div class="col-md-6 offset-md-3">
-                    <h3>Contributions aux besoins</h3>
+                    <h3>Contributions aux besoins des évènements</h3>
                     <div class="mb-3">
                         <div class="progress" style="height: 25px;">
                             <div class="progress-bar bg-success" role="progressbar" 

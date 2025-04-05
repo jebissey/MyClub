@@ -5,7 +5,7 @@ namespace app\controllers;
 use PDO;
 use app\helpers\Arwards;
 use app\helpers\Event;
-use app\helpers\TranslationManager;
+use app\helpers\PersonStatistics;
 
 class NavBarController extends BaseController
 {
@@ -202,6 +202,22 @@ class NavBarController extends BaseController
         }
     }
 
+    public function showPersonStatistics()
+    {
+        if ($person = $this->getPerson([])) {
+
+            $personalStatistics = new PersonStatistics($this->pdo);
+            $season = $personalStatistics->getSeasonRange();
+            echo $this->latte->render('app/views/user/statistics.latte', $this->params->getAll([
+                'stats' => $personalStatistics->getStats($person, $season['start'], $season['end']),
+                'seasons' => $personalStatistics->getAvailableSeasons(),
+                'currentSeason' => $season,
+                'navItems' => $this->getNavItems(),
+            ]));
+        } else {
+            $this->application->error403(__FILE__, __LINE__);
+        }
+    }
 
     private function authorizedUser($page)
     {
@@ -228,7 +244,8 @@ class NavBarController extends BaseController
             '/navbar/show/arwards',
             '/navbar/show/events',
             '/navbar/show/nextEvents',
-            '/navbar/show/getEmails'
+            '/navbar/show/getEmails',
+            '/navbar/show/personStatistics',
         ];
     }
 }
