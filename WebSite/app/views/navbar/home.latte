@@ -16,14 +16,16 @@
         {/foreach}
       </ul>
 
-      <a class="nav-link" href="{$href}">
-        <img src="{$userImg}" alt="User avatar" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="{='my_data'|translate}">
-      </a>
       {if $keys}
         <a href="/admin" class="me-2">
           <img src="/app/images/admin.png" alt="Key set" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="{='admin_zone'|translate}">
         </a>
       {/if}
+
+      <a class="nav-link" href="{$href}">
+        <img src="{$userImg}" alt="User avatar" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="{='my_data'|translate}">
+      </a>
+      
       {if $userEmail != ''}
         <a href="/user/sign/out">
           <img src="/app/images/SignOut.png" alt="Sign out" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="{='logout'|translate}">

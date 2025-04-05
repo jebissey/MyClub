@@ -55,6 +55,7 @@ CREATE TABLE IF NOT EXISTS "Design" (
 	"Detail"	TEXT,
 	"NavBar"	TEXT,
 	"Status"	TEXT NOT NULL DEFAULT 'UnderReview',
+	"LastUpdate"	TEXT NOT NULL DEFAULT current_timestamp,
 	PRIMARY KEY("Id"),
 	FOREIGN KEY("IdGroup") REFERENCES "Group"("Id"),
 	FOREIGN KEY("IdPerson") REFERENCES "Person"("Id")
@@ -64,6 +65,7 @@ CREATE TABLE IF NOT EXISTS "DesignVote" (
 	"IdDesign"	INTEGER NOT NULL,
 	"IdPerson"	INTEGER NOT NULL,
 	"Vote"	INTEGER NOT NULL DEFAULT 0,
+	"LastUpdate"	TEXT NOT NULL DEFAULT current_timestamp,
 	PRIMARY KEY("Id"),
 	FOREIGN KEY("IdDesign") REFERENCES "Design"("Id"),
 	FOREIGN KEY("IdPerson") REFERENCES "Person"("Id")
@@ -209,6 +211,7 @@ CREATE TABLE IF NOT EXISTS "Reply" (
 	"IdPerson"	INTEGER NOT NULL,
 	"IdSurvey"	INTEGER NOT NULL,
 	"Answers"	TEXT NOT NULL,
+	"LastUpdaate"	TEXT NOT NULL DEFAULT current_timestamp,
 	PRIMARY KEY("Id"),
 	FOREIGN KEY("IdPerson") REFERENCES "Person"("Id"),
 	FOREIGN KEY("IdSurvey") REFERENCES "Survey"("Id")

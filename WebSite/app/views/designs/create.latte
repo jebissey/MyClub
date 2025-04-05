@@ -1,0 +1,137 @@
+{layout '../layout.latte'}
+
+{block title}Ajouter un design{/block}
+
+{block navbar}
+{include '../navbar/redactor.latte'}
+{/block}
+
+{block content}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header">
+                    <h2>Ajouter un nouveau design</h2>
+                </div>
+                <div class="card-body">
+                    <form action="/designs/store" method="post">
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Nom du design</label>
+                            <input type="text" class="form-control" id="name" name="name" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="detail" class="form-label">Détails</label>
+                            <textarea class="form-control" id="detail" name="detail" rows="3"></textarea>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="navbar" class="form-label">NavBar</label>
+                            <select class="form-select" id="navbar" name="navbar" required>
+                                <option value="">Sélectionnez une NavBar</option>
+                                <option value="article">Article</option>
+                                <option value="arward">Compteur</option>
+                                <option value="getEmails">GetEmails</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Pour qui ?</label>
+                            
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="visibility" id="visibilityAll" value="all">
+                                <label class="form-check-label" for="visibilityAll">
+                                    Pour tous (All)
+                                </label>
+                            </div>
+                            
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="visibility" id="visibilityMembers" value="members" checked>
+                                <label class="form-check-label" for="visibilityMembers">
+                                    Pour les membres uniquement (Members)
+                                </label>
+                            </div>
+                            
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="visibility" id="visibilityGroup" value="group">
+                                <label class="form-check-label" for="visibilityGroup">
+                                    Pour un groupe spécifique
+                                </label>
+                            </div>
+                            
+                            <div class="mt-2" id="groupSelection" style="display: none;">
+                                <select class="form-select" id="idGroup" name="idGroup">
+                                    <option value="">Sélectionnez un groupe</option>
+                                    {foreach $groups as $group}
+                                        <option value="{$group['Id']}">{$group['Name']}</option>
+                                    {/foreach}
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="/designs" class="btn btn-secondary me-md-2">Annuler</a>
+                            <button type="submit" class="btn btn-primary">Enregistrer</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}
+
+{block scripts}
+<script>
+    document.querySelectorAll('input[name="visibility"]').forEach(radio => {
+        radio.addEventListener('change', function() {
+            const groupSelection = document.getElementById('groupSelection');
+            const idGroupSelect = document.getElementById('idGroup');
+            
+            if (this.value === 'group') {
+                groupSelection.style.display = 'block';
+                idGroupSelect.required = true;
+            } else {
+                groupSelection.style.display = 'none';
+                idGroupSelect.required = false;
+                idGroupSelect.value = '';
+            }
+        });
+    });
+    
+    document.querySelector('form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const visibility = document.querySelector('input[name="visibility"]:checked').value;
+        const idGroup = document.getElementById('idGroup').value;
+        const form = this;
+        const oldHiddenInputs = form.querySelectorAll('input[name="onlyForMembers"], input[name="idGroup"]');
+        oldHiddenInputs.forEach(input => input.remove());
+        
+        const onlyForMembersInput = document.createElement('input');
+        onlyForMembersInput.type = 'hidden';
+        onlyForMembersInput.name = 'onlyForMembers';
+        
+        let idGroupInput;
+        if (visibility === 'group') {
+            idGroupInput = document.createElement('input');
+            idGroupInput.type = 'hidden';
+            idGroupInput.name = 'idGroup';
+            idGroupInput.value = idGroup;
+        }
+        
+        if (visibility === 'all') {
+            onlyForMembersInput.value = '0';
+        } else if (visibility === 'members' || visibility === 'group') {
+            onlyForMembersInput.value = '1';
+        }
+        
+        form.appendChild(onlyForMembersInput);
+        if (visibility === 'group') {
+            form.appendChild(idGroupInput);
+        }
+        form.submit();
+    });
+</script>
+{/block}

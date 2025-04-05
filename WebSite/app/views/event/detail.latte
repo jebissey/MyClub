@@ -42,7 +42,12 @@
                 {/if}
                 <p><strong>{='date_time'|translate}</strong> {=$event['StartTime']|longDateTime}</p>
                 <p><strong>{='duration'|translate}</strong> {=$event['Duration']|readableDuration}</p>
-                <p><strong>{='location'|translate}</strong> {$event['Location']}</p>
+                <p>
+                    <strong>{='location'|translate}</strong> {$event['Location']} 
+                    <a href="/event/location?address={$event['Location']}" target="_blank" class="btn btn-sm btn-primary me-2" title="Voir sur carte">
+                        <i class="bi bi-map"></i>
+                    </a>
+                </p>
                 <div class="card mb-3">
                     <div class="card-header"><strong>{='description'|translate}</strong></div>
                     <div class="card-body">            
@@ -118,7 +123,7 @@
         var startTime = new Date(event.StartTime);
         var endTime = new Date(startTime.getTime() + event.Duration * 1000);
         var dates = 'dates=' + encodeURIComponent(formatDateForGoogle(startTime, endTime));
-        var details = 'details=' + encodeURIComponent(event.Description);
+        var details = 'details=' + encodeURIComponent(event.Description) + '&link=' + encodeURIComponent(window.location.href);
         var location = 'location=' + encodeURIComponent(event.Location);
         
         return base + '?' + 'action=TEMPLATE' + '&' + text + '&' + dates + '&' + details + '&' + location;

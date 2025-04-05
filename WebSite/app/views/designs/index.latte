@@ -1,0 +1,170 @@
+{layout '../layout.latte'}
+
+{block title}Designs{/block}
+
+{block navbar}
+    {include '../navbar/redactor.latte'}
+{/block}
+
+{block content}
+<div class="d-flexc">
+    <div class="container mt-4 d-flex justify-content-between align-items-center mb-3">
+        <h1>Designs</h1>
+        <a href="/designs/create" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Ajouter un design
+        </a>
+    </div>
+
+    <div class="d-flex">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Créateur</th>
+                        <th>Nom du design</th>
+                        <th>NavBar</th>
+                        <th>Statut</th>
+                        <th>Votes</th>
+                        <th>All</th>
+                        <th>Members</th>
+                        {foreach $groups as $group}
+                            <th>{$group['Name']}</th>
+                        {/foreach}
+                    </tr>
+                </thead>
+                <tbody>
+                    {foreach $designs as $design}
+                        <tr class="design-row" data-id="{$design['Id']}">
+                            <td>{$design['NameOfDesigner']}</td>
+                            <td data-bs-toggle="tooltip" data-bs-placement="top" title="{$design['Detail']}">
+                                {$design['Name']}
+                            </td>
+                            <td>{$design['NavBar']}</td>
+                            <td>
+                                {if $design['Status'] === 'UnderReview'}
+                                    <h4>⏳</h4>
+                                {elseif $design['Status'] === 'Approved'}
+                                    <h4>✅</h4>
+                                {elseif $design['Status'] === 'Rejected'}
+                                    <h4>❌</h4>
+                                {/if}
+                            </td>
+                            <td>{$design['Votes']}</td>
+                            <td class="text-center">
+                                {if $design['IdGroup'] == '' && $design['OnlyForMembers'] == 0}
+                                <h4>✅</h4>
+                                {/if}
+                            </td>
+                            <td class="text-center">
+                                {if $design['IdGroup'] == '' && $design['OnlyForMembers'] == 1}
+                                <h4>✅</h4>
+                                {/if}
+                            </td>
+                            {foreach $groups as $group}
+                            <td class="text-center">
+                                {if $design['IdGroup'] == $group['Id']}
+                                <h4>✅</h4>
+                                {/if}
+                            </td>
+                            {/foreach}
+                        </tr>
+                    {/foreach}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="modal fade" id="voteModal" tabindex="-1" aria-labelledby="voteModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="voteModalLabel">Voter pour ce design</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <h4 id="design-name"></h4>
+                    <p id="design-detail"></p>
+
+                    <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="voteOption" id="voteUp" value="1">
+                    <label class="form-check-label" for="voteUp">👍 Pour</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="voteOption" id="voteDown" value="-1">
+                    <label class="form-check-label" for="voteDown">👎 Contre</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="voteOption" id="voteNeutral" value="0">
+                    <label class="form-check-label" for="voteNeutral">🤔 Neutre</label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <button type="button" class="btn btn-primary" id="submit-vote">Voter</button>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}
+
+{block scripts}
+<script>
+    document.querySelectorAll('.design-row').forEach(row => {
+        row.addEventListener('click', function() {
+            const designId = this.dataset.id;
+            const designName = this.querySelector('td:nth-child(2)').textContent.trim();
+            const designDetail = this.querySelector('td:nth-child(2)').getAttribute('title');
+            
+            document.getElementById('design-name').textContent = designName;
+            document.getElementById('design-detail').textContent = designDetail;
+            
+            // Pré-remplir le vote si l'utilisateur a déjà voté
+            const userVotes = {$userVotes|json};
+            if (userVotes[designId] !== undefined) {
+                const vote = userVotes[designId];
+                if (vote === 1) {
+                    document.getElementById('voteUp').checked = true;
+                } else if (vote === -1) {
+                    document.getElementById('voteDown').checked = true;
+                } else {
+                    document.getElementById('voteNeutral').checked = true;
+                }
+            } else {
+                document.getElementById('voteNeutral').checked = true;
+            }
+            
+            document.getElementById('submit-vote').dataset.designId = designId;
+            const voteModal = new bootstrap.Modal(document.getElementById('voteModal'));
+            voteModal.show();
+        });
+    });
+    
+    document.getElementById('submit-vote').addEventListener('click', function() {
+        const designId = this.dataset.designId;
+        const voteOption = document.querySelector('input[name="voteOption"]:checked').value;
+        
+        fetch('/api/designs/vote', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                designId: designId,
+                vote: parseInt(voteOption)
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                bootstrap.Modal.getInstance(document.getElementById('voteModal')).hide();
+                alert('Votre vote a été enregistré !');
+            } else {
+                alert('Erreur lors de l\'enregistrement du vote : ' + data.message);
+            }
+        })
+        .catch(error => {
+            alert('Une erreur est survenue lors de l\'envoi du vote.');
+        });
+    });
+</script>
+{/block}

@@ -111,8 +111,20 @@ $containerBuilder->addDefinitions([
             $container->get(Engine::class)
         );
     },
-    'app\controllers\eventTypeController' => function (Container $container) {
+    'app\controllers\EventTypeController' => function (Container $container) {
         return new \app\controllers\EventTypeController(
+            $container->get(PDO::class),
+            $container->get(Engine::class)
+        );
+    },
+    'app\controllers\DesignController' => function (Container $container) {
+        return new \app\controllers\DesignController(
+            $container->get(PDO::class),
+            $container->get(Engine::class)
+        );
+    },
+    'app\controllers\PersonStatisticsController' => function (Container $container) {
+        return new \app\controllers\PersonStatisticsController(
             $container->get(PDO::class),
             $container->get(Engine::class)
         );
@@ -230,8 +242,9 @@ $flight->route('GET  /persons/delete/@id', function($id) use ($personController)
 $eventController = $container->get('app\controllers\EventController');
 $flight->route('GET  /nextEvents',              function()    use ($eventController) { $eventController->nextEvents(); });
 $flight->route('GET  /events/@id',              function($id) use ($eventController) { $eventController->show($id); });
-$flight->route('GET /events/@id/register',      function($id) use ($eventController) { $eventController->register($id, true); });
-$flight->route('GET /events/@id/unregister',    function($id) use ($eventController) { $eventController->register($id, false); });
+$flight->route('GET  /event/location',           function()    use ($eventController) { $eventController->location(); });
+$flight->route('GET  /events/@id/register',     function($id) use ($eventController) { $eventController->register($id, true); });
+$flight->route('GET  /events/@id/unregister',   function($id) use ($eventController) { $eventController->register($id, false); });
 
 $flight->route('GET  /eventManager',            function()    use ($eventController) { $eventController->home(); });
 $flight->route('GET  /eventManager/help',       function()    use ($eventController) { $eventController->help(); });
@@ -297,6 +310,15 @@ $flight->route('POST   /api/attributes/create',     function()    use ($eventTyp
 $flight->route('POST   /api/attributes/update',     function()    use ($eventTypeController) { $eventTypeController->updateAttribute(); });
 $flight->route('DELETE /api/attributes/delete/@id', function($id) use ($eventTypeController) { $eventTypeController->deleteAttribute($id); });
 $flight->route('GET    /api/attributes/list',       function()    use ($eventTypeController) { $eventTypeController->getAttributes(); });
+
+$designController = $container->get('app\controllers\DesignController');
+$flight->route('GET  /designs',          function() use ($designController) { $designController->index(); });
+$flight->route('GET  /designs/create',   function() use ($designController) { $designController->create(); });
+$flight->route('POST /designs/store',    function() use ($designController) { $designController->store(); });
+$flight->route('POST /api/designs/vote', function() use ($designController) { $designController->vote(); });
+
+$personStatisticsController = $container->get('app\controllers\PersonStatisticsController');
+$flight->route('GET /statistics/person/@id', function($id) use ($personStatisticsController) {$personStatisticsController->showStatistics($id);});
 
 $apiController = $container->get('app\controllers\ApiController');
 $flight->route('GET  /api/persons-by-group/@id', function($id) use ($apiController) { $apiController->getPersonsByGroup($id); });
