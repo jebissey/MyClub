@@ -18,11 +18,9 @@ class NavBarController extends BaseController
                 LEFT JOIN 'Group' on Page.IdGroup = 'Group'.Id
                 ORDER BY 'Group'.Name");
             $navItems = $query->fetchAll(PDO::FETCH_ASSOC);
-            $query = $this->pdo->query("SELECT * FROM 'Group' WHERE Inactivated = 0 ORDER BY 'Group'.Name");
-            $groups = $query->fetchAll(PDO::FETCH_ASSOC);
             echo $this->latte->render('app/views/navbar/index.latte', $this->params->getAll([
                 'navItems' => $navItems,
-                'groups' => $groups,
+                'groups' => $this->getGroups(),
                 'availableRoutes' => $this->getAvailableRoutes()
             ]));
         } else {
@@ -132,7 +130,7 @@ class NavBarController extends BaseController
             echo $this->latte->render('app/views/admin/arwards.latte', $this->params->getAll([
                 'counterNames' => $counterNames = $arwards->getCounterNames(),
                 'data' => $arwards->getData($counterNames),
-                'groups' => $arwards->getGroups(),
+                'groups' => $this->getGroups(),
                 'layout' => $this->getLayout()
             ]));
         } else {

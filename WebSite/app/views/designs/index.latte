@@ -34,7 +34,8 @@
                 </thead>
                 <tbody>
                     {foreach $designs as $design}
-                        <tr class="design-row" data-id="{$design['Id']}">
+                        <tr class="design-row" data-id="{$design['Id']}" data-name="{$design['Name']}" data-detail="{$design['Detail']}">
+
                             <td>{$design['NameOfDesigner']}</td>
                             <td data-bs-toggle="tooltip" data-bs-placement="top" title="{$design['Detail']}">
                                 {$design['Name']}
@@ -86,25 +87,25 @@
                     <p id="design-detail"></p>
 
                     <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name="voteOption" id="voteUp" value="1">
-                    <label class="form-check-label" for="voteUp">👍 Pour</label>
+                        <input class="form-check-input" type="radio" name="voteOption" id="voteUp" value="voteUp">
+                        <label class="form-check-label" for="voteUp">👍 Pour</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="voteOption" id="voteDown" value="voteDown">
+                        <label class="form-check-label" for="voteDown">👎 Contre</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="voteOption" id="voteNeutral" value="voteNeutral">
+                        <label class="form-check-label" for="voteNeutral">🤔 Neutre</label>
+                    </div>
                 </div>
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name="voteOption" id="voteDown" value="-1">
-                    <label class="form-check-label" for="voteDown">👎 Contre</label>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="button" class="btn btn-primary" id="submit-vote">Voter</button>
                 </div>
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name="voteOption" id="voteNeutral" value="0">
-                    <label class="form-check-label" for="voteNeutral">🤔 Neutre</label>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                <button type="button" class="btn btn-primary" id="submit-vote">Voter</button>
             </div>
         </div>
     </div>
-</div>
 {/block}
 
 {block scripts}
@@ -112,13 +113,12 @@
     document.querySelectorAll('.design-row').forEach(row => {
         row.addEventListener('click', function() {
             const designId = this.dataset.id;
-            const designName = this.querySelector('td:nth-child(2)').textContent.trim();
-            const designDetail = this.querySelector('td:nth-child(2)').getAttribute('title');
-            
+            const designName = this.dataset.name;
+            const designDetail = this.dataset.detail;
+
             document.getElementById('design-name').textContent = designName;
             document.getElementById('design-detail').textContent = designDetail;
-            
-            // Pré-remplir le vote si l'utilisateur a déjà voté
+
             const userVotes = {$userVotes|json};
             if (userVotes[designId] !== undefined) {
                 const vote = userVotes[designId];
@@ -132,7 +132,7 @@
             } else {
                 document.getElementById('voteNeutral').checked = true;
             }
-            
+
             document.getElementById('submit-vote').dataset.designId = designId;
             const voteModal = new bootstrap.Modal(document.getElementById('voteModal'));
             voteModal.show();
@@ -150,7 +150,7 @@
             },
             body: JSON.stringify({
                 designId: designId,
-                vote: parseInt(voteOption)
+                vote: voteOption
             })
         })
         .then(response => response.json())
@@ -158,6 +158,7 @@
             if (data.success) {
                 bootstrap.Modal.getInstance(document.getElementById('voteModal')).hide();
                 alert('Votre vote a été enregistré !');
+                location.reload();
             } else {
                 alert('Erreur lors de l\'enregistrement du vote : ' + data.message);
             }

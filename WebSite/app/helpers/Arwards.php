@@ -13,12 +13,6 @@ class Arwards
         $this->pdo = $pdo;
     }
 
-    public function getGroups()
-    {
-        $query = $this->pdo->query("SELECT Id, Name FROM 'Group' WHERE Inactivated = 0");
-        return  $query->fetchAll(PDO::FETCH_ASSOC);
-    }
-
     public function getData($counterNames)
     {
         $query = $this->pdo->query('

@@ -335,12 +335,6 @@ class ArticleController extends TableController
         return $query->fetchAll(PDO::FETCH_OBJ) ?: [];
     }
 
-    private function getGroups()
-    {
-        $query = $this->pdo->query("SELECT Id, Name FROM 'Group' WHERE Inactivated=0 ORDER BY Name");
-        return $query->fetchAll(PDO::FETCH_ASSOC);
-    }
-
     private function getArticle($id)
     {
         $query = $this->pdo->prepare("

@@ -166,7 +166,7 @@ class MediaController extends BaseController
 
     public function gpxViewer()
     {
-        if ($this->getPerson(['Redactor'])) {
+        if ($this->getPerson([''])) {
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $this->latte->render('app/views/media/gpxViewer.latte', $this->params->getAll([]));
             } else {

@@ -128,6 +128,12 @@ $containerBuilder->addDefinitions([
             $container->get(PDO::class),
             $container->get(Engine::class)
         );
+    },
+    'app\controllers\AlertController' => function (Container $container) {
+        return new \app\controllers\AlertController(
+            $container->get(PDO::class),
+            $container->get(Engine::class)
+        );
     }
 ]);
 $container = $containerBuilder->build();
@@ -226,7 +232,7 @@ $flight->route('POST /groups/delete/@id', function($id) use ($groupController) {
 
 $registrationController = $container->get('app\controllers\RegistrationController');
 $flight->route('GET  /registration',                               function()                    use ($registrationController) { $registrationController->index(); });
-$flight->route('GET  /registration/groups/@id',                    function($id)                 use ($registrationController) { $registrationController->getGroups($id); });
+$flight->route('GET  /registration/groups/@id',                    function($id)                 use ($registrationController) { $registrationController->getPersonGroups($id); });
 $flight->route('POST /api/registration/add/@personId/@groupId',    function($personId, $groupId) use ($registrationController) { $registrationController->addToGroup($personId, $groupId); });
 $flight->route('POST /api/registration/remove/@personId/@groupId', function($personId, $groupId) use ($registrationController) { $registrationController->removeFromGroup($personId, $groupId); });
 
@@ -320,6 +326,10 @@ $flight->route('POST /api/designs/vote', function() use ($designController) { $d
 
 $personStatisticsController = $container->get('app\controllers\PersonStatisticsController');
 $flight->route('GET /statistics/person', function() use ($personStatisticsController) {$personStatisticsController->showStatistics();});
+
+$alertController = $container->get('app\controllers\AlertController');
+$flight->route('GET  /alerts',      function() use ($alertController) {$alertController->showAlerts();});
+$flight->route('POST /alerts/save', function() use ($alertController) {$alertController->updateAlert();});
 
 $apiController = $container->get('app\controllers\ApiController');
 $flight->route('GET  /api/persons-by-group/@id', function($id) use ($apiController) { $apiController->getPersonsByGroup($id); });

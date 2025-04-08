@@ -44,7 +44,7 @@ class RegistrationController extends TableController
         }
     }
 
-    public function getGroups($personId)
+    public function getPersonGroups($personId)
     {
         if ($this->getPerson(['PersonManager', 'Webmaster'])) {
             if ($this->authorizations->isWebmaster()) {

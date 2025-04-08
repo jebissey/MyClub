@@ -8,16 +8,16 @@ use Latte\Engine as LatteEngine;
 
 use app\helpers\Application;
 use app\helpers\Authorization;
+use app\helpers\BaseHelper;
 use app\helpers\GravatarHandler;
 use app\helpers\Params;
 use app\helpers\Settings;
 use app\helpers\TranslationManager;
 
-abstract class BaseController
+abstract class BaseController extends BaseHelper
 {
     protected const VERSION = 0.4;
 
-    protected PDO $pdo;
     protected $fluent;
     protected Engine $flight;
     protected $latte;

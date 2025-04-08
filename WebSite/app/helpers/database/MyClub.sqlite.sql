@@ -1,4 +1,18 @@
 BEGIN TRANSACTION;
+CREATE TABLE IF NOT EXISTS "Alert" (
+	"Id"	INTEGER,
+	"CreatedBy"	INTEGER NOT NULL,
+	"IdGroup"	INTEGER NOT NULL,
+	"OnlyForMembers"	INTEGER NOT NULL DEFAULT 1,
+	"StartDate"	TEXT NOT NULL DEFAULT current_timestamp,
+	"EndDate"	TEXT NOT NULL DEFAULT current_timestamp,
+	"Message"	TEXT NOT NULL,
+	"Type"	TEXT NOT NULL DEFAULT 'alert-warning',
+	"LastUpdate"	TEXT NOT NULL DEFAULT current_timestamp,
+	PRIMARY KEY("Id"),
+	FOREIGN KEY("CreatedBy") REFERENCES "Person"("Id"),
+	FOREIGN KEY("IdGroup") REFERENCES "Group"("Id")
+);
 CREATE TABLE IF NOT EXISTS "Article" (
 	"Id"	INTEGER,
 	"Title"	TEXT NOT NULL,
@@ -7,8 +21,8 @@ CREATE TABLE IF NOT EXISTS "Article" (
 	"Timestamp"	TEXT NOT NULL DEFAULT current_timestamp,
 	"PublishedBy"	INTEGER DEFAULT NULL,
 	"IdGroup"	INTEGER DEFAULT NULL,
-	"LastUpdate"	TEXT NOT NULL DEFAULT current_timestamp,
 	"OnlyForMembers"	INTEGER NOT NULL DEFAULT 1,
+	"LastUpdate"	TEXT NOT NULL DEFAULT current_timestamp,
 	PRIMARY KEY("Id"),
 	FOREIGN KEY("CreatedBy") REFERENCES "Person"("Id"),
 	FOREIGN KEY("IdGroup") REFERENCES "Group"("Id"),
