@@ -58,7 +58,7 @@ class PersonController extends TableController implements CrudControllerInterfac
             $query = $this->fluent->from('Person')
                 ->select('Id, FirstName, LastName, Email')
                 ->orderBy('LastName')
-                ->where('Inactivated', 0);
+                ->where('Inactivated = 0');
             $data = $this->prepareTableData($query, $filterValues, $_GET['tablePage'] ?? null);
             echo $this->latte->render('app/views/persons/index.latte', $this->params->getAll([
                 'persons' => $data['items'],

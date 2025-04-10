@@ -92,8 +92,7 @@ class GroupController extends BaseController implements CrudControllerInterface
     {
         if ($this->getPerson(['PersonManager', 'Webmaster'])) {
 
-            $query = $this->pdo->query('SELECT * FROM Authorization WHERE Id <> 1');
-            $availableAuthorizations = $query->fetchAll(PDO::FETCH_ASSOC);
+            $availableAuthorizations = $this->fluent->from('Authorization')->where('Id <> 1')->fetchAll();
 
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $name = isset($_POST['name']) ? $this->sanitizeInput($_POST['name']) : '';
