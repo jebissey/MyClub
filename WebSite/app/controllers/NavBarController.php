@@ -64,7 +64,8 @@ class NavBarController extends BaseController
                         'Name' => $data['name'],
                         'Route' => $data['route'],
                         'Position' => $newPosition,
-                        'IdGroup' => $data['idGroup']
+                        'IdGroup' => $data['idGroup'],
+                        'OnlyForMembers' => $data['onlyForMembers']
                     ])
                     ->execute();
                 header('Content-Type: application/json');
@@ -74,7 +75,8 @@ class NavBarController extends BaseController
                     ->set([
                         'Name' => $data['name'],
                         'Route' => $data['route'],
-                        'IdGroup' => $data['idGroup']
+                        'IdGroup' => $data['idGroup'],
+                        'OnlyForMembers' => $data['onlyForMembers']
                     ])
                     ->where('Id', $data['id'])
                     ->execute();
