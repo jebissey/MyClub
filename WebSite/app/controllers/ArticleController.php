@@ -28,53 +28,56 @@ class ArticleController extends TableController
     {
         $person = $this->getPerson([]);
         $filterValues = [
-            'createdBy' => $_GET['createdBy'] ?? '',
+            'PersonName' => $_GET['PersonName'] ?? '',
             'title' => $_GET['title'] ?? '',
             'timestamp' => $_GET['timestamp'] ?? '',
             'lastUpdate' => $_GET['lastUpdate'] ?? '',
-            'published' => $_GET['published'] ?? ''
+            'published' => $_GET['published'] ?? '',
+            'GroupName' => $_GET['GroupName'] ?? '',
         ];
         $filterConfig = [
-            ['name' => 'createdBy', 'label' => 'Créé par'],
+            ['name' => 'PersonName', 'label' => 'Créé par'],
             ['name' => 'title', 'label' => 'Titre'],
             ['name' => 'timestamp', 'label' => 'Date de création'],
             ['name' => 'lastUpdate', 'label' => 'Dernière modification'],
             ['name' => 'published', 'label' => 'Publié'],
-            ['name' => 'groupName', 'label' => 'N° du groupe']
+            ['name' => 'GroupName', 'label' => 'Groupe']
         ];
         $columns = [
-            ['field' => 'CreatedBy', 'label' => 'Créé par'],
-            ['field' => 'PersonName', 'label' => 'Nom'],
+            ['field' => 'PersonName', 'label' => 'Créé par'],
             ['field' => 'Title', 'label' => 'Titre'],
             ['field' => 'Timestamp', 'label' => 'Date de création'],
             ['field' => 'LastUpdate', 'label' => 'Dernière modification'],
             ['field' => 'Published', 'label' => 'Publié'],
-            ['field' => 'IdGroup', 'label' => 'Groupe(n°)'],
+            ['field' => 'GroupName', 'label' => 'Groupe'],
             ['field' => 'ForMembers', 'label' => 'Club'],
             ['field' => 'HasSurvey', 'label' => 'Sondage'],
             ['field' => 'Votes', 'label' => 'Votes']
         ];
         $query = $this->fluent->from('Article')
-            ->select('Article.Id, Article.CreatedBy, Article.Title, Article.Timestamp, CASE WHEN Article.PublishedBy IS NULL THEN "non" ELSE "oui" END AS Published')
+            ->select('Article.Id, Article.CreatedBy, Article.Title, Article.Timestamp')
+            ->select('CASE WHEN Article.PublishedBy IS NULL THEN "non" ELSE "oui" END AS Published')
             ->select('CASE WHEN Article.OnlyForMembers = 1 THEN "oui" ELSE "non" END AS ForMembers')
             ->select('CASE WHEN Survey.IdArticle IS NOT NULL THEN "oui" ELSE "non" END AS HasSurvey')
             ->select('CASE WHEN Person.NickName != "" THEN Person.FirstName || " " || Person.LastName || " (" || Person.NickName || ")" ELSE Person.FirstName || " " || Person.LastName END AS PersonName')
+            ->select("'Group'.Name AS GroupName")
             ->select('COUNT(Reply.Id) AS Votes')
             ->innerJoin('Person ON Article.CreatedBy = Person.Id')
             ->leftJoin('Survey ON Article.Id = Survey.IdArticle')
             ->leftJoin('Reply ON Survey.Id = Reply.IdSurvey')
-            ->where('(Article.IdGroup IS NULL)')
-            ->where('(Article.OnlyForMembers = 0)')
-            ->where('(Article.PublishedBy IS NOT NULL)')
-            ->groupBy('Article.Id, Article.CreatedBy, Article.Title, Article.Timestamp, Article.PublishedBy, Person.FirstName, Person.LastName, Person.NickName, Survey.IdArticle');
+            ->leftJoin("'Group' ON 'Group'.Id = Article.IdGroup")
+            ->groupBy('Article.Id');
         
         if ($person) {
-            if ($this->authorizations->isEditor()) {
-                $query = $query->whereOr('1=1');
-            } else {
-                $query = $query->whereOr('Article.CreatedBy = ' . $person['Id'])
-                    ->whereOr('Article.IdGroup IN (SELECT IdGroup FROM PersonGroup WHERE IdPerson = ' . $person['Id'] . ')');
+            if (!$this->authorizations->isEditor()) {
+                $query = $query->where('(Article.CreatedBy = ' . $person['Id'] . '
+                    OR (Article.PublishedBy IS NOT NULL 
+                        AND (Article.IdGroup IS NULL OR Article.IdGroup IN (SELECT IdGroup FROM PersonGroup WHERE IdPerson = ' . $person['Id'] . '))
+                       ))');
             }
+        }
+        else {
+            $query = $query->where('(Article.IdGroup IS NULL AND Article.OnlyForMembers = 0 AND Article.PublishedBy IS NOT NULL)');
         }
         $query = $query->orderBy('Article.Timestamp DESC');
         $data = $this->prepareTableData($query, $filterValues, $_GET['tablePage'] ?? null);

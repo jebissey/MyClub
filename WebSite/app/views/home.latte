@@ -36,7 +36,11 @@
         {/if}        
         
         {if count($latestArticleTitles) > 0}
-            <h3>Articles récents</h3>
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h3 class="mb-0">Articles récents</h3>
+                <a href="/articles" class="btn btn-secondary">Liste de tout les articles</a>
+            </div>
+
             <ul class="list-group">
                 {foreach $latestArticleTitles as $article}
                     <li class="list-group-item d-flex justify-content-between align-items-center">
