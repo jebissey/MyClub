@@ -138,19 +138,19 @@ abstract class BaseController extends BaseHelper
 
     protected function getNavItems()
     {
-        $query = $this->pdo->query("
-            SELECT Route, Name, IdGroup
-            FROM Page
-            ORDER by Position
-        ");
-        $navItems = $query->fetchAll(PDO::FETCH_ASSOC);
+        $navItems = $this->fluent->from('Page')->orderBy('Position')->fetchAll();
         $person = $this->getPerson();
         if (!$person) $userGroups = [];
-        else         $userGroups = $this->getUserGroups($person['Email']);
+        else $userGroups = $this->getUserGroups($person['Email']);
 
         $filteredNavItems = [];
         foreach ($navItems as $navItem) {
-            if ($navItem['IdGroup'] == null || !empty(array_intersect([$navItem['IdGroup']], $userGroups))) {
+            if (
+                ($person === false && $navItem['OnlyForMembers'] === 0)
+                || ($person && $navItem['OnlyForMembers'] === 1 &&
+                    ($navItem['IdGroup'] == null || !empty(array_intersect([$navItem['IdGroup']], $userGroups)))
+                )
+            ) {
                 $filteredNavItems[] = $navItem;
             }
         }
