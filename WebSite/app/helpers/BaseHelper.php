@@ -18,4 +18,11 @@ class BaseHelper
         $query = $this->pdo->query("SELECT * FROM 'Group' WHERE Inactivated = 0 ORDER BY Name");
         return $query->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    protected function getPersonByEmail($email)
+    {
+        $query = $this->pdo->prepare('SELECT * FROM "Person" WHERE Email = ? COLLATE NOCASE');
+        $query->execute([$email]);
+        return $query->fetch(PDO::FETCH_ASSOC);
+    }
 }

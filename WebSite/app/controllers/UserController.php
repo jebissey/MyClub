@@ -27,9 +27,7 @@ class UserController extends BaseController
         $email = urldecode($encodedEmail);
 
         if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            $query = $this->pdo->prepare('SELECT * FROM "Person" WHERE Email = ?');
-            $query->execute([$email]);
-            $person = $query->fetch(PDO::FETCH_ASSOC);
+            $person = $this->getPersonByEmail($email);
 
             if ($person) {
                 if ($person['TokenCreatedAt'] === null || (new DateTime($person['TokenCreatedAt']))->diff(new DateTime())->h >= 1) {
@@ -105,10 +103,7 @@ class UserController extends BaseController
                 if (strlen($password) < 6 || strlen($password) > 20) {
                     $this->application->error482('password rules are not respected', __FILE__, __LINE__);
                 } else {
-                    $query = $this->pdo->prepare('SELECT Password FROM Person WHERE Email = ?');
-                    $query->execute([$email]);
-                    $person = $query->fetch(PDO::FETCH_ASSOC);
-                    if (!$person) {
+                    if (!$person = $this->getPersonByEmail($email)) {
                         $this->application->error480($email, __FILE__, __LINE__);
                     } else {
                         if (PasswordManager::verifyPassword($password, $person['Password'] ?? '')) {

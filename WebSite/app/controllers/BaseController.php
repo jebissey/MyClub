@@ -79,9 +79,7 @@ abstract class BaseController extends BaseHelper
             $this->setDefaultParams();
             return false;
         } else {
-            $query = $this->pdo->prepare('SELECT * FROM Person WHERE Email = ?');
-            $query->execute([$userEmail]);
-            $person = $query->fetch(PDO::FETCH_ASSOC);
+            $person = $this->getPersonByEmail($userEmail);
             if (!$person) {
                 $this->application->error480($userEmail, __FILE__, __LINE__);
                 return false;

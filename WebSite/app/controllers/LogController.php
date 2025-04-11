@@ -37,7 +37,8 @@ class LogController extends BaseController
                 'os' => 'Os',
                 'who' => 'Who',
                 'code' => 'Code',
-                'uri' => 'uri',
+                'uri' => 'Uri',
+                'message' => 'Message',
             ];
 
             foreach ($filters as $param => $column) {
