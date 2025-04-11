@@ -8,31 +8,50 @@
 
 {block content}
     <div class="container-fluid">
-        {$greatings|noescape}        
+        {$greatings|noescape}
+
+        <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        {foreach $pendingSurveys as $survey}
+            <div class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="false">
+                <div class="toast-header">
+                    <strong class="me-auto">Sondage en attente: {$survey['ArticleTitle']}</strong>
+                    <small>Fermeture: {$survey['ClosingDate']|shortDate}</small>
+                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+                <div class="toast-body">
+                    {$survey['SurveyQuestion']}
+                    <div class="mt-2 pt-2 border-top">
+                        <a href="/articles/{$survey['ArticleId']}" class="btn btn-primary btn-sm">Répondre au sondage</a>
+                    </div>
+                </div>
+            </div>
+        {/foreach}
+        </div>
+
         {if $latestArticle}
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h2 class="card-title">{$latestArticle->Title}</h2>
-                    <small class="text-muted">
-                        {='created_by'|translate} {$latestArticle->FirstName} {$latestArticle->LastName} 
-                        {='on'|translate} {=$latestArticle->Timestamp|shortDate}
-                        {$publishedBy}
-                        {if date('Y-m-d', strtotime($latestArticle->Timestamp)) !== date('Y-m-d', strtotime($latestArticle->LastUpdate))}
-                        {='modified_on'|translate} {=$latestArticle->LastUpdate|shortDate}
-                        {/if}
-                        {if $latestArticleHasSurvey}
-                        <a href="/articles/{$latestArticle->Id}" class="btn btn-success ms-2">{='vote'|translate}{if $userEmail == ''} {='connection_required'|translate}{/if}</a>
-                        {/if}
-                    </small>
-                </div>
-                <div class="card-body">
-                    {$latestArticle->Content|noescape}
-                </div>
+        <div class="card mb-4">
+            <div class="card-header">
+                <h2 class="card-title">{$latestArticle->Title}</h2>
+                <small class="text-muted">
+                    {='created_by'|translate} {$latestArticle->FirstName} {$latestArticle->LastName} 
+                    {='on'|translate} {=$latestArticle->Timestamp|shortDate}
+                    {$publishedBy}
+                    {if date('Y-m-d', strtotime($latestArticle->Timestamp)) !== date('Y-m-d', strtotime($latestArticle->LastUpdate))}
+                    {='modified_on'|translate} {=$latestArticle->LastUpdate|shortDate}
+                    {/if}
+                    {if $latestArticleHasSurvey}
+                    <a href="/articles/{$latestArticle->Id}" class="btn btn-success ms-2">{='vote'|translate}{if $userEmail == ''} {='connection_required'|translate}{/if}</a>
+                    {/if}
+                </small>
             </div>
+            <div class="card-body">
+                {$latestArticle->Content|noescape}
+            </div>
+        </div>
         {else}
-            <div class="alert alert-info">
-                Aucun article disponible.
-            </div>
+        <div class="alert alert-info">
+            Aucun article disponible.
+        </div>
         {/if}        
         
         {if count($latestArticleTitles) > 0}
@@ -46,7 +65,7 @@
                     <li class="list-group-item d-flex justify-content-between align-items-center">
                         <a href="/articles/{$article->Id}">{$article->Title}</a>
                         <span class="badge bg-secondary rounded-pill">
-                            {date('d/m/Y', strtotime($article->LastUpdate))}
+                            {$article->LastUpdate|shortDate}
                         </span>
                     </li>
                 {/foreach}
@@ -58,4 +77,17 @@
         </div>
         {/if}
     </div>
+{/block}
+
+{block scripts}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var toastElList = [].slice.call(document.querySelectorAll('.toast'));
+        var toastList = toastElList.map(function(toastEl) {
+            return new bootstrap.Toast(toastEl);
+        });
+        
+        toastList.forEach(toast => toast.show());
+    });
+</script>
 {/block}

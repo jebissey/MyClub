@@ -17,12 +17,13 @@
                             <span>{$option}</span>
                             <span class="badge bg-primary rounded-pill">{$results[$option]}</span>
                         </div>
+                        {var $percentage = $results[$option] / count($participants) * 100}
                         <div class="progress mt-2">
-                            <div class="progress-bar" role="progressbar" style="width: {$participants ? ($results[$option] / count($participants) * 100) : 0}%" 
-                                 aria-valuenow="{$participants ? ($results[$option] / count($participants) * 100) : 0}" 
+                            <div class="progress-bar" role="progressbar" style="width: {$percentage|number}%;" 
+                                 aria-valuenow="{$participants ? $percentage|number : 0}" 
                                  aria-valuemin="0" 
                                  aria-valuemax="100">
-                                {$participants ? round(($results[$option] / count($participants) * 100), 1) : 0}%
+                                {$participants ? number_format($percentage, 1) : 0}%
                             </div>
                         </div>
                     </div>

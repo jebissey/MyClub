@@ -5,6 +5,7 @@ namespace app\controllers;
 use DateTime;
 use flight\Engine;
 use PDO;
+use app\helpers\Alert;
 use app\helpers\Article;
 use app\helpers\Client;
 use app\helpers\Params;
@@ -106,12 +107,16 @@ class UserController extends BaseController
                     if (!$person = $this->getPersonByEmail($email)) {
                         $this->application->error480($email, __FILE__, __LINE__);
                     } else {
-                        if (PasswordManager::verifyPassword($password, $person['Password'] ?? '')) {
-                            $_SESSION['user'] = $email;
-                            $_SESSION['navbar'] = 'user';
-                            $this->application->message("Sign in succeeded with $email", 1);
+                        if ($person['Inactivated'] == 1) {
+                            $this->application->error479($email, __FILE__, __LINE__);
                         } else {
-                            $this->application->error482("sign in failed with $email address", __FILE__, __LINE__);
+                            if (PasswordManager::verifyPassword($password, $person['Password'] ?? '')) {
+                                $_SESSION['user'] = $email;
+                                $_SESSION['navbar'] = 'user';
+                                $this->application->message("Sign in succeeded with $email", 1);
+                            } else {
+                                $this->application->error482("sign in failed with $email address", __FILE__, __LINE__);
+                            }
                         }
                     }
                 }
@@ -141,6 +146,7 @@ class UserController extends BaseController
 
     public function home(ArticleController $articleController)
     {
+        $userPendingSurveys = [];
         $userEmail = $_SESSION['user'] ?? '';
         if ($userEmail) {
             $person = $this->getPerson();
@@ -148,6 +154,10 @@ class UserController extends BaseController
                 unset($_SESSION['user']);
                 $this->application->error480($userEmail, __FILE__, __LINE__);
             }
+            $pendingSurveyResponses = (new Alert($this->pdo))->getPendingSurveyResponses();
+            $userPendingSurveys = array_filter($pendingSurveyResponses, function ($item) use ($userEmail) {
+                return strcasecmp($item['Email'], $userEmail) === 0;
+            });
         } else {
             $translationManager = new TranslationManager($this->pdo);
             $this->params = new Params([
@@ -170,6 +180,7 @@ class UserController extends BaseController
             'navItems' => $this->getNavItems(),
             'publishedBy' => $articles['latestArticle'] && $articles['latestArticle']->PublishedBy != $articles['latestArticle']->CreatedBy ? $this->getPublisher($articles['latestArticle']->PublishedBy) : '',
             'latestArticleHasSurvey' => (new Article($this->pdo))->hasSurvey($articles['latestArticle']->Id ?? 0),
+            'pendingSurveys' => $userPendingSurveys,
         ]));
     }
 

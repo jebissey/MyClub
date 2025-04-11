@@ -10,51 +10,46 @@ class AlertController extends BaseController
 
     public function showAlerts()
     {
-        $person = $this->getPerson([]);
-        if (!$person) {
-            $this->application->error403(__FILE__, __LINE__);
-            return;
-        }
-        $alertManager = new Alert($this->pdo);
-        $alerts = $alertManager->getAlerts();
+        if ($person = $this->getPerson(['Redactor'])) {
+            $alerts = (new Alert($this->pdo))->getAlerts();
 
-        // Déterminer le statut de chaque alerte
-        $today = new DateTime();
-        foreach ($alerts as &$alert) {
-            $startDate = new DateTime($alert['StartDate']);
-            $endDate = new DateTime($alert['EndDate']);
+            $today = new DateTime();
+            foreach ($alerts as &$alert) {
+                $startDate = new DateTime($alert['StartDate']);
+                $endDate = new DateTime($alert['EndDate']);
 
-            if ($startDate <= $today && $endDate >= $today) {
-                $alert['Status'] = 'active';
-            } elseif ($startDate > $today) {
-                $alert['Status'] = 'futur';
-            } else {
-                $alert['Status'] = 'passée';
+                if ($startDate <= $today && $endDate >= $today) {
+                    $alert['Status'] = 'active';
+                } elseif ($startDate > $today) {
+                    $alert['Status'] = 'futur';
+                } else {
+                    $alert['Status'] = 'passée';
+                }
+
+                $alert['IsCreator'] = ($alert['CreatedBy'] == $person['Id']);
             }
 
-            // Vérifier si l'utilisateur courant est le créateur de l'alerte
-            $alert['IsCreator'] = ($alert['CreatedBy'] == $person['Id']);
+            $alertTypes = [
+                'alert-primary' => 'Primaire',
+                'alert-secondary' => 'Secondaire',
+                'alert-success' => 'Succès',
+                'alert-danger' => 'Danger',
+                'alert-warning' => 'Avertissement',
+                'alert-info' => 'Information',
+                'alert-light' => 'Clair',
+                'alert-dark' => 'Sombre'
+            ];
+
+            echo $this->latte->render('app/views/alerts/index.latte', $this->params->getAll([
+                'alerts' => $alerts,
+                'alertTypes' => $alertTypes,
+                'person' => $person,
+                'navItems' => $this->getNavItems(),
+                'groups' => $this->getGroups(),
+            ]));
+        } else {
+            $this->application->error403(__FILE__, __LINE__);
         }
-
-        // Récupérer les types d'alertes Bootstrap pour le formulaire d'édition
-        $alertTypes = [
-            'alert-primary' => 'Primaire',
-            'alert-secondary' => 'Secondaire',
-            'alert-success' => 'Succès',
-            'alert-danger' => 'Danger',
-            'alert-warning' => 'Avertissement',
-            'alert-info' => 'Information',
-            'alert-light' => 'Clair',
-            'alert-dark' => 'Sombre'
-        ];
-
-        echo $this->latte->render('app/views/alerts/index.latte', $this->params->getAll([
-            'alerts' => $alerts,
-            'alertTypes' => $alertTypes,
-            'person' => $person,
-            'navItems' => $this->getNavItems(),
-            'groups' => $this->getGroups(),
-        ]));
     }
 
     public function updateAlert()
