@@ -99,10 +99,8 @@ class DesignController extends BaseController
     public function create()
     {
         if ($this->getPerson(['Redactor'])) {
-            $groups = $this->fluent->from("'Group'")->orderBy('Name ASC')->fetchAll();
-
             $this->latte->render('app/views/designs/create.latte', $this->params->getAll([
-                'groups' => $groups
+                'groups' => $$this->fluent->from("'Group'")->orderBy('Name ASC')->fetchAll()
             ]));
         } else {
             $this->application->error403(__FILE__, __LINE__);

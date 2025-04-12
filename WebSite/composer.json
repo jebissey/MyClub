@@ -5,7 +5,8 @@
         "latte/latte": "^3.0",
         "tracy/tracy": "^2.10",
         "envms/fluentpdo": "^2.2",
-        "ua-parser/uap-php": "^3.9"
+        "ua-parser/uap-php": "^3.9",
+        "guzzlehttp/guzzle": "^7.9"
     },
     "autoload": {
         "psr-4": {

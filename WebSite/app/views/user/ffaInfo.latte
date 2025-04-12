@@ -1,0 +1,57 @@
+{layout '../layout.latte'}
+
+{block title}Informations FFA{/block}
+
+{block navbar}
+{include '../navbar/home.latte'}
+{/block}
+
+{block content}
+<div class="container mt-4">
+    <h1>Informations FFA pour {$person['FirstName']} {$person['LastName']}</h1>
+    
+    {if !empty($athleteInfo) && !isset($athleteInfo['error'])}
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5>Résultats Marche Nordique FFA</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Classement</th>
+                            <th>Nom</th>
+                            <th>Club</th>
+                            <th>Catégorie</th>
+                            <th>Points</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {foreach $athleteInfo as $info}
+                            <tr>
+                                <td>{$info['rank']}</td>
+                                <td>{$info['fullName']}</td>
+                                <td>{$info['club'] ?? '-'}</td>
+                                <td>{$info['category'] ?? '-'}</td>
+                                <td>{$info['points'] ?? '-'}</td>
+                            </tr>
+                        {/foreach}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    {elseif isset($athleteInfo['error'])}
+        <div class="alert alert-danger">
+            <strong>Erreur :</strong> {$athleteInfo['error']}
+        </div>
+    {else}
+        <div class="alert alert-warning">
+            Aucune information FFA trouvée pour ce membre.
+        </div>
+    {/if}
+    
+    <div class="mt-3">
+        <a href="/statistics/person" class="btn btn-primary">Retour aux statistiques</a>
+    </div>
+</div>
+{/block}

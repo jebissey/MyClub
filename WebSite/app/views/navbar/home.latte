@@ -23,7 +23,7 @@
       {/if}
 
       <a class="nav-link" href="{$href}">
-        <img src="{$userImg}" alt="User avatar" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="{='my_data'|translate}">
+        <img src="{$userImg}" alt="User avatar" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="{if $userEmail != ''}{='my_data'|translate}{else}{='login'|translate}{/if}">
       </a>
       
       {if $userEmail != ''}

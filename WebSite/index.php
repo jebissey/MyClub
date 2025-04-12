@@ -134,6 +134,12 @@ $containerBuilder->addDefinitions([
             $container->get(PDO::class),
             $container->get(Engine::class)
         );
+    },
+    'app\controllers\FFAController' => function (Container $container) {
+        return new \app\controllers\FFAController(
+            $container->get(PDO::class),
+            $container->get(Engine::class)
+        );
     }
 ]);
 $container = $containerBuilder->build();
@@ -330,6 +336,10 @@ $flight->route('GET /statistics/person', function() use ($personStatisticsContro
 $alertController = $container->get('app\controllers\AlertController');
 $flight->route('GET  /alerts',      function() use ($alertController) {$alertController->showAlerts();});
 $flight->route('POST /alerts/save', function() use ($alertController) {$alertController->updateAlert();});
+
+$ffaController = $container->get('app\controllers\FFAController');
+$flight->route('GET /ffa/info',   function() use ($ffaController) {$ffaController->showFFAInfo();});
+$flight->route('GET /ffa/search', function() use ($ffaController) {$ffaController->searchMember();});
 
 $apiController = $container->get('app\controllers\ApiController');
 $flight->route('GET  /api/persons-by-group/@id', function($id) use ($apiController) { $apiController->getPersonsByGroup($id); });

@@ -69,7 +69,6 @@ class AlertController extends BaseController
 
         $alertManager = new Alert($this->pdo);
 
-        // Vérifier que l'utilisateur est bien le créateur de l'alerte
         $alert = $alertManager->getAlertById($alertId);
         if (!$alert || $alert['CreatedBy'] != $person['Id']) {
             $this->application->error403(__FILE__, __LINE__);
