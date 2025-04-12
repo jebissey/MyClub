@@ -146,7 +146,7 @@ class UserController extends BaseController
 
     public function home(ArticleController $articleController)
     {
-        $userPendingSurveys = [];
+        $userPendingSurveys = $userPendingDesigns = [];
         $userEmail = $_SESSION['user'] ?? '';
         if ($userEmail) {
             $person = $this->getPerson();
@@ -156,6 +156,10 @@ class UserController extends BaseController
             }
             $pendingSurveyResponses = (new Alert($this->pdo))->getPendingSurveyResponses();
             $userPendingSurveys = array_filter($pendingSurveyResponses, function ($item) use ($userEmail) {
+                return strcasecmp($item['Email'], $userEmail) === 0;
+            });
+            $pendingDesignResponses = (new Alert($this->pdo))->getPendingDesignResponses();
+            $userPendingDesigns = array_filter($pendingDesignResponses, function ($item) use ($userEmail) {
                 return strcasecmp($item['Email'], $userEmail) === 0;
             });
         } else {
@@ -181,6 +185,7 @@ class UserController extends BaseController
             'publishedBy' => $articles['latestArticle'] && $articles['latestArticle']->PublishedBy != $articles['latestArticle']->CreatedBy ? $this->getPublisher($articles['latestArticle']->PublishedBy) : '',
             'latestArticleHasSurvey' => (new Article($this->pdo))->hasSurvey($articles['latestArticle']->Id ?? 0),
             'pendingSurveys' => $userPendingSurveys,
+            'pendingDesigns' => $userPendingDesigns,
         ]));
     }
 

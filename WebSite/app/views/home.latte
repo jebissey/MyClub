@@ -26,6 +26,23 @@
                 </div>
             </div>
         {/foreach}
+        {if $isRedactor}
+            {foreach $pendingDesigns as $design}
+            <div class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="false">
+                <div class="toast-header">
+                    <strong class="me-auto">Design en attente: {$design['DesignName']}</strong>
+                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+                <div class="toast-body">
+                    {$design['DesignDetail']}
+                    <small>Cliquer sur la ligne pour donner votre avis</small>
+                    <div class="mt-2 pt-2 border-top">
+                        <a href="/designs/" class="btn btn-primary btn-sm">Donner votre avis</a>
+                    </div>
+                </div>
+            </div>
+            {/foreach}
+        {/if}
         </div>
 
         {if $latestArticle}

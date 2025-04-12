@@ -195,7 +195,7 @@ class NavBarController extends BaseController
         if ($this->getPerson(['EventManager'])) {
             echo $this->latte->render('app/views/emails/getEmails.latte', $this->params->getAll([
                 'groups' => $this->fluent->from("'Group'")->where('Inactivated', 0)->orderBy('Name')->fetchAll('Id', 'Name'),
-                'eventTypes' => $this->fluent->from('EventType')->where('Inactivated', 0)->orderBy('Name')->fetchAll('Id', 'Name'),
+                'eventTypes' => $this->fluent->from('EventType')->where('Inactivated = 0')->orderBy('Name')->fetchAll('Id', 'Name'),
             ]));
         } else {
             $this->application->error403(__FILE__, __LINE__);

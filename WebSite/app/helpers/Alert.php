@@ -115,7 +115,27 @@ class Alert
                 OR pg.IdGroup IS NOT NULL 
             )
             AND r.Id IS NULL
-        ORDER BY s.ClosingDate, p.LastName, p.FirstName;";
+        ORDER BY s.ClosingDate, p.LastName, p.FirstName";
+
+        return $this->pdo->query($query)->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function getPendingDesignResponses()
+    {
+        $query = "
+        SELECT 
+            p.Id AS PersonId, 
+            p.Email, 
+            d.Id AS DesignId, 
+            d.Name AS DesignName,
+            d.Detail AS DesignDetail
+        FROM Person p
+        CROSS JOIN Design d
+        LEFT JOIN DesignVote dv ON dv.IdDesign = d.Id AND dv.IdPerson = p.Id
+        WHERE p.Inactivated = 0
+            AND d.Status = 'UnderReview'
+            AND dv.Id IS NULL
+        ORDER BY d.LastUpdate";
 
         return $this->pdo->query($query)->fetchAll(PDO::FETCH_ASSOC);
     }
