@@ -635,6 +635,12 @@ class LogController extends BaseController
             $period = $_GET['period'] ?? 'week';
             $dateCondition = '';
             switch ($period) {
+                case 'yesterday':
+                    $dateCondition = "date(CreatedAt) = date('now', '-1 days')";
+                    break;
+                case 'beforeYesterday':
+                        $dateCondition = "date(CreatedAt) = date('now', '-2 days')";
+                        break;
                 case 'today':
                     $dateCondition = "date(CreatedAt) = date('now')";
                     break;

@@ -25,6 +25,8 @@
                     <select class="form-control" id="period" name="period" onchange="this.form.submit()">
                         <option value="all" {if $period == 'all'}selected{/if}>Tout</option>
                         <option value="today" {if $period == 'today'}selected{/if}>Aujourd'hui</option>
+                        <option value="yesterday" {if $period == 'yesterday'}selected{/if}>Hier</option>
+                        <option value="beforeYesterday" {if $period == 'beforeYesterday'}selected{/if}>Avant hier</option>
                         <option value="week" {if $period == 'week'}selected{/if}>7 derniers jours</option>
                         <option value="month" {if $period == 'month'}selected{/if}>30 derniers jours</option>
                         <option value="quarter" {if $period == 'quarter'}selected{/if}>Dernier trimestre</option>
