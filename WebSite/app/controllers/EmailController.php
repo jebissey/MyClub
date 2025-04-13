@@ -20,34 +20,18 @@ class EmailController extends BaseController
                 foreach ($persons as $person) {
                     $include = true;
                     if (!empty($idEventType)) {
-                        if ($person['Preferences'] ?? '' != '') {
-                            $preferences = json_decode($person['Preferences'] ?? '', true);
+                        if ($person['Preferences'] != '') {
+                            $preferences = json_decode($person['Preferences'], true);
                             if ($preferences != '' && !isset($preferences['eventTypes'][$idEventType])) {
                                 $include = false;
                             }
                         }
                     }
-                    if (!empty($dayOfWeek)) {
-                        if ($person['Availabilities'] ?? '' != '') {
-                            $availabilities = json_decode($person['Availabilities'] ?? '', true);
-                            if (empty($timeOfDay)) {
-                                if (!isset($availabilities[$dayOfWeek])) {
-                                    $include = false;
-                                }
-                            } else {
-                                $timeKey = match ($timeOfDay) {
-                                    'morning' => 'morning',
-                                    'afternoon' => 'afternoon',
-                                    'evening' => 'evening',
-                                    default => ''
-                                };
-
-                                if (
-                                    !isset($availabilities[$dayOfWeek][$timeKey])
-                                    || $availabilities[$dayOfWeek][$timeKey] !== 'on'
-                                ) {
-                                    $include = false;
-                                }
+                    if ($dayOfWeek != '' && $timeOfDay != '') {
+                        if ($person['Availabilities'] != '') {
+                            $availabilities = json_decode($person['Availabilities'], true);
+                            if (isset($availabilities[$dayOfWeek][$timeOfDay]) != 'on') {
+                                $include = false;
                             }
                         }
                     }
@@ -55,9 +39,9 @@ class EmailController extends BaseController
                         $filteredEmails[] = $person['Email'];
                     }
                 }
-                $groupName = $idGroup !='' ? $this->getGroup($idGroup)['Name'] : '';
-                $eventTypeName = $idEventType !='' ? $this->fluent->from('EventType')->where('Id', $idEventType)->fetch('Name') : '';
-                $dayOfWeekName = $dayOfWeek !='' ? ['Lu.', 'Ma.', 'Me.', 'Je.', 'Ve.', 'Sa.', 'Di.', ''][$dayOfWeek] : '';
+                $groupName = $idGroup != '' ? $this->getGroup($idGroup)['Name'] : '';
+                $eventTypeName = $idEventType != '' ? $this->fluent->from('EventType')->where('Id', $idEventType)->fetch('Name') : '';
+                $dayOfWeekName = $dayOfWeek != '' ? ['Lu.', 'Ma.', 'Me.', 'Je.', 'Ve.', 'Sa.', 'Di.', ''][$dayOfWeek] : '';
                 echo $this->latte->render('app/views/emails/copyToClipBoard.latte', $this->params->getAll([
                     'emailsJson' => json_encode($filteredEmails),
                     'emails' => $filteredEmails,
