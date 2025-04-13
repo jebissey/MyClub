@@ -304,6 +304,7 @@ $flight->route('GET    /navBar/show/events',           function()    use ($navBa
 $flight->route('GET    /navBar/show/nextEvents',       function()    use ($navBarController) { $navBarController->showNextEvents(); });
 $flight->route('GET    /navBar/show/getEmails',        function()    use ($navBarController) { $navBarController->showGetEmails(); });
 $flight->route('GET    /navBar/show/personStatistics', function()    use ($navBarController) { $navBarController->showPersonStatistics(); });
+$flight->route('GET    /navBar/show/ffaSearch',        function()    use ($navBarController) { $navBarController->showFFASearch(); });
 
 $mediaController = $container->get('app\controllers\MediaController');
 $flight->route('GET  /data/media/@year/@month/@filename',       function($year, $month, $filename) use ($mediaController) { $mediaController->viewFile($year,$month,$filename); });
@@ -338,7 +339,6 @@ $flight->route('GET  /alerts',      function() use ($alertController) {$alertCon
 $flight->route('POST /alerts/save', function() use ($alertController) {$alertController->updateAlert();});
 
 $ffaController = $container->get('app\controllers\FFAController');
-$flight->route('GET /ffa/info',   function() use ($ffaController) {$ffaController->showFFAInfo();});
 $flight->route('GET /ffa/search', function() use ($ffaController) {$ffaController->searchMember();});
 
 $apiController = $container->get('app\controllers\ApiController');

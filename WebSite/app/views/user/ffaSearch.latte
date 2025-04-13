@@ -3,7 +3,7 @@
 {block title}Recherche FFA{/block}
 
 {block navbar}
-{include '../navbar/admin.latte'}
+{include '../navbar/home.latte'}
 {/block}
 
 {block content}
@@ -15,7 +15,7 @@
             <h5>Rechercher un membre</h5>
         </div>
         <div class="card-body">
-            <form method="get" action="/admin/ffa/search">
+            <form method="get" action="/ffa/search">
                 <div class="row">
                     <div class="col-md-5">
                         <div class="form-group">
@@ -47,12 +47,18 @@
                     <thead>
                         <tr>
                             <th>Classement</th>
+                            <th>Epreuve</th>
+                            <th>Nom</th>
+                            <th>Club</th>
                             <th>Points</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
                             <td>{$results['rank']}</td>
+                            <td>{$results['event']}</td>
+                            <td>{$results['name']}</td>
+                            <td>{$results['club']}</td>
                             <td>{$results['points']}</td>
                         </tr>
                     </tbody>

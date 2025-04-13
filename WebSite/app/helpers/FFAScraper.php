@@ -69,6 +69,9 @@ class FFAScraper
                 if ($dataCells->length >= 5) {
                     return [
                         'rank' => trim($dataCells->item(0)->textContent),
+                        'event' => trim($dataCells->item(1)->textContent),
+                        'name' => trim($dataCells->item(2)->textContent),
+                        'club' => trim($dataCells->item(3)->textContent),
                         'points' => trim($dataCells->item(4)->textContent)
                     ];
                 }
