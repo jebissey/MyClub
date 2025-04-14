@@ -283,6 +283,8 @@ INSERT INTO "Languages" VALUES (27,'unregister','Unregister','Se désinscrire');
 INSERT INTO "Languages" VALUES (28,'fullyBooked','Fully booked','Complet');
 INSERT INTO "Languages" VALUES (29,'noAttributes','No attributes','Aucun attribut');
 INSERT INTO "Languages" VALUES (30,'noParticipant','No participant at this time','Aucun participant pour le moment');
+INSERT INTO "Languages" VALUES (31,'login','Login','Connexion');
+INSERT INTO "Languages" VALUES (32,'edit','Edit','Modifier');
 INSERT INTO "Metadata" VALUES (1,'MyClub',1);
 INSERT INTO "Person" VALUES (1,'webmaster@myclub.foo','613cbc51f1650fb264beaad127efc1a5da0f96a96d4da7c440dc01a9e5299910','my first name','my last name','my nick name or nothing',NULL,'0',NULL,NULL,NULL,NULL,0,0,NULL);
 INSERT INTO "PersonGroup" VALUES (1,1,1);

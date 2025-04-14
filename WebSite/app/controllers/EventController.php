@@ -22,7 +22,8 @@ class EventController extends BaseController
 
     public function show($eventId): void
     {
-        $userEmail = $this->getPerson()['Email'] ?? '';
+        $person = $this->getPerson();
+        $userEmail = $person['Email'] ?? '';
         if ($userEmail === '') {
             $this->setDefaultParams();
         }
@@ -36,6 +37,7 @@ class EventController extends BaseController
             'userEmail' => $userEmail,
             'isRegistered' => $event->isUserRegistered($eventId, $userEmail),
             'navItems' => $this->getNavItems(),
+            'isOwner' => $event->isOwner($person['Id'], $eventId),
         ]));
     }
 

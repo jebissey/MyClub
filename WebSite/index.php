@@ -254,7 +254,7 @@ $flight->route('GET  /persons/delete/@id', function($id) use ($personController)
 $eventController = $container->get('app\controllers\EventController');
 $flight->route('GET  /nextEvents',              function()    use ($eventController) { $eventController->nextEvents(); });
 $flight->route('GET  /events/@id',              function($id) use ($eventController) { $eventController->show($id); });
-$flight->route('GET  /event/location',           function()    use ($eventController) { $eventController->location(); });
+$flight->route('GET  /event/location',          function()    use ($eventController) { $eventController->location(); });
 $flight->route('GET  /events/@id/register',     function($id) use ($eventController) { $eventController->register($id, true); });
 $flight->route('GET  /events/@id/unregister',   function($id) use ($eventController) { $eventController->register($id, false); });
 
