@@ -12,15 +12,25 @@ class FFAController extends BaseController
         if ($person = $this->getPerson([])) {
             $firstName = $_GET['firstName'] ?? $person['FirstName'] ?? '';
             $lastName = $_GET['lastName'] ?? $person['LastName'] ?? '';
+            $question = $_GET['question'] ?? 'rank';
+            $year = $_GET['year'] ?? date('Y');
+            $club = $_GET['club'] ?? $this->settings->get('FFA_club')?? '';
             $results = [];
             $ffaScraper = new FFAScraper();
-            $results = $ffaScraper->searchAthlete($firstName, $lastName);
-
+            if($question == 'rank') {
+                $results = $ffaScraper->searchAthleteRank($firstName, $lastName);
+            } else {
+                $results = $ffaScraper->searchAthleteResults($firstName, $lastName, $year, $club);
+            }
             echo $this->latte->render('app/views/user/ffaSearch.latte', $this->params->getAll([
                 'firstName' => $firstName,
                 'lastName' => $lastName,
+                'question' => $question,
                 'results' => $results,
                 'navItems' => $this->getNavItems(),
+                'question' => $question,
+                'year' => $year,
+                'club' => $club,
             ]));
         } else {
             $this->application->error403(__FILE__, __LINE__);

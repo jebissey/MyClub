@@ -226,13 +226,16 @@ class NavBarController extends BaseController
             $firstName = $person['FirstName'] ?? '';
             $lastName = $person['LastName'] ?? '';
             $ffaScraper = new FFAScraper();
-            $results = $ffaScraper->searchAthlete($firstName, $lastName);
+            $results = $ffaScraper->searchAthleteRank($firstName, $lastName);
 
             echo $this->latte->render('app/views/user/ffaSearch.latte', $this->params->getAll([
                 'firstName' => $firstName,
                 'lastName' => $lastName,
                 'results' => $results,
                 'navItems' => $this->getNavItems(),
+                'question' => 'rank',
+                'year' => date('Y'),
+                'club' => $this->settings->get('FFA_club')?? '',
             ]));
         } else {
             $this->application->error403(__FILE__, __LINE__);
