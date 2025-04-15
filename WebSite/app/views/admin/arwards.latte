@@ -188,7 +188,6 @@ document.addEventListener('DOMContentLoaded', function() {
           personSelect.disabled = false;
         })
         .catch(error => {
-          console.error('Erreur lors du chargement des personnes:', error);
           appendAlert('Erreur lors du chargement des personnes: ' + error.message, 'danger');
           personSelect.disabled = true;
         });

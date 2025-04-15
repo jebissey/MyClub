@@ -90,8 +90,7 @@
             }
         })
         .catch(error => {
-            console.error('Error:', error);
-            alert('Une erreur est survenue');
+            alert('Une erreur est survenue : ' + error.message);
         });
     }
 
@@ -116,8 +115,7 @@
             }
         })
         .catch(error => {
-            console.error('Error:', error);
-            alert('Une erreur est survenue');
+            alert('Une erreur est survenue : ' + error.message);
         });
     }
 
@@ -138,8 +136,7 @@
                 }
             })
             .catch(error => {
-                console.error('Error:', error);
-                alert('Une erreur est survenue');
+                alert('Une erreur est survenue : ' + error.message);
             });
         }
     }
@@ -151,8 +148,7 @@
             document.getElementById('attributesList').innerHTML = html;
         })
         .catch(error => {
-            console.error('Error:', error);
-            alert('Impossible de charger la liste des attributs');
+            alert('Impossible de charger la liste des attributs : ' + error.message);
         });
     }
 </script>

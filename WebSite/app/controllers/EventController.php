@@ -37,7 +37,6 @@ class EventController extends BaseController
             'userEmail' => $userEmail,
             'isRegistered' => $event->isUserRegistered($eventId, $userEmail),
             'navItems' => $this->getNavItems(),
-            'isOwner' => $event->isOwner($person['Id'], $eventId),
         ]));
     }
 
@@ -59,7 +58,7 @@ class EventController extends BaseController
                         'userId' => $userId
                     ]);
                 }
-            } else{
+            } else {
                 $query = $this->pdo->prepare(
                     "DELETE FROM Participant 
                      WHERE IdEvent = :eventId AND IdPerson = :userId"
@@ -73,7 +72,7 @@ class EventController extends BaseController
         $this->flight->redirect('/events/' . $eventId);
     }
 
-public function location(): void
+    public function location(): void
     {
         if ($this->getPerson(['EventManager'])) {
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
@@ -85,6 +84,9 @@ public function location(): void
             $this->application->error403(__FILE__, __LINE__);
         }
     }
+
+
+
 
 
 
@@ -149,7 +151,7 @@ public function location(): void
                     return $event->isUserRegistered($eventId, $userEmail);
                 },
                 'eventTypes' => $this->fluent->from('EventType')->where('Inactivated', 0)->orderBy('Name')->fetchAll('Id', 'Name'),
-                'eventAttributes' => $this->fluent->from('Attribute')->fetchAll('Id', 'Name', 'Detail', 'Color'),
+                'eventAttributes' => $this->fluent->from('Attribute')->fetchAll('Id', 'Name, Detail, Color'),
                 'layout' => $this->getLayout()
             ]));
         } else {

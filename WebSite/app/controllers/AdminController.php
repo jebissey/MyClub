@@ -40,17 +40,4 @@ class AdminController extends BaseController
             $this->application->error403(__FILE__, __LINE__);
         }
     }
-
-    public function lastVersion()
-    {
-        $pdoForLog = \app\helpers\database\Database::getInstance()->getPdoForLog();
-        $query = $pdoForLog->prepare('INSERT INTO Log(IpAddress, Referer, Os, Browser, ScreenResolution, Type, Uri, Token, Who, Code, Message) 
-        VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ? ,?)');
-        $query->execute([$_SERVER['REMOTE_ADDR'], $_SERVER['HTTP_REFERER'] ?? '', '', '', '', '', $_SERVER['REQUEST_URI'], '', gethostbyaddr($_SERVER['REMOTE_ADDR']) ??'', '', $_SERVER['HTTP_USER_AGENT']]);
-
-
-        header('Content-Type: application/json');
-        echo json_encode(['lastVersion' => self::VERSION]);
-        exit();
-    }
 }

@@ -239,7 +239,7 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         })
         .catch(error => {
-            console.error('Erreur lors du chargement des données chronologiques:', error);
+            alert('Erreur lors du chargement des données chronologiques : ' + error.message);
         });
 });
 </script>

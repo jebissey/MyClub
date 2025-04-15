@@ -136,32 +136,4 @@ class RegistrationController extends TableController
             $this->application->error403(__FILE__, __LINE__);
         }
     }
-
-    public function addToGroup($personId, $groupId)
-    {
-        if ($this->getPerson(['PersonManager', 'Webmaster'])) {
-            $insert = $this->pdo->prepare("INSERT INTO PersonGroup (IdPerson, IdGroup) VALUES (?, ?)");
-            $success = $insert->execute([$personId, $groupId]);
-
-            echo json_encode(['success' => $success]);
-        } else {
-            header('Content-Type: application/json', true, 403);
-            echo json_encode(['success' => false, 'message' => 'User not allowed']);
-        }
-        exit();
-    }
-
-    public function removeFromGroup($personId, $groupId)
-    {
-        if ($this->getPerson(['PersonManager', 'Webmaster'])) {
-            $delete = $this->pdo->prepare("DELETE FROM PersonGroup WHERE IdPerson = ? AND IdGroup = ?");
-            $success = $delete->execute([$personId, $groupId]);
-
-            echo json_encode(['success' => $success]);
-        } else {
-            header('Content-Type: application/json', true, 403);
-            echo json_encode(['success' => false, 'message' => 'User not allowed']);
-        }
-        exit();
-    }
 }

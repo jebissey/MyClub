@@ -7,6 +7,7 @@ use PDO;
 class BaseHelper
 {
     protected PDO $pdo;
+    protected $mediaPath;
 
     public function __construct(PDO $pdo)
     {
@@ -24,5 +25,14 @@ class BaseHelper
         $query = $this->pdo->prepare('SELECT * FROM "Person" WHERE Email = ? COLLATE NOCASE');
         $query->execute([$email]);
         return $query->fetch(PDO::FETCH_ASSOC);
+    }
+
+    protected function getBaseUrl()
+    {
+        $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https://' : 'http://';
+        $host = $_SERVER['HTTP_HOST'];
+        $baseUrl = $protocol . $host . '/';
+
+        return $baseUrl;
     }
 }

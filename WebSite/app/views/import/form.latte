@@ -174,7 +174,6 @@ document.addEventListener('DOMContentLoaded', function() {
             submitBtn.style.display = 'block';
         })
         .catch(error => {
-            console.error('Erreur:', error);
             alert('Erreur lors de la lecture du fichier: ' + error.message);
         })
         .finally(() => {

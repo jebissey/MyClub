@@ -553,8 +553,7 @@
                         }
                     })
                     .catch(error => {
-                        console.error('Erreur:', error);
-                        alert('Une erreur est survenue lors de l\'enregistrement de votre réponse.');
+                        alert('Une erreur est survenue lors de l\'enregistrement de votre réponse : ' + error.message);
                     });
                 });
             }

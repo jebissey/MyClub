@@ -56,46 +56,6 @@ class DesignController extends BaseController
         }
     }
 
-    public function vote()
-    {
-        if ($person = $this->getPerson(['Redactor'])) {
-            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-                $data = json_decode(file_get_contents('php://input'), true);
-
-                $designId = (int)$data['designId'] ?? 0;
-                $userId = $person['Id'];
-                $voteValue = $data['vote'] ?? 'voteNeutral';
-
-                $existingVote = $this->fluent->from('DesignVote')
-                    ->where('IdDesign', $designId)
-                    ->where('IdPerson', $userId)
-                    ->fetch();
-                if ($existingVote) {
-                    $this->fluent->update('DesignVote')
-                        ->set(['Vote' => $voteValue])
-                        ->where('Id', $existingVote['Id'])
-                        ->execute();
-                } else {
-                    $this->fluent->insertInto('DesignVote')
-                        ->values([
-                            'IdDesign' => $designId,
-                            'IdPerson' => $userId,
-                            'Vote' => $voteValue
-                        ])
-                        ->execute();
-                }
-                header('Content-Type: application/json');
-                echo json_encode(['success' => true]);
-            } else {
-                header('Content-Type: application/json', true, 470);
-                echo json_encode(['success' => false, 'message' => 'Bad request method']);
-            }
-        } else {
-            header('Content-Type: application/json', true, 403);
-            echo json_encode(['success' => false, 'message' => 'User not allowed']);
-        }
-    }
-
     public function create()
     {
         if ($this->getPerson(['Redactor'])) {

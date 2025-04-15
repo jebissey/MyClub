@@ -182,8 +182,7 @@
                         modal.show();
                     })
                     .catch(error => {
-                        console.error('Error fetching item:', error);
-                        alert('Failed to load navigation item data.');
+                        alert('Failed to load navigation item data:' + error.message);
                     });
             });
         });
@@ -306,7 +305,7 @@
                     }
                 })
                 .catch(error => {
-                    alert('Error updating positions:' + error);
+                    alert('Error updating positions:' + error.message);
                 });
             });
             

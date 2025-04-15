@@ -25,6 +25,8 @@ abstract class BaseController extends BaseHelper
     protected Params $params;
     protected $authorizations;
     protected $settings;
+    protected PDO $pdoForLog;
+    protected $fluentForLog;
 
     private $translationManager;
 
@@ -33,6 +35,8 @@ abstract class BaseController extends BaseHelper
         $this->pdo = $pdo;
         $this->fluent = new \Envms\FluentPDO\Query($pdo);
         $this->flight = $flight;
+        $this->pdoForLog = \app\helpers\database\Database::getInstance()->getPdoForLog();
+        $this->fluentForLog = new \Envms\FluentPDO\Query($this->pdoForLog);
 
         $this->translationManager = new TranslationManager($pdo);
         $this->latte = new LatteEngine();
