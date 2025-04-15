@@ -14,7 +14,6 @@ currentDate.setHours(0, 0, 0, 0);
 let startDate = new Date();
 
 function initEventManager() {
-    // Initialiser avec la date du jour
     startDate = new Date(currentDate);
 
     // Ajouter les événements aux boutons de navigation
@@ -33,16 +32,6 @@ function initEventManager() {
         if (event.target.closest('.event-row')) {
             const eventRow = event.target.closest('.event-row');
             showEventDetail(eventRow);
-        }
-
-        // Gestion de l'inscription à un événement
-        if (event.target.classList.contains('register-event')) {
-            registerForEvent(event.target);
-        }
-
-        // Gestion de la désinscription d'un événement
-        if (event.target.classList.contains('unregister-event')) {
-            unregisterFromEvent(event.target);
         }
     });
 
@@ -189,62 +178,4 @@ function showEventDetail(eventRow) {
             }
         })
         .catch(error => console.error('Erreur lors de la récupération des détails de l\'événement:', error));
-}
-
-function registerForEvent(button) {
-    const eventId = button.dataset.eventId;
-
-    const formData = new FormData();
-    formData.append('eventId', eventId);
-
-    fetch('/api/event/register', {
-        method: 'POST',
-        body: formData
-    })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Échec de l\'inscription');
-            }
-            return response.text();
-        })
-        .then(() => {
-            const activeButton = document.querySelector('.show-events.active');
-            if (activeButton) {
-                showEvents(activeButton);
-            }
-        })
-        .catch(error => {
-            console.error('Erreur lors de l\'inscription:', error);
-            alert('Erreur lors de l\'inscription à l\'événement');
-        });
-}
-
-function unregisterFromEvent(button) {
-    const eventId = button.dataset.eventId;
-
-    if (confirm('Êtes-vous sûr de vouloir vous désinscrire de cet événement ?')) {
-        const formData = new FormData();
-        formData.append('eventId', eventId);
-
-        fetch('/api/event/unregister', {
-            method: 'POST',
-            body: formData
-        })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Échec de la désinscription');
-                }
-                return response.text();
-            })
-            .then(() => {
-                const activeButton = document.querySelector('.show-events.active');
-                if (activeButton) {
-                    showEvents(activeButton);
-                }
-            })
-            .catch(error => {
-                console.error('Erreur lors de la désinscription:', error);
-                alert('Erreur lors de la désinscription de l\'événement');
-            });
-    }
 }

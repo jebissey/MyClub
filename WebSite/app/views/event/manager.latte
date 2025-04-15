@@ -125,29 +125,112 @@
 {block scripts}
 <script src="/app/js/eventManager.js"></script>
 <script n:syntax="off">
-    document.addEventListener('DOMContentLoaded', function() {
-        initEventManager();
-    });
-
-
-
+document.addEventListener('DOMContentLoaded', function() {
+    const eventModal = document.getElementById('eventModal');
+    const eventForm = document.getElementById('eventForm');
+    const modalTitle = document.getElementById('eventModalLabel');
+    const submitButton = document.getElementById('submitEventBtn');
+    const formMode = document.getElementById('formMode');
+    const eventId = document.getElementById('eventId');
+    
     let selectedAttributes = [];
-    document.getElementById('addAttributeBtn').addEventListener('click', function() {
-        const select = document.getElementById('availableAttributesSelect');
-        const selectedOption = select.options[select.selectedIndex];
+    
+    const eventTypeInput = document.getElementById('eventTypeInput');
+    const availableAttributesSelect = document.getElementById('availableAttributesSelect');
+    
+    function loadAttributesByEventType(eventTypeId) {
+        availableAttributesSelect.innerHTML = '<option value="">Chargement...</option>';
         
-        if (!selectedOption) return;
-
-        const attributeId = selectedOption.value;
-        const attributeName = selectedOption.text;
-        const attributeColor = selectedOption.dataset.color;
-        const attributeDetail = selectedOption.dataset.detail;
-
-        if (selectedAttributes.some(attr => attr.id === attributeId)) {
-            alert('Cet attribut a déjà été ajouté.');
-            return;
+        fetch(`/api/attributes-by-event-type/${eventTypeId}`)
+            .then(response => response.json())
+            .then(data => {
+                availableAttributesSelect.innerHTML = '';
+                
+                if (data.attributes && data.attributes.length > 0) {
+                    data.attributes.forEach(attribute => {
+                        const option = document.createElement('option');
+                        option.value = attribute.Id;
+                        option.textContent = attribute.Name;
+                        option.dataset.color = attribute.Color;
+                        option.dataset.detail = attribute.Detail;
+                        availableAttributesSelect.appendChild(option);
+                    });
+                } else {
+                    const option = document.createElement('option');
+                    option.value = "";
+                    option.textContent = "Aucun attribut disponible";
+                    availableAttributesSelect.appendChild(option);
+                }
+            })
+            .catch(error => {
+                availableAttributesSelect.innerHTML = '<option value="">Erreur de chargement</option>';
+            });
+    }
+    
+    eventTypeInput.addEventListener('change', function() {
+        const selectedEventTypeId = this.value;
+        if (selectedEventTypeId) {
+            loadAttributesByEventType(selectedEventTypeId);
+        } else {
+            availableAttributesSelect.innerHTML = '<option value="">Sélectionnez d\'abord un type d\'événement</option>';
         }
-
+    });
+    
+    function openCreateModal() {
+        modalTitle.textContent = 'Créer un événement';
+        submitButton.textContent = 'Créer';
+        formMode.value = 'create';
+        eventForm.reset();
+        selectedAttributes = [];
+        document.getElementById('attributesList').innerHTML = '';
+        
+        availableAttributesSelect.innerHTML = '<option value="">Sélectionnez d\'abord un type d\'événement</option>';
+        
+        new bootstrap.Modal(eventModal).show();
+    }
+    
+    function openUpdateModal(event) {
+        modalTitle.textContent = 'Mettre à jour l\'événement';
+        submitButton.textContent = 'Mettre à jour';
+        formMode.value = 'update';
+        eventId.value = event.Id;
+    
+        document.getElementById('summaryInput').value = event.Summary;
+        document.getElementById('descriptionInput').value = event.Description;
+        document.getElementById('locationInput').value = event.Location;
+        document.getElementById('eventTypeInput').value = event.IdEventType;
+        
+        // Charger les attributs correspondant au type d'événement
+        loadAttributesByEventType(event.IdEventType);
+        
+        const startDate = new Date(event.StartTime);
+        const endDate = new Date(event.EndTime);
+        document.getElementById('dateInput').value = startDate.toISOString().split('T')[0];
+        document.getElementById('startTimeInput').value = startDate.toTimeString().split(' ')[0].slice(0, 5);
+        const durationHours = (endDate - startDate) / (1000 * 60 * 60);
+        document.getElementById('durationInput').value = durationHours.toFixed(1);
+    
+        const attributesList = document.getElementById('attributesList');
+        attributesList.innerHTML = '';
+        selectedAttributes = [];
+    
+        if (event.attributes) {
+            event.attributes.forEach(attr => {
+                const attributeElement = createAttributeElement(attr.Id, attr.Name, attr.Color, attr.Detail);
+                attributesList.appendChild(attributeElement);
+                selectedAttributes.push({
+                    id: attr.Id,
+                    name: attr.Name,
+                    color: attr.Color,
+                    detail: attr.Detail
+                });
+            });
+        }
+    
+        new bootstrap.Modal(eventModal).show();
+    }
+    
+    function createAttributeElement(attributeId, attributeName, attributeColor, attributeDetail) {
         const attributeElement = document.createElement('span');
         attributeElement.className = 'badge me-2 mb-2 position-relative';
         attributeElement.style.backgroundColor = attributeColor;
@@ -155,22 +238,41 @@
         attributeElement.innerHTML = `
             ${attributeName}
             <button type="button" class="btn-close position-absolute top-0 end-0" 
-                    aria-label="Supprimer" 
-                    data-attribute-id="${attributeId}"></button>
+                aria-label="Supprimer" 
+                data-attribute-id="${attributeId}"></button>
         `;
         attributeElement.style.position = 'relative';
         attributeElement.style.paddingRight = '25px';
-
+        
         attributeElement.setAttribute('title', attributeDetail);
         attributeElement.classList.add('tooltip-trigger');
-
+    
         const removeBtn = attributeElement.querySelector('.btn-close');
         removeBtn.addEventListener('click', function() {
             const idToRemove = this.dataset.attributeId;
             selectedAttributes = selectedAttributes.filter(attr => attr.id !== idToRemove);
             attributeElement.remove();
         });
-
+    
+        return attributeElement;
+    }
+    
+    document.getElementById('addAttributeBtn').addEventListener('click', function() {
+        const select = document.getElementById('availableAttributesSelect');
+        const selectedOption = select.options[select.selectedIndex];
+        if (!selectedOption || !selectedOption.value) return;
+    
+        const attributeId = selectedOption.value;
+        const attributeName = selectedOption.text;
+        const attributeColor = selectedOption.dataset.color;
+        const attributeDetail = selectedOption.dataset.detail;
+    
+        if (selectedAttributes.some(attr => attr.id === attributeId)) {
+            alert('Cet attribut a déjà été ajouté.');
+            return;
+        }
+    
+        const attributeElement = createAttributeElement(attributeId, attributeName, attributeColor, attributeDetail);
         document.getElementById('attributesList').appendChild(attributeElement);
         selectedAttributes.push({
             id: attributeId,
@@ -179,436 +281,75 @@
             detail: attributeDetail
         });
     });
-
-    function getContrastYIQ(hexcolor) {
-        hexcolor = hexcolor.replace("#", "");
-        const r = parseInt(hexcolor.substr(0,2),16);
-        const g = parseInt(hexcolor.substr(2,2),16);
-        const b = parseInt(hexcolor.substr(4,2),16);
-        const yiq = ((r*299)+(g*587)+(b*114))/1000;
-        return (yiq >= 128) ? 'black' : 'white';
-    }
-
-    function formatDate(dateString) {
-        const date = new Date(dateString);
-        return date.toLocaleString('fr-FR', {
-            year: 'numeric',
-            month: '2-digit',
-            day: '2-digit',
-            hour: '2-digit',
-            minute: '2-digit'
-        }).replace(',', '');
-    }
-
-    function fetchWeekEvents(date) {
-        return fetch(`/api/events/week?date=${date}`)
-            .then(response => response.json())
-            .then(events => {
-                updateWeekView(events);
-            })
-            .catch(error => {
-                console.error('Erreur lors de la récupération des événements:', error);
-            });
-    }
-
-    function createEventElement(event) {
-        const eventContainer = document.createElement('div');
-        eventContainer.classList.add('event-container');
-        eventContainer.style.display = 'flex';
-        eventContainer.style.flexWrap = 'wrap';
-
-        if (!event.attributes || event.attributes.length === 0) {
-            const defaultEventDiv = document.createElement('div');
-            defaultEventDiv.classList.add('event-marker');
-            defaultEventDiv.style.backgroundColor = '#FFFFFF';
-            defaultEventDiv.style.border = '1px solid #CCCCCC';
-            defaultEventDiv.style.width = '20px';
-            defaultEventDiv.style.height = '20px';
-            defaultEventDiv.style.margin = '2px';
-            
-            defaultEventDiv.setAttribute('title', event.EventTypeName);
-            defaultEventDiv.addEventListener('click', () => showEventDetails(event));
-            
-            eventContainer.appendChild(defaultEventDiv);
-        } else {
-            event.attributes.forEach(attr => {
-                const eventDiv = document.createElement('div');
-                eventDiv.classList.add('event-marker');
-                eventDiv.style.backgroundColor = attr.Color;
-                eventDiv.style.width = '20px';
-                eventDiv.style.height = '20px';
-                eventDiv.style.margin = '2px';
-                
-                eventDiv.setAttribute('title', 
-                    `Type: ${event.EventTypeName}\n` +
-                    `Attribut: ${attr.Name}\n` +
-                    `Détail: ${attr.Detail}`
-                );
-                
-                eventDiv.addEventListener('click', () => showEventDetails(event));
-                
-                eventContainer.appendChild(eventDiv);
-            });
-        }
-
-        return eventContainer;
-    }
-
-    function showEventDetails(event) {
-        const detailsContainer = document.getElementById('events-detail');
-        detailsContainer.innerHTML = ''; 
-        const card = document.createElement('div');
-        card.className = 'card';
-        const cardBody = document.createElement('div');
-        cardBody.className = 'card-body';
-        cardBody.innerHTML = `
-            <h5 class="card-title">${event.Summary}</h5>
-            <p class="card-text">
-                <strong>Description:</strong> ${event.Description}<br>
-                <strong>Lieu:</strong> ${event.Location}<br>
-                <strong>Type:</strong> ${event.EventTypeName}<br>
-                <strong>Début:</strong> ${formatDate(event.StartTime)}<br>
-                <strong>Fin:</strong> ${formatDate(event.EndTime)}
-            </p>
-        `;
-
-        if (event.attributes && event.attributes.length > 0) {
-            const attributesSection = document.createElement('div');
-            attributesSection.innerHTML = '<strong>Attributs:</strong>';
-            
-            event.attributes.forEach(attr => {
-                const attrDiv = document.createElement('div');
-                attrDiv.style.display = 'flex';
-                attrDiv.style.alignItems = 'center';
-                attrDiv.innerHTML = `
-                    <div style="width: 20px; height: 20px; background-color: ${attr.Color}; margin-right: 10px;"></div>
-                    <span>${attr.Name}: ${attr.Detail}</span>
-                `;
-                attributesSection.appendChild(attrDiv);
-            });
-            
-            cardBody.appendChild(attributesSection);
-        }
-
-        fetch('/api/check-event-manager')
-            .then(response => response.json())
-            .then(data => {
-                if (data.isEventManager) {
-                    const updateBtn = document.createElement('button');
-                    updateBtn.className = 'btn btn-primary mt-3';
-                    updateBtn.textContent = 'Mettre à jour';
-                    updateBtn.addEventListener('click', () => openUpdateModal(event));
-                    cardBody.appendChild(updateBtn);
-                }
-            });
-
-        card.appendChild(cardBody);
-        detailsContainer.appendChild(card);
-    }
-
-
-
-    function openUpdateModal(event) {
-        const updateModal = new bootstrap.Modal(document.getElementById('updateEventModal'));
-        
-        // Pré-remplir le formulaire
-        document.getElementById('updateSummaryInput').value = event.Summary;
-        document.getElementById('updateDescriptionInput').value = event.Description;
-        document.getElementById('updateLocationInput').value = event.Location;
-        document.getElementById('updateEventTypeInput').value = event.IdEventType;
-        
-        const startDate = new Date(event.StartTime);
-        const endDate = new Date(event.EndTime);
-        
-        document.getElementById('updateDateInput').value = 
-            startDate.toISOString().split('T')[0];
-        document.getElementById('updateStartTimeInput').value = 
-            startDate.toTimeString().split(' ')[0].slice(0, 5);
-        
-        // Calculer la durée
-        const durationHours = (endDate - startDate) / (1000 * 60 * 60);
-        document.getElementById('updateDurationInput').value = durationHours.toFixed(1);
-
-        // Gérer les attributs
-        const attributesList = document.getElementById('updateAttributesList');
-        attributesList.innerHTML = ''; // Effacer les attributs précédents
-
-        // Ajouter les attributs existants
-        if (event.attributes) {
-            event.attributes.forEach(attr => {
-                const attributeElement = document.createElement('span');
-                attributeElement.className = 'badge me-2 mb-2 position-relative';
-                attributeElement.style.backgroundColor = attr.Color;
-                attributeElement.style.color = getContrastYIQ(attr.Color);
-                attributeElement.innerHTML = `
-                    ${attr.Name}
-                    <button type="button" class="btn-close position-absolute top-0 end-0" 
-                            aria-label="Supprimer" 
-                            data-attribute-id="${attr.Id}"></button>
-                `;
-                attributeElement.style.position = 'relative';
-                attributeElement.style.paddingRight = '25px';
-
-                attributesList.appendChild(attributeElement);
-            });
-        }
-        document.getElementById('updateEventForm').dataset.eventId = event.Id;
-        updateModal.show();
-    }
-
-
-
-    function updateWeekView(events) {
-        const eventsRow = document.getElementById('events-row');
-        eventsRow.innerHTML = '';
-        for (let i = 0; i < 7; i++) {
-            const dayCell = document.createElement('td');
-            const dayEvents = events.filter(event => {
-                const eventDate = new Date(event.StartTime);
-                return eventDate.getDay() === i;
-            });
-            dayEvents.forEach(event => {
-                const eventElement = createEventElement(event);
-                dayCell.appendChild(eventElement);
-            });
-
-            eventsRow.appendChild(dayCell);
-        }
-    }
-
-// Initialisation
-document.addEventListener('DOMContentLoaded', () => {
-    // Charger les événements de la semaine actuelle
-    const today = new Date();
-    fetchWeekEvents(today.toISOString().split('T')[0]);
-
-    // Gestion des boutons de navigation
-    document.querySelectorAll('.move-day, .move-week').forEach(button => {
-        button.addEventListener('click', () => {
-            const days = parseInt(button.dataset.days);
-            today.setDate(today.getDate() + days);
-            fetchWeekEvents(today.toISOString().split('T')[0]);
-        });
-    });
-});
-
-
-
-document.getElementById('updateAddAttributeBtn').addEventListener('click', function() {
-    const select = document.getElementById('updateAvailableAttributesSelect');
-    const selectedOption = select.options[select.selectedIndex];
     
-    if (!selectedOption) return;
-
-    const attributeId = selectedOption.value;
-    const attributeName = selectedOption.text;
-    const attributeColor = selectedOption.dataset.color;
-
-    // Vérifier si l'attribut existe déjà
-    const existingAttributes = document.querySelectorAll('#updateAttributesList .badge');
-    const attributeExists = Array.from(existingAttributes).some(
-        attr => attr.querySelector('.btn-close').dataset.attributeId === attributeId
-    );
-
-    if (attributeExists) {
-        alert('Cet attribut a déjà été ajouté.');
-        return;
-    }
-
-    // Créer l'élément d'attribut
-    const attributeElement = document.createElement('span');
-    attributeElement.className = 'badge me-2 mb-2 position-relative';
-    attributeElement.style.backgroundColor = attributeColor;
-    attributeElement.style.color = getContrastYIQ(attributeColor);
-    attributeElement.innerHTML = `
-        ${attributeName}
-        <button type="button" class="btn-close position-absolute top-0 end-0" 
-                aria-label="Supprimer" 
-                data-attribute-id="${attributeId}"></button>
-    `;
-    attributeElement.style.position = 'relative';
-    attributeElement.style.paddingRight = '25px';
-
-    // Bouton de suppression
-    const removeBtn = attributeElement.querySelector('.btn-close');
-    removeBtn.addEventListener('click', function() {
-        attributeElement.remove();
+    eventForm.addEventListener('submit', function(event) {
+        event.preventDefault();
+    
+        const summary = document.getElementById('summaryInput').value.trim();
+        const description = document.getElementById('descriptionInput').value.trim();
+        const location = document.getElementById('locationInput').value.trim();
+        const eventType = document.getElementById('eventTypeInput').value;
+        const date = document.getElementById('dateInput').value;
+        const startTime = document.getElementById('startTimeInput').value;
+        const duration = Math.round(parseFloat(document.getElementById('durationInput').value) * 60 * 60);
+    
+        const startDate = new Date(date + " " + startTime);
+    
+        const eventData = {
+            summary: summary,
+            description: description,
+            location: location,
+            idEventType: eventType,
+            startTime: startDate.toISOString(),
+            duration: duration,
+            attributes: selectedAttributes.map(attr => attr.id)
+        };
+        if (formMode.value === 'update') {
+            eventData.id = eventId.value;
+        }
+        const apiUrl = formMode.value === 'create' ? '/api/event/create' : '/api/event/update';
+        fetch(apiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(eventData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(formMode.value === 'create' 
+                    ? "Événement créé avec succès !" 
+                    : "Événement mis à jour avec succès !");
+                bootstrap.Modal.getInstance(eventModal).hide();
+    
+                // Rafraîchir la vue des événements
+                fetchWeekEvents(new Date().toISOString().split('T')[0]);
+            } else {
+                alert("Erreur: " + data.message);
+            }
+        })
+        .catch(error => alert('Erreur:' + error));
     });
-
-    // Ajouter à la liste
-    document.getElementById('updateAttributesList').appendChild(attributeElement);
+    
+    // Initialisation - charger les attributs quand un type d'événement est déjà sélectionné
+    if (eventTypeInput.value) {
+        loadAttributesByEventType(eventTypeInput.value);
+    } else {
+        availableAttributesSelect.innerHTML = '<option value="">Sélectionnez d\'abord un type d\'événement</option>';
+    }
+    
+    // Exposition des fonctions pour les utiliser ailleurs
+    window.openCreateModal = openCreateModal;
+    window.openUpdateModal = openUpdateModal;
 });
 
-
-
-
-
-
-    document.addEventListener('DOMContentLoaded', function() {
-        const eventModal = document.getElementById('eventModal');
-        const eventForm = document.getElementById('eventForm');
-        const modalTitle = document.getElementById('eventModalLabel');
-        const submitButton = document.getElementById('submitEventBtn');
-        const formMode = document.getElementById('formMode');
-        const eventId = document.getElementById('eventId');
-
-        function openCreateModal() {
-            modalTitle.textContent = 'Créer un événement';
-            submitButton.textContent = 'Créer';
-            formMode.value = 'create';
-            eventForm.reset();
-            selectedAttributes = [];
-            document.getElementById('attributesList').innerHTML = '';
-            new bootstrap.Modal(eventModal).show();
-        }
-
-        function openUpdateModal(event) {
-            modalTitle.textContent = 'Mettre à jour l\'événement';
-            submitButton.textContent = 'Mettre à jour';
-            formMode.value = 'update';
-            eventId.value = event.Id;
-
-            document.getElementById('summaryInput').value = event.Summary;
-            document.getElementById('descriptionInput').value = event.Description;
-            document.getElementById('locationInput').value = event.Location;
-            document.getElementById('eventTypeInput').value = event.IdEventType;
-            
-            const startDate = new Date(event.StartTime);
-            const endDate = new Date(event.EndTime);
-            
-            document.getElementById('dateInput').value = startDate.toISOString().split('T')[0];
-            document.getElementById('startTimeInput').value = startDate.toTimeString().split(' ')[0].slice(0, 5);
-            
-            const durationHours = (endDate - startDate) / (1000 * 60 * 60);
-            document.getElementById('durationInput').value = durationHours.toFixed(1);
-
-            const attributesList = document.getElementById('attributesList');
-            attributesList.innerHTML = '';
-            selectedAttributes = [];
-
-            if (event.attributes) {
-                event.attributes.forEach(attr => {
-                    const attributeElement = createAttributeElement(attr.Id, attr.Name, attr.Color);
-                    attributesList.appendChild(attributeElement);
-                    selectedAttributes.push({
-                        id: attr.Id,
-                        name: attr.Name,
-                        color: attr.Color
-                    });
-                });
-            }
-
-            new bootstrap.Modal(eventModal).show();
-        }
-
-        function createAttributeElement(attributeId, attributeName, attributeColor) {
-            const attributeElement = document.createElement('span');
-            attributeElement.className = 'badge me-2 mb-2 position-relative';
-            attributeElement.style.backgroundColor = attributeColor;
-            attributeElement.style.color = getContrastYIQ(attributeColor);
-            attributeElement.innerHTML = `
-                ${attributeName}
-                <button type="button" class="btn-close position-absolute top-0 end-0" 
-                        aria-label="Supprimer" 
-                        data-attribute-id="${attributeId}"></button>
-            `;
-            attributeElement.style.position = 'relative';
-            attributeElement.style.paddingRight = '25px';
-
-            const removeBtn = attributeElement.querySelector('.btn-close');
-            removeBtn.addEventListener('click', function() {
-                const idToRemove = this.dataset.attributeId;
-                selectedAttributes = selectedAttributes.filter(attr => attr.id !== idToRemove);
-                attributeElement.remove();
-            });
-
-            return attributeElement;
-        }
-
-        document.getElementById('addAttributeBtn').addEventListener('click', function() {
-            const select = document.getElementById('availableAttributesSelect');
-            const selectedOption = select.options[select.selectedIndex];
-            
-            if (!selectedOption) return;
-
-            const attributeId = selectedOption.value;
-            const attributeName = selectedOption.text;
-            const attributeColor = selectedOption.dataset.color;
-
-            if (selectedAttributes.some(attr => attr.id === attributeId)) {
-                alert('Cet attribut a déjà été ajouté.');
-                return;
-            }
-
-            const attributeElement = createAttributeElement(attributeId, attributeName, attributeColor);
-            document.getElementById('attributesList').appendChild(attributeElement);
-            selectedAttributes.push({
-                id: attributeId,
-                name: attributeName,
-                color: attributeColor
-            });
-        });
-
-        eventForm.addEventListener('submit', function(event) {
-            event.preventDefault();
-
-            const summary = document.getElementById('summaryInput').value.trim();
-            const description = document.getElementById('descriptionInput').value.trim();
-            const location = document.getElementById('locationInput').value.trim();
-            const eventType = document.getElementById('eventTypeInput').value;
-            const date = document.getElementById('dateInput').value;
-            const startTime = document.getElementById('startTimeInput').value;
-            const duration = parseFloat(document.getElementById('durationInput').value);
-
-            const startDate = new Date(date + "T" + startTime + ":00Z");
-            const endDate = new Date(startDate);
-            endDate.setHours(endDate.getHours() + duration);
-
-            const eventData = {
-                summary: summary,
-                description: description,
-                location: location,
-                idEventType: eventType,
-                startTime: startDate.toISOString(),
-                endTime: endDate.toISOString(),
-                attributes: selectedAttributes.map(attr => attr.id)
-            };
-
-            // Ajouter l'ID pour la modification
-            if (formMode.value === 'update') {
-                eventData.id = eventId.value;
-            }
-
-            const apiUrl = formMode.value === 'create' ? '/api/event/create' : '/api/event/update';
-
-            fetch(apiUrl, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(eventData)
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert(formMode.value === 'create' 
-                        ? "Événement créé avec succès !" 
-                        : "Événement mis à jour avec succès !");
-                    
-                    // Fermer la modal
-                    bootstrap.Modal.getInstance(eventModal).hide();
-
-                    // Rafraîchir la vue des événements
-                    fetchWeekEvents(new Date().toISOString().split('T')[0]);
-                } else {
-                    alert("Erreur: " + data.message);
-                }
-            })
-            .catch(error => alert('Erreur:' + error));
-        });
-
-        // Exposition des fonctions pour les utiliser ailleurs
-        window.openCreateModal = openCreateModal;
-        window.openUpdateModal = openUpdateModal;
-    });
-
+// Fonction de contraste existante
+function getContrastYIQ(hexcolor) {
+    hexcolor = hexcolor.replace("#", "");
+    const r = parseInt(hexcolor.substr(0,2),16);
+    const g = parseInt(hexcolor.substr(2,2),16);
+    const b = parseInt(hexcolor.substr(4,2),16);
+    const yiq = ((r*299)+(g*587)+(b*114))/1000;
+    return (yiq >= 128) ? 'black' : 'white';
+}
 </script>
 {/block}

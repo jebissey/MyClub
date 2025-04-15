@@ -21,7 +21,22 @@
 {/block}
 
 {block content}
-<h1>{if $person != false}{='eventsAvailableForYou'|translate}{else}{='eventsAvailableForAll'|translate}{/if}</h1>
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="mb-0">
+    {if $person != false}
+        {='eventsAvailableForYou'|translate}
+    {else}
+        {='eventsAvailableForAll'|translate}
+    {/if}
+    </h1>
+    {if $isEventManager}
+    <div class="ms-auto">
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#eventModal">
+            <i class="bi bi-plus-lg"></i>
+        </button>
+    </div>
+    {/if}
+</div>
 <table class="table table-striped">
     <thead>
         <tr>

@@ -14,15 +14,6 @@ use app\helpers\TranslationManager;
 
 class UserController extends BaseController
 {
-    private PDO $pdoForLog;
-
-    public function __construct(PDO $pdo, Engine $flight)
-    {
-        parent::__construct($pdo, $flight);
-        $this->pdoForLog = \app\helpers\database\Database::getInstance()->getPdoForLog();
-    }
-
-
     public function forgotPassword($encodedEmail)
     {
         $email = urldecode($encodedEmail);

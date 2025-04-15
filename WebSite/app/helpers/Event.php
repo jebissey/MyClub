@@ -4,13 +4,6 @@ namespace app\helpers;
 
 use PDO;
 
-enum EventAudience: string
-{
-    case ForClubMembersOnly = 'ClubMembersOnly';
-    case ForGuest = 'Guest';
-    case ForAll = 'All';
-}
-
 class Event
 {
     private PDO $pdo;

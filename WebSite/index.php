@@ -257,7 +257,6 @@ $flight->route('GET  /eventManager/help',       function()    use ($eventControl
 $flight->route('GET  /events',                  function()    use ($eventController) { $eventController->index(); });
 $flight->route('GET  /api/event/count',         function()    use ($eventController) { $eventController->getEventCount(); });
 $flight->route('GET  /event/detail',            function()    use ($eventController) { $eventController->getEventDetail(); });
-$flight->route('POST /api/event/create',        function()    use ($eventController) { $eventController->create(); });
 $flight->route('GET  /api/events/week',         function()    use ($eventController) { $eventController->getEventsForWeek(); });
 $flight->route('GET  /api/check-event-manager', function()    use ($eventController) { $eventController->checkEventManager(); });
 $flight->route('POST /api/event/update',        function()    use ($eventController) { $eventController->update(); });
@@ -327,13 +326,15 @@ $flight->route('GET /ffa/search', function() use ($ffaController) {$ffaControlle
 $apiController = $container->get('app\controllers\ApiController');
 $flight->route('GET /api/analytics/visitorsByDate', function() use ($apiController) { $apiController->getVisitorsByDate(); });
 
-$flight->route('POST   /api/attributes/create',        function()    use ($apiController) { $apiController->createAttribute(); });
-$flight->route('POST   /api/attributes/update',        function()    use ($apiController) { $apiController->updateAttribute(); });
-$flight->route('DELETE /api/attributes/delete/@id',    function($id) use ($apiController) { $apiController->deleteAttribute($id); });
-$flight->route('GET    /api/attributes/list',          function()    use ($apiController) { $apiController->getAttributes(); });
-$flight->route('GET    /api/attributes/by-event-type', function()    use ($apiController) { $apiController->getAttributesByEventType(); });
+$flight->route('POST   /api/attributes/create',            function()    use ($apiController) { $apiController->createAttribute(); });
+$flight->route('POST   /api/attributes/update',            function()    use ($apiController) { $apiController->updateAttribute(); });
+$flight->route('DELETE /api/attributes/delete/@id',        function($id) use ($apiController) { $apiController->deleteAttribute($id); });
+$flight->route('GET    /api/attributes/list',              function()    use ($apiController) { $apiController->getAttributes(); });
+$flight->route('GET    /api/attributes-by-event-type/@id', function($id) use ($apiController) { $apiController->getAttributesByEventType($id); });
 
 $flight->route('POST /api/designs/vote', function() use ($apiController) { $apiController->designVote(); });
+
+$flight->route('POST /api/event/create', function() use ($apiController) { $apiController->create(); });
 
 $flight->route('GET /api/lastVersion', function() use ($apiController) { $apiController->lastVersion(); });
 

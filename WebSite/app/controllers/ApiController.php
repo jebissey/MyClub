@@ -2,11 +2,11 @@
 
 namespace app\controllers;
 
+use app\helpers\EventAudience;
 use Exception;
 
 class ApiController extends BaseController
 {
-
 
     /* #region survey */
     public function saveSurveyReply()
@@ -589,12 +589,9 @@ class ApiController extends BaseController
     }
     /* #endregion */
 
-
-    public function getAttributesByEventType()
+    /* #region event */
+    public function getAttributesByEventType($eventTypeId)
     {
-        $data = json_decode(file_get_contents('php://input'), true);
-        $eventTypeId = $data['eventTypeId'];
-
         if (!$eventTypeId) {
             header('Content-Type: application/json', true, 499);
             echo json_encode(['success' => false, 'message' => 'Unknown event type']);
@@ -608,4 +605,56 @@ class ApiController extends BaseController
         }
         exit();
     }
+
+    public function create(): void
+    {
+        if ($person = $this->getPerson(['EventManager'])) {
+            $data = json_decode(file_get_contents('php://input'), true);
+
+            try {
+                $this->pdo->beginTransaction();
+                $eventId = $this->fluent->insertInto('Event')
+                    ->values([
+                        'Summary' => $data['summary'] ?? '',
+                        'Description' => $data['description'] ?? '',
+                        'Location' => $data['location'] ?? '',
+                        'StartTime' => $data['startTime'],
+                        'Duration' => $data['duration'] ?? 1,
+                        'IdEventType' => $data['idEventType'],
+                        'CreatedBy' => $person['Id'],
+                        'MaxParticipants' => $data['maxParticipants'] ?? 0,
+                        'Audience' => $data['audience'] ?? EventAudience::ForClubMembersOnly->value,
+                    ])
+                    ->execute();
+                if (isset($data['attributes']) && is_array($data['attributes'])) {
+                    foreach ($data['attributes'] as $attributeId) {
+                        $this->fluent->insertInto('EventAttribute')
+                            ->values([
+                                'IdEvent' => $eventId,
+                                'IdAttribute' => $attributeId
+                            ])
+                            ->execute();
+                    }
+                }
+                $this->pdo->commit();
+
+                header('Content-Type: application/json');
+                echo json_encode(['success' => true, 'eventId' => $eventId]);
+            } catch (Exception $e) {
+                $this->pdo->rollBack();
+
+                header('Content-Type: application/json', true, 500);
+                echo json_encode([
+                    'success' => false,
+                    'message' => 'Erreur lors de l\'insertion en base de données',
+                    'error' => $e->getMessage()
+                ]);
+            }
+        } else {
+            header('Content-Type: application/json', true, 403);
+            echo json_encode(['success' => false, 'message' => 'User not allowed']);
+        }
+        exit();
+    }
+    /* #endregion */
 }
