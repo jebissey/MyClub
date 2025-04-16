@@ -38,6 +38,7 @@ class SurveyController extends BaseController
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $articleId = $_POST['article_id'] ?? null;
                 $question = $_POST['question'] ?? '';
+                $closingDate = $_POST['closingDate'] ?? date('now', '+7 days');
                 $options = isset($_POST['options']) ? json_encode($_POST['options']) : '[]';
 
                 $survey = $this->fluent->from('Survey')
@@ -47,6 +48,7 @@ class SurveyController extends BaseController
                     $this->fluent->update('Survey')
                         ->set(['Question' => $question])
                         ->set(['Options' => $options])
+                        ->set(['ClosingDate' => $closingDate])
                         ->where('Id', $survey['Id'])
                         ->execute();
                 } else {
@@ -55,7 +57,8 @@ class SurveyController extends BaseController
                         ->values([
                             'Question' => $question,
                             'Options' => $options,
-                            'IdArticle' => $articleId
+                            'IdArticle' => $articleId,
+                            'ClosingDate' => $closingDate
                         ])
                         ->execute();
                 }

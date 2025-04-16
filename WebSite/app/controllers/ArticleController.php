@@ -67,7 +67,7 @@ class ArticleController extends TableController
             ->leftJoin('Reply ON Survey.Id = Reply.IdSurvey')
             ->leftJoin("'Group' ON 'Group'.Id = Article.IdGroup")
             ->groupBy('Article.Id');
-        
+
         if ($person) {
             if (!$this->authorizations->isEditor()) {
                 $query = $query->where('(Article.CreatedBy = ' . $person['Id'] . '
@@ -75,8 +75,7 @@ class ArticleController extends TableController
                         AND (Article.IdGroup IS NULL OR Article.IdGroup IN (SELECT IdGroup FROM PersonGroup WHERE IdPerson = ' . $person['Id'] . '))
                        ))');
             }
-        }
-        else {
+        } else {
             $query = $query->where('(Article.IdGroup IS NULL AND Article.OnlyForMembers = 0 AND Article.PublishedBy IS NOT NULL)');
         }
         $query = $query->orderBy('Article.Timestamp DESC');
@@ -131,16 +130,12 @@ class ArticleController extends TableController
             $_SESSION['success'] = null;
         }
 
-        $survey = $this->fluent->from('Survey')
-            ->where('IdArticle', $id)
-            ->fetch();
-        
         echo $this->latte->render('app/views/user/article.latte', $this->params->getAll([
             'chosenArticle' => $chosenArticle,
             'latestArticleTitles' => $this->getLatestArticleTitles($articleIds),
             'canEdit' => $canEdit,
             'groups' => $this->getGroups(),
-            'hasSurvey' => $survey ? true : false,
+            'hasSurvey' =>  $this->fluent->from('Survey')->where('IdArticle', $id)->fetch(),
             'id' => $id,
             'userConnected' => $person,
             'navItems' => $this->getNavItems(),

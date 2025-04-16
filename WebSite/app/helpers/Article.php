@@ -12,9 +12,14 @@ class Article
     {
         $this->fluent = new \Envms\FluentPDO\Query($pdo);
     }
-    
+
     public function hasSurvey($id)
     {
-        return $this->fluent->from('Survey')->join('Article ON Survey.IdArticle = Article.Id')->where('IdArticle', $id)->fetch();
+        return $this->fluent
+            ->from('Survey')
+            ->join('Article ON Survey.IdArticle = Article.Id')
+            ->where('IdArticle', $id)
+            ->where('ClosingDate <= ?', date('now'))
+            ->fetch();
     }
 }

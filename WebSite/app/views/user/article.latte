@@ -124,7 +124,7 @@
                     <a href="/surveys/add/{$id}" class="btn btn-success ms-2">Ajouter un sondage</a>
                         {/if}
                     {/if}
-                    {if $hasSurvey && $userConnected && isset($chosenArticle->PublishedBy) && $chosenArticle->PublishedBy !== null}
+                    {if $hasSurvey && $userConnected && isset($chosenArticle->PublishedBy) && $chosenArticle->PublishedBy !== null && $hasSurvey['ClosingDate'] >= date('Y-m-d')}
                     <button id="reply-survey-btn" class="btn btn-success ms-2">Répondre au sondage</button>
                     {/if}
                     <a href="/articles" class="btn btn-secondary ms-2">Liste des articles</a>
