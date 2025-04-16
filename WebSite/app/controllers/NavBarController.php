@@ -5,7 +5,6 @@ namespace app\controllers;
 use PDO;
 use app\helpers\Arwards;
 use app\helpers\Event;
-use app\helpers\FFAScraper;
 use app\helpers\PersonStatistics;
 
 class NavBarController extends BaseController
@@ -83,70 +82,6 @@ class NavBarController extends BaseController
         }
     }
 
-    public function showNextEvents()
-    {
-        $event = new Event($this->pdo);
-        $person = $this->getPerson();
-
-        echo $this->latte->render('app/views/event/nextEvents.latte', $this->params->getAll([
-            'navItems' => $this->getNavItems(),
-            'events' => $event->getNextEvents($person),
-            'person' => $person,
-        ]));
-    }
-
-    public function showGetEmails()
-    {
-        if ($this->getPerson(['EventManager'])) {
-            echo $this->latte->render('app/views/emails/getEmails.latte', $this->params->getAll([
-                'groups' => $this->fluent->from("'Group'")->where('Inactivated', 0)->orderBy('Name')->fetchAll('Id', 'Name'),
-                'eventTypes' => $this->fluent->from('EventType')->where('Inactivated = 0')->orderBy('Name')->fetchAll('Id', 'Name'),
-            ]));
-        } else {
-            $this->application->error403(__FILE__, __LINE__);
-        }
-    }
-
-    public function showPersonStatistics()
-    {
-        if ($person = $this->getPerson([])) {
-
-            $personalStatistics = new PersonStatistics($this->pdo);
-            $season = $personalStatistics->getSeasonRange();
-            echo $this->latte->render('app/views/user/statistics.latte', $this->params->getAll([
-                'stats' => $personalStatistics->getStats($person, $season['start'], $season['end']),
-                'seasons' => $personalStatistics->getAvailableSeasons(),
-                'currentSeason' => $season,
-                'navItems' => $this->getNavItems(),
-            ]));
-        } else {
-            $this->application->error403(__FILE__, __LINE__);
-        }
-    }
-
-    public function showFFASearch()
-    {
-        if ($person = $this->getPerson([])) {
-            $firstName = $person['FirstName'] ?? '';
-            $lastName = $person['LastName'] ?? '';
-            $ffaScraper = new FFAScraper();
-            $results = $ffaScraper->searchAthleteRank($firstName, $lastName);
-
-            echo $this->latte->render('app/views/user/ffaSearch.latte', $this->params->getAll([
-                'firstName' => $firstName,
-                'lastName' => $lastName,
-                'results' => $results,
-                'navItems' => $this->getNavItems(),
-                'question' => 'rank',
-                'year' => date('Y'),
-                'club' => $this->settings->get('FFA_club')?? '',
-            ]));
-        } else {
-            $this->application->error403(__FILE__, __LINE__);
-        }
-    }
-
-
     private function authorizedUser($page)
     {
         $query = $this->pdo->query("
@@ -171,10 +106,10 @@ class NavBarController extends BaseController
             '/navbar/show/article/@id',
             '/navbar/show/arwards',
             '/navbar/show/events',
-            '/navbar/show/nextEvents',
-            '/navbar/show/getEmails',
-            '/navbar/show/personStatistics',
-            '/navbar/show/ffaSearch',
+            '/nextEvents',
+            '/emails',
+            '/personStatistics',
+            '/ffa/search',
         ];
     }
 }

@@ -288,10 +288,6 @@ $flight->route('POST /navBar/update',                function()    use ($navBarC
 $flight->route('GET  /navBar/show/article/@id',      function($id) use ($navBarController) { $navBarController->showArticle($id); });
 $flight->route('GET  /navBar/show/arwards',          function()    use ($navBarController) { $navBarController->showArwards(); });
 $flight->route('GET  /navBar/show/events',           function()    use ($navBarController) { $navBarController->showEvents(); });
-$flight->route('GET  /navBar/show/nextEvents',       function()    use ($navBarController) { $navBarController->showNextEvents(); });
-$flight->route('GET  /navBar/show/getEmails',        function()    use ($navBarController) { $navBarController->showGetEmails(); });
-$flight->route('GET  /navBar/show/personStatistics', function()    use ($navBarController) { $navBarController->showPersonStatistics(); });
-$flight->route('GET  /navBar/show/ffaSearch',        function()    use ($navBarController) { $navBarController->showFFASearch(); });
 
 $mediaController = $container->get('app\controllers\MediaController');
 $flight->route('GET /data/media/@year/@month/@filename',       function($year, $month, $filename) use ($mediaController) { $mediaController->viewFile($year,$month,$filename); });
@@ -320,6 +316,11 @@ $flight->route('POST /alerts/save', function() use ($alertController) {$alertCon
 
 $ffaController = $container->get('app\controllers\FFAController');
 $flight->route('GET /ffa/search', function() use ($ffaController) {$ffaController->searchMember();});
+
+$applicationHelper = $container->get('app\helpers\Application');
+$flight->route('/help',         function() use ($applicationHelper) { $applicationHelper->help(); });
+$flight->route('/legal/notice', function() use ($applicationHelper) { $applicationHelper->legalNotice(); });
+
 /* #endregion */
 
 /* #region api */
@@ -353,10 +354,6 @@ $flight->route('POST /api/registration/remove/@personId/@groupId', function($per
 $flight->route('POST /api/surveys/reply',     function()    use ($apiController) { $apiController->saveSurveyReply(); });
 $flight->route('GET  /api/surveys/reply/@id', function($id) use ($apiController) { $apiController->showSurveyReplyForm($id); });
 /* #endregion */
-
-$applicationHelper = $container->get('app\helpers\Application');
-$flight->route('/help',         function() use ($applicationHelper) { $applicationHelper->help(); });
-$flight->route('/legal/notice', function() use ($applicationHelper) { $applicationHelper->legalNotice(); });
 
 $flight->route('/favicon.ico', function() {
     $path = __DIR__ . '/app/images/favicon.ico';

@@ -78,7 +78,7 @@ class ArticleController extends TableController
         } else {
             $query = $query->where('(Article.IdGroup IS NULL AND Article.OnlyForMembers = 0 AND Article.PublishedBy IS NOT NULL)');
         }
-        $query = $query->orderBy('Article.Timestamp DESC');
+        $query = $query->orderBy('Article.LastUpdate DESC');
         $data = $this->prepareTableData($query, $filterValues, $_GET['tablePage'] ?? null);
         echo $this->latte->render('app/views/user/articles.latte', $this->params->getAll([
             'articles' => $data['items'],
@@ -112,11 +112,16 @@ class ArticleController extends TableController
 
     public function show($id): void
     {
-        $article = $this->fluent->from('Article')->where('PublishedBy IS NOT NULL')->where('Id', $id)->fetch();
+        $person = $this->getPerson();
+        $stmt = $this->pdo->prepare("SELECT * FROM Article WHERE Id = :id AND (PublishedBy IS NOT NULL OR CreatedBy = :createdBy)");
+        $stmt->execute([
+            ':id' => $id,
+            ':createdBy' => $person['Id'],
+        ]);
+        $article = $stmt->fetch(PDO::FETCH_ASSOC);
         if (!$article) {
             $this->application->error403(__FILE__, __LINE__);
         } else {
-            $person = $this->getPerson();
             if (
                 $person === false && $article['OnlyForMembers'] === 0
                 || ($person

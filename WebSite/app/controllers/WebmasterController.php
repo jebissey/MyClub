@@ -3,6 +3,7 @@
 namespace app\controllers;
 
 use Exception;
+use PDO;
 use app\helpers\Arwards;
 
 class WebmasterController extends BaseController
@@ -96,21 +97,22 @@ class WebmasterController extends BaseController
         $feed_url = $base_url . "/rss.xml";
         $feed_description = "Mises à jour de la liste d'articles";
 
-        $query = $this->fluent->from('Article')
-            ->select('Article.Id, Article.Title, Article.Timestamp, Article.LastUpdate')
-            ->select('CASE WHEN Survey.IdArticle IS NOT NULL THEN "oui" ELSE "non" END AS HasSurvey')
-            ->innerJoin('Person ON Article.CreatedBy = Person.Id')
-            ->leftJoin('Survey ON Article.Id = Survey.IdArticle')
-            ->where('(Article.IdGroup IS NULL)')
-            ->where('(Article.Published IN NOT NULL)');
-        if ($person = $this->getPerson([])) {
-            $query = $query->whereOr('Article.IdGroup IN (SELECT IdGroup FROM PersonGroup WHERE IdPerson = ' . $person['Id'] . ')');
-        }
-        $query = $query->orderBy('Article.LastUpdate DESC');
-        $articles = $query->fetchAll();
+        $personId = ($this->getPerson([]))['Id'] ?? 0;
+        $query = $this->pdo->query("
+            SELECT DISTINCT Article.*
+            FROM Article
+            CROSS JOIN Person p
+            LEFT JOIN PersonGroup pg ON pg.IdPerson = p.Id
+            WHERE Article.PublishedBy IS NOT NULL
+            AND ((Article.IdGroup IS NULL AND Article.OnlyForMembers = 0)
+              OR (Article.IdGroup IS NULL AND Article.OnlyForMembers = 1 AND $personId <> 0)
+              OR (Article.IdGroup IS NOT NULL AND Article.IdGroup IN (SELECT IdGroup FROM PersonGroup WHERE PersonGroup.IdPerson = $personId))
+            )
+            ORDER BY Article.LastUpdate DESC");
+        $articles = $query->fetchAll(PDO::FETCH_ASSOC);
+        var_dump($articles);
 
         $rss_content = $this->generateRSS($articles, $site_title, $site_url, $feed_url, $feed_description);
-
         $rss_file_path = $_SERVER['DOCUMENT_ROOT'] . '/rss.xml';
         file_put_contents($rss_file_path, $rss_content);
 

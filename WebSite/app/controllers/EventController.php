@@ -17,6 +17,8 @@ class EventController extends BaseController
             'navItems' => $this->getNavItems(),
             'events' => $event->getNextEvents($person),
             'person' => $person,
+            'eventTypes' => $this->fluent->from('EventType')->where('Inactivated', 0)->orderBy('Name')->fetchAll('Id', 'Name'),
+            'eventAttributes' => $this->fluent->from('Attribute')->fetchAll('Id', 'Name, Detail, Color'),
         ]));
     }
 

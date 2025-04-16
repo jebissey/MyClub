@@ -59,6 +59,7 @@ class Event
         $query = $this->fluent
             ->from('Event e')
             ->leftJoin('EventType et ON e.IdEventType = et.Id')
+            ->leftJoin('Participant p ON e.Id = p.IdEvent AND p.IdPerson = ?', $person['Id'])
             ->where('e.StartTime > ?', $now)
             ->groupBy('e.Id');
 
@@ -68,7 +69,7 @@ class Event
         } else {
             $query->where("et.IdGroup IS NULL OR et.IdGroup IN (SELECT IdGroup FROM PersonGroup WHERE IdPerson = ?)", $person['Id']);
         }
-        $query->select('et.Name AS EventTypeName, et.IdGroup AS EventTypeIdGroup')->orderBy('e.StartTime');
+        $query->select('et.Name AS EventTypeName, et.IdGroup AS EventTypeIdGroup, p.Id As Booked')->orderBy('e.StartTime');
         $events = $query->fetchAll();
 
         $eventIds = array_column($events, 'Id');
@@ -106,6 +107,7 @@ class Event
                 'attributes' => $attributes[$event['Id']] ?? [],
                 'participants' => $this->fluent->from('Participant')->where('IdEvent', $event['Id'])->count(),
                 'maxParticipants' => $event['MaxParticipants'],
+                'booked' => $event['Booked'],
                 'audience' => $event['Audience'],
             ];
         }, $events);
