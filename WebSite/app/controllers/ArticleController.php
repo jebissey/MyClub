@@ -112,36 +112,53 @@ class ArticleController extends TableController
 
     public function show($id): void
     {
-        $person = $this->getPerson();
-        $articleIds = $this->getArticleIdsBasedOnAccess($person['Email'] ?? null);
-        $chosenArticle = $this->getLatestArticle([$id]);
-        $canEdit = false;
-        if ($person && $chosenArticle) {
-            $canEdit = ($person && $person['Id'] == $chosenArticle->CreatedBy);
-        }
+        $article = $this->fluent->from('Article')->where('PublishedBy IS NOT NULL')->where('Id', $id)->fetch();
+        if (!$article) {
+            $this->application->error403(__FILE__, __LINE__);
+        } else {
+            $person = $this->getPerson();
+            if (
+                $person === false && $article['OnlyForMembers'] === 0
+                || ($person
+                    && ($article['OnlyForMembers'] === 1
+                        || $article['IdGroup'] == null
+                        || !empty(array_intersect([$article['IdGroup']], $this->getUserGroups($person['Email'])))
+                    )
+                )
+            ) {
+                $articleIds = $this->getArticleIdsBasedOnAccess($person['Email'] ?? null);
+                $chosenArticle = $this->getLatestArticle([$id]);
+                $canEdit = false;
+                if ($person && $chosenArticle) {
+                    $canEdit = ($person && $person['Id'] == $chosenArticle->CreatedBy);
+                }
 
-        $messages = [];
-        if (isset($_SESSION['error'])) {
-            $messages['error'] = $_SESSION['error'];
-            $_SESSION['error'] = null;
-        }
-        if (isset($_SESSION['success'])) {
-            $messages['success'] = $_SESSION['success'];
-            $_SESSION['success'] = null;
-        }
+                $messages = [];
+                if (isset($_SESSION['error'])) {
+                    $messages['error'] = $_SESSION['error'];
+                    $_SESSION['error'] = null;
+                }
+                if (isset($_SESSION['success'])) {
+                    $messages['success'] = $_SESSION['success'];
+                    $_SESSION['success'] = null;
+                }
 
-        echo $this->latte->render('app/views/user/article.latte', $this->params->getAll([
-            'chosenArticle' => $chosenArticle,
-            'latestArticleTitles' => $this->getLatestArticleTitles($articleIds),
-            'canEdit' => $canEdit,
-            'groups' => $this->getGroups(),
-            'hasSurvey' =>  $this->fluent->from('Survey')->where('IdArticle', $id)->fetch(),
-            'id' => $id,
-            'userConnected' => $person,
-            'navItems' => $this->getNavItems(),
-            'publishedBy' => $chosenArticle->PublishedBy && $chosenArticle->PublishedBy != $chosenArticle->CreatedBy ? $this->getPublisher($chosenArticle->PublishedBy) : '',
-            'latestArticleHasSurvey' => (new Article($this->pdo))->hasSurvey($id),
-        ]));
+                echo $this->latte->render('app/views/user/article.latte', $this->params->getAll([
+                    'chosenArticle' => $chosenArticle,
+                    'latestArticleTitles' => $this->getLatestArticleTitles($articleIds),
+                    'canEdit' => $canEdit,
+                    'groups' => $this->getGroups(),
+                    'hasSurvey' =>  $this->fluent->from('Survey')->where('IdArticle', $id)->fetch(),
+                    'id' => $id,
+                    'userConnected' => $person,
+                    'navItems' => $this->getNavItems(),
+                    'publishedBy' => $chosenArticle->PublishedBy && $chosenArticle->PublishedBy != $chosenArticle->CreatedBy ? $this->getPublisher($chosenArticle->PublishedBy) : '',
+                    'latestArticleHasSurvey' => (new Article($this->pdo))->hasSurvey($id),
+                ]));
+            } else {
+                $this->application->error403(__FILE__, __LINE__);
+            }
+        }
     }
 
     public function update($id): void
