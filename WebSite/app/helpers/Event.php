@@ -59,7 +59,7 @@ class Event
         $query = $this->fluent
             ->from('Event e')
             ->leftJoin('EventType et ON e.IdEventType = et.Id')
-            ->leftJoin('Participant p ON e.Id = p.IdEvent AND p.IdPerson = ?', $person['Id'])
+            ->leftJoin('Participant p ON e.Id = p.IdEvent AND p.IdPerson = ?', $person['Id'] ?? 0)
             ->where('e.StartTime > ?', $now)
             ->groupBy('e.Id');
 

@@ -110,13 +110,13 @@ class WebmasterController extends BaseController
             )
             ORDER BY Article.LastUpdate DESC");
         $articles = $query->fetchAll(PDO::FETCH_ASSOC);
-        var_dump($articles);
 
-        $rss_content = $this->generateRSS($articles, $site_title, $site_url, $feed_url, $feed_description);
-        $rss_file_path = $_SERVER['DOCUMENT_ROOT'] . '/rss.xml';
-        file_put_contents($rss_file_path, $rss_content);
+        header('Cache-Control: no-cache, no-store, must-revalidate'); // HTTP 1.1
+        header('Pragma: no-cache'); // HTTP 1.0
+        header('Expires: 0'); // Proxies
 
-        header("Refresh: 2; URL=$site_url/articles");
+        header('Content-Type: application/rss+xml; charset=utf-8');
+        echo $this->generateRSS($articles, $site_title, $site_url, $feed_url, $feed_description);
     }
 
     private function generateRSS($articles, $site_title, $site_url, $feed_url, $feed_description)
@@ -137,7 +137,7 @@ class WebmasterController extends BaseController
             $rss .= '<link>' . htmlspecialchars($site_url . '/articles/' . $article['Id']) . '</link>';
             $rss .= '<guid>' . htmlspecialchars($site_url . '/articles/' . $article['Id']) . '</guid>';
             $rss .= '<pubDate>' . date(DATE_RSS, strtotime($article['LastUpdate'])) . '</pubDate>';
-            $rss .= '<description>Article' . ($article['HasSurvey'] === 'oui' ? ' avec sondage' : '') . '</description>';
+            $rss .= '<description>Article: ...</description>';
             $rss .= '</item>';
         }
 
