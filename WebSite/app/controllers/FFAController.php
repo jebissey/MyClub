@@ -18,7 +18,7 @@ class FFAController extends BaseController
             $results = [];
             $ffaScraper = new FFAScraper();
             if($question == 'rank') {
-                $results = $ffaScraper->searchAthleteRank($firstName, $lastName);
+                $results = $ffaScraper->searchAthleteRank($firstName, $lastName, $year, $club);
             } else {
                 $results = $ffaScraper->searchAthleteResults($firstName, $lastName, $year, $club);
             }

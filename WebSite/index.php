@@ -308,7 +308,7 @@ $flight->route('GET  /designs/create',   function() use ($designController) { $d
 $flight->route('POST /designs/store',    function() use ($designController) { $designController->store(); });
 
 $personStatisticsController = $container->get('app\controllers\PersonStatisticsController');
-$flight->route('GET /statistics/person', function() use ($personStatisticsController) {$personStatisticsController->showStatistics();});
+$flight->route('GET /person/statistics', function() use ($personStatisticsController) {$personStatisticsController->showStatistics();});
 
 $alertController = $container->get('app\controllers\AlertController');
 $flight->route('GET  /alerts',      function() use ($alertController) {$alertController->showAlerts();});

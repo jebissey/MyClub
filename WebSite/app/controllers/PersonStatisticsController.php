@@ -16,6 +16,7 @@ class PersonStatisticsController extends BaseController
                 'stats' => $personalStatistics->getStats($person, $season['start'], $season['end']),
                 'seasons' => $personalStatistics->getAvailableSeasons(),
                 'currentSeason' => $season,
+                'navItems' => $this->getNavItems(),
             ]));
         } else {
             $this->application->error403(__FILE__, __LINE__);

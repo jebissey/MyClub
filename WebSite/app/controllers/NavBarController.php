@@ -108,7 +108,7 @@ class NavBarController extends BaseController
             '/navbar/show/events',
             '/nextEvents',
             '/emails',
-            '/personStatistics',
+            '/person/statistics',
             '/ffa/search',
         ];
     }

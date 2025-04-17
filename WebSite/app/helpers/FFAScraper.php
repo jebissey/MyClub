@@ -24,20 +24,19 @@ class FFAScraper
         ]);
     }
 
-    public function searchAthleteRank($firstName, $lastName)
+    public function searchAthleteRank($firstName, $lastName, $year, $club)
     {
         $params = [
             'frmpostback' => 'true',
             'frmbase' => 'coupe',
             'frmmode' => '1',
             'frmespace' => '0',
-            'frmsaison' => '2025',
+            'frmsaison' => $year,
             'frmepreuve' => 'Classement du Circuit Marche Nordique',
             'frmsexe' => '',
             'frmnom' => $lastName,
-            'frmlicence' => '',
-            'frmligue' => '',
-            'frmdepartement' => '',
+            'frmprenom' => $firstName,
+            'frmclub' => $club,
             'frmposition' => '2'
         ];
 
@@ -47,7 +46,7 @@ class FFAScraper
                 'allow_redirects' => true
             ]);
             $html = (string) $response->getBody();
-            return $this->parseAthleteRank($html, $firstName, $lastName);
+            return $this->parseAthleteRank($html);
         } catch (GuzzleException $e) {
             return ['error' => 'Erreur lors de la récupération des données: ' . $e->getMessage()];
         }
@@ -72,66 +71,57 @@ class FFAScraper
                 'allow_redirects' => true
             ]);
             $html = (string) $response->getBody();
-            return $this->parseAthleteResults($html, $firstName, $lastName);
+            return $this->parseAthleteResults($html);
         } catch (GuzzleException $e) {
             return ['error' => 'Erreur lors de la récupération des données: ' . $e->getMessage()];
         }
     }
-    private function parseAthleteRank($html, $firstName, $lastName)
+    private function parseAthleteRank($html)
     {
         $dom = new DOMDocument();
         @$dom->loadHTML($html);
         $xpath = new DOMXPath($dom);
-        $fullName = strtoupper($lastName . ' ' . $firstName);
         $rows = $xpath->query("//table[@id='ctnCoupe']//tr[td[@class='datas0']]");
 
         foreach ($rows as $row) {
-            $rowText = $row->textContent;
-
-            if (strpos($rowText, $fullName) !== false) {
-                $dataCells = $xpath->query(".//td[@class='datas0']", $row);
-                if ($dataCells->length >= 5) {
-                    return [
-                        'rank' => trim($dataCells->item(0)->textContent),
-                        'event' => trim($dataCells->item(1)->textContent),
-                        'name' => trim($dataCells->item(2)->textContent),
-                        'club' => trim($dataCells->item(3)->textContent),
-                        'points' => trim($dataCells->item(4)->textContent)
-                    ];
-                }
+            $dataCells = $xpath->query(".//td[@class='datas0']", $row);
+            if ($dataCells->length >= 5) {
+                return [
+                    'rank' => trim($dataCells->item(0)->textContent),
+                    'event' => trim($dataCells->item(1)->textContent),
+                    'name' => trim($dataCells->item(2)->textContent),
+                    'club' => trim($dataCells->item(3)->textContent),
+                    'points' => trim($dataCells->item(4)->textContent)
+                ];
             }
         }
         return null;
     }
 
-    private function parseAthleteResults($html, $firstName, $lastName)
+    private function parseAthleteResults($html)
     {
         $dom = new DOMDocument();
         @$dom->loadHTML($html);
         $xpath = new DOMXPath($dom);
-        $searchName = strtoupper($lastName);
         $frmcompetition = $this->extractFrm($html, 'frmcompetition');
         $results = [];
         $rows = $xpath->query("//table[@id='ctnResultats']//tr[td[contains(@class, 'datas0') or contains(@class, 'datas1')]]");
         foreach ($rows as $row) {
-            $rowText = $row->textContent;
-            if (strpos($rowText, $searchName) !== false) {
-                $isDatas0 = ($xpath->evaluate("count(.//td[@class='datas0'])", $row) > 0);
-                $cellClass = $isDatas0 ? 'datas0' : 'datas1';
-                $cells = $xpath->query(".//td[@class='$cellClass']", $row);
-                if ($cells->length >= 10) {
-                    $code = trim($cells->item(7)->textContent);
-                    $results[] = [
-                        'date' => trim($cells->item(0)->textContent),
-                        'competition' => trim($cells->item(2)->textContent),
-                        'place' => trim($cells->item(4)->textContent),
-                        'time' => trim(strip_tags($cells->item(5)->textContent)), // Retire les balises <b>
-                        'category' => $code,
-                        'round' => trim($cells->item(8)->textContent),
-                        'location' => trim($cells->item(9)->textContent),
-                        'url' => "https://bases.athle.fr/asp.net/liste.aspx?frmbase=resultats&frmmode=1&frmespace=0&frmcompetition=" . $frmcompetition . "&frmcategorie=" . substr($code, 0, 2) . "&frmsexe=" . substr($code, 2, 1),
-                    ];
-                }
+            $isDatas0 = ($xpath->evaluate("count(.//td[@class='datas0'])", $row) > 0);
+            $cellClass = $isDatas0 ? 'datas0' : 'datas1';
+            $cells = $xpath->query(".//td[@class='$cellClass']", $row);
+            if ($cells->length >= 10) {
+                $code = trim($cells->item(7)->textContent);
+                $results[] = [
+                    'date' => trim($cells->item(0)->textContent),
+                    'name' => trim($cells->item(1)->textContent),
+                    'competition' => trim($cells->item(2)->textContent),
+                    'place' => trim($cells->item(4)->textContent),
+                    'time' => trim($cells->item(5)->textContent),
+                    'category' => $code,
+                    'round' => trim($cells->item(8)->textContent),
+                    'location' => trim($cells->item(9)->textContent),
+                ];
             }
         }
 

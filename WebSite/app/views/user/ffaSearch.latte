@@ -8,11 +8,9 @@
 
 {block content}
 <div class="container mt-4">
-    <h1>Recherche dans la base FFA</h1>
-    
     <div class="card mb-4">
         <div class="card-header">
-            <h5>Rechercher un membre</h5>
+            <h5>Recherche dans la base FFA</h5>
         </div>
         <div class="card-body">
             <form method="get" action="/ffa/search">
@@ -31,9 +29,6 @@
                             <input type="text" class="form-control" id="lastName" name="lastName" value="{$lastName}">
                         </div>
                     </div>
-                    <div class="col-md-2 d-flex align-items-end">
-                        <button type="submit" class="btn btn-primary w-100" onclick="setQuestion('rank')">Classement</button>
-                    </div>
                 </div>
 
                 <div class="row">
@@ -49,7 +44,13 @@
                             <input type="text" class="form-control" id="club" name="club" value="{$club}">
                         </div>
                     </div>
-                    <div class="col-md-2 d-flex align-items-end">
+                </div>
+
+                <div class="row">
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-primary w-100" onclick="setQuestion('rank')">Classement</button>
+                    </div>
+                    <div class="col-md-2">
                         <button type="submit" class="btn btn-primary w-100" onclick="setQuestion('results')">Résultats</button>
                     </div>
                 </div>
@@ -100,6 +101,7 @@
                             <th>Catégorie</th>
                             <th>Round</th>
                             <th>Lieu</th>
+                            {if $firstName == '' && $lastName == ''}<th>Nom</th>{/if}
                         </tr>
                     </thead>
                     <tbody>
@@ -112,6 +114,7 @@
                             <td>{$result['category']}</td>
                             <td>{$result['round']}</td>
                             <td>{$result['location']}</td>
+                            {if $firstName == '' && $lastName == ''}<td>{$result['name']}</td>{/if}
                         </tr>
                         {/foreach}
                     </tbody>
