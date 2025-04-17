@@ -40,12 +40,13 @@
     <table class="table table-striped">
         <thead>
             <tr>
+                <th></th>
                 <th>{='type'|translate}</th>
-                <th>{='summary'|translate}</th>
-                <th>{='location'|translate}</th>
                 <th>{='date_time'|translate}</th>
                 <th>{='duration'|translate}</th>
                 <th>{='attributes'|translate}</th>
+                <th>{='summary'|translate}</th>
+                <th>{='location'|translate}</th>
                 <th>{='participants'|translate}</th>
                 <th>{='audience'|translate}</th>
             </tr>
@@ -53,9 +54,19 @@
         <tbody>
             {foreach $events as $event}
             <tr onclick="window.location.href='/events/{$event['id']}';" style="cursor: pointer;">
+                <td>
+                {if $event['createdBy'] == $person['Id']}
+                    <div class="ms-auto d-flex flex-column flex-sm-row gap-2">
+                        <button class="btn btn-sm btn-primary edit-btn">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+                        <button class="btn btn-sm btn-danger delete-btn">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>
+                {/if}
+                </td>
                 <td>{$event['eventTypeName']} {if $event['groupName']}({$event['groupName']}){/if}</td>
-                <td>{$event['summary']}</td>
-                <td>{$event['location']}</td>
                 <td>{=$event['startTime']|longDateTime}</td>
                 <td>{$event['duration']}</td>
                 <td>
@@ -71,6 +82,8 @@
                     Aucun attribut
                 {/if}
                 </td>
+                <td>{$event['summary']}</td>
+                <td>{$event['location']}</td>
                 <td>{$event['participants']}{if $event['maxParticipants'] > 0} / {$event['maxParticipants']}{/if}{if isset($event['booked'])}👤{/if}</td>
                 <td>{=$event['audience']|translate}</td>
             </tr>
@@ -86,47 +99,56 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="eventForm">
+                    <form id="eventForm" method="post" action="/event/save">
                         <input type="hidden" id="eventId" name="eventId">
                         <input type="hidden" id="formMode" name="formMode" value="create">
 
-                        <div class="mb-3">
-                            <label for="summaryInput" class="form-label">Résumé</label>
-                            <input type="text" class="form-control" id="summaryInput" name="summary" required>
+                        <div class="mb-3 row align-items-center">
+                            <label for="summaryInput" class="col-auto col-form-label">Titre</label>
+                            <div class="col">
+                                <input type="text" class="form-control" id="summaryInput" name="summary" placeholder="Titre dans le calendrier" required>
+                            </div>
                         </div>
 
                         <div class="mb-3">
-                            <label for="descriptionInput" class="form-label">Description</label>
-                            <textarea class="form-control" id="descriptionInput" name="description" required></textarea>
+                            <textarea class="form-control" id="descriptionInput" name="description" placeholder="Détails de l'évènement" required></textarea>
+                        </div>
+
+                        <div class="mb-3 row align-items-center">
+                            <label for="locationInput" class="col-auto col-form-label">Lieu</label>
+                            <div class="col">
+                                <input type="text" class="form-control" id="locationInput" name="location" placeholder="rue / lieu dit , ville" required>
+                            </div>
+                        </div>
+
+                        <div class="mb-3 row align-items-center">
+                            <label for="eventTypeInput" class="col-auto col-form-label">Type d'événement</label>
+                            <div class="col">
+                                <select class="form-control" id="eventTypeInput" name="eventType" required>
+                                    {foreach $eventTypes as $eventType}
+                                        <option value="{$eventType['Id']}">{$eventType['Name']}</option>
+                                    {/foreach}
+                                </select>
+                            </div>
                         </div>
 
                         <div class="mb-3">
-                            <label for="locationInput" class="form-label">Lieu</label>
-                            <input type="text" class="form-control" id="locationInput" name="location" required>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="eventTypeInput" class="form-label">Type d'événement</label>
-                            <select class="form-control" id="eventTypeInput" name="eventType" required>
-                                {foreach $eventTypes as $eventType}
-                                    <option value="{$eventType['Id']}">{$eventType['Name']}</option>
-                                {/foreach}
-                            </select>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="dateInput" class="form-label">Date</label>
-                            <input type="date" class="form-control" id="dateInput" name="date" required>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="startTimeInput" class="form-label">Heure de début</label>
-                            <input type="time" class="form-control" id="startTimeInput" name="startTime" step="900" required>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="durationInput" class="form-label">Durée (en heures)</label>
-                            <input type="number" class="form-control" id="durationInput" name="duration" min="0.5" step="0.5" required>
+                            <div class="row text-center">
+                                <div class="col-12">
+                                    <label class="form-label">Date / Heure / Durée (h)</label>
+                                </div>
+                            </div>
+                            <div class="d-flex justify-content-center gap-3 flex-wrap">
+                                <div class="w-auto">
+                                    <input type="date" class="form-control" id="dateInput" name="date" required>
+                                </div>
+                                <div class="w-auto">
+                                    <input type="time" class="form-control" id="startTimeInput" name="startTime" step="900" required>
+                                </div>
+                                <div style="width: 80px;">
+                                    <input type="number" class="form-control" id="durationInput" name="duration" min="0.5" step="0.5" required>
+                                </div>
+                            </div>
                         </div>
 
                         <div class="mb-3">
@@ -164,10 +186,69 @@
         const submitButton = document.getElementById('submitEventBtn');
         const formMode = document.getElementById('formMode');
         const eventId = document.getElementById('eventId');
-        
+        const modalTitle = document.getElementById('eventModalLabel');
         let selectedAttributes = [];
-        
         const eventTypeInput = document.getElementById('eventTypeInput');
+        
+        // Ajout des gestionnaires d'événements pour les boutons édition et suppression
+        document.querySelectorAll('.edit-btn').forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.stopPropagation(); // Empêcher la propagation pour ne pas déclencher le clic sur la ligne
+                const row = this.closest('tr');
+                const eventId = row.getAttribute('onclick').match(/\/events\/(\d+)/)[1];
+                fetchEventDetails(eventId);
+            });
+        });
+        
+        document.querySelectorAll('.delete-btn').forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.stopPropagation(); // Empêcher la propagation pour ne pas déclencher le clic sur la ligne
+                const row = this.closest('tr');
+                const eventId = row.getAttribute('onclick').match(/\/events\/(\d+)/)[1];
+                confirmAndDeleteEvent(eventId);
+            });
+        });
+        
+        function fetchEventDetails(eventId) {
+            fetch(`/api/event/${eventId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.event && data.attributes) {
+                        openUpdateModal(data.event, data.attributes);
+                    } else {
+                        alert('Erreur lors de la récupération des détails de l\'événement');
+                    }
+                })
+                .catch(error => {
+                    console.error('Erreur:', error);
+                    alert('Erreur de communication avec le serveur (1) :' + error.message);
+                });
+        }
+        
+        function confirmAndDeleteEvent(eventId) {
+            if (confirm('Êtes-vous sûr de vouloir supprimer cet événement ?')) {
+                fetch('/event/delete', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ id: eventId })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        window.location.reload();
+                    } else {
+                        alert('Erreur lors de la suppression: ' + (data.message || 'Erreur inconnue'));
+                    }
+                })
+                .catch(error => {
+                    console.error('Erreur:', error);
+                    alert('Erreur de communication avec le serveur(2)');
+                });
+            }
+        }
+        
         eventTypeInput.addEventListener('change', function() {
             const selectedEventTypeId = this.value;
             if (selectedEventTypeId) {
@@ -180,12 +261,10 @@
         const availableAttributesSelect = document.getElementById('availableAttributesSelect');
         function loadAttributesByEventType(eventTypeId) {
             availableAttributesSelect.innerHTML = '<option value="">Chargement...</option>';
-            
             fetch(`/api/attributes-by-event-type/${eventTypeId}`)
                 .then(response => response.json())
                 .then(data => {
                     availableAttributesSelect.innerHTML = '';
-                    
                     if (data.attributes && data.attributes.length > 0) {
                         data.attributes.forEach(attribute => {
                             const option = document.createElement('option');
@@ -220,7 +299,7 @@
             new bootstrap.Modal(eventModal).show();
         }
 
-        function openUpdateModal(event) {
+        function openUpdateModal(event, attributes) {
             modalTitle.textContent = 'Mettre à jour l\'événement';
             submitButton.textContent = 'Mettre à jour';
             formMode.value = 'update';
@@ -231,14 +310,12 @@
             document.getElementById('locationInput').value = event.Location;
             document.getElementById('eventTypeInput').value = event.IdEventType;
 
-            // Charger les attributs correspondant au type d'événement
             loadAttributesByEventType(event.IdEventType);
 
             const startDate = new Date(event.StartTime);
-            const endDate = new Date(event.EndTime);
             document.getElementById('dateInput').value = startDate.toISOString().split('T')[0];
             document.getElementById('startTimeInput').value = startDate.toTimeString().split(' ')[0].slice(0, 5);
-            const durationHours = (endDate - startDate) / (1000 * 60 * 60);
+            const durationHours = event.Duration / (60 * 60);
             document.getElementById('durationInput').value = durationHours.toFixed(1);
 
             const attributesList = document.getElementById('attributesList');
@@ -269,8 +346,8 @@
             attributeElement.innerHTML = `
                 ${attributeName}
                 <button type="button" class="btn-close position-absolute top-0 end-0" 
-                    aria-label="Supprimer" 
-                    data-attribute-id="${attributeId}"></button>
+                        aria-label="Supprimer" 
+                        data-attribute-id="${attributeId}"></button>
             `;
             attributeElement.style.position = 'relative';
             attributeElement.style.paddingRight = '25px';
@@ -311,6 +388,53 @@
                 color: attributeColor,
                 detail: attributeDetail
             });
+        });
+        
+        eventForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = {
+                id: eventId.value,
+                formMode: formMode.value,
+                summary: document.getElementById('summaryInput').value,
+                description: document.getElementById('descriptionInput').value,
+                location: document.getElementById('locationInput').value,
+                idEventType: document.getElementById('eventTypeInput').value,
+                attributes: selectedAttributes.map(attr => attr.id),
+                maxParticipants: 0, // Vous pouvez ajouter un champ pour cela si nécessaire
+                audience: 'ClubMembersOnly'  // Vous pouvez ajouter un champ pour cela si nécessaire
+            };
+            
+            const dateValue = document.getElementById('dateInput').value;
+            const timeValue = document.getElementById('startTimeInput').value;
+            formData.startTime = `${dateValue}T${timeValue}:00`;
+            
+            // Durée
+            formData.duration = parseInt(document.getElementById('durationInput').value * 60 * 60);
+            
+            fetch('/api/event/save', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    bootstrap.Modal.getInstance(eventModal).hide();
+                    window.location.reload();
+                } else {
+                    alert('Erreur: ' + (data.message || 'Erreur inconnue'));
+                }
+            })
+            .catch(error => {
+                alert('Erreur de communication avec le serveur (3) :' + error.message);
+            });
+        });
+        
+        document.querySelector('[data-bs-target="#eventModal"]').addEventListener('click', function() {
+            openCreateModal();
         });
     });
 

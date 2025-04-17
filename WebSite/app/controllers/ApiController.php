@@ -606,40 +606,71 @@ class ApiController extends BaseController
         exit();
     }
 
-    public function create(): void
+
+    public function getEvent($id): void
+    {
+        if ($this->getPerson(['EventManager'])) {
+            header('Content-Type: application/json');
+            echo json_encode([
+                'success' => true,
+                'event' => $this->fluent->from('Event')->where('Id', $id)->fetch(),
+                'attributes' => $this->fluent->from('EventAttribute')->where('IdEvent', $id)->fetchall(),
+            ]);
+        } else {
+            header('Content-Type: application/json', true, 403);
+            echo json_encode(['success' => false, 'message' => 'User not allowed']);
+        }
+        exit();
+    }
+
+    public function saveEvent(): void
     {
         if ($person = $this->getPerson(['EventManager'])) {
             $data = json_decode(file_get_contents('php://input'), true);
+            $values = [
+                'Summary' => $data['summary'] ?? '',
+                'Description' => $data['description'] ?? '',
+                'Location' => $data['location'] ?? '',
+                'StartTime' => $data['startTime'],
+                'Duration' => $data['duration'] ?? 1,
+                'IdEventType' => $data['idEventType'],
+                'CreatedBy' => $person['Id'],
+                'MaxParticipants' => $data['maxParticipants'] ?? 0,
+                'Audience' => $data['audience'] ?? EventAudience::ForClubMembersOnly->value,
+            ];
 
+            $this->pdo->beginTransaction();
             try {
-                $this->pdo->beginTransaction();
-                $eventId = $this->fluent->insertInto('Event')
-                    ->values([
-                        'Summary' => $data['summary'] ?? '',
-                        'Description' => $data['description'] ?? '',
-                        'Location' => $data['location'] ?? '',
-                        'StartTime' => $data['startTime'],
-                        'Duration' => $data['duration'] ?? 1,
-                        'IdEventType' => $data['idEventType'],
-                        'CreatedBy' => $person['Id'],
-                        'MaxParticipants' => $data['maxParticipants'] ?? 0,
-                        'Audience' => $data['audience'] ?? EventAudience::ForClubMembersOnly->value,
-                    ])
-                    ->execute();
-                if (isset($data['attributes']) && is_array($data['attributes'])) {
-                    foreach ($data['attributes'] as $attributeId) {
-                        $this->fluent->insertInto('EventAttribute')
-                            ->values([
-                                'IdEvent' => $eventId,
-                                'IdAttribute' => $attributeId
-                            ])
-                            ->execute();
-                    }
-                }
-                $this->pdo->commit();
+                if ($data['formMode'] == 'create') {
 
+                    $eventId = $this->fluent->insertInto('Event')->values($values)->execute();
+                    if (isset($data['attributes']) && is_array($data['attributes'])) {
+                        foreach ($data['attributes'] as $attributeId) {
+                            $this->fluent->insertInto('EventAttribute')
+                                ->values([
+                                    'IdEvent' => $eventId,
+                                    'IdAttribute' => $attributeId
+                                ])
+                                ->execute();
+                        }
+                    }
+                } elseif ($data['formMode'] == 'update') {
+                    $this->fluent->update('Event')->set($values)->where('Id', $data['id'])->execute();
+                    $this->fluent->deleteFrom('EventAttribute')->where('IdEvent', $data['id'])->execute();
+                    if (isset($data['attributes']) && is_array($data['attributes'])) {
+                        foreach ($data['attributes'] as $attributeId) {
+                            $this->fluent->insertInto('EventAttribute')
+                                ->values([
+                                    'IdEvent' => $data['id'],
+                                    'IdAttribute' => $attributeId
+                                ])
+                                ->execute();
+                        }
+                    }
+                } else die('Fatal error in file ' . __FILE__ . ' at line ' . __LINE__ . " with formMode=" . $data['formMode']);
                 header('Content-Type: application/json');
-                echo json_encode(['success' => true, 'eventId' => $eventId]);
+                echo json_encode(['success' => true, 'eventId' => $data['id']]);
+                $this->pdo->commit();
             } catch (Exception $e) {
                 $this->pdo->rollBack();
 
@@ -647,6 +678,43 @@ class ApiController extends BaseController
                 echo json_encode([
                     'success' => false,
                     'message' => 'Erreur lors de l\'insertion en base de données',
+                    'error' => $e->getMessage()
+                ]);
+            }
+        } else {
+            header('Content-Type: application/json', true, 403);
+            echo json_encode(['success' => false, 'message' => 'User not allowed']);
+        }
+        exit();
+    }
+
+    public function deleteEvent($id): void
+    {
+        if ($person = $this->getPerson(['EventManager'])) {
+
+            if (!$this->fluent->from('Event')->where('Id', $id)->where('CreatedBy', $person['Id'])->fetch()) {
+                header('Content-Type: application/json', true, 403);
+                echo json_encode(['success' => false, 'message' => 'Not allowed user']);
+                exit;
+            }
+            try {
+                $this->pdo->beginTransaction();
+
+                $this->fluent->deleteFrom('EventAttribute')->where('IdEvent', $id)->execute();
+                // TODO manage participant and paticipantSupply
+                $this->fluent->deleteFrom('Event')->where('Id', $id)->execute();
+
+                $this->pdo->commit();
+
+                header('Content-Type: application/json');
+                echo json_encode(['success' => true]);
+            } catch (Exception $e) {
+                $this->pdo->rollBack();
+
+                header('Content-Type: application/json', true, 500);
+                echo json_encode([
+                    'success' => false,
+                    'message' => 'Erreur lors de la suppression en base de données',
                     'error' => $e->getMessage()
                 ]);
             }

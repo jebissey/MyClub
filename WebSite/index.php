@@ -335,7 +335,9 @@ $flight->route('GET    /api/attributes-by-event-type/@id', function($id) use ($a
 
 $flight->route('POST /api/designs/vote', function() use ($apiController) { $apiController->designVote(); });
 
-$flight->route('POST /api/event/create', function() use ($apiController) { $apiController->create(); });
+$flight->route('POST   /api/event/save',       function()    use ($apiController) { $apiController->saveEvent(); });
+$flight->route('DELETE /api/event/delete/@id', function($id) use ($apiController) { $apiController->deleteEvent($id); });
+$flight->route('GET    /api/event/@id',        function($id) use ($apiController) { $apiController->getEvent($id); });
 
 $flight->route('GET /api/lastVersion', function() use ($apiController) { $apiController->lastVersion(); });
 

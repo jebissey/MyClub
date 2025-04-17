@@ -5,7 +5,6 @@ namespace app\controllers;
 use PDO;
 use app\helpers\Arwards;
 use app\helpers\Event;
-use app\helpers\PersonStatistics;
 
 class NavBarController extends BaseController
 {
@@ -18,6 +17,7 @@ class NavBarController extends BaseController
                 LEFT JOIN 'Group' on Page.IdGroup = 'Group'.Id
                 ORDER BY 'Group'.Name");
             $navItems = $query->fetchAll(PDO::FETCH_ASSOC);
+            
             echo $this->latte->render('app/views/navbar/index.latte', $this->params->getAll([
                 'navItems' => $navItems,
                 'groups' => $this->getGroups(),

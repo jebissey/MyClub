@@ -67,6 +67,11 @@ class Application
         $this->error(470, "Method $requestMethod invalid in file $file at line $line", $timeout);
     }
 
+    public function error471($parameter, $file, $line, $timeout = 1000)
+    {
+        $this->error(471, "Parameter $parameter invalid in file $file at line $line", $timeout);
+    }
+
     public function error479($email, $file, $line, $timeout = 1000)
     {
         $this->error(479, "Email address: $email inactivated in file $file at line $line", $timeout);

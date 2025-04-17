@@ -109,6 +109,7 @@ class Event
                 'maxParticipants' => $event['MaxParticipants'],
                 'booked' => $event['Booked'],
                 'audience' => $event['Audience'],
+                'createdBy' => $event['CreatedBy'],
             ];
         }, $events);
     }
