@@ -63,6 +63,11 @@ abstract class BaseController extends BaseHelper
         $this->application = new Application($pdo, $flight);
         $this->authorizations = new Authorization($this->pdo);
         $this->settings = new Settings($this->pdo);
+
+        $this->mediaPath = __DIR__ . '/../../data/media/';
+        if (!file_exists($this->mediaPath)) {
+            mkdir($this->mediaPath, 0755, true);
+        }
     }
 
     public static function GetVersion()

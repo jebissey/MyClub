@@ -11,11 +11,6 @@ class MediaController extends BaseController
     {
         parent::__construct($pdo, $flight);
 
-        $this->mediaPath = __DIR__ . '/../../data/media/';
-        if (!file_exists($this->mediaPath)) {
-            mkdir($this->mediaPath, 0755, true);
-        }
-
         $this->latte->addFilter('formatFileSize', function ($bytes) {
             if ($bytes >= 1073741824) {
                 return number_format($bytes / 1073741824, 2) . ' GB';
