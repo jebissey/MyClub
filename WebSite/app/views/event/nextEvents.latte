@@ -170,6 +170,22 @@
                             </div>
                         </div>
 
+                        <div class="mb-3 d-flex align-items-center">
+                            <label for="maxParticipantsInput" class="me-2 mb-0">Nombre max de participants</label>
+                            <input type="number" class="form-control form-control-sm" id="maxParticipantsInput" name="maxParticipants" min="0" value="0" style="width: 70px;">
+                            <small class="form-text text-muted ms-2">0 = illimité</small>
+                        </div>
+
+                        <div class="mb-3 row align-items-center">
+                            <label for="audienceInput" class="col-auto col-form-label">Public</label>
+                            <div class="col">
+                                <select class="form-control" id="audienceInput" name="audience" required>
+                                    <option value="ClubMembersOnly">Membres du club uniquement</option>
+                                    <option value="All">Tous</option>
+                                </select>
+                            </div>
+                        </div>
+
                         <button type="submit" id="submitEventBtn" class="btn btn-success">Créer</button>
                     </form>
                 </div>
@@ -190,10 +206,9 @@
         let selectedAttributes = [];
         const eventTypeInput = document.getElementById('eventTypeInput');
         
-        // Ajout des gestionnaires d'événements pour les boutons édition et suppression
         document.querySelectorAll('.edit-btn').forEach(button => {
             button.addEventListener('click', function(e) {
-                e.stopPropagation(); // Empêcher la propagation pour ne pas déclencher le clic sur la ligne
+                e.stopPropagation(); 
                 const row = this.closest('tr');
                 const eventId = row.getAttribute('onclick').match(/\/events\/(\d+)/)[1];
                 fetchEventDetails(eventId);
@@ -202,7 +217,7 @@
         
         document.querySelectorAll('.delete-btn').forEach(button => {
             button.addEventListener('click', function(e) {
-                e.stopPropagation(); // Empêcher la propagation pour ne pas déclencher le clic sur la ligne
+                e.stopPropagation(); 
                 const row = this.closest('tr');
                 const eventId = row.getAttribute('onclick').match(/\/events\/(\d+)/)[1];
                 confirmAndDeleteEvent(eventId);
@@ -293,9 +308,9 @@
             eventForm.reset();
             selectedAttributes = [];
             document.getElementById('attributesList').innerHTML = '';
-
             availableAttributesSelect.innerHTML = '<option value="">Sélectionnez d\'abord un type d\'événement</option>';
-
+            document.getElementById('maxParticipantsInput').value = 0;
+            document.getElementById('audienceInput').value = 'ClubMembersOnly';
             new bootstrap.Modal(eventModal).show();
         }
 
@@ -309,6 +324,8 @@
             document.getElementById('descriptionInput').value = event.Description;
             document.getElementById('locationInput').value = event.Location;
             document.getElementById('eventTypeInput').value = event.IdEventType;
+            document.getElementById('maxParticipantsInput').value = event.MaxParticipants || 0;
+            document.getElementById('audienceInput').value = event.Audience || 'ClubMembersOnly';
 
             loadAttributesByEventType(event.IdEventType);
 
@@ -401,15 +418,13 @@
                 location: document.getElementById('locationInput').value,
                 idEventType: document.getElementById('eventTypeInput').value,
                 attributes: selectedAttributes.map(attr => attr.id),
-                maxParticipants: 0, // Vous pouvez ajouter un champ pour cela si nécessaire
-                audience: 'ClubMembersOnly'  // Vous pouvez ajouter un champ pour cela si nécessaire
+                maxParticipants: parseInt(document.getElementById('maxParticipantsInput').value),
+                audience: document.getElementById('audienceInput').value
             };
             
             const dateValue = document.getElementById('dateInput').value;
             const timeValue = document.getElementById('startTimeInput').value;
             formData.startTime = `${dateValue}T${timeValue}:00`;
-            
-            // Durée
             formData.duration = parseInt(document.getElementById('durationInput').value * 60 * 60);
             
             fetch('/api/event/save', {

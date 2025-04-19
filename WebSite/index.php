@@ -140,6 +140,12 @@ $containerBuilder->addDefinitions([
             $container->get(PDO::class),
             $container->get(Engine::class)
         );
+    },
+    'app\controllers\NeedsController' => function (Container $container) {
+        return new \app\controllers\NeedsController(
+            $container->get(PDO::class),
+            $container->get(Engine::class)
+        );
     }
 ]);
 $container = $containerBuilder->build();
@@ -170,6 +176,10 @@ Flight::map('getData', function ($key) {
 });
 
 /* #region web */
+$applicationHelper = $container->get('app\helpers\Application');
+$flight->route('/help',         function() use ($applicationHelper) { $applicationHelper->help(); });
+$flight->route('/legal/notice', function() use ($applicationHelper) { $applicationHelper->legalNotice(); });
+
 $articleController = $container->get('app\controllers\ArticleController');
 $flight->route('GET  /redactor',            function()    use ($articleController) { $articleController->home(); });
 $flight->route('GET  /articles',            function()    use ($articleController) { $articleController->index(); });
@@ -317,10 +327,8 @@ $flight->route('POST /alerts/save', function() use ($alertController) {$alertCon
 $ffaController = $container->get('app\controllers\FFAController');
 $flight->route('GET /ffa/search', function() use ($ffaController) {$ffaController->searchMember();});
 
-$applicationHelper = $container->get('app\helpers\Application');
-$flight->route('/help',         function() use ($applicationHelper) { $applicationHelper->help(); });
-$flight->route('/legal/notice', function() use ($applicationHelper) { $applicationHelper->legalNotice(); });
-
+$needsController = $container->get('app\controllers\NeedsController');
+$flight->route('GET /needs', function() use ($needsController) {$needsController->index();});
 /* #endregion */
 
 /* #region api */
@@ -355,6 +363,11 @@ $flight->route('POST /api/registration/remove/@personId/@groupId', function($per
 
 $flight->route('POST /api/surveys/reply',     function()    use ($apiController) { $apiController->saveSurveyReply(); });
 $flight->route('GET  /api/surveys/reply/@id', function($id) use ($apiController) { $apiController->showSurveyReplyForm($id); });
+
+$flight->route('POST   /api/needs/type/save',       function()    use ($apiController) { $apiController->saveNeedType(); });
+$flight->route('DELETE /api/needs/type/delete/@id', function($id) use ($apiController) { $apiController->deleteNeedType($id);});
+$flight->route('POST   /api/needs/save',            function()    use ($apiController) { $apiController->saveNeed(); });
+$flight->route('DELETE /api/needs/delete/@id',      function($id) use ($apiController) { $apiController->deleteNeed($id);});
 /* #endregion */
 
 $flight->route('/favicon.ico', function() {
@@ -378,5 +391,3 @@ $flight->after('start', function() use ($userController) { $userController->log(
 $flight->start();
 
 Debugger::$email = $personController->getWebmasterEmail();
-
-

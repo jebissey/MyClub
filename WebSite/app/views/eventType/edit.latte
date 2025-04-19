@@ -21,7 +21,7 @@
                     <div class="mb-3">
                         <label for="name" class="form-label">Nom</label>
                         <input type="text" class="form-control {if isset($error)}is-invalid{/if}"
-                            id="name" name="name" value="{$name}" required>
+                               id="name" name="name" value="{$name}" required>
                         <div class="invalid-feedback">Le nom est requis</div>
                     </div>
 
@@ -47,24 +47,17 @@
                             {foreach $attributes as $attribute}
                                 <div class="col-md-4 mb-2">
                                     <div class="form-check">
-                                        <input 
-                                            class="form-check-input" 
-                                            type="checkbox" 
-                                            name="attributes[]" 
-                                            id="attribute{$attribute['Id']}" 
-                                            value="{$attribute['Id']}"
-                                            {if in_array($attribute['Id'], $existingAttributes)}checked{/if}
-                                        >
-                                        <label 
-                                            class="form-check-label" 
-                                            for="attribute{$attribute['Id']}"
-                                            data-bs-toggle="tooltip" 
-                                            title="{$attribute['Detail']}"
-                                        >
-                                            <span 
-                                                class="d-inline-block me-2" 
-                                                style="width: 20px; height: 20px; background-color: {$attribute['Color']};"
-                                            ></span>
+                                        <input class="form-check-input" 
+                                               type="checkbox" 
+                                               name="attributes[]" 
+                                               id="attribute{$attribute['Id']}" 
+                                               value="{$attribute['Id']}"
+                                               {if in_array($attribute['Id'], $existingAttributes)}checked{/if}>
+                                        <label class="form-check-label" 
+                                               for="attribute{$attribute['Id']}"
+                                               data-bs-toggle="tooltip" 
+                                               title="{$attribute['Detail']}">
+                                            <span class="d-inline-block me-2" style="width: 20px; height: 20px; background-color: {$attribute['Color']};"></span>
                                             {$attribute['Name']}
                                         </label>
                                     </div>

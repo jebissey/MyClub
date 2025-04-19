@@ -431,9 +431,7 @@ class ApiController extends BaseController
     public function getItem($id)
     {
         if ($this->getPerson(['Webmaster'])) {
-            $item = $this->fluent->from('Page')
-                ->where('Id', $id)
-                ->fetch();
+            $item = $this->fluent->from('Page')->where('Id', $id)->fetch();
             header('Content-Type: application/json');
             echo json_encode($item);
         } else {
@@ -717,6 +715,164 @@ class ApiController extends BaseController
                     'message' => 'Erreur lors de la suppression en base de données',
                     'error' => $e->getMessage()
                 ]);
+            }
+        } else {
+            header('Content-Type: application/json', true, 403);
+            echo json_encode(['success' => false, 'message' => 'User not allowed']);
+        }
+        exit();
+    }
+    /* #endregion */
+
+    /* #region needs */
+    public function saveNeedType()
+    {
+        if ($this->getPerson(['Webmaster'])) {
+            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                $data = json_decode(file_get_contents('php://input'), true);
+                $id = $data['id'] ?? '';
+                $name = $data['name'] ?? '';
+                if (empty($name)) {
+                    header('Content-Type: application/json', true, 472);
+                    echo json_encode(['success' => false, 'message' => "Missing parameter name ='$name'"]);
+                } else {
+                    try {
+                        if ($id) {
+                            $this->fluent->update('NeedType')->set(['Name' => $name])->where('Id', $id)->execute();
+                        } else {
+                            $id = $this->fluent->insertInto('NeedType')->values(['Name' => $name])->execute();
+                        }
+                        header('Content-Type: application/json');
+                        echo json_encode(['success' => true, 'id' => $id]);
+                    } catch (\Exception $e) {
+                        $this->flight->json(['success' => 'false', 'message' => 'Erreur lors de l\'enregistrement: ' . $e->getMessage()]);
+                    }
+                }
+            } else {
+                header('Content-Type: application/json', true, 470);
+                echo json_encode(['success' => false, 'message' => 'Bad request method']);
+            }
+        } else {
+            header('Content-Type: application/json', true, 403);
+            echo json_encode(['success' => false, 'message' => 'User not allowed']);
+        }
+        exit();
+    }
+
+    public function deleteNeedType($id)
+    {
+        if ($this->getPerson(['Webmaster'])) {
+            if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
+                if (!$id) {
+                    header('Content-Type: application/json', true, 472);
+                    echo json_encode(['success' => false, 'message' => 'Missing Id parameter']);
+                } else {
+                    $countNeeds = $this->fluent->from('Need')->where('IdNeedType', $id)->count();
+
+                    if ($countNeeds > 0) {
+                        header('Content-Type: application/json', true, 409);
+                        echo json_encode([
+                            'success' => false,
+                            'message' => 'Ce type de besoin est associé à ' . $countNeeds . ' besoin(s) et ne peut pas être supprimé'
+                        ]);
+                    } else {
+                        try {
+                            $this->fluent->deleteFrom('NeedType')
+                                ->where('Id', $id)
+                                ->execute();
+
+                            header('Content-Type: application/json');
+                            echo json_encode(['success' => true]);
+                        } catch (\Exception $e) {
+                            header('Content-Type: application/json', true, 500);
+                            echo json_encode(['success' => false, 'message' => 'Erreur lors de la suppression: ' . $e->getMessage()]);
+                        }
+                    }
+                }
+            } else {
+                header('Content-Type: application/json', true, 470);
+                echo json_encode(['success' => false, 'message' => 'Bad request method']);
+            }
+        } else {
+            header('Content-Type: application/json', true, 403);
+            echo json_encode(['success' => false, 'message' => 'User not allowed']);
+        }
+        exit();
+    }
+
+    public function saveNeed()
+    {
+        if ($this->getPerson(['Webmaster'])) {
+            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                $data = json_decode(file_get_contents('php://input'), true);
+                $id = $data['id'] ?? false;
+                $name = $data['name'] ?? '';
+                $participantDependent = isset($data['participantDependent']) ? intval($data['participantDependent']) : 0;
+                $idNeedType = $data['idNeedType'] ?? null;
+
+                if (empty($name)) {
+                    header('Content-Type: application/json', true, 472);
+                    echo json_encode(['success' => false, 'message' => 'Missing parameter name']);
+                    exit();
+                }
+
+                if (!$idNeedType) {
+                    header('Content-Type: application/json', true, 472);
+                    echo json_encode(['success' => false, 'message' => 'Missing parameter idNeedType']);
+                    exit();
+                }
+
+                try {
+                    $needData = [
+                        'Name' => $name,
+                        'ParticipantDependent' => $participantDependent,
+                        'IdNeedType' => $idNeedType
+                    ];
+
+                    if ($id) {
+                        $this->fluent->update('Need')->set($needData)->where('Id', $id)->execute();
+                    } else {
+                        $id = $this->fluent->insertInto('Need')->values($needData)->execute();
+                    }
+
+                    header('Content-Type: application/json');
+                    echo json_encode(['success' => true, 'id' => $id]);
+                } catch (\Exception $e) {
+                    header('Content-Type: application/json', true, 500);
+                    echo json_encode(['success' => false, 'message' => 'Erreur lors de l\'enregistrement: ' . $e->getMessage()]);
+                }
+            } else {
+                header('Content-Type: application/json', true, 470);
+                echo json_encode(['success' => false, 'message' => 'Bad request method']);
+            }
+        } else {
+            header('Content-Type: application/json', true, 403);
+            echo json_encode(['success' => false, 'message' => 'User not allowed']);
+        }
+        exit();
+    }
+
+    public function deleteNeed($id)
+    {
+        if ($this->getPerson(['Webmaster'])) {
+            if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
+                if (!$id) {
+                    header('Content-Type: application/json', true, 472);
+                    echo json_encode(['success' => false, 'message' => 'Missing ID parameter']);
+                } else {
+                    try {
+                        $this->fluent->deleteFrom('Need')->where('Id', $id)->execute();
+
+                        header('Content-Type: application/json');
+                        echo json_encode(['success' => true]);
+                    } catch (\Exception $e) {
+                        header('Content-Type: application/json', true, 500);
+                        echo json_encode(['success' => false, 'message' => 'Erreur lors de la suppression: ' . $e->getMessage()]);
+                    }
+                }
+            } else {
+                header('Content-Type: application/json', true, 470);
+                echo json_encode(['success' => false, 'message' => 'Bad request method']);
             }
         } else {
             header('Content-Type: application/json', true, 403);
