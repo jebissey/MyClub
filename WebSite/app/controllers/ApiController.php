@@ -612,7 +612,10 @@ class ApiController extends BaseController
             echo json_encode([
                 'success' => true,
                 'event' => $this->fluent->from('Event')->where('Id', $id)->fetch(),
-                'attributes' => $this->fluent->from('EventAttribute')->where('IdEvent', $id)->fetchall(),
+                'attributes' => $this->fluent->from('EventAttribute')
+                                     ->join('Attribute ON EventAttribute.IdAttribute = Attribute.Id')
+                                     ->select('Attribute.Name AS Name, Attribute.Detail AS Detail, Attribute.Color AS Color')
+                                     ->where('IdEvent', $id)->fetchall(),
             ]);
         } else {
             header('Content-Type: application/json', true, 403);

@@ -205,6 +205,7 @@
         const modalTitle = document.getElementById('eventModalLabel');
         let selectedAttributes = [];
         const eventTypeInput = document.getElementById('eventTypeInput');
+        const attributesList = document.getElementById('attributesList');
         
         document.querySelectorAll('.edit-btn').forEach(button => {
             button.addEventListener('click', function(e) {
@@ -268,6 +269,8 @@
             const selectedEventTypeId = this.value;
             if (selectedEventTypeId) {
                 loadAttributesByEventType(selectedEventTypeId);
+                selectedAttributes = [];
+                attributesList.innerHTML = ''; 
             } else {
                 availableAttributesSelect.innerHTML = '<option value="">Sélectionnez d\'abord un type d\'événement</option>';
             }
@@ -335,12 +338,10 @@
             const durationHours = event.Duration / (60 * 60);
             document.getElementById('durationInput').value = durationHours.toFixed(1);
 
-            const attributesList = document.getElementById('attributesList');
             attributesList.innerHTML = '';
             selectedAttributes = [];
-
-            if (event.attributes) {
-                event.attributes.forEach(attr => {
+            if (attributes) {
+                attributes.forEach(attr => {
                     const attributeElement = createAttributeElement(attr.Id, attr.Name, attr.Color, attr.Detail);
                     attributesList.appendChild(attributeElement);
                     selectedAttributes.push({
