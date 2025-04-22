@@ -55,7 +55,7 @@
             {foreach $events as $event}
             <tr onclick="window.location.href='/events/{$event['id']}';" style="cursor: pointer;">
                 <td>
-                {if $event['createdBy'] == $person['Id']}
+                {if $event['createdBy'] ?? '' == $person['Id']}
                     <div class="ms-auto d-flex flex-column flex-sm-row gap-2">
                         <button class="btn btn-sm btn-primary edit-btn">
                             <i class="bi bi-pencil"></i>

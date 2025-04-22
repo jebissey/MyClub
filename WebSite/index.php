@@ -256,20 +256,12 @@ $flight->route('POST /persons/edit/@id',   function($id) use ($personController)
 $flight->route('GET  /persons/delete/@id', function($id) use ($personController) { $personController->delete($id); });
 
 $eventController = $container->get('app\controllers\EventController');
+$flight->route('GET  /eventManager/help',       function()    use ($eventController) { $eventController->help(); });
 $flight->route('GET  /nextEvents',              function()    use ($eventController) { $eventController->nextEvents(); });
 $flight->route('GET  /events/@id',              function($id) use ($eventController) { $eventController->show($id); });
 $flight->route('GET  /event/location',          function()    use ($eventController) { $eventController->location(); });
 $flight->route('GET  /events/@id/register',     function($id) use ($eventController) { $eventController->register($id, true); });
 $flight->route('GET  /events/@id/unregister',   function($id) use ($eventController) { $eventController->register($id, false); });
-
-$flight->route('GET  /eventManager',            function()    use ($eventController) { $eventController->home(); });
-$flight->route('GET  /eventManager/help',       function()    use ($eventController) { $eventController->help(); });
-$flight->route('GET  /events',                  function()    use ($eventController) { $eventController->index(); });
-$flight->route('GET  /api/event/count',         function()    use ($eventController) { $eventController->getEventCount(); });
-$flight->route('GET  /event/detail',            function()    use ($eventController) { $eventController->getEventDetail(); });
-$flight->route('GET  /api/events/week',         function()    use ($eventController) { $eventController->getEventsForWeek(); });
-$flight->route('GET  /api/check-event-manager', function()    use ($eventController) { $eventController->checkEventManager(); });
-$flight->route('POST /api/event/update',        function()    use ($eventController) { $eventController->update(); });
 
 $importController = $container->get('app\controllers\ImportController');
 $flight->route('GET  /import',         function() use ($importController) { $importController->showImportForm(); });

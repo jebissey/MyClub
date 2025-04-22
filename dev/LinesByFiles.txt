@@ -1,6 +1,6 @@
 === Détail par fichier ===
      1 ../WebSite/phpinfo.php
-   393 ../WebSite/index.php
+   385 ../WebSite/index.php
     65 ../WebSite/app/views/dbbrowser/edit.latte
     43 ../WebSite/app/views/dbbrowser/index.latte
    135 ../WebSite/app/views/dbbrowser/table.latte
@@ -31,10 +31,8 @@
     80 ../WebSite/app/views/registration/index.latte
    318 ../WebSite/app/views/event/location.latte
    193 ../WebSite/app/views/event/detail.latte
-    44 ../WebSite/app/views/event/list.latte
-   326 ../WebSite/app/views/event/needs.latte
-   354 ../WebSite/app/views/event/manager.latte
-   464 ../WebSite/app/views/event/nextEvents.latte
+   325 ../WebSite/app/views/event/needs.latte
+   465 ../WebSite/app/views/event/nextEvents.latte
     60 ../WebSite/app/views/logs/referer.latte
    153 ../WebSite/app/views/logs/crossTab.latte
     80 ../WebSite/app/views/logs/topPages.latte
@@ -82,12 +80,12 @@
     39 ../WebSite/app/controllers/FFAController.php
    133 ../WebSite/app/controllers/EventTypeController.php
    161 ../WebSite/app/controllers/MediaController.php
-   359 ../WebSite/app/controllers/EventController.php
+   137 ../WebSite/app/controllers/EventController.php
    152 ../WebSite/app/controllers/ImportController.php
    170 ../WebSite/app/controllers/PersonController.php
    739 ../WebSite/app/controllers/LogController.php
    139 ../WebSite/app/controllers/RegistrationController.php
-   884 ../WebSite/app/controllers/ApiController.php
+   887 ../WebSite/app/controllers/ApiController.php
    368 ../WebSite/app/controllers/ArticleController.php
     44 ../WebSite/app/controllers/TableController.php
     89 ../WebSite/app/controllers/AlertController.php
@@ -114,10 +112,10 @@
     25 ../WebSite/app/helpers/Article.php
     14 ../WebSite/app/helpers/Params.php
    124 ../WebSite/app/helpers/Event.php
- 14913 total
+ 14288 total
 
 === Total par type de fichier ===
 Fichiers PHP :
-7090
+6863
 Fichiers Latte :
-7823
+7425
