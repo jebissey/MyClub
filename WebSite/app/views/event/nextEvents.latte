@@ -55,7 +55,7 @@
             {foreach $events as $event}
             <tr onclick="window.location.href='/events/{$event['id']}';" style="cursor: pointer;">
                 <td>
-                {if $event['createdBy'] ?? '' == $person['Id']}
+                {if $event['createdBy'] == ($person['Id'] ?? false)}
                     <div class="ms-auto d-flex flex-column flex-sm-row gap-2">
                         <button class="btn btn-sm btn-primary edit-btn">
                             <i class="bi bi-pencil"></i>
@@ -170,6 +170,21 @@
                             </div>
                         </div>
 
+                        <div class="mb-3">
+                            <label class="form-label">Besoins</label>
+                            <div id="needsList" class="mb-2">
+                                <!-- Dynamically populated needs list will go here -->
+                            </div>
+                            <div class="input-group">
+                                <select id="availableNeedsSelect" class="form-control">
+                                    <option value="">Sélectionnez d'abord un type de besoin</option>
+                                </select>
+                                <button type="button" id="addNeedBtn" class="btn btn-secondary">
+                                    <i class="bi bi-plus-lg"></i> Ajouter
+                                </button>
+                            </div>
+                        </div>
+
                         <div class="mb-3 d-flex align-items-center">
                             <label for="maxParticipantsInput" class="me-2 mb-0">Nombre max de participants</label>
                             <input type="number" class="form-control form-control-sm" id="maxParticipantsInput" name="maxParticipants" min="0" value="0" style="width: 70px;">
@@ -203,9 +218,14 @@
         const formMode = document.getElementById('formMode');
         const eventId = document.getElementById('eventId');
         const modalTitle = document.getElementById('eventModalLabel');
+
         let selectedAttributes = [];
         const eventTypeInput = document.getElementById('eventTypeInput');
         const attributesList = document.getElementById('attributesList');
+
+        let selectedNeeds = [];
+        const needsList = document.getElementById('needsList');
+        const availableNeedsSelect = document.getElementById('availableNeedsSelect');
         
         document.querySelectorAll('.edit-btn').forEach(button => {
             button.addEventListener('click', function(e) {
@@ -276,6 +296,17 @@
             }
         });
 
+        eventTypeInput.addEventListener('change', function() {
+            const selectedEventTypeId = this.value;
+            if (selectedEventTypeId) {               
+                loadNeedsByEventType(selectedEventTypeId);
+                selectedNeeds = [];
+                needsList.innerHTML = '';
+            } else {
+                availableAttributesSelect.innerHTML = '<option value="">Sélectionnez d\'abord un type de besoin</option>';
+            }
+        });
+
         const availableAttributesSelect = document.getElementById('availableAttributesSelect');
         function loadAttributesByEventType(eventTypeId) {
             availableAttributesSelect.innerHTML = '<option value="">Chargement...</option>';
@@ -309,11 +340,17 @@
             submitButton.textContent = 'Créer';
             formMode.value = 'create';
             eventForm.reset();
+            
             selectedAttributes = [];
             document.getElementById('attributesList').innerHTML = '';
             availableAttributesSelect.innerHTML = '<option value="">Sélectionnez d\'abord un type d\'événement</option>';
+            
+            selectedNeeds = [];
+            document.getElementById('needsList').innerHTML = '';
+            
             document.getElementById('maxParticipantsInput').value = 0;
             document.getElementById('audienceInput').value = 'ClubMembersOnly';
+
             new bootstrap.Modal(eventModal).show();
         }
 
@@ -352,6 +389,28 @@
                     });
                 });
             }
+
+            fetch(`/api/event-needs/${event.Id}`)
+                .then(response => response.json())
+                .then(data => {
+                if (data.success && data.needs) {
+                    needsList.innerHTML = '';
+                    selectedNeeds = [];
+                    data.needs.forEach(need => {
+                        const needElement = createNeedElement(need.IdNeed, need.Name, need.Quantity, need.Counter);
+                        needsList.appendChild(needElement);
+                        selectedNeeds.push({
+                            id: need.IdNeed,
+                            name: need.Name,
+                            quantity: need.ParticipantDependent,
+                            counter: need.Counter
+                        });
+                    });
+                }
+            })
+            .catch(error => {
+                alert('Erreur:' + error.message);
+            });
 
             new bootstrap.Modal(eventModal).show();
         }
@@ -407,6 +466,104 @@
                 detail: attributeDetail
             });
         });
+
+        function loadNeedsByEventType(eventTypeId) {
+            availableNeedsSelect.innerHTML = '<option value="">Chargement...</option>';
+            fetch(`/api/needs-by-event-type/${eventTypeId}`)
+                .then(response => response.json())
+                .then(data => {
+                availableNeedsSelect.innerHTML = '';
+                if (data.needs && data.needs.length > 0) {
+                    data.needs.forEach(need => {
+                    const option = document.createElement('option');
+                    option.value = need.Id;
+                    option.textContent = `${need.Name} (${need.TypeName})`;
+                    option.dataset.quantity = need.ParticipantDependent;
+                    availableNeedsSelect.appendChild(option);
+                    });
+                } else {
+                    const option = document.createElement('option');
+                    option.value = "";
+                    option.textContent = "Aucun besoin disponible";
+                    availableNeedsSelect.appendChild(option);
+                }
+            })
+            .catch(error => {
+            availableNeedsSelect.innerHTML = '<option value="">Erreur de chargement</option>';
+            });
+        }
+
+        function createNeedElement(needId, needName, needQuantity, counter = 0) {
+            const needElement = document.createElement('div');
+            needElement.className = 'border rounded p-2 mb-2';
+            needElement.innerHTML = `
+                <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <strong>${needName}</strong>
+                    <div class="input-group input-group-sm mt-1" style="max-width: 150px;">
+                    <span class="input-group-text">Quantité:</span>
+                    <input type="number" class="form-control need-counter" value="${counter}" min="1" max="${needQuantity}" 
+                            data-need-id="${needId}" data-max="${needQuantity}">
+                    <span class="input-group-text">/ ${needQuantity}</span>
+                    </div>
+                </div>
+                <button type="button" class="btn btn-sm btn-outline-danger remove-need" data-need-id="${needId}">
+                    <i class="bi bi-x"></i>
+                </button>
+                </div>
+            `;
+
+            const removeBtn = needElement.querySelector('.remove-need');
+            removeBtn.addEventListener('click', function() {
+                const idToRemove = this.dataset.needId;
+                selectedNeeds = selectedNeeds.filter(need => need.id !== idToRemove);
+                needElement.remove();
+            });
+
+            const counterInput = needElement.querySelector('.need-counter');
+            counterInput.addEventListener('change', function() {
+                const idToUpdate = this.dataset.needId;
+                const maxValue = parseInt(this.dataset.max);
+                const value = parseInt(this.value);
+                
+                if (value > maxValue) {
+                this.value = maxValue;
+                } else if (value < 1) {
+                this.value = 1;
+                }
+                
+                const needIndex = selectedNeeds.findIndex(need => need.id === idToUpdate);
+                if (needIndex !== -1) {
+                selectedNeeds[needIndex].counter = parseInt(this.value);
+                }
+            });
+
+            return needElement;
+        }
+
+        document.getElementById('addNeedBtn').addEventListener('click', function() {
+            const select = document.getElementById('availableNeedsSelect');
+            const selectedOption = select.options[select.selectedIndex];
+            if (!selectedOption || !selectedOption.value) return;
+
+            const needId = selectedOption.value;
+            const needName = selectedOption.text;
+            const needQuantity = selectedOption.dataset.quantity;
+
+            if (selectedNeeds.some(need => need.id === needId)) {
+                alert('Ce besoin a déjà été ajouté.');
+                return;
+            }
+
+            const needElement = createNeedElement(needId, needName, needQuantity, 1);
+            document.getElementById('needsList').appendChild(needElement);
+            selectedNeeds.push({
+                id: needId,
+                name: needName,
+                quantity: needQuantity,
+                counter: 1
+            });
+        });
         
         eventForm.addEventListener('submit', function(e) {
             e.preventDefault();
@@ -420,7 +577,11 @@
                 idEventType: document.getElementById('eventTypeInput').value,
                 attributes: selectedAttributes.map(attr => attr.id),
                 maxParticipants: parseInt(document.getElementById('maxParticipantsInput').value),
-                audience: document.getElementById('audienceInput').value
+                audience: document.getElementById('audienceInput').value,
+                needs: selectedNeeds.map(need => ({
+                    id: need.id,
+                    counter: need.counter
+                }))
             };
             
             const dateValue = document.getElementById('dateInput').value;

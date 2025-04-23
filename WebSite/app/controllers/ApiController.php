@@ -692,7 +692,6 @@ class ApiController extends BaseController
     public function deleteEvent($id): void
     {
         if ($person = $this->getPerson(['EventManager'])) {
-
             if (!$this->fluent->from('Event')->where('Id', $id)->where('CreatedBy', $person['Id'])->fetch()) {
                 header('Content-Type: application/json', true, 403);
                 echo json_encode(['success' => false, 'message' => 'Not allowed user']);
@@ -723,6 +722,37 @@ class ApiController extends BaseController
             header('Content-Type: application/json', true, 403);
             echo json_encode(['success' => false, 'message' => 'User not allowed']);
         }
+        exit();
+    }
+
+    public function getNeedsByEventType($eventTypeId)
+    {
+        $needs = $this->fluent->from('Need')
+            ->select('Need.*, NeedType.Name as TypeName')
+            ->join('NeedType ON Need.IdNeedType = NeedType.Id')
+            ->where('Need.IdNeedType', $eventTypeId)
+            ->fetchAll();
+        
+            header('Content-Type: application/json');
+            echo json_encode([
+                'success' => true,
+                'needs' => $needs]);
+        exit();
+    }
+    
+    public function getEventNeeds($eventId)
+    {
+        $needs = $this->fluent->from('EventNeed')
+            ->select('EventNeed.*, Need.Name, Need.ParticipantDependent, NeedType.Name as TypeName')
+            ->join('Need ON EventNeed.IdNeed = Need.Id')
+            ->join('NeedType ON Need.IdNeedType = NeedType.Id')
+            ->where('EventNeed.IdEvent', $eventId)
+            ->fetchAll();
+        
+            header('Content-Type: application/json');
+            echo json_encode([
+                'success' => true,
+                'needs' => $needs]);
         exit();
     }
     /* #endregion */
@@ -809,16 +839,21 @@ class ApiController extends BaseController
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $data = json_decode(file_get_contents('php://input'), true);
                 $id = $data['id'] ?? false;
+                $label = $data['label'] ?? '';
                 $name = $data['name'] ?? '';
                 $participantDependent = isset($data['participantDependent']) ? intval($data['participantDependent']) : 0;
                 $idNeedType = $data['idNeedType'] ?? null;
 
+                if (empty($label)) {
+                    header('Content-Type: application/json', true, 472);
+                    echo json_encode(['success' => false, 'message' => 'Missing parameter label']);
+                    exit();
+                }
                 if (empty($name)) {
                     header('Content-Type: application/json', true, 472);
                     echo json_encode(['success' => false, 'message' => 'Missing parameter name']);
                     exit();
                 }
-
                 if (!$idNeedType) {
                     header('Content-Type: application/json', true, 472);
                     echo json_encode(['success' => false, 'message' => 'Missing parameter idNeedType']);
@@ -827,6 +862,7 @@ class ApiController extends BaseController
 
                 try {
                     $needData = [
+                        'Label' => $label,
                         'Name' => $name,
                         'ParticipantDependent' => $participantDependent,
                         'IdNeedType' => $idNeedType

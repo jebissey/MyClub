@@ -162,9 +162,11 @@ CREATE TABLE IF NOT EXISTS "Metadata" (
 );
 CREATE TABLE IF NOT EXISTS "Need" (
 	"Id"	INTEGER,
+	"Label"	TEXT NOT NULL,
 	"Name"	TEXT NOT NULL,
-	"PaticipantDependent"	INTEGER NOT NULL DEFAULT 0,
+	"ParticipantDependent"	INTEGER NOT NULL DEFAULT 0,
 	"IdNeedType"	INTEGER NOT NULL,
+	PRIMARY KEY("Id"),
 	FOREIGN KEY("IdNeedType") REFERENCES "NeedType"("Id")
 );
 CREATE TABLE IF NOT EXISTS "NeedType" (

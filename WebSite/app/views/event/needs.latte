@@ -33,13 +33,11 @@
                                 <td>{$type['Name']}</td>
                                 <td>
                                     <button type="button" class="btn btn-sm btn-primary edit-need-type" 
-                                        data-id="{$type['Id']}" 
-                                        data-name="{$type['Name']}">
+                                            data-id="{$type['Id']}" 
+                                            data-name="{$type['Name']}">
                                         <i class="bi bi-pencil"></i>
                                     </button>
-                                    <button type="button" class="btn btn-sm btn-danger delete-need-type" 
-                                        data-id="{$type['Id']}" 
-                                        data-name="{$type['Name']}">
+                                    <button type="button" class="btn btn-sm btn-danger delete-need-type">
                                         <i class="bi bi-trash"></i>
                                     </button>
                                 </td>
@@ -63,6 +61,7 @@
                     <table class="table table-striped">
                         <thead>
                             <tr>
+                                <th>Label</th>
                                 <th>Nom</th>
                                 <th>Type</th>
                                 <th>En fonction des participants</th>
@@ -72,21 +71,21 @@
                         <tbody>
                             {foreach $needs as $need}
                             <tr>
+                                <td><h5>{$need['Label']}</h5></td>
                                 <td>{$need['Name']}</td>
                                 <td>{$need['TypeName']}</td>
                                 <td>{if $need['ParticipantDependent'] == 1}Oui{else}Non{/if}</td>
                                 <td>
                                     <button type="button" class="btn btn-sm btn-primary edit-need" 
-                                        data-id="{$need['Id']}" 
-                                        data-name="{$need['Name']}" 
-                                        data-participantDependent="{$need['ParticipantDependent']}" 
-                                        data-type="{$need['IdNeedType']}">
-                                    <i class="bi bi-pencil"></i>
+                                            data-id="{$need['Id']}"
+                                            data-label="{$need['Label']}" 
+                                            data-name="{$need['Name']}" 
+                                            data-participant-dependent="{$need['ParticipantDependent']}" 
+                                            data-type="{$need['IdNeedType']}">
+                                        <i class="bi bi-pencil"></i>
                                     </button>
-                                    <button type="button" class="btn btn-sm btn-danger delete-need" 
-                                        data-id="{$need['Id']}" 
-                                        data-name="{$need['Name']}">
-                                    <i class="bi bi-trash"></i>
+                                    <button type="button" class="btn btn-sm btn-danger delete-need" data-id="{$need['Id']}" data-name="{$need['Name']}">
+                                        <i class="bi bi-trash"></i>
                                     </button>
                                 </td>
                             </tr>
@@ -134,10 +133,6 @@
                 <form id="needForm">
                     <input type="hidden" id="needId" name="id">
                     <div class="mb-3">
-                        <label for="needName" class="form-label">Nom</label>
-                        <input type="text" class="form-control" id="needName" name="name" required>
-                    </div>
-                    <div class="mb-3">
                         <label for="needType" class="form-label">Type</label>
                         <select class="form-select" id="needType" name="idNeedType" required>
                             <option value="">Sélectionnez un type</option>
@@ -147,8 +142,16 @@
                         </select>
                     </div>
                     <div class="mb-3">
+                        <label for="needLabel" class="form-label">Label</label>
+                        <input type="text" class="form-control" id="needLabel" name="label" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="needName" class="form-label">Nom</label>
+                        <input type="text" class="form-control" id="needName" name="name" required>
+                    </div>
+                    <div class="mb-3">
                         <label for="needParticipantDependent" class="form-label">En fonction du nombre de participants</label>
-                        <input class="form-check-input" type="checkbox" id="participantDependent" name="participantDependent" value="1">
+                        <input class="form-check-input" type="checkbox" id="needParticipantDependent" name="participantDependent" value="1">
                     </div>
                 </form>
             </div>
@@ -215,8 +218,9 @@ document.addEventListener('DOMContentLoaded', function() {
         button.addEventListener('click', function() {
             document.getElementById('needModalTitle').textContent = 'Modifier un besoin';
             document.getElementById('needId').value = this.dataset.id;
+            document.getElementById('needLabel').value = this.dataset.label;
             document.getElementById('needName').value = this.dataset.name;
-            document.getElementById('needParticipantDependent').value = this.dataset.participantDependent;
+            document.getElementById('needParticipantDependent').checked = this.dataset.participantDependent;
             document.getElementById('needType').value = this.dataset.type;
             needModal.show();
         });
@@ -252,6 +256,7 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('saveNeed').addEventListener('click', function() {
         const data = {
             id: document.getElementById('needId').value,
+            label: document.getElementById('needLabel').value,
             name: document.getElementById('needName').value,
             idNeedType: document.getElementById('needType').value,
             participantDependent: document.getElementById('participantDependent').checked ? 1 : 0

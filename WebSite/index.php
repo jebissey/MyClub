@@ -243,8 +243,8 @@ $flight->route('POST /groups/edit/@id',   function($id) use ($groupController) {
 $flight->route('POST /groups/delete/@id', function($id) use ($groupController) { $groupController->delete($id); });
 
 $registrationController = $container->get('app\controllers\RegistrationController');
-$flight->route('GET  /registration',                               function()                    use ($registrationController) { $registrationController->index(); });
-$flight->route('GET  /registration/groups/@id',                    function($id)                 use ($registrationController) { $registrationController->getPersonGroups($id); });
+$flight->route('GET  /registration',            function()    use ($registrationController) { $registrationController->index(); });
+$flight->route('GET  /registration/groups/@id', function($id) use ($registrationController) { $registrationController->getPersonGroups($id); });
 
 $personController = $container->get('app\controllers\PersonController');
 $flight->route('GET  /personManager',      function()    use ($personController) { $personController->home(); });
@@ -256,12 +256,12 @@ $flight->route('POST /persons/edit/@id',   function($id) use ($personController)
 $flight->route('GET  /persons/delete/@id', function($id) use ($personController) { $personController->delete($id); });
 
 $eventController = $container->get('app\controllers\EventController');
-$flight->route('GET  /eventManager/help',       function()    use ($eventController) { $eventController->help(); });
-$flight->route('GET  /nextEvents',              function()    use ($eventController) { $eventController->nextEvents(); });
-$flight->route('GET  /events/@id',              function($id) use ($eventController) { $eventController->show($id); });
-$flight->route('GET  /event/location',          function()    use ($eventController) { $eventController->location(); });
-$flight->route('GET  /events/@id/register',     function($id) use ($eventController) { $eventController->register($id, true); });
-$flight->route('GET  /events/@id/unregister',   function($id) use ($eventController) { $eventController->register($id, false); });
+$flight->route('GET /eventManager/help',     function()    use ($eventController) { $eventController->help(); });
+$flight->route('GET /nextEvents',            function()    use ($eventController) { $eventController->nextEvents(); });
+$flight->route('GET /events/@id',            function($id) use ($eventController) { $eventController->show($id); });
+$flight->route('GET /event/location',        function()    use ($eventController) { $eventController->location(); });
+$flight->route('GET /events/@id/register',   function($id) use ($eventController) { $eventController->register($id, true); });
+$flight->route('GET /events/@id/unregister', function($id) use ($eventController) { $eventController->register($id, false); });
 
 $importController = $container->get('app\controllers\ImportController');
 $flight->route('GET  /import',         function() use ($importController) { $importController->showImportForm(); });
@@ -285,17 +285,17 @@ $flight->route('POST /dbbrowser/@table/edit/@id',   function($table, $id) use ($
 $flight->route('POST /dbbrowser/@table/delete/@id', function($table, $id) use ($dbBrowserController) { $dbBrowserController->deleteRecord($table, $id); });
 
 $navBarController = $container->get('app\controllers\NavBarController');
-$flight->route('GET  /navBar',                       function()    use ($navBarController) { $navBarController->index(); });
-$flight->route('POST /navBar/update',                function()    use ($navBarController) { $navBarController->updatePositions(); });
-$flight->route('GET  /navBar/show/article/@id',      function($id) use ($navBarController) { $navBarController->showArticle($id); });
-$flight->route('GET  /navBar/show/arwards',          function()    use ($navBarController) { $navBarController->showArwards(); });
-$flight->route('GET  /navBar/show/events',           function()    use ($navBarController) { $navBarController->showEvents(); });
+$flight->route('GET  /navBar',                  function()    use ($navBarController) { $navBarController->index(); });
+$flight->route('POST /navBar/update',           function()    use ($navBarController) { $navBarController->updatePositions(); });
+$flight->route('GET  /navBar/show/article/@id', function($id) use ($navBarController) { $navBarController->showArticle($id); });
+$flight->route('GET  /navBar/show/arwards',     function()    use ($navBarController) { $navBarController->showArwards(); });
+$flight->route('GET  /navBar/show/events',      function()    use ($navBarController) { $navBarController->showEvents(); });
 
 $mediaController = $container->get('app\controllers\MediaController');
-$flight->route('GET /data/media/@year/@month/@filename',       function($year, $month, $filename) use ($mediaController) { $mediaController->viewFile($year,$month,$filename); });
-$flight->route('GET /media/upload',                            function()                         use ($mediaController) { $mediaController->showUploadForm(); });
-$flight->route('GET /media/list',                              function()                         use ($mediaController) { $mediaController->listFiles(); });
-$flight->route('GET /media/gpxViewer',                         function()                         use ($mediaController) { $mediaController->gpxViewer(); });
+$flight->route('GET /data/media/@year/@month/@filename', function($year, $month, $filename) use ($mediaController) { $mediaController->viewFile($year,$month,$filename); });
+$flight->route('GET /media/upload',                      function()                         use ($mediaController) { $mediaController->showUploadForm(); });
+$flight->route('GET /media/list',                        function()                         use ($mediaController) { $mediaController->listFiles(); });
+$flight->route('GET /media/gpxViewer',                   function()                         use ($mediaController) { $mediaController->gpxViewer(); });
 
 $eventTypeController = $container->get('app\controllers\EventTypeController');
 $flight->route('GET  /eventTypes',                function()    use ($eventTypeController) { $eventTypeController->index(); });
@@ -360,6 +360,9 @@ $flight->route('POST   /api/needs/type/save',       function()    use ($apiContr
 $flight->route('DELETE /api/needs/type/delete/@id', function($id) use ($apiController) { $apiController->deleteNeedType($id);});
 $flight->route('POST   /api/needs/save',            function()    use ($apiController) { $apiController->saveNeed(); });
 $flight->route('DELETE /api/needs/delete/@id',      function($id) use ($apiController) { $apiController->deleteNeed($id);});
+
+$flight->route('GET /api/needs-by-event-type/@id', function($id) use ($apiController) { $apiController->getNeedsByEventType($id); });
+$flight->route('GET /api/event-needs/@id',         function($id) use ($apiController) { $apiController->getEventNeeds($id); });
 /* #endregion */
 
 $flight->route('/favicon.ico', function() {

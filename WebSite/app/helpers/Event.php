@@ -113,12 +113,4 @@ class Event
             ];
         }, $events);
     }
-
-    public function isOwner($personId, $eventId)
-    {
-        return $this->fluent->from('Event e')
-            ->where('e.Id = ?', $eventId)
-            ->where('e.CreatedBy = ?', $personId)
-            ->fetch() !== false;
-    }
 }
