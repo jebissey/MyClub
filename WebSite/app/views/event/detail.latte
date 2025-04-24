@@ -3,17 +3,17 @@
 {block title}{='summary'|translate}{/block}
 
 {block head}
-<style>
-    .attribute-badge {
-        display: inline-block;
-        width: 20px;
-        height: 20px;
-        margin-right: 5px;
-        border-radius: 4px;
-        cursor: help;
-        border: 1px solid rgba(0,0,0,0.2);
-    }
-</style>
+    <style>
+        .attribute-badge {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            margin-right: 5px;
+            border-radius: 4px;
+            cursor: help;
+            border: 1px solid rgba(0,0,0,0.2);
+        }
+    </style>
 {/block}
 
 {block navbar}
@@ -21,173 +21,92 @@
 {/block}
 
 {block content}
-<div class="card">
-    <div class="card-header"><strong>{$event['Summary']}</strong></div>
-    <div class="card-body">
-        <div class="row">
-            <div class="col-md-6">
-                <p><strong>{='type'|translate}</strong> {$event['EventTypeName']}</p>
-                {if count($attributes) > 0}
-                <p><strong>{='attributes'|translate}</strong>
-                    {foreach $attributes as $attribute}
-                    <span 
-                        class="attribute-badge" 
-                        style="background-color: {$attribute['Color']|noescape};"
-                        title="{$attribute['Name']} - {$attribute['Detail']}">
-                    </span>
-                    {/foreach}
-                </p>
-                {else}
-                    <p>{='noAttributes'|translate}</p>
-                {/if}
-                <p><strong>{='date_time'|translate}</strong> {=$event['StartTime']|longDateTime}</p>
-                <p><strong>{='duration'|translate}</strong> {=$event['Duration']|readableDuration}</p>
-                <p>
-                    <strong>{='location'|translate}</strong> {$event['Location']} 
-                    <a href="/event/location?address={$event['Location']}" target="_blank" class="btn btn-sm btn-primary me-2" title="Voir sur carte">
-                        <i class="bi bi-map"></i>
-                    </a>
-                </p>
-                <div class="card mb-3">
-                    <div class="card-header"><strong>{='description'|translate}</strong></div>
-                    <div class="card-body">            
-                        <p>{$event['Description']}</p>
+    <div class="card">
+        <div class="card-header"><strong>{$event['Summary']}</strong></div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>{='type'|translate}</strong> {$event['EventTypeName']}</p>
+                    {if count($attributes) > 0}
+                    <p><strong>{='attributes'|translate}</strong>
+                        {foreach $attributes as $attribute}
+                        <span 
+                            class="attribute-badge" 
+                            style="background-color: {$attribute['Color']|noescape};"
+                            title="{$attribute['Name']} - {$attribute['Detail']}">
+                        </span>
+                        {/foreach}
+                    </p>
+                    {else}
+                        <p>{='noAttributes'|translate}</p>
+                    {/if}
+                    <p><strong>{='date_time'|translate}</strong> {=$event['StartTime']|longDateTime}</p>
+                    <p><strong>{='duration'|translate}</strong> {=$event['Duration']|readableDuration}</p>
+                    <p>
+                        <strong>{='location'|translate}</strong> {$event['Location']} 
+                        <a href="/event/location?address={$event['Location']}" target="_blank" class="btn btn-sm btn-primary me-2" title="Voir sur carte">
+                            <i class="bi bi-map"></i>
+                        </a>
+                    </p>
+                    <div class="card mb-3">
+                        <div class="card-header"><strong>{='description'|translate}</strong></div>
+                        <div class="card-body">            
+                            <p>{$event['Description']}</p>
+                        </div>
                     </div>
                 </div>
-            </div>
-            
-            <div class="col-md-6">
-                {if $isRegistered}
-                <div class="card mb-3">
-                    <div class="card-header">
-                        <strong>Participants:</strong> 
-                        {count($participants)}{if $event['MaxParticipants'] > 0} / {$event['MaxParticipants']}{/if}
+                
+                <div class="col-md-6">
+                    {if $isRegistered}
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <strong>Participants:</strong> 
+                            {count($participants)}{if $event['MaxParticipants'] > 0} / {$event['MaxParticipants']}{/if}
+                        </div>
+                        <div class="card-body">
+                            {if count($participants) > 0}
+                                <ul class="list-group">
+                                    {foreach $participants as $participant}
+                                        <li class="list-group-item">
+                                            {$participant['FirstName']} {$participant['LastName']} {if $participant['NickName'] != ''}({$participant['NickName']}){/if}
+                                            {if $participant['Email'] === $userEmail}👤{/if}
+                                        </li>
+                                    {/foreach}
+                                </ul>
+                            {else}
+                                <p>{='noParticipant'|translate}</p>
+                            {/if}
+                        </div>
                     </div>
-                    <div class="card-body">
-                        {if count($participants) > 0}
-                            <ul class="list-group">
-                                {foreach $participants as $participant}
-                                    <li class="list-group-item">
-                                        {$participant['FirstName']} {$participant['LastName']} {if $participant['NickName'] != ''}({$participant['NickName']}){/if}
-                                        {if $participant['Email'] === $userEmail}👤{/if}
-                                    </li>
-                                {/foreach}
-                            </ul>
+
+                    <div class="mb-3">
+                        <button onclick="window.open(createGoogleCalendarUrl({$event|noescape|json}), '_blank')" class="btn btn-success">
+                            <i class="bi bi-calendar-event me-2"></i>Google
+                        </button>
+                        <button onclick="window.open(createOutlookCalendarUrl({$event|noescape|json}), '_blank')" class="btn btn-info">
+                            <i class="bi bi-calendar-event me-2"></i>Outlook
+                        </button>
+                        <button onclick="downloadICalFile({$event|noescape|json})" class="btn btn-light">
+                            <i class="bi bi-calendar-event me-2"></i>iCal (.ics)
+                        </button>
+                    </div>
+                    {/if}
+                    
+                    <div class="mt-3">
+                        {if $isRegistered}
+                        <a href="/events/{$eventId}/unregister" class="btn btn-primary">{='unregister'|translate}</a>
+                        {elseif count($participants) < $event['MaxParticipants'] || $event['MaxParticipants'] == 0}
+                        <a href="/events/{$eventId}/register" class="btn btn-primary">{='register'|translate}</a>
                         {else}
-                            <p>{='noParticipant'|translate}</p>
+                        <button class="btn btn-secondary" disabled>{='fullyBooked'|translate}</button>
                         {/if}
                     </div>
-                </div>
-
-                <div class="mb-3">
-                    <button onclick="window.open(createGoogleCalendarUrl({$event|noescape|json}), '_blank')" class="btn btn-success">
-                        <i class="bi bi-calendar-event me-2"></i>Google
-                    </button>
-                    <button onclick="window.open(createOutlookCalendarUrl({$event|noescape|json}), '_blank')" class="btn btn-info">
-                        <i class="bi bi-calendar-event me-2"></i>Outlook
-                    </button>
-                    <button onclick="downloadICalFile({$event|noescape|json})" class="btn btn-light">
-                        <i class="bi bi-calendar-event me-2"></i>iCal (.ics)
-                    </button>
-                </div>
-                {/if}
-                
-                <div class="mt-3">
-                    {if $isRegistered}
-                    <a href="/events/{$eventId}/unregister" class="btn btn-primary">{='unregister'|translate}</a>
-                    {elseif count($participants) < $event['MaxParticipants'] || $event['MaxParticipants'] == 0}
-                    <a href="/events/{$eventId}/register" class="btn btn-primary">{='register'|translate}</a>
-                    {else}
-                    <button class="btn btn-secondary" disabled>{='fullyBooked'|translate}</button>
-                    {/if}
                 </div>
             </div>
         </div>
     </div>
-</div>
 {/block}
 
 {block scripts}
-<script>
-    function createGoogleCalendarUrl(event) {
-
-        function formatDateForGoogle(startTime, endTime) {
-            function formatDate(date) {
-                return date.toISOString().replace(/-|:|\.\d+/g, '');
-            }
-            return formatDate(startTime) + '/' + formatDate(endTime);
-        }
-
-        var base = 'https://calendar.google.com/calendar/render';
-        var text = 'text=' + encodeURIComponent(event.Summary);
-        var startTime = new Date(event.StartTime);
-        var endTime = new Date(startTime.getTime() + event.Duration * 1000);
-        var dates = 'dates=' + encodeURIComponent(formatDateForGoogle(startTime, endTime));
-        var details = 'details=' + encodeURIComponent(event.Description) + '&link=' + encodeURIComponent(window.location.href);
-        var location = 'location=' + encodeURIComponent(event.Location);
-        
-        return base + '?' + 'action=TEMPLATE' + '&' + text + '&' + dates + '&' + details + '&' + location;
-    }
-
-    function createOutlookCalendarUrl(event) {
-        var base = 'https://outlook.office.com/calendar/action/compose';
-        var subject = 'subject=' + encodeURIComponent(event.Summary);
-        var startdt = 'startdt=' + encodeURIComponent(new Date(event.StartTime).toISOString());
-        var enddt = 'enddt=' + encodeURIComponent(new Date(new Date(event.StartTime).getTime() + event.Duration * 1000).toISOString());
-        var body = 'body=' + encodeURIComponent(event.Description);
-        var location = 'location=' + encodeURIComponent(event.Location);
-        
-        return base + '?' + subject + '&' + startdt + '&' + enddt + '&' + body + '&' + location;
-    }
-
-    function generateICalFile(event) {
-        function formatICalDate(date) {
-            return date.toISOString().replace(/-|:|\.\d+/g, '').slice(0, -1) + 'Z';
-        }
-        
-        var startTime = new Date(event.StartTime);
-        var endTime = new Date(startTime.getTime() + event.Duration * 1000);
-        var now = formatICalDate(new Date());
-        var uid = 'event-' + event.Id + '-' + now + '@bnw.com';
-        
-        return [
-            'BEGIN:VCALENDAR',
-            'VERSION:2.0',
-            'PRODID:-//YourApp//Calendar//FR',
-            'CALSCALE:GREGORIAN',
-            'METHOD:PUBLISH',
-            'BEGIN:VEVENT',
-            'UID:' + uid,
-            'DTSTAMP:' + now,
-            'DTSTART:' + formatICalDate(startTime),
-            'DTEND:' + formatICalDate(endTime),
-            'SUMMARY:' + event.Summary,
-            'DESCRIPTION:' + event.Description.replace(/\n/g, '\\n'),
-            'LOCATION:' + event.Location,
-            'END:VEVENT',
-            'END:VCALENDAR'
-        ].join('\r\n');
-
-        var blob = new Blob([icalContent], { type: 'text/calendar;charset=utf-8' });
-        var url = URL.createObjectURL(blob);
-        
-        var link = document.createElement('a');
-        link.href = url;
-        link.download = 'event.ics';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-
-            var toast = document.createElement('div');
-    toast.style = 'position: fixed; bottom: 20px; right: 20px; padding: 10px 20px; background: #28a745; color: white; border-radius: 5px; z-index: 1000;';
-    toast.textContent = 'Téléchargement du fichier iCal démarré';
-    document.body.appendChild(toast);
-    
-    setTimeout(function() {
-        document.body.removeChild(link);
-        document.body.removeChild(toast);
-        URL.revokeObjectURL(url);
-    }, 3000);
-    }
-</script>
+    <script src="/app/js/event/detail.js"></script>
 {/block}

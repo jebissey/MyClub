@@ -54,9 +54,18 @@ $applicationHelper = new Application($container->get(PDO::class), $container->ge
 $flight->route('/help',         function() use ($applicationHelper) { $applicationHelper->help(); });
 $flight->route('/legal/notice', function() use ($applicationHelper) { $applicationHelper->legalNotice(); });
 
+use app\controllers\AdminController;
+$adminController = new AdminController($container->get(PDO::class), $container->get(Engine::class));
+$flight->route('GET /admin',           function() use ($adminController) { $adminController->home(); });
+$flight->route('GET /admin/help',      function() use ($adminController) { $adminController->help(); });
+
+use app\controllers\AlertController;
+$alertController = new AlertController($container->get(PDO::class), $container->get(Engine::class));
+$flight->route('GET  /alerts',      function() use ($alertController) {$alertController->showAlerts();});
+$flight->route('POST /alerts/save', function() use ($alertController) {$alertController->updateAlert();});
+
 use app\controllers\ArticleController;
 $articleController = new ArticleController($container->get(PDO::class), $container->get(Engine::class));
-$flight->route('GET  /redactor',            function()    use ($articleController) { $articleController->home(); });
 $flight->route('GET  /articles',            function()    use ($articleController) { $articleController->index(); });
 $flight->route('GET  /articles/create',     function()    use ($articleController) { $articleController->create(); });
 $flight->route('GET  /articles/delete/@id', function($id) use ($articleController) { $articleController->delete($id); });
@@ -64,6 +73,104 @@ $flight->route('GET  /articles/@id',        function($id) use ($articleControlle
 $flight->route('POST /articles/@id',        function($id) use ($articleController) { $articleController->update($id); });
 $flight->route('GET  /publish/article/@id', function($id) use ($articleController) { $articleController->publish($id); });
 $flight->route('POST /publish/article/@id', function($id) use ($articleController) { $articleController->publish($id); });
+$flight->route('GET  /redactor',            function()    use ($articleController) { $articleController->home(); });
+
+use app\controllers\DbBrowserController;
+$dbBrowserController = new DbBrowserController($container->get(PDO::class), $container->get(Engine::class));
+$flight->route('GET  /dbbrowser',                   function()            use ($dbBrowserController) { $dbBrowserController->index(); });
+$flight->route('GET  /dbbrowser/@table',            function($table)      use ($dbBrowserController) { $dbBrowserController->showTable($table); });
+$flight->route('GET  /dbbrowser/@table/create',     function($table)      use ($dbBrowserController) { $dbBrowserController->showCreateForm($table); });
+$flight->route('POST /dbbrowser/@table/create',     function($table)      use ($dbBrowserController) { $dbBrowserController->createRecord($table); });
+$flight->route('GET  /dbbrowser/@table/edit/@id',   function($table, $id) use ($dbBrowserController) { $dbBrowserController->showEditForm($table, $id); });
+$flight->route('POST /dbbrowser/@table/edit/@id',   function($table, $id) use ($dbBrowserController) { $dbBrowserController->updateRecord($table, $id); });
+$flight->route('POST /dbbrowser/@table/delete/@id', function($table, $id) use ($dbBrowserController) { $dbBrowserController->deleteRecord($table, $id); });
+
+use app\controllers\DesignController;
+$designController = new DesignController($container->get(PDO::class), $container->get(Engine::class));
+$flight->route('GET  /designs',          function() use ($designController) { $designController->index(); });
+$flight->route('GET  /designs/create',   function() use ($designController) { $designController->create(); });
+$flight->route('POST /designs/store',    function() use ($designController) { $designController->store(); });
+
+use app\controllers\EmailController;
+$emailController = new EmailController($container->get(PDO::class), $container->get(Engine::class));
+$flight->route('GET  /emails',             function()    use ($emailController) { $emailController->fetchEmails(); });
+$flight->route('POST /emails',             function()    use ($emailController) { $emailController->fetchEmails(); });
+$flight->route('GET  /emails/article/@id', function($id) use ($emailController) { $emailController->fetchEmailsForArticle($id); });
+
+use app\controllers\EventController;
+$eventController = new EventController($container->get(PDO::class), $container->get(Engine::class));
+$flight->route('GET /eventManager',          function()    use ($eventController) { $eventController->home(); });
+$flight->route('GET /eventManager/help',     function()    use ($eventController) { $eventController->help(); });
+$flight->route('GET /nextEvents',            function()    use ($eventController) { $eventController->nextEvents(); });
+$flight->route('GET /events/@id',            function($id) use ($eventController) { $eventController->show($id); });
+$flight->route('GET /event/location',        function()    use ($eventController) { $eventController->location(); });
+$flight->route('GET /events/@id/register',   function($id) use ($eventController) { $eventController->register($id, true); });
+$flight->route('GET /events/@id/unregister', function($id) use ($eventController) { $eventController->register($id, false); });
+$flight->route('GET /needs',                 function()    use ($eventController) { $eventController->needs();});
+
+use app\controllers\EventTypeController;
+$eventTypeController = new EventTypeController($container->get(PDO::class), $container->get(Engine::class));
+$flight->route('GET  /eventTypes',                function()    use ($eventTypeController) { $eventTypeController->index(); });
+$flight->route('GET  /eventTypes/create',         function()    use ($eventTypeController) { $eventTypeController->create(); });
+$flight->route('GET  /eventTypes/edit/@id',       function($id) use ($eventTypeController) { $eventTypeController->edit($id); });
+$flight->route('POST /eventTypes/edit/@id',       function($id) use ($eventTypeController) { $eventTypeController->edit($id); });
+$flight->route('GET  /eventTypes/delete/@id',     function($id) use ($eventTypeController) { $eventTypeController->delete($id); });
+
+use app\controllers\FFAController;
+$ffaController = new FFAController($container->get(PDO::class), $container->get(Engine::class));
+$flight->route('GET /ffa/search', function() use ($ffaController) {$ffaController->searchMember();});
+
+use app\controllers\GroupController;
+$groupController = new GroupController($container->get(PDO::class), $container->get(Engine::class));
+$flight->route('GET  /groups',            function()    use ($groupController) { $groupController->index(); });
+$flight->route('GET  /groups/create',     function()    use ($groupController) { $groupController->create(); });
+$flight->route('POST /groups/create',     function()    use ($groupController) { $groupController->create(); });
+$flight->route('GET  /groups/edit/@id',   function($id) use ($groupController) { $groupController->edit($id); });
+$flight->route('POST /groups/edit/@id',   function($id) use ($groupController) { $groupController->edit($id); });
+$flight->route('POST /groups/delete/@id', function($id) use ($groupController) { $groupController->delete($id); });
+
+use app\controllers\ImportController;
+$importController = new ImportController($container->get(PDO::class), $container->get(Engine::class));
+$flight->route('GET  /import',         function() use ($importController) { $importController->showImportForm(); });
+$flight->route('POST /import',         function() use ($importController) { $importController->processImport(); });
+$flight->route('POST /import/headers', function() use ($importController) { $importController->getHeadersFromCSV(); });
+
+use app\controllers\LogController;
+$logController = new LogController($container->get(PDO::class), $container->get(Engine::class));
+$flight->route('GET /logs',                         function() use ($logController) { $logController->index(); });
+$flight->route('GET /referers',                     function() use ($logController) { $logController->referers(); });
+$flight->route('GET /visitors/graf',                function() use ($logController) { $logController->visitorsGraf(); });
+$flight->route('GET /analytics',                    function() use ($logController) { $logController->analytics(); });
+$flight->route('GET /topPages',                     function() use ($logController) { $logController->topPagesByPeriod(); });
+$flight->route('GET /crossTab',                     function() use ($logController) { $logController->crossTab(); });
+
+use app\controllers\MediaController;
+$mediaController = new MediaController($container->get(PDO::class), $container->get(Engine::class));
+$flight->route('GET /data/media/@year/@month/@filename', function($year, $month, $filename) use ($mediaController) { $mediaController->viewFile($year,$month,$filename); });
+$flight->route('GET /media/upload',                      function()                         use ($mediaController) { $mediaController->showUploadForm(); });
+$flight->route('GET /media/list',                        function()                         use ($mediaController) { $mediaController->listFiles(); });
+$flight->route('GET /media/gpxViewer',                   function()                         use ($mediaController) { $mediaController->gpxViewer(); });
+
+use app\controllers\NavBarController;
+$navBarController = new NavBarController($container->get(PDO::class), $container->get(Engine::class));
+$flight->route('GET  /navBar',                  function()    use ($navBarController) { $navBarController->index(); });
+$flight->route('GET  /navBar/show/article/@id', function($id) use ($navBarController) { $navBarController->showArticle($id); });
+$flight->route('GET  /navBar/show/arwards',     function()    use ($navBarController) { $navBarController->showArwards(); });
+
+use app\controllers\PersonController;
+$personController = new PersonController($container->get(PDO::class), $container->get(Engine::class));
+$flight->route('GET  /personManager',      function()    use ($personController) { $personController->home(); });
+$flight->route('GET  /personManager/help', function()    use ($personController) { $personController->help(); });
+$flight->route('GET  /persons',            function()    use ($personController) { $personController->index(); });
+$flight->route('GET  /persons/create',     function()    use ($personController) { $personController->create(); });
+$flight->route('GET  /persons/edit/@id',   function($id) use ($personController) { $personController->edit($id); });
+$flight->route('POST /persons/edit/@id',   function($id) use ($personController) { $personController->edit($id); });
+$flight->route('GET  /persons/delete/@id', function($id) use ($personController) { $personController->delete($id); });
+
+use app\controllers\RegistrationController;
+$registrationController = new RegistrationController($container->get(PDO::class), $container->get(Engine::class));
+$flight->route('GET  /registration',            function()    use ($registrationController) { $registrationController->index(); });
+$flight->route('GET  /registration/groups/@id', function($id) use ($registrationController) { $registrationController->getPersonGroups($id); });
 
 use app\controllers\SurveyController;
 $surveyController = new SurveyController($container->get(PDO::class), $container->get(Engine::class));
@@ -90,11 +197,7 @@ $flight->route('POST /user/preferences',                  function()            
 $flight->route('GET  /user/groups',                       function()              use ($userController)                     { $userController->groups(); });
 $flight->route('POST /user/groups',                       function()              use ($userController)                     { $userController->groups(); });
 $flight->route('GET  /user/help',                         function()              use ($userController)                     { $userController->help(); });
-
-use app\controllers\AdminController;
-$adminController = new AdminController($container->get(PDO::class), $container->get(Engine::class));
-$flight->route('GET /admin',           function() use ($adminController) { $adminController->home(); });
-$flight->route('GET /admin/help',      function() use ($adminController) { $adminController->help(); });
+$flight->route('GET  /person/statistics',                 function()              use ($userController)                     { $userController->showStatistics();});
 
 use app\controllers\WebmasterController;
 $webmasterController = new WebmasterController($container->get(PDO::class), $container->get(Engine::class));
@@ -103,115 +206,6 @@ $flight->route('GET  /arwards',              function() use ($webmasterControlle
 $flight->route('POST /arwards',              function() use ($webmasterController) { $webmasterController->arwards(); });
 $flight->route('GET  /admin/webmaster/help', function() use ($webmasterController) { $webmasterController->help(); });
 $flight->route('GET  /rss.xml',              function() use ($webmasterController) { $webmasterController->rssGenerator(); });
-
-use app\controllers\LogController;
-$logController = new LogController($container->get(PDO::class), $container->get(Engine::class));
-$flight->route('GET /logs',                         function() use ($logController) { $logController->index(); });
-$flight->route('GET /referers',                     function() use ($logController) { $logController->referers(); });
-$flight->route('GET /visitors/graf',                function() use ($logController) { $logController->visitorsGraf(); });
-$flight->route('GET /analytics',                    function() use ($logController) { $logController->analytics(); });
-$flight->route('GET /topPages',                     function() use ($logController) { $logController->topPagesByPeriod(); });
-$flight->route('GET /crossTab',                     function() use ($logController) { $logController->crossTab(); });
-
-use app\controllers\GroupController;
-$groupController = new GroupController($container->get(PDO::class), $container->get(Engine::class));
-$flight->route('GET  /groups',            function()    use ($groupController) { $groupController->index(); });
-$flight->route('GET  /groups/create',     function()    use ($groupController) { $groupController->create(); });
-$flight->route('POST /groups/create',     function()    use ($groupController) { $groupController->create(); });
-$flight->route('GET  /groups/edit/@id',   function($id) use ($groupController) { $groupController->edit($id); });
-$flight->route('POST /groups/edit/@id',   function($id) use ($groupController) { $groupController->edit($id); });
-$flight->route('POST /groups/delete/@id', function($id) use ($groupController) { $groupController->delete($id); });
-
-use app\controllers\RegistrationController;
-$registrationController = new RegistrationController($container->get(PDO::class), $container->get(Engine::class));
-$flight->route('GET  /registration',            function()    use ($registrationController) { $registrationController->index(); });
-$flight->route('GET  /registration/groups/@id', function($id) use ($registrationController) { $registrationController->getPersonGroups($id); });
-
-use app\controllers\PersonController;
-$personController = new PersonController($container->get(PDO::class), $container->get(Engine::class));
-$flight->route('GET  /personManager',      function()    use ($personController) { $personController->home(); });
-$flight->route('GET  /personManager/help', function()    use ($personController) { $personController->help(); });
-$flight->route('GET  /persons',            function()    use ($personController) { $personController->index(); });
-$flight->route('GET  /persons/create',     function()    use ($personController) { $personController->create(); });
-$flight->route('GET  /persons/edit/@id',   function($id) use ($personController) { $personController->edit($id); });
-$flight->route('POST /persons/edit/@id',   function($id) use ($personController) { $personController->edit($id); });
-$flight->route('GET  /persons/delete/@id', function($id) use ($personController) { $personController->delete($id); });
-
-use app\controllers\EventController;
-$eventController = new EventController($container->get(PDO::class), $container->get(Engine::class));
-$flight->route('GET /eventManager/help',     function()    use ($eventController) { $eventController->help(); });
-$flight->route('GET /nextEvents',            function()    use ($eventController) { $eventController->nextEvents(); });
-$flight->route('GET /events/@id',            function($id) use ($eventController) { $eventController->show($id); });
-$flight->route('GET /event/location',        function()    use ($eventController) { $eventController->location(); });
-$flight->route('GET /events/@id/register',   function($id) use ($eventController) { $eventController->register($id, true); });
-$flight->route('GET /events/@id/unregister', function($id) use ($eventController) { $eventController->register($id, false); });
-
-use app\controllers\ImportController;
-$importController = new ImportController($container->get(PDO::class), $container->get(Engine::class));
-$flight->route('GET  /import',         function() use ($importController) { $importController->showImportForm(); });
-$flight->route('POST /import',         function() use ($importController) { $importController->processImport(); });
-$flight->route('POST /import/headers', function() use ($importController) { $importController->getHeadersFromCSV(); });
-
-use app\controllers\EmailController;
-$emailController = new EmailController($container->get(PDO::class), $container->get(Engine::class));
-$flight->route('GET  /emails',             function()    use ($emailController) { $emailController->fetchEmails(); });
-$flight->route('POST /emails',             function()    use ($emailController) { $emailController->fetchEmails(); });
-$flight->route('GET  /emails/article/@id', function($id) use ($emailController) { $emailController->fetchEmailsForArticle($id); });
-
-use app\controllers\DbBrowserController;
-$dbBrowserController = new DbBrowserController($container->get(PDO::class), $container->get(Engine::class));
-$flight->route('GET  /dbbrowser',                   function()            use ($dbBrowserController) { $dbBrowserController->index(); });
-$flight->route('GET  /dbbrowser/@table',            function($table)      use ($dbBrowserController) { $dbBrowserController->showTable($table); });
-$flight->route('GET  /dbbrowser/@table/create',     function($table)      use ($dbBrowserController) { $dbBrowserController->showCreateForm($table); });
-$flight->route('POST /dbbrowser/@table/create',     function($table)      use ($dbBrowserController) { $dbBrowserController->createRecord($table); });
-$flight->route('GET  /dbbrowser/@table/edit/@id',   function($table, $id) use ($dbBrowserController) { $dbBrowserController->showEditForm($table, $id); });
-$flight->route('POST /dbbrowser/@table/edit/@id',   function($table, $id) use ($dbBrowserController) { $dbBrowserController->updateRecord($table, $id); });
-$flight->route('POST /dbbrowser/@table/delete/@id', function($table, $id) use ($dbBrowserController) { $dbBrowserController->deleteRecord($table, $id); });
-
-use app\controllers\NavBarController;
-$navBarController = new NavBarController($container->get(PDO::class), $container->get(Engine::class));
-$flight->route('GET  /navBar',                  function()    use ($navBarController) { $navBarController->index(); });
-$flight->route('GET  /navBar/show/article/@id', function($id) use ($navBarController) { $navBarController->showArticle($id); });
-$flight->route('GET  /navBar/show/arwards',     function()    use ($navBarController) { $navBarController->showArwards(); });
-$flight->route('GET  /navBar/show/events',      function()    use ($navBarController) { $navBarController->showEvents(); });
-
-use app\controllers\MediaController;
-$mediaController = new MediaController($container->get(PDO::class), $container->get(Engine::class));
-$flight->route('GET /data/media/@year/@month/@filename', function($year, $month, $filename) use ($mediaController) { $mediaController->viewFile($year,$month,$filename); });
-$flight->route('GET /media/upload',                      function()                         use ($mediaController) { $mediaController->showUploadForm(); });
-$flight->route('GET /media/list',                        function()                         use ($mediaController) { $mediaController->listFiles(); });
-$flight->route('GET /media/gpxViewer',                   function()                         use ($mediaController) { $mediaController->gpxViewer(); });
-
-use app\controllers\EventTypeController;
-$eventTypeController = new EventTypeController($container->get(PDO::class), $container->get(Engine::class));
-$flight->route('GET  /eventTypes',                function()    use ($eventTypeController) { $eventTypeController->index(); });
-$flight->route('GET  /eventTypes/create',         function()    use ($eventTypeController) { $eventTypeController->create(); });
-$flight->route('GET  /eventTypes/edit/@id',       function($id) use ($eventTypeController) { $eventTypeController->edit($id); });
-$flight->route('POST /eventTypes/edit/@id',       function($id) use ($eventTypeController) { $eventTypeController->edit($id); });
-$flight->route('GET  /eventTypes/delete/@id',     function($id) use ($eventTypeController) { $eventTypeController->delete($id); });
-
-use app\controllers\DesignController;
-$designController = new DesignController($container->get(PDO::class), $container->get(Engine::class));
-$flight->route('GET  /designs',          function() use ($designController) { $designController->index(); });
-$flight->route('GET  /designs/create',   function() use ($designController) { $designController->create(); });
-$flight->route('POST /designs/store',    function() use ($designController) { $designController->store(); });
-
-use app\controllers\PersonStatisticsController;
-$personStatisticsController = new PersonStatisticsController($container->get(PDO::class), $container->get(Engine::class));
-$flight->route('GET /person/statistics', function() use ($personStatisticsController) {$personStatisticsController->showStatistics();});
-
-use app\controllers\AlertController;
-$alertController = new AlertController($container->get(PDO::class), $container->get(Engine::class));
-$flight->route('GET  /alerts',      function() use ($alertController) {$alertController->showAlerts();});
-$flight->route('POST /alerts/save', function() use ($alertController) {$alertController->updateAlert();});
-
-use app\controllers\FFAController;
-$ffaController = new FFAController($container->get(PDO::class), $container->get(Engine::class));
-$flight->route('GET /ffa/search', function() use ($ffaController) {$ffaController->searchMember();});
-
-use app\controllers\NeedsController;
-$needsController = new NeedsController($container->get(PDO::class), $container->get(Engine::class));
-$flight->route('GET /needs', function() use ($needsController) {$needsController->index();});
 /* #endregion */
 
 /* #region api */

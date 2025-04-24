@@ -3,329 +3,185 @@
 {block title}Gestion des besoins{/block}
 
 {block navbar}
-{include '../navbar/webmaster.latte'}
+    {include '../navbar/webmaster.latte'}
 {/block}
 
 {block content}
-<div class="container mt-4">
-    <h1>Les besoins des évènements</h1>
-    
-    <div class="row mb-4">
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">Types de besoins</h5>
-                    <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addNeedTypeModal">
-                        <i class="fas fa-plus"></i> Ajouter
-                    </button>
-                </div>
-                <div class="card-body">
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>Nom</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {foreach $needTypes as $type}
-                            <tr>
-                                <td>{$type['Name']}</td>
-                                <td>
-                                    <button type="button" class="btn btn-sm btn-primary edit-need-type" 
-                                            data-id="{$type['Id']}" 
-                                            data-name="{$type['Name']}">
-                                        <i class="bi bi-pencil"></i>
-                                    </button>
-                                    <button type="button" class="btn btn-sm btn-danger delete-need-type">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                            {/foreach}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
+    <div class="container mt-4">
+        <h1>Les besoins des évènements</h1>
         
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">Besoins</h5>
-                    <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addNeedModal">
-                        <i class="fas fa-plus"></i> Ajouter
-                    </button>
-                </div>
-                <div class="card-body">
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>Label</th>
-                                <th>Nom</th>
-                                <th>Type</th>
-                                <th>En fonction des participants</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {foreach $needs as $need}
-                            <tr>
-                                <td><h5>{$need['Label']}</h5></td>
-                                <td>{$need['Name']}</td>
-                                <td>{$need['TypeName']}</td>
-                                <td>{if $need['ParticipantDependent'] == 1}Oui{else}Non{/if}</td>
-                                <td>
-                                    <button type="button" class="btn btn-sm btn-primary edit-need" 
-                                            data-id="{$need['Id']}"
-                                            data-label="{$need['Label']}" 
-                                            data-name="{$need['Name']}" 
-                                            data-participant-dependent="{$need['ParticipantDependent']}" 
-                                            data-type="{$need['IdNeedType']}">
-                                        <i class="bi bi-pencil"></i>
-                                    </button>
-                                    <button type="button" class="btn btn-sm btn-danger delete-need" data-id="{$need['Id']}" data-name="{$need['Name']}">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                            {/foreach}
-                        </tbody>
-                    </table>
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Types de besoins</h5>
+                        <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addNeedTypeModal">
+                            <i class="fas fa-plus"></i> Ajouter
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Nom</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {foreach $needTypes as $type}
+                                <tr>
+                                    <td>{$type['Name']}</td>
+                                    <td>
+                                        <button type="button" class="btn btn-sm btn-primary edit-need-type" 
+                                                data-id="{$type['Id']}" 
+                                                data-name="{$type['Name']}">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-sm btn-danger delete-need-type">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                {/foreach}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
+            
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Besoins</h5>
+                        <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addNeedModal">
+                            <i class="fas fa-plus"></i> Ajouter
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Label</th>
+                                    <th>Nom</th>
+                                    <th>Type</th>
+                                    <th>En fonction des participants</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {foreach $needs as $need}
+                                <tr>
+                                    <td><h5>{$need['Label']}</h5></td>
+                                    <td>{$need['Name']}</td>
+                                    <td>{$need['TypeName']}</td>
+                                    <td>{if $need['ParticipantDependent'] == 1}Oui{else}Non{/if}</td>
+                                    <td>
+                                        <button type="button" class="btn btn-sm btn-primary edit-need" 
+                                                data-id="{$need['Id']}"
+                                                data-label="{$need['Label']}" 
+                                                data-name="{$need['Name']}" 
+                                                data-participant-dependent="{$need['ParticipantDependent']}" 
+                                                data-type="{$need['IdNeedType']}">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-sm btn-danger delete-need" data-id="{$need['Id']}" data-name="{$need['Name']}">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                {/foreach}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-</div>
 
-<div class="modal fade" id="addNeedTypeModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="needTypeModalTitle">Ajouter un type de besoin</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form id="needTypeForm">
-                    <input type="hidden" id="needTypeId" name="id">
-                    <div class="mb-3">
-                        <label for="needTypeName" class="form-label">Nom</label>
-                        <input type="text" class="form-control" id="needTypeName" name="name" required>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                <button type="button" class="btn btn-primary" id="saveNeedType">Enregistrer</button>
+    <div class="modal fade" id="addNeedTypeModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="needTypeModalTitle">Ajouter un type de besoin</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="needTypeForm">
+                        <input type="hidden" id="needTypeId" name="id">
+                        <div class="mb-3">
+                            <label for="needTypeName" class="form-label">Nom</label>
+                            <input type="text" class="form-control" id="needTypeName" name="name" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="button" class="btn btn-primary" id="saveNeedType">Enregistrer</button>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<div class="modal fade" id="addNeedModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="needModalTitle">Ajouter un besoin</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form id="needForm">
-                    <input type="hidden" id="needId" name="id">
-                    <div class="mb-3">
-                        <label for="needType" class="form-label">Type</label>
-                        <select class="form-select" id="needType" name="idNeedType" required>
-                            <option value="">Sélectionnez un type</option>
-                            {foreach $needTypes as $type}
-                            <option value="{$type['Id']}">{$type['Name']}</option>
-                            {/foreach}
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label for="needLabel" class="form-label">Label</label>
-                        <input type="text" class="form-control" id="needLabel" name="label" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="needName" class="form-label">Nom</label>
-                        <input type="text" class="form-control" id="needName" name="name" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="needParticipantDependent" class="form-label">En fonction du nombre de participants</label>
-                        <input class="form-check-input" type="checkbox" id="needParticipantDependent" name="participantDependent" value="1">
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                <button type="button" class="btn btn-primary" id="saveNeed">Enregistrer</button>
+    <div class="modal fade" id="addNeedModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="needModalTitle">Ajouter un besoin</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="needForm">
+                        <input type="hidden" id="needId" name="id">
+                        <div class="mb-3">
+                            <label for="needType" class="form-label">Type</label>
+                            <select class="form-select" id="needType" name="idNeedType" required>
+                                <option value="">Sélectionnez un type</option>
+                                {foreach $needTypes as $type}
+                                <option value="{$type['Id']}">{$type['Name']}</option>
+                                {/foreach}
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="needLabel" class="form-label">Label</label>
+                            <input type="text" class="form-control" id="needLabel" name="label" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="needName" class="form-label">Nom</label>
+                            <input type="text" class="form-control" id="needName" name="name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="needParticipantDependent" class="form-label">En fonction du nombre de participants</label>
+                            <input class="form-check-input" type="checkbox" id="needParticipantDependent" name="participantDependent" value="1">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="button" class="btn btn-primary" id="saveNeed">Enregistrer</button>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Confirmer la suppression</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <p id="deleteConfirmMessage">Êtes-vous sûr de vouloir supprimer cet élément ?</p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                <button type="button" class="btn btn-danger" id="confirmDelete">Supprimer</button>
+    <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirmer la suppression</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p id="deleteConfirmMessage">Êtes-vous sûr de vouloir supprimer cet élément ?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="button" class="btn btn-danger" id="confirmDelete">Supprimer</button>
+                </div>
             </div>
         </div>
     </div>
-</div>
 {/block}
 
 {block scripts}
-<script n:syntax=off>
-document.addEventListener('DOMContentLoaded', function() {
-    let deleteItemId = null;
-    let deleteItemType = null;
-    const needTypeModal = new bootstrap.Modal(document.getElementById('addNeedTypeModal'));
-    const needTypeForm = document.getElementById('needTypeForm');
-    const needModal = new bootstrap.Modal(document.getElementById('addNeedModal'));
-    const needForm = document.getElementById('needForm');
-    const deleteConfirmModal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
-    
-    document.querySelector('[data-bs-target="#addNeedTypeModal"]').addEventListener('click', function() {
-        document.getElementById('needTypeModalTitle').textContent = 'Ajouter un type de besoin';
-        needTypeForm.reset();
-        document.getElementById('needTypeId').value = '';
-    });
-    
-    document.querySelectorAll('.edit-need-type').forEach(button => {
-        button.addEventListener('click', function() {
-            document.getElementById('needTypeModalTitle').textContent = 'Modifier un type de besoin';
-            document.getElementById('needTypeId').value = this.dataset.id;
-            document.getElementById('needTypeName').value = this.dataset.name;
-            needTypeModal.show();
-        });
-    });
-    
-    document.querySelector('[data-bs-target="#addNeedModal"]').addEventListener('click', function() {
-        document.getElementById('needModalTitle').textContent = 'Ajouter un besoin';
-        needForm.reset();
-        document.getElementById('needId').value = '';
-    });
-    
-    document.querySelectorAll('.edit-need').forEach(button => {
-        button.addEventListener('click', function() {
-            document.getElementById('needModalTitle').textContent = 'Modifier un besoin';
-            document.getElementById('needId').value = this.dataset.id;
-            document.getElementById('needLabel').value = this.dataset.label;
-            document.getElementById('needName').value = this.dataset.name;
-            document.getElementById('needParticipantDependent').checked = this.dataset.participantDependent;
-            document.getElementById('needType').value = this.dataset.type;
-            needModal.show();
-        });
-    });
-    
-    document.getElementById('saveNeedType').addEventListener('click', function() {
-        const data = {
-            id: document.getElementById('needTypeId').value,
-            name: document.getElementById('needTypeName').value
-        };
-        fetch('/api/needs/type/save', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success === true) {
-                bootstrap.Modal.getInstance(document.getElementById('addNeedTypeModal')).hide();
-                window.location.reload();
-            } else {
-                alert('Erreur: ' + (data.message || 'Une erreur est survenue'));
-            }
-        })
-        .catch(error => {
-            console.error('Erreur:', error);
-            alert('Une erreur est survenue lors de l\'enregistrement');
-        });
-    });
-
-    document.getElementById('saveNeed').addEventListener('click', function() {
-        const data = {
-            id: document.getElementById('needId').value,
-            label: document.getElementById('needLabel').value,
-            name: document.getElementById('needName').value,
-            idNeedType: document.getElementById('needType').value,
-            participantDependent: document.getElementById('participantDependent').checked ? 1 : 0
-        };
-        
-        fetch('/api/needs/save', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success === true) {
-                bootstrap.Modal.getInstance(document.getElementById('addNeedModal')).hide();
-                window.location.reload();
-            } else {
-                alert('Erreur: ' + (data.message || 'Une erreur est survenue'));
-            }
-        })
-        .catch(error => {
-            console.error('Erreur:', error);
-            alert('Une erreur est survenue lors de l\'enregistrement');
-        });
-    });
-    
-    document.querySelectorAll('.delete-need-type').forEach(button => {
-        button.addEventListener('click', function() {
-            deleteItemId = this.dataset.id;
-            deleteItemType = 'type';
-            document.getElementById('deleteConfirmMessage').textContent = 
-                `Êtes-vous sûr de vouloir supprimer le type de besoin "${this.dataset.name}" ?`;
-            deleteConfirmModal.show();
-        });
-    });
-    
-    document.querySelectorAll('.delete-need').forEach(button => {
-        button.addEventListener('click', function() {
-            deleteItemId = this.dataset.id;
-            deleteItemType = 'need';
-            document.getElementById('deleteConfirmMessage').textContent = 
-                `Êtes-vous sûr de vouloir supprimer le besoin "${this.dataset.name}" ?`;
-            deleteConfirmModal.show();
-        });
-    });
-    
-    document.getElementById('confirmDelete').addEventListener('click', function() {
-        const endpoint = deleteItemType === 'type' ? '/api/needs/type/delete/' : '/api/needs/delete/';
-        fetch(endpoint + deleteItemId, {
-            method: 'DELETE',
-             headers: {
-                'Content-Type': 'application/json'
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success === true) {
-                deleteConfirmModal.hide();
-                window.location.reload();
-            } else {
-                alert('Erreur: ' + data.message);
-            }
-        })
-        .catch(error => {
-            console.error('Erreur:', error);
-            alert('Une erreur est survenue lors de la suppression');
-        });
-    });
-});
-</script>
+    <script src="/app/js/event/needs.js"></script>
 {/block}

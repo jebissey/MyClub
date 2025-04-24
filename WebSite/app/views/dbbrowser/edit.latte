@@ -1,66 +1,66 @@
 {layout "../admin/webmaster.latte"}
 
 {block content}
-<div class="container-fluid">
-    <h1>Modifier un enregistrement dans {$table}</h1>
-    
-    <div class="row mb-3">
-        <div class="col">
-            <a href="/dbbrowser/{$table}" class="btn btn-secondary">
-                <i class="fas fa-arrow-left"></i> Retour à la table
-            </a>
+    <div class="container-fluid">
+        <h1>Modifier un enregistrement dans {$table}</h1>
+        
+        <div class="row mb-3">
+            <div class="col">
+                <a href="/dbbrowser/{$table}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Retour à la table
+                </a>
+            </div>
         </div>
-    </div>
-    
-    <div class="card">
-        <div class="card-header bg-primary text-white">
-            <h5 class="mb-0">Modifier l'enregistrement</h5>
-        </div>
-        <div class="card-body">
-            <form method="POST" action="/dbbrowser/{$table}/edit/{$record[$primaryKey]}">
-                {foreach $columns as $column}
-                    {var $columnInfo = $columnTypes[$column]}
-                    <div class="form-group">
-                        <label for="{$column}">
-                            {$column}
-                            {if $columnInfo['notnull'] && !$columnInfo['pk']}
-                                <span class="text-danger">*</span>
+        
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Modifier l'enregistrement</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="/dbbrowser/{$table}/edit/{$record[$primaryKey]}">
+                    {foreach $columns as $column}
+                        {var $columnInfo = $columnTypes[$column]}
+                        <div class="form-group">
+                            <label for="{$column}">
+                                {$column}
+                                {if $columnInfo['notnull'] && !$columnInfo['pk']}
+                                    <span class="text-danger">*</span>
+                                {/if}
+                            </label>
+                            
+                            {if $columnInfo['pk']}
+                                <input type="text" class="form-control" id="{$column}" name="{$column}" 
+                                    value="{$record[$column]}" readonly>
+                                <small class="form-text text-muted">Ce champ est une clé primaire et ne peut pas être modifié.</small>
+                            {elseif strpos($columnInfo['type'], 'TEXT') !== false && strpos($columnInfo['type'], 'BLOB') === false}
+                                <textarea class="form-control" id="{$column}" name="{$column}" rows="3"
+                                        {if $columnInfo['notnull']}required{/if}>{$record[$column]}</textarea>
+                            {elseif strpos($columnInfo['type'], 'INT') !== false}
+                                <input type="number" class="form-control" id="{$column}" name="{$column}" 
+                                    value="{$record[$column]}" {if $columnInfo['notnull']}required{/if}>
+                            {elseif strpos($columnInfo['type'], 'REAL') !== false || strpos($columnInfo['type'], 'FLOA') !== false}
+                                <input type="number" step="0.01" class="form-control" id="{$column}" name="{$column}" 
+                                    value="{$record[$column]}" {if $columnInfo['notnull']}required{/if}>
+                            {elseif strpos($columnInfo['type'], 'BOOL') !== false}
+                                <select class="form-control" id="{$column}" name="{$column}" {if $columnInfo['notnull']}required{/if}>
+                                    <option value="0" {if $record[$column] == '0'}selected{/if}>Faux (0)</option>
+                                    <option value="1" {if $record[$column] == '1'}selected{/if}>Vrai (1)</option>
+                                </select>
+                            {elseif strpos(strtoupper($column), 'DATE') !== false || strpos($columnInfo['type'], 'DATE') !== false}
+                                <input type="date" class="form-control" id="{$column}" name="{$column}" 
+                                    value="{$record[$column]}" {if $columnInfo['notnull']}required{/if}>
+                            {else}
+                                <input type="text" class="form-control" id="{$column}" name="{$column}" 
+                                    value="{$record[$column]}" {if $columnInfo['notnull']}required{/if}>
                             {/if}
-                        </label>
-                        
-                        {if $columnInfo['pk']}
-                            <input type="text" class="form-control" id="{$column}" name="{$column}" 
-                                value="{$record[$column]}" readonly>
-                            <small class="form-text text-muted">Ce champ est une clé primaire et ne peut pas être modifié.</small>
-                        {elseif strpos($columnInfo['type'], 'TEXT') !== false && strpos($columnInfo['type'], 'BLOB') === false}
-                            <textarea class="form-control" id="{$column}" name="{$column}" rows="3"
-                                    {if $columnInfo['notnull']}required{/if}>{$record[$column]}</textarea>
-                        {elseif strpos($columnInfo['type'], 'INT') !== false}
-                            <input type="number" class="form-control" id="{$column}" name="{$column}" 
-                                value="{$record[$column]}" {if $columnInfo['notnull']}required{/if}>
-                        {elseif strpos($columnInfo['type'], 'REAL') !== false || strpos($columnInfo['type'], 'FLOA') !== false}
-                            <input type="number" step="0.01" class="form-control" id="{$column}" name="{$column}" 
-                                value="{$record[$column]}" {if $columnInfo['notnull']}required{/if}>
-                        {elseif strpos($columnInfo['type'], 'BOOL') !== false}
-                            <select class="form-control" id="{$column}" name="{$column}" {if $columnInfo['notnull']}required{/if}>
-                                <option value="0" {if $record[$column] == '0'}selected{/if}>Faux (0)</option>
-                                <option value="1" {if $record[$column] == '1'}selected{/if}>Vrai (1)</option>
-                            </select>
-                        {elseif strpos(strtoupper($column), 'DATE') !== false || strpos($columnInfo['type'], 'DATE') !== false}
-                            <input type="date" class="form-control" id="{$column}" name="{$column}" 
-                                value="{$record[$column]}" {if $columnInfo['notnull']}required{/if}>
-                        {else}
-                            <input type="text" class="form-control" id="{$column}" name="{$column}" 
-                                value="{$record[$column]}" {if $columnInfo['notnull']}required{/if}>
-                        {/if}
-                        
-                        <small class="form-text text-muted">Type: {$columnInfo['type']}</small>
-                    </div>
-                {/foreach}
-                
-                <button type="submit" class="btn btn-primary">Enregistrer les modifications</button>
-            </form>
+                            
+                            <small class="form-text text-muted">Type: {$columnInfo['type']}</small>
+                        </div>
+                    {/foreach}
+                    
+                    <button type="submit" class="btn btn-primary">Enregistrer les modifications</button>
+                </form>
+            </div>
         </div>
     </div>
-</div>
 {/block}

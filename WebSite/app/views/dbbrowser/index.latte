@@ -1,26 +1,26 @@
 {layout "../admin/webmaster.latte"}
 
 {block content}
-<div class="container-fluid">
-    <h1>Explorateur de base de données</h1>
-    
-    <div class="card">
-        <div class="card-header">
-            Sélectionnez une table
-        </div>
-        <div class="card-body">
-            <div class="form-group">
-                <label for="tableSelect">Tables disponibles:</label>
-                <select class="form-control" id="tableSelect" onchange="window.location.href='/dbbrowser/' + this.value">
-                    <option value="">-- Sélectionnez une table --</option>
-                    {foreach $tables as $table}
-                        <option value="{$table}">{$table}</option>
-                    {/foreach}
-                </select>
+    <div class="container-fluid">
+        <h1>Explorateur de base de données</h1>
+        
+        <div class="card">
+            <div class="card-header">
+                Sélectionnez une table
+            </div>
+            <div class="card-body">
+                <div class="form-group">
+                    <label for="tableSelect">Tables disponibles:</label>
+                    <select class="form-control" id="tableSelect" onchange="window.location.href='/dbbrowser/' + this.value">
+                        <option value="">-- Sélectionnez une table --</option>
+                        {foreach $tables as $table}
+                            <option value="{$table}">{$table}</option>
+                        {/foreach}
+                    </select>
+                </div>
             </div>
         </div>
     </div>
-</div>
 {/block}
 
 {block scripts}

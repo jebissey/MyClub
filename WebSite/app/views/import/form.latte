@@ -1,186 +1,97 @@
 {layout '../admin/personManager.latte'}
 
 {block content}
-<div class="container-fluid">
-    <h2>Import CSV</h2>
-    
-    {if $results}
-        <div class="container-fluid">
-            {if $results['errors'] > 0}
-                <div class="alert alert-danger alert-dismissible">{$error}</div>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    <div class="alert alert-warning">
-                        <h4>Résultat de l'import :</h4>
+    <div class="container-fluid">
+        <h2>Import CSV</h2>
+        
+        {if $results}
+            <div class="container-fluid">
+                {if $results['errors'] > 0}
+                    <div class="alert alert-danger alert-dismissible">{$error}</div>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        <div class="alert alert-warning">
+                            <h4>Résultat de l'import :</h4>
+                            <ul>
+                                <li>Nouveaux enregistrements : {$results['created']}</li>
+                                <li>Enregistrements mis à jour : {$results['updated']}</li>
+                                <li>Enregistrements inactivé : {$results['inactivated']}</li>
+                                <li>Erreurs : {$results['errors']}</li>
+                            </ul>
+                            <h4>Détail des erreurs :</h4>
+                            <ul>
+                                {foreach $results['messages'] as $message}
+                                    <li>{$message}</li>
+                                {/foreach}
+                            </ul>
+                        </div>
+                    </div>
+                {else}
+                    <div class="alert alert-success alert-dismissible">
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        <h4>Import terminé avec succès :</h4>
                         <ul>
                             <li>Nouveaux enregistrements : {$results['created']}</li>
                             <li>Enregistrements mis à jour : {$results['updated']}</li>
-                            <li>Enregistrements inactivé : {$results['inactivated']}</li>
-                            <li>Erreurs : {$results['errors']}</li>
-                        </ul>
-                        <h4>Détail des erreurs :</h4>
-                        <ul>
-                            {foreach $results['messages'] as $message}
-                                <li>{$message}</li>
-                            {/foreach}
+                            <li>Enregistrements inactivés : {$results['inactivated']}</li>
                         </ul>
                     </div>
+                {/if}
+            </div>
+        {/if}
+
+        <form method="post" enctype="multipart/form-data" class="mb-4" id="importForm">
+            <div class="mb-3">
+                <label for="csvFile" class="form-label">Fichier CSV</label>
+                <input type="file" class="form-control" id="csvFile" name="csvFile" accept=".csv" required>
+            </div>
+
+            <div id="headerRow" class="mb-3" style="display: none;">
+                <label for="headerRow" class="form-label">Ligne des en-têtes</label>
+                <input type="number" class="form-control w-auto" name="headerRow" id="headerRowInput"
+                    value="{$importSettings['headerRow']}" min="1" required>
+            </div>
+
+            <div id="mappingSection" style="display: none;">
+                <h4 class="mt-4">Mapping des colonnes</h4>
+                
+                <div class="mb-3 d-flex align-items-end">
+                    <label for="emailColumn" class="form-label me-2">Email</label>
+                    <select class="form-control w-auto" id="emailColumn" name="emailColumn" required>
+                        <option value="">Sélectionnez une colonne</option>
+                    </select>
                 </div>
-            {else}
-                <div class="alert alert-success alert-dismissible">
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    <h4>Import terminé avec succès :</h4>
-                    <ul>
-                        <li>Nouveaux enregistrements : {$results['created']}</li>
-                        <li>Enregistrements mis à jour : {$results['updated']}</li>
-                        <li>Enregistrements inactivés : {$results['inactivated']}</li>
-                    </ul>
+
+                <div class="mb-3 d-flex align-items-end">
+                    <label for="firstNameColumn" class="form-label me-2">Prénom</label>
+                    <select class="form-control w-auto" id="firstNameColumn" name="firstNameColumn" required>
+                        <option value="">Sélectionnez une colonne</option>
+                    </select>
                 </div>
-            {/if}
-        </div>
-    {/if}
 
-    <form method="post" enctype="multipart/form-data" class="mb-4" id="importForm">
-        <div class="mb-3">
-            <label for="csvFile" class="form-label">Fichier CSV</label>
-            <input type="file" class="form-control" id="csvFile" name="csvFile" accept=".csv" required>
-        </div>
+                <div class="mb-3 d-flex align-items-end">
+                    <label for="lastNameColumn" class="form-label me-2">Nom</label>
+                    <select class="form-control w-auto" id="lastNameColumn" name="lastNameColumn" required>
+                        <option value="">Sélectionnez une colonne</option>
+                    </select>
+                </div>
 
-        <div id="headerRow" class="mb-3" style="display: none;">
-            <label for="headerRow" class="form-label">Ligne des en-têtes</label>
-            <input type="number" class="form-control w-auto" name="headerRow" id="headerRowInput"
-                   value="{$importSettings['headerRow']}" min="1" required>
-        </div>
-
-        <div id="mappingSection" style="display: none;">
-            <h4 class="mt-4">Mapping des colonnes</h4>
-            
-            <div class="mb-3 d-flex align-items-end">
-                <label for="emailColumn" class="form-label me-2">Email</label>
-                <select class="form-control w-auto" id="emailColumn" name="emailColumn" required>
-                    <option value="">Sélectionnez une colonne</option>
-                </select>
+                <div class="mb-3 d-flex align-items-end">
+                    <label for="phoneColumn" class="form-label me-2">Téléphone</label>
+                    <select class="form-control w-auto" id="phoneColumn" name="phoneColumn" required>
+                        <option value="">Sélectionnez une colonne</option>
+                    </select>
+                </div>
             </div>
 
-            <div class="mb-3 d-flex align-items-end">
-                <label for="firstNameColumn" class="form-label me-2">Prénom</label>
-                <select class="form-control w-auto" id="firstNameColumn" name="firstNameColumn" required>
-                    <option value="">Sélectionnez une colonne</option>
-                </select>
-            </div>
-
-            <div class="mb-3 d-flex align-items-end">
-                <label for="lastNameColumn" class="form-label me-2">Nom</label>
-                <select class="form-control w-auto" id="lastNameColumn" name="lastNameColumn" required>
-                    <option value="">Sélectionnez une colonne</option>
-                </select>
-            </div>
-
-            <div class="mb-3 d-flex align-items-end">
-                <label for="phoneColumn" class="form-label me-2">Téléphone</label>
-                <select class="form-control w-auto" id="phoneColumn" name="phoneColumn" required>
-                    <option value="">Sélectionnez une colonne</option>
-                </select>
-            </div>
-        </div>
-
-        <button type="submit" class="btn btn-primary" id="submitBtn" style="display: none;">Importer</button>
-    </form>
-</div>
+            <button type="submit" class="btn btn-primary" id="submitBtn" style="display: none;">Importer</button>
+        </form>
+    </div>
 {/block}
 
 {block scripts}
 <script>
     const importSettings = {$importSettings};
 </script>
-<script n:syntax="off">
-document.addEventListener('DOMContentLoaded', function() {
-    const csvFileInput = document.getElementById('csvFile');
-    const headerRowSection = document.getElementById('headerRow');
-    const mappingSection = document.getElementById('mappingSection');
-    const submitBtn = document.getElementById('submitBtn');
-    const headerRowInput = headerRowSection.querySelector('input[name="headerRow"]');
-
-    csvFileInput.addEventListener('change', function() {
-        if (this.files.length > 0) {
-            headerRowSection.style.display = 'block';
-            mappingSection.style.display = 'none';
-            submitBtn.style.display = 'none';
-            updateHeaders();
-        } else {
-            headerRowSection.style.display = 'none';
-            mappingSection.style.display = 'none';
-            submitBtn.style.display = 'none';
-        }
-    });
-
-    headerRowInput.addEventListener('input', function() {
-        if (this.value.trim() !== '') {
-            mappingSection.style.display = 'block';
-            submitBtn.style.display = 'block';
-            updateHeaders();
-        } else {
-            mappingSection.style.display = 'none';
-            submitBtn.style.display = 'none';
-        }
-    });
-
-    function updateHeaders() {
-        if (!csvFileInput.files.length > 0 ) {
-            mappingSection.style.display = 'none';
-            submitBtn.style.display = 'none';
-            return;
-        }
-
-        const formData = new FormData();
-        formData.append('csvFile', csvFileInput.files[0]);
-        formData.append('headerRow', headerRowInput.value);
-
-        headerRowInput.disabled = true;
-
-        fetch('/import/headers', {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.error) {
-                alert(data.error);
-                return;
-            }
-
-            const headers = data.headers;
-            const selects = ['emailColumn', 'firstNameColumn', 'lastNameColumn', 'phoneColumn'];
-            
-            selects.forEach(selectId => {
-                const select = document.getElementById(selectId);
-                select.innerHTML = '<option value="">Sélectionnez une colonne</option>';
-                
-                headers.forEach((header, index) => {
-                    const option = document.createElement('option');
-                    option.value = index;
-                    option.textContent = `${header} (colonne ${index + 1})`;
-                    select.appendChild(option);
-                });
-
-                if (importSettings && importSettings.mapping) {
-                    const mappingKey = selectId.replace('Column', '');
-                    if (importSettings.mapping[mappingKey] !== undefined) {
-                        select.value = importSettings.mapping[mappingKey];
-                    }
-                }
-            });
-
-            mappingSection.style.display = 'block';
-            submitBtn.style.display = 'block';
-        })
-        .catch(error => {
-            alert('Erreur lors de la lecture du fichier: ' + error.message);
-        })
-        .finally(() => {
-            headerRowInput.disabled = false;
-        });
-    }
-});
-</script>
+    <script src="/app/js/import/form.js"></script>
 {/block}
  

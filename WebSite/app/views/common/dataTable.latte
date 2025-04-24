@@ -1,5 +1,4 @@
 <div class="container-fluid">
-
     {if isset($filters) && count($filters) > 0}
         <form method="get" class="row g-3 mb-4">
             {foreach $filters as $filter}
@@ -116,16 +115,16 @@
 </div>
 
 {if isset($modal)}
-    <div class="modal fade" id="{$modal['id']}" tabindex="-1">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">{$modal['title']}</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body" id="{$modal['contentId']}">
-                </div>
+<div class="modal fade" id="{$modal['id']}" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">{$modal['title']}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="{$modal['contentId']}">
             </div>
         </div>
     </div>
+</div>
 {/if}

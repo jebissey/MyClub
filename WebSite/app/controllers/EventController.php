@@ -97,6 +97,40 @@ class EventController extends BaseController
         ]);
     }
 
+    public function home(): void
+    {
+        if ($this->getPerson(['EventManager'])) {
+
+            if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+                $_SESSION['navbar'] = 'eventManager';
+
+                echo $this->latte->render('app/views/admin/eventManager.latte', $this->params->getAll([]));
+            } else {
+                $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
+            }
+        } else {
+            $this->application->error403(__FILE__, __LINE__);
+        }
+    }
+
+    public function needs()
+    {
+        if ($this->getPerson(['Webmaster'])) {
+            echo $this->latte->render('app/views/event/needs.latte', $this->params->getAll([
+                'navItems' => $this->getNavItems(),
+                'needTypes' => $this->fluent->from('NeedType')->orderBy('Name')->fetchAll(),
+                'needs' => $this->fluent
+                    ->from('Need')
+                    ->select('Need.*, NeedType.Name AS TypeName')
+                    ->leftJoin('NeedType ON Need.IdNeedType = NeedType.Id')
+                    ->orderBy('NeedType.Name, Need.Name')
+                    ->fetchAll()
+            ]));
+        } else {
+            $this->application->error403(__FILE__, __LINE__);
+        }
+    }
+
 
     private function getEvent($eventId)
     {

@@ -3,14 +3,15 @@
 namespace app\controllers;
 
 use DateTime;
-use flight\Engine;
 use PDO;
 use app\helpers\Alert;
 use app\helpers\Article;
 use app\helpers\Client;
 use app\helpers\Params;
 use app\helpers\PasswordManager;
+use app\helpers\PersonStatistics;
 use app\helpers\TranslationManager;
+
 
 class UserController extends BaseController
 {
@@ -373,5 +374,22 @@ class UserController extends BaseController
         $query = $this->pdoForLog->prepare('INSERT INTO Log(IpAddress, Referer, Os, Browser, ScreenResolution, Type, Uri, Token, Who, Code, Message) 
         VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ? ,?)');
         $query->execute([$client->getIp(), $client->getReferer(), $client->getOs(), $client->getBrowser(), $client->getScreenResolution(), $client->getType(), $client->getUri(), $client->getToken(), $email, $code, $message]);
+    }
+
+    public function showStatistics()
+    {
+        if ($person = $this->getPerson([])) {
+
+            $personalStatistics = new PersonStatistics($this->pdo);
+            $season = $personalStatistics->getSeasonRange();
+            echo $this->latte->render('app/views/user/statistics.latte', $this->params->getAll([
+                'stats' => $personalStatistics->getStats($person, $season['start'], $season['end']),
+                'seasons' => $personalStatistics->getAvailableSeasons(),
+                'currentSeason' => $season,
+                'navItems' => $this->getNavItems(),
+            ]));
+        } else {
+            $this->application->error403(__FILE__, __LINE__);
+        }
     }
 }

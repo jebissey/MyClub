@@ -1,73 +1,73 @@
-  <div class="container-fluid">
-    <a class="navbar-brand" href="/">
-      <img src="/app/images/home.png" alt="Home" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="{='home'|translate}">
-    </a>
+              <div class="container-fluid">
+                <a class="navbar-brand" href="/">
+                  <img src="/app/images/home.png" alt="Home" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="{='home'|translate}">
+                </a>
 
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-      <span class="navbar-toggler-icon"></span>
-    </button>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                  <span class="navbar-toggler-icon"></span>
+                </button>
 
-    <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav me-auto">
-        {foreach $navItems as $navItem}
-        <li class="nav-item">
-          <a class="nav-link" href="{$navItem['Route']}">{$navItem['Name']|noescape}</a>
-        </li>
-        {/foreach}
-      </ul>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                  <ul class="navbar-nav me-auto">
+                    {foreach $navItems as $navItem}
+                    <li class="nav-item">
+                      <a class="nav-link" href="{$navItem['Route']}">{$navItem['Name']|noescape}</a>
+                    </li>
+                    {/foreach}
+                  </ul>
 
-      {if $keys}
-        <a href="/admin" class="me-2">
-          <img src="/app/images/admin.png" alt="Key set" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="{='admin_zone'|translate}">
-        </a>
-      {/if}
+                  {if $keys}
+                    <a href="/admin" class="me-2">
+                      <img src="/app/images/admin.png" alt="Key set" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="{='admin_zone'|translate}">
+                    </a>
+                  {/if}
 
-      <a class="nav-link" href="{$href}">
-        <img src="{$userImg}" alt="User avatar" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="{if $userEmail != ''}{='my_data'|translate}{else}{='login'|translate}{/if}">
-      </a>
-      
-      {if $userEmail != ''}
-        <a href="/user/sign/out">
-          <img src="/app/images/SignOut.png" alt="Sign out" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="{='logout'|translate}">
-        </a>
-      {/if}
-      <a href="/help">
-        <img src="/app/images/help.png" alt="Help" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="{='contextual_help'|translate}" class="me-2">
-      </a>
-      <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#languageModal">
-        <h2 class="modal-title" id="languageModalLabel">{$flag}</h2>
-      </button>
-    </div>
-  </div>
+                  <a class="nav-link" href="{$href}">
+                    <img src="{$userImg}" alt="User avatar" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="{if $userEmail != ''}{='my_data'|translate}{else}{='login'|translate}{/if}">
+                  </a>
+                  
+                  {if $userEmail != ''}
+                    <a href="/user/sign/out">
+                      <img src="/app/images/SignOut.png" alt="Sign out" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="{='logout'|translate}">
+                    </a>
+                  {/if}
+                  <a href="/help">
+                    <img src="/app/images/help.png" alt="Help" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="{='contextual_help'|translate}" class="me-2">
+                  </a>
+                  <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#languageModal">
+                    <h2 class="modal-title" id="languageModalLabel">{$flag}</h2>
+                  </button>
+                </div>
+              </div>
 
-<div class="modal fade" id="languageModal" tabindex="-1" aria-labelledby="languageModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 class="modal-title" id="languageModalLabel">{='language'|translate}</h2>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form id="languageForm" method="get">
-                    <div class="mb-3">
-                        <label for="lang" class="form-label">{='select_language'|translate}</label>
-                        <select name="lang" id="languageSelect" class="form-select">
-                            {foreach $supportedLanguages as $lang}
-                                <option value="{$lang}" {$lang === $currentLanguage ? 'selected' : ''}>
-                                    {$lang}
-                                </option>
-                            {/foreach}
-                        </select>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
+              <div class="modal fade" id="languageModal" tabindex="-1" aria-labelledby="languageModalLabel" aria-hidden="true">
+                  <div class="modal-dialog">
+                      <div class="modal-content">
+                          <div class="modal-header">
+                              <h2 class="modal-title" id="languageModalLabel">{='language'|translate}</h2>
+                              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                          </div>
+                          <div class="modal-body">
+                              <form id="languageForm" method="get">
+                                  <div class="mb-3">
+                                      <label for="lang" class="form-label">{='select_language'|translate}</label>
+                                      <select name="lang" id="languageSelect" class="form-select">
+                                          {foreach $supportedLanguages as $lang}
+                                              <option value="{$lang}" {$lang === $currentLanguage ? 'selected' : ''}>
+                                                  {$lang}
+                                              </option>
+                                          {/foreach}
+                                      </select>
+                                  </div>
+                              </form>
+                          </div>
+                      </div>
+                  </div>
+              </div>
 
-<script>
-document.getElementById('languageSelect').addEventListener('change', function() {
-    document.cookie = "user_language=" + this.value + "; path=/; max-age=31536000";
-    document.getElementById('languageForm').submit();
-});
-</script>
+              <script>
+              document.getElementById('languageSelect').addEventListener('change', function() {
+                  document.cookie = "user_language=" + this.value + "; path=/; max-age=31536000";
+                  document.getElementById('languageForm').submit();
+              });
+              </script>

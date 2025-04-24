@@ -4,11 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Recherche d'adresse avec carte</title>
-    <!-- Bootstrap CSS -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Bootstrap Icons -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.1/font/bootstrap-icons.min.css" rel="stylesheet">
-    <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
     <style>
         #map {
@@ -89,12 +86,10 @@
         </div>
     </div>
 
-    <!-- Bouton flottant pour copier et fermer -->
     <button id="copyCloseBtn" class="btn btn-success btn-lg rounded-circle shadow">
         <i class="bi bi-clipboard-check"></i>
     </button>
 
-    <!-- Toast pour notification -->
     <div class="toast-container">
         <div id="copyToast" class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
             <div class="d-flex">
@@ -106,12 +101,9 @@
         </div>
     </div>
 
-    <!-- Bootstrap Bundle with Popper -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
-    <!-- Leaflet JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
     <script n:syntax="off">
-        // Variables globales
         let currentAddress = "";
         const copyCloseBtn = document.getElementById('copyCloseBtn');
         const copyToast = document.getElementById('copyToast');
@@ -119,18 +111,14 @@
         const addressInput = document.getElementById('address');
         const searchBtn = document.getElementById('search-btn');
 
-        // Initialisation de la carte
         const map = L.map('map').setView([48.856614, 2.3522219], 13); // Paris par défaut
         
-        // Ajout de la couche OpenStreetMap
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         }).addTo(map);
         
-        // Variable pour stocker le marqueur
         let marker;
         
-        // Fonction pour récupérer les paramètres de l'URL
         function getUrlParams() {
             const params = {};
             const queryString = window.location.search.substring(1);
@@ -146,10 +134,8 @@
             return params;
         }
         
-        // Fonction pour géocoder une adresse avec Nominatim (service gratuit d'OpenStreetMap)
         async function geocodeAddress(address) {
             try {
-                // Ajout d'un délai pour respecter les limites de Nominatim
                 const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&limit=1&addressdetails=1`);
                 const data = await response.json();
                 
@@ -164,30 +150,21 @@
             }
         }
         
-        // Fonction pour mettre à jour la carte et les détails
         function updateMap(result) {
-            // Stocker l'adresse trouvée
             currentAddress = result.display_name;
-            
-            // Afficher le bouton de copie et fermeture
             copyCloseBtn.style.display = "block";
-            
-            // Mise à jour de la carte
             const lat = parseFloat(result.lat);
             const lon = parseFloat(result.lon);
             
             map.setView([lat, lon], 16);
             
-            // Suppression du marqueur existant s'il y en a un
             if (marker) {
                 map.removeLayer(marker);
             }
             
-            // Ajout d'un nouveau marqueur
             marker = L.marker([lat, lon]).addTo(map);
             marker.bindPopup(result.display_name).openPopup();
             
-            // Mise à jour des détails de l'adresse avec Bootstrap
             const addressDetails = document.getElementById('address-details');
             addressDetails.className = "mt-3"; // Supprime alert-info pour styles personnalisés
             
@@ -201,7 +178,6 @@
                     </div>
                 </div>`;
             
-            // Si des détails d'adresse sont disponibles, les ajouter dans un tableau Bootstrap
             if (result.address) {
                 addressHTML += `
                 <div class="card">
@@ -234,16 +210,11 @@
             addressDetails.innerHTML = addressHTML;
         }
 
-        // Fonction pour copier l'adresse et fermer l'onglet
         function copyAddressAndClose() {
             if (currentAddress) {
-                // Copier l'adresse dans le presse-papier
                 navigator.clipboard.writeText(currentAddress)
                     .then(() => {
-                        // Afficher le toast de confirmation
                         toast.show();
-                        
-                        // Fermer l'onglet après un court délai
                         setTimeout(() => {
                             window.close();
                         }, 1500);
@@ -255,17 +226,13 @@
             }
         }
         
-        // Fonction pour effectuer la recherche
         async function performSearch() {
             const address = addressInput.value.trim();
             const addressDetails = document.getElementById('address-details');
             
             if (address) {
                 try {
-                    // Cacher le bouton de copie pendant la recherche
                     copyCloseBtn.style.display = "none";
-                    
-                    // Afficher un indicateur de chargement
                     addressDetails.className = "alert alert-info";
                     addressDetails.innerHTML = '<div class="d-flex align-items-center"><strong>Recherche en cours...</strong><div class="spinner-border ms-auto text-primary" role="status" aria-hidden="true"></div></div>';
                     
@@ -274,41 +241,29 @@
                 } catch (error) {
                     addressDetails.className = "alert alert-danger";
                     addressDetails.innerHTML = "<strong>Erreur:</strong> Impossible de trouver cette adresse. Veuillez réessayer.";
-                    
-                    // Cacher le bouton si la recherche échoue
                     copyCloseBtn.style.display = "none";
                 }
             } else {
                 addressDetails.className = "alert alert-warning";
                 addressDetails.innerHTML = "<strong>Attention:</strong> Veuillez entrer une adresse avant de lancer la recherche.";
-                
-                // Cacher le bouton si aucune adresse n'est entrée
                 copyCloseBtn.style.display = "none";
             }
         }
         
-        // Gestionnaire d'événement pour le bouton de recherche
         searchBtn.addEventListener('click', performSearch);
         
-        // Permettre la recherche en appuyant sur Entrée
         addressInput.addEventListener('keypress', function(event) {
             if (event.key === 'Enter') {
                 searchBtn.click();
             }
         });
         
-        // Événement pour le bouton de copie et fermeture
         copyCloseBtn.addEventListener('click', copyAddressAndClose);
-        
-        // Au chargement de la page, vérifier s'il y a un paramètre d'adresse
         document.addEventListener('DOMContentLoaded', function() {
             const params = getUrlParams();
             
             if (params.address) {
-                // Remplir le champ de recherche avec l'adresse de l'URL
                 addressInput.value = params.address;
-                
-                // Lancer automatiquement la recherche
                 setTimeout(() => {
                     searchBtn.click();
                 }, 500); // Petit délai pour s'assurer que tout est chargé

@@ -3,58 +3,58 @@
 {block title}Modifier le groupe{/block}
 
 {block content}
-<div class="row justify-content-center">
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-header">
-                <h2 class="card-title h5 m-0">Modifier le groupe</h2>
-            </div>
-            <div class="card-body">
-                {if isset($error)}
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    {$error}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title h5 m-0">Modifier le groupe</h2>
                 </div>
-                {/if}
-
-                <form method="POST">
-                    <div class="mb-3">
-                        <label for="name" class="form-label">Nom</label>
-                        <input type="text" class="form-control {if isset($error)}is-invalid{/if}"
-                            id="name" name="name" value="{$group['Name']}" required>
-                        <div class="invalid-feedback">Le nom du groupe est requis</div>
-                    </div>
-                    <div class="mb-3 form-check">
-                        <input type="checkbox" class="form-check-input" id="selfRegistration"
-                            name="selfRegistration" value="1" {if $group['SelfRegistration']}checked{/if}>
-                        <label class="form-check-label" for="selfRegistration">Auto-inscription autorisée</label>
-                    </div>
-                    {if $isWebmaster}
-                    <div class="mb-3">
-                        <label class="form-label">Autorisations</label>
-                        {foreach $availableAuthorizations as $authorization}
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" 
-                                id="auth_{$authorization['Id']}" 
-                                name="authorizations[]" 
-                                value="{$authorization['Id']}"
-                            {if isset($currentAuthorizations) && in_array($authorization['Id'], $currentAuthorizations)}checked{/if}>
-                            <label class="form-check-label" for="auth_{$authorization['Id']}">
-                                {$authorization['Name']}
-                            </label>
-                        </div>
-                        {/foreach}
+                <div class="card-body">
+                    {if isset($error)}
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        {$error}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
                     {/if}
-                    <div class="d-flex justify-content-between">
-                        <a href="/groups" class="btn btn-secondary">Annuler</a>
-                        <button type="submit" class="btn btn-primary">Enregistrer</button>
-                    </div>
-                </form>
+
+                    <form method="POST">
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Nom</label>
+                            <input type="text" class="form-control {if isset($error)}is-invalid{/if}"
+                                id="name" name="name" value="{$group['Name']}" required>
+                            <div class="invalid-feedback">Le nom du groupe est requis</div>
+                        </div>
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="selfRegistration"
+                                name="selfRegistration" value="1" {if $group['SelfRegistration']}checked{/if}>
+                            <label class="form-check-label" for="selfRegistration">Auto-inscription autorisée</label>
+                        </div>
+                        {if $isWebmaster}
+                        <div class="mb-3">
+                            <label class="form-label">Autorisations</label>
+                            {foreach $availableAuthorizations as $authorization}
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" 
+                                    id="auth_{$authorization['Id']}" 
+                                    name="authorizations[]" 
+                                    value="{$authorization['Id']}"
+                                {if isset($currentAuthorizations) && in_array($authorization['Id'], $currentAuthorizations)}checked{/if}>
+                                <label class="form-check-label" for="auth_{$authorization['Id']}">
+                                    {$authorization['Name']}
+                                </label>
+                            </div>
+                            {/foreach}
+                        </div>
+                        {/if}
+                        <div class="d-flex justify-content-between">
+                            <a href="/groups" class="btn btn-secondary">Annuler</a>
+                            <button type="submit" class="btn btn-primary">Enregistrer</button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
-</div>
 {/block}
 {block scripts}
 <script>
