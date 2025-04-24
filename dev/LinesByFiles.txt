@@ -1,25 +1,25 @@
 === Détail par fichier ===
      1 ../WebSite/phpinfo.php
-   385 ../WebSite/index.php
+   270 ../WebSite/index.php
     65 ../WebSite/app/views/dbbrowser/edit.latte
     43 ../WebSite/app/views/dbbrowser/index.latte
    135 ../WebSite/app/views/dbbrowser/table.latte
     65 ../WebSite/app/views/dbbrowser/create.latte
    154 ../WebSite/app/views/layout.latte
    110 ../WebSite/app/views/home.latte
-   170 ../WebSite/app/views/designs/index.latte
-   136 ../WebSite/app/views/designs/create.latte
+   116 ../WebSite/app/views/designs/index.latte
+    86 ../WebSite/app/views/designs/create.latte
     89 ../WebSite/app/views/groups/edit.latte
-   125 ../WebSite/app/views/groups/index.latte
+    90 ../WebSite/app/views/groups/index.latte
     93 ../WebSite/app/views/groups/create.latte
     98 ../WebSite/app/views/eventType/edit.latte
-   154 ../WebSite/app/views/eventType/index.latte
+    59 ../WebSite/app/views/eventType/index.latte
     26 ../WebSite/app/views/eventType/attributes.latte
     40 ../WebSite/app/views/eventType/attributes-list.latte
     27 ../WebSite/app/views/persons/index.latte
     29 ../WebSite/app/views/navbar/redactor.latte
     35 ../WebSite/app/views/navbar/user.latte
-    72 ../WebSite/app/views/navbar/home.latte
+    73 ../WebSite/app/views/navbar/home.latte
    327 ../WebSite/app/views/navbar/index.latte
     23 ../WebSite/app/views/navbar/eventManager.latte
     29 ../WebSite/app/views/navbar/personManager.latte
@@ -29,10 +29,10 @@
     34 ../WebSite/app/views/navbar/admin.latte
     38 ../WebSite/app/views/registration/groups.latte
     80 ../WebSite/app/views/registration/index.latte
-   318 ../WebSite/app/views/event/location.latte
-   193 ../WebSite/app/views/event/detail.latte
-   325 ../WebSite/app/views/event/needs.latte
-   465 ../WebSite/app/views/event/nextEvents.latte
+   273 ../WebSite/app/views/event/location.latte
+   112 ../WebSite/app/views/event/detail.latte
+   186 ../WebSite/app/views/event/needs.latte
+   213 ../WebSite/app/views/event/nextEvents.latte
     60 ../WebSite/app/views/logs/referer.latte
    153 ../WebSite/app/views/logs/crossTab.latte
     80 ../WebSite/app/views/logs/topPages.latte
@@ -40,11 +40,11 @@
    120 ../WebSite/app/views/logs/visitor.latte
    165 ../WebSite/app/views/logs/statistics.latte
      5 ../WebSite/app/views/admin/redactor.latte
-     8 ../WebSite/app/views/admin/eventManager.latte
-   238 ../WebSite/app/views/admin/arwards.latte
-     8 ../WebSite/app/views/admin/personManager.latte
-    17 ../WebSite/app/views/admin/webmaster.latte
-     8 ../WebSite/app/views/admin/admin.latte
+     4 ../WebSite/app/views/admin/eventManager.latte
+   106 ../WebSite/app/views/admin/arwards.latte
+     4 ../WebSite/app/views/admin/personManager.latte
+    13 ../WebSite/app/views/admin/webmaster.latte
+     4 ../WebSite/app/views/admin/admin.latte
    101 ../WebSite/app/views/survey/add.latte
     51 ../WebSite/app/views/survey/results.latte
    142 ../WebSite/app/views/user/ffaSearch.latte
@@ -64,35 +64,46 @@
     97 ../WebSite/app/views/media/upload.latte
     26 ../WebSite/app/views/emails/copyToClipBoard.latte
     76 ../WebSite/app/views/emails/getEmails.latte
-   130 ../WebSite/app/views/common/dataTable.latte
+   129 ../WebSite/app/views/common/dataTable.latte
     12 ../WebSite/app/views/info.latte
-   186 ../WebSite/app/views/import/form.latte
-   184 ../WebSite/app/views/alerts/index.latte
+    97 ../WebSite/app/views/import/form.latte
+   133 ../WebSite/app/views/alerts/index.latte
+   213 ../WebSite/app/api/WebmasterApi.php
+   270 ../WebSite/app/api/ArticleApi.php
+   445 ../WebSite/app/api/EventApi.php
     43 ../WebSite/app/controllers/AdminController.php
    121 ../WebSite/app/controllers/EmailController.php
    297 ../WebSite/app/controllers/DbBrowserController.php
-    25 ../WebSite/app/controllers/PersonStatisticsController.php
    228 ../WebSite/app/controllers/BaseController.php
-   377 ../WebSite/app/controllers/UserController.php
-   115 ../WebSite/app/controllers/NavBarController.php
+   395 ../WebSite/app/controllers/UserController.php
+    91 ../WebSite/app/controllers/NavBarController.php
    173 ../WebSite/app/controllers/WebmasterController.php
    124 ../WebSite/app/controllers/SurveyController.php
     39 ../WebSite/app/controllers/FFAController.php
    133 ../WebSite/app/controllers/EventTypeController.php
    161 ../WebSite/app/controllers/MediaController.php
-   137 ../WebSite/app/controllers/EventController.php
+   171 ../WebSite/app/controllers/EventController.php
    152 ../WebSite/app/controllers/ImportController.php
    170 ../WebSite/app/controllers/PersonController.php
    739 ../WebSite/app/controllers/LogController.php
    139 ../WebSite/app/controllers/RegistrationController.php
-   887 ../WebSite/app/controllers/ApiController.php
    368 ../WebSite/app/controllers/ArticleController.php
     44 ../WebSite/app/controllers/TableController.php
     89 ../WebSite/app/controllers/AlertController.php
-    24 ../WebSite/app/controllers/NeedsController.php
     93 ../WebSite/app/controllers/DesignController.php
     11 ../WebSite/app/controllers/CrudControllerInterface.php
    168 ../WebSite/app/controllers/GroupController.php
+    55 ../WebSite/app/js/designs/index.js
+    48 ../WebSite/app/js/designs/create.js
+    32 ../WebSite/app/js/groups/index.js
+    93 ../WebSite/app/js/eventType/index.js
+    58 ../WebSite/app/js/event/detail.js
+   142 ../WebSite/app/js/event/needs.js
+   411 ../WebSite/app/js/event/nextEvents.js
+   159 ../WebSite/app/js/logs/analytics.js
+   127 ../WebSite/app/js/admin/arwards.js
+    87 ../WebSite/app/js/import/form.js
+    48 ../WebSite/app/js/alerts/index.js
     10 ../WebSite/app/helpers/EventAudience.php
     28 ../WebSite/app/helpers/Settings.php
     64 ../WebSite/app/helpers/Authorization.php
@@ -111,11 +122,13 @@
     38 ../WebSite/app/helpers/BaseHelper.php
     25 ../WebSite/app/helpers/Article.php
     14 ../WebSite/app/helpers/Params.php
-   124 ../WebSite/app/helpers/Event.php
- 14288 total
+   116 ../WebSite/app/helpers/Event.php
+ 14406 total
 
 === Total par type de fichier ===
 Fichiers PHP :
-6863
+6760
 Fichiers Latte :
-7425
+6386
+Fichiers Javascript :
+1260
