@@ -7,131 +7,131 @@
 {/block}
 
 {block content}
-<div class="container mt-4">
-    <div class="card mb-4">
-        <div class="card-header">
-            <h5>Recherche dans la base FFA</h5>
-        </div>
-        <div class="card-body">
-            <form method="get" action="/ffa/search">
-                <input type="hidden" name="question" id="question" value="rank">
-
-                <div class="row">
-                    <div class="col-md-5">
-                        <div class="form-group">
-                            <label for="firstName">Prénom</label>
-                            <input type="text" class="form-control" id="firstName" name="firstName" value="{$firstName}">
-                        </div>
-                    </div>
-                    <div class="col-md-5">
-                        <div class="form-group">
-                            <label for="lastName">Nom</label>
-                            <input type="text" class="form-control" id="lastName" name="lastName" value="{$lastName}">
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-md-5">
-                        <div class="form-group">
-                            <label for="year">Année</label>
-                            <input type="number" class="form-control" id="year" name="year" value="{$year}">
-                        </div>
-                    </div>
-                    <div class="col-md-5">
-                        <div class="form-group">
-                            <label for="club">Club</label>
-                            <input type="text" class="form-control" id="club" name="club" value="{$club}">
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-md-2">
-                        <button type="submit" class="btn btn-primary w-100" onclick="setQuestion('rank')">Classement</button>
-                    </div>
-                    <div class="col-md-2">
-                        <button type="submit" class="btn btn-primary w-100" onclick="setQuestion('results')">Résultats</button>
-                    </div>
-                </div>
-            </form>
-        </div>
-    </div>
-    
-    {if !empty($results) && !isset($results['error'])}
-        <div class="card">
-        {if $question == 'rank'}
+    <div class="container mt-4">
+        <div class="card mb-4">
             <div class="card-header">
-                <h5>Classement</h5>
+                <h5>Recherche dans la base FFA</h5>
             </div>
             <div class="card-body">
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>Classement</th>
-                            <th>Epreuve</th>
-                            <th>Nom</th>
-                            <th>Club</th>
-                            <th>Points</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>{$results['rank']}</td>
-                            <td>{$results['event']}</td>
-                            <td>{$results['name']}</td>
-                            <td>{$results['club']}</td>
-                            <td>{$results['points']}</td>
-                        </tr>
-                    </tbody>
-                </table>
+                <form method="get" action="/ffa/search">
+                    <input type="hidden" name="question" id="question" value="rank">
+
+                    <div class="row">
+                        <div class="col-md-5">
+                            <div class="form-group">
+                                <label for="firstName">Prénom</label>
+                                <input type="text" class="form-control" id="firstName" name="firstName" value="{$firstName}">
+                            </div>
+                        </div>
+                        <div class="col-md-5">
+                            <div class="form-group">
+                                <label for="lastName">Nom</label>
+                                <input type="text" class="form-control" id="lastName" name="lastName" value="{$lastName}">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-5">
+                            <div class="form-group">
+                                <label for="year">Année</label>
+                                <input type="number" class="form-control" id="year" name="year" value="{$year}">
+                            </div>
+                        </div>
+                        <div class="col-md-5">
+                            <div class="form-group">
+                                <label for="club">Club</label>
+                                <input type="text" class="form-control" id="club" name="club" value="{$club}">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-primary w-100" onclick="setQuestion('rank')">Classement</button>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-primary w-100" onclick="setQuestion('results')">Résultats</button>
+                        </div>
+                    </div>
+                </form>
             </div>
-        {elseif $question == 'results'}
-            <div class="card-header">
-                <h5>Résultats</h5>
+        </div>
+        
+        {if !empty($results) && !isset($results['error'])}
+            <div class="card">
+            {if $question == 'rank'}
+                <div class="card-header">
+                    <h5>Classement</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Classement</th>
+                                <th>Epreuve</th>
+                                <th>Nom</th>
+                                <th>Club</th>
+                                <th>Points</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>{$results['rank']}</td>
+                                <td>{$results['event']}</td>
+                                <td>{$results['name']}</td>
+                                <td>{$results['club']}</td>
+                                <td>{$results['points']}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            {elseif $question == 'results'}
+                <div class="card-header">
+                    <h5>Résultats</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Compétition</th>
+                                <th>Place</th>
+                                <th>Temps</th>
+                                <th>Catégorie</th>
+                                <th>Round</th>
+                                <th>Lieu</th>
+                                {if $firstName == '' && $lastName == ''}<th>Nom</th>{/if}
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {foreach $results as $result}   
+                            <tr>
+                                <td>{$result['date']}</td>
+                                <td>{$result['competition']}</td>
+                                <td>{$result['place']}</td>
+                                <td>{$result['time']}</td>
+                                <td>{$result['category']}</td>
+                                <td>{$result['round']}</td>
+                                <td>{$result['location']}</td>
+                                {if $firstName == '' && $lastName == ''}<td>{$result['name']}</td>{/if}
+                            </tr>
+                            {/foreach}
+                        </tbody>
+                    </table>
+                </div>
+            {/if}
             </div>
-            <div class="card-body">
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>Date</th>
-                            <th>Compétition</th>
-                            <th>Place</th>
-                            <th>Temps</th>
-                            <th>Catégorie</th>
-                            <th>Round</th>
-                            <th>Lieu</th>
-                            {if $firstName == '' && $lastName == ''}<th>Nom</th>{/if}
-                        </tr>
-                    </thead>
-                    <tbody>
-                    {foreach $results as $result}   
-                        <tr>
-                            <td>{$result['date']}</td>
-                            <td>{$result['competition']}</td>
-                            <td>{$result['place']}</td>
-                            <td>{$result['time']}</td>
-                            <td>{$result['category']}</td>
-                            <td>{$result['round']}</td>
-                            <td>{$result['location']}</td>
-                            {if $firstName == '' && $lastName == ''}<td>{$result['name']}</td>{/if}
-                        </tr>
-                        {/foreach}
-                    </tbody>
-                </table>
+        {elseif isset($results['error'])}
+            <div class="alert alert-danger">
+                <strong>Erreur :</strong> {$results['error']}
+            </div>
+        {elseif $firstName && $lastName}
+            <div class="alert alert-warning">
+                Aucun résultat trouvé pour cette recherche.
             </div>
         {/if}
-        </div>
-    {elseif isset($results['error'])}
-        <div class="alert alert-danger">
-            <strong>Erreur :</strong> {$results['error']}
-        </div>
-    {elseif $firstName && $lastName}
-        <div class="alert alert-warning">
-            Aucun résultat trouvé pour cette recherche.
-        </div>
-    {/if}
-</div>
+    </div>
 {/block}
 
 {block scripts}

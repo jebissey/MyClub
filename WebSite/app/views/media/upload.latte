@@ -1,98 +1,44 @@
 {layout '../admin/redactor.latte'}
 
 {block content}
-<div class="container mt-4">
-    <h1>Upload de fichiers médias</h1>
-    
-    <div class="card">
-        <div class="card-body">
-            <form id="uploadForm" enctype="multipart/form-data">
-                <div class="mb-3">
-                    <label for="file" class="form-label">Sélectionner un fichier</label>
-                    <input type="file" class="form-control" id="file" name="file" required>
-                </div>
-                <button type="submit" class="btn btn-primary"><i class="bi bi-upload"></i></button>
-            </form>
-            
-            <div id="uploadStatus" class="mt-3" style="display: none;"></div>
-            
-            <div id="uploadResult" class="mt-4" style="display: none;">
-                <h5>Fichier uploadé avec succès</h5>
-                <div class="mb-2">
-                    <strong>Nom:</strong> <span id="fileName"></span>
-                </div>
-                <div class="mb-2">
-                    <strong>URL:</strong> 
-                    <div class="input-group">
-                        <input type="text" class="form-control" id="fileUrl" readonly>
-                        <button class="btn btn-outline-secondary" type="button" id="copyUrlBtn">
-                            <i class="bi bi-clipboard"></i> Copier
-                        </button>
+    <div class="container mt-4">
+        <h1>Upload de fichiers médias</h1>
+        
+        <div class="card">
+            <div class="card-body">
+                <form id="uploadForm" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label for="file" class="form-label">Sélectionner un fichier</label>
+                        <input type="file" class="form-control" id="file" name="file" required>
                     </div>
-                </div>
-                <div class="mt-3">
-                    <a href="/media/list" class="btn btn-secondary">Voir tous les fichiers</a>
+                    <button type="submit" class="btn btn-primary"><i class="bi bi-upload"></i></button>
+                </form>
+                
+                <div id="uploadStatus" class="mt-3" style="display: none;"></div>
+                
+                <div id="uploadResult" class="mt-4" style="display: none;">
+                    <h5>Fichier uploadé avec succès</h5>
+                    <div class="mb-2">
+                        <strong>Nom:</strong> <span id="fileName"></span>
+                    </div>
+                    <div class="mb-2">
+                        <strong>URL:</strong> 
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="fileUrl" readonly>
+                            <button class="btn btn-outline-secondary" type="button" id="copyUrlBtn">
+                                <i class="bi bi-clipboard"></i> Copier
+                            </button>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <a href="/media/list" class="btn btn-secondary">Voir tous les fichiers</a>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 {/block}
 
 {block scripts}
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const uploadForm = document.getElementById('uploadForm');
-        const uploadStatus = document.getElementById('uploadStatus');
-        const uploadResult = document.getElementById('uploadResult');
-        const fileNameEl = document.getElementById('fileName');
-        const fileUrlEl = document.getElementById('fileUrl');
-        const copyUrlBtn = document.getElementById('copyUrlBtn');
-        
-        uploadForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const formData = new FormData(this);
-            
-            uploadStatus.innerHTML = '<div class="alert alert-info">Upload en cours...</div>';
-            uploadStatus.style.display = 'block';
-            uploadResult.style.display = 'none';
-            
-            fetch('/api/media/upload', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    uploadStatus.innerHTML = '<div class="alert alert-success">' + data.message + '</div>';
-                    fileNameEl.textContent = data.file.name;
-                    fileUrlEl.value = data.file.url;
-                    uploadResult.style.display = 'block';
-                } else {
-                    uploadStatus.innerHTML = '<div class="alert alert-danger">' + data.message + '</div>';
-                }
-            })
-            .catch(error => {
-                uploadStatus.innerHTML = '<div class="alert alert-danger">Erreur: ' + error.message + '</div>';
-            });
-        });
-        
-        copyUrlBtn.addEventListener('click', function() {
-            fileUrlEl.select();
-            document.execCommand('copy');
-            
-            const originalText = copyUrlBtn.innerHTML;
-            copyUrlBtn.innerHTML = '<i class="bi bi-check"></i> Copié!';
-            copyUrlBtn.classList.add('btn-success');
-            copyUrlBtn.classList.remove('btn-outline-secondary');
-            
-            setTimeout(function() {
-                copyUrlBtn.innerHTML = originalText;
-                copyUrlBtn.classList.remove('btn-success');
-                copyUrlBtn.classList.add('btn-outline-secondary');
-            }, 2000);
-        });
-    });
-</script>
+    <script src="/app/js/media/upload.js"></script>
 {/block}

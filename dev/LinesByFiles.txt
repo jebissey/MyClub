@@ -1,11 +1,11 @@
 === Détail par fichier ===
      1 ../WebSite/phpinfo.php
-   270 ../WebSite/index.php
+   267 ../WebSite/index.php
     65 ../WebSite/app/views/dbbrowser/edit.latte
     43 ../WebSite/app/views/dbbrowser/index.latte
    135 ../WebSite/app/views/dbbrowser/table.latte
     65 ../WebSite/app/views/dbbrowser/create.latte
-   154 ../WebSite/app/views/layout.latte
+    98 ../WebSite/app/views/layout.latte
    110 ../WebSite/app/views/home.latte
    116 ../WebSite/app/views/designs/index.latte
     86 ../WebSite/app/views/designs/create.latte
@@ -20,7 +20,7 @@
     29 ../WebSite/app/views/navbar/redactor.latte
     35 ../WebSite/app/views/navbar/user.latte
     73 ../WebSite/app/views/navbar/home.latte
-   327 ../WebSite/app/views/navbar/index.latte
+   111 ../WebSite/app/views/navbar/index.latte
     23 ../WebSite/app/views/navbar/eventManager.latte
     29 ../WebSite/app/views/navbar/personManager.latte
     50 ../WebSite/app/views/navbar/webmaster.latte
@@ -28,7 +28,7 @@
     10 ../WebSite/app/views/navbar/article.latte
     34 ../WebSite/app/views/navbar/admin.latte
     38 ../WebSite/app/views/registration/groups.latte
-    80 ../WebSite/app/views/registration/index.latte
+    31 ../WebSite/app/views/registration/index.latte
    273 ../WebSite/app/views/event/location.latte
    112 ../WebSite/app/views/event/detail.latte
    186 ../WebSite/app/views/event/needs.latte
@@ -37,7 +37,7 @@
    153 ../WebSite/app/views/logs/crossTab.latte
     80 ../WebSite/app/views/logs/topPages.latte
    245 ../WebSite/app/views/logs/analytics.latte
-   120 ../WebSite/app/views/logs/visitor.latte
+   121 ../WebSite/app/views/logs/visitor.latte
    165 ../WebSite/app/views/logs/statistics.latte
      5 ../WebSite/app/views/admin/redactor.latte
      4 ../WebSite/app/views/admin/eventManager.latte
@@ -45,23 +45,23 @@
      4 ../WebSite/app/views/admin/personManager.latte
     13 ../WebSite/app/views/admin/webmaster.latte
      4 ../WebSite/app/views/admin/admin.latte
-   101 ../WebSite/app/views/survey/add.latte
+    60 ../WebSite/app/views/survey/add.latte
     51 ../WebSite/app/views/survey/results.latte
    142 ../WebSite/app/views/user/ffaSearch.latte
-     8 ../WebSite/app/views/user/user.latte
+     4 ../WebSite/app/views/user/user.latte
    116 ../WebSite/app/views/user/articles.latte
     30 ../WebSite/app/views/user/groups.latte
-    94 ../WebSite/app/views/user/availabilities.latte
-   112 ../WebSite/app/views/user/signIn.latte
+    65 ../WebSite/app/views/user/availabilities.latte
+    42 ../WebSite/app/views/user/signIn.latte
     36 ../WebSite/app/views/user/setPassword.latte
-   160 ../WebSite/app/views/user/preferences.latte
+    99 ../WebSite/app/views/user/preferences.latte
     29 ../WebSite/app/views/user/publish.latte
-   136 ../WebSite/app/views/user/account.latte
+   106 ../WebSite/app/views/user/account.latte
    561 ../WebSite/app/views/user/article.latte
    212 ../WebSite/app/views/user/statistics.latte
-   175 ../WebSite/app/views/media/list.latte
+   100 ../WebSite/app/views/media/list.latte
     68 ../WebSite/app/views/media/gpxViewer.latte
-    97 ../WebSite/app/views/media/upload.latte
+    43 ../WebSite/app/views/media/upload.latte
     26 ../WebSite/app/views/emails/copyToClipBoard.latte
     76 ../WebSite/app/views/emails/getEmails.latte
    129 ../WebSite/app/views/common/dataTable.latte
@@ -71,13 +71,12 @@
    213 ../WebSite/app/api/WebmasterApi.php
    270 ../WebSite/app/api/ArticleApi.php
    445 ../WebSite/app/api/EventApi.php
-    43 ../WebSite/app/controllers/AdminController.php
    121 ../WebSite/app/controllers/EmailController.php
    297 ../WebSite/app/controllers/DbBrowserController.php
    228 ../WebSite/app/controllers/BaseController.php
    395 ../WebSite/app/controllers/UserController.php
     91 ../WebSite/app/controllers/NavBarController.php
-   173 ../WebSite/app/controllers/WebmasterController.php
+   210 ../WebSite/app/controllers/WebmasterController.php
    124 ../WebSite/app/controllers/SurveyController.php
     39 ../WebSite/app/controllers/FFAController.php
    133 ../WebSite/app/controllers/EventTypeController.php
@@ -93,15 +92,26 @@
     93 ../WebSite/app/controllers/DesignController.php
     11 ../WebSite/app/controllers/CrudControllerInterface.php
    168 ../WebSite/app/controllers/GroupController.php
+    55 ../WebSite/app/js/layout.js
     55 ../WebSite/app/js/designs/index.js
     48 ../WebSite/app/js/designs/create.js
     32 ../WebSite/app/js/groups/index.js
     93 ../WebSite/app/js/eventType/index.js
+   214 ../WebSite/app/js/navbar/index.js
+    47 ../WebSite/app/js/registration/index.js
     58 ../WebSite/app/js/event/detail.js
    142 ../WebSite/app/js/event/needs.js
    411 ../WebSite/app/js/event/nextEvents.js
    159 ../WebSite/app/js/logs/analytics.js
    127 ../WebSite/app/js/admin/arwards.js
+    39 ../WebSite/app/js/survey/add.js
+    59 ../WebSite/app/js/user/preferences.js
+    27 ../WebSite/app/js/user/availabilities.js
+    70 ../WebSite/app/js/user/signIn.js
+    27 ../WebSite/app/js/user/account.js
+     0 ../WebSite/app/js/user/article.js
+    52 ../WebSite/app/js/media/upload.js
+    73 ../WebSite/app/js/media/list.js
     87 ../WebSite/app/js/import/form.js
     48 ../WebSite/app/js/alerts/index.js
     10 ../WebSite/app/helpers/EventAudience.php
@@ -123,12 +133,12 @@
     25 ../WebSite/app/helpers/Article.php
     14 ../WebSite/app/helpers/Params.php
    116 ../WebSite/app/helpers/Event.php
- 14406 total
+ 14376 total
 
 === Total par type de fichier ===
 Fichiers PHP :
-6760
+6751
 Fichiers Latte :
-6386
+5702
 Fichiers Javascript :
-1260
+1923

@@ -7,207 +7,207 @@
 {/block}
 
 {block content}
-<div class="container mt-4">
-    <h1>Statistiques pour {$stats['person']['FirstName']} {$stats['person']['LastName']}</h1>
-    
-    <div class="card mb-4">
-        <div class="card-header">
-            <div class="row">
-                <div class="col">
-                    <h5>Période : {date('d/m/Y', strtotime($currentSeason['start']))} - {date('d/m/Y', strtotime($currentSeason['end']))}</h5>
-                </div>
-                <div class="col-md-4">
-                    <form method="get" class="form-inline">
-                        <div class="input-group">
-                            <select name="season" class="form-control" onchange="this.form.submit()">
-                                {foreach $seasons as $season}
-                                    <option value="{$season['start']}|{$season['end']}" {if $season['start'] == $currentSeason['start']}selected{/if}>
-                                        {$season['label']}
-                                    </option>
-                                {/foreach}
-                            </select>
-                            <div class="input-group-append">
-                                <button class="btn btn-outline-secondary" type="submit">Filtrer</button>
+    <div class="container mt-4">
+        <h1>Statistiques pour {$stats['person']['FirstName']} {$stats['person']['LastName']}</h1>
+        
+        <div class="card mb-4">
+            <div class="card-header">
+                <div class="row">
+                    <div class="col">
+                        <h5>Période : {date('d/m/Y', strtotime($currentSeason['start']))} - {date('d/m/Y', strtotime($currentSeason['end']))}</h5>
+                    </div>
+                    <div class="col-md-4">
+                        <form method="get" class="form-inline">
+                            <div class="input-group">
+                                <select name="season" class="form-control" onchange="this.form.submit()">
+                                    {foreach $seasons as $season}
+                                        <option value="{$season['start']}|{$season['end']}" {if $season['start'] == $currentSeason['start']}selected{/if}>
+                                            {$season['label']}
+                                        </option>
+                                    {/foreach}
+                                </select>
+                                <div class="input-group-append">
+                                    <button class="btn btn-outline-secondary" type="submit">Filtrer</button>
+                                </div>
                             </div>
-                        </div>
-                    </form>
+                        </form>
+                    </div>
                 </div>
             </div>
-        </div>
-        
-        <div class="card-body">
-            <div class="row">
-                <div class="col-md-6">
-                    <h3>Activités éditoriales</h3>
-                    
-                    {if $isRedactor}
-                    <div class="mb-3">
-                        <h5>Articles</h5>
-                        <div class="progress" style="height: 25px;">
-                            <div class="progress-bar" role="progressbar" style="width: {$stats['articles']['percentage']}%;" 
-                                aria-valuenow="{$stats['articles']['percentage']}" aria-valuemin="0" aria-valuemax="100">
-                                {$stats['articles']['percentage']}%
+            
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h3>Activités éditoriales</h3>
+                        
+                        {if $isRedactor}
+                        <div class="mb-3">
+                            <h5>Articles</h5>
+                            <div class="progress" style="height: 25px;">
+                                <div class="progress-bar" role="progressbar" style="width: {$stats['articles']['percentage']}%;" 
+                                    aria-valuenow="{$stats['articles']['percentage']}" aria-valuemin="0" aria-valuemax="100">
+                                    {$stats['articles']['percentage']}%
+                                </div>
                             </div>
+                            <small class="text-muted">
+                                {$stats['articles']['user']} article(s) sur un total de {$stats['articles']['total']}
+                            </small>
                         </div>
-                        <small class="text-muted">
-                            {$stats['articles']['user']} article(s) sur un total de {$stats['articles']['total']}
-                        </small>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <h5>Sondages</h5>
-                        <div class="progress" style="height: 25px;">
-                            <div class="progress-bar bg-info" role="progressbar" style="width: {$stats['surveys']['percentage']}%;" 
-                                aria-valuenow="{$stats['surveys']['percentage']}" aria-valuemin="0" aria-valuemax="100">
-                                {$stats['surveys']['percentage']}%
+                        
+                        <div class="mb-3">
+                            <h5>Sondages</h5>
+                            <div class="progress" style="height: 25px;">
+                                <div class="progress-bar bg-info" role="progressbar" style="width: {$stats['surveys']['percentage']}%;" 
+                                    aria-valuenow="{$stats['surveys']['percentage']}" aria-valuemin="0" aria-valuemax="100">
+                                    {$stats['surveys']['percentage']}%
+                                </div>
                             </div>
+                            <small class="text-muted">
+                                {$stats['surveys']['user']} sondage(s) sur un total de {$stats['surveys']['total']}
+                            </small>
                         </div>
-                        <small class="text-muted">
-                            {$stats['surveys']['user']} sondage(s) sur un total de {$stats['surveys']['total']}
-                        </small>
-                    </div>
-                    {/if}
+                        {/if}
 
-                    <div class="mb-3">
-                        <h5>Réponses aux sondages</h5>
-                        <div class="progress" style="height: 25px;">
-                            <div class="progress-bar bg-success" role="progressbar" style="width: {$stats['surveyReplies']['percentage']}%;" 
-                                aria-valuenow="{$stats['surveyReplies']['percentage']}" aria-valuemin="0" aria-valuemax="100">
-                                {$stats['surveyReplies']['percentage']}%
+                        <div class="mb-3">
+                            <h5>Réponses aux sondages</h5>
+                            <div class="progress" style="height: 25px;">
+                                <div class="progress-bar bg-success" role="progressbar" style="width: {$stats['surveyReplies']['percentage']}%;" 
+                                    aria-valuenow="{$stats['surveyReplies']['percentage']}" aria-valuemin="0" aria-valuemax="100">
+                                    {$stats['surveyReplies']['percentage']}%
+                                </div>
                             </div>
+                            <small class="text-muted">
+                                {$stats['surveyReplies']['user']} réponse(s) sur un total de {$stats['surveyReplies']['total']}
+                            </small>
                         </div>
-                        <small class="text-muted">
-                            {$stats['surveyReplies']['user']} réponse(s) sur un total de {$stats['surveyReplies']['total']}
-                        </small>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <h3>Designs et votes</h3>
+                        
+                        {if $isRedactor}
+                        <div class="mb-3">
+                            <h5>Designs créés</h5>
+                            <div class="progress" style="height: 25px;">
+                                <div class="progress-bar bg-warning" role="progressbar" style="width: {$stats['designs']['percentage']}%;" 
+                                    aria-valuenow="{$stats['designs']['percentage']}" aria-valuemin="0" aria-valuemax="100">
+                                    {$stats['designs']['percentage']}%
+                                </div>
+                            </div>
+                            <small class="text-muted">
+                                {$stats['designs']['user']} design(s) sur un total de {$stats['designs']['total']}
+                            </small>
+                        </div>
+                        {/if}
+                        
+                        <div class="mb-3">
+                            <h5>Votes sur les designs</h5>
+                            <div class="progress" style="height: 25px;">
+                                <div class="progress-bar bg-danger" role="progressbar" style="width: {$stats['designVotes']['percentage']}%;" 
+                                    aria-valuenow="{$stats['designVotes']['percentage']}" aria-valuemin="0" aria-valuemax="100">
+                                    {$stats['designVotes']['percentage']}%
+                                </div>
+                            </div>
+                            <small class="text-muted">
+                                {$stats['designVotes']['user']} vote(s) sur un total de {$stats['designVotes']['total']}
+                            </small>
+                        </div>
                     </div>
                 </div>
                 
-                <div class="col-md-6">
-                    <h3>Designs et votes</h3>
-                    
-                    {if $isRedactor}
-                    <div class="mb-3">
-                        <h5>Designs créés</h5>
-                        <div class="progress" style="height: 25px;">
-                            <div class="progress-bar bg-warning" role="progressbar" style="width: {$stats['designs']['percentage']}%;" 
-                                aria-valuenow="{$stats['designs']['percentage']}" aria-valuemin="0" aria-valuemax="100">
-                                {$stats['designs']['percentage']}%
-                            </div>
-                        </div>
-                        <small class="text-muted">
-                            {$stats['designs']['user']} design(s) sur un total de {$stats['designs']['total']}
-                        </small>
-                    </div>
-                    {/if}
-                    
-                    <div class="mb-3">
-                        <h5>Votes sur les designs</h5>
-                        <div class="progress" style="height: 25px;">
-                            <div class="progress-bar bg-danger" role="progressbar" style="width: {$stats['designVotes']['percentage']}%;" 
-                                aria-valuenow="{$stats['designVotes']['percentage']}" aria-valuemin="0" aria-valuemax="100">
-                                {$stats['designVotes']['percentage']}%
-                            </div>
-                        </div>
-                        <small class="text-muted">
-                            {$stats['designVotes']['user']} vote(s) sur un total de {$stats['designVotes']['total']}
-                        </small>
-                    </div>
-                </div>
-            </div>
-            
-            <hr>
-            
-            <div class="row mt-4">
-            {if $isEventManager}
-                <div class="col-md-6">
-                    <h3>Événements créés</h3>
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>Type d'événement</th>
-                                <th>Nombre</th>
-                                <th>Total</th>
-                                <th>Pourcentage</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {foreach $stats['events'] as $typeId => $eventStat}
-                                <tr {if $typeId === 'total'}class="table-active"{/if}>
-                                    <td>{$eventStat['typeName']}</td>
-                                    <td>{$eventStat['user']}</td>
-                                    <td>{$eventStat['total']}</td>
-                                    <td>
-                                        <div class="progress">
-                                            <div class="progress-bar bg-primary" role="progressbar" 
-                                                style="width: {$eventStat['percentage']}%;" 
-                                                aria-valuenow="{$eventStat['percentage']}" 
-                                                aria-valuemin="0" aria-valuemax="100">
-                                                {$eventStat['percentage']}%
-                                            </div>
-                                        </div>
-                                    </td>
+                <hr>
+                
+                <div class="row mt-4">
+                {if $isEventManager}
+                    <div class="col-md-6">
+                        <h3>Événements créés</h3>
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Type d'événement</th>
+                                    <th>Nombre</th>
+                                    <th>Total</th>
+                                    <th>Pourcentage</th>
                                 </tr>
-                            {/foreach}
-                        </tbody>
-                    </table>
-                </div>
-            {/if}
+                            </thead>
+                            <tbody>
+                                {foreach $stats['events'] as $typeId => $eventStat}
+                                    <tr {if $typeId === 'total'}class="table-active"{/if}>
+                                        <td>{$eventStat['typeName']}</td>
+                                        <td>{$eventStat['user']}</td>
+                                        <td>{$eventStat['total']}</td>
+                                        <td>
+                                            <div class="progress">
+                                                <div class="progress-bar bg-primary" role="progressbar" 
+                                                    style="width: {$eventStat['percentage']}%;" 
+                                                    aria-valuenow="{$eventStat['percentage']}" 
+                                                    aria-valuemin="0" aria-valuemax="100">
+                                                    {$eventStat['percentage']}%
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {/foreach}
+                            </tbody>
+                        </table>
+                    </div>
+                {/if}
 
-                <div class="col-md-6">
-                    <h3>Participations aux événements</h3>
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>Type d'événement</th>
-                                <th>Nombre</th>
-                                <th>Total</th>
-                                <th>Pourcentage</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {foreach $stats['eventParticipations'] as $typeId => $participationStat}
-                                <tr {if $typeId === 'total'}class="table-active"{/if}>
-                                    <td>{$participationStat['typeName']}</td>
-                                    <td>{$participationStat['user']}</td>
-                                    <td>{$participationStat['total']}</td>
-                                    <td>
-                                        <div class="progress">
-                                            <div class="progress-bar bg-info" role="progressbar" 
-                                                style="width: {$participationStat['percentage']}%;" 
-                                                aria-valuenow="{$participationStat['percentage']}" 
-                                                aria-valuemin="0" aria-valuemax="100">
-                                                {$participationStat['percentage']}%
-                                            </div>
-                                        </div>
-                                    </td>
+                    <div class="col-md-6">
+                        <h3>Participations aux événements</h3>
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Type d'événement</th>
+                                    <th>Nombre</th>
+                                    <th>Total</th>
+                                    <th>Pourcentage</th>
                                 </tr>
-                            {/foreach}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                {foreach $stats['eventParticipations'] as $typeId => $participationStat}
+                                    <tr {if $typeId === 'total'}class="table-active"{/if}>
+                                        <td>{$participationStat['typeName']}</td>
+                                        <td>{$participationStat['user']}</td>
+                                        <td>{$participationStat['total']}</td>
+                                        <td>
+                                            <div class="progress">
+                                                <div class="progress-bar bg-info" role="progressbar" 
+                                                    style="width: {$participationStat['percentage']}%;" 
+                                                    aria-valuenow="{$participationStat['percentage']}" 
+                                                    aria-valuemin="0" aria-valuemax="100">
+                                                    {$participationStat['percentage']}%
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {/foreach}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-            </div>
-            
-            <hr>
-            
-            <div class="row mt-4">
-                <div class="col-md-6 offset-md-3">
-                    <h3>Contributions aux besoins des évènements</h3>
-                    <div class="mb-3">
-                        <div class="progress" style="height: 25px;">
-                            <div class="progress-bar bg-success" role="progressbar" 
-                                style="width: {$stats['participantSupplies']['percentage']}%;" 
-                                aria-valuenow="{$stats['participantSupplies']['percentage']}" 
-                                aria-valuemin="0" aria-valuemax="100">
-                                {$stats['participantSupplies']['percentage']}%
+                
+                <hr>
+                
+                <div class="row mt-4">
+                    <div class="col-md-6 offset-md-3">
+                        <h3>Contributions aux besoins des évènements</h3>
+                        <div class="mb-3">
+                            <div class="progress" style="height: 25px;">
+                                <div class="progress-bar bg-success" role="progressbar" 
+                                    style="width: {$stats['participantSupplies']['percentage']}%;" 
+                                    aria-valuenow="{$stats['participantSupplies']['percentage']}" 
+                                    aria-valuemin="0" aria-valuemax="100">
+                                    {$stats['participantSupplies']['percentage']}%
+                                </div>
                             </div>
+                            <small class="text-muted">
+                                {$stats['participantSupplies']['user']} contribution(s) sur un total de {$stats['participantSupplies']['total']}
+                            </small>
                         </div>
-                        <small class="text-muted">
-                            {$stats['participantSupplies']['user']} contribution(s) sur un total de {$stats['participantSupplies']['total']}
-                        </small>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 {/block}

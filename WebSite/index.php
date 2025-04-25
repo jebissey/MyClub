@@ -54,11 +54,6 @@ $applicationHelper = new Application($container->get(PDO::class), $container->ge
 $flight->route('/help',         function() use ($applicationHelper) { $applicationHelper->help(); });
 $flight->route('/legal/notice', function() use ($applicationHelper) { $applicationHelper->legalNotice(); });
 
-use app\controllers\AdminController;
-$adminController = new AdminController($container->get(PDO::class), $container->get(Engine::class));
-$flight->route('GET /admin',           function() use ($adminController) { $adminController->home(); });
-$flight->route('GET /admin/help',      function() use ($adminController) { $adminController->help(); });
-
 use app\controllers\AlertController;
 $alertController = new AlertController($container->get(PDO::class), $container->get(Engine::class));
 $flight->route('GET  /alerts',      function() use ($alertController) {$alertController->showAlerts();});
@@ -201,11 +196,13 @@ $flight->route('GET  /person/statistics',                 function()            
 
 use app\controllers\WebmasterController;
 $webmasterController = new WebmasterController($container->get(PDO::class), $container->get(Engine::class));
-$flight->route('GET  /webmaster',            function() use ($webmasterController) { $webmasterController->home(); });
+$flight->route('GET  /admin',                function() use ($webmasterController) { $webmasterController->homeAdmin(); });
+$flight->route('GET  /admin/help',           function() use ($webmasterController) { $webmasterController->helpAdmin(); });
+$flight->route('GET  /admin/webmaster/help', function() use ($webmasterController) { $webmasterController->helpWebmaster(); });
 $flight->route('GET  /arwards',              function() use ($webmasterController) { $webmasterController->arwards(); });
 $flight->route('POST /arwards',              function() use ($webmasterController) { $webmasterController->arwards(); });
-$flight->route('GET  /admin/webmaster/help', function() use ($webmasterController) { $webmasterController->help(); });
 $flight->route('GET  /rss.xml',              function() use ($webmasterController) { $webmasterController->rssGenerator(); });
+$flight->route('GET  /webmaster',            function() use ($webmasterController) { $webmasterController->homeWebmaster(); });
 /* #endregion */
 
 /* #region api */

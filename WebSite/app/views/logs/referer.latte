@@ -1,61 +1,61 @@
 {layout '../admin/webmaster.latte'}
 
 {block content}
-
-<div class="container-fluid">
-    <h2>Referers</h2>
-    
-    <div class="row mb-4">
-        <div class="col">
-            <div class="btn-group">
-                <a href="{$control->buildUrl(['period' => 'day'])}" class="btn btn-outline-primary {if $period === 'day'}active{/if}">Jour</a>
-                <a href="{$control->buildUrl(['period' => 'week'])}" class="btn btn-outline-primary {if $period === 'week'}active{/if}">Semaine</a>
-                <a href="{$control->buildUrl(['period' => 'month'])}" class="btn btn-outline-primary {if $period === 'month'}active{/if}">Mois</a>
-                <a href="{$control->buildUrl(['period' => 'year'])}" class="btn btn-outline-primary {if $period === 'year'}active{/if}">Année</a>
+    <div class="container-fluid">
+        <h2>Referers</h2>
+        
+        <div class="row mb-4">
+            <div class="col">
+                <div class="btn-group">
+                    <a href="{$control->buildUrl(['period' => 'day'])}" class="btn btn-outline-primary {if $period === 'day'}active{/if}">Jour</a>
+                    <a href="{$control->buildUrl(['period' => 'week'])}" class="btn btn-outline-primary {if $period === 'week'}active{/if}">Semaine</a>
+                    <a href="{$control->buildUrl(['period' => 'month'])}" class="btn btn-outline-primary {if $period === 'month'}active{/if}">Mois</a>
+                    <a href="{$control->buildUrl(['period' => 'year'])}" class="btn btn-outline-primary {if $period === 'year'}active{/if}">Année</a>
+                </div>
             </div>
         </div>
-    </div>
 
-    <div class="row mb-4">
-        <div class="col">
-            <div class="btn-group">
-                <a href="{$control->buildUrl(['date' => $nav['first']])}" class="btn btn-outline-secondary">&lt;&lt;</a>
-                <a href="{$control->buildUrl(['date' => $nav['prev']])}" class="btn btn-outline-secondary">&lt;</a>
-                <span class="btn btn-secondary">{$nav['current']}</span>
-                <a href="{$control->buildUrl(['date' => $nav['next']])}" class="btn btn-outline-secondary">&gt;</a>
-                <a href="{$control->buildUrl(['date' => $nav['last']])}" class="btn btn-outline-secondary">&gt;&gt;</a>
+        <div class="row mb-4">
+            <div class="col">
+                <div class="btn-group">
+                    <a href="{$control->buildUrl(['date' => $nav['first']])}" class="btn btn-outline-secondary">&lt;&lt;</a>
+                    <a href="{$control->buildUrl(['date' => $nav['prev']])}" class="btn btn-outline-secondary">&lt;</a>
+                    <span class="btn btn-secondary">{$nav['current']}</span>
+                    <a href="{$control->buildUrl(['date' => $nav['next']])}" class="btn btn-outline-secondary">&gt;</a>
+                    <a href="{$control->buildUrl(['date' => $nav['last']])}" class="btn btn-outline-secondary">&gt;&gt;</a>
+                </div>
             </div>
         </div>
-    </div>
 
-    <div class="row">
-        <div class="col">
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>Source</th>
-                        <th class="text-end">Visites</th>
-                    </tr>
-                </thead>
-                <tbody>
-                {foreach $control->getRefererStats($period, $currentDate) as $row}
-                    <tr>
-                        <td>{$row[source] ?? ''}</td>
-                        <td class="text-end">{number_format($row[count], 0, ',', ' ')}</td>
-                    </tr>
-                {/foreach}
-
-                {if $externalRefs !=''}
-                    <tr><td colspan="2" class="border-top"></td></tr>
-                    {foreach $externalRefs as $row}
+        <div class="row">
+            <div class="col">
+                <table class="table table-striped">
+                    <thead>
                         <tr>
-                            <td>{$row[source]}</td>
+                            <th>Source</th>
+                            <th class="text-end">Visites</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {foreach $control->getRefererStats($period, $currentDate) as $row}
+                        <tr>
+                            <td>{$row[source] ?? ''}</td>
                             <td class="text-end">{number_format($row[count], 0, ',', ' ')}</td>
                         </tr>
                     {/foreach}
-                {/if}
-                </tbody>
-            </table>
+
+                    {if $externalRefs !=''}
+                        <tr><td colspan="2" class="border-top"></td></tr>
+                        {foreach $externalRefs as $row}
+                            <tr>
+                                <td>{$row[source]}</td>
+                                <td class="text-end">{number_format($row[count], 0, ',', ' ')}</td>
+                            </tr>
+                        {/foreach}
+                    {/if}
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
-</div>
+{/block}
