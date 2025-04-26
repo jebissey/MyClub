@@ -233,7 +233,7 @@ $flight->route('GET    /api/needs-by-event-type/@id', function($id) use ($eventA
 
 use app\api\WebmasterApi;
 $webmasterApi = new WebmasterApi($container->get(PDO::class), $container->get(Engine::class));
-$flight->route('GET     /api/analytics/visitorsByDate',              function()                    use ($webmasterApi) { $webmasterApi->getVisitorsByDate(); });
+$flight->route('GET    /api/analytics/visitorsByDate',               function()                    use ($webmasterApi) { $webmasterApi->getVisitorsByDate(); });
 $flight->route('GET    /api/lastVersion',                            function()                    use ($webmasterApi) { $webmasterApi->lastVersion(); });
 $flight->route('DELETE /api/navBar/deleteItem/@id',                  function($id)                 use ($webmasterApi) { $webmasterApi->deleteNavbarItem($id); });
 $flight->route('GET    /api/navBar/getItem/@id',                     function($id)                 use ($webmasterApi) { $webmasterApi->getNavbarItem($id); });

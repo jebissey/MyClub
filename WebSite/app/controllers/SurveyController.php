@@ -17,8 +17,8 @@ class SurveyController extends BaseController
                     $this->flight->redirect('/articles');
                 }
                 $survey = $this->fluent->from('Survey')
-                ->where('IdArticle', $article['Id'])
-                ->fetch();
+                    ->where('IdArticle', $article['Id'])
+                    ->fetch();
 
                 $this->latte->render('app/views/survey/add.latte', $this->params->getAll([
                     'article' => $article,
@@ -74,51 +74,59 @@ class SurveyController extends BaseController
 
     public function viewResults($articleId)
     {
-        $survey = $this->fluent->from('Survey')
-            ->where('IdArticle', $articleId)
-            ->fetch();
-
-        if (!$survey) {
-            $this->flight->redirect('/articles/' . $articleId);
-        }
-
-        $replies = $this->fluent->from('Reply')
-            ->where('IdSurvey', $survey['Id'])
-            ->fetchAll();
-
-        $participants = [];
-        $results = [];
-        $options = json_decode($survey['Options']);
-
-        foreach ($options as $option) {
-            $results[$option] = 0;
-        }
-
-        foreach ($replies as $reply) {
-            $answers = json_decode($reply['Answers']);
-            $person = $this->fluent->from('Person')
-                ->where('Id', $reply['IdPerson'])
+        if ($person = $this->getPerson(['Redactor'])) {
+            $survey = $this->fluent->from('Survey')
+                ->join('Article ON Survey.IdArticle = Article.Id')
+                ->where('IdArticle', $articleId)
+                ->select('Article.CreatedBy')
                 ->fetch();
-
-            $participants[] = [
-                'name' => $person['FirstName'] . ' ' . $person['LastName'],
-                'answers' => $answers
-            ];
-
-            foreach ($answers as $answer) {
-                if (isset($results[$answer])) {
-                    $results[$answer]++;
-                }
+            if (!$survey) {
+                $this->flight->redirect('/articles/' . $articleId);
             }
-        }
+            if ($survey['CreatedBy'] == $person['Id']) {
+                $replies = $this->fluent->from('Reply')
+                    ->where('IdSurvey', $survey['Id'])
+                    ->fetchAll();
 
-        $this->latte->render('app/views/survey/results.latte', [
-            'survey' => $survey,
-            'options' => $options,
-            'results' => $results,
-            'participants' => $participants,
-            'articleId' => $articleId,
-            'currentVersion' => self::VERSION
-        ]);
+                $participants = [];
+                $results = [];
+                $options = json_decode($survey['Options']);
+
+                foreach ($options as $option) {
+                    $results[$option] = 0;
+                }
+
+                foreach ($replies as $reply) {
+                    $answers = json_decode($reply['Answers']);
+                    $person = $this->fluent->from('Person')
+                        ->where('Id', $reply['IdPerson'])
+                        ->fetch();
+
+                    $participants[] = [
+                        'name' => $person['FirstName'] . ' ' . $person['LastName'],
+                        'answers' => $answers
+                    ];
+
+                    foreach ($answers as $answer) {
+                        if (isset($results[$answer])) {
+                            $results[$answer]++;
+                        }
+                    }
+                }
+
+                $this->latte->render('app/views/survey/results.latte', [
+                    'survey' => $survey,
+                    'options' => $options,
+                    'results' => $results,
+                    'participants' => $participants,
+                    'articleId' => $articleId,
+                    'currentVersion' => self::VERSION
+                ]);
+            } else {
+                $this->application->error403(__FILE__, __LINE__);
+            }
+        } else {
+            $this->application->error403(__FILE__, __LINE__);
+        }
     }
 }

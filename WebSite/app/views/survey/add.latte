@@ -40,7 +40,7 @@
                 <button type="button" id="add-option" class="btn btn-secondary mb-3">Ajouter une option</button>
                 <div class="mb-3">
                     <label for="dateInput" class="form-label">Date de cloture</label>
-                    <input type="date" class="form-control w-auto" id="dateInput" name="closingDate" value="{$survey['ClosingDate']}" required>
+                    <input type="date" class="form-control w-auto" id="dateInput" name="closingDate" value="{$survey['ClosingDate'] ?? ''}" required>
                 </div>
             </div>
             

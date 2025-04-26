@@ -73,7 +73,7 @@ document.addEventListener('DOMContentLoaded', function () {
             label: document.getElementById('needLabel').value,
             name: document.getElementById('needName').value,
             idNeedType: document.getElementById('needType').value,
-            participantDependent: document.getElementById('participantDependent').checked ? 1 : 0
+            participantDependent: document.getElementById('needParticipantDependent').checked ? 1 : 0
         };
 
         fetch('/api/needs/save', {
@@ -102,8 +102,9 @@ document.addEventListener('DOMContentLoaded', function () {
         button.addEventListener('click', function () {
             deleteItemId = this.dataset.id;
             deleteItemType = 'type';
+            const itemName = this.dataset.name;
             document.getElementById('deleteConfirmMessage').textContent =
-                `Êtes-vous sûr de vouloir supprimer le type de besoin "${this.dataset.name}" ?`;
+                `Êtes-vous sûr de vouloir supprimer le type de besoin "${itemName}" ?`;
             deleteConfirmModal.show();
         });
     });

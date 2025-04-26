@@ -37,7 +37,9 @@
                                                 data-name="{$type['Name']}">
                                             <i class="bi bi-pencil"></i>
                                         </button>
-                                        <button type="button" class="btn btn-sm btn-danger delete-need-type">
+                                        <button type="button" class="btn btn-sm btn-danger delete-need-type"
+                                                data-id="{$type['Id']}" 
+                                                data-name="{$type['Name']}">
                                             <i class="bi bi-trash"></i>
                                         </button>
                                     </td>
@@ -84,7 +86,9 @@
                                                 data-type="{$need['IdNeedType']}">
                                             <i class="bi bi-pencil"></i>
                                         </button>
-                                        <button type="button" class="btn btn-sm btn-danger delete-need" data-id="{$need['Id']}" data-name="{$need['Name']}">
+                                        <button type="button" class="btn btn-sm btn-danger delete-need" 
+                                                data-id="{$need['Id']}" 
+                                                data-name="{$need['Name']}">
                                             <i class="bi bi-trash"></i>
                                         </button>
                                     </td>

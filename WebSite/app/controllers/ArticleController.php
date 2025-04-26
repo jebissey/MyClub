@@ -113,11 +113,13 @@ class ArticleController extends TableController
     public function show($id): void
     {
         $person = $this->getPerson();
-        $stmt = $this->pdo->prepare("SELECT * FROM Article WHERE Id = :id AND (PublishedBy IS NOT NULL OR CreatedBy = :createdBy)");
-        $stmt->execute([
-            ':id' => $id,
-            ':createdBy' => $person['Id'],
-        ]);
+        if ($person && $this->authorizations->isEditor()) {
+            $stmt = $this->pdo->prepare("SELECT * FROM Article WHERE Id = :id");
+        } else {
+            $createdBy = $person['Id'] ?? '';
+            $stmt = $this->pdo->prepare("SELECT * FROM Article WHERE Id = :id AND (PublishedBy IS NOT NULL OR CreatedBy = '$createdBy')");
+        }
+        $stmt->execute([':id' => $id]);
         $article = $stmt->fetch(PDO::FETCH_ASSOC);
         if (!$article) {
             $this->application->error403(__FILE__, __LINE__);

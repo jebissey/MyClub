@@ -11,7 +11,8 @@
                 <div class="mt-4">
                     <h3>Résultats:</h3>
                     <div class="list-group">
-                        {foreach $options as $option}
+                        {if count($participants) > 0 }
+                            {foreach $options as $option}
                         <div class="list-group-item">
                             <div class="d-flex justify-content-between align-items-center">
                                 <span>{$option}</span>
@@ -20,14 +21,17 @@
                             {var $percentage = $results[$option] / count($participants) * 100}
                             <div class="progress mt-2">
                                 <div class="progress-bar" role="progressbar" style="width: {$percentage|number}%;" 
-                                    aria-valuenow="{$participants ? $percentage|number : 0}" 
+                                    aria-valuenow="{$percentage|number}" 
                                     aria-valuemin="0" 
                                     aria-valuemax="100">
-                                    {$participants ? number_format($percentage, 1) : 0}%
+                                    {number_format($percentage, 1)}%
                                 </div>
                             </div>
                         </div>
-                        {/foreach}
+                            {/foreach}
+                        {else}    
+                        Aucun vote
+                        {/if}
                     </div>
                 </div>
                 

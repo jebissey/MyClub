@@ -29,35 +29,35 @@ class Authorization
 
     public function isEventManager(): bool
     {
-        return in_array('EventManager', $this->authorizations);
+        return in_array('EventManager', $this->authorizations ?? []);
     }
 
     public function isPersonManager(): bool
     {
-        return in_array('PersonManager', $this->authorizations);
+        return in_array('PersonManager', $this->authorizations ?? []);
     }
 
     public function isRedactor(): bool
     {
-        return in_array('Redactor', $this->authorizations);
+        return in_array('Redactor', $this->authorizations ?? []);
     }
 
     public function isEditor(): bool
     {
-        return in_array('Editor', $this->authorizations);
+        return in_array('Editor', $this->authorizations ?? []);
     }
 
     public function isWebmaster(): bool
     {
-        return in_array('Webmaster', $this->authorizations);
+        return in_array('Webmaster', $this->authorizations ?? []);
     }
 
-    public function hasAutorization() : bool
+    public function hasAutorization(): bool
     {
         return count($this->authorizations ?? []) > 0;
     }
 
-    public function hasOnlyOneAutorization() : bool
+    public function hasOnlyOneAutorization(): bool
     {
         return count($this->authorizations ?? []) == 1;
     }
