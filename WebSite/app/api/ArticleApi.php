@@ -238,6 +238,28 @@ class ArticleApi extends BaseController
         exit();
     }
 
+    public function getAuthor($articleId)
+    {
+        if (!$articleId) {
+            header('Content-Type: application/json', true, 499);
+            echo json_encode(['success' => false, 'message' => 'Unknown article']);
+        } else {
+            $query = $this->fluent
+                ->from('Article')
+                ->where('Article.Id = ?', $articleId)
+                ->join('Person ON Article.CreatedBy = Person.Id')
+                ->select('CASE WHEN Person.NickName != "" THEN Person.FirstName || " " || Person.LastName || " (" || Person.NickName || ")" ELSE Person.FirstName || " " || Person.LastName END AS PersonName')
+                ->select('Article.Title AS ArticleTitle');
+            
+            $result = $query->fetch();
+            
+            header('Content-Type: application/json');
+            echo json_encode(['author' => $result ? [$result] : []]);
+        }
+        exit();
+    }
+
+
     /* #region private methods */
     private function getUploadErrorMessage($error)
     {

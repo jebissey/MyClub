@@ -430,9 +430,6 @@ class LogController extends BaseController
     }
 
 
-
-
-
     public function analytics()
     {
         if ($this->getPerson(['Webmaster'])) {
@@ -480,20 +477,19 @@ class LogController extends BaseController
                 FROM Log
                 UNION ALL
                 SELECT 
-                id,
-                browser,
-                CASE WHEN word = '' THEN SUBSTR(rest, 0, INSTR(rest, ' '))
-                    ELSE word || ' ' || SUBSTR(rest, 0, INSTR(rest, ' '))
-                END,
-                LTRIM(SUBSTR(rest, INSTR(rest, ' '))),
-                position + 1
+                    id,
+                    browser,
+                    CASE WHEN word = '' THEN SUBSTR(rest, 0, INSTR(rest, ' '))
+                        ELSE word || ' ' || SUBSTR(rest, 0, INSTR(rest, ' '))
+                    END,
+                    LTRIM(SUBSTR(rest, INSTR(rest, ' '))),
+                    position + 1
                 FROM split
                 WHERE rest != '' AND SUBSTR(rest, 0, INSTR(rest, ' ')) NOT GLOB '[0-9]*'
             )
             SELECT word AS Browser, COUNT(*) as count
             FROM split
-            WHERE rest = '' 
-            OR SUBSTR(rest, 0, INSTR(rest, ' ')) GLOB '[0-9]*'
+            WHERE rest = '' OR SUBSTR(rest, 0, INSTR(rest, ' ')) GLOB '[0-9]*'
             GROUP BY word
             ORDER BY count DESC");
         $results = $query->fetchAll(PDO::FETCH_ASSOC);
@@ -560,7 +556,6 @@ class LogController extends BaseController
     }
 
 
-
     const TOP = 50;
     public function topPagesByPeriod()
     {
@@ -600,6 +595,55 @@ class LogController extends BaseController
         }
     }
 
+    public function topArticlesByPeriod()
+    {
+        if ($this->getPerson(['Redactor'])) {
+            $period = $_GET['period'] ?? 'week';
+    
+            $dateCondition = '';
+            switch ($period) {
+                case 'today':
+                    $dateCondition = "date(CreatedAt) = date('now')";
+                    break;
+                case 'week':
+                    $dateCondition = "date(CreatedAt) >= date('now', '-7 days')";
+                    break;
+                case 'month':
+                    $dateCondition = "date(CreatedAt) >= date('now', '-30 days')";
+                    break;
+                default:
+                    $dateCondition = "1=1";
+            }
+    
+            $query = $this->fluentForLog
+                ->from('Log')
+                ->select('
+                    Uri, 
+                    COUNT(*) AS visits,
+                    CASE 
+                        WHEN Uri LIKE "/articles/%" THEN CAST(substr(Uri, 11) AS INTEGER)
+                        WHEN Uri LIKE "/navbar/show/article/%" THEN CAST(substr(Uri, 22) AS INTEGER)
+                        ELSE NULL
+                    END AS articleId')
+                ->where($dateCondition)
+                ->where('(
+                    (Uri LIKE "/articles/%" AND Uri GLOB "/articles/[0-9]*" AND Uri NOT LIKE "/articles/%/%") 
+                    OR 
+                    (Uri LIKE "/navbar/show/article/%" AND Uri GLOB "/navbar/show/article/[0-9]*" AND Uri NOT LIKE "/navbar/show/article/%/%")
+                )')
+                ->groupBy('Uri')
+                ->orderBy('visits DESC')
+                ->limit(self::TOP);
+    
+            $this->latte->render('app/views/logs/topArticles.latte', $this->params->getAll([
+                'title' => 'Top des articles visités par période',
+                'period' => $period,
+                'topPages' => $query->fetchAll()
+            ]));
+        } else {
+            $this->application->error403(__FILE__, __LINE__);
+        }
+    }
 
 
     public function crossTab()

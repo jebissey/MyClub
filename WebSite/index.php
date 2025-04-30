@@ -137,6 +137,7 @@ $flight->route('GET /referers',                     function() use ($logControll
 $flight->route('GET /visitors/graf',                function() use ($logController) { $logController->visitorsGraf(); });
 $flight->route('GET /analytics',                    function() use ($logController) { $logController->analytics(); });
 $flight->route('GET /topPages',                     function() use ($logController) { $logController->topPagesByPeriod(); });
+$flight->route('GET /topArticles',                  function() use ($logController) { $logController->topArticlesByPeriod(); });
 $flight->route('GET /crossTab',                     function() use ($logController) { $logController->crossTab(); });
 
 use app\controllers\MediaController;
@@ -208,6 +209,7 @@ $flight->route('GET  /webmaster',            function() use ($webmasterControlle
 /* #region api */
 use app\api\ArticleApi;
 $articleApi = new ArticleApi($container->get(PDO::class), $container->get(Engine::class));
+$flight->route('GET  /api/author/@articleId', function($articleId) use ($articleApi) { $articleApi->getAuthor($articleId); });
 $flight->route('POST /api/designs/vote', function() use ($articleApi) { $articleApi->designVote(); });
 $flight->route('POST /api/media/delete/@year/@month/@filename', function($year, $month, $filename) use ($articleApi) { $articleApi->deleteFile($year,$month,$filename); });
 $flight->route('POST /api/media/upload',                        function()                         use ($articleApi) { $articleApi->uploadFile(); });

@@ -1,0 +1,101 @@
+{layout '../admin/redactor.latte'}
+
+{block content}
+    <div class="container-fluid">
+        <h1>{$title}</h1>
+        
+        {if isset($period)}
+        <div class="mb-4">
+            <form method="get" class="form-inline">
+                <div class="form-group mr-2">
+                    <label for="period" class="mr-2">Période:</label>
+                    <select class="form-control" id="period" name="period" onchange="this.form.submit()">
+                        <option value="all" {if $period == 'all'}selected{/if}>Tout</option>
+                        <option value="today" {if $period == 'today'}selected{/if}>Aujourd'hui</option>
+                        <option value="week" {if $period == 'week'}selected{/if}>7 derniers jours</option>
+                        <option value="month" {if $period == 'month'}selected{/if}>30 derniers jours</option>
+                        <option value="quarter" {if $period == 'quarter'}selected{/if}>Dernier trimestre</option>
+                        <option value="year" {if $period == 'year'}selected{/if}>Dernière année</option>
+                    </select>
+                </div>
+            </form>
+        </div>
+        {/if}
+        
+        {if count($topPages) > 0}
+            {var $totalVisits = 0}
+            {foreach $topPages as $pageItem}
+                {do $totalVisits += $pageItem['visits']}
+            {/foreach} 
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">Top des articles visitées</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">               
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>URI</th>
+                                <th>Titre</th>
+                                <th>Auteur</th>
+                                <th>Visites</th>
+                                <th>Pourcentage</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {foreach $topPages as $index => $pageData}
+                            <tr>
+                                <td>{$index + 1}</td>
+                                <td>{$pageData['Uri']|truncate:80}</td>
+                                <td>
+                                    {if isset($pageData['articleId'])}
+                                        <span class="article-title" data-article-id="{$pageData['articleId']}">Chargement...</span>
+                                    {else}
+                                        -
+                                    {/if}
+                                </td>
+                                <td>
+                                    {if isset($pageData['articleId'])}
+                                        <span class="author-name" data-article-id="{$pageData['articleId']}">Chargement...</span>
+                                    {else}
+                                        -
+                                    {/if}
+                                </td>
+                                <td>{$pageData['visits']}</td>
+                                <td>
+                                    {var $percentage = ($pageData['visits'] / $totalVisits) * 100}
+                                    <div class="progress">
+                                        <div class="progress-bar" role="progressbar" 
+                                                style="width: {$percentage|number}%;" 
+                                                aria-valuenow="{$percentage|number}" 
+                                                aria-valuemin="0" 
+                                                aria-valuemax="100">
+                                            {if $percentage >= 10}
+                                            {number_format($percentage, 1)}%
+                                            {/if}
+                                        </div>
+                                        {if $percentage < 10}
+                                        <span class="small text-dark ms-2">{number_format($percentage, 1)}%</span>
+                                        {/if}
+                                    </div>
+                                </td>
+                            </tr>
+                            {/foreach}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        {else}
+        <div class="alert alert-info">
+            Aucune donnée de visite n'est disponible pour le moment.
+        </div>
+        {/if}
+    </div>
+{/block}
+
+{block scripts}
+    <script src="/app/js/logs/topArticles.js"></script>
+{/block}
