@@ -174,7 +174,7 @@ class WebmasterController extends BaseController
             $rss .= '<link>' . htmlspecialchars($site_url . '/articles/' . $article['Id']) . '</link>';
             $rss .= '<guid>' . htmlspecialchars($site_url . '/articles/' . $article['Id']) . '</guid>';
             $rss .= '<pubDate>' . date(DATE_RSS, strtotime($article['LastUpdate'])) . '</pubDate>';
-            $rss .= '<description>Article: ...</description>';
+            $rss .= '<description>' . $this->getFirstElement($article['Content']) . '</description>';
             $rss .= '</item>';
         }
 
@@ -182,6 +182,23 @@ class WebmasterController extends BaseController
         $rss .= '</rss>';
 
         return $rss;
+    }
+
+    private function getFirstElement($html)
+    {
+        $htmlSansImages = preg_replace('/<img[^>]*>/i', '', $html);
+        if (preg_match('/<p[^>]*>(.*?)<\/p>/is', $htmlSansImages, $matches)) {
+            $text = strip_tags($matches[1]);
+        } else {
+            $text = strip_tags($htmlSansImages);
+            $text = trim($text);
+        }
+    
+        $maxLength = 200;
+        if (mb_strlen($text) > $maxLength) {
+            $text = mb_substr($text, 0, $maxLength) . '...';
+        }
+        return htmlspecialchars($text, ENT_XML1 | ENT_QUOTES, 'UTF-8');
     }
 
     private function getLastVersion()

@@ -219,6 +219,7 @@ abstract class BaseController extends BaseHelper
         ]);
     }
 
+    
     private function getHref($userEmail)
     {
         return $userEmail == '' ? '/user/sign/in' : '/user';
