@@ -473,19 +473,35 @@ class LogController extends BaseController
 
     private function getBrowserDistribution()
     {
-        $query = $this->fluentForLog
-            ->from('Log')
-            ->select('Browser, COUNT(*) as count')
-            ->groupBy('Browser')
-            ->orderBy('count DESC');
-
-        $results = $query->fetchAll();
+        $query = $this->pdoForLog->query("
+            WITH RECURSIVE
+            split(id, browser, word, rest, position) AS (
+                SELECT rowid, Browser, '', Browser || ' ', 1
+                FROM Log
+                UNION ALL
+                SELECT 
+                id,
+                browser,
+                CASE WHEN word = '' THEN SUBSTR(rest, 0, INSTR(rest, ' '))
+                    ELSE word || ' ' || SUBSTR(rest, 0, INSTR(rest, ' '))
+                END,
+                LTRIM(SUBSTR(rest, INSTR(rest, ' '))),
+                position + 1
+                FROM split
+                WHERE rest != '' AND SUBSTR(rest, 0, INSTR(rest, ' ')) NOT GLOB '[0-9]*'
+            )
+            SELECT word AS Browser, COUNT(*) as count
+            FROM split
+            WHERE rest = '' 
+            OR SUBSTR(rest, 0, INSTR(rest, ' ')) GLOB '[0-9]*'
+            GROUP BY word
+            ORDER BY count DESC");
+        $results = $query->fetchAll(PDO::FETCH_ASSOC);
 
         $labels = [];
         $data = [];
-
         foreach ($results as $row) {
-            $labels[] = $row['Browser'] ?: 'Inconnu';
+            $labels[] = $row['Browser'] ?? 'Inconnu';
             $data[] = $row['count'];
         }
 
@@ -599,8 +615,8 @@ class LogController extends BaseController
                     $dateCondition = "date(CreatedAt) = date('now', '-1 days')";
                     break;
                 case 'beforeYesterday':
-                        $dateCondition = "date(CreatedAt) = date('now', '-2 days')";
-                        break;
+                    $dateCondition = "date(CreatedAt) = date('now', '-2 days')";
+                    break;
                 case 'today':
                     $dateCondition = "date(CreatedAt) = date('now')";
                     break;

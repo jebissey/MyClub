@@ -63,7 +63,7 @@ abstract class BaseController extends BaseHelper
         $this->latte->addFilter('extractFirstElement', function ($html) {
             if (preg_match('/<p[^>]*>(.*?)<\/p>/s', $html, $matches)) {
                 return $matches[0];
-            }            
+            }
             if (preg_match('/<img[^>]*>/i', $html, $matches)) {
                 return $matches[0];
             }
@@ -165,17 +165,12 @@ abstract class BaseController extends BaseHelper
 
         $filteredNavItems = [];
         foreach ($navItems as $navItem) {
-            if (
-                $person === false && $navItem['OnlyForMembers'] === 0
-                || ($person
-                    && ($navItem['OnlyForMembers'] === 1
-                        || $navItem['IdGroup'] == null
-                        || !empty(array_intersect([$navItem['IdGroup']], $userGroups))
-                    )
+            if ( $person === false && $navItem['OnlyForMembers'] === 0
+             || ($person && (($navItem['OnlyForMembers'] === 1 &&  $navItem['IdGroup'] === null)
+                           || !empty(array_intersect([$navItem['IdGroup']], $userGroups))
+                            )
                 )
-            ) {
-                $filteredNavItems[] = $navItem;
-            }
+            ) $filteredNavItems[] = $navItem;
         }
         return $filteredNavItems;
     }
@@ -219,7 +214,7 @@ abstract class BaseController extends BaseHelper
         ]);
     }
 
-    
+
     private function getHref($userEmail)
     {
         return $userEmail == '' ? '/user/sign/in' : '/user';

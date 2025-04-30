@@ -4,7 +4,6 @@ namespace app\controllers;
 
 use PDO;
 use app\helpers\Arwards;
-use app\helpers\Event;
 
 class NavBarController extends BaseController
 {
@@ -58,6 +57,7 @@ class NavBarController extends BaseController
             $this->application->error403(__FILE__, __LINE__);
         }
     }
+
 
     private function authorizedUser($page)
     {
