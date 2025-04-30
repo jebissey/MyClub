@@ -60,6 +60,19 @@ abstract class BaseController extends BaseHelper
         $this->latte->addFilter('json', function ($value) {
             return json_encode($value, JSON_HEX_APOS | JSON_HEX_QUOT);
         });
+        $this->latte->addFilter('extractFirstElement', function ($html) {
+            if (preg_match('/<p[^>]*>(.*?)<\/p>/s', $html, $matches)) {
+                return $matches[0];
+            }            
+            if (preg_match('/<img[^>]*>/i', $html, $matches)) {
+                return $matches[0];
+            }
+            if (preg_match('/<a[^>]*>.*?<\/a>/i', $html, $matches)) {
+                return $matches[0];
+            }
+            $text = strip_tags($html);
+            return strlen($text) > 150 ? substr($text, 0, 150) . '...' : $text;
+        });
         $this->application = new Application($pdo, $flight);
         $this->authorizations = new Authorization($this->pdo);
         $this->settings = new Settings($this->pdo);

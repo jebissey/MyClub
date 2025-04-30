@@ -58,7 +58,10 @@ class ArticleController extends TableController
             ->select('Article.Id, Article.CreatedBy, Article.Title, Article.Timestamp')
             ->select('CASE WHEN Article.PublishedBy IS NULL THEN "non" ELSE "oui" END AS Published')
             ->select('CASE WHEN Article.OnlyForMembers = 1 THEN "oui" ELSE "non" END AS ForMembers')
-            ->select('CASE WHEN Survey.IdArticle IS NOT NULL THEN "oui" ELSE "non" END AS HasSurvey')
+            ->select('CASE WHEN Survey.IdArticle IS NULL THEN "non" 
+                           WHEN Survey.ClosingDate < CURRENT_DATE THEN "clos" 
+                           ELSE "oui" 
+                      END AS HasSurvey')
             ->select('CASE WHEN Person.NickName != "" THEN Person.FirstName || " " || Person.LastName || " (" || Person.NickName || ")" ELSE Person.FirstName || " " || Person.LastName END AS PersonName')
             ->select("'Group'.Name AS GroupName")
             ->select('COUNT(Reply.Id) AS Votes')

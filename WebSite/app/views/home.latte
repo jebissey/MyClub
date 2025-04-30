@@ -62,7 +62,10 @@
                 </small>
             </div>
             <div class="card-body">
-                {$latestArticle->Content|noescape}
+                {$latestArticle->Content|extractFirstElement|noescape}
+                <div class="mt-3">
+                    <a href="/articles/{$latestArticle->Id}" class="btn btn-primary btn-sm">Lire l'article</a>
+                </div>
             </div>
         </div>
         {else}
