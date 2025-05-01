@@ -1,0 +1,126 @@
+{layout '../layout.latte'}
+
+{block title}Tableau croisé des articles{/block}
+
+{block navbar}
+    {include '../navbar/redactor.latte'}
+{/block}
+
+{block content}
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <h4 class="mb-0">Tableau croisé dynamique des auteurs d'articles</h4>
+                        </div>
+                        <div class="col-auto">
+                            <form id="periodForm" class="form-inline">
+                                <label for="periodSelect" class="mr-2 text-white">Période :</label>
+                                <select id="periodSelect" name="period" class="form-control form-control-sm" onchange="document.getElementById('periodForm').submit()">
+                                    {foreach $availablePeriods as $key => $label}
+                                        <option value="{$key}" {if $period == $key}selected{/if}>{$label}</option>
+                                    {/foreach}
+                                </select>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <i class="fa fa-info-circle"></i> Période sélectionnée : 
+                        <strong>{date('d/m/Y', strtotime($dateRange['start']))}</strong> au 
+                        <strong>{date('d/m/Y', strtotime($dateRange['end']))}</strong>
+                    </div>
+                    
+                    {var $totals = (new \app\helpers\Article($pdo))->calculateTotals($crosstabData)}
+                    
+                    {if count($crosstabData['authors']) > 0}
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-hover table-striped">
+                                <thead class="thead-dark">
+                                    <tr>
+                                        <th rowspan="2" class="align-middle">Audience / Groupe</th>
+                                        <th colspan="{count($crosstabData['authors'])}" class="text-center">Auteurs</th>
+                                        <th rowspan="2" class="align-middle text-center">Total</th>
+                                    </tr>
+                                    <tr>
+                                        {foreach $crosstabData['authors'] as $author}
+                                            <th class="text-center">{$author['FirstName']}<br>{$author['LastName']}</th>
+                                        {/foreach}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {foreach $crosstabData['audiences'] as $audience}
+                                        {var $audienceId = $audience['id']}
+                                        <tr>
+                                            <td>
+                                                <strong>{$audience['name']}</strong>
+                                                {if $audience['type'] == 'special'}
+                                                    {if $audienceId == 'public'}
+                                                        <span class="badge badge-success">Public</span>
+                                                    {elseif $audienceId == 'members'}
+                                                        <span class="badge badge-info">Membres</span>
+                                                    {/if}
+                                                {/if}
+                                            </td>
+                                            {foreach $crosstabData['authors'] as $author}
+                                            <td class="text-center">
+                                                {var $count = $crosstabData['data'][$audienceId][$author['Id']] ?? 0}
+                                                {if $count > 0}
+                                                {$count}
+                                                {else}
+                                                <span class="text-muted">-</span>
+                                                {/if}
+                                            </td>
+                                            {/foreach}
+                                            
+                                            <td class="text-center font-weight-bold bg-light">
+                                                {if isset($totals['byAudience'][$audienceId]) && $totals['byAudience'][$audienceId] > 0}
+                                                    {$totals['byAudience'][$audienceId]}
+                                                {else}
+                                                    <span class="text-muted">-</span>
+                                                {/if}
+                                            </td>
+                                        </tr>
+                                    {/foreach}
+                                </tbody>
+                                <tfoot>
+                                    <tr class="fs-5 bg-primary text-white">
+                                        <td class="bg-primary text-white"><strong>Total</strong></td>
+                                        {foreach $crosstabData['authors'] as $author}
+                                            {var $authorId = $author['Id']}
+                                        <td class="text-center font-weight-bold bg-primary text-white">
+                                            {$totals['byAuthor'][$authorId]}
+                                        </td>
+                                        {/foreach}
+                                        
+                                        {var $grandTotal = 0}
+                                        {foreach $totals['byAuthor'] as $total}
+                                            {var $grandTotal = $grandTotal + $total}
+                                        {/foreach}
+                                        
+                                        <td class="text-center font-weight-bold bg-primary text-white">
+                                            {if $grandTotal > 0}
+                                                {$grandTotal}
+                                            {else}
+                                                <span class="text-muted">-</span>
+                                            {/if}
+                                        </td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    {else}
+                        <div class="alert alert-warning">
+                            <i class="fa fa-exclamation-triangle"></i> Aucun article trouvé pour la période sélectionnée.
+                        </div>
+                    {/if}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}

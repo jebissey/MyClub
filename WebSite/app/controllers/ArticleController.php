@@ -277,6 +277,30 @@ class ArticleController extends TableController
         }
     }
 
+    public function showArticleCrosstab()
+    {
+        if ($this->getPerson(['Redactor'])) {
+            $period = $this->flight->request()->query->period ?? 'month';
+            
+            $articleStatistics = new Article($this->pdo);
+            $dateRange = $articleStatistics->getDateRangeForPeriod($period);
+            $crosstabData = $articleStatistics->getAuthorAudienceCrosstab(
+                $dateRange['start'], 
+                $dateRange['end']
+            );
+            
+            echo $this->latte->render('app/views/articles/crosstab.latte', $this->params->getAll([
+                'crosstabData' => $crosstabData,
+                'period' => $period,
+                'dateRange' => $dateRange,
+                'availablePeriods' => $articleStatistics->getAvailablePeriods(),
+                'pdo' => $this->pdo,
+            ]));
+        } else {
+            $this->application->error403(__FILE__, __LINE__);
+        }
+    }
+
     private function getArticleIdsBasedOnAccess(?string $userEmail): array
     {
         $noGroupArticleIds = $this->getNoGroupArticleIds();

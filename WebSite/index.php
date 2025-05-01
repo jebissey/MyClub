@@ -63,6 +63,7 @@ use app\controllers\ArticleController;
 $articleController = new ArticleController($container->get(PDO::class), $container->get(Engine::class));
 $flight->route('GET  /articles',            function()    use ($articleController) { $articleController->index(); });
 $flight->route('GET  /articles/create',     function()    use ($articleController) { $articleController->create(); });
+$flight->route('GET  /articles/crosstab',   function()    use ($articleController) { $articleController->showArticleCrosstab();});
 $flight->route('GET  /articles/delete/@id', function($id) use ($articleController) { $articleController->delete($id); });
 $flight->route('GET  /articles/@id',        function($id) use ($articleController) { $articleController->show($id); });
 $flight->route('POST /articles/@id',        function($id) use ($articleController) { $articleController->update($id); });
