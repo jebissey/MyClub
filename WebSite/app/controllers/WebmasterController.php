@@ -125,10 +125,7 @@ class WebmasterController extends BaseController
 
     public function rssGenerator()
     {
-        $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https://' : 'http://';
-        $domain = $_SERVER['HTTP_HOST'];
-        $base_url = $protocol . $domain;
-
+        $base_url = $this->getBaseUrl();
         $site_title = "Liste d'articles";
         $site_url = $base_url;
         $feed_url = $base_url . "/rss.xml";
@@ -155,6 +152,28 @@ class WebmasterController extends BaseController
         header('Content-Type: application/rss+xml; charset=utf-8');
         echo $this->generateRSS($articles, $site_title, $site_url, $feed_url, $feed_description);
     }
+
+    public function sitemapGenerator()
+    {
+
+        $base_url = $this->getBaseUrl();
+        $lastMod = $this->fluent->from('Article')
+            ->select(null)
+            ->select('MAX(LastUpdate) AS LastMod')
+            ->fetch('LastMod');
+
+        header("Content-Type: application/xml; charset=utf-8");
+        echo '<?xml version="1.0" encoding="UTF-8"?>' . PHP_EOL;
+        echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . PHP_EOL;
+        echo '  <url>' . PHP_EOL;
+        echo '    <loc>' . $base_url . '/</loc>' . PHP_EOL;
+        echo '    <lastmod>' . $lastMod . '</lastmod>' . PHP_EOL;
+        echo '    <changefreq>daily</changefreq>' . PHP_EOL;
+        echo '    <priority>1.0</priority>' . PHP_EOL;
+        echo '  </url>' . PHP_EOL;
+        echo '</urlset>';
+    }
+
 
     private function generateRSS($articles, $site_title, $site_url, $feed_url, $feed_description)
     {
@@ -193,7 +212,7 @@ class WebmasterController extends BaseController
             $text = strip_tags($htmlSansImages);
             $text = trim($text);
         }
-    
+
         $maxLength = 200;
         if (mb_strlen($text) > $maxLength) {
             $text = mb_substr($text, 0, $maxLength) . '...';
@@ -223,5 +242,12 @@ class WebmasterController extends BaseController
             }
         }
         return false;
+    }
+
+    protected function getBaseUrl()
+    {
+        $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https://' : 'http://';
+        $domain = $_SERVER['HTTP_HOST'];
+        return $protocol . $domain;
     }
 }

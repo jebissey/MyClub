@@ -16,7 +16,7 @@ class NavBarController extends BaseController
                 LEFT JOIN 'Group' on Page.IdGroup = 'Group'.Id
                 ORDER BY 'Group'.Name");
             $navItems = $query->fetchAll(PDO::FETCH_ASSOC);
-            
+
             echo $this->latte->render('app/views/navbar/index.latte', $this->params->getAll([
                 'navItems' => $navItems,
                 'groups' => $this->getGroups(),
@@ -36,7 +36,8 @@ class NavBarController extends BaseController
                 'counterNames' => $counterNames = $arwards->getCounterNames(),
                 'data' => $arwards->getData($counterNames),
                 'groups' => $this->getGroups(),
-                'layout' => $this->getLayout()
+                'layout' => $this->getLayout(),
+                'navItems' => $this->getNavItems(),
             ]));
         } else {
             $this->application->error403(__FILE__, __LINE__);
@@ -58,7 +59,7 @@ class NavBarController extends BaseController
         }
     }
 
-
+    /* #region private function */
     private function authorizedUser($page)
     {
         $query = $this->pdo->query("
@@ -88,4 +89,5 @@ class NavBarController extends BaseController
             '/ffa/search',
         ];
     }
+    /* #endregion */
 }

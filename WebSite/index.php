@@ -204,6 +204,7 @@ $flight->route('GET  /admin/webmaster/help', function() use ($webmasterControlle
 $flight->route('GET  /arwards',              function() use ($webmasterController) { $webmasterController->arwards(); });
 $flight->route('POST /arwards',              function() use ($webmasterController) { $webmasterController->arwards(); });
 $flight->route('GET  /rss.xml',              function() use ($webmasterController) { $webmasterController->rssGenerator(); });
+$flight->route('GET  /sitemap.xml',          function() use ($webmasterController) { $webmasterController->sitemapGenerator(); });
 $flight->route('GET  /webmaster',            function() use ($webmasterController) { $webmasterController->homeWebmaster(); });
 /* #endregion */
 
