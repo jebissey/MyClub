@@ -42,6 +42,16 @@
                     <label for="dateInput" class="form-label">Date de cloture</label>
                     <input type="date" class="form-control w-auto" id="dateInput" name="closingDate" value="{$survey['ClosingDate'] ?? ''}" required>
                 </div>
+                <div class="mb-3">
+                    <label for="visibility" class="form-label">Visibilité</label>
+                    <select class="form-control w-auto" id="visibility" name="visibility" required>
+                        <option value="redactor" {if $survey['Visibility'] == 'redactor'}selected{/if}>Rédacteur 👁️‍🗨️📝</option>
+                        <option value="all" {if $survey['Visibility'] == 'all'}selected{/if}>Tout le monde 👁️‍🗨️👥</option>
+                        <option value="allAfterClosing" {if $survey['Visibility'] == 'allAfterClosing'}selected{/if}>Tout le monde après la cloture 👁️‍🗨️👥📅</option>
+                        <option value="voters" {if $survey['Visibility'] == 'voters'}selected{/if}>Les votants 👁️‍🗨️🗳️</option>
+                        <option value="votersAfterClosing" {if $survey['Visibility'] == 'votersAfterClosing'}selected{/if}>Les votants après la cloture 👁️‍🗨️🗳️📅</option>
+                    </select>
+                </div>
             </div>
             
             <div class="mb-3">

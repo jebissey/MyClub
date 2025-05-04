@@ -250,7 +250,8 @@ CREATE TABLE IF NOT EXISTS "Survey" (
 	"Question"	TEXT NOT NULL,
 	"Options"	TEXT NOT NULL,
 	"IdArticle"	INTEGER NOT NULL,
-	"ClosingDate"	DATE DEFAULT (date('now', '+10 days')),
+	"ClosingDate"	DATE NOT NULL DEFAULT (date('now', '+10 days')),
+	"Visibility"	TEXT NOT NULL DEFAULT 'redactor',
 	PRIMARY KEY("Id"),
 	FOREIGN KEY("IdArticle") REFERENCES "Article"("Id")
 );

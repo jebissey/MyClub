@@ -2,6 +2,7 @@
 
 namespace app\controllers;
 
+use DateTime;
 use PDO;
 use app\helpers\Article;
 use app\helpers\Backup;
@@ -38,7 +39,6 @@ class ArticleController extends TableController
         $filterConfig = [
             ['name' => 'PersonName', 'label' => 'Créé par'],
             ['name' => 'title', 'label' => 'Titre'],
-            ['name' => 'timestamp', 'label' => 'Date de création'],
             ['name' => 'lastUpdate', 'label' => 'Dernière modification'],
             ['name' => 'published', 'label' => 'Publié'],
             ['name' => 'GroupName', 'label' => 'Groupe']
@@ -46,25 +46,39 @@ class ArticleController extends TableController
         $columns = [
             ['field' => 'PersonName', 'label' => 'Créé par'],
             ['field' => 'Title', 'label' => 'Titre'],
-            ['field' => 'Timestamp', 'label' => 'Date de création'],
             ['field' => 'LastUpdate', 'label' => 'Dernière modification'],
             ['field' => 'Published', 'label' => 'Publié'],
             ['field' => 'GroupName', 'label' => 'Groupe'],
             ['field' => 'ForMembers', 'label' => 'Club'],
-            ['field' => 'HasSurvey', 'label' => 'Sondage'],
-            ['field' => 'Votes', 'label' => 'Votes']
+            ['field' => 'Pool', 'label' => 'Sondage (votes)'],
         ];
         $query = $this->fluent->from('Article')
             ->select('Article.Id, Article.CreatedBy, Article.Title, Article.Timestamp')
             ->select('CASE WHEN Article.PublishedBy IS NULL THEN "non" ELSE "oui" END AS Published')
             ->select('CASE WHEN Article.OnlyForMembers = 1 THEN "oui" ELSE "non" END AS ForMembers')
-            ->select('CASE WHEN Survey.IdArticle IS NULL THEN "non" 
-                           WHEN Survey.ClosingDate < CURRENT_DATE THEN "clos" 
-                           ELSE "oui" 
-                      END AS HasSurvey')
+            ->select('
+                CASE 
+                    WHEN Survey.IdArticle IS NULL THEN "non"
+                    ELSE 
+                        (
+                            CASE 
+                                WHEN Survey.ClosingDate < CURRENT_DATE THEN "clos"
+                                ELSE strftime("%d/%m/%Y", Survey.ClosingDate)
+                            END
+                            || " (" || COUNT(Reply.Id) || ") "
+                            || CASE Survey.Visibility
+                                WHEN "all" THEN "👁️‍🗨️👥"
+                                WHEN "allAfterClosing" THEN "👁️‍🗨️👥📅"
+                                WHEN "voters" THEN "👁️‍🗨️🗳️"
+                                WHEN "votersAfterClosing" THEN "👁️‍🗨️🗳️📅"
+                                WHEN "redactor" THEN "👁️‍🗨️📝"
+                                ELSE ""
+                            END
+                        )
+                END AS Pool
+            ')
             ->select('CASE WHEN Person.NickName != "" THEN Person.FirstName || " " || Person.LastName || " (" || Person.NickName || ")" ELSE Person.FirstName || " " || Person.LastName END AS PersonName')
             ->select("'Group'.Name AS GroupName")
-            ->select('COUNT(Reply.Id) AS Votes')
             ->innerJoin('Person ON Article.CreatedBy = Person.Id')
             ->leftJoin('Survey ON Article.Id = Survey.IdArticle')
             ->leftJoin('Reply ON Survey.Id = Reply.IdSurvey')
@@ -164,6 +178,7 @@ class ArticleController extends TableController
                     'navItems' => $this->getNavItems(),
                     'publishedBy' => $chosenArticle->PublishedBy && $chosenArticle->PublishedBy != $chosenArticle->CreatedBy ? $this->getPublisher($chosenArticle->PublishedBy) : '',
                     'latestArticleHasSurvey' => (new Article($this->pdo))->hasSurvey($id),
+                    'canReadPool' => $this->canPersonReadSurveyResults($chosenArticle, $person),
                 ]));
             } else {
                 $this->application->error403(__FILE__, __LINE__);
@@ -281,14 +296,14 @@ class ArticleController extends TableController
     {
         if ($this->getPerson(['Redactor'])) {
             $period = $this->flight->request()->query->period ?? 'month';
-            
+
             $articleStatistics = new Article($this->pdo);
             $dateRange = $articleStatistics->getDateRangeForPeriod($period);
             $crosstabData = $articleStatistics->getAuthorAudienceCrosstab(
-                $dateRange['start'], 
+                $dateRange['start'],
                 $dateRange['end']
             );
-            
+
             echo $this->latte->render('app/views/articles/crosstab.latte', $this->params->getAll([
                 'crosstabData' => $crosstabData,
                 'period' => $period,
@@ -393,5 +408,32 @@ class ArticleController extends TableController
         WHERE a.Id = ?");
         $query->execute([$id]);
         return $query->fetch(PDO::FETCH_ASSOC);
+    }
+
+    private function canPersonReadSurveyResults($article, $person)
+    {
+        $survey = $this->fluent->from('Survey')->where('IdArticle', $article->Id)->fetch();
+        if (!$survey || !$person) {
+            return false;
+        }
+
+        $now = (new DateTime())->format('Y-m-d');
+        $closingDate = $survey['ClosingDate'];
+
+        if (
+            $article->CreatedBy == $person['Id']
+            || $survey['Visibility'] == 'all'
+            || $survey['Visibility'] == 'allAfterClosing' && $closingDate < $now
+        ) {
+            return true;
+        }
+
+        $stmt = $this->pdo->prepare('SELECT COUNT(*) FROM Reply WHERE IdSurvey = ? AND IdPerson = ?');
+        $stmt->execute([$survey['Id'], $person['Id']]);
+        $hasVoted = $stmt->fetchColumn() > 0;
+        if ($hasVoted && ($survey['Visibility'] == 'voters' || ($survey['Visibility'] == 'votersAfterClosing' && $closingDate < $now))) {
+            return true;
+        }
+        return false;
     }
 }
