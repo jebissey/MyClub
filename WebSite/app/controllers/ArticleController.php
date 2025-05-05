@@ -47,11 +47,13 @@ class ArticleController extends TableController
             ['field' => 'PersonName', 'label' => 'Créé par'],
             ['field' => 'Title', 'label' => 'Titre'],
             ['field' => 'LastUpdate', 'label' => 'Dernière modification'],
-            ['field' => 'Published', 'label' => 'Publié'],
             ['field' => 'GroupName', 'label' => 'Groupe'],
             ['field' => 'ForMembers', 'label' => 'Club'],
             ['field' => 'Pool', 'label' => 'Sondage (votes)'],
         ];
+        if ($this->authorizations->isWebmaster()) {
+            $columns[] = ['field' => 'Published', 'label' => 'Publié'];
+        }
         $query = $this->fluent->from('Article')
             ->select('Article.Id, Article.CreatedBy, Article.Title, Article.Timestamp')
             ->select('CASE WHEN Article.PublishedBy IS NULL THEN "non" ELSE "oui" END AS Published')
