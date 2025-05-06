@@ -156,6 +156,7 @@ $flight->route('GET  /navBar/show/arwards',     function()    use ($navBarContro
 
 use app\controllers\PersonController;
 $personController = new PersonController($container->get(PDO::class), $container->get(Engine::class));
+$flight->route('GET  /directory',          function()    use ($personController) { $personController->showDirectory(); });
 $flight->route('GET  /personManager',      function()    use ($personController) { $personController->home(); });
 $flight->route('GET  /personManager/help', function()    use ($personController) { $personController->help(); });
 $flight->route('GET  /persons',            function()    use ($personController) { $personController->index(); });
@@ -163,6 +164,9 @@ $flight->route('GET  /persons/create',     function()    use ($personController)
 $flight->route('GET  /persons/edit/@id',   function($id) use ($personController) { $personController->edit($id); });
 $flight->route('POST /persons/edit/@id',   function($id) use ($personController) { $personController->edit($id); });
 $flight->route('GET  /persons/delete/@id', function($id) use ($personController) { $personController->delete($id); });
+$flight->route('GET  /presentation/edit',  function()    use ($personController) { $personController->editPresentation(); });
+$flight->route('POST /presentation/edit',  function()    use ($personController) { $personController->savePresentation(); });
+$flight->route('GET  /presentation/@id',   function($id) use ($personController) { $personController->showPresentation($id); });
 
 use app\controllers\RegistrationController;
 $registrationController = new RegistrationController($container->get(PDO::class), $container->get(Engine::class));

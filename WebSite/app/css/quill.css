@@ -1,0 +1,75 @@
+button.ql-clearbreak {
+    font-weight: bold;
+    font-size: 16px;
+}
+.clearbreak-display, .ql-clearbreak {
+    clear: both !important;
+    display: block !important;
+    width: 100% !important;
+    height: 1px !important; 
+    margin: 10px 0 !important;
+    padding: 0 !important;
+    float: none !important;
+    position: relative !important;
+    border-bottom: none !important; 
+    background-color: transparent; 
+}
+.clearbreak-display + * {
+    clear: both !important;
+    display: block;
+}
+.ql-editor {
+    min-height: 300px;
+}
+#editor-container {
+    display: none;
+}
+.card-body img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+}
+.ql-editor img, #content-display img {
+    float: left;
+    margin-right: 10px;
+    margin-bottom: 5px;
+    max-width: 100%;
+    height: auto;
+}
+#content-display p, .ql-editor p {
+    margin-top: 0;
+    margin-bottom: 1em;
+}
+.ql-clearbreak {
+    clear: both !important;
+    display: block !important;
+    width: 100% !important;
+    height: 1px !important;
+    margin: 10px 0 !important;
+    border-bottom: 1px dashed #ccc !important;
+    padding: 0 !important;
+    float: none !important;
+    position: relative !important;
+}
+.ql-clearbreak + * {
+    clear: both;
+}
+button.ql-clearbreak:hover {
+    background-color: #f0f0f0;
+}
+.ql-editor img.img-left, #content-display img.img-left {
+    float: left;
+    margin-right: 10px;
+    margin-bottom: 5px;
+    max-width: 100%;
+    height: auto;
+}
+
+.ql-editor img.img-right, #content-display img.img-right {
+    float: right;
+    margin-left: 10px;
+    margin-bottom: 5px;
+    max-width: 100%;
+    height: auto;
+}

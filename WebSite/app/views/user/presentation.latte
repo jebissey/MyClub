@@ -1,0 +1,124 @@
+{layout '../layout.latte'}
+
+{block title}Présentation de {$person['FirstName']} {$person['LastName']}{if $person['NickName']} ({$person['NickName']}){/if}{/block}
+
+{block navbar}
+    {include '../navbar/home.latte'}
+{/block}
+
+{block head}
+<style>
+.presentation-content img.img-left {
+    float: left;
+    margin-right: 10px;
+    margin-bottom: 5px;
+    max-width: 100%;
+    height: auto;
+}
+
+.presentation-content img.img-right {
+    float: right;
+    margin-left: 10px;
+    margin-bottom: 5px;
+    max-width: 100%;
+    height: auto;
+}
+
+</style>
+{/block}
+
+{block content}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-12 mb-4 mt-3">
+            <a href="/directory" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Retour au trombinoscope
+            </a>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body text-center">
+                    {if $person['UseGravatar'] == 'yes' && $person['Email']}
+                        <img src="https://www.gravatar.com/avatar/{md5(strtolower(trim($person['Email'])))}?s=150&d=mp" alt="Avatar" class="img-fluid rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover;">
+                    {elseif $person['Avatar']}
+                        <img src="/app/images/{$person['Avatar']}" alt="Avatar" class="img-fluid rounded-circle mb-3">
+                    {else}
+                        <div class="rounded-circle bg-light d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 48px; height: 48px;">
+                            <i class="bi bi-person-circle" style="font-size: 4rem;"></i>
+                        </div>
+                    {/if}
+                    
+                    <h3>{$person['FirstName']} {$person['LastName']}</h3>
+                    {if $person['NickName']}
+                        <p class="text-muted">{$person['NickName']}</p>
+                    {/if}
+                    
+                    {if $loggedPerson && $loggedPerson['Id'] == $person['Id']}
+                        <a href="/presentation/edit" class="btn btn-sm btn-primary mt-2">
+                            <i class="bi bi-pencil"></i> Modifier ma présentation
+                        </a>
+                    {/if}
+                </div>
+            </div>
+            
+            {if $person['Location']}
+                <div class="card mt-3">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Quartier</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <div id="map" style="height: 200px;"></div>
+                    </div>
+                </div>
+            {/if}
+            
+            {if $person['Phone'] || $person['Email']}
+                <div class="card mt-3">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Contact</h5>
+                    </div>
+                    <div class="card-body">
+                        {if $person['Phone']}
+                            <p><i class="bi bi-telephone"></i> {$person['Phone']}</p>
+                        {/if}
+                        {if $person['Email']}
+                            <p><i class="bi bi-envelope"></i> {$person['Email']}</p>
+                        {/if}
+                    </div>
+                </div>
+            {/if}
+        </div>
+        
+        <div class="col-md-9">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Présentation</h5>
+                </div>
+                <div class="card-body">
+                    {if $person['Presentation']}
+                        <div class="presentation-content">
+                            {$person['Presentation']|noescape}
+                        </div>
+                    {else}
+                        <p class="text-muted">Aucune présentation disponible</p>
+                    {/if}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}
+
+{block scripts}
+{if $person['Location']}
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+    <script>
+            const locationStr = {$person["Location"]};
+    </script>
+    <script src="/app/js/user/presentation.js"></script>
+{/if}
+{/block}

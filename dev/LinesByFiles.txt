@@ -1,6 +1,6 @@
 === Détail par fichier ===
      1 ../WebSite/phpinfo.php
-   271 ../WebSite/index.php
+   275 ../WebSite/index.php
     65 ../WebSite/app/views/dbbrowser/edit.latte
     43 ../WebSite/app/views/dbbrowser/index.latte
    146 ../WebSite/app/views/dbbrowser/table.latte
@@ -19,7 +19,7 @@
     40 ../WebSite/app/views/eventType/attributes-list.latte
     27 ../WebSite/app/views/persons/index.latte
     35 ../WebSite/app/views/navbar/redactor.latte
-    35 ../WebSite/app/views/navbar/user.latte
+    38 ../WebSite/app/views/navbar/user.latte
     73 ../WebSite/app/views/navbar/home.latte
    111 ../WebSite/app/views/navbar/index.latte
     23 ../WebSite/app/views/navbar/eventManager.latte
@@ -49,17 +49,20 @@
      4 ../WebSite/app/views/admin/admin.latte
     70 ../WebSite/app/views/survey/add.latte
     55 ../WebSite/app/views/survey/results.latte
+   124 ../WebSite/app/views/user/presentation.latte
    142 ../WebSite/app/views/user/ffaSearch.latte
      4 ../WebSite/app/views/user/user.latte
    116 ../WebSite/app/views/user/articles.latte
     30 ../WebSite/app/views/user/groups.latte
+    97 ../WebSite/app/views/user/editPresentation.latte
     65 ../WebSite/app/views/user/availabilities.latte
     42 ../WebSite/app/views/user/signIn.latte
     36 ../WebSite/app/views/user/setPassword.latte
     99 ../WebSite/app/views/user/preferences.latte
     29 ../WebSite/app/views/user/publish.latte
    106 ../WebSite/app/views/user/account.latte
-   564 ../WebSite/app/views/user/article.latte
+    97 ../WebSite/app/views/user/directory.latte
+   300 ../WebSite/app/views/user/article.latte
    212 ../WebSite/app/views/user/statistics.latte
    100 ../WebSite/app/views/media/list.latte
     68 ../WebSite/app/views/media/gpxViewer.latte
@@ -85,7 +88,7 @@
    161 ../WebSite/app/controllers/MediaController.php
    171 ../WebSite/app/controllers/EventController.php
    152 ../WebSite/app/controllers/ImportController.php
-   170 ../WebSite/app/controllers/PersonController.php
+   286 ../WebSite/app/controllers/PersonController.php
    799 ../WebSite/app/controllers/LogController.php
    139 ../WebSite/app/controllers/RegistrationController.php
    441 ../WebSite/app/controllers/ArticleController.php
@@ -100,6 +103,7 @@
     32 ../WebSite/app/js/groups/index.js
     93 ../WebSite/app/js/eventType/index.js
    214 ../WebSite/app/js/navbar/index.js
+   224 ../WebSite/app/js/quill/script.js
     47 ../WebSite/app/js/registration/index.js
     58 ../WebSite/app/js/event/detail.js
    143 ../WebSite/app/js/event/needs.js
@@ -110,6 +114,7 @@
     39 ../WebSite/app/js/survey/add.js
     59 ../WebSite/app/js/user/preferences.js
     27 ../WebSite/app/js/user/availabilities.js
+    22 ../WebSite/app/js/user/presentation.js
     70 ../WebSite/app/js/user/signIn.js
     27 ../WebSite/app/js/user/account.js
      0 ../WebSite/app/js/user/article.js
@@ -136,12 +141,12 @@
    263 ../WebSite/app/helpers/Article.php
     14 ../WebSite/app/helpers/Params.php
    116 ../WebSite/app/helpers/Event.php
- 15150 total
+ 15573 total
 
 === Total par type de fichier ===
 Fichiers PHP :
-7212
+7332
 Fichiers Latte :
-5968
+6025
 Fichiers Javascript :
-1970
+2216
