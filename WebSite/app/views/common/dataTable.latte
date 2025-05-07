@@ -2,7 +2,7 @@
     {if isset($filters) && count($filters) > 0}
         <form method="get" class="row g-3 mb-4">
             {foreach $filters as $filter}
-                <div class="col-md-3">
+                <div class="col-md-2">
                     <label for="{$filter['name']}" class="form-label">{$filter['label']}</label>
                     <input type="text" class="form-control" id="{$filter['name']}" name="{$filter['name']}" 
                         value="{$filterValues[$filter['name']] ?? ''}">
