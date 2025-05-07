@@ -1,9 +1,7 @@
 document.addEventListener('DOMContentLoaded', function () {
-    // Vérifie si l'éditeur Quill est présent sur la page
     const editorElement = document.getElementById('quill-editor');
     if (!editorElement) return;
 
-    // Configuration de base de Quill
     const BlockEmbed = Quill.import('blots/block/embed');
 
     class ClearBreakBlot extends BlockEmbed {
@@ -31,7 +29,6 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    // Ajout du bouton clearBreak (uniquement si la toolbar existe)
     const toolbar = quill.getModule('toolbar');
     if (toolbar) {
         const toolbarEl = toolbar.container;
@@ -110,7 +107,6 @@ document.addEventListener('DOMContentLoaded', function () {
         quill.clipboard.dangerouslyPasteHTML(initialContent);
     }
 
-    // Gestion des boutons (pour la vue article)
     const editToggleBtn = document.getElementById('edit-toggle-btn');
     const saveBtn = document.getElementById('save-btn');
     const cancelBtn = document.getElementById('cancel-btn');
@@ -137,7 +133,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Pour la vue article (avec edit-toggle-btn)
     if (editToggleBtn) {
         editToggleBtn.addEventListener('click', function () {
             contentDisplay.style.display = 'none';
@@ -168,28 +163,7 @@ document.addEventListener('DOMContentLoaded', function () {
         editForm.addEventListener('submit', function (e) {
             contentInput.value = quill.root.innerHTML;
         });
-    }
-
-    // Gestion spécifique aux articles
-    const groupSelect = document.getElementById('group-select');
-    const publishedInput = document.getElementById('published-input');
-    const membersOnlyCheckbox = document.getElementById('members-only-checkbox');
-
-    if (groupSelect && publishedInput && membersOnlyCheckbox) {
-        function updateCheckboxState() {
-            if (groupSelect.value === "") {
-                publishedInput.disabled = true;
-                publishedInput.checked = false;
-                membersOnlyCheckbox.disabled = false;
-            } else {
-                publishedInput.disabled = false;
-                membersOnlyCheckbox.checked = true;
-                membersOnlyCheckbox.disabled = true;
-            }
-        }
-        updateCheckboxState();
-        groupSelect.addEventListener('change', updateCheckboxState);
-    }
+    }    
 });
 
 function resizeImage(file, maxWidth = 1024, maxHeight = 1024) {
