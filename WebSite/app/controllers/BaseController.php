@@ -182,6 +182,11 @@ abstract class BaseController extends BaseHelper
         return $query->fetch(PDO::FETCH_ASSOC);
     }
 
+    protected function getGroups()
+    {
+        return $this->fluent->from("'Group'")->where('Inactivated', 0)->orderBy('Name')->fetchAll();
+    }
+
     protected function getPublisher($id)
     {
         if ($id == null) {
@@ -193,7 +198,7 @@ abstract class BaseController extends BaseHelper
         return "publié par " . $person['FirstName'] . " " . $person['LastName'];
     }
 
-    protected function setDefaultParams()
+    protected function setDefaultParams($segment = 0)
     {
         $translationManager = new TranslationManager($this->pdo);
         $this->params = new Params([
@@ -206,7 +211,7 @@ abstract class BaseController extends BaseHelper
             'isRedactor' => false,
             'isEditor' => false,
             'isWebmaster' => false,
-            'page' => explode('/', trim(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/'))[0],
+            'page' => explode('/', trim(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/'))[$segment],
             'currentVersion' => self::VERSION,
             'currentLanguage' => $translationManager->getCurrentLanguage(),
             'supportedLanguages' => $translationManager->getSupportedLanguages(),

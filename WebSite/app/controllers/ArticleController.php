@@ -296,7 +296,7 @@ class ArticleController extends TableController
 
     public function showArticleCrosstab()
     {
-        if ($this->getPerson(['Redactor'])) {
+        if ($this->getPerson(['Redactor'], 1)) {
             $period = $this->flight->request()->query->period ?? 'month';
 
             $articleStatistics = new Article($this->pdo);

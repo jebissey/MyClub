@@ -51,7 +51,7 @@ class EmailController extends BaseController
             } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
                 echo $this->latte->render('app/views/emails/getEmails.latte', $this->params->getAll([
-                    'groups' => $this->fluent->from("'Group'")->where('Inactivated', 0)->orderBy('Name')->fetchAll('Id', 'Name'),
+                    'groups' => $this->getGroups(),
                     'eventTypes' => $this->fluent->from('EventType')->where('Inactivated', 0)->orderBy('Name')->fetchAll('Id', 'Name'),
                 ]));
             } else {

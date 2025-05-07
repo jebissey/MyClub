@@ -85,7 +85,7 @@ use app\controllers\DesignController;
 $designController = new DesignController($container->get(PDO::class), $container->get(Engine::class));
 $flight->route('GET  /designs',          function() use ($designController) { $designController->index(); });
 $flight->route('GET  /designs/create',   function() use ($designController) { $designController->create(); });
-$flight->route('POST /designs/store',    function() use ($designController) { $designController->store(); });
+$flight->route('POST /designs/save',     function() use ($designController) { $designController->save(); });
 
 use app\controllers\EmailController;
 $emailController = new EmailController($container->get(PDO::class), $container->get(Engine::class));
