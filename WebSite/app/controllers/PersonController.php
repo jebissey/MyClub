@@ -258,18 +258,18 @@ class PersonController extends TableController implements CrudControllerInterfac
                 ")->fetchAll();
             }
 
-                $groupCounts = [];
-                $groupCountResult = $this->pdo->query("
-                    SELECT g.Id, COUNT(DISTINCT pg.IdPerson) as Count 
-                    FROM `Group` g
-                    JOIN PersonGroup pg ON g.Id = pg.IdGroup
-                    JOIN Person p ON pg.IdPerson = p.Id
-                    WHERE p.InPresentationDirectory = 'yes'
-                    GROUP BY g.Id
+            $groupCounts = [];
+            $groupCountResult = $this->pdo->query("
+                SELECT g.Id, COUNT(DISTINCT pg.IdPerson) as Count 
+                FROM `Group` g
+                JOIN PersonGroup pg ON g.Id = pg.IdGroup
+                JOIN Person p ON pg.IdPerson = p.Id
+                WHERE p.InPresentationDirectory = 'yes'
+                GROUP BY g.Id
                 ")->fetchAll();
-                foreach ($groupCountResult as $count) {
-                    $groupCounts[$count['Id']] = $count['Count'];
-                }
+            foreach ($groupCountResult as $count) {
+                $groupCounts[$count['Id']] = $count['Count'];
+            }
 
             echo $this->latte->render('app/views/user/directory.latte', $this->params->getAll([
                 'persons' => $persons,
@@ -278,6 +278,42 @@ class PersonController extends TableController implements CrudControllerInterfac
                 'groups' => $this->getGroups(),
                 'groupCounts' => $groupCounts,
                 'selectedGroup' => $selectedGroup,
+            ]));
+        } else {
+            $this->application->error403(__FILE__, __LINE__);
+        }
+    }
+
+    public function showMap()
+    {
+        if ($this->getPerson([])) {
+            $members = $this->fluent->from('Person')
+                ->where('InPresentationDirectory', 1)
+                ->where('Location IS NOT NULL')
+                ->where('Inactivated', 0)
+                ->fetchAll();
+
+            $locationData = [];
+            foreach ($members as $member) {
+                if (!empty($member['Location']) && preg_match('/^[-+]?([1-8]?\d(\.\d+)?|90(\.0+)?),\s*[-+]?(180(\.0+)?|((1[0-7]\d)|([1-9]?\d))(\.\d+)?)$/', $member['Location'])) {
+                    list($lat, $lng) = explode(',', $member['Location']);
+                    $locationData[] = [
+                        'id' => $member['Id'],
+                        'name' => $member['FirstName'] . ' ' . $member['LastName'],
+                        'nickname' => $member['NickName'],
+                        'avatar' => $member['Avatar'],
+                        'useGravatar' => $member['UseGravatar'],
+                        'email' => $member['Email'],
+                        'lat' => trim($lat),
+                        'lng' => trim($lng)
+                    ];
+                }
+            }
+
+            echo $this->latte->render('app/views/user/map.latte', $this->params->getAll([
+                'locationData' => $locationData,
+                'membersCount' => count($locationData),
+                'navItems' => $this->getNavItems(),
             ]));
         } else {
             $this->application->error403(__FILE__, __LINE__);

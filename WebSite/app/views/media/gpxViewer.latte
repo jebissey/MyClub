@@ -36,7 +36,8 @@
                 return;
             }
 
-            let map = L.map("map").setView([48.8566, 2.3522], 13);
+            let map = L.map('map').setView([47.3220, 5.0415], 13); // Dijon
+
             L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
                 attribution: "&copy; OpenStreetMap contributors"
             }).addTo(map);

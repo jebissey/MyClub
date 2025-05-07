@@ -157,6 +157,7 @@ $flight->route('GET  /navBar/show/arwards',     function()    use ($navBarContro
 use app\controllers\PersonController;
 $personController = new PersonController($container->get(PDO::class), $container->get(Engine::class));
 $flight->route('GET  /directory',          function()    use ($personController) { $personController->showDirectory(); });
+$flight->route('GET  /members/map',        function()    use ($personController) { $personController->showMap(); });
 $flight->route('GET  /personManager',      function()    use ($personController) { $personController->home(); });
 $flight->route('GET  /personManager/help', function()    use ($personController) { $personController->help(); });
 $flight->route('GET  /persons',            function()    use ($personController) { $personController->index(); });

@@ -1,0 +1,37 @@
+
+{layout '../layout.latte'}
+
+{block title}Localisation des membres{/block}
+
+{block navbar}
+    {include '../navbar/home.latte'}
+{/block}
+
+{block content}
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h1 class="card-title">Carte des membres</h1>
+                    <h6 class="card-subtitle mb-2 text-muted">{$membersCount} membres localisés</h6>
+                </div>
+                <div class="card-body">
+                    <div id="memberMap" style="height: 600px; width: 100%;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}
+
+{block scripts}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/blueimp-md5/2.19.0/js/md5.min.js"></script>
+<script>
+    const locationData = {$locationData};
+</script>
+<script src="/app/js/user/map.js"></script>
+{/block}
