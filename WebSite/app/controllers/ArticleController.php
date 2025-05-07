@@ -55,7 +55,7 @@ class ArticleController extends TableController
             $columns[] = ['field' => 'Published', 'label' => 'Publié'];
         }
         $query = $this->fluent->from('Article')
-            ->select('Article.Id, Article.CreatedBy, Article.Title, Article.Timestamp')
+            ->select('Article.Id, Article.CreatedBy, Article.Title, Article.LastUpdate')
             ->select('CASE WHEN Article.PublishedBy IS NULL THEN "non" ELSE "oui" END AS Published')
             ->select('CASE WHEN Article.OnlyForMembers = 1 THEN "oui" ELSE "non" END AS ForMembers')
             ->select('

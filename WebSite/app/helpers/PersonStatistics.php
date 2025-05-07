@@ -37,10 +37,10 @@ class PersonStatistics
     public function getAvailableSeasons()
     {
         $query = "
-            SELECT MIN(Timestamp) as min_date FROM (
-                SELECT MIN(Timestamp) as Timestamp FROM Article
+            SELECT MIN(LastUpdate) as min_date FROM (
+                SELECT MIN(LastUpdate) as LastUpdate FROM Article
                 UNION
-                SELECT MIN(StartTime) as Timestamp FROM Event
+                SELECT MIN(StartTime) as LastUpdate FROM Event
             )
         ";
         $stmt = $this->pdo->prepare($query);
@@ -100,7 +100,7 @@ class PersonStatistics
             SELECT COUNT(*) as count 
             FROM Article 
             WHERE CreatedBy = ? 
-            AND Timestamp BETWEEN ? AND ?
+            AND LastUpdate BETWEEN ? AND ?
         ";
         $userArticles = $this->pdo->prepare($query);
         $userArticles->execute([$personId, $seasonStart, $seasonEnd]);
@@ -109,7 +109,7 @@ class PersonStatistics
         $query = "
             SELECT COUNT(*) as count 
             FROM Article 
-            WHERE Timestamp BETWEEN ? AND ?
+            WHERE LastUpdate BETWEEN ? AND ?
         ";
         $totalArticles = $this->pdo->prepare($query);
         $totalArticles->execute([$seasonStart, $seasonEnd]);
@@ -131,7 +131,7 @@ class PersonStatistics
             WHERE a.CreatedBy = ? 
             AND s.Id IN (
                 SELECT Id FROM Survey WHERE IdArticle IN (
-                    SELECT Id FROM Article WHERE Timestamp BETWEEN ? AND ?
+                    SELECT Id FROM Article WHERE LastUpdate BETWEEN ? AND ?
                 )
             )
         ";
@@ -143,7 +143,7 @@ class PersonStatistics
             SELECT COUNT(*) as count 
             FROM Survey 
             WHERE IdArticle IN (
-                SELECT Id FROM Article WHERE Timestamp BETWEEN ? AND ?
+                SELECT Id FROM Article WHERE LastUpdate BETWEEN ? AND ?
             )
         ";
         $totalSurveys = $this->pdo->prepare($query);
@@ -167,7 +167,7 @@ class PersonStatistics
                 SELECT r.Id FROM Reply r
                 JOIN Survey s ON r.IdSurvey = s.Id
                 JOIN Article a ON s.IdArticle = a.Id
-                WHERE a.Timestamp BETWEEN ? AND ?
+                WHERE a.LastUpdate BETWEEN ? AND ?
             )
         ";
         $userReplies = $this->pdo->prepare($query);
@@ -181,7 +181,7 @@ class PersonStatistics
                 SELECT r.Id FROM Reply r
                 JOIN Survey s ON r.IdSurvey = s.Id
                 JOIN Article a ON s.IdArticle = a.Id
-                WHERE a.Timestamp BETWEEN ? AND ?
+                WHERE a.LastUpdate BETWEEN ? AND ?
             )
         ";
         $totalReplies = $this->pdo->prepare($query);

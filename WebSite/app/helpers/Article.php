@@ -25,8 +25,6 @@ class Article
             ->fetch();
     }
 
-
-
     public function getAvailablePeriods()
     {
         return [
@@ -141,7 +139,7 @@ class Article
                 SELECT DISTINCT p.Id, p.FirstName, p.LastName
                 FROM Person p
                 JOIN Article a ON p.Id = a.CreatedBy
-                WHERE a.Timestamp BETWEEN :startDate AND :endDate
+                WHERE a.LastUpdate BETWEEN :startDate AND :endDate AND a.PublishedBy IS NOT NULL
                 ORDER BY p.LastName, p.FirstName
             ";
         $stmt = $this->pdo->prepare($query);
@@ -181,7 +179,7 @@ class Article
                 SELECT COUNT(*) as total
                 FROM Article
                 WHERE CreatedBy = :authorId
-                AND Timestamp BETWEEN :startDate AND :endDate
+                AND LastUpdate BETWEEN :startDate AND :endDate
             ";
         $params = [
             ':authorId' => $authorId,
@@ -212,7 +210,7 @@ class Article
                 FROM Article
                 WHERE CreatedBy = :authorId
                 AND IdGroup = :groupId
-                AND Timestamp BETWEEN :startDate AND :endDate";
+                AND LastUpdate BETWEEN :startDate AND :endDate";
         $stmt = $this->pdo->prepare($query);
         $stmt->execute([
             ':authorId' => $authorId,
