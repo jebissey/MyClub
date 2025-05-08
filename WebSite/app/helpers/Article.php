@@ -133,6 +133,7 @@ class Article
         return $crosstab;
     }
 
+
     private function getAuthorsWithArticlesInPeriod($startDate, $endDate)
     {
         $query = "
@@ -223,6 +224,7 @@ class Article
         return (int)$result['total'];
     }
 
+    
     public function calculateTotals($crosstabData)
     {
         $totals = [

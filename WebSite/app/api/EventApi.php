@@ -4,7 +4,9 @@ namespace app\api;
 
 use Exception;
 use app\controllers\BaseController;
+use app\helpers\Event;
 use app\helpers\EventAudience;
+use app\helpers\Message;
 
 class EventApi extends BaseController
 {
@@ -440,6 +442,125 @@ class EventApi extends BaseController
         } else {
             header('Content-Type: application/json', true, 403);
             echo json_encode(['success' => false, 'message' => 'User not allowed']);
+        }
+    }
+
+
+    public function addMessage()
+    {
+        if ($person = $this->getPerson([])) {
+            $json = file_get_contents('php://input');
+            $data = json_decode($json, true);
+
+            if (!isset($data['eventId']) || !isset($data['text'])) {
+                header('Content-Type: application/json', true, 400);
+                echo json_encode(['success' => false, 'message' => 'Données manquantes']);
+                exit;
+            }
+
+            $eventHelper = new Event($this->pdo);
+            if (!$eventHelper->isUserRegistered($data['eventId'], $person['Email'])) {
+                header('Content-Type: application/json', true, 403);
+                echo json_encode(['success' => false, 'message' => 'Accès non autorisé à cet événement']);
+                exit;
+            }
+
+            try {
+                $messageHelper = new Message($this->pdo);
+                $messageId = $messageHelper->addMessage($data['eventId'], $person['Id'], $data['text']);
+
+                $messages = $messageHelper->getEventMessages($data['eventId']);
+                $newMessage = null;
+
+                foreach ($messages as $message) {
+                    if ($message['Id'] == $messageId) {
+                        $newMessage = $message;
+                        break;
+                    }
+                }
+
+                header('Content-Type: application/json');
+                echo json_encode([
+                    'success' => true,
+                    'message' => 'Message ajouté',
+                    'data' => $newMessage
+                ]);
+            } catch (\Exception $e) {
+                header('Content-Type: application/json', true, 500);
+                echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+            }
+        } else {
+            header('Content-Type: application/json', true, 403);
+            echo json_encode(['success' => false, 'message' => 'Utilisateur non connecté']);
+        }
+    }
+
+    public function updateMessage()
+    {
+        if ($person = $this->getPerson([])) {
+            $json = file_get_contents('php://input');
+            $data = json_decode($json, true);
+
+            if (!isset($data['messageId']) || !isset($data['text'])) {
+                header('Content-Type: application/json', true, 400);
+                echo json_encode(['success' => false, 'message' => 'Données manquantes']);
+                return;
+            }
+
+            try {
+                $messageHelper = new Message($this->pdo);
+                $messageHelper->updateMessage($data['messageId'], $person['Id'], $data['text']);
+
+                header('Content-Type: application/json');
+                echo json_encode([
+                    'success' => true,
+                    'message' => 'Message mis à jour',
+                    'data' => [
+                        'messageId' => $data['messageId'],
+                        'text' => $data['text']
+                    ]
+                ]);
+            } catch (\Exception $e) {
+                header('Content-Type: application/json', true, 500);
+                echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+            }
+        } else {
+            header('Content-Type: application/json', true, 403);
+            echo json_encode(['success' => false, 'message' => 'Utilisateur non connecté']);
+        }
+    }
+
+    public function deleteMessage()
+    {
+        if ($person = $this->getPerson([])) {
+            $json = file_get_contents('php://input');
+            $data = json_decode($json, true);
+
+            if (!isset($data['messageId'])) {
+                header('Content-Type: application/json', true, 400);
+                echo json_encode(['success' => false, 'message' => 'ID de message manquant']);
+                return;
+            }
+
+            try {
+                $messageHelper = new Message($this->pdo);
+                $messageHelper->deleteMessage($data['messageId'], $person['Id']);
+
+                header('Content-Type: application/json');
+                echo json_encode([
+                    'success' => true,
+                    'message' => 'Message supprimé',
+                    'data' => [
+                        'messageId' => $data['messageId']
+                    ]
+                ]);
+            } catch (\Exception $e) {
+                header('Content-Type: application/json', true, 500);
+                echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+            }
+        } else {
+            header('Content-Type: application/json', true, 403);
+            echo json_encode(['success' => false, 'message' => 'Utilisateur non connecté']);
         }
     }
 }

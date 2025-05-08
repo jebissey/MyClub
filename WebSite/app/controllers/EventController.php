@@ -131,6 +131,34 @@ class EventController extends BaseController
         }
     }
 
+    public function showEventChat($eventId)
+    {
+        if ($person = $this->getPerson([])) {
+            $event = $this->fluent->from('Event')->where('Id', $eventId)->fetch();
+            if (!$event) {
+                $this->application->error471($eventId, __FILE__, __LINE__);
+                return;
+            }
+            $creator = $this->fluent->from('Person')->where('Id', $event['CreatedBy'])->fetch();
+            $messages = $this->fluent->from('Message')
+                ->select('Message.*, Person.FirstName, Person.LastName, Person.NickName, Person.Avatar, Person.UseGravatar, Person.Email')
+                ->join('Person ON Person.Id = Message.PersonId')
+                ->where('EventId', $eventId)
+                ->orderBy('Message.Id ASC')
+                ->fetchAll();
+
+            echo $this->latte->render('app/views/event/chat.latte', $this->params->getAll([
+                'event' => $event,
+                'creator' => $creator,
+                'messages' => $messages,
+                'person' => $person,
+                'navItems' => $this->getNavItems(),
+            ]));
+        } else {
+            $this->application->error403(__FILE__, __LINE__);
+        }
+    }
+
 
     private function getEvent($eventId)
     {

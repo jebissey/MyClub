@@ -95,6 +95,7 @@
                     <div class="mt-3">
                         {if $isRegistered}
                         <a href="/events/{$eventId}/unregister" class="btn btn-primary">{='unregister'|translate}</a>
+                        <a href="/event/chat/{$eventId}" class="btn btn-primary">{='messages'|translate}</a>
                         {elseif count($participants) < $event['MaxParticipants'] || $event['MaxParticipants'] == 0}
                         <a href="/events/{$eventId}/register" class="btn btn-primary">{='register'|translate}</a>
                         {else}

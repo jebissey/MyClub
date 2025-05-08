@@ -154,6 +154,15 @@ CREATE TABLE IF NOT EXISTS "Languages" (
 	"fr_FR"	TEXT NOT NULL,
 	PRIMARY KEY("Id")
 );
+CREATE TABLE IF NOT EXISTS "Message" (
+	"Id"	INTEGER,
+	"EventId"	INTEGER NOT NULL,
+	"PersonId"	INTEGER NOT NULL,
+	"Text"	INTEGER NOT NULL,
+	PRIMARY KEY("Id"),
+	FOREIGN KEY("EventId") REFERENCES "Event"("Id"),
+	FOREIGN KEY("PersonId") REFERENCES "Person"("Id")
+);
 CREATE TABLE IF NOT EXISTS "Metadata" (
 	"Id"	INTEGER,
 	"ApplicationName"	TEXT NOT NULL,

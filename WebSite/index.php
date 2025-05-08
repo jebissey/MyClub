@@ -103,6 +103,7 @@ $flight->route('GET /event/location',        function()    use ($eventController
 $flight->route('GET /events/@id/register',   function($id) use ($eventController) { $eventController->register($id, true); });
 $flight->route('GET /events/@id/unregister', function($id) use ($eventController) { $eventController->register($id, false); });
 $flight->route('GET /needs',                 function()    use ($eventController) { $eventController->needs();});
+$flight->route('GET /event/chat/@id',        function($id) use ($eventController) { $eventController->showEventChat($id); });
 
 use app\controllers\EventTypeController;
 $eventTypeController = new EventTypeController($container->get(PDO::class), $container->get(Engine::class));
@@ -239,6 +240,9 @@ $flight->route('POST   /api/needs/save',              function()    use ($eventA
 $flight->route('DELETE /api/needs/type/delete/@id',   function($id) use ($eventApi) { $eventApi->deleteNeedType($id);});
 $flight->route('POST   /api/needs/type/save',         function()    use ($eventApi) { $eventApi->saveNeedType(); });
 $flight->route('GET    /api/needs-by-event-type/@id', function($id) use ($eventApi) { $eventApi->getNeedsByEventType($id); });
+$flight->route('POST /api/message/add',    function() use ($eventApi) {$eventApi->addMessage();});
+$flight->route('POST /api/message/update', function() use ($eventApi) {$eventApi->updateMessage();});
+$flight->route('POST /api/message/delete', function() use ($eventApi) {$eventApi->deleteMessage();});
 
 use app\api\WebmasterApi;
 $webmasterApi = new WebmasterApi($container->get(PDO::class), $container->get(Engine::class));
