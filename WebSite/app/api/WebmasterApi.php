@@ -152,7 +152,8 @@ class WebmasterApi extends BaseController
                         'Route' => $data['route'],
                         'Position' => $newPosition,
                         'IdGroup' => $data['idGroup'],
-                        'OnlyForMembers' => $data['onlyForMembers']
+                        'ForMembers' => $data['forMembers'],
+                        'ForAnonymous' => $data['forAnonymous'],
                     ])
                     ->execute();
                 header('Content-Type: application/json');
@@ -163,7 +164,8 @@ class WebmasterApi extends BaseController
                         'Name' => $data['name'],
                         'Route' => $data['route'],
                         'IdGroup' => $data['idGroup'],
-                        'OnlyForMembers' => $data['onlyForMembers']
+                        'ForMembers' => $data['ForMembers'],
+                        'ForAnonymous' => $data['ForAnonymous'],
                     ])
                     ->where('Id', $data['id'])
                     ->execute();
