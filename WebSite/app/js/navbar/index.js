@@ -25,7 +25,6 @@ document.addEventListener('DOMContentLoaded', function () {
             idParam.value = '';
         }
     }
-
     routeSelect.addEventListener('change', checkRouteParams);
 
     const editButtons = document.querySelectorAll('.edit-btn');
@@ -66,7 +65,8 @@ document.addEventListener('DOMContentLoaded', function () {
                         }
                     }
 
-                    document.getElementById('onlyForMembers').checked = data.OnlyForMembers == 1;
+                    document.getElementById('forMembers').checked = data.ForMembers == 1;
+                    document.getElementById('forAnonymous').checked = data.ForAnonymous == 1;
 
                     modal.show();
                 })
@@ -121,7 +121,8 @@ document.addEventListener('DOMContentLoaded', function () {
             name: name,
             route: route,
             idGroup: document.getElementById('itemGroup').value || null,
-            onlyForMembers: document.getElementById('onlyForMembers').checked ? 1 : 0
+            forMembers: document.getElementById('forMembers').checked ? 1 : 0,
+            forAnonymous: document.getElementById('forAnonymous').checked ? 1 : 0
         };
 
         fetch('/api/navBar/saveItem', {
@@ -150,7 +151,8 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('itemName').value = '';
         document.getElementById('itemRoute').selectedIndex = 0;
         document.getElementById('itemGroup').selectedIndex = 0;
-        document.getElementById('onlyForMembers').value = '';
+        document.getElementById('forMembers').value = '';
+        document.getElementById('forAnonymous').value = '';
         idParam.value = '';
         idParamContainer.style.display = 'none';
         modal.show();

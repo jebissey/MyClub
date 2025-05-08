@@ -164,8 +164,8 @@ class WebmasterApi extends BaseController
                         'Name' => $data['name'],
                         'Route' => $data['route'],
                         'IdGroup' => $data['idGroup'],
-                        'ForMembers' => $data['ForMembers'],
-                        'ForAnonymous' => $data['ForAnonymous'],
+                        'ForMembers' => $data['forMembers'],
+                        'ForAnonymous' => $data['forAnonymous'],
                     ])
                     ->where('Id', $data['id'])
                     ->execute();
