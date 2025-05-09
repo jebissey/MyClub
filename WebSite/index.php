@@ -184,7 +184,6 @@ $flight->route('GET  /surveys/results/@id',   function($id) use ($surveyControll
 use app\controllers\UserController;
 $userController = new UserController($container->get(PDO::class), $container->get(Engine::class));
 $flight->route('GET  /',                                  function()              use ($userController, $articleController) { $userController->home($articleController); });
-$flight->route('GET  /person/statistics',                 function()              use ($userController)                     { $userController->showStatistics();});
 $flight->route('GET  /user',                              function()              use ($userController)                     { $userController->user(); });
 $flight->route('GET  /user/account',                      function()              use ($userController)                     { $userController->account(); });
 $flight->route('POST /user/account',                      function()              use ($userController)                     { $userController->account(); });
@@ -201,6 +200,7 @@ $flight->route('POST /user/setPassword/@token',           function($token)      
 $flight->route('GET  /user/sign/in',                      function()              use ($userController)                     { $userController->signIn(); });
 $flight->route('POST /user/sign/in',                      function()              use ($userController)                     { $userController->signIn(); });
 $flight->route('GET  /user/sign/out',                     function()              use ($userController)                     { $userController->signOut(); });
+$flight->route('GET  /user/statistics',                   function()              use ($userController)                     { $userController->showStatistics();});
 
 use app\controllers\WebmasterController;
 $webmasterController = new WebmasterController($container->get(PDO::class), $container->get(Engine::class));

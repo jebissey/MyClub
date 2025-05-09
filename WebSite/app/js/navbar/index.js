@@ -162,50 +162,50 @@ document.addEventListener('DOMContentLoaded', function () {
 
     if (navList) {
         let draggedRow = null;
-    
+
         navList.querySelectorAll('tr').forEach(row => {
             row.draggable = true;
-    
+
             row.addEventListener('dragstart', function (e) {
                 draggedRow = this;
                 this.classList.add('table-active'); // petite classe visuelle optionnelle
                 e.dataTransfer.effectAllowed = 'move';
             });
-    
+
             row.addEventListener('dragend', function () {
                 this.classList.remove('table-active');
                 draggedRow = null;
             });
-    
+
             row.addEventListener('dragover', function (e) {
                 e.preventDefault();
                 e.dataTransfer.dropEffect = 'move';
             });
-    
+
             row.addEventListener('drop', function (e) {
                 e.preventDefault();
                 if (draggedRow && draggedRow !== this) {
                     const rows = Array.from(navList.querySelectorAll('tr'));
                     const draggedIndex = rows.indexOf(draggedRow);
                     const targetIndex = rows.indexOf(this);
-    
+
                     if (draggedIndex < targetIndex) {
                         navList.insertBefore(draggedRow, this.nextSibling);
                     } else {
                         navList.insertBefore(draggedRow, this);
                     }
-    
+
                     updatePositions();
                 }
             });
         });
-    
+
         function updatePositions() {
             const positions = {};
             navList.querySelectorAll('tr').forEach((row, index) => {
                 positions[row.dataset.id] = index + 1;
             });
-    
+
             fetch('/api/navBar/updatePositions', {
                 method: 'POST',
                 headers: {
@@ -213,16 +213,15 @@ document.addEventListener('DOMContentLoaded', function () {
                 },
                 body: JSON.stringify({ positions: positions })
             })
-            .then(response => response.json())
-            .then(result => {
-                if (!result.success) {
-                    alert('Erreur lors de la mise à jour des positions : ' + result.message);
-                }
-            })
-            .catch(error => {
-                alert('Erreur lors de la mise à jour des positions : ' + error.message);
-            });
+                .then(response => response.json())
+                .then(result => {
+                    if (!result.success) {
+                        alert('Erreur lors de la mise à jour des positions : ' + result.message);
+                    }
+                })
+                .catch(error => {
+                    alert('Erreur lors de la mise à jour des positions : ' + error.message);
+                });
         }
     }
-    
 });

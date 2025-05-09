@@ -156,7 +156,7 @@ abstract class BaseController extends BaseHelper
         return $query->fetchAll(PDO::FETCH_COLUMN);
     }
 
-    protected function getNavItems()
+    protected function getNavItems($all = false)
     {
         $navItems = $this->fluent
             ->from('Page')
@@ -173,6 +173,7 @@ abstract class BaseController extends BaseHelper
             if (($person === false && $navItem['ForAnonymous'] === 1)
              || ($person && $navItem['ForMembers'] === 1)
              || ($person && !empty(array_intersect([$navItem['IdGroup']], $userGroups)))
+             || $all
             ) $filteredNavItems[] = $navItem;
         }
         return $filteredNavItems;

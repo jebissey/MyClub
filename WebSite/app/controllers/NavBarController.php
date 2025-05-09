@@ -10,9 +10,8 @@ class NavBarController extends BaseController
     public function index()
     {
         if ($this->getPerson(['Webmaster'])) {
-            
             echo $this->latte->render('app/views/navbar/index.latte', $this->params->getAll([
-                'navItems' => $this->getNavItems(),
+                'navItems' => $this->getNavItems(true),
                 'groups' => $this->getGroups(),
                 'availableRoutes' => $this->getAvailableRoutes()
             ]));
@@ -79,7 +78,7 @@ class NavBarController extends BaseController
             '/navbar/show/arwards',
             '/nextEvents',
             '/emails',
-            '/person/statistics',
+            '/user/statistics',
             '/ffa/search',
         ];
     }
