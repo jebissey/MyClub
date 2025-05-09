@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const editButtons = document.querySelectorAll('.edit-btn');
     editButtons.forEach(button => {
         button.addEventListener('click', function () {
-            const id = this.closest('li').dataset.id;
+            const id = this.closest('tr').dataset.id;
 
             fetch(`/api/navBar/getItem/${id}`)
                 .then(response => response.json())
@@ -79,7 +79,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const deleteButtons = document.querySelectorAll('.delete-btn');
     deleteButtons.forEach(button => {
         button.addEventListener('click', function () {
-            const id = this.closest('li').dataset.id;
+            const id = this.closest('tr').dataset.id;
 
             if (confirm('Êtes-vous sûr de vouloir supprimer cet élément de navigation ?')) {
                 fetch(`/api/navBar/deleteItem/${id}`, {
@@ -88,7 +88,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     .then(response => response.json())
                     .then(result => {
                         if (result.success) {
-                            this.closest('li').remove();
+                            this.closest('tr').remove();
                         } else {
                             alert(result.message || 'Échec de la suppression de l\'élément de navigation.');
                         }
@@ -159,29 +159,53 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     const navList = document.getElementById('navList');
-    let draggedItem = null;
-    Array.from(navList.children).forEach(item => {
-        initDraggable(item);
-    });
-    function initDraggable(element) {
-        element.setAttribute('draggable', 'true');
 
-        element.addEventListener('dragstart', function () {
-            draggedItem = this;
-            setTimeout(() => {
-                this.classList.add('dragging');
-            }, 0);
-        });
-
-        element.addEventListener('dragend', function () {
-            draggedItem = null;
-            this.classList.remove('dragging');
-
-            const positions = {};
-            Array.from(navList.children).forEach((item, index) => {
-                positions[item.dataset.id] = index + 1; // Position starts from 1
+    if (navList) {
+        let draggedRow = null;
+    
+        navList.querySelectorAll('tr').forEach(row => {
+            row.draggable = true;
+    
+            row.addEventListener('dragstart', function (e) {
+                draggedRow = this;
+                this.classList.add('table-active'); // petite classe visuelle optionnelle
+                e.dataTransfer.effectAllowed = 'move';
             });
-
+    
+            row.addEventListener('dragend', function () {
+                this.classList.remove('table-active');
+                draggedRow = null;
+            });
+    
+            row.addEventListener('dragover', function (e) {
+                e.preventDefault();
+                e.dataTransfer.dropEffect = 'move';
+            });
+    
+            row.addEventListener('drop', function (e) {
+                e.preventDefault();
+                if (draggedRow && draggedRow !== this) {
+                    const rows = Array.from(navList.querySelectorAll('tr'));
+                    const draggedIndex = rows.indexOf(draggedRow);
+                    const targetIndex = rows.indexOf(this);
+    
+                    if (draggedIndex < targetIndex) {
+                        navList.insertBefore(draggedRow, this.nextSibling);
+                    } else {
+                        navList.insertBefore(draggedRow, this);
+                    }
+    
+                    updatePositions();
+                }
+            });
+        });
+    
+        function updatePositions() {
+            const positions = {};
+            navList.querySelectorAll('tr').forEach((row, index) => {
+                positions[row.dataset.id] = index + 1;
+            });
+    
             fetch('/api/navBar/updatePositions', {
                 method: 'POST',
                 headers: {
@@ -189,29 +213,16 @@ document.addEventListener('DOMContentLoaded', function () {
                 },
                 body: JSON.stringify({ positions: positions })
             })
-                .then(response => response.json())
-                .then(result => {
-                    if (!result.success) {
-                        alert('Error updating positions:' + result.message);
-                    }
-                })
-                .catch(error => {
-                    alert('Error updating positions:' + error.message);
-                });
-        });
-
-        element.addEventListener('dragover', function (e) {
-            e.preventDefault();
-            if (!draggedItem || draggedItem === this) return;
-
-            const rect = this.getBoundingClientRect();
-            const midpoint = (rect.top + rect.bottom) / 2;
-
-            if (e.clientY < midpoint) {
-                navList.insertBefore(draggedItem, this);
-            } else {
-                navList.insertBefore(draggedItem, this.nextSibling);
-            }
-        });
+            .then(response => response.json())
+            .then(result => {
+                if (!result.success) {
+                    alert('Erreur lors de la mise à jour des positions : ' + result.message);
+                }
+            })
+            .catch(error => {
+                alert('Erreur lors de la mise à jour des positions : ' + error.message);
+            });
+        }
     }
+    
 });

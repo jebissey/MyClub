@@ -10,15 +10,9 @@ class NavBarController extends BaseController
     public function index()
     {
         if ($this->getPerson(['Webmaster'])) {
-            $query = $this->pdo->query("
-                SELECT Page.*, 'Group'.Name as GroupName 
-                FROM Page
-                LEFT JOIN 'Group' on Page.IdGroup = 'Group'.Id
-                ORDER BY 'Group'.Name");
-            $navItems = $query->fetchAll(PDO::FETCH_ASSOC);
-
+            
             echo $this->latte->render('app/views/navbar/index.latte', $this->params->getAll([
-                'navItems' => $navItems,
+                'navItems' => $this->getNavItems(),
                 'groups' => $this->getGroups(),
                 'availableRoutes' => $this->getAvailableRoutes()
             ]));

@@ -158,7 +158,12 @@ abstract class BaseController extends BaseHelper
 
     protected function getNavItems()
     {
-        $navItems = $this->fluent->from('Page')->orderBy('Position')->fetchAll();
+        $navItems = $this->fluent
+            ->from('Page')
+            ->leftJoin("'Group' ON Page.IdGroup = 'Group'.Id")
+            ->select("'Group'.Name AS GroupName")
+            ->orderBy('Position')
+            ->fetchAll();
         $person = $this->getPerson();
         if (!$person) $userGroups = [];
         else $userGroups = $this->getUserGroups($person['Email']);
