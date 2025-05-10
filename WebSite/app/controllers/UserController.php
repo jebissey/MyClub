@@ -304,9 +304,24 @@ class UserController extends BaseController
                 ");
                 $query->execute([$person['Id']]);
                 $eventTypes = $query->fetchAll(PDO::FETCH_ASSOC);
+
+                $eventTypesWithAttributes = [];
+                foreach ($eventTypes as $eventType) {
+                    $queryAttributes = $this->pdo->prepare("
+                        SELECT a.*
+                        FROM Attribute a
+                        JOIN EventTypeAttribute eta ON a.Id = eta.IdAttribute
+                        WHERE eta.IdEventType = ?
+                        ORDER BY a.Name
+                    ");
+                    $queryAttributes->execute([$eventType['Id']]);
+                    $eventType['Attributes'] = $queryAttributes->fetchAll(PDO::FETCH_ASSOC);
+                    $eventTypesWithAttributes[] = $eventType;
+                }
+
                 echo $this->latte->render('app/views/user/preferences.latte', $this->params->getAll([
                     'currentPreferences' => $preferences,
-                    'eventTypes' => $eventTypes
+                    'eventTypes' => $eventTypesWithAttributes
                 ]));
             } else {
                 $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);

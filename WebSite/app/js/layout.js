@@ -54,3 +54,11 @@ const appendAlert = (message, type) => {
     ].join('');
     alertPlaceholder.append(wrapper);
 };
+
+document.querySelectorAll('[data-tooltip-id]').forEach(el => {
+    const tooltipContent = document.getElementById(el.getAttribute('data-tooltip-id')).innerHTML;
+    new bootstrap.Tooltip(el, {
+        html: true,
+        title: tooltipContent
+    });
+});

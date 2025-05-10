@@ -1,5 +1,15 @@
 {layout "user.latte"}
 
+{block head}
+    <style>
+        .tooltip-inner {
+            max-width: 550px;
+            white-space: normal;
+            text-align: left;
+        }
+    </style>
+{/block}
+
 {block content}
     <form method="POST" data-form="checkSave">
         <div class="row">
@@ -30,9 +40,25 @@
                                                     id="eventType{$eventType['Id']}"
                                                     name="preferences[eventTypes][{$eventType['Id']}][enabled]"
                                                     {isset($currentPreferences['eventTypes'][$eventType['Id']]['enabled']) ? checked : ''}>
-                                                <label class="form-check-label" for="eventType{$eventType['Id']}">
+                                                <label class="form-check-label" 
+                                                    id="eventType{$eventType['Id']}"
+                                                    data-tooltip-id="tooltip-content-{$eventType['Id']}">
                                                     {$eventType['Name']}
                                                 </label>
+
+                                                <div id="tooltip-content-{$eventType['Id']}" class="d-none">
+                                                    <div>
+                                                        {foreach $eventType['Attributes'] as $attribute}
+                                                        <div>
+                                                            <span 
+                                                                class="attribute-badge" 
+                                                                style="background-color: {$attribute['Color']|noescape};">
+                                                            </span>
+                                                            <strong>{$attribute['Name']}</strong>: {$attribute['Detail']}
+                                                        </div>
+                                                        {/foreach}
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                         <div class="availability-options" 
