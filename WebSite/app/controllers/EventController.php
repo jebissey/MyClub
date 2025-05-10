@@ -38,6 +38,7 @@ class EventController extends BaseController
             'userEmail' => $userEmail,
             'isRegistered' => $event->isUserRegistered($eventId, $userEmail),
             'navItems' => $this->getNavItems(),
+            'countOfMessages' => $this->fluent->from('Message')->where('EventId', $eventId)->count(),
         ]));
     }
 

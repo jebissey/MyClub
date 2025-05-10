@@ -170,10 +170,15 @@ abstract class BaseController extends BaseHelper
 
         $filteredNavItems = [];
         foreach ($navItems as $navItem) {
-            if (($person === false && $navItem['ForAnonymous'] === 1)
-             || ($person && $navItem['ForMembers'] === 1)
-             || ($person && !empty(array_intersect([$navItem['IdGroup']], $userGroups)))
-             || $all
+            if (
+                ($person === false && $navItem['ForAnonymous'] == 1)
+                || ($person && $navItem['ForMembers'] == 1 &&
+                    (
+                        $navItem['IdGroup'] === null
+                        || ($userGroups != [] && in_array($navItem['IdGroup'], $userGroups))
+                    )
+                )
+                || $all
             ) $filteredNavItems[] = $navItem;
         }
         return $filteredNavItems;

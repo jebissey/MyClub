@@ -259,7 +259,6 @@ class UserController extends BaseController
     public function availabilities()
     {
         if ($person = $this->getPerson([], 1)) {
-
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $availabilities = $_POST['availabilities'];
                 $query = $this->pdo->prepare('UPDATE Person SET availabilities = ? WHERE Id = ' . $person['Id']);
@@ -273,6 +272,8 @@ class UserController extends BaseController
             } else {
                 $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
             }
+        }else {
+            $this->application->error403(__FILE__, __LINE__);
         }
     }
 
