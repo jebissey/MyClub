@@ -70,14 +70,15 @@ class PersonStatistics
         return $seasons;
     }
 
-    public function getSeasonRange(): array {
+    public function getSeasonRange(): array
+    {
         $seasonStart = $_GET['seasonStart'] ?? null;
         $seasonEnd = $_GET['seasonEnd'] ?? null;
-    
+
         if ($seasonStart === null || $seasonEnd === null) {
             $currentYear = date('Y');
             $currentMonth = date('m');
-    
+
             if ($currentMonth < 9) {
                 $seasonStart = ($currentYear - 1) . '-09-01';
                 $seasonEnd = $currentYear . '-08-31';
@@ -86,13 +87,13 @@ class PersonStatistics
                 $seasonEnd = ($currentYear + 1) . '-08-31';
             }
         }
-    
+
         return [
             'start' => $seasonStart,
             'end' => $seasonEnd
         ];
     }
-    
+
 
     private function getArticleStats($personId, $seasonStart, $seasonEnd)
     {
@@ -264,7 +265,7 @@ class PersonStatistics
         $eventTypes = $this->fluent->from('EventType')->fetchAll();
 
         $stats = [];
-        
+
         foreach ($eventTypes as $eventType) {
             $query = "
                 SELECT COUNT(*) as count 
@@ -329,7 +330,7 @@ class PersonStatistics
         $eventTypes = $this->fluent->from('EventType')->fetchAll();
 
         $stats = [];
-        
+
         foreach ($eventTypes as $eventType) {
             $query = "
                 SELECT COUNT(*) as count 

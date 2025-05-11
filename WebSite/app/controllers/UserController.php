@@ -272,7 +272,7 @@ class UserController extends BaseController
             } else {
                 $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
             }
-        }else {
+        } else {
             $this->application->error403(__FILE__, __LINE__);
         }
     }
@@ -403,9 +403,118 @@ class UserController extends BaseController
                 'seasons' => $personalStatistics->getAvailableSeasons(),
                 'currentSeason' => $season,
                 'navItems' => $this->getNavItems(),
+                'chartData' => $this->getVisitStatsForChart($season, $person),
             ]));
         } else {
             $this->application->error403(__FILE__, __LINE__);
         }
+    }
+
+
+    private function getVisitStatsForChart($season, $person)
+    {
+        $stats = $this->getVisitStats($season);
+        $currentUserTranche = $this->getCurrentUserTranche($stats, $person);
+
+        $chartData = [];
+        for ($i = 0; $i < count($stats['tranches']); $i++) {
+            $chartData[] = [
+                'tranche' => $stats['tranches'][$i]['label'],
+                'count' => $stats['distribution'][$i],
+                'isCurrentUser' => ($i === $currentUserTranche)
+            ];
+        }
+
+        return $chartData;
+    }
+
+    const SLICES = 25;
+    private function getVisitStats($season)
+    {
+        $memberVisits = $this->getMemberVisits($season);
+        $visitCounts = array_values($memberVisits);
+        if (empty($visitCounts)) {
+            return [
+                'tranches' => [],
+                'distribution' => [],
+                'currentUserTranche' => null
+            ];
+        }
+        $minVisits = min($visitCounts);
+        $maxVisits = max($visitCounts);
+        $trancheSize = max(1, ceil(($maxVisits - $minVisits) / self::SLICES));
+        $tranches = [];
+        for ($i = 0; $i < self::SLICES; $i++) {
+            $start = $minVisits + ($i * $trancheSize);
+            $end = $start + $trancheSize - 1;
+            if ($i == self::SLICES - 1) {
+                $end = $maxVisits;
+            }
+            $tranches[] = [
+                'start' => $start,
+                'end' => $end,
+                'label' => "$start-$end"
+            ];
+        }
+        $distribution = array_fill(0, count($tranches), 0);
+        foreach ($memberVisits as $visits) {
+            $index = ($trancheSize > 0)
+                ? floor(($visits - $minVisits) / $trancheSize)
+                : 0;
+            if ($index >= self::SLICES) $index = self::SLICES - 1;
+            $distribution[$index]++;
+        }
+
+        return [
+            'tranches' => $tranches,
+            'distribution' => $distribution,
+            'memberVisits' => $memberVisits
+        ];
+    }
+
+    private function getMemberVisits($season)
+    {
+        $query = $this->pdoForLog->prepare("
+            SELECT Who, COUNT(Id) as VisitCount
+            FROM Log 
+            WHERE CreatedAt BETWEEN :start AND :end
+            GROUP BY Who
+        ");
+        $query->execute([
+            ':start' => $season['start'],
+            ':end' => $season['end']
+        ]);
+        $visits = $query->fetchAll(PDO::FETCH_KEY_PAIR);
+        $memberVisits = [];
+        $members = $this->fluent->from('Person')->select('Email')->where('Inactivated', 0)->fetchAll();
+        foreach ($members as $member) {
+            $email = $member['Email'];
+            $memberVisits[$email] = isset($visits[$email]) ? (int)$visits[$email] : 0;
+        }
+        return $memberVisits;
+    }
+
+    private function getCurrentUserTranche($stats, $person)
+    {
+        if (empty($person) || empty($stats['memberVisits'])) {
+            die('$person or $stats can\'t be null');
+        }
+
+        $email = $person['Email'];
+
+        if (!array_key_exists($email, $stats['memberVisits'])) {
+            die("User $email not found in stats.");
+        }
+
+        $userVisits = $stats['memberVisits'][$email];
+
+        for ($i = 0; $i < count($stats['tranches']); $i++) {
+            $tranche = $stats['tranches'][$i];
+            if ($userVisits >= $tranche['start'] && $userVisits <= $tranche['end']) {
+                return $i;
+            }
+        }
+
+        die('$user slice not found');
     }
 }

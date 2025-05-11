@@ -9,7 +9,7 @@
 {block content}
     <div class="container mt-4">
         <h1>Statistiques pour {$stats['person']['FirstName']} {$stats['person']['LastName']}</h1>
-        
+
         <div class="card mb-4">
             <div class="card-header">
                 <div class="row">
@@ -36,6 +36,24 @@
             </div>
             
             <div class="card-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h3>Distribution des visites</h3>
+                        <div style="width: 100%; height: 200px;">
+                            <canvas id="visitorChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-md-12">
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle"></i> 
+                            <strong>Information:</strong> Ce graphique montre la distribution des membres par nombre de pages visitées.
+                            Votre position est indiquée par un point plus gros.
+                        </div>
+                    </div>
+                </div>
+
                 <div class="row">
                     <div class="col-md-6">
                         <h3>Activités éditoriales</h3>
@@ -152,7 +170,6 @@
                         </table>
                     </div>
                 {/if}
-
                     <div class="col-md-6">
                         <h3>Participations aux événements</h3>
                         <table class="table table-striped">
@@ -210,4 +227,12 @@
             </div>
         </div>
     </div>
+{/block}
+
+{block scripts}
+<script>
+const chartData = {$chartData};
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+<script src="/app/js/user/statistics.js"></script>
 {/block}
