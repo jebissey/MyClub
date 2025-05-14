@@ -304,7 +304,6 @@ class ArticleController extends TableController
                 $dateRange['start'],
                 $dateRange['end']
             );
-
             echo $this->latte->render('app/views/articles/crosstab.latte', $this->params->getAll([
                 'crosstabData' => $crosstabData,
                 'period' => $period,

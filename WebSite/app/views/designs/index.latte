@@ -36,11 +36,11 @@
                         {foreach $designs as $design}
                             <tr class="design-row" data-id="{$design->Id}" data-name="{$design->Name}" data-detail="{$design->Detail}">
 
-                                <td>{$design['NameOfDesigner']}</td>
+                                <td>{$design->NameOfDesigner}</td>
                                 <td data-bs-toggle="tooltip" data-bs-placement="top" title="{$design->Detail}">
                                     {$design->Name}
                                 </td>
-                                <td>{$design['NavBar']}</td>
+                                <td>{$design->NavBar}</td>
                                 <td>
                                     {if $design->Status === 'UnderReview'}
                                         <h4>⏳</h4>
@@ -50,14 +50,14 @@
                                         <h4>❌</h4>
                                     {/if}
                                 </td>
-                                <td>{$design['Votes']}</td>
+                                <td>{$design->Votes}</td>
                                 <td class="text-center">
-                                    {if $design->IdGroup == '' && $design['OnlyForMembers'] == 0}
+                                    {if $design->IdGroup == '' && $design->OnlyForMembers == 0}
                                     <h4>✅</h4>
                                     {/if}
                                 </td>
                                 <td class="text-center">
-                                    {if $design->IdGroup == '' && $design['OnlyForMembers'] == 1}
+                                    {if $design->IdGroup == '' && $design->OnlyForMembers == 1}
                                     <h4>✅</h4>
                                     {/if}
                                 </td>

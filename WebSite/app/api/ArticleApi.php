@@ -138,7 +138,7 @@ class ArticleApi extends BaseController
                 }
 
                 try {
-                    $options = json_decode($survey['Options']);
+                    $options = json_decode($survey->Options);
                     if (json_last_error() !== JSON_ERROR_NONE) {
                         throw new Exception("Erreur de décodage JSON : " . json_last_error_msg());
                     }
@@ -148,7 +148,7 @@ class ArticleApi extends BaseController
                         ->where('IdPerson', $person->Id)
                         ->fetch();
 
-                    $previousAnswers = $previousReply ? json_decode($previousReply['Answers'], true) : null;
+                    $previousAnswers = $previousReply ? json_decode($previousReply->Answers, true) : null;
 
                     header('Content-Type: application/json');
                     echo json_encode([

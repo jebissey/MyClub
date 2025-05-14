@@ -48,7 +48,7 @@
                                     </tr>
                                     <tr>
                                         {foreach $crosstabData['authors'] as $author}
-                                            <th class="text-center">{$author['FirstName']}<br>{$author['LastName']}</th>
+                                            <th class="text-center">{$author->FirstName}<br>{$author->LastName}</th>
                                         {/foreach}
                                     </tr>
                                 </thead>
@@ -68,7 +68,7 @@
                                             </td>
                                             {foreach $crosstabData['authors'] as $author}
                                             <td class="text-center">
-                                                {var $count = $crosstabData['data'][$audienceId][$author['Id']] ?? 0}
+                                                {var $count = $crosstabData['data'][$audienceId][$author->Id] ?? 0}
                                                 {if $count > 0}
                                                 {$count}
                                                 {else}
@@ -91,7 +91,7 @@
                                     <tr class="fs-5 bg-primary text-white">
                                         <td class="bg-primary text-white"><strong>Total</strong></td>
                                         {foreach $crosstabData['authors'] as $author}
-                                            {var $authorId = $author['Id']}
+                                            {var $authorId = $author->Id}
                                         <td class="text-center font-weight-bold bg-primary text-white">
                                             {$totals['byAuthor'][$authorId]}
                                         </td>

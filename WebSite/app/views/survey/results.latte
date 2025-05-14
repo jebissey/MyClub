@@ -35,18 +35,50 @@
                     </div>
                 </div>
                 
-                <div class="mt-4">
-                    <h3>Participants ({count($participants)})</h3>
-                    <ul class="list-group">
-                        {foreach $participants as $participant}
-                        <li class="list-group-item">
-                            <strong>{$participant['name']}</strong>: 
-                            {foreach $participant['answers'] as $answer}
-                            <span class="badge bg-info">{$answer}</span>
+                <div class="row mt-4">
+                    <div class="col-md-4">
+                        <h3>Participants ({count($participants)})</h3>
+                        <ul class="list-group">
+                            {foreach $participants as $participant}
+                            <li class="list-group-item">
+                                <strong>{$participant['name']}</strong>: 
+                                {foreach $participant['answers'] as $answer}
+                                <span class="badge bg-info">{$answer}</span>
+                                {/foreach}
+                            </li>
                             {/foreach}
-                        </li>
-                        {/foreach}
-                    </ul>
+                        </ul>
+                    </div>
+                    
+                    <div class="col-md-8">
+                        <h3 class="text-center p-2 mb-3" style="background-color: #f8f9fa;">Tableau des votants par option</h3>
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        {foreach $options as $option}
+                                        <th class="text-center">{$option}</th>
+                                        {/foreach}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        {foreach $options as $option}
+                                        <td class="align-top">
+                                            <ul class="list-unstyled mb-0">
+                                                {foreach $participants as $participant}
+                                                    {if in_array($option, $participant['answers'])}
+                                                    <li>{$participant['name']}</li>
+                                                    {/if}
+                                                {/foreach}
+                                            </ul>
+                                        </td>
+                                        {/foreach}
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

@@ -14,14 +14,14 @@
         {foreach $pendingSurveys as $survey}
             <div class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="false">
                 <div class="toast-header">
-                    <strong class="me-auto">Sondage en attente: {$survey['ArticleTitle']}</strong>
-                    <small>Fermeture: {$survey['ClosingDate']|shortDate}</small>
+                    <strong class="me-auto">Sondage en attente: {$survey->ArticleTitle}</strong>
+                    <small>Fermeture: {$survey->ClosingDate|shortDate}</small>
                     <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
                 </div>
                 <div class="toast-body">
-                    {$survey['SurveyQuestion']}
+                    {$survey->SurveyQuestion}
                     <div class="mt-2 pt-2 border-top">
-                        <a href="/articles/{$survey['ArticleId']}" class="btn btn-primary btn-sm">Répondre au sondage</a>
+                        <a href="/articles/{$survey->ArticleId}" class="btn btn-primary btn-sm">Répondre au sondage</a>
                     </div>
                 </div>
             </div>
@@ -30,11 +30,11 @@
             {foreach $pendingDesigns as $design}
             <div class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="false">
                 <div class="toast-header">
-                    <strong class="me-auto">Design en attente: {$design['DesignName']}</strong>
+                    <strong class="me-auto">Design en attente: {$design->DesignName}</strong>
                     <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
                 </div>
                 <div class="toast-body">
-                    {$design['DesignDetail']}
+                    {$design->DesignDetail}
                     <small>Cliquer sur la ligne pour donner votre avis</small>
                     <div class="mt-2 pt-2 border-top">
                         <a href="/designs/" class="btn btn-primary btn-sm">Donner votre avis</a>

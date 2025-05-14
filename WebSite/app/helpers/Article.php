@@ -56,7 +56,7 @@ class Article
                 break;
             case 'all':
             default:
-                $start = '1970-01-01 00:00:00'; // Début des temps (pratiquement)
+                $start = '1970-01-01 00:00:00';
                 break;
         }
 
@@ -69,7 +69,7 @@ class Article
     public function getAuthorAudienceCrosstab($startDate, $endDate)
     {
         $authors = $this->getAuthorsWithArticlesInPeriod($startDate, $endDate);
-        $groups = $this->getAllGroups();
+        $groups = $this->fluent->from("'Group'")->select('Id, Name')->where('Inactivated', 0)->orderBy('Name')->fetchAll();
         $crosstab = [
             'authors' => $authors,
             'audiences' => [
@@ -97,7 +97,7 @@ class Article
             $audienceType = $audience['type'];
 
             foreach ($authors as $author) {
-                $authorId = $author['Id'];
+                $authorId = $author->Id;
                 $count = 0;
 
                 if ($audienceType === 'special') {
@@ -161,13 +161,7 @@ class Article
             $stmt->execute();
             $authors = $stmt->fetchAll();
         }
-
         return $authors;
-    }
-
-    private function getAllGroups()
-    {
-        return $this->fluent->from('Group')->select('Id, Name')->where('Inactivated', 0)->orderBy('Name')->fetchAll();
     }
 
     private function countArticlesByAuthorAndAudience($authorId, $groupId, $onlyForMembers, $startDate, $endDate)
@@ -198,7 +192,7 @@ class Article
         $stmt->execute($params);
 
         $result = $stmt->fetch();
-        return (int)$result['total'];
+        return (int)$result->total;
     }
 
     private function countArticlesByAuthorAndGroup($authorId, $groupId, $startDate, $endDate)
@@ -230,7 +224,7 @@ class Article
         ];
 
         foreach ($crosstabData['authors'] as $author) {
-            $authorId = $author['Id'];
+            $authorId = $author->Id;
             $total = 0;
 
             foreach ($crosstabData['audiences'] as $audience) {
