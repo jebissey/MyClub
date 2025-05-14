@@ -73,19 +73,12 @@ class SurveyController extends BaseController
     public function viewResults($articleId)
     {
         if ($person = $this->getPerson(['Redactor'])) {
-            $survey = $this->fluent->from('Survey')
-                ->join('Article ON Survey.IdArticle = Article.Id')
-                ->where('IdArticle', $articleId)
-                ->select('Article.CreatedBy')
-                ->fetch();
+            $survey = $this->fluent->from('Survey')->join('Article ON Survey.IdArticle = Article.Id')->where('IdArticle', $articleId)->select('Article.CreatedBy')->fetch();
             if (!$survey) {
                 $this->flight->redirect('/articles/' . $articleId);
             }
-            var_dump($survey);
             if ($this->canPersonReadSurveyResults($this->fluent->from('Article')->where('Id', $survey->IdArticle)->fetch(), $person)) {
-                $replies = $this->fluent->from('Reply')
-                    ->where('IdSurvey', $survey->Id)
-                    ->fetchAll();
+                $replies = $this->fluent->from('Reply')->where('IdSurvey', $survey->Id)->fetchAll();
 
                 $participants = [];
                 $results = [];
@@ -96,7 +89,7 @@ class SurveyController extends BaseController
                 }
 
                 foreach ($replies as $reply) {
-                    $answers = json_decode($reply['Answers']);
+                    $answers = json_decode($reply->Answers);
                     $person = $this->fluent->from('Person')
                         ->where('Id', $reply->IdPerson)
                         ->fetch();

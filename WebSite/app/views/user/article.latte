@@ -65,7 +65,7 @@
                 {if $canReadPool}
                     <button id="show-survey-results-btn" class="btn btn-info ms-2" onclick="window.location.href='/surveys/results/{$chosenArticle->Id}'">Voir résultats sondage</button>
                 {/if}
-                {if $hasSurvey && $userConnected && isset($chosenArticle->PublishedBy) && $chosenArticle->PublishedBy !== null && $hasSurvey['ClosingDate'] >= date('Y-m-d')}
+                {if $hasSurvey && $userConnected && isset($chosenArticle->PublishedBy) && $chosenArticle->PublishedBy !== null && $hasSurvey->ClosingDate >= date('Y-m-d')}
                     <button id="reply-survey-btn" class="btn btn-success ms-2">Répondre au sondage</button>
                 {/if}
                     <a href="/articles" class="btn btn-secondary ms-2">Liste des articles</a>

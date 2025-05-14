@@ -3,23 +3,23 @@
 {block content}
     <div class="container-fluid">
         {if $survey}
-        <h1>Modifier le sondage de l'article: {$article['Title']}</h1>
+        <h1>Modifier le sondage de l'article: {$article->Title}</h1>
         {else}
-        <h1>Ajouter un sondage à l'article: {$article['Title']}</h1>
+        <h1>Ajouter un sondage à l'article: {$article->Title}</h1>
         {/if}
         <form action="/surveys/create" method="POST">
             <input type="hidden" name="article_id" value="{$article->Id}">
             
             <div class="mb-3">
                 <label for="question" class="form-label">Question du sondage</label>
-                <input type="text" class="form-control" id="question" name="question" value="{if $survey}{$survey['Question']}{/if}" required>
+                <input type="text" class="form-control" id="question" name="question" value="{if $survey}{$survey->Question}{/if}" required>
             </div>
             
             <div id="options-container">
                 <div class="mb-3">
                     <label class="form-label">Options (réponses possibles)</label>
                     {if $survey}
-                        {var $surveyOptions = json_decode($survey['Options'], true)}
+                        {var $surveyOptions = json_decode($survey->Options, true)}
                         {foreach $surveyOptions as $optionText}
                         <div class="d-flex mb-2">
                             <input type="text" class="form-control me-2" name="options[]" value="{$optionText}" required>
@@ -40,16 +40,16 @@
                 <button type="button" id="add-option" class="btn btn-secondary mb-3">Ajouter une option</button>
                 <div class="mb-3">
                     <label for="dateInput" class="form-label">Date de cloture</label>
-                    <input type="date" class="form-control w-auto" id="dateInput" name="closingDate" value="{$survey['ClosingDate'] ?? ''}" required>
+                    <input type="date" class="form-control w-auto" id="dateInput" name="closingDate" value="{$survey?->ClosingDate ?? ''}" required>
                 </div>
                 <div class="mb-3">
                     <label for="visibility" class="form-label">Visibilité</label>
                     <select class="form-control w-auto" id="visibility" name="visibility" required>
-                        <option value="redactor" {if $survey['Visibility'] == 'redactor'}selected{/if}>Rédacteur 👁️‍🗨️📝</option>
-                        <option value="all" {if $survey['Visibility'] == 'all'}selected{/if}>Tout le monde 👁️‍🗨️👥</option>
-                        <option value="allAfterClosing" {if $survey['Visibility'] == 'allAfterClosing'}selected{/if}>Tout le monde après la cloture 👁️‍🗨️👥📅</option>
-                        <option value="voters" {if $survey['Visibility'] == 'voters'}selected{/if}>Les votants 👁️‍🗨️🗳️</option>
-                        <option value="votersAfterClosing" {if $survey['Visibility'] == 'votersAfterClosing'}selected{/if}>Les votants après la cloture 👁️‍🗨️🗳️📅</option>
+                        <option value="redactor" {if $survey !== false && $survey->Visibility == 'redactor'}selected{/if}>Rédacteur 👁️‍🗨️📝</option>
+                        <option value="all" {if $survey !== false && $survey->Visibility == 'all'}selected{/if}>Tout le monde 👁️‍🗨️👥</option>
+                        <option value="allAfterClosing" {if $survey !== false && $survey->Visibility == 'allAfterClosing'}selected{/if}>Tout le monde après la cloture 👁️‍🗨️👥📅</option>
+                        <option value="voters" {if $survey !== false && $survey->Visibility == 'voters'}selected{/if}>Les votants 👁️‍🗨️🗳️</option>
+                        <option value="votersAfterClosing" {if $survey !== false && $survey->Visibility == 'votersAfterClosing'}selected{/if}>Les votants après la cloture 👁️‍🗨️🗳️📅</option>
                     </select>
                 </div>
             </div>
