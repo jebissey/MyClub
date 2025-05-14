@@ -20,23 +20,23 @@ class EmailController extends BaseController
                 foreach ($persons as $person) {
                     $include = true;
                     if (!empty($idEventType)) {
-                        if ($person['Preferences'] != '') {
-                            $preferences = json_decode($person['Preferences'], true);
+                        if ($person->Preferences != '') {
+                            $preferences = json_decode($person->Preferences, true);
                             if ($preferences != '' && !isset($preferences['eventTypes'][$idEventType])) {
                                 $include = false;
                             }
                         }
                     }
                     if ($dayOfWeek != '' && $timeOfDay != '') {
-                        if ($person['Availabilities'] != '') {
-                            $availabilities = json_decode($person['Availabilities'], true);
+                        if ($person->Availabilities != '') {
+                            $availabilities = json_decode($person->Availabilities, true);
                             if (isset($availabilities[$dayOfWeek][$timeOfDay]) != 'on') {
                                 $include = false;
                             }
                         }
                     }
                     if ($include) {
-                        $filteredEmails[] = $person['Email'];
+                        $filteredEmails[] = $person->Email;
                     }
                 }
                 $groupName = $idGroup != '' ? $this->getGroup($idGroup)['Name'] : '';
@@ -73,8 +73,8 @@ class EmailController extends BaseController
                 $filteredEmails = [];
                 foreach ($persons as $person) {
                     $include = false;
-                    if ($person['Preferences'] ?? '' != '') {
-                        $preferences = json_decode($person['Preferences'] ?? '', true);
+                    if ($person->Preferences ?? '' != '') {
+                        $preferences = json_decode($person->Preferences ?? '', true);
                         if ($preferences != '' && isset($preferences['eventTypes']['newArticle'])) {
                             if (isset($preferences['eventTypes']['newArticle']['pollOnly'])) {
                                 if ($idSurvey) {
@@ -86,7 +86,7 @@ class EmailController extends BaseController
                         }
                     }
                     if ($include) {
-                        $filteredEmails[] = $person['Email'];
+                        $filteredEmails[] = $person->Email;
                     }
                 }
                 echo $this->latte->render('app/views/emails/copyToClipBoard.latte', $this->params->getAll([
@@ -116,6 +116,6 @@ class EmailController extends BaseController
             $innerJoin
             WHERE Person.Inactivated = 0 $and
         ");
-        return $query->fetchAll(PDO::FETCH_ASSOC);
+        return $query->fetchAll();
     }
 }

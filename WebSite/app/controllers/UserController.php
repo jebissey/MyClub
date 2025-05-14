@@ -15,6 +15,7 @@ use app\helpers\TranslationManager;
 
 class UserController extends BaseController
 {
+    #region Sign
     public function forgotPassword($encodedEmail)
     {
         $email = urldecode($encodedEmail);
@@ -23,12 +24,12 @@ class UserController extends BaseController
             $person = $this->getPersonByEmail($email);
 
             if ($person) {
-                if ($person['TokenCreatedAt'] === null || (new DateTime($person['TokenCreatedAt']))->diff(new DateTime())->h >= 1) {
+                if ($person->TokenCreatedAt === null || (new DateTime($person->TokenCreatedAt))->diff(new DateTime())->h >= 1) {
                     $token = bin2hex(openssl_random_pseudo_bytes(32));
                     $tokenCreatedAt = (new DateTime())->format('Y-m-d H:i:s');
 
                     $query = $this->pdo->prepare('UPDATE Person SET Token = ?, TokenCreatedAt = ? WHERE Id = ?');
-                    $query->execute([$token, $tokenCreatedAt, $person['Id']]);
+                    $query->execute([$token, $tokenCreatedAt, $person->Id]);
                     $resetLink = 'https://' . $_SERVER['HTTP_HOST'] . '/user/setPassword/' . $token;
 
                     $to = $email;
@@ -41,7 +42,7 @@ class UserController extends BaseController
                         $this->application->message("Une erreur est survenue lors de l'envoi de l'email");
                     }
                 } else {
-                    $this->application->message("Un courriel de réinitialisation a déjà été envoyé à " . substr($person['TokenCreatedAt'], 10) . ". Il est valide pendant 1 heure.");
+                    $this->application->message("Un courriel de réinitialisation a déjà été envoyé à " . substr($person->TokenCreatedAt, 10) . ". Il est valide pendant 1 heure.");
                 }
             } else {
                 $this->application->error480($email, __FILE__, __LINE__);
@@ -55,17 +56,17 @@ class UserController extends BaseController
     {
         $query = $this->pdo->prepare('SELECT * FROM "Person" WHERE Token = ?');
         $query->execute([$token]);
-        $person = $query->fetch(PDO::FETCH_ASSOC);
+        $person = $query->fetch();
 
         if (!$person) {
             $this->application->error498('Person', $token, __FILE__, __LINE__);
         } else {
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-                if ($person['TokenCreatedAt'] === null || (new DateTime($person['TokenCreatedAt']))->diff(new DateTime())->h >= 1) {
+                if ($person->TokenCreatedAt === null || (new DateTime($person->TokenCreatedAt))->diff(new DateTime())->h >= 1) {
                     $this->application->error497($token, __FILE__, __LINE__);
                 } else {
                     $stmt = $this->pdo->prepare('UPDATE Person SET Password = ?, Token = null, TokenCreatedAt = null WHERE Id = ?');
-                    $stmt->execute([PasswordManager::signPassword($_POST['password']), $person['Id']]);
+                    $stmt->execute([PasswordManager::signPassword($_POST['password']), $person->Id]);
 
                     $this->application->message('Votre mot de passe est réinitialisé');
                 }
@@ -99,10 +100,10 @@ class UserController extends BaseController
                     if (!$person = $this->getPersonByEmail($email)) {
                         $this->application->error480($email, __FILE__, __LINE__);
                     } else {
-                        if ($person['Inactivated'] == 1) {
+                        if ($person->Inactivated == 1) {
                             $this->application->error479($email, __FILE__, __LINE__);
                         } else {
-                            if (PasswordManager::verifyPassword($password, $person['Password'] ?? '')) {
+                            if (PasswordManager::verifyPassword($password, $person->Password ?? '')) {
                                 $_SESSION['user'] = $email;
                                 $_SESSION['navbar'] = 'user';
                                 $this->application->message("Sign in succeeded with $email", 1);
@@ -135,6 +136,7 @@ class UserController extends BaseController
         header('Location:/');
         exit();
     }
+    #endregion
 
     public function home(ArticleController $articleController)
     {
@@ -148,11 +150,11 @@ class UserController extends BaseController
             }
             $pendingSurveyResponses = (new Alert($this->pdo))->getPendingSurveyResponses();
             $userPendingSurveys = array_filter($pendingSurveyResponses, function ($item) use ($userEmail) {
-                return strcasecmp($item['Email'], $userEmail) === 0;
+                return strcasecmp($item->Email, $userEmail) === 0;
             });
             $pendingDesignResponses = (new Alert($this->pdo))->getPendingDesignResponses();
             $userPendingDesigns = array_filter($pendingDesignResponses, function ($item) use ($userEmail) {
-                return strcasecmp($item['Email'], $userEmail) === 0;
+                return strcasecmp($item->Email, $userEmail) === 0;
             });
         } else {
             $translationManager = new TranslationManager($this->pdo);
@@ -182,6 +184,7 @@ class UserController extends BaseController
         ]));
     }
 
+    #region Data user
     public function user()
     {
         if ($this->getPerson()) {
@@ -208,27 +211,27 @@ class UserController extends BaseController
                 $nickName = $_POST['nickName'];
                 $avatar = pathinfo($_POST['avatar'], PATHINFO_BASENAME) ?? '';
                 $useGravatar = $_POST['useGravatar'] ?? 'no';
-                $query = $this->pdo->prepare('UPDATE Person SET FirstName = ?, LastName = ?, NickName = ?, Avatar = ?, useGravatar = ? WHERE Id = ' . $person['Id']);
+                $query = $this->pdo->prepare('UPDATE Person SET FirstName = ?, LastName = ?, NickName = ?, Avatar = ?, useGravatar = ? WHERE Id = ' . $person->Id);
                 $query->execute([$firstName, $lastName, $nickName, $avatar, $useGravatar]);
 
                 if (!empty($password)) {
-                    $query = $this->pdo->prepare('UPDATE Person SET Password = ? WHERE Id = ' . $person['Id']);
+                    $query = $this->pdo->prepare('UPDATE Person SET Password = ? WHERE Id = ' . $person->Id);
                     $query->execute([PasswordManager::signPassword($password)]);
                 }
 
-                if ($person['Imported'] == 0) {
-                    $query = $this->pdo->prepare('UPDATE Person SET Email = ? WHERE Id = ' . $person['Id']);
+                if ($person->Imported == 0) {
+                    $query = $this->pdo->prepare('UPDATE Person SET Email = ? WHERE Id = ' . $person->Id);
                     $query->execute([$email]);
                     $_SESSION['user'] = $email;
                 }
                 $this->flight->redirect('/user');
             } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-                $email = filter_var($person['Email'], FILTER_VALIDATE_EMAIL) ?? '';
-                $firstName = $this->sanitizeInput($person['FirstName']);
-                $lastName = $this->sanitizeInput($person['LastName']);
-                $nickName = $this->sanitizeInput($person['NickName']);
-                $avatar = $this->sanitizeInput($person['Avatar']);
-                $useGravatar = $this->sanitizeInput($person['UseGravatar']) ?? 'no';
+                $email = filter_var($person->Email, FILTER_VALIDATE_EMAIL) ?? '';
+                $firstName = $this->sanitizeInput($person->FirstName);
+                $lastName = $this->sanitizeInput($person->LastName);
+                $nickName = $this->sanitizeInput($person->NickName);
+                $avatar = $this->sanitizeInput($person->Avatar);
+                $useGravatar = $this->sanitizeInput($person->UseGravatar) ?? 'no';
 
                 $emojiFiles = glob(__DIR__ . '/../images/emoji*');
                 $emojis = array_map(function ($path) {
@@ -236,7 +239,7 @@ class UserController extends BaseController
                 }, $emojiFiles);
 
                 echo $this->latte->render('app/views/user/account.latte', $this->params->getAll([
-                    'readOnly' => $person['Imported'] == 1 ? true : false,
+                    'readOnly' => $person->Imported == 1 ? true : false,
                     'email' => $email,
                     'firstName' => $firstName,
                     'lastName' => $lastName,
@@ -261,11 +264,11 @@ class UserController extends BaseController
         if ($person = $this->getPerson([], 1)) {
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $availabilities = $_POST['availabilities'];
-                $query = $this->pdo->prepare('UPDATE Person SET availabilities = ? WHERE Id = ' . $person['Id']);
+                $query = $this->pdo->prepare('UPDATE Person SET availabilities = ? WHERE Id = ' . $person->Id);
                 $query->execute([json_encode($availabilities)]);
                 $this->flight->redirect('/user');
             } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-                $currentAvailabilities = json_decode($person['Availabilities'] ?? '', true);
+                $currentAvailabilities = json_decode($person->Availabilities ?? '', true);
                 echo $this->latte->render('app/views/user/availabilities.latte', $this->params->getAll([
                     'currentAvailabilities' => $currentAvailabilities
                 ]));
@@ -283,11 +286,11 @@ class UserController extends BaseController
 
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $preferences = $_POST['preferences'];
-                $query = $this->pdo->prepare('UPDATE Person SET preferences = ? WHERE Id = ' . $person['Id']);
+                $query = $this->pdo->prepare('UPDATE Person SET preferences = ? WHERE Id = ' . $person->Id);
                 $query->execute([json_encode($preferences)]);
                 $this->flight->redirect('/user');
             } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-                $preferences = json_decode($person['Preferences'] ?? '', true);
+                $preferences = json_decode($person->Preferences ?? '', true);
                 $query = $this->pdo->prepare("
                     SELECT et.*
                     FROM EventType et
@@ -302,8 +305,8 @@ class UserController extends BaseController
                         OR et.IdGroup is NULL)
                     ORDER BY et.Name
                 ");
-                $query->execute([$person['Id']]);
-                $eventTypes = $query->fetchAll(PDO::FETCH_ASSOC);
+                $query->execute([$person->Id]);
+                $eventTypes = $query->fetchAll();
 
                 $eventTypesWithAttributes = [];
                 foreach ($eventTypes as $eventType) {
@@ -314,8 +317,8 @@ class UserController extends BaseController
                         WHERE eta.IdEventType = ?
                         ORDER BY a.Name
                     ");
-                    $queryAttributes->execute([$eventType['Id']]);
-                    $eventType['Attributes'] = $queryAttributes->fetchAll(PDO::FETCH_ASSOC);
+                    $queryAttributes->execute([$eventType->Id]);
+                    $eventType->Attributes = $queryAttributes->fetchAll();
                     $eventTypesWithAttributes[] = $eventType;
                 }
 
@@ -337,7 +340,7 @@ class UserController extends BaseController
 
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $groups = $_POST['groups'] ?? [];
-                $idPerson = $person['Id'];
+                $idPerson = $person->Id;
                 $query = $this->pdo->prepare("
                 DELETE FROM PersonGroup 
                 WHERE IdPerson = $idPerson 
@@ -358,8 +361,8 @@ class UserController extends BaseController
                 LEFT JOIN PersonGroup pg ON pg.IdGroup = g.Id AND pg.IdPerson = ?
                 WHERE g.Inactivated = 0 AND (g.SelfRegistration = 1 OR pg.Id IS NOT NULL)
                 ORDER BY g.Name');
-                $query->execute([$person['Id']]);
-                $currentGroups = $query->fetchAll(PDO::FETCH_ASSOC);
+                $query->execute([$person->Id]);
+                $currentGroups = $query->fetchAll();
                 echo $this->latte->render('app/views/user/groups.latte', $this->params->getAll([
                     'groups' => $currentGroups,
                     'layout' => $this->getLayout()
@@ -369,6 +372,7 @@ class UserController extends BaseController
             }
         }
     }
+    /* #endregion */
 
     public function help()
     {
@@ -392,10 +396,10 @@ class UserController extends BaseController
         $query->execute([$client->getIp(), $client->getReferer(), $client->getOs(), $client->getBrowser(), $client->getScreenResolution(), $client->getType(), $client->getUri(), $client->getToken(), $email, $code, $message]);
     }
 
+    /* #region Statistics */
     public function showStatistics()
     {
         if ($person = $this->getPerson([])) {
-
             $personalStatistics = new PersonStatistics($this->pdo);
             $season = $personalStatistics->getSeasonRange();
             echo $this->latte->render('app/views/user/statistics.latte', $this->params->getAll([
@@ -488,7 +492,7 @@ class UserController extends BaseController
         $memberVisits = [];
         $members = $this->fluent->from('Person')->select('Email')->where('Inactivated', 0)->fetchAll();
         foreach ($members as $member) {
-            $email = $member['Email'];
+            $email = $member->Email;
             $memberVisits[$email] = isset($visits[$email]) ? (int)$visits[$email] : 0;
         }
         return $memberVisits;
@@ -500,7 +504,7 @@ class UserController extends BaseController
             die('$person or $stats can\'t be null');
         }
 
-        $email = $person['Email'];
+        $email = $person->Email;
 
         if (!array_key_exists($email, $stats['memberVisits'])) {
             die("User $email not found in stats.");
@@ -517,4 +521,5 @@ class UserController extends BaseController
 
         die('$user slice not found');
     }
+    /* #endregion */
 }

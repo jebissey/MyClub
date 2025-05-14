@@ -82,8 +82,8 @@
                     <tr>
                         {php $actionDisplayed = !isset($conditionValue)}
                         {foreach $columns as $column}
-                            <td>{$item[$column['field']]}</td>
-                            {if isset($conditionValue) && $column['field'] == $conditionColumn && $item[$column['field']] == $conditionValue}
+                            <td>{$item->{$column['field']}}</td>
+                            {if isset($conditionValue) && $column->field == $conditionColumn && $item[$column->field] == $conditionValue}
                                 {php $actionDisplayed = true}
                             {/if}
                         {/foreach}
@@ -92,14 +92,14 @@
                             {if $actionDisplayed}
                                 {foreach $actions as $action}
                                     {if $action['type'] == 'link'}
-                                        <a href="{str_replace('{id}', $item['Id'], $action['url'])}" 
+                                        <a href="{str_replace('{id}', $item->Id, $action['url'])}" 
                                         class="btn btn-sm {$action['class']}"
                                         {if isset($action['confirm'])}onclick="return confirm('{$action['confirm']}')"{/if}>
                                             {$action['label']}
                                         </a>
                                     {elseif $action['type'] == 'button'}
                                         <button class="btn btn-sm {$action['class']}" 
-                                                onclick={str_replace('{id}', $item['Id'], $action['onClick']) | noescape}>
+                                                onclick={str_replace('{id}', $item->Id, $action['onClick']) | noescape}>
                                             {$action['label']}
                                         </button>
                                     {/if}

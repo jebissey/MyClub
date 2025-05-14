@@ -17,7 +17,7 @@ class Settings
     {
         $query = $this->pdo->prepare('SELECT Value FROM Settings WHERE Name = ?');
         $query->execute([$name]);
-        return $query->fetch(PDO::FETCH_ASSOC)['Value'] ?? null;
+        return $query->fetch()->Value ?? null;
     }
 
     public function set($name, $value)

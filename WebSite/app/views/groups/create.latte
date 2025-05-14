@@ -36,10 +36,10 @@
                                 {foreach $availableAuthorizations as $authorization}
                                     <div class="form-check">
                                         <input class="form-check-input" type="checkbox" 
-                                            id="auth_{$authorization['Id']}" 
+                                            id="auth_{$authorization->Id}" 
                                             name="authorizations[]" 
-                                            value="{$authorization['Id']}">
-                                        <label class="form-check-label" for="auth_{$authorization['Id']}">
+                                            value="{$authorization->Id}">
+                                        <label class="form-check-label" for="auth_{$authorization->Id}">
                                         {$authorization['Name']}
                                         </label>
                                     </div>

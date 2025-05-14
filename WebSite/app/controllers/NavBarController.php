@@ -67,7 +67,7 @@ class NavBarController extends BaseController
         $person = $this->getPerson();
         if (!$person) return false;
 
-        $userGroups = $this->getUserGroups($person['Email']);
+        $userGroups = $this->getUserGroups($person->Email);
         return !empty(array_intersect($groups, $userGroups));
     }
 

@@ -21,14 +21,14 @@ class PersonStatistics
             'person' => $person,
             'seasonStart' => $seasonStart,
             'seasonEnd' => $seasonEnd,
-            'articles' => $this->getArticleStats($person['Id'], $seasonStart, $seasonEnd),
-            'surveys' => $this->getSurveyStats($person['Id'], $seasonStart, $seasonEnd),
-            'surveyReplies' => $this->getSurveyRepliesStats($person['Id'], $seasonStart, $seasonEnd),
-            'designs' => $this->getDesignStats($person['Id'], $seasonStart, $seasonEnd),
-            'designVotes' => $this->getDesignVoteStats($person['Id'], $seasonStart, $seasonEnd),
-            'events' => $this->getEventStats($person['Id'], $seasonStart, $seasonEnd),
-            'eventParticipations' => $this->getEventParticipationStats($person['Id'], $seasonStart, $seasonEnd),
-            'participantSupplies' => $this->getParticipantSupplyStats($person['Id'], $seasonStart, $seasonEnd),
+            'articles' => $this->getArticleStats($person->Id, $seasonStart, $seasonEnd),
+            'surveys' => $this->getSurveyStats($person->Id, $seasonStart, $seasonEnd),
+            'surveyReplies' => $this->getSurveyRepliesStats($person->Id, $seasonStart, $seasonEnd),
+            'designs' => $this->getDesignStats($person->Id, $seasonStart, $seasonEnd),
+            'designVotes' => $this->getDesignVoteStats($person->Id, $seasonStart, $seasonEnd),
+            'events' => $this->getEventStats($person->Id, $seasonStart, $seasonEnd),
+            'eventParticipations' => $this->getEventParticipationStats($person->Id, $seasonStart, $seasonEnd),
+            'participantSupplies' => $this->getParticipantSupplyStats($person->Id, $seasonStart, $seasonEnd),
         ];
 
         return $stats;
@@ -45,7 +45,7 @@ class PersonStatistics
         ";
         $stmt = $this->pdo->prepare($query);
         $stmt->execute();
-        $firstDate = $stmt->fetch(PDO::FETCH_ASSOC)['min_date'];
+        $firstDate = $stmt->fetch()->min_date;
 
         if (!$firstDate) {
             $firstDate = date('Y-m-d');
@@ -105,7 +105,7 @@ class PersonStatistics
         ";
         $userArticles = $this->pdo->prepare($query);
         $userArticles->execute([$personId, $seasonStart, $seasonEnd]);
-        $userArticlesCount = $userArticles->fetch(PDO::FETCH_ASSOC)['count'];
+        $userArticlesCount = $userArticles->fetch()->count;
 
         $query = "
             SELECT COUNT(*) as count 
@@ -114,7 +114,7 @@ class PersonStatistics
         ";
         $totalArticles = $this->pdo->prepare($query);
         $totalArticles->execute([$seasonStart, $seasonEnd]);
-        $totalArticlesCount = $totalArticles->fetch(PDO::FETCH_ASSOC)['count'];
+        $totalArticlesCount = $totalArticles->fetch()->count;
 
         return [
             'user' => $userArticlesCount,
@@ -138,7 +138,7 @@ class PersonStatistics
         ";
         $userSurveys = $this->pdo->prepare($query);
         $userSurveys->execute([$personId, $seasonStart, $seasonEnd]);
-        $userSurveysCount = $userSurveys->fetch(PDO::FETCH_ASSOC)['count'];
+        $userSurveysCount = $userSurveys->fetch()->count;
 
         $query = "
             SELECT COUNT(*) as count 
@@ -149,7 +149,7 @@ class PersonStatistics
         ";
         $totalSurveys = $this->pdo->prepare($query);
         $totalSurveys->execute([$seasonStart, $seasonEnd]);
-        $totalSurveysCount = $totalSurveys->fetch(PDO::FETCH_ASSOC)['count'];
+        $totalSurveysCount = $totalSurveys->fetch()->count;
 
         return [
             'user' => $userSurveysCount,
@@ -173,7 +173,7 @@ class PersonStatistics
         ";
         $userReplies = $this->pdo->prepare($query);
         $userReplies->execute([$personId, $seasonStart, $seasonEnd]);
-        $userRepliesCount = $userReplies->fetch(PDO::FETCH_ASSOC)['count'];
+        $userRepliesCount = $userReplies->fetch()->count;
 
         $query = "
             SELECT COUNT(*) as count 
@@ -187,7 +187,7 @@ class PersonStatistics
         ";
         $totalReplies = $this->pdo->prepare($query);
         $totalReplies->execute([$seasonStart, $seasonEnd]);
-        $totalRepliesCount = $totalReplies->fetch(PDO::FETCH_ASSOC)['count'];
+        $totalRepliesCount = $totalReplies->fetch()->count;
 
         return [
             'user' => $userRepliesCount,
@@ -206,7 +206,7 @@ class PersonStatistics
         ";
         $userDesigns = $this->pdo->prepare($query);
         $userDesigns->execute([$personId, $seasonStart, $seasonEnd]);
-        $userDesignsCount = $userDesigns->fetch(PDO::FETCH_ASSOC)['count'];
+        $userDesignsCount = $userDesigns->fetch()->count;
 
         $query = "
             SELECT COUNT(*) as count 
@@ -215,7 +215,7 @@ class PersonStatistics
         ";
         $totalDesigns = $this->pdo->prepare($query);
         $totalDesigns->execute([$seasonStart, $seasonEnd]);
-        $totalDesignsCount = $totalDesigns->fetch(PDO::FETCH_ASSOC)['count'];
+        $totalDesignsCount = $totalDesigns->fetch()->count;
 
         return [
             'user' => $userDesignsCount,
@@ -238,7 +238,7 @@ class PersonStatistics
         ";
         $userVotes = $this->pdo->prepare($query);
         $userVotes->execute([$personId, $seasonStart, $seasonEnd]);
-        $userVotesCount = $userVotes->fetch(PDO::FETCH_ASSOC)['count'];
+        $userVotesCount = $userVotes->fetch()->count;
 
         $query = "
             SELECT COUNT(*) as count 
@@ -251,7 +251,7 @@ class PersonStatistics
         ";
         $totalVotes = $this->pdo->prepare($query);
         $totalVotes->execute([$seasonStart, $seasonEnd]);
-        $totalVotesCount = $totalVotes->fetch(PDO::FETCH_ASSOC)['count'];
+        $totalVotesCount = $totalVotes->fetch()->count;
 
         return [
             'user' => $userVotesCount,
@@ -275,8 +275,8 @@ class PersonStatistics
                 AND datetime(StartTime) BETWEEN datetime(?) AND datetime(?)
             ";
             $userEvents = $this->pdo->prepare($query);
-            $userEvents->execute([$personId, $eventType['Id'], $seasonStart, $seasonEnd]);
-            $userEventsCount = $userEvents->fetch(PDO::FETCH_ASSOC)['count'];
+            $userEvents->execute([$personId, $eventType->Id, $seasonStart, $seasonEnd]);
+            $userEventsCount = $userEvents->fetch()->count;
 
             $query = "
                 SELECT COUNT(*) as count 
@@ -285,11 +285,11 @@ class PersonStatistics
                 AND datetime(StartTime) BETWEEN datetime(?) AND datetime(?)
             ";
             $totalEvents = $this->pdo->prepare($query);
-            $totalEvents->execute([$eventType['Id'], $seasonStart, $seasonEnd]);
-            $totalEventsCount = $totalEvents->fetch(PDO::FETCH_ASSOC)['count'];
+            $totalEvents->execute([$eventType->Id, $seasonStart, $seasonEnd]);
+            $totalEventsCount = $totalEvents->fetch()->count;
 
-            $stats[$eventType['Id']] = [
-                'typeName' => $eventType['Name'],
+            $stats[$eventType->Id] = [
+                'typeName' => $eventType->Name,
                 'user' => $userEventsCount,
                 'total' => $totalEventsCount,
                 'percentage' => $totalEventsCount > 0 ? round(($userEventsCount / $totalEventsCount) * 100, 2) : 0
@@ -304,7 +304,7 @@ class PersonStatistics
         ";
         $userAllEvents = $this->pdo->prepare($query);
         $userAllEvents->execute([$personId, $seasonStart, $seasonEnd]);
-        $userAllEventsCount = $userAllEvents->fetch(PDO::FETCH_ASSOC)['count'];
+        $userAllEventsCount = $userAllEvents->fetch()->count;
 
         $query = "
             SELECT COUNT(*) as count 
@@ -313,7 +313,7 @@ class PersonStatistics
         ";
         $totalAllEvents = $this->pdo->prepare($query);
         $totalAllEvents->execute([$seasonStart, $seasonEnd]);
-        $totalAllEventsCount = $totalAllEvents->fetch(PDO::FETCH_ASSOC)['count'];
+        $totalAllEventsCount = $totalAllEvents->fetch()->count;
 
         $stats['total'] = [
             'typeName' => 'Total',
@@ -341,8 +341,8 @@ class PersonStatistics
                 AND datetime(e.StartTime) BETWEEN datetime(?) AND datetime(?)
             ";
             $userParticipations = $this->pdo->prepare($query);
-            $userParticipations->execute([$personId, $eventType['Id'], $seasonStart, $seasonEnd]);
-            $userParticipationsCount = $userParticipations->fetch(PDO::FETCH_ASSOC)['count'];
+            $userParticipations->execute([$personId, $eventType->Id, $seasonStart, $seasonEnd]);
+            $userParticipationsCount = $userParticipations->fetch()->count;
 
             $query = "
                 SELECT COUNT(*) as count 
@@ -352,11 +352,11 @@ class PersonStatistics
                 AND datetime(e.StartTime) BETWEEN datetime(?) AND datetime(?)
             ";
             $totalParticipations = $this->pdo->prepare($query);
-            $totalParticipations->execute([$eventType['Id'], $seasonStart, $seasonEnd]);
-            $totalParticipationsCount = $totalParticipations->fetch(PDO::FETCH_ASSOC)['count'];
+            $totalParticipations->execute([$eventType->Id, $seasonStart, $seasonEnd]);
+            $totalParticipationsCount = $totalParticipations->fetch()->count;
 
-            $stats[$eventType['Id']] = [
-                'typeName' => $eventType['Name'],
+            $stats[$eventType->Id] = [
+                'typeName' => $eventType->Name,
                 'user' => $userParticipationsCount,
                 'total' => $totalParticipationsCount,
                 'percentage' => $totalParticipationsCount > 0 ? round(($userParticipationsCount / $totalParticipationsCount) * 100, 2) : 0
@@ -372,7 +372,7 @@ class PersonStatistics
         ";
         $userAllParticipations = $this->pdo->prepare($query);
         $userAllParticipations->execute([$personId, $seasonStart, $seasonEnd]);
-        $userAllParticipationsCount = $userAllParticipations->fetch(PDO::FETCH_ASSOC)['count'];
+        $userAllParticipationsCount = $userAllParticipations->fetch()->count;
 
         $query = "
             SELECT COUNT(*) as count 
@@ -382,7 +382,7 @@ class PersonStatistics
         ";
         $totalAllParticipations = $this->pdo->prepare($query);
         $totalAllParticipations->execute([$seasonStart, $seasonEnd]);
-        $totalAllParticipationsCount = $totalAllParticipations->fetch(PDO::FETCH_ASSOC)['count'];
+        $totalAllParticipationsCount = $totalAllParticipations->fetch()->count;
 
         $stats['total'] = [
             'typeName' => 'Total',
@@ -406,7 +406,7 @@ class PersonStatistics
         ";
         $userSupplies = $this->pdo->prepare($query);
         $userSupplies->execute([$personId, $seasonStart, $seasonEnd]);
-        $userSuppliesCount = $userSupplies->fetch(PDO::FETCH_ASSOC)['count'];
+        $userSuppliesCount = $userSupplies->fetch()->count;
 
         $query = "
             SELECT COUNT(*) as count 
@@ -417,7 +417,7 @@ class PersonStatistics
         ";
         $totalSupplies = $this->pdo->prepare($query);
         $totalSupplies->execute([$seasonStart, $seasonEnd]);
-        $totalSuppliesCount = $totalSupplies->fetch(PDO::FETCH_ASSOC)['count'];
+        $totalSuppliesCount = $totalSupplies->fetch()->count;
 
         return [
             'user' => $userSuppliesCount,

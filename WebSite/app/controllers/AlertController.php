@@ -26,7 +26,7 @@ class AlertController extends BaseController
                     $alert['Status'] = 'passée';
                 }
 
-                $alert['IsCreator'] = ($alert['CreatedBy'] == $person['Id']);
+                $alert['IsCreator'] = ($alert['CreatedBy'] == $person->Id);
             }
 
             $alertTypes = [
@@ -70,7 +70,7 @@ class AlertController extends BaseController
         $alertManager = new Alert($this->pdo);
 
         $alert = $alertManager->getAlertById($alertId);
-        if (!$alert || $alert['CreatedBy'] != $person['Id']) {
+        if (!$alert || $alert->CreatedBy != $person->Id) {
             $this->application->error403(__FILE__, __LINE__);
             return;
         }

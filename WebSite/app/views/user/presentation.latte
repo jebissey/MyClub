@@ -1,6 +1,6 @@
 {layout '../layout.latte'}
 
-{block title}Présentation de {$person['FirstName']} {$person['LastName']}{if $person['NickName']} ({$person['NickName']}){/if}{/block}
+{block title}Présentation de {$person->FirstName} {$person->LastName}{if $person->NickName} ({$person->NickName}){/if}{/block}
 
 {block navbar}
     {include '../navbar/home.latte'}
@@ -41,22 +41,22 @@
         <div class="col-md-3">
             <div class="card">
                 <div class="card-body text-center">
-                    {if $person['UseGravatar'] == 'yes' && $person['Email']}
-                        <img src="https://www.gravatar.com/avatar/{md5(strtolower(trim($person['Email'])))}?s=150&d=mp" alt="Avatar" class="img-fluid rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover;">
-                    {elseif $person['Avatar']}
-                        <img src="/app/images/{$person['Avatar']}" alt="Avatar" class="img-fluid rounded-circle mb-3">
+                    {if $person->UseGravatar == 'yes' && $person->Email}
+                        <img src="https://www.gravatar.com/avatar/{md5(strtolower(trim($person->Email)))}?s=150&d=mp" alt="Avatar" class="img-fluid rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover;">
+                    {elseif $person->Avatar}
+                        <img src="/app/images/{$person->Avatar}" alt="Avatar" class="img-fluid rounded-circle mb-3">
                     {else}
                         <div class="rounded-circle bg-light d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 48px; height: 48px;">
                             <i class="bi bi-person-circle" style="font-size: 4rem;"></i>
                         </div>
                     {/if}
                     
-                    <h3>{$person['FirstName']} {$person['LastName']}</h3>
-                    {if $person['NickName']}
-                        <p class="text-muted">{$person['NickName']}</p>
+                    <h3>{$person->FirstName} {$person->LastName}</h3>
+                    {if $person->NickName}
+                        <p class="text-muted">{$person->NickName}</p>
                     {/if}
                     
-                    {if $loggedPerson && $loggedPerson['Id'] == $person['Id']}
+                    {if $loggedPerson && $loggedPerson->Id == $person->Id}
                         <a href="/presentation/edit" class="btn btn-sm btn-primary mt-2">
                             <i class="bi bi-pencil"></i> Modifier ma présentation
                         </a>
@@ -64,7 +64,7 @@
                 </div>
             </div>
             
-            {if $person['Location']}
+            {if $person->Location}
                 <div class="card mt-3">
                     <div class="card-header">
                         <h5 class="card-title mb-0">Quartier</h5>
@@ -75,17 +75,17 @@
                 </div>
             {/if}
             
-            {if $person['Phone'] || $person['Email']}
+            {if $person->Phone || $person->Email}
                 <div class="card mt-3">
                     <div class="card-header">
                         <h5 class="card-title mb-0">Contact</h5>
                     </div>
                     <div class="card-body">
-                        {if $person['Phone']}
-                            <p><i class="bi bi-telephone"></i> {$person['Phone']}</p>
+                        {if $person->Phone}
+                            <p><i class="bi bi-telephone"></i> {$person->Phone}</p>
                         {/if}
-                        {if $person['Email']}
-                            <p><i class="bi bi-envelope"></i> {$person['Email']}</p>
+                        {if $person->Email}
+                            <p><i class="bi bi-envelope"></i> {$person->Email}</p>
                         {/if}
                     </div>
                 </div>
@@ -98,9 +98,9 @@
                     <h5 class="card-title mb-0">Présentation</h5>
                 </div>
                 <div class="card-body">
-                    {if $person['Presentation']}
+                    {if $person->Presentation}
                         <div class="presentation-content">
-                            {$person['Presentation']|noescape}
+                            {$person->Presentation|noescape}
                         </div>
                     {else}
                         <p class="text-muted">Aucune présentation disponible</p>
@@ -113,11 +113,11 @@
 {/block}
 
 {block scripts}
-{if $person['Location']}
+{if $person->Location}
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
     <script>
-            const locationStr = {$person["Location"]};
+            const locationStr = {$person->Location};
     </script>
     <script src="/app/js/user/presentation.js"></script>
 {/if}

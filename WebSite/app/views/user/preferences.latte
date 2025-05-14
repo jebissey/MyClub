@@ -16,8 +16,7 @@
             <div class="col-md-8">
                 <div class="mb-3">
                     <div class="form-check">
-                        <input type="checkbox" class="form-check-input" id="noAlerts" name="preferences[noAlerts]"
-                               {isset($currentPreferences['noAlerts']) ? checked : ''}>
+                        <input type="checkbox" class="form-check-input" id="noAlerts" name="preferences[noAlerts]" {isset($currentPreferences['noAlerts']) ? checked : ''}>
                         <label class="form-check-label" for="noAlerts">
                             <strong>Ne recevoir aucune alerte</strong>
                         </label>
@@ -37,24 +36,24 @@
                                         <div>
                                             <div class="form-check">
                                                 <input type="checkbox" class="form-check-input event-type-checkbox" 
-                                                    id="eventType{$eventType['Id']}"
-                                                    name="preferences[eventTypes][{$eventType['Id']}][enabled]"
-                                                    {isset($currentPreferences['eventTypes'][$eventType['Id']]['enabled']) ? checked : ''}>
+                                                    id="eventType{$eventType->Id}"
+                                                    name="preferences[eventTypes][{$eventType->Id}][enabled]"
+                                                    {isset($currentPreferences['eventTypes'][$eventType->Id]['enabled']) ? checked : ''}>
                                                 <label class="form-check-label" 
-                                                    id="eventType{$eventType['Id']}"
-                                                    data-tooltip-id="tooltip-content-{$eventType['Id']}">
-                                                    {$eventType['Name']}
+                                                    id="eventType{$eventType->Id}"
+                                                    data-tooltip-id="tooltip-content-{$eventType->Id}">
+                                                    {$eventType->Name}
                                                 </label>
 
-                                                <div id="tooltip-content-{$eventType['Id']}" class="d-none">
+                                                <div id="tooltip-content-{$eventType->Id}" class="d-none">
                                                     <div>
-                                                        {foreach $eventType['Attributes'] as $attribute}
+                                                        {foreach $eventType->Attributes as $attribute}
                                                         <div>
                                                             <span 
                                                                 class="attribute-badge" 
-                                                                style="background-color: {$attribute['Color']|noescape};">
+                                                                style="background-color: {$attribute->Color|noescape};">
                                                             </span>
-                                                            <strong>{$attribute['Name']}</strong>: {$attribute['Detail']}
+                                                            <strong>{$attribute->Name}</strong>: {$attribute->Detail}
                                                         </div>
                                                         {/foreach}
                                                     </div>
@@ -62,14 +61,14 @@
                                             </div>
                                         </div>
                                         <div class="availability-options" 
-                                            id="availabilityOptions{$eventType['Id']}" 
-                                            {if !isset($currentPreferences['eventTypes'][$eventType['Id']]['enabled']) || !$currentPreferences['eventTypes'][$eventType['Id']]['enabled']}style="display: none;"{/if}>
+                                            id="availabilityOptions{$eventType->Id}" 
+                                            {if !isset($currentPreferences->eventTypes[$eventType->Id]->enabled) || !$currentPreferences->eventTypes[$eventType->Id]->enabled}style="display: none;"{/if}>
                                             <div class="form-check">
                                                 <input type="checkbox" class="form-check-input" 
-                                                    id="availability{$eventType['Id']}"
-                                                    name="preferences[eventTypes][{$eventType['Id']}][available]"
-                                                    {isset($currentPreferences['eventTypes'][$eventType['Id']]['available']) ? checked : '' }>
-                                                <label class="form-check-label" for="availability{$eventType['Id']}">
+                                                    id="availability{$eventType->Id}"
+                                                    name="preferences[eventTypes][{$eventType->Id}][available]"
+                                                    {if isset($currentPreferences['eventTypes'][$eventType->Id]['available']) && $currentPreferences['eventTypes'][$eventType->Id]['available']}checked{/if}>
+                                                <label class="form-check-label" for="availability{$eventType->Id}">
                                                     Si je suis disponible
                                                 </label>
                                             </div>

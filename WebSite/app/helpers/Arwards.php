@@ -22,24 +22,24 @@ class Arwards
             GROUP BY p.Id, p.FirstName, p.LastName, p.NickName, c.Name
             HAVING Total > 0
             ORDER BY Total DESC');
-        $results =  $query->fetchAll(PDO::FETCH_ASSOC);
+        $results =  $query->fetchAll();
         $data = [];
         foreach ($results as $row) {
-            $personId = $row['Id'];
+            $personId = $row->Id;
             if (!isset($data[$personId])) {
                 $data[$personId] = [
                     'name' => trim(sprintf(
                         '%s %s %s',
-                        $row['FirstName'],
-                        $row['LastName'],
-                        $row['NickName'] ? "({$row['NickName']})" : ''
+                        $row->FirstName,
+                        $row->LastName,
+                        $row->NickName ? "({$row->NickName})" : ''
                     )),
                     'counters' => array_fill_keys($counterNames, 0),
-                    'total' => $row['Total']
+                    'total' => $row->Total
                 ];
             }
-            if ($row['CounterName']) {
-                $data[$personId]['counters'][$row['CounterName']] = $row['CounterValue'];
+            if ($row->CounterName) {
+                $data[$personId]['counters'][$row->CounterName] = $row->CounterValue;
             }
         }
         return $data;

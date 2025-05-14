@@ -9,7 +9,19 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
+    function initializeAvailabilityOptions() {
+        eventTypeCheckboxes.forEach(checkbox => {
+            const eventTypeId = checkbox.id.replace('eventType', '');
+            const availabilityOptions = document.getElementById('availabilityOptions' + eventTypeId);
+
+            if (checkbox.checked && availabilityOptions) {
+                availabilityOptions.style.display = 'block';
+            }
+        });
+    }
+
     handleNoAlertsInitial();
+    initializeAvailabilityOptions();
 
     noAlertsCheckbox.addEventListener('change', function () {
         if (this.checked) {
@@ -38,10 +50,8 @@ document.addEventListener('DOMContentLoaded', function () {
             const eventTypeId = this.id.replace('eventType', '');
             const availabilityOptions = document.getElementById('availabilityOptions' + eventTypeId);
 
-            if (this.checked) {
-                availabilityOptions.style.display = 'block';
-            } else {
-                availabilityOptions.style.display = 'none';
+            if (availabilityOptions) {
+                availabilityOptions.style.display = this.checked ? 'block' : 'none';
             }
         });
     });
@@ -49,12 +59,18 @@ document.addEventListener('DOMContentLoaded', function () {
     const newArticleCheckbox = document.getElementById('eventTypeNewArticle');
     const pollOnlyOptions = document.getElementById('availabilityOptionsNewArticle');
 
-    newArticleCheckbox.addEventListener('change', function () {
-        if (this.checked) {
-            noAlertsCheckbox.checked = false;
+    if (newArticleCheckbox && pollOnlyOptions) {
+        if (newArticleCheckbox.checked) {
             pollOnlyOptions.style.display = 'block';
-        } else {
-            pollOnlyOptions.style.display = 'none';
         }
-    });
+
+        newArticleCheckbox.addEventListener('change', function () {
+            if (this.checked) {
+                noAlertsCheckbox.checked = false;
+                pollOnlyOptions.style.display = 'block';
+            } else {
+                pollOnlyOptions.style.display = 'none';
+            }
+        });
+    }
 });

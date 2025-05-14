@@ -12,7 +12,7 @@ class ImportController extends BaseController
 
     private function loadSettings()
     {
-        if(!$this->importSettings = json_decode($this->settings->get('ImportPersonParameters'), true)){
+        if (!$this->importSettings = json_decode($this->settings->get('ImportPersonParameters'), true)) {
             $this->importSettings = [
                 'headerRow' => 1,
                 'mapping' => [
@@ -86,11 +86,9 @@ class ImportController extends BaseController
                         $this->results['errors']++;
                         $this->results['messages'][] = "Adresse email incorrecte ligne $currentRow";
                     } else {
-                        $query = $this->pdo->prepare("SELECT Id FROM Person WHERE Email = ?");
-                        $query->execute([$personData['Email']]);
-                        $existingPerson = $query->fetch(PDO::FETCH_ASSOC);
+                        $existingPerson = $this->fluent->from('Person')->select('Id')->where('Email', $personData['Email'])->fetch();
                         if ($existingPerson) {
-                            $query = $this->pdo->prepare("UPDATE Person SET Email = ?, FirstName = ?, LastName = ?, phone = ?, Imported = 1 WHERE Id = " . $existingPerson['Id']);
+                            $query = $this->pdo->prepare("UPDATE Person SET Email = ?, FirstName = ?, LastName = ?, phone = ?, Imported = 1 WHERE Id = " . $existingPerson->Id);
                             $this->results['updated']++;
                         } else {
                             $query = $this->pdo->prepare("INSERT INTO Person (Email, FirstName, LastName, phone, Imported) VALUES (?, ?, ?, ?, 1)");
@@ -108,8 +106,8 @@ class ImportController extends BaseController
                 fclose($file);
                 $persons = $this->fluent->from('Person')->where('Inactivated', 0)->fetchAll('Id', 'Email');
                 foreach ($persons as $person) {
-                    if (!in_array($person['Email'], $this->foundEmails)) {
-                        $this->fluent->update('Person', ['Inactivated' => 1], $person['Id'])->execute();
+                    if (!in_array($person->Email, $this->foundEmails)) {
+                        $this->fluent->update('Person', ['Inactivated' => 1], $person->Id)->execute();
                         $this->results['inactivated']++;
                     }
                 }
@@ -137,7 +135,7 @@ class ImportController extends BaseController
         $file = fopen($_FILES['csvFile']['tmp_name'], 'r');
         $currentRow = 0;
 
-        while (($data = fgetcsv($file)) !== false && $currentRow <= $headerRow) {
+        while (($data = fgetcsv($file, 0, ",", "\"", "\\")) !== false && $currentRow <= $headerRow) {
             $currentRow++;
             if ($currentRow == $headerRow) {
                 $headers = $data;

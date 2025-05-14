@@ -76,7 +76,7 @@ class EventApi extends BaseController
     public function deleteEvent($id): void
     {
         if ($person = $this->getPerson(['EventManager'])) {
-            if (!$this->fluent->from('Event')->where('Id', $id)->where('CreatedBy', $person['Id'])->fetch()) {
+            if (!$this->fluent->from('Event')->where('Id', $id)->where('CreatedBy', $person->Id)->fetch()) {
                 header('Content-Type: application/json', true, 403);
                 echo json_encode(['success' => false, 'message' => 'Not allowed user']);
                 exit;
@@ -274,7 +274,7 @@ class EventApi extends BaseController
                 'StartTime' => $data['startTime'],
                 'Duration' => $data['duration'] ?? 1,
                 'IdEventType' => $data['idEventType'],
-                'CreatedBy' => $person['Id'],
+                'CreatedBy' => $person->Id,
                 'MaxParticipants' => $data['maxParticipants'] ?? 0,
                 'Audience' => $data['audience'] ?? EventAudience::ForClubMembersOnly->value,
             ];
@@ -459,7 +459,7 @@ class EventApi extends BaseController
             }
 
             $eventHelper = new Event($this->pdo);
-            if (!$eventHelper->isUserRegistered($data['eventId'], $person['Email'])) {
+            if (!$eventHelper->isUserRegistered($data['eventId'], $person->Email)) {
                 header('Content-Type: application/json', true, 403);
                 echo json_encode(['success' => false, 'message' => 'Accès non autorisé à cet événement']);
                 exit;
@@ -467,13 +467,13 @@ class EventApi extends BaseController
 
             try {
                 $messageHelper = new Message($this->pdo);
-                $messageId = $messageHelper->addMessage($data['eventId'], $person['Id'], $data['text']);
+                $messageId = $messageHelper->addMessage($data['eventId'], $person->Id, $data['text']);
 
                 $messages = $messageHelper->getEventMessages($data['eventId']);
                 $newMessage = null;
 
                 foreach ($messages as $message) {
-                    if ($message['Id'] == $messageId) {
+                    if ($message->Id == $messageId) {
                         $newMessage = $message;
                         break;
                     }
@@ -509,7 +509,7 @@ class EventApi extends BaseController
 
             try {
                 $messageHelper = new Message($this->pdo);
-                $messageHelper->updateMessage($data['messageId'], $person['Id'], $data['text']);
+                $messageHelper->updateMessage($data['messageId'], $person->Id, $data['text']);
 
                 header('Content-Type: application/json');
                 echo json_encode([
@@ -544,7 +544,7 @@ class EventApi extends BaseController
 
             try {
                 $messageHelper = new Message($this->pdo);
-                $messageHelper->deleteMessage($data['messageId'], $person['Id']);
+                $messageHelper->deleteMessage($data['messageId'], $person->Id);
 
                 header('Content-Type: application/json');
                 echo json_encode([

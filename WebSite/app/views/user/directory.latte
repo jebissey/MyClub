@@ -21,7 +21,7 @@
                 </span>Localiser les membres
             </a>
             {if $loggedPerson}
-                {if $loggedPerson['InPresentationDirectory']}
+                {if $loggedPerson->InPresentationDirectory}
             <a href="/presentation/edit" class="btn btn-primary">
                 <i class="bi bi-person-badge"></i> Modifier ma présentation
             </a>
@@ -44,10 +44,10 @@
                             Tous
                         </a>
                         {foreach $groups as $group}
-                            <a href="/directory?group={$group['Id']}" class="btn {if isset($selectedGroup) && $selectedGroup == $group['Id']}btn-primary{else}btn-outline-primary{/if}">
-                                {$group['Name']} 
-                                {if isset($groupCounts[$group['Id']])}
-                                    <span class="badge bg-light text-dark">{$groupCounts[$group['Id']]}</span>
+                            <a href="/directory?group={$group->Id}" class="btn {if isset($selectedGroup) && $selectedGroup == $group->Id}btn-primary{else}btn-outline-primary{/if}">
+                                {$group->Name} 
+                                {if isset($groupCounts[$group->Id])}
+                                    <span class="badge bg-light text-dark">{$groupCounts[$group->Id]}</span>
                                 {/if}
                             </a>
                         {/foreach}
@@ -63,30 +63,30 @@
                 <div class="col">
                     <div class="card h-100">
                         <div class="card-body text-center">
-                            <a href="/presentation/{$person['Id']}" class="text-decoration-none">
-                                {if $person['UseGravatar'] == 'yes' && $person['Email']}
-                                    <img src="https://www.gravatar.com/avatar/{md5(strtolower(trim($person['Email'])))}?s=100&d=mp" alt="Avatar" class="img-fluid rounded-circle mb-3" style="width: 100px; height: 100px; object-fit: cover;">
-                                {elseif $person['Avatar']}
-                                    <img src="app/images/{$person['Avatar']}" alt="Avatar" class="img-fluid rounded-circle mb-3">
+                            <a href="/presentation/{$person->Id}" class="text-decoration-none">
+                                {if $person->UseGravatar == 'yes' && $person->Email}
+                                    <img src="https://www.gravatar.com/avatar/{md5(strtolower(trim($person->Email)))}?s=100&d=mp" alt="Avatar" class="img-fluid rounded-circle mb-3" style="width: 100px; height: 100px; object-fit: cover;">
+                                {elseif $person->Avatar}
+                                    <img src="app/images/{$person->Avatar}" alt="Avatar" class="img-fluid rounded-circle mb-3">
                                 {else}
                                     <div class="rounded-circle bg-light d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 48px; height: 48px;">
                                         <i class="bi bi-person-circle" style="font-size: 3rem;"></i>
                                     </div>
                                 {/if}
                                 
-                                <h5 class="card-title">{$person['FirstName']} {$person['LastName']}</h5>
-                                {if $person['NickName']}
-                                    <p class="text-muted mb-0">{$person['NickName']}</p>
+                                <h5 class="card-title">{$person->FirstName} {$person->LastName}</h5>
+                                {if $person->NickName}
+                                    <p class="text-muted mb-0">{$person->NickName}</p>
                                 {/if}
-                                {if isset($person['Groups']) && count($person['Groups']) > 0}
-                                    {foreach $person['Groups'] as $group}
-                                        <span class="badge bg-secondary me-1">{$group['Name']}</span>
+                                {if isset($person->Groups) && count($person->Groups) > 0}
+                                    {foreach $person->Groups as $group}
+                                        <span class="badge bg-secondary me-1">{$group->Name}</span>
                                     {/foreach}
                                 {/if}
                             </a>
                             
                             <div class="mt-3">
-                                <a href="/presentation/{$person['Id']}" class="btn btn-sm btn-primary">
+                                <a href="/presentation/{$person->Id}" class="btn btn-sm btn-primary">
                                     Voir le profil
                                 </a>
                             </div>

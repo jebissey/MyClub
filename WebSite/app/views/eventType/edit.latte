@@ -30,8 +30,8 @@
                             <select class="form-select" id="itemGroup">
                                 <option value="">Aucun</option>
                                 {foreach $groups as $group}
-                                <option value="{$group['Id']}" {if $group['Id'] == $idGroup}selected{/if}>
-                                    {$group['Name']}
+                                <option value="{$group->Id}" {if $group->Id == $idGroup}selected{/if}>
+                                    {$group->Name}
                                 </option>
                                 {/foreach}
                             </select>
@@ -50,11 +50,11 @@
                                             <input class="form-check-input" 
                                                 type="checkbox" 
                                                 name="attributes[]" 
-                                                id="attribute{$attribute['Id']}" 
-                                                value="{$attribute['Id']}"
-                                                {if in_array($attribute['Id'], $existingAttributes)}checked{/if}>
+                                                id="attribute{$attribute->Id}" 
+                                                value="{$attribute->Id}"
+                                                {if in_array($attribute->Id, $existingAttributes)}checked{/if}>
                                             <label class="form-check-label" 
-                                                for="attribute{$attribute['Id']}"
+                                                for="attribute{$attribute->Id}"
                                                 data-bs-toggle="tooltip" 
                                                 title="{$attribute['Detail']}">
                                                 <span class="d-inline-block me-2" style="width: 20px; height: 20px; background-color: {$attribute['Color']};"></span>

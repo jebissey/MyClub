@@ -105,14 +105,14 @@
                 <tbody>
                     {foreach $logs as $log}
                     <tr>
-                        <td>{$log['CreatedAt']}</td>
-                        <td>{$log['Type']}</td>
-                        <td>{$log['Browser']}</td>
-                        <td>{$log['Os']}</td>
-                        <td>{$log['Uri']}</td>
-                        <td>{$log['Who']}</td>
-                        <td>{$log['Code']}</td>
-                        <td>{$log['Message']}</td>
+                        <td>{$log->CreatedAt}</td>
+                        <td>{$log->Type}</td>
+                        <td>{$log->Browser}</td>
+                        <td>{$log->Os}</td>
+                        <td>{$log->Uri}</td>
+                        <td>{$log->Who}</td>
+                        <td>{$log->Code}</td>
+                        <td>{$log->Message}</td>
                     </tr>
                     {/foreach}
                 </tbody>

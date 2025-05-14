@@ -2,8 +2,6 @@
 
 namespace app\controllers;
 
-use Exception;
-
 class SurveyController extends BaseController
 {
     public function add($articleId)
@@ -17,7 +15,7 @@ class SurveyController extends BaseController
                     $this->flight->redirect('/articles');
                 }
                 $survey = $this->fluent->from('Survey')
-                    ->where('IdArticle', $article['Id'])
+                    ->where('IdArticle', $article->Id)
                     ->fetch();
 
                 $this->latte->render('app/views/survey/add.latte', $this->params->getAll([
@@ -42,16 +40,14 @@ class SurveyController extends BaseController
                 $visibility = $_POST['visibility'] ?? 'redactor';
                 $options = isset($_POST['options']) ? json_encode($_POST['options']) : '[]';
 
-                $survey = $this->fluent->from('Survey')
-                    ->where('IdArticle', $articleId)
-                    ->fetch();
+                $survey = $this->fluent->from('Survey')->where('IdArticle', $articleId)->fetch();
                 if ($survey) {
                     $this->fluent->update('Survey')
                         ->set(['Question' => $question])
                         ->set(['Options' => $options])
                         ->set(['ClosingDate' => $closingDate])
                         ->set(['Visibility' => $visibility])
-                        ->where('Id', $survey['Id'])
+                        ->where('Id', $survey->Id)
                         ->execute();
                 } else {
 
@@ -85,14 +81,15 @@ class SurveyController extends BaseController
             if (!$survey) {
                 $this->flight->redirect('/articles/' . $articleId);
             }
-            if ($survey['CreatedBy'] == $person['Id']) {
+            var_dump($survey);
+            if ($this->canPersonReadSurveyResults($this->fluent->from('Article')->where('Id', $survey->IdArticle)->fetch(), $person)) {
                 $replies = $this->fluent->from('Reply')
-                    ->where('IdSurvey', $survey['Id'])
+                    ->where('IdSurvey', $survey->Id)
                     ->fetchAll();
 
                 $participants = [];
                 $results = [];
-                $options = json_decode($survey['Options']);
+                $options = json_decode($survey->Options);
 
                 foreach ($options as $option) {
                     $results[$option] = 0;
@@ -101,11 +98,11 @@ class SurveyController extends BaseController
                 foreach ($replies as $reply) {
                     $answers = json_decode($reply['Answers']);
                     $person = $this->fluent->from('Person')
-                        ->where('Id', $reply['IdPerson'])
+                        ->where('Id', $reply->IdPerson)
                         ->fetch();
 
                     $participants[] = [
-                        'name' => $person['FirstName'] . ' ' . $person['LastName'],
+                        'name' => $person->FirstName . ' ' . $person->LastName,
                         'answers' => $answers
                     ];
 

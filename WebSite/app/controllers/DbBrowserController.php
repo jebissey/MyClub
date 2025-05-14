@@ -70,7 +70,7 @@ class DbBrowserController extends BaseController
             $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
             $stmt->execute();
 
-            $records = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $records = $stmt->fetchAll();
 
             echo $this->latte->render('app/views/dbbrowser/table.latte', $this->params->getAll([
                 'table' => $table,
@@ -148,7 +148,7 @@ class DbBrowserController extends BaseController
             $stmt->bindValue(':id', $id);
             $stmt->execute();
 
-            $record = $stmt->fetch(PDO::FETCH_ASSOC);
+            $record = $stmt->fetch();
 
             if (!$record) {
                 $this->flight->halt(404, 'Record not found');
@@ -227,8 +227,8 @@ class DbBrowserController extends BaseController
         $stmt->execute();
 
         $columns = [];
-        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $columns[] = $row['name'];
+        while ($row = $stmt->fetch()) {
+            $columns[] = $row->name;
         }
 
         return $columns;
@@ -240,17 +240,17 @@ class DbBrowserController extends BaseController
         $stmt = $this->pdo->prepare("PRAGMA table_info(" . $this->quoteName($table) . ")");
         $stmt->execute();
 
-        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            if ($row['pk'] == 1) {
-                return $row['name'];
+        while ($row = $stmt->fetch()) {
+            if ($row->pk == 1) {
+                return $row->name;
             }
         }
 
         // Si pas de clé primaire, utilise la première colonne
         $stmt = $this->pdo->prepare("PRAGMA table_info(" . $this->quoteName($table) . ")");
         $stmt->execute();
-        $row = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $row['name'];
+        $row = $stmt->fetch();
+        return $row->name;
     }
 
     private function getColumnTypes($table)
@@ -260,11 +260,11 @@ class DbBrowserController extends BaseController
         $stmt->execute();
 
         $columnTypes = [];
-        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $columnTypes[$row['name']] = [
-                'type' => $row['type'],
-                'notnull' => $row['notnull'],
-                'dflt_value' => $row['dflt_value'],
+        while ($row = $stmt->fetch()) {
+            $columnTypes[$row->name] = [
+                'type' => $row->type,
+                'notnull' => $row->notnull,
+                'dflt_value' => $row->dflt_value,
                 'pk' => $row['pk']
             ];
         }

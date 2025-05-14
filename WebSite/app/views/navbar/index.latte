@@ -34,12 +34,12 @@
                     </thead>
                     <tbody id="navList">
                         {foreach $navItems as $item}
-                        <tr data-id="{$item['Id']}">
-                            <td>{$item['Name']}</td>
-                            <td>{$item['Route']}</td>
+                        <tr data-id="{$item->Id}">
+                            <td>{$item->Name}</td>
+                            <td>{$item->Route}</td>
                             <td>
-                                {if isset($item['GroupName'])}
-                                {$item['GroupName']}
+                                {if isset($item->GroupName)}
+                                {$item->GroupName}
                                 {/if}
                             </td>
                             <td class="text-center">
@@ -100,7 +100,7 @@
                                 <select class="form-select" id="itemGroup">
                                     <option value="">None</option>
                                     {foreach $groups as $group}
-                                    <option value="{$group['Id']}">{$group['Name']}</option>
+                                    <option value="{$group->Id}">{$group->Name}</option>
                                     {/foreach}
                                 </select>
                             </div>

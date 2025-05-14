@@ -80,7 +80,7 @@ class PersonController extends TableController implements CrudControllerInterfac
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $query = $this->pdo->prepare("SELECT Id FROM Person WHERE Email = ''");
                 $query->execute();
-                $id = $query->fetch(PDO::FETCH_ASSOC)['Id'] ?? null;
+                $id = $query->fetch()->Id ?? null;
                 if ($id == null) {
                     $query = $this->pdo->prepare("
                         INSERT INTO Person (Email, FirstName, LastName, Imported) 
@@ -103,7 +103,7 @@ class PersonController extends TableController implements CrudControllerInterfac
         if ($this->getPerson(['PersonManager', 'Webmaster'])) {
             $query = $this->pdo->prepare('SELECT * FROM "Person" WHERE Id = ?');
             $query->execute([$id]);
-            $person = $query->fetch(PDO::FETCH_ASSOC);
+            $person = $query->fetch();
             if (!$person) {
                 $this->application->error499('Person', $id, __FILE__, __LINE__);
             } else {
@@ -111,21 +111,21 @@ class PersonController extends TableController implements CrudControllerInterfac
 
                     $firstName = $_POST['firstName'];
                     $lastName = $_POST['lastName'];
-                    $query = $this->pdo->prepare('UPDATE Person SET FirstName = ?, LastName = ? WHERE Id = ' . $person['Id']);
+                    $query = $this->pdo->prepare('UPDATE Person SET FirstName = ?, LastName = ? WHERE Id = ' . $person->Id);
                     $query->execute([$firstName, $lastName]);
 
-                    if ($person['Imported'] == 0) {
+                    if ($person->Imported == 0) {
                         $email = filter_var($_POST['email'], FILTER_VALIDATE_EMAIL) ?? '';
-                        $query = $this->pdo->prepare('UPDATE Person SET Email = ? WHERE Id = ' . $person['Id']);
+                        $query = $this->pdo->prepare('UPDATE Person SET Email = ? WHERE Id = ' . $person->Id);
                         $query->execute([$email]);
                     }
                     $this->flight->redirect('/persons');
                 } else if (($_SERVER['REQUEST_METHOD'] === 'GET')) {
                     echo $this->latte->render('app/views/user/account.latte', $this->params->getAll([
-                        'readOnly' => $person['Imported'] == 1 ? true : false,
-                        'email' => $person['Email'],
-                        'firstName' => $person['FirstName'],
-                        'lastName' => $person['LastName'],
+                        'readOnly' => $person->Imported == 1 ? true : false,
+                        'email' => $person->Email,
+                        'firstName' => $person->FirstName,
+                        'lastName' => $person->LastName,
                         'isSelfEdit' => false,
                         'layout' => $this->getLayout('account')
                     ]));
@@ -196,7 +196,7 @@ class PersonController extends TableController implements CrudControllerInterfac
                         'Location' => $location,
                         'InPresentationDirectory' => $inDirectory,
                     ])
-                    ->where('Id', $person['Id'])
+                    ->where('Id', $person->Id)
                     ->execute();
                 if ($success) {
                     $this->flight->redirect('/directory');
@@ -268,7 +268,7 @@ class PersonController extends TableController implements CrudControllerInterfac
                 GROUP BY g.Id
                 ")->fetchAll();
             foreach ($groupCountResult as $count) {
-                $groupCounts[$count['Id']] = $count['Count'];
+                $groupCounts[$count->Id] = $count['Count'];
             }
 
             echo $this->latte->render('app/views/user/directory.latte', $this->params->getAll([
@@ -295,15 +295,15 @@ class PersonController extends TableController implements CrudControllerInterfac
 
             $locationData = [];
             foreach ($members as $member) {
-                if (!empty($member['Location']) && preg_match('/^[-+]?([1-8]?\d(\.\d+)?|90(\.0+)?),\s*[-+]?(180(\.0+)?|((1[0-7]\d)|([1-9]?\d))(\.\d+)?)$/', $member['Location'])) {
-                    list($lat, $lng) = explode(',', $member['Location']);
+                if (!empty($member->Location) && preg_match('/^[-+]?([1-8]?\d(\.\d+)?|90(\.0+)?),\s*[-+]?(180(\.0+)?|((1[0-7]\d)|([1-9]?\d))(\.\d+)?)$/', $member->Location)) {
+                    list($lat, $lng) = explode(',', $member->Location);
                     $locationData[] = [
-                        'id' => $member['Id'],
-                        'name' => $member['FirstName'] . ' ' . $member['LastName'],
-                        'nickname' => $member['NickName'],
-                        'avatar' => $member['Avatar'],
-                        'useGravatar' => $member['UseGravatar'],
-                        'email' => $member['Email'],
+                        'id' => $member->Id,
+                        'name' => $member->FirstName . ' ' . $member->LastName,
+                        'nickname' => $member->NickName,
+                        'avatar' => $member->Avatar,
+                        'useGravatar' => $member->UseGravatar,
+                        'email' => $member->Email,
                         'lat' => trim($lat),
                         'lng' => trim($lng)
                     ];

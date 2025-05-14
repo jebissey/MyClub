@@ -53,9 +53,9 @@
         </thead>
         <tbody>
             {foreach $events as $event}
-            <tr onclick="window.location.href='/events/{$event['id']}';" style="cursor: pointer;">
+            <tr onclick="window.location.href='/events/{$event->id}';" style="cursor: pointer;">
                 <td>
-                {if $event['createdBy'] == ($person['Id'] ?? false)}
+                {if $event['createdBy'] == ($person->Id ?? false)}
                     <div class="ms-auto d-flex flex-column flex-sm-row gap-2">
                         <button class="btn btn-sm btn-primary edit-btn">
                             <i class="bi bi-pencil"></i>
@@ -66,12 +66,12 @@
                     </div>
                 {/if}
                 </td>
-                <td>{$event['eventTypeName']} {if $event['groupName']}({$event['groupName']}){/if}</td>
-                <td>{=$event['startTime']|longDateTime}</td>
-                <td>{$event['duration']}</td>
+                <td>{$event->eventTypeName} {if $event->groupName}({$event->groupName}){/if}</td>
+                <td>{=$event->startTime|longDateTime}</td>
+                <td>{$event->duration}</td>
                 <td>
-                {if count($event['attributes']) > 0}
-                    {foreach $event['attributes'] as $attribute}
+                {if count($event->attributes) > 0}
+                    {foreach $event->attributes as $attribute}
                     <span 
                         class="attribute-badge" 
                         style="background-color: {$attribute['color']|noescape};"
@@ -82,10 +82,10 @@
                     Aucun attribut
                 {/if}
                 </td>
-                <td>{$event['summary']}</td>
-                <td>{$event['location']}</td>
-                <td>{$event['participants']}{if $event['maxParticipants'] > 0} / {$event['maxParticipants']}{/if}{if isset($event['booked'])}👤{/if}</td>
-                <td>{=$event['audience']|translate}</td>
+                <td>{$event->summary}</td>
+                <td>{$event->location}</td>
+                <td>{$event->participants}{if $event->maxParticipants > 0} / {$event->maxParticipants}{/if}{if isset($event->booked)}👤{/if}</td>
+                <td>{=$event->audience|translate}</td>
             </tr>
             {/foreach}
         </tbody>
@@ -126,7 +126,7 @@
                             <div class="col">
                                 <select class="form-control" id="eventTypeInput" name="eventType" required>
                                     {foreach $eventTypes as $eventType}
-                                        <option value="{$eventType['Id']}">{$eventType['Name']}</option>
+                                        <option value="{$eventType->Id}">{$eventType->Name}</option>
                                     {/foreach}
                                 </select>
                             </div>
@@ -159,8 +159,8 @@
                             <div class="input-group">
                                 <select id="availableAttributesSelect" class="form-control">
                                     {foreach $eventAttributes as $attribute}
-                                    <option value="{$attribute['Id']}" data-color="{$attribute['Color']}" data-detail="{$attribute['Detail']}">
-                                        {$attribute['Name']}
+                                    <option value="{$attribute->Id}" data-color="{$attribute->Color}" data-detail="{$attribute->Detail}">
+                                        {$attribute->Name}
                                     </option>
                                     {/foreach}
                                 </select>

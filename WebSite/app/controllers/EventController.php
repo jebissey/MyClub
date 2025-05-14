@@ -24,7 +24,7 @@ class EventController extends BaseController
     public function show($eventId): void
     {
         $person = $this->getPerson();
-        $userEmail = $person['Email'] ?? '';
+        $userEmail = $person->Email ?? '';
         if ($userEmail === '') {
             $this->setDefaultParams();
         }
@@ -46,11 +46,11 @@ class EventController extends BaseController
     {
         $person = $this->getPerson();
         if ($person) {
-            $userId = $person['Id'];
+            $userId = $person->Id;
             if ($set) {
                 $event = new Event($this->pdo);
 
-                if ($eventId > 0 && !$event->isUserRegistered($eventId, $person['Email'] ?? '')) {
+                if ($eventId > 0 && !$event->isUserRegistered($eventId, $person->Email ?? '')) {
                     $query = $this->pdo->prepare(
                         "INSERT INTO Participant (IdEvent, IdPerson, IdContact) 
                          VALUES (:eventId, :userId, NULL)"
@@ -170,7 +170,7 @@ class EventController extends BaseController
             WHERE e.Id = :eventId");
 
         $query->execute(['eventId' => $eventId]);
-        return $query->fetch(PDO::FETCH_ASSOC);
+        return $query->fetch();
     }
 
     private function getEventAttributes($eventId)
@@ -182,7 +182,7 @@ class EventController extends BaseController
             WHERE ea.IdEvent = :eventId");
 
         $query->execute(['eventId' => $eventId]);
-        return $query->fetchAll(PDO::FETCH_ASSOC);
+        return $query->fetchAll();
     }
 
     private function getEventParticipants($eventId)
@@ -195,6 +195,6 @@ class EventController extends BaseController
             ORDER BY pe.FirstName, pe.LastName");
 
         $query->execute(['eventId' => $eventId]);
-        return $query->fetchAll(PDO::FETCH_ASSOC);
+        return $query->fetchAll();
     }
 }

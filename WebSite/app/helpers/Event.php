@@ -32,7 +32,7 @@ class Event
             'userEmail' => $userEmail
         ]);
 
-        return $query->fetchAll(PDO::FETCH_ASSOC);
+        return $query->fetchAll();
     }
 
     public function isUserRegistered($eventId, $userEmail)
@@ -49,7 +49,7 @@ class Event
             'userEmail' => $userEmail
         ]);
 
-        $result = $query->fetch(PDO::FETCH_ASSOC);
+        $result = $query->fetch();
         return ($result['count'] > 0);
     }
 
@@ -59,7 +59,7 @@ class Event
         $query = $this->fluent
             ->from('Event e')
             ->leftJoin('EventType et ON e.IdEventType = et.Id')
-            ->leftJoin('Participant p ON e.Id = p.IdEvent AND p.IdPerson = ?', $person['Id'] ?? 0)
+            ->leftJoin('Participant p ON e.Id = p.IdEvent AND p.IdPerson = ?', $person->Id ?? 0)
             ->where('e.StartTime > ?', $now)
             ->groupBy('e.Id');
 
@@ -67,7 +67,7 @@ class Event
             $query->where("e.Audience = '" . EventAudience::ForAll->value . "'");
             $query->where("et.IdGroup IS NULL");
         } else {
-            $query->where("et.IdGroup IS NULL OR et.IdGroup IN (SELECT IdGroup FROM PersonGroup WHERE IdPerson = ?)", $person['Id']);
+            $query->where("et.IdGroup IS NULL OR et.IdGroup IN (SELECT IdGroup FROM PersonGroup WHERE IdPerson = ?)", $person->Id);
         }
         $query->select('et.Name AS EventTypeName, et.IdGroup AS EventTypeIdGroup, p.Id As Booked')->orderBy('e.StartTime');
         $events = $query->fetchAll();
@@ -84,32 +84,31 @@ class Event
                 WHERE ea.IdEvent IN ($placeholders)
             ");
             $attributeQuery->execute($eventIds);
-
-            while ($row = $attributeQuery->fetch(PDO::FETCH_ASSOC)) {
-                $attributes[$row['IdEvent']][] = [
-                    'id' => $row['Id'],
-                    'name' => $row['Name'],
-                    'detail' => $row['Detail'],
-                    'color' => $row['Color']
+            while ($row = $attributeQuery->fetch()) {
+                $attributes[$row->IdEvent][] = [
+                    'id' => $row->Id,
+                    'name' => $row->Name,
+                    'detail' => $row->Detail,
+                    'color' => $row->Color
                 ];
             }
         }
 
         return array_map(function ($event) use ($attributes) {
             return [
-                'id' => $event['Id'],
-                'eventTypeName' => $event['EventTypeName'],
-                'groupName' => $event['EventTypeIdGroup'] ? $this->fluent->from("'Group'")->where('Id', $event['EventTypeIdGroup'])->fetch('Name') : '',
-                'summary' => $event['Summary'],
-                'location' => $event['Location'],
-                'startTime' => $event['StartTime'],
-                'duration' => (new TranslationManager($this->pdo))->getReadableDuration($event['Duration']),
-                'attributes' => $attributes[$event['Id']] ?? [],
-                'participants' => $this->fluent->from('Participant')->where('IdEvent', $event['Id'])->count(),
-                'maxParticipants' => $event['MaxParticipants'],
-                'booked' => $event['Booked'],
-                'audience' => $event['Audience'],
-                'createdBy' => $event['CreatedBy'],
+                'id' => $event->Id,
+                'eventTypeName' => $event->EventTypeName,
+                'groupName' => $event->EventTypeIdGroup ? $this->fluent->from("'Group'")->where('Id', $event->EventTypeIdGroup)->fetch('Name') : '',
+                'summary' => $event->Summary,
+                'location' => $event->Location,
+                'startTime' => $event->StartTime,
+                'duration' => (new TranslationManager($this->pdo))->getReadableDuration($event->Duration),
+                'attributes' => $attributes[$event->Id] ?? [],
+                'participants' => $this->fluent->from('Participant')->where('IdEvent', $event->Id)->count(),
+                'maxParticipants' => $event->MaxParticipants,
+                'booked' => $event->Booked,
+                'audience' => $event->Audience,
+                'createdBy' => $event->CreatedBy,
             ];
         }, $events);
     }

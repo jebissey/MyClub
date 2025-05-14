@@ -46,7 +46,7 @@
                     <select class="form-control" id="group" name="group">
                         <option value="">Tous les groupes</option>
                         {foreach $groups as $group}
-                        <option value="{$group['Name']}" {if $groupFilter == $group['Name']}selected{/if}>{$group['Name']}</option>
+                        <option value="{$group->Name}" {if $groupFilter == $group->Name}selected{/if}>{$group->Name}</option>
                         {/foreach}
                     </select>
                 </div>
@@ -70,8 +70,8 @@
                         <tr>
                             <th>URI</th>
                             {foreach $persons as $person}
-                            <th class="text-center rotate" title="{$person['FirstName']} {$person['LastName']}">
-                                {$person['Email']|truncate:30}
+                            <th class="text-center rotate" title="{$person->FirstName} {$person->LastName}">
+                                {$person->Email|truncate:30}
                             </th>
                             {/foreach}
                             <th class="text-center bg-light">Total</th>
@@ -83,8 +83,8 @@
                                 <td>{$uri|truncate:50}</td>
                                 {foreach $persons as $person}
                                     <td class="text-center">
-                                        {if isset($data['visits'][$person['Email']])}
-                                            {$data['visits'][$person['Email']]}
+                                        {if isset($data['visits'][$person->Email])}
+                                            {$data['visits'][$person->Email]}
                                         {else}
                                             0
                                         {/if}
@@ -99,8 +99,8 @@
                             <th>Total</th>
                             {foreach $persons as $person}
                                 <th class="text-center">
-                                    {if isset($columnTotals[$person['Email']])}
-                                        {$columnTotals[$person['Email']]}
+                                    {if isset($columnTotals[$person->Email])}
+                                        {$columnTotals[$person->Email]}
                                     {else}
                                         0
                                     {/if}

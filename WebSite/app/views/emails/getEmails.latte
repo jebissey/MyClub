@@ -9,7 +9,7 @@
                     <select class="form-select" id="groupSelect" name="idGroup">
                         <option value="">Tous les groupes</option>
                         {foreach $groups as $group}
-                            <option value="{$group['Id']}">{$group['Name']}</option>
+                            <option value="{$group->Id}">{$group->Name}</option>
                         {/foreach}
                     </select>
                 </div>
@@ -19,7 +19,7 @@
                     <select class="form-select" id="eventTypeSelect" name="idEventType">
                         <option value="">Tous les types</option>
                         {foreach $eventTypes as $type}
-                            <option value="{$type['Id']}">{$type['Name']}</option>
+                            <option value="{$type->Id}">{$type->Name}</option>
                         {/foreach}
                     </select>
                 </div>

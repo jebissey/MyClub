@@ -6,12 +6,12 @@
                 <li class="list-group-item">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <strong>{$group['Name']}</strong>
+                            <strong>{$group->Name}</strong>
 
                         </div>
                         <button class="btn btn-danger btn-sm" 
-                                onclick="removeFromGroup({$personId}, {$group['Id']})"
-                                {if $group['Authorizations'] && !$isWebmaster}disabled{/if}>
+                                onclick="removeFromGroup({$personId}, {$group->Id})"
+                                {if $group->Authorizations && !$isWebmaster}disabled{/if}>
                             Retirer
                         </button>
                     </div>
@@ -26,9 +26,9 @@
             {foreach $availableGroups as $group}
                 <li class="list-group-item">
                     <div class="d-flex justify-content-between align-items-center">
-                        {$group['Name']}
+                        {$group->Name}
                         <button class="btn btn-success btn-sm" 
-                                onclick="addToGroup({$personId}, {$group['Id']})">
+                                onclick="addToGroup({$personId}, {$group->Id})">
                             Ajouter
                         </button>
                     </div>

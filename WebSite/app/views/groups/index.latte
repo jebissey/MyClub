@@ -30,31 +30,31 @@
                     <tbody>
                         {foreach $groups as $group}
                         <tr>
-                            <td>{$group['Name']}</td>
+                            <td>{$group->Name}</td>
                             <td>
-                                <span class="badge {$group['SelfRegistration'] ? 'bg-success' : 'bg-secondary'}">
-                                    {$group['SelfRegistration'] ? 'Oui' : 'Non'}
+                                <span class="badge {$group->SelfRegistration ? 'bg-success' : 'bg-secondary'}">
+                                    {$group->SelfRegistration ? 'Oui' : 'Non'}
                                 </span>
                             </td>
-                            <td>{$group['Authorizations']}</td>
+                            <td>{$group->Authorizations}</td>
                             <td class="text-nowrap">
-                                {if $group['Id'] != 1}
-                                    <a href="/groups/edit/{$group['Id']}" class="btn btn-sm btn-primary">
+                                {if $group->Id != 1}
+                                    <a href="/groups/edit/{$group->Id}" class="btn btn-sm btn-primary">
                                         <i class="fas fa-edit"></i>Modifier
                                     </a>
                                     <button type="button" class="btn btn-sm btn-danger" 
-                                            onclick="confirmDelete({$group['Id']})">
+                                            onclick="confirmDelete({$group->Id})">
                                         <i class="fas fa-trash"></i>Supprimer
                                     </button>
                                 {/if}
-                                <button class="btn btn-sm btn-success" onclick="loadGroupUsers({$group['Id']})">
+                                <button class="btn btn-sm btn-success" onclick="loadGroupUsers({$group->Id})">
                                     <i class="fas fa-plus"></i>Membres
                                 </button>
                             </td>
                         </tr>
-                        <tr id="users-group-{$group['Id']}" class="d-none">
+                        <tr id="users-group-{$group->Id}" class="d-none">
                             <td colspan="4">
-                                <div id="user-list-{$group['Id']}">Chargement...</div>
+                                <div id="user-list-{$group->Id}">Chargement...</div>
                             </td>
                         </tr>
                         {/foreach}

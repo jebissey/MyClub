@@ -10,13 +10,13 @@
                         <div class="form-check mb-2">
                             <input class="form-check-input" type="checkbox" 
                                 name="groups[]" 
-                                value="{$group['Id']}" 
-                                id="group{$group['Id']}"
-                                {if $group['isMember']}checked{/if}
-                                {if !$group['canToggle']}disabled{/if}>
-                            <label class="form-check-label" for="group{$group['Id']}">
-                                {$group['Name']}
-                                {if $group['isMember'] and !$group['canToggle']}<span class="text-success">(Inscrit)</span>{/if}
+                                value="{$group->Id}" 
+                                id="group{$group->Id}"
+                                {if $group->isMember}checked{/if}
+                                {if !$group->canToggle}disabled{/if}>
+                            <label class="form-check-label" for="group{$group->Id}">
+                                {$group->Name}
+                                {if $group->isMember and !$group->canToggle}<span class="text-success">(Inscrit)</span>{/if}
                             </label>
                         </div>
                     {/foreach}

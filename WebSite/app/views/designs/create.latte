@@ -64,7 +64,7 @@
                                     <select class="form-select" id="idGroup" name="idGroup">
                                         <option value="">Sélectionnez un groupe</option>
                                         {foreach $groups as $group}
-                                            <option value="{$group['Id']}">{$group['Name']}</option>
+                                            <option value="{$group->Id}">{$group->Name}</option>
                                         {/foreach}
                                     </select>
                                 </div>

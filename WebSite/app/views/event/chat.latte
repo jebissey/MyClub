@@ -39,37 +39,37 @@
                         </div>
                     {else}
                         {foreach $messages as $message}
-                            <div class="message-container mb-3 {if $message['PersonId'] == $person['Id']}message-mine{/if}" 
-                                data-message-id="{$message['Id']}" 
-                                data-author-id="{$message['PersonId']}">
-                                <div class="d-flex {if $message['PersonId'] == $person['Id']}flex-row-reverse{/if}">
-                                    <div class="avatar mr-2 {if $message['PersonId'] == $person['Id']}ml-2 mr-0{/if}">
-                                        {if $message['UseGravatar'] == 'yes'}
-                                            <img src="https://www.gravatar.com/avatar/{md5(strtolower(trim($message['Email'])))}" 
+                            <div class="message-container mb-3 {if $message->PersonId == $person->Id}message-mine{/if}" 
+                                data-message-id="{$message->Id}" 
+                                data-author-id="{$message->PersonId}">
+                                <div class="d-flex {if $message['PersonId'] == $person->Id}flex-row-reverse{/if}">
+                                    <div class="avatar mr-2 {if $message->PersonId == $person->Id}ml-2 mr-0{/if}">
+                                        {if $message->UseGravatar == 'yes'}
+                                            <img src="https://www.gravatar.com/avatar/{md5(strtolower(trim($message->Email)))}" 
                                                 class="rounded-circle" width="40" height="40" alt="Avatar">
-                                        {elseif $message['Avatar']}
-                                            <img src="/app/images/{$message['Avatar']}" class="rounded-circle" width="40" height="40" alt="Avatar">
+                                        {elseif $message->Avatar}
+                                            <img src="/app/images/{$message->Avatar}" class="rounded-circle" width="40" height="40" alt="Avatar">
                                         {else}
                                             <img src="/app/images/emojiPensif.png" class="rounded-circle" width="40" height="40" alt="Avatar">
                                         {/if}
                                     </div>
-                                    <div class="message-content {if $message['PersonId'] == $person['Id']}bg-primary text-white{else}bg-light{/if} p-2 rounded">
+                                    <div class="message-content {if $message->PersonId == $person->Id}bg-primary text-white{else}bg-light{/if} p-2 rounded">
                                         <div class="message-header mb-1">
                                             <strong>
-                                                {if $message['NickName']}
-                                                    {$message['NickName']}
+                                                {if $message->NickName}
+                                                    {$message->NickName}
                                                 {else}
-                                                    {$message['FirstName']} {$message['LastName']}
+                                                    {$message->FirstName} {$message->LastName}
                                                 {/if}
                                             </strong>
                                             <small class="text-muted">
-                                                {if $message['PersonId'] == $person['Id']}
+                                                {if $message['PersonId'] == $person->Id}
                                                     <i class="edit-message fa fa-edit ml-2" title="Modifier"></i>
                                                 {/if}
                                             </small>
                                         </div>
                                         <div class="message-text">
-                                            {$message['Text']}
+                                            {$message->Text}
                                         </div>
                                     </div>
                                 </div>
@@ -80,7 +80,7 @@
 
                 <div class="message-form p-3 border-top">
                     <form id="new-message-form" class="d-flex">
-                        <input type="hidden" id="event-id" value="{$event['Id']}">
+                        <input type="hidden" id="event-id" value="{$event->Id}">
                         <input type="text" id="message-text" class="form-control" placeholder="Écrivez votre message..." required>
                         <button type="submit" class="btn btn-primary ml-2">Envoyer</button>
                     </form>

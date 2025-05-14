@@ -81,8 +81,8 @@ class Article
 
         foreach ($groups as $group) {
             $crosstab['audiences'][] = [
-                'id' => $group['Id'],
-                'name' => $group['Name'],
+                'id' => $group->Id,
+                'name' => $group->Name,
                 'type' => 'group'
             ];
         }
@@ -148,7 +148,7 @@ class Article
             ':startDate' => $startDate,
             ':endDate' => $endDate
         ]);
-        $authors = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $authors = $stmt->fetchAll();
         if (empty($authors)) {
             $query = "
                     SELECT DISTINCT p.Id, p.FirstName, p.LastName
@@ -159,7 +159,7 @@ class Article
                 ";
             $stmt = $this->pdo->prepare($query);
             $stmt->execute();
-            $authors = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $authors = $stmt->fetchAll();
         }
 
         return $authors;
@@ -167,11 +167,7 @@ class Article
 
     private function getAllGroups()
     {
-        $query = "SELECT Id, Name FROM `Group` WHERE Inactivated = 0 ORDER BY Name";
-        $stmt = $this->pdo->prepare($query);
-        $stmt->execute();
-
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $this->fluent->from('Group')->select('Id, Name')->where('Inactivated', 0)->orderBy('Name')->fetchAll();
     }
 
     private function countArticlesByAuthorAndAudience($authorId, $groupId, $onlyForMembers, $startDate, $endDate)
@@ -185,7 +181,8 @@ class Article
         $params = [
             ':authorId' => $authorId,
             ':startDate' => $startDate,
-            ':endDate' => $endDate];
+            ':endDate' => $endDate
+        ];
 
         if ($groupId === null) {
             $query .= " AND IdGroup IS NULL";
@@ -200,7 +197,7 @@ class Article
         $stmt = $this->pdo->prepare($query);
         $stmt->execute($params);
 
-        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        $result = $stmt->fetch();
         return (int)$result['total'];
     }
 
@@ -220,11 +217,11 @@ class Article
             ':endDate' => $endDate
         ]);
 
-        $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        return (int)$result['total'];
+        $result = $stmt->fetch();
+        return (int)$result->total;
     }
 
-    
+
     public function calculateTotals($crosstabData)
     {
         $totals = [

@@ -2,6 +2,7 @@
 
 namespace app\controllers;
 
+use DateTime;
 use PDO;
 use flight\Engine;
 use Latte\Engine as LatteEngine;
@@ -106,15 +107,15 @@ abstract class BaseController extends BaseHelper
                 $this->application->error480($userEmail, __FILE__, __LINE__);
                 return false;
             } else {
-                $authorizations = $this->authorizations->get($person['Id']);
+                $authorizations = $this->authorizations->get($person->Id);
                 if ($requiredAuthorisations != [] && empty(array_intersect($authorizations, $requiredAuthorisations))) {
                     $this->application->error403(__FILE__, __LINE__);
                     return false;
                 }
                 $this->params = new Params([
-                    'href' => $this->getHref($person['Email']),
+                    'href' => $this->getHref($person->Email),
                     'userImg' => $this->getUserImg($person),
-                    'userEmail' => $person['Email'],
+                    'userEmail' => $person->Email,
                     'keys' => count($authorizations) ?? 0 > 0 ? true : false,
                     'isEventManager' => $this->authorizations->isEventManager(),
                     'isPersonManager' => $this->authorizations->isPersonManager(),
@@ -166,16 +167,16 @@ abstract class BaseController extends BaseHelper
             ->fetchAll();
         $person = $this->getPerson();
         if (!$person) $userGroups = [];
-        else $userGroups = $this->getUserGroups($person['Email']);
+        else $userGroups = $this->getUserGroups($person->Email);
 
         $filteredNavItems = [];
         foreach ($navItems as $navItem) {
             if (
-                ($person === false && $navItem['ForAnonymous'] == 1)
-                || ($person && $navItem['ForMembers'] == 1 &&
+                ($person === false && $navItem->ForAnonymous == 1)
+                || ($person && $navItem->ForMembers == 1 &&
                     (
-                        $navItem['IdGroup'] === null
-                        || ($userGroups != [] && in_array($navItem['IdGroup'], $userGroups))
+                        $navItem->IdGroup === null
+                        || ($userGroups != [] && in_array($navItem->IdGroup, $userGroups))
                     )
                 )
                 || $all
@@ -188,7 +189,7 @@ abstract class BaseController extends BaseHelper
     {
         $query = $this->pdo->prepare('SELECT * FROM "Group" WHERE Id = ?');
         $query->execute([$id]);
-        return $query->fetch(PDO::FETCH_ASSOC);
+        return $query->fetch();
     }
 
     protected function getGroups()
@@ -203,8 +204,8 @@ abstract class BaseController extends BaseHelper
         }
         $query = $this->pdo->prepare('SELECT FirstName, LastName FROM Person  WHERE Id = ?');
         $query->execute([$id]);
-        $person = $query->fetch(PDO::FETCH_ASSOC);
-        return "publié par " . $person['FirstName'] . " " . $person['LastName'];
+        $person = $query->fetch();
+        return "publié par " . $person->FirstName . " " . $person->LastName;
     }
 
     protected function setDefaultParams($segment = 0)
@@ -228,6 +229,32 @@ abstract class BaseController extends BaseHelper
         ]);
     }
 
+    protected function canPersonReadSurveyResults($article, $person)
+    {
+        $survey = $this->fluent->from('Survey')->where('IdArticle', $article->Id)->fetch();
+        if (!$survey || !$person) {
+            return false;
+        }
+
+        $now = (new DateTime())->format('Y-m-d');
+        $closingDate = $survey->ClosingDate;
+
+        if (
+            $article->CreatedBy == $person->Id
+            || $survey->Visibility == 'all'
+            || $survey->Visibility == 'allAfterClosing' && $closingDate < $now
+        ) {
+            return true;
+        }
+
+        $stmt = $this->pdo->prepare('SELECT COUNT(*) FROM Reply WHERE IdSurvey = ? AND IdPerson = ?');
+        $stmt->execute([$survey->Id, $person->Id]);
+        $hasVoted = $stmt->fetchColumn() > 0;
+        if ($hasVoted && ($survey->Visibility == 'voters' || ($survey->Visibility == 'votersAfterClosing' && $closingDate < $now))) {
+            return true;
+        }
+        return false;
+    }
 
     private function getHref($userEmail)
     {
@@ -238,13 +265,13 @@ abstract class BaseController extends BaseHelper
     {
         if ($person === null) {
             return '/app/images/anonymat.png';
-        } else if ($person['UseGravatar'] === 'yes') {
-            return (new GravatarHandler())->getGravatar($person['Email']);
+        } else if ($person->UseGravatar === 'yes') {
+            return (new GravatarHandler())->getGravatar($person->Email);
         } else {
-            if (empty($person['Avatar'])) {
+            if (empty($person->Avatar)) {
                 return '/app/images/emojiPensif.png';
             } else {
-                return '/app/images/' . $person['Avatar'];
+                return '/app/images/' . $person->Avatar;
             }
         }
     }

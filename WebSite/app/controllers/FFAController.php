@@ -10,8 +10,8 @@ class FFAController extends BaseController
     public function searchMember()
     {
         if ($person = $this->getPerson([])) {
-            $firstName = $_GET['firstName'] ?? $person['FirstName'] ?? '';
-            $lastName = $_GET['lastName'] ?? $person['LastName'] ?? '';
+            $firstName = $_GET['firstName'] ?? $person->FirstName ?? '';
+            $lastName = $_GET['lastName'] ?? $person->LastName ?? '';
             $question = $_GET['question'] ?? 'rank';
             $year = $_GET['year'] ?? date('Y');
             $club = $_GET['club'] ?? $this->settings->get('FFA_club')?? '';

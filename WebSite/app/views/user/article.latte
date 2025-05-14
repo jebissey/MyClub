@@ -94,7 +94,7 @@
                                 <select class="form-select" id="group-select" name="idGroup">
                                     <option value="">-- Aucun groupe --</option>
                                     {foreach $groups as $group}
-                                    <option value="{$group['Id']}" {if isset($chosenArticle->IdGroup) && $chosenArticle->IdGroup == $group['Id']}selected{/if}>{$group['Name']}</option>
+                                    <option value="{$group->Id}" {if isset($chosenArticle->IdGroup) && $chosenArticle->IdGroup == $group->Id}selected{/if}>{$group->Name}</option>
                                     {/foreach}
                                 </select>
                             </div>

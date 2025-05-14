@@ -57,23 +57,24 @@ class Database
             }
             self::$pdoForLog = new PDO('sqlite:' . $sqliteLogFile);
             self::$pdoForLog->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            self::$pdoForLog->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_OBJ);
 
             $sqliteFile = self::SQLITE_DEST_PATH . self::SQLITE_FILE;
             if (!is_file($sqliteFile)) {
                 (new File())->copy(__DIR__ . '/' . self::SQLITE_FILE, self::SQLITE_DEST_PATH);
             }
             $pdo = new PDO('sqlite:' . $sqliteFile);
+            $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_OBJ);
 
             $query = "SELECT * FROM Metadata LIMIT 1";
             $stmt = $pdo->query($query);
-            $row = $stmt->fetch(PDO::FETCH_ASSOC);
-
+            $row = $stmt->fetch();
             if ($row) {
-                if ($row['ApplicationName'] != self::APPLICATION) {
+                if ($row->ApplicationName != self::APPLICATION) {
                     die('Non-compliant database');
                 }
-                if ($row['DatabaseVersion'] != self::VERSION) {
-                    if ($row['DatabaseVersion'] > self::VERSION) {
+                if ($row->DatabaseVersion != self::VERSION) {
+                    if ($row->DatabaseVersion > self::VERSION) {
                         die('The database requires a more recent version of the application');
                     }
                     self::upgradeDatabase($pdo);

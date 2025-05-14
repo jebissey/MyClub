@@ -24,7 +24,7 @@
                         <div class="row mb-4">
                             <div class="col-md-6">
                                 <div class="form-check mb-3">
-                                    <input class="form-check-input" type="checkbox" id="inPresentationDirectory" name="inPresentationDirectory" {if $person['InPresentationDirectory']}checked{/if}>
+                                    <input class="form-check-input" type="checkbox" id="inPresentationDirectory" name="inPresentationDirectory" {if $person->InPresentationDirectory}checked{/if}>
                                     <label class="form-check-label" for="inPresentationDirectory">
                                         Je souhaite figurer dans le trombinoscope
                                     </label>
@@ -34,7 +34,7 @@
                         </div>
 
                         <div id="content-display" style="display: none;">
-                            {if isset($person['Presentation'])}{$person['Presentation']|noescape}{/if}
+                            {if isset($person->Presentation)}{$person->Presentation|noescape}{/if}
                         </div>
                         <div id="quill-editor"></div>
                         <input type="hidden" name="content" id="content-input">
@@ -42,7 +42,7 @@
                         <div class="mb-4">
                             <label class="form-label">Lieu d'habitation (quartier)</label>
                             <div id="map" style="height: 300px;"></div>
-                            <input type="hidden" id="location" name="location" value="{$person['Location']}">
+                            <input type="hidden" id="location" name="location" value="{$person->Location}">
                             <div class="form-text">Cliquez sur la carte pour indiquer votre quartier d'habitation</div>
                         </div>
 

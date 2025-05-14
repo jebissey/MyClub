@@ -99,7 +99,7 @@
                             <select class="form-control" id="groupId" name="groupId" required>
                                 <option value="">Sélectionner un groupe</option>
                                 {foreach $groups as $group}
-                                    <option value="{$group['Id']}">{$group['Name']}</option>
+                                    <option value="{$group->Id}">{$group->Name}</option>
                                 {/foreach}
                             </select>
                         </div>

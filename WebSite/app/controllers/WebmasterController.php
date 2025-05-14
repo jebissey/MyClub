@@ -131,7 +131,7 @@ class WebmasterController extends BaseController
         $feed_url = $base_url . "/rss.xml";
         $feed_description = "Mises à jour de la liste d'articles";
 
-        $personId = ($this->getPerson([]))['Id'] ?? 0;
+        $personId = ($this->getPerson([]))->Id ?? 0;
         $query = $this->pdo->query("
             SELECT DISTINCT Article.*
             FROM Article
@@ -143,7 +143,7 @@ class WebmasterController extends BaseController
               OR (Article.IdGroup IS NOT NULL AND Article.IdGroup IN (SELECT IdGroup FROM PersonGroup WHERE PersonGroup.IdPerson = $personId))
             )
             ORDER BY Article.LastUpdate DESC");
-        $articles = $query->fetchAll(PDO::FETCH_ASSOC);
+        $articles = $query->fetchAll();
 
         header('Cache-Control: no-cache, no-store, must-revalidate'); // HTTP 1.1
         header('Pragma: no-cache'); // HTTP 1.0
@@ -190,8 +190,8 @@ class WebmasterController extends BaseController
         foreach ($articles as $article) {
             $rss .= '<item>';
             $rss .= '<title>' . htmlspecialchars($article['Title']) . '</title>';
-            $rss .= '<link>' . htmlspecialchars($site_url . '/articles/' . $article['Id']) . '</link>';
-            $rss .= '<guid>' . htmlspecialchars($site_url . '/articles/' . $article['Id']) . '</guid>';
+            $rss .= '<link>' . htmlspecialchars($site_url . '/articles/' . $article->Id) . '</link>';
+            $rss .= '<guid>' . htmlspecialchars($site_url . '/articles/' . $article->Id) . '</guid>';
             $rss .= '<pubDate>' . date(DATE_RSS, strtotime($article['LastUpdate'])) . '</pubDate>';
             $rss .= '<description>' . $this->getFirstElement($article['Content']) . '</description>';
             $rss .= '</item>';

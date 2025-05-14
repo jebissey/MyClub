@@ -45,7 +45,7 @@ class ArticleApi extends BaseController
                 $data = json_decode(file_get_contents('php://input'), true);
 
                 $designId = (int)$data['designId'] ?? 0;
-                $userId = $person['Id'];
+                $userId = $person->Id;
                 $voteValue = $data['vote'] ?? 'voteNeutral';
 
                 $existingVote = $this->fluent->from('DesignVote')
@@ -55,7 +55,7 @@ class ArticleApi extends BaseController
                 if ($existingVote) {
                     $this->fluent->update('DesignVote')
                         ->set(['Vote' => $voteValue])
-                        ->where('Id', $existingVote['Id'])
+                        ->where('Id', $existingVote->Id)
                         ->execute();
                 } else {
                     $this->fluent->insertInto('DesignVote')
@@ -93,18 +93,18 @@ class ArticleApi extends BaseController
                 $answers = isset($data['survey_answers']) ? json_encode($data['survey_answers']) : '[]';
 
                 $existingReply = $this->fluent->from('Reply')
-                    ->where('IdPerson', $person['Id'])
+                    ->where('IdPerson', $person->Id)
                     ->where('IdSurvey', $surveyId)
                     ->fetch();
                 if ($existingReply) {
                     $this->fluent->update('Reply')
                         ->set(['Answers' => $answers])
-                        ->where('Id', $existingReply['Id'])
+                        ->where('Id', $existingReply->Id)
                         ->execute();
                 } else {
                     $this->fluent->insertInto('Reply')
                         ->values([
-                            'IdPerson' => $person['Id'],
+                            'IdPerson' => $person->Id,
                             'IdSurvey' => $surveyId,
                             'Answers' => $answers
                         ])
@@ -144,8 +144,8 @@ class ArticleApi extends BaseController
                     }
 
                     $previousReply = $this->fluent->from('Reply')
-                        ->where('IdSurvey', $survey['Id'])
-                        ->where('IdPerson', $person['Id'])
+                        ->where('IdSurvey', $survey->Id)
+                        ->where('IdPerson', $person->Id)
                         ->fetch();
 
                     $previousAnswers = $previousReply ? json_decode($previousReply['Answers'], true) : null;
@@ -154,8 +154,8 @@ class ArticleApi extends BaseController
                     echo json_encode([
                         'success' => true,
                         'survey' => [
-                            'id' => $survey['Id'],
-                            'question' => $survey['Question'],
+                            'id' => $survey->Id,
+                            'question' => $survey->Question,
                             'options' => $options,
                             'previousAnswers' => $previousAnswers
                         ]

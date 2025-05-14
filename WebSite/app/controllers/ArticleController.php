@@ -2,7 +2,6 @@
 
 namespace app\controllers;
 
-use DateTime;
 use PDO;
 use app\helpers\Article;
 use app\helpers\Backup;
@@ -89,9 +88,9 @@ class ArticleController extends TableController
 
         if ($person) {
             if (!$this->authorizations->isEditor()) {
-                $query = $query->where('(Article.CreatedBy = ' . $person['Id'] . '
+                $query = $query->where('(Article.CreatedBy = ' . $person->Id . '
                     OR (Article.PublishedBy IS NOT NULL 
-                        AND (Article.IdGroup IS NULL OR Article.IdGroup IN (SELECT IdGroup FROM PersonGroup WHERE IdPerson = ' . $person['Id'] . '))
+                        AND (Article.IdGroup IS NULL OR Article.IdGroup IN (SELECT IdGroup FROM PersonGroup WHERE IdPerson = ' . $person->Id . '))
                        ))');
             }
         } else {
@@ -135,28 +134,28 @@ class ArticleController extends TableController
         if ($person && $this->authorizations->isEditor()) {
             $stmt = $this->pdo->prepare("SELECT * FROM Article WHERE Id = :id");
         } else {
-            $createdBy = $person['Id'] ?? '';
+            $createdBy = $person->Id ?? '';
             $stmt = $this->pdo->prepare("SELECT * FROM Article WHERE Id = :id AND (PublishedBy IS NOT NULL OR CreatedBy = '$createdBy')");
         }
         $stmt->execute([':id' => $id]);
-        $article = $stmt->fetch(PDO::FETCH_ASSOC);
+        $article = $stmt->fetch();
         if (!$article) {
             $this->application->error403(__FILE__, __LINE__);
         } else {
             if (
-                $person === false && $article['OnlyForMembers'] === 0
+                $person === false && $article->OnlyForMembers === 0
                 || ($person
-                    && ($article['OnlyForMembers'] === 1
-                        || $article['IdGroup'] == null
-                        || !empty(array_intersect([$article['IdGroup']], $this->getUserGroups($person['Email'])))
+                    && ($article->OnlyForMembers === 1
+                        || $article->IdGroup == null
+                        || !empty(array_intersect([$article->IdGroup], $this->getUserGroups($person->Email)))
                     )
                 )
             ) {
-                $articleIds = $this->getArticleIdsBasedOnAccess($person['Email'] ?? null);
+                $articleIds = $this->getArticleIdsBasedOnAccess($person->Email ?? null);
                 $chosenArticle = $this->getLatestArticle([$id]);
                 $canEdit = false;
                 if ($person && $chosenArticle) {
-                    $canEdit = ($person && $person['Id'] == $chosenArticle->CreatedBy);
+                    $canEdit = ($person && $person->Id == $chosenArticle->CreatedBy);
                 }
 
                 $messages = [];
@@ -193,7 +192,7 @@ class ArticleController extends TableController
         if ($person = $this->getPerson(['Redactor'])) {
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $article = $this->getLatestArticle([$id]);
-                if (!$article || $person['Id'] != $article->CreatedBy) {
+                if (!$article || $person->Id != $article->CreatedBy) {
                     $this->application->error403(__FILE__, __LINE__);
                     return;
                 }
@@ -209,7 +208,7 @@ class ArticleController extends TableController
                 }
 
                 $query = $this->pdo->prepare("UPDATE Article SET Title = ?, Content = ?, PublishedBy = ?, IdGroup = ?, OnlyForMembers = ?, LastUpdate = ? WHERE Id = ?");
-                $result = $query->execute([$title, $content, $published == 1 ? $person['Id'] : NULL, $idGroup, $membersOnly, date('Y-m-d H:i:s'), $id]);
+                $result = $query->execute([$title, $content, $published == 1 ? $person->Id : NULL, $idGroup, $membersOnly, date('Y-m-d H:i:s'), $id]);
                 if ($result) {
                     $_SESSION['success'] = "L'article a été mis à jour avec succès";
                     (new Backup())->save();
@@ -230,14 +229,14 @@ class ArticleController extends TableController
         if ($person = $this->getPerson(['Editor'])) {
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $article = $this->getLatestArticle([$id]);
-                if (!$article || ($person['Id'] != $article->CreatedBy && !$this->authorizations->isEditor())) {
+                if (!$article || ($person->Id != $article->CreatedBy && !$this->authorizations->isEditor())) {
                     $this->application->error403(__FILE__, __LINE__);
                     return;
                 }
                 $published = $_POST['published'] ?? 0;
 
                 $query = $this->pdo->prepare("UPDATE Article SET PublishedBy = ?, LastUpdate = ?  WHERE Id = ?");
-                $result = $query->execute([$published == 1 ? $person['Id'] : NULL, date('Y-m-d H:i:s'), $id]);
+                $result = $query->execute([$published == 1 ? $person->Id : NULL, date('Y-m-d H:i:s'), $id]);
                 if ($result) {
                     $_SESSION['success'] = "L'article a été mis à jour avec succès";
                     (new Backup())->save();
@@ -262,7 +261,7 @@ class ArticleController extends TableController
         if ($person = $this->getPerson(['Redactor'])) {
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $query = $this->pdo->prepare("INSERT INTO Article (Title, Content, CreatedBy) VALUES ('', '', ?)");
-                $query->execute([$person['Id']]);
+                $query->execute([$person->Id]);
                 $id = $this->pdo->lastInsertId();
                 $this->flight->redirect('/articles/' . $id);
             } else {
@@ -278,7 +277,7 @@ class ArticleController extends TableController
         if ($person = $this->getPerson(['Redactor'])) {
             if (($_SERVER['REQUEST_METHOD'] === 'GET')) {
                 $article = $this->getLatestArticle([$id]);
-                if (!$article || $person['Id'] != $article->CreatedBy) {
+                if (!$article || $person->Id != $article->CreatedBy) {
                     $this->application->error403(__FILE__, __LINE__);
                     return;
                 }
@@ -384,7 +383,7 @@ class ArticleController extends TableController
             ORDER BY Article.LastUpdate DESC 
             LIMIT 1");
         $query->execute($articleIds);
-        return $query->fetch(PDO::FETCH_OBJ) ?: null;
+        return $query->fetch() ?: null;
     }
 
     private function getLatestArticleTitles(array $articleIds): array
@@ -398,44 +397,17 @@ class ArticleController extends TableController
             ORDER BY Article.LastUpdate DESC 
             LIMIT 10");
         $query->execute($articleIds);
-        return $query->fetchAll(PDO::FETCH_OBJ) ?: [];
+        return $query->fetchAll() ?: [];
     }
 
     private function getArticle($id)
     {
         $query = $this->pdo->prepare("
-        SELECT a.*, p.FirstName, p.LastName, p.NickName
-        FROM Article a
-        LEFT JOIN Person p ON a.CreatedBy = p.Id
-        WHERE a.Id = ?");
+            SELECT a.*, p.FirstName, p.LastName, p.NickName
+            FROM Article a
+            LEFT JOIN Person p ON a.CreatedBy = p.Id
+            WHERE a.Id = ?");
         $query->execute([$id]);
-        return $query->fetch(PDO::FETCH_ASSOC);
-    }
-
-    private function canPersonReadSurveyResults($article, $person)
-    {
-        $survey = $this->fluent->from('Survey')->where('IdArticle', $article->Id)->fetch();
-        if (!$survey || !$person) {
-            return false;
-        }
-
-        $now = (new DateTime())->format('Y-m-d');
-        $closingDate = $survey['ClosingDate'];
-
-        if (
-            $article->CreatedBy == $person['Id']
-            || $survey['Visibility'] == 'all'
-            || $survey['Visibility'] == 'allAfterClosing' && $closingDate < $now
-        ) {
-            return true;
-        }
-
-        $stmt = $this->pdo->prepare('SELECT COUNT(*) FROM Reply WHERE IdSurvey = ? AND IdPerson = ?');
-        $stmt->execute([$survey['Id'], $person['Id']]);
-        $hasVoted = $stmt->fetchColumn() > 0;
-        if ($hasVoted && ($survey['Visibility'] == 'voters' || ($survey['Visibility'] == 'votersAfterClosing' && $closingDate < $now))) {
-            return true;
-        }
-        return false;
+        return $query->fetch();
     }
 }

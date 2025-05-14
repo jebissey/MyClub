@@ -48,7 +48,7 @@ class Message
             
             $query = $this->pdo->prepare('SELECT PersonId FROM Message WHERE Id = ?');
             $query->execute([$messageId]);
-            $message = $query->fetch(PDO::FETCH_ASSOC);
+            $message = $query->fetch();
             if (!$message || $message['PersonId'] != $personId) {
                 throw new \Exception("Vous n'êtes pas autorisé à modifier ce message");
             }
@@ -71,7 +71,7 @@ class Message
             
             $query = $this->pdo->prepare('SELECT PersonId FROM Message WHERE Id = ?');
             $query->execute([$messageId]);
-            $message = $query->fetch(PDO::FETCH_ASSOC);
+            $message = $query->fetch();
             
             if (!$message || $message['PersonId'] != $personId) {
                 throw new \Exception("Vous n'êtes pas autorisé à supprimer ce message");

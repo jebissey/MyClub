@@ -54,7 +54,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                  <form id="addCounterForm" method="post">
+                  <form id="addCounterForm" method="post" action="/arwards">
                     <div class="mb-3">
                         <label for="counterName" class="form-label">Nom du compteur</label>
                         <select class="form-select" id="counterName" name="name" required>
@@ -81,7 +81,7 @@
                         <select class="form-select" id="counterGroup" name="idGroup" required>
                         <option value="" selected disabled>Choisir un groupe</option>
                         {foreach $groups as $group}
-                            <option value="{$group['Id']}">{$group['Name']}</option>
+                            <option value="{$group->Id}">{$group->Name}</option>
                         {/foreach}
                         </select>
                     </div>

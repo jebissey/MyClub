@@ -30,12 +30,12 @@ class DesignController extends BaseController
                 LEFT JOIN DesignVote dv ON d.Id = dv.IdDesign
                 JOIN Person p ON d.IdPerson = p.Id
                 GROUP BY d.Id";
-            $designs = $this->pdo->query($query)->fetchAll(PDO::FETCH_ASSOC);
+            $designs = $this->pdo->query($query)->fetchAll();
 
             $userVotes = [];
-            $votes = $this->fluent->from('DesignVote')->where('IdPerson', $person['Id'])->fetchAll();
+            $votes = $this->fluent->from('DesignVote')->where('IdPerson', $person->Id)->fetchAll();
             foreach ($votes as $vote) {
-                $userVotes[$vote['IdDesign']] = $vote['Vote'];
+                $userVotes[$vote->IdDesign] = $vote->Vote;
             }
 
             $this->latte->render('app/views/designs/index.latte', $this->params->getAll([
@@ -64,7 +64,7 @@ class DesignController extends BaseController
         if ($person = $this->getPerson(['Redactor'])) {
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $values = [
-                    'IdPerson' => $person['Id'],
+                    'IdPerson' => $person->Id,
                     'Name' => $_POST['name'] ?? '',
                     'Detail' => $_POST['detail'] ?? '',
                     'NavBar' => $_POST['navbar'] ?? '',

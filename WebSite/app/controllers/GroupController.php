@@ -28,7 +28,7 @@ class GroupController extends BaseController implements CrudControllerInterface
                 $having
                 ORDER BY g.Name
             ");
-            $groups = $query->fetchAll(PDO::FETCH_ASSOC);
+            $groups = $query->fetchAll();
             echo $this->latte->render('app/views/groups/index.latte', $this->params->getAll([
                 'groups' => $groups,
                 'layout' => $this->getLayout()
@@ -42,9 +42,7 @@ class GroupController extends BaseController implements CrudControllerInterface
     {
         if ($this->getPerson(['PersonManager', 'Webmaster'])) {
 
-            $query = $this->pdo->query('SELECT * FROM "Authorization"');
-            $availableAuthorizations = $query->fetchAll(PDO::FETCH_ASSOC);
-
+            $availableAuthorizations = $this->fluent->from('Authorization')->fetchAll();
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $name = isset($_POST['name']) ? $this->sanitizeInput($_POST['name']) : '';
                 $selfRegistration = isset($_POST['selfRegistration']) ? 1 : 0;

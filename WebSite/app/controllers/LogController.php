@@ -51,12 +51,12 @@ class LogController extends BaseController
 
             $query = $this->pdoForLog->prepare("SELECT COUNT(*) as total FROM Log $where");
             $query->execute($params);
-            $total = $query->fetch(PDO::FETCH_ASSOC)['total'];
+            $total = $query->fetch()->total;
 
             $query = $this->pdoForLog->prepare("SELECT * FROM Log $where ORDER BY CreatedAt DESC LIMIT ? OFFSET ?");
             $allParams = array_merge($params, [$perPage, $offset]);
             $query->execute($allParams);
-            $logs = $query->fetchAll(PDO::FETCH_ASSOC);
+            $logs = $query->fetchAll();
 
             $totalPages = ceil($total / $perPage);
 
@@ -125,14 +125,14 @@ class LogController extends BaseController
         }
 
         $query = $this->pdoForLog->query('SELECT MIN(CreatedAt) as first, MAX(CreatedAt) as last FROM Log');
-        $range = $query->fetch(PDO::FETCH_ASSOC);
+        $range = $query->fetch();
 
         return [
-            'first' => (new DateTime($range['first']))->format('Y-m-d'),
+            'first' => (new DateTime($range->first))->format('Y-m-d'),
             'prev' => $prev->format('Y-m-d'),
             'current' => $date->format('Y-m-d'),
             'next' => $next->format('Y-m-d'),
-            'last' => (new DateTime($range['last']))->format('Y-m-d')
+            'last' => (new DateTime($range->last))->format('Y-m-d')
         ];
     }
 
@@ -189,7 +189,7 @@ class LogController extends BaseController
             'end_date' => $endDate->format('Y-m-d H:i:s')
         ]);
 
-        return $query->fetchAll(PDO::FETCH_ASSOC);
+        return $query->fetchAll();
     }
 
     private function getExternalRefererStats(string $period, string $currentDate): array
@@ -231,7 +231,7 @@ class LogController extends BaseController
             'end_date' => $endDate->format('Y-m-d H:i:s')
         ]);
 
-        return $query->fetchAll(PDO::FETCH_ASSOC);
+        return $query->fetchAll();
     }
 
 
@@ -280,7 +280,7 @@ class LogController extends BaseController
                 ':startDate' => $startDate,
                 ':endDate' => $endDate
             ]);
-            $uniqueVisitors = $uniqueVisitorsQuery->fetch(PDO::FETCH_ASSOC)['count'] ?? 0;
+            $uniqueVisitors = $uniqueVisitorsQuery->fetch()->count ?? 0;
 
             $pageViewsQuery = $this->pdoForLog->prepare("
                 SELECT COUNT(*) as count
@@ -291,7 +291,7 @@ class LogController extends BaseController
                 ':startDate' => $startDate,
                 ':endDate' => $endDate
             ]);
-            $pageViews = $pageViewsQuery->fetch(PDO::FETCH_ASSOC)['count'] ?? 0;
+            $pageViews = $pageViewsQuery->fetch()->count ?? 0;
 
             $result[] = [
                 'label' => $this->formatPeriodLabel($period, $periodType),
@@ -429,7 +429,7 @@ class LogController extends BaseController
         }
     }
 
-
+    #region Analytics
     public function analytics()
     {
         if ($this->getPerson(['Webmaster'])) {
@@ -459,8 +459,8 @@ class LogController extends BaseController
         $data = [];
 
         foreach ($results as $row) {
-            $labels[] = $row['Os'] ?: 'Inconnu';
-            $data[] = $row['count'];
+            $labels[] = $row->Os ?: 'Inconnu';
+            $data[] = $row->count;
         }
         return [
             'labels' => $labels,
@@ -492,13 +492,13 @@ class LogController extends BaseController
             WHERE rest = '' OR SUBSTR(rest, 0, INSTR(rest, ' ')) GLOB '[0-9]*'
             GROUP BY word
             ORDER BY count DESC");
-        $results = $query->fetchAll(PDO::FETCH_ASSOC);
+        $results = $query->fetchAll();
 
         $labels = [];
         $data = [];
         foreach ($results as $row) {
-            $labels[] = $row['Browser'] ?? 'Inconnu';
-            $data[] = $row['count'];
+            $labels[] = $row->Browser ?? 'Inconnu';
+            $data[] = $row->count;
         }
 
         return [
@@ -521,8 +521,8 @@ class LogController extends BaseController
         $data = [];
 
         foreach ($results as $row) {
-            $labels[] = $row['ScreenResolution'] ?: 'Inconnu';
-            $data[] = $row['count'];
+            $labels[] = $row->ScreenResolution ?: 'Inconnu';
+            $data[] = $row->count;
         }
 
         return [
@@ -545,8 +545,8 @@ class LogController extends BaseController
         $data = [];
 
         foreach ($results as $row) {
-            $labels[] = $row['Type'] ?: 'Inconnu';
-            $data[] = $row['count'];
+            $labels[] = $row->Type ?: 'Inconnu';
+            $data[] = $row->count;
         }
 
         return [
@@ -554,7 +554,7 @@ class LogController extends BaseController
             'data' => $data
         ];
     }
-
+    #endregion
 
     const TOP = 50;
     public function topPagesByPeriod()
@@ -599,7 +599,7 @@ class LogController extends BaseController
     {
         if ($this->getPerson(['Redactor'])) {
             $period = $_GET['period'] ?? 'week';
-    
+
             $dateCondition = '';
             switch ($period) {
                 case 'today':
@@ -614,7 +614,7 @@ class LogController extends BaseController
                 default:
                     $dateCondition = "1=1";
             }
-    
+
             $query = $this->fluentForLog
                 ->from('Log')
                 ->select('
@@ -634,7 +634,7 @@ class LogController extends BaseController
                 ->groupBy('Uri')
                 ->orderBy('visits DESC')
                 ->limit(self::TOP);
-    
+
             $this->latte->render('app/views/logs/topArticles.latte', $this->params->getAll([
                 'title' => 'Top des articles visités par période',
                 'period' => $period,
@@ -652,7 +652,7 @@ class LogController extends BaseController
             $uriFilter = $_GET['uri'] ?? '';
             $emailFilter = $_GET['email'] ?? '';
             $groupFilter = $_GET['group'] ?? '';
-            $period = $_GET['period'] ?? 'week';
+            $period = $_GET['period'] ?? 'today';
             $dateCondition = '';
             switch ($period) {
                 case 'yesterday':
@@ -713,11 +713,11 @@ class LogController extends BaseController
             }
             $stmt = $this->pdo->prepare($sql);
             $stmt->execute($params);
-            $persons = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $persons = $stmt->fetchAll();
 
             $stmt = $this->pdo->prepare('SELECT Id, Name FROM "Group" WHERE Inactivated = 0 ORDER BY Name');
             $stmt->execute();
-            $groups = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $groups = $stmt->fetchAll();
 
             $crossTabData = [];
             $columnTotals = [];
@@ -725,8 +725,8 @@ class LogController extends BaseController
             $grandTotal = 0;
             $personEmails = [];
             foreach ($persons as $person) {
-                $personEmails[] = $person['Email'];
-                $columnTotals[$person['Email']] = 0;
+                $personEmails[] = $person->Email;
+                $columnTotals[$person->Email] = 0;
             }
             $placeholders = rtrim(str_repeat('?,', count($personEmails)), ',');
 
@@ -740,13 +740,13 @@ class LogController extends BaseController
                         WHERE URI = ? AND Who IN($placeholders) AND $dateCondition GROUP BY Who");
                     $params = array_merge([$uri], $personEmails);
                     $stmt->execute($params);
-                    $counts = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                    $counts = $stmt->fetchAll();
                     foreach ($counts as $count) {
-                        if (!empty($count['Who'])) {
-                            $uriVisits[$count['Who']] = $count['visit_count'];
-                            $rowTotal += $count['visit_count'];
-                            $columnTotals[$count['Who']] += $count['visit_count'];
-                            $grandTotal += $count['visit_count'];
+                        if (!empty($count->Who)) {
+                            $uriVisits[$count->Who] = $count->visit_count;
+                            $rowTotal += $count->visit_count;
+                            $columnTotals[$count->Who] += $count->visit_count;
+                            $grandTotal += $count->visit_count;
                         }
                     }
                 }
@@ -766,7 +766,7 @@ class LogController extends BaseController
 
             $personsAssoc = [];
             foreach ($persons as $person) {
-                $personsAssoc[$person["Email"]] = $person;
+                $personsAssoc[$person->Email] = $person;
             }
             $filteredPersons = [];
             $filteredColumnTotals = [];

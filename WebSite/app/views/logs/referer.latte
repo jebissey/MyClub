@@ -39,8 +39,8 @@
                     <tbody>
                     {foreach $control->getRefererStats($period, $currentDate) as $row}
                         <tr>
-                            <td>{$row[source] ?? ''}</td>
-                            <td class="text-end">{number_format($row[count], 0, ',', ' ')}</td>
+                            <td>{$row->source ?? ''}</td>
+                            <td class="text-end">{number_format($row->count, 0, ',', ' ')}</td>
                         </tr>
                     {/foreach}
 
@@ -48,8 +48,8 @@
                         <tr><td colspan="2" class="border-top"></td></tr>
                         {foreach $externalRefs as $row}
                             <tr>
-                                <td>{$row[source]}</td>
-                                <td class="text-end">{number_format($row[count], 0, ',', ' ')}</td>
+                                <td>{$row->source}</td>
+                                <td class="text-end">{number_format($row->count, 0, ',', ' ')}</td>
                             </tr>
                         {/foreach}
                     {/if}

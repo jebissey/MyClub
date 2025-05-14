@@ -76,7 +76,7 @@ class RegistrationController extends TableController
                 ");
             }
             $query->execute([$personId]);
-            $currentGroups = $query->fetchAll(PDO::FETCH_ASSOC);
+            $currentGroups = $query->fetchAll();
 
             $availableGroupsWithoutAuthorisationQuery = "
                 SELECT 
@@ -125,7 +125,7 @@ class RegistrationController extends TableController
                 )
             ");
             $availableGroupsLeftQuery->execute([$personId]);
-            $availableGroups = $availableGroupsLeftQuery->fetchAll(PDO::FETCH_ASSOC);
+            $availableGroups = $availableGroupsLeftQuery->fetchAll();
 
             echo $this->latte->render('app/views/registration/groups.latte', $this->params->getAll([
                 'currentGroups' => $currentGroups,

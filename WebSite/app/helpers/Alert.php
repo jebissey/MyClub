@@ -26,25 +26,24 @@ class Alert
         ORDER BY a.StartDate DESC
     ";
 
-        return $this->pdo->query($query)->fetchAll(PDO::FETCH_ASSOC);
+        return $this->pdo->query($query)->fetchAll();
     }
 
     public function getAlertById($id)
     {
         $query = "
-        SELECT a.*, 
-               p.FirstName, p.LastName, p.NickName, 
-               g.Name as GroupName
-        FROM Alert a
-        JOIN Person p ON a.CreatedBy = p.Id
-        JOIN 'Group' g ON a.IdGroup = g.Id
-        WHERE a.Id = :id
-    ";
-
+            SELECT a.*, 
+                p.FirstName, p.LastName, p.NickName, 
+                g.Name as GroupName
+            FROM Alert a
+            JOIN Person p ON a.CreatedBy = p.Id
+            JOIN 'Group' g ON a.IdGroup = g.Id
+            WHERE a.Id = :id
+        ";
         $stmt = $this->pdo->prepare($query);
         $stmt->execute(['id' => $id]);
 
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+        return $stmt->fetch();
     }
 
     public function createAlert($createdBy, $groupId, $message, $type, $startDate, $endDate, $onlyForMembers)
@@ -117,7 +116,7 @@ class Alert
             AND r.Id IS NULL
         ORDER BY s.ClosingDate, p.LastName, p.FirstName";
 
-        return $this->pdo->query($query)->fetchAll(PDO::FETCH_ASSOC);
+        return $this->pdo->query($query)->fetchAll();
     }
 
     public function getPendingDesignResponses()
@@ -137,6 +136,6 @@ class Alert
             AND dv.Id IS NULL
         ORDER BY d.LastUpdate";
 
-        return $this->pdo->query($query)->fetchAll(PDO::FETCH_ASSOC);
+        return $this->pdo->query($query)->fetchAll();
     }
 }
