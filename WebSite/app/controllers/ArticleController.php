@@ -147,7 +147,8 @@ class ArticleController extends TableController
                 || ($person
                     && ($article->OnlyForMembers === 1
                         || $article->IdGroup == null
-                        || !empty(array_intersect([$article->IdGroup], $this->getUserGroups($person->Email)))
+                        || !empty(array_intersect([$article->IdGroup], $this->getUserGroups($person->Email))
+                        || $article->CreatedBy == $person->Id)
                     )
                 )
             ) {

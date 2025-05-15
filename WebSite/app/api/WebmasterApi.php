@@ -85,8 +85,8 @@ class WebmasterApi extends BaseController
                 $counts = [];
 
                 foreach ($results as $row) {
-                    $dates[] = $row['date'];
-                    $counts[] = $row['count'];
+                    $dates[] = $row->date;
+                    $counts[] = $row->count;
                 }
 
                 header('Content-Type: application/json');
