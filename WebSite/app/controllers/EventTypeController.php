@@ -100,8 +100,8 @@ class EventTypeController extends TableController implements CrudControllerInter
                     $existingAttributes = $existingAttributesQuery->fetchAll(PDO::FETCH_COLUMN);
 
                     echo $this->latte->render('app/views/eventType/edit.latte', $this->params->getAll([
-                        'name' => $eventType['Name'],
-                        'idGroup' => $eventType['IdGroup'],
+                        'name' => $eventType->Name,
+                        'idGroup' => $eventType->IdGroup,
                         'groups' => $this->fluent->from('`Group`')->where('Inactivated', 0)->orderBy('Name')->fetchAll(),
                         'attributes' => $this->fluent->from('Attribute')->orderBy('Name')->fetchAll(),
                         'existingAttributes' => $existingAttributes

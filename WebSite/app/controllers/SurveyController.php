@@ -72,7 +72,7 @@ class SurveyController extends BaseController
 
     public function viewResults($articleId)
     {
-        if ($person = $this->getPerson(['Redactor'])) {
+        if ($person = $this->getPerson([])) {
             $survey = $this->fluent->from('Survey')->join('Article ON Survey.IdArticle = Article.Id')->where('IdArticle', $articleId)->select('Article.CreatedBy')->fetch();
             if (!$survey) {
                 $this->flight->redirect('/articles/' . $articleId);

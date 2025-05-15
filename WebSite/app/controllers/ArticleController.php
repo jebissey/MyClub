@@ -401,12 +401,11 @@ class ArticleController extends TableController
 
     private function getArticle($id)
     {
-        $query = $this->pdo->prepare("
-            SELECT a.*, p.FirstName, p.LastName, p.NickName
-            FROM Article a
-            LEFT JOIN Person p ON a.CreatedBy = p.Id
-            WHERE a.Id = ?");
-        $query->execute([$id]);
-        return $query->fetch();
+        return $this->fluent
+            ->from('Article a')
+            ->leftJoin('Person p ON a.CreatedBy = p.Id')
+            ->select('a.*, p.FirstName, p.LastName, p.NickName')
+            ->where('a.Id', $id)
+            ->fetch();
     }
 }

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Carte de visite MyClub</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f8f9fa;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .card {
+      width: 85mm;
+      height: 110mm;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .top-half {
+      height: 50%;
+      padding: 16px;
+      position: relative;
+      border-bottom: 2px solid #003366;
+    }
+    .bottom-half {
+      height: 50%;
+      padding: 16px;
+      position: relative;
+    }
+    .logo-bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      opacity: 0.4;
+      width: 100%;
+      height: 100%;
+      background: url('https://raw.githubusercontent.com/jebissey/MyClub/main/WebSite/app/images/logo.png') center/60% no-repeat;
+      z-index: 0;
+    }
+    .content {
+      position: relative;
+      z-index: 1;
+    }
+    .title {
+      font-size: 1.5em;
+      font-weight: bold;
+      color: #003366;
+      margin-bottom: 4px;
+    }
+    .subtitle {
+      font-size: 0.9em;
+      color: #333;
+      margin-bottom: 12px;
+    }
+    ul {
+      padding-left: 20px;
+      font-size: 0.85em;
+      margin-bottom: 12px;
+      color: #003366;
+    }
+    ul li::marker {
+      content: "➤ ";
+      color: #007BFF;
+    }
+    .contact {
+      font-size: 1.2em;
+      color: #000;
+      margin-bottom: 8px;
+    }
+    .qrcode {
+      position: absolute;
+      bottom: 3px;
+      right: 10px;
+      width: 60px;
+      height: 60px;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="top-half">
+      <div class="content">
+        <div class="title">MyClub</div>
+        <div class="subtitle">Webapp open source pour les associations.</div>
+        <ul>
+          <li>Gestion des adhérents</li>
+          <li>Planification des activités, événements</li>
+          <li>Communication interne</li>
+          <li>Rédaction d'articles</li>
+          <li>Nombreux tableaux de bords</li>
+          <li>Entièrement paramétrable</li>
+        </ul>
+      </div>
+    </div>
+    <div class="bottom-half">
+      <div class="logo-bg"></div>
+      <div class="content">
+        <div class="contact">JEB<br/>je.bissey@gmail.com</div>
+        <img class="qrcode" src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=https://github.com/jebissey/MyClub" alt="QR Code">
+      </div>
+    </div>
+  </div>
+</body>
+</html>

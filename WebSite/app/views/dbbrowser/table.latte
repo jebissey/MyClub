@@ -64,14 +64,14 @@
                     {foreach $records as $record}
                     <tr>
                         {foreach $columns as $column}
-                        <td class="col-max">{$record[$column]}</td>
+                        <td class="col-max">{$record->$column}</td>
                         {/foreach}
                         <td class="text-nowrap">
-                            <a href="/dbbrowser/{$table}/edit/{$record[$primaryKey]}" class="btn btn-sm btn-primary">
+                            <a href="/dbbrowser/{$table}/edit/{$record->$primaryKey}" class="btn btn-sm btn-primary">
                                 <i class="fas fa-edit"></i> Modifier
                             </a>
                             <button type="button" class="btn btn-sm btn-danger" 
-                                    onclick="confirmDelete({$table}, {$record[$primaryKey]})">
+                                    onclick="confirmDelete({$table}, {$record->$primaryKey})">
                                 <i class="fas fa-trash"></i> Supprimer
                             </button>
                         </td>

@@ -257,6 +257,17 @@ $flight->route('POST   /api/registration/add/@personId/@groupId',    function($p
 $flight->route('POST   /api/registration/remove/@personId/@groupId', function($personId, $groupId) use ($webmasterApi) { $webmasterApi->removeFromGroup($personId, $groupId); });
 /* #endregion */
 
+$flight->route('/webCard', function() {
+    $path = __DIR__ . '/app/images/businessCard.html';
+    if (file_exists($path)) {
+        header('Content-Type: text/html; charset=UTF-8');
+        readfile($path);
+        exit;
+    } else {
+        Flight::halt(404, 'Fichier HTML non trouvé');
+    }
+});
+
 $flight->route('/favicon.ico', function() {
     $path = __DIR__ . '/app/images/favicon.ico';
     if (file_exists($path)) {

@@ -265,7 +265,7 @@ class DbBrowserController extends BaseController
                 'type' => $row->type,
                 'notnull' => $row->notnull,
                 'dflt_value' => $row->dflt_value,
-                'pk' => $row['pk']
+                'pk' => $row->pk
             ];
         }
 

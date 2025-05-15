@@ -19,7 +19,7 @@
 {block content}
     <div class="container-fluid mt-4">
         <div class="row">
-            <div class="col-md-6">
+            <div class="col-12">
                 <h3>Navigation Items</h3>
                 <table class="table table-striped table-hover align-middle">
                     <thead>
@@ -43,10 +43,10 @@
                                 {/if}
                             </td>
                             <td class="text-center">
-                                <input type="checkbox" class="form-check-input" {if $item['ForMembers']}checked{/if} disabled>
+                                <input type="checkbox" class="form-check-input" {if $item->ForMembers}checked{/if} disabled>
                             </td>
                             <td class="text-center">
-                                <input type="checkbox" class="form-check-input" {if $item['ForAnonymous']}checked{/if} disabled>
+                                <input type="checkbox" class="form-check-input" {if $item->ForAnonymous}checked{/if} disabled>
                             </td>
                             <td class="text-end">
                                 <button class="btn btn-sm btn-primary edit-btn">

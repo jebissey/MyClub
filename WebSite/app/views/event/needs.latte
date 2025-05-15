@@ -30,16 +30,16 @@
                             <tbody>
                                 {foreach $needTypes as $type}
                                 <tr>
-                                    <td>{$type['Name']}</td>
+                                    <td>{$type->Name}</td>
                                     <td>
                                         <button type="button" class="btn btn-sm btn-primary edit-need-type" 
-                                                data-id="{$type['Id']}" 
-                                                data-name="{$type['Name']}">
+                                                data-id="{$type->Id}" 
+                                                data-name="{$type->Name}">
                                             <i class="bi bi-pencil"></i>
                                         </button>
                                         <button type="button" class="btn btn-sm btn-danger delete-need-type"
-                                                data-id="{$type['Id']}" 
-                                                data-name="{$type['Name']}">
+                                                data-id="{$type->Id}" 
+                                                data-name="{$type->Name}">
                                             <i class="bi bi-trash"></i>
                                         </button>
                                     </td>

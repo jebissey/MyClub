@@ -4,14 +4,14 @@
             <h4>Publication de l'article</h4>
             <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title">{$article['Title']}</h5>
+                    <h5 class="card-title">{$article->Title}</h5>
                     <p class="card-text">
-                        <strong>Créé par :</strong> {$article['FirstName']} {$article['LastName']} {$article['NickName'] ? "({$article['NickName']})" : ''}
+                        <strong>Créé par :</strong> {$article->FirstName} {$article->LastName} {$article->NickName ? "({$article->NickName})" : ''}
                     </p>
                     <div class="form-check form-switch mt-3">
-                        <input class="form-check-input" type="checkbox" id="published" name="published" value="1" {if $article['PublishedBy']}checked{/if}>
+                        <input class="form-check-input" type="checkbox" id="published" name="published" value="1" {if $article->PublishedBy}checked{/if}>
                         <label class="form-check-label" for="published">
-                            {if $article['PublishedBy']}
+                            {if $article->PublishedBy}
                                 Article publié
                             {else}
                                 Publier cet article
