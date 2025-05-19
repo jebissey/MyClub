@@ -1,6 +1,6 @@
 === Détail par fichier ===
      1 ../WebSite/phpinfo.php
-   280 ../WebSite/index.php
+   297 ../WebSite/index.php
     65 ../WebSite/app/views/dbbrowser/edit.latte
     43 ../WebSite/app/views/dbbrowser/index.latte
    146 ../WebSite/app/views/dbbrowser/table.latte
@@ -49,7 +49,7 @@
     13 ../WebSite/app/views/admin/webmaster.latte
      4 ../WebSite/app/views/admin/admin.latte
     70 ../WebSite/app/views/survey/add.latte
-    55 ../WebSite/app/views/survey/results.latte
+    87 ../WebSite/app/views/survey/results.latte
    124 ../WebSite/app/views/user/presentation.latte
    142 ../WebSite/app/views/user/ffaSearch.latte
      4 ../WebSite/app/views/user/user.latte
@@ -64,7 +64,7 @@
     29 ../WebSite/app/views/user/publish.latte
    106 ../WebSite/app/views/user/account.latte
    103 ../WebSite/app/views/user/directory.latte
-   173 ../WebSite/app/views/user/article.latte
+   208 ../WebSite/app/views/user/article.latte
    237 ../WebSite/app/views/user/statistics.latte
    100 ../WebSite/app/views/media/list.latte
     69 ../WebSite/app/views/media/gpxViewer.latte
@@ -76,6 +76,7 @@
     97 ../WebSite/app/views/import/form.latte
    133 ../WebSite/app/views/alerts/index.latte
    215 ../WebSite/app/api/WebmasterApi.php
+   153 ../WebSite/app/api/CarouselApi.php
    292 ../WebSite/app/api/ArticleApi.php
    566 ../WebSite/app/api/EventApi.php
    121 ../WebSite/app/controllers/EmailController.php
@@ -91,9 +92,9 @@
    200 ../WebSite/app/controllers/EventController.php
    150 ../WebSite/app/controllers/ImportController.php
    322 ../WebSite/app/controllers/PersonController.php
-   799 ../WebSite/app/controllers/LogController.php
+   382 ../WebSite/app/controllers/LogController.php
    139 ../WebSite/app/controllers/RegistrationController.php
-   413 ../WebSite/app/controllers/ArticleController.php
+   412 ../WebSite/app/controllers/ArticleController.php
     44 ../WebSite/app/controllers/TableController.php
     89 ../WebSite/app/controllers/AlertController.php
     85 ../WebSite/app/controllers/DesignController.php
@@ -116,6 +117,7 @@
    127 ../WebSite/app/js/admin/arwards.js
     39 ../WebSite/app/js/survey/add.js
     75 ../WebSite/app/js/user/preferences.js
+   326 ../WebSite/app/js/user/carousel.js
     27 ../WebSite/app/js/user/availabilities.js
     22 ../WebSite/app/js/user/presentation.js
     55 ../WebSite/app/js/user/map.js
@@ -144,15 +146,16 @@
    428 ../WebSite/app/helpers/PersonStatistics.php
    133 ../WebSite/app/helpers/Application.php
     38 ../WebSite/app/helpers/BaseHelper.php
-   261 ../WebSite/app/helpers/Article.php
+   255 ../WebSite/app/helpers/Article.php
+   520 ../WebSite/app/helpers/Log.php
     14 ../WebSite/app/helpers/Params.php
    115 ../WebSite/app/helpers/Event.php
- 16473 total
+ 17132 total
 
 === Total par type de fichier ===
 Fichiers PHP :
-7728
+7994
 Fichiers Latte :
-6074
+6141
 Fichiers Javascript :
-2671
+2997

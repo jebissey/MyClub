@@ -224,6 +224,12 @@ $flight->route('POST /api/media/upload',                        function()      
 $flight->route('POST /api/surveys/reply',     function()    use ($articleApi) { $articleApi->saveSurveyReply(); });
 $flight->route('GET  /api/surveys/reply/@id', function($id) use ($articleApi) { $articleApi->showSurveyReplyForm($id); });
 
+use app\api\CarouselApi;
+$carouselApi = new carouselApi($container->get(PDO::class), $container->get(Engine::class));
+$flight->route('GET  /api/carousel/@articleId', function($articleId) use ($carouselApi) { $carouselApi->getItems($articleId); });
+$flight->route('POST /api/carousel/save',       function()           use ($carouselApi) { $carouselApi->saveItem(); });
+$flight->route('POST /api/carousel/delete/@id', function($id)        use ($carouselApi) { $carouselApi->deleteItem($id); });
+
 use app\api\EventApi;
 $eventApi = new EventApi($container->get(PDO::class), $container->get(Engine::class));
 $flight->route('POST   /api/attributes/create',            function()    use ($eventApi) { $eventApi->createAttribute(); });

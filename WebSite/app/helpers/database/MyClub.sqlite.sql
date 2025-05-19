@@ -40,6 +40,13 @@ CREATE TABLE IF NOT EXISTS "Authorization" (
 	"Name"	TEXT NOT NULL,
 	PRIMARY KEY("Id")
 );
+CREATE TABLE IF NOT EXISTS "Carousel" (
+	"Id"	INTEGER,
+	"IdArticle"	INTEGER NOT NULL,
+	"Item"	TEXT NOT NULL,
+	PRIMARY KEY("Id"),
+	FOREIGN KEY("IdArticle") REFERENCES "Article"("Id")
+);
 CREATE TABLE IF NOT EXISTS "Contact" (
 	"Id"	INTEGER,
 	"Email"	TEXT NOT NULL,

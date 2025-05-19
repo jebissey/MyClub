@@ -202,9 +202,8 @@ abstract class BaseController extends BaseHelper
         if ($id == null) {
             return null;
         }
-        $query = $this->pdo->prepare('SELECT FirstName, LastName FROM Person  WHERE Id = ?');
-        $query->execute([$id]);
-        $person = $query->fetch();
+        $person = $this->fluent->from('Person')->select('FirstName, LastName')->where('Id', $id)->fetch();
+
         return "publié par " . $person->FirstName . " " . $person->LastName;
     }
 
@@ -255,6 +254,7 @@ abstract class BaseController extends BaseHelper
         }
         return false;
     }
+
 
     private function getHref($userEmail)
     {

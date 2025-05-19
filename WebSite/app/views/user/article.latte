@@ -12,6 +12,7 @@
     <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
     <link href="/app/css/quill.css" rel="stylesheet">
 {/if}
+    <link href="/app/css/carousel.css" rel="stylesheet">
 {/block}
 
 {block content}
@@ -77,6 +78,39 @@
                     {$chosenArticle->Content|noescape}
                 </div>
                 
+                {if !empty($carouselItems)}
+                <div class="mt-4">
+                    <h4>Galerie</h4>
+                    <div id="articleCarousel" class="carousel slide" data-bs-ride="carousel">
+                        <!-- Carousel indicators -->
+                        <div class="carousel-indicators">
+                            {foreach $carouselItems as $index => $item}
+                                <button type="button" data-bs-target="#articleCarousel" data-bs-slide-to="{$index}" {if $index === 0}class="active" aria-current="true"{/if} aria-label="Slide {$index + 1}"></button>
+                            {/foreach}
+                        </div>
+                        
+                        <!-- Carousel items -->
+                        <div class="carousel-inner">
+                            {foreach $carouselItems as $index => $item}
+                                <div class="carousel-item {if $index === 0}active{/if}">
+                                    {$item->Item|noescape}
+                                </div>
+                            {/foreach}
+                        </div>
+                        
+                        <!-- Carousel controls -->
+                        <button class="carousel-control-prev" type="button" data-bs-target="#articleCarousel" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Précédent</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#articleCarousel" data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Suivant</span>
+                        </button>
+                    </div>
+                </div>
+                {/if}
+
                 {if $canEdit}
                 <div id="editor-container">
                     <form id="edit-form" method="post">
@@ -171,4 +205,5 @@
         const ARTICLE_ID = {$chosenArticle->Id};
     </script>
     <script src="/app/js/user/article.js"></script>
+    <script src="/app/js/user/carousel.js"></script>
 {/block}

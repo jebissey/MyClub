@@ -147,9 +147,8 @@ class ArticleController extends TableController
                 || ($person
                     && ($article->OnlyForMembers === 1
                         || $article->IdGroup == null
-                        || !empty(array_intersect([$article->IdGroup], $this->getUserGroups($person->Email))
+                        || !empty(array_intersect([$article->IdGroup], $this->getUserGroups($person->Email)))
                         || $article->CreatedBy == $person->Id)
-                    )
                 )
             ) {
                 $articleIds = $this->getArticleIdsBasedOnAccess($person->Email ?? null);
@@ -181,6 +180,7 @@ class ArticleController extends TableController
                     'publishedBy' => $chosenArticle->PublishedBy && $chosenArticle->PublishedBy != $chosenArticle->CreatedBy ? $this->getPublisher($chosenArticle->PublishedBy) : '',
                     'latestArticleHasSurvey' => (new Article($this->pdo))->hasSurvey($id),
                     'canReadPool' => $this->canPersonReadSurveyResults($chosenArticle, $person),
+                    'carouselItems' => $this->fluent->from('Carousel')->where('IdArticle', $id)->fetchAll(),
                 ]));
             } else {
                 $this->application->error403(__FILE__, __LINE__);
