@@ -86,19 +86,12 @@ class LogController extends BaseController
                 'currentDate' => $currentDate,
                 'nav' => $this->log->getRefererNavigation($period, $currentDate),
                 'externalRefs' => $this->log->getExternalRefererStats($period, $currentDate),
-                'control' => $this
+                'control' => $this->log,
             ]));
         } else {
             $this->application->error403(__FILE__, __LINE__);
         }
     }
-
-    public function buildUrl($newParams)
-    {
-        $params = array_merge($_GET, $newParams);
-        return '?' . http_build_query($params);
-    }
-
 
     private $periodTypes = ['day', 'week', 'month', 'year'];
     private $defaultPeriodType = 'day';

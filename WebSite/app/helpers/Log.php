@@ -476,6 +476,12 @@ class Log
         return $query->fetchAll();
     }
 
+    public function buildUrl($newParams)
+    {
+        $params = array_merge($_GET, $newParams);
+        return '?' . http_build_query($params);
+    }
+
     public function getExternalRefererStats(string $period, string $currentDate): array
     {
         $date = new DateTime($currentDate);
