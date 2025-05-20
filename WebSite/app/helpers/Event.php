@@ -112,4 +112,32 @@ class Event
             ];
         }, $events);
     }
+
+    public function getEvent($eventId)
+    {
+        return $this->fluent->from('Event e')
+            ->select('e.*, et.Name AS EventTypeName')
+            ->join('EventType et ON e.IdEventType = et.Id')
+            ->where('e.Id', $eventId)
+            ->fetch();
+    }
+
+    public function getEventAttributes($eventId)
+    {
+        return $this->fluent->from('EventAttribute ea')
+            ->select('a.Name, a.Detail, a.Color')
+            ->join('Attribute a ON ea.IdAttribute = a.Id')
+            ->where('ea.IdEvent', $eventId)
+            ->fetchAll();
+    }
+
+    public function getEventParticipants($eventId)
+    {
+        return $this->fluent->from('Participant pa')
+            ->select('pe.FirstName, pe.LastName, pe.NickName, pe.Email')
+            ->join('Person pe ON pa.IdPerson = pe.Id')
+            ->where('pa.IdEvent', $eventId)
+            ->orderBy('pe.FirstName, pe.LastName')
+            ->fetchAll();
+    }
 }

@@ -32,9 +32,9 @@ class EventController extends BaseController
 
         echo $this->latte->render('app/views/event/detail.latte', $this->params->getAll([
             'eventId' => $eventId,
-            'event' => $this->getEvent($eventId),
-            'attributes' => $this->getEventAttributes($eventId),
-            'participants' => $this->getEventParticipants($eventId),
+            'event' => $event->getEvent($eventId),
+            'attributes' => $event->getEventAttributes($eventId),
+            'participants' => $event->getEventParticipants($eventId),
             'userEmail' => $userEmail,
             'isRegistered' => $event->isUserRegistered($eventId, $userEmail),
             'navItems' => $this->getNavItems(),
@@ -161,40 +161,5 @@ class EventController extends BaseController
     }
 
 
-    private function getEvent($eventId)
-    {
-        $query = $this->pdo->prepare("
-            SELECT e.*, et.Name as EventTypeName 
-            FROM Event e
-            JOIN EventType et ON e.IdEventType = et.Id
-            WHERE e.Id = :eventId");
 
-        $query->execute(['eventId' => $eventId]);
-        return $query->fetch();
-    }
-
-    private function getEventAttributes($eventId)
-    {
-        $query = $this->pdo->prepare("
-            SELECT a.Name, a.Detail, a.Color
-            FROM EventAttribute ea
-            JOIN Attribute a ON ea.IdAttribute = a.Id
-            WHERE ea.IdEvent = :eventId");
-
-        $query->execute(['eventId' => $eventId]);
-        return $query->fetchAll();
-    }
-
-    private function getEventParticipants($eventId)
-    {
-        $query = $this->pdo->prepare("
-            SELECT pe.FirstName, pe.LastName, pe.NickName, pe.Email
-            FROM Participant pa
-            JOIN Person pe ON pa.IdPerson = pe.Id
-            WHERE pa.IdEvent = :eventId
-            ORDER BY pe.FirstName, pe.LastName");
-
-        $query->execute(['eventId' => $eventId]);
-        return $query->fetchAll();
-    }
 }
