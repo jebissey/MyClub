@@ -144,7 +144,7 @@ class WebmasterApi extends BaseController
 
             if (empty($data['id'])) {
                 $maxPosition = $this->fluent->from('Page')->select('MAX(Position) AS MaxPos')->fetch();
-                $newPosition = ($maxPosition && $maxPosition['MaxPos']) ? $maxPosition['MaxPos'] + 1 : 1;
+                $newPosition = ($maxPosition && $maxPosition->MaxPos) ? $maxPosition->MaxPos + 1 : 1;
 
                 $this->fluent->insertInto('Page')
                     ->values([

@@ -37,20 +37,13 @@ class Event
 
     public function isUserRegistered($eventId, $userEmail)
     {
-        $query = $this->pdo->prepare("
-            SELECT COUNT(*) as count
-            FROM Participant pa
-            JOIN Person pe ON pa.IdPerson = pe.Id
-            WHERE pa.IdEvent = :eventId
-            AND pe.Email = :userEmail");
-
-        $query->execute([
-            'eventId' => $eventId,
-            'userEmail' => $userEmail
-        ]);
-
-        $result = $query->fetch();
-        return ($result['count'] > 0);
+        $result = $this->fluent->from('Participant pa')
+            ->select('COUNT(*) AS count')
+            ->join('Person pe ON pa.IdPerson = pe.Id')
+            ->where('pa.IdEvent', $eventId)
+            ->where('pe.Email', $userEmail)
+            ->fetch();
+        return ($result->count > 0);
     }
 
     public function getNextEvents($person)
@@ -74,17 +67,14 @@ class Event
 
         $eventIds = array_column($events, 'Id');
         $attributes = [];
-
         if (!empty($eventIds)) {
-            $placeholders = implode(',', array_fill(0, count($eventIds), '?'));
-            $attributeQuery = $this->pdo->prepare("
-                SELECT ea.IdEvent, a.Id, a.Name, a.Detail, a.Color 
-                FROM EventAttribute ea 
-                JOIN Attribute a ON ea.IdAttribute = a.Id 
-                WHERE ea.IdEvent IN ($placeholders)
-            ");
-            $attributeQuery->execute($eventIds);
-            while ($row = $attributeQuery->fetch()) {
+            $rows = $this->fluent->from('EventAttribute ea')
+                ->select('ea.IdEvent, a.Id, a.Name, a.Detail, a.Color')
+                ->join('Attribute a ON ea.IdAttribute = a.Id')
+                ->where('ea.IdEvent', $eventIds)
+                ->fetchAll();
+
+            foreach ($rows as $row) {
                 $attributes[$row->IdEvent][] = [
                     'id' => $row->Id,
                     'name' => $row->Name,

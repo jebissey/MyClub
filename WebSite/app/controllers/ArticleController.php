@@ -373,32 +373,37 @@ class ArticleController extends TableController
 
     private function getLatestArticle(array $articleIds): ?object
     {
-        $placeholders = implode(',', array_fill(0, count($articleIds), '?'));
-        $query = $this->pdo->prepare("
-            SELECT Article.*, Person.FirstName, Person.LastName, 'Group'.Name || '(' || 'Group'.Id || ')' AS GroupName
-            FROM Article 
-            LEFT JOIN Person ON Person.Id = Article.CreatedBy 
-            LEFT JOIN 'Group' ON Article.IdGroup = 'Group'.Id
-            WHERE Article.Id IN ($placeholders)
-            ORDER BY Article.LastUpdate DESC 
-            LIMIT 1");
-        $query->execute($articleIds);
-        return $query->fetch() ?: null;
+        if (empty($articleIds)) {
+            return null;
+        }
+
+        $article = $this->fluent->from('Article')
+            ->select('Article.*, Person.FirstName, Person.LastName, "Group".Name || \'(\' || "Group".Id || \')\' AS GroupName')
+            ->leftJoin('Person ON Person.Id = Article.CreatedBy')
+            ->leftJoin('"Group" ON Article.IdGroup = "Group".Id')
+            ->where('Article.Id', $articleIds)
+            ->orderBy('Article.LastUpdate DESC')
+            ->limit(1)
+            ->fetch();
+
+        return $article ?: null;
     }
 
     private function getLatestArticleTitles(array $articleIds): array
     {
-        $placeholders = implode(',', array_fill(0, count($articleIds), '?'));
-        $query = $this->pdo->prepare("
-            SELECT Id, Title, Timestamp, LastUpdate 
-            FROM Article 
-            WHERE Article.Id IN ($placeholders)
-            AND Article.publishedBy IS NOT NULL 
-            ORDER BY Article.LastUpdate DESC 
-            LIMIT 10");
-        $query->execute($articleIds);
-        return $query->fetchAll() ?: [];
+        if (empty($articleIds)) {
+            return [];
+        }
+
+        return $this->fluent->from('Article')
+            ->select('Id, Title, Timestamp, LastUpdate')
+            ->where('Id', $articleIds)
+            ->where('publishedBy IS NOT NULL')
+            ->orderBy('LastUpdate DESC')
+            ->limit(10)
+            ->fetchAll() ?: [];
     }
+
 
     private function getArticle($id)
     {
