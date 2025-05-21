@@ -32,6 +32,25 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
+    document.querySelectorAll(".duplicate-btn").forEach(btn => {
+        btn.addEventListener("click", function (e) {
+            e.stopPropagation();
+            const eventId = this.dataset.id;
+            if (confirm("Dupliquer cet événement à aujourd’hui 23:59 ?")) {
+                fetch(`/api/event/duplicate/${eventId}`, { method: 'POST' })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert("Événement dupliqué !");
+                            window.location.reload();
+                        } else {
+                            alert("Erreur : " + data.message);
+                        }
+                    });
+            }
+        });
+    });
+
     function fetchEventDetails(eventId) {
         fetch(`/api/event/${eventId}`)
             .then(response => response.json())
@@ -404,9 +423,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
 function getContrastYIQ(hexcolor) {
     hexcolor = hexcolor.replace("#", "");
-    const r = parseInt(hexcolor.substr(0,2),16);
-    const g = parseInt(hexcolor.substr(2,2),16);
-    const b = parseInt(hexcolor.substr(4,2),16);
-    const yiq = ((r*299)+(g*587)+(b*114))/1000;
+    const r = parseInt(hexcolor.substr(0, 2), 16);
+    const g = parseInt(hexcolor.substr(2, 2), 16);
+    const b = parseInt(hexcolor.substr(4, 2), 16);
+    const yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
     return (yiq >= 128) ? 'black' : 'white';
 }

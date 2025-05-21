@@ -2,6 +2,7 @@
 
 namespace app\api;
 
+use DateTime;
 use Exception;
 use app\controllers\BaseController;
 use app\helpers\Event;
@@ -178,6 +179,39 @@ class EventApi extends BaseController
         }
         exit();
     }
+
+    public function duplicateEvent($id)
+    {
+        if ($person = $this->getPerson(['EventManager'])) {
+            $event = $this->fluent->from('Event')->where('Id', $id)->fetch();
+            if (!$event) {
+                header('Content-Type: application/json', true, 471);
+                echo json_encode(['success' => false, 'message' => 'Événement introuvable']);
+                exit;
+            }
+
+            $newEvent = [
+                'Summary' => $event->Summary,
+                'Description' => $event->Description,
+                'Location' => $event->Location,
+                'StartTime' => (new DateTime('today 23:59'))->format('Y-m-d H:i:s'),
+                'Duration' => $event->Duration,
+                'IdEventType' => $event->IdEventType,
+                'CreatedBy' => $person->Id,
+                'MaxParticipants' => $event->MaxParticipants,
+                'Audience' => $event->Audience
+            ];
+            $this->fluent->insertInto('Event')->values($newEvent)->execute();
+
+            header('Content-Type: application/json');
+            echo json_encode(['success' => true]);
+        } else {
+            header('Content-Type: application/json', true, 403);
+            echo json_encode(['success' => false, 'message' => 'User not allowed']);
+        }
+        exit();
+    }
+
 
     public function getAttributes()
     {

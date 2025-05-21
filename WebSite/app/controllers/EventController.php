@@ -11,13 +11,17 @@ class EventController extends BaseController
     {
         $event = new Event($this->pdo);
         $person = $this->getPerson();
+        $offset = (int) ($_GET['offset'] ?? 0);
+        $mode = $_GET['mode'] ?? 'next';
 
         echo $this->latte->render('app/views/event/nextEvents.latte', $this->params->getAll([
             'navItems' => $this->getNavItems(),
-            'events' => $event->getNextEvents($person),
+            'events' => $event->getEvents($person, $mode, $offset),
             'person' => $person,
             'eventTypes' => $this->fluent->from('EventType')->where('Inactivated', 0)->orderBy('Name')->fetchAll('Id', 'Name'),
             'eventAttributes' => $this->fluent->from('Attribute')->fetchAll('Id', 'Name, Detail, Color'),
+            'offset' => $offset,
+            'mode' => $mode,
         ]));
     }
 
@@ -159,7 +163,4 @@ class EventController extends BaseController
             $this->application->error403(__FILE__, __LINE__);
         }
     }
-
-
-
 }

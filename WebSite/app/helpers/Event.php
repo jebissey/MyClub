@@ -63,44 +63,7 @@ class Event
             $query->where("et.IdGroup IS NULL OR et.IdGroup IN (SELECT IdGroup FROM PersonGroup WHERE IdPerson = ?)", $person->Id);
         }
         $query->select('et.Name AS EventTypeName, et.IdGroup AS EventTypeIdGroup, p.Id As Booked')->orderBy('e.StartTime');
-        $events = $query->fetchAll();
-
-        $eventIds = array_column($events, 'Id');
-        $attributes = [];
-        if (!empty($eventIds)) {
-            $rows = $this->fluent->from('EventAttribute ea')
-                ->select('ea.IdEvent, a.Id, a.Name, a.Detail, a.Color')
-                ->join('Attribute a ON ea.IdAttribute = a.Id')
-                ->where('ea.IdEvent', $eventIds)
-                ->fetchAll();
-
-            foreach ($rows as $row) {
-                $attributes[$row->IdEvent][] = [
-                    'id' => $row->Id,
-                    'name' => $row->Name,
-                    'detail' => $row->Detail,
-                    'color' => $row->Color
-                ];
-            }
-        }
-
-        return array_map(function ($event) use ($attributes) {
-            return [
-                'id' => $event->Id,
-                'eventTypeName' => $event->EventTypeName,
-                'groupName' => $event->EventTypeIdGroup ? $this->fluent->from("'Group'")->where('Id', $event->EventTypeIdGroup)->fetch('Name') : '',
-                'summary' => $event->Summary,
-                'location' => $event->Location,
-                'startTime' => $event->StartTime,
-                'duration' => (new TranslationManager($this->pdo))->getReadableDuration($event->Duration),
-                'attributes' => $attributes[$event->Id] ?? [],
-                'participants' => $this->fluent->from('Participant')->where('IdEvent', $event->Id)->count(),
-                'maxParticipants' => $event->MaxParticipants,
-                'booked' => $event->Booked,
-                'audience' => $event->Audience,
-                'createdBy' => $event->CreatedBy,
-            ];
-        }, $events);
+        return $this->events($query->fetchAll());
     }
 
     public function getEvent($eventId)
@@ -129,5 +92,69 @@ class Event
             ->where('pa.IdEvent', $eventId)
             ->orderBy('pe.FirstName, pe.LastName')
             ->fetchAll();
+    }
+
+    public function getEvents($person, string $mode, int $offset): array
+    {
+        if ($mode == 'next') {
+            return $this->getNextEvents($person);
+        }
+
+        $limit = 10;
+
+        $query = $this->fluent->from('Event e')
+            ->leftJoin('EventType et ON et.Id = e.IdEventType')
+            ->limit($limit)
+            ->offset($offset)
+            ->select('et.Name AS EventTypeName, et.IdGroup AS EventTypeIdGroup, 0 As Booked')
+            ->orderBy('e.StartTime');
+
+        if ($mode === 'past') {
+            $query->where('StartTime < ?', date('Y-m-d H:i:s'))
+                ->orderBy('StartTime DESC');
+        } else {
+            die("Invalide mode ($mode)");
+        }
+        return $this->events($query->fetchAll());
+    }
+
+
+    private function events($events): array
+    {
+        $eventIds = array_column($events, 'Id');
+        $attributes = [];
+        if (!empty($eventIds)) {
+            $rows = $this->fluent->from('EventAttribute ea')
+                ->select('ea.IdEvent, a.Id, a.Name, a.Detail, a.Color')
+                ->join('Attribute a ON ea.IdAttribute = a.Id')
+                ->where('ea.IdEvent', $eventIds)
+                ->fetchAll();
+
+            foreach ($rows as $row) {
+                $attributes[$row->IdEvent][] = [
+                    'id' => $row->Id,
+                    'name' => $row->Name,
+                    'detail' => $row->Detail,
+                    'color' => $row->Color
+                ];
+            }
+        }
+        return array_map(function ($event) use ($attributes) {
+            return [
+                'id' => $event->Id,
+                'eventTypeName' => $event->EventTypeName,
+                'groupName' => $event->EventTypeIdGroup ? $this->fluent->from("'Group'")->where('Id', $event->EventTypeIdGroup)->fetch('Name') : '',
+                'summary' => $event->Summary,
+                'location' => $event->Location,
+                'startTime' => $event->StartTime,
+                'duration' => (new TranslationManager($this->pdo))->getReadableDuration($event->Duration),
+                'attributes' => $attributes[$event->Id] ?? [],
+                'participants' => $this->fluent->from('Participant')->where('IdEvent', $event->Id)->count(),
+                'maxParticipants' => $event->MaxParticipants,
+                'booked' => $event->Booked,
+                'audience' => $event->Audience,
+                'createdBy' => $event->CreatedBy,
+            ];
+        }, $events);
     }
 }

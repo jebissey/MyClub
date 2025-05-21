@@ -30,7 +30,11 @@
         {/if}
         </h1>
         {if $isEventManager}
-        <div class="ms-auto">
+            <div class="ms-auto d-flex gap-2">
+            <a href="?mode=past&offset=0" class="btn btn-outline-secondary">&laquo;</a>
+            <a href="?mode={$mode}&offset={max(0, $offset-10)}" class="btn btn-outline-secondary">&lsaquo;</a>
+            <a href="?mode={$mode}&offset={$offset+10}" class="btn btn-outline-secondary">&rsaquo;</a>
+            <a href="?mode=next&offset=0" class="btn btn-outline-secondary">&raquo;</a>
             <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#eventModal">
                 <i class="bi bi-plus-lg"></i>
             </button>
@@ -55,13 +59,20 @@
             {foreach $events as $event}
             <tr onclick="window.location.href='/events/{$event['id']}';" style="cursor: pointer;">
                 <td>
-                {if $event['createdBy'] == ($person->Id ?? false)}
+                {if $event['createdBy'] == ($person->Id ?? false) && $mode == 'next'}
                     <div class="ms-auto d-flex flex-column flex-sm-row gap-2">
                         <button class="btn btn-sm btn-primary edit-btn">
                             <i class="bi bi-pencil"></i>
                         </button>
                         <button class="btn btn-sm btn-danger delete-btn">
                             <i class="bi bi-trash"></i>
+                        </button>
+                    </div>
+                {/if}
+                {if $isEventManager && $mode == 'past'}
+                    <div class="ms-auto d-flex flex-column flex-sm-row gap-2">
+                        <button class="btn btn-sm btn-secondary duplicate-btn" data-id="{$event['id']}">
+                            <i class="bi bi-files"></i>
                         </button>
                     </div>
                 {/if}
