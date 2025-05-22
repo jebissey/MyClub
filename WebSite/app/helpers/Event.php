@@ -53,6 +53,7 @@ class Event
             ->from('Event e')
             ->leftJoin('EventType et ON e.IdEventType = et.Id')
             ->leftJoin('Participant p ON e.Id = p.IdEvent AND p.IdPerson = ?', $person->Id ?? 0)
+            ->leftJoin('Message m ON m.EventId = e.Id')
             ->where('e.StartTime > ?', $now)
             ->groupBy('e.Id');
 
@@ -62,9 +63,14 @@ class Event
         } else {
             $query->where("et.IdGroup IS NULL OR et.IdGroup IN (SELECT IdGroup FROM PersonGroup WHERE IdPerson = ?)", $person->Id);
         }
-        $query->select('et.Name AS EventTypeName, et.IdGroup AS EventTypeIdGroup, p.Id As Booked')->orderBy('e.StartTime');
+
+        $query->select('COUNT(m.Id) AS MessageCount');
+        $query->select('et.Name AS EventTypeName, et.IdGroup AS EventTypeIdGroup, p.Id As Booked')
+            ->orderBy('e.StartTime');
+
         return $this->events($query->fetchAll());
     }
+
 
     public function getEvent($eventId)
     {
@@ -98,24 +104,22 @@ class Event
     {
         if ($mode == 'next') {
             return $this->getNextEvents($person);
-        }
-
-        $limit = 10;
-
-        $query = $this->fluent->from('Event e')
-            ->leftJoin('EventType et ON et.Id = e.IdEventType')
-            ->limit($limit)
-            ->offset($offset)
-            ->select('et.Name AS EventTypeName, et.IdGroup AS EventTypeIdGroup, 0 As Booked')
-            ->orderBy('e.StartTime');
-
-        if ($mode === 'past') {
-            $query->where('StartTime < ?', date('Y-m-d H:i:s'))
-                ->orderBy('StartTime DESC');
+        } else if ($mode === 'past') {
+            $limit = 10;
+            $query = $this->fluent->from('Event e')
+                ->leftJoin('EventType et ON et.Id = e.IdEventType')
+                ->leftJoin('Message m ON m.EventId = e.Id')
+                ->where('StartTime < ?', date('Y-m-d H:i:s'))
+                ->groupBy('e.Id')
+                ->limit($limit)
+                ->offset($offset)
+                ->select('et.Name AS EventTypeName, et.IdGroup AS EventTypeIdGroup, 0 AS Booked')
+                ->select('COUNT(m.Id) AS MessageCount')
+                ->orderBy('e.StartTime');
+            return $this->events($query->fetchAll());
         } else {
             die("Invalide mode ($mode)");
         }
-        return $this->events($query->fetchAll());
     }
 
 
@@ -154,6 +158,7 @@ class Event
                 'booked' => $event->Booked,
                 'audience' => $event->Audience,
                 'createdBy' => $event->CreatedBy,
+                'messages' => $event->MessageCount,
             ];
         }, $events);
     }

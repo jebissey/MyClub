@@ -30,7 +30,7 @@
         {/if}
         </h1>
         {if $isEventManager}
-            <div class="ms-auto d-flex gap-2">
+        <div class="ms-auto d-flex gap-2">
             <a href="?mode=past&offset=0" class="btn btn-outline-secondary">&laquo;</a>
             <a href="?mode={$mode}&offset={max(0, $offset-10)}" class="btn btn-outline-secondary">&lsaquo;</a>
             <a href="?mode={$mode}&offset={$offset+10}" class="btn btn-outline-secondary">&rsaquo;</a>
@@ -52,6 +52,7 @@
                 <th>{='summary'|translate}</th>
                 <th>{='location'|translate}</th>
                 <th>{='participants'|translate}</th>
+                <th>{='messages'|translate}</th>
                 <th>{='audience'|translate}</th>
             </tr>
         </thead>
@@ -96,6 +97,7 @@
                 <td>{$event['summary']}</td>
                 <td>{$event['location']}</td>
                 <td>{$event['participants']}{if $event['maxParticipants'] > 0} / {$event['maxParticipants']}{/if}{if isset($event['booked'])}👤{/if}</td>
+                <td>{$event['messages']}</td>
                 <td>{=$event['audience']|translate}</td>
             </tr>
             {/foreach}

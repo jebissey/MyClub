@@ -33,16 +33,6 @@
     animation: fadeIn 0.3s ease;
 }
 
-@media (max-width: 576px) {
-    .card {
-        max-width: 85% !important;
-    }
-
-    #chat-container {
-        max-height: calc(100vh - 320px);
-    }
-}
-
 .bg-light-primary {
     background-color: #e6f2ff;
     border: 1px solid #cce0ff;
