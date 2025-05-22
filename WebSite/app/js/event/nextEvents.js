@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', function () {
         btn.addEventListener("click", function (e) {
             e.stopPropagation();
             const eventId = this.dataset.id;
-            if (confirm("Dupliquer cet événement à aujourd’hui 23:59 ?")) {
+            if (confirm("Dupliquer cet événement à aujourd'hui 23:59 ?")) {
                 fetch(`/api/event/duplicate/${eventId}`, { method: 'POST' })
                     .then(res => res.json())
                     .then(data => {
@@ -183,10 +183,10 @@ document.addEventListener('DOMContentLoaded', function () {
         selectedAttributes = [];
         if (attributes) {
             attributes.forEach(attr => {
-                const attributeElement = createAttributeElement(attr.Id, attr.Name, attr.Color, attr.Detail);
+                const attributeElement = createAttributeElement(attr.AttributeId, attr.Name, attr.Color, attr.Detail);
                 attributesList.appendChild(attributeElement);
                 selectedAttributes.push({
-                    id: attr.Id,
+                    id: String(attr.AttributeId),
                     name: attr.Name,
                     color: attr.Color,
                     detail: attr.Detail
@@ -238,8 +238,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const removeBtn = attributeElement.querySelector('.btn-close');
         removeBtn.addEventListener('click', function () {
-            const idToRemove = this.dataset.attributeId;
-            selectedAttributes = selectedAttributes.filter(attr => attr.id !== idToRemove);
+            const idToRemove = String(this.dataset.attributeId);
+            selectedAttributes = selectedAttributes.filter(attr => String(attr.id) !== idToRemove);
             attributeElement.remove();
         });
 
@@ -251,12 +251,12 @@ document.addEventListener('DOMContentLoaded', function () {
         const selectedOption = select.options[select.selectedIndex];
         if (!selectedOption || !selectedOption.value) return;
 
-        const attributeId = selectedOption.value;
+        const attributeId = String(selectedOption.value);
         const attributeName = selectedOption.text;
         const attributeColor = selectedOption.dataset.color;
         const attributeDetail = selectedOption.dataset.detail;
 
-        if (selectedAttributes.some(attr => attr.id === attributeId)) {
+        if (selectedAttributes.some(attr => String(attr.id) === attributeId)) {
             alert('Cet attribut a déjà été ajouté.');
             return;
         }

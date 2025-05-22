@@ -11,6 +11,7 @@ use app\helpers\Message;
 
 class EventApi extends BaseController
 {
+    #region Attribute
     public function createAttribute()
     {
         if ($this->getPerson(['Webmaster'])) {
@@ -74,6 +75,65 @@ class EventApi extends BaseController
         }
     }
 
+    public function getAttributes()
+    {
+        if ($this->getPerson(['Webmaster'])) {
+            $attributes = $this->fluent->from('Attribute')
+                ->orderBy('Name')
+                ->fetchAll();
+
+            echo $this->latte->render('app/views/eventType/attributes-list.latte', $this->params->getAll([
+                'attributes' => $attributes
+            ]));
+        } else {
+            header('Content-Type: application/json', true, 403);
+            echo json_encode(['success' => false, 'message' => 'User not allowed']);
+        }
+    }
+
+    public function getAttributesByEventType($eventTypeId)
+    {
+        if (!$eventTypeId) {
+            header('Content-Type: application/json', true, 499);
+            echo json_encode(['success' => false, 'message' => 'Unknown event type']);
+        } else {
+            $query = $this->fluent->from('EventTypeAttribute')
+                ->select('Attribute.*')
+                ->join('Attribute ON EventTypeAttribute.IdAttribute = Attribute.Id')
+                ->where('EventTypeAttribute.IdEventType', $eventTypeId);
+            header('Content-Type: application/json');
+            echo json_encode(['attributes' => $query->fetchAll()]);
+        }
+        exit();
+    }
+
+    public function updateAttribute()
+    {
+        if ($this->getPerson(['Webmaster'])) {
+            $json = file_get_contents('php://input');
+            $data = json_decode($json, true);
+
+            try {
+                $this->pdo->beginTransaction();
+                $query = $this->pdo->prepare('UPDATE Attribute SET Name = ?, Detail = ?, Color = ? WHERE Id = ?');
+                $query->execute([$data['name'], $data['detail'], $data['color'], $data['id']]);
+                $this->pdo->commit();
+
+                header('Content-Type: application/json');
+                echo json_encode(['success' => true]);
+            } catch (\Exception $e) {
+                $this->pdo->rollBack();
+                http_response_code(500);
+                echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+            }
+        } else {
+            header('Content-Type: application/json', true, 403);
+            echo json_encode(['success' => false, 'message' => 'User not allowed']);
+        }
+    }
+    #endregion
+
+    #region Event
     public function deleteEvent($id): void
     {
         if ($person = $this->getPerson(['EventManager'])) {
@@ -110,137 +170,52 @@ class EventApi extends BaseController
         exit();
     }
 
-    public function deleteNeed($id)
-    {
-        if ($this->getPerson(['Webmaster'])) {
-            if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
-                if (!$id) {
-                    header('Content-Type: application/json', true, 472);
-                    echo json_encode(['success' => false, 'message' => 'Missing ID parameter']);
-                } else {
-                    try {
-                        $this->fluent->deleteFrom('Need')->where('Id', $id)->execute();
-
-                        header('Content-Type: application/json');
-                        echo json_encode(['success' => true]);
-                    } catch (\Exception $e) {
-                        header('Content-Type: application/json', true, 500);
-                        echo json_encode(['success' => false, 'message' => 'Erreur lors de la suppression: ' . $e->getMessage()]);
-                    }
-                }
-            } else {
-                header('Content-Type: application/json', true, 470);
-                echo json_encode(['success' => false, 'message' => 'Bad request method']);
-            }
-        } else {
-            header('Content-Type: application/json', true, 403);
-            echo json_encode(['success' => false, 'message' => 'User not allowed']);
-        }
-        exit();
-    }
-
-    public function deleteNeedType($id)
-    {
-        if ($this->getPerson(['Webmaster'])) {
-            if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
-                if (!$id) {
-                    header('Content-Type: application/json', true, 472);
-                    echo json_encode(['success' => false, 'message' => 'Missing Id parameter']);
-                } else {
-                    $countNeeds = $this->fluent->from('Need')->where('IdNeedType', $id)->count();
-
-                    if ($countNeeds > 0) {
-                        header('Content-Type: application/json', true, 409);
-                        echo json_encode([
-                            'success' => false,
-                            'message' => 'Ce type de besoin est associé à ' . $countNeeds . ' besoin(s) et ne peut pas être supprimé'
-                        ]);
-                    } else {
-                        try {
-                            $this->fluent->deleteFrom('NeedType')
-                                ->where('Id', $id)
-                                ->execute();
-
-                            header('Content-Type: application/json');
-                            echo json_encode(['success' => true]);
-                        } catch (\Exception $e) {
-                            header('Content-Type: application/json', true, 500);
-                            echo json_encode(['success' => false, 'message' => 'Erreur lors de la suppression: ' . $e->getMessage()]);
-                        }
-                    }
-                }
-            } else {
-                header('Content-Type: application/json', true, 470);
-                echo json_encode(['success' => false, 'message' => 'Bad request method']);
-            }
-        } else {
-            header('Content-Type: application/json', true, 403);
-            echo json_encode(['success' => false, 'message' => 'User not allowed']);
-        }
-        exit();
-    }
-
     public function duplicateEvent($id)
     {
         if ($person = $this->getPerson(['EventManager'])) {
-            $event = $this->fluent->from('Event')->where('Id', $id)->fetch();
-            if (!$event) {
-                header('Content-Type: application/json', true, 471);
-                echo json_encode(['success' => false, 'message' => 'Événement introuvable']);
-                exit;
+            try {
+                $this->pdo->beginTransaction();
+
+                $event = $this->fluent->from('Event')->where('Id', $id)->fetch();
+                if (!$event) {
+                    $this->pdo->rollBack();
+                    header('Content-Type: application/json', true, 471);
+                    echo json_encode(['success' => false, 'message' => 'Événement introuvable']);
+                    exit;
+                }
+
+                $newEvent = [
+                    'Summary' => $event->Summary,
+                    'Description' => $event->Description,
+                    'Location' => $event->Location,
+                    'StartTime' => (new DateTime('today 23:59'))->format('Y-m-d H:i:s'),
+                    'Duration' => $event->Duration,
+                    'IdEventType' => $event->IdEventType,
+                    'CreatedBy' => $person->Id,
+                    'MaxParticipants' => $event->MaxParticipants,
+                    'Audience' => $event->Audience
+                ];
+                $newEventId = $this->fluent->insertInto('Event')->values($newEvent)->execute();
+
+                $attributes = $this->fluent->from('EventAttribute')->where('IdEvent', $id)->fetchAll();
+                foreach ($attributes as $attr) {
+                    $this->fluent->insertInto('EventAttribute')->values([
+                        'IdEvent' => $newEventId,
+                        'IdAttribute' => $attr->IdAttribute,
+                    ])->execute();
+                }
+                $this->pdo->commit();
+
+                header('Content-Type: application/json');
+                echo json_encode(['success' => true, 'newEventId' => $newEventId]);
+            } catch (Exception $e) {
+                $this->pdo->rollBack();
+                header('Content-Type: application/json', true, 500);
+                echo json_encode(['success' => false, 'message' => 'Erreur serveur : ' . $e->getMessage()]);
             }
-
-            $newEvent = [
-                'Summary' => $event->Summary,
-                'Description' => $event->Description,
-                'Location' => $event->Location,
-                'StartTime' => (new DateTime('today 23:59'))->format('Y-m-d H:i:s'),
-                'Duration' => $event->Duration,
-                'IdEventType' => $event->IdEventType,
-                'CreatedBy' => $person->Id,
-                'MaxParticipants' => $event->MaxParticipants,
-                'Audience' => $event->Audience
-            ];
-            $this->fluent->insertInto('Event')->values($newEvent)->execute();
-
-            header('Content-Type: application/json');
-            echo json_encode(['success' => true]);
         } else {
             header('Content-Type: application/json', true, 403);
             echo json_encode(['success' => false, 'message' => 'User not allowed']);
-        }
-        exit();
-    }
-
-
-    public function getAttributes()
-    {
-        if ($this->getPerson(['Webmaster'])) {
-            $attributes = $this->fluent->from('Attribute')
-                ->orderBy('Name')
-                ->fetchAll();
-
-            echo $this->latte->render('app/views/eventType/attributes-list.latte', $this->params->getAll([
-                'attributes' => $attributes
-            ]));
-        } else {
-            header('Content-Type: application/json', true, 403);
-            echo json_encode(['success' => false, 'message' => 'User not allowed']);
-        }
-    }
-
-    public function getAttributesByEventType($eventTypeId)
-    {
-        if (!$eventTypeId) {
-            header('Content-Type: application/json', true, 499);
-            echo json_encode(['success' => false, 'message' => 'Unknown event type']);
-        } else {
-            $query = $this->fluent->from('EventTypeAttribute')
-                ->select('Attribute.*')
-                ->join('Attribute ON EventTypeAttribute.IdAttribute = Attribute.Id')
-                ->where('EventTypeAttribute.IdEventType', $eventTypeId);
-            header('Content-Type: application/json');
-            echo json_encode(['attributes' => $query->fetchAll()]);
         }
         exit();
     }
@@ -254,46 +229,13 @@ class EventApi extends BaseController
                 'event' => $this->fluent->from('Event')->where('Id', $id)->fetch(),
                 'attributes' => $this->fluent->from('EventAttribute')
                     ->join('Attribute ON EventAttribute.IdAttribute = Attribute.Id')
-                    ->select('Attribute.Name AS Name, Attribute.Detail AS Detail, Attribute.Color AS Color')
+                    ->select('Attribute.Name AS Name, Attribute.Detail AS Detail, Attribute.Color AS Color, Attribute.Id AS AttributeId')
                     ->where('IdEvent', $id)->fetchall(),
             ]);
         } else {
             header('Content-Type: application/json', true, 403);
             echo json_encode(['success' => false, 'message' => 'User not allowed']);
         }
-        exit();
-    }
-
-    public function getEventNeeds($eventId)
-    {
-        $needs = $this->fluent->from('EventNeed')
-            ->select('EventNeed.*, Need.Name, Need.ParticipantDependent, NeedType.Name as TypeName')
-            ->join('Need ON EventNeed.IdNeed = Need.Id')
-            ->join('NeedType ON Need.IdNeedType = NeedType.Id')
-            ->where('EventNeed.IdEvent', $eventId)
-            ->fetchAll();
-
-        header('Content-Type: application/json');
-        echo json_encode([
-            'success' => true,
-            'needs' => $needs
-        ]);
-        exit();
-    }
-
-    public function getNeedsByEventType($eventTypeId)
-    {
-        $needs = $this->fluent->from('Need')
-            ->select('Need.*, NeedType.Name as TypeName')
-            ->join('NeedType ON Need.IdNeedType = NeedType.Id')
-            ->where('Need.IdNeedType', $eventTypeId)
-            ->fetchAll();
-
-        header('Content-Type: application/json');
-        echo json_encode([
-            'success' => true,
-            'needs' => $needs
-        ]);
         exit();
     }
 
@@ -312,7 +254,6 @@ class EventApi extends BaseController
                 'MaxParticipants' => $data['maxParticipants'] ?? 0,
                 'Audience' => $data['audience'] ?? EventAudience::ForClubMembersOnly->value,
             ];
-
             $this->pdo->beginTransaction();
             try {
                 if ($data['formMode'] == 'create') {
@@ -354,6 +295,37 @@ class EventApi extends BaseController
                     'message' => 'Erreur lors de l\'insertion en base de données',
                     'error' => $e->getMessage()
                 ]);
+            }
+        } else {
+            header('Content-Type: application/json', true, 403);
+            echo json_encode(['success' => false, 'message' => 'User not allowed']);
+        }
+        exit();
+    }
+    #endregion
+
+    #region Need
+    public function deleteNeed($id)
+    {
+        if ($this->getPerson(['Webmaster'])) {
+            if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
+                if (!$id) {
+                    header('Content-Type: application/json', true, 472);
+                    echo json_encode(['success' => false, 'message' => 'Missing ID parameter']);
+                } else {
+                    try {
+                        $this->fluent->deleteFrom('Need')->where('Id', $id)->execute();
+
+                        header('Content-Type: application/json');
+                        echo json_encode(['success' => true]);
+                    } catch (\Exception $e) {
+                        header('Content-Type: application/json', true, 500);
+                        echo json_encode(['success' => false, 'message' => 'Erreur lors de la suppression: ' . $e->getMessage()]);
+                    }
+                }
+            } else {
+                header('Content-Type: application/json', true, 470);
+                echo json_encode(['success' => false, 'message' => 'Bad request method']);
             }
         } else {
             header('Content-Type: application/json', true, 403);
@@ -419,6 +391,82 @@ class EventApi extends BaseController
         }
         exit();
     }
+    
+    public function getEventNeeds($eventId)
+    {
+        $needs = $this->fluent->from('EventNeed')
+            ->select('EventNeed.*, Need.Name, Need.ParticipantDependent, NeedType.Name as TypeName')
+            ->join('Need ON EventNeed.IdNeed = Need.Id')
+            ->join('NeedType ON Need.IdNeedType = NeedType.Id')
+            ->where('EventNeed.IdEvent', $eventId)
+            ->fetchAll();
+
+        header('Content-Type: application/json');
+        echo json_encode([
+            'success' => true,
+            'needs' => $needs
+        ]);
+        exit();
+    }
+
+    public function getNeedsByEventType($eventTypeId)
+    {
+        $needs = $this->fluent->from('Need')
+            ->select('Need.*, NeedType.Name as TypeName')
+            ->join('NeedType ON Need.IdNeedType = NeedType.Id')
+            ->where('Need.IdNeedType', $eventTypeId)
+            ->fetchAll();
+
+        header('Content-Type: application/json');
+        echo json_encode([
+            'success' => true,
+            'needs' => $needs
+        ]);
+        exit();
+    }
+    #endregion
+
+    #region NeedType
+    public function deleteNeedType($id)
+    {
+        if ($this->getPerson(['Webmaster'])) {
+            if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
+                if (!$id) {
+                    header('Content-Type: application/json', true, 472);
+                    echo json_encode(['success' => false, 'message' => 'Missing Id parameter']);
+                } else {
+                    $countNeeds = $this->fluent->from('Need')->where('IdNeedType', $id)->count();
+
+                    if ($countNeeds > 0) {
+                        header('Content-Type: application/json', true, 409);
+                        echo json_encode([
+                            'success' => false,
+                            'message' => 'Ce type de besoin est associé à ' . $countNeeds . ' besoin(s) et ne peut pas être supprimé'
+                        ]);
+                    } else {
+                        try {
+                            $this->fluent->deleteFrom('NeedType')
+                                ->where('Id', $id)
+                                ->execute();
+
+                            header('Content-Type: application/json');
+                            echo json_encode(['success' => true]);
+                        } catch (\Exception $e) {
+                            header('Content-Type: application/json', true, 500);
+                            echo json_encode(['success' => false, 'message' => 'Erreur lors de la suppression: ' . $e->getMessage()]);
+                        }
+                    }
+                }
+            } else {
+                header('Content-Type: application/json', true, 470);
+                echo json_encode(['success' => false, 'message' => 'Bad request method']);
+            }
+        } else {
+            header('Content-Type: application/json', true, 403);
+            echo json_encode(['success' => false, 'message' => 'User not allowed']);
+        }
+        exit();
+    }
 
     public function saveNeedType()
     {
@@ -453,33 +501,9 @@ class EventApi extends BaseController
         }
         exit();
     }
+    #endregion
 
-    public function updateAttribute()
-    {
-        if ($this->getPerson(['Webmaster'])) {
-            $json = file_get_contents('php://input');
-            $data = json_decode($json, true);
-
-            try {
-                $this->pdo->beginTransaction();
-                $query = $this->pdo->prepare('UPDATE Attribute SET Name = ?, Detail = ?, Color = ? WHERE Id = ?');
-                $query->execute([$data['name'], $data['detail'], $data['color'], $data['id']]);
-                $this->pdo->commit();
-
-                header('Content-Type: application/json');
-                echo json_encode(['success' => true]);
-            } catch (\Exception $e) {
-                $this->pdo->rollBack();
-                http_response_code(500);
-                echo json_encode(['success' => false, 'message' => $e->getMessage()]);
-            }
-        } else {
-            header('Content-Type: application/json', true, 403);
-            echo json_encode(['success' => false, 'message' => 'User not allowed']);
-        }
-    }
-
-
+    #region Message
     public function addMessage()
     {
         if ($person = $this->getPerson([])) {
@@ -597,4 +621,5 @@ class EventApi extends BaseController
             echo json_encode(['success' => false, 'message' => 'Utilisateur non connecté']);
         }
     }
+    #endregion
 }
