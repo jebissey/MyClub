@@ -69,12 +69,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function confirmAndDeleteEvent(eventId) {
         if (confirm('Êtes-vous sûr de vouloir supprimer cet événement ?')) {
-            fetch('/event/delete', {
-                method: 'POST',
+            fetch('/api/event/delete/' + eventId, {
+                method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ id: eventId })
+                }
             })
                 .then(response => response.json())
                 .then(data => {
@@ -85,8 +84,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
                 })
                 .catch(error => {
-                    console.error('Erreur:', error);
-                    alert('Erreur de communication avec le serveur(2)');
+                    alert('Erreur de communication avec le serveur(2):' + error);
                 });
         }
     }

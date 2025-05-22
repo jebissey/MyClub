@@ -1,6 +1,6 @@
 {layout '../layout.latte'}
 
-{block title}Chat: {$event['Summary']}{/block}
+{block title}Chat: {$event->Summary}{/block}
 
 {block navbar}
     {include '../navbar/home.latte'}
@@ -11,73 +11,67 @@
 {/block}
 
 {block content}
-    <div class="container-fluid mt-3 flex-grow-1 d-flex flex-column">
+    <div class="container-fluid d-flex flex-column">
         <div class="card flex-grow-1 d-flex flex-column">
             <div class="card-header bg-primary text-white">
-                <h2>{$event['Summary']}</h2>
+                <h2>{$event->Summary}</h2>
                 <h4>
                     <div class="row">
                         <div class="col-md-6">
                             <i class="bi bi-calendar"></i>
-                            {$event['StartTime']|longDate}
+                            {$event->StartTime|longDate}
                             <i class="bi bi-clock ml-3"></i>
-                            {date('H:i', strtotime($event['StartTime']))} - 
-                            {date('H:i', strtotime($event['StartTime']) + $event['Duration'])}
+                            {date('H:i', strtotime($event->StartTime))} - 
+                            {date('H:i', strtotime($event->StartTime) + $event->Duration)}
                         </div>
                         <div class="col-md-6">
-                            <i class="fa fa-map-marker"></i> {$event['Location']}
+                            <i class="fa fa-map-marker"></i> {$event->Location}
                         </div>
                     </div>
                 </h4>
             </div>
-
             <div class="card-body d-flex flex-column p-0">
                 <div id="chat-container" class="flex-grow-1 overflow-auto p-3">
-                    {if count($messages) == 0}
-                        <div class="text-center text-muted">
-                            <p>Aucun message pour le moment. Soyez le premier à écrire !</p>
-                        </div>
-                    {else}
-                        {foreach $messages as $message}
-                            <div class="message-container mb-3 {if $message->PersonId == $person->Id}message-mine{/if}" 
-                                data-message-id="{$message->Id}" 
-                                data-author-id="{$message->PersonId}">
-                                <div class="d-flex {if $message['PersonId'] == $person->Id}flex-row-reverse{/if}">
-                                    <div class="avatar mr-2 {if $message->PersonId == $person->Id}ml-2 mr-0{/if}">
-                                        {if $message->UseGravatar == 'yes'}
-                                            <img src="https://www.gravatar.com/avatar/{md5(strtolower(trim($message->Email)))}" 
-                                                class="rounded-circle" width="40" height="40" alt="Avatar">
-                                        {elseif $message->Avatar}
-                                            <img src="/app/images/{$message->Avatar}" class="rounded-circle" width="40" height="40" alt="Avatar">
-                                        {else}
-                                            <img src="/app/images/emojiPensif.png" class="rounded-circle" width="40" height="40" alt="Avatar">
-                                        {/if}
-                                    </div>
-                                    <div class="message-content {if $message->PersonId == $person->Id}bg-primary text-white{else}bg-light{/if} p-2 rounded">
-                                        <div class="message-header mb-1">
-                                            <strong>
-                                                {if $message->NickName}
-                                                    {$message->NickName}
-                                                {else}
-                                                    {$message->FirstName} {$message->LastName}
-                                                {/if}
-                                            </strong>
-                                            <small class="text-muted">
-                                                {if $message['PersonId'] == $person->Id}
-                                                    <i class="edit-message fa fa-edit ml-2" title="Modifier"></i>
-                                                {/if}
-                                            </small>
-                                        </div>
-                                        <div class="message-text">
-                                            {$message->Text}
-                                        </div>
-                                    </div>
+                {if count($messages) == 0}
+                    <div class="text-center text-muted">
+                        <p>Aucun message pour le moment. Soyez le premier à écrire !</p>
+                    </div>
+                {else}
+                    {foreach $messages as $message}
+                    <div class="mb-3 {if $message->PersonId == $person->Id}text-end{/if}" 
+                        data-message-id="{$message->Id}" 
+                        data-author-id="{$message->PersonId}">
+                        <div class="card {if $message->PersonId == $person->Id}bg-light-primary{else}bg-light{/if}" style="max-width: 70%; display: inline-block;">
+                            <div class="card-body p-2">
+                                <div class="d-flex align-items-center mb-1">
+                                {if $message->UseGravatar == 'yes'}
+                                    <img src="https://www.gravatar.com/avatar/{md5(strtolower(trim($message->Email)))}" 
+                                        class="rounded-circle me-2" width="30" height="30" alt="Avatar">
+                                {elseif $message->Avatar}
+                                    <img src="/app/images/{$message->Avatar}" class="rounded-circle me-2" width="30" height="30" alt="Avatar">
+                                {else}
+                                    <img src="/app/images/emojiPensif.png" class="rounded-circle me-2" width="30" height="30" alt="Avatar">
+                                {/if}
+                                    
+                                    <strong class="card-title mb-0 {if $message->PersonId == $person->Id}text-dark{/if}">
+                                    {if $message->NickName}
+                                        {$message->NickName}
+                                    {else}
+                                        {$message->FirstName} {$message->LastName}
+                                    {/if}
+                                    </strong>
+                                    
+                                {if $message->PersonId == $person->Id}
+                                    <i class="bi bi-pencil edit-message ms-2 text-dark" title="Modifier"></i>
+                                {/if}
                                 </div>
+                                <p class="card-text mb-0 {if $message->PersonId == $person->Id}text-dark{/if}">{$message->Text}</p>
                             </div>
-                        {/foreach}
-                    {/if}
+                        </div>
+                    </div>
+                    {/foreach}
+                {/if}
                 </div>
-
                 <div class="message-form p-3 border-top">
                     <form id="new-message-form" class="d-flex">
                         <input type="hidden" id="event-id" value="{$event->Id}">

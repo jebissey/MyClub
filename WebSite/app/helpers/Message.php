@@ -1,4 +1,5 @@
 <?php
+
 namespace app\helpers;
 
 use PDO;
@@ -27,64 +28,34 @@ class Message
 
     public function addMessage($eventId, $personId, $text)
     {
-        try {
-            $this->pdo->beginTransaction();
-            $query = $this->pdo->prepare('INSERT INTO Message (EventId, PersonId, Text) VALUES (?, ?, ?)');
-            $query->execute([$eventId, $personId, $text]);
-            $messageId = $this->pdo->lastInsertId();
-            $this->pdo->commit();
-            
-            return $messageId;
-        } catch (\Exception $e) {
-            $this->pdo->rollBack();
-            throw $e;
-        }
+        $messageId = $this->fluent->insertInto(
+            'Message',
+            [
+                'EventId'  => $eventId,
+                'PersonId' => $personId,
+                'Text'     => $text
+            ]
+        )->execute();
+        return $messageId;
     }
 
     public function updateMessage($messageId, $personId, $text)
     {
-        try {
-            $this->pdo->beginTransaction();
-            
-            $query = $this->pdo->prepare('SELECT PersonId FROM Message WHERE Id = ?');
-            $query->execute([$messageId]);
-            $message = $query->fetch();
-            if (!$message || $message['PersonId'] != $personId) {
-                throw new \Exception("Vous n'êtes pas autorisé à modifier ce message");
-            }
-            
-            $query = $this->pdo->prepare('UPDATE Message SET Text = ? WHERE Id = ?');
-            $query->execute([$text, $messageId]);
-            $this->pdo->commit();
-            
-            return true;
-        } catch (\Exception $e) {
-            $this->pdo->rollBack();
-            throw $e;
+        $message = $this->fluent->from('Message')->select('PersonId')->where('Id', $messageId)->fetch();
+        if (!$message || $message->PersonId != $personId) {
+            throw new \Exception("Vous n'êtes pas autorisé à modifier ce message");
         }
+        $this->fluent->update('Message')->set(['Text' => $text])->where('Id', $messageId)->execute();
+        return true;
     }
 
     public function deleteMessage($messageId, $personId)
     {
-        try {
-            $this->pdo->beginTransaction();
-            
-            $query = $this->pdo->prepare('SELECT PersonId FROM Message WHERE Id = ?');
-            $query->execute([$messageId]);
-            $message = $query->fetch();
-            
-            if (!$message || $message['PersonId'] != $personId) {
-                throw new \Exception("Vous n'êtes pas autorisé à supprimer ce message");
-            }
-            
-            $query = $this->pdo->prepare('DELETE FROM Message WHERE Id = ?');
-            $query->execute([$messageId]);
-            $this->pdo->commit();
-            
-            return true;
-        } catch (\Exception $e) {
-            $this->pdo->rollBack();
-            throw $e;
+        $message = $this->fluent->from('Message')->select('PersonId')->where('Id', $messageId)->fetch();
+        if (!$message || $message->PersonId != $personId) {
+            throw new \Exception("Vous n'êtes pas autorisé à supprimer ce message");
         }
+        $this->fluent->deleteFrom('Message')->where('Id', $messageId)->execute();
+        return true;
     }
 }
