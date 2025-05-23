@@ -239,6 +239,8 @@ CREATE TABLE IF NOT EXISTS "Person" (
 	"Presentation"	TEXT,
 	"InPresentationDirectory"	INTEGER NOT NULL DEFAULT 0,
 	"Location"	TEXT,
+	"LastSignIn"	TEXT,
+	"LastSignOut"	TEXT,
 	PRIMARY KEY("Id")
 );
 CREATE TABLE IF NOT EXISTS "PersonGroup" (
@@ -316,7 +318,7 @@ INSERT INTO "Languages" VALUES (31,'login','Login','Connexion');
 INSERT INTO "Languages" VALUES (32,'edit','Edit','Modifier');
 INSERT INTO "Languages" VALUES (33,'messages','Messages','Messages');
 INSERT INTO "Metadata" VALUES (1,'MyClub',1);
-INSERT INTO "Person" VALUES (1,'webmaster@myclub.foo','613cbc51f1650fb264beaad127efc1a5da0f96a96d4da7c440dc01a9e5299910','my first name','my last name','my nick name or nothing',NULL,'0',NULL,NULL,NULL,NULL,0,0,NULL,NULL,0,NULL);
+INSERT INTO "Person" VALUES (1,'webmaster@myclub.foo','613cbc51f1650fb264beaad127efc1a5da0f96a96d4da7c440dc01a9e5299910','my first name','my last name','my nick name or nothing',NULL,'0',NULL,NULL,NULL,NULL,0,0,NULL,NULL,0,NULL,NULL,NULL);
 INSERT INTO "PersonGroup" VALUES (1,1,1);
 INSERT INTO "Settings" VALUES (1,'Title','title');
 INSERT INTO "Settings" VALUES (2,'LegalNotices','LegalNotices');

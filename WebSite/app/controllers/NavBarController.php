@@ -41,10 +41,9 @@ class NavBarController extends BaseController
     {
         if ($this->authorizedUser("/navbar/show/article/$id")) {
             $this->getPerson();
-            $chosenArticle = $this->fluent->from('Article')->where('Id', $id)->fetch();
             echo $this->latte->render('app/views/navbar/article.latte', $this->params->getAll([
                 'navItems' => $this->getNavItems(),
-                'chosenArticle' => $chosenArticle,
+                'chosenArticle' => $this->fluent->from('Article')->where('Id', $id)->fetch(),
                 'hasAuthorization' => $this->authorizations->hasAutorization()
             ]));
         } else {

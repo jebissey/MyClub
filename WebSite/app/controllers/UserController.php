@@ -107,6 +107,28 @@ class UserController extends BaseController
                                 $_SESSION['user'] = $email;
                                 $_SESSION['navbar'] = 'user';
                                 $this->application->message("Sign in succeeded with $email", 1);
+                                $now = date('Y-m-d H:i:s');
+                                $signOutCount = $this->fluentForLog->from('Log')
+                                    ->select(null)
+                                    ->select('COUNT(*) AS count')
+                                    ->where('Who = ?', $email)
+                                    ->where('Uri = ?', '/user/sign/out')
+                                    ->where('CreatedAt > ?', $person->LastSignIn)
+                                    ->fetch('count');
+                                if ($signOutCount == 0) {
+                                    $lastActivity = $this->fluentForLog->from('Log')
+                                        ->select(null)
+                                        ->select('CreatedAt')
+                                        ->where('Who = ?', $email)
+                                        ->where('CreatedAt > ?', $person->LastSignIn)
+                                        ->orderBy('CreatedAt DESC')
+                                        ->limit(1)
+                                        ->fetch('CreatedAt');
+                                    if ($lastActivity) {
+                                        $this->fluent->update('Person')->set('LastSignOut', $lastActivity)->where('Email', $email)->execute();
+                                    }
+                                }
+                                $this->fluent->update('Person')->set(['LastSignIn' => $now])->where('Email', $email)->execute();
                             } else {
                                 $this->application->error482("sign in failed with $email address", __FILE__, __LINE__);
                             }
@@ -131,6 +153,7 @@ class UserController extends BaseController
     public function signOut()
     {
         $this->log(200, 'Sign out succeeded with with ' . $_SESSION['user'] ?? '');
+        $this->fluent->update('Person')->set(['LastSignOut' => date('Y-m-d H:i:s')])->where('Email', $_SESSION['user'])->execute();
         unset($_SESSION['user']);
         $_SESSION['navbar'] = '';
         header('Location:/');
