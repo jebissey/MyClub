@@ -414,9 +414,21 @@ class UserController extends BaseController
     {
         $email = filter_var($_SESSION['user'] ?? '', FILTER_VALIDATE_EMAIL);
         $client = new Client();
-        $query = $this->pdoForLog->prepare('INSERT INTO Log(IpAddress, Referer, Os, Browser, ScreenResolution, Type, Uri, Token, Who, Code, Message) 
-        VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ? ,?)');
-        $query->execute([$client->getIp(), $client->getReferer(), $client->getOs(), $client->getBrowser(), $client->getScreenResolution(), $client->getType(), $client->getUri(), $client->getToken(), $email, $code, $message]);
+        $this->fluentForLog
+            ->insertInto('Log', [
+                'IpAddress'        => $client->getIp(),
+                'Referer'          => $client->getReferer(),
+                'Os'               => $client->getOs(),
+                'Browser'          => $client->getBrowser(),
+                'ScreenResolution' => $client->getScreenResolution(),
+                'Type'             => $client->getType(),
+                'Uri'              => $client->getUri(),
+                'Token'            => $client->getToken(),
+                'Who'              => $email,
+                'Code'             => $code,
+                'Message'          => $message,
+            ])
+            ->execute();
     }
 
     /* #region Statistics */
@@ -455,7 +467,7 @@ class UserController extends BaseController
         return $chartData;
     }
 
-    const SLICES = 25;
+    const SLICES = 100;
     private function getVisitStats($season)
     {
         $memberVisits = $this->getMemberVisits($season);
@@ -491,13 +503,42 @@ class UserController extends BaseController
             if ($index >= self::SLICES) $index = self::SLICES - 1;
             $distribution[$index]++;
         }
+        $mergedTranches = [];
+        $mergedDistribution = [];
+        $currentTranche = null;
+        $currentCount = 0;
+        for ($i = 0; $i < count($tranches); $i++) {
+            if ($distribution[$i] === 0) {
+                if ($currentTranche === null) {
+                    $currentTranche = $tranches[$i];
+                    $currentCount = 0;
+                } else {
+                    $currentTranche['end'] = $tranches[$i]['end'];
+                    $currentTranche['label'] = "{$currentTranche['start']}-{$currentTranche['end']}";
+                }
+            } else {
+                if ($currentTranche !== null) {
+                    $mergedTranches[] = $currentTranche;
+                    $mergedDistribution[] = $currentCount;
+                    $currentTranche = null;
+                    $currentCount = 0;
+                }
+                $mergedTranches[] = $tranches[$i];
+                $mergedDistribution[] = $distribution[$i];
+            }
+        }
+        if ($currentTranche !== null) {
+            $mergedTranches[] = $currentTranche;
+            $mergedDistribution[] = $currentCount;
+        }
 
         return [
-            'tranches' => $tranches,
-            'distribution' => $distribution,
+            'tranches' => $mergedTranches,
+            'distribution' => $mergedDistribution,
             'memberVisits' => $memberVisits
         ];
     }
+
 
     private function getMemberVisits($season)
     {
