@@ -202,12 +202,8 @@
                             </tbody>
                         </table>
                     </div>
-                </div>
-                
-                <hr>
-                
-                <div class="row mt-4">
-                    <div class="col-md-6 offset-md-3">
+
+                    <div class="col-md-6">
                         <h3>Contributions aux besoins des évènements</h3>
                         <div class="mb-3">
                             <div class="progress" style="height: 25px;">
@@ -220,6 +216,23 @@
                             </div>
                             <small class="text-muted">
                                 {$stats['participantSupplies']['user']} contribution(s) sur un total de {$stats['participantSupplies']['total']}
+                            </small>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <h3>Messages des évènements</h3>
+                        <div class="mb-3">
+                            <div class="progress" style="height: 25px;">
+                                <div class="progress-bar bg-success" role="progressbar" 
+                                    style="width: {$stats['participantMessages']['percentage']}%;" 
+                                    aria-valuenow="{$stats['participantMessages']['percentage']}" 
+                                    aria-valuemin="0" aria-valuemax="100">
+                                    {$stats['participantMessages']['percentage']}%
+                                </div>
+                            </div>
+                            <small class="text-muted">
+                                {$stats['participantMessages']['user']} contribution(s) sur un total de {$stats['participantMessages']['total']}
                             </small>
                         </div>
                     </div>

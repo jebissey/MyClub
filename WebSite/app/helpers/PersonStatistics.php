@@ -29,6 +29,7 @@ class PersonStatistics
             'events' => $this->getEventStats($person->Id, $seasonStart, $seasonEnd),
             'eventParticipations' => $this->getEventParticipationStats($person->Id, $seasonStart, $seasonEnd),
             'participantSupplies' => $this->getParticipantSupplyStats($person->Id, $seasonStart, $seasonEnd),
+            'participantMessages' => $this->getParticipantMessageStats($person->Id, $seasonStart, $seasonEnd),
         ];
 
         return $stats;
@@ -94,32 +95,29 @@ class PersonStatistics
         ];
     }
 
-
+    #region Private functions
     private function getArticleStats($personId, $seasonStart, $seasonEnd)
     {
-        $query = "
-            SELECT COUNT(*) as count 
-            FROM Article 
-            WHERE CreatedBy = ? 
-            AND LastUpdate BETWEEN ? AND ?
-        ";
-        $userArticles = $this->pdo->prepare($query);
-        $userArticles->execute([$personId, $seasonStart, $seasonEnd]);
-        $userArticlesCount = $userArticles->fetch()->count;
-
-        $query = "
-            SELECT COUNT(*) as count 
-            FROM Article 
-            WHERE LastUpdate BETWEEN ? AND ?
-        ";
-        $totalArticles = $this->pdo->prepare($query);
-        $totalArticles->execute([$seasonStart, $seasonEnd]);
-        $totalArticlesCount = $totalArticles->fetch()->count;
+        $userArticlesCount = $this->fluent
+            ->from('Article')
+            ->select(null)
+            ->select('COUNT(*) AS count')
+            ->where('CreatedBy', $personId)
+            ->where('LastUpdate BETWEEN ? AND ?', [$seasonStart, $seasonEnd])
+            ->fetch('count');
+        $totalArticlesCount = $this->fluent
+            ->from('Article')
+            ->select(null)
+            ->select('COUNT(*) AS count')
+            ->where('LastUpdate BETWEEN ? AND ?', [$seasonStart, $seasonEnd])
+            ->fetch('count');
 
         return [
-            'user' => $userArticlesCount,
-            'total' => $totalArticlesCount,
-            'percentage' => $totalArticlesCount > 0 ? round(($userArticlesCount / $totalArticlesCount) * 100, 2) : 0
+            'user'       => $userArticlesCount,
+            'total'      => $totalArticlesCount,
+            'percentage' => $totalArticlesCount > 0
+                ? round(($userArticlesCount / $totalArticlesCount) * 100, 2)
+                : 0
         ];
     }
 
@@ -169,157 +167,129 @@ class PersonStatistics
                 JOIN Survey s ON r.IdSurvey = s.Id
                 JOIN Article a ON s.IdArticle = a.Id
                 WHERE a.LastUpdate BETWEEN ? AND ?
-            )
-        ";
+            )";
         $userReplies = $this->pdo->prepare($query);
         $userReplies->execute([$personId, $seasonStart, $seasonEnd]);
         $userRepliesCount = $userReplies->fetch()->count;
 
-        $query = "
-            SELECT COUNT(*) as count 
-            FROM Reply
-            WHERE Id IN (
-                SELECT r.Id FROM Reply r
-                JOIN Survey s ON r.IdSurvey = s.Id
-                JOIN Article a ON s.IdArticle = a.Id
-                WHERE a.LastUpdate BETWEEN ? AND ?
-            )
-        ";
-        $totalReplies = $this->pdo->prepare($query);
-        $totalReplies->execute([$seasonStart, $seasonEnd]);
-        $totalRepliesCount = $totalReplies->fetch()->count;
+        $totalRepliesCount = $this->fluent->from('Reply r')
+            ->select(null)
+            ->select('COUNT(*) AS count')
+            ->join('Survey s ON r.IdSurvey = s.Id')
+            ->join('Article a ON s.IdArticle = a.Id')
+            ->where('a.LastUpdate BETWEEN ? AND ?', $seasonStart, $seasonEnd)
+            ->fetch()->count;
 
         return [
-            'user' => $userRepliesCount,
-            'total' => $totalRepliesCount,
-            'percentage' => $totalRepliesCount > 0 ? round(($userRepliesCount / $totalRepliesCount) * 100, 2) : 0
+            'user'       => $userRepliesCount,
+            'total'      => $totalRepliesCount,
+            'percentage' => $totalRepliesCount > 0
+                ? round(($userRepliesCount / $totalRepliesCount) * 100, 2)
+                : 0
         ];
     }
 
     private function getDesignStats($personId, $seasonStart, $seasonEnd)
     {
-        $query = "
-            SELECT COUNT(*) as count 
-            FROM Design 
-            WHERE IdPerson = ? 
-            AND datetime(LastUpdate) BETWEEN datetime(?) AND datetime(?)
-        ";
-        $userDesigns = $this->pdo->prepare($query);
-        $userDesigns->execute([$personId, $seasonStart, $seasonEnd]);
-        $userDesignsCount = $userDesigns->fetch()->count;
-
-        $query = "
-            SELECT COUNT(*) as count 
-            FROM Design 
-            WHERE datetime(LastUpdate) BETWEEN datetime(?) AND datetime(?)
-        ";
-        $totalDesigns = $this->pdo->prepare($query);
-        $totalDesigns->execute([$seasonStart, $seasonEnd]);
-        $totalDesignsCount = $totalDesigns->fetch()->count;
-
+        $userDesignsCount = $this->fluent
+            ->from('Design')
+            ->select(null)
+            ->select('COUNT(*) AS count')
+            ->where('IdPerson', $personId)
+            ->where('datetime(LastUpdate) BETWEEN datetime(?) AND datetime(?)', [$seasonStart, $seasonEnd])
+            ->fetch('count');
+        $totalDesignsCount = $this->fluent
+            ->from('Design')
+            ->select(null)
+            ->select('COUNT(*) AS count')
+            ->where('datetime(LastUpdate) BETWEEN datetime(?) AND datetime(?)', [$seasonStart, $seasonEnd])
+            ->fetch('count');
         return [
-            'user' => $userDesignsCount,
-            'total' => $totalDesignsCount,
-            'percentage' => $totalDesignsCount > 0 ? round(($userDesignsCount / $totalDesignsCount) * 100, 2) : 0
+            'user'       => $userDesignsCount,
+            'total'      => $totalDesignsCount,
+            'percentage' => $totalDesignsCount > 0
+                ? round(($userDesignsCount / $totalDesignsCount) * 100, 2)
+                : 0
         ];
     }
 
     private function getDesignVoteStats($personId, $seasonStart, $seasonEnd)
     {
-        $query = "
-            SELECT COUNT(*) as count 
-            FROM DesignVote 
-            WHERE IdPerson = ? 
-            AND Id IN (
-                SELECT dv.Id FROM DesignVote dv
-                JOIN Design d ON dv.IdDesign = d.Id
-                WHERE datetime(d.LastUpdate) BETWEEN datetime(?) AND datetime(?)
-            )
-        ";
-        $userVotes = $this->pdo->prepare($query);
-        $userVotes->execute([$personId, $seasonStart, $seasonEnd]);
-        $userVotesCount = $userVotes->fetch()->count;
-
-        $query = "
-            SELECT COUNT(*) as count 
-            FROM DesignVote
-            WHERE Id IN (
-                SELECT dv.Id FROM DesignVote dv
-                JOIN Design d ON dv.IdDesign = d.Id
-                WHERE datetime(d.LastUpdate) BETWEEN datetime(?) AND datetime(?)
-            )
-        ";
-        $totalVotes = $this->pdo->prepare($query);
-        $totalVotes->execute([$seasonStart, $seasonEnd]);
-        $totalVotesCount = $totalVotes->fetch()->count;
+        $userVotesCount = $this->fluent
+            ->from('DesignVote dv')
+            ->select(null)
+            ->select('COUNT(*) AS count')
+            ->join('Design d ON dv.IdDesign = d.Id')
+            ->where('dv.IdPerson', $personId)
+            ->where('datetime(d.LastUpdate) BETWEEN datetime(?) AND datetime(?)', [$seasonStart, $seasonEnd])
+            ->fetch('count');
+        $totalVotesCount = $this->fluent
+            ->from('DesignVote dv')
+            ->select(null)
+            ->select('COUNT(*) AS count')
+            ->join('Design d ON dv.IdDesign = d.Id')
+            ->where('datetime(d.LastUpdate) BETWEEN datetime(?) AND datetime(?)', [$seasonStart, $seasonEnd])
+            ->fetch('count');
 
         return [
-            'user' => $userVotesCount,
-            'total' => $totalVotesCount,
-            'percentage' => $totalVotesCount > 0 ? round(($userVotesCount / $totalVotesCount) * 100, 2) : 0
+            'user'       => $userVotesCount,
+            'total'      => $totalVotesCount,
+            'percentage' => $totalVotesCount > 0
+                ? round(($userVotesCount / $totalVotesCount) * 100, 2)
+                : 0
         ];
     }
 
     private function getEventStats($personId, $seasonStart, $seasonEnd)
     {
         $eventTypes = $this->fluent->from('EventType')->fetchAll();
-
         $stats = [];
-
         foreach ($eventTypes as $eventType) {
-            $query = "
-                SELECT COUNT(*) as count 
-                FROM Event 
-                WHERE CreatedBy = ? 
-                AND IdEventType = ?
-                AND datetime(StartTime) BETWEEN datetime(?) AND datetime(?)
-            ";
-            $userEvents = $this->pdo->prepare($query);
-            $userEvents->execute([$personId, $eventType->Id, $seasonStart, $seasonEnd]);
-            $userEventsCount = $userEvents->fetch()->count;
-
-            $query = "
-                SELECT COUNT(*) as count 
-                FROM Event 
-                WHERE IdEventType = ?
-                AND datetime(StartTime) BETWEEN datetime(?) AND datetime(?)
-            ";
-            $totalEvents = $this->pdo->prepare($query);
-            $totalEvents->execute([$eventType->Id, $seasonStart, $seasonEnd]);
-            $totalEventsCount = $totalEvents->fetch()->count;
-
+            $userEventsCount = $this->fluent
+                ->from('Event')
+                ->select(null)
+                ->select('COUNT(*) AS count')
+                ->where('CreatedBy', $personId)
+                ->where('IdEventType', $eventType->Id)
+                ->where('datetime(StartTime) BETWEEN datetime(?) AND datetime(?)', [$seasonStart, $seasonEnd])
+                ->fetch('count');
+            $totalEventsCount = $this->fluent
+                ->from('Event')
+                ->select(null)
+                ->select('COUNT(*) AS count')
+                ->where('IdEventType', $eventType->Id)
+                ->where('datetime(StartTime) BETWEEN datetime(?) AND datetime(?)', [$seasonStart, $seasonEnd])
+                ->fetch('count');
             $stats[$eventType->Id] = [
-                'typeName' => $eventType->Name,
-                'user' => $userEventsCount,
-                'total' => $totalEventsCount,
-                'percentage' => $totalEventsCount > 0 ? round(($userEventsCount / $totalEventsCount) * 100, 2) : 0
+                'typeName'   => $eventType->Name,
+                'user'       => $userEventsCount,
+                'total'      => $totalEventsCount,
+                'percentage' => $totalEventsCount > 0
+                    ? round(($userEventsCount / $totalEventsCount) * 100, 2)
+                    : 0
             ];
         }
-
-        $query = "
-            SELECT COUNT(*) as count 
-            FROM Event 
-            WHERE CreatedBy = ? 
-            AND datetime(StartTime) BETWEEN datetime(?) AND datetime(?)
-        ";
-        $userAllEvents = $this->pdo->prepare($query);
-        $userAllEvents->execute([$personId, $seasonStart, $seasonEnd]);
-        $userAllEventsCount = $userAllEvents->fetch()->count;
-
-        $query = "
-            SELECT COUNT(*) as count 
-            FROM Event 
-            WHERE datetime(StartTime) BETWEEN datetime(?) AND datetime(?)
-        ";
-        $totalAllEvents = $this->pdo->prepare($query);
-        $totalAllEvents->execute([$seasonStart, $seasonEnd]);
-        $totalAllEventsCount = $totalAllEvents->fetch()->count;
+        $userAllEventsCount = $this->fluent
+            ->from('Event')
+            ->select(null)
+            ->select('COUNT(*) AS count')
+            ->where('CreatedBy', $personId)
+            ->where('datetime(StartTime) BETWEEN datetime(?) AND datetime(?)', [$seasonStart, $seasonEnd])
+            ->fetch('count');
+        $totalAllEventsCount = $this->fluent
+            ->from('Event')
+            ->select(null)
+            ->select('COUNT(*) AS count')
+            ->where('datetime(StartTime) BETWEEN datetime(?) AND datetime(?)', [$seasonStart, $seasonEnd])
+            ->fetch('count');
 
         $stats['total'] = [
-            'typeName' => 'Total',
-            'user' => $userAllEventsCount,
-            'total' => $totalAllEventsCount,
-            'percentage' => $totalAllEventsCount > 0 ? round(($userAllEventsCount / $totalAllEventsCount) * 100, 2) : 0
+            'typeName'   => 'Total',
+            'user'       => $userAllEventsCount,
+            'total'      => $totalAllEventsCount,
+            'percentage' => $totalAllEventsCount > 0
+                ? round(($userAllEventsCount / $totalAllEventsCount) * 100, 2)
+                : 0
         ];
 
         return $stats;
@@ -332,63 +302,56 @@ class PersonStatistics
         $stats = [];
 
         foreach ($eventTypes as $eventType) {
-            $query = "
-                SELECT COUNT(*) as count 
-                FROM Participant p
-                JOIN Event e ON p.IdEvent = e.Id
-                WHERE p.IdPerson = ? 
-                AND e.IdEventType = ?
-                AND datetime(e.StartTime) BETWEEN datetime(?) AND datetime(?)
-            ";
-            $userParticipations = $this->pdo->prepare($query);
-            $userParticipations->execute([$personId, $eventType->Id, $seasonStart, $seasonEnd]);
-            $userParticipationsCount = $userParticipations->fetch()->count;
-
-            $query = "
-                SELECT COUNT(*) as count 
-                FROM Participant p
-                JOIN Event e ON p.IdEvent = e.Id
-                WHERE e.IdEventType = ?
-                AND datetime(e.StartTime) BETWEEN datetime(?) AND datetime(?)
-            ";
-            $totalParticipations = $this->pdo->prepare($query);
-            $totalParticipations->execute([$eventType->Id, $seasonStart, $seasonEnd]);
-            $totalParticipationsCount = $totalParticipations->fetch()->count;
+            $userParticipationsCount = $this->fluent
+                ->from('Participant p')
+                ->select(null)
+                ->select('COUNT(*) AS count')
+                ->join('Event e ON p.IdEvent = e.Id')
+                ->where('p.IdPerson', $personId)
+                ->where('e.IdEventType', $eventType->Id)
+                ->where('datetime(e.StartTime) BETWEEN datetime(?) AND datetime(?)', [$seasonStart, $seasonEnd])
+                ->fetch('count');
+            $totalParticipationsCount = $this->fluent
+                ->from('Participant p')
+                ->select(null)
+                ->select('COUNT(*) AS count')
+                ->join('Event e ON p.IdEvent = e.Id')
+                ->where('e.IdEventType', $eventType->Id)
+                ->where('datetime(e.StartTime) BETWEEN datetime(?) AND datetime(?)', [$seasonStart, $seasonEnd])
+                ->fetch('count');
 
             $stats[$eventType->Id] = [
-                'typeName' => $eventType->Name,
-                'user' => $userParticipationsCount,
-                'total' => $totalParticipationsCount,
-                'percentage' => $totalParticipationsCount > 0 ? round(($userParticipationsCount / $totalParticipationsCount) * 100, 2) : 0
+                'typeName'   => $eventType->Name,
+                'user'       => $userParticipationsCount,
+                'total'      => $totalParticipationsCount,
+                'percentage' => $totalParticipationsCount > 0
+                    ? round(($userParticipationsCount / $totalParticipationsCount) * 100, 2)
+                    : 0
             ];
         }
-
-        $query = "
-            SELECT COUNT(*) as count 
-            FROM Participant p
-            JOIN Event e ON p.IdEvent = e.Id
-            WHERE p.IdPerson = ? 
-            AND datetime(e.StartTime) BETWEEN datetime(?) AND datetime(?)
-        ";
-        $userAllParticipations = $this->pdo->prepare($query);
-        $userAllParticipations->execute([$personId, $seasonStart, $seasonEnd]);
-        $userAllParticipationsCount = $userAllParticipations->fetch()->count;
-
-        $query = "
-            SELECT COUNT(*) as count 
-            FROM Participant p
-            JOIN Event e ON p.IdEvent = e.Id
-            WHERE datetime(e.StartTime) BETWEEN datetime(?) AND datetime(?)
-        ";
-        $totalAllParticipations = $this->pdo->prepare($query);
-        $totalAllParticipations->execute([$seasonStart, $seasonEnd]);
-        $totalAllParticipationsCount = $totalAllParticipations->fetch()->count;
+        $userAllParticipationsCount = $this->fluent
+            ->from('Participant p')
+            ->select(null)
+            ->select('COUNT(*) AS count')
+            ->join('Event e ON p.IdEvent = e.Id')
+            ->where('p.IdPerson', $personId)
+            ->where('datetime(e.StartTime) BETWEEN datetime(?) AND datetime(?)', [$seasonStart, $seasonEnd])
+            ->fetch('count');
+        $totalAllParticipationsCount = $this->fluent
+            ->from('Participant p')
+            ->select(null)
+            ->select('COUNT(*) AS count')
+            ->join('Event e ON p.IdEvent = e.Id')
+            ->where('datetime(e.StartTime) BETWEEN datetime(?) AND datetime(?)', [$seasonStart, $seasonEnd])
+            ->fetch('count');
 
         $stats['total'] = [
-            'typeName' => 'Total',
-            'user' => $userAllParticipationsCount,
-            'total' => $totalAllParticipationsCount,
-            'percentage' => $totalAllParticipationsCount > 0 ? round(($userAllParticipationsCount / $totalAllParticipationsCount) * 100, 2) : 0
+            'typeName'   => 'Total',
+            'user'       => $userAllParticipationsCount,
+            'total'      => $totalAllParticipationsCount,
+            'percentage' => $totalAllParticipationsCount > 0
+                ? round(($userAllParticipationsCount / $totalAllParticipationsCount) * 100, 2)
+                : 0
         ];
 
         return $stats;
@@ -396,33 +359,55 @@ class PersonStatistics
 
     private function getParticipantSupplyStats($personId, $seasonStart, $seasonEnd)
     {
-        $query = "
-            SELECT COUNT(*) as count 
-            FROM ParticipantSupply ps
-            JOIN Participant p ON ps.IdParticipant = p.Id
-            JOIN Event e ON p.IdEvent = e.Id
-            WHERE p.IdPerson = ? 
-            AND datetime(e.StartTime) BETWEEN datetime(?) AND datetime(?)
-        ";
-        $userSupplies = $this->pdo->prepare($query);
-        $userSupplies->execute([$personId, $seasonStart, $seasonEnd]);
-        $userSuppliesCount = $userSupplies->fetch()->count;
-
-        $query = "
-            SELECT COUNT(*) as count 
-            FROM ParticipantSupply ps
-            JOIN Participant p ON ps.IdParticipant = p.Id
-            JOIN Event e ON p.IdEvent = e.Id
-            WHERE datetime(e.StartTime) BETWEEN datetime(?) AND datetime(?)
-        ";
-        $totalSupplies = $this->pdo->prepare($query);
-        $totalSupplies->execute([$seasonStart, $seasonEnd]);
-        $totalSuppliesCount = $totalSupplies->fetch()->count;
-
+        $userSuppliesCount = $this->fluent
+            ->from('ParticipantSupply ps')
+            ->select(null)
+            ->select('COUNT(*) AS count')
+            ->join('Participant p ON ps.IdParticipant = p.Id')
+            ->join('Event e ON p.IdEvent = e.Id')
+            ->where('p.IdPerson', $personId)
+            ->where('datetime(e.StartTime) BETWEEN datetime(?) AND datetime(?)', [$seasonStart, $seasonEnd])
+            ->fetch('count');
+        $totalSuppliesCount = $this->fluent
+            ->from('ParticipantSupply ps')
+            ->select(null)
+            ->select('COUNT(*) AS count')
+            ->join('Participant p ON ps.IdParticipant = p.Id')
+            ->join('Event e ON p.IdEvent = e.Id')
+            ->where('datetime(e.StartTime) BETWEEN datetime(?) AND datetime(?)', [$seasonStart, $seasonEnd])
+            ->fetch('count');
         return [
-            'user' => $userSuppliesCount,
-            'total' => $totalSuppliesCount,
-            'percentage' => $totalSuppliesCount > 0 ? round(($userSuppliesCount / $totalSuppliesCount) * 100, 2) : 0
+            'user'       => $userSuppliesCount,
+            'total'      => $totalSuppliesCount,
+            'percentage' => $totalSuppliesCount > 0
+                ? round(($userSuppliesCount / $totalSuppliesCount) * 100, 2)
+                : 0
+        ];
+    }
+
+    private function getParticipantMessageStats($personId, $seasonStart, $seasonEnd)
+    {
+        $userMessagesCount = $this->fluent
+            ->from('Message m')
+            ->select(null)
+            ->select('COUNT(*) AS count')
+            ->join('Event e ON m.EventId = e.Id')
+            ->where('m.PersonId', $personId)
+            ->where('datetime(e.StartTime) BETWEEN datetime(?) AND datetime(?)', [$seasonStart, $seasonEnd])
+            ->fetch('count');
+        $totalMessagesCount = $this->fluent
+            ->from('Message m')
+            ->select(null)
+            ->select('COUNT(*) AS count')
+            ->join('Event e ON m.EventId = e.Id')
+            ->where('datetime(e.StartTime) BETWEEN datetime(?) AND datetime(?)', [$seasonStart, $seasonEnd])
+            ->fetch('count');
+        return [
+            'user'       => $userMessagesCount,
+            'total'      => $totalMessagesCount,
+            'percentage' => $totalMessagesCount > 0
+                ? round(($userMessagesCount / $totalMessagesCount) * 100, 2)
+                : 0
         ];
     }
 }
