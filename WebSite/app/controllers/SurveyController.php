@@ -18,7 +18,7 @@ class SurveyController extends BaseController
                     ->where('IdArticle', $article->Id)
                     ->fetch();
 
-                $this->latte->render('app/views/survey/add.latte', $this->params->getAll([
+                $this->render('app/views/survey/add.latte', $this->params->getAll([
                     'article' => $article,
                     'survey' => $survey
                 ]));
@@ -106,7 +106,7 @@ class SurveyController extends BaseController
                     }
                 }
 
-                $this->latte->render('app/views/survey/results.latte', [
+                $this->render('app/views/survey/results.latte', [
                     'survey' => $survey,
                     'options' => $options,
                     'results' => $results,

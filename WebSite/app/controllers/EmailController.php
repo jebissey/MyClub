@@ -42,7 +42,7 @@ class EmailController extends BaseController
                 $groupName = $idGroup != '' ? $this->getGroup($idGroup)->Name : '';
                 $eventTypeName = $idEventType != '' ? $this->fluent->from('EventType')->where('Id', $idEventType)->fetch('Name') : '';
                 $dayOfWeekName = $dayOfWeek != '' ? ['Lu.', 'Ma.', 'Me.', 'Je.', 'Ve.', 'Sa.', 'Di.', ''][$dayOfWeek] : '';
-                echo $this->latte->render('app/views/emails/copyToClipBoard.latte', $this->params->getAll([
+                $this->render('app/views/emails/copyToClipBoard.latte', $this->params->getAll([
                     'emailsJson' => json_encode($filteredEmails),
                     'emails' => $filteredEmails,
                     'filters' => "$groupName / $eventTypeName / $dayOfWeekName / $timeOfDay",
@@ -50,7 +50,7 @@ class EmailController extends BaseController
                 ]));
             } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
-                echo $this->latte->render('app/views/emails/getEmails.latte', $this->params->getAll([
+                $this->render('app/views/emails/getEmails.latte', $this->params->getAll([
                     'groups' => $this->getGroups(),
                     'eventTypes' => $this->fluent->from('EventType')->where('Inactivated', 0)->orderBy('Name')->fetchAll('Id', 'Name'),
                 ]));
@@ -89,7 +89,7 @@ class EmailController extends BaseController
                         $filteredEmails[] = $person->Email;
                     }
                 }
-                echo $this->latte->render('app/views/emails/copyToClipBoard.latte', $this->params->getAll([
+                $this->render('app/views/emails/copyToClipBoard.latte', $this->params->getAll([
                     'emailsJson' => json_encode($filteredEmails),
                     'emails' => $filteredEmails,
                     'filters' => "subcription to new article",

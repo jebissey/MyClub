@@ -3,17 +3,17 @@
 {block title}Evènements{/block}
 
 {block head}
-<style>
-.attribute-badge {
-    display: inline-block;
-    width: 20px;
-    height: 20px;
-    margin-right: 5px;
-    border-radius: 4px;
-    cursor: help;
-    border: 1px solid rgba(0,0,0,0.2);
-}
-</style>
+    <style>
+        .attribute-badge {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            margin-right: 5px;
+            border-radius: 4px;
+            cursor: help;
+            border: 1px solid rgba(0,0,0,0.2);
+        }
+    </style>
 {/block}
 
 {block navbar}
@@ -41,6 +41,7 @@
         </div>
         {/if}
     </div>
+
     <table class="table table-striped">
         <thead>
             <tr>
@@ -57,23 +58,29 @@
             </tr>
         </thead>
         <tbody>
-            {foreach $events as $event}
+        {foreach $events as $event}
             <tr onclick="window.location.href='/events/{$event['id']}';" style="cursor: pointer;">
                 <td>
                 {if $event['createdBy'] == ($person->Id ?? false) && $mode == 'next'}
                     <div class="ms-auto d-flex flex-column flex-sm-row gap-2">
+                        <button class="btn btn-sm btn-info email-btn" 
+                                data-event-id="{$event['id']}"
+                                data-event-title="{$event['summary']}"
+                                data-participants-count="{$event['participants']}"
+                                data-messages-count="{$event['messages']}"
+                                data-bs-toggle="modal" 
+                                data-bs-target="#emailModal"
+                                onclick="event.stopPropagation();">
+                            <i class="bi bi-envelope"></i>
+                        </button>
+                        <button class="btn btn-sm btn-secondary duplicate-btn" data-id="{$event['id']}">
+                            <i class="bi bi-files"></i>
+                        </button>
                         <button class="btn btn-sm btn-primary edit-btn">
                             <i class="bi bi-pencil"></i>
                         </button>
                         <button class="btn btn-sm btn-danger delete-btn">
                             <i class="bi bi-trash"></i>
-                        </button>
-                    </div>
-                {/if}
-                {if $isEventManager && $mode == 'past'}
-                    <div class="ms-auto d-flex flex-column flex-sm-row gap-2">
-                        <button class="btn btn-sm btn-secondary duplicate-btn" data-id="{$event['id']}">
-                            <i class="bi bi-files"></i>
                         </button>
                     </div>
                 {/if}
@@ -100,10 +107,56 @@
                 <td>{$event['messages']}</td>
                 <td>{=$event['audience']|translate}</td>
             </tr>
-            {/foreach}
+        {/foreach}
         </tbody>
     </table>
 
+    <!-- Modale pour l'envoi d'emails -->
+    <div class="modal fade" id="emailModal" tabindex="-1" aria-labelledby="emailModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="emailModalLabel">Envoyer un courriel</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="emailForm">
+                        <input type="hidden" id="emailEventId" name="eventId">
+
+                        <div class="mb-3">
+                            <label for="emailTypeSelect" class="form-label">Type de message</label>
+                            <select class="form-control" id="emailTypeSelect" name="emailType" required>
+                                <option value="">Sélectionnez un type</option>
+                                <option value="nouvel-evenement">Nouvel évènement</option>
+                                <option value="rappel">Rappel</option>
+                                <option value="annule">Annulé</option>
+                                <option value="modifie">Modifié</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="recipientsSelect" class="form-label">Destinataires</label>
+                            <select class="form-control" id="recipientsSelect" name="recipients" required>
+                                <option value="">Sélectionnez d'abord un type de message</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="emailMessage" class="form-label">Message</label>
+                            <textarea class="form-control" id="emailMessage" name="message" rows="5" placeholder="Saisissez votre message..." required></textarea>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                            <button type="submit" class="btn btn-primary">Envoyer</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modale pour créer/modifier un événement -->
     <div class="modal fade" id="eventModal" tabindex="-1" aria-labelledby="eventModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">

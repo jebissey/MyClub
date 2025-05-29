@@ -6,7 +6,6 @@ use DateTime;
 use PDO;
 use app\helpers\Alert;
 use app\helpers\Article;
-use app\helpers\Client;
 use app\helpers\Params;
 use app\helpers\PasswordManager;
 use app\helpers\PersonStatistics;
@@ -71,7 +70,7 @@ class UserController extends BaseController
                     $this->application->message('Votre mot de passe est réinitialisé');
                 }
             } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-                echo $this->latte->render('app/views/user/setPassword.latte', [
+                $this->render('app/views/user/setPassword.latte', [
                     'href' => '/user/sign/in',
                     'userImg' => '/app/images/anonymat.png',
                     'userEmail' => '',
@@ -137,7 +136,7 @@ class UserController extends BaseController
                 }
             }
         } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-            echo $this->latte->render('app/views/user/signIn.latte', [
+            $this->render('app/views/user/signIn.latte', [
                 'href' => '/user/sign/in',
                 'userImg' => '/app/images/anonymat.png',
                 'userEmail' => '',
@@ -157,7 +156,7 @@ class UserController extends BaseController
         unset($_SESSION['user']);
         $_SESSION['navbar'] = '';
         header('Location:/');
-        exit();
+        exit;
     }
     #endregion
 
@@ -194,7 +193,7 @@ class UserController extends BaseController
             ]);
         }
         $articles = $articleController->getLatestArticles($userEmail);
-        echo $this->latte->render('app/views/home.latte', $this->params->getAll([
+        $this->render('app/views/home.latte', $this->params->getAll([
             'latestArticle' => $articles['latestArticle'],
             'latestArticleTitles' => $articles['latestArticleTitles'],
             'greatings' => $this->settings->get('Greatings'),
@@ -213,7 +212,7 @@ class UserController extends BaseController
         if ($this->getPerson()) {
             $_SESSION['navbar'] = 'user';
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-                echo $this->latte->render('app/views/user/user.latte', $this->params->getAll([]));
+                $this->render('app/views/user/user.latte', $this->params->getAll([]));
             } else {
                 $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
             }
@@ -261,7 +260,7 @@ class UserController extends BaseController
                     return basename($path);
                 }, $emojiFiles);
 
-                echo $this->latte->render('app/views/user/account.latte', $this->params->getAll([
+                $this->render('app/views/user/account.latte', $this->params->getAll([
                     'readOnly' => $person->Imported == 1 ? true : false,
                     'email' => $email,
                     'firstName' => $firstName,
@@ -292,7 +291,7 @@ class UserController extends BaseController
                 $this->flight->redirect('/user');
             } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $currentAvailabilities = json_decode($person->Availabilities ?? '', true);
-                echo $this->latte->render('app/views/user/availabilities.latte', $this->params->getAll([
+                $this->render('app/views/user/availabilities.latte', $this->params->getAll([
                     'currentAvailabilities' => $currentAvailabilities
                 ]));
             } else {
@@ -345,7 +344,7 @@ class UserController extends BaseController
                     $eventTypesWithAttributes[] = $eventType;
                 }
 
-                echo $this->latte->render('app/views/user/preferences.latte', $this->params->getAll([
+                $this->render('app/views/user/preferences.latte', $this->params->getAll([
                     'currentPreferences' => $preferences,
                     'eventTypes' => $eventTypesWithAttributes
                 ]));
@@ -386,7 +385,7 @@ class UserController extends BaseController
                 ORDER BY g.Name');
                 $query->execute([$person->Id]);
                 $currentGroups = $query->fetchAll();
-                echo $this->latte->render('app/views/user/groups.latte', $this->params->getAll([
+                $this->render('app/views/user/groups.latte', $this->params->getAll([
                     'groups' => $currentGroups,
                     'layout' => $this->getLayout()
                 ]));
@@ -400,7 +399,7 @@ class UserController extends BaseController
     public function help()
     {
         if ($this->getPerson()) {
-            echo $this->latte->render('app/views/info.latte', $this->params->getAll([
+            $this->render('app/views/info.latte', $this->params->getAll([
                 'content' => $this->settings->get('Help_user'),
                 'hasAuthorization' => $this->authorizations->hasAutorization(),
                 'currentVersion' => self::VERSION
@@ -410,34 +409,13 @@ class UserController extends BaseController
         }
     }
 
-    public function log($code = '', $message = '')
-    {
-        $email = filter_var($_SESSION['user'] ?? '', FILTER_VALIDATE_EMAIL);
-        $client = new Client();
-        $this->fluentForLog
-            ->insertInto('Log', [
-                'IpAddress'        => $client->getIp(),
-                'Referer'          => $client->getReferer(),
-                'Os'               => $client->getOs(),
-                'Browser'          => $client->getBrowser(),
-                'ScreenResolution' => $client->getScreenResolution(),
-                'Type'             => $client->getType(),
-                'Uri'              => $client->getUri(),
-                'Token'            => $client->getToken(),
-                'Who'              => $email,
-                'Code'             => $code,
-                'Message'          => $message,
-            ])
-            ->execute();
-    }
-
     /* #region Statistics */
     public function showStatistics()
     {
         if ($person = $this->getPerson([])) {
             $personalStatistics = new PersonStatistics($this->pdo);
             $season = $personalStatistics->getSeasonRange();
-            echo $this->latte->render('app/views/user/statistics.latte', $this->params->getAll([
+            $this->render('app/views/user/statistics.latte', $this->params->getAll([
                 'stats' => $personalStatistics->getStats($person, $season['start'], $season['end']),
                 'seasons' => $personalStatistics->getAvailableSeasons(),
                 'currentSeason' => $season,
@@ -448,7 +426,6 @@ class UserController extends BaseController
             $this->application->error403(__FILE__, __LINE__);
         }
     }
-
 
     private function getVisitStatsForChart($season, $person)
     {

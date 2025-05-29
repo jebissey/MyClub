@@ -14,7 +14,7 @@ class EventController extends BaseController
         $offset = (int) ($_GET['offset'] ?? 0);
         $mode = $_GET['mode'] ?? 'next';
 
-        echo $this->latte->render('app/views/event/nextEvents.latte', $this->params->getAll([
+        $this->render('app/views/event/nextEvents.latte', $this->params->getAll([
             'navItems' => $this->getNavItems(),
             'events' => $event->getEvents($person, $mode, $offset),
             'person' => $person,
@@ -34,7 +34,7 @@ class EventController extends BaseController
         }
         $event = new Event($this->pdo);
 
-        echo $this->latte->render('app/views/event/detail.latte', $this->params->getAll([
+        $this->render('app/views/event/detail.latte', $this->params->getAll([
             'eventId' => $eventId,
             'event' => $event->getEvent($eventId),
             'attributes' => $event->getEventAttributes($eventId),
@@ -82,7 +82,7 @@ class EventController extends BaseController
     {
         if ($this->getPerson(['EventManager'])) {
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-                $this->latte->render('app/views/event/location.latte', $this->params->getAll([]));
+                $this->render('app/views/event/location.latte', $this->params->getAll([]));
             } else {
                 $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
             }
@@ -95,7 +95,7 @@ class EventController extends BaseController
     {
         $this->getPerson();
 
-        echo $this->latte->render('app/views/info.latte', [
+        $this->render('app/views/info.latte', [
             'content' => $this->settings->get('Help_eventManager'),
             'hasAuthorization' => $this->authorizations->hasAutorization(),
             'currentVersion' => self::VERSION
@@ -109,7 +109,7 @@ class EventController extends BaseController
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $_SESSION['navbar'] = 'eventManager';
 
-                echo $this->latte->render('app/views/admin/eventManager.latte', $this->params->getAll([]));
+                $this->render('app/views/admin/eventManager.latte', $this->params->getAll([]));
             } else {
                 $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
             }
@@ -121,7 +121,7 @@ class EventController extends BaseController
     public function needs()
     {
         if ($this->getPerson(['Webmaster'])) {
-            echo $this->latte->render('app/views/event/needs.latte', $this->params->getAll([
+            $this->render('app/views/event/needs.latte', $this->params->getAll([
                 'navItems' => $this->getNavItems(),
                 'needTypes' => $this->fluent->from('NeedType')->orderBy('Name')->fetchAll(),
                 'needs' => $this->fluent
@@ -152,7 +152,7 @@ class EventController extends BaseController
                 ->orderBy('Message.Id ASC')
                 ->fetchAll();
 
-            echo $this->latte->render('app/views/event/chat.latte', $this->params->getAll([
+            $this->render('app/views/event/chat.latte', $this->params->getAll([
                 'event' => $event,
                 'creator' => $creator,
                 'messages' => $messages,

@@ -61,7 +61,7 @@ class EventApi extends BaseController
 
                 $this->pdo->commit();
 
-                echo $this->latte->render('app/views/eventType/attributes-list.latte', $this->params->getAll([
+                $this->render('app/views/eventType/attributes-list.latte', $this->params->getAll([
                     'attributes' => $attributes
                 ]));
             } catch (\Exception $e) {
@@ -82,7 +82,7 @@ class EventApi extends BaseController
                 ->orderBy('Name')
                 ->fetchAll();
 
-            echo $this->latte->render('app/views/eventType/attributes-list.latte', $this->params->getAll([
+            $this->render('app/views/eventType/attributes-list.latte', $this->params->getAll([
                 'attributes' => $attributes
             ]));
         } else {

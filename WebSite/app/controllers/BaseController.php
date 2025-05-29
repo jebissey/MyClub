@@ -4,12 +4,14 @@ namespace app\controllers;
 
 use DateTime;
 use PDO;
+use flight;
 use flight\Engine;
 use Latte\Engine as LatteEngine;
 
 use app\helpers\Application;
 use app\helpers\Authorization;
 use app\helpers\BaseHelper;
+use app\helpers\Client;
 use app\helpers\GravatarHandler;
 use app\helpers\Params;
 use app\helpers\Settings;
@@ -31,6 +33,7 @@ abstract class BaseController extends BaseHelper
 
     private $translationManager;
 
+    #region Public funcions
     public function __construct(PDO $pdo, Engine $flight)
     {
         $this->pdo = $pdo;
@@ -89,6 +92,28 @@ abstract class BaseController extends BaseHelper
         return self::VERSION;
     }
 
+    public function log($code = '', $message = '')
+    {
+        $email = filter_var($_SESSION['user'] ?? '', FILTER_VALIDATE_EMAIL);
+        $client = new Client();
+        $this->fluentForLog
+            ->insertInto('Log', [
+                'IpAddress'        => $client->getIp(),
+                'Referer'          => $client->getReferer(),
+                'Os'               => $client->getOs(),
+                'Browser'          => $client->getBrowser(),
+                'ScreenResolution' => $client->getScreenResolution(),
+                'Type'             => $client->getType(),
+                'Uri'              => $client->getUri(),
+                'Token'            => $client->getToken(),
+                'Who'              => $email,
+                'Code'             => $code,
+                'Message'          => $message,
+            ])
+            ->execute();
+    }
+
+    #region Protected functions
     protected function sanitizeInput($data)
     {
         return trim($data ?? '');
@@ -255,7 +280,19 @@ abstract class BaseController extends BaseHelper
         return false;
     }
 
+    protected function render(string $name, object|array $params = []): void
+    {
+        $content = $this->latte->renderToString($name, $params);
+        echo $content;
 
+        if (ob_get_level()) {
+            ob_end_flush();
+        }
+        flush();
+        Flight::stop();
+    }
+
+    #region Private functions
     private function getHref($userEmail)
     {
         return $userEmail == '' ? '/user/sign/in' : '/user';

@@ -29,7 +29,7 @@ class GroupController extends BaseController implements CrudControllerInterface
                 ORDER BY g.Name
             ");
             $groups = $query->fetchAll();
-            echo $this->latte->render('app/views/groups/index.latte', $this->params->getAll([
+            $this->render('app/views/groups/index.latte', $this->params->getAll([
                 'groups' => $groups,
                 'layout' => $this->getLayout()
             ]));
@@ -49,12 +49,11 @@ class GroupController extends BaseController implements CrudControllerInterface
                 $selectedAuthorizations = isset($_POST['authorizations']) ? $_POST['authorizations'] : [];
 
                 if (empty($name)) {
-                    echo $this->latte->render('app/views/groups/create.latte', $this->params->getAll([
+                    $this->render('app/views/groups/create.latte', $this->params->getAll([
                         'availableAuthorizations' => $availableAuthorizations,
                         'error' => 'Le nom du groupe est requis',
                         'layout' => $this->getLayout()
                     ]));
-                    return;
                 }
 
                 $this->pdo->beginTransaction();
@@ -74,7 +73,7 @@ class GroupController extends BaseController implements CrudControllerInterface
                     throw $e;
                 }
             } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-                echo $this->latte->render('app/views/groups/create.latte', $this->params->getAll([
+                $this->render('app/views/groups/create.latte', $this->params->getAll([
                     'availableAuthorizations' => $availableAuthorizations,
                     'layout' => $this->getLayout()
                 ]));
@@ -100,7 +99,7 @@ class GroupController extends BaseController implements CrudControllerInterface
                 if (empty($name)) {
                     $group = $this->getGroup($id);
 
-                    echo $this->latte->render('app/views/groups/edit.latte', $this->params->getAll([
+                    $this->render('app/views/groups/edit.latte', $this->params->getAll([
                         'group' => $group,
                         'availableAuthorizations' => $availableAuthorizations,
                         'error' => 'Le nom du groupe est requis',
@@ -136,7 +135,7 @@ class GroupController extends BaseController implements CrudControllerInterface
                     $query->execute([$id]);
                     $currentAuthorizations = $query->fetchAll(PDO::FETCH_COLUMN);
 
-                    echo $this->latte->render('app/views/groups/edit.latte', $this->params->getAll([
+                    $this->render('app/views/groups/edit.latte', $this->params->getAll([
                         'group' => $group,
                         'availableAuthorizations' => $availableAuthorizations,
                         'currentAuthorizations' => $currentAuthorizations,

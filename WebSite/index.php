@@ -264,28 +264,44 @@ $flight->route('POST   /api/registration/add/@personId/@groupId',    function($p
 $flight->route('POST   /api/registration/remove/@personId/@groupId', function($personId, $groupId) use ($webmasterApi) { $webmasterApi->removeFromGroup($personId, $groupId); });
 /* #endregion */
 
-$flight->route('/webCard', function() {
+$flight->route('/webCard', function() use ($applicationHelper) {
     $path = __DIR__ . '/app/images/businessCard.html';
     if (file_exists($path)) {
-        header('Content-Type: text/html; charset=UTF-8');
-        readfile($path);
-        exit;
+        $content = file_get_contents($path);
+        Flight::response()->header('Content-Type', 'text/html; charset=UTF-8');
+        Flight::response()->write($content);
     } else {
-        Flight::halt(404, 'Fichier HTML non trouvé');
+        $applicationHelper->error404(); 
     }
 });
 
-$flight->route('/favicon.ico', function() {
+$flight->route('/phpInfo', function() {
+    header('Content-Type: text/html; charset=UTF-8');
+    header('Connection: close');
+    ob_start();
+    phpinfo();
+    $output = ob_get_contents();
+    ob_end_clean();
+    header('Content-Length: ' . strlen($output));
+    echo $output;
+    if (ob_get_level()) {
+        ob_end_flush();
+    }
+    flush();
+});
+
+$flight->route('/favicon.ico', function() use ($applicationHelper) {
     $path = __DIR__ . '/app/images/favicon.ico';
     if (file_exists($path)) {
-        header('Content-Type: image/x-icon');
-        readfile($path);
-        exit;
+        $content = file_get_contents($path);
+        Flight::response()->header('Content-Type', 'image/x-icon');
+        Flight::response()->write($content);
+    } else {
+        $applicationHelper->error404(); 
     }
 });
 
 $flight->route('/*',            function() use ($applicationHelper) { $applicationHelper->error404(); });
-
 
 $flight->map('error', function  (Throwable $ex) use ($userController, $applicationHelper){
     $userController->log(500, 'Internal error: ' . $ex->getMessage() .' in file ' . $ex->getFile() . ' at line' . $ex->getLine());
@@ -294,5 +310,3 @@ $flight->map('error', function  (Throwable $ex) use ($userController, $applicati
 
 $flight->after('start', function() use ($userController) { $userController->log(Flight::getData('code'), Flight::getData('message')); });
 $flight->start();
-
-Debugger::$email = $personController->getWebmasterEmail();

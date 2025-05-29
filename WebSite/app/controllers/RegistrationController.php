@@ -29,7 +29,7 @@ class RegistrationController extends TableController
                 ->orderBy('LastName')
                 ->where('Inactivated = 0');
             $data = $this->prepareTableData($query, $filterValues, $_GET['tablePage'] ?? null);
-            echo $this->latte->render('app/views/registration/index.latte', $this->params->getAll([
+            $this->render('app/views/registration/index.latte', $this->params->getAll([
                 'persons' => $data['items'],
                 'currentPage' => $data['currentPage'],
                 'totalPages' => $data['totalPages'],
@@ -127,7 +127,7 @@ class RegistrationController extends TableController
             $availableGroupsLeftQuery->execute([$personId]);
             $availableGroups = $availableGroupsLeftQuery->fetchAll();
 
-            echo $this->latte->render('app/views/registration/groups.latte', $this->params->getAll([
+            $this->render('app/views/registration/groups.latte', $this->params->getAll([
                 'currentGroups' => $currentGroups,
                 'availableGroups' => $availableGroups,
                 'personId' => $personId

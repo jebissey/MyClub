@@ -40,7 +40,7 @@ class AlertController extends BaseController
                 'alert-dark' => 'Sombre'
             ];
 
-            echo $this->latte->render('app/views/alerts/index.latte', $this->params->getAll([
+            $this->render('app/views/alerts/index.latte', $this->params->getAll([
                 'alerts' => $alerts,
                 'alertTypes' => $alertTypes,
                 'person' => $person,
@@ -80,8 +80,7 @@ class AlertController extends BaseController
         if ($result) {
             $this->flight->redirect('/alerts');
         } else {
-            // Gérer l'erreur
-            echo $this->latte->render('app/views/error.latte', $this->params->getAll([
+            $this->render('app/views/error.latte', $this->params->getAll([
                 'message' => 'Erreur lors de la mise à jour de l\'alerte.'
             ]));
         }

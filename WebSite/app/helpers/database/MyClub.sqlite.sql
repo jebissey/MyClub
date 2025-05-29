@@ -167,6 +167,7 @@ CREATE TABLE IF NOT EXISTS "Message" (
 	"PersonId"	INTEGER NOT NULL,
 	"Text"	INTEGER NOT NULL,
 	"LastUpdate"	TEXT NOT NULL DEFAULT current_timestamp,
+	"From"	TEXT NOT NULL DEFAULT 'User',
 	PRIMARY KEY("Id"),
 	FOREIGN KEY("EventId") REFERENCES "Event"("Id"),
 	FOREIGN KEY("PersonId") REFERENCES "Person"("Id")

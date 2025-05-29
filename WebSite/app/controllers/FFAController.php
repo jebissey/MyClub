@@ -22,7 +22,7 @@ class FFAController extends BaseController
             } else {
                 $results = $ffaScraper->searchAthleteResults($firstName, $lastName, $year, $club);
             }
-            echo $this->latte->render('app/views/user/ffaSearch.latte', $this->params->getAll([
+            $this->render('app/views/user/ffaSearch.latte', $this->params->getAll([
                 'firstName' => $firstName,
                 'lastName' => $lastName,
                 'question' => $question,

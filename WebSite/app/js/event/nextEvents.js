@@ -41,7 +41,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     .then(res => res.json())
                     .then(data => {
                         if (data.success) {
-                            alert("Événement dupliqué !");
                             window.location.reload();
                         } else {
                             alert("Erreur : " + data.message);
@@ -417,6 +416,107 @@ document.addEventListener('DOMContentLoaded', function () {
     document.querySelector('[data-bs-target="#eventModal"]').addEventListener('click', function () {
         openCreateModal();
     });
+
+    const emailModal = document.getElementById('emailModal');
+    const emailTypeSelect = document.getElementById('emailTypeSelect');
+    const recipientsSelect = document.getElementById('recipientsSelect');
+    const emailForm = document.getElementById('emailForm');
+
+    let currentEventData = {};
+
+    // Gestion de l'ouverture de la modale email
+    document.querySelectorAll('.email-btn').forEach(btn => {
+        btn.addEventListener('click', function () {
+            currentEventData = {
+                eventId: this.dataset.eventId,
+                eventTitle: this.dataset.eventTitle,
+                participantsCount: parseInt(this.dataset.participantsCount),
+                messagesCount: parseInt(this.dataset.messagesCount)
+            };
+
+            document.getElementById('emailEventId').value = currentEventData.eventId;
+            updateEmailTypeOptions();
+            resetEmailForm();
+        });
+    });
+
+    // Mise à jour des options de type de message selon l'état de l'événement
+    function updateEmailTypeOptions() {
+        const hasMessages = currentEventData.messagesCount > 0;
+        emailTypeSelect.innerHTML = '<option value="">Sélectionnez un type</option>';
+
+        if (!hasMessages) {
+            emailTypeSelect.innerHTML += '<option value="nouvel-evenement">Nouvel évènement</option>';
+        } else {
+            emailTypeSelect.innerHTML += '<option value="rappel">Rappel</option>';
+            emailTypeSelect.innerHTML += '<option value="annule">Annulé</option>';
+            emailTypeSelect.innerHTML += '<option value="modifie">Modifié</option>';
+        }
+    }
+
+    // Gestion du changement de type de message
+    emailTypeSelect.addEventListener('change', function () {
+        updateRecipientsOptions(this.value);
+    });
+
+    // Mise à jour des options de destinataires selon le type de message
+    function updateRecipientsOptions(messageType) {
+        recipientsSelect.innerHTML = '<option value="">Sélectionnez les destinataires</option>';
+
+        switch (messageType) {
+            case 'nouvel-evenement':
+                recipientsSelect.innerHTML += '<option value="tous">Tous</option>';
+                break;
+            case 'rappel':
+                recipientsSelect.innerHTML += '<option value="non-inscrits">Tous les non-inscrits</option>';
+                break;
+            case 'annule':
+            case 'modifie':
+                recipientsSelect.innerHTML += '<option value="inscrits">Tous les inscrits</option>';
+                break;
+        }
+    }
+
+    // Gestion de l'envoi du formulaire email
+    emailForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        const formData = new FormData(this);
+        const emailData = {
+            EventId: currentEventData.eventId,
+            Title: emailTypeSelect.options[emailTypeSelect.selectedIndex].text,
+            Body: formData.get('message'),
+            Recipients: formData.get('recipients')
+        };
+
+        fetch('/api/email/send', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(emailData)
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Courriel envoyé avec succès !');
+                    bootstrap.Modal.getInstance(emailModal).hide();
+                    resetEmailForm();
+                } else {
+                    alert('Erreur lors de l\'envoi du courriel : ' + (data.message || 'Erreur inconnue'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Erreur lors de l\'envoi du courriel');
+            });
+    });
+
+    // Réinitialisation du formulaire email
+    function resetEmailForm() {
+        emailForm.reset();
+        recipientsSelect.innerHTML = '<option value="">Sélectionnez d\'abord un type de message</option>';
+    }
 });
 
 function getContrastYIQ(hexcolor) {

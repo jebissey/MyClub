@@ -13,7 +13,7 @@ class DbBrowserController extends BaseController
         if ($this->getPerson(['Webmaster'])) {
             $tables = $this->getTables();
 
-            echo $this->latte->render('app/views/dbbrowser/index.latte', $this->params->getAll([
+            $this->render('app/views/dbbrowser/index.latte', $this->params->getAll([
                 'tables' => $tables
             ]));
         } else {
@@ -72,7 +72,7 @@ class DbBrowserController extends BaseController
 
             $records = $stmt->fetchAll();
 
-            echo $this->latte->render('app/views/dbbrowser/table.latte', $this->params->getAll([
+            $this->render('app/views/dbbrowser/table.latte', $this->params->getAll([
                 'table' => $table,
                 'columns' => $columns,
                 'records' => $records,
@@ -93,7 +93,7 @@ class DbBrowserController extends BaseController
             $columns = $this->getTableColumns($table);
             $columnTypes = $this->getColumnTypes($table);
 
-            echo $this->latte->render('app/views/dbbrowser/create.latte', $this->params->getAll([
+            $this->render('app/views/dbbrowser/create.latte', $this->params->getAll([
                 'table' => $table,
                 'columns' => $columns,
                 'columnTypes' => $columnTypes
@@ -154,7 +154,7 @@ class DbBrowserController extends BaseController
                 $this->flight->halt(404, 'Record not found');
             }
 
-            echo $this->latte->render('app/views/dbbrowser/edit.latte', $this->params->getAll([
+            $this->render('app/views/dbbrowser/edit.latte', $this->params->getAll([
                 'table' => $table,
                 'columns' => $columns,
                 'record' => $record,
@@ -219,7 +219,7 @@ class DbBrowserController extends BaseController
         }
     }
 
-    
+    #region Private function
     private function getTableColumns($table)
     {
         $this->validateTableName($table);

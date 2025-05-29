@@ -10,7 +10,7 @@ class NavBarController extends BaseController
     public function index()
     {
         if ($this->getPerson(['Webmaster'])) {
-            echo $this->latte->render('app/views/navbar/index.latte', $this->params->getAll([
+            $this->render('app/views/navbar/index.latte', $this->params->getAll([
                 'navItems' => $this->getNavItems(true),
                 'groups' => $this->getGroups(),
                 'availableRoutes' => $this->getAvailableRoutes()
@@ -25,7 +25,7 @@ class NavBarController extends BaseController
         if ($this->authorizedUser('/navbar/show/arwards')) {
             $this->getPerson();
             $arwards = new Arwards($this->pdo);
-            echo $this->latte->render('app/views/admin/arwards.latte', $this->params->getAll([
+            $this->render('app/views/admin/arwards.latte', $this->params->getAll([
                 'counterNames' => $counterNames = $arwards->getCounterNames(),
                 'data' => $arwards->getData($counterNames),
                 'groups' => $this->getGroups(),
@@ -41,7 +41,7 @@ class NavBarController extends BaseController
     {
         if ($this->authorizedUser("/navbar/show/article/$id")) {
             $this->getPerson();
-            echo $this->latte->render('app/views/navbar/article.latte', $this->params->getAll([
+            $this->render('app/views/navbar/article.latte', $this->params->getAll([
                 'navItems' => $this->getNavItems(),
                 'chosenArticle' => $this->fluent->from('Article')->where('Id', $id)->fetch(),
                 'hasAuthorization' => $this->authorizations->hasAutorization()

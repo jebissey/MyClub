@@ -28,7 +28,7 @@ class MediaController extends BaseController
     {
         if ($this->getPerson(['Redactor'])) {
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-                $this->latte->render('app/views/media/upload.latte', $this->params->getAll([]));
+                $this->render('app/views/media/upload.latte', $this->params->getAll([]));
             } else {
                 $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
             }
@@ -51,7 +51,7 @@ class MediaController extends BaseController
                     $files = $this->getFilesForYear($year, $search);
                 }
 
-                $this->latte->render('app/views/media/list.latte',  $this->params->getAll([
+                $this->render('app/views/media/list.latte',  $this->params->getAll([
                     'files' => $files,
                     'years' => $years,
                     'currentYear' => $year,
@@ -98,7 +98,7 @@ class MediaController extends BaseController
     {
         if ($this->getPerson([])) {
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-                $this->latte->render('app/views/media/gpxViewer.latte', $this->params->getAll([]));
+                $this->render('app/views/media/gpxViewer.latte', $this->params->getAll([]));
             } else {
                 $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
             }

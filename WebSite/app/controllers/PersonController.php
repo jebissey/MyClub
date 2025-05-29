@@ -9,7 +9,7 @@ class PersonController extends TableController implements CrudControllerInterfac
     public function help(): void
     {
         if ($this->getPerson(['PersonManager', 'Webmaster'])) {
-            echo $this->latte->render('app/views/info.latte', [
+            $this->render('app/views/info.latte', [
                 'content' => $this->settings->get('Help_personManager'),
                 'hasAuthorization' => $this->authorizations->hasAutorization(),
                 'currentVersion' => self::VERSION
@@ -25,7 +25,7 @@ class PersonController extends TableController implements CrudControllerInterfac
 
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $_SESSION['navbar'] = 'personManager';
-                echo $this->latte->render('app/views/admin/personManager.latte', $this->params->getAll([]));
+                $this->render('app/views/admin/personManager.latte', $this->params->getAll([]));
             } else {
                 $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
             }
@@ -60,7 +60,7 @@ class PersonController extends TableController implements CrudControllerInterfac
                 ->orderBy('LastName')
                 ->where('Inactivated = 0');
             $data = $this->prepareTableData($query, $filterValues, $_GET['tablePage'] ?? null);
-            echo $this->latte->render('app/views/persons/index.latte', $this->params->getAll([
+            $this->render('app/views/persons/index.latte', $this->params->getAll([
                 'persons' => $data['items'],
                 'currentPage' => $data['currentPage'],
                 'totalPages' => $data['totalPages'],
@@ -121,7 +121,7 @@ class PersonController extends TableController implements CrudControllerInterfac
                     }
                     $this->flight->redirect('/persons');
                 } else if (($_SERVER['REQUEST_METHOD'] === 'GET')) {
-                    echo $this->latte->render('app/views/user/account.latte', $this->params->getAll([
+                    $this->render('app/views/user/account.latte', $this->params->getAll([
                         'readOnly' => $person->Imported == 1 ? true : false,
                         'email' => $person->Email,
                         'firstName' => $person->FirstName,
@@ -173,7 +173,7 @@ class PersonController extends TableController implements CrudControllerInterfac
     public function editPresentation()
     {
         if ($person = $this->getPerson([])) {
-            echo $this->latte->render('app/views/user/editPresentation.latte', $this->params->getAll([
+            $this->render('app/views/user/editPresentation.latte', $this->params->getAll([
                 'person' => $person,
                 'navItems' => $this->getNavItems(),
             ]));
@@ -225,7 +225,7 @@ class PersonController extends TableController implements CrudControllerInterfac
                 return;
             }
 
-            echo $this->latte->render('app/views/user/presentation.latte', $this->params->getAll([
+            $this->render('app/views/user/presentation.latte', $this->params->getAll([
                 'person' => $person,
                 'loggedPerson' => $loggedPerson,
                 'navItems' => $this->getNavItems(),
@@ -271,7 +271,7 @@ class PersonController extends TableController implements CrudControllerInterfac
                 $groupCounts[$count->Id] = $count['Count'];
             }
 
-            echo $this->latte->render('app/views/user/directory.latte', $this->params->getAll([
+            $this->render('app/views/user/directory.latte', $this->params->getAll([
                 'persons' => $persons,
                 'navItems' => $this->getNavItems(),
                 'loggedPerson' => $person,
@@ -310,7 +310,7 @@ class PersonController extends TableController implements CrudControllerInterfac
                 }
             }
 
-            echo $this->latte->render('app/views/user/map.latte', $this->params->getAll([
+            $this->render('app/views/user/map.latte', $this->params->getAll([
                 'locationData' => $locationData,
                 'membersCount' => count($locationData),
                 'navItems' => $this->getNavItems(),

@@ -27,22 +27,24 @@ class Application
     }
 
 
-    public function help() 
+    public function help()
     {
-        echo $this->latte->render('app/views/info.latte', [
+        $content = $this->latte->renderToString('app/views/info.latte', [
             'content' => $this->settings->get('Help_home'),
             'hasAuthorization' => $this->authorizations->hasAutorization(),
             'currentVersion' => $this->version
         ]);
+        echo $content;
     }
 
-    public function legalNotice() 
+    public function legalNotice()
     {
-        echo $this->latte->render('app/views/info.latte', [
+        $content = $this->latte->renderToString('app/views/info.latte', [
             'content' => $this->settings->get('LegalNotices'),
             'hasAuthorization' => $this->authorizations->hasAutorization(),
             'currentVersion' => $this->version
         ]);
+        echo $content;
     }
 
 
@@ -118,6 +120,7 @@ class Application
         $this->error(500, "Internal error: $message in file $file at line $line", $timeout);
     }
 
+    #region private Function
     private function error($code, $message, $timeout = 1000)
     {
         $this->flight->setData('code', $code);

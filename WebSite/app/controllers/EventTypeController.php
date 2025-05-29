@@ -27,7 +27,7 @@ class EventTypeController extends TableController implements CrudControllerInter
                 ->orderBy('EventType.Name');
 
             $data = $this->prepareTableData($query, $filterValues, $_GET['tablePage'] ?? null);
-            echo $this->latte->render('app/views/eventType/index.latte', $this->params->getAll([
+            $this->render('app/views/eventType/index.latte', $this->params->getAll([
                 'eventTypes' => $data['items'],
                 'currentPage' => $data['currentPage'],
                 'totalPages' => $data['totalPages'],
@@ -99,7 +99,7 @@ class EventTypeController extends TableController implements CrudControllerInter
                     $existingAttributesQuery->execute([$id]);
                     $existingAttributes = $existingAttributesQuery->fetchAll(PDO::FETCH_COLUMN);
 
-                    echo $this->latte->render('app/views/eventType/edit.latte', $this->params->getAll([
+                    $this->render('app/views/eventType/edit.latte', $this->params->getAll([
                         'name' => $eventType->Name,
                         'idGroup' => $eventType->IdGroup,
                         'groups' => $this->fluent->from('`Group`')->where('Inactivated', 0)->orderBy('Name')->fetchAll(),

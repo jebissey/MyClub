@@ -38,7 +38,7 @@ class DesignController extends BaseController
                 $userVotes[$vote->IdDesign] = $vote->Vote;
             }
 
-            $this->latte->render('app/views/designs/index.latte', $this->params->getAll([
+            $this->render('app/views/designs/index.latte', $this->params->getAll([
                 'designs' => $designs,
                 'groups' => $this->getGroups(),
                 'userVotes' => $userVotes
@@ -51,7 +51,7 @@ class DesignController extends BaseController
     public function create()
     {
         if ($this->getPerson(['Redactor'])) {
-            $this->latte->render('app/views/designs/create.latte', $this->params->getAll([
+            $this->render('app/views/designs/create.latte', $this->params->getAll([
                 'groups' => $this->getGroups(),
             ]));
         } else {

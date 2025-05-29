@@ -60,7 +60,7 @@ class LogController extends BaseController
 
             $totalPages = ceil($total / $perPage);
 
-            echo $this->latte->render('app/views/logs/visitor.latte', $this->params->getAll([
+            $this->render('app/views/logs/visitor.latte', $this->params->getAll([
                 'logs' => $logs,
                 'currentPage' => $logPage,
                 'totalPages' => $totalPages,
@@ -81,7 +81,7 @@ class LogController extends BaseController
                 $currentDate = date('Y-m-d');
             }
 
-            echo $this->latte->render('app/views/logs/referer.latte', $this->params->getAll([
+            $this->render('app/views/logs/referer.latte', $this->params->getAll([
                 'period' => $period,
                 'currentDate' => $currentDate,
                 'nav' => $this->log->getRefererNavigation($period, $currentDate),
@@ -104,7 +104,7 @@ class LogController extends BaseController
             $offset = (int)($this->flight->request()->query->offset ?? 0);
             $data = $this->log->getStatisticsData($periodType, $offset);
 
-            echo $this->latte->render('app/views/logs/statistics.latte', $this->params->getAll([
+            $this->render('app/views/logs/statistics.latte', $this->params->getAll([
                 'periodTypes' => $this->periodTypes,
                 'currentPeriodType' => $periodType,
                 'currentOffset' => $offset,
@@ -121,7 +121,7 @@ class LogController extends BaseController
     {
         if ($this->getPerson(['Webmaster'])) {
 
-            $this->latte->render('app/views/logs/analytics.latte', $this->params->getAll([
+            $this->render('app/views/logs/analytics.latte', $this->params->getAll([
                 'osData' => $this->log->getOsDistribution(),
                 'browserData' => $this->log->getBrowserDistribution(),
                 'screenResolutionData' => $this->log->getScreenResolutionDistribution(),
@@ -162,7 +162,7 @@ class LogController extends BaseController
                 ->orderBy('visits DESC')
                 ->limit(self::TOP);
 
-            $this->latte->render('app/views/logs/topPages.latte', $this->params->getAll([
+            $this->render('app/views/logs/topPages.latte', $this->params->getAll([
                 'title' => 'Top des pages visitées',
                 'period' => $period,
                 'topPages' => $query->fetchAll()
@@ -212,7 +212,7 @@ class LogController extends BaseController
                 ->orderBy('visits DESC')
                 ->limit(self::TOP);
 
-            $this->latte->render('app/views/logs/topArticles.latte', $this->params->getAll([
+            $this->render('app/views/logs/topArticles.latte', $this->params->getAll([
                 'title' => 'Top des articles visités par période',
                 'period' => $period,
                 'topPages' => $query->fetchAll()
@@ -355,7 +355,7 @@ class LogController extends BaseController
             $persons = $filteredPersons;
             $columnTotals = $filteredColumnTotals;
 
-            $this->latte->render('app/views/logs/crossTab.latte', $this->params->getAll([
+            $this->render('app/views/logs/crossTab.latte', $this->params->getAll([
                 'title' => 'Tableau croisé dynamique des visites',
                 'period' => $period,
                 'uris' => $sortedCrossTabData,

@@ -12,7 +12,7 @@ class WebmasterController extends BaseController
     {
         $this->getPerson();
 
-        echo $this->latte->render('app/views/info.latte', [
+        $this->render('app/views/info.latte', [
             'content' => $this->settings->get('Help_webmaster'),
             'hasAuthorization' => $this->authorizations->hasAutorization(),
             'currentVersion' => self::VERSION
@@ -23,7 +23,7 @@ class WebmasterController extends BaseController
     {
         if ($this->getPerson(['EventManager', 'PersonManager', 'Redactor', 'Webmaster'])) {
 
-            echo $this->latte->render('app/views/info.latte', $this->params->getAll([
+            $this->render('app/views/info.latte', $this->params->getAll([
                 'content' => $this->settings->get('Help_admin'),
                 'hasAuthorization' => $this->authorizations->isEventManager(),
                 'currentVersion' => self::VERSION
@@ -41,12 +41,14 @@ class WebmasterController extends BaseController
                 $_SESSION['navbar'] = 'webmaster';
 
                 $newVersion = null;
-                if ($lastVersion = $this->getLastVersion()) {
-                    if ($lastVersion != self::VERSION) {
-                        $newVersion = "A new version is available (V$lastVersion)";
-                    }
+                $result = $this->getLastVersion();
+                if (!$result['success']) {
+                    error_log("Erreur récupération version : " . $result['error']);
+                } elseif ($result['version'] != self::VERSION) {
+                    $newVersion = "A new version is available (V" . $result['version'] . ")";
                 }
-                echo $this->latte->render('app/views/admin/webmaster.latte', $this->params->getAll(['newVersion' => $newVersion]));
+
+                $this->render('app/views/admin/webmaster.latte', $this->params->getAll(['newVersion' => $newVersion]));
             } else {
                 $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
             }
@@ -69,7 +71,7 @@ class WebmasterController extends BaseController
                     $this->flight->redirect('/webmaster');
                 }
             } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-                echo $this->latte->render('app/views/admin/admin.latte', $this->params->getAll([]));
+                $this->render('app/views/admin/admin.latte', $this->params->getAll([]));
             } else {
                 $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
             }
@@ -83,7 +85,7 @@ class WebmasterController extends BaseController
         if ($this->getPerson(['Webmaster'])) {
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $arwards = new Arwards($this->pdo);
-                echo $this->latte->render('app/views/admin/arwards.latte', $this->params->getAll([
+                $this->render('app/views/admin/arwards.latte', $this->params->getAll([
                     'counterNames' => $counterNames = $arwards->getCounterNames(),
                     'data' => $arwards->getData($counterNames),
                     'groups' => $this->getGroups(),
@@ -222,27 +224,49 @@ class WebmasterController extends BaseController
 
     private function getLastVersion()
     {
-        $options = [
-            "http" => [
-                "method" => "GET",
-                "header" => "User-Agent: PHP/" . PHP_VERSION . "\r\nAccept: application/json\r\n",
-            ],
-            "ssl" => [
-                "verify_peer" => false,
-                "verify_peer_name" => false,
-            ],
-        ];
         $url = "https://myclub.alwaysdata.net/api/lastVersion";
-        $response = file_get_contents($url, false, stream_context_create($options));
 
-        if ($response !== false) {
-            $data = json_decode($response, true);
-            if ($data !== null) {
-                return $data["lastVersion"];
-            }
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_USERAGENT, "PHP/" . PHP_VERSION);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, ["Accept: application/json"]);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 5);
+        curl_setopt($ch, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_1);
+
+        $response = curl_exec($ch);
+
+        if ($response === false) {
+            $error = curl_error($ch);
+            curl_close($ch);
+            return [
+                'success' => false,
+                'version' => null,
+                'error'   => "Erreur cURL : $error"
+            ];
         }
-        return false;
+
+        curl_close($ch);
+
+        $data = json_decode($response, true);
+
+        if ($data === null || !isset($data["lastVersion"])) {
+            return [
+                'success' => false,
+                'version' => null,
+                'error'   => "Réponse JSON invalide ou champ 'lastVersion' absent."
+            ];
+        }
+
+        return [
+            'success' => true,
+            'version' => $data["lastVersion"],
+            'error'   => null
+        ];
     }
+
+
 
     protected function getBaseUrl()
     {

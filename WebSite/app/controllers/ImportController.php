@@ -29,7 +29,7 @@ class ImportController extends BaseController
     {
         if ($this->getPerson(['PersonManager'])) {
             $this->loadSettings();
-            echo $this->latte->render('app/views/import/form.latte', $this->params->getAll([
+            $this->render('app/views/import/form.latte', $this->params->getAll([
                 'importSettings' => $this->importSettings,
                 'results' => $this->results
             ]));
@@ -45,7 +45,7 @@ class ImportController extends BaseController
                 $this->results['errors']++;
                 $this->results['messages'][] = 'Veuillez sélectionner un fichier CSV valide';
 
-                echo $this->latte->render('app/views/import/form.latte', $this->params->getAll([
+                $this->render('app/views/import/form.latte', $this->params->getAll([
                     'importSettings' => $this->importSettings,
                     'results' => $this->results
                 ]));
@@ -112,7 +112,7 @@ class ImportController extends BaseController
                     }
                 }
 
-                echo $this->latte->render('app/views/import/form.latte', $this->params->getAll([
+                $this->render('app/views/import/form.latte', $this->params->getAll([
                     'importSettings' => $this->importSettings,
                     'results' => $this->results
                 ]));
@@ -126,7 +126,7 @@ class ImportController extends BaseController
     {
         if (!isset($_FILES['csvFile']) || $_FILES['csvFile']['error'] != 0) {
             echo json_encode(['error' => 'Fichier non valide']);
-            exit();
+            exit;
         }
 
         $headerRow = intval($_POST['headerRow']);
@@ -145,6 +145,6 @@ class ImportController extends BaseController
         fclose($file);
 
         echo json_encode(['headers' => $headers]);
-        exit();
+        exit;
     }
 }

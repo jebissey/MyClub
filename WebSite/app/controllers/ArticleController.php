@@ -15,7 +15,7 @@ class ArticleController extends TableController
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $_SESSION['navbar'] = 'redactor';
 
-                echo $this->latte->render('app/views/admin/redactor.latte', $this->params->getAll([]));
+                $this->render('app/views/admin/redactor.latte', $this->params->getAll([]));
             } else {
                 $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
             }
@@ -98,7 +98,7 @@ class ArticleController extends TableController
         }
         $query = $query->orderBy('Article.LastUpdate DESC');
         $data = $this->prepareTableData($query, $filterValues, $_GET['tablePage'] ?? null);
-        echo $this->latte->render('app/views/user/articles.latte', $this->params->getAll([
+        $this->render('app/views/user/articles.latte', $this->params->getAll([
             'articles' => $data['items'],
             'currentPage' => $data['currentPage'],
             'totalPages' => $data['totalPages'],
@@ -168,7 +168,7 @@ class ArticleController extends TableController
                     $_SESSION['success'] = null;
                 }
 
-                echo $this->latte->render('app/views/user/article.latte', $this->params->getAll([
+                $this->render('app/views/user/article.latte', $this->params->getAll([
                     'chosenArticle' => $chosenArticle,
                     'latestArticleTitles' => $this->getLatestArticleTitles($articleIds),
                     'canEdit' => $canEdit,
@@ -246,7 +246,7 @@ class ArticleController extends TableController
                 }
                 $this->flight->redirect('/articles/' . $id);
             } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-                echo $this->latte->render('app/views/user/publish.latte', $this->params->getAll([
+                $this->render('app/views/user/publish.latte', $this->params->getAll([
                     'article' => $this->getArticle($id),
                 ]));
             } else {
@@ -305,7 +305,7 @@ class ArticleController extends TableController
                 $dateRange['start'],
                 $dateRange['end']
             );
-            echo $this->latte->render('app/views/articles/crosstab.latte', $this->params->getAll([
+            $this->render('app/views/articles/crosstab.latte', $this->params->getAll([
                 'crosstabData' => $crosstabData,
                 'period' => $period,
                 'dateRange' => $dateRange,
