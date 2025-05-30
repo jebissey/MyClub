@@ -58,7 +58,7 @@ class NavBarController extends BaseController
             SELECT 'Group'.Id 
             FROM Page
             LEFT JOIN 'Group' on Page.IdGroup = 'Group'.Id
-            WHERE Page.Name = '$page'
+            WHERE Page.Route = '$page'
         ");
         $groups = $query->fetchAll(PDO::FETCH_COLUMN);
         if (!$groups) return true;

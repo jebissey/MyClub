@@ -285,9 +285,11 @@ class UserController extends BaseController
     {
         if ($person = $this->getPerson([], 1)) {
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-                $availabilities = $_POST['availabilities'];
-                $query = $this->pdo->prepare('UPDATE Person SET availabilities = ? WHERE Id = ' . $person->Id);
-                $query->execute([json_encode($availabilities)]);
+                $availabilities = $_POST['availabilities'] ?? '';
+                if ($availabilities != '') {
+                    $query = $this->pdo->prepare('UPDATE Person SET availabilities = ? WHERE Id = ' . $person->Id);
+                    $query->execute([json_encode($availabilities)]);
+                }
                 $this->flight->redirect('/user');
             } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $currentAvailabilities = json_decode($person->Availabilities ?? '', true);

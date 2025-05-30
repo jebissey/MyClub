@@ -224,7 +224,7 @@ class WebmasterController extends BaseController
 
     private function getLastVersion()
     {
-        $url = "https://myclub.alwaysdata.net/api/lastVersion";
+        $url = "http://myclub.alwaysdata.net/api/lastVersion";
 
         $ch = curl_init($url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -232,11 +232,11 @@ class WebmasterController extends BaseController
         curl_setopt($ch, CURLOPT_HTTPHEADER, ["Accept: application/json"]);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 5);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 1);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 2);
         curl_setopt($ch, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_1);
 
         $response = curl_exec($ch);
-
         if ($response === false) {
             $error = curl_error($ch);
             curl_close($ch);
@@ -248,9 +248,7 @@ class WebmasterController extends BaseController
         }
 
         curl_close($ch);
-
         $data = json_decode($response, true);
-
         if ($data === null || !isset($data["lastVersion"])) {
             return [
                 'success' => false,
@@ -266,8 +264,7 @@ class WebmasterController extends BaseController
         ];
     }
 
-
-
+    #region Protected functions
     protected function getBaseUrl()
     {
         $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https://' : 'http://';
