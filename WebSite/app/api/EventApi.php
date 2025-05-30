@@ -42,28 +42,16 @@ class EventApi extends BaseController
         if ($this->getPerson(['Webmaster'])) {
             try {
                 $this->pdo->beginTransaction();
-
-                $deleteAssociationsQuery = $this->pdo->prepare('
-                        DELETE FROM EventTypeAttribute 
-                        WHERE IdAttribute = ?
-                    ');
-                $deleteAssociationsQuery->execute([$id]);
-
-                $deleteQuery = $this->pdo->prepare('
-                        DELETE FROM Attribute 
-                        WHERE Id = ?
-                    ');
-                $deleteQuery->execute([$id]);
-
-                $attributes = $this->fluent->from('Attribute')
-                    ->orderBy('Name')
-                    ->fetchAll();
+                $this->fluent->deleteFrom('EventTypeAttribute')
+                    ->where('IdAttribute', $id)
+                    ->execute();
+                $this->fluent->deleteFrom('Attribute')
+                    ->where('Id', $id)
+                    ->execute();
 
                 $this->pdo->commit();
-
-                $this->render('app/views/eventType/attributes-list.latte', $this->params->getAll([
-                    'attributes' => $attributes
-                ]));
+                header('Content-Type: application/json');
+                echo json_encode(['success' => true]);
             } catch (\Exception $e) {
                 $this->pdo->rollBack();
                 http_response_code(500);
@@ -391,7 +379,7 @@ class EventApi extends BaseController
         }
         exit();
     }
-    
+
     public function getEventNeeds($eventId)
     {
         $needs = $this->fluent->from('EventNeed')

@@ -27,11 +27,11 @@ function createAttribute_() {
                 document.getElementById('newAttributeDetail').value = '';
                 document.getElementById('newAttributeColor').value = '#563d7c';
             } else {
-                alert(data.message || 'Une erreur est survenue');
+                alert('Une erreur est survenue (1) : ' + data.message);
             }
         })
         .catch(error => {
-            alert('Une erreur est survenue : ' + error.message);
+            alert('Une erreur est survenue (2) : ' + error.message);
         });
 }
 
@@ -52,11 +52,11 @@ function editAttribute(id) {
             if (data.success) {
                 loadAttributesList();
             } else {
-                alert(data.message || 'Une erreur est survenue');
+                alert('Une erreur est survenue 3) : ' + data.message);
             }
         })
         .catch(error => {
-            alert('Une erreur est survenue : ' + error.message);
+            alert('Une erreur est survenue (4) : ' + error.message);
         });
 }
 
@@ -73,11 +73,11 @@ function deleteAttribute(id) {
                 if (data.success) {
                     loadAttributesList();
                 } else {
-                    alert(data.message || 'Une erreur est survenue');
+                    alert('Une erreur est survenue (5) : ' + data.message);
                 }
             })
             .catch(error => {
-                alert('Une erreur est survenue : ' + error.message);
+                alert('Une erreur est survenue(6) : ' + error.message);
             });
     }
 }
