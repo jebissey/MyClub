@@ -3,7 +3,6 @@
 namespace app\controllers;
 
 use app\helpers\Event;
-use PDO;
 
 class EventController extends BaseController
 {
@@ -22,6 +21,21 @@ class EventController extends BaseController
             'eventAttributes' => $this->fluent->from('Attribute')->fetchAll('Id', 'Name, Detail, Color'),
             'offset' => $offset,
             'mode' => $mode,
+            'layout' => $this->getLayout()
+        ]));
+    }
+
+    public function weekEvents(): void
+    {
+        $event = new Event($this->pdo);
+        $person = $this->getPerson();
+        $offset = (int) ($_GET['offset'] ?? 0);
+        $mode = $_GET['mode'] ?? 'next';
+
+        $this->render('app/views/event/weekEvents.latte', $this->params->getAll([
+            'events' => $event->getNextWeekEvents($person, $mode, $offset),
+            'eventTypes' => $this->fluent->from('EventType')->where('Inactivated', 0)->orderBy('Name')->fetchAll('Id', 'Name'),
+            'eventAttributes' => $this->fluent->from('Attribute')->fetchAll('Id', 'Name, Detail, Color'),
         ]));
     }
 

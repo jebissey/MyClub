@@ -1,0 +1,173 @@
+{layout '../layout.latte'}
+
+{block title}Prochaines semaines{/block}
+
+{block head}
+<style>
+.attribute-badge {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    margin-right: 5px;
+    border-radius: 4px;
+    cursor: help;
+    border: 1px solid rgba(0,0,0,0.2);
+}
+
+.weekly-calendar {
+    margin: 20px 0;
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 14px;
+}
+
+.weekly-calendar th,
+.weekly-calendar td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    vertical-align: top;
+    text-align: left;
+}
+
+.weekly-calendar th {
+    background-color: #f5f5f5;
+    font-weight: bold;
+    text-align: center;
+}
+
+.week-header {
+    background-color: #f5f5f5;
+    font-weight: bold;
+    text-align: center;
+}
+
+.day-header {
+    background-color: #f0f8ff;
+    font-weight: bold;
+    text-align: center;
+    width: 12%;
+}
+
+.current-day {
+    background-color: #fff3cd;
+    border: 2px solid #ffc107;
+}
+
+.event-item {
+    margin-bottom: 8px;
+    padding: 4px;
+    background-color: #f8f9fa;
+    border-radius: 3px;
+    font-size: 12px;
+}
+
+.event-time {
+    font-weight: bold;
+    color: #007bff;
+}
+
+.event-summary {
+    margin: 2px 0;
+}
+
+.event-duration {
+    font-style: italic;
+    color: #6c757d;
+}
+
+.event-group {
+    font-weight: bold;
+    color: #6c757d;
+}
+
+.no-events {
+    color: #999;
+    font-style: italic;
+    text-align: center;
+}
+
+.week-dates {
+    font-size: 12px;
+    color: #666;
+}
+</style>
+{/block}
+
+{block navbar}
+{include '../navbar/eventManager.latte'}
+{/block}
+
+{block content}
+<div class="container-fluid">
+    <h1>Calendrier des événements</h1>
+    
+    {if count($events) > 0}
+        <table class="weekly-calendar">
+            <thead>
+                <tr>
+                    <th style="width: 14%;">Semaine</th>
+                    <th class="day-header">Lundi</th>
+                    <th class="day-header">Mardi</th>
+                    <th class="day-header">Mercredi</th>
+                    <th class="day-header">Jeudi</th>
+                    <th class="day-header">Vendredi</th>
+                    <th class="day-header">Samedi</th>
+                    <th class="day-header">Dimanche</th>
+                </tr>
+            </thead>
+            <tbody>
+                {foreach $events as $weekData}
+                    <tr>
+                        <td class="week-header" style="text-align: center;">
+                            <div>{$weekData['weekStart']} - {$weekData['weekEnd']}</div>
+                        </td>
+                        
+                        {for $day = 1; $day <= 7; $day++}
+                            {var $currentDayOffset = $day - 1}
+                            {var $currentDayTimestamp = strtotime($weekData['weekStartFull'] . ' +' . $currentDayOffset . ' days')}
+                            {var $todayTimestamp = strtotime('today')}
+                            {var $isToday = date('Y-m-d', $currentDayTimestamp) === date('Y-m-d', $todayTimestamp)}
+                            
+                        <td class="{if $isToday}current-day{/if}">
+                        {if count($weekData['days'][$day]) > 0}
+                            {foreach $weekData['days'][$day] as $event}
+                            <div class="event-item">
+                                <div class="d-flex justify-content-between">
+                                    <div class="event-time">{$event['startTime']}</div>
+                                    <div class="event-duration">({$event['duration']})</div>
+                                    {ifset $event['groupName']}
+                                    <div class="event-group">[{$event['groupName']}]</div>
+                                    {/ifset}
+                                </div>
+                                <div class="event-summary">{$event['summary']}</div>
+                                    <div>
+                                    {if count($event['attributes']) > 0}
+                                        {foreach $event['attributes'] as $attribute}
+                                        <span 
+                                            class="attribute-badge" 
+                                            style="background-color: {$attribute['color']|noescape};" 
+                                            title="{$attribute['name']} - {$attribute['detail']}"
+                                        ></span>
+                                        {/foreach}
+                                    {else}
+                                        <span style="font-size: 16px;">⌧</span>
+                                    {/if}
+                                    </div>
+                                </div>
+                            {/foreach}
+                        {else}
+                            <div class="no-events">Aucun événement</div>
+                        {/if}
+                        </td>
+                        {/for}
+                    </tr>
+                {/foreach}
+            </tbody>
+        </table>
+    {else}
+        <div class="alert alert-info">
+            <p>Aucun événement programmé pour les deux prochaines semaines.</p>
+        </div>
+    {/if}
+</div>
+{/block}

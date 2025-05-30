@@ -1,4 +1,4 @@
-{layout '../layout.latte'}
+{layout $layout}
 
 {block title}Evènements{/block}
 
@@ -14,10 +14,6 @@
             border: 1px solid rgba(0,0,0,0.2);
         }
     </style>
-{/block}
-
-{block navbar}
-    {include '../navbar/home.latte'}
 {/block}
 
 {block content}

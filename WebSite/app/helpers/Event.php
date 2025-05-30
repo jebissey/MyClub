@@ -124,77 +124,75 @@ class Event
         }
     }
 
-
     public function getNextWeekEvents(): array
     {
-        $startOfCurrentWeek = new DateTime();
-        $startOfCurrentWeek->setISODate(
-            (int)$startOfCurrentWeek->format('o'),
-            (int)$startOfCurrentWeek->format('W')
-        );
+        $today = new DateTime();
+        $startOfCurrentWeek = clone $today;
+        $dayOfWeek = (int)$startOfCurrentWeek->format('N'); // 1=Monday, 7=Sunday
+        $startOfCurrentWeek->sub(new DateInterval('P' . ($dayOfWeek - 1) . 'D'));
+        $startOfCurrentWeek->setTime(0, 0, 0);
+        $endOfThirdWeek = clone $startOfCurrentWeek;
+        $endOfThirdWeek->add(new DateInterval('P20D'));
+        $endOfThirdWeek->setTime(23, 59, 59);
 
-        $endOfNextWeek = clone $startOfCurrentWeek;
-        $endOfNextWeek->add(new DateInterval('P14D')); // +14 jours
-
-        // Requête pour récupérer les événements des 2 prochaines semaines
         $events = $this->fluent->from('Event e')
-            ->select([
-                'e.Id',
-                'e.Summary',
-                'e.Description',
-                'e.Location',
-                'e.StartTime',
-                'e.Duration',
-                'e.IdEventType',
-                'et.Name AS EventTypeName',
-                'GROUP_CONCAT(a.Id) AS AttributeIds',
-                'GROUP_CONCAT(a.Name) AS AttributeNames',
-                'GROUP_CONCAT(a.Detail) AS AttributeDetails',
-                'GROUP_CONCAT(a.Color) AS AttributeColors'
-            ])
+            ->select("
+                e.Id,
+                e.Summary,
+                e.Description,
+                e.Location,
+                e.StartTime,
+                e.Duration,
+                e.IdEventType,
+                et.Name AS EventTypeName,
+                'Group'.Name AS GroupName,
+                GROUP_CONCAT(a.Id) AS AttributeIds,
+                GROUP_CONCAT(a.Name) AS AttributeNames,
+                GROUP_CONCAT(a.Detail) AS AttributeDetails,
+                GROUP_CONCAT(a.Color) AS AttributeColors
+            ")
             ->innerJoin('EventType et ON e.IdEventType = et.Id')
             ->leftJoin('EventAttribute ea ON e.Id = ea.IdEvent')
             ->leftJoin('Attribute a ON ea.IdAttribute = a.Id')
+            ->leftJoin("'Group' ON et.IdGroup = 'Group'.Id")
             ->where('datetime(e.StartTime) >= ?', $startOfCurrentWeek->format('Y-m-d H:i:s'))
-            ->where('datetime(e.StartTime) < ?', $endOfNextWeek->format('Y-m-d H:i:s'))
+            ->where('datetime(e.StartTime) < ?', $endOfThirdWeek->format('Y-m-d H:i:s'))
             ->groupBy('e.Id')
             ->orderBy('e.StartTime')
             ->fetchAll();
-
-
-        // Organiser les événements par semaine et par jour
         $weeklyEvents = [];
+        for ($weekOffset = 0; $weekOffset < 3; $weekOffset++) {
+            $weekStart = clone $startOfCurrentWeek;
+            $weekStart->add(new DateInterval('P' . ($weekOffset * 7) . 'D'));
+            $weekEnd = clone $weekStart;
+            $weekEnd->add(new DateInterval('P6D'));
+            $weekKey = $weekStart->format('Y-W');
+            $weeklyEvents[$weekKey] = [
+                'weekStart' => $weekStart->format('d/m'),
+                'weekEnd' => $weekEnd->format('d/m'),
+                'weekStartFull' => $weekStart->format('Y-m-d'),
+                'days' => array_fill(1, 7, [])
+            ];
+        }
 
         foreach ($events as $event) {
-            $eventDate = new DateTime($event['StartTime']);
+            $eventDate = new DateTime($event->StartTime);
             $weekNumber = (int)$eventDate->format('W');
             $year = (int)$eventDate->format('o');
-            $dayOfWeek = (int)$eventDate->format('N'); // 1=Lundi, 7=Dimanche
+            $dayOfWeek = (int)$eventDate->format('N');
 
-            // Calculer les dates de début et fin de semaine
-            $startOfWeek = new DateTime();
-            $startOfWeek->setISODate($year, $weekNumber);
-            $endOfWeek = clone $startOfWeek;
-            $endOfWeek->add(new DateInterval('P6D'));
-
-            $weekKey = $startOfWeek->format('Y-W');
-
+            $eventWeekStart = new DateTime();
+            $eventWeekStart->setISODate($year, $weekNumber);
+            $weekKey = $eventWeekStart->format('Y-W');
             if (!isset($weeklyEvents[$weekKey])) {
-                $weeklyEvents[$weekKey] = [
-                    'weekStart' => $startOfWeek->format('d/m'),
-                    'weekEnd' => $endOfWeek->format('d/m'),
-                    'weekStartFull' => $startOfWeek->format('Y-m-d'),
-                    'days' => array_fill(1, 7, []) // Jours 1-7 (Lundi-Dimanche)
-                ];
+                continue;
             }
-
-            // Traiter les attributs
             $attributes = [];
-            if (!empty($event['AttributeIds'])) {
-                $ids = explode(',', $event['AttributeIds']);
-                $names = explode(',', $event['AttributeNames']);
-                $details = explode(',', $event['AttributeDetails']);
-                $colors = explode(',', $event['AttributeColors']);
+            if (!empty($event->AttributeIds)) {
+                $ids = explode(',', $event->AttributeIds);
+                $names = explode(',', $event->AttributeNames);
+                $details = explode(',', $event->AttributeDetails);
+                $colors = explode(',', $event->AttributeColors);
 
                 for ($i = 0; $i < count($ids); $i++) {
                     $attributes[] = [
@@ -206,9 +204,8 @@ class Event
                 }
             }
 
-            // Formater l'heure et la durée
-            $startTime = new DateTime($event['StartTime']);
-            $durationMinutes = $event['Duration'] / 60;
+            $startTime = new DateTime($event->StartTime);
+            $durationMinutes = $event->Duration / 60;
             $durationFormatted = '';
 
             if ($durationMinutes >= 60) {
@@ -223,23 +220,21 @@ class Event
             }
 
             $eventFormatted = [
-                'id' => $event['Id'],
-                'summary' => $event['Summary'],
-                'description' => $event['Description'],
-                'location' => $event['Location'],
+                'id' => $event->Id,
+                'summary' => $event->Summary,
+                'description' => $event->Description,
+                'location' => $event->Location,
                 'startTime' => $startTime->format('H:i'),
                 'duration' => $durationFormatted,
-                'eventType' => $event['EventTypeName'],
+                'eventType' => $event->EventTypeName,
                 'attributes' => $attributes,
-                'fullDateTime' => $event['StartTime']
+                'fullDateTime' => $event->StartTime,
+                'groupName'=> $event->GroupName
             ];
 
             $weeklyEvents[$weekKey]['days'][$dayOfWeek][] = $eventFormatted;
         }
-
-        // Trier par semaine
         ksort($weeklyEvents);
-
         return $weeklyEvents;
     }
 

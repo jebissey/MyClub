@@ -104,7 +104,7 @@ class UserController extends BaseController
                         } else {
                             if (PasswordManager::verifyPassword($password, $person->Password ?? '')) {
                                 $_SESSION['user'] = $email;
-                                $_SESSION['navbar'] = 'user';
+                                $_SESSION['navbar'] = '';
                                 $this->application->message("Sign in succeeded with $email", 1);
                                 $now = date('Y-m-d H:i:s');
                                 $signOutCount = $this->fluentForLog->from('Log')
@@ -162,6 +162,7 @@ class UserController extends BaseController
 
     public function home(ArticleController $articleController)
     {
+        $_SESSION['navbar'] = '';
         $userPendingSurveys = $userPendingDesigns = [];
         $userEmail = $_SESSION['user'] ?? '';
         if ($userEmail) {

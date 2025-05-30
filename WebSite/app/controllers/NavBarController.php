@@ -54,20 +54,29 @@ class NavBarController extends BaseController
     /* #region private function */
     private function authorizedUser($page)
     {
-        $query = $this->pdo->query("
-            SELECT 'Group'.Id 
-            FROM Page
-            LEFT JOIN 'Group' on Page.IdGroup = 'Group'.Id
-            WHERE Page.Route = '$page'
-        ");
-        $groups = $query->fetchAll(PDO::FETCH_COLUMN);
-        if (!$groups) return true;
-
+        $pageData = $this->fluent->from('Page')
+            ->select('"Page".IdGroup, "Page".ForMembers, "Page".ForAnonymous, "Group".Id AS groupId')
+            ->leftJoin('"Group" ON Page.IdGroup = "Group".Id')
+            ->where('Page.Route', $page)
+            ->fetch();
+        if (!$pageData) return false;
         $person = $this->getPerson();
-        if (!$person) return false;
 
+        if (!$pageData->IdGroup) {
+            if (!$person && $pageData->ForAnonymous) {
+                return true;
+            }
+            if ($person && $pageData->ForMembers) {
+                return true;
+            }
+            return false;
+        }
+
+        if (!$person) {
+            return false;
+        }
         $userGroups = $this->getUserGroups($person->Email);
-        return !empty(array_intersect($groups, $userGroups));
+        return in_array($pageData->IdGroup, $userGroups);
     }
 
     private function getAvailableRoutes()

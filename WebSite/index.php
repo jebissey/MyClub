@@ -104,6 +104,7 @@ $flight->route('GET /events/@id/register',   function($id) use ($eventController
 $flight->route('GET /events/@id/unregister', function($id) use ($eventController) { $eventController->register($id, false); });
 $flight->route('GET /needs',                 function()    use ($eventController) { $eventController->needs();});
 $flight->route('GET /event/chat/@id',        function($id) use ($eventController) { $eventController->showEventChat($id); });
+$flight->route('GET /weekEvents',            function()    use ($eventController) { $eventController->weekEvents();});
 
 use app\controllers\EventTypeController;
 $eventTypeController = new EventTypeController($container->get(PDO::class), $container->get(Engine::class));
