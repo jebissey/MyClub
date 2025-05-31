@@ -122,7 +122,7 @@ class CarouselApi extends BaseController
         }
 
         if ($article->IdGroup && $person) {
-            $userGroups = $this->getUserGroups($person->Email);
+            $userGroups = $this->authorizations->getUserGroups($person->Email);
             if (!in_array($article->IdGroup, $userGroups)) {
                 return false;
             }

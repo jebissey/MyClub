@@ -2,16 +2,19 @@
 
 namespace app\helpers;
 
+use DateTime;
 use PDO;
 
 class Authorization
 {
     private PDO $pdo;
     private $authorizations;
+    private $fluent;
 
     public function __construct(PDO $pdo)
     {
         $this->pdo = $pdo;
+        $this->fluent = new \Envms\FluentPDO\Query($pdo);
     }
 
     public function get($idPerson)
@@ -60,5 +63,72 @@ class Authorization
     public function hasOnlyOneAutorization(): bool
     {
         return count($this->authorizations ?? []) == 1;
+    }
+
+    public function canPersonReadSurveyResults($article, $person)
+    {
+        $survey = $this->fluent->from('Survey')->where('IdArticle', $article->Id)->fetch();
+        if (!$survey || !$person) {
+            return false;
+        }
+
+        $now = (new DateTime())->format('Y-m-d');
+        $closingDate = $survey->ClosingDate;
+
+        if (
+            $article->CreatedBy == $person->Id
+            || $survey->Visibility == 'all'
+            || $survey->Visibility == 'allAfterClosing' && $closingDate < $now
+        ) {
+            return true;
+        }
+
+        $stmt = $this->pdo->prepare('SELECT COUNT(*) FROM Reply WHERE IdSurvey = ? AND IdPerson = ?');
+        $stmt->execute([$survey->Id, $person->Id]);
+        $hasVoted = $stmt->fetchColumn() > 0;
+        if ($hasVoted && ($survey->Visibility == 'voters' || ($survey->Visibility == 'votersAfterClosing' && $closingDate < $now))) {
+            return true;
+        }
+        return false;
+    }
+
+    public function getArticle($id, $person)
+    {
+        $article = $this->fluent->from('Article')->where('Id', $id)->fetch();
+        if (!$this->canReadArticle($article, $person)) {
+            return false;
+        }
+        return $article;
+    }
+
+    public function getUserGroups(string $userEmail): array
+    {
+        $rows = $this->fluent->from('PersonGroup')
+            ->select('PersonGroup.IdGroup AS IdGroup')
+            ->leftJoin('Person ON Person.Id = PersonGroup.IdPerson')
+            ->where('Person.Email', $userEmail)
+            ->fetchAll();
+        return array_column($rows, 'IdGroup');
+    }
+
+    #region Private functions
+    private function canReadArticle($article, $person)
+    {
+        if (!$article) {
+            return false;
+        }
+        if ($person && ($article->CreatedBy == $person->Id || $this->authorizations->isEditor())) {
+            return true;
+        }
+        if ($article->PublishedBy === null) {
+            return false;
+        }
+        if (!$person) {
+            return $article->OnlyForMembers == 0 && ($article->IdGroup === null);
+        }
+        if ($article->OnlyForMembers == 1 && $article->IdGroup === null) {
+            return true;
+        }
+        return $article->IdGroup === null || !empty(array_intersect([$article->IdGroup], $this->getUserGroups($person->Email)));
     }
 }

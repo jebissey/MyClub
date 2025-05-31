@@ -75,7 +75,7 @@ class NavBarController extends BaseController
         if (!$person) {
             return false;
         }
-        $userGroups = $this->getUserGroups($person->Email);
+        $userGroups = $this->authorizations->getUserGroups($person->Email);
         return in_array($pageData->IdGroup, $userGroups);
     }
 

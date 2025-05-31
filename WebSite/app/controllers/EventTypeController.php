@@ -45,12 +45,7 @@ class EventTypeController extends TableController implements CrudControllerInter
     {
         if ($this->getPerson(['Webmaster'])) {
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-                $query = $this->pdo->prepare("
-                        INSERT INTO EventType (Name) 
-                        VALUES ('')
-                    ");
-                $query->execute([]);
-                $id = $this->pdo->lastInsertId();
+                $id = $this->fluent->insertInto('EventType', ['Name' => ''])->execute();
                 $this->flight->redirect('/EventTypes/edit/' . $id);
             } else {
                 $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);

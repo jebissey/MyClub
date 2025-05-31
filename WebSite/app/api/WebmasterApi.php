@@ -11,8 +11,10 @@ class WebmasterApi extends BaseController
     public function addToGroup($personId, $groupId)
     {
         if ($this->getPerson(['PersonManager', 'Webmaster'])) {
-            $insert = $this->pdo->prepare("INSERT INTO PersonGroup (IdPerson, IdGroup) VALUES (?, ?)");
-            $success = $insert->execute([$personId, $groupId]);
+            $success = $this->fluent->insertInto('PersonGroup', [
+                'IdPerson' => $personId,
+                'IdGroup'  => $groupId
+            ])->execute();
 
             echo json_encode(['success' => $success]);
         } else {
@@ -131,8 +133,10 @@ class WebmasterApi extends BaseController
     public function removeFromGroup($personId, $groupId)
     {
         if ($this->getPerson(['PersonManager', 'Webmaster'])) {
-            $delete = $this->pdo->prepare("DELETE FROM PersonGroup WHERE IdPerson = ? AND IdGroup = ?");
-            $success = $delete->execute([$personId, $groupId]);
+            $success = $this->fluent->deleteFrom('PersonGroup')
+                ->where('IdPerson', $personId)
+                ->where('IdGroup', $groupId)
+                ->execute();
 
             echo json_encode(['success' => $success]);
         } else {

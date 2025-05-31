@@ -69,24 +69,18 @@ class EventController extends BaseController
                 $event = new Event($this->pdo);
 
                 if ($eventId > 0 && !$event->isUserRegistered($eventId, $person->Email ?? '')) {
-                    $query = $this->pdo->prepare(
-                        "INSERT INTO Participant (IdEvent, IdPerson, IdContact) 
-                         VALUES (:eventId, :userId, NULL)"
-                    );
-                    $query->execute([
-                        'eventId' => $eventId,
-                        'userId' => $userId
-                    ]);
+                    $this->fluent->insertInto('Participant', [
+                        'IdEvent'  => $eventId,
+                        'IdPerson' => $userId,
+                        'IdContact' => null
+                    ])
+                        ->execute();
                 }
             } else {
-                $query = $this->pdo->prepare(
-                    "DELETE FROM Participant 
-                     WHERE IdEvent = :eventId AND IdPerson = :userId"
-                );
-                $query->execute([
-                    'eventId' => $eventId,
-                    'userId' => $userId
-                ]);
+                $this->fluent->deleteFrom('Participant')
+                    ->where('IdEvent', $eventId)
+                    ->where('IdPerson', $userId)
+                    ->execute();
             }
         }
         $this->flight->redirect('/events/' . $eventId);

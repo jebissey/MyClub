@@ -2,7 +2,6 @@
 
 namespace app\controllers;
 
-use DateTime;
 use PDO;
 use flight;
 use flight\Engine;
@@ -171,17 +170,6 @@ abstract class BaseController extends BaseHelper
         die('Fatal error in file ' . __FILE__ . ' at line ' . __LINE__ . " with navbar=" . $navbar);
     }
 
-    protected function getUserGroups(string $userEmail): array
-    {
-        $query = $this->pdo->prepare("
-            SELECT PersonGroup.IdGroup 
-            FROM PersonGroup 
-            LEFT JOIN Person ON Person.Id = PersonGroup.IdPerson 
-            WHERE Person.Email = ?");
-        $query->execute([$userEmail]);
-        return $query->fetchAll(PDO::FETCH_COLUMN);
-    }
-
     protected function getNavItems($all = false)
     {
         $navItems = $this->fluent
@@ -192,7 +180,7 @@ abstract class BaseController extends BaseHelper
             ->fetchAll();
         $person = $this->getPerson();
         if (!$person) $userGroups = [];
-        else $userGroups = $this->getUserGroups($person->Email);
+        else $userGroups = $this->authorizations->getUserGroups($person->Email);
 
         $filteredNavItems = [];
         foreach ($navItems as $navItem) {
@@ -212,9 +200,9 @@ abstract class BaseController extends BaseHelper
 
     protected function getGroup($id)
     {
-        $query = $this->pdo->prepare('SELECT * FROM "Group" WHERE Id = ?');
-        $query->execute([$id]);
-        return $query->fetch();
+        return $this->fluent->from('"Group"')
+            ->where('Id', $id)
+            ->fetch();
     }
 
     protected function getGroups()
@@ -251,33 +239,6 @@ abstract class BaseController extends BaseHelper
             'supportedLanguages' => $translationManager->getSupportedLanguages(),
             'flag' => $translationManager->getFlag($translationManager->getCurrentLanguage()),
         ]);
-    }
-
-    protected function canPersonReadSurveyResults($article, $person)
-    {
-        $survey = $this->fluent->from('Survey')->where('IdArticle', $article->Id)->fetch();
-        if (!$survey || !$person) {
-            return false;
-        }
-
-        $now = (new DateTime())->format('Y-m-d');
-        $closingDate = $survey->ClosingDate;
-
-        if (
-            $article->CreatedBy == $person->Id
-            || $survey->Visibility == 'all'
-            || $survey->Visibility == 'allAfterClosing' && $closingDate < $now
-        ) {
-            return true;
-        }
-
-        $stmt = $this->pdo->prepare('SELECT COUNT(*) FROM Reply WHERE IdSurvey = ? AND IdPerson = ?');
-        $stmt->execute([$survey->Id, $person->Id]);
-        $hasVoted = $stmt->fetchColumn() > 0;
-        if ($hasVoted && ($survey->Visibility == 'voters' || ($survey->Visibility == 'votersAfterClosing' && $closingDate < $now))) {
-            return true;
-        }
-        return false;
     }
 
     protected function render(string $name, object|array $params = []): void

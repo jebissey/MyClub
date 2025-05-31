@@ -77,7 +77,7 @@ class SurveyController extends BaseController
             if (!$survey) {
                 $this->flight->redirect('/articles/' . $articleId);
             }
-            if ($this->canPersonReadSurveyResults($this->fluent->from('Article')->where('Id', $survey->IdArticle)->fetch(), $person)) {
+            if ($this->authorizations->canPersonReadSurveyResults($this->fluent->from('Article')->where('Id', $survey->IdArticle)->fetch(), $person)) {
                 $replies = $this->fluent->from('Reply')->where('IdSurvey', $survey->Id)->fetchAll();
 
                 $participants = [];

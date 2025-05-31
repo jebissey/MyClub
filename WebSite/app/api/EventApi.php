@@ -20,8 +20,11 @@ class EventApi extends BaseController
 
             try {
                 $this->pdo->beginTransaction();
-                $query = $this->pdo->prepare('INSERT INTO Attribute (Name, Detail, Color) VALUES (?, ?, ?)');
-                $query->execute([$data['name'], $data['detail'], $data['color']]);
+                $this->fluent->insertInto('Attribute', [
+                    'Name'   => $data['name'],
+                    'Detail' => $data['detail'],
+                    'Color'  => $data['color']
+                ])->execute();
                 $this->pdo->commit();
 
                 header('Content-Type: application/json');
@@ -103,8 +106,14 @@ class EventApi extends BaseController
 
             try {
                 $this->pdo->beginTransaction();
-                $query = $this->pdo->prepare('UPDATE Attribute SET Name = ?, Detail = ?, Color = ? WHERE Id = ?');
-                $query->execute([$data['name'], $data['detail'], $data['color'], $data['id']]);
+                $this->fluent->update('Attribute')
+                    ->set([
+                        'Name'   => $data['name'],
+                        'Detail' => $data['detail'],
+                        'Color'  => $data['color']
+                    ])
+                    ->where('Id', $data['id'])
+                    ->execute();
                 $this->pdo->commit();
 
                 header('Content-Type: application/json');
