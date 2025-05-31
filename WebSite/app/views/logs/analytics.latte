@@ -10,7 +10,7 @@
                 <div class="card-header">
                     <h5 class="card-title">Systèmes d'exploitation</h5>
                 </div>
-                <div class="card-body">
+                <div class="card-body" style="height: 400px;">
                     <canvas id="osChart"></canvas>
                 </div>
             </div>
@@ -20,7 +20,7 @@
                 <div class="card-header">
                     <h5 class="card-title">Navigateurs</h5>
                 </div>
-                <div class="card-body">
+                <div class="card-body" style="height: 400px;">
                     <canvas id="browserChart"></canvas>
                 </div>
             </div>
@@ -33,7 +33,7 @@
                 <div class="card-header">
                     <h5 class="card-title">Résolutions d'écran</h5>
                 </div>
-                <div class="card-body" style="height: 330px;">
+                <div class="card-body" style="height: 400px;">
                     <canvas id="resolutionChart"></canvas>
                 </div>
             </div>
@@ -43,21 +43,8 @@
                 <div class="card-header">
                     <h5 class="card-title">Matériel</h5>
                 </div>
-                <div class="card-body">
+                <div class="card-body" style="height: 400px;">
                     <canvas id="typeChart"></canvas>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <div class="row">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="card-title">Visites par jour</h5>
-                </div>
-                <div class="card-body">
-                    <canvas id="visitorsTimeChart"></canvas>
                 </div>
             </div>
         </div>
@@ -187,60 +174,6 @@ document.addEventListener('DOMContentLoaded', function() {
         options: commonOptions
     });
     
-    fetch('/api/analytics/visitorsByDate')
-        .then(response => response.json())
-        .then(data => {
-            new Chart(document.getElementById('visitorsTimeChart'), {
-                type: 'line',
-                data: {
-                    labels: data.labels,
-                    datasets: [{
-                        label: 'Nombre de visites',
-                        data: data.data,
-                        borderColor: colorPalette[0],
-                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                        borderWidth: 2,
-                        fill: true
-                    }]
-                },
-                options: {
-                    ...commonOptions,
-                    plugins: {
-                        legend: {
-                            position: 'top',
-                            labels: {
-                                boxWidth: 10,
-                                font: {
-                                    size: 10
-                                }
-                            }
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                font: {
-                                    size: 10
-                                }
-                            }
-                        },
-                        x: {
-                            ticks: {
-                                font: {
-                                    size: 8
-                                },
-                                maxRotation: 45,
-                                minRotation: 45
-                            }
-                        }
-                    }
-                }
-            });
-        })
-        .catch(error => {
-            alert('Erreur lors du chargement des données chronologiques : ' + error.message);
-        });
 });
 </script>
 {/block}

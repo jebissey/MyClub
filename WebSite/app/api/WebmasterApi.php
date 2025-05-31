@@ -71,42 +71,6 @@ class WebmasterApi extends BaseController
         exit();
     }
 
-    public function getVisitorsByDate()
-    {
-        if ($this->getPerson([])) {
-            if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-                $query = $this->fluentForLog
-                    ->from('Log')
-                    ->select('date(CreatedAt) as date, COUNT(*) as count')
-                    ->groupBy('date(CreatedAt)')
-                    ->orderBy('date');
-
-                $results = $query->fetchAll();
-
-                $dates = [];
-                $counts = [];
-
-                foreach ($results as $row) {
-                    $dates[] = $row->date;
-                    $counts[] = $row->count;
-                }
-
-                header('Content-Type: application/json');
-                echo json_encode([
-                    'labels' => $dates,
-                    'data' => $counts
-                ]);
-            } else {
-                header('Content-Type: application/json', true, 470);
-                echo json_encode(['success' => false, 'message' => 'Bad request method']);
-            }
-        } else {
-            header('Content-Type: application/json', true, 403);
-            echo json_encode(['success' => false, 'message' => 'User not found']);
-        }
-        exit();
-    }
-
     public function lastVersion()
     {
         $this->fluentForLog
@@ -145,7 +109,6 @@ class WebmasterApi extends BaseController
         }
         exit();
     }
-
 
     public function saveNavbarItem()
     {

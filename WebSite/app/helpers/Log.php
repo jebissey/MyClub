@@ -87,18 +87,40 @@ class Log
             ->select('ScreenResolution, COUNT(*) as count')
             ->groupBy('ScreenResolution')
             ->orderBy('count DESC');
+
         $results = $query->fetchAll();
 
-        $labels = [];
-        $data = [];
+        $typeGroups = [];
+        $typeResolutions = [];
 
         foreach ($results as $row) {
             $orientation = $this->getScreenOrientation($row->ScreenResolution);
             $type = $this->getResolutionType($row->ScreenResolution);
             $emoji = $this->getDeviceEmoji($orientation, $type);
-            $resolution = $row->ScreenResolution ?: 'Inconnu';
-            $labels[] = "$resolution $emoji [$type]";
-            $data[] = $row->count;
+
+            $typeKey = "$type $emoji";
+            if (!isset($typeGroups[$typeKey])) {
+                $typeGroups[$typeKey] = 0;
+                $typeResolutions[$typeKey] = [];
+            }
+            $typeGroups[$typeKey] += $row->count;
+
+            if ($row->ScreenResolution && $row->ScreenResolution !== 'Inconnu') {
+                $typeResolutions[$typeKey][] = $row->ScreenResolution;
+            }
+        }
+        arsort($typeGroups);
+        $labels = [];
+        $data = [];
+
+        foreach ($typeGroups as $typeKey => $count) {
+            $label = $typeKey;
+            if (isset($typeResolutions[$typeKey]) && !empty($typeResolutions[$typeKey])) {
+                $resolutionRange = $this->getResolutionRange($typeResolutions[$typeKey]);
+                $label .= " $resolutionRange";
+            }
+            $labels[] = $label;
+            $data[] = $count;
         }
 
         return [
@@ -106,6 +128,39 @@ class Log
             'data' => $data
         ];
     }
+
+    private function getResolutionRange($resolutions)
+    {
+        $widths = [];
+        $heights = [];
+
+        foreach ($resolutions as $resolution) {
+            if (strpos($resolution, 'x') !== false) {
+                list($width, $height) = explode('x', $resolution);
+                $widths[] = (int)$width;
+                $heights[] = (int)$height;
+            }
+        }
+
+        if (empty($widths) || empty($heights)) {
+            return 'Résolutions variées';
+        }
+
+        $minWidth = min($widths);
+        $maxWidth = max($widths);
+        $minHeight = min($heights);
+        $maxHeight = max($heights);
+
+        if ($minWidth === $maxWidth && $minHeight === $maxHeight) {
+            return $minWidth . 'x' . $minHeight;
+        }
+
+        $widthRange = ($minWidth === $maxWidth) ? "[$minWidth]" : "[$minWidth-$maxWidth]";
+        $heightRange = ($minHeight === $maxHeight) ? "[$minHeight]" : "[$minHeight-$maxHeight]";
+
+        return $widthRange . 'x' . $heightRange;
+    }
+
     private function getDeviceEmoji($orientation, $type)
     {
         if (strpos($type, 'Mobile Premium') !== false) {
@@ -117,13 +172,13 @@ class Log
         } elseif (strpos($type, 'Mobile Basique') !== false) {
             return '📞';
         } elseif (strpos($type, 'Tablette') !== false) {
-            return '💻';
+            return '📋';
         } elseif (strpos($type, '4K') !== false) {
             return '🖥️+';
         } elseif (strpos($type, '2K') !== false || strpos($type, '1440p') !== false) {
             return '🖥️';
         } elseif (strpos($type, 'HD') !== false) {
-            return '🖥️';
+            return '🖥️-';
         }
         return ($orientation === 'Portrait') ? '📱' : '🖥️';
     }
