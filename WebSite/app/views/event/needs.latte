@@ -73,22 +73,22 @@
                             <tbody>
                                 {foreach $needs as $need}
                                 <tr>
-                                    <td><h5>{$need['Label']}</h5></td>
-                                    <td>{$need['Name']}</td>
-                                    <td>{$need['TypeName']}</td>
-                                    <td>{if $need['ParticipantDependent'] == 1}Oui{else}Non{/if}</td>
+                                    <td><h5>{$need->Label}</h5></td>
+                                    <td>{$need->Name}</td>
+                                    <td>{$need->TypeName}</td>
+                                    <td>{if $need->ParticipantDependent == 1}Oui{else}Non{/if}</td>
                                     <td>
                                         <button type="button" class="btn btn-sm btn-primary edit-need" 
-                                                data-id="{$need['Id']}"
-                                                data-label="{$need['Label']}" 
-                                                data-name="{$need['Name']}" 
-                                                data-participant-dependent="{$need['ParticipantDependent']}" 
-                                                data-type="{$need['IdNeedType']}">
+                                                data-id="{$need->Id}"
+                                                data-label="{$need->Label}" 
+                                                data-name="{$need->Name}" 
+                                                data-participant-dependent="{$need->ParticipantDependent}" 
+                                                data-type="{$need->IdNeedType}">
                                             <i class="bi bi-pencil"></i>
                                         </button>
                                         <button type="button" class="btn btn-sm btn-danger delete-need" 
-                                                data-id="{$need['Id']}" 
-                                                data-name="{$need['Name']}">
+                                                data-id="{$need->Id}" 
+                                                data-name="{$need->Name}">
                                             <i class="bi bi-trash"></i>
                                         </button>
                                     </td>
@@ -141,7 +141,7 @@
                             <select class="form-select" id="needType" name="idNeedType" required>
                                 <option value="">Sélectionnez un type</option>
                                 {foreach $needTypes as $type}
-                                <option value="{$type['Id']}">{$type['Name']}</option>
+                                <option value="{$type->Id}">{$type->Name}</option>
                                 {/foreach}
                             </select>
                         </div>

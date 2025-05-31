@@ -45,18 +45,18 @@
                                                     {$eventType->Name}
                                                 </label>
 
-                                                <div id="tooltip-content-{$eventType->Id}" class="d-none">
-                                                    <div>
-                                                        {foreach $eventType->Attributes as $attribute}
-                                                        <div>
-                                                            <span 
-                                                                class="attribute-badge" 
-                                                                style="background-color: {$attribute->Color|noescape};">
-                                                            </span>
-                                                            <strong>{$attribute->Name}</strong>: {$attribute->Detail}
-                                                        </div>
-                                                        {/foreach}
-                                                    </div>
+                                                <div>
+                                                {if count($eventType->Attributes) > 0}
+                                                    {foreach $eventType->Attributes as $attribute}
+                                                    <span 
+                                                        class="attribute-badge" 
+                                                        style="background-color: {$attribute->Color|noescape};" 
+                                                        title="{$attribute->Name} - {$attribute->Detail}"
+                                                    ></span>
+                                                    {/foreach}
+                                                {else}
+                                                    <span style="font-size: 16px;">⌧</span>
+                                                {/if}
                                                 </div>
                                             </div>
                                         </div>
