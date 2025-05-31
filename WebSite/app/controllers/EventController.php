@@ -36,6 +36,8 @@ class EventController extends BaseController
             'events' => $event->getNextWeekEvents($person, $mode, $offset),
             'eventTypes' => $this->fluent->from('EventType')->where('Inactivated', 0)->orderBy('Name')->fetchAll('Id', 'Name'),
             'eventAttributes' => $this->fluent->from('Attribute')->fetchAll('Id', 'Name, Detail, Color'),
+            'navItems' => $this->getNavItems(),
+            'layout' => $this->getLayout()
         ]));
     }
 

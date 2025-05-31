@@ -85,6 +85,7 @@ class NavBarController extends BaseController
             '/navbar/show/article/@id',
             '/navbar/show/arwards',
             '/nextEvents',
+            '/weekEvents',
             '/emails',
             '/user/statistics',
             '/ffa/search',
