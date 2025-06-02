@@ -172,13 +172,18 @@ class PersonStatistics
         $userReplies->execute([$personId, $seasonStart, $seasonEnd]);
         $userRepliesCount = $userReplies->fetch()->count;
 
-        $totalRepliesCount = $this->fluent->from('Reply r')
-            ->select(null)
-            ->select('COUNT(*) AS count')
-            ->join('Survey s ON r.IdSurvey = s.Id')
-            ->join('Article a ON s.IdArticle = a.Id')
-            ->where('a.LastUpdate BETWEEN ? AND ?', $seasonStart, $seasonEnd)
-            ->fetch()->count;
+        $query = "
+            SELECT COUNT(*) as count 
+            FROM Reply 
+            WHERE Id IN (
+                SELECT r.Id FROM Reply r
+                JOIN Survey s ON r.IdSurvey = s.Id
+                JOIN Article a ON s.IdArticle = a.Id
+                WHERE a.LastUpdate BETWEEN ? AND ?
+            )";
+        $totalReplies = $this->pdo->prepare($query);
+        $totalReplies->execute([$seasonStart, $seasonEnd]);
+        $totalRepliesCount = $totalReplies->fetch()->count;
 
         return [
             'user'       => $userRepliesCount,

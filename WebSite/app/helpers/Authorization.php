@@ -117,7 +117,7 @@ class Authorization
         if (!$article) {
             return false;
         }
-        if ($person && ($article->CreatedBy == $person->Id || $this->authorizations->isEditor())) {
+        if ($person && ($article->CreatedBy == $person->Id || $this->isEditor())) {
             return true;
         }
         if ($article->PublishedBy === null) {

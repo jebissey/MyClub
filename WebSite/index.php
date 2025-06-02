@@ -242,7 +242,7 @@ $flight->route('DELETE /api/event/delete/@id',    function($id) use ($eventApi) 
 $flight->route('POST   /api/event/duplicate/@id', function($id) use ($eventApi) { $eventApi->duplicateEvent($id); });
 $flight->route('POST   /api/event/save',          function()    use ($eventApi) { $eventApi->saveEvent(); });
 $flight->route('GET    /api/event/@id',           function($id) use ($eventApi) { $eventApi->getEvent($id); });
-$flight->route('GET    /api/event-needs/@id',  function($id) use ($eventApi) { $eventApi->getEventNeeds($id); });
+$flight->route('GET    /api/event-needs/@id',     function($id) use ($eventApi) { $eventApi->getEventNeeds($id); });
 $flight->route('DELETE /api/needs/delete/@id',        function($id) use ($eventApi) { $eventApi->deleteNeed($id);});
 $flight->route('POST   /api/needs/save',              function()    use ($eventApi) { $eventApi->saveNeed(); });
 $flight->route('DELETE /api/needs/type/delete/@id',   function($id) use ($eventApi) { $eventApi->deleteNeedType($id);});

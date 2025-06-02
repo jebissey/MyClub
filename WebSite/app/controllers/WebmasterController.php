@@ -66,6 +66,7 @@ class WebmasterController extends BaseController
                 } else if ($this->authorizations->isPersonManager()) {
                     $this->flight->redirect('/personManager');
                 } else if ($this->authorizations->isRedactor()) {
+                    $_SESSION['navbar'] = 'redactor';
                     $this->flight->redirect('/articles');
                 } else if ($this->authorizations->isWebmaster()) {
                     $this->flight->redirect('/webmaster');
@@ -89,7 +90,8 @@ class WebmasterController extends BaseController
                     'counterNames' => $counterNames = $arwards->getCounterNames(),
                     'data' => $arwards->getData($counterNames),
                     'groups' => $this->getGroups(),
-                    'layout' => $this->getLayout()
+                    'layout' => $this->getLayout(),
+                    'navItems' => $this->getNavItems(),
                 ]));
             } else if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $request = $this->flight->request();
@@ -130,7 +132,7 @@ class WebmasterController extends BaseController
         $base_url = $this->getBaseUrl();
         $site_title = "Liste d'articles";
         $site_url = $base_url;
-        $feed_url = $base_url . "/rss.xml";
+        $feed_url = $base_url . "rss.xml";
         $feed_description = "Mises à jour de la liste d'articles";
 
         $personId = ($this->getPerson([]))->Id ?? 0;
@@ -168,7 +170,7 @@ class WebmasterController extends BaseController
         echo '<?xml version="1.0" encoding="UTF-8"?>' . PHP_EOL;
         echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . PHP_EOL;
         echo '  <url>' . PHP_EOL;
-        echo '    <loc>' . $base_url . '/</loc>' . PHP_EOL;
+        echo '    <loc>' . $base_url . '</loc>' . PHP_EOL;
         echo '    <lastmod>' . $lastMod . '</lastmod>' . PHP_EOL;
         echo '    <changefreq>daily</changefreq>' . PHP_EOL;
         echo '    <priority>1.0</priority>' . PHP_EOL;
@@ -176,7 +178,7 @@ class WebmasterController extends BaseController
         echo '</urlset>';
     }
 
-
+    #region Private methods
     private function generateRSS($articles, $site_title, $site_url, $feed_url, $feed_description)
     {
         $rss = '<?xml version="1.0" encoding="UTF-8"?>';
@@ -192,8 +194,8 @@ class WebmasterController extends BaseController
         foreach ($articles as $article) {
             $rss .= '<item>';
             $rss .= '<title>' . htmlspecialchars($article->Title) . '</title>';
-            $rss .= '<link>' . htmlspecialchars($site_url . '/articles/' . $article->Id) . '</link>';
-            $rss .= '<guid>' . htmlspecialchars($site_url . '/articles/' . $article->Id) . '</guid>';
+            $rss .= '<link>' . htmlspecialchars($site_url . 'articles/' . $article->Id) . '</link>';
+            $rss .= '<guid>' . htmlspecialchars($site_url . 'articles/' . $article->Id) . '</guid>';
             $rss .= '<pubDate>' . date(DATE_RSS, strtotime($article->LastUpdate)) . '</pubDate>';
             $rss .= '<description>' . $this->getFirstElement($article->Content) . '</description>';
             $rss .= '</item>';
@@ -262,13 +264,5 @@ class WebmasterController extends BaseController
             'version' => $data["lastVersion"],
             'error'   => null
         ];
-    }
-
-    #region Protected functions
-    protected function getBaseUrl()
-    {
-        $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https://' : 'http://';
-        $domain = $_SERVER['HTTP_HOST'];
-        return $protocol . $domain;
     }
 }
