@@ -73,7 +73,6 @@ class Event
         return $this->events($query->fetchAll());
     }
 
-
     public function getEvent($eventId)
     {
         return $this->fluent->from('Event e')
@@ -95,7 +94,7 @@ class Event
     public function getEventParticipants($eventId)
     {
         return $this->fluent->from('Participant pa')
-            ->select('pe.FirstName, pe.LastName, pe.NickName, pe.Email')
+            ->select('pe.FirstName, pe.LastName, pe.NickName, pe.Email, pe.Id')
             ->join('Person pe ON pa.IdPerson = pe.Id')
             ->where('pa.IdEvent', $eventId)
             ->orderBy('pe.FirstName, pe.LastName')
@@ -229,7 +228,7 @@ class Event
                 'eventType' => $event->EventTypeName,
                 'attributes' => $attributes,
                 'fullDateTime' => $event->StartTime,
-                'groupName'=> $event->GroupName
+                'groupName' => $event->GroupName
             ];
 
             $weeklyEvents[$weekKey]['days'][$dayOfWeek][] = $eventFormatted;

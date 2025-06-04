@@ -399,6 +399,7 @@ class PersonStatistics
             ->join('Event e ON m.EventId = e.Id')
             ->where('m.PersonId', $personId)
             ->where('datetime(e.StartTime) BETWEEN datetime(?) AND datetime(?)', [$seasonStart, $seasonEnd])
+            ->where('"From"', 'User')
             ->fetch('count');
         $totalMessagesCount = $this->fluent
             ->from('Message m')
@@ -406,6 +407,7 @@ class PersonStatistics
             ->select('COUNT(*) AS count')
             ->join('Event e ON m.EventId = e.Id')
             ->where('datetime(e.StartTime) BETWEEN datetime(?) AND datetime(?)', [$seasonStart, $seasonEnd])
+            ->where('"From"', 'User')
             ->fetch('count');
         return [
             'user'       => $userMessagesCount,

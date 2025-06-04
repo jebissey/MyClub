@@ -2,15 +2,28 @@
 
 namespace app\api;
 
+use Flight\Engine;
+use PDO;
 use DateTime;
 use Exception;
 use app\controllers\BaseController;
+use app\helpers\Email;
 use app\helpers\Event;
 use app\helpers\EventAudience;
 use app\helpers\Message;
 
 class EventApi extends BaseController
 {
+    private $event;
+    private $email;
+
+    public function __construct(PDO $pdo, Engine $flight)
+    {
+        parent::__construct($pdo, $flight);
+        $this->event = new Event($this->pdo);
+        $this->email = new Email($this->pdo);
+    }
+
     #region Attribute
     public function createAttribute()
     {
@@ -298,6 +311,70 @@ class EventApi extends BaseController
             echo json_encode(['success' => false, 'message' => 'User not allowed']);
         }
         exit();
+    }
+
+    public function sendEmails()
+    {
+        if ($this->getPerson(['EventManager'])) {
+            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                $json = file_get_contents('php://input');
+                $data = json_decode($json, true);
+                $eventId = $data['EventId'] ?? '';
+                $event = $this->fluent->from('Event')->where('Id', $eventId)->fetch();
+                if (!$event) {
+                    header('Content-Type: application/json', true, 403);
+                    echo json_encode(['success' => false, 'message' => "Unknown event ($eventId)"]);
+                    return;
+                }
+                $emailTitle = $data['Title'] ?? '';
+                $recipients = $data['Recipients'] ?? '';
+                $message = $data['Body'] ?? '';
+                if ($recipients === 'registered') {
+                    $participants = $this->event->getEventParticipants($eventId);
+                } else if ($recipients === 'unregistered') {
+                } else if ($recipients === 'all') {
+                    $participants = $this->email->getInterestedPeople(
+                        $this->fluent->from('EventType')->where('Id', $event->IdEventType)->fetch('IdGroup'),
+                        new DateTime($event->StartTime)->format('N') - 1,
+                        $this->getPeriodOfDay($event->StartTime)
+                    );
+                } else {
+                    header('Content-Type: application/json', true, 404);
+                    echo json_encode(['success' => false, 'message' => "Invalid recipients ($recipients)"]);
+                    return;
+                }
+                if ($participants) {
+                    $eventLink = 'https://' . $_SERVER['HTTP_HOST'] . '/events/' . $event->Id;
+                    $sentError = 0;
+                    $sent = 0;
+                    foreach ($participants as $participant) {
+                        $sent++;
+                        $this->fluent->insertInto('Message')
+                            ->values([
+                                'EventId' => $eventId,
+                                'PersonId' => $participant->Id,
+                                'Text' => $emailTitle,
+                                '"From"' => 'Webapp'
+                            ])
+                            ->execute();
+                        if (!mail($participant->Email, $emailTitle, $message . $eventLink)) {
+                            $sentError++;
+                        }
+                    }
+                } else {
+                    header('Content-Type: application/json', true, 404);
+                    echo json_encode(['success' => false, 'message' => 'No participant']);
+                    return;
+                }
+                header('Content-Type: application/json');
+                echo json_encode(['success' => true, 'message' => "sent = $sent ; sentError = $sentError"]);
+            } else {
+                $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
+            }
+        } else {
+            header('Content-Type: application/json', true, 403);
+            echo json_encode(['success' => false, 'message' => 'User not allowed']);
+        }
     }
     #endregion
 
@@ -619,4 +696,18 @@ class EventApi extends BaseController
         }
     }
     #endregion
+
+    private function getPeriodOfDay($dateString)
+    {
+        $date = new DateTime($dateString);
+        $hour = (int)$date->format('H');
+
+        if ($hour < 13) {
+            return 'morning';
+        } elseif ($hour < 18) {
+            return 'afternoon';
+        } else {
+            return 'evening';
+        }
+    }
 }

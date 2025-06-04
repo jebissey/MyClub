@@ -107,7 +107,6 @@
         </tbody>
     </table>
 
-    <!-- Modale pour l'envoi d'emails -->
     <div class="modal fade" id="emailModal" tabindex="-1" aria-labelledby="emailModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -152,7 +151,6 @@
         </div>
     </div>
 
-    <!-- Modale pour créer/modifier un événement -->
     <div class="modal fade" id="eventModal" tabindex="-1" aria-labelledby="eventModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -161,7 +159,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="eventForm" method="post" action="/event/save">
+                    <form id="eventForm">
                         <input type="hidden" id="eventId" name="eventId">
                         <input type="hidden" id="formMode" name="formMode" value="create">
 

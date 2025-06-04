@@ -465,14 +465,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
         switch (messageType) {
             case 'nouvel-evenement':
-                recipientsSelect.innerHTML += '<option value="tous">Tous</option>';
+                recipientsSelect.innerHTML += '<option value="all">Tous</option>';
                 break;
             case 'rappel':
-                recipientsSelect.innerHTML += '<option value="non-inscrits">Tous les non-inscrits</option>';
+                recipientsSelect.innerHTML += '<option value="unregistered">Tous les non-inscrits</option>';
                 break;
             case 'annule':
             case 'modifie':
-                recipientsSelect.innerHTML += '<option value="inscrits">Tous les inscrits</option>';
+                recipientsSelect.innerHTML += '<option value="registered">Tous les inscrits</option>';
                 break;
         }
     }
@@ -489,7 +489,7 @@ document.addEventListener('DOMContentLoaded', function () {
             Recipients: formData.get('recipients')
         };
 
-        fetch('/api/email/send', {
+        fetch('/api/event/sendEmails', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

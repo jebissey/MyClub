@@ -2,10 +2,20 @@
 
 namespace app\controllers;
 
+use Flight\Engine;
 use PDO;
+use app\helpers\Email;
 
 class EmailController extends BaseController
 {
+    private $email;
+
+    public function __construct(PDO $pdo, Engine $flight)
+    {
+        parent::__construct($pdo, $flight);
+        $this->email = new Email($this->pdo);
+    }
+
     public function fetchEmails()
     {
         if ($this->getPerson(['EventManager'])) {
@@ -14,31 +24,7 @@ class EmailController extends BaseController
                 $idEventType = $_POST['idEventType'] ?? '';
                 $dayOfWeek = $_POST['dayOfWeek'] ?? '';
                 $timeOfDay = $_POST['timeOfDay'] ?? '';
-
-                $persons = $this->getPersons($idGroup);
-                $filteredEmails = [];
-                foreach ($persons as $person) {
-                    $include = true;
-                    if (!empty($idEventType)) {
-                        if ($person->Preferences != '') {
-                            $preferences = json_decode($person->Preferences, true);
-                            if ($preferences != '' && !isset($preferences['eventTypes'][$idEventType])) {
-                                $include = false;
-                            }
-                        }
-                    }
-                    if ($dayOfWeek != '' && $timeOfDay != '') {
-                        if ($person->Availabilities != '') {
-                            $availabilities = json_decode($person->Availabilities, true);
-                            if (isset($availabilities[$dayOfWeek][$timeOfDay]) != 'on') {
-                                $include = false;
-                            }
-                        }
-                    }
-                    if ($include) {
-                        $filteredEmails[] = $person->Email;
-                    }
-                }
+                $filteredEmails = $this->email->getEmailsOfInterestedPeople($idGroup, $dayOfWeek, $timeOfDay);
                 $groupName = $idGroup != '' ? $this->getGroup($idGroup)->Name : '';
                 $eventTypeName = $idEventType != '' ? $this->fluent->from('EventType')->where('Id', $idEventType)->fetch('Name') : '';
                 $dayOfWeekName = $dayOfWeek != '' ? ['Lu.', 'Ma.', 'Me.', 'Je.', 'Ve.', 'Sa.', 'Di.', ''][$dayOfWeek] : '';
@@ -69,7 +55,7 @@ class EmailController extends BaseController
                 $idGroup = $this->fluent->from('Article')->where('Id', $idArticle)->fetch('IdGroup');
                 $idSurvey = $this->fluent->from('Survey')->where('IdArticle', $idArticle)->fetch('Id');
 
-                $persons = $this->getPersons($idGroup);
+                $persons = $this->email->getPersons($idGroup);
                 $filteredEmails = [];
                 foreach ($persons as $person) {
                     $include = false;
@@ -101,21 +87,5 @@ class EmailController extends BaseController
         } else {
             $this->application->error403(__FILE__, __LINE__);
         }
-    }
-
-    private function getPersons($idGroup)
-    {
-        $innerJoin = $and = '';
-        if (!empty($idGroup)) {
-            $innerJoin = 'INNER JOIN PersonGroup on PersonGroup.IdPerson = Person.Id';
-            $and = 'AND PersonGroup.IdGroup = ' . $idGroup;
-        }
-        $query = $this->pdo->query("
-            SELECT Email, Preferences, Availabilities
-            FROM Person
-            $innerJoin
-            WHERE Person.Inactivated = 0 $and
-        ");
-        return $query->fetchAll();
     }
 }
