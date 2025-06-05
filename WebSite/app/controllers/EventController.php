@@ -18,6 +18,7 @@ class EventController extends BaseController
             'events' => $event->getEvents($person, $mode, $offset),
             'person' => $person,
             'eventTypes' => $this->fluent->from('EventType')->where('Inactivated', 0)->orderBy('Name')->fetchAll('Id', 'Name'),
+            'needTypes' => $this->fluent->from('NeedType')->orderBy('Name')->fetchAll('Id', 'Name'),
             'eventAttributes' => $this->fluent->from('Attribute')->fetchAll('Id', 'Name, Detail, Color'),
             'offset' => $offset,
             'mode' => $mode,

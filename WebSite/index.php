@@ -248,7 +248,7 @@ $flight->route('DELETE /api/needs/delete/@id',        function($id) use ($eventA
 $flight->route('POST   /api/needs/save',              function()    use ($eventApi) { $eventApi->saveNeed(); });
 $flight->route('DELETE /api/needs/type/delete/@id',   function($id) use ($eventApi) { $eventApi->deleteNeedType($id);});
 $flight->route('POST   /api/needs/type/save',         function()    use ($eventApi) { $eventApi->saveNeedType(); });
-$flight->route('GET    /api/needs-by-event-type/@id', function($id) use ($eventApi) { $eventApi->getNeedsByEventType($id); });
+$flight->route('GET    /api/needs-by-need-type/@id', function($id) use ($eventApi) { $eventApi->getNeedsByNeedType($id); });
 $flight->route('POST /api/message/add',    function() use ($eventApi) {$eventApi->addMessage();});
 $flight->route('POST /api/message/update', function() use ($eventApi) {$eventApi->updateMessage();});
 $flight->route('POST /api/message/delete', function() use ($eventApi) {$eventApi->deleteMessage();});

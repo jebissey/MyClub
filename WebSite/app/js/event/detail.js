@@ -12,48 +12,58 @@ function createGoogleCalendarUrl(event) {
     var startTime = new Date(event.StartTime);
     var endTime = new Date(startTime.getTime() + event.Duration * 1000);
     var dates = 'dates=' + encodeURIComponent(formatDateForGoogle(startTime, endTime));
-    var details = 'details=' + encodeURIComponent(event.Description) + '&link=' + encodeURIComponent(window.location.href);
+    var detailsText = event.Description + '\n\nPlus d\'infos : ' + window.location.href;
+    var details = 'details=' + encodeURIComponent(detailsText);
     var location = 'location=' + encodeURIComponent(event.Location);
 
     return base + '?' + 'action=TEMPLATE' + '&' + text + '&' + dates + '&' + details + '&' + location;
 }
 
 function createOutlookCalendarUrl(event) {
-    var base = 'https://outlook.office.com/calendar/action/compose';
+    var base = 'https://outlook.live.com/calendar/0/deeplink/compose';
     var subject = 'subject=' + encodeURIComponent(event.Summary);
-    var startdt = 'startdt=' + encodeURIComponent(new Date(event.StartTime).toISOString());
-    var enddt = 'enddt=' + encodeURIComponent(new Date(new Date(event.StartTime).getTime() + event.Duration * 1000).toISOString());
-    var body = 'body=' + encodeURIComponent(event.Description);
+    var startTime = new Date(event.StartTime);
+    var endTime = new Date(startTime.getTime() + event.Duration * 1000);
+    var startdt = 'startdt=' + encodeURIComponent(startTime.toISOString());
+    var enddt = 'enddt=' + encodeURIComponent(endTime.toISOString());
     var location = 'location=' + encodeURIComponent(event.Location);
+    var bodyText = event.Description + '\n\nPlus d\'infos : ' + window.location.href;
+    var body = 'body=' + encodeURIComponent(bodyText);
 
     return base + '?' + subject + '&' + startdt + '&' + enddt + '&' + body + '&' + location;
 }
 
-function generateICalFile(event) {
-    function formatICalDate(date) {
-        return date.toISOString().replace(/-|:|\.\d+/g, '').slice(0, -1) + 'Z';
-    }
-
+function downloadICalFile(event) {
     var startTime = new Date(event.StartTime);
     var endTime = new Date(startTime.getTime() + event.Duration * 1000);
-    var now = formatICalDate(new Date());
-    var uid = 'event-' + event.Id + '-' + now + '@bnw.com';
 
-    return [
-        'BEGIN:VCALENDAR',
-        'VERSION:2.0',
-        'PRODID:-//YourApp//Calendar//FR',
-        'CALSCALE:GREGORIAN',
-        'METHOD:PUBLISH',
-        'BEGIN:VEVENT',
-        'UID:' + uid,
-        'DTSTAMP:' + now,
-        'DTSTART:' + formatICalDate(startTime),
-        'DTEND:' + formatICalDate(endTime),
-        'SUMMARY:' + event.Summary,
-        'DESCRIPTION:' + event.Description.replace(/\n/g, '\\n'),
-        'LOCATION:' + event.Location,
-        'END:VEVENT',
-        'END:VCALENDAR'
-    ].join('\r\n');
+    function formatDateICS(date) {
+        return date.toISOString().replace(/-|:|\.\d+/g, '').replace(/(\.\d+)?Z$/, 'Z');
+    }
+
+    var icsContent =
+        'BEGIN:VCALENDAR\n' +
+        'VERSION:2.0\n' +
+        'PRODID:-//YourAppName//EN\n' +
+        'BEGIN:VEVENT\n' +
+        'UID:' + Date.now() + '@yourapp.com\n' +
+        'DTSTAMP:' + formatDateICS(new Date()) + '\n' +
+        'DTSTART:' + formatDateICS(startTime) + '\n' +
+        'DTEND:' + formatDateICS(endTime) + '\n' +
+        'SUMMARY:' + event.Summary + '\n' +
+        'DESCRIPTION:' + event.Description.replace(/\n/g, '\\n') + '\\n\\nPlus d\'infos : ' + window.location.href + '\n' +
+        'LOCATION:' + event.Location + '\n' +
+        'END:VEVENT\n' +
+        'END:VCALENDAR';
+
+    var blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
+    var url = URL.createObjectURL(blob);
+
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = event.Summary.replace(/\s+/g, '_') + '.ics';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
 }

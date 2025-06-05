@@ -67,16 +67,16 @@
                                 data-bs-toggle="modal" 
                                 data-bs-target="#emailModal"
                                 onclick="event.stopPropagation();">
-                            <i class="bi bi-envelope"></i>
+                            <i class="bi bi-envelope" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="{='sendEmail'|translate}"></i>
                         </button>
                         <button class="btn btn-sm btn-secondary duplicate-btn" data-id="{$event['id']}">
-                            <i class="bi bi-files"></i>
+                            <i class="bi bi-files" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="{='duplicate'|translate}"></i>
                         </button>
                         <button class="btn btn-sm btn-primary edit-btn">
-                            <i class="bi bi-pencil"></i>
+                            <i class="bi bi-pencil" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="{='edit'|translate}"></i>
                         </button>
                         <button class="btn btn-sm btn-danger delete-btn">
-                            <i class="bi bi-trash"></i>
+                            <i class="bi bi-trash" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="{='delete'|translate}"></i>
                         </button>
                     </div>
                 {/if}
@@ -211,39 +211,56 @@
                             </div>
                         </div>
 
-                        <div class="mb-3">
-                            <label class="form-label">Attributs</label>
-                            <div id="attributesList" class="mb-2">
-                                <!-- Dynamically populated attribute list will go here -->
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h5 class="mb-0">Attributs</h5>
                             </div>
-                            <div class="input-group">
-                                <select id="availableAttributesSelect" class="form-control">
-                                    {foreach $eventAttributes as $attribute}
-                                    <option value="{$attribute->Id}" data-color="{$attribute->Color}" data-detail="{$attribute->Detail}">
-                                        {$attribute->Name}
-                                    </option>
-                                    {/foreach}
-                                </select>
-                                <button type="button" id="addAttributeBtn" class="btn btn-secondary">
-                                    <i class="bi bi-plus-lg"></i> Ajouter
-                                </button>
+                            <div class="card-body">
+                                <div id="attributesList" class="mb-3">
+                                    <!-- Dynamically populated attribute list will go here -->
+                                </div>
+                                <div class="input-group">
+                                    <select id="availableAttributesSelect" class="form-control">
+                                        {foreach $eventAttributes as $attribute}
+                                        <option value="{$attribute->Id}" data-color="{$attribute->Color}" data-detail="{$attribute->Detail}">
+                                            {$attribute->Name}
+                                        </option>
+                                        {/foreach}
+                                    </select>
+                                    <button type="button" id="addAttributeBtn" class="btn btn-secondary">
+                                        <i class="bi bi-plus-lg"></i> Ajouter
+                                    </button>
+                                </div>
                             </div>
                         </div>
 
-                        <div class="mb-3">
-                            <label class="form-label">Besoins</label>
-                            <div id="needsList" class="mb-2">
-                                <!-- Dynamically populated needs list will go here -->
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h5 class="mb-0">Besoins</h5>
                             </div>
-                            <div class="input-group">
-                                <select id="availableNeedsSelect" class="form-control">
-                                    <option value="">Sélectionnez d'abord un type de besoin</option>
-                                </select>
-                                <button type="button" id="addNeedBtn" class="btn btn-secondary">
-                                    <i class="bi bi-plus-lg"></i> Ajouter
-                                </button>
+                            <div class="card-body">
+                                <div id="needsList" class="mb-3 d-flex flex-wrap gap-2">
+                                    <!-- Dynamically populated needs list will go here -->
+                                </div>
+                                <div class="mb-3">
+                                    <select class="form-control" id="needTypeInput" name="needType" required>
+                                        <option value="0">Type de besoin</option>
+                                        {foreach $needTypes as $needType}
+                                            <option value="{$needType->Id}">{$needType->Name}</option>
+                                        {/foreach}
+                                    </select>
+                                </div>
+                                <div class="input-group">
+                                    <select id="availableNeedsSelect" class="form-control">
+                                        <option value="">Sélectionnez d'abord un type de besoin</option>
+                                    </select>
+                                    <button type="button" id="addNeedBtn" class="btn btn-secondary">
+                                        <i class="bi bi-plus-lg"></i> Ajouter
+                                    </button>
+                                </div>
                             </div>
                         </div>
+
 
                         <div class="mb-3 d-flex align-items-center">
                             <label for="maxParticipantsInput" class="me-2 mb-0">Nombre max de participants</label>

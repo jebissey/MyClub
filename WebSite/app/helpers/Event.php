@@ -237,7 +237,6 @@ class Event
         return $weeklyEvents;
     }
 
-
     #region Private functions
     private function events($events): array
     {

@@ -254,48 +254,36 @@ class EventApi extends BaseController
         if ($person = $this->getPerson(['EventManager'])) {
             $data = json_decode(file_get_contents('php://input'), true);
             $values = [
-                'Summary' => $data['summary'] ?? '',
-                'Description' => $data['description'] ?? '',
-                'Location' => $data['location'] ?? '',
-                'StartTime' => $data['startTime'],
-                'Duration' => $data['duration'] ?? 1,
-                'IdEventType' => $data['idEventType'],
-                'CreatedBy' => $person->Id,
+                'Summary'        => $data['summary'] ?? '',
+                'Description'    => $data['description'] ?? '',
+                'Location'       => $data['location'] ?? '',
+                'StartTime'      => $data['startTime'],
+                'Duration'       => $data['duration'] ?? 1,
+                'IdEventType'    => $data['idEventType'],
+                'CreatedBy'      => $person->Id,
                 'MaxParticipants' => $data['maxParticipants'] ?? 0,
-                'Audience' => $data['audience'] ?? EventAudience::ForClubMembersOnly->value,
+                'Audience'       => $data['audience'] ?? EventAudience::ForClubMembersOnly->value,
             ];
+
             $this->pdo->beginTransaction();
             try {
                 if ($data['formMode'] == 'create') {
-
                     $eventId = $this->fluent->insertInto('Event')->values($values)->execute();
-                    if (isset($data['attributes']) && is_array($data['attributes'])) {
-                        foreach ($data['attributes'] as $attributeId) {
-                            $this->fluent->insertInto('EventAttribute')
-                                ->values([
-                                    'IdEvent' => $eventId,
-                                    'IdAttribute' => $attributeId
-                                ])
-                                ->execute();
-                        }
-                    }
                 } elseif ($data['formMode'] == 'update') {
                     $this->fluent->update('Event')->set($values)->where('Id', $data['id'])->execute();
-                    $this->fluent->deleteFrom('EventAttribute')->where('IdEvent', $data['id'])->execute();
-                    if (isset($data['attributes']) && is_array($data['attributes'])) {
-                        foreach ($data['attributes'] as $attributeId) {
-                            $this->fluent->insertInto('EventAttribute')
-                                ->values([
-                                    'IdEvent' => $data['id'],
-                                    'IdAttribute' => $attributeId
-                                ])
-                                ->execute();
-                        }
-                    }
-                } else die('Fatal error in file ' . __FILE__ . ' at line ' . __LINE__ . " with formMode=" . $data['formMode']);
-                header('Content-Type: application/json');
-                echo json_encode(['success' => true, 'eventId' => $data['id']]);
+                    $eventId = $data['id'];
+
+                    $this->fluent->deleteFrom('EventAttribute')->where('IdEvent', $eventId)->execute();
+                    $this->fluent->deleteFrom('EventNeed')->where('IdEvent', $eventId)->execute();
+                } else {
+                    die('Fatal error in file ' . __FILE__ . ' at line ' . __LINE__ . " with formMode=" . $data['formMode']);
+                }
+                $this->insertEventAttributes($eventId, $data['attributes'] ?? []);
+                $this->insertEventNeeds($eventId, $data['needs'] ?? []);
                 $this->pdo->commit();
+
+                header('Content-Type: application/json');
+                echo json_encode(['success' => true, 'eventId' => $eventId]);
             } catch (Exception $e) {
                 $this->pdo->rollBack();
 
@@ -303,7 +291,7 @@ class EventApi extends BaseController
                 echo json_encode([
                     'success' => false,
                     'message' => 'Erreur lors de l\'insertion en base de données',
-                    'error' => $e->getMessage()
+                    'error'   => $e->getMessage()
                 ]);
             }
         } else {
@@ -311,6 +299,33 @@ class EventApi extends BaseController
             echo json_encode(['success' => false, 'message' => 'User not allowed']);
         }
         exit();
+    }
+    private function insertEventAttributes(int $eventId, array $attributes): void
+    {
+        if (!empty($attributes)) {
+            foreach ($attributes as $attributeId) {
+                $this->fluent->insertInto('EventAttribute')
+                    ->values([
+                        'IdEvent'    => $eventId,
+                        'IdAttribute' => $attributeId
+                    ])
+                    ->execute();
+            }
+        }
+    }
+    private function insertEventNeeds(int $eventId, array $needs): void
+    {
+        if (!empty($needs)) {
+            foreach ($needs as $need) {
+                $this->fluent->insertInto('EventNeed')
+                    ->values([
+                        'IdEvent' => $eventId,
+                        'IdNeed'  => $need['id'],
+                        'Counter' => $need['counter'],
+                    ])
+                    ->execute();
+            }
+        }
     }
 
     public function sendEmails()
@@ -335,7 +350,7 @@ class EventApi extends BaseController
                 } else if ($recipients === 'all') {
                     $participants = $this->email->getInterestedPeople(
                         $this->fluent->from('EventType')->where('Id', $event->IdEventType)->fetch('IdGroup'),
-                        new DateTime($event->StartTime)->format('N') - 1,
+                        (new DateTime($event->StartTime))->format('N') - 1,
                         $this->getPeriodOfDay($event->StartTime)
                     );
                 } else {
@@ -469,7 +484,7 @@ class EventApi extends BaseController
     public function getEventNeeds($eventId)
     {
         $needs = $this->fluent->from('EventNeed')
-            ->select('EventNeed.*, Need.Name, Need.ParticipantDependent, NeedType.Name as TypeName')
+            ->select('EventNeed.*, Need.Label, Need.Name, Need.ParticipantDependent, NeedType.Name as TypeName')
             ->join('Need ON EventNeed.IdNeed = Need.Id')
             ->join('NeedType ON Need.IdNeedType = NeedType.Id')
             ->where('EventNeed.IdEvent', $eventId)
@@ -483,12 +498,12 @@ class EventApi extends BaseController
         exit();
     }
 
-    public function getNeedsByEventType($eventTypeId)
+    public function getNeedsByNeedType($needTypeId)
     {
         $needs = $this->fluent->from('Need')
             ->select('Need.*, NeedType.Name as TypeName')
             ->join('NeedType ON Need.IdNeedType = NeedType.Id')
-            ->where('Need.IdNeedType', $eventTypeId)
+            ->where('Need.IdNeedType', $needTypeId)
             ->fetchAll();
 
         header('Content-Type: application/json');

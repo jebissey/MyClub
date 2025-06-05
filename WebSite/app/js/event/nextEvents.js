@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', function () {
     let selectedAttributes = [];
     const eventTypeInput = document.getElementById('eventTypeInput');
     const attributesList = document.getElementById('attributesList');
+    const needTypeInput = document.getElementById('needTypeInput');
 
     let selectedNeeds = [];
     const needsList = document.getElementById('needsList');
@@ -99,12 +100,10 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    eventTypeInput.addEventListener('change', function () {
-        const selectedEventTypeId = this.value;
-        if (selectedEventTypeId) {
-            loadNeedsByEventType(selectedEventTypeId);
-            selectedNeeds = [];
-            needsList.innerHTML = '';
+    needTypeInput.addEventListener('change', function () {
+        const selectedNeedTypeId = this.value;
+        if (selectedNeedTypeId) {
+            loadNeedsByNeedType(selectedNeedTypeId);
         } else {
             availableAttributesSelect.innerHTML = '<option value="">Sélectionnez d\'abord un type de besoin</option>';
         }
@@ -200,12 +199,13 @@ document.addEventListener('DOMContentLoaded', function () {
                     needsList.innerHTML = '';
                     selectedNeeds = [];
                     data.needs.forEach(need => {
-                        const needElement = createNeedElement(need.IdNeed, need.Name, need.Quantity, need.Counter);
+                        const needElement = createNeedElement(need.IdNeed, need.Label, need.Name, need.ParticipantDependent, need.Counter);
                         needsList.appendChild(needElement);
                         selectedNeeds.push({
                             id: need.IdNeed,
                             name: need.Name,
-                            quantity: need.ParticipantDependent,
+                            label: need.label,
+                            participantDependent: need.ParticipantDependent,
                             counter: need.Counter
                         });
                     });
@@ -270,9 +270,9 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    function loadNeedsByEventType(eventTypeId) {
+    function loadNeedsByNeedType(needTypeId) {
         availableNeedsSelect.innerHTML = '<option value="">Chargement...</option>';
-        fetch(`/api/needs-by-event-type/${eventTypeId}`)
+        fetch(`/api/needs-by-need-type/${needTypeId}`)
             .then(response => response.json())
             .then(data => {
                 availableNeedsSelect.innerHTML = '';
@@ -280,8 +280,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     data.needs.forEach(need => {
                         const option = document.createElement('option');
                         option.value = need.Id;
-                        option.textContent = `${need.Name} (${need.TypeName})`;
-                        option.dataset.quantity = need.ParticipantDependent;
+                        option.textContent = `${need.Name}`;
+                        option.dataset.needLabel = need.Label;
+                        option.dataset.needParticipantDependent = need.ParticipantDependent;
                         availableNeedsSelect.appendChild(option);
                     });
                 } else {
@@ -296,49 +297,38 @@ document.addEventListener('DOMContentLoaded', function () {
             });
     }
 
-    function createNeedElement(needId, needName, needQuantity, counter = 0) {
+    function createNeedElement(needId, needLabel, needName, participantDependent, counter = 0) {
         const needElement = document.createElement('div');
         needElement.className = 'border rounded p-2 mb-2';
-        needElement.innerHTML = `
-            <div class="d-flex justify-content-between align-items-center">
-            <div>
-                <strong>${needName}</strong>
-                <div class="input-group input-group-sm mt-1" style="max-width: 150px;">
-                <span class="input-group-text">Quantité:</span>
-                <input type="number" class="form-control need-counter" value="${counter}" min="1" max="${needQuantity}" 
-                        data-need-id="${needId}" data-max="${needQuantity}">
-                <span class="input-group-text">/ ${needQuantity}</span>
+        needElement.setAttribute('title', needName);
+
+        let quantityHtml = '';
+        if (participantDependent == 0) {
+            quantityHtml = `
+                <div class="input-group input-group-sm mt-1" style="width: 70px;">
+                    <input type="number" class="form-control need-counter" value="${counter}" data-need-id="${needId}" maxlength="3">
                 </div>
-            </div>
-            <button type="button" class="btn btn-sm btn-outline-danger remove-need" data-need-id="${needId}">
-                <i class="bi bi-x"></i>
-            </button>
+            `;
+        }
+        needElement.innerHTML = `
+            <div class="d-flex flex-row align-items-center bg-light rounded p-2">
+                <strong class="me-2">${needLabel}</strong>
+                ${quantityHtml}
+                <button type="button" class="btn btn-sm btn-danger remove-need ms-2" data-need-id="${needId}">
+                    <i class="bi bi-x"></i>
+                </button>
             </div>
         `;
 
-        const removeBtn = needElement.querySelector('.remove-need');
-        removeBtn.addEventListener('click', function () {
-            const idToRemove = this.dataset.needId;
-            selectedNeeds = selectedNeeds.filter(need => need.id !== idToRemove);
+        needElement.querySelector('.remove-need').onclick = () => {
+            selectedNeeds = selectedNeeds.filter(need => need.id !== needId);
             needElement.remove();
-        });
+        };
 
-        const counterInput = needElement.querySelector('.need-counter');
-        counterInput.addEventListener('change', function () {
-            const idToUpdate = this.dataset.needId;
-            const maxValue = parseInt(this.dataset.max);
-            const value = parseInt(this.value);
-
-            if (value > maxValue) {
-                this.value = maxValue;
-            } else if (value < 1) {
-                this.value = 1;
-            }
-
-            const needIndex = selectedNeeds.findIndex(need => need.id === idToUpdate);
-            if (needIndex !== -1) {
-                selectedNeeds[needIndex].counter = parseInt(this.value);
-            }
+        needElement.querySelector('.need-counter')?.addEventListener('change', e => {
+            const value = parseInt(e.target.value);
+            const needIndex = selectedNeeds.findIndex(need => need.id === needId);
+            if (needIndex !== -1) selectedNeeds[needIndex].counter = value;
         });
 
         return needElement;
@@ -351,19 +341,20 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const needId = selectedOption.value;
         const needName = selectedOption.text;
-        const needQuantity = selectedOption.dataset.quantity;
+        const needLabel = selectedOption.dataset.needLabel;
+        const needParticipantDependent = selectedOption.dataset.needParticipantDependent;
 
         if (selectedNeeds.some(need => need.id === needId)) {
             alert('Ce besoin a déjà été ajouté.');
             return;
         }
 
-        const needElement = createNeedElement(needId, needName, needQuantity, 1);
+        const needElement = createNeedElement(needId, needLabel, needName, needParticipantDependent, 1);
         document.getElementById('needsList').appendChild(needElement);
         selectedNeeds.push({
             id: needId,
             name: needName,
-            quantity: needQuantity,
+            participantDependent: needParticipantDependent,
             counter: 1
         });
     });
