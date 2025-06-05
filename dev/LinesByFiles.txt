@@ -1,5 +1,5 @@
 === Détail par fichier ===
-   311 ../WebSite/index.php
+   313 ../WebSite/index.php
     65 ../WebSite/app/views/dbbrowser/edit.latte
     43 ../WebSite/app/views/dbbrowser/index.latte
    146 ../WebSite/app/views/dbbrowser/table.latte
@@ -30,9 +30,9 @@
     38 ../WebSite/app/views/registration/groups.latte
     31 ../WebSite/app/views/registration/index.latte
    273 ../WebSite/app/views/event/location.latte
-   118 ../WebSite/app/views/event/detail.latte
+   269 ../WebSite/app/views/event/detail.latte
    190 ../WebSite/app/views/event/needs.latte
-   275 ../WebSite/app/views/event/nextEvents.latte
+   290 ../WebSite/app/views/event/nextEvents.latte
    121 ../WebSite/app/views/event/chat.latte
    169 ../WebSite/app/views/event/weekEvents.latte
     60 ../WebSite/app/views/logs/referer.latte
@@ -78,18 +78,18 @@
    194 ../WebSite/app/api/WebmasterApi.php
    153 ../WebSite/app/api/CarouselApi.php
    292 ../WebSite/app/api/ArticleApi.php
-   622 ../WebSite/app/api/EventApi.php
-   121 ../WebSite/app/controllers/EmailController.php
+   806 ../WebSite/app/api/EventApi.php
+    91 ../WebSite/app/controllers/EmailController.php
    297 ../WebSite/app/controllers/DbBrowserController.php
    276 ../WebSite/app/controllers/BaseController.php
    569 ../WebSite/app/controllers/UserController.php
     95 ../WebSite/app/controllers/NavBarController.php
-   274 ../WebSite/app/controllers/WebmasterController.php
+   268 ../WebSite/app/controllers/WebmasterController.php
    124 ../WebSite/app/controllers/SurveyController.php
     39 ../WebSite/app/controllers/FFAController.php
    128 ../WebSite/app/controllers/EventTypeController.php
    161 ../WebSite/app/controllers/MediaController.php
-   176 ../WebSite/app/controllers/EventController.php
+   180 ../WebSite/app/controllers/EventController.php
    150 ../WebSite/app/controllers/ImportController.php
    322 ../WebSite/app/controllers/PersonController.php
    375 ../WebSite/app/controllers/LogController.php
@@ -109,9 +109,9 @@
    198 ../WebSite/app/js/quill/script.js
     47 ../WebSite/app/js/registration/index.js
    134 ../WebSite/app/js/event/chat.js
-    58 ../WebSite/app/js/event/detail.js
+   211 ../WebSite/app/js/event/detail.js
    143 ../WebSite/app/js/event/needs.js
-   528 ../WebSite/app/js/event/nextEvents.js
+   519 ../WebSite/app/js/event/nextEvents.js
     46 ../WebSite/app/js/logs/topArticles.js
    127 ../WebSite/app/js/admin/arwards.js
     39 ../WebSite/app/js/survey/add.js
@@ -142,19 +142,20 @@
     75 ../WebSite/app/helpers/Client.php
    102 ../WebSite/app/helpers/Backup.php
     36 ../WebSite/app/helpers/GravatarHandler.php
-   413 ../WebSite/app/helpers/PersonStatistics.php
+   420 ../WebSite/app/helpers/PersonStatistics.php
    136 ../WebSite/app/helpers/Application.php
     38 ../WebSite/app/helpers/BaseHelper.php
    255 ../WebSite/app/helpers/Article.php
    581 ../WebSite/app/helpers/Log.php
     14 ../WebSite/app/helpers/Params.php
-   282 ../WebSite/app/helpers/Event.php
- 17620 total
+   418 ../WebSite/app/helpers/Event.php
+    72 ../WebSite/app/helpers/Email.php
+ 18299 total
 
 === Total par type de fichier ===
 Fichiers PHP :
-8333
+8702
 Fichiers Latte :
-6368
+6534
 Fichiers Javascript :
-2919
+3063

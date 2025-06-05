@@ -13,6 +13,25 @@
             cursor: help;
             border: 1px solid rgba(0,0,0,0.2);
         }
+        
+        .need-fulfilled {
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+        }
+        
+        .need-partial {
+            background-color: #fff3cd;
+            border-color: #ffeaa7;
+        }
+        
+        .need-missing {
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+        }
+        
+        .progress-bar-custom {
+            transition: width 0.3s ease;
+        }
     </style>
 {/block}
 
@@ -109,6 +128,139 @@
                     </div>
                 </div>
             </div>
+            
+            <!-- Section Besoins de l'événement -->
+            {if count($eventNeeds) > 0}
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <strong><i class="bi bi-list-check me-2"></i>Besoins de l'événement</strong>
+                            {if $isRegistered}
+                                <small class="text-muted ms-2">Cliquez sur les quantités pour modifier vos apports</small>
+                            {/if}
+                        </div>
+                        <div class="card-body">
+                            {foreach $eventNeeds as $need}
+                                {var $percentage = $need->RequiredQuantity > 0 ? min(100, ($need->ProvidedQuantity / $need->RequiredQuantity) * 100) : 0}
+                                {var $cssClass = $percentage >= 100 ? 'need-fulfilled' : ($percentage > 0 ? 'need-partial' : 'need-missing')}
+                                {var $progressColor = $percentage >= 100 ? 'success' : ($percentage > 0 ? 'warning' : 'danger')}
+                                
+                                {* Trouver l'apport actuel de l'utilisateur pour ce besoin *}
+                                {var $userSupply = 0}
+                                {foreach $userSupplies as $supply}
+                                    {if $supply->IdNeed == $need->Id}
+                                        {var $userSupply = $supply->Supply}
+                                    {/if}
+                                {/foreach}
+                                
+                                <div class="mb-3 p-3 border rounded {$cssClass}" data-need-id="{$need->Id}">
+                                    <div class="row align-items-center">
+                                        <div class="col-md-3">
+                                            <strong>{$need->Label}</strong>
+                                            {if $need->Name != $need->Label}
+                                                <br><small class="text-muted">{$need->Name}</small>
+                                            {/if}
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="progress mb-2" style="height: 25px;">
+                                                <div class="progress-bar progress-bar-custom bg-{$progressColor}" 
+                                                     role="progressbar" 
+                                                     style="width: {$percentage}%"
+                                                     aria-valuenow="{$percentage}" 
+                                                     aria-valuemin="0" 
+                                                     aria-valuemax="100">
+                                                    <span class="progress-percentage">{$percentage|number:0}%</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 text-center">
+                                            <span class="badge bg-primary fs-6 supply-count">
+                                                <span class="provided-quantity">{$need->ProvidedQuantity}</span> / {$need->RequiredQuantity}
+                                            </span>
+                                            {if $need->ParticipantDependent == 1}
+                                                <br><small class="text-muted">par participant</small>
+                                            {/if}
+                                        </div>
+                                        <div class="col-md-3 text-end">
+                                            {if $isRegistered}
+                                                <div class="d-flex align-items-center justify-content-end gap-2">
+                                                    <div class="input-group input-group-sm" style="max-width: 120px;">
+                                                        <span class="input-group-text">Vous</span>
+                                                        <input type="number" 
+                                                               class="form-control user-supply-input" 
+                                                               value="{$userSupply}" 
+                                                               min="0" 
+                                                               max="99"
+                                                               data-need-id="{$need->Id}"
+                                                               data-original-value="{$userSupply}">
+                                                    </div>
+                                                    <button class="btn btn-outline-success btn-sm update-supply-btn" 
+                                                            type="button" 
+                                                            data-need-id="{$need->Id}"
+                                                            style="display: none;">
+                                                        Valider
+                                                    </button>
+                                                </div>
+                                            {else}
+                                                <small class="text-muted">Inscrivez-vous pour contribuer</small>
+                                            {/if}
+                                        </div>
+                                    </div>
+                                </div>
+                            {/foreach}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {/if}
+            
+            <!-- Section Apports des participants -->
+            {if $isRegistered && count($participantSupplies) > 0}
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <strong><i class="bi bi-people me-2"></i>Apports des participants</strong>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>Participant</th>
+                                            <th>Besoin</th>
+                                            <th class="text-end">Quantité</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {foreach $participantSupplies as $supply}
+                                        <tr>
+                                            <td>
+                                                {$supply->FirstName} {$supply->LastName}
+                                                {if $supply->NickName != ''}
+                                                    ({$supply->NickName})
+                                                {/if}
+                                            </td>
+                                            <td>
+                                                {$supply->NeedLabel}
+                                                {if $supply->NeedName != $supply->NeedLabel}
+                                                    <br><small class="text-muted">{$supply->NeedName}</small>
+                                                {/if}
+                                            </td>
+                                            <td class="text-end">
+                                                <span class="badge bg-success">{$supply->Supply}</span>
+                                            </td>
+                                        </tr>
+                                        {/foreach}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {/if}
         </div>
     </div>
 {/block}

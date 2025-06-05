@@ -60,6 +60,9 @@ class EventController extends BaseController
             'isRegistered' => $event->isUserRegistered($eventId, $userEmail),
             'navItems' => $this->getNavItems(),
             'countOfMessages' => $this->fluent->from('Message')->where('EventId', $eventId)->count(),
+            'eventNeeds' => $event->getEventNeeds($eventId),
+            'participantSupplies' => $event->getParticipantSupplies($eventId),
+            'userSupplies' => $event->getUserSupplies($eventId, $userEmail)
         ]));
     }
 

@@ -712,6 +712,84 @@ class EventApi extends BaseController
     }
     #endregion
 
+
+
+    // Nouvelle méthode à ajouter dans votre contrôleur d'événements
+
+    /**
+     * Met à jour l'apport d'un participant pour un besoin (via AJAX)
+     */
+    public function updateSupply(): void
+    {
+        header('Content-Type: application/json');
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            http_response_code(405);
+            echo json_encode(['success' => false, 'message' => 'Méthode non autorisée']);
+            return;
+        }
+
+        $person = $this->getPerson();
+        $userEmail = $person->Email ?? '';
+
+        if ($userEmail === '') {
+            http_response_code(401);
+            echo json_encode(['success' => false, 'message' => 'Non authentifié']);
+            return;
+        }
+
+        $input = json_decode(file_get_contents('php://input'), true);
+        $eventId = $input['eventId'] ?? null;
+        $needId = $input['needId'] ?? null;
+        $supply = intval($input['supply'] ?? 0);
+
+        if (!$eventId || !$needId || $supply < 0) {
+            http_response_code(400);
+            echo json_encode(['success' => false, 'message' => 'Paramètres invalides']);
+            return;
+        }
+
+        $event = new Event($this->pdo);
+
+        // Vérifier que l'utilisateur est inscrit à l'événement
+        if (!$event->isUserRegistered($eventId, $userEmail)) {
+            http_response_code(403);
+            echo json_encode(['success' => false, 'message' => 'Non inscrit à cet événement']);
+            return;
+        }
+
+        $success = $event->updateUserSupply($eventId, $userEmail, $needId, $supply);
+
+        if ($success) {
+            // Récupérer les données mises à jour pour renvoyer les nouveaux totaux
+            $eventNeeds = $event->getEventNeeds($eventId);
+            $updatedNeed = null;
+
+            foreach ($eventNeeds as $need) {
+                if ($need->Id == $needId) {
+                    $updatedNeed = [
+                        'id' => $need->Id,
+                        'providedQuantity' => $need->ProvidedQuantity,
+                        'requiredQuantity' => $need->RequiredQuantity,
+                        'percentage' => $need->RequiredQuantity > 0 ? min(100, ($need->ProvidedQuantity / $need->RequiredQuantity) * 100) : 0
+                    ];
+                    break;
+                }
+            }
+
+            echo json_encode([
+                'success' => true,
+                'message' => 'Apport mis à jour avec succès',
+                'updatedNeed' => $updatedNeed
+            ]);
+        } else {
+            http_response_code(500);
+            echo json_encode(['success' => false, 'message' => 'Erreur lors de la mise à jour']);
+        }
+    }
+
+
+
     private function getPeriodOfDay($dateString)
     {
         $date = new DateTime($dateString);
