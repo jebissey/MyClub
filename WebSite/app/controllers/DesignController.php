@@ -70,7 +70,7 @@ class DesignController extends BaseController
                     'NavBar' => $_POST['navbar'] ?? '',
                     'Status' => 'UnderReview',
                     'OnlyForMembers' => $_POST['onlyForMembers'] ? 1 : 0,
-                    'IdGroup' => $_POST['idGroup'] ?? null
+                    'IdGroup' => $_POST['idGroup'] !== '' ? $_POST['idGroup'] : null
                 ];
                 $this->fluent->insertInto('Design')->values($values)->execute();
 

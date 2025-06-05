@@ -70,7 +70,7 @@ CREATE TABLE IF NOT EXISTS "Counter" (
 CREATE TABLE IF NOT EXISTS "Design" (
 	"Id"	INTEGER,
 	"IdPerson"	INTEGER NOT NULL,
-	"IdGroup"	INTEGER NOT NULL,
+	"IdGroup"	INTEGER,
 	"OnlyForMembers"	INTEGER NOT NULL DEFAULT 1,
 	"Name"	TEXT,
 	"Detail"	TEXT,
