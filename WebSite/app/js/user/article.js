@@ -86,42 +86,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     appendAlert('Erreur_4 : ', error, 'danger');
                 });
         });
-
-        document.getElementById('submit-survey').addEventListener('click', function () {
-            const form = document.getElementById('survey-form');
-            const surveyId = form.querySelector('input[name="survey_id"]').value;
-
-            const checkboxes = form.querySelectorAll('input[name="survey_answers"]:checked');
-            const answers = Array.from(checkboxes).map(checkbox => checkbox.value);
-
-            if (answers.length === 0) {
-                alert('Veuillez sélectionner au moins une option.');
-                return;
-            }
-
-            fetch('/api/surveys/reply', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    survey_id: surveyId,
-                    answers: answers
-                }),
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        bootstrap.Modal.getInstance(document.getElementById('surveyModal')).hide();
-                        appendAlert('Votre réponse a été enregistrée. Merci!', 'info');
-                    } else {
-                        appendAlert('Erreur: ' + data.message, 'danger');
-                    }
-                })
-                .catch(error => {
-                    alert('Une erreur est survenue lors de l\'enregistrement de votre réponse : ' + error.message);
-                });
-        });
     }
 
     const groupSelect = document.getElementById('group-select');

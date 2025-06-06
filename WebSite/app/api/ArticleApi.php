@@ -120,7 +120,6 @@ class ArticleApi extends BaseController
             header('Content-Type: application/json', true, 403);
             echo json_encode(['success' => false, 'message' => 'User not found']);
         }
-        exit();
     }
 
     public function showSurveyReplyForm($articleId)

@@ -47,10 +47,10 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 });
 
-// Gestion des alertes
+let appendAlert;
 const alertPlaceholder = document.getElementById('liveAlertPlaceholder');
 if (alertPlaceholder) {
-    const appendAlert = (message, type) => {
+    appendAlert = (message, type) => {
         const wrapper = document.createElement('div');
         wrapper.innerHTML = [
             `<div class="alert alert-${type} alert-dismissible" role="alert">`,
@@ -62,7 +62,6 @@ if (alertPlaceholder) {
     };
 }
 
-// Gestion des tooltips personnalisés
 document.querySelectorAll('[data-tooltip-id]').forEach(el => {
     const tooltipContent = document.getElementById(el.getAttribute('data-tooltip-id'));
     if (tooltipContent) {
