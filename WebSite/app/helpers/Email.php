@@ -42,7 +42,7 @@ class Email
             if ($dayOfWeek != '' && $timeOfDay != '') {
                 if ($person->Availabilities != '') {
                     $availabilities = json_decode($person->Availabilities, true);
-                    if (isset($availabilities[$dayOfWeek][$timeOfDay])) {
+                    if (isset($availabilities[$dayOfWeek][$timeOfDay]) != 'on') {
                         $include = false;
                     }
                 }
