@@ -47,6 +47,15 @@
             </a>
             <strong>{$event->Summary}</strong>
         </div>
+        {if !$userEmail}
+            <div class="alert alert-info">
+                <p>
+                    <b>
+                        Il faut être connecté pour pouvoir s'inscrire à un événement.
+                    </b>
+                </p>
+            </div>
+        {/if}
         <div class="card-body">
             <div class="row">
                 <div class="col-md-6">
@@ -146,7 +155,6 @@
                                 {var $cssClass = $percentage >= 100 ? 'need-fulfilled' : ($percentage > 0 ? 'need-partial' : 'need-missing')}
                                 {var $progressColor = $percentage >= 100 ? 'success' : ($percentage > 0 ? 'warning' : 'danger')}
                                 
-                                {* Trouver l'apport actuel de l'utilisateur pour ce besoin *}
                                 {var $userSupply = 0}
                                 {foreach $userSupplies as $supply}
                                     {if $supply->IdNeed == $need->Id}
