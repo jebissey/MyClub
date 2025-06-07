@@ -76,6 +76,9 @@ abstract class BaseController extends BaseHelper
             $text = strip_tags($html);
             return strlen($text) > 150 ? substr($text, 0, 150) . '...' : $text;
         });
+        $this->latte->addFilter('nl2br', function ($string) {
+            return nl2br(htmlspecialchars($string, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'));
+        });
         $this->application = new Application($pdo, $flight);
         $this->authorizations = new Authorization($this->pdo);
         $this->settings = new Settings($this->pdo);

@@ -163,6 +163,8 @@ class ArticleController extends TableController
                 'canReadPool' => $this->authorizations->canPersonReadSurveyResults($chosenArticle, $person),
                 'carouselItems' => $this->fluent->from('Carousel')->where('IdArticle', $id)->fetchAll(),
             ]));
+        } else if ($person == '') {
+            $this->application->message('Il faut être connecté pour pouvoir consuler cet article');
         } else {
             $this->application->error403(__FILE__, __LINE__);
         }

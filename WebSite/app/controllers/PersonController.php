@@ -279,6 +279,8 @@ class PersonController extends TableController implements CrudControllerInterfac
                 'groupCounts' => $groupCounts,
                 'selectedGroup' => $selectedGroup,
             ]));
+        } else if ($person == '') {
+            $this->application->message('Il faut être connecté pour pouvoir consuler le trombinoscope');
         } else {
             $this->application->error403(__FILE__, __LINE__);
         }

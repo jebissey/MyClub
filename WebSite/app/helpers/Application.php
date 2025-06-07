@@ -50,7 +50,7 @@ class Application
 
     public function message($message, $timeout = 5000)
     {
-        $this->error(200, $message, $timeout);
+        $this->error(0, $message, $timeout);
     }
 
 
@@ -126,7 +126,10 @@ class Application
         $this->flight->setData('code', $code);
         $this->flight->setData('message', $message);
 
-        echo "<h1>$code</h1><h2>$message</h2>";
+        if ($code) {
+            echo "<h1>$code</h1>";
+        }
+        echo "<h2>$message</h2>";
         echo "<script>
             setTimeout(function() {
                 window.location.href = '/';
