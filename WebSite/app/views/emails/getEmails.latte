@@ -17,7 +17,7 @@
                 <div class="col-md-3">
                     <label for="eventTypeSelect" class="form-label">Type d'événement</label>
                     <select class="form-select" id="eventTypeSelect" name="idEventType">
-                        <option value="">Tous les types</option>
+                        <option value="">Choisir un type</option>
                         {foreach $eventTypes as $type}
                             <option value="{$type->Id}">{$type->Name}</option>
                         {/foreach}
@@ -27,7 +27,7 @@
                 <div class="col-md-3">
                     <label for="daySelect" class="form-label">Jour</label>
                     <select class="form-select" id="daySelect" name="dayOfWeek">
-                        <option value="">Tous les jours</option>
+                        <option value="">Choisir un jour</option>
                         <option value="0">Lundi</option>
                         <option value="1">Mardi</option>
                         <option value="2">Mercredi</option>
@@ -41,7 +41,7 @@
                 <div class="col-md-3">
                     <label for="timeSelect" class="form-label">Moment de la journée</label>
                     <select class="form-select" id="timeSelect" name="timeOfDay" disabled>
-                        <option value="">Toute la journée</option>
+                        <option value="">Choisir un moment</option>
                         <option value="morning">Matin</option>
                         <option value="afternoon">Après-midi</option>
                         <option value="evening">Soir</option>

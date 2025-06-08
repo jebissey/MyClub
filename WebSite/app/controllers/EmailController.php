@@ -24,7 +24,7 @@ class EmailController extends BaseController
                 $idEventType = $_POST['idEventType'] ?? '';
                 $dayOfWeek = $_POST['dayOfWeek'] ?? '';
                 $timeOfDay = $_POST['timeOfDay'] ?? '';
-                $filteredEmails = $this->email->getEmailsOfInterestedPeople($idGroup, $dayOfWeek, $timeOfDay);
+                $filteredEmails = $this->email->getEmailsOfInterestedPeople($idGroup, $idEventType, $dayOfWeek, $timeOfDay);
                 $groupName = $idGroup != '' ? $this->getGroup($idGroup)->Name : '';
                 $eventTypeName = $idEventType != '' ? $this->fluent->from('EventType')->where('Id', $idEventType)->fetch('Name') : '';
                 $dayOfWeekName = $dayOfWeek != '' ? ['Lu.', 'Ma.', 'Me.', 'Je.', 'Ve.', 'Sa.', 'Di.', ''][$dayOfWeek] : '';

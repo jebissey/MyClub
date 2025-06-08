@@ -15,9 +15,9 @@ class Email
         $this->fluent = new \Envms\FluentPDO\Query($pdo);
     }
 
-    public function getEmailsOfInterestedPeople($idGroup, $dayOfWeek, $timeOfDay)
+    public function getEmailsOfInterestedPeople($idGroup, $idEventType, $dayOfWeek, $timeOfDay)
     {
-        $persons = $this->getInterestedPeople($idGroup, $dayOfWeek, $timeOfDay);
+        $persons = $this->getInterestedPeople($idGroup, $idEventType, $dayOfWeek, $timeOfDay);
         $filteredEmails = [];
         foreach ($persons as $person) {
             $filteredEmails[] = $person->Email;
@@ -25,20 +25,31 @@ class Email
         return $filteredEmails;
     }
 
-    public function getInterestedPeople($idGroup, $dayOfWeek, $timeOfDay)
+    public function getInterestedPeople($idGroup, $idEventType, $dayOfWeek, $timeOfDay)
     {
         $persons = $this->getPersons($idGroup);
         $filteredPeople = [];
         foreach ($persons as $person) {
             $include = true;
+
+            if ($person->Preferences != '') {
+                $preferences = json_decode($person->Preferences, true);
+                if (isset($preferences['noAlerts']) && $preferences['noAlerts'] == 'on') {
+                    $include = false;
+                    continue; 
+                }
+            }
+
             if (!empty($idEventType)) {
                 if ($person->Preferences != '') {
                     $preferences = json_decode($person->Preferences, true);
-                    if ($preferences != '' && !isset($preferences['eventTypes'][$idEventType])) {
+                    if ($preferences != '' && (!isset($preferences['eventTypes'][$idEventType]))) {
                         $include = false;
+                        continue;
                     }
                 }
             }
+
             if ($dayOfWeek != '' && $timeOfDay != '') {
                 if ($person->Availabilities != '') {
                     $availabilities = json_decode($person->Availabilities, true);
@@ -47,6 +58,7 @@ class Email
                     }
                 }
             }
+
             if ($include) {
                 $filteredPeople[] = $person;
             }
