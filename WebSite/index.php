@@ -244,12 +244,12 @@ $flight->route('POST   /api/event/save',          function()    use ($eventApi) 
 $flight->route('POST   /api/event/sendEmails',    function()    use ($eventApi) { $eventApi->sendEmails(); });
 $flight->route('GET    /api/event/@id',           function($id) use ($eventApi) { $eventApi->getEvent($id); });
 $flight->route('GET    /api/event-needs/@id',     function($id) use ($eventApi) { $eventApi->getEventNeeds($id); });
+$flight->route('POST   /api/event/updateSupply',  function()    use ($eventApi) { $eventApi->updateSupply(); });
 $flight->route('DELETE /api/needs/delete/@id',        function($id) use ($eventApi) { $eventApi->deleteNeed($id);});
 $flight->route('POST   /api/needs/save',              function()    use ($eventApi) { $eventApi->saveNeed(); });
 $flight->route('DELETE /api/needs/type/delete/@id',   function($id) use ($eventApi) { $eventApi->deleteNeedType($id);});
 $flight->route('POST   /api/needs/type/save',         function()    use ($eventApi) { $eventApi->saveNeedType(); });
 $flight->route('GET    /api/needs-by-need-type/@id',  function($id) use ($eventApi) { $eventApi->getNeedsByNeedType($id); });
-$flight->route('POST   /api/event/updateSupply',      function()    use ($eventApi) { $eventApi->updateSupply(); });
 $flight->route('POST /api/message/add',    function() use ($eventApi) {$eventApi->addMessage();});
 $flight->route('POST /api/message/update', function() use ($eventApi) {$eventApi->updateMessage();});
 $flight->route('POST /api/message/delete', function() use ($eventApi) {$eventApi->deleteMessage();});
@@ -301,6 +301,7 @@ $flight->route('/favicon.ico', function() use ($applicationHelper) {
     } else {
         $applicationHelper->error404(); 
     }
+    exit;
 });
 
 $flight->route('/*',            function() use ($applicationHelper) { $applicationHelper->error404(); });

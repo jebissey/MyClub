@@ -69,7 +69,6 @@ function downloadICalFile(event) {
 }
 
 document.addEventListener('DOMContentLoaded', function () {
-    // Gestion des modifications d'apports
     const supplyInputs = document.querySelectorAll('.user-supply-input');
     const updateButtons = document.querySelectorAll('.update-supply-btn');
 
@@ -100,15 +99,16 @@ document.addEventListener('DOMContentLoaded', function () {
 
     updateButtons.forEach(button => {
         button.addEventListener('click', function () {
+            const eventId = this.dataset.eventId;
             const needId = this.dataset.needId;
             const input = document.querySelector(`.user-supply-input[data-need-id="${needId}"]`);
             const supply = parseInt(input.value) || 0;
 
-            updateSupply(needId, supply, input, this);
+            updateSupply(eventId, needId, supply, input, this);
         });
     });
 
-    function updateSupply(needId, supply, inputElement, buttonElement) {
+    function updateSupply(eventId, needId, supply, inputElement, buttonElement) {
         buttonElement.disabled = true;
         const originalText = buttonElement.textContent;
         buttonElement.textContent = 'En cours...';
@@ -119,7 +119,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                eventId: { $eventId },
+                eventId: eventId,
                 needId: needId,
                 supply: supply
             })

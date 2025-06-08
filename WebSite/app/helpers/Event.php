@@ -272,25 +272,26 @@ class Event
 
     public function getParticipantSupplies($eventId): array
     {
-        $sql = "
-        SELECT 
-            p.FirstName,
-            p.LastName,
-            p.NickName,
-            n.Label as NeedLabel,
-            n.Name as NeedName,
-            ps.Supply
-        FROM ParticipantSupply ps
-        INNER JOIN Participant part ON ps.IdParticipant = part.Id
-        INNER JOIN Person p ON part.IdPerson = p.Id
-        INNER JOIN Need n ON ps.IdNeed = n.Id
-        WHERE part.IdEvent = ? AND ps.Supply > 0
-        ORDER BY p.FirstName, p.LastName, n.Label
-    ";
+        $query = $this->fluent->from('ParticipantSupply ps')
+            ->select([
+                'p.FirstName',
+                'p.LastName',
+                'p.NickName',
+                'n.Label AS NeedLabel',
+                'n.Name AS NeedName',
+                'ps.Supply'
+            ])
+            ->innerJoin('Participant part ON ps.IdParticipant = part.Id')
+            ->innerJoin('Person p ON part.IdPerson = p.Id')
+            ->innerJoin('Need n ON ps.IdNeed = n.Id')
+            ->innerJoin('EventNeed en ON ps.IdNeed = en.IdNeed AND en.IdEvent = part.IdEvent')
+            ->where('part.IdEvent', $eventId)
+            ->where('ps.Supply > 0')
+            ->orderBy('p.FirstName')
+            ->orderBy('p.LastName')
+            ->orderBy('n.Label');
 
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([$eventId]);
-        return $stmt->fetchAll(PDO::FETCH_OBJ);
+        return $query->fetchAll();
     }
 
     public function getUserSupplies($eventId, $userEmail): array

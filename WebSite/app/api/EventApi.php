@@ -713,12 +713,6 @@ class EventApi extends BaseController
     #endregion
 
 
-
-    // Nouvelle méthode à ajouter dans votre contrôleur d'événements
-
-    /**
-     * Met à jour l'apport d'un participant pour un besoin (via AJAX)
-     */
     public function updateSupply(): void
     {
         header('Content-Type: application/json');
@@ -728,10 +722,8 @@ class EventApi extends BaseController
             echo json_encode(['success' => false, 'message' => 'Méthode non autorisée']);
             return;
         }
-
         $person = $this->getPerson();
         $userEmail = $person->Email ?? '';
-
         if ($userEmail === '') {
             http_response_code(401);
             echo json_encode(['success' => false, 'message' => 'Non authentifié']);
@@ -745,7 +737,7 @@ class EventApi extends BaseController
 
         if (!$eventId || !$needId || $supply < 0) {
             http_response_code(400);
-            echo json_encode(['success' => false, 'message' => 'Paramètres invalides']);
+            echo json_encode(['success' => false, 'message' => "Invalid parameters (eventId=eventId, needId=$needId, supply=$supply)"]);
             return;
         }
 
