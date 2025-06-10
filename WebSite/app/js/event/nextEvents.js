@@ -144,8 +144,7 @@ document.addEventListener('DOMContentLoaded', function () {
         eventForm.reset();
 
         selectedAttributes = [];
-        document.getElementById('attributesList').innerHTML = '';
-        availableAttributesSelect.innerHTML = '<option value="">Sélectionnez d\'abord un type d\'événement</option>';
+        loadAttributesByEventType(eventTypeInput.value);
 
         selectedNeeds = [];
         document.getElementById('needsList').innerHTML = '';

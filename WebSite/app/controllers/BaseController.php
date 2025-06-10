@@ -79,6 +79,9 @@ abstract class BaseController extends BaseHelper
         $this->latte->addFilter('nl2br', function ($string) {
             return nl2br(htmlspecialchars($string, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'));
         });
+        $this->latte->addFilter('urlencode', function ($s) {
+            return urlencode($s);
+        });
         $this->application = new Application($pdo, $flight);
         $this->authorizations = new Authorization($this->pdo);
         $this->settings = new Settings($this->pdo);

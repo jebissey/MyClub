@@ -262,7 +262,7 @@ class Event
             )
         WHERE en.IdEvent = ?
         GROUP BY n.Id, n.Label, n.Name, n.ParticipantDependent, en.Counter
-        ORDER BY n.Label
+        ORDER BY n.IdNeedType, n.Name
     ";
 
         $stmt = $this->pdo->prepare($sql);
