@@ -255,115 +255,51 @@ class LogController extends BaseController
                 default:
                     $dateCondition = "1=1";
             }
-            $query = "SELECT DISTINCT Uri FROM Log";
-            $params = [];
+
+            $crossTabQuery = $this->fluentForLog->from('Log')
+                ->select(null)
+                ->select('Uri, Who, COUNT(*) as count')
+                ->where($dateCondition)
+                ->groupBy('Uri, Who');
             if (!empty($uriFilter)) {
-                $query .= " WHERE Uri LIKE ?";
-                $query .= " AND $dateCondition";
-                $params[] = '%' . $uriFilter . '%';
-            } else {
-                $query .= " WHERE $dateCondition";
+                $crossTabQuery->where('Uri LIKE ?', "%$uriFilter%");
             }
-            $stmt = $this->pdoForLog->prepare($query);
-            $stmt->execute($params);
-            $uris = $stmt->fetchAll(PDO::FETCH_COLUMN);
-
-            $sql = "SELECT Person.Email, Person.FirstName, Person.LastName FROM Person";
-            $params = [];
-            $conditions = [];
             if (!empty($emailFilter)) {
-                $conditions[] = "Person.Email LIKE ?";
-                $params[] = '%' . $emailFilter . '%';
+                $crossTabQuery->where('Who LIKE ?', "%$emailFilter%");
             }
-            if (!empty($groupFilter)) {
-                $sql .= ' LEFT JOIN PersonGroup ON Person.Id = PersonGroup.IdPerson
-                          LEFT JOIN "Group" ON PersonGroup.IdGroup = "Group".Id';
-                $conditions[] = '"Group".Name LIKE ?';
-                $params[] = '%' . $groupFilter . '%';
-            }
-            if (!empty($conditions)) {
-                $sql .= " WHERE " . implode(" AND ", $conditions);
-            }
-            if (!empty($groupFilter)) {
-                $sql .= " GROUP BY Person.Id";
-            }
-            $stmt = $this->pdo->prepare($sql);
-            $stmt->execute($params);
-            $persons = $stmt->fetchAll();
-
-            $stmt = $this->pdo->prepare('SELECT Id, Name FROM "Group" WHERE Inactivated = 0 ORDER BY Name');
-            $stmt->execute();
-            $groups = $stmt->fetchAll();
-
-            $crossTabData = [];
+            $crossTabData = $crossTabQuery->fetchAll();
+            $filteredPersons = array_unique(array_column($crossTabData, 'Who'));
+            $sortedCrossTabData = [];
             $columnTotals = [];
-            $rowTotals = [];
-            $grandTotal = 0;
-            $personEmails = [];
-            foreach ($persons as $person) {
-                $personEmails[] = $person->Email;
-                $columnTotals[$person->Email] = 0;
-            }
-            $placeholders = rtrim(str_repeat('?,', count($personEmails)), ',');
-
-            foreach ($uris as $uri) {
-                $uriVisits = [];
-                $rowTotal = 0;
-                if (!empty($personEmails)) {
-                    $stmt = $this->pdoForLog->prepare("
-                        SELECT Who, COUNT(*) AS visit_count 
-                        FROM Log 
-                        WHERE URI = ? AND Who IN($placeholders) AND $dateCondition GROUP BY Who");
-                    $params = array_merge([$uri], $personEmails);
-                    $stmt->execute($params);
-                    $counts = $stmt->fetchAll();
-                    foreach ($counts as $count) {
-                        if (!empty($count->Who)) {
-                            $uriVisits[$count->Who] = $count->visit_count;
-                            $rowTotal += $count->visit_count;
-                            $columnTotals[$count->Who] += $count->visit_count;
-                            $grandTotal += $count->visit_count;
-                        }
+            foreach ($crossTabData as $row) {
+                $uri = $row->Uri;
+                $who = $row->Who;
+                if (!empty($groupFilter)) {
+                    if (!$this->authorizations->isUserInGroup($who, $groupFilter)) {
+                        continue;
                     }
                 }
-
-                $crossTabData[$uri] = [
-                    'visits' => $uriVisits,
-                    'total' => $rowTotal
-                ];
-                $rowTotals[$uri] = $rowTotal;
-            }
-            arsort($rowTotals);
-            $sortedCrossTabData = [];
-            foreach (array_keys($rowTotals) as $uri) {
-                $sortedCrossTabData[$uri] = $crossTabData[$uri];
-            }
-
-
-            $personsAssoc = [];
-            foreach ($persons as $person) {
-                $personsAssoc[$person->Email] = $person;
-            }
-            $filteredPersons = [];
-            $filteredColumnTotals = [];
-            foreach ($columnTotals as $person => $total) {
-                if ($total > 0) {
-                    $filteredPersons[$person] = $personsAssoc[$person];
-                    $filteredColumnTotals[$person] = $total;
+                $count = $row->count;
+                if (!isset($sortedCrossTabData[$uri])) {
+                    $sortedCrossTabData[$uri] = ['visits' => [], 'total' => 0];
                 }
+                $sortedCrossTabData[$uri]['visits'][$who] = $count;
+                $sortedCrossTabData[$uri]['total'] += $count;
+
+                if (!isset($columnTotals[$who])) {
+                    $columnTotals[$who] = 0;
+                }
+                $columnTotals[$who] += $count;
             }
-            $persons = $filteredPersons;
-            $columnTotals = $filteredColumnTotals;
 
             $this->render('app/views/logs/crossTab.latte', $this->params->getAll([
                 'title' => 'Tableau croisé dynamique des visites',
                 'period' => $period,
                 'uris' => $sortedCrossTabData,
-                'persons' => $persons,
-                'rowTotals' => $rowTotals,
+                'persons' => $this->getPersons($filteredPersons),
                 'columnTotals' => $columnTotals,
-                'grandTotal' => $grandTotal,
-                'groups' => $groups,
+                'grandTotal' => array_sum(array_filter($columnTotals, fn($v, $k) => !empty($k), ARRAY_FILTER_USE_BOTH)),
+                'groups' => $this->getGroups(),
                 'uriFilter' => $uriFilter,
                 'emailFilter' => $emailFilter,
                 'groupFilter' => $groupFilter
@@ -371,5 +307,19 @@ class LogController extends BaseController
         } else {
             $this->application->error403(__FILE__, __LINE__);
         }
+    }
+
+    #region Private functions
+    private function getPersons($filteredPersonEmails)
+    {
+        $filteredPersonEmails = array_filter($filteredPersonEmails);
+        $query = $this->fluent->from('Person')
+            ->select(null)
+            ->select('Email, FirstName, LastName');
+        if (!empty($filteredPersonEmails)) {
+            $placeholders = implode(',', array_fill(0, count($filteredPersonEmails), '?'));
+            $query->where("Email COLLATE NOCASE IN ($placeholders)", $filteredPersonEmails);
+        }
+        return $query->fetchAll();
     }
 }

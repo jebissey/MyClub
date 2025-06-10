@@ -111,6 +111,11 @@ class Authorization
         return array_column($rows, 'IdGroup');
     }
 
+    public function isUserInGroup($personEmail, $groupsFilter)
+    {
+        return !empty(array_intersect($this->getGroups($groupsFilter), $this->getUserGroups($personEmail)));
+    }
+
     #region Private functions
     private function canReadArticle($article, $person)
     {
@@ -130,5 +135,14 @@ class Authorization
             return true;
         }
         return $article->IdGroup === null || !empty(array_intersect([$article->IdGroup], $this->getUserGroups($person->Email)));
+    }
+
+    private function getGroups($groupsFilter): array
+    {
+        $rows = $this->fluent->from('"Group"')
+            ->select('Id AS IdGroup')
+            ->where('Name LIKE "%' . $groupsFilter . '%"')
+            ->fetchAll();
+        return array_column($rows, 'IdGroup');
     }
 }
