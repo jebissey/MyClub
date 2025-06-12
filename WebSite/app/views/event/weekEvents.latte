@@ -128,7 +128,7 @@
                         {if count($weekData['days'][$day]) > 0}
                             {foreach $weekData['days'][$day] as $event}
                             <div class="event-item">
-                                <div class="d-flex justify-content-between">
+                                <div class="d-flex justify-content-between" data-bs-toggle="tooltip" data-bs-placement="top" title="{$event['date']|longDate}">
                                     <div class="event-time">{$event['startTime']}</div>
                                     <div class="event-duration">({$event['duration']})</div>
                                     {ifset $event['groupName']}

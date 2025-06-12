@@ -229,7 +229,8 @@ class Event
                 'eventType' => $event->EventTypeName,
                 'attributes' => $attributes,
                 'fullDateTime' => $event->StartTime,
-                'groupName' => $event->GroupName
+                'groupName' => $event->GroupName,
+                'date' => $startTime->format('Y-m-d'),
             ];
 
             $weeklyEvents[$weekKey]['days'][$dayOfWeek][] = $eventFormatted;
