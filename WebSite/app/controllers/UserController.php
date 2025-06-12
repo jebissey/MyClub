@@ -415,7 +415,7 @@ class UserController extends BaseController
     /* #region Statistics */
     public function showStatistics()
     {
-        if ($person = $this->getPerson([])) {
+        if ($person = $this->getPerson([], 1)) {
             $personalStatistics = new PersonStatistics($this->pdo);
             $season = $personalStatistics->getSeasonRange();
             $this->render('app/views/user/statistics.latte', $this->params->getAll([
