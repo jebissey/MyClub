@@ -44,7 +44,7 @@ class Event
             ->select('COUNT(*) AS count')
             ->join('Person pe ON pa.IdPerson = pe.Id')
             ->where('pa.IdEvent', $eventId)
-            ->where('pe.Email', $userEmail)
+            ->where('pe.Email COLLATE NOCASE', $userEmail)
             ->fetch();
         return ($result->count > 0);
     }
@@ -241,30 +241,29 @@ class Event
     public function getEventNeeds($eventId): array
     {
         $sql = "
-        SELECT 
-            n.Id,
-            n.Label,
-            n.Name,
-            n.ParticipantDependent,
-            en.Counter,
-            CASE 
-                WHEN n.ParticipantDependent = 1 THEN 
-                    (SELECT COUNT(*) FROM Participant WHERE IdEvent = ?)
-                ELSE 
-                    COALESCE(en.Counter, 0)
-            END as RequiredQuantity,
-            COALESCE(SUM(ps.Supply), 0) as ProvidedQuantity
-        FROM Need n
-        INNER JOIN EventNeed en ON n.Id = en.IdNeed
-        LEFT JOIN ParticipantSupply ps ON n.Id = ps.IdNeed 
-            AND ps.IdParticipant IN (
-                SELECT Id FROM Participant WHERE IdEvent = ?
-            )
-        WHERE en.IdEvent = ?
-        GROUP BY n.Id, n.Label, n.Name, n.ParticipantDependent, en.Counter
-        ORDER BY n.IdNeedType, n.Name
-    ";
-
+            SELECT 
+                n.Id,
+                n.Label,
+                n.Name,
+                n.ParticipantDependent,
+                en.Counter,
+                CASE 
+                    WHEN n.ParticipantDependent = 1 THEN 
+                        (SELECT COUNT(*) FROM Participant WHERE IdEvent = ?)
+                    ELSE 
+                        COALESCE(en.Counter, 0)
+                END as RequiredQuantity,
+                COALESCE(SUM(ps.Supply), 0) as ProvidedQuantity
+            FROM Need n
+            INNER JOIN EventNeed en ON n.Id = en.IdNeed
+            LEFT JOIN ParticipantSupply ps ON n.Id = ps.IdNeed 
+                AND ps.IdParticipant IN (
+                    SELECT Id FROM Participant WHERE IdEvent = ?
+                )
+            WHERE en.IdEvent = ?
+            GROUP BY n.Id, n.Label, n.Name, n.ParticipantDependent, en.Counter
+            ORDER BY n.IdNeedType, n.Name
+        ";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([$eventId, $eventId, $eventId]);
         return $stmt->fetchAll(PDO::FETCH_OBJ);
@@ -296,76 +295,54 @@ class Event
 
     public function getUserSupplies($eventId, $userEmail): array
     {
-        $sql = "
-        SELECT 
-            ps.Id,
-            ps.IdNeed,
-            ps.Supply,
-            n.Label,
-            n.Name
-        FROM ParticipantSupply ps
-        INNER JOIN Participant part ON ps.IdParticipant = part.Id
-        INNER JOIN Person p ON part.IdPerson = p.Id
-        INNER JOIN Need n ON ps.IdNeed = n.Id
-        WHERE part.IdEvent = ? AND p.Email = ?
-    ";
-
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([$eventId, $userEmail]);
-        return $stmt->fetchAll(PDO::FETCH_OBJ);
+        return $this->fluent
+            ->from('ParticipantSupply ps')
+            ->select('ps.Id, ps.IdNeed, ps.Supply, n.Label, n.Name')
+            ->innerJoin('Participant part ON ps.IdParticipant = part.Id')
+            ->innerJoin('Person p ON part.IdPerson = p.Id')
+            ->innerJoin('Need n ON ps.IdNeed = n.Id')
+            ->where('part.IdEvent', $eventId)
+            ->where('p.Email COLLATE NOCASE', $userEmail)
+            ->fetchAll();
     }
 
     public function updateUserSupply($eventId, $userEmail, $needId, $supply): bool
     {
         try {
-            // Récupérer l'ID du participant
-            $participantSql = "
-            SELECT part.Id 
-            FROM Participant part
-            INNER JOIN Person p ON part.IdPerson = p.Id
-            WHERE part.IdEvent = ? AND p.Email = ?
-        ";
-            $stmt = $this->pdo->prepare($participantSql);
-            $stmt->execute([$eventId, $userEmail]);
-            $participant = $stmt->fetch(PDO::FETCH_OBJ);
-
+            $participant = $this->fluent->from('Participant part')
+                ->select('part.Id')
+                ->innerJoin('Person p ON part.IdPerson = p.Id')
+                ->where('part.IdEvent', $eventId)
+                ->where('p.Email COLLATE NOCASE', $userEmail)
+                ->fetch();
             if (!$participant) {
                 return false;
             }
 
-            // Vérifier si l'apport existe déjà
-            $existingSql = "
-            SELECT Id FROM ParticipantSupply 
-            WHERE IdParticipant = ? AND IdNeed = ?
-        ";
-            $stmt = $this->pdo->prepare($existingSql);
-            $stmt->execute([$participant->Id, $needId]);
-            $existing = $stmt->fetch(PDO::FETCH_OBJ);
-
+            $existing = $this->fluent->from('ParticipantSupply')
+                ->select('Id')
+                ->where('IdParticipant', $participant->Id)
+                ->where('IdNeed', $needId)
+                ->fetch();
             if ($existing) {
                 if ($supply > 0) {
-                    // Mettre à jour
-                    $updateSql = "
-                    UPDATE ParticipantSupply 
-                    SET Supply = ? 
-                    WHERE Id = ?
-                ";
-                    $stmt = $this->pdo->prepare($updateSql);
-                    return $stmt->execute([$supply, $existing->Id]);
+                    $this->fluent->update('ParticipantSupply')
+                        ->set(['Supply' => $supply])
+                        ->where('Id', $existing->Id)
+                        ->execute();
                 } else {
-                    // Supprimer si quantité = 0
-                    $deleteSql = "DELETE FROM ParticipantSupply WHERE Id = ?";
-                    $stmt = $this->pdo->prepare($deleteSql);
-                    return $stmt->execute([$existing->Id]);
+                    $this->fluent->deleteFrom('ParticipantSupply')
+                        ->where('Id', $existing->Id)
+                        ->execute();
                 }
             } else if ($supply > 0) {
-                // Créer nouvel apport
-                $insertSql = "
-                INSERT INTO ParticipantSupply (IdParticipant, IdNeed, Supply) 
-                VALUES (?, ?, ?)
-            ";
-                $stmt = $this->pdo->prepare($insertSql);
-                return $stmt->execute([$participant->Id, $needId, $supply]);
+                $this->fluent->insertInto('ParticipantSupply')
+                    ->values([
+                        'IdParticipant' => $participant->Id,
+                        'IdNeed'        => $needId,
+                        'Supply'        => $supply
+                    ])
+                    ->execute();
             }
 
             return true;
@@ -374,7 +351,15 @@ class Event
         }
     }
 
-
+    public function getEventGroup($eventId)
+    {
+        return $this->fluent
+            ->from('EventType et')
+            ->select('et.IdGroup')
+            ->innerJoin('Event e ON et.Id = e.IdEventType')
+            ->where('e.Id', $eventId)
+            ->fetchSingle();
+    }
 
     #region Private functions
     private function events($events): array

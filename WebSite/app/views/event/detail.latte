@@ -77,9 +77,6 @@
                     <p><strong>{='duration'|translate}</strong> {=$event->Duration|readableDuration}</p>
                     <p>
                         <strong>{='location'|translate}</strong> {$event->Location} 
-                        <a href="/event/location?address={$event->Location}" target="_blank" class="btn btn-sm btn-primary me-2" title="Voir sur carte">
-                            <i class="bi bi-map"></i>
-                        </a>
                         <a href="https://maps.google.com/maps?q={$event->Location|urlencode}" target="_blank" class="btn btn-sm btn-success me-2" title="Ouvrir dans Google Maps">
                             <i class="bi bi-geo-alt"></i>
                         </a>

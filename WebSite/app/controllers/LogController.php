@@ -315,7 +315,7 @@ class LogController extends BaseController
         $filteredPersonEmails = array_filter($filteredPersonEmails);
         $query = $this->fluent->from('Person')
             ->select(null)
-            ->select('Email, FirstName, LastName');
+            ->select('LOWER(Email) AS Email, FirstName, LastName');
         if (!empty($filteredPersonEmails)) {
             $placeholders = implode(',', array_fill(0, count($filteredPersonEmails), '?'));
             $query->where("Email COLLATE NOCASE IN ($placeholders)", $filteredPersonEmails);

@@ -349,7 +349,8 @@ class EventApi extends BaseController
                 } else if ($recipients === 'unregistered') {
                 } else if ($recipients === 'all') {
                     $participants = $this->email->getInterestedPeople(
-                        $this->fluent->from('EventType')->where('Id', $event->IdEventType)->fetch('IdGroup'),
+                        $this->event->getEventGroup($eventId),
+                        $this->fluent->from('Event')->where('Id', $eventId)->fetchSingle('IdEventType'),
                         (new DateTime($event->StartTime))->format('N') - 1,
                         $this->getPeriodOfDay($event->StartTime)
                     );
