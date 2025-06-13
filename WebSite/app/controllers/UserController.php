@@ -412,7 +412,89 @@ class UserController extends BaseController
         }
     }
 
-    /* #region Statistics */
+    public function contact()
+    {
+        if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+            $this->getPerson();
+            $this->render('app/views/contact.latte', $this->params->getAll([
+                'navItems' => $this->getNavItems(),
+            ]));
+        } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $name = trim($_POST['name'] ?? '');
+            $email = trim($_POST['email'] ?? '');
+            $message = trim($_POST['message'] ?? '');
+            $errors = [];
+            if (empty($name)) {
+                $errors[] = 'Le nom et prénom sont requis.';
+            }
+            if (empty($email)) {
+                $errors[] = 'L\'email est requis.';
+            } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                $errors[] = 'L\'email n\'est pas valide.';
+            }
+            if (empty($message)) {
+                $errors[] = 'Le message est requis.';
+            }
+            if (empty($errors)) {
+                $emailSent = $this->sendContactEmail($name, $email, $message);
+
+                if ($emailSent) {
+                    header('Location: /contact?success=' . urlencode('Votre message a été envoyé avec succès. Nous vous répondrons dans les plus brefs délais.'));
+                    exit;
+                } else {
+                    $params = [
+                        'error' => 'Une erreur est survenue lors de l\'envoi du message. Veuillez réessayer.',
+                        'old_name' => $name,
+                        'old_email' => $email,
+                        'old_message' => $message
+                    ];
+                    $queryString = http_build_query($params);
+                    header('Location: /contact?' . $queryString);
+                    exit;
+                }
+            } else {
+                $params = [
+                    'errors' => implode('|', $errors),
+                    'old_name' => $name,
+                    'old_email' => $email,
+                    'old_message' => $message
+                ];
+                $queryString = http_build_query($params);
+                header('Location: /contact?' . $queryString);
+                exit;
+            }
+        }
+    }
+    private function sendContactEmail($name, $email, $message)
+    {
+        $adminEmail = $this->settings->get('contactEmail');
+        if (!filter_var($adminEmail, FILTER_VALIDATE_EMAIL)) {
+            $this->application->error500('Invalid contactEmmail', __FILE__, __LINE__);
+        }
+        $subject = 'Nouveau message de contact - ' . $name;
+        $body = "Nouveau message de contact reçu :\n\n";
+        $body .= "Nom & Prénom : " . $name . "\n";
+        $body .= "Email : " . $email . "\n";
+        $body .= "Message :\n" . $message . "\n\n";
+        $body .= "---\n";
+        $body .= "Envoyé le : " . date('d/m/Y à H:i') . "\n";
+        $body .= "IP : " . $_SERVER['REMOTE_ADDR'] ?? 'Inconnue';
+        $headers = array(
+            'From' => $email,
+            'Reply-To' => $email,
+            'Return-Path' => $adminEmail,
+            'X-Mailer' => 'PHP/' . phpversion(),
+            'Content-Type' => 'text/plain; charset=UTF-8'
+        );
+        $headerString = '';
+        foreach ($headers as $key => $value) {
+            $headerString .= $key . ': ' . $value . "\r\n";
+        }
+        return mail($adminEmail, $subject, $body, $headerString);
+    }
+
+
+    #region Statistics
     public function showStatistics()
     {
         if ($person = $this->getPerson([], 1)) {

@@ -89,6 +89,7 @@ class NavBarController extends BaseController
             '/emails',
             '/user/statistics',
             '/ffa/search',
+            '/contact'
         ];
     }
     /* #endregion */

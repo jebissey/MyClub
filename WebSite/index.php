@@ -202,6 +202,8 @@ $flight->route('GET  /user/sign/in',                      function()            
 $flight->route('POST /user/sign/in',                      function()              use ($userController)                     { $userController->signIn(); });
 $flight->route('GET  /user/sign/out',                     function()              use ($userController)                     { $userController->signOut(); });
 $flight->route('GET  /user/statistics',                   function()              use ($userController)                     { $userController->showStatistics();});
+$flight->route('GET  /contact',                           function()              use ($userController)                     { $userController->contact(); });
+$flight->route('POST /contact',                           function()              use ($userController)                     { $userController->contact(); });
 
 use app\controllers\WebmasterController;
 $webmasterController = new WebmasterController($container->get(PDO::class), $container->get(Engine::class));
