@@ -578,4 +578,68 @@ class Log
 
         return $query->fetchAll();
     }
+
+
+
+
+
+    public function getLastVisitPerActivePersonWithTimeAgo($activePersons)
+    {
+        $visits = $this->getLastVisitPerActivePerson($activePersons);
+
+        foreach ($visits as &$visit) {
+            $visit->TimeAgo = $this->calculateTimeAgo($visit->LastActivity);
+            $visit->FormattedDate = (new DateTime($visit->LastActivity))->format('d/m/Y H:i');
+        }
+
+        return $visits;
+    }
+    private function getLastVisitPerActivePerson($activePersons)
+    {
+        $result = [];
+        foreach ($activePersons as $person) {
+            $lastLog = $this->fluentForLog->from('Log')
+                ->select('Uri, CreatedAt, IpAddress, Os, Browser')
+                ->where('Who COLLATE NOCASE', $person->Email)
+                ->orderBy('CreatedAt DESC')
+                ->limit(1)
+                ->fetch();
+
+            if ($lastLog) {
+                $result[] = (object)[
+                    'PersonId' => $person->Id,
+                    'FullName' => $person->FirstName . ' ' . $person->LastName,
+                    'Email' => $person->Email,
+                    'Avatar' => $person->Avatar,
+                    'LastPage' => $lastLog->Uri,
+                    'LastActivity' => $lastLog->CreatedAt,
+                    'IpAddress' => $lastLog->IpAddress,
+                    'Os' => $lastLog->Os,
+                    'Browser' => $lastLog->Browser
+                ];
+            }
+        }
+
+        usort($result, function ($a, $b) {
+            return strcmp($b->LastActivity, $a->LastActivity);
+        });
+
+        return $result;
+    }
+    private function calculateTimeAgo($dateTime)
+    {
+        $datetime = new DateTime($dateTime);
+        $now = new DateTime();
+        $interval = $now->diff($datetime);
+
+        if ($interval->days > 0) {
+            return $interval->days . ' jour' . ($interval->days > 1 ? 's' : '');
+        } elseif ($interval->h > 0) {
+            return $interval->h . ' heure' . ($interval->h > 1 ? 's' : '');
+        } elseif ($interval->i > 0) {
+            return $interval->i . ' minute' . ($interval->i > 1 ? 's' : '');
+        } else {
+            return 'À l\'instant';
+        }
+    }
 }

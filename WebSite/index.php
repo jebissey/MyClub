@@ -142,6 +142,7 @@ $flight->route('GET /analytics',                    function() use ($logControll
 $flight->route('GET /topPages',                     function() use ($logController) { $logController->topPagesByPeriod(); });
 $flight->route('GET /topArticles',                  function() use ($logController) { $logController->topArticlesByPeriod(); });
 $flight->route('GET /crossTab',                     function() use ($logController) { $logController->crossTab(); });
+$flight->route('GET /lastVisits',                     function() use ($logController) { $logController->showLastVisits(); });
 
 use app\controllers\MediaController;
 $mediaController = new MediaController($container->get(PDO::class), $container->get(Engine::class));

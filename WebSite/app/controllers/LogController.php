@@ -5,6 +5,7 @@ namespace app\controllers;
 use flight\Engine;
 use PDO;
 use app\helpers\Log;
+use app\helpers\PersonStatistics;
 
 class LogController extends BaseController
 {
@@ -303,6 +304,20 @@ class LogController extends BaseController
                 'uriFilter' => $uriFilter,
                 'emailFilter' => $emailFilter,
                 'groupFilter' => $groupFilter
+            ]));
+        } else {
+            $this->application->error403(__FILE__, __LINE__);
+        }
+    }
+
+    public function showLastVisits()
+    {
+        if ($this->getPerson(['Webmaster'])) {
+            $activePersons = (new PersonStatistics($this->pdo))->getActivePerson();
+            $this->render('app/views/user/lastVisits.latte', $this->params->getAll([
+                'lastVisits' => $this->log->getLastVisitPerActivePersonWithTimeAgo($activePersons),
+                'totalActiveUsers' => count($activePersons),
+                'navItems' => $this->getNavItems(),
             ]));
         } else {
             $this->application->error403(__FILE__, __LINE__);

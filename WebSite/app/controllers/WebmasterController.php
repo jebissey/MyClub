@@ -3,7 +3,6 @@
 namespace app\controllers;
 
 use Exception;
-use PDO;
 use app\helpers\Arwards;
 
 class WebmasterController extends BaseController
