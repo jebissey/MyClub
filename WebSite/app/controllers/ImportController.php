@@ -86,7 +86,7 @@ class ImportController extends BaseController
                         $this->results['errors']++;
                         $this->results['messages'][] = "Adresse email incorrecte ligne $currentRow";
                     } else {
-                        $existingPerson = $this->fluent->from('Person')->select('Id')->where('Email', $personData['Email'])->fetch();
+                        $existingPerson = $this->fluent->from('Person')->select('Id')->where('Email COLLATE NOCASE', $personData['Email'])->fetch();
                         if ($existingPerson) {
                             $query = $this->pdo->prepare("UPDATE Person SET Email = ?, FirstName = ?, LastName = ?, phone = ?, Imported = 1 WHERE Id = " . $existingPerson->Id);
                             $this->results['updated']++;

@@ -3,6 +3,7 @@
 namespace app\helpers;
 
 use DateTime;
+use DateTimeZone;
 use PDO;
 
 class Log
@@ -10,6 +11,7 @@ class Log
     private $pdoForLog;
     private $fluentForLog;
     private string $host;
+    private const DISPLAY_TIMEZONE = 'Europe/Paris';
 
     public function __construct(PDO $pdoForLog)
     {
@@ -579,19 +581,14 @@ class Log
         return $query->fetchAll();
     }
 
-
-
-
-
+    #region Last visits
     public function getLastVisitPerActivePersonWithTimeAgo($activePersons)
     {
         $visits = $this->getLastVisitPerActivePerson($activePersons);
-
         foreach ($visits as &$visit) {
             $visit->TimeAgo = $this->calculateTimeAgo($visit->LastActivity);
-            $visit->FormattedDate = (new DateTime($visit->LastActivity))->format('d/m/Y H:i');
+            $visit->FormattedDate = $this->formatDateFromUTC($visit->LastActivity);
         }
-
         return $visits;
     }
     private function getLastVisitPerActivePerson($activePersons)
@@ -599,7 +596,7 @@ class Log
         $result = [];
         foreach ($activePersons as $person) {
             $lastLog = $this->fluentForLog->from('Log')
-                ->select('Uri, CreatedAt, IpAddress, Os, Browser')
+                ->select('Uri, CreatedAt, Os, Browser')
                 ->where('Who COLLATE NOCASE', $person->Email)
                 ->orderBy('CreatedAt DESC')
                 ->limit(1)
@@ -613,25 +610,23 @@ class Log
                     'Avatar' => $person->Avatar,
                     'LastPage' => $lastLog->Uri,
                     'LastActivity' => $lastLog->CreatedAt,
-                    'IpAddress' => $lastLog->IpAddress,
                     'Os' => $lastLog->Os,
                     'Browser' => $lastLog->Browser
                 ];
             }
         }
-
         usort($result, function ($a, $b) {
             return strcmp($b->LastActivity, $a->LastActivity);
         });
-
         return $result;
     }
+
     private function calculateTimeAgo($dateTime)
     {
-        $datetime = new DateTime($dateTime);
-        $now = new DateTime();
+        $datetime = new DateTime($dateTime, new DateTimeZone('UTC'));
+        $datetime->setTimezone(new DateTimeZone(self::DISPLAY_TIMEZONE));
+        $now = new DateTime('now', new DateTimeZone(self::DISPLAY_TIMEZONE));
         $interval = $now->diff($datetime);
-
         if ($interval->days > 0) {
             return $interval->days . ' jour' . ($interval->days > 1 ? 's' : '');
         } elseif ($interval->h > 0) {
@@ -641,5 +636,12 @@ class Log
         } else {
             return 'À l\'instant';
         }
+    }
+
+    private function formatDateFromUTC($dateTime)
+    {
+        $datetime = new DateTime($dateTime, new DateTimeZone('UTC'));
+        $datetime->setTimezone(new DateTimeZone(self::DISPLAY_TIMEZONE));
+        return $datetime->format('d/m/Y H:i');
     }
 }
