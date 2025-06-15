@@ -39,17 +39,13 @@ class EventApi extends BaseController
                     'Color'  => $data['color']
                 ])->execute();
                 $this->pdo->commit();
-
-                header('Content-Type: application/json');
-                echo json_encode(['success' => true]);
+                $this->renderJson(['success' => true]);
             } catch (\Exception $e) {
                 $this->pdo->rollBack();
-                header('Content-Type: application/json', true, 500);
-                echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+                $this->renderJson(['success' => false, 'message' => $e->getMessage()], 500);
             }
         } else {
-            header('Content-Type: application/json', true, 403);
-            echo json_encode(['success' => false, 'message' => 'User not allowed']);
+            $this->renderJson(['success' => false, 'message' => 'User not allowed'], 403);
         }
     }
 
@@ -66,16 +62,14 @@ class EventApi extends BaseController
                     ->execute();
 
                 $this->pdo->commit();
-                header('Content-Type: application/json');
-                echo json_encode(['success' => true]);
+                $this->renderJson(['success' => true]);
             } catch (\Exception $e) {
                 $this->pdo->rollBack();
                 http_response_code(500);
                 echo json_encode(['success' => false, 'message' => $e->getMessage()]);
             }
         } else {
-            header('Content-Type: application/json', true, 403);
-            echo json_encode(['success' => false, 'message' => 'User not allowed']);
+            $this->renderJson(['success' => false, 'message' => 'User not allowed'], 403);
         }
     }
 
@@ -90,23 +84,20 @@ class EventApi extends BaseController
                 'attributes' => $attributes
             ]));
         } else {
-            header('Content-Type: application/json', true, 403);
-            echo json_encode(['success' => false, 'message' => 'User not allowed']);
+            $this->renderJson(['success' => false, 'message' => 'User not allowed'], 403);
         }
     }
 
     public function getAttributesByEventType($eventTypeId)
     {
         if (!$eventTypeId) {
-            header('Content-Type: application/json', true, 499);
-            echo json_encode(['success' => false, 'message' => 'Unknown event type']);
+            $this->renderJson(['success' => false, 'message' => 'Unknown event type'], 499);
         } else {
             $query = $this->fluent->from('EventTypeAttribute')
                 ->select('Attribute.*')
                 ->join('Attribute ON EventTypeAttribute.IdAttribute = Attribute.Id')
                 ->where('EventTypeAttribute.IdEventType', $eventTypeId);
-            header('Content-Type: application/json');
-            echo json_encode(['attributes' => $query->fetchAll()]);
+            $this->renderJson(['attributes' => $query->fetchAll()]);
         }
         exit();
     }
@@ -128,17 +119,13 @@ class EventApi extends BaseController
                     ->where('Id', $data['id'])
                     ->execute();
                 $this->pdo->commit();
-
-                header('Content-Type: application/json');
-                echo json_encode(['success' => true]);
+                $this->renderJson(['success' => true]);
             } catch (\Exception $e) {
                 $this->pdo->rollBack();
-                http_response_code(500);
-                echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+                $this->renderJson(['success' => false, 'message' => $e->getMessage()], 500);
             }
         } else {
-            header('Content-Type: application/json', true, 403);
-            echo json_encode(['success' => false, 'message' => 'User not allowed']);
+            $this->renderJson(['success' => false, 'message' => 'User not allowed'], 403);
         }
     }
     #endregion
@@ -148,9 +135,8 @@ class EventApi extends BaseController
     {
         if ($person = $this->getPerson(['EventManager'])) {
             if (!$this->fluent->from('Event')->where('Id', $id)->where('CreatedBy', $person->Id)->fetch()) {
-                header('Content-Type: application/json', true, 403);
-                echo json_encode(['success' => false, 'message' => 'Not allowed user']);
-                exit;
+                $this->renderJson(['success' => false, 'message' => 'User not allowed'], 403);
+                return;
             }
             try {
                 $this->pdo->beginTransaction();
@@ -158,26 +144,19 @@ class EventApi extends BaseController
                 $this->fluent->deleteFrom('EventAttribute')->where('IdEvent', $id)->execute();
                 // TODO manage participant and paticipantSupply
                 $this->fluent->deleteFrom('Event')->where('Id', $id)->execute();
-
                 $this->pdo->commit();
-
-                header('Content-Type: application/json');
-                echo json_encode(['success' => true]);
+                $this->renderJson(['success' => true]);
             } catch (Exception $e) {
                 $this->pdo->rollBack();
-
-                header('Content-Type: application/json', true, 500);
-                echo json_encode([
+                $this->renderJson([
                     'success' => false,
                     'message' => 'Erreur lors de la suppression en base de données',
                     'error' => $e->getMessage()
-                ]);
+                ], 500);
             }
         } else {
-            header('Content-Type: application/json', true, 403);
-            echo json_encode(['success' => false, 'message' => 'User not allowed']);
+            $this->renderJson(['success' => false, 'message' => 'User not allowed'], 403);
         }
-        exit();
     }
 
     public function duplicateEvent($id)
@@ -189,9 +168,8 @@ class EventApi extends BaseController
                 $event = $this->fluent->from('Event')->where('Id', $id)->fetch();
                 if (!$event) {
                     $this->pdo->rollBack();
-                    header('Content-Type: application/json', true, 471);
-                    echo json_encode(['success' => false, 'message' => 'Événement introuvable']);
-                    exit;
+                    $this->renderJson(['success' => false, 'message' => 'Unknow event'], 471);
+                    return;
                 }
 
                 $newEvent = [
@@ -215,26 +193,20 @@ class EventApi extends BaseController
                     ])->execute();
                 }
                 $this->pdo->commit();
-
-                header('Content-Type: application/json');
-                echo json_encode(['success' => true, 'newEventId' => $newEventId]);
+                $this->renderJson(['success' => true, 'newEventId' => $newEventId]);
             } catch (Exception $e) {
                 $this->pdo->rollBack();
-                header('Content-Type: application/json', true, 500);
-                echo json_encode(['success' => false, 'message' => 'Erreur serveur : ' . $e->getMessage()]);
+                $this->renderJson(['success' => false, 'message' => 'Erreur serveur : ' . $e->getMessage()], 500);
             }
         } else {
-            header('Content-Type: application/json', true, 403);
-            echo json_encode(['success' => false, 'message' => 'User not allowed']);
+            $this->renderJson(['success' => false, 'message' => 'User not allowed'], 403);
         }
-        exit();
     }
 
     public function getEvent($id): void
     {
         if ($this->getPerson(['EventManager'])) {
-            header('Content-Type: application/json');
-            echo json_encode([
+            $this->renderJson([
                 'success' => true,
                 'event' => $this->fluent->from('Event')->where('Id', $id)->fetch(),
                 'attributes' => $this->fluent->from('EventAttribute')
@@ -243,10 +215,8 @@ class EventApi extends BaseController
                     ->where('IdEvent', $id)->fetchall(),
             ]);
         } else {
-            header('Content-Type: application/json', true, 403);
-            echo json_encode(['success' => false, 'message' => 'User not allowed']);
+            $this->renderJson(['success' => false, 'message' => 'User not allowed'], 403);
         }
-        exit();
     }
 
     public function saveEvent(): void
@@ -281,22 +251,17 @@ class EventApi extends BaseController
                 $this->insertEventAttributes($eventId, $data['attributes'] ?? []);
                 $this->insertEventNeeds($eventId, $data['needs'] ?? []);
                 $this->pdo->commit();
-
-                header('Content-Type: application/json');
-                echo json_encode(['success' => true, 'eventId' => $eventId]);
+                $this->renderJson(['success' => true, 'eventId' => $eventId]);
             } catch (Exception $e) {
                 $this->pdo->rollBack();
-
-                header('Content-Type: application/json', true, 500);
-                echo json_encode([
+                $this->renderJson([
                     'success' => false,
                     'message' => 'Erreur lors de l\'insertion en base de données',
                     'error'   => $e->getMessage()
-                ]);
+                ], 500);
             }
         } else {
-            header('Content-Type: application/json', true, 403);
-            echo json_encode(['success' => false, 'message' => 'User not allowed']);
+            $this->renderJson(['success' => false, 'message' => 'User not allowed'], 403);
         }
         exit();
     }
@@ -337,8 +302,7 @@ class EventApi extends BaseController
                 $eventId = $data['EventId'] ?? '';
                 $event = $this->fluent->from('Event')->where('Id', $eventId)->fetch();
                 if (!$event) {
-                    header('Content-Type: application/json', true, 403);
-                    echo json_encode(['success' => false, 'message' => "Unknown event ($eventId)"]);
+                    $this->renderJson(['success' => false, 'message' => "Unknown event ($eventId)"], 403);
                     return;
                 }
                 $emailTitle = $data['Title'] ?? '';
@@ -355,8 +319,7 @@ class EventApi extends BaseController
                         $this->getPeriodOfDay($event->StartTime)
                     );
                 } else {
-                    header('Content-Type: application/json', true, 404);
-                    echo json_encode(['success' => false, 'message' => "Invalid recipients ($recipients)"]);
+                    $this->renderJson(['success' => false, 'message' => "Invalid recipients ($recipients)"], 404);
                     return;
                 }
                 if ($participants) {
@@ -378,18 +341,15 @@ class EventApi extends BaseController
                         }
                     }
                 } else {
-                    header('Content-Type: application/json', true, 404);
-                    echo json_encode(['success' => false, 'message' => 'No participant']);
+                    $this->renderJson(['success' => false, 'message' => 'No participant'], 404);
                     return;
                 }
-                header('Content-Type: application/json');
-                echo json_encode(['success' => true, 'message' => "sent = $sent ; sentError = $sentError"]);
+                $this->renderJson(['success' => true, 'message' => "sent = $sent ; sentError = $sentError"]);
             } else {
                 $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
             }
         } else {
-            header('Content-Type: application/json', true, 403);
-            echo json_encode(['success' => false, 'message' => 'User not allowed']);
+            $this->renderJson(['success' => false, 'message' => 'User not allowed'], 403);
         }
     }
     #endregion
@@ -400,26 +360,20 @@ class EventApi extends BaseController
         if ($this->getPerson(['Webmaster'])) {
             if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
                 if (!$id) {
-                    header('Content-Type: application/json', true, 472);
-                    echo json_encode(['success' => false, 'message' => 'Missing ID parameter']);
+                    $this->renderJson(['success' => false, 'message' => 'Missing ID parameter'], 472);
                 } else {
                     try {
                         $this->fluent->deleteFrom('Need')->where('Id', $id)->execute();
-
-                        header('Content-Type: application/json');
-                        echo json_encode(['success' => true]);
+                        $this->renderJson(['success' => true]);
                     } catch (\Exception $e) {
-                        header('Content-Type: application/json', true, 500);
-                        echo json_encode(['success' => false, 'message' => 'Erreur lors de la suppression: ' . $e->getMessage()]);
+                        $this->renderJson(['success' => false, 'message' => 'Erreur lors de la suppression: ' . $e->getMessage()], 500);
                     }
                 }
             } else {
-                header('Content-Type: application/json', true, 470);
-                echo json_encode(['success' => false, 'message' => 'Bad request method']);
+                $this->renderJson(['success' => false, 'message' => 'Bad request method'], 470);
             }
         } else {
-            header('Content-Type: application/json', true, 403);
-            echo json_encode(['success' => false, 'message' => 'User not allowed']);
+            $this->renderJson(['success' => false, 'message' => 'User not allowed'], 403);
         }
         exit();
     }
@@ -434,23 +388,18 @@ class EventApi extends BaseController
                 $name = $data['name'] ?? '';
                 $participantDependent = isset($data['participantDependent']) ? intval($data['participantDependent']) : 0;
                 $idNeedType = $data['idNeedType'] ?? null;
-
                 if (empty($label)) {
-                    header('Content-Type: application/json', true, 472);
-                    echo json_encode(['success' => false, 'message' => 'Missing parameter label']);
-                    exit();
+                    $this->renderJson(['success' => false, 'message' => 'Missing parameter label'], 472);
+                    return;
                 }
                 if (empty($name)) {
-                    header('Content-Type: application/json', true, 472);
-                    echo json_encode(['success' => false, 'message' => 'Missing parameter name']);
-                    exit();
+                    $this->renderJson(['success' => false, 'message' => 'Missing parameter name'], 472);
+                    return;
                 }
                 if (!$idNeedType) {
-                    header('Content-Type: application/json', true, 472);
-                    echo json_encode(['success' => false, 'message' => 'Missing parameter idNeedType']);
-                    exit();
+                    $this->renderJson(['success' => false, 'message' => 'Missing parameter idNeedType'], 472);
+                    return;
                 }
-
                 try {
                     $needData = [
                         'Label' => $label,
@@ -458,28 +407,21 @@ class EventApi extends BaseController
                         'ParticipantDependent' => $participantDependent,
                         'IdNeedType' => $idNeedType
                     ];
-
                     if ($id) {
                         $this->fluent->update('Need')->set($needData)->where('Id', $id)->execute();
                     } else {
                         $id = $this->fluent->insertInto('Need')->values($needData)->execute();
                     }
-
-                    header('Content-Type: application/json');
-                    echo json_encode(['success' => true, 'id' => $id]);
+                    $this->renderJson(['success' => true, 'id' => $id]);
                 } catch (\Exception $e) {
-                    header('Content-Type: application/json', true, 500);
-                    echo json_encode(['success' => false, 'message' => 'Erreur lors de l\'enregistrement: ' . $e->getMessage()]);
+                    $this->renderJson(['success' => false, 'message' => 'Erreur lors de l\'enregistrement: ' . $e->getMessage()], 500);
                 }
             } else {
-                header('Content-Type: application/json', true, 470);
-                echo json_encode(['success' => false, 'message' => 'Bad request method']);
+                $this->renderJson(['success' => false, 'message' => 'Bad request method'], 470);
             }
         } else {
-            header('Content-Type: application/json', true, 403);
-            echo json_encode(['success' => false, 'message' => 'User not allowed']);
+            $this->renderJson(['success' => false, 'message' => 'User not allowed'], 403);
         }
-        exit();
     }
 
     public function getEventNeeds($eventId)
@@ -490,13 +432,7 @@ class EventApi extends BaseController
             ->join('NeedType ON Need.IdNeedType = NeedType.Id')
             ->where('EventNeed.IdEvent', $eventId)
             ->fetchAll();
-
-        header('Content-Type: application/json');
-        echo json_encode([
-            'success' => true,
-            'needs' => $needs
-        ]);
-        exit();
+        $this->renderJson(['success' => true, 'needs' => $needs]);
     }
 
     public function getNeedsByNeedType($needTypeId)
@@ -506,13 +442,7 @@ class EventApi extends BaseController
             ->join('NeedType ON Need.IdNeedType = NeedType.Id')
             ->where('Need.IdNeedType', $needTypeId)
             ->fetchAll();
-
-        header('Content-Type: application/json');
-        echo json_encode([
-            'success' => true,
-            'needs' => $needs
-        ]);
-        exit();
+        $this->renderJson(['success' => true, 'needs' => $needs]);
     }
     #endregion
 
@@ -522,38 +452,28 @@ class EventApi extends BaseController
         if ($this->getPerson(['Webmaster'])) {
             if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
                 if (!$id) {
-                    header('Content-Type: application/json', true, 472);
-                    echo json_encode(['success' => false, 'message' => 'Missing Id parameter']);
+                    $this->renderJson(['success' => false, 'message' => 'Missing Id parameter'], 472);
                 } else {
                     $countNeeds = $this->fluent->from('Need')->where('IdNeedType', $id)->count();
-
                     if ($countNeeds > 0) {
-                        header('Content-Type: application/json', true, 409);
-                        echo json_encode([
+                        $this->renderJson([
                             'success' => false,
                             'message' => 'Ce type de besoin est associé à ' . $countNeeds . ' besoin(s) et ne peut pas être supprimé'
-                        ]);
+                        ], 409);
                     } else {
                         try {
-                            $this->fluent->deleteFrom('NeedType')
-                                ->where('Id', $id)
-                                ->execute();
-
-                            header('Content-Type: application/json');
-                            echo json_encode(['success' => true]);
+                            $this->fluent->deleteFrom('NeedType')->where('Id', $id)->execute();
+                            $this->renderJson(['success' => true]);
                         } catch (\Exception $e) {
-                            header('Content-Type: application/json', true, 500);
-                            echo json_encode(['success' => false, 'message' => 'Erreur lors de la suppression: ' . $e->getMessage()]);
+                            $this->renderJson(['success' => false, 'message' => 'Erreur lors de la suppression: ' . $e->getMessage()], 500);
                         }
                     }
                 }
             } else {
-                header('Content-Type: application/json', true, 470);
-                echo json_encode(['success' => false, 'message' => 'Bad request method']);
+                $this->renderJson(['success' => false, 'message' => 'Bad request method'], 470);
             }
         } else {
-            header('Content-Type: application/json', true, 403);
-            echo json_encode(['success' => false, 'message' => 'User not allowed']);
+            $this->renderJson(['success' => false, 'message' => 'User not allowed'], 403);
         }
         exit();
     }
@@ -566,8 +486,7 @@ class EventApi extends BaseController
                 $id = $data['id'] ?? '';
                 $name = $data['name'] ?? '';
                 if (empty($name)) {
-                    header('Content-Type: application/json', true, 472);
-                    echo json_encode(['success' => false, 'message' => "Missing parameter name ='$name'"]);
+                    $this->renderJson(['success' => false, 'message' => "Missing parameter name ='$name'"], 472);
                 } else {
                     try {
                         if ($id) {
@@ -575,21 +494,17 @@ class EventApi extends BaseController
                         } else {
                             $id = $this->fluent->insertInto('NeedType')->values(['Name' => $name])->execute();
                         }
-                        header('Content-Type: application/json');
-                        echo json_encode(['success' => true, 'id' => $id]);
+                        $this->renderJson(['success' => true, 'id' => $id]);
                     } catch (\Exception $e) {
                         $this->flight->json(['success' => 'false', 'message' => 'Erreur lors de l\'enregistrement: ' . $e->getMessage()]);
                     }
                 }
             } else {
-                header('Content-Type: application/json', true, 470);
-                echo json_encode(['success' => false, 'message' => 'Bad request method']);
+                $this->renderJson(['success' => false, 'message' => 'Bad request method'], 470);
             }
         } else {
-            header('Content-Type: application/json', true, 403);
-            echo json_encode(['success' => false, 'message' => 'User not allowed']);
+            $this->renderJson(['success' => false, 'message' => 'User not allowed'], 403);
         }
-        exit();
     }
     #endregion
 
@@ -601,16 +516,14 @@ class EventApi extends BaseController
             $data = json_decode($json, true);
 
             if (!isset($data['eventId']) || !isset($data['text'])) {
-                header('Content-Type: application/json', true, 400);
-                echo json_encode(['success' => false, 'message' => 'Données manquantes']);
-                exit;
+                $this->renderJson(['success' => false, 'message' => 'Données manquantes'], 400);
+                return;
             }
 
             $eventHelper = new Event($this->pdo);
             if (!$eventHelper->isUserRegistered($data['eventId'], $person->Email)) {
-                header('Content-Type: application/json', true, 403);
-                echo json_encode(['success' => false, 'message' => 'Accès non autorisé à cet événement']);
-                exit;
+                $this->renderJson(['success' => false, 'message' => 'User not allowed'], 403);
+                return;
             }
 
             try {
@@ -626,20 +539,12 @@ class EventApi extends BaseController
                         break;
                     }
                 }
-
-                header('Content-Type: application/json');
-                echo json_encode([
-                    'success' => true,
-                    'message' => 'Message ajouté',
-                    'data' => $newMessage
-                ]);
+                $this->renderJson(['success' => true, 'message' => 'Message ajouté', 'data' => $newMessage]);
             } catch (\Exception $e) {
-                header('Content-Type: application/json', true, 500);
-                echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+                $this->renderJson(['success' => false, 'message' => $e->getMessage()], 500);
             }
         } else {
-            header('Content-Type: application/json', true, 403);
-            echo json_encode(['success' => false, 'message' => 'Utilisateur non connecté']);
+            $this->renderJson(['success' => false, 'message' => 'User not allowed'], 403);
         }
     }
 
@@ -650,8 +555,7 @@ class EventApi extends BaseController
             $data = json_decode($json, true);
 
             if (!isset($data['messageId']) || !isset($data['text'])) {
-                header('Content-Type: application/json', true, 400);
-                echo json_encode(['success' => false, 'message' => 'Données manquantes']);
+                $this->renderJson(['success' => false, 'message' => 'Données manquantes'], 400);
                 return;
             }
 
@@ -659,8 +563,7 @@ class EventApi extends BaseController
                 $messageHelper = new Message($this->pdo);
                 $messageHelper->updateMessage($data['messageId'], $person->Id, $data['text']);
 
-                header('Content-Type: application/json');
-                echo json_encode([
+                $this->renderJson([
                     'success' => true,
                     'message' => 'Message mis à jour',
                     'data' => [
@@ -669,12 +572,10 @@ class EventApi extends BaseController
                     ]
                 ]);
             } catch (\Exception $e) {
-                header('Content-Type: application/json', true, 500);
-                echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+                $this->renderJson(['success' => false, 'message' => $e->getMessage()], 500);
             }
         } else {
-            header('Content-Type: application/json', true, 403);
-            echo json_encode(['success' => false, 'message' => 'Utilisateur non connecté']);
+            $this->renderJson(['success' => false, 'message' => 'User not allowed'], 403);
         }
     }
 
@@ -685,8 +586,7 @@ class EventApi extends BaseController
             $data = json_decode($json, true);
 
             if (!isset($data['messageId'])) {
-                header('Content-Type: application/json', true, 400);
-                echo json_encode(['success' => false, 'message' => 'ID de message manquant']);
+                $this->renderJson(['success' => false, 'message' => 'ID de message manquant'], 400);
                 return;
             }
 
@@ -694,8 +594,7 @@ class EventApi extends BaseController
                 $messageHelper = new Message($this->pdo);
                 $messageHelper->deleteMessage($data['messageId'], $person->Id);
 
-                header('Content-Type: application/json');
-                echo json_encode([
+                $this->renderJson([
                     'success' => true,
                     'message' => 'Message supprimé',
                     'data' => [
@@ -703,12 +602,10 @@ class EventApi extends BaseController
                     ]
                 ]);
             } catch (\Exception $e) {
-                header('Content-Type: application/json', true, 500);
-                echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+                $this->renderJson(['success' => false, 'message' => $e->getMessage()], 500);
             }
         } else {
-            header('Content-Type: application/json', true, 403);
-            echo json_encode(['success' => false, 'message' => 'Utilisateur non connecté']);
+            $this->renderJson(['success' => false, 'message' => 'User not allowed'], 403);
         }
     }
     #endregion
@@ -716,18 +613,16 @@ class EventApi extends BaseController
 
     public function updateSupply(): void
     {
-        header('Content-Type: application/json');
-
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             http_response_code(405);
-            echo json_encode(['success' => false, 'message' => 'Méthode non autorisée']);
+            $this->renderJson(['success' => false, 'message' => 'Méthode non autorisée']);
             return;
         }
         $person = $this->getPerson();
         $userEmail = $person->Email ?? '';
         if ($userEmail === '') {
             http_response_code(401);
-            echo json_encode(['success' => false, 'message' => 'Non authentifié']);
+            $this->renderJson(['success' => false, 'message' => 'Non authentifié']);
             return;
         }
 
@@ -738,7 +633,7 @@ class EventApi extends BaseController
 
         if (!$eventId || !$needId || $supply < 0) {
             http_response_code(400);
-            echo json_encode(['success' => false, 'message' => "Invalid parameters (eventId=eventId, needId=$needId, supply=$supply)"]);
+            $this->renderJson(['success' => false, 'message' => "Invalid parameters (eventId=eventId, needId=$needId, supply=$supply)"]);
             return;
         }
 
@@ -747,7 +642,7 @@ class EventApi extends BaseController
         // Vérifier que l'utilisateur est inscrit à l'événement
         if (!$event->isUserRegistered($eventId, $userEmail)) {
             http_response_code(403);
-            echo json_encode(['success' => false, 'message' => 'Non inscrit à cet événement']);
+            $this->renderJson(['success' => false, 'message' => 'Non inscrit à cet événement']);
             return;
         }
 
@@ -777,7 +672,7 @@ class EventApi extends BaseController
             ]);
         } else {
             http_response_code(500);
-            echo json_encode(['success' => false, 'message' => 'Erreur lors de la mise à jour']);
+            $this->renderJson(['success' => false, 'message' => 'Erreur lors de la mise à jour']);
         }
     }
 

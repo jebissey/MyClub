@@ -34,13 +34,15 @@ class ArticleController extends TableController
             'lastUpdate' => $_GET['lastUpdate'] ?? '',
             'published' => $_GET['published'] ?? '',
             'GroupName' => $_GET['GroupName'] ?? '',
+            'Content' => $_GET['Content'] ?? '',
         ];
         $filterConfig = [
             ['name' => 'PersonName', 'label' => 'Créé par'],
             ['name' => 'title', 'label' => 'Titre'],
             ['name' => 'lastUpdate', 'label' => 'Dernière modification'],
             ['name' => 'published', 'label' => 'Publié'],
-            ['name' => 'GroupName', 'label' => 'Groupe']
+            ['name' => 'GroupName', 'label' => 'Groupe'],
+            ['name' => 'Content', 'label' => 'Contenu'],
         ];
         $columns = [
             ['field' => 'PersonName', 'label' => 'Créé par'],

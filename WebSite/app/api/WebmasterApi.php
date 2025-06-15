@@ -15,24 +15,19 @@ class WebmasterApi extends BaseController
                 'IdPerson' => $personId,
                 'IdGroup'  => $groupId
             ])->execute();
-
-            echo json_encode(['success' => $success]);
+            $this->renderJson(['success' => $success]);
         } else {
-            header('Content-Type: application/json', true, 403);
-            echo json_encode(['success' => false, 'message' => 'User not allowed']);
+            $this->renderJson(['success' => false, 'message' => 'User not allowed'], 403);
         }
-        exit();
     }
 
     public function getNavbarItem($id)
     {
         if ($this->getPerson(['Webmaster'])) {
             $item = $this->fluent->from('Page')->where('Id', $id)->fetch();
-            header('Content-Type: application/json');
-            echo json_encode($item);
+            $this->renderJson($item);
         } else {
-            header('Content-Type: application/json', true, 403);
-            echo json_encode(['success' => false, 'message' => 'User not allowed']);
+            $this->renderJson(['success' => false, 'message' => 'User not allowed'], 403);
         }
         exit();
     }
@@ -53,22 +48,16 @@ class WebmasterApi extends BaseController
                     if (!$users) {
                         $users = [];
                     }
-
-                    header('Content-Type: application/json');
-                    echo json_encode($users);
+                    $this->renderJson($users);
                 } catch (Exception $e) {
-                    header('Content-Type: application/json', true, 500);
-                    echo json_encode(['error' => $e->getMessage()]);
+                    $this->renderJson(['error' => $e->getMessage()], 500);
                 }
             } else {
-                header('Content-Type: application/json', true, 470);
-                echo json_encode(['success' => false, 'message' => 'Bad request method']);
+                $this->renderJson(['success' => false, 'message' => 'Bad request method'], 470);
             }
         } else {
-            header('Content-Type: application/json', true, 403);
-            echo json_encode(['success' => false, 'message' => 'User not found']);
+            $this->renderJson(['success' => false, 'message' => 'User not allowed'], 403);
         }
-        exit();
     }
 
     public function lastVersion()
@@ -88,10 +77,7 @@ class WebmasterApi extends BaseController
                 'Message'          => $_SERVER['HTTP_USER_AGENT']
             ])
             ->execute();
-
-        header('Content-Type: application/json');
-        echo json_encode(['lastVersion' => self::VERSION]);
-        exit();
+        $this->renderJson(['lastVersion' => self::VERSION]);
     }
 
     public function removeFromGroup($personId, $groupId)
@@ -101,13 +87,10 @@ class WebmasterApi extends BaseController
                 ->where('IdPerson', $personId)
                 ->where('IdGroup', $groupId)
                 ->execute();
-
-            echo json_encode(['success' => $success]);
+            $this->renderJson(['success' => $success]);
         } else {
-            header('Content-Type: application/json', true, 403);
-            echo json_encode(['success' => false, 'message' => 'User not allowed']);
+            $this->renderJson(['success' => false, 'message' => 'User not allowed'], 403);
         }
-        exit();
     }
 
     public function saveNavbarItem()
@@ -116,15 +99,13 @@ class WebmasterApi extends BaseController
             $data = json_decode(file_get_contents('php://input'), true);
 
             if (empty($data['name']) || empty($data['route'])) {
-                header('Content-Type: application/json');
-                echo json_encode(['success' => false, 'message' => 'Name and Route are required']);
-                exit();
+                $this->renderJson(['success' => false, 'message' => 'Name and Route are required']);
+                return;
             }
 
             if (empty($data['id'])) {
                 $maxPosition = $this->fluent->from('Page')->select('MAX(Position) AS MaxPos')->fetch();
                 $newPosition = ($maxPosition && $maxPosition->MaxPos) ? $maxPosition->MaxPos + 1 : 1;
-
                 $this->fluent->insertInto('Page')
                     ->values([
                         'Name' => $data['name'],
@@ -135,8 +116,7 @@ class WebmasterApi extends BaseController
                         'ForAnonymous' => $data['forAnonymous'],
                     ])
                     ->execute();
-                header('Content-Type: application/json');
-                echo json_encode(['success' => true]);
+                $this->renderJson(['success' => true]);
             } else {
                 $this->fluent->update('Page')
                     ->set([
@@ -148,12 +128,10 @@ class WebmasterApi extends BaseController
                     ])
                     ->where('Id', $data['id'])
                     ->execute();
-                header('Content-Type: application/json');
-                echo json_encode(['success' => true]);
+                $this->renderJson(['success' => true]);
             }
         } else {
-            header('Content-Type: application/json', true, 403);
-            echo json_encode(['success' => false, 'message' => 'User not allowed']);
+            $this->renderJson(['success' => false, 'message' => 'User not allowed'], 403);
         }
         exit();
     }
@@ -170,25 +148,19 @@ class WebmasterApi extends BaseController
                     ->where('Id', $id)
                     ->execute();
             }
-            header('Content-Type: application/json');
-            echo json_encode(['success' => true]);
+            $this->renderJson(['success' => true]);
         } else {
-            header('Content-Type: application/json', true, 403);
-            echo json_encode(['success' => false, 'message' => 'User not allowed']);
+            $this->renderJson(['success' => false, 'message' => 'User not allowed'], 403);
         }
-        exit();
     }
 
     public function deleteNavbarItem($id)
     {
         if ($this->getPerson(['Webmaster'])) {
             $result = $this->fluent->deleteFrom('Page')->where('Id', $id)->execute();
-            header('Content-Type: application/json');
-            echo json_encode(['success' => $result == 1]);
+            $this->renderJson(['success' => $result == 1]);
         } else {
-            header('Content-Type: application/json', true, 403);
-            echo json_encode(['success' => false, 'message' => 'User not allowed']);
+            $this->renderJson(['success' => false, 'message' => 'User not allowed'], 403);
         }
-        exit();
     }
 }

@@ -259,6 +259,18 @@ abstract class BaseController extends BaseHelper
         Flight::stop();
     }
 
+    protected function renderJson(array $response, int $statusCode = 200): void
+    {
+        http_response_code($statusCode);
+        header('Content-Type: application/json');
+        echo json_encode($response);
+        if (ob_get_level()) {
+            ob_end_flush();
+        }
+        flush();
+        Flight::stop();
+    }
+
     #region Private functions
     private function getHref($userEmail)
     {

@@ -32,10 +32,7 @@ class ArticleApi extends BaseController
                 $response['message'] = 'Erreur lors de la suppression du fichier';
             }
         }
-
-        header('Content-Type: application/json');
-        echo json_encode($response);
-        exit;
+        $this->renderJson($response);
     }
 
     public function designVote()
@@ -66,15 +63,12 @@ class ArticleApi extends BaseController
                         ])
                         ->execute();
                 }
-                header('Content-Type: application/json');
-                echo json_encode(['success' => true]);
+                $this->renderJson(['success' => true]);
             } else {
-                header('Content-Type: application/json', true, 470);
-                echo json_encode(['success' => false, 'message' => 'Bad request method']);
+                $this->renderJson(['success' => false, 'message' => 'Bad request method'], 470);
             }
         } else {
-            header('Content-Type: application/json', true, 403);
-            echo json_encode(['success' => false, 'message' => 'User not allowed']);
+            $this->renderJson(['success' => false, 'message' => 'User not allowed'], 403);
         }
     }
 
@@ -86,9 +80,8 @@ class ArticleApi extends BaseController
                 $data = json_decode($json, true);
                 $surveyId = $data['survey_id'] ?? null;
                 if (!$surveyId) {
-                    header('Content-Type: application/json', true, 400);
-                    echo json_encode(['success' => false, 'message' => 'Données manquantes']);
-                    exit();
+                    $this->renderJson(['success' => false, 'message' => 'Missing data'], 400);
+                    return;
                 }
                 $answers = isset($data['survey_answers']) ? json_encode($data['survey_answers']) : '[]';
 
@@ -110,15 +103,12 @@ class ArticleApi extends BaseController
                         ])
                         ->execute();
                 }
-                header('Content-Type: application/json');
-                echo json_encode(['success' => true]);
+                $this->renderJson(['success' => true]);
             } else {
-                header('Content-Type: application/json', true, 470);
-                echo json_encode(['success' => false, 'message' => 'Bad request method']);
+                $this->renderJson(['success' => false, 'message' => 'Bad request method'], 470);
             }
         } else {
-            header('Content-Type: application/json', true, 403);
-            echo json_encode(['success' => false, 'message' => 'User not found']);
+            $this->renderJson(['success' => false, 'message' => 'User not allowed'], 403);
         }
     }
 
@@ -131,9 +121,8 @@ class ArticleApi extends BaseController
                     ->fetch();
 
                 if (!$survey) {
-                    header('Content-Type: application/json');
-                    echo json_encode(['success' => false, 'message' => "Aucun sondage trouvé pour l'article $articleId"]);
-                    exit();
+                    $this->renderJson(['success' => false, 'message' => "Aucun sondage trouvé pour l'article $articleId"]);
+                    return;
                 }
 
                 try {
@@ -148,9 +137,7 @@ class ArticleApi extends BaseController
                         ->fetch();
 
                     $previousAnswers = $previousReply ? json_decode($previousReply->Answers, true) : null;
-
-                    header('Content-Type: application/json');
-                    echo json_encode([
+                    $this->renderJson([
                         'success' => true,
                         'survey' => [
                             'id' => $survey->Id,
@@ -160,18 +147,14 @@ class ArticleApi extends BaseController
                         ]
                     ]);
                 } catch (Exception $e) {
-                    header('Content-Type: application/json');
-                    echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+                    $this->renderJson(['success' => false, 'message' => $e->getMessage()]);
                 }
             } else {
-                header('Content-Type: application/json', true, 470);
-                echo json_encode(['success' => false, 'message' => 'Bad request method']);
+                $this->renderJson(['success' => false, 'message' => 'Bad request method'], 470);
             }
         } else {
-            header('Content-Type: application/json', true, 403);
-            echo json_encode(['success' => false, 'message' => 'User not found']);
+            $this->renderJson(['success' => false, 'message' => 'User not found'], 403);
         }
-        exit();
     }
 
     public function uploadFile()
@@ -181,17 +164,15 @@ class ArticleApi extends BaseController
 
             if (empty($_FILES['file'])) {
                 $response['message'] = 'Aucun fichier sélectionné';
-                header('Content-Type: application/json');
-                echo json_encode($response);
-                exit();
+                $this->renderJson($response);
+                return;
             }
 
             $file = $_FILES['file'];
             if ($file['error'] !== UPLOAD_ERR_OK) {
                 $response['message'] = 'Erreur lors de l\'upload: ' . $this->getUploadErrorMessage($file['error']);
-                header('Content-Type: application/json');
-                echo json_encode($response);
-                exit();
+                $this->renderJson($response);
+                return;
             }
 
             $year = date('Y');
@@ -228,34 +209,26 @@ class ArticleApi extends BaseController
             } else {
                 $response['message'] = 'Erreur lors de l\'enregistrement du fichier';
             }
-            header('Content-Type: application/json');
-            echo json_encode($response);
+            $this->renderJson($response);
         } else {
-            header('Content-Type: application/json', true, 403);
-            echo json_encode(['success' => false, 'message' => 'User not allowed']);
+            $this->renderJson(['success' => false, 'message' => 'User not allowed'], 403);
         }
-        exit();
     }
 
     public function getAuthor($articleId)
     {
         if (!$articleId) {
-            header('Content-Type: application/json', true, 499);
-            echo json_encode(['success' => false, 'message' => 'Unknown article']);
+            $this->renderJson(['success' => false, 'message' => 'Unknown article'], 499);
         } else {
-            $query = $this->fluent
+            $result = $this->fluent
                 ->from('Article')
                 ->where('Article.Id = ?', $articleId)
                 ->join('Person ON Article.CreatedBy = Person.Id')
                 ->select('CASE WHEN Person.NickName != "" THEN Person.FirstName || " " || Person.LastName || " (" || Person.NickName || ")" ELSE Person.FirstName || " " || Person.LastName END AS PersonName')
-                ->select('Article.Title AS ArticleTitle');
-            
-            $result = $query->fetch();
-            
-            header('Content-Type: application/json');
-            echo json_encode(['author' => $result ? [$result] : []]);
+                ->select('Article.Title AS ArticleTitle')
+                ->fetch();
+            $this->renderJson(['author' => $result ? [$result] : []]);
         }
-        exit();
     }
 
 
