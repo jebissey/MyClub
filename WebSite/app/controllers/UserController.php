@@ -6,6 +6,7 @@ use DateTime;
 use PDO;
 use app\helpers\Alert;
 use app\helpers\Article;
+use app\helpers\Email;
 use app\helpers\Params;
 use app\helpers\PasswordManager;
 use app\helpers\PersonStatistics;
@@ -472,18 +473,7 @@ class UserController extends BaseController
         $body .= "---\n";
         $body .= "Envoyé le : " . date('d/m/Y à H:i') . "\n";
         $body .= "IP : " . $_SERVER['REMOTE_ADDR'] ?? 'Inconnue';
-        $headers = array(
-            'From' => $email,
-            'Reply-To' => $email,
-            'Return-Path' => $adminEmail,
-            'X-Mailer' => 'PHP/' . phpversion(),
-            'Content-Type' => 'text/plain; charset=UTF-8'
-        );
-        $headerString = '';
-        foreach ($headers as $key => $value) {
-            $headerString .= $key . ': ' . $value . "\r\n";
-        }
-        return mail($adminEmail, $subject, $body, $headerString);
+        return Email::send($email, $adminEmail, $subject, $body);
     }
 
 

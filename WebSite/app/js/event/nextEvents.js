@@ -414,7 +414,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
     let currentEventData = {};
 
-    // Gestion de l'ouverture de la modale email
     document.querySelectorAll('.email-btn').forEach(btn => {
         btn.addEventListener('click', function () {
             currentEventData = {
@@ -430,7 +429,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    // Mise à jour des options de type de message selon l'état de l'événement
     function updateEmailTypeOptions() {
         const hasMessages = currentEventData.messagesCount > 0;
         emailTypeSelect.innerHTML = '<option value="">Sélectionnez un type</option>';
@@ -444,12 +442,10 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    // Gestion du changement de type de message
     emailTypeSelect.addEventListener('change', function () {
         updateRecipientsOptions(this.value);
     });
 
-    // Mise à jour des options de destinataires selon le type de message
     function updateRecipientsOptions(messageType) {
         recipientsSelect.innerHTML = '<option value="">Sélectionnez les destinataires</option>';
 
@@ -467,7 +463,6 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    // Gestion de l'envoi du formulaire email
     emailForm.addEventListener('submit', function (e) {
         e.preventDefault();
 

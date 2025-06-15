@@ -36,7 +36,7 @@ class Email
                 $preferences = json_decode($person->Preferences, true);
                 if (isset($preferences['noAlerts']) && $preferences['noAlerts'] == 'on') {
                     $include = false;
-                    continue; 
+                    continue;
                 }
             }
 
@@ -80,5 +80,21 @@ class Email
             WHERE Person.Inactivated = 0 $and
         ");
         return $query->fetchAll();
+    }
+
+    public static function send($emailFrom, $emailTo, $subject, $body)
+    {
+        $headers = array(
+            'From' => $emailFrom,
+            'Reply-To' => $emailFrom,
+            'Return-Path' => $emailTo,
+            'X-Mailer' => 'PHP/' . phpversion(),
+            'Content-Type' => 'text/plain; charset=UTF-8'
+        );
+        $headerString = '';
+        foreach ($headers as $key => $value) {
+            $headerString .= $key . ': ' . $value . "\r\n";
+        }
+        return mail($emailTo, $subject, $body, $headerString);
     }
 }

@@ -56,7 +56,7 @@ class Event
             ->from('Event e')
             ->leftJoin('EventType et ON e.IdEventType = et.Id')
             ->leftJoin('Participant p ON e.Id = p.IdEvent AND p.IdPerson = ?', $person->Id ?? 0)
-            ->leftJoin('Message m ON m.EventId = e.Id')
+            ->leftJoin('Message m ON m.EventId = e.Id AND m."From" = "User"')
             ->where('e.StartTime > ?', $now)
             ->groupBy('e.Id');
 
@@ -110,7 +110,7 @@ class Event
             $limit = 10;
             $query = $this->fluent->from('Event e')
                 ->leftJoin('EventType et ON et.Id = e.IdEventType')
-                ->leftJoin('Message m ON m.EventId = e.Id')
+                ->leftJoin('Message m ON m.EventId = e.Id AND m."From" = "User"')
                 ->where('StartTime < ?', date('Y-m-d H:i:s'))
                 ->groupBy('e.Id')
                 ->limit($limit)
@@ -354,12 +354,12 @@ class Event
 
     public function getEventGroup($eventId)
     {
-        return $this->fluent
+        return ($this->fluent
             ->from('EventType et')
-            ->select('et.IdGroup')
+            ->select('et.IdGroup AS IdGroup')
             ->innerJoin('Event e ON et.Id = e.IdEventType')
             ->where('e.Id', $eventId)
-            ->fetchSingle();
+            ->fetch())->IdGroup ?? null;
     }
 
     #region Private functions

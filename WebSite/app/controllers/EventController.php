@@ -59,7 +59,10 @@ class EventController extends BaseController
             'userEmail' => $userEmail,
             'isRegistered' => $event->isUserRegistered($eventId, $userEmail),
             'navItems' => $this->getNavItems(),
-            'countOfMessages' => $this->fluent->from('Message')->where('EventId', $eventId)->count(),
+            'countOfMessages' => $this->fluent
+                ->from('Message')
+                ->where('Message."From"', 'User')
+                ->where('EventId', $eventId)->count(),
             'eventNeeds' => $event->getEventNeeds($eventId),
             'participantSupplies' => $event->getParticipantSupplies($eventId),
             'userSupplies' => $event->getUserSupplies($eventId, $userEmail)
@@ -163,6 +166,7 @@ class EventController extends BaseController
                 ->select('Message.*, Person.FirstName, Person.LastName, Person.NickName, Person.Avatar, Person.UseGravatar, Person.Email')
                 ->join('Person ON Person.Id = Message.PersonId')
                 ->where('EventId', $eventId)
+                ->where('Message."From" = "User"')
                 ->orderBy('Message.Id ASC')
                 ->fetchAll();
 

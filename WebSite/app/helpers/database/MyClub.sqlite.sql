@@ -165,7 +165,7 @@ CREATE TABLE IF NOT EXISTS "Message" (
 	"Id"	INTEGER,
 	"EventId"	INTEGER NOT NULL,
 	"PersonId"	INTEGER NOT NULL,
-	"Text"	INTEGER NOT NULL,
+	"Text"	TEXT NOT NULL,
 	"LastUpdate"	TEXT NOT NULL DEFAULT current_timestamp,
 	"From"	TEXT NOT NULL DEFAULT 'User',
 	PRIMARY KEY("Id"),
