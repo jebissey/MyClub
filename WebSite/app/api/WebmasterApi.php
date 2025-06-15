@@ -29,7 +29,6 @@ class WebmasterApi extends BaseController
         } else {
             $this->renderJson(['success' => false, 'message' => 'User not allowed'], 403);
         }
-        exit();
     }
 
     public function getPersonsByGroup($id)
@@ -133,7 +132,6 @@ class WebmasterApi extends BaseController
         } else {
             $this->renderJson(['success' => false, 'message' => 'User not allowed'], 403);
         }
-        exit();
     }
 
     public function updateNavbarPositions()

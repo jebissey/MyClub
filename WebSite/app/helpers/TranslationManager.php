@@ -32,7 +32,6 @@ class TranslationManager
         $_COOKIE[self::COOKIE_NAME] = $language;
 
         header('Location: ' . $_SERVER['PHP_SELF']);
-        exit;
     }
 
     public function getCurrentLanguage()

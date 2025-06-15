@@ -74,7 +74,7 @@ class MediaController extends BaseController
 
                 if (!file_exists($filePath)) {
                     $this->application->error404();
-                    exit;
+                    return;
                 }
 
                 $finfo = finfo_open(FILEINFO_MIME_TYPE);
@@ -85,7 +85,7 @@ class MediaController extends BaseController
                 header('Content-Length: ' . filesize($filePath));
                 header('Content-Disposition: inline; filename="' . $filename . '"');
                 readfile($filePath);
-                exit;
+                return;
             } else {
                 $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
             }

@@ -99,7 +99,6 @@ class EventApi extends BaseController
                 ->where('EventTypeAttribute.IdEventType', $eventTypeId);
             $this->renderJson(['attributes' => $query->fetchAll()]);
         }
-        exit();
     }
 
     public function updateAttribute()
@@ -263,7 +262,6 @@ class EventApi extends BaseController
         } else {
             $this->renderJson(['success' => false, 'message' => 'User not allowed'], 403);
         }
-        exit();
     }
     private function insertEventAttributes(int $eventId, array $attributes): void
     {
@@ -375,7 +373,6 @@ class EventApi extends BaseController
         } else {
             $this->renderJson(['success' => false, 'message' => 'User not allowed'], 403);
         }
-        exit();
     }
 
     public function saveNeed()
@@ -475,7 +472,6 @@ class EventApi extends BaseController
         } else {
             $this->renderJson(['success' => false, 'message' => 'User not allowed'], 403);
         }
-        exit();
     }
 
     public function saveNeedType()

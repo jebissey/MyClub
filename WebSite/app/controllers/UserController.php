@@ -416,9 +416,7 @@ class UserController extends BaseController
     {
         if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             $this->getPerson();
-            $this->render('app/views/contact.latte', $this->params->getAll([
-                'navItems' => $this->getNavItems(),
-            ]));
+            $this->render('app/views/contact.latte', $this->params->getAll(['navItems' => $this->getNavItems()]));
         } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $name = trim($_POST['name'] ?? '');
             $email = trim($_POST['email'] ?? '');
@@ -437,10 +435,9 @@ class UserController extends BaseController
             }
             if (empty($errors)) {
                 $emailSent = $this->sendContactEmail($name, $email, $message);
-
                 if ($emailSent) {
                     header('Location: /contact?success=' . urlencode('Votre message a été envoyé avec succès. Nous vous répondrons dans les plus brefs délais.'));
-                    exit;
+                    return;
                 } else {
                     $params = [
                         'error' => 'Une erreur est survenue lors de l\'envoi du message. Veuillez réessayer.',
@@ -450,7 +447,7 @@ class UserController extends BaseController
                     ];
                     $queryString = http_build_query($params);
                     header('Location: /contact?' . $queryString);
-                    exit;
+                    return;
                 }
             } else {
                 $params = [
@@ -461,7 +458,6 @@ class UserController extends BaseController
                 ];
                 $queryString = http_build_query($params);
                 header('Location: /contact?' . $queryString);
-                exit;
             }
         }
     }
