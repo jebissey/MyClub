@@ -30,7 +30,6 @@ class TranslationManager
 
         setcookie(self::COOKIE_NAME, $language, time() + (self::COOKIE_EXPIRATION), self::COOKIE_PATH);
         $_COOKIE[self::COOKIE_NAME] = $language;
-
         header('Location: ' . $_SERVER['PHP_SELF']);
     }
 

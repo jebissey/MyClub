@@ -155,8 +155,7 @@ class UserController extends BaseController
         $this->fluent->update('Person')->set(['LastSignOut' => date('Y-m-d H:i:s')])->where('Email COLLATE NOCASE', $_SESSION['user'])->execute();
         unset($_SESSION['user']);
         $_SESSION['navbar'] = '';
-        header('Location:/');
-        exit;
+        $this->flight->redirect('/');
     }
     #endregion
 
@@ -436,8 +435,7 @@ class UserController extends BaseController
             if (empty($errors)) {
                 $emailSent = $this->sendContactEmail($name, $email, $message);
                 if ($emailSent) {
-                    header('Location: /contact?success=' . urlencode('Votre message a été envoyé avec succès. Nous vous répondrons dans les plus brefs délais.'));
-                    return;
+                    $this->flight->redirect('/contact?success=' . urlencode('Votre message a été envoyé avec succès. Nous vous répondrons dans les plus brefs délais.'));
                 } else {
                     $params = [
                         'error' => 'Une erreur est survenue lors de l\'envoi du message. Veuillez réessayer.',
@@ -446,8 +444,7 @@ class UserController extends BaseController
                         'old_message' => $message
                     ];
                     $queryString = http_build_query($params);
-                    header('Location: /contact?' . $queryString);
-                    return;
+                    $this->flight->redirect('/contact?' . $queryString);
                 }
             } else {
                 $params = [
@@ -457,7 +454,7 @@ class UserController extends BaseController
                     'old_message' => $message
                 ];
                 $queryString = http_build_query($params);
-                header('Location: /contact?' . $queryString);
+                $this->flight->redirect('/contact?' . $queryString);
             }
         }
     }
