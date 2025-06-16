@@ -104,31 +104,23 @@ class UserController extends BaseController
                             $this->application->error479($email, __FILE__, __LINE__);
                         } else {
                             if (PasswordManager::verifyPassword($password, $person->Password ?? '')) {
+                                $lastActivity = $this->fluentForLog->from('Log')
+                                    ->select(null)
+                                    ->select('CreatedAt')
+                                    ->where('Who COLLATE NOCASE', $email)
+                                    ->orderBy('Id DESC')
+                                    ->limit(1)
+                                    ->fetch('CreatedAt');
+                                if ($lastActivity) {
+                                    $this->fluent->update('Person')
+                                        ->set('LastSignOut', $lastActivity)
+                                        ->where('Email COLLATE NOCASE', $email)
+                                        ->execute();
+                                }
+                                $this->fluent->update('Person')->set(['LastSignIn' => date('Y-m-d H:i:s')])->where('Email COLLATE NOCASE', $email)->execute();
                                 $_SESSION['user'] = $email;
                                 $_SESSION['navbar'] = '';
-                                $this->application->message("Sign in succeeded with $email", 1);
-                                $now = date('Y-m-d H:i:s');
-                                $signOutCount = $this->fluentForLog->from('Log')
-                                    ->select(null)
-                                    ->select('COUNT(*) AS count')
-                                    ->where('Who COLLATE NOCASE', $email)
-                                    ->where('Uri', '/user/sign/out')
-                                    ->where('CreatedAt > ?', $person->LastSignIn)
-                                    ->fetch('count');
-                                if ($signOutCount == 0) {
-                                    $lastActivity = $this->fluentForLog->from('Log')
-                                        ->select(null)
-                                        ->select('CreatedAt')
-                                        ->where('Who COLLATE NOCASE', $email)
-                                        ->where('CreatedAt > ?', $person->LastSignIn)
-                                        ->orderBy('CreatedAt DESC')
-                                        ->limit(1)
-                                        ->fetch('CreatedAt');
-                                    if ($lastActivity) {
-                                        $this->fluent->update('Person')->set('LastSignOut', $lastActivity)->where('Email COLLATE NOCASE', $email)->execute();
-                                    }
-                                }
-                                $this->fluent->update('Person')->set(['LastSignIn' => $now])->where('Email COLLATE NOCASE', $email)->execute();
+                                $this->application->message("Sign in succeeded with $email", 1, 200);
                             } else {
                                 $this->application->error482("sign in failed with $email address", __FILE__, __LINE__);
                             }
