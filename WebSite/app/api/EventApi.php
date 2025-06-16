@@ -65,8 +65,7 @@ class EventApi extends BaseController
                 $this->renderJson(['success' => true]);
             } catch (\Exception $e) {
                 $this->pdo->rollBack();
-                http_response_code(500);
-                echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+                $this->renderJson(['success' => false, 'message' => $e->getMessage()], 500);
             }
         } else {
             $this->renderJson(['success' => false, 'message' => 'User not allowed'], 403);
@@ -634,8 +633,6 @@ class EventApi extends BaseController
         }
 
         $event = new Event($this->pdo);
-
-        // Vérifier que l'utilisateur est inscrit à l'événement
         if (!$event->isUserRegistered($eventId, $userEmail)) {
             http_response_code(403);
             $this->renderJson(['success' => false, 'message' => 'Non inscrit à cet événement']);
@@ -643,9 +640,7 @@ class EventApi extends BaseController
         }
 
         $success = $event->updateUserSupply($eventId, $userEmail, $needId, $supply);
-
         if ($success) {
-            // Récupérer les données mises à jour pour renvoyer les nouveaux totaux
             $eventNeeds = $event->getEventNeeds($eventId);
             $updatedNeed = null;
 
@@ -661,14 +656,13 @@ class EventApi extends BaseController
                 }
             }
 
-            echo json_encode([
+            $this->renderJson([
                 'success' => true,
                 'message' => 'Apport mis à jour avec succès',
                 'updatedNeed' => $updatedNeed
             ]);
         } else {
-            http_response_code(500);
-            $this->renderJson(['success' => false, 'message' => 'Erreur lors de la mise à jour']);
+            $this->renderJson(['success' => false, 'message' => 'Erreur lors de la mise à jour'], 500);
         }
     }
 
