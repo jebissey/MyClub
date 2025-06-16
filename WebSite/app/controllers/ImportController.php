@@ -125,8 +125,8 @@ class ImportController extends BaseController
     public function getHeadersFromCSV()
     {
         if (!isset($_FILES['csvFile']) || $_FILES['csvFile']['error'] != 0) {
-            echo json_encode(['error' => 'Fichier non valide']);
-            exit;
+            $this->renderJson(['error' => 'Fichier non valide']);
+            return;
         }
 
         $headerRow = intval($_POST['headerRow']);
@@ -144,7 +144,6 @@ class ImportController extends BaseController
         }
         fclose($file);
 
-        echo json_encode(['headers' => $headers]);
-        exit;
+        $this->renderJson(['headers' => $headers]);
     }
 }

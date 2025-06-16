@@ -345,7 +345,6 @@ class Event
                     ])
                     ->execute();
             }
-
             return true;
         } catch (Exception $e) {
             return false;

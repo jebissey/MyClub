@@ -179,7 +179,7 @@ document.addEventListener('DOMContentLoaded', function () {
             })
             .catch(error => {
                 console.error('Erreur:', error);
-                showNotification('Erreur de connexion', 'error');
+                showNotification('Erreur ' + error, 'error');
             })
             .finally(() => {
                 buttonElement.disabled = false;
