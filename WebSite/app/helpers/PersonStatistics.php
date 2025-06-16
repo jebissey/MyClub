@@ -409,7 +409,7 @@ class PersonStatistics
             ->where('datetime(e.StartTime) BETWEEN datetime(?) AND datetime(?)', [$seasonStart, $seasonEnd])
             ->where('"From"', 'User')
             ->fetch('count');
-        $totalMessagesCount = $this->fluent
+        $totalUsersMessagesCount = $this->fluent
             ->from('Message m')
             ->select(null)
             ->select('COUNT(*) AS count')
@@ -417,12 +417,35 @@ class PersonStatistics
             ->where('datetime(e.StartTime) BETWEEN datetime(?) AND datetime(?)', [$seasonStart, $seasonEnd])
             ->where('"From"', 'User')
             ->fetch('count');
+        
+        $webappMessagesCount = $this->fluent
+            ->from('Message m')
+            ->select(null)
+            ->select('COUNT(*) AS count')
+            ->join('Event e ON m.EventId = e.Id')
+            ->where('m.PersonId', $personId)
+            ->where('datetime(e.StartTime) BETWEEN datetime(?) AND datetime(?)', [$seasonStart, $seasonEnd])
+            ->where('"From"', 'Webapp')
+            ->fetch('count');
+        $totalWebappMessagesCount = $this->fluent
+            ->from('Message m')
+            ->select(null)
+            ->select('COUNT(*) AS count')
+            ->join('Event e ON m.EventId = e.Id')
+            ->where('datetime(e.StartTime) BETWEEN datetime(?) AND datetime(?)', [$seasonStart, $seasonEnd])
+            ->where('"From"', 'Webapp')
+            ->fetch('count');
         return [
             'user'       => $userMessagesCount,
-            'total'      => $totalMessagesCount,
-            'percentage' => $totalMessagesCount > 0
-                ? round(($userMessagesCount / $totalMessagesCount) * 100, 2)
-                : 0
+            'totalUsers'      => $totalUsersMessagesCount,
+            'percentage' => $totalUsersMessagesCount > 0
+                ? round(($userMessagesCount / $totalUsersMessagesCount) * 100, 2)
+                : 0,
+            'webapp'       => $webappMessagesCount,
+            'totalWebapp'      => $totalWebappMessagesCount,
+            'percentageWebapp' => $totalWebappMessagesCount > 0
+                ? round(($webappMessagesCount / $totalWebappMessagesCount) * 100, 2)
+                : 0,
         ];
     }
 }

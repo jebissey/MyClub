@@ -214,7 +214,20 @@
                                 </div>
                             </div>
                             <small class="text-muted">
-                                {$stats['participantMessages']['user']} message(s) sur un total de {$stats['participantMessages']['total']}
+                                {$stats['participantMessages']['user']} message(s) créés sur un total de {$stats['participantMessages']['totalUsers']}
+                            </small>
+                        </div>
+                        <div class="mb-3">
+                            <div class="progress" style="height: 25px;">
+                                <div class="progress-bar bg-success" role="progressbar" 
+                                    style="width: {$stats['participantMessages']['percentage']}%;" 
+                                    aria-valuenow="{$stats['participantMessages']['percentage']}" 
+                                    aria-valuemin="0" aria-valuemax="100">
+                                    {$stats['participantMessages']['percentageWebapp']}%
+                                </div>
+                            </div>
+                            <small class="text-muted">
+                                {$stats['participantMessages']['webapp']} message(s) reçus sur un total de {$stats['participantMessages']['totalWebapp']}
                             </small>
                         </div>
                     </div>
