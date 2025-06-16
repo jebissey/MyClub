@@ -321,10 +321,10 @@ class EventApi extends BaseController
                 }
                 if ($participants) {
                     $eventLink = 'https://' . $_SERVER['HTTP_HOST'] . '/events/' . $event->Id;
-                    $sentError = 0;
-                    $sent = 0;
+                    $bccList = [];
+
                     foreach ($participants as $participant) {
-                        $sent++;
+                        $bccList[] = $participant->Email;
                         $this->fluent->insertInto('Message')
                             ->values([
                                 'EventId' => $eventId,
@@ -333,17 +333,28 @@ class EventApi extends BaseController
                                 '"From"' => 'Webapp'
                             ])
                             ->execute();
-                        if (!mail($participant->Email, $emailTitle, $message . $eventLink)) {
-                            $sentError++;
-                        }
                     }
+                    $adminEmail = $this->settings->get('contactEmail');
+                    if (!filter_var($adminEmail, FILTER_VALIDATE_EMAIL)) {
+                        $this->renderJson(['success' => false, 'message' => 'Invalid contactEmmail in file ' + __FILE__ + ' at line ' + __LINE__], 404);
+                        return;
+                    }
+                    Email::send(
+                        $adminEmail,
+                        $adminEmail,
+                        $emailTitle,
+                        $message . "\n\n" . $eventLink,
+                        null,
+                        $bccList,
+                        false
+                    );
+                    mail($participant->Email, $emailTitle, $message . $eventLink);
+                    $this->renderJson(['success' => true]);
                 } else {
                     $this->renderJson(['success' => false, 'message' => 'No participant'], 404);
-                    return;
                 }
-                $this->renderJson(['success' => true, 'message' => "sent = $sent ; sentError = $sentError"]);
             } else {
-                $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
+                $this->renderJson(['success' => false, 'message' =>  'Method ' + $_SERVER['REQUEST_METHOD'] + ' invalid in file ' + __FILE__ + ' at line ' + __LINE__]);
             }
         } else {
             $this->renderJson(['success' => false, 'message' => 'User not allowed'], 403);
