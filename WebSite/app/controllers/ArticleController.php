@@ -166,7 +166,7 @@ class ArticleController extends TableController
                 'carouselItems' => $this->fluent->from('Carousel')->where('IdArticle', $id)->fetchAll(),
             ]));
         } else if ($person == '') {
-            $this->application->message('Il faut être connecté pour pouvoir consuler cet article');
+            $this->application->message('Il faut être connecté pour pouvoir consuler cet article', 5000, 403);
         } else {
             $this->application->error403(__FILE__, __LINE__);
         }

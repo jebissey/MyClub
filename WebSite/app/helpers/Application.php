@@ -48,9 +48,9 @@ class Application
     }
 
 
-    public function message($message, $timeout = 5000)
+    public function message($message, $timeout = 5000, $code = 0)
     {
-        $this->error(0, $message, $timeout);
+        $this->error($code, $message, $timeout, false);
     }
 
 
@@ -121,12 +121,12 @@ class Application
     }
 
     #region private Function
-    private function error($code, $message, $timeout = 1000)
+    private function error($code, $message, $timeout = 1000, $displayCode = true)
     {
         $this->flight->setData('code', $code);
         $this->flight->setData('message', $message);
 
-        if ($code) {
+        if ($code && $displayCode) {
             echo "<h1>$code</h1>";
         }
         echo "<h2>$message</h2>";
