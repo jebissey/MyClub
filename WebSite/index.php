@@ -307,6 +307,17 @@ $flight->route('/favicon.ico', function() use ($applicationHelper) {
     exit;
 });
 
+$flight->route('/my-club-120.png', function() use ($applicationHelper) {
+    $path = __DIR__ . '/app/images/my-club-120.png';
+    if (file_exists($path)) {
+        $content = file_get_contents($path);
+        Flight::response()->header('Content-Type', 'image/png');
+        Flight::response()->write($content);
+    } else {
+        $applicationHelper->error404(); 
+    }
+});
+
 $flight->route('/*',            function() use ($applicationHelper) { $applicationHelper->error404(); });
 
 $flight->map('error', function  (Throwable $ex) use ($userController, $applicationHelper){
