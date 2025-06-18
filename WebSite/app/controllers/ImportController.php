@@ -2,8 +2,6 @@
 
 namespace app\controllers;
 
-use PDO;
-
 class ImportController extends BaseController
 {
     private $importSettings;
@@ -71,7 +69,7 @@ class ImportController extends BaseController
                 $file = fopen($_FILES['csvFile']['tmp_name'], 'r');
                 $currentRow = 0;
 
-                while (($data = fgetcsv($file)) !== false) {
+                while (($data = fgetcsv($file, 0, ",", "\"", "\\")) !== false) {
                     $currentRow++;
                     if ($currentRow <= $headerRow) continue;
 

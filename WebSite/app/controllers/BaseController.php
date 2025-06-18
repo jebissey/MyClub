@@ -18,7 +18,7 @@ use app\helpers\TranslationManager;
 
 abstract class BaseController extends BaseHelper
 {
-    protected const VERSION = 0.4;
+    protected const VERSION = 0.5;
 
     protected $fluent;
     protected Engine $flight;

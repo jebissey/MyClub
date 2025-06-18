@@ -316,6 +316,7 @@ $flight->route('/my-club-120.png', function() use ($applicationHelper) {
     } else {
         $applicationHelper->error404(); 
     }
+    exit;
 });
 
 $flight->route('/*',            function() use ($applicationHelper) { $applicationHelper->error404(); });
