@@ -163,7 +163,7 @@ CREATE TABLE IF NOT EXISTS "Languages" (
 );
 CREATE TABLE IF NOT EXISTS "Message" (
 	"Id"	INTEGER,
-	"EventId"	INTEGER NOT NULL,
+	"EventId"	INTEGER,
 	"PersonId"	INTEGER NOT NULL,
 	"Text"	TEXT NOT NULL,
 	"LastUpdate"	TEXT NOT NULL DEFAULT current_timestamp,

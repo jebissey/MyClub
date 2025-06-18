@@ -50,7 +50,7 @@ class EmailController extends BaseController
 
     public function fetchEmailsForArticle($idArticle)
     {
-        if ($this->getPerson(['Redactor'])) {
+        if ($person = $this->getPerson(['Redactor'])) {
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $idGroup = $this->fluent->from('Article')->where('Id', $idArticle)->fetch('IdGroup');
                 $idSurvey = $this->fluent->from('Survey')->where('IdArticle', $idArticle)->fetch('Id');
@@ -73,14 +73,37 @@ class EmailController extends BaseController
                     }
                     if ($include) {
                         $filteredEmails[] = $person->Email;
+                        $this->fluent->insertInto('Message')
+                            ->values([
+                                'EventId' => null,
+                                'PersonId' => $person->Id,
+                                'Text' =>  "New article \n\n /articles/" . $idArticle,
+                                '"From"' => 'Webapp'
+                            ])
+                            ->execute();
                     }
                 }
-                $this->render('app/views/emails/copyToClipBoard.latte', $this->params->getAll([
-                    'emailsJson' => json_encode($filteredEmails),
-                    'emails' => $filteredEmails,
-                    'filters' => "subcription to new article",
-                    'phones' => $this->fluent->from('Person')->where('Inactivated', 0)->fetchAll('Email', 'Phone'),
-                ]));
+                $article = $this->fluent->from('Article')->where('Id', $idArticle)->fetch();
+                if (!$article) die('Fatal program error in file ' + __FILE__ + ' at line ' + __LINE__);
+                $articleCreatorEmail = $this->fluent->from('Person')->where('Id', $article->CreatedBy)->fetch('Email');
+                if (!$articleCreatorEmail) {
+                    $this->renderJson(['success' => false, 'message' => 'Invalid Email in file ' + __FILE__ + ' at line ' + __LINE__], 404);
+                     $this->application->error471('Invalid Email', __FILE__, __LINE__);
+                    return;
+                }
+                $emailTitle = 'BNW - Un nouvel article est disponible';
+                $message = "Conformement à vos souhaits, ce message vous signale la présence d'un nouvel article";
+                Email::send(
+                    $articleCreatorEmail,
+                    $articleCreatorEmail,
+                    $emailTitle,
+                    $message . "\n\n" . 'https://' . $_SERVER['HTTP_HOST'] . '/articles/' . $idArticle,
+                    null,
+                    $filteredEmails,
+                    false
+                );
+                $_SESSION['success'] = "Un courriel a été envoyé aux abonnés";
+                $this->flight->redirect('/articles/' . $idArticle);
             } else {
                 $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
             }

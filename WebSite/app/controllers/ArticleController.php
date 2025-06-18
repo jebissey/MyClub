@@ -164,6 +164,7 @@ class ArticleController extends TableController
                 'latestArticleHasSurvey' => (new Article($this->pdo))->hasSurvey($id),
                 'canReadPool' => $this->authorizations->canPersonReadSurveyResults($chosenArticle, $person),
                 'carouselItems' => $this->fluent->from('Carousel')->where('IdArticle', $id)->fetchAll(),
+                'message' => $messages,
             ]));
         } else if ($person == '') {
             $this->application->message('Il faut être connecté pour pouvoir consuler cet article', 5000, 403);
