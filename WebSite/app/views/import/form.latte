@@ -33,6 +33,15 @@
                             <li>Nouveaux enregistrements : {$results['created']}</li>
                             <li>Enregistrements mis à jour : {$results['updated']}</li>
                             <li>Enregistrements inactivés : {$results['inactivated']}</li>
+                            {if $results['messages']}
+                            <hr>
+                            <h5>Détails :</h5>
+                            <ul>
+                            {foreach $results['messages'] as $message}
+                                <li>{$message}</li>
+                            {/foreach}
+                            </ul>
+                            {/if}
                         </ul>
                     </div>
                 {/if}

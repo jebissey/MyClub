@@ -329,19 +329,21 @@ class EventApi extends BaseController
                             ->values([
                                 'EventId' => $eventId,
                                 'PersonId' => $participant->Id,
-                                'Text' => $emailTitle,
+                                'Text' => $emailTitle . "\n\n" . $message,
                                 '"From"' => 'Webapp'
                             ])
                             ->execute();
                     }
-                    $adminEmail = $this->settings->get('contactEmail');
-                    if (!filter_var($adminEmail, FILTER_VALIDATE_EMAIL)) {
-                        $this->renderJson(['success' => false, 'message' => 'Invalid contactEmmail in file ' + __FILE__ + ' at line ' + __LINE__], 404);
+                    $eventCreatorEmail = $this->fluent->from('Person')
+                        ->where('Id', $event->CreatedBy)
+                        ->fetch('Email');
+                    if (!$eventCreatorEmail) {
+                        $this->renderJson(['success' => false, 'message' => 'Invalid Email in file ' + __FILE__ + ' at line ' + __LINE__], 404);
                         return;
                     }
                     Email::send(
-                        $adminEmail,
-                        $adminEmail,
+                        $eventCreatorEmail,
+                        $eventCreatorEmail,
                         $emailTitle,
                         $message . "\n\n" . $eventLink,
                         null,

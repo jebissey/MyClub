@@ -91,6 +91,7 @@ class ImportController extends BaseController
                         } else {
                             $query = $this->pdo->prepare("INSERT INTO Person (Email, FirstName, LastName, phone, Imported) VALUES (?, ?, ?, ?, 1)");
                             $this->results['created']++;
+                            $this->results['messages'][] = '(+) ' . $personData['Email'];
                         }
                         array_push($this->foundEmails, $personData['Email']);
                         $query->execute([
@@ -107,9 +108,9 @@ class ImportController extends BaseController
                     if (!in_array($person->Email, $this->foundEmails)) {
                         $this->fluent->update('Person', ['Inactivated' => 1], $person->Id)->execute();
                         $this->results['inactivated']++;
+                        $this->results['messages'][] = '(-) ' . $person->Email;
                     }
                 }
-
                 $this->render('app/views/import/form.latte', $this->params->getAll([
                     'importSettings' => $this->importSettings,
                     'results' => $this->results
