@@ -63,7 +63,7 @@ class Event
             $audienceCondition = '(et.IdGroup IS NULL OR et.IdGroup IN (SELECT IdGroup FROM PersonGroup WHERE IdPerson = ?))';
             $params = [$person->Id];
         }
-        $query->where("e.StartTime > DATETIME('now') AND " . $audienceCondition, ...$params)
+        $query->where("e.StartTime > DATETIME('now') AND et.Inactivated = 0 AND " . $audienceCondition, ...$params)
             ->groupBy('e.Id')
             ->select('COUNT(m.Id) AS MessageCount')
             ->select('et.Name AS EventTypeName, et.IdGroup AS EventTypeIdGroup, p.Id As Booked')
@@ -154,6 +154,7 @@ class Event
             ->leftJoin("'Group' ON et.IdGroup = 'Group'.Id")
             ->where('datetime(e.StartTime) >= ?', $startOfCurrentWeek->format('Y-m-d H:i:s'))
             ->where('datetime(e.StartTime) < ?', $endOfThirdWeek->format('Y-m-d H:i:s'))
+            ->where('et.Inactivated = 0')
             ->groupBy('e.Id')
             ->orderBy('e.StartTime')
             ->fetchAll();
