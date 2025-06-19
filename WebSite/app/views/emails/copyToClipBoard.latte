@@ -1,6 +1,7 @@
 {layout '../admin/eventManager.latte'}
 
 {block content}
+<div id="liveAlertPlaceholder"></div>
 <div class="container-fluid">
     <h2>Liste des adresses email ({count($emails)}) avec {$filters}</h2>
     <ul>
@@ -17,9 +18,9 @@
         var emailsArray = JSON.parse({$emailsJson});
         var emailsString = emailsArray.join(' , ');
         navigator.clipboard.writeText(emailsString).then(function() {
-            alert('Les emails ont été copiés dans le presse-papiers !');
+            appendAlert('Les emails ont été copiés dans le presse-papiers', 'info');
         }, function(err) {
-            alert('Erreur lors de la copie dans le presse-papiers: ' + err);
+            appendAlert('Erreur lors de la copie dans le presse-papiers: ' + err, 'danger');
         });
     }
     copyToClipboard();
