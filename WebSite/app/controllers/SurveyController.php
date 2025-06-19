@@ -55,11 +55,10 @@ class SurveyController extends BaseController
                         ->where('Id', $survey->Id)
                         ->execute();
                 } else {
-
                     $this->fluent->insertInto('Survey')
                         ->values([
                             'Question' => $question,
-                            'Options' => $options,
+                            'Options' => $optionsJson,
                             'IdArticle' => $articleId,
                             'ClosingDate' => $closingDate
                         ])
