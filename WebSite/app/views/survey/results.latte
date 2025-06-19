@@ -63,17 +63,17 @@
                                 </thead>
                                 <tbody>
                                     <tr>
-                                        {foreach $options as $option}
+                                    {foreach $options as $option}
                                         <td class="align-top">
                                             <ul class="list-unstyled mb-0">
-                                                {foreach $participants as $participant}
-                                                    {if in_array($option, $participant['answers'])}
-                                                    <li>{$participant['name']}</li>
-                                                    {/if}
-                                                {/foreach}
+                                            {foreach $participants as $participant}
+                                                {if in_array($option, $participant['answers'])}
+                                                <li>{$participant['name']}</li>
+                                                {/if}
+                                            {/foreach}
                                             </ul>
                                         </td>
-                                        {/foreach}
+                                    {/foreach}
                                     </tr>
                                 </tbody>
                             </table>

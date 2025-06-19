@@ -51,26 +51,23 @@ class Event
 
     public function getNextEvents($person)
     {
-        $now = date('Y-m-d H:i:s');
         $query = $this->fluent
             ->from('Event e')
             ->leftJoin('EventType et ON e.IdEventType = et.Id')
             ->leftJoin('Participant p ON e.Id = p.IdEvent AND p.IdPerson = ?', $person->Id ?? 0)
-            ->leftJoin('Message m ON m.EventId = e.Id AND m."From" = "User"')
-            ->where('e.StartTime > ?', $now)
-            ->groupBy('e.Id');
-
+            ->leftJoin('Message m ON m.EventId = e.Id AND m."From" = "User"');
         if ($person === false) {
-            $query->where("e.Audience = '" . EventAudience::ForAll->value . "'");
-            $query->where("et.IdGroup IS NULL");
+            $audienceCondition = 'e.Audience = \'' . EventAudience::ForAll->value . '\' AND et.IdGroup IS NULL';
+            $params = [];
         } else {
-            $query->where("et.IdGroup IS NULL OR et.IdGroup IN (SELECT IdGroup FROM PersonGroup WHERE IdPerson = ?)", $person->Id);
+            $audienceCondition = '(et.IdGroup IS NULL OR et.IdGroup IN (SELECT IdGroup FROM PersonGroup WHERE IdPerson = ?))';
+            $params = [$person->Id];
         }
-
-        $query->select('COUNT(m.Id) AS MessageCount');
-        $query->select('et.Name AS EventTypeName, et.IdGroup AS EventTypeIdGroup, p.Id As Booked')
+        $query->where("e.StartTime > DATETIME('now') AND " . $audienceCondition, ...$params)
+            ->groupBy('e.Id')
+            ->select('COUNT(m.Id) AS MessageCount')
+            ->select('et.Name AS EventTypeName, et.IdGroup AS EventTypeIdGroup, p.Id As Booked')
             ->orderBy('e.StartTime');
-
         return $this->events($query->fetchAll());
     }
 

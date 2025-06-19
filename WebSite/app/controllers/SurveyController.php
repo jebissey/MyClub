@@ -38,13 +38,18 @@ class SurveyController extends BaseController
                 $question = $_POST['question'] ?? '';
                 $closingDate = $_POST['closingDate'] ?? date('now', '+7 days');
                 $visibility = $_POST['visibility'] ?? 'redactor';
-                $options = isset($_POST['options']) ? json_encode($_POST['options']) : '[]';
-
+                $options = [];
+                if (isset($_POST['options']) && is_array($_POST['options'])) {
+                    foreach ($_POST['options'] as $option) {
+                        $options[] = str_replace('"', "''", $option);
+                    }
+                }
+                $optionsJson = json_encode($options);
                 $survey = $this->fluent->from('Survey')->where('IdArticle', $articleId)->fetch();
                 if ($survey) {
                     $this->fluent->update('Survey')
                         ->set(['Question' => $question])
-                        ->set(['Options' => $options])
+                        ->set(['Options' => $optionsJson])
                         ->set(['ClosingDate' => $closingDate])
                         ->set(['Visibility' => $visibility])
                         ->where('Id', $survey->Id)
@@ -83,22 +88,16 @@ class SurveyController extends BaseController
                 $participants = [];
                 $results = [];
                 $options = json_decode($survey->Options);
-
                 foreach ($options as $option) {
                     $results[$option] = 0;
                 }
-
                 foreach ($replies as $reply) {
                     $answers = json_decode($reply->Answers);
-                    $person = $this->fluent->from('Person')
-                        ->where('Id', $reply->IdPerson)
-                        ->fetch();
-
+                    $person = $this->fluent->from('Person')->where('Id', $reply->IdPerson)->fetch();
                     $participants[] = [
                         'name' => $person->FirstName . ' ' . $person->LastName,
                         'answers' => $answers
                     ];
-
                     foreach ($answers as $answer) {
                         if (isset($results[$answer])) {
                             $results[$answer]++;
