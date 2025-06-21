@@ -33,6 +33,7 @@ class ArticleController extends TableController
             'timestamp' => $_GET['timestamp'] ?? '',
             'lastUpdate' => $_GET['lastUpdate'] ?? '',
             'published' => $_GET['published'] ?? '',
+            'pool' => $_GET['pool'] ?? '',
             'GroupName' => $_GET['GroupName'] ?? '',
             'Content' => $_GET['Content'] ?? '',
         ];
@@ -40,28 +41,33 @@ class ArticleController extends TableController
             ['name' => 'PersonName', 'label' => 'Créé par'],
             ['name' => 'title', 'label' => 'Titre'],
             ['name' => 'lastUpdate', 'label' => 'Dernière modification'],
-            ['name' => 'published', 'label' => 'Publié'],
+            ['name' => 'pool', 'label' => 'Sondage'],
             ['name' => 'GroupName', 'label' => 'Groupe'],
             ['name' => 'Content', 'label' => 'Contenu'],
         ];
+        if ($this->authorizations->isEditor()) {
+            $filterConfig[] = ['name' => 'published', 'label' => 'Publié'];
+        }
         $columns = [
             ['field' => 'PersonName', 'label' => 'Créé par'],
             ['field' => 'Title', 'label' => 'Titre'],
             ['field' => 'LastUpdate', 'label' => 'Dernière modification'],
             ['field' => 'GroupName', 'label' => 'Groupe'],
             ['field' => 'ForMembers', 'label' => 'Club'],
-            ['field' => 'Pool', 'label' => 'Sondage (votes)'],
+            ['field' => 'Pool', 'label' => 'Sondage'],
+            ['field' => 'PoolDetail', 'label' => 'Cloture (votes) visibilité'],
         ];
-        if ($this->authorizations->isWebmaster()) {
+        if ($this->authorizations->isEditor()) {
             $columns[] = ['field' => 'Published', 'label' => 'Publié'];
         }
         $query = $this->fluent->from('Article')
             ->select('Article.Id, Article.CreatedBy, Article.Title, Article.LastUpdate')
             ->select('CASE WHEN Article.PublishedBy IS NULL THEN "non" ELSE "oui" END AS Published')
             ->select('CASE WHEN Article.OnlyForMembers = 1 THEN "oui" ELSE "non" END AS ForMembers')
+            ->select('CASE WHEN Survey.IdArticle IS NULL THEN "non" ELSE "oui" END AS Pool')
             ->select('
                 CASE 
-                    WHEN Survey.IdArticle IS NULL THEN "non"
+                    WHEN Survey.IdArticle IS NULL THEN ""
                     ELSE 
                         (
                             CASE 
@@ -78,7 +84,7 @@ class ArticleController extends TableController
                                 ELSE ""
                             END
                         )
-                END AS Pool
+                END AS PoolDetail
             ')
             ->select('CASE WHEN Person.NickName != "" THEN Person.FirstName || " " || Person.LastName || " (" || Person.NickName || ")" ELSE Person.FirstName || " " || Person.LastName END AS PersonName')
             ->select("'Group'.Name AS GroupName")
@@ -167,7 +173,7 @@ class ArticleController extends TableController
                 'message' => $messages,
             ]));
         } else if ($person == '') {
-            $this->application->message('Il faut être connecté pour pouvoir consuler cet article', 5000, 403);
+            $this->application->message('Il faut être connecté pour pouvoir consulter cet article', 5000, 403);
         } else {
             $this->application->error403(__FILE__, __LINE__);
         }
@@ -319,6 +325,7 @@ class ArticleController extends TableController
         }
     }
 
+    #region Private functions
     private function getArticleIdsBasedOnAccess(?string $userEmail): array
     {
         $noGroupArticleIds = $this->getNoGroupArticleIds();
@@ -403,7 +410,6 @@ class ArticleController extends TableController
             ->limit(10)
             ->fetchAll() ?: [];
     }
-
 
     private function getArticle($id)
     {

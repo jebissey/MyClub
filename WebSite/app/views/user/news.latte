@@ -1,0 +1,191 @@
+{layout '../layout.latte'}
+
+{block title}News{/block}
+
+{block navbar}
+    {include '../navbar/user.latte'}
+{/block}
+
+{block content}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h3 class="card-title">
+                        <i class="fas fa-bell"></i> Nouvelles
+                    </h3>
+                    <div class="card-tools">
+                        <div class="btn-group" role="group">
+                            <a href="/user/news?from=signout" 
+                               class="btn btn-sm {if $searchMode === 'signout'}btn-primary{else}btn-outline-primary{/if}">
+                                Depuis déconnexion
+                            </a>
+                            <a href="/user/news?from=signin" 
+                               class="btn btn-sm {if $searchMode === 'signin'}btn-primary{else}btn-outline-primary{/if}">
+                                Depuis connexion
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card-body">
+                    {if $searchFrom}
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i>
+                            Affichage des nouveautés depuis le 
+                            <strong>{$searchFrom|date:'d/m/Y à H:i'}</strong>
+                            {if $searchMode === 'signout'}
+                                (dernière déconnexion)
+                            {else}
+                                (dernière connexion)
+                            {/if}
+                        </div>
+                    {/if}
+                    
+                    {if count($news) > 0}
+                        <div class="timeline">
+                            {foreach $news as $item}
+                                <div class="timeline-item">
+                                    <div class="timeline-marker">
+                                        <div class="timeline-marker-icon 
+                                            {if $item['type'] === 'article'}bg-primary
+                                            {elseif $item['type'] === 'event'}bg-success
+                                            {elseif $item['type'] === 'message'}bg-info
+                                            {elseif $item['type'] === 'presentation'}bg-warning
+                                            {/if}">
+                                            <i class="{if $item['type'] === 'article'}fas fa-newspaper
+                                                     {elseif $item['type'] === 'event'}fas fa-calendar-alt
+                                                     {elseif $item['type'] === 'message'}fas fa-envelope
+                                                     {elseif $item['type'] === 'presentation'}fas fa-user
+                                                     {/if}"></i>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="timeline-content">
+                                        <div class="timeline-header">
+                                            <span class="badge 
+                                                {if $item['action'] === 'created'}badge-success
+                                                {else}badge-primary
+                                                {/if}">
+                                                {if $item['type'] === 'article'}
+                                                    {if $item['action'] === 'created'}Nouvel article{else}Article modifié{/if}
+                                                {elseif $item['type'] === 'event'}
+                                                    {if $item['action'] === 'created'}Nouvel événement{else}Événement modifié{/if}
+                                                {elseif $item['type'] === 'message'}
+                                                    {if $item['action'] === 'created'}Nouveau message{else}Message modifié{/if}
+                                                {elseif $item['type'] === 'presentation'}
+                                                    Présentation mise à jour
+                                                {/if}
+                                            </span>
+                                            <small class="text-muted float-right">
+                                                {$item['date']|date:'d/m/Y H:i'}
+                                            </small>
+                                        </div>
+                                        
+                                        <div class="timeline-body">
+                                            <h5>
+                                                <a href="{$item['url']}" class="text-dark">
+                                                    {$item['title']}
+                                                </a>
+                                            </h5>
+                                            
+                                            {if isset($item['from']) && $item['from']}
+                                                <p class="text-muted mb-0">
+                                                    <i class="fas fa-user"></i> Par {$item['from']}
+                                                </p>
+                                            {/if}
+                                        </div>
+                                        
+                                        <div class="timeline-footer">
+                                            <a href="{$item['url']}" class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-eye"></i> Voir
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            {/foreach}
+                        </div>
+                    {else}
+                        <div class="text-center py-5">
+                            <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                            <h4 class="text-muted">Aucune nouvelle</h4>
+                            <p class="text-muted">
+                                Aucune création ou modification depuis 
+                                {if $searchMode === 'signout'}votre dernière déconnexion{else}votre dernière connexion{/if}.
+                            </p>
+                        </div>
+                    {/if}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.timeline {
+    position: relative;
+    padding-left: 30px;
+}
+
+.timeline::before {
+    content: '';
+    position: absolute;
+    left: 15px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: #dee2e6;
+}
+
+.timeline-item {
+    position: relative;
+    margin-bottom: 30px;
+}
+
+.timeline-marker {
+    position: absolute;
+    left: -22px;
+    top: 0;
+}
+
+.timeline-marker-icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 12px;
+}
+
+.timeline-content {
+    background: #fff;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 15px;
+    margin-left: 15px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.timeline-header {
+    margin-bottom: 10px;
+}
+
+.timeline-body h5 {
+    margin-bottom: 5px;
+}
+
+.timeline-body h5 a:hover {
+    text-decoration: none;
+    color: #007bff !important;
+}
+
+.timeline-footer {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid #f8f9fa;
+}
+</style>
+{/block}

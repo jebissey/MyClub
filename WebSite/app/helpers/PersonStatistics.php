@@ -417,7 +417,6 @@ class PersonStatistics
             ->where('datetime(e.StartTime) BETWEEN datetime(?) AND datetime(?)', [$seasonStart, $seasonEnd])
             ->where('"From"', 'User')
             ->fetch('count');
-        
         $webappMessagesCount = $this->fluent
             ->from('Message m')
             ->select(null)

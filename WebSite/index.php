@@ -195,6 +195,7 @@ $flight->route('GET  /user/forgotPassword/@encodedEmail', function($encodedEmail
 $flight->route('GET  /user/groups',                       function()              use ($userController)                     { $userController->groups(); });
 $flight->route('POST /user/groups',                       function()              use ($userController)                     { $userController->groups(); });
 $flight->route('GET  /user/help',                         function()              use ($userController)                     { $userController->help(); });
+$flight->route('GET  /user/news',                         function()              use ($userController)                     { $userController->showNews();});
 $flight->route('GET  /user/preferences',                  function()              use ($userController)                     { $userController->preferences(); });
 $flight->route('POST /user/preferences',                  function()              use ($userController)                     { $userController->preferences(); });
 $flight->route('GET  /user/setPassword/@token',           function($token)        use ($userController)                     { $userController->setPassword($token); });
@@ -269,16 +270,7 @@ $flight->route('POST   /api/registration/add/@personId/@groupId',    function($p
 $flight->route('POST   /api/registration/remove/@personId/@groupId', function($personId, $groupId) use ($webmasterApi) { $webmasterApi->removeFromGroup($personId, $groupId); });
 /* #endregion */
 
-$flight->route('/webCard', function() use ($applicationHelper) {
-    $path = __DIR__ . '/app/images/businessCard.html';
-    if (file_exists($path)) {
-        $content = file_get_contents($path);
-        Flight::response()->header('Content-Type', 'text/html; charset=UTF-8');
-        Flight::response()->write($content);
-    } else {
-        $applicationHelper->error404(); 
-    }
-});
+
 
 $flight->route('/phpInfo', function() {
     header('Content-Type: text/html; charset=UTF-8');
@@ -295,29 +287,25 @@ $flight->route('/phpInfo', function() {
     flush();
 });
 
+$flight->route('/webCard', function() use ($applicationHelper) {
+    serveFile('businessCard.html', $applicationHelper, "'Content-Type', 'text/html; charset=UTF-8'"); 
+});
 $flight->route('/favicon.ico', function() use ($applicationHelper) {
-    $path = __DIR__ . '/app/images/favicon.ico';
-    if (file_exists($path)) {
-        $content = file_get_contents($path);
-        Flight::response()->header('Content-Type', 'image/x-icon');
-        Flight::response()->write($content);
-    } else {
-        $applicationHelper->error404(); 
-    }
-    exit;
+    serveFile('favicon.ico', $applicationHelper); 
+});
+$flight->route('/apple-touch-icon.png', function() use ($applicationHelper) {
+    serveFile('my-club-180.png', $applicationHelper); 
+});
+$flight->route('/apple-touch-icon-120x120.png', function() use ($applicationHelper) {
+    serveFile('my-club-120.png', $applicationHelper);
+});
+$flight->route('/apple-touch-icon-180x180.png', function() use ($applicationHelper) {
+    serveFile('my-club-180.png', $applicationHelper);
+});
+$flight->route('/apple-touch-icon-precomposed.png', function() use ($applicationHelper) {
+    serveFile('my-club-180.png', $applicationHelper);
 });
 
-$flight->route('/my-club-120.png', function() use ($applicationHelper) {
-    $path = __DIR__ . '/app/images/my-club-120.png';
-    if (file_exists($path)) {
-        $content = file_get_contents($path);
-        Flight::response()->header('Content-Type', 'image/png');
-        Flight::response()->write($content);
-    } else {
-        $applicationHelper->error404(); 
-    }
-    exit;
-});
 
 $flight->route('/*',            function() use ($applicationHelper) { $applicationHelper->error404(); });
 
@@ -328,3 +316,19 @@ $flight->map('error', function  (Throwable $ex) use ($userController, $applicati
 
 $flight->after('start', function() use ($userController) { $userController->log(Flight::getData('code'), Flight::getData('message')); });
 $flight->start();
+
+
+function serveFile($filename, $applicationHelper, $ContentType = "'Content-Type', 'image/png'")
+{
+    $path = __DIR__ . "/app/images/$filename";
+    if (file_exists($path)) {
+        Flight::response()
+            ->header($ContentType)
+            ->header('Cache-Control', 'public, max-age=604800, immutable')
+            ->header('Expires', gmdate('D, d M Y H:i:s', time() + 604800) . ' GMT');
+        readfile($path);
+    } else {
+        $applicationHelper->error404();
+    }
+    exit;
+}

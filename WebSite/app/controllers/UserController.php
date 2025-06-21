@@ -7,6 +7,7 @@ use PDO;
 use app\helpers\Alert;
 use app\helpers\Article;
 use app\helpers\Email;
+use app\helpers\News;
 use app\helpers\Params;
 use app\helpers\PasswordManager;
 use app\helpers\PersonStatistics;
@@ -94,8 +95,8 @@ class UserController extends BaseController
                 $this->application->error481($_POST['email'], __FILE__, __LINE__);
             } else {
                 $password = $_POST['password'] ?? '';
-                if (strlen($password) < 6 || strlen($password) > 20) {
-                    $this->application->error482('password rules are not respected', __FILE__, __LINE__);
+                if (strlen($password) < 6 || strlen($password) > 30) {
+                    $this->application->error482('password rules are not respected [6..30] characters', __FILE__, __LINE__);
                 } else {
                     if (!$person = $this->getPersonByEmail($email)) {
                         $this->application->error480($email, __FILE__, __LINE__);
@@ -389,7 +390,7 @@ class UserController extends BaseController
             }
         }
     }
-    /* #endregion */
+    #endregion 
 
     public function help()
     {
@@ -469,6 +470,41 @@ class UserController extends BaseController
     }
 
 
+    #region News
+    public function showNews()
+    {
+        if ($person = $this->getPerson([], 1)) {
+            $news = new News($this->pdo);
+
+            $searchFrom = $this->getSearchFromDate($person);
+            $searchMode = $_GET['from'] ?? 'signout';
+            if ($searchMode === 'signin') {
+                $searchFrom = $person->LastSignIn;
+            }
+            $news = $news->getNewsForPerson($person, $searchFrom);
+
+            $this->render('app/views/user/news.latte', $this->params->getAll([
+                'news' => $news,
+                'searchFrom' => $searchFrom,
+                'searchMode' => $searchMode,
+                'navItems' => $this->getNavItems(),
+                'person' => $person
+            ]));
+        } else {
+            $this->application->error403(__FILE__, __LINE__);
+        }
+    }
+    private function getSearchFromDate($person)
+    {
+        if (!empty($person->LastSignOut)) {
+            return $person->LastSignOut;
+        }
+        if (!empty($person->LastSignIn)) {
+            return $person->LastSignIn;
+        }
+        die('Fatal error in file ' . __FILE__ . ' at line ' . __LINE__);
+    }
+
     #region Statistics
     public function showStatistics()
     {
@@ -486,7 +522,6 @@ class UserController extends BaseController
             $this->application->error403(__FILE__, __LINE__);
         }
     }
-
     private function getVisitStatsForChart($season, $person)
     {
         $stats = $this->getVisitStats($season);
@@ -576,7 +611,6 @@ class UserController extends BaseController
         ];
     }
 
-
     private function getMemberVisits($season)
     {
         $query = $this->pdoForLog->prepare("
@@ -622,5 +656,4 @@ class UserController extends BaseController
 
         die('$user slice not found');
     }
-    /* #endregion */
 }

@@ -280,7 +280,7 @@ class PersonController extends TableController implements CrudControllerInterfac
                 'selectedGroup' => $selectedGroup,
             ]));
         } else if ($person == '') {
-            $this->application->message('Il faut être connecté pour pouvoir consuler le trombinoscope', 5000, 403);
+            $this->application->message('Il faut être connecté pour pouvoir consulter le trombinoscope', 5000, 403);
         } else {
             $this->application->error403(__FILE__, __LINE__);
         }
