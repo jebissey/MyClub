@@ -25,10 +25,10 @@
               <a class="nav-link {if $page == 'statistics'}active{/if}" href="/user/statistics">Statistiques</a>
           </li>
           <li class="nav-item">
-              <a class="nav-link {if $page == 'directory'}active{/if}" href="/directory">Trombinoscope</a>
+              <a class="nav-link {if $page == 'directory'}active{/if}" href="/directory" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="{='directory'|translate}"><h2>👥</h2></a>
           </li>
           <li class="nav-item">
-              <a class="nav-link {if $page == 'news'}active{/if}" href="/user/news"><h2>📰</h2></a>
+              <a class="nav-link {if $page == 'news'}active{/if}" href="/user/news" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="{='news'|translate}"><h2>📰</h2></a>
           </li>
       </ul>
 

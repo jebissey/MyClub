@@ -19,11 +19,11 @@
                         <div class="btn-group" role="group">
                             <a href="/user/news?from=signout" 
                                class="btn btn-sm {if $searchMode === 'signout'}btn-primary{else}btn-outline-primary{/if}">
-                                Depuis déconnexion
+                                Depuis votre dernière déconnexion
                             </a>
                             <a href="/user/news?from=signin" 
                                class="btn btn-sm {if $searchMode === 'signin'}btn-primary{else}btn-outline-primary{/if}">
-                                Depuis connexion
+                                Depuis votre connexion
                             </a>
                         </div>
                     </div>
@@ -64,23 +64,17 @@
                                     
                                     <div class="timeline-content">
                                         <div class="timeline-header">
-                                            <span class="badge 
-                                                {if $item['action'] === 'created'}badge-success
-                                                {else}badge-primary
-                                                {/if}">
+                                            <span class="badge badge-primary">
                                                 {if $item['type'] === 'article'}
-                                                    {if $item['action'] === 'created'}Nouvel article{else}Article modifié{/if}
+                                                    Article créé/modifié
                                                 {elseif $item['type'] === 'event'}
-                                                    {if $item['action'] === 'created'}Nouvel événement{else}Événement modifié{/if}
+                                                    Événement ajouté/modifié
                                                 {elseif $item['type'] === 'message'}
-                                                    {if $item['action'] === 'created'}Nouveau message{else}Message modifié{/if}
+                                                    Message ajouté/modifié
                                                 {elseif $item['type'] === 'presentation'}
-                                                    Présentation mise à jour
+                                                    Présentation créée/mise à jour
                                                 {/if}
                                             </span>
-                                            <small class="text-muted float-right">
-                                                {$item['date']|date:'d/m/Y H:i'}
-                                            </small>
                                         </div>
                                         
                                         <div class="timeline-body">
@@ -89,18 +83,14 @@
                                                     {$item['title']}
                                                 </a>
                                             </h5>
-                                            
+                                            <small class="text-muted float-right">
+                                                {$item['date']|date:'d/m/Y H:i'}
+                                            </small>
                                             {if isset($item['from']) && $item['from']}
                                                 <p class="text-muted mb-0">
                                                     <i class="fas fa-user"></i> Par {$item['from']}
                                                 </p>
                                             {/if}
-                                        </div>
-                                        
-                                        <div class="timeline-footer">
-                                            <a href="{$item['url']}" class="btn btn-sm btn-outline-primary">
-                                                <i class="fas fa-eye"></i> Voir
-                                            </a>
                                         </div>
                                     </div>
                                 </div>
@@ -121,71 +111,4 @@
         </div>
     </div>
 </div>
-
-<style>
-.timeline {
-    position: relative;
-    padding-left: 30px;
-}
-
-.timeline::before {
-    content: '';
-    position: absolute;
-    left: 15px;
-    top: 0;
-    bottom: 0;
-    width: 2px;
-    background: #dee2e6;
-}
-
-.timeline-item {
-    position: relative;
-    margin-bottom: 30px;
-}
-
-.timeline-marker {
-    position: absolute;
-    left: -22px;
-    top: 0;
-}
-
-.timeline-marker-icon {
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-size: 12px;
-}
-
-.timeline-content {
-    background: #fff;
-    border: 1px solid #dee2e6;
-    border-radius: 8px;
-    padding: 15px;
-    margin-left: 15px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-.timeline-header {
-    margin-bottom: 10px;
-}
-
-.timeline-body h5 {
-    margin-bottom: 5px;
-}
-
-.timeline-body h5 a:hover {
-    text-decoration: none;
-    color: #007bff !important;
-}
-
-.timeline-footer {
-    margin-top: 10px;
-    padding-top: 10px;
-    border-top: 1px solid #f8f9fa;
-}
-</style>
 {/block}

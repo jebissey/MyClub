@@ -2,8 +2,6 @@
 
 namespace app\helpers;
 
-use PDO;
-
 class News
 {
     private $pdo;
@@ -24,16 +22,15 @@ class News
         $articles = $this->getArticleNews($person, $searchFrom);
         $news = array_merge($news, $articles);
 
-        /*$events = $this->getEventNews($person, $searchFrom);
+        $events = $this->getEventNews($person, $searchFrom);
         $news = array_merge($news, $events);
 
         $messages = $this->getMessageNews($person, $searchFrom);
         $news = array_merge($news, $messages);
 
         $presentations = $this->getPresentationNews($person, $searchFrom);
-        $news = array_merge($news, $presentations);*/
+        $news = array_merge($news, $presentations);
 
-        // Trier par date décroissante
         usort($news, function ($a, $b) {
             return strtotime($b['date']) - strtotime($a['date']);
         });
@@ -42,24 +39,23 @@ class News
     }
 
     #region Private functions
-
     private function getArticleNews($person, $searchFrom)
     {
         $articles = $this->fluent->from('Article a')
-            ->select('a.id, a.title, a.LastUpdate')
+            ->select('a.Id, a.Title, a.LastUpdate')
             ->where('a.LastUpdate >= ?', $searchFrom)
-            ->where('a.PublishedBy <> NULL')
+            ->where('a.PublishedBy IS NOT NULL')
             ->orderBy('a.LastUpdate DESC')
             ->fetchAll();
         $news = [];
         foreach ($articles as $article) {
-            if ($this->authorizations->getArticle($article['id'], $person)) {
+            if ($this->authorizations->getArticle($article->Id, $person)) {
                 $news[] = [
-                    'type' => 'article',
-                    'id' => $article['id'],
-                    'title' => $article['title'],
-                    'date' => $article->LastUpdate,
-                    'url' => '/article/' . $article->id
+                    'type'  => 'article',
+                    'id'    => $article->Id,
+                    'title' => $article->Title,
+                    'date'  => $article->LastUpdate,
+                    'url'   => '/article/' . $article->Id
                 ];
             }
         }
@@ -68,18 +64,26 @@ class News
 
     private function getEventNews($person, $searchFrom)
     {
-        $events = $this->fluent->from('Event e')
-            ->select('e.id, e.Summary, e.LastUpdate')
-            ->where('e.LastUpdate >= ?', $searchFrom)
-            ->orderBy('e.LastUpdate DESC')
-            ->fetchAll();
-
+        $sql = "
+            SELECT e.Id, e.Summary, e.LastUpdate
+            FROM Event e
+            JOIN EventType et ON e.IdEventType = et.Id
+            LEFT JOIN PersonGroup pg ON et.IdGroup = pg.IdGroup AND pg.IdPerson = :personId
+            WHERE e.LastUpdate >= :searchFrom AND pg.Id IS NOT NULL
+            ORDER BY e.LastUpdate DESC
+        ";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([
+            ':personId'   => $person->Id,
+            ':searchFrom' => $searchFrom
+        ]);
+        $events = $stmt->fetchAll();
         $news = [];
         foreach ($events as $event) {
             $news[] = [
                 'type' => 'event',
-                'id' => $event['id'],
-                'title' => $event['title'],
+                'id' => $event->Id,
+                'title' => $event->Summary,
                 'date' => $event->LastUpdate,
                 'url' => '/event/' . $event['id']
             ];
@@ -94,31 +98,26 @@ class News
             ->leftJoin('Person p ON p.Id = m.PersonId')
             ->select('m.Id, m.Text, m.LastUpdate, m.EventId')
             ->select('p.FirstName, p.LastName')
-            ->where('m.LastUpdate >= ?', $searchFrom)
-            ->where('(
-                m.GroupId IN (SELECT GroupId FROM PersonGroup WHERE PersonEmail = ?) OR
-                m.EventId IN (SELECT EventId FROM EventParticipant WHERE PersonEmail = ?)
-            )', $person->Email, $person->Email)
+            ->where(
+                'm.LastUpdate >= ?
+                AND m.PersonId != ?
+                AND m.EventId IN (SELECT IdEvent FROM Participant WHERE IdPerson = ?)',
+                [$searchFrom, $person->Id, $person->Id]
+            )
             ->orderBy('m.LastUpdate DESC')
             ->fetchAll();
-
         $news = [];
         foreach ($messages as $message) {
-            $fromName = !empty($message['firstname']) && !empty($message['lastname'])
-                ? $message['firstname'] . ' ' . $message['lastname']
-                : $message['From'];
-
+            $fromName = $message->FirstName . ' ' . $message->LastName;
             $news[] = [
                 'type' => 'message',
-                'action' => $message['action_type'],
-                'id' => $message['id'],
-                'title' => $message->Text ?: 'Message sans sujet',
+                'id' => $message->Id,
+                'title' => $message->Text,
                 'from' => $fromName,
-                'date' => $message['action_type'] === 'created' ? $message['created_at'] : $message['LastUpdate'],
-                'url' => '/message/' . $message['id']
+                'date' => $message->LastUpdate,
+                'url' => '/event/chat/' . $message->EventId
             ];
         }
-
         return $news;
     }
 
@@ -131,24 +130,21 @@ class News
             ->where('p.email != ?', $person->Email)
             ->orderBy('p.PresentationLastUpdate DESC')
             ->fetchAll();
-
         $news = [];
         foreach ($presentations as $presentation) {
-            $fullName = trim($presentation['firstname'] . ' ' . $presentation['lastname']);
+            $fullName = trim($presentation->FirstName . ' ' . $presentation->LastName);
             if (empty($fullName)) {
-                $fullName = $presentation['email'];
+                $fullName = $presentation->email;
             }
 
             $news[] = [
                 'type' => 'presentation',
-                'action' => 'updated',
-                'id' => $presentation['id'],
+                'id' => $presentation->Id,
                 'title' => 'Présentation de ' . $fullName,
-                'date' => $presentation['PresentationLastUpdate'],
-                'url' => '/person/' . $presentation['id']
+                'date' => $presentation->PresentationLastUpdate,
+                'url' => '/presentation/' . $presentation->Id
             ];
         }
-
         return $news;
     }
 

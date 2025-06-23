@@ -240,6 +240,7 @@ CREATE TABLE IF NOT EXISTS "Person" (
 	"Inactivated"	INTEGER NOT NULL DEFAULT 0,
 	"Phone"	TEXT,
 	"Presentation"	TEXT,
+	"PresentationLastUpdate"	TEXT NOT NULL DEFAULT current_timestamp,
 	"InPresentationDirectory"	INTEGER NOT NULL DEFAULT 0,
 	"Location"	TEXT,
 	"LastSignIn"	TEXT,
@@ -323,8 +324,10 @@ INSERT INTO "Languages" VALUES (33,'messages','Messages','Messages');
 INSERT INTO "Languages" VALUES (34,'delete','Delete','Supprimer');
 INSERT INTO "Languages" VALUES (35,'duplicate','Duplicate','Dupliquer');
 INSERT INTO "Languages" VALUES (36,'sendEmail','Send email','Envoyer courriel');
+INSERT INTO "Languages" VALUES (37,'news','News','News');
+INSERT INTO "Languages" VALUES (38,'directory','Directory','Trombinoscope');
 INSERT INTO "Metadata" VALUES (1,'MyClub',1);
-INSERT INTO "Person" VALUES (1,'webmaster@myclub.foo','613cbc51f1650fb264beaad127efc1a5da0f96a96d4da7c440dc01a9e5299910','my first name','my last name','my nick name or nothing',NULL,'0',NULL,NULL,NULL,NULL,0,0,NULL,NULL,0,NULL,NULL,NULL);
+INSERT INTO "Person" VALUES (1,'webmaster@myclub.foo','613cbc51f1650fb264beaad127efc1a5da0f96a96d4da7c440dc01a9e5299910','my first name','my last name','my nick name or nothing',NULL,'0',NULL,NULL,NULL,NULL,0,0,NULL,NULL,'2025-01-01',0,NULL,NULL,NULL);
 INSERT INTO "PersonGroup" VALUES (1,1,1);
 INSERT INTO "Settings" VALUES (1,'Title','title');
 INSERT INTO "Settings" VALUES (2,'LegalNotices','LegalNotices');

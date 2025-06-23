@@ -193,6 +193,7 @@ class PersonController extends TableController implements CrudControllerInterfac
                 $success = $this->fluent->update('Person')
                     ->set([
                         'Presentation' => $presentation,
+                        'PresentationLastUpdate' => date('Y-m-d H:i:s'),
                         'Location' => $location,
                         'InPresentationDirectory' => $inDirectory,
                     ])

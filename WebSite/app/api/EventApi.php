@@ -231,6 +231,7 @@ class EventApi extends BaseController
                 'CreatedBy'      => $person->Id,
                 'MaxParticipants' => $data['maxParticipants'] ?? 0,
                 'Audience'       => $data['audience'] ?? EventAudience::ForClubMembersOnly->value,
+                'LastUpdate'     => date('Y-m-d H:i:s'),
             ];
 
             $this->pdo->beginTransaction();
