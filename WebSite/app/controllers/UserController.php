@@ -195,6 +195,8 @@ class UserController extends BaseController
             $userPendingDesigns = array_filter($pendingDesignResponses, function ($item) use ($userEmail) {
                 return strcasecmp($item->Email, $userEmail) === 0;
             });
+
+            $news = (new News($this->pdo))->anyNews($person);
         } else {
             $translationManager = new TranslationManager($this->pdo);
             $this->params = new Params([
@@ -220,6 +222,7 @@ class UserController extends BaseController
             'latestArticleHasSurvey' => (new Article($this->pdo))->hasSurvey($articles['latestArticle']->Id ?? 0),
             'pendingSurveys' => $userPendingSurveys,
             'pendingDesigns' => $userPendingDesigns,
+            'news' => $news ?? false,
         ]));
     }
 
@@ -497,14 +500,13 @@ class UserController extends BaseController
     public function showNews()
     {
         if ($person = $this->getPerson([], 1)) {
-            $news = new News($this->pdo);
-
-            $searchFrom = $this->getSearchFromDate($person);
             $searchMode = $_GET['from'] ?? 'signout';
             if ($searchMode === 'signin') {
-                $searchFrom = $person->LastSignIn;
+                $searchFrom = $person->LastSignIn ?? '';
+            } else {
+                $searchFrom = $person->LastSignOut ?? '';
             }
-            $news = $news->getNewsForPerson($person, $searchFrom);
+            $news = (new News($this->pdo))->getNewsForPerson($person, $searchFrom);
 
             $this->render('app/views/user/news.latte', $this->params->getAll([
                 'news' => $news,
@@ -516,16 +518,6 @@ class UserController extends BaseController
         } else {
             $this->application->error403(__FILE__, __LINE__);
         }
-    }
-    private function getSearchFromDate($person)
-    {
-        if (!empty($person->LastSignOut)) {
-            return $person->LastSignOut;
-        }
-        if (!empty($person->LastSignIn)) {
-            return $person->LastSignIn;
-        }
-        die('Fatal error in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     #region Statistics

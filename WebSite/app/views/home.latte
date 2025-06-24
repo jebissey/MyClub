@@ -45,6 +45,12 @@
         {/if}
         </div>
 
+        {if $news}
+            <div class="alert alert-info" role="alert">
+                <a href="/user/news" class="btn btn-primary btn-sm">Voir les nouveautées</a>
+            </div>
+        {/if}
+
         {if $latestArticle}
         <div class="card mb-4">
             <div class="card-header">

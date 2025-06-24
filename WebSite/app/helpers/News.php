@@ -38,6 +38,12 @@ class News
         return $news;
     }
 
+    public function anyNews($person)
+    {
+        $news = $this->getNewsForPerson($person, $person->LastSignIn ?? '');
+        return is_array($news) && count($news) > 0;
+    }
+
     #region Private functions
     private function getArticleNews($person, $searchFrom)
     {

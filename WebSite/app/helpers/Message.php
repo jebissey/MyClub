@@ -45,7 +45,7 @@ class Message
         if (!$message || $message->PersonId != $personId) {
             throw new \Exception("Vous n'êtes pas autorisé à modifier ce message");
         }
-        $this->fluent->update('Message')->set(['Text' => $text])->where('Id', $messageId)->execute();
+        $this->fluent->update('Message')->set(['Text' => $text, 'LastUpdate' =>  date('Y-m-d H:i:s')])->where('Id', $messageId)->execute();
         return true;
     }
 
