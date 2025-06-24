@@ -28,7 +28,6 @@ class UserController extends BaseController
                 if ($person->TokenCreatedAt === null || (new DateTime($person->TokenCreatedAt))->diff(new DateTime())->h >= 1) {
                     $token = bin2hex(openssl_random_pseudo_bytes(32));
                     $tokenCreatedAt = (new DateTime())->format('Y-m-d H:i:s');
-
                     $query = $this->pdo->prepare('UPDATE Person SET Token = ?, TokenCreatedAt = ? WHERE Id = ?');
                     $query->execute([$token, $tokenCreatedAt, $person->Id]);
                     $resetLink = 'https://' . $_SERVER['HTTP_HOST'] . '/user/setPassword/' . $token;
@@ -105,6 +104,20 @@ class UserController extends BaseController
                             $this->application->error479($email, __FILE__, __LINE__);
                         } else {
                             if (PasswordManager::verifyPassword($password, $person->Password ?? '')) {
+                                $rememberMe = isset($_POST['rememberMe']) && $_POST['rememberMe'] === 'on';
+                                if ($rememberMe) {
+                                    $token = bin2hex(openssl_random_pseudo_bytes(32));
+                                    $tokenCreatedAt = (new DateTime())->format('Y-m-d H:i:s');
+                                    $query = $this->pdo->prepare('UPDATE Person SET Token = ?, TokenCreatedAt = ? WHERE Id = ?');
+                                    $query->execute([$token, $tokenCreatedAt, $person->Id]);
+                                    setcookie('rememberMe', $token, [
+                                        'expires' => time() + 30 * 24 * 60 * 60, // 30 days
+                                        'path' => '/',
+                                        'secure' => true,
+                                        'httponly' => true,
+                                        'samesite' => 'Strict'
+                                    ]);
+                                }
                                 $lastActivity = $this->fluentForLog->from('Log')
                                     ->select(null)
                                     ->select('CreatedAt')
@@ -113,10 +126,7 @@ class UserController extends BaseController
                                     ->limit(1)
                                     ->fetch('CreatedAt');
                                 if ($lastActivity) {
-                                    $this->fluent->update('Person')
-                                        ->set('LastSignOut', $lastActivity)
-                                        ->where('Email COLLATE NOCASE', $email)
-                                        ->execute();
+                                    $this->fluent->update('Person')->set('LastSignOut', $lastActivity)->where('Email COLLATE NOCASE', $email)->execute();
                                 }
                                 $this->fluent->update('Person')->set(['LastSignIn' => date('Y-m-d H:i:s')])->where('Email COLLATE NOCASE', $email)->execute();
                                 $_SESSION['user'] = $email;
@@ -130,6 +140,19 @@ class UserController extends BaseController
                 }
             }
         } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+            if (isset($_COOKIE['rememberMe'])) {
+                $token = $_COOKIE['rememberMe'];
+                $person = $this->fluent->from('Person')->where('Token', $token)->fetch();
+                if ($person && $person->Inactivated == 0) {
+                    $this->fluent->update('Person')->set(['LastSignIn' => date('Y-m-d H:i:s')])->where('Id', $person->Id)->execute();
+                    $_SESSION['user'] = $person->Email;
+                    $_SESSION['navbar'] = '';
+                } else {
+                    setcookie('rememberMe', '', time() - 3600, '/');
+                }
+                $this->flight->redirect('/');
+            }
+
             $this->render('app/views/user/signIn.latte', [
                 'href' => '/user/sign/in',
                 'userImg' => '/app/images/anonymat.png',
