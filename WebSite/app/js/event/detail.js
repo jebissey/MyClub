@@ -145,7 +145,6 @@ document.addEventListener('DOMContentLoaded', function () {
                             progressBar.setAttribute('aria-valuenow', percentage);
                             progressPercentage.textContent = percentage + '%';
 
-                            // Changer la couleur de la barre
                             progressBar.className = 'progress-bar progress-bar-custom';
                             if (percentage >= 100) {
                                 progressBar.classList.add('bg-success');

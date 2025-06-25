@@ -127,7 +127,11 @@
                         <td class="{if $isToday}current-day{/if}">
                         {if count($weekData['days'][$day]) > 0}
                             {foreach $weekData['days'][$day] as $event}
+                            {if $event['audience'] == 'All'}
+                            <a href="/contact/event/{$event['id']}" class="event-item text-decoration-none text-dark">
+                            {else}
                             <div class="event-item">
+                            {/if}
                                 <div class="d-flex justify-content-between" data-bs-toggle="tooltip" data-bs-placement="top" title="{$event['date']|longDate}">
                                     <div class="event-time">{$event['startTime']}</div>
                                     <div class="event-duration">({$event['duration']})</div>
@@ -136,7 +140,7 @@
                                     {/ifset}
                                 </div>
                                 <div class="event-summary">{$event['summary']}</div>
-                                    <div>
+                                <div>
                                     {if count($event['attributes']) > 0}
                                         {foreach $event['attributes'] as $attribute}
                                         <span 
@@ -148,8 +152,12 @@
                                     {else}
                                         <span style="font-size: 16px;">⌧</span>
                                     {/if}
-                                    </div>
                                 </div>
+                            {if $event['audience'] == 'All'}
+                            </a>
+                            {else}
+                            </div>
+                            {/if}
                             {/foreach}
                         {else}
                             <div class="no-events">Aucun événement</div>

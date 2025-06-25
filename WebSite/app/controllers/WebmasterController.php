@@ -158,13 +158,11 @@ class WebmasterController extends BaseController
 
     public function sitemapGenerator()
     {
-
         $base_url = $this->getBaseUrl();
         $lastMod = $this->fluent->from('Article')
             ->select(null)
             ->select('MAX(LastUpdate) AS LastMod')
             ->fetch('LastMod');
-
         header("Content-Type: application/xml; charset=utf-8");
         echo '<?xml version="1.0" encoding="UTF-8"?>' . PHP_EOL;
         echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . PHP_EOL;
@@ -174,6 +172,21 @@ class WebmasterController extends BaseController
         echo '    <changefreq>daily</changefreq>' . PHP_EOL;
         echo '    <priority>1.0</priority>' . PHP_EOL;
         echo '  </url>' . PHP_EOL;
+
+        $articles = $this->fluent->from('Article')
+            ->select('Id, Title, LastUpdate')
+            ->where('IdGroup IS NULL AND OnlyForMembers = 0')
+            ->orderBy('LastUpdate DESC')
+            ->fetchAll();
+        foreach ($articles as $article) {
+            echo '  <url>' . PHP_EOL;
+            echo '    <loc>' . $base_url . '/article/' . $article->Id . '</loc>' . PHP_EOL;
+            echo '    <lastmod>' . $article->LastUpdate . '</lastmod>' . PHP_EOL;
+            echo '    <changefreq>monthly</changefreq>' . PHP_EOL;
+            echo '    <priority>0.5</priority>' . PHP_EOL;
+            echo '  </url>' . PHP_EOL;
+        }
+
         echo '</urlset>';
     }
 

@@ -201,6 +201,7 @@ $flight->route('GET  /user/sign/out',                     function()            
 $flight->route('GET  /user/statistics',                   function()              use ($userController)                     { $userController->showStatistics();});
 $flight->route('GET  /contact',                           function()              use ($userController)                     { $userController->contact(); });
 $flight->route('POST /contact',                           function()              use ($userController)                     { $userController->contact(); });
+$flight->route('GET  /contact/event/@id',                 function($id)           use ($userController)                     { $userController->contact($id); });
 
 use app\controllers\WebmasterController;
 $webmasterController = new WebmasterController($container->get(PDO::class), $container->get(Engine::class));

@@ -28,13 +28,9 @@ class EventController extends BaseController
 
     public function weekEvents(): void
     {
-        $event = new Event($this->pdo);
-        $person = $this->getPerson();
-        $offset = (int) ($_GET['offset'] ?? 0);
-        $mode = $_GET['mode'] ?? 'next';
-
+        $this->getPerson();
         $this->render('app/views/event/weekEvents.latte', $this->params->getAll([
-            'events' => $event->getNextWeekEvents($person, $mode, $offset),
+            'events' => (new Event($this->pdo))->getNextWeekEvents(),
             'eventTypes' => $this->fluent->from('EventType')->where('Inactivated', 0)->orderBy('Name')->fetchAll('Id', 'Name'),
             'eventAttributes' => $this->fluent->from('Attribute')->fetchAll('Id', 'Name, Detail, Color'),
             'navItems' => $this->getNavItems(),

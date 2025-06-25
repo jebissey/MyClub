@@ -431,11 +431,14 @@ class UserController extends BaseController
         }
     }
 
-    public function contact()
+    public function contact($eventId = null)
     {
         if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             $this->getPerson();
-            $this->render('app/views/contact.latte', $this->params->getAll(['navItems' => $this->getNavItems()]));
+            $this->render('app/views/contact.latte', $this->params->getAll([
+                'navItems' => $this->getNavItems(),
+                'event' => $eventId != null ? $this->fluent->from('Event')->where('Id', $eventId)->fetch() : null,
+            ]));
         } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $name = trim($_POST['name'] ?? '');
             $email = trim($_POST['email'] ?? '');
@@ -451,6 +454,12 @@ class UserController extends BaseController
             }
             if (empty($message)) {
                 $errors[] = 'Le message est requis.';
+            } else {
+                $eventId = trim($_POST['event-id'] ?? '');
+                if (!empty($eventId)) {
+                    $eventLink = 'https://' . $_SERVER['HTTP_HOST'] . '/events/' . $eventId;
+                    $message .=  "\n\n" . $eventLink;
+                }
             }
             if (empty($errors)) {
                 $emailSent = $this->sendContactEmail($name, $email, $message);
