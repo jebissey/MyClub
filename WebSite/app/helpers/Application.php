@@ -48,11 +48,10 @@ class Application
     }
 
 
-    public function message($message, $timeout = 5000, $code = 0)
+    public function message($message, $timeout = 5000, $code = 200)
     {
         $this->error($code, $message, $timeout, false);
     }
-
 
     public function error403($file, $line, $timeout = 1000)
     {

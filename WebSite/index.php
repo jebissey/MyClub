@@ -54,11 +54,6 @@ $applicationHelper = new Application($container->get(PDO::class), $container->ge
 $flight->route('/help',         function() use ($applicationHelper) { $applicationHelper->help(); });
 $flight->route('/legal/notice', function() use ($applicationHelper) { $applicationHelper->legalNotice(); });
 
-use app\controllers\AlertController;
-$alertController = new AlertController($container->get(PDO::class), $container->get(Engine::class));
-$flight->route('GET  /alerts',      function() use ($alertController) {$alertController->showAlerts();});
-$flight->route('POST /alerts/save', function() use ($alertController) {$alertController->updateAlert();});
-
 use app\controllers\ArticleController;
 $articleController = new ArticleController($container->get(PDO::class), $container->get(Engine::class));
 $flight->route('GET  /articles',            function()    use ($articleController) { $articleController->index(); });

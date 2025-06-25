@@ -39,7 +39,7 @@ class UserController extends BaseController
                     if (mail($to, $subject, $message)) {
                         $this->application->message('Un courriel a été envoyé pour réinitialiser votre mot de passe');
                     } else {
-                        $this->application->message("Une erreur est survenue lors de l'envoi de l'email");
+                        $this->application->message("Une erreur est survenue lors de l'envoi de l'email", 3000, 500);
                     }
                 } else {
                     $this->application->message("Un courriel de réinitialisation a déjà été envoyé à " . substr($person->TokenCreatedAt, 10) . ". Il est valide pendant 1 heure.");
@@ -131,7 +131,7 @@ class UserController extends BaseController
                                 $this->fluent->update('Person')->set(['LastSignIn' => date('Y-m-d H:i:s')])->where('Email COLLATE NOCASE', $email)->execute();
                                 $_SESSION['user'] = $email;
                                 $_SESSION['navbar'] = '';
-                                $this->application->message("Sign in succeeded with $email", 1, 200);
+                                $this->application->message("Sign in succeeded with $email", 1);
                             } else {
                                 $this->application->error482("sign in failed with $email address", __FILE__, __LINE__);
                             }
