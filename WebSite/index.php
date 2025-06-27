@@ -36,7 +36,7 @@ $flight->before('start', function () {
     session_start();
     
     if (!isset($_SESSION['token'])) {
-        $_SESSION['token'] = bin2hex(openssl_random_pseudo_bytes(32));
+        $_SESSION['token'] = bin2hex(random_bytes(32));
     }
 
 });
@@ -100,6 +100,12 @@ $flight->route('GET /events/@id/unregister', function($id) use ($eventController
 $flight->route('GET /needs',                 function()    use ($eventController) { $eventController->needs();});
 $flight->route('GET /event/chat/@id',        function($id) use ($eventController) { $eventController->showEventChat($id); });
 $flight->route('GET /weekEvents',            function()    use ($eventController) { $eventController->weekEvents();});
+
+$flight->route('GET      /events/@idEvent/@emailContact', function($idEvent, $emailContact) use ($eventController) { $eventController->processOrganizerLink($idEvent, $emailContact);});
+$flight->route('GET|POST /events/@idEvent/@token',        function($idEvent, $token)        use ($eventController) { 
+    if (filter_var($token, FILTER_VALIDATE_EMAIL)) $eventController->processOrganizerLink($idEvent, $token);
+    else                                           $eventController->registerWithToken($idEvent, $token);
+});
 
 use app\controllers\EventTypeController;
 $eventTypeController = new EventTypeController($container->get(PDO::class), $container->get(Engine::class));

@@ -2,6 +2,8 @@
 
 namespace app\controllers;
 
+use DateTime;
+use Exception;
 use app\helpers\Event;
 
 class EventController extends BaseController
@@ -131,7 +133,7 @@ class EventController extends BaseController
         }
     }
 
-    public function needs()
+    public function needs(): void
     {
         if ($this->getPerson(['Webmaster'])) {
             $this->render('app/views/event/needs.latte', $this->params->getAll([
@@ -149,7 +151,7 @@ class EventController extends BaseController
         }
     }
 
-    public function showEventChat($eventId)
+    public function showEventChat($eventId): void
     {
         if ($person = $this->getPerson([])) {
             $event = $this->fluent->from('Event')->where('Id', $eventId)->fetch();
@@ -175,6 +177,140 @@ class EventController extends BaseController
             ]));
         } else {
             $this->application->error403(__FILE__, __LINE__);
+        }
+    }
+
+    public function processOrganizerLink($idEvent, $emailContact)
+    {
+        if ($this->getPerson(['EventManager'])) {
+            try {
+                $event = $this->fluent->from('Event')->where('Id', $idEvent)->fetch();
+                if (!$event) {
+                    $this->application->error471($idEvent, __FILE__, __LINE__);
+                    return;
+                }
+                $contact = $this->fluent->from('Contact')->where('Email', $emailContact)->fetch();
+                if (!$contact) {
+                    $contactData = [
+                        'Email' => $emailContact,
+                        'NickName' => null,
+                        'Token' => bin2hex(random_bytes(32)),
+                        'TokenCreatedAt' => date('Y-m-d H:i:s')
+                    ];
+                    $contactId = $this->fluent->insertInto('Contact')->values($contactData)->execute();
+                } else {
+                    $token = bin2hex(random_bytes(32));
+                    $this->fluent->update('Contact')
+                        ->set([
+                            'Token' => $token,
+                            'TokenCreatedAt' => date('Y-m-d H:i:s')
+                        ])
+                        ->where('Id', $contact['Id'])
+                        ->execute();
+
+                    $contact->Token = $token;
+                }
+                if (!isset($contact)) {
+                    $contact = $this->fluent->from('Contact')->where('Id', $contactId)->fetch();
+                }
+                $registrationLink = $this->getBaseUrl() . "events/{$idEvent}/{$contact->Token}";
+
+                echo $this->latte->render('app/views/contact/organizer-link.latte', [
+                    'event' => $event,
+                    'contact' => $contact,
+                    'registrationLink' => $registrationLink
+                ]);
+            } catch (Exception $e) {
+                $this->application->error500($e->getMessage(), __FILE__, __LINE__);
+            }
+        } else {
+            $this->application->error403(__FILE__, __LINE__);
+        }
+    }
+
+    public function registerWithToken($idEvent, $token)
+    {
+        $person = $this->getPerson([]);
+        if ($person) {
+            $this->application->error471("For guest only", __FILE__, __LINE__);
+            return;
+        }
+        try {
+            $event = $this->fluent->from('Event')->where('Id', $idEvent)->fetch();
+            if (!$event) {
+                $this->application->error471($idEvent, __FILE__, __LINE__);
+                return;
+            }
+            $contact = $this->fluent->from('Contact')->where('Token', $token)->fetch();
+            if (!$contact) {
+                echo $this->latte->render('app/views/contact/invalid-token.latte', [
+                    'event' => $event
+                ]);
+                return;
+            }
+            $tokenCreatedAt = new DateTime($contact['TokenCreatedAt']);
+            $now = new DateTime();
+            $interval = $now->diff($tokenCreatedAt);
+            if ($interval->days >= 1 || ($interval->days == 0 && $interval->h >= 24)) {
+                echo $this->latte->render('app/views/contact/expired-token.latte', [
+                    'event' => $event,
+                    'contact' => $contact
+                ]);
+                return;
+            }
+            $existingParticipant = $this->fluent->from('Participant')
+                ->where('IdEvent', $idEvent)
+                ->where('IdContact', $contact['Id'])
+                ->fetch();
+            if ($existingParticipant) {
+                echo $this->latte->render('app/views/contact/already-registered.latte', [
+                    'event' => $event,
+                    'contact' => $contact
+                ]);
+                return;
+            }
+            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                $this->processRegistration($idEvent, $contact);
+                return;
+            }
+
+            echo $this->latte->render('app/views/contact/register-form.latte', [
+                'event' => $event,
+                'contact' => $contact,
+                'token' => $token
+            ]);
+        } catch (Exception $e) {
+            $this->application->error500($e->getMessage(), __FILE__, __LINE__);
+        }
+    }
+    private function processRegistration($idEvent, $contact)
+    {
+        try {
+            $nickname = $_POST['nickname'] ?? null;
+            if ($nickname && trim($nickname) !== '') {
+                $this->fluent->update('Contact')
+                    ->set(['NickName' => trim($nickname)])
+                    ->where('Id', $contact->Id)
+                    ->execute();
+                $contact->NickName = trim($nickname);
+            }
+            $this->fluent->insertInto('Participant')->values([
+                'IdEvent' => $idEvent,
+                'IdPerson' => null,
+                'IdContact' => $contact->Id
+            ])->execute();
+
+            $this->fluent->update('Contact')
+                ->set(['Token' => null, 'TokenCreatedAt' => null])
+                ->where('Id', $contact->Id)
+                ->execute();
+
+            echo $this->latte->render('app/views/contact/registration-success.latte', [
+                'event' => $this->fluent->from('Event')->where('Id', $idEvent)->fetch(),
+                'contact' => $contact
+            ]);
+        } catch (Exception $e) {
+            $this->application->error500($e->getMessage(), __FILE__, __LINE__);
         }
     }
 }

@@ -271,6 +271,11 @@ abstract class BaseController extends BaseHelper
         Flight::stop();
     }
 
+    protected function buildUrl($base, $params = [])
+    {
+        return $base . '?' . http_build_query($params);
+    }
+
     #region Private functions
     private function getHref($userEmail)
     {

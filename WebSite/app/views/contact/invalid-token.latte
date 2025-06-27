@@ -1,0 +1,44 @@
+{layout '../layout.latte'}
+
+{block title}Lien invalide{/block}
+
+{block navbar}
+{include '../navbar/home.latte'}
+{/block}
+
+{block content}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        Lien invalide
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-danger">
+                        <h5>Oops ! Ce lien d'inscription n'est pas valide.</h5>
+                        <p>Le lien que vous avez utilisé pour vous inscrire à l'événement "<strong>{$event['Title']}</strong>" n'est pas reconnu ou a déjà été utilisé.</p>
+                    </div>
+
+                    <h6>Que faire ?</h6>
+                    <ul>
+                        <li>Vérifiez que vous avez copié le lien complet depuis l'email reçu</li>
+                        <li>Ce lien a peut-être déjà été utilisé pour une inscription</li>
+                        <li>Contactez l'organisateur pour obtenir un nouveau lien</li>
+                    </ul>
+
+                    <div class="text-center mt-4">
+                        <a href="/" class="btn btn-primary">
+                            <i class="fas fa-home"></i>
+                            Retour à l'accueil
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}

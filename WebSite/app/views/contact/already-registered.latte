@@ -1,0 +1,49 @@
+{layout '../layout.latte'}
+
+{block title}Déjà inscrit{/block}
+
+{block navbar}
+{include '../navbar/home.latte'}
+{/block}
+
+{block content}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card border-info">
+                <div class="card-header bg-info text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-user-check"></i>
+                        Déjà inscrit(e)
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <h5>Vous êtes déjà inscrit(e) !</h5>
+                        <p>L'adresse <strong>{$contact['Email']}</strong> est déjà inscrite à l'événement "<strong>{$event['Title']}</strong>".</p>
+                    </div>
+
+                    {if $event['StartDate']}
+                        <p><strong>Date de l'événement :</strong> {date('d/m/Y H:i', strtotime($event['StartDate']))}</p>
+                    {/if}
+                    {if $event['Location']}
+                        <p><strong>Lieu :</strong> {$event['Location']}</p>
+                    {/if}
+
+                    <div class="alert alert-success">
+                        <i class="fas fa-check-circle"></i>
+                        Votre inscription est confirmée. Vous recevrez les informations complémentaires par email si nécessaire.
+                    </div>
+
+                    <div class="text-center mt-4">
+                        <a href="/" class="btn btn-primary">
+                            <i class="fas fa-home"></i>
+                            Retour à l'accueil
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}

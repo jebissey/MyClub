@@ -39,7 +39,7 @@
                 
                 <form method="POST" action="/contact">
                     {if $event}
-                    <input type="hidden" id="event-id" value="{$event->Id}">
+                    <input type="hidden" id="eventId" name="eventId" value="{$event->Id}">
                     {/if}
                     <div class="mb-3">
                         <label for="name" class="form-label"><strong>Nom & Prénom *</strong></label>

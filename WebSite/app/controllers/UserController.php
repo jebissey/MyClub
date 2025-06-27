@@ -26,7 +26,7 @@ class UserController extends BaseController
 
             if ($person) {
                 if ($person->TokenCreatedAt === null || (new DateTime($person->TokenCreatedAt))->diff(new DateTime())->h >= 1) {
-                    $token = bin2hex(openssl_random_pseudo_bytes(32));
+                    $token = bin2hex(random_bytes(32));
                     $tokenCreatedAt = (new DateTime())->format('Y-m-d H:i:s');
                     $query = $this->pdo->prepare('UPDATE Person SET Token = ?, TokenCreatedAt = ? WHERE Id = ?');
                     $query->execute([$token, $tokenCreatedAt, $person->Id]);
@@ -106,7 +106,7 @@ class UserController extends BaseController
                             if (PasswordManager::verifyPassword($password, $person->Password ?? '')) {
                                 $rememberMe = isset($_POST['rememberMe']) && $_POST['rememberMe'] === 'on';
                                 if ($rememberMe) {
-                                    $token = bin2hex(openssl_random_pseudo_bytes(32));
+                                    $token = bin2hex(random_bytes(32));
                                     $tokenCreatedAt = (new DateTime())->format('Y-m-d H:i:s');
                                     $query = $this->pdo->prepare('UPDATE Person SET Token = ?, TokenCreatedAt = ? WHERE Id = ?');
                                     $query->execute([$token, $tokenCreatedAt, $person->Id]);
@@ -455,16 +455,20 @@ class UserController extends BaseController
             if (empty($message)) {
                 $errors[] = 'Le message est requis.';
             } else {
-                $eventId = trim($_POST['event-id'] ?? '');
+                $eventId = trim($_POST['eventId'] ?? '');
                 if (!empty($eventId)) {
-                    $eventLink = 'https://' . $_SERVER['HTTP_HOST'] . '/events/' . $eventId;
+                    $eventLink = 'https://' . $_SERVER['HTTP_HOST'] . '/events/' . $eventId . '/' . urlencode($email);
                     $message .=  "\n\n" . $eventLink;
                 }
             }
             if (empty($errors)) {
                 $emailSent = $this->sendContactEmail($name, $email, $message);
                 if ($emailSent) {
-                    $this->flight->redirect('/contact?success=' . urlencode('Votre message a été envoyé avec succès. Nous vous répondrons dans les plus brefs délais.'));
+                    $url = $this->buildUrl('/contact', [
+                        'success' => 'Votre message a été envoyé avec succès. Nous vous répondrons dans les plus brefs délais.',
+                        'who'     => $email
+                    ]);
+                    $this->flight->redirect($url);
                 } else {
                     $params = [
                         'error' => 'Une erreur est survenue lors de l\'envoi du message. Veuillez réessayer.',

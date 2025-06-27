@@ -91,7 +91,7 @@ class News
                 'id' => $event->Id,
                 'title' => $event->Summary,
                 'date' => $event->LastUpdate,
-                'url' => '/event/' . $event['id']
+                'url' => '/event/' . $event->id
             ];
         }
 
