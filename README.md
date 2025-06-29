@@ -57,6 +57,7 @@ user@myclub.foo : user1234
 
 ## Examples
 https://bnw-dijon.fr/
+
 https://peinturesbribri.alwaysdata.net/navbar/show/article/3
 
 
