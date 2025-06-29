@@ -54,3 +54,9 @@ user@myclub.foo : user1234
 
 - If you have this : "Error : could not find driverFatal error in file .../app/helpers/database/Database.php at line 38", you must add "extension=pdo_sqlite.so" in your php.ini
 - If you have this : "Internal error: Class "IntlDateFormatter" not found", you must add "extension=intl" in your php.ini
+
+## Examples
+https://bnw-dijon.fr/
+https://peinturesbribri.alwaysdata.net/navbar/show/article/3
+
+
