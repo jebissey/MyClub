@@ -37,8 +37,27 @@ document.addEventListener('DOMContentLoaded', function () {
         btn.addEventListener("click", function (e) {
             e.stopPropagation();
             const eventId = this.dataset.id;
-            if (confirm("Dupliquer cet événement à aujourd'hui 23:59 ?")) {
-                fetch(`/api/event/duplicate/${eventId}`, { method: 'POST' })
+
+            const choice = prompt(
+                "Que souhaitez-vous faire ?\n" +
+                "1 : Dupliquer cet événement à aujourd'hui 23:59\n" +
+                "2 : Dupliquer cet événement même jour/heure la semaine prochaine\n\n" +
+                "Annuler pour quitter."
+            );
+
+            if (choice === "1") {
+                fetch(`/api/event/duplicate/${eventId}?mode=today`, { method: 'POST' })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success) {
+                            window.location.reload();
+                        } else {
+                            alert("Erreur : " + data.message);
+                        }
+                    });
+
+            } else if (choice === "2") {
+                fetch(`/api/event/duplicate/${eventId}?mode=week`, { method: 'POST' })
                     .then(res => res.json())
                     .then(data => {
                         if (data.success) {
@@ -50,6 +69,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     });
+
 
     function fetchEventDetails(eventId) {
         fetch(`/api/event/${eventId}`)

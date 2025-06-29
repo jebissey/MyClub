@@ -146,7 +146,7 @@
                                         <span 
                                             class="attribute-badge" 
                                             style="background-color: {$attribute['color']|noescape};" 
-                                            title="{$attribute['name']} - {$attribute['detail']}"
+                                            title="{$attribute['name']} : {$attribute['detail']}"
                                         ></span>
                                         {/foreach}
                                     {else}
@@ -168,6 +168,17 @@
                 {/foreach}
             </tbody>
         </table>
+        <div class="mb-4 p-3 bg-light border rounded">
+            <h5>📅 Bienvenue sur le calendrier des sorties !</h5>
+            <p>Retrouvez ici tous les événements de l’association sur 3 semaines.</p>
+            <ul>
+                <li><strong>La plupart sont réservés aux membres</strong>.</li>
+                <li><strong>Carrés colorés</strong> = infos spéciales (passez la souris pour voir (ils sont tronqués, si quelqu'un à la solution...)).</li>
+                <li><strong>Curseur en main pointée</strong> = ouvert à tous !</li>
+                <li><strong>[Nom de groupe]</strong> = réservé aux membres de ce groupe.</li>
+            </ul>
+            <p>À vos agendas ! 📆✨</p>
+        </div>
     {else}
         <div class="alert alert-info">
             <p>Aucun événement programmé pour les deux prochaines semaines.</p>

@@ -18,24 +18,13 @@ class News
     public function getNewsForPerson($person, $searchFrom)
     {
         $news = [];
-
-        $articles = $this->getArticleNews($person, $searchFrom);
-        $news = array_merge($news, $articles);
-
-        $events = $this->getEventNews($person, $searchFrom);
-        $news = array_merge($news, $events);
-
-        $messages = $this->getMessageNews($person, $searchFrom);
-        $news = array_merge($news, $messages);
-
-        $presentations = $this->getPresentationNews($person, $searchFrom);
-        $news = array_merge($news, $presentations);
-
-        usort($news, function ($a, $b) {
-            return strtotime($b['date']) - strtotime($a['date']);
-        });
-
-        return $news;
+        return array_merge(
+            $news,
+            $this->getArticleNews($person, $searchFrom),
+            $this->getEventNews($person, $searchFrom),
+            $this->getMessageNews($person, $searchFrom),
+            $this->getPresentationNews($person, $searchFrom)
+        );
     }
 
     public function anyNews($person)
@@ -61,7 +50,7 @@ class News
                     'id'    => $article->Id,
                     'title' => $article->Title,
                     'date'  => $article->LastUpdate,
-                    'url'   => '/article/' . $article->Id
+                    'url'   => '/articles/' . $article->Id
                 ];
             }
         }
@@ -91,7 +80,7 @@ class News
                 'id' => $event->Id,
                 'title' => $event->Summary,
                 'date' => $event->LastUpdate,
-                'url' => '/event/' . $event->id
+                'url' => '/event/' . $event->Id
             ];
         }
 
@@ -100,26 +89,26 @@ class News
 
     private function getMessageNews($person, $searchFrom)
     {
-        $messages = $this->fluent->from('Message m')
-            ->leftJoin('Person p ON p.Id = m.PersonId')
-            ->select('m.Id, m.Text, m.LastUpdate, m.EventId')
-            ->select('p.FirstName, p.LastName')
-            ->where(
-                'm.LastUpdate >= ?
-                AND m.PersonId != ?
-                AND m.EventId IN (SELECT IdEvent FROM Participant WHERE IdPerson = ?)',
-                [$searchFrom, $person->Id, $person->Id]
-            )
-            ->orderBy('m.LastUpdate DESC')
-            ->fetchAll();
+        $sql = "
+            SELECT m.Id, m.Text, m.LastUpdate, m.EventId, p.FirstName, p.LastName, p.NickName, e.Summary, e.StartTime
+            From Message m
+            JOIN Person p ON p.Id = m.PersonId
+            JOIN Event e ON e.Id = m.EventId
+            WHERE m.LastUpdate > :searchFrom AND m.'From' = 'User' 
+            AND m.EventId IN (SELECT IdEvent FROM Participant WHERE IdPerson = $person->Id)
+        ";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([
+            ':searchFrom' => $searchFrom
+        ]);
+        $messages = $stmt->fetchAll();
         $news = [];
         foreach ($messages as $message) {
-            $fromName = $message->FirstName . ' ' . $message->LastName;
             $news[] = [
                 'type' => 'message',
-                'id' => $message->Id,
+                'id' => $message->EventId,
                 'title' => $message->Text,
-                'from' => $fromName,
+                'from' => $message->FirstName . ' ' . $message->LastName,
                 'date' => $message->LastUpdate,
                 'url' => '/event/chat/' . $message->EventId
             ];

@@ -90,7 +90,7 @@
                     <span 
                         class="attribute-badge" 
                         style="background-color: {$attribute['color']|noescape};"
-                        title="{$attribute['name']} - {$attribute['detail']}"
+                        title="{$attribute['name']} : {$attribute['detail']}"
                     ></span>
                     {/foreach}
                 {else}
@@ -206,7 +206,7 @@
                                     <input type="time" class="form-control" id="startTimeInput" name="startTime" step="900" required>
                                 </div>
                                 <div style="width: 80px;">
-                                    <input type="number" class="form-control" id="durationInput" name="duration" min="0.5" step="0.5" required>
+                                    <input type="number" class="form-control" id="durationInput" name="duration" min="0.25" step="0.25" required>
                                 </div>
                             </div>
                         </div>

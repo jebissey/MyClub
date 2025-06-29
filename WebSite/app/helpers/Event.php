@@ -109,7 +109,7 @@ class Event
                 ->leftJoin('EventType et ON et.Id = e.IdEventType')
                 ->leftJoin('Message m ON m.EventId = e.Id AND m."From" = "User"')
                 ->leftJoin('PersonGroup pg ON et.IdGroup = pg.IdGroup AND pg.IdPerson = ?', $person->Id)
-                ->where('(et.IdGroup IS NULL OR pg.IdPerson IS NOT NULL) AND StartTime < ?', date('Y-m-d H:i:s'))
+                ->where('et.Inactivated = 0 AND (et.IdGroup IS NULL OR pg.IdPerson IS NOT NULL) AND StartTime < ?', date('Y-m-d H:i:s'))
                 ->groupBy('e.Id')
                 ->limit($limit)
                 ->offset($offset)

@@ -25,10 +25,22 @@
                                class="btn btn-sm {if $searchMode === 'signin'}btn-primary{else}btn-outline-primary{/if}">
                                 Depuis votre connexion
                             </a>
+                            <a href="/user/news?from=week" 
+                               class="btn btn-sm {if $searchMode === 'week'}btn-primary{else}btn-outline-primary{/if}">
+                                Depuis une semaine
+                            </a>
+                            <a href="/user/news?from=month" 
+                               class="btn btn-sm {if $searchMode === 'month'}btn-primary{else}btn-outline-primary{/if}">
+                                Depuis un mois
+                            </a>
                         </div>
                     </div>
                 </div>
                 
+                {var $groupedNews = []}
+                {foreach $news as $item}
+                    {var $groupedNews[$item['type']][] = $item}
+                {/foreach}
                 <div class="card-body">
                     {if $searchFrom}
                         <div class="alert alert-info">
@@ -37,65 +49,63 @@
                             <strong>{$searchFrom|date:'d/m/Y à H:i'}</strong>
                             {if $searchMode === 'signout'}
                                 (dernière déconnexion)
-                            {else}
+                            {elseif $searchMode === 'signin'}
                                 (dernière connexion)
+                            {elseif $searchMode === 'week'}
+                                (1 semaine)
+                            {elseif $searchMode === 'month'}
+                                (1 mois)
                             {/if}
                         </div>
                     {/if}
-                    
+
                     {if count($news) > 0}
-                        <div class="timeline">
-                            {foreach $news as $item}
-                                <div class="timeline-item">
-                                    <div class="timeline-marker">
-                                        <div class="timeline-marker-icon 
-                                            {if $item['type'] === 'article'}bg-primary
-                                            {elseif $item['type'] === 'event'}bg-success
-                                            {elseif $item['type'] === 'message'}bg-info
-                                            {elseif $item['type'] === 'presentation'}bg-warning
-                                            {/if}">
-                                            <i class="{if $item['type'] === 'article'}fas fa-newspaper
-                                                     {elseif $item['type'] === 'event'}fas fa-calendar-alt
-                                                     {elseif $item['type'] === 'message'}fas fa-envelope
-                                                     {elseif $item['type'] === 'presentation'}fas fa-user
-                                                     {/if}"></i>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="timeline-content">
-                                        <div class="timeline-header">
-                                            <span class="badge badge-primary">
-                                                {if $item['type'] === 'article'}
-                                                    Article créé/modifié
-                                                {elseif $item['type'] === 'event'}
-                                                    Événement ajouté/modifié
-                                                {elseif $item['type'] === 'message'}
-                                                    Message ajouté/modifié
-                                                {elseif $item['type'] === 'presentation'}
-                                                    Présentation créée/mise à jour
-                                                {/if}
-                                            </span>
-                                        </div>
-                                        
-                                        <div class="timeline-body">
-                                            <h5>
-                                                <a href="{$item['url']}" class="text-dark">
-                                                    {$item['title']}
-                                                </a>
-                                            </h5>
+                        {var $groupedNews = []}
+                        {foreach $news as $item}
+                            {var $groupedNews[$item['type']][] = $item}
+                        {/foreach}
+
+                        {foreach $groupedNews as $type => $items}
+                        <div class="card mb-4">
+                            <div class="card-header 
+                                {if $type === 'article'}bg-primary text-white
+                                {elseif $type === 'event'}bg-success text-white
+                                {elseif $type === 'message'}bg-info text-white
+                                {elseif $type === 'presentation'}bg-warning
+                                {/if}">
+                                <h5 class="mb-0">
+                                    {if $type === 'article'}
+                                        📄 Articles
+                                    {elseif $type === 'event'}
+                                        📅 Événements
+                                    {elseif $type === 'message'}
+                                        ✉️ Messages
+                                    {elseif $type === 'presentation'}
+                                        🙋 Présentations
+                                    {/if}
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                {foreach $items as $item}
+                                    <div class="mb-3 border-bottom pb-2">
+                                        <h5>
+                                            <a href="{$item['url']}" class="text-dark">
+                                                {$item['title']}
+                                            </a>
                                             <small class="text-muted float-right">
                                                 {$item['date']|date:'d/m/Y H:i'}
                                             </small>
-                                            {if isset($item['from']) && $item['from']}
-                                                <p class="text-muted mb-0">
-                                                    <i class="fas fa-user"></i> Par {$item['from']}
-                                                </p>
-                                            {/if}
-                                        </div>
+                                        </h5>
+                                        {if isset($item['from']) && $item['from']}
+                                            <p class="text-muted mb-0">
+                                                <i class="fas fa-user"></i> Par {$item['from']}
+                                            </p>
+                                        {/if}
                                     </div>
-                                </div>
-                            {/foreach}
+                                {/foreach}
+                            </div>
                         </div>
+                        {/foreach}
                     {else}
                         <div class="text-center py-5">
                             <i class="fas fa-inbox fa-3x text-muted mb-3"></i>

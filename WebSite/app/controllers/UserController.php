@@ -516,13 +516,16 @@ class UserController extends BaseController
             $searchMode = $_GET['from'] ?? 'signout';
             if ($searchMode === 'signin') {
                 $searchFrom = $person->LastSignIn ?? '';
-            } else {
+            } elseif ($searchMode === 'signout') {
                 $searchFrom = $person->LastSignOut ?? '';
+            } elseif ($searchMode === 'week') {
+                $searchFrom = date('Y-m-d H:i:s', strtotime('-1 week'));
+            }elseif ($searchMode === 'month') {
+                $searchFrom = date('Y-m-d H:i:s', strtotime('-1 month'));
             }
-            $news = (new News($this->pdo))->getNewsForPerson($person, $searchFrom);
 
             $this->render('app/views/user/news.latte', $this->params->getAll([
-                'news' => $news,
+                'news' => (new News($this->pdo))->getNewsForPerson($person, $searchFrom),
                 'searchFrom' => $searchFrom,
                 'searchMode' => $searchMode,
                 'navItems' => $this->getNavItems(),

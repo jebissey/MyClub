@@ -1,18 +1,15 @@
 document.addEventListener("DOMContentLoaded", function () {
-    // Partie 1: Enregistrement de la résolution d'écran
     var width = screen.width;
     var height = screen.height;
     let expiration = new Date();
     expiration.setDate(expiration.getDate() + 30);
     document.cookie = "screen_resolution=" + width + "x" + height + "; path=/; expires=" + expiration.toUTCString();
 
-    // Partie 2: Initialisation des tooltips Bootstrap
     var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+    tooltipTriggerList.map(function (tooltipTriggerEl) {
         return new bootstrap.Tooltip(tooltipTriggerEl);
     });
 
-    // Partie 3: Gestion des modifications de formulaire (uniquement si le formulaire existe)
     const form = document.querySelector('form[data-form="checkSave"]');
     if (form) {
         let formModified = false;
