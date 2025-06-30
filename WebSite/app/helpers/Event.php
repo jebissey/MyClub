@@ -11,11 +11,13 @@ class Event
 {
     private PDO $pdo;
     private $fluent;
+    private $personPreferences;
 
     public function __construct(PDO $pdo)
     {
         $this->pdo = $pdo;
         $this->fluent = new \Envms\FluentPDO\Query($pdo);
+        $this->personPreferences = new PersonPreferences($this->pdo);
     }
 
     public function getEventsForDay($date, $userEmail)
@@ -49,7 +51,7 @@ class Event
         return ($result->count > 0);
     }
 
-    public function getNextEvents($person)
+    public function getNextEvents($person, bool $filterByPreferences = false)
     {
         $query = $this->fluent
             ->from('Event e')
@@ -66,9 +68,14 @@ class Event
         $query->where("e.StartTime > DATETIME('now') AND et.Inactivated = 0 AND " . $audienceCondition, ...$params)
             ->groupBy('e.Id')
             ->select('COUNT(m.Id) AS MessageCount')
-            ->select('et.Name AS EventTypeName, et.IdGroup AS EventTypeIdGroup, p.Id As Booked')
+            ->select('et.Name AS EventTypeName, et.IdGroup AS EventTypeIdGroup, p.Id AS Booked')
             ->orderBy('e.StartTime');
-        return $this->events($query->fetchAll());
+        $events = $this->events($query->fetchAll());
+        if ($filterByPreferences && $person) {
+            return $this->personPreferences->filterEventsByPreferences($events, $person);
+        }
+
+        return $events;
     }
 
     public function getEvent($eventId)
@@ -99,10 +106,10 @@ class Event
             ->fetchAll();
     }
 
-    public function getEvents($person, string $mode, int $offset): array
+    public function getEvents($person, string $mode, int $offset, bool $filterByPreferences = false): array
     {
         if ($mode == 'next') {
-            return $this->getNextEvents($person);
+            return $this->getNextEvents($person, $filterByPreferences);
         } else if ($mode === 'past') {
             $limit = 10;
             $query = $this->fluent->from('Event e')
@@ -386,6 +393,7 @@ class Event
         return array_map(function ($event) use ($attributes) {
             return [
                 'id' => $event->Id,
+                'idEventType' => $event->IdEventType,
                 'eventTypeName' => $event->EventTypeName,
                 'groupName' => $event->EventTypeIdGroup ? $this->fluent->from("'Group'")->where('Id', $event->EventTypeIdGroup)->fetch('Name') : '',
                 'summary' => $event->Summary,

@@ -13,6 +13,13 @@
             cursor: help;
             border: 1px solid rgba(0,0,0,0.2);
         }
+        .preferences-filter {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 0.375rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
     </style>
 {/block}
 
@@ -37,6 +44,19 @@
         </div>
         {/if}
     </div>
+
+    {if $person != false}
+    <div class="preferences-filter">
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="filterByPreferences" 
+                   {if $filterByPreferences}checked{/if} 
+                   onchange="togglePreferencesFilter()">
+            <label class="form-check-label" for="filterByPreferences">
+                <i class="bi bi-funnel"></i> Uniquement les événements qui correspondent à mes préférences
+            </label>
+        </div>
+    </div>
+    {/if}
 
     <table class="table table-striped">
         <thead>
@@ -288,4 +308,21 @@
 
 {block scripts}
     <script src="/app/js/event/nextEvents.js"></script>
+    <script>
+        function togglePreferencesFilter() {
+            const checkbox = document.getElementById('filterByPreferences');
+            const currentUrl = new URL(window.location.href);
+            
+            if (checkbox.checked) {
+                currentUrl.searchParams.set('filterByPreferences', '1');
+            } else {
+                currentUrl.searchParams.delete('filterByPreferences');
+            }
+            
+            // Réinitialiser l'offset lors du changement de filtre
+            currentUrl.searchParams.set('offset', '0');
+            
+            window.location.href = currentUrl.toString();
+        }
+    </script>
 {/block}

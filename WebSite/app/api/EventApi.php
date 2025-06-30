@@ -11,17 +11,20 @@ use app\helpers\Email;
 use app\helpers\Event;
 use app\helpers\EventAudience;
 use app\helpers\Message;
+use app\helpers\PersonPreferences;
 
 class EventApi extends BaseController
 {
-    private $event;
     private $email;
+    private $event;
+    private $personPreferences;
 
     public function __construct(PDO $pdo, Engine $flight)
     {
         parent::__construct($pdo, $flight);
         $this->event = new Event($this->pdo);
         $this->email = new Email($this->pdo);
+        $this->personPreferences = new PersonPreferences($this->pdo);
     }
 
     #region Attribute
@@ -309,19 +312,22 @@ class EventApi extends BaseController
                 if ($recipients === 'registered') {
                     $participants = $this->event->getEventParticipants($eventId);
                 } else if ($recipients === 'unregistered') {
+                    //TODO
                 } else if ($recipients === 'all') {
                     $participants = $this->email->getInterestedPeople(
                         $this->event->getEventGroup($eventId),
                         ($this->fluent->from('Event')->where('Id', $eventId)->fetch())->IdEventType ?? null,
                         (new DateTime($event->StartTime))->format('N') - 1,
-                        $this->getPeriodOfDay($event->StartTime)
+                        $this->personPreferences->getPeriodOfDay($event->StartTime)
                     );
                 } else {
                     $this->renderJson(['success' => false, 'message' => "Invalid recipients ($recipients)"], 404);
                     return;
                 }
                 if ($participants) {
-                    $eventLink = 'https://' . $_SERVER['HTTP_HOST'] . '/events/' . $event->Id;
+                    $root = 'https://' . $_SERVER['HTTP_HOST'];
+                    $eventLink = $root . '/events/' . $event->Id;
+                    $unsubscribeLink = $root . '/user/preferences';
                     $bccList = [];
 
                     foreach ($participants as $participant) {
@@ -335,9 +341,7 @@ class EventApi extends BaseController
                             ])
                             ->execute();
                     }
-                    $eventCreatorEmail = $this->fluent->from('Person')
-                        ->where('Id', $event->CreatedBy)
-                        ->fetch('Email');
+                    $eventCreatorEmail = $this->fluent->from('Person')->where('Id', $event->CreatedBy)->fetch('Email');
                     if (!$eventCreatorEmail) {
                         $this->renderJson(['success' => false, 'message' => 'Invalid Email in file ' + __FILE__ + ' at line ' + __LINE__], 404);
                         return;
@@ -346,7 +350,7 @@ class EventApi extends BaseController
                         $eventCreatorEmail,
                         $eventCreatorEmail,
                         $emailTitle,
-                        $message . "\n\n" . $eventLink,
+                        $message . "\n\n" . $eventLink . "\n\n Pour ne plus recevoir ce type de message vous pouvez mettre à jour vos préférences" . $unsubscribeLink,
                         null,
                         $bccList,
                         false
@@ -677,22 +681,6 @@ class EventApi extends BaseController
             ]);
         } else {
             $this->renderJson(['success' => false, 'message' => 'Erreur lors de la mise à jour'], 500);
-        }
-    }
-
-
-
-    private function getPeriodOfDay($dateString)
-    {
-        $date = new DateTime($dateString);
-        $hour = (int)$date->format('H');
-
-        if ($hour < 13) {
-            return 'morning';
-        } elseif ($hour < 18) {
-            return 'afternoon';
-        } else {
-            return 'evening';
         }
     }
 }

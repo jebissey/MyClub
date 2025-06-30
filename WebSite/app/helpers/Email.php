@@ -9,11 +9,13 @@ class Email
 {
     private PDO $pdo;
     private $fluent;
+    private $personPreferences;
 
     public function __construct(PDO $pdo)
     {
         $this->pdo = $pdo;
         $this->fluent = new \Envms\FluentPDO\Query($pdo);
+        $this->personPreferences = new PersonPreferences($pdo);
     }
 
     public function getEmailsOfInterestedPeople($idGroup, $idEventType, $dayOfWeek, $timeOfDay)
@@ -31,36 +33,7 @@ class Email
         $persons = $this->getPersons($idGroup);
         $filteredPeople = [];
         foreach ($persons as $person) {
-            $include = true;
-
-            if ($person->Preferences != '') {
-                $preferences = json_decode($person->Preferences, true);
-                if (isset($preferences['noAlerts']) && $preferences['noAlerts'] == 'on') {
-                    $include = false;
-                    continue;
-                }
-            }
-
-            if (!empty($idEventType)) {
-                if ($person->Preferences != '') {
-                    $preferences = json_decode($person->Preferences, true);
-                    if ($preferences != '' && (!isset($preferences['eventTypes'][$idEventType]))) {
-                        $include = false;
-                        continue;
-                    }
-                }
-            }
-
-            if ($dayOfWeek != '' && $timeOfDay != '') {
-                if ($person->Availabilities != '') {
-                    $availabilities = json_decode($person->Availabilities, true);
-                    if (isset($availabilities[$dayOfWeek][$timeOfDay]) != 'on') {
-                        $include = false;
-                    }
-                }
-            }
-
-            if ($include) {
+            if ($this->personPreferences->isPersonInterested($person, $idEventType, $dayOfWeek, $timeOfDay)) {
                 $filteredPeople[] = $person;
             }
         }

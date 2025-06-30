@@ -96,6 +96,7 @@ class News
             JOIN Event e ON e.Id = m.EventId
             WHERE m.LastUpdate > :searchFrom AND m.'From' = 'User' 
             AND m.EventId IN (SELECT IdEvent FROM Participant WHERE IdPerson = $person->Id)
+            ORDER BY m.LastUpdate DESC
         ";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([

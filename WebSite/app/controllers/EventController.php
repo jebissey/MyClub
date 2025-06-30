@@ -14,16 +14,18 @@ class EventController extends BaseController
         $person = $this->getPerson();
         $offset = (int) ($_GET['offset'] ?? 0);
         $mode = $_GET['mode'] ?? 'next';
+        $filterByPreferences = isset($_GET['filterByPreferences']) && $_GET['filterByPreferences'] === '1';
 
         $this->render('app/views/event/nextEvents.latte', $this->params->getAll([
             'navItems' => $this->getNavItems(),
-            'events' => $event->getEvents($person, $mode, $offset),
+            'events' => $event->getEvents($person, $mode, $offset, $filterByPreferences),
             'person' => $person,
             'eventTypes' => $this->fluent->from('EventType')->where('Inactivated', 0)->orderBy('Name')->fetchAll('Id', 'Name'),
             'needTypes' => $this->fluent->from('NeedType')->orderBy('Name')->fetchAll('Id', 'Name'),
             'eventAttributes' => $this->fluent->from('Attribute')->fetchAll('Id', 'Name, Detail, Color'),
             'offset' => $offset,
             'mode' => $mode,
+            'filterByPreferences' => $filterByPreferences,
             'layout' => $this->getLayout()
         ]));
     }
