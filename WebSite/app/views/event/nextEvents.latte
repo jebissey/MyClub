@@ -45,7 +45,7 @@
         {/if}
     </div>
 
-    {if $person != false}
+    {if $person != false && $mode == 'next'}
     <div class="preferences-filter">
         <div class="form-check">
             <input class="form-check-input" type="checkbox" id="filterByPreferences" 
@@ -77,8 +77,8 @@
         {foreach $events as $event}
             <tr onclick="window.location.href='/events/{$event['id']}';" style="cursor: pointer;">
                 <td>
-                {if $event['createdBy'] == ($person->Id ?? false) && $mode == 'next'}
                     <div class="ms-auto d-flex flex-column flex-sm-row gap-2">
+                    {if $event['createdBy'] == ($person->Id ?? false) && $mode == 'next'}
                         <button class="btn btn-sm btn-info email-btn" 
                                 data-event-id="{$event['id']}"
                                 data-event-title="{$event['summary']}"
@@ -90,17 +90,19 @@
                                 onclick="event.stopPropagation();">
                             <i class="bi bi-envelope" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="{='sendEmail'|translate}"></i>
                         </button>
-                        <button class="btn btn-sm btn-secondary duplicate-btn" data-id="{$event['id']}">
-                            <i class="bi bi-files" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="{='duplicate'|translate}"></i>
-                        </button>
                         <button class="btn btn-sm btn-primary edit-btn">
                             <i class="bi bi-pencil" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="{='edit'|translate}"></i>
                         </button>
                         <button class="btn btn-sm btn-danger delete-btn">
                             <i class="bi bi-trash" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="{='delete'|translate}"></i>
                         </button>
+                    {/if}
+                    {if $event['createdBy'] == ($person->Id ?? false) || $mode =='past'}
+                        <button class="btn btn-sm btn-secondary duplicate-btn" data-id="{$event['id']}">
+                            <i class="bi bi-files" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="{='duplicate'|translate}"></i>
+                        </button>
+                    {/if}
                     </div>
-                {/if}
                 </td>
                 <td>{$event['eventTypeName']} {if $event['groupName']}({$event['groupName']}){/if}</td>
                 <td>{=$event['startTime']|longDateTime}</td>
@@ -307,28 +309,28 @@
     </div>
 
     <div class="modal fade" id="duplicateModal" tabindex="-1" aria-labelledby="duplicateModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-        <div class="modal-header">
-            <h5 class="modal-title" id="duplicateModalLabel">Que souhaitez-vous faire ?</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
-        </div>
-        <div class="modal-body">
-            <div class="form-check">
-            <input class="form-check-input" type="radio" name="duplicateChoice" value="1" id="choiceToday">
-            <label class="form-check-label" for="choiceToday">Dupliquer aujourd'hui à 23:59</label>
+        <div class="modal-dialog">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="duplicateModalLabel">Que souhaitez-vous faire ?</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
             </div>
-            <div class="form-check">
-            <input class="form-check-input" type="radio" name="duplicateChoice" value="2" id="choiceWeek">
-            <label class="form-check-label" for="choiceWeek">Dupliquer même jour/heure la semaine prochaine</label>
+            <div class="modal-body">
+                <div class="form-check">
+                <input class="form-check-input" type="radio" name="duplicateChoice" value="1" id="choiceToday">
+                <label class="form-check-label" for="choiceToday">Dupliquer aujourd'hui à 23:59</label>
+                </div>
+                <div class="form-check">
+                <input class="form-check-input" type="radio" name="duplicateChoice" value="2" id="choiceWeek">
+                <label class="form-check-label" for="choiceWeek">Dupliquer même jour/heure la semaine prochaine</label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <button type="button" class="btn btn-primary" id="confirmDuplicate">Confirmer</button>
+            </div>
             </div>
         </div>
-        <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-            <button type="button" class="btn btn-primary" id="confirmDuplicate">Confirmer</button>
-        </div>
-        </div>
-    </div>
     </div>
 {/block}
 

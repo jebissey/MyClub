@@ -35,12 +35,16 @@ document.addEventListener('DOMContentLoaded', function () {
             fetch(`/api/navBar/getItem/${id}`)
                 .then(response => response.json())
                 .then(data => {
-                    document.getElementById('itemId').value = data.Id;
-                    document.getElementById('itemName').value = data.Name;
+                    if (data.success) {
+                        document.getElementById('itemId').value = data.message.Id;
+                        document.getElementById('itemName').value = data.message.Name;
+                    } else {
+                        alert("Erreur : " + data.message);
+                    }
 
-                    let routeBase = data.Route;
+                    let routeBase = data.message.Route;
                     let idValue = '';
-                    const match = data.Route.match(/(.+\/)(\d+)$/);
+                    const match = data.message.Route.match(/(.+\/)(\d+)$/);
                     if (match) {
                         routeBase = match[1] + '@id';
                         idValue = match[2];
@@ -57,7 +61,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     checkRouteParams();
 
                     const groupSelect = document.getElementById('itemGroup');
-                    const groupId = data.IdGroup ? data.IdGroup.toString() : '';
+                    const groupId = data.message.IdGroup ? data.message.IdGroup.toString() : '';
                     for (let i = 0; i < groupSelect.options.length; i++) {
                         if (groupSelect.options[i].value === groupId) {
                             groupSelect.selectedIndex = i;
@@ -65,8 +69,8 @@ document.addEventListener('DOMContentLoaded', function () {
                         }
                     }
 
-                    document.getElementById('forMembers').checked = data.ForMembers == 1;
-                    document.getElementById('forAnonymous').checked = data.ForAnonymous == 1;
+                    document.getElementById('forMembers').checked = data.message.ForMembers == 1;
+                    document.getElementById('forAnonymous').checked = data.message.ForAnonymous == 1;
 
                     modal.show();
                 })

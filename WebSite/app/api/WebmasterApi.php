@@ -25,7 +25,7 @@ class WebmasterApi extends BaseController
     {
         if ($this->getPerson(['Webmaster'])) {
             $item = $this->fluent->from('Page')->where('Id', $id)->fetch();
-            $this->renderJson($item);
+            $this->renderJson(['success' => true, 'message' => $item]);
         } else {
             $this->renderJson(['success' => false, 'message' => 'User not allowed'], 403);
         }
