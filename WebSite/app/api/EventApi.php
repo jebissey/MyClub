@@ -4,6 +4,7 @@ namespace app\api;
 
 use Flight\Engine;
 use PDO;
+use DateInterval;
 use DateTime;
 use Exception;
 use app\controllers\BaseController;
@@ -169,15 +170,16 @@ class EventApi extends BaseController
                 $event = $this->fluent->from('Event')->where('Id', $id)->fetch();
                 if (!$event) {
                     $this->pdo->rollBack();
-                    $this->renderJson(['success' => false, 'message' => 'Unknow event'], 471);
+                    $this->renderJson(['success' => false, 'message' => 'Unknown event'], 471);
                     return;
                 }
-
+                $mode = $_GET['mode'] ?? 'today';
+                $newStartTime = $this->calculateNewStartTime($event->StartTime, $mode);
                 $newEvent = [
                     'Summary' => $event->Summary,
                     'Description' => $event->Description,
                     'Location' => $event->Location,
-                    'StartTime' => (new DateTime('today 23:59'))->format('Y-m-d H:i:s'),
+                    'StartTime' => $newStartTime,
                     'Duration' => $event->Duration,
                     'IdEventType' => $event->IdEventType,
                     'CreatedBy' => $person->Id,
@@ -185,7 +187,6 @@ class EventApi extends BaseController
                     'Audience' => $event->Audience
                 ];
                 $newEventId = $this->fluent->insertInto('Event')->values($newEvent)->execute();
-
                 $attributes = $this->fluent->from('EventAttribute')->where('IdEvent', $id)->fetchAll();
                 foreach ($attributes as $attr) {
                     $this->fluent->insertInto('EventAttribute')->values([
@@ -193,6 +194,7 @@ class EventApi extends BaseController
                         'IdAttribute' => $attr->IdAttribute,
                     ])->execute();
                 }
+
                 $this->pdo->commit();
                 $this->renderJson(['success' => true, 'newEventId' => $newEventId]);
             } catch (Exception $e) {
@@ -201,6 +203,24 @@ class EventApi extends BaseController
             }
         } else {
             $this->renderJson(['success' => false, 'message' => 'User not allowed'], 403);
+        }
+    }
+    private function calculateNewStartTime($originalStartTime, $mode)
+    {
+        switch ($mode) {
+            case 'today':
+                return (new DateTime('today 23:59'))->format('Y-m-d H:i:s');
+
+            case 'week':
+                $now = new DateTime();
+                $newDate = clone new DateTime($originalStartTime);
+                do {
+                    $newDate->add(new DateInterval('P7D'));
+                } while ($newDate <= $now);
+                return $newDate->format('Y-m-d H:i:s');
+
+            default:
+                return (new DateTime('today 23:59'))->format('Y-m-d H:i:s');
         }
     }
 
@@ -350,7 +370,7 @@ class EventApi extends BaseController
                         $eventCreatorEmail,
                         $eventCreatorEmail,
                         $emailTitle,
-                        $message . "\n\n" . $eventLink . "\n\n Pour ne plus recevoir ce type de message vous pouvez mettre à jour vos préférences" . $unsubscribeLink,
+                        $message . "\n" . $eventLink . "\n\n Pour ne plus recevoir ce type de message vous pouvez mettre à jour vos préférences\n" . $unsubscribeLink,
                         null,
                         $bccList,
                         false

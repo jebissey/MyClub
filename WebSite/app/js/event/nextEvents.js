@@ -37,16 +37,20 @@ document.addEventListener('DOMContentLoaded', function () {
         btn.addEventListener("click", function (e) {
             e.stopPropagation();
             const eventId = this.dataset.id;
-
-            const choice = prompt(
-                "Que souhaitez-vous faire ?\n" +
-                "1 : Dupliquer cet événement à aujourd'hui 23:59\n" +
-                "2 : Dupliquer cet événement même jour/heure la semaine prochaine\n\n" +
-                "Annuler pour quitter."
-            );
-
-            if (choice === "1") {
-                fetch(`/api/event/duplicate/${eventId}?mode=today`, { method: 'POST' })
+            const duplicateModal = new bootstrap.Modal(document.getElementById('duplicateModal'));
+            duplicateModal.show();
+            document.querySelectorAll("input[name='duplicateChoice']").forEach(input => input.checked = false);
+            document.getElementById("confirmDuplicate").onclick = function () {
+                const choice = document.querySelector("input[name='duplicateChoice']:checked");
+                if (!choice) {
+                    alert("Merci de sélectionner une option.");
+                    return;
+                }
+                const selectedValue = choice.value;
+                let mode = "";
+                if (selectedValue === "1") mode = "today";
+                if (selectedValue === "2") mode = "week";
+                fetch(`/api/event/duplicate/${eventId}?mode=${mode}`, { method: 'POST' })
                     .then(res => res.json())
                     .then(data => {
                         if (data.success) {
@@ -55,21 +59,10 @@ document.addEventListener('DOMContentLoaded', function () {
                             alert("Erreur : " + data.message);
                         }
                     });
-
-            } else if (choice === "2") {
-                fetch(`/api/event/duplicate/${eventId}?mode=week`, { method: 'POST' })
-                    .then(res => res.json())
-                    .then(data => {
-                        if (data.success) {
-                            window.location.reload();
-                        } else {
-                            alert("Erreur : " + data.message);
-                        }
-                    });
-            }
+                duplicateModal.hide();
+            };
         });
     });
-
 
     function fetchEventDetails(eventId) {
         fetch(`/api/event/${eventId}`)
