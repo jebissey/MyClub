@@ -5,15 +5,18 @@ namespace app\controllers;
 use Flight\Engine;
 use PDO;
 use app\helpers\Email;
+use app\helpers\PersonPreferences;
 
 class EmailController extends BaseController
 {
     private $email;
+    private $personPreferences;
 
     public function __construct(PDO $pdo, Engine $flight)
     {
         parent::__construct($pdo, $flight);
         $this->email = new Email($this->pdo);
+        //$this->personPreferences = new PersonPreferences($this->pdo);
     }
 
     public function fetchEmails()
@@ -50,54 +53,30 @@ class EmailController extends BaseController
 
     public function fetchEmailsForArticle($idArticle)
     {
-        if ($person = $this->getPerson(['Redactor'])) {
+        if ($this->getPerson(['Redactor'])) {
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-                $idGroup = $this->fluent->from('Article')->where('Id', $idArticle)->fetch('IdGroup');
-                $idSurvey = $this->fluent->from('Survey')->where('IdArticle', $idArticle)->fetch('Id');
-
-                $persons = $this->email->getPersons($idGroup);
-                $filteredEmails = [];
-                foreach ($persons as $person) {
-                    $include = false;
-                    if ($person->Preferences ?? '' != '') {
-                        $preferences = json_decode($person->Preferences ?? '', true);
-                        if ($preferences != '' && isset($preferences['eventTypes']['newArticle'])) {
-                            if (isset($preferences['eventTypes']['newArticle']['pollOnly'])) {
-                                if ($idSurvey) {
-                                    $include = true;
-                                }
-                            } else {
-                                $include = true;
-                            }
-                        }
-                    }
-                    if ($include) {
-                        $filteredEmails[] = $person->Email;
-                        $this->fluent->insertInto('Message')
-                            ->values([
-                                'EventId' => null,
-                                'PersonId' => $person->Id,
-                                'Text' =>  "New article \n\n /articles/" . $idArticle,
-                                '"From"' => 'Webapp'
-                            ])
-                            ->execute();
-                    }
-                }
                 $article = $this->fluent->from('Article')->where('Id', $idArticle)->fetch();
                 if (!$article) die('Fatal program error in file ' + __FILE__ + ' at line ' + __LINE__);
                 $articleCreatorEmail = $this->fluent->from('Person')->where('Id', $article->CreatedBy)->fetch('Email');
                 if (!$articleCreatorEmail) {
-                    $this->renderJson(['success' => false, 'message' => 'Invalid Email in file ' + __FILE__ + ' at line ' + __LINE__], 404);
-                     $this->application->error471('Invalid Email', __FILE__, __LINE__);
+                    $this->application->error471('Invalid Email', __FILE__, __LINE__);
                     return;
                 }
+                /*$alreadySentMessages = $this->getAlreadySentMessages("/articles/$idArticle");
+var_dump($alreadySentMessages);            
+die;    */
+                $filteredEmails = $this->personPreferences->getPersonWantedToBeAlerted($idArticle);
+                $root = 'https://' . $_SERVER['HTTP_HOST'];
+                $articleLink = $root . '/articles/' . $idArticle;
+                $unsubscribeLink = $root . '/user/preferences';
                 $emailTitle = 'BNW - Un nouvel article est disponible';
-                $message = "Conformement à vos souhaits, ce message vous signale la présence d'un nouvel article";
+                $message = "Conformément à vos souhaits, ce message vous signale la présence d'un nouvel article" . "\n\n" . $articleLink
+                    . "\n\n Pour ne plus recevoir ce type de message vous pouvez mettre à jour vos préférences" . $unsubscribeLink;
                 Email::send(
                     $articleCreatorEmail,
                     $articleCreatorEmail,
                     $emailTitle,
-                    $message . "\n\n" . 'https://' . $_SERVER['HTTP_HOST'] . '/articles/' . $idArticle,
+                    $message,
                     null,
                     $filteredEmails,
                     false
@@ -110,5 +89,18 @@ class EmailController extends BaseController
         } else {
             $this->application->error403(__FILE__, __LINE__);
         }
+    }
+
+    public function getAlreadySentMessages($filter)
+    {
+        $sql = "
+            SELECT *, 
+                (strftime('%s', LastUpdate) / 20) AS TimeGroup, 
+                COUNT(*) AS Count
+            FROM Message
+            WHERE 'From' = 'Webapp' and Text like '%$filter%'
+            GROUP BY TimeGroup, Text";
+        $stmt = $this->pdo->query($sql);
+        return $stmt->fetchAll();
     }
 }

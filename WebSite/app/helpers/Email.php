@@ -9,12 +9,14 @@ class Email
 {
     private PDO $pdo;
     private $fluent;
-    private $personPreferences;
+    private Person $person;
+    private PersonPreferences $personPreferences;
 
     public function __construct(PDO $pdo)
     {
         $this->pdo = $pdo;
         $this->fluent = new \Envms\FluentPDO\Query($pdo);
+        $this->person = new Person($pdo);
         $this->personPreferences = new PersonPreferences($pdo);
     }
 
@@ -30,7 +32,7 @@ class Email
 
     public function getInterestedPeople($idGroup, $idEventType, $dayOfWeek, $timeOfDay)
     {
-        $persons = $this->getPersons($idGroup);
+        $persons = $this->person->getPersons($idGroup);
         $filteredPeople = [];
         foreach ($persons as $person) {
             if ($this->personPreferences->isPersonInterested($person, $idEventType, $dayOfWeek, $timeOfDay)) {
@@ -40,21 +42,7 @@ class Email
         return $filteredPeople;
     }
 
-    public function getPersons($idGroup)
-    {
-        $innerJoin = $and = '';
-        if (!empty($idGroup)) {
-            $innerJoin = 'INNER JOIN PersonGroup on PersonGroup.IdPerson = Person.Id';
-            $and = 'AND PersonGroup.IdGroup = ' . $idGroup;
-        }
-        $query = $this->pdo->query("
-            SELECT Email, Preferences, Availabilities, Person.Id
-            FROM Person
-            $innerJoin
-            WHERE Person.Inactivated = 0 $and
-        ");
-        return $query->fetchAll();
-    }
+
 
     public static function send($emailFrom, $emailTo, $subject, $body, $cc = null, $bcc = null, $isHtml = false)
     {

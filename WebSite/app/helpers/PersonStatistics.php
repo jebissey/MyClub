@@ -95,14 +95,6 @@ class PersonStatistics
         ];
     }
 
-    public function getActivePerson()
-    {
-        return $this->fluent->from('Person')
-            ->select('Id, FirstName, LastName, Email, Avatar')
-            ->where('Inactivated = 0')
-            ->fetchAll();
-    }
-
     #region Private functions
     private function getArticleStats($personId, $seasonStart, $seasonEnd)
     {

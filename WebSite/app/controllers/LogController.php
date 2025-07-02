@@ -5,7 +5,7 @@ namespace app\controllers;
 use flight\Engine;
 use PDO;
 use app\helpers\Log;
-use app\helpers\PersonStatistics;
+use app\helpers\Person;
 
 class LogController extends BaseController
 {
@@ -313,7 +313,7 @@ class LogController extends BaseController
     public function showLastVisits()
     {
         if ($this->getPerson(['Webmaster'])) {
-            $activePersons = (new PersonStatistics($this->pdo))->getActivePerson();
+            $activePersons = (new Person($this->pdo))->getActivePerson();
             $this->render('app/views/user/lastVisits.latte', $this->params->getAll([
                 'lastVisits' => $this->log->getLastVisitPerActivePersonWithTimeAgo($activePersons),
                 'totalActiveUsers' => count($activePersons),
