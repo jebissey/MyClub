@@ -2,7 +2,6 @@
 
 namespace app\helpers;
 
-use DateTime;
 use PDO;
 
 class Person
@@ -15,7 +14,6 @@ class Person
         $this->pdo = $pdo;
         $this->fluent = new \Envms\FluentPDO\Query($pdo);
     }
-
 
     public function getPersons($idGroup)
     {
@@ -32,7 +30,6 @@ class Person
         ");
         return $query->fetchAll();
     }
-
 
     public function getActivePerson()
     {

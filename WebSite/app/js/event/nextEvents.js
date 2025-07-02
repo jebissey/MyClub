@@ -440,7 +440,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 eventId: this.dataset.eventId,
                 eventTitle: this.dataset.eventTitle,
                 participantsCount: parseInt(this.dataset.participantsCount),
-                messagesCount: parseInt(this.dataset.messagesCount)
+                messagesCount: parseInt(this.dataset.webappMessagesCount)
             };
 
             document.getElementById('emailEventId').value = currentEventData.eventId;

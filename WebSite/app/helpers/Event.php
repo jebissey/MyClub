@@ -407,7 +407,19 @@ class Event
                 'audience' => $event->Audience,
                 'createdBy' => $event->CreatedBy,
                 'messages' => $event->MessageCount,
+                'webappMessages' => $this->getEventMessagesCount($event->Id, 'Webapp')
             ];
         }, $events);
+    }
+
+    private function getEventMessagesCount($eventId, $from)
+    {
+        $sql = 'SELECT COUNT(Id) FROM Message m WHERE m.EventId = :eventId AND m."From" = :from';
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([
+            ':eventId' => $eventId,
+            ':from'    => $from
+        ]);
+        return $stmt->fetchColumn();
     }
 }
