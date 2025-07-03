@@ -5,6 +5,7 @@ namespace app\controllers;
 use PDO;
 use app\helpers\Article;
 use app\helpers\Backup;
+use app\helpers\Crosstab;
 
 class ArticleController extends TableController
 {
@@ -306,19 +307,42 @@ class ArticleController extends TableController
     {
         if ($this->getPerson(['Redactor'], 1)) {
             $period = $this->flight->request()->query->period ?? 'month';
-
-            $articleStatistics = new Article($this->pdo);
-            $dateRange = $articleStatistics->getDateRangeForPeriod($period);
-            $crosstabData = $articleStatistics->getAuthorAudienceCrosstab(
-                $dateRange['start'],
-                $dateRange['end']
+            $sql = "
+                SELECT 
+                    p.FirstName || ' ' || p.LastName || 
+                    CASE 
+                        WHEN p.NickName IS NOT NULL AND p.NickName != '' THEN ' (' || p.NickName || ')'
+                        ELSE ''
+                    END AS columnForCrosstab,
+                    CASE 
+                        WHEN g.Name IS NOT NULL THEN g.Name
+                        WHEN a.OnlyForMembers = 0 THEN 'Tous'
+                        WHEN a.OnlyForMembers = 1 THEN 'Club'
+                    END AS rowForCrosstab,
+                    1 AS countForCrosstab
+                FROM Person p
+                JOIN Article a ON p.Id = a.CreatedBy
+                LEFT JOIN \"Group\" g ON g.Id = a.IdGroup
+                WHERE a.LastUpdate BETWEEN :start AND :end
+                AND a.PublishedBy IS NOT NULL
+                ORDER BY p.LastName, p.FirstName
+            ";
+            $crossTab = new CrossTab($this->pdo);
+            $dateRange = $crossTab->getDateRangeForPeriod($period);
+            $crosstabData = $crossTab->generateCrosstab(
+                $sql,
+                [':start' => $dateRange['start'], ':end' => $dateRange['end']],
+                'Audience',
+                'Rédateurs',
             );
-            $this->render('app/views/articles/crosstab.latte', $this->params->getAll([
+
+            $this->render('app/views/common/crosstab.latte', $this->params->getAll([
                 'crosstabData' => $crosstabData,
                 'period' => $period,
                 'dateRange' => $dateRange,
-                'availablePeriods' => $articleStatistics->getAvailablePeriods(),
-                'pdo' => $this->pdo,
+                'availablePeriods' => $crossTab->getAvailablePeriods(),
+                'navbarTemplate' => '../navbar/redactor.latte',
+                'title' => 'Rédateurs vs audience'
             ]));
         } else {
             $this->application->error403(__FILE__, __LINE__);

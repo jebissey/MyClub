@@ -1,0 +1,111 @@
+{layout '../layout.latte'}
+
+{block title}{$title}{/block}
+
+{block navbar}
+    {include $navbarTemplate}
+{/block}
+
+{block content}
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <h4 class="mb-0">{$title}</h4>
+                        </div>
+                        {ifset $availablePeriods}
+                        <div class="col-auto">
+                            <form id="periodForm" class="form-inline">
+                                <label for="periodSelect" class="mr-2 text-white">Période :</label>
+                                <select id="periodSelect" name="period" class="form-control form-control-sm" onchange="document.getElementById('periodForm').submit()">
+                                    {foreach $availablePeriods as $key => $label}
+                                        <option value="{$key}" {if $period == $key}selected{/if}>{$label}</option>
+                                    {/foreach}
+                                </select>
+                            </form>
+                        </div>
+                        {/ifset}
+                    </div>
+                </div>
+                <div class="card-body">
+                    {ifset $dateRange}
+                    <div class="alert alert-info">
+                        <i class="fa fa-info-circle"></i> Période sélectionnée :
+                        <strong>{date('d/m/Y', strtotime($dateRange['start']))}</strong> au
+                        <strong>{date('d/m/Y', strtotime($dateRange['end']))}</strong>
+                    </div>
+                    {/ifset}
+
+                    {if count($crosstabData['columns']) > 0}
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-hover table-striped">
+                                <thead class="thead-dark">
+                                    <tr>
+                                        <th rowspan="2" class="align-middle"><h1>{$crosstabData['rowsTitle']}</h1></th>
+                                        <th colspan="{count($crosstabData['columns'])}" class="text-center"><h2>{$crosstabData['columnsTitle']}</h2></th>
+                                        <th rowspan="2" class="align-middle text-center bg-primary text-white fs-5">Total</th>
+                                    </tr>
+                                    <tr>
+                                        {foreach $crosstabData['columns'] as $column}
+                                            <th class="text-center">{$column}</th>
+                                        {/foreach}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {foreach $crosstabData['rows'] as $rowLabel => $rowValues}
+                                        <tr>
+                                            <td><strong>{$rowLabel}</strong></td>
+                                            {foreach $crosstabData['columns'] as $column}
+                                                {var $count = $rowValues[$column] ?? 0}
+                                                <td class="text-center">
+                                                    {if $count > 0}
+                                                        {$count}
+                                                    {else}
+                                                        <span class="text-muted">-</span>
+                                                    {/if}
+                                                </td>
+                                            {/foreach}
+                                            <td class="text-center font-weight-bold bg-light">
+                                                {var $rowTotal = array_sum($rowValues)}
+                                                {if $rowTotal > 0}
+                                                    {$rowTotal}
+                                                {else}
+                                                    <span class="text-muted">-</span>
+                                                {/if}
+                                            </td>
+                                        </tr>
+                                    {/foreach}
+                                </tbody>
+                                <tfoot>
+                                    <tr class="fs-5 bg-primary text-white">
+                                        <td><strong>Total</strong></td>
+                                        {foreach $crosstabData['columns'] as $column}
+                                            {var $colTotal = 0}
+                                            {foreach $crosstabData['rows'] as $rowValues}
+                                                {var $colTotal = $colTotal + ($rowValues[$column] ?? 0)}
+                                            {/foreach}
+                                            <td class="text-center font-weight-bold">{$colTotal}</td>
+                                        {/foreach}
+                                        {var $grandTotal = 0}
+                                        {foreach $crosstabData['rows'] as $rowValues}
+                                            {var $grandTotal = $grandTotal + array_sum($rowValues)}
+                                        {/foreach}
+                                        <td class="text-center font-weight-bold">{$grandTotal}</td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    {else}
+                        <div class="alert alert-warning">
+                            <i class="fa fa-exclamation-triangle"></i> Aucun résultat trouvé pour la période sélectionnée.
+                        </div>
+                    {/if}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}
