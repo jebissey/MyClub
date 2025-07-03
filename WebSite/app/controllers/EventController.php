@@ -4,6 +4,7 @@ namespace app\controllers;
 
 use DateTime;
 use Exception;
+use app\helpers\Crosstab;
 use app\helpers\Event;
 
 class EventController extends BaseController
@@ -41,6 +42,48 @@ class EventController extends BaseController
             'layout' => $this->getLayout()
         ]));
     }
+
+    public function showEventCrosstab()
+    {
+        if ($this->getPerson(['Redactor'], 1)) {
+            $period = $this->flight->request()->query->period ?? 'month';
+            $sql = "
+                SELECT 
+                    p.FirstName || ' ' || p.LastName || 
+                    CASE 
+                        WHEN p.NickName IS NOT NULL AND p.NickName != '' THEN ' (' || p.NickName || ')'
+                        ELSE ''
+                    END AS columnForCrosstab,
+                    et.Name AS rowForCrosstab,
+                    1 AS countForCrosstab
+                FROM Person p
+                JOIN Event e ON p.Id = e.CreatedBy
+                JOIN EventType et ON e.IdEventType = et.Id
+                WHERE e.LastUpdate BETWEEN :start AND :end
+                ORDER BY p.LastName, p.FirstName
+            ";
+            $crossTab = new CrossTab($this->pdo);
+            $dateRange = $crossTab->getDateRangeForPeriod($period);
+            $crosstabData = $crossTab->generateCrosstab(
+                $sql,
+                [':start' => $dateRange['start'], ':end' => $dateRange['end']],
+                'Types d\'événement',
+                'Animateurs',
+            );
+
+            $this->render('app/views/common/crosstab.latte', $this->params->getAll([
+                'crosstabData' => $crosstabData,
+                'period' => $period,
+                'dateRange' => $dateRange,
+                'availablePeriods' => $crossTab->getAvailablePeriods(),
+                'navbarTemplate' => '../navbar/eventManager.latte',
+                'title' => 'Animateurs vs type d\'événement'
+            ]));
+        } else {
+            $this->application->error403(__FILE__, __LINE__);
+        }
+    }
+
 
     public function show($eventId): void
     {

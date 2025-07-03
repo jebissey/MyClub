@@ -316,8 +316,8 @@ class ArticleController extends TableController
                     END AS columnForCrosstab,
                     CASE 
                         WHEN g.Name IS NOT NULL THEN g.Name
-                        WHEN a.OnlyForMembers = 0 THEN 'Tous'
-                        WHEN a.OnlyForMembers = 1 THEN 'Club'
+                        WHEN a.OnlyForMembers = 0 THEN 'Tous (les visiteurs)'
+                        WHEN a.OnlyForMembers = 1 THEN 'Club (membres)'
                     END AS rowForCrosstab,
                     1 AS countForCrosstab
                 FROM Person p
