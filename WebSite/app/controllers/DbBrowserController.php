@@ -170,13 +170,18 @@ class DbBrowserController extends BaseController
     {
         if ($this->getPerson(['Webmaster'])) {
             $this->validateTableName($table);
-            $columns = $this->getTableColumns($table);
+            $columnsDetails = $this->getTableColumnsDetails($table);
             $primaryKey = $this->getPrimaryKey($table);
 
             $data = [];
-            foreach ($columns as $column) {
+            foreach ($columnsDetails as $columnsDetail) {
+                $column = $columnsDetail['name'];
                 if (isset($_POST[$column]) && $column != $primaryKey) {
-                    $data[$column] = $_POST[$column];
+                    $value = $_POST[$column];
+                    if ($value === '' && $columnsDetail['notnull'] == 0) {
+                        $value = null;
+                    }
+                    $data[$column] = $value;
                 }
             }
 
@@ -191,10 +196,9 @@ class DbBrowserController extends BaseController
             $stmt = $this->pdo->prepare($query);
 
             foreach ($data as $column => $value) {
-                $stmt->bindValue(':update_' . $column, $value);
+                $stmt->bindValue(':update_' . $column, $value, $value === null ? PDO::PARAM_NULL : PDO::PARAM_STR);
             }
             $stmt->bindValue(':id', $id);
-
             $stmt->execute();
             $this->flight->redirect('/dbbrowser/' . urlencode($table));
         } else {
@@ -233,6 +237,24 @@ class DbBrowserController extends BaseController
 
         return $columns;
     }
+
+    private function getTableColumnsDetails($table)
+    {
+        $this->validateTableName($table);
+        $stmt = $this->pdo->prepare("PRAGMA table_info(" . $this->quoteName($table) . ")");
+        $stmt->execute();
+
+        $columns = [];
+        while ($row = $stmt->fetch(PDO::FETCH_OBJ)) {
+            $columns[] = [
+                'name' => $row->name,
+                'notnull' => $row->notnull
+            ];
+        }
+
+        return $columns;
+    }
+
 
     private function getPrimaryKey($table)
     {
