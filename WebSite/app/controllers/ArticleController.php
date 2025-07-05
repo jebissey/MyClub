@@ -2,6 +2,7 @@
 
 namespace app\controllers;
 
+use flight\Engine;
 use PDO;
 use app\helpers\Article;
 use app\helpers\Backup;
@@ -9,6 +10,14 @@ use app\helpers\Crosstab;
 
 class ArticleController extends TableController
 {
+    private Article $article;
+
+    public function __construct(PDO $pdo, Engine $flight)
+    {
+        parent::__construct($pdo, $flight); 
+        $this->article = new Article($pdo);
+    }
+
     public function home(): void
     {
         if ($this->getPerson(['Redactor'])) {
@@ -122,28 +131,13 @@ class ArticleController extends TableController
         ]));
     }
 
-    public function getLatestArticles(?string $userEmail = null): array
-    {
-        $articleIds = $this->getArticleIdsBasedOnAccess($userEmail);
-        if (empty($articleIds)) {
-            return [
-                'latestArticle' => null,
-                'latestArticleTitles' => []
-            ];
-        }
-        return [
-            'latestArticle' => $this->getLatestArticle($articleIds),
-            'latestArticleTitles' => $this->getLatestArticleTitles($articleIds)
-        ];
-    }
-
     public function show($id): void
     {
         $person = $this->getPerson();
         $article = $this->authorizations->getArticle($id, $person);
         if ($article) {
-            $articleIds = $this->getArticleIdsBasedOnAccess($person->Email ?? null);
-            $chosenArticle = $this->getLatestArticle([$id]);
+            $articleIds = $this->article->getArticleIdsBasedOnAccess($person->Email ?? null);
+            $chosenArticle = $this->article->getLatestArticle([$id]);
             $canEdit = false;
             if ($person && $chosenArticle) {
                 $canEdit = ($person && $person->Id == $chosenArticle->CreatedBy);
@@ -160,7 +154,7 @@ class ArticleController extends TableController
 
             $this->render('app/views/user/article.latte', $this->params->getAll([
                 'chosenArticle' => $chosenArticle,
-                'latestArticleTitles' => $this->getLatestArticleTitles($articleIds),
+                'latestArticles' => $this->article->getLatestArticles_($articleIds),
                 'canEdit' => $canEdit,
                 'groups' => $this->getGroups(),
                 'hasSurvey' =>  $this->fluent->from('Survey')->where('IdArticle', $id)->fetch(),
@@ -184,7 +178,7 @@ class ArticleController extends TableController
     {
         if ($person = $this->getPerson(['Redactor'])) {
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-                $article = $this->getLatestArticle([$id]);
+                $article = $this->article->getLatestArticle([$id]);
                 if (!$article || $person->Id != $article->CreatedBy) {
                     $this->application->error403(__FILE__, __LINE__);
                     return;
@@ -230,7 +224,7 @@ class ArticleController extends TableController
     {
         if ($person = $this->getPerson(['Editor'])) {
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-                $article = $this->getLatestArticle([$id]);
+                $article = $this->article->getLatestArticle([$id]);
                 if (!$article || ($person->Id != $article->CreatedBy && !$this->authorizations->isEditor())) {
                     $this->application->error403(__FILE__, __LINE__);
                     return;
@@ -252,7 +246,7 @@ class ArticleController extends TableController
                 $this->flight->redirect('/articles/' . $id);
             } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $this->render('app/views/user/publish.latte', $this->params->getAll([
-                    'article' => $this->getArticle($id),
+                    'article' => $this->article->getArticle($id),
                 ]));
             } else {
                 $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
@@ -285,7 +279,7 @@ class ArticleController extends TableController
     {
         if ($person = $this->getPerson(['Redactor'])) {
             if (($_SERVER['REQUEST_METHOD'] === 'GET')) {
-                $article = $this->getLatestArticle([$id]);
+                $article = $this->article->getLatestArticle([$id]);
                 if (!$article || $person->Id != $article->CreatedBy) {
                     $this->application->error403(__FILE__, __LINE__);
                     return;
@@ -347,101 +341,5 @@ class ArticleController extends TableController
         } else {
             $this->application->error403(__FILE__, __LINE__);
         }
-    }
-
-    #region Private functions
-    private function getArticleIdsBasedOnAccess(?string $userEmail): array
-    {
-        $noGroupArticleIds = $this->getNoGroupArticleIds();
-        if (empty($userEmail)) {
-            return $noGroupArticleIds;
-        }
-        $forMembersOnlyArticleIds = $this->getArticleIdsForMembers([$userEmail]);
-        if (empty($forMembersOnlyArticleIds)) {
-            $articleIds = $noGroupArticleIds;
-        } else {
-            $articleIds = array_merge($noGroupArticleIds, $forMembersOnlyArticleIds);
-        }
-        $userGroups = $this->authorizations->getUserGroups($userEmail);
-        if (empty($userGroups)) {
-            return $articleIds;
-        }
-        $groupArticleIds = $this->getArticleIdsByGroups($userGroups);
-        return array_unique(array_merge($articleIds, $groupArticleIds));
-    }
-
-    private function getNoGroupArticleIds(): array
-    {
-        $query = $this->pdo->prepare("
-            SELECT Article.Id FROM Article 
-            WHERE Article.publishedBy IS NOT NULL AND Article.IdGroup IS NULL AND Article.OnlyForMembers = 0");
-        $query->execute();
-        return $query->fetchAll(PDO::FETCH_COLUMN);
-    }
-
-    private function getArticleIdsForMembers(): array
-    {
-        $query = $this->pdo->prepare("
-            SELECT Article.Id FROM Article 
-            WHERE Article.publishedBy IS NOT NULL AND Article.IdGroup IS NULL AND Article.OnlyForMembers = 1");
-        $query->execute();
-        return $query->fetchAll(PDO::FETCH_COLUMN);
-    }
-
-    private function getArticleIdsByGroups(array $groupIds): array
-    {
-        if (empty($groupIds)) {
-            return [];
-        }
-        $groups = implode(',', array_fill(0, count($groupIds), '?'));
-        $query = $this->pdo->prepare("
-            SELECT DISTINCT Article.Id FROM Article 
-            WHERE Article.publishedBy IS NOT NULL
-            AND Article.IdGroup IN ($groups)");
-        $query->execute($groupIds);
-        return $query->fetchAll(PDO::FETCH_COLUMN);
-    }
-
-    private function getLatestArticle(array $articleIds): ?object
-    {
-        if (empty($articleIds)) {
-            return null;
-        }
-
-        $article = $this->fluent->from('Article')
-            ->select('Article.*, Person.FirstName, Person.LastName, "Group".Name || \'(\' || "Group".Id || \')\' AS GroupName')
-            ->leftJoin('Person ON Person.Id = Article.CreatedBy')
-            ->leftJoin('"Group" ON Article.IdGroup = "Group".Id')
-            ->where('Article.Id', $articleIds)
-            ->orderBy('Article.LastUpdate DESC')
-            ->limit(1)
-            ->fetch();
-
-        return $article ?: null;
-    }
-
-    private function getLatestArticleTitles(array $articleIds): array
-    {
-        if (empty($articleIds)) {
-            return [];
-        }
-
-        return $this->fluent->from('Article')
-            ->select('Id, Title, Timestamp, LastUpdate')
-            ->where('Id', $articleIds)
-            ->where('publishedBy IS NOT NULL')
-            ->orderBy('LastUpdate DESC')
-            ->limit(10)
-            ->fetchAll() ?: [];
-    }
-
-    private function getArticle($id)
-    {
-        return $this->fluent
-            ->from('Article a')
-            ->leftJoin('Person p ON a.CreatedBy = p.Id')
-            ->select('a.*, p.FirstName, p.LastName, p.NickName')
-            ->where('a.Id', $id)
-            ->fetch();
     }
 }

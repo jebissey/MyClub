@@ -5,7 +5,6 @@ namespace app\controllers;
 use Flight\Engine;
 use PDO;
 use app\helpers\Email;
-use app\helpers\PersonPreferences;
 
 class EmailController extends BaseController
 {
@@ -16,7 +15,6 @@ class EmailController extends BaseController
     {
         parent::__construct($pdo, $flight);
         $this->email = new Email($this->pdo);
-        //$this->personPreferences = new PersonPreferences($this->pdo);
     }
 
     public function fetchEmails()
@@ -62,9 +60,6 @@ class EmailController extends BaseController
                     $this->application->error471('Invalid Email', __FILE__, __LINE__);
                     return;
                 }
-                /*$alreadySentMessages = $this->getAlreadySentMessages("/articles/$idArticle");
-var_dump($alreadySentMessages);            
-die;    */
                 $filteredEmails = $this->personPreferences->getPersonWantedToBeAlerted($idArticle);
                 $root = 'https://' . $_SERVER['HTTP_HOST'];
                 $articleLink = $root . '/articles/' . $idArticle;

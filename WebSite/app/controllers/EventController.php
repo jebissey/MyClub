@@ -84,7 +84,6 @@ class EventController extends BaseController
         }
     }
 
-
     public function show($eventId): void
     {
         $person = $this->getPerson();

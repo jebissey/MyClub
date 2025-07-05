@@ -80,7 +80,7 @@ class News
                 'id' => $event->Id,
                 'title' => $event->Summary,
                 'date' => $event->LastUpdate,
-                'url' => '/event/' . $event->Id
+                'url' => '/events/' . $event->Id
             ];
         }
 

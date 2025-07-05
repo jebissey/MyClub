@@ -3,6 +3,7 @@
 namespace app\controllers;
 
 use DateTime;
+use flight\Engine;
 use PDO;
 use app\helpers\Alert;
 use app\helpers\Article;
@@ -13,9 +14,16 @@ use app\helpers\PasswordManager;
 use app\helpers\PersonStatistics;
 use app\helpers\TranslationManager;
 
-
 class UserController extends BaseController
 {
+    private Article $article;
+
+    public function __construct(PDO $pdo, Engine $flight)
+    {
+        parent::__construct($pdo, $flight); 
+        $this->article = new Article($pdo);
+    }
+    
     #region Sign
     public function forgotPassword($encodedEmail)
     {
@@ -176,7 +184,7 @@ class UserController extends BaseController
     }
     #endregion
 
-    public function home(ArticleController $articleController)
+    public function home()
     {
         $_SESSION['navbar'] = '';
         $userPendingSurveys = $userPendingDesigns = [];
@@ -211,10 +219,15 @@ class UserController extends BaseController
                 'isRedactor' => false,
             ]);
         }
-        $articles = $articleController->getLatestArticles($userEmail);
+        $articles = $this->article->getLatestArticles($userEmail);
+        $spotlight = $this->article->getSpotlightArticle();
+        if ($spotlight !== null) {
+            $articleId = $spotlight['articleId'];
+            $spotlightUntil = $spotlight['spotlightUntil'];
+        }
         $this->render('app/views/home.latte', $this->params->getAll([
             'latestArticle' => $articles['latestArticle'],
-            'latestArticleTitles' => $articles['latestArticleTitles'],
+            'latestArticles' => $articles['latestArticles'],
             'greatings' => $this->settings->get('Greatings'),
             'link' => $this->settings->get('Link'),
             'navItems' => $this->getNavItems(),
@@ -508,7 +521,6 @@ class UserController extends BaseController
         return Email::send($email, $adminEmail, $subject, $body);
     }
 
-
     #region News
     public function showNews()
     {
@@ -520,7 +532,7 @@ class UserController extends BaseController
                 $searchFrom = $person->LastSignOut ?? '';
             } elseif ($searchMode === 'week') {
                 $searchFrom = date('Y-m-d H:i:s', strtotime('-1 week'));
-            }elseif ($searchMode === 'month') {
+            } elseif ($searchMode === 'month') {
                 $searchFrom = date('Y-m-d H:i:s', strtotime('-1 month'));
             }
 
