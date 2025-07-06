@@ -18,6 +18,22 @@
                             {/if}
                         </label>
                     </div>
+
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input type="hidden" name="isSpotlightActive" value="0">
+                            <input class="form-check-input" type="checkbox" value="1" id="isSpotlightActive" name="isSpotlightActive">
+                            <label class="form-check-label" for="isSpotlightActive">
+                                <strong>Mettre à la une</strong>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="mb-3" id="isSpotlightedUntil" style="display: none;">
+                        <div class="form-text">
+                            Sélectionnez la date jusqu'à laquelle l'article sera mis à la une
+                        </div>
+                        <input type="date" class="form-control mx-auto" style="width: auto;" id="spotlightedUntil" name="spotlightedUntil">
+                    </div>
                 </div>
             </div>
         </div>

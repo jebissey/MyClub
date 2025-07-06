@@ -89,29 +89,11 @@
                 </div>
                 <div class="modal-body" id="publishContent">
                 </div>
-                <div class="modal-footer">
-                    <!-- Boutons de la modale -->
-                </div>
             </div>
         </div>
     </div>
 {/block}
 
 {block scripts}
-<script n:syntax="off">
-    let publishModal;
-
-    document.addEventListener('DOMContentLoaded', function() {
-        publishModal = new bootstrap.Modal(document.getElementById('publishModal'));
-    });
-
-    function showPublish(articleId) {
-        fetch(`/publish/article/${articleId}`)
-            .then(response => response.text())
-            .then(html => {
-                document.getElementById('publishContent').innerHTML = html;
-                publishModal.show();
-            });
-    }
-</script>
+    <script src="/app/js/article/articles.js"></script>
 {/block}

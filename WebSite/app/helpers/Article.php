@@ -115,6 +115,11 @@ class Article
         return array_unique(array_merge($articleIds, $groupArticleIds));
     }
 
+    public function isUserAllowedToReadArticle(string $userEmail, $id)
+    {
+        return in_array($id, $this->getArticleIdsBasedOnAccess($userEmail));
+    }
+
     public function getLatestArticle(array $articleIds): ?object
     {
         if (empty($articleIds)) {

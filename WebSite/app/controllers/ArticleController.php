@@ -14,7 +14,7 @@ class ArticleController extends TableController
 
     public function __construct(PDO $pdo, Engine $flight)
     {
-        parent::__construct($pdo, $flight); 
+        parent::__construct($pdo, $flight);
         $this->article = new Article($pdo);
     }
 
@@ -228,6 +228,11 @@ class ArticleController extends TableController
                 if (!$article || ($person->Id != $article->CreatedBy && !$this->authorizations->isEditor())) {
                     $this->application->error403(__FILE__, __LINE__);
                     return;
+                }
+                $isSpotlightActive = $_POST['isSpotlightActive'] ?? 0;
+                if ($isSpotlightActive) {
+                    $spotlightedUntil = $_POST['spotlightedUntil'] ?? 0;
+                    $this->article->setSpotlightArticle($id, $spotlightedUntil);
                 }
                 $published = $_POST['published'] ?? 0;
                 $result = $this->fluent->update('Article')

@@ -331,4 +331,5 @@ INSERT INTO "Person" VALUES (1,'webmaster@myclub.foo','613cbc51f1650fb264beaad12
 INSERT INTO "PersonGroup" VALUES (1,1,1);
 INSERT INTO "Settings" VALUES (1,'Title','title');
 INSERT INTO "Settings" VALUES (2,'LegalNotices','LegalNotices');
+INSERT INTO "Settings" VALUES (3,'SpotlightArticle','');
 COMMIT;

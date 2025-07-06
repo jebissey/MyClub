@@ -20,10 +20,10 @@ class UserController extends BaseController
 
     public function __construct(PDO $pdo, Engine $flight)
     {
-        parent::__construct($pdo, $flight); 
+        parent::__construct($pdo, $flight);
         $this->article = new Article($pdo);
     }
-    
+
     #region Sign
     public function forgotPassword($encodedEmail)
     {
@@ -220,13 +220,19 @@ class UserController extends BaseController
             ]);
         }
         $articles = $this->article->getLatestArticles($userEmail);
+        $latestArticle = $articles['latestArticle'];
         $spotlight = $this->article->getSpotlightArticle();
         if ($spotlight !== null) {
             $articleId = $spotlight['articleId'];
-            $spotlightUntil = $spotlight['spotlightUntil'];
+            if ($this->article->isUserAllowedToReadArticle($userEmail, $articleId)) {
+                $spotlightUntil = $spotlight['spotlightUntil'];
+                if (strtotime($spotlightUntil) >= strtotime(date('Y-m-d'))) {
+                    $latestArticle = $this->article->getArticle($articleId);
+                }
+            }
         }
         $this->render('app/views/home.latte', $this->params->getAll([
-            'latestArticle' => $articles['latestArticle'],
+            'latestArticle' => $latestArticle,
             'latestArticles' => $articles['latestArticles'],
             'greatings' => $this->settings->get('Greatings'),
             'link' => $this->settings->get('Link'),
