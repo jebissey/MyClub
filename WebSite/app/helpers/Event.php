@@ -74,7 +74,6 @@ class Event
         if ($filterByPreferences && $person) {
             return $this->personPreferences->filterEventsByPreferences($events, $person);
         }
-
         return $events;
     }
 

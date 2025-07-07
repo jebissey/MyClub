@@ -50,6 +50,12 @@ class PersonPreferences
                 if ($preferences != '' && (!isset($preferences['eventTypes'][$idEventType]))) {
                     return false;
                 }
+                if (
+                    $preferences != '' && (isset($preferences['eventTypes'][$idEventType]))
+                    && !isset($preferences['eventTypes'][$idEventType]["available"])
+                ) {
+                    return true;
+                }
             }
         }
         if ($dayOfWeek != '' && $timeOfDay != '') {
