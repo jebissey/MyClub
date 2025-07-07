@@ -66,7 +66,7 @@ class EventTypeController extends TableController implements CrudControllerInter
                     $this->pdo->beginTransaction();
                     try {
                         $name = $_POST['name'];
-                        $idGroup = $_POST['idGroup'];
+                        $idGroup = $_POST['idGroup'] === '' ? null : ($_POST['idGroup'] ?? null);
                         $query = $this->pdo->prepare('UPDATE EventType SET Name = ?, IdGroup = ? WHERE Id = ?');
                         $query->execute([$name, $idGroup, $id]);
 

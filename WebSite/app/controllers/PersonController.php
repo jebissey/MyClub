@@ -168,8 +168,6 @@ class PersonController extends TableController implements CrudControllerInterfac
         return $query->fetchColumn();
     }
 
-
-
     public function editPresentation()
     {
         if ($person = $this->getPerson([])) {
