@@ -98,7 +98,7 @@
                             <i class="bi bi-trash" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="{='delete'|translate}"></i>
                         </button>
                     {/if}
-                    {if $event['createdBy'] == ($person->Id ?? false) || $mode =='past'}
+                    {if $event['createdBy'] == ($person->Id ?? false) || $mode =='past' || $isEventManager}
                         <button class="btn btn-sm btn-secondary duplicate-btn" data-id="{$event['id']}">
                             <i class="bi bi-files" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="{='duplicate'|translate}"></i>
                         </button>
@@ -337,21 +337,4 @@
 
 {block scripts}
     <script src="/app/js/event/nextEvents.js"></script>
-    <script>
-        function togglePreferencesFilter() {
-            const checkbox = document.getElementById('filterByPreferences');
-            const currentUrl = new URL(window.location.href);
-            
-            if (checkbox.checked) {
-                currentUrl.searchParams.set('filterByPreferences', '1');
-            } else {
-                currentUrl.searchParams.delete('filterByPreferences');
-            }
-            
-            // Réinitialiser l'offset lors du changement de filtre
-            currentUrl.searchParams.set('offset', '0');
-            
-            window.location.href = currentUrl.toString();
-        }
-    </script>
 {/block}

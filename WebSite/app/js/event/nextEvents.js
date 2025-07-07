@@ -525,3 +525,16 @@ function getContrastYIQ(hexcolor) {
     const yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
     return (yiq >= 128) ? 'black' : 'white';
 }
+
+function togglePreferencesFilter() {
+    const checkbox = document.getElementById('filterByPreferences');
+    const currentUrl = new URL(window.location.href);
+
+    if (checkbox.checked) {
+        currentUrl.searchParams.set('filterByPreferences', '1');
+    } else {
+        currentUrl.searchParams.delete('filterByPreferences');
+    }
+    currentUrl.searchParams.set('offset', '0');
+    window.location.href = currentUrl.toString();
+}
