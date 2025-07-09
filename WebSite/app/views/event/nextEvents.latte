@@ -75,7 +75,19 @@
             </tr>
         </thead>
         <tbody>
+        {var $previousWeek = null}
         {foreach $events as $event}
+            {var $currentWeek = date('o-W', strtotime($event['startTime']))}
+            {if $currentWeek != $previousWeek}
+                {var $weekStart = date('Y-m-d', strtotime('monday this week', strtotime($event['startTime'])))}
+                {var $weekEnd = date('Y-m-d', strtotime('sunday this week', strtotime($event['startTime'])))}
+                <tr>
+                    <td colspan="10" class="table-secondary fw-bold">
+                        📅 Semaine du {$weekStart|longDate} au {$weekEnd|longDate}
+                    </td>
+                </tr>
+                {var $previousWeek = $currentWeek}
+            {/if}
             <tr onclick="window.location.href='/events/{$event['id']}';" style="cursor: pointer;">
                 <td>
                     <div class="ms-auto d-flex flex-column flex-sm-row gap-2">

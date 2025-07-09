@@ -40,18 +40,18 @@
                                     value="{$record->$column}" {if $columnInfo['notnull']}required{/if}>
                             {elseif strpos($columnInfo['type'], 'REAL') !== false || strpos($columnInfo['type'], 'FLOA') !== false}
                                 <input type="number" step="0.01" class="form-control" id="{$column}" name="{$column}" 
-                                    value="{$record[$column]}" {if $columnInfo['notnull']}required{/if}>
+                                    value="{$record->$column}" {if $columnInfo['notnull']}required{/if}>
                             {elseif strpos($columnInfo['type'], 'BOOL') !== false}
                                 <select class="form-control" id="{$column}" name="{$column}" {if $columnInfo['notnull']}required{/if}>
-                                    <option value="0" {if $record[$column] == '0'}selected{/if}>Faux (0)</option>
-                                    <option value="1" {if $record[$column] == '1'}selected{/if}>Vrai (1)</option>
+                                    <option value="0" {if $record->$column == '0'}selected{/if}>Faux (0)</option>
+                                    <option value="1" {if $record->$column == '1'}selected{/if}>Vrai (1)</option>
                                 </select>
                             {elseif strpos(strtoupper($column), 'DATE') !== false || strpos($columnInfo['type'], 'DATE') !== false}
                                 <input type="date" class="form-control" id="{$column}" name="{$column}" 
-                                    value="{$record[$column]}" {if $columnInfo['notnull']}required{/if}>
+                                    value="{$record->$column}" {if $columnInfo['notnull']}required{/if}>
                             {else}
                                 <input type="text" class="form-control" id="{$column}" name="{$column}" 
-                                    value="{$record[$column]}" {if $columnInfo['notnull']}required{/if}>
+                                    value="{$record->$column}" {if $columnInfo['notnull']}required{/if}>
                             {/if}
                             
                             <small class="form-text text-muted">Type: {$columnInfo['type']}</small>

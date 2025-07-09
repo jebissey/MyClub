@@ -26,7 +26,7 @@
                 <div id="alertOptions">
                     <div class="card mb-3">
                         <div class="card-header">
-                            <h5 class="card-title mb-0">Sélectionnez les type d'évènement pour lesquels vous souhaitez recevoir une alerte :</h5>
+                            <h5 class="card-title mb-0">Sélectionnez les types d'évènement qui correspondent à vos préférences</h5>
                         </div>
                         <div class="card-body">
                             <div class="list-group">
@@ -81,16 +81,28 @@
                     </div>
 
                     <div class="card mb-3">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">Recevoir des alertes par courriel</h5>
+                        </div>
                         <div class="card-body">
                             <div class="d-flex justify-content-between align-items-center mb-2">
                                 <div>
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input event-type-checkbox" 
+                                            id="eventTypeNewEvent"
+                                            name="preferences[eventTypes][newEvent][enabled]"
+                                            {isset($currentPreferences['eventTypes']['newEvent']['enabled']) ? checked : ''}>
+                                        <label class="form-check-label" for="eventTypeNewEvent">
+                                            Lorsqu'un nouvel événement est disponible
+                                        </label>
+                                    </div>
                                     <div class="form-check">
                                         <input type="checkbox" class="form-check-input event-type-checkbox" 
                                             id="eventTypeNewArticle"
                                             name="preferences[eventTypes][newArticle][enabled]"
                                             {isset($currentPreferences['eventTypes']['newArticle']['enabled']) ? checked : ''}>
                                         <label class="form-check-label" for="eventTypeNewArticle">
-                                            Recevoir une alerte lorsqu'un nouvel article est publié
+                                            Lorsqu'un nouvel article est publié
                                         </label>
                                     </div>
                                 </div>

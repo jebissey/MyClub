@@ -91,24 +91,28 @@ class EventController extends BaseController
         if ($userEmail === '') {
             $this->setDefaultParams();
         }
-        $event = new Event($this->pdo);
+        if ($this->fluent->from('Event')->where('Id', $eventId)->fetch()) {
+            $event = new Event($this->pdo);
 
-        $this->render('app/views/event/detail.latte', $this->params->getAll([
-            'eventId' => $eventId,
-            'event' => $event->getEvent($eventId),
-            'attributes' => $event->getEventAttributes($eventId),
-            'participants' => $event->getEventParticipants($eventId),
-            'userEmail' => $userEmail,
-            'isRegistered' => $event->isUserRegistered($eventId, $userEmail),
-            'navItems' => $this->getNavItems(),
-            'countOfMessages' => $this->fluent
-                ->from('Message')
-                ->where('Message."From"', 'User')
-                ->where('EventId', $eventId)->count(),
-            'eventNeeds' => $event->getEventNeeds($eventId),
-            'participantSupplies' => $event->getParticipantSupplies($eventId),
-            'userSupplies' => $event->getUserSupplies($eventId, $userEmail)
-        ]));
+            $this->render('app/views/event/detail.latte', $this->params->getAll([
+                'eventId' => $eventId,
+                'event' => $event->getEvent($eventId),
+                'attributes' => $event->getEventAttributes($eventId),
+                'participants' => $event->getEventParticipants($eventId),
+                'userEmail' => $userEmail,
+                'isRegistered' => $event->isUserRegistered($eventId, $userEmail),
+                'navItems' => $this->getNavItems(),
+                'countOfMessages' => $this->fluent
+                    ->from('Message')
+                    ->where('Message."From"', 'User')
+                    ->where('EventId', $eventId)->count(),
+                'eventNeeds' => $event->getEventNeeds($eventId),
+                'participantSupplies' => $event->getParticipantSupplies($eventId),
+                'userSupplies' => $event->getUserSupplies($eventId, $userEmail)
+            ]));
+        } else {
+            $this->application->message('Evénement non trouvé', 3000, 403);
+        }
     }
 
     public function register($eventId, bool $set): void
