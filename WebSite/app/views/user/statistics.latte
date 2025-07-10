@@ -250,7 +250,34 @@
                         </div>
                     </div>
                 </div>
-
+                {if $isWebmaster}
+                <hr>
+                <h1>Gestion des alertes des membres</h1>
+                <div class="row mt-3">
+                    <div class="col-md-12">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Membre</th>
+                                    <th>Aucune alerte</th>
+                                    <th>Evénement</th>
+                                    <th>Article</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {foreach $stats['membersAlerts'] as $memberAlerts}                                
+                                <tr>
+                                    <td>{$memberAlerts->clubMember}</td>
+                                    <td>{$memberAlerts->NoAlert}</td>
+                                    <td>{$memberAlerts->NewEvent}</td>
+                                    <td>{$memberAlerts->NewArticle}</td>
+                                </tr>
+                                {/foreach}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                {/if}
             </div>
         </div>
     </div>

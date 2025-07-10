@@ -15,7 +15,7 @@ class PersonStatistics
         $this->fluent = new \Envms\FluentPDO\Query($pdo);
     }
 
-    public function getStats($person, $seasonStart, $seasonEnd)
+    public function getStats($person, $seasonStart, $seasonEnd, $isWebmaster)
     {
         $stats = [
             'person' => $person,
@@ -30,6 +30,7 @@ class PersonStatistics
             'eventParticipations' => $this->getEventParticipationStats($person->Id, $seasonStart, $seasonEnd),
             'participantSupplies' => $this->getParticipantSupplyStats($person->Id, $seasonStart, $seasonEnd),
             'participantMessages' => $this->getParticipantMessageStats($person->Id, $seasonStart, $seasonEnd),
+            'membersAlerts' => $this->getMembersAlerts($isWebmaster),
         ];
 
         return $stats;
@@ -438,5 +439,40 @@ class PersonStatistics
                 ? round(($webappMessagesCount / $totalWebappMessagesCount) * 100, 2)
                 : 0,
         ];
+    }
+
+    private function getMembersAlerts($isWebmaster)
+    {
+        $membersAlerts = [];
+        if ($isWebmaster) {
+            $query = "
+            SELECT 
+                p.FirstName || ' ' || p.LastName || 
+                CASE 
+                    WHEN p.NickName IS NOT NULL AND p.NickName != '' THEN ' (' || p.NickName || ')'
+                    ELSE ''
+                END AS clubMember,
+                CASE 
+                    WHEN p.Preferences LIKE '%noAlerts%' THEN 'X'
+                    ELSE ''
+                END AS NoAlert,
+                CASE 
+                    WHEN p.Preferences LIKE '%newEvent%' THEN 'X'
+                    ELSE ''
+                END AS NewEvent,
+                CASE 
+                    WHEN p.Preferences LIKE '%newArticle%' THEN 'X'
+                    ELSE ''
+                END AS NewArticle
+            FROM Person AS p
+            WHERE p.Preferences LIKE '%noAlerts%' 
+            OR p.Preferences LIKE '%newEvent%' 
+            OR p.Preferences LIKE '%newArticle%'
+            ORDER BY clubMember
+            ";
+            $stmt = $this->pdo->query($query);
+            $membersAlerts = $stmt->fetchAll();
+        }
+        return $membersAlerts;
     }
 }

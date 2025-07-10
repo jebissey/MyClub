@@ -561,7 +561,7 @@ class UserController extends BaseController
             $personalStatistics = new PersonStatistics($this->pdo);
             $season = $personalStatistics->getSeasonRange();
             $this->render('app/views/user/statistics.latte', $this->params->getAll([
-                'stats' => $personalStatistics->getStats($person, $season['start'], $season['end']),
+                'stats' => $personalStatistics->getStats($person, $season['start'], $season['end'], $this->authorizations->isWebmaster()),
                 'seasons' => $personalStatistics->getAvailableSeasons(),
                 'currentSeason' => $season,
                 'navItems' => $this->getNavItems(),
