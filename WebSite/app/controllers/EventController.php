@@ -108,7 +108,8 @@ class EventController extends BaseController
                     ->where('EventId', $eventId)->count(),
                 'eventNeeds' => $event->getEventNeeds($eventId),
                 'participantSupplies' => $event->getParticipantSupplies($eventId),
-                'userSupplies' => $event->getUserSupplies($eventId, $userEmail)
+                'userSupplies' => $event->getUserSupplies($eventId, $userEmail),
+                'isEventManager' => $this->authorizations->isEventManager(),
             ]));
         } else {
             $this->application->message('Evénement non trouvé', 3000, 403);

@@ -42,39 +42,12 @@ class Event
 
     public function isUserRegistered($eventId, $userEmail)
     {
-        $result = $this->fluent->from('Participant pa')
-            ->select('COUNT(*) AS count')
+        return $this->fluent->from('Participant pa')
+            ->select('pe.Email')
             ->join('Person pe ON pa.IdPerson = pe.Id')
             ->where('pa.IdEvent', $eventId)
             ->where('pe.Email COLLATE NOCASE', $userEmail)
             ->fetch();
-        return ($result->count > 0);
-    }
-
-    public function getNextEvents($person, bool $filterByPreferences = false)
-    {
-        $query = $this->fluent
-            ->from('Event e')
-            ->leftJoin('EventType et ON e.IdEventType = et.Id')
-            ->leftJoin('Participant p ON e.Id = p.IdEvent AND p.IdPerson = ?', $person->Id ?? 0)
-            ->leftJoin('Message m ON m.EventId = e.Id AND m."From" = "User"');
-        if ($person === false) {
-            $audienceCondition = 'e.Audience = \'' . EventAudience::ForAll->value . '\' AND et.IdGroup IS NULL';
-            $params = [];
-        } else {
-            $audienceCondition = '(et.IdGroup IS NULL OR et.IdGroup IN (SELECT IdGroup FROM PersonGroup WHERE IdPerson = ?))';
-            $params = [$person->Id];
-        }
-        $query->where("e.StartTime > DATETIME('now') AND et.Inactivated = 0 AND " . $audienceCondition, ...$params)
-            ->groupBy('e.Id')
-            ->select('COUNT(m.Id) AS MessageCount')
-            ->select('et.Name AS EventTypeName, et.IdGroup AS EventTypeIdGroup, p.Id AS Booked')
-            ->orderBy('e.StartTime');
-        $events = $this->events($query->fetchAll());
-        if ($filterByPreferences && $person) {
-            return $this->personPreferences->filterEventsByPreferences($events, $person);
-        }
-        return $events;
     }
 
     public function getEvent($eventId)
@@ -107,25 +80,9 @@ class Event
 
     public function getEvents($person, string $mode, int $offset, bool $filterByPreferences = false): array
     {
-        if ($mode == 'next') {
-            return $this->getNextEvents($person, $filterByPreferences);
-        } else if ($mode === 'past') {
-            $limit = 10;
-            $query = $this->fluent->from('Event e')
-                ->leftJoin('EventType et ON et.Id = e.IdEventType')
-                ->leftJoin('Message m ON m.EventId = e.Id AND m."From" = "User"')
-                ->leftJoin('PersonGroup pg ON et.IdGroup = pg.IdGroup AND pg.IdPerson = ?', $person->Id)
-                ->where('et.Inactivated = 0 AND (et.IdGroup IS NULL OR pg.IdPerson IS NOT NULL) AND StartTime < ?', date('Y-m-d H:i:s'))
-                ->groupBy('e.Id')
-                ->limit($limit)
-                ->offset($offset)
-                ->select('et.Name AS EventTypeName, et.IdGroup AS EventTypeIdGroup, 0 AS Booked')
-                ->select('COUNT(m.Id) AS MessageCount')
-                ->orderBy('e.StartTime');
-            return $this->events($query->fetchAll());
-        } else {
-            die("Invalide mode ($mode)");
-        }
+        if ($mode === 'next') return $this->getNextEvents($person, $filterByPreferences);
+        elseif ($mode === 'past') return $this->getPassedEvents($person, $offset);
+        else die("Invalide mode ($mode)");
     }
 
     public function getNextWeekEvents(): array
@@ -420,5 +377,49 @@ class Event
             ':from'    => $from
         ]);
         return $stmt->fetchColumn();
+    }
+
+    private function getNextEvents($person, bool $filterByPreferences = false)
+    {
+        $query = $this->fluent
+            ->from('Event e')
+            ->leftJoin('EventType et ON e.IdEventType = et.Id')
+            ->leftJoin('Participant p ON e.Id = p.IdEvent AND p.IdPerson = ?', $person->Id ?? 0)
+            ->leftJoin('Message m ON m.EventId = e.Id AND m."From" = "User"');
+        if ($person === false) {
+            $audienceCondition = 'e.Audience = \'' . EventAudience::ForAll->value . '\' AND et.IdGroup IS NULL';
+            $params = [];
+        } else {
+            $audienceCondition = '(et.IdGroup IS NULL OR et.IdGroup IN (SELECT IdGroup FROM PersonGroup WHERE IdPerson = ?))';
+            $params = [$person->Id];
+        }
+        $query->where("e.StartTime > DATETIME('now') AND et.Inactivated = 0 AND " . $audienceCondition, ...$params)
+            ->groupBy('e.Id')
+            ->select('COUNT(m.Id) AS MessageCount')
+            ->select('et.Name AS EventTypeName, et.IdGroup AS EventTypeIdGroup, p.Id AS Booked')
+            ->orderBy('e.StartTime');
+        $events = $this->events($query->fetchAll());
+        if ($filterByPreferences && $person) {
+            return $this->personPreferences->filterEventsByPreferences($events, $person);
+        }
+        return $events;
+    }
+
+    private function getPassedEvents($person, int $offset)
+    {
+        $limit = 10;
+        $query = $this->fluent->from('Event e')
+            ->leftJoin('EventType et ON et.Id = e.IdEventType')
+            ->leftJoin('Participant p ON e.Id = p.IdEvent AND p.IdPerson = ?', $person->Id ?? 0)
+            ->leftJoin('Message m ON m.EventId = e.Id AND m."From" = "User"')
+            ->leftJoin('PersonGroup pg ON et.IdGroup = pg.IdGroup AND pg.IdPerson = ?', $person->Id)
+            ->where('et.Inactivated = 0 AND (et.IdGroup IS NULL OR pg.IdPerson IS NOT NULL) AND StartTime < ?', date('Y-m-d H:i:s'))
+            ->groupBy('e.Id')
+            ->limit($limit)
+            ->offset($offset)
+            ->select('et.Name AS EventTypeName, et.IdGroup AS EventTypeIdGroup, p.Id AS Booked')
+            ->select('COUNT(m.Id) AS MessageCount')
+            ->orderBy('e.StartTime');
+        return $this->events($query->fetchAll());
     }
 }

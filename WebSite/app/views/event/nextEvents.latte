@@ -27,7 +27,9 @@
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h1 class="mb-0">
         {if $person != false}
+            {if $mode == 'next'}
             {='eventsAvailableForYou'|translate}
+            {/if}
         {else}
             {='eventsAvailableForAll'|translate}
         {/if}
@@ -56,7 +58,7 @@
             </label>
         </div>
     </div>
-    <h5>Cliquer sur la ligne d'un événement pour voir le détail, s'inscrire ou se désinscrire</h5>
+    <h4 class="text-center bg-light py-2">Cliquer sur la ligne d'un événement pour voir le détail, s'inscrire ou se désinscrire</h4>
     {/if}
 
     <table class="table table-striped">

@@ -90,28 +90,29 @@
                 </div>
                 
                 <div class="col-md-6">
-                    {if $isRegistered}
+                    {if $isRegistered || $isEventManager}
                     <div class="card mb-3">
                         <div class="card-header">
                             <strong>Participants:</strong> 
                             {count($participants)}{if $event->MaxParticipants > 0} / {$event->MaxParticipants}{/if}
                         </div>
                         <div class="card-body">
-                            {if count($participants) > 0}
-                                <ul class="list-group">
-                                    {foreach $participants as $participant}
-                                        <li class="list-group-item">
-                                            {$participant->FirstName} {$participant->LastName} {if $participant->NickName != ''}({$participant->NickName}){/if}
-                                            {if $participant->Email === $userEmail}👤{/if}
-                                        </li>
-                                    {/foreach}
-                                </ul>
-                            {else}
-                                <p>{='noParticipant'|translate}</p>
-                            {/if}
+                        {if count($participants) > 0}
+                            <ul class="list-group">
+                                {foreach $participants as $participant}
+                                    <li class="list-group-item">
+                                        {$participant->FirstName} {$participant->LastName} {if $participant->NickName != ''}({$participant->NickName}){/if}
+                                        {if $participant->Email === $userEmail}👤{/if}
+                                    </li>
+                                {/foreach}
+                            </ul>
+                        {else}
+                            <p>{='noParticipant'|translate}</p>
+                        {/if}
                         </div>
                     </div>
 
+                        {if strtotime($event->StartTime) > time()}
                     <div class="mb-3">
                         <button onclick="window.open(createGoogleCalendarUrl({$event|noescape|json}), '_blank')" class="btn btn-success">
                             <i class="bi bi-calendar-event me-2"></i>Google
@@ -123,14 +124,19 @@
                             <i class="bi bi-calendar-event me-2"></i>iCal (.ics)
                         </button>
                     </div>
+                        {/if}
                     {/if}
                     
                     <div class="mt-3">
                         {if $isRegistered}
+                            {if strtotime($event->StartTime) > time()}
                         <a href="/events/{$eventId}/unregister" class="btn btn-primary">{='unregister'|translate}</a>
+                            {/if}
                         <a href="/event/chat/{$eventId}" class="btn btn-primary">{='messages'|translate}{if $countOfMessages > 0} ({$countOfMessages}){/if}</a>
                         {elseif count($participants) < $event->MaxParticipants || $event->MaxParticipants == 0}
+                            {if strtotime($event->StartTime) > time()}
                         <a href="/events/{$eventId}/register" class="btn btn-primary">{='register'|translate}</a>
+                            {/if}
                         {else}
                         <button class="btn btn-secondary" disabled>{='fullyBooked'|translate}</button>
                         {/if}
@@ -138,7 +144,6 @@
                 </div>
             </div>
             
-            <!-- Section Besoins de l'événement -->
             {if count($eventNeeds) > 0}
             <div class="row mt-4">
                 <div class="col-12">
@@ -224,7 +229,6 @@
             </div>
             {/if}
             
-            <!-- Section Apports des participants -->
             {if $isRegistered && count($participantSupplies) > 0}
             <div class="row mt-4">
                 <div class="col-12">
