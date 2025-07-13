@@ -187,7 +187,6 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function showNotification(message, type) {
-        // Créer une notification Bootstrap temporaire
         const alertClass = type === 'success' ? 'alert-success' : 'alert-danger';
         const alertHtml = `
                     <div class="alert ${alertClass} alert-dismissible fade show position-fixed" 

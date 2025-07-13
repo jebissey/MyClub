@@ -3,7 +3,7 @@
 {block title}Lien d'inscription généré{/block}
 
 {block navbar}
-{include '../navbar/home.latte'}
+{include '../navbar/eventManager.latte'}
 {/block}
 
 {block content}
@@ -18,8 +18,8 @@
                     </h4>
                 </div>
                 <div class="card-body">
-                    <h5>Événement : {$event['Title']}</h5>
-                    <p class="text-muted">Contact : {$contact['Email']}</p>
+                    <h5>Événement : {$event->Summary}</h5>
+                    <p class="text-muted">Contact : {$contact->Email}</p>
                     
                     <div class="alert alert-info">
                         <strong>Le lien d'inscription a été généré avec succès !</strong><br>
@@ -28,10 +28,10 @@
 
                     <div class="form-group">
                         <label for="registrationMessage"><strong>Message à copier dans votre réponse :</strong></label>
-                        <textarea id="registrationMessage" class="form-control" rows="3" readonly>{$registrationLink|noescape}
-
+                        <textarea id="registrationMessage" class="form-control" rows="3" readonly>
 Vous pouvez vous inscrire avec ce lien :
-{$registrationLink}</textarea>
+{$registrationLink}
+                        </textarea>
                     </div>
 
                     <div class="text-center mt-3">
@@ -65,10 +65,9 @@ function copyToClipboard() {
         document.getElementById('copySuccess').style.display = 'block';
         setTimeout(() => {
             document.getElementById('copySuccess').style.display = 'none';
-        }, 3000);
+        }, 5000);
     } catch (err) {
-        console.error('Erreur lors de la copie:', err);
-        alert('Erreur lors de la copie. Veuillez sélectionner et copier manuellement.');
+        alert('Erreur lors de la copie. Veuillez sélectionner et copier manuellement.' + err);
     }
 }
 </script>

@@ -1,0 +1,57 @@
+{layout $layout}
+
+{block title}Gestion des invitations{/block}
+
+{block content}
+    {if isset($message) && $message !=''}
+    <div class="alert alert-{if $messageType === 'success'}success{else}danger{/if} alert-dismissible">
+        {$message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {/if}
+    <div class="container mt-4">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="mb-0">Inviter un participant</h4>
+                    </div>
+                    <div class="card-body">
+                        <form id="invitationForm" method="POST" action="/events/guest">
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Adresse e-mail *</label>
+                                <input type="email" class="form-control" id="email" name="email" required>
+                                <div class="invalid-feedback">Veuillez entrer une adresse e-mail valide</div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="nickname" class="form-label">Nom de l'invité</label>
+                                <input type="text" class="form-control" id="nickname" name="nickname" placeholder="Optionnel">
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="event" class="form-label">Événement *</label>
+                                <select class="form-select" id="event" name="eventId" required>
+                                    <option value="">Sélectionnez un événement</option>
+                                    {foreach $events as $event}
+                                        <option value="{$event->Id}">{$event->Summary} - {$event->StartTime|date:'d/m/Y H:i'} - {$event->PersonName}</option>
+                                    {/foreach}
+                                </select>
+                                <div class="invalid-feedback">Veuillez sélectionner un événement</div>
+                            </div>
+                            
+                            <div class="d-flex justify-content-center gap-2">
+                                <button type="submit" class="btn btn-primary">Envoyer l'invitation</button>
+                                <a href="/event/list" class="btn btn-secondary">Annuler</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{/block}
+
+{block scripts}
+    <script src="/app/js/event/guest.js"></script>
+{/block}

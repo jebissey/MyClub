@@ -82,14 +82,11 @@
                 <div class="mt-4">
                     <h4>Galerie</h4>
                     <div id="articleCarousel" class="carousel slide" data-bs-ride="carousel">
-                        <!-- Carousel indicators -->
                         <div class="carousel-indicators">
                             {foreach $carouselItems as $index => $item}
                                 <button type="button" data-bs-target="#articleCarousel" data-bs-slide-to="{$index}" {if $index === 0}class="active" aria-current="true"{/if} aria-label="Slide {$index + 1}"></button>
                             {/foreach}
                         </div>
-                        
-                        <!-- Carousel items -->
                         <div class="carousel-inner">
                             {foreach $carouselItems as $index => $item}
                                 <div class="carousel-item {if $index === 0}active{/if}">
@@ -97,8 +94,6 @@
                                 </div>
                             {/foreach}
                         </div>
-                        
-                        <!-- Carousel controls -->
                         <button class="carousel-control-prev" type="button" data-bs-target="#articleCarousel" data-bs-slide="prev">
                             <span class="carousel-control-prev-icon" aria-hidden="true"></span>
                             <span class="visually-hidden">Précédent</span>

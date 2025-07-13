@@ -1,18 +1,4 @@
 BEGIN TRANSACTION;
-CREATE TABLE IF NOT EXISTS "Alert" (
-	"Id"	INTEGER,
-	"CreatedBy"	INTEGER NOT NULL,
-	"IdGroup"	INTEGER NOT NULL,
-	"OnlyForMembers"	INTEGER NOT NULL DEFAULT 1,
-	"StartDate"	TEXT NOT NULL DEFAULT current_timestamp,
-	"EndDate"	TEXT NOT NULL DEFAULT current_timestamp,
-	"Message"	TEXT NOT NULL,
-	"Type"	TEXT NOT NULL DEFAULT 'alert-warning',
-	"LastUpdate"	TEXT NOT NULL DEFAULT current_timestamp,
-	PRIMARY KEY("Id"),
-	FOREIGN KEY("CreatedBy") REFERENCES "Person"("Id"),
-	FOREIGN KEY("IdGroup") REFERENCES "Group"("Id")
-);
 CREATE TABLE IF NOT EXISTS "Article" (
 	"Id"	INTEGER,
 	"Title"	TEXT NOT NULL,
@@ -154,6 +140,16 @@ CREATE TABLE IF NOT EXISTS "GroupAuthorization" (
 	PRIMARY KEY("Id"),
 	FOREIGN KEY("IdAuthorization") REFERENCES "Authorization"("Id"),
 	FOREIGN KEY("IdGroup") REFERENCES "Group"("Id")
+);
+CREATE TABLE IF NOT EXISTS "Guest" (
+	"Id"	INTEGER,
+	"IdContact"	INTEGER NOT NULL,
+	"IdEvent"	INTEGER NOT NULL,
+	"InvitedBy"	INTEGER NOT NULL,
+	PRIMARY KEY("Id"),
+	FOREIGN KEY("IdContact") REFERENCES "Contact"("Id"),
+	FOREIGN KEY("IdEvent") REFERENCES "Event"("Id"),
+	FOREIGN KEY("InvitedBy") REFERENCES "Person"("Id")
 );
 CREATE TABLE IF NOT EXISTS "Languages" (
 	"Id"	INTEGER,

@@ -90,22 +90,24 @@ $flight->route('GET  /emails/article/@id', function($id) use ($emailController) 
 
 use app\controllers\EventController;
 $eventController = new EventController($container->get(PDO::class), $container->get(Engine::class));
-$flight->route('GET /eventManager',          function()    use ($eventController) { $eventController->home(); });
-$flight->route('GET /eventManager/help',     function()    use ($eventController) { $eventController->help(); });
-$flight->route('GET /nextEvents',            function()    use ($eventController) { $eventController->nextEvents(); });
-$flight->route('GET /events/crosstab',       function()    use ($eventController) { $eventController->showEventCrosstab();});
-$flight->route('GET /events/@id',            function($id) use ($eventController) { $eventController->show($id); });
-$flight->route('GET /event/location',        function()    use ($eventController) { $eventController->location(); });
-$flight->route('GET /events/@id/register',   function($id) use ($eventController) { $eventController->register($id, true); });
-$flight->route('GET /events/@id/unregister', function($id) use ($eventController) { $eventController->register($id, false); });
-$flight->route('GET /needs',                 function()    use ($eventController) { $eventController->needs();});
-$flight->route('GET /event/chat/@id',        function($id) use ($eventController) { $eventController->showEventChat($id); });
-$flight->route('GET /weekEvents',            function()    use ($eventController) { $eventController->weekEvents();});
+$flight->route('GET  /eventManager',          function()    use ($eventController) { $eventController->home(); });
+$flight->route('GET  /eventManager/help',     function()    use ($eventController) { $eventController->help(); });
+$flight->route('GET  /nextEvents',            function()    use ($eventController) { $eventController->nextEvents(); });
+$flight->route('GET  /events/crosstab',       function()    use ($eventController) { $eventController->showEventCrosstab();});
+$flight->route('GET  /events/guest',          function()    use ($eventController) { $eventController->guest();});
+$flight->route('POST /events/guest',          function()    use ($eventController) { $eventController->guestInvite();});
+$flight->route('GET  /events/@id',            function($id) use ($eventController) { $eventController->show($id); });
+$flight->route('GET  /event/location',        function()    use ($eventController) { $eventController->location(); });
+$flight->route('GET  /events/@id/register',   function($id) use ($eventController) { $eventController->register($id, true); });
+$flight->route('GET  /events/@id/unregister', function($id) use ($eventController) { $eventController->register($id, false); });
+$flight->route('GET  /needs',                 function()    use ($eventController) { $eventController->needs();});
+$flight->route('GET  /event/chat/@id',        function($id) use ($eventController) { $eventController->showEventChat($id); });
+$flight->route('GET  /weekEvents',            function()    use ($eventController) { $eventController->weekEvents();});
 
 $flight->route('GET      /events/@idEvent/@emailContact', function($idEvent, $emailContact) use ($eventController) { $eventController->processOrganizerLink($idEvent, $emailContact);});
 $flight->route('GET|POST /events/@idEvent/@token',        function($idEvent, $token)        use ($eventController) { 
     if (filter_var($token, FILTER_VALIDATE_EMAIL)) $eventController->processOrganizerLink($idEvent, $token);
-    else                                           $eventController->registerWithToken($idEvent, $token);
+    else                                           $eventController->register($idEvent, true, $token);
 });
 
 use app\controllers\EventTypeController;

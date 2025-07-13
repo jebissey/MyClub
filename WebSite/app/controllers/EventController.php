@@ -5,6 +5,7 @@ namespace app\controllers;
 use DateTime;
 use Exception;
 use app\helpers\Crosstab;
+use app\helpers\Email;
 use app\helpers\Event;
 
 class EventController extends BaseController
@@ -45,7 +46,7 @@ class EventController extends BaseController
 
     public function showEventCrosstab()
     {
-        if ($this->getPerson(['Redactor'], 1)) {
+        if ($this->getPerson(['EventManager'], 1)) {
             $period = $this->flight->request()->query->period ?? 'month';
             $sql = "
                 SELECT 
@@ -84,7 +85,134 @@ class EventController extends BaseController
         }
     }
 
-    public function show($eventId): void
+    public function guest($message = '', $type = '')
+    {
+        if ($this->getPerson(['EventManager'], 1)) {
+            $events = $this->fluent->from('Event e')
+                ->join('Person p ON p.Id = e.CreatedBy')
+                ->where('e.StartTime > ?', (new DateTime())->format('Y-m-d'))
+                ->where('e.Audience = "All" OR Audience = "Guest"')
+                ->select('e.Id, e.Summary, e.StartTime')
+                ->select('CASE WHEN p.NickName != "" THEN p.FirstName || " " || p.LastName || " (" || p.NickName || ")" ELSE p.FirstName || " " || p.LastName END AS PersonName')
+                ->orderBy('e.StartTime ASC')
+                ->fetchAll();
+
+            $this->render('app/views/event/guest.latte', $this->params->getAll([
+                'events' => $events,
+                'navbarTemplate' => '../navbar/eventManager.latte',
+                'layout' => $this->getLayout(),
+                'message' => $message,
+                'messageType' => $type
+            ]));
+        } else {
+            $this->application->error403(__FILE__, __LINE__);
+        }
+    }
+
+    public function guestInvite()
+    {
+        if ($person = $this->getPerson(['EventManager'], 1)) {
+            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                $email = trim($_POST['email'] ?? '');
+                $nickname = trim($_POST['nickname'] ?? '');
+                $eventId = (int)($_POST['eventId'] ?? 0);
+
+                if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                    $this->guest('Adresse e-mail invalide', 'error');
+                    return;
+                }
+                if ($eventId <= 0) {
+                    $this->guest('Veuillez sélectionner un événement', 'error');
+                    return;
+                }
+                $event = $this->fluent->from('Event')
+                    ->where('Id = ?', $eventId)
+                    ->where('Audience = "All" OR Audience = "Guest"')
+                    ->where('StartTime > ?', (new DateTime())->format('Y-m-d'))
+                    ->fetch();
+
+                if (!$event) {
+                    $this->guest('Événement non trouvé ou non accessible', 'error');
+                    return;
+                }
+
+                try {
+                    $contact = $this->fluent->from('Contact')
+                        ->where('Email = ?', $email)
+                        ->fetch();
+                    if (!$contact) {
+                        $token = bin2hex(random_bytes(32));
+                        $contactId = $this->fluent->insertInto('Contact')
+                            ->values([
+                                'Email' => $email,
+                                'NickName' => $nickname,
+                                'Token' => $token,
+                                'TokenCreatedAt' => (new DateTime())->format('Y-m-d H:i:s')
+                            ])
+                            ->execute();
+                    } else {
+                        $contactId = $contact->Id;
+                        $token = $contact->Token;
+                        if (!empty($nickname) && $nickname !== $contact->NickName) {
+                            $this->fluent->update('Contact')
+                                ->set(['NickName' => $nickname])
+                                ->where('Id = ?', $contactId)
+                                ->execute();
+                        }
+
+                        if (
+                            empty($token) ||
+                            (new DateTime($contact->TokenCreatedAt))->diff(new DateTime())->days > 0
+                        ) {
+                            $token = bin2hex(random_bytes(32));
+                            $this->fluent->update('Contact')
+                                ->set([
+                                    'Token' => $token,
+                                    'TokenCreatedAt' => (new DateTime())->format('Y-m-d H:i:s')
+                                ])
+                                ->where('Id = ?', $contactId)
+                                ->execute();
+                        }
+                    }
+                    $existingGuest = $this->fluent->from('Guest')
+                        ->where('IdContact = ?', $contactId)
+                        ->where('IdEvent = ?', $eventId)
+                        ->fetch();
+                    if ($existingGuest) {
+                        $this->guest('Cette personne est déjà invitée à cet événement', 'error');
+                        return;
+                    }
+                    $this->fluent->insertInto('Guest')
+                        ->values([
+                            'IdContact' => $contactId,
+                            'IdEvent' => $eventId,
+                            'InvitedBy' => $person->Id
+                        ])
+                        ->execute();
+
+                    $root = 'https://' . $_SERVER['HTTP_HOST'];
+                    $invitationLink = $root . "/events/$eventId?t=$token";
+                    $subject = "Invitation à l'événement : " . $event->Summary;
+                    $body = "Bonjour" . (!empty($nickname) ? " {$nickname}" : "") . ",\n\n";
+                    $body .= "Vous êtes invité(e) à participer à l'événement suivant :\n\n";
+                    $body .= "Titre : {$event->Summary}\n";
+                    $body .= "Description : {$event->Description}\n";
+                    $body .= "Lieu : {$event->Location}\n";
+                    $body .= "Date : " . (new DateTime($event->StartTime))->format('d/m/Y à H:i') . "\n\n";
+                    $body .= "Pour confirmer votre participation, cliquez sur le lien suivant :\n";
+                    $body .= $invitationLink . "\n\n";
+                    $body .= "Cordialement,\nL'équipe BNW Dijon";
+                    $emailFrom = $person->Email;
+                    Email::send($emailFrom, $email, $subject, $body);
+                    $this->guest('Invitation envoyée avec succès à ' . $email, 'success');
+                } catch (Exception $e) {
+                    $this->guest('Erreur lors de l\'envoi de l\'invitation. ' . $e->getMessage(), 'error');
+                }
+            } else $this->guest();
+        } else $this->application->error403(__FILE__, __LINE__);
+    }
+
+    public function show($eventId, $message = null, $messageType = null): void
     {
         $person = $this->getPerson();
         $userEmail = $person->Email ?? '';
@@ -110,6 +238,9 @@ class EventController extends BaseController
                 'participantSupplies' => $event->getParticipantSupplies($eventId),
                 'userSupplies' => $event->getUserSupplies($eventId, $userEmail),
                 'isEventManager' => $this->authorizations->isEventManager(),
+                'token' => isset($_GET['t']) ? $_GET['t'] : false,
+                'message' => $message,
+                'messageType' => $messageType,
             ]));
         } else {
             $this->application->message('Evénement non trouvé', 3000, 403);
@@ -118,6 +249,7 @@ class EventController extends BaseController
 
     public function register($eventId, bool $set): void
     {
+        $token = $_GET['t'] ?? null;
         $person = $this->getPerson();
         if ($person) {
             $userId = $person->Id;
@@ -137,6 +269,53 @@ class EventController extends BaseController
                     ->where('IdEvent', $eventId)
                     ->where('IdPerson', $userId)
                     ->execute();
+            }
+        } elseif ($token) {
+            try {
+                $event = $this->fluent->from('Event')->where('Id', $eventId)->fetch();
+                if (!$event) {
+                    $this->application->error471($eventId, __FILE__, __LINE__);
+                    return;
+                }
+                $contact = $this->fluent->from('Contact')->where('Token', $token)->fetch();
+                if (!$contact) {
+                    $this->show($eventId, 'Token inconnu', 'error');
+                    return;
+                }
+                $tokenCreatedAt = new DateTime($contact->TokenCreatedAt);
+                $now = new DateTime();
+                $interval = $now->diff($tokenCreatedAt);
+                if ($interval->days >= 1 || ($interval->days == 0 && $interval->h >= 24)) {
+                    $this->show($eventId, 'Token expiré', 'error');
+                    return;
+                }
+                $existingParticipant = $this->fluent->from('Participant')
+                    ->where('IdEvent', $eventId)
+                    ->where('IdContact', $contact->Id)
+                    ->fetch();
+                if ($existingParticipant && $set) {
+                    $this->show($eventId, 'Participant déjà enregistré', 'error');
+                    return;
+                }
+                if ($event->Audience === 'Guest') {
+                    $invitation = $this->fluent->from('Guest')->where('IdEvent', $event->Id)->where('IdContact', $contact->Id)->fetch();
+                    if (!$invitation) {
+                        $this->show($eventId, "Il faut avoir une invitation pour pouvoir s'inscrire à cet événement", 'error');
+                        return;
+                    }
+                }
+                if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+                    $this->processRegistration($event, $contact);
+                    return;
+                }
+
+                echo $this->latte->render('app/views/contact/register-form.latte', [
+                    'event' => $event,
+                    'contact' => $contact,
+                    'token' => $token
+                ]);
+            } catch (Exception $e) {
+                $this->application->error500($e->getMessage(), __FILE__, __LINE__);
             }
         }
         $this->flight->redirect('/events/' . $eventId);
@@ -254,7 +433,7 @@ class EventController extends BaseController
                             'Token' => $token,
                             'TokenCreatedAt' => date('Y-m-d H:i:s')
                         ])
-                        ->where('Id', $contact['Id'])
+                        ->where('Id', $contact->Id)
                         ->execute();
 
                     $contact->Token = $token;
@@ -264,76 +443,24 @@ class EventController extends BaseController
                 }
                 $registrationLink = $this->getBaseUrl() . "events/{$idEvent}/{$contact->Token}";
 
-                echo $this->latte->render('app/views/contact/organizer-link.latte', [
+                $this->render('app/views/contact/organizer-link.latte', $this->params->getAll([
                     'event' => $event,
                     'contact' => $contact,
-                    'registrationLink' => $registrationLink
-                ]);
+                    'registrationLink' => $registrationLink,
+                    'navItems' => $this->getNavItems(),
+                ]));
             } catch (Exception $e) {
                 $this->application->error500($e->getMessage(), __FILE__, __LINE__);
             }
         } else {
-            $this->application->error403(__FILE__, __LINE__);
+            $this->application->message("Il faut être connecté pour traiter cette demande");
         }
     }
 
-    public function registerWithToken($idEvent, $token)
+    #region Private functions
+    private function processRegistration($event, $contact)
     {
-        $person = $this->getPerson([]);
-        if ($person) {
-            $this->application->error471("For guest only", __FILE__, __LINE__);
-            return;
-        }
-        try {
-            $event = $this->fluent->from('Event')->where('Id', $idEvent)->fetch();
-            if (!$event) {
-                $this->application->error471($idEvent, __FILE__, __LINE__);
-                return;
-            }
-            $contact = $this->fluent->from('Contact')->where('Token', $token)->fetch();
-            if (!$contact) {
-                echo $this->latte->render('app/views/contact/invalid-token.latte', [
-                    'event' => $event
-                ]);
-                return;
-            }
-            $tokenCreatedAt = new DateTime($contact['TokenCreatedAt']);
-            $now = new DateTime();
-            $interval = $now->diff($tokenCreatedAt);
-            if ($interval->days >= 1 || ($interval->days == 0 && $interval->h >= 24)) {
-                echo $this->latte->render('app/views/contact/expired-token.latte', [
-                    'event' => $event,
-                    'contact' => $contact
-                ]);
-                return;
-            }
-            $existingParticipant = $this->fluent->from('Participant')
-                ->where('IdEvent', $idEvent)
-                ->where('IdContact', $contact['Id'])
-                ->fetch();
-            if ($existingParticipant) {
-                echo $this->latte->render('app/views/contact/already-registered.latte', [
-                    'event' => $event,
-                    'contact' => $contact
-                ]);
-                return;
-            }
-            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-                $this->processRegistration($idEvent, $contact);
-                return;
-            }
-
-            echo $this->latte->render('app/views/contact/register-form.latte', [
-                'event' => $event,
-                'contact' => $contact,
-                'token' => $token
-            ]);
-        } catch (Exception $e) {
-            $this->application->error500($e->getMessage(), __FILE__, __LINE__);
-        }
-    }
-    private function processRegistration($idEvent, $contact)
-    {
+        var_dump($contact);
         try {
             $nickname = $_POST['nickname'] ?? null;
             if ($nickname && trim($nickname) !== '') {
@@ -344,18 +471,13 @@ class EventController extends BaseController
                 $contact->NickName = trim($nickname);
             }
             $this->fluent->insertInto('Participant')->values([
-                'IdEvent' => $idEvent,
+                'IdEvent' => $event->Id,
                 'IdPerson' => null,
                 'IdContact' => $contact->Id
             ])->execute();
 
-            $this->fluent->update('Contact')
-                ->set(['Token' => null, 'TokenCreatedAt' => null])
-                ->where('Id', $contact->Id)
-                ->execute();
-
-            echo $this->latte->render('app/views/contact/registration-success.latte', [
-                'event' => $this->fluent->from('Event')->where('Id', $idEvent)->fetch(),
+            $this->render('app/views/contact/registration-success.latte', [
+                'event' => $event,
                 'contact' => $contact
             ]);
         } catch (Exception $e) {
