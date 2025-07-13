@@ -460,7 +460,6 @@ class EventController extends BaseController
     #region Private functions
     private function processRegistration($event, $contact)
     {
-        var_dump($contact);
         try {
             $nickname = $_POST['nickname'] ?? null;
             if ($nickname && trim($nickname) !== '') {
@@ -476,10 +475,11 @@ class EventController extends BaseController
                 'IdContact' => $contact->Id
             ])->execute();
 
-            $this->render('app/views/contact/registration-success.latte', [
+            $this->render('app/views/contact/registration-success.latte', $this->params->getAll([
                 'event' => $event,
-                'contact' => $contact
-            ]);
+                'contact' => $contact,
+                'navItems' => $this->getNavItems(),
+            ]));
         } catch (Exception $e) {
             $this->application->error500($e->getMessage(), __FILE__, __LINE__);
         }

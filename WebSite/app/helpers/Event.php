@@ -71,10 +71,11 @@ class Event
     public function getEventParticipants($eventId)
     {
         return $this->fluent->from('Participant pa')
-            ->select('pe.FirstName, pe.LastName, pe.NickName, pe.Email, pe.Id')
-            ->join('Person pe ON pa.IdPerson = pe.Id')
+            ->leftJoin('Person pe ON pa.IdPerson = pe.Id')
+            ->leftJoin('Contact c ON pa.IdContact = c.Id')
             ->where('pa.IdEvent', $eventId)
-            ->orderBy('pe.FirstName, pe.LastName')
+            ->select('pe.FirstName, pe.LastName, pe.NickName, pe.Email, pe.Id AS PersonId, c.Email, c.NickName, c.Id AS ContactId')
+            ->orderBy('pe.FirstName, pe.LastName, c.NickName')
             ->fetchAll();
     }
 

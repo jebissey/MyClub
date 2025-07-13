@@ -20,24 +20,22 @@
                 <div class="card-body">
                     <div class="alert alert-success">
                         <h5>Félicitations !</h5>
-                        <p class="mb-0">Votre inscription à l'événement "<strong>{$event['Title']}</strong>" a été confirmée.</p>
+                        <p class="mb-0">Votre inscription à l'événement "<strong>{$event->Summary}</strong>" a été confirmée.</p>
                     </div>
 
                     <div class="row">
                         <div class="col-md-6">
                             <h6>Vos informations :</h6>
-                            <p><strong>Email :</strong> {$contact['Email']}</p>
-                            {if $contact['NickName']}
-                                <p><strong>Nom :</strong> {$contact['NickName']}</p>
+                            <p><strong>Email :</strong> {$contact->Email}</p>
+                            {if $contact->NickName}
+                                <p><strong>Nom :</strong> {$contact->NickName}</p>
                             {/if}
                         </div>
                         <div class="col-md-6">
                             <h6>Détails de l'événement :</h6>
-                            {if $event['StartDate']}
-                                <p><strong>Date :</strong> {date('d/m/Y H:i', strtotime($event['StartDate']))}</p>
-                            {/if}
-                            {if $event['Location']}
-                                <p><strong>Lieu :</strong> {$event['Location']}</p>
+                                <p><strong>Date :</strong> {$event->StartTime|longDateTime}</p>
+                            {if $event->Location}
+                                <p><strong>Lieu :</strong> {$event->Location}</p>
                             {/if}
                         </div>
                     </div>
@@ -45,7 +43,7 @@
                     <div class="alert alert-info">
                         <i class="fas fa-info-circle"></i>
                         <strong>Important :</strong> Conservez cette page ou prenez une capture d'écran comme confirmation de votre inscription.
-                        L'organisateur pourra vous contacter si nécessaire à l'adresse {$contact['Email']}.
+                        L'organisateur pourra vous contacter si nécessaire à l'adresse {$contact->Email}.
                     </div>
 
                     <div class="text-center">

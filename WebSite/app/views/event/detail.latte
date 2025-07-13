@@ -107,7 +107,11 @@
                             <ul class="list-group">
                                 {foreach $participants as $participant}
                                     <li class="list-group-item">
+                                        {if $participant->PersonId}
                                         {$participant->FirstName} {$participant->LastName} {if $participant->NickName != ''}({$participant->NickName}){/if}
+                                        {elseif $participant->ContactId}
+                                        {$participant->NickName}📩
+                                        {/if}
                                         {if $participant->Email === $userEmail}👤{/if}
                                     </li>
                                 {/foreach}
