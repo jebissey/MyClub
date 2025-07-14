@@ -247,22 +247,20 @@ class EventController extends BaseController
         }
     }
 
-    public function register($eventId, bool $set): void
+    public function register($eventId, bool $set, $token = null): void
     {
-        $token = $_GET['t'] ?? null;
+        if ($token === null) $token = $_GET['t'] ?? null;
         $person = $this->getPerson();
         if ($person) {
             $userId = $person->Id;
             if ($set) {
                 $event = new Event($this->pdo);
-
                 if ($eventId > 0 && !$event->isUserRegistered($eventId, $person->Email ?? '')) {
                     $this->fluent->insertInto('Participant', [
                         'IdEvent'  => $eventId,
                         'IdPerson' => $userId,
                         'IdContact' => null
-                    ])
-                        ->execute();
+                    ])->execute();
                 }
             } else {
                 $this->fluent->deleteFrom('Participant')
@@ -274,7 +272,7 @@ class EventController extends BaseController
             try {
                 $event = $this->fluent->from('Event')->where('Id', $eventId)->fetch();
                 if (!$event) {
-                    $this->application->error471($eventId, __FILE__, __LINE__);
+                    $this->show($eventId, 'Evénement inconnu', 'error');
                     return;
                 }
                 $contact = $this->fluent->from('Contact')->where('Token', $token)->fetch();
@@ -305,15 +303,17 @@ class EventController extends BaseController
                     }
                 }
                 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-                    $this->processRegistration($event, $contact);
-                    return;
+                    $this->fluent->insertInto('Participant')->values([
+                        'IdEvent' => $event->Id,
+                        'IdPerson' => null,
+                        'IdContact' => $contact->Id
+                    ])->execute();
+                    $this->render('app/views/contact/registration-success.latte', $this->params->getAll([
+                        'event' => $event,
+                        'contact' => $contact,
+                        'navItems' => $this->getNavItems(),
+                    ]));
                 }
-
-                echo $this->latte->render('app/views/contact/register-form.latte', [
-                    'event' => $event,
-                    'contact' => $contact,
-                    'token' => $token
-                ]);
             } catch (Exception $e) {
                 $this->application->error500($e->getMessage(), __FILE__, __LINE__);
             }
@@ -405,83 +405,6 @@ class EventController extends BaseController
             ]));
         } else {
             $this->application->error403(__FILE__, __LINE__);
-        }
-    }
-
-    public function processOrganizerLink($idEvent, $emailContact)
-    {
-        if ($this->getPerson(['EventManager'])) {
-            try {
-                $event = $this->fluent->from('Event')->where('Id', $idEvent)->fetch();
-                if (!$event) {
-                    $this->application->error471($idEvent, __FILE__, __LINE__);
-                    return;
-                }
-                $contact = $this->fluent->from('Contact')->where('Email', $emailContact)->fetch();
-                if (!$contact) {
-                    $contactData = [
-                        'Email' => $emailContact,
-                        'NickName' => null,
-                        'Token' => bin2hex(random_bytes(32)),
-                        'TokenCreatedAt' => date('Y-m-d H:i:s')
-                    ];
-                    $contactId = $this->fluent->insertInto('Contact')->values($contactData)->execute();
-                } else {
-                    $token = bin2hex(random_bytes(32));
-                    $this->fluent->update('Contact')
-                        ->set([
-                            'Token' => $token,
-                            'TokenCreatedAt' => date('Y-m-d H:i:s')
-                        ])
-                        ->where('Id', $contact->Id)
-                        ->execute();
-
-                    $contact->Token = $token;
-                }
-                if (!isset($contact)) {
-                    $contact = $this->fluent->from('Contact')->where('Id', $contactId)->fetch();
-                }
-                $registrationLink = $this->getBaseUrl() . "events/{$idEvent}/{$contact->Token}";
-
-                $this->render('app/views/contact/organizer-link.latte', $this->params->getAll([
-                    'event' => $event,
-                    'contact' => $contact,
-                    'registrationLink' => $registrationLink,
-                    'navItems' => $this->getNavItems(),
-                ]));
-            } catch (Exception $e) {
-                $this->application->error500($e->getMessage(), __FILE__, __LINE__);
-            }
-        } else {
-            $this->application->message("Il faut être connecté pour traiter cette demande");
-        }
-    }
-
-    #region Private functions
-    private function processRegistration($event, $contact)
-    {
-        try {
-            $nickname = $_POST['nickname'] ?? null;
-            if ($nickname && trim($nickname) !== '') {
-                $this->fluent->update('Contact')
-                    ->set(['NickName' => trim($nickname)])
-                    ->where('Id', $contact->Id)
-                    ->execute();
-                $contact->NickName = trim($nickname);
-            }
-            $this->fluent->insertInto('Participant')->values([
-                'IdEvent' => $event->Id,
-                'IdPerson' => null,
-                'IdContact' => $contact->Id
-            ])->execute();
-
-            $this->render('app/views/contact/registration-success.latte', $this->params->getAll([
-                'event' => $event,
-                'contact' => $contact,
-                'navItems' => $this->getNavItems(),
-            ]));
-        } catch (Exception $e) {
-            $this->application->error500($e->getMessage(), __FILE__, __LINE__);
         }
     }
 }

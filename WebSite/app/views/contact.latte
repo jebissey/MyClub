@@ -37,7 +37,7 @@
                     </div>
                 {/if}
                 
-                <form method="POST" action="/contact">
+                <form id="emailForm" method="POST" action="/contact">
                     {if $event}
                     <input type="hidden" id="eventId" name="eventId" value="{$event->Id}">
                     {/if}

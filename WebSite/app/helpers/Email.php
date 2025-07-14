@@ -5,16 +5,15 @@ namespace app\helpers;
 use InvalidArgumentException;
 use PDO;
 
-class Email
+class Email extends BaseHelper
 {
-    private PDO $pdo;
     private $fluent;
     private Person $person;
     private PersonPreferences $personPreferences;
 
     public function __construct(PDO $pdo)
     {
-        $this->pdo = $pdo;
+        parent::__construct($pdo);
         $this->fluent = new \Envms\FluentPDO\Query($pdo);
         $this->person = new Person($pdo);
         $this->personPreferences = new PersonPreferences($pdo);
@@ -41,8 +40,6 @@ class Email
         }
         return $filteredPeople;
     }
-
-
 
     public static function send($emailFrom, $emailTo, $subject, $body, $cc = null, $bcc = null, $isHtml = false)
     {
@@ -82,5 +79,49 @@ class Email
             $headerString .= $key . ': ' . $value . "\r\n";
         }
         return mail($emailTo, $subject, $body, $headerString);
+    }
+
+    public function sendContactEmail($adminEmail, $name, $email, $message): bool
+    {
+        $subject = 'Nouveau message de contact - ' . $name;
+        $body = "Nouveau message de contact reçu :\n\n";
+        $body .= "Nom & Prénom : " . $name . "\n";
+        $body .= "Email : " . $email . "\n";
+        $body .= "Message :\n" . $message . "\n\n";
+        $body .= "---\n";
+        $body .= "Envoyé le : " . date('d/m/Y à H:i') . "\n";
+        $body .= "IP : " . $_SERVER['REMOTE_ADDR'] ?? 'Inconnue';
+        return Email::send($email, $adminEmail, $subject, $body);
+    }
+
+    public function sendRegistrationLink($adminEmail, $name, $emailContact, $event): bool
+    {
+        $contact = $this->fluent->from('Contact')->where('Email', $emailContact)->fetch();
+        if (!$contact) {
+            $contactData = [
+                'Email' => $emailContact,
+                'NickName' => $name,
+                'Token' => bin2hex(random_bytes(32)),
+                'TokenCreatedAt' => date('Y-m-d H:i:s')
+            ];
+            $contactId = $this->fluent->insertInto('Contact')->values($contactData)->execute();
+        } else {
+            $token = bin2hex(random_bytes(32));
+            $this->fluent->update('Contact')
+                ->set([
+                    'Token' => $token,
+                    'TokenCreatedAt' => date('Y-m-d H:i:s')
+                ])
+                ->where('Id', $contact->Id)
+                ->execute();
+            $contact->Token = $token;
+        }
+        if (!$contact) {
+            $contact = $this->fluent->from('Contact')->where('Id', $contactId)->fetch();
+        }
+        $registrationLink = $this->getBaseUrl() . "events/{$event->Id}/{$contact->Token}";
+        $subject = "Lien d'inscription pour " . $event->Summary;
+        $body = $registrationLink;
+        return Email::send($adminEmail, $emailContact, $subject, $body);
     }
 }

@@ -17,11 +17,13 @@ use app\helpers\TranslationManager;
 class UserController extends BaseController
 {
     private Article $article;
+    private Email $email;
 
     public function __construct(PDO $pdo, Engine $flight)
     {
         parent::__construct($pdo, $flight);
         $this->article = new Article($pdo);
+        $this->email = new Email($pdo);
     }
 
     #region Sign
@@ -473,18 +475,23 @@ class UserController extends BaseController
             }
             if (empty($message)) {
                 $errors[] = 'Le message est requis.';
-            } else {
-                $eventId = trim($_POST['eventId'] ?? '');
-                if (!empty($eventId)) {
-                    $eventLink = 'https://' . $_SERVER['HTTP_HOST'] . '/events/' . $eventId . '/' . urlencode($email);
-                    $message .=  "\n\n" . $eventLink;
-                }
             }
             if (empty($errors)) {
-                $emailSent = $this->sendContactEmail($name, $email, $message);
+                $adminEmail = $this->settings->get('contactEmail');
+                if (!filter_var($adminEmail, FILTER_VALIDATE_EMAIL)) {
+                    $this->application->error500('Invalid contactEmmail', __FILE__, __LINE__);
+                }
+                $eventId = trim($_POST['eventId'] ?? '');
+                $event = $this->fluent->from('Event')->where('Id', $eventId)->fetch();
+                if (!$event) {
+                    $this->application->error471($eventId, __FILE__, __LINE__);
+                    return false;
+                }
+                if (!empty($eventId)) $emailSent = $this->email->sendRegistrationLink($adminEmail, $name, $email, $event);
+                else $emailSent = $this->email->sendContactEmail($adminEmail, $name, $email, $message);
                 if ($emailSent) {
                     $url = $this->buildUrl('/contact', [
-                        'success' => 'Votre message a été envoyé avec succès. Nous vous répondrons dans les plus brefs délais.',
+                        'success' => 'Message envoyé avec succès.',
                         'who'     => $email
                     ]);
                     $this->flight->redirect($url);
@@ -509,22 +516,6 @@ class UserController extends BaseController
                 $this->flight->redirect('/contact?' . $queryString);
             }
         }
-    }
-    private function sendContactEmail($name, $email, $message)
-    {
-        $adminEmail = $this->settings->get('contactEmail');
-        if (!filter_var($adminEmail, FILTER_VALIDATE_EMAIL)) {
-            $this->application->error500('Invalid contactEmmail', __FILE__, __LINE__);
-        }
-        $subject = 'Nouveau message de contact - ' . $name;
-        $body = "Nouveau message de contact reçu :\n\n";
-        $body .= "Nom & Prénom : " . $name . "\n";
-        $body .= "Email : " . $email . "\n";
-        $body .= "Message :\n" . $message . "\n\n";
-        $body .= "---\n";
-        $body .= "Envoyé le : " . date('d/m/Y à H:i') . "\n";
-        $body .= "IP : " . $_SERVER['REMOTE_ADDR'] ?? 'Inconnue';
-        return Email::send($email, $adminEmail, $subject, $body);
     }
 
     #region News

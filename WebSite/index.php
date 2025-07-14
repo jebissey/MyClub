@@ -48,7 +48,7 @@ Flight::map('getData', function ($key) {
     return Flight::get($key);
 });
 
-/* #region web */
+#region web
 use app\helpers\Application;
 $applicationHelper = new Application($container->get(PDO::class), $container->get(Engine::class));
 $flight->route('/help',         function() use ($applicationHelper) { $applicationHelper->help(); });
@@ -90,25 +90,20 @@ $flight->route('GET  /emails/article/@id', function($id) use ($emailController) 
 
 use app\controllers\EventController;
 $eventController = new EventController($container->get(PDO::class), $container->get(Engine::class));
-$flight->route('GET  /eventManager',          function()    use ($eventController) { $eventController->home(); });
-$flight->route('GET  /eventManager/help',     function()    use ($eventController) { $eventController->help(); });
-$flight->route('GET  /nextEvents',            function()    use ($eventController) { $eventController->nextEvents(); });
-$flight->route('GET  /events/crosstab',       function()    use ($eventController) { $eventController->showEventCrosstab();});
-$flight->route('GET  /events/guest',          function()    use ($eventController) { $eventController->guest();});
-$flight->route('POST /events/guest',          function()    use ($eventController) { $eventController->guestInvite();});
-$flight->route('GET  /events/@id',            function($id) use ($eventController) { $eventController->show($id); });
-$flight->route('GET  /event/location',        function()    use ($eventController) { $eventController->location(); });
-$flight->route('GET  /events/@id/register',   function($id) use ($eventController) { $eventController->register($id, true); });
-$flight->route('GET  /events/@id/unregister', function($id) use ($eventController) { $eventController->register($id, false); });
-$flight->route('GET  /needs',                 function()    use ($eventController) { $eventController->needs();});
-$flight->route('GET  /event/chat/@id',        function($id) use ($eventController) { $eventController->showEventChat($id); });
-$flight->route('GET  /weekEvents',            function()    use ($eventController) { $eventController->weekEvents();});
-
-$flight->route('GET      /events/@idEvent/@emailContact', function($idEvent, $emailContact) use ($eventController) { $eventController->processOrganizerLink($idEvent, $emailContact);});
-$flight->route('GET|POST /events/@idEvent/@token',        function($idEvent, $token)        use ($eventController) { 
-    if (filter_var($token, FILTER_VALIDATE_EMAIL)) $eventController->processOrganizerLink($idEvent, $token);
-    else                                           $eventController->register($idEvent, true, $token);
-});
+$flight->route('GET  /eventManager',          function()            use ($eventController) { $eventController->home(); });
+$flight->route('GET  /eventManager/help',     function()            use ($eventController) { $eventController->help(); });
+$flight->route('GET  /nextEvents',            function()            use ($eventController) { $eventController->nextEvents(); });
+$flight->route('GET  /events/crosstab',       function()            use ($eventController) { $eventController->showEventCrosstab();});
+$flight->route('GET  /events/guest',          function()            use ($eventController) { $eventController->guest();});
+$flight->route('POST /events/guest',          function()            use ($eventController) { $eventController->guestInvite();});
+$flight->route('GET  /events/@id',            function($id)         use ($eventController) { $eventController->show($id); });
+$flight->route('GET  /events/@id/register',   function($id)         use ($eventController) { $eventController->register($id, true); });
+$flight->route('GET  /events/@id/unregister', function($id)         use ($eventController) { $eventController->register($id, false); });
+$flight->route('GET  /events/@id/@token',     function($id, $token) use ($eventController) { $eventController->register($id, true, $token);});
+$flight->route('GET  /event/location',        function()            use ($eventController) { $eventController->location(); });
+$flight->route('GET  /needs',                 function()            use ($eventController) { $eventController->needs();});
+$flight->route('GET  /event/chat/@id',        function($id)         use ($eventController) { $eventController->showEventChat($id); });
+$flight->route('GET  /weekEvents',            function()            use ($eventController) { $eventController->weekEvents();});
 
 use app\controllers\EventTypeController;
 $eventTypeController = new EventTypeController($container->get(PDO::class), $container->get(Engine::class));
@@ -222,9 +217,9 @@ $flight->route('POST /arwards',              function() use ($webmasterControlle
 $flight->route('GET  /rss.xml',              function() use ($webmasterController) { $webmasterController->rssGenerator(); });
 $flight->route('GET  /sitemap.xml',          function() use ($webmasterController) { $webmasterController->sitemapGenerator(); });
 $flight->route('GET  /webmaster',            function() use ($webmasterController) { $webmasterController->homeWebmaster(); });
-/* #endregion */
+#endregion
 
-/* #region api */
+#region api
 use app\api\ArticleApi;
 $articleApi = new ArticleApi($container->get(PDO::class), $container->get(Engine::class));
 $flight->route('GET  /api/author/@articleId', function($articleId) use ($articleApi) { $articleApi->getAuthor($articleId); });
@@ -273,9 +268,7 @@ $flight->route('POST   /api/navBar/updatePositions',                 function() 
 $flight->route('GET    /api/persons-by-group/@id',                   function($id)                 use ($webmasterApi) { $webmasterApi->getPersonsByGroup($id); });
 $flight->route('POST   /api/registration/add/@personId/@groupId',    function($personId, $groupId) use ($webmasterApi) { $webmasterApi->addToGroup($personId, $groupId); });
 $flight->route('POST   /api/registration/remove/@personId/@groupId', function($personId, $groupId) use ($webmasterApi) { $webmasterApi->removeFromGroup($personId, $groupId); });
-/* #endregion */
-
-
+#endregion
 
 $flight->route('/phpInfo', function() {
     header('Content-Type: text/html; charset=UTF-8');
