@@ -48,6 +48,68 @@
                 </form>
             </div>
         </div>
+        {if $totalPages > 1}
+        <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-center">
+                <li class="page-item {$currentPage <= 1 ? 'disabled' : ''}">
+                    <a class="page-link" href="?dbbPage=1{foreach $filters as $column => $value}&filter_{$column}={$value}{/foreach}" aria-label="Première page">
+                        &laquo;&laquo;
+                    </a>
+                </li>
+                <li class="page-item {$currentPage <= 1 ? 'disabled' : ''}">
+                    <a class="page-link" href="?dbbPage={$currentPage - 1}{foreach $filters as $column => $value}&filter_{$column}={$value}{/foreach}" aria-label="Page précédente">
+                        &laquo;
+                    </a>
+                </li>
+                {var $startPage = max(1, $currentPage - 2)}
+                {var $endPage = min($totalPages, $currentPage + 2)}
+                {if $endPage - $startPage < 4 && $totalPages > 5}
+                    {if $currentPage <= 3}
+                        {var $endPage = min($totalPages, 5)}
+                    {elseif $currentPage >= $totalPages - 2}
+                        {var $startPage = max(1, $totalPages - 4)}
+                    {/if}
+                {/if}
+                {if $startPage > 1}
+                    <li class="page-item">
+                        <a class="page-link" href="?dbbPage=1{foreach $filters as $column => $value}&filter_{$column}={$value}{/foreach}">1</a>
+                    </li>
+                    {if $startPage > 2}
+                        <li class="page-item disabled">
+                            <span class="page-link">...</span>
+                        </li>
+                    {/if}
+                {/if}
+                {for $i = $startPage; $i <= $endPage; $i++}
+                <li class="page-item {$i == $currentPage ? 'active' : ''}">
+                    <a class="page-link" href="?dbbPage={$i}{foreach $filters as $column => $value}&filter_{$column}={$value}{/foreach}">
+                        {$i}
+                    </a>
+                </li>
+                {/for}
+                {if $endPage < $totalPages}
+                    {if $endPage < $totalPages - 1}
+                        <li class="page-item disabled">
+                            <span class="page-link">...</span>
+                        </li>
+                    {/if}
+                    <li class="page-item">
+                        <a class="page-link" href="?dbbPage={$totalPages}{foreach $filters as $column => $value}&filter_{$column}={$value}{/foreach}">{$totalPages}</a>
+                    </li>
+                {/if}
+                <li class="page-item {$currentPage >= $totalPages ? 'disabled' : ''}">
+                    <a class="page-link" href="?dbbPage={$currentPage + 1}{foreach $filters as $column => $value}&filter_{$column}={$value}{/foreach}" aria-label="Page suivante">
+                        &raquo;
+                    </a>
+                </li>
+                <li class="page-item {$currentPage >= $totalPages ? 'disabled' : ''}">
+                    <a class="page-link" href="?dbbPage={$totalPages}{foreach $filters as $column => $value}&filter_{$column}={$value}{/foreach}" aria-label="Dernière page">
+                        &raquo;&raquo;
+                    </a>
+                </li>
+            </ul>
+        </nav>
+        {/if}
         
         {if count($records) > 0}
         <div class="table-responsive">
@@ -79,34 +141,7 @@
                     {/foreach}
                 </tbody>
             </table>
-        </div>
-        
-        {if $totalPages > 1}
-        <nav aria-label="Page navigation">
-            <ul class="pagination justify-content-center">
-                <li class="page-item {$currentPage <= 1 ? 'disabled' : ''}">
-                    <a class="page-link" href="?dbbPage={$currentPage - 1}{foreach $filters as $column => $value}&filter_{$column}={$value}{/foreach}">
-                        Précédent
-                    </a>
-                </li>
-                
-                {for $i = 1; $i <= $totalPages; $i++}
-                <li class="page-item {$i == $currentPage ? 'active' : ''}">
-                    <a class="page-link" href="?dbbPage={$i}{foreach $filters as $column => $value}&filter_{$column}={$value}{/foreach}">
-                        {$i}
-                    </a>
-                </li>
-                {/for}
-                
-                <li class="page-item {$currentPage >= $totalPages ? 'disabled' : ''}">
-                    <a class="page-link" href="?dbbPage={$currentPage + 1}{foreach $filters as $column => $value}&filter_{$column}={$value}{/foreach}">
-                        Suivant
-                    </a>
-                </li>
-            </ul>
-        </nav>
-        {/if}
-        
+        </div>        
         {else}
         <div class="alert alert-info">
             Aucun enregistrement trouvé.
