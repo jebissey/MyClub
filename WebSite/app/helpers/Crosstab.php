@@ -13,7 +13,7 @@ class Crosstab
         $this->pdo = $pdo;
     }
 
-    
+
     public function generateCrosstab($sql, $params = [], $rowsTitle = 'Lignes', $columnsTitle = 'Colonnes', $fetchMode = PDO::FETCH_ASSOC)
     {
         $stmt = $this->pdo->prepare($sql);
@@ -27,14 +27,17 @@ class Crosstab
             $row    = $item['rowForCrosstab'];
             $column = $item['columnForCrosstab'];
             $count  = $item['countForCrosstab'];
+            $count2  = $item['count2ForCrosstab'] ?? null ;
 
             if (!isset($rows[$row])) {
                 $rows[$row] = [];
             }
             if (!isset($rows[$row][$column])) {
-                $rows[$row][$column] = 0;
+                $rows[$row][$column] = ['count' => 0, 'count2' => 0];
             }
-            $rows[$row][$column] += $count;
+            $rows[$row][$column]['count']  += $count;
+            $rows[$row][$column]['count2'] += $count2;
+
             $columns[$column] = true;
         }
 

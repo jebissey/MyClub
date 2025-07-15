@@ -74,7 +74,11 @@ class Event
             ->leftJoin('Person pe ON pa.IdPerson = pe.Id')
             ->leftJoin('Contact c ON pa.IdContact = c.Id')
             ->where('pa.IdEvent', $eventId)
-            ->select('pe.FirstName, pe.LastName, pe.NickName, pe.Email, pe.Id AS PersonId, c.Email, c.NickName, c.Id AS ContactId')
+            ->select('
+                COALESCE(pe.Email, c.Email) AS Email,
+                COALESCE(pe.NickName, c.NickName) AS NickName,
+                pe.FirstName, pe.LastName, pe.Id AS PersonId, c.Id AS ContactId
+            ')
             ->orderBy('pe.FirstName, pe.LastName, c.NickName')
             ->fetchAll();
     }

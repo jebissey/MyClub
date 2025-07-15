@@ -56,11 +56,14 @@ class EventController extends BaseController
                         ELSE ''
                     END AS columnForCrosstab,
                     et.Name AS rowForCrosstab,
-                    1 AS countForCrosstab
+                    COUNT(DISTINCT e.Id) AS countForCrosstab,
+                    COUNT(part.Id) AS count2ForCrosstab
                 FROM Person p
                 JOIN Event e ON p.Id = e.CreatedBy
                 JOIN EventType et ON e.IdEventType = et.Id
+                LEFT JOIN Participant part ON part.IdEvent = e.Id
                 WHERE e.LastUpdate BETWEEN :start AND :end
+                GROUP BY p.Id, et.Id
                 ORDER BY p.LastName, p.FirstName
             ";
             $crossTab = new CrossTab($this->pdo);
@@ -78,7 +81,8 @@ class EventController extends BaseController
                 'dateRange' => $dateRange,
                 'availablePeriods' => $crossTab->getAvailablePeriods(),
                 'navbarTemplate' => '../navbar/eventManager.latte',
-                'title' => 'Animateurs vs type d\'événement'
+                'title' => 'Animateurs vs type d\'événement',
+                'totalLabels' =>['événements', 'participants']
             ]));
         } else {
             $this->application->error403(__FILE__, __LINE__);

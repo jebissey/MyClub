@@ -55,45 +55,91 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {foreach $crosstabData['rows'] as $rowLabel => $rowValues}
-                                        <tr>
-                                            <td><strong>{$rowLabel}</strong></td>
-                                            {foreach $crosstabData['columns'] as $column}
-                                                {var $count = $rowValues[$column] ?? 0}
-                                                <td class="text-center">
-                                                    {if $count > 0}
-                                                        {$count}
-                                                    {else}
-                                                        <span class="text-muted">-</span>
-                                                    {/if}
-                                                </td>
-                                            {/foreach}
-                                            <td class="text-center font-weight-bold bg-light">
-                                                {var $rowTotal = array_sum($rowValues)}
-                                                {if $rowTotal > 0}
-                                                    {$rowTotal}
-                                                {else}
-                                                    <span class="text-muted">-</span>
+                                {foreach $crosstabData['rows'] as $rowLabel => $rowValues}
+                                    <tr>
+                                        <td><strong>{$rowLabel}</strong></td>
+                                        {foreach $crosstabData['columns'] as $column}
+                                            {var $value = $rowValues[$column] ?? ['count' => 0, 'count2' => 0]}
+                                            <td class="text-center">
+                                            {if $value['count'] > 0} 
+                                                <div>{$value['count']}</div>
+                                                {if $value['count2'] > 0}
+                                                <small class="text-secondary">{$value['count2']}</small>
                                                 {/if}
+                                            {else}
+                                                <span class="text-muted">-</span>
+                                            {/if}
                                             </td>
-                                        </tr>
-                                    {/foreach}
+                                        {/foreach}
+
+                                        {var $rowTotalCount = 0}
+                                        {var $rowTotalCount2 = 0}
+                                        {foreach $rowValues as $v}
+                                            {do $rowTotalCount += $v['count']}
+                                            {do $rowTotalCount2 += $v['count2']}
+                                        {/foreach}
+                                        <td class="text-center font-weight-bold bg-light">
+                                            {if $rowTotalCount > 0}
+                                                <div>{$rowTotalCount}</div>
+                                                {if $rowTotalCount2 > 0}
+                                                <small class="text-secondary">{$rowTotalCount2}</small>
+                                                {/if}
+                                            {else}
+                                                <span class="text-muted">-</span>
+                                            {/if}
+                                        </td>
+                                    </tr>
+                                {/foreach}
+
                                 </tbody>
                                 <tfoot>
                                     <tr class="fs-5 bg-primary text-white">
-                                        <td><strong>Total</strong></td>
-                                        {foreach $crosstabData['columns'] as $column}
-                                            {var $colTotal = 0}
-                                            {foreach $crosstabData['rows'] as $rowValues}
-                                                {var $colTotal = $colTotal + ($rowValues[$column] ?? 0)}
-                                            {/foreach}
-                                            <td class="text-center font-weight-bold">{$colTotal}</td>
-                                        {/foreach}
-                                        {var $grandTotal = 0}
+                                        <td>
+                                            <strong>Total</strong>
+                                            <div>{$totalLabels[0]}</div>
+                                            {if $totalLabels[1]}
+                                            <small class="text-secondary">{$totalLabels[1]}</small>
+                                            {/if}
+                                        </td>
+                                    {foreach $crosstabData['columns'] as $column}
+                                        {var $colTotalCount = 0}
+                                        {var $colTotalCount2 = 0}
                                         {foreach $crosstabData['rows'] as $rowValues}
-                                            {var $grandTotal = $grandTotal + array_sum($rowValues)}
+                                            {ifset $rowValues[$column]}
+                                                {do $colTotalCount += ($rowValues[$column]['count'] ?? 0)}
+                                                {do $colTotalCount2 += ($rowValues[$column]['count2'] ?? 0)}
+                                            {/ifset}
                                         {/foreach}
-                                        <td class="text-center font-weight-bold">{$grandTotal}</td>
+                                        <td class="text-center font-weight-bold">
+                                            {if $colTotalCount > 0} 
+                                                <div>{$colTotalCount}</div>
+                                                {if $colTotalCount2 > 0}
+                                                <small class="text-secondary">{$colTotalCount2}</small>
+                                                {/if}
+                                            {else}
+                                                <span class="text-muted">-</span>
+                                            {/if}
+                                        </td>
+                                    {/foreach}
+
+                                    {var $grandTotalCount = 0}
+                                    {var $grandTotalCount2 = 0}
+                                    {foreach $crosstabData['rows'] as $rowValues}
+                                        {foreach $rowValues as $v}
+                                            {do $grandTotalCount += $v['count']}
+                                            {do $grandTotalCount2 += $v['count2']}
+                                        {/foreach}
+                                    {/foreach}
+                                        <td class="text-center font-weight-bold bg-light">
+                                            {if $grandTotalCount > 0}
+                                                <div>{$grandTotalCount}</div>
+                                                {if $grandTotalCount2 > 0}
+                                                <small class="text-secondary">{$grandTotalCount2}</small>
+                                                {/if}
+                                            {else}
+                                                <span class="text-muted">-</span>
+                                            {/if}
+                                        </td>
                                     </tr>
                                 </tfoot>
                             </table>

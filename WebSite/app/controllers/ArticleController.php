@@ -341,7 +341,8 @@ class ArticleController extends TableController
                 'dateRange' => $dateRange,
                 'availablePeriods' => $crossTab->getAvailablePeriods(),
                 'navbarTemplate' => '../navbar/redactor.latte',
-                'title' => 'Rédateurs vs audience'
+                'title' => 'Rédateurs vs audience',
+                'totalLabels' => ['articles', '']
             ]));
         } else {
             $this->application->error403(__FILE__, __LINE__);

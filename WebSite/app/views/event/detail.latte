@@ -122,7 +122,7 @@
                         </div>
                     </div>
 
-                        {if strtotime($event->StartTime) > time()}
+                        {if strtotime($event->StartTime) > time() && $isRegistered}
                     <div class="mb-3">
                         <button onclick="window.open(createGoogleCalendarUrl({$event|noescape|json}), '_blank')" class="btn btn-success">
                             <i class="bi bi-calendar-event me-2"></i>Google

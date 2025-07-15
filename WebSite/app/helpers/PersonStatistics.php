@@ -275,6 +275,7 @@ class PersonStatistics
                     : 0
             ];
         }
+
         $userAllEventsCount = $this->fluent
             ->from('Event')
             ->select(null)
@@ -288,7 +289,6 @@ class PersonStatistics
             ->select('COUNT(*) AS count')
             ->where('datetime(StartTime) BETWEEN datetime(?) AND datetime(?)', [$seasonStart, $seasonEnd])
             ->fetch('count');
-
         $stats['total'] = [
             'typeName'   => 'Total',
             'user'       => $userAllEventsCount,
@@ -297,6 +297,32 @@ class PersonStatistics
                 ? round(($userAllEventsCount / $totalAllEventsCount) * 100, 2)
                 : 0
         ];
+
+        $userInvitationCount = $this->fluent
+            ->from('Guest g')
+            ->innerJoin('Event e ON e.Id = g.IdEvent')
+            ->select(null)
+            ->select('COUNT(*) AS count')
+            ->where('InvitedBy', $personId)
+            ->where('datetime(e.StartTime) BETWEEN datetime(?) AND datetime(?)', [$seasonStart, $seasonEnd])
+            ->fetch('count');
+        if ($userInvitationCount > 0) {
+            $totalInvitationCount = $this->fluent
+                ->from('Guest g')
+                ->innerJoin('Event e ON e.Id = g.IdEvent')
+                ->select(null)
+                ->select('COUNT(*) AS count')
+                ->where('datetime(e.StartTime) BETWEEN datetime(?) AND datetime(?)', [$seasonStart, $seasonEnd])
+                ->fetch('count');
+            $stats['invitation'] = [
+                'typeName'   => 'Invitation envoyées',
+                'user'       => $userInvitationCount,
+                'total'      => $totalInvitationCount,
+                'percentage' => $totalInvitationCount > 0
+                    ? round(($userInvitationCount / $totalInvitationCount) * 100, 2)
+                    : 0
+            ];
+        }
 
         return $stats;
     }
