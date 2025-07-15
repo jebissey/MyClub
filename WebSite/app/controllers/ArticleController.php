@@ -251,7 +251,7 @@ class ArticleController extends TableController
                 $this->flight->redirect('/articles/' . $id);
             } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $this->render('app/views/user/publish.latte', $this->params->getAll([
-                    'article' => $this->article->getArticle($id),
+                    'article' => $this->article->get($id),
                 ]));
             } else {
                 $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);

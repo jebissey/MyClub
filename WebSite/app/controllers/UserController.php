@@ -229,7 +229,7 @@ class UserController extends BaseController
             if ($this->article->isUserAllowedToReadArticle($userEmail, $articleId)) {
                 $spotlightUntil = $spotlight['spotlightUntil'];
                 if (strtotime($spotlightUntil) >= strtotime(date('Y-m-d'))) {
-                    $latestArticle = $this->article->getArticle($articleId);
+                    $latestArticle = $this->article->get($articleId);
                 }
             }
         }

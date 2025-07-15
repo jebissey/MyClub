@@ -48,10 +48,12 @@ class SurveyController extends BaseController
                 $survey = $this->fluent->from('Survey')->where('IdArticle', $articleId)->fetch();
                 if ($survey) {
                     $this->fluent->update('Survey')
-                        ->set(['Question' => $question])
-                        ->set(['Options' => $optionsJson])
-                        ->set(['ClosingDate' => $closingDate])
-                        ->set(['Visibility' => $visibility])
+                        ->set([
+                            'Question' => $question,
+                            'Options' => $optionsJson,
+                            'ClosingDate' => $closingDate,
+                            'Visibility' => $visibility
+                        ])
                         ->where('Id', $survey->Id)
                         ->execute();
                 } else {

@@ -6,6 +6,7 @@ class News
 {
     private $pdo;
     private $fluent;
+    private Article $article;
     private $authorizations;
 
     public function __construct($pdo)
@@ -13,6 +14,7 @@ class News
         $this->pdo = $pdo;
         $this->fluent = new \Envms\FluentPDO\Query($pdo);
         $this->authorizations = new Authorization($this->pdo);
+        $this->article = new Article($pdo);
     }
 
     public function getNewsForPerson($person, $searchFrom)
@@ -21,6 +23,7 @@ class News
         return array_merge(
             $news,
             $this->getArticleNews($person, $searchFrom),
+            $this->getSurveyNews($person, $searchFrom),
             $this->getEventNews($person, $searchFrom),
             $this->getMessageNews($person, $searchFrom),
             $this->getPresentationNews($person, $searchFrom)
@@ -142,6 +145,47 @@ class News
             ];
         }
         return $news;
+    }
+
+    private function getSurveyNews($person, $searchFrom)
+    {
+        $sql = "
+            SELECT 
+                p.FirstName, 
+                p.LastName, 
+                s.Question, 
+                s.ClosingDate, 
+                s.Visibility, 
+                r.LastUpdate, 
+                s.IdArticle
+            FROM Reply r
+            JOIN Survey s ON s.Id = r.IdSurvey
+            JOIN Article a ON a.Id = s.IdArticle
+            JOIN Person p ON p.Id = a.CreatedBy
+            WHERE r.LastUpdate >= :searchFrom
+            ORDER BY r.LastUpdate DESC
+        ";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([':searchFrom' => $searchFrom]);
+        $surveys = $stmt->fetchAll();
+        $news = [];
+        foreach ($surveys as $survey) {
+            if ($this->authorizations->getArticle($survey->IdArticle, $person) && $this->surveyResultsAreVisible($this->article->get($survey->IdArticle), $person)) {
+                $news[] = [
+                    'type' => 'survey',
+                    'id' => $survey->IdArticle,
+                    'title' => $survey->Question,
+                    'from' => $survey->FirstName . ' ' . $survey->LastName,
+                    'date' => $survey->LastUpdate,
+                    'url' => '/surveys/results/' . $survey->IdArticle
+                ];
+            }
+        }
+        return $news;
+    }
+    private function surveyResultsAreVisible($article, $person): bool
+    {
+        return $this->authorizations->canPersonReadSurveyResults($article, $person);
     }
 
     #endregion

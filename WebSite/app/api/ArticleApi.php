@@ -91,7 +91,10 @@ class ArticleApi extends BaseController
                     ->fetch();
                 if ($existingReply) {
                     $this->fluent->update('Reply')
-                        ->set(['Answers' => $answers])
+                        ->set([
+                            'Answers' => $answers,
+                            'LastUpdate' => date('Y-m-d H:i:s')
+                        ])
                         ->where('Id', $existingReply->Id)
                         ->execute();
                 } else {
@@ -99,7 +102,8 @@ class ArticleApi extends BaseController
                         ->values([
                             'IdPerson' => $person->Id,
                             'IdSurvey' => $surveyId,
-                            'Answers' => $answers
+                            'Answers' => $answers,
+                            'LastUpdate' => date('Y-m-d H:i:s')
                         ])
                         ->execute();
                 }

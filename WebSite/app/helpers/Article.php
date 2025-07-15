@@ -153,7 +153,7 @@ class Article
         ];
     }
 
-    public function getArticle($id)
+    public function get($id)
     {
         return $this->fluent
             ->from('Article a')
