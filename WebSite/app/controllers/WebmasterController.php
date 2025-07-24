@@ -2,95 +2,78 @@
 
 namespace app\controllers;
 
-use Exception;
-use app\helpers\Arwards;
+use app\helpers\ArticleDataHelper;
+use app\helpers\ArwardsDataHelper;
+use app\utils\Webapp;
 
 class WebmasterController extends BaseController
 {
     public function helpWebmaster(): void
     {
-        $this->getPerson();
+        $this->personDataHelper->getPerson();
 
         $this->render('app/views/info.latte', [
-            'content' => $this->settings->get('Help_webmaster'),
-            'hasAuthorization' => $this->authorizations->hasAutorization(),
-            'currentVersion' => self::VERSION
+            'content' => $this->application->getSettings()->get('Help_webmaster'),
+            'hasAuthorization' => $this->application->getAuthorizations()->isEventManager(),
+            'currentVersion' => $this->application->getVersion()
         ]);
     }
 
     public function helpAdmin()
     {
-        if ($this->getPerson(['EventManager', 'PersonManager', 'Redactor', 'Webmaster'])) {
+        if ($this->personDataHelper->getPerson(['EventManager', 'PersonManager', 'Redactor', 'Webmaster'])) {
 
             $this->render('app/views/info.latte', $this->params->getAll([
-                'content' => $this->settings->get('Help_admin'),
-                'hasAuthorization' => $this->authorizations->isEventManager(),
-                'currentVersion' => self::VERSION
+                'content' => $this->application->getSettings()->get('Help_admin'),
+                'hasAuthorization' => $this->application->getAuthorizations()->isEventManager(),
+                'currentVersion' => $this->application->getVersion()
             ]));
-        } else {
-            $this->application->error403(__FILE__, __LINE__);
-        }
+        } else $this->application->error403(__FILE__, __LINE__);
     }
 
     public function homeWebmaster(): void
     {
-        if ($this->getPerson(['Webmaster'])) {
+        if ($this->personDataHelper->getPerson(['Webmaster'])) {
 
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $_SESSION['navbar'] = 'webmaster';
 
                 $newVersion = null;
                 $result = $this->getLastVersion();
-                if (!$result['success']) {
-                    error_log("Erreur récupération version : " . $result['error']);
-                } elseif ($result['version'] != self::VERSION) {
-                    $newVersion = "A new version is available (V" . $result['version'] . ")";
-                }
+                if (!$result['success']) error_log("Erreur récupération version : " . $result['error']);
+                elseif ($result['version'] != $this->application->getVersion()) $newVersion = "A new version is available (V" . $result['version'] . ")";
 
                 $this->render('app/views/admin/webmaster.latte', $this->params->getAll(['newVersion' => $newVersion]));
-            } else {
-                $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
-            }
-        } else {
-            $this->application->error403(__FILE__, __LINE__);
-        }
+            } else $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
+        } else $this->application->error403(__FILE__, __LINE__);
     }
 
     public function homeAdmin()
     {
-        if ($this->getPerson(['EventManager', 'PersonManager', 'Redactor', 'Webmaster'])) {
-            if ($this->authorizations->hasOnlyOneAutorization()) {
-                if ($this->authorizations->isEventManager()) {
-                    $this->flight->redirect('/eventManager');
-                } else if ($this->authorizations->isPersonManager()) {
-                    $this->flight->redirect('/personManager');
-                } else if ($this->authorizations->isRedactor()) {
+        if ($this->personDataHelper->getPerson(['EventManager', 'PersonManager', 'Redactor', 'Webmaster'])) {
+            if ($this->application->getAuthorizations()->hasOnlyOneAutorization()) {
+                if ($this->application->getAuthorizations()->isEventManager())       $this->flight->redirect('/eventManager');
+                else if ($this->application->getAuthorizations()->isPersonManager()) $this->flight->redirect('/personManager');
+                else if ($this->application->getAuthorizations()->isRedactor()) {
                     $_SESSION['navbar'] = 'redactor';
                     $this->flight->redirect('/articles');
-                } else if ($this->authorizations->isWebmaster()) {
-                    $this->flight->redirect('/webmaster');
-                }
-            } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-                $this->render('app/views/admin/admin.latte', $this->params->getAll([]));
-            } else {
-                $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
-            }
-        } else {
-            $this->application->error403(__FILE__, __LINE__);
-        }
+                } else if ($this->application->getAuthorizations()->isWebmaster())   $this->flight->redirect('/webmaster');
+            } else if ($_SERVER['REQUEST_METHOD'] === 'GET') $this->render('app/views/admin/admin.latte', $this->params->getAll([]));
+            else $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
+        } else $this->application->error403(__FILE__, __LINE__);
     }
 
     public function arwards(): void
     {
-        if ($this->getPerson(['Webmaster'])) {
+        if ($person = $this->personDataHelper->getPerson(['Webmaster'])) {
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-                $arwards = new Arwards($this->pdo);
+                $arwardsDataHelper = new ArwardsDataHelper();
                 $this->render('app/views/admin/arwards.latte', $this->params->getAll([
-                    'counterNames' => $counterNames = $arwards->getCounterNames(),
-                    'data' => $arwards->getData($counterNames),
-                    'groups' => $this->getGroups(),
-                    'layout' => $this->getLayout(),
-                    'navItems' => $this->getNavItems(),
+                    'counterNames' => $counterNames = $arwardsDataHelper->getCounterNames(),
+                    'data' => $arwardsDataHelper->getData($counterNames),
+                    'groups' => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
+                    'layout' => Webapp::getLayout()(),
+                    'navItems' => $this->getNavItems($person),
                 ]));
             } else if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $request = $this->flight->request();
@@ -100,84 +83,51 @@ class WebmasterController extends BaseController
                 $idPerson = (int)$request->data->idPerson;
                 $idGroup = (int)$request->data->idGroup;
 
-                if (empty($name) || $value < 0 || $idPerson <= 0 || $idGroup <= 0) {
-                    $this->flight->redirect('/arwards?error=invalid_data');
-                } else {
-                    try {
-                        $this->fluent->insertInto('Counter')
-                            ->values([
-                                'Name' => $name,
-                                'Detail' => $detail,
-                                'Value' => $value,
-                                'IdPerson' => $idPerson,
-                                'IdGroup' => $idGroup
-                            ])
-                            ->execute();
-                        $this->flight->redirect('/arwards?success=true');
-                    } catch (\Exception $e) {
-                        $this->flight->redirect('/arwards?error=' . urlencode($e->getMessage()));
-                    }
+                if (empty($name) || $value < 0 || $idPerson <= 0 || $idGroup <= 0) $this->flight->redirect('/arwards?error=invalid_data');
+                else {
+                    $this->dataHelper->set('Counter', [
+                        'Name' => $name,
+                        'Detail' => $detail,
+                        'Value' => $value,
+                        'IdPerson' => $idPerson,
+                        'IdGroup' => $idGroup
+                    ]);
+                    $this->flight->redirect('/arwards?success=true');
                 }
-            } else {
-                $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
-            }
-        } else {
-            $this->application->error403(__FILE__, __LINE__);
-        }
+            } else $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
+        } else $this->application->error403(__FILE__, __LINE__);
     }
 
     public function rssGenerator()
     {
-        $base_url = $this->getBaseUrl();
+        $base_url = Webapp::getBaseUrl();
         $site_title = "Liste d'articles";
         $site_url = $base_url;
         $feed_url = $base_url . "rss.xml";
         $feed_description = "Mises à jour de la liste d'articles";
-
-        $personId = ($this->getPerson([]))->Id ?? 0;
-        $query = $this->pdo->query("
-            SELECT DISTINCT Article.*
-            FROM Article
-            CROSS JOIN Person p
-            LEFT JOIN PersonGroup pg ON pg.IdPerson = p.Id
-            WHERE Article.PublishedBy IS NOT NULL
-            AND ((Article.IdGroup IS NULL AND Article.OnlyForMembers = 0)
-              OR (Article.IdGroup IS NULL AND Article.OnlyForMembers = 1 AND $personId <> 0)
-              OR (Article.IdGroup IS NOT NULL AND Article.IdGroup IN (SELECT IdGroup FROM PersonGroup WHERE PersonGroup.IdPerson = $personId))
-            )
-            ORDER BY Article.LastUpdate DESC");
-        $articles = $query->fetchAll();
-
+        $articles = (new ArticleDataHelper())->getArticlesForRss(($this->personDataHelper->getPerson([]))->Id ?? 0);
         header('Cache-Control: no-cache, no-store, must-revalidate'); // HTTP 1.1
         header('Pragma: no-cache'); // HTTP 1.0
         header('Expires: 0'); // Proxies
-
         header('Content-Type: application/rss+xml; charset=utf-8');
         echo $this->generateRSS($articles, $site_title, $site_url, $feed_url, $feed_description);
     }
 
     public function sitemapGenerator()
     {
-        $base_url = $this->getBaseUrl();
-        $lastMod = $this->fluent->from('Article')
-            ->select(null)
-            ->select('MAX(LastUpdate) AS LastMod')
-            ->fetch('LastMod');
+        $articleDataHelper = new ArticleDataHelper();
+        $base_url = Webapp::getBaseUrl();
         header("Content-Type: application/xml; charset=utf-8");
         echo '<?xml version="1.0" encoding="UTF-8"?>' . PHP_EOL;
         echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . PHP_EOL;
         echo '  <url>' . PHP_EOL;
         echo '    <loc>' . $base_url . '</loc>' . PHP_EOL;
-        echo '    <lastmod>' . $lastMod . '</lastmod>' . PHP_EOL;
+        echo '    <lastmod>' . $articleDataHelper->getLastUpdateArticles() . '</lastmod>' . PHP_EOL;
         echo '    <changefreq>daily</changefreq>' . PHP_EOL;
         echo '    <priority>1.0</priority>' . PHP_EOL;
         echo '  </url>' . PHP_EOL;
 
-        $articles = $this->fluent->from('Article')
-            ->select('Id, Title, LastUpdate')
-            ->where('IdGroup IS NULL AND OnlyForMembers = 0')
-            ->orderBy('LastUpdate DESC')
-            ->fetchAll();
+        $articles = $articleDataHelper->getArticlesForAll();
         foreach ($articles as $article) {
             echo '  <url>' . PHP_EOL;
             echo '    <loc>' . $base_url . '/article/' . $article->Id . '</loc>' . PHP_EOL;
@@ -186,7 +136,6 @@ class WebmasterController extends BaseController
             echo '    <priority>0.5</priority>' . PHP_EOL;
             echo '  </url>' . PHP_EOL;
         }
-
         echo '</urlset>';
     }
 

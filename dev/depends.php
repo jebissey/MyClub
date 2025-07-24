@@ -7,8 +7,8 @@ if (file_exists($dependenciesFile)) {
     $rawData = file_get_contents($dependenciesFile);
 } else {
     // Données de fallback si le fichier n'existe pas
-    $rawData = '../WebSite/app/api/ArticleApi.php depends on: Exception, app\controllers\BaseController
-../WebSite/app/api/CarouselApi.php depends on: Exception, app\controllers\BaseController
+    $rawData = '../WebSite/app/apis/ArticleApi.php depends on: Exception, app\controllers\BaseController
+../WebSite/app/apis/CarouselApi.php depends on: Exception, app\controllers\BaseController
 ../WebSite/app/helpers/TranslationManager.php depends on: DateTime, IntlDateFormatter, PDO';
 }
 

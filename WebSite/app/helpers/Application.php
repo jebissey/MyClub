@@ -2,128 +2,190 @@
 
 namespace app\helpers;
 
-use app\controllers\BaseController;
 use PDO;
 use flight\Engine;
 use Latte\Engine as LatteEngine;
 
 class Application
 {
+    private const VERSION = 0.5;
+
+    private static $instance = null;
     private PDO $pdo;
+    private PDO $pdoForLog;
     private Engine $flight;
+    private LatteEngine $latte;
+    private Authorization $authorizations;
     private Settings $settings;
-    private $latte;
-    private $authorizations;
-    private $version;
+    private string $version;
+    public static string $root;
 
-    public function __construct(PDO $pdo, Engine $flight)
+    private function __construct()
     {
-        $this->pdo = $pdo;
-        $this->flight = $flight;
-        $this->settings = new Settings($this->pdo);
+        $database = \app\helpers\Database::getInstance();
+        $this->pdo = $database->getPdo();
+        $this->pdoForLog = $database->getPdoForLog();
+
+        $this->authorizations = new Authorization();
+        $this->settings = new Settings();
+        $this->version = self::VERSION;
+
         $this->latte = new LatteEngine();
-        $this->authorizations = new Authorization($this->pdo);
-        $this->version = BaseController::GetVersion();
+        $this->root = 'https://' . $_SERVER['HTTP_HOST'];
     }
 
+    public static function getInstance(): self
+    {
+        if (self::$instance === null) {
+            self::$instance = new self();
+        }
+        return self::$instance;
+    }
 
-    public function help()
+    public function getLatte(): LatteEngine
+    {
+        return $this->latte;
+    }
+
+    public function getFlight(): Engine
+    {
+        return $this->flight;
+    }
+
+    public function setFlight(Engine $flight): void
+    {
+        $this->flight = $flight;
+    }
+
+    public function getPdo(): PDO
+    {
+        return $this->pdo;
+    }
+
+    public function getPdoForLog(): PDO
+    {
+        return $this->pdoForLog;
+    }
+
+    public function getSettings(): Settings
+    {
+        return $this->settings;
+    }
+
+    public function getAuthorizations(): Authorization
+    {
+        return $this->authorizations;
+    }
+
+    public function getVersion(): string
+    {
+        return $this->version;
+    }
+
+    public function help(): void
     {
         $content = $this->latte->renderToString('app/views/info.latte', [
-            'content' => $this->settings->get('Help_home'),
+            'content' => $this->settings->get_('Help_home'),
             'hasAuthorization' => $this->authorizations->hasAutorization(),
             'currentVersion' => $this->version
         ]);
         echo $content;
     }
 
-    public function legalNotice()
+    public function legalNotice(): void
     {
         $content = $this->latte->renderToString('app/views/info.latte', [
-            'content' => $this->settings->get('LegalNotices'),
+            'content' => $this->settings->get_('LegalNotices'),
             'hasAuthorization' => $this->authorizations->hasAutorization(),
             'currentVersion' => $this->version
         ]);
         echo $content;
     }
 
-
-    public function message($message, $timeout = 5000, $code = 200)
+    public function message(string $message, int $timeout = 5000, int $code = 200): void
     {
         $this->error($code, $message, $timeout, false);
     }
 
-    public function error403($file, $line, $timeout = 1000)
+    public function error403(string $file, int $line, int $timeout = 1000): void
     {
         $this->error(403, "Page not allowed in file $file at line $line", $timeout);
     }
 
-    public function error404($timeout = 1000)
+    public function error404(int $timeout = 1000): void
     {
         $this->error(404, 'Page not found', $timeout);
     }
 
-    public function error470($requestMethod, $file, $line, $timeout = 1000)
+    public function error470(string $requestMethod, string $file, int $line, int $timeout = 1000): void
     {
         $this->error(470, "Method $requestMethod invalid in file $file at line $line", $timeout);
     }
 
-    public function error471($parameter, $file, $line, $timeout = 1000)
+    public function error471(string $parameter, string $file, int $line, int $timeout = 1000): void
     {
         $this->error(471, "Parameter $parameter invalid in file $file at line $line", $timeout);
     }
 
-    public function error472($parameterName, $file, $line, $timeout = 1000)
+    public function error472(string $parameterName, string $file, int $line, int $timeout = 1000): void
     {
         $this->error(472, "Missing Parameter $parameterName invalid in file $file at line $line", $timeout);
     }
 
-    public function error479($email, $file, $line, $timeout = 1000)
+    public function error479(string $email, string $file, int $line, int $timeout = 1000): void
     {
         $this->error(479, "Email address: $email inactivated in file $file at line $line", $timeout);
     }
 
-    public function error480($email, $file, $line, $timeout = 1000)
+    public function error480(string $email, string $file, int $line, int $timeout = 1000): void
     {
         $this->error(480, "Unknown user with this email address: $email in file $file at line $line", $timeout);
     }
 
-    public function error481($email, $file, $line, $timeout = 1000)
+    public function error481(string $email, string $file, int $line, int $timeout = 1000): void
     {
         $this->error(481, "Invalid email address: $email in file $file at line $line", $timeout);
     }
 
-    public function error482($message, $file, $line, $timeout = 1000)
+    public function error482(string $message, string $file, int $line, int $timeout = 1000): void
     {
         $this->error(482, "Invalid password: $message in file $file at line $line", $timeout);
     }
 
-
-    public function error497($token, $file, $line, $timeout = 1000)
+    public function error490(string $error, string $file, int $line, int $timeout = 1000): void
     {
-        $this->error(497, "Token $token is expired in file $file at line $line", $timeout);
+        $this->error(490, "Error $error in file $file at line $line", $timeout);
     }
 
-    public function error498($table, $token, $file, $line, $timeout = 1000)
+    public function error497(string $token, string $file, int $line, int $timeout = 1000): void
+    {
+        $this->error(497,  "Token $token is expired in file $file at line $line", $timeout);
+    }
+
+    public function error498(string $table, string $token, string $file, int $line, int $timeout = 1000): void
     {
         $this->error(498, "Record with token $token not found in table $table in file $file at line $line", $timeout);
     }
 
-    public function error499($table, $id, $file, $line, $timeout = 1000)
+    public function error499(string $table, string $id, string $file, int $line, int $timeout = 1000): void
     {
         $this->error(499, "Record $id not found in table $table in file $file at line $line", $timeout);
     }
 
-    public function error500($message, $file, $line, $timeout = 5000)
+    public function error500(string $message, string $file, int $line, int $timeout = 5000): void
     {
         $this->error(500, "Internal error: $message in file $file at line $line", $timeout);
     }
 
-    #region private Function
-    private function error($code, $message, $timeout = 1000, $displayCode = true)
+    #region Private functions
+    private function error(int $code, string $message, int $timeout = 1000, bool $displayCode = true): void
     {
-        $this->flight->setData('code', $code);
-        $this->flight->setData('message', $message);
+        $this->logError($code, $message);
+
+        if ($this->flight) {
+            $this->flight->setData('code', $code);
+            $this->flight->setData('message', $message);
+        }
 
         if ($code && $displayCode) {
             echo "<h1>$code</h1>";
@@ -134,5 +196,35 @@ class Application
                 window.location.href = '/';
             }, $timeout);
         </script>";
+    }
+
+    private function logError(int $code, string $message): void
+    {
+        try {
+            $email = filter_var($_SESSION['user'] ?? '', FILTER_VALIDATE_EMAIL);
+            $client = new Client();
+
+            $stmt = $this->pdoForLog->prepare("
+                INSERT INTO Log (IpAddress, Referer, Os, Browser, ScreenResolution, Type, Uri, Token, Who, Code, Message, CreatedAt) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))
+            ");
+
+            $stmt->execute([
+                $client->getIp(),
+                $client->getReferer(),
+                $client->getOs(),
+                $client->getBrowser(),
+                $client->getScreenResolution(),
+                $client->getType(),
+                $client->getUri(),
+                $client->getToken(),
+                $email ?: 'anonymous',
+                $code,
+                $message
+            ]);
+        } catch (\Exception $e) {
+            // En cas d'erreur lors du logging, on évite une boucle infinie
+            error_log("Failed to log error: " . $e->getMessage());
+        }
     }
 }

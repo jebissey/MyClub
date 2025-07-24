@@ -2,98 +2,61 @@
 
 namespace app\controllers;
 
-use DateTime;
 use flight\Engine;
-use PDO;
 use app\helpers\Alert;
-use app\helpers\Article;
+use app\helpers\ArticleDataHelper;
+use app\helpers\AttributeDataHelper;
 use app\helpers\Email;
+use app\helpers\EventTypeDataHelper;
+use app\helpers\GroupDataHelper;
+use app\helpers\LogDataHelper;
 use app\helpers\News;
-use app\helpers\Params;
-use app\helpers\PasswordManager;
+use app\helpers\PersonGroupDataHelper;
 use app\helpers\PersonStatistics;
-use app\helpers\TranslationManager;
+use app\helpers\SurveyDataHelper;
+use app\services\Sign;
+use app\utils\Params;
+use app\services\Password;
+use app\utils\TranslationManager;
+use app\utils\Webapp;
 
 class UserController extends BaseController
 {
-    private Article $article;
+    private ArticleDataHelper $articleDataHelper;
     private Email $email;
+    private Sign $sign;
+    private SurveyDataHelper $surveyDataHelper;
 
-    public function __construct(PDO $pdo, Engine $flight)
+    public function __construct(Engine $flight)
     {
-        parent::__construct($pdo, $flight);
-        $this->article = new Article($pdo);
-        $this->email = new Email($pdo);
+        parent::__construct($flight);
+        $this->articleDataHelper = new ArticleDataHelper();
+        $this->email = new Email();
+        $this->sign = new Sign($this->dataHelper, $this->personDataHelper, $this->application);
+        $this->surveyDataHelper = new SurveyDataHelper();
     }
 
     #region Sign
     public function forgotPassword($encodedEmail)
     {
-        $email = urldecode($encodedEmail);
-
-        if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            $person = $this->getPersonByEmail($email);
-
-            if ($person) {
-                if ($person->TokenCreatedAt === null || (new DateTime($person->TokenCreatedAt))->diff(new DateTime())->h >= 1) {
-                    $token = bin2hex(random_bytes(32));
-                    $tokenCreatedAt = (new DateTime())->format('Y-m-d H:i:s');
-                    $query = $this->pdo->prepare('UPDATE Person SET Token = ?, TokenCreatedAt = ? WHERE Id = ?');
-                    $query->execute([$token, $tokenCreatedAt, $person->Id]);
-                    $resetLink = 'https://' . $_SERVER['HTTP_HOST'] . '/user/setPassword/' . $token;
-
-                    $to = $email;
-                    $subject = "Initialisation du mot de passe";
-                    $message = "Cliquez sur ce lien pour initialiser votre mot de passe : $resetLink";
-
-                    if (mail($to, $subject, $message)) {
-                        $this->application->message('Un courriel a été envoyé pour réinitialiser votre mot de passe');
-                    } else {
-                        $this->application->message("Une erreur est survenue lors de l'envoi de l'email", 3000, 500);
-                    }
-                } else {
-                    $this->application->message("Un courriel de réinitialisation a déjà été envoyé à " . substr($person->TokenCreatedAt, 10) . ". Il est valide pendant 1 heure.");
-                }
-            } else {
-                $this->application->error480($email, __FILE__, __LINE__);
-            }
-        } else {
-            $this->application->error481($email, __FILE__, __LINE__);
-        }
+        $this->sign->forgotPassword(urldecode($encodedEmail));
     }
 
     public function setPassword($token)
     {
-        $query = $this->pdo->prepare('SELECT * FROM "Person" WHERE Token = ?');
-        $query->execute([$token]);
-        $person = $query->fetch();
-
-        if (!$person) {
-            $this->application->error498('Person', $token, __FILE__, __LINE__);
-        } else {
-            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-                if ($person->TokenCreatedAt === null || (new DateTime($person->TokenCreatedAt))->diff(new DateTime())->h >= 1) {
-                    $this->application->error497($token, __FILE__, __LINE__);
-                } else {
-                    $stmt = $this->pdo->prepare('UPDATE Person SET Password = ?, Token = null, TokenCreatedAt = null WHERE Id = ?');
-                    $stmt->execute([PasswordManager::signPassword($_POST['password']), $person->Id]);
-
-                    $this->application->message('Votre mot de passe est réinitialisé');
-                }
-            } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-                $this->render('app/views/user/setPassword.latte', [
-                    'href' => '/user/sign/in',
-                    'userImg' => '/app/images/anonymat.png',
-                    'userEmail' => '',
-                    'keys' => false,
-                    'page' => basename(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH)),
-                    'token' => $token,
-                    'currentVersion' => self::VERSION
-                ]);
-            } else {
-                $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
-            }
-        }
+        if ($_SERVER['REQUEST_METHOD'] === 'POST')
+            $this->sign->checkAndSetPassword($token, $_POST['password']);
+        elseif ($_SERVER['REQUEST_METHOD'] === 'GET') {
+            $this->render('app/views/user/setPassword.latte', [
+                'href' => '/user/sign/in',
+                'userImg' => '/app/images/anonymat.png',
+                'userEmail' => '',
+                'keys' => false,
+                'page' => basename(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH)),
+                'token' => $token,
+                'currentVersion' => $this->application->getVersion()
+            ]);
+        } else $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
     }
 
     public function signIn()
@@ -104,63 +67,21 @@ class UserController extends BaseController
                 $this->application->error481($_POST['email'], __FILE__, __LINE__);
             } else {
                 $password = $_POST['password'] ?? '';
-                if (strlen($password) < 6 || strlen($password) > 30) {
+                if (strlen($password) < 6 || strlen($password) > 30)
                     $this->application->error482('password rules are not respected [6..30] characters', __FILE__, __LINE__);
-                } else {
-                    if (!$person = $this->getPersonByEmail($email)) {
-                        $this->application->error480($email, __FILE__, __LINE__);
-                    } else {
-                        if ($person->Inactivated == 1) {
-                            $this->application->error479($email, __FILE__, __LINE__);
-                        } else {
-                            if (PasswordManager::verifyPassword($password, $person->Password ?? '')) {
-                                $rememberMe = isset($_POST['rememberMe']) && $_POST['rememberMe'] === 'on';
-                                if ($rememberMe) {
-                                    $token = bin2hex(random_bytes(32));
-                                    $tokenCreatedAt = (new DateTime())->format('Y-m-d H:i:s');
-                                    $query = $this->pdo->prepare('UPDATE Person SET Token = ?, TokenCreatedAt = ? WHERE Id = ?');
-                                    $query->execute([$token, $tokenCreatedAt, $person->Id]);
-                                    setcookie('rememberMe', $token, [
-                                        'expires' => time() + 30 * 24 * 60 * 60, // 30 days
-                                        'path' => '/',
-                                        'secure' => true,
-                                        'httponly' => true,
-                                        'samesite' => 'Strict'
-                                    ]);
-                                }
-                                $lastActivity = $this->fluentForLog->from('Log')
-                                    ->select(null)
-                                    ->select('CreatedAt')
-                                    ->where('Who COLLATE NOCASE', $email)
-                                    ->orderBy('Id DESC')
-                                    ->limit(1)
-                                    ->fetch('CreatedAt');
-                                if ($lastActivity) {
-                                    $this->fluent->update('Person')->set('LastSignOut', $lastActivity)->where('Email COLLATE NOCASE', $email)->execute();
-                                }
-                                $this->fluent->update('Person')->set(['LastSignIn' => date('Y-m-d H:i:s')])->where('Email COLLATE NOCASE', $email)->execute();
-                                $_SESSION['user'] = $email;
-                                $_SESSION['navbar'] = '';
-                                $this->application->message("Sign in succeeded with $email", 1);
-                            } else {
-                                $this->application->error482("sign in failed with $email address", __FILE__, __LINE__);
-                            }
-                        }
-                    }
-                }
+                else $this->sign->authenticate($email, $password, isset($_POST['rememberMe']) && $_POST['rememberMe'] === 'on');
             }
-        } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+        } elseif ($_SERVER['REQUEST_METHOD'] === 'GET') {
             if (isset($_COOKIE['rememberMe'])) {
                 $token = $_COOKIE['rememberMe'];
-                $person = $this->fluent->from('Person')->where('Token', $token)->fetch();
+                $person = $this->dataHelper->get('Person', ['Token' => $token]);
                 if ($person && $person->Inactivated == 0) {
-                    $this->fluent->update('Person')->set(['LastSignIn' => date('Y-m-d H:i:s')])->where('Id', $person->Id)->execute();
+                    $this->dataHelper->set('Person', ['LastSignIn' => date('Y-m-d H:i:s')], ['Id' => $person->Id]);
                     $_SESSION['user'] = $person->Email;
                     $_SESSION['navbar'] = '';
-                } else {
-                    setcookie('rememberMe', '', time() - 3600, '/');
-                }
+                } else setcookie('rememberMe', '', time() - 3600, '/');
                 $this->flight->redirect('/');
+                return;
             }
 
             $this->render('app/views/user/signIn.latte', [
@@ -169,17 +90,15 @@ class UserController extends BaseController
                 'userEmail' => '',
                 'keys' => false,
                 'page' => basename(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH)),
-                'currentVersion' => self::VERSION
+                'currentVersion' => $this->application->getVersion()
             ]);
-        } else {
-            $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
-        }
+        } else $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
     }
 
     public function signOut()
     {
         $this->log(200, 'Sign out succeeded with with ' . $_SESSION['user'] ?? '');
-        $this->fluent->update('Person')->set(['LastSignOut' => date('Y-m-d H:i:s')])->where('Email COLLATE NOCASE', $_SESSION['user'])->execute();
+        $this->dataHelper->set('Person',  ['LastSignOut' => date('Y-m-d H:i:s')], ['Email COLLATE NOCASE' . $_SESSION['user'] => null]);
         unset($_SESSION['user']);
         $_SESSION['navbar'] = '';
         $this->flight->redirect('/');
@@ -192,55 +111,56 @@ class UserController extends BaseController
         $userPendingSurveys = $userPendingDesigns = [];
         $userEmail = $_SESSION['user'] ?? '';
         if ($userEmail) {
-            $person = $this->getPerson();
+            $person = $this->personDataHelper->getPerson();
             if (!$person) {
                 unset($_SESSION['user']);
                 $this->application->error480($userEmail, __FILE__, __LINE__);
             }
-            $pendingSurveyResponses = (new Alert($this->pdo))->getPendingSurveyResponses();
+            $pendingSurveyResponses = (new Alert())->getPendingSurveyResponses();
             $userPendingSurveys = array_filter($pendingSurveyResponses, function ($item) use ($userEmail) {
                 return strcasecmp($item->Email, $userEmail) === 0;
             });
-            $pendingDesignResponses = (new Alert($this->pdo))->getPendingDesignResponses();
+            $pendingDesignResponses = (new Alert())->getPendingDesignResponses();
             $userPendingDesigns = array_filter($pendingDesignResponses, function ($item) use ($userEmail) {
                 return strcasecmp($item->Email, $userEmail) === 0;
             });
 
-            $news = (new News($this->pdo))->anyNews($person);
+            $news = (new News())->anyNews($person);
         } else {
-            $translationManager = new TranslationManager($this->pdo);
-            $this->params = new Params([
+            $lang = TranslationManager::getCurrentLanguage();
+            Params::setParams([
                 'href' => '/user/sign/in',
                 'userImg' => '/app/images/anonymat.png',
                 'userEmail' => '',
                 'keys' => false,
-                'currentVersion' => self::VERSION,
-                'currentLanguage' => $translationManager->getCurrentLanguage(),
-                'supportedLanguages' => $translationManager->getSupportedLanguages(),
-                'flag' => $translationManager->getFlag($translationManager->getCurrentLanguage()),
+                'currentVersion' => $this->application->getVersion(),
+                'currentLanguage' => $lang,
+                'supportedLanguages' => TranslationManager::getSupportedLanguages(),
+                'flag' => TranslationManager::getFlag($lang),
                 'isRedactor' => false,
             ]);
         }
-        $articles = $this->article->getLatestArticles($userEmail);
+        $articles = $this->articleDataHelper->getLatestArticles($userEmail);
         $latestArticle = $articles['latestArticle'];
-        $spotlight = $this->article->getSpotlightArticle();
+        $spotlight = $this->articleDataHelper->getSpotlightArticle();
         if ($spotlight !== null) {
             $articleId = $spotlight['articleId'];
-            if ($this->article->isUserAllowedToReadArticle($userEmail, $articleId)) {
+            if ($this->articleDataHelper->isUserAllowedToReadArticle($userEmail, $articleId)) {
                 $spotlightUntil = $spotlight['spotlightUntil'];
-                if (strtotime($spotlightUntil) >= strtotime(date('Y-m-d'))) {
-                    $latestArticle = $this->article->get($articleId);
-                }
+                if (strtotime($spotlightUntil) >= strtotime(date('Y-m-d')))
+                    $latestArticle = $this->articleDataHelper->getWithAuthor($articleId);
             }
         }
+
         $this->render('app/views/home.latte', $this->params->getAll([
             'latestArticle' => $latestArticle,
             'latestArticles' => $articles['latestArticles'],
-            'greatings' => $this->settings->get('Greatings'),
-            'link' => $this->settings->get('Link'),
-            'navItems' => $this->getNavItems(),
-            'publishedBy' => $articles['latestArticle'] && $articles['latestArticle']->PublishedBy != $articles['latestArticle']->CreatedBy ? $this->getPublisher($articles['latestArticle']->PublishedBy) : '',
-            'latestArticleHasSurvey' => (new Article($this->pdo))->hasSurvey($articles['latestArticle']->Id ?? 0),
+            'greatings' => $this->application->getSettings()->get_('Greatings'),
+            'link' => $this->application->getSettings()->get_('Link'),
+            'navItems' => $this->getNavItems($person),
+            'publishedBy' => $articles['latestArticle']
+                && $articles['latestArticle']->PublishedBy != $articles['latestArticle']->CreatedBy ? $this->personDataHelper->getPublisher($articles['latestArticle']->PublishedBy) : '',
+            'latestArticleHasSurvey' => $this->surveyDataHelper->articleHasSurvey($articles['latestArticle']->Id ?? 0),
             'pendingSurveys' => $userPendingSurveys,
             'pendingDesigns' => $userPendingDesigns,
             'news' => $news ?? false,
@@ -250,21 +170,17 @@ class UserController extends BaseController
     #region Data user
     public function user()
     {
-        if ($this->getPerson()) {
+        if ($this->personDataHelper->getPerson()) {
             $_SESSION['navbar'] = 'user';
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $this->render('app/views/user/user.latte', $this->params->getAll([]));
-            } else {
-                $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
-            }
-        } else {
-            $this->application->error403(__FILE__, __LINE__);
-        }
+            } else $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
+        } else $this->application->error403(__FILE__, __LINE__);
     }
 
     public function account()
     {
-        if ($person = $this->getPerson([], 1)) {
+        if ($person = $this->personDataHelper->getPerson([], 1)) {
 
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $email = filter_var($_POST['email'], FILTER_VALIDATE_EMAIL) ?? '';
@@ -274,28 +190,27 @@ class UserController extends BaseController
                 $nickName = $_POST['nickName'];
                 $avatar = pathinfo($_POST['avatar'], PATHINFO_BASENAME) ?? '';
                 $useGravatar = $_POST['useGravatar'] ?? 'no';
-                $query = $this->pdo->prepare('UPDATE Person SET FirstName = ?, LastName = ?, NickName = ?, Avatar = ?, useGravatar = ? WHERE Id = ' . $person->Id);
-                $query->execute([$firstName, $lastName, $nickName, $avatar, $useGravatar]);
-
-                if (!empty($password)) {
-                    $query = $this->pdo->prepare('UPDATE Person SET Password = ? WHERE Id = ' . $person->Id);
-                    $query->execute([PasswordManager::signPassword($password)]);
-                }
-
+                $this->dataHelper->set('Person', [
+                    'FirstName' => $firstName,
+                    'LastName' => $lastName,
+                    'NickName' => $nickName,
+                    'Avatar' => $avatar,
+                    'useGravatar' => $useGravatar
+                ], ['Id' => $person->Id]);
+                if (!empty($password))
+                    $this->dataHelper->set('Person', ['Password' => Password::signPassword($password)], ['Id' => $person->Id]);
                 if ($person->Imported == 0) {
-                    $query = $this->pdo->prepare('UPDATE Person SET Email = ? WHERE Id = ' . $person->Id);
-                    $query->execute([$email]);
+                    $this->dataHelper->set('Person', ['Email' => $email], ['Id' => $person->Id]);
                     $_SESSION['user'] = $email;
                 }
                 $this->flight->redirect('/user');
             } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $email = filter_var($person->Email, FILTER_VALIDATE_EMAIL) ?? '';
-                $firstName = $this->sanitizeInput($person->FirstName);
-                $lastName = $this->sanitizeInput($person->LastName);
-                $nickName = $this->sanitizeInput($person->NickName);
-                $avatar = $this->sanitizeInput($person->Avatar);
-                $useGravatar = $this->sanitizeInput($person->UseGravatar) ?? 'no';
-
+                $firstName = WebApp::sanitizeInput($person->FirstName);
+                $lastName = WebApp::sanitizeInput($person->LastName);
+                $nickName = WebApp::sanitizeInput($person->NickName);
+                $avatar = WebApp::sanitizeInput($person->Avatar);
+                $useGravatar = WebApp::sanitizeInput($person->UseGravatar) ?? 'no';
                 $emojiFiles = glob(__DIR__ . '/../images/emoji*');
                 $emojis = array_map(function ($path) {
                     return basename($path);
@@ -312,153 +227,87 @@ class UserController extends BaseController
                     'emojis' => $emojis,
                     'emojiPath' => '/app/images/',
                     'isSelfEdit' => true,
-                    'layout' => $this->getLayout()
+                    'layout' => Webapp::getLayout()()
                 ]));
-            } else {
-                $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
-            }
-        } else {
-            $this->application->error403(__FILE__, __LINE__);
-        }
+            } else $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
+        } else $this->application->error403(__FILE__, __LINE__);
     }
 
     public function availabilities()
     {
-        if ($person = $this->getPerson([], 1)) {
+        if ($person = $this->personDataHelper->getPerson([], 1)) {
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $availabilities = $_POST['availabilities'] ?? '';
-                if ($availabilities != '') {
-                    $query = $this->pdo->prepare('UPDATE Person SET availabilities = ? WHERE Id = ' . $person->Id);
-                    $query->execute([json_encode($availabilities)]);
-                }
+                if ($availabilities != '') $this->dataHelper->set('Person', ['Availabilities' => json_encode($availabilities)], ['Id' => $person->Id]);
                 $this->flight->redirect('/user');
             } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $currentAvailabilities = json_decode($person->Availabilities ?? '', true);
-                $this->render('app/views/user/availabilities.latte', $this->params->getAll([
-                    'currentAvailabilities' => $currentAvailabilities
-                ]));
-            } else {
-                $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
-            }
-        } else {
-            $this->application->error403(__FILE__, __LINE__);
-        }
+                $this->render('app/views/user/availabilities.latte', $this->params->getAll(['currentAvailabilities' => $currentAvailabilities]));
+            } else $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
+        } else $this->application->error403(__FILE__, __LINE__);
     }
 
     public function preferences()
     {
-        if ($person = $this->getPerson([], 1)) {
+        if ($person = $this->personDataHelper->getPerson([], 1)) {
 
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $preferences = $_POST['preferences'];
-                $query = $this->pdo->prepare('UPDATE Person SET preferences = ? WHERE Id = ' . $person->Id);
-                $query->execute([json_encode($preferences)]);
+                $this->dataHelper->set('Person', ['preferences' =>  json_encode($preferences)], ['Id' => $person->Id]);
                 $this->flight->redirect('/user');
             } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-                $preferences = json_decode($person->Preferences ?? '', true);
-                $query = $this->pdo->prepare("
-                    SELECT et.*
-                    FROM EventType et
-                    LEFT JOIN `Group` g ON et.IdGroup = g.Id
-                    WHERE et.Inactivated = 0 
-                    AND (
-                        g.Id IN (
-                            SELECT pg.IdGroup
-                            FROM PersonGroup pg
-                            WHERE pg.IdPerson = ? AND pg.IdGroup = g.Id
-                        )
-                        OR et.IdGroup is NULL)
-                    ORDER BY et.Name
-                ");
-                $query->execute([$person->Id]);
-                $eventTypes = $query->fetchAll();
-
+                $eventTypes = (new EventTypeDataHelper())->getsFor($person->Id);
                 $eventTypesWithAttributes = [];
+                $attributeDataHelper = new AttributeDataHelper();
                 foreach ($eventTypes as $eventType) {
-                    $queryAttributes = $this->pdo->prepare("
-                        SELECT a.*
-                        FROM Attribute a
-                        JOIN EventTypeAttribute eta ON a.Id = eta.IdAttribute
-                        WHERE eta.IdEventType = ?
-                        ORDER BY a.Name
-                    ");
-                    $queryAttributes->execute([$eventType->Id]);
-                    $eventType->Attributes = $queryAttributes->fetchAll();
+                    $eventType->Attributes = $attributeDataHelper->getAttributesOf($eventType->Id);
                     $eventTypesWithAttributes[] = $eventType;
                 }
 
                 $this->render('app/views/user/preferences.latte', $this->params->getAll([
-                    'currentPreferences' => $preferences,
+                    'currentPreferences' => json_decode($person->Preferences ?? '', true),
                     'eventTypes' => $eventTypesWithAttributes
                 ]));
-            } else {
-                $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
-            }
-        } else {
-            $this->application->error403(__FILE__, __LINE__);
-        }
+            } else $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
+        } else $this->application->error403(__FILE__, __LINE__);
     }
 
     public function groups()
     {
-        if ($person = $this->getPerson([], 1)) {
-
+        if ($person = $this->personDataHelper->getPerson([], 1)) {
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-                $groups = $_POST['groups'] ?? [];
-                $idPerson = $person->Id;
-                $query = $this->pdo->prepare("
-                DELETE FROM PersonGroup 
-                WHERE IdPerson = $idPerson 
-                AND IdGroup IN (SELECT Id FROM `Group` WHERE SelfRegistration = 1)");
-                $query->execute();
-
-                $query = $this->pdo->prepare('INSERT INTO PersonGroup (IdPerson, IdGroup) VALUES (?, ?)');
-                foreach ($groups as $groupId) {
-                    $query->execute([$idPerson, $groupId]);
-                }
+                (new PersonGroupDataHelper())->update($person->Id, $_POST['groups'] ?? []);
                 $this->flight->redirect('/user');
             } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-                $query = $this->pdo->prepare('
-                SELECT g.*, 
-                    CASE WHEN pg.Id IS NOT NULL THEN 1 ELSE 0 END as isMember,
-                    g.SelfRegistration as canToggle
-                FROM `Group` g 
-                LEFT JOIN PersonGroup pg ON pg.IdGroup = g.Id AND pg.IdPerson = ?
-                WHERE g.Inactivated = 0 AND (g.SelfRegistration = 1 OR pg.Id IS NOT NULL)
-                ORDER BY g.Name');
-                $query->execute([$person->Id]);
-                $currentGroups = $query->fetchAll();
+                $currentGroups = (new GroupDataHelper())->getCurrentGroups($person->Id);
+
                 $this->render('app/views/user/groups.latte', $this->params->getAll([
                     'groups' => $currentGroups,
-                    'layout' => $this->getLayout()
+                    'layout' => Webapp::getLayout()()
                 ]));
-            } else {
-                $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
-            }
+            } else $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
         }
     }
     #endregion 
 
     public function help()
     {
-        if ($this->getPerson()) {
+        if ($this->personDataHelper->getPerson()) {
             $this->render('app/views/info.latte', $this->params->getAll([
-                'content' => $this->settings->get('Help_user'),
-                'hasAuthorization' => $this->authorizations->hasAutorization(),
-                'currentVersion' => self::VERSION
+                'content' => $this->application->getSettings()->get_('Help_user'),
+                'hasAuthorization' => $this->application->getAuthorizations()->hasAutorization(),
+                'currentVersion' => $this->application->getVersion()
             ]));
-        } else {
-            $this->application->error403(__FILE__, __LINE__);
-        }
+        } else $this->application->error403(__FILE__, __LINE__);
     }
 
     public function contact($eventId = null)
     {
         if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-            $this->getPerson();
+            $person = $this->personDataHelper->getPerson();
             $this->render('app/views/contact.latte', $this->params->getAll([
-                'navItems' => $this->getNavItems(),
-                'event' => $eventId != null ? $this->fluent->from('Event')->where('Id', $eventId)->fetch() : null,
+                'navItems' => $this->getNavItems($person),
+                'event' => $eventId != null ? $this->dataHelper->get('Event', ['Id' => $eventId]) : null,
             ]));
         } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $name = trim($_POST['name'] ?? '');
@@ -468,21 +317,17 @@ class UserController extends BaseController
             if (empty($name)) {
                 $errors[] = 'Le nom et prénom sont requis.';
             }
-            if (empty($email)) {
-                $errors[] = 'L\'email est requis.';
-            } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                $errors[] = 'L\'email n\'est pas valide.';
-            }
-            if (empty($message)) {
-                $errors[] = 'Le message est requis.';
-            }
+            if (empty($email)) $errors[] = 'L\'email est requis.';
+            elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) $errors[] = 'L\'email n\'est pas valide.';
+            if (empty($message)) $errors[] = 'Le message est requis.';
             if (empty($errors)) {
-                $adminEmail = $this->settings->get('contactEmail');
+                $adminEmail = $this->application->getSettings()->get_('contactEmail');
                 if (!filter_var($adminEmail, FILTER_VALIDATE_EMAIL)) {
                     $this->application->error500('Invalid contactEmmail', __FILE__, __LINE__);
+                    return;
                 }
                 $eventId = trim($_POST['eventId'] ?? '');
-                $event = $this->fluent->from('Event')->where('Id', $eventId)->fetch();
+                $event = $this->dataHelper->get('Event', ['Id' => $eventId]);
                 if (!$event) {
                     $this->application->error471($eventId, __FILE__, __LINE__);
                     return false;
@@ -490,7 +335,7 @@ class UserController extends BaseController
                 if (!empty($eventId)) $emailSent = $this->email->sendRegistrationLink($adminEmail, $name, $email, $event);
                 else $emailSent = $this->email->sendContactEmail($adminEmail, $name, $email, $message);
                 if ($emailSent) {
-                    $url = $this->buildUrl('/contact', [
+                    $url = (new Webapp())->buildUrl('/contact', [
                         'success' => 'Message envoyé avec succès.',
                         'who'     => $email
                     ]);
@@ -521,7 +366,7 @@ class UserController extends BaseController
     #region News
     public function showNews()
     {
-        if ($person = $this->getPerson([], 1)) {
+        if ($person = $this->personDataHelper->getPerson([], 1)) {
             $searchMode = $_GET['from'] ?? 'signout';
             if ($searchMode === 'signin') {
                 $searchFrom = $person->LastSignIn ?? '';
@@ -534,33 +379,29 @@ class UserController extends BaseController
             }
 
             $this->render('app/views/user/news.latte', $this->params->getAll([
-                'news' => (new News($this->pdo))->getNewsForPerson($person, $searchFrom),
+                'news' => (new News())->getNewsForPerson($person, $searchFrom),
                 'searchFrom' => $searchFrom,
                 'searchMode' => $searchMode,
-                'navItems' => $this->getNavItems(),
+                'navItems' => $this->getNavItems($person),
                 'person' => $person
             ]));
-        } else {
-            $this->application->error403(__FILE__, __LINE__);
-        }
+        } else $this->application->error403(__FILE__, __LINE__);
     }
 
     #region Statistics
     public function showStatistics()
     {
-        if ($person = $this->getPerson([], 1)) {
-            $personalStatistics = new PersonStatistics($this->pdo);
+        if ($person = $this->personDataHelper->getPerson([], 1)) {
+            $personalStatistics = new PersonStatistics();
             $season = $personalStatistics->getSeasonRange();
             $this->render('app/views/user/statistics.latte', $this->params->getAll([
-                'stats' => $personalStatistics->getStats($person, $season['start'], $season['end'], $this->authorizations->isWebmaster()),
+                'stats' => $personalStatistics->getStats($person, $season['start'], $season['end'], $this->application->getAuthorizations()->isWebmaster()),
                 'seasons' => $personalStatistics->getAvailableSeasons(),
                 'currentSeason' => $season,
-                'navItems' => $this->getNavItems(),
+                'navItems' => $this->getNavItems($person),
                 'chartData' => $this->getVisitStatsForChart($season, $person),
             ]));
-        } else {
-            $this->application->error403(__FILE__, __LINE__);
-        }
+        } else $this->application->error403(__FILE__, __LINE__);
     }
     private function getVisitStatsForChart($season, $person)
     {
@@ -653,19 +494,9 @@ class UserController extends BaseController
 
     private function getMemberVisits($season)
     {
-        $query = $this->pdoForLog->prepare("
-            SELECT Who, COUNT(Id) as VisitCount
-            FROM Log 
-            WHERE CreatedAt BETWEEN :start AND :end
-            GROUP BY Who
-        ");
-        $query->execute([
-            ':start' => $season['start'],
-            ':end' => $season['end']
-        ]);
-        $visits = $query->fetchAll(PDO::FETCH_KEY_PAIR);
+        $visits = (new LogDataHelper())->getVisits($season);
         $memberVisits = [];
-        $members = $this->fluent->from('Person')->select('Email')->where('Inactivated', 0)->fetchAll();
+        $members = $this->dataHelper->gets('Person', ['Inactivated' => 0], 'Email');
         foreach ($members as $member) {
             $email = $member->Email;
             $memberVisits[$email] = isset($visits[$email]) ? (int)$visits[$email] : 0;
@@ -675,25 +506,14 @@ class UserController extends BaseController
 
     private function getCurrentUserTranche($stats, $person)
     {
-        if (empty($person) || empty($stats['memberVisits'])) {
-            die('$person or $stats can\'t be null');
-        }
-
+        if (empty($person) || empty($stats['memberVisits'])) die('$person or $stats can\'t be nulli n file ' . __FILE__ . ' at line ' . __LINE__);
         $email = $person->Email;
-
-        if (!array_key_exists($email, $stats['memberVisits'])) {
-            die("User $email not found in stats.");
-        }
-
+        if (!array_key_exists($email, $stats['memberVisits'])) die('User $email not found in stats in file ' . __FILE__ . ' at line ' . __LINE__);
         $userVisits = $stats['memberVisits'][$email];
-
         for ($i = 0; $i < count($stats['tranches']); $i++) {
             $tranche = $stats['tranches'][$i];
-            if ($userVisits >= $tranche['start'] && $userVisits <= $tranche['end']) {
-                return $i;
-            }
+            if ($userVisits >= $tranche['start'] && $userVisits <= $tranche['end']) return $i;
         }
-
-        die('$user slice not found');
+        die('$user slice not found in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 }

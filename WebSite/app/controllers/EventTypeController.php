@@ -2,13 +2,24 @@
 
 namespace app\controllers;
 
-use PDO;
+use app\helpers\EventDataHelper;
+use app\helpers\TableControllerHelper;
 
 class EventTypeController extends TableController implements CrudControllerInterface
 {
+    private EventDataHelper $eventDataHelper;
+    private TableControllerHelper $tableControllerHelper;
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->eventDataHelper = new EventDataHelper();
+        $this->tableControllerHelper = new TableControllerHelper();
+    }
+
     public function index()
     {
-        if ($this->getPerson(['Webmaster'])) {
+        if ($this->personDataHelper->getPerson(['Webmaster'])) {
             $filterValues = [];
             $filterConfig = [];
             $columns = [
@@ -16,17 +27,8 @@ class EventTypeController extends TableController implements CrudControllerInter
                 ['field' => 'GroupName', 'label' => 'Groupe'],
                 ['field' => 'Attributes', 'label' => 'Attributs'],
             ];
-            $query = $this->fluent->from('EventType')
-                ->select('EventType.Id AS EventTypeId, EventType.Name AS EventTypeName, `Group`.Name AS GroupName')
-                ->select('GROUP_CONCAT(Attribute.Name, ", ") AS Attributes')
-                ->leftJoin('`Group` ON EventType.IdGroup = `Group`.Id')
-                ->leftJoin('EventTypeAttribute ON EventType.Id = EventTypeAttribute.IdEventType')
-                ->leftJoin('Attribute ON EventTypeAttribute.IdAttribute = Attribute.Id')
-                ->where('EventType.Inactivated', 0)
-                ->groupBy('EventType.Id')
-                ->orderBy('EventType.Name');
+            $data = $this->prepareTableData($this->tableControllerHelper->getEventTypesQuery(), $filterValues, $_GET['tablePage'] ?? null);
 
-            $data = $this->prepareTableData($query, $filterValues, $_GET['tablePage'] ?? null);
             $this->render('app/views/eventType/index.latte', $this->params->getAll([
                 'eventTypes' => $data['items'],
                 'currentPage' => $data['currentPage'],
@@ -36,93 +38,50 @@ class EventTypeController extends TableController implements CrudControllerInter
                 'columns' => $columns,
                 'resetUrl' => '/eventTypes'
             ]));
-        } else {
-            $this->application->error403(__FILE__, __LINE__);
-        }
+        } else $this->application->error403(__FILE__, __LINE__);
     }
 
     public function create()
     {
-        if ($this->getPerson(['Webmaster'])) {
+        if ($this->personDataHelper->getPerson(['Webmaster'])) {
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-                $id = $this->fluent->insertInto('EventType', ['Name' => ''])->execute();
+                $id = $this->dataHelper->set('EventType', ['Name' => '']);
                 $this->flight->redirect('/EventTypes/edit/' . $id);
-            } else {
-                $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
-            }
-        } else {
-            $this->application->error403(__FILE__, __LINE__);
-        }
+            } else $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
+        } else $this->application->error403(__FILE__, __LINE__);
     }
 
     public function edit($id)
     {
-        if ($this->getPerson(['Webmaster'])) {
-            $eventType = $this->fluent->from('`EventType`')->where('Id', $id)->fetch();
-            if (!$eventType) {
-                $this->application->error499('EventType', $id, __FILE__, __LINE__);
-            } else {
+        if ($this->personDataHelper->getPerson(['Webmaster'])) {
+            $eventType = $this->dataHelper->get('EventType', ['Id', $id]);
+            if (!$eventType) $this->application->error499('EventType', $id, __FILE__, __LINE__);
+            else {
                 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-                    $this->pdo->beginTransaction();
-                    try {
-                        $name = $_POST['name'];
-                        $idGroup = $_POST['idGroup'] === '' ? null : ($_POST['idGroup'] ?? null);
-                        $query = $this->pdo->prepare('UPDATE EventType SET Name = ?, IdGroup = ? WHERE Id = ?');
-                        $query->execute([$name, $idGroup, $id]);
-
-                        $deleteQuery = $this->pdo->prepare('DELETE FROM EventTypeAttribute WHERE IdEventType = ?');
-                        $deleteQuery->execute([$id]);
-
-                        if (isset($_POST['attributes']) && is_array($_POST['attributes'])) {
-                            $insertQuery = $this->pdo->prepare('INSERT INTO EventTypeAttribute (IdEventType, IdAttribute) VALUES (?, ?)');
-                            foreach ($_POST['attributes'] as $attributeId) {
-                                $insertQuery->execute([$id, $attributeId]);
-                            }
-                        }
-                        $this->pdo->commit();
-                        $this->flight->redirect('/eventTypes');
-                    } catch (\Exception $e) {
-                        $this->pdo->rollBack();
-                        throw $e;
-                    }
+                    $this->eventDataHelper->update($id, $_POST['name'], $_POST['idGroup'] === '' ? null : ($_POST['idGroup'] ?? null));
                 } else if (($_SERVER['REQUEST_METHOD'] === 'GET')) {
-                    $existingAttributesQuery = $this->pdo->prepare('
-                        SELECT IdAttribute 
-                        FROM EventTypeAttribute 
-                        WHERE IdEventType = ?
-                    ');
-                    $existingAttributesQuery->execute([$id]);
-                    $existingAttributes = $existingAttributesQuery->fetchAll(PDO::FETCH_COLUMN);
+                    $existingAttributes = $this->eventDataHelper->getExistingAttibutes($id);
 
                     $this->render('app/views/eventType/edit.latte', $this->params->getAll([
                         'name' => $eventType->Name,
                         'idGroup' => $eventType->IdGroup,
-                        'groups' => $this->fluent->from('`Group`')->where('Inactivated', 0)->orderBy('Name')->fetchAll(),
-                        'attributes' => $this->fluent->from('Attribute')->orderBy('Name')->fetchAll(),
+                        'groups' => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
+                        'attributes' => $this->dataHelper->gets('Attribute', [], '*', 'Name'),
                         'existingAttributes' => $existingAttributes
                     ]));
-                } else {
-                    $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
-                }
+                } else $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
             }
-        } else {
-            $this->application->error403(__FILE__, __LINE__);
-        }
+        } else $this->application->error403(__FILE__, __LINE__);
     }
 
     public function delete($id)
     {
-        if ($this->getPerson(['Webmaster'])) {
+        if ($this->personDataHelper->getPerson(['Webmaster'])) {
             if (($_SERVER['REQUEST_METHOD'] === 'GET')) {
-                $query = $this->pdo->prepare('UPDATE "EventType" SET Inactivated = 1 WHERE Id = ?');
-                $query->execute([$id]);
+                $this->dataHelper->set('EventType', ['Inactivated' => 1], ['Id' => $id]);
 
                 $this->flight->redirect('/eventTypes');
-            } else {
-                $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
-            }
-        } else {
-            $this->application->error403(__FILE__, __LINE__);
-        }
+            } else $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
+        } else $this->application->error403(__FILE__, __LINE__);
     }
 }

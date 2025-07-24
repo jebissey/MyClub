@@ -4,7 +4,7 @@ function loadGroupUsers(groupId) {
 
     if (userRow.classList.contains("d-none")) {
         userList.innerHTML = "Chargement...";
-        fetch(`/api/persons-by-group/${groupId}`)
+        fetch(`/api/personsInGroup/${groupId}`)
             .then(response => response.json())
             .then(data => {
                 if (data.length === 0) {

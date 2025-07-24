@@ -2,75 +2,53 @@
 
 namespace App\Controllers;
 
-use Flight\Engine;
-use PDO;
+use app\utils\Media;
+use app\utils\Webapp;
 
 class MediaController extends BaseController
 {
-    public function __construct(PDO $pdo, Engine $flight)
-    {
-        parent::__construct($pdo, $flight);
+    private Media $media;
 
-        $this->latte->addFilter('formatFileSize', function ($bytes) {
-            if ($bytes >= 1073741824) {
-                return number_format($bytes / 1073741824, 2) . ' GB';
-            } elseif ($bytes >= 1048576) {
-                return number_format($bytes / 1048576, 2) . ' MB';
-            } elseif ($bytes >= 1024) {
-                return number_format($bytes / 1024, 2) . ' KB';
-            } else {
-                return $bytes . ' bytes';
-            }
-        });
+    public function __construct()
+    {
+        $this->media = new Media();
     }
 
     public function showUploadForm()
     {
-        if ($this->getPerson(['Redactor'])) {
+        if ($this->personDataHelper->getPerson(['Redactor'])) {
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $this->render('app/views/media/upload.latte', $this->params->getAll([]));
-            } else {
-                $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
-            }
-        } else {
-            $this->application->error403(__FILE__, __LINE__);
-        }
+            } else $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
+        } else $this->application->error403(__FILE__, __LINE__);
     }
 
     public function listFiles()
     {
-        if ($this->getPerson(['Redactor'])) {
+        if ($this->personDataHelper->getPerson(['Redactor'])) {
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $year = $this->flight->request()->query->year ?? date('Y');
                 $search = $this->flight->request()->query->search ?? '';
-
                 $files = [];
                 $years = $this->getAvailableYears();
-
-                if (in_array($year, $years)) {
-                    $files = $this->getFilesForYear($year, $search);
-                }
+                if (in_array($year, $years)) $files = $this->getFilesForYear($year, $search);
 
                 $this->render('app/views/media/list.latte',  $this->params->getAll([
                     'files' => $files,
                     'years' => $years,
                     'currentYear' => $year,
                     'search' => $search,
-                    'baseUrl' => $this->getBaseUrl()
+                    'baseUrl' => Webapp::getBaseUrl()
                 ]));
-            } else {
-                $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
-            }
-        } else {
-            $this->application->error403(__FILE__, __LINE__);
-        }
+            } else $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
+        } else $this->application->error403(__FILE__, __LINE__);
     }
 
     public function viewFile($year, $month, $filename)
     {
-        if ($this->getPerson(['Redactor'])) {
+        if ($this->personDataHelper->getPerson(['Redactor'])) {
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-                $filePath = $this->mediaPath . $year . '/' . $month . '/' . $filename;
+                $filePath = $this->media->GetMediaPath() . $year . '/' . $month . '/' . $filename;
 
                 if (!file_exists($filePath)) {
                     $this->application->error404();
@@ -86,47 +64,37 @@ class MediaController extends BaseController
                 header('Content-Disposition: inline; filename="' . $filename . '"');
                 readfile($filePath);
                 return;
-            } else {
-                $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
-            }
-        } else {
-            $this->application->error403(__FILE__, __LINE__);
-        }
+            } else $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
+        } else $this->application->error403(__FILE__, __LINE__);
     }
 
-    public function gpxViewer()
+    public function gpxViewer(): void
     {
-        if ($this->getPerson([])) {
+        if ($this->personDataHelper->getPerson([])) {
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $this->render('app/views/media/gpxViewer.latte', $this->params->getAll([]));
-            } else {
-                $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
-            }
-        } else {
-            $this->application->error403(__FILE__, __LINE__);
-        }
+            } else $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
+        } else $this->application->error403(__FILE__, __LINE__);
     }
 
 
-    private function getAvailableYears()
+    private function getAvailableYears(): array
     {
         $years = [];
-        if (file_exists($this->mediaPath) && is_dir($this->mediaPath)) {
-            $dirs = scandir($this->mediaPath);
+        if (file_exists($this->media->GetMediaPath()) && is_dir($this->media->GetMediaPath())) {
+            $dirs = scandir($this->media->GetMediaPath());
             foreach ($dirs as $dir) {
-                if ($dir !== '.' && $dir !== '..' && is_dir($this->mediaPath . $dir) && is_numeric($dir)) {
-                    $years[] = $dir;
-                }
+                if ($dir !== '.' && $dir !== '..' && is_dir($this->media->GetMediaPath() . $dir) && is_numeric($dir)) $years[] = $dir;
             }
             rsort($years);
         }
         return $years;
     }
 
-    private function getFilesForYear($year, $search = '')
+    private function getFilesForYear($year, $search = ''): array
     {
         $files = [];
-        $yearPath = $this->mediaPath . $year . '/';
+        $yearPath = $this->media->GetMediaPath() . $year . '/';
 
         if (file_exists($yearPath) && is_dir($yearPath)) {
             $months = scandir($yearPath);
@@ -141,7 +109,7 @@ class MediaController extends BaseController
                                 $files[] = [
                                     'name' => $file,
                                     'path' => 'data/media/' . $year . '/' . $month . '/' . $file,
-                                    'url' => $this->getBaseUrl() . 'data/media/' . $year . '/' . $month . '/' . $file,
+                                    'url' => Webapp::getBaseUrl() . 'data/media/' . $year . '/' . $month . '/' . $file,
                                     'size' => filesize($monthPath . $file),
                                     'date' => date('Y-m-d H:i:s', filemtime($monthPath . $file)),
                                     'month' => $month

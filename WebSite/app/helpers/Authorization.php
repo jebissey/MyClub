@@ -3,21 +3,17 @@
 namespace app\helpers;
 
 use DateTime;
-use PDO;
 
-class Authorization
+class Authorization extends Data
 {
-    private PDO $pdo;
     private $authorizations;
-    private $fluent;
 
-    public function __construct(PDO $pdo)
+    public function __construct()
     {
-        $this->pdo = $pdo;
-        $this->fluent = new \Envms\FluentPDO\Query($pdo);
+        $this->authorizations = new Authorization();
     }
 
-    public function get($idPerson)
+    public function getsFor($idPerson)
     {
         $query = $this->pdo->prepare("
             SELECT DISTINCT Authorization.Name FROM Person 

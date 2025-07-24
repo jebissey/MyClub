@@ -2,19 +2,8 @@
 
 namespace app\helpers;
 
-use PDO;
-
-class PersonStatistics
+class PersonStatistics extends Data
 {
-    private PDO $pdo;
-    private $fluent;
-
-    public function __construct(PDO $pdo)
-    {
-        $this->pdo = $pdo;
-        $this->fluent = new \Envms\FluentPDO\Query($pdo);
-    }
-
     public function getStats($person, $seasonStart, $seasonEnd, $isWebmaster)
     {
         $stats = [

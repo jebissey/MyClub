@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', function () {
     groupSelect.addEventListener('change', function () {
         const groupId = this.value;
         if (groupId) {
-            fetch(`/api/persons-by-group/${groupId}`)
+            fetch(`/api/personsInGroup/${groupId}`)
                 .then(response => {
                     if (!response.ok) {
                         throw new Error('Erreur réseau ou serveur');

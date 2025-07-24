@@ -2,18 +2,8 @@
 
 namespace app\helpers;
 
-use PDO;
-
-class Alert
+class Alert extends Data
 {
-    protected PDO $pdo;
-    protected $fluent;
-    public function __construct(PDO $pdo)
-    {
-        $this->pdo = $pdo;
-        $this->fluent = new \Envms\FluentPDO\Query($pdo);
-    }
-
     public function getPendingSurveyResponses()
     {
         $query = "

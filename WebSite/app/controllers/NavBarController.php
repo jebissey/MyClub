@@ -2,83 +2,51 @@
 
 namespace app\controllers;
 
-use PDO;
-use app\helpers\Arwards;
+use app\helpers\ArwardsDataHelper;
+use app\utils\Webapp;
 
 class NavBarController extends BaseController
 {
     public function index()
     {
-        if ($this->getPerson(['Webmaster'])) {
+        if ($this->personDataHelper->getPerson(['Webmaster'])) {
             $this->render('app/views/navbar/index.latte', $this->params->getAll([
                 'navItems' => $this->getNavItems(true),
-                'groups' => $this->getGroups(),
+                'groups' => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
                 'availableRoutes' => $this->getAvailableRoutes()
             ]));
-        } else {
-            $this->application->error403(__FILE__, __LINE__);
-        }
+        } else $this->application->error403(__FILE__, __LINE__);
     }
 
     public function showArwards()
     {
-        if ($this->authorizedUser('/navbar/show/arwards')) {
-            $this->getPerson();
-            $arwards = new Arwards($this->pdo);
+        $person = $this->personDataHelper->getPerson();
+        if ($this->pageDataHelper->authorizedUser('/navbar/show/arwards', $person)) {
+            $arwardsDataHelper = new ArwardsDataHelper();
+
             $this->render('app/views/admin/arwards.latte', $this->params->getAll([
-                'counterNames' => $counterNames = $arwards->getCounterNames(),
-                'data' => $arwards->getData($counterNames),
-                'groups' => $this->getGroups(),
-                'layout' => $this->getLayout(),
-                'navItems' => $this->getNavItems(),
+                'counterNames' => $counterNames = $arwardsDataHelper->getCounterNames(),
+                'data' => $arwardsDataHelper->getData($counterNames),
+                'groups' => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
+                'layout' => Webapp::getLayout()(),
+                'navItems' => $this->getNavItems($person),
             ]));
-        } else {
-            $this->application->error403(__FILE__, __LINE__);
-        }
+        } else $this->application->error403(__FILE__, __LINE__);
     }
 
     public function showArticle($id)
     {
-        if ($this->authorizedUser("/navbar/show/article/$id")) {
-            $this->getPerson();
+        $person = $this->personDataHelper->getPerson();
+        if ($this->pageDataHelper->authorizedUser("/navbar/show/article/$id", $person)) {
             $this->render('app/views/navbar/article.latte', $this->params->getAll([
-                'navItems' => $this->getNavItems(),
-                'chosenArticle' => $this->fluent->from('Article')->where('Id', $id)->fetch(),
-                'hasAuthorization' => $this->authorizations->hasAutorization()
+                'navItems' => $this->getNavItems($person),
+                'chosenArticle' => $this->dataHelper->get('Article', ['Id' => $id]),
+                'hasAuthorization' => $this->application->getAuthorizations()->hasAutorization()
             ]));
-        } else {
-            $this->application->error403(__FILE__, __LINE__);
-        }
+        } else $this->application->error403(__FILE__, __LINE__);
     }
 
-    /* #region private function */
-    private function authorizedUser($page)
-    {
-        $pageData = $this->fluent->from('Page')
-            ->select('"Page".IdGroup, "Page".ForMembers, "Page".ForAnonymous, "Group".Id AS groupId')
-            ->leftJoin('"Group" ON Page.IdGroup = "Group".Id')
-            ->where('Page.Route', $page)
-            ->fetch();
-        if (!$pageData) return false;
-        $person = $this->getPerson();
-
-        if (!$pageData->IdGroup) {
-            if (!$person && $pageData->ForAnonymous) {
-                return true;
-            }
-            if ($person && $pageData->ForMembers) {
-                return true;
-            }
-            return false;
-        }
-
-        if (!$person) {
-            return false;
-        }
-        $userGroups = $this->authorizations->getUserGroups($person->Email);
-        return in_array($pageData->IdGroup, $userGroups);
-    }
-
+    #region private function 
     private function getAvailableRoutes()
     {
         return [
@@ -93,5 +61,4 @@ class NavBarController extends BaseController
             '/webCard',
         ];
     }
-    /* #endregion */
 }

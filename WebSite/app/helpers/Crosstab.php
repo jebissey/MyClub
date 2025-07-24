@@ -3,17 +3,10 @@
 namespace app\helpers;
 
 use PDO;
+use app\utils\Period;
 
-class Crosstab
+class Crosstab extends Data
 {
-    private $pdo;
-
-    public function __construct(PDO $pdo)
-    {
-        $this->pdo = $pdo;
-    }
-
-
     public function generateCrosstab($sql, $params = [], $rowsTitle = 'Lignes', $columnsTitle = 'Colonnes', $fetchMode = PDO::FETCH_ASSOC)
     {
         $stmt = $this->pdo->prepare($sql);
@@ -27,7 +20,7 @@ class Crosstab
             $row    = $item['rowForCrosstab'];
             $column = $item['columnForCrosstab'];
             $count  = $item['countForCrosstab'];
-            $count2  = $item['count2ForCrosstab'] ?? null ;
+            $count2  = $item['count2ForCrosstab'] ?? null;
 
             if (!isset($rows[$row])) {
                 $rows[$row] = [];
@@ -53,44 +46,61 @@ class Crosstab
         ];
     }
 
-    public function getDateRangeForPeriod($period)
+    public function getevents($period)
     {
-        $end = date('Y-m-d H:i:s');
-        $start = '';
-
-        switch ($period) {
-            case 'week':
-                $start = date('Y-m-d H:i:s', strtotime('-1 week'));
-                break;
-            case 'month':
-                $start = date('Y-m-d H:i:s', strtotime('-1 month'));
-                break;
-            case 'quarter':
-                $start = date('Y-m-d H:i:s', strtotime('-3 months'));
-                break;
-            case 'year':
-                $start = date('Y-m-d H:i:s', strtotime('-1 year'));
-                break;
-            case 'all':
-            default:
-                $start = '1970-01-01 00:00:00';
-                break;
-        }
-
-        return [
-            'start' => $start,
-            'end' => $end
-        ];
+        $sql = "
+                SELECT 
+                    p.FirstName || ' ' || p.LastName || 
+                    CASE 
+                        WHEN p.NickName IS NOT NULL AND p.NickName != '' THEN ' (' || p.NickName || ')'
+                        ELSE ''
+                    END AS columnForCrosstab,
+                    et.Name AS rowForCrosstab,
+                    COUNT(DISTINCT e.Id) AS countForCrosstab,
+                    COUNT(part.Id) AS count2ForCrosstab
+                FROM Person p
+                JOIN Event e ON p.Id = e.CreatedBy
+                JOIN EventType et ON e.IdEventType = et.Id
+                LEFT JOIN Participant part ON part.IdEvent = e.Id
+                WHERE e.LastUpdate BETWEEN :start AND :end
+                GROUP BY p.Id, et.Id
+                ORDER BY p.LastName, p.FirstName
+            ";
+        $crossTab = new CrossTab();
+        $dateRange = Period::getDateRangeFor($period);
+        $crosstabData = $crossTab->generateCrosstab(
+            $sql,
+            [':start' => $dateRange['start'], ':end' => $dateRange['end']],
+            'Types d\'événement',
+            'Animateurs',
+        );
+        return [$dateRange, $crosstabData];
     }
 
-    public function getAvailablePeriods()
+    public function getPersons($dateCondition)
     {
-        return [
-            'week' => 'Dernière semaine',
-            'month' => 'Dernier mois',
-            'quarter' => 'Dernier trimestre',
-            'year' => 'Dernière année',
-            'all' => 'Tout'
-        ];
+        $crossTabQuery = $this->fluentForLog->from('Log')
+            ->select(null)
+            ->select('Uri, Who, COUNT(*) as count')
+            ->where($dateCondition)
+            ->groupBy('Uri, Who');
+        if (!empty($uriFilter)) $crossTabQuery->where('Uri LIKE ?', "%$uriFilter%");
+        if (!empty($emailFilter)) $crossTabQuery->where('Who LIKE ?', "%$emailFilter%");
+        $crossTabData = $crossTabQuery->fetchAll();
+        $filteredPersons = array_unique(array_column($crossTabData, 'Who'));
+        $sortedCrossTabData = [];
+        $columnTotals = [];
+        foreach ($crossTabData as $row) {
+            $uri = $row->Uri;
+            $who = $row->Who;
+            if (!empty($groupFilter) && !$this->application->getAuthorizations()->isUserInGroup($who, $groupFilter)) continue;
+            $count = $row->count;
+            if (!isset($sortedCrossTabData[$uri])) $sortedCrossTabData[$uri] = ['visits' => [], 'total' => 0];
+            $sortedCrossTabData[$uri]['visits'][$who] = $count;
+            $sortedCrossTabData[$uri]['total'] += $count;
+            if (!isset($columnTotals[$who])) $columnTotals[$who] = 0;
+            $columnTotals[$who] += $count;
+        }
+        return [$sortedCrossTabData, $filteredPersons, $columnTotals];
     }
 }

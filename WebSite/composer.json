@@ -6,8 +6,7 @@
         "tracy/tracy": "^2.10",
         "envms/fluentpdo": "^2.2",
         "ua-parser/uap-php": "^3.9",
-        "guzzlehttp/guzzle": "^7.9",
-        "doctrine/dbal": "^4.2"
+        "guzzlehttp/guzzle": "^7.9"
     },
     "autoload": {
         "psr-4": {

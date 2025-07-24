@@ -3,21 +3,9 @@
 namespace app\helpers;
 
 use DateTime;
-use PDO;
 
-class PersonPreferences
+class PersonPreferences extends Data
 {
-    private PDO $pdo;
-    private $fluent;
-    private Person $person;
-
-    public function __construct(PDO $pdo)
-    {
-        $this->pdo = $pdo;
-        $this->fluent = new \Envms\FluentPDO\Query($pdo);
-        $this->person = new Person($pdo);
-    }
-
     public function filterEventsByPreferences(array $events, $person): array
     {
         if (!$person || empty($person->Preferences)) {
@@ -74,20 +62,16 @@ class PersonPreferences
         $date = new DateTime($dateString);
         $hour = (int)$date->format('H');
 
-        if ($hour < 12) {
-            return 'morning';
-        } elseif ($hour < 17) {
-            return 'afternoon';
-        } else {
-            return 'evening';
-        }
+        if ($hour < 12)     return 'morning';
+        elseif ($hour < 17) return 'afternoon';
+        else                return 'evening';
     }
 
     public function getPersonWantedToBeAlerted($idArticle)
     {
         $idGroup = $this->fluent->from('Article')->where('Id', $idArticle)->fetch('IdGroup');
         $idSurvey = $this->fluent->from('Survey')->where('IdArticle', $idArticle)->fetch('Id');
-        $persons = $this->person->getPersons($idGroup);
+        $persons = (new PersonDataHelper())->getPersonsInGroup($idGroup);
         $filteredEmails = [];
         foreach ($persons as $person) {
             $include = false;

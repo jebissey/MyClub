@@ -2,19 +2,13 @@
 
 namespace app\helpers;
 
-class News
+class News extends Data
 {
-    private $pdo;
-    private $fluent;
-    private Article $article;
     private $authorizations;
 
-    public function __construct($pdo)
+    public function __construct()
     {
-        $this->pdo = $pdo;
-        $this->fluent = new \Envms\FluentPDO\Query($pdo);
-        $this->authorizations = new Authorization($this->pdo);
-        $this->article = new Article($pdo);
+        $this->authorizations = new Authorization();
     }
 
     public function getNewsForPerson($person, $searchFrom)
@@ -170,7 +164,7 @@ class News
         $surveys = $stmt->fetchAll();
         $news = [];
         foreach ($surveys as $survey) {
-            if ($this->authorizations->getArticle($survey->IdArticle, $person) && $this->surveyResultsAreVisible($this->article->get($survey->IdArticle), $person)) {
+            if ($this->authorizations->getArticle($survey->IdArticle, $person) && $this->surveyResultsAreVisible((new ArticleDataHelper())->getWithAuthor($survey->IdArticle), $person)) {
                 $news[] = [
                     'type' => 'survey',
                     'id' => $survey->IdArticle,
@@ -183,10 +177,10 @@ class News
         }
         return $news;
     }
+
     private function surveyResultsAreVisible($article, $person): bool
     {
         return $this->authorizations->canPersonReadSurveyResults($article, $person);
     }
-
     #endregion
 }

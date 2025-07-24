@@ -2,37 +2,31 @@
 
 namespace app\controllers;
 
+use app\helpers\SurveyDataHelper;
+
 class SurveyController extends BaseController
 {
     public function add($articleId)
     {
-        if ($this->getPerson(['Redactor'])) {
+        if ($this->personDataHelper->getPerson(['Redactor'])) {
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-                $article = $this->fluent->from('Article')
-                    ->where('Id', $articleId)
-                    ->fetch();
+                $article = $this->dataHelper->get('Article', ['Id' => $articleId]);
                 if (!$article) {
                     $this->flight->redirect('/articles');
+                    return;
                 }
-                $survey = $this->fluent->from('Survey')
-                    ->where('IdArticle', $article->Id)
-                    ->fetch();
 
                 $this->render('app/views/survey/add.latte', $this->params->getAll([
                     'article' => $article,
-                    'survey' => $survey
+                    'survey' => $this->dataHelper->get('Survey', ['IdArticle' => $article->Id])
                 ]));
-            } else {
-                $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
-            }
-        } else {
-            $this->application->error403(__FILE__, __LINE__);
-        }
+            } else $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
+        } else $this->application->error403(__FILE__, __LINE__);
     }
 
     public function createOrUpdate()
     {
-        if ($this->getPerson(['Redactor'])) {
+        if ($this->personDataHelper->getPerson(['Redactor'])) {
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $articleId = $_POST['article_id'] ?? null;
                 $question = $_POST['question'] ?? '';
@@ -45,47 +39,31 @@ class SurveyController extends BaseController
                     }
                 }
                 $optionsJson = json_encode($options);
-                $survey = $this->fluent->from('Survey')->where('IdArticle', $articleId)->fetch();
-                if ($survey) {
-                    $this->fluent->update('Survey')
-                        ->set([
-                            'Question' => $question,
-                            'Options' => $optionsJson,
-                            'ClosingDate' => $closingDate,
-                            'Visibility' => $visibility
-                        ])
-                        ->where('Id', $survey->Id)
-                        ->execute();
-                } else {
-                    $this->fluent->insertInto('Survey')
-                        ->values([
-                            'Question' => $question,
-                            'Options' => $optionsJson,
-                            'IdArticle' => $articleId,
-                            'ClosingDate' => $closingDate
-                        ])
-                        ->execute();
-                }
-
+                $fields = [
+                    'Question' => $question,
+                    'Options' => $optionsJson,
+                    'ClosingDate' => $closingDate,
+                    'IdArticle' => $articleId,
+                    'Visibility' => $visibility
+                ];
+                $survey = $this->dataHelper->get('Survey', ['IdArticle' => $articleId]);
+                if ($survey) $this->dataHelper->set('Survey', $fields, ['Id' => $survey->Id]);
+                else         $this->dataHelper->set('Survey', $fields);
                 $this->flight->redirect('/articles/' . $articleId);
-            } else {
-                $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
-            }
-        } else {
-            $this->application->error403(__FILE__, __LINE__);
-        }
+            } else $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
+        } else $this->application->error403(__FILE__, __LINE__);
     }
 
     public function viewResults($articleId)
     {
-        if ($person = $this->getPerson([])) {
-            $survey = $this->fluent->from('Survey')->join('Article ON Survey.IdArticle = Article.Id')->where('IdArticle', $articleId)->select('Article.CreatedBy')->fetch();
+        if ($person = $this->personDataHelper->getPerson([])) {
+            $survey = (new SurveyDataHelper())->getWithCreator($articleId);
             if (!$survey) {
                 $this->flight->redirect('/articles/' . $articleId);
+                return;
             }
-            if ($this->authorizations->canPersonReadSurveyResults($this->fluent->from('Article')->where('Id', $survey->IdArticle)->fetch(), $person)) {
-                $replies = $this->fluent->from('Reply')->where('IdSurvey', $survey->Id)->fetchAll();
-
+            if ($this->application->getAuthorizations()->canPersonReadSurveyResults($this->dataHelper->get('Article', ['Id' => $survey->IdArticle]), $person)) {
+                $replies = $this->dataHelper->gets('Reply', ['IdSurvey' => $survey->Id]);
                 $participants = [];
                 $results = [];
                 $options = json_decode($survey->Options);
@@ -94,15 +72,13 @@ class SurveyController extends BaseController
                 }
                 foreach ($replies as $reply) {
                     $answers = json_decode($reply->Answers);
-                    $person = $this->fluent->from('Person')->where('Id', $reply->IdPerson)->fetch();
+                    $person = $this->dataHelper->get('Person', ['Id' => $reply->IdPerson]);
                     $participants[] = [
                         'name' => $person->FirstName . ' ' . $person->LastName,
                         'answers' => $answers
                     ];
                     foreach ($answers as $answer) {
-                        if (isset($results[$answer])) {
-                            $results[$answer]++;
-                        }
+                        if (isset($results[$answer])) $results[$answer]++;
                     }
                 }
 
@@ -112,13 +88,9 @@ class SurveyController extends BaseController
                     'results' => $results,
                     'participants' => $participants,
                     'articleId' => $articleId,
-                    'currentVersion' => self::VERSION
+                    'currentVersion' => $this->application->getVersion()
                 ]);
-            } else {
-                $this->application->error403(__FILE__, __LINE__);
-            }
-        } else {
-            $this->application->error403(__FILE__, __LINE__);
-        }
+            } else $this->application->error403(__FILE__, __LINE__);
+        } else $this->application->error403(__FILE__, __LINE__);
     }
 }

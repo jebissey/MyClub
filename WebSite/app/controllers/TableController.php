@@ -2,15 +2,18 @@
 
 namespace app\controllers;
 
+use app\helpers\Generic;
+
 abstract class TableController extends BaseController
 {
-    protected $itemsPerPage = 10;
+    protected int $itemsPerPage = 10;
 
-    protected function prepareTableData($query, $filters = [], $page = 1)
+    protected function prepareTableData($query, $filters = [], $page = 1): array
     {
         foreach ($filters as $key => $value) {
             if (!empty($value)) {
-                $query = $query->where("$key LIKE '%$value%'");
+                $query = $query->where("$key LIKE ?");
+                $values[] = "%$value%";
             }
         }
 
@@ -18,26 +21,24 @@ abstract class TableController extends BaseController
         //var_dump($query->getQuery());
         //die();
 
-        $totalItems = $this->pdo->query("SELECT COUNT(*) FROM (" . $query->getQuery() . ")")->fetchColumn();
+        $totalItems = (new Generic())->countOf($query->getQuery());
         $totalPages = ceil($totalItems / $this->itemsPerPage);
         $currentPage = max(1, min($page, $totalPages));
         $query = $query->limit($this->itemsPerPage)->offset(($currentPage - 1) * $this->itemsPerPage);
 
         return [
-            'items' => $query->fetchAll(),
+            'items' => isset($values) ? $query->fetchAll($values) : $query->fetchAll(),
             'currentPage' => $currentPage,
             'totalPages' => $totalPages,
             'filters' => $filters
         ];
     }
 
-    protected function buildPaginationParams($filters)
+    protected function buildPaginationParams($filters): array
     {
         $params = [];
         foreach ($filters as $key => $value) {
-            if (!empty($value)) {
-                $params[$key] = urlencode($value);
-            }
+            if (!empty($value)) $params[$key] = urlencode($value);
         }
         return $params;
     }

@@ -38,13 +38,9 @@ class Client
 
     function getIp()
     {
-        if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
-            $ip = $_SERVER['HTTP_CLIENT_IP'];
-        } elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-            $ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
-        } else {
-            $ip = $_SERVER['REMOTE_ADDR'];
-        }
+        if (!empty($_SERVER['HTTP_CLIENT_IP']))           $ip = $_SERVER['HTTP_CLIENT_IP'];
+        elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) $ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
+        else                                              $ip = $_SERVER['REMOTE_ADDR'];
         return $ip;
     }
 
@@ -55,11 +51,8 @@ class Client
 
     function getScreenResolution()
     {
-        if (isset($_COOKIE['screen_resolution'])) {
-            $resolution = $_COOKIE['screen_resolution'];
-        } else {
-            $resolution = '';
-        }
+        if (isset($_COOKIE['screen_resolution'])) $resolution = $_COOKIE['screen_resolution'];
+        else $resolution = '';
         return $resolution;
     }
 

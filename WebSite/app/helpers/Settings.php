@@ -2,25 +2,16 @@
 
 namespace app\helpers;
 
-use PDO;
-
-class Settings
+class Settings extends Data
 {
-    private PDO $pdo;
-
-    public function __construct(PDO $pdo)
-    {
-        $this->pdo = $pdo;
-    }
-
-    public function get($name)
+    public function get_(string $name): string
     {
         $query = $this->pdo->prepare('SELECT Value FROM Settings WHERE Name = ?');
         $query->execute([$name]);
         return $query->fetch()->Value ?? null;
     }
 
-    public function set($name, $value)
+    public function set_(string $name, string $value): void
     {
         $query = $this->pdo->prepare('UPDATE Settings SET Value = ? WHERE Name = ?');
         $query->execute([$value, $name]);

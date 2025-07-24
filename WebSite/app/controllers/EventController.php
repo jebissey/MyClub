@@ -4,118 +4,102 @@ namespace app\controllers;
 
 use DateTime;
 use Exception;
+use app\helpers\Application;
 use app\helpers\Crosstab;
 use app\helpers\Email;
-use app\helpers\Event;
+use app\helpers\EventDataHelper;
+use app\helpers\MessagePersonHelper;
+use app\helpers\NeedHelper;
+use app\helpers\ParticipantHelper;
+use app\utils\Params;
+use app\utils\Period;
+use app\utils\Webapp;
 
 class EventController extends BaseController
 {
+    private Crosstab $crosstab;
+    private EventDataHelper $eventDataHelper;
+    private MessagePersonHelper $messagePersonHelper;
+    private NeedHelper $needHelper;
+
+    public function __construct()
+    {
+        $this->crosstab = new Crosstab();
+        $this->eventDataHelper = new EventDataHelper();
+        $this->messagePersonHelper = new MessagePersonHelper();
+        $this->needHelper = new NeedHelper();
+    }
+
     public function nextEvents(): void
     {
-        $event = new Event($this->pdo);
-        $person = $this->getPerson();
+        $person = $this->personDataHelper->getPerson();
         $offset = (int) ($_GET['offset'] ?? 0);
         $mode = $_GET['mode'] ?? 'next';
         $filterByPreferences = isset($_GET['filterByPreferences']) && $_GET['filterByPreferences'] === '1';
 
         $this->render('app/views/event/nextEvents.latte', $this->params->getAll([
-            'navItems' => $this->getNavItems(),
-            'events' => $event->getEvents($person, $mode, $offset, $filterByPreferences),
+            'navItems' => $this->getNavItems($person),
+            'events' => $this->eventDataHelper->getEvents($person, $mode, $offset, $filterByPreferences),
             'person' => $person,
-            'eventTypes' => $this->fluent->from('EventType')->where('Inactivated', 0)->orderBy('Name')->fetchAll('Id', 'Name'),
-            'needTypes' => $this->fluent->from('NeedType')->orderBy('Name')->fetchAll('Id', 'Name'),
-            'eventAttributes' => $this->fluent->from('Attribute')->fetchAll('Id', 'Name, Detail, Color'),
+            'eventTypes' => $this->dataHelper->gets('EventType', ['Inactivated' => 0], "'Id', 'Name'", 'Name'),
+            'needTypes' => $this->dataHelper->gets('NeedType', [], "'Id', 'Name'", 'Name'),
+            'eventAttributes' => $this->dataHelper->gets('Attribute', [], "'Id', 'Name, Detail, Color'"),
             'offset' => $offset,
             'mode' => $mode,
             'filterByPreferences' => $filterByPreferences,
-            'layout' => $this->getLayout()
+            'layout' => Webapp::getLayout()
         ]));
     }
 
     public function weekEvents(): void
     {
-        $this->getPerson();
+        $person = $this->personDataHelper->getPerson();
+
         $this->render('app/views/event/weekEvents.latte', $this->params->getAll([
-            'events' => (new Event($this->pdo))->getNextWeekEvents(),
-            'eventTypes' => $this->fluent->from('EventType')->where('Inactivated', 0)->orderBy('Name')->fetchAll('Id', 'Name'),
-            'eventAttributes' => $this->fluent->from('Attribute')->fetchAll('Id', 'Name, Detail, Color'),
-            'navItems' => $this->getNavItems(),
-            'layout' => $this->getLayout()
+            'events' => $this->eventDataHelper->getNextWeekEvents(),
+            'eventTypes' => $this->dataHelper->gets('EventType', ['Inactivated', 0], "'Id', 'Name'", 'Name'),
+            'eventAttributes' => $this->dataHelper->gets('Attribute', [], "'Id', 'Name, Detail, Color'"),
+            'navItems' => $this->getNavItems($person),
+            'layout' => WebApp::getLayout()
         ]));
     }
 
     public function showEventCrosstab()
     {
-        if ($this->getPerson(['EventManager'], 1)) {
+        if ($this->personDataHelper->getPerson(['EventManager'], 1)) {
             $period = $this->flight->request()->query->period ?? 'month';
-            $sql = "
-                SELECT 
-                    p.FirstName || ' ' || p.LastName || 
-                    CASE 
-                        WHEN p.NickName IS NOT NULL AND p.NickName != '' THEN ' (' || p.NickName || ')'
-                        ELSE ''
-                    END AS columnForCrosstab,
-                    et.Name AS rowForCrosstab,
-                    COUNT(DISTINCT e.Id) AS countForCrosstab,
-                    COUNT(part.Id) AS count2ForCrosstab
-                FROM Person p
-                JOIN Event e ON p.Id = e.CreatedBy
-                JOIN EventType et ON e.IdEventType = et.Id
-                LEFT JOIN Participant part ON part.IdEvent = e.Id
-                WHERE e.LastUpdate BETWEEN :start AND :end
-                GROUP BY p.Id, et.Id
-                ORDER BY p.LastName, p.FirstName
-            ";
-            $crossTab = new CrossTab($this->pdo);
-            $dateRange = $crossTab->getDateRangeForPeriod($period);
-            $crosstabData = $crossTab->generateCrosstab(
-                $sql,
-                [':start' => $dateRange['start'], ':end' => $dateRange['end']],
-                'Types d\'événement',
-                'Animateurs',
-            );
+            [$dateRange, $crosstabData] = $this->crosstab->getevents($period);
 
             $this->render('app/views/common/crosstab.latte', $this->params->getAll([
                 'crosstabData' => $crosstabData,
                 'period' => $period,
                 'dateRange' => $dateRange,
-                'availablePeriods' => $crossTab->getAvailablePeriods(),
+                'availablePeriods' => Period::gets(),
                 'navbarTemplate' => '../navbar/eventManager.latte',
                 'title' => 'Animateurs vs type d\'événement',
-                'totalLabels' =>['événements', 'participants']
+                'totalLabels' => ['événements', 'participants']
             ]));
-        } else {
-            $this->application->error403(__FILE__, __LINE__);
-        }
+        } else $this->application->error403(__FILE__, __LINE__);
     }
 
     public function guest($message = '', $type = '')
     {
-        if ($this->getPerson(['EventManager'], 1)) {
-            $events = $this->fluent->from('Event e')
-                ->join('Person p ON p.Id = e.CreatedBy')
-                ->where('e.StartTime > ?', (new DateTime())->format('Y-m-d'))
-                ->where('e.Audience = "All" OR Audience = "Guest"')
-                ->select('e.Id, e.Summary, e.StartTime')
-                ->select('CASE WHEN p.NickName != "" THEN p.FirstName || " " || p.LastName || " (" || p.NickName || ")" ELSE p.FirstName || " " || p.LastName END AS PersonName')
-                ->orderBy('e.StartTime ASC')
-                ->fetchAll();
+        if ($this->personDataHelper->getPerson(['EventManager'], 1)) {
+            $events = $this->eventDataHelper->getEventsForAllOrGuest();
 
             $this->render('app/views/event/guest.latte', $this->params->getAll([
                 'events' => $events,
                 'navbarTemplate' => '../navbar/eventManager.latte',
-                'layout' => $this->getLayout(),
+                'layout' => Webapp::getLayout()(),
                 'message' => $message,
                 'messageType' => $type
             ]));
-        } else {
-            $this->application->error403(__FILE__, __LINE__);
-        }
+        } else $this->application->error403(__FILE__, __LINE__);
     }
 
     public function guestInvite()
     {
-        if ($person = $this->getPerson(['EventManager'], 1)) {
+        if ($person = $this->personDataHelper->getPerson(['EventManager'], 1)) {
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $email = trim($_POST['email'] ?? '');
                 $nickname = trim($_POST['nickname'] ?? '');
@@ -129,72 +113,60 @@ class EventController extends BaseController
                     $this->guest('Veuillez sélectionner un événement', 'error');
                     return;
                 }
-                $event = $this->fluent->from('Event')
-                    ->where('Id = ?', $eventId)
-                    ->where('Audience = "All" OR Audience = "Guest"')
-                    ->where('StartTime > ?', (new DateTime())->format('Y-m-d'))
-                    ->fetch();
-
+                $event = $this->eventDataHelper->getEventExternal($eventId);
                 if (!$event) {
                     $this->guest('Événement non trouvé ou non accessible', 'error');
                     return;
                 }
-
                 try {
-                    $contact = $this->fluent->from('Contact')
-                        ->where('Email = ?', $email)
-                        ->fetch();
+                    $contact = $this->dataHelper->get('Contact', ['Email', $email]);
                     if (!$contact) {
                         $token = bin2hex(random_bytes(32));
-                        $contactId = $this->fluent->insertInto('Contact')
-                            ->values([
-                                'Email' => $email,
-                                'NickName' => $nickname,
-                                'Token' => $token,
-                                'TokenCreatedAt' => (new DateTime())->format('Y-m-d H:i:s')
-                            ])
-                            ->execute();
+                        $contactId = $this->dataHelper->set('Contact', [
+                            'Email' => $email,
+                            'NickName' => $nickname,
+                            'Token' => $token,
+                            'TokenCreatedAt' => (new DateTime())->format('Y-m-d H:i:s')
+                        ]);
                     } else {
                         $contactId = $contact->Id;
                         $token = $contact->Token;
                         if (!empty($nickname) && $nickname !== $contact->NickName) {
-                            $this->fluent->update('Contact')
-                                ->set(['NickName' => $nickname])
-                                ->where('Id = ?', $contactId)
-                                ->execute();
+                            $this->dataHelper->set('Contact', ['NickName' => $nickname], ['Id', $contactId]);
                         }
-
                         if (
                             empty($token) ||
                             (new DateTime($contact->TokenCreatedAt))->diff(new DateTime())->days > 0
                         ) {
                             $token = bin2hex(random_bytes(32));
-                            $this->fluent->update('Contact')
-                                ->set([
+                            $this->dataHelper->set(
+                                'Contact',
+                                [
                                     'Token' => $token,
                                     'TokenCreatedAt' => (new DateTime())->format('Y-m-d H:i:s')
-                                ])
-                                ->where('Id = ?', $contactId)
-                                ->execute();
+                                ],
+                                ['Id', $contactId]
+                            );
                         }
                     }
-                    $existingGuest = $this->fluent->from('Guest')
-                        ->where('IdContact = ?', $contactId)
-                        ->where('IdEvent = ?', $eventId)
-                        ->fetch();
+                    $existingGuest = $this->dataHelper->get('Guest', [
+                        'IdContact' => $contactId,
+                        'IdEvent' => $eventId
+                    ]);
                     if ($existingGuest) {
                         $this->guest('Cette personne est déjà invitée à cet événement', 'error');
                         return;
                     }
-                    $this->fluent->insertInto('Guest')
-                        ->values([
+                    $this->dataHelper->set(
+                        'Guest',
+                        [
                             'IdContact' => $contactId,
                             'IdEvent' => $eventId,
                             'InvitedBy' => $person->Id
-                        ])
-                        ->execute();
+                        ]
+                    );
 
-                    $root = 'https://' . $_SERVER['HTTP_HOST'];
+                    $root = Application::$root;
                     $invitationLink = $root . "/events/$eventId?t=$token";
                     $subject = "Invitation à l'événement : " . $event->Summary;
                     $body = "Bonjour" . (!empty($nickname) ? " {$nickname}" : "") . ",\n\n";
@@ -218,108 +190,105 @@ class EventController extends BaseController
 
     public function show($eventId, $message = null, $messageType = null): void
     {
-        $person = $this->getPerson();
+        $person = $this->personDataHelper->getPerson();
         $userEmail = $person->Email ?? '';
-        if ($userEmail === '') {
-            $this->setDefaultParams();
-        }
-        if ($this->fluent->from('Event')->where('Id', $eventId)->fetch()) {
-            $event = new Event($this->pdo);
+        if ($userEmail === '') Params::setDefaultParams($_SERVER['REQUEST_URI']);
+        if ($this->dataHelper->get('Event', ['Id' => $eventId])) {
 
             $this->render('app/views/event/detail.latte', $this->params->getAll([
                 'eventId' => $eventId,
-                'event' => $event->getEvent($eventId),
-                'attributes' => $event->getEventAttributes($eventId),
-                'participants' => $event->getEventParticipants($eventId),
+                'event' => $this->eventDataHelper->getEvent($eventId),
+                'attributes' => $this->eventDataHelper->getEventAttributes($eventId),
+                'participants' => (new ParticipantHelper())->getEventParticipants($eventId),
                 'userEmail' => $userEmail,
-                'isRegistered' => $event->isUserRegistered($eventId, $userEmail),
-                'navItems' => $this->getNavItems(),
-                'countOfMessages' => $this->fluent
-                    ->from('Message')
-                    ->where('Message."From"', 'User')
-                    ->where('EventId', $eventId)->count(),
-                'eventNeeds' => $event->getEventNeeds($eventId),
-                'participantSupplies' => $event->getParticipantSupplies($eventId),
-                'userSupplies' => $event->getUserSupplies($eventId, $userEmail),
-                'isEventManager' => $this->authorizations->isEventManager(),
+                'isRegistered' => $this->eventDataHelper->isUserRegistered($eventId, $userEmail),
+                'navItems' => $this->getNavItems($person),
+                'countOfMessages' => count($this->dataHelper->gets('Message', [
+                    'From' => 'User',
+                    'EventId' => $eventId
+                ])),
+                'eventNeeds' => $this->eventDataHelper->getEventNeeds($eventId),
+                'participantSupplies' => $this->eventDataHelper->getParticipantSupplies($eventId),
+                'userSupplies' => $this->eventDataHelper->getUserSupplies($eventId, $userEmail),
+                'isEventManager' => $this->application->getAuthorizations()->isEventManager(),
                 'token' => isset($_GET['t']) ? $_GET['t'] : false,
                 'message' => $message,
                 'messageType' => $messageType,
             ]));
-        } else {
-            $this->application->message('Evénement non trouvé', 3000, 403);
-        }
+        } else $this->application->message('Evénement non trouvé', 3000, 403);
     }
 
     public function register($eventId, bool $set, $token = null): void
     {
         if ($token === null) $token = $_GET['t'] ?? null;
-        $person = $this->getPerson();
+        $person = $this->personDataHelper->getPerson();
         if ($person) {
             $userId = $person->Id;
             if ($set) {
-                $event = new Event($this->pdo);
-                if ($eventId > 0 && !$event->isUserRegistered($eventId, $person->Email ?? '')) {
-                    $this->fluent->insertInto('Participant', [
+                if ($eventId > 0 && $this->eventDataHelper->isUserRegistered($eventId, $person->Email ?? '')) {
+                    $this->dataHelper->set('Participant', [
                         'IdEvent'  => $eventId,
                         'IdPerson' => $userId,
                         'IdContact' => null
-                    ])->execute();
+                    ]);
                 }
             } else {
-                $this->fluent->deleteFrom('Participant')
-                    ->where('IdEvent', $eventId)
-                    ->where('IdPerson', $userId)
-                    ->execute();
+                $this->dataHelper->delete(
+                    'Participant',
+                    [
+                        'IdEvent' => $eventId,
+                        'IdPerson' => $userId
+                    ]
+                );
             }
         } elseif ($token) {
-            try {
-                $event = $this->fluent->from('Event')->where('Id', $eventId)->fetch();
-                if (!$event) {
-                    $this->show($eventId, 'Evénement inconnu', 'error');
+            $event = $this->dataHelper->get('Event', ['Id', $eventId]);
+            if (!$event) {
+                $this->show($eventId, 'Evénement inconnu', 'error');
+                return;
+            }
+            $contact = $this->dataHelper->get('Contact', ['Token' => $token]);
+            if (!$contact) {
+                $this->show($eventId, 'Token inconnu', 'error');
+                return;
+            }
+            $tokenCreatedAt = new DateTime($contact->TokenCreatedAt);
+            $now = new DateTime();
+            $interval = $now->diff($tokenCreatedAt);
+            if ($interval->days >= 1 || ($interval->days == 0 && $interval->h >= 24)) {
+                $this->show($eventId, 'Token expiré', 'error');
+                return;
+            }
+            $existingParticipant = $this->dataHelper->get('Participant', [
+                'IdEvent' => $eventId,
+                'IdContact' => $contact->Id
+            ]);
+            if ($existingParticipant && $set) {
+                $this->show($eventId, 'Participant déjà enregistré', 'error');
+                return;
+            }
+            if ($event->Audience === 'Guest') {
+                $invitation = $this->dataHelper->get('Guest', [
+                    'IdEvent' => $event->Id,
+                    'IdContact' => $contact->Id
+                ]);
+                if (!$invitation) {
+                    $this->show($eventId, "Il faut avoir une invitation pour pouvoir s'inscrire à cet événement", 'error');
                     return;
                 }
-                $contact = $this->fluent->from('Contact')->where('Token', $token)->fetch();
-                if (!$contact) {
-                    $this->show($eventId, 'Token inconnu', 'error');
-                    return;
-                }
-                $tokenCreatedAt = new DateTime($contact->TokenCreatedAt);
-                $now = new DateTime();
-                $interval = $now->diff($tokenCreatedAt);
-                if ($interval->days >= 1 || ($interval->days == 0 && $interval->h >= 24)) {
-                    $this->show($eventId, 'Token expiré', 'error');
-                    return;
-                }
-                $existingParticipant = $this->fluent->from('Participant')
-                    ->where('IdEvent', $eventId)
-                    ->where('IdContact', $contact->Id)
-                    ->fetch();
-                if ($existingParticipant && $set) {
-                    $this->show($eventId, 'Participant déjà enregistré', 'error');
-                    return;
-                }
-                if ($event->Audience === 'Guest') {
-                    $invitation = $this->fluent->from('Guest')->where('IdEvent', $event->Id)->where('IdContact', $contact->Id)->fetch();
-                    if (!$invitation) {
-                        $this->show($eventId, "Il faut avoir une invitation pour pouvoir s'inscrire à cet événement", 'error');
-                        return;
-                    }
-                }
-                if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-                    $this->fluent->insertInto('Participant')->values([
-                        'IdEvent' => $event->Id,
-                        'IdPerson' => null,
-                        'IdContact' => $contact->Id
-                    ])->execute();
-                    $this->render('app/views/contact/registration-success.latte', $this->params->getAll([
-                        'event' => $event,
-                        'contact' => $contact,
-                        'navItems' => $this->getNavItems(),
-                    ]));
-                }
-            } catch (Exception $e) {
-                $this->application->error500($e->getMessage(), __FILE__, __LINE__);
+            }
+            if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+                $this->dataHelper->set('Participant', [
+                    'IdEvent' => $event->Id,
+                    'IdPerson' => null,
+                    'IdContact' => $contact->Id
+                ]);
+
+                $this->render('app/views/contact/registration-success.latte', $this->params->getAll([
+                    'event' => $event,
+                    'contact' => $contact,
+                    'navItems' => $this->getNavItems($person),
+                ]));
             }
         }
         $this->flight->redirect('/events/' . $eventId);
@@ -327,88 +296,65 @@ class EventController extends BaseController
 
     public function location(): void
     {
-        if ($this->getPerson(['EventManager'])) {
+        if ($this->personDataHelper->getPerson(['EventManager'])) {
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $this->render('app/views/event/location.latte', $this->params->getAll([]));
-            } else {
-                $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
-            }
-        } else {
-            $this->application->error403(__FILE__, __LINE__);
-        }
+            } else $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
+        } else $this->application->error403(__FILE__, __LINE__);
     }
 
     public function help(): void
     {
-        $this->getPerson();
+        $this->personDataHelper->getPerson();
 
         $this->render('app/views/info.latte', [
-            'content' => $this->settings->get('Help_eventManager'),
-            'hasAuthorization' => $this->authorizations->hasAutorization(),
-            'currentVersion' => self::VERSION
+            'content' => $this->application->getSettings()->get('Help_eventManager'),
+            'hasAuthorization' => $this->application->getAuthorizations()->hasAutorization(),
+            'currentVersion' => $this->application->getVersion()
         ]);
     }
 
     public function home(): void
     {
-        if ($this->getPerson(['EventManager'])) {
+        if ($this->personDataHelper->getPerson(['EventManager'])) {
 
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $_SESSION['navbar'] = 'eventManager';
 
                 $this->render('app/views/admin/eventManager.latte', $this->params->getAll([]));
-            } else {
-                $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
-            }
-        } else {
-            $this->application->error403(__FILE__, __LINE__);
-        }
+            } else $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
+        } else $this->application->error403(__FILE__, __LINE__);
     }
 
     public function needs(): void
     {
-        if ($this->getPerson(['Webmaster'])) {
+        if ($person = $this->personDataHelper->getPerson(['Webmaster'])) {
             $this->render('app/views/event/needs.latte', $this->params->getAll([
-                'navItems' => $this->getNavItems(),
-                'needTypes' => $this->fluent->from('NeedType')->orderBy('Name')->fetchAll(),
-                'needs' => $this->fluent
-                    ->from('Need')
-                    ->select('Need.*, NeedType.Name AS TypeName')
-                    ->leftJoin('NeedType ON Need.IdNeedType = NeedType.Id')
-                    ->orderBy('NeedType.Name, Need.Name')
-                    ->fetchAll()
+                'navItems' => $this->getNavItems($person),
+                'needTypes' => $this->dataHelper->gets('NeedType', [], '*', 'Name'),
+                'needs' => $this->needHelper->getNeedsAndTheirTypes(),
             ]));
-        } else {
-            $this->application->error403(__FILE__, __LINE__);
-        }
+        } else $this->application->error403(__FILE__, __LINE__);
     }
 
     public function showEventChat($eventId): void
     {
-        if ($person = $this->getPerson([])) {
-            $event = $this->fluent->from('Event')->where('Id', $eventId)->fetch();
+        if ($person = $this->personDataHelper->getPerson([])) {
+            $event = $this->dataHelper->get('Event', ['Id' => $eventId]);
             if (!$event) {
                 $this->application->error471($eventId, __FILE__, __LINE__);
                 return;
             }
-            $creator = $this->fluent->from('Person')->where('Id', $event->CreatedBy)->fetch();
-            $messages = $this->fluent->from('Message')
-                ->select('Message.*, Person.FirstName, Person.LastName, Person.NickName, Person.Avatar, Person.UseGravatar, Person.Email')
-                ->join('Person ON Person.Id = Message.PersonId')
-                ->where('EventId', $eventId)
-                ->where('Message."From" = "User"')
-                ->orderBy('Message.Id ASC')
-                ->fetchAll();
+            $creator = $this->dataHelper->get('Person', ['Id', $event->CreatedBy]);
+            $messages = $this->messagePersonHelper->getEventMessages($eventId);
 
             $this->render('app/views/event/chat.latte', $this->params->getAll([
                 'event' => $event,
                 'creator' => $creator,
                 'messages' => $messages,
                 'person' => $person,
-                'navItems' => $this->getNavItems(),
+                'navItems' => $this->getNavItems($person),
             ]));
-        } else {
-            $this->application->error403(__FILE__, __LINE__);
-        }
+        } else $this->application->error403(__FILE__, __LINE__);
     }
 }

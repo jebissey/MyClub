@@ -3,20 +3,16 @@
 namespace app\helpers;
 
 use InvalidArgumentException;
-use PDO;
+use app\utils\Webapp;
 
-class Email extends BaseHelper
+class Email extends Data
 {
-    private $fluent;
-    private Person $person;
     private PersonPreferences $personPreferences;
 
-    public function __construct(PDO $pdo)
+    public function __construct()
     {
-        parent::__construct($pdo);
-        $this->fluent = new \Envms\FluentPDO\Query($pdo);
-        $this->person = new Person($pdo);
-        $this->personPreferences = new PersonPreferences($pdo);
+        parent::__construct();
+        $this->personPreferences = new PersonPreferences();
     }
 
     public function getEmailsOfInterestedPeople($idGroup, $idEventType, $dayOfWeek, $timeOfDay)
@@ -31,7 +27,7 @@ class Email extends BaseHelper
 
     public function getInterestedPeople($idGroup, $idEventType, $dayOfWeek, $timeOfDay)
     {
-        $persons = $this->person->getPersons($idGroup);
+        $persons = (new PersonDataHelper())->getPersonsInGroup($idGroup, true);
         $filteredPeople = [];
         foreach ($persons as $person) {
             if ($this->personPreferences->isPersonInterested($person, $idEventType, $dayOfWeek, $timeOfDay)) {
@@ -119,7 +115,7 @@ class Email extends BaseHelper
         if (!$contact) {
             $contact = $this->fluent->from('Contact')->where('Id', $contactId)->fetch();
         }
-        $registrationLink = $this->getBaseUrl() . "events/{$event->Id}/{$contact->Token}";
+        $registrationLink = Webapp::getBaseUrl() . "events/{$event->Id}/{$contact->Token}";
         $subject = "Lien d'inscription pour " . $event->Summary;
         $body = $registrationLink;
         return Email::send($adminEmail, $emailContact, $subject, $body);
