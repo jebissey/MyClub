@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tableau Croisé Dynamique des Dépendances</title>
+    <title>Dépendances - Tableau & Graphe</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -22,7 +22,6 @@
         h1 {
             color: #333;
             text-align: center;
-            margin-bottom: 30px;
         }
 
         .table-container {
@@ -60,7 +59,6 @@
             position: sticky;
             left: 0;
             z-index: 5;
-            min-width: 200px;
         }
 
         .group-header {
@@ -108,107 +106,93 @@
             vertical-align: middle;
             border: 1px solid #ccc;
         }
-
-        table th:not(.file-name),
-        table td:not(.file-name) {
-            width: 7mm;
-            max-width: 7mm;
-            min-width: 7mm;
-            overflow: hidden;
-        }
-
-        table thead tr.dependency-header-row {
-            height: 4cm;
-        }
-
-        table thead tr.dependency-header-row th {
-            vertical-align: top;
-        }
     </style>
 </head>
 
 <body>
+
+    <!-- Tableau croisé dynamique -->
     <div class="container">
         <h1>Tableau Croisé Dynamique des Dépendances</h1>
-
         <div class="table-container">
             <table id="dependencyTable">
                 <thead>
                     <tr id="headerRow">
                         <th class="file-name">Fichier</th>
-                        <!-- En-têtes de colonnes générées dynamiquement -->
                     </tr>
                 </thead>
-                <tbody id="tableBody">
-                    <!-- Lignes générées dynamiquement -->
-                </tbody>
+                <tbody id="tableBody"></tbody>
             </table>
         </div>
-
         <div class="legend">
             <h3>Légende:</h3>
             <div class="legend-item">
-                <span class="legend-color dependency-yes"></span>
-                Dépendance présente
+                <span class="legend-color dependency-yes"></span> Dépendance présente
             </div>
             <div class="legend-item">
-                <span class="legend-color external-group"></span>
-                Dépendances externes
+                <span class="legend-color external-group"></span> Dépendances externes
             </div>
             <div class="legend-item">
-                <span class="legend-color internal-group"></span>
-                Dépendances internes
+                <span class="legend-color internal-group"></span> Dépendances internes
             </div>
         </div>
     </div>
 
     <script>
-        // Données brutes des dépendances
-        const rawData = `../WebSite/app/apis/ArticleApi.php depends on: Exception, app\\controllers\\BaseController
-../WebSite/app/apis/CarouselApi.php depends on: Exception, app\\controllers\\BaseController
-../WebSite/app/apis/EventApi.php depends on: Flight\\Engine, PDO, DateInterval, DateTime, Exception, app\\controllers\\BaseController, app\\helpers\\Email, app\\helpers\\Event, app\\helpers\\EventAudience, app\\helpers\\Message, app\\helpers\\PersonPreferences
-../WebSite/app/apis/WebmasterApi.php depends on: Exception, app\\controllers\\BaseController
-../WebSite/app/controllers/ArticleController.php depends on: flight\\Engine, PDO, app\\helpers\\Article, app\\helpers\\Backup, app\\helpers\\Crosstab
-../WebSite/app/controllers/BaseController.php depends on: PDO, flight, flight\\Engine, Latte\\Engine as LatteEngine, app\\helpers\\Application, app\\helpers\\Authorization, app\\helpers\\BaseHelper, app\\helpers\\Client, app\\helpers\\GravatarHandler, app\\helpers\\Params, app\\helpers\\Settings, app\\helpers\\TranslationManager
-../WebSite/app/controllers/DbBrowserController.php depends on: PDO
-../WebSite/app/controllers/DesignController.php depends on: PDO
-../WebSite/app/controllers/EmailController.php depends on: Flight\\Engine, PDO, app\\helpers\\Email
-../WebSite/app/controllers/EventController.php depends on: DateTime, Exception, app\\helpers\\Crosstab, app\\helpers\\Email, app\\helpers\\Event
-../WebSite/app/controllers/EventTypeController.php depends on: PDO
-../WebSite/app/controllers/FFAController.php depends on: app\\helpers\\FFAScraper
-../WebSite/app/controllers/GroupController.php depends on: app\\helpers\\Application, PDO
-../WebSite/app/controllers/LogController.php depends on: flight\\Engine, PDO, app\\helpers\\Log, app\\helpers\\Person, = []
-../WebSite/app/controllers/MediaController.php depends on: Flight\\Engine, PDO
-../WebSite/app/controllers/NavBarController.php depends on: PDO, app\\helpers\\Arwards
-../WebSite/app/controllers/PersonController.php depends on: PDO
-../WebSite/app/controllers/RegistrationController.php depends on: PDO
-../WebSite/app/controllers/UserController.php depends on: DateTime, flight\\Engine, PDO, app\\helpers\\Alert, app\\helpers\\Article, app\\helpers\\Email, app\\helpers\\News, app\\helpers\\Params, app\\helpers\\PasswordManager, app\\helpers\\PersonStatistics, app\\helpers\\TranslationManager
-../WebSite/app/controllers/WebmasterController.php depends on: Exception, app\\helpers\\Arwards
-../WebSite/app/helpers/Alert.php depends on: PDO
-../WebSite/app/helpers/Application.php depends on: app\\controllers\\BaseController, PDO, flight\\Engine, Latte\\Engine as LatteEngine
-../WebSite/app/helpers/Article.php depends on: PDO
-../WebSite/app/helpers/Arwards.php depends on: PDO
-../WebSite/app/helpers/Authorization.php depends on: DateTime, PDO
-../WebSite/app/helpers/BaseHelper.php depends on: PDO
-../WebSite/app/helpers/Client.php depends on: UAParser\\Parser
-../WebSite/app/helpers/Crosstab.php depends on: PDO
-../WebSite/app/helpers/database/Database.php depends on: PDO, PDOException
-../WebSite/app/helpers/Email.php depends on: InvalidArgumentException, PDO
-../WebSite/app/helpers/Event.php depends on: DateInterval, DateTime, Exception, PDO
-../WebSite/app/helpers/FFAScraper.php depends on: GuzzleHttp\\Client, GuzzleHttp\\Exception\\GuzzleException, DOMDocument, DOMXPath
-../WebSite/app/helpers/Log.php depends on: DateTime, DateTimeZone, PDO
-../WebSite/app/helpers/Message.php depends on: PDO
-../WebSite/app/helpers/Person.php depends on: PDO
-../WebSite/app/helpers/PersonPreferences.php depends on: DateTime, PDO
-../WebSite/app/helpers/PersonStatistics.php depends on: PDO
-../WebSite/app/helpers/Settings.php depends on: PDO
-../WebSite/app/helpers/TranslationManager.php depends on: DateTime, IntlDateFormatter, PDO`;
+        const rawData = String.raw`
+../WebSite/app/apis/ArticleApi.php depends on: Exception, app\helpers\ArticleDataHelper, app\helpers\DesignVoteHelper, app\helpers\ReplyHelper, app\utils\Media
+../WebSite/app/apis/BaseApi.php depends on: flight, Latte\Engine as LatteEngine, app\helpers\Application, app\helpers\DataHelper, app\helpers\PersonDataHelper
+../WebSite/app/apis/CarouselApi.php depends on: Exception, app\helpers\carouselHelper, app\utils\Webapp
+../WebSite/app/apis/EventApi.php depends on: app\helpers\Application, DateTime, Exception, app\helpers\ApiEventHelper, app\helpers\ApiNeedHelper, app\helpers\ApiNeedTypeHelper, app\helpers\AttributeDataHelper, app\helpers\Email, app\helpers\EventDataHelper, app\helpers\EventNeedHelper, app\helpers\MessageHelper, app\helpers\ParticipantDataHelper, app\helpers\PersonPreferences
+../WebSite/app/apis/ImportApi.php depends on: app\helpers\ApiImportHelper
+../WebSite/app/apis/WebmasterApi.php depends on: Exception, app\helpers\Application, app\helpers\LogDataHelper, app\helpers\PageDataHelper, app\helpers\PersonGroupDataHelper
+../WebSite/app/controllers/ArticleController.php depends on: app\helpers\ArticleCrosstab, app\helpers\ArticleDataHelper, app\helpers\ArticleTableData, app\helpers\CarouselHelper, app\helpers\SurveyDataHelper, app\utils\Backup, app\utils\Period, app\utils\Webapp
+../WebSite/app/controllers/BaseController.php depends on: flight, flight\Engine, Latte\Engine as LatteEngine, app\helpers\Application, app\helpers\Client, app\helpers\DataHelper, app\helpers\LanguagesDataHelper, app\helpers\PageDataHelper, app\helpers\PersonDataHelper, app\utils\Params, app\utils\TranslationManager
+../WebSite/app/controllers/DbBrowserController.php depends on: app\helpers\DbBrowserHelper
+../WebSite/app/controllers/DesignController.php depends on: app\helpers\DesignDesignVotePersonHelper
+../WebSite/app/controllers/EmailController.php depends on: Flight\Engine, app\helpers\Application, app\helpers\Email, app\helpers\PersonPreferences
+../WebSite/app/controllers/EventController.php depends on: DateTime, Exception, app\helpers\Application, app\helpers\Crosstab, app\helpers\Email, app\helpers\EventDataHelper, app\helpers\MessagePersonHelper, app\helpers\NeedHelper, app\helpers\ParticipantDataHelper, app\utils\Params, app\utils\Period, app\utils\Webapp
+../WebSite/app/controllers/EventTypeController.php depends on: app\helpers\EventDataHelper, app\helpers\TableControllerHelper
+../WebSite/app/controllers/FFAController.php depends on: app\helpers\FFAScraper
+../WebSite/app/controllers/GroupController.php depends on: app\helpers\GroupDataHelper, app\utils\Webapp
+../WebSite/app/controllers/ImportController.php depends on: app\helpers\ImportDataHelper
+../WebSite/app/controllers/LogController.php depends on: app\helpers\Crosstab, app\helpers\LogDataHelper, app\utils\Common, app\utils\Period, app\utils\Webapp
+../WebSite/app/controllers/MediaController.php depends on: app\utils\Media, app\utils\Webapp
+../WebSite/app/controllers/NavBarController.php depends on: app\helpers\ArwardsDataHelper, app\utils\Webapp
+../WebSite/app/controllers/PersonController.php depends on: app\helpers\Application, app\helpers\GroupDataHelper, app\helpers\TableControllerHelper, app\utils\Webapp
+../WebSite/app/controllers/RegistrationController.php depends on: app\helpers\GroupDataHelper, app\helpers\TableControllerHelper, app\utils\Webapp
+../WebSite/app/controllers/SurveyController.php depends on: app\helpers\Application, app\helpers\SurveyDataHelper
+../WebSite/app/controllers/TableController.php depends on: app\helpers\Generic
+../WebSite/app/controllers/UserController.php depends on: flight\Engine, app\helpers\Alert, app\helpers\Application, app\helpers\ArticleDataHelper, app\helpers\AttributeDataHelper, app\helpers\Email, app\helpers\EventTypeDataHelper, app\helpers\GroupDataHelper, app\helpers\LogDataHelper, app\helpers\News, app\helpers\PersonGroupDataHelper, app\helpers\PersonStatistics, app\helpers\SurveyDataHelper, app\services\Sign, app\utils\Params, app\services\Password, app\utils\TranslationManager, app\utils\Webapp
+../WebSite/app/controllers/WebmasterController.php depends on: app\helpers\Application, app\helpers\ArticleDataHelper, app\helpers\ArwardsDataHelper, app\utils\Webapp
+../WebSite/app/helpers/ApiEventHelper.php depends on: Exception, app\enums\EventAudience
+../WebSite/app/helpers/ApiNeedHelper.php depends on: Exception
+../WebSite/app/helpers/ApiNeedTypeHelper.php depends on: Exception
+../WebSite/app/helpers/Application.php depends on: PDO, flight\Engine, Latte\Engine as LatteEngine
+../WebSite/app/helpers/ArticleDataHelper.php depends on: PDO
+../WebSite/app/helpers/Authorization.php depends on: DateTime
+../WebSite/app/helpers/Client.php depends on: UAParser\Parser
+../WebSite/app/helpers/Crosstab.php depends on: PDO, app\utils\Period
+../WebSite/app/helpers/Database.php depends on: PDO, app\utils\File
+../WebSite/app/helpers/Data.php depends on: PDO, PDOException, = [], = []
+../WebSite/app/helpers/DbBrowserHelper.php depends on: PDO
+../WebSite/app/helpers/Email.php depends on: InvalidArgumentException, app\utils\Webapp
+../WebSite/app/helpers/EventDataHelper.php depends on: DateInterval, DateTime, Exception, PDO, app\enums\EventAudience, app\utils\TranslationManager
+../WebSite/app/helpers/FFAScraper.php depends on: GuzzleHttp\Client, GuzzleHttp\Exception\GuzzleException, DOMDocument, DOMXPath
+../WebSite/app/helpers/GroupDataHelper.php depends on: Exception
+../WebSite/app/helpers/LanguagesDataHelper.php depends on: app\utils\TranslationManager
+../WebSite/app/helpers/LogDataHelper.php depends on: DateTime, DateTimeZone, PDO, app\helpers\Application, = []
+../WebSite/app/helpers/PersonDataHelper.php depends on: DateTime, app\utils\Params, app\utils\TranslationManager
+../WebSite/app/helpers/PersonPreferences.php depends on: DateTime
+../WebSite/app/Services/Sign.php depends on: DateTime, app\helpers\Application, app\services\Password
+../WebSite/app/utils/Params.php depends on: InvalidArgumentException, app\helpers\Application, app\utils\TranslationManager
+../WebSite/app/utils/TranslationManager.php depends on: DateTime, IntlDateFormatter
+../WebSite/app/utils/Webapp.php depends on: Latte\Engine as LatteEngine, app\helpers\Application
+`;
 
-        // Fonction pour parser les données
         function parseData(data) {
             const lines = data.trim().split('\n');
             const dependencies = {};
-
             lines.forEach(line => {
                 const match = line.match(/^(.+?) depends on: (.+)$/);
                 if (match) {
@@ -217,151 +201,86 @@
                     dependencies[file] = deps;
                 }
             });
-
             return dependencies;
         }
 
-        // Fonction pour classer les dépendances
         function classifyDependencies(allDeps) {
-            const external = [];
-            const internal = [];
-
+            const external = [], internal = [];
             allDeps.forEach(dep => {
-                // Nettoyer les alias
                 const cleanDep = dep.replace(/ as .+$/, '');
-
-                if (cleanDep.startsWith('app\\')) {
-                    internal.push(cleanDep);
-                } else {
-                    external.push(cleanDep);
-                }
+                if (cleanDep.startsWith('app\\')) internal.push(cleanDep);
+                else external.push(cleanDep);
             });
-
             return {
                 external: [...new Set(external)].sort(),
                 internal: [...new Set(internal)].sort()
             };
         }
 
-        // Fonction pour générer le tableau
         function generateTable() {
             const dependencies = parseData(rawData);
             const files = Object.keys(dependencies).sort();
-
-            // Collecter toutes les dépendances uniques
-            const allDeps = [];
-            Object.values(dependencies).forEach(deps => {
-                allDeps.push(...deps);
-            });
-
+            const allDeps = [].concat(...Object.values(dependencies));
             const classified = classifyDependencies(allDeps);
-
-            // Générer l'en-tête
             const headerRow = document.getElementById('headerRow');
 
-            // Ajouter les en-têtes pour les dépendances externes
             if (classified.external.length > 0) {
-                const externalHeader = document.createElement('th');
-                externalHeader.textContent = 'Dépendances Externes';
-                externalHeader.className = 'group-header external-group';
-                externalHeader.colSpan = classified.external.length;
-                headerRow.appendChild(externalHeader);
-            }
-
-            // Ajouter les en-têtes pour les dépendances internes
-            if (classified.internal.length > 0) {
-                const internalHeader = document.createElement('th');
-                internalHeader.textContent = 'Dépendances Internes';
-                internalHeader.className = 'group-header internal-group';
-                internalHeader.colSpan = classified.internal.length;
-                headerRow.appendChild(internalHeader);
-            }
-
-            // Créer une deuxième ligne d'en-tête pour les noms des dépendances
-            const subHeaderRow = document.createElement('tr');
-            subHeaderRow.className = 'dependency-header-row'; // <-- ajout classe ici
-            const emptyCell = document.createElement('th');
-            emptyCell.className = 'file-name';
-            subHeaderRow.appendChild(emptyCell);
-
-
-            // Ajouter les noms des dépendances externes
-            classified.external.forEach(dep => {
                 const th = document.createElement('th');
-                th.textContent = dep;
-                th.className = 'external-group';
-                th.style.transform = 'rotate(-90deg)';
-                th.style.minWidth = '30px';
-                th.style.fontSize = '10px';
-                th.style.whiteSpace = 'nowrap';
-                subHeaderRow.appendChild(th);
-            });
+                th.textContent = 'Dépendances Externes';
+                th.className = 'group-header external-group';
+                th.colSpan = classified.external.length;
+                headerRow.appendChild(th);
+            }
+            if (classified.internal.length > 0) {
+                const th = document.createElement('th');
+                th.textContent = 'Dépendances Internes';
+                th.className = 'group-header internal-group';
+                th.colSpan = classified.internal.length;
+                headerRow.appendChild(th);
+            }
 
-            // Ajouter les noms des dépendances internes
-            classified.internal.forEach(dep => {
+            const subHeaderRow = document.createElement('tr');
+            subHeaderRow.className = 'dependency-header-row';
+            const empty = document.createElement('th');
+            empty.className = 'file-name';
+            subHeaderRow.appendChild(empty);
+
+            [...classified.external, ...classified.internal].forEach(dep => {
                 const th = document.createElement('th');
                 th.textContent = dep.replace('app\\', '');
-                th.className = 'internal-group';
-                th.style.transform = 'rotate(-90deg)';
-                th.style.minWidth = '30px';
+                th.style.writingMode = 'vertical-rl';
+                th.style.textOrientation = 'upright';
+                th.style.width = '20px';
+                th.style.minWidth = '20px';
+                th.style.maxWidth = '20px';
+                th.style.padding = '4px';
                 th.style.fontSize = '10px';
-                th.style.height = '150px';
-                th.style.whiteSpace = 'nowrap';
+                th.style.lineHeight = '1.2';
                 subHeaderRow.appendChild(th);
             });
-
             headerRow.parentNode.appendChild(subHeaderRow);
 
-            // Générer les lignes du tableau
             const tableBody = document.getElementById('tableBody');
-
             files.forEach(file => {
                 const row = document.createElement('tr');
-
-                // Cellule du nom de fichier
                 const fileCell = document.createElement('td');
-                fileCell.textContent = file;
                 fileCell.className = 'file-name';
+                fileCell.textContent = file;
                 row.appendChild(fileCell);
 
                 const fileDeps = dependencies[file] || [];
-
-                // Cellules pour dépendances externes
-                classified.external.forEach(dep => {
+                [...classified.external, ...classified.internal].forEach(dep => {
                     const cell = document.createElement('td');
                     const cleanDep = dep.replace(/ as .+$/, '');
-                    const hasDep = fileDeps.some(fd => fd.replace(/ as .+$/, '') === cleanDep);
-
-                    if (hasDep) {
-                        cell.textContent = '●';
-                        cell.className = 'dependency-yes';
-                    } else {
-                        cell.textContent = '';
-                        cell.className = 'dependency-no';
-                    }
-                    row.appendChild(cell);
-                });
-
-                // Cellules pour dépendances internes
-                classified.internal.forEach(dep => {
-                    const cell = document.createElement('td');
-                    const hasDep = fileDeps.includes(dep);
-
-                    if (hasDep) {
-                        cell.textContent = '●';
-                        cell.className = 'dependency-yes';
-                    } else {
-                        cell.textContent = '';
-                        cell.className = 'dependency-no';
-                    }
+                    const hasDep = fileDeps.some(d => d.replace(/ as .+$/, '') === cleanDep);
+                    cell.textContent = hasDep ? '●' : '';
+                    cell.className = hasDep ? 'dependency-yes' : 'dependency-no';
                     row.appendChild(cell);
                 });
 
                 tableBody.appendChild(row);
             });
         }
-
-        // Générer le tableau au chargement de la page
         generateTable();
     </script>
 </body>

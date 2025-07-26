@@ -7,7 +7,7 @@ use app\utils\File;
 
 class Database
 {
-    const SQLITE_DEST_PATH = __DIR__ . '/../../../data/';
+    const SQLITE_DEST_PATH = __DIR__ . '/../../data/';
     const SQLITE_FILE = 'MyClub.sqlite';
     const SQLITE_LOG_FILE = 'LogMyClub.sqlite';
     const APPLICATION = 'MyClub';
@@ -41,17 +41,13 @@ class Database
     private function check(): void
     {
         $sqliteLogFile = self::SQLITE_DEST_PATH . self::SQLITE_LOG_FILE;
-        if (!is_file($sqliteLogFile)) {
-            File::copy(__DIR__ . '/' . self::SQLITE_LOG_FILE, self::SQLITE_DEST_PATH);
-        }
+        if (!is_file($sqliteLogFile)) File::copy(__DIR__ . '/database/' . self::SQLITE_LOG_FILE, self::SQLITE_DEST_PATH);
         self::$pdoForLog = new PDO('sqlite:' . $sqliteLogFile);
         self::$pdoForLog->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         self::$pdoForLog->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_OBJ);
 
         $sqliteFile = self::SQLITE_DEST_PATH . self::SQLITE_FILE;
-        if (!is_file($sqliteFile)) {
-            (new File())->copy(__DIR__ . '/' . self::SQLITE_FILE, self::SQLITE_DEST_PATH);
-        }
+        if (!is_file($sqliteFile)) File::copy(__DIR__ . '/database/' . self::SQLITE_FILE, self::SQLITE_DEST_PATH);
         self::$pdo = new PDO('sqlite:' . $sqliteFile);
         self::$pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_OBJ);
         self::$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);

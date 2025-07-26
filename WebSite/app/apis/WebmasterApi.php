@@ -3,6 +3,7 @@
 namespace app\apis;
 
 use Exception;
+use app\helpers\Application;
 use app\helpers\LogDataHelper;
 use app\helpers\PageDataHelper;
 use app\helpers\PersonGroupDataHelper;
@@ -46,7 +47,7 @@ class WebmasterApi extends BaseApi
     public function lastVersion()
     {
         (new LogDataHelper())->add();
-        $this->renderJson(['lastVersion' => $this->application->getVersion()]);
+        $this->renderJson(['lastVersion' => Application::getVersion()]);
     }
 
     public function removeFromGroup($personId, $groupId)

@@ -10,7 +10,7 @@ use app\helpers\Email;
 use app\helpers\EventDataHelper;
 use app\helpers\MessagePersonHelper;
 use app\helpers\NeedHelper;
-use app\helpers\ParticipantHelper;
+use app\helpers\ParticipantDataHelper;
 use app\utils\Params;
 use app\utils\Period;
 use app\utils\Webapp;
@@ -199,7 +199,7 @@ class EventController extends BaseController
                 'eventId' => $eventId,
                 'event' => $this->eventDataHelper->getEvent($eventId),
                 'attributes' => $this->eventDataHelper->getEventAttributes($eventId),
-                'participants' => (new ParticipantHelper())->getEventParticipants($eventId),
+                'participants' => (new ParticipantDataHelper())->getEventParticipants($eventId),
                 'userEmail' => $userEmail,
                 'isRegistered' => $this->eventDataHelper->isUserRegistered($eventId, $userEmail),
                 'navItems' => $this->getNavItems($person),
@@ -310,7 +310,7 @@ class EventController extends BaseController
         $this->render('app/views/info.latte', [
             'content' => $this->application->getSettings()->get('Help_eventManager'),
             'hasAuthorization' => $this->application->getAuthorizations()->hasAutorization(),
-            'currentVersion' => $this->application->getVersion()
+            'currentVersion' => Application::getVersion()
         ]);
     }
 

@@ -2,6 +2,7 @@
 
 namespace app\controllers;
 
+use app\helpers\Application;
 use app\helpers\ArticleDataHelper;
 use app\helpers\ArwardsDataHelper;
 use app\utils\Webapp;
@@ -15,7 +16,7 @@ class WebmasterController extends BaseController
         $this->render('app/views/info.latte', [
             'content' => $this->application->getSettings()->get('Help_webmaster'),
             'hasAuthorization' => $this->application->getAuthorizations()->isEventManager(),
-            'currentVersion' => $this->application->getVersion()
+            'currentVersion' => Application::getVersion()
         ]);
     }
 

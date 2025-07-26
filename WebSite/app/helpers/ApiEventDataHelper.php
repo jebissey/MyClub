@@ -5,7 +5,7 @@ namespace app\helpers;
 use Exception;
 use app\enums\EventAudience;
 
-class ApiEventHelper extends Data
+class ApiEventDataHelper extends Data
 {
     public function update($data, $personId)
     {

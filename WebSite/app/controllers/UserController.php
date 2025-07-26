@@ -3,9 +3,10 @@
 namespace app\controllers;
 
 use flight\Engine;
-use app\helpers\Alert;
+use app\helpers\Application;
 use app\helpers\ArticleDataHelper;
 use app\helpers\AttributeDataHelper;
+use app\helpers\DesignDataHelper;
 use app\helpers\Email;
 use app\helpers\EventTypeDataHelper;
 use app\helpers\GroupDataHelper;
@@ -54,7 +55,7 @@ class UserController extends BaseController
                 'keys' => false,
                 'page' => basename(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH)),
                 'token' => $token,
-                'currentVersion' => $this->application->getVersion()
+                'currentVersion' => Application::getVersion()
             ]);
         } else $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
     }
@@ -90,7 +91,7 @@ class UserController extends BaseController
                 'userEmail' => '',
                 'keys' => false,
                 'page' => basename(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH)),
-                'currentVersion' => $this->application->getVersion()
+                'currentVersion' => Application::getVersion()
             ]);
         } else $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
     }
@@ -116,11 +117,11 @@ class UserController extends BaseController
                 unset($_SESSION['user']);
                 $this->application->error480($userEmail, __FILE__, __LINE__);
             }
-            $pendingSurveyResponses = (new Alert())->getPendingSurveyResponses();
+            $pendingSurveyResponses = $this->surveyDataHelper->getPendingSurveyResponses();
             $userPendingSurveys = array_filter($pendingSurveyResponses, function ($item) use ($userEmail) {
                 return strcasecmp($item->Email, $userEmail) === 0;
             });
-            $pendingDesignResponses = (new Alert())->getPendingDesignResponses();
+            $pendingDesignResponses = (new DesignDataHelper())->getPendingDesignResponses();
             $userPendingDesigns = array_filter($pendingDesignResponses, function ($item) use ($userEmail) {
                 return strcasecmp($item->Email, $userEmail) === 0;
             });
@@ -133,7 +134,7 @@ class UserController extends BaseController
                 'userImg' => '/app/images/anonymat.png',
                 'userEmail' => '',
                 'keys' => false,
-                'currentVersion' => $this->application->getVersion(),
+                'currentVersion' => Application::getVersion(),
                 'currentLanguage' => $lang,
                 'supportedLanguages' => TranslationManager::getSupportedLanguages(),
                 'flag' => TranslationManager::getFlag($lang),
@@ -296,7 +297,7 @@ class UserController extends BaseController
             $this->render('app/views/info.latte', $this->params->getAll([
                 'content' => $this->application->getSettings()->get_('Help_user'),
                 'hasAuthorization' => $this->application->getAuthorizations()->hasAutorization(),
-                'currentVersion' => $this->application->getVersion()
+                'currentVersion' => Application::getVersion()
             ]));
         } else $this->application->error403(__FILE__, __LINE__);
     }

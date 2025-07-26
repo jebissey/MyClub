@@ -2,21 +2,14 @@
 
 namespace app\controllers;
 
-use app\helpers\DesignDesignVotePersonHelper;
+use app\helpers\DesignDataHelper;
 
 class DesignController extends BaseController
 {
-    private DesignDesignVotePersonHelper $designDesignVotePersonHelper;
-
-    public function __construct()
-    {
-        $this->designDesignVotePersonHelper = new DesignDesignVotePersonHelper();
-    }
-
     public function index()
     {
         if ($person = $this->personDataHelper->getPerson(['Redactor'])) {
-            [$designs, $userVotes] = $this->designDesignVotePersonHelper->getUsersVotes($person->Id);
+            [$designs, $userVotes] = (new DesignDataHelper())->getUsersVotes($person->Id);
 
             $this->render('app/views/designs/index.latte', $this->params->getAll([
                 'designs' => $designs,

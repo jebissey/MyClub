@@ -35,7 +35,7 @@ class Params
             'isEditor' => false,
             'isWebmaster' => false,
             'page' => $page,
-            'currentVersion' => (new Application())->getVersion(),
+            'currentVersion' => Application::getVersion(),
             'currentLanguage' => $lang,
             'supportedLanguages' => TranslationManager::getSupportedLanguages(),
             'flag' => TranslationManager::getFlag($lang),

@@ -4,7 +4,7 @@ namespace app\helpers;
 
 use Exception;
 
-class ApiNeedHelper extends Data
+class ApiNeedDataHelper extends Data
 {
     public function countForNeedType($needTypeid)
     {

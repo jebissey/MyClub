@@ -2,6 +2,7 @@
 
 namespace app\controllers;
 
+use app\helpers\Application;
 use app\helpers\SurveyDataHelper;
 
 class SurveyController extends BaseController
@@ -88,7 +89,7 @@ class SurveyController extends BaseController
                     'results' => $results,
                     'participants' => $participants,
                     'articleId' => $articleId,
-                    'currentVersion' => $this->application->getVersion()
+                    'currentVersion' => Application::getVersion()
                 ]);
             } else $this->application->error403(__FILE__, __LINE__);
         } else $this->application->error403(__FILE__, __LINE__);

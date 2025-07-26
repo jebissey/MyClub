@@ -4,7 +4,7 @@ namespace app\helpers;
 
 use Exception;
 
-class ApiNeedTypeHelper extends Data
+class ApiNeedTypeDataHelper extends Data
 {
     public function delete_($id)
     {

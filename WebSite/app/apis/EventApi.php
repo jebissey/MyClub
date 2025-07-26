@@ -6,9 +6,9 @@ use app\helpers\Application;
 use DateTime;
 use Exception;
 
-use app\helpers\ApiEventHelper;
-use app\helpers\ApiNeedHelper;
-use app\helpers\ApiNeedTypeHelper;
+use app\helpers\ApiEventDataHelper;
+use app\helpers\ApiNeedDataHelper;
+use app\helpers\ApiNeedTypeDataHelper;
 use app\helpers\AttributeDataHelper;
 use app\helpers\Email;
 use app\helpers\EventDataHelper;
@@ -19,11 +19,10 @@ use app\helpers\PersonPreferences;
 
 class EventApi extends BaseApi
 {
-    private ApiNeedHelper $apiNeedHelper;
-    private ApiNeedTypeHelper $apiNeedTypeHelper;
+    private ApiNeedDataHelper $apiNeedDataHelper;
+    private ApiNeedTypeDataHelper $apiNeedTypeDataHelper;
     private AttributeDataHelper $attributeDataHelper;
     private $email;
-    private ApiEventHelper $apiEventHelper;
     private EventDataHelper $eventDataHelper;
     private EventNeedHelper $eventNeedHelper;
     private MessageHelper $messageHelper;
@@ -32,11 +31,10 @@ class EventApi extends BaseApi
     public function __construct()
     {
         parent::__construct();
-        $this->apiNeedHelper = new ApiNeedHelper();
-        $this->apiNeedTypeHelper = new ApiNeedTypeHelper();
+        $this->apiNeedDataHelper = new ApiNeedDataHelper();
+        $this->apiNeedTypeDataHelper = new ApiNeedTypeDataHelper();
         $this->attributeDataHelper = new AttributeDataHelper();
         $this->email = new Email();
-        $this->apiEventHelper = new ApiEventHelper();
         $this->eventDataHelper = new EventDataHelper();
         $this->eventNeedHelper = new EventNeedHelper();
         $this->messageHelper = new MessageHelper();
@@ -115,7 +113,7 @@ class EventApi extends BaseApi
     public function saveEvent(): void
     {
         if ($person = $this->personDataHelper->getPerson(['EventManager'])) {
-            [$response, $statusCode] = $this->apiEventHelper->update(json_decode(file_get_contents('php://input'), true), $person->Id);
+            [$response, $statusCode] = (new ApiEventDataHelper())->update(json_decode(file_get_contents('php://input'), true), $person->Id);
             $this->renderJson($response, $statusCode);
         } else $this->renderJson(['success' => false, 'message' => 'User not allowed'], 403);
     }
@@ -180,7 +178,7 @@ class EventApi extends BaseApi
     {
         if ($this->personDataHelper->getPerson(['Webmaster'])) {
             if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
-                [$response, $statusCode] = $this->renderJson($this->apiNeedHelper->delete_($id));
+                [$response, $statusCode] = $this->renderJson($this->apiNeedDataHelper->delete_($id));
                 $this->renderJson($response, $statusCode);
             } else $this->renderJson(['success' => false, 'message' => 'Bad request method'], 470);
         } else $this->renderJson(['success' => false, 'message' => 'User not allowed'], 403);
@@ -214,7 +212,7 @@ class EventApi extends BaseApi
                     'ParticipantDependent' => $participantDependent,
                     'IdNeedType' => $idNeedType
                 ];
-                [$response, $statusCode] = $this->renderJson($this->apiNeedHelper->insertOrUpdate($id, $needData));
+                [$response, $statusCode] = $this->renderJson($this->apiNeedDataHelper->insertOrUpdate($id, $needData));
                 $this->renderJson($response, $statusCode);
             } else $this->renderJson(['success' => false, 'message' => 'Bad request method'], 470);
         } else $this->renderJson(['success' => false, 'message' => 'User not allowed'], 403);
@@ -227,7 +225,7 @@ class EventApi extends BaseApi
 
     public function getNeedsByNeedType($needTypeId)
     {
-        $this->renderJson(['success' => true, 'needs' => $this->apiNeedTypeHelper->needsforNeedType($needTypeId)]);
+        $this->renderJson(['success' => true, 'needs' => $this->apiNeedTypeDataHelper->needsforNeedType($needTypeId)]);
     }
     #endregion
 
@@ -239,7 +237,7 @@ class EventApi extends BaseApi
                 if (!$id) {
                     $this->renderJson(['success' => false, 'message' => 'Missing Id parameter'], 472);
                 } else {
-                    $countNeeds = $this->apiNeedHelper->countForNeedType($id);
+                    $countNeeds = $this->apiNeedDataHelper->countForNeedType($id);
                     if ($countNeeds > 0) {
                         $this->renderJson([
                             'success' => false,
@@ -259,7 +257,7 @@ class EventApi extends BaseApi
                 $name = $data['name'] ?? '';
                 if (empty($name)) $this->renderJson(['success' => false, 'message' => "Missing parameter name ='$name'"], 472);
                 else {
-                    [$response, $statusCode] = $this->renderJson($this->apiNeedTypeHelper->insertOrUpdate($data['id'] ?? '', $name));
+                    [$response, $statusCode] = $this->renderJson($this->apiNeedTypeDataHelper->insertOrUpdate($data['id'] ?? '', $name));
                     $this->renderJson($response, $statusCode);
                 }
             } else $this->renderJson(['success' => false, 'message' => 'Bad request method'], 470);

@@ -77,7 +77,7 @@ class PersonDataHelper extends Data
             'isEditor' => $this->application->getAuthorizations()->isEditor(),
             'isWebmaster' => $this->application->getAuthorizations()->isWebmaster(),
             'page' => explode('/', trim(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/'))[$segment],
-            'currentVersion' => $this->application->getVersion(),
+            'currentVersion' => Application::getVersion(),
             'currentLanguage' => $lang,
             'supportedLanguages' => TranslationManager::getSupportedLanguages(),
             'flag' => TranslationManager::getFlag($lang),

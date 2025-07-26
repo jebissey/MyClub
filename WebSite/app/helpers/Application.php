@@ -17,7 +17,6 @@ class Application
     private LatteEngine $latte;
     private Authorization $authorizations;
     private Settings $settings;
-    private string $version;
     public static string $root;
 
     private function __construct()
@@ -25,13 +24,21 @@ class Application
         $database = \app\helpers\Database::getInstance();
         $this->pdo = $database->getPdo();
         $this->pdoForLog = $database->getPdoForLog();
-
+        $this->flight = new Engine();
+        $this->latte = new LatteEngine();
         $this->authorizations = new Authorization();
         $this->settings = new Settings();
-        $this->version = self::VERSION;
-
-        $this->latte = new LatteEngine();
         $this->root = 'https://' . $_SERVER['HTTP_HOST'];
+    }
+
+    public function getAuthorizations(): Authorization
+    {
+        return $this->authorizations;
+    }
+
+    public function getFlight(): Engine
+    {
+        return $this->flight;
     }
 
     public static function getInstance(): self
@@ -45,16 +52,6 @@ class Application
     public function getLatte(): LatteEngine
     {
         return $this->latte;
-    }
-
-    public function getFlight(): Engine
-    {
-        return $this->flight;
-    }
-
-    public function setFlight(Engine $flight): void
-    {
-        $this->flight = $flight;
     }
 
     public function getPdo(): PDO
@@ -72,14 +69,9 @@ class Application
         return $this->settings;
     }
 
-    public function getAuthorizations(): Authorization
+    public static function getVersion(): string
     {
-        return $this->authorizations;
-    }
-
-    public function getVersion(): string
-    {
-        return $this->version;
+        return self::VERSION;
     }
 
     public function help(): void
@@ -87,7 +79,7 @@ class Application
         $content = $this->latte->renderToString('app/views/info.latte', [
             'content' => $this->settings->get_('Help_home'),
             'hasAuthorization' => $this->authorizations->hasAutorization(),
-            'currentVersion' => $this->version
+            'currentVersion' => self::VERSION
         ]);
         echo $content;
     }
@@ -97,7 +89,7 @@ class Application
         $content = $this->latte->renderToString('app/views/info.latte', [
             'content' => $this->settings->get_('LegalNotices'),
             'hasAuthorization' => $this->authorizations->hasAutorization(),
-            'currentVersion' => $this->version
+            'currentVersion' => self::VERSION
         ]);
         echo $content;
     }
@@ -107,6 +99,7 @@ class Application
         $this->error($code, $message, $timeout, false);
     }
 
+    #region Errors
     public function error403(string $file, int $line, int $timeout = 1000): void
     {
         $this->error(403, "Page not allowed in file $file at line $line", $timeout);

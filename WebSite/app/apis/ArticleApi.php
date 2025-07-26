@@ -5,19 +5,17 @@ namespace app\apis;
 use Exception;
 
 use app\helpers\ArticleDataHelper;
-use app\helpers\DesignVoteHelper;
+use app\helpers\DesignDataHelper;
 use app\helpers\ReplyHelper;
 use app\utils\Media;
 
 class ArticleApi extends BaseApi
 {
-    private DesignVoteHelper $designVoteHelper;
     private Media $media;
     private ReplyHelper $replyHelper;
 
     public function __construct()
     {
-        $this->designVoteHelper = new DesignVoteHelper();
         $this->media = new Media();
         $this->replyHelper = new ReplyHelper();
     }
@@ -31,7 +29,7 @@ class ArticleApi extends BaseApi
     {
         if ($person = $this->personDataHelper->getPerson(['Redactor'])) {
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-                $this->designVoteHelper->insertOrUpdate(json_decode(file_get_contents('php://input'), true), $person->Id);
+                (new DesignDataHelper())->insertOrUpdate(json_decode(file_get_contents('php://input'), true), $person->Id);
                 $this->renderJson(['success' => true]);
             } else $this->renderJson(['success' => false, 'message' => 'Bad request method'], 470);
         } else $this->renderJson(['success' => false, 'message' => 'User not allowed'], 403);
