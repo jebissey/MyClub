@@ -5,7 +5,7 @@ namespace app\apis;
 use Exception;
 
 use app\helpers\carouselHelper;
-use app\utils\Webapp;
+use app\helpers\Webapp;
 
 class CarouselApi extends BaseApi
 {

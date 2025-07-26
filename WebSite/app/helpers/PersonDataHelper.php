@@ -3,8 +3,8 @@
 namespace app\helpers;
 
 use DateTime;
-use app\utils\Params;
-use app\utils\TranslationManager;
+use app\helpers\Params;
+use app\helpers\TranslationManager;
 
 class PersonDataHelper extends Data
 {

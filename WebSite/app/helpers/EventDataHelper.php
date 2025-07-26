@@ -8,7 +8,7 @@ use Exception;
 use PDO;
 
 use app\enums\EventAudience;
-use app\utils\TranslationManager;
+use app\helpers\TranslationManager;
 
 class EventDataHelper extends Data
 {

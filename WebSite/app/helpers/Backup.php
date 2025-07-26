@@ -1,6 +1,6 @@
 <?php
 
-namespace app\utils;
+namespace app\helpers;
 
 class Backup
 {

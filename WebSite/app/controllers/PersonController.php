@@ -5,7 +5,7 @@ namespace app\controllers;
 use app\helpers\Application;
 use app\helpers\GroupDataHelper;
 use app\helpers\TableControllerHelper;
-use app\utils\Webapp;
+use app\helpers\Webapp;
 
 
 class PersonController extends TableController implements CrudControllerInterface

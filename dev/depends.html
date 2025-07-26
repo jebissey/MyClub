@@ -6,17 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dépendances - Tableau & Graphe</title>
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 20px;
-            background-color: #f5f5f5;
-        }
-
-        .container {
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        tbody tr:nth-child(even) {
+            background-color: #f0f0f0;
         }
 
         h1 {
@@ -26,7 +17,7 @@
 
         .table-container {
             overflow-x: auto;
-            max-height: 80vh;
+            max-height: 92vh;
             border: 1px solid #ddd;
             border-radius: 4px;
         }
@@ -45,7 +36,6 @@
         }
 
         th {
-            background-color: #f8f9fa;
             font-weight: bold;
             position: sticky;
             top: 0;
@@ -54,25 +44,10 @@
 
         .file-name {
             text-align: left;
-            background-color: #f8f9fa;
             font-weight: bold;
             position: sticky;
             left: 0;
             z-index: 5;
-        }
-
-        .group-header {
-            background-color: #e9ecef;
-            font-weight: bold;
-            color: #495057;
-        }
-
-        .external-group {
-            background-color: #fff3cd;
-        }
-
-        .internal-group {
-            background-color: #d4edda;
         }
 
         .dependency-yes {
@@ -80,39 +55,11 @@
             color: white;
             font-weight: bold;
         }
-
-        .dependency-no {
-            background-color: #f8f9fa;
-        }
-
-        .legend {
-            margin-top: 20px;
-            padding: 15px;
-            background-color: #f8f9fa;
-            border-radius: 4px;
-        }
-
-        .legend-item {
-            display: inline-block;
-            margin-right: 20px;
-            margin-bottom: 10px;
-        }
-
-        .legend-color {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            margin-right: 5px;
-            vertical-align: middle;
-            border: 1px solid #ccc;
-        }
     </style>
 </head>
 
 <body>
-
-    <!-- Tableau croisé dynamique -->
-    <div class="container">
+    <div>
         <h1>Tableau Croisé Dynamique des Dépendances</h1>
         <div class="table-container">
             <table id="dependencyTable">
@@ -124,32 +71,20 @@
                 <tbody id="tableBody"></tbody>
             </table>
         </div>
-        <div class="legend">
-            <h3>Légende:</h3>
-            <div class="legend-item">
-                <span class="legend-color dependency-yes"></span> Dépendance présente
-            </div>
-            <div class="legend-item">
-                <span class="legend-color external-group"></span> Dépendances externes
-            </div>
-            <div class="legend-item">
-                <span class="legend-color internal-group"></span> Dépendances internes
-            </div>
-        </div>
     </div>
 
     <script>
         const rawData = String.raw`
-../WebSite/app/apis/ArticleApi.php depends on: Exception, app\helpers\ArticleDataHelper, app\helpers\DesignVoteHelper, app\helpers\ReplyHelper, app\utils\Media
+../WebSite/app/apis/ArticleApi.php depends on: Exception, app\helpers\ArticleDataHelper, app\helpers\DesignDataHelper, app\helpers\ReplyHelper, app\utils\Media
 ../WebSite/app/apis/BaseApi.php depends on: flight, Latte\Engine as LatteEngine, app\helpers\Application, app\helpers\DataHelper, app\helpers\PersonDataHelper
 ../WebSite/app/apis/CarouselApi.php depends on: Exception, app\helpers\carouselHelper, app\utils\Webapp
-../WebSite/app/apis/EventApi.php depends on: app\helpers\Application, DateTime, Exception, app\helpers\ApiEventHelper, app\helpers\ApiNeedHelper, app\helpers\ApiNeedTypeHelper, app\helpers\AttributeDataHelper, app\helpers\Email, app\helpers\EventDataHelper, app\helpers\EventNeedHelper, app\helpers\MessageHelper, app\helpers\ParticipantDataHelper, app\helpers\PersonPreferences
+../WebSite/app/apis/EventApi.php depends on: app\helpers\Application, DateTime, Exception, app\helpers\ApiEventDataHelper, app\helpers\ApiNeedDataHelper, app\helpers\ApiNeedTypeDataHelper, app\helpers\AttributeDataHelper, app\helpers\Email, app\helpers\EventDataHelper, app\helpers\EventNeedHelper, app\helpers\MessageHelper, app\helpers\ParticipantDataHelper, app\helpers\PersonPreferences
 ../WebSite/app/apis/ImportApi.php depends on: app\helpers\ApiImportHelper
 ../WebSite/app/apis/WebmasterApi.php depends on: Exception, app\helpers\Application, app\helpers\LogDataHelper, app\helpers\PageDataHelper, app\helpers\PersonGroupDataHelper
 ../WebSite/app/controllers/ArticleController.php depends on: app\helpers\ArticleCrosstab, app\helpers\ArticleDataHelper, app\helpers\ArticleTableData, app\helpers\CarouselHelper, app\helpers\SurveyDataHelper, app\utils\Backup, app\utils\Period, app\utils\Webapp
 ../WebSite/app/controllers/BaseController.php depends on: flight, flight\Engine, Latte\Engine as LatteEngine, app\helpers\Application, app\helpers\Client, app\helpers\DataHelper, app\helpers\LanguagesDataHelper, app\helpers\PageDataHelper, app\helpers\PersonDataHelper, app\utils\Params, app\utils\TranslationManager
 ../WebSite/app/controllers/DbBrowserController.php depends on: app\helpers\DbBrowserHelper
-../WebSite/app/controllers/DesignController.php depends on: app\helpers\DesignDesignVotePersonHelper
+../WebSite/app/controllers/DesignController.php depends on: app\helpers\DesignDataHelper
 ../WebSite/app/controllers/EmailController.php depends on: Flight\Engine, app\helpers\Application, app\helpers\Email, app\helpers\PersonPreferences
 ../WebSite/app/controllers/EventController.php depends on: DateTime, Exception, app\helpers\Application, app\helpers\Crosstab, app\helpers\Email, app\helpers\EventDataHelper, app\helpers\MessagePersonHelper, app\helpers\NeedHelper, app\helpers\ParticipantDataHelper, app\utils\Params, app\utils\Period, app\utils\Webapp
 ../WebSite/app/controllers/EventTypeController.php depends on: app\helpers\EventDataHelper, app\helpers\TableControllerHelper
@@ -163,11 +98,11 @@
 ../WebSite/app/controllers/RegistrationController.php depends on: app\helpers\GroupDataHelper, app\helpers\TableControllerHelper, app\utils\Webapp
 ../WebSite/app/controllers/SurveyController.php depends on: app\helpers\Application, app\helpers\SurveyDataHelper
 ../WebSite/app/controllers/TableController.php depends on: app\helpers\Generic
-../WebSite/app/controllers/UserController.php depends on: flight\Engine, app\helpers\Alert, app\helpers\Application, app\helpers\ArticleDataHelper, app\helpers\AttributeDataHelper, app\helpers\Email, app\helpers\EventTypeDataHelper, app\helpers\GroupDataHelper, app\helpers\LogDataHelper, app\helpers\News, app\helpers\PersonGroupDataHelper, app\helpers\PersonStatistics, app\helpers\SurveyDataHelper, app\services\Sign, app\utils\Params, app\services\Password, app\utils\TranslationManager, app\utils\Webapp
+../WebSite/app/controllers/UserController.php depends on: flight\Engine, app\helpers\Application, app\helpers\ArticleDataHelper, app\helpers\AttributeDataHelper, app\helpers\DesignDataHelper, app\helpers\Email, app\helpers\EventTypeDataHelper, app\helpers\GroupDataHelper, app\helpers\LogDataHelper, app\helpers\News, app\helpers\PersonGroupDataHelper, app\helpers\PersonStatistics, app\helpers\SurveyDataHelper, app\services\Sign, app\utils\Params, app\services\Password, app\utils\TranslationManager, app\utils\Webapp
 ../WebSite/app/controllers/WebmasterController.php depends on: app\helpers\Application, app\helpers\ArticleDataHelper, app\helpers\ArwardsDataHelper, app\utils\Webapp
-../WebSite/app/helpers/ApiEventHelper.php depends on: Exception, app\enums\EventAudience
-../WebSite/app/helpers/ApiNeedHelper.php depends on: Exception
-../WebSite/app/helpers/ApiNeedTypeHelper.php depends on: Exception
+../WebSite/app/helpers/ApiEventDataHelper.php depends on: Exception, app\enums\EventAudience
+../WebSite/app/helpers/ApiNeedDataHelper.php depends on: Exception
+../WebSite/app/helpers/ApiNeedTypeDataHelper.php depends on: Exception
 ../WebSite/app/helpers/Application.php depends on: PDO, flight\Engine, Latte\Engine as LatteEngine
 ../WebSite/app/helpers/ArticleDataHelper.php depends on: PDO
 ../WebSite/app/helpers/Authorization.php depends on: DateTime
@@ -224,43 +159,88 @@
             const classified = classifyDependencies(allDeps);
             const headerRow = document.getElementById('headerRow');
 
+            const totalDeps = [...classified.external, ...classified.internal];
+            const columnCounts = Array(totalDeps.length).fill(0); // pour les totaux colonnes
+
+            // En-tête de groupe (externes / internes)
             if (classified.external.length > 0) {
                 const th = document.createElement('th');
                 th.textContent = 'Dépendances Externes';
-                th.className = 'group-header external-group';
                 th.colSpan = classified.external.length;
                 headerRow.appendChild(th);
             }
             if (classified.internal.length > 0) {
                 const th = document.createElement('th');
                 th.textContent = 'Dépendances Internes';
-                th.className = 'group-header internal-group';
                 th.colSpan = classified.internal.length;
                 headerRow.appendChild(th);
             }
 
+            const thTotalCol = document.createElement('th');
+            thTotalCol.textContent = 'Total';
+            headerRow.appendChild(thTotalCol);
+
+            // Sous-en-tête (dépendance par dépendance)
             const subHeaderRow = document.createElement('tr');
             subHeaderRow.className = 'dependency-header-row';
             const empty = document.createElement('th');
             empty.className = 'file-name';
             subHeaderRow.appendChild(empty);
 
-            [...classified.external, ...classified.internal].forEach(dep => {
+            const getAltColor = (type, index) => {
+                if (type === 'external' && index % 2 === 0) return '#fff9c4'; // jaune clair
+                if (type === 'internal' && index % 2 === 0) return '#d4edda'; // vert clair
+                return '';
+            };
+
+            let depColumnMeta = []; // on stocke pour appliquer les couleurs aux td aussi
+
+            classified.external.forEach((dep, i) => {
                 const th = document.createElement('th');
                 th.textContent = dep.replace('app\\', '');
-                th.style.writingMode = 'vertical-rl';
-                th.style.textOrientation = 'upright';
-                th.style.width = '20px';
-                th.style.minWidth = '20px';
-                th.style.maxWidth = '20px';
-                th.style.padding = '4px';
-                th.style.fontSize = '10px';
-                th.style.lineHeight = '1.2';
+                th.style = `
+                    writing-mode: vertical-rl;
+                    text-orientation: upright;
+                    width: 20px;
+                    min-width: 20px;
+                    max-width: 20px;
+                    padding: 4px;
+                    font-size: 10px;
+                    line-height: 1.2;
+                    background-color: ${getAltColor('external', i)};
+                `;
                 subHeaderRow.appendChild(th);
+                depColumnMeta.push({ type: 'external', color: getAltColor('external', i) });
             });
+
+            classified.internal.forEach((dep, i) => {
+                const th = document.createElement('th');
+                th.textContent = dep.replace('app\\', '');
+                th.style = `
+                    writing-mode: vertical-rl;
+                    text-orientation: upright;
+                    width: 20px;
+                    min-width: 20px;
+                    max-width: 20px;
+                    padding: 4px;
+                    font-size: 10px;
+                    line-height: 1.2;
+                    background-color: ${getAltColor('internal', i)};
+                `;
+                subHeaderRow.appendChild(th);
+                depColumnMeta.push({ type: 'internal', color: getAltColor('internal', i) });
+            });
+
+
+            const thTotal = document.createElement('th');
+            thTotal.textContent = 'Total';
+            subHeaderRow.appendChild(thTotal);
+
             headerRow.parentNode.appendChild(subHeaderRow);
 
+            // Corps du tableau
             const tableBody = document.getElementById('tableBody');
+            let rowCount = 0;
             files.forEach(file => {
                 const row = document.createElement('tr');
                 const fileCell = document.createElement('td');
@@ -269,18 +249,59 @@
                 row.appendChild(fileCell);
 
                 const fileDeps = dependencies[file] || [];
-                [...classified.external, ...classified.internal].forEach(dep => {
+                let rowTotal = 0;
+
+                totalDeps.forEach((dep, colIdx) => {
                     const cell = document.createElement('td');
                     const cleanDep = dep.replace(/ as .+$/, '');
                     const hasDep = fileDeps.some(d => d.replace(/ as .+$/, '') === cleanDep);
                     cell.textContent = hasDep ? '●' : '';
-                    cell.className = hasDep ? 'dependency-yes' : 'dependency-no';
+                    cell.className = hasDep ? 'dependency-yes' : '';
+
+                    const bg = depColumnMeta[colIdx].color;
+                    if (bg) cell.style.backgroundColor = bg;
+
                     row.appendChild(cell);
+
+                    if (hasDep) {
+                        columnCounts[colIdx]++;
+                        rowTotal++;
+                    }
                 });
 
+                const totalCell = document.createElement('td');
+                totalCell.textContent = rowTotal;
+                totalCell.style.fontWeight = 'bold';
+                row.appendChild(totalCell);
+
                 tableBody.appendChild(row);
+                rowCount++;
             });
+
+            // Ligne des totaux
+            const totalRow = document.createElement('tr');
+            const labelCell = document.createElement('td');
+            labelCell.textContent = 'Total';
+            labelCell.className = 'file-name';
+            totalRow.appendChild(labelCell);
+
+            let grandTotal = 0;
+            columnCounts.forEach(count => {
+                const td = document.createElement('td');
+                td.textContent = count;
+                td.style.fontWeight = 'bold';
+                totalRow.appendChild(td);
+                grandTotal += count;
+            });
+
+            const totalGrand = document.createElement('td');
+            totalGrand.textContent = grandTotal;
+            totalGrand.style.fontWeight = 'bold';
+            totalRow.appendChild(totalGrand);
+
+            tableBody.appendChild(totalRow);
         }
+
         generateTable();
     </script>
 </body>

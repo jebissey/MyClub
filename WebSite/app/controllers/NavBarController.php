@@ -3,7 +3,7 @@
 namespace app\controllers;
 
 use app\helpers\ArwardsDataHelper;
-use app\utils\Webapp;
+use app\helpers\Webapp;
 
 class NavBarController extends BaseController
 {

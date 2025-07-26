@@ -10,10 +10,10 @@ use app\helpers\Email;
 use app\helpers\EventDataHelper;
 use app\helpers\MessagePersonHelper;
 use app\helpers\NeedHelper;
+use app\helpers\Params;
 use app\helpers\ParticipantDataHelper;
-use app\utils\Params;
-use app\utils\Period;
-use app\utils\Webapp;
+use app\helpers\Period;
+use app\helpers\Webapp;
 
 class EventController extends BaseController
 {

@@ -3,7 +3,8 @@
 namespace app\helpers;
 
 use PDO;
-use app\utils\Period;
+
+use app\helpers\Period;
 
 class Crosstab extends Data
 {

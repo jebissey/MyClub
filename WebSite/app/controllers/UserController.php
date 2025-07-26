@@ -12,14 +12,14 @@ use app\helpers\EventTypeDataHelper;
 use app\helpers\GroupDataHelper;
 use app\helpers\LogDataHelper;
 use app\helpers\News;
+use app\helpers\Params;
+use app\helpers\Password;
 use app\helpers\PersonGroupDataHelper;
 use app\helpers\PersonStatistics;
+use app\helpers\Sign;
 use app\helpers\SurveyDataHelper;
-use app\services\Sign;
-use app\utils\Params;
-use app\services\Password;
-use app\utils\TranslationManager;
-use app\utils\Webapp;
+use app\helpers\TranslationManager;
+use app\helpers\Webapp;
 
 class UserController extends BaseController
 {

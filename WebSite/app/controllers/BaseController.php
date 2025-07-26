@@ -11,9 +11,9 @@ use app\helpers\Client;
 use app\helpers\DataHelper;
 use app\helpers\LanguagesDataHelper;
 use app\helpers\PageDataHelper;
+use app\helpers\Params;
 use app\helpers\PersonDataHelper;
-use app\utils\Params;
-use app\utils\TranslationManager;
+use app\helpers\TranslationManager;
 
 abstract class BaseController
 {
@@ -31,11 +31,11 @@ abstract class BaseController
     {
         $this->application = Application::getInstance();
         $this->dataHelper = new DataHelper();
+        $this->languagesDataHelper = new LanguagesDataHelper();
         $this->pageDataHelper = new PageDataHelper();
         $this->personDataHelper = new PersonDataHelper();
 
         $this->flight = $flight;
-        $this->application->setFlight($flight);
         $this->latte = $this->application->getLatte();
         $this->addLatteFilters();
     }

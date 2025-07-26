@@ -2,7 +2,7 @@
 
 namespace app\helpers;
 
-use app\utils\TranslationManager;
+use app\helpers\TranslationManager;
 
 class LanguagesDataHelper extends Data
 {

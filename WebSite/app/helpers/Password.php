@@ -1,6 +1,6 @@
 <?php
 
-namespace app\services;
+namespace app\helpers;
 
 class Password
 {

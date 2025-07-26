@@ -2,8 +2,8 @@
 
 namespace App\Controllers;
 
-use app\utils\Media;
-use app\utils\Webapp;
+use app\helpers\Media;
+use app\helpers\Webapp;
 
 class MediaController extends BaseController
 {

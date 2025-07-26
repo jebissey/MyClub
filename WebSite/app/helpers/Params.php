@@ -1,10 +1,10 @@
 <?php
 
-namespace app\utils;
+namespace app\helpers;
 
 use InvalidArgumentException;
 use app\helpers\Application;
-use app\utils\TranslationManager;
+use app\helpers\TranslationManager;
 
 class Params
 {

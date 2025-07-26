@@ -4,9 +4,8 @@ namespace app\controllers;
 
 use app\helpers\Crosstab;
 use app\helpers\LogDataHelper;
-use app\utils\Common;
-use app\utils\Period;
-use app\utils\Webapp;
+use app\helpers\Period;
+use app\helpers\Webapp;
 
 class LogController extends BaseController
 {

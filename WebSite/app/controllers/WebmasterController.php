@@ -5,7 +5,7 @@ namespace app\controllers;
 use app\helpers\Application;
 use app\helpers\ArticleDataHelper;
 use app\helpers\ArwardsDataHelper;
-use app\utils\Webapp;
+use app\helpers\Webapp;
 
 class WebmasterController extends BaseController
 {

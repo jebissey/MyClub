@@ -6,8 +6,8 @@ use Exception;
 
 use app\helpers\ArticleDataHelper;
 use app\helpers\DesignDataHelper;
+use app\helpers\Media;
 use app\helpers\ReplyHelper;
-use app\utils\Media;
 
 class ArticleApi extends BaseApi
 {

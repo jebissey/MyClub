@@ -3,7 +3,7 @@
 namespace app\helpers;
 
 use PDO;
-use app\utils\File;
+use app\helpers\File;
 
 class Database
 {

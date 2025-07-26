@@ -4,7 +4,7 @@ namespace app\controllers;
 
 use app\helpers\GroupDataHelper;
 use app\helpers\TableControllerHelper;
-use app\utils\Webapp;
+use app\helpers\Webapp;
 
 class RegistrationController extends TableController
 {

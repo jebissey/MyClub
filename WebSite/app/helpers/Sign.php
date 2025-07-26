@@ -1,10 +1,10 @@
 <?php
 
-namespace app\services;
+namespace app\helpers;
 
 use DateTime;
 use app\helpers\Application;
-use app\services\Password;
+use app\helpers\Password;
 
 class Sign
 {

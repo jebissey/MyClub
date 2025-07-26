@@ -3,7 +3,7 @@
 namespace app\controllers;
 
 use app\helpers\GroupDataHelper;
-use app\utils\Webapp;
+use app\helpers\Webapp;
 
 class GroupController extends BaseController implements CrudControllerInterface
 {
