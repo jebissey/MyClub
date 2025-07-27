@@ -14,21 +14,22 @@ class Application
     private const VERSION = 0.5;
 
     private static $instance = null;
-    private PDO $pdo;
-    private PDO $pdoForLog;
-    private Engine $flight;
+    private static Engine $flight;
     private static LatteEngine $latte;
     public static string $root;
+    private PDO $pdo;
+    private PDO $pdoForLog;
 
-    private function __construct()
+    public function __construct()
     {
+        self::$instance = $this;
+        self::$flight = new Engine();
+        self::$latte = new LatteEngine();
+        self::$root = 'https://' . $_SERVER['HTTP_HOST'];
+        
         $database = Database::getInstance();
         $this->pdo = $database->getPdo();
-        $this->pdoForLog = $database->getPdoForLog();
-        $this->flight = new Engine();
-        $this->latte = new LatteEngine();
-        $this->root = 'https://' . $_SERVER['HTTP_HOST'];
-    }
+        $this->pdoForLog = $database->getPdoForLog();    }
 
     public static function getFlight(): Engine
     {
@@ -37,9 +38,6 @@ class Application
 
     public static function getInstance(): self
     {
-        if (self::$instance === null) {
-            self::$instance = new self();
-        }
         return self::$instance;
     }
 

@@ -3,10 +3,16 @@
 namespace app\controllers;
 
 use app\helpers\Application;
+use app\helpers\AuthorizationDataHelper;
 use app\helpers\SurveyDataHelper;
 
 class SurveyController extends BaseController
 {
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
     public function add($articleId)
     {
         if ($this->personDataHelper->getPerson(['Redactor'])) {
@@ -63,7 +69,7 @@ class SurveyController extends BaseController
                 $this->flight->redirect('/articles/' . $articleId);
                 return;
             }
-            if ($this->application->getAuthorizations()->canPersonReadSurveyResults($this->dataHelper->get('Article', ['Id' => $survey->IdArticle]), $person)) {
+            if ((new AuthorizationDataHelper())->canPersonReadSurveyResults($this->dataHelper->get('Article', ['Id' => $survey->IdArticle]), $person)) {
                 $replies = $this->dataHelper->gets('Reply', ['IdSurvey' => $survey->Id]);
                 $participants = [];
                 $results = [];

@@ -8,6 +8,11 @@ use app\helpers\Webapp;
 
 class NavBarController extends BaseController
 {
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
     public function index()
     {
         if ($this->personDataHelper->getPerson(['Webmaster'])) {

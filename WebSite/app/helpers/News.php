@@ -2,7 +2,7 @@
 
 namespace app\helpers;
 
-class News extends Data
+class News
 {
     public function getNewsForPerson($person, $searchFrom): array
     {

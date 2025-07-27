@@ -4,6 +4,11 @@ namespace app\helpers;
 
 class ParticipantDataHelper extends Data
 {
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
     public function getEventParticipants($eventId)
     {
         return $this->fluent->from('Participant pa')

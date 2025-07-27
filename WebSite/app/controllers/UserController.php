@@ -33,9 +33,9 @@ class UserController extends BaseController
     private Sign $sign;
     private SurveyDataHelper $surveyDataHelper;
 
-    public function __construct(Engine $flight)
+    public function __construct()
     {
-        parent::__construct($flight);
+        parent::__construct();
         $this->articleDataHelper = new ArticleDataHelper();
         $this->authorizationDatahelper = new AuthorizationDataHelper();
         $this->email = new Email();

@@ -6,6 +6,11 @@ use Throwable;
 
 class ApiNeedDataHelper extends Data
 {
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
     public function countForNeedType($needTypeid)
     {
         return $this->fluent->from('Need')->where('IdNeedType', $needTypeid)->count();

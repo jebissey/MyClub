@@ -8,6 +8,11 @@ use app\enums\EventAudience;
 
 class ApiEventDataHelper extends Data
 {
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
     public function update($data, $personId)
     {
         $values = [

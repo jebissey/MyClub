@@ -4,6 +4,11 @@ namespace app\helpers;
 
 class ArticleTableData extends Data
 {
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
     public function getQuery($person)
     {
         $query =  $this->fluent->from('Article')

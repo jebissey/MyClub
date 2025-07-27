@@ -4,6 +4,11 @@ namespace app\helpers;
 
 class SurveyDataHelper extends Data
 {
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
     public function articleHasSurvey($articleId)
     {
         return $this->fluent
@@ -73,8 +78,10 @@ class SurveyDataHelper extends Data
         $news = [];
         $authorizationDataHelper = new AuthorizationDataHelper;
         foreach ($surveys as $survey) {
-            if ($authorizationDataHelper->getArticle($survey->IdArticle, $person) 
-                && $authorizationDataHelper->canPersonReadSurveyResults((new ArticleDataHelper())->getWithAuthor($survey->IdArticle), $person)) {
+            if (
+                $authorizationDataHelper->getArticle($survey->IdArticle, $person)
+                && $authorizationDataHelper->canPersonReadSurveyResults((new ArticleDataHelper())->getWithAuthor($survey->IdArticle), $person)
+            ) {
                 $news[] = [
                     'type' => 'survey',
                     'id' => $survey->IdArticle,

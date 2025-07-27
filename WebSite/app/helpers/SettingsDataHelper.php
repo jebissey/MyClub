@@ -4,6 +4,11 @@ namespace app\helpers;
 
 class SettingsDataHelper extends Data
 {
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
     public function get_(string $name): string
     {
         $query = $this->pdo->prepare('SELECT Value FROM Settings WHERE Name = ?');

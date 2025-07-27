@@ -16,6 +16,7 @@ class EventDataHelper extends Data
 
     public function __construct()
     {
+        parent::__construct();
         $this->personPreferences = new PersonPreferences($this->pdo);
     }
 

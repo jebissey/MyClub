@@ -2,21 +2,17 @@
 
 namespace app\controllers;
 
-use Flight\Engine;
 use app\helpers\Application;
 use app\helpers\Email;
-use app\helpers\PersonPreferences;
 
 class EmailController extends BaseController
 {
     private Email $email;
-    private PersonPreferences $personPreferences;
 
-    public function __construct(Engine $flight)
+    public function __construct()
     {
-        parent::__construct($flight);
+        parent::__construct();
         $this->email = new Email();
-        $this->personPreferences = new PersonPreferences();
     }
 
     public function fetchEmails()
@@ -58,7 +54,7 @@ class EmailController extends BaseController
                     $this->application->error471('Invalid Email', __FILE__, __LINE__);
                     return;
                 }
-                $filteredEmails = $this->personPreferences->getPersonWantedToBeAlerted($idArticle);
+                $filteredEmails = $this->personDataHelper->getPersonWantedToBeAlerted($idArticle);
                 $root = Application::$root;
                 $articleLink = $root . '/articles/' . $idArticle;
                 $unsubscribeLink = $root . '/user/preferences';

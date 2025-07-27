@@ -6,6 +6,11 @@ use Throwable;
 
 class GroupDataHelper extends Data
 {
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
     public function getAvailableGroups($personId)
     {
         if ((new AuthorizationDataHelper())->isWebmaster()) {

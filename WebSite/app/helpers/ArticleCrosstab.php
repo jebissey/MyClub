@@ -4,6 +4,11 @@ namespace app\helpers;
 
 class ArticleCrosstab extends Data
 {
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
     public function getItems($dateRange)
     {
         $sql = "

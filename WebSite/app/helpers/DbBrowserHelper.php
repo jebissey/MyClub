@@ -6,6 +6,11 @@ use PDO;
 
 class DbBrowserHelper extends Data
 {
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
     public function createRecord($table)
     {
         $this->validateTableName($table);

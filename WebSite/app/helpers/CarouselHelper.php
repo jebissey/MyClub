@@ -5,6 +5,11 @@ namespace app\helpers;
 
 class CarouselHelper extends Data
 {
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
     public function delete_($id)
     {
         $this->fluent->deleteFrom('Carousel')

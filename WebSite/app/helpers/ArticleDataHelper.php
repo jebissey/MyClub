@@ -6,6 +6,11 @@ use PDO;
 
 class ArticleDataHelper extends Data
 {
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
     public function calculateTotals($crosstabData)
     {
         $totals = [

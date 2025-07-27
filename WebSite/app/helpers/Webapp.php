@@ -8,12 +8,10 @@ use app\helpers\Application;
 class Webapp
 {
     private LatteEngine $latte;
-    protected Application $application;
 
     public function __construct()
     {
-        $this->application = Application::getInstance();
-        $this->latte = $this->application->getLatte();
+        $this->latte = Application::getLatte();
         $this->latte->setTempDirectory(__DIR__ . '/../../var/latte/temp');
         $this->setupLatteFilters();
     }

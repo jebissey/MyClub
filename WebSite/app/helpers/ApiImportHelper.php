@@ -2,7 +2,7 @@
 
 namespace app\helpers;
 
-class ApiImportHelper extends Data
+class ApiImportHelper
 {
     public function getHeadersFromCSV()
     {

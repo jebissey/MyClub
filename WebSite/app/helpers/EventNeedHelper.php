@@ -4,6 +4,11 @@ namespace app\helpers;
 
 class EventNeedHelper extends Data
 {
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
     public function needsForEvent($eventId)
     {
         return $this->fluent->from('EventNeed')

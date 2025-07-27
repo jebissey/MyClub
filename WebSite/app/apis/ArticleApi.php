@@ -17,6 +17,7 @@ class ArticleApi extends BaseApi
 
     public function __construct()
     {
+        parent::__construct();
         $this->media = new Media();
         $this->replyDataHelper = new ReplyDataHelper();
     }

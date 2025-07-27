@@ -4,6 +4,11 @@ namespace app\helpers;
 
 class DesignDataHelper extends Data
 {
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
     public function insertOrUpdate($data, $personId)
     {
         $designId = (int)$data['designId'] ?? 0;

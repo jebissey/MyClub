@@ -10,6 +10,7 @@ class AuthorizationDataHelper extends Data
 
     public function __construct()
     {
+        parent::__construct();
         $this->authorizations = new AuthorizationDataHelper();
     }
 

@@ -4,6 +4,11 @@ namespace app\helpers;
 
 class PersonStatistics extends Data
 {
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
     public function getStats($person, $seasonStart, $seasonEnd, $isWebmaster)
     {
         $stats = [

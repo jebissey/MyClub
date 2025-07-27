@@ -4,6 +4,11 @@ namespace app\helpers;
 
 class ImportDataHelper extends Data
 {
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
     public function getResults($headerRow, $mapping, $foundEmails)
     {
         $results = [

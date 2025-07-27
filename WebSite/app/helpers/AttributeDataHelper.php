@@ -6,6 +6,11 @@ use Throwable;
 
 class AttributeDataHelper extends Data
 {
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
     public function delete_($id)
     {
         try {

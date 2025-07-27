@@ -22,6 +22,7 @@ class ArticleController extends TableController
 
     public function __construct()
     {
+        parent::__construct();
         $this->articleCrosstab = new ArticleCrosstab();
         $this->articleDataHelper = new ArticleDataHelper();
         $this->articleTableData = new ArticleTableData();

@@ -16,6 +16,7 @@ class LogDataHelper extends Data
 
     public function __construct()
     {
+        parent::__construct();
         $this->host = Application::$root . '%';
         $this->pdoForLog = $this->application->getPdoForLog();
     }

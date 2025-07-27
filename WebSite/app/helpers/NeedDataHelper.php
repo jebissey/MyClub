@@ -5,6 +5,11 @@ namespace app\helpers;
 
 class NeedDataHelper extends Data
 {
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
     public function getNeedsAndTheirTypes()
     {
         return $this->fluent

@@ -8,6 +8,11 @@ abstract class TableController extends BaseController
 {
     protected int $itemsPerPage = 10;
 
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
     protected function prepareTableData($query, $filters = [], $page = 1): array
     {
         foreach ($filters as $key => $value) {

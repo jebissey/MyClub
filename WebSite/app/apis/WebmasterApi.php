@@ -16,6 +16,7 @@ class WebmasterApi extends BaseApi
 
     public function __construct()
     {
+        parent::__construct();
         $this->pageDataHelper = new PageDataHelper();
         $this->personGroupDataHelper = new PersonGroupDataHelper();
     }

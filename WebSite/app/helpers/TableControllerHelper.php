@@ -4,6 +4,11 @@ namespace app\helpers;
 
 class TableControllerHelper extends Data
 {
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
     public function getEventTypesQuery()
     {
         return $this->fluent->from('EventType')

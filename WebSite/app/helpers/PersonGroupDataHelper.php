@@ -4,6 +4,11 @@ namespace app\helpers;
 
 class PersonGroupDataHelper extends Data
 {
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
     public function add($personId, $groupId): int
     {
         return $this->fluent->insertInto('PersonGroup', [

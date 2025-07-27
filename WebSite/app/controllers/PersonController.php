@@ -3,7 +3,9 @@
 namespace app\controllers;
 
 use app\helpers\Application;
+use app\helpers\AuthorizationDataHelper;
 use app\helpers\GroupDataHelper;
+use app\helpers\SettingsDataHelper;
 use app\helpers\TableControllerHelper;
 use app\helpers\Webapp;
 
@@ -24,8 +26,8 @@ class PersonController extends TableController implements CrudControllerInterfac
     {
         if ($this->personDataHelper->getPerson(['PersonManager', 'Webmaster'])) {
             $this->render('app/views/info.latte', [
-                'content' => $this->application->getSettings()->get('Help_personManager'),
-                'hasAuthorization' => $this->application->getAuthorizations()->hasAutorization(),
+                'content' => (new SettingsDataHelper())->get('Help_personManager'),
+                'hasAuthorization' => (new AuthorizationDataHelper())->hasAutorization(),
                 'currentVersion' => Application::getVersion()
             ]);
         } else $this->application->error403(__FILE__, __LINE__);

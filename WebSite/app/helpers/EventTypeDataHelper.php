@@ -4,6 +4,11 @@ namespace app\helpers;
 
 class EventTypeDataHelper extends Data
 {
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
     public function getsFor($personId): array
     {
         $query = $this->pdo->prepare("

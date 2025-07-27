@@ -4,6 +4,11 @@ namespace app\helpers;
 
 class PageDataHelper extends Data
 {
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
     public function del($id)
     {
         return $this->fluent->deleteFrom('Page')->where('Id', $id)->execute();

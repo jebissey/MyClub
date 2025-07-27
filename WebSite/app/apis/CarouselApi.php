@@ -15,6 +15,7 @@ class CarouselApi extends BaseApi
 
     public function __construct()
     {
+        parent::__construct();
         $this->authorizationDataHelper = new AuthorizationDataHelper;
         $this->carouselHelper = new carouselHelper();
     }

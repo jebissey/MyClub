@@ -4,6 +4,11 @@ namespace app\helpers;
 
 class ReplyDataHelper extends Data
 {
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
     public function insertOrUpdate($personId, $surveyId,  $answers)
     {
         $existingReply = $this->fluent->from('Reply')

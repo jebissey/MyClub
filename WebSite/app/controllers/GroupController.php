@@ -11,6 +11,7 @@ class GroupController extends BaseController implements CrudControllerInterface
 
     public function __construct()
     {
+        parent::__construct();
         $this->groupDataHelper = new GroupDataHelper();
     }
 

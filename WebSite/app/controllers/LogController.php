@@ -13,6 +13,7 @@ class LogController extends BaseController
 
     public function __construct()
     {
+        parent::__construct();
         $this->logDataHelper = new LogDataHelper();
     }
 

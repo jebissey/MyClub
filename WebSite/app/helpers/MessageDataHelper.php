@@ -6,6 +6,11 @@ use Exception;
 
 class MessageDataHelper extends Data
 {
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
     public function addMessage($eventId, $personId, $text)
     {
         $messageId = $this->fluent->insertInto(

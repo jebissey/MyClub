@@ -11,6 +11,11 @@ class ImportController extends BaseController
     private $results;
     private array $foundEmails = [];
 
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
     private function loadSettings()
     {
         if (!$this->importSettings = json_decode((new SettingsDataHelper())->get_('ImportPersonParameters'), true)) {

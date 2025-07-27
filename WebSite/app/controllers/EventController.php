@@ -26,6 +26,7 @@ class EventController extends BaseController
 
     public function __construct()
     {
+        parent::__construct();
         $this->authorizationDatahelper = new AuthorizationDataHelper();
         $this->crosstab = new Crosstab();
         $this->eventDataHelper = new EventDataHelper();

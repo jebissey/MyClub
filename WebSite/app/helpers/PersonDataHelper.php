@@ -12,6 +12,7 @@ class PersonDataHelper extends Data
 
     public function __construct()
     {
+        parent::__construct();
         $this->authorizationDataHelper = new AuthorizationDataHelper();
     }
 
@@ -174,6 +175,41 @@ class PersonDataHelper extends Data
             ];
         }
         return $news;
+    }
+
+    public function getPersonWantedToBeAlerted($idArticle): array
+    {
+        $idGroup = $this->fluent->from('Article')->where('Id', $idArticle)->fetch('IdGroup');
+        $idSurvey = $this->fluent->from('Survey')->where('IdArticle', $idArticle)->fetch('Id');
+        $persons = (new PersonDataHelper())->getPersonsInGroup($idGroup);
+        $filteredEmails = [];
+        foreach ($persons as $person) {
+            $include = false;
+            if ($person->Preferences ?? '' != '') {
+                $preferences = json_decode($person->Preferences ?? '', true);
+                if ($preferences != '' && isset($preferences['eventTypes']['newArticle'])) {
+                    if (isset($preferences['eventTypes']['newArticle']['pollOnly'])) {
+                        if ($idSurvey) {
+                            $include = true;
+                        }
+                    } else {
+                        $include = true;
+                    }
+                }
+            }
+            if ($include) {
+                $filteredEmails[] = $person->Email;
+                $this->fluent->insertInto('Message')
+                    ->values([
+                        'EventId' => null,
+                        'PersonId' => $person->Id,
+                        'Text' =>  "New article \n\n /articles/" . $idArticle,
+                        '"From"' => 'Webapp'
+                    ])
+                    ->execute();
+            }
+        }
+        return $filteredEmails;
     }
 
     #region Private functions

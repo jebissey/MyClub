@@ -32,14 +32,12 @@ if ($_SERVER['SERVER_NAME'] === 'localhost')
     Debugger::enable(Debugger::Development, __DIR__ . '/var/tracy/log');
 else Debugger::enable(Debugger::Production, __DIR__ . '/var/tracy/log');
 
-
+$flight = new Application()::getFlight();
 
 // Add a custom URL parser to fix issue with URL with encoded email address
 $flight->map('pass', function ($str) {
     return $str;
 });
-
-$flight = Application::getFlight();
 $flight->before('start', function () {
     session_start();
     if (!isset($_SESSION['token'])) $_SESSION['token'] = bin2hex(random_bytes(32));
@@ -53,6 +51,7 @@ $flight->map('getData', function ($key) {
 
 #region web
 $articleController = new ArticleController($flight);
+die;
 $flight->route('GET  /articles', function () use ($articleController) {
     $articleController->index();
 });

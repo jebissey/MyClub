@@ -8,6 +8,11 @@ use app\helpers\Period;
 
 class Crosstab extends Data
 {
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
     public function generateCrosstab($sql, $params = [], $rowsTitle = 'Lignes', $columnsTitle = 'Colonnes', $fetchMode = PDO::FETCH_ASSOC)
     {
         $stmt = $this->pdo->prepare($sql);

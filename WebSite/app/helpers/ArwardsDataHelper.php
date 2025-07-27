@@ -4,6 +4,11 @@ namespace app\helpers;
 
 class ArwardsDataHelper extends Data
 {
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
     public function getData($counterNames)
     {
         $query = $this->pdo->query('
