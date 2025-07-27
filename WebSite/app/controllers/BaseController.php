@@ -7,7 +7,7 @@ use flight\Engine;
 use Latte\Engine as LatteEngine;
 
 use app\helpers\Application;
-use app\helpers\Client;
+use app\helpers\AuthorizationDataHelper;
 use app\helpers\DataHelper;
 use app\helpers\LanguagesDataHelper;
 use app\helpers\PageDataHelper;
@@ -27,7 +27,7 @@ abstract class BaseController
     protected PageDataHelper $pageDataHelper;
     protected PersonDataHelper $personDataHelper;
 
-    public function __construct(Engine $flight)
+    public function __construct()
     {
         $this->application = Application::getInstance();
         $this->dataHelper = new DataHelper();
@@ -35,46 +35,16 @@ abstract class BaseController
         $this->pageDataHelper = new PageDataHelper();
         $this->personDataHelper = new PersonDataHelper();
 
-        $this->flight = $flight;
-        $this->latte = $this->application->getLatte();
+        $this->flight = Application::getFlight();
+        $this->latte = Application::getLatte();
         $this->addLatteFilters();
-    }
-
-    public function log(string $code = '', string $message = ''): void
-    {
-        try {
-            $email = filter_var($_SESSION['user'] ?? '', FILTER_VALIDATE_EMAIL);
-            $client = new Client();
-            $pdoForLog = $this->application->getPdoForLog();
-
-            $stmt = $pdoForLog->prepare("
-                INSERT INTO Log (IpAddress, Referer, Os, Browser, ScreenResolution, Type, Uri, Token, Who, Code, Message, CreatedAt) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))
-            ");
-
-            $stmt->execute([
-                $client->getIp(),
-                $client->getReferer(),
-                $client->getOs(),
-                $client->getBrowser(),
-                $client->getScreenResolution(),
-                $client->getType(),
-                $client->getUri(),
-                $client->getToken(),
-                $email ?: 'anonymous',
-                $code,
-                $message
-            ]);
-        } catch (\Exception $e) {
-            error_log("Failed to log: " . $e->getMessage());
-        }
     }
 
     #region Protected fucntions
     protected function getNavItems($person, $all = false)
     {
         if (!$person) $userGroups = [];
-        else $userGroups = $this->application->getAuthorizations()->getUserGroups($person->Email);
+        else $userGroups = (new AuthorizationDataHelper())->getUserGroups($person->Email);
 
         $navItems = $this->dataHelper->gets('Page');
         $filteredNavItems = [];

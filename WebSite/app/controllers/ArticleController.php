@@ -5,6 +5,7 @@ namespace app\controllers;
 use app\helpers\ArticleCrosstab;
 use app\helpers\ArticleDataHelper;
 use app\helpers\ArticleTableData;
+use app\helpers\AuthorizationDataHelper;
 use app\helpers\Backup;
 use app\helpers\CarouselHelper;
 use app\helpers\Period;
@@ -16,6 +17,7 @@ class ArticleController extends TableController
     private ArticleCrosstab $articleCrosstab;
     private ArticleDataHelper $articleDataHelper;
     private ArticleTableData $articleTableData;
+    private AuthorizationDataHelper $authorizationDatahelper;
     private CarouselHelper $carouselHelper;
 
     public function __construct()
@@ -23,6 +25,7 @@ class ArticleController extends TableController
         $this->articleCrosstab = new ArticleCrosstab();
         $this->articleDataHelper = new ArticleDataHelper();
         $this->articleTableData = new ArticleTableData();
+        $this->authorizationDatahelper = new AuthorizationDataHelper();
         $this->carouselHelper = new CarouselHelper();
     }
 
@@ -59,7 +62,7 @@ class ArticleController extends TableController
             ['name' => 'GroupName', 'label' => 'Groupe'],
             ['name' => 'Content', 'label' => 'Contenu'],
         ];
-        if ($this->application->getAuthorizations()->isEditor()) {
+        if ($this->authorizationDatahelper->isEditor()) {
             $filterConfig[] = ['name' => 'published', 'label' => 'Publié'];
         }
         $columns = [
@@ -71,7 +74,7 @@ class ArticleController extends TableController
             ['field' => 'Pool', 'label' => 'Sondage'],
             ['field' => 'PoolDetail', 'label' => 'Cloture (votes) visibilité'],
         ];
-        if ($this->application->getAuthorizations()->isEditor()) {
+        if ($this->authorizationDatahelper->isEditor()) {
             $columns[] = ['field' => 'Published', 'label' => 'Publié'];
         }
         $query = $this->articleTableData->getQuery($person);
@@ -84,7 +87,7 @@ class ArticleController extends TableController
             'filters' => $filterConfig,
             'columns' => $columns,
             'resetUrl' => '/articles',
-            'isRedactor' => $person ? $this->application->getAuthorizations()->isRedactor() : false,
+            'isRedactor' => $person ? $this->authorizationDatahelper->isRedactor() : false,
             'userConnected' => $person,
             'layout' => WebApp::getLayout(),
             'navItems' => $this->getNavItems($person),
@@ -94,7 +97,7 @@ class ArticleController extends TableController
     public function show($id): void
     {
         $person = $this->personDataHelper->getPerson();
-        $article = $this->application->getAuthorizations()->getArticle($id, $person);
+        $article = $this->authorizationDatahelper->getArticle($id, $person);
         if ($article) {
             $articleIds = $this->articleDataHelper->getArticleIdsBasedOnAccess($person->Email ?? null);
             $chosenArticle = $this->articleDataHelper->getLatestArticle([$id]);
@@ -117,12 +120,12 @@ class ArticleController extends TableController
                 'latestArticles' => $this->articleDataHelper->getLatestArticles_($articleIds),
                 'canEdit' => $canEdit,
                 'groups' => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
-                'hasSurvey' =>  (new SurveyDataHelper())->articleHasSurvey($id),
+                'hasSurvey' => (new SurveyDataHelper())->articleHasSurvey($id),
                 'id' => $id,
                 'userConnected' => $person,
                 'navItems' => $this->getNavItems($person),
                 'publishedBy' => $chosenArticle->PublishedBy && $chosenArticle->PublishedBy != $chosenArticle->CreatedBy ? $this->personDataHelper->getPublisher($chosenArticle->PublishedBy) : '',
-                'canReadPool' => $this->application->getAuthorizations()->canPersonReadSurveyResults($chosenArticle, $person),
+                'canReadPool' => $this->authorizationDatahelper->canPersonReadSurveyResults($chosenArticle, $person),
                 'carouselItems' => $this->carouselHelper->getsForArticle($id),
                 'message' => $messages,
             ]));
@@ -169,7 +172,7 @@ class ArticleController extends TableController
         if ($person = $this->personDataHelper->getPerson(['Editor'])) {
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $article = $this->articleDataHelper->getLatestArticle([$id]);
-                if (!$article || ($person->Id != $article->CreatedBy && !$this->application->getAuthorizations()->isEditor())) {
+                if (!$article || ($person->Id != $article->CreatedBy && !$this->authorizationDatahelper->isEditor())) {
                     $this->application->error403(__FILE__, __LINE__);
                     return;
                 }

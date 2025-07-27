@@ -2,7 +2,7 @@
 
 namespace app\helpers;
 
-use Exception;
+use Throwable;
 
 class ApiNeedDataHelper extends Data
 {
@@ -18,7 +18,7 @@ class ApiNeedDataHelper extends Data
             try {
                 $this->fluent->deleteFrom('Need')->where('Id', $id)->execute();
                 return [['success' => true], 200];
-            } catch (Exception $e) {
+            } catch (Throwable $e) {
                 return [['success' => false, 'message' => 'Erreur lors de la suppression: ' . $e->getMessage()], 500];
             }
         }
@@ -30,7 +30,7 @@ class ApiNeedDataHelper extends Data
             if ($id) $this->fluent->update('Need')->set($needData)->where('Id', $id)->execute();
             else $id = $this->fluent->insertInto('Need')->values($needData)->execute();
             return [['success' => true, 'id' => $id], 200];
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             return [['success' => false, 'message' => 'Save error: ' . $e->getMessage()], 500];
         }
     }

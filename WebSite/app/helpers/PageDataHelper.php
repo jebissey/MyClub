@@ -77,7 +77,7 @@ class PageDataHelper extends Data
             return false;
         }
         if (!$person) return false;
-        $userGroups = $this->application->getAuthorizations()->getUserGroups($person->Email);
+        $userGroups = (new AuthorizationDataHelper())->getUserGroups($person->Email);
         return in_array($pageData->IdGroup, $userGroups);
     }
 }

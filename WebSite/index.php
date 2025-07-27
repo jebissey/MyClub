@@ -26,15 +26,12 @@ use app\controllers\SurveyController;
 use app\controllers\UserController;
 use app\controllers\WebmasterController;
 use app\helpers\Application;
-
+use app\helpers\LogDataHelper;
 
 if ($_SERVER['SERVER_NAME'] === 'localhost')
     Debugger::enable(Debugger::Development, __DIR__ . '/var/tracy/log');
-else
-    Debugger::enable(Debugger::Production, __DIR__ . '/var/tracy/log');
+else Debugger::enable(Debugger::Production, __DIR__ . '/var/tracy/log');
 
-$application = new Application();
-$flight = $this->application-> getFlight();
 
 
 // Add a custom URL parser to fix issue with URL with encoded email address
@@ -42,7 +39,7 @@ $flight->map('pass', function ($str) {
     return $str;
 });
 
-
+$flight = Application::getFlight();
 $flight->before('start', function () {
     session_start();
     if (!isset($_SESSION['token'])) $_SESSION['token'] = bin2hex(random_bytes(32));
@@ -55,31 +52,23 @@ $flight->map('getData', function ($key) {
 });
 
 #region web
-$application = Application::getInstance();
-$flight->route('/help',         function () use ($application) {
-    $application->help();
-});
-$flight->route('/legal/notice', function () use ($application) {
-    $application->legalNotice();
-});
-
 $articleController = new ArticleController($flight);
-$flight->route('GET  /articles',            function ()    use ($articleController) {
+$flight->route('GET  /articles', function () use ($articleController) {
     $articleController->index();
 });
-$flight->route('GET  /articles/create',     function ()    use ($articleController) {
+$flight->route('GET  /articles/create', function () use ($articleController) {
     $articleController->create();
 });
-$flight->route('GET  /articles/crosstab',   function ()    use ($articleController) {
+$flight->route('GET  /articles/crosstab', function () use ($articleController) {
     $articleController->showArticleCrosstab();
 });
 $flight->route('GET  /articles/delete/@id', function ($id) use ($articleController) {
     $articleController->delete($id);
 });
-$flight->route('GET  /articles/@id',        function ($id) use ($articleController) {
+$flight->route('GET  /articles/@id', function ($id) use ($articleController) {
     $articleController->show($id);
 });
-$flight->route('POST /articles/@id',        function ($id) use ($articleController) {
+$flight->route('POST /articles/@id', function ($id) use ($articleController) {
     $articleController->update($id);
 });
 $flight->route('GET  /publish/article/@id', function ($id) use ($articleController) {
@@ -88,7 +77,7 @@ $flight->route('GET  /publish/article/@id', function ($id) use ($articleControll
 $flight->route('POST /publish/article/@id', function ($id) use ($articleController) {
     $articleController->publish($id);
 });
-$flight->route('GET  /redactor',            function ()    use ($articleController) {
+$flight->route('GET  /redactor', function () use ($articleController) {
     $articleController->home();
 });
 
@@ -340,8 +329,14 @@ $flight->route('GET  /surveys/results/@id', function ($id) use ($surveyControlle
 });
 
 $userController = new UserController($flight);
+$flight->route('/help',         function () use ($userController) {
+    $userController->helpHome();
+});
 $flight->route('GET  /', function () use ($userController) {
     $userController->home();
+});
+$flight->route('/legal/notice', function () use ($userController) {
+    $userController->legalNotice();
 });
 $flight->route('GET  /user', function () use ($userController) {
     $userController->user();
@@ -595,13 +590,15 @@ $flight->route('/*', function () use ($applicationHelper) {
     $applicationHelper->error404();
 });
 
-$flight->map('error', function (Throwable $ex) use ($userController, $applicationHelper) {
-    $userController->log(500, 'Internal error: ' . $ex->getMessage() . ' in file ' . $ex->getFile() . ' at line' . $ex->getLine());
+$logDataHelper = new LogDataHelper();
+$flight->map('error', function (Throwable $ex) use ($logDataHelper, $applicationHelper) {
+    $logDataHelper->add(500, 'Internal error: ' . $ex->getMessage() . ' in file ' . $ex->getFile() . ' at line' . $ex->getLine());
     $applicationHelper->error500($ex->getMessage(), $ex->getFile(), $ex->getLine());
 });
-$flight->after('start', function () use ($userController) {
-    $userController->log(Flight::getData('code'), Flight::getData('message'));
+$flight->after('start', function () use ($logDataHelper) {
+    $logDataHelper->add(Flight::getData('code'), Flight::getData('message'));
 });
+
 $flight->start();
 
 function serveFile($filename, $applicationHelper, $ContentType = "'Content-Type', 'image/png'"): void

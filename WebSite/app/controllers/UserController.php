@@ -3,7 +3,9 @@
 namespace app\controllers;
 
 use flight\Engine;
+
 use app\helpers\Application;
+use app\helpers\AuthorizationDataHelper;
 use app\helpers\ArticleDataHelper;
 use app\helpers\AttributeDataHelper;
 use app\helpers\DesignDataHelper;
@@ -16,6 +18,7 @@ use app\helpers\Params;
 use app\helpers\Password;
 use app\helpers\PersonGroupDataHelper;
 use app\helpers\PersonStatistics;
+use app\helpers\SettingsDataHelper;
 use app\helpers\Sign;
 use app\helpers\SurveyDataHelper;
 use app\helpers\TranslationManager;
@@ -24,7 +27,9 @@ use app\helpers\Webapp;
 class UserController extends BaseController
 {
     private ArticleDataHelper $articleDataHelper;
+    private AuthorizationDataHelper $authorizationDatahelper;
     private Email $email;
+    private SettingsDataHelper $settingsDataHelper;
     private Sign $sign;
     private SurveyDataHelper $surveyDataHelper;
 
@@ -32,7 +37,9 @@ class UserController extends BaseController
     {
         parent::__construct($flight);
         $this->articleDataHelper = new ArticleDataHelper();
+        $this->authorizationDatahelper = new AuthorizationDataHelper();
         $this->email = new Email();
+        $this->settingsDataHelper = new SettingsDataHelper();
         $this->sign = new Sign($this->dataHelper, $this->personDataHelper, $this->application);
         $this->surveyDataHelper = new SurveyDataHelper();
     }
@@ -98,13 +105,33 @@ class UserController extends BaseController
 
     public function signOut()
     {
-        $this->log(200, 'Sign out succeeded with with ' . $_SESSION['user'] ?? '');
+        (new LogDataHelper())->add(200, 'Sign out succeeded with with ' . $_SESSION['user'] ?? '');
         $this->dataHelper->set('Person',  ['LastSignOut' => date('Y-m-d H:i:s')], ['Email COLLATE NOCASE' . $_SESSION['user'] => null]);
         unset($_SESSION['user']);
         $_SESSION['navbar'] = '';
         $this->flight->redirect('/');
     }
     #endregion
+
+    public function helpHome(): void
+    {
+        $content = $this->application->getLatte()->latte->renderToString('app/views/info.latte', [
+            'content' => $this->settingsDataHelper->get_('Help_home'),
+            'hasAuthorization' => $this->authorizationDatahelper->hasAutorization(),
+            'currentVersion' => $this->application->getVersion()
+        ]);
+        echo $content;
+    }
+
+    public function legalNotice(): void
+    {
+        $content = $this->application->getLatte()->latte->renderToString('app/views/info.latte', [
+            'content' => $this->settingsDataHelper->get_('LegalNotices'),
+            'hasAuthorization' => $this->authorizationDatahelper->hasAutorization(),
+            'currentVersion' => $this->application->getVersion()
+        ]);
+        echo $content;
+    }
 
     public function home()
     {
@@ -156,8 +183,8 @@ class UserController extends BaseController
         $this->render('app/views/home.latte', $this->params->getAll([
             'latestArticle' => $latestArticle,
             'latestArticles' => $articles['latestArticles'],
-            'greatings' => $this->application->getSettings()->get_('Greatings'),
-            'link' => $this->application->getSettings()->get_('Link'),
+            'greatings' => $this->settingsDataHelper->get_('Greatings'),
+            'link' => $this->settingsDataHelper->get_('Link'),
             'navItems' => $this->getNavItems($person),
             'publishedBy' => $articles['latestArticle']
                 && $articles['latestArticle']->PublishedBy != $articles['latestArticle']->CreatedBy ? $this->personDataHelper->getPublisher($articles['latestArticle']->PublishedBy) : '',
@@ -295,8 +322,8 @@ class UserController extends BaseController
     {
         if ($this->personDataHelper->getPerson()) {
             $this->render('app/views/info.latte', $this->params->getAll([
-                'content' => $this->application->getSettings()->get_('Help_user'),
-                'hasAuthorization' => $this->application->getAuthorizations()->hasAutorization(),
+                'content' => $this->settingsDataHelper->get_('Help_user'),
+                'hasAuthorization' => $this->authorizationDatahelper->hasAutorization(),
                 'currentVersion' => Application::getVersion()
             ]));
         } else $this->application->error403(__FILE__, __LINE__);
@@ -322,7 +349,7 @@ class UserController extends BaseController
             elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) $errors[] = 'L\'email n\'est pas valide.';
             if (empty($message)) $errors[] = 'Le message est requis.';
             if (empty($errors)) {
-                $adminEmail = $this->application->getSettings()->get_('contactEmail');
+                $adminEmail = $this->settingsDataHelper->get_('contactEmail');
                 if (!filter_var($adminEmail, FILTER_VALIDATE_EMAIL)) {
                     $this->application->error500('Invalid contactEmmail', __FILE__, __LINE__);
                     return;
@@ -396,7 +423,7 @@ class UserController extends BaseController
             $personalStatistics = new PersonStatistics();
             $season = $personalStatistics->getSeasonRange();
             $this->render('app/views/user/statistics.latte', $this->params->getAll([
-                'stats' => $personalStatistics->getStats($person, $season['start'], $season['end'], $this->application->getAuthorizations()->isWebmaster()),
+                'stats' => $personalStatistics->getStats($person, $season['start'], $season['end'], $this->authorizationDatahelper->isWebmaster()),
                 'seasons' => $personalStatistics->getAvailableSeasons(),
                 'currentSeason' => $season,
                 'navItems' => $this->getNavItems($person),

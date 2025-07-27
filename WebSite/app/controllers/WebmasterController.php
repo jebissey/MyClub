@@ -5,17 +5,29 @@ namespace app\controllers;
 use app\helpers\Application;
 use app\helpers\ArticleDataHelper;
 use app\helpers\ArwardsDataHelper;
+use app\helpers\AuthorizationDataHelper;
+use app\helpers\SettingsDataHelper;
 use app\helpers\Webapp;
 
 class WebmasterController extends BaseController
 {
+    private AuthorizationDataHelper $authorizationDatahelper;
+    private SettingsDataHelper $settingsDataHelper;
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->authorizationDatahelper = new AuthorizationDataHelper();
+        $this->settingsDataHelper = new SettingsDataHelper();
+    }
+
     public function helpWebmaster(): void
     {
         $this->personDataHelper->getPerson();
 
         $this->render('app/views/info.latte', [
-            'content' => $this->application->getSettings()->get('Help_webmaster'),
-            'hasAuthorization' => $this->application->getAuthorizations()->isEventManager(),
+            'content' => $this->settingsDataHelper->get('Help_webmaster'),
+            'hasAuthorization' => $this->authorizationDatahelper->isEventManager(),
             'currentVersion' => Application::getVersion()
         ]);
     }
@@ -25,8 +37,8 @@ class WebmasterController extends BaseController
         if ($this->personDataHelper->getPerson(['EventManager', 'PersonManager', 'Redactor', 'Webmaster'])) {
 
             $this->render('app/views/info.latte', $this->params->getAll([
-                'content' => $this->application->getSettings()->get('Help_admin'),
-                'hasAuthorization' => $this->application->getAuthorizations()->isEventManager(),
+                'content' => $this->settingsDataHelper->get('Help_admin'),
+                'hasAuthorization' => $this->authorizationDatahelper->isEventManager(),
                 'currentVersion' => $this->application->getVersion()
             ]));
         } else $this->application->error403(__FILE__, __LINE__);
@@ -52,13 +64,13 @@ class WebmasterController extends BaseController
     public function homeAdmin()
     {
         if ($this->personDataHelper->getPerson(['EventManager', 'PersonManager', 'Redactor', 'Webmaster'])) {
-            if ($this->application->getAuthorizations()->hasOnlyOneAutorization()) {
-                if ($this->application->getAuthorizations()->isEventManager())       $this->flight->redirect('/eventManager');
-                else if ($this->application->getAuthorizations()->isPersonManager()) $this->flight->redirect('/personManager');
-                else if ($this->application->getAuthorizations()->isRedactor()) {
+            if ($this->authorizationDatahelper->hasOnlyOneAutorization()) {
+                if ($this->authorizationDatahelper->isEventManager())       $this->flight->redirect('/eventManager');
+                else if ($this->authorizationDatahelper->isPersonManager()) $this->flight->redirect('/personManager');
+                else if ($this->authorizationDatahelper->isRedactor()) {
                     $_SESSION['navbar'] = 'redactor';
                     $this->flight->redirect('/articles');
-                } else if ($this->application->getAuthorizations()->isWebmaster())   $this->flight->redirect('/webmaster');
+                } else if ($this->authorizationDatahelper->isWebmaster())   $this->flight->redirect('/webmaster');
             } else if ($_SERVER['REQUEST_METHOD'] === 'GET') $this->render('app/views/admin/admin.latte', $this->params->getAll([]));
             else $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
         } else $this->application->error403(__FILE__, __LINE__);
@@ -172,17 +184,14 @@ class WebmasterController extends BaseController
     private function getFirstElement($html)
     {
         $htmlSansImages = preg_replace('/<img[^>]*>/i', '', $html);
-        if (preg_match('/<p[^>]*>(.*?)<\/p>/is', $htmlSansImages, $matches)) {
-            $text = strip_tags($matches[1]);
-        } else {
+        if (preg_match('/<p[^>]*>(.*?)<\/p>/is', $htmlSansImages, $matches)) $text = strip_tags($matches[1]);
+        else {
             $text = strip_tags($htmlSansImages);
             $text = trim($text);
         }
 
         $maxLength = 200;
-        if (mb_strlen($text) > $maxLength) {
-            $text = mb_substr($text, 0, $maxLength) . '...';
-        }
+        if (mb_strlen($text) > $maxLength) $text = mb_substr($text, 0, $maxLength) . '...';
         return htmlspecialchars($text, ENT_XML1 | ENT_QUOTES, 'UTF-8');
     }
 

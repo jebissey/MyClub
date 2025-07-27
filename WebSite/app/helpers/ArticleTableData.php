@@ -41,7 +41,7 @@ class ArticleTableData extends Data
             ->groupBy('Article.Id');
 
         if ($person) {
-            if (!$this->application->getAuthorizations()->isEditor()) {
+            if (!(new AuthorizationDataHelper())->isEditor()) {
                 $query = $query->where('(Article.CreatedBy = ' . $person->Id . '
                     OR (Article.PublishedBy IS NOT NULL 
                         AND (Article.IdGroup IS NULL OR Article.IdGroup IN (SELECT IdGroup FROM PersonGroup WHERE IdPerson = ' . $person->Id . '))

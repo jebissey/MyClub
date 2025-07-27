@@ -2,13 +2,13 @@
 
 namespace app\helpers;
 
-use Exception;
+use Throwable;
 
 class GroupDataHelper extends Data
 {
     public function getAvailableGroups($personId)
     {
-        if ($this->application->getAuthorizations()->isWebmaster()) {
+        if ((new AuthorizationDataHelper())->isWebmaster()) {
             $query = $this->pdo->prepare("
                     SELECT 
                         g.Id,
@@ -59,7 +59,7 @@ class GroupDataHelper extends Data
                 WHERE g.Inactivated = 0 AND g.Id <> 1
 				GROUP BY g.Name
             ";
-        if ($this->application->getAuthorizations()->isWebmaster()) $availableGroupsQuery = $availableGroupsWithAuthorisationQuery;
+        if ((new AuthorizationDataHelper())->isWebmaster()) $availableGroupsQuery = $availableGroupsWithAuthorisationQuery;
         else                                                        $availableGroupsQuery = $availableGroupsWithoutAuthorisationQuery;
         $availableGroupsLeftQuery = $this->pdo->prepare("
                 SELECT availableGroups.*
@@ -102,8 +102,9 @@ class GroupDataHelper extends Data
 
     public function getGroupsWithAuthorizations(): array|false
     {
+        $autorizationDataHelper = new AuthorizationDataHelper;
         $having = '';
-        if ($this->application->getAuthorizations()->isPersonManager() && !$this->application->getAuthorizations()->isWebmaster()) {
+        if ($autorizationDataHelper->isPersonManager() && !$autorizationDataHelper->isWebmaster()) {
             $having = "HAVING Authorizations IS NULL";
         }
         $sql = "
@@ -151,7 +152,7 @@ class GroupDataHelper extends Data
             }
             $this->pdo->commit();
             $this->application->getFlight()->redirect('/groups');
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             $this->pdo->rollBack();
             throw $e;
         }
@@ -178,7 +179,7 @@ class GroupDataHelper extends Data
             }
             $this->pdo->commit();
             $this->application->getFlight()->redirect('/groups');
-        } catch (\Exception $e) {
+        } catch (Throwable $e) {
             $this->pdo->rollBack();
             throw $e;
         }

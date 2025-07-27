@@ -3,31 +3,32 @@
 namespace app\controllers;
 
 use DateTime;
-use Exception;
+use Throwable;
+
 use app\helpers\Application;
+use app\helpers\AuthorizationDataHelper;
 use app\helpers\Crosstab;
 use app\helpers\Email;
 use app\helpers\EventDataHelper;
-use app\helpers\MessagePersonHelper;
-use app\helpers\NeedHelper;
+use app\helpers\MessageDataHelper;
+use app\helpers\NeedDataHelper;
 use app\helpers\Params;
 use app\helpers\ParticipantDataHelper;
 use app\helpers\Period;
+use app\helpers\SettingsDataHelper;
 use app\helpers\Webapp;
 
 class EventController extends BaseController
 {
+    private AuthorizationDataHelper $authorizationDatahelper;
     private Crosstab $crosstab;
     private EventDataHelper $eventDataHelper;
-    private MessagePersonHelper $messagePersonHelper;
-    private NeedHelper $needHelper;
 
     public function __construct()
     {
+        $this->authorizationDatahelper = new AuthorizationDataHelper();
         $this->crosstab = new Crosstab();
         $this->eventDataHelper = new EventDataHelper();
-        $this->messagePersonHelper = new MessagePersonHelper();
-        $this->needHelper = new NeedHelper();
     }
 
     public function nextEvents(): void
@@ -181,7 +182,7 @@ class EventController extends BaseController
                     $emailFrom = $person->Email;
                     Email::send($emailFrom, $email, $subject, $body);
                     $this->guest('Invitation envoyée avec succès à ' . $email, 'success');
-                } catch (Exception $e) {
+                } catch (Throwable $e) {
                     $this->guest('Erreur lors de l\'envoi de l\'invitation. ' . $e->getMessage(), 'error');
                 }
             } else $this->guest();
@@ -210,7 +211,7 @@ class EventController extends BaseController
                 'eventNeeds' => $this->eventDataHelper->getEventNeeds($eventId),
                 'participantSupplies' => $this->eventDataHelper->getParticipantSupplies($eventId),
                 'userSupplies' => $this->eventDataHelper->getUserSupplies($eventId, $userEmail),
-                'isEventManager' => $this->application->getAuthorizations()->isEventManager(),
+                'isEventManager' => $this->authorizationDatahelper->isEventManager(),
                 'token' => isset($_GET['t']) ? $_GET['t'] : false,
                 'message' => $message,
                 'messageType' => $messageType,
@@ -308,8 +309,8 @@ class EventController extends BaseController
         $this->personDataHelper->getPerson();
 
         $this->render('app/views/info.latte', [
-            'content' => $this->application->getSettings()->get('Help_eventManager'),
-            'hasAuthorization' => $this->application->getAuthorizations()->hasAutorization(),
+            'content' => (new SettingsDataHelper())->get('Help_eventManager'),
+            'hasAuthorization' => $this->authorizationDatahelper->hasAutorization(),
             'currentVersion' => Application::getVersion()
         ]);
     }
@@ -332,7 +333,7 @@ class EventController extends BaseController
             $this->render('app/views/event/needs.latte', $this->params->getAll([
                 'navItems' => $this->getNavItems($person),
                 'needTypes' => $this->dataHelper->gets('NeedType', [], '*', 'Name'),
-                'needs' => $this->needHelper->getNeedsAndTheirTypes(),
+                'needs' => (new NeeddataHelper())->getNeedsAndTheirTypes(),
             ]));
         } else $this->application->error403(__FILE__, __LINE__);
     }
@@ -346,7 +347,7 @@ class EventController extends BaseController
                 return;
             }
             $creator = $this->dataHelper->get('Person', ['Id', $event->CreatedBy]);
-            $messages = $this->messagePersonHelper->getEventMessages($eventId);
+            $messages = (new MessageDataHelper())->getEventMessages($eventId);
 
             $this->render('app/views/event/chat.latte', $this->params->getAll([
                 'event' => $event,

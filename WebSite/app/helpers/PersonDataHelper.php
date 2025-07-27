@@ -8,6 +8,13 @@ use app\helpers\TranslationManager;
 
 class PersonDataHelper extends Data
 {
+    private AuthorizationDataHelper $authorizationDataHelper;
+
+    public function __construct()
+    {
+        $this->authorizationDataHelper = new AuthorizationDataHelper();
+    }
+
     public function getPersonsInGroup(int $idGroup, bool $everybodyIfNoGroup = false): array
     {
         $innerJoin = $and = '';
@@ -59,7 +66,7 @@ class PersonDataHelper extends Data
             return false;
         }
 
-        $authorizations = $this->application->getAuthorizations()->getsFor($person->Id);
+        $authorizations = $this->authorizationDataHelper->getsFor($person->Id);
         if ($requiredAuthorisations != [] && empty(array_intersect($authorizations, $requiredAuthorisations))) {
             $this->application->error403(__FILE__, __LINE__);
             return false;
@@ -71,11 +78,11 @@ class PersonDataHelper extends Data
             'userImg' => $this->getUserImg($person),
             'userEmail' => $person->Email,
             'keys' => count($authorizations) > 0,
-            'isEventManager' => $this->application->getAuthorizations()->isEventManager(),
-            'isPersonManager' => $this->application->getAuthorizations()->isPersonManager(),
-            'isRedactor' => $this->application->getAuthorizations()->isRedactor(),
-            'isEditor' => $this->application->getAuthorizations()->isEditor(),
-            'isWebmaster' => $this->application->getAuthorizations()->isWebmaster(),
+            'isEventManager' => $this->authorizationDataHelper->isEventManager(),
+            'isPersonManager' => $this->authorizationDataHelper->isPersonManager(),
+            'isRedactor' => $this->authorizationDataHelper->isRedactor(),
+            'isEditor' => $this->authorizationDataHelper->isEditor(),
+            'isWebmaster' => $this->authorizationDataHelper->isWebmaster(),
             'page' => explode('/', trim(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/'))[$segment],
             'currentVersion' => Application::getVersion(),
             'currentLanguage' => $lang,
@@ -144,6 +151,30 @@ class PersonDataHelper extends Data
         return $query->fetchColumn();
     }
 
+    public function getPresentationNews($person, $searchFrom)
+    {
+        $presentations = $this->fluent->from('Person p')
+            ->select('p.id, p.email, p.firstname, p.lastname, p.PresentationLastUpdate')
+            ->where('p.InPresentationDirectory = 1')
+            ->where('p.PresentationLastUpdate >= ?', $searchFrom)
+            ->where('p.email != ?', $person->Email)
+            ->orderBy('p.PresentationLastUpdate DESC')
+            ->fetchAll();
+        $news = [];
+        foreach ($presentations as $presentation) {
+            $fullName = trim($presentation->FirstName . ' ' . $presentation->LastName);
+            if (empty($fullName)) $fullName = $presentation->email;
+
+            $news[] = [
+                'type' => 'presentation',
+                'id' => $presentation->Id,
+                'title' => 'Présentation de ' . $fullName,
+                'date' => $presentation->PresentationLastUpdate,
+                'url' => '/presentation/' . $presentation->Id
+            ];
+        }
+        return $news;
+    }
 
     #region Private functions
     private function getHref(string $userEmail): string

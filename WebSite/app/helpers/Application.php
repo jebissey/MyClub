@@ -2,9 +2,12 @@
 
 namespace app\helpers;
 
-use PDO;
 use flight\Engine;
 use Latte\Engine as LatteEngine;
+use PDO;
+use Throwable;
+
+use app\helpers\Database;
 
 class Application
 {
@@ -14,31 +17,22 @@ class Application
     private PDO $pdo;
     private PDO $pdoForLog;
     private Engine $flight;
-    private LatteEngine $latte;
-    private Authorization $authorizations;
-    private Settings $settings;
+    private static LatteEngine $latte;
     public static string $root;
 
     private function __construct()
     {
-        $database = \app\helpers\Database::getInstance();
+        $database = Database::getInstance();
         $this->pdo = $database->getPdo();
         $this->pdoForLog = $database->getPdoForLog();
         $this->flight = new Engine();
         $this->latte = new LatteEngine();
-        $this->authorizations = new Authorization();
-        $this->settings = new Settings();
         $this->root = 'https://' . $_SERVER['HTTP_HOST'];
     }
 
-    public function getAuthorizations(): Authorization
+    public static function getFlight(): Engine
     {
-        return $this->authorizations;
-    }
-
-    public function getFlight(): Engine
-    {
-        return $this->flight;
+        return self::$flight;
     }
 
     public static function getInstance(): self
@@ -49,9 +43,9 @@ class Application
         return self::$instance;
     }
 
-    public function getLatte(): LatteEngine
+    public static function getLatte(): LatteEngine
     {
-        return $this->latte;
+        return self::$latte;
     }
 
     public function getPdo(): PDO
@@ -64,34 +58,9 @@ class Application
         return $this->pdoForLog;
     }
 
-    public function getSettings(): Settings
-    {
-        return $this->settings;
-    }
-
     public static function getVersion(): string
     {
         return self::VERSION;
-    }
-
-    public function help(): void
-    {
-        $content = $this->latte->renderToString('app/views/info.latte', [
-            'content' => $this->settings->get_('Help_home'),
-            'hasAuthorization' => $this->authorizations->hasAutorization(),
-            'currentVersion' => self::VERSION
-        ]);
-        echo $content;
-    }
-
-    public function legalNotice(): void
-    {
-        $content = $this->latte->renderToString('app/views/info.latte', [
-            'content' => $this->settings->get_('LegalNotices'),
-            'hasAuthorization' => $this->authorizations->hasAutorization(),
-            'currentVersion' => self::VERSION
-        ]);
-        echo $content;
     }
 
     public function message(string $message, int $timeout = 5000, int $code = 200): void
@@ -215,9 +184,8 @@ class Application
                 $code,
                 $message
             ]);
-        } catch (\Exception $e) {
-            // En cas d'erreur lors du logging, on évite une boucle infinie
-            error_log("Failed to log error: " . $e->getMessage());
+        } catch (Throwable $e) {
+            die("Failed to log error: " . $e->getMessage() . ' in file ' . __FILE__ . ' at line ' . __LINE__);
         }
     }
 }

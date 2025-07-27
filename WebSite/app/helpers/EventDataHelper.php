@@ -4,8 +4,8 @@ namespace app\helpers;
 
 use DateInterval;
 use DateTime;
-use Exception;
 use PDO;
+use Throwable;
 
 use app\enums\EventAudience;
 use app\helpers\TranslationManager;
@@ -32,7 +32,7 @@ class EventDataHelper extends Data
             $this->fluent->deleteFrom('Event')->where('Id', $id)->execute();
             $this->pdo->commit();
             return [['success' => true], 200];
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             $this->pdo->rollBack();
             return [[
                 'success' => false,
@@ -75,7 +75,7 @@ class EventDataHelper extends Data
             }
             $this->pdo->commit();
             return ['success' => true, 'newEventId' => $newEventId];
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             $this->pdo->rollBack();
             return [['success' => false, 'message' => 'Erreur serveur : ' . $e->getMessage()], 500];
         }
@@ -316,6 +316,36 @@ class EventDataHelper extends Data
         return $stmt->fetchAll(PDO::FETCH_OBJ);
     }
 
+    public function getEventNews($person, $searchFrom)
+    {
+        $sql = "
+            SELECT e.Id, e.Summary, e.LastUpdate
+            FROM Event e
+            JOIN EventType et ON e.IdEventType = et.Id
+            LEFT JOIN PersonGroup pg ON et.IdGroup = pg.IdGroup AND pg.IdPerson = :personId
+            WHERE e.LastUpdate >= :searchFrom AND pg.Id IS NOT NULL
+            ORDER BY e.LastUpdate DESC
+        ";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([
+            ':personId'   => $person->Id,
+            ':searchFrom' => $searchFrom
+        ]);
+        $events = $stmt->fetchAll();
+        $news = [];
+        foreach ($events as $event) {
+            $news[] = [
+                'type' => 'event',
+                'id' => $event->Id,
+                'title' => $event->Summary,
+                'date' => $event->LastUpdate,
+                'url' => '/events/' . $event->Id
+            ];
+        }
+
+        return $news;
+    }
+
     public function getExistingAttibutes($id)
     {
         $existingAttributesQuery = $this->pdo->prepare('
@@ -391,7 +421,7 @@ class EventDataHelper extends Data
                 }
             }
             $this->pdo->commit();
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             $this->pdo->rollBack();
             throw $e;
         }
@@ -434,10 +464,12 @@ class EventDataHelper extends Data
                     ->execute();
             }
             return true;
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             throw $e;
         }
     }
+
+
 
     #region Private functions
     private function events($events): array

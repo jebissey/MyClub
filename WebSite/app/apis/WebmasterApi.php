@@ -2,7 +2,8 @@
 
 namespace app\apis;
 
-use Exception;
+use Throwable;
+
 use app\helpers\Application;
 use app\helpers\LogDataHelper;
 use app\helpers\PageDataHelper;
@@ -24,7 +25,7 @@ class WebmasterApi extends BaseApi
         if ($this->personDataHelper->getPerson(['PersonManager', 'Webmaster'])) {
             try {
                 $this->renderJson(['success' => $this->personGroupDataHelper->add($personId, $groupId)]);
-            } catch (Exception $e) {
+            } catch (Throwable $e) {
                 $this->renderJson(['error' => $e->getMessage()], 500);
             }
         } else $this->renderJson(['success' => false, 'message' => 'User not allowed'], 403);
@@ -37,7 +38,7 @@ class WebmasterApi extends BaseApi
                 try {
                     $users = $this->personDataHelper->getPersonsInGroup($id);
                     $this->renderJson($users);
-                } catch (Exception $e) {
+                } catch (Throwable $e) {
                     $this->renderJson(['error' => $e->getMessage()], 500);
                 }
             } else $this->renderJson(['success' => false, 'message' => 'Bad request method'], 470);
@@ -46,7 +47,7 @@ class WebmasterApi extends BaseApi
 
     public function lastVersion()
     {
-        (new LogDataHelper())->add();
+        (new LogDataHelper())->add(200, $_SERVER['HTTP_USER_AGENT']);
         $this->renderJson(['lastVersion' => Application::getVersion()]);
     }
 
@@ -55,7 +56,7 @@ class WebmasterApi extends BaseApi
         if ($this->personDataHelper->getPerson(['PersonManager', 'Webmaster'])) {
             try {
                 $this->renderJson(['success' => $this->personGroupDataHelper->del($personId, $groupId)]);
-            } catch (Exception $e) {
+            } catch (Throwable $e) {
                 $this->renderJson(['error' => $e->getMessage()], 500);
             }
         } else $this->renderJson(['success' => false, 'message' => 'User not allowed'], 403);
@@ -68,7 +69,7 @@ class WebmasterApi extends BaseApi
             try {
                 $result = $this->pageDataHelper->del($id);
                 $this->renderJson(['success' => $result == 1]);
-            } catch (Exception $e) {
+            } catch (Throwable $e) {
                 $this->renderJson(['error' => $e->getMessage()], 500);
             }
         } else $this->renderJson(['success' => false, 'message' => 'User not allowed'], 403);
@@ -79,7 +80,7 @@ class WebmasterApi extends BaseApi
         if ($this->personDataHelper->getPerson(['Webmaster'])) {
             try {
                 $this->renderJson(['success' => true, 'message' => $this->pageDataHelper->get_($id)]);
-            } catch (Exception $e) {
+            } catch (Throwable $e) {
                 $this->renderJson(['error' => $e->getMessage()], 500);
             }
         } else $this->renderJson(['success' => false, 'message' => 'User not allowed'], 403);
@@ -97,7 +98,7 @@ class WebmasterApi extends BaseApi
             try {
                 $this->pageDataHelper->insertOrUpdate($data);
                 $this->renderJson(['success' => true]);
-            } catch (Exception $e) {
+            } catch (Throwable $e) {
                 $this->renderJson(['error' => $e->getMessage()], 500);
             }
         } else $this->renderJson(['success' => false, 'message' => 'User not allowed'], 403);
@@ -110,7 +111,7 @@ class WebmasterApi extends BaseApi
             try {
                 $this->pageDataHelper->updates($data['positions']);
                 $this->renderJson(['success' => true]);
-            } catch (Exception $e) {
+            } catch (Throwable $e) {
                 $this->renderJson(['error' => $e->getMessage()], 500);
             }
         } else $this->renderJson(['success' => false, 'message' => 'User not allowed'], 403);

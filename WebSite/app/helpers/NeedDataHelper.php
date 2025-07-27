@@ -3,7 +3,7 @@
 namespace app\helpers;
 
 
-class NeedHelper extends Data
+class NeedDataHelper extends Data
 {
     public function getNeedsAndTheirTypes()
     {

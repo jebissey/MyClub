@@ -4,13 +4,13 @@ namespace app\helpers;
 
 use DateTime;
 
-class Authorization extends Data
+class AuthorizationDataHelper extends Data
 {
     private $authorizations;
 
     public function __construct()
     {
-        $this->authorizations = new Authorization();
+        $this->authorizations = new AuthorizationDataHelper();
     }
 
     public function getsFor($idPerson)

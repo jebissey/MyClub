@@ -48,4 +48,43 @@ class SurveyDataHelper extends Data
 
         return $this->pdo->query($query)->fetchAll();
     }
+
+    public function getSurveyNews($person, $searchFrom)
+    {
+        $sql = "
+            SELECT 
+                p.FirstName, 
+                p.LastName, 
+                s.Question, 
+                s.ClosingDate, 
+                s.Visibility, 
+                r.LastUpdate, 
+                s.IdArticle
+            FROM Reply r
+            JOIN Survey s ON s.Id = r.IdSurvey
+            JOIN Article a ON a.Id = s.IdArticle
+            JOIN Person p ON p.Id = a.CreatedBy
+            WHERE r.LastUpdate >= :searchFrom
+            ORDER BY r.LastUpdate DESC
+        ";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([':searchFrom' => $searchFrom]);
+        $surveys = $stmt->fetchAll();
+        $news = [];
+        $authorizationDataHelper = new AuthorizationDataHelper;
+        foreach ($surveys as $survey) {
+            if ($authorizationDataHelper->getArticle($survey->IdArticle, $person) 
+                && $authorizationDataHelper->canPersonReadSurveyResults((new ArticleDataHelper())->getWithAuthor($survey->IdArticle), $person)) {
+                $news[] = [
+                    'type' => 'survey',
+                    'id' => $survey->IdArticle,
+                    'title' => $survey->Question,
+                    'from' => $survey->FirstName . ' ' . $survey->LastName,
+                    'date' => $survey->LastUpdate,
+                    'url' => '/surveys/results/' . $survey->IdArticle
+                ];
+            }
+        }
+        return $news;
+    }
 }

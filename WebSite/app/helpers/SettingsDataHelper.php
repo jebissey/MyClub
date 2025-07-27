@@ -2,7 +2,7 @@
 
 namespace app\helpers;
 
-class Settings extends Data
+class SettingsDataHelper extends Data
 {
     public function get_(string $name): string
     {

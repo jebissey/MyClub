@@ -3,21 +3,22 @@
 namespace app\apis;
 
 use Exception;
+use Throwable;
 
 use app\helpers\ArticleDataHelper;
 use app\helpers\DesignDataHelper;
 use app\helpers\Media;
-use app\helpers\ReplyHelper;
+use app\helpers\ReplyDataHelper;
 
 class ArticleApi extends BaseApi
 {
     private Media $media;
-    private ReplyHelper $replyHelper;
+    private ReplyDataHelper $replyDataHelper;
 
     public function __construct()
     {
         $this->media = new Media();
-        $this->replyHelper = new ReplyHelper();
+        $this->replyDataHelper = new ReplyDataHelper();
     }
 
     public function deleteFile($year, $month, $filename)
@@ -46,7 +47,7 @@ class ArticleApi extends BaseApi
                     $this->renderJson(['success' => false, 'message' => 'Missing data'], 400);
                     return;
                 }
-                $this->replyHelper->insertOrUpdate($person->Id, $surveyId, isset($data['survey_answers']) ? json_encode($data['survey_answers']) : '[]');
+                $this->replyDataHelper->insertOrUpdate($person->Id, $surveyId, isset($data['survey_answers']) ? json_encode($data['survey_answers']) : '[]');
                 $this->renderJson(['success' => true]);
             } else $this->renderJson(['success' => false, 'message' => 'Bad request method'], 470);
         } else $this->renderJson(['success' => false, 'message' => 'User not allowed'], 403);
@@ -64,7 +65,7 @@ class ArticleApi extends BaseApi
                 try {
                     $options = json_decode($survey->Options);
                     if (json_last_error() !== JSON_ERROR_NONE) throw new Exception("JSON error: " . json_last_error_msg());
-                    $previousReply = $this->replyHelper->get_($survey->Id, $person->Id);
+                    $previousReply = $this->replyDataHelper->get_($survey->Id, $person->Id);
                     $previousAnswers = $previousReply ? json_decode($previousReply->Answers, true) : null;
                     $this->renderJson([
                         'success' => true,
@@ -75,7 +76,7 @@ class ArticleApi extends BaseApi
                             'previousAnswers' => $previousAnswers
                         ]
                     ]);
-                } catch (Exception $e) {
+                } catch (Throwable $e) {
                     $this->renderJson(['success' => false, 'message' => $e->getMessage()]);
                 }
             } else $this->renderJson(['success' => false, 'message' => 'Bad request method'], 470);

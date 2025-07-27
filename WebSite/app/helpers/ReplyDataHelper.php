@@ -2,7 +2,7 @@
 
 namespace app\helpers;
 
-class ReplyHelper extends Data
+class ReplyDataHelper extends Data
 {
     public function insertOrUpdate($personId, $surveyId,  $answers)
     {

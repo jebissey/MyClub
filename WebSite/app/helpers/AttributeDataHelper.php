@@ -2,6 +2,8 @@
 
 namespace app\helpers;
 
+use Throwable;
+
 class AttributeDataHelper extends Data
 {
     public function delete_($id)
@@ -17,7 +19,7 @@ class AttributeDataHelper extends Data
 
             $this->pdo->commit();
             return [['success' => true], 200];
-        } catch (\Exception $e) {
+        } catch (Throwable $e) {
             $this->pdo->rollBack();
             return [['success' => false, 'message' => $e->getMessage()], 500];
         }
@@ -34,7 +36,7 @@ class AttributeDataHelper extends Data
             ])->execute();
             $this->pdo->commit();
             return [['success' => true], 200];
-        } catch (\Exception $e) {
+        } catch (Throwable $e) {
             $this->pdo->rollBack();
             return [['success' => false, 'message' => $e->getMessage()], 500];
         }
@@ -70,7 +72,7 @@ class AttributeDataHelper extends Data
                 ->execute();
             $this->pdo->commit();
             return ['success' => true];
-        } catch (\Exception $e) {
+        } catch (Throwable $e) {
             $this->pdo->rollBack();
             return [['success' => false, 'message' => $e->getMessage()], 500];
         }

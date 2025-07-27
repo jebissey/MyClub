@@ -2,24 +2,27 @@
 
 namespace app\apis;
 
-use Exception;
+use app\helpers\AuthorizationDataHelper;
+use Throwable;
 
 use app\helpers\carouselHelper;
 use app\helpers\Webapp;
 
 class CarouselApi extends BaseApi
 {
+    private AuthorizationDataHelper $authorizationDataHelper;
     private CarouselHelper $carouselHelper;
 
     public function __construct()
     {
+        $this->authorizationDataHelper = new AuthorizationDataHelper;
         $this->carouselHelper = new carouselHelper();
     }
 
     public function getItems($idArticle)
     {
         $person = $this->personDataHelper->getPerson();
-        if (!$this->application->getAuthorizations()->getArticle($idArticle, $person)) {
+        if (!$this->authorizationDataHelper->getArticle($idArticle, $person)) {
             $this->renderJson(['error' => 'Accès non autorisé'], 403);
             return;
         }
@@ -39,7 +42,7 @@ class CarouselApi extends BaseApi
             $this->renderJson(['error' => 'Données invalides'], 400);
             return;
         }
-        if (!$this->application->getAuthorizations()->getArticle($data['idArticle'], $person)) {
+        if (!$this->authorizationDataHelper->getArticle($data['idArticle'], $person)) {
             $this->renderJson(['error' => 'Vous n\'êtes pas autorisé à modifier cet article'], 403);
             return;
         }
@@ -48,7 +51,7 @@ class CarouselApi extends BaseApi
         try {
             $message = $this->carouselHelper->set_($data, $item);
             $this->renderJson(['success' => true, 'message' => $message]);
-        } catch (\Exception $e) {
+        } catch (Throwable $e) {
             $this->renderJson(['error' => 'Erreur lors de l\'enregistrement: ' . $e->getMessage()], 500);
         }
     }
@@ -65,14 +68,14 @@ class CarouselApi extends BaseApi
             $this->renderJson(['error' => 'Élément non trouvé'], 404);
             return;
         }
-        if (!$this->application->getAuthorizations()->getArticle($item->IdArticle, $person)) {
+        if (!$this->authorizationDataHelper->getArticle($item->IdArticle, $person)) {
             $this->renderJson(['error' => 'Vous n\'êtes pas autorisé à modifier cet article'], 403);
             return;
         }
         try {
             $this->carouselHelper->delete_($id);
             $this->renderJson(['success' => true, 'message' => 'Élément supprimé avec succès']);
-        } catch (\Exception $e) {
+        } catch (Throwable $e) {
             $this->renderJson(['error' => 'Erreur lors de la suppression: ' . $e->getMessage()], 500);
         }
     }

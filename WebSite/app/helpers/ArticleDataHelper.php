@@ -85,7 +85,7 @@ class ArticleDataHelper extends Data
 
     public function getSpotlightArticle()
     {
-        $spotlightArticleJson = $this->application->getSettings()->get_('SpotlightArticle');
+        $spotlightArticleJson = (new SettingsDataHelper())->get_('SpotlightArticle');
         if ($spotlightArticleJson === null) {
             return null;
         }
@@ -98,7 +98,7 @@ class ArticleDataHelper extends Data
             'articleId' => $articleId,
             'spotlightUntil' => $spotlightUntil
         ];
-        $this->application->getSettings()->set_('SpotlightArticle', json_encode($data));
+        (new SettingsDataHelper())->set_('SpotlightArticle', json_encode($data));
     }
 
     public function getArticleIdsBasedOnAccess(?string $userEmail): array
@@ -108,7 +108,7 @@ class ArticleDataHelper extends Data
         $forMembersOnlyArticleIds = $this->getArticleIdsForMembers([$userEmail]);
         if (empty($forMembersOnlyArticleIds)) $articleIds = $noGroupArticleIds;
         else $articleIds = array_merge($noGroupArticleIds, $forMembersOnlyArticleIds);
-        $userGroups = $this->application->getAuthorizations()->getUserGroups($userEmail);
+        $userGroups = (new AuthorizationDataHelper())->getUserGroups($userEmail);
         if (empty($userGroups)) return $articleIds;
         $groupArticleIds = $this->getArticleIdsByGroups($userGroups);
         return array_unique(array_merge($articleIds, $groupArticleIds));
@@ -200,6 +200,29 @@ class ArticleDataHelper extends Data
             ->where('IdGroup IS NULL AND OnlyForMembers = 0')
             ->orderBy('LastUpdate DESC')
             ->fetchAll();
+    }
+
+    public function getArticleNews($person, $searchFrom)
+    {
+        $articles = $this->fluent->from('Article a')
+            ->select('a.Id, a.Title, a.LastUpdate')
+            ->where('a.LastUpdate >= ?', $searchFrom)
+            ->where('a.PublishedBy IS NOT NULL')
+            ->orderBy('a.LastUpdate DESC')
+            ->fetchAll();
+        $news = [];
+        foreach ($articles as $article) {
+            if ((new AuthorizationDataHelper())->getArticle($article->Id, $person)) {
+                $news[] = [
+                    'type'  => 'article',
+                    'id'    => $article->Id,
+                    'title' => $article->Title,
+                    'date'  => $article->LastUpdate,
+                    'url'   => '/articles/' . $article->Id
+                ];
+            }
+        }
+        return $news;
     }
 
     #region Private funcions

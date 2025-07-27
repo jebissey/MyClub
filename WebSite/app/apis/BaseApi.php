@@ -13,14 +13,12 @@ abstract class BaseApi
 {
     private LatteEngine $latte;
 
-    protected Application $application;
     protected DataHelper $dataHelper;
     protected PersonDataHelper $personDataHelper;
 
     public function __construct()
     {
-        $this->latte = $this->application->getLatte();
-        $this->application = Application::getInstance();
+        $this->latte = Application::getLatte();
         $this->dataHelper = new DataHelper();
         $this->personDataHelper = new PersonDataHelper();
     }

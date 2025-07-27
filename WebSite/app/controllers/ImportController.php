@@ -3,6 +3,7 @@
 namespace app\controllers;
 
 use app\helpers\ImportDataHelper;
+use app\helpers\SettingsDataHelper;
 
 class ImportController extends BaseController
 {
@@ -12,7 +13,7 @@ class ImportController extends BaseController
 
     private function loadSettings()
     {
-        if (!$this->importSettings = json_decode($this->application->getSettings()->get_('ImportPersonParameters'), true)) {
+        if (!$this->importSettings = json_decode((new SettingsDataHelper())->get_('ImportPersonParameters'), true)) {
             $this->importSettings = [
                 'headerRow' => 1,
                 'mapping' => [
@@ -29,7 +30,7 @@ class ImportController extends BaseController
     {
         if ($this->personDataHelper->getPerson(['PersonManager'])) {
             $this->loadSettings();
-            
+
             $this->render('app/views/import/form.latte', $this->params->getAll([
                 'importSettings' => $this->importSettings,
                 'results' => $this->results
@@ -58,7 +59,7 @@ class ImportController extends BaseController
                 ];
                 $this->importSettings['headerRow'] = $headerRow;
                 $this->importSettings['mapping'] = $mapping;
-                $this->application->getSettings()->set_('ImportPersonParameters', json_encode($this->importSettings));
+                (new SettingsDataHelper())->set_('ImportPersonParameters', json_encode($this->importSettings));
 
                 $persons = $this->dataHelper->gets('Person', ['Inactivated' => 0], 'Id, Email');
                 $results = (new ImportDataHelper())->getResults($headerRow, $mapping, $this->foundEmails);

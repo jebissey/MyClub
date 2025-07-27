@@ -2,18 +2,18 @@
 
 namespace app\apis;
 
-use app\helpers\Application;
 use DateTime;
-use Exception;
+use Throwable;
 
 use app\helpers\ApiEventDataHelper;
 use app\helpers\ApiNeedDataHelper;
 use app\helpers\ApiNeedTypeDataHelper;
+use app\helpers\Application;
 use app\helpers\AttributeDataHelper;
 use app\helpers\Email;
 use app\helpers\EventDataHelper;
 use app\helpers\EventNeedHelper;
-use app\helpers\MessageHelper;
+use app\helpers\MessageDataHelper;
 use app\helpers\ParticipantDataHelper;
 use app\helpers\PersonPreferences;
 
@@ -25,7 +25,7 @@ class EventApi extends BaseApi
     private $email;
     private EventDataHelper $eventDataHelper;
     private EventNeedHelper $eventNeedHelper;
-    private MessageHelper $messageHelper;
+    private MessageDataHelper $messageDataHelper;
     private $personPreferences;
 
     public function __construct()
@@ -37,7 +37,7 @@ class EventApi extends BaseApi
         $this->email = new Email();
         $this->eventDataHelper = new EventDataHelper();
         $this->eventNeedHelper = new EventNeedHelper();
-        $this->messageHelper = new MessageHelper();
+        $this->messageDataHelper = new MessageDataHelper();
         $this->personPreferences = new PersonPreferences();
     }
 
@@ -156,7 +156,7 @@ class EventApi extends BaseApi
                         $this->renderJson(['success' => false, 'message' => 'Invalid Email in file ' + __FILE__ + ' at line ' + __LINE__], 404);
                         return;
                     }
-                    $bccList = $this->messageHelper->addWebAppMessages($eventId, $participants, $emailTitle . "\n\n" . $message);
+                    $bccList = $this->messageDataHelper->addWebAppMessages($eventId, $participants, $emailTitle . "\n\n" . $message);
                     $result = Email::send(
                         $eventCreatorEmail,
                         $eventCreatorEmail,
@@ -281,8 +281,8 @@ class EventApi extends BaseApi
                 return;
             }
             try {
-                $messageId = $this->messageHelper->addMessage($data['eventId'], $person->Id, $data['text']);
-                $messages = $this->messageHelper->getEventMessages($data['eventId']);
+                $messageId = $this->messageDataHelper->addMessage($data['eventId'], $person->Id, $data['text']);
+                $messages = $this->messageDataHelper->getEventMessages($data['eventId']);
                 $newMessage = null;
 
                 foreach ($messages as $message) {
@@ -292,7 +292,7 @@ class EventApi extends BaseApi
                     }
                 }
                 $this->renderJson(['success' => true, 'message' => 'Message ajouté', 'data' => $newMessage]);
-            } catch (Exception $e) {
+            } catch (Throwable $e) {
                 $this->renderJson(['success' => false, 'message' => $e->getMessage()], 500);
             }
         } else $this->renderJson(['success' => false, 'message' => 'User not allowed'], 403);
@@ -309,7 +309,7 @@ class EventApi extends BaseApi
                 return;
             }
             try {
-                $this->messageHelper->updateMessage($data['messageId'], $person->Id, $data['text']);
+                $this->messageDataHelper->updateMessage($data['messageId'], $person->Id, $data['text']);
 
                 $this->renderJson([
                     'success' => true,
@@ -319,7 +319,7 @@ class EventApi extends BaseApi
                         'text' => $data['text']
                     ]
                 ]);
-            } catch (Exception $e) {
+            } catch (Throwable $e) {
                 $this->renderJson(['success' => false, 'message' => $e->getMessage()], 500);
             }
         } else $this->renderJson(['success' => false, 'message' => 'User not allowed'], 403);
@@ -337,7 +337,7 @@ class EventApi extends BaseApi
             }
 
             try {
-                $this->messageHelper->deleteMessage($data['messageId'], $person->Id);
+                $this->messageDataHelper->deleteMessage($data['messageId'], $person->Id);
 
                 $this->renderJson([
                     'success' => true,
@@ -346,7 +346,7 @@ class EventApi extends BaseApi
                         'messageId' => $data['messageId']
                     ]
                 ]);
-            } catch (Exception $e) {
+            } catch (Throwable $e) {
                 $this->renderJson(['success' => false, 'message' => $e->getMessage()], 500);
             }
         } else $this->renderJson(['success' => false, 'message' => 'User not allowed'], 403);

@@ -2,7 +2,9 @@
 
 namespace app\helpers;
 
-class MessageHelper extends Data
+use Exception;
+
+class MessageDataHelper extends Data
 {
     public function addMessage($eventId, $personId, $text)
     {
@@ -39,7 +41,7 @@ class MessageHelper extends Data
     {
         $message = $this->fluent->from('Message')->select('PersonId')->where('Id', $messageId)->fetch();
         if (!$message || $message->PersonId != $personId) {
-            throw new \Exception("Vous n'êtes pas autorisé à supprimer ce message");
+            throw new Exception("Vous n'êtes pas autorisé à supprimer ce message");
         }
         $this->fluent->deleteFrom('Message')->where('Id', $messageId)->execute();
         return true;
@@ -60,9 +62,39 @@ class MessageHelper extends Data
     {
         $message = $this->fluent->from('Message')->select('PersonId')->where('Id', $messageId)->fetch();
         if (!$message || $message->PersonId != $personId) {
-            throw new \Exception("Vous n'êtes pas autorisé à modifier ce message");
+            throw new Exception("Vous n'êtes pas autorisé à modifier ce message");
         }
         $this->fluent->update('Message')->set(['Text' => $text, 'LastUpdate' =>  date('Y-m-d H:i:s')])->where('Id', $messageId)->execute();
         return true;
+    }
+
+    public function getMessageNews($person, $searchFrom)
+    {
+        $sql = "
+            SELECT m.Id, m.Text, m.LastUpdate, m.EventId, p.FirstName, p.LastName, p.NickName, e.Summary, e.StartTime
+            From Message m
+            JOIN Person p ON p.Id = m.PersonId
+            JOIN Event e ON e.Id = m.EventId
+            WHERE m.LastUpdate > :searchFrom AND m.'From' = 'User' 
+            AND m.EventId IN (SELECT IdEvent FROM Participant WHERE IdPerson = $person->Id)
+            ORDER BY m.LastUpdate DESC
+        ";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([
+            ':searchFrom' => $searchFrom
+        ]);
+        $messages = $stmt->fetchAll();
+        $news = [];
+        foreach ($messages as $message) {
+            $news[] = [
+                'type' => 'message',
+                'id' => $message->EventId,
+                'title' => $message->Text,
+                'from' => $message->FirstName . ' ' . $message->LastName,
+                'date' => $message->LastUpdate,
+                'url' => '/event/chat/' . $message->EventId
+            ];
+        }
+        return $news;
     }
 }

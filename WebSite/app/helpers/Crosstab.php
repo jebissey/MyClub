@@ -94,7 +94,7 @@ class Crosstab extends Data
         foreach ($crossTabData as $row) {
             $uri = $row->Uri;
             $who = $row->Who;
-            if (!empty($groupFilter) && !$this->application->getAuthorizations()->isUserInGroup($who, $groupFilter)) continue;
+            if (!empty($groupFilter) && !(new AuthorizationDataHelper())->isUserInGroup($who, $groupFilter)) continue;
             $count = $row->count;
             if (!isset($sortedCrossTabData[$uri])) $sortedCrossTabData[$uri] = ['visits' => [], 'total' => 0];
             $sortedCrossTabData[$uri]['visits'][$who] = $count;

@@ -3,6 +3,7 @@
 namespace app\controllers;
 
 use app\helpers\ArwardsDataHelper;
+use  app\helpers\AuthorizationDataHelper;
 use app\helpers\Webapp;
 
 class NavBarController extends BaseController
@@ -41,7 +42,7 @@ class NavBarController extends BaseController
             $this->render('app/views/navbar/article.latte', $this->params->getAll([
                 'navItems' => $this->getNavItems($person),
                 'chosenArticle' => $this->dataHelper->get('Article', ['Id' => $id]),
-                'hasAuthorization' => $this->application->getAuthorizations()->hasAutorization()
+                'hasAuthorization' => (new AuthorizationDataHelper())->hasAutorization()
             ]));
         } else $this->application->error403(__FILE__, __LINE__);
     }

@@ -20,7 +20,7 @@ class LogDataHelper extends Data
         $this->pdoForLog = $this->application->getPdoForLog();
     }
 
-    public function add()
+    public function add($code, $message)
     {
         $this->fluentForLog
             ->insertInto('Log', [
@@ -33,8 +33,8 @@ class LogDataHelper extends Data
                 'Uri'              => $_SERVER['REQUEST_URI'],
                 'Token'            => '',
                 'Who'              => gethostbyaddr($_SERVER['REMOTE_ADDR']) ?? '',
-                'Code'             => '',
-                'Message'          => $_SERVER['HTTP_USER_AGENT']
+                'Code'             => $code,
+                'Message'          => $message
             ])
             ->execute();
     }

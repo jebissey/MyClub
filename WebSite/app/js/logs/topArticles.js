@@ -19,7 +19,6 @@ document.addEventListener('DOMContentLoaded', function () {
         if (articleId) {
             fetchArticleInfo(articleId)
                 .then(data => {
-                    console.log('Données reçues pour articleId', articleId, ':', data);
                     if (data.author && data.author.length > 0) {
                         span.textContent = data.author[0].PersonName || '(Non spécifié)';
 

@@ -2,7 +2,8 @@
 
 namespace app\helpers;
 
-use Exception;
+use Throwable;
+
 use app\enums\EventAudience;
 
 class ApiEventDataHelper extends Data
@@ -37,7 +38,7 @@ class ApiEventDataHelper extends Data
             $this->insertEventNeeds($eventId, $data['needs'] ?? []);
             $this->pdo->commit();
             return [['success' => true, 'eventId' => $eventId], 200];
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             $this->pdo->rollBack();
             return [[
                 'success' => false,

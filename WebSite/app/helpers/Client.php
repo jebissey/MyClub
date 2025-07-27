@@ -3,66 +3,72 @@
 namespace app\helpers;
 
 use UAParser\Parser;
+use Throwable;
 
 class Client
 {
-    private $browser;
-    private $version;
-    private $os;
-    private $device;
+    private $browser = 'Unknown';
+    private $version = '';
+    private $os = 'Unknown';
+    private $device = 'Unknown';
 
-    public function __construct() {
-        $parser = Parser::create();
-        $result = $parser->parse($_SERVER['HTTP_USER_AGENT']);
+    public function __construct()
+    {
+        try {
+            if (!empty($_SERVER['HTTP_USER_AGENT'])) {
+                $parser = Parser::create();
+                $result = $parser->parse($_SERVER['HTTP_USER_AGENT']);
 
-        $this->browser = $result->ua->family;
-        $this->version = $result->ua->major;
-        $this->os = $result->os->family;
-        $this->device = $result->device->family;
+                $this->browser = $result->ua->family ?? 'Unknown';
+                $this->version = $result->ua->major ?? '';
+                $this->os = $result->os->family ?? 'Unknown';
+                $this->device = $result->device->family ?? 'Unknown';
+            }
+        } catch (Throwable $e) {
+            throw $e;
+        }
     }
 
-    public function getBrowser()
+    public function getBrowser(): string
     {
         return $this->browser . " " . $this->version;
     }
 
-    public function getOS()
+    public function getOS(): string
     {
         return $this->os;
     }
 
-    function getType()
+    public function getType(): string
     {
         return $this->device;
     }
 
-    function getIp()
+    public function getIp(): string
     {
-        if (!empty($_SERVER['HTTP_CLIENT_IP']))           $ip = $_SERVER['HTTP_CLIENT_IP'];
-        elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) $ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
-        else                                              $ip = $_SERVER['REMOTE_ADDR'];
-        return $ip;
+        return $_SERVER['HTTP_CLIENT_IP']
+            ?? $_SERVER['HTTP_X_FORWARDED_FOR']
+            ?? $_SERVER['REMOTE_ADDR']
+            ?? '0.0.0.0';
     }
 
-    function getReferer()
+    public function getReferer(): string
     {
         return $_SERVER['HTTP_REFERER'] ?? '';
     }
 
-    function getScreenResolution()
+    public function getScreenResolution(): string
     {
-        if (isset($_COOKIE['screen_resolution'])) $resolution = $_COOKIE['screen_resolution'];
-        else $resolution = '';
-        return $resolution;
+        return $_COOKIE['screen_resolution'] ?? '';
     }
 
-    function getToken()
+    public function getToken(): string
     {
         return $_SESSION['token'] ?? '';
     }
 
-    function getUri()
+    public function getUri(): string
     {
-        return $_SERVER['REQUEST_URI'];
+        return $_SERVER['REQUEST_URI'] ?? '';
     }
 }
