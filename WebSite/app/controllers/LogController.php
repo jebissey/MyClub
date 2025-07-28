@@ -2,6 +2,8 @@
 
 namespace app\controllers;
 
+use app\helpers\Application;
+use app\enums\ApplicationError;
 use app\helpers\Crosstab;
 use app\helpers\LogDataHelper;
 use app\helpers\Period;
@@ -11,10 +13,10 @@ class LogController extends BaseController
 {
     private LogDataHelper $logDataHelper;
 
-    public function __construct()
+    public function __construct(Application $application)
     {
-        parent::__construct();
-        $this->logDataHelper = new LogDataHelper();
+        parent::__construct($application);
+        $this->logDataHelper = new LogDataHelper($this->application);
     }
 
     public function index()
@@ -30,7 +32,7 @@ class LogController extends BaseController
                 'totalPages' => $totalPages,
                 'filters' => $_GET
             ]));
-        } else $this->application->error403(__FILE__, __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function referers()
@@ -48,7 +50,7 @@ class LogController extends BaseController
                 'externalRefs' => $this->logDataHelper->getExternalRefererStats($period, $currentDate),
                 'control' => new Webapp(),
             ]));
-        } else $this->application->error403(__FILE__, __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     private $periodTypes = ['day', 'week', 'month', 'year'];
@@ -70,7 +72,7 @@ class LogController extends BaseController
                 'chartData' => $this->logDataHelper->formatDataForChart($data),
                 'periodLabel' => $this->logDataHelper->getPeriodLabel($periodType)
             ]));
-        } else $this->application->error403(__FILE__, __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function analytics()
@@ -84,7 +86,7 @@ class LogController extends BaseController
                 'typeData' => $this->logDataHelper->getTypeDistribution(),
                 'title' => 'Synthèse des visiteurs'
             ]));
-        } else $this->application->error403(__FILE__, __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     const TOP = 50;
@@ -100,7 +102,7 @@ class LogController extends BaseController
                 'period' => $period,
                 'topPages' => $topPages
             ]));
-        } else $this->application->error403(__FILE__, __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function topArticlesByPeriod()
@@ -115,7 +117,7 @@ class LogController extends BaseController
                 'period' => $period,
                 'topPages' => $topPages
             ]));
-        } else $this->application->error403(__FILE__, __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function crossTab()
@@ -139,7 +141,7 @@ class LogController extends BaseController
                 'emailFilter' => $emailFilter,
                 'groupFilter' => $groupFilter
             ]));
-        } else $this->application->error403(__FILE__, __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function showLastVisits()
@@ -151,6 +153,6 @@ class LogController extends BaseController
                 'totalActiveUsers' => count($activePersons),
                 'navItems' => $this->getNavItems($person),
             ]));
-        } else $this->application->error403(__FILE__, __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 }

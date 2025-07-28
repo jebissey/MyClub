@@ -15,6 +15,7 @@ use app\helpers\EventDataHelper;
 use app\helpers\EventNeedHelper;
 use app\helpers\MessageDataHelper;
 use app\helpers\ParticipantDataHelper;
+use app\helpers\PersonDataHelper;
 use app\helpers\PersonPreferences;
 
 class EventApi extends BaseApi
@@ -22,23 +23,21 @@ class EventApi extends BaseApi
     private ApiNeedDataHelper $apiNeedDataHelper;
     private ApiNeedTypeDataHelper $apiNeedTypeDataHelper;
     private AttributeDataHelper $attributeDataHelper;
-    private $email;
     private EventDataHelper $eventDataHelper;
     private EventNeedHelper $eventNeedHelper;
     private MessageDataHelper $messageDataHelper;
     private $personPreferences;
 
-    public function __construct()
+    public function __construct(Application $application)
     {
-        parent::__construct();
-        $this->apiNeedDataHelper = new ApiNeedDataHelper();
-        $this->apiNeedTypeDataHelper = new ApiNeedTypeDataHelper();
-        $this->attributeDataHelper = new AttributeDataHelper();
-        $this->email = new Email();
-        $this->eventDataHelper = new EventDataHelper();
-        $this->eventNeedHelper = new EventNeedHelper();
-        $this->messageDataHelper = new MessageDataHelper();
-        $this->personPreferences = new PersonPreferences();
+        parent::__construct($application);
+        $this->apiNeedDataHelper = new ApiNeedDataHelper($application);
+        $this->apiNeedTypeDataHelper = new ApiNeedTypeDataHelper($application);
+        $this->attributeDataHelper = new AttributeDataHelper($application);
+        $this->eventDataHelper = new EventDataHelper($application);
+        $this->eventNeedHelper = new EventNeedHelper($application);
+        $this->messageDataHelper = new MessageDataHelper($application);
+        $this->personPreferences = new PersonPreferences($application);
     }
 
     #region Attribute
@@ -113,7 +112,7 @@ class EventApi extends BaseApi
     public function saveEvent(): void
     {
         if ($person = $this->personDataHelper->getPerson(['EventManager'])) {
-            [$response, $statusCode] = (new ApiEventDataHelper())->update(json_decode(file_get_contents('php://input'), true), $person->Id);
+            [$response, $statusCode] = (new ApiEventDataHelper($this->application))->update(json_decode(file_get_contents('php://input'), true), $person->Id);
             $this->renderJson($response, $statusCode);
         } else $this->renderJson(['success' => false, 'message' => 'User not allowed'], 403);
     }
@@ -133,11 +132,11 @@ class EventApi extends BaseApi
                 $emailTitle = $data['Title'] ?? '';
                 $recipients = $data['Recipients'] ?? '';
                 $message = $data['Body'] ?? '';
-                if ($recipients === 'registered') $participants = (new ParticipantDataHelper())->getEventParticipants($eventId);
+                if ($recipients === 'registered') $participants = (new ParticipantDataHelper($this->application))->getEventParticipants($eventId);
                 else if ($recipients === 'unregistered') {
                     //TODO
                 } else if ($recipients === 'all') {
-                    $participants = $this->email->getInterestedPeople(
+                    $participants = (new PersonDataHelper($this->application))->getInterestedPeople(
                         $this->eventDataHelper->getEventGroup($eventId),
                         $event->IdEventType ?? null,
                         (new DateTime($event->StartTime))->format('N') - 1,

@@ -2,11 +2,11 @@
 
 namespace app\helpers;
 
-class ArticleTableData extends Data
+class ArticleTableDataHelper extends Data
 {
-    public function __construct()
+    public function __construct(Application $application)
     {
-        parent::__construct();
+        parent::__construct($application);
     }
 
     public function getQuery($person)
@@ -46,7 +46,7 @@ class ArticleTableData extends Data
             ->groupBy('Article.Id');
 
         if ($person) {
-            if (!(new AuthorizationDataHelper())->isEditor()) {
+            if (!(new AuthorizationDataHelper($this->application))->isEditor()) {
                 $query = $query->where('(Article.CreatedBy = ' . $person->Id . '
                     OR (Article.PublishedBy IS NOT NULL 
                         AND (Article.IdGroup IS NULL OR Article.IdGroup IN (SELECT IdGroup FROM PersonGroup WHERE IdPerson = ' . $person->Id . '))

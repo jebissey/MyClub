@@ -12,13 +12,11 @@ class LogDataHelper extends Data
 {
     private string $host;
     private const DISPLAY_TIMEZONE = 'Europe/Paris';
-    private $pdoForLog;
 
-    public function __construct()
+    public function __construct(Application $application)
     {
-        parent::__construct();
+        parent::__construct($application);
         $this->host = Application::$root . '%';
-        $this->pdoForLog = $this->application->getPdoForLog();
     }
 
     public function add($code, $message)

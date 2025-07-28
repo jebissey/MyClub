@@ -5,6 +5,7 @@ namespace app\apis;
 use app\helpers\AuthorizationDataHelper;
 use Throwable;
 
+use app\helpers\Application;
 use app\helpers\carouselHelper;
 use app\helpers\Webapp;
 
@@ -13,10 +14,10 @@ class CarouselApi extends BaseApi
     private AuthorizationDataHelper $authorizationDataHelper;
     private CarouselHelper $carouselHelper;
 
-    public function __construct()
+    public function __construct(Application $application)
     {
-        parent::__construct();
-        $this->authorizationDataHelper = new AuthorizationDataHelper;
+        parent::__construct($application);
+        $this->authorizationDataHelper = new AuthorizationDataHelper($application);
         $this->carouselHelper = new carouselHelper();
     }
 

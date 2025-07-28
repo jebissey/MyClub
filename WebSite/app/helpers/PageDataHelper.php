@@ -4,9 +4,9 @@ namespace app\helpers;
 
 class PageDataHelper extends Data
 {
-    public function __construct()
+    public function __construct(Application $application)
     {
-        parent::__construct();
+        parent::__construct($application);
     }
 
     public function del($id)
@@ -82,7 +82,7 @@ class PageDataHelper extends Data
             return false;
         }
         if (!$person) return false;
-        $userGroups = (new AuthorizationDataHelper())->getUserGroups($person->Email);
+        $userGroups = (new AuthorizationDataHelper($this->application))->getUserGroups($person->Email);
         return in_array($pageData->IdGroup, $userGroups);
     }
 }

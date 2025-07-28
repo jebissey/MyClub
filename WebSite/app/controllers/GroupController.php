@@ -2,6 +2,8 @@
 
 namespace app\controllers;
 
+use app\helpers\Application;
+use app\enums\ApplicationError;
 use app\helpers\GroupDataHelper;
 use app\helpers\Webapp;
 
@@ -9,10 +11,10 @@ class GroupController extends BaseController implements CrudControllerInterface
 {
     private GroupDataHelper $groupDataHelper;
 
-    public function __construct()
+    public function __construct(Application $application)
     {
-        parent::__construct();
-        $this->groupDataHelper = new GroupDataHelper();
+        parent::__construct($application);
+        $this->groupDataHelper = new GroupDataHelper($application);
     }
 
     public function index()
@@ -22,7 +24,7 @@ class GroupController extends BaseController implements CrudControllerInterface
                 'groups' => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
                 'layout' => Webapp::getLayout()()
             ]));
-        } else $this->application->error403(__FILE__, __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function create()
@@ -48,8 +50,8 @@ class GroupController extends BaseController implements CrudControllerInterface
                     'availableAuthorizations' => $availableAuthorizations,
                     'layout' => Webapp::getLayout()()
                 ]));
-            } else $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
-        } else $this->application->error403(__FILE__, __LINE__);
+            } else $this->application->getErrorManager()->raise(ApplicationError::InvalidRequestMethod, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function edit($id)
@@ -72,7 +74,7 @@ class GroupController extends BaseController implements CrudControllerInterface
                     ]));
                 } else $this->groupDataHelper->update($id, $name, $selfRegistration, $selectedAuthorizations);
             } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-                if (!$group) $this->application->error499('Group', $id, __FILE__, __LINE__);
+                if (!$group) $this->application->getErrorManager()->raise(ApplicationError::BadRequest, "Unknwon group $id in file " . __FILE__ . ' at line ' . __LINE__);
                 else {
                     $this->render('app/views/groups/edit.latte', $this->params->getAll([
                         'group' => $group,
@@ -81,8 +83,8 @@ class GroupController extends BaseController implements CrudControllerInterface
                         'layout' => Webapp::getLayout()()
                     ]));
                 }
-            } else $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
-        } else $this->application->error403(__FILE__, __LINE__);
+            } else $this->application->getErrorManager()->raise(ApplicationError::InvalidRequestMethod, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function delete($id)
@@ -90,6 +92,6 @@ class GroupController extends BaseController implements CrudControllerInterface
         if ($this->personDataHelper->getPerson(['PersonManager', 'Webmaster'])) {
             $this->dataHelper->set('Group', ['Inactivated' => 0], ['Id' => $id]);
             $this->flight->redirect('/groups');
-        } else $this->application->error403(__FILE__, __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 }

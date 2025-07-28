@@ -32,7 +32,8 @@ if ($_SERVER['SERVER_NAME'] === 'localhost')
     Debugger::enable(Debugger::Development, __DIR__ . '/var/tracy/log');
 else Debugger::enable(Debugger::Production, __DIR__ . '/var/tracy/log');
 
-$flight = new Application()::getFlight();
+$application = Application::init();
+$flight = $application->getFlight();
 
 // Add a custom URL parser to fix issue with URL with encoded email address
 $flight->map('pass', function ($str) {
@@ -50,8 +51,7 @@ $flight->map('getData', function ($key) {
 });
 
 #region web
-$articleController = new ArticleController($flight);
-die;
+$articleController = new ArticleController($application);
 $flight->route('GET  /articles', function () use ($articleController) {
     $articleController->index();
 });
@@ -80,7 +80,7 @@ $flight->route('GET  /redactor', function () use ($articleController) {
     $articleController->home();
 });
 
-$dbBrowserController = new DbBrowserController($flight);
+$dbBrowserController = new DbBrowserController($application);
 $flight->route('GET  /dbbrowser', function () use ($dbBrowserController) {
     $dbBrowserController->index();
 });
@@ -103,7 +103,7 @@ $flight->route('POST /dbbrowser/@table/delete/@id', function ($table, $id) use (
     $dbBrowserController->deleteRecord($table, $id);
 });
 
-$designController = new DesignController($flight);
+$designController = new DesignController($application);
 $flight->route('GET  /designs', function () use ($designController) {
     $designController->index();
 });
@@ -114,7 +114,7 @@ $flight->route('POST /designs/save', function () use ($designController) {
     $designController->save();
 });
 
-$emailController = new EmailController($flight);
+$emailController = new EmailController($application);
 $flight->route('GET  /emails', function () use ($emailController) {
     $emailController->fetchEmails();
 });
@@ -125,7 +125,7 @@ $flight->route('GET  /emails/article/@id', function ($id) use ($emailController)
     $emailController->fetchEmailsForArticle($id);
 });
 
-$eventController = new EventController($flight);
+$eventController = new EventController($application);
 $flight->route('GET  /eventManager', function () use ($eventController) {
     $eventController->home();
 });
@@ -169,7 +169,7 @@ $flight->route('GET  /weekEvents', function () use ($eventController) {
     $eventController->weekEvents();
 });
 
-$eventTypeController = new EventTypeController($flight);
+$eventTypeController = new EventTypeController($application);
 $flight->route('GET  /eventTypes', function () use ($eventTypeController) {
     $eventTypeController->index();
 });
@@ -186,12 +186,12 @@ $flight->route('GET  /eventTypes/delete/@id', function ($id) use ($eventTypeCont
     $eventTypeController->delete($id);
 });
 
-$ffaController = new FFAController($flight);
+$ffaController = new FFAController($application);
 $flight->route('GET /ffa/search', function () use ($ffaController) {
     $ffaController->searchMember();
 });
 
-$groupController = new GroupController($flight);
+$groupController = new GroupController($application);
 $flight->route('GET  /groups', function () use ($groupController) {
     $groupController->index();
 });
@@ -211,7 +211,7 @@ $flight->route('POST /groups/delete/@id', function ($id) use ($groupController) 
     $groupController->delete($id);
 });
 
-$importController = new ImportController($flight);
+$importController = new ImportController($application);
 $flight->route('GET  /import', function () use ($importController) {
     $importController->showImportForm();
 });
@@ -219,7 +219,7 @@ $flight->route('POST /import', function () use ($importController) {
     $importController->processImport();
 });
 
-$logController = new LogController($flight);
+$logController = new LogController($application);
 $flight->route('GET /logs', function () use ($logController) {
     $logController->index();
 });
@@ -245,7 +245,7 @@ $flight->route('GET /lastVisits', function () use ($logController) {
     $logController->showLastVisits();
 });
 
-$mediaController = new MediaController($flight);
+$mediaController = new MediaController($application);
 $flight->route('GET /data/media/@year/@month/@filename', function ($year, $month, $filename) use ($mediaController) {
     $mediaController->viewFile($year, $month, $filename);
 });
@@ -259,7 +259,7 @@ $flight->route('GET /media/gpxViewer', function () use ($mediaController) {
     $mediaController->gpxViewer();
 });
 
-$navBarController = new NavBarController($flight);
+$navBarController = new NavBarController($application);
 $flight->route('GET  /navBar', function () use ($navBarController) {
     $navBarController->index();
 });
@@ -270,7 +270,7 @@ $flight->route('GET  /navBar/show/arwards', function () use ($navBarController) 
     $navBarController->showArwards();
 });
 
-$personController = new PersonController($flight);
+$personController = new PersonController($application);
 $flight->route('GET  /directory', function () use ($personController) {
     $personController->showDirectory();
 });
@@ -308,7 +308,7 @@ $flight->route('GET  /presentation/@id', function ($id) use ($personController) 
     $personController->showPresentation($id);
 });
 
-$registrationController = new RegistrationController($flight);
+$registrationController = new RegistrationController($application);
 $flight->route('GET  /registration', function () use ($registrationController) {
     $registrationController->index();
 });
@@ -316,7 +316,7 @@ $flight->route('GET  /registration/groups/@id', function ($id) use ($registratio
     $registrationController->getPersonGroups($id);
 });
 
-$surveyController = new SurveyController($flight);
+$surveyController = new SurveyController($application);
 $flight->route('GET  /surveys/add/@id', function ($id) use ($surveyController) {
     $surveyController->add($id);
 });
@@ -327,7 +327,7 @@ $flight->route('GET  /surveys/results/@id', function ($id) use ($surveyControlle
     $surveyController->viewResults($id);
 });
 
-$userController = new UserController($flight);
+$userController = new UserController($application);
 $flight->route('/help',         function () use ($userController) {
     $userController->helpHome();
 });
@@ -401,7 +401,7 @@ $flight->route('GET  /contact/event/@id', function ($id) use ($userController) {
     $userController->contact($id);
 });
 
-$webmasterController = new WebmasterController($flight);
+$webmasterController = new WebmasterController($application);
 $flight->route('GET  /admin', function () use ($webmasterController) {
     $webmasterController->homeAdmin();
 });
@@ -429,7 +429,7 @@ $flight->route('GET  /webmaster', function () use ($webmasterController) {
 #endregion
 
 #region api
-$articleApi = new ArticleApi($flight);
+$articleApi = new ArticleApi($application);
 $flight->route('GET  /api/author/@articleId', function ($articleId) use ($articleApi) {
     $articleApi->getAuthor($articleId);
 });
@@ -449,7 +449,7 @@ $flight->route('GET  /api/surveys/reply/@id', function ($id) use ($articleApi) {
     $articleApi->showSurveyReplyForm($id);
 });
 
-$carouselApi = new carouselApi($flight);
+$carouselApi = new carouselApi($application);
 $flight->route('GET  /api/carousel/@articleId', function ($articleId) use ($carouselApi) {
     $carouselApi->getItems($articleId);
 });
@@ -460,7 +460,7 @@ $flight->route('POST /api/carousel/delete/@id', function ($id) use ($carouselApi
     $carouselApi->deleteItem($id);
 });
 
-$eventApi = new EventApi($flight);
+$eventApi = new EventApi($application);
 $flight->route('POST   /api/attributes/create', function () use ($eventApi) {
     $eventApi->createAttribute();
 });
@@ -522,12 +522,12 @@ $flight->route('POST /api/message/delete', function () use ($eventApi) {
     $eventApi->deleteMessage();
 });
 
-$importApi = new ImportApi($flight);
+$importApi = new ImportApi($application);
 $flight->route('POST /import/headers', function () use ($importApi) {
     $importApi->getHeadersFromCSV();
 });
 
-$webmasterApi = new WebmasterApi($flight);
+$webmasterApi = new WebmasterApi($application);
 $flight->route('GET    /api/lastVersion', function () use ($webmasterApi) {
     $webmasterApi->lastVersion();
 });
@@ -589,7 +589,7 @@ $flight->route('/*', function () use ($applicationHelper) {
     $applicationHelper->error404();
 });
 
-$logDataHelper = new LogDataHelper();
+$logDataHelper = new LogDataHelper($application);
 $flight->map('error', function (Throwable $ex) use ($logDataHelper, $applicationHelper) {
     $logDataHelper->add(500, 'Internal error: ' . $ex->getMessage() . ' in file ' . $ex->getFile() . ' at line' . $ex->getLine());
     $applicationHelper->error500($ex->getMessage(), $ex->getFile(), $ex->getLine());

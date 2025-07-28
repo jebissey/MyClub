@@ -2,6 +2,8 @@
 
 namespace app\controllers;
 
+use app\helpers\Application;
+use app\enums\ApplicationError;
 use app\helpers\EventDataHelper;
 use app\helpers\TableControllerHelper;
 
@@ -10,11 +12,11 @@ class EventTypeController extends TableController implements CrudControllerInter
     private EventDataHelper $eventDataHelper;
     private TableControllerHelper $tableControllerHelper;
 
-    public function __construct()
+    public function __construct(Application $application)
     {
-        parent::__construct();
-        $this->eventDataHelper = new EventDataHelper();
-        $this->tableControllerHelper = new TableControllerHelper();
+        parent::__construct($application);
+        $this->eventDataHelper = new EventDataHelper($application);
+        $this->tableControllerHelper = new TableControllerHelper($application);
     }
 
     public function index()
@@ -38,7 +40,7 @@ class EventTypeController extends TableController implements CrudControllerInter
                 'columns' => $columns,
                 'resetUrl' => '/eventTypes'
             ]));
-        } else $this->application->error403(__FILE__, __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function create()
@@ -47,15 +49,15 @@ class EventTypeController extends TableController implements CrudControllerInter
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $id = $this->dataHelper->set('EventType', ['Name' => '']);
                 $this->flight->redirect('/EventTypes/edit/' . $id);
-            } else $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
-        } else $this->application->error403(__FILE__, __LINE__);
+            } else $this->application->getErrorManager()->raise(ApplicationError::InvalidRequestMethod, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function edit($id)
     {
         if ($this->personDataHelper->getPerson(['Webmaster'])) {
             $eventType = $this->dataHelper->get('EventType', ['Id', $id]);
-            if (!$eventType) $this->application->error499('EventType', $id, __FILE__, __LINE__);
+            if (!$eventType) $this->application->getErrorManager()->raise(ApplicationError::InvalidSetting, "Invalide EventType: $id in file " . __FILE__ . ' at line ' . __LINE__);
             else {
                 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $this->eventDataHelper->update($id, $_POST['name'], $_POST['idGroup'] === '' ? null : ($_POST['idGroup'] ?? null));
@@ -69,9 +71,9 @@ class EventTypeController extends TableController implements CrudControllerInter
                         'attributes' => $this->dataHelper->gets('Attribute', [], '*', 'Name'),
                         'existingAttributes' => $existingAttributes
                     ]));
-                } else $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
+                } else $this->application->getErrorManager()->raise(ApplicationError::InvalidRequestMethod, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
             }
-        } else $this->application->error403(__FILE__, __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function delete($id)
@@ -81,7 +83,7 @@ class EventTypeController extends TableController implements CrudControllerInter
                 $this->dataHelper->set('EventType', ['Inactivated' => 1], ['Id' => $id]);
 
                 $this->flight->redirect('/eventTypes');
-            } else $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
-        } else $this->application->error403(__FILE__, __LINE__);
+            } else $this->application->getErrorManager()->raise(ApplicationError::InvalidRequestMethod, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 }

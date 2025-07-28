@@ -6,11 +6,11 @@ use PDO;
 
 use app\helpers\Period;
 
-class Crosstab extends Data
+class CrosstabDataHelper extends Data
 {
-    public function __construct()
+    public function __construct(Application $application)
     {
-        parent::__construct();
+        parent::__construct($application);
     }
 
     public function generateCrosstab($sql, $params = [], $rowsTitle = 'Lignes', $columnsTitle = 'Colonnes', $fetchMode = PDO::FETCH_ASSOC)
@@ -72,9 +72,8 @@ class Crosstab extends Data
                 GROUP BY p.Id, et.Id
                 ORDER BY p.LastName, p.FirstName
             ";
-        $crossTab = new CrossTab();
         $dateRange = Period::getDateRangeFor($period);
-        $crosstabData = $crossTab->generateCrosstab(
+        $crosstabData = $this->generateCrosstab(
             $sql,
             [':start' => $dateRange['start'], ':end' => $dateRange['end']],
             'Types d\'événement',
@@ -99,7 +98,7 @@ class Crosstab extends Data
         foreach ($crossTabData as $row) {
             $uri = $row->Uri;
             $who = $row->Who;
-            if (!empty($groupFilter) && !(new AuthorizationDataHelper())->isUserInGroup($who, $groupFilter)) continue;
+            if (!empty($groupFilter) && !(new AuthorizationDataHelper($this->application))->isUserInGroup($who, $groupFilter)) continue;
             $count = $row->count;
             if (!isset($sortedCrossTabData[$uri])) $sortedCrossTabData[$uri] = ['visits' => [], 'total' => 0];
             $sortedCrossTabData[$uri]['visits'][$who] = $count;

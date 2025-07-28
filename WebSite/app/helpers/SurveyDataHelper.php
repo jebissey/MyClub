@@ -4,9 +4,9 @@ namespace app\helpers;
 
 class SurveyDataHelper extends Data
 {
-    public function __construct()
+    public function __construct(Application $application)
     {
-        parent::__construct();
+        parent::__construct($application);
     }
 
     public function articleHasSurvey($articleId)
@@ -76,11 +76,11 @@ class SurveyDataHelper extends Data
         $stmt->execute([':searchFrom' => $searchFrom]);
         $surveys = $stmt->fetchAll();
         $news = [];
-        $authorizationDataHelper = new AuthorizationDataHelper;
+        $authorizationDataHelper = new AuthorizationDataHelper($this->application);
         foreach ($surveys as $survey) {
             if (
                 $authorizationDataHelper->getArticle($survey->IdArticle, $person)
-                && $authorizationDataHelper->canPersonReadSurveyResults((new ArticleDataHelper())->getWithAuthor($survey->IdArticle), $person)
+                && $authorizationDataHelper->canPersonReadSurveyResults((new ArticleDataHelper($this->application))->getWithAuthor($survey->IdArticle), $person)
             ) {
                 $news[] = [
                     'type' => 'survey',

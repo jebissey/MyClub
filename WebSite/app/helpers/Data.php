@@ -2,6 +2,7 @@
 
 namespace app\helpers;
 
+use app\enums\ApplicationError;
 use PDO;
 use PDOException;
 
@@ -21,17 +22,19 @@ $results = $data->query($pdo, 'SELECT * FROM users WHERE age > :age', [':age' =>
 
 abstract class Data
 {
-    protected PDO $pdo;
     protected Application $application;
+    protected PDO $pdo;
+    protected PDO $pdoForLog;
     protected $fluent;
     protected $fluentForLog;
 
-    public function __construct()
+    public function __construct(Application $application)
     {
-        $this->application = Application::getInstance();
-        $this->pdo = $this->application->getPdo();
+        $this->application = $application;
+        $this->pdo = $application->getPdo();
+        $this->pdoForLog = $application->getPdoForLog();
         $this->fluent = new \Envms\FluentPDO\Query($this->pdo);
-        $this->fluentForLog = new \Envms\FluentPDO\Query($this->application->getPdoForLog());
+        $this->fluentForLog = new \Envms\FluentPDO\Query($this->pdoForLog);
     }
 
     public function count($query)
@@ -42,7 +45,7 @@ abstract class Data
     public function delete(string $table, array $where): int
     {
         try {
-            if (empty($where)) throw new \PDOException("Conditions WHERE requises pour DELETE");
+            if (empty($where)) throw new PDOException("Conditions WHERE requises pour DELETE");
 
             $conditions = [];
             $params = [];
@@ -58,7 +61,7 @@ abstract class Data
 
             return $result ? $stmt->rowCount() : false;
         } catch (PDOException $e) {
-            $this->application->error490($e->getMessage(), __FILE__, __LINE__);
+            $this->application->getErrorManager()->raise(ApplicationError::Error, 'Database error: ' . $e->getMessage() . ' in file ' . __FILE__ . ' at line ' . __LINE__);
             throw $e;
         }
     }
@@ -85,7 +88,7 @@ abstract class Data
 
             return $stmt->fetch();
         } catch (PDOException $e) {
-            $this->application->error490($e->getMessage(), __FILE__, __LINE__);
+            $this->application->getErrorManager()->raise(ApplicationError::Error, 'Database error: ' . $e->getMessage() . ' in file ' . __FILE__ . ' at line ' . __LINE__);
             throw $e;
         }
     }
@@ -115,7 +118,7 @@ abstract class Data
 
             return $stmt->fetchall();
         } catch (PDOException $e) {
-            $this->application->error490($e->getMessage(), __FILE__, __LINE__);
+            $this->application->getErrorManager()->raise(ApplicationError::Error, 'Database error: ' . $e->getMessage() . ' in file ' . __FILE__ . ' at line ' . __LINE__);
             throw $e;
         }
     }
@@ -143,7 +146,7 @@ abstract class Data
                     return $result;
             }
         } catch (\PDOException $e) {
-            $this->application->error490($e->getMessage(), __FILE__, __LINE__);
+            $this->application->getErrorManager()->raise(ApplicationError::Error, 'Database error: ' . $e->getMessage() . ' in file ' . __FILE__ . ' at line ' . __LINE__);
             return false;
         }
     }
@@ -187,8 +190,8 @@ abstract class Data
                 $stmt = $this->pdo->prepare($sql);
                 return $stmt->execute($params);
             }
-        } catch (\PDOException $e) {
-            $this->application->error490($e->getMessage(), __FILE__, __LINE__);
+        } catch (PDOException $e) {
+            $this->application->getErrorManager()->raise(ApplicationError::Error, 'Database error: ' . $e->getMessage() . ' in file ' . __FILE__ . ' at line ' . __LINE__);
             return false;
         }
     }

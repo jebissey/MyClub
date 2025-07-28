@@ -6,15 +6,14 @@ use DateTime;
 
 class AuthorizationDataHelper extends Data
 {
-    private $authorizations;
+    private $authorizations = null;
 
-    public function __construct()
+    public function __construct(Application $application)
     {
-        parent::__construct();
-        $this->authorizations = new AuthorizationDataHelper();
+        parent::__construct($application);
     }
 
-    public function getsFor($idPerson)
+    public function getsFor($personId)
     {
         $query = $this->pdo->prepare("
             SELECT DISTINCT Authorization.Name FROM Person 
@@ -23,7 +22,7 @@ class AuthorizationDataHelper extends Data
             INNER JOIN GroupAuthorization on `Group`.Id = GroupAuthorization.IdGroup
             INNER JOIN Authorization on GroupAuthorization.IdAuthorization = Authorization.Id 
             WHERE Person.Id = ?");
-        $query->execute([$idPerson]);
+        $query->execute([$personId]);
         return $this->authorizations = array_column($query->fetchAll(), 'Name');
     }
 

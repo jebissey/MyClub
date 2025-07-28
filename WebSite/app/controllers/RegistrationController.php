@@ -2,15 +2,17 @@
 
 namespace app\controllers;
 
+use app\helpers\Application;
+use app\enums\ApplicationError;
 use app\helpers\GroupDataHelper;
 use app\helpers\TableControllerHelper;
 use app\helpers\Webapp;
 
 class RegistrationController extends TableController
 {
-    public function __construct()
+    public function __construct(Application $application)
     {
-        parent::__construct();
+        parent::__construct($application);
     }
 
     public function index()
@@ -31,7 +33,7 @@ class RegistrationController extends TableController
                 ['field' => 'FirstName', 'label' => 'Prénom'],
                 ['field' => 'NickName', 'label' => 'Surnom']
             ];
-            $data = $this->prepareTableData((new TableControllerHelper())->getPersonsQuery(), $filterValues, $_GET['tablePage'] ?? null);
+            $data = $this->prepareTableData((new TableControllerHelper($this->application))->getPersonsQuery(), $filterValues, $_GET['tablePage'] ?? null);
             $this->render('app/views/registration/index.latte', $this->params->getAll([
                 'persons' => $data['items'],
                 'currentPage' => $data['currentPage'],
@@ -42,19 +44,19 @@ class RegistrationController extends TableController
                 'resetUrl' => '/registration',
                 'layout' => Webapp::getLayout()()
             ]));
-        } else $this->application->error403(__FILE__, __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function getPersonGroups($personId)
     {
         if ($this->personDataHelper->getPerson(['PersonManager', 'Webmaster'])) {
-            [$availableGroups, $currentGroups] = (new GroupDataHelper())->getAvailableGroups($personId);
+            [$availableGroups, $currentGroups] = (new GroupDataHelper($this->application))->getAvailableGroups($personId);
 
             $this->render('app/views/registration/groups.latte', $this->params->getAll([
                 'currentGroups' => $currentGroups,
                 'availableGroups' => $availableGroups,
                 'personId' => $personId
             ]));
-        } else $this->application->error403(__FILE__, __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 }

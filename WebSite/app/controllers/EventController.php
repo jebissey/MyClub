@@ -5,9 +5,11 @@ namespace app\controllers;
 use DateTime;
 use Throwable;
 
+use app\enums\ApplicationError;
 use app\helpers\Application;
 use app\helpers\AuthorizationDataHelper;
 use app\helpers\Crosstab;
+use app\helpers\CrosstabDataHelper;
 use app\helpers\Email;
 use app\helpers\EventDataHelper;
 use app\helpers\MessageDataHelper;
@@ -21,15 +23,13 @@ use app\helpers\Webapp;
 class EventController extends BaseController
 {
     private AuthorizationDataHelper $authorizationDatahelper;
-    private Crosstab $crosstab;
     private EventDataHelper $eventDataHelper;
 
-    public function __construct()
+    public function __construct(Application $application)
     {
-        parent::__construct();
-        $this->authorizationDatahelper = new AuthorizationDataHelper();
-        $this->crosstab = new Crosstab();
-        $this->eventDataHelper = new EventDataHelper();
+        parent::__construct($application);
+        $this->authorizationDatahelper = new AuthorizationDataHelper($application);
+        $this->eventDataHelper = new EventDataHelper($application);
     }
 
     public function nextEvents(): void
@@ -70,7 +70,7 @@ class EventController extends BaseController
     {
         if ($this->personDataHelper->getPerson(['EventManager'], 1)) {
             $period = $this->flight->request()->query->period ?? 'month';
-            [$dateRange, $crosstabData] = $this->crosstab->getevents($period);
+            [$dateRange, $crosstabData] = (new CrosstabDataHelper($this->application))->getevents($period);
 
             $this->render('app/views/common/crosstab.latte', $this->params->getAll([
                 'crosstabData' => $crosstabData,
@@ -81,7 +81,7 @@ class EventController extends BaseController
                 'title' => 'Animateurs vs type d\'événement',
                 'totalLabels' => ['événements', 'participants']
             ]));
-        } else $this->application->error403(__FILE__, __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function guest($message = '', $type = '')
@@ -96,7 +96,7 @@ class EventController extends BaseController
                 'message' => $message,
                 'messageType' => $type
             ]));
-        } else $this->application->error403(__FILE__, __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function guestInvite()
@@ -187,7 +187,7 @@ class EventController extends BaseController
                     $this->guest('Erreur lors de l\'envoi de l\'invitation. ' . $e->getMessage(), 'error');
                 }
             } else $this->guest();
-        } else $this->application->error403(__FILE__, __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function show($eventId, $message = null, $messageType = null): void
@@ -201,7 +201,7 @@ class EventController extends BaseController
                 'eventId' => $eventId,
                 'event' => $this->eventDataHelper->getEvent($eventId),
                 'attributes' => $this->eventDataHelper->getEventAttributes($eventId),
-                'participants' => (new ParticipantDataHelper())->getEventParticipants($eventId),
+                'participants' => (new ParticipantDataHelper($this->application))->getEventParticipants($eventId),
                 'userEmail' => $userEmail,
                 'isRegistered' => $this->eventDataHelper->isUserRegistered($eventId, $userEmail),
                 'navItems' => $this->getNavItems($person),
@@ -217,7 +217,7 @@ class EventController extends BaseController
                 'message' => $message,
                 'messageType' => $messageType,
             ]));
-        } else $this->application->message('Evénement non trouvé', 3000, 403);
+        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Evénement non trouvé', 3000);
     }
 
     public function register($eventId, bool $set, $token = null): void
@@ -301,8 +301,8 @@ class EventController extends BaseController
         if ($this->personDataHelper->getPerson(['EventManager'])) {
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $this->render('app/views/event/location.latte', $this->params->getAll([]));
-            } else $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
-        } else $this->application->error403(__FILE__, __LINE__);
+            } else $this->application->getErrorManager()->raise(ApplicationError::InvalidRequestMethod, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function help(): void
@@ -310,7 +310,7 @@ class EventController extends BaseController
         $this->personDataHelper->getPerson();
 
         $this->render('app/views/info.latte', [
-            'content' => (new SettingsDataHelper())->get('Help_eventManager'),
+            'content' => (new SettingsDataHelper($this->application))->get('Help_eventManager'),
             'hasAuthorization' => $this->authorizationDatahelper->hasAutorization(),
             'currentVersion' => Application::getVersion()
         ]);
@@ -324,8 +324,8 @@ class EventController extends BaseController
                 $_SESSION['navbar'] = 'eventManager';
 
                 $this->render('app/views/admin/eventManager.latte', $this->params->getAll([]));
-            } else $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
-        } else $this->application->error403(__FILE__, __LINE__);
+            } else $this->application->getErrorManager()->raise(ApplicationError::InvalidRequestMethod, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function needs(): void
@@ -334,9 +334,9 @@ class EventController extends BaseController
             $this->render('app/views/event/needs.latte', $this->params->getAll([
                 'navItems' => $this->getNavItems($person),
                 'needTypes' => $this->dataHelper->gets('NeedType', [], '*', 'Name'),
-                'needs' => (new NeeddataHelper())->getNeedsAndTheirTypes(),
+                'needs' => (new NeeddataHelper($this->application))->getNeedsAndTheirTypes(),
             ]));
-        } else $this->application->error403(__FILE__, __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function showEventChat($eventId): void
@@ -344,11 +344,11 @@ class EventController extends BaseController
         if ($person = $this->personDataHelper->getPerson([])) {
             $event = $this->dataHelper->get('Event', ['Id' => $eventId]);
             if (!$event) {
-                $this->application->error471($eventId, __FILE__, __LINE__);
+                $this->application->getErrorManager()->raise(ApplicationError::BadRequest, "Unknown event '$eventId' in file " . __FILE__ . ' at line ' . __LINE__);
                 return;
             }
             $creator = $this->dataHelper->get('Person', ['Id', $event->CreatedBy]);
-            $messages = (new MessageDataHelper())->getEventMessages($eventId);
+            $messages = (new MessageDataHelper($this->application))->getEventMessages($eventId);
 
             $this->render('app/views/event/chat.latte', $this->params->getAll([
                 'event' => $event,
@@ -357,6 +357,6 @@ class EventController extends BaseController
                 'person' => $person,
                 'navItems' => $this->getNavItems($person),
             ]));
-        } else $this->application->error403(__FILE__, __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 }

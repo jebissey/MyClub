@@ -2,6 +2,7 @@
 
 namespace app\controllers;
 
+use app\enums\ApplicationError;
 use app\helpers\Application;
 use app\helpers\AuthorizationDataHelper;
 use app\helpers\GroupDataHelper;
@@ -15,22 +16,22 @@ class PersonController extends TableController implements CrudControllerInterfac
     private GroupDataHelper $groupDataHelper;
     private TableControllerHelper $tableControllerHelper;
 
-    public function __construct()
+    public function __construct(Application $application)
     {
-        parent::__construct();
-        $this->groupDataHelper = new GroupdataHelper();
-        $this->tableControllerHelper = new TableControllerHelper();
+        parent::__construct($application);
+        $this->groupDataHelper = new GroupdataHelper($application);
+        $this->tableControllerHelper = new TableControllerHelper($application);
     }
 
     public function help(): void
     {
         if ($this->personDataHelper->getPerson(['PersonManager', 'Webmaster'])) {
             $this->render('app/views/info.latte', [
-                'content' => (new SettingsDataHelper())->get('Help_personManager'),
-                'hasAuthorization' => (new AuthorizationDataHelper())->hasAutorization(),
+                'content' => (new SettingsDataHelper($this->application))->get('Help_personManager'),
+                'hasAuthorization' => (new AuthorizationDataHelper($this->application))->hasAutorization(),
                 'currentVersion' => Application::getVersion()
             ]);
-        } else $this->application->error403(__FILE__, __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function home(): void
@@ -39,8 +40,8 @@ class PersonController extends TableController implements CrudControllerInterfac
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $_SESSION['navbar'] = 'personManager';
                 $this->render('app/views/admin/personManager.latte', $this->params->getAll([]));
-            } else $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
-        } else $this->application->error403(__FILE__, __LINE__);
+            } else $this->application->getErrorManager()->raise(ApplicationError::InvalidRequestMethod, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function index()
@@ -75,7 +76,7 @@ class PersonController extends TableController implements CrudControllerInterfac
                 'columns' => $columns,
                 'resetUrl' => '/persons'
             ]));
-        } else $this->application->error403(__FILE__, __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function create()
@@ -83,15 +84,15 @@ class PersonController extends TableController implements CrudControllerInterfac
         if ($this->personDataHelper->getPerson(['PersonManager', 'Webmaster'])) {
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $this->flight->redirect('/persons/edit/' . $this->personDataHelper->create());
-            } else $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
-        } else $this->application->error403(__FILE__, __LINE__);
+            } else $this->application->getErrorManager()->raise(ApplicationError::InvalidRequestMethod, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function edit($id)
     {
         if ($this->personDataHelper->getPerson(['PersonManager', 'Webmaster'])) {
             $person = $this->dataHelper->get('Person', ['Id' => $id]);
-            if (!$person) $this->application->error499('Person', $id, __FILE__, __LINE__);
+            if (!$person) $this->application->getErrorManager()->raise(ApplicationError::BadRequest, "Unknown person id: $id in file " . __FILE__ . ' at line ' . __LINE__);
             else {
                 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $firstName = $_POST['firstName'];
@@ -111,9 +112,9 @@ class PersonController extends TableController implements CrudControllerInterfac
                         'isSelfEdit' => false,
                         'layout' => Webapp::getLayout()('account')
                     ]));
-                } else $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
+                } else $this->application->getErrorManager()->raise(ApplicationError::InvalidRequestMethod, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
             }
-        } else $this->application->error403(__FILE__, __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function delete($id)
@@ -122,8 +123,8 @@ class PersonController extends TableController implements CrudControllerInterfac
             if (($_SERVER['REQUEST_METHOD'] === 'GET')) {
                 $this->dataHelper->set('Person', ['Inactivated' => 1], ['Id' => $id]);
                 $this->flight->redirect('/persons');
-            } else $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
-        } else $this->application->error403(__FILE__, __LINE__);
+            } else $this->application->getErrorManager()->raise(ApplicationError::InvalidRequestMethod, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function editPresentation()
@@ -133,7 +134,7 @@ class PersonController extends TableController implements CrudControllerInterfac
                 'person' => $person,
                 'navItems' => $this->getNavItems($person),
             ]));
-        } else $this->application->error403(__FILE__, __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function savePresentation()
@@ -151,8 +152,8 @@ class PersonController extends TableController implements CrudControllerInterfac
                     'InPresentationDirectory' => $inDirectory,
                 ], ['Id' => $person->Id]);
                 $this->flight->redirect('/directory');
-            } else $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
-        } else $this->application->error403(__FILE__, __LINE__);
+            } else $this->application->getErrorManager()->raise(ApplicationError::InvalidRequestMethod, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function showPresentation($personId)
@@ -164,7 +165,7 @@ class PersonController extends TableController implements CrudControllerInterfac
                 'InPresentationDirectory' => 1
             ]);
             if (!$person) {
-                $this->application->error404(__FILE__, __LINE__);
+                $this->application->getErrorManager()->raise(ApplicationError::BadRequest, "Unknown person id $personId in file " . __FILE__ . ' at line ' . __LINE__);
                 return;
             }
 
@@ -173,7 +174,7 @@ class PersonController extends TableController implements CrudControllerInterfac
                 'loggedPerson' => $loggedPerson,
                 'navItems' => $this->getNavItems($person),
             ]));
-        } else $this->application->error403(__FILE__, __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function showDirectory()
@@ -192,8 +193,8 @@ class PersonController extends TableController implements CrudControllerInterfac
                 'groupCounts' => $groupCounts,
                 'selectedGroup' => $selectedGroup,
             ]));
-        } elseif ($person == '') $this->application->message('Il faut être connecté pour pouvoir consulter le trombinoscope', 5000, 403);
-        else $this->application->error403(__FILE__, __LINE__);
+        } elseif ($person == '') $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Il faut être connecté pour pouvoir consulter le trombinoscope', 5000);
+        else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function showMap()
@@ -226,6 +227,6 @@ class PersonController extends TableController implements CrudControllerInterfac
                 'membersCount' => count($locationData),
                 'navItems' => $this->getNavItems($person),
             ]));
-        } else $this->application->error403(__FILE__, __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 }

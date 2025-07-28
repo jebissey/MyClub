@@ -2,6 +2,8 @@
 
 namespace app\controllers;
 
+use app\helpers\Application;
+use app\enums\ApplicationError;
 use app\helpers\DbBrowserHelper;
 
 class DbBrowserController extends BaseController
@@ -9,10 +11,10 @@ class DbBrowserController extends BaseController
     private int $itemsPerPage = 10;
     private DbBrowserHelper $dbBrowserHelper;
 
-    public function __construct()
+    public function __construct(Application $application)
     {
-        parent::__construct();
-        $this->dbBrowserHelper = new DbBrowserHelper();
+        parent::__construct($application);
+        $this->dbBrowserHelper = new DbBrowserHelper($application);
     }
 
     public function createRecord($table)
@@ -20,7 +22,7 @@ class DbBrowserController extends BaseController
         if ($this->personDataHelper->getPerson(['Webmaster'])) {
             $this->dbBrowserHelper->createRecord($table);
             $this->flight->redirect('/dbbrowser/' . urlencode($table));
-        } else $this->application->error403(__FILE__, __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function deleteRecord($table, $id)
@@ -28,14 +30,14 @@ class DbBrowserController extends BaseController
         if ($this->personDataHelper->getPerson(['Webmaster'])) {
             $this->dbBrowserHelper->deleteRecord($table, $id);
             $this->flight->redirect('/dbbrowser/' . urlencode($table));
-        } else $this->application->error403(__FILE__, __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function index()
     {
         if ($this->personDataHelper->getPerson(['Webmaster'])) {
             $this->render('app/views/dbbrowser/index.latte', $this->params->getAll(['tables' => $this->getTables()]));
-        } else $this->application->error403(__FILE__, __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function showCreateForm($table)
@@ -48,7 +50,7 @@ class DbBrowserController extends BaseController
                 'columns' => $columns,
                 'columnTypes' => $columnTypes
             ]));
-        } else $this->application->error403(__FILE__, __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function showEditForm($table, $id)
@@ -63,7 +65,7 @@ class DbBrowserController extends BaseController
                 'primaryKey' => $primaryKey,
                 'columnTypes' => $columnTypes
             ]));
-        } else $this->application->error403(__FILE__, __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function showTable($table)
@@ -80,7 +82,7 @@ class DbBrowserController extends BaseController
                 'totalPages' => $totalPages,
                 'filters' => $filters
             ]));
-        } else $this->application->error403(__FILE__, __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function updateRecord($table, $id)
@@ -88,7 +90,7 @@ class DbBrowserController extends BaseController
         if ($this->personDataHelper->getPerson(['Webmaster'])) {
             $this->dbBrowserHelper->updateRecord($table, $id);
             $this->flight->redirect('/dbbrowser/' . urlencode($table));
-        } else $this->application->error403(__FILE__, __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     #region Private function

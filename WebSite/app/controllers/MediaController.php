@@ -2,6 +2,8 @@
 
 namespace App\Controllers;
 
+use app\helpers\Application;
+use app\enums\ApplicationError;
 use app\helpers\Media;
 use app\helpers\Webapp;
 
@@ -9,9 +11,9 @@ class MediaController extends BaseController
 {
     private Media $media;
 
-    public function __construct()
+    public function __construct(Application $application)
     {
-        parent::__construct();
+        parent::__construct($application);
         $this->media = new Media();
     }
 
@@ -20,8 +22,8 @@ class MediaController extends BaseController
         if ($this->personDataHelper->getPerson(['Redactor'])) {
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $this->render('app/views/media/upload.latte', $this->params->getAll([]));
-            } else $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
-        } else $this->application->error403(__FILE__, __LINE__);
+            } else $this->application->getErrorManager()->raise(ApplicationError::InvalidRequestMethod, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' invalid in file ' . __FILE__ . ' at line ' . __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function listFiles()
@@ -41,8 +43,8 @@ class MediaController extends BaseController
                     'search' => $search,
                     'baseUrl' => Webapp::getBaseUrl()
                 ]));
-            } else $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
-        } else $this->application->error403(__FILE__, __LINE__);
+            } else $this->application->getErrorManager()->raise(ApplicationError::InvalidRequestMethod, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function viewFile($year, $month, $filename)
@@ -52,7 +54,7 @@ class MediaController extends BaseController
                 $filePath = $this->media->GetMediaPath() . $year . '/' . $month . '/' . $filename;
 
                 if (!file_exists($filePath)) {
-                    $this->application->error404();
+                    $this->application->getErrorManager()->raise(ApplicationError::PageNotFound, "File $filename not found in file " . __FILE__ . ' at line ' . __LINE__);
                     return;
                 }
 
@@ -65,8 +67,8 @@ class MediaController extends BaseController
                 header('Content-Disposition: inline; filename="' . $filename . '"');
                 readfile($filePath);
                 return;
-            } else $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
-        } else $this->application->error403(__FILE__, __LINE__);
+            } else $this->application->getErrorManager()->raise(ApplicationError::InvalidRequestMethod, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function gpxViewer(): void
@@ -74,8 +76,8 @@ class MediaController extends BaseController
         if ($this->personDataHelper->getPerson([])) {
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $this->render('app/views/media/gpxViewer.latte', $this->params->getAll([]));
-            } else $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
-        } else $this->application->error403(__FILE__, __LINE__);
+            } else $this->application->getErrorManager()->raise(ApplicationError::InvalidRequestMethod, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
 

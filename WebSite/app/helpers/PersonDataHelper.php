@@ -3,6 +3,8 @@
 namespace app\helpers;
 
 use DateTime;
+
+use app\enums\ApplicationError;
 use app\helpers\Params;
 use app\helpers\TranslationManager;
 
@@ -10,10 +12,10 @@ class PersonDataHelper extends Data
 {
     private AuthorizationDataHelper $authorizationDataHelper;
 
-    public function __construct()
+    public function __construct(Application $application)
     {
-        parent::__construct();
-        $this->authorizationDataHelper = new AuthorizationDataHelper();
+        parent::__construct($application);
+        $this->authorizationDataHelper = new AuthorizationDataHelper($application);
     }
 
     public function getPersonsInGroup(int $idGroup, bool $everybodyIfNoGroup = false): array
@@ -63,13 +65,13 @@ class PersonDataHelper extends Data
 
         $person = $this->get('Person', ['Email' => $userEmail]);
         if (!$person) {
-            $this->application->error480($userEmail, __FILE__, __LINE__);
+            $this->application->getErrorManager()->raise(ApplicationError::BadRequest, "Unknown user with this email address: $userEmail in file " . __FILE__ . ' at line ' . __LINE__);
             return false;
         }
 
         $authorizations = $this->authorizationDataHelper->getsFor($person->Id);
         if ($requiredAuthorisations != [] && empty(array_intersect($authorizations, $requiredAuthorisations))) {
-            $this->application->error403(__FILE__, __LINE__);
+            $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
             return false;
         }
 
@@ -181,7 +183,7 @@ class PersonDataHelper extends Data
     {
         $idGroup = $this->fluent->from('Article')->where('Id', $idArticle)->fetch('IdGroup');
         $idSurvey = $this->fluent->from('Survey')->where('IdArticle', $idArticle)->fetch('Id');
-        $persons = (new PersonDataHelper())->getPersonsInGroup($idGroup);
+        $persons = (new PersonDataHelper($this->application))->getPersonsInGroup($idGroup);
         $filteredEmails = [];
         foreach ($persons as $person) {
             $include = false;
@@ -192,9 +194,7 @@ class PersonDataHelper extends Data
                         if ($idSurvey) {
                             $include = true;
                         }
-                    } else {
-                        $include = true;
-                    }
+                    } else $include = true;
                 }
             }
             if ($include) {
@@ -210,6 +210,57 @@ class PersonDataHelper extends Data
             }
         }
         return $filteredEmails;
+    }
+
+    public function getEmailsOfInterestedPeople($idGroup, $idEventType, $dayOfWeek, $timeOfDay)
+    {
+        $persons = $this->getInterestedPeople($idGroup, $idEventType, $dayOfWeek, $timeOfDay);
+        $filteredEmails = [];
+        foreach ($persons as $person) {
+            $filteredEmails[] = $person->Email;
+        }
+        return $filteredEmails;
+    }
+
+    public function getInterestedPeople($idGroup, $idEventType, $dayOfWeek, $timeOfDay): array
+    {
+        $persons = (new PersonDataHelper($this->application))->getPersonsInGroup($idGroup, true);
+        $filteredPeople = [];
+        foreach ($persons as $person) {
+            if ((new PersonPreferences())->isPersonInterested($person, $idEventType, $dayOfWeek, $timeOfDay)) $filteredPeople[] = $person;
+        }
+        return $filteredPeople;
+    }
+
+    public function sendRegistrationLink($adminEmail, $name, $emailContact, $event): bool
+    {
+        $contact = $this->fluent->from('Contact')->where('Email', $emailContact)->fetch();
+        if (!$contact) {
+            $contactData = [
+                'Email' => $emailContact,
+                'NickName' => $name,
+                'Token' => bin2hex(random_bytes(32)),
+                'TokenCreatedAt' => date('Y-m-d H:i:s')
+            ];
+            $contactId = $this->fluent->insertInto('Contact')->values($contactData)->execute();
+        } else {
+            $token = bin2hex(random_bytes(32));
+            $this->fluent->update('Contact')
+                ->set([
+                    'Token' => $token,
+                    'TokenCreatedAt' => date('Y-m-d H:i:s')
+                ])
+                ->where('Id', $contact->Id)
+                ->execute();
+            $contact->Token = $token;
+        }
+        if (!$contact) {
+            $contact = $this->fluent->from('Contact')->where('Id', $contactId)->fetch();
+        }
+        $registrationLink = Webapp::getBaseUrl() . "events/{$event->Id}/{$contact->Token}";
+        $subject = "Lien d'inscription pour " . $event->Summary;
+        $body = $registrationLink;
+        return Email::send($adminEmail, $emailContact, $subject, $body);
     }
 
     #region Private functions

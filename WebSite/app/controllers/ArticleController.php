@@ -2,32 +2,30 @@
 
 namespace app\controllers;
 
-use app\helpers\ArticleCrosstab;
+use app\enums\ApplicationError;
+use app\helpers\Application;
+use app\helpers\ArticleCrosstabDataHelper;
 use app\helpers\ArticleDataHelper;
-use app\helpers\ArticleTableData;
+use app\helpers\ArticleTableDataHelper;
 use app\helpers\AuthorizationDataHelper;
 use app\helpers\Backup;
-use app\helpers\CarouselHelper;
+use app\helpers\CarouselDataHelper;
 use app\helpers\Period;
 use app\helpers\SurveyDataHelper;
 use app\helpers\Webapp;
 
 class ArticleController extends TableController
 {
-    private ArticleCrosstab $articleCrosstab;
     private ArticleDataHelper $articleDataHelper;
-    private ArticleTableData $articleTableData;
+    private ArticleTableDataHelper $articleTableDataHelper;
     private AuthorizationDataHelper $authorizationDatahelper;
-    private CarouselHelper $carouselHelper;
 
-    public function __construct()
+    public function __construct(Application $application)
     {
-        parent::__construct();
-        $this->articleCrosstab = new ArticleCrosstab();
-        $this->articleDataHelper = new ArticleDataHelper();
-        $this->articleTableData = new ArticleTableData();
-        $this->authorizationDatahelper = new AuthorizationDataHelper();
-        $this->carouselHelper = new CarouselHelper();
+        parent::__construct($application);
+        $this->articleDataHelper = new ArticleDataHelper($application);
+        $this->articleTableDataHelper = new ArticleTableDataHelper($application);
+        $this->authorizationDatahelper = new AuthorizationDataHelper($application);
     }
 
     public function home(): void
@@ -38,8 +36,8 @@ class ArticleController extends TableController
                 $_SESSION['navbar'] = 'redactor';
 
                 $this->render('app/views/admin/redactor.latte', $this->params->getAll([]));
-            } else $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
-        } else $this->application->error403(__FILE__, __LINE__);
+            } else $this->application->getErrorManager()->raise(ApplicationError::InvalidRequestMethod, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function index()
@@ -78,7 +76,7 @@ class ArticleController extends TableController
         if ($this->authorizationDatahelper->isEditor()) {
             $columns[] = ['field' => 'Published', 'label' => 'Publié'];
         }
-        $query = $this->articleTableData->getQuery($person);
+        $query = $this->articleTableDataHelper->getQuery($person);
         $data = $this->prepareTableData($query, $filterValues, $_GET['tablePage'] ?? null);
         $this->render('app/views/user/articles.latte', $this->params->getAll([
             'articles' => $data['items'],
@@ -121,17 +119,17 @@ class ArticleController extends TableController
                 'latestArticles' => $this->articleDataHelper->getLatestArticles_($articleIds),
                 'canEdit' => $canEdit,
                 'groups' => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
-                'hasSurvey' => (new SurveyDataHelper())->articleHasSurvey($id),
+                'hasSurvey' => (new SurveyDataHelper($this->application))->articleHasSurvey($id),
                 'id' => $id,
                 'userConnected' => $person,
                 'navItems' => $this->getNavItems($person),
                 'publishedBy' => $chosenArticle->PublishedBy && $chosenArticle->PublishedBy != $chosenArticle->CreatedBy ? $this->personDataHelper->getPublisher($chosenArticle->PublishedBy) : '',
                 'canReadPool' => $this->authorizationDatahelper->canPersonReadSurveyResults($chosenArticle, $person),
-                'carouselItems' => $this->carouselHelper->getsForArticle($id),
+                'carouselItems' => (new CarouselDataHelper($this->application))->getsForArticle($id),
                 'message' => $messages,
             ]));
-        } else if ($person == '') $this->application->message('Il faut être connecté pour pouvoir consulter cet article', 5000, 403);
-        else $this->application->error403(__FILE__, __LINE__);
+        } else if ($person == '') $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Il faut être connecté pour pouvoir consulter cet article', 5000);
+        else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function update($id): void
@@ -140,7 +138,7 @@ class ArticleController extends TableController
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $article = $this->articleDataHelper->getLatestArticle([$id]);
                 if (!$article || $person->Id != $article->CreatedBy) {
-                    $this->application->error403(__FILE__, __LINE__);
+                    $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
                     return;
                 }
                 $title = $_POST['title'] ?? '';
@@ -164,8 +162,8 @@ class ArticleController extends TableController
                     (new Backup())->save();
                 } else $_SESSION['error'] = "Une erreur est survenue lors de la mise à jour de l'article";
                 $this->flight->redirect('/articles/' . $id);
-            } else $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
-        } else $this->application->error403(__FILE__, __LINE__);
+            } else $this->application->getErrorManager()->raise(ApplicationError::InvalidRequestMethod, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function publish($id): void
@@ -174,7 +172,7 @@ class ArticleController extends TableController
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $article = $this->articleDataHelper->getLatestArticle([$id]);
                 if (!$article || ($person->Id != $article->CreatedBy && !$this->authorizationDatahelper->isEditor())) {
-                    $this->application->error403(__FILE__, __LINE__);
+                    $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
                     return;
                 }
                 $isSpotlightActive = $_POST['isSpotlightActive'] ?? 0;
@@ -190,8 +188,8 @@ class ArticleController extends TableController
                 $this->flight->redirect('/articles/' . $id);
             } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $this->render('app/views/user/publish.latte', $this->params->getAll(['article' => $this->articleDataHelper->getWithAuthor($id)]));
-            } else $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
-        } else $this->application->error403(__FILE__, __LINE__);
+            } else $this->application->getErrorManager()->raise(ApplicationError::InvalidRequestMethod, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function create()
@@ -200,8 +198,8 @@ class ArticleController extends TableController
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $id = $this->articleDataHelper->insert($person->Id);
                 $this->flight->redirect('/articles/' . $id);
-            } else $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
-        } else $this->application->error403(__FILE__, __LINE__);
+            } else $this->application->getErrorManager()->raise(ApplicationError::InvalidRequestMethod, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function delete($id)
@@ -210,13 +208,13 @@ class ArticleController extends TableController
             if (($_SERVER['REQUEST_METHOD'] === 'GET')) {
                 $article = $this->articleDataHelper->getLatestArticle([$id]);
                 if (!$article || $person->Id != $article->CreatedBy) {
-                    $this->application->error403(__FILE__, __LINE__);
+                    $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
                     return;
                 }
                 $this->articleDataHelper->delete_($id);
                 $this->flight->redirect('/articles');
-            } else $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
-        } else $this->application->error403(__FILE__, __LINE__);
+            } else $this->application->getErrorManager()->raise(ApplicationError::InvalidRequestMethod, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function showArticleCrosstab()
@@ -224,7 +222,7 @@ class ArticleController extends TableController
         if ($this->personDataHelper->getPerson(['Redactor'], 1)) {
             $period = $this->flight->request()->query->period ?? 'month';
             $dateRange = Period::getDateRangeFor($period);
-            $crosstabData = $this->articleCrosstab->getItems($dateRange);
+            $crosstabData = (new ArticleCrosstabDataHelper($this->application))->getItems($dateRange);
 
             $this->render('app/views/common/crosstab.latte', $this->params->getAll([
                 'crosstabData' => $crosstabData,
@@ -235,6 +233,6 @@ class ArticleController extends TableController
                 'title' => 'Rédateurs vs audience',
                 'totalLabels' => ['articles', '']
             ]));
-        } else $this->application->error403(__FILE__, __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 }

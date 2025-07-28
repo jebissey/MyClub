@@ -2,14 +2,16 @@
 
 namespace app\controllers;
 
+use app\helpers\Application;
+use app\enums\ApplicationError;
 use app\helpers\FFAScraper;
 use app\helpers\SettingsDataHelper;
 
 class FFAController extends BaseController
 {
-    public function __construct()
+    public function __construct(Application $application)
     {
-        parent::__construct();
+        parent::__construct($application);
     }
 
     public function searchMember()
@@ -19,7 +21,7 @@ class FFAController extends BaseController
             $lastName = $_GET['lastName'] ?? $person->LastName ?? '';
             $question = $_GET['question'] ?? 'rank';
             $year = $_GET['year'] ?? date('Y');
-            $club = $_GET['club'] ?? (new SettingsDataHelper())->get('FFA_club') ?? '';
+            $club = $_GET['club'] ?? (new SettingsDataHelper($this->application))->get('FFA_club') ?? '';
             $results = [];
             $ffaScraper = new FFAScraper();
             if ($question == 'rank') $results = $ffaScraper->searchAthleteRank($firstName, $lastName, $year, $club);
@@ -35,6 +37,6 @@ class FFAController extends BaseController
                 'year' => $year,
                 'club' => $club,
             ]));
-        } else $this->application->error403(__FILE__, __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 }

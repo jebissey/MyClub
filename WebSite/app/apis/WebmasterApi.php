@@ -14,11 +14,11 @@ class WebmasterApi extends BaseApi
     private PageDataHelper $pageDataHelper;
     private PersonGroupDataHelper $personGroupDataHelper;
 
-    public function __construct()
+    public function __construct(Application $application)
     {
-        parent::__construct();
-        $this->pageDataHelper = new PageDataHelper();
-        $this->personGroupDataHelper = new PersonGroupDataHelper();
+        parent::__construct($application);
+        $this->pageDataHelper = new PageDataHelper($application);
+        $this->personGroupDataHelper = new PersonGroupDataHelper($application);
     }
 
     public function addToGroup($personId, $groupId)
@@ -48,7 +48,7 @@ class WebmasterApi extends BaseApi
 
     public function lastVersion()
     {
-        (new LogDataHelper())->add(200, $_SERVER['HTTP_USER_AGENT']);
+        (new LogDataHelper($this->application))->add(200, $_SERVER['HTTP_USER_AGENT']);
         $this->renderJson(['lastVersion' => Application::getVersion()]);
     }
 

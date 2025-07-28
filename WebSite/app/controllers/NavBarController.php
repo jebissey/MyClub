@@ -2,15 +2,17 @@
 
 namespace app\controllers;
 
+use app\helpers\Application;
+use app\enums\ApplicationError;
 use app\helpers\ArwardsDataHelper;
 use  app\helpers\AuthorizationDataHelper;
 use app\helpers\Webapp;
 
 class NavBarController extends BaseController
 {
-    public function __construct()
+    public function __construct(Application $application)
     {
-        parent::__construct();
+        parent::__construct($application);
     }
 
     public function index()
@@ -21,14 +23,14 @@ class NavBarController extends BaseController
                 'groups' => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
                 'availableRoutes' => $this->getAvailableRoutes()
             ]));
-        } else $this->application->error403(__FILE__, __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function showArwards()
     {
         $person = $this->personDataHelper->getPerson();
         if ($this->pageDataHelper->authorizedUser('/navbar/show/arwards', $person)) {
-            $arwardsDataHelper = new ArwardsDataHelper();
+            $arwardsDataHelper = new ArwardsDataHelper($this->application);
 
             $this->render('app/views/admin/arwards.latte', $this->params->getAll([
                 'counterNames' => $counterNames = $arwardsDataHelper->getCounterNames(),
@@ -37,7 +39,7 @@ class NavBarController extends BaseController
                 'layout' => Webapp::getLayout()(),
                 'navItems' => $this->getNavItems($person),
             ]));
-        } else $this->application->error403(__FILE__, __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function showArticle($id)
@@ -47,9 +49,9 @@ class NavBarController extends BaseController
             $this->render('app/views/navbar/article.latte', $this->params->getAll([
                 'navItems' => $this->getNavItems($person),
                 'chosenArticle' => $this->dataHelper->get('Article', ['Id' => $id]),
-                'hasAuthorization' => (new AuthorizationDataHelper())->hasAutorization()
+                'hasAuthorization' => (new AuthorizationDataHelper($this->application))->hasAutorization()
             ]));
-        } else $this->application->error403(__FILE__, __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     #region private function 

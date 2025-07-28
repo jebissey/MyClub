@@ -6,9 +6,9 @@ use PDO;
 
 class ArticleDataHelper extends Data
 {
-    public function __construct()
+    public function __construct(Application $application)
     {
-        parent::__construct();
+        parent::__construct($application);
     }
 
     public function calculateTotals($crosstabData)
@@ -90,7 +90,7 @@ class ArticleDataHelper extends Data
 
     public function getSpotlightArticle()
     {
-        $spotlightArticleJson = (new SettingsDataHelper())->get_('SpotlightArticle');
+        $spotlightArticleJson = (new SettingsDataHelper($this->application))->get_('SpotlightArticle');
         if ($spotlightArticleJson === null) {
             return null;
         }
@@ -103,7 +103,7 @@ class ArticleDataHelper extends Data
             'articleId' => $articleId,
             'spotlightUntil' => $spotlightUntil
         ];
-        (new SettingsDataHelper())->set_('SpotlightArticle', json_encode($data));
+        (new SettingsDataHelper($this->application))->set_('SpotlightArticle', json_encode($data));
     }
 
     public function getArticleIdsBasedOnAccess(?string $userEmail): array
@@ -113,7 +113,7 @@ class ArticleDataHelper extends Data
         $forMembersOnlyArticleIds = $this->getArticleIdsForMembers([$userEmail]);
         if (empty($forMembersOnlyArticleIds)) $articleIds = $noGroupArticleIds;
         else $articleIds = array_merge($noGroupArticleIds, $forMembersOnlyArticleIds);
-        $userGroups = (new AuthorizationDataHelper())->getUserGroups($userEmail);
+        $userGroups = (new AuthorizationDataHelper($this->application))->getUserGroups($userEmail);
         if (empty($userGroups)) return $articleIds;
         $groupArticleIds = $this->getArticleIdsByGroups($userGroups);
         return array_unique(array_merge($articleIds, $groupArticleIds));
@@ -217,7 +217,7 @@ class ArticleDataHelper extends Data
             ->fetchAll();
         $news = [];
         foreach ($articles as $article) {
-            if ((new AuthorizationDataHelper())->getArticle($article->Id, $person)) {
+            if ((new AuthorizationDataHelper($this->application))->getArticle($article->Id, $person)) {
                 $news[] = [
                     'type'  => 'article',
                     'id'    => $article->Id,

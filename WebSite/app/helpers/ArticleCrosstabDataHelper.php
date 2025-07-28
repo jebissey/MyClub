@@ -2,11 +2,11 @@
 
 namespace app\helpers;
 
-class ArticleCrosstab extends Data
+class ArticleCrosstabDataHelper extends Data
 {
-    public function __construct()
+    public function __construct(Application $application)
     {
-        parent::__construct();
+        parent::__construct($application);
     }
 
     public function getItems($dateRange)
@@ -31,7 +31,7 @@ class ArticleCrosstab extends Data
             AND a.PublishedBy IS NOT NULL
             ORDER BY p.LastName, p.FirstName
         ";
-        return (new Crosstab())->generateCrosstab(
+        return (new CrosstabDataHelper($this->application))->generateCrosstab(
             $sql,
             [':start' => $dateRange['start'], ':end' => $dateRange['end']],
             'Audience',

@@ -27,16 +27,16 @@ abstract class BaseController
     protected PageDataHelper $pageDataHelper;
     protected PersonDataHelper $personDataHelper;
 
-    public function __construct()
+    public function __construct(Application $application)
     {
-        $this->application = Application::getInstance();
-        $this->dataHelper = new DataHelper();
-        $this->languagesDataHelper = new LanguagesDataHelper();
-        $this->pageDataHelper = new PageDataHelper();
-        $this->personDataHelper = new PersonDataHelper();
+        $this->application = $application;
+        $this->dataHelper = new DataHelper($application);
+        $this->languagesDataHelper = new LanguagesDataHelper($application);
+        $this->pageDataHelper = new PageDataHelper($application);
+        $this->personDataHelper = new PersonDataHelper($application);
 
-        $this->flight = Application::getFlight();
-        $this->latte = Application::getLatte();
+        $this->flight = $application->getFlight();
+        $this->latte = $application->getLatte();
         $this->addLatteFilters();
     }
 
@@ -44,7 +44,7 @@ abstract class BaseController
     protected function getNavItems($person, $all = false)
     {
         if (!$person) $userGroups = [];
-        else $userGroups = (new AuthorizationDataHelper())->getUserGroups($person->Email);
+        else $userGroups = (new AuthorizationDataHelper($this->application))->getUserGroups($person->Email);
 
         $navItems = $this->dataHelper->gets('Page');
         $filteredNavItems = [];

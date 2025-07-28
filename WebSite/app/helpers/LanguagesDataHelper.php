@@ -6,9 +6,9 @@ use app\helpers\TranslationManager;
 
 class LanguagesDataHelper extends Data
 {
-    public function __construct()
+    public function __construct(Application $application)
     {
-        parent::__construct();
+        parent::__construct($application);
     }
 
     public function translate($key)

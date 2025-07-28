@@ -5,6 +5,7 @@ namespace app\apis;
 use Exception;
 use Throwable;
 
+use app\helpers\Application;
 use app\helpers\ArticleDataHelper;
 use app\helpers\DesignDataHelper;
 use app\helpers\Media;
@@ -15,11 +16,11 @@ class ArticleApi extends BaseApi
     private Media $media;
     private ReplyDataHelper $replyDataHelper;
 
-    public function __construct()
+    public function __construct(Application $application)
     {
-        parent::__construct();
+        parent::__construct($application);
         $this->media = new Media();
-        $this->replyDataHelper = new ReplyDataHelper();
+        $this->replyDataHelper = new ReplyDataHelper($application);
     }
 
     public function deleteFile($year, $month, $filename)
@@ -31,7 +32,7 @@ class ArticleApi extends BaseApi
     {
         if ($person = $this->personDataHelper->getPerson(['Redactor'])) {
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-                (new DesignDataHelper())->insertOrUpdate(json_decode(file_get_contents('php://input'), true), $person->Id);
+                (new DesignDataHelper($this->application))->insertOrUpdate(json_decode(file_get_contents('php://input'), true), $person->Id);
                 $this->renderJson(['success' => true]);
             } else $this->renderJson(['success' => false, 'message' => 'Bad request method'], 470);
         } else $this->renderJson(['success' => false, 'message' => 'User not allowed'], 403);
@@ -108,7 +109,7 @@ class ArticleApi extends BaseApi
     {
         if (!$articleId) $this->renderJson(['success' => false, 'message' => 'Unknown article'], 499);
         else {
-            $result = (new ArticleDataHelper())->getAuthor($articleId);
+            $result = (new ArticleDataHelper($this->application))->getAuthor($articleId);
             $this->renderJson(['author' => $result ? [$result] : []]);
         }
     }

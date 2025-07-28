@@ -2,15 +2,16 @@
 
 namespace app\controllers;
 
+use app\enums\ApplicationError;
 use app\helpers\Application;
 use app\helpers\AuthorizationDataHelper;
 use app\helpers\SurveyDataHelper;
 
 class SurveyController extends BaseController
 {
-    public function __construct()
+    public function __construct(Application $application)
     {
-        parent::__construct();
+        parent::__construct($application);
     }
 
     public function add($articleId)
@@ -27,8 +28,8 @@ class SurveyController extends BaseController
                     'article' => $article,
                     'survey' => $this->dataHelper->get('Survey', ['IdArticle' => $article->Id])
                 ]));
-            } else $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
-        } else $this->application->error403(__FILE__, __LINE__);
+            } else $this->application->getErrorManager()->raise(ApplicationError::InvalidRequestMethod, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function createOrUpdate()
@@ -57,19 +58,19 @@ class SurveyController extends BaseController
                 if ($survey) $this->dataHelper->set('Survey', $fields, ['Id' => $survey->Id]);
                 else         $this->dataHelper->set('Survey', $fields);
                 $this->flight->redirect('/articles/' . $articleId);
-            } else $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
-        } else $this->application->error403(__FILE__, __LINE__);
+            } else $this->application->getErrorManager()->raise(ApplicationError::InvalidRequestMethod, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function viewResults($articleId)
     {
         if ($person = $this->personDataHelper->getPerson([])) {
-            $survey = (new SurveyDataHelper())->getWithCreator($articleId);
+            $survey = (new SurveyDataHelper($this->application))->getWithCreator($articleId);
             if (!$survey) {
                 $this->flight->redirect('/articles/' . $articleId);
                 return;
             }
-            if ((new AuthorizationDataHelper())->canPersonReadSurveyResults($this->dataHelper->get('Article', ['Id' => $survey->IdArticle]), $person)) {
+            if ((new AuthorizationDataHelper($this->application))->canPersonReadSurveyResults($this->dataHelper->get('Article', ['Id' => $survey->IdArticle]), $person)) {
                 $replies = $this->dataHelper->gets('Reply', ['IdSurvey' => $survey->Id]);
                 $participants = [];
                 $results = [];
@@ -97,7 +98,7 @@ class SurveyController extends BaseController
                     'articleId' => $articleId,
                     'currentVersion' => Application::getVersion()
                 ]);
-            } else $this->application->error403(__FILE__, __LINE__);
-        } else $this->application->error403(__FILE__, __LINE__);
+            } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 }

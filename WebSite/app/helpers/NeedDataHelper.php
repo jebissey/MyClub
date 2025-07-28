@@ -5,7 +5,7 @@ namespace app\helpers;
 
 class NeedDataHelper extends Data
 {
-    public function __construct()
+    public function __construct(Application $application)
     {
         parent::__construct();
     }

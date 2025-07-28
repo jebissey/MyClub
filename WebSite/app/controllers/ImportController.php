@@ -2,6 +2,8 @@
 
 namespace app\controllers;
 
+use app\helpers\Application;
+use app\enums\ApplicationError;
 use app\helpers\ImportDataHelper;
 use app\helpers\SettingsDataHelper;
 
@@ -11,14 +13,14 @@ class ImportController extends BaseController
     private $results;
     private array $foundEmails = [];
 
-    public function __construct()
+    public function __construct(Application $application)
     {
-        parent::__construct();
+        parent::__construct($application);
     }
 
     private function loadSettings()
     {
-        if (!$this->importSettings = json_decode((new SettingsDataHelper())->get_('ImportPersonParameters'), true)) {
+        if (!$this->importSettings = json_decode((new SettingsDataHelper($this->application))->get_('ImportPersonParameters'), true)) {
             $this->importSettings = [
                 'headerRow' => 1,
                 'mapping' => [
@@ -40,7 +42,7 @@ class ImportController extends BaseController
                 'importSettings' => $this->importSettings,
                 'results' => $this->results
             ]));
-        } else $this->application->error403(__FILE__, __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function processImport()
@@ -64,10 +66,10 @@ class ImportController extends BaseController
                 ];
                 $this->importSettings['headerRow'] = $headerRow;
                 $this->importSettings['mapping'] = $mapping;
-                (new SettingsDataHelper())->set_('ImportPersonParameters', json_encode($this->importSettings));
+                (new SettingsDataHelper($this->application))->set_('ImportPersonParameters', json_encode($this->importSettings));
 
                 $persons = $this->dataHelper->gets('Person', ['Inactivated' => 0], 'Id, Email');
-                $results = (new ImportDataHelper())->getResults($headerRow, $mapping, $this->foundEmails);
+                $results = (new ImportDataHelper($this->application))->getResults($headerRow, $mapping, $this->foundEmails);
                 foreach ($persons as $person) {
                     if (!in_array($person->Email, $this->foundEmails)) {
                         $this->dataHelper->set('Person', ['Inactivated' => 1], ['Id' => $person->Id]);
@@ -81,6 +83,6 @@ class ImportController extends BaseController
                     'results' => $results
                 ]));
             }
-        } else $this->application->error403(__FILE__, __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 }

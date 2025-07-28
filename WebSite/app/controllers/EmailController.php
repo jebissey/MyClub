@@ -2,17 +2,16 @@
 
 namespace app\controllers;
 
+use app\enums\ApplicationError;
 use app\helpers\Application;
 use app\helpers\Email;
+use app\helpers\PersonDataHelper;
 
 class EmailController extends BaseController
 {
-    private Email $email;
-
-    public function __construct()
+    public function __construct(Application $application)
     {
-        parent::__construct();
-        $this->email = new Email();
+        parent::__construct($application);
     }
 
     public function fetchEmails()
@@ -23,11 +22,11 @@ class EmailController extends BaseController
                 $idEventType = $_POST['idEventType'] ?? '';
                 $dayOfWeek = $_POST['dayOfWeek'] ?? '';
                 $timeOfDay = $_POST['timeOfDay'] ?? '';
-                $filteredEmails = $this->email->getEmailsOfInterestedPeople($idGroup, $idEventType, $dayOfWeek, $timeOfDay);
+                $filteredEmails = (new PersonDataHelper($this->application))->getEmailsOfInterestedPeople($idGroup, $idEventType, $dayOfWeek, $timeOfDay);
                 $groupName = $idGroup != '' ? $this->dataHelper->get('Group', ['Id' => $idGroup], 'Name')->Name ?? '' : '';
                 $eventTypeName = $idEventType != '' ? $this->dataHelper->get('EventType', ['Id', $idEventType], 'Name') : '';
                 $dayOfWeekName = $dayOfWeek != '' ? ['Lu.', 'Ma.', 'Me.', 'Je.', 'Ve.', 'Sa.', 'Di.', ''][$dayOfWeek] : '';
-                
+
                 $this->render('app/views/emails/copyToClipBoard.latte', $this->params->getAll([
                     'emailsJson' => json_encode($filteredEmails),
                     'emails' => $filteredEmails,
@@ -39,8 +38,8 @@ class EmailController extends BaseController
                     'groups' => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
                     'eventTypes' => $this->dataHelper->gets('EventType', ['Inactivated' => 0], 'Id, Name', 'Name'),
                 ]));
-            } else $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
-        } else $this->application->error403(__FILE__, __LINE__);
+            } else $this->application->getErrorManager()->raise(ApplicationError::InvalidRequestMethod, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function fetchEmailsForArticle($idArticle)
@@ -51,7 +50,7 @@ class EmailController extends BaseController
                 if (!$article) die('Fatal program error in file ' + __FILE__ + ' at line ' + __LINE__);
                 $articleCreatorEmail = $this->dataHelper->get('Person', ['Id', $article->CreatedBy])->Email;
                 if (!$articleCreatorEmail) {
-                    $this->application->error471('Invalid Email', __FILE__, __LINE__);
+                    $this->application->getErrorManager()->raise(ApplicationError::InvalidParameter, "Unknown author of article '$idArticle' in file " . __FILE__ . ' at line ' . __LINE__);
                     return;
                 }
                 $filteredEmails = $this->personDataHelper->getPersonWantedToBeAlerted($idArticle);
@@ -72,7 +71,7 @@ class EmailController extends BaseController
                 );
                 $_SESSION['success'] = "Un courriel a été envoyé aux abonnés";
                 $this->flight->redirect('/articles/' . $idArticle);
-            } else $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
-        } else $this->application->error403(__FILE__, __LINE__);
+            } else $this->application->getErrorManager()->raise(ApplicationError::InvalidRequestMethod, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 }

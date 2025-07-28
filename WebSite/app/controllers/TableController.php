@@ -2,15 +2,16 @@
 
 namespace app\controllers;
 
+use app\helpers\Application;
 use app\helpers\Generic;
 
 abstract class TableController extends BaseController
 {
     protected int $itemsPerPage = 10;
 
-    public function __construct()
+    public function __construct(Application $application)
     {
-        parent::__construct();
+        parent::__construct($application);
     }
 
     protected function prepareTableData($query, $filters = [], $page = 1): array

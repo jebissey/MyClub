@@ -2,6 +2,7 @@
 
 namespace app\controllers;
 
+use app\enums\ApplicationError;
 use app\helpers\Application;
 use app\helpers\ArticleDataHelper;
 use app\helpers\ArwardsDataHelper;
@@ -14,11 +15,11 @@ class WebmasterController extends BaseController
     private AuthorizationDataHelper $authorizationDatahelper;
     private SettingsDataHelper $settingsDataHelper;
 
-    public function __construct()
+    public function __construct(Application $application)
     {
-        parent::__construct();
-        $this->authorizationDatahelper = new AuthorizationDataHelper();
-        $this->settingsDataHelper = new SettingsDataHelper();
+        parent::__construct($application);
+        $this->authorizationDatahelper = new AuthorizationDataHelper($application);
+        $this->settingsDataHelper = new SettingsDataHelper($application);
     }
 
     public function helpWebmaster(): void
@@ -41,7 +42,7 @@ class WebmasterController extends BaseController
                 'hasAuthorization' => $this->authorizationDatahelper->isEventManager(),
                 'currentVersion' => $this->application->getVersion()
             ]));
-        } else $this->application->error403(__FILE__, __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function homeWebmaster(): void
@@ -57,8 +58,8 @@ class WebmasterController extends BaseController
                 elseif ($result['version'] != $this->application->getVersion()) $newVersion = "A new version is available (V" . $result['version'] . ")";
 
                 $this->render('app/views/admin/webmaster.latte', $this->params->getAll(['newVersion' => $newVersion]));
-            } else $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
-        } else $this->application->error403(__FILE__, __LINE__);
+            } else $this->application->getErrorManager()->raise(ApplicationError::InvalidRequestMethod, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function homeAdmin()
@@ -72,15 +73,15 @@ class WebmasterController extends BaseController
                     $this->flight->redirect('/articles');
                 } else if ($this->authorizationDatahelper->isWebmaster())   $this->flight->redirect('/webmaster');
             } else if ($_SERVER['REQUEST_METHOD'] === 'GET') $this->render('app/views/admin/admin.latte', $this->params->getAll([]));
-            else $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
-        } else $this->application->error403(__FILE__, __LINE__);
+            else $this->application->getErrorManager()->raise(ApplicationError::InvalidRequestMethod, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function arwards(): void
     {
         if ($person = $this->personDataHelper->getPerson(['Webmaster'])) {
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-                $arwardsDataHelper = new ArwardsDataHelper();
+                $arwardsDataHelper = new ArwardsDataHelper($this->application);
                 $this->render('app/views/admin/arwards.latte', $this->params->getAll([
                     'counterNames' => $counterNames = $arwardsDataHelper->getCounterNames(),
                     'data' => $arwardsDataHelper->getData($counterNames),
@@ -107,8 +108,8 @@ class WebmasterController extends BaseController
                     ]);
                     $this->flight->redirect('/arwards?success=true');
                 }
-            } else $this->application->error470($_SERVER['REQUEST_METHOD'], __FILE__, __LINE__);
-        } else $this->application->error403(__FILE__, __LINE__);
+            } else $this->application->getErrorManager()->raise(ApplicationError::InvalidRequestMethod, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function rssGenerator()
@@ -118,7 +119,7 @@ class WebmasterController extends BaseController
         $site_url = $base_url;
         $feed_url = $base_url . "rss.xml";
         $feed_description = "Mises à jour de la liste d'articles";
-        $articles = (new ArticleDataHelper())->getArticlesForRss(($this->personDataHelper->getPerson([]))->Id ?? 0);
+        $articles = (new ArticleDataHelper($this->application))->getArticlesForRss(($this->personDataHelper->getPerson([]))->Id ?? 0);
         header('Cache-Control: no-cache, no-store, must-revalidate'); // HTTP 1.1
         header('Pragma: no-cache'); // HTTP 1.0
         header('Expires: 0'); // Proxies
@@ -128,7 +129,7 @@ class WebmasterController extends BaseController
 
     public function sitemapGenerator()
     {
-        $articleDataHelper = new ArticleDataHelper();
+        $articleDataHelper = new ArticleDataHelper($this->application);
         $base_url = Webapp::getBaseUrl();
         header("Content-Type: application/xml; charset=utf-8");
         echo '<?xml version="1.0" encoding="UTF-8"?>' . PHP_EOL;

@@ -4,9 +4,9 @@ namespace app\helpers;
 
 class EventTypeDataHelper extends Data
 {
-    public function __construct()
+    public function __construct(Application $application)
     {
-        parent::__construct();
+        parent::__construct($application);
     }
 
     public function getsFor($personId): array

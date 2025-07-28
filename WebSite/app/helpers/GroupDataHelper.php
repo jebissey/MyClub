@@ -6,14 +6,14 @@ use Throwable;
 
 class GroupDataHelper extends Data
 {
-    public function __construct()
+    public function __construct(Application $application)
     {
-        parent::__construct();
+        parent::__construct($application);
     }
 
     public function getAvailableGroups($personId)
     {
-        if ((new AuthorizationDataHelper())->isWebmaster()) {
+        if ((new AuthorizationDataHelper($this->application))->isWebmaster()) {
             $query = $this->pdo->prepare("
                     SELECT 
                         g.Id,
@@ -64,7 +64,7 @@ class GroupDataHelper extends Data
                 WHERE g.Inactivated = 0 AND g.Id <> 1
 				GROUP BY g.Name
             ";
-        if ((new AuthorizationDataHelper())->isWebmaster()) $availableGroupsQuery = $availableGroupsWithAuthorisationQuery;
+        if ((new AuthorizationDataHelper($this->application))->isWebmaster()) $availableGroupsQuery = $availableGroupsWithAuthorisationQuery;
         else                                                        $availableGroupsQuery = $availableGroupsWithoutAuthorisationQuery;
         $availableGroupsLeftQuery = $this->pdo->prepare("
                 SELECT availableGroups.*
@@ -107,7 +107,7 @@ class GroupDataHelper extends Data
 
     public function getGroupsWithAuthorizations(): array|false
     {
-        $autorizationDataHelper = new AuthorizationDataHelper;
+        $autorizationDataHelper = new AuthorizationDataHelper($this->application);
         $having = '';
         if ($autorizationDataHelper->isPersonManager() && !$autorizationDataHelper->isWebmaster()) {
             $having = "HAVING Authorizations IS NULL";
