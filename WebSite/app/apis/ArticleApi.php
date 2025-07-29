@@ -30,9 +30,10 @@ class ArticleApi extends BaseApi
 
     public function designVote()
     {
-        if ($person = $this->personDataHelper->getPerson(['Redactor'])) {
+        $this->connectedUser = $this->connectedUser->get();
+        if ($this->connectedUser->isRedactor()) {
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-                (new DesignDataHelper($this->application))->insertOrUpdate(json_decode(file_get_contents('php://input'), true), $person->Id);
+                (new DesignDataHelper($this->application))->insertOrUpdate(json_decode(file_get_contents('php://input'), true), $this->connectedUser->person->Id);
                 $this->renderJson(['success' => true]);
             } else $this->renderJson(['success' => false, 'message' => 'Bad request method'], 470);
         } else $this->renderJson(['success' => false, 'message' => 'User not allowed'], 403);
@@ -40,7 +41,7 @@ class ArticleApi extends BaseApi
 
     public function saveSurveyReply()
     {
-        if ($person = $this->personDataHelper->getPerson([])) {
+        if ($person = $this->connectedUser->get()->person ?? false) {
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $json = file_get_contents('php://input');
                 $data = json_decode($json, true);
@@ -57,7 +58,7 @@ class ArticleApi extends BaseApi
 
     public function showSurveyReplyForm($articleId)
     {
-        if ($person = $this->personDataHelper->getPerson([])) {
+        if ($person = $this->connectedUser->get()->person ?? false) {
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $survey = $this->dataHelper->get('Survey', ['IdArticle' => $articleId]);
                 if (!$survey) {
@@ -87,7 +88,8 @@ class ArticleApi extends BaseApi
 
     public function uploadFile()
     {
-        if ($this->personDataHelper->getPerson(['Redactor'])) {
+        $this->connectedUser = $this->connectedUser->get();
+        if ($this->connectedUser->isRedactor()) {
             $response = ['success' => false, 'message' => '', 'file' => null];
 
             if (empty($_FILES['file'])) {

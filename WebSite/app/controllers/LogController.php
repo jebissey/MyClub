@@ -4,7 +4,7 @@ namespace app\controllers;
 
 use app\helpers\Application;
 use app\enums\ApplicationError;
-use app\helpers\Crosstab;
+use app\helpers\CrosstabDataHelper;
 use app\helpers\LogDataHelper;
 use app\helpers\Period;
 use app\helpers\Webapp;
@@ -21,7 +21,8 @@ class LogController extends BaseController
 
     public function index()
     {
-        if ($this->personDataHelper->getPerson(['Webmaster'])) {
+        $this->connectedUser = $this->connectedUser->get();
+        if ($this->connectedUser->isWebmaster()) {
             $logPage = isset($_GET['logPage']) ? (int)$_GET['logPage'] : 1;
             $perPage = 10;
             [$logs, $totalPages] = $this->logDataHelper->getVisitedPages($perPage, $logPage);
@@ -37,7 +38,8 @@ class LogController extends BaseController
 
     public function referers()
     {
-        if ($this->personDataHelper->getPerson(['Webmaster'])) {
+        $this->connectedUser = $this->connectedUser->get();
+        if ($this->connectedUser->isWebmaster()) {
             $currentParams = $_GET;
             $period = $currentParams['period'] ?? 'day';
             $currentDate = $currentParams['date'] ?? date('Y-m-d');
@@ -57,7 +59,8 @@ class LogController extends BaseController
     private $defaultPeriodType = 'day';
     public function visitorsGraf()
     {
-        if ($this->personDataHelper->getPerson(['Webmaster'])) {
+        $this->connectedUser = $this->connectedUser->get();
+        if ($this->connectedUser->isWebmaster()) {
             $periodType = $this->flight->request()->query->periodType ?? $this->defaultPeriodType;
             $periodType = in_array($periodType, $this->periodTypes) ? $periodType : $this->defaultPeriodType;
 
@@ -77,7 +80,8 @@ class LogController extends BaseController
 
     public function analytics()
     {
-        if ($this->personDataHelper->getPerson(['Webmaster'])) {
+        $this->connectedUser = $this->connectedUser->get();
+        if ($this->connectedUser->isWebmaster()) {
 
             $this->render('app/views/logs/analytics.latte', $this->params->getAll([
                 'osData' => $this->logDataHelper->getOsDistribution(),
@@ -92,7 +96,8 @@ class LogController extends BaseController
     const TOP = 50;
     public function topPagesByPeriod()
     {
-        if ($this->personDataHelper->getPerson(['Webmaster'])) {
+        $this->connectedUser = $this->connectedUser->get();
+        if ($this->connectedUser->isWebmaster()) {
             $period = $_GET['period'] ?? 'week';
             $dateCondition = Period::getDateConditions($period);
             $topPages = $this->logDataHelper->getTopPages($dateCondition, self::TOP);
@@ -107,7 +112,8 @@ class LogController extends BaseController
 
     public function topArticlesByPeriod()
     {
-        if ($this->personDataHelper->getPerson(['Redactor'])) {
+        $this->connectedUser = $this->connectedUser->get();
+        if ($this->connectedUser->isRedactor()) {
             $period = $_GET['period'] ?? 'week';
             $dateCondition = Period::getDateConditions($period);
             $topPages = $this->logDataHelper->getTopArticles($dateCondition, self::TOP);
@@ -122,12 +128,13 @@ class LogController extends BaseController
 
     public function crossTab()
     {
-        if ($this->personDataHelper->getPerson(['Webmaster'])) {
+        $this->connectedUser = $this->connectedUser->get();
+        if ($this->connectedUser->isWebmaster()) {
             $uriFilter = $_GET['uri'] ?? '';
             $emailFilter = $_GET['email'] ?? '';
             $groupFilter = $_GET['group'] ?? '';
             $period = $_GET['period'] ?? 'today';
-            [$sortedCrossTabData, $filteredPersons, $columnTotals] = (new Crosstab())->getPersons(Period::getDateConditions($period));
+            [$sortedCrossTabData, $filteredPersons, $columnTotals] = (new CrosstabDataHelper($this->application))->getPersons(Period::getDateConditions($period));
 
             $this->render('app/views/logs/crossTab.latte', $this->params->getAll([
                 'title' => 'Tableau croisé dynamique des visites',
@@ -146,7 +153,8 @@ class LogController extends BaseController
 
     public function showLastVisits()
     {
-        if ($person = $this->personDataHelper->getPerson(['Webmaster'])) {
+        $person = $this->connectedUser->get()->person ?? false;
+        if ($person && $this->connectedUser->isWebmaster()) {
             $activePersons = $this->dataHelper->gets('Persons', ['Inactivated' => 0]);
             $this->render('app/views/user/lastVisits.latte', $this->params->getAll([
                 'lastVisits' => $this->logDataHelper->getLastVisitPerActivePersonWithTimeAgo($activePersons),

@@ -4,7 +4,10 @@ namespace app\helpers;
 
 use PDO;
 
-class ArticleDataHelper extends Data
+use app\interfaces\NewsProviderInterface;
+
+
+class ArticleDataHelper extends Data implements NewsProviderInterface
 {
     public function __construct(Application $application)
     {
@@ -207,7 +210,7 @@ class ArticleDataHelper extends Data
             ->fetchAll();
     }
 
-    public function getArticleNews($person, $searchFrom)
+    public function getNews($person, $searchFrom): array
     {
         $articles = $this->fluent->from('Article a')
             ->select('a.Id, a.Title, a.LastUpdate')

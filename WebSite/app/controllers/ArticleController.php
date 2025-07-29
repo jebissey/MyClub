@@ -11,6 +11,7 @@ use app\helpers\AuthorizationDataHelper;
 use app\helpers\Backup;
 use app\helpers\CarouselDataHelper;
 use app\helpers\Period;
+use app\helpers\PersonDataHelper;
 use app\helpers\SurveyDataHelper;
 use app\helpers\Webapp;
 
@@ -30,7 +31,8 @@ class ArticleController extends TableController
 
     public function home(): void
     {
-        if ($this->personDataHelper->getPerson(['Redactor'])) {
+        $this->connectedUser = $this->connectedUser->get();
+        if ($this->connectedUser->isRedactor() ?? false) {
 
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $_SESSION['navbar'] = 'redactor';
@@ -42,7 +44,7 @@ class ArticleController extends TableController
 
     public function index()
     {
-        $person = $this->personDataHelper->getPerson([]);
+        $this->connectedUser = $this->connectedUser->get();
         $filterValues = [
             'PersonName' => $_GET['PersonName'] ?? '',
             'title' => $_GET['title'] ?? '',
@@ -61,7 +63,7 @@ class ArticleController extends TableController
             ['name' => 'GroupName', 'label' => 'Groupe'],
             ['name' => 'Content', 'label' => 'Contenu'],
         ];
-        if ($this->authorizationDatahelper->isEditor()) {
+        if ($this->connectedUser->isEditor()) {
             $filterConfig[] = ['name' => 'published', 'label' => 'Publié'];
         }
         $columns = [
@@ -73,10 +75,10 @@ class ArticleController extends TableController
             ['field' => 'Pool', 'label' => 'Sondage'],
             ['field' => 'PoolDetail', 'label' => 'Cloture (votes) visibilité'],
         ];
-        if ($this->authorizationDatahelper->isEditor()) {
+        if ($this->connectedUser->isEditor()) {
             $columns[] = ['field' => 'Published', 'label' => 'Publié'];
         }
-        $query = $this->articleTableDataHelper->getQuery($person);
+        $query = $this->articleTableDataHelper->getQuery($this->connectedUser->person);
         $data = $this->prepareTableData($query, $filterValues, $_GET['tablePage'] ?? null);
         $this->render('app/views/user/articles.latte', $this->params->getAll([
             'articles' => $data['items'],
@@ -86,23 +88,23 @@ class ArticleController extends TableController
             'filters' => $filterConfig,
             'columns' => $columns,
             'resetUrl' => '/articles',
-            'isRedactor' => $person ? $this->authorizationDatahelper->isRedactor() : false,
-            'userConnected' => $person,
+            'isRedactor' => $this->connectedUser->person ? $this->connectedUser->isRedactor() : false,
+            'userConnected' => $this->connectedUser->person,
             'layout' => WebApp::getLayout(),
-            'navItems' => $this->getNavItems($person),
+            'navItems' => $this->getNavItems($this->connectedUser->person),
         ]));
     }
 
     public function show($id): void
     {
-        $person = $this->personDataHelper->getPerson();
-        $article = $this->authorizationDatahelper->getArticle($id, $person);
+        $this->connectedUser = $this->connectedUser->get();
+        $article = $this->authorizationDatahelper->getArticle($id, $this->connectedUser->person);
         if ($article) {
-            $articleIds = $this->articleDataHelper->getArticleIdsBasedOnAccess($person->Email ?? null);
+            $articleIds = $this->articleDataHelper->getArticleIdsBasedOnAccess($this->connectedUser->person->Email ?? null);
             $chosenArticle = $this->articleDataHelper->getLatestArticle([$id]);
             $canEdit = false;
-            if ($person && $chosenArticle) {
-                $canEdit = ($person && $person->Id == $chosenArticle->CreatedBy);
+            if ($this->connectedUser->person && $chosenArticle) {
+                $canEdit = ($this->connectedUser->person && $this->connectedUser->person->Id == $chosenArticle->CreatedBy);
             }
             $messages = [];
             if (isset($_SESSION['error'])) {
@@ -121,23 +123,24 @@ class ArticleController extends TableController
                 'groups' => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
                 'hasSurvey' => (new SurveyDataHelper($this->application))->articleHasSurvey($id),
                 'id' => $id,
-                'userConnected' => $person,
-                'navItems' => $this->getNavItems($person),
-                'publishedBy' => $chosenArticle->PublishedBy && $chosenArticle->PublishedBy != $chosenArticle->CreatedBy ? $this->personDataHelper->getPublisher($chosenArticle->PublishedBy) : '',
-                'canReadPool' => $this->authorizationDatahelper->canPersonReadSurveyResults($chosenArticle, $person),
+                'userConnected' => $this->connectedUser->person,
+                'navItems' => $this->getNavItems($this->connectedUser->person),
+                'publishedBy' => $chosenArticle->PublishedBy && $chosenArticle->PublishedBy != $chosenArticle->CreatedBy ? (new PersonDataHelper($this->application))->getPublisher($chosenArticle->PublishedBy) : '',
+                'canReadPool' => $this->authorizationDatahelper->canPersonReadSurveyResults($chosenArticle, $this->connectedUser->person),
                 'carouselItems' => (new CarouselDataHelper($this->application))->getsForArticle($id),
                 'message' => $messages,
             ]));
-        } else if ($person == '') $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Il faut être connecté pour pouvoir consulter cet article', 5000);
+        } else if ($this->connectedUser->person == '') $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Il faut être connecté pour pouvoir consulter cet article', 5000);
         else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function update($id): void
     {
-        if ($person = $this->personDataHelper->getPerson(['Redactor'])) {
+        $this->connectedUser = $this->connectedUser->get();
+        if ($this->connectedUser->isRedactor()) {
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $article = $this->articleDataHelper->getLatestArticle([$id]);
-                if (!$article || $person->Id != $article->CreatedBy) {
+                if (!$article || $this->connectedUser->person->Id != $article->CreatedBy) {
                     $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
                     return;
                 }
@@ -150,7 +153,7 @@ class ArticleController extends TableController
                 }
                 $result = $this->articleDataHelper->update(
                     $id,
-                    $person->Id,
+                    $this->connectedUser->person->Id,
                     $_POST['published'] ?? 0,
                     $title,
                     $content,
@@ -168,10 +171,11 @@ class ArticleController extends TableController
 
     public function publish($id): void
     {
-        if ($person = $this->personDataHelper->getPerson(['Editor'])) {
+        $this->connectedUser = $this->connectedUser->get();
+        if ($this->connectedUser->isEditor()) {
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $article = $this->articleDataHelper->getLatestArticle([$id]);
-                if (!$article || ($person->Id != $article->CreatedBy && !$this->authorizationDatahelper->isEditor())) {
+                if (!$article || ($this->connectedUser->person->Id != $article->CreatedBy && !$this->connectedUser->isEditor())) {
                     $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
                     return;
                 }
@@ -180,7 +184,7 @@ class ArticleController extends TableController
                     $spotlightedUntil = $_POST['spotlightedUntil'] ?? 0;
                     $this->articleDataHelper->setSpotlightArticle($id, $spotlightedUntil);
                 }
-                $result = $this->articleDataHelper->update($id, $person->Id, $_POST['published'] ?? 0);
+                $result = $this->articleDataHelper->update($id, $this->connectedUser->person->Id, $_POST['published'] ?? 0);
                 if ($result) {
                     $_SESSION['success'] = "L'article a été mis à jour avec succès";
                     (new Backup())->save();
@@ -194,9 +198,10 @@ class ArticleController extends TableController
 
     public function create()
     {
-        if ($person = $this->personDataHelper->getPerson(['Redactor'])) {
+        $this->connectedUser = $this->connectedUser->get();
+        if ($this->connectedUser->isRedactor()) {
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-                $id = $this->articleDataHelper->insert($person->Id);
+                $id = $this->articleDataHelper->insert($this->connectedUser->person->Id);
                 $this->flight->redirect('/articles/' . $id);
             } else $this->application->getErrorManager()->raise(ApplicationError::InvalidRequestMethod, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
         } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
@@ -204,10 +209,11 @@ class ArticleController extends TableController
 
     public function delete($id)
     {
-        if ($person = $this->personDataHelper->getPerson(['Redactor'])) {
+        $this->connectedUser = $this->connectedUser->get();
+        if ($this->connectedUser->isRedactor()) {
             if (($_SERVER['REQUEST_METHOD'] === 'GET')) {
                 $article = $this->articleDataHelper->getLatestArticle([$id]);
-                if (!$article || $person->Id != $article->CreatedBy) {
+                if (!$article || $this->connectedUser->person->Id != $article->CreatedBy) {
                     $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
                     return;
                 }
@@ -219,7 +225,8 @@ class ArticleController extends TableController
 
     public function showArticleCrosstab()
     {
-        if ($this->personDataHelper->getPerson(['Redactor'], 1)) {
+        $this->connectedUser = $this->connectedUser->get(1);
+        if ($this->connectedUser->isRedactor()) {
             $period = $this->flight->request()->query->period ?? 'month';
             $dateRange = Period::getDateRangeFor($period);
             $crosstabData = (new ArticleCrosstabDataHelper($this->application))->getItems($dateRange);

@@ -25,6 +25,7 @@ use app\controllers\RegistrationController;
 use app\controllers\SurveyController;
 use app\controllers\UserController;
 use app\controllers\WebmasterController;
+use app\enums\ApplicationError;
 use app\helpers\Application;
 use app\helpers\LogDataHelper;
 
@@ -585,14 +586,14 @@ $flight->route('/apple-touch-icon-180x180.png', function () use ($applicationHel
 $flight->route('/apple-touch-icon-precomposed.png', function () use ($applicationHelper) {
     serveFile('my-club-180.png', $applicationHelper);
 });
-$flight->route('/*', function () use ($applicationHelper) {
-    $applicationHelper->error404();
+$flight->route('/*', function () use ($application) {
+    $application->getErrorManager()->raise(ApplicationError::PageNotFound, "Page not found in file " . __FILE__ . ' at line ' . __LINE__);
 });
 
 $logDataHelper = new LogDataHelper($application);
-$flight->map('error', function (Throwable $ex) use ($logDataHelper, $applicationHelper) {
+$flight->map('error', function (Throwable $ex) use ($logDataHelper, $application) {
     $logDataHelper->add(500, 'Internal error: ' . $ex->getMessage() . ' in file ' . $ex->getFile() . ' at line' . $ex->getLine());
-    $applicationHelper->error500($ex->getMessage(), $ex->getFile(), $ex->getLine());
+    $application->getErrorManager()->raise(ApplicationError::Error, 'Error ' . $ex->getMessage() . ' in file ' . $ex->getFile() . ' at line ' . $ex->getLine());
 });
 $flight->after('start', function () use ($logDataHelper) {
     $logDataHelper->add(Flight::getData('code'), Flight::getData('message'));

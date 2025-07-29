@@ -35,7 +35,8 @@ class ImportController extends BaseController
 
     public function showImportForm()
     {
-        if ($this->personDataHelper->getPerson(['PersonManager'])) {
+        $this->connectedUser = $this->connectedUser->get();
+        if ($this->connectedUser->isPersonManager()) {
             $this->loadSettings();
 
             $this->render('app/views/import/form.latte', $this->params->getAll([
@@ -47,7 +48,8 @@ class ImportController extends BaseController
 
     public function processImport()
     {
-        if ($this->personDataHelper->getPerson(['PersonManager'])) {
+        $this->connectedUser = $this->connectedUser->get();
+        if ($this->connectedUser->isPersonManager()) {
             if (!isset($_FILES['csvFile']) || $_FILES['csvFile']['error'] != 0) {
                 $this->results['errors']++;
                 $this->results['messages'][] = 'Veuillez sélectionner un fichier CSV valide';

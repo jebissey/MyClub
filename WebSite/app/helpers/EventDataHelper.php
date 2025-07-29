@@ -9,8 +9,9 @@ use Throwable;
 
 use app\enums\EventAudience;
 use app\helpers\TranslationManager;
+use app\interfaces\NewsProviderInterface;
 
-class EventDataHelper extends Data
+class EventDataHelper extends Data implements NewsProviderInterface
 {
     private $personPreferences;
 
@@ -317,7 +318,7 @@ class EventDataHelper extends Data
         return $stmt->fetchAll(PDO::FETCH_OBJ);
     }
 
-    public function getEventNews($person, $searchFrom)
+    public function getNews($person, $searchFrom): array
     {
         $sql = "
             SELECT e.Id, e.Summary, e.LastUpdate

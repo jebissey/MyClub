@@ -9,6 +9,7 @@ use app\helpers\SettingsDataHelper;
 
 class FFAController extends BaseController
 {
+
     public function __construct(Application $application)
     {
         parent::__construct($application);
@@ -16,7 +17,7 @@ class FFAController extends BaseController
 
     public function searchMember()
     {
-        if ($person = $this->personDataHelper->getPerson([])) {
+        if ($person = $this->connectedUser->get()->person ?? false) {
             $firstName = $_GET['firstName'] ?? $person->FirstName ?? '';
             $lastName = $_GET['lastName'] ?? $person->LastName ?? '';
             $question = $_GET['question'] ?? 'rank';

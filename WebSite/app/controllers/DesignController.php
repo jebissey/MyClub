@@ -8,6 +8,7 @@ use app\helpers\DesignDataHelper;
 
 class DesignController extends BaseController
 {
+
     public function __construct(Application $application)
     {
         parent::__construct($application);
@@ -15,8 +16,9 @@ class DesignController extends BaseController
 
     public function index()
     {
-        if ($person = $this->personDataHelper->getPerson(['Redactor'])) {
-            [$designs, $userVotes] = (new DesignDataHelper($this->application))->getUsersVotes($person->Id);
+        $this->connectedUser = $this->connectedUser->get();
+        if ($this->connectedUser->isRedactor()) {
+            [$designs, $userVotes] = (new DesignDataHelper($this->application))->getUsersVotes($this->connectedUser->person->Id);
 
             $this->render('app/views/designs/index.latte', $this->params->getAll([
                 'designs' => $designs,
@@ -28,7 +30,8 @@ class DesignController extends BaseController
 
     public function create()
     {
-        if ($this->personDataHelper->getPerson(['Redactor'])) {
+        $this->connectedUser = $this->connectedUser->get();
+        if ($this->connectedUser->isRedactor()) {
             $this->render('app/views/designs/create.latte', $this->params->getAll([
                 'groups' => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
             ]));
@@ -37,10 +40,11 @@ class DesignController extends BaseController
 
     public function save()
     {
-        if ($person = $this->personDataHelper->getPerson(['Redactor'])) {
+        $this->connectedUser = $this->connectedUser->get();
+        if ($this->connectedUser->isRedactor()) {
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $values = [
-                    'IdPerson' => $person->Id,
+                    'IdPerson' => $this->connectedUser->person->Id,
                     'Name' => $_POST['name'] ?? '',
                     'Detail' => $_POST['detail'] ?? '',
                     'NavBar' => $_POST['navbar'] ?? '',

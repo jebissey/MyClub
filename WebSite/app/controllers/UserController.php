@@ -4,17 +4,19 @@ namespace app\controllers;
 
 use app\enums\ApplicationError;
 use app\helpers\Application;
-use app\helpers\AuthorizationDataHelper;
 use app\helpers\ArticleDataHelper;
 use app\helpers\AttributeDataHelper;
 use app\helpers\DesignDataHelper;
 use app\helpers\Email;
+use app\helpers\EventDataHelper;
 use app\helpers\EventTypeDataHelper;
 use app\helpers\GroupDataHelper;
 use app\helpers\LogDataHelper;
+use app\helpers\MessageDataHelper;
 use app\helpers\News;
 use app\helpers\Params;
 use app\helpers\Password;
+use app\helpers\PersonDataHelper;
 use app\helpers\PersonGroupDataHelper;
 use app\helpers\PersonStatistics;
 use app\helpers\SettingsDataHelper;
@@ -26,8 +28,8 @@ use app\helpers\Webapp;
 class UserController extends BaseController
 {
     private ArticleDataHelper $articleDataHelper;
-    private AuthorizationDataHelper $authorizationDatahelper;
     private Email $email;
+    private News $news;
     private SettingsDataHelper $settingsDataHelper;
     private Sign $sign;
     private SurveyDataHelper $surveyDataHelper;
@@ -36,11 +38,17 @@ class UserController extends BaseController
     {
         parent::__construct($application);
         $this->articleDataHelper = new ArticleDataHelper($application);
-        $this->authorizationDatahelper = new AuthorizationDataHelper($application);
         $this->email = new Email();
         $this->settingsDataHelper = new SettingsDataHelper($application);
-        $this->sign = new Sign($this->dataHelper, $this->personDataHelper, $this->application);
+        $this->sign = new Sign($this->application);
         $this->surveyDataHelper = new SurveyDataHelper($application);
+        $this->news =  new News([
+            new ArticleDataHelper($application),
+            new SurveyDataHelper($application),
+            new EventDataHelper($application),
+            new MessageDataHelper($application),
+            new PersonDataHelper($application),
+        ]);
     }
 
     #region Sign
@@ -114,9 +122,10 @@ class UserController extends BaseController
 
     public function helpHome(): void
     {
+        $this->connectedUser = $this->connectedUser->get();
         $content = $this->application->getLatte()->latte->renderToString('app/views/info.latte', [
             'content' => $this->settingsDataHelper->get_('Help_home'),
-            'hasAuthorization' => $this->authorizationDatahelper->hasAutorization(),
+            'hasAuthorization' => $this->connectedUser->hasAutorization(),
             'currentVersion' => $this->application->getVersion()
         ]);
         echo $content;
@@ -124,9 +133,10 @@ class UserController extends BaseController
 
     public function legalNotice(): void
     {
+        $this->connectedUser = $this->connectedUser->get();
         $content = $this->application->getLatte()->latte->renderToString('app/views/info.latte', [
             'content' => $this->settingsDataHelper->get_('LegalNotices'),
-            'hasAuthorization' => $this->authorizationDatahelper->hasAutorization(),
+            'hasAuthorization' => $this->connectedUser->hasAutorization(),
             'currentVersion' => $this->application->getVersion()
         ]);
         echo $content;
@@ -134,11 +144,11 @@ class UserController extends BaseController
 
     public function home()
     {
+        $person = $this->connectedUser->get()->person ?? false;
         $_SESSION['navbar'] = '';
         $userPendingSurveys = $userPendingDesigns = [];
         $userEmail = $_SESSION['user'] ?? '';
         if ($userEmail) {
-            $person = $this->personDataHelper->getPerson();
             if (!$person) {
                 unset($_SESSION['user']);
                 $this->application->getErrorManager()->raise(ApplicationError::BadRequest, "Unknown user with this email address: $userEmail in file " . __FILE__ . ' at line ' . __LINE__);
@@ -151,8 +161,7 @@ class UserController extends BaseController
             $userPendingDesigns = array_filter($pendingDesignResponses, function ($item) use ($userEmail) {
                 return strcasecmp($item->Email, $userEmail) === 0;
             });
-
-            $news = (new News())->anyNews($person);
+            $news = $this->news->anyNews($person);
         } else {
             $lang = TranslationManager::getCurrentLanguage();
             Params::setParams([
@@ -174,8 +183,7 @@ class UserController extends BaseController
             $articleId = $spotlight['articleId'];
             if ($this->articleDataHelper->isUserAllowedToReadArticle($userEmail, $articleId)) {
                 $spotlightUntil = $spotlight['spotlightUntil'];
-                if (strtotime($spotlightUntil) >= strtotime(date('Y-m-d')))
-                    $latestArticle = $this->articleDataHelper->getWithAuthor($articleId);
+                if (strtotime($spotlightUntil) >= strtotime(date('Y-m-d'))) $latestArticle = $this->articleDataHelper->getWithAuthor($articleId);
             }
         }
 
@@ -186,7 +194,7 @@ class UserController extends BaseController
             'link' => $this->settingsDataHelper->get_('Link'),
             'navItems' => $this->getNavItems($person),
             'publishedBy' => $articles['latestArticle']
-                && $articles['latestArticle']->PublishedBy != $articles['latestArticle']->CreatedBy ? $this->personDataHelper->getPublisher($articles['latestArticle']->PublishedBy) : '',
+                && $articles['latestArticle']->PublishedBy != $articles['latestArticle']->CreatedBy ? (new PersonDataHelper($this->application))->getPublisher($articles['latestArticle']->PublishedBy) : '',
             'latestArticleHasSurvey' => $this->surveyDataHelper->articleHasSurvey($articles['latestArticle']->Id ?? 0),
             'pendingSurveys' => $userPendingSurveys,
             'pendingDesigns' => $userPendingDesigns,
@@ -197,7 +205,8 @@ class UserController extends BaseController
     #region Data user
     public function user()
     {
-        if ($this->personDataHelper->getPerson()) {
+        $this->connectedUser = $this->connectedUser->get();
+        if ($this->connectedUser->person) {
             $_SESSION['navbar'] = 'user';
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $this->render('app/views/user/user.latte', $this->params->getAll([]));
@@ -207,8 +216,7 @@ class UserController extends BaseController
 
     public function account()
     {
-        if ($person = $this->personDataHelper->getPerson([], 1)) {
-
+        if ($person = $this->connectedUser->get(1)->person ?? false) {
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $email = filter_var($_POST['email'], FILTER_VALIDATE_EMAIL) ?? '';
                 $password = $_POST['password'];
@@ -262,7 +270,7 @@ class UserController extends BaseController
 
     public function availabilities()
     {
-        if ($person = $this->personDataHelper->getPerson([], 1)) {
+        if ($person = $this->connectedUser->get(1)->person ?? false) {
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $availabilities = $_POST['availabilities'] ?? '';
                 if ($availabilities != '') $this->dataHelper->set('Person', ['Availabilities' => json_encode($availabilities)], ['Id' => $person->Id]);
@@ -276,7 +284,7 @@ class UserController extends BaseController
 
     public function preferences()
     {
-        if ($person = $this->personDataHelper->getPerson([], 1)) {
+        if ($person = $this->connectedUser->get(1)->person ?? false) {
 
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $preferences = $_POST['preferences'];
@@ -301,7 +309,7 @@ class UserController extends BaseController
 
     public function groups()
     {
-        if ($person = $this->personDataHelper->getPerson([], 1)) {
+        if ($person = $this->connectedUser->get(1)->person ?? false) {
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 (new PersonGroupDataHelper($this->application))->update($person->Id, $_POST['groups'] ?? []);
                 $this->flight->redirect('/user');
@@ -319,10 +327,11 @@ class UserController extends BaseController
 
     public function help()
     {
-        if ($this->personDataHelper->getPerson()) {
+        $this->connectedUser = $this->connectedUser->get();
+        if ($this->connectedUser->person) {
             $this->render('app/views/info.latte', $this->params->getAll([
                 'content' => $this->settingsDataHelper->get_('Help_user'),
-                'hasAuthorization' => $this->authorizationDatahelper->hasAutorization(),
+                'hasAuthorization' => $this->connectedUser->hasAutorization(),
                 'currentVersion' => Application::getVersion()
             ]));
         } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
@@ -331,9 +340,9 @@ class UserController extends BaseController
     public function contact($eventId = null)
     {
         if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-            $person = $this->personDataHelper->getPerson();
+
             $this->render('app/views/contact.latte', $this->params->getAll([
-                'navItems' => $this->getNavItems($person),
+                'navItems' => $this->getNavItems($this->connectedUser->get()->person ?? false),
                 'event' => $eventId != null ? $this->dataHelper->get('Event', ['Id' => $eventId]) : null,
             ]));
         } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -341,9 +350,7 @@ class UserController extends BaseController
             $email = trim($_POST['email'] ?? '');
             $message = trim($_POST['message'] ?? '');
             $errors = [];
-            if (empty($name)) {
-                $errors[] = 'Le nom et prénom sont requis.';
-            }
+            if (empty($name)) $errors[] = 'Le nom et prénom sont requis.';
             if (empty($email)) $errors[] = 'L\'email est requis.';
             elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) $errors[] = 'L\'email n\'est pas valide.';
             if (empty($message)) $errors[] = 'Le message est requis.';
@@ -357,10 +364,10 @@ class UserController extends BaseController
                 $event = $this->dataHelper->get('Event', ['Id' => $eventId]);
                 if (!$event) {
                     $this->application->getErrorManager()->raise(ApplicationError::BadRequest, "Unknown event '$eventId' in file " . __FILE__ . ' at line ' . __LINE__);
-                    
+
                     return false;
                 }
-                if (!empty($eventId)) $emailSent = $this->personDataHelper->sendRegistrationLink($adminEmail, $name, $email, $event);
+                if (!empty($eventId)) $emailSent = (new PersonDataHelper($this->application))->sendRegistrationLink($adminEmail, $name, $email, $event);
                 else $emailSent = $this->email->sendContactEmail($adminEmail, $name, $email, $message);
                 if ($emailSent) {
                     $url = (new Webapp())->buildUrl('/contact', [
@@ -394,7 +401,7 @@ class UserController extends BaseController
     #region News
     public function showNews()
     {
-        if ($person = $this->personDataHelper->getPerson([], 1)) {
+        if ($person = $this->connectedUser->get(1)->person ?? false) {
             $searchMode = $_GET['from'] ?? 'signout';
             if ($searchMode === 'signin') {
                 $searchFrom = $person->LastSignIn ?? '';
@@ -407,7 +414,7 @@ class UserController extends BaseController
             }
 
             $this->render('app/views/user/news.latte', $this->params->getAll([
-                'news' => (new News())->getNewsForPerson($person, $searchFrom),
+                'news' => $this->news->getNewsForPerson($person, $searchFrom),
                 'searchFrom' => $searchFrom,
                 'searchMode' => $searchMode,
                 'navItems' => $this->getNavItems($person),
@@ -419,11 +426,11 @@ class UserController extends BaseController
     #region Statistics
     public function showStatistics()
     {
-        if ($person = $this->personDataHelper->getPerson([], 1)) {
+        if ($person = $this->connectedUser->get(1)->person ?? false) {
             $personalStatistics = new PersonStatistics();
             $season = $personalStatistics->getSeasonRange();
             $this->render('app/views/user/statistics.latte', $this->params->getAll([
-                'stats' => $personalStatistics->getStats($person, $season['start'], $season['end'], $this->authorizationDatahelper->isWebmaster()),
+                'stats' => $personalStatistics->getStats($person, $season['start'], $season['end'], $this->connectedUser->isWebmaster()),
                 'seasons' => $personalStatistics->getAvailableSeasons(),
                 'currentSeason' => $season,
                 'navItems' => $this->getNavItems($person),

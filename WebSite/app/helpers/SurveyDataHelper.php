@@ -2,7 +2,9 @@
 
 namespace app\helpers;
 
-class SurveyDataHelper extends Data
+use app\interfaces\NewsProviderInterface;
+
+class SurveyDataHelper extends Data implements NewsProviderInterface
 {
     public function __construct(Application $application)
     {
@@ -54,7 +56,7 @@ class SurveyDataHelper extends Data
         return $this->pdo->query($query)->fetchAll();
     }
 
-    public function getSurveyNews($person, $searchFrom)
+    public function getNews($person, $searchFrom): array
     {
         $sql = "
             SELECT 

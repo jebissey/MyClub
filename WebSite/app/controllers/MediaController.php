@@ -19,7 +19,8 @@ class MediaController extends BaseController
 
     public function showUploadForm()
     {
-        if ($this->personDataHelper->getPerson(['Redactor'])) {
+        $this->connectedUser = $this->connectedUser->get();
+        if ($this->connectedUser->isRedactor()) {
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $this->render('app/views/media/upload.latte', $this->params->getAll([]));
             } else $this->application->getErrorManager()->raise(ApplicationError::InvalidRequestMethod, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' invalid in file ' . __FILE__ . ' at line ' . __LINE__);
@@ -28,7 +29,8 @@ class MediaController extends BaseController
 
     public function listFiles()
     {
-        if ($this->personDataHelper->getPerson(['Redactor'])) {
+        $this->connectedUser = $this->connectedUser->get();
+        if ($this->connectedUser->isRedactor()) {
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $year = $this->flight->request()->query->year ?? date('Y');
                 $search = $this->flight->request()->query->search ?? '';
@@ -49,7 +51,8 @@ class MediaController extends BaseController
 
     public function viewFile($year, $month, $filename)
     {
-        if ($this->personDataHelper->getPerson(['Redactor'])) {
+        $this->connectedUser = $this->connectedUser->get();
+        if ($this->connectedUser->isRedactor()) {
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $filePath = $this->media->GetMediaPath() . $year . '/' . $month . '/' . $filename;
 
@@ -73,14 +76,15 @@ class MediaController extends BaseController
 
     public function gpxViewer(): void
     {
-        if ($this->personDataHelper->getPerson([])) {
+        $this->connectedUser = $this->connectedUser->get();
+        if ($this->connectedUser->person) {
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $this->render('app/views/media/gpxViewer.latte', $this->params->getAll([]));
             } else $this->application->getErrorManager()->raise(ApplicationError::InvalidRequestMethod, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
         } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
-
+    #region Private functions
     private function getAvailableYears(): array
     {
         $years = [];

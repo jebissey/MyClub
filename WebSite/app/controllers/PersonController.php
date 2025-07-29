@@ -4,11 +4,12 @@ namespace app\controllers;
 
 use app\enums\ApplicationError;
 use app\helpers\Application;
-use app\helpers\AuthorizationDataHelper;
 use app\helpers\GroupDataHelper;
+use app\helpers\PersonDataHelper;
 use app\helpers\SettingsDataHelper;
 use app\helpers\TableControllerHelper;
 use app\helpers\Webapp;
+use app\interfaces\CrudControllerInterface;
 
 
 class PersonController extends TableController implements CrudControllerInterface
@@ -25,10 +26,11 @@ class PersonController extends TableController implements CrudControllerInterfac
 
     public function help(): void
     {
-        if ($this->personDataHelper->getPerson(['PersonManager', 'Webmaster'])) {
+        $this->connectedUser = $this->connectedUser->get();
+        if ($this->connectedUser->isPersonManager() || $this->connectedUser->isWebmaster()) {
             $this->render('app/views/info.latte', [
                 'content' => (new SettingsDataHelper($this->application))->get('Help_personManager'),
-                'hasAuthorization' => (new AuthorizationDataHelper($this->application))->hasAutorization(),
+                'hasAuthorization' => $this->connectedUser->hasAutorization(),
                 'currentVersion' => Application::getVersion()
             ]);
         } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
@@ -36,9 +38,11 @@ class PersonController extends TableController implements CrudControllerInterfac
 
     public function home(): void
     {
-        if ($this->personDataHelper->getPerson(['EventManager', 'PersonManager', 'Redactor', 'Webmaster'])) {
+        $this->connectedUser = $this->connectedUser->get();
+        if ($this->connectedUser->isAdministrator()) {
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $_SESSION['navbar'] = 'personManager';
+
                 $this->render('app/views/admin/personManager.latte', $this->params->getAll([]));
             } else $this->application->getErrorManager()->raise(ApplicationError::InvalidRequestMethod, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
         } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
@@ -46,7 +50,8 @@ class PersonController extends TableController implements CrudControllerInterfac
 
     public function index()
     {
-        if ($this->personDataHelper->getPerson(['PersonManager', 'Webmaster'])) {
+        $this->connectedUser = $this->connectedUser->get();
+        if ($this->connectedUser->isPersonManager() || $this->connectedUser->isWebmaster()) {
             $filterValues = [
                 'firstName' => $_GET['firstName'] ?? '',
                 'lastName' => $_GET['lastName'] ?? '',
@@ -81,16 +86,18 @@ class PersonController extends TableController implements CrudControllerInterfac
 
     public function create()
     {
-        if ($this->personDataHelper->getPerson(['PersonManager', 'Webmaster'])) {
+        $this->connectedUser = $this->connectedUser->get();
+        if ($this->connectedUser->isPersonManager() || $this->connectedUser->isWebmaster()) {
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-                $this->flight->redirect('/persons/edit/' . $this->personDataHelper->create());
+                $this->flight->redirect('/persons/edit/' . (new PersonDataHelper($this->application))->create());
             } else $this->application->getErrorManager()->raise(ApplicationError::InvalidRequestMethod, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
         } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function edit($id)
     {
-        if ($this->personDataHelper->getPerson(['PersonManager', 'Webmaster'])) {
+        $this->connectedUser = $this->connectedUser->get();
+        if ($this->connectedUser->isPersonManager() || $this->connectedUser->isWebmaster()) {
             $person = $this->dataHelper->get('Person', ['Id' => $id]);
             if (!$person) $this->application->getErrorManager()->raise(ApplicationError::BadRequest, "Unknown person id: $id in file " . __FILE__ . ' at line ' . __LINE__);
             else {
@@ -119,7 +126,8 @@ class PersonController extends TableController implements CrudControllerInterfac
 
     public function delete($id)
     {
-        if ($this->personDataHelper->getPerson(['PersonManager', 'Webmaster'])) {
+        $this->connectedUser = $this->connectedUser->get();
+        if ($this->connectedUser->isPersonManager() || $this->connectedUser->isWebmaster()) {
             if (($_SERVER['REQUEST_METHOD'] === 'GET')) {
                 $this->dataHelper->set('Person', ['Inactivated' => 1], ['Id' => $id]);
                 $this->flight->redirect('/persons');
@@ -129,7 +137,7 @@ class PersonController extends TableController implements CrudControllerInterfac
 
     public function editPresentation()
     {
-        if ($person = $this->personDataHelper->getPerson([])) {
+        if ($person = $this->connectedUser->get()->person ?? false) {
             $this->render('app/views/user/editPresentation.latte', $this->params->getAll([
                 'person' => $person,
                 'navItems' => $this->getNavItems($person),
@@ -139,7 +147,7 @@ class PersonController extends TableController implements CrudControllerInterfac
 
     public function savePresentation()
     {
-        if ($person = $this->personDataHelper->getPerson([])) {
+        if ($person = $this->connectedUser->get()->person ?? false) {
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $presentation = $_POST['content'] ?? '';
                 $location =  $_POST['location'] ?? '';
@@ -158,7 +166,8 @@ class PersonController extends TableController implements CrudControllerInterfac
 
     public function showPresentation($personId)
     {
-        if ($loggedPerson = $this->personDataHelper->getPerson([])) {
+        $this->connectedUser = $this->connectedUser->get();
+        if ($loggedPerson = $this->connectedUser->person) {
             $person = $this->dataHelper->get('Person', [
                 'Id' => $personId,
                 'Inactivated' => 0,
@@ -179,9 +188,9 @@ class PersonController extends TableController implements CrudControllerInterfac
 
     public function showDirectory()
     {
-        if ($person = $this->personDataHelper->getPerson([])) {
+        if ($person = $this->connectedUser->get()->person ?? false) {
             $selectedGroup = isset($_GET['group']) ? (int)$_GET['group'] : null;
-            if ($selectedGroup) $persons = $this->personDataHelper->getPersonsInGroupForDirectory($selectedGroup);
+            if ($selectedGroup) $persons = (new PersonDataHelper($this->application))->getPersonsInGroupForDirectory($selectedGroup);
             else $persons = $this->dataHelper->gets('Person', ['InPresentationDirectory' => 1, 'Inactivated' => 0], 'LastName, FirstName');
             $groupCounts = $this->groupDataHelper->getGroupCount();
 
@@ -199,7 +208,7 @@ class PersonController extends TableController implements CrudControllerInterfac
 
     public function showMap()
     {
-        if ($person = $this->personDataHelper->getPerson([])) {
+        if ($person = $this->connectedUser->get()->person ?? false) {
             $members = $this->dataHelper->gets('Person', [
                 'InPresentationDirectory' => 1,
                 'Location IS NOT NULL' => null,

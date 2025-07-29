@@ -11,9 +11,9 @@ class GroupDataHelper extends Data
         parent::__construct($application);
     }
 
-    public function getAvailableGroups($personId)
+    public function getAvailableGroups(ConnectedUser $connectedUser)
     {
-        if ((new AuthorizationDataHelper($this->application))->isWebmaster()) {
+        if ($connectedUser->isWebmaster()) {
             $query = $this->pdo->prepare("
                     SELECT 
                         g.Id,
@@ -41,7 +41,7 @@ class GroupDataHelper extends Data
 					HAVING Authorizations is NULL
                 ");
         }
-        $query->execute([$personId]);
+        $query->execute([$connectedUser->person->Id]);
         $currentGroups = $query->fetchAll();
 
         $availableGroupsWithoutAuthorisationQuery = "
@@ -64,7 +64,7 @@ class GroupDataHelper extends Data
                 WHERE g.Inactivated = 0 AND g.Id <> 1
 				GROUP BY g.Name
             ";
-        if ((new AuthorizationDataHelper($this->application))->isWebmaster()) $availableGroupsQuery = $availableGroupsWithAuthorisationQuery;
+        if ($connectedUser->isWebmaster()) $availableGroupsQuery = $availableGroupsWithAuthorisationQuery;
         else                                                        $availableGroupsQuery = $availableGroupsWithoutAuthorisationQuery;
         $availableGroupsLeftQuery = $this->pdo->prepare("
                 SELECT availableGroups.*
@@ -87,7 +87,7 @@ class GroupDataHelper extends Data
                     ) userGroups
                 )
             ");
-        $availableGroupsLeftQuery->execute([$personId]);
+        $availableGroupsLeftQuery->execute([$connectedUser->person->Id]);
         return [$availableGroupsLeftQuery->fetchAll(), $currentGroups];
     }
 
@@ -107,9 +107,9 @@ class GroupDataHelper extends Data
 
     public function getGroupsWithAuthorizations(): array|false
     {
-        $autorizationDataHelper = new AuthorizationDataHelper($this->application);
+        $connectedUser = new ConnectedUser($this->application);
         $having = '';
-        if ($autorizationDataHelper->isPersonManager() && !$autorizationDataHelper->isWebmaster()) {
+        if ($connectedUser->isPersonManager() && !$connectedUser->isWebmaster()) {
             $having = "HAVING Authorizations IS NULL";
         }
         $sql = "

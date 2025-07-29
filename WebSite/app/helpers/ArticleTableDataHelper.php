@@ -9,7 +9,7 @@ class ArticleTableDataHelper extends Data
         parent::__construct($application);
     }
 
-    public function getQuery($person)
+    public function getQuery(ConnectedUser $connectedUser)
     {
         $query =  $this->fluent->from('Article')
             ->select('Article.Id, Article.CreatedBy, Article.Title, Article.LastUpdate')
@@ -45,11 +45,11 @@ class ArticleTableDataHelper extends Data
             ->leftJoin("'Group' ON 'Group'.Id = Article.IdGroup")
             ->groupBy('Article.Id');
 
-        if ($person) {
-            if (!(new AuthorizationDataHelper($this->application))->isEditor()) {
-                $query = $query->where('(Article.CreatedBy = ' . $person->Id . '
+        if ($connectedUser) {
+            if (!$connectedUser->isEditor()) {
+                $query = $query->where('(Article.CreatedBy = ' . $connectedUser->person->Id . '
                     OR (Article.PublishedBy IS NOT NULL 
-                        AND (Article.IdGroup IS NULL OR Article.IdGroup IN (SELECT IdGroup FROM PersonGroup WHERE IdPerson = ' . $person->Id . '))
+                        AND (Article.IdGroup IS NULL OR Article.IdGroup IN (SELECT IdGroup FROM PersonGroup WHERE IdPerson = ' . $connectedUser->person->Id . '))
                        ))');
             }
         } else $query = $query->where('(Article.IdGroup IS NULL AND Article.OnlyForMembers = 0 AND Article.PublishedBy IS NOT NULL)');

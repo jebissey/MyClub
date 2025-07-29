@@ -4,17 +4,20 @@ namespace app\helpers;
 
 class News
 {
+    private array $providers;
+
+    public function __construct(array $providers)
+    {
+        $this->providers = $providers;
+    }
+
     public function getNewsForPerson($person, $searchFrom): array
     {
         $news = [];
-        return array_merge(
-            $news,
-            (new ArticleDataHelper())->getArticleNews($person, $searchFrom),
-            (new SurveyDataHelper())->getSurveyNews($person, $searchFrom),
-            (new EventDataHelper())->getEventNews($person, $searchFrom),
-            (new MessageDataHelper())->getMessageNews($person, $searchFrom),
-            (new PersonDataHelper())->getPresentationNews($person, $searchFrom)
-        );
+        foreach ($this->providers as $provider) {
+            $news = array_merge($news, $provider->getNews($person, $searchFrom));
+        }
+        return $news;
     }
 
     public function anyNews($person): bool

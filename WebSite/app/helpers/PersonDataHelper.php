@@ -4,18 +4,13 @@ namespace app\helpers;
 
 use DateTime;
 
-use app\enums\ApplicationError;
-use app\helpers\Params;
-use app\helpers\TranslationManager;
+use app\interfaces\NewsProviderInterface;
 
-class PersonDataHelper extends Data
+class PersonDataHelper extends Data implements NewsProviderInterface
 {
-    private AuthorizationDataHelper $authorizationDataHelper;
-
     public function __construct(Application $application)
     {
         parent::__construct($application);
-        $this->authorizationDataHelper = new AuthorizationDataHelper($application);
     }
 
     public function getPersonsInGroup(int $idGroup, bool $everybodyIfNoGroup = false): array
@@ -55,46 +50,7 @@ class PersonDataHelper extends Data
         return "publié par " . $person->FirstName . " " . $person->LastName;
     }
 
-    public function getPerson(array $requiredAuthorisations = [], int $segment = 0): object|bool
-    {
-        $userEmail = $_SESSION['user'] ?? '';
-        if (!$userEmail) {
-            Params::setDefaultParams($_SERVER['REQUEST_URI']);
-            return false;
-        }
 
-        $person = $this->get('Person', ['Email' => $userEmail]);
-        if (!$person) {
-            $this->application->getErrorManager()->raise(ApplicationError::BadRequest, "Unknown user with this email address: $userEmail in file " . __FILE__ . ' at line ' . __LINE__);
-            return false;
-        }
-
-        $authorizations = $this->authorizationDataHelper->getsFor($person->Id);
-        if ($requiredAuthorisations != [] && empty(array_intersect($authorizations, $requiredAuthorisations))) {
-            $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
-            return false;
-        }
-
-        $lang = TranslationManager::getCurrentLanguage();
-        Params::setParams([
-            'href' => $this->getHref($person->Email),
-            'userImg' => $this->getUserImg($person),
-            'userEmail' => $person->Email,
-            'keys' => count($authorizations) > 0,
-            'isEventManager' => $this->authorizationDataHelper->isEventManager(),
-            'isPersonManager' => $this->authorizationDataHelper->isPersonManager(),
-            'isRedactor' => $this->authorizationDataHelper->isRedactor(),
-            'isEditor' => $this->authorizationDataHelper->isEditor(),
-            'isWebmaster' => $this->authorizationDataHelper->isWebmaster(),
-            'page' => explode('/', trim(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/'))[$segment],
-            'currentVersion' => Application::getVersion(),
-            'currentLanguage' => $lang,
-            'supportedLanguages' => TranslationManager::getSupportedLanguages(),
-            'flag' => TranslationManager::getFlag($lang),
-        ]);
-
-        return $person;
-    }
 
     public function create()
     {
@@ -154,7 +110,7 @@ class PersonDataHelper extends Data
         return $query->fetchColumn();
     }
 
-    public function getPresentationNews($person, $searchFrom)
+    public function getNews($person, $searchFrom): array
     {
         $presentations = $this->fluent->from('Person p')
             ->select('p.id, p.email, p.firstname, p.lastname, p.PresentationLastUpdate')
@@ -261,20 +217,5 @@ class PersonDataHelper extends Data
         $subject = "Lien d'inscription pour " . $event->Summary;
         $body = $registrationLink;
         return Email::send($adminEmail, $emailContact, $subject, $body);
-    }
-
-    #region Private functions
-    private function getHref(string $userEmail): string
-    {
-        return $userEmail == '' ? '/user/sign/in' : '/user';
-    }
-
-    private function getUserImg(object $person): string
-    {
-        if ($person->UseGravatar === 'yes') return (new GravatarHandler())->getGravatar($person->Email);
-        else {
-            if (empty($person->Avatar)) return '/app/images/emojiPensif.png';
-            else                        return '/app/images/' . $person->Avatar;
-        }
     }
 }

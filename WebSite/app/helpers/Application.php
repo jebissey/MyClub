@@ -45,7 +45,6 @@ class Application
         return self::$instance;
     }
 
-
     public function getFlight(): Engine
     {
         return self::$flight;

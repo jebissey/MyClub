@@ -4,7 +4,9 @@ namespace app\helpers;
 
 use Exception;
 
-class MessageDataHelper extends Data
+use app\interfaces\NewsProviderInterface;
+
+class MessageDataHelper extends Data implements NewsProviderInterface
 {
     public function __construct(Application $application)
     {
@@ -73,7 +75,7 @@ class MessageDataHelper extends Data
         return true;
     }
 
-    public function getMessageNews($person, $searchFrom)
+    public function getNews($person, $searchFrom): array
     {
         $sql = "
             SELECT m.Id, m.Text, m.LastUpdate, m.EventId, p.FirstName, p.LastName, p.NickName, e.Summary, e.StartTime

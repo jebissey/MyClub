@@ -5,7 +5,6 @@ namespace app\controllers;
 use app\helpers\Application;
 use app\enums\ApplicationError;
 use app\helpers\ArwardsDataHelper;
-use  app\helpers\AuthorizationDataHelper;
 use app\helpers\Webapp;
 
 class NavBarController extends BaseController
@@ -17,7 +16,8 @@ class NavBarController extends BaseController
 
     public function index()
     {
-        if ($this->personDataHelper->getPerson(['Webmaster'])) {
+        $this->connectedUser = $this->connectedUser->get();
+        if ($this->connectedUser->isWebmaster()) {
             $this->render('app/views/navbar/index.latte', $this->params->getAll([
                 'navItems' => $this->getNavItems(true),
                 'groups' => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
@@ -28,8 +28,8 @@ class NavBarController extends BaseController
 
     public function showArwards()
     {
-        $person = $this->personDataHelper->getPerson();
-        if ($this->pageDataHelper->authorizedUser('/navbar/show/arwards', $person)) {
+        $person = $this->connectedUser->get()->person ?? false;
+        if ($person && $this->pageDataHelper->authorizedUser('/navbar/show/arwards', $person)) {
             $arwardsDataHelper = new ArwardsDataHelper($this->application);
 
             $this->render('app/views/admin/arwards.latte', $this->params->getAll([
@@ -44,12 +44,12 @@ class NavBarController extends BaseController
 
     public function showArticle($id)
     {
-        $person = $this->personDataHelper->getPerson();
-        if ($this->pageDataHelper->authorizedUser("/navbar/show/article/$id", $person)) {
+        $person = $this->connectedUser->get()->person ?? false;
+        if ($person && $this->pageDataHelper->authorizedUser("/navbar/show/article/$id", $person)) {
             $this->render('app/views/navbar/article.latte', $this->params->getAll([
                 'navItems' => $this->getNavItems($person),
                 'chosenArticle' => $this->dataHelper->get('Article', ['Id' => $id]),
-                'hasAuthorization' => (new AuthorizationDataHelper($this->application))->hasAutorization()
+                'hasAuthorization' => $this->connectedUser->hasAutorization()
             ]));
         } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }

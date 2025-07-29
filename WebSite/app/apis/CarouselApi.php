@@ -6,35 +6,35 @@ use app\helpers\AuthorizationDataHelper;
 use Throwable;
 
 use app\helpers\Application;
-use app\helpers\carouselHelper;
+use app\helpers\CarouselDataHelper;
 use app\helpers\Webapp;
 
 class CarouselApi extends BaseApi
 {
     private AuthorizationDataHelper $authorizationDataHelper;
-    private CarouselHelper $carouselHelper;
+    private CarouselDataHelper $carouselDataHelper;
 
     public function __construct(Application $application)
     {
         parent::__construct($application);
         $this->authorizationDataHelper = new AuthorizationDataHelper($application);
-        $this->carouselHelper = new carouselHelper();
+        $this->carouselDataHelper = new CarouselDataHelper($this->application);
     }
 
     public function getItems($idArticle)
     {
-        $person = $this->personDataHelper->getPerson();
-        if (!$this->authorizationDataHelper->getArticle($idArticle, $person)) {
+        $person = $this->connectedUser->get()->person ?? false;
+        if (!$person || !$this->authorizationDataHelper->getArticle($idArticle, $person)) {
             $this->renderJson(['error' => 'Accès non autorisé'], 403);
             return;
         }
-        $items = $this->carouselHelper->getByArticle($idArticle);
+        $items = $this->carouselDataHelper->getByArticle($idArticle);
         $this->renderJson(['success' => true, 'items' => $items]);
     }
 
     public function saveItem()
     {
-        $person = $this->personDataHelper->getPerson();
+        $person = $this->connectedUser->get()->person ?? false;
         if (!$person) {
             $this->renderJson(['error' => 'Utilisateur non connecté'], 401);
             return;
@@ -51,7 +51,7 @@ class CarouselApi extends BaseApi
 
         $item = Webapp::sanitizeHtml($data['item']);
         try {
-            $message = $this->carouselHelper->set_($data, $item);
+            $message = $this->carouselDataHelper->set_($data, $item);
             $this->renderJson(['success' => true, 'message' => $message]);
         } catch (Throwable $e) {
             $this->renderJson(['error' => 'Erreur lors de l\'enregistrement: ' . $e->getMessage()], 500);
@@ -60,12 +60,12 @@ class CarouselApi extends BaseApi
 
     public function deleteItem($id)
     {
-        $person = $this->personDataHelper->getPerson();
+        $person = $this->connectedUser->get()->person ?? false;
         if (!$person) {
             $this->renderJson(['error' => 'Utilisateur non connecté'], 401);
             return;
         }
-        $item = $this->carouselHelper->get_($id);
+        $item = $this->carouselDataHelper->get_($id);
         if (!$item) {
             $this->renderJson(['error' => 'Élément non trouvé'], 404);
             return;
@@ -75,7 +75,7 @@ class CarouselApi extends BaseApi
             return;
         }
         try {
-            $this->carouselHelper->delete_($id);
+            $this->carouselDataHelper->delete_($id);
             $this->renderJson(['success' => true, 'message' => 'Élément supprimé avec succès']);
         } catch (Throwable $e) {
             $this->renderJson(['error' => 'Erreur lors de la suppression: ' . $e->getMessage()], 500);

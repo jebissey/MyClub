@@ -16,7 +16,8 @@ class SurveyController extends BaseController
 
     public function add($articleId)
     {
-        if ($this->personDataHelper->getPerson(['Redactor'])) {
+        $this->connectedUser = $this->connectedUser->get();
+        if ($this->connectedUser->isRedactor()) {
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $article = $this->dataHelper->get('Article', ['Id' => $articleId]);
                 if (!$article) {
@@ -34,7 +35,8 @@ class SurveyController extends BaseController
 
     public function createOrUpdate()
     {
-        if ($this->personDataHelper->getPerson(['Redactor'])) {
+        $this->connectedUser = $this->connectedUser->get();
+        if ($this->connectedUser->isRedactor()) {
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $articleId = $_POST['article_id'] ?? null;
                 $question = $_POST['question'] ?? '';
@@ -64,7 +66,7 @@ class SurveyController extends BaseController
 
     public function viewResults($articleId)
     {
-        if ($person = $this->personDataHelper->getPerson([])) {
+        if ($person = $this->connectedUser->get()->person ?? false) {
             $survey = (new SurveyDataHelper($this->application))->getWithCreator($articleId);
             if (!$survey) {
                 $this->flight->redirect('/articles/' . $articleId);

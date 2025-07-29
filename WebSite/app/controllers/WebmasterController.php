@@ -24,22 +24,23 @@ class WebmasterController extends BaseController
 
     public function helpWebmaster(): void
     {
-        $this->personDataHelper->getPerson();
+        $this->connectedUser = $this->connectedUser->get();
 
         $this->render('app/views/info.latte', [
             'content' => $this->settingsDataHelper->get('Help_webmaster'),
-            'hasAuthorization' => $this->authorizationDatahelper->isEventManager(),
+            'hasAuthorization' => $this->connectedUser->isEventManager(),
             'currentVersion' => Application::getVersion()
         ]);
     }
 
     public function helpAdmin()
     {
-        if ($this->personDataHelper->getPerson(['EventManager', 'PersonManager', 'Redactor', 'Webmaster'])) {
+        $this->connectedUser = $this->connectedUser->get();
+        if ($this->connectedUser->isAdministrator()) {
 
             $this->render('app/views/info.latte', $this->params->getAll([
                 'content' => $this->settingsDataHelper->get('Help_admin'),
-                'hasAuthorization' => $this->authorizationDatahelper->isEventManager(),
+                'hasAuthorization' => $this->connectedUser->isEventManager(),
                 'currentVersion' => $this->application->getVersion()
             ]));
         } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
@@ -47,7 +48,8 @@ class WebmasterController extends BaseController
 
     public function homeWebmaster(): void
     {
-        if ($this->personDataHelper->getPerson(['Webmaster'])) {
+        $this->connectedUser = $this->connectedUser->get();
+        if ($this->connectedUser->isWebmaster()) {
 
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $_SESSION['navbar'] = 'webmaster';
@@ -64,14 +66,15 @@ class WebmasterController extends BaseController
 
     public function homeAdmin()
     {
-        if ($this->personDataHelper->getPerson(['EventManager', 'PersonManager', 'Redactor', 'Webmaster'])) {
-            if ($this->authorizationDatahelper->hasOnlyOneAutorization()) {
-                if ($this->authorizationDatahelper->isEventManager())       $this->flight->redirect('/eventManager');
-                else if ($this->authorizationDatahelper->isPersonManager()) $this->flight->redirect('/personManager');
-                else if ($this->authorizationDatahelper->isRedactor()) {
+        $this->connectedUser = $this->connectedUser->get();
+        if ($this->connectedUser->isAdministrator()) {
+            if ($this->connectedUser->hasOnlyOneAutorization()) {
+                if ($this->connectedUser->isEventManager())       $this->flight->redirect('/eventManager');
+                else if ($this->connectedUser->isPersonManager()) $this->flight->redirect('/personManager');
+                else if ($this->connectedUser->isRedactor()) {
                     $_SESSION['navbar'] = 'redactor';
                     $this->flight->redirect('/articles');
-                } else if ($this->authorizationDatahelper->isWebmaster())   $this->flight->redirect('/webmaster');
+                } else if ($this->connectedUser->isWebmaster())   $this->flight->redirect('/webmaster');
             } else if ($_SERVER['REQUEST_METHOD'] === 'GET') $this->render('app/views/admin/admin.latte', $this->params->getAll([]));
             else $this->application->getErrorManager()->raise(ApplicationError::InvalidRequestMethod, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
         } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
@@ -79,7 +82,8 @@ class WebmasterController extends BaseController
 
     public function arwards(): void
     {
-        if ($person = $this->personDataHelper->getPerson(['Webmaster'])) {
+        $person = $this->connectedUser = $this->connectedUser->get()->person ?? false;
+        if ($person && $this->connectedUser->isWebmaster()) {
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $arwardsDataHelper = new ArwardsDataHelper($this->application);
                 $this->render('app/views/admin/arwards.latte', $this->params->getAll([
@@ -119,7 +123,8 @@ class WebmasterController extends BaseController
         $site_url = $base_url;
         $feed_url = $base_url . "rss.xml";
         $feed_description = "Mises à jour de la liste d'articles";
-        $articles = (new ArticleDataHelper($this->application))->getArticlesForRss(($this->personDataHelper->getPerson([]))->Id ?? 0);
+        $this->connectedUser = $this->connectedUser->get();
+        $articles = (new ArticleDataHelper($this->application))->getArticlesForRss($this->connectedUser->person->Id ?? 0);
         header('Cache-Control: no-cache, no-store, must-revalidate'); // HTTP 1.1
         header('Pragma: no-cache'); // HTTP 1.0
         header('Expires: 0'); // Proxies

@@ -8,11 +8,11 @@ use Latte\Engine as LatteEngine;
 
 use app\helpers\Application;
 use app\helpers\AuthorizationDataHelper;
+use app\helpers\ConnectedUser;
 use app\helpers\DataHelper;
 use app\helpers\LanguagesDataHelper;
 use app\helpers\PageDataHelper;
 use app\helpers\Params;
-use app\helpers\PersonDataHelper;
 use app\helpers\TranslationManager;
 
 abstract class BaseController
@@ -20,20 +20,19 @@ abstract class BaseController
     protected Engine $flight;
     private LatteEngine $latte;
     protected Params $params;
-
     protected Application $application;
+    protected ConnectedUser $connectedUser;
     protected DataHelper $dataHelper;
     protected LanguagesDataHelper $languagesDataHelper;
     protected PageDataHelper $pageDataHelper;
-    protected PersonDataHelper $personDataHelper;
 
     public function __construct(Application $application)
     {
         $this->application = $application;
         $this->dataHelper = new DataHelper($application);
+        $this->connectedUser = new ConnectedUser($application);
         $this->languagesDataHelper = new LanguagesDataHelper($application);
         $this->pageDataHelper = new PageDataHelper($application);
-        $this->personDataHelper = new PersonDataHelper($application);
 
         $this->flight = $application->getFlight();
         $this->latte = $application->getLatte();

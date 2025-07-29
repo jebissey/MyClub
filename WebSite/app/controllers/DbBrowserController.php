@@ -2,8 +2,8 @@
 
 namespace app\controllers;
 
-use app\helpers\Application;
 use app\enums\ApplicationError;
+use app\helpers\Application;
 use app\helpers\DbBrowserHelper;
 
 class DbBrowserController extends BaseController
@@ -19,7 +19,8 @@ class DbBrowserController extends BaseController
 
     public function createRecord($table)
     {
-        if ($this->personDataHelper->getPerson(['Webmaster'])) {
+        $this->connectedUser = $this->connectedUser->get();
+        if ($this->connectedUser->isWebmaster()) {
             $this->dbBrowserHelper->createRecord($table);
             $this->flight->redirect('/dbbrowser/' . urlencode($table));
         } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
@@ -27,7 +28,8 @@ class DbBrowserController extends BaseController
 
     public function deleteRecord($table, $id)
     {
-        if ($this->personDataHelper->getPerson(['Webmaster'])) {
+        $this->connectedUser = $this->connectedUser->get();
+        if ($this->connectedUser->isWebmaster()) {
             $this->dbBrowserHelper->deleteRecord($table, $id);
             $this->flight->redirect('/dbbrowser/' . urlencode($table));
         } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
@@ -35,14 +37,16 @@ class DbBrowserController extends BaseController
 
     public function index()
     {
-        if ($this->personDataHelper->getPerson(['Webmaster'])) {
+        $this->connectedUser = $this->connectedUser->get();
+        if ($this->connectedUser->isWebmaster()) {
             $this->render('app/views/dbbrowser/index.latte', $this->params->getAll(['tables' => $this->getTables()]));
         } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function showCreateForm($table)
     {
-        if ($this->personDataHelper->getPerson(['Webmaster'])) {
+        $this->connectedUser = $this->connectedUser->get();
+        if ($this->connectedUser->isWebmaster()) {
             [$columns, $columnTypes] = $this->dbBrowserHelper->showCreateForm($table);
 
             $this->render('app/views/dbbrowser/create.latte', $this->params->getAll([
@@ -55,7 +59,8 @@ class DbBrowserController extends BaseController
 
     public function showEditForm($table, $id)
     {
-        if ($this->personDataHelper->getPerson(['Webmaster'])) {
+        $this->connectedUser = $this->connectedUser->get();
+        if ($this->connectedUser->isWebmaster()) {
             [$columns, $record, $primaryKey, $columnTypes] = $this->dbBrowserHelper->showEditForm($table, $id);
 
             $this->render('app/views/dbbrowser/edit.latte', $this->params->getAll([
@@ -70,7 +75,8 @@ class DbBrowserController extends BaseController
 
     public function showTable($table)
     {
-        if ($this->personDataHelper->getPerson(['Webmaster'])) {
+        $this->connectedUser = $this->connectedUser->get();
+        if ($this->connectedUser->isWebmaster()) {
             [$records, $columns, $dbbPage, $totalPages, $filters] = $this->dbBrowserHelper->showTable($table, $this->itemsPerPage);
 
             $this->render('app/views/dbbrowser/table.latte', $this->params->getAll([
@@ -87,7 +93,8 @@ class DbBrowserController extends BaseController
 
     public function updateRecord($table, $id)
     {
-        if ($this->personDataHelper->getPerson(['Webmaster'])) {
+        $this->connectedUser = $this->connectedUser->get();
+        if ($this->connectedUser->isWebmaster()) {
             $this->dbBrowserHelper->updateRecord($table, $id);
             $this->flight->redirect('/dbbrowser/' . urlencode($table));
         } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);

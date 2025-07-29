@@ -6,14 +6,12 @@ use DateTime;
 
 class AuthorizationDataHelper extends Data
 {
-    private $authorizations = null;
-
     public function __construct(Application $application)
     {
         parent::__construct($application);
     }
 
-    public function getsFor($personId)
+    public function getsFor(ConnectedUser $connectedUser)
     {
         $query = $this->pdo->prepare("
             SELECT DISTINCT Authorization.Name FROM Person 
@@ -22,43 +20,8 @@ class AuthorizationDataHelper extends Data
             INNER JOIN GroupAuthorization on `Group`.Id = GroupAuthorization.IdGroup
             INNER JOIN Authorization on GroupAuthorization.IdAuthorization = Authorization.Id 
             WHERE Person.Id = ?");
-        $query->execute([$personId]);
-        return $this->authorizations = array_column($query->fetchAll(), 'Name');
-    }
-
-    public function isEventManager(): bool
-    {
-        return in_array('EventManager', $this->authorizations ?? []);
-    }
-
-    public function isPersonManager(): bool
-    {
-        return in_array('PersonManager', $this->authorizations ?? []);
-    }
-
-    public function isRedactor(): bool
-    {
-        return in_array('Redactor', $this->authorizations ?? []);
-    }
-
-    public function isEditor(): bool
-    {
-        return in_array('Editor', $this->authorizations ?? []);
-    }
-
-    public function isWebmaster(): bool
-    {
-        return in_array('Webmaster', $this->authorizations ?? []);
-    }
-
-    public function hasAutorization(): bool
-    {
-        return count($this->authorizations ?? []) > 0;
-    }
-
-    public function hasOnlyOneAutorization(): bool
-    {
-        return count($this->authorizations ?? []) == 1;
+        $query->execute([$connectedUser->person->Id]);
+        return array_column($query->fetchAll(), 'Name');
     }
 
     public function canPersonReadSurveyResults($article, $person)
@@ -113,24 +76,14 @@ class AuthorizationDataHelper extends Data
     }
 
     #region Private functions
-    private function canReadArticle($article, $person)
+    private function canReadArticle($article, ConnectedUser $connectedUser)
     {
-        if (!$article) {
-            return false;
-        }
-        if ($person && ($article->CreatedBy == $person->Id || $this->isEditor())) {
-            return true;
-        }
-        if ($article->PublishedBy === null) {
-            return false;
-        }
-        if (!$person) {
-            return $article->OnlyForMembers == 0 && ($article->IdGroup === null);
-        }
-        if ($article->OnlyForMembers == 1 && $article->IdGroup === null) {
-            return true;
-        }
-        return $article->IdGroup === null || !empty(array_intersect([$article->IdGroup], $this->getUserGroups($person->Email)));
+        if (!$article) return false;
+        if ($connectedUser->person && ($article->CreatedBy == $connectedUser->person->Id || $connectedUser->isEditor())) return true;
+        if ($article->PublishedBy === null) return false;
+        if (!$connectedUser->person) return $article->OnlyForMembers == 0 && ($article->IdGroup === null);
+        if ($article->OnlyForMembers == 1 && $article->IdGroup === null) return true;
+        return $article->IdGroup === null || !empty(array_intersect([$article->IdGroup], $this->getUserGroups($connectedUser->person->Email)));
     }
 
     private function getGroups($groupsFilter): array

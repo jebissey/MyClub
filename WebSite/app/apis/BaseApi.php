@@ -6,6 +6,7 @@ use flight;
 use Latte\Engine as LatteEngine;
 
 use app\helpers\Application;
+use app\helpers\ConnectedUser;
 use app\helpers\DataHelper;
 use app\helpers\PersonDataHelper;
 
@@ -14,6 +15,7 @@ abstract class BaseApi
     private LatteEngine $latte;
 
     protected Application $application;
+    protected ConnectedUser $connectedUser;
     protected DataHelper $dataHelper;
     protected PersonDataHelper $personDataHelper;
 
@@ -21,6 +23,7 @@ abstract class BaseApi
     {
         $this->application = $application;
         $this->latte = $application->getLatte();
+        $this->connectedUser = new ConnectedUser($application);
         $this->dataHelper = new DataHelper($application);
         $this->personDataHelper = new PersonDataHelper($application);
     }

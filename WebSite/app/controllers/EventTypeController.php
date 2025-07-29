@@ -2,10 +2,11 @@
 
 namespace app\controllers;
 
-use app\helpers\Application;
 use app\enums\ApplicationError;
+use app\helpers\Application;
 use app\helpers\EventDataHelper;
 use app\helpers\TableControllerHelper;
+use app\interfaces\CrudControllerInterface;
 
 class EventTypeController extends TableController implements CrudControllerInterface
 {
@@ -21,7 +22,8 @@ class EventTypeController extends TableController implements CrudControllerInter
 
     public function index()
     {
-        if ($this->personDataHelper->getPerson(['Webmaster'])) {
+        $this->connectedUser = $this->connectedUser->get();
+        if ($this->connectedUser->IsWebmaster()) {
             $filterValues = [];
             $filterConfig = [];
             $columns = [
@@ -45,7 +47,8 @@ class EventTypeController extends TableController implements CrudControllerInter
 
     public function create()
     {
-        if ($this->personDataHelper->getPerson(['Webmaster'])) {
+        $this->connectedUser = $this->connectedUser->get();
+        if ($this->connectedUser->isWebmaster()) {
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $id = $this->dataHelper->set('EventType', ['Name' => '']);
                 $this->flight->redirect('/EventTypes/edit/' . $id);
@@ -55,7 +58,8 @@ class EventTypeController extends TableController implements CrudControllerInter
 
     public function edit($id)
     {
-        if ($this->personDataHelper->getPerson(['Webmaster'])) {
+        $this->connectedUser = $this->connectedUser->get();
+        if ($this->connectedUser->isWebmaster()) {
             $eventType = $this->dataHelper->get('EventType', ['Id', $id]);
             if (!$eventType) $this->application->getErrorManager()->raise(ApplicationError::InvalidSetting, "Invalide EventType: $id in file " . __FILE__ . ' at line ' . __LINE__);
             else {
@@ -78,7 +82,8 @@ class EventTypeController extends TableController implements CrudControllerInter
 
     public function delete($id)
     {
-        if ($this->personDataHelper->getPerson(['Webmaster'])) {
+        $this->connectedUser = $this->connectedUser->get();
+        if ($this->connectedUser->isWebmaster()) {
             if (($_SERVER['REQUEST_METHOD'] === 'GET')) {
                 $this->dataHelper->set('EventType', ['Inactivated' => 1], ['Id' => $id]);
 

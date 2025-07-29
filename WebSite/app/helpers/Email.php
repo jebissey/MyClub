@@ -3,7 +3,6 @@
 namespace app\helpers;
 
 use InvalidArgumentException;
-use app\helpers\Webapp;
 
 class Email
 {

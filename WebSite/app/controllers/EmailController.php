@@ -16,7 +16,8 @@ class EmailController extends BaseController
 
     public function fetchEmails()
     {
-        if ($this->personDataHelper->getPerson(['EventManager'])) {
+        $this->connectedUser = $this->connectedUser->get();
+        if ($this->connectedUser->isEventManager()) {
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $idGroup = $_POST['idGroup'] ?? '';
                 $idEventType = $_POST['idEventType'] ?? '';
@@ -44,7 +45,8 @@ class EmailController extends BaseController
 
     public function fetchEmailsForArticle($idArticle)
     {
-        if ($this->personDataHelper->getPerson(['Redactor'])) {
+        $this->connectedUser = $this->connectedUser->get();
+        if ($this->connectedUser->isRedactor()) {
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $article = $this->dataHelper->get('Article', ['Id', $idArticle]);
                 if (!$article) die('Fatal program error in file ' + __FILE__ + ' at line ' + __LINE__);
@@ -53,7 +55,7 @@ class EmailController extends BaseController
                     $this->application->getErrorManager()->raise(ApplicationError::InvalidParameter, "Unknown author of article '$idArticle' in file " . __FILE__ . ' at line ' . __LINE__);
                     return;
                 }
-                $filteredEmails = $this->personDataHelper->getPersonWantedToBeAlerted($idArticle);
+                $filteredEmails = (new PersonDataHelper($this->application))->getPersonWantedToBeAlerted($idArticle);
                 $root = Application::$root;
                 $articleLink = $root . '/articles/' . $idArticle;
                 $unsubscribeLink = $root . '/user/preferences';

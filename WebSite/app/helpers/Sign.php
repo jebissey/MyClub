@@ -2,22 +2,23 @@
 
 namespace app\helpers;
 
-use app\enums\ApplicationError;
 use DateTime;
+
+use app\enums\ApplicationError;
 use app\helpers\Application;
 use app\helpers\Password;
 
 class Sign
 {
+    private Application $application;
     private $dataHelper;
     private $personDataHelper;
-    private Application $application;
 
-    public function __construct($dataHelper, $personDataHelper, Application $application)
+    public function __construct(Application $application)
     {
-        $this->dataHelper = $dataHelper;
-        $this->personDataHelper = $personDataHelper;
         $this->application = $application;
+        $this->dataHelper = new DataHelper($application);
+        $this->personDataHelper = new PersonDataHelper($application);
     }
 
     public function forgotPassword(string $email): void

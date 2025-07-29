@@ -17,7 +17,8 @@ class RegistrationController extends TableController
 
     public function index()
     {
-        if ($this->personDataHelper->getPerson(['PersonManager', 'Webmaster'])) {
+        $this->connectedUser = $this->connectedUser->get();
+        if ($this->connectedUser->isPersonManager() || $this->connectedUser->isWebmaster()) {
             $filterValues = [
                 'lastName' => $_GET['lastName'] ?? '',
                 'firstName' => $_GET['firstName'] ?? '',
@@ -49,7 +50,8 @@ class RegistrationController extends TableController
 
     public function getPersonGroups($personId)
     {
-        if ($this->personDataHelper->getPerson(['PersonManager', 'Webmaster'])) {
+        $this->connectedUser = $this->connectedUser->get();
+        if ($this->connectedUser->isPersonManager() || $this->connectedUser->isWebmaster()) {
             [$availableGroups, $currentGroups] = (new GroupDataHelper($this->application))->getAvailableGroups($personId);
 
             $this->render('app/views/registration/groups.latte', $this->params->getAll([
