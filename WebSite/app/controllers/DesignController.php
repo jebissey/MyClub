@@ -5,6 +5,7 @@ namespace app\controllers;
 use app\helpers\Application;
 use app\enums\ApplicationError;
 use app\helpers\DesignDataHelper;
+use app\helpers\Params;
 
 class DesignController extends BaseController
 {
@@ -20,7 +21,7 @@ class DesignController extends BaseController
         if ($this->connectedUser->isRedactor()) {
             [$designs, $userVotes] = (new DesignDataHelper($this->application))->getUsersVotes($this->connectedUser->person->Id);
 
-            $this->render('app/views/designs/index.latte', $this->params->getAll([
+            $this->render('app/views/designs/index.latte', Params::getAll([
                 'designs' => $designs,
                 'groups' => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
                 'userVotes' => $userVotes
@@ -32,7 +33,7 @@ class DesignController extends BaseController
     {
         $this->connectedUser = $this->connectedUser->get();
         if ($this->connectedUser->isRedactor()) {
-            $this->render('app/views/designs/create.latte', $this->params->getAll([
+            $this->render('app/views/designs/create.latte', Params::getAll([
                 'groups' => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
             ]));
         } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);

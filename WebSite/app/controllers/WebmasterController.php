@@ -7,6 +7,7 @@ use app\helpers\Application;
 use app\helpers\ArticleDataHelper;
 use app\helpers\ArwardsDataHelper;
 use app\helpers\AuthorizationDataHelper;
+use app\helpers\Params;
 use app\helpers\SettingsDataHelper;
 use app\helpers\Webapp;
 
@@ -38,7 +39,7 @@ class WebmasterController extends BaseController
         $this->connectedUser = $this->connectedUser->get();
         if ($this->connectedUser->isAdministrator()) {
 
-            $this->render('app/views/info.latte', $this->params->getAll([
+            $this->render('app/views/info.latte', Params::getAll([
                 'content' => $this->settingsDataHelper->get('Help_admin'),
                 'hasAuthorization' => $this->connectedUser->isEventManager(),
                 'currentVersion' => $this->application->getVersion()
@@ -59,7 +60,7 @@ class WebmasterController extends BaseController
                 if (!$result['success']) error_log("Erreur récupération version : " . $result['error']);
                 elseif ($result['version'] != $this->application->getVersion()) $newVersion = "A new version is available (V" . $result['version'] . ")";
 
-                $this->render('app/views/admin/webmaster.latte', $this->params->getAll(['newVersion' => $newVersion]));
+                $this->render('app/views/admin/webmaster.latte', Params::getAll(['newVersion' => $newVersion]));
             } else $this->application->getErrorManager()->raise(ApplicationError::InvalidRequestMethod, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
         } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
@@ -75,7 +76,7 @@ class WebmasterController extends BaseController
                     $_SESSION['navbar'] = 'redactor';
                     $this->flight->redirect('/articles');
                 } else if ($this->connectedUser->isWebmaster())   $this->flight->redirect('/webmaster');
-            } else if ($_SERVER['REQUEST_METHOD'] === 'GET') $this->render('app/views/admin/admin.latte', $this->params->getAll([]));
+            } else if ($_SERVER['REQUEST_METHOD'] === 'GET') $this->render('app/views/admin/admin.latte', Params::getAll([]));
             else $this->application->getErrorManager()->raise(ApplicationError::InvalidRequestMethod, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
         } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
@@ -86,7 +87,7 @@ class WebmasterController extends BaseController
         if ($person && $this->connectedUser->isWebmaster()) {
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $arwardsDataHelper = new ArwardsDataHelper($this->application);
-                $this->render('app/views/admin/arwards.latte', $this->params->getAll([
+                $this->render('app/views/admin/arwards.latte', Params::getAll([
                     'counterNames' => $counterNames = $arwardsDataHelper->getCounterNames(),
                     'data' => $arwardsDataHelper->getData($counterNames),
                     'groups' => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),

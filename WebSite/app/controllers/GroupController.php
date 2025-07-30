@@ -5,6 +5,7 @@ namespace app\controllers;
 use app\helpers\Application;
 use app\enums\ApplicationError;
 use app\helpers\GroupDataHelper;
+use app\helpers\Params;
 use app\helpers\Webapp;
 use app\interfaces\CrudControllerInterface;
 
@@ -22,7 +23,7 @@ class GroupController extends BaseController implements CrudControllerInterface
     {
         $this->connectedUser = $this->connectedUser->get();
         if ($this->connectedUser->isPersonManager() || $this->connectedUser->isWebmaster()) {
-            $this->render('app/views/groups/index.latte', $this->params->getAll([
+            $this->render('app/views/groups/index.latte', Params::getAll([
                 'groups' => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
                 'layout' => Webapp::getLayout()()
             ]));
@@ -41,7 +42,7 @@ class GroupController extends BaseController implements CrudControllerInterface
                 $selectedAuthorizations = isset($_POST['authorizations']) ? $_POST['authorizations'] : [];
 
                 if (empty($name)) {
-                    $this->render('app/views/groups/create.latte', $this->params->getAll([
+                    $this->render('app/views/groups/create.latte', Params::getAll([
                         'availableAuthorizations' => $availableAuthorizations,
                         'error' => 'Le nom du groupe est requis',
                         'layout' => Webapp::getLayout()()
@@ -49,7 +50,7 @@ class GroupController extends BaseController implements CrudControllerInterface
                 }
                 $this->groupDataHelper->insert($name, $selfRegistration, $selectedAuthorizations);
             } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-                $this->render('app/views/groups/create.latte', $this->params->getAll([
+                $this->render('app/views/groups/create.latte', Params::getAll([
                     'availableAuthorizations' => $availableAuthorizations,
                     'layout' => Webapp::getLayout()()
                 ]));
@@ -70,7 +71,7 @@ class GroupController extends BaseController implements CrudControllerInterface
                 $selectedAuthorizations = isset($_POST['authorizations']) ? $_POST['authorizations'] : [];
 
                 if (empty($name)) {
-                    $this->render('app/views/groups/edit.latte', $this->params->getAll([
+                    $this->render('app/views/groups/edit.latte', Params::getAll([
                         'group' => $group,
                         'availableAuthorizations' => $availableAuthorizations,
                         'error' => 'Le nom du groupe est requis',
@@ -80,7 +81,7 @@ class GroupController extends BaseController implements CrudControllerInterface
             } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 if (!$group) $this->application->getErrorManager()->raise(ApplicationError::BadRequest, "Unknwon group $id in file " . __FILE__ . ' at line ' . __LINE__);
                 else {
-                    $this->render('app/views/groups/edit.latte', $this->params->getAll([
+                    $this->render('app/views/groups/edit.latte', Params::getAll([
                         'group' => $group,
                         'availableAuthorizations' => $availableAuthorizations,
                         'currentAuthorizations' => array_column($this->dataHelper->gets('GroupAuthorization', ['IdGroup' => $id], 'IdAuthorization'), 'IdAuthorization'),

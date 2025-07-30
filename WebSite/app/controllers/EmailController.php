@@ -5,6 +5,7 @@ namespace app\controllers;
 use app\enums\ApplicationError;
 use app\helpers\Application;
 use app\helpers\Email;
+use app\helpers\Params;
 use app\helpers\PersonDataHelper;
 
 class EmailController extends BaseController
@@ -28,14 +29,14 @@ class EmailController extends BaseController
                 $eventTypeName = $idEventType != '' ? $this->dataHelper->get('EventType', ['Id', $idEventType], 'Name') : '';
                 $dayOfWeekName = $dayOfWeek != '' ? ['Lu.', 'Ma.', 'Me.', 'Je.', 'Ve.', 'Sa.', 'Di.', ''][$dayOfWeek] : '';
 
-                $this->render('app/views/emails/copyToClipBoard.latte', $this->params->getAll([
+                $this->render('app/views/emails/copyToClipBoard.latte', Params::getAll([
                     'emailsJson' => json_encode($filteredEmails),
                     'emails' => $filteredEmails,
                     'filters' => "$groupName / $eventTypeName / $dayOfWeekName / $timeOfDay",
                     'phones' => $this->dataHelper->gets('Person', ['Inactivated' => 0], "Email', 'Phone'"),
                 ]));
             } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-                $this->render('app/views/emails/getEmails.latte', $this->params->getAll([
+                $this->render('app/views/emails/getEmails.latte', Params::getAll([
                     'groups' => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
                     'eventTypes' => $this->dataHelper->gets('EventType', ['Inactivated' => 0], 'Id, Name', 'Name'),
                 ]));

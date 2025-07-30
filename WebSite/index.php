@@ -568,23 +568,23 @@ $flight->route('/phpInfo', function () {
     flush();
 });
 
-$flight->route('/webCard', function () use ($applicationHelper) {
-    serveFile('businessCard.html', $applicationHelper, "'Content-Type', 'text/html; charset=UTF-8'");
+$flight->route('/webCard', function () use ($application) {
+    serveFile($application, 'businessCard.html', "'Content-Type', 'text/html; charset=UTF-8'");
 });
-$flight->route('/favicon.ico', function () use ($applicationHelper) {
-    serveFile('favicon.ico', $applicationHelper);
+$flight->route('/favicon.ico', function () use ($application) {
+    serveFile($application, 'favicon.ico');
 });
-$flight->route('/apple-touch-icon.png', function () use ($applicationHelper) {
-    serveFile('my-club-180.png', $applicationHelper);
+$flight->route('/apple-touch-icon.png', function () use ($application) {
+    serveFile($application, 'my-club-180.png');
 });
-$flight->route('/apple-touch-icon-120x120.png', function () use ($applicationHelper) {
-    serveFile('my-club-120.png', $applicationHelper);
+$flight->route('/apple-touch-icon-120x120.png', function () use ($application) {
+    serveFile($application, 'my-club-120.png');
 });
-$flight->route('/apple-touch-icon-180x180.png', function () use ($applicationHelper) {
-    serveFile('my-club-180.png', $applicationHelper);
+$flight->route('/apple-touch-icon-180x180.png', function () use ($application) {
+    serveFile($application, 'my-club-180.png');
 });
-$flight->route('/apple-touch-icon-precomposed.png', function () use ($applicationHelper) {
-    serveFile('my-club-180.png', $applicationHelper);
+$flight->route('/apple-touch-icon-precomposed.png', function () use ($application) {
+    serveFile($application, 'my-club-180.png');
 });
 $flight->route('/*', function () use ($application) {
     $application->getErrorManager()->raise(ApplicationError::PageNotFound, "Page not found in file " . __FILE__ . ' at line ' . __LINE__);
@@ -595,13 +595,13 @@ $flight->map('error', function (Throwable $ex) use ($logDataHelper, $application
     $logDataHelper->add(500, 'Internal error: ' . $ex->getMessage() . ' in file ' . $ex->getFile() . ' at line' . $ex->getLine());
     $application->getErrorManager()->raise(ApplicationError::Error, 'Error ' . $ex->getMessage() . ' in file ' . $ex->getFile() . ' at line ' . $ex->getLine());
 });
-$flight->after('start', function () use ($logDataHelper) {
-    $logDataHelper->add(Flight::getData('code'), Flight::getData('message'));
+$flight->after('start', function () use ($logDataHelper, $flight) {
+    $logDataHelper->add($flight->getData('code'), $flight->getData('message'));
 });
 
 $flight->start();
 
-function serveFile($filename, $applicationHelper, $ContentType = "'Content-Type', 'image/png'"): void
+function serveFile($application, $filename, $ContentType = "'Content-Type', 'image/png'"): void
 {
     $path = __DIR__ . "/app/images/$filename";
     if (file_exists($path)) {
@@ -610,6 +610,6 @@ function serveFile($filename, $applicationHelper, $ContentType = "'Content-Type'
             ->header('Cache-Control', 'public, max-age=604800, immutable')
             ->header('Expires', gmdate('D, d M Y H:i:s', time() + 604800) . ' GMT');
         readfile($path);
-    } else $applicationHelper->error404();
+    } else $application->getErrorManager()->raise(ApplicationError::PageNotFound, "File $filename not found in file " . __FILE__ . ' at line ' . __LINE__);
     exit;
 }

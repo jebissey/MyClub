@@ -5,6 +5,7 @@ namespace app\controllers;
 use app\helpers\Application;
 use app\enums\ApplicationError;
 use app\helpers\ArwardsDataHelper;
+use app\helpers\Params;
 use app\helpers\Webapp;
 
 class NavBarController extends BaseController
@@ -18,7 +19,7 @@ class NavBarController extends BaseController
     {
         $this->connectedUser = $this->connectedUser->get();
         if ($this->connectedUser->isWebmaster()) {
-            $this->render('app/views/navbar/index.latte', $this->params->getAll([
+            $this->render('app/views/navbar/index.latte', Params::getAll([
                 'navItems' => $this->getNavItems(true),
                 'groups' => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
                 'availableRoutes' => $this->getAvailableRoutes()
@@ -32,7 +33,7 @@ class NavBarController extends BaseController
         if ($person && $this->pageDataHelper->authorizedUser('/navbar/show/arwards', $person)) {
             $arwardsDataHelper = new ArwardsDataHelper($this->application);
 
-            $this->render('app/views/admin/arwards.latte', $this->params->getAll([
+            $this->render('app/views/admin/arwards.latte', Params::getAll([
                 'counterNames' => $counterNames = $arwardsDataHelper->getCounterNames(),
                 'data' => $arwardsDataHelper->getData($counterNames),
                 'groups' => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
@@ -46,7 +47,7 @@ class NavBarController extends BaseController
     {
         $person = $this->connectedUser->get()->person ?? false;
         if ($person && $this->pageDataHelper->authorizedUser("/navbar/show/article/$id", $person)) {
-            $this->render('app/views/navbar/article.latte', $this->params->getAll([
+            $this->render('app/views/navbar/article.latte', Params::getAll([
                 'navItems' => $this->getNavItems($person),
                 'chosenArticle' => $this->dataHelper->get('Article', ['Id' => $id]),
                 'hasAuthorization' => $this->connectedUser->hasAutorization()

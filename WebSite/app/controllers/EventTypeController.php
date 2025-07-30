@@ -5,6 +5,7 @@ namespace app\controllers;
 use app\enums\ApplicationError;
 use app\helpers\Application;
 use app\helpers\EventDataHelper;
+use app\helpers\Params;
 use app\helpers\TableControllerHelper;
 use app\interfaces\CrudControllerInterface;
 
@@ -33,7 +34,7 @@ class EventTypeController extends TableController implements CrudControllerInter
             ];
             $data = $this->prepareTableData($this->tableControllerHelper->getEventTypesQuery(), $filterValues, $_GET['tablePage'] ?? null);
 
-            $this->render('app/views/eventType/index.latte', $this->params->getAll([
+            $this->render('app/views/eventType/index.latte', Params::getAll([
                 'eventTypes' => $data['items'],
                 'currentPage' => $data['currentPage'],
                 'totalPages' => $data['totalPages'],
@@ -68,7 +69,7 @@ class EventTypeController extends TableController implements CrudControllerInter
                 } else if (($_SERVER['REQUEST_METHOD'] === 'GET')) {
                     $existingAttributes = $this->eventDataHelper->getExistingAttibutes($id);
 
-                    $this->render('app/views/eventType/edit.latte', $this->params->getAll([
+                    $this->render('app/views/eventType/edit.latte', Params::getAll([
                         'name' => $eventType->Name,
                         'idGroup' => $eventType->IdGroup,
                         'groups' => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),

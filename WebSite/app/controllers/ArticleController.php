@@ -10,6 +10,7 @@ use app\helpers\ArticleTableDataHelper;
 use app\helpers\AuthorizationDataHelper;
 use app\helpers\Backup;
 use app\helpers\CarouselDataHelper;
+use app\helpers\Params;
 use app\helpers\Period;
 use app\helpers\PersonDataHelper;
 use app\helpers\SurveyDataHelper;
@@ -37,7 +38,7 @@ class ArticleController extends TableController
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $_SESSION['navbar'] = 'redactor';
 
-                $this->render('app/views/admin/redactor.latte', $this->params->getAll([]));
+                $this->render('app/views/admin/redactor.latte', Params::getAll([]));
             } else $this->application->getErrorManager()->raise(ApplicationError::InvalidRequestMethod, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
         } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
@@ -80,7 +81,7 @@ class ArticleController extends TableController
         }
         $query = $this->articleTableDataHelper->getQuery($this->connectedUser->person);
         $data = $this->prepareTableData($query, $filterValues, $_GET['tablePage'] ?? null);
-        $this->render('app/views/user/articles.latte', $this->params->getAll([
+        $this->render('app/views/user/articles.latte', Params::getAll([
             'articles' => $data['items'],
             'currentPage' => $data['currentPage'],
             'totalPages' => $data['totalPages'],
@@ -116,7 +117,7 @@ class ArticleController extends TableController
                 $_SESSION['success'] = null;
             }
 
-            $this->render('app/views/user/article.latte', $this->params->getAll([
+            $this->render('app/views/user/article.latte', Params::getAll([
                 'chosenArticle' => $chosenArticle,
                 'latestArticles' => $this->articleDataHelper->getLatestArticles_($articleIds),
                 'canEdit' => $canEdit,
@@ -191,7 +192,7 @@ class ArticleController extends TableController
                 } else $_SESSION['error'] = "Une erreur est survenue lors de la mise à jour de l'article";
                 $this->flight->redirect('/articles/' . $id);
             } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-                $this->render('app/views/user/publish.latte', $this->params->getAll(['article' => $this->articleDataHelper->getWithAuthor($id)]));
+                $this->render('app/views/user/publish.latte', Params::getAll(['article' => $this->articleDataHelper->getWithAuthor($id)]));
             } else $this->application->getErrorManager()->raise(ApplicationError::InvalidRequestMethod, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
         } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
@@ -231,7 +232,7 @@ class ArticleController extends TableController
             $dateRange = Period::getDateRangeFor($period);
             $crosstabData = (new ArticleCrosstabDataHelper($this->application))->getItems($dateRange);
 
-            $this->render('app/views/common/crosstab.latte', $this->params->getAll([
+            $this->render('app/views/common/crosstab.latte', Params::getAll([
                 'crosstabData' => $crosstabData,
                 'period' => $period,
                 'dateRange' => $dateRange,

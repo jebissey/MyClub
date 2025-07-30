@@ -25,16 +25,13 @@ class ConnectedUser
     public function get(int $segment = 0): self|null
     {
         $userEmail = $_SESSION['user'] ?? '';
-        if (!$userEmail) {
-            Params::setDefaultParams($_SERVER['REQUEST_URI']);
-            return null;
-        }
+        if (!$userEmail) return null;
         $this->person = $this->dataHelper->get('Person', ['Email' => $userEmail]);
         if (!$this->person) {
             $this->application->getErrorManager()->raise(ApplicationError::BadRequest, "Unknown user with this email address: $userEmail in file " . __FILE__ . ' at line ' . __LINE__);
             return null;
         }
-        $this->authorizations = $this->authorizationDataHelper->getsFor($this->person->Id);
+        $this->authorizations = $this->authorizationDataHelper->getsFor($this);
         $lang = TranslationManager::getCurrentLanguage();
         Params::setParams([
             'href' => $this->getHref($this->person->Email),

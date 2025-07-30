@@ -5,6 +5,7 @@ namespace app\controllers;
 use app\helpers\Application;
 use app\enums\ApplicationError;
 use app\helpers\FFAScraper;
+use app\helpers\Params;
 use app\helpers\SettingsDataHelper;
 
 class FFAController extends BaseController
@@ -28,7 +29,7 @@ class FFAController extends BaseController
             if ($question == 'rank') $results = $ffaScraper->searchAthleteRank($firstName, $lastName, $year, $club);
             else                    $results = $ffaScraper->searchAthleteResults($firstName, $lastName, $year, $club);
 
-            $this->render('app/views/user/ffaSearch.latte', $this->params->getAll([
+            $this->render('app/views/user/ffaSearch.latte', Params::getAll([
                 'firstName' => $firstName,
                 'lastName' => $lastName,
                 'question' => $question,

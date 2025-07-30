@@ -35,7 +35,7 @@ class EventController extends BaseController
         $mode = $_GET['mode'] ?? 'next';
         $filterByPreferences = isset($_GET['filterByPreferences']) && $_GET['filterByPreferences'] === '1';
 
-        $this->render('app/views/event/nextEvents.latte', $this->params->getAll([
+        $this->render('app/views/event/nextEvents.latte', Params::getAll([
             'navItems' => $this->getNavItems($this->connectedUser->person),
             'events' => $this->eventDataHelper->getEvents($$this->connectedUser->person, $mode, $offset, $filterByPreferences),
             'person' => $$this->connectedUser->person,
@@ -53,7 +53,7 @@ class EventController extends BaseController
     {
         $this->connectedUser = $this->connectedUser->get();
 
-        $this->render('app/views/event/weekEvents.latte', $this->params->getAll([
+        $this->render('app/views/event/weekEvents.latte', Params::getAll([
             'events' => $this->eventDataHelper->getNextWeekEvents(),
             'eventTypes' => $this->dataHelper->gets('EventType', ['Inactivated', 0], "'Id', 'Name'", 'Name'),
             'eventAttributes' => $this->dataHelper->gets('Attribute', [], "'Id', 'Name, Detail, Color'"),
@@ -69,7 +69,7 @@ class EventController extends BaseController
             $period = $this->flight->request()->query->period ?? 'month';
             [$dateRange, $crosstabData] = (new CrosstabDataHelper($this->application))->getevents($period);
 
-            $this->render('app/views/common/crosstab.latte', $this->params->getAll([
+            $this->render('app/views/common/crosstab.latte', Params::getAll([
                 'crosstabData' => $crosstabData,
                 'period' => $period,
                 'dateRange' => $dateRange,
@@ -87,7 +87,7 @@ class EventController extends BaseController
         if ($this->connectedUser->isEventManager()) {
             $events = $this->eventDataHelper->getEventsForAllOrGuest();
 
-            $this->render('app/views/event/guest.latte', $this->params->getAll([
+            $this->render('app/views/event/guest.latte', Params::getAll([
                 'events' => $events,
                 'navbarTemplate' => '../navbar/eventManager.latte',
                 'layout' => Webapp::getLayout()(),
@@ -193,10 +193,8 @@ class EventController extends BaseController
     {
         $this->connectedUser = $this->connectedUser->get();
         $userEmail = $person->Email ?? '';
-        if ($userEmail === '') Params::setDefaultParams($_SERVER['REQUEST_URI']);
         if ($this->dataHelper->get('Event', ['Id' => $eventId])) {
-
-            $this->render('app/views/event/detail.latte', $this->params->getAll([
+            $this->render('app/views/event/detail.latte', Params::getAll([
                 'eventId' => $eventId,
                 'event' => $this->eventDataHelper->getEvent($eventId),
                 'attributes' => $this->eventDataHelper->getEventAttributes($eventId),
@@ -285,7 +283,7 @@ class EventController extends BaseController
                     'IdContact' => $contact->Id
                 ]);
 
-                $this->render('app/views/contact/registration-success.latte', $this->params->getAll([
+                $this->render('app/views/contact/registration-success.latte', Params::getAll([
                     'event' => $event,
                     'contact' => $contact,
                     'navItems' => $this->getNavItems($this->connectedUser->person),
@@ -300,7 +298,7 @@ class EventController extends BaseController
         $this->connectedUser = $this->connectedUser->get();
         if ($this->connectedUser->isEventManager()) {
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-                $this->render('app/views/event/location.latte', $this->params->getAll([]));
+                $this->render('app/views/event/location.latte', Params::getAll([]));
             } else $this->application->getErrorManager()->raise(ApplicationError::InvalidRequestMethod, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
         } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
@@ -324,7 +322,7 @@ class EventController extends BaseController
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $_SESSION['navbar'] = 'eventManager';
 
-                $this->render('app/views/admin/eventManager.latte', $this->params->getAll([]));
+                $this->render('app/views/admin/eventManager.latte', Params::getAll([]));
             } else $this->application->getErrorManager()->raise(ApplicationError::InvalidRequestMethod, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
         } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
@@ -333,7 +331,7 @@ class EventController extends BaseController
     {
         $this->connectedUser = $this->connectedUser->get();
         if ($this->connectedUser->isWebmaster()) {
-            $this->render('app/views/event/needs.latte', $this->params->getAll([
+            $this->render('app/views/event/needs.latte', Params::getAll([
                 'navItems' => $this->getNavItems($this->connectedUser->person),
                 'needTypes' => $this->dataHelper->gets('NeedType', [], '*', 'Name'),
                 'needs' => (new NeeddataHelper($this->application))->getNeedsAndTheirTypes(),
@@ -353,7 +351,7 @@ class EventController extends BaseController
             $creator = $this->dataHelper->get('Person', ['Id', $event->CreatedBy]);
             $messages = (new MessageDataHelper($this->application))->getEventMessages($eventId);
 
-            $this->render('app/views/event/chat.latte', $this->params->getAll([
+            $this->render('app/views/event/chat.latte', Params::getAll([
                 'event' => $event,
                 'creator' => $creator,
                 'messages' => $messages,

@@ -5,6 +5,7 @@ namespace app\controllers;
 use app\enums\ApplicationError;
 use app\helpers\Application;
 use app\helpers\AuthorizationDataHelper;
+use app\helpers\Params;
 use app\helpers\SurveyDataHelper;
 
 class SurveyController extends BaseController
@@ -25,7 +26,7 @@ class SurveyController extends BaseController
                     return;
                 }
 
-                $this->render('app/views/survey/add.latte', $this->params->getAll([
+                $this->render('app/views/survey/add.latte', Params::getAll([
                     'article' => $article,
                     'survey' => $this->dataHelper->get('Survey', ['IdArticle' => $article->Id])
                 ]));

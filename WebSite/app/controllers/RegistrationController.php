@@ -5,6 +5,7 @@ namespace app\controllers;
 use app\helpers\Application;
 use app\enums\ApplicationError;
 use app\helpers\GroupDataHelper;
+use app\helpers\Params;
 use app\helpers\TableControllerHelper;
 use app\helpers\Webapp;
 
@@ -35,7 +36,7 @@ class RegistrationController extends TableController
                 ['field' => 'NickName', 'label' => 'Surnom']
             ];
             $data = $this->prepareTableData((new TableControllerHelper($this->application))->getPersonsQuery(), $filterValues, $_GET['tablePage'] ?? null);
-            $this->render('app/views/registration/index.latte', $this->params->getAll([
+            $this->render('app/views/registration/index.latte', Params::getAll([
                 'persons' => $data['items'],
                 'currentPage' => $data['currentPage'],
                 'totalPages' => $data['totalPages'],
@@ -54,7 +55,7 @@ class RegistrationController extends TableController
         if ($this->connectedUser->isPersonManager() || $this->connectedUser->isWebmaster()) {
             [$availableGroups, $currentGroups] = (new GroupDataHelper($this->application))->getAvailableGroups($personId);
 
-            $this->render('app/views/registration/groups.latte', $this->params->getAll([
+            $this->render('app/views/registration/groups.latte', Params::getAll([
                 'currentGroups' => $currentGroups,
                 'availableGroups' => $availableGroups,
                 'personId' => $personId

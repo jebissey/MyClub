@@ -3,6 +3,7 @@
 namespace app\helpers;
 
 use InvalidArgumentException;
+
 use app\helpers\Application;
 use app\helpers\TranslationManager;
 
@@ -12,16 +13,22 @@ class Params
 
     public static function getAll(array $specificParams): array
     {
+        if (self::$commonParams === []) self::setDefaultParams($_SERVER['REQUEST_URI']);
         return array_merge(self::$commonParams, $specificParams);
     }
 
-    public static function setDefaultParams(string $requestUri, int $segment = 0): void
+    public static function setParams($params)
     {
-        if ($segment < 0) throw new InvalidArgumentException('Page segment index must be non-negative');
+        self::$commonParams = $params;
+    }
+
+    #region Private functions
+    private static function setDefaultParams(string $requestUri): void
+    {
         $path = parse_url($requestUri, PHP_URL_PATH);
         if ($path === false || $path === null) throw new InvalidArgumentException('Invalid URI provided');
         $segments = explode('/', trim($path, '/'));
-        $page = $segments[$segment] ?? '';
+        $page = $segments[0] ?? '';
         $lang = TranslationManager::getCurrentLanguage();
 
         self::$commonParams = [
@@ -40,10 +47,5 @@ class Params
             'supportedLanguages' => TranslationManager::getSupportedLanguages(),
             'flag' => TranslationManager::getFlag($lang),
         ];
-    }
-
-    public static function setParams($params)
-    {
-        self::$commonParams = $params;
     }
 }

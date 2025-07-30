@@ -6,6 +6,7 @@ use app\helpers\Application;
 use app\enums\ApplicationError;
 use app\helpers\CrosstabDataHelper;
 use app\helpers\LogDataHelper;
+use app\helpers\Params;
 use app\helpers\Period;
 use app\helpers\Webapp;
 
@@ -27,7 +28,7 @@ class LogController extends BaseController
             $perPage = 10;
             [$logs, $totalPages] = $this->logDataHelper->getVisitedPages($perPage, $logPage);
 
-            $this->render('app/views/logs/visitor.latte', $this->params->getAll([
+            $this->render('app/views/logs/visitor.latte', Params::getAll([
                 'logs' => $logs,
                 'currentPage' => $logPage,
                 'totalPages' => $totalPages,
@@ -45,12 +46,12 @@ class LogController extends BaseController
             $currentDate = $currentParams['date'] ?? date('Y-m-d');
             if (!strtotime($currentDate)) $currentDate = date('Y-m-d');
 
-            $this->render('app/views/logs/referer.latte', $this->params->getAll([
+            $this->render('app/views/logs/referer.latte', Params::getAll([
                 'period' => $period,
                 'currentDate' => $currentDate,
                 'nav' => $this->logDataHelper->getRefererNavigation($period, $currentDate),
                 'externalRefs' => $this->logDataHelper->getExternalRefererStats($period, $currentDate),
-                'control' => new Webapp(),
+                'control' => new Webapp($this->application),
             ]));
         } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
@@ -67,7 +68,7 @@ class LogController extends BaseController
             $offset = (int)($this->flight->request()->query->offset ?? 0);
             $data = $this->logDataHelper->getStatisticsData($periodType, $offset);
 
-            $this->render('app/views/logs/statistics.latte', $this->params->getAll([
+            $this->render('app/views/logs/statistics.latte', Params::getAll([
                 'periodTypes' => $this->periodTypes,
                 'currentPeriodType' => $periodType,
                 'currentOffset' => $offset,
@@ -83,7 +84,7 @@ class LogController extends BaseController
         $this->connectedUser = $this->connectedUser->get();
         if ($this->connectedUser->isWebmaster()) {
 
-            $this->render('app/views/logs/analytics.latte', $this->params->getAll([
+            $this->render('app/views/logs/analytics.latte', Params::getAll([
                 'osData' => $this->logDataHelper->getOsDistribution(),
                 'browserData' => $this->logDataHelper->getBrowserDistribution(),
                 'screenResolutionData' => $this->logDataHelper->getScreenResolutionDistribution(),
@@ -102,7 +103,7 @@ class LogController extends BaseController
             $dateCondition = Period::getDateConditions($period);
             $topPages = $this->logDataHelper->getTopPages($dateCondition, self::TOP);
 
-            $this->render('app/views/logs/topPages.latte', $this->params->getAll([
+            $this->render('app/views/logs/topPages.latte', Params::getAll([
                 'title' => 'Top des pages visitées',
                 'period' => $period,
                 'topPages' => $topPages
@@ -118,7 +119,7 @@ class LogController extends BaseController
             $dateCondition = Period::getDateConditions($period);
             $topPages = $this->logDataHelper->getTopArticles($dateCondition, self::TOP);
 
-            $this->render('app/views/logs/topArticles.latte', $this->params->getAll([
+            $this->render('app/views/logs/topArticles.latte', Params::getAll([
                 'title' => 'Top des articles visités par période',
                 'period' => $period,
                 'topPages' => $topPages
@@ -136,7 +137,7 @@ class LogController extends BaseController
             $period = $_GET['period'] ?? 'today';
             [$sortedCrossTabData, $filteredPersons, $columnTotals] = (new CrosstabDataHelper($this->application))->getPersons(Period::getDateConditions($period));
 
-            $this->render('app/views/logs/crossTab.latte', $this->params->getAll([
+            $this->render('app/views/logs/crossTab.latte', Params::getAll([
                 'title' => 'Tableau croisé dynamique des visites',
                 'period' => $period,
                 'uris' => $sortedCrossTabData,
@@ -156,7 +157,7 @@ class LogController extends BaseController
         $person = $this->connectedUser->get()->person ?? false;
         if ($person && $this->connectedUser->isWebmaster()) {
             $activePersons = $this->dataHelper->gets('Persons', ['Inactivated' => 0]);
-            $this->render('app/views/user/lastVisits.latte', $this->params->getAll([
+            $this->render('app/views/user/lastVisits.latte', Params::getAll([
                 'lastVisits' => $this->logDataHelper->getLastVisitPerActivePersonWithTimeAgo($activePersons),
                 'totalActiveUsers' => count($activePersons),
                 'navItems' => $this->getNavItems($person),

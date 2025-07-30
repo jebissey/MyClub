@@ -5,6 +5,7 @@ namespace app\controllers;
 use app\enums\ApplicationError;
 use app\helpers\Application;
 use app\helpers\GroupDataHelper;
+use app\helpers\Params;
 use app\helpers\PersonDataHelper;
 use app\helpers\SettingsDataHelper;
 use app\helpers\TableControllerHelper;
@@ -43,7 +44,7 @@ class PersonController extends TableController implements CrudControllerInterfac
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $_SESSION['navbar'] = 'personManager';
 
-                $this->render('app/views/admin/personManager.latte', $this->params->getAll([]));
+                $this->render('app/views/admin/personManager.latte', Params::getAll([]));
             } else $this->application->getErrorManager()->raise(ApplicationError::InvalidRequestMethod, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
         } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
@@ -72,7 +73,7 @@ class PersonController extends TableController implements CrudControllerInterfac
             ];
             $data = $this->prepareTableData($this->tableControllerHelper->getPersonsQuery(), $filterValues, $_GET['tablePage'] ?? null);
 
-            $this->render('app/views/persons/index.latte', $this->params->getAll([
+            $this->render('app/views/persons/index.latte', Params::getAll([
                 'persons' => $data['items'],
                 'currentPage' => $data['currentPage'],
                 'totalPages' => $data['totalPages'],
@@ -111,7 +112,7 @@ class PersonController extends TableController implements CrudControllerInterfac
                     }
                     $this->flight->redirect('/persons');
                 } else if (($_SERVER['REQUEST_METHOD'] === 'GET')) {
-                    $this->render('app/views/user/account.latte', $this->params->getAll([
+                    $this->render('app/views/user/account.latte', Params::getAll([
                         'readOnly' => $person->Imported == 1 ? true : false,
                         'email' => $person->Email,
                         'firstName' => $person->FirstName,
@@ -138,7 +139,7 @@ class PersonController extends TableController implements CrudControllerInterfac
     public function editPresentation()
     {
         if ($person = $this->connectedUser->get()->person ?? false) {
-            $this->render('app/views/user/editPresentation.latte', $this->params->getAll([
+            $this->render('app/views/user/editPresentation.latte', Params::getAll([
                 'person' => $person,
                 'navItems' => $this->getNavItems($person),
             ]));
@@ -178,7 +179,7 @@ class PersonController extends TableController implements CrudControllerInterfac
                 return;
             }
 
-            $this->render('app/views/user/presentation.latte', $this->params->getAll([
+            $this->render('app/views/user/presentation.latte', Params::getAll([
                 'person' => $person,
                 'loggedPerson' => $loggedPerson,
                 'navItems' => $this->getNavItems($person),
@@ -194,7 +195,7 @@ class PersonController extends TableController implements CrudControllerInterfac
             else $persons = $this->dataHelper->gets('Person', ['InPresentationDirectory' => 1, 'Inactivated' => 0], 'LastName, FirstName');
             $groupCounts = $this->groupDataHelper->getGroupCount();
 
-            $this->render('app/views/user/directory.latte', $this->params->getAll([
+            $this->render('app/views/user/directory.latte', Params::getAll([
                 'persons' => $persons,
                 'navItems' => $this->getNavItems($person),
                 'loggedPerson' => $person,
@@ -231,7 +232,7 @@ class PersonController extends TableController implements CrudControllerInterfac
                 }
             }
 
-            $this->render('app/views/user/map.latte', $this->params->getAll([
+            $this->render('app/views/user/map.latte', Params::getAll([
                 'locationData' => $locationData,
                 'membersCount' => count($locationData),
                 'navItems' => $this->getNavItems($person),

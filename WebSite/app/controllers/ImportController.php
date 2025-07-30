@@ -5,6 +5,7 @@ namespace app\controllers;
 use app\helpers\Application;
 use app\enums\ApplicationError;
 use app\helpers\ImportDataHelper;
+use app\helpers\Params;
 use app\helpers\SettingsDataHelper;
 
 class ImportController extends BaseController
@@ -39,7 +40,7 @@ class ImportController extends BaseController
         if ($this->connectedUser->isPersonManager()) {
             $this->loadSettings();
 
-            $this->render('app/views/import/form.latte', $this->params->getAll([
+            $this->render('app/views/import/form.latte', Params::getAll([
                 'importSettings' => $this->importSettings,
                 'results' => $this->results
             ]));
@@ -54,7 +55,7 @@ class ImportController extends BaseController
                 $this->results['errors']++;
                 $this->results['messages'][] = 'Veuillez sélectionner un fichier CSV valide';
 
-                $this->render('app/views/import/form.latte', $this->params->getAll([
+                $this->render('app/views/import/form.latte', Params::getAll([
                     'importSettings' => $this->importSettings,
                     'results' => $this->results
                 ]));
@@ -80,7 +81,7 @@ class ImportController extends BaseController
                     }
                 }
 
-                $this->render('app/views/import/form.latte', $this->params->getAll([
+                $this->render('app/views/import/form.latte', Params::getAll([
                     'importSettings' => $this->importSettings,
                     'results' => $results
                 ]));

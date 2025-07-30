@@ -113,7 +113,7 @@ class UserController extends BaseController
     public function signOut()
     {
         (new LogDataHelper($this->application))->add(200, 'Sign out succeeded with with ' . $_SESSION['user'] ?? '');
-        $this->dataHelper->set('Person',  ['LastSignOut' => date('Y-m-d H:i:s')], ['Email COLLATE NOCASE' . $_SESSION['user'] => null]);
+        $this->dataHelper->set('Person',  ['LastSignOut' => date('Y-m-d H:i:s')], ['Email' => $_SESSION['user']]);
         unset($_SESSION['user']);
         $_SESSION['navbar'] = '';
         $this->flight->redirect('/');
@@ -187,7 +187,7 @@ class UserController extends BaseController
             }
         }
 
-        $this->render('app/views/home.latte', $this->params->getAll([
+        $this->render('app/views/home.latte', Params::getAll([
             'latestArticle' => $latestArticle,
             'latestArticles' => $articles['latestArticles'],
             'greatings' => $this->settingsDataHelper->get_('Greatings'),
@@ -209,7 +209,7 @@ class UserController extends BaseController
         if ($this->connectedUser->person) {
             $_SESSION['navbar'] = 'user';
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-                $this->render('app/views/user/user.latte', $this->params->getAll([]));
+                $this->render('app/views/user/user.latte', Params::getAll([]));
             } else $this->application->getErrorManager()->raise(ApplicationError::InvalidRequestMethod, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
         } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
@@ -251,7 +251,7 @@ class UserController extends BaseController
                     return basename($path);
                 }, $emojiFiles);
 
-                $this->render('app/views/user/account.latte', $this->params->getAll([
+                $this->render('app/views/user/account.latte', Params::getAll([
                     'readOnly' => $person->Imported == 1 ? true : false,
                     'email' => $email,
                     'firstName' => $firstName,
@@ -277,7 +277,7 @@ class UserController extends BaseController
                 $this->flight->redirect('/user');
             } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $currentAvailabilities = json_decode($person->Availabilities ?? '', true);
-                $this->render('app/views/user/availabilities.latte', $this->params->getAll(['currentAvailabilities' => $currentAvailabilities]));
+                $this->render('app/views/user/availabilities.latte', Params::getAll(['currentAvailabilities' => $currentAvailabilities]));
             } else $this->application->getErrorManager()->raise(ApplicationError::InvalidRequestMethod, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
         } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
@@ -299,7 +299,7 @@ class UserController extends BaseController
                     $eventTypesWithAttributes[] = $eventType;
                 }
 
-                $this->render('app/views/user/preferences.latte', $this->params->getAll([
+                $this->render('app/views/user/preferences.latte', Params::getAll([
                     'currentPreferences' => json_decode($person->Preferences ?? '', true),
                     'eventTypes' => $eventTypesWithAttributes
                 ]));
@@ -316,7 +316,7 @@ class UserController extends BaseController
             } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $currentGroups = (new GroupDataHelper($this->application))->getCurrentGroups($person->Id);
 
-                $this->render('app/views/user/groups.latte', $this->params->getAll([
+                $this->render('app/views/user/groups.latte', Params::getAll([
                     'groups' => $currentGroups,
                     'layout' => Webapp::getLayout()()
                 ]));
@@ -329,7 +329,7 @@ class UserController extends BaseController
     {
         $this->connectedUser = $this->connectedUser->get();
         if ($this->connectedUser->person) {
-            $this->render('app/views/info.latte', $this->params->getAll([
+            $this->render('app/views/info.latte', Params::getAll([
                 'content' => $this->settingsDataHelper->get_('Help_user'),
                 'hasAuthorization' => $this->connectedUser->hasAutorization(),
                 'currentVersion' => Application::getVersion()
@@ -341,7 +341,7 @@ class UserController extends BaseController
     {
         if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
-            $this->render('app/views/contact.latte', $this->params->getAll([
+            $this->render('app/views/contact.latte', Params::getAll([
                 'navItems' => $this->getNavItems($this->connectedUser->get()->person ?? false),
                 'event' => $eventId != null ? $this->dataHelper->get('Event', ['Id' => $eventId]) : null,
             ]));
@@ -370,7 +370,7 @@ class UserController extends BaseController
                 if (!empty($eventId)) $emailSent = (new PersonDataHelper($this->application))->sendRegistrationLink($adminEmail, $name, $email, $event);
                 else $emailSent = $this->email->sendContactEmail($adminEmail, $name, $email, $message);
                 if ($emailSent) {
-                    $url = (new Webapp())->buildUrl('/contact', [
+                    $url = (new Webapp($this->application))->buildUrl('/contact', [
                         'success' => 'Message envoyé avec succès.',
                         'who'     => $email
                     ]);
@@ -413,7 +413,7 @@ class UserController extends BaseController
                 $searchFrom = date('Y-m-d H:i:s', strtotime('-1 month'));
             }
 
-            $this->render('app/views/user/news.latte', $this->params->getAll([
+            $this->render('app/views/user/news.latte', Params::getAll([
                 'news' => $this->news->getNewsForPerson($person, $searchFrom),
                 'searchFrom' => $searchFrom,
                 'searchMode' => $searchMode,
@@ -429,7 +429,7 @@ class UserController extends BaseController
         if ($person = $this->connectedUser->get(1)->person ?? false) {
             $personalStatistics = new PersonStatistics();
             $season = $personalStatistics->getSeasonRange();
-            $this->render('app/views/user/statistics.latte', $this->params->getAll([
+            $this->render('app/views/user/statistics.latte', Params::getAll([
                 'stats' => $personalStatistics->getStats($person, $season['start'], $season['end'], $this->connectedUser->isWebmaster()),
                 'seasons' => $personalStatistics->getAvailableSeasons(),
                 'currentSeason' => $season,

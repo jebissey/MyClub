@@ -8,11 +8,11 @@ use Throwable;
 
 class ErrorManager
 {
-    private PDO $pdo;
+    private PDO $pdoForLog;
 
     public function __construct(PDO $pdoForLog)
     {
-        $this->pdo = $pdoForLog;
+        $this->pdoForLog = $pdoForLog;
     }
 
     public function raise(ApplicationError $code, string $message, int $timeout = 1000, bool $displayCode = true): void
@@ -49,7 +49,7 @@ class ErrorManager
         try {
             $email = filter_var($_SESSION['user'] ?? '', FILTER_VALIDATE_EMAIL) ?: 'anonymous';
 
-            $stmt = $this->pdo->prepare("
+            $stmt = $this->pdoForLog->prepare("
                 INSERT INTO Log (
                     IpAddress, Referer, Os, Browser, ScreenResolution,
                     Type, Uri, Token, Who, Code, Message, CreatedAt

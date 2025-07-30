@@ -5,6 +5,7 @@ namespace App\Controllers;
 use app\helpers\Application;
 use app\enums\ApplicationError;
 use app\helpers\Media;
+use app\helpers\Params;
 use app\helpers\Webapp;
 
 class MediaController extends BaseController
@@ -22,7 +23,7 @@ class MediaController extends BaseController
         $this->connectedUser = $this->connectedUser->get();
         if ($this->connectedUser->isRedactor()) {
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-                $this->render('app/views/media/upload.latte', $this->params->getAll([]));
+                $this->render('app/views/media/upload.latte', Params::getAll([]));
             } else $this->application->getErrorManager()->raise(ApplicationError::InvalidRequestMethod, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' invalid in file ' . __FILE__ . ' at line ' . __LINE__);
         } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
@@ -38,7 +39,7 @@ class MediaController extends BaseController
                 $years = $this->getAvailableYears();
                 if (in_array($year, $years)) $files = $this->getFilesForYear($year, $search);
 
-                $this->render('app/views/media/list.latte',  $this->params->getAll([
+                $this->render('app/views/media/list.latte',  Params::getAll([
                     'files' => $files,
                     'years' => $years,
                     'currentYear' => $year,
@@ -79,7 +80,7 @@ class MediaController extends BaseController
         $this->connectedUser = $this->connectedUser->get();
         if ($this->connectedUser->person) {
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-                $this->render('app/views/media/gpxViewer.latte', $this->params->getAll([]));
+                $this->render('app/views/media/gpxViewer.latte', Params::getAll([]));
             } else $this->application->getErrorManager()->raise(ApplicationError::InvalidRequestMethod, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
         } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }

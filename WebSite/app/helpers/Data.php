@@ -55,10 +55,8 @@ abstract class Data
             }
 
             $sql = "DELETE FROM {$table} WHERE " . implode(' AND ', $conditions);
-
             $stmt = $this->pdo->prepare($sql);
             $result = $stmt->execute($params);
-
             return $result ? $stmt->rowCount() : false;
         } catch (PDOException $e) {
             $this->application->getErrorManager()->raise(ApplicationError::Error, 'Database error: ' . $e->getMessage() . ' in file ' . __FILE__ . ' at line ' . __LINE__);
@@ -66,7 +64,7 @@ abstract class Data
         }
     }
 
-    public function get(string $table, array $where = [], $fields = '*'): object
+    public function get(string $table, array $where = [], $fields = '*'): object|false
     {
         try {
             if (is_array($fields)) $fieldsStr = implode(', ', $fields);
@@ -85,7 +83,6 @@ abstract class Data
             }
             $stmt = $this->pdo->prepare($sql);
             $stmt->execute($params);
-
             return $stmt->fetch();
         } catch (PDOException $e) {
             $this->application->getErrorManager()->raise(ApplicationError::Error, 'Database error: ' . $e->getMessage() . ' in file ' . __FILE__ . ' at line ' . __LINE__);
@@ -115,7 +112,6 @@ abstract class Data
             }
             $stmt = $this->pdo->prepare($sql);
             $stmt->execute($params);
-
             return $stmt->fetchall();
         } catch (PDOException $e) {
             $this->application->getErrorManager()->raise(ApplicationError::Error, 'Database error: ' . $e->getMessage() . ' in file ' . __FILE__ . ' at line ' . __LINE__);
@@ -128,10 +124,7 @@ abstract class Data
         try {
             $stmt = $this->pdo->prepare($sql);
             $result = $stmt->execute($parameters);
-
-            if (!$result) {
-                return false;
-            }
+            if (!$result) return false;
 
             $queryType = strtoupper(substr(trim($sql), 0, 6));
             switch ($queryType) {
@@ -163,30 +156,25 @@ abstract class Data
                 foreach ($fields as $field => $value) {
                     $params[":{$field}"] = $value;
                 }
-
                 $stmt = $this->pdo->prepare($sql);
                 $result = $stmt->execute($params);
-
                 return $result ? $this->pdo->lastInsertId() : false;
             } else {
                 // UPDATE
                 $setClause = [];
                 $params = [];
-
                 foreach ($fields as $field => $value) {
                     $setClause[] = "{$field} = :set_{$field}";
                     $params[":set_{$field}"] = $value;
                 }
-
                 $whereClause = [];
                 foreach ($where as $field => $value) {
-                    $whereClause[] = "{$field} = :where_{$field}";
+                    if (strtolower($field) === 'email') $whereClause[] = "{$field} COLLATE NOCASE = :where_{$field}";
+                    else                                $whereClause[] = "{$field} = :where_{$field}";
                     $params[":where_{$field}"] = $value;
                 }
-
                 $sql = "UPDATE '{$table}' SET " . implode(', ', $setClause) .
                     " WHERE " . implode(' AND ', $whereClause);
-
                 $stmt = $this->pdo->prepare($sql);
                 return $stmt->execute($params);
             }

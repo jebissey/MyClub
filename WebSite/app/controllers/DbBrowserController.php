@@ -5,6 +5,7 @@ namespace app\controllers;
 use app\enums\ApplicationError;
 use app\helpers\Application;
 use app\helpers\DbBrowserHelper;
+use app\helpers\Params;
 
 class DbBrowserController extends BaseController
 {
@@ -39,7 +40,7 @@ class DbBrowserController extends BaseController
     {
         $this->connectedUser = $this->connectedUser->get();
         if ($this->connectedUser->isWebmaster()) {
-            $this->render('app/views/dbbrowser/index.latte', $this->params->getAll(['tables' => $this->getTables()]));
+            $this->render('app/views/dbbrowser/index.latte', Params::getAll(['tables' => $this->getTables()]));
         } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
@@ -49,7 +50,7 @@ class DbBrowserController extends BaseController
         if ($this->connectedUser->isWebmaster()) {
             [$columns, $columnTypes] = $this->dbBrowserHelper->showCreateForm($table);
 
-            $this->render('app/views/dbbrowser/create.latte', $this->params->getAll([
+            $this->render('app/views/dbbrowser/create.latte', Params::getAll([
                 'table' => $table,
                 'columns' => $columns,
                 'columnTypes' => $columnTypes
@@ -63,7 +64,7 @@ class DbBrowserController extends BaseController
         if ($this->connectedUser->isWebmaster()) {
             [$columns, $record, $primaryKey, $columnTypes] = $this->dbBrowserHelper->showEditForm($table, $id);
 
-            $this->render('app/views/dbbrowser/edit.latte', $this->params->getAll([
+            $this->render('app/views/dbbrowser/edit.latte', Params::getAll([
                 'table' => $table,
                 'columns' => $columns,
                 'record' => $record,
@@ -79,7 +80,7 @@ class DbBrowserController extends BaseController
         if ($this->connectedUser->isWebmaster()) {
             [$records, $columns, $dbbPage, $totalPages, $filters] = $this->dbBrowserHelper->showTable($table, $this->itemsPerPage);
 
-            $this->render('app/views/dbbrowser/table.latte', $this->params->getAll([
+            $this->render('app/views/dbbrowser/table.latte', Params::getAll([
                 'table' => $table,
                 'columns' => $columns,
                 'records' => $records,

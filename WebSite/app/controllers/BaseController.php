@@ -12,14 +12,12 @@ use app\helpers\ConnectedUser;
 use app\helpers\DataHelper;
 use app\helpers\LanguagesDataHelper;
 use app\helpers\PageDataHelper;
-use app\helpers\Params;
 use app\helpers\TranslationManager;
 
 abstract class BaseController
 {
     protected Engine $flight;
     private LatteEngine $latte;
-    protected Params $params;
     protected Application $application;
     protected ConnectedUser $connectedUser;
     protected DataHelper $dataHelper;
@@ -66,7 +64,6 @@ abstract class BaseController
     {
         $content = $this->latte->renderToString($name, $params);
         echo $content;
-
         if (ob_get_level()) ob_end_flush();
         flush();
         Flight::stop();
