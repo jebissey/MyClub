@@ -30,8 +30,7 @@ class ArticleApi extends BaseApi
 
     public function designVote()
     {
-        $this->connectedUser = $this->connectedUser->get();
-        if ($this->connectedUser->isRedactor()) {
+        if ($this->connectedUser->get()->isRedactor() ?? false) {
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 (new DesignDataHelper($this->application))->insertOrUpdate(json_decode(file_get_contents('php://input'), true), $this->connectedUser->person->Id);
                 $this->renderJson(['success' => true]);
@@ -88,8 +87,7 @@ class ArticleApi extends BaseApi
 
     public function uploadFile()
     {
-        $this->connectedUser = $this->connectedUser->get();
-        if ($this->connectedUser->isRedactor()) {
+        if ($this->connectedUser->get()->isRedactor() ?? false) {
             $response = ['success' => false, 'message' => '', 'file' => null];
 
             if (empty($_FILES['file'])) {

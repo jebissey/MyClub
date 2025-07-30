@@ -17,8 +17,7 @@ class NavBarController extends BaseController
 
     public function index()
     {
-        $this->connectedUser = $this->connectedUser->get();
-        if ($this->connectedUser->isWebmaster()) {
+        if ($this->connectedUser->get()->isWebmaster() ?? false) {
             $this->render('app/views/navbar/index.latte', Params::getAll([
                 'navItems' => $this->getNavItems(true),
                 'groups' => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
@@ -46,7 +45,7 @@ class NavBarController extends BaseController
     public function showArticle($id)
     {
         $person = $this->connectedUser->get()->person ?? false;
-        if ($person && $this->pageDataHelper->authorizedUser("/navbar/show/article/$id", $person)) {
+        if ($this->pageDataHelper->authorizedUser("/navbar/show/article/$id", $person)) {
             $this->render('app/views/navbar/article.latte', Params::getAll([
                 'navItems' => $this->getNavItems($person),
                 'chosenArticle' => $this->dataHelper->get('Article', ['Id' => $id]),

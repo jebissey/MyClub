@@ -17,8 +17,7 @@ class SurveyController extends BaseController
 
     public function add($articleId)
     {
-        $this->connectedUser = $this->connectedUser->get();
-        if ($this->connectedUser->isRedactor()) {
+        if ($this->connectedUser->get()->isRedactor() ?? false) {
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $article = $this->dataHelper->get('Article', ['Id' => $articleId]);
                 if (!$article) {
@@ -36,8 +35,7 @@ class SurveyController extends BaseController
 
     public function createOrUpdate()
     {
-        $this->connectedUser = $this->connectedUser->get();
-        if ($this->connectedUser->isRedactor()) {
+        if ($this->connectedUser->get()->isRedactor() ?? false) {
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $articleId = $_POST['article_id'] ?? null;
                 $question = $_POST['question'] ?? '';

@@ -25,19 +25,16 @@ class WebmasterController extends BaseController
 
     public function helpWebmaster(): void
     {
-        $this->connectedUser = $this->connectedUser->get();
-
         $this->render('app/views/info.latte', [
             'content' => $this->settingsDataHelper->get('Help_webmaster'),
-            'hasAuthorization' => $this->connectedUser->isEventManager(),
+            'hasAuthorization' => $this->connectedUser->get()->isEventManager() ?? false,
             'currentVersion' => Application::getVersion()
         ]);
     }
 
     public function helpAdmin()
     {
-        $this->connectedUser = $this->connectedUser->get();
-        if ($this->connectedUser->isAdministrator()) {
+        if ($this->connectedUser->get()->isAdministrator() ?? false) {
 
             $this->render('app/views/info.latte', Params::getAll([
                 'content' => $this->settingsDataHelper->get('Help_admin'),
@@ -49,8 +46,7 @@ class WebmasterController extends BaseController
 
     public function homeWebmaster(): void
     {
-        $this->connectedUser = $this->connectedUser->get();
-        if ($this->connectedUser->isWebmaster()) {
+        if ($this->connectedUser->get()->isWebmaster() ?? false) {
 
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $_SESSION['navbar'] = 'webmaster';
@@ -67,8 +63,7 @@ class WebmasterController extends BaseController
 
     public function homeAdmin()
     {
-        $this->connectedUser = $this->connectedUser->get();
-        if ($this->connectedUser->isAdministrator()) {
+        if ($this->connectedUser->get()->isAdministrator() ?? false) {
             if ($this->connectedUser->hasOnlyOneAutorization()) {
                 if ($this->connectedUser->isEventManager())       $this->flight->redirect('/eventManager');
                 else if ($this->connectedUser->isPersonManager()) $this->flight->redirect('/personManager');
@@ -83,7 +78,7 @@ class WebmasterController extends BaseController
 
     public function arwards(): void
     {
-        $person = $this->connectedUser = $this->connectedUser->get()->person ?? false;
+        $person = $this->connectedUser->get()->person ?? false;
         if ($person && $this->connectedUser->isWebmaster()) {
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $arwardsDataHelper = new ArwardsDataHelper($this->application);
@@ -124,8 +119,7 @@ class WebmasterController extends BaseController
         $site_url = $base_url;
         $feed_url = $base_url . "rss.xml";
         $feed_description = "Mises à jour de la liste d'articles";
-        $this->connectedUser = $this->connectedUser->get();
-        $articles = (new ArticleDataHelper($this->application))->getArticlesForRss($this->connectedUser->person->Id ?? 0);
+        $articles = (new ArticleDataHelper($this->application))->getArticlesForRss($this->connectedUser->get()->person->Id ?? 0);
         header('Cache-Control: no-cache, no-store, must-revalidate'); // HTTP 1.1
         header('Pragma: no-cache'); // HTTP 1.0
         header('Expires: 0'); // Proxies

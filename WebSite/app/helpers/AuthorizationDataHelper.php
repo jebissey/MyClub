@@ -51,10 +51,10 @@ class AuthorizationDataHelper extends Data
         return false;
     }
 
-    public function getArticle($id, $person)
+    public function getArticle($id, $connectedUser)
     {
         $article = $this->fluent->from('Article')->where('Id', $id)->fetch();
-        if (!$this->canReadArticle($article, $person)) {
+        if (!$this->canReadArticle($article, $connectedUser)) {
             return false;
         }
         return $article;

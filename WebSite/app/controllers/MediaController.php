@@ -20,8 +20,7 @@ class MediaController extends BaseController
 
     public function showUploadForm()
     {
-        $this->connectedUser = $this->connectedUser->get();
-        if ($this->connectedUser->isRedactor()) {
+        if ($this->connectedUser->get()->isRedactor() ?? false) {
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $this->render('app/views/media/upload.latte', Params::getAll([]));
             } else $this->application->getErrorManager()->raise(ApplicationError::InvalidRequestMethod, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' invalid in file ' . __FILE__ . ' at line ' . __LINE__);
@@ -30,8 +29,7 @@ class MediaController extends BaseController
 
     public function listFiles()
     {
-        $this->connectedUser = $this->connectedUser->get();
-        if ($this->connectedUser->isRedactor()) {
+        if ($this->connectedUser->get()->isRedactor() ?? false) {
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $year = $this->flight->request()->query->year ?? date('Y');
                 $search = $this->flight->request()->query->search ?? '';
@@ -52,8 +50,7 @@ class MediaController extends BaseController
 
     public function viewFile($year, $month, $filename)
     {
-        $this->connectedUser = $this->connectedUser->get();
-        if ($this->connectedUser->isRedactor()) {
+        if ($this->connectedUser->get()->isRedactor()?? false) {
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $filePath = $this->media->GetMediaPath() . $year . '/' . $month . '/' . $filename;
 
@@ -77,8 +74,7 @@ class MediaController extends BaseController
 
     public function gpxViewer(): void
     {
-        $this->connectedUser = $this->connectedUser->get();
-        if ($this->connectedUser->person) {
+        if ($this->connectedUser->get()->person ?? false) {
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $this->render('app/views/media/gpxViewer.latte', Params::getAll([]));
             } else $this->application->getErrorManager()->raise(ApplicationError::InvalidRequestMethod, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);

@@ -62,7 +62,10 @@
     {/if}
     
     {if isset($createButton)}
-        <a href="{$createButton['url']}" class="btn btn-primary mb-3 mt-3">{$createButton['label']}</a>
+        {var $alignmentClass = isset($createButton['alignment']) ? 'd-flex justify-content-' . $createButton['alignment'] : ''}
+        <div class="{$alignmentClass}">
+            <a href="{$createButton['url']}" class="btn btn-primary mb-3 mt-3">{$createButton['label']}</a>
+        </div>
     {/if}
     
     <div class="table-responsive">

@@ -122,10 +122,9 @@ class UserController extends BaseController
 
     public function helpHome(): void
     {
-        $this->connectedUser = $this->connectedUser->get();
         $content = $this->application->getLatte()->latte->renderToString('app/views/info.latte', [
             'content' => $this->settingsDataHelper->get_('Help_home'),
-            'hasAuthorization' => $this->connectedUser->hasAutorization(),
+            'hasAuthorization' => $this->connectedUser->get()->hasAutorization() ?? false,
             'currentVersion' => $this->application->getVersion()
         ]);
         echo $content;
@@ -133,10 +132,9 @@ class UserController extends BaseController
 
     public function legalNotice(): void
     {
-        $this->connectedUser = $this->connectedUser->get();
         $content = $this->application->getLatte()->latte->renderToString('app/views/info.latte', [
             'content' => $this->settingsDataHelper->get_('LegalNotices'),
-            'hasAuthorization' => $this->connectedUser->hasAutorization(),
+            'hasAuthorization' => $this->connectedUser->get()->hasAutorization() ?? false,
             'currentVersion' => $this->application->getVersion()
         ]);
         echo $content;
@@ -205,8 +203,7 @@ class UserController extends BaseController
     #region Data user
     public function user()
     {
-        $this->connectedUser = $this->connectedUser->get();
-        if ($this->connectedUser->person) {
+        if ($this->connectedUser->get()->person ?? false) {
             $_SESSION['navbar'] = 'user';
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $this->render('app/views/user/user.latte', Params::getAll([]));
@@ -327,8 +324,7 @@ class UserController extends BaseController
 
     public function help()
     {
-        $this->connectedUser = $this->connectedUser->get();
-        if ($this->connectedUser->person) {
+        if ($this->connectedUser->get()->person ?? false) {
             $this->render('app/views/info.latte', Params::getAll([
                 'content' => $this->settingsDataHelper->get_('Help_user'),
                 'hasAuthorization' => $this->connectedUser->hasAutorization(),

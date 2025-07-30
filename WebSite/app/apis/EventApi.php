@@ -43,8 +43,7 @@ class EventApi extends BaseApi
     #region Attribute
     public function createAttribute()
     {
-        $this->connectedUser = $this->connectedUser->get();
-        if ($this->connectedUser->isWebmaster()) {
+        if ($this->connectedUser->get()->isWebmaster() ?? false) {
             $json = file_get_contents('php://input');
             [$response, $statusCode] = $this->attributeDataHelper->insert(json_decode($json, true));
             $this->renderJson($response, $statusCode);
@@ -53,8 +52,7 @@ class EventApi extends BaseApi
 
     public function deleteAttribute($id)
     {
-        $this->connectedUser = $this->connectedUser->get();
-        if ($this->connectedUser->isWebmaster()) {
+        if ($this->connectedUser->get()->isWebmaster() ?? false) {
             [$response, $statusCode] = $this->attributeDataHelper->delete_($id);
             $this->renderJson($response, $statusCode);
         } else $this->renderJson(['success' => false, 'message' => 'User not allowed'], 403);
@@ -62,8 +60,7 @@ class EventApi extends BaseApi
 
     public function getAttributes()
     {
-        $this->connectedUser = $this->connectedUser->get();
-        if ($this->connectedUser->isWebmaster()) {
+        if ($this->connectedUser->get()->isWebmaster() ?? false) {
             $this->renderPartial('app/views/eventType/attributes-list.latte', ['attributes' => $this->dataHelper->gets('Attribute')]);
         } else $this->renderJson(['success' => false, 'message' => 'User not allowed'], 403);
     }
@@ -76,8 +73,7 @@ class EventApi extends BaseApi
 
     public function updateAttribute()
     {
-        $this->connectedUser = $this->connectedUser->get();
-        if ($this->connectedUser->isWebmaster()) {
+        if ($this->connectedUser->get()->isWebmaster() ?? false) {
             $json = file_get_contents('php://input');
             [$response, $statusCode] = $this->attributeDataHelper->update(json_decode($json, true));
             $this->renderJson($response, $statusCode);
@@ -88,8 +84,7 @@ class EventApi extends BaseApi
     #region Event
     public function deleteEvent($id): void
     {
-        $this->connectedUser = $this->connectedUser->get();
-        if ($this->connectedUser->isEventManager()) {
+        if ($this->connectedUser->get()->isEventManager() ?? false) {
             [$response, $statusCode] = $this->eventDataHelper->delete_($id, $this->connectedUser->person->Id);
             $this->renderJson($response, $statusCode);
         } else $this->renderJson(['success' => false, 'message' => 'User not allowed'], 403);
@@ -97,8 +92,7 @@ class EventApi extends BaseApi
 
     public function duplicateEvent($id)
     {
-        $this->connectedUser = $this->connectedUser->get();
-        if ($this->connectedUser->isEventManager()) {
+        if ($this->connectedUser->get()->isEventManager() || false) {
             [$response, $statusCode] = $this->eventDataHelper->duplicate($id, $this->connectedUser->person->Id);
             $this->renderJson($response, $statusCode);
         } else $this->renderJson(['success' => false, 'message' => 'User not allowed'], 403);
@@ -106,8 +100,7 @@ class EventApi extends BaseApi
 
     public function getEvent($id): void
     {
-        $this->connectedUser = $this->connectedUser->get();
-        if ($this->connectedUser->isEventManager()) {
+        if ($this->connectedUser->get()->isEventManager() || false) {
             $this->renderJson([
                 'success' => true,
                 'event' => $this->eventDataHelper->getEvent($id),
@@ -118,8 +111,7 @@ class EventApi extends BaseApi
 
     public function saveEvent(): void
     {
-        $this->connectedUser = $this->connectedUser->get();
-        if ($this->connectedUser->isEventManager()) {
+        if ($this->connectedUser->get()->isEventManager() || false) {
             [$response, $statusCode] = (new ApiEventDataHelper($this->application))->update(json_decode(file_get_contents('php://input'), true), $this->connectedUser->person->Id);
             $this->renderJson($response, $statusCode);
         } else $this->renderJson(['success' => false, 'message' => 'User not allowed'], 403);
@@ -127,8 +119,7 @@ class EventApi extends BaseApi
 
     public function sendEmails()
     {
-        $this->connectedUser = $this->connectedUser->get();
-        if ($this->connectedUser->isEventManager()) {
+        if ($this->connectedUser->get()->isEventManager() || false) {
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $json = file_get_contents('php://input');
                 $data = json_decode($json, true);
@@ -164,14 +155,14 @@ class EventApi extends BaseApi
                         $this->renderJson(['success' => false, 'message' => 'Invalid Email in file ' + __FILE__ + ' at line ' + __LINE__], 404);
                         return;
                     }
-                    $bccList = $this->messageDataHelper->addWebAppMessages($eventId, $participants, $emailTitle . "\n\n" . $message);
+                    $ccList = $this->messageDataHelper->addWebAppMessages($eventId, $participants, $emailTitle . "\n\n" . $message);
                     $result = Email::send(
                         $eventCreatorEmail,
                         $eventCreatorEmail,
                         $emailTitle,
                         $message . "\n" . $eventLink . "\n\n Pour ne plus recevoir ce type de message vous pouvez mettre à jour vos préférences\n" . $unsubscribeLink,
+                        $ccList,
                         null,
-                        $bccList,
                         false
                     );
                     $this->renderJson(['success' => $result]);
@@ -184,8 +175,7 @@ class EventApi extends BaseApi
     #region Need
     public function deleteNeed($id)
     {
-        $this->connectedUser = $this->connectedUser->get();
-        if ($this->connectedUser->isWebmaster()) {
+        if ($this->connectedUser->get()->isWebmaster() || false) {
             if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
                 [$response, $statusCode] = $this->renderJson($this->apiNeedDataHelper->delete_($id));
                 $this->renderJson($response, $statusCode);
@@ -195,8 +185,7 @@ class EventApi extends BaseApi
 
     public function saveNeed()
     {
-        $this->connectedUser = $this->connectedUser->get();
-        if ($this->connectedUser->isWebmaster()) {
+        if ($this->connectedUser->get()->isWebmaster() || false) {
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $data = json_decode(file_get_contents('php://input'), true);
                 $id = $data['id'] ?? false;
@@ -242,8 +231,7 @@ class EventApi extends BaseApi
     #region NeedType
     public function deleteNeedType($id)
     {
-        $this->connectedUser = $this->connectedUser->get();
-        if ($this->connectedUser->isWebmaster()) {
+        if ($this->connectedUser->get()->isWebmaster() || false) {
             if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
                 if (!$id) {
                     $this->renderJson(['success' => false, 'message' => 'Missing Id parameter'], 472);
@@ -262,8 +250,7 @@ class EventApi extends BaseApi
 
     public function saveNeedType()
     {
-        $this->connectedUser = $this->connectedUser->get();
-        if ($this->connectedUser->isWebmaster()) {
+        if ($this->connectedUser->get()->isWebmaster() || false) {
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $data = json_decode(file_get_contents('php://input'), true);
                 $name = $data['name'] ?? '';

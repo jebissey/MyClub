@@ -17,8 +17,7 @@ class EmailController extends BaseController
 
     public function fetchEmails()
     {
-        $this->connectedUser = $this->connectedUser->get();
-        if ($this->connectedUser->isEventManager()) {
+        if ($this->connectedUser->get()->isEventManager() ?? false) {
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $idGroup = $_POST['idGroup'] ?? '';
                 $idEventType = $_POST['idEventType'] ?? '';
@@ -46,8 +45,7 @@ class EmailController extends BaseController
 
     public function fetchEmailsForArticle($idArticle)
     {
-        $this->connectedUser = $this->connectedUser->get();
-        if ($this->connectedUser->isRedactor()) {
+        if ($this->connectedUser->get()->isRedactor() ?? false) {
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $article = $this->dataHelper->get('Article', ['Id', $idArticle]);
                 if (!$article) die('Fatal program error in file ' + __FILE__ + ' at line ' + __LINE__);

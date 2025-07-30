@@ -17,8 +17,7 @@ class DesignController extends BaseController
 
     public function index()
     {
-        $this->connectedUser = $this->connectedUser->get();
-        if ($this->connectedUser->isRedactor()) {
+        if ($this->connectedUser->get()->isRedactor() ?? false) {
             [$designs, $userVotes] = (new DesignDataHelper($this->application))->getUsersVotes($this->connectedUser->person->Id);
 
             $this->render('app/views/designs/index.latte', Params::getAll([
@@ -31,8 +30,7 @@ class DesignController extends BaseController
 
     public function create()
     {
-        $this->connectedUser = $this->connectedUser->get();
-        if ($this->connectedUser->isRedactor()) {
+        if ($this->connectedUser->get()->isRedactor() ?? false) {
             $this->render('app/views/designs/create.latte', Params::getAll([
                 'groups' => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
             ]));
@@ -41,8 +39,7 @@ class DesignController extends BaseController
 
     public function save()
     {
-        $this->connectedUser = $this->connectedUser->get();
-        if ($this->connectedUser->isRedactor()) {
+        if ($this->connectedUser->get()->isRedactor() ?? false) {
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $values = [
                     'IdPerson' => $this->connectedUser->person->Id,

@@ -27,7 +27,7 @@ abstract class TableController extends BaseController
         //var_dump($query->getQuery());
         //die();
 
-        $totalItems = (new Generic())->countOf($query->getQuery());
+        $totalItems = (new Generic($this->application))->countOf($query->getQuery());
         $totalPages = ceil($totalItems / $this->itemsPerPage);
         $currentPage = max(1, min($page, $totalPages));
         $query = $query->limit($this->itemsPerPage)->offset(($currentPage - 1) * $this->itemsPerPage);

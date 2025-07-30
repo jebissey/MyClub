@@ -30,13 +30,12 @@ class EventController extends BaseController
 
     public function nextEvents(): void
     {
-        $this->connectedUser = $this->connectedUser->get();
         $offset = (int) ($_GET['offset'] ?? 0);
         $mode = $_GET['mode'] ?? 'next';
         $filterByPreferences = isset($_GET['filterByPreferences']) && $_GET['filterByPreferences'] === '1';
 
         $this->render('app/views/event/nextEvents.latte', Params::getAll([
-            'navItems' => $this->getNavItems($this->connectedUser->person),
+            'navItems' => $this->getNavItems($this->connectedUser->get()->person ?? false),
             'events' => $this->eventDataHelper->getEvents($$this->connectedUser->person, $mode, $offset, $filterByPreferences),
             'person' => $$this->connectedUser->person,
             'eventTypes' => $this->dataHelper->gets('EventType', ['Inactivated' => 0], "'Id', 'Name'", 'Name'),
@@ -51,21 +50,18 @@ class EventController extends BaseController
 
     public function weekEvents(): void
     {
-        $this->connectedUser = $this->connectedUser->get();
-
         $this->render('app/views/event/weekEvents.latte', Params::getAll([
             'events' => $this->eventDataHelper->getNextWeekEvents(),
             'eventTypes' => $this->dataHelper->gets('EventType', ['Inactivated', 0], "'Id', 'Name'", 'Name'),
             'eventAttributes' => $this->dataHelper->gets('Attribute', [], "'Id', 'Name, Detail, Color'"),
-            'navItems' => $this->getNavItems($$this->connectedUser->person),
+            'navItems' => $this->getNavItems($this->connectedUser->get()->person ?? false),
             'layout' => WebApp::getLayout()
         ]));
     }
 
     public function showEventCrosstab()
     {
-        $this->connectedUser = $this->connectedUser->get(1);
-        if ($this->connectedUser->isEventManager()) {
+        if ($this->connectedUser->get(1)->isEventManager() ?? false) {
             $period = $this->flight->request()->query->period ?? 'month';
             [$dateRange, $crosstabData] = (new CrosstabDataHelper($this->application))->getevents($period);
 
@@ -83,8 +79,7 @@ class EventController extends BaseController
 
     public function guest($message = '', $type = '')
     {
-        $this->connectedUser = $this->connectedUser->get(1);
-        if ($this->connectedUser->isEventManager()) {
+        if ($this->connectedUser->get(1)->isEventManager() ?? false) {
             $events = $this->eventDataHelper->getEventsForAllOrGuest();
 
             $this->render('app/views/event/guest.latte', Params::getAll([
@@ -99,8 +94,7 @@ class EventController extends BaseController
 
     public function guestInvite()
     {
-        $this->connectedUser = $this->connectedUser->get(1);
-        if ($this->connectedUser->isEventManager()) {
+        if ($this->connectedUser->get(1)->isEventManager() ?? false) {
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $email = trim($_POST['email'] ?? '');
                 $nickname = trim($_POST['nickname'] ?? '');
@@ -191,7 +185,7 @@ class EventController extends BaseController
 
     public function show($eventId, $message = null, $messageType = null): void
     {
-        $this->connectedUser = $this->connectedUser->get();
+        $person = $this->connectedUser->get()->person ?? false;
         $userEmail = $person->Email ?? '';
         if ($this->dataHelper->get('Event', ['Id' => $eventId])) {
             $this->render('app/views/event/detail.latte', Params::getAll([
@@ -201,7 +195,7 @@ class EventController extends BaseController
                 'participants' => (new ParticipantDataHelper($this->application))->getEventParticipants($eventId),
                 'userEmail' => $userEmail,
                 'isRegistered' => $this->eventDataHelper->isUserRegistered($eventId, $userEmail),
-                'navItems' => $this->getNavItems($this->connectedUser->person),
+                'navItems' => $this->getNavItems($person),
                 'countOfMessages' => count($this->dataHelper->gets('Message', [
                     'From' => 'User',
                     'EventId' => $eventId
@@ -209,7 +203,7 @@ class EventController extends BaseController
                 'eventNeeds' => $this->eventDataHelper->getEventNeeds($eventId),
                 'participantSupplies' => $this->eventDataHelper->getParticipantSupplies($eventId),
                 'userSupplies' => $this->eventDataHelper->getUserSupplies($eventId, $userEmail),
-                'isEventManager' => $this->connectedUser->isEventManager(),
+                'isEventManager' => $this->connectedUser->isEventManager() || false,
                 'token' => isset($_GET['t']) ? $_GET['t'] : false,
                 'message' => $message,
                 'messageType' => $messageType,
@@ -220,8 +214,7 @@ class EventController extends BaseController
     public function register($eventId, bool $set, $token = null): void
     {
         if ($token === null) $token = $_GET['t'] ?? null;
-        $this->connectedUser = $this->connectedUser->get();
-        if ($this->connectedUser->person) {
+        if ($this->connectedUser->get()->person ?? false) {
             $userId = $this->connectedUser->person->Id;
             if ($set) {
                 if ($eventId > 0 && $this->eventDataHelper->isUserRegistered($eventId, $person->Email ?? '')) {
@@ -295,8 +288,7 @@ class EventController extends BaseController
 
     public function location(): void
     {
-        $this->connectedUser = $this->connectedUser->get();
-        if ($this->connectedUser->isEventManager()) {
+        if ($this->connectedUser->get()->isEventManager() ?? false) {
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $this->render('app/views/event/location.latte', Params::getAll([]));
             } else $this->application->getErrorManager()->raise(ApplicationError::InvalidRequestMethod, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
@@ -305,19 +297,16 @@ class EventController extends BaseController
 
     public function help(): void
     {
-        $this->connectedUser = $this->connectedUser->get();
-
         $this->render('app/views/info.latte', [
             'content' => (new SettingsDataHelper($this->application))->get('Help_eventManager'),
-            'hasAuthorization' => $this->connectedUser->hasAutorization(),
+            'hasAuthorization' => $this->connectedUser->get()->hasAutorization() ?? false,
             'currentVersion' => Application::getVersion()
         ]);
     }
 
     public function home(): void
     {
-        $this->connectedUser = $this->connectedUser->get();
-        if ($this->connectedUser->isEventManager()) {
+        if ($this->connectedUser->get()->isEventManager() ?? false) {
 
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $_SESSION['navbar'] = 'eventManager';
@@ -329,8 +318,7 @@ class EventController extends BaseController
 
     public function needs(): void
     {
-        $this->connectedUser = $this->connectedUser->get();
-        if ($this->connectedUser->isWebmaster()) {
+        if ($this->connectedUser->get()->isWebmaster() ?? false) {
             $this->render('app/views/event/needs.latte', Params::getAll([
                 'navItems' => $this->getNavItems($this->connectedUser->person),
                 'needTypes' => $this->dataHelper->gets('NeedType', [], '*', 'Name'),
@@ -341,8 +329,7 @@ class EventController extends BaseController
 
     public function showEventChat($eventId): void
     {
-        $this->connectedUser = $this->connectedUser->get();
-        if ($this->connectedUser->person) {
+        if ($this->connectedUser->get()->person ?? false) {
             $event = $this->dataHelper->get('Event', ['Id' => $eventId]);
             if (!$event) {
                 $this->application->getErrorManager()->raise(ApplicationError::BadRequest, "Unknown event '$eventId' in file " . __FILE__ . ' at line ' . __LINE__);

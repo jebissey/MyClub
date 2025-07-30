@@ -147,7 +147,7 @@ abstract class Data
     public function set(string $table, array $fields, array $where = []): int|bool
     {
         try {
-            if (empty($where)) {
+            if ($where === []) {
                 // INSERT
                 $columns = implode(', ', array_keys($fields));
                 $placeholders = ':' . implode(', :', array_keys($fields));

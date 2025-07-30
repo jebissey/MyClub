@@ -27,8 +27,7 @@ class PersonController extends TableController implements CrudControllerInterfac
 
     public function help(): void
     {
-        $this->connectedUser = $this->connectedUser->get();
-        if ($this->connectedUser->isPersonManager() || $this->connectedUser->isWebmaster()) {
+        if (($this->connectedUser->get()->isPersonManager() ?? false) || $this->connectedUser->isWebmaster() ?? false) {
             $this->render('app/views/info.latte', [
                 'content' => (new SettingsDataHelper($this->application))->get('Help_personManager'),
                 'hasAuthorization' => $this->connectedUser->hasAutorization(),
@@ -39,8 +38,7 @@ class PersonController extends TableController implements CrudControllerInterfac
 
     public function home(): void
     {
-        $this->connectedUser = $this->connectedUser->get();
-        if ($this->connectedUser->isAdministrator()) {
+        if ($this->connectedUser->get()->isAdministrator() ?? false) {
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $_SESSION['navbar'] = 'personManager';
 
@@ -51,8 +49,7 @@ class PersonController extends TableController implements CrudControllerInterfac
 
     public function index()
     {
-        $this->connectedUser = $this->connectedUser->get();
-        if ($this->connectedUser->isPersonManager() || $this->connectedUser->isWebmaster()) {
+        if (($this->connectedUser->get()->isPersonManager() ?? false) || $this->connectedUser->isWebmaster() ?? false) {
             $filterValues = [
                 'firstName' => $_GET['firstName'] ?? '',
                 'lastName' => $_GET['lastName'] ?? '',
@@ -87,8 +84,7 @@ class PersonController extends TableController implements CrudControllerInterfac
 
     public function create()
     {
-        $this->connectedUser = $this->connectedUser->get();
-        if ($this->connectedUser->isPersonManager() || $this->connectedUser->isWebmaster()) {
+        if (($this->connectedUser->get()->isPersonManager() ?? false) || $this->connectedUser->isWebmaster() ?? false) {
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $this->flight->redirect('/persons/edit/' . (new PersonDataHelper($this->application))->create());
             } else $this->application->getErrorManager()->raise(ApplicationError::InvalidRequestMethod, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
@@ -97,8 +93,7 @@ class PersonController extends TableController implements CrudControllerInterfac
 
     public function edit($id)
     {
-        $this->connectedUser = $this->connectedUser->get();
-        if ($this->connectedUser->isPersonManager() || $this->connectedUser->isWebmaster()) {
+        if (($this->connectedUser->get()->isPersonManager() ?? false) || $this->connectedUser->isWebmaster() ?? false) {
             $person = $this->dataHelper->get('Person', ['Id' => $id]);
             if (!$person) $this->application->getErrorManager()->raise(ApplicationError::BadRequest, "Unknown person id: $id in file " . __FILE__ . ' at line ' . __LINE__);
             else {
@@ -127,8 +122,7 @@ class PersonController extends TableController implements CrudControllerInterfac
 
     public function delete($id)
     {
-        $this->connectedUser = $this->connectedUser->get();
-        if ($this->connectedUser->isPersonManager() || $this->connectedUser->isWebmaster()) {
+        if (($this->connectedUser->get()->isPersonManager() ?? false) || $this->connectedUser->isWebmaster() ?? false) {
             if (($_SERVER['REQUEST_METHOD'] === 'GET')) {
                 $this->dataHelper->set('Person', ['Inactivated' => 1], ['Id' => $id]);
                 $this->flight->redirect('/persons');
@@ -167,8 +161,7 @@ class PersonController extends TableController implements CrudControllerInterfac
 
     public function showPresentation($personId)
     {
-        $this->connectedUser = $this->connectedUser->get();
-        if ($loggedPerson = $this->connectedUser->person) {
+        if ($loggedPerson = $this->connectedUser->get()->person ?? false) {
             $person = $this->dataHelper->get('Person', [
                 'Id' => $personId,
                 'Inactivated' => 0,

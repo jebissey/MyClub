@@ -23,8 +23,7 @@ class EventTypeController extends TableController implements CrudControllerInter
 
     public function index()
     {
-        $this->connectedUser = $this->connectedUser->get();
-        if ($this->connectedUser->IsWebmaster()) {
+        if ($this->connectedUser->get()->IsWebmaster() ?? false) {
             $filterValues = [];
             $filterConfig = [];
             $columns = [
@@ -48,8 +47,7 @@ class EventTypeController extends TableController implements CrudControllerInter
 
     public function create()
     {
-        $this->connectedUser = $this->connectedUser->get();
-        if ($this->connectedUser->isWebmaster()) {
+        if ($this->connectedUser->get()->isWebmaster() ?? false) {
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $id = $this->dataHelper->set('EventType', ['Name' => '']);
                 $this->flight->redirect('/EventTypes/edit/' . $id);
@@ -59,8 +57,7 @@ class EventTypeController extends TableController implements CrudControllerInter
 
     public function edit($id)
     {
-        $this->connectedUser = $this->connectedUser->get();
-        if ($this->connectedUser->isWebmaster()) {
+        if ($this->connectedUser->get()->isWebmaster() ?? false) {
             $eventType = $this->dataHelper->get('EventType', ['Id', $id]);
             if (!$eventType) $this->application->getErrorManager()->raise(ApplicationError::InvalidSetting, "Invalide EventType: $id in file " . __FILE__ . ' at line ' . __LINE__);
             else {
@@ -83,8 +80,7 @@ class EventTypeController extends TableController implements CrudControllerInter
 
     public function delete($id)
     {
-        $this->connectedUser = $this->connectedUser->get();
-        if ($this->connectedUser->isWebmaster()) {
+        if ($this->connectedUser->get()->isWebmaster() ?? false) {
             if (($_SERVER['REQUEST_METHOD'] === 'GET')) {
                 $this->dataHelper->set('EventType', ['Inactivated' => 1], ['Id' => $id]);
 

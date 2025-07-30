@@ -22,8 +22,7 @@ class LogController extends BaseController
 
     public function index()
     {
-        $this->connectedUser = $this->connectedUser->get();
-        if ($this->connectedUser->isWebmaster()) {
+        if ($this->connectedUser->get()->isWebmaster() ?? false) {
             $logPage = isset($_GET['logPage']) ? (int)$_GET['logPage'] : 1;
             $perPage = 10;
             [$logs, $totalPages] = $this->logDataHelper->getVisitedPages($perPage, $logPage);
@@ -39,8 +38,7 @@ class LogController extends BaseController
 
     public function referers()
     {
-        $this->connectedUser = $this->connectedUser->get();
-        if ($this->connectedUser->isWebmaster()) {
+        if ($this->connectedUser->get()->isWebmaster() ?? false) {
             $currentParams = $_GET;
             $period = $currentParams['period'] ?? 'day';
             $currentDate = $currentParams['date'] ?? date('Y-m-d');
@@ -60,8 +58,7 @@ class LogController extends BaseController
     private $defaultPeriodType = 'day';
     public function visitorsGraf()
     {
-        $this->connectedUser = $this->connectedUser->get();
-        if ($this->connectedUser->isWebmaster()) {
+        if ($this->connectedUser->get()->isWebmaster() ?? false) {
             $periodType = $this->flight->request()->query->periodType ?? $this->defaultPeriodType;
             $periodType = in_array($periodType, $this->periodTypes) ? $periodType : $this->defaultPeriodType;
 
@@ -81,8 +78,7 @@ class LogController extends BaseController
 
     public function analytics()
     {
-        $this->connectedUser = $this->connectedUser->get();
-        if ($this->connectedUser->isWebmaster()) {
+        if ($this->connectedUser->get()->isWebmaster() ?? false) {
 
             $this->render('app/views/logs/analytics.latte', Params::getAll([
                 'osData' => $this->logDataHelper->getOsDistribution(),
@@ -97,8 +93,7 @@ class LogController extends BaseController
     const TOP = 50;
     public function topPagesByPeriod()
     {
-        $this->connectedUser = $this->connectedUser->get();
-        if ($this->connectedUser->isWebmaster()) {
+        if ($this->connectedUser->get()->isWebmaster() ?? false) {
             $period = $_GET['period'] ?? 'week';
             $dateCondition = Period::getDateConditions($period);
             $topPages = $this->logDataHelper->getTopPages($dateCondition, self::TOP);
@@ -113,8 +108,7 @@ class LogController extends BaseController
 
     public function topArticlesByPeriod()
     {
-        $this->connectedUser = $this->connectedUser->get();
-        if ($this->connectedUser->isRedactor()) {
+        if ($this->connectedUser->get()->isRedactor() ?? false) {
             $period = $_GET['period'] ?? 'week';
             $dateCondition = Period::getDateConditions($period);
             $topPages = $this->logDataHelper->getTopArticles($dateCondition, self::TOP);
@@ -129,8 +123,7 @@ class LogController extends BaseController
 
     public function crossTab()
     {
-        $this->connectedUser = $this->connectedUser->get();
-        if ($this->connectedUser->isWebmaster()) {
+        if ($this->connectedUser->get()->isWebmaster() ?? false) {
             $uriFilter = $_GET['uri'] ?? '';
             $emailFilter = $_GET['email'] ?? '';
             $groupFilter = $_GET['group'] ?? '';

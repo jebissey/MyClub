@@ -51,35 +51,6 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
         return $totals;
     }
 
-    public function delete_(int $id): void
-    {
-        $this->fluent->deleteFrom('Article')->where('Id', $id)->execute();
-    }
-
-    public function insert($personId)
-    {
-        return $this->fluent->insertInto('Article', [
-            'Title'     => '',
-            'Content'   => '',
-            'CreatedBy' => $personId
-        ])->execute();
-    }
-
-    public function update($id, $personId, $published, $title = '', $content = '', $idGroup = null, $membersOnly = 1)
-    {
-        $this->fluent->update('Article')
-            ->set([
-                'Title'          => $title,
-                'Content'        => $content,
-                'PublishedBy'    => ($published == 1 ? $personId : null),
-                'IdGroup'        => $idGroup,
-                'OnlyForMembers' => $membersOnly,
-                'LastUpdate'     => date('Y-m-d H:i:s')
-            ])
-            ->where('Id', $id)
-            ->execute();
-    }
-
     public function isSpotlightActive(): bool
     {
         $spotlight = $this->getSpotlightArticle();

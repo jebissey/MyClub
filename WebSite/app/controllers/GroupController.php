@@ -21,8 +21,7 @@ class GroupController extends BaseController implements CrudControllerInterface
 
     public function index()
     {
-        $this->connectedUser = $this->connectedUser->get();
-        if ($this->connectedUser->isPersonManager() || $this->connectedUser->isWebmaster()) {
+        if (($this->connectedUser->get()->isPersonManager() ?? false) || $this->connectedUser->isWebmaster() ?? false) {
             $this->render('app/views/groups/index.latte', Params::getAll([
                 'groups' => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
                 'layout' => Webapp::getLayout()()
@@ -32,8 +31,7 @@ class GroupController extends BaseController implements CrudControllerInterface
 
     public function create()
     {
-        $this->connectedUser = $this->connectedUser->get();
-        if ($this->connectedUser->isPersonManager() || $this->connectedUser->isWebmaster()) {
+        if (($this->connectedUser->get()->isPersonManager() ?? false) || $this->connectedUser->isWebmaster() ?? false) {
 
             $availableAuthorizations = $this->dataHelper->gets('Authorization');
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -60,8 +58,7 @@ class GroupController extends BaseController implements CrudControllerInterface
 
     public function edit($id)
     {
-        $this->connectedUser = $this->connectedUser->get();
-        if ($this->connectedUser->isPersonManager() || $this->connectedUser->isWebmaster()) {
+        if (($this->connectedUser->get()->isPersonManager() ?? false) || $this->connectedUser->isWebmaster() ?? false) {
             $availableAuthorizations = $this->dataHelper->gets('Authorization', ['Id <> 1' => null]);
             $group = $this->dataHelper->get('Group', ['Id' => $id]);
 
@@ -94,8 +91,7 @@ class GroupController extends BaseController implements CrudControllerInterface
 
     public function delete($id)
     {
-        $this->connectedUser = $this->connectedUser->get();
-        if ($this->connectedUser->isPersonManager() || $this->connectedUser->isWebmaster()) {
+        if (($this->connectedUser->get()->isPersonManager() ?? false) || $this->connectedUser->isWebmaster() ?? false) {
             $this->dataHelper->set('Group', ['Inactivated' => 0], ['Id' => $id]);
             $this->flight->redirect('/groups');
         } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
