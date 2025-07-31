@@ -21,7 +21,7 @@ class ImportController extends BaseController
 
     private function loadSettings()
     {
-        if (!$this->importSettings = json_decode((new SettingsDataHelper($this->application))->get_('ImportPersonParameters'), true)) {
+        if (!$this->importSettings = json_decode($this->dataHelper->get('Settings', ['Name ' => 'ImportPersonParameters'])->Value ?? '', true)) {
             $this->importSettings = [
                 'headerRow' => 1,
                 'mapping' => [
@@ -67,7 +67,7 @@ class ImportController extends BaseController
                 ];
                 $this->importSettings['headerRow'] = $headerRow;
                 $this->importSettings['mapping'] = $mapping;
-                (new SettingsDataHelper($this->application))->set_('ImportPersonParameters', json_encode($this->importSettings));
+                $this->dataHelper->set('Settings', ['Value' => json_encode($this->importSettings)], ['Name' => 'ImportPersonParameters']);
 
                 $persons = $this->dataHelper->gets('Person', ['Inactivated' => 0], 'Id, Email');
                 $results = (new ImportDataHelper($this->application))->getResults($headerRow, $mapping, $this->foundEmails);

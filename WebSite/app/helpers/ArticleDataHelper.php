@@ -64,7 +64,7 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
 
     public function getSpotlightArticle()
     {
-        $spotlightArticleJson = (new SettingsDataHelper($this->application))->get_('SpotlightArticle');
+        $spotlightArticleJson = $this->get('Settings', ['Name' => 'SpotlightArticle'])->Value ?? '';
         if ($spotlightArticleJson === null) {
             return null;
         }
@@ -77,7 +77,7 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
             'articleId' => $articleId,
             'spotlightUntil' => $spotlightUntil
         ];
-        (new SettingsDataHelper($this->application))->set_('SpotlightArticle', json_encode($data));
+        $this->set('Setting', ['Name' => 'SpotlightArticle'], ['Value' => json_encode($data)]);
     }
 
     public function getArticleIdsBasedOnAccess(?string $userEmail): array

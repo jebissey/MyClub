@@ -123,7 +123,7 @@ class UserController extends BaseController
     public function helpHome(): void
     {
         $content = $this->application->getLatte()->latte->renderToString('app/views/info.latte', [
-            'content' => $this->settingsDataHelper->get_('Help_home'),
+            'content' => $this->dataHelper->get('Settings', ['Name' => 'Help_home'])->Value ?? '',
             'hasAuthorization' => $this->connectedUser->get()->hasAutorization() ?? false,
             'currentVersion' => Application::VERSION
         ]);
@@ -133,7 +133,7 @@ class UserController extends BaseController
     public function legalNotice(): void
     {
         $content = $this->application->getLatte()->latte->renderToString('app/views/info.latte', [
-            'content' => $this->settingsDataHelper->get_('LegalNotices'),
+            'content' => $this->dataHelper->get('Settings', ['Name' => 'LegalNotices'])->Value ?? '',
             'hasAuthorization' => $this->connectedUser->get()->hasAutorization() ?? false,
             'currentVersion' => Application::VERSION
         ]);
@@ -188,8 +188,8 @@ class UserController extends BaseController
         $this->render('app/views/home.latte', Params::getAll([
             'latestArticle' => $latestArticle,
             'latestArticles' => $articles['latestArticles'],
-            'greatings' => $this->settingsDataHelper->get_('Greatings'),
-            'link' => $this->settingsDataHelper->get_('Link'),
+            'greatings' => $this->dataHelper->get('Settings', ['Name' => 'Greatings'])->Value ?? '',
+            'link' => $this->dataHelper->get('Settings', ['Name' => 'Link']),
             'navItems' => $this->getNavItems($person),
             'publishedBy' => $articles['latestArticle']
                 && $articles['latestArticle']->PublishedBy != $articles['latestArticle']->CreatedBy ? (new PersonDataHelper($this->application))->getPublisher($articles['latestArticle']->PublishedBy) : '',
@@ -310,7 +310,7 @@ class UserController extends BaseController
     {
         if ($this->connectedUser->get()->person ?? false) {
             $this->render('app/views/info.latte', Params::getAll([
-                'content' => $this->settingsDataHelper->get_('Help_user'),
+                'content' => $this->dataHelper->get('Settings', ['Name' => 'Help_user'])->Value ?? '',
                 'hasAuthorization' => $this->connectedUser->hasAutorization(),
                 'currentVersion' => Application::VERSION
             ]));
@@ -335,7 +335,7 @@ class UserController extends BaseController
             elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) $errors[] = 'L\'email n\'est pas valide.';
             if (empty($message)) $errors[] = 'Le message est requis.';
             if (empty($errors)) {
-                $adminEmail = $this->settingsDataHelper->get_('contactEmail');
+                $adminEmail = $this->dataHelper->get('Settings', ['Name' => 'contactEmail'])->Value ?? '';
                 if (!filter_var($adminEmail, FILTER_VALIDATE_EMAIL)) {
                     $this->application->getErrorManager()->raise(ApplicationError::InvalidSetting, 'Invalid contactEmmail', __FILE__, __LINE__);
                     return;
