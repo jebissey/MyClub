@@ -13,15 +13,15 @@ class ApiNeedDataHelper extends Data
 
     public function countForNeedType($needTypeid)
     {
-        return $this->fluent->from('Need')->where('IdNeedType', $needTypeid)->count();
+        return count($this->gets('Need', ['IdNeedType' => $needTypeid]));
     }
 
-    public function delete_($id)
+    public function delete_(int $id): array
     {
         if (!$id) return [['success' => false, 'message' => 'Missing ID parameter'], 472];
         else {
             try {
-                $this->fluent->deleteFrom('Need')->where('Id', $id)->execute();
+                $this->delete('Need', ['Id' => $id]);
                 return [['success' => true], 200];
             } catch (Throwable $e) {
                 return [['success' => false, 'message' => 'Erreur lors de la suppression: ' . $e->getMessage()], 500];
@@ -29,11 +29,11 @@ class ApiNeedDataHelper extends Data
         }
     }
 
-    public function insertOrUpdate($id, $needData)
+    public function insertOrUpdate(int $id, array $needData): array
     {
         try {
-            if ($id) $this->fluent->update('Need')->set($needData)->where('Id', $id)->execute();
-            else $id = $this->fluent->insertInto('Need')->values($needData)->execute();
+            if ($id) $this->set('Need', $needData, ['Id' => $id]);
+            else $id = $this->set('Need', $needData);
             return [['success' => true, 'id' => $id], 200];
         } catch (Throwable $e) {
             return [['success' => false, 'message' => 'Save error: ' . $e->getMessage()], 500];

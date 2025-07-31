@@ -11,7 +11,7 @@ class AuthorizationDataHelper extends Data
         parent::__construct($application);
     }
 
-    public function getsFor(ConnectedUser $connectedUser)
+    public function getsFor(ConnectedUser $connectedUser): array
     {
         $query = $this->pdo->prepare("
             SELECT DISTINCT Authorization.Name FROM Person 
@@ -24,7 +24,7 @@ class AuthorizationDataHelper extends Data
         return array_column($query->fetchAll(), 'Name');
     }
 
-    public function canPersonReadSurveyResults($article, $person)
+    public function canPersonReadSurveyResults($article, $person): bool
     {
         $survey = $this->fluent->from('Survey')->where('IdArticle', $article->Id)->fetch();
         if (!$survey || !$person) {

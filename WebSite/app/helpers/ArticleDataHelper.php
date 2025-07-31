@@ -9,6 +9,8 @@ use app\interfaces\NewsProviderInterface;
 
 class ArticleDataHelper extends Data implements NewsProviderInterface
 {
+    private const LAST_ARTICLES = 10;
+
     public function __construct(Application $application)
     {
         parent::__construct($application);
@@ -101,14 +103,28 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
     public function getLatestArticle(array $articleIds): ?object
     {
         if (empty($articleIds)) return null;
-        $article = $this->fluent->from('Article')
-            ->select('Article.*, Person.FirstName, Person.LastName, "Group".Name || \'(\' || "Group".Id || \')\' AS GroupName')
-            ->leftJoin('Person ON Person.Id = Article.CreatedBy')
-            ->leftJoin('"Group" ON Article.IdGroup = "Group".Id')
-            ->where('Article.Id', $articleIds)
-            ->orderBy('Article.LastUpdate DESC')
-            ->limit(1)
-            ->fetch();
+        $placeholders = [];
+        $params = [];
+        foreach ($articleIds as $index => $id) {
+            $key = ":id$index";
+            $placeholders[] = $key;
+            $params[$key] = $id;
+        }
+        $sql = "
+            SELECT Article.*, 
+                Person.FirstName, 
+                Person.LastName, 
+                \"Group\".Name || '(' || \"Group\".Id || ')' AS GroupName
+            FROM Article
+            LEFT JOIN Person ON Person.Id = Article.CreatedBy
+            LEFT JOIN \"Group\" ON Article.IdGroup = \"Group\".Id
+            WHERE Article.Id IN (" . implode(',', $placeholders) . ")
+            ORDER BY Article.LastUpdate DESC
+            LIMIT 1
+        ";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($params);
+        $article = $stmt->fetch();
         return $article ?: null;
     }
 
@@ -127,77 +143,103 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
         ];
     }
 
-    public function getWithAuthor($id)
+    public function getWithAuthor(int $id): object|false
     {
-        return $this->fluent
-            ->from('Article a')
-            ->leftJoin('Person p ON a.CreatedBy = p.Id')
-            ->select('a.*, p.FirstName, p.LastName, p.NickName')
-            ->where('a.Id', $id)
-            ->fetch();
+        $sql = "
+            SELECT a.*, p.FirstName, p.LastName, p.NickName
+            FROM Article a
+            LEFT JOIN Person p ON a.CreatedBy = p.Id
+            WHERE a.Id = :id
+        ";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([':id' => $id]);
+        return $stmt->fetch();
     }
 
-    public function getAuthor($articleId)
+    public function getAuthor(int $articleId): object|false
     {
-        return $this->fluent
-            ->from('Article')
-            ->where('Article.Id = ?', $articleId)
-            ->join('Person ON Article.CreatedBy = Person.Id')
-            ->select('CASE WHEN Person.NickName != "" THEN Person.FirstName || " " || Person.LastName || " (" || Person.NickName || ")" ELSE Person.FirstName || " " || Person.LastName END AS PersonName')
-            ->select('Article.Title AS ArticleTitle')
-            ->fetch();
+        $sql = "
+            SELECT 
+                CASE 
+                    WHEN Person.NickName != '' 
+                    THEN Person.FirstName || ' ' || Person.LastName || ' (' || Person.NickName || ')' 
+                    ELSE Person.FirstName || ' ' || Person.LastName 
+                END AS PersonName,
+                Article.Title AS ArticleTitle
+            FROM Article
+            JOIN Person ON Article.CreatedBy = Person.Id
+            WHERE Article.Id = :articleId
+        ";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([':articleId' => $articleId]);
+        return $stmt->fetch();
     }
 
-    public function getArticlesForRss($personId)
+    public function getArticlesForRss(int $personId): array
     {
-        $query = $this->pdo->query("
+        $sql = "
             SELECT DISTINCT Article.*
             FROM Article
             CROSS JOIN Person p
             LEFT JOIN PersonGroup pg ON pg.IdPerson = p.Id
             WHERE Article.PublishedBy IS NOT NULL
-            AND ((Article.IdGroup IS NULL AND Article.OnlyForMembers = 0)
-              OR (Article.IdGroup IS NULL AND Article.OnlyForMembers = 1 AND $personId <> 0)
-              OR (Article.IdGroup IS NOT NULL AND Article.IdGroup IN (SELECT IdGroup FROM PersonGroup WHERE PersonGroup.IdPerson = $personId))
+            AND (
+                (Article.IdGroup IS NULL AND Article.OnlyForMembers = 0)
+                OR (Article.IdGroup IS NULL AND Article.OnlyForMembers = 1 AND :personId <> 0)
+                OR (Article.IdGroup IS NOT NULL AND Article.IdGroup IN (
+                    SELECT IdGroup FROM PersonGroup WHERE IdPerson = :personId
+                ))
             )
-            ORDER BY Article.LastUpdate DESC");
-        return $query->fetchAll();
+            ORDER BY Article.LastUpdate DESC
+        ";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([':personId' => $personId]);
+        return $stmt->fetchAll();
     }
 
-    public function getLastUpdateArticles()
+    public function getLastUpdateArticles(): ?string
     {
-        return $this->fluent->from('Article')
-            ->select(null)
-            ->select('MAX(LastUpdate) AS LastMod')
-            ->fetch('LastMod');
+        $sql = "SELECT MAX(LastUpdate) AS LastMod FROM Article";
+        $stmt = $this->pdo->query($sql);
+        $result = $stmt->fetch();
+        return $result['LastMod'] ?? null;
     }
 
-    public function getArticlesForAll()
+    public function getArticlesForAll(): array
     {
-        return $this->fluent->from('Article')
-            ->select('Id, Title, LastUpdate')
-            ->where('IdGroup IS NULL AND OnlyForMembers = 0')
-            ->orderBy('LastUpdate DESC')
-            ->fetchAll();
+        $sql = "
+            SELECT Id, Title, LastUpdate
+            FROM Article
+            WHERE IdGroup IS NULL AND OnlyForMembers = 0
+            ORDER BY LastUpdate DESC
+        ";
+        $stmt = $this->pdo->query($sql);
+        return $stmt->fetchAll();
     }
 
-    public function getNews($person, $searchFrom): array
+    public function getNews(object $person, string $searchFrom): array
     {
-        $articles = $this->fluent->from('Article a')
-            ->select('a.Id, a.Title, a.LastUpdate')
-            ->where('a.LastUpdate >= ?', $searchFrom)
-            ->where('a.PublishedBy IS NOT NULL')
-            ->orderBy('a.LastUpdate DESC')
-            ->fetchAll();
+        $sql = "
+            SELECT a.Id, a.Title, a.LastUpdate
+            FROM Article a
+            WHERE a.LastUpdate >= :searchFrom
+            AND a.PublishedBy IS NOT NULL
+            ORDER BY a.LastUpdate DESC
+        ";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([':searchFrom' => $searchFrom]);
+        $articles = $stmt->fetchAll(); // objets si FETCH_OBJ par défaut
+
+        $authHelper = new AuthorizationDataHelper($this->application);
         $news = [];
         foreach ($articles as $article) {
-            if ((new AuthorizationDataHelper($this->application))->getArticle($article->Id, $person)) {
+            if ($authHelper->getArticle($article->Id, $person)) {
                 $news[] = [
                     'type'  => 'article',
                     'id'    => $article->Id,
                     'title' => $article->Title,
                     'date'  => $article->LastUpdate,
-                    'url'   => '/articles/' . $article->Id
+                    'url'   => '/articles/' . $article->Id,
                 ];
             }
         }
@@ -237,17 +279,24 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
 
     public function getLatestArticles_(array $articleIds): array
     {
-        if (empty($articleIds)) {
-            return [];
-        }
+        if (empty($articleIds)) return [];
 
-        return $this->fluent->from('Article')
-            ->select(null)
-            ->select('Id, Title, Timestamp, LastUpdate')
-            ->where('Id', $articleIds)
-            ->where('publishedBy IS NOT NULL')
-            ->orderBy('LastUpdate DESC')
-            ->limit(10)
-            ->fetchAll() ?: [];
+        $placeholders = [];
+        $params = [];
+        foreach ($articleIds as $index => $id) {
+            $key = ":id$index";
+            $placeholders[] = $key;
+            $params[$key] = $id;
+        }
+        $sql = "
+            SELECT Id, Title, Timestamp, LastUpdate
+            FROM Article
+            WHERE Id IN (" . implode(',', $placeholders) . ")
+            AND PublishedBy IS NOT NULL
+            ORDER BY LastUpdate DESC
+            LIMIT " . self::LAST_ARTICLES;
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($params);
+        return $stmt->fetchAll() ?: [];
     }
 }

@@ -6,27 +6,20 @@ use app\enums\ApplicationError;
 use app\helpers\Application;
 use app\helpers\ArticleDataHelper;
 use app\helpers\ArwardsDataHelper;
-use app\helpers\AuthorizationDataHelper;
 use app\helpers\Params;
-use app\helpers\SettingsDataHelper;
 use app\helpers\Webapp;
 
 class WebmasterController extends BaseController
 {
-    private AuthorizationDataHelper $authorizationDatahelper;
-    private SettingsDataHelper $settingsDataHelper;
-
     public function __construct(Application $application)
     {
         parent::__construct($application);
-        $this->authorizationDatahelper = new AuthorizationDataHelper($application);
-        $this->settingsDataHelper = new SettingsDataHelper($application);
     }
 
     public function helpWebmaster(): void
     {
         $this->render('app/views/info.latte', [
-            'content' => $this->settingsDataHelper->get('Help_webmaster'),
+            'content' => $this->dataHelper->get('Settings', ['Name' => 'Help_webmaster'])->Value ?? '',
             'hasAuthorization' => $this->connectedUser->get()->isEventManager() ?? false,
             'currentVersion' => Application::VERSION
         ]);
@@ -37,7 +30,7 @@ class WebmasterController extends BaseController
         if ($this->connectedUser->get()->isAdministrator() ?? false) {
 
             $this->render('app/views/info.latte', Params::getAll([
-                'content' => $this->settingsDataHelper->get('Help_admin'),
+                'content' => $this->dataHelper->get('Settings', ['Name' => 'Help_admin'])->Value ?? '',
                 'hasAuthorization' => $this->connectedUser->isEventManager(),
                 'currentVersion' => Application::VERSION
             ]));

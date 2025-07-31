@@ -11,21 +11,21 @@ class ApiNeedTypeDataHelper extends Data
         parent::__construct($application);
     }
 
-    public function delete_($id)
+    public function delete_($id): array
     {
         try {
-            $this->fluent->deleteFrom('NeedType')->where('Id', $id)->execute();
+            $this->delete('NeedType', ['Id' => $id]);
             return [['success' => true], 200];
         } catch (Throwable $e) {
             return [['success' => false, 'message' => 'Erreur lors de la suppression: ' . $e->getMessage()], 500];
         }
     }
 
-    public function insertOrUpdate($id, $name)
+    public function insertOrUpdate($id, $name): array
     {
         try {
-            if ($id) $this->fluent->update('NeedType')->set(['Name' => $name])->where('Id', $id)->execute();
-            else $id = $this->fluent->insertInto('NeedType')->values(['Name' => $name])->execute();
+            if ($id) $this->set('NeedType', ['Name' => $name], ['Id' => $id]);
+            else $id = $this->set('NeedType', ['Name' => $name]);
             return [['success' => true, 'id' => $id], 200];
         } catch (Throwable $e) {
             return [['success' => 'false', 'message' => 'Erreur lors de l\'enregistrement: ' . $e->getMessage(), 500]];
@@ -34,10 +34,14 @@ class ApiNeedTypeDataHelper extends Data
 
     public function needsforNeedType($needTypeId)
     {
-        return $this->fluent->from('Need')
-            ->select('Need.*, NeedType.Name as TypeName')
-            ->join('NeedType ON Need.IdNeedType = NeedType.Id')
-            ->where('Need.IdNeedType', $needTypeId)
-            ->fetchAll();
+        $sql = "
+            SELECT Need.*, NeedType.Name AS TypeName
+            FROM Need
+            JOIN NeedType ON Need.IdNeedType = NeedType.Id
+            WHERE Need.IdNeedType = :needTypeId
+        ";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([':needTypeId' => $needTypeId]);
+        return $stmt->fetchAll();
     }
 }

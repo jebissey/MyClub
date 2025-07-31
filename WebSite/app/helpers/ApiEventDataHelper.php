@@ -31,13 +31,13 @@ class ApiEventDataHelper extends Data
         $this->pdo->beginTransaction();
         try {
             if ($data['formMode'] == 'create') {
-                $eventId = $this->fluent->insertInto('Event')->values($values)->execute();
+                $eventId = $this->set('Event', $values);
             } elseif ($data['formMode'] == 'update') {
-                $this->fluent->update('Event')->set($values)->where('Id', $data['id'])->execute();
+                $this->set('Event', $values, ['Id' => $data['id']]);
                 $eventId = $data['id'];
 
-                $this->fluent->deleteFrom('EventAttribute')->where('IdEvent', $eventId)->execute();
-                $this->fluent->deleteFrom('EventNeed')->where('IdEvent', $eventId)->execute();
+                $this->delete('EventAttribute', ['IdEvent' => $eventId]);
+                $this->delete('EventNeed', ['IdEvent' => $eventId]);
             } else die('Fatal error in file ' . __FILE__ . ' at line ' . __LINE__ . " with formMode=" . $data['formMode']);
             $this->insertEventAttributes($eventId, $data['attributes'] ?? []);
             $this->insertEventNeeds($eventId, $data['needs'] ?? []);
@@ -58,12 +58,10 @@ class ApiEventDataHelper extends Data
     {
         if (!empty($attributes)) {
             foreach ($attributes as $attributeId) {
-                $this->fluent->insertInto('EventAttribute')
-                    ->values([
-                        'IdEvent'    => $eventId,
-                        'IdAttribute' => $attributeId
-                    ])
-                    ->execute();
+                $this->set('EventAttribute', [
+                    'IdEvent'     => $eventId,
+                    'IdAttribute' => $attributeId
+                ]);
             }
         }
     }
@@ -72,13 +70,11 @@ class ApiEventDataHelper extends Data
     {
         if (!empty($needs)) {
             foreach ($needs as $need) {
-                $this->fluent->insertInto('EventNeed')
-                    ->values([
-                        'IdEvent' => $eventId,
-                        'IdNeed'  => $need['id'],
-                        'Counter' => $need['counter'],
-                    ])
-                    ->execute();
+                $this->set('EventNeed', [
+                    'IdEvent' => $eventId,
+                    'IdNeed'  => $need['id'],
+                    'Counter' => $need['counter'],
+                ]);
             }
         }
     }

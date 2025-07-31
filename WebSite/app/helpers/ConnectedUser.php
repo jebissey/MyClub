@@ -9,9 +9,9 @@ use app\helpers\TranslationManager;
 
 class ConnectedUser
 {
-    private $authorizations;
     private Application $application;
     private AuthorizationDataHelper $authorizationDataHelper;
+    private array $authorizations;
     private DataHelper $dataHelper;
     public $person;
 
@@ -22,14 +22,16 @@ class ConnectedUser
         $this->dataHelper = new DataHelper($application);
     }
 
-    public function get(int $segment = 0): self|null
+    public function get(int $segment = 0): self
     {
+        $this->authorizations = [];
+        $this->person = null;
         $userEmail = $_SESSION['user'] ?? '';
-        if (!$userEmail) return null;
+        if (!$userEmail) return $this;
         $this->person = $this->dataHelper->get('Person', ['Email' => $userEmail]);
         if (!$this->person) {
             $this->application->getErrorManager()->raise(ApplicationError::BadRequest, "Unknown user with this email address: $userEmail in file " . __FILE__ . ' at line ' . __LINE__);
-            return null;
+            return $this;
         }
         $this->authorizations = $this->authorizationDataHelper->getsFor($this);
         $lang = TranslationManager::getCurrentLanguage();

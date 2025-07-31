@@ -19,7 +19,6 @@ use app\helpers\Password;
 use app\helpers\PersonDataHelper;
 use app\helpers\PersonGroupDataHelper;
 use app\helpers\PersonStatistics;
-use app\helpers\SettingsDataHelper;
 use app\helpers\Sign;
 use app\helpers\SurveyDataHelper;
 use app\helpers\TranslationManager;
@@ -30,7 +29,6 @@ class UserController extends BaseController
     private ArticleDataHelper $articleDataHelper;
     private Email $email;
     private News $news;
-    private SettingsDataHelper $settingsDataHelper;
     private Sign $sign;
     private SurveyDataHelper $surveyDataHelper;
 
@@ -39,7 +37,6 @@ class UserController extends BaseController
         parent::__construct($application);
         $this->articleDataHelper = new ArticleDataHelper($application);
         $this->email = new Email();
-        $this->settingsDataHelper = new SettingsDataHelper($application);
         $this->sign = new Sign($this->application);
         $this->surveyDataHelper = new SurveyDataHelper($application);
         $this->news =  new News([
@@ -122,7 +119,7 @@ class UserController extends BaseController
 
     public function helpHome(): void
     {
-        $content = $this->application->getLatte()->latte->renderToString('app/views/info.latte', [
+        $content = $this->application->getLatte()->renderToString('app/views/info.latte', [
             'content' => $this->dataHelper->get('Settings', ['Name' => 'Help_home'])->Value ?? '',
             'hasAuthorization' => $this->connectedUser->get()->hasAutorization() ?? false,
             'currentVersion' => Application::VERSION
@@ -132,7 +129,7 @@ class UserController extends BaseController
 
     public function legalNotice(): void
     {
-        $content = $this->application->getLatte()->latte->renderToString('app/views/info.latte', [
+        $content = $this->application->getLatte()->renderToString('app/views/info.latte', [
             'content' => $this->dataHelper->get('Settings', ['Name' => 'LegalNotices'])->Value ?? '',
             'hasAuthorization' => $this->connectedUser->get()->hasAutorization() ?? false,
             'currentVersion' => Application::VERSION
@@ -189,7 +186,7 @@ class UserController extends BaseController
             'latestArticle' => $latestArticle,
             'latestArticles' => $articles['latestArticles'],
             'greatings' => $this->dataHelper->get('Settings', ['Name' => 'Greatings'])->Value ?? '',
-            'link' => $this->dataHelper->get('Settings', ['Name' => 'Link']),
+            'link' => $this->dataHelper->get('Settings', ['Name' => 'Link'])->Value ?? '',
             'navItems' => $this->getNavItems($person),
             'publishedBy' => $articles['latestArticle']
                 && $articles['latestArticle']->PublishedBy != $articles['latestArticle']->CreatedBy ? (new PersonDataHelper($this->application))->getPublisher($articles['latestArticle']->PublishedBy) : '',

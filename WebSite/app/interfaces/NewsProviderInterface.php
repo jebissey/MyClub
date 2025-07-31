@@ -4,6 +4,6 @@ namespace app\interfaces;
 
 interface NewsProviderInterface
 {
-    public function getNews($person, $searchFrom): array;
+    public function getNews(object $person, string $searchFrom): array;
 }
 
