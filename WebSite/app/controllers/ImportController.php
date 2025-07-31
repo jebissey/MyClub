@@ -6,7 +6,6 @@ use app\helpers\Application;
 use app\enums\ApplicationError;
 use app\helpers\ImportDataHelper;
 use app\helpers\Params;
-use app\helpers\SettingsDataHelper;
 
 class ImportController extends BaseController
 {

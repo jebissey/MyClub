@@ -7,7 +7,6 @@ use app\helpers\Application;
 use app\helpers\GroupDataHelper;
 use app\helpers\Params;
 use app\helpers\PersonDataHelper;
-use app\helpers\SettingsDataHelper;
 use app\helpers\TableControllerHelper;
 use app\helpers\Webapp;
 use app\interfaces\CrudControllerInterface;
@@ -29,7 +28,7 @@ class PersonController extends TableController implements CrudControllerInterfac
     {
         if (($this->connectedUser->get()->isPersonManager() ?? false) || $this->connectedUser->isWebmaster() ?? false) {
             $this->render('app/views/info.latte', [
-                'content' => (new SettingsDataHelper($this->application))->get('Help_personManager'),
+                'content' => $this->dataHelper->get('settings', ['Name' => 'Help_personManager']),
                 'hasAuthorization' => $this->connectedUser->hasAutorization(),
                 'currentVersion' => Application::VERSION
             ]);
@@ -113,7 +112,7 @@ class PersonController extends TableController implements CrudControllerInterfac
                         'firstName' => $person->FirstName,
                         'lastName' => $person->LastName,
                         'isSelfEdit' => false,
-                        'layout' => Webapp::getLayout()('account')
+                        'layout' => Webapp::getLayout()
                     ]));
                 } else $this->application->getErrorManager()->raise(ApplicationError::InvalidRequestMethod, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
             }

@@ -296,7 +296,7 @@ class UserController extends BaseController
 
                 $this->render('app/views/user/groups.latte', Params::getAll([
                     'groups' => $currentGroups,
-                    'layout' => Webapp::getLayout()()
+                    'layout' => Webapp::getLayout()
                 ]));
             } else $this->application->getErrorManager()->raise(ApplicationError::InvalidRequestMethod, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
         }

@@ -15,7 +15,6 @@ use app\helpers\NeedDataHelper;
 use app\helpers\Params;
 use app\helpers\ParticipantDataHelper;
 use app\helpers\Period;
-use app\helpers\SettingsDataHelper;
 use app\helpers\Webapp;
 
 class EventController extends BaseController
@@ -36,8 +35,8 @@ class EventController extends BaseController
 
         $this->render('app/views/event/nextEvents.latte', Params::getAll([
             'navItems' => $this->getNavItems($this->connectedUser->get()->person ?? false),
-            'events' => $this->eventDataHelper->getEvents($$this->connectedUser->person, $mode, $offset, $filterByPreferences),
-            'person' => $$this->connectedUser->person,
+            'events' => $this->eventDataHelper->getEvents($this->connectedUser->person, $mode, $offset, $filterByPreferences),
+            'person' => $this->connectedUser->person,
             'eventTypes' => $this->dataHelper->gets('EventType', ['Inactivated' => 0], "'Id', 'Name'", 'Name'),
             'needTypes' => $this->dataHelper->gets('NeedType', [], "'Id', 'Name'", 'Name'),
             'eventAttributes' => $this->dataHelper->gets('Attribute', [], "'Id', 'Name, Detail, Color'"),
@@ -85,7 +84,7 @@ class EventController extends BaseController
             $this->render('app/views/event/guest.latte', Params::getAll([
                 'events' => $events,
                 'navbarTemplate' => '../navbar/eventManager.latte',
-                'layout' => Webapp::getLayout()(),
+                'layout' => Webapp::getLayout(),
                 'message' => $message,
                 'messageType' => $type
             ]));
@@ -298,7 +297,7 @@ class EventController extends BaseController
     public function help(): void
     {
         $this->render('app/views/info.latte', [
-            'content' => (new SettingsDataHelper($this->application))->get('Help_eventManager'),
+            'content' => $this->dataHelper->get('Settings', ['Name' => 'Help_eventManager']),
             'hasAuthorization' => $this->connectedUser->get()->hasAutorization() ?? false,
             'currentVersion' => Application::VERSION
         ]);

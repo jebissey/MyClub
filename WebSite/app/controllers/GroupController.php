@@ -24,7 +24,7 @@ class GroupController extends BaseController implements CrudControllerInterface
         if (($this->connectedUser->get()->isPersonManager() ?? false) || $this->connectedUser->isWebmaster() ?? false) {
             $this->render('app/views/groups/index.latte', Params::getAll([
                 'groups' => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
-                'layout' => Webapp::getLayout()()
+                'layout' => Webapp::getLayout()
             ]));
         } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
@@ -43,14 +43,14 @@ class GroupController extends BaseController implements CrudControllerInterface
                     $this->render('app/views/groups/create.latte', Params::getAll([
                         'availableAuthorizations' => $availableAuthorizations,
                         'error' => 'Le nom du groupe est requis',
-                        'layout' => Webapp::getLayout()()
+                        'layout' => Webapp::getLayout()
                     ]));
                 }
                 $this->groupDataHelper->insert($name, $selfRegistration, $selectedAuthorizations);
             } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $this->render('app/views/groups/create.latte', Params::getAll([
                     'availableAuthorizations' => $availableAuthorizations,
-                    'layout' => Webapp::getLayout()()
+                    'layout' => Webapp::getLayout()
                 ]));
             } else $this->application->getErrorManager()->raise(ApplicationError::InvalidRequestMethod, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
         } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
@@ -72,7 +72,7 @@ class GroupController extends BaseController implements CrudControllerInterface
                         'group' => $group,
                         'availableAuthorizations' => $availableAuthorizations,
                         'error' => 'Le nom du groupe est requis',
-                        'layout' => Webapp::getLayout()()
+                        'layout' => Webapp::getLayout()
                     ]));
                 } else $this->groupDataHelper->update($id, $name, $selfRegistration, $selectedAuthorizations);
             } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
@@ -82,7 +82,7 @@ class GroupController extends BaseController implements CrudControllerInterface
                         'group' => $group,
                         'availableAuthorizations' => $availableAuthorizations,
                         'currentAuthorizations' => array_column($this->dataHelper->gets('GroupAuthorization', ['IdGroup' => $id], 'IdAuthorization'), 'IdAuthorization'),
-                        'layout' => Webapp::getLayout()()
+                        'layout' => Webapp::getLayout()
                     ]));
                 }
             } else $this->application->getErrorManager()->raise(ApplicationError::InvalidRequestMethod, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);

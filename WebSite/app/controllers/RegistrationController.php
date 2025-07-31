@@ -43,7 +43,7 @@ class RegistrationController extends TableController
                 'filters' => $filterConfig,
                 'columns' => $columns,
                 'resetUrl' => '/registration',
-                'layout' => Webapp::getLayout()()
+                'layout' => Webapp::getLayout()
             ]));
         } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
