@@ -3,6 +3,10 @@
 namespace app\helpers;
 
 use PDO;
+use RuntimeException;
+use Throwable;
+
+use app\helpers\database\migrators\V1ToV2Migrator;
 use app\helpers\File;
 
 class Database
@@ -11,13 +15,13 @@ class Database
     const SQLITE_FILE = 'MyClub.sqlite';
     const SQLITE_LOG_FILE = 'LogMyClub.sqlite';
     const APPLICATION = 'MyClub';
-    const VERSION = 1;              //Don't forget to update when database structure is modified
+    const DB_VERSION = 1;              //Don't forget to update when database structure is modified
 
     private static $instance = null;
     private static $pdo = null;
     private static $pdoForLog = null;
 
-    public function __construct()
+    private function __construct()
     {
         if (self::$pdo === null) self::check();
     }
@@ -57,20 +61,30 @@ class Database
         $row = $stmt->fetch();
         if ($row) {
             if ($row->ApplicationName != self::APPLICATION) die('Non-compliant database in file ' . __FILE__ . ' at line ' . __LINE__);
-            if ($row->DatabaseVersion != self::VERSION) {
-                if ($row->DatabaseVersion > self::VERSION)  die('The database requires a more recent version of the applicationin  in file ' . __FILE__ . ' at line ' . __LINE__);
-                $newVersion = self::upgradeDatabase(self::$pdo, $row->DatabaseVersion, self::VERSION);
+            if ($row->DatabaseVersion != self::DB_VERSION) {
+                if ($row->DatabaseVersion > self::DB_VERSION)  die('The database requires a more recent version of the applicationin  in file ' . __FILE__ . ' at line ' . __LINE__);
+                self::upgradeDatabase(self::$pdo, $row->DatabaseVersion, self::DB_VERSION);
             }
-        } else die('Empty Metadata table');
+        } else throw new RuntimeException('Empty Metadata table in file ' + __FILE__ + ' at line ' + __LINE__);
     }
 
     private function upgradeDatabase(PDO $pdo, int $from, int $to)
     {
-        die('Fatal error in file ' . __FILE__ . ' at line ' . __LINE__);
-        //todo add here sql to upgrade schema
+        $pdo->beginTransaction();
+        try {
+
+            if ($from == 1) $from = new V1ToV2Migrator($pdo);
 
 
-        $stmt = $pdo->prepare("UPDATE Metadata SET DatabaseVersion = ? WHERE Id = 1");
-        $stmt->execute([$to]);
+            if ($from != $to) throw new RuntimeException('Fatal program error in file ' + __FILE__ + ' at line ' + __LINE__);
+
+            $stmt = $pdo->prepare("UPDATE Metadata SET DatabaseVersion = ? WHERE Id = 1");
+            $stmt->execute([$to]);
+        } catch (Throwable $e) {
+            $pdo->rollBack();
+            throw new RuntimeException('Fatal program error ' . $e->getMessage() . ' in file ' + __FILE__ + ' at line ' + __LINE__);
+        }
+        $pdo->commit();
+        return;
     }
 }

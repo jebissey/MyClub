@@ -33,7 +33,21 @@
       </ul>
 
       <a class="nav-link" href="{$href}">
-        <img id="userAvatar" src="{$userImg}" alt="User avatar" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="{if $userEmail != ''}{='my_data'|translate}{else}{='login'|translate}{/if}">
+      {if strlen($userImg) < 10}
+        <span class="user-avatar-emoji" 
+              data-bs-toggle="tooltip" 
+              data-bs-placement="bottom" 
+              data-bs-title="{if $userEmail != ''}{='my_data'|translate}{else}{='login'|translate}{/if}"
+              style="font-size: 2rem; cursor: pointer; display: inline-block; line-height: 1;">
+            {$userImg}
+        </span>
+      {else}
+        <img id="userAvatar" src="{$userImg}" 
+            alt="User gravatar" 
+            data-bs-toggle="tooltip" 
+            data-bs-placement="bottom" 
+            data-bs-title="{if $userEmail != ''}{='my_data'|translate}{else}{='login'|translate}{/if}">
+      {/if}
       </a>
 
       {if $keys}

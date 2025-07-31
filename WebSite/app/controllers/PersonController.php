@@ -31,7 +31,7 @@ class PersonController extends TableController implements CrudControllerInterfac
             $this->render('app/views/info.latte', [
                 'content' => (new SettingsDataHelper($this->application))->get('Help_personManager'),
                 'hasAuthorization' => $this->connectedUser->hasAutorization(),
-                'currentVersion' => Application::getVersion()
+                'currentVersion' => Application::VERSION
             ]);
         } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }

@@ -6,14 +6,10 @@ use InvalidArgumentException;
 
 class Email
 {
-    public static function send($emailFrom, $emailTo, $subject, $body, $cc = null, $bcc = null, $isHtml = false)
+    public static function send($emailFrom, $emailTo, $subject, $body, $cc = null, $bcc = null, $isHtml = false): bool
     {
-        if (!filter_var($emailFrom, FILTER_VALIDATE_EMAIL)) {
-            throw new InvalidArgumentException("Adresse expéditeur invalide : $emailFrom");
-        }
-        if (!filter_var($emailTo, FILTER_VALIDATE_EMAIL)) {
-            throw new InvalidArgumentException("Adresse destinataire invalide : $emailTo");
-        }
+        if (!filter_var($emailFrom, FILTER_VALIDATE_EMAIL)) throw new InvalidArgumentException("Invalid from email: $emailFrom");
+        if (!filter_var($emailTo, FILTER_VALIDATE_EMAIL))   throw new InvalidArgumentException("Invalid to email: $emailTo");
         $headers = array(
             'From' => $emailFrom,
             'Reply-To' => $emailFrom,
@@ -26,18 +22,14 @@ class Email
             $ccList = array_filter(array_map('trim', $ccList), function ($email) {
                 return filter_var($email, FILTER_VALIDATE_EMAIL);
             });
-            if ($ccList) {
-                $headers['Cc'] = implode(', ', $ccList);
-            }
+            if ($ccList) $headers['Cc'] = implode(', ', $ccList);
         }
         if ($bcc) {
             $bccList = is_array($bcc) ? $bcc : explode(',', $bcc);
             $bccList = array_filter(array_map('trim', $bccList), function ($email) {
                 return filter_var($email, FILTER_VALIDATE_EMAIL);
             });
-            if ($bccList) {
-                $headers['Bcc'] = implode(', ', $bccList);
-            }
+            if ($bccList) $headers['Bcc'] = implode(', ', $bccList);
         }
         $headerString = '';
         foreach ($headers as $key => $value) {

@@ -87,10 +87,10 @@ class ArticleController extends TableController
             'filters' => $filterConfig,
             'columns' => $columns,
             'resetUrl' => '/articles',
-            'isRedactor' => $this->connectedUser->person ? $this->connectedUser->isRedactor() : false,
-            'userConnected' => $this->connectedUser->person,
+            'isRedactor' => $this->connectedUser->isRedactor() ?? false,
+            'userConnected' => $this->connectedUser->person ?? false,
             'layout' => WebApp::getLayout(),
-            'navItems' => $this->getNavItems($this->connectedUser->person),
+            'navItems' => $this->getNavItems($this->connectedUser->person ?? false),
         ]));
     }
 

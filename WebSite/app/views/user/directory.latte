@@ -67,7 +67,7 @@
                                 {if $person->UseGravatar == 'yes' && $person->Email}
                                     <img src="https://www.gravatar.com/avatar/{md5(strtolower(trim($person->Email)))}?s=100&d=mp" alt="Avatar" class="img-fluid rounded-circle mb-3" style="width: 100px; height: 100px; object-fit: cover;">
                                 {elseif $person->Avatar}
-                                    <img src="app/images/{$person->Avatar}" alt="Avatar" class="img-fluid rounded-circle mb-3">
+                                    <img src="/app/images/{$person->Avatar}" alt="Avatar" class="img-fluid rounded-circle mb-3">
                                 {else}
                                     <div class="rounded-circle bg-light d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 48px; height: 48px;">
                                         <i class="bi bi-person-circle" style="font-size: 3rem;"></i>

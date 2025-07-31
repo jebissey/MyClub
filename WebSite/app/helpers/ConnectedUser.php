@@ -44,7 +44,7 @@ class ConnectedUser
             'isEditor' => $this->isEditor(),
             'isWebmaster' => $this->isWebmaster(),
             'page' => explode('/', trim(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/'))[$segment],
-            'currentVersion' => Application::getVersion(),
+            'currentVersion' => Application::VERSION,
             'currentLanguage' => $lang,
             'supportedLanguages' => TranslationManager::getSupportedLanguages(),
             'flag' => TranslationManager::getFlag($lang),
@@ -101,8 +101,11 @@ class ConnectedUser
     {
         if ($person->UseGravatar === 'yes') return (new GravatarHandler())->getGravatar($person->Email);
         else {
-            if (empty($person->Avatar)) return '/app/images/emojiPensif.png';
-            else                        return '/app/images/' . $person->Avatar;
+            if (empty($person->Avatar)) return '🤔';
+            else {
+                if (in_array($person->Avatar, Application::EMOJI_LIST)) return $person->Avatar;
+                else return '🤔';
+            }
         }
     }
 }

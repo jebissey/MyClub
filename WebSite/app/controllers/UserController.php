@@ -64,12 +64,12 @@ class UserController extends BaseController
         elseif ($_SERVER['REQUEST_METHOD'] === 'GET') {
             $this->render('app/views/user/setPassword.latte', [
                 'href' => '/user/sign/in',
-                'userImg' => '/app/images/anonymat.png',
+                'userImg' => '🫥',
                 'userEmail' => '',
                 'keys' => false,
                 'page' => basename(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH)),
                 'token' => $token,
-                'currentVersion' => Application::getVersion()
+                'currentVersion' => Application::VERSION
             ]);
         } else $this->application->getErrorManager()->raise(ApplicationError::InvalidRequestMethod, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
     }
@@ -101,11 +101,11 @@ class UserController extends BaseController
 
             $this->render('app/views/user/signIn.latte', [
                 'href' => '/user/sign/in',
-                'userImg' => '/app/images/anonymat.png',
+                'userImg' => '🫥',
                 'userEmail' => '',
                 'keys' => false,
                 'page' => basename(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH)),
-                'currentVersion' => Application::getVersion()
+                'currentVersion' => Application::VERSION
             ]);
         } else $this->application->getErrorManager()->raise(ApplicationError::InvalidRequestMethod, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
     }
@@ -125,7 +125,7 @@ class UserController extends BaseController
         $content = $this->application->getLatte()->latte->renderToString('app/views/info.latte', [
             'content' => $this->settingsDataHelper->get_('Help_home'),
             'hasAuthorization' => $this->connectedUser->get()->hasAutorization() ?? false,
-            'currentVersion' => $this->application->getVersion()
+            'currentVersion' => Application::VERSION
         ]);
         echo $content;
     }
@@ -135,7 +135,7 @@ class UserController extends BaseController
         $content = $this->application->getLatte()->latte->renderToString('app/views/info.latte', [
             'content' => $this->settingsDataHelper->get_('LegalNotices'),
             'hasAuthorization' => $this->connectedUser->get()->hasAutorization() ?? false,
-            'currentVersion' => $this->application->getVersion()
+            'currentVersion' => Application::VERSION
         ]);
         echo $content;
     }
@@ -164,10 +164,10 @@ class UserController extends BaseController
             $lang = TranslationManager::getCurrentLanguage();
             Params::setParams([
                 'href' => '/user/sign/in',
-                'userImg' => '/app/images/anonymat.png',
+                'userImg' => '🫥',
                 'userEmail' => '',
                 'keys' => false,
-                'currentVersion' => Application::getVersion(),
+                'currentVersion' => Application::VERSION,
                 'currentLanguage' => $lang,
                 'supportedLanguages' => TranslationManager::getSupportedLanguages(),
                 'flag' => TranslationManager::getFlag($lang),
@@ -217,16 +217,12 @@ class UserController extends BaseController
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $email = filter_var($_POST['email'], FILTER_VALIDATE_EMAIL) ?? '';
                 $password = $_POST['password'];
-                $firstName = $_POST['firstName'];
-                $lastName = $_POST['lastName'];
-                $nickName = $_POST['nickName'];
-                $avatar = pathinfo($_POST['avatar'], PATHINFO_BASENAME) ?? '';
                 $useGravatar = $_POST['useGravatar'] ?? 'no';
                 $this->dataHelper->set('Person', [
-                    'FirstName' => $firstName,
-                    'LastName' => $lastName,
-                    'NickName' => $nickName,
-                    'Avatar' => $avatar,
+                    'FirstName' => $_POST['firstName'],
+                    'LastName' => $_POST['lastName'],
+                    'NickName' => $_POST['nickName'],
+                    'Avatar' => $useGravatar == 'no' ? $_POST['avatar'] : '',
                     'useGravatar' => $useGravatar
                 ], ['Id' => $person->Id]);
                 if (!empty($password))
@@ -237,29 +233,17 @@ class UserController extends BaseController
                 }
                 $this->flight->redirect('/user');
             } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-                $email = filter_var($person->Email, FILTER_VALIDATE_EMAIL) ?? '';
-                $firstName = WebApp::sanitizeInput($person->FirstName);
-                $lastName = WebApp::sanitizeInput($person->LastName);
-                $nickName = WebApp::sanitizeInput($person->NickName);
-                $avatar = WebApp::sanitizeInput($person->Avatar);
-                $useGravatar = WebApp::sanitizeInput($person->UseGravatar) ?? 'no';
-                $emojiFiles = glob(__DIR__ . '/../images/emoji*');
-                $emojis = array_map(function ($path) {
-                    return basename($path);
-                }, $emojiFiles);
-
                 $this->render('app/views/user/account.latte', Params::getAll([
                     'readOnly' => $person->Imported == 1 ? true : false,
-                    'email' => $email,
-                    'firstName' => $firstName,
-                    'lastName' => $lastName,
-                    'nickName' => $nickName,
-                    'avatar' => $avatar,
-                    'useGravatar' => $useGravatar,
-                    'emojis' => $emojis,
-                    'emojiPath' => '/app/images/',
+                    'email' => filter_var($person->Email, FILTER_VALIDATE_EMAIL) ?? '',
+                    'firstName' => WebApp::sanitizeInput($person->FirstName),
+                    'lastName' => WebApp::sanitizeInput($person->LastName),
+                    'nickName' => WebApp::sanitizeInput($person->NickName),
+                    'avatar' => WebApp::sanitizeInput($person->Avatar),
+                    'useGravatar' => WebApp::sanitizeInput($person->UseGravatar) ?? 'no',
+                    'emojis' => Application::EMOJI_LIST,
                     'isSelfEdit' => true,
-                    'layout' => Webapp::getLayout()()
+                    'layout' => Webapp::getLayout()
                 ]));
             } else $this->application->getErrorManager()->raise(ApplicationError::InvalidRequestMethod, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
         } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
@@ -328,12 +312,12 @@ class UserController extends BaseController
             $this->render('app/views/info.latte', Params::getAll([
                 'content' => $this->settingsDataHelper->get_('Help_user'),
                 'hasAuthorization' => $this->connectedUser->hasAutorization(),
-                'currentVersion' => Application::getVersion()
+                'currentVersion' => Application::VERSION
             ]));
         } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
-    public function contact($eventId = null)
+    public function contact($eventId = null): void
     {
         if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
@@ -357,11 +341,9 @@ class UserController extends BaseController
                     return;
                 }
                 $eventId = trim($_POST['eventId'] ?? '');
-                $event = $this->dataHelper->get('Event', ['Id' => $eventId]);
-                if (!$event) {
-                    $this->application->getErrorManager()->raise(ApplicationError::BadRequest, "Unknown event '$eventId' in file " . __FILE__ . ' at line ' . __LINE__);
-
-                    return false;
+                if (!empty($eventId)) {
+                    $event = $this->dataHelper->get('Event', ['Id' => $eventId]);
+                    if (!$event) $this->application->getErrorManager()->raise(ApplicationError::BadRequest, "Unknown event '$eventId' in file " . __FILE__ . ' at line ' . __LINE__);
                 }
                 if (!empty($eventId)) $emailSent = (new PersonDataHelper($this->application))->sendRegistrationLink($adminEmail, $name, $email, $event);
                 else $emailSent = $this->email->sendContactEmail($adminEmail, $name, $email, $message);
@@ -399,15 +381,10 @@ class UserController extends BaseController
     {
         if ($person = $this->connectedUser->get(1)->person ?? false) {
             $searchMode = $_GET['from'] ?? 'signout';
-            if ($searchMode === 'signin') {
-                $searchFrom = $person->LastSignIn ?? '';
-            } elseif ($searchMode === 'signout') {
-                $searchFrom = $person->LastSignOut ?? '';
-            } elseif ($searchMode === 'week') {
-                $searchFrom = date('Y-m-d H:i:s', strtotime('-1 week'));
-            } elseif ($searchMode === 'month') {
-                $searchFrom = date('Y-m-d H:i:s', strtotime('-1 month'));
-            }
+            if ($searchMode === 'signin')      $searchFrom = $person->LastSignIn ?? '';
+            elseif ($searchMode === 'signout') $searchFrom = $person->LastSignOut ?? '';
+            elseif ($searchMode === 'week')    $searchFrom = date('Y-m-d H:i:s', strtotime('-1 week'));
+            elseif ($searchMode === 'month')   $searchFrom = date('Y-m-d H:i:s', strtotime('-1 month'));
 
             $this->render('app/views/user/news.latte', Params::getAll([
                 'news' => $this->news->getNewsForPerson($person, $searchFrom),

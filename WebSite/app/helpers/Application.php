@@ -10,6 +10,14 @@ use Throwable;
 class Application
 {
     public const VERSION = '0.5.0';
+    public const  EMOJI_LIST = [
+        '😀', '😄', '😁', '😅', '😂', '🤣', '😊', '😇', '🤨', 
+        '🙂', '🙃', '😉', '😌', '☹️', '😐', '🙄', '😯', '🥴', 
+        '🤩', '😍', '🥰', '😘', '😚', '🧐', '🤓', '😎', '🥸', 
+        '🫣', '🤗', '🫢', '🤭', '🤫', '🤔', '🫡', '🥱', '😴', 
+        '😋', '😛', '🤪', '🤮', '🤧', '😷', '🤒', '🤕', '🤐', 
+        '😥', '😭', '😤', '😠', '🥵', '🥶', '🤑', '🤠', '🥳', 
+    ];
 
     private static self $instance;
     private static Engine $flight;
@@ -70,11 +78,6 @@ class Application
     public function getErrorManager(): ErrorManager
     {
         return $this->errorManager;
-    }
-
-    public static function getVersion(): string
-    {
-        return self::VERSION;
     }
 
     #region Private functions

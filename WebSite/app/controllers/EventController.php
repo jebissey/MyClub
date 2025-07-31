@@ -300,7 +300,7 @@ class EventController extends BaseController
         $this->render('app/views/info.latte', [
             'content' => (new SettingsDataHelper($this->application))->get('Help_eventManager'),
             'hasAuthorization' => $this->connectedUser->get()->hasAutorization() ?? false,
-            'currentVersion' => Application::getVersion()
+            'currentVersion' => Application::VERSION
         ]);
     }
 

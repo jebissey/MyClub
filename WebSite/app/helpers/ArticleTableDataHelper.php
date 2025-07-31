@@ -45,7 +45,7 @@ class ArticleTableDataHelper extends Data
             ->leftJoin("'Group' ON 'Group'.Id = Article.IdGroup")
             ->groupBy('Article.Id');
 
-        if ($connectedUser) {
+        if ($connectedUser->person ?? false) {
             if (!$connectedUser->isEditor()) {
                 $query = $query->where('(Article.CreatedBy = ' . $connectedUser->person->Id . '
                     OR (Article.PublishedBy IS NOT NULL 

@@ -33,7 +33,7 @@ class Params
 
         self::$commonParams = [
             'href' => '/user/sign/in',
-            'userImg' => '/app/images/anonymat.png',
+            'userImg' => '🫥',
             'userEmail' => '',
             'keys' => false,
             'isEventManager' => false,
@@ -42,7 +42,7 @@ class Params
             'isEditor' => false,
             'isWebmaster' => false,
             'page' => $page,
-            'currentVersion' => Application::getVersion(),
+            'currentVersion' => Application::VERSION,
             'currentLanguage' => $lang,
             'supportedLanguages' => TranslationManager::getSupportedLanguages(),
             'flag' => TranslationManager::getFlag($lang),

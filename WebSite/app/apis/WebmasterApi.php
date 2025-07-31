@@ -23,7 +23,7 @@ class WebmasterApi extends BaseApi
 
     public function addToGroup($personId, $groupId)
     {
-        if ($this->personDataHelper->getPerson(['PersonManager', 'Webmaster'])) {
+        if (($this->connectedUser->get()->isPersonManager() ?? false) || $this->connectedUser->isWebmaster() ?? false) {
             try {
                 $this->renderJson(['success' => $this->personGroupDataHelper->add($personId, $groupId)]);
             } catch (Throwable $e) {
@@ -34,7 +34,7 @@ class WebmasterApi extends BaseApi
 
     public function getPersonsInGroup($id)
     {
-        if ($this->personDataHelper->getPerson([])) {
+        if ($this->connectedUser->get()->person ?? false) {
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 try {
                     $users = $this->personDataHelper->getPersonsInGroup($id);
@@ -49,12 +49,12 @@ class WebmasterApi extends BaseApi
     public function lastVersion()
     {
         (new LogDataHelper($this->application))->add(200, $_SERVER['HTTP_USER_AGENT']);
-        $this->renderJson(['lastVersion' => Application::getVersion()]);
+        $this->renderJson(['lastVersion' => Application::VERSION]);
     }
 
     public function removeFromGroup($personId, $groupId)
     {
-        if ($this->personDataHelper->getPerson(['PersonManager', 'Webmaster'])) {
+        if (($this->connectedUser->get()->isPersonManager() ?? false) || $this->connectedUser->isWebmaster() ?? false) {
             try {
                 $this->renderJson(['success' => $this->personGroupDataHelper->del($personId, $groupId)]);
             } catch (Throwable $e) {
@@ -66,7 +66,7 @@ class WebmasterApi extends BaseApi
     #region Navbar
     public function deleteNavbarItem($id)
     {
-        if ($this->personDataHelper->getPerson(['Webmaster'])) {
+        if ($this->connectedUser->isWebmaster() ?? false) {
             try {
                 $result = $this->pageDataHelper->del($id);
                 $this->renderJson(['success' => $result == 1]);
@@ -78,7 +78,7 @@ class WebmasterApi extends BaseApi
 
     public function getNavbarItem($id)
     {
-        if ($this->personDataHelper->getPerson(['Webmaster'])) {
+        if ($this->connectedUser->isWebmaster() ?? false) {
             try {
                 $this->renderJson(['success' => true, 'message' => $this->pageDataHelper->get_($id)]);
             } catch (Throwable $e) {
@@ -89,7 +89,7 @@ class WebmasterApi extends BaseApi
 
     public function saveNavbarItem()
     {
-        if ($this->personDataHelper->getPerson(['Webmaster'])) {
+        if ($this->connectedUser->isWebmaster() ?? false) {
             $data = json_decode(file_get_contents('php://input'), true);
 
             if (empty($data['name']) || empty($data['route'])) {
@@ -107,7 +107,7 @@ class WebmasterApi extends BaseApi
 
     public function updateNavbarPositions()
     {
-        if ($this->personDataHelper->getPerson(['Webmaster'])) {
+        if ($this->connectedUser->isWebmaster() ?? false) {
             $data = json_decode(file_get_contents('php://input'), true);
             try {
                 $this->pageDataHelper->updates($data['positions']);

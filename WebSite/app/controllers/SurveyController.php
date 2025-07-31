@@ -97,7 +97,7 @@ class SurveyController extends BaseController
                     'results' => $results,
                     'participants' => $participants,
                     'articleId' => $articleId,
-                    'currentVersion' => Application::getVersion()
+                    'currentVersion' => Application::VERSION
                 ]);
             } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
         } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);

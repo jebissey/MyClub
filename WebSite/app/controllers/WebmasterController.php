@@ -28,7 +28,7 @@ class WebmasterController extends BaseController
         $this->render('app/views/info.latte', [
             'content' => $this->settingsDataHelper->get('Help_webmaster'),
             'hasAuthorization' => $this->connectedUser->get()->isEventManager() ?? false,
-            'currentVersion' => Application::getVersion()
+            'currentVersion' => Application::VERSION
         ]);
     }
 
@@ -39,7 +39,7 @@ class WebmasterController extends BaseController
             $this->render('app/views/info.latte', Params::getAll([
                 'content' => $this->settingsDataHelper->get('Help_admin'),
                 'hasAuthorization' => $this->connectedUser->isEventManager(),
-                'currentVersion' => $this->application->getVersion()
+                'currentVersion' => Application::VERSION
             ]));
         } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
@@ -54,7 +54,7 @@ class WebmasterController extends BaseController
                 $newVersion = null;
                 $result = $this->getLastVersion();
                 if (!$result['success']) error_log("Erreur récupération version : " . $result['error']);
-                elseif ($result['version'] != $this->application->getVersion()) $newVersion = "A new version is available (V" . $result['version'] . ")";
+                elseif ($result['version'] != Application::VERSION) $newVersion = "A new version is available (V" . $result['version'] . ")";
 
                 $this->render('app/views/admin/webmaster.latte', Params::getAll(['newVersion' => $newVersion]));
             } else $this->application->getErrorManager()->raise(ApplicationError::InvalidRequestMethod, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
