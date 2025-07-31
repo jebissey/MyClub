@@ -46,7 +46,6 @@ user@myclub.foo : user1234
 - Change WebSite/app/Images/home.png with your 48x48 image.
 - Change WebSite/app/Images/logo.png with yours.
 - Change WebSite/app/Images/favicon.ico with yours.
-- You can add, change or remove emoji files. 48x48 image with name emoji...
 - You can also change the other images. Keep size and name.
 - Update records in Settings table.
 
