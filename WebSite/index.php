@@ -1,6 +1,7 @@
 <?php
 require_once 'vendor/autoload.php';
 
+use flight\Engine;
 use Tracy\Debugger;
 
 use app\apis\ArticleApi;
@@ -53,101 +54,43 @@ $flight->map('getData', function ($key) {
 
 #region web
 $articleController = new ArticleController($application);
-$flight->route('GET  /articles', function () use ($articleController) {
-    $articleController->index();
-});
-$flight->route('GET  /articles/create', function () use ($articleController) {
-    $articleController->create();
-});
-$flight->route('GET  /articles/crosstab', function () use ($articleController) {
-    $articleController->showArticleCrosstab();
-});
-$flight->route('GET  /articles/delete/@id', function ($id) use ($articleController) {
-    $articleController->delete($id);
-});
-$flight->route('GET  /articles/@id', function ($id) use ($articleController) {
-    $articleController->show($id);
-});
-$flight->route('POST /articles/@id', function ($id) use ($articleController) {
-    $articleController->update($id);
-});
-$flight->route('GET  /publish/article/@id', function ($id) use ($articleController) {
-    $articleController->publish($id);
-});
-$flight->route('POST /publish/article/@id', function ($id) use ($articleController) {
-    $articleController->publish($id);
-});
-$flight->route('GET  /redactor', function () use ($articleController) {
-    $articleController->home();
-});
+mapRoute($flight, 'GET  /articles', $articleController, 'index');
+mapRoute($flight, 'GET  /articles/create', $articleController, 'create');
+mapRoute($flight, 'GET  /articles/crosstab', $articleController, 'showArticleCrosstab');
+mapRoute($flight, 'GET  /articles/delete/@id:[0-9]+', $articleController, 'delete', 1);
+mapRoute($flight, 'GET  /articles/@id:[0-9]+', $articleController, 'show', 1);
+mapRoute($flight, 'POST /articles/@id:[0-9]+', $articleController, 'update', 1);
+mapRoute($flight, 'GET  /publish/article/@id:[0-9]+', $articleController, 'publish', 1);
+mapRoute($flight, 'POST /publish/article/@id:[0-9]+', $articleController, 'publish', 1);
+mapRoute($flight, 'GET  /redactor', $articleController, 'home');
 
 $dbBrowserController = new DbBrowserController($application);
-$flight->route('GET  /dbbrowser', function () use ($dbBrowserController) {
-    $dbBrowserController->index();
-});
-$flight->route('GET  /dbbrowser/@table', function ($table) use ($dbBrowserController) {
-    $dbBrowserController->showTable($table);
-});
-$flight->route('GET  /dbbrowser/@table/create', function ($table) use ($dbBrowserController) {
-    $dbBrowserController->showCreateForm($table);
-});
-$flight->route('POST /dbbrowser/@table/create', function ($table) use ($dbBrowserController) {
-    $dbBrowserController->createRecord($table);
-});
-$flight->route('GET  /dbbrowser/@table/edit/@id', function ($table, $id) use ($dbBrowserController) {
-    $dbBrowserController->showEditForm($table, $id);
-});
-$flight->route('POST /dbbrowser/@table/edit/@id', function ($table, $id) use ($dbBrowserController) {
-    $dbBrowserController->updateRecord($table, $id);
-});
-$flight->route('POST /dbbrowser/@table/delete/@id', function ($table, $id) use ($dbBrowserController) {
-    $dbBrowserController->deleteRecord($table, $id);
-});
+mapRoute($flight, 'GET  /dbbrowser', $dbBrowserController, 'index');
+mapRoute($flight, 'GET  /dbbrowser/@table', $dbBrowserController, 'showTable', 1);
+mapRoute($flight, 'GET  /dbbrowser/@table/create', $dbBrowserController, 'showCreateForm', 1);
+mapRoute($flight, 'POST /dbbrowser/@table/create', $dbBrowserController, 'createRecord', 1);
+mapRoute($flight, 'GET  /dbbrowser/@table/edit/@id:[0-9]+', $dbBrowserController, 'showEditForm', 2);
+mapRoute($flight, 'POST /dbbrowser/@table/edit/@id:[0-9]+', $dbBrowserController, 'updateRecord', 2);
+mapRoute($flight, 'POST /dbbrowser/@table/delete/@id:[0-9]+', $dbBrowserController, 'deleteRecord', 2);
 
 $designController = new DesignController($application);
-$flight->route('GET  /designs', function () use ($designController) {
-    $designController->index();
-});
-$flight->route('GET  /designs/create', function () use ($designController) {
-    $designController->create();
-});
-$flight->route('POST /designs/save', function () use ($designController) {
-    $designController->save();
-});
+mapRoute($flight, 'GET  /designs', $designController, 'index');
+mapRoute($flight, 'GET  /designs/create', $designController, 'create');
+mapRoute($flight, 'POST /designs/save', $designController, 'save');
 
 $emailController = new EmailController($application);
-$flight->route('GET  /emails', function () use ($emailController) {
-    $emailController->fetchEmails();
-});
-$flight->route('POST /emails', function () use ($emailController) {
-    $emailController->fetchEmails();
-});
-$flight->route('GET  /emails/article/@id', function ($id) use ($emailController) {
-    $emailController->fetchEmailsForArticle($id);
-});
+mapRoute($flight, 'GET  /emails', $emailController, 'fetchEmails');
+mapRoute($flight, 'POST /emails', $emailController, 'fetchEmails');
+mapRoute($flight, 'GET  /emails/article/@id:[0-9]+', $emailController, 'fetchEmailsForArticle', 1);
 
 $eventController = new EventController($application);
-$flight->route('GET  /eventManager', function () use ($eventController) {
-    $eventController->home();
-});
-$flight->route('GET  /eventManager/help', function () use ($eventController) {
-    $eventController->help();
-});
-$flight->route('GET  /nextEvents', function () use ($eventController) {
-    $eventController->nextEvents();
-});
-$flight->route('GET  /events/crosstab', function () use ($eventController) {
-    $eventController->showEventCrosstab();
-});
-$flight->route('GET  /events/guest', function () use ($eventController) {
-    $eventController->guest();
-});
-$flight->route('POST /events/guest', function () use ($eventController) {
-    $eventController->guestInvite();
-});
-$flight->route('GET  /events/@id', function ($id) use ($eventController) {
-    $eventController->show($id);
-});
+mapRoute($flight, 'GET  /eventManager', $eventController, 'home');
+mapRoute($flight, 'GET  /eventManager/help', $eventController, 'help');
+mapRoute($flight, 'GET  /nextEvents', $eventController, 'nextEvents');
+mapRoute($flight, 'GET  /events/crosstab', $eventController, 'showEventCrosstab');
+mapRoute($flight, 'GET  /events/guest', $eventController, 'guest');
+mapRoute($flight, 'POST /events/guest', $eventController, 'guestInvite');
+mapRoute($flight, 'GET  /events/@id:[0-9]+', $eventController, 'show', 1);
 $flight->route('GET  /events/@id/register', function ($id) use ($eventController) {
     $eventController->register($id, true);
 });
@@ -157,402 +100,163 @@ $flight->route('GET  /events/@id/unregister', function ($id) use ($eventControll
 $flight->route('GET  /events/@id/@token', function ($id, $token) use ($eventController) {
     $eventController->register($id, true, $token);
 });
-$flight->route('GET  /event/location', function () use ($eventController) {
-    $eventController->location();
-});
-$flight->route('GET  /needs', function () use ($eventController) {
-    $eventController->needs();
-});
-$flight->route('GET  /event/chat/@id', function ($id) use ($eventController) {
-    $eventController->showEventChat($id);
-});
-$flight->route('GET  /weekEvents', function () use ($eventController) {
-    $eventController->weekEvents();
-});
+mapRoute($flight, 'GET  /event/location', $eventController, 'location');
+mapRoute($flight, 'GET  /needs', $eventController, 'needs');
+mapRoute($flight, 'GET  /event/chat/@id:[0-9]+', $eventController, 'showEventChat', 1);
+mapRoute($flight, 'GET  /weekEvents', $eventController, 'weekEvents');
 
 $eventTypeController = new EventTypeController($application);
-$flight->route('GET  /eventTypes', function () use ($eventTypeController) {
-    $eventTypeController->index();
-});
-$flight->route('GET  /eventTypes/create', function () use ($eventTypeController) {
-    $eventTypeController->create();
-});
-$flight->route('GET  /eventTypes/edit/@id', function ($id) use ($eventTypeController) {
-    $eventTypeController->edit($id);
-});
-$flight->route('POST /eventTypes/edit/@id', function ($id) use ($eventTypeController) {
-    $eventTypeController->edit($id);
-});
-$flight->route('GET  /eventTypes/delete/@id', function ($id) use ($eventTypeController) {
-    $eventTypeController->delete($id);
-});
+mapRoute($flight, 'GET  /eventTypes', $eventTypeController, 'index');
+mapRoute($flight, 'GET  /eventTypes/create', $eventTypeController, 'create');
+mapRoute($flight, 'GET  /eventTypes/edit/@id:[0-9]+', $eventTypeController, 'edit', 1);
+mapRoute($flight, 'POST /eventTypes/edit/@id:[0-9]+', $eventTypeController, 'edit', 1);
+mapRoute($flight, 'GET  /eventTypes/delete/@id:[0-9]+', $eventTypeController, 'delete', 1);
 
 $ffaController = new FFAController($application);
-$flight->route('GET /ffa/search', function () use ($ffaController) {
-    $ffaController->searchMember();
-});
+mapRoute($flight, 'GET /ffa/search', $ffaController, 'searchMember');
 
 $groupController = new GroupController($application);
-$flight->route('GET  /groups', function () use ($groupController) {
-    $groupController->index();
-});
-$flight->route('GET  /groups/create', function () use ($groupController) {
-    $groupController->create();
-});
-$flight->route('POST /groups/create', function () use ($groupController) {
-    $groupController->create();
-});
-$flight->route('GET  /groups/edit/@id', function ($id) use ($groupController) {
-    $groupController->edit($id);
-});
-$flight->route('POST /groups/edit/@id', function ($id) use ($groupController) {
-    $groupController->edit($id);
-});
-$flight->route('POST /groups/delete/@id', function ($id) use ($groupController) {
-    $groupController->delete($id);
-});
+mapRoute($flight, 'GET  /groups', $groupController, 'index');
+mapRoute($flight, 'GET  /groups/create', $groupController, 'create');
+mapRoute($flight, 'POST /groups/create', $groupController, 'create');
+mapRoute($flight, 'GET  /groups/edit/@id:[0-9]+', $groupController, 'edit', 1);
+mapRoute($flight, 'POST /groups/edit/@id:[0-9]+', $groupController, 'edit', 1);
+mapRoute($flight, 'POST /groups/delete/@id:[0-9]+', $groupController, 'delete', 1);
 
 $importController = new ImportController($application);
-$flight->route('GET  /import', function () use ($importController) {
-    $importController->showImportForm();
-});
-$flight->route('POST /import', function () use ($importController) {
-    $importController->processImport();
-});
+mapRoute($flight, 'GET  /import', $importController, 'showImportForm');
+mapRoute($flight, 'POST /import', $importController, 'processImport');
 
 $logController = new LogController($application);
-$flight->route('GET /logs', function () use ($logController) {
-    $logController->index();
-});
-$flight->route('GET /referers', function () use ($logController) {
-    $logController->referers();
-});
-$flight->route('GET /visitors/graf', function () use ($logController) {
-    $logController->visitorsGraf();
-});
-$flight->route('GET /analytics', function () use ($logController) {
-    $logController->analytics();
-});
-$flight->route('GET /topPages', function () use ($logController) {
-    $logController->topPagesByPeriod();
-});
-$flight->route('GET /topArticles', function () use ($logController) {
-    $logController->topArticlesByPeriod();
-});
-$flight->route('GET /crossTab', function () use ($logController) {
-    $logController->crossTab();
-});
-$flight->route('GET /lastVisits', function () use ($logController) {
-    $logController->showLastVisits();
-});
+mapRoute($flight, 'GET /logs', $logController, 'index');
+mapRoute($flight, 'GET /referents', $logController, 'referents');
+mapRoute($flight, 'GET /visitors/graf', $logController, 'visitorsGraf');
+mapRoute($flight, 'GET /analytics', $logController, 'analytics');
+mapRoute($flight, 'GET /topPages', $logController, 'topPagesByPeriod');
+mapRoute($flight, 'GET /topArticles', $logController, 'topArticlesByPeriod');
+mapRoute($flight, 'GET /crossTab', $logController, 'crossTab');
+mapRoute($flight, 'GET /lastVisits', $logController, 'showLastVisits');
 
 $mediaController = new MediaController($application);
-$flight->route('GET /data/media/@year/@month/@filename', function ($year, $month, $filename) use ($mediaController) {
-    $mediaController->viewFile($year, $month, $filename);
-});
-$flight->route('GET /media/upload', function () use ($mediaController) {
-    $mediaController->showUploadForm();
-});
-$flight->route('GET /media/list', function () use ($mediaController) {
-    $mediaController->listFiles();
-});
-$flight->route('GET /media/gpxViewer', function () use ($mediaController) {
-    $mediaController->gpxViewer();
-});
+mapRoute($flight, 'GET /data/media/@year/@month/@filename', $mediaController, 'viewFile', 3);
+mapRoute($flight, 'GET /media/upload', $mediaController, 'showUploadForm');
+mapRoute($flight, 'GET /media/list', $mediaController, 'listFiles');
+mapRoute($flight, 'GET /media/gpxViewer', $mediaController, 'gpxViewer');
 
 $navBarController = new NavBarController($application);
-$flight->route('GET  /navBar', function () use ($navBarController) {
-    $navBarController->index();
-});
-$flight->route('GET  /navBar/show/article/@id', function ($id) use ($navBarController) {
-    $navBarController->showArticle($id);
-});
-$flight->route('GET  /navBar/show/arwards', function () use ($navBarController) {
-    $navBarController->showArwards();
-});
+mapRoute($flight, 'GET  /navBar', $navBarController, 'index');
+mapRoute($flight, 'GET  /navBar/show/article/@id:[0-9]+', $navBarController, 'showArticle', 1);
+mapRoute($flight, 'GET  /navBar/show/arwards', $navBarController, 'showArwards');
 
 $personController = new PersonController($application);
-$flight->route('GET  /directory', function () use ($personController) {
-    $personController->showDirectory();
-});
-$flight->route('GET  /members/map', function () use ($personController) {
-    $personController->showMap();
-});
-$flight->route('GET  /personManager', function () use ($personController) {
-    $personController->home();
-});
-$flight->route('GET  /personManager/help', function () use ($personController) {
-    $personController->help();
-});
-$flight->route('GET  /persons', function () use ($personController) {
-    $personController->index();
-});
-$flight->route('GET  /persons/create', function () use ($personController) {
-    $personController->create();
-});
-$flight->route('GET  /persons/edit/@id', function ($id) use ($personController) {
-    $personController->edit($id);
-});
-$flight->route('POST /persons/edit/@id', function ($id) use ($personController) {
-    $personController->edit($id);
-});
-$flight->route('GET  /persons/delete/@id', function ($id) use ($personController) {
-    $personController->delete($id);
-});
-$flight->route('GET  /presentation/edit', function () use ($personController) {
-    $personController->editPresentation();
-});
-$flight->route('POST /presentation/edit', function () use ($personController) {
-    $personController->savePresentation();
-});
-$flight->route('GET  /presentation/@id', function ($id) use ($personController) {
-    $personController->showPresentation($id);
-});
+mapRoute($flight, 'GET  /directory', $personController, 'showDirectory');
+mapRoute($flight, 'GET  /members/map', $personController, 'showMap');
+mapRoute($flight, 'GET  /personManager', $personController, 'home');
+mapRoute($flight, 'GET  /personManager/help', $personController, 'help');
+mapRoute($flight, 'GET  /persons', $personController, 'index');
+mapRoute($flight, 'GET  /persons/create', $personController, 'create');
+mapRoute($flight, 'GET  /persons/edit/@id:[0-9]+', $personController, 'edit', 1);
+mapRoute($flight, 'POST /persons/edit/@id:[0-9]+', $personController, 'edit', 1);
+mapRoute($flight, 'GET  /persons/delete/@id:[0-9]+', $personController, 'delete', 1);
+mapRoute($flight, 'GET  /presentation/edit', $personController, 'editPresentation');
+mapRoute($flight, 'POST /presentation/edit', $personController, 'savePresentation');
+mapRoute($flight, 'GET  /presentation/@id:[0-9]+', $personController, 'showPresentation', 1);
 
 $registrationController = new RegistrationController($application);
-$flight->route('GET  /registration', function () use ($registrationController) {
-    $registrationController->index();
-});
-$flight->route('GET  /registration/groups/@id', function ($id) use ($registrationController) {
-    $registrationController->getPersonGroups($id);
-});
+mapRoute($flight, 'GET  /registration', $registrationController, 'index');
+mapRoute($flight, 'GET  /registration/groups/@id:[0-9]+', $registrationController, 'getPersonGroups', 1);
 
 $surveyController = new SurveyController($application);
-$flight->route('GET  /surveys/add/@id', function ($id) use ($surveyController) {
-    $surveyController->add($id);
-});
-$flight->route('POST /surveys/create', function () use ($surveyController) {
-    $surveyController->createOrUpdate();
-});
-$flight->route('GET  /surveys/results/@id', function ($id) use ($surveyController) {
-    $surveyController->viewResults($id);
-});
+mapRoute($flight, 'GET  /surveys/add/@id', $surveyController, 'add', 1);
+mapRoute($flight, 'POST /surveys/create', $surveyController, 'createOrUpdate');
+mapRoute($flight, 'GET  /surveys/results/@id:[0-9]+', $surveyController, 'viewResults', 1);
 
 $userController = new UserController($application);
-$flight->route('/help',         function () use ($userController) {
-    $userController->helpHome();
-});
-$flight->route('GET  /', function () use ($userController) {
-    $userController->home();
-});
-$flight->route('/legal/notice', function () use ($userController) {
-    $userController->legalNotice();
-});
-$flight->route('GET  /user', function () use ($userController) {
-    $userController->user();
-});
-$flight->route('GET  /user/account', function () use ($userController) {
-    $userController->account();
-});
-$flight->route('POST /user/account', function () use ($userController) {
-    $userController->account();
-});
-$flight->route('GET  /user/availabilities', function () use ($userController) {
-    $userController->availabilities();
-});
-$flight->route('POST /user/availabilities', function () use ($userController) {
-    $userController->availabilities();
-});
-$flight->route('GET  /user/forgotPassword/@encodedEmail', function ($encodedEmail) use ($userController) {
-    $userController->forgotPassword($encodedEmail);
-});
-$flight->route('GET  /user/groups', function () use ($userController) {
-    $userController->groups();
-});
-$flight->route('POST /user/groups', function () use ($userController) {
-    $userController->groups();
-});
-$flight->route('GET  /user/help', function () use ($userController) {
-    $userController->help();
-});
-$flight->route('GET  /user/news', function () use ($userController) {
-    $userController->showNews();
-});
-$flight->route('GET  /user/preferences', function () use ($userController) {
-    $userController->preferences();
-});
-$flight->route('POST /user/preferences', function () use ($userController) {
-    $userController->preferences();
-});
-$flight->route('GET  /user/setPassword/@token', function ($token) use ($userController) {
-    $userController->setPassword($token);
-});
-$flight->route('POST /user/setPassword/@token', function ($token) use ($userController) {
-    $userController->setPassword($token);
-});
-$flight->route('GET  /user/sign/in', function () use ($userController) {
-    $userController->signIn();
-});
-$flight->route('POST /user/sign/in', function () use ($userController) {
-    $userController->signIn();
-});
-$flight->route('GET  /user/sign/out', function () use ($userController) {
-    $userController->signOut();
-});
-$flight->route('GET  /user/statistics', function () use ($userController) {
-    $userController->showStatistics();
-});
-$flight->route('GET  /contact', function () use ($userController) {
-    $userController->contact();
-});
-$flight->route('POST /contact', function () use ($userController) {
-    $userController->contact();
-});
-$flight->route('GET  /contact/event/@id', function ($id) use ($userController) {
-    $userController->contact($id);
-});
+mapRoute($flight, 'GET  /help', $userController, 'helpHome');
+mapRoute($flight, 'GET  /', $userController, 'home');
+mapRoute($flight, 'GET  /legal/notice', $userController, 'legalNotice');
+mapRoute($flight, 'GET  /user', $userController, 'user');
+mapRoute($flight, 'GET  /user/account', $userController, 'account');
+mapRoute($flight, 'POST /user/account', $userController, 'account');
+mapRoute($flight, 'GET  /user/availabilities', $userController, 'availabilities');
+mapRoute($flight, 'POST /user/availabilities', $userController, 'availabilities');
+mapRoute($flight, 'GET  /user/forgotPassword/@encodedEmail', $userController, 'forgotPassword', 1);
+mapRoute($flight, 'GET  /user/groups', $userController, 'groups');
+mapRoute($flight, 'POST /user/groups', $userController, 'groups');
+mapRoute($flight, 'GET  /user/help', $userController, 'help');
+mapRoute($flight, 'GET  /user/news', $userController, 'showNews');
+mapRoute($flight, 'GET  /user/preferences', $userController, 'preferences');
+mapRoute($flight, 'POST /user/preferences', $userController, 'preferences');
+mapRoute($flight, 'GET  /user/setPassword/@token', $userController, 'setPassword', 1);
+mapRoute($flight, 'POST /user/setPassword/@token', $userController, 'setPassword', 1);
+mapRoute($flight, 'GET  /user/sign/in', $userController, 'signIn');
+mapRoute($flight, 'POST /user/sign/in', $userController, 'signIn');
+mapRoute($flight, 'GET  /user/sign/out', $userController, 'signOut');
+mapRoute($flight, 'GET  /user/statistics', $userController, 'showStatistics');
+mapRoute($flight, 'GET  /contact', $userController, 'contact');
+mapRoute($flight, 'POST /contact', $userController, 'contact');
+mapRoute($flight, 'GET  /contact/event/@id:[0-9]+', $userController, 'contactEvent', 1);
 
 $webmasterController = new WebmasterController($application);
-$flight->route('GET  /admin', function () use ($webmasterController) {
-    $webmasterController->homeAdmin();
-});
-$flight->route('GET  /admin/help', function () use ($webmasterController) {
-    $webmasterController->helpAdmin();
-});
-$flight->route('GET  /admin/webmaster/help', function () use ($webmasterController) {
-    $webmasterController->helpWebmaster();
-});
-$flight->route('GET  /arwards', function () use ($webmasterController) {
-    $webmasterController->arwards();
-});
-$flight->route('POST /arwards', function () use ($webmasterController) {
-    $webmasterController->arwards();
-});
-$flight->route('GET  /rss.xml', function () use ($webmasterController) {
-    $webmasterController->rssGenerator();
-});
-$flight->route('GET  /sitemap.xml', function () use ($webmasterController) {
-    $webmasterController->sitemapGenerator();
-});
-$flight->route('GET  /webmaster', function () use ($webmasterController) {
-    $webmasterController->homeWebmaster();
-});
+mapRoute($flight, 'GET  /admin', $webmasterController, 'homeAdmin');
+mapRoute($flight, 'GET  /admin/help', $webmasterController, 'helpAdmin');
+mapRoute($flight, 'GET  /admin/webmaster/help', $webmasterController, 'helpWebmaster');
+mapRoute($flight, 'GET  /arwards', $webmasterController, 'arwards');
+mapRoute($flight, 'POST /arwards', $webmasterController, 'arwards');
+mapRoute($flight, 'GET  /rss.xml', $webmasterController, 'rssGenerator');
+mapRoute($flight, 'GET  /sitemap.xml', $webmasterController, 'sitemapGenerator');
+mapRoute($flight, 'GET  /webmaster', $webmasterController, 'homeWebmaster');
 #endregion
 
 #region api
 $articleApi = new ArticleApi($application);
-$flight->route('GET  /api/author/@articleId', function ($articleId) use ($articleApi) {
-    $articleApi->getAuthor($articleId);
-});
-$flight->route('POST /api/designs/vote', function () use ($articleApi) {
-    $articleApi->designVote();
-});
-$flight->route('POST /api/media/delete/@year/@month/@filename', function ($year, $month, $filename) use ($articleApi) {
-    $articleApi->deleteFile($year, $month, $filename);
-});
-$flight->route('POST /api/media/upload', function () use ($articleApi) {
-    $articleApi->uploadFile();
-});
-$flight->route('POST /api/surveys/reply', function () use ($articleApi) {
-    $articleApi->saveSurveyReply();
-});
-$flight->route('GET  /api/surveys/reply/@id', function ($id) use ($articleApi) {
-    $articleApi->showSurveyReplyForm($id);
-});
+mapRoute($flight, 'GET  /api/author/@articleId', $articleApi, 'getAuthor', 1);
+mapRoute($flight, 'POST /api/designs/vote', $articleApi, 'designVote');
+mapRoute($flight, 'POST /api/media/delete/@year/@month/@filename', $articleApi, 'deleteFile', 3);
+mapRoute($flight, 'POST /api/media/upload', $articleApi, 'uploadFile');
+mapRoute($flight, 'POST /api/surveys/reply', $articleApi, 'saveSurveyReply');
+mapRoute($flight, 'GET  /api/surveys/reply/@id', $articleApi, 'showSurveyReplyForm', 1);
 
 $carouselApi = new carouselApi($application);
-$flight->route('GET  /api/carousel/@articleId', function ($articleId) use ($carouselApi) {
-    $carouselApi->getItems($articleId);
-});
-$flight->route('POST /api/carousel/save', function () use ($carouselApi) {
-    $carouselApi->saveItem();
-});
-$flight->route('POST /api/carousel/delete/@id', function ($id) use ($carouselApi) {
-    $carouselApi->deleteItem($id);
-});
+mapRoute($flight, 'GET  /api/carousel/@articleId', $carouselApi, 'getItems', 1);
+mapRoute($flight, 'POST /api/carousel/save', $carouselApi, 'saveItem');
+mapRoute($flight, 'POST /api/carousel/delete/@id', $carouselApi, 'deleteItem', 1);
 
+// Event API
 $eventApi = new EventApi($application);
-$flight->route('POST   /api/attributes/create', function () use ($eventApi) {
-    $eventApi->createAttribute();
-});
-$flight->route('DELETE /api/attributes/delete/@id', function ($id) use ($eventApi) {
-    $eventApi->deleteAttribute($id);
-});
-$flight->route('GET    /api/attributes/list', function () use ($eventApi) {
-    $eventApi->getAttributes();
-});
-$flight->route('POST   /api/attributes/update', function () use ($eventApi) {
-    $eventApi->updateAttribute();
-});
-$flight->route('GET    /api/attributes-by-event-type/@id', function ($id) use ($eventApi) {
-    $eventApi->getAttributesByEventType($id);
-});
-$flight->route('DELETE /api/event/delete/@id', function ($id) use ($eventApi) {
-    $eventApi->deleteEvent($id);
-});
-$flight->route('POST   /api/event/duplicate/@id', function ($id) use ($eventApi) {
-    $eventApi->duplicateEvent($id);
-});
-$flight->route('POST   /api/event/save', function () use ($eventApi) {
-    $eventApi->saveEvent();
-});
-$flight->route('POST   /api/event/sendEmails', function () use ($eventApi) {
-    $eventApi->sendEmails();
-});
-$flight->route('GET    /api/event/@id', function ($id) use ($eventApi) {
-    $eventApi->getEvent($id);
-});
-$flight->route('GET    /api/event-needs/@id', function ($id) use ($eventApi) {
-    $eventApi->getEventNeeds($id);
-});
-$flight->route('POST   /api/event/updateSupply', function () use ($eventApi) {
-    $eventApi->updateSupply();
-});
-$flight->route('DELETE /api/needs/delete/@id', function ($id) use ($eventApi) {
-    $eventApi->deleteNeed($id);
-});
-$flight->route('POST   /api/needs/save', function () use ($eventApi) {
-    $eventApi->saveNeed();
-});
-$flight->route('DELETE /api/needs/type/delete/@id', function ($id) use ($eventApi) {
-    $eventApi->deleteNeedType($id);
-});
-$flight->route('POST   /api/needs/type/save', function () use ($eventApi) {
-    $eventApi->saveNeedType();
-});
-$flight->route('GET    /api/needs-by-need-type/@id', function ($id) use ($eventApi) {
-    $eventApi->getNeedsByNeedType($id);
-});
-$flight->route('POST /api/message/add', function () use ($eventApi) {
-    $eventApi->addMessage();
-});
-$flight->route('POST /api/message/update', function () use ($eventApi) {
-    $eventApi->updateMessage();
-});
-$flight->route('POST /api/message/delete', function () use ($eventApi) {
-    $eventApi->deleteMessage();
-});
+mapRoute($flight, 'POST   /api/attributes/create', $eventApi, 'createAttribute');
+mapRoute($flight, 'DELETE /api/attributes/delete/@id:[0-9]+', $eventApi, 'deleteAttribute', 1);
+mapRoute($flight, 'GET    /api/attributes/list', $eventApi, 'getAttributes');
+mapRoute($flight, 'POST   /api/attributes/update', $eventApi, 'updateAttribute');
+mapRoute($flight, 'GET    /api/attributes-by-event-type/@id:[0-9]+', $eventApi, 'getAttributesByEventType', 1);
+mapRoute($flight, 'DELETE /api/event/delete/@id:[0-9]+', $eventApi, 'deleteEvent', 1);
+mapRoute($flight, 'POST   /api/event/duplicate/@id:[0-9]+', $eventApi, 'duplicateEvent', 1);
+mapRoute($flight, 'POST   /api/event/save', $eventApi, 'saveEvent');
+mapRoute($flight, 'POST   /api/event/sendEmails', $eventApi, 'sendEmails');
+mapRoute($flight, 'GET    /api/event/@id:[0-9]+', $eventApi, 'getEvent', 1);
+mapRoute($flight, 'GET    /api/event-needs/@id:[0-9]+', $eventApi, 'getEventNeeds', 1);
+mapRoute($flight, 'POST   /api/event/updateSupply', $eventApi, 'updateSupply');
+mapRoute($flight, 'DELETE /api/needs/delete/@id:[0-9]+', $eventApi, 'deleteNeed', 1);
+mapRoute($flight, 'POST   /api/needs/save', $eventApi, 'saveNeed');
+mapRoute($flight, 'DELETE /api/needs/type/delete/@id:[0-9]+', $eventApi, 'deleteNeedType', 1);
+mapRoute($flight, 'POST   /api/needs/type/save', $eventApi, 'saveNeedType');
+mapRoute($flight, 'GET    /api/needs-by-need-type/@id:[0-9]+', $eventApi, 'getNeedsByNeedType', 1);
+mapRoute($flight, 'POST /api/message/add', $eventApi, 'addMessage');
+mapRoute($flight, 'POST /api/message/update', $eventApi, 'updateMessage');
+mapRoute($flight, 'POST /api/message/delete', $eventApi, 'deleteMessage');
 
 $importApi = new ImportApi($application);
-$flight->route('POST /import/headers', function () use ($importApi) {
-    $importApi->getHeadersFromCSV();
-});
+mapRoute($flight, 'POST /import/headers', $importApi, 'getHeadersFromCSV');
 
 $webmasterApi = new WebmasterApi($application);
-$flight->route('GET    /api/lastVersion', function () use ($webmasterApi) {
-    $webmasterApi->lastVersion();
-});
-$flight->route('DELETE /api/navBar/deleteItem/@id', function ($id) use ($webmasterApi) {
-    $webmasterApi->deleteNavbarItem($id);
-});
-$flight->route('GET    /api/navBar/getItem/@id', function ($id) use ($webmasterApi) {
-    $webmasterApi->getNavbarItem($id);
-});
-$flight->route('POST   /api/navBar/saveItem', function ()  use ($webmasterApi) {
-    $webmasterApi->saveNavbarItem();
-});
-$flight->route('POST   /api/navBar/updatePositions', function () use ($webmasterApi) {
-    $webmasterApi->updateNavbarPositions();
-});
-$flight->route('GET    /api/personsInGroup/@id', function ($id) use ($webmasterApi) {
-    $webmasterApi->getPersonsInGroup($id);
-});
-$flight->route('POST   /api/registration/add/@personId/@groupId', function ($personId, $groupId) use ($webmasterApi) {
-    $webmasterApi->addToGroup($personId, $groupId);
-});
-$flight->route('POST   /api/registration/remove/@personId/@groupId', function ($personId, $groupId) use ($webmasterApi) {
-    $webmasterApi->removeFromGroup($personId, $groupId);
-});
+mapRoute($flight, 'GET    /api/lastVersion', $webmasterApi, 'lastVersion');
+mapRoute($flight, 'DELETE /api/navBar/deleteItem/@id:[0-9]+', $webmasterApi, 'deleteNavbarItem', 1);
+mapRoute($flight, 'GET    /api/navBar/getItem/@id:[0-9]+', $webmasterApi, 'getNavbarItem', 1);
+mapRoute($flight, 'POST   /api/navBar/saveItem', $webmasterApi, 'saveNavbarItem');
+mapRoute($flight, 'POST   /api/navBar/updatePositions', $webmasterApi, 'updateNavbarPositions');
+mapRoute($flight, 'GET    /api/personsInGroup/@id:[0-9]+', $webmasterApi, 'getPersonsInGroup', 1);
+mapRoute($flight, 'POST   /api/registration/add/@personId:[0-9]+/@groupId:[0-9]+', $webmasterApi, 'addToGroup', 2);
+mapRoute($flight, 'POST   /api/registration/remove/@personId:[0-9]+/@groupId:[0-9]+', $webmasterApi, 'removeFromGroup', 2);
 #endregion
 
 $flight->route('/phpInfo', function () {
@@ -612,4 +316,15 @@ function serveFile($application, $filename, $ContentType = "'Content-Type', 'ima
         readfile($path);
     } else $application->getErrorManager()->raise(ApplicationError::PageNotFound, "File $filename not found in file " . __FILE__ . ' at line ' . __LINE__);
     exit;
+}
+
+function mapRoute(Engine $flight, string $methodPath, object $controller, string $methodName, int $paramCount = 0): void {
+    $flight->route($methodPath, match ($paramCount) {
+        0 => fn()                  => $controller->$methodName(),
+        1 => fn($a)                => $controller->$methodName($a),
+        2 => fn($a, $b)            => $controller->$methodName($a, $b),
+        3 => fn($a, $b, $c)        => $controller->$methodName($a, $b, $c),
+        4 => fn($a, $b, $c, $d)    => $controller->$methodName($a, $b, $c, $d),
+        default => fn(...$args)    => $controller->$methodName(...$args),
+    });
 }

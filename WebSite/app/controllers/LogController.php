@@ -36,7 +36,7 @@ class LogController extends BaseController
         } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
-    public function referers()
+    public function referents()
     {
         if ($this->connectedUser->get()->isWebmaster() ?? false) {
             $currentParams = $_GET;
@@ -44,12 +44,13 @@ class LogController extends BaseController
             $currentDate = $currentParams['date'] ?? date('Y-m-d');
             if (!strtotime($currentDate)) $currentDate = date('Y-m-d');
 
-            $this->render('app/views/logs/referer.latte', Params::getAll([
+            $this->render('app/views/logs/referent.latte', Params::getAll([
                 'period' => $period,
                 'currentDate' => $currentDate,
-                'nav' => $this->logDataHelper->getRefererNavigation($period, $currentDate),
-                'externalRefs' => $this->logDataHelper->getExternalRefererStats($period, $currentDate),
+                'nav' => $this->logDataHelper->getReferentNavigation($period, $currentDate),
+                'externalRefs' => $this->logDataHelper->getExternalReferentStats($period, $currentDate),
                 'control' => new Webapp($this->application),
+                'rows' =>$this->logDataHelper->getReferentStats($period, $currentDate),
             ]));
         } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }

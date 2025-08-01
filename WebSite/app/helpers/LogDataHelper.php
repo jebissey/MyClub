@@ -443,7 +443,7 @@ class LogDataHelper extends Data
     }
 
 
-    public function getRefererNavigation(string $period, string $currentDate): array
+    public function getReferentNavigation(string $period, string $currentDate): array
     {
         $date = new DateTime($currentDate);
         $prev = clone $date;
@@ -480,7 +480,7 @@ class LogDataHelper extends Data
         ];
     }
 
-    public function getRefererStats(string $period, string $currentDate): array
+    public function getReferentStats(string $period, string $currentDate): array
     {
         $date = new DateTime($currentDate);
         $startDate = clone $date;
@@ -536,7 +536,7 @@ class LogDataHelper extends Data
         return $query->fetchAll();
     }
 
-    public function getExternalRefererStats(string $period, string $currentDate): array
+    public function getExternalReferentStats(string $period, string $currentDate): array
     {
         $date = new DateTime($currentDate);
         $startDate = clone $date;

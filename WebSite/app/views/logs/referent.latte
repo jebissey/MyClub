@@ -2,7 +2,7 @@
 
 {block content}
     <div class="container-fluid">
-        <h2>Referers</h2>
+        <h2>Referents</h2>
         
         <div class="row mb-4">
             <div class="col">
@@ -37,7 +37,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                    {foreach $control->getRefererStats($period, $currentDate) as $row}
+                    {foreach $rows as $row}
                         <tr>
                             <td>{$row->source ?? ''}</td>
                             <td class="text-end">{number_format($row->count, 0, ',', ' ')}</td>
