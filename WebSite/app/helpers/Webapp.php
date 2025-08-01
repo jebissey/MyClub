@@ -2,6 +2,8 @@
 
 namespace app\helpers;
 
+use RuntimeException;
+
 class Webapp
 {
     public function buildUrl($newParams)
@@ -29,7 +31,7 @@ class Webapp
         else if ($navbar == 'redactor') return '../admin/redactor.latte';
         else if ($navbar == '') return '../home.latte';
 
-        die('Fatal error in file ' . __FILE__ . ' at line ' . __LINE__ . " with navbar=" . $navbar);
+        throw new RuntimeException('Fatal error in file ' . __FILE__ . ' at line ' . __LINE__ . " with navbar=" . $navbar);
     }
 
     static public function sanitizeHtml($html)

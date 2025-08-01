@@ -5,6 +5,7 @@ namespace app\helpers;
 use DateInterval;
 use DateTime;
 use PDO;
+use RuntimeException;
 use Throwable;
 
 use app\enums\EventAudience;
@@ -166,7 +167,7 @@ class EventDataHelper extends Data implements NewsProviderInterface
     {
         if ($mode === 'next') return $this->getNextEvents($person, $filterByPreferences);
         elseif ($mode === 'past') return $this->getPassedEvents($person, $offset);
-        else die("Invalide mode ($mode)");
+        else throw new RuntimeException("Invalide mode ($mode)");
     }
 
     public function getNextWeekEvents(): array

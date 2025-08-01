@@ -2,6 +2,8 @@
 
 namespace app\controllers;
 
+use \Envms\FluentPDO\Queries\Select;
+
 use app\helpers\Application;
 use app\helpers\Generic;
 
@@ -14,7 +16,7 @@ abstract class TableController extends BaseController
         parent::__construct($application);
     }
 
-    protected function prepareTableData($query, $filters = [], $page = 1): array
+    protected function prepareTableData(Select $query, $filters = [], $page = 1): array
     {
         foreach ($filters as $key => $value) {
             if (!empty($value)) {
@@ -23,17 +25,22 @@ abstract class TableController extends BaseController
             }
         }
 
-        //var_dump($filters);
-        //var_dump($query->getQuery());
-        //die();
-
         $totalItems = (new Generic($this->application))->countOf($query->getQuery());
         $totalPages = ceil($totalItems / $this->itemsPerPage);
         $currentPage = max(1, min($page, $totalPages));
         $query = $query->limit($this->itemsPerPage)->offset(($currentPage - 1) * $this->itemsPerPage);
 
+        //var_dump($filters);
+        //var_dump($query->getQuery());
+        //var_dump($values);
+        //die();
+
+        $stmt = $this->application->getPdo()->prepare($query->getQuery());
+        $stmt->execute($values);
+        $items = $stmt->fetchAll();
+
         return [
-            'items' => isset($values) ? $query->fetchAll($values) : $query->fetchAll(),
+            'items' => $items,
             'currentPage' => $currentPage,
             'totalPages' => $totalPages,
             'filters' => $filters

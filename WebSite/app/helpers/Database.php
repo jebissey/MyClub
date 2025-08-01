@@ -34,12 +34,12 @@ class Database
 
     public function getPdo(): PDO
     {
-        return self::$pdo ?? die('Fatal error in file ' . __FILE__ . ' at line ' . __LINE__);
+        return self::$pdo ?? throw new RuntimeException('Fatal error in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function getPdoForLog(): PDO
     {
-        return self::$pdoForLog ?? die('Fatal error in file ' . __FILE__ . ' at line ' . __LINE__);
+        return self::$pdoForLog ?? throw new RuntimeException('Fatal error in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     private function check(): void
@@ -60,9 +60,9 @@ class Database
         $stmt = self::$pdo->query($query);
         $row = $stmt->fetch();
         if ($row) {
-            if ($row->ApplicationName != self::APPLICATION) die('Non-compliant database in file ' . __FILE__ . ' at line ' . __LINE__);
+            if ($row->ApplicationName != self::APPLICATION) throw new RuntimeException('Non-compliant database in file ' . __FILE__ . ' at line ' . __LINE__);
             if ($row->DatabaseVersion != self::DB_VERSION) {
-                if ($row->DatabaseVersion > self::DB_VERSION)  die('The database requires a more recent version of the applicationin  in file ' . __FILE__ . ' at line ' . __LINE__);
+                if ($row->DatabaseVersion > self::DB_VERSION)  throw new RuntimeException('The database requires a more recent version of the applicationin  in file ' . __FILE__ . ' at line ' . __LINE__);
                 self::upgradeDatabase(self::$pdo, $row->DatabaseVersion, self::DB_VERSION);
             }
         } else throw new RuntimeException('Empty Metadata table in file ' + __FILE__ + ' at line ' + __LINE__);

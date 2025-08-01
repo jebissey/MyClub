@@ -4,6 +4,7 @@ namespace app\helpers;
 
 use app\enums\ApplicationError;
 use PDO;
+use RuntimeException;
 use Throwable;
 
 class ErrorManager
@@ -71,7 +72,7 @@ class ErrorManager
                 $message
             ]);
         } catch (Throwable $e) {
-            die("Failed to log error: " . $e->getMessage() . ' in file ' . __FILE__ . ' at line ' . __LINE__);
+            throw new RuntimeException("Failed to log error: " . $e->getMessage() . ' in file ' . __FILE__ . ' at line ' . __LINE__);
         }
     }
 }

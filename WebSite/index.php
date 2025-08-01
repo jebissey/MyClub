@@ -172,8 +172,8 @@ mapRoute($flight, 'POST /surveys/create', $surveyController, 'createOrUpdate');
 mapRoute($flight, 'GET  /surveys/results/@id:[0-9]+', $surveyController, 'viewResults', 1);
 
 $userController = new UserController($application);
-mapRoute($flight, 'GET  /help', $userController, 'helpHome');
 mapRoute($flight, 'GET  /', $userController, 'home');
+mapRoute($flight, 'GET  /help', $userController, 'helpHome');
 mapRoute($flight, 'GET  /legal/notice', $userController, 'legalNotice');
 mapRoute($flight, 'GET  /user', $userController, 'user');
 mapRoute($flight, 'GET  /user/account', $userController, 'account');

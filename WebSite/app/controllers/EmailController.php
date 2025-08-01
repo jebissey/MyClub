@@ -2,6 +2,8 @@
 
 namespace app\controllers;
 
+use RuntimeException;
+
 use app\enums\ApplicationError;
 use app\helpers\Application;
 use app\helpers\Email;
@@ -48,7 +50,7 @@ class EmailController extends BaseController
         if ($this->connectedUser->get()->isRedactor() ?? false) {
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $article = $this->dataHelper->get('Article', ['Id', $idArticle]);
-                if (!$article) die('Fatal program error in file ' + __FILE__ + ' at line ' + __LINE__);
+                if (!$article) throw new RuntimeException('Fatal program error in file ' + __FILE__ + ' at line ' + __LINE__);
                 $articleCreatorEmail = $this->dataHelper->get('Person', ['Id', $article->CreatedBy])->Email;
                 if (!$articleCreatorEmail) {
                     $this->application->getErrorManager()->raise(ApplicationError::InvalidParameter, "Unknown author of article '$idArticle' in file " . __FILE__ . ' at line ' . __LINE__);

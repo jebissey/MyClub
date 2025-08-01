@@ -2,6 +2,8 @@
 
 namespace app\helpers;
 
+use RuntimeException;
+
 class File
 {
     static function sanitizeFilename($filename)
@@ -15,7 +17,7 @@ class File
         $destinationFile = $destinationDir . basename($sourceFile);
         if (!is_dir($destinationDir)) {
             if (!mkdir($destinationDir, 0777, true))
-                die('Error creating ' . $destinationDir . ' folder in file ' . __FILE__ . ' at line ' . __LINE__);
+                throw new RuntimeException('Error creating ' . $destinationDir . ' folder in file ' . __FILE__ . ' at line ' . __LINE__);
         }
         return copy($sourceFile, $destinationFile);
     }

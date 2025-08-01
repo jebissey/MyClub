@@ -2,6 +2,7 @@
 
 namespace app\helpers;
 
+use RuntimeException;
 use Throwable;
 
 use app\enums\EventAudience;
@@ -38,7 +39,7 @@ class ApiEventDataHelper extends Data
 
                 $this->delete('EventAttribute', ['IdEvent' => $eventId]);
                 $this->delete('EventNeed', ['IdEvent' => $eventId]);
-            } else die('Fatal error in file ' . __FILE__ . ' at line ' . __LINE__ . " with formMode=" . $data['formMode']);
+            } else throw new RuntimeException('Fatal error in file ' . __FILE__ . ' at line ' . __LINE__ . " with formMode=" . $data['formMode']);
             $this->insertEventAttributes($eventId, $data['attributes'] ?? []);
             $this->insertEventNeeds($eventId, $data['needs'] ?? []);
             $this->pdo->commit();

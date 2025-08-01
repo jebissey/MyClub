@@ -3,6 +3,7 @@
 namespace app\helpers;
 
 use PDO;
+use RuntimeException;
 
 class DbBrowserHelper extends Data
 {
@@ -134,7 +135,7 @@ class DbBrowserHelper extends Data
         $stmt->bindValue(':id', $id);
         $stmt->execute();
         $record = $stmt->fetch();
-        if (!$record) die('Record not found in file ' + __FILE__ + ' at line ' + __LINE__);
+        if (!$record) throw new RuntimeException('Record not found in file ' + __FILE__ + ' at line ' + __LINE__);
         return [$this->getTableColumns($table), $record, $primaryKey, $this->getColumnTypes($table)];
     }
 
@@ -220,8 +221,8 @@ class DbBrowserHelper extends Data
 
     private function validateTableName($table)
     {
-        if (!preg_match('/^[a-zA-Z0-9_]+$/', $table)) die('Invalid table name in file ' + __FILE__ + ' at line ' + __LINE__);
+        if (!preg_match('/^[a-zA-Z0-9_]+$/', $table)) throw new RuntimeException('Invalid table name in file ' + __FILE__ + ' at line ' + __LINE__);
         $tables = $this->getTables();
-        if (!in_array($table, $tables)) die('Table not found in file ' + __FILE__ + ' at line ' + __LINE__);
+        if (!in_array($table, $tables)) throw new RuntimeException('Table not found in file ' + __FILE__ + ' at line ' + __LINE__);
     }
 }

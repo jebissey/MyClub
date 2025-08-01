@@ -2,6 +2,8 @@
 
 namespace app\controllers;
 
+use RuntimeException;
+
 use app\enums\ApplicationError;
 use app\helpers\Application;
 use app\helpers\ArticleDataHelper;
@@ -511,14 +513,14 @@ class UserController extends BaseController
 
     private function getCurrentUserTranche($stats, $person)
     {
-        if (empty($person) || empty($stats['memberVisits'])) die('$person or $stats can\'t be nulli n file ' . __FILE__ . ' at line ' . __LINE__);
+        if (empty($person) || empty($stats['memberVisits'])) throw new RuntimeException('$person or $stats can\'t be nulli n file ' . __FILE__ . ' at line ' . __LINE__);
         $email = $person->Email;
-        if (!array_key_exists($email, $stats['memberVisits'])) die('User $email not found in stats in file ' . __FILE__ . ' at line ' . __LINE__);
+        if (!array_key_exists($email, $stats['memberVisits'])) throw new RuntimeException('User $email not found in stats in file ' . __FILE__ . ' at line ' . __LINE__);
         $userVisits = $stats['memberVisits'][$email];
         for ($i = 0; $i < count($stats['tranches']); $i++) {
             $tranche = $stats['tranches'][$i];
             if ($userVisits >= $tranche['start'] && $userVisits <= $tranche['end']) return $i;
         }
-        die('$user slice not found in file ' . __FILE__ . ' at line ' . __LINE__);
+        throw new RuntimeException('$user slice not found in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 }

@@ -5,6 +5,7 @@ namespace app\helpers;
 use flight\Engine;
 use Latte\Engine as LatteEngine;
 use PDO;
+use RuntimeException;
 use Throwable;
 
 class Application
@@ -42,7 +43,7 @@ class Application
             $this->pdo = $db->getPdo();
             $this->pdoForLog = $db->getPdoForLog();
         } catch (Throwable $e) {
-            die('Database error ' . $e->getMessage() . ' in file ' . __FILE__ . ' at line ' . __LINE__);
+            throw new RuntimeException('Database error ' . $e->getMessage() . ' in file ' . __FILE__ . ' at line ' . __LINE__);
         }
         $this->errorManager = new ErrorManager($this->pdoForLog);
     }

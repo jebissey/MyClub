@@ -2,6 +2,8 @@
 
 namespace app\controllers;
 
+use RuntimeException;
+
 use app\enums\ApplicationError;
 use app\helpers\Application;
 use app\helpers\ArticleCrosstabDataHelper;
@@ -206,7 +208,7 @@ class ArticleController extends TableController
                 $id = $this->dataHelper->set('Article', [
                     'Title'     => '',
                     'Content'   => '',
-                    'CreatedBy' => $this->connectedUser->person->Id ?? die('Fatal error in file ' . __FILE__ . ' at line ' . __LINE__)
+                    'CreatedBy' => $this->connectedUser->person->Id ?? throw new RuntimeException('Fatal error in file ' . __FILE__ . ' at line ' . __LINE__)
                 ]);
                 $this->flight->redirect('/articles/' . $id);
             } else $this->application->getErrorManager()->raise(ApplicationError::InvalidRequestMethod, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);

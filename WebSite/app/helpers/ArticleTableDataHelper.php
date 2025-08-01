@@ -1,6 +1,7 @@
 <?php
 
 namespace app\helpers;
+use \Envms\FluentPDO\Queries\Select;
 
 class ArticleTableDataHelper extends Data
 {
@@ -9,9 +10,9 @@ class ArticleTableDataHelper extends Data
         parent::__construct($application);
     }
 
-    public function getQuery(ConnectedUser $connectedUser)
+    public function getQuery(ConnectedUser $connectedUser): Select
     {
-        $query =  $this->fluent->from('Article')
+        $query = $this->fluent->from('Article')
             ->select('Article.Id, Article.CreatedBy, Article.Title, Article.LastUpdate')
             ->select('CASE WHEN Article.PublishedBy IS NULL THEN "non" ELSE "oui" END AS Published')
             ->select('CASE WHEN Article.OnlyForMembers = 1 THEN "oui" ELSE "non" END AS ForMembers')
