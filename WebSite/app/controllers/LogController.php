@@ -8,7 +8,7 @@ use app\helpers\CrosstabDataHelper;
 use app\helpers\LogDataHelper;
 use app\helpers\Params;
 use app\helpers\Period;
-use app\helpers\Webapp;
+use app\helpers\WebApp;
 
 class LogController extends BaseController
 {
@@ -49,7 +49,7 @@ class LogController extends BaseController
                 'currentDate' => $currentDate,
                 'nav' => $this->logDataHelper->getReferentNavigation($period, $currentDate),
                 'externalRefs' => $this->logDataHelper->getExternalReferentStats($period, $currentDate),
-                'control' => new Webapp($this->application),
+                'control' => new WebApp($this->application),
                 'rows' =>$this->logDataHelper->getReferentStats($period, $currentDate),
             ]));
         } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);

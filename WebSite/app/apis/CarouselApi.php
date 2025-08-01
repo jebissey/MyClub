@@ -7,7 +7,7 @@ use Throwable;
 
 use app\helpers\Application;
 use app\helpers\CarouselDataHelper;
-use app\helpers\Webapp;
+use app\helpers\WebApp;
 
 class CarouselApi extends BaseApi
 {
@@ -49,7 +49,7 @@ class CarouselApi extends BaseApi
             return;
         }
 
-        $item = Webapp::sanitizeHtml($data['item']);
+        $item = WebApp::sanitizeHtml($data['item']);
         try {
             $message = $this->carouselDataHelper->set_($data, $item);
             $this->renderJson(['success' => true, 'message' => $message]);

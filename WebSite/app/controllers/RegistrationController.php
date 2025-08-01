@@ -7,7 +7,7 @@ use app\enums\ApplicationError;
 use app\helpers\GroupDataHelper;
 use app\helpers\Params;
 use app\helpers\TableControllerHelper;
-use app\helpers\Webapp;
+use app\helpers\WebApp;
 
 class RegistrationController extends TableController
 {
@@ -43,7 +43,7 @@ class RegistrationController extends TableController
                 'filters' => $filterConfig,
                 'columns' => $columns,
                 'resetUrl' => '/registration',
-                'layout' => Webapp::getLayout()
+                'layout' => WebApp::getLayout()
             ]));
         } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }

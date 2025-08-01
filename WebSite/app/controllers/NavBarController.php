@@ -6,7 +6,7 @@ use app\helpers\Application;
 use app\enums\ApplicationError;
 use app\helpers\ArwardsDataHelper;
 use app\helpers\Params;
-use app\helpers\Webapp;
+use app\helpers\WebApp;
 
 class NavBarController extends BaseController
 {
@@ -36,7 +36,7 @@ class NavBarController extends BaseController
                 'counterNames' => $counterNames = $arwardsDataHelper->getCounterNames(),
                 'data' => $arwardsDataHelper->getData($counterNames),
                 'groups' => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
-                'layout' => Webapp::getLayout(),
+                'layout' => WebApp::getLayout(),
                 'navItems' => $this->getNavItems($person),
             ]));
         } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);

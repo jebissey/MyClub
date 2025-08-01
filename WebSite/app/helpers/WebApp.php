@@ -4,7 +4,7 @@ namespace app\helpers;
 
 use RuntimeException;
 
-class Webapp
+class WebApp
 {
     public function buildUrl($newParams)
     {

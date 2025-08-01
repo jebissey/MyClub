@@ -6,16 +6,13 @@ use app\helpers\Application;
 use app\enums\ApplicationError;
 use app\helpers\Media;
 use app\helpers\Params;
-use app\helpers\Webapp;
+use app\helpers\WebApp;
 
 class MediaController extends BaseController
 {
-    private Media $media;
-
     public function __construct(Application $application)
     {
         parent::__construct($application);
-        $this->media = new Media();
     }
 
     public function showUploadForm()
@@ -42,7 +39,7 @@ class MediaController extends BaseController
                     'years' => $years,
                     'currentYear' => $year,
                     'search' => $search,
-                    'baseUrl' => Webapp::getBaseUrl()
+                    'baseUrl' => WebApp::getBaseUrl()
                 ]));
             } else $this->application->getErrorManager()->raise(ApplicationError::InvalidRequestMethod, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
         } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
@@ -52,7 +49,7 @@ class MediaController extends BaseController
     {
         if ($this->connectedUser->get()->isRedactor()?? false) {
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-                $filePath = $this->media->GetMediaPath() . $year . '/' . $month . '/' . $filename;
+                $filePath = Media::GetMediaPath() . $year . '/' . $month . '/' . $filename;
 
                 if (!file_exists($filePath)) {
                     $this->application->getErrorManager()->raise(ApplicationError::PageNotFound, "File $filename not found in file " . __FILE__ . ' at line ' . __LINE__);
@@ -85,10 +82,10 @@ class MediaController extends BaseController
     private function getAvailableYears(): array
     {
         $years = [];
-        if (file_exists($this->media->GetMediaPath()) && is_dir($this->media->GetMediaPath())) {
-            $dirs = scandir($this->media->GetMediaPath());
+        if (file_exists(Media::GetMediaPath()) && is_dir(Media::GetMediaPath())) {
+            $dirs = scandir(Media::GetMediaPath());
             foreach ($dirs as $dir) {
-                if ($dir !== '.' && $dir !== '..' && is_dir($this->media->GetMediaPath() . $dir) && is_numeric($dir)) $years[] = $dir;
+                if ($dir !== '.' && $dir !== '..' && is_dir(Media::GetMediaPath() . $dir) && is_numeric($dir)) $years[] = $dir;
             }
             rsort($years);
         }
@@ -98,7 +95,7 @@ class MediaController extends BaseController
     private function getFilesForYear($year, $search = ''): array
     {
         $files = [];
-        $yearPath = $this->media->GetMediaPath() . $year . '/';
+        $yearPath = Media::GetMediaPath() . $year . '/';
 
         if (file_exists($yearPath) && is_dir($yearPath)) {
             $months = scandir($yearPath);
@@ -113,7 +110,7 @@ class MediaController extends BaseController
                                 $files[] = [
                                     'name' => $file,
                                     'path' => 'data/media/' . $year . '/' . $month . '/' . $file,
-                                    'url' => Webapp::getBaseUrl() . 'data/media/' . $year . '/' . $month . '/' . $file,
+                                    'url' => WebApp::getBaseUrl() . 'data/media/' . $year . '/' . $month . '/' . $file,
                                     'size' => filesize($monthPath . $file),
                                     'date' => date('Y-m-d H:i:s', filemtime($monthPath . $file)),
                                     'month' => $month

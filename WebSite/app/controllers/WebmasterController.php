@@ -7,7 +7,7 @@ use app\helpers\Application;
 use app\helpers\ArticleDataHelper;
 use app\helpers\ArwardsDataHelper;
 use app\helpers\Params;
-use app\helpers\Webapp;
+use app\helpers\WebApp;
 
 class WebmasterController extends BaseController
 {
@@ -79,7 +79,7 @@ class WebmasterController extends BaseController
                     'counterNames' => $counterNames = $arwardsDataHelper->getCounterNames(),
                     'data' => $arwardsDataHelper->getData($counterNames),
                     'groups' => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
-                    'layout' => Webapp::getLayout(),
+                    'layout' => WebApp::getLayout(),
                     'navItems' => $this->getNavItems($person),
                 ]));
             } else if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -107,7 +107,7 @@ class WebmasterController extends BaseController
 
     public function rssGenerator()
     {
-        $base_url = Webapp::getBaseUrl();
+        $base_url = WebApp::getBaseUrl();
         $site_title = "Liste d'articles";
         $site_url = $base_url;
         $feed_url = $base_url . "rss.xml";
@@ -123,7 +123,7 @@ class WebmasterController extends BaseController
     public function sitemapGenerator()
     {
         $articleDataHelper = new ArticleDataHelper($this->application);
-        $base_url = Webapp::getBaseUrl();
+        $base_url = WebApp::getBaseUrl();
         header("Content-Type: application/xml; charset=utf-8");
         echo '<?xml version="1.0" encoding="UTF-8"?>' . PHP_EOL;
         echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . PHP_EOL;

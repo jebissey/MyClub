@@ -24,7 +24,7 @@ use app\helpers\PersonStatistics;
 use app\helpers\Sign;
 use app\helpers\SurveyDataHelper;
 use app\helpers\TranslationManager;
-use app\helpers\Webapp;
+use app\helpers\WebApp;
 
 class UserController extends BaseController
 {
@@ -192,7 +192,7 @@ class UserController extends BaseController
             'navItems' => $this->getNavItems($person),
             'publishedBy' => $articles['latestArticle']
                 && $articles['latestArticle']->PublishedBy != $articles['latestArticle']->CreatedBy ? (new PersonDataHelper($this->application))->getPublisher($articles['latestArticle']->PublishedBy) : '',
-            'latestArticleHasSurvey' => $this->surveyDataHelper->articleHasSurvey($articles['latestArticle']->Id ?? 0),
+            'latestArticleHasSurvey' => $this->surveyDataHelper->articleHasSurveyNotClosed($articles['latestArticle']->Id ?? 0),
             'pendingSurveys' => $userPendingSurveys,
             'pendingDesigns' => $userPendingDesigns,
             'news' => $news ?? false,
@@ -242,7 +242,7 @@ class UserController extends BaseController
                     'useGravatar' => WebApp::sanitizeInput($person->UseGravatar) ?? 'no',
                     'emojis' => Application::EMOJI_LIST,
                     'isSelfEdit' => true,
-                    'layout' => Webapp::getLayout()
+                    'layout' => WebApp::getLayout()
                 ]));
             } else $this->application->getErrorManager()->raise(ApplicationError::InvalidRequestMethod, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
         } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
@@ -298,7 +298,7 @@ class UserController extends BaseController
 
                 $this->render('app/views/user/groups.latte', Params::getAll([
                     'groups' => $currentGroups,
-                    'layout' => Webapp::getLayout()
+                    'layout' => WebApp::getLayout()
                 ]));
             } else $this->application->getErrorManager()->raise(ApplicationError::InvalidRequestMethod, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
         }
@@ -347,7 +347,7 @@ class UserController extends BaseController
                 if (!empty($eventId)) $emailSent = (new PersonDataHelper($this->application))->sendRegistrationLink($adminEmail, $name, $email, $event);
                 else $emailSent = $this->email->sendContactEmail($adminEmail, $name, $email, $message);
                 if ($emailSent) {
-                    $url = (new Webapp($this->application))->buildUrl('/contact', [
+                    $url = (new WebApp($this->application))->buildUrl('/contact', [
                         'success' => 'Message envoyé avec succès.',
                         'who'     => $email
                     ]);

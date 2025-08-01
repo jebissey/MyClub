@@ -36,7 +36,7 @@ abstract class TableController extends BaseController
         //die();
 
         $stmt = $this->application->getPdo()->prepare($query->getQuery());
-        $stmt->execute($values);
+        $stmt->execute($values ?? null);
         $items = $stmt->fetchAll();
 
         return [

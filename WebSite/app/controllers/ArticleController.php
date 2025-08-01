@@ -15,8 +15,7 @@ use app\helpers\CarouselDataHelper;
 use app\helpers\Params;
 use app\helpers\Period;
 use app\helpers\PersonDataHelper;
-use app\helpers\SurveyDataHelper;
-use app\helpers\Webapp;
+use app\helpers\WebApp;
 
 class ArticleController extends TableController
 {
@@ -122,7 +121,7 @@ class ArticleController extends TableController
                 'latestArticles' => $this->articleDataHelper->getLatestArticles_($articleIds),
                 'canEdit' => $canEdit,
                 'groups' => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
-                'hasSurvey' => (new SurveyDataHelper($this->application))->articleHasSurvey($id),
+                'hasSurvey' => $this->dataHelper->get('Survey',['IdArticle' => $id]),
                 'id' => $id,
                 'userConnected' => $this->connectedUser->person,
                 'navItems' => $this->getNavItems($this->connectedUser->person),

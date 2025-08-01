@@ -15,7 +15,7 @@ use app\helpers\NeedDataHelper;
 use app\helpers\Params;
 use app\helpers\ParticipantDataHelper;
 use app\helpers\Period;
-use app\helpers\Webapp;
+use app\helpers\WebApp;
 
 class EventController extends BaseController
 {
@@ -43,7 +43,7 @@ class EventController extends BaseController
             'offset' => $offset,
             'mode' => $mode,
             'filterByPreferences' => $filterByPreferences,
-            'layout' => Webapp::getLayout()
+            'layout' => WebApp::getLayout()
         ]));
     }
 
@@ -84,7 +84,7 @@ class EventController extends BaseController
             $this->render('app/views/event/guest.latte', Params::getAll([
                 'events' => $events,
                 'navbarTemplate' => '../navbar/eventManager.latte',
-                'layout' => Webapp::getLayout(),
+                'layout' => WebApp::getLayout(),
                 'message' => $message,
                 'messageType' => $type
             ]));

@@ -8,7 +8,7 @@ use app\helpers\GroupDataHelper;
 use app\helpers\Params;
 use app\helpers\PersonDataHelper;
 use app\helpers\TableControllerHelper;
-use app\helpers\Webapp;
+use app\helpers\WebApp;
 use app\interfaces\CrudControllerInterface;
 
 
@@ -112,7 +112,7 @@ class PersonController extends TableController implements CrudControllerInterfac
                         'firstName' => $person->FirstName,
                         'lastName' => $person->LastName,
                         'isSelfEdit' => false,
-                        'layout' => Webapp::getLayout()
+                        'layout' => WebApp::getLayout()
                     ]));
                 } else $this->application->getErrorManager()->raise(ApplicationError::InvalidRequestMethod, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
             }

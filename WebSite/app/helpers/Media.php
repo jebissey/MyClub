@@ -4,17 +4,16 @@ namespace app\helpers;
 
 class Media
 {
-    private string $mediaPath;
+    private const MEDIA_PATH =  __DIR__ . '/../../data/media/';
 
     public function __construct()
     {
-        $this->mediaPath = __DIR__ . '/../../data/media/';
-        if (!file_exists($this->mediaPath)) mkdir($this->mediaPath, 0755, true);
+        if (!file_exists(self::MEDIA_PATH)) mkdir(self::MEDIA_PATH, 0755, true);
     }
 
     public function deleteFile($year, $month, $filename)
     {
-        $filePath = $this->mediaPath . $year . '/' . $month . '/' . $filename;
+        $filePath = self::MEDIA_PATH . $year . '/' . $month . '/' . $filename;
         $response = ['success' => false, 'message' => ''];
 
         if (!file_exists($filePath)) $response['message'] = 'Fichier non trouvé';
@@ -23,11 +22,11 @@ class Media
                 $response['success'] = true;
                 $response['message'] = 'Fichier supprimé avec succès';
 
-                $monthDir = $this->mediaPath . $year . '/' . $month;
+                $monthDir = self::MEDIA_PATH . $year . '/' . $month;
                 if (count(glob("$monthDir/*")) === 0) {
                     rmdir($monthDir);
 
-                    $yearDir = $this->mediaPath . $year;
+                    $yearDir = self::MEDIA_PATH . $year;
                     if (count(glob("$yearDir/*")) === 0) {
                         rmdir($yearDir);
                     }
@@ -41,10 +40,8 @@ class Media
     {
         $year = date('Y');
         $month = date('m');
-        $targetDir = $this->mediaPath . $year . '/' . $month . '/';
-        if (!file_exists($targetDir)) {
-            mkdir($targetDir, 0755, true);
-        }
+        $targetDir = self::MEDIA_PATH . $year . '/' . $month . '/';
+        if (!file_exists($targetDir)) mkdir($targetDir, 0755, true);
         $originalName = $file['name'];
         $extension = pathinfo($originalName, PATHINFO_EXTENSION);
         $baseFilename = pathinfo($originalName, PATHINFO_FILENAME);
@@ -72,8 +69,8 @@ class Media
         return $response;
     }
 
-    public function getMediaPath()
+    public static function getMediaPath()
     {
-        return $this->mediaPath;
+        return self::MEDIA_PATH;
     }
 }

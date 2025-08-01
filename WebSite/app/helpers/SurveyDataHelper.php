@@ -11,13 +11,13 @@ class SurveyDataHelper extends Data implements NewsProviderInterface
         parent::__construct($application);
     }
 
-    public function articleHasSurvey($articleId)
+    public function articleHasSurveyNotClosed($articleId): bool
     {
         return $this->fluent
             ->from('Survey')
             ->join('Article ON Survey.IdArticle = Article.Id')
             ->where('IdArticle', $articleId)
-            ->where('ClosingDate <= ?', date('now'))
+            ->where('ClosingDate >= ?', date('now'))
             ->fetch();
     }
 
