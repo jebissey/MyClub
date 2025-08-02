@@ -15,13 +15,8 @@ class AttributeDataHelper extends Data
     {
         try {
             $this->pdo->beginTransaction();
-            $this->fluent->deleteFrom('EventTypeAttribute')
-                ->where('IdAttribute', $id)
-                ->execute();
-            $this->fluent->deleteFrom('Attribute')
-                ->where('Id', $id)
-                ->execute();
-
+            $this->delete('EventTypeAttribute', ['IdAttribute' => $id]);
+            $this->delete('Attribute', ['Id' => $id]);
             $this->pdo->commit();
             return [['success' => true], 200];
         } catch (Throwable $e) {
@@ -34,11 +29,11 @@ class AttributeDataHelper extends Data
     {
         try {
             $this->pdo->beginTransaction();
-            $this->fluent->insertInto('Attribute', [
+            $this->set('Attribute', [
                 'Name'   => $data['name'],
                 'Detail' => $data['detail'],
                 'Color'  => $data['color']
-            ])->execute();
+            ]);
             $this->pdo->commit();
             return [['success' => true], 200];
         } catch (Throwable $e) {
@@ -47,34 +42,30 @@ class AttributeDataHelper extends Data
         }
     }
 
-    public function getAttributesOf($eventTypeId)
+    public function getAttributesOf(int $eventTypeId): array
     {
-        return $this->fluent->from('EventTypeAttribute')
-            ->select('Attribute.*')
-            ->join('Attribute ON EventTypeAttribute.IdAttribute = Attribute.Id')
-            ->where('EventTypeAttribute.IdEventType', $eventTypeId)
-            ->fetchall();
+        $sql = '
+            SELECT Attribute.*
+            FROM EventTypeAttribute
+            INNER JOIN Attribute ON EventTypeAttribute.IdAttribute = Attribute.Id
+            WHERE EventTypeAttribute.IdEventType = :id
+        ';
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([':id' => $eventTypeId]);
+        return $stmt->fetchAll();
     }
 
-    public function gets_()
-    {
-        return  $this->fluent->from('Attribute')
-            ->orderBy('Name')
-            ->fetchAll();
-    }
+
 
     public function update($data)
     {
         try {
             $this->pdo->beginTransaction();
-            $this->fluent->update('Attribute')
-                ->set([
-                    'Name'   => $data['name'],
-                    'Detail' => $data['detail'],
-                    'Color'  => $data['color']
-                ])
-                ->where('Id', $data['id'])
-                ->execute();
+            $this->set('Attribute', [
+                'Name'   => $data['name'],
+                'Detail' => $data['detail'],
+                'Color'  => $data['color']
+            ], ['Id' => $data['id']]);
             $this->pdo->commit();
             return ['success' => true];
         } catch (Throwable $e) {

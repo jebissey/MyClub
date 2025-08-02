@@ -11,7 +11,7 @@ use app\helpers\ArticleDataHelper;
 use app\helpers\ArticleTableDataHelper;
 use app\helpers\AuthorizationDataHelper;
 use app\helpers\Backup;
-use app\helpers\CarouselDataHelper;
+use app\helpers\DataHelper;
 use app\helpers\Params;
 use app\helpers\Period;
 use app\helpers\PersonDataHelper;
@@ -121,13 +121,13 @@ class ArticleController extends TableController
                 'latestArticles' => $this->articleDataHelper->getLatestArticles_($articleIds),
                 'canEdit' => $canEdit,
                 'groups' => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
-                'hasSurvey' => $this->dataHelper->get('Survey',['IdArticle' => $id]),
+                'hasSurvey' => $this->dataHelper->get('Survey', ['IdArticle' => $id]),
                 'id' => $id,
                 'userConnected' => $this->connectedUser->person,
                 'navItems' => $this->getNavItems($this->connectedUser->person),
                 'publishedBy' => $chosenArticle->PublishedBy && $chosenArticle->PublishedBy != $chosenArticle->CreatedBy ? (new PersonDataHelper($this->application))->getPublisher($chosenArticle->PublishedBy) : '',
                 'canReadPool' => $this->authorizationDatahelper->canPersonReadSurveyResults($chosenArticle, $this->connectedUser->person),
-                'carouselItems' => (new CarouselDataHelper($this->application))->getsForArticle($id),
+                'carouselItems' => (new DataHelper($this->application))->gets('Carousel', ['IdArticle' => $id]),
                 'message' => $messages,
             ]));
         } else if ($this->connectedUser->person == '') $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Il faut être connecté pour pouvoir consulter cet article', 5000);

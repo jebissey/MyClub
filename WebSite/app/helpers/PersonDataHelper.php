@@ -13,21 +13,20 @@ class PersonDataHelper extends Data implements NewsProviderInterface
         parent::__construct($application);
     }
 
-    public function getPersonsInGroup(int $idGroup, bool $everybodyIfNoGroup = false): array
+    public function getPersonsInGroup(?int $idGroup): array
     {
         $innerJoin = $and = '';
-        if (!empty($idGroup) || $everybodyIfNoGroup) {
+        if ($idGroup !== null) {
             $innerJoin = 'INNER JOIN PersonGroup on PersonGroup.IdPerson = Person.Id';
             $and = 'AND PersonGroup.IdGroup = ' . $idGroup;
         }
-        $query = $this->pdo->query("
+        return $this->pdo->query("
             SELECT Person.Id, FirstName, LastName, Email, Preferences, Availabilities
             FROM Person
             $innerJoin
             WHERE Person.Inactivated = 0 $and
             ORDER BY FirstName, LastName
-        ");
-        return $query->fetchAll();
+        ")->fetchAll();
     }
 
     public function getPersonsInGroupForDirectory($groupId)
@@ -49,8 +48,6 @@ class PersonDataHelper extends Data implements NewsProviderInterface
         $person = $this->get('Person', ['Id' => $id], 'FirstName, LastName');
         return "publié par " . $person->FirstName . " " . $person->LastName;
     }
-
-
 
     public function create()
     {
@@ -137,8 +134,8 @@ class PersonDataHelper extends Data implements NewsProviderInterface
 
     public function getPersonWantedToBeAlerted($idArticle): array
     {
-        $idGroup = $this->fluent->from('Article')->where('Id', $idArticle)->fetch('IdGroup');
-        $idSurvey = $this->fluent->from('Survey')->where('IdArticle', $idArticle)->fetch('Id');
+        $idGroup = $this->get('Article', ['Id' => $idArticle], 'IdGroup')->IdGroup;
+        $idSurvey = $this->get('Survey', ['IdArticle' => $idArticle], 'Id')->Id;
         $persons = (new PersonDataHelper($this->application))->getPersonsInGroup($idGroup);
         $filteredEmails = [];
         foreach ($persons as $person) {
@@ -147,28 +144,24 @@ class PersonDataHelper extends Data implements NewsProviderInterface
                 $preferences = json_decode($person->Preferences ?? '', true);
                 if ($preferences != '' && isset($preferences['eventTypes']['newArticle'])) {
                     if (isset($preferences['eventTypes']['newArticle']['pollOnly'])) {
-                        if ($idSurvey) {
-                            $include = true;
-                        }
+                        if ($idSurvey) $include = true;
                     } else $include = true;
                 }
             }
             if ($include) {
                 $filteredEmails[] = $person->Email;
-                $this->fluent->insertInto('Message')
-                    ->values([
-                        'EventId' => null,
-                        'PersonId' => $person->Id,
-                        'Text' =>  "New article \n\n /articles/" . $idArticle,
-                        '"From"' => 'Webapp'
-                    ])
-                    ->execute();
+                $this->set('Message', [
+                    'EventId' => null,
+                    'PersonId' => $person->Id,
+                    'Text' =>  "New article \n\n /articles/" . $idArticle,
+                    '"From"' => 'Webapp'
+                ]);
             }
         }
         return $filteredEmails;
     }
 
-    public function getEmailsOfInterestedPeople($idGroup, $idEventType, $dayOfWeek, $timeOfDay)
+    public function getEmailsOfInterestedPeople(?int $idGroup, ?int $idEventType, string $dayOfWeek, string $timeOfDay): array
     {
         $persons = $this->getInterestedPeople($idGroup, $idEventType, $dayOfWeek, $timeOfDay);
         $filteredEmails = [];
@@ -178,9 +171,9 @@ class PersonDataHelper extends Data implements NewsProviderInterface
         return $filteredEmails;
     }
 
-    public function getInterestedPeople($idGroup, $idEventType, $dayOfWeek, $timeOfDay): array
+    public function getInterestedPeople(?int $idGroup, ?int $idEventType, string $dayOfWeek, string $timeOfDay): array
     {
-        $persons = (new PersonDataHelper($this->application))->getPersonsInGroup($idGroup, true);
+        $persons = (new PersonDataHelper($this->application))->getPersonsInGroup($idGroup);
         $filteredPeople = [];
         foreach ($persons as $person) {
             if ((new PersonPreferences())->isPersonInterested($person, $idEventType, $dayOfWeek, $timeOfDay)) $filteredPeople[] = $person;

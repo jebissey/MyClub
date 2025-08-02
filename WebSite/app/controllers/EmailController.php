@@ -21,8 +21,8 @@ class EmailController extends BaseController
     {
         if ($this->connectedUser->get()->isEventManager() ?? false) {
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-                $idGroup = $_POST['idGroup'] ?? '';
-                $idEventType = $_POST['idEventType'] ?? '';
+                $idGroup = isset($_POST['idGroup']) && is_numeric($_POST['idGroup']) ? (int)$_POST['idGroup'] : null;
+                $idEventType = isset($_POST['idGroup']) && is_numeric($_POST['idGroup']) ? (int)$_POST['idEventType'] : null;
                 $dayOfWeek = $_POST['dayOfWeek'] ?? '';
                 $timeOfDay = $_POST['timeOfDay'] ?? '';
                 $filteredEmails = (new PersonDataHelper($this->application))->getEmailsOfInterestedPeople($idGroup, $idEventType, $dayOfWeek, $timeOfDay);
@@ -34,7 +34,7 @@ class EmailController extends BaseController
                     'emailsJson' => json_encode($filteredEmails),
                     'emails' => $filteredEmails,
                     'filters' => "$groupName / $eventTypeName / $dayOfWeekName / $timeOfDay",
-                    'phones' => $this->dataHelper->gets('Person', ['Inactivated' => 0], "Email', 'Phone'"),
+                    'people' => $this->dataHelper->gets('Person', ['Inactivated' => 0], 'Email, Phone, FirstName, LastName', '', true),
                 ]));
             } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $this->render('app/views/emails/getEmails.latte', Params::getAll([

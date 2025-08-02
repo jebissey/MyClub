@@ -129,7 +129,7 @@ class LogController extends BaseController
             $emailFilter = $_GET['email'] ?? '';
             $groupFilter = $_GET['group'] ?? '';
             $period = $_GET['period'] ?? 'today';
-            [$sortedCrossTabData, $filteredPersons, $columnTotals] = (new CrosstabDataHelper($this->application))->getPersons(Period::getDateConditions($period));
+            [$sortedCrossTabData, $filteredPersons, $columnTotals] = (new CrosstabDataHelper($this->application))->getPersons(Period::getDateConditions($period), $uriFilter, $emailFilter, $groupFilter);
 
             $this->render('app/views/logs/crossTab.latte', Params::getAll([
                 'title' => 'Tableau croisé dynamique des visites',

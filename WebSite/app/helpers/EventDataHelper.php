@@ -127,7 +127,7 @@ class EventDataHelper extends Data implements NewsProviderInterface
         ";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute(['eventId' => $eventId]);
-        $result = $stmt->fetchAll(PDO::FETCH_OBJ);
+        $result = $stmt->fetchAll();
 
         return $result;
     }
@@ -316,7 +316,7 @@ class EventDataHelper extends Data implements NewsProviderInterface
         ";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([$eventId, $eventId, $eventId]);
-        return $stmt->fetchAll(PDO::FETCH_OBJ);
+        return $stmt->fetchAll();
     }
 
     public function getNews($person, $searchFrom): array

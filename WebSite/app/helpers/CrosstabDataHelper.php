@@ -55,23 +55,23 @@ class CrosstabDataHelper extends Data
     public function getevents($period)
     {
         $sql = "
-                SELECT 
-                    p.FirstName || ' ' || p.LastName || 
-                    CASE 
-                        WHEN p.NickName IS NOT NULL AND p.NickName != '' THEN ' (' || p.NickName || ')'
-                        ELSE ''
-                    END AS columnForCrosstab,
-                    et.Name AS rowForCrosstab,
-                    COUNT(DISTINCT e.Id) AS countForCrosstab,
-                    COUNT(part.Id) AS count2ForCrosstab
-                FROM Person p
-                JOIN Event e ON p.Id = e.CreatedBy
-                JOIN EventType et ON e.IdEventType = et.Id
-                LEFT JOIN Participant part ON part.IdEvent = e.Id
-                WHERE e.LastUpdate BETWEEN :start AND :end
-                GROUP BY p.Id, et.Id
-                ORDER BY p.LastName, p.FirstName
-            ";
+            SELECT 
+                p.FirstName || ' ' || p.LastName || 
+                CASE 
+                    WHEN p.NickName IS NOT NULL AND p.NickName != '' THEN ' (' || p.NickName || ')'
+                    ELSE ''
+                END AS columnForCrosstab,
+                et.Name AS rowForCrosstab,
+                COUNT(DISTINCT e.Id) AS countForCrosstab,
+                COUNT(part.Id) AS count2ForCrosstab
+            FROM Person p
+            JOIN Event e ON p.Id = e.CreatedBy
+            JOIN EventType et ON e.IdEventType = et.Id
+            LEFT JOIN Participant part ON part.IdEvent = e.Id
+            WHERE e.LastUpdate BETWEEN :start AND :end
+            GROUP BY p.Id, et.Id
+            ORDER BY p.LastName, p.FirstName
+        ";
         $dateRange = Period::getDateRangeFor($period);
         $crosstabData = $this->generateCrosstab(
             $sql,
@@ -82,16 +82,26 @@ class CrosstabDataHelper extends Data
         return [$dateRange, $crosstabData];
     }
 
-    public function getPersons($dateCondition)
+    public function getPersons(string $dateCondition, ?string $uriFilter = null, ?string $emailFilter = null, ?string $groupFilter = null): array
     {
-        $crossTabQuery = $this->fluentForLog->from('Log')
-            ->select(null)
-            ->select('Uri, Who, COUNT(*) as count')
-            ->where($dateCondition)
-            ->groupBy('Uri, Who');
-        if (!empty($uriFilter)) $crossTabQuery->where('Uri LIKE ?', "%$uriFilter%");
-        if (!empty($emailFilter)) $crossTabQuery->where('Who LIKE ?', "%$emailFilter%");
-        $crossTabData = $crossTabQuery->fetchAll();
+        $sql = '
+            SELECT Uri, Who, COUNT(*) as count
+            FROM Log
+            WHERE ' . $dateCondition . '
+        ';
+        $params = [];
+        if (!empty($uriFilter)) {
+            $sql .= ' AND Uri LIKE :uriFilter';
+            $params[':uriFilter'] = "%$uriFilter%";
+        }
+        if (!empty($emailFilter)) {
+            $sql .= ' AND Who LIKE :emailFilter';
+            $params[':emailFilter'] = "%$emailFilter%";
+        }
+        $sql .= ' GROUP BY Uri, Who';
+        $stmt = $this->pdoForLog->prepare($sql);
+        $stmt->execute($params);
+        $crossTabData = $stmt->fetchAll();
         $filteredPersons = array_unique(array_column($crossTabData, 'Who'));
         $sortedCrossTabData = [];
         $columnTotals = [];
@@ -99,7 +109,7 @@ class CrosstabDataHelper extends Data
             $uri = $row->Uri;
             $who = $row->Who;
             if (!empty($groupFilter) && !(new AuthorizationDataHelper($this->application))->isUserInGroup($who, $groupFilter)) continue;
-            $count = $row->count;
+            $count = (int) $row->count;
             if (!isset($sortedCrossTabData[$uri])) $sortedCrossTabData[$uri] = ['visits' => [], 'total' => 0];
             $sortedCrossTabData[$uri]['visits'][$who] = $count;
             $sortedCrossTabData[$uri]['total'] += $count;

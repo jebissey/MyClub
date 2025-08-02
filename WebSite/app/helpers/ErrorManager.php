@@ -48,8 +48,7 @@ class ErrorManager
         $client = new Client();;
 
         try {
-            $email = filter_var($_SESSION['user'] ?? '', FILTER_VALIDATE_EMAIL) ?: 'anonymous';
-
+            $email = filter_var($_SESSION['user'] ?? '', FILTER_VALIDATE_EMAIL) ?: '';
             $stmt = $this->pdoForLog->prepare("
                 INSERT INTO Log (
                     IpAddress, Referer, Os, Browser, ScreenResolution,
@@ -57,7 +56,6 @@ class ErrorManager
                 )
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))
             ");
-
             $stmt->execute([
                 $client->getIp(),
                 $client->getReferer(),

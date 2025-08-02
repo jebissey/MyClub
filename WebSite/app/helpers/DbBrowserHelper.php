@@ -86,7 +86,7 @@ class DbBrowserHelper extends Data
         $stmt->execute();
 
         $columns = [];
-        while ($row = $stmt->fetch(PDO::FETCH_OBJ)) {
+        while ($row = $stmt->fetch()) {
             $columns[] = [
                 'name' => $row->name,
                 'notnull' => $row->notnull

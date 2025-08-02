@@ -300,7 +300,7 @@ $flight->map('error', function (Throwable $ex) use ($logDataHelper, $application
     $application->getErrorManager()->raise(ApplicationError::Error, 'Error ' . $ex->getMessage() . ' in file ' . $ex->getFile() . ' at line ' . $ex->getLine());
 });
 $flight->after('start', function () use ($logDataHelper, $flight) {
-    $logDataHelper->add($flight->getData('code'), $flight->getData('message'));
+    $logDataHelper->add($flight->getData('code') ?? '', $flight->getData('message') ?? '');
 });
 
 $flight->start();

@@ -19,46 +19,52 @@ class LogDataHelper extends Data
         $this->host = Application::$root . '%';
     }
 
-    public function add($code, $message)
+    public function add(string $code, string $message): void
     {
-        $this->fluentForLog
-            ->insertInto('Log', [
-                'IpAddress'        => $_SERVER['REMOTE_ADDR'],
-                'Referer'          => $_SERVER['HTTP_REFERER'] ?? '',
-                'Os'               => '',
-                'Browser'          => '',
-                'ScreenResolution' => '',
-                'Type'             => '',
-                'Uri'              => $_SERVER['REQUEST_URI'],
-                'Token'            => '',
-                'Who'              => gethostbyaddr($_SERVER['REMOTE_ADDR']) ?? '',
-                'Code'             => $code,
-                'Message'          => $message
-            ])
-            ->execute();
+        $sql = '
+            INSERT INTO Log (IpAddress, Referer, Os, Browser, ScreenResolution, Type, Uri, Token, Who, Code, Message) 
+            VALUES (:ipAddress, :referer, :os, :browser, :screenResolution, :type, :uri, :token, :who, :code, :message)
+        ';
+        $params = [
+            ':ipAddress'        => $_SERVER['REMOTE_ADDR'],
+            ':referer'          => $_SERVER['HTTP_REFERER'] ?? '',
+            ':os'               => '',
+            ':browser'          => '',
+            ':screenResolution' => '',
+            ':type'             => '',
+            ':uri'              => $_SERVER['REQUEST_URI'],
+            ':token'            => '',
+            ':who'              => gethostbyaddr($_SERVER['REMOTE_ADDR']) ?? '',
+            ':code'             => $code,
+            ':message'          => $message,
+        ];
+        $stmt = $this->pdoForLog->prepare($sql);
+        $stmt->execute($params);
     }
 
-    public function getOsDistribution()
+    public function getOsDistribution(): array
     {
-        $query = $this->fluentForLog
-            ->from('Log')
-            ->select('Os, COUNT(*) as count')
-            ->groupBy('Os')
-            ->orderBy('count DESC');
-        $results = $query->fetchAll();
-
+        $sql = '
+            SELECT Os, COUNT(*) AS count
+            FROM Log
+            GROUP BY Os
+            ORDER BY count DESC
+        ';
+        $stmt = $this->pdoForLog->prepare($sql);
+        $stmt->execute();
+        $results = $stmt->fetchAll();
         $labels = [];
         $data = [];
-
         foreach ($results as $row) {
             $labels[] = $row->Os ?: 'Inconnu';
-            $data[] = $row->count;
+            $data[] = (int) $row->count;
         }
         return [
             'labels' => $labels,
             'data' => $data
         ];
     }
+
 
     public function getBrowserDistribution()
     {
@@ -85,14 +91,12 @@ class LogDataHelper extends Data
             GROUP BY word
             ORDER BY count DESC");
         $results = $query->fetchAll();
-
         $labels = [];
         $data = [];
         foreach ($results as $row) {
             $labels[] = $row->Browser ?? 'Inconnu';
             $data[] = $row->count;
         }
-
         return [
             'labels' => $labels,
             'data' => $data
@@ -101,15 +105,15 @@ class LogDataHelper extends Data
 
     public function getScreenResolutionDistribution()
     {
-        $query = $this->fluentForLog
-            ->from('Log')
-            ->select(null)
-            ->select('ScreenResolution, COUNT(*) as count')
-            ->groupBy('ScreenResolution')
-            ->orderBy('count DESC');
-
-        $results = $query->fetchAll();
-
+        $sql = '
+            SELECT ScreenResolution, COUNT(*) AS count
+            FROM Log
+            GROUP BY ScreenResolution
+            ORDER BY count DESC
+        ';
+        $stmt = $this->pdoForLog->prepare($sql);
+        $stmt->execute();
+        $results = $stmt->fetchAll();
         $typeGroups = [];
         $typeResolutions = [];
 
@@ -124,7 +128,6 @@ class LogDataHelper extends Data
                 $typeResolutions[$typeKey] = [];
             }
             $typeGroups[$typeKey] += $row->count;
-
             if ($row->ScreenResolution && $row->ScreenResolution !== 'Inconnu') {
                 $typeResolutions[$typeKey][] = $row->ScreenResolution;
             }
@@ -132,7 +135,6 @@ class LogDataHelper extends Data
         arsort($typeGroups);
         $labels = [];
         $data = [];
-
         foreach ($typeGroups as $typeKey => $count) {
             $label = $typeKey;
             if (isset($typeResolutions[$typeKey]) && !empty($typeResolutions[$typeKey])) {
@@ -142,7 +144,6 @@ class LogDataHelper extends Data
             $labels[] = $label;
             $data[] = $count;
         }
-
         return [
             'labels' => $labels,
             'data' => $data
@@ -251,22 +252,21 @@ class LogDataHelper extends Data
 
     public function getTypeDistribution()
     {
-        $query = $this->fluentForLog
-            ->from('Log')
-            ->select('Type, COUNT(*) as count')
-            ->groupBy('Type')
-            ->orderBy('count DESC');
-
-        $results = $query->fetchAll();
-
+        $sql = '
+            SELECT Type, COUNT(*) AS count
+            FROM Log
+            GROUP BY Type
+            ORDER BY count DESC
+        ';
+        $stmt = $this->pdoForLog->prepare($sql);
+        $stmt->execute();
+        $results = $stmt->fetchAll();
         $labels = [];
         $data = [];
-
         foreach ($results as $row) {
             $labels[] = $row->Type ?: 'Inconnu';
             $data[] = $row->count;
         }
-
         return [
             'labels' => $labels,
             'data' => $data
@@ -588,27 +588,31 @@ class LogDataHelper extends Data
         }
         return $visits;
     }
-    private function getLastVisitPerActivePerson($activePersons)
+    private function getLastVisitPerActivePerson(array $activePersons): array
     {
         $result = [];
-        foreach ($activePersons as $person) {
-            $lastLog = $this->fluentForLog->from('Log')
-                ->select('Uri, CreatedAt, Os, Browser')
-                ->where('Who COLLATE NOCASE', $person->Email)
-                ->orderBy('CreatedAt DESC')
-                ->limit(1)
-                ->fetch();
 
+        $sql = '
+            SELECT Uri, CreatedAt, Os, Browser
+            FROM Log
+            WHERE Who COLLATE NOCASE = :email
+            ORDER BY CreatedAt DESC
+            LIMIT 1
+        ';
+        $stmt = $this->pdoForLog->prepare($sql);
+        foreach ($activePersons as $person) {
+            $stmt->execute([':email' => $person->Email]);
+            $lastLog = $stmt->fetch();
             if ($lastLog) {
                 $result[] = (object)[
-                    'PersonId' => $person->Id,
-                    'FullName' => $person->FirstName . ' ' . $person->LastName,
-                    'Email' => $person->Email,
-                    'Avatar' => $person->Avatar,
-                    'LastPage' => $lastLog->Uri,
+                    'PersonId'     => $person->Id,
+                    'FullName'     => $person->FirstName . ' ' . $person->LastName,
+                    'Email'        => $person->Email,
+                    'Avatar'       => $person->Avatar,
+                    'LastPage'     => $lastLog->Uri,
                     'LastActivity' => $lastLog->CreatedAt,
-                    'Os' => $lastLog->Os,
-                    'Browser' => $lastLog->Browser
+                    'Os'           => $lastLog->Os,
+                    'Browser'      => $lastLog->Browser
                 ];
             }
         }
@@ -617,6 +621,7 @@ class LogDataHelper extends Data
         });
         return $result;
     }
+
 
     private function calculateTimeAgo($dateTime)
     {
@@ -690,28 +695,31 @@ class LogDataHelper extends Data
         return $query->fetchAll();
     }
 
-    public function getTopArticles($dateCondition, $top)
+    public function getTopArticles(string $dateCondition, int $top): array
     {
-        $query = $this->fluentForLog
-            ->from('Log')
-            ->select('
-                    Uri, 
-                    COUNT(*) AS visits,
-                    CASE 
-                        WHEN Uri LIKE "/articles/%" THEN CAST(substr(Uri, 11) AS INTEGER)
-                        WHEN Uri LIKE "/navbar/show/article/%" THEN CAST(substr(Uri, 22) AS INTEGER)
-                        ELSE NULL
-                    END AS articleId')
-            ->where($dateCondition)
-            ->where('(
-                    (Uri LIKE "/articles/%" AND Uri GLOB "/articles/[0-9]*" AND Uri NOT LIKE "/articles/%/%") 
-                    OR 
+        $sql = '
+            SELECT
+                Uri,
+                COUNT(*) AS visits,
+                CASE
+                    WHEN Uri LIKE "/articles/%" THEN CAST(substr(Uri, 11) AS INTEGER)
+                    WHEN Uri LIKE "/navbar/show/article/%" THEN CAST(substr(Uri, 22) AS INTEGER)
+                    ELSE NULL
+                END AS articleId
+            FROM Log
+            WHERE ' . $dateCondition . '
+                AND (
+                    (Uri LIKE "/articles/%" AND Uri GLOB "/articles/[0-9]*" AND Uri NOT LIKE "/articles/%/%")
+                    OR
                     (Uri LIKE "/navbar/show/article/%" AND Uri GLOB "/navbar/show/article/[0-9]*" AND Uri NOT LIKE "/navbar/show/article/%/%")
-                )')
-            ->groupBy('Uri')
-            ->orderBy('visits DESC')
-            ->limit($top);
-        return $query->fetchAll();
+                )
+            GROUP BY Uri
+            ORDER BY visits DESC
+            LIMIT :top
+        ';
+        $stmt = $this->pdoForLog->prepare($sql);
+        $stmt->execute([':top' => $top]);
+        return $stmt->fetchAll();
     }
 
     public function getTopPages($dateCondition, $top)

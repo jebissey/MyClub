@@ -32,7 +32,7 @@ class WebmasterApi extends BaseApi
         } else $this->renderJson(['success' => false, 'message' => 'User not allowed'], 403);
     }
 
-    public function getPersonsInGroup($id)
+    public function getPersonsInGroup(?int $id): void
     {
         if ($this->connectedUser->get()->person ?? false) {
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {

@@ -2,9 +2,11 @@
 
 namespace app\helpers;
 
-use app\enums\ApplicationError;
+use InvalidArgumentException;
 use PDO;
 use PDOException;
+
+use app\enums\ApplicationError;
 
 /*
 Examples
@@ -70,7 +72,7 @@ abstract class Data
             if (is_array($fields)) $fieldsStr = implode(', ', $fields);
             else                   $fieldsStr = $fields;
 
-            $sql = "SELECT {$fieldsStr} FROM '{$table}'";
+            $sql = "SELECT {$fieldsStr} FROM \"{$table}\"";
             $params = [];
             if (!empty($where)) {
                 $conditions = [];
@@ -90,29 +92,42 @@ abstract class Data
         }
     }
 
-    public function gets(string $table, array $where = [], $fields = '*', string $orderBy = ''): array
+    public function gets(string $table, array $where = [], string $fields = '*', string $orderBy = '', bool $keyPair = false): array
     {
         try {
-            if (is_array($fields)) $fieldsStr = implode(', ', $fields);
-            else                   $fieldsStr = $fields;
-
-            $sql = "SELECT {$fieldsStr} FROM '{$table}'";
+            $firstField = null;
+            if ($keyPair) {
+                if ($fields === '*') throw new InvalidArgumentException("Cannot use keyPair with fields='*'");
+                $fieldParts = array_map('trim', explode(',', $fields));
+                $firstField = $fieldParts[0];
+            }
+            $sql = "SELECT {$fields} FROM \"{$table}\"";
             $params = [];
             if (!empty($where)) {
                 $conditions = [];
                 foreach ($where as $field => $value) {
-                    if ($value == null) $conditions[] = "{$field}";
+                    if ($value === null)                    $conditions[] = "{$field}";
                     else {
-                        $conditions[] = "{$field} = :{$field}";
-                        $params[":{$field}"] = $value;
+                        if (strtolower($field) === 'email') $conditions[] = "{$field} COLLATE NOCASE = ?";
+                        else                                $conditions[] = "{$field} = ?";
+                        $params[] = $value;
                     }
                 }
                 $sql .= " WHERE " . implode(' AND ', $conditions);
-                if ($orderBy !== '')  $sql .= " ORDER BY " . $orderBy;
             }
+            if ($orderBy !== '') $sql .= " ORDER BY " . $orderBy;
             $stmt = $this->pdo->prepare($sql);
             $stmt->execute($params);
-            return $stmt->fetchall();
+            if ($keyPair) {
+                $results = $stmt->fetchAll(PDO::FETCH_OBJ);
+                $keyPairArray = [];
+                foreach ($results as $result) {
+                    $key = $result->{$firstField};
+                    $keyPairArray[$key] = $result;
+                }
+                return $keyPairArray;
+            }
+            return $stmt->fetchAll();
         } catch (PDOException $e) {
             $this->application->getErrorManager()->raise(ApplicationError::Error, 'Database error: ' . $e->getMessage() . ' in file ' . __FILE__ . ' at line ' . __LINE__);
             throw $e;
@@ -129,7 +144,7 @@ abstract class Data
             $queryType = strtoupper(substr(trim($sql), 0, 6));
             switch ($queryType) {
                 case 'SELECT':
-                    return $stmt->fetchAll(PDO::FETCH_OBJ);
+                    return $stmt->fetchAll();
                 case 'INSERT':
                     return $this->pdo->lastInsertId();
                 case 'UPDATE':

@@ -34,37 +34,27 @@ class PageDataHelper extends Data
         if (empty($data['id'])) {
             $maxPosition = $this->fluent->from('Page')->select('MAX(Position) AS MaxPos')->fetch();
             $newPosition = ($maxPosition && $maxPosition->MaxPos) ? $maxPosition->MaxPos + 1 : 1;
-            $this->fluent->insertInto('Page')
-                ->values([
-                    'Name' => $data['name'],
-                    'Route' => $data['route'],
-                    'Position' => $newPosition,
-                    'IdGroup' => $data['idGroup'],
-                    'ForMembers' => $data['forMembers'],
-                    'ForAnonymous' => $data['forAnonymous'],
-                ])
-                ->execute();
-        } else {
-            $this->fluent->update('Page')
-                ->set([
-                    'Name' => $data['name'],
-                    'Route' => $data['route'],
-                    'IdGroup' => $data['idGroup'],
-                    'ForMembers' => $data['forMembers'],
-                    'ForAnonymous' => $data['forAnonymous'],
-                ])
-                ->where('Id', $data['id'])
-                ->execute();
-        }
+            $this->set('Page', [
+                'Name' => $data['name'],
+                'Route' => $data['route'],
+                'Position' => $newPosition,
+                'IdGroup' => $data['idGroup'],
+                'ForMembers' => $data['forMembers'],
+                'ForAnonymous' => $data['forAnonymous']
+            ]);
+        } else $this->set('Page', [
+            'Name' => $data['name'],
+            'Route' => $data['route'],
+            'IdGroup' => $data['idGroup'],
+            'ForMembers' => $data['forMembers'],
+            'ForAnonymous' => $data['forAnonymous'],
+        ], ['Id' => $data['id']]);
     }
 
     public function updates($positions)
     {
         foreach ($positions as $id => $position) {
-            $this->fluent->update('Page')
-                ->set(['Position' => $position])
-                ->where('Id', $id)
-                ->execute();
+            $this->set('Page', ['Position' => $position], ['Id' => $id]);
         }
     }
 
@@ -77,8 +67,7 @@ class PageDataHelper extends Data
             ->fetch();
         if (!$pageData) return false;
         if (!$pageData->IdGroup) {
-            if (!$person && $pageData->ForAnonymous) return true;
-            if ($person && $pageData->ForMembers)    return true;
+            if ((!$person && $pageData->ForAnonymous) || ($person && $pageData->ForMembers)) return true;
             return false;
         }
         if (!$person) return false;

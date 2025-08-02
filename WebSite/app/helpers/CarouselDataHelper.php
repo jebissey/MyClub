@@ -10,50 +10,14 @@ class CarouselDataHelper extends Data
         parent::__construct($application);
     }
 
-    public function delete_($id)
-    {
-        $this->fluent->deleteFrom('Carousel')
-            ->where('Id', $id)
-            ->execute();
-    }
-
-    public function get_($id)
-    {
-        return $this->fluent->from('Carousel')
-            ->where('Id', $id)
-            ->fetch();
-    }
-
-    public function getsForArticle($id)
-    {
-        $this->fluent->from('Carousel')->where('IdArticle', $id)->fetchAll();
-    }
-
-    public function getByArticle($idArticle)
-    {
-        return $this->fluent->from('Carousel')->where('IdArticle', $idArticle)->fetchAll();
-    }
-
-    public function set_($data, $item): string
+    public function set_(array $data, string $item): string
     {
         if (!empty($data['id'])) {
-            $this->fluent->update('Carousel')
-                ->set([
-                    'Item' => $item
-                ])
-                ->where('Id', $data['id'])
-                ->where('IdArticle', $data['idArticle'])
-                ->execute();
-            $message = 'Élément mis à jour avec succès';
+            $this->set('Carousel', ['Item' => $item], ['id' => $data['id'], 'IdArticle' => $data['idArticle']]);
+            return 'Élément mis à jour avec succès';
         } else {
-            $this->fluent->insertInto('Carousel')
-                ->values([
-                    'IdArticle' => $data['idArticle'],
-                    'Item' => $item
-                ])
-                ->execute();
-            $message = 'Élément ajouté avec succès';
+            $this->set('Carousel', ['Item' => $item, 'IdArticle' => $data['idArticle']]);
+            return 'Élément ajouté avec succès';
         }
-        return $message;
     }
 }

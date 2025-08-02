@@ -24,51 +24,46 @@ class AuthorizationDataHelper extends Data
         return array_column($query->fetchAll(), 'Name');
     }
 
-    public function canPersonReadSurveyResults($article, $person): bool
+    public function canPersonReadSurveyResults(object $article, object $person): bool
     {
-        $survey = $this->fluent->from('Survey')->where('IdArticle', $article->Id)->fetch();
-        if (!$survey || !$person) {
-            return false;
-        }
-
+        $survey = $this->get('Survey', ['IdArticle' => $article->Id]);
+        if (!$survey || !$person) return false;
         $now = (new DateTime())->format('Y-m-d');
         $closingDate = $survey->ClosingDate;
-
         if (
             $article->CreatedBy == $person->Id
             || $survey->Visibility == 'all'
             || $survey->Visibility == 'allAfterClosing' && $closingDate < $now
-        ) {
-            return true;
-        }
-
+        ) return true;
         $stmt = $this->pdo->prepare('SELECT COUNT(*) FROM Reply WHERE IdSurvey = ? AND IdPerson = ?');
         $stmt->execute([$survey->Id, $person->Id]);
         $hasVoted = $stmt->fetchColumn() > 0;
-        if ($hasVoted && ($survey->Visibility == 'voters' || ($survey->Visibility == 'votersAfterClosing' && $closingDate < $now))) {
+        if ($hasVoted && ($survey->Visibility == 'voters' || ($survey->Visibility == 'votersAfterClosing' && $closingDate < $now)))
             return true;
-        }
         return false;
     }
 
-    public function getArticle($id, $connectedUser)
+    public function getArticle($id, $connectedUser): object|false
     {
-        $article = $this->fluent->from('Article')->where('Id', $id)->fetch();
-        if (!$this->canReadArticle($article, $connectedUser)) {
-            return false;
-        }
+        $article = $this->get('Article', ['Id' => $id]);
+        if (!$this->canReadArticle($article, $connectedUser)) return false;
         return $article;
     }
 
     public function getUserGroups(string $userEmail): array
     {
-        $rows = $this->fluent->from('PersonGroup')
-            ->select('PersonGroup.IdGroup AS IdGroup')
-            ->leftJoin('Person ON Person.Id = PersonGroup.IdPerson')
-            ->where('Person.Email', $userEmail)
-            ->fetchAll();
+        $sql = '
+            SELECT PersonGroup.IdGroup AS IdGroup
+            FROM PersonGroup
+            LEFT JOIN Person ON Person.Id = PersonGroup.IdPerson
+            WHERE Person.Email COLLATE NOCASE = :email
+        ';
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([':email' => $userEmail]);
+        $rows = $stmt->fetchAll();
         return array_column($rows, 'IdGroup');
     }
+
 
     public function isUserInGroup($personEmail, $groupsFilter)
     {
@@ -88,10 +83,7 @@ class AuthorizationDataHelper extends Data
 
     private function getGroups($groupsFilter): array
     {
-        $rows = $this->fluent->from('"Group"')
-            ->select('Id AS IdGroup')
-            ->where('Name LIKE "%' . $groupsFilter . '%"')
-            ->fetchAll();
-        return array_column($rows, 'IdGroup');
+        $rows = $this->gets('Group', ['Name LIKE "%' . $groupsFilter . '%"' => null]);
+        return array_column($rows, 'Id');
     }
 }

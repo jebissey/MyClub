@@ -37,9 +37,9 @@ class EventController extends BaseController
             'navItems' => $this->getNavItems($this->connectedUser->get()->person ?? false),
             'events' => $this->eventDataHelper->getEvents($this->connectedUser->person, $mode, $offset, $filterByPreferences),
             'person' => $this->connectedUser->person,
-            'eventTypes' => $this->dataHelper->gets('EventType', ['Inactivated' => 0], "'Id', 'Name'", 'Name'),
-            'needTypes' => $this->dataHelper->gets('NeedType', [], "'Id', 'Name'", 'Name'),
-            'eventAttributes' => $this->dataHelper->gets('Attribute', [], "'Id', 'Name, Detail, Color'"),
+            'eventTypes' => $this->dataHelper->gets('EventType', ['Inactivated' => 0], 'Id, Name'),
+            'needTypes' => $this->dataHelper->gets('NeedType', [], 'Id, Name'),
+            'eventAttributes' => $this->dataHelper->gets('Attribute', [], 'Id, Name, Detail, Color'),
             'offset' => $offset,
             'mode' => $mode,
             'filterByPreferences' => $filterByPreferences,
@@ -51,8 +51,8 @@ class EventController extends BaseController
     {
         $this->render('app/views/event/weekEvents.latte', Params::getAll([
             'events' => $this->eventDataHelper->getNextWeekEvents(),
-            'eventTypes' => $this->dataHelper->gets('EventType', ['Inactivated', 0], "'Id', 'Name'", 'Name'),
-            'eventAttributes' => $this->dataHelper->gets('Attribute', [], "'Id', 'Name, Detail, Color'"),
+            'eventTypes' => $this->dataHelper->gets('EventType', ['Inactivated' => 0], 'Id, Name'),
+            'eventAttributes' => $this->dataHelper->gets('Attribute', [], 'Id, Name, Detail, Color'),
             'navItems' => $this->getNavItems($this->connectedUser->get()->person ?? false),
             'layout' => WebApp::getLayout()
         ]));
@@ -182,7 +182,7 @@ class EventController extends BaseController
         } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
-    public function show($eventId, $message = null, $messageType = null): void
+    public function show(int $eventId, string $message = '', string $messageType = ''): void
     {
         $person = $this->connectedUser->get()->person ?? false;
         $userEmail = $person->Email ?? '';
@@ -196,7 +196,7 @@ class EventController extends BaseController
                 'isRegistered' => $this->eventDataHelper->isUserRegistered($eventId, $userEmail),
                 'navItems' => $this->getNavItems($person),
                 'countOfMessages' => count($this->dataHelper->gets('Message', [
-                    'From' => 'User',
+                    '"From"' => 'User',
                     'EventId' => $eventId
                 ])),
                 'eventNeeds' => $this->eventDataHelper->getEventNeeds($eventId),
