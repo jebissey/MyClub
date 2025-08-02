@@ -682,17 +682,19 @@ class LogDataHelper extends Data
         return [$query->fetchAll(), ceil($total / $perPage)];
     }
 
-    public function getPersons($filteredPersonEmails)
+    public function getPersons(array $filteredPersonEmails): array
     {
-        $filteredPersonEmails = array_filter($filteredPersonEmails);
-        $query = $this->fluent->from('Person')
-            ->select(null)
-            ->select('LOWER(Email) AS Email, FirstName, LastName');
-        if (!empty($filteredPersonEmails)) {
-            $placeholders = implode(',', array_fill(0, count($filteredPersonEmails), '?'));
-            $query->where("Email COLLATE NOCASE IN ($placeholders)", $filteredPersonEmails);
+        $emails = array_filter(array_map('trim', array_values($filteredPersonEmails)));
+        $sql = "SELECT LOWER(Email) AS Email, FirstName, LastName FROM Person";
+        $params = [];
+        if (!empty($emails)) {
+            $placeholders = implode(',', array_fill(0, count($emails), '?'));
+            $sql .= " WHERE LOWER(Email) IN ($placeholders)";
+            $params = array_map('strtolower', $emails);
         }
-        return $query->fetchAll();
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($params);
+        return $stmt->fetchAll();
     }
 
     public function getTopArticles(string $dateCondition, int $top): array
