@@ -23,7 +23,7 @@ class GroupController extends BaseController implements CrudControllerInterface
     {
         if (($this->connectedUser->get()->isPersonManager() ?? false) || $this->connectedUser->isWebmaster() ?? false) {
             $this->render('app/views/groups/index.latte', Params::getAll([
-                'groups' => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
+                'groups' => $this->groupDataHelper->getGroupsWithAuthorizations(),
                 'layout' => WebApp::getLayout()
             ]));
         } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);

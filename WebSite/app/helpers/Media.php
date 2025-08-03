@@ -11,8 +11,9 @@ class Media
         if (!file_exists(self::MEDIA_PATH)) mkdir(self::MEDIA_PATH, 0755, true);
     }
 
-    public function deleteFile($year, $month, $filename)
+    public function deleteFile(string $year, string $month, string $filename)
     {
+        $filename = basename($filename);
         $filePath = self::MEDIA_PATH . $year . '/' . $month . '/' . $filename;
         $response = ['success' => false, 'message' => ''];
 

@@ -23,7 +23,7 @@ class ArticleApi extends BaseApi
         $this->replyDataHelper = new ReplyDataHelper($application);
     }
 
-    public function deleteFile($year, $month, $filename)
+    public function deleteFile(string $year, string $month, string $filename)
     {
         $this->renderJson($this->media->deleteFile($year, $month, $filename));
     }

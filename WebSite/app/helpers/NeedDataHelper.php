@@ -2,21 +2,22 @@
 
 namespace app\helpers;
 
-
 class NeedDataHelper extends Data
 {
     public function __construct(Application $application)
     {
-        parent::__construct();
+        parent::__construct($application);
     }
 
-    public function getNeedsAndTheirTypes()
+    public function getNeedsAndTheirTypes(): array
     {
-        return $this->fluent
-            ->from('Need')
-            ->select('Need.*, NeedType.Name AS TypeName')
-            ->leftJoin('NeedType ON Need.IdNeedType = NeedType.Id')
-            ->orderBy('NeedType.Name, Need.Name')
-            ->fetchAll();
+        $sql = "
+            SELECT Need.*, NeedType.Name AS TypeName
+            FROM Need
+            LEFT JOIN NeedType ON Need.IdNeedType = NeedType.Id
+            ORDER BY NeedType.Name, Need.Name
+        ";
+        $stmt = $this->pdo->query($sql);
+        return $stmt->fetchAll();
     }
 }

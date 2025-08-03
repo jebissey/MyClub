@@ -45,17 +45,16 @@ class MediaController extends BaseController
         } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
-    public function viewFile($year, $month, $filename)
+    public function viewFile(string $year, string $month, string $filename): void
     {
-        if ($this->connectedUser->get()->isRedactor()?? false) {
+        $filename = basename($filename);
+        if ($this->connectedUser->get()->isRedactor() ?? false) {
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $filePath = Media::GetMediaPath() . $year . '/' . $month . '/' . $filename;
-
                 if (!file_exists($filePath)) {
-                    $this->application->getErrorManager()->raise(ApplicationError::PageNotFound, "File $filename not found in file " . __FILE__ . ' at line ' . __LINE__);
+                    $this->application->getErrorManager()->raise(ApplicationError::PageNotFound, "File $filePath not found in file " . __FILE__ . ' at line ' . __LINE__);
                     return;
                 }
-
                 $finfo = finfo_open(FILEINFO_MIME_TYPE);
                 $mime = finfo_file($finfo, $filePath);
                 finfo_close($finfo);
@@ -92,7 +91,7 @@ class MediaController extends BaseController
         return $years;
     }
 
-    private function getFilesForYear($year, $search = ''): array
+    private function getFilesForYear(string $year, string $search = ''): array
     {
         $files = [];
         $yearPath = Media::GetMediaPath() . $year . '/';
@@ -103,7 +102,6 @@ class MediaController extends BaseController
                 if ($month !== '.' && $month !== '..' && is_dir($yearPath . $month)) {
                     $monthPath = $yearPath . $month . '/';
                     $monthFiles = scandir($monthPath);
-
                     foreach ($monthFiles as $file) {
                         if ($file !== '.' && $file !== '..' && is_file($monthPath . $file)) {
                             if (empty($search) || stripos($file, $search) !== false) {

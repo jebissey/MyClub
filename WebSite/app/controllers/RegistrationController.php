@@ -51,7 +51,7 @@ class RegistrationController extends TableController
     public function getPersonGroups($personId)
     {
         if (($this->connectedUser->get()->isPersonManager() ?? false) || $this->connectedUser->isWebmaster() ?? false) {
-            [$availableGroups, $currentGroups] = (new GroupDataHelper($this->application))->getAvailableGroups($personId);
+            [$availableGroups, $currentGroups] = (new GroupDataHelper($this->application))->getAvailableGroups($this->connectedUser, $personId);
 
             $this->render('app/views/registration/groups.latte', Params::getAll([
                 'currentGroups' => $currentGroups,

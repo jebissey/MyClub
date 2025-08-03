@@ -5,6 +5,7 @@ namespace app\controllers;
 use RuntimeException;
 
 use app\enums\ApplicationError;
+use app\enums\InputPattern;
 use app\helpers\Application;
 use app\helpers\ArticleCrosstabDataHelper;
 use app\helpers\ArticleDataHelper;
@@ -45,16 +46,17 @@ class ArticleController extends TableController
     public function index()
     {
         $this->connectedUser->get();
-        $filterValues = [
-            'PersonName' => $_GET['PersonName'] ?? '',
-            'title' => $_GET['title'] ?? '',
-            'timestamp' => $_GET['timestamp'] ?? '',
-            'lastUpdate' => $_GET['lastUpdate'] ?? '',
-            'published' => $_GET['published'] ?? '',
-            'pool' => $_GET['pool'] ?? '',
-            'GroupName' => $_GET['GroupName'] ?? '',
-            'Content' => $_GET['Content'] ?? '',
+        $schema = [
+            'PersonName' => InputPattern::Name->value,
+            'title' => InputPattern::Title->value,
+            'timestamp' => InputPattern::DateTime->value,
+            'lastUpdate' => InputPattern::DateTime->value,
+            'published' => ['oui', 'non'],
+            'pool' => ['oui', 'non'],
+            'GroupName' => InputPattern::GroupName->value,
+            'Content' => InputPattern::Content->value,
         ];
+        $filterValues = WebApp::filterInput($schema, $_GET);
         $filterConfig = [
             ['name' => 'PersonName', 'label' => 'Créé par'],
             ['name' => 'title', 'label' => 'Titre'],
@@ -79,7 +81,7 @@ class ArticleController extends TableController
             $columns[] = ['field' => 'Published', 'label' => 'Publié'];
         }
         $query = $this->articleTableDataHelper->getQuery($this->connectedUser);
-        $data = $this->prepareTableData($query, $filterValues, $_GET['tablePage'] ?? null);
+        $data = $this->prepareTableData($query, $filterValues, (int)($_GET['tablePage'] ?? 0));
         $this->render('app/views/user/articles.latte', Params::getAll([
             'articles' => $data['items'],
             'currentPage' => $data['currentPage'],
@@ -95,7 +97,7 @@ class ArticleController extends TableController
         ]));
     }
 
-    public function show($id): void
+    public function show(int $id): void
     {
         $this->connectedUser->get();
         $article = $this->authorizationDatahelper->getArticle($id, $this->connectedUser);
@@ -134,7 +136,7 @@ class ArticleController extends TableController
         else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
-    public function update($id): void
+    public function update(int $id): void
     {
         if ($this->connectedUser->get()->isRedactor() || false) {
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -167,7 +169,7 @@ class ArticleController extends TableController
         } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
-    public function publish($id): void
+    public function publish(int $id): void
     {
         if ($this->connectedUser->get()->isEditor() ?? false) {
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -214,7 +216,7 @@ class ArticleController extends TableController
         } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
-    public function delete($id)
+    public function delete(int $id)
     {
         if ($this->connectedUser->get()->isRedactor() || false) {
             if (($_SERVER['REQUEST_METHOD'] === 'GET')) {

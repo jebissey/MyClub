@@ -150,7 +150,7 @@ class LogController extends BaseController
     {
         $person = $this->connectedUser->get()->person ?? false;
         if ($person && $this->connectedUser->isWebmaster()) {
-            $activePersons = $this->dataHelper->gets('Persons', ['Inactivated' => 0]);
+            $activePersons = $this->dataHelper->gets('Person', ['Inactivated' => 0]);
             $this->render('app/views/user/lastVisits.latte', Params::getAll([
                 'lastVisits' => $this->logDataHelper->getLastVisitPerActivePersonWithTimeAgo($activePersons),
                 'totalActiveUsers' => count($activePersons),

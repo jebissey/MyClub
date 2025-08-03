@@ -11,7 +11,7 @@ class GroupDataHelper extends Data
         parent::__construct($application);
     }
 
-    public function getAvailableGroups(ConnectedUser $connectedUser)
+    public function getAvailableGroups(ConnectedUser $connectedUser, int $personId)
     {
         if ($connectedUser->isWebmaster()) {
             $query = $this->pdo->prepare("
@@ -41,7 +41,7 @@ class GroupDataHelper extends Data
 					HAVING Authorizations is NULL
                 ");
         }
-        $query->execute([$connectedUser->person->Id]);
+        $query->execute([$personId]);
         $currentGroups = $query->fetchAll();
 
         $availableGroupsWithoutAuthorisationQuery = "

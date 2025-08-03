@@ -12,7 +12,7 @@ class DbBrowserHelper extends Data
         parent::__construct($application);
     }
 
-    public function createRecord($table)
+    public function createRecord(string $table): void
     {
         $this->validateTableName($table);
         $columns = $this->getTableColumns($table);
@@ -21,23 +21,19 @@ class DbBrowserHelper extends Data
         foreach ($columns as $column) {
             if (isset($_POST[$column])) $data[$column] = $_POST[$column];
         }
-
         $columnsList = implode(', ', array_map([$this, 'quoteName'], array_keys($data)));
         $placeholders = implode(', ', array_map(function ($key) {
             return ':' . $key;
         }, array_keys($data)));
-
         $query = "INSERT INTO " . $this->quoteName($table) . " (" . $columnsList . ") VALUES (" . $placeholders . ")";
         $stmt = $this->pdo->prepare($query);
-
         foreach ($data as $key => $value) {
             $stmt->bindValue(':' . $key, $value);
         }
-
         $stmt->execute();
     }
 
-    public function deleteRecord($table, $id)
+    public function deleteRecord(string $table, int $id): void
     {
         $this->validateTableName($table);
         $primaryKey = $this->getPrimaryKey($table);
@@ -49,7 +45,7 @@ class DbBrowserHelper extends Data
         $stmt->execute();
     }
 
-    public function getPrimaryKey($table)
+    public function getPrimaryKey(string $table): string
     {
         $this->validateTableName($table);
         $stmt = $this->pdo->prepare("PRAGMA table_info(" . $this->quoteName($table) . ")");
@@ -58,20 +54,17 @@ class DbBrowserHelper extends Data
         while ($row = $stmt->fetch()) {
             if ($row->pk == 1) return $row->name;
         }
-
-        // Si pas de clé primaire, utilise la première colonne
         $stmt = $this->pdo->prepare("PRAGMA table_info(" . $this->quoteName($table) . ")");
         $stmt->execute();
         $row = $stmt->fetch();
         return $row->name;
     }
 
-    public function getTableColumns($table)
+    public function getTableColumns(string $table): array
     {
         $this->validateTableName($table);
         $stmt = $this->pdo->prepare("PRAGMA table_info(" . $this->quoteName($table) . ")");
         $stmt->execute();
-
         $columns = [];
         while ($row = $stmt->fetch()) {
             $columns[] = $row->name;
@@ -79,12 +72,11 @@ class DbBrowserHelper extends Data
         return $columns;
     }
 
-    public function getTableColumnsDetails($table)
+    public function getTableColumnsDetails(string $table): array
     {
         $this->validateTableName($table);
         $stmt = $this->pdo->prepare("PRAGMA table_info(" . $this->quoteName($table) . ")");
         $stmt->execute();
-
         $columns = [];
         while ($row = $stmt->fetch()) {
             $columns[] = [
@@ -95,12 +87,11 @@ class DbBrowserHelper extends Data
         return $columns;
     }
 
-    public function getColumnTypes($table)
+    public function getColumnTypes(string $table): array
     {
         $this->validateTableName($table);
         $stmt = $this->pdo->prepare("PRAGMA table_info(" . $this->quoteName($table) . ")");
         $stmt->execute();
-
         $columnTypes = [];
         while ($row = $stmt->fetch()) {
             $columnTypes[$row->name] = [
@@ -113,23 +104,22 @@ class DbBrowserHelper extends Data
         return $columnTypes;
     }
 
-    public function getTables()
+    public function getTables(): array
     {
         $stmt = $this->pdo->query("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' ORDER BY name");
         return $stmt->fetchAll(PDO::FETCH_COLUMN);
     }
 
-    public function showCreateForm($table)
+    public function showCreateForm(string $table): array
     {
         $this->validateTableName($table);
         return [$this->getTableColumns($table), $this->getColumnTypes($table)];
     }
 
-    public function showEditForm($table, $id)
+    public function showEditForm(string $table, int $id): array
     {
         $this->validateTableName($table);
         $primaryKey = $this->getPrimaryKey($table);
-
         $query = "SELECT * FROM " . $this->quoteName($table) . " WHERE " . $this->quoteName($primaryKey) . " = :id LIMIT 1";
         $stmt = $this->pdo->prepare($query);
         $stmt->bindValue(':id', $id);
@@ -139,16 +129,14 @@ class DbBrowserHelper extends Data
         return [$this->getTableColumns($table), $record, $primaryKey, $this->getColumnTypes($table)];
     }
 
-    public function showTable($table, $itemsPerPage)
+    public function showTable(string $table, int $itemsPerPage): array
     {
         $this->validateTableName($table);
-
         $columns = $this->getTableColumns($table);
         $filters = [];
         foreach ($columns as $column) {
             if (isset($_GET['filter_' . $column])) $filters[$column] = $_GET['filter_' . $column];
         }
-
         $dbbPage = isset($_GET['dbbPage']) ? max(1, intval($_GET['dbbPage'])) : 1;
         $offset = ($dbbPage - 1) * $itemsPerPage;
         $query = "SELECT * FROM " . $this->quoteName($table);
@@ -162,7 +150,6 @@ class DbBrowserHelper extends Data
             }
             $query .= " WHERE " . implode(' AND ', $whereConditions);
         }
-
         $countQuery = "SELECT COUNT(*) FROM (" . $query . ")";
         $stmt = $this->pdo->prepare($countQuery);
         foreach ($params as $key => $value) {
@@ -171,7 +158,6 @@ class DbBrowserHelper extends Data
         $stmt->execute();
         $totalRecords = $stmt->fetchColumn();
         $totalPages = ceil($totalRecords / $itemsPerPage);
-
         $query .= " LIMIT :limit OFFSET :offset";
         $stmt = $this->pdo->prepare($query);
         foreach ($params as $key => $value) {
@@ -183,7 +169,7 @@ class DbBrowserHelper extends Data
         return [$stmt->fetchAll(), $columns, $dbbPage, $totalPages, $filters];
     }
 
-    public function updateRecord($table, $id)
+    public function updateRecord(string $table, int $id): void
     {
         $this->validateTableName($table);
         $columnsDetails = $this->getTableColumnsDetails($table);
@@ -201,7 +187,6 @@ class DbBrowserHelper extends Data
         foreach ($data as $column => $value) {
             $updateParts[] = $this->quoteName($column) . " = :update_" . $column;
         }
-
         $query = "UPDATE " . $this->quoteName($table)
             . " SET " . implode(', ', $updateParts)
             . " WHERE " . $this->quoteName($primaryKey) . " = :id";
@@ -214,12 +199,12 @@ class DbBrowserHelper extends Data
     }
 
     #region Private functions
-    private function quoteName($name)
+    private function quoteName(string $name): string
     {
         return '"' . str_replace('"', '""', $name) . '"';
     }
 
-    private function validateTableName($table)
+    private function validateTableName(string $table): void
     {
         if (!preg_match('/^[a-zA-Z0-9_]+$/', $table)) throw new RuntimeException('Invalid table name in file ' + __FILE__ + ' at line ' + __LINE__);
         $tables = $this->getTables();

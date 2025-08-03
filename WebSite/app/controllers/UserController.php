@@ -109,7 +109,7 @@ class UserController extends BaseController
         } else $this->application->getErrorManager()->raise(ApplicationError::InvalidRequestMethod, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
-    public function signOut()
+    public function signOut(): void
     {
         (new LogDataHelper($this->application))->add(200, 'Sign out succeeded with with ' . $_SESSION['user'] ?? '');
         $this->dataHelper->set('Person',  ['LastSignOut' => date('Y-m-d H:i:s')], ['Email' => $_SESSION['user']]);
@@ -139,7 +139,7 @@ class UserController extends BaseController
         echo $content;
     }
 
-    public function home()
+    public function home(): void
     {
         $person = $this->connectedUser->get()->person ?? false;
         $_SESSION['navbar'] = '';
@@ -200,7 +200,7 @@ class UserController extends BaseController
     }
 
     #region Data user
-    public function user()
+    public function user(): void
     {
         if ($this->connectedUser->get()->person ?? false) {
             $_SESSION['navbar'] = 'user';
@@ -210,7 +210,7 @@ class UserController extends BaseController
         } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
-    public function account()
+    public function account(): void
     {
         if ($person = $this->connectedUser->get(1)->person ?? false) {
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -248,7 +248,7 @@ class UserController extends BaseController
         } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
-    public function availabilities()
+    public function availabilities(): void
     {
         if ($person = $this->connectedUser->get(1)->person ?? false) {
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -262,7 +262,7 @@ class UserController extends BaseController
         } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
-    public function preferences()
+    public function preferences(): void
     {
         if ($person = $this->connectedUser->get(1)->person ?? false) {
 
@@ -287,7 +287,7 @@ class UserController extends BaseController
         } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
-    public function groups()
+    public function groups(): void
     {
         if ($person = $this->connectedUser->get(1)->person ?? false) {
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -301,11 +301,11 @@ class UserController extends BaseController
                     'layout' => WebApp::getLayout()
                 ]));
             } else $this->application->getErrorManager()->raise(ApplicationError::InvalidRequestMethod, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
-        }
+        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
     #endregion 
 
-    public function help()
+    public function help(): void
     {
         if ($this->connectedUser->get()->person ?? false) {
             $this->render('app/views/info.latte', Params::getAll([
@@ -376,7 +376,7 @@ class UserController extends BaseController
     }
 
     #region News
-    public function showNews()
+    public function showNews(): void
     {
         if ($person = $this->connectedUser->get(1)->person ?? false) {
             $searchMode = $_GET['from'] ?? 'signout';
@@ -396,7 +396,7 @@ class UserController extends BaseController
     }
 
     #region Statistics
-    public function showStatistics()
+    public function showStatistics(): void
     {
         if ($person = $this->connectedUser->get(1)->person ?? false) {
             $personalStatistics = new PersonStatistics();
@@ -410,11 +410,10 @@ class UserController extends BaseController
             ]));
         } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
-    private function getVisitStatsForChart($season, $person)
+    private function getVisitStatsForChart(array $season, object $person): array
     {
         $stats = $this->getVisitStats($season);
         $currentUserTranche = $this->getCurrentUserTranche($stats, $person);
-
         $chartData = [];
         for ($i = 0; $i < count($stats['tranches']); $i++) {
             $chartData[] = [
@@ -423,7 +422,6 @@ class UserController extends BaseController
                 'isCurrentUser' => ($i === $currentUserTranche)
             ];
         }
-
         return $chartData;
     }
 

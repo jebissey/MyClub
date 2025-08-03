@@ -6,6 +6,7 @@ use DateTime;
 use Throwable;
 
 use app\enums\ApplicationError;
+use app\enums\InputPattern;
 use app\helpers\Application;
 use app\helpers\CrosstabDataHelper;
 use app\helpers\Email;
@@ -29,7 +30,7 @@ class EventController extends BaseController
 
     public function nextEvents(): void
     {
-        $offset = (int) ($_GET['offset'] ?? 0);
+        $offset = (int)($_GET['offset'] ?? 0);
         $mode = $_GET['mode'] ?? 'next';
         $filterByPreferences = isset($_GET['filterByPreferences']) && $_GET['filterByPreferences'] === '1';
 
@@ -95,14 +96,18 @@ class EventController extends BaseController
     {
         if ($this->connectedUser->get(1)->isEventManager() ?? false) {
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-                $email = trim($_POST['email'] ?? '');
-                $nickname = trim($_POST['nickname'] ?? '');
-                $eventId = (int)($_POST['eventId'] ?? 0);
-
+                $schema = [
+                    'email' => InputPattern::Email->value,
+                    'nickname' => InputPattern::Nickname->value,
+                    'eventId' => 'int',
+                ];
+                $input = WebApp::filterInput($schema, $_POST);
+                $email = $input['email'];
                 if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
                     $this->guest('Adresse e-mail invalide', 'error');
                     return;
                 }
+                $eventId = (int)($input['eventId'] ?? 0);
                 if ($eventId <= 0) {
                     $this->guest('Veuillez sélectionner un événement', 'error');
                     return;
@@ -112,6 +117,7 @@ class EventController extends BaseController
                     $this->guest('Événement non trouvé ou non accessible', 'error');
                     return;
                 }
+                $nickname = $input['nickname'];
                 try {
                     $contact = $this->dataHelper->get('Contact', ['Email', $email]);
                     if (!$contact) {
@@ -210,7 +216,7 @@ class EventController extends BaseController
         } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Evénement non trouvé', 3000);
     }
 
-    public function register($eventId, bool $set, $token = null): void
+    public function register(int $eventId, bool $set, $token = null): void
     {
         if ($token === null) $token = $_GET['t'] ?? null;
         if ($this->connectedUser->get()->person ?? false) {
@@ -297,7 +303,7 @@ class EventController extends BaseController
     public function help(): void
     {
         $this->render('app/views/info.latte', [
-            'content' => $this->dataHelper->get('Settings', ['Name' => 'Help_eventManager']),
+            'content' => $this->dataHelper->get('Settings', ['Name' => 'Help_eventManager'])->Value ?? '',
             'hasAuthorization' => $this->connectedUser->get()->hasAutorization() ?? false,
             'currentVersion' => Application::VERSION
         ]);

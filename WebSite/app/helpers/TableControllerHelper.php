@@ -17,7 +17,7 @@ class TableControllerHelper extends Data
             ->leftJoin('`Group` ON EventType.IdGroup = `Group`.Id')
             ->leftJoin('EventTypeAttribute ON EventType.Id = EventTypeAttribute.IdEventType')
             ->leftJoin('Attribute ON EventTypeAttribute.IdAttribute = Attribute.Id')
-            ->where('EventType.Inactivated', 0)
+            ->where('EventType.Inactivated = 0')
             ->groupBy('EventType.Id')
             ->orderBy('EventType.Name');
     }

@@ -19,7 +19,7 @@ class NavBarController extends BaseController
     {
         if ($this->connectedUser->get()->isWebmaster() ?? false) {
             $this->render('app/views/navbar/index.latte', Params::getAll([
-                'navItems' => $this->getNavItems(true),
+                'navItems' => $this->getNavItems($this->connectedUser->person),
                 'groups' => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
                 'availableRoutes' => $this->getAvailableRoutes()
             ]));

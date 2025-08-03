@@ -43,7 +43,7 @@ class AuthorizationDataHelper extends Data
         return false;
     }
 
-    public function getArticle($id, $connectedUser): object|false
+    public function getArticle(int $id, ConnectedUser $connectedUser): object|false
     {
         $article = $this->get('Article', ['Id' => $id]);
         if (!$this->canReadArticle($article, $connectedUser)) return false;
@@ -64,7 +64,6 @@ class AuthorizationDataHelper extends Data
         return array_column($rows, 'IdGroup');
     }
 
-
     public function isUserInGroup($personEmail, $groupsFilter)
     {
         return !empty(array_intersect($this->getGroups($groupsFilter), $this->getUserGroups($personEmail)));
@@ -81,8 +80,9 @@ class AuthorizationDataHelper extends Data
         return $article->IdGroup === null || !empty(array_intersect([$article->IdGroup], $this->getUserGroups($connectedUser->person->Email)));
     }
 
-    private function getGroups($groupsFilter): array
+    private function getGroups(string $groupsFilter): array
     {
+        $groupsFilter = preg_replace('/[^\p{L}]/u', '', $groupsFilter);
         $rows = $this->gets('Group', ['Name LIKE "%' . $groupsFilter . '%"' => null]);
         return array_column($rows, 'Id');
     }

@@ -102,7 +102,10 @@ class CrosstabDataHelper extends Data
         $stmt = $this->pdoForLog->prepare($sql);
         $stmt->execute($params);
         $crossTabData = $stmt->fetchAll();
-        $filteredPersons = array_unique(array_column($crossTabData, 'Who'));
+        $filteredPersons = array_values(array_filter(
+            array_unique(array_column($crossTabData, 'Who')),
+            fn($email) => filter_var($email, FILTER_VALIDATE_EMAIL)
+        ));
         $sortedCrossTabData = [];
         $columnTotals = [];
         foreach ($crossTabData as $row) {

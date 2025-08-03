@@ -16,7 +16,7 @@ abstract class TableController extends BaseController
         parent::__construct($application);
     }
 
-    protected function prepareTableData(Select $query, $filters = [], $page = 1): array
+    protected function prepareTableData(Select $query, array $filters = [], int $page = 1): array
     {
         foreach ($filters as $key => $value) {
             if (!empty($value)) {
@@ -32,7 +32,7 @@ abstract class TableController extends BaseController
 
         //var_dump($filters);
         //var_dump($query->getQuery());
-        //var_dump($values);
+        //var_dump($values ?? null);
         //die();
 
         $stmt = $this->application->getPdo()->prepare($query->getQuery());

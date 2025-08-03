@@ -11,7 +11,7 @@ class SurveyDataHelper extends Data implements NewsProviderInterface
         parent::__construct($application);
     }
 
-    public function articleHasSurveyNotClosed($articleId): bool
+    public function articleHasSurveyNotClosed(int $articleId): object|bool
     {
         return $this->fluent
             ->from('Survey')
@@ -21,12 +21,12 @@ class SurveyDataHelper extends Data implements NewsProviderInterface
             ->fetch();
     }
 
-    public function getWithCreator($articleId)
+    public function getWithCreator(int $articleId): object|bool
     {
         return $this->fluent->from('Survey')->join('Article ON Survey.IdArticle = Article.Id')->where('IdArticle', $articleId)->select('Article.CreatedBy')->fetch();
     }
 
-    public function getPendingSurveyResponses()
+    public function getPendingSurveyResponses(): array
     {
         $query = "
         SELECT 
