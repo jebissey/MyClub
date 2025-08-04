@@ -56,8 +56,10 @@ class SurveyDataHelper extends Data implements NewsProviderInterface
         return $this->pdo->query($query)->fetchAll();
     }
 
-    public function getNews($person, $searchFrom): array
+    public function getNews(ConnectedUser $connectedUser, $searchFrom): array
     {
+        $news = [];
+        if (!($connectedUser->person ?? false)) return $news;
         $sql = "
             SELECT 
                 p.FirstName, 
@@ -81,8 +83,8 @@ class SurveyDataHelper extends Data implements NewsProviderInterface
         $authorizationDataHelper = new AuthorizationDataHelper($this->application);
         foreach ($surveys as $survey) {
             if (
-                $authorizationDataHelper->getArticle($survey->IdArticle, $person)
-                && $authorizationDataHelper->canPersonReadSurveyResults((new ArticleDataHelper($this->application))->getWithAuthor($survey->IdArticle), $person)
+                $authorizationDataHelper->getArticle($survey->IdArticle, $connectedUser)
+                && $authorizationDataHelper->canPersonReadSurveyResults((new ArticleDataHelper($this->application))->getWithAuthor($survey->IdArticle), $connectedUser)
             ) {
                 $news[] = [
                     'type' => 'survey',

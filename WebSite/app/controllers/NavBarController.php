@@ -8,7 +8,7 @@ use app\helpers\ArwardsDataHelper;
 use app\helpers\Params;
 use app\helpers\WebApp;
 
-class NavBarController extends BaseController
+class NavBarController extends AbstractController
 {
     public function __construct(Application $application)
     {

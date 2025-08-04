@@ -9,7 +9,7 @@ use app\helpers\Params;
 use app\helpers\WebApp;
 use app\interfaces\CrudControllerInterface;
 
-class GroupController extends BaseController implements CrudControllerInterface
+class GroupController extends AbstractController implements CrudControllerInterface
 {
     private GroupDataHelper $groupDataHelper;
 

@@ -7,7 +7,7 @@ use app\enums\ApplicationError;
 use app\helpers\DesignDataHelper;
 use app\helpers\Params;
 
-class DesignController extends BaseController
+class DesignController extends AbstractController
 {
 
     public function __construct(Application $application)

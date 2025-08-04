@@ -137,7 +137,7 @@ class DbBrowserHelper extends Data
         foreach ($columns as $column) {
             if (isset($_GET['filter_' . $column])) $filters[$column] = $_GET['filter_' . $column];
         }
-        $dbbPage = isset($_GET['dbbPage']) ? max(1, intval($_GET['dbbPage'])) : 1;
+        $dbbPage = isset($_GET['dbbPage']) ? max(1, intval((int)$_GET['dbbPage'])) : 1;
         $offset = ($dbbPage - 1) * $itemsPerPage;
         $query = "SELECT * FROM " . $this->quoteName($table);
         $params = [];

@@ -7,7 +7,7 @@ use \Envms\FluentPDO\Queries\Select;
 use app\helpers\Application;
 use app\helpers\Generic;
 
-abstract class TableController extends BaseController
+abstract class TableController extends AbstractController
 {
     protected int $itemsPerPage = 10;
 

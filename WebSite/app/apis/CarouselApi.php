@@ -10,7 +10,7 @@ use app\helpers\CarouselDataHelper;
 use app\helpers\DataHelper;
 use app\helpers\WebApp;
 
-class CarouselApi extends BaseApi
+class CarouselApi extends AbstractApi
 {
 
     public function __construct(Application $application)
@@ -20,8 +20,8 @@ class CarouselApi extends BaseApi
 
     public function getItems($idArticle)
     {
-        $person = $this->connectedUser->get()->person ?? false;
-        if (!$person || !(new AuthorizationDataHelper($this->application))->getArticle($idArticle, $person)) {
+        $connectedUser = $this->connectedUser->get();
+        if (!($connectedUser->person ?? false) || !(new AuthorizationDataHelper($this->application))->getArticle($idArticle, $connectedUser)) {
             $this->renderJson(['error' => 'Accès non autorisé'], 403);
             return;
         }

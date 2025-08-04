@@ -217,7 +217,7 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
         return $stmt->fetchAll();
     }
 
-    public function getNews(object $person, string $searchFrom): array
+    public function getNews(ConnectedUser $connectedUser, string $searchFrom): array
     {
         $sql = "
             SELECT a.Id, a.Title, a.LastUpdate
@@ -233,7 +233,7 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
         $authHelper = new AuthorizationDataHelper($this->application);
         $news = [];
         foreach ($articles as $article) {
-            if ($authHelper->getArticle($article->Id, $person)) {
+            if ($authHelper->getArticle($article->Id, $connectedUser)) {
                 $news[] = [
                     'type'  => 'article',
                     'id'    => $article->Id,

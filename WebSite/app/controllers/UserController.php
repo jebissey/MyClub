@@ -5,6 +5,7 @@ namespace app\controllers;
 use RuntimeException;
 
 use app\enums\ApplicationError;
+use app\enums\Period;
 use app\helpers\Application;
 use app\helpers\ArticleDataHelper;
 use app\helpers\AttributeDataHelper;
@@ -26,7 +27,7 @@ use app\helpers\SurveyDataHelper;
 use app\helpers\TranslationManager;
 use app\helpers\WebApp;
 
-class UserController extends BaseController
+class UserController extends AbstractController
 {
     private ArticleDataHelper $articleDataHelper;
     private Email $email;
@@ -141,12 +142,12 @@ class UserController extends BaseController
 
     public function home(): void
     {
-        $person = $this->connectedUser->get()->person ?? false;
+        $connectedUser = $this->connectedUser->get();
         $_SESSION['navbar'] = '';
         $userPendingSurveys = $userPendingDesigns = [];
         $userEmail = $_SESSION['user'] ?? '';
         if ($userEmail) {
-            if (!$person) {
+            if (!($connectedUser->person ?? false)) {
                 unset($_SESSION['user']);
                 $this->application->getErrorManager()->raise(ApplicationError::BadRequest, "Unknown user with this email address: $userEmail in file " . __FILE__ . ' at line ' . __LINE__);
             }
@@ -158,7 +159,7 @@ class UserController extends BaseController
             $userPendingDesigns = array_filter($pendingDesignResponses, function ($item) use ($userEmail) {
                 return strcasecmp($item->Email, $userEmail) === 0;
             });
-            $news = $this->news->anyNews($person);
+            $news = $this->news->anyNews($connectedUser);
         } else {
             $lang = TranslationManager::getCurrentLanguage();
             Params::setParams([
@@ -189,7 +190,7 @@ class UserController extends BaseController
             'latestArticles' => $articles['latestArticles'],
             'greatings' => $this->dataHelper->get('Settings', ['Name' => 'Greatings'])->Value ?? '',
             'link' => $this->dataHelper->get('Settings', ['Name' => 'Link'])->Value ?? '',
-            'navItems' => $this->getNavItems($person),
+            'navItems' => $this->getNavItems($connectedUser->person ?? false),
             'publishedBy' => $articles['latestArticle']
                 && $articles['latestArticle']->PublishedBy != $articles['latestArticle']->CreatedBy ? (new PersonDataHelper($this->application))->getPublisher($articles['latestArticle']->PublishedBy) : '',
             'latestArticleHasSurvey' => $this->surveyDataHelper->articleHasSurveyNotClosed($articles['latestArticle']->Id ?? 0),
@@ -378,19 +379,20 @@ class UserController extends BaseController
     #region News
     public function showNews(): void
     {
-        if ($person = $this->connectedUser->get(1)->person ?? false) {
-            $searchMode = $_GET['from'] ?? 'signout';
-            if ($searchMode === 'signin')      $searchFrom = $person->LastSignIn ?? '';
-            elseif ($searchMode === 'signout') $searchFrom = $person->LastSignOut ?? '';
-            elseif ($searchMode === 'week')    $searchFrom = date('Y-m-d H:i:s', strtotime('-1 week'));
-            elseif ($searchMode === 'month')   $searchFrom = date('Y-m-d H:i:s', strtotime('-1 month'));
+        $connectedUser = $this->connectedUser->get(1);
+        if ($connectedUser->person ?? false) {
+            $searchMode = WebApp::getFiltered('from', $this->application->enumToValues(Period::class), $_GET) ?: Period::Signout->value;
+            if ($searchMode === Period::Signin->value)      $searchFrom = $connectedUser->person->LastSignIn ?? '';
+            elseif ($searchMode === Period::Signout->value) $searchFrom = $connectedUser->person->LastSignOut ?? '';
+            elseif ($searchMode === Period::Week->value)    $searchFrom = date('Y-m-d H:i:s', strtotime('-1 week'));
+            elseif ($searchMode === Period::Month->value)   $searchFrom = date('Y-m-d H:i:s', strtotime('-1 month'));
 
             $this->render('app/views/user/news.latte', Params::getAll([
-                'news' => $this->news->getNewsForPerson($person, $searchFrom),
+                'news' => $this->news->getNewsForPerson($connectedUser, $searchFrom),
                 'searchFrom' => $searchFrom,
                 'searchMode' => $searchMode,
-                'navItems' => $this->getNavItems($person),
-                'person' => $person
+                'navItems' => $this->getNavItems($connectedUser->person ?? false),
+                'person' => $connectedUser->person
             ]));
         } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }

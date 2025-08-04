@@ -14,7 +14,7 @@ use app\helpers\LanguagesDataHelper;
 use app\helpers\PageDataHelper;
 use app\helpers\TranslationManager;
 
-abstract class BaseController
+abstract class AbstractController
 {
     protected Engine $flight;
     private LatteEngine $latte;
@@ -38,7 +38,7 @@ abstract class BaseController
     }
 
     #region Protected fucntions
-    protected function getNavItems($person, $all = false)
+    protected function getNavItems($person, bool $all = false)
     {
         if (!$person) $userGroups = [];
         else $userGroups = (new AuthorizationDataHelper($this->application))->getUserGroups($person->Email);

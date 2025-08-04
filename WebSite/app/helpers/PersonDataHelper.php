@@ -107,20 +107,27 @@ class PersonDataHelper extends Data implements NewsProviderInterface
         return $query->fetchColumn();
     }
 
-    public function getNews($person, $searchFrom): array
+    public function getNews(ConnectedUser $connectedUser, string $searchFrom): array
     {
-        $presentations = $this->fluent->from('Person p')
-            ->select('p.id, p.email, p.firstname, p.lastname, p.PresentationLastUpdate')
-            ->where('p.InPresentationDirectory = 1')
-            ->where('p.PresentationLastUpdate >= ?', $searchFrom)
-            ->where('p.email != ?', $person->Email)
-            ->orderBy('p.PresentationLastUpdate DESC')
-            ->fetchAll();
         $news = [];
+        if (!($connectedUser->person ?? false)) return $news;
+        $sql = "
+            SELECT Id, Email, FirstName, LastName, PresentationLastUpdate
+            FROM Person
+            WHERE InPresentationDirectory = 1
+            AND PresentationLastUpdate >= :searchFrom
+            AND Email != :email
+            ORDER BY PresentationLastUpdate DESC
+        ";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([
+            ':searchFrom' => $searchFrom,
+            ':email' => $connectedUser->person->Email
+        ]);
+        $presentations = $stmt->fetchAll();
         foreach ($presentations as $presentation) {
             $fullName = trim($presentation->FirstName . ' ' . $presentation->LastName);
-            if (empty($fullName)) $fullName = $presentation->email;
-
+            if (empty($fullName)) $fullName = $presentation->Email;
             $news[] = [
                 'type' => 'presentation',
                 'id' => $presentation->Id,

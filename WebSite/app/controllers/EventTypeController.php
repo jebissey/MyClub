@@ -31,7 +31,7 @@ class EventTypeController extends TableController implements CrudControllerInter
                 ['field' => 'GroupName', 'label' => 'Groupe'],
                 ['field' => 'Attributes', 'label' => 'Attributs'],
             ];
-            $data = $this->prepareTableData($this->tableControllerHelper->getEventTypesQuery(), $filterValues, $_GET['tablePage'] ?? null);
+            $data = $this->prepareTableData($this->tableControllerHelper->getEventTypesQuery(), $filterValues, (int)($_GET['tablePage'] ?? 1));
 
             $this->render('app/views/eventType/index.latte', Params::getAll([
                 'eventTypes' => $data['items'],

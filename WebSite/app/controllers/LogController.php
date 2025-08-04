@@ -2,15 +2,17 @@
 
 namespace app\controllers;
 
-use app\helpers\Application;
 use app\enums\ApplicationError;
+use app\enums\Period;
+use app\enums\InputPattern;
+use app\helpers\Application;
 use app\helpers\CrosstabDataHelper;
 use app\helpers\LogDataHelper;
 use app\helpers\Params;
-use app\helpers\Period;
+use app\helpers\PeriodHelper;
 use app\helpers\WebApp;
 
-class LogController extends BaseController
+class LogController extends AbstractController
 {
     private LogDataHelper $logDataHelper;
 
@@ -50,7 +52,7 @@ class LogController extends BaseController
                 'nav' => $this->logDataHelper->getReferentNavigation($period, $currentDate),
                 'externalRefs' => $this->logDataHelper->getExternalReferentStats($period, $currentDate),
                 'control' => new WebApp($this->application),
-                'rows' =>$this->logDataHelper->getReferentStats($period, $currentDate),
+                'rows' => $this->logDataHelper->getReferentStats($period, $currentDate),
             ]));
         } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
@@ -95,8 +97,8 @@ class LogController extends BaseController
     public function topPagesByPeriod()
     {
         if ($this->connectedUser->get()->isWebmaster() ?? false) {
-            $period = $_GET['period'] ?? 'week';
-            $dateCondition = Period::getDateConditions($period);
+            $period =  WebApp::getFiltered('period', $this->application->enumToValues(Period::class), $_GET) ?: Period::Week->value;
+            $dateCondition = PeriodHelper::getDateConditions($period);
             $topPages = $this->logDataHelper->getTopPages($dateCondition, self::TOP);
 
             $this->render('app/views/logs/topPages.latte', Params::getAll([
@@ -110,8 +112,8 @@ class LogController extends BaseController
     public function topArticlesByPeriod()
     {
         if ($this->connectedUser->get()->isRedactor() ?? false) {
-            $period = $_GET['period'] ?? 'week';
-            $dateCondition = Period::getDateConditions($period);
+            $period = WebApp::getFiltered('period', $this->application->enumToValues(Period::class), $_GET) ?: Period::Week->value;
+            $dateCondition = PeriodHelper::getDateConditions($period);
             $topPages = $this->logDataHelper->getTopArticles($dateCondition, self::TOP);
 
             $this->render('app/views/logs/topArticles.latte', Params::getAll([
@@ -125,11 +127,18 @@ class LogController extends BaseController
     public function crossTab()
     {
         if ($this->connectedUser->get()->isWebmaster() ?? false) {
-            $uriFilter = $_GET['uri'] ?? '';
-            $emailFilter = $_GET['email'] ?? '';
-            $groupFilter = $_GET['group'] ?? '';
-            $period = $_GET['period'] ?? 'today';
-            [$sortedCrossTabData, $filteredPersons, $columnTotals] = (new CrosstabDataHelper($this->application))->getPersons(Period::getDateConditions($period), $uriFilter, $emailFilter, $groupFilter);
+            $schema = [
+                'uri' => InputPattern::Uri->value,
+                'email' => InputPattern::Email->value,
+                'group' => InputPattern::Content->value,
+                'period' => $this->application->enumToValues(Period::class),
+            ];
+            $input = WebApp::filterInput($schema, $_GET);
+            $uriFilter = $input['uri'];
+            $emailFilter = $input['email'];
+            $groupFilter = $input['group'];
+            $period = $input['period'] !== '' ? $input['period'] : Period::Today->value;
+            [$sortedCrossTabData, $filteredPersons, $columnTotals] = (new CrosstabDataHelper($this->application))->getPersons(PeriodHelper::getDateConditions($period), $uriFilter, $emailFilter, $groupFilter);
 
             $this->render('app/views/logs/crossTab.latte', Params::getAll([
                 'title' => 'Tableau croisé dynamique des visites',

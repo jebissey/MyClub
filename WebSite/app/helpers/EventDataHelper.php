@@ -9,6 +9,7 @@ use RuntimeException;
 use Throwable;
 
 use app\enums\EventAudience;
+use app\enums\Period;
 use app\helpers\TranslationManager;
 use app\interfaces\NewsProviderInterface;
 
@@ -55,7 +56,7 @@ class EventDataHelper extends Data implements NewsProviderInterface
                 $this->pdo->rollBack();
                 return [['success' => false, 'message' => 'Unknown event'], 471];
             }
-            $mode = $_GET['mode'] ?? 'today';
+            $mode = WebApp::getFiltered('mode', $this->application->enumToValues(Period::class), $_GET) ?: Period::Today->value;
             $newStartTime = $this->calculateNewStartTime($event->StartTime, $mode);
             $newEvent = [
                 'Summary' => $event->Summary,
@@ -319,8 +320,10 @@ class EventDataHelper extends Data implements NewsProviderInterface
         return $stmt->fetchAll();
     }
 
-    public function getNews($person, $searchFrom): array
+    public function getNews(ConnectedUser $connectedUser, string $searchFrom): array
     {
+        $news = [];
+        if (!($connectedUser->person ?? false)) return $news;
         $sql = "
             SELECT e.Id, e.Summary, e.LastUpdate
             FROM Event e
@@ -331,11 +334,10 @@ class EventDataHelper extends Data implements NewsProviderInterface
         ";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([
-            ':personId'   => $person->Id,
+            ':personId'   => $connectedUser->person?->Id ?? 0,
             ':searchFrom' => $searchFrom
         ]);
         $events = $stmt->fetchAll();
-        $news = [];
         foreach ($events as $event) {
             $news[] = [
                 'type' => 'event',

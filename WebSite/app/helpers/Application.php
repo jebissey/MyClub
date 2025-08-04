@@ -81,6 +81,11 @@ class Application
         return $this->errorManager;
     }
 
+    public function enumToValues(string $enumClass): array
+    {
+        return array_map(fn($case) => $case->value, $enumClass::cases());
+    }
+
     #region Private functions
     private function setupLatteFilters(): void
     {

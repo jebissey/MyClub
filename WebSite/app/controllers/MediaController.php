@@ -8,7 +8,7 @@ use app\helpers\Media;
 use app\helpers\Params;
 use app\helpers\WebApp;
 
-class MediaController extends BaseController
+class MediaController extends AbstractController
 {
     public function __construct(Application $application)
     {

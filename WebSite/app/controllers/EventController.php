@@ -15,10 +15,10 @@ use app\helpers\MessageDataHelper;
 use app\helpers\NeedDataHelper;
 use app\helpers\Params;
 use app\helpers\ParticipantDataHelper;
-use app\helpers\Period;
+use app\helpers\PeriodHelper;
 use app\helpers\WebApp;
 
-class EventController extends BaseController
+class EventController extends AbstractController
 {
     private EventDataHelper $eventDataHelper;
 
@@ -33,11 +33,12 @@ class EventController extends BaseController
         $offset = (int)($_GET['offset'] ?? 0);
         $mode = $_GET['mode'] ?? 'next';
         $filterByPreferences = isset($_GET['filterByPreferences']) && $_GET['filterByPreferences'] === '1';
+        $connectedUser = $this->connectedUser->get();
 
         $this->render('app/views/event/nextEvents.latte', Params::getAll([
-            'navItems' => $this->getNavItems($this->connectedUser->get()->person ?? false),
-            'events' => $this->eventDataHelper->getEvents($this->connectedUser->person, $mode, $offset, $filterByPreferences),
-            'person' => $this->connectedUser->person,
+            'navItems' => $this->getNavItems($connectedUser->person ?? false),
+            'events' => $this->eventDataHelper->getEvents($connectedUser->person, $mode, $offset, $filterByPreferences),
+            'person' => $connectedUser->person,
             'eventTypes' => $this->dataHelper->gets('EventType', ['Inactivated' => 0], 'Id, Name'),
             'needTypes' => $this->dataHelper->gets('NeedType', [], 'Id, Name'),
             'eventAttributes' => $this->dataHelper->gets('Attribute', [], 'Id, Name, Detail, Color'),
@@ -69,7 +70,7 @@ class EventController extends BaseController
                 'crosstabData' => $crosstabData,
                 'period' => $period,
                 'dateRange' => $dateRange,
-                'availablePeriods' => Period::gets(),
+                'availablePeriods' => PeriodHelper::gets(),
                 'navbarTemplate' => '../navbar/eventManager.latte',
                 'title' => 'Animateurs vs type d\'événement',
                 'totalLabels' => ['événements', 'participants']
@@ -98,7 +99,7 @@ class EventController extends BaseController
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $schema = [
                     'email' => InputPattern::Email->value,
-                    'nickname' => InputPattern::Nickname->value,
+                    'nickname' => InputPattern::PersonName->value,
                     'eventId' => 'int',
                 ];
                 $input = WebApp::filterInput($schema, $_POST);
@@ -209,7 +210,7 @@ class EventController extends BaseController
                 'participantSupplies' => $this->eventDataHelper->getParticipantSupplies($eventId),
                 'userSupplies' => $this->eventDataHelper->getUserSupplies($eventId, $userEmail),
                 'isEventManager' => $this->connectedUser->isEventManager() || false,
-                'token' => isset($_GET['t']) ? $_GET['t'] : false,
+                'token' => WebApp::getFiltered('t', InputPattern::Token->value, $_GET) ?: false,
                 'message' => $message,
                 'messageType' => $messageType,
             ]));
@@ -218,7 +219,7 @@ class EventController extends BaseController
 
     public function register(int $eventId, bool $set, $token = null): void
     {
-        if ($token === null) $token = $_GET['t'] ?? null;
+        if ($token === null) $token = isset($_GET['t']) ? WebApp::getFiltered('t', InputPattern::Token->value, $_GET) : null;
         if ($this->connectedUser->get()->person ?? false) {
             $userId = $this->connectedUser->person->Id;
             if ($set) {

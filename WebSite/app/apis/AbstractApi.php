@@ -10,7 +10,7 @@ use app\helpers\ConnectedUser;
 use app\helpers\DataHelper;
 use app\helpers\PersonDataHelper;
 
-abstract class BaseApi
+abstract class AbstractApi
 {
     private LatteEngine $latte;
 

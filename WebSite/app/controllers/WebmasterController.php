@@ -9,7 +9,7 @@ use app\helpers\ArwardsDataHelper;
 use app\helpers\Params;
 use app\helpers\WebApp;
 
-class WebmasterController extends BaseController
+class WebmasterController extends AbstractController
 {
     public function __construct(Application $application)
     {

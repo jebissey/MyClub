@@ -107,4 +107,11 @@ class WebApp
         }
         return $filtered;
     }
+
+    static public function getFiltered(string $key, string|array $rule, array $source): mixed
+    {
+        $source ??= $_GET;
+        $result = self::filterInput([$key => $rule], $source);
+        return $result[$key] !== '' ? $result[$key] : false;
+    }
 }

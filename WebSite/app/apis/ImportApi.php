@@ -5,7 +5,7 @@ namespace app\apis;
 use app\helpers\ApiImportHelper;
 use app\helpers\Application;
 
-class ImportApi extends BaseApi
+class ImportApi extends AbstractApi
 {
     public function __construct(Application $application)
     {

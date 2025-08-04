@@ -2,8 +2,9 @@
 
 namespace app\controllers;
 
-use app\helpers\Application;
 use app\enums\ApplicationError;
+use app\enums\InputPattern;
+use app\helpers\Application;
 use app\helpers\GroupDataHelper;
 use app\helpers\Params;
 use app\helpers\TableControllerHelper;
@@ -19,11 +20,12 @@ class RegistrationController extends TableController
     public function index()
     {
         if (($this->connectedUser->get()->isPersonManager() ?? false) || $this->connectedUser->isWebmaster() ?? false) {
-            $filterValues = [
-                'lastName' => $_GET['lastName'] ?? '',
-                'firstName' => $_GET['firstName'] ?? '',
-                'nickName' => $_GET['nickName'] ?? ''
+            $schema = [
+                'lastName' => InputPattern::PersonName->value,
+                'firstName' => InputPattern::PersonName->value,
+                'nickName' => InputPattern::PersonName->value,
             ];
+            $filterValues = WebApp::filterInput($schema, $_GET);
             $filterConfig = [
                 ['name' => 'lastName', 'label' => 'Nom'],
                 ['name' => 'firstName', 'label' => 'Prénom'],
@@ -34,7 +36,7 @@ class RegistrationController extends TableController
                 ['field' => 'FirstName', 'label' => 'Prénom'],
                 ['field' => 'NickName', 'label' => 'Surnom']
             ];
-            $data = $this->prepareTableData((new TableControllerHelper($this->application))->getPersonsQuery(), $filterValues, $_GET['tablePage'] ?? null);
+            $data = $this->prepareTableData((new TableControllerHelper($this->application))->getPersonsQuery(), $filterValues, (int)($_GET['tablePage'] ?? 1));
             $this->render('app/views/registration/index.latte', Params::getAll([
                 'persons' => $data['items'],
                 'currentPage' => $data['currentPage'],

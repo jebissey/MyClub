@@ -10,7 +10,7 @@ use app\helpers\Email;
 use app\helpers\Params;
 use app\helpers\PersonDataHelper;
 
-class EmailController extends BaseController
+class EmailController extends AbstractController
 {
     public function __construct(Application $application)
     {

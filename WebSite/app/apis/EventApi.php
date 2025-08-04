@@ -18,7 +18,7 @@ use app\helpers\ParticipantDataHelper;
 use app\helpers\PersonDataHelper;
 use app\helpers\PersonPreferences;
 
-class EventApi extends BaseApi
+class EventApi extends AbstractApi
 {
     private ApiNeedDataHelper $apiNeedDataHelper;
     private ApiNeedTypeDataHelper $apiNeedTypeDataHelper;

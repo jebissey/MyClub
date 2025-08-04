@@ -8,7 +8,7 @@ use app\helpers\AuthorizationDataHelper;
 use app\helpers\Params;
 use app\helpers\SurveyDataHelper;
 
-class SurveyController extends BaseController
+class SurveyController extends AbstractController
 {
     public function __construct(Application $application)
     {
@@ -65,13 +65,13 @@ class SurveyController extends BaseController
 
     public function viewResults($articleId)
     {
-        if ($person = $this->connectedUser->get()->person ?? false) {
+        if ($connectedUser = $this->connectedUser->get()) {
             $survey = (new SurveyDataHelper($this->application))->getWithCreator($articleId);
             if (!$survey) {
                 $this->flight->redirect('/articles/' . $articleId);
                 return;
             }
-            if ((new AuthorizationDataHelper($this->application))->canPersonReadSurveyResults($this->dataHelper->get('Article', ['Id' => $survey->IdArticle]), $person)) {
+            if ((new AuthorizationDataHelper($this->application))->canPersonReadSurveyResults($this->dataHelper->get('Article', ['Id' => $survey->IdArticle]), $connectedUser)) {
                 $replies = $this->dataHelper->gets('Reply', ['IdSurvey' => $survey->Id]);
                 $participants = [];
                 $results = [];

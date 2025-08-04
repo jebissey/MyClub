@@ -7,7 +7,7 @@ use app\enums\ApplicationError;
 use app\helpers\ImportDataHelper;
 use app\helpers\Params;
 
-class ImportController extends BaseController
+class ImportController extends AbstractController
 {
     private $importSettings;
     private $results;

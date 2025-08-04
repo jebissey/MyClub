@@ -11,7 +11,7 @@ use app\helpers\DesignDataHelper;
 use app\helpers\Media;
 use app\helpers\ReplyDataHelper;
 
-class ArticleApi extends BaseApi
+class ArticleApi extends AbstractApi
 {
     private Media $media;
     private ReplyDataHelper $replyDataHelper;

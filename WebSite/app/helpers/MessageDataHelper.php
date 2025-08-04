@@ -75,15 +75,17 @@ class MessageDataHelper extends Data implements NewsProviderInterface
         return true;
     }
 
-    public function getNews($person, $searchFrom): array
+    public function getNews(ConnectedUser $connectedUser, string $searchFrom): array
     {
+        $news = [];
+        if (!($connectedUser->person ?? false)) return $news;
         $sql = "
             SELECT m.Id, m.Text, m.LastUpdate, m.EventId, p.FirstName, p.LastName, p.NickName, e.Summary, e.StartTime
             From Message m
             JOIN Person p ON p.Id = m.PersonId
             JOIN Event e ON e.Id = m.EventId
             WHERE m.LastUpdate > :searchFrom AND m.'From' = 'User' 
-            AND m.EventId IN (SELECT IdEvent FROM Participant WHERE IdPerson = $person->Id)
+            AND m.EventId IN (SELECT IdEvent FROM Participant WHERE IdPerson = " . $connectedUser->person->Id . ")
             ORDER BY m.LastUpdate DESC
         ";
         $stmt = $this->pdo->prepare($sql);
@@ -91,7 +93,6 @@ class MessageDataHelper extends Data implements NewsProviderInterface
             ':searchFrom' => $searchFrom
         ]);
         $messages = $stmt->fetchAll();
-        $news = [];
         foreach ($messages as $message) {
             $news[] = [
                 'type' => 'message',

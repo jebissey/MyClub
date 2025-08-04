@@ -2,7 +2,7 @@
 
 namespace app\helpers;
 
-class Period
+class PeriodHelper
 {
     static function getDateRangeFor($period)
     {

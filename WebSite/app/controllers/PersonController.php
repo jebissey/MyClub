@@ -3,6 +3,7 @@
 namespace app\controllers;
 
 use app\enums\ApplicationError;
+use app\enums\InputPattern;
 use app\helpers\Application;
 use app\helpers\GroupDataHelper;
 use app\helpers\Params;
@@ -49,12 +50,13 @@ class PersonController extends TableController implements CrudControllerInterfac
     public function index()
     {
         if (($this->connectedUser->get()->isPersonManager() ?? false) || $this->connectedUser->isWebmaster() ?? false) {
-            $filterValues = [
-                'firstName' => $_GET['firstName'] ?? '',
-                'lastName' => $_GET['lastName'] ?? '',
-                'nickName' => $_GET['nickName'] ?? '',
-                'email' => $_GET['email'] ?? ''
+            $schema = [
+                'firstName' => InputPattern::PersonName->value,
+                'lastName' => InputPattern::PersonName->value,
+                'nickName' => InputPattern::PersonName->value,
+                'email' => InputPattern::Email->value,
             ];
+            $filterValues = WebApp::filterInput($schema, $_GET);
             $filterConfig = [
                 ['name' => 'firstName', 'label' => 'Prénom'],
                 ['name' => 'lastName', 'label' => 'Nom'],
@@ -67,7 +69,7 @@ class PersonController extends TableController implements CrudControllerInterfac
                 ['field' => 'Email', 'label' => 'Email'],
                 ['field' => 'Phone', 'label' => 'Téléphone']
             ];
-            $data = $this->prepareTableData($this->tableControllerHelper->getPersonsQuery(), $filterValues, $_GET['tablePage'] ?? null);
+            $data = $this->prepareTableData($this->tableControllerHelper->getPersonsQuery(), $filterValues, (int)$_GET['tablePage'] ?? null);
 
             $this->render('app/views/persons/index.latte', Params::getAll([
                 'persons' => $data['items'],

@@ -7,7 +7,7 @@ use app\helpers\Application;
 use app\helpers\DbBrowserHelper;
 use app\helpers\Params;
 
-class DbBrowserController extends BaseController
+class DbBrowserController extends AbstractController
 {
     private int $itemsPerPage = 10;
     private DbBrowserHelper $dbBrowserHelper;

@@ -2,8 +2,10 @@
 
 namespace app\interfaces;
 
+use app\helpers\ConnectedUser;
+
 interface NewsProviderInterface
 {
-    public function getNews(object $person, string $searchFrom): array;
+    public function getNews(ConnectedUser $connectedUser, string $searchFrom): array;
 }
 

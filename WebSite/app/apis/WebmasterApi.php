@@ -9,7 +9,7 @@ use app\helpers\LogDataHelper;
 use app\helpers\PageDataHelper;
 use app\helpers\PersonGroupDataHelper;
 
-class WebmasterApi extends BaseApi
+class WebmasterApi extends AbstractApi
 {
     private PageDataHelper $pageDataHelper;
     private PersonGroupDataHelper $personGroupDataHelper;

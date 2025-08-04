@@ -4,7 +4,7 @@ namespace app\helpers;
 
 use PDO;
 
-use app\helpers\Period;
+use app\helpers\PeriodHelper;
 
 class CrosstabDataHelper extends Data
 {
@@ -72,7 +72,7 @@ class CrosstabDataHelper extends Data
             GROUP BY p.Id, et.Id
             ORDER BY p.LastName, p.FirstName
         ";
-        $dateRange = Period::getDateRangeFor($period);
+        $dateRange = PeriodHelper::getDateRangeFor($period);
         $crosstabData = $this->generateCrosstab(
             $sql,
             [':start' => $dateRange['start'], ':end' => $dateRange['end']],

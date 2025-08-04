@@ -13,7 +13,7 @@ class ConnectedUser
     private AuthorizationDataHelper $authorizationDataHelper;
     private array $authorizations;
     private DataHelper $dataHelper;
-    public $person;
+    public ?object $person;
 
     public function __construct(Application $application)
     {

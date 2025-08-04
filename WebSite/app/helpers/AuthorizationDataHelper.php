@@ -20,23 +20,23 @@ class AuthorizationDataHelper extends Data
             INNER JOIN GroupAuthorization on `Group`.Id = GroupAuthorization.IdGroup
             INNER JOIN Authorization on GroupAuthorization.IdAuthorization = Authorization.Id 
             WHERE Person.Id = ?");
-        $query->execute([$connectedUser->person->Id]);
+        $query->execute([$connectedUser->person?->Id ?? 0]);
         return array_column($query->fetchAll(), 'Name');
     }
 
-    public function canPersonReadSurveyResults(object $article, object $person): bool
+    public function canPersonReadSurveyResults(object $article, ConnectedUser $connectedUser): bool
     {
         $survey = $this->get('Survey', ['IdArticle' => $article->Id]);
-        if (!$survey || !$person) return false;
+        if (!$survey || !($connectedUser->person ?? false)) return false;
         $now = (new DateTime())->format('Y-m-d');
         $closingDate = $survey->ClosingDate;
         if (
-            $article->CreatedBy == $person->Id
+            $article->CreatedBy == $connectedUser->person?->Id ?? 0
             || $survey->Visibility == 'all'
             || $survey->Visibility == 'allAfterClosing' && $closingDate < $now
         ) return true;
         $stmt = $this->pdo->prepare('SELECT COUNT(*) FROM Reply WHERE IdSurvey = ? AND IdPerson = ?');
-        $stmt->execute([$survey->Id, $person->Id]);
+        $stmt->execute([$survey->Id, $connectedUser->person?->Id ?? 0]);
         $hasVoted = $stmt->fetchColumn() > 0;
         if ($hasVoted && ($survey->Visibility == 'voters' || ($survey->Visibility == 'votersAfterClosing' && $closingDate < $now)))
             return true;
@@ -73,11 +73,11 @@ class AuthorizationDataHelper extends Data
     private function canReadArticle($article, ConnectedUser $connectedUser)
     {
         if (!$article) return false;
-        if ($connectedUser->person && ($article->CreatedBy == $connectedUser->person->Id || $connectedUser->isEditor())) return true;
+        if (($connectedUser->person  ?? false) && ($article->CreatedBy == $connectedUser->person->Id || $connectedUser->isEditor())) return true;
         if ($article->PublishedBy === null) return false;
-        if (!$connectedUser->person) return $article->OnlyForMembers == 0 && ($article->IdGroup === null);
+        if (!($connectedUser->person ?? false)) return $article->OnlyForMembers == 0 && ($article->IdGroup === null);
         if ($article->OnlyForMembers == 1 && $article->IdGroup === null) return true;
-        return $article->IdGroup === null || !empty(array_intersect([$article->IdGroup], $this->getUserGroups($connectedUser->person->Email)));
+        return $article->IdGroup === null || !empty(array_intersect([$article->IdGroup], $this->getUserGroups($connectedUser->person?->Email ?? '')));
     }
 
     private function getGroups(string $groupsFilter): array
