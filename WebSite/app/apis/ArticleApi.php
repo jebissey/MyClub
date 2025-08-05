@@ -59,7 +59,7 @@ class ArticleApi extends AbstractApi
     {
         if ($person = $this->connectedUser->get()->person ?? false) {
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-                $survey = $this->dataHelper->get('Survey', ['IdArticle' => $articleId]);
+                $survey = $this->dataHelper->get('Survey', ['IdArticle' => $articleId], 'Id, Question, Options');
                 if (!$survey) {
                     $this->renderJson(['success' => false, 'message' => "Aucun sondage trouvé pour l'article $articleId"]);
                     return;

@@ -19,7 +19,7 @@ class SurveyController extends AbstractController
     {
         if ($this->connectedUser->get()->isRedactor() ?? false) {
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-                $article = $this->dataHelper->get('Article', ['Id' => $articleId]);
+                $article = $this->dataHelper->get('Article', ['Id' => $articleId], 'Title, Id, ');
                 if (!$article) {
                     $this->flight->redirect('/articles');
                     return;
@@ -27,7 +27,7 @@ class SurveyController extends AbstractController
 
                 $this->render('app/views/survey/add.latte', Params::getAll([
                     'article' => $article,
-                    'survey' => $this->dataHelper->get('Survey', ['IdArticle' => $article->Id])
+                    'survey' => $this->dataHelper->get('Survey', ['IdArticle' => $article->Id], 'Question, Options, ClosingDate, Visibility')
                 ]));
             } else $this->application->getErrorManager()->raise(ApplicationError::InvalidRequestMethod, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
         } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
@@ -55,7 +55,7 @@ class SurveyController extends AbstractController
                     'IdArticle' => $articleId,
                     'Visibility' => $visibility
                 ];
-                $survey = $this->dataHelper->get('Survey', ['IdArticle' => $articleId]);
+                $survey = $this->dataHelper->get('Survey', ['IdArticle' => $articleId], 'Id');
                 if ($survey) $this->dataHelper->set('Survey', $fields, ['Id' => $survey->Id]);
                 else         $this->dataHelper->set('Survey', $fields);
                 $this->flight->redirect('/articles/' . $articleId);
@@ -81,7 +81,7 @@ class SurveyController extends AbstractController
                 }
                 foreach ($replies as $reply) {
                     $answers = json_decode($reply->Answers);
-                    $person = $this->dataHelper->get('Person', ['Id' => $reply->IdPerson]);
+                    $person = $this->dataHelper->get('Person', ['Id' => $reply->IdPerson], 'FirstName, LastName');
                     $participants[] = [
                         'name' => $person->FirstName . ' ' . $person->LastName,
                         'answers' => $answers

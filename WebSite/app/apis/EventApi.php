@@ -150,7 +150,7 @@ class EventApi extends AbstractApi
                     $root = Application::$root;
                     $eventLink = $root . '/events/' . $event->Id;
                     $unsubscribeLink = $root . '/user/preferences';
-                    $eventCreatorEmail = $this->dataHelper->get('Person', ['Id' => $event->CreatedBy])->Email;
+                    $eventCreatorEmail = $this->dataHelper->get('Person', ['Id' => $event->CreatedBy], 'Email')->Email;
                     if (!$eventCreatorEmail) {
                         $this->renderJson(['success' => false, 'message' => 'Invalid Email in file ' + __FILE__ + ' at line ' + __LINE__], 404);
                         return;

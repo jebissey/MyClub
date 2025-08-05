@@ -222,7 +222,6 @@ mapRoute($flight, 'GET  /api/carousel/@articleId:[0-9]+', $carouselApi, 'getItem
 mapRoute($flight, 'POST /api/carousel/save', $carouselApi, 'saveItem');
 mapRoute($flight, 'POST /api/carousel/delete/@id:[0-9]+', $carouselApi, 'deleteItem');
 
-// Event API
 $eventApi = new EventApi($application);
 mapRoute($flight, 'POST   /api/attributes/create', $eventApi, 'createAttribute');
 mapRoute($flight, 'DELETE /api/attributes/delete/@id:[0-9]+', $eventApi, 'deleteAttribute');

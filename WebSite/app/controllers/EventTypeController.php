@@ -58,7 +58,7 @@ class EventTypeController extends TableController implements CrudControllerInter
     public function edit($id)
     {
         if ($this->connectedUser->get()->isWebmaster() ?? false) {
-            $eventType = $this->dataHelper->get('EventType', ['Id', $id]);
+            $eventType = $this->dataHelper->get('EventType', ['Id', $id], 'Name, IdGroup');
             if (!$eventType) $this->application->getErrorManager()->raise(ApplicationError::InvalidSetting, "Invalide EventType: $id in file " . __FILE__ . ' at line ' . __LINE__);
             else {
                 if ($_SERVER['REQUEST_METHOD'] === 'POST') {

@@ -66,10 +66,8 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
 
     public function getSpotlightArticle()
     {
-        $spotlightArticleJson = $this->get('Settings', ['Name' => 'SpotlightArticle'])->Value ?? '';
-        if ($spotlightArticleJson === null) {
-            return null;
-        }
+        $spotlightArticleJson = $this->get('Settings', ['Name' => 'SpotlightArticle'], 'Value')->Value ?? '';
+        if ($spotlightArticleJson === null) return null;
         return json_decode($spotlightArticleJson, true);
     }
 
@@ -150,6 +148,7 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
             FROM Article a
             LEFT JOIN Person p ON a.CreatedBy = p.Id
             WHERE a.Id = :id
+            LIMIT 1
         ";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':id' => $id]);
@@ -228,8 +227,7 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
         ";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':searchFrom' => $searchFrom]);
-        $articles = $stmt->fetchAll(); // objets si FETCH_OBJ par défaut
-
+        $articles = $stmt->fetchAll();
         $authHelper = new AuthorizationDataHelper($this->application);
         $news = [];
         foreach ($articles as $article) {

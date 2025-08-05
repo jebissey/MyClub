@@ -29,7 +29,7 @@ class PersonController extends TableController implements CrudControllerInterfac
     {
         if (($this->connectedUser->get()->isPersonManager() ?? false) || $this->connectedUser->isWebmaster() ?? false) {
             $this->render('app/views/info.latte', [
-                'content' => $this->dataHelper->get('settings', ['Name' => 'Help_personManager'])->Value ?? '',
+                'content' => $this->dataHelper->get('settings', ['Name' => 'Help_personManager'], 'Value')->Value ?? '',
                 'hasAuthorization' => $this->connectedUser->hasAutorization(),
                 'currentVersion' => Application::VERSION
             ]);
@@ -69,7 +69,7 @@ class PersonController extends TableController implements CrudControllerInterfac
                 ['field' => 'Email', 'label' => 'Email'],
                 ['field' => 'Phone', 'label' => 'Téléphone']
             ];
-            $data = $this->prepareTableData($this->tableControllerHelper->getPersonsQuery(), $filterValues, (int)$_GET['tablePage'] ?? null);
+            $data = $this->prepareTableData($this->tableControllerHelper->getPersonsQuery(), $filterValues, (int)($_GET['tablePage'] ?? 1));
 
             $this->render('app/views/persons/index.latte', Params::getAll([
                 'persons' => $data['items'],
@@ -95,7 +95,7 @@ class PersonController extends TableController implements CrudControllerInterfac
     public function edit($id)
     {
         if (($this->connectedUser->get()->isPersonManager() ?? false) || $this->connectedUser->isWebmaster() ?? false) {
-            $person = $this->dataHelper->get('Person', ['Id' => $id]);
+            $person = $this->dataHelper->get('Person', ['Id' => $id], 'Id, Imported, Email, FirstName, LastName');
             if (!$person) $this->application->getErrorManager()->raise(ApplicationError::BadRequest, "Unknown person id: $id in file " . __FILE__ . ' at line ' . __LINE__);
             else {
                 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -186,7 +186,7 @@ class PersonController extends TableController implements CrudControllerInterfac
         if ($person = $this->connectedUser->get()->person ?? false) {
             $selectedGroup = isset($_GET['group']) ? (int)$_GET['group'] : null;
             if ($selectedGroup) $persons = (new PersonDataHelper($this->application))->getPersonsInGroupForDirectory($selectedGroup);
-            else $persons = $this->dataHelper->gets('Person', ['InPresentationDirectory' => 1, 'Inactivated' => 0], 'LastName, FirstName');
+            else $persons = $this->dataHelper->gets('Person', ['InPresentationDirectory' => 1, 'Inactivated' => 0], 'Id, LastName, FirstName, NickName, UseGravatar, Avatar, Email');
             $groupCounts = $this->groupDataHelper->getGroupCount();
 
             $this->render('app/views/user/directory.latte', Params::getAll([

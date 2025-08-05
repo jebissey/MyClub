@@ -31,7 +31,7 @@ class FFAController extends AbstractController
             $lastName = $input['lastName'] !== '' ? $input['lastName'] : $person->LastName ?? '';
             $question = $input['question'] !== '' ? $input['question'] : 'rank';
             $year = $input['year'] !== '' ? $input['year'] : date('Y');
-            $club = $input['club'] !== '' ? $input['club'] : $this->dataHelper->get('Settings', ['Name' => 'FFA_club']) ?? '';
+            $club = $input['club'] !== '' ? $input['club'] : $this->dataHelper->get('Settings', ['Name' => 'FFA_club'], 'Value')->Value ?? '';
             $results = [];
             $ffaScraper = new FFAScraper();
             if ($question == 'rank') $results = $ffaScraper->searchAthleteRank($firstName, $lastName, $year, $club);

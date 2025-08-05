@@ -101,8 +101,8 @@ class WebApp
             if (is_array($rule))                                     $filtered[$key] = in_array($value, $rule, true) ? $value : ''; // White list
             elseif (is_string($rule) && str_starts_with($rule, '/')) $filtered[$key] = preg_match($rule, $value) ? $value : '';     // Regex
             elseif ($rule === 'bool')                                $filtered[$key] = filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
-            elseif ($rule === 'int')                                 $filtered[$key] = filter_var($value, FILTER_VALIDATE_INT) ?? '';
-            elseif ($rule === 'float')                               $filtered[$key] = filter_var($value, FILTER_VALIDATE_FLOAT) ?? '';
+            elseif ($rule === 'int')                                 $filtered[$key] = filter_var($value, FILTER_VALIDATE_INT) ?? 0;
+            elseif ($rule === 'float')                               $filtered[$key] = filter_var($value, FILTER_VALIDATE_FLOAT) ?? 0.0;
             else                                                     $filtered[$key] = $value;
         }
         return $filtered;

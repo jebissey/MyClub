@@ -19,7 +19,7 @@ class WebmasterController extends AbstractController
     public function helpWebmaster(): void
     {
         $this->render('app/views/info.latte', [
-            'content' => $this->dataHelper->get('Settings', ['Name' => 'Help_webmaster'])->Value ?? '',
+            'content' => $this->dataHelper->get('Settings', ['Name' => 'Help_webmaster'], 'Value')->Value ?? '',
             'hasAuthorization' => $this->connectedUser->get()->isEventManager() ?? false,
             'currentVersion' => Application::VERSION
         ]);
@@ -30,7 +30,7 @@ class WebmasterController extends AbstractController
         if ($this->connectedUser->get()->isAdministrator() ?? false) {
 
             $this->render('app/views/info.latte', Params::getAll([
-                'content' => $this->dataHelper->get('Settings', ['Name' => 'Help_admin'])->Value ?? '',
+                'content' => $this->dataHelper->get('Settings', ['Name' => 'Help_admin'], 'Value')->Value ?? '',
                 'hasAuthorization' => $this->connectedUser->isEventManager(),
                 'currentVersion' => Application::VERSION
             ]));

@@ -61,7 +61,7 @@ class CarouselApi extends AbstractApi
             $this->renderJson(['error' => 'Utilisateur non connecté'], 401);
             return;
         }
-        $item = (new DataHelper($this->application))->get('Carousel', ['Id' => $id]);
+        $item = (new DataHelper($this->application))->get('Carousel', ['Id' => $id], 'IdArticle');
         if (!$item) {
             $this->renderJson(['error' => 'Élément non trouvé'], 404);
             return;

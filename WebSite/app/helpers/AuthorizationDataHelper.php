@@ -26,7 +26,7 @@ class AuthorizationDataHelper extends Data
 
     public function canPersonReadSurveyResults(object $article, ConnectedUser $connectedUser): bool
     {
-        $survey = $this->get('Survey', ['IdArticle' => $article->Id]);
+        $survey = $this->get('Survey', ['IdArticle' => $article->Id], 'ClosingDate, Visibility, Id');
         if (!$survey || !($connectedUser->person ?? false)) return false;
         $now = (new DateTime())->format('Y-m-d');
         $closingDate = $survey->ClosingDate;
@@ -45,7 +45,7 @@ class AuthorizationDataHelper extends Data
 
     public function getArticle(int $id, ConnectedUser $connectedUser): object|false
     {
-        $article = $this->get('Article', ['Id' => $id]);
+        $article = $this->get('Article', ['Id' => $id], 'CreatedBy, PublishedBy, OnlyForMembers, IdGroup');
         if (!$this->canReadArticle($article, $connectedUser)) return false;
         return $article;
     }

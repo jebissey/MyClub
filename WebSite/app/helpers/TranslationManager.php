@@ -5,6 +5,8 @@ namespace app\helpers;
 use DateTime;
 use IntlDateFormatter;
 
+use app\enums\WeekdayFormat;
+
 class TranslationManager
 {
     const SUPPORTED_LANGUAGES = ['en_US', 'fr_FR'];
@@ -17,7 +19,7 @@ class TranslationManager
     const COOKIE_EXPIRATION = 86400 * 30; // 30 days
     const COOKIE_PATH = '/';
 
-    static function setLanguage($language)
+    public static function setLanguage($language)
     {
         $language = in_array($language, self::SUPPORTED_LANGUAGES) ? $language : self::DEFAULT_LANGUAGE;
 
@@ -26,43 +28,56 @@ class TranslationManager
         header('Location: ' . $_SERVER['PHP_SELF']);
     }
 
-    static function getCurrentLanguage()
+    public static function getCurrentLanguage()
     {
         return $_COOKIE['user_language'] ?? self::DEFAULT_LANGUAGE;
     }
 
-    static function getSupportedLanguages()
+    public static function getSupportedLanguages()
     {
         return self::SUPPORTED_LANGUAGES;
     }
 
-    static function getFlag(string $locale): string
+    public static function getFlag(string $locale): string
     {
         return self::FLAGS[$locale] ?? '🏳️';
     }
 
-    static function getShortDate($date)
+    public static function getShortDate($date)
     {
         $formatter = new IntlDateFormatter(self::getCurrentLanguage(), IntlDateFormatter::SHORT, IntlDateFormatter::NONE);
         return $formatter->format(new DateTime($date));
     }
 
-    static function getLongDate($date)
+    public static function getLongDate($date)
     {
         $formatter = new IntlDateFormatter(self::getCurrentLanguage(), IntlDateFormatter::FULL, IntlDateFormatter::NONE);
         return $formatter->format(new DateTime($date));
     }
 
-    static function getLongDateTime($date)
+    public static function getLongDateTime($date)
     {
         $formatter = new IntlDateFormatter(self::getCurrentLanguage(), IntlDateFormatter::FULL, IntlDateFormatter::SHORT);
         return $formatter->format(new DateTime($date));
     }
 
-    static function getReadableDuration($duration)
+    public static function getReadableDuration($duration)
     {
         $durationHours = floor($duration / 3600);
         $durationMinutes = floor(($duration % 3600) / 60);
         return ($durationHours > 0 ? "$durationHours h " : '') . ($durationMinutes > 0 ? "$durationMinutes min" : '');
+    }
+
+    public static function getWeekdayNames(WeekdayFormat $format = WeekdayFormat::Full): array
+    {
+        $formatter = new IntlDateFormatter(self::getCurrentLanguage(), IntlDateFormatter::FULL, IntlDateFormatter::NONE);
+        $formatter->setPattern($format->value);
+        $days = [];
+        for ($i = 1; $i <= 7; $i++) {
+            $date = new DateTime();
+            $date->setISODate(2024, 1, $i); //2024-01-01 = Monday
+            $days[] = $formatter->format($date);
+        }
+        return $days;
     }
 }

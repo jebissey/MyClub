@@ -13,13 +13,21 @@ class SurveyDataHelper extends Data implements NewsProviderInterface
 
     public function articleHasSurveyNotClosed(int $articleId): object|bool
     {
-        return $this->fluent
-            ->from('Survey')
-            ->join('Article ON Survey.IdArticle = Article.Id')
-            ->where('IdArticle', $articleId)
-            ->where('ClosingDate >= ?', date('now'))
-            ->fetch();
+        $sql = "
+            SELECT Survey.*
+            FROM Survey
+            JOIN Article ON Survey.IdArticle = Article.Id
+            WHERE Survey.IdArticle = :articleId
+            AND Survey.ClosingDate >= datetime('now')
+            LIMIT 1
+        ";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([':articleId' => $articleId]);
+        $survey = $stmt->fetch();
+        return $survey;
     }
+
+
 
     public function getWithCreator(int $articleId): object|bool
     {

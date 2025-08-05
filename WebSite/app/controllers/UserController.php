@@ -89,7 +89,7 @@ class UserController extends AbstractController
         } elseif ($_SERVER['REQUEST_METHOD'] === 'GET') {
             if (isset($_COOKIE['rememberMe'])) {
                 $token = $_COOKIE['rememberMe'];
-                $person = $this->dataHelper->get('Person', ['Token' => $token]);
+                $person = $this->dataHelper->get('Person', ['Token' => $token], 'Id, Inactivated, Email');
                 if ($person && $person->Inactivated == 0) {
                     $this->dataHelper->set('Person', ['LastSignIn' => date('Y-m-d H:i:s')], ['Id' => $person->Id]);
                     $_SESSION['user'] = $person->Email;
@@ -123,7 +123,7 @@ class UserController extends AbstractController
     public function helpHome(): void
     {
         $content = $this->application->getLatte()->renderToString('app/views/info.latte', [
-            'content' => $this->dataHelper->get('Settings', ['Name' => 'Help_home'])->Value ?? '',
+            'content' => $this->dataHelper->get('Settings', ['Name' => 'Help_home'], 'Value')->Value ?? '',
             'hasAuthorization' => $this->connectedUser->get()->hasAutorization() ?? false,
             'currentVersion' => Application::VERSION
         ]);
@@ -133,7 +133,7 @@ class UserController extends AbstractController
     public function legalNotice(): void
     {
         $content = $this->application->getLatte()->renderToString('app/views/info.latte', [
-            'content' => $this->dataHelper->get('Settings', ['Name' => 'LegalNotices'])->Value ?? '',
+            'content' => $this->dataHelper->get('Settings', ['Name' => 'LegalNotices'], 'Value')->Value ?? '',
             'hasAuthorization' => $this->connectedUser->get()->hasAutorization() ?? false,
             'currentVersion' => Application::VERSION
         ]);
@@ -188,8 +188,8 @@ class UserController extends AbstractController
         $this->render('app/views/home.latte', Params::getAll([
             'latestArticle' => $latestArticle,
             'latestArticles' => $articles['latestArticles'],
-            'greatings' => $this->dataHelper->get('Settings', ['Name' => 'Greatings'])->Value ?? '',
-            'link' => $this->dataHelper->get('Settings', ['Name' => 'Link'])->Value ?? '',
+            'greatings' => $this->dataHelper->get('Settings', ['Name' => 'Greatings'], 'Value')->Value ?? '',
+            'link' => $this->dataHelper->get('Settings', ['Name' => 'Link'], 'Value')->Value ?? '',
             'navItems' => $this->getNavItems($connectedUser->person ?? false),
             'publishedBy' => $articles['latestArticle']
                 && $articles['latestArticle']->PublishedBy != $articles['latestArticle']->CreatedBy ? (new PersonDataHelper($this->application))->getPublisher($articles['latestArticle']->PublishedBy) : '',
@@ -310,7 +310,7 @@ class UserController extends AbstractController
     {
         if ($this->connectedUser->get()->person ?? false) {
             $this->render('app/views/info.latte', Params::getAll([
-                'content' => $this->dataHelper->get('Settings', ['Name' => 'Help_user'])->Value ?? '',
+                'content' => $this->dataHelper->get('Settings', ['Name' => 'Help_user'], 'Value')->Value ?? '',
                 'hasAuthorization' => $this->connectedUser->hasAutorization(),
                 'currentVersion' => Application::VERSION
             ]));
@@ -323,7 +323,7 @@ class UserController extends AbstractController
 
             $this->render('app/views/contact.latte', Params::getAll([
                 'navItems' => $this->getNavItems($this->connectedUser->get()->person ?? false),
-                'event' => $eventId != null ? $this->dataHelper->get('Event', ['Id' => $eventId]) : null,
+                'event' => $eventId != null ? $this->dataHelper->get('Event', ['Id' => $eventId], 'Id, Summary') : null,
             ]));
         } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $name = trim($_POST['name'] ?? '');
@@ -335,14 +335,14 @@ class UserController extends AbstractController
             elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) $errors[] = 'L\'email n\'est pas valide.';
             if (empty($message)) $errors[] = 'Le message est requis.';
             if (empty($errors)) {
-                $adminEmail = $this->dataHelper->get('Settings', ['Name' => 'contactEmail'])->Value ?? '';
+                $adminEmail = $this->dataHelper->get('Settings', ['Name' => 'contactEmail'], 'Value')->Value ?? '';
                 if (!filter_var($adminEmail, FILTER_VALIDATE_EMAIL)) {
                     $this->application->getErrorManager()->raise(ApplicationError::InvalidSetting, 'Invalid contactEmmail', __FILE__, __LINE__);
                     return;
                 }
                 $eventId = trim($_POST['eventId'] ?? '');
                 if (!empty($eventId)) {
-                    $event = $this->dataHelper->get('Event', ['Id' => $eventId]);
+                    $event = $this->dataHelper->get('Event', ['Id' => $eventId], 'Id, Summary');
                     if (!$event) $this->application->getErrorManager()->raise(ApplicationError::BadRequest, "Unknown event '$eventId' in file " . __FILE__ . ' at line ' . __LINE__);
                 }
                 if (!empty($eventId)) $emailSent = (new PersonDataHelper($this->application))->sendRegistrationLink($adminEmail, $name, $email, $event);
@@ -401,7 +401,7 @@ class UserController extends AbstractController
     public function showStatistics(): void
     {
         if ($person = $this->connectedUser->get(1)->person ?? false) {
-            $personalStatistics = new PersonStatistics();
+            $personalStatistics = new PersonStatistics($this->application);
             $season = $personalStatistics->getSeasonRange();
             $this->render('app/views/user/statistics.latte', Params::getAll([
                 'stats' => $personalStatistics->getStats($person, $season['start'], $season['end'], $this->connectedUser->isWebmaster()),

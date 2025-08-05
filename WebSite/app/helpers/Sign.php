@@ -24,7 +24,7 @@ class Sign
     public function forgotPassword(string $email): void
     {
         if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            $person = $this->dataHelper->get('Person', ['Email' => $email]);
+            $person = $this->dataHelper->get('Person', ['Email' => $email], 'Id, TokenCreatedAt');
             if ($person) {
                 if ($person->TokenCreatedAt === null || (new DateTime($person->TokenCreatedAt))->diff(new DateTime())->h >= 1) {
                     $token = $this->personDataHelper->setToken($person->Id);
@@ -41,7 +41,7 @@ class Sign
 
     public function checkAndSetPassword(string $token, string $newPassword): void
     {
-        $person = $this->dataHelper->get('Person', ['Token' => $token]);
+        $person = $this->dataHelper->get('Person', ['Token' => $token], 'Id, TokenCreatedAt');
         if (!$person)
             $this->application->getErrorManager()->raise(ApplicationError::BadRequest, "Record with token $token not found in table 'Person' in file " . __FILE__ . ' at line ' . __LINE__);
         elseif (
@@ -56,7 +56,7 @@ class Sign
 
     public function authenticate(string $email, string $password, bool $rememberMe = false): bool
     {
-        $person = $this->dataHelper->get('Person', ['Email' => $email]);
+        $person = $this->dataHelper->get('Person', ['Email' => $email], 'Inactivated, Password, Id');
         if (!$person)
             $this->application->getErrorManager()->raise(ApplicationError::BadRequest, "Unknown user with this email address: $email in file " . __FILE__ . ' at line ' . __LINE__);
         elseif ($person->Inactivated == 1)

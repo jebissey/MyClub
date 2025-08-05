@@ -48,7 +48,7 @@ class NavBarController extends AbstractController
         if ($this->pageDataHelper->authorizedUser("/navbar/show/article/$id", $person)) {
             $this->render('app/views/navbar/article.latte', Params::getAll([
                 'navItems' => $this->getNavItems($person),
-                'chosenArticle' => $this->dataHelper->get('Article', ['Id' => $id]),
+                'chosenArticle' => $this->dataHelper->get('Article', ['Id' => $id], 'Content'),
                 'hasAuthorization' => $this->connectedUser->hasAutorization()
             ]));
         } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);

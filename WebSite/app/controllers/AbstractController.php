@@ -6,6 +6,7 @@ use flight;
 use flight\Engine;
 use Latte\Engine as LatteEngine;
 
+use app\enums\TimeOfDay;
 use app\helpers\Application;
 use app\helpers\AuthorizationDataHelper;
 use app\helpers\ConnectedUser;
@@ -67,6 +68,17 @@ abstract class AbstractController
         if (ob_get_level()) ob_end_flush();
         flush();
         Flight::stop();
+    }
+
+    protected function getAllLabels(): array
+    {
+        return array_map(
+            fn(TimeOfDay $case) => [
+                'value' => $case->value,
+                'label' => $this->languagesDataHelper->translate($case->value)
+            ],
+            TimeOfDay::cases()
+        );
     }
 
     #region Private functions

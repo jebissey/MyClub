@@ -28,13 +28,9 @@
                     <label for="daySelect" class="form-label">Jour</label>
                     <select class="form-select" id="daySelect" name="dayOfWeek">
                         <option value="">Choisir un jour</option>
-                        <option value="0">Lundi</option>
-                        <option value="1">Mardi</option>
-                        <option value="2">Mercredi</option>
-                        <option value="3">Jeudi</option>
-                        <option value="4">Vendredi</option>
-                        <option value="5">Samedi</option>
-                        <option value="6">Dimanche</option>
+                        {foreach $weekdayNames as $index => $weekdayName}
+                        <option value="{$index}">{$weekdayName}</option>
+                        {/foreach}
                     </select>
                 </div>
 
@@ -42,9 +38,9 @@
                     <label for="timeSelect" class="form-label">Moment de la journée</label>
                     <select class="form-select" id="timeSelect" name="timeOfDay" disabled>
                         <option value="">Choisir un moment</option>
-                        <option value="morning">Matin</option>
-                        <option value="afternoon">Après-midi</option>
-                        <option value="evening">Soir</option>
+                        {foreach $timeOptions as $option}
+                        <option value="{$option['value']}">{$option['label']}</option>
+                        {/foreach}
                     </select>
                 </div>
             </div>

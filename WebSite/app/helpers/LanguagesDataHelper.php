@@ -13,7 +13,10 @@ class LanguagesDataHelper extends Data
 
     public function translate($key)
     {
-        $translation = $this->fluent->from('Languages')->where('Name', $key)->fetch(TranslationManager::getCurrentLanguage());
-        return !$translation ? "-- $key --" : $translation;
+        $lang = TranslationManager::getCurrentLanguage();
+        $stmt = $this->pdo->prepare("SELECT `$lang` FROM Languages WHERE Name = :key");
+        $stmt->execute([':key' => $key]);
+        $result = $stmt->fetchColumn();
+        return $result === false ? "-- $key --" : $result;
     }
 }

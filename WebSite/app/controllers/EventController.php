@@ -120,7 +120,7 @@ class EventController extends AbstractController
                 }
                 $nickname = $input['nickname'];
                 try {
-                    $contact = $this->dataHelper->get('Contact', ['Email', $email]);
+                    $contact = $this->dataHelper->get('Contact', ['Email', $email], 'Id, Token, NickName, TokenCreatedAt');
                     if (!$contact) {
                         $token = bin2hex(random_bytes(32));
                         $contactId = $this->dataHelper->set('Contact', [
@@ -153,7 +153,7 @@ class EventController extends AbstractController
                     $existingGuest = $this->dataHelper->get('Guest', [
                         'IdContact' => $contactId,
                         'IdEvent' => $eventId
-                    ]);
+                    ], 'Id');
                     if ($existingGuest) {
                         $this->guest('Cette personne est déjà invitée à cet événement', 'error');
                         return;
@@ -193,7 +193,7 @@ class EventController extends AbstractController
     {
         $person = $this->connectedUser->get()->person ?? false;
         $userEmail = $person->Email ?? '';
-        if ($this->dataHelper->get('Event', ['Id' => $eventId])) {
+        if ($this->dataHelper->get('Event', ['Id' => $eventId], 'Id')) {
             $this->render('app/views/event/detail.latte', Params::getAll([
                 'eventId' => $eventId,
                 'event' => $this->eventDataHelper->getEvent($eventId),
@@ -240,12 +240,12 @@ class EventController extends AbstractController
                 );
             }
         } elseif ($token) {
-            $event = $this->dataHelper->get('Event', ['Id', $eventId]);
+            $event = $this->dataHelper->get('Event', ['Id', $eventId], 'Id, Audience');
             if (!$event) {
                 $this->show($eventId, 'Evénement inconnu', 'error');
                 return;
             }
-            $contact = $this->dataHelper->get('Contact', ['Token' => $token]);
+            $contact = $this->dataHelper->get('Contact', ['Token' => $token], 'Id, TokenCreatedAt');
             if (!$contact) {
                 $this->show($eventId, 'Token inconnu', 'error');
                 return;
@@ -260,7 +260,7 @@ class EventController extends AbstractController
             $existingParticipant = $this->dataHelper->get('Participant', [
                 'IdEvent' => $eventId,
                 'IdContact' => $contact->Id
-            ]);
+            ], 'Id');
             if ($existingParticipant && $set) {
                 $this->show($eventId, 'Participant déjà enregistré', 'error');
                 return;
@@ -269,7 +269,7 @@ class EventController extends AbstractController
                 $invitation = $this->dataHelper->get('Guest', [
                     'IdEvent' => $event->Id,
                     'IdContact' => $contact->Id
-                ]);
+                ], 'Id');
                 if (!$invitation) {
                     $this->show($eventId, "Il faut avoir une invitation pour pouvoir s'inscrire à cet événement", 'error');
                     return;
@@ -304,7 +304,7 @@ class EventController extends AbstractController
     public function help(): void
     {
         $this->render('app/views/info.latte', [
-            'content' => $this->dataHelper->get('Settings', ['Name' => 'Help_eventManager'])->Value ?? '',
+            'content' => $this->dataHelper->get('Settings', ['Name' => 'Help_eventManager'], 'Value')->Value ?? '',
             'hasAuthorization' => $this->connectedUser->get()->hasAutorization() ?? false,
             'currentVersion' => Application::VERSION
         ]);
@@ -336,17 +336,15 @@ class EventController extends AbstractController
     public function showEventChat($eventId): void
     {
         if ($this->connectedUser->get()->person ?? false) {
-            $event = $this->dataHelper->get('Event', ['Id' => $eventId]);
+            $event = $this->dataHelper->get('Event', ['Id' => $eventId], 'CreatedBy, Summary, Id, StartTime, Duration, Location');
             if (!$event) {
                 $this->application->getErrorManager()->raise(ApplicationError::BadRequest, "Unknown event '$eventId' in file " . __FILE__ . ' at line ' . __LINE__);
                 return;
             }
-            $creator = $this->dataHelper->get('Person', ['Id', $event->CreatedBy]);
             $messages = (new MessageDataHelper($this->application))->getEventMessages($eventId);
 
             $this->render('app/views/event/chat.latte', Params::getAll([
                 'event' => $event,
-                'creator' => $creator,
                 'messages' => $messages,
                 'person' => $this->connectedUser->person,
                 'navItems' => $this->getNavItems($this->connectedUser->person),

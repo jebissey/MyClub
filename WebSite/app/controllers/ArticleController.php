@@ -123,7 +123,7 @@ class ArticleController extends TableController
                 'latestArticles' => $this->articleDataHelper->getLatestArticles_($articleIds),
                 'canEdit' => $canEdit,
                 'groups' => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
-                'hasSurvey' => $this->dataHelper->get('Survey', ['IdArticle' => $id]),
+                'hasSurvey' => $this->dataHelper->get('Survey', ['IdArticle' => $id], 'ClosingDate'),
                 'id' => $id,
                 'userConnected' => $connectedUser->person ?? false,
                 'navItems' => $this->getNavItems($connectedUser->person ?? false),
@@ -145,8 +145,16 @@ class ArticleController extends TableController
                     $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
                     return;
                 }
-                $title = $_POST['title'] ?? '';
-                $content = $_POST['content'] ?? '';
+                $schema = [
+                    'title' => InputPattern::Content->value,
+                    'content' => InputPattern::Content->value,
+                    'published' => 'int',
+                    'idGroup' => InputPattern::Content->value,
+                    'membersOnly' => 'int',
+                ];
+                $input = WebApp::filterInput($schema, $_POST);
+                $title = $input['title'];
+                $content = $input['content'];
                 if (empty($title) || empty($content)) {
                     $_SESSION['error'] = "Le titre et le contenu sont obligatoires";
                     $this->flight->redirect('/articles/' . $id);
@@ -155,9 +163,9 @@ class ArticleController extends TableController
                 $result = $this->dataHelper->set('Article', [
                     'Title'          => $title,
                     'Content'        => $content,
-                    'PublishedBy'    => (($_POST['published'] ?? 0) == 1 ? $this->connectedUser->person->Id : null),
-                    'IdGroup'        => $_POST['idGroup'] === '' ? null : ($_POST['idGroup'] ?? null),
-                    'OnlyForMembers' => $_POST['membersOnly'] ?? 0,
+                    'PublishedBy'    => $input['published'] == 1 ? $this->connectedUser->person->Id : null,
+                    'IdGroup'        => $input['idGroup'] === '' ? null : $input['idGroup'],
+                    'OnlyForMembers' => $input['membersOnly'],
                     'LastUpdate'     => date('Y-m-d H:i:s')
                 ], ['Id' => $id]);
                 if ($result) {
@@ -178,17 +186,25 @@ class ArticleController extends TableController
                     $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
                     return;
                 }
-                $isSpotlightActive = $_POST['isSpotlightActive'] ?? 0;
+                $schema = [
+                    'isSpotlightActive' => 'bool',
+                    'spotlightedUntil' => InputPattern::DateTime->value,
+                    'published' => 'int',
+                    'idGroup' => InputPattern::Content->value,
+                    'membersOnly' => 'int',
+                ];
+                $input = WebApp::filterInput($schema, $_POST);
+                $isSpotlightActive = $input['isSpotlightActive'];
                 if ($isSpotlightActive) {
-                    $spotlightedUntil = $_POST['spotlightedUntil'] ?? 0;
+                    $spotlightedUntil = $input['spotlightedUntil'];
                     $this->articleDataHelper->setSpotlightArticle($id, $spotlightedUntil);
                 }
                 $result = $this->dataHelper->set('Article', [
                     'Title'          => '',
                     'Content'        => '',
-                    'PublishedBy'    => $_POST['published'] ?? 0  == 1 ? $this->connectedUser->person->Id : null,
-                    'IdGroup'        => $_POST['idGroup'] === '' ? null : ($_POST['idGroup'] ?? null),
-                    'OnlyForMembers' => $_POST['membersOnly'] ?? 0,
+                    'PublishedBy'    => $input['published'] ?? 0  == 1 ? $this->connectedUser->person->Id : null,
+                    'IdGroup'        => $input['idGroup'] === '' ? null : ($input['idGroup'] ?? null),
+                    'OnlyForMembers' => $input['membersOnly'],
                     'LastUpdate'     => date('Y-m-d H:i:s')
                 ], ['Id' => $id]);
                 if ($result) {

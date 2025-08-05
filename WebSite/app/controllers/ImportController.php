@@ -18,21 +18,6 @@ class ImportController extends AbstractController
         parent::__construct($application);
     }
 
-    private function loadSettings()
-    {
-        if (!$this->importSettings = json_decode($this->dataHelper->get('Settings', ['Name ' => 'ImportPersonParameters'])->Value ?? '', true)) {
-            $this->importSettings = [
-                'headerRow' => 1,
-                'mapping' => [
-                    'email' => null,
-                    'firstName' => null,
-                    'lastName' => null,
-                    'phone' => null
-                ]
-            ];
-        }
-    }
-
     public function showImportForm()
     {
         if ($this->connectedUser->get()->isPersonManager() ?? false) {
@@ -84,5 +69,21 @@ class ImportController extends AbstractController
                 ]));
             }
         } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+    }
+
+    #region Private functions
+    private function loadSettings()
+    {
+        if (!$this->importSettings = json_decode($this->dataHelper->get('Settings', ['Name' => 'ImportPersonParameters'], 'Value')->Value ?? '', true)) {
+            $this->importSettings = [
+                'headerRow' => 1,
+                'mapping' => [
+                    'email' => null,
+                    'firstName' => null,
+                    'lastName' => null,
+                    'phone' => null
+                ]
+            ];
+        }
     }
 }

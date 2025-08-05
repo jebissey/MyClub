@@ -6,9 +6,9 @@ use app\enums\InputPattern;
 
 class PersonStatistics extends Data
 {
-    public function __construct()
+    public function __construct(Application $application)
     {
-        parent::__construct();
+        parent::__construct($application);
     }
 
     public function getStats($person, $seasonStart, $seasonEnd, $isWebmaster)

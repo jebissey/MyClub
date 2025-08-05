@@ -5,10 +5,15 @@ namespace app\controllers;
 use RuntimeException;
 
 use app\enums\ApplicationError;
+use app\enums\InputPattern;
+use app\enums\WeekdayFormat;
 use app\helpers\Application;
 use app\helpers\Email;
 use app\helpers\Params;
 use app\helpers\PersonDataHelper;
+use app\helpers\TimeOfDayTranslator;
+use app\helpers\TranslationManager;
+use app\helpers\WebApp;
 
 class EmailController extends AbstractController
 {
@@ -21,14 +26,19 @@ class EmailController extends AbstractController
     {
         if ($this->connectedUser->get()->isEventManager() ?? false) {
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                $schema = [
+                    'dayOfWeek' => $this->application->enumToValues(WeekdayFormat::class),
+                    'timeOfDay' => InputPattern::Content->value,
+                ];
+                $input = WebApp::filterInput($schema, $_POST);
                 $idGroup = isset($_POST['idGroup']) && is_numeric($_POST['idGroup']) ? (int)$_POST['idGroup'] : null;
-                $idEventType = isset($_POST['idGroup']) && is_numeric($_POST['idGroup']) ? (int)$_POST['idEventType'] : null;
+                $idEventType = isset($_POST['idEventType']) && is_numeric($_POST['idEventType']) ? (int)$_POST['idEventType'] : null;
                 $dayOfWeek = $_POST['dayOfWeek'] ?? '';
                 $timeOfDay = $_POST['timeOfDay'] ?? '';
                 $filteredEmails = (new PersonDataHelper($this->application))->getEmailsOfInterestedPeople($idGroup, $idEventType, $dayOfWeek, $timeOfDay);
                 $groupName = $idGroup != '' ? $this->dataHelper->get('Group', ['Id' => $idGroup], 'Name')->Name ?? '' : '';
                 $eventTypeName = $idEventType != '' ? $this->dataHelper->get('EventType', ['Id', $idEventType], 'Name') : '';
-                $dayOfWeekName = $dayOfWeek != '' ? ['Lu.', 'Ma.', 'Me.', 'Je.', 'Ve.', 'Sa.', 'Di.', ''][$dayOfWeek] : '';
+                $dayOfWeekName = $dayOfWeek != '' ? TranslationManager::getWeekdayNames()[$dayOfWeek] : '';
 
                 $this->render('app/views/emails/copyToClipBoard.latte', Params::getAll([
                     'emailsJson' => json_encode($filteredEmails),
@@ -40,6 +50,8 @@ class EmailController extends AbstractController
                 $this->render('app/views/emails/getEmails.latte', Params::getAll([
                     'groups' => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
                     'eventTypes' => $this->dataHelper->gets('EventType', ['Inactivated' => 0], 'Id, Name', 'Name'),
+                    'weekdayNames' => TranslationManager::getWeekdayNames(),
+                    'timeOptions' => $this->getAllLabels(),
                 ]));
             } else $this->application->getErrorManager()->raise(ApplicationError::InvalidRequestMethod, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
         } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
@@ -49,9 +61,9 @@ class EmailController extends AbstractController
     {
         if ($this->connectedUser->get()->isRedactor() ?? false) {
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-                $article = $this->dataHelper->get('Article', ['Id', $idArticle]);
+                $article = $this->dataHelper->get('Article', ['Id', $idArticle], 'CreatedBy');
                 if (!$article) throw new RuntimeException('Fatal program error in file ' + __FILE__ + ' at line ' + __LINE__);
-                $articleCreatorEmail = $this->dataHelper->get('Person', ['Id', $article->CreatedBy])->Email;
+                $articleCreatorEmail = $this->dataHelper->get('Person', ['Id', $article->CreatedBy], 'Email')->Email;
                 if (!$articleCreatorEmail) {
                     $this->application->getErrorManager()->raise(ApplicationError::InvalidParameter, "Unknown author of article '$idArticle' in file " . __FILE__ . ' at line ' . __LINE__);
                     return;

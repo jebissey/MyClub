@@ -2,10 +2,12 @@
 
 namespace app\controllers;
 
+use app\enums\InputPattern;
 use app\helpers\Application;
 use app\enums\ApplicationError;
 use app\helpers\DesignDataHelper;
 use app\helpers\Params;
+use app\helpers\WebApp;
 
 class DesignController extends AbstractController
 {
@@ -41,14 +43,22 @@ class DesignController extends AbstractController
     {
         if ($this->connectedUser->get()->isRedactor() ?? false) {
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                $schema = [
+                    'name' => InputPattern::Content->value,
+                    'detail' => InputPattern::Content->value,
+                    'navbar' => InputPattern::Content->value,
+                    'onlyForMembers' => 'int',
+                    'idGroup' => InputPattern::Content->value,
+                ];
+                $filterValues = WebApp::filterInput($schema, $_POST);
                 $values = [
                     'IdPerson' => $this->connectedUser->person->Id,
-                    'Name' => $_POST['name'] ?? '',
-                    'Detail' => $_POST['detail'] ?? '',
-                    'NavBar' => $_POST['navbar'] ?? '',
+                    'Name' => $filterValues['name'] ?? '',
+                    'Detail' => $filterValues['detail'] ?? '',
+                    'NavBar' => $filterValues['navbar'] ?? '',
                     'Status' => 'UnderReview',
-                    'OnlyForMembers' => $_POST['onlyForMembers'] ? 1 : 0,
-                    'IdGroup' => $_POST['idGroup'] !== '' ? $_POST['idGroup'] : null
+                    'OnlyForMembers' => $filterValues['onlyForMembers'] ? 1 : 0,
+                    'IdGroup' => $filterValues['idGroup'] !== '' ? $filterValues['idGroup'] : null
                 ];
                 $this->dataHelper->set('Design', $values);
 
