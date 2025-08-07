@@ -2,7 +2,7 @@
 
 namespace app\controllers;
 
-use app\enums\InputPattern;
+use app\enums\FilterInputRule;
 use app\helpers\Application;
 use app\enums\ApplicationError;
 use app\helpers\DesignDataHelper;
@@ -27,7 +27,7 @@ class DesignController extends AbstractController
                 'groups' => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
                 'userVotes' => $userVotes
             ]));
-        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function create()
@@ -36,7 +36,7 @@ class DesignController extends AbstractController
             $this->render('app/views/designs/create.latte', Params::getAll([
                 'groups' => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
             ]));
-        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function save()
@@ -44,26 +44,26 @@ class DesignController extends AbstractController
         if ($this->connectedUser->get()->isRedactor() ?? false) {
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $schema = [
-                    'name' => InputPattern::Content->value,
-                    'detail' => InputPattern::Content->value,
-                    'navbar' => InputPattern::Content->value,
-                    'onlyForMembers' => 'int',
-                    'idGroup' => InputPattern::Content->value,
+                    'name' => FilterInputRule::HtmlSafeName->value,
+                    'detail' => FilterInputRule::HtmlSafeName->value,
+                    'navbar' => FilterInputRule::Content->value,
+                    'onlyForMembers' => FilterInputRule::Int->value,
+                    'idGroup' => FilterInputRule::Int->value,
                 ];
-                $filterValues = WebApp::filterInput($schema, $_POST);
+                $filterValues = WebApp::filterInput($schema, $this->flight->request()->data->getData());
                 $values = [
                     'IdPerson' => $this->connectedUser->person->Id,
                     'Name' => $filterValues['name'] ?? '',
                     'Detail' => $filterValues['detail'] ?? '',
                     'NavBar' => $filterValues['navbar'] ?? '',
                     'Status' => 'UnderReview',
-                    'OnlyForMembers' => $filterValues['onlyForMembers'] ? 1 : 0,
-                    'IdGroup' => $filterValues['idGroup'] !== '' ? $filterValues['idGroup'] : null
+                    'OnlyForMembers' => $filterValues['onlyForMembers'] ?? 1,
+                    'IdGroup' => $filterValues['idGroup']
                 ];
                 $this->dataHelper->set('Design', $values);
 
                 $this->flight->redirect('/designs');
-            } else $this->application->getErrorManager()->raise(ApplicationError::InvalidRequestMethod, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
-        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+            } else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 }

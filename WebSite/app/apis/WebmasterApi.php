@@ -48,7 +48,7 @@ class WebmasterApi extends AbstractApi
 
     public function lastVersion()
     {
-        (new LogDataHelper($this->application))->add(200, $_SERVER['HTTP_USER_AGENT']);
+        (new LogDataHelper($this->application))->add(200, $_SERVER['HTTP_USER_AGENT'] ?? 'HTTP_USER_AGENT not defined');
         $this->renderJson(['lastVersion' => Application::VERSION]);
     }
 

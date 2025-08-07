@@ -3,7 +3,7 @@
 namespace app\controllers;
 
 use app\enums\ApplicationError;
-use app\enums\InputPattern;
+use app\enums\FilterInputRule;
 use app\helpers\Application;
 use app\helpers\FFAScraper;
 use app\helpers\Params;
@@ -20,18 +20,18 @@ class FFAController extends AbstractController
     {
         if ($person = $this->connectedUser->get()->person ?? false) {
             $schema = [
-                'firstName' => InputPattern::PersonName->value,
-                'lastName' => InputPattern::PersonName->value,
-                'question' => InputPattern::Content->value,
-                'year' => 'int',
-                'club' => InputPattern::Content->value,
+                'firstName' => FilterInputRule::PersonName->value,
+                'lastName' => FilterInputRule::PersonName->value,
+                'question' => FilterInputRule::HtmlSafeName->value,
+                'year' => FilterInputRule::Int->value,
+                'club' => FilterInputRule::HtmlSafeName->value,
             ];
-            $input = WebApp::filterInput($schema, $_GET);
-            $firstName = $input['firstName'] !== '' ? $input['firstName'] : ($person->FirstName ?? '');
-            $lastName = $input['lastName'] !== '' ? $input['lastName'] : $person->LastName ?? '';
-            $question = $input['question'] !== '' ? $input['question'] : 'rank';
-            $year = $input['year'] !== '' ? $input['year'] : date('Y');
-            $club = $input['club'] !== '' ? $input['club'] : $this->dataHelper->get('Settings', ['Name' => 'FFA_club'], 'Value')->Value ?? '';
+            $input = WebApp::filterInput($schema, $this->flight->request()->query->getData());
+            $firstName = $input['firstName'] ?? $person->FirstName ?? '';
+            $lastName = $input['lastName'] ?? $person->LastName ?? '';
+            $question = $input['question'] ?? 'rank';
+            $year = $input['year'] ?? date('Y');
+            $club = $input['club'] ?? $this->dataHelper->get('Settings', ['Name' => 'FFA_club'], 'Value')->Value ?? '';
             $results = [];
             $ffaScraper = new FFAScraper();
             if ($question == 'rank') $results = $ffaScraper->searchAthleteRank($firstName, $lastName, $year, $club);
@@ -47,6 +47,6 @@ class FFAController extends AbstractController
                 'year' => $year,
                 'club' => $club,
             ]));
-        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 }

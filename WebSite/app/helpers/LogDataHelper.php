@@ -12,6 +12,7 @@ class LogDataHelper extends Data
 {
     private string $host;
     private const DISPLAY_TIMEZONE = 'Europe/Paris';
+    private const MAX_FILTER_LENGTH = 100;
 
     public function __construct(Application $application)
     {
@@ -642,45 +643,21 @@ class LogDataHelper extends Data
         return $datetime->format('d/m/Y H:i');
     }
 
-
-    public function getVisitedPages($perPage, $logPage)
+    public function getVisitedPages(int $perPage, int $logPage, array $filtersInput): array
     {
-        $offset = ($logPage - 1) * $perPage;
-
-        $whereClause = [];
-        $params = [];
-
-        $filters = [
-            'type' => 'Type',
-            'browser' => 'Browser',
-            'os' => 'Os',
-            'who' => 'Who',
-            'code' => 'Code',
-            'uri' => 'Uri',
-            'message' => 'Message',
-        ];
-
-        foreach ($filters as $param => $column) {
-            if (isset($_GET[$param]) && !empty($_GET[$param])) {
-                $whereClause[] = "$column LIKE ?";
-                $params[] = '%' . $_GET[$param] . '%';
-            }
-        }
-
-        $where = '';
-        if (!empty($whereClause)) {
-            $where = 'WHERE ' . implode(' AND ', $whereClause);
-        }
-
-        $query = $this->pdoForLog->prepare("SELECT COUNT(*) as total FROM Log $where");
-        $query->execute($params);
-        $total = $query->fetch()->total;
-
-        $query = $this->pdoForLog->prepare("SELECT * FROM Log $where ORDER BY CreatedAt DESC LIMIT ? OFFSET ?");
-        $allParams = array_merge($params, [$perPage, $offset]);
-        $query->execute($allParams);
-        return [$query->fetchAll(), ceil($total / $perPage)];
+        $offset = max(0, ($logPage - 1) * $perPage);
+        [$whereSQL, $params] = $this->buildWhereClauseFromFilters($filtersInput);
+        $countStmt = $this->pdoForLog->prepare("SELECT COUNT(*) as total FROM Log $whereSQL");
+        $countStmt->execute($params);
+        $total = (int) $countStmt->fetchColumn();
+        $sql = "SELECT * FROM Log $whereSQL ORDER BY CreatedAt DESC LIMIT ? OFFSET ?";
+        $stmt = $this->pdoForLog->prepare($sql);
+        $params[] = (int) $perPage;
+        $params[] = (int) $offset;
+        $stmt->execute($params);
+        return [$stmt->fetchAll(), ceil($total / $perPage)];
     }
+
 
     public function getPersons(array $filteredPersonEmails): array
     {
@@ -749,5 +726,32 @@ class LogDataHelper extends Data
             ':end' => $season['end']
         ]);
         return $query->fetchAll(PDO::FETCH_KEY_PAIR);
+    }
+
+    #region Private functions
+    private function buildWhereClauseFromFilters(array $filtersInput): array
+    {
+        $filters = [
+            'type' => 'Type',
+            'browser' => 'Browser',
+            'os' => 'Os',
+            'who' => 'Who',
+            'code' => 'Code',
+            'uri' => 'Uri',
+            'message' => 'Message',
+        ];
+        $whereClauses = [];
+        $params = [];
+        foreach ($filters as $param => $column) {
+            if (isset($filtersInput[$param]) && trim($filtersInput[$param]) !== '') {
+                $value = trim($filtersInput[$param]);
+                if (mb_strlen($value) > self::MAX_FILTER_LENGTH) $value = mb_substr($value, 0, self::MAX_FILTER_LENGTH);
+                $whereClauses[] = "$column LIKE ?";
+                $params[] = '%' . $value . '%';
+            }
+        }
+        $whereSQL = '';
+        if (!empty($whereClauses)) $whereSQL = 'WHERE ' . implode(' AND ', $whereClauses);
+        return [$whereSQL, $params];
     }
 }

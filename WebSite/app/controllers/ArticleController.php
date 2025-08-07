@@ -5,7 +5,7 @@ namespace app\controllers;
 use RuntimeException;
 
 use app\enums\ApplicationError;
-use app\enums\InputPattern;
+use app\enums\FilterInputRule;
 use app\helpers\Application;
 use app\helpers\ArticleCrosstabDataHelper;
 use app\helpers\ArticleDataHelper;
@@ -39,24 +39,24 @@ class ArticleController extends TableController
                 $_SESSION['navbar'] = 'redactor';
 
                 $this->render('app/views/admin/redactor.latte', Params::getAll([]));
-            } else $this->application->getErrorManager()->raise(ApplicationError::InvalidRequestMethod, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
-        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+            } else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function index()
     {
         $connectedUser = $this->connectedUser->get();
         $schema = [
-            'PersonName' => InputPattern::PersonName->value,
-            'title' => InputPattern::Content->value,
-            'timestamp' => InputPattern::DateTime->value,
-            'lastUpdate' => InputPattern::DateTime->value,
+            'PersonName' => FilterInputRule::PersonName->value,
+            'title' => FilterInputRule::Content->value,
+            'timestamp' => FilterInputRule::DateTime->value,
+            'lastUpdate' => FilterInputRule::DateTime->value,
             'published' => ['oui', 'non'],
             'pool' => ['oui', 'non'],
-            'GroupName' => InputPattern::Content->value,
-            'Content' => InputPattern::Content->value,
+            'GroupName' => FilterInputRule::HtmlSafeName->value,
+            'Content' => FilterInputRule::Content->value,
         ];
-        $filterValues = WebApp::filterInput($schema, $_GET);
+        $filterValues = WebApp::filterInput($schema, $this->flight->request()->query->getData());
         $filterConfig = [
             ['name' => 'PersonName', 'label' => 'Créé par'],
             ['name' => 'title', 'label' => 'Titre'],
@@ -81,7 +81,7 @@ class ArticleController extends TableController
             $columns[] = ['field' => 'Published', 'label' => 'Publié'];
         }
         $query = $this->articleTableDataHelper->getQuery($connectedUser);
-        $data = $this->prepareTableData($query, $filterValues, (int)($_GET['tablePage'] ?? 0));
+        $data = $this->prepareTableData($query, $filterValues, (int)($this->flight->request()->query['tablePage'] ?? 0));
         $this->render('app/views/user/articles.latte', Params::getAll([
             'articles' => $data['items'],
             'currentPage' => $data['currentPage'],
@@ -132,8 +132,8 @@ class ArticleController extends TableController
                 'carouselItems' => (new DataHelper($this->application))->gets('Carousel', ['IdArticle' => $id]),
                 'message' => $messages,
             ]));
-        } else if (!($connectedUser->person ?? false)) $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Il faut être connecté pour pouvoir consulter cet article', 5000);
-        else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+        } else if (!($connectedUser->person ?? false)) $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Il faut être connecté pour pouvoir consulter cet article', 5000);
+        else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function update(int $id): void
@@ -142,17 +142,17 @@ class ArticleController extends TableController
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $article = $this->articleDataHelper->getLatestArticle([$id]);
                 if (!$article || ($this->connectedUser->person?->Id ?? 0) != $article->CreatedBy) {
-                    $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+                    $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
                     return;
                 }
                 $schema = [
-                    'title' => InputPattern::Content->value,
-                    'content' => InputPattern::Content->value,
-                    'published' => 'int',
-                    'idGroup' => InputPattern::Content->value,
-                    'membersOnly' => 'int',
+                    'title' => FilterInputRule::HtmlSafeName->value,
+                    'content' => FilterInputRule::Content->value,
+                    'published' => FilterInputRule::Int->value,
+                    'idGroup' => FilterInputRule::Int->value,
+                    'membersOnly' => FilterInputRule::Int->value,
                 ];
-                $input = WebApp::filterInput($schema, $_POST);
+                $input = WebApp::filterInput($schema, $this->flight->request()->data->getData());
                 $title = $input['title'];
                 $content = $input['content'];
                 if (empty($title) || empty($content)) {
@@ -164,8 +164,8 @@ class ArticleController extends TableController
                     'Title'          => $title,
                     'Content'        => $content,
                     'PublishedBy'    => $input['published'] == 1 ? $this->connectedUser->person->Id : null,
-                    'IdGroup'        => $input['idGroup'] === '' ? null : $input['idGroup'],
-                    'OnlyForMembers' => $input['membersOnly'],
+                    'IdGroup'        => $input['idGroup'],
+                    'OnlyForMembers' => $input['membersOnly'] ?? 1,
                     'LastUpdate'     => date('Y-m-d H:i:s')
                 ], ['Id' => $id]);
                 if ($result) {
@@ -173,8 +173,8 @@ class ArticleController extends TableController
                     (new Backup())->save();
                 } else $_SESSION['error'] = "Une erreur est survenue lors de la mise à jour de l'article";
                 $this->flight->redirect('/articles/' . $id);
-            } else $this->application->getErrorManager()->raise(ApplicationError::InvalidRequestMethod, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
-        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+            } else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function publish(int $id): void
@@ -183,17 +183,17 @@ class ArticleController extends TableController
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $article = $this->articleDataHelper->getLatestArticle([$id]);
                 if (!$article || ($this->connectedUser->person->Id != $article->CreatedBy && !$this->connectedUser->isEditor())) {
-                    $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+                    $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
                     return;
                 }
                 $schema = [
-                    'isSpotlightActive' => 'bool',
-                    'spotlightedUntil' => InputPattern::DateTime->value,
-                    'published' => 'int',
-                    'idGroup' => InputPattern::Content->value,
-                    'membersOnly' => 'int',
+                    'isSpotlightActive' => FilterInputRule::Bool->value,
+                    'spotlightedUntil' => FilterInputRule::DateTime->value,
+                    'published' => FilterInputRule::Int->value,
+                    'idGroup' => FilterInputRule::Content->value,
+                    'membersOnly' => FilterInputRule::Int->value,
                 ];
-                $input = WebApp::filterInput($schema, $_POST);
+                $input = WebApp::filterInput($schema, $this->flight->request()->data->getData());
                 $isSpotlightActive = $input['isSpotlightActive'];
                 if ($isSpotlightActive) {
                     $spotlightedUntil = $input['spotlightedUntil'];
@@ -214,8 +214,8 @@ class ArticleController extends TableController
                 $this->flight->redirect('/articles/' . $id);
             } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $this->render('app/views/user/publish.latte', Params::getAll(['article' => $this->articleDataHelper->getWithAuthor($id)]));
-            } else $this->application->getErrorManager()->raise(ApplicationError::InvalidRequestMethod, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
-        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+            } else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function create()
@@ -228,8 +228,8 @@ class ArticleController extends TableController
                     'CreatedBy' => $this->connectedUser->person->Id ?? throw new RuntimeException('Fatal error in file ' . __FILE__ . ' at line ' . __LINE__)
                 ]);
                 $this->flight->redirect('/articles/' . $id);
-            } else $this->application->getErrorManager()->raise(ApplicationError::InvalidRequestMethod, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
-        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+            } else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function delete(int $id)
@@ -238,13 +238,13 @@ class ArticleController extends TableController
             if (($_SERVER['REQUEST_METHOD'] === 'GET')) {
                 $article = $this->articleDataHelper->getLatestArticle([$id]);
                 if (!$article || $this->connectedUser->person->Id != $article->CreatedBy) {
-                    $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+                    $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
                     return;
                 }
                 $this->dataHelper->delete('Article', ['Id' => $id]);
                 $this->flight->redirect('/articles');
-            } else $this->application->getErrorManager()->raise(ApplicationError::InvalidRequestMethod, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
-        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+            } else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function showArticleCrosstab()
@@ -263,6 +263,6 @@ class ArticleController extends TableController
                 'title' => 'Rédateurs vs audience',
                 'totalLabels' => ['articles', '']
             ]));
-        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 }

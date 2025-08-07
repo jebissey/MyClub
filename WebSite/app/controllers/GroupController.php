@@ -2,8 +2,9 @@
 
 namespace app\controllers;
 
-use app\helpers\Application;
 use app\enums\ApplicationError;
+use app\enums\FilterInputRule;
+use app\helpers\Application;
 use app\helpers\GroupDataHelper;
 use app\helpers\Params;
 use app\helpers\WebApp;
@@ -26,7 +27,7 @@ class GroupController extends AbstractController implements CrudControllerInterf
                 'groups' => $this->groupDataHelper->getGroupsWithAuthorizations(),
                 'layout' => WebApp::getLayout()
             ]));
-        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function create()
@@ -35,10 +36,15 @@ class GroupController extends AbstractController implements CrudControllerInterf
 
             $availableAuthorizations = $this->dataHelper->gets('Authorization');
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-                $name = isset($_POST['name']) ? WebApp::sanitizeInput($_POST['name']) : '';
-                $selfRegistration = isset($_POST['selfRegistration']) ? 1 : 0;
-                $selectedAuthorizations = isset($_POST['authorizations']) ? $_POST['authorizations'] : [];
-
+                $schema = [
+                    'name' => FilterInputRule::HtmlSafeName->value,
+                    'selfRegistration' => FilterInputRule::Int->value,
+                    'authorizations' => FilterInputRule::ArrayInt->value,
+                ];
+                $input = WebApp::filterInput($schema, $this->flight->request()->data->getData());
+                $name = $input['name'];
+                $selfRegistration = $input['selfRegistration'] ?? 0;
+                $selectedAuthorizations = $input['authorizations'] ?? [];
                 if (empty($name)) {
                     $this->render('app/views/groups/create.latte', Params::getAll([
                         'availableAuthorizations' => $availableAuthorizations,
@@ -52,8 +58,8 @@ class GroupController extends AbstractController implements CrudControllerInterf
                     'availableAuthorizations' => $availableAuthorizations,
                     'layout' => WebApp::getLayout()
                 ]));
-            } else $this->application->getErrorManager()->raise(ApplicationError::InvalidRequestMethod, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
-        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+            } else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function edit($id)
@@ -63,9 +69,15 @@ class GroupController extends AbstractController implements CrudControllerInterf
             $group = $this->dataHelper->get('Group', ['Id' => $id], 'Name, SelfRegistration');
 
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-                $name = isset($_POST['name']) ? WebApp::sanitizeInput($_POST['name']) : '';
-                $selfRegistration = isset($_POST['selfRegistration']) ? 1 : 0;
-                $selectedAuthorizations = isset($_POST['authorizations']) ? $_POST['authorizations'] : [];
+                $schema = [
+                    'name' => FilterInputRule::HtmlSafeName->value,
+                    'selfRegistration' => FilterInputRule::Int->value,
+                    'authorizations' => FilterInputRule::ArrayInt->value,
+                ];
+                $input = WebApp::filterInput($schema, $this->flight->request()->data->getData());
+                $name = $input['name'] ?? '';
+                $selfRegistration = $input['selfRegistration'] ?? 0;
+                $selectedAuthorizations = $input['authorizations'] ?? [];
 
                 if (empty($name)) {
                     $this->render('app/views/groups/edit.latte', Params::getAll([
@@ -85,8 +97,8 @@ class GroupController extends AbstractController implements CrudControllerInterf
                         'layout' => WebApp::getLayout()
                     ]));
                 }
-            } else $this->application->getErrorManager()->raise(ApplicationError::InvalidRequestMethod, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
-        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+            } else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function delete($id)
@@ -94,6 +106,6 @@ class GroupController extends AbstractController implements CrudControllerInterf
         if (($this->connectedUser->get()->isPersonManager() ?? false) || $this->connectedUser->isWebmaster() ?? false) {
             $this->dataHelper->set('Group', ['Inactivated' => 0], ['Id' => $id]);
             $this->flight->redirect('/groups');
-        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 }

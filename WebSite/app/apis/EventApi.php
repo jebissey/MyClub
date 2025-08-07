@@ -5,6 +5,7 @@ namespace app\apis;
 use DateTime;
 use Throwable;
 
+use app\enums\Period;
 use app\helpers\ApiEventDataHelper;
 use app\helpers\ApiNeedDataHelper;
 use app\helpers\ApiNeedTypeDataHelper;
@@ -17,6 +18,7 @@ use app\helpers\MessageDataHelper;
 use app\helpers\ParticipantDataHelper;
 use app\helpers\PersonDataHelper;
 use app\helpers\PersonPreferences;
+use app\helpers\WebApp;
 
 class EventApi extends AbstractApi
 {
@@ -93,7 +95,11 @@ class EventApi extends AbstractApi
     public function duplicateEvent($id)
     {
         if ($this->connectedUser->get()->isEventManager() || false) {
-            [$response, $statusCode] = $this->eventDataHelper->duplicate($id, $this->connectedUser->person->Id);
+            [$response, $statusCode] = $this->eventDataHelper->duplicate(
+                $id,
+                $this->connectedUser->person->Id,
+                WebApp::getFiltered('mode', $this->application->enumToValues(Period::class), $_GET) ?: Period::Today->value
+            );
             $this->renderJson($response, $statusCode);
         } else $this->renderJson(['success' => false, 'message' => 'User not allowed'], 403);
     }

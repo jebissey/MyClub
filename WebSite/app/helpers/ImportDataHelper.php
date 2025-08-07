@@ -26,7 +26,7 @@ class ImportDataHelper extends Data
             if ($currentRow <= $headerRow) continue;
 
             $personData = [
-                'Email' => filter_var($data[$mapping['email']], FILTER_VALIDATE_EMAIL) ?? '',
+                'Email' => filter_var($data[$mapping['email']], FILTER_VALIDATE_EMAIL) ?: '',
                 'FirstName' => $data[$mapping['firstName']],
                 'LastName' => $data[$mapping['lastName']],
                 'Phone' => $data[$mapping['phone']],

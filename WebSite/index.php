@@ -195,7 +195,7 @@ mapRoute($flight, 'GET  /user/sign/out', $userController, 'signOut');
 mapRoute($flight, 'GET  /user/statistics', $userController, 'showStatistics');
 mapRoute($flight, 'GET  /contact', $userController, 'contact');
 mapRoute($flight, 'POST /contact', $userController, 'contact');
-mapRoute($flight, 'GET  /contact/event/@id:[0-9]+', $userController, 'contactEvent');
+mapRoute($flight, 'GET  /contact/event/@id:[0-9]+', $userController, 'contact');
 
 $webmasterController = new WebmasterController($application);
 mapRoute($flight, 'GET  /admin', $webmasterController, 'homeAdmin');

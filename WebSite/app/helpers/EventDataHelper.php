@@ -9,7 +9,8 @@ use RuntimeException;
 use Throwable;
 
 use app\enums\EventAudience;
-use app\enums\Period;
+use app\enums\EventSearchMode;
+use app\enums\FilterInputRule;
 use app\helpers\TranslationManager;
 use app\interfaces\NewsProviderInterface;
 
@@ -46,7 +47,7 @@ class EventDataHelper extends Data implements NewsProviderInterface
         }
     }
 
-    public function duplicate($id, $personId)
+    public function duplicate(int $id, int $personId, string $mode): array
     {
         try {
             $this->pdo->beginTransaction();
@@ -56,7 +57,6 @@ class EventDataHelper extends Data implements NewsProviderInterface
                 $this->pdo->rollBack();
                 return [['success' => false, 'message' => 'Unknown event'], 471];
             }
-            $mode = WebApp::getFiltered('mode', $this->application->enumToValues(Period::class), $_GET) ?: Period::Today->value;
             $newStartTime = $this->calculateNewStartTime($event->StartTime, $mode);
             $newEvent = [
                 'Summary' => $event->Summary,
@@ -164,10 +164,10 @@ class EventDataHelper extends Data implements NewsProviderInterface
             ->fetch();
     }
 
-    public function getEvents($person, string $mode, int $offset, bool $filterByPreferences = false): array
+    public function getEvents(?object $person, string $mode, int $offset, bool $filterByPreferences = false): array
     {
-        if ($mode === 'next') return $this->getNextEvents($person, $filterByPreferences);
-        elseif ($mode === 'past') return $this->getPassedEvents($person, $offset);
+        if ($mode === EventSearchMode::Next->value) return $this->getNextEvents($person, $filterByPreferences);
+        elseif ($mode === EventSearchMode::Past->value) return $this->getPassedEvents($person, $offset);
         else throw new RuntimeException("Invalide mode ($mode)");
     }
 
@@ -409,7 +409,7 @@ class EventDataHelper extends Data implements NewsProviderInterface
             ->fetch();
     }
 
-    public function update($id, $name, $idGroup)
+    public function update($id, $name, $idGroup, array $attributes)
     {
         $this->pdo->beginTransaction();
         try {
@@ -419,9 +419,10 @@ class EventDataHelper extends Data implements NewsProviderInterface
             $deleteQuery = $this->pdo->prepare('DELETE FROM EventTypeAttribute WHERE IdEventType = ?');
             $deleteQuery->execute([$id]);
 
-            if (isset($_POST['attributes']) && is_array($_POST['attributes'])) {
+            
+            if ($attributes) {
                 $insertQuery = $this->pdo->prepare('INSERT INTO EventTypeAttribute (IdEventType, IdAttribute) VALUES (?, ?)');
-                foreach ($_POST['attributes'] as $attributeId) {
+                foreach ($attributes as $attributeId) {
                     $insertQuery->execute([$id, $attributeId]);
                 }
             }
@@ -530,14 +531,14 @@ class EventDataHelper extends Data implements NewsProviderInterface
         return $stmt->fetchColumn();
     }
 
-    private function getNextEvents($person, bool $filterByPreferences = false)
+    private function getNextEvents(?object $person, bool $filterByPreferences = false)
     {
         $query = $this->fluent
             ->from('Event e')
             ->leftJoin('EventType et ON e.IdEventType = et.Id')
             ->leftJoin('Participant p ON e.Id = p.IdEvent AND p.IdPerson = ?', $person->Id ?? 0)
             ->leftJoin('Message m ON m.EventId = e.Id AND m."From" = "User"');
-        if ($person === false) {
+        if ($person == null) {
             $audienceCondition = 'e.Audience = \'' . EventAudience::ForAll->value . '\' AND et.IdGroup IS NULL';
             $params = [];
         } else {

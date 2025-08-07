@@ -23,7 +23,7 @@ class NavBarController extends AbstractController
                 'groups' => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
                 'availableRoutes' => $this->getAvailableRoutes()
             ]));
-        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function showArwards()
@@ -39,7 +39,7 @@ class NavBarController extends AbstractController
                 'layout' => WebApp::getLayout(),
                 'navItems' => $this->getNavItems($person),
             ]));
-        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function showArticle($id)
@@ -51,7 +51,7 @@ class NavBarController extends AbstractController
                 'chosenArticle' => $this->dataHelper->get('Article', ['Id' => $id], 'Content'),
                 'hasAuthorization' => $this->connectedUser->hasAutorization()
             ]));
-        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     #region private function 

@@ -56,9 +56,9 @@ class PersonDataHelper extends Data implements NewsProviderInterface
         $id = $query->fetch()->Id ?? null;
         if ($id == null) {
             $query = $this->pdo->prepare("
-                        INSERT INTO Person (Email, FirstName, LastName, Imported) 
-                        VALUES ('', '', '', 0)
-                    ");
+                INSERT INTO Person (Email, FirstName, LastName, Imported) 
+                VALUES ('', '', '', 0)
+            ");
             $query->execute([]);
             $id = $this->pdo->lastInsertId();
         }

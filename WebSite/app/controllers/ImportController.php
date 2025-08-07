@@ -2,10 +2,12 @@
 
 namespace app\controllers;
 
-use app\helpers\Application;
 use app\enums\ApplicationError;
+use app\enums\FilterInputRule;
+use app\helpers\Application;
 use app\helpers\ImportDataHelper;
 use app\helpers\Params;
+use app\helpers\WebApp;
 
 class ImportController extends AbstractController
 {
@@ -27,7 +29,7 @@ class ImportController extends AbstractController
                 'importSettings' => $this->importSettings,
                 'results' => $this->results
             ]));
-        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function processImport()
@@ -42,12 +44,20 @@ class ImportController extends AbstractController
                     'results' => $this->results
                 ]));
             } else {
-                $headerRow = $_POST['headerRow'];
+                $schema = [
+                    'headerRow' => FilterInputRule::Int->value,
+                    'email' => FilterInputRule::Email->value,
+                    'firstName' => FilterInputRule::PersonName->value,
+                    'lastName' => FilterInputRule::PersonName->value,
+                    'phone' => FilterInputRule::Phone->value,
+                ];
+                $input = WebApp::filterInput($schema, $this->flight->request()->data->getData());
+                $headerRow = $input['headerRow'] ?? 1;
                 $mapping = [
-                    'email' => $_POST['emailColumn'],
-                    'firstName' => $_POST['firstNameColumn'],
-                    'lastName' => $_POST['lastNameColumn'],
-                    'phone' => $_POST['phoneColumn']
+                    'email' => $input['emailColumn'] ?? '',
+                    'firstName' => $input['firstNameColumn'] ?? '',
+                    'lastName' => $input['lastNameColumn'] ?? '',
+                    'phone' => $input['phoneColumn'] ?? ''
                 ];
                 $this->importSettings['headerRow'] = $headerRow;
                 $this->importSettings['mapping'] = $mapping;
@@ -68,7 +78,7 @@ class ImportController extends AbstractController
                     'results' => $results
                 ]));
             }
-        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     #region Private functions

@@ -2,8 +2,6 @@
 
 namespace app\helpers;
 
-use app\enums\InputPattern;
-
 class PersonStatistics extends Data
 {
     public function __construct(Application $application)
@@ -68,11 +66,8 @@ class PersonStatistics extends Data
         return $seasons;
     }
 
-    public function getSeasonRange(): array
+    public function getSeasonRange(?string $seasonStart, ?string $seasonEnd): array
     {
-        $seasonStart = WebApp::getFiltered('seasonStart', InputPattern::DateTime->value, $_GET) ?: null;
-        $seasonEnd = WebApp::getFiltered('seasonEnd', InputPattern::DateTime->value, $_GET) ?: null;
-
         if ($seasonStart === null || $seasonEnd === null) {
             $currentYear = date('Y');
             $currentMonth = date('m');
@@ -85,7 +80,6 @@ class PersonStatistics extends Data
                 $seasonEnd = ($currentYear + 1) . '-08-31';
             }
         }
-
         return [
             'start' => $seasonStart,
             'end' => $seasonEnd

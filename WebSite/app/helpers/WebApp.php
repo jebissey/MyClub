@@ -4,6 +4,8 @@ namespace app\helpers;
 
 use RuntimeException;
 
+use app\enums\FilterInputRule;
+
 class WebApp
 {
     public function buildUrl($newParams)
@@ -45,72 +47,72 @@ class WebApp
         return $html;
     }
 
-    static public function sanitizeInput(string $data): string
+    static public function sanitizeInput(string $data, array $possibleValues = [], string $defaultValue = ''): string
     {
-        return trim($data ?? '');
+        $data = trim($data ?? '');
+        if (!empty($possibleValues)) {
+            if (!in_array($data, $possibleValues, true)) return $defaultValue;
+        }
+        return $data;
     }
 
     /**
      * Sanitize and validate input based on a schema.
      *
-     * The schema defines expected keys and how to filter them.
-     * Each rule can be:
-     * - a regex string (e.g. '/^[a-z]+$/')
-     * - an array of allowed values (e.g. ['yes', 'no'])
-     * - a type keyword: 'bool', 'int', 'float'
-     *
-     * Examples
-     * ========
-     * // From $_GET:
+     * Examples:
+     * ---------
+     * // From $_POST:
      * $schema = [
-     *     'name' => '/^[a-zA-Z\s\-]+$/',
-     *     'age' => 'int',
-     *     'newsletter' => ['yes', 'no'],
-     *     'score' => 'float',
-     *     'valid' => 'bool',
+     *     'article_id' => FilterInputRule::Int->value,
+     *     'question' => FilterInputRule::HtmlSafeText->value,
+     *     'closingDate' => FilterInputRule::DateTime->value,
+     *     'visibility' => $this->application->enumToValues(SurveyVisibility::class),
      * ];
-     * $input = WebApp::filterInput($schema, $_GET);
+     * $input = WebApp::filterInput($schema, $this->flight->request()->data->getData());
      *
-     * // From custom array:
-     * $data = [
-     *     'token' => '<script>bad()</script>ABC123',
-     *     'confirm' => 'yes'
-     * ];
-     * $input = WebApp::filterInput([
-     *     'token' => '/^[A-Z0-9]+$/',
-     *     'confirm' => ['yes', 'no']
-     * ], $data);
-     *
-     * @param array $schema Associative array [key => rule] where rule is:
-     *                      - regex string (starts with '/')
-     *                      - array of allowed values
-     *                      - 'bool', 'int', or 'float'
-     * @param array $source Input source (e.g. $_GET, $_POST, decoded JSON, etc.)
-     * @return array Filtered values (invalid values return empty string or null for bool)
+     * @param array $schema Associative array [key => rule]
+     * @param array $source Input source (e.g. $_GET, $_POST, etc.)
+     * @return array Filtered values, with null for invalid or missing inputs
      */
     static public function filterInput(array $schema, array $source): array
     {
         $filtered = [];
         foreach ($schema as $key => $rule) {
-            $raw = $source[$key] ?? '';
+            $raw = $source[$key] ?? null;
+            if (!isset($raw) || (is_string($raw) && strlen($raw) > 1024 * 1024)) {
+                $filtered[$key] = null;
+                continue;
+            }
+            if ($rule === FilterInputRule::ArrayInt || $rule === FilterInputRule::ArrayString) {
+                if (is_array($raw)) {
+                    $filtered[$key] = array_values(array_filter(
+                        $raw,
+                        fn($v) =>
+                        $rule === FilterInputRule::ArrayInt
+                            ? preg_match(FilterInputRule::Integer->value, (string)$v)
+                            : is_string($v) && trim($v) !== ''
+                    ));
+                    if (empty($filtered[$key])) $filtered[$key] = null;
+                } else $filtered[$key] = null;
+                continue;
+            }
             if (is_array($raw)) {
-                $filtered[$key] = '';
+                $filtered[$key] = null;
                 continue;
             }
             $value = trim(strip_tags($raw));
-            if (is_array($rule))                                     $filtered[$key] = in_array($value, $rule, true) ? $value : ''; // White list
-            elseif (is_string($rule) && str_starts_with($rule, '/')) $filtered[$key] = preg_match($rule, $value) ? $value : '';     // Regex
-            elseif ($rule === 'bool')                                $filtered[$key] = filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
-            elseif ($rule === 'int')                                 $filtered[$key] = filter_var($value, FILTER_VALIDATE_INT) ?? 0;
-            elseif ($rule === 'float')                               $filtered[$key] = filter_var($value, FILTER_VALIDATE_FLOAT) ?? 0.0;
-            else                                                     $filtered[$key] = $value;
+            if (is_array($rule))                                     $filtered[$key] = in_array($value, $rule, true) ? $value : null;
+            elseif (is_string($rule) && str_starts_with($rule, '/')) $filtered[$key] = preg_match($rule, $value) ? $value : null;
+            elseif ($rule === FilterInputRule::Bool)                 $filtered[$key] = filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+            elseif ($rule === FilterInputRule::Int)                  $filtered[$key] = filter_var($value, FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
+            elseif ($rule === FilterInputRule::Float)                $filtered[$key] = filter_var($value, FILTER_VALIDATE_FLOAT, FILTER_NULL_ON_FAILURE);
+            else                                                     $filtered[$key] = $value !== '' ? $value : null;
         }
         return $filtered;
     }
 
     static public function getFiltered(string $key, string|array $rule, array $source): mixed
     {
-        $source ??= $_GET;
         $result = self::filterInput([$key => $rule], $source);
         return $result[$key] !== '' ? $result[$key] : false;
     }

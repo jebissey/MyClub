@@ -3,10 +3,14 @@
 namespace app\controllers;
 
 use app\enums\ApplicationError;
+use app\enums\FilterInputRule;
+use app\enums\SurveyVisibility;
 use app\helpers\Application;
 use app\helpers\AuthorizationDataHelper;
 use app\helpers\Params;
 use app\helpers\SurveyDataHelper;
+use app\helpers\WebApp;
+use RuntimeException;
 
 class SurveyController extends AbstractController
 {
@@ -29,21 +33,29 @@ class SurveyController extends AbstractController
                     'article' => $article,
                     'survey' => $this->dataHelper->get('Survey', ['IdArticle' => $article->Id], 'Question, Options, ClosingDate, Visibility')
                 ]));
-            } else $this->application->getErrorManager()->raise(ApplicationError::InvalidRequestMethod, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
-        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+            } else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function createOrUpdate()
     {
         if ($this->connectedUser->get()->isRedactor() ?? false) {
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-                $articleId = $_POST['article_id'] ?? null;
-                $question = $_POST['question'] ?? '';
-                $closingDate = $_POST['closingDate'] ?? date('now', '+7 days');
-                $visibility = $_POST['visibility'] ?? 'redactor';
+                $schema = [
+                    'article_id' => FilterInputRule::Int->value,
+                    'question' => FilterInputRule::HtmlSafeText->value,
+                    'closingDate' => FilterInputRule::DateTime->value,
+                    'visibility' => $this->application->enumToValues(SurveyVisibility::class),
+                    'options' => FilterInputRule::ArrayString,
+                ];
+                $input = WebApp::filterInput($schema, $this->flight->request()->data->getData());
+                $articleId = $input['article_id'] ?? throw new RuntimeException('Fatal error in file ' . __FILE__ . ' at line ' . __LINE__);
+                $question = $input['question'] ?? '';
+                $closingDate = $input['closingDate'] ?? date('now', '+7 days');
+                $visibility = $input['visibility'] ?? 'redactor';
                 $options = [];
-                if (isset($_POST['options']) && is_array($_POST['options'])) {
-                    foreach ($_POST['options'] as $option) {
+                if (isset($input['options']) && is_array($input['options'])) {
+                    foreach ($input['options'] as $option) {
                         $options[] = str_replace('"', "''", $option);
                     }
                 }
@@ -59,8 +71,8 @@ class SurveyController extends AbstractController
                 if ($survey) $this->dataHelper->set('Survey', $fields, ['Id' => $survey->Id]);
                 else         $this->dataHelper->set('Survey', $fields);
                 $this->flight->redirect('/articles/' . $articleId);
-            } else $this->application->getErrorManager()->raise(ApplicationError::InvalidRequestMethod, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
-        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+            } else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function viewResults($articleId)
@@ -99,7 +111,7 @@ class SurveyController extends AbstractController
                     'articleId' => $articleId,
                     'currentVersion' => Application::VERSION
                 ]);
-            } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
-        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+            } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 }

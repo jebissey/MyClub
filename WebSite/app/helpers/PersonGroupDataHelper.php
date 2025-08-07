@@ -2,6 +2,10 @@
 
 namespace app\helpers;
 
+use Exception;
+use PDOException;
+use RuntimeException;
+
 class PersonGroupDataHelper extends Data
 {
     public function __construct(Application $application)
@@ -9,23 +13,41 @@ class PersonGroupDataHelper extends Data
         parent::__construct($application);
     }
 
-    public function add($personId, $groupId): int
+    public function add(int $personId, int $groupId): int
     {
-        return $this->fluent->insertInto('PersonGroup', [
-            'IdPerson' => $personId,
-            'IdGroup'  => $groupId
-        ])->execute();
+        try {
+            $stmt = $this->pdo->prepare("
+                INSERT INTO PersonGroup (IdPerson, IdGroup)
+                VALUES (:personId, :groupId)
+            ");
+            $stmt->execute([
+                ':personId' => $personId,
+                ':groupId'  => $groupId
+            ]);
+            return (int) $this->pdo->lastInsertId();
+        } catch (PDOException $e) {
+            throw new RuntimeException("Add error: " . $e->getMessage()) . ' in file ' . __FILE__ . ' at line ' . __LINE__;
+        }
     }
 
-    public function del($personId, $groupId)
+    public function del(int $personId, int $groupId): int
     {
-        return $this->fluent->deleteFrom('PersonGroup')
-            ->where('IdPerson', $personId)
-            ->where('IdGroup', $groupId)
-            ->execute();
+        try {
+            $stmt = $this->pdo->prepare("
+                DELETE FROM PersonGroup
+                WHERE IdPerson = :personId AND IdGroup = :groupId
+            ");
+            $stmt->execute([
+                ':personId' => $personId,
+                ':groupId'  => $groupId
+            ]);
+            return $stmt->rowCount();
+        } catch (PDOException $e) {
+            throw new RuntimeException("Add error: " . $e->getMessage()) . ' in file ' . __FILE__ . ' at line ' . __LINE__;
+        }
     }
 
-    public function update($personId, $groups): void
+    public function update(int $personId, array $groups): void
     {
         $query = $this->pdo->prepare("
             DELETE FROM PersonGroup 

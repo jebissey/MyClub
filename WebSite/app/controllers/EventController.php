@@ -6,7 +6,8 @@ use DateTime;
 use Throwable;
 
 use app\enums\ApplicationError;
-use app\enums\InputPattern;
+use app\enums\EventSearchMode;
+use app\enums\FilterInputRule;
 use app\helpers\Application;
 use app\helpers\CrosstabDataHelper;
 use app\helpers\Email;
@@ -30,9 +31,15 @@ class EventController extends AbstractController
 
     public function nextEvents(): void
     {
-        $offset = (int)($_GET['offset'] ?? 0);
-        $mode = $_GET['mode'] ?? 'next';
-        $filterByPreferences = isset($_GET['filterByPreferences']) && $_GET['filterByPreferences'] === '1';
+        $schema = [
+            'offset' => FilterInputRule::Int->value,
+            'mode' => $this->application->enumToValues(EventSearchMode::class),
+            'filterByPreferences' => FilterInputRule::Int->value,
+        ];
+        $input = WebApp::filterInput($schema, $this->flight->request()->query->getData());
+        $offset = $input['offset'] ?? 0;
+        $mode = $input['mode'] ?? EventSearchMode::Next->value;
+        $filterByPreferences = $input['filterByPreferences'] ?? 0 === 1;
         $connectedUser = $this->connectedUser->get();
 
         $this->render('app/views/event/nextEvents.latte', Params::getAll([
@@ -75,7 +82,7 @@ class EventController extends AbstractController
                 'title' => 'Animateurs vs type d\'événement',
                 'totalLabels' => ['événements', 'participants']
             ]));
-        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function guest($message = '', $type = '')
@@ -90,7 +97,7 @@ class EventController extends AbstractController
                 'message' => $message,
                 'messageType' => $type
             ]));
-        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function guestInvite()
@@ -98,11 +105,11 @@ class EventController extends AbstractController
         if ($this->connectedUser->get(1)->isEventManager() ?? false) {
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $schema = [
-                    'email' => InputPattern::Email->value,
-                    'nickname' => InputPattern::PersonName->value,
-                    'eventId' => 'int',
+                    'email' => FilterInputRule::Email->value,
+                    'nickname' => FilterInputRule::PersonName->value,
+                    'eventId' => FilterInputRule::Int->value,
                 ];
-                $input = WebApp::filterInput($schema, $_POST);
+                $input = WebApp::filterInput($schema, $this->flight->request()->data->getData());
                 $email = $input['email'];
                 if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
                     $this->guest('Adresse e-mail invalide', 'error');
@@ -118,7 +125,7 @@ class EventController extends AbstractController
                     $this->guest('Événement non trouvé ou non accessible', 'error');
                     return;
                 }
-                $nickname = $input['nickname'];
+                $nickname = $input['nickname'] ?? '';
                 try {
                     $contact = $this->dataHelper->get('Contact', ['Email', $email], 'Id, Token, NickName, TokenCreatedAt');
                     if (!$contact) {
@@ -186,7 +193,7 @@ class EventController extends AbstractController
                     $this->guest('Erreur lors de l\'envoi de l\'invitation. ' . $e->getMessage(), 'error');
                 }
             } else $this->guest();
-        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function show(int $eventId, string $message = '', string $messageType = ''): void
@@ -210,16 +217,16 @@ class EventController extends AbstractController
                 'participantSupplies' => $this->eventDataHelper->getParticipantSupplies($eventId),
                 'userSupplies' => $this->eventDataHelper->getUserSupplies($eventId, $userEmail),
                 'isEventManager' => $this->connectedUser->isEventManager() || false,
-                'token' => WebApp::getFiltered('t', InputPattern::Token->value, $_GET) ?: false,
+                'token' => WebApp::getFiltered('t', FilterInputRule::Token->value, $this->flight->request()->query->getData()) ?? false,
                 'message' => $message,
                 'messageType' => $messageType,
             ]));
-        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Evénement non trouvé', 3000);
+        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Evénement non trouvé', 3000);
     }
 
     public function register(int $eventId, bool $set, $token = null): void
     {
-        if ($token === null) $token = isset($_GET['t']) ? WebApp::getFiltered('t', InputPattern::Token->value, $_GET) : null;
+        if ($token === null) $token = WebApp::getFiltered('t', FilterInputRule::Token->value, $this->flight->request()->query->getData());
         if ($this->connectedUser->get()->person ?? false) {
             $userId = $this->connectedUser->person->Id;
             if ($set) {
@@ -297,8 +304,8 @@ class EventController extends AbstractController
         if ($this->connectedUser->get()->isEventManager() ?? false) {
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $this->render('app/views/event/location.latte', Params::getAll([]));
-            } else $this->application->getErrorManager()->raise(ApplicationError::InvalidRequestMethod, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
-        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+            } else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function help(): void
@@ -318,8 +325,8 @@ class EventController extends AbstractController
                 $_SESSION['navbar'] = 'eventManager';
 
                 $this->render('app/views/admin/eventManager.latte', Params::getAll([]));
-            } else $this->application->getErrorManager()->raise(ApplicationError::InvalidRequestMethod, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
-        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+            } else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function needs(): void
@@ -330,7 +337,7 @@ class EventController extends AbstractController
                 'needTypes' => $this->dataHelper->gets('NeedType', [], '*', 'Name'),
                 'needs' => (new NeeddataHelper($this->application))->getNeedsAndTheirTypes(),
             ]));
-        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function showEventChat($eventId): void
@@ -349,6 +356,6 @@ class EventController extends AbstractController
                 'person' => $this->connectedUser->person,
                 'navItems' => $this->getNavItems($this->connectedUser->person),
             ]));
-        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 }

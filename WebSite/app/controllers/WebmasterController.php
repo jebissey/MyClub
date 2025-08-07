@@ -3,11 +3,13 @@
 namespace app\controllers;
 
 use app\enums\ApplicationError;
+use app\enums\FilterInputRule;
 use app\helpers\Application;
 use app\helpers\ArticleDataHelper;
 use app\helpers\ArwardsDataHelper;
 use app\helpers\Params;
 use app\helpers\WebApp;
+use RuntimeException;
 
 class WebmasterController extends AbstractController
 {
@@ -34,7 +36,7 @@ class WebmasterController extends AbstractController
                 'hasAuthorization' => $this->connectedUser->isEventManager(),
                 'currentVersion' => Application::VERSION
             ]));
-        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function homeWebmaster(): void
@@ -50,8 +52,8 @@ class WebmasterController extends AbstractController
                 elseif ($result['version'] != Application::VERSION) $newVersion = "A new version is available (V" . $result['version'] . ")";
 
                 $this->render('app/views/admin/webmaster.latte', Params::getAll(['newVersion' => $newVersion]));
-            } else $this->application->getErrorManager()->raise(ApplicationError::InvalidRequestMethod, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
-        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+            } else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function homeAdmin()
@@ -65,8 +67,8 @@ class WebmasterController extends AbstractController
                     $this->flight->redirect('/articles');
                 } else if ($this->connectedUser->isWebmaster())   $this->flight->redirect('/webmaster');
             } else if ($_SERVER['REQUEST_METHOD'] === 'GET') $this->render('app/views/admin/admin.latte', Params::getAll([]));
-            else $this->application->getErrorManager()->raise(ApplicationError::InvalidRequestMethod, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
-        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+            else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function arwards(): void
@@ -83,26 +85,37 @@ class WebmasterController extends AbstractController
                     'navItems' => $this->getNavItems($person),
                 ]));
             } else if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-                $request = $this->flight->request();
-                $name = $request->data->customName ?? $request->data->name;
-                $detail = $request->data->detail;
-                $value = (int)$request->data->value;
-                $idPerson = (int)$request->data->idPerson;
-                $idGroup = (int)$request->data->idGroup;
-
-                if (empty($name) || $value < 0 || $idPerson <= 0 || $idGroup <= 0) $this->flight->redirect('/arwards?error=invalid_data');
+                $schema = [
+                    'customName' => FilterInputRule::PersonName->value,
+                    'name' => FilterInputRule::PersonName->value,
+                    'detail' => FilterInputRule::HtmlSafeText->value,
+                    'value' => FilterInputRule::Int->value,
+                    'idPerson' => FilterInputRule::Int->value,
+                    'idGroup' => FilterInputRule::Int->value,
+                ];
+                $input = WebApp::filterInput($schema, $this->flight->request()->data->getData());
+                $name = $input['customName'] ?? $input['name'];
+                $value = $input['value'];
+                $idPerson = $input['idPerson'];
+                $idGroup = $input['idGroup'];
+                if (
+                    $name === null
+                    || $value === null || $value < 0
+                    || $idPerson === null || $idPerson <= 0
+                    || $idGroup === null || $idGroup <= 0
+                ) $this->flight->redirect('/arwards?error=invalid_data');
                 else {
                     $this->dataHelper->set('Counter', [
                         'Name' => $name,
-                        'Detail' => $detail,
+                        'Detail' => $input['detail'],
                         'Value' => $value,
                         'IdPerson' => $idPerson,
                         'IdGroup' => $idGroup
                     ]);
                     $this->flight->redirect('/arwards?success=true');
                 }
-            } else $this->application->getErrorManager()->raise(ApplicationError::InvalidRequestMethod, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
-        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+            } else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function rssGenerator()

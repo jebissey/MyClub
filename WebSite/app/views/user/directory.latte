@@ -40,11 +40,11 @@
                 <div class="card-body">
                     <h5 class="card-title">Filtrer par groupe</h5>
                     <div class="d-flex flex-wrap gap-2">
-                        <a href="/directory" class="btn {if !isset($selectedGroup)}btn-primary{else}btn-outline-primary{/if}">
+                        <a href="/directory" class="btn {if $selectedGroup === null}btn-primary{else}btn-outline-primary{/if}">
                             Tous
                         </a>
                         {foreach $groups as $group}
-                            <a href="/directory?group={$group->Id}" class="btn {if isset($selectedGroup) && $selectedGroup == $group->Id}btn-primary{else}btn-outline-primary{/if}">
+                            <a href="/directory?group={$group->Id}" class="btn {if $selectedGroup === $group->Id}btn-primary{else}btn-outline-primary{/if}">
                                 {$group->Name} 
                                 {if isset($groupCounts[$group->Id])}
                                     <span class="badge bg-light text-dark">{$groupCounts[$group->Id]}</span>

@@ -4,7 +4,7 @@ namespace app\controllers;
 
 use app\enums\ApplicationError;
 use app\enums\Period;
-use app\enums\InputPattern;
+use app\enums\FilterInputRule;
 use app\helpers\Application;
 use app\helpers\CrosstabDataHelper;
 use app\helpers\LogDataHelper;
@@ -25,23 +25,23 @@ class LogController extends AbstractController
     public function index()
     {
         if ($this->connectedUser->get()->isWebmaster() ?? false) {
-            $logPage = isset($_GET['logPage']) ? (int)$_GET['logPage'] : 1;
+            $logPage = max(1, (int)($this->flight->request()->query['logPage'] ?? 1));
             $perPage = 10;
-            [$logs, $totalPages] = $this->logDataHelper->getVisitedPages($perPage, $logPage);
+            [$logs, $totalPages] = $this->logDataHelper->getVisitedPages($perPage, $logPage, $this->flight->request()->query->getData());
 
             $this->render('app/views/logs/visitor.latte', Params::getAll([
                 'logs' => $logs,
                 'currentPage' => $logPage,
                 'totalPages' => $totalPages,
-                'filters' => $_GET
+                'filters' => $this->flight->request()->query->getData()
             ]));
-        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function referents()
     {
         if ($this->connectedUser->get()->isWebmaster() ?? false) {
-            $currentParams = $_GET;
+            $currentParams = $this->flight->request()->query->getData();
             $period = $currentParams['period'] ?? 'day';
             $currentDate = $currentParams['date'] ?? date('Y-m-d');
             if (!strtotime($currentDate)) $currentDate = date('Y-m-d');
@@ -54,7 +54,7 @@ class LogController extends AbstractController
                 'control' => new WebApp($this->application),
                 'rows' => $this->logDataHelper->getReferentStats($period, $currentDate),
             ]));
-        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     private $periodTypes = ['day', 'week', 'month', 'year'];
@@ -76,7 +76,7 @@ class LogController extends AbstractController
                 'chartData' => $this->logDataHelper->formatDataForChart($data),
                 'periodLabel' => $this->logDataHelper->getPeriodLabel($periodType)
             ]));
-        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function analytics()
@@ -90,14 +90,14 @@ class LogController extends AbstractController
                 'typeData' => $this->logDataHelper->getTypeDistribution(),
                 'title' => 'Synthèse des visiteurs'
             ]));
-        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     const TOP = 50;
     public function topPagesByPeriod()
     {
         if ($this->connectedUser->get()->isWebmaster() ?? false) {
-            $period =  WebApp::getFiltered('period', $this->application->enumToValues(Period::class), $_GET) ?: Period::Week->value;
+            $period =  WebApp::getFiltered('period', $this->application->enumToValues(Period::class), $this->flight->request()->query->getData()) ?: Period::Week->value;
             $dateCondition = PeriodHelper::getDateConditions($period);
             $topPages = $this->logDataHelper->getTopPages($dateCondition, self::TOP);
 
@@ -106,13 +106,13 @@ class LogController extends AbstractController
                 'period' => $period,
                 'topPages' => $topPages
             ]));
-        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function topArticlesByPeriod()
     {
         if ($this->connectedUser->get()->isRedactor() ?? false) {
-            $period = WebApp::getFiltered('period', $this->application->enumToValues(Period::class), $_GET) ?: Period::Week->value;
+            $period = WebApp::getFiltered('period', $this->application->enumToValues(Period::class), $this->flight->request()->query->getData()) ?: Period::Week->value;
             $dateCondition = PeriodHelper::getDateConditions($period);
             $topPages = $this->logDataHelper->getTopArticles($dateCondition, self::TOP);
 
@@ -121,19 +121,19 @@ class LogController extends AbstractController
                 'period' => $period,
                 'topPages' => $topPages
             ]));
-        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function crossTab()
     {
         if ($this->connectedUser->get()->isWebmaster() ?? false) {
             $schema = [
-                'uri' => InputPattern::Uri->value,
-                'email' => InputPattern::Email->value,
-                'group' => InputPattern::Content->value,
+                'uri' => FilterInputRule::Uri->value,
+                'email' => FilterInputRule::Email->value,
+                'group' => FilterInputRule::HtmlSafeName->value,
                 'period' => $this->application->enumToValues(Period::class),
             ];
-            $input = WebApp::filterInput($schema, $_GET);
+            $input = WebApp::filterInput($schema, $this->flight->request()->query->getData());
             $uriFilter = $input['uri'];
             $emailFilter = $input['email'];
             $groupFilter = $input['group'];
@@ -152,7 +152,7 @@ class LogController extends AbstractController
                 'emailFilter' => $emailFilter,
                 'groupFilter' => $groupFilter
             ]));
-        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function showLastVisits()
@@ -165,6 +165,6 @@ class LogController extends AbstractController
                 'totalActiveUsers' => count($activePersons),
                 'navItems' => $this->getNavItems($person),
             ]));
-        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 }

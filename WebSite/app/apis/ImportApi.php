@@ -14,6 +14,6 @@ class ImportApi extends AbstractApi
 
     public function getHeadersFromCSV()
     {
-        $this->renderJson((new ApiImportHelper())->getHeadersFromCSV());
+        $this->renderJson((new ApiImportHelper())->getHeadersFromCSV(intval($_POST['headerRow'])));
     }
 }

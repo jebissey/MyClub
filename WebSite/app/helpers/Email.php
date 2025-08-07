@@ -20,14 +20,14 @@ class Email
         if ($cc) {
             $ccList = is_array($cc) ? $cc : explode(',', $cc);
             $ccList = array_filter(array_map('trim', $ccList), function ($email) {
-                return filter_var($email, FILTER_VALIDATE_EMAIL);
+                return filter_var($email, FILTER_VALIDATE_EMAIL) ?: '';
             });
             if ($ccList) $headers['Cc'] = implode(', ', $ccList);
         }
         if ($bcc) {
             $bccList = is_array($bcc) ? $bcc : explode(',', $bcc);
             $bccList = array_filter(array_map('trim', $bccList), function ($email) {
-                return filter_var($email, FILTER_VALIDATE_EMAIL);
+                return filter_var($email, FILTER_VALIDATE_EMAIL) ?: '';
             });
             if ($bccList) $headers['Bcc'] = implode(', ', $bccList);
         }

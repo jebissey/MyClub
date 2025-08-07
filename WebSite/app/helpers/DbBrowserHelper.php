@@ -104,12 +104,6 @@ class DbBrowserHelper extends Data
         return $columnTypes;
     }
 
-    public function getTables(): array
-    {
-        $stmt = $this->pdo->query("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' ORDER BY name");
-        return $stmt->fetchAll(PDO::FETCH_COLUMN);
-    }
-
     public function showCreateForm(string $table): array
     {
         $this->validateTableName($table);
@@ -129,15 +123,9 @@ class DbBrowserHelper extends Data
         return [$this->getTableColumns($table), $record, $primaryKey, $this->getColumnTypes($table)];
     }
 
-    public function showTable(string $table, int $itemsPerPage): array
+    public function showTable(string $table, int $itemsPerPage, array $filters, int $dbbPage): array
     {
         $this->validateTableName($table);
-        $columns = $this->getTableColumns($table);
-        $filters = [];
-        foreach ($columns as $column) {
-            if (isset($_GET['filter_' . $column])) $filters[$column] = $_GET['filter_' . $column];
-        }
-        $dbbPage = isset($_GET['dbbPage']) ? max(1, intval((int)$_GET['dbbPage'])) : 1;
         $offset = ($dbbPage - 1) * $itemsPerPage;
         $query = "SELECT * FROM " . $this->quoteName($table);
         $params = [];
@@ -166,7 +154,7 @@ class DbBrowserHelper extends Data
         $stmt->bindValue(':limit', $itemsPerPage, PDO::PARAM_INT);
         $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
         $stmt->execute();
-        return [$stmt->fetchAll(), $columns, $dbbPage, $totalPages, $filters];
+        return [$stmt->fetchAll(), $this->getTableColumns($table), $dbbPage, $totalPages, $filters];
     }
 
     public function updateRecord(string $table, int $id): void
@@ -198,16 +186,19 @@ class DbBrowserHelper extends Data
         $stmt->execute();
     }
 
+    public function getColumnFilters($table, $query): array
+    {
+        $columns = $this->getTableColumns($table);
+        $filters = [];
+        foreach ($columns as $column) {
+            if (isset($query['filter_' . $column])) $filters[$column] = $query['filter_' . $column];
+        }
+        return $filters;
+    }
+
     #region Private functions
     private function quoteName(string $name): string
     {
         return '"' . str_replace('"', '""', $name) . '"';
-    }
-
-    private function validateTableName(string $table): void
-    {
-        if (!preg_match('/^[a-zA-Z0-9_]+$/', $table)) throw new RuntimeException('Invalid table name in file ' + __FILE__ + ' at line ' + __LINE__);
-        $tables = $this->getTables();
-        if (!in_array($table, $tables)) throw new RuntimeException('Table not found in file ' + __FILE__ + ' at line ' + __LINE__);
     }
 }

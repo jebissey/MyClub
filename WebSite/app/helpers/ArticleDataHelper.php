@@ -201,7 +201,7 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
         $sql = "SELECT MAX(LastUpdate) AS LastMod FROM Article";
         $stmt = $this->pdo->query($sql);
         $result = $stmt->fetch();
-        return $result['LastMod'] ?? null;
+        return $result->LastMod ?? null;
     }
 
     public function getArticlesForAll(): array

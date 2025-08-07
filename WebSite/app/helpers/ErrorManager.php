@@ -46,7 +46,6 @@ class ErrorManager
     private function log(int $code, string $message): void
     {
         $client = new Client();;
-
         try {
             $email = filter_var($_SESSION['user'] ?? '', FILTER_VALIDATE_EMAIL) ?: '';
             $stmt = $this->pdoForLog->prepare("

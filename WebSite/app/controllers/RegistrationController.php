@@ -3,7 +3,7 @@
 namespace app\controllers;
 
 use app\enums\ApplicationError;
-use app\enums\InputPattern;
+use app\enums\FilterInputRule;
 use app\helpers\Application;
 use app\helpers\GroupDataHelper;
 use app\helpers\Params;
@@ -21,11 +21,11 @@ class RegistrationController extends TableController
     {
         if (($this->connectedUser->get()->isPersonManager() ?? false) || $this->connectedUser->isWebmaster() ?? false) {
             $schema = [
-                'lastName' => InputPattern::PersonName->value,
-                'firstName' => InputPattern::PersonName->value,
-                'nickName' => InputPattern::PersonName->value,
+                'lastName' => FilterInputRule::PersonName->value,
+                'firstName' => FilterInputRule::PersonName->value,
+                'nickName' => FilterInputRule::PersonName->value,
             ];
-            $filterValues = WebApp::filterInput($schema, $_GET);
+            $filterValues = WebApp::filterInput($schema, $this->flight->request()->query->getData());
             $filterConfig = [
                 ['name' => 'lastName', 'label' => 'Nom'],
                 ['name' => 'firstName', 'label' => 'Prénom'],
@@ -36,7 +36,7 @@ class RegistrationController extends TableController
                 ['field' => 'FirstName', 'label' => 'Prénom'],
                 ['field' => 'NickName', 'label' => 'Surnom']
             ];
-            $data = $this->prepareTableData((new TableControllerHelper($this->application))->getPersonsQuery(), $filterValues, (int)($_GET['tablePage'] ?? 1));
+            $data = $this->prepareTableData((new TableControllerHelper($this->application))->getPersonsQuery(), $filterValues, (int)($this->flight->request()->query['tablePage'] ?? 1));
             $this->render('app/views/registration/index.latte', Params::getAll([
                 'persons' => $data['items'],
                 'currentPage' => $data['currentPage'],
@@ -47,7 +47,7 @@ class RegistrationController extends TableController
                 'resetUrl' => '/registration',
                 'layout' => WebApp::getLayout()
             ]));
-        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function getPersonGroups($personId)
@@ -60,6 +60,6 @@ class RegistrationController extends TableController
                 'availableGroups' => $availableGroups,
                 'personId' => $personId
             ]));
-        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 }

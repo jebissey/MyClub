@@ -23,7 +23,7 @@ class DbBrowserController extends AbstractController
         if ($this->connectedUser->get()->isWebmaster() ?? false) {
             $this->dbBrowserHelper->createRecord($table);
             $this->flight->redirect('/dbbrowser/' . urlencode($table));
-        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function deleteRecord(string $table, int $id): void
@@ -31,14 +31,14 @@ class DbBrowserController extends AbstractController
         if ($this->connectedUser->get()->isWebmaster() || false) {
             $this->dbBrowserHelper->deleteRecord($table, $id);
             $this->flight->redirect('/dbbrowser/' . urlencode($table));
-        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function index(): void
     {
         if ($this->connectedUser->get()->isWebmaster() ?? false) {
-            $this->render('app/views/dbbrowser/index.latte', Params::getAll(['tables' => $this->getTables()]));
-        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+            $this->render('app/views/dbbrowser/index.latte', Params::getAll(['tables' => $this->dbBrowserHelper->getTables()]));
+        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function showCreateForm(string $table): void
@@ -51,7 +51,7 @@ class DbBrowserController extends AbstractController
                 'columns' => $columns,
                 'columnTypes' => $columnTypes
             ]));
-        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function showEditForm(string $table, int $id): void
@@ -66,24 +66,30 @@ class DbBrowserController extends AbstractController
                 'primaryKey' => $primaryKey,
                 'columnTypes' => $columnTypes
             ]));
-        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function showTable(string $table): void
     {
         if ($this->connectedUser->get()->isWebmaster() ?? false) {
-            [$records, $columns, $dbbPage, $totalPages, $filters] = $this->dbBrowserHelper->showTable($table, $this->itemsPerPage);
+            $filters = $this->dbBrowserHelper->getColumnFilters($table, $this->flight->request()->query);
+            [$records, $columns, $dbbPage, $totalPages, $filters] = $this->dbBrowserHelper->showTable(
+                $table,
+                $this->itemsPerPage,
+                $filters,
+                max(1, (int)($this->flight->request()->query['dbbPage'] ?? 1))
+            );
 
             $this->render('app/views/dbbrowser/table.latte', Params::getAll([
                 'table' => $table,
                 'columns' => $columns,
                 'records' => $records,
-                'primaryKey' => $this->getPrimaryKey($table),
+                'primaryKey' => $this->dbBrowserHelper->getPrimaryKey($table),
                 'currentPage' => $dbbPage,
                 'totalPages' => $totalPages,
                 'filters' => $filters
             ]));
-        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function updateRecord(string $table, int $id): void
@@ -91,17 +97,6 @@ class DbBrowserController extends AbstractController
         if ($this->connectedUser->get()->isWebmaster() ?? false) {
             $this->dbBrowserHelper->updateRecord($table, $id);
             $this->flight->redirect('/dbbrowser/' . urlencode($table));
-        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
-    }
-
-    #region Private function
-    private function getPrimaryKey(string $table): string
-    {
-        return $this->dbBrowserHelper->getPrimaryKey($table);
-    }
-
-    private function getTables(): array
-    {
-        return $this->dbBrowserHelper->getTables();
+        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 }

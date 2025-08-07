@@ -5,7 +5,9 @@ namespace app\controllers;
 use RuntimeException;
 
 use app\enums\ApplicationError;
+use app\enums\FilterInputRule;
 use app\enums\Period;
+use app\enums\YesNo;
 use app\helpers\Application;
 use app\helpers\ArticleDataHelper;
 use app\helpers\AttributeDataHelper;
@@ -59,9 +61,11 @@ class UserController extends AbstractController
 
     public function setPassword($token)
     {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST')
-            $this->sign->checkAndSetPassword($token, $_POST['password']);
-        elseif ($_SERVER['REQUEST_METHOD'] === 'GET') {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $newPassword = WebApp::getFiltered('password', FilterInputRule::Password->value, $this->flight->request()->data->getData());
+            if ($newPassword != null) $this->sign->checkAndSetPassword($token, $newPassword);
+            else $this->application->getErrorManager()->raise(ApplicationError::BadRequest, 'Le nouveau mot de passe n\'est pas correct. Il doit faire entre 6 et 30 caractères.', 5000, false);
+        } elseif ($_SERVER['REQUEST_METHOD'] === 'GET') {
             $this->render('app/views/user/setPassword.latte', [
                 'href' => '/user/sign/in',
                 'userImg' => '🫥',
@@ -71,20 +75,24 @@ class UserController extends AbstractController
                 'token' => $token,
                 'currentVersion' => Application::VERSION
             ]);
-        } else $this->application->getErrorManager()->raise(ApplicationError::InvalidRequestMethod, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function signIn()
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $email = filter_var($_POST['email'], FILTER_VALIDATE_EMAIL) ?? '';
-            if ($email === '') {
-                $this->application->getErrorManager()->raise(ApplicationError::BadRequest, 'Invalid email address: ' . $_POST['email'] . ' in file ' . __FILE__ . ' at line ' . __LINE__);
-            } else {
-                $password = $_POST['password'] ?? '';
-                if (strlen($password) < 6 || strlen($password) > 30)
-                    $this->application->getErrorManager()->raise(ApplicationError::InvalidParameter, 'password rules are not respected [6..30] characters in file ' . __FILE__ . ' at line ' . __LINE__);
-                else $this->sign->authenticate($email, $password, isset($_POST['rememberMe']) && $_POST['rememberMe'] === 'on');
+            $schema = [
+                'email' => FilterInputRule::Email->value,
+                'password' => FilterInputRule::Password->value,
+                'rememberMe' => ['on'],
+            ];
+            $input = WebApp::filterInput($schema, $this->flight->request()->data->getData());
+            if ($input['email'] == null)
+                $this->application->getErrorManager()->raise(ApplicationError::BadRequest, 'Invalid email address: ' . ($input['email'] ?? '') . ' in file ' . __FILE__ . ' at line ' . __LINE__);
+            else {
+                if ($input['password'] == null)
+                    $this->application->getErrorManager()->raise(ApplicationError::BadRequest, 'password rules are not respected [6..30] characters in file ' . __FILE__ . ' at line ' . __LINE__);
+                else $this->sign->authenticate($input['email'], $input['password'], ($input['rememberMe'] ?? '') === 'on');
             }
         } elseif ($_SERVER['REQUEST_METHOD'] === 'GET') {
             if (isset($_COOKIE['rememberMe'])) {
@@ -107,13 +115,14 @@ class UserController extends AbstractController
                 'page' => basename(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH)),
                 'currentVersion' => Application::VERSION
             ]);
-        } else $this->application->getErrorManager()->raise(ApplicationError::InvalidRequestMethod, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function signOut(): void
     {
-        (new LogDataHelper($this->application))->add(200, 'Sign out succeeded with with ' . $_SESSION['user'] ?? '');
-        $this->dataHelper->set('Person',  ['LastSignOut' => date('Y-m-d H:i:s')], ['Email' => $_SESSION['user']]);
+        $user = $_SESSION['user'] ?? '';
+        (new LogDataHelper($this->application))->add(200, 'Sign out succeeded with with ' . $user);
+        $this->dataHelper->set('Person',  ['LastSignOut' => date('Y-m-d H:i:s')], ['Email' => $user]);
         unset($_SESSION['user']);
         $_SESSION['navbar'] = '';
         $this->flight->redirect('/');
@@ -207,60 +216,67 @@ class UserController extends AbstractController
             $_SESSION['navbar'] = 'user';
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $this->render('app/views/user/user.latte', Params::getAll([]));
-            } else $this->application->getErrorManager()->raise(ApplicationError::InvalidRequestMethod, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
-        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+            } else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function account(): void
     {
         if ($person = $this->connectedUser->get(1)->person ?? false) {
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-                $email = filter_var($_POST['email'], FILTER_VALIDATE_EMAIL) ?? '';
-                $password = $_POST['password'];
-                $useGravatar = $_POST['useGravatar'] ?? 'no';
+                $schema = [
+                    'email' => FilterInputRule::Email->value,
+                    'password' => FilterInputRule::Password->value,
+                    'firstName' => FilterInputRule::PersonName->value,
+                    'lastName' => FilterInputRule::PersonName->value,
+                    'nickName' => FilterInputRule::PersonName->value,
+                    'useGravatar' => $this->application->enumToValues(YesNo::class),
+                    'avatar' => FilterInputRule::Avatar->value,
+                ];
+                $input = WebApp::filterInput($schema, $this->flight->request()->data->getData());
                 $this->dataHelper->set('Person', [
-                    'FirstName' => $_POST['firstName'],
-                    'LastName' => $_POST['lastName'],
-                    'NickName' => $_POST['nickName'],
-                    'Avatar' => $useGravatar == 'no' ? $_POST['avatar'] : '',
-                    'useGravatar' => $useGravatar
+                    'FirstName' => $input['firstName'] ?? '',
+                    'LastName' => $input['lastName'] ?? '',
+                    'NickName' => $input['nickName'] ?? '',
+                    'Avatar' => ($input['useGravatar'] ?? '') == YesNo::Yes->value ? '' : $input['avatar'],
+                    'useGravatar' => $input['useGravatar'] ?? YesNo::No->value,
                 ], ['Id' => $person->Id]);
                 if (!empty($password))
-                    $this->dataHelper->set('Person', ['Password' => Password::signPassword($password)], ['Id' => $person->Id]);
+                    $this->dataHelper->set('Person', ['Password' => Password::signPassword($input['password'])], ['Id' => $person->Id]);
                 if ($person->Imported == 0) {
-                    $this->dataHelper->set('Person', ['Email' => $email], ['Id' => $person->Id]);
-                    $_SESSION['user'] = $email;
+                    $this->dataHelper->set('Person', ['Email' => $input['email']], ['Id' => $person->Id]);
+                    $_SESSION['user'] = $input['email'];
                 }
                 $this->flight->redirect('/user');
             } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $this->render('app/views/user/account.latte', Params::getAll([
                     'readOnly' => $person->Imported == 1 ? true : false,
-                    'email' => filter_var($person->Email, FILTER_VALIDATE_EMAIL) ?? '',
+                    'email' => filter_var($person->Email, FILTER_VALIDATE_EMAIL) ?: '',
                     'firstName' => WebApp::sanitizeInput($person->FirstName),
                     'lastName' => WebApp::sanitizeInput($person->LastName),
                     'nickName' => WebApp::sanitizeInput($person->NickName),
                     'avatar' => WebApp::sanitizeInput($person->Avatar),
-                    'useGravatar' => WebApp::sanitizeInput($person->UseGravatar) ?? 'no',
+                    'useGravatar' => WebApp::sanitizeInput($person->UseGravatar, $this->application->enumToValues(YesNo::class), YesNo::No->value),
                     'emojis' => Application::EMOJI_LIST,
                     'isSelfEdit' => true,
                     'layout' => WebApp::getLayout()
                 ]));
-            } else $this->application->getErrorManager()->raise(ApplicationError::InvalidRequestMethod, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
-        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+            } else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function availabilities(): void
     {
         if ($person = $this->connectedUser->get(1)->person ?? false) {
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-                $availabilities = $_POST['availabilities'] ?? '';
+                $availabilities = WebApp::getFiltered('availabilities', FilterInputRule::Json->value, $this->flight->request()->data->getData()) ?? '';
                 if ($availabilities != '') $this->dataHelper->set('Person', ['Availabilities' => json_encode($availabilities)], ['Id' => $person->Id]);
                 $this->flight->redirect('/user');
             } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $currentAvailabilities = json_decode($person->Availabilities ?? '', true);
                 $this->render('app/views/user/availabilities.latte', Params::getAll(['currentAvailabilities' => $currentAvailabilities]));
-            } else $this->application->getErrorManager()->raise(ApplicationError::InvalidRequestMethod, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
-        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+            } else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function preferences(): void
@@ -268,7 +284,7 @@ class UserController extends AbstractController
         if ($person = $this->connectedUser->get(1)->person ?? false) {
 
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-                $preferences = $_POST['preferences'];
+                $preferences = WebApp::getFiltered('preferences', FilterInputRule::Json->value, $this->flight->request()->data->getData()) ?? '';
                 $this->dataHelper->set('Person', ['preferences' =>  json_encode($preferences)], ['Id' => $person->Id]);
                 $this->flight->redirect('/user');
             } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
@@ -284,15 +300,16 @@ class UserController extends AbstractController
                     'currentPreferences' => json_decode($person->Preferences ?? '', true),
                     'eventTypes' => $eventTypesWithAttributes
                 ]));
-            } else $this->application->getErrorManager()->raise(ApplicationError::InvalidRequestMethod, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
-        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+            } else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function groups(): void
     {
         if ($person = $this->connectedUser->get(1)->person ?? false) {
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-                (new PersonGroupDataHelper($this->application))->update($person->Id, $_POST['groups'] ?? []);
+                $groups = WebApp::getFiltered('groups', FilterInputRule::ArrayInt->value, $this->flight->request()->data->getData());
+                (new PersonGroupDataHelper($this->application))->update($person->Id, $groups ?? []);
                 $this->flight->redirect('/user');
             } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $currentGroups = (new GroupDataHelper($this->application))->getCurrentGroups($person->Id);
@@ -301,8 +318,8 @@ class UserController extends AbstractController
                     'groups' => $currentGroups,
                     'layout' => WebApp::getLayout()
                 ]));
-            } else $this->application->getErrorManager()->raise(ApplicationError::InvalidRequestMethod, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
-        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+            } else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
     #endregion 
 
@@ -314,7 +331,7 @@ class UserController extends AbstractController
                 'hasAuthorization' => $this->connectedUser->hasAutorization(),
                 'currentVersion' => Application::VERSION
             ]));
-        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function contact($eventId = null): void
@@ -326,13 +343,19 @@ class UserController extends AbstractController
                 'event' => $eventId != null ? $this->dataHelper->get('Event', ['Id' => $eventId], 'Id, Summary') : null,
             ]));
         } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $name = trim($_POST['name'] ?? '');
-            $email = trim($_POST['email'] ?? '');
-            $message = trim($_POST['message'] ?? '');
+            $schema = [
+                'name' => FilterInputRule::PersonName->value,
+                'email' => FilterInputRule::Email->value,
+                'message' => FilterInputRule::HtmlSafeText->value,
+                'eventId' => FilterInputRule::Int->value,
+            ];
+            $input = WebApp::filterInput($schema, $this->flight->request()->data->getData());
+            $name = $input['name'] ?? '';
+            $email = $input['email'] ?? '';
+            $message = $input['message'] ?? '';
             $errors = [];
-            if (empty($name)) $errors[] = 'Le nom et prénom sont requis.';
-            if (empty($email)) $errors[] = 'L\'email est requis.';
-            elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) $errors[] = 'L\'email n\'est pas valide.';
+            if (empty($name)) $errors[] = 'Nom et prénom sont requis.';
+            if (empty($email)) $errors[] = 'Un email valide est requis.';
             if (empty($message)) $errors[] = 'Le message est requis.';
             if (empty($errors)) {
                 $adminEmail = $this->dataHelper->get('Settings', ['Name' => 'contactEmail'], 'Value')->Value ?? '';
@@ -340,12 +363,12 @@ class UserController extends AbstractController
                     $this->application->getErrorManager()->raise(ApplicationError::InvalidSetting, 'Invalid contactEmmail', __FILE__, __LINE__);
                     return;
                 }
-                $eventId = trim($_POST['eventId'] ?? '');
-                if (!empty($eventId)) {
+                $eventId = $input['eventId'];
+                if ($eventId != null) {
                     $event = $this->dataHelper->get('Event', ['Id' => $eventId], 'Id, Summary');
                     if (!$event) $this->application->getErrorManager()->raise(ApplicationError::BadRequest, "Unknown event '$eventId' in file " . __FILE__ . ' at line ' . __LINE__);
                 }
-                if (!empty($eventId)) $emailSent = (new PersonDataHelper($this->application))->sendRegistrationLink($adminEmail, $name, $email, $event);
+                if ($eventId != null) $emailSent = (new PersonDataHelper($this->application))->sendRegistrationLink($adminEmail, $name, $email, $event);
                 else $emailSent = $this->email->sendContactEmail($adminEmail, $name, $email, $message);
                 if ($emailSent) {
                     $url = (new WebApp($this->application))->buildUrl('/contact', [
@@ -381,7 +404,7 @@ class UserController extends AbstractController
     {
         $connectedUser = $this->connectedUser->get(1);
         if ($connectedUser->person ?? false) {
-            $searchMode = WebApp::getFiltered('from', $this->application->enumToValues(Period::class), $_GET) ?: Period::Signout->value;
+            $searchMode = WebApp::getFiltered('from', $this->application->enumToValues(Period::class), $this->flight->request()->query->getData()) ?: Period::Signout->value;
             if ($searchMode === Period::Signin->value)      $searchFrom = $connectedUser->person->LastSignIn ?? '';
             elseif ($searchMode === Period::Signout->value) $searchFrom = $connectedUser->person->LastSignOut ?? '';
             elseif ($searchMode === Period::Week->value)    $searchFrom = date('Y-m-d H:i:s', strtotime('-1 week'));
@@ -394,7 +417,7 @@ class UserController extends AbstractController
                 'navItems' => $this->getNavItems($connectedUser->person ?? false),
                 'person' => $connectedUser->person
             ]));
-        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     #region Statistics
@@ -402,7 +425,12 @@ class UserController extends AbstractController
     {
         if ($person = $this->connectedUser->get(1)->person ?? false) {
             $personalStatistics = new PersonStatistics($this->application);
-            $season = $personalStatistics->getSeasonRange();
+            $schema = [
+                'seasonStart' => FilterInputRule::DateTime->value,
+                'seasonEnd' => FilterInputRule::DateTime->value,
+            ];
+            $input = WebApp::filterInput($schema, $this->flight->request()->query->getData());
+            $season = $personalStatistics->getSeasonRange($input['seasonStart'] ?: null, $input['seasonEnd'] ?: null);
             $this->render('app/views/user/statistics.latte', Params::getAll([
                 'stats' => $personalStatistics->getStats($person, $season['start'], $season['end'], $this->connectedUser->isWebmaster()),
                 'seasons' => $personalStatistics->getAvailableSeasons(),
@@ -410,7 +438,7 @@ class UserController extends AbstractController
                 'navItems' => $this->getNavItems($person),
                 'chartData' => $this->getVisitStatsForChart($season, $person),
             ]));
-        } else $this->application->getErrorManager()->raise(ApplicationError::NotAllowed, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
     private function getVisitStatsForChart(array $season, object $person): array
     {

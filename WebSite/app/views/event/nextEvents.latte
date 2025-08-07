@@ -112,7 +112,7 @@
                             <i class="bi bi-trash" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="{='delete'|translate}"></i>
                         </button>
                     {/if}
-                    {if $event['createdBy'] == ($person->Id ?? false) || $mode =='past' || $isEventManager}
+                    {if $event['createdBy'] == ($person->Id ?? false) || $mode == 'past' || $isEventManager}
                         <button class="btn btn-sm btn-secondary duplicate-btn" data-id="{$event['id']}">
                             <i class="bi bi-files" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="{='duplicate'|translate}"></i>
                         </button>

@@ -5,6 +5,7 @@ namespace app\helpers;
 use InvalidArgumentException;
 use PDO;
 use PDOException;
+use RuntimeException;
 
 use app\enums\ApplicationError;
 
@@ -29,6 +30,8 @@ abstract class Data
     protected PDO $pdoForLog;
     protected $fluent;
     protected $fluentForLog;
+    private array $tables;
+    private static ?array $cachedTables = null;
 
     public function __construct(Application $application)
     {
@@ -37,15 +40,25 @@ abstract class Data
         $this->pdoForLog = $application->getPdoForLog();
         $this->fluent = new \Envms\FluentPDO\Query($this->pdo);
         $this->fluentForLog = new \Envms\FluentPDO\Query($this->pdoForLog);
+        self::$cachedTables ??= $this->getTables();
+        $this->tables = self::$cachedTables;
     }
 
-    public function count($query)
+    protected function validateTableName(string $table): void
+    {
+        if (strlen($table) > 64)            throw new RuntimeException('Table name too long (max 64) in file ' . __FILE__ . ' at line ' . __LINE__);
+        if (!preg_match('/^[a-zA-Z0-9_]+$/', $table)) throw new RuntimeException('Invalid table name in file ' . __FILE__ . ' at line ' . __LINE__);
+        if (!in_array($table, $this->tables))   throw new RuntimeException("Table '$table' not found in file " . __FILE__ . ' at line ' . __LINE__);
+    }
+
+    public function count(string $query): int
     {
         return $this->pdo->query("SELECT COUNT(*) FROM (" . $query . ")")->fetchColumn();
     }
 
     public function delete(string $table, array $where): int
     {
+        $this->validateTableName($table);
         try {
             if (empty($where)) throw new PDOException("Conditions WHERE requises pour DELETE");
 
@@ -56,7 +69,7 @@ abstract class Data
                 $params[":{$field}"] = $value;
             }
 
-            $sql = "DELETE FROM {$table} WHERE " . implode(' AND ', $conditions);
+            $sql = "DELETE FROM \"{$table}\" WHERE " . implode(' AND ', $conditions);
             $stmt = $this->pdo->prepare($sql);
             $result = $stmt->execute($params);
             return $result ? $stmt->rowCount() : false;
@@ -68,6 +81,7 @@ abstract class Data
 
     public function get(string $table, array $where = [], $fields = '*'): object|false
     {
+        $this->validateTableName($table);
         try {
             if (is_array($fields)) $fieldsStr = implode(', ', $fields);
             else                   $fieldsStr = $fields;
@@ -94,6 +108,7 @@ abstract class Data
 
     public function gets(string $table, array $where = [], string $fields = '*', string $orderBy = '', bool $keyPair = false): array
     {
+        $this->validateTableName($table);
         try {
             $firstField = null;
             if ($keyPair) {
@@ -134,13 +149,18 @@ abstract class Data
         }
     }
 
+    public function getTables(): array
+    {
+        $stmt = $this->pdo->query("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' ORDER BY name");
+        return $stmt->fetchAll(PDO::FETCH_COLUMN);
+    }
+
     public function query(string $sql, array $parameters = []): mixed
     {
         try {
             $stmt = $this->pdo->prepare($sql);
             $result = $stmt->execute($parameters);
             if (!$result) return false;
-
             $queryType = strtoupper(substr(trim($sql), 0, 6));
             switch ($queryType) {
                 case 'SELECT':
@@ -161,12 +181,13 @@ abstract class Data
 
     public function set(string $table, array $fields, array $where = []): int|bool
     {
+        $this->validateTableName($table);
         try {
             if ($where === []) {
                 // INSERT
                 $columns = implode(', ', array_keys($fields));
                 $placeholders = ':' . implode(', :', array_keys($fields));
-                $sql = "INSERT INTO '{$table}' ({$columns}) VALUES ({$placeholders})";
+                $sql = "INSERT INTO \"{$table}\" ({$columns}) VALUES ({$placeholders})";
                 $params = [];
                 foreach ($fields as $field => $value) {
                     $params[":{$field}"] = $value;
@@ -188,7 +209,7 @@ abstract class Data
                     else                                $whereClause[] = "{$field} = :where_{$field}";
                     $params[":where_{$field}"] = $value;
                 }
-                $sql = "UPDATE '{$table}' SET " . implode(', ', $setClause) .
+                $sql = "UPDATE \"{$table}\" SET " . implode(', ', $setClause) .
                     " WHERE " . implode(' AND ', $whereClause);
                 $stmt = $this->pdo->prepare($sql);
                 return $stmt->execute($params);

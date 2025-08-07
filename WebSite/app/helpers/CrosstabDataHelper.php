@@ -104,7 +104,7 @@ class CrosstabDataHelper extends Data
         $crossTabData = $stmt->fetchAll();
         $filteredPersons = array_values(array_filter(
             array_unique(array_column($crossTabData, 'Who')),
-            fn($email) => filter_var($email, FILTER_VALIDATE_EMAIL)
+            fn($email) => filter_var($email, FILTER_VALIDATE_EMAIL) ?: ""
         ));
         $sortedCrossTabData = [];
         $columnTotals = [];
