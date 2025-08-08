@@ -27,6 +27,7 @@ class Application
 
     private PDO $pdo;
     private PDO $pdoForLog;
+    private DataHelper $dataHelper;
 
     private ErrorManager $errorManager;
 
@@ -42,6 +43,7 @@ class Application
             $db = Database::getInstance();
             $this->pdo = $db->getPdo();
             $this->pdoForLog = $db->getPdoForLog();
+            $this->dataHelper = new DataHelper($this);
         } catch (Throwable $e) {
             throw new RuntimeException('Database error ' . $e->getMessage() . ' in file ' . __FILE__ . ' at line ' . __LINE__);
         }
@@ -79,6 +81,11 @@ class Application
     public function getErrorManager(): ErrorManager
     {
         return $this->errorManager;
+    }
+
+    public function getDataHelper(): DataHelper
+    {
+        return $this->dataHelper;
     }
 
     public function enumToValues(string $enumClass): array

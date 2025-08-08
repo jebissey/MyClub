@@ -6,7 +6,7 @@
     <h2>Liste des adresses email ({count($emails)}) avec {$filters}</h2>
     <ul>
         {foreach $emails as $email}
-            <li>{$email} (📞{$people[$email]->Phone} 👤{$people[$email]->FirstName} {$people[$email]->LastName})</li>
+            <li>{$email} (📞{$people[$email]->Phone} 👤{$people[$email]->FirstName} {$people[$email]->LastName}{if $people[$email]->NickName != ''}-><b>{$people[$email]->NickName}</b>{/if})</li>
         {/foreach}
     </ul>
 </div>

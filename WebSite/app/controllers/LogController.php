@@ -137,7 +137,7 @@ class LogController extends AbstractController
             $uriFilter = $input['uri'];
             $emailFilter = $input['email'];
             $groupFilter = $input['group'];
-            $period = $input['period'] !== '' ? $input['period'] : Period::Today->value;
+            $period = $input['period'] != null ? $input['period'] : Period::Today->value;
             [$sortedCrossTabData, $filteredPersons, $columnTotals] = (new CrosstabDataHelper($this->application))->getPersons(PeriodHelper::getDateConditions($period), $uriFilter, $emailFilter, $groupFilter);
 
             $this->render('app/views/logs/crossTab.latte', Params::getAll([

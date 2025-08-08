@@ -1,10 +1,10 @@
 <?php
 
-namespace app\helpers;
+namespace app\services;
 
 use InvalidArgumentException;
 
-class Email
+class EmailService
 {
     public static function send($emailFrom, $emailTo, $subject, $body, $cc = null, $bcc = null, $isHtml = false): bool
     {
@@ -38,6 +38,11 @@ class Email
         return mail($emailTo, $subject, $body, $headerString);
     }
 
+    public static function mail_(string $email, string $subject, string $message): bool
+    {
+        return mail($email, $subject, $message);
+    }
+
     public function sendContactEmail($adminEmail, $name, $email, $message): bool
     {
         $subject = 'Nouveau message de contact - ' . $name;
@@ -48,6 +53,6 @@ class Email
         $body .= "---\n";
         $body .= "Envoyé le : " . date('d/m/Y à H:i') . "\n";
         $body .= "IP : " . $_SERVER['REMOTE_ADDR'] ?? 'Inconnue';
-        return Email::send($email, $adminEmail, $subject, $body);
+        return EmailService::send($email, $adminEmail, $subject, $body);
     }
 }

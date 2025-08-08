@@ -10,7 +10,6 @@ use app\enums\EventSearchMode;
 use app\enums\FilterInputRule;
 use app\helpers\Application;
 use app\helpers\CrosstabDataHelper;
-use app\helpers\Email;
 use app\helpers\EventDataHelper;
 use app\helpers\MessageDataHelper;
 use app\helpers\NeedDataHelper;
@@ -18,6 +17,7 @@ use app\helpers\Params;
 use app\helpers\ParticipantDataHelper;
 use app\helpers\PeriodHelper;
 use app\helpers\WebApp;
+use app\services\EmailService;
 
 class EventController extends AbstractController
 {
@@ -187,7 +187,7 @@ class EventController extends AbstractController
                     $body .= $invitationLink . "\n\n";
                     $body .= "Cordialement,\nL'équipe BNW Dijon";
                     $emailFrom = $this->connectedUser->person->Email;
-                    Email::send($emailFrom, $email, $subject, $body);
+                    EmailService::send($emailFrom, $email, $subject, $body);
                     $this->guest('Invitation envoyée avec succès à ' . $email, 'success');
                 } catch (Throwable $e) {
                     $this->guest('Erreur lors de l\'envoi de l\'invitation. ' . $e->getMessage(), 'error');

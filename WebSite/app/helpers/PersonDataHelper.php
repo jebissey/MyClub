@@ -5,6 +5,7 @@ namespace app\helpers;
 use DateTime;
 
 use app\interfaces\NewsProviderInterface;
+use app\services\EmailService;
 
 class PersonDataHelper extends Data implements NewsProviderInterface
 {
@@ -210,12 +211,10 @@ class PersonDataHelper extends Data implements NewsProviderInterface
                 ->execute();
             $contact->Token = $token;
         }
-        if (!$contact) {
-            $contact = $this->fluent->from('Contact')->where('Id', $contactId)->fetch();
-        }
+        if (!$contact) $contact = $this->fluent->from('Contact')->where('Id', $contactId)->fetch();
         $registrationLink = Webapp::getBaseUrl() . "events/{$event->Id}/{$contact->Token}";
         $subject = "Lien d'inscription pour " . $event->Summary;
         $body = $registrationLink;
-        return Email::send($adminEmail, $emailContact, $subject, $body);
+        return EmailService::send($adminEmail, $emailContact, $subject, $body);
     }
 }

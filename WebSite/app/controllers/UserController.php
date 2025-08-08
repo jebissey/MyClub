@@ -12,7 +12,6 @@ use app\helpers\Application;
 use app\helpers\ArticleDataHelper;
 use app\helpers\AttributeDataHelper;
 use app\helpers\DesignDataHelper;
-use app\helpers\Email;
 use app\helpers\EventDataHelper;
 use app\helpers\EventTypeDataHelper;
 use app\helpers\GroupDataHelper;
@@ -24,25 +23,25 @@ use app\helpers\Password;
 use app\helpers\PersonDataHelper;
 use app\helpers\PersonGroupDataHelper;
 use app\helpers\PersonStatistics;
-use app\helpers\Sign;
 use app\helpers\SurveyDataHelper;
 use app\helpers\TranslationManager;
 use app\helpers\WebApp;
+use app\services\AuthenticationService;
+use app\services\EmailService;
 
 class UserController extends AbstractController
 {
     private ArticleDataHelper $articleDataHelper;
-    private Email $email;
+    private EmailService $email;
     private News $news;
-    private Sign $sign;
     private SurveyDataHelper $surveyDataHelper;
+    private AuthenticationService $authService;
 
     public function __construct(Application $application)
     {
         parent::__construct($application);
         $this->articleDataHelper = new ArticleDataHelper($application);
-        $this->email = new Email();
-        $this->sign = new Sign($this->application);
+        $this->email = new EmailService();
         $this->surveyDataHelper = new SurveyDataHelper($application);
         $this->news =  new News([
             new ArticleDataHelper($application),
@@ -51,80 +50,94 @@ class UserController extends AbstractController
             new MessageDataHelper($application),
             new PersonDataHelper($application),
         ]);
+        $this->authService = new AuthenticationService($application);
     }
 
     #region Sign
-    public function forgotPassword($encodedEmail)
+    public function forgotPassword($encodedEmail): void
     {
-        $this->sign->forgotPassword(urldecode($encodedEmail));
+        $email = urldecode($encodedEmail);
+        $success = $this->authService->handleForgotPassword($email);
+        if ($success) $this->flight->redirect('/user/sign/in?message=reset-sent');
+        else $this->application->getErrorManager()->raise(
+            ApplicationError::Error,
+            'Unable to send password reset email'
+        );
     }
 
-    public function setPassword($token)
+    public function setPassword($token): void
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $newPassword = WebApp::getFiltered('password', FilterInputRule::Password->value, $this->flight->request()->data->getData());
-            if ($newPassword != null) $this->sign->checkAndSetPassword($token, $newPassword);
-            else $this->application->getErrorManager()->raise(ApplicationError::BadRequest, 'Le nouveau mot de passe n\'est pas correct. Il doit faire entre 6 et 30 caractères.', 5000, false);
+            $newPassword = WebApp::getFiltered(
+                'password',
+                FilterInputRule::Password->value,
+                $this->flight->request()->data->getData()
+            );
+            if (!$newPassword) {
+                $this->application->getErrorManager()->raise(
+                    ApplicationError::BadRequest,
+                    'Invalid password format'
+                );
+                return;
+            }
+            if ($this->authService->resetPassword($token, $newPassword)) {
+                $this->flight->redirect('/user/sign/in?message=password-updated');
+            } else {
+                $this->application->getErrorManager()->raise(
+                    ApplicationError::BadRequest,
+                    'Invalid or expired token'
+                );
+            }
         } elseif ($_SERVER['REQUEST_METHOD'] === 'GET') {
             $this->render('app/views/user/setPassword.latte', [
-                'href' => '/user/sign/in',
-                'userImg' => '🫥',
-                'userEmail' => '',
-                'keys' => false,
-                'page' => basename(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH)),
                 'token' => $token,
                 'currentVersion' => Application::VERSION
             ]);
-        } else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
+        }
     }
 
     public function signIn()
     {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $schema = [
-                'email' => FilterInputRule::Email->value,
-                'password' => FilterInputRule::Password->value,
-                'rememberMe' => ['on'],
-            ];
-            $input = WebApp::filterInput($schema, $this->flight->request()->data->getData());
-            if ($input['email'] == null)
-                $this->application->getErrorManager()->raise(ApplicationError::BadRequest, 'Invalid email address: ' . ($input['email'] ?? '') . ' in file ' . __FILE__ . ' at line ' . __LINE__);
-            else {
-                if ($input['password'] == null)
-                    $this->application->getErrorManager()->raise(ApplicationError::BadRequest, 'password rules are not respected [6..30] characters in file ' . __FILE__ . ' at line ' . __LINE__);
-                else $this->sign->authenticate($input['email'], $input['password'], ($input['rememberMe'] ?? '') === 'on');
-            }
-        } elseif ($_SERVER['REQUEST_METHOD'] === 'GET') {
-            if (isset($_COOKIE['rememberMe'])) {
-                $token = $_COOKIE['rememberMe'];
-                $person = $this->dataHelper->get('Person', ['Token' => $token], 'Id, Inactivated, Email');
-                if ($person && $person->Inactivated == 0) {
-                    $this->dataHelper->set('Person', ['LastSignIn' => date('Y-m-d H:i:s')], ['Id' => $person->Id]);
-                    $_SESSION['user'] = $person->Email;
-                    $_SESSION['navbar'] = '';
-                } else setcookie('rememberMe', '', time() - 3600, '/');
-                $this->flight->redirect('/');
-                return;
-            }
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') return $this->handleSignInPost();
+        if ($_SERVER['REQUEST_METHOD'] === 'GET')  return $this->handleSignInGet();
+        $this->application->getErrorManager()->raise(
+            ApplicationError::MethodNotAllowed,
+            'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid'
+        );
+    }
+    private function handleSignInPost(): void
+    {
+        $result = $this->authService->handleSignIn($this->flight->request()->data->getData());
+        if (!$result->isSuccess()) {
+            $this->application->getErrorManager()->raise(
+                ApplicationError::BadRequest,
+                $result->getError()
+            );
+            return;
+        }
+        $this->flight->redirect('/');
+    }
+    private function handleSignInGet(): void
+    {
+        $rememberMeResult = $this->authService->handleRememberMeLogin();
+        if ($rememberMeResult && $rememberMeResult->isSuccess()) {
+            $this->flight->redirect('/');
+            return;
+        }
 
-            $this->render('app/views/user/signIn.latte', [
-                'href' => '/user/sign/in',
-                'userImg' => '🫥',
-                'userEmail' => '',
-                'keys' => false,
-                'page' => basename(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH)),
-                'currentVersion' => Application::VERSION
-            ]);
-        } else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
+        $this->render('app/views/user/signIn.latte', [
+            'href' => '/user/sign/in',
+            'userImg' => '🫥',
+            'userEmail' => '',
+            'keys' => false,
+            'page' => basename(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH)),
+            'currentVersion' => Application::VERSION
+        ]);
     }
 
     public function signOut(): void
     {
-        $user = $_SESSION['user'] ?? '';
-        (new LogDataHelper($this->application))->add(200, 'Sign out succeeded with with ' . $user);
-        $this->dataHelper->set('Person',  ['LastSignOut' => date('Y-m-d H:i:s')], ['Email' => $user]);
-        unset($_SESSION['user']);
-        $_SESSION['navbar'] = '';
+        $this->authService->signOut();
         $this->flight->redirect('/');
     }
     #endregion
@@ -552,3 +565,38 @@ class UserController extends AbstractController
         throw new RuntimeException('$user slice not found in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 }
+
+
+
+
+
+/*
+    private function requireAuth(): object
+    {
+        try {
+            return $this->authService->requireAuthentication();
+        } catch (AuthenticationException $e) {
+            $this->application->getErrorManager()->raise(
+                ApplicationError::Forbidden, 
+                'Authentication required'
+            );
+        }
+    }
+
+
+    public function account(): void
+    {
+        $person = $this->requireAuth();
+        
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            // Logique de mise à jour du compte
+            // ...
+        } else {
+            // Affichage du formulaire
+            $this->render('app/views/user/account.latte', [
+                'person' => $person,
+                // ...
+            ]);
+        }
+    }
+*/

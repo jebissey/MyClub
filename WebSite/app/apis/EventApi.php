@@ -11,7 +11,6 @@ use app\helpers\ApiNeedDataHelper;
 use app\helpers\ApiNeedTypeDataHelper;
 use app\helpers\Application;
 use app\helpers\AttributeDataHelper;
-use app\helpers\Email;
 use app\helpers\EventDataHelper;
 use app\helpers\EventNeedHelper;
 use app\helpers\MessageDataHelper;
@@ -19,6 +18,7 @@ use app\helpers\ParticipantDataHelper;
 use app\helpers\PersonDataHelper;
 use app\helpers\PersonPreferences;
 use app\helpers\WebApp;
+use app\services\EmailService;
 
 class EventApi extends AbstractApi
 {
@@ -162,7 +162,7 @@ class EventApi extends AbstractApi
                         return;
                     }
                     $ccList = $this->messageDataHelper->addWebAppMessages($eventId, $participants, $emailTitle . "\n\n" . $message);
-                    $result = Email::send(
+                    $result = EmailService::send(
                         $eventCreatorEmail,
                         $eventCreatorEmail,
                         $emailTitle,

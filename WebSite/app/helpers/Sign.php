@@ -8,6 +8,7 @@ use app\enums\ApplicationError;
 use app\helpers\Application;
 use app\helpers\Password;
 
+
 class Sign
 {
     private Application $application;

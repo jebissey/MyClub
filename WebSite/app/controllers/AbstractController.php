@@ -28,7 +28,7 @@ abstract class AbstractController
     public function __construct(Application $application)
     {
         $this->application = $application;
-        $this->dataHelper = new DataHelper($application);
+        $this->dataHelper = $application->getDataHelper();
         $this->connectedUser = new ConnectedUser($application);
         $this->languagesDataHelper = new LanguagesDataHelper($application);
         $this->pageDataHelper = new PageDataHelper($application);
