@@ -25,7 +25,8 @@ Options:
   --db-path=PATH      Chemin vers la base de données SQLite
   --export-json       Exporter les résultats en JSON
   --export-csv        Exporter les résultats en CSV
-  --help, -h          Afficher cette aide
+  --help              Afficher cette aide
+  --test=n°           Faire uniquement le test demandé
 EOT;
 }
 
@@ -39,7 +40,7 @@ function main(array $argv): int
         'export-json',
         'export-csv',
         'help',
-        'h'
+        'test:'
     ]);
     if (isset($options['help']) || isset($options['h'])) {
         printHelp();
@@ -51,6 +52,7 @@ function main(array $argv): int
     );
     $routeFile  = $options['routes-file'] ?? __DIR__ . '/../WebSite/index.php';
     $dbPath     = $options['db-path'] ?? __DIR__ . '/tests.sqlite';
+    $test       = $options['test'];
     $exportJson = isset($options['export-json']);
     $exportCsv  = isset($options['export-csv']);
     try {
@@ -62,7 +64,7 @@ function main(array $argv): int
         echo "Extraction des routes...\n";
 
         $orchestrator = RouteTestFactory::create($config, $dbPath);
-        $results = $orchestrator->runTests($routeFile);
+        $results = $orchestrator->runTests($routeFile, $test);
 
         if ($exportJson) (new JsonTestExporter())->export($results, 'route_test_results.json');
         if ($exportCsv) (new CsvTestExporter())->export($results, 'route_test_results.csv');

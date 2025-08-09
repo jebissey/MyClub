@@ -22,7 +22,7 @@ class RouteTestOrchestrator
         private ?TestDataRepositoryInterface $testDataRepository = null
     ) {}
 
-    public function runTests(string $routeFilePath): array
+    public function runTests(string $routeFilePath, ?int $test): array
     {
         $routes = $this->routeExtractor->extractRoutes($routeFilePath);
         $totalRoutes = count($routes);
@@ -32,37 +32,39 @@ class RouteTestOrchestrator
         $results = [];
         foreach ($routes as $index => $route) {
             $routeNumber = $index + 1;
-            echo sprintf(
-                "[%d/%d] Testing %s %s",
-                $routeNumber,
-                $totalRoutes,
-                $route->method,
-                $route->originalPath
-            );
-            $testResults = $this->testRoute($route);
-            $results = array_merge($results, $testResults);
-            if (count($testResults) === 0) {
-                echo " -> \033[31mERREUR: Aucune donnée de test valide\033[0m\n";
-            } elseif (count($testResults) > 1) {
-                $avgResponseTime = array_sum(array_map(
-                    fn($r) => $r->response->responseTimeMs,
-                    $testResults
-                )) / count($testResults);
-                echo sprintf(" -> %d tests, avg %.2fms\n", count($testResults), $avgResponseTime);
-            } else {
-                $result = $testResults[0];
-                $status = $this->getStatusText($result->response->httpCode);
-                $color = $this->getStatusColor($result->response->httpCode);
+            if ($test == null || $test == $routeNumber) {
                 echo sprintf(
-                    " -> %s%d %s%s (%.2fms)\n",
-                    $color,
-                    $result->response->httpCode,
-                    $status,
-                    "\033[0m",
-                    $result->response->responseTimeMs
+                    "[%d/%d] Testing %s %s",
+                    $routeNumber,
+                    $totalRoutes,
+                    $route->method,
+                    $route->originalPath
                 );
+                $testResults = $this->testRoute($route);
+                $results = array_merge($results, $testResults);
+                if (count($testResults) === 0) {
+                    echo " -> \033[31mERREUR: Aucune donnée de test valide\033[0m\n";
+                } elseif (count($testResults) > 1) {
+                    $avgResponseTime = array_sum(array_map(
+                        fn($r) => $r->response->responseTimeMs,
+                        $testResults
+                    )) / count($testResults);
+                    echo sprintf(" -> %d tests, avg %.2fms\n", count($testResults), $avgResponseTime);
+                } else {
+                    $result = $testResults[0];
+                    $status = $this->getStatusText($result->response->httpCode);
+                    $color = $this->getStatusColor($result->response->httpCode);
+                    echo sprintf(
+                        " -> %s%d %s%s (%.2fms)\n",
+                        $color,
+                        $result->response->httpCode,
+                        $status,
+                        "\033[0m",
+                        $result->response->responseTimeMs
+                    );
+                }
+                usleep($this->config->requestDelay);
             }
-            usleep($this->config->requestDelay);
         }
 
         $summary = $this->generateSummary($results);
@@ -84,7 +86,7 @@ class RouteTestOrchestrator
             'original_path' => $route->originalPath
         ]);
         if (empty($testData)) {
-            $this->parameterErrors[] = "URI avec paramètres mais aucune donnée de test trouvée: {$route->originalPath}";
+            $this->parameterErrors[] = "URI : {$route->originalPath}";
             echo " -> \033[31mERREUR: Aucune donnée de test trouvée\033[0m";
             return [];
         }
@@ -111,11 +113,11 @@ class RouteTestOrchestrator
             $url = $this->buildUrl($route, $parameters);
             $response = $this->httpClient->request($route->method, $url);
             $validationResult = $this->responseValidator->validate(
-                $response->body,
-                $test['ExpectedResponse']
+                $response->httpCode,
+                $test['ExpectedResponseCode']
             );
             if (!$validationResult->isValid) {
-                $this->responseErrors[] = "Réponse inattendue pour le test {$test['Method']} {$test['Uri']} avec {$test['JsonParameters']}, attendu : {$test['ExpectedResponse']}, reçu : {$response->body}";
+                $this->responseErrors[] = "Réponse inattendue pour le test {$test['Method']} {$test['Uri']} avec {$test['JsonParameters']}, attendu : {$test['ExpectedResponseCode']}, reçu : {$response->httpCode}";
             }
             $results[] = new TestResult(
                 route: $route,

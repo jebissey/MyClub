@@ -12,7 +12,7 @@ interface HttpClientInterface
 
 interface ResponseValidatorInterface
 {
-    public function validate(string $actualResponse, string $expectedResponse): ValidationResult;
+    public function validate(int $actualResponseCode, int $expectedResponseCode): ValidationResult;
 }
 
 interface RouteExtractorInterface

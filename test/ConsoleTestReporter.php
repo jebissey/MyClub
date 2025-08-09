@@ -52,8 +52,9 @@ class ConsoleTestReporter implements TestReporterInterface
     private function displayErrorSection(string $title, array $errors): void
     {
         if (!empty($errors)) {
+            echo str_repeat('=', 80);
             echo "\n$title:\n";
-            echo str_repeat('-', 80) . "\n";
+            echo str_repeat('=', 80) . "\n";
             foreach ($errors as $error) {
                 echo "  • $error\n";
             }
@@ -71,4 +72,3 @@ class ConsoleTestReporter implements TestReporterInterface
         };
     }
 }
-
