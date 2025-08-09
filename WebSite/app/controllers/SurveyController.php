@@ -50,14 +50,12 @@ class SurveyController extends AbstractController
                 ];
                 $input = WebApp::filterInput($schema, $this->flight->request()->data->getData());
                 $articleId = $input['article_id'] ?? throw new RuntimeException('Fatal error in file ' . __FILE__ . ' at line ' . __LINE__);
-                $question = $input['question'] ?? '';
+                $question = $input['question'] ?? '???';
                 $closingDate = $input['closingDate'] ?? date('now', '+7 days');
-                $visibility = $input['visibility'] ?? 'redactor';
+                $visibility = $input['visibility'] ?? SurveyVisibility::Redactor->value;
                 $options = [];
-                if (isset($input['options']) && is_array($input['options'])) {
-                    foreach ($input['options'] as $option) {
-                        $options[] = str_replace('"', "''", $option);
-                    }
+                foreach ($input['options'] ?? [] as $option) {
+                    $options[] = str_replace('"', "''", $option);
                 }
                 $optionsJson = json_encode($options);
                 $fields = [

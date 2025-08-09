@@ -110,12 +110,12 @@ class EventController extends AbstractController
                     'eventId' => FilterInputRule::Int->value,
                 ];
                 $input = WebApp::filterInput($schema, $this->flight->request()->data->getData());
-                $email = $input['email'];
-                if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                $email = $input['email'] ?? '';
+                if (empty($email)) {
                     $this->guest('Adresse e-mail invalide', 'error');
                     return;
                 }
-                $eventId = (int)($input['eventId'] ?? 0);
+                $eventId = $input['eventId'] ?? 0;
                 if ($eventId <= 0) {
                     $this->guest('Veuillez sélectionner un événement', 'error');
                     return;
@@ -125,7 +125,7 @@ class EventController extends AbstractController
                     $this->guest('Événement non trouvé ou non accessible', 'error');
                     return;
                 }
-                $nickname = $input['nickname'] ?? '';
+                $nickname = $input['nickname'] ?? '???';
                 try {
                     $contact = $this->dataHelper->get('Contact', ['Email', $email], 'Id, Token, NickName, TokenCreatedAt');
                     if (!$contact) {

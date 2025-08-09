@@ -31,8 +31,8 @@ class AuthenticationService
             'rememberMe' => ['on'],
         ];
         $input = WebApp::filterInput($schema, $requestData);
-        if (empty($input['email']))    return AuthResult::error('Invalid email address');
-        if (empty($input['password'])) return AuthResult::error('Password rules are not respected [6..30] characters');
+        if ($input['email'] == null)    return AuthResult::error('Invalid email address');
+        if ($input['password'] == null) return AuthResult::error('Password rules are not respected [6..30] characters');
         return $this->authenticate(
             $input['email'],
             $input['password'],

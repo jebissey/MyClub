@@ -153,8 +153,8 @@ class ArticleController extends TableController
                     'membersOnly' => FilterInputRule::Int->value,
                 ];
                 $input = WebApp::filterInput($schema, $this->flight->request()->data->getData());
-                $title = $input['title'];
-                $content = $input['content'];
+                $title = $input['title'] ?? '???';
+                $content = $input['content'] ?? '???';
                 if (empty($title) || empty($content)) {
                     $_SESSION['error'] = "Le titre et le contenu sont obligatoires";
                     $this->flight->redirect('/articles/' . $id);
@@ -194,9 +194,9 @@ class ArticleController extends TableController
                     'membersOnly' => FilterInputRule::Int->value,
                 ];
                 $input = WebApp::filterInput($schema, $this->flight->request()->data->getData());
-                $isSpotlightActive = $input['isSpotlightActive'];
+                $isSpotlightActive = $input['isSpotlightActive'] ?? false;
                 if ($isSpotlightActive) {
-                    $spotlightedUntil = $input['spotlightedUntil'];
+                    $spotlightedUntil = $input['spotlightedUntil'] ?? date('Y-m-d H:i:s', strtotime('+1 week'));
                     $this->articleDataHelper->setSpotlightArticle($id, $spotlightedUntil);
                 }
                 $result = $this->dataHelper->set('Article', [

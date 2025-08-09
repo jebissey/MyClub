@@ -105,7 +105,7 @@ class PersonController extends TableController implements CrudControllerInterfac
                         'lastName' => FilterInputRule::PersonName->value,
                     ];
                     $input = WebApp::filterInput($schema, $this->flight->request()->data->getData());
-                    $this->dataHelper->set('Person', ['FirstName' => $input['firstName'] ?? '', 'LastName' => $input['lastName']] ?? '', ['Id' => $person->Id]);
+                    $this->dataHelper->set('Person', ['FirstName' => $input['firstName'] ?? '???', 'LastName' => $input['lastName']] ?? '???', ['Id' => $person->Id]);
                     if ($person->Imported == 0) $this->dataHelper->set('Person', ['Email' => $input['email']], ['Id' => $person->Id]);
                     $this->flight->redirect('/persons');
                 } else if (($_SERVER['REQUEST_METHOD'] === 'GET')) {
@@ -152,8 +152,8 @@ class PersonController extends TableController implements CrudControllerInterfac
                     'inPresentationDirectory' => FilterInputRule::Int->value,
                 ];
                 $input = WebApp::filterInput($schema, $this->flight->request()->data->getData());
-                $presentation = $input['content'] ?? '';
-                $location =  $input['location'] ?? '';
+                $presentation = $input['content'] ?? '???';
+                $location =  $input['location'] ?? '???';
                 $inDirectory = $input['inPresentationDirectory'] ?? 0;
 
                 $this->dataHelper->set('Person', [

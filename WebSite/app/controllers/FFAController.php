@@ -27,11 +27,11 @@ class FFAController extends AbstractController
                 'club' => FilterInputRule::HtmlSafeName->value,
             ];
             $input = WebApp::filterInput($schema, $this->flight->request()->query->getData());
-            $firstName = $input['firstName'] ?? $person->FirstName ?? '';
-            $lastName = $input['lastName'] ?? $person->LastName ?? '';
+            $firstName = $input['firstName'] ?? $person->FirstName ?? '???';
+            $lastName = $input['lastName'] ?? $person->LastName ?? '???';
             $question = $input['question'] ?? 'rank';
             $year = $input['year'] ?? date('Y');
-            $club = $input['club'] ?? $this->dataHelper->get('Settings', ['Name' => 'FFA_club'], 'Value')->Value ?? '';
+            $club = $input['club'] ?? $this->dataHelper->get('Settings', ['Name' => 'FFA_club'], 'Value')->Value ?? '???';
             $results = [];
             $ffaScraper = new FFAScraper();
             if ($question == 'rank') $results = $ffaScraper->searchAthleteRank($firstName, $lastName, $year, $club);

@@ -42,7 +42,7 @@ class GroupController extends AbstractController implements CrudControllerInterf
                     'authorizations' => FilterInputRule::ArrayInt->value,
                 ];
                 $input = WebApp::filterInput($schema, $this->flight->request()->data->getData());
-                $name = $input['name'];
+                $name = $input['name'] ?? '???';
                 $selfRegistration = $input['selfRegistration'] ?? 0;
                 $selectedAuthorizations = $input['authorizations'] ?? [];
                 if (empty($name)) {
@@ -75,7 +75,7 @@ class GroupController extends AbstractController implements CrudControllerInterf
                     'authorizations' => FilterInputRule::ArrayInt->value,
                 ];
                 $input = WebApp::filterInput($schema, $this->flight->request()->data->getData());
-                $name = $input['name'] ?? '';
+                $name = $input['name'] ?? '???';
                 $selfRegistration = $input['selfRegistration'] ?? 0;
                 $selectedAuthorizations = $input['authorizations'] ?? [];
 

@@ -242,16 +242,16 @@ class UserController extends AbstractController
                     'password' => FilterInputRule::Password->value,
                     'firstName' => FilterInputRule::PersonName->value,
                     'lastName' => FilterInputRule::PersonName->value,
-                    'nickName' => FilterInputRule::PersonName->value,
+                    'nickName' => FilterInputRule::HtmlSafeName->value,
                     'useGravatar' => $this->application->enumToValues(YesNo::class),
                     'avatar' => FilterInputRule::Avatar->value,
                 ];
                 $input = WebApp::filterInput($schema, $this->flight->request()->data->getData());
                 $this->dataHelper->set('Person', [
-                    'FirstName' => $input['firstName'] ?? '',
-                    'LastName' => $input['lastName'] ?? '',
-                    'NickName' => $input['nickName'] ?? '',
-                    'Avatar' => ($input['useGravatar'] ?? '') == YesNo::Yes->value ? '' : $input['avatar'],
+                    'FirstName' => $input['firstName'] ?? '???',
+                    'LastName' => $input['lastName'] ?? '???',
+                    'NickName' => $input['nickName'] ?? '???',
+                    'Avatar' => ($input['useGravatar'] ?? YesNo::No->value ) == YesNo::Yes->value ? '' : $input['avatar'] ?? '🤔',
                     'useGravatar' => $input['useGravatar'] ?? YesNo::No->value,
                 ], ['Id' => $person->Id]);
                 if (!empty($password))
@@ -443,7 +443,7 @@ class UserController extends AbstractController
                 'seasonEnd' => FilterInputRule::DateTime->value,
             ];
             $input = WebApp::filterInput($schema, $this->flight->request()->query->getData());
-            $season = $personalStatistics->getSeasonRange($input['seasonStart'] ?: null, $input['seasonEnd'] ?: null);
+            $season = $personalStatistics->getSeasonRange($input['seasonStart'] ?? null, $input['seasonEnd'] ?? null);
             $this->render('app/views/user/statistics.latte', Params::getAll([
                 'stats' => $personalStatistics->getStats($person, $season['start'], $season['end'], $this->connectedUser->isWebmaster()),
                 'seasons' => $personalStatistics->getAvailableSeasons(),

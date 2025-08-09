@@ -78,7 +78,7 @@ class EventTypeController extends TableController implements CrudControllerInter
                     $input = WebApp::filterInput($schema, $this->flight->request()->data->getData());
                     $this->eventDataHelper->update(
                         $id,
-                        $input['name'] ?? '',
+                        $input['name'] ?? '???',
                         $input['idGroup'] ??  throw new RuntimeException('Fatal error in file ' . __FILE__ . ' at line ' . __LINE__),
                         $input['groups']
                     );
