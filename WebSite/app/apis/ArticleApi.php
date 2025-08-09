@@ -6,10 +6,10 @@ use Exception;
 use Throwable;
 
 use app\helpers\Application;
-use app\helpers\ArticleDataHelper;
-use app\helpers\DesignDataHelper;
 use app\helpers\Media;
-use app\helpers\ReplyDataHelper;
+use app\models\ArticleDataHelper;
+use app\models\DesignDataHelper;
+use app\models\ReplyDataHelper;
 
 class ArticleApi extends AbstractApi
 {

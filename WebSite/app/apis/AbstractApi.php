@@ -7,8 +7,8 @@ use Latte\Engine as LatteEngine;
 
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
-use app\helpers\DataHelper;
-use app\helpers\PersonDataHelper;
+use app\models\DataHelper;
+use app\models\PersonDataHelper;
 
 abstract class AbstractApi
 {

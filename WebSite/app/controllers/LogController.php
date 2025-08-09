@@ -6,11 +6,11 @@ use app\enums\ApplicationError;
 use app\enums\Period;
 use app\enums\FilterInputRule;
 use app\helpers\Application;
-use app\helpers\CrosstabDataHelper;
-use app\helpers\LogDataHelper;
 use app\helpers\Params;
 use app\helpers\PeriodHelper;
 use app\helpers\WebApp;
+use app\models\CrosstabDataHelper;
+use app\models\LogDataHelper;
 
 class LogController extends AbstractController
 {

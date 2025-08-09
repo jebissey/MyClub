@@ -6,18 +6,18 @@ use DateTime;
 use Throwable;
 
 use app\enums\Period;
-use app\helpers\ApiEventDataHelper;
-use app\helpers\ApiNeedDataHelper;
-use app\helpers\ApiNeedTypeDataHelper;
 use app\helpers\Application;
-use app\helpers\AttributeDataHelper;
-use app\helpers\EventDataHelper;
-use app\helpers\EventNeedHelper;
-use app\helpers\MessageDataHelper;
-use app\helpers\ParticipantDataHelper;
-use app\helpers\PersonDataHelper;
 use app\helpers\PersonPreferences;
 use app\helpers\WebApp;
+use app\models\ApiEventDataHelper;
+use app\models\ApiNeedDataHelper;
+use app\models\ApiNeedTypeDataHelper;
+use app\models\AttributeDataHelper;
+use app\models\EventDataHelper;
+use app\models\EventNeedHelper;
+use app\models\MessageDataHelper;
+use app\models\ParticipantDataHelper;
+use app\models\PersonDataHelper;
 use app\services\EmailService;
 
 class EventApi extends AbstractApi

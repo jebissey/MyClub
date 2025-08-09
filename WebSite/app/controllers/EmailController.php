@@ -9,10 +9,10 @@ use app\enums\FilterInputRule;
 use app\enums\WeekdayFormat;
 use app\helpers\Application;
 use app\helpers\Params;
-use app\helpers\PersonDataHelper;
 use app\helpers\TranslationManager;
 use app\helpers\WebApp;
 use app\services\EmailService;
+use app\models\PersonDataHelper;
 
 class EmailController extends AbstractController
 {

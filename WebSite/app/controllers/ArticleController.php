@@ -7,16 +7,16 @@ use RuntimeException;
 use app\enums\ApplicationError;
 use app\enums\FilterInputRule;
 use app\helpers\Application;
-use app\helpers\ArticleCrosstabDataHelper;
-use app\helpers\ArticleDataHelper;
-use app\helpers\ArticleTableDataHelper;
-use app\helpers\AuthorizationDataHelper;
 use app\helpers\Backup;
-use app\helpers\DataHelper;
 use app\helpers\Params;
 use app\helpers\PeriodHelper;
-use app\helpers\PersonDataHelper;
 use app\helpers\WebApp;
+use app\models\ArticleCrosstabDataHelper;
+use app\models\ArticleDataHelper;
+use app\models\ArticleTableDataHelper;
+use app\models\AuthorizationDataHelper;
+use app\models\DataHelper;
+use app\models\PersonDataHelper;
 
 class ArticleController extends TableController
 {

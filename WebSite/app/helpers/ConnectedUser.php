@@ -6,6 +6,8 @@ use app\enums\ApplicationError;
 use app\enums\Authorization;
 use app\helpers\Params;
 use app\helpers\TranslationManager;
+use app\models\AuthorizationDataHelper;
+use app\models\DataHelper;
 
 class ConnectedUser
 {

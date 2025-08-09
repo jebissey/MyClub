@@ -9,15 +9,15 @@ use app\enums\ApplicationError;
 use app\enums\EventSearchMode;
 use app\enums\FilterInputRule;
 use app\helpers\Application;
-use app\helpers\CrosstabDataHelper;
-use app\helpers\EventDataHelper;
-use app\helpers\MessageDataHelper;
-use app\helpers\NeedDataHelper;
 use app\helpers\Params;
-use app\helpers\ParticipantDataHelper;
 use app\helpers\PeriodHelper;
 use app\helpers\WebApp;
 use app\services\EmailService;
+use app\models\CrosstabDataHelper;
+use app\models\EventDataHelper;
+use app\models\MessageDataHelper;
+use app\models\NeedDataHelper;
+use app\models\ParticipantDataHelper;
 
 class EventController extends AbstractController
 {

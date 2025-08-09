@@ -2,13 +2,13 @@
 
 namespace app\apis;
 
-use app\helpers\AuthorizationDataHelper;
 use Throwable;
 
 use app\helpers\Application;
-use app\helpers\CarouselDataHelper;
-use app\helpers\DataHelper;
 use app\helpers\WebApp;
+use app\models\AuthorizationDataHelper;
+use app\models\CarouselDataHelper;
+use app\models\DataHelper;
 
 class CarouselApi extends AbstractApi
 {

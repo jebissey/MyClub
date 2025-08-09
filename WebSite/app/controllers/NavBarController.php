@@ -4,9 +4,9 @@ namespace app\controllers;
 
 use app\helpers\Application;
 use app\enums\ApplicationError;
-use app\helpers\ArwardsDataHelper;
 use app\helpers\Params;
 use app\helpers\WebApp;
+use app\models\ArwardsDataHelper;
 
 class NavBarController extends AbstractController
 {

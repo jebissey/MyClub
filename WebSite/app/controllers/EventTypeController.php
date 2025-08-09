@@ -7,22 +7,20 @@ use RuntimeException;
 use app\enums\ApplicationError;
 use app\enums\FilterInputRule;
 use app\helpers\Application;
-use app\helpers\EventDataHelper;
 use app\helpers\Params;
-use app\helpers\TableControllerHelper;
 use app\helpers\WebApp;
 use app\interfaces\CrudControllerInterface;
+use app\models\EventDataHelper;
+use app\models\TableControllerDataHelper;
 
 class EventTypeController extends TableController implements CrudControllerInterface
 {
     private EventDataHelper $eventDataHelper;
-    private TableControllerHelper $tableControllerHelper;
 
     public function __construct(Application $application)
     {
         parent::__construct($application);
         $this->eventDataHelper = new EventDataHelper($application);
-        $this->tableControllerHelper = new TableControllerHelper($application);
     }
 
     public function index()
@@ -36,7 +34,7 @@ class EventTypeController extends TableController implements CrudControllerInter
                 ['field' => 'Attributes', 'label' => 'Attributs'],
             ];
             $data = $this->prepareTableData(
-                $this->tableControllerHelper->getEventTypesQuery(),
+                (new TableControllerDataHelper($this->application))->getEventTypesQuery(),
                 $filterValues,
                 (int)($this->flight->request()->query['tablePage'] ?? 1)
             );

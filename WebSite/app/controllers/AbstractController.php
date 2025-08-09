@@ -8,12 +8,12 @@ use Latte\Engine as LatteEngine;
 
 use app\enums\TimeOfDay;
 use app\helpers\Application;
-use app\helpers\AuthorizationDataHelper;
-use app\helpers\ConnectedUser;
-use app\helpers\DataHelper;
-use app\helpers\LanguagesDataHelper;
-use app\helpers\PageDataHelper;
 use app\helpers\TranslationManager;
+use app\helpers\ConnectedUser;
+use app\models\AuthorizationDataHelper;
+use app\models\DataHelper;
+use app\models\LanguagesDataHelper;
+use app\models\PageDataHelper;
 
 abstract class AbstractController
 {

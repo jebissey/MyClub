@@ -5,10 +5,10 @@ namespace app\controllers;
 use app\enums\ApplicationError;
 use app\enums\FilterInputRule;
 use app\helpers\Application;
-use app\helpers\GroupDataHelper;
 use app\helpers\Params;
-use app\helpers\TableControllerHelper;
 use app\helpers\WebApp;
+use app\models\GroupDataHelper;
+use app\models\TableControllerDataHelper;
 
 class RegistrationController extends TableController
 {
@@ -36,7 +36,7 @@ class RegistrationController extends TableController
                 ['field' => 'FirstName', 'label' => 'Prénom'],
                 ['field' => 'NickName', 'label' => 'Surnom']
             ];
-            $data = $this->prepareTableData((new TableControllerHelper($this->application))->getPersonsQuery(), $filterValues, (int)($this->flight->request()->query['tablePage'] ?? 1));
+            $data = $this->prepareTableData((new TableControllerDataHelper($this->application))->getPersonsQuery(), $filterValues, (int)($this->flight->request()->query['tablePage'] ?? 1));
             $this->render('app/views/registration/index.latte', Params::getAll([
                 'persons' => $data['items'],
                 'currentPage' => $data['currentPage'],

@@ -9,23 +9,23 @@ use app\enums\FilterInputRule;
 use app\enums\Period;
 use app\enums\YesNo;
 use app\helpers\Application;
-use app\helpers\ArticleDataHelper;
-use app\helpers\AttributeDataHelper;
-use app\helpers\DesignDataHelper;
-use app\helpers\EventDataHelper;
-use app\helpers\EventTypeDataHelper;
-use app\helpers\GroupDataHelper;
-use app\helpers\LogDataHelper;
-use app\helpers\MessageDataHelper;
 use app\helpers\News;
 use app\helpers\Params;
 use app\helpers\Password;
-use app\helpers\PersonDataHelper;
-use app\helpers\PersonGroupDataHelper;
-use app\helpers\PersonStatistics;
-use app\helpers\SurveyDataHelper;
 use app\helpers\TranslationManager;
 use app\helpers\WebApp;
+use app\models\ArticleDataHelper;
+use app\models\AttributeDataHelper;
+use app\models\DesignDataHelper;
+use app\models\EventDataHelper;
+use app\models\EventTypeDataHelper;
+use app\models\GroupDataHelper;
+use app\models\LogDataHelper;
+use app\models\MessageDataHelper;
+use app\models\PersonDataHelper;
+use app\models\PersonGroupDataHelper;
+use app\models\PersonStatisticsDataHelper;
+use app\models\SurveyDataHelper;
 use app\services\AuthenticationService;
 use app\services\EmailService;
 
@@ -437,7 +437,7 @@ class UserController extends AbstractController
     public function showStatistics(): void
     {
         if ($person = $this->connectedUser->get(1)->person ?? false) {
-            $personalStatistics = new PersonStatistics($this->application);
+            $personalStatistics = new PersonStatisticsDataHelper($this->application);
             $schema = [
                 'seasonStart' => FilterInputRule::DateTime->value,
                 'seasonEnd' => FilterInputRule::DateTime->value,

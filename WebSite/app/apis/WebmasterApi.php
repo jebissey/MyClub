@@ -5,9 +5,9 @@ namespace app\apis;
 use Throwable;
 
 use app\helpers\Application;
-use app\helpers\LogDataHelper;
-use app\helpers\PageDataHelper;
-use app\helpers\PersonGroupDataHelper;
+use app\models\LogDataHelper;
+use app\models\PageDataHelper;
+use app\models\PersonGroupDataHelper;
 
 class WebmasterApi extends AbstractApi
 {

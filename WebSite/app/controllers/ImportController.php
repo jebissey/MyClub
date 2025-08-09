@@ -5,9 +5,9 @@ namespace app\controllers;
 use app\enums\ApplicationError;
 use app\enums\FilterInputRule;
 use app\helpers\Application;
-use app\helpers\ImportDataHelper;
 use app\helpers\Params;
 use app\helpers\WebApp;
+use app\models\ImportDataHelper;
 
 class ImportController extends AbstractController
 {

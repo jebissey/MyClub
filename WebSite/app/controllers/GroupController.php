@@ -5,10 +5,10 @@ namespace app\controllers;
 use app\enums\ApplicationError;
 use app\enums\FilterInputRule;
 use app\helpers\Application;
-use app\helpers\GroupDataHelper;
 use app\helpers\Params;
 use app\helpers\WebApp;
 use app\interfaces\CrudControllerInterface;
+use app\models\GroupDataHelper;
 
 class GroupController extends AbstractController implements CrudControllerInterface
 {

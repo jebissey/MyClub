@@ -5,11 +5,10 @@ namespace app\controllers;
 use app\enums\ApplicationError;
 use app\enums\FilterInputRule;
 use app\helpers\Application;
-use app\helpers\ArticleDataHelper;
-use app\helpers\ArwardsDataHelper;
 use app\helpers\Params;
 use app\helpers\WebApp;
-use RuntimeException;
+use app\models\ArticleDataHelper;
+use app\models\ArwardsDataHelper;
 
 class WebmasterController extends AbstractController
 {

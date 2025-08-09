@@ -5,24 +5,19 @@ namespace app\controllers;
 use app\enums\ApplicationError;
 use app\enums\FilterInputRule;
 use app\helpers\Application;
-use app\helpers\GroupDataHelper;
 use app\helpers\Params;
-use app\helpers\PersonDataHelper;
-use app\helpers\TableControllerHelper;
 use app\helpers\WebApp;
 use app\interfaces\CrudControllerInterface;
+use app\models\GroupDataHelper;
+use app\models\PersonDataHelper;
+use app\models\TableControllerDataHelper;
 
 
 class PersonController extends TableController implements CrudControllerInterface
 {
-    private GroupDataHelper $groupDataHelper;
-    private TableControllerHelper $tableControllerHelper;
-
     public function __construct(Application $application)
     {
         parent::__construct($application);
-        $this->groupDataHelper = new GroupdataHelper($application);
-        $this->tableControllerHelper = new TableControllerHelper($application);
     }
 
     public function help(): void
@@ -69,7 +64,7 @@ class PersonController extends TableController implements CrudControllerInterfac
                 ['field' => 'Email', 'label' => 'Email'],
                 ['field' => 'Phone', 'label' => 'Téléphone']
             ];
-            $data = $this->prepareTableData($this->tableControllerHelper->getPersonsQuery(), $filterValues, (int)($this->flight->request()->query['tablePage'] ?? 1));
+            $data = $this->prepareTableData((new TableControllerDataHelper($this->application))->getPersonsQuery(), $filterValues, (int)($this->flight->request()->query['tablePage'] ?? 1));
 
             $this->render('app/views/persons/index.latte', Params::getAll([
                 'persons' => $data['items'],
@@ -200,7 +195,7 @@ class PersonController extends TableController implements CrudControllerInterfac
                     'Inactivated' => 0
                 ], 'Id, LastName, FirstName, NickName, UseGravatar, Avatar, Email');
             }
-            $groupCounts = $this->groupDataHelper->getGroupCount();
+            $groupCounts = (new GroupDataHelper($this->application))->getGroupCount();
             $this->render('app/views/user/directory.latte', Params::getAll([
                 'persons' => $persons,
                 'navItems' => $this->getNavItems($person),

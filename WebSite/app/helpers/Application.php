@@ -8,6 +8,9 @@ use PDO;
 use RuntimeException;
 use Throwable;
 
+use app\models\Database;
+use app\models\DataHelper;
+
 class Application
 {
     public const VERSION = '0.6.0';

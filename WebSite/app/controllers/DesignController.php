@@ -5,9 +5,9 @@ namespace app\controllers;
 use app\enums\FilterInputRule;
 use app\helpers\Application;
 use app\enums\ApplicationError;
-use app\helpers\DesignDataHelper;
 use app\helpers\Params;
 use app\helpers\WebApp;
+use app\models\DesignDataHelper;
 
 class DesignController extends AbstractController
 {
