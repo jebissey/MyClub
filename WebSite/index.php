@@ -28,7 +28,7 @@ use app\controllers\UserController;
 use app\controllers\WebmasterController;
 use app\enums\ApplicationError;
 use app\helpers\Application;
-use app\helpers\LogDataHelper;
+use app\models\LogDataHelper;
 
 if ($_SERVER['SERVER_NAME'] === 'localhost')
     Debugger::enable(Debugger::Development, __DIR__ . '/var/tracy/log');

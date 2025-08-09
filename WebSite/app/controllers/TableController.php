@@ -5,7 +5,7 @@ namespace app\controllers;
 use \Envms\FluentPDO\Queries\Select;
 
 use app\helpers\Application;
-use app\helpers\Generic;
+use app\models\GenericDataHelper;
 
 abstract class TableController extends AbstractController
 {
@@ -25,7 +25,7 @@ abstract class TableController extends AbstractController
             }
         }
 
-        $totalItems = (new Generic($this->application))->countOf($query->getQuery());
+        $totalItems = (new GenericDataHelper($this->application))->countOf($query->getQuery());
         $totalPages = ceil($totalItems / $this->itemsPerPage);
         $currentPage = max(1, min($page, $totalPages));
         $query = $query->limit($this->itemsPerPage)->offset(($currentPage - 1) * $this->itemsPerPage);

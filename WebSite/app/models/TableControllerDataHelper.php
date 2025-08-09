@@ -2,6 +2,8 @@
 
 namespace app\models;
 
+use \Envms\FluentPDO\Queries\Select;
+
 use app\helpers\Application;
 
 class TableControllerDataHelper extends Data
@@ -11,7 +13,7 @@ class TableControllerDataHelper extends Data
         parent::__construct($application);
     }
 
-    public function getEventTypesQuery()
+    public function getEventTypesQuery(): Select
     {
         return $this->fluent->from('EventType')
             ->select('EventType.Id AS EventTypeId, EventType.Name AS EventTypeName, `Group`.Name AS GroupName')
@@ -24,7 +26,7 @@ class TableControllerDataHelper extends Data
             ->orderBy('EventType.Name');
     }
 
-    public function getPersonsQuery()
+    public function getPersonsQuery(): Select
     {
         return $this->fluent->from('Person')
             ->select('Id, FirstName, LastName, NickName, Email')

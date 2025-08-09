@@ -5,11 +5,11 @@ namespace app\services;
 use app\enums\FilterInputRule;
 use app\exceptions\AuthenticationException;
 use app\helpers\Application;
-use app\helpers\LogDataHelper;
 use app\helpers\Password;
-use app\helpers\PersonDataHelper;
 use app\helpers\WebApp;
 use app\models\AuthResult;
+use app\models\LogDataHelper;
+use app\models\PersonDataHelper;
 use app\services\EmailService;
 
 class AuthenticationService

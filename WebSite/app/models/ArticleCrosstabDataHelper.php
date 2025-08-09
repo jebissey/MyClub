@@ -3,7 +3,7 @@
 namespace app\models;
 
 use app\helpers\Application;
-use app\helpers\CrosstabDataHelper;
+use app\models\CrosstabDataHelper;
 
 class ArticleCrosstabDataHelper extends Data
 {
