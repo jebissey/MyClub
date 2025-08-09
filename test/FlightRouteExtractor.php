@@ -2,6 +2,10 @@
 
 class FlightRouteExtractor implements RouteExtractorInterface
 {
+    private const REGEX_MAP_ROUTE = '/mapRoute\(\$flight,\s*[\'"]([^\'"]+)[\'"]\s*,/';
+    private const REGEX_DIRECT_ROUTE = '/\$flight->route\(\s*[\'"]([^\'"]+)[\'"]/';
+    private const REGEX_ROUTE_PARAM = '/@\w+(?::[^\s\/]+)?/';
+
     public function extractRoutes(string $filePath): array
     {
         if (!file_exists($filePath)) throw new InvalidArgumentException("Le fichier $filePath n'existe pas");
@@ -9,14 +13,14 @@ class FlightRouteExtractor implements RouteExtractorInterface
         $content = file_get_contents($filePath);
         $routes = [];
 
-        preg_match_all('/mapRoute\(\$flight,\s*[\'"]([^\'\"]+)[\'"]\s*,/', $content, $matches);
+        preg_match_all(self::REGEX_MAP_ROUTE, $content, $matches);
         foreach ($matches[1] as $route) {
             $parsed = $this->parseRoute($route);
             if ($parsed) {
                 $routes[] = $parsed;
             }
         }
-        preg_match_all('/\$flight->route\(\s*[\'"]([^\'\"]+)[\'"]/', $content, $directMatches);
+        preg_match_all(self::REGEX_DIRECT_ROUTE, $content, $directMatches);
         foreach ($directMatches[1] as $route) {
             $parsed = $this->parseRoute($route);
             if ($parsed) $routes[] = $parsed;
@@ -31,7 +35,7 @@ class FlightRouteExtractor implements RouteExtractorInterface
         $method = strtoupper($parts[0]);
         $path = $parts[1];
         if (!str_starts_with($path, '/')) return null;
-        $hasParameters = preg_match('/@\w+(?::[^\s\/]+)?/', $path) > 0;
+        $hasParameters = preg_match(self::REGEX_ROUTE_PARAM, $path) > 0;
 
         return new Route(
             method: $method,

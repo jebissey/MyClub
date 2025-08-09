@@ -9,47 +9,60 @@ class CurlHttpClient implements HttpClientInterface
     public function request(string $method, string $url, array $options = []): HttpResponse
     {
         $ch = curl_init();
-        $curlOptions = [
-            CURLOPT_URL => $url,
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_TIMEOUT => $this->config->timeout,
-            CURLOPT_FOLLOWLOCATION => false,
-            CURLOPT_CUSTOMREQUEST => $method,
-            CURLOPT_HEADER => true,
-            CURLOPT_NOBODY => ($method === 'HEAD'),
-            CURLOPT_SSL_VERIFYPEER => $this->config->verifySSL,
-            CURLOPT_SSL_VERIFYHOST => $this->config->verifySSL ? 2 : 0
-        ];
 
-        if (isset($options['headers']))    $curlOptions[CURLOPT_HTTPHEADER] = $options['headers'];
-        if (isset($options['cookies']))    $curlOptions[CURLOPT_COOKIE] = implode('; ', $options['cookies']);
-        if (isset($options['postfields'])) $curlOptions[CURLOPT_POSTFIELDS] = $options['postfields'];
+        $curlOptions = $this->buildCurlOptions($method, $url, $options);
         curl_setopt_array($ch, $curlOptions);
 
         $startTime = microtime(true);
-        $response = curl_exec($ch);
-        $endTime = microtime(true);
+        $response  = curl_exec($ch);
+        $endTime   = microtime(true);
 
         if ($response === false) {
             $error = curl_error($ch);
+            $errno = curl_errno($ch);
             curl_close($ch);
-            throw new RuntimeException("Erreur cURL: $error");
+            throw new RuntimeException("Erreur cURL ($errno): $error");
         }
-        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $httpCode   = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         $headerSize = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
-        $headers = substr($response, 0, $headerSize);
-        $body = substr($response, $headerSize);
+        $headersRaw = substr($response, 0, $headerSize);
+        $body       = substr($response, $headerSize);
         $responseTime = round(($endTime - $startTime) * 1000, 2);
-
         curl_close($ch);
 
         return new HttpResponse(
             httpCode: $httpCode,
             body: $body,
-            headers: $headers,
+            headers: $headersRaw, 
             responseTimeMs: $responseTime,
             success: $httpCode > 0,
             url: $url
         );
     }
+
+    private function buildCurlOptions(string $method, string $url, array $options): array
+    {
+        $opts = [
+            CURLOPT_URL            => $url,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_TIMEOUT        => $this->config->timeout,
+            CURLOPT_FOLLOWLOCATION => false,
+            CURLOPT_CUSTOMREQUEST  => strtoupper($method),
+            CURLOPT_HEADER         => true,
+            CURLOPT_NOBODY         => (strtoupper($method) === 'HEAD'),
+            CURLOPT_SSL_VERIFYPEER => $this->config->verifySSL,
+            CURLOPT_SSL_VERIFYHOST => $this->config->verifySSL ? 2 : 0,
+            CURLOPT_USERAGENT      => $options['useragent'] ?? 'CurlHttpClient/1.0',
+        ];
+
+        if (!empty($options['headers'])) $opts[CURLOPT_HTTPHEADER] = $options['headers'];
+        if (!empty($options['cookies'])) $opts[CURLOPT_COOKIE] = implode('; ', $options['cookies']);
+        if (!empty($options['postfields'])) {
+            $opts[CURLOPT_POSTFIELDS] = is_array($options['postfields'])
+                ? http_build_query($options['postfields'])
+                : $options['postfields'];
+        }
+        return $opts;
+    }
 }
+

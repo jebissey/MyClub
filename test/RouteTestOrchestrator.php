@@ -2,6 +2,12 @@
 
 class RouteTestOrchestrator
 {
+    private const COLOR_GREEN =   "\033[32m";
+    private const COLOR_YELLOW =  "\033[33m";
+    private const COLOR_MAGENTA = "\033[35m";
+    private const COLOR_RED =     "\033[31m";
+    private const COLOR_WHITE =   "\033[37m";
+
     private array $parameterErrors = [];
     private array $responseErrors = [];
     private array $testErrors = [];
@@ -39,7 +45,7 @@ class RouteTestOrchestrator
                 echo " -> \033[31mERREUR: Aucune donnée de test valide\033[0m\n";
             } elseif (count($testResults) > 1) {
                 $avgResponseTime = array_sum(array_map(
-                    fn($r) => $r->response->responseTimeMs, 
+                    fn($r) => $r->response->responseTimeMs,
                     $testResults
                 )) / count($testResults);
                 echo sprintf(" -> %d tests, avg %.2fms\n", count($testResults), $avgResponseTime);
@@ -89,12 +95,15 @@ class RouteTestOrchestrator
         }
         $results = [];
         foreach ($testData as $test) {
-            $connectedUser = $test['JsonConnectedUser'] ? 
-                json_decode($test['JsonConnectedUser'], true) : null;
+            $connectedUser = $test['JsonConnectedUser'] ? json_decode($test['JsonConnectedUser'], true) : null;
             if ($connectedUser) {
                 $authResult = $this->authenticator->authenticate($connectedUser);
                 if (!$authResult->success) {
-                    $this->testErrors[] = "Échec de l'authentification pour le test ID {$test['Id']}";
+                    $this->testErrors[] = sprintf(
+                        "Échec de l'authentification pour le test ID %s: %s",
+                        $test['Id'],
+                        $authResult->error
+                    );
                     continue;
                 }
             }
@@ -102,7 +111,7 @@ class RouteTestOrchestrator
             $url = $this->buildUrl($route, $parameters);
             $response = $this->httpClient->request($route->method, $url);
             $validationResult = $this->responseValidator->validate(
-                $response->body, 
+                $response->body,
                 $test['ExpectedResponse']
             );
             if (!$validationResult->isValid) {
@@ -121,7 +130,7 @@ class RouteTestOrchestrator
     private function validateTestData(Route $route, array $testData): array
     {
         $errors = [];
-        
+
         foreach ($testData as $test) {
             $parameters = json_decode($test['JsonParameters'], true);
             if (json_last_error() !== JSON_ERROR_NONE) {
@@ -131,14 +140,14 @@ class RouteTestOrchestrator
 
             preg_match_all('/@(\w+)(?::[^\s\/]+)?/', $route->originalPath, $matches);
             $requiredParams = $matches[1];
-            
+
             foreach ($requiredParams as $param) {
                 if (!isset($parameters[$param])) {
                     $errors[] = "Paramètre manquant '$param' dans le test ID {$test['Id']}";
                 }
             }
         }
-        
+
         return $errors;
     }
 
@@ -230,10 +239,10 @@ class RouteTestOrchestrator
 
     private function getStatusColor(int $code): string
     {
-        if ($code >= 200 && $code < 300) return "\033[32m"; // Vert
-        if ($code >= 300 && $code < 400) return "\033[33m"; // Jaune
-        if ($code >= 400 && $code < 500) return "\033[35m"; // Magenta
-        if ($code >= 500) return "\033[31m"; // Rouge
-        return "\033[37m"; // Blanc
+        if ($code >= 200 && $code < 300) return self::COLOR_GREEN;
+        if ($code >= 300 && $code < 400) return self::COLOR_YELLOW;
+        if ($code >= 400 && $code < 500) return self::COLOR_MAGENTA;
+        if ($code >= 500) return self::COLOR_RED;
+        return self::COLOR_WHITE;
     }
 }

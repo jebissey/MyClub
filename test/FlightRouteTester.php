@@ -14,64 +14,63 @@ require_once __DIR__ . '/RouteTestOrchestrator.php';
 require_once __DIR__ . '/SessionAuthenticator.php';
 require_once __DIR__ . '/SqliteTestDataRepository.php';
 
-function main($argv)
+function printHelp(): void
 {
-    $baseUrl = 'http://localhost:8000';
-    $timeout = 10;
-    $routeFile = __DIR__ . '/../WebSite/index.php';
-    $dbPath = __DIR__ . '/tests.sqlite';
-    $exportJson = false;
-    $exportCsv = false;
+    echo <<<EOT
+Usage: php route_tester.php [options]
+Options:
+  --base-url=URL      URL de base (défaut: http://localhost:8000)
+  --timeout=SECONDS   Timeout en secondes (défaut: 10)
+  --routes-file=FILE  Fichier contenant les routes (défaut: index.php)
+  --db-path=PATH      Chemin vers la base de données SQLite
+  --export-json       Exporter les résultats en JSON
+  --export-csv        Exporter les résultats en CSV
+  --help, -h          Afficher cette aide
+EOT;
+}
 
-    for ($i = 1; $i < count($argv); $i++) {
-        $arg = $argv[$i];
-        if (strpos($arg, '--base-url=') === 0)        $baseUrl = substr($arg, strlen('--base-url='));
-        elseif (strpos($arg, '--timeout=') === 0)     $timeout = intval(substr($arg, strlen('--timeout=')));
-        elseif (strpos($arg, '--routes-file=') === 0) $routeFile = substr($arg, strlen('--routes-file='));
-        elseif (strpos($arg, '--db-path=') === 0)     $dbPath = substr($arg, strlen('--db-path='));
-        elseif ($arg === '--export-json')             $exportJson = true;
-        elseif ($arg === '--export-csv')              $exportCsv = true;
-        elseif ($arg === '--help' || $arg === '-h') {
-            echo "Usage: php route_tester.php [options]\n";
-            echo "Options:\n";
-            echo "  --base-url=URL      URL de base (défaut: http://localhost:8000)\n";
-            echo "  --timeout=SECONDS   Timeout en secondes (défaut: 10)\n";
-            echo "  --routes-file=FILE  Fichier contenant les routes (défaut: index.php)\n";
-            echo "  --db-path=PATH      Chemin vers la base de données SQLite\n";
-            echo "  --export-json       Exporter les résultats en JSON\n";
-            echo "  --export-csv        Exporter les résultats en CSV\n";
-            echo "  --help, -h          Afficher cette aide\n";
-            exit(0);
-        }
+function main(array $argv): int
+{
+    $options = getopt('', [
+        'base-url:',
+        'timeout:',
+        'routes-file:',
+        'db-path:',
+        'export-json',
+        'export-csv',
+        'help',
+        'h'
+    ]);
+    if (isset($options['help']) || isset($options['h'])) {
+        printHelp();
+        return 0;
     }
     $config = new TestConfiguration(
-        baseUrl: $baseUrl,
-        timeout: $timeout
+        baseUrl: $options['base-url'] ?? 'http://localhost:8000',
+        timeout: (int)($options['timeout'] ?? 10)
     );
+    $routeFile  = $options['routes-file'] ?? __DIR__ . '/../WebSite/index.php';
+    $dbPath     = $options['db-path'] ?? __DIR__ . '/tests.sqlite';
+    $exportJson = isset($options['export-json']);
+    $exportCsv  = isset($options['export-csv']);
     try {
         echo "Configuration:\n";
-        echo "  URL de base: $baseUrl\n";
-        echo "  Timeout: $timeout secondes\n";
+        echo "  URL de base: {$config->baseUrl}\n";
+        echo "  Timeout: {$config->timeout} secondes\n";
         echo "  Fichier de routes: $routeFile\n";
-        echo "  Base de données: " . ($dbPath ? $dbPath : "Non spécifiée") . "\n\n";
+        echo "  Base de données: " . ($dbPath ?: "Non spécifiée") . "\n\n";
         echo "Extraction des routes...\n";
 
         $orchestrator = RouteTestFactory::create($config, $dbPath);
         $results = $orchestrator->runTests($routeFile);
 
-        if ($exportJson) {
-            $jsonExporter = new JsonTestExporter();
-            $jsonExporter->export($results, 'route_test_results.json');
-        }
-        if ($exportCsv) {
-            $csvExporter = new CsvTestExporter();
-            $csvExporter->export($results, 'route_test_results.csv');
-        }
-
-    } catch (Exception $e) {
-        echo "Erreur: " . $e->getMessage() . "\n";
-        exit(1);
+        if ($exportJson) (new JsonTestExporter())->export($results, 'route_test_results.json');
+        if ($exportCsv) (new CsvTestExporter())->export($results, 'route_test_results.csv');
+    } catch (Throwable $e) {
+        fwrite(STDERR, "Error: {$e->getMessage()} in {$e->getFile()}:{$e->getLine()}\n");
+        return 1;
     }
+    return 0;
 }
 
-if (basename(__FILE__) === basename($_SERVER['SCRIPT_NAME'] ?? ''))  main($argv ?? []);
+if (basename(__FILE__) === basename($_SERVER['SCRIPT_NAME'] ?? '')) exit(main($argv));
