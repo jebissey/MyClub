@@ -5,8 +5,11 @@ namespace app\models;
 use DateTime;
 use DateTimeZone;
 use PDO;
+use RuntimeException;
+use Throwable;
 
 use app\helpers\Application;
+use app\helpers\Client;
 
 class LogDataHelper extends Data
 {
@@ -22,25 +25,28 @@ class LogDataHelper extends Data
 
     public function add(string $code, string $message): void
     {
-        $sql = '
-            INSERT INTO Log (IpAddress, Referer, Os, Browser, ScreenResolution, Type, Uri, Token, Who, Code, Message) 
-            VALUES (:ipAddress, :referer, :os, :browser, :screenResolution, :type, :uri, :token, :who, :code, :message)
-        ';
-        $params = [
-            ':ipAddress'        => $_SERVER['REMOTE_ADDR'],
-            ':referer'          => $_SERVER['HTTP_REFERER'] ?? '',
-            ':os'               => '',
-            ':browser'          => '',
-            ':screenResolution' => '',
-            ':type'             => '',
-            ':uri'              => $_SERVER['REQUEST_URI'],
-            ':token'            => '',
-            ':who'              => gethostbyaddr($_SERVER['REMOTE_ADDR']) ?? '',
-            ':code'             => $code,
-            ':message'          => $message,
-        ];
-        $stmt = $this->pdoForLog->prepare($sql);
-        $stmt->execute($params);
+        $client = new Client();;
+        try {
+            $stmt = $this->pdoForLog->prepare("
+                INSERT INTO Log (IpAddress, Referer, Os, Browser, ScreenResolution, Type, Uri, Token, Who, Code, Message, CreatedAt)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))
+            ");
+            $stmt->execute([
+                $client->getIp(),
+                $client->getReferer(),
+                $client->getOS(),
+                $client->getBrowser(),
+                $client->getScreenResolution(),
+                $client->getType(),
+                $client->getUri(),
+                $client->getToken(),
+                filter_var($_SESSION['user'] ?? '', FILTER_VALIDATE_EMAIL) ?: gethostbyaddr($_SERVER['REMOTE_ADDR']) ?? '',
+                $code,
+                $message
+            ]);
+        } catch (Throwable $e) {
+            throw new RuntimeException("Failed to log error: " . $e->getMessage() . ' in file ' . __FILE__ . ' at line ' . __LINE__);
+        }
     }
 
     public function getOsDistribution(): array
