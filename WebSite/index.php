@@ -167,7 +167,7 @@ mapRoute($flight, 'GET  /registration', $registrationController, 'index');
 mapRoute($flight, 'GET  /registration/groups/@id:[0-9]+', $registrationController, 'getPersonGroups');
 
 $surveyController = new SurveyController($application);
-mapRoute($flight, 'GET  /surveys/add/@id', $surveyController, 'add');
+mapRoute($flight, 'GET  /surveys/add/@id:[0-9]+', $surveyController, 'add');
 mapRoute($flight, 'POST /surveys/create', $surveyController, 'createOrUpdate');
 mapRoute($flight, 'GET  /surveys/results/@id:[0-9]+', $surveyController, 'viewResults');
 
