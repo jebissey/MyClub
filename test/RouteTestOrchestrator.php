@@ -1,13 +1,9 @@
 <?php
 
+use app\enums\Color;
+
 class RouteTestOrchestrator
 {
-    private const COLOR_GREEN =   "\033[32m";
-    private const COLOR_YELLOW =  "\033[33m";
-    private const COLOR_MAGENTA = "\033[35m";
-    private const COLOR_RED =     "\033[31m";
-    private const COLOR_WHITE =   "\033[37m";
-
     private array $parameterErrors = [];
     private array $responseErrors = [];
     private array $testErrors = [];
@@ -43,7 +39,7 @@ class RouteTestOrchestrator
                 $testResults = $this->testRoute($route);
                 $results = array_merge($results, $testResults);
                 if (count($testResults) === 0) {
-                    echo " -> \033[31mERREUR: Aucune donnée de test valide\033[0m\n";
+                    echo " -> " . Color::Red->value . "ERREUR: Aucune donnée de test valide" . Color::Reset->value . "\n";
                 } elseif (count($testResults) > 1) {
                     $avgResponseTime = array_sum(array_map(
                         fn($r) => $r->response->responseTimeMs,
@@ -59,7 +55,7 @@ class RouteTestOrchestrator
                         $color,
                         $result->response->httpCode,
                         $status,
-                        "\033[0m",
+                        Color::Reset->value,
                         $result->response->responseTimeMs
                     );
                 }
@@ -87,7 +83,7 @@ class RouteTestOrchestrator
         ]);
         if (empty($testData)) {
             $this->parameterErrors[] = "URI : {$route->originalPath}";
-            echo " -> \033[31mERREUR: Aucune donnée de test trouvée\033[0m";
+            echo " -> " . Color::Red->value . "ERREUR: Aucune donnée de test trouvée" . Color::Reset->value;
             return [];
         }
         $validationErrors = $this->validateTestData($route, $testData);
@@ -109,7 +105,7 @@ class RouteTestOrchestrator
                     continue;
                 }
             }
-            $parameters = json_decode($test['JsonParameters'], true);
+            $parameters = json_decode($test['JsonGetParameters'], true);
             $url = $this->buildUrl($route, $parameters);
             $response = $this->httpClient->request($route->method, $url);
             $validationResult = $this->responseValidator->validate(
@@ -117,7 +113,7 @@ class RouteTestOrchestrator
                 $test['ExpectedResponseCode']
             );
             if (!$validationResult->isValid) {
-                $this->responseErrors[] = "Réponse inattendue pour le test {$test['Method']} {$test['Uri']} avec {$test['JsonParameters']}, attendu : {$test['ExpectedResponseCode']}, reçu : {$response->httpCode}";
+                $this->responseErrors[] = "Unexpected response for test {$test['Method']} {$test['Uri']} with {$test['JsonGetParameters']}, expected : {$test['ExpectedResponseCode']}, received : {$response->httpCode}";
             }
             $results[] = new TestResult(
                 route: $route,
@@ -134,9 +130,9 @@ class RouteTestOrchestrator
         $errors = [];
 
         foreach ($testData as $test) {
-            $parameters = json_decode($test['JsonParameters'], true);
+            $parameters = json_decode($test['JsonGetParameters'], true);
             if (json_last_error() !== JSON_ERROR_NONE) {
-                $errors[] = "JsonParameters invalide dans le test ID {$test['Id']}";
+                $errors[] = "Invalid JsonGetParameters for test ID {$test['Id']}";
                 continue;
             }
 
@@ -145,11 +141,10 @@ class RouteTestOrchestrator
 
             foreach ($requiredParams as $param) {
                 if (!isset($parameters[$param])) {
-                    $errors[] = "Paramètre manquant '$param' dans le test ID {$test['Id']}";
+                    $errors[] = "Missing param '$param' for test ID {$test['Id']}";
                 }
             }
         }
-
         return $errors;
     }
 
@@ -195,17 +190,12 @@ class RouteTestOrchestrator
         $statusCodes = [];
         foreach ($results as $result) {
             if ($result instanceof TestResult) {
-                if ($result->response->success && $result->response->httpCode < 400) {
-                    $successful++;
-                } elseif ($result->response->httpCode >= 500) {
-                    $errors++;
-                }
-
+                if ($result->response->success && $result->response->httpCode < 400) $successful++;
+                elseif ($result->response->httpCode >= 500)                          $errors++;
                 $code = $result->response->httpCode;
                 $statusCodes[$code] = ($statusCodes[$code] ?? 0) + 1;
             }
         }
-
         return new TestSummary(
             totalTests: $total,
             successful: $successful,
@@ -241,10 +231,10 @@ class RouteTestOrchestrator
 
     private function getStatusColor(int $code): string
     {
-        if ($code >= 200 && $code < 300) return self::COLOR_GREEN;
-        if ($code >= 300 && $code < 400) return self::COLOR_YELLOW;
-        if ($code >= 400 && $code < 500) return self::COLOR_MAGENTA;
-        if ($code >= 500) return self::COLOR_RED;
-        return self::COLOR_WHITE;
+        if ($code >= 200 && $code < 300) return Color::Green->value;
+        if ($code >= 300 && $code < 400) return Color::Yellow->value;
+        if ($code >= 400 && $code < 500) return Color::Magenta->value;
+        if ($code >= 500) return Color::Red->value;
+        return Color::White->value;
     }
 }

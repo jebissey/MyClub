@@ -52,7 +52,7 @@ class CurlHttpClient implements HttpClientInterface
             CURLOPT_NOBODY         => (strtoupper($method) === 'HEAD'),
             CURLOPT_SSL_VERIFYPEER => $this->config->verifySSL,
             CURLOPT_SSL_VERIFYHOST => $this->config->verifySSL ? 2 : 0,
-            CURLOPT_USERAGENT      => $options['useragent'] ?? 'CurlHttpClient/1.0',
+            CURLOPT_USERAGENT      => 'Mozilla/5.0 (Linux; Android 99; TestDevice 1.0)',
         ];
 
         if (!empty($options['headers'])) $opts[CURLOPT_HTTPHEADER] = $options['headers'];

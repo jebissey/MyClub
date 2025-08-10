@@ -3,9 +3,11 @@
 require_once __DIR__ . '/interfaces.php';
 require_once __DIR__ . '/valueObjects.php';
 
+require_once __DIR__ . '/Color.php';
 require_once __DIR__ . '/ConsoleTestReporter.php';
 require_once __DIR__ . '/CsvTestExporter.php';
 require_once __DIR__ . '/CurlHttpClient.php';
+require_once __DIR__ . '/CurrentWebSite.php';
 require_once __DIR__ . '/FlightRouteExtractor.php';
 require_once __DIR__ . '/JsonTestExporter.php';
 require_once __DIR__ . '/ResponseValidator.php';
@@ -30,7 +32,7 @@ Options:
 EOT;
 }
 
-function main(array $argv): int
+function main(): int
 {
     $options = getopt('', [
         'base-url:',
@@ -50,20 +52,23 @@ function main(array $argv): int
         baseUrl: $options['base-url'] ?? 'http://localhost:8000',
         timeout: (int)($options['timeout'] ?? 10)
     );
-    $routeFile  = $options['routes-file'] ?? __DIR__ . '/../WebSite/index.php';
-    $dbPath     = $options['db-path'] ?? __DIR__ . '/tests.sqlite';
     $test       = $options['test'];
     $exportJson = isset($options['export-json']);
     $exportCsv  = isset($options['export-csv']);
+    $routeFile  = $options['routes-file'] ?? __DIR__ . '/../WebSite/index.php';
+    $dbTestsPath     = $options['db-path'] ?? __DIR__ . '/tests.sqlite';
+    $dbWebSitePath   = $options['db-path'] ?? __DIR__ . '/../WebSite/data/MyClub.sqlite';
+    if (!CurrentWebSite::backup($dbWebSitePath)) throw new InvalidArgumentException("File $dbWebSitePath doesn't exist");
+    if (!CurrentWebSite::remove($dbWebSitePath)) throw new InvalidArgumentException("File $dbWebSitePath doesn't removed");
     try {
         echo "Configuration:\n";
         echo "  URL de base: {$config->baseUrl}\n";
         echo "  Timeout: {$config->timeout} secondes\n";
         echo "  Fichier de routes: $routeFile\n";
-        echo "  Base de données: " . ($dbPath ?: "Non spécifiée") . "\n\n";
+        echo "  Base de données: " . ($dbTestsPath ?: "Non spécifiée") . "\n\n";
         echo "Extraction des routes...\n";
 
-        $orchestrator = RouteTestFactory::create($config, $dbPath);
+        $orchestrator = RouteTestFactory::create($config, $dbTestsPath);
         $results = $orchestrator->runTests($routeFile, $test);
 
         if ($exportJson) (new JsonTestExporter())->export($results, 'route_test_results.json');
@@ -71,6 +76,8 @@ function main(array $argv): int
     } catch (Throwable $e) {
         fwrite(STDERR, "Error: {$e->getMessage()} in {$e->getFile()}:{$e->getLine()}\n");
         return 1;
+    } finally {
+        if (!CurrentWebSite::restore($dbWebSitePath)) throw new InvalidArgumentException("File $dbWebSitePath doesn't restored");
     }
     return 0;
 }

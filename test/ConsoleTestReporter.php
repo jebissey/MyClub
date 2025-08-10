@@ -1,13 +1,10 @@
 <?php
 
+use app\enums\Color;
+
 class ConsoleTestReporter implements TestReporterInterface
 {
-    private const COLOR_GREEN   = "\033[32m";
-    private const COLOR_YELLOW  = "\033[33m";
-    private const COLOR_MAGENTA = "\033[35m";
-    private const COLOR_RED     = "\033[31m";
-    private const COLOR_WHITE   = "\033[37m";
-    private const COLOR_RESET   = "\033[0m";
+
 
     public function displaySummary(TestSummary $summary): void
     {
@@ -16,7 +13,7 @@ class ConsoleTestReporter implements TestReporterInterface
         echo "\nRépartition par code de statut:\n";
         foreach ($summary->statusCodes as $code => $count) {
             $color = $this->getStatusColor($code);
-            echo sprintf("  %s%d%s: %d\n", $color, $code, self::COLOR_RESET, $count);
+            echo sprintf("  %s%d%s: %d\n", $color, $code, Color::Reset->value, $count);
         }
 
         if ($summary->hasDatabase) {
@@ -64,11 +61,11 @@ class ConsoleTestReporter implements TestReporterInterface
     private function getStatusColor(int $code): string
     {
         return match (true) {
-            $code >= 200 && $code < 300 => self::COLOR_GREEN,
-            $code >= 300 && $code < 400 => self::COLOR_YELLOW,
-            $code >= 400 && $code < 500 => self::COLOR_MAGENTA,
-            $code >= 500                 => self::COLOR_RED,
-            default                      => self::COLOR_WHITE
+            $code >= 200 && $code < 300 => Color::Green->value,
+            $code >= 300 && $code < 400 => Color::Yellow->value,
+            $code >= 400 && $code < 500 => Color::Magenta->value,
+            $code >= 500                => Color::Red->value,
+            default                     => Color::White->value,
         };
     }
 }
