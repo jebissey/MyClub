@@ -5,6 +5,7 @@ namespace app\apis;
 use Exception;
 use Throwable;
 
+use app\enums\ApplicationError;
 use app\helpers\Application;
 use app\helpers\Media;
 use app\models\ArticleDataHelper;
@@ -25,7 +26,11 @@ class ArticleApi extends AbstractApi
 
     public function deleteFile(string $year, string $month, string $filename)
     {
-        $this->renderJson($this->media->deleteFile($year, $month, $filename));
+        if ($this->connectedUser->get()->isRedactor() ?? false) {
+            if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
+                $this->renderJson($this->media->deleteFile($year, $month, $filename));
+            } else $this->renderJson(['success' => false, 'message' => 'Bad request method'], ApplicationError::MethodNotAllowed->value);
+        } else $this->renderJson(['success' => false, 'message' => 'User not allowed'], ApplicationError::Forbidden->value);
     }
 
     public function designVote()
@@ -34,8 +39,8 @@ class ArticleApi extends AbstractApi
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 (new DesignDataHelper($this->application))->insertOrUpdate(json_decode(file_get_contents('php://input'), true), $this->connectedUser->person->Id);
                 $this->renderJson(['success' => true]);
-            } else $this->renderJson(['success' => false, 'message' => 'Bad request method'], 470);
-        } else $this->renderJson(['success' => false, 'message' => 'User not allowed'], 403);
+            } else $this->renderJson(['success' => false, 'message' => 'Bad request method'], ApplicationError::MethodNotAllowed->value);
+        } else $this->renderJson(['success' => false, 'message' => 'User not allowed'], ApplicationError::Forbidden->value);
     }
 
     public function saveSurveyReply()
@@ -46,13 +51,13 @@ class ArticleApi extends AbstractApi
                 $data = json_decode($json, true);
                 $surveyId = $data['survey_id'] ?? null;
                 if (!$surveyId) {
-                    $this->renderJson(['success' => false, 'message' => 'Missing data'], 400);
+                    $this->renderJson(['success' => false, 'message' => 'Missing data'], ApplicationError::BadRequest->value);
                     return;
                 }
                 $this->replyDataHelper->insertOrUpdate($person->Id, $surveyId, isset($data['survey_answers']) ? json_encode($data['survey_answers']) : '[]');
                 $this->renderJson(['success' => true]);
-            } else $this->renderJson(['success' => false, 'message' => 'Bad request method'], 470);
-        } else $this->renderJson(['success' => false, 'message' => 'User not allowed'], 403);
+            } else $this->renderJson(['success' => false, 'message' => 'Bad request method'], ApplicationError::MethodNotAllowed->value);
+        } else $this->renderJson(['success' => false, 'message' => 'User not allowed'], ApplicationError::Forbidden->value);
     }
 
     public function showSurveyReplyForm($articleId)
@@ -81,8 +86,8 @@ class ArticleApi extends AbstractApi
                 } catch (Throwable $e) {
                     $this->renderJson(['success' => false, 'message' => $e->getMessage()]);
                 }
-            } else $this->renderJson(['success' => false, 'message' => 'Bad request method'], 470);
-        } else $this->renderJson(['success' => false, 'message' => 'User not found'], 403);
+            } else $this->renderJson(['success' => false, 'message' => 'Bad request method'], ApplicationError::MethodNotAllowed->value);
+        } else $this->renderJson(['success' => false, 'message' => 'User not found'], ApplicationError::Forbidden->value);
     }
 
     public function uploadFile()
@@ -102,12 +107,12 @@ class ArticleApi extends AbstractApi
                 return;
             }
             $this->renderJson($this->media->uploadFile($file));
-        } else $this->renderJson(['success' => false, 'message' => 'User not allowed'], 403);
+        } else $this->renderJson(['success' => false, 'message' => 'User not allowed'], ApplicationError::Forbidden->value);
     }
 
     public function getAuthor($articleId)
     {
-        if (!$articleId) $this->renderJson(['success' => false, 'message' => 'Unknown article'], 499);
+        if (!$articleId) $this->renderJson(['success' => false, 'message' => 'Unknown article'], ApplicationError::BadRequest->value);
         else {
             $result = (new ArticleDataHelper($this->application))->getAuthor($articleId);
             $this->renderJson(['author' => $result ? [$result] : []]);

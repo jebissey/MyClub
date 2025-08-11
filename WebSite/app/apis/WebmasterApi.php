@@ -4,6 +4,7 @@ namespace app\apis;
 
 use Throwable;
 
+use app\enums\ApplicationError;
 use app\helpers\Application;
 use app\models\LogDataHelper;
 use app\models\PageDataHelper;
@@ -27,9 +28,9 @@ class WebmasterApi extends AbstractApi
             try {
                 $this->renderJson(['success' => $this->personGroupDataHelper->add($personId, $groupId)]);
             } catch (Throwable $e) {
-                $this->renderJson(['error' => $e->getMessage()], 500);
+                $this->renderJson(['error' => $e->getMessage()], ApplicationError::Error->value);
             }
-        } else $this->renderJson(['success' => false, 'message' => 'User not allowed'], 403);
+        } else $this->renderJson(['success' => false, 'message' => 'User not allowed'], ApplicationError::Forbidden->value);
     }
 
     public function getPersonsInGroup(?int $id): void
@@ -40,10 +41,10 @@ class WebmasterApi extends AbstractApi
                     $users = $this->personDataHelper->getPersonsInGroup($id);
                     $this->renderJson($users);
                 } catch (Throwable $e) {
-                    $this->renderJson(['error' => $e->getMessage()], 500);
+                    $this->renderJson(['error' => $e->getMessage()], ApplicationError::Error->value);
                 }
-            } else $this->renderJson(['success' => false, 'message' => 'Bad request method'], 470);
-        } else $this->renderJson(['success' => false, 'message' => 'User not allowed'], 403);
+            } else $this->renderJson(['success' => false, 'message' => 'Bad request method'], ApplicationError::MethodNotAllowed->value);
+        } else $this->renderJson(['success' => false, 'message' => 'User not allowed'], ApplicationError::Forbidden->value);
     }
 
     public function lastVersion()
@@ -58,9 +59,9 @@ class WebmasterApi extends AbstractApi
             try {
                 $this->renderJson(['success' => $this->personGroupDataHelper->del($personId, $groupId)]);
             } catch (Throwable $e) {
-                $this->renderJson(['error' => $e->getMessage()], 500);
+                $this->renderJson(['error' => $e->getMessage()], ApplicationError::Error->value);
             }
-        } else $this->renderJson(['success' => false, 'message' => 'User not allowed'], 403);
+        } else $this->renderJson(['success' => false, 'message' => 'User not allowed'], ApplicationError::Forbidden->value);
     }
 
     #region Navbar
@@ -71,9 +72,9 @@ class WebmasterApi extends AbstractApi
                 $result = $this->pageDataHelper->del($id);
                 $this->renderJson(['success' => $result == 1]);
             } catch (Throwable $e) {
-                $this->renderJson(['error' => $e->getMessage()], 500);
+                $this->renderJson(['error' => $e->getMessage()], ApplicationError::Error->value);
             }
-        } else $this->renderJson(['success' => false, 'message' => 'User not allowed'], 403);
+        } else $this->renderJson(['success' => false, 'message' => 'User not allowed'], ApplicationError::Forbidden->value);
     }
 
     public function getNavbarItem($id)
@@ -82,9 +83,9 @@ class WebmasterApi extends AbstractApi
             try {
                 $this->renderJson(['success' => true, 'message' => $this->pageDataHelper->get_($id)]);
             } catch (Throwable $e) {
-                $this->renderJson(['error' => $e->getMessage()], 500);
+                $this->renderJson(['error' => $e->getMessage()], ApplicationError::Error->value);
             }
-        } else $this->renderJson(['success' => false, 'message' => 'User not allowed'], 403);
+        } else $this->renderJson(['success' => false, 'message' => 'User not allowed'], ApplicationError::Forbidden->value);
     }
 
     public function saveNavbarItem()
@@ -100,9 +101,9 @@ class WebmasterApi extends AbstractApi
                 $this->pageDataHelper->insertOrUpdate($data);
                 $this->renderJson(['success' => true]);
             } catch (Throwable $e) {
-                $this->renderJson(['error' => $e->getMessage()], 500);
+                $this->renderJson(['error' => $e->getMessage()], ApplicationError::Error->value);
             }
-        } else $this->renderJson(['success' => false, 'message' => 'User not allowed'], 403);
+        } else $this->renderJson(['success' => false, 'message' => 'User not allowed'], ApplicationError::Forbidden->value);
     }
 
     public function updateNavbarPositions()
@@ -113,8 +114,8 @@ class WebmasterApi extends AbstractApi
                 $this->pageDataHelper->updates($data['positions']);
                 $this->renderJson(['success' => true]);
             } catch (Throwable $e) {
-                $this->renderJson(['error' => $e->getMessage()], 500);
+                $this->renderJson(['error' => $e->getMessage()], ApplicationError::Error->value);
             }
-        } else $this->renderJson(['success' => false, 'message' => 'User not allowed'], 403);
+        } else $this->renderJson(['success' => false, 'message' => 'User not allowed'], ApplicationError::Forbidden->value);
     }
 }

@@ -98,7 +98,7 @@ class EventTypeController extends TableController implements CrudControllerInter
     public function delete($id)
     {
         if ($this->connectedUser->get()->isWebmaster() ?? false) {
-            if (($_SERVER['REQUEST_METHOD'] === 'GET')) {
+            if (($_SERVER['REQUEST_METHOD'] === 'DELETE')) {
                 $this->dataHelper->set('EventType', ['Inactivated' => 1], ['Id' => $id]);
 
                 $this->flight->redirect('/eventTypes');

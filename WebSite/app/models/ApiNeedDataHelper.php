@@ -3,6 +3,8 @@
 namespace app\models;
 
 use Throwable;
+
+use app\enums\ApplicationError;
 use app\helpers\Application;
 
 class ApiNeedDataHelper extends Data
@@ -25,7 +27,7 @@ class ApiNeedDataHelper extends Data
                 $this->delete('Need', ['Id' => $id]);
                 return [['success' => true], 200];
             } catch (Throwable $e) {
-                return [['success' => false, 'message' => 'Erreur lors de la suppression: ' . $e->getMessage()], 500];
+                return [['success' => false, 'message' => 'Erreur lors de la suppression: ' . $e->getMessage()], ApplicationError::Error->value];
             }
         }
     }
@@ -37,7 +39,7 @@ class ApiNeedDataHelper extends Data
             else $id = $this->set('Need', $needData);
             return [['success' => true, 'id' => $id], 200];
         } catch (Throwable $e) {
-            return [['success' => false, 'message' => 'Save error: ' . $e->getMessage()], 500];
+            return [['success' => false, 'message' => 'Save error: ' . $e->getMessage()], ApplicationError::Error->value];
         }
     }
 }

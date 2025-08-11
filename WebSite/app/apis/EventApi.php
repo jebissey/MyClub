@@ -5,6 +5,7 @@ namespace app\apis;
 use DateTime;
 use Throwable;
 
+use app\enums\ApplicationError;
 use app\enums\Period;
 use app\helpers\Application;
 use app\helpers\PersonPreferences;
@@ -49,7 +50,7 @@ class EventApi extends AbstractApi
             $json = file_get_contents('php://input');
             [$response, $statusCode] = $this->attributeDataHelper->insert(json_decode($json, true));
             $this->renderJson($response, $statusCode);
-        } else $this->renderJson(['success' => false, 'message' => 'User not allowed'], 403);
+        } else $this->renderJson(['success' => false, 'message' => 'User not allowed'], ApplicationError::Forbidden->value);
     }
 
     public function deleteAttribute($id)
@@ -57,19 +58,19 @@ class EventApi extends AbstractApi
         if ($this->connectedUser->get()->isWebmaster() ?? false) {
             [$response, $statusCode] = $this->attributeDataHelper->delete_($id);
             $this->renderJson($response, $statusCode);
-        } else $this->renderJson(['success' => false, 'message' => 'User not allowed'], 403);
+        } else $this->renderJson(['success' => false, 'message' => 'User not allowed'], ApplicationError::Forbidden->value);
     }
 
     public function getAttributes()
     {
         if ($this->connectedUser->get()->isWebmaster() ?? false) {
             $this->renderPartial('app/views/eventType/attributes-list.latte', ['attributes' => $this->dataHelper->gets('Attribute')]);
-        } else $this->renderJson(['success' => false, 'message' => 'User not allowed'], 403);
+        } else $this->renderJson(['success' => false, 'message' => 'User not allowed'], ApplicationError::Forbidden->value);
     }
 
     public function getAttributesByEventType($eventTypeId)
     {
-        if (!$eventTypeId) $this->renderJson(['success' => false, 'message' => 'Unknown event type'], 499);
+        if (!$eventTypeId) $this->renderJson(['success' => false, 'message' => 'Unknown event type'], ApplicationError::BadRequest->value);
         else $this->renderJson(['attributes' => $this->attributeDataHelper->getAttributesOf($eventTypeId)]);
     }
 
@@ -79,7 +80,7 @@ class EventApi extends AbstractApi
             $json = file_get_contents('php://input');
             [$response, $statusCode] = $this->attributeDataHelper->update(json_decode($json, true));
             $this->renderJson($response, $statusCode);
-        } else $this->renderJson(['success' => false, 'message' => 'User not allowed'], 403);
+        } else $this->renderJson(['success' => false, 'message' => 'User not allowed'], ApplicationError::Forbidden->value);
     }
     #endregion
 
@@ -89,7 +90,7 @@ class EventApi extends AbstractApi
         if ($this->connectedUser->get()->isEventManager() ?? false) {
             [$response, $statusCode] = $this->eventDataHelper->delete_($id, $this->connectedUser->person->Id);
             $this->renderJson($response, $statusCode);
-        } else $this->renderJson(['success' => false, 'message' => 'User not allowed'], 403);
+        } else $this->renderJson(['success' => false, 'message' => 'User not allowed'], ApplicationError::Forbidden->value);
     }
 
     public function duplicateEvent($id)
@@ -101,7 +102,7 @@ class EventApi extends AbstractApi
                 WebApp::getFiltered('mode', $this->application->enumToValues(Period::class), $_GET) ?: Period::Today->value
             );
             $this->renderJson($response, $statusCode);
-        } else $this->renderJson(['success' => false, 'message' => 'User not allowed'], 403);
+        } else $this->renderJson(['success' => false, 'message' => 'User not allowed'], ApplicationError::Forbidden->value);
     }
 
     public function getEvent($id): void
@@ -112,7 +113,7 @@ class EventApi extends AbstractApi
                 'event' => $this->eventDataHelper->getEvent($id),
                 'attributes' => $this->eventDataHelper->getEventAttributes($id),
             ]);
-        } else $this->renderJson(['success' => false, 'message' => 'User not allowed'], 403);
+        } else $this->renderJson(['success' => false, 'message' => 'User not allowed'], ApplicationError::Forbidden->value);
     }
 
     public function saveEvent(): void
@@ -120,7 +121,7 @@ class EventApi extends AbstractApi
         if ($this->connectedUser->get()->isEventManager() || false) {
             [$response, $statusCode] = (new ApiEventDataHelper($this->application))->update(json_decode(file_get_contents('php://input'), true), $this->connectedUser->person->Id);
             $this->renderJson($response, $statusCode);
-        } else $this->renderJson(['success' => false, 'message' => 'User not allowed'], 403);
+        } else $this->renderJson(['success' => false, 'message' => 'User not allowed'], ApplicationError::Forbidden->value);
     }
 
     public function sendEmails()
@@ -132,7 +133,7 @@ class EventApi extends AbstractApi
                 $eventId = $data['EventId'] ?? '';
                 $event = $this->eventDataHelper->getEvent($eventId);
                 if (!$event) {
-                    $this->renderJson(['success' => false, 'message' => "Unknown event ($eventId)"], 403);
+                    $this->renderJson(['success' => false, 'message' => "Unknown event ($eventId)"], ApplicationError::Forbidden->value);
                     return;
                 }
                 $emailTitle = $data['Title'] ?? '';
@@ -149,7 +150,7 @@ class EventApi extends AbstractApi
                         $this->personPreferences->getPeriodOfDay($event->StartTime)
                     );
                 } else {
-                    $this->renderJson(['success' => false, 'message' => "Invalid recipients ($recipients)"], 404);
+                    $this->renderJson(['success' => false, 'message' => "Invalid recipients ($recipients)"], ApplicationError::BadRequest->value);
                     return;
                 }
                 if ($participants) {
@@ -158,7 +159,7 @@ class EventApi extends AbstractApi
                     $unsubscribeLink = $root . '/user/preferences';
                     $eventCreatorEmail = $this->dataHelper->get('Person', ['Id' => $event->CreatedBy], 'Email')->Email;
                     if (!$eventCreatorEmail) {
-                        $this->renderJson(['success' => false, 'message' => 'Invalid Email in file ' + __FILE__ + ' at line ' + __LINE__], 404);
+                        $this->renderJson(['success' => false, 'message' => 'Invalid Email in file ' + __FILE__ + ' at line ' + __LINE__], ApplicationError::BadRequest->value);
                         return;
                     }
                     $ccList = $this->messageDataHelper->addWebAppMessages($eventId, $participants, $emailTitle . "\n\n" . $message);
@@ -172,9 +173,9 @@ class EventApi extends AbstractApi
                         false
                     );
                     $this->renderJson(['success' => $result]);
-                } else $this->renderJson(['success' => false, 'message' => 'No participant'], 404);
+                } else $this->renderJson(['success' => false, 'message' => 'No participant'], ApplicationError::BadRequest->value);
             } else $this->renderJson(['success' => false, 'message' =>  'Method ' + $_SERVER['REQUEST_METHOD'] + ' invalid in file ' + __FILE__ + ' at line ' + __LINE__]);
-        } else $this->renderJson(['success' => false, 'message' => 'User not allowed'], 403);
+        } else $this->renderJson(['success' => false, 'message' => 'User not allowed'], ApplicationError::Forbidden->value);
     }
     #endregion
 
@@ -185,8 +186,8 @@ class EventApi extends AbstractApi
             if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
                 [$response, $statusCode] = $this->renderJson($this->apiNeedDataHelper->delete_($id));
                 $this->renderJson($response, $statusCode);
-            } else $this->renderJson(['success' => false, 'message' => 'Bad request method'], 470);
-        } else $this->renderJson(['success' => false, 'message' => 'User not allowed'], 403);
+            } else $this->renderJson(['success' => false, 'message' => 'Bad request method'], ApplicationError::MethodNotAllowed->value);
+        } else $this->renderJson(['success' => false, 'message' => 'User not allowed'], ApplicationError::Forbidden->value);
     }
 
     public function saveNeed()
@@ -200,15 +201,15 @@ class EventApi extends AbstractApi
                 $participantDependent = isset($data['participantDependent']) ? intval($data['participantDependent']) : 0;
                 $idNeedType = $data['idNeedType'] ?? null;
                 if (empty($label)) {
-                    $this->renderJson(['success' => false, 'message' => 'Missing parameter label'], 472);
+                    $this->renderJson(['success' => false, 'message' => 'Missing parameter label'], ApplicationError::BadRequest->value);
                     return;
                 }
                 if (empty($name)) {
-                    $this->renderJson(['success' => false, 'message' => 'Missing parameter name'], 472);
+                    $this->renderJson(['success' => false, 'message' => 'Missing parameter name'], ApplicationError::BadRequest->value);
                     return;
                 }
                 if (!$idNeedType) {
-                    $this->renderJson(['success' => false, 'message' => 'Missing parameter idNeedType'], 472);
+                    $this->renderJson(['success' => false, 'message' => 'Missing parameter idNeedType'], ApplicationError::BadRequest->value);
                     return;
                 }
                 $needData = [
@@ -219,8 +220,8 @@ class EventApi extends AbstractApi
                 ];
                 [$response, $statusCode] = $this->renderJson($this->apiNeedDataHelper->insertOrUpdate($id, $needData));
                 $this->renderJson($response, $statusCode);
-            } else $this->renderJson(['success' => false, 'message' => 'Bad request method'], 470);
-        } else $this->renderJson(['success' => false, 'message' => 'User not allowed'], 403);
+            } else $this->renderJson(['success' => false, 'message' => 'Bad request method'], ApplicationError::MethodNotAllowed->value);
+        } else $this->renderJson(['success' => false, 'message' => 'User not allowed'], ApplicationError::Forbidden->value);
     }
 
     public function getEventNeeds($eventId)
@@ -240,7 +241,7 @@ class EventApi extends AbstractApi
         if ($this->connectedUser->get()->isWebmaster() || false) {
             if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
                 if (!$id) {
-                    $this->renderJson(['success' => false, 'message' => 'Missing Id parameter'], 472);
+                    $this->renderJson(['success' => false, 'message' => 'Missing Id parameter'], ApplicationError::BadRequest->value);
                 } else {
                     $countNeeds = $this->apiNeedDataHelper->countForNeedType($id);
                     if ($countNeeds > 0) {
@@ -250,8 +251,8 @@ class EventApi extends AbstractApi
                         ], 409);
                     }
                 }
-            } else $this->renderJson(['success' => false, 'message' => 'Bad request method'], 470);
-        } else $this->renderJson(['success' => false, 'message' => 'User not allowed'], 403);
+            } else $this->renderJson(['success' => false, 'message' => 'Bad request method'], ApplicationError::MethodNotAllowed->value);
+        } else $this->renderJson(['success' => false, 'message' => 'User not allowed'], ApplicationError::Forbidden->value);
     }
 
     public function saveNeedType()
@@ -260,13 +261,13 @@ class EventApi extends AbstractApi
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $data = json_decode(file_get_contents('php://input'), true);
                 $name = $data['name'] ?? '';
-                if (empty($name)) $this->renderJson(['success' => false, 'message' => "Missing parameter name ='$name'"], 472);
+                if (empty($name)) $this->renderJson(['success' => false, 'message' => "Missing parameter name ='$name'"], ApplicationError::BadRequest->value);
                 else {
                     [$response, $statusCode] = $this->renderJson($this->apiNeedTypeDataHelper->insertOrUpdate($data['id'] ?? '', $name));
                     $this->renderJson($response, $statusCode);
                 }
-            } else $this->renderJson(['success' => false, 'message' => 'Bad request method'], 470);
-        } else $this->renderJson(['success' => false, 'message' => 'User not allowed'], 403);
+            } else $this->renderJson(['success' => false, 'message' => 'Bad request method'], ApplicationError::MethodNotAllowed->value);
+        } else $this->renderJson(['success' => false, 'message' => 'User not allowed'], ApplicationError::Forbidden->value);
     }
     #endregion
 
@@ -278,11 +279,11 @@ class EventApi extends AbstractApi
             $data = json_decode($json, true);
 
             if (!isset($data['eventId']) || !isset($data['text'])) {
-                $this->renderJson(['success' => false, 'message' => 'Données manquantes'], 400);
+                $this->renderJson(['success' => false, 'message' => 'Données manquantes'], ApplicationError::BadRequest->value);
                 return;
             }
             if (!$this->eventDataHelper->isUserRegistered($data['eventId'], $person->Email)) {
-                $this->renderJson(['success' => false, 'message' => 'User not allowed'], 403);
+                $this->renderJson(['success' => false, 'message' => 'User not allowed'], ApplicationError::Forbidden->value);
                 return;
             }
             try {
@@ -298,9 +299,9 @@ class EventApi extends AbstractApi
                 }
                 $this->renderJson(['success' => true, 'message' => 'Message ajouté', 'data' => $newMessage]);
             } catch (Throwable $e) {
-                $this->renderJson(['success' => false, 'message' => $e->getMessage()], 500);
+                $this->renderJson(['success' => false, 'message' => $e->getMessage()], ApplicationError::Error->value);
             }
-        } else $this->renderJson(['success' => false, 'message' => 'User not allowed'], 403);
+        } else $this->renderJson(['success' => false, 'message' => 'User not allowed'], ApplicationError::Forbidden->value);
     }
 
     public function updateMessage()
@@ -310,7 +311,7 @@ class EventApi extends AbstractApi
             $data = json_decode($json, true);
 
             if (!isset($data['messageId']) || !isset($data['text'])) {
-                $this->renderJson(['success' => false, 'message' => 'Données manquantes'], 400);
+                $this->renderJson(['success' => false, 'message' => 'Données manquantes'], ApplicationError::BadRequest->value);
                 return;
             }
             try {
@@ -325,9 +326,9 @@ class EventApi extends AbstractApi
                     ]
                 ]);
             } catch (Throwable $e) {
-                $this->renderJson(['success' => false, 'message' => $e->getMessage()], 500);
+                $this->renderJson(['success' => false, 'message' => $e->getMessage()], ApplicationError::Error->value);
             }
-        } else $this->renderJson(['success' => false, 'message' => 'User not allowed'], 403);
+        } else $this->renderJson(['success' => false, 'message' => 'User not allowed'], ApplicationError::Forbidden->value);
     }
 
     public function deleteMessage()
@@ -335,12 +336,10 @@ class EventApi extends AbstractApi
         if ($person = $this->connectedUser->get()->person ?? false) {
             $json = file_get_contents('php://input');
             $data = json_decode($json, true);
-
             if (!isset($data['messageId'])) {
-                $this->renderJson(['success' => false, 'message' => 'ID de message manquant'], 400);
+                $this->renderJson(['success' => false, 'message' => 'ID de message manquant'], ApplicationError::BadRequest->value);
                 return;
             }
-
             try {
                 $this->messageDataHelper->deleteMessage($data['messageId'], $person->Id);
 
@@ -352,21 +351,21 @@ class EventApi extends AbstractApi
                     ]
                 ]);
             } catch (Throwable $e) {
-                $this->renderJson(['success' => false, 'message' => $e->getMessage()], 500);
+                $this->renderJson(['success' => false, 'message' => $e->getMessage()], ApplicationError::Error->value);
             }
-        } else $this->renderJson(['success' => false, 'message' => 'User not allowed'], 403);
+        } else $this->renderJson(['success' => false, 'message' => 'User not allowed'], ApplicationError::Forbidden->value);
     }
     #endregion
 
     public function updateSupply(): void
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            $this->renderJson(['success' => false, 'message' => 'Méthode non autorisée'], 405);
+            $this->renderJson(['success' => false, 'message' => 'Méthode non autorisée'], ApplicationError::Forbidden->value);
             return;
         }
         $userEmail = $this->connectedUser->get()->person->Email ?? '';
         if ($userEmail === '') {
-            $this->renderJson(['success' => false, 'message' => 'Non authentifié'], 401);
+            $this->renderJson(['success' => false, 'message' => 'Non authentifié'], ApplicationError::Unauthorized->value);
             return;
         }
 
@@ -376,12 +375,12 @@ class EventApi extends AbstractApi
         $supply = intval($input['supply'] ?? 0);
 
         if (!$eventId || !$needId || $supply < 0) {
-            $this->renderJson(['success' => false, 'message' => "Invalid parameters (eventId=eventId, needId=$needId, supply=$supply)"], 400);
+            $this->renderJson(['success' => false, 'message' => "Invalid parameters (eventId=eventId, needId=$needId, supply=$supply)"], ApplicationError::BadRequest->value);
             return;
         }
 
         if (!$this->eventDataHelper->isUserRegistered($eventId, $userEmail)) {
-            $this->renderJson(['success' => false, 'message' => 'Non inscrit à cet événement'], 403);
+            $this->renderJson(['success' => false, 'message' => 'Non inscrit à cet événement'], ApplicationError::Forbidden->value);
             return;
         }
 
@@ -406,6 +405,6 @@ class EventApi extends AbstractApi
                 'message' => 'Apport mis à jour avec succès',
                 'updatedNeed' => $updatedNeed
             ]);
-        } else $this->renderJson(['success' => false, 'message' => 'Erreur lors de la mise à jour'], 500);
+        } else $this->renderJson(['success' => false, 'message' => 'Erreur lors de la mise à jour'], ApplicationError::BadRequest->value);
     }
 }

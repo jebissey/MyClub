@@ -120,7 +120,7 @@ class PersonController extends TableController implements CrudControllerInterfac
     public function delete($id)
     {
         if (($this->connectedUser->get()->isPersonManager() ?? false) || $this->connectedUser->isWebmaster() ?? false) {
-            if (($_SERVER['REQUEST_METHOD'] === 'GET')) {
+            if (($_SERVER['REQUEST_METHOD'] === 'DELETE')) {
                 $this->dataHelper->set('Person', ['Inactivated' => 1], ['Id' => $id]);
                 $this->flight->redirect('/persons');
             } else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);

@@ -2,6 +2,7 @@
 
 namespace app\services;
 
+use app\enums\ApplicationError;
 use app\enums\FilterInputRule;
 use app\exceptions\AuthenticationException;
 use app\helpers\Application;
@@ -45,20 +46,20 @@ class AuthenticationService
         try {
             $person = $this->findPersonByEmail($email);
             if (!$person) {
-                $this->logHelper->add(401, "Sign in failed: unknown email $email");
+                $this->logHelper->add(ApplicationError::Unauthorized->value, "Sign in failed: unknown email $email");
                 return AuthResult::error('Invalid credentials');
             }
             if ($person->Inactivated == 1) {
-                $this->logHelper->add(401, "Sign in failed: inactivated user $email");
+                $this->logHelper->add(ApplicationError::Unauthorized->value, "Sign in failed: inactivated user $email");
                 return AuthResult::error('Account is inactive');
             }
             if (!$this->verifyPassword($password, $person->Password)) {
-                $this->logHelper->add(401, "Sign in failed: wrong password for $email");
+                $this->logHelper->add(ApplicationError::Unauthorized->value, "Sign in failed: wrong password for $email");
                 return AuthResult::error('Invalid credentials');
             }
             return $this->loginUser($person, $rememberMe);
         } catch (\Exception $e) {
-            $this->logHelper->add(500, "Sign in error: " . $e->getMessage());
+            $this->logHelper->add(ApplicationError::Error->value, "Sign in error: " . $e->getMessage());
             return AuthResult::error('Authentication system error');
         }
     }

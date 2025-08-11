@@ -5,6 +5,7 @@ namespace app\models;
 use RuntimeException;
 use Throwable;
 
+use app\enums\ApplicationError;
 use app\enums\EventAudience;
 use app\helpers\Application;
 
@@ -51,7 +52,7 @@ class ApiEventDataHelper extends Data
                 'success' => false,
                 'message' => 'Erreur lors de l\'insertion en base de données',
                 'error'   => $e->getMessage()
-            ], 500];
+            ], ApplicationError::Error->value];
         }
     }
 

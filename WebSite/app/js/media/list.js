@@ -39,7 +39,7 @@ deleteBtns.forEach(btn => {
             const file = pathParts[2];
 
             fetch(`/api/media/delete/${year}/${month}/${file}`, {
-                method: 'POST'
+                method: 'DELETE'
             })
                 .then(response => response.json())
                 .then(data => {

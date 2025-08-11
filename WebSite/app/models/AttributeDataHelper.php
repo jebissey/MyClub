@@ -4,6 +4,7 @@ namespace app\models;
 
 use Throwable;
 
+use app\enums\ApplicationError;
 use app\helpers\Application;
 
 class AttributeDataHelper extends Data
@@ -23,7 +24,7 @@ class AttributeDataHelper extends Data
             return [['success' => true], 200];
         } catch (Throwable $e) {
             $this->pdo->rollBack();
-            return [['success' => false, 'message' => $e->getMessage()], 500];
+            return [['success' => false, 'message' => $e->getMessage()], ApplicationError::Error->value];
         }
     }
 
@@ -40,7 +41,7 @@ class AttributeDataHelper extends Data
             return [['success' => true], 200];
         } catch (Throwable $e) {
             $this->pdo->rollBack();
-            return [['success' => false, 'message' => $e->getMessage()], 500];
+            return [['success' => false, 'message' => $e->getMessage()], ApplicationError::Error->value];
         }
     }
 
@@ -72,7 +73,7 @@ class AttributeDataHelper extends Data
             return ['success' => true];
         } catch (Throwable $e) {
             $this->pdo->rollBack();
-            return [['success' => false, 'message' => $e->getMessage()], 500];
+            return [['success' => false, 'message' => $e->getMessage()], ApplicationError::Error->value];
         }
     }
 }

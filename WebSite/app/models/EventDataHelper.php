@@ -8,6 +8,7 @@ use PDO;
 use RuntimeException;
 use Throwable;
 
+use app\enums\ApplicationError;
 use app\enums\EventAudience;
 use app\enums\EventSearchMode;
 use app\helpers\Application;
@@ -29,7 +30,7 @@ class EventDataHelper extends Data implements NewsProviderInterface
     public function delete_($id, $personId)
     {
         if (!$this->fluent->from('Event')->where('Id', $id)->where('CreatedBy', $personId)->fetch()) {
-            return [['success' => false, 'message' => 'User not allowed'], 403];
+            return [['success' => false, 'message' => 'User not allowed'], ApplicationError::Forbidden->value];
         }
         try {
             $this->pdo->beginTransaction();
@@ -45,7 +46,7 @@ class EventDataHelper extends Data implements NewsProviderInterface
                 'success' => false,
                 'message' => 'Erreur lors de la suppression en base de données',
                 'error' => $e->getMessage()
-            ], 500];
+            ], ApplicationError::Error->value];
         }
     }
 
@@ -83,7 +84,7 @@ class EventDataHelper extends Data implements NewsProviderInterface
             return ['success' => true, 'newEventId' => $newEventId];
         } catch (Throwable $e) {
             $this->pdo->rollBack();
-            return [['success' => false, 'message' => 'Erreur serveur : ' . $e->getMessage()], 500];
+            return [['success' => false, 'message' => 'Erreur serveur : ' . $e->getMessage()], ApplicationError::Error->value];
         }
     }
 

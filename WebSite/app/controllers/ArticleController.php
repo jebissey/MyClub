@@ -235,7 +235,7 @@ class ArticleController extends TableController
     public function delete(int $id)
     {
         if ($this->connectedUser->get()->isRedactor() || false) {
-            if (($_SERVER['REQUEST_METHOD'] === 'GET')) {
+            if (($_SERVER['REQUEST_METHOD'] === 'DELETE')) {
                 $article = $this->articleDataHelper->getLatestArticle([$id]);
                 if (!$article || $this->connectedUser->person->Id != $article->CreatedBy) {
                     $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);

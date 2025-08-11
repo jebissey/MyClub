@@ -4,6 +4,7 @@ namespace app\models;
 
 use Throwable;
 
+use app\enums\ApplicationError;
 use app\helpers\Application;
 
 class ApiNeedTypeDataHelper extends Data
@@ -19,7 +20,7 @@ class ApiNeedTypeDataHelper extends Data
             $this->delete('NeedType', ['Id' => $id]);
             return [['success' => true], 200];
         } catch (Throwable $e) {
-            return [['success' => false, 'message' => 'Erreur lors de la suppression: ' . $e->getMessage()], 500];
+            return [['success' => false, 'message' => 'Erreur lors de la suppression: ' . $e->getMessage()], ApplicationError::Error->value];
         }
     }
 
@@ -30,7 +31,7 @@ class ApiNeedTypeDataHelper extends Data
             else $id = $this->set('NeedType', ['Name' => $name]);
             return [['success' => true, 'id' => $id], 200];
         } catch (Throwable $e) {
-            return [['success' => 'false', 'message' => 'Erreur lors de l\'enregistrement: ' . $e->getMessage(), 500]];
+            return [['success' => 'false', 'message' => 'Erreur lors de l\'enregistrement: ' . $e->getMessage(), ApplicationError::Error->value]];
         }
     }
 
