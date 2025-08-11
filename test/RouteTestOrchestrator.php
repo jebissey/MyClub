@@ -22,7 +22,7 @@ class RouteTestOrchestrator
     {
         $routes = $this->routeExtractor->extractRoutes($routeFilePath);
         $totalRoutes = count($routes);
-        echo "Trouvé $totalRoutes routes.\n";
+        echo "Found $totalRoutes routes.\n";
         echo str_repeat('-', 80) . "\n";
 
         $results = [];
@@ -36,7 +36,7 @@ class RouteTestOrchestrator
                     $route->method,
                     $route->originalPath
                 );
-                $testResults = $this->testRoute($route);
+                $testResults = $this->testRoute($route, $routeNumber);
                 $results = array_merge($results, $testResults);
                 if (count($testResults) === 0) {
                     echo " -> " . Color::Red->value . "ERREUR: Aucune donnée de test valide" . Color::Reset->value . "\n";
@@ -68,18 +68,19 @@ class RouteTestOrchestrator
         return $results;
     }
 
-    private function testRoute(Route $route): array
+    private function testRoute(Route $route, int $routeNumber): array
     {
         if ($route->hasParameters && $this->testDataRepository) {
-            return $this->testRouteWithData($route);
+            return $this->testRouteWithData($route, $routeNumber);
         }
         return [$this->testSimpleRoute($route)];
     }
 
-    private function testRouteWithData(Route $route): array
+    private function testRouteWithData(Route $route, int $routeNumber): array
     {
         $testData = $this->testDataRepository->getTestDataForRoute([
-            'original_path' => $route->originalPath
+            'original_path' => $route->originalPath,
+            'method' => $route->method
         ]);
         if (empty($testData)) {
             $this->parameterErrors[] = "URI : {$route->originalPath}";
@@ -113,7 +114,7 @@ class RouteTestOrchestrator
                 $test['ExpectedResponseCode']
             );
             if (!$validationResult->isValid) {
-                $this->responseErrors[] = "Unexpected response for test {$test['Method']} {$test['Uri']} with {$test['JsonGetParameters']}, expected : {$test['ExpectedResponseCode']}, received : {$response->httpCode}";
+                $this->responseErrors[] = "Unexpected response for test {$routeNumber}: {$test['Method']} {$test['Uri']} with {$test['JsonGetParameters']}, expected : {$test['ExpectedResponseCode']}, received : {$response->httpCode}";
             }
             $results[] = new TestResult(
                 route: $route,

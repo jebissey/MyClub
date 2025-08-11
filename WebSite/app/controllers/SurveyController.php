@@ -76,9 +76,11 @@ class SurveyController extends AbstractController
 
     public function viewResults($articleId)
     {
-        if ($connectedUser = $this->connectedUser->get()) {
+        $connectedUser = $this->connectedUser->get();
+        if ($connectedUser->person != null) {
             $survey = (new SurveyDataHelper($this->application))->getWithCreator($articleId);
             if (!$survey) {
+                $this->application->getErrorManager()->raise(ApplicationError::BadRequest, "No survey for article {$articleId} in file " . __FILE__ . ' at line ' . __LINE__);
                 $this->flight->redirect('/articles/' . $articleId);
                 return;
             }
@@ -111,6 +113,6 @@ class SurveyController extends AbstractController
                     'currentVersion' => Application::VERSION
                 ]);
             } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
-        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::Unauthorized, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 }

@@ -97,7 +97,7 @@ $flight->route('GET  /events/@id:[0-9]+/register', function ($id) use ($eventCon
 $flight->route('GET  /events/@id:[0-9]+/unregister', function ($id) use ($eventController) {
     $eventController->register($id, false);
 });
-$flight->route('GET  /events/@id/@token:[a-f0-9]+', function ($id, $token) use ($eventController) {
+$flight->route('GET  /events/@id:[0-9]+/@token:[a-f0-9]+', function ($id, $token) use ($eventController) {
     $eventController->register($id, true, $token);
 });
 mapRoute($flight, 'GET  /event/location', $eventController, 'location');
