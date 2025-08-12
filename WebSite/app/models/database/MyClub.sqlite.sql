@@ -337,4 +337,10 @@ INSERT INTO "PersonGroup" VALUES (1,1,1);
 INSERT INTO "Settings" VALUES (1,'Title','title');
 INSERT INTO "Settings" VALUES (2,'LegalNotices','LegalNotices');
 INSERT INTO "Settings" VALUES (3,'SpotlightArticle','');
+INSERT INTO "Settings" VALUES (4,'Greatings','<h1 class="text-center">🚧🔧🛠️ Under Construction 🛠️🔧🚧</h1>');
+INSERT INTO "Settings" VALUES (5,'Link','<div style="text-align:center; font-size:2.4em; line-height:1.4;">
+🚧👷‍♂️🔧👷‍♀️🚧<br>
+<b>WORK IN PROGRESS</b><br>
+🚧👷‍♀️🔧👷‍♂️🚧
+</div>');
 COMMIT;

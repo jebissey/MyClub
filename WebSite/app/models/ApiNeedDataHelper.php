@@ -25,7 +25,7 @@ class ApiNeedDataHelper extends Data
         else {
             try {
                 $this->delete('Need', ['Id' => $id]);
-                return [['success' => true], 200];
+                return [['success' => true], ApplicationError::Ok->value];
             } catch (Throwable $e) {
                 return [['success' => false, 'message' => 'Erreur lors de la suppression: ' . $e->getMessage()], ApplicationError::Error->value];
             }
@@ -37,7 +37,7 @@ class ApiNeedDataHelper extends Data
         try {
             if ($id) $this->set('Need', $needData, ['Id' => $id]);
             else $id = $this->set('Need', $needData);
-            return [['success' => true, 'id' => $id], 200];
+            return [['success' => true, 'id' => $id], ApplicationError::Ok->value];
         } catch (Throwable $e) {
             return [['success' => false, 'message' => 'Save error: ' . $e->getMessage()], ApplicationError::Error->value];
         }

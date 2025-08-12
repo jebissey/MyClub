@@ -2,409 +2,282 @@
 
 namespace app\apis;
 
-use DateTime;
+use InvalidArgumentException;
 use Throwable;
 
 use app\enums\ApplicationError;
 use app\enums\Period;
 use app\helpers\Application;
-use app\helpers\PersonPreferences;
 use app\helpers\WebApp;
+use app\interfaces\AttributeServiceInterface;
+use app\interfaces\AuthorizationServiceInterface;
+use app\interfaces\EventServiceInterface;
+use app\interfaces\MessageServiceInterface;
+use app\interfaces\SupplyServiceInterface;
 use app\models\ApiEventDataHelper;
-use app\models\ApiNeedDataHelper;
-use app\models\ApiNeedTypeDataHelper;
-use app\models\AttributeDataHelper;
 use app\models\EventDataHelper;
-use app\models\EventNeedHelper;
-use app\models\MessageDataHelper;
-use app\models\ParticipantDataHelper;
-use app\models\PersonDataHelper;
-use app\services\EmailService;
 
 class EventApi extends AbstractApi
 {
-    private ApiNeedDataHelper $apiNeedDataHelper;
-    private ApiNeedTypeDataHelper $apiNeedTypeDataHelper;
-    private AttributeDataHelper $attributeDataHelper;
+    private ApiEventDataHelper $apiEventDataHelper;
+    private AuthorizationServiceInterface $authService;
+    private AttributeServiceInterface $attributeService;
     private EventDataHelper $eventDataHelper;
-    private EventNeedHelper $eventNeedHelper;
-    private MessageDataHelper $messageDataHelper;
-    private $personPreferences;
+    private EventServiceInterface $eventService;
+    private MessageServiceInterface $messageService;
+    private SupplyServiceInterface $supplyService;
 
-    public function __construct(Application $application)
-    {
+    public function __construct(
+        ApiEventDataHelper $apiEventDataHelper,
+        Application $application,
+        AuthorizationServiceInterface $authService,
+        AttributeServiceInterface $attributeService,
+        EventDataHelper $eventDataHelper,
+        EventServiceInterface $eventService,
+        MessageServiceInterface $messageService,
+        SupplyServiceInterface $supplyService,
+    ) {
         parent::__construct($application);
-        $this->apiNeedDataHelper = new ApiNeedDataHelper($application);
-        $this->apiNeedTypeDataHelper = new ApiNeedTypeDataHelper($application);
-        $this->attributeDataHelper = new AttributeDataHelper($application);
-        $this->eventDataHelper = new EventDataHelper($application);
-        $this->eventNeedHelper = new EventNeedHelper($application);
-        $this->messageDataHelper = new MessageDataHelper($application);
-        $this->personPreferences = new PersonPreferences($application);
+        $this->apiEventDataHelper = $apiEventDataHelper;
+        $this->authService = $authService;
+        $this->attributeService = $attributeService;
+        $this->eventDataHelper = $eventDataHelper;
+        $this->eventService = $eventService;
+        $this->messageService = $messageService;
+        $this->supplyService = $supplyService;
     }
 
-    #region Attribute
-    public function createAttribute()
+    // region Attribute
+    public function createAttribute(): void
     {
-        if ($this->connectedUser->get()->isWebmaster() ?? false) {
-            $json = file_get_contents('php://input');
-            [$response, $statusCode] = $this->attributeDataHelper->insert(json_decode($json, true));
+        if (!$this->authService->isWebmaster()) {
+            $this->renderUnauthorized();
+            return;
+        }
+        try {
+            $data = $this->getJsonInput();
+            [$response, $statusCode] = $this->attributeService->createAttribute($data);
             $this->renderJson($response, $statusCode);
-        } else $this->renderJson(['success' => false, 'message' => 'User not allowed'], ApplicationError::Forbidden->value);
+        } catch (Throwable $e) {
+            $this->renderError($e->getMessage());
+        }
     }
 
-    public function deleteAttribute($id)
+    public function deleteAttribute(int $id): void
     {
-        if ($this->connectedUser->get()->isWebmaster() ?? false) {
-            [$response, $statusCode] = $this->attributeDataHelper->delete_($id);
+        if (!$this->authService->isWebmaster()) {
+            $this->renderUnauthorized();
+            return;
+        }
+
+        try {
+            [$response, $statusCode] = $this->attributeService->deleteAttribute($id);
             $this->renderJson($response, $statusCode);
-        } else $this->renderJson(['success' => false, 'message' => 'User not allowed'], ApplicationError::Forbidden->value);
+        } catch (Throwable $e) {
+            $this->renderError($e->getMessage());
+        }
     }
 
-    public function getAttributes()
+    public function getAttributesByEventType(int $eventTypeId): void
     {
-        if ($this->connectedUser->get()->isWebmaster() ?? false) {
-            $this->renderPartial('app/views/eventType/attributes-list.latte', ['attributes' => $this->dataHelper->gets('Attribute')]);
-        } else $this->renderJson(['success' => false, 'message' => 'User not allowed'], ApplicationError::Forbidden->value);
+        if (!$eventTypeId) {
+            $this->renderJson(['success' => false, 'message' => 'Unknown event type'], ApplicationError::BadRequest->value);
+            return;
+        }
+        try {
+            $response = $this->attributeService->getAttributesByEventType($eventTypeId);
+            $this->renderJson($response);
+        } catch (Throwable $e) {
+            $this->renderError($e->getMessage());
+        }
     }
 
-    public function getAttributesByEventType($eventTypeId)
+    public function updateAttribute(): void
     {
-        if (!$eventTypeId) $this->renderJson(['success' => false, 'message' => 'Unknown event type'], ApplicationError::BadRequest->value);
-        else $this->renderJson(['attributes' => $this->attributeDataHelper->getAttributesOf($eventTypeId)]);
-    }
+        if (!$this->authService->isWebmaster()) {
+            $this->renderUnauthorized();
+            return;
+        }
 
-    public function updateAttribute()
-    {
-        if ($this->connectedUser->get()->isWebmaster() ?? false) {
-            $json = file_get_contents('php://input');
-            [$response, $statusCode] = $this->attributeDataHelper->update(json_decode($json, true));
+        try {
+            $data = $this->getJsonInput();
+            [$response, $statusCode] = $this->attributeService->updateAttribute($data);
             $this->renderJson($response, $statusCode);
-        } else $this->renderJson(['success' => false, 'message' => 'User not allowed'], ApplicationError::Forbidden->value);
+        } catch (Throwable $e) {
+            $this->renderError($e->getMessage());
+        }
     }
-    #endregion
 
     #region Event
-    public function deleteEvent($id): void
+    public function deleteEvent(int $id): void
     {
-        if ($this->connectedUser->get()->isEventManager() ?? false) {
-            [$response, $statusCode] = $this->eventDataHelper->delete_($id, $this->connectedUser->person->Id);
+        if (!$this->authService->isEventManager()) {
+            $this->renderUnauthorized();
+            return;
+        }
+        try {
+            [$response, $statusCode] = $this->eventService->deleteEvent($id, $this->authService->getUserId());
             $this->renderJson($response, $statusCode);
-        } else $this->renderJson(['success' => false, 'message' => 'User not allowed'], ApplicationError::Forbidden->value);
+        } catch (Throwable $e) {
+            $this->renderError($e->getMessage());
+        }
     }
 
-    public function duplicateEvent($id)
+    public function duplicateEvent($id): void
     {
-        if ($this->connectedUser->get()->isEventManager() || false) {
-            [$response, $statusCode] = $this->eventDataHelper->duplicate(
+        if (!$this->authService->isEventManager()) {
+            $this->renderUnauthorized();
+            return;
+        }
+        try {
+            [$response, $statusCode] = $this->eventService->duplicateEvent(
                 $id,
                 $this->connectedUser->person->Id,
                 WebApp::getFiltered('mode', $this->application->enumToValues(Period::class), $_GET) ?: Period::Today->value
             );
             $this->renderJson($response, $statusCode);
-        } else $this->renderJson(['success' => false, 'message' => 'User not allowed'], ApplicationError::Forbidden->value);
+        } catch (Throwable $e) {
+            $this->renderError($e->getMessage());
+        }
     }
 
     public function getEvent($id): void
     {
-        if ($this->connectedUser->get()->isEventManager() || false) {
-            $this->renderJson([
-                'success' => true,
-                'event' => $this->eventDataHelper->getEvent($id),
-                'attributes' => $this->eventDataHelper->getEventAttributes($id),
-            ]);
-        } else $this->renderJson(['success' => false, 'message' => 'User not allowed'], ApplicationError::Forbidden->value);
+        if (!$this->authService->isEventManager()) {
+            $this->renderUnauthorized();
+            return;
+        }
+        try {
+            $this->renderJson($this->eventService->getEvent($id));
+        } catch (Throwable $e) {
+            $this->renderError($e->getMessage());
+        }
     }
 
     public function saveEvent(): void
     {
-        if ($this->connectedUser->get()->isEventManager() || false) {
-            [$response, $statusCode] = (new ApiEventDataHelper($this->application))->update(json_decode(file_get_contents('php://input'), true), $this->connectedUser->person->Id);
+        if (!$this->authService->isEventManager()) {
+            $this->renderUnauthorized();
+            return;
+        }
+        try {
+            $data = $this->getJsonInput();
+            [$response, $statusCode] = $this->apiEventDataHelper->update($data, $this->authService->getUserId());
             $this->renderJson($response, $statusCode);
-        } else $this->renderJson(['success' => false, 'message' => 'User not allowed'], ApplicationError::Forbidden->value);
+        } catch (Throwable $e) {
+            $this->renderError($e->getMessage());
+        }
     }
-
-    public function sendEmails()
-    {
-        if ($this->connectedUser->get()->isEventManager() || false) {
-            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-                $json = file_get_contents('php://input');
-                $data = json_decode($json, true);
-                $eventId = $data['EventId'] ?? '';
-                $event = $this->eventDataHelper->getEvent($eventId);
-                if (!$event) {
-                    $this->renderJson(['success' => false, 'message' => "Unknown event ($eventId)"], ApplicationError::Forbidden->value);
-                    return;
-                }
-                $emailTitle = $data['Title'] ?? '';
-                $recipients = $data['Recipients'] ?? '';
-                $message = $data['Body'] ?? '';
-                if ($recipients === 'registered') $participants = (new ParticipantDataHelper($this->application))->getEventParticipants($eventId);
-                else if ($recipients === 'unregistered') {
-                    //TODO
-                } else if ($recipients === 'all') {
-                    $participants = (new PersonDataHelper($this->application))->getInterestedPeople(
-                        $this->eventDataHelper->getEventGroup($eventId),
-                        $event->IdEventType ?? null,
-                        (new DateTime($event->StartTime))->format('N') - 1,
-                        $this->personPreferences->getPeriodOfDay($event->StartTime)
-                    );
-                } else {
-                    $this->renderJson(['success' => false, 'message' => "Invalid recipients ($recipients)"], ApplicationError::BadRequest->value);
-                    return;
-                }
-                if ($participants) {
-                    $root = Application::$root;
-                    $eventLink = $root . '/events/' . $event->Id;
-                    $unsubscribeLink = $root . '/user/preferences';
-                    $eventCreatorEmail = $this->dataHelper->get('Person', ['Id' => $event->CreatedBy], 'Email')->Email;
-                    if (!$eventCreatorEmail) {
-                        $this->renderJson(['success' => false, 'message' => 'Invalid Email in file ' + __FILE__ + ' at line ' + __LINE__], ApplicationError::BadRequest->value);
-                        return;
-                    }
-                    $ccList = $this->messageDataHelper->addWebAppMessages($eventId, $participants, $emailTitle . "\n\n" . $message);
-                    $result = EmailService::send(
-                        $eventCreatorEmail,
-                        $eventCreatorEmail,
-                        $emailTitle,
-                        $message . "\n" . $eventLink . "\n\n Pour ne plus recevoir ce type de message vous pouvez mettre à jour vos préférences\n" . $unsubscribeLink,
-                        $ccList,
-                        null,
-                        false
-                    );
-                    $this->renderJson(['success' => $result]);
-                } else $this->renderJson(['success' => false, 'message' => 'No participant'], ApplicationError::BadRequest->value);
-            } else $this->renderJson(['success' => false, 'message' =>  'Method ' + $_SERVER['REQUEST_METHOD'] + ' invalid in file ' + __FILE__ + ' at line ' + __LINE__]);
-        } else $this->renderJson(['success' => false, 'message' => 'User not allowed'], ApplicationError::Forbidden->value);
-    }
-    #endregion
-
-    #region Need
-    public function deleteNeed($id)
-    {
-        if ($this->connectedUser->get()->isWebmaster() || false) {
-            if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
-                [$response, $statusCode] = $this->renderJson($this->apiNeedDataHelper->delete_($id));
-                $this->renderJson($response, $statusCode);
-            } else $this->renderJson(['success' => false, 'message' => 'Bad request method'], ApplicationError::MethodNotAllowed->value);
-        } else $this->renderJson(['success' => false, 'message' => 'User not allowed'], ApplicationError::Forbidden->value);
-    }
-
-    public function saveNeed()
-    {
-        if ($this->connectedUser->get()->isWebmaster() || false) {
-            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-                $data = json_decode(file_get_contents('php://input'), true);
-                $id = $data['id'] ?? false;
-                $label = $data['label'] ?? '';
-                $name = $data['name'] ?? '';
-                $participantDependent = isset($data['participantDependent']) ? intval($data['participantDependent']) : 0;
-                $idNeedType = $data['idNeedType'] ?? null;
-                if (empty($label)) {
-                    $this->renderJson(['success' => false, 'message' => 'Missing parameter label'], ApplicationError::BadRequest->value);
-                    return;
-                }
-                if (empty($name)) {
-                    $this->renderJson(['success' => false, 'message' => 'Missing parameter name'], ApplicationError::BadRequest->value);
-                    return;
-                }
-                if (!$idNeedType) {
-                    $this->renderJson(['success' => false, 'message' => 'Missing parameter idNeedType'], ApplicationError::BadRequest->value);
-                    return;
-                }
-                $needData = [
-                    'Label' => $label,
-                    'Name' => $name,
-                    'ParticipantDependent' => $participantDependent,
-                    'IdNeedType' => $idNeedType
-                ];
-                [$response, $statusCode] = $this->renderJson($this->apiNeedDataHelper->insertOrUpdate($id, $needData));
-                $this->renderJson($response, $statusCode);
-            } else $this->renderJson(['success' => false, 'message' => 'Bad request method'], ApplicationError::MethodNotAllowed->value);
-        } else $this->renderJson(['success' => false, 'message' => 'User not allowed'], ApplicationError::Forbidden->value);
-    }
-
-    public function getEventNeeds($eventId)
-    {
-        $this->renderJson(['success' => true, 'needs' => $this->eventNeedHelper->needsForEvent($eventId)]);
-    }
-
-    public function getNeedsByNeedType($needTypeId)
-    {
-        $this->renderJson(['success' => true, 'needs' => $this->apiNeedTypeDataHelper->needsforNeedType($needTypeId)]);
-    }
-    #endregion
-
-    #region NeedType
-    public function deleteNeedType($id)
-    {
-        if ($this->connectedUser->get()->isWebmaster() || false) {
-            if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
-                if (!$id) {
-                    $this->renderJson(['success' => false, 'message' => 'Missing Id parameter'], ApplicationError::BadRequest->value);
-                } else {
-                    $countNeeds = $this->apiNeedDataHelper->countForNeedType($id);
-                    if ($countNeeds > 0) {
-                        $this->renderJson([
-                            'success' => false,
-                            'message' => 'Ce type de besoin est associé à ' . $countNeeds . ' besoin(s) et ne peut pas être supprimé'
-                        ], 409);
-                    }
-                }
-            } else $this->renderJson(['success' => false, 'message' => 'Bad request method'], ApplicationError::MethodNotAllowed->value);
-        } else $this->renderJson(['success' => false, 'message' => 'User not allowed'], ApplicationError::Forbidden->value);
-    }
-
-    public function saveNeedType()
-    {
-        if ($this->connectedUser->get()->isWebmaster() || false) {
-            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-                $data = json_decode(file_get_contents('php://input'), true);
-                $name = $data['name'] ?? '';
-                if (empty($name)) $this->renderJson(['success' => false, 'message' => "Missing parameter name ='$name'"], ApplicationError::BadRequest->value);
-                else {
-                    [$response, $statusCode] = $this->renderJson($this->apiNeedTypeDataHelper->insertOrUpdate($data['id'] ?? '', $name));
-                    $this->renderJson($response, $statusCode);
-                }
-            } else $this->renderJson(['success' => false, 'message' => 'Bad request method'], ApplicationError::MethodNotAllowed->value);
-        } else $this->renderJson(['success' => false, 'message' => 'User not allowed'], ApplicationError::Forbidden->value);
-    }
-    #endregion
 
     #region Message
-    public function addMessage()
+    public function addMessage(): void
     {
-        if ($person = $this->connectedUser->get()->person ?? false) {
-            $json = file_get_contents('php://input');
-            $data = json_decode($json, true);
+        $userId = $this->authService->getUserId();
+        if (!$userId) {
+            $this->renderUnauthorized();
+            return;
+        }
+        try {
+            $data = $this->getJsonInput();
+            $this->validateMessageData($data);
 
-            if (!isset($data['eventId']) || !isset($data['text'])) {
-                $this->renderJson(['success' => false, 'message' => 'Données manquantes'], ApplicationError::BadRequest->value);
-                return;
-            }
-            if (!$this->eventDataHelper->isUserRegistered($data['eventId'], $person->Email)) {
-                $this->renderJson(['success' => false, 'message' => 'User not allowed'], ApplicationError::Forbidden->value);
-                return;
-            }
-            try {
-                $messageId = $this->messageDataHelper->addMessage($data['eventId'], $person->Id, $data['text']);
-                $messages = $this->messageDataHelper->getEventMessages($data['eventId']);
-                $newMessage = null;
-
-                foreach ($messages as $message) {
-                    if ($message->Id == $messageId) {
-                        $newMessage = $message;
-                        break;
-                    }
-                }
-                $this->renderJson(['success' => true, 'message' => 'Message ajouté', 'data' => $newMessage]);
-            } catch (Throwable $e) {
-                $this->renderJson(['success' => false, 'message' => $e->getMessage()], ApplicationError::Error->value);
-            }
-        } else $this->renderJson(['success' => false, 'message' => 'User not allowed'], ApplicationError::Forbidden->value);
+            $response = $this->messageService->addMessage($data['eventId'], $userId, $data['text']);
+            $this->renderJson($response);
+        } catch (Throwable $e) {
+            $this->renderError($e->getMessage());
+        }
     }
 
-    public function updateMessage()
+    public function updateMessage(): void
     {
-        if ($person = $this->connectedUser->get()->person ?? false) {
-            $json = file_get_contents('php://input');
-            $data = json_decode($json, true);
-
+        $userId = $this->authService->getUserId();
+        if (!$userId) {
+            $this->renderUnauthorized();
+            return;
+        }
+        try {
+            $data = $this->getJsonInput();
             if (!isset($data['messageId']) || !isset($data['text'])) {
-                $this->renderJson(['success' => false, 'message' => 'Données manquantes'], ApplicationError::BadRequest->value);
-                return;
+                throw new InvalidArgumentException('Données manquantes');
             }
-            try {
-                $this->messageDataHelper->updateMessage($data['messageId'], $person->Id, $data['text']);
-
-                $this->renderJson([
-                    'success' => true,
-                    'message' => 'Message mis à jour',
-                    'data' => [
-                        'messageId' => $data['messageId'],
-                        'text' => $data['text']
-                    ]
-                ]);
-            } catch (Throwable $e) {
-                $this->renderJson(['success' => false, 'message' => $e->getMessage()], ApplicationError::Error->value);
-            }
-        } else $this->renderJson(['success' => false, 'message' => 'User not allowed'], ApplicationError::Forbidden->value);
+            $response = $this->messageService->updateMessage($data['messageId'], $userId, $data['text']);
+            $this->renderJson($response);
+        } catch (Throwable $e) {
+            $this->renderError($e->getMessage());
+        }
     }
 
-    public function deleteMessage()
-    {
-        if ($person = $this->connectedUser->get()->person ?? false) {
-            $json = file_get_contents('php://input');
-            $data = json_decode($json, true);
-            if (!isset($data['messageId'])) {
-                $this->renderJson(['success' => false, 'message' => 'ID de message manquant'], ApplicationError::BadRequest->value);
-                return;
-            }
-            try {
-                $this->messageDataHelper->deleteMessage($data['messageId'], $person->Id);
-
-                $this->renderJson([
-                    'success' => true,
-                    'message' => 'Message supprimé',
-                    'data' => [
-                        'messageId' => $data['messageId']
-                    ]
-                ]);
-            } catch (Throwable $e) {
-                $this->renderJson(['success' => false, 'message' => $e->getMessage()], ApplicationError::Error->value);
-            }
-        } else $this->renderJson(['success' => false, 'message' => 'User not allowed'], ApplicationError::Forbidden->value);
-    }
-    #endregion
-
+    #region Supply
     public function updateSupply(): void
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             $this->renderJson(['success' => false, 'message' => 'Méthode non autorisée'], ApplicationError::Forbidden->value);
             return;
         }
-        $userEmail = $this->connectedUser->get()->person->Email ?? '';
-        if ($userEmail === '') {
+
+        $userEmail = $this->authService->getUserEmail();
+        if (empty($userEmail)) {
             $this->renderJson(['success' => false, 'message' => 'Non authentifié'], ApplicationError::Unauthorized->value);
             return;
         }
+        try {
+            $input = $this->getJsonInput();
+            $this->validateSupplyData($input);
+            $response = $this->supplyService->updateSupply(
+                $input['eventId'],
+                $userEmail,
+                $input['needId'],
+                intval($input['supply'])
+            );
+            $this->renderJson($response);
+        } catch (Throwable $e) {
+            $this->renderError($e->getMessage());
+        }
+    }
 
-        $input = json_decode(file_get_contents('php://input'), true);
-        $eventId = $input['eventId'] ?? null;
-        $needId = $input['needId'] ?? null;
-        $supply = intval($input['supply'] ?? 0);
+    #region Emails
+    public function sendEmails()
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->renderJson(['success' => false, 'message' => 'Method ' + $_SERVER['REQUEST_METHOD'] + ' invalid in file ' + __FILE__ + ' at line ' + __LINE__], ApplicationError::Forbidden->value);
+            return;
+        }
+        if (!$this->authService->isEventManager()) {
+            $this->renderUnauthorized();
+            return;
+        }
+
+        try {
+            $data = $this->getJsonInput();
+            $eventId = $data['EventId'] ?? '';
+            $event = $this->eventDataHelper->getEvent($eventId);
+            if (!$event) {
+                $this->renderJson(['success' => false, 'message' => "Unknown event ($eventId)"], ApplicationError::Forbidden->value);
+                return;
+            }
+            [$message, $code] = $this->eventService->sendEventEmails($event, $data['Title'] ?? '', $data['Body'] ?? '', $data['Recipients'] ?? '');
+            $this->renderJson($message, $code);
+        } catch (Throwable $e) {
+            $this->renderError($e->getMessage());
+        }
+    }
+
+    #region Private functions
+    private function validateMessageData(array $data): void
+    {
+        if (!isset($data['eventId']) || !isset($data['text'])) {
+            throw new InvalidArgumentException('Données manquantes');
+        }
+    }
+
+    private function validateSupplyData(array $data): void
+    {
+        $eventId = $data['eventId'] ?? null;
+        $needId = $data['needId'] ?? null;
+        $supply = intval($data['supply'] ?? 0);
 
         if (!$eventId || !$needId || $supply < 0) {
-            $this->renderJson(['success' => false, 'message' => "Invalid parameters (eventId=eventId, needId=$needId, supply=$supply)"], ApplicationError::BadRequest->value);
-            return;
+            throw new InvalidArgumentException("Invalid parameters");
         }
-
-        if (!$this->eventDataHelper->isUserRegistered($eventId, $userEmail)) {
-            $this->renderJson(['success' => false, 'message' => 'Non inscrit à cet événement'], ApplicationError::Forbidden->value);
-            return;
-        }
-
-        $success = $this->eventDataHelper->updateUserSupply($eventId, $userEmail, $needId, $supply);
-        if ($success) {
-            $eventNeeds = $this->eventDataHelper->getEventNeeds($eventId);
-            $updatedNeed = null;
-
-            foreach ($eventNeeds as $need) {
-                if ($need->Id == $needId) {
-                    $updatedNeed = [
-                        'id' => $need->Id,
-                        'providedQuantity' => $need->ProvidedQuantity,
-                        'requiredQuantity' => $need->RequiredQuantity,
-                        'percentage' => $need->RequiredQuantity > 0 ? min(100, ($need->ProvidedQuantity / $need->RequiredQuantity) * 100) : 0
-                    ];
-                    break;
-                }
-            }
-            $this->renderJson([
-                'success' => true,
-                'message' => 'Apport mis à jour avec succès',
-                'updatedNeed' => $updatedNeed
-            ]);
-        } else $this->renderJson(['success' => false, 'message' => 'Erreur lors de la mise à jour'], ApplicationError::BadRequest->value);
     }
 }

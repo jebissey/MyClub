@@ -21,7 +21,7 @@ class AttributeDataHelper extends Data
             $this->delete('EventTypeAttribute', ['IdAttribute' => $id]);
             $this->delete('Attribute', ['Id' => $id]);
             $this->pdo->commit();
-            return [['success' => true], 200];
+            return [['success' => true], ApplicationError::Ok->value];
         } catch (Throwable $e) {
             $this->pdo->rollBack();
             return [['success' => false, 'message' => $e->getMessage()], ApplicationError::Error->value];
@@ -38,7 +38,7 @@ class AttributeDataHelper extends Data
                 'Color'  => $data['color']
             ]);
             $this->pdo->commit();
-            return [['success' => true], 200];
+            return [['success' => true], ApplicationError::Ok->value];
         } catch (Throwable $e) {
             $this->pdo->rollBack();
             return [['success' => false, 'message' => $e->getMessage()], ApplicationError::Error->value];

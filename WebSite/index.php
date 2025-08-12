@@ -28,7 +28,23 @@ use app\controllers\UserController;
 use app\controllers\WebmasterController;
 use app\enums\ApplicationError;
 use app\helpers\Application;
+use app\helpers\ConnectedUser;
+use app\helpers\PersonPreferences;
+use app\models\ApiEventDataHelper;
+use app\models\ApiNeedDataHelper;
+use app\models\ApiNeedTypeDataHelper;
+use app\models\DataHelper;
+use app\models\EventDataHelper;
+use app\models\EventNeedHelper;
 use app\models\LogDataHelper;
+use app\models\MessageDataHelper;
+use app\models\ParticipantDataHelper;
+use app\models\PersonDataHelper;
+use app\services\AttributeService;
+use app\services\AuthorizationService;
+use app\services\EventService;
+use app\services\MessageService;
+use app\services\SupplyService;
 
 if ($_SERVER['SERVER_NAME'] === 'localhost')
     Debugger::enable(Debugger::Development, __DIR__ . '/var/tracy/log');
@@ -51,6 +67,18 @@ $flight->map('setData', function ($key, $value) {
 $flight->map('getData', function ($key) {
     return Flight::get($key);
 });
+
+$apiEventDataHelper = new ApiEventDataHelper($application);
+$apiNeedDataHelper = new ApiNeedDataHelper($application);
+$apiNeedTypeDataHelper = new ApiNeedTypeDataHelper($application);
+$connectedUser = new ConnectedUser($application);
+$dataHelper = new DataHelper($application);
+$eventDataHelper = new EventDataHelper($application);
+$eventNeedHelper = new EventNeedHelper($application);
+$messageDataHelper = new MessageDataHelper($application);
+$participantDataHelper = new ParticipantDataHelper($application);
+$personDataHelper = new PersonDataHelper($application);
+$personPreferences = new PersonPreferences();
 
 #region web
 $articleController = new ArticleController($application);
@@ -222,7 +250,23 @@ mapRoute($flight, 'GET    /api/carousel/@articleId:[0-9]+', $carouselApi, 'getIt
 mapRoute($flight, 'POST   /api/carousel/save', $carouselApi, 'saveItem');
 mapRoute($flight, 'DELETE /api/carousel/delete/@id:[0-9]+', $carouselApi, 'deleteItem');
 
-$eventApi = new EventApi($application);
+$eventApi = new EventApi(
+    $apiEventDataHelper,
+    $application,
+    new AuthorizationService($connectedUser),
+    new AttributeService($connectedUser),
+    $eventDataHelper,
+    new EventService(
+        $dataHelper,
+        $eventDataHelper,
+        $messageDataHelper,
+        $participantDataHelper,
+        $personDataHelper,
+        $personPreferences
+    ),
+    new MessageService($messageDataHelper, $eventDataHelper),
+    new SupplyService($eventDataHelper)
+);
 mapRoute($flight, 'POST   /api/attributes/create', $eventApi, 'createAttribute');
 mapRoute($flight, 'DELETE /api/attributes/delete/@id:[0-9]+', $eventApi, 'deleteAttribute');
 mapRoute($flight, 'GET    /api/attributes/list', $eventApi, 'getAttributes');

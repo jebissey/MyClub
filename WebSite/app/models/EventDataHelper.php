@@ -39,7 +39,7 @@ class EventDataHelper extends Data implements NewsProviderInterface
             // TODO manage participant and paticipantSupply
             $this->fluent->deleteFrom('Event')->where('Id', $id)->execute();
             $this->pdo->commit();
-            return [['success' => true], 200];
+            return [['success' => true], ApplicationError::Ok->value];
         } catch (Throwable $e) {
             $this->pdo->rollBack();
             return [[
@@ -412,7 +412,7 @@ class EventDataHelper extends Data implements NewsProviderInterface
             ->fetch();
     }
 
-    public function update($id, $name, $idGroup, array $attributes)
+    public function update(int $id, string $name, ?int $idGroup, array $attributes): void
     {
         $this->pdo->beginTransaction();
         try {
@@ -422,7 +422,6 @@ class EventDataHelper extends Data implements NewsProviderInterface
             $deleteQuery = $this->pdo->prepare('DELETE FROM EventTypeAttribute WHERE IdEventType = ?');
             $deleteQuery->execute([$id]);
 
-            
             if ($attributes) {
                 $insertQuery = $this->pdo->prepare('INSERT INTO EventTypeAttribute (IdEventType, IdAttribute) VALUES (?, ?)');
                 foreach ($attributes as $attributeId) {
@@ -478,9 +477,26 @@ class EventDataHelper extends Data implements NewsProviderInterface
         }
     }
 
-
-
     #region Private functions
+    private function calculateNewStartTime($originalStartTime, $mode)
+    {
+        switch ($mode) {
+            case 'today':
+                return (new DateTime('today 23:59'))->format('Y-m-d H:i:s');
+
+            case 'week':
+                $now = new DateTime();
+                $newDate = clone new DateTime($originalStartTime);
+                do {
+                    $newDate->add(new DateInterval('P7D'));
+                } while ($newDate <= $now);
+                return $newDate->format('Y-m-d H:i:s');
+
+            default:
+                return (new DateTime('today 23:59'))->format('Y-m-d H:i:s');
+        }
+    }
+
     private function events($events): array
     {
         $eventIds = array_column($events, 'Id');
@@ -576,24 +592,5 @@ class EventDataHelper extends Data implements NewsProviderInterface
             ->select('COUNT(m.Id) AS MessageCount')
             ->orderBy('e.StartTime');
         return $this->events($query->fetchAll());
-    }
-
-    private function calculateNewStartTime($originalStartTime, $mode)
-    {
-        switch ($mode) {
-            case 'today':
-                return (new DateTime('today 23:59'))->format('Y-m-d H:i:s');
-
-            case 'week':
-                $now = new DateTime();
-                $newDate = clone new DateTime($originalStartTime);
-                do {
-                    $newDate->add(new DateInterval('P7D'));
-                } while ($newDate <= $now);
-                return $newDate->format('Y-m-d H:i:s');
-
-            default:
-                return (new DateTime('today 23:59'))->format('Y-m-d H:i:s');
-        }
     }
 }

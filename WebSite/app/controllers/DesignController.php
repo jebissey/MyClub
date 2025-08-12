@@ -8,6 +8,7 @@ use app\enums\ApplicationError;
 use app\helpers\Params;
 use app\helpers\WebApp;
 use app\models\DesignDataHelper;
+use RuntimeException;
 
 class DesignController extends AbstractController
 {
@@ -44,6 +45,7 @@ class DesignController extends AbstractController
         if ($this->connectedUser->get()->isRedactor() ?? false) {
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $schema = [
+                    'id' => FilterInputRule::Int->value,
                     'name' => FilterInputRule::HtmlSafeName->value,
                     'detail' => FilterInputRule::HtmlSafeName->value,
                     'navbar' => FilterInputRule::Content->value,
@@ -60,7 +62,7 @@ class DesignController extends AbstractController
                     'OnlyForMembers' => $filterValues['onlyForMembers'] ?? 1,
                     'IdGroup' => $filterValues['idGroup']
                 ];
-                $this->dataHelper->set('Design', $values);
+                $this->dataHelper->set('Design', $values, ['Id'=> $filterValues['id'] ?? throw new RuntimeException('Missing Id in file ' . __FILE__ . ' at line ' . __LINE__)]);
 
                 $this->flight->redirect('/designs');
             } else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);

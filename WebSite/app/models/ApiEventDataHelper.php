@@ -16,7 +16,7 @@ class ApiEventDataHelper extends Data
         parent::__construct($application);
     }
 
-    public function update($data, $personId)
+    public function update(array $data, int $personId): array
     {
         $values = [
             'Summary'         => $data['summary'] ?? '',
@@ -45,7 +45,7 @@ class ApiEventDataHelper extends Data
             $this->insertEventAttributes($eventId, $data['attributes'] ?? []);
             $this->insertEventNeeds($eventId, $data['needs'] ?? []);
             $this->pdo->commit();
-            return [['success' => true, 'eventId' => $eventId], 200];
+            return [['success' => true, 'eventId' => $eventId], ApplicationError::Ok->value];
         } catch (Throwable $e) {
             $this->pdo->rollBack();
             return [[

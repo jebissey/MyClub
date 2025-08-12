@@ -2,6 +2,8 @@
 
 namespace app\services;
 
+use DateTime;
+
 use app\enums\ApplicationError;
 use app\enums\FilterInputRule;
 use app\exceptions\AuthenticationException;
@@ -84,7 +86,7 @@ class AuthenticationService
         );
         $_SESSION['user'] = $person->Email;
         $_SESSION['navbar'] = '';
-        $this->logHelper->add(200, "Auto sign in succeeded for {$person->Email}");
+        $this->logHelper->add(ApplicationError::Ok->value, "Auto sign in succeeded for {$person->Email}");
         return AuthResult::success($person);
     }
 
@@ -92,7 +94,7 @@ class AuthenticationService
     {
         $userEmail = $_SESSION['user'] ?? '';
         if ($userEmail) {
-            $this->logHelper->add(200, "Sign out succeeded with $userEmail");
+            $this->logHelper->add(ApplicationError::Ok->value, "Sign out succeeded with $userEmail");
             $this->application->getDataHelper()->set(
                 'Person',
                 ['LastSignOut' => date('Y-m-d H:i:s')],
@@ -117,17 +119,10 @@ class AuthenticationService
 
     public function resetPassword(string $token, string $newPassword): bool
     {
-        $person = $this->application->getDataHelper()->get('Person', [
-            'PasswordResetToken' => $token,
-        ], 'Id, PasswordResetExpiry');
-        if (!$person) return false;
-        if (strtotime($person->PasswordResetExpiry) < time()) return false;
-        $this->application->getDataHelper()->set('Person', [
-            'Password' => Password::signPassword($newPassword),
-            'PasswordResetToken' => null,
-            'PasswordResetExpiry' => null
-        ], ['Id' => $person->Id]);
-        $this->logHelper->add(200, "Password reset succeeded for user ID {$person->Id}");
+        $person = $this->application->getDataHelper()->get('Person', ['Token' => $token], 'Id, TokenCreatedAt');
+//error_log(var_export($person, true));
+        if (!$person || $person->TokenCreatedAt === null || (new DateTime($person->TokenCreatedAt))->diff(new DateTime())->h >= 1) return false;
+        $this->application->getPersonDataHelper()->setPassword([Password::signPassword($newPassword)], $person->Id);
         return true;
     }
 
@@ -196,7 +191,7 @@ class AuthenticationService
         if ($rememberMe) $this->setRememberMeToken($person);
         $_SESSION['user'] = $person->Email;
         $_SESSION['navbar'] = '';
-        $this->logHelper->add(200, "Sign in succeeded for {$person->Email}");
+        $this->logHelper->add(ApplicationError::Ok->value, "Sign in succeeded for {$person->Email}");
         return AuthResult::success($person);
     }
 }

@@ -18,7 +18,7 @@ class ApiNeedTypeDataHelper extends Data
     {
         try {
             $this->delete('NeedType', ['Id' => $id]);
-            return [['success' => true], 200];
+            return [['success' => true], ApplicationError::Ok->value];
         } catch (Throwable $e) {
             return [['success' => false, 'message' => 'Erreur lors de la suppression: ' . $e->getMessage()], ApplicationError::Error->value];
         }
@@ -29,7 +29,7 @@ class ApiNeedTypeDataHelper extends Data
         try {
             if ($id) $this->set('NeedType', ['Name' => $name], ['Id' => $id]);
             else $id = $this->set('NeedType', ['Name' => $name]);
-            return [['success' => true, 'id' => $id], 200];
+            return [['success' => true, 'id' => $id], ApplicationError::Ok->value];
         } catch (Throwable $e) {
             return [['success' => 'false', 'message' => 'Erreur lors de l\'enregistrement: ' . $e->getMessage(), ApplicationError::Error->value]];
         }

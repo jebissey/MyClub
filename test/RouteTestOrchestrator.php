@@ -39,7 +39,7 @@ class RouteTestOrchestrator
                 $testResults = $this->testRoute($route, $routeNumber);
                 $results = array_merge($results, $testResults);
                 if (count($testResults) === 0) {
-                    echo " -> " . Color::Red->value . "ERREUR: Aucune donnée de test valide" . Color::Reset->value . "\n";
+                    echo " -> " . Color::Red->value . "ERROR: No valid data found" . Color::Reset->value . "\n";
                 } elseif (count($testResults) > 1) {
                     $avgResponseTime = array_sum(array_map(
                         fn($r) => $r->response->responseTimeMs,
@@ -70,7 +70,7 @@ class RouteTestOrchestrator
 
     private function testRoute(Route $route, int $routeNumber): array
     {
-        if ($route->hasParameters && $this->testDataRepository) {
+        if (($route->hasParameters || $route->method == 'POST') && $this->testDataRepository) {
             return $this->testRouteWithData($route, $routeNumber);
         }
         return [$this->testSimpleRoute($route)];
@@ -84,10 +84,10 @@ class RouteTestOrchestrator
         ]);
         if (empty($testData)) {
             $this->parameterErrors[] = "URI : {$route->originalPath}";
-            echo " -> " . Color::Red->value . "ERREUR: Aucune donnée de test trouvée" . Color::Reset->value;
+            echo " -> " . Color::Red->value . "ERROR: Data not found" . Color::Reset->value;
             return [];
         }
-        $validationErrors = $this->validateTestData($route, $testData);
+        $validationErrors = $this->validateTestData($route, $routeNumber, $testData);
         if (!empty($validationErrors)) {
             $this->parameterErrors = array_merge($this->parameterErrors, $validationErrors);
             return [];
@@ -106,9 +106,10 @@ class RouteTestOrchestrator
                     continue;
                 }
             }
-            $parameters = json_decode($test['JsonGetParameters'], true);
-            $url = $this->buildUrl($route, $parameters);
-            $response = $this->httpClient->request($route->method, $url);
+            $getParameters = json_decode($test['JsonGetParameters'], true) ?? [];
+            $postParameters = json_decode($test['JsonPostParameters'], true);
+            $url = $this->buildUrl($route, $getParameters);
+            $response = $this->httpClient->request($route->method, $url, ['postfields' => $postParameters]);
             $validationResult = $this->responseValidator->validate(
                 $response->httpCode,
                 $test['ExpectedResponseCode']
@@ -126,23 +127,38 @@ class RouteTestOrchestrator
         return $results;
     }
 
-    private function validateTestData(Route $route, array $testData): array
+    private function validateTestData(Route $route, int $routeNumber, array $testData): array
     {
-        $errors = [];
-
-        foreach ($testData as $test) {
-            $parameters = json_decode($test['JsonGetParameters'], true);
+        $validateJson = function (string $json, string $fieldName, int $routeNumber): array {
+            $decoded = json_decode($json, true);
             if (json_last_error() !== JSON_ERROR_NONE) {
-                $errors[] = "Invalid JsonGetParameters for test ID {$test['Id']}";
+                return [null, "Invalid {$fieldName} for test {$routeNumber}"];
+            }
+            return [$decoded, null];
+        };
+
+        $errors = [];
+        foreach ($testData as $test) {
+            [$getParams, $error] = $validateJson($test['JsonGetParameters'], 'JsonGetParameters', $routeNumber);
+            if ($error && $route->method == 'GET') {
+                $errors[] = $error;
                 continue;
             }
-
             preg_match_all('/@(\w+)(?::[^\s\/]+)?/', $route->originalPath, $matches);
             $requiredParams = $matches[1];
-
             foreach ($requiredParams as $param) {
-                if (!isset($parameters[$param])) {
-                    $errors[] = "Missing param '$param' for test ID {$test['Id']}";
+                if (!array_key_exists($param, $getParams)) {
+                    $errors[] = "Missing GET param '{$param}' in JsonGetParameters for test {$routeNumber}";
+                }
+            }
+            if ($route->method === 'POST') {
+                if (empty($test['JsonPostParameters'])) {
+                    $errors[] = "Missing JsonPostParameters for POST test {$routeNumber}";
+                } else {
+                    [$postParams, $error] = $validateJson($test['JsonPostParameters'], 'JsonPostParameters', $routeNumber);
+                    if ($error) {
+                        $errors[] = $error;
+                    }
                 }
             }
         }
@@ -160,10 +176,10 @@ class RouteTestOrchestrator
         );
     }
 
-    private function buildUrl(Route $route, array $parameters): string
+    private function buildUrl(Route $route, array $getParameters): string
     {
         $url = $this->config->baseUrl . $route->originalPath;
-        foreach ($parameters as $key => $value) {
+        foreach ($getParameters as $key => $value) {
             $url = preg_replace('/@' . preg_quote($key, '/') . '(?::[^\s\/]+)?/', $value, $url);
         }
         return $url;

@@ -68,26 +68,10 @@ class UserController extends AbstractController
     public function setPassword($token): void
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $newPassword = WebApp::getFiltered(
-                'password',
-                FilterInputRule::Password->value,
-                $this->flight->request()->data->getData()
-            );
-            if (!$newPassword) {
-                $this->application->getErrorManager()->raise(
-                    ApplicationError::BadRequest,
-                    'Invalid password format'
-                );
-                return;
-            }
-            if ($this->authService->resetPassword($token, $newPassword)) {
-                $this->flight->redirect('/user/sign/in?message=password-updated');
-            } else {
-                $this->application->getErrorManager()->raise(
-                    ApplicationError::BadRequest,
-                    'Invalid or expired token'
-                );
-            }
+            $newPassword = WebApp::getFiltered('password', FilterInputRule::Password->value, $this->flight->request()->data->getData());
+            if (!$newPassword)                                               $this->application->getErrorManager()->raise(ApplicationError::BadRequest, 'Invalid password format');
+            elseif ($this->authService->resetPassword($token, $newPassword)) $this->application->getErrorManager()->raise(ApplicationError::Ok, 'Votre mot de passe est réinitialisé', 3000, false);
+            else                                                             $this->application->getErrorManager()->raise(ApplicationError::BadRequest, 'Invalid or expired token');
         } elseif ($_SERVER['REQUEST_METHOD'] === 'GET') {
             $this->render('app/views/user/setPassword.latte', [
                 'token' => $token,
@@ -251,7 +235,7 @@ class UserController extends AbstractController
                     'FirstName' => $input['firstName'] ?? '???',
                     'LastName' => $input['lastName'] ?? '???',
                     'NickName' => $input['nickName'] ?? '???',
-                    'Avatar' => ($input['useGravatar'] ?? YesNo::No->value ) == YesNo::Yes->value ? '' : $input['avatar'] ?? '🤔',
+                    'Avatar' => ($input['useGravatar'] ?? YesNo::No->value) == YesNo::Yes->value ? '' : $input['avatar'] ?? '🤔',
                     'useGravatar' => $input['useGravatar'] ?? YesNo::No->value,
                 ], ['Id' => $person->Id]);
                 if (!empty($password))

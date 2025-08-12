@@ -5,6 +5,7 @@ namespace app\apis;
 use flight;
 use Latte\Engine as LatteEngine;
 
+use app\enums\ApplicationError;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
 use app\models\DataHelper;
@@ -28,7 +29,18 @@ abstract class AbstractApi
         $this->personDataHelper = new PersonDataHelper($application);
     }
 
-    protected function renderJson(array $response, int $statusCode = 200): void
+    protected function getJsonInput(): array
+    {
+        $json = file_get_contents('php://input');
+        return json_decode($json, true) ?? [];
+    }
+
+    protected function renderError(string $message): void
+    {
+        $this->renderJson(['success' => false, 'message' => $message], ApplicationError::Error->value);
+    }
+
+    protected function renderJson(array $response, int $statusCode = ApplicationError::Ok->value): void
     {
         http_response_code($statusCode);
         header('Content-Type: application/json');
@@ -41,5 +53,10 @@ abstract class AbstractApi
     protected function renderPartial(string $template, array $params = []): void
     {
         $this->latte->render($template, $params);
+    }
+
+    protected function renderUnauthorized(): void
+    {
+        $this->renderJson(['success' => false, 'message' => 'User not allowed'], ApplicationError::Forbidden->value);
     }
 }

@@ -54,7 +54,6 @@ class CurlHttpClient implements HttpClientInterface
             CURLOPT_SSL_VERIFYHOST => $this->config->verifySSL ? 2 : 0,
             CURLOPT_USERAGENT      => 'Mozilla/5.0 (Linux; Android 99; TestDevice 1.0)',
         ];
-
         if (!empty($options['headers'])) $opts[CURLOPT_HTTPHEADER] = $options['headers'];
         if (!empty($options['cookies'])) $opts[CURLOPT_COOKIE] = implode('; ', $options['cookies']);
         if (!empty($options['postfields'])) {

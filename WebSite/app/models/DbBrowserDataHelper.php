@@ -18,7 +18,6 @@ class DbBrowserDataHelper extends Data
     {
         $this->validateTableName($table);
         $columns = $this->getTableColumns($table);
-
         $data = [];
         foreach ($columns as $column) {
             if (isset($_POST[$column])) $data[$column] = $_POST[$column];

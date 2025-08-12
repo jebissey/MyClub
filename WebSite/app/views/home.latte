@@ -74,10 +74,6 @@
                 </div>
             </div>
         </div>
-        {else}
-        <div class="alert alert-info">
-            Aucun article disponible.
-        </div>
         {/if}        
         
         {if count($latestArticles) > 0}
@@ -97,7 +93,7 @@
                 {/foreach}
             </ul>
         {/if}
-        {if isset($link)}
+        {if isset($link) && $link !=''}
         <div class="alert alert-info">
             {$link|noescape}
         </div>
