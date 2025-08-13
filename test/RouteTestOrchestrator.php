@@ -138,23 +138,28 @@ class RouteTestOrchestrator
         };
 
         $errors = [];
-        foreach ($testData as $test) {
-            [$getParams, $error] = $validateJson($test['JsonGetParameters'], 'JsonGetParameters', $routeNumber);
-            if ($error && $route->method == 'GET') {
-                $errors[] = $error;
-                continue;
-            }
-            preg_match_all('/@(\w+)(?::[^\s\/]+)?/', $route->originalPath, $matches);
-            $requiredParams = $matches[1];
-            foreach ($requiredParams as $param) {
-                if (!array_key_exists($param, $getParams)) {
-                    $errors[] = "Missing GET param '{$param}' in JsonGetParameters for test {$routeNumber}";
+        if ($route->method === 'GET' || $route->method === 'DELETE') {
+            if (count($testData) == 0) $errors[] = "Missing JsonGetParameters for GET/DELETE test {$routeNumber}";
+            else {
+                foreach ($testData as $test) {
+                    [$getParams, $error] = $validateJson($test['JsonGetParameters'], 'JsonGetParameters', $routeNumber);
+                    if ($error) {
+                        $errors[] = $error;
+                        continue;
+                    }
+                    preg_match_all('/@(\w+)(?::[^\s\/]+)?/', $route->originalPath, $matches);
+                    $requiredParams = $matches[1];
+                    foreach ($requiredParams as $param) {
+                        if (!array_key_exists($param, $getParams)) {
+                            $errors[] = "Missing GET param '{$param}' in JsonGetParameters for test {$routeNumber}";
+                        }
+                    }
                 }
             }
-            if ($route->method === 'POST') {
-                if (empty($test['JsonPostParameters'])) {
-                    $errors[] = "Missing JsonPostParameters for POST test {$routeNumber}";
-                } else {
+        } elseif ($route->method === 'POST') {
+            if (count($testData) == 0) $errors[] = "Missing JsonPostParameters for POST test {$routeNumber}";
+            else {
+                foreach ($testData as $test) {
                     [$postParams, $error] = $validateJson($test['JsonPostParameters'], 'JsonPostParameters', $routeNumber);
                     if ($error) {
                         $errors[] = $error;

@@ -44,6 +44,8 @@ use app\services\AttributeService;
 use app\services\AuthorizationService;
 use app\services\EventService;
 use app\services\MessageService;
+use app\services\NeedService;
+use app\services\NeedTypeService;
 use app\services\SupplyService;
 
 if ($_SERVER['SERVER_NAME'] === 'localhost')
@@ -265,6 +267,8 @@ $eventApi = new EventApi(
         $personPreferences
     ),
     new MessageService($messageDataHelper, $eventDataHelper),
+    new NeedService($apiNeedDataHelper, $apiNeedTypeDataHelper, $eventNeedHelper),
+    new NeedTypeService($apiNeedTypeDataHelper, $apiNeedDataHelper),
     new SupplyService($eventDataHelper)
 );
 mapRoute($flight, 'POST   /api/attributes/create', $eventApi, 'createAttribute');

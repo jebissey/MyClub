@@ -47,7 +47,7 @@ class WebmasterController extends AbstractController
 
                 $newVersion = null;
                 $result = $this->getLastVersion();
-                if (!$result['success']) error_log("Erreur récupération version : " . $result['error']);
+                if (!$result['success']) $newVersion = "Test for MyClub new version error : " . $result['error'];
                 elseif ($result['version'] != Application::VERSION) $newVersion = "A new version is available (V" . $result['version'] . ")";
 
                 $this->render('app/views/admin/webmaster.latte', Params::getAll(['newVersion' => $newVersion]));

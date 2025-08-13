@@ -13,6 +13,8 @@ use app\interfaces\AttributeServiceInterface;
 use app\interfaces\AuthorizationServiceInterface;
 use app\interfaces\EventServiceInterface;
 use app\interfaces\MessageServiceInterface;
+use app\interfaces\NeedServiceInterface;
+use app\interfaces\NeedTypeServiceInterface;
 use app\interfaces\SupplyServiceInterface;
 use app\models\ApiEventDataHelper;
 use app\models\EventDataHelper;
@@ -25,6 +27,8 @@ class EventApi extends AbstractApi
     private EventDataHelper $eventDataHelper;
     private EventServiceInterface $eventService;
     private MessageServiceInterface $messageService;
+    private NeedServiceInterface $needService;
+    private NeedTypeServiceInterface $needTypeService;
     private SupplyServiceInterface $supplyService;
 
     public function __construct(
@@ -35,6 +39,8 @@ class EventApi extends AbstractApi
         EventDataHelper $eventDataHelper,
         EventServiceInterface $eventService,
         MessageServiceInterface $messageService,
+        NeedServiceInterface $needService,
+        NeedTypeServiceInterface $needTypeService,
         SupplyServiceInterface $supplyService,
     ) {
         parent::__construct($application);
@@ -44,6 +50,8 @@ class EventApi extends AbstractApi
         $this->eventDataHelper = $eventDataHelper;
         $this->eventService = $eventService;
         $this->messageService = $messageService;
+        $this->needService = $needService;
+        $this->needTypeService = $needTypeService;
         $this->supplyService = $supplyService;
     }
 
@@ -80,15 +88,14 @@ class EventApi extends AbstractApi
 
     public function getAttributesByEventType(int $eventTypeId): void
     {
-        if (!$eventTypeId) {
+        if ($eventTypeId <= 0) {
             $this->renderJson(['success' => false, 'message' => 'Unknown event type'], ApplicationError::BadRequest->value);
             return;
         }
         try {
-            $response = $this->attributeService->getAttributesByEventType($eventTypeId);
-            $this->renderJson($response);
+            $this->renderJson(['success' => true, 'attributes' => $this->attributeService->getAttributesByEventType($eventTypeId)]);
         } catch (Throwable $e) {
-            $this->renderError($e->getMessage());
+            $this->renderJson(['success' => false, 'message' => $e->getMessage()]);
         }
     }
 
@@ -207,14 +214,82 @@ class EventApi extends AbstractApi
         }
     }
 
+    #region Need
+
+    public function deleteNeed(int $id): void
+    {
+        if (!$this->authService->isWebmaster()) {
+            $this->renderUnauthorized();
+            return;
+        }
+        try {
+            [$response, $statusCode] = $this->needService->deleteNeed($id);
+            $this->renderJson($response, $statusCode);
+        } catch (Throwable $e) {
+            $this->renderError($e->getMessage());
+        }
+    }
+
+    public function getEventNeeds(int $id)
+    {
+        try {
+            $this->renderJson($this->needService->getEventNeeds($id), ApplicationError::Ok->value);
+        } catch (Throwable $e) {
+            $this->renderError($e->getMessage());
+        }
+    }
+
+    public function saveNeed(): void
+    {
+        if (!$this->authService->isWebmaster()) {
+            $this->renderUnauthorized();
+            return;
+        }
+        $data = $this->getJsonInput();
+        try {
+            [$response, $statusCode] = $this->needService->saveNeed($data);
+            $this->renderJson($response, $statusCode);
+        } catch (Throwable $e) {
+            $this->renderError($e->getMessage());
+        }
+    }
+
+    public function deleteNeedType(int $id): void
+    {
+        if (!$this->authService->isWebmaster()) {
+            $this->renderUnauthorized();
+            return;
+        }
+        try {
+            [$response, $statusCode] = $this->needTypeService->deleteNeedType($id);
+            $this->renderJson($response, $statusCode);
+        } catch (Throwable $e) {
+            $this->renderError($e->getMessage());
+        }
+    }
+
+    public function saveNeedType()
+    {
+        if (!$this->authService->isWebmaster()) {
+            $this->renderUnauthorized();
+            return;
+        }
+        try {
+            $data = $this->getJsonInput();
+            [$response, $statusCode] = $this->needTypeService->saveNeedType($data);
+            $this->renderJson($response, $statusCode);
+        } catch (Throwable $e) {
+            $this->renderError($e->getMessage());
+        }
+    }
+
     #region Supply
     public function updateSupply(): void
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            $this->renderJson(['success' => false, 'message' => 'Méthode non autorisée'], ApplicationError::Forbidden->value);
+            $this->renderJson(['success' => false, 'message' => 'Not allowed method: ' . $_SERVER['REQUEST_METHOD'] . ' in file ' . __FILE__ . ' at line ' . __LINE__], ApplicationError::Forbidden->value);
             return;
         }
-
         $userEmail = $this->authService->getUserEmail();
         if (empty($userEmail)) {
             $this->renderJson(['success' => false, 'message' => 'Non authentifié'], ApplicationError::Unauthorized->value);

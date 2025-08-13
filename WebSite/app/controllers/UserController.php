@@ -58,7 +58,7 @@ class UserController extends AbstractController
     {
         $email = urldecode($encodedEmail);
         $success = $this->authService->handleForgotPassword($email);
-        if ($success) $this->flight->redirect('/user/sign/in?message=reset-sent');
+        if ($success) $this->application->getErrorManager()->raise(ApplicationError::Ok, 'Votre mot de passe est réinitialisé', 3000, false);
         else $this->application->getErrorManager()->raise(
             ApplicationError::Error,
             'Unable to send password reset email'
@@ -122,7 +122,7 @@ class UserController extends AbstractController
     public function signOut(): void
     {
         $this->authService->signOut();
-        $this->flight->redirect('/');
+        $this->flight->redirect('/', ApplicationError::Ok->value);
     }
     #endregion
 
@@ -334,7 +334,6 @@ class UserController extends AbstractController
     public function contact($eventId = null): void
     {
         if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-
             $this->render('app/views/contact.latte', Params::getAll([
                 'navItems' => $this->getNavItems($this->connectedUser->get()->person ?? false),
                 'event' => $eventId != null ? $this->dataHelper->get('Event', ['Id' => $eventId], 'Id, Summary') : null,
@@ -356,6 +355,7 @@ class UserController extends AbstractController
             if (empty($message)) $errors[] = 'Le message est requis.';
             if (empty($errors)) {
                 $adminEmail = $this->dataHelper->get('Settings', ['Name' => 'contactEmail'], 'Value')->Value ?? '';
+                if ($adminEmail == '') $adminEmail = (new PersonDataHelper($this->application))->getWebmasterEmail();
                 if (!filter_var($adminEmail, FILTER_VALIDATE_EMAIL)) {
                     $this->application->getErrorManager()->raise(ApplicationError::InvalidSetting, 'Invalid contactEmmail', __FILE__, __LINE__);
                     return;
@@ -363,7 +363,10 @@ class UserController extends AbstractController
                 $eventId = $input['eventId'];
                 if ($eventId != null) {
                     $event = $this->dataHelper->get('Event', ['Id' => $eventId], 'Id, Summary');
-                    if (!$event) $this->application->getErrorManager()->raise(ApplicationError::BadRequest, "Unknown event '$eventId' in file " . __FILE__ . ' at line ' . __LINE__);
+                    if (!$event) {
+                        $this->application->getErrorManager()->raise(ApplicationError::BadRequest, "Unknown event '$eventId' in file " . __FILE__ . ' at line ' . __LINE__);
+                        return;
+                    }
                 }
                 if ($eventId != null) $emailSent = (new PersonDataHelper($this->application))->sendRegistrationLink($adminEmail, $name, $email, $event);
                 else $emailSent = $this->email->sendContactEmail($adminEmail, $name, $email, $message);
@@ -393,7 +396,10 @@ class UserController extends AbstractController
                 $queryString = http_build_query($params);
                 $this->flight->redirect('/contact?' . $queryString);
             }
-        }
+        } else $this->application->getErrorManager()->raise(
+            ApplicationError::BadRequest,
+            'Method not allowed ' . $_SERVER['REQUEST_METHOD'] . ' in file ' . __FILE__ . ' at line ' . __LINE__
+        );
     }
 
     #region News

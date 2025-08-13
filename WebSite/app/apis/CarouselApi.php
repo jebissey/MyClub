@@ -34,7 +34,7 @@ class CarouselApi extends AbstractApi
     {
         $person = $this->connectedUser->get()->person ?? false;
         if (!$person) {
-            $this->renderJson(['error' => 'Utilisateur non connecté'], ApplicationError::Unauthorized->value);
+            $this->renderJson(['error' => 'Utilisateur non connecté'], ApplicationError::Forbidden->value);
             return;
         }
         $data = json_decode(file_get_contents('php://input'), true);

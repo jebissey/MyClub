@@ -3,14 +3,17 @@
 namespace app\services;
 
 use app\interfaces\NeedServiceInterface;
+use app\models\ApiNeedDataHelper;
+use app\models\ApiNeedTypeDataHelper;
+use app\models\EventNeedHelper;
 
 class NeedService implements NeedServiceInterface
 {
-    private $apiNeedDataHelper;
-    private $apiNeedTypeDataHelper;
-    private $eventNeedHelper;
+    private ApiNeedDataHelper $apiNeedDataHelper;
+    private ApiNeedTypeDataHelper $apiNeedTypeDataHelper;
+    private EventNeedHelper $eventNeedHelper;
 
-    public function __construct($apiNeedDataHelper, $apiNeedTypeDataHelper, $eventNeedHelper)
+    public function __construct(ApiNeedDataHelper $apiNeedDataHelper, ApiNeedTypeDataHelper $apiNeedTypeDataHelper, EventNeedHelper $eventNeedHelper)
     {
         $this->apiNeedDataHelper = $apiNeedDataHelper;
         $this->apiNeedTypeDataHelper = $apiNeedTypeDataHelper;
@@ -25,14 +28,12 @@ class NeedService implements NeedServiceInterface
     public function saveNeed(array $data): array
     {
         $this->validateNeedData($data);
-        
         $needData = [
             'Label' => $data['label'],
             'Name' => $data['name'],
             'ParticipantDependent' => intval($data['participantDependent'] ?? 0),
             'IdNeedType' => $data['idNeedType']
         ];
-        
         return $this->apiNeedDataHelper->insertOrUpdate($data['id'] ?? false, $needData);
     }
 

@@ -11,13 +11,22 @@ class EventNeedHelper extends Data
         parent::__construct($application);
     }
 
-    public function needsForEvent($eventId)
+    public function needsForEvent(int $eventId): array
     {
-        return $this->fluent->from('EventNeed')
-            ->select('EventNeed.*, Need.Label, Need.Name, Need.ParticipantDependent, NeedType.Name as TypeName')
-            ->join('Need ON EventNeed.IdNeed = Need.Id')
-            ->join('NeedType ON Need.IdNeedType = NeedType.Id')
-            ->where('EventNeed.IdEvent', $eventId)
-            ->fetchAll();
+        $sql = "
+            SELECT 
+                EventNeed.*,
+                Need.Label,
+                Need.Name,
+                Need.ParticipantDependent,
+                NeedType.Name AS TypeName
+            FROM EventNeed
+            INNER JOIN Need ON EventNeed.IdNeed = Need.Id
+            INNER JOIN NeedType ON Need.IdNeedType = NeedType.Id
+            WHERE EventNeed.IdEvent = :eventId
+        ";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([':eventId' => $eventId]);
+        return $stmt->fetchAll();
     }
 }

@@ -30,6 +30,6 @@ class AttributeService implements AttributeServiceInterface
 
     public function getAttributesByEventType(int $eventTypeId): array
     {
-        return ['attributes' => $this->attributeDataHelper->getAttributesOf($eventTypeId)];
+        return $this->attributeDataHelper->getAttributesOf($eventTypeId);
     }
 }

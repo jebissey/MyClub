@@ -226,6 +226,10 @@ class EventController extends AbstractController
 
     public function register(int $eventId, bool $set, $token = null): void
     {
+        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+            $this->application->getErrorManager()->raise(ApplicationError::Forbidden, "Method {$_SERVER['REQUEST_METHOD']} not allowed in file " . __FILE__ . ' at line ' . __LINE__);
+            return;
+        }
         if ($token === null) $token = WebApp::getFiltered('t', FilterInputRule::Token->value, $this->flight->request()->query->getData());
         if ($this->connectedUser->get()->person ?? false) {
             $userId = $this->connectedUser->person->Id;
@@ -238,15 +242,12 @@ class EventController extends AbstractController
                     ]);
                 }
             } else {
-                $this->dataHelper->delete(
-                    'Participant',
-                    [
-                        'IdEvent' => $eventId,
-                        'IdPerson' => $userId
-                    ]
-                );
+                $this->dataHelper->delete('Participant', [
+                    'IdEvent' => $eventId,
+                    'IdPerson' => $userId
+                ]);
             }
-        } elseif ($token) {
+        } elseif ($token != null) {
             $event = $this->dataHelper->get('Event', ['Id', $eventId], 'Id, Audience');
             if (!$event) {
                 $this->show($eventId, 'Evénement inconnu', 'error');
@@ -295,6 +296,9 @@ class EventController extends AbstractController
                     'navItems' => $this->getNavItems($this->connectedUser->person),
                 ]));
             }
+        } else {
+            $this->application->getErrorManager()->raise(ApplicationError::Forbidden, "User not allowed in file " . __FILE__ . ' at line ' . __LINE__);
+            return;
         }
         $this->flight->redirect('/events/' . $eventId);
     }

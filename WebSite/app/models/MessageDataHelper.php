@@ -6,6 +6,7 @@ use Exception;
 
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
+use app\helpers\TranslationManager;
 use app\interfaces\NewsProviderInterface;
 
 class MessageDataHelper extends Data implements NewsProviderInterface
@@ -99,7 +100,7 @@ class MessageDataHelper extends Data implements NewsProviderInterface
             $news[] = [
                 'type' => 'message',
                 'id' => $message->EventId,
-                'title' => $message->Text,
+                'title' => $message->Summary . '(' . TranslationManager::getShortDate($message->StartTime) . ')' . ' => ' . $message->Text,
                 'from' => $message->FirstName . ' ' . $message->LastName,
                 'date' => $message->LastUpdate,
                 'url' => '/event/chat/' . $message->EventId

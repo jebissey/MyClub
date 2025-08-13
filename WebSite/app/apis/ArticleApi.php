@@ -110,9 +110,9 @@ class ArticleApi extends AbstractApi
         } else $this->renderJson(['success' => false, 'message' => 'User not allowed'], ApplicationError::Forbidden->value);
     }
 
-    public function getAuthor($articleId)
+    public function getAuthor(int $articleId): void
     {
-        if (!$articleId) $this->renderJson(['success' => false, 'message' => 'Unknown article'], ApplicationError::BadRequest->value);
+        if ($articleId <= 0) $this->renderJson(['success' => false, 'message' => 'Unknown article'], ApplicationError::BadRequest->value);
         else {
             $result = (new ArticleDataHelper($this->application))->getAuthor($articleId);
             $this->renderJson(['author' => $result ? [$result] : []]);

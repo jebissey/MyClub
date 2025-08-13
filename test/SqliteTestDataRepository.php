@@ -14,7 +14,7 @@ class SqliteTestDataRepository implements TestDataRepositoryInterface
     public function getTestDataForRoute(array $route): array
     {
         try {
-            $stmt = $this->db->prepare("SELECT * FROM Test WHERE Uri = ? AND Method = ?");
+            $stmt = $this->db->prepare("SELECT * FROM Test WHERE Uri = ? AND Method = ? and Step is null");
             $stmt->execute([$route['original_path'], $route['method']]);
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {

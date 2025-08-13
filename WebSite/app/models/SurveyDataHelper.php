@@ -29,8 +29,6 @@ class SurveyDataHelper extends Data implements NewsProviderInterface
         return $survey;
     }
 
-
-
     public function getWithCreator(int $articleId): object|bool
     {
         return $this->fluent->from('Survey')->join('Article ON Survey.IdArticle = Article.Id')->where('IdArticle', $articleId)->select('Article.CreatedBy')->fetch();
@@ -78,11 +76,14 @@ class SurveyDataHelper extends Data implements NewsProviderInterface
                 s.ClosingDate, 
                 s.Visibility, 
                 r.LastUpdate, 
-                s.IdArticle
+                s.IdArticle,
+                v.FirstName as VoterFirstName,
+                v.LastName as VoterLastName
             FROM Reply r
             JOIN Survey s ON s.Id = r.IdSurvey
             JOIN Article a ON a.Id = s.IdArticle
             JOIN Person p ON p.Id = a.CreatedBy
+            JOIN Person v On p.Id = r.IdPerson
             WHERE r.LastUpdate >= :searchFrom
             ORDER BY r.LastUpdate DESC
         ";
@@ -99,7 +100,7 @@ class SurveyDataHelper extends Data implements NewsProviderInterface
                 $news[] = [
                     'type' => 'survey',
                     'id' => $survey->IdArticle,
-                    'title' => $survey->Question,
+                    'title' => $survey->Question. " => ({$survey->VoterFirstName} {$survey->VoterLastName})",
                     'from' => $survey->FirstName . ' ' . $survey->LastName,
                     'date' => $survey->LastUpdate,
                     'url' => '/surveys/results/' . $survey->IdArticle

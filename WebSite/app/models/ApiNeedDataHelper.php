@@ -34,10 +34,11 @@ class ApiNeedDataHelper extends Data
 
     public function insertOrUpdate(int $id, array $needData): array
     {
+        $result = null;
         try {
-            if ($id) $this->set('Need', $needData, ['Id' => $id]);
-            else $id = $this->set('Need', $needData);
-            return [['success' => true, 'id' => $id], ApplicationError::Ok->value];
+            if ($id > 0) $result = $this->set('Need', $needData, ['Id' => $id]);
+            else $id =  $this->set('Need', $needData);
+            return [['success' => ($result === true || is_numeric($result)), 'id' => $id], ApplicationError::Ok->value];
         } catch (Throwable $e) {
             return [['success' => false, 'message' => 'Save error: ' . $e->getMessage()], ApplicationError::Error->value];
         }
