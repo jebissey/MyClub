@@ -22,83 +22,79 @@
         {/if}
     {/if}
     <form method="POST" class="needs-validation" data-form="account">
-        {if $layout == '../admin/personManager.latte'}
-            <div class="mb-3">
-                <label for="email" class="form-label">Email</label>
-                <input type="email" class="form-control" id="email" name="email" value="{$email}" required>
-                <div class="invalid-feedback">Veuillez saisir une adresse email valide</div>
-            </div>
-        {else}
-            <div class="mb-3">
-                <label for="email" class="form-label">Email</label>
-                <input type="email" class="form-control {if $readOnly}bg-light text-muted{/if}" id="email" name="email" value="{$email}" {if $readOnly}readonly{else}required{/if}>
-                <div class="invalid-feedback">Veuillez saisir une adresse email valide</div>
-            </div>
-        {/if}
-
-        {if $isSelfEdit}
-            <div class="mb-3">
-                <label for="password" class="form-label">Mot de passe</label>
-                <input type="password" class="form-control" id="password" name="password" placeholder="Laissez vide pour ne pas modifier">
-                <div class="invalid-feedback">Le mot de passe doit contenir au moins 6 caractères</div>
-            </div>
-        {/if}
-
-        <div class="mb-3">
-            <label for="firstName" class="form-label">Prénom</label>
-            <input type="text" class="form-control {if $readOnly}bg-light text-muted{/if}" id="firstName" name="firstName" 
-                value="{$firstName}" {if $readOnly}readonly{else}required{/if}>
-            <div class="invalid-feedback">
-                Le prénom est requis.
-            </div>
-        </div>
-
-        <div class="mb-3">
-            <label for="lastName" class="form-label">Nom</label>
-            <input type="text" class="form-control {if $readOnly}bg-light text-muted{/if}" id="lastName" name="lastName" 
-                value="{$lastName}" {if $readOnly}readonly{else}required{/if}>
-            <div class="invalid-feedback">
-                Le nom est requis.
-            </div>
-        </div>
-
-        {if $isSelfEdit}
-            <div class="mb-3">
-                <label for="nickName" class="form-label">Pseudo</label>
-                <input type="text" class="form-control" id="nickName" name="nickName" 
-                    value="{$nickName}">
-            </div>
-
-            <div class="mb-3">
-                <div class="dropdown" id="emojiDropdown">
-                    <button class="btn btn-outline-primary dropdown-toggle" type="button" id="emojiSelect" data-bs-toggle="dropdown" aria-expanded="false">
-                        <span id="selectedEmoji"></span>
-                        Sélectionnez un Emoji
-                    </button>
-                    <ul class="dropdown-menu emoji-dropdown" id="emojiList" style="max-height: 300px; overflow-y: auto;">
-                        {foreach $emojis as $emoji}
-                            <li>
-                                <a class="dropdown-item emoji-item" href="#" data-emoji="{$emoji}" style="font-size: 1.5rem; padding: 8px 12px;">
-                                    {$emoji}
-                                </a>
-                            </li>
-                        {/foreach}                
-                    </ul>
-                    <input type="hidden" class="form-control" id="avatar" name="avatar" value="{$avatar}">
+        <div class="row justify-content-center">
+            <div class="col-12 col-md-6 col-lg-4">
+                {if $layout == '../admin/personManager.latte'}
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email</label>
+                    <input type="email" class="form-control" id="email" name="email" value="{$email}" required>
+                    <div class="invalid-feedback">Veuillez saisir une adresse email valide</div>
                 </div>
-                <label for="gravatar"> 
-                    <input type="checkbox" id="useGravatar" name="useGravatar" {if $useGravatar == 'yes'}checked{/if} value="yes"> 
-                    Utiliser mon <a href="https://gravatar.com/"> gravatar</a>
-                </label>
-            </div>
-        {/if}
+                {else}
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email</label>
+                    <input type="email" class="form-control {if $readOnly}bg-light text-muted{/if}" id="email" name="email" value="{$email}" {if $readOnly}readonly{else}required{/if}>
+                    <div class="invalid-feedback">Veuillez saisir une adresse email valide</div>
+                </div>
+                {/if}
 
-        {php $uriParts = explode('/', trim($_SERVER['REQUEST_URI'], '/'))}
-        {if isset($uriParts[0])}
-            {php $uriRoot = '/' . $uriParts[0]}
-        {/if}
-        <a href="{$uriRoot}" class="btn btn-secondary">Annuler</a>
-        <button type="submit" class="btn btn-primary">Valider</button>
+                <div class="mb-3">
+                    <label for="firstName" class="form-label">Prénom</label>
+                    <input type="text" class="form-control {if $readOnly}bg-light text-muted{/if}" id="firstName" name="firstName" 
+                        value="{$firstName}" {if $readOnly}readonly{else}required{/if}>
+                    <div class="invalid-feedback">
+                        Le prénom est requis.
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="lastName" class="form-label">Nom</label>
+                    <input type="text" class="form-control {if $readOnly}bg-light text-muted{/if}" id="lastName" name="lastName" 
+                        value="{$lastName}" {if $readOnly}readonly{else}required{/if}>
+                    <div class="invalid-feedback">
+                        Le nom est requis.
+                    </div>
+                </div>
+
+                {if $isSelfEdit}
+                <div class="mb-3">
+                    <label for="nickName" class="form-label">Pseudo</label>
+                    <input type="text" class="form-control" id="nickName" name="nickName" 
+                        value="{$nickName}">
+                </div>
+
+                <div class="mb-3">
+                    <div class="dropdown" id="emojiDropdown">
+                        <button class="btn btn-outline-primary dropdown-toggle" type="button" id="emojiSelect" data-bs-toggle="dropdown" aria-expanded="false">
+                            <span id="selectedEmoji"></span>
+                            Sélectionnez un Emoji
+                        </button>
+                        <ul class="dropdown-menu emoji-dropdown" id="emojiList" style="max-height: 300px; overflow-y: auto;">
+                            {foreach $emojis as $emoji}
+                                <li>
+                                    <a class="dropdown-item emoji-item" href="#" data-emoji="{$emoji}" style="font-size: 1.5rem; padding: 8px 12px;">
+                                        {$emoji}
+                                    </a>
+                                </li>
+                            {/foreach}                
+                        </ul>
+                        <input type="hidden" class="form-control" id="avatar" name="avatar" value="{$avatar}">
+                    </div>
+                    <label for="gravatar"> 
+                        <input type="checkbox" id="useGravatar" name="useGravatar" {if $useGravatar == 'yes'}checked{/if} value="yes"> 
+                        Utiliser mon <a href="https://gravatar.com/"> gravatar</a>
+                    </label>
+                </div>
+                {/if}
+
+                {php $uriParts = explode('/', trim($_SERVER['REQUEST_URI'], '/'))}
+                {if isset($uriParts[0])}
+                    {php $uriRoot = '/' . $uriParts[0]}
+                {/if}
+                <a href="{$uriRoot}" class="btn btn-secondary">Annuler</a>
+                <button type="submit" class="btn btn-primary">Valider</button>
+            </div>
+        </div>
     </form>
 {/block}
 

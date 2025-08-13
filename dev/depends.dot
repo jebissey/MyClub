@@ -1,0 +1,212 @@
+digraph WebAppArchitecture {
+    rankdir=TB;
+    compound=true;
+    nodesep=0.5;
+    ranksep=1.0;
+    
+    // Cluster definitions
+    subgraph cluster_apis {
+        label = "APIs";
+        style=filled;
+        color=lightblue;
+        
+        AbstractApi;
+        ArticleApi;
+        CarouselApi;
+        EventApi;
+        ImportApi;
+        WebmasterApi;
+    }
+    
+    subgraph cluster_controllers {
+        label = "Controllers";
+        style=filled;
+        color=lightgreen;
+        
+        AbstractController;
+        ArticleController;
+        DbBrowserController;
+        DesignController;
+        EmailController;
+        EventController;
+        EventTypeController;
+        FFAController;
+        GroupController;
+        ImportController;
+        LogController;
+        MediaController;
+        NavBarController;
+        PersonController;
+        RegistrationController;
+        SurveyController;
+        TableController;
+        UserController;
+        WebmasterController;
+    }
+    
+    subgraph cluster_helpers {
+        label = "Helpers";
+        style=filled;
+        color=lightyellow;
+        
+        Application;
+        Client;
+        ConnectedUser;
+        ErrorManager;
+        FFAScraper;
+        File;
+        News;
+        Params;
+        PersonPreferences;
+        TranslationManager;
+        WebApp;
+    }
+    
+    subgraph cluster_models {
+        label = "Models";
+        style=filled;
+        color=lavender;
+        
+        ApiEventDataHelper;
+        ApiNeedDataHelper;
+        ApiNeedTypeDataHelper;
+        ArticleCrosstabDataHelper;
+        ArticleDataHelper;
+        ArticleTableDataHelper;
+        ArwardsDataHelper;
+        AttributeDataHelper;
+        AuthorizationDataHelper;
+        CarouselDataHelper;
+        CrosstabDataHelper;
+        Database;
+        DataHelper;
+        DbBrowserDataHelper;
+        DesignDataHelper;
+        EventDataHelper;
+        EventNeedHelper;
+        EventTypeDataHelper;
+        GenericDataHelper;
+        GroupDataHelper;
+        ImportDataHelper;
+        LanguagesDataHelper;
+        LogDataHelper;
+        MessageDataHelper;
+        NeedDataHelper;
+        PageDataHelper;
+        ParticipantDataHelper;
+        PersonDataHelper;
+        PersonGroupDataHelper;
+        PersonStatisticsDataHelper;
+        ReplyDataHelper;
+        SurveyDataHelper;
+        TableControllerDataHelper;
+    }
+    
+    subgraph cluster_services {
+        label = "Services";
+        style=filled;
+        color=lightpink;
+        
+        AttributeService;
+        AuthenticationService;
+        AuthorizationService;
+        EmailService;
+        EventService;
+        MessageService;
+        NeedService;
+        NeedTypeService;
+        SupplyService;
+    }
+    
+    subgraph cluster_interfaces {
+        label = "Interfaces";
+        style=filled;
+        color=lightgrey;
+        
+        AttributeServiceInterface;
+        AuthorizationServiceInterface;
+        CrudControllerInterface;
+        DatabaseMigratorInterface;
+        EventServiceInterface;
+        MessageServiceInterface;
+        NeedServiceInterface;
+        NeedTypeServiceInterface;
+        NewsProviderInterface;
+        SupplyServiceInterface;
+    }
+    
+    subgraph cluster_enums {
+        label = "Enums";
+        style=filled;
+        color=wheat;
+        
+        ApplicationError;
+        Authorization;
+        EventAudience;
+        EventSearchMode;
+        FilterInputRule;
+        Period;
+        SurveyVisibility;
+        TimeOfDay;
+        WeekdayFormat;
+        YesNo;
+    }
+    
+    subgraph cluster_exceptions {
+        label = "Exceptions";
+        style=filled;
+        color=lightcoral;
+        
+        AuthenticationException;
+        UnauthorizedAccessException;
+    }
+    
+    // Cross-layer dependencies
+    
+    // APIs dependencies
+    AbstractApi -> {Application ConnectedUser DataHelper PersonDataHelper};
+    ArticleApi -> {Application ArticleDataHelper DesignDataHelper ReplyDataHelper};
+    CarouselApi -> {Application AuthorizationDataHelper CarouselDataHelper DataHelper};
+    EventApi -> {Application ApiEventDataHelper EventDataHelper};
+    WebmasterApi -> {Application LogDataHelper PageDataHelper PersonGroupDataHelper};
+    
+    // Controllers dependencies
+    AbstractController -> {Application ConnectedUser TranslationManager AuthorizationDataHelper DataHelper LanguagesDataHelper PageDataHelper};
+    ArticleController -> {Application ArticleDataHelper AuthorizationDataHelper DataHelper PersonDataHelper};
+    EventController -> {Application EventDataHelper MessageDataHelper NeedDataHelper ParticipantDataHelper};
+    UserController -> {Application AuthenticationService EmailService PersonDataHelper};
+    
+    // Helpers dependencies
+    Application -> {Database DataHelper PersonDataHelper};
+    ConnectedUser -> {AuthorizationDataHelper DataHelper Params TranslationManager};
+    TranslationManager -> {WeekdayFormat};
+    WebApp -> {FilterInputRule};
+    
+    // Models dependencies
+    ArticleDataHelper -> {Application ConnectedUser NewsProviderInterface};
+    EventDataHelper -> {Application ConnectedUser NewsProviderInterface TranslationManager};
+    PersonDataHelper -> {Application ConnectedUser EmailService NewsProviderInterface};
+    
+    // Services dependencies
+    AuthenticationService -> {Application Password PersonDataHelper EmailService};
+    EventService -> {Application EventDataHelper MessageDataHelper ParticipantDataHelper PersonDataHelper};
+    
+    // Interfaces implementations
+    AttributeService -> AttributeServiceInterface;
+    AuthorizationService -> AuthorizationServiceInterface;
+    EventService -> EventServiceInterface;
+    MessageService -> MessageServiceInterface;
+    NeedService -> NeedServiceInterface;
+    NeedTypeService -> NeedTypeServiceInterface;
+    SupplyService -> SupplyServiceInterface;
+    
+    // Enums usage
+    {AbstractController EventController UserController} -> TimeOfDay;
+    {ArticleController EventController UserController} -> FilterInputRule;
+    {EventApi EventController} -> Period;
+    {AuthenticationException UnauthorizedAccessException} -> ApplicationError;
+    
+    // Exceptions
+    AuthenticationService -> AuthenticationException;
+    SupplyService -> UnauthorizedAccessException;
+}

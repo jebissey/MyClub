@@ -131,9 +131,9 @@ class AuthenticationService
         return !empty($_SESSION['user']);
     }
 
-    public function getCurrentUser(): ?object
+    public function getCurrentUser(): object|false
     {
-        if (!$this->isAuthenticated()) return null;
+        if (!$this->isAuthenticated()) return false;
         $email = $_SESSION['user'];
         return $this->findPersonByEmail($email);
     }
@@ -146,7 +146,7 @@ class AuthenticationService
     }
 
     #region Private methodes
-    private function findPersonByEmail(string $email): ?object
+    private function findPersonByEmail(string $email): object|false
     {
         return $this->application->getDataHelper()->get(
             'Person',

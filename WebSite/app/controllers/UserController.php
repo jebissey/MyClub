@@ -234,7 +234,7 @@ class UserController extends AbstractController
                 $this->dataHelper->set('Person', [
                     'FirstName' => $input['firstName'] ?? '???',
                     'LastName' => $input['lastName'] ?? '???',
-                    'NickName' => $input['nickName'] ?? '???',
+                    'NickName' => $input['nickName'] ?? '',
                     'Avatar' => ($input['useGravatar'] ?? YesNo::No->value) == YesNo::Yes->value ? '' : $input['avatar'] ?? '🤔',
                     'useGravatar' => $input['useGravatar'] ?? YesNo::No->value,
                 ], ['Id' => $person->Id]);
@@ -251,8 +251,8 @@ class UserController extends AbstractController
                     'email' => filter_var($person->Email, FILTER_VALIDATE_EMAIL) ?: '',
                     'firstName' => WebApp::sanitizeInput($person->FirstName),
                     'lastName' => WebApp::sanitizeInput($person->LastName),
-                    'nickName' => WebApp::sanitizeInput($person->NickName),
-                    'avatar' => WebApp::sanitizeInput($person->Avatar),
+                    'nickName' => WebApp::sanitizeInput($person->NickName ?? ''),
+                    'avatar' => WebApp::sanitizeInput($person->Avatar ?? ''),
                     'useGravatar' => WebApp::sanitizeInput($person->UseGravatar, $this->application->enumToValues(YesNo::class), YesNo::No->value),
                     'emojis' => Application::EMOJI_LIST,
                     'isSelfEdit' => true,
@@ -544,7 +544,7 @@ class UserController extends AbstractController
 
     private function getCurrentUserTranche($stats, $person)
     {
-        if (empty($person) || empty($stats['memberVisits'])) throw new RuntimeException('$person or $stats can\'t be nulli n file ' . __FILE__ . ' at line ' . __LINE__);
+        if (empty($person) || empty($stats['memberVisits'])) throw new RuntimeException('$person or $stats can\'t be null in file ' . __FILE__ . ' at line ' . __LINE__);
         $email = $person->Email;
         if (!array_key_exists($email, $stats['memberVisits'])) throw new RuntimeException('User $email not found in stats in file ' . __FILE__ . ' at line ' . __LINE__);
         $userVisits = $stats['memberVisits'][$email];
@@ -555,38 +555,3 @@ class UserController extends AbstractController
         throw new RuntimeException('$user slice not found in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 }
-
-
-
-
-
-/*
-    private function requireAuth(): object
-    {
-        try {
-            return $this->authService->requireAuthentication();
-        } catch (AuthenticationException $e) {
-            $this->application->getErrorManager()->raise(
-                ApplicationError::Forbidden, 
-                'Authentication required'
-            );
-        }
-    }
-
-
-    public function account(): void
-    {
-        $person = $this->requireAuth();
-        
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            // Logique de mise à jour du compte
-            // ...
-        } else {
-            // Affichage du formulaire
-            $this->render('app/views/user/account.latte', [
-                'person' => $person,
-                // ...
-            ]);
-        }
-    }
-*/

@@ -92,7 +92,8 @@ abstract class Data
             if (!empty($where)) {
                 $conditions = [];
                 foreach ($where as $field => $value) {
-                    $conditions[] = "{$field} = :{$field}";
+                    if (strtolower($field) === 'email') $conditions[] = "{$field} COLLATE NOCASE = :{$field}";
+                    else                                $conditions[] = "{$field} = :{$field}";
                     $params[":{$field}"] = $value;
                 }
                 $sql .= " WHERE " . implode(' AND ', $conditions);
