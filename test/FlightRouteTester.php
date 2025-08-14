@@ -14,7 +14,11 @@ require_once __DIR__ . '/ResponseValidator.php';
 require_once __DIR__ . '/RouteTestFactory.php';
 require_once __DIR__ . '/RouteTestOrchestrator.php';
 require_once __DIR__ . '/SessionAuthenticator.php';
+require_once __DIR__ . '/SimulationExtractor.php';
 require_once __DIR__ . '/SqliteTestDataRepository.php';
+require_once __DIR__ . '/TestDataValidator.php';
+require_once __DIR__ . '/TestExecutor.php';
+require_once __DIR__ . '/UrlBuilder.php';
 
 function printHelp(): void
 {
@@ -52,7 +56,7 @@ function main(): int
         baseUrl: $options['base-url'] ?? 'http://localhost:8000',
         timeout: (int)($options['timeout'] ?? 10)
     );
-    $test       = $options['test'];
+    $test       = $options['test'] ?? null;
     $exportJson = isset($options['export-json']);
     $exportCsv  = isset($options['export-csv']);
     $routeFile  = $options['routes-file'] ?? __DIR__ . '/../WebSite/index.php';
@@ -66,7 +70,6 @@ function main(): int
         echo "  Timeout: {$config->timeout} secondes\n";
         echo "  Fichier de routes: $routeFile\n";
         echo "  Base de données: " . ($dbTestsPath ?: "Non spécifiée") . "\n\n";
-        echo "Extraction des routes...\n";
 
         $orchestrator = RouteTestFactory::create($config, $dbTestsPath);
         $results = $orchestrator->runTests($routeFile, $test);

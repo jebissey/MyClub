@@ -1,8 +1,7 @@
 <?php
 
-use app\enums\Color;
-
-class RouteTestOrchestrator
+/*
+class RouteTestOrchestrator_
 {
     private array $parameterErrors = [];
     private array $responseErrors = [];
@@ -127,48 +126,7 @@ class RouteTestOrchestrator
         return $results;
     }
 
-    private function validateTestData(Route $route, int $routeNumber, array $testData): array
-    {
-        $validateJson = function (string $json, string $fieldName, int $routeNumber): array {
-            $decoded = json_decode($json, true);
-            if (json_last_error() !== JSON_ERROR_NONE) {
-                return [null, "Invalid {$fieldName} for test {$routeNumber}"];
-            }
-            return [$decoded, null];
-        };
 
-        $errors = [];
-        if ($route->method === 'GET' || $route->method === 'DELETE') {
-            if (count($testData) == 0) $errors[] = "Missing JsonGetParameters for GET/DELETE test {$routeNumber}";
-            else {
-                foreach ($testData as $test) {
-                    [$getParams, $error] = $validateJson($test['JsonGetParameters'], 'JsonGetParameters', $routeNumber);
-                    if ($error) {
-                        $errors[] = $error;
-                        continue;
-                    }
-                    preg_match_all('/@(\w+)(?::[^\s\/]+)?/', $route->originalPath, $matches);
-                    $requiredParams = $matches[1];
-                    foreach ($requiredParams as $param) {
-                        if (!array_key_exists($param, $getParams)) {
-                            $errors[] = "Missing GET param '{$param}' in JsonGetParameters for test {$routeNumber}";
-                        }
-                    }
-                }
-            }
-        } elseif ($route->method === 'POST') {
-            if (count($testData) == 0) $errors[] = "Missing JsonPostParameters for POST test {$routeNumber}";
-            else {
-                foreach ($testData as $test) {
-                    [$postParams, $error] = $validateJson($test['JsonPostParameters'], 'JsonPostParameters', $routeNumber);
-                    if ($error) {
-                        $errors[] = $error;
-                    }
-                }
-            }
-        }
-        return $errors;
-    }
 
     private function testSimpleRoute(Route $route): TestResult
     {
@@ -181,54 +139,9 @@ class RouteTestOrchestrator
         );
     }
 
-    private function buildUrl(Route $route, array $getParameters): string
-    {
-        $url = $this->config->baseUrl . $route->originalPath;
-        foreach ($getParameters as $key => $value) {
-            $url = preg_replace('/@' . preg_quote($key, '/') . '(?::[^\s\/]+)?/', $value, $url);
-        }
-        return $url;
-    }
 
-    private function convertToTestPath(string $path): string
-    {
-        $replacements = [
-            '@id:[0-9]+' => '1',
-            '@year:[0-9]+' => '2024',
-            '/@id/' => '/1',
-            '/\*/' => ''
-        ];
-        foreach ($replacements as $pattern => $replacement) {
-            $path = str_replace($pattern, $replacement, $path);
-        }
-        return $path;
-    }
 
-    private function generateSummary(array $results): TestSummary
-    {
-        $total = count($results);
-        $successful = 0;
-        $errors = 0;
-        $statusCodes = [];
-        foreach ($results as $result) {
-            if ($result instanceof TestResult) {
-                if ($result->response->success && $result->response->httpCode < 400) $successful++;
-                elseif ($result->response->httpCode >= 500)                          $errors++;
-                $code = $result->response->httpCode;
-                $statusCodes[$code] = ($statusCodes[$code] ?? 0) + 1;
-            }
-        }
-        return new TestSummary(
-            totalTests: $total,
-            successful: $successful,
-            errors: $errors,
-            statusCodes: $statusCodes,
-            parameterErrors: $this->parameterErrors,
-            responseErrors: $this->responseErrors,
-            testErrors: $this->testErrors,
-            hasDatabase: $this->testDataRepository !== null
-        );
-    }
+
 
     private function getStatusText(int $code): string
     {
@@ -258,5 +171,58 @@ class RouteTestOrchestrator
         if ($code >= 400 && $code < 500) return Color::Magenta->value;
         if ($code >= 500) return Color::Red->value;
         return Color::White->value;
+    }
+}
+*/
+
+class RouteTestOrchestrator
+{
+    public function __construct(
+        private RouteExtractorInterface $routeExtractor,
+        private SimulationExtractor $simulationExtractor,
+        private TestExecutor $executor,
+        private TestReporterInterface $reporter,
+    ) {}
+
+    public function runTests(string $routeFilePath, ?int $test = null): array
+    {
+        $this->reporter->sectionTitle("Routes extraction");
+        $routes = $this->routeExtractor->extractRoutes($routeFilePath);
+        $results = $this->executor->testRoutes($routes, $test);
+error_log(var_export($results, true));  
+
+        $this->reporter->sectionTitle("Simulations extraction");
+        $simulations = $this->simulationExtractor->extract();
+        $results = array_merge($results, $this->executor->testSimulations($simulations));
+
+        $this->reporter->displaySummary($this->summaryGenerator($results));
+        return $results;
+    }
+
+    #region Private methods
+    private function summaryGenerator(array $results): TestSummary
+    {
+        $total = count($results);
+        $successful = 0;
+        $errors = 0;
+        $statusCodes = [];
+        foreach ($results as $result) {
+            if ($result instanceof TestResult) {
+                if ($result->response->success && $result->response->httpCode < 400) $successful++;
+                elseif ($result->response->httpCode >= 500)                          $errors++;
+                $code = $result->response->httpCode;
+                $statusCodes[$code] = ($statusCodes[$code] ?? 0) + 1;
+            }
+        }
+        return new TestSummary(
+            totalTests: $total,
+            successful: $successful,
+            errors: $errors,
+            statusCodes: $statusCodes,
+            parameterErrors: $this->executor->getParameterErrors(),
+            responseErrors: $this->executor->getResponseErrors(),
+            testErrors: $this->executor->getTestErrors(),
+            hasDatabase: true
+        );
     }
 }

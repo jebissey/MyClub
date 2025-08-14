@@ -11,11 +11,22 @@ class SqliteTestDataRepository implements TestDataRepositoryInterface
         $this->db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     }
 
-    public function getTestDataForRoute(array $route): array
+    public function getTestDataForRoute(string $uri, string $method): array
     {
         try {
-            $stmt = $this->db->prepare("SELECT * FROM Test WHERE Uri = ? AND Method = ? and Step is null");
-            $stmt->execute([$route['original_path'], $route['method']]);
+            $stmt = $this->db->prepare("SELECT * FROM Test WHERE Uri = ? AND Method = ? AND Step IS NULL");
+            $stmt->execute([$uri, $method]);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            throw new RuntimeException("Erreur lors de la récupération des données: " . $e->getMessage());
+        }
+    }
+
+    public function getSimulations(): array
+    {
+        try {
+            $stmt = $this->db->prepare("SELECT * FROM Test WHERE Step IS NOT NULL ORDER BY Step");
+            $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
             throw new RuntimeException("Erreur lors de la récupération des données: " . $e->getMessage());

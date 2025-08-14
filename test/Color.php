@@ -1,7 +1,5 @@
 <?php
 
-namespace app\enums;
-
 enum Color: string
 {
     case Reset   = "\033[0m";

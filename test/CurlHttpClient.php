@@ -2,9 +2,7 @@
 
 class CurlHttpClient implements HttpClientInterface
 {
-    public function __construct(
-        private TestConfiguration $config
-    ) {}
+    public function __construct(private TestConfiguration $config) {}
 
     public function request(string $method, string $url, array $options = []): HttpResponse
     {
@@ -33,7 +31,7 @@ class CurlHttpClient implements HttpClientInterface
         return new HttpResponse(
             httpCode: $httpCode,
             body: $body,
-            headers: $headersRaw, 
+            headers: $headersRaw,
             responseTimeMs: $responseTime,
             success: $httpCode > 0,
             url: $url
@@ -64,4 +62,3 @@ class CurlHttpClient implements HttpClientInterface
         return $opts;
     }
 }
-

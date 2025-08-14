@@ -12,7 +12,6 @@ class FlightRouteExtractor implements RouteExtractorInterface
 
         $content = file_get_contents($filePath);
         $routes = [];
-
         preg_match_all(self::REGEX_MAP_ROUTE, $content, $matches);
         foreach ($matches[1] as $route) {
             $parsed = $this->parseRoute($route);
@@ -28,6 +27,7 @@ class FlightRouteExtractor implements RouteExtractorInterface
         return $routes;
     }
 
+    #region Private functions
     private function parseRoute(string $routeDefinition): ?Route
     {
         $parts = preg_split('/\s+/', trim($routeDefinition), 2);
@@ -41,7 +41,6 @@ class FlightRouteExtractor implements RouteExtractorInterface
             method: $method,
             originalPath: $path,
             hasParameters: $hasParameters,
-            fullUrlTemplate: $path
         );
     }
 }

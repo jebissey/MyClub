@@ -97,4 +97,7 @@ INSERT INTO "Test" VALUES (89,NULL,'POST','/api/event/sendEmails',NULL,'{"id":1}
 INSERT INTO "Test" VALUES (90,NULL,'POST','/api/needs/save',NULL,'{"id":1}',NULL,'403',NULL,NULL);
 INSERT INTO "Test" VALUES (91,NULL,'POST','/api/message/update',NULL,'{"id":1}',NULL,'403',NULL,NULL);
 INSERT INTO "Test" VALUES (92,NULL,'POST','/api/navBar/updatePositions',NULL,'{"id":1}',NULL,'403',NULL,NULL);
+INSERT INTO "Test" VALUES (93,1000,'POST','/user/sign/in',NULL,'{"email":"badEmail@myclub.foo","password":"wrongPassword" }',NULL,'400',NULL,NULL);
+INSERT INTO "Test" VALUES (94,1010,'POST','/user/sign/in',NULL,'{"email":"admin@myclub.foo","password":"wrongPassword" }',NULL,'400',NULL,NULL);
+INSERT INTO "Test" VALUES (95,1020,'POST','/user/sign/in',NULL,'{"email":"admin@myclub.foo","password":"admin1234" }',NULL,'400',NULL,NULL);
 COMMIT;

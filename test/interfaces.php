@@ -22,8 +22,9 @@ interface RouteExtractorInterface
 
 interface TestDataRepositoryInterface
 {
-    public function getTestDataForRoute(array $route): array;
     public function executeQuery(string $query): array;
+    public function getTestDataForRoute(string $uri, string $method): array;
+    public function getSimulations(): array;
 }
 
 interface TestExporterInterface
@@ -34,4 +35,7 @@ interface TestExporterInterface
 interface TestReporterInterface
 {
     public function displaySummary(TestSummary $summary): void;
+    public function error(string $message): string;
+    public function sectionTitle(string $title): void;
+    public function validationErrors(array $errors): array;
 }

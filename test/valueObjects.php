@@ -28,7 +28,20 @@ readonly class Route
         public string $method,
         public string $originalPath,
         public bool $hasParameters,
-        public string $fullUrlTemplate
+    ) {}
+}
+
+readonly class Simulation
+{
+    public function __construct(
+        public Route $route,
+        public int $number,
+        public array $getParams,
+        public array $postParams,
+        public ?array $connectedUser,
+        public int $expectedResponseCode,
+        public ?string $query,
+        public ?string $queryExpectedResponse
     ) {}
 }
 

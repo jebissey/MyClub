@@ -1,11 +1,7 @@
 <?php
 
-use app\enums\Color;
-
 class ConsoleTestReporter implements TestReporterInterface
 {
-
-
     public function displaySummary(TestSummary $summary): void
     {
         echo $this->formatSummary($summary);
@@ -23,6 +19,28 @@ class ConsoleTestReporter implements TestReporterInterface
         }
     }
 
+    public function sectionTitle(string $title): void
+    {
+        echo str_repeat('-', 80) . PHP_EOL;
+        echo $title . PHP_EOL;
+    }
+
+    public function error(string $message): string
+    {
+        echo Color::Red->value . "ERROR: {$message}" . Color::Reset->value . PHP_EOL;
+        return "ERROR: {$message}";
+    }
+
+    public function validationErrors(array $errors): array
+    {
+        $errors = [];
+        foreach ($errors as $err) {
+            $errors[] =  $this->error($err);
+        }
+        return $errors;
+    }
+
+    #region Private functions
     private function formatSummary(TestSummary $summary): string
     {
         $out = [];
