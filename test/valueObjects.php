@@ -53,7 +53,7 @@ readonly class Simulation
             'Step' => $this->number,
             'JsonGetParameters' => json_encode($this->getParams),
             'JsonPostParameters' => json_encode($this->postParams),
-            'JsonConnectedUser' => json_encode($this->connectedUser),
+            'JsonConnectedUser' => $this->connectedUser == null ? null : json_encode($this->connectedUser),
             'ExpectedResponseCode' => $this->expectedResponseCode,
             'Query' => $this->query,
             'QueryExpectedResponse' => $this->queryExpectedResponse,

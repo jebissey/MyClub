@@ -17,7 +17,7 @@ class TestExecutor
         private TestConfiguration $config
     ) {}
 
-    public function testRoutes(array $routes, ?int $testFilter = null): array
+    public function testRoutes(array $routes, ?int $testFilter): array
     {
         $totalRoutes = count($routes);
         $results = [];
@@ -36,11 +36,14 @@ class TestExecutor
         return $results;
     }
 
-    public function testSimulations(array $simulations): array
+    public function testSimulations(array $simulations, ?int $simuFilter): array
     {
         $results = [];
-        foreach ($simulations as $simulation) {
-            $results = array_merge($results, $this->runRouteTests($simulation->route, $simulation->number, $simulation));
+        foreach ($simulations as $i =>  $simulation) {
+            $simuNumber = $i + 1;
+            if ($simuFilter === null || $simuFilter === $simuNumber) {
+                $results = array_merge($results, $this->runRouteTests($simulation->route, $simulation->number, $simulation));
+            }
         }
         return $results;
     }
@@ -63,8 +66,8 @@ class TestExecutor
     #region Private functions
     private function runRouteTests(Route $route, int $routeNumber, ?Simulation $simulation = null): array
     {
-        $testData = $this->repo->getTestDataForRoute($route->originalPath, $route->method);
         if ($simulation == null) {
+            $testData = $this->repo->getTestDataForRoute($route->originalPath, $route->method);
             if ($route->hasParameters && $testData === []) {
                 $this->parameterErrors[] = $this->reporter->error("({$routeNumber}) No data found for {$route->originalPath}");
                 return [];
@@ -81,9 +84,11 @@ class TestExecutor
             $results[] = new TestResult($route, $response, $routeNumber);
         } else {
             foreach ($testData as $test) {
+error_log(var_export($test, true));                
                 if (!$this->authenticateIfNeeded($test)) continue;
 
                 $route->testedPath = $url = $this->urlBuilder->build($route, json_decode($test['JsonGetParameters'], true) ?? []);
+error_log(var_export($url, true));
                 $response = $this->http->request($route->method, $url, [
                     'postfields' => json_decode($test['JsonPostParameters'], true)
                 ]);
@@ -96,7 +101,7 @@ class TestExecutor
 
     private function authenticateIfNeeded(array $test): bool
     {
-        if (!empty($test['JsonConnectedUser'])) {
+        if ($test['JsonConnectedUser'] != null) {
             $user = json_decode($test['JsonConnectedUser'], true);
             $authResult = $this->authenticator->authenticate($user);
             if (!$authResult->success) {

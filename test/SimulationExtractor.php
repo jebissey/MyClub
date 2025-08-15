@@ -19,7 +19,7 @@ class SimulationExtractor
                 number: (int) $row['Step'],
                 getParams: json_decode($row['JsonGetParameters'] ?? '[]', true),
                 postParams: json_decode($row['JsonPostParameters'] ?? '[]', true),
-                connectedUser: json_decode($row['JsonConnectedUser'] ?? 'null', true),
+                connectedUser: $row['JsonConnectedUser'] == null ? null : json_decode($row['JsonConnectedUser'], true),
                 expectedResponseCode: (int) $row['ExpectedResponseCode'],
                 query: $row['Query'],
                 queryExpectedResponse: $row['QueryExpectedResponse'],

@@ -59,10 +59,7 @@ class UserController extends AbstractController
         $email = urldecode($encodedEmail);
         $success = $this->authService->handleForgotPassword($email);
         if ($success) $this->application->getErrorManager()->raise(ApplicationError::Ok, 'Votre mot de passe est réinitialisé', 3000, false);
-        else $this->application->getErrorManager()->raise(
-            ApplicationError::Error,
-            'Unable to send password reset email'
-        );
+        else $this->application->getErrorManager()->raise(ApplicationError::Error, 'Unable to send password reset email');
     }
 
     public function setPassword($token): void

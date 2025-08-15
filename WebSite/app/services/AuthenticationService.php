@@ -47,21 +47,11 @@ class AuthenticationService
     {
         try {
             $person = $this->findPersonByEmail($email);
-            if (!$person) {
-                $this->logHelper->add(ApplicationError::Unauthorized->value, "Sign in failed: unknown email $email");
-                return AuthResult::error('Invalid credentials');
-            }
-            if ($person->Inactivated == 1) {
-                $this->logHelper->add(ApplicationError::Unauthorized->value, "Sign in failed: inactivated user $email");
-                return AuthResult::error('Account is inactive');
-            }
-            if (!$this->verifyPassword($password, $person->Password)) {
-                $this->logHelper->add(ApplicationError::Unauthorized->value, "Sign in failed: wrong password for $email");
-                return AuthResult::error('Invalid credentials');
-            }
+            if (!$person)                                             return AuthResult::error("Sign in failed: unknown email $email");
+            if ($person->Inactivated == 1)                            return AuthResult::error("Sign in failed: inactivated user $email");
+            if (!$this->verifyPassword($password, $person->Password)) return AuthResult::error("Sign in failed: wrong password for $email");
             return $this->loginUser($person, $rememberMe);
         } catch (\Exception $e) {
-            $this->logHelper->add(ApplicationError::Error->value, "Sign in error: " . $e->getMessage());
             return AuthResult::error('Authentication system error');
         }
     }
@@ -86,7 +76,7 @@ class AuthenticationService
         );
         $_SESSION['user'] = $person->Email;
         $_SESSION['navbar'] = '';
-        $this->logHelper->add(ApplicationError::Ok->value, "Auto sign in succeeded for {$person->Email}");
+        $this->application->getErrorManager()->raise(ApplicationError::Ok, "Auto sign in succeeded for {$person->Email}", 1, false);
         return AuthResult::success($person);
     }
 
@@ -94,12 +84,12 @@ class AuthenticationService
     {
         $userEmail = $_SESSION['user'] ?? '';
         if ($userEmail) {
-            $this->logHelper->add(ApplicationError::Ok->value, "Sign out succeeded with $userEmail");
             $this->application->getDataHelper()->set(
                 'Person',
                 ['LastSignOut' => date('Y-m-d H:i:s')],
                 ['Email' => $userEmail]
             );
+            $this->application->getErrorManager()->raise(ApplicationError::Ok, "Sign out succeeded with $userEmail", 1, false);
         }
         unset($_SESSION['user']);
         $_SESSION['navbar'] = '';
@@ -191,7 +181,7 @@ class AuthenticationService
         if ($rememberMe) $this->setRememberMeToken($person);
         $_SESSION['user'] = $person->Email;
         $_SESSION['navbar'] = '';
-        $this->logHelper->add(ApplicationError::Ok->value, "Sign in succeeded for {$person->Email}");
+        $this->application->getErrorManager()->raise(ApplicationError::Ok, "Sign in succeeded for {$person->Email}", 1, false);
         return AuthResult::success($person);
     }
 }

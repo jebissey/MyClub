@@ -9,21 +9,25 @@ class RouteTestOrchestrator
         private TestReporterInterface $reporter,
     ) {}
 
-    public function runTests(string $routeFilePath, ?int $test = null): array
+    public function runTests(string $routeFilePath, ?int $test = null, ?int $simu = null): array
     {
-        $this->reporter->sectionTitle("Routes extraction");
-        $routes = $this->routeExtractor->extractRoutes($routeFilePath);
-        $totalRoutes = count($routes);
-        echo "Found $totalRoutes routes.\n";
-        echo str_repeat('-', 80) . "\n";
-        $results = $this->executor->testRoutes($routes, $test);
-
+        $results = [];
+        if ($simu == null) {
+            $this->reporter->sectionTitle("Routes extraction");
+            $routes = $this->routeExtractor->extractRoutes($routeFilePath);
+            $totalRoutes = count($routes);
+            echo "Found {$totalRoutes} routes.\n";
+            echo str_repeat('-', 80) . "\n";
+            $results = $this->executor->testRoutes($routes, $test);
+        }
         if ($test == null) {
             $this->reporter->sectionTitle("Simulations extraction");
             $simulations = $this->simulationExtractor->extract();
-#            $results = array_merge($results, $this->executor->testSimulations($simulations));
+            $totalSimulations = count($simulations);
+            echo "Found {$totalSimulations} simulations.\n";
+            echo str_repeat('-', 80) . "\n";
+            $results = array_merge($results, $this->executor->testSimulations($simulations, $simu));
         }
-
         $this->reporter->displaySummary($this->summaryGenerator($results));
         return $results;
     }

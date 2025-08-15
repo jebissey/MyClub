@@ -33,6 +33,7 @@ Options:
   --export-csv        Exporter les résultats en CSV
   --help              Afficher cette aide
   --test=n°           Faire uniquement le test demandé
+  --simu=n°           Faire uniquement la simulation demandée
 EOT;
 }
 
@@ -46,7 +47,8 @@ function main(): int
         'export-json',
         'export-csv',
         'help',
-        'test:'
+        'test:',
+        'simu:'
     ]);
     if (isset($options['help']) || isset($options['h'])) {
         printHelp();
@@ -57,6 +59,7 @@ function main(): int
         timeout: (int)($options['timeout'] ?? 10)
     );
     $test       = $options['test'] ?? null;
+    $simu       = $options['simu'] ?? null;
     $exportJson = isset($options['export-json']);
     $exportCsv  = isset($options['export-csv']);
     $routeFile  = $options['routes-file'] ?? __DIR__ . '/../WebSite/index.php';
@@ -72,7 +75,7 @@ function main(): int
         echo "  Base de données: " . ($dbTestsPath ?: "Non spécifiée") . "\n\n";
 
         $orchestrator = RouteTestFactory::create($config, $dbTestsPath);
-        $results = $orchestrator->runTests($routeFile, $test);
+        $results = $orchestrator->runTests($routeFile, $test, $simu);
 
         if ($exportJson) (new JsonTestExporter())->export($results, 'route_test_results.json');
         if ($exportCsv) (new CsvTestExporter())->export($results, 'route_test_results.csv');
