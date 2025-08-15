@@ -28,7 +28,7 @@ class TestExecutor
                 $tests = $this->runRouteTests($route, $routeNumber);
                 $results = array_merge($results, $tests);
                 foreach ($tests as $test) {
-                    $this->reporter->diplayResult($test->route->testedPath, $test->response->httpCode, $test->response->responseTimeMs);
+                    $this->reporter->diplayResult($test->route->testedPath, $test->response->httpCode, $test->response->responseTimeMs, []);
                 }
                 usleep($this->config->requestDelay);
             }
@@ -38,11 +38,15 @@ class TestExecutor
 
     public function testSimulations(array $simulations, ?int $simuFilter): array
     {
+        $totalSimulations = count($simulations);
         $results = [];
         foreach ($simulations as $i =>  $simulation) {
             $simuNumber = $i + 1;
             if ($simuFilter === null || $simuFilter === $simuNumber) {
-                $results = array_merge($results, $this->runRouteTests($simulation->route, $simulation->number, $simulation));
+                $this->reporter->diplayTest($simuNumber, $totalSimulations, $simulation->route->method, $simulation->route->originalPath);
+                $tests = $this->runRouteTests($simulation->route, $simulation->number, $simulation);
+                $results = array_merge($results, $tests);
+                $this->reporter->diplayResult($tests[0]->route->testedPath, $tests[0]->response->httpCode, $tests[0]->response->responseTimeMs, $simulation->postParams);
             }
         }
         return $results;
@@ -84,11 +88,9 @@ class TestExecutor
             $results[] = new TestResult($route, $response, $routeNumber);
         } else {
             foreach ($testData as $test) {
-error_log(var_export($test, true));                
                 if (!$this->authenticateIfNeeded($test)) continue;
 
                 $route->testedPath = $url = $this->urlBuilder->build($route, json_decode($test['JsonGetParameters'], true) ?? []);
-error_log(var_export($url, true));
                 $response = $this->http->request($route->method, $url, [
                     'postfields' => json_decode($test['JsonPostParameters'], true)
                 ]);

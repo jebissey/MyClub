@@ -40,7 +40,7 @@ class ConsoleTestReporter implements TestReporterInterface
         return $errors;
     }
 
-    public function diplayTest(int $testNumber, int $totalTests, string $method, string $path)
+    public function diplayTest(int $testNumber, int $totalTests, string $method, string $path): void
     {
         echo sprintf(
             "[%d/%d] Testing %s %s ",
@@ -51,11 +51,21 @@ class ConsoleTestReporter implements TestReporterInterface
         );
     }
 
-    public function diplayResult(string $testedPath, int $httpCode, float $responseTimeMs)
+    public function diplayResult(string $testedPath, int $httpCode, float $responseTimeMs, array $postParams): void
     {
+        $strPostParams = '';
+        if ($postParams != []) {
+            $strPostParams = ' with ' . implode(', ', array_map(
+                fn($k, $v) => "$k=$v",
+                array_keys($postParams),
+                $postParams
+            ));
+        }
+
         echo sprintf(
-            " => %s -> %s%d %s%s (%.2fms)\n",
+            " => %s%s -> %s%d %s%s (%.2fms)\n",
             $testedPath,
+            $strPostParams,
             $this->getStatusColor($httpCode),
             $httpCode,
             $this->getStatusText($httpCode),
