@@ -6,7 +6,7 @@ class UrlBuilder
 
     public function build(Route $route, array $getParameters = []): string
     {
-        $url = $this->config->baseUrl . $route->originalPath;
+        $url = $route->originalPath;
         foreach ($getParameters as $key => $value) {
             $url = preg_replace('/@' . preg_quote($key, '/') . '(?::[^\s\/]+)?/', $value, $url);
         }

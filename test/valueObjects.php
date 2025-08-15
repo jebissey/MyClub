@@ -22,12 +22,13 @@ readonly class HttpResponse
     ) {}
 }
 
-readonly class Route
+class Route
 {
     public function __construct(
-        public string $method,
-        public string $originalPath,
-        public bool $hasParameters,
+        public readonly string $method,
+        public readonly string $originalPath,
+        public readonly bool $hasParameters,
+        public string $testedPath,
     ) {}
 }
 
@@ -43,6 +44,21 @@ readonly class Simulation
         public ?string $query,
         public ?string $queryExpectedResponse
     ) {}
+
+    public function toArray(): array
+    {
+        return [
+            'Method' => $this->route->method,
+            'Uri' => $this->route->originalPath,
+            'Step' => $this->number,
+            'JsonGetParameters' => json_encode($this->getParams),
+            'JsonPostParameters' => json_encode($this->postParams),
+            'JsonConnectedUser' => json_encode($this->connectedUser),
+            'ExpectedResponseCode' => $this->expectedResponseCode,
+            'Query' => $this->query,
+            'QueryExpectedResponse' => $this->queryExpectedResponse,
+        ];
+    }
 }
 
 readonly class TestConfiguration
@@ -87,4 +103,3 @@ readonly class ValidationResult
         public string $message = ''
     ) {}
 }
-

@@ -38,4 +38,6 @@ interface TestReporterInterface
     public function error(string $message): string;
     public function sectionTitle(string $title): void;
     public function validationErrors(array $errors): array;
+    public function diplayTest(int $testNumber, int $totalTests, string $method, string $path);
+    public function diplayResult(string $testedPath, int $httpCode, float $responseTimeMs);
 }

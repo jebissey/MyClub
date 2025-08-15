@@ -19,12 +19,17 @@ class TestExecutor
 
     public function testRoutes(array $routes, ?int $testFilter = null): array
     {
+        $totalRoutes = count($routes);
         $results = [];
         foreach ($routes as $i => $route) {
             $routeNumber = $i + 1;
             if ($testFilter === null || $testFilter === $routeNumber) {
-    error_log(var_export($routeNumber, true));
-                $results = array_merge($results, $this->runRouteTests($route, $routeNumber));
+                $this->reporter->diplayTest($routeNumber, $totalRoutes, $route->method, $route->originalPath);
+                $tests = $this->runRouteTests($route, $routeNumber);
+                $results = array_merge($results, $tests);
+                foreach ($tests as $test) {
+                    $this->reporter->diplayResult($test->route->testedPath, $test->response->httpCode, $test->response->responseTimeMs);
+                }
                 usleep($this->config->requestDelay);
             }
         }
@@ -35,7 +40,7 @@ class TestExecutor
     {
         $results = [];
         foreach ($simulations as $simulation) {
-            $results = array_merge($results, $this->runRouteTests($simulation->route, $simulation->number));
+            $results = array_merge($results, $this->runRouteTests($simulation->route, $simulation->number, $simulation));
         }
         return $results;
     }
@@ -56,16 +61,17 @@ class TestExecutor
     }
 
     #region Private functions
-    private function runRouteTests(Route $route, int $routeNumber): array
+    private function runRouteTests(Route $route, int $routeNumber, ?Simulation $simulation = null): array
     {
         $testData = [];
-        if ($route->hasParameters) {
+        if ($route->hasParameters && $simulation == null) {
             $testData = $this->repo->getTestDataForRoute($route->originalPath, $route->method);
             if ($testData === []) {
                 $this->parameterErrors[] = $this->reporter->error("({$routeNumber}) No data found for {$route->originalPath}");
                 return [];
             }
         }
+        if ($simulation != null) $testData[] = $simulation->toArray();
         $errors = $this->validator->validate($route, $routeNumber, $testData);
         if ($errors) {
             $this->responseErrors[] = $this->reporter->validationErrors($errors);
@@ -78,7 +84,8 @@ class TestExecutor
         } else {
             foreach ($testData as $test) {
                 if (!$this->authenticateIfNeeded($test)) continue;
-                $url = $this->urlBuilder->build($route, json_decode($test['JsonGetParameters'], true) ?? []);
+
+                $route->testedPath = $url = $this->urlBuilder->build($route, json_decode($test['JsonGetParameters'], true) ?? []);
                 $response = $this->http->request($route->method, $url, [
                     'postfields' => json_decode($test['JsonPostParameters'], true)
                 ]);
@@ -106,7 +113,7 @@ class TestExecutor
     {
         $result = $this->responseValidator->validate($response->httpCode, $test['ExpectedResponseCode']);
         if (!$result->isValid) {
-            $this->testErrors[] = $this->reporter->error("Unexpected response for test {$routeNumber}");
+            $this->testErrors[] = $this->reporter->error("Unexpected response for test {$routeNumber}: {$test['Method']} {$test['Uri']} with {$test['JsonGetParameters']}, expected : {$test['ExpectedResponseCode']}, received : {$response->httpCode}");
         }
     }
 }

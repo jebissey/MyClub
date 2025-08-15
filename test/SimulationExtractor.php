@@ -14,6 +14,7 @@ class SimulationExtractor
                     method: $row['Method'],
                     originalPath: $row['Uri'],
                     hasParameters: str_contains($row['Uri'], '@'),
+                    testedPath: $row['Uri']
                 ),
                 number: (int) $row['Step'],
                 getParams: json_decode($row['JsonGetParameters'] ?? '[]', true),

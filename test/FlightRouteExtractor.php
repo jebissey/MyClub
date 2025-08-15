@@ -32,15 +32,14 @@ class FlightRouteExtractor implements RouteExtractorInterface
     {
         $parts = preg_split('/\s+/', trim($routeDefinition), 2);
         if (count($parts) !== 2) return null;
-        $method = strtoupper($parts[0]);
         $path = $parts[1];
         if (!str_starts_with($path, '/')) return null;
-        $hasParameters = preg_match(self::REGEX_ROUTE_PARAM, $path) > 0;
 
         return new Route(
-            method: $method,
+            method: strtoupper($parts[0]),
             originalPath: $path,
-            hasParameters: $hasParameters,
+            hasParameters: preg_match(self::REGEX_ROUTE_PARAM, $path) > 0,
+            testedPath: ''
         );
     }
 }

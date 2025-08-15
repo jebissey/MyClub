@@ -27,7 +27,7 @@ class ConsoleTestReporter implements TestReporterInterface
 
     public function error(string $message): string
     {
-        echo Color::Red->value . "ERROR: {$message}" . Color::Reset->value . PHP_EOL;
+        echo Color::Red->value . "ERROR: {$message}" . Color::Reset->value;
         return "ERROR: {$message}";
     }
 
@@ -38,6 +38,30 @@ class ConsoleTestReporter implements TestReporterInterface
             $errors[] =  $this->error($err);
         }
         return $errors;
+    }
+
+    public function diplayTest(int $testNumber, int $totalTests, string $method, string $path)
+    {
+        echo sprintf(
+            "[%d/%d] Testing %s %s",
+            $testNumber,
+            $totalTests,
+            $method,
+            $path
+        );
+    }
+
+    public function diplayResult(string $testedPath, int $httpCode, float $responseTimeMs)
+    {
+        echo sprintf(
+            " => %s -> %s%d %s%s (%.2fms)\n",
+            $testedPath,
+            $this->getStatusColor($httpCode),
+            $httpCode,
+            $this->getStatusText($httpCode),
+            Color::Reset->value,
+            $responseTimeMs
+        );
     }
 
     #region Private functions
@@ -85,5 +109,26 @@ class ConsoleTestReporter implements TestReporterInterface
             $code >= 500                => Color::Red->value,
             default                     => Color::White->value,
         };
+    }
+
+    private function getStatusText(int $code): string
+    {
+        $statuses = [
+            200 => 'OK',
+            201 => 'Created',
+            204 => 'No Content',
+            301 => 'Moved Permanently',
+            302 => 'Found',
+            304 => 'Not Modified',
+            400 => 'Bad Request',
+            401 => 'Unauthorized',
+            403 => 'Forbidden',
+            404 => 'Not Found',
+            405 => 'Method Not Allowed',
+            500 => 'Internal Server Error',
+            502 => 'Bad Gateway',
+            503 => 'Service Unavailable'
+        ];
+        return $statuses[$code] ?? 'Unknown';
     }
 }
