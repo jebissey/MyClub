@@ -2,7 +2,7 @@
 
 class TestExecutor
 {
-    private $parameterErrors = [];
+    private array $parameterErrors = [];
     private array $responseErrors = [];
     private array $testErrors = [];
 
@@ -63,15 +63,13 @@ class TestExecutor
     #region Private functions
     private function runRouteTests(Route $route, int $routeNumber, ?Simulation $simulation = null): array
     {
-        $testData = [];
-        if ($route->hasParameters && $simulation == null) {
-            $testData = $this->repo->getTestDataForRoute($route->originalPath, $route->method);
-            if ($testData === []) {
+        $testData = $this->repo->getTestDataForRoute($route->originalPath, $route->method);
+        if ($simulation == null) {
+            if ($route->hasParameters && $testData === []) {
                 $this->parameterErrors[] = $this->reporter->error("({$routeNumber}) No data found for {$route->originalPath}");
                 return [];
             }
-        }
-        if ($simulation != null) $testData[] = $simulation->toArray();
+        } else $testData[] = $simulation->toArray();
         $errors = $this->validator->validate($route, $routeNumber, $testData);
         if ($errors) {
             $this->responseErrors[] = $this->reporter->validationErrors($errors);
@@ -113,7 +111,7 @@ class TestExecutor
     {
         $result = $this->responseValidator->validate($response->httpCode, $test['ExpectedResponseCode']);
         if (!$result->isValid) {
-            $this->testErrors[] = $this->reporter->error("Unexpected response for test {$routeNumber}: {$test['Method']} {$test['Uri']} with {$test['JsonGetParameters']}, expected : {$test['ExpectedResponseCode']}, received : {$response->httpCode}");
+            $this->responseErrors[] = $this->reporter->error("Unexpected response for test {$routeNumber}: {$test['Method']} {$test['Uri']} ; expected: {$test['ExpectedResponseCode']}, received: {$response->httpCode}");
         }
     }
 }

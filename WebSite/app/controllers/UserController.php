@@ -122,7 +122,7 @@ class UserController extends AbstractController
     public function signOut(): void
     {
         $this->authService->signOut();
-        $this->flight->redirect('/', ApplicationError::Ok->value);
+        $this->flight->redirect('/');
     }
     #endregion
 

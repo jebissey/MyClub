@@ -43,7 +43,7 @@ class ConsoleTestReporter implements TestReporterInterface
     public function diplayTest(int $testNumber, int $totalTests, string $method, string $path)
     {
         echo sprintf(
-            "[%d/%d] Testing %s %s",
+            "[%d/%d] Testing %s %s ",
             $testNumber,
             $totalTests,
             $method,
