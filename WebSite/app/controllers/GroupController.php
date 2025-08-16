@@ -34,7 +34,7 @@ class GroupController extends AbstractController implements CrudControllerInterf
     {
         if (($this->connectedUser->get()->isPersonManager() ?? false) || $this->connectedUser->isWebmaster() ?? false) {
 
-            $availableAuthorizations = $this->dataHelper->gets('Authorization');
+            $availableAuthorizations = $this->dataHelper->gets('Authorization',['Id <> 1' => null]);
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $schema = [
                     'name' => FilterInputRule::HtmlSafeName->value,

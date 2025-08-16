@@ -26,6 +26,15 @@ class WebmasterController extends AbstractController
         ]);
     }
 
+    public function helpVisitorInsights(): void
+    {
+        $this->render('app/views/info.latte', [
+            'content' => $this->dataHelper->get('Settings', ['Name' => 'Help_visitorInsights'], 'Value')->Value ?? '',
+            'hasAuthorization' => $this->connectedUser->get()->isEventManager() ?? false,
+            'currentVersion' => Application::VERSION
+        ]);
+    }
+
     public function helpAdmin()
     {
         if ($this->connectedUser->get()->isAdministrator() ?? false) {
@@ -157,6 +166,19 @@ class WebmasterController extends AbstractController
         }
         echo '</urlset>';
     }
+
+    public function visitorInsights(): void
+    {
+        if ($this->connectedUser->get()->isVisitorInsights() ?? false) {
+
+            if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+                $_SESSION['navbar'] = 'visitorInsights';
+
+                $this->render('app/views/admin/visitorInsights.latte', Params::getAll([]));
+            } else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+    }
+
 
     #region Private methods
     private function generateRSS($articles, $site_title, $site_url, $feed_url, $feed_description)

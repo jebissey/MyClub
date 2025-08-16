@@ -27,6 +27,14 @@
                 <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Tableau croisé dynamique">
                     <a class="nav-link {if $page == 'crossTab'}active{/if}" href="/events/crossTab"><h2>🧮</h2></a>
                 </li>
+                {if $isEventDesigner}
+                <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Les types d'évènements">
+                    <a class="nav-link {if $page == 'eventTypes'}active{/if}" href="/eventTypes"><h2>🎨</h2></a>
+                </li>
+                <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Les besoins">
+                    <a class="nav-link {if $page == 'needs'}active{/if}" href="/needs"><h2>📋</h2></a>
+                </li>
+                {/if}
             </ul>
             <a href ="/eventManager/help"><img src="/app/images/help.png" alt="Help" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Aide contextuelle"></a>
         </div>

@@ -42,10 +42,13 @@ class ConnectedUser
             'userImg' => $this->getUserImg($this->person),
             'userEmail' => $this->person->Email,
             'keys' => count($this->authorizations) > 0,
+            'isEventDesigner' => $this->isEventDesigner(),
             'isEventManager' => $this->isEventManager(),
+            'isHomeDesigner' => $this->isHomeDesigner(),
             'isPersonManager' => $this->isPersonManager(),
             'isRedactor' => $this->isRedactor(),
             'isEditor' => $this->isEditor(),
+            'isVisitorInsights' => $this->isVisitorInsights(),
             'isWebmaster' => $this->isWebmaster(),
             'page' => explode('/', trim(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/'))[$segment],
             'currentVersion' => Application::VERSION,
@@ -58,16 +61,27 @@ class ConnectedUser
 
     public function isAdministrator(): bool
     {
-        return $this->isEditor() || $this->isEventManager() || $this->isPersonManager() || $this->isWebmaster();
+        return $this->isEditor() || $this->isEventManager() || $this->isPersonManager() || $this->isWebmaster() || $this->isVisitorInsights();
     }
+
     public function isEditor(): bool
     {
         return in_array(Authorization::Editor->value, $this->authorizations ?? []);
     }
 
+    public function isEventDesigner(): bool
+    {
+        return in_array(Authorization::EventDesigner->value, $this->authorizations ?? []);
+    }
+
     public function isEventManager(): bool
     {
         return in_array(Authorization::EventManager->value, $this->authorizations ?? []);
+    }
+
+    public function isHomeDesigner(): bool
+    {
+        return in_array(Authorization::HomeDesigner->value, $this->authorizations ?? []);
     }
 
     public function isPersonManager(): bool
@@ -78,6 +92,11 @@ class ConnectedUser
     public function isRedactor(): bool
     {
         return in_array(Authorization::Redactor->value, $this->authorizations ?? []);
+    }
+
+    public function isVisitorInsights(): bool
+    {
+        return in_array(Authorization::VisitorInsights->value, $this->authorizations ?? []);
     }
 
     public function isWebmaster(): bool

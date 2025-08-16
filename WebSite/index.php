@@ -235,6 +235,8 @@ mapRoute($flight, 'GET  /arwards', $webmasterController, 'arwards');
 mapRoute($flight, 'POST /arwards', $webmasterController, 'arwards');
 mapRoute($flight, 'GET  /rss.xml', $webmasterController, 'rssGenerator');
 mapRoute($flight, 'GET  /sitemap.xml', $webmasterController, 'sitemapGenerator');
+mapRoute($flight, 'GET  /visitorInsights', $webmasterController, 'visitorInsights');
+mapRoute($flight, 'GET  /visitorInsights/help', $webmasterController, 'helpVisitorInsights');
 mapRoute($flight, 'GET  /webmaster', $webmasterController, 'homeWebmaster');
 #endregion
 

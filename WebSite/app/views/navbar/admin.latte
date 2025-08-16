@@ -24,6 +24,11 @@
                                 <a class="nav-link" href="/redactor" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Rédacteur"><h2>✍️</h2></a>
                             </li>
                             {/if}
+                            {if $isVisitorInsights}
+                            <li class="nav-item">
+                                <a class="nav-link" href="/visitorInsights" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Observatoire"><h2>🔍</h2></a>
+                            </li>
+                            {/if}
                             {if $isWebmaster}
                             <li class="nav-item">
                                 <a class="nav-link" href="/webmaster" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Webmaster"><h2>🛠️</h2></a>

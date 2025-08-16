@@ -83,7 +83,7 @@ class WebApp
                 $filtered[$key] = null;
                 continue;
             }
-            if ($rule === FilterInputRule::ArrayInt || $rule === FilterInputRule::ArrayString) {
+            if ($rule === FilterInputRule::ArrayInt->value || $rule === FilterInputRule::ArrayString->value) {
                 if (is_array($raw)) {
                     $filtered[$key] = array_values(array_filter(
                         $raw,
