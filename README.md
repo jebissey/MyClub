@@ -21,7 +21,7 @@ All data is stored in a **SQLight** database.
 
 Security is based on groups. There are three types of group. Groups with authorisation, groups without authorisation and self-registration groups. There are different authorisations: 
 
-| Role / Permission  | Description |
+| Authorization  | Description |
 |--------------------|-------------|
 | **Webmaster**      | Full administrative access to all features and settings of the web application, including technical and structural management. |
 | **PersonManager**  | Can manage members and user profiles, including creating, editing, deleting, and importing/exporting user data. |
