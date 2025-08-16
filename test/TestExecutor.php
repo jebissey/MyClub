@@ -8,6 +8,7 @@ class TestExecutor
 
     public function __construct(
         private TestDataRepositoryInterface $repo,
+        private MyclubDataRepositoryInterface $myClub,
         private AuthenticatorInterface $authenticator,
         private HttpClientInterface $http,
         private ResponseValidatorInterface $responseValidator,
@@ -88,28 +89,35 @@ class TestExecutor
             $results[] = new TestResult($route, $response, $routeNumber);
         } else {
             foreach ($testData as $test) {
-                if (!$this->authenticateIfNeeded($test)) continue;
-
+                if (!$this->authenticateIfNeeded($test, $routeNumber)) continue;
                 $route->testedPath = $url = $this->urlBuilder->build($route, json_decode($test['JsonGetParameters'], true) ?? []);
                 $response = $this->http->request($route->method, $url, [
                     'postfields' => json_decode($test['JsonPostParameters'], true)
                 ]);
                 $this->validateResponse($routeNumber, $test, $response);
                 $results[] = new TestResult($route, $response, $routeNumber);
+                if ($test['Query'] != null) {
+                    $response = $this->myClub->executeQuery($test['Query']);
+                    $jsonResponse = json_encode($response, JSON_UNESCAPED_UNICODE);
+                    if ($jsonResponse != $test['QueryExpectedResponse']) {
+                        $this->responseErrors[] = $this->reporter->error("Unexpected query response for test {$routeNumber}: {$test['Method']} {$test['Uri']}  \nexpected: {$test['QueryExpectedResponse']} \nreceived: {$jsonResponse}");
+                    }
+                }
             }
         }
         return $results;
     }
 
-    private function authenticateIfNeeded(array $test): bool
+    private function authenticateIfNeeded(array $test, int $routeNumber): bool
     {
         if ($test['JsonConnectedUser'] != null) {
             $user = json_decode($test['JsonConnectedUser'], true);
             $authResult = $this->authenticator->authenticate($user);
             if (!$authResult->success) {
-                $this->reporter->error("Auth failed for test ID {$test['Id']}");
+                $this->reporter->error("Auth failed for test {$routeNumber}");
                 return false;
             }
+            $_SESSION['user'] = $user['email'];
         }
         return true;
     }

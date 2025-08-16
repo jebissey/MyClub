@@ -9,6 +9,7 @@ class SimulationExtractor
         $data = $this->repo->getSimulations();
         $simulations = [];
         foreach ($data as $row) {
+#error_log(var_export($row, true))        ;
             $simulations[] = new Simulation(
                 route: new Route(
                     method: $row['Method'],

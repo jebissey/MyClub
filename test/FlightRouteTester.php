@@ -15,6 +15,7 @@ require_once __DIR__ . '/RouteTestFactory.php';
 require_once __DIR__ . '/RouteTestOrchestrator.php';
 require_once __DIR__ . '/SessionAuthenticator.php';
 require_once __DIR__ . '/SimulationExtractor.php';
+require_once __DIR__ . '/SqliteMyClubDataRepository.php';
 require_once __DIR__ . '/SqliteTestDataRepository.php';
 require_once __DIR__ . '/TestDataValidator.php';
 require_once __DIR__ . '/TestExecutor.php';
@@ -64,6 +65,7 @@ function main(): int
     $exportCsv  = isset($options['export-csv']);
     $routeFile  = $options['routes-file'] ?? __DIR__ . '/../WebSite/index.php';
     $dbTestsPath     = $options['db-path'] ?? __DIR__ . '/tests.sqlite';
+    $dbMyClubPath    =  __DIR__ . '/../WebSite/data/MyClub.sqlite';
     $dbWebSitePath   = $options['db-path'] ?? __DIR__ . '/../WebSite/data/MyClub.sqlite';
     if (!CurrentWebSite::backup($dbWebSitePath)) throw new InvalidArgumentException("File $dbWebSitePath doesn't exist");
     if (!CurrentWebSite::remove($dbWebSitePath)) throw new InvalidArgumentException("File $dbWebSitePath doesn't removed");
@@ -74,7 +76,7 @@ function main(): int
         echo "  Fichier de routes: $routeFile\n";
         echo "  Base de données: " . ($dbTestsPath ?: "Non spécifiée") . "\n\n";
 
-        $orchestrator = RouteTestFactory::create($config, $dbTestsPath);
+        $orchestrator = RouteTestFactory::create($config, $dbTestsPath, $dbMyClubPath);
         $results = $orchestrator->runTests($routeFile, $test, $simu);
 
         if ($exportJson) (new JsonTestExporter())->export($results, 'route_test_results.json');

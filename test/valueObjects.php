@@ -4,7 +4,6 @@ readonly class AuthenticationResult
 {
     public function __construct(
         public bool $success,
-        public array $sessionData = [],
         public string $error = ''
     ) {}
 }

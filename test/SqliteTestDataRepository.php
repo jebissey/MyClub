@@ -32,15 +32,4 @@ class SqliteTestDataRepository implements TestDataRepositoryInterface
             throw new RuntimeException("Erreur lors de la récupération des données: " . $e->getMessage());
         }
     }
-
-    public function executeQuery(string $query): array
-    {
-        try {
-            $stmt = $this->db->prepare($query);
-            $stmt->execute();
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
-        } catch (PDOException $e) {
-            throw new RuntimeException("Erreur d'exécution de requête: " . $e->getMessage());
-        }
-    }
 }

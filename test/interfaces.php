@@ -10,6 +10,11 @@ interface HttpClientInterface
     public function request(string $method, string $url, array $options = []): HttpResponse;
 }
 
+interface MyClubDataRepositoryInterface
+{
+    public function executeQuery(string $query): array;
+}
+
 interface ResponseValidatorInterface
 {
     public function validate(int $actualResponseCode, int $expectedResponseCode): ValidationResult;
@@ -22,7 +27,6 @@ interface RouteExtractorInterface
 
 interface TestDataRepositoryInterface
 {
-    public function executeQuery(string $query): array;
     public function getTestDataForRoute(string $uri, string $method): array;
     public function getSimulations(): array;
 }

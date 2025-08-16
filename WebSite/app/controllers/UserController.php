@@ -253,7 +253,8 @@ class UserController extends AbstractController
                     'useGravatar' => WebApp::sanitizeInput($person->UseGravatar, $this->application->enumToValues(YesNo::class), YesNo::No->value),
                     'emojis' => Application::EMOJI_LIST,
                     'isSelfEdit' => true,
-                    'layout' => WebApp::getLayout()
+                    'layout' => WebApp::getLayout(),
+                    'navItems' => $this->getNavItems($connectedUser->person ?? false),
                 ]));
             } else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
         } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);

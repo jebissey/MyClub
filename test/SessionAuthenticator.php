@@ -15,13 +15,10 @@ class SessionAuthenticator implements AuthenticatorInterface
                 'postfields' => http_build_query($credentials),
                 'headers' => ['Content-Type: application/x-www-form-urlencoded']
             ]);
-            $success = in_array($response->httpCode, [200, 302]);
-            preg_match_all('/Set-Cookie:\s*([^;\r\n]+)/', $response->headers, $matches);
-            $sessionData = ['cookies' => $matches[1] ?? []];
+            $success = in_array($response->httpCode, [200, 302, 303]);
 
             return new AuthenticationResult(
                 success: $success,
-                sessionData: $sessionData,
                 error: $success ? '' : "Code HTTP: {$response->httpCode}"
             );
         } catch (Exception $e) {
