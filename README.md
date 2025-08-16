@@ -19,7 +19,19 @@ But there are also events.
 
 All data is stored in a **SQLight** database.
 
-Security is based on groups. There are three types of group. Groups with authorisation, groups without authorisation and self-registration groups. There are five different authorisations: event manager, person manager, redactor, editor and webmaster.
+Security is based on groups. There are three types of group. Groups with authorisation, groups without authorisation and self-registration groups. There are different authorisations: 
+
+| Role / Permission  | Description |
+|--------------------|-------------|
+| **Webmaster**      | Full administrative access to all features and settings of the web application, including technical and structural management. |
+| **PersonManager**  | Can manage members and user profiles, including creating, editing, deleting, and importing/exporting user data. |
+| **EventManager**   | Can create, edit, and manage events, including scheduling, location, and participant limits. |
+| **Redactor**       | Can write articles and other content, and publish them if the audience is restricted to club members or to a specific group. Cannot publish publicly visible content. |
+| **Editor**         | Can review, approve, publish, and unpublish any content, including content intended for public visibility. |
+| **HomeDesigner**   | Can customize the home page layout, banners, and featured sections. |
+| **EventDesigner**  | Can create event types, define their attributes, and optionally assign them to groups. |
+| **VisitorInsights**| Can view visitor statistics and insights, including visit counts, pages viewed, and other analytics data. |
+
 
 ## How to test
 https://myclub.alwaysdata.net/
