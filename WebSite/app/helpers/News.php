@@ -2,8 +2,6 @@
 
 namespace app\helpers;
 
-use RuntimeException;
-
 class News
 {
     private array $providers;

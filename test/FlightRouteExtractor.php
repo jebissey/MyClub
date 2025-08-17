@@ -24,6 +24,7 @@ class FlightRouteExtractor implements RouteExtractorInterface
             $parsed = $this->parseRoute($route);
             if ($parsed) $routes[] = $parsed;
         }
+        usort($routes, fn(Route $a, Route $b) => strcmp($a->originalPath, $b->originalPath));
         return $routes;
     }
 

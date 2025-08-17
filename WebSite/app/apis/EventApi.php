@@ -86,6 +86,15 @@ class EventApi extends AbstractApi
         }
     }
 
+    public function getAttributes(): void
+    {
+        try {
+            $this->renderJson(['success' => true, 'attributes' => $this->attributeService->getAllAttributes()]);
+        } catch (Throwable $e) {
+            $this->renderJson(['success' => false, 'message' => $e->getMessage()]);
+        }
+    }
+
     public function getAttributesByEventType(int $eventTypeId): void
     {
         if ($eventTypeId <= 0) {
@@ -195,6 +204,24 @@ class EventApi extends AbstractApi
         }
     }
 
+    public function deleteMessage(): void
+    {
+        $userId = $this->authService->getUserId();
+        if (!$userId) {
+            $this->renderUnauthorized();
+            return;
+        }
+        try {
+            $data = $this->getJsonInput();
+            $this->validateMessageData($data);
+
+            $response = $this->messageService->deleteMessage($data['messageId'], $userId);
+            $this->renderJson($response);
+        } catch (Throwable $e) {
+            $this->renderError($e->getMessage());
+        }
+    }
+
     public function updateMessage(): void
     {
         $userId = $this->authService->getUserId();
@@ -215,7 +242,6 @@ class EventApi extends AbstractApi
     }
 
     #region Need
-
     public function deleteNeed(int $id): void
     {
         if (!$this->authService->isWebmaster()) {
@@ -277,6 +303,16 @@ class EventApi extends AbstractApi
         try {
             $data = $this->getJsonInput();
             [$response, $statusCode] = $this->needTypeService->saveNeedType($data);
+            $this->renderJson($response, $statusCode);
+        } catch (Throwable $e) {
+            $this->renderError($e->getMessage());
+        }
+    }
+
+    public function getNeedsByNeedType(int $id): void
+    {
+        try {
+            [$response, $statusCode] = $this->needService->getNeedsByNeedType($id);
             $this->renderJson($response, $statusCode);
         } catch (Throwable $e) {
             $this->renderError($e->getMessage());

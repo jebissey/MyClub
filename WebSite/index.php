@@ -9,23 +9,7 @@ use app\apis\CarouselApi;
 use app\apis\EventApi;
 use app\apis\ImportApi;
 use app\apis\WebmasterApi;
-use app\controllers\ArticleController;
-use app\controllers\DbBrowserController;
-use app\controllers\DesignController;
-use app\controllers\EmailController;
-use app\controllers\EventController;
-use app\controllers\EventTypeController;
-use app\controllers\FFAController;
-use app\controllers\GroupController;
-use app\controllers\ImportController;
-use app\controllers\LogController;
-use app\controllers\MediaController;
-use app\controllers\NavBarController;
-use app\controllers\PersonController;
-use app\controllers\RegistrationController;
-use app\controllers\SurveyController;
-use app\controllers\UserController;
-use app\controllers\WebmasterController;
+use app\modules\Article\ArticleController;
 use app\enums\ApplicationError;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
@@ -33,13 +17,30 @@ use app\helpers\PersonPreferences;
 use app\models\ApiEventDataHelper;
 use app\models\ApiNeedDataHelper;
 use app\models\ApiNeedTypeDataHelper;
+use app\models\AttributeDataHelper;
 use app\models\DataHelper;
 use app\models\EventDataHelper;
 use app\models\EventNeedHelper;
 use app\models\LogDataHelper;
 use app\models\MessageDataHelper;
+use app\models\NeedDataHelper;
 use app\models\ParticipantDataHelper;
 use app\models\PersonDataHelper;
+use app\modules\Article\MediaController;
+use app\modules\Article\SurveyController;
+use app\modules\Design\DesignController;
+use app\modules\Event\EventController;
+use app\modules\Event\EventTypeController;
+use app\Modules\PersonManager\GroupController;
+use app\Modules\PersonManager\ImportController;
+use app\modules\PersonManager\PersonController;
+use app\modules\PersonManager\RegistrationController;
+use app\modules\User\FFAController;
+use app\modules\User\UserController;
+use app\modules\VisitorInsights\LogController;
+use app\modules\Webmaster\DbBrowserController;
+use app\modules\Webmaster\NavBarController;
+use app\modules\Webmaster\WebmasterController;
 use app\services\AttributeService;
 use app\services\AuthorizationService;
 use app\services\EventService;
@@ -78,6 +79,7 @@ $dataHelper = new DataHelper($application);
 $eventDataHelper = new EventDataHelper($application);
 $eventNeedHelper = new EventNeedHelper($application);
 $messageDataHelper = new MessageDataHelper($application);
+$needDataHelper = new NeedDataHelper($application);
 $participantDataHelper = new ParticipantDataHelper($application);
 $personDataHelper = new PersonDataHelper($application);
 $personPreferences = new PersonPreferences();
@@ -108,13 +110,10 @@ mapRoute($flight, 'GET  /designs', $designController, 'index');
 mapRoute($flight, 'GET  /designs/create', $designController, 'create');
 mapRoute($flight, 'POST /designs/save', $designController, 'save');
 
-$emailController = new EmailController($application);
-mapRoute($flight, 'GET  /emails', $emailController, 'fetchEmails');
-mapRoute($flight, 'POST /emails', $emailController, 'fetchEmails');
-mapRoute($flight, 'GET  /emails/article/@id:[0-9]+', $emailController, 'fetchEmailsForArticle');
-
 $eventController = new EventController($application);
-mapRoute($flight, 'GET  /eventManager', $eventController, 'home');
+mapRoute($flight, 'GET  /emails', $eventController, 'fetchEmails');
+mapRoute($flight, 'POST /emails', $eventController, 'fetchEmails');
+mapRoute($flight, 'GET  /emails/article/@id:[0-9]+', $eventController, 'fetchEmailsForArticle');mapRoute($flight, 'GET  /eventManager', $eventController, 'home');
 mapRoute($flight, 'GET  /eventManager/help', $eventController, 'help');
 mapRoute($flight, 'GET  /nextEvents', $eventController, 'nextEvents');
 mapRoute($flight, 'GET  /events/crosstab', $eventController, 'showEventCrosstab');
@@ -258,7 +257,7 @@ $eventApi = new EventApi(
     $apiEventDataHelper,
     $application,
     new AuthorizationService($connectedUser),
-    new AttributeService($connectedUser),
+    new AttributeService(new AttributeDataHelper($application)),
     $eventDataHelper,
     new EventService(
         $dataHelper,
@@ -269,7 +268,7 @@ $eventApi = new EventApi(
         $personPreferences
     ),
     new MessageService($messageDataHelper, $eventDataHelper),
-    new NeedService($apiNeedDataHelper, $apiNeedTypeDataHelper, $eventNeedHelper),
+    new NeedService($needDataHelper, $eventNeedHelper),
     new NeedTypeService($apiNeedTypeDataHelper, $apiNeedDataHelper),
     new SupplyService($eventDataHelper)
 );

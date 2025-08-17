@@ -70,11 +70,8 @@ function deleteAttribute(id) {
         })
             .then(response => response.json())
             .then(data => {
-                if (data.success) {
-                    loadAttributesList();
-                } else {
-                    alert('Une erreur est survenue (5) : ' + data.message);
-                }
+                if (data.success) loadAttributesList();
+                else alert('Une erreur est survenue (5) : ' + data.message);
             })
             .catch(error => {
                 alert('Une erreur est survenue(6) : ' + error.message);

@@ -22,4 +22,17 @@ class NeedDataHelper extends Data
         $stmt = $this->pdo->query($sql);
         return $stmt->fetchAll();
     }
+
+    public function needsforNeedType(int $needTypeId): array
+    {
+        $sql = "
+            SELECT Need.*, NeedType.Name AS TypeName
+            FROM Need
+            JOIN NeedType ON Need.IdNeedType = NeedType.Id
+            WHERE Need.IdNeedType = :needTypeId
+        ";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([':needTypeId' => $needTypeId]);
+        return $stmt->fetchAll();
+    }
 }

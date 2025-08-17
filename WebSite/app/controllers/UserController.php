@@ -32,7 +32,7 @@ use app\services\EmailService;
 class UserController extends AbstractController
 {
     private ArticleDataHelper $articleDataHelper;
-    private EmailService $email;
+    private EmailService $emailService;
     private News $news;
     private SurveyDataHelper $surveyDataHelper;
     private AuthenticationService $authService;
@@ -41,7 +41,7 @@ class UserController extends AbstractController
     {
         parent::__construct($application);
         $this->articleDataHelper = new ArticleDataHelper($application);
-        $this->email = new EmailService();
+        $this->emailService = new EmailService();
         $this->surveyDataHelper = new SurveyDataHelper($application);
         $this->news =  new News([
             new ArticleDataHelper($application),
@@ -209,7 +209,7 @@ class UserController extends AbstractController
         if ($this->connectedUser->get()->person ?? false) {
             $_SESSION['navbar'] = 'user';
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-                $this->render('app/views/user/user.latte', Params::getAll([]));
+                $this->render('app/views/user/user.latte', Params::getAll(['page' => '']));
             } else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
         } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
@@ -309,7 +309,8 @@ class UserController extends AbstractController
 
                 $this->render('app/views/user/groups.latte', Params::getAll([
                     'groups' => $currentGroups,
-                    'layout' => WebApp::getLayout()
+                    'layout' => WebApp::getLayout(),
+                    'navItems' => $this->getNavItems($connectedUser->person ?? false),
                 ]));
             } else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
         } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
@@ -365,7 +366,7 @@ class UserController extends AbstractController
                     }
                 }
                 if ($eventId != null) $emailSent = (new PersonDataHelper($this->application))->sendRegistrationLink($adminEmail, $name, $email, $event);
-                else $emailSent = $this->email->sendContactEmail($adminEmail, $name, $email, $message);
+                else $emailSent = $this->emailService->sendContactEmail($adminEmail, $name, $email, $message);
                 if ($emailSent) {
                     $url = (new WebApp($this->application))->buildUrl('/contact', [
                         'success' => 'Message envoyé avec succès.',

@@ -45,7 +45,8 @@ class RegistrationController extends TableController
                 'filters' => $filterConfig,
                 'columns' => $columns,
                 'resetUrl' => '/registration',
-                'layout' => WebApp::getLayout()
+                'layout' => WebApp::getLayout(),
+                'navItems' => $this->getNavItems($connectedUser->person ?? false),
             ]));
         } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }

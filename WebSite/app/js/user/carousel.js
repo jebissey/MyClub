@@ -41,9 +41,7 @@ const carouselItemsManager = {
                     data.items.forEach(item => {
                         this.renderCarouselItem(item);
                     });
-                } else {
-                    itemsList.innerHTML = '<p class="text-muted">Aucun élément dans la galerie</p>';
-                }
+                } else itemsList.innerHTML = '<p class="text-muted">Aucun élément dans la galerie</p>';
             })
             .catch(error => {
                 console.error('Error loading carousel items:', error);
@@ -291,16 +289,11 @@ const carouselItemsManager = {
             return;
         }
 
-        fetch(`/api/carousel/delete/${itemId}`, {
-            method: 'POST'
-        })
+        fetch(`/api/carousel/delete/${itemId}`, { method: 'POST' })
             .then(response => response.json())
             .then(result => {
-                if (result.success) {
-                    this.loadCarouselItems();
-                } else {
-                    alert('Erreur: ' + (result.message || 'Une erreur est survenue'));
-                }
+                if (result.success) this.loadCarouselItems();
+                else alert('Erreur: ' + (result.message || 'Une erreur est survenue'));
             })
             .catch(error => {
                 console.error('Error deleting carousel item:', error);

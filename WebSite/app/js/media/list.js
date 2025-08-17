@@ -38,18 +38,16 @@ deleteBtns.forEach(btn => {
             const month = pathParts[1];
             const file = pathParts[2];
 
-            fetch(`/api/media/delete/${year}/${month}/${file}`, {
-                method: 'DELETE'
-            })
+            fetch(`/api/media/delete/${year}/${month}/${file}`, { method: 'DELETE' })
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
                         const alertDiv = document.createElement('div');
                         alertDiv.className = 'alert alert-success alert-dismissible fade show';
                         alertDiv.innerHTML = `
-                        ${data.message}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    `;
+                            ${data.message}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        `;
                         document.querySelector('.card-body').prepend(alertDiv);
 
                         this.closest('tr').remove();
@@ -57,14 +55,12 @@ deleteBtns.forEach(btn => {
                         if (tbody.children.length === 0) {
                             const tableContainer = document.querySelector('.table-responsive');
                             tableContainer.innerHTML = `
-                            <div class="alert alert-info">
-                                Aucun fichier pour l'année ${document.querySelector('select[name="year"]').value}.
-                            </div>
-                        `;
+                                <div class="alert alert-info">
+                                    Aucun fichier pour l'année ${document.querySelector('select[name="year"]').value}.
+                                </div>
+                            `;
                         }
-                    } else {
-                        alert(`Erreur: ${data.message}`);
-                    }
+                    } else alert(`Erreur: ${data.message}`);
                 })
                 .catch(error => {
                     alert(`Erreur lors de la suppression : ${error.message}`);

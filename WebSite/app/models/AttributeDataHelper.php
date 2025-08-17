@@ -45,6 +45,17 @@ class AttributeDataHelper extends Data
         }
     }
 
+    public function getAllAttributes(): array
+    {
+        $sql = '
+            SELECT Attribute.*
+            ORDER BY Name
+        ';
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([]);
+        return $stmt->fetchAll();
+    }
+
     public function getAttributesOf(int $eventTypeId): array
     {
         $sql = '
@@ -57,8 +68,6 @@ class AttributeDataHelper extends Data
         $stmt->execute([':id' => $eventTypeId]);
         return $stmt->fetchAll();
     }
-
-
 
     public function update($data)
     {

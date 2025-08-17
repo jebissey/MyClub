@@ -66,7 +66,7 @@ readonly class TestConfiguration
         public string $baseUrl = 'http://localhost:8000',
         public int $timeout = 10,
         public bool $verifySSL = true,
-        public int $requestDelay = 100000
+        public int $requestDelay = 10000
     ) {}
 }
 

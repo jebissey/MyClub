@@ -139,11 +139,8 @@
                 const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&limit=1&addressdetails=1`);
                 const data = await response.json();
                 
-                if (data.length > 0) {
-                    return data[0];
-                } else {
-                    throw new Error("Adresse non trouvée");
-                }
+                if (data.length > 0) return data[0];
+                else throw new Error("Adresse non trouvée");
             } catch (error) {
                 console.error("Erreur lors de la géolocalisation:", error);
                 throw error;
@@ -158,9 +155,7 @@
             
             map.setView([lat, lon], 16);
             
-            if (marker) {
-                map.removeLayer(marker);
-            }
+            if (marker) map.removeLayer(marker);
             
             marker = L.marker([lat, lon]).addTo(map);
             marker.bindPopup(result.display_name).openPopup();
@@ -253,9 +248,7 @@
         searchBtn.addEventListener('click', performSearch);
         
         addressInput.addEventListener('keypress', function(event) {
-            if (event.key === 'Enter') {
-                searchBtn.click();
-            }
+            if (event.key === 'Enter') searchBtn.click();
         });
         
         copyCloseBtn.addEventListener('click', copyAddressAndClose);

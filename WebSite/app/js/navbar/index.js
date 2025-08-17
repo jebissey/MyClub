@@ -38,9 +38,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     if (data.success) {
                         document.getElementById('itemId').value = data.message.Id;
                         document.getElementById('itemName').value = data.message.Name;
-                    } else {
-                        alert("Erreur : " + data.message);
-                    }
+                    } else alert("Erreur : " + data.message);
 
                     let routeBase = data.message.Route;
                     let idValue = '';
@@ -86,16 +84,11 @@ document.addEventListener('DOMContentLoaded', function () {
             const id = this.closest('tr').dataset.id;
 
             if (confirm('Êtes-vous sûr de vouloir supprimer cet élément de navigation ?')) {
-                fetch(`/api/navBar/deleteItem/${id}`, {
-                    method: 'DELETE'
-                })
+                fetch(`/api/navBar/deleteItem/${id}`, { method: 'DELETE' })
                     .then(response => response.json())
                     .then(result => {
-                        if (result.success) {
-                            this.closest('tr').remove();
-                        } else {
-                            alert(result.message || 'Échec de la suppression de l\'élément de navigation.');
-                        }
+                        if (result.success) this.closest('tr').remove();
+                        else alert(result.message || 'Échec de la suppression de l\'élément de navigation.');
                     })
                     .catch(error => {
                         alert('Une erreur s\'est produite lors de la suppression de l\'élément de navigation.');

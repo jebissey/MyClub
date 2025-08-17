@@ -39,10 +39,7 @@ function removeFromGroup(personId, groupId) {
     })
         .then(response => response.json())
         .then(data => {
-            if (data.success) {
-                showGroups(personId);
-            } else {
-                alert(data.message || 'Une erreur est survenue');
-            }
+            if (data.success) showGroups(personId);
+            else alert(data.message || 'Une erreur est survenue');
         });
 }

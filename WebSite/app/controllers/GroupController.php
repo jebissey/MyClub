@@ -25,7 +25,8 @@ class GroupController extends AbstractController implements CrudControllerInterf
         if (($this->connectedUser->get()->isPersonManager() ?? false) || $this->connectedUser->isWebmaster() ?? false) {
             $this->render('app/views/groups/index.latte', Params::getAll([
                 'groups' => $this->groupDataHelper->getGroupsWithAuthorizations(),
-                'layout' => WebApp::getLayout()
+                'layout' => WebApp::getLayout(),
+                'navItems' => $this->getNavItems($connectedUser->person ?? false),
             ]));
         } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }

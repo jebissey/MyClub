@@ -2,30 +2,31 @@
 
 namespace app\services;
 
+use InvalidArgumentException;
+
 use app\interfaces\NeedServiceInterface;
-use app\models\ApiNeedDataHelper;
-use app\models\ApiNeedTypeDataHelper;
+use app\models\DataHelper;
+use app\models\NeedDataHelper;
 use app\models\EventNeedHelper;
 
 class NeedService implements NeedServiceInterface
 {
-    private ApiNeedDataHelper $apiNeedDataHelper;
-    private ApiNeedTypeDataHelper $apiNeedTypeDataHelper;
+    private DataHelper $dataHelper;
+    private NeedDataHelper $needDataHelper;
     private EventNeedHelper $eventNeedHelper;
 
-    public function __construct(ApiNeedDataHelper $apiNeedDataHelper, ApiNeedTypeDataHelper $apiNeedTypeDataHelper, EventNeedHelper $eventNeedHelper)
+    public function __construct(NeedDataHelper $needDataHelper, EventNeedHelper $eventNeedHelper)
     {
-        $this->apiNeedDataHelper = $apiNeedDataHelper;
-        $this->apiNeedTypeDataHelper = $apiNeedTypeDataHelper;
+        $this->needDataHelper = $needDataHelper;
         $this->eventNeedHelper = $eventNeedHelper;
     }
 
-    public function deleteNeed(int $id): array
+    public function deleteNeed(int $id): int
     {
-        return $this->apiNeedDataHelper->delete_($id);
+        return $this->dataHelper-> delete('Need', ['Id' => $id]);
     }
 
-    public function saveNeed(array $data): array
+    public function saveNeed(array $data): int|bool
     {
         $this->validateNeedData($data);
         $needData = [
@@ -34,7 +35,7 @@ class NeedService implements NeedServiceInterface
             'ParticipantDependent' => intval($data['participantDependent'] ?? 0),
             'IdNeedType' => $data['idNeedType']
         ];
-        return $this->apiNeedDataHelper->insertOrUpdate($data['id'] ?? false, $needData);
+        return $this->dataHelper->set('Need', $needData, $data['id'] == null ? [] : ['Id' =>$data['id']]);
     }
 
     public function getEventNeeds(int $eventId): array
@@ -44,19 +45,14 @@ class NeedService implements NeedServiceInterface
 
     public function getNeedsByNeedType(int $needTypeId): array
     {
-        return ['success' => true, 'needs' => $this->apiNeedTypeDataHelper->needsforNeedType($needTypeId)];
+        return ['success' => true, 'needs' => $this->needDataHelper->needsforNeedType($needTypeId)];
     }
 
+    #region Private functions
     private function validateNeedData(array $data): void
     {
-        if (empty($data['label'])) {
-            throw new \InvalidArgumentException('Missing parameter label');
-        }
-        if (empty($data['name'])) {
-            throw new \InvalidArgumentException('Missing parameter name');
-        }
-        if (!($data['idNeedType'] ?? null)) {
-            throw new \InvalidArgumentException('Missing parameter idNeedType');
-        }
+        if (empty($data['label']))          throw new InvalidArgumentException('Missing parameter label');
+        if (empty($data['name']))           throw new InvalidArgumentException('Missing parameter name');
+        if (!($data['idNeedType'] ?? null)) throw new InvalidArgumentException('Missing parameter idNeedType');
     }
 }

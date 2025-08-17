@@ -51,7 +51,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (selectedValue === "1") mode = "today";
                 if (selectedValue === "2") mode = "week";
                 fetch(`/api/event/duplicate/${eventId}?mode=${mode}`, { method: 'POST' })
-                    .then(res => res.json())
+                    .then(response => response.json())
                     .then(data => {
                         if (data.success) {
                             window.location.reload();

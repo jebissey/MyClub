@@ -20,7 +20,7 @@ class ApiNeedTypeDataHelper extends Data
             $this->delete('NeedType', ['Id' => $id]);
             return [['success' => true], ApplicationError::Ok->value];
         } catch (Throwable $e) {
-            return [['success' => false, 'message' => 'Erreur lors de la suppression: ' . $e->getMessage()], ApplicationError::Error->value];
+            return [['success' => false, 'message' => 'Error ' . $e->getMessage()], ApplicationError::Error->value];
         }
     }
 
@@ -31,20 +31,7 @@ class ApiNeedTypeDataHelper extends Data
             else $id = $this->set('NeedType', ['Name' => $name]);
             return [['success' => true, 'id' => $id], ApplicationError::Ok->value];
         } catch (Throwable $e) {
-            return [['success' => 'false', 'message' => 'Erreur lors de l\'enregistrement: ' . $e->getMessage(), ApplicationError::Error->value]];
+            return [['success' => 'false', 'message' => 'Error ' . $e->getMessage(), ApplicationError::Error->value]];
         }
-    }
-
-    public function needsforNeedType($needTypeId)
-    {
-        $sql = "
-            SELECT Need.*, NeedType.Name AS TypeName
-            FROM Need
-            JOIN NeedType ON Need.IdNeedType = NeedType.Id
-            WHERE Need.IdNeedType = :needTypeId
-        ";
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([':needTypeId' => $needTypeId]);
-        return $stmt->fetchAll();
     }
 }
