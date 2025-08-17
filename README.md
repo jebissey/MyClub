@@ -76,4 +76,5 @@ Test account: user@myclub.foo ( user1234 )
 ## 🔍 Examples  
 
 👉 Nordic walking site: [https://bnw-dijon.fr/](https://bnw-dijon.fr/) 
+
 👉 static site: [https://peinturesbribri.alwaysdata.net/navbar/show/article/3](https://peinturesbribri.alwaysdata.net/navbar/show/article/3)  
