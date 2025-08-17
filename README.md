@@ -33,6 +33,16 @@ Security is based on groups. There are three types of group. Groups with authori
 | **VisitorInsights**| Can view visitor statistics and insights, including visit counts, pages viewed, and other analytics data. |
 
 
+All routes are automatically discovered and tested (>150).  
+
+- For routes with parameters (`@`), a row must exist in the test database with the **JsonGetParameters** column filled in, otherwise an error will be raised.  
+- For **POST** routes, a row must exist with the **JsonPostParameters** column filled in, otherwise an error will be raised.  
+- Additional rows can be added to simulate requests.  
+- If a test requires an authenticated user, the **JsonConnectedUser** column must be filled in.  
+- The result of a simulation can be verified by providing values in the **Query** and **QueryExpectedResponse** columns.  
+- Each row must also specify the **ExpectedResponseCode**.  
+
+
 ## How to test
 https://myclub.alwaysdata.net/
 
