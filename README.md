@@ -17,7 +17,7 @@ It helps clubs manage **articles, events, and members** with an intuitive interf
     - [Available Authorizations](#available-authorizations)
   - [🧪 Automated Route Testing](#-automated-route-testing)
   - [🔍 How to Test](#-how-to-test)
-  - [🔍 Examples](#-examples)
+  - [👁️ Examples](#️-examples)
 
 ---
 
@@ -73,7 +73,7 @@ Test account: user@myclub.foo ( user1234 )
 
 ---
 
-## 🔍 Examples  
+## 👁️ Examples  
 
 👉 Nordic walking site: [https://bnw-dijon.fr/](https://bnw-dijon.fr/) 
 
