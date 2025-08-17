@@ -1,83 +1,72 @@
-# MyClub
+# MyClub  
 
-This web application is designed to make life easier for members of an association. It offers several key features:
+![PHP](https://img.shields.io/badge/PHP-%3E%3D8.1-blue)  
+![SQLite](https://img.shields.io/badge/SQLite-Supported-green)  
+![License](https://img.shields.io/badge/license-MIT-lightgrey)  
 
-**Viewing articles:** Members can read and share articles written by other members of the association.
+**MyClub** is a lightweight CMS tailored for associations.  
+It helps clubs manage **articles, events, and members** with an intuitive interface, user preferences, and built-in access control.  
 
-**Activity management:** It's easy to sign up for the various activities offered by the association. You can also retrieve an iCal file to update your personal diary.
+---
 
-**User preferences:** Save your preferences for the types of events you like and your weekly availability. This allows you to filter the events on offer according to your preferences and schedule.
+## 📑 Table of Contents
+1. [Features](#-features)  
+2. [Security & Authorizations](#-security--authorizations)  
+3. [Automated Route Testing](#-automated-route-testing)  
+4. [How to Test](#-how-to-test)  
+5. [Installation](#-installation)  
+6. [Customization](#-customization)  
+7. [Troubleshooting](#-troubleshooting)  
+8. [Examples](#-examples)  
 
-**Secure identification:** Users are identified by their e-mail address. When they log in for the first time, they must use the ‘forgotten password’ option to create a password.
+---
 
+## ✨ Features
 
-This is a generic application.
+1. **Articles** – Members can read and share articles written by other members.  
+2. **Activity Management** – Sign up for activities, export events to your calendar with iCal.  
+3. **User Preferences** – Save your favorite event types and weekly availability to filter events.  
+4. **Secure Identification** – Users log in via email; the first login requires using the "forgotten password" option to create a password.  
+5. **Mini CMS** – Includes articles, events, and customizable pages.  
+6. **Database** – All data is stored in an **SQLite** database.  
 
-It behaves like a **mini CMS** with articles.
+---
 
-But there are also events.
+## 🔐 Security & Authorizations  
 
-All data is stored in a **SQLight** database.
+Security is based on **groups**. There are three types:  
+- Groups with authorization  
+- Groups without authorization  
+- Self-registration groups  
 
-Security is based on groups. There are three types of group. Groups with authorisation, groups without authorisation and self-registration groups. There are different authorisations: 
+### Available Authorizations  
 
-| Authorization  | Description |
-|--------------------|-------------|
-| **Webmaster**      | Full administrative access to all features and settings of the web application, including technical and structural management. |
-| **PersonManager**  | Can manage members and user profiles, including creating, editing, deleting, and importing/exporting user data. |
-| **EventManager**   | Can create, edit, and manage events, including scheduling, location, and participant limits. |
-| **Redactor**       | Can write articles and other content, and publish them if the audience is restricted to club members or to a specific group. Cannot publish publicly visible content. |
-| **Editor**         | Can review, approve, publish, and unpublish any content, including content intended for public visibility. |
-| **HomeDesigner**   | Can customize the home page layout, banners, and featured sections. |
-| **EventDesigner**  | Can create event types, define their attributes, and optionally assign them to groups. |
-| **VisitorInsights**| Can view visitor statistics and insights, including visit counts, pages viewed, and other analytics data. |
+| Authorization   | Description |
+|-----------------|-------------|
+| **Webmaster**       | Full administrative access to all features and settings of the application. |
+| **PersonManager**   | Manage members and profiles (create, edit, delete, import/export). |
+| **EventManager**    | Create, edit, and manage events (scheduling, location, participants). |
+| **Redactor**        | Write content and publish for restricted audiences (not public). |
+| **Editor**          | Review, approve, publish/unpublish any content, including public articles. |
+| **HomeDesigner**    | Customize the homepage layout, banners, and featured sections. |
+| **EventDesigner**   | Define event types and their attributes, assign to groups. |
+| **VisitorInsights** | Access visitor statistics and analytics. |
 
+---
 
-All routes are automatically discovered and tested (>150).  
+## 🧪 Automated Route Testing  
 
-- For routes with parameters (`@`), a row must exist in the test database with the **JsonGetParameters** column filled in, otherwise an error will be raised.  
-- For **POST** routes, a row must exist with the **JsonPostParameters** column filled in, otherwise an error will be raised.  
-- Additional rows can be added to simulate requests.  
-- If a test requires an authenticated user, the **JsonConnectedUser** column must be filled in.  
-- The result of a simulation can be verified by providing values in the **Query** and **QueryExpectedResponse** columns.  
-- Each row must also specify the **ExpectedResponseCode**.  
+- **150+ routes** are automatically discovered and tested.  
+- For routes with parameters (`@`), the **JsonGetParameters** column must exist in the test database.  
+- For **POST** routes, the **JsonPostParameters** column must be filled.  
+- **Authentication** can be simulated via the **JsonConnectedUser** column.  
+- Results can be validated with **Query** and **QueryExpectedResponse**.  
+- Each test row must define **ExpectedResponseCode**.  
 
+---
 
-## How to test
-https://myclub.alwaysdata.net/
+## 🔍 How to Test  
 
-user@myclub.foo : user1234
+👉 Demo site: [https://myclub.alwaysdata.net/](https://myclub.alwaysdata.net/)  
 
-## How to install
-
-### From source: 
-
-- clone
-- update references with ```composer update``` from WebSite folder
-- test locally from WebSite folder with ```php -S localhost:8000 ../dev/router.php```
-- and in your browser http://localhost:8000/
-- upload to the cloud to your host
-- enjoy
-
-## How to customize
-
-- You must update the webmaster accout (webmaster@myclub.foo : admin1234)
-- Create your groups with their authorizations
-- Create your event types with their attributes
-- Create your navigation bar
-- Change WebSite/app/Images/home.png with your 48x48 image.
-- Change WebSite/app/Images/logo.png with yours.
-- Change WebSite/app/Images/favicon.ico with yours.
-- Update records in Settings table.
-
-## How to fix
-
-- If you have this : "Error : could not find driverFatal error in file .../app/helpers/database/Database.php at line 38", you must add "extension=pdo_sqlite.so" in your php.ini
-- If you have this : "Internal error: Class "IntlDateFormatter" not found", you must add "extension=intl" in your php.ini
-
-## Examples
-https://bnw-dijon.fr/
-
-https://peinturesbribri.alwaysdata.net/navbar/show/article/3
-
-
+Test account:  
