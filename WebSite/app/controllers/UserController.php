@@ -220,7 +220,6 @@ class UserController extends AbstractController
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $schema = [
                     'email' => FilterInputRule::Email->value,
-                    'password' => FilterInputRule::Password->value,
                     'firstName' => FilterInputRule::PersonName->value,
                     'lastName' => FilterInputRule::PersonName->value,
                     'nickName' => FilterInputRule::HtmlSafeName->value,
@@ -235,11 +234,10 @@ class UserController extends AbstractController
                     'Avatar' => ($input['useGravatar'] ?? YesNo::No->value) == YesNo::Yes->value ? '' : $input['avatar'] ?? '🤔',
                     'useGravatar' => $input['useGravatar'] ?? YesNo::No->value,
                 ], ['Id' => $person->Id]);
-                if (!empty($password))
-                    $this->dataHelper->set('Person', ['Password' => Password::signPassword($input['password'])], ['Id' => $person->Id]);
                 if ($person->Imported == 0) {
-                    $this->dataHelper->set('Person', ['Email' => $input['email']], ['Id' => $person->Id]);
-                    $_SESSION['user'] = $input['email'];
+                    $email = urldecode($input['email']);
+                    $this->dataHelper->set('Person', ['Email' => $email], ['Id' => $person->Id]);
+                    $_SESSION['user'] = $email;
                 }
                 $this->flight->redirect('/user');
             } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
@@ -264,7 +262,7 @@ class UserController extends AbstractController
     {
         if ($person = $this->connectedUser->get(1)->person ?? false) {
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-                $availabilities = WebApp::getFiltered('availabilities', FilterInputRule::Json->value, $this->flight->request()->data->getData()) ?? '';
+                $availabilities = WebApp::getFiltered('availabilities', FilterInputRule::CheckboxMatrix->value, $this->flight->request()->data->getData()) ?? '';
                 if ($availabilities != '') $this->dataHelper->set('Person', ['Availabilities' => json_encode($availabilities)], ['Id' => $person->Id]);
                 $this->flight->redirect('/user');
             } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
@@ -279,7 +277,7 @@ class UserController extends AbstractController
         if ($person = $this->connectedUser->get(1)->person ?? false) {
 
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-                $preferences = WebApp::getFiltered('preferences', FilterInputRule::Json->value, $this->flight->request()->data->getData()) ?? '';
+                $preferences = WebApp::getFiltered('preferences', FilterInputRule::CheckboxMatrix->value, $this->flight->request()->data->getData()) ?? '';
                 $this->dataHelper->set('Person', ['preferences' =>  json_encode($preferences)], ['Id' => $person->Id]);
                 $this->flight->redirect('/user');
             } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {

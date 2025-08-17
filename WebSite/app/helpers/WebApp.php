@@ -96,6 +96,23 @@ class WebApp
                 } else $filtered[$key] = null;
                 continue;
             }
+            if ($rule === FilterInputRule::CheckboxMatrix->value) {
+                $validateCheckboxMatrix = function (array $arr) use (&$validateCheckboxMatrix) {
+                    $result = [];
+                    foreach ($arr as $key => $val) {
+                        if (is_array($val)) {
+                            $nested = $validateCheckboxMatrix($val);
+                            if (!empty($nested)) $result[$key] = $nested;
+                        } elseif ($val === 'on') $result[$key] = 'on';
+                    }
+                    return $result;
+                };
+                if (is_array($raw)) {
+                    $filtered[$key] = $validateCheckboxMatrix($raw);
+                    if (empty($filtered[$key])) $filtered[$key] = null;
+                } else $filtered[$key] = null;
+                continue;
+            }
             if (is_array($raw)) {
                 $filtered[$key] = null;
                 continue;

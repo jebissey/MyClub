@@ -54,14 +54,7 @@ class ConsoleTestReporter implements TestReporterInterface
     public function diplayResult(string $testedPath, int $httpCode, float $responseTimeMs, array $postParams): void
     {
         $strPostParams = '';
-        if ($postParams != []) {
-            $strPostParams = ' with ' . implode(', ', array_map(
-                fn($k, $v) => "$k=$v",
-                array_keys($postParams),
-                $postParams
-            ));
-        }
-
+        if ($postParams != []) $strPostParams = ' with ' . json_encode($postParams, JSON_UNESCAPED_UNICODE);
         echo sprintf(
             " => %s%s -> %s%d %s%s (%.2fms)\n",
             $testedPath,
