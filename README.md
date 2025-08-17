@@ -66,7 +66,7 @@ Security is based on **groups**. There are three types:
 
 ## 👁️ Examples  
 
-👉 Demo site: [https://myclub.alwaysdata.net/](https://myclub.alwaysdata.net/)  { test account = user ＠ myclub ․ foo ( user1234 ) }
+👉 Demo site: [https://myclub.alwaysdata.net/](https://myclub.alwaysdata.net/)  { test account = user ＠ myclub ․ foo ( user2345 ) }
 
 👉 Nordic walking site: [https://bnw-dijon.fr/](https://bnw-dijon.fr/) 
 
