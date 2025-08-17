@@ -10,14 +10,14 @@ It helps clubs manage **articles, events, and members** with an intuitive interf
 ---
 
 ## 📑 Table of Contents
-1. [Features](#-features)  
-2. [Security & Authorizations](#-security--authorizations)  
-3. [Automated Route Testing](#-automated-route-testing)  
-4. [How to Test](#-how-to-test)  
-5. [Installation](#-installation)  
-6. [Customization](#-customization)  
-7. [Troubleshooting](#-troubleshooting)  
-8. [Examples](#-examples)  
+- [MyClub](#myclub)
+  - [📑 Table of Contents](#-table-of-contents)
+  - [✨ Features](#-features)
+  - [🔐 Security \& Authorizations](#-security--authorizations)
+    - [Available Authorizations](#available-authorizations)
+  - [🧪 Automated Route Testing](#-automated-route-testing)
+  - [🔍 How to Test](#-how-to-test)
+  - [🔍 Examples](#-examples)
 
 ---
 
@@ -41,16 +41,16 @@ Security is based on **groups**. There are three types:
 
 ### Available Authorizations  
 
-| Authorization   | Description |
-|-----------------|-------------|
+| Authorization       | Description                                                                 |
+| ------------------- | --------------------------------------------------------------------------- |
 | **Webmaster**       | Full administrative access to all features and settings of the application. |
-| **PersonManager**   | Manage members and profiles (create, edit, delete, import/export). |
-| **EventManager**    | Create, edit, and manage events (scheduling, location, participants). |
-| **Redactor**        | Write content and publish for restricted audiences (not public). |
-| **Editor**          | Review, approve, publish/unpublish any content, including public articles. |
-| **HomeDesigner**    | Customize the homepage layout, banners, and featured sections. |
-| **EventDesigner**   | Define event types and their attributes, assign to groups. |
-| **VisitorInsights** | Access visitor statistics and analytics. |
+| **PersonManager**   | Manage members and profiles (create, edit, delete, import/export).          |
+| **EventManager**    | Create, edit, and manage events (scheduling, location, participants).       |
+| **Redactor**        | Write content and publish for restricted audiences (not public).            |
+| **Editor**          | Review, approve, publish/unpublish any content, including public articles.  |
+| **HomeDesigner**    | Customize the homepage layout, banners, and featured sections.              |
+| **EventDesigner**   | Define event types and their attributes, assign to groups.                  |
+| **VisitorInsights** | Access visitor statistics and analytics.                                    |
 
 ---
 
@@ -69,4 +69,11 @@ Security is based on **groups**. There are three types:
 
 👉 Demo site: [https://myclub.alwaysdata.net/](https://myclub.alwaysdata.net/)  
 
-Test account:  
+Test account: user@myclub.foo ( user1234 )
+
+---
+
+## 🔍 Examples  
+
+👉 Nordic walking site: [https://bnw-dijon.fr/](https://bnw-dijon.fr/) 
+👉 static site: [https://peinturesbribri.alwaysdata.net/navbar/show/article/3](https://peinturesbribri.alwaysdata.net/navbar/show/article/3)  
