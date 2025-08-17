@@ -1,4 +1,4 @@
-# MyClub  
+# MyClub – The ultra-light, fully customizable CMS for your association
 
 ![PHP](https://img.shields.io/badge/PHP-%3E%3D8.1-blue)  
 ![SQLite](https://img.shields.io/badge/SQLite-Supported-green)  
@@ -10,13 +10,12 @@ It helps clubs manage **articles, events, and members** with an intuitive interf
 ---
 
 ## 📑 Table of Contents
-- [MyClub](#myclub)
+- [MyClub – The ultra-light, fully customizable CMS for your association](#myclub--the-ultra-light-fully-customizable-cms-for-your-association)
   - [📑 Table of Contents](#-table-of-contents)
   - [✨ Features](#-features)
   - [🔐 Security \& Authorizations](#-security--authorizations)
     - [Available Authorizations](#available-authorizations)
   - [🧪 Automated Route Testing](#-automated-route-testing)
-  - [🔍 How to Test](#-how-to-test)
   - [👁️ Examples](#️-examples)
 
 ---
@@ -65,16 +64,10 @@ Security is based on **groups**. There are three types:
 
 ---
 
-## 🔍 How to Test  
-
-👉 Demo site: [https://myclub.alwaysdata.net/](https://myclub.alwaysdata.net/)  
-
-Test account: user@myclub.foo ( user1234 )
-
----
-
 ## 👁️ Examples  
+
+👉 Demo site: [https://myclub.alwaysdata.net/](https://myclub.alwaysdata.net/)  { test account = user@myclub.foo ( user1234 ) }
 
 👉 Nordic walking site: [https://bnw-dijon.fr/](https://bnw-dijon.fr/) 
 
-👉 static site: [https://peinturesbribri.alwaysdata.net/navbar/show/article/3](https://peinturesbribri.alwaysdata.net/navbar/show/article/3)  
+👉 Static site: [https://peinturesbribri.alwaysdata.net/navbar/show/article/3](https://peinturesbribri.alwaysdata.net/navbar/show/article/3)  
