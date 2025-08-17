@@ -1,12 +1,13 @@
 <?php
 
-namespace App\Controllers;
+namespace app\modules\Article;
 
-use app\helpers\Application;
 use app\enums\ApplicationError;
+use app\helpers\Application;
 use app\helpers\Media;
 use app\helpers\Params;
 use app\helpers\WebApp;
+use app\modules\Common\AbstractController;
 
 class MediaController extends AbstractController
 {

@@ -1,6 +1,6 @@
 <?php
 
-namespace app\controllers;
+namespace app\modules\PersonManager;
 
 use app\enums\ApplicationError;
 use app\enums\FilterInputRule;
@@ -11,6 +11,7 @@ use app\interfaces\CrudControllerInterface;
 use app\models\GroupDataHelper;
 use app\models\PersonDataHelper;
 use app\models\TableControllerDataHelper;
+use app\modules\Common\TableController;
 
 
 class PersonController extends TableController implements CrudControllerInterface

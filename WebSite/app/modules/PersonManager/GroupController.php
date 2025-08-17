@@ -1,6 +1,6 @@
 <?php
 
-namespace app\controllers;
+namespace app\modules\PersonManager;
 
 use app\enums\ApplicationError;
 use app\enums\FilterInputRule;
@@ -9,6 +9,7 @@ use app\helpers\Params;
 use app\helpers\WebApp;
 use app\interfaces\CrudControllerInterface;
 use app\models\GroupDataHelper;
+use app\modules\Common\AbstractController;
 
 class GroupController extends AbstractController implements CrudControllerInterface
 {

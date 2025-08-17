@@ -1,6 +1,6 @@
 <?php
 
-namespace app\controllers;
+namespace app\modules\User;
 
 use RuntimeException;
 
@@ -11,7 +11,6 @@ use app\enums\YesNo;
 use app\helpers\Application;
 use app\helpers\News;
 use app\helpers\Params;
-use app\helpers\Password;
 use app\helpers\TranslationManager;
 use app\helpers\WebApp;
 use app\models\ArticleDataHelper;
@@ -26,6 +25,7 @@ use app\models\PersonDataHelper;
 use app\models\PersonGroupDataHelper;
 use app\models\PersonStatisticsDataHelper;
 use app\models\SurveyDataHelper;
+use app\modules\Common\AbstractController;
 use app\services\AuthenticationService;
 use app\services\EmailService;
 

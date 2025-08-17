@@ -1,6 +1,6 @@
 <?php
 
-namespace app\controllers;
+namespace app\modules\PersonManager;
 
 use app\enums\ApplicationError;
 use app\enums\FilterInputRule;
@@ -8,6 +8,7 @@ use app\helpers\Application;
 use app\helpers\Params;
 use app\helpers\WebApp;
 use app\models\ImportDataHelper;
+use app\modules\Common\AbstractController;
 
 class ImportController extends AbstractController
 {

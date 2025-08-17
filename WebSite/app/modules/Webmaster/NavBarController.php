@@ -1,12 +1,13 @@
 <?php
 
-namespace app\controllers;
+namespace app\modules\Webmaster;
 
 use app\helpers\Application;
 use app\enums\ApplicationError;
 use app\helpers\Params;
 use app\helpers\WebApp;
 use app\models\ArwardsDataHelper;
+use app\modules\Common\AbstractController;
 
 class NavBarController extends AbstractController
 {

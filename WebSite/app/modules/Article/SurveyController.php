@@ -1,6 +1,6 @@
 <?php
 
-namespace app\controllers;
+namespace app\modules\Article;
 
 use RuntimeException;
 
@@ -12,6 +12,7 @@ use app\helpers\Params;
 use app\helpers\WebApp;
 use app\models\AuthorizationDataHelper;
 use app\models\SurveyDataHelper;
+use app\modules\Common\AbstractController;
 
 class SurveyController extends AbstractController
 {

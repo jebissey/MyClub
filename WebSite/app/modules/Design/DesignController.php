@@ -1,6 +1,8 @@
 <?php
 
-namespace app\controllers;
+namespace app\modules\Design;
+
+use RuntimeException;
 
 use app\enums\FilterInputRule;
 use app\helpers\Application;
@@ -8,7 +10,7 @@ use app\enums\ApplicationError;
 use app\helpers\Params;
 use app\helpers\WebApp;
 use app\models\DesignDataHelper;
-use RuntimeException;
+use app\modules\Common\AbstractController;
 
 class DesignController extends AbstractController
 {

@@ -1,6 +1,6 @@
 <?php
 
-namespace app\controllers;
+namespace app\modules\Webmaster;
 
 use app\enums\ApplicationError;
 use app\enums\FilterInputRule;
@@ -9,6 +9,7 @@ use app\helpers\Params;
 use app\helpers\WebApp;
 use app\models\ArticleDataHelper;
 use app\models\ArwardsDataHelper;
+use app\modules\Common\AbstractController;
 
 class WebmasterController extends AbstractController
 {

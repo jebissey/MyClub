@@ -1,6 +1,6 @@
 <?php
 
-namespace app\controllers;
+namespace app\modules\Article;
 
 use RuntimeException;
 
@@ -17,6 +17,7 @@ use app\models\ArticleTableDataHelper;
 use app\models\AuthorizationDataHelper;
 use app\models\DataHelper;
 use app\models\PersonDataHelper;
+use app\modules\Common\TableController;
 
 class ArticleController extends TableController
 {

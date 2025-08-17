@@ -1,6 +1,6 @@
 <?php
 
-namespace app\controllers;
+namespace app\modules\PersonManager;
 
 use app\enums\ApplicationError;
 use app\enums\FilterInputRule;
@@ -9,6 +9,7 @@ use app\helpers\Params;
 use app\helpers\WebApp;
 use app\models\GroupDataHelper;
 use app\models\TableControllerDataHelper;
+use app\modules\Common\TableController;
 
 class RegistrationController extends TableController
 {

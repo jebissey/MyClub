@@ -1,6 +1,6 @@
 <?php
 
-namespace app\controllers;
+namespace app\modules\Common;
 
 use flight;
 use flight\Engine;

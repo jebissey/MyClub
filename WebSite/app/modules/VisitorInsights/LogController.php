@@ -1,6 +1,6 @@
 <?php
 
-namespace app\controllers;
+namespace app\modules\VisitorInsights;
 
 use app\enums\ApplicationError;
 use app\enums\Period;
@@ -11,6 +11,7 @@ use app\helpers\PeriodHelper;
 use app\helpers\WebApp;
 use app\models\CrosstabDataHelper;
 use app\models\LogDataHelper;
+use app\modules\Common\AbstractController;
 
 class LogController extends AbstractController
 {

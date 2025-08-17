@@ -1,11 +1,12 @@
 <?php
 
-namespace app\controllers;
+namespace app\modules\Webmaster;
 
 use app\enums\ApplicationError;
 use app\helpers\Application;
-use app\models\DbBrowserDataHelper;
 use app\helpers\Params;
+use app\models\DbBrowserDataHelper;
+use app\modules\Common\AbstractController;
 
 class DbBrowserController extends AbstractController
 {

@@ -1,6 +1,6 @@
 <?php
 
-namespace app\controllers;
+namespace app\modules\Event;
 
 use RuntimeException;
 
@@ -12,6 +12,7 @@ use app\helpers\WebApp;
 use app\interfaces\CrudControllerInterface;
 use app\models\EventDataHelper;
 use app\models\TableControllerDataHelper;
+use app\modules\Common\TableController;
 
 class EventTypeController extends TableController implements CrudControllerInterface
 {
