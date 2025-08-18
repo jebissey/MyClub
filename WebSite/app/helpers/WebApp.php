@@ -30,8 +30,8 @@ class WebApp
         else if ($navbar == 'eventManager') return '../admin/eventManager.latte';
         else if ($navbar == 'personManager') return '../admin/personManager.latte';
         else if ($navbar == 'webmaster') return '../admin/webmaster.latte';
-        else if ($navbar == 'redactor') return '../admin/redactor.latte';
-        else if ($navbar == '') return '../home.latte';
+        else if ($navbar == 'redactor') return '../../Webmaster/views/navbar/redactor.latte';
+        else if ($navbar == '') return '../../Webmaster/views/navbar/home.latte';
 
         throw new RuntimeException('Fatal error in file ' . __FILE__ . ' at line ' . __LINE__ . " with navbar=" . $navbar);
     }

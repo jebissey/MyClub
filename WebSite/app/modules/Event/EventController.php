@@ -321,7 +321,7 @@ class EventController extends AbstractController
 
     public function help(): void
     {
-        $this->render('app/views/info.latte', [
+        $this->render('Common/views/info.latte', [
             'content' => $this->dataHelper->get('Settings', ['Name' => 'Help_eventManager'], 'Value')->Value ?? '',
             'hasAuthorization' => $this->connectedUser->get()->hasAutorization() ?? false,
             'currentVersion' => Application::VERSION

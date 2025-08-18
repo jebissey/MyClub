@@ -11,23 +11,40 @@ class CurlHttpClient implements HttpClientInterface
         $ch = curl_init();
         $fullUrl = $this->buildFullUrl($url);
         $curlOptions = $this->buildCurlOptions($method, $fullUrl, $options);
+        $curlOptions[CURLOPT_FAILONERROR] = false;
+        $receivedData = '';
+        $curlOptions[CURLOPT_WRITEFUNCTION] = function ($ch, $data) use (&$receivedData) {
+            $receivedData .= $data;
+            return strlen($data);
+        };
         curl_setopt_array($ch, $curlOptions);
-
         $startTime = microtime(true);
         $response = curl_exec($ch);
         $endTime = microtime(true);
-
         if ($response === false) {
             $error = curl_error($ch);
             $errno = curl_errno($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            $bytesReceived = curl_getinfo($ch, CURLINFO_SIZE_DOWNLOAD);
+            $totalTime = curl_getinfo($ch, CURLINFO_TOTAL_TIME);
             curl_close($ch);
-            throw new RuntimeException("Erreur cURL ($errno): $error");
+            $snippet = '';
+            if (!empty($receivedData)) $snippet = substr($receivedData, 0, 10000);
+
+            throw new RuntimeException(
+                "Erreur cURL ($errno): $error\n" .
+                    "URL: $fullUrl\n" .
+                    "Code HTTP: $httpCode\n" .
+                    "Octets reçus: $bytesReceived\n" .
+                    "Temps total: " . round($totalTime * 1000, 2) . "ms\n" .
+                    "Contenu reçu: $snippet"
+            );
         }
 
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         $headerSize = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
-        $headersRaw = substr($response, 0, $headerSize);
-        $body = substr($response, $headerSize);
+        $headersRaw = substr($receivedData, 0, $headerSize);
+        $body = substr($receivedData, $headerSize);
 
         foreach (explode("\r\n", $headersRaw) as $header) {
             if (stripos($header, 'Set-Cookie:') === 0) {
@@ -35,13 +52,10 @@ class CurlHttpClient implements HttpClientInterface
                 $parts = explode(';', $cookie);
                 if (count($parts) > 0) {
                     $nameValue = explode('=', trim($parts[0]), 2);
-                    if (count($nameValue) === 2) {
-                        $this->storedCookies[$nameValue[0]] = $nameValue[1];
-                    }
+                    if (count($nameValue) === 2) $this->storedCookies[$nameValue[0]] = $nameValue[1];
                 }
             }
         }
-
         $responseTime = round(($endTime - $startTime) * 1000, 2);
         curl_close($ch);
 

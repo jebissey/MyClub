@@ -4,6 +4,7 @@ namespace app\helpers;
 
 use flight\Engine;
 use Latte\Engine as LatteEngine;
+use Latte\Loaders\FileLoader;
 use PDO;
 use RuntimeException;
 use Throwable;
@@ -41,6 +42,7 @@ class Application
         self::$root = 'https://' . ($_SERVER['HTTP_HOST'] ?? 'localhost');
         self::$flight = new Engine();
         self::$latte = new LatteEngine();
+        self::$latte->setLoader(new FileLoader(__DIR__ . '/../../app/modules'));
         self::$latte->setTempDirectory(__DIR__ . '/../../var/latte/temp');
         $this->setupLatteFilters();
 

@@ -83,7 +83,7 @@ class ArticleController extends TableController
         }
         $query = $this->articleTableDataHelper->getQuery($connectedUser);
         $data = $this->prepareTableData($query, $filterValues, (int)($this->flight->request()->query['tablePage'] ?? 0));
-        $this->render('app/modules/Article/views/articles.latte', Params::getAll([
+        $this->render('Article/views/articles.latte', Params::getAll([
             'articles' => $data['items'],
             'currentPage' => $data['currentPage'],
             'totalPages' => $data['totalPages'],

@@ -106,7 +106,7 @@ class UserController extends AbstractController
             return;
         }
 
-        $this->render('app/views/user/signIn.latte', [
+        $this->render('User/views/signIn.latte', [
             'href' => '/user/sign/in',
             'userImg' => '🫥',
             'userEmail' => '',
@@ -125,7 +125,7 @@ class UserController extends AbstractController
 
     public function helpHome(): void
     {
-        $content = $this->application->getLatte()->renderToString('app/views/info.latte', [
+        $content = $this->application->getLatte()->renderToString('Common/views/info.latte', [
             'content' => $this->dataHelper->get('Settings', ['Name' => 'Help_home'], 'Value')->Value ?? '',
             'hasAuthorization' => $this->connectedUser->get()->hasAutorization() ?? false,
             'currentVersion' => Application::VERSION
@@ -135,7 +135,7 @@ class UserController extends AbstractController
 
     public function legalNotice(): void
     {
-        $content = $this->application->getLatte()->renderToString('app/views/info.latte', [
+        $content = $this->application->getLatte()->renderToString('Common/views/info.latte', [
             'content' => $this->dataHelper->get('Settings', ['Name' => 'LegalNotices'], 'Value')->Value ?? '',
             'hasAuthorization' => $this->connectedUser->get()->hasAutorization() ?? false,
             'currentVersion' => Application::VERSION
@@ -188,7 +188,7 @@ class UserController extends AbstractController
             }
         }
 
-        $this->render('app/views/home.latte', Params::getAll([
+        $this->render('Common/views/home.latte', Params::getAll([
             'latestArticle' => $latestArticle,
             'latestArticles' => $articles['latestArticles'],
             'greatings' => $this->dataHelper->get('Settings', ['Name' => 'Greatings'], 'Value')->Value ?? '',
@@ -320,7 +320,7 @@ class UserController extends AbstractController
     public function help(): void
     {
         if ($this->connectedUser->get()->person ?? false) {
-            $this->render('app/views/info.latte', Params::getAll([
+            $this->render('Common/views/info.latte', Params::getAll([
                 'content' => $this->dataHelper->get('Settings', ['Name' => 'Help_user'], 'Value')->Value ?? '',
                 'hasAuthorization' => $this->connectedUser->hasAutorization(),
                 'currentVersion' => Application::VERSION
@@ -331,7 +331,7 @@ class UserController extends AbstractController
     public function contact($eventId = null): void
     {
         if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-            $this->render('app/views/contact.latte', Params::getAll([
+            $this->render('Common/views/contact.latte', Params::getAll([
                 'navItems' => $this->getNavItems($this->connectedUser->get()->person ?? false),
                 'event' => $eventId != null ? $this->dataHelper->get('Event', ['Id' => $eventId], 'Id, Summary') : null,
             ]));

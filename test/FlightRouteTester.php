@@ -27,7 +27,7 @@ function printHelp(): void
 Usage: php route_tester.php [options]
 Options:
   --base-url=URL      URL de base (défaut: http://localhost:8000)
-  --timeout=SECONDS   Timeout en secondes (défaut: 10)
+  --timeout=SECONDS   Timeout en secondes (défaut: 5)
   --routes-file=FILE  Fichier contenant les routes (défaut: index.php)
   --db-path=PATH      Chemin vers la base de données SQLite
   --export-json       Exporter les résultats en JSON
@@ -57,7 +57,7 @@ function main(): int
     }
     $config = new TestConfiguration(
         baseUrl: $options['base-url'] ?? 'http://localhost:8000',
-        timeout: (int)($options['timeout'] ?? 10)
+        timeout: (int)($options['timeout'] ?? 5)
     );
     $test       = $options['test'] ?? null;
     $simu       = $options['simu'] ?? null;

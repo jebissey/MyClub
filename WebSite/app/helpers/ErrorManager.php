@@ -23,10 +23,13 @@ class ErrorManager
         $this->application->getFlight()->response()->status($code);
         $this->application->getFlight()->setData('code', $code);
         $this->application->getFlight()->setData('message', $message);
-        if ($displayCode) echo "<h1>$code</h1>";
-        echo "<h2>$message</h2>";
-        echo "<script>
-                setTimeout(() => location.href = '/', $timeout);
-            </script>";
+        
+        $content = '';
+        if ($displayCode) $content .= "<h1>$code</h1>";
+        $content .= "<h2>$message</h2>";
+        $content .= "<script>setTimeout(() => location.href = '/', $timeout);</script>";
+
+        $this->application->getFlight()->response()->write($content);
+        $this->application->getFlight()->response()->send();
     }
 }

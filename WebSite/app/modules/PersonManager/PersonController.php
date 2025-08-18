@@ -24,7 +24,7 @@ class PersonController extends TableController implements CrudControllerInterfac
     public function help(): void
     {
         if (($this->connectedUser->get()->isPersonManager() ?? false) || $this->connectedUser->isWebmaster() ?? false) {
-            $this->render('app/views/info.latte', [
+            $this->render('Common/views/info.latte', [
                 'content' => $this->dataHelper->get('Settings', ['Name' => 'Help_personManager'], 'Value')->Value ?? '',
                 'hasAuthorization' => $this->connectedUser->hasAutorization(),
                 'currentVersion' => Application::VERSION
