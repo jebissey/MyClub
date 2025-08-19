@@ -8,7 +8,7 @@ use app\enums\FilterInputRule;
 
 class WebApp
 {
-    public function buildUrl($newParams)
+    public function buildUrl($newParams): string
     {
         $params = array_merge($_GET, $newParams);
         return '?' . http_build_query($params);
@@ -26,9 +26,9 @@ class WebApp
     static public function getLayout()
     {
         $navbar = $_SESSION['navbar'] ?? '';
-        if ($navbar == 'user') return '../user/user.latte';
-        else if ($navbar == 'eventManager') return '../admin/eventManager.latte';
-        else if ($navbar == 'personManager') return '../admin/personManager.latte';
+        if ($navbar == 'user') return 'user.latte';
+        else if ($navbar == 'eventManager') return '../../../Webmaster/views/eventManager.latte';
+        else if ($navbar == 'personManager') return '../../../Webmaster/views/personManager.latte';
         else if ($navbar == 'webmaster') return '../admin/webmaster.latte';
         else if ($navbar == 'redactor') return '../../Webmaster/views/navbar/redactor.latte';
         else if ($navbar == '') return '../../Webmaster/views/navbar/home.latte';

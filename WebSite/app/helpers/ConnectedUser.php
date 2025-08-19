@@ -41,7 +41,7 @@ class ConnectedUser
             'href' => $this->getHref($this->person->Email),
             'userImg' => $this->getUserImg($this->person),
             'userEmail' => $this->person->Email,
-            'keys' => count($this->authorizations) > 0,
+            'isAdmin' => count($this->authorizations) > 0,
             'isEventDesigner' => $this->isEventDesigner(),
             'isEventManager' => $this->isEventManager(),
             'isHomeDesigner' => $this->isHomeDesigner(),

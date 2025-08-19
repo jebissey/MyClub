@@ -20,7 +20,7 @@ class MediaController extends AbstractController
     {
         if ($this->connectedUser->get()->isRedactor() ?? false) {
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-                $this->render('app/views/media/upload.latte', Params::getAll([]));
+                $this->render('Article/views/media/upload.latte', Params::getAll([]));
             } else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' invalid in file ' . __FILE__ . ' at line ' . __LINE__);
         } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
@@ -35,7 +35,7 @@ class MediaController extends AbstractController
                 $years = $this->getAvailableYears();
                 if (in_array($year, $years)) $files = $this->getFilesForYear($year, $search);
 
-                $this->render('app/views/media/list.latte',  Params::getAll([
+                $this->render('Article/views/media/list.latte',  Params::getAll([
                     'files' => $files,
                     'years' => $years,
                     'currentYear' => $year,
@@ -73,7 +73,7 @@ class MediaController extends AbstractController
     {
         if ($this->connectedUser->get()->person ?? false) {
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-                $this->render('app/views/media/gpxViewer.latte', Params::getAll([]));
+                $this->render('Article/views/media/gpxViewer.latte', Params::getAll([]));
             } else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
         } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }

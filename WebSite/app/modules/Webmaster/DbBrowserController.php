@@ -38,7 +38,7 @@ class DbBrowserController extends AbstractController
     public function index(): void
     {
         if ($this->connectedUser->get()->isWebmaster() ?? false) {
-            $this->render('app/views/dbbrowser/index.latte', Params::getAll(['tables' => $this->dbBrowserDataHelper->getTables()]));
+            $this->render('Webmaster/views/dbbrowser/index.latte', Params::getAll(['tables' => $this->dbBrowserDataHelper->getTables()]));
         } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
@@ -47,7 +47,7 @@ class DbBrowserController extends AbstractController
         if ($this->connectedUser->get()->isWebmaster() ?? false) {
             [$columns, $columnTypes] = $this->dbBrowserDataHelper->showCreateForm($table);
 
-            $this->render('app/views/dbbrowser/create.latte', Params::getAll([
+            $this->render('Webmaster/views/dbbrowser/create.latte', Params::getAll([
                 'table' => $table,
                 'columns' => $columns,
                 'columnTypes' => $columnTypes
@@ -60,7 +60,7 @@ class DbBrowserController extends AbstractController
         if ($this->connectedUser->get()->isWebmaster() ?? false) {
             [$columns, $record, $primaryKey, $columnTypes] = $this->dbBrowserDataHelper->showEditForm($table, $id);
 
-            $this->render('app/views/dbbrowser/edit.latte', Params::getAll([
+            $this->render('Webmaster/views/dbbrowser/edit.latte', Params::getAll([
                 'table' => $table,
                 'columns' => $columns,
                 'record' => $record,
@@ -81,7 +81,7 @@ class DbBrowserController extends AbstractController
                 max(1, (int)($this->flight->request()->query['dbbPage'] ?? 1))
             );
 
-            $this->render('app/views/dbbrowser/table.latte', Params::getAll([
+            $this->render('Webmaster/views/dbbrowser/table.latte', Params::getAll([
                 'table' => $table,
                 'columns' => $columns,
                 'records' => $records,

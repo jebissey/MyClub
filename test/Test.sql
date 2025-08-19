@@ -79,7 +79,7 @@ INSERT INTO "Test" VALUES (71,NULL,'POST','/user/availabilities',NULL,'{"id":1}'
 INSERT INTO "Test" VALUES (72,NULL,'POST','/user/groups',NULL,'{"id":1}',NULL,'403',NULL,NULL);
 INSERT INTO "Test" VALUES (73,NULL,'POST','/user/preferences',NULL,'{"id":1}',NULL,'403',NULL,NULL);
 INSERT INTO "Test" VALUES (74,NULL,'POST','/user/sign/in',NULL,'{"id":1}',NULL,'400',NULL,NULL);
-INSERT INTO "Test" VALUES (75,NULL,'POST','/contact',NULL,'{"name":"zz","email":"user@myclub.foo", "message":"zz"}',NULL,'200',NULL,NULL);
+INSERT INTO "Test" VALUES (75,NULL,'POST','/contact',NULL,'{"name":"zz","email":"user@myclub.foo", "message":"zz"}',NULL,'303',NULL,NULL);
 INSERT INTO "Test" VALUES (76,NULL,'POST','/api/designs/vote',NULL,'{"id":1}',NULL,'403',NULL,NULL);
 INSERT INTO "Test" VALUES (77,NULL,'POST','/arwards',NULL,'{"id":1}',NULL,'403',NULL,NULL);
 INSERT INTO "Test" VALUES (78,NULL,'POST','/api/media/upload',NULL,'{"id":1}',NULL,'403',NULL,NULL);

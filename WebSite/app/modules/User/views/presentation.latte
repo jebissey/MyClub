@@ -1,9 +1,5 @@
-{layout '../layout.latte'}
+{extends "user.latte"}
 
-{block title}Présentation de {$person->FirstName} {$person->LastName}{if $person->NickName} ({$person->NickName}){/if}{/block}
-
-{block navbar}
-    {include '../navbar/user.latte'}
 {/block}
 
 {block head}

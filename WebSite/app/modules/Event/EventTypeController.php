@@ -40,7 +40,7 @@ class EventTypeController extends TableController implements CrudControllerInter
                 (int)($this->flight->request()->query['tablePage'] ?? 1)
             );
 
-            $this->render('app/views/eventType/index.latte', Params::getAll([
+            $this->render('Event/views/eventType/index.latte', Params::getAll([
                 'eventTypes' => $data['items'],
                 'currentPage' => $data['currentPage'],
                 'totalPages' => $data['totalPages'],
@@ -84,7 +84,7 @@ class EventTypeController extends TableController implements CrudControllerInter
                 } else if (($_SERVER['REQUEST_METHOD'] === 'GET')) {
                     $existingAttributes = $this->eventDataHelper->getExistingAttibutes($id);
 
-                    $this->render('app/views/eventType/edit.latte', Params::getAll([
+                    $this->render('Event/views/eventType/edit.latte', Params::getAll([
                         'name' => $eventType->Name,
                         'idGroup' => $eventType->IdGroup,
                         'groups' => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),

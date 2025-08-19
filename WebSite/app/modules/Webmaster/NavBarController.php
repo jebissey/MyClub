@@ -19,7 +19,7 @@ class NavBarController extends AbstractController
     public function index()
     {
         if ($this->connectedUser->get()->isWebmaster() ?? false) {
-            $this->render('app/views/navbar/index.latte', Params::getAll([
+            $this->render('Webmaster/views/navbar/index.latte', Params::getAll([
                 'navItems' => $this->getNavItems($this->connectedUser->person),
                 'groups' => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
                 'availableRoutes' => $this->getAvailableRoutes()
@@ -33,7 +33,7 @@ class NavBarController extends AbstractController
         if ($person && $this->pageDataHelper->authorizedUser('/navbar/show/arwards', $person)) {
             $arwardsDataHelper = new ArwardsDataHelper($this->application);
 
-            $this->render('app/views/admin/arwards.latte', Params::getAll([
+            $this->render('Webmaster/views/arwards.latte', Params::getAll([
                 'counterNames' => $counterNames = $arwardsDataHelper->getCounterNames(),
                 'data' => $arwardsDataHelper->getData($counterNames),
                 'groups' => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
@@ -47,7 +47,7 @@ class NavBarController extends AbstractController
     {
         $person = $this->connectedUser->get()->person ?? false;
         if ($this->pageDataHelper->authorizedUser("/navbar/show/article/$id", $person)) {
-            $this->render('app/views/navbar/article.latte', Params::getAll([
+            $this->render('Webmaster/views/navbar/article.latte', Params::getAll([
                 'navItems' => $this->getNavItems($person),
                 'chosenArticle' => $this->dataHelper->get('Article', ['Id' => $id], 'Content'),
                 'hasAuthorization' => $this->connectedUser->hasAutorization()

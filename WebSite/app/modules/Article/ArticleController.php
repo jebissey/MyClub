@@ -39,7 +39,7 @@ class ArticleController extends TableController
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $_SESSION['navbar'] = 'redactor';
 
-                $this->render('app/views/admin/redactor.latte', Params::getAll([]));
+                $this->render('Webmaster/views/redactor.latte', Params::getAll([]));
             } else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
         } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
@@ -214,7 +214,7 @@ class ArticleController extends TableController
                 } else $_SESSION['error'] = "Une erreur est survenue lors de la mise à jour de l'article";
                 $this->flight->redirect('/articles/' . $id);
             } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-                $this->render('app/views/user/publish.latte', Params::getAll(['article' => $this->articleDataHelper->getWithAuthor($id)]));
+                $this->render('User/views/publish.latte', Params::getAll(['article' => $this->articleDataHelper->getWithAuthor($id)]));
             } else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
         } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
@@ -255,7 +255,7 @@ class ArticleController extends TableController
             $dateRange = PeriodHelper::getDateRangeFor($period);
             $crosstabData = (new ArticleCrosstabDataHelper($this->application))->getItems($dateRange);
 
-            $this->render('app/views/common/crosstab.latte', Params::getAll([
+            $this->render('Common/views/crosstab.latte', Params::getAll([
                 'crosstabData' => $crosstabData,
                 'period' => $period,
                 'dateRange' => $dateRange,

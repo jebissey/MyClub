@@ -49,7 +49,7 @@ class EventController extends AbstractController
         $filterByPreferences = $input['filterByPreferences'] ?? 0 === 1;
         $connectedUser = $this->connectedUser->get();
 
-        $this->render('app/views/event/nextEvents.latte', Params::getAll([
+        $this->render('Event/views/nextEvents.latte', Params::getAll([
             'navItems' => $this->getNavItems($connectedUser->person ?? false),
             'events' => $this->eventDataHelper->getEvents($connectedUser->person, $mode, $offset, $filterByPreferences),
             'person' => $connectedUser->person,
@@ -65,7 +65,7 @@ class EventController extends AbstractController
 
     public function weekEvents(): void
     {
-        $this->render('app/views/event/weekEvents.latte', Params::getAll([
+        $this->render('Event/views/event/weekEvents.latte', Params::getAll([
             'events' => $this->eventDataHelper->getNextWeekEvents(),
             'eventTypes' => $this->dataHelper->gets('EventType', ['Inactivated' => 0], 'Id, Name'),
             'eventAttributes' => $this->dataHelper->gets('Attribute', [], 'Id, Name, Detail, Color'),
@@ -97,7 +97,7 @@ class EventController extends AbstractController
         if ($this->connectedUser->get(1)->isEventManager() ?? false) {
             $events = $this->eventDataHelper->getEventsForAllOrGuest();
 
-            $this->render('app/views/event/guest.latte', Params::getAll([
+            $this->render('Event/views/event/guest.latte', Params::getAll([
                 'events' => $events,
                 'navbarTemplate' => '../navbar/eventManager.latte',
                 'layout' => WebApp::getLayout(),
@@ -208,7 +208,7 @@ class EventController extends AbstractController
         $person = $this->connectedUser->get()->person ?? false;
         $userEmail = $person->Email ?? '';
         if ($this->dataHelper->get('Event', ['Id' => $eventId], 'Id')) {
-            $this->render('app/views/event/detail.latte', Params::getAll([
+            $this->render('Event/views/event/detail.latte', Params::getAll([
                 'eventId' => $eventId,
                 'event' => $this->eventDataHelper->getEvent($eventId),
                 'attributes' => $this->eventDataHelper->getEventAttributes($eventId),
@@ -314,7 +314,7 @@ class EventController extends AbstractController
     {
         if ($this->connectedUser->get()->isEventManager() ?? false) {
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-                $this->render('app/views/event/location.latte', Params::getAll([]));
+                $this->render('Event/views/event/location.latte', Params::getAll([]));
             } else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
         } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
@@ -335,7 +335,7 @@ class EventController extends AbstractController
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $_SESSION['navbar'] = 'eventManager';
 
-                $this->render('app/views/admin/eventManager.latte', Params::getAll([]));
+                $this->render('Webmaster/views/eventManager.latte', Params::getAll([]));
             } else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
         } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
@@ -343,7 +343,7 @@ class EventController extends AbstractController
     public function needs(): void
     {
         if ($this->connectedUser->get()->isWebmaster() ?? false) {
-            $this->render('app/views/event/needs.latte', Params::getAll([
+            $this->render('Event/views/event/needs.latte', Params::getAll([
                 'navItems' => $this->getNavItems($this->connectedUser->person),
                 'needTypes' => $this->dataHelper->gets('NeedType', [], '*', 'Name'),
                 'needs' => (new NeeddataHelper($this->application))->getNeedsAndTheirTypes(),
@@ -361,7 +361,7 @@ class EventController extends AbstractController
             }
             $messages = (new MessageDataHelper($this->application))->getEventMessages($eventId);
 
-            $this->render('app/views/event/chat.latte', Params::getAll([
+            $this->render('Event/views/event/chat.latte', Params::getAll([
                 'event' => $event,
                 'messages' => $messages,
                 'person' => $this->connectedUser->person,
@@ -390,14 +390,14 @@ class EventController extends AbstractController
                 $eventTypeName = $idEventType != null ? $this->dataHelper->get('EventType', ['Id', $idEventType], 'Name') : '';
                 $dayOfWeekName = $dayOfWeek != null ? TranslationManager::getWeekdayNames()[$dayOfWeek] : '';
 
-                $this->render('app/views/emails/copyToClipBoard.latte', Params::getAll([
+                $this->render('Event/views/emails/copyToClipBoard.latte', Params::getAll([
                     'emailsJson' => json_encode($filteredEmails),
                     'emails' => $filteredEmails,
                     'filters' => "$groupName / $eventTypeName / $dayOfWeekName / $timeOfDay",
                     'people' => $this->dataHelper->gets('Person', ['Inactivated' => 0], 'Email, Phone, FirstName, LastName, NickName', '', true),
                 ]));
             } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-                $this->render('app/views/emails/getEmails.latte', Params::getAll([
+                $this->render('Event/views/emails/getEmails.latte', Params::getAll([
                     'groups' => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
                     'eventTypes' => $this->dataHelper->gets('EventType', ['Inactivated' => 0], 'Id, Name', 'Name'),
                     'weekdayNames' => TranslationManager::getWeekdayNames(),

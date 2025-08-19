@@ -35,7 +35,7 @@ class Params
             'href' => '/user/sign/in',
             'userImg' => '🫥',
             'userEmail' => '',
-            'keys' => false,
+            'isAdmin' => false,
             'isEventDesigner' => false,
             'isEventManager' => false,
             'isHomeDesigner' => false,

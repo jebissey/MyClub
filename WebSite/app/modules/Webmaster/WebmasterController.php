@@ -60,7 +60,7 @@ class WebmasterController extends AbstractController
                 if (!$result['success']) $newVersion = "Test for MyClub new version error : " . $result['error'];
                 elseif ($result['version'] != Application::VERSION) $newVersion = "A new version is available (V" . $result['version'] . ")";
 
-                $this->render('app/views/admin/webmaster.latte', Params::getAll(['newVersion' => $newVersion]));
+                $this->render('Webmaster/views/webmaster.latte', Params::getAll(['newVersion' => $newVersion]));
             } else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
         } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
@@ -75,7 +75,7 @@ class WebmasterController extends AbstractController
                     $_SESSION['navbar'] = 'redactor';
                     $this->flight->redirect('/articles');
                 } else if ($this->connectedUser->isWebmaster())   $this->flight->redirect('/webmaster');
-            } else if ($_SERVER['REQUEST_METHOD'] === 'GET') $this->render('app/views/admin/admin.latte', Params::getAll([]));
+            } else if ($_SERVER['REQUEST_METHOD'] === 'GET') $this->render('Webmaster/views/admin.latte', Params::getAll([]));
             else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
         } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
@@ -86,7 +86,7 @@ class WebmasterController extends AbstractController
         if ($person && $this->connectedUser->isWebmaster()) {
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $arwardsDataHelper = new ArwardsDataHelper($this->application);
-                $this->render('app/views/admin/arwards.latte', Params::getAll([
+                $this->render('Webmaster/views/arwards.latte', Params::getAll([
                     'counterNames' => $counterNames = $arwardsDataHelper->getCounterNames(),
                     'data' => $arwardsDataHelper->getData($counterNames),
                     'groups' => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
@@ -175,7 +175,7 @@ class WebmasterController extends AbstractController
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $_SESSION['navbar'] = 'visitorInsights';
 
-                $this->render('app/views/admin/visitorInsights.latte', Params::getAll([]));
+                $this->render('Webmaster/views/visitorInsights.latte', Params::getAll([]));
             } else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
         } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }

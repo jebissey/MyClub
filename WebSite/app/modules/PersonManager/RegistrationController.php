@@ -38,7 +38,7 @@ class RegistrationController extends TableController
                 ['field' => 'NickName', 'label' => 'Surnom']
             ];
             $data = $this->prepareTableData((new TableControllerDataHelper($this->application))->getPersonsQuery(), $filterValues, (int)($this->flight->request()->query['tablePage'] ?? 1));
-            $this->render('app/views/registration/index.latte', Params::getAll([
+            $this->render('Event/views/registration/index.latte', Params::getAll([
                 'persons' => $data['items'],
                 'currentPage' => $data['currentPage'],
                 'totalPages' => $data['totalPages'],
@@ -57,7 +57,7 @@ class RegistrationController extends TableController
         if (($this->connectedUser->get()->isPersonManager() ?? false) || $this->connectedUser->isWebmaster() ?? false) {
             [$availableGroups, $currentGroups] = (new GroupDataHelper($this->application))->getAvailableGroups($this->connectedUser, $personId);
 
-            $this->render('app/views/registration/groups.latte', Params::getAll([
+            $this->render('Event/views/registration/groups.latte', Params::getAll([
                 'currentGroups' => $currentGroups,
                 'availableGroups' => $availableGroups,
                 'personId' => $personId

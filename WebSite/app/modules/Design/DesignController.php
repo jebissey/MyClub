@@ -25,7 +25,7 @@ class DesignController extends AbstractController
         if ($this->connectedUser->get()->isRedactor() ?? false) {
             [$designs, $userVotes] = (new DesignDataHelper($this->application))->getUsersVotes($this->connectedUser->person->Id);
 
-            $this->render('app/views/designs/index.latte', Params::getAll([
+            $this->render('Article/views/designs/index.latte', Params::getAll([
                 'designs' => $designs,
                 'groups' => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
                 'userVotes' => $userVotes
@@ -36,7 +36,7 @@ class DesignController extends AbstractController
     public function create()
     {
         if ($this->connectedUser->get()->isRedactor() ?? false) {
-            $this->render('app/views/designs/create.latte', Params::getAll([
+            $this->render('Article/views/designs/create.latte', Params::getAll([
                 'groups' => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
             ]));
         } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
