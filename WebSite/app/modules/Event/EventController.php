@@ -65,7 +65,7 @@ class EventController extends AbstractController
 
     public function weekEvents(): void
     {
-        $this->render('Event/views/event/weekEvents.latte', Params::getAll([
+        $this->render('Event/views/weekEvents.latte', Params::getAll([
             'events' => $this->eventDataHelper->getNextWeekEvents(),
             'eventTypes' => $this->dataHelper->gets('EventType', ['Inactivated' => 0], 'Id, Name'),
             'eventAttributes' => $this->dataHelper->gets('Attribute', [], 'Id, Name, Detail, Color'),

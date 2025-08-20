@@ -40,6 +40,7 @@ use app\modules\User\UserController;
 use app\modules\VisitorInsights\LogController;
 use app\modules\Webmaster\DbBrowserController;
 use app\modules\Webmaster\NavBarController;
+use app\modules\Webmaster\RssController;
 use app\modules\Webmaster\WebmasterController;
 use app\services\AttributeService;
 use app\services\AuthorizationService;
@@ -124,16 +125,16 @@ mapRoute($flight, 'GET  /events/@id:[0-9]+', $eventController, 'show');
 $flight->route('GET  /events/@id:[0-9]+/register', function ($id) use ($eventController) {
     $eventController->register($id, true);
 });
-$flight->route('GET  /events/@id:[0-9]+/unregister', function ($id) use ($eventController) {
+$flight->route('GET /events/@id:[0-9]+/unregister', function ($id) use ($eventController) {
     $eventController->register($id, false);
 });
-$flight->route('GET  /events/@id:[0-9]+/@token:[a-f0-9]+', function ($id, $token) use ($eventController) {
+$flight->route('GET /events/@id:[0-9]+/@token:[a-f0-9]+', function ($id, $token) use ($eventController) {
     $eventController->register($id, true, $token);
 });
-mapRoute($flight, 'GET  /event/location', $eventController, 'location');
-mapRoute($flight, 'GET  /needs', $eventController, 'needs');
-mapRoute($flight, 'GET  /event/chat/@id:[0-9]+', $eventController, 'showEventChat');
-mapRoute($flight, 'GET  /weekEvents', $eventController, 'weekEvents');
+mapRoute($flight, 'GET /event/location', $eventController, 'location');
+mapRoute($flight, 'GET /needs', $eventController, 'needs');
+mapRoute($flight, 'GET /event/chat/@id:[0-9]+', $eventController, 'showEventChat');
+mapRoute($flight, 'GET /weekEvents', $eventController, 'weekEvents');
 
 $eventTypeController = new EventTypeController($application);
 mapRoute($flight, 'GET    /eventTypes', $eventTypeController, 'index');
@@ -174,9 +175,9 @@ mapRoute($flight, 'GET /media/list', $mediaController, 'listFiles');
 mapRoute($flight, 'GET /media/gpxViewer', $mediaController, 'gpxViewer');
 
 $navBarController = new NavBarController($application);
-mapRoute($flight, 'GET  /navBar', $navBarController, 'index');
-mapRoute($flight, 'GET  /navBar/show/article/@id:[0-9]+', $navBarController, 'showArticle');
-mapRoute($flight, 'GET  /navBar/show/arwards', $navBarController, 'showArwards');
+mapRoute($flight, 'GET /navBar', $navBarController, 'index');
+mapRoute($flight, 'GET /navBar/show/article/@id:[0-9]+', $navBarController, 'showArticle');
+mapRoute($flight, 'GET /navBar/show/arwards', $navBarController, 'showArwards');
 
 $personController = new PersonController($application);
 mapRoute($flight, 'GET    /directory', $personController, 'showDirectory');
@@ -193,8 +194,12 @@ mapRoute($flight, 'POST   /presentation/edit', $personController, 'savePresentat
 mapRoute($flight, 'GET    /presentation/@id:[0-9]+', $personController, 'showPresentation');
 
 $registrationController = new RegistrationController($application);
-mapRoute($flight, 'GET  /registration', $registrationController, 'index');
-mapRoute($flight, 'GET  /registration/groups/@id:[0-9]+', $registrationController, 'getPersonGroups');
+mapRoute($flight, 'GET /registration', $registrationController, 'index');
+mapRoute($flight, 'GET /registration/groups/@id:[0-9]+', $registrationController, 'getPersonGroups');
+
+$rssController = new RssController($application);
+mapRoute($flight, 'GET /articles-rss.xml', $rssController, 'articlesRssGenerator');
+mapRoute($flight, 'GET /events-rss.xml', $rssController, 'eventsRssGenerator');
 
 $surveyController = new SurveyController($application);
 mapRoute($flight, 'GET  /surveys/add/@id:[0-9]+', $surveyController, 'add');
@@ -233,7 +238,6 @@ mapRoute($flight, 'GET  /admin/help', $webmasterController, 'helpAdmin');
 mapRoute($flight, 'GET  /admin/webmaster/help', $webmasterController, 'helpWebmaster');
 mapRoute($flight, 'GET  /arwards', $webmasterController, 'arwards');
 mapRoute($flight, 'POST /arwards', $webmasterController, 'arwards');
-mapRoute($flight, 'GET  /rss.xml', $webmasterController, 'rssGenerator');
 mapRoute($flight, 'GET  /sitemap.xml', $webmasterController, 'sitemapGenerator');
 mapRoute($flight, 'GET  /visitorInsights', $webmasterController, 'visitorInsights');
 mapRoute($flight, 'GET  /visitorInsights/help', $webmasterController, 'helpVisitorInsights');

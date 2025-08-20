@@ -99,8 +99,8 @@ INSERT INTO "Test" VALUES (91,NULL,'POST','/api/message/update',NULL,'{"id":1}',
 INSERT INTO "Test" VALUES (92,NULL,'POST','/api/navBar/updatePositions',NULL,'{"id":1}',NULL,'403',NULL,NULL);
 INSERT INTO "Test" VALUES (93,1000,'POST','/user/sign/in',NULL,'{"email":"badEmail@myclub.foo","password":"wrongPassword" }',NULL,'400',NULL,NULL);
 INSERT INTO "Test" VALUES (94,1010,'POST','/user/sign/in',NULL,'{"email":"webmaster@myclub.foo","password":"wrongPassword" }',NULL,'400',NULL,NULL);
-INSERT INTO "Test" VALUES (95,1020,'POST','/user/sign/in',NULL,'{"email":"webmaster@myclub.foo","password":"admin1234" }',NULL,'303',NULL,NULL);
-INSERT INTO "Test" VALUES (96,NULL,'GET','/user/sign/out',NULL,NULL,NULL,'303',NULL,NULL);
+INSERT INTO "Test" VALUES (95,1020,'POST','/user/sign/in',NULL,'{"email":"webmaster@myclub.foo","password":"admin1234" }',NULL,'200',NULL,NULL);
+INSERT INTO "Test" VALUES (96,NULL,'GET','/user/sign/out',NULL,NULL,NULL,'302',NULL,NULL);
 INSERT INTO "Test" VALUES (97,1030,'GET','/user/account',NULL,NULL,'{"email":"webmaster@myclub.foo","password":"admin1234" }','200',NULL,NULL);
 INSERT INTO "Test" VALUES (98,1040,'GET','/user/availabilities',NULL,NULL,'{"email":"webmaster@myclub.foo","password":"admin1234" }','200',NULL,NULL);
 INSERT INTO "Test" VALUES (99,1050,'GET','/user/groups',NULL,NULL,'{"email":"webmaster@myclub.foo","password":"admin1234" }','200','SELECT * From "Group"','[{"Id":1,"Name":"Webmaster","Inactivated":0,"SelfRegistration":0}]');

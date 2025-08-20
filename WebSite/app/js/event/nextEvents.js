@@ -283,29 +283,33 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     function loadNeedsByNeedType(needTypeId) {
+//console.log("/////////////////////");          
         availableNeedsSelect.innerHTML = '<option value="">Chargement...</option>';
         fetch(`/api/needs-by-need-type/${needTypeId}`)
             .then(response => response.json())
             .then(data => {
-                availableNeedsSelect.innerHTML = '';
-                if (data.needs && data.needs.length > 0) {
-                    data.needs.forEach(need => {
+                if (data.success) {
+//console.log(data);                     
+                    availableNeedsSelect.innerHTML = '';
+                    if (data.needs && data.needs.length > 0) {
+                        data.needs.forEach(need => {
+                            const option = document.createElement('option');
+                            option.value = need.Id;
+                            option.textContent = `${need.Name}`;
+                            option.dataset.needLabel = need.Label;
+                            option.dataset.needParticipantDependent = need.ParticipantDependent;
+                            availableNeedsSelect.appendChild(option);
+                        });
+                    } else {
                         const option = document.createElement('option');
-                        option.value = need.Id;
-                        option.textContent = `${need.Name}`;
-                        option.dataset.needLabel = need.Label;
-                        option.dataset.needParticipantDependent = need.ParticipantDependent;
+                        option.value = "";
+                        option.textContent = "Aucun besoin disponible";
                         availableNeedsSelect.appendChild(option);
-                    });
-                } else {
-                    const option = document.createElement('option');
-                    option.value = "";
-                    option.textContent = "Aucun besoin disponible";
-                    availableNeedsSelect.appendChild(option);
+                    }
                 }
             })
             .catch(error => {
-                availableNeedsSelect.innerHTML = '<option value="">Erreur de chargement</option>';
+                availableNeedsSelect.innerHTML = '<option value="">Erreur de chargement</option>' + error.message;
             });
     }
 

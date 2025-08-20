@@ -11,19 +11,17 @@ use app\helpers\Application;
 use app\helpers\Password;
 use app\helpers\WebApp;
 use app\models\AuthResult;
-use app\models\LogDataHelper;
 use app\models\PersonDataHelper;
 use app\services\EmailService;
+use Throwable;
 
 class AuthenticationService
 {
     private Application $application;
-    private LogDataHelper $logHelper;
 
     public function __construct(Application $application)
     {
         $this->application = $application;
-        $this->logHelper = new LogDataHelper($application);
     }
 
     public function handleSignIn(array $requestData): AuthResult
@@ -51,8 +49,8 @@ class AuthenticationService
             if ($person->Inactivated == 1)                            return AuthResult::error("Sign in failed: inactivated user $email");
             if (!$this->verifyPassword($password, $person->Password)) return AuthResult::error("Sign in failed: wrong password for $email");
             return $this->loginUser($person, $rememberMe);
-        } catch (\Exception $e) {
-            return AuthResult::error('Authentication system error');
+        } catch (Throwable $e) {
+            return AuthResult::error("Authentication system error: {$e->getMessage()} in {$e->getFile()}:{$e->getLine()}" );
         }
     }
 

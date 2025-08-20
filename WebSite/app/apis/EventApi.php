@@ -312,7 +312,8 @@ class EventApi extends AbstractApi
     public function getNeedsByNeedType(int $id): void
     {
         try {
-            [$response, $statusCode] = $this->needService->getNeedsByNeedType($id);
+            $result = $this->needService->getNeedsByNeedType($id);
+            [$response, $statusCode] = [['success' => true, 'needs' => $result], ApplicationError::Ok->value];
             $this->renderJson($response, $statusCode);
         } catch (Throwable $e) {
             $this->renderError($e->getMessage());

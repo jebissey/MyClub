@@ -31,7 +31,7 @@ class WebApp
         else if ($navbar == 'personManager') return '../../../Webmaster/views/personManager.latte';
         else if ($navbar == 'webmaster') return '../admin/webmaster.latte';
         else if ($navbar == 'redactor') return '../../Webmaster/views/navbar/redactor.latte';
-        else if ($navbar == '') return '../../Webmaster/views/navbar/home.latte';
+        else if ($navbar == '') return '../../../Webmaster/views/navbar/home.latte';
 
         throw new RuntimeException('Fatal error in file ' . __FILE__ . ' at line ' . __LINE__ . " with navbar=" . $navbar);
     }

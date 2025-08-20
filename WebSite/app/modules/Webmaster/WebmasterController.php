@@ -127,20 +127,7 @@ class WebmasterController extends AbstractController
         } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
-    public function rssGenerator()
-    {
-        $base_url = WebApp::getBaseUrl();
-        $site_title = "Liste d'articles";
-        $site_url = $base_url;
-        $feed_url = $base_url . "rss.xml";
-        $feed_description = "Mises à jour de la liste d'articles";
-        $articles = (new ArticleDataHelper($this->application))->getArticlesForRss($this->connectedUser->get()->person->Id ?? 0);
-        header('Cache-Control: no-cache, no-store, must-revalidate'); // HTTP 1.1
-        header('Pragma: no-cache'); // HTTP 1.0
-        header('Expires: 0'); // Proxies
-        header('Content-Type: application/rss+xml; charset=utf-8');
-        echo $this->generateRSS($articles, $site_title, $site_url, $feed_url, $feed_description);
-    }
+
 
     public function sitemapGenerator()
     {
@@ -182,47 +169,6 @@ class WebmasterController extends AbstractController
 
 
     #region Private methods
-    private function generateRSS($articles, $site_title, $site_url, $feed_url, $feed_description)
-    {
-        $rss = '<?xml version="1.0" encoding="UTF-8"?>';
-        $rss .= '<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">';
-        $rss .= '<channel>';
-        $rss .= '<title>' . htmlspecialchars($site_title) . '</title>';
-        $rss .= '<link>' . htmlspecialchars($site_url) . '</link>';
-        $rss .= '<description>' . htmlspecialchars($feed_description) . '</description>';
-        $rss .= '<language>fr-fr</language>';
-        $rss .= '<lastBuildDate>' . date(DATE_RSS) . '</lastBuildDate>';
-        $rss .= '<atom:link href="' . htmlspecialchars($feed_url) . '" rel="self" type="application/rss+xml" />';
-
-        foreach ($articles as $article) {
-            $rss .= '<item>';
-            $rss .= '<title>' . htmlspecialchars($article->Title) . '</title>';
-            $rss .= '<link>' . htmlspecialchars($site_url . 'articles/' . $article->Id) . '</link>';
-            $rss .= '<guid>' . htmlspecialchars($site_url . 'articles/' . $article->Id) . '</guid>';
-            $rss .= '<pubDate>' . date(DATE_RSS, strtotime($article->LastUpdate)) . '</pubDate>';
-            $rss .= '<description>' . $this->getFirstElement($article->Content) . '</description>';
-            $rss .= '</item>';
-        }
-
-        $rss .= '</channel>';
-        $rss .= '</rss>';
-
-        return $rss;
-    }
-
-    private function getFirstElement($html)
-    {
-        $htmlSansImages = preg_replace('/<img[^>]*>/i', '', $html);
-        if (preg_match('/<p[^>]*>(.*?)<\/p>/is', $htmlSansImages, $matches)) $text = strip_tags($matches[1]);
-        else {
-            $text = strip_tags($htmlSansImages);
-            $text = trim($text);
-        }
-
-        $maxLength = 200;
-        if (mb_strlen($text) > $maxLength) $text = mb_substr($text, 0, $maxLength) . '...';
-        return htmlspecialchars($text, ENT_XML1 | ENT_QUOTES, 'UTF-8');
-    }
 
     private function getLastVersion()
     {

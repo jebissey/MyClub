@@ -69,59 +69,36 @@ class UserController extends AbstractController
             if (!$newPassword)                                               $this->application->getErrorManager()->raise(ApplicationError::BadRequest, 'Invalid password format');
             elseif ($this->authService->resetPassword($token, $newPassword)) $this->application->getErrorManager()->raise(ApplicationError::Ok, 'Votre mot de passe est réinitialisé', 3000, false);
             else                                                             $this->application->getErrorManager()->raise(ApplicationError::BadRequest, 'Invalid or expired token');
-        } elseif ($_SERVER['REQUEST_METHOD'] === 'GET') {
-            
-            $this->render('User/views/setPassword.latte', [
-                'token' => $token,
-                'currentVersion' => Application::VERSION,
-                'page' => ''
-            ]);
-        }
+        } elseif ($_SERVER['REQUEST_METHOD'] === 'GET') $this->render('User/views/setPassword.latte', Params::getAll(['token' => $token,]));
     }
 
     public function signIn()
     {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') return $this->handleSignInPost();
-        if ($_SERVER['REQUEST_METHOD'] === 'GET')  return $this->handleSignInGet();
-        $this->application->getErrorManager()->raise(
-            ApplicationError::MethodNotAllowed,
-            'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid'
-        );
-    }
-    private function handleSignInPost(): void
-    {
-        $result = $this->authService->handleSignIn($this->flight->request()->data->getData());
-        if (!$result->isSuccess()) {
-            $this->application->getErrorManager()->raise(
-                ApplicationError::BadRequest,
-                $result->getError()
-            );
-            return;
-        }
-        $this->flight->redirect('/');
-    }
-    private function handleSignInGet(): void
-    {
-        $rememberMeResult = $this->authService->handleRememberMeLogin();
-        if ($rememberMeResult && $rememberMeResult->isSuccess()) {
-            $this->flight->redirect('/');
-            return;
-        }
-
-        $this->render('User/views/signIn.latte', [
-            'href' => '/user/sign/in',
-            'userImg' => '🫥',
-            'userEmail' => '',
-            'isAdmin' => false,
-            'page' => basename(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH)),
-            'currentVersion' => Application::VERSION
-        ]);
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $result = $this->authService->handleSignIn($this->flight->request()->data->getData());
+            if ($result->isSuccess()) $this->redirect('/');
+            else $this->application->getErrorManager()->raise(ApplicationError::BadRequest, $result->getError());
+        } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+            $rememberMeResult = $this->authService->handleRememberMeLogin();
+            if ($rememberMeResult && $rememberMeResult->isSuccess()) {
+                $this->redirect('/');
+                return;
+            }
+            $this->render('User/views/signIn.latte', [
+                'href' => '/user/sign/in',
+                'userImg' => '🫥',
+                'userEmail' => '',
+                'isAdmin' => false,
+                'page' => basename(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH)),
+                'currentVersion' => Application::VERSION
+            ]);
+        } else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid');
     }
 
     public function signOut(): void
     {
         $this->authService->signOut();
-        $this->flight->redirect('/');
+        $this->redirect('/');
     }
     #endregion
 

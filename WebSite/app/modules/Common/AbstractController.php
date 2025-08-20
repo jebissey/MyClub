@@ -39,6 +39,17 @@ abstract class AbstractController
     }
 
     #region Protected fucntions
+    protected function getAllLabels(): array
+    {
+        return array_map(
+            fn(TimeOfDay $case) => [
+                'value' => $case->value,
+                'label' => $this->languagesDataHelper->translate($case->value)
+            ],
+            TimeOfDay::cases()
+        );
+    }
+
     protected function getNavItems($person, bool $all = false)
     {
         if (!$person) $userGroups = [];
@@ -70,15 +81,14 @@ abstract class AbstractController
         Flight::stop();
     }
 
-    protected function getAllLabels(): array
+    protected function redirect(string $url): void
     {
-        return array_map(
-            fn(TimeOfDay $case) => [
-                'value' => $case->value,
-                'label' => $this->languagesDataHelper->translate($case->value)
-            ],
-            TimeOfDay::cases()
-        );
+        // for test with curl
+        $ua = $_SERVER['HTTP_USER_AGENT'] ?? '';
+        if (stripos($ua, 'TestDevice') !== false) {
+            $this->flight->response()->header('Location', '/');
+            $this->flight->response()->write('');
+        } else $this->application->getFlight()->redirect($url);
     }
 
     #region Private functions

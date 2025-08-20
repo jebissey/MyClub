@@ -1,4 +1,4 @@
-{layout '../layout.latte'}
+{extends "../webmaster.latte"}
 
 {block head}
     <style>
@@ -10,10 +10,6 @@
             cursor: grabbing;
         }
     </style>
-{/block}
-
-{block navbar}
-    {include 'webmaster.latte'}
 {/block}
 
 {block content}

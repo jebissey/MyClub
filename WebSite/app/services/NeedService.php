@@ -23,7 +23,7 @@ class NeedService implements NeedServiceInterface
 
     public function deleteNeed(int $id): int
     {
-        return $this->dataHelper-> delete('Need', ['Id' => $id]);
+        return $this->dataHelper->delete('Need', ['Id' => $id]);
     }
 
     public function saveNeed(array $data): int|bool
@@ -35,7 +35,7 @@ class NeedService implements NeedServiceInterface
             'ParticipantDependent' => intval($data['participantDependent'] ?? 0),
             'IdNeedType' => $data['idNeedType']
         ];
-        return $this->dataHelper->set('Need', $needData, $data['id'] == null ? [] : ['Id' =>$data['id']]);
+        return $this->dataHelper->set('Need', $needData, $data['id'] == null ? [] : ['Id' => $data['id']]);
     }
 
     public function getEventNeeds(int $eventId): array
@@ -45,7 +45,7 @@ class NeedService implements NeedServiceInterface
 
     public function getNeedsByNeedType(int $needTypeId): array
     {
-        return ['success' => true, 'needs' => $this->needDataHelper->needsforNeedType($needTypeId)];
+        return $this->needDataHelper->needsforNeedType($needTypeId);
     }
 
     #region Private functions
