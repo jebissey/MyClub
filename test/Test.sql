@@ -45,7 +45,7 @@ INSERT INTO "Test" VALUES (32,NULL,'GET','/event/chat/@id:[0-9]+','{"id":1}',NUL
 INSERT INTO "Test" VALUES (33,NULL,'GET','/eventTypes/edit/@id:[0-9]+','{"id":1}',NULL,NULL,'403',NULL,NULL);
 INSERT INTO "Test" VALUES (34,NULL,'POST','/eventTypes/edit/@id:[0-9]+','{"id":1}','{"id":1}',NULL,'403',NULL,NULL);
 INSERT INTO "Test" VALUES (35,NULL,'DELETE','/eventTypes/delete/@id:[0-9]+','{"id":1}',NULL,NULL,'403',NULL,NULL);
-INSERT INTO "Test" VALUES (36,NULL,'GET','/presentation/@id:[0-9]+','{"id":1}',NULL,NULL,'403',NULL,NULL);
+INSERT INTO "Test" VALUES (36,NULL,'GET','/user/presentation/@id:[0-9]+','{"id":1}',NULL,NULL,'403',NULL,NULL);
 INSERT INTO "Test" VALUES (37,NULL,'GET','/api/author/@articleId:[0-9]+','{"articleId":1}',NULL,NULL,'200',NULL,NULL);
 INSERT INTO "Test" VALUES (38,NULL,'GET','/api/surveys/reply/@id:[0-9]+','{"id":1}',NULL,NULL,'403',NULL,NULL);
 INSERT INTO "Test" VALUES (39,NULL,'GET','/api/carousel/@articleId:[0-9]+','{"articleId":1}',NULL,NULL,'403',NULL,NULL);
@@ -72,7 +72,7 @@ INSERT INTO "Test" VALUES (64,NULL,'POST','/emails',NULL,'{"dayOfWeek":"zz"}',NU
 INSERT INTO "Test" VALUES (65,NULL,'POST','/events/guest',NULL,'{"email":"zz"}',NULL,'403',NULL,NULL);
 INSERT INTO "Test" VALUES (66,NULL,'POST','/groups/create',NULL,'{"name":"zz"}',NULL,'403',NULL,NULL);
 INSERT INTO "Test" VALUES (67,NULL,'POST','/import',NULL,'{"csvFile":"zz"}',NULL,'403',NULL,NULL);
-INSERT INTO "Test" VALUES (68,NULL,'POST','/presentation/edit',NULL,'{"content":"zz"}',NULL,'403',NULL,NULL);
+INSERT INTO "Test" VALUES (68,NULL,'POST','/user/presentation/edit',NULL,'{"content":"zz"}',NULL,'403',NULL,NULL);
 INSERT INTO "Test" VALUES (69,NULL,'POST','/surveys/create',NULL,'{"question":"zz"}',NULL,'403',NULL,NULL);
 INSERT INTO "Test" VALUES (70,NULL,'POST','/user/account',NULL,'{"id":1}',NULL,'403',NULL,NULL);
 INSERT INTO "Test" VALUES (71,NULL,'POST','/user/availabilities',NULL,'{"id":1}',NULL,'403',NULL,NULL);
@@ -99,14 +99,14 @@ INSERT INTO "Test" VALUES (91,NULL,'POST','/api/message/update',NULL,'{"id":1}',
 INSERT INTO "Test" VALUES (92,NULL,'POST','/api/navBar/updatePositions',NULL,'{"id":1}',NULL,'403',NULL,NULL);
 INSERT INTO "Test" VALUES (93,1000,'POST','/user/sign/in',NULL,'{"email":"badEmail@myclub.foo","password":"wrongPassword" }',NULL,'400',NULL,NULL);
 INSERT INTO "Test" VALUES (94,1010,'POST','/user/sign/in',NULL,'{"email":"webmaster@myclub.foo","password":"wrongPassword" }',NULL,'400',NULL,NULL);
-INSERT INTO "Test" VALUES (95,1020,'POST','/user/sign/in',NULL,'{"email":"webmaster@myclub.foo","password":"admin1234" }',NULL,'200',NULL,NULL);
+INSERT INTO "Test" VALUES (95,1020,'POST','/user/sign/in',NULL,'{"email":"webmaster@myclub.foo","password":"admin1234" }',NULL,'302',NULL,NULL);
 INSERT INTO "Test" VALUES (96,NULL,'GET','/user/sign/out',NULL,NULL,NULL,'302',NULL,NULL);
 INSERT INTO "Test" VALUES (97,1030,'GET','/user/account',NULL,NULL,'{"email":"webmaster@myclub.foo","password":"admin1234" }','200',NULL,NULL);
 INSERT INTO "Test" VALUES (98,1040,'GET','/user/availabilities',NULL,NULL,'{"email":"webmaster@myclub.foo","password":"admin1234" }','200',NULL,NULL);
 INSERT INTO "Test" VALUES (99,1050,'GET','/user/groups',NULL,NULL,'{"email":"webmaster@myclub.foo","password":"admin1234" }','200','SELECT * From "Group"','[{"Id":1,"Name":"Webmaster","Inactivated":0,"SelfRegistration":0}]');
 INSERT INTO "Test" VALUES (100,1060,'GET','/user/preferences',NULL,NULL,'{"email":"webmaster@myclub.foo","password":"admin1234" }','200',NULL,NULL);
 INSERT INTO "Test" VALUES (101,1070,'GET','/user/statistics',NULL,NULL,'{"email":"webmaster@myclub.foo","password":"admin1234" }','200',NULL,NULL);
-INSERT INTO "Test" VALUES (102,1080,'GET','/directory',NULL,NULL,'{"email":"webmaster@myclub.foo","password":"admin1234" }','200',NULL,NULL);
+INSERT INTO "Test" VALUES (102,1080,'GET','/user/directory',NULL,NULL,'{"email":"webmaster@myclub.foo","password":"admin1234" }','200',NULL,NULL);
 INSERT INTO "Test" VALUES (103,1090,'GET','/user/news',NULL,NULL,'{"email":"webmaster@myclub.foo","password":"admin1234" }','200',NULL,NULL);
 INSERT INTO "Test" VALUES (104,1100,'GET','/webmaster',NULL,NULL,'{"email":"webmaster@myclub.foo","password":"admin1234" }','200',NULL,NULL);
 INSERT INTO "Test" VALUES (105,1110,'GET','/dbbrowser',NULL,NULL,'{"email":"webmaster@myclub.foo","password":"admin1234" }','200',NULL,NULL);
@@ -125,5 +125,7 @@ INSERT INTO "Test" VALUES (117,1160,'GET','/admin/webmaster/help',NULL,NULL,'{"e
 INSERT INTO "Test" VALUES (118,1032,'POST','/user/account',NULL,'{"email":"webmaster%40myclub.foo", "firstName":"fn", "lastName":"ln", "nickName":"", "avatar":"%F0%9F%98%82"}','{"email":"webmaster@myclub.foo","password":"admin1234" }','303','SELECT Email, FirstName, LastName, NickName, Avatar From Person','[{"Email":"webmaster@myclub.foo","FirstName":"fn","LastName":"ln","NickName":"","Avatar":"🤔"}]');
 INSERT INTO "Test" VALUES (119,1042,'POST','/user/availabilities',NULL,'{"availabilities":{"4":{"morning":"on"},"5":{"morning":"on"},"0":{"evening":"on"},"2":{"evening":"on"}}}','{"email":"webmaster@myclub.foo","password":"admin1234" }','303','SELECT Availabilities From Person','[{"Availabilities":"{\"4\":{\"morning\":\"on\"},\"5\":{\"morning\":\"on\"},\"0\":{\"evening\":\"on\"},\"2\":{\"evening\":\"on\"}}"}]');
 INSERT INTO "Test" VALUES (120,1062,'POST','/user/preferences',NULL,'{"preferences":{"eventTypes":{"newEvent":{"enabled":"on"},"newArticle":{"enabled":"on","pollOnly":"on"}}}}','{"email":"webmaster@myclub.foo","password":"admin1234" }','303','SELECT Preferences From Person','[{"Preferences":"{\"eventTypes\":{\"newEvent\":{\"enabled\":\"on\"},\"newArticle\":{\"enabled\":\"on\",\"pollOnly\":\"on\"}}}"}]');
-INSERT INTO "Test" VALUES (121,1170,'GET','/user/sign/out',NULL,NULL,'{"email":"webmaster@myclub.foo","password":"admin1234" }','200',NULL,NULL);
+INSERT INTO "Test" VALUES (121,1170,'GET','/user/sign/out',NULL,NULL,'{"email":"webmaster@myclub.foo","password":"admin1234" }','302',NULL,NULL);
+INSERT INTO "Test" VALUES (122,1082,'GET','/user/presentation/edit',NULL,NULL,NULL,'403',NULL,NULL);
+INSERT INTO "Test" VALUES (123,1084,'POST','/user/presentation/edit',NULL,NULL,'{"email":"webmaster@myclub.foo","password":"admin1234" }','303',NULL,NULL);
 COMMIT;

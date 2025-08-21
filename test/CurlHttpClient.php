@@ -6,6 +6,11 @@ class CurlHttpClient implements HttpClientInterface
 
     public function __construct(private TestConfiguration $config) {}
 
+    public function clearSession(): void
+    {
+        $this->storedCookies = [];
+    }
+
     public function request(string $method, string $url, array $options = []): HttpResponse
     {
         $ch = curl_init();

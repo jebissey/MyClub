@@ -8,6 +8,7 @@ interface AuthenticatorInterface
 interface HttpClientInterface
 {
     public function request(string $method, string $url, array $options = []): HttpResponse;
+    public function clearSession(): void;
 }
 
 interface MyClubDataRepositoryInterface

@@ -16,11 +16,11 @@
             </a>
             {if $loggedPerson}
                 {if $loggedPerson->InPresentationDirectory}
-            <a href="/presentation/edit" class="btn btn-primary">
+            <a href="/user/presentation/edit" class="btn btn-primary">
                 <i class="bi bi-person-badge"></i> Modifier ma présentation
             </a>
                 {else}
-            <a href="/presentation/edit" class="btn btn-primary">
+            <a href="/user/presentation/edit" class="btn btn-primary">
                 <i class="bi bi-plus-circle"></i> Créer ma présentation
             </a>
                 {/if}
@@ -34,11 +34,11 @@
                 <div class="card-body">
                     <h5 class="card-title">Filtrer par groupe</h5>
                     <div class="d-flex flex-wrap gap-2">
-                        <a href="/directory" class="btn {if $selectedGroup === null}btn-primary{else}btn-outline-primary{/if}">
+                        <a href="/user/directory" class="btn {if $selectedGroup === null}btn-primary{else}btn-outline-primary{/if}">
                             Tous
                         </a>
                         {foreach $groups as $group}
-                            <a href="/directory?group={$group->Id}" class="btn {if $selectedGroup === $group->Id}btn-primary{else}btn-outline-primary{/if}">
+                            <a href="/user/directory?group={$group->Id}" class="btn {if $selectedGroup === $group->Id}btn-primary{else}btn-outline-primary{/if}">
                                 {$group->Name} 
                                 {if isset($groupCounts[$group->Id])}
                                     <span class="badge bg-light text-dark">{$groupCounts[$group->Id]}</span>
@@ -57,7 +57,7 @@
                 <div class="col">
                     <div class="card h-100">
                         <div class="card-body text-center">
-                            <a href="/presentation/{$person->Id}" class="text-decoration-none">
+                            <a href="/user/presentation/{$person->Id}" class="text-decoration-none">
                                 {if $person->UseGravatar == 'yes' && $person->Email}
                                     <img src="https://www.gravatar.com/avatar/{md5(strtolower(trim($person->Email)))}?s=100&d=mp" alt="Avatar" class="img-fluid rounded-circle mb-3" style="width: 100px; height: 100px; object-fit: cover;">
                                 {elseif $person->Avatar}
@@ -80,7 +80,7 @@
                             </a>
                             
                             <div class="mt-3">
-                                <a href="/presentation/{$person->Id}" class="btn btn-sm btn-primary">
+                                <a href="/user/presentation/{$person->Id}" class="btn btn-sm btn-primary">
                                     Voir le profil
                                 </a>
                             </div>

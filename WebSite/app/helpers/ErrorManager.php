@@ -30,6 +30,5 @@ class ErrorManager
         $content .= "<script>setTimeout(() => location.href = '/', $timeout);</script>";
 
         $this->application->getFlight()->response()->write($content);
-        $this->application->getFlight()->response()->send();
     }
 }

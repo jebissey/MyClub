@@ -27,7 +27,7 @@
 <div class="container-fluid">
     <div class="row">
         <div class="col-md-12 mb-4 mt-3">
-            <a href="/directory" class="btn btn-secondary">
+            <a href="/user/directory" class="btn btn-secondary">
                 <i class="bi bi-arrow-left"></i> Retour au trombinoscope
             </a>
         </div>
@@ -53,7 +53,7 @@
                     {/if}
                     
                     {if $loggedPerson && $loggedPerson->Id == $person->Id}
-                        <a href="/presentation/edit" class="btn btn-sm btn-primary mt-2">
+                        <a href="/user/presentation/edit" class="btn btn-sm btn-primary mt-2">
                             <i class="bi bi-pencil"></i> Modifier ma présentation
                         </a>
                     {/if}

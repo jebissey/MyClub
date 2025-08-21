@@ -74,7 +74,7 @@ class TestExecutor
         if ($simulation == null) {
             $testData = $this->repo->getTestDataForRoute($route->originalPath, $route->method);
             if ($route->hasParameters && $testData === []) {
-                $this->parameterErrors[] = $this->reporter->error("({$routeNumber}) No data found for {$route->originalPath}");
+                $this->parameterErrors[] = $this->reporter->error("No data found for {$route->originalPath} ({$routeNumber}) ");
                 return [];
             }
         } else $testData[] = $simulation->toArray();
@@ -89,6 +89,7 @@ class TestExecutor
             $results[] = new TestResult($route, $response, $routeNumber);
         } else {
             foreach ($testData as $test) {
+                $this->http->clearSession();
                 if (!$this->authenticateIfNeeded($test, $routeNumber)) continue;
                 $route->testedPath = $url = $this->urlBuilder->build($route, json_decode($test['JsonGetParameters'], true) ?? []);
                 $response = $this->http->request($route->method, $url, [
@@ -113,6 +114,7 @@ class TestExecutor
         if ($test['JsonConnectedUser'] != null) {
             $user = json_decode($test['JsonConnectedUser'], true);
             $authResult = $this->authenticator->authenticate($user);
+
             if (!$authResult->success) {
                 $this->reporter->error("Auth failed for test {$routeNumber}");
                 return false;

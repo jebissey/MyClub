@@ -138,7 +138,7 @@ class PersonDataHelper extends Data implements NewsProviderInterface
                 'id' => $presentation->Id,
                 'title' => 'Présentation de ' . $fullName,
                 'date' => $presentation->PresentationLastUpdate,
-                'url' => '/presentation/' . $presentation->Id
+                'url' => '/user/presentation/' . $presentation->Id
             ];
         }
         return $news;
