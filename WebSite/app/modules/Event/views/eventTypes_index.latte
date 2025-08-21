@@ -1,11 +1,11 @@
-{layout '../admin/eventManager.latte'}
+{extends '../../Webmaster/views/eventManager.latte'}
 
 {block title}Types d'évènement et leurs attributs{/block}
 
 {block content}
     <div class="row">
         <div class="col-12">
-            {include '../common/dataTable.latte',
+            {include '../../Common/views/dataTable.latte',
                 'createButton' => [
                     'url' => '/eventTypes/create',
                     'label' => "Créer un type d'évènement"

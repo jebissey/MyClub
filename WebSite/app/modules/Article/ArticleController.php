@@ -83,7 +83,7 @@ class ArticleController extends TableController
         }
         $query = $this->articleTableDataHelper->getQuery($connectedUser);
         $data = $this->prepareTableData($query, $filterValues, (int)($this->flight->request()->query['tablePage'] ?? 0));
-        $this->render('Article/views/articles.latte', Params::getAll([
+        $this->render('Article/views/articles_index.latte', Params::getAll([
             'articles' => $data['items'],
             'currentPage' => $data['currentPage'],
             'totalPages' => $data['totalPages'],
@@ -93,7 +93,7 @@ class ArticleController extends TableController
             'resetUrl' => '/articles',
             'isRedactor' => $connectedUser->isRedactor() ?? false,
             'userConnected' => $connectedUser->person ?? false,
-            'layout' => WebApp::getLayout(),
+            'layout' => $this->getLayout(),
             'navItems' => $this->getNavItems($connectedUser->person ?? false),
         ]));
     }
@@ -119,7 +119,7 @@ class ArticleController extends TableController
                 $_SESSION['success'] = null;
             }
 
-            $this->render('app/modules/Article/views/article.latte', Params::getAll([
+            $this->render('Article/views/article_show.latte', Params::getAll([
                 'chosenArticle' => $chosenArticle,
                 'latestArticles' => $this->articleDataHelper->getLatestArticles_($articleIds),
                 'canEdit' => $canEdit,

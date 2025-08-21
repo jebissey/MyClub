@@ -69,7 +69,7 @@ class UserController extends AbstractController
             if (!$newPassword)                                               $this->application->getErrorManager()->raise(ApplicationError::BadRequest, 'Invalid password format');
             elseif ($this->authService->resetPassword($token, $newPassword)) $this->application->getErrorManager()->raise(ApplicationError::Ok, 'Votre mot de passe est réinitialisé', 3000, false);
             else                                                             $this->application->getErrorManager()->raise(ApplicationError::BadRequest, 'Invalid or expired token');
-        } elseif ($_SERVER['REQUEST_METHOD'] === 'GET') $this->render('User/views/setPassword.latte', Params::getAll(['token' => $token,]));
+        } elseif ($_SERVER['REQUEST_METHOD'] === 'GET') $this->render('User/views/user_set_password.latte', Params::getAll(['token' => $token,]));
     }
 
     public function signIn()
@@ -84,7 +84,7 @@ class UserController extends AbstractController
                 $this->redirect('/');
                 return;
             }
-            $this->render('User/views/signIn.latte', [
+            $this->render('User/views/user_sign_in.latte', [
                 'href' => '/user/sign/in',
                 'userImg' => '🫥',
                 'userEmail' => '',
@@ -220,7 +220,7 @@ class UserController extends AbstractController
                 }
                 $this->flight->redirect('/user');
             } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-                $this->render('User/views/account.latte', Params::getAll([
+                $this->render('User/views/user_account.latte', Params::getAll([
                     'readOnly' => $person->Imported == 1 ? true : false,
                     'email' => filter_var($person->Email, FILTER_VALIDATE_EMAIL) ?: '',
                     'firstName' => WebApp::sanitizeInput($person->FirstName),
@@ -230,7 +230,7 @@ class UserController extends AbstractController
                     'useGravatar' => WebApp::sanitizeInput($person->UseGravatar, $this->application->enumToValues(YesNo::class), YesNo::No->value),
                     'emojis' => Application::EMOJI_LIST,
                     'isSelfEdit' => true,
-                    'layout' => WebApp::getLayout(),
+                    'layout' => $this->getLayout(),
                     'navItems' => $this->getNavItems($connectedUser->person ?? false),
                 ]));
             } else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
@@ -246,7 +246,7 @@ class UserController extends AbstractController
                 $this->flight->redirect('/user');
             } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $currentAvailabilities = json_decode($person->Availabilities ?? '', true);
-                $this->render('User/views/availabilities.latte', Params::getAll(['currentAvailabilities' => $currentAvailabilities]));
+                $this->render('User/views/user_availabilities.latte', Params::getAll(['currentAvailabilities' => $currentAvailabilities]));
             } else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
         } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
@@ -268,7 +268,7 @@ class UserController extends AbstractController
                     $eventTypesWithAttributes[] = $eventType;
                 }
 
-                $this->render('User/views/preferences.latte', Params::getAll([
+                $this->render('User/views/user_preferences.latte', Params::getAll([
                     'currentPreferences' => json_decode($person->Preferences ?? '', true),
                     'eventTypes' => $eventTypesWithAttributes
                 ]));
@@ -286,9 +286,9 @@ class UserController extends AbstractController
             } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $currentGroups = (new GroupDataHelper($this->application))->getCurrentGroups($person->Id);
 
-                $this->render('User/views/groups.latte', Params::getAll([
+                $this->render('User/views/user_groups.latte', Params::getAll([
                     'groups' => $currentGroups,
-                    'layout' => WebApp::getLayout(),
+                    'layout' => $this->getLayout(),
                     'navItems' => $this->getNavItems($connectedUser->person ?? false),
                 ]));
             } else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
@@ -410,7 +410,7 @@ class UserController extends AbstractController
             ];
             $input = WebApp::filterInput($schema, $this->flight->request()->query->getData());
             $season = $personalStatistics->getSeasonRange($input['seasonStart'] ?? null, $input['seasonEnd'] ?? null);
-            $this->render('User/views/statistics.latte', Params::getAll([
+            $this->render('User/views/user_statistics.latte', Params::getAll([
                 'stats' => $personalStatistics->getStats($person, $season['start'], $season['end'], $this->connectedUser->isWebmaster()),
                 'seasons' => $personalStatistics->getAvailableSeasons(),
                 'currentSeason' => $season,

@@ -5,6 +5,7 @@ namespace app\modules\Common;
 use flight;
 use flight\Engine;
 use Latte\Engine as LatteEngine;
+use RuntimeException;
 
 use app\enums\TimeOfDay;
 use app\helpers\Application;
@@ -48,6 +49,19 @@ abstract class AbstractController
             ],
             TimeOfDay::cases()
         );
+    }
+
+    protected function getLayout()
+    {
+        $navbar = $_SESSION['navbar'] ?? '';
+        if ($navbar == 'user') return 'user.latte';
+        else if ($navbar == 'eventManager') return '../../Webmaster/views/eventManager.latte';
+        else if ($navbar == 'personManager') return '../../../Webmaster/views/personManager.latte';
+        else if ($navbar == 'webmaster') return '../admin/webmaster.latte';
+        else if ($navbar == 'redactor') return '../../Webmaster/views/navbar/redactor.latte';
+        else if ($navbar == '') return '../../Webmaster/views/navbar/home.latte';
+
+        throw new RuntimeException('Fatal error in file ' . __FILE__ . ' at line ' . __LINE__ . " with navbar=" . $navbar);
     }
 
     protected function getNavItems($person, bool $all = false)

@@ -38,7 +38,7 @@ class RegistrationController extends TableController
                 ['field' => 'NickName', 'label' => 'Surnom']
             ];
             $data = $this->prepareTableData((new TableControllerDataHelper($this->application))->getPersonsQuery(), $filterValues, (int)($this->flight->request()->query['tablePage'] ?? 1));
-            $this->render('Event/views/registration/index.latte', Params::getAll([
+            $this->render('PersonManager/views/registration_groups_index.latte', Params::getAll([
                 'persons' => $data['items'],
                 'currentPage' => $data['currentPage'],
                 'totalPages' => $data['totalPages'],
@@ -46,7 +46,7 @@ class RegistrationController extends TableController
                 'filters' => $filterConfig,
                 'columns' => $columns,
                 'resetUrl' => '/registration',
-                'layout' => WebApp::getLayout(),
+                'layout' => $this->getLayout(),
                 'navItems' => $this->getNavItems($connectedUser->person ?? false),
             ]));
         } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
@@ -57,7 +57,7 @@ class RegistrationController extends TableController
         if (($this->connectedUser->get()->isPersonManager() ?? false) || $this->connectedUser->isWebmaster() ?? false) {
             [$availableGroups, $currentGroups] = (new GroupDataHelper($this->application))->getAvailableGroups($this->connectedUser, $personId);
 
-            $this->render('Event/views/registration/groups.latte', Params::getAll([
+            $this->render('PersonManager/views/registration_user_groups_partial.latte', Params::getAll([
                 'currentGroups' => $currentGroups,
                 'availableGroups' => $availableGroups,
                 'personId' => $personId

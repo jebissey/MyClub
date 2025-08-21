@@ -26,11 +26,12 @@ use app\models\MessageDataHelper;
 use app\models\NeedDataHelper;
 use app\models\ParticipantDataHelper;
 use app\models\PersonDataHelper;
+use app\modules\Article\DesignController;
 use app\modules\Article\MediaController;
 use app\modules\Article\SurveyController;
-use app\modules\Design\DesignController;
 use app\modules\Event\EventController;
 use app\modules\Event\EventTypeController;
+use app\modules\Event\NeedController;
 use app\modules\PersonManager\GroupController;
 use app\modules\PersonManager\ImportController;
 use app\modules\PersonManager\PersonController;
@@ -132,7 +133,6 @@ $flight->route('GET /events/@id:[0-9]+/@token:[a-f0-9]+', function ($id, $token)
     $eventController->register($id, true, $token);
 });
 mapRoute($flight, 'GET /event/location', $eventController, 'location');
-mapRoute($flight, 'GET /needs', $eventController, 'needs');
 mapRoute($flight, 'GET /event/chat/@id:[0-9]+', $eventController, 'showEventChat');
 mapRoute($flight, 'GET /weekEvents', $eventController, 'weekEvents');
 
@@ -178,6 +178,9 @@ $navBarController = new NavBarController($application);
 mapRoute($flight, 'GET /navBar', $navBarController, 'index');
 mapRoute($flight, 'GET /navBar/show/article/@id:[0-9]+', $navBarController, 'showArticle');
 mapRoute($flight, 'GET /navBar/show/arwards', $navBarController, 'showArwards');
+
+$needController = new NeedController($application, $needDataHelper);
+mapRoute($flight, 'GET /needs', $needController, 'needs');
 
 $personController = new PersonController($application);
 mapRoute($flight, 'GET    /directory', $personController, 'showDirectory');

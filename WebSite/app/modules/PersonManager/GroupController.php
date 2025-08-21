@@ -24,9 +24,9 @@ class GroupController extends AbstractController implements CrudControllerInterf
     public function index()
     {
         if (($this->connectedUser->get()->isPersonManager() ?? false) || $this->connectedUser->isWebmaster() ?? false) {
-            $this->render('PersonManager/views/groups/index.latte', Params::getAll([
+            $this->render('PersonManager/views/groups_index.latte', Params::getAll([
                 'groups' => $this->groupDataHelper->getGroupsWithAuthorizations(),
-                'layout' => WebApp::getLayout(),
+                'layout' => $this->getLayout(),
                 'navItems' => $this->getNavItems($connectedUser->person ?? false),
             ]));
         } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
@@ -51,14 +51,14 @@ class GroupController extends AbstractController implements CrudControllerInterf
                     $this->render('PersonManager/views/groups/create.latte', Params::getAll([
                         'availableAuthorizations' => $availableAuthorizations,
                         'error' => 'Le nom du groupe est requis',
-                        'layout' => WebApp::getLayout()
+                        'layout' => $this->getLayout()
                     ]));
                 }
                 $this->groupDataHelper->insert($name, $selfRegistration, $selectedAuthorizations);
             } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $this->render('PersonManager/views/groups/create.latte', Params::getAll([
                     'availableAuthorizations' => $availableAuthorizations,
-                    'layout' => WebApp::getLayout()
+                    'layout' => $this->getLayout()
                 ]));
             } else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
         } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
@@ -82,21 +82,21 @@ class GroupController extends AbstractController implements CrudControllerInterf
                 $selectedAuthorizations = $input['authorizations'] ?? [];
 
                 if (empty($name)) {
-                    $this->render('PersonManager/views/groups/edit.latte', Params::getAll([
+                    $this->render('PersonManager/views/group_edit.latte', Params::getAll([
                         'group' => $group,
                         'availableAuthorizations' => $availableAuthorizations,
                         'error' => 'Le nom du groupe est requis',
-                        'layout' => WebApp::getLayout()
+                        'layout' => $this->getLayout()
                     ]));
                 } else $this->groupDataHelper->update($id, $name, $selfRegistration, $selectedAuthorizations);
             } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 if (!$group) $this->application->getErrorManager()->raise(ApplicationError::BadRequest, "Unknwon group $id in file " . __FILE__ . ' at line ' . __LINE__);
                 else {
-                    $this->render('PersonManager/views/groups/edit.latte', Params::getAll([
+                    $this->render('PersonManager/views/group_edit.latte', Params::getAll([
                         'group' => $group,
                         'availableAuthorizations' => $availableAuthorizations,
                         'currentAuthorizations' => array_column($this->dataHelper->gets('GroupAuthorization', ['IdGroup' => $id], 'IdAuthorization'), 'IdAuthorization'),
-                        'layout' => WebApp::getLayout()
+                        'layout' => $this->getLayout()
                     ]));
                 }
             } else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);

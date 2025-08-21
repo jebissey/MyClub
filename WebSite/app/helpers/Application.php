@@ -96,7 +96,6 @@ class Application
         return $this->dataHelper;
     }
 
-
     public function getPersonDataHelper(): PersonDataHelper
     {
         return $this->personDataHelper;

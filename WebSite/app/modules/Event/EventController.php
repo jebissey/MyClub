@@ -19,7 +19,6 @@ use app\services\EmailService;
 use app\models\CrosstabDataHelper;
 use app\models\EventDataHelper;
 use app\models\MessageDataHelper;
-use app\models\NeedDataHelper;
 use app\models\PersonDataHelper;
 use app\models\ParticipantDataHelper;
 use app\modules\Common\AbstractController;
@@ -59,7 +58,7 @@ class EventController extends AbstractController
             'offset' => $offset,
             'mode' => $mode,
             'filterByPreferences' => $filterByPreferences,
-            'layout' => WebApp::getLayout()
+            'layout' => $this->getLayout()
         ]));
     }
 
@@ -70,7 +69,7 @@ class EventController extends AbstractController
             'eventTypes' => $this->dataHelper->gets('EventType', ['Inactivated' => 0], 'Id, Name'),
             'eventAttributes' => $this->dataHelper->gets('Attribute', [], 'Id, Name, Detail, Color'),
             'navItems' => $this->getNavItems($this->connectedUser->get()->person ?? false),
-            'layout' => WebApp::getLayout()
+            'layout' => $this->getLayout()
         ]));
     }
 
@@ -100,7 +99,7 @@ class EventController extends AbstractController
             $this->render('Event/views/event/guest.latte', Params::getAll([
                 'events' => $events,
                 'navbarTemplate' => '../navbar/eventManager.latte',
-                'layout' => WebApp::getLayout(),
+                'layout' => $this->getLayout(),
                 'message' => $message,
                 'messageType' => $type
             ]));
@@ -297,7 +296,7 @@ class EventController extends AbstractController
                     'IdContact' => $contact->Id
                 ]);
 
-                $this->render('app/views/contact/registration-success.latte', Params::getAll([
+                $this->render('Common/views/registration_success.latte', Params::getAll([
                     'event' => $event,
                     'contact' => $contact,
                     'navItems' => $this->getNavItems($this->connectedUser->person),
@@ -340,16 +339,6 @@ class EventController extends AbstractController
         } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
-    public function needs(): void
-    {
-        if ($this->connectedUser->get()->isWebmaster() ?? false) {
-            $this->render('Event/views/event/needs.latte', Params::getAll([
-                'navItems' => $this->getNavItems($this->connectedUser->person),
-                'needTypes' => $this->dataHelper->gets('NeedType', [], '*', 'Name'),
-                'needs' => (new NeeddataHelper($this->application))->getNeedsAndTheirTypes(),
-            ]));
-        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
-    }
 
     public function showEventChat($eventId): void
     {

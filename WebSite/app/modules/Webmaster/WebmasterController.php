@@ -90,7 +90,7 @@ class WebmasterController extends AbstractController
                     'counterNames' => $counterNames = $arwardsDataHelper->getCounterNames(),
                     'data' => $arwardsDataHelper->getData($counterNames),
                     'groups' => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
-                    'layout' => WebApp::getLayout(),
+                    'layout' => $this->getLayout(),
                     'navItems' => $this->getNavItems($person),
                 ]));
             } else if ($_SERVER['REQUEST_METHOD'] === 'POST') {

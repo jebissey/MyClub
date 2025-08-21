@@ -31,7 +31,7 @@ class SurveyController extends AbstractController
                     return;
                 }
 
-                $this->render('Event/views/survey/add.latte', Params::getAll([
+                $this->render('Article/views/survey_add.latte', Params::getAll([
                     'article' => $article,
                     'survey' => $this->dataHelper->get('Survey', ['IdArticle' => $article->Id], 'Question, Options, ClosingDate, Visibility')
                 ]));
@@ -105,7 +105,7 @@ class SurveyController extends AbstractController
                     }
                 }
 
-                $this->render('Event/views/survey/results.latte', [
+                $this->render('Article/views/survey_results.latte', [
                     'survey' => $survey,
                     'options' => $options,
                     'results' => $results,

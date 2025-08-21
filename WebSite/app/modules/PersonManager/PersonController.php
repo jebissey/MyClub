@@ -67,7 +67,7 @@ class PersonController extends TableController implements CrudControllerInterfac
             ];
             $data = $this->prepareTableData((new TableControllerDataHelper($this->application))->getPersonsQuery(), $filterValues, (int)($this->flight->request()->query['tablePage'] ?? 1));
 
-            $this->render('app/views/persons/index.latte', Params::getAll([
+            $this->render('PersonManager/views/users_index.latte', Params::getAll([
                 'persons' => $data['items'],
                 'currentPage' => $data['currentPage'],
                 'totalPages' => $data['totalPages'],
@@ -105,13 +105,13 @@ class PersonController extends TableController implements CrudControllerInterfac
                     if ($person->Imported == 0) $this->dataHelper->set('Person', ['Email' => $input['email']], ['Id' => $person->Id]);
                     $this->flight->redirect('/persons');
                 } else if (($_SERVER['REQUEST_METHOD'] === 'GET')) {
-                    $this->render('User/views/account.latte', Params::getAll([
+                    $this->render('User/views/user_account.latte', Params::getAll([
                         'readOnly' => $person->Imported == 1 ? true : false,
                         'email' => $person->Email,
                         'firstName' => $person->FirstName,
                         'lastName' => $person->LastName,
                         'isSelfEdit' => false,
-                        'layout' => WebApp::getLayout()
+                        'layout' => $this->getLayout()
                     ]));
                 } else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
             }
@@ -131,7 +131,7 @@ class PersonController extends TableController implements CrudControllerInterfac
     public function editPresentation()
     {
         if ($person = $this->connectedUser->get()->person ?? false) {
-            $this->render('User/views/editPresentation.latte', Params::getAll([
+            $this->render('User/views/user_edit_presentation.latte', Params::getAll([
                 'person' => $person,
                 'navItems' => $this->getNavItems($person),
             ]));
@@ -176,7 +176,7 @@ class PersonController extends TableController implements CrudControllerInterfac
                 return;
             }
 
-            $this->render('User/views/presentation.latte', Params::getAll([
+            $this->render('User/views/user_presentation.latte', Params::getAll([
                 'person' => $person,
                 'loggedPerson' => $loggedPerson,
                 'navItems' => $this->getNavItems($person),
@@ -197,7 +197,7 @@ class PersonController extends TableController implements CrudControllerInterfac
                 ], 'Id, LastName, FirstName, NickName, UseGravatar, Avatar, Email');
             }
             $groupCounts = (new GroupDataHelper($this->application))->getGroupCount();
-            $this->render('User/views/directory.latte', Params::getAll([
+            $this->render('User/views/users_directory.latte', Params::getAll([
                 'persons' => $persons,
                 'navItems' => $this->getNavItems($person),
                 'loggedPerson' => $person,
@@ -234,7 +234,7 @@ class PersonController extends TableController implements CrudControllerInterfac
                 }
             }
 
-            $this->render('User/views/map.latte', Params::getAll([
+            $this->render('User/views/users_map.latte', Params::getAll([
                 'locationData' => $locationData,
                 'membersCount' => count($locationData),
                 'navItems' => $this->getNavItems($person),

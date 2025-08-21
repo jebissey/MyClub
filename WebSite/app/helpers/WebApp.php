@@ -23,19 +23,6 @@ class WebApp
         return $baseUrl;
     }
 
-    static public function getLayout()
-    {
-        $navbar = $_SESSION['navbar'] ?? '';
-        if ($navbar == 'user') return 'user.latte';
-        else if ($navbar == 'eventManager') return '../../../Webmaster/views/eventManager.latte';
-        else if ($navbar == 'personManager') return '../../../Webmaster/views/personManager.latte';
-        else if ($navbar == 'webmaster') return '../admin/webmaster.latte';
-        else if ($navbar == 'redactor') return '../../Webmaster/views/navbar/redactor.latte';
-        else if ($navbar == '') return '../../../Webmaster/views/navbar/home.latte';
-
-        throw new RuntimeException('Fatal error in file ' . __FILE__ . ' at line ' . __LINE__ . " with navbar=" . $navbar);
-    }
-
     static public function sanitizeHtml($html)
     {
         $allowed_tags = '<div><span><p><br><strong><em><ul><ol><li><a><img><h1><h2><h3><h4><h5><h6><blockquote><pre><code><table><thead><tbody><tr><th><td>';

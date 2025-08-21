@@ -37,7 +37,7 @@ class NavBarController extends AbstractController
                 'counterNames' => $counterNames = $arwardsDataHelper->getCounterNames(),
                 'data' => $arwardsDataHelper->getData($counterNames),
                 'groups' => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
-                'layout' => WebApp::getLayout(),
+                'layout' => $this->getLayout(),
                 'navItems' => $this->getNavItems($person),
             ]));
         } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
