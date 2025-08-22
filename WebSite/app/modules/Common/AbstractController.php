@@ -57,7 +57,7 @@ abstract class AbstractController
         if ($navbar == 'user') return 'user.latte';
         else if ($navbar == 'eventManager') return '../../Webmaster/views/eventManager.latte';
         else if ($navbar == 'personManager') return '../../../Webmaster/views/personManager.latte';
-        else if ($navbar == 'webmaster') return '../admin/webmaster.latte';
+        else if ($navbar == 'webmaster') return '../../Webmaster/views/webmaster.latte';
         else if ($navbar == 'redactor') return '../../Webmaster/views/navbar/redactor.latte';
         else if ($navbar == '') return '../../Webmaster/views/navbar/home.latte';
 

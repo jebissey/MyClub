@@ -96,7 +96,7 @@ class EventController extends AbstractController
         if ($this->connectedUser->get(1)->isEventManager() ?? false) {
             $events = $this->eventDataHelper->getEventsForAllOrGuest();
 
-            $this->render('Event/views/event/guest.latte', Params::getAll([
+            $this->render('Event/views/guest.latte', Params::getAll([
                 'events' => $events,
                 'navbarTemplate' => '../navbar/eventManager.latte',
                 'layout' => $this->getLayout(),
@@ -207,7 +207,7 @@ class EventController extends AbstractController
         $person = $this->connectedUser->get()->person ?? false;
         $userEmail = $person->Email ?? '';
         if ($this->dataHelper->get('Event', ['Id' => $eventId], 'Id')) {
-            $this->render('Event/views/event/detail.latte', Params::getAll([
+            $this->render('Event/views/detail.latte', Params::getAll([
                 'eventId' => $eventId,
                 'event' => $this->eventDataHelper->getEvent($eventId),
                 'attributes' => $this->eventDataHelper->getEventAttributes($eventId),
@@ -313,7 +313,7 @@ class EventController extends AbstractController
     {
         if ($this->connectedUser->get()->isEventManager() ?? false) {
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-                $this->render('Event/views/event/location.latte', Params::getAll([]));
+                $this->render('Event/views/location.latte', Params::getAll([]));
             } else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
         } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
@@ -350,7 +350,7 @@ class EventController extends AbstractController
             }
             $messages = (new MessageDataHelper($this->application))->getEventMessages($eventId);
 
-            $this->render('Event/views/event/chat.latte', Params::getAll([
+            $this->render('Event/views/chat.latte', Params::getAll([
                 'event' => $event,
                 'messages' => $messages,
                 'person' => $this->connectedUser->person,

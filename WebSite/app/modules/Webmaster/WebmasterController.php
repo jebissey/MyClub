@@ -20,11 +20,13 @@ class WebmasterController extends AbstractController
 
     public function helpWebmaster(): void
     {
-        $this->render('Common/views/info.latte', [
-            'content' => $this->dataHelper->get('Settings', ['Name' => 'Help_webmaster'], 'Value')->Value ?? '',
-            'hasAuthorization' => $this->connectedUser->get()->isEventManager() ?? false,
-            'currentVersion' => Application::VERSION
-        ]);
+        if ($this->connectedUser->get()->isAdministrator() ?? false) {
+            $this->render('Common/views/info.latte', [
+                'content' => $this->dataHelper->get('Settings', ['Name' => 'Help_webmaster'], 'Value')->Value ?? '',
+                'hasAuthorization' => $this->connectedUser->get()->isEventManager() ?? false,
+                'currentVersion' => Application::VERSION
+            ]);
+        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function helpVisitorInsights(): void
@@ -39,7 +41,6 @@ class WebmasterController extends AbstractController
     public function helpAdmin()
     {
         if ($this->connectedUser->get()->isAdministrator() ?? false) {
-
             $this->render('Common/views/info.latte', Params::getAll([
                 'content' => $this->dataHelper->get('Settings', ['Name' => 'Help_admin'], 'Value')->Value ?? '',
                 'hasAuthorization' => $this->connectedUser->isEventManager(),
