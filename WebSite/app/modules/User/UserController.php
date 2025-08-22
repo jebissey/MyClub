@@ -312,13 +312,13 @@ class UserController extends AbstractController
                 $schema = [
                     'content' => FilterInputRule::Html->value,
                     'location' => FilterInputRule::Location->value,
-                    'InPresentationDirectory' => FilterInputRule::Bool->value,              //bug inPresentationDirectory shoud be send
+                    'inPresentationDirectory' => FilterInputRule::Bool->value,
                 ];
                 $input = WebApp::filterInput($schema, $this->flight->request()->data->getData());
 #error_log('# $input # ' . var_export($input,true));                   
                 $presentation = $input['content'] ?? '???';
                 $location =  $input['location'] ?? '???';
-                $inDirectory = $input['InPresentationDirectory'] ?? 0;                      //bug inPresentationDirectory shoud be send
+                $inDirectory = $input['inPresentationDirectory'] ?? 0;
 
                 $this->dataHelper->set('Person', [
                     'Presentation' => $presentation,
