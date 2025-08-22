@@ -7,7 +7,7 @@ class CurrentWebSite
     static public function backup(string $dbWebSitePath): bool
     {
         $filename = basename($dbWebSitePath);
-        $destination = __DIR__ . DIRECTORY_SEPARATOR . $filename;
+        $destination = __DIR__ . '/../Database/' . $filename;
         return copy($dbWebSitePath, $destination);
     }
 
@@ -19,7 +19,7 @@ class CurrentWebSite
     static public function restore(string $dbWebSitePath): bool
     {
         $filename = basename($dbWebSitePath);
-        $backupPath = __DIR__ . DIRECTORY_SEPARATOR . $filename;
+        $backupPath = __DIR__ . '/../Database/' . $filename;
         if (!file_exists($backupPath)) return false;
         return copy($backupPath, $dbWebSitePath);
     }

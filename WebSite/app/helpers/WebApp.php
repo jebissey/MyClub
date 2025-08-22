@@ -104,13 +104,21 @@ class WebApp
                 $filtered[$key] = null;
                 continue;
             }
-            $value = trim(strip_tags($raw));
+            if ($rule === FilterInputRule::Html->value) $value = trim($raw);
+            else                                        $value = trim(strip_tags($raw));
             if (is_array($rule))                                     $filtered[$key] = in_array($value, $rule, true) ? $value : null;
             elseif (is_string($rule) && str_starts_with($rule, '/')) $filtered[$key] = preg_match($rule, $value) ? $value : null;
-            elseif ($rule === FilterInputRule::Bool)                 $filtered[$key] = filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
-            elseif ($rule === FilterInputRule::Int)                  $filtered[$key] = filter_var($value, FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
-            elseif ($rule === FilterInputRule::Float)                $filtered[$key] = filter_var($value, FILTER_VALIDATE_FLOAT, FILTER_NULL_ON_FAILURE);
-            else                                                     $filtered[$key] = $value !== '' ? $value : null;
+            elseif ($rule === FilterInputRule::Bool->value) {
+    if (is_array($raw)) {
+        $filtered[$key] = !empty($raw) ? 1 : 0;
+        continue;
+    }
+                if ($value === 'on' || $value === '1' || $value === 'true')                        $filtered[$key] = 1;
+                elseif ($value === 'off' || $value === '0' || $value === 'false' || $value === '') $filtered[$key] = 0;
+                else                                                                               $filtered[$key] = filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+            } elseif ($rule === FilterInputRule::Int) $filtered[$key] = filter_var($value, FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
+            elseif ($rule === FilterInputRule::Float) $filtered[$key] = filter_var($value, FILTER_VALIDATE_FLOAT, FILTER_NULL_ON_FAILURE);
+            else                                      $filtered[$key] = $value !== '' ? $value : null;
         }
         return $filtered;
     }
