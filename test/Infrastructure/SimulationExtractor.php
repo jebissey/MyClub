@@ -1,5 +1,11 @@
 <?php
 
+namespace test\Infrastructure;
+
+use test\Core\Route;
+use test\Core\Simulation;
+use test\Interfaces\TestDataRepositoryInterface;
+
 class SimulationExtractor
 {
     public function __construct(private TestDataRepositoryInterface $repo) {}

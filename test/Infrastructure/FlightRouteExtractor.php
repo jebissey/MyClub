@@ -1,5 +1,12 @@
 <?php
 
+namespace test\Infrastructure;
+
+use InvalidArgumentException;
+
+use test\Core\Route;
+use test\Interfaces\RouteExtractorInterface;
+
 class FlightRouteExtractor implements RouteExtractorInterface
 {
     private const REGEX_MAP_ROUTE = '/mapRoute\(\$flight,\s*[\'"]([^\'"]+)[\'"]\s*,/';

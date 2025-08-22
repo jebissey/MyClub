@@ -1,5 +1,14 @@
 <?php
 
+namespace test\Database;
+
+use InvalidArgumentException;
+use PDO;
+use PDOException;
+use RuntimeException;
+
+use test\Interfaces\TestDataRepositoryInterface;
+
 class SqliteTestDataRepository implements TestDataRepositoryInterface
 {
     private PDO $db;

@@ -1,5 +1,13 @@
 <?php
 
+namespace test\Infrastructure;
+
+use Throwable;
+
+use test\Core\AuthenticationResult;
+use test\Interfaces\AuthenticatorInterface;
+use test\Interfaces\HttpClientInterface;
+
 class SessionAuthenticator implements AuthenticatorInterface
 {
     public function __construct(
@@ -21,7 +29,7 @@ class SessionAuthenticator implements AuthenticatorInterface
                 success: $success,
                 error: $success ? '' : "Code HTTP: {$response->httpCode}"
             );
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             return new AuthenticationResult(
                 success: false,
                 error: $e->getMessage()

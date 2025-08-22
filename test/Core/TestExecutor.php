@@ -1,5 +1,14 @@
 <?php
 
+namespace test\Core;
+
+use test\Interfaces\AuthenticatorInterface;
+use test\Interfaces\HttpClientInterface;
+use test\Interfaces\MyclubDataRepositoryInterface;
+use test\Interfaces\ResponseValidatorInterface;
+use test\Interfaces\TestDataRepositoryInterface;
+use test\Interfaces\TestReporterInterface;
+
 class TestExecutor
 {
     private array $parameterErrors = [];

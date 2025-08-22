@@ -1,25 +1,12 @@
 <?php
 
-require_once __DIR__ . '/interfaces.php';
-require_once __DIR__ . '/valueObjects.php';
+require_once __DIR__ . '/bootstrap.php';
 
-require_once __DIR__ . '/Color.php';
-require_once __DIR__ . '/ConsoleTestReporter.php';
-require_once __DIR__ . '/CsvTestExporter.php';
-require_once __DIR__ . '/CurlHttpClient.php';
-require_once __DIR__ . '/CurrentWebSite.php';
-require_once __DIR__ . '/FlightRouteExtractor.php';
-require_once __DIR__ . '/JsonTestExporter.php';
-require_once __DIR__ . '/ResponseValidator.php';
-require_once __DIR__ . '/RouteTestFactory.php';
-require_once __DIR__ . '/RouteTestOrchestrator.php';
-require_once __DIR__ . '/SessionAuthenticator.php';
-require_once __DIR__ . '/SimulationExtractor.php';
-require_once __DIR__ . '/SqliteMyClubDataRepository.php';
-require_once __DIR__ . '/SqliteTestDataRepository.php';
-require_once __DIR__ . '/TestDataValidator.php';
-require_once __DIR__ . '/TestExecutor.php';
-require_once __DIR__ . '/UrlBuilder.php';
+use test\Core\TestConfiguration;
+use test\Core\JsonTestExporter;
+use test\Core\CsvTestExporter;
+use test\Infrastructure\RouteTestFactory;
+use test\Infrastructure\CurrentWebSite;
 
 function printHelp(): void
 {
@@ -64,7 +51,7 @@ function main(): int
     $exportJson = isset($options['export-json']);
     $exportCsv  = isset($options['export-csv']);
     $routeFile  = $options['routes-file'] ?? __DIR__ . '/../WebSite/index.php';
-    $dbTestsPath     = $options['db-path'] ?? __DIR__ . '/tests.sqlite';
+    $dbTestsPath     = $options['db-path'] ?? __DIR__ . '/Database/tests.sqlite';
     $dbMyClubPath    =  __DIR__ . '/../WebSite/data/MyClub.sqlite';
     $dbWebSitePath   = $options['db-path'] ?? __DIR__ . '/../WebSite/data/MyClub.sqlite';
     if (!CurrentWebSite::backup($dbWebSitePath)) throw new InvalidArgumentException("File $dbWebSitePath doesn't exist");

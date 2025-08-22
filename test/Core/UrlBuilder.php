@@ -1,5 +1,7 @@
 <?php
 
+namespace test\Core;
+
 class UrlBuilder
 {
     public function __construct(private TestConfiguration $config) {}

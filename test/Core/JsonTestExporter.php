@@ -1,5 +1,9 @@
 <?php
 
+namespace test\Core;
+
+use test\Interfaces\TestExporterInterface;
+
 class JsonTestExporter implements TestExporterInterface
 {
     public function export(array $results, string $filename): void

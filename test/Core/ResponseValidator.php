@@ -1,5 +1,9 @@
 <?php
 
+namespace test\Core;
+
+use test\Interfaces\ResponseValidatorInterface;
+
 class ResponseValidator implements ResponseValidatorInterface
 {
     public function validate(int $actualResponseCode, int $expectedResponseCode): ValidationResult

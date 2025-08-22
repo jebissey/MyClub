@@ -1,5 +1,7 @@
 <?php
 
+namespace test\Core;
+
 class TestDataValidator
 {
     public function validate(Route $route, int $routeNumber, array $testData): array

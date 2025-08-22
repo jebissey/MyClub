@@ -4,4 +4,4 @@ WebSite/data/*
 WebSite/backup/*
 doc/*.pdf
 WebSite/rss.xml
-test/MyClub.sqlite
+test/Database/MyClub.sqlite

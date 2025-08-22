@@ -1,5 +1,23 @@
 <?php
 
+namespace test\Infrastructure;
+
+use Throwable;
+
+use test\Core\ConsoleTestReporter;
+use test\Core\ResponseValidator;
+use test\Core\TestConfiguration;
+use test\Core\TestExecutor;
+use test\Core\TestDataValidator;
+use test\Core\UrlBuilder;
+use test\Database\SqliteMyClubDataRepository;
+use test\Database\SqliteTestDataRepository;
+use test\Infrastructure\CurlHttpClient;
+use test\Infrastructure\FlightRouteExtractor;
+use test\Infrastructure\RouteTestOrchestrator;
+use test\Infrastructure\SessionAuthenticator;
+use test\Infrastructure\SimulationExtractor;
+
 class RouteTestFactory
 {
     public static function create(TestConfiguration $config, ?string $dbTestsPath = null, ?string $dbMyClubPath = null): RouteTestOrchestrator
@@ -11,7 +29,7 @@ class RouteTestFactory
         if ($dbTestsPath && file_exists($dbTestsPath)) {
             try {
                 $testDataRepository = new SqliteTestDataRepository($dbTestsPath);
-            } catch (Exception $e) {
+            } catch (Throwable $e) {
                 echo "Erreur de connexion à la base de données: " . $e->getMessage() . "\n";
             }
         } else {

@@ -1,5 +1,7 @@
 <?php
 
+namespace test\Infrastructure;
+
 class CurrentWebSite
 {
     static public function backup(string $dbWebSitePath): bool

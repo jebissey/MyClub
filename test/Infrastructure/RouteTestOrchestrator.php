@@ -1,5 +1,14 @@
 <?php
 
+namespace test\Infrastructure;
+
+use test\Core\TestExecutor;
+use test\Core\TestResult;
+use test\Core\TestSummary;
+use test\Infrastructure\SimulationExtractor;
+use test\Interfaces\RouteExtractorInterface;
+use test\Interfaces\TestReporterInterface;
+
 class RouteTestOrchestrator
 {
     public function __construct(

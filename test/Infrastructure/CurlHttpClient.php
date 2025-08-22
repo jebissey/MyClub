@@ -1,5 +1,13 @@
 <?php
 
+namespace test\Infrastructure;
+
+use RuntimeException;
+
+use test\Core\HttpResponse;
+use test\Core\TestConfiguration;
+use test\Interfaces\HttpClientInterface;
+
 class CurlHttpClient implements HttpClientInterface
 {
     private array $storedCookies = [];
