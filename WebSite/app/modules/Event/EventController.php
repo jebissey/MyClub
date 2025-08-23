@@ -79,12 +79,12 @@ class EventController extends AbstractController
             $period = $this->flight->request()->query->period ?? 'month';
             [$dateRange, $crosstabData] = (new CrosstabDataHelper($this->application))->getevents($period);
 
-            $this->render('app/views/common/crosstab.latte', Params::getAll([
+            $this->render('Common/views/crosstab.latte', Params::getAll([
                 'crosstabData' => $crosstabData,
                 'period' => $period,
                 'dateRange' => $dateRange,
                 'availablePeriods' => PeriodHelper::gets(),
-                'navbarTemplate' => '../navbar/eventManager.latte',
+                'navbarTemplate' => '../../Webmaster/views/navbar/eventManager.latte',
                 'title' => 'Animateurs vs type d\'événement',
                 'totalLabels' => ['événements', 'participants']
             ]));
@@ -313,7 +313,7 @@ class EventController extends AbstractController
     {
         if ($this->connectedUser->get()->isEventManager() ?? false) {
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-                $this->render('Event/views/location.latte', Params::getAll([]));
+                $this->render('Event/views/event_location.latte', Params::getAll([]));
             } else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
         } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
@@ -386,7 +386,7 @@ class EventController extends AbstractController
                     'people' => $this->dataHelper->gets('Person', ['Inactivated' => 0], 'Email, Phone, FirstName, LastName, NickName', '', true),
                 ]));
             } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-                $this->render('Event/views/emails/getEmails.latte', Params::getAll([
+                $this->render('Event/views/getEmails.latte', Params::getAll([
                     'groups' => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
                     'eventTypes' => $this->dataHelper->gets('EventType', ['Inactivated' => 0], 'Id, Name', 'Name'),
                     'weekdayNames' => TranslationManager::getWeekdayNames(),

@@ -5,6 +5,7 @@ namespace app\modules\Webmaster;
 use app\enums\ApplicationError;
 use app\helpers\Application;
 use app\helpers\Params;
+use app\helpers\WebApp;
 use app\models\DbBrowserDataHelper;
 use app\modules\Common\AbstractController;
 
@@ -38,7 +39,10 @@ class DbBrowserController extends AbstractController
     public function index(): void
     {
         if ($this->connectedUser->get()->isWebmaster() ?? false) {
-            $this->render('Webmaster/views/dbbrowser/index.latte', Params::getAll(['tables' => $this->dbBrowserDataHelper->getTables()]));
+            $this->render('Webmaster/views/dbbrowser/index.latte', Params::getAll([
+                'tables' => $this->dbBrowserDataHelper->getTables(),
+                'isMyclubWebSite' => WebApp::isMyClubWebSite(),
+            ]));
         } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
@@ -88,7 +92,8 @@ class DbBrowserController extends AbstractController
                 'primaryKey' => $this->dbBrowserDataHelper->getPrimaryKey($table),
                 'currentPage' => $dbbPage,
                 'totalPages' => $totalPages,
-                'filters' => $filters
+                'filters' => $filters,
+                'isMyclubWebSite' => WebApp::isMyClubWebSite(),
             ]));
         } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }

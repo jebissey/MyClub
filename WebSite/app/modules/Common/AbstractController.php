@@ -54,12 +54,13 @@ abstract class AbstractController
     protected function getLayout()
     {
         $navbar = $_SESSION['navbar'] ?? '';
-        if ($navbar == 'user') return 'user.latte';
-        else if ($navbar == 'eventManager') return '../../Webmaster/views/eventManager.latte';
-        else if ($navbar == 'personManager') return '../../../Webmaster/views/personManager.latte';
-        else if ($navbar == 'webmaster') return '../../Webmaster/views/webmaster.latte';
-        else if ($navbar == 'redactor') return '../../Webmaster/views/navbar/redactor.latte';
-        else if ($navbar == '') return '../../Webmaster/views/navbar/home.latte';
+        if ($navbar == 'user')                return 'user.latte';
+        else if ($navbar == 'eventManager')   return '../../Webmaster/views/eventManager.latte';
+        else if ($navbar == 'personManager')  return '../../Webmaster/views/personManager.latte';
+        else if ($navbar == 'redactor')       return '../../Webmaster/views/redactor.latte';
+        else if ($navbar == 'visitoInsights') return '../../Webmaster/views/visitorInsights.latte';
+        else if ($navbar == 'webmaster')      return '../../Webmaster/views/webmaster.latte';
+        else if ($navbar == '')               return '../../Common/views/home.latte';
 
         throw new RuntimeException('Fatal error in file ' . __FILE__ . ' at line ' . __LINE__ . " with navbar=" . $navbar);
     }
@@ -88,6 +89,7 @@ abstract class AbstractController
 
     protected function render(string $name, object|array $params = []): void
     {
+#error_log("\n\n" . var_export($name,true) . "\n");        
         $content = $this->latte->renderToString($name, $params);
         echo $content;
         if (ob_get_level()) ob_end_flush();

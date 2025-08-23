@@ -98,30 +98,34 @@ class LogController extends AbstractController
     public function topPagesByPeriod()
     {
         if ($this->connectedUser->get()->isWebmaster() ?? false) {
-            $period =  WebApp::getFiltered('period', $this->application->enumToValues(Period::class), $this->flight->request()->query->getData()) ?: Period::Week->value;
-            $dateCondition = PeriodHelper::getDateConditions($period);
-            $topPages = $this->logDataHelper->getTopPages($dateCondition, self::TOP);
+            if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+                $period =  WebApp::getFiltered('period', $this->application->enumToValues(Period::class), $this->flight->request()->query->getData()) ?: Period::Week->value;
+                $dateCondition = PeriodHelper::getDateConditions($period);
+                $topPages = $this->logDataHelper->getTopPages($dateCondition, self::TOP);
 
-            $this->render('VisitorInsights/views/topPages.latte', Params::getAll([
-                'title' => 'Top des pages visitées',
-                'period' => $period,
-                'topPages' => $topPages
-            ]));
+                $this->render('VisitorInsights/views/topPages.latte', Params::getAll([
+                    'title' => 'Top des pages visitées',
+                    'period' => $period,
+                    'topPages' => $topPages
+                ]));
+            } else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
         } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function topArticlesByPeriod()
     {
         if ($this->connectedUser->get()->isRedactor() ?? false) {
-            $period = WebApp::getFiltered('period', $this->application->enumToValues(Period::class), $this->flight->request()->query->getData()) ?: Period::Week->value;
-            $dateCondition = PeriodHelper::getDateConditions($period);
-            $topPages = $this->logDataHelper->getTopArticles($dateCondition, self::TOP);
+            if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+                $period = WebApp::getFiltered('period', $this->application->enumToValues(Period::class), $this->flight->request()->query->getData()) ?: Period::Week->value;
+                $dateCondition = PeriodHelper::getDateConditions($period);
+                $topPages = $this->logDataHelper->getTopArticles($dateCondition, self::TOP);
 
-            $this->render('VisitorInsights/views/topArticles.latte', Params::getAll([
-                'title' => 'Top des articles visités par période',
-                'period' => $period,
-                'topPages' => $topPages
-            ]));
+                $this->render('Article/views/topArticles.latte', Params::getAll([
+                    'title' => 'Top des articles visités par période',
+                    'period' => $period,
+                    'topPages' => $topPages
+                ]));
+            } else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
         } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
@@ -160,12 +164,14 @@ class LogController extends AbstractController
     {
         $person = $this->connectedUser->get()->person ?? false;
         if ($person && $this->connectedUser->isWebmaster()) {
-            $activePersons = $this->dataHelper->gets('Person', ['Inactivated' => 0]);
-            $this->render('VisitorInsights/views/lastVisits.latte', Params::getAll([
-                'lastVisits' => $this->logDataHelper->getLastVisitPerActivePersonWithTimeAgo($activePersons),
-                'totalActiveUsers' => count($activePersons),
-                'navItems' => $this->getNavItems($person),
-            ]));
+            if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+                $activePersons = $this->dataHelper->gets('Person', ['Inactivated' => 0]);
+                $this->render('VisitorInsights/views/lastVisits.latte', Params::getAll([
+                    'lastVisits' => $this->logDataHelper->getLastVisitPerActivePersonWithTimeAgo($activePersons),
+                    'totalActiveUsers' => count($activePersons),
+                    'navItems' => $this->getNavItems($person),
+                ]));
+            } else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
         } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 }

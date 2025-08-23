@@ -9,6 +9,7 @@ use app\helpers\Params;
 use app\helpers\WebApp;
 use app\models\ArticleDataHelper;
 use app\models\ArwardsDataHelper;
+use app\models\LogDataHelper;
 use app\modules\Common\AbstractController;
 
 class WebmasterController extends AbstractController
@@ -61,7 +62,10 @@ class WebmasterController extends AbstractController
                 if (!$result['success']) $newVersion = "Test for MyClub new version error : " . $result['error'];
                 elseif ($result['version'] != Application::VERSION) $newVersion = "A new version is available (V" . $result['version'] . ")";
 
-                $this->render('Webmaster/views/webmaster.latte', Params::getAll(['newVersion' => $newVersion]));
+                $this->render('Webmaster/views/webmaster.latte', Params::getAll([
+                    'newVersion' => $newVersion,
+                    'isMyclubWebSite' => WebApp::isMyClubWebSite(),
+                ]));
             } else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
         } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
@@ -93,6 +97,7 @@ class WebmasterController extends AbstractController
                     'groups' => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
                     'layout' => $this->getLayout(),
                     'navItems' => $this->getNavItems($person),
+                    'isMyclubWebSite' => WebApp::isMyClubWebSite(),
                 ]));
             } else if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $schema = [
@@ -168,12 +173,26 @@ class WebmasterController extends AbstractController
         } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
+    public function showInstallations()
+    {
+        $person = $this->connectedUser->get()->person ?? false;
+        if ($person && $this->connectedUser->isWebmaster()) {
+            $installations = (new LogDataHelper($this->application))->getInstallationsData();
+
+            $this->render('Webmaster/views/installations.latte', Params::getAll([
+                'installations' => $installations,
+                'totalInstallations' => count($installations),
+                'navItems' => $this->getNavItems($person),
+                'isMyclubWebSite' => WebApp::isMyClubWebSite(),
+            ]));
+        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+    }
 
     #region Private methods
 
     private function getLastVersion()
     {
-        $url = "http://myclub.alwaysdata.net/api/lastVersion";
+        $url = WebApp::MYCLUB_WEBAPP . '/api/lastVersion?cv=' . Application::VERSION;
 
         $ch = curl_init($url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -195,7 +214,6 @@ class WebmasterController extends AbstractController
                 'error'   => "Erreur cURL : $error"
             ];
         }
-
         curl_close($ch);
         $data = json_decode($response, true);
         if ($data === null || !isset($data["lastVersion"])) {

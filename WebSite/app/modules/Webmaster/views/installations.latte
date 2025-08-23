@@ -1,0 +1,128 @@
+{extends '../../Webmaster/views/webmaster.latte'}
+
+{block title}Installations{/block}
+
+{block head}
+    <style>
+        .table td {
+            vertical-align: middle;
+        }
+        
+        .badge {
+            font-size: 0.75em;
+        }
+        
+        .table-hover tbody tr:hover {
+            background-color: rgba(0, 0, 0, 0.075);
+        }
+    </style>
+{/block}
+
+{block content}
+            <div class="d-flexc">
+                <div class="container mt-4 d-flex justify-content-between align-items-center mb-3">
+                    <h1>
+                        Installations de la webapp
+                        <span class="badge bg-primary fs-6">{$totalInstallations} installations</span>
+                    </h1>
+                    <div>
+                        <button class="btn btn-outline-secondary btn-sm" onclick="refreshData()">
+                            <i class="fas fa-refresh"></i> Actualiser
+                        </button>
+                    </div>
+                </div>
+
+                <div class="d-flex">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Installation</th>
+                                    <th>Type</th>
+                                    <th>Version Webapp</th>
+                                    <th>Version PHP</th>
+                                    <th>Dernière vérification</th>
+                                    <th>Nombre de vérifications</th>
+                                    <th>Statut</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {foreach $installations as $installation}
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div>
+                                                <div class="fw-bold">{$installation->Who}</div>
+                                                {if $installation->installationType === 'Hostname'}
+                                                    <small class="text-muted">Serveur nommé</small>
+                                                {else}
+                                                    <small class="text-muted">Adresse IP</small>
+                                                {/if}
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                    {if $installation->installationType === 'Hostname'}
+                                        <span class="badge bg-success">Hostname</span>
+                                    {else}
+                                        <span class="badge bg-info">IP</span>
+                                    {/if}
+                                    </td>
+                                    <td>
+                                    {if $installation->webappVersions === 'Version inconnue'}
+                                        <span class="text-muted">{$installation->webappVersions}</span>
+                                    {else}
+                                        <span class="badge bg-secondary">{$installation->webappVersions}</span>
+                                    {/if}
+                                    </td>
+                                    <td>
+                                    {if $installation->phpVersions === 'Version inconnue'}
+                                        <span class="text-muted">{$installation->phpVersions}</span>
+                                    {else}
+                                        <span class="text-success">{$installation->phpVersions}</span>
+                                    {/if}
+                                    </td>
+                                    <td>
+                                        <div>
+                                            <div>{$installation->lastCheck|date:'d/m/Y H:i'}</div>
+                                            <small class="text-muted">{$installation->timeAgo}</small>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span>{$installation->checkCount}</span>
+                                    </td>
+                                    <td>
+                                    {var $daysSinceLastCheck = (time() - strtotime($installation->lastCheck)) / 86400}
+                                    {if $daysSinceLastCheck < 1}
+                                        <span class="badge bg-success">Actif</span>
+                                    {elseif $daysSinceLastCheck < 7}
+                                        <span class="badge bg-warning">Récent</span>
+                                    {else}
+                                        <span class="badge bg-danger">Inactif</span>
+                                    {/if}
+                                    </td>
+                                </tr>
+                                {/foreach}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                {if count($installations) === 0}
+                <div class="text-center mt-5">
+                    <div class="alert alert-info">
+                        <h5>Aucune installation détectée</h5>
+                        <p>Aucune installation de la webapp n'a encore vérifié les mises à jour.</p>
+                    </div>
+                </div>
+                {/if}
+            </div>
+{/block}
+
+{block scripts}
+    <script>
+        function refreshData() {
+            location.reload();
+        }
+    </script>
+{/block}

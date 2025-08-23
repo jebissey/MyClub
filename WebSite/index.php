@@ -242,6 +242,7 @@ mapRoute($flight, 'GET  /admin/help', $webmasterController, 'helpAdmin');
 mapRoute($flight, 'GET  /admin/webmaster/help', $webmasterController, 'helpWebmaster');
 mapRoute($flight, 'GET  /arwards', $webmasterController, 'arwards');
 mapRoute($flight, 'POST /arwards', $webmasterController, 'arwards');
+mapRoute($flight, 'GET  /installations', $webmasterController, 'showInstallations');
 mapRoute($flight, 'GET  /sitemap.xml', $webmasterController, 'sitemapGenerator');
 mapRoute($flight, 'GET  /visitorInsights', $webmasterController, 'visitorInsights');
 mapRoute($flight, 'GET  /visitorInsights/help', $webmasterController, 'helpVisitorInsights');

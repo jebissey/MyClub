@@ -15,7 +15,7 @@ class Client
     public function __construct()
     {
         try {
-            if (!empty($_SERVER['HTTP_USER_AGENT'])) {
+            if ($_SERVER['HTTP_USER_AGENT'] ?? '' != '' ) {
                 $parser = Parser::create();
                 $result = $parser->parse($_SERVER['HTTP_USER_AGENT']);
 

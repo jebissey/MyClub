@@ -760,4 +760,55 @@ class LogDataHelper extends Data
         if (!empty($whereClauses)) $whereSQL = 'WHERE ' . implode(' AND ', $whereClauses);
         return [$whereSQL, $params];
     }
+
+
+    #region Installations
+    public function getInstallationsData()
+    {
+        $query = "
+            SELECT 
+                Who,
+                MAX(CreatedAt) as lastCheck,
+                COUNT(*) as checkCount,
+                GROUP_CONCAT(DISTINCT 
+                    CASE 
+                        WHEN Uri LIKE '%cv=%' 
+                        THEN SUBSTRING(Uri, INSTR(Uri, 'cv=') + 3)
+                        ELSE NULL 
+                    END
+                ) as webappVersions,
+                GROUP_CONCAT(DISTINCT Message) as phpVersions
+            FROM Log 
+            WHERE Uri LIKE '/api/lastVersion%'
+            GROUP BY Who
+            ORDER BY MAX(CreatedAt) DESC
+        ";
+        $results = $this->pdoForLog->query($query)->fetchAll();
+        foreach ($results as &$installation) {
+            if ($installation->webappVersions) {
+                $versions = array_filter(array_unique(explode(',', $installation->webappVersions)));
+                $installation->webappVersions = implode(', ', $versions);
+            } else $installation->webappVersions = 'Version inconnue';
+            if ($installation->phpVersions) {
+                $phpVersions = array_filter(array_unique(explode(',', $installation->phpVersions)));
+                $installation->phpVersions = implode(', ', $phpVersions);
+            } else $installation->phpVersions = 'Version inconnue';
+            $installation->timeAgo = $this->getTimeAgo($installation->lastCheck);
+            $installation->installationType = filter_var($installation->Who, FILTER_VALIDATE_IP) ? 'IP' : 'Hostname';
+        }
+        return $results;
+    }
+
+    private function getTimeAgo($datetime)
+    {
+        $time = time() - strtotime($datetime);
+
+        if ($time < 60) return 'Il y a ' . $time . ' secondes';
+        if ($time < 3600) return 'Il y a ' . round($time / 60) . ' minutes';
+        if ($time < 86400) return 'Il y a ' . round($time / 3600) . ' heures';
+        if ($time < 2592000) return 'Il y a ' . round($time / 86400) . ' jours';
+        if ($time < 31536000) return 'Il y a ' . round($time / 2592000) . ' mois';
+
+        return 'Il y a ' . round($time / 31536000) . ' ans';
+    }
 }

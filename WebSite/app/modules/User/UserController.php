@@ -315,7 +315,6 @@ class UserController extends AbstractController
                     'inPresentationDirectory' => FilterInputRule::Bool->value,
                 ];
                 $input = WebApp::filterInput($schema, $this->flight->request()->data->getData());
-#error_log('# $input # ' . var_export($input,true));                   
                 $presentation = $input['content'] ?? '???';
                 $location =  $input['location'] ?? '???';
                 $inDirectory = $input['inPresentationDirectory'] ?? 0;

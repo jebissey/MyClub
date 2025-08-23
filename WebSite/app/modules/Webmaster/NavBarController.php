@@ -22,7 +22,8 @@ class NavBarController extends AbstractController
             $this->render('Webmaster/views/navbar/index.latte', Params::getAll([
                 'navItems' => $this->getNavItems($this->connectedUser->person),
                 'groups' => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
-                'availableRoutes' => $this->getAvailableRoutes()
+                'availableRoutes' => $this->getAvailableRoutes(),
+                'isMyclubWebSite' => WebApp::isMyClubWebSite(),
             ]));
         } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }

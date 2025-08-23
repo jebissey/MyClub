@@ -1,33 +1,38 @@
-    <div class="container-fluid">
-        <a class="navbar-brand" href="/">
-            <img src="/app/images/home.png" alt="Home" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="{='home'|translate}">
-        </a>
-        <a class="navbar-brand" href="/admin">
-            <img src="/app/images/admin.png" alt="Admin" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Zone admin">
-        </a>
+            <div class="container-fluid">
+                <a class="navbar-brand" href="/">
+                    <img src="/app/images/home.png" alt="Home" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="{='home'|translate}">
+                </a>
+                <a class="navbar-brand" href="/admin">
+                    <img src="/app/images/admin.png" alt="Admin" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Zone admin">
+                </a>
 
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-        <span class="navbar-toggler-icon"></span>
-        </button>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+                </button>
 
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav">
-                <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="DB Browser">
-                    <a class="nav-link {if $page == 'dbbrowser'}active{/if}" href="/dbbrowser"><h2>🗂️</h2></a>
-                </li>
-                <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Nav bar">
-                    <a class="nav-link {if $page == 'navBar'}active{/if}" href="/navBar"><h2>📑</h2></a>
-                </li>
-                <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Compteurs">
-                    <a class="nav-link {if $page == 'arwards'}active{/if}" href="/arwards"><h2>🏆</h2></a>
-                </li>
-                <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Groupes">
-                    <a class="nav-link {if $page == 'groups'}active{/if}" href="/groups"><h2>🧑‍🤝‍🧑</h2></a>
-                </li>
-                <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Inscriptions">
-                    <a class="nav-link {if $page == 'registration'}active{/if}" href="/registration"><h2>🎟️</h2></a>
-                </li>
-            </ul>
-            <a href ="/admin/webmaster/help"><img src="/app/images/help.png" alt="Help" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Aide contextuelle"></a>
-        </div>
-    </div>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav">
+                        <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="DB Browser">
+                            <a class="nav-link {if $page == 'dbbrowser'}active{/if}" href="/dbbrowser"><h2>🗂️</h2></a>
+                        </li>
+                        <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Nav bar">
+                            <a class="nav-link {if $page == 'navBar'}active{/if}" href="/navBar"><h2>📑</h2></a>
+                        </li>
+                        <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Compteurs">
+                            <a class="nav-link {if $page == 'arwards'}active{/if}" href="/arwards"><h2>🏆</h2></a>
+                        </li>
+                        <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Groupes">
+                            <a class="nav-link {if $page == 'groups'}active{/if}" href="/groups"><h2>🧑‍🤝‍🧑</h2></a>
+                        </li>
+                        <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Inscriptions">
+                            <a class="nav-link {if $page == 'registration'}active{/if}" href="/registration"><h2>🎟️</h2></a>
+                        </li>
+                        {if $isMyclubWebSite}
+                        <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Installations">
+                            <a class="nav-link {if $page == 'installations'}active{/if}" href="/installations"><h2>🌐</h2></a>
+                        </li>
+                        {/if}
+                    </ul>
+                    <a href ="/admin/webmaster/help"><img src="/app/images/help.png" alt="Help" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Aide contextuelle"></a>
+                </div>
+            </div>

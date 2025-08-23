@@ -251,19 +251,21 @@ class ArticleController extends TableController
     public function showArticleCrosstab()
     {
         if ($this->connectedUser->get(1)->isRedactor() || false) {
-            $period = $this->flight->request()->query->period ?? 'month';
-            $dateRange = PeriodHelper::getDateRangeFor($period);
-            $crosstabData = (new ArticleCrosstabDataHelper($this->application))->getItems($dateRange);
+            if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+                $period = $this->flight->request()->query->period ?? 'month';
+                $dateRange = PeriodHelper::getDateRangeFor($period);
+                $crosstabData = (new ArticleCrosstabDataHelper($this->application))->getItems($dateRange);
 
-            $this->render('Common/views/crosstab.latte', Params::getAll([
-                'crosstabData' => $crosstabData,
-                'period' => $period,
-                'dateRange' => $dateRange,
-                'availablePeriods' => PeriodHelper::gets(),
-                'navbarTemplate' => '../navbar/redactor.latte',
-                'title' => 'Rédateurs vs audience',
-                'totalLabels' => ['articles', '']
-            ]));
+                $this->render('Common/views/crosstab.latte', Params::getAll([
+                    'crosstabData' => $crosstabData,
+                    'period' => $period,
+                    'dateRange' => $dateRange,
+                    'availablePeriods' => PeriodHelper::gets(),
+                    'navbarTemplate' => '../../Webmaster/views/navbar/redactor.latte',
+                    'title' => 'Rédateurs vs audience',
+                    'totalLabels' => ['articles', '']
+                ]));
+            } else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
         } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 }

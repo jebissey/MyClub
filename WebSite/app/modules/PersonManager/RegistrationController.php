@@ -48,6 +48,7 @@ class RegistrationController extends TableController
                 'resetUrl' => '/registration',
                 'layout' => $this->getLayout(),
                 'navItems' => $this->getNavItems($connectedUser->person ?? false),
+                'isMyclubWebSite' => WebApp::isMyClubWebSite(),
             ]));
         } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }

@@ -8,6 +8,8 @@ use app\enums\FilterInputRule;
 
 class WebApp
 {
+    public const MYCLUB_WEBAPP = "https://myclub.alwaysdata.net";
+
     public function buildUrl($newParams): string
     {
         $params = array_merge($_GET, $newParams);
@@ -21,6 +23,10 @@ class WebApp
         $baseUrl = $protocol . $host . '/';
 
         return $baseUrl;
+    }
+
+    static public function isMyClubWebSite(): bool{
+        return self::getBaseUrl() == self::MYCLUB_WEBAPP;
     }
 
     static public function sanitizeHtml($html)
