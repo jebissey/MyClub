@@ -30,11 +30,12 @@ class ConnectedUser
         $this->person = null;
         $userEmail = $_SESSION['user'] ?? '';
         if (!$userEmail) return $this;
-        $this->person = $this->dataHelper->get('Person', ['Email' => $userEmail]);
-        if (!$this->person) {
+        $person = $this->dataHelper->get('Person', ['Email' => $userEmail]);
+        if (!$person) {
             $this->application->getErrorManager()->raise(ApplicationError::BadRequest, "Unknown user with this email address: $userEmail in file " . __FILE__ . ' at line ' . __LINE__);
             return $this;
         }
+        $this->person = $person;
         $this->authorizations = $this->authorizationDataHelper->getsFor($this);
         $lang = TranslationManager::getCurrentLanguage();
         Params::setParams([

@@ -2,6 +2,22 @@ document.addEventListener('DOMContentLoaded', function () {
     const noAlertsCheckbox = document.getElementById('noAlerts');
     const alertOptionsContainer = document.getElementById('alertOptions');
     const eventTypeCheckboxes = document.querySelectorAll('.event-type-checkbox');
+    
+    const eventInfoLinks = document.querySelectorAll('.event-info-link');
+    const eventDetailCards = document.querySelectorAll('.event-detail-card');
+    eventInfoLinks.forEach(link => {
+        link.addEventListener('click', function (e) {
+            e.preventDefault();
+            const eventId = this.getAttribute('data-event-id');
+            const targetCard = document.getElementById('eventDetailCard' + eventId);
+            eventDetailCards.forEach(card => {
+                card.style.display = 'none';
+            });
+            if (targetCard) {
+                targetCard.style.display = 'block';
+            }
+        });
+    });
 
     function handleNoAlertsInitial() {
         if (noAlertsCheckbox.checked) {

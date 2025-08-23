@@ -26,7 +26,7 @@ function loadGroupUsers(groupId) {
 }
 
 function confirmDelete(id) {
-    document.getElementById('deleteForm').action = '/groups/delete/' + id;
+    document.getElementById('deleteForm').action = '/group/delete/' + id;
     const deleteModal = document.getElementById('deleteModal');
     const modal = new bootstrap.Modal(deleteModal);
     modal.show();

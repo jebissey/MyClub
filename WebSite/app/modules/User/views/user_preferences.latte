@@ -7,13 +7,43 @@
             white-space: normal;
             text-align: left;
         }
+        
+        .event-detail-card {
+            display: none;
+        }
+        
+        .attribute-detail-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .attribute-color-square {
+            width: 16px;
+            height: 16px;
+            border-radius: 2px;
+            margin-right: 10px;
+            flex-shrink: 0;
+        }
+        
+        .event-info-link {
+            margin-left: 10px;
+            cursor: pointer;
+            color: #007bff;
+            text-decoration: none;
+        }
+        
+        .event-info-link:hover {
+            color: #0056b3;
+            text-decoration: underline;
+        }
     </style>
 {/block}
 
 {block content}
     <form method="POST" data-form="checkSave">
         <div class="row">
-            <div class="col-md-8">
+            <div class="col-md-6">
                 <div class="mb-3">
                     <div class="form-check">
                         <input type="checkbox" class="form-check-input" id="noAlerts" name="preferences[noAlerts]" {isset($currentPreferences['noAlerts']) ? checked : ''}>
@@ -44,6 +74,10 @@
                                                     data-tooltip-id="tooltip-content-{$eventType->Id}">
                                                     {$eventType->Name}
                                                 </label>
+                                                
+                                                <a href="#" class="event-info-link" data-event-id="{$eventType->Id}">
+                                                    ℹ️ Voir détails
+                                                </a>
 
                                                 <div>
                                                 {if count($eventType->Attributes) > 0}
@@ -124,6 +158,28 @@
                     </div>
                 </div>
             </div>
+            
+            <div class="col-md-6 mt-3">
+                {foreach $eventTypes as $eventType}
+                <div class="card mb-3 event-detail-card" id="eventDetailCard{$eventType->Id}">
+                    <div class="card-header">
+                        <h6 class="card-title mb-0">{$eventType->Name}</h6>
+                    </div>
+                    <div class="card-body">
+                        {if count($eventType->Attributes) > 0}
+                            {foreach $eventType->Attributes as $attribute}
+                            <div class="attribute-detail-item">
+                                <div class="attribute-color-square" style="background-color: {$attribute->Color|noescape};"></div>
+                                <span>{$attribute->Detail}</span>
+                            </div>
+                            {/foreach}
+                        {else}
+                            <p class="text-muted">Aucun attribut disponible pour ce type d'événement.</p>
+                        {/if}
+                    </div>
+                </div>
+                {/foreach}
+            </div>
         </div>
 
         <div class="mt-4">
@@ -133,5 +189,5 @@
 {/block}
 
 {block scripts}
-    <script src="/app/js/user/preferences.js"></script>
+    <script src="/app/modules/User/js/preferences.js"></script>
 {/block}

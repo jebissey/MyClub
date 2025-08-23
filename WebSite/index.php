@@ -148,11 +148,11 @@ mapRoute($flight, 'GET /ffa/search', $ffaController, 'searchMember');
 
 $groupController = new GroupController($application);
 mapRoute($flight, 'GET    /groups', $groupController, 'index');
-mapRoute($flight, 'GET    /groups/create', $groupController, 'create');
-mapRoute($flight, 'POST   /groups/create', $groupController, 'create');
-mapRoute($flight, 'GET    /groups/edit/@id:[0-9]+', $groupController, 'edit');
-mapRoute($flight, 'POST   /groups/edit/@id:[0-9]+', $groupController, 'edit');
-mapRoute($flight, 'DELETE /groups/delete/@id:[0-9]+', $groupController, 'delete');
+mapRoute($flight, 'GET    /group/create', $groupController, 'create');
+mapRoute($flight, 'POST   /group/create', $groupController, 'create');
+mapRoute($flight, 'GET    /group/edit/@id:[0-9]+', $groupController, 'edit');
+mapRoute($flight, 'POST   /group/edit/@id:[0-9]+', $groupController, 'edit');
+mapRoute($flight, 'DELETE /group/delete/@id:[0-9]+', $groupController, 'delete');
 
 $importController = new ImportController($application);
 mapRoute($flight, 'GET  /import', $importController, 'showImportForm');

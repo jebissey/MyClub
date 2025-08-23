@@ -37,7 +37,7 @@ class GroupController extends AbstractController implements CrudControllerInterf
     {
         if (($this->connectedUser->get()->isPersonManager() ?? false) || $this->connectedUser->isWebmaster() ?? false) {
 
-            $availableAuthorizations = $this->dataHelper->gets('Authorization',['Id <> 1' => null]);
+            $availableAuthorizations = $this->dataHelper->gets('Authorization', ['Id <> 1' => null]);
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $schema = [
                     'name' => FilterInputRule::HtmlSafeName->value,
@@ -49,17 +49,19 @@ class GroupController extends AbstractController implements CrudControllerInterf
                 $selfRegistration = $input['selfRegistration'] ?? 0;
                 $selectedAuthorizations = $input['authorizations'] ?? [];
                 if (empty($name)) {
-                    $this->render('PersonManager/views/groups/create.latte', Params::getAll([
+                    $this->render('PersonManager/views/group_create.latte', Params::getAll([
                         'availableAuthorizations' => $availableAuthorizations,
                         'error' => 'Le nom du groupe est requis',
-                        'layout' => $this->getLayout()
+                        'layout' => $this->getLayout(),
+                        'isMyclubWebSite' => WebApp::isMyClubWebSite(),
                     ]));
                 }
                 $this->groupDataHelper->insert($name, $selfRegistration, $selectedAuthorizations);
             } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-                $this->render('PersonManager/views/groups/create.latte', Params::getAll([
+                $this->render('PersonManager/views/group_create.latte', Params::getAll([
                     'availableAuthorizations' => $availableAuthorizations,
-                    'layout' => $this->getLayout()
+                    'layout' => $this->getLayout(),
+                    'isMyclubWebSite' => WebApp::isMyClubWebSite(),
                 ]));
             } else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
         } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
@@ -97,7 +99,9 @@ class GroupController extends AbstractController implements CrudControllerInterf
                         'group' => $group,
                         'availableAuthorizations' => $availableAuthorizations,
                         'currentAuthorizations' => array_column($this->dataHelper->gets('GroupAuthorization', ['IdGroup' => $id], 'IdAuthorization'), 'IdAuthorization'),
-                        'layout' => $this->getLayout()
+                        'layout' => $this->getLayout(),
+                        'isMyclubWebSite' => WebApp::isMyClubWebSite(),
+
                     ]));
                 }
             } else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
