@@ -55,7 +55,7 @@ class Application
         } catch (Throwable $e) {
             throw new RuntimeException('Database error ' . $e->getMessage() . ' in file ' . __FILE__ . ' at line ' . __LINE__);
         }
-        $this->errorManager = new ErrorManager($this);
+        $this->errorManager = new ErrorManager();
     }
 
     public static function init(): self
