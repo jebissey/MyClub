@@ -239,7 +239,7 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
                     'id'    => $article->Id,
                     'title' => $article->Title,
                     'date'  => $article->LastUpdate,
-                    'url'   => '/articles/' . $article->Id,
+                    'url'   => '/article/' . $article->Id,
                 ];
             }
         }

@@ -158,7 +158,7 @@ class ArticleController extends TableController
                 $content = $input['content'] ?? '???';
                 if (empty($title) || empty($content)) {
                     $_SESSION['error'] = "Le titre et le contenu sont obligatoires";
-                    $this->flight->redirect('/articles/' . $id);
+                    $this->flight->redirect('/article/' . $id);
                     return;
                 }
                 $result = $this->dataHelper->set('Article', [
@@ -173,7 +173,7 @@ class ArticleController extends TableController
                     $_SESSION['success'] = "L'article a été mis à jour avec succès";
                     (new Backup())->save();
                 } else $_SESSION['error'] = "Une erreur est survenue lors de la mise à jour de l'article";
-                $this->flight->redirect('/articles/' . $id);
+                $this->flight->redirect('/article/' . $id);
             } else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
         } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
@@ -212,7 +212,7 @@ class ArticleController extends TableController
                     $_SESSION['success'] = "L'article a été mis à jour avec succès";
                     (new Backup())->save();
                 } else $_SESSION['error'] = "Une erreur est survenue lors de la mise à jour de l'article";
-                $this->flight->redirect('/articles/' . $id);
+                $this->flight->redirect('/article/' . $id);
             } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $this->render('User/views/publish.latte', Params::getAll(['article' => $this->articleDataHelper->getWithAuthor($id)]));
             } else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
@@ -228,7 +228,7 @@ class ArticleController extends TableController
                     'Content'   => '',
                     'CreatedBy' => $this->connectedUser->person->Id ?? throw new RuntimeException('Fatal error in file ' . __FILE__ . ' at line ' . __LINE__)
                 ]);
-                $this->flight->redirect('/articles/' . $id);
+                $this->flight->redirect('/article/' . $id);
             } else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
         } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }

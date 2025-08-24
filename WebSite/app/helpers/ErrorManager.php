@@ -3,11 +3,26 @@
 namespace app\helpers;
 
 use app\enums\ApplicationError;
+use app\models\LogDataHelper;
+
+/*
+TODO find the good way to manage error with flight and use the hook for logging page.
+
+*/
 
 class ErrorManager
 {
+    private Application $application;
+
+    public function __construct(Application $application)
+    {
+        $this->application = $application;
+    }
+
     public function raise(ApplicationError $code, string $message, int $timeout = 1000, bool $displayCode = true): void
     {
+        //(new LogDataHelper($this->application))->add($code->value, 'Internal error: ' . $message . ' in file ' . __FILE__ . ' at line' . __LINE__);
+
         if ($this->isJsonExpected()) {
             header('Content-Type: application/json', true, $code->value);
             echo json_encode(['code' => $code->value, 'message' => $message]);

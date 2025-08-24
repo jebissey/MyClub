@@ -7,7 +7,57 @@
 {/block}
 
 {block content}
-    {ifset $content}
-        {$content|noescape}
-    {/ifset}
+    <div class="container mt-4">
+        {ifset $content}
+            {$content|noescape}
+        {/ifset}
+
+        {if $previousPage}
+            <div class="mt-3">
+                <button class="btn btn-secondary" onclick="history.back()">⬅ Retour</button>
+            </div>
+        {/if}
+    </div>
+
+    {if $timer > 0}
+        <div class="fixed-bottom">
+            <div class="progress" style="height: 6px;">
+                <div id="progressBar" 
+                     class="progress-bar bg-success" 
+                     role="progressbar" 
+                     style="width: 0%;" 
+                     aria-valuenow="0" 
+                     aria-valuemin="0" 
+                     aria-valuemax="100">
+                </div>
+            </div>
+        </div>
+    {/if}
+{/block}
+
+{block scripts}
+<script>
+    (function() {
+        const duration = {$timer};      // ms
+        const progressBar = document.getElementById('progressBar');
+        const step = 100;               // ms
+        let elapsed = 0;
+
+        const interval = setInterval(() => {
+            elapsed += step;
+            let percent = Math.min((elapsed / duration) * 100, 100);
+            progressBar.style.width = percent + "%";
+            progressBar.setAttribute("aria-valuenow", percent);
+
+            if (elapsed >= duration) {
+                clearInterval(interval);
+                {ifset $previousPage}
+                    history.back();
+                {else}
+                    window.location.href = "/";
+                {/ifset}
+            }
+        }, step);
+    })();
+</script>
 {/block}

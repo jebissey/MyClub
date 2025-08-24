@@ -88,12 +88,12 @@ $personPreferences = new PersonPreferences();
 
 #region web
 $articleController = new ArticleController($application);
+mapRoute($flight, 'GET    /article/create', $articleController, 'create');
+mapRoute($flight, 'DELETE /article/delete/@id:[0-9]+', $articleController, 'delete');
+mapRoute($flight, 'GET    /article/@id:[0-9]+', $articleController, 'show');
+mapRoute($flight, 'POST   /article/@id:[0-9]+', $articleController, 'update');
 mapRoute($flight, 'GET    /articles', $articleController, 'index');
-mapRoute($flight, 'GET    /articles/create', $articleController, 'create');
 mapRoute($flight, 'GET    /articles/crosstab', $articleController, 'showArticleCrosstab');
-mapRoute($flight, 'DELETE /articles/delete/@id:[0-9]+', $articleController, 'delete');
-mapRoute($flight, 'GET    /articles/@id:[0-9]+', $articleController, 'show');
-mapRoute($flight, 'POST   /articles/@id:[0-9]+', $articleController, 'update');
 mapRoute($flight, 'GET    /publish/article/@id:[0-9]+', $articleController, 'publish');
 mapRoute($flight, 'POST   /publish/article/@id:[0-9]+', $articleController, 'publish');
 mapRoute($flight, 'GET    /redactor', $articleController, 'home');
@@ -122,14 +122,14 @@ mapRoute($flight, 'GET  /nextEvents', $eventController, 'nextEvents');
 mapRoute($flight, 'GET  /events/crosstab', $eventController, 'showEventCrosstab');
 mapRoute($flight, 'GET  /events/guest', $eventController, 'guest');
 mapRoute($flight, 'POST /events/guest', $eventController, 'guestInvite');
-mapRoute($flight, 'GET  /events/@id:[0-9]+', $eventController, 'show');
-$flight->route('GET  /events/@id:[0-9]+/register', function ($id) use ($eventController) {
+mapRoute($flight, 'GET  /event/@id:[0-9]+', $eventController, 'show');
+$flight->route('GET  /event/@id:[0-9]+/register', function ($id) use ($eventController) {
     $eventController->register($id, true);
 });
-$flight->route('GET /events/@id:[0-9]+/unregister', function ($id) use ($eventController) {
+$flight->route('GET /event/@id:[0-9]+/unregister', function ($id) use ($eventController) {
     $eventController->register($id, false);
 });
-$flight->route('GET /events/@id:[0-9]+/@token:[a-f0-9]+', function ($id, $token) use ($eventController) {
+$flight->route('GET /event/@id:[0-9]+/@token:[a-f0-9]+', function ($id, $token) use ($eventController) {
     $eventController->register($id, true, $token);
 });
 mapRoute($flight, 'GET /event/location', $eventController, 'location');

@@ -323,7 +323,9 @@ class EventController extends AbstractController
         $this->render('Common/views/info.latte', [
             'content' => $this->dataHelper->get('Settings', ['Name' => 'Help_eventManager'], 'Value')->Value ?? '',
             'hasAuthorization' => $this->connectedUser->get()->hasAutorization() ?? false,
-            'currentVersion' => Application::VERSION
+            'currentVersion' => Application::VERSION,
+            'timer' => 0,
+            'previousPage' => true
         ]);
     }
 
@@ -409,7 +411,7 @@ class EventController extends AbstractController
                 }
                 $filteredEmails = (new PersonDataHelper($this->application))->getPersonWantedToBeAlerted($idArticle);
                 $root = Application::$root;
-                $articleLink = $root . '/articles/' . $idArticle;
+                $articleLink = $root . '/article/' . $idArticle;
                 $unsubscribeLink = $root . '/user/preferences';
                 $emailTitle = 'BNW - Un nouvel article est disponible';
                 $message = "Conformément à vos souhaits, ce message vous signale la présence d'un nouvel article" . "\n\n" . $articleLink
@@ -424,7 +426,7 @@ class EventController extends AbstractController
                     false
                 );
                 $_SESSION['success'] = "Un courriel a été envoyé aux abonnés";
-                $this->flight->redirect('/articles/' . $idArticle);
+                $this->flight->redirect('/article/' . $idArticle);
             } else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
         } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }

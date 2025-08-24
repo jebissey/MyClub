@@ -8,7 +8,6 @@ use app\helpers\Application;
 use app\helpers\Params;
 use app\helpers\WebApp;
 use app\interfaces\CrudControllerInterface;
-use app\models\GroupDataHelper;
 use app\models\PersonDataHelper;
 use app\models\TableControllerDataHelper;
 use app\modules\Common\TableController;
@@ -27,7 +26,9 @@ class PersonController extends TableController implements CrudControllerInterfac
             $this->render('Common/views/info.latte', [
                 'content' => $this->dataHelper->get('Settings', ['Name' => 'Help_personManager'], 'Value')->Value ?? '',
                 'hasAuthorization' => $this->connectedUser->hasAutorization(),
-                'currentVersion' => Application::VERSION
+                'currentVersion' => Application::VERSION,
+                'timer' => 0,
+                'previousPage' => true
             ]);
         } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }

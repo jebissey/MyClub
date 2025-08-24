@@ -104,12 +104,13 @@ class UserController extends AbstractController
 
     public function helpHome(): void
     {
-        $content = $this->application->getLatte()->renderToString('Common/views/info.latte', [
+        $this->render('Common/views/info.latte', [
             'content' => $this->dataHelper->get('Settings', ['Name' => 'Help_home'], 'Value')->Value ?? '',
             'hasAuthorization' => $this->connectedUser->get()->hasAutorization() ?? false,
-            'currentVersion' => Application::VERSION
+            'currentVersion' => Application::VERSION,
+            'timer' => 0,
+            'previousPage' => true
         ]);
-        echo $content;
     }
 
     public function legalNotice(): void
@@ -298,10 +299,12 @@ class UserController extends AbstractController
     public function editPresentation()
     {
         if ($person = $this->connectedUser->get()->person ?? false) {
-            $this->render('User/views/user_edit_presentation.latte', Params::getAll([
-                'person' => $person,
-                'navItems' => $this->getNavItems($person),
-            ]));
+            if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+                $this->render('User/views/user_edit_presentation.latte', Params::getAll([
+                    'person' => $person,
+                    'navItems' => $this->getNavItems($person),
+                ]));
+            } else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
         } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
@@ -416,7 +419,9 @@ class UserController extends AbstractController
             $this->render('Common/views/info.latte', Params::getAll([
                 'content' => $this->dataHelper->get('Settings', ['Name' => 'Help_user'], 'Value')->Value ?? '',
                 'hasAuthorization' => $this->connectedUser->hasAutorization(),
-                'currentVersion' => Application::VERSION
+                'currentVersion' => Application::VERSION,
+                'timer' => 0,
+                'previousPage' => true
             ]));
         } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }

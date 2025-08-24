@@ -10,7 +10,7 @@
     {if $isEditor && $isRedactor}
         {include '../../Common/views/dataTable.latte',
             'createButton' => [
-                'url' => '/articles/create',
+                'url' => '/article/create',
                 'label' => 'Créer un article',
                 'alignment' => 'end',
             ],
@@ -19,7 +19,7 @@
                 [
                     'type' => 'link',
                     'label' => 'Voir',
-                    'url' => '/articles/{id}',
+                    'url' => '/article/{id}',
                     'class' => 'btn-info'
                 ],
                 [
@@ -33,7 +33,7 @@
     {elseif $isRedactor}
         {include '../../Common/views/dataTable.latte',
             'createButton' => [
-                'url' => '/articles/create',
+                'url' => '/article/create',
                 'label' => 'Créer un article',
                 'alignment' => 'end',
             ],
@@ -42,7 +42,7 @@
                 [
                     'type' => 'link',
                     'label' => 'Voir',
-                    'url' => '/articles/{id}',
+                    'url' => '/article/{id}',
                     'class' => 'btn-info'
                 ]
             ]
@@ -54,7 +54,7 @@
                 [
                     'type' => 'link',
                     'label' => 'Voir',
-                    'url' => '/articles/{id}',
+                    'url' => '/article/{id}',
                     'class' => 'btn-info'
                 ],
                 [
@@ -72,7 +72,7 @@
                 [
                     'type' => 'link',
                     'label' => 'Voir',
-                    'url' => '/articles/{id}',
+                    'url' => '/article/{id}',
                     'class' => 'btn-info'
                 ]
             ]

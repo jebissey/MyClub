@@ -25,7 +25,9 @@ class WebmasterController extends AbstractController
             $this->render('Common/views/info.latte', [
                 'content' => $this->dataHelper->get('Settings', ['Name' => 'Help_webmaster'], 'Value')->Value ?? '',
                 'hasAuthorization' => $this->connectedUser->get()->isEventManager() ?? false,
-                'currentVersion' => Application::VERSION
+                'currentVersion' => Application::VERSION,
+                'timer' => 0,
+                'previousPage' => true
             ]);
         } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
@@ -35,7 +37,9 @@ class WebmasterController extends AbstractController
         $this->render('Common/views/info.latte', [
             'content' => $this->dataHelper->get('Settings', ['Name' => 'Help_visitorInsights'], 'Value')->Value ?? '',
             'hasAuthorization' => $this->connectedUser->get()->isEventManager() ?? false,
-            'currentVersion' => Application::VERSION
+            'currentVersion' => Application::VERSION,
+            'timer' => 0,
+            'previousPage' => true
         ]);
     }
 
@@ -45,7 +49,9 @@ class WebmasterController extends AbstractController
             $this->render('Common/views/info.latte', Params::getAll([
                 'content' => $this->dataHelper->get('Settings', ['Name' => 'Help_admin'], 'Value')->Value ?? '',
                 'hasAuthorization' => $this->connectedUser->isEventManager(),
-                'currentVersion' => Application::VERSION
+                'currentVersion' => Application::VERSION,
+                'timer' => 0,
+                'previousPage' => true
             ]));
         } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
