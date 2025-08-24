@@ -24,7 +24,7 @@ class DbBrowserController extends AbstractController
     {
         if ($this->connectedUser->get()->isWebmaster() ?? false) {
             $this->dbBrowserDataHelper->createRecord($table);
-            $this->flight->redirect('/dbbrowser/' . urlencode($table));
+            $this->redirect('/dbbrowser/' . urlencode($table));
         } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
@@ -32,7 +32,7 @@ class DbBrowserController extends AbstractController
     {
         if ($this->connectedUser->get()->isWebmaster() || false) {
             $this->dbBrowserDataHelper->deleteRecord($table, $id);
-            $this->flight->redirect('/dbbrowser/' . urlencode($table));
+            $this->redirect('/dbbrowser/' . urlencode($table));
         } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
@@ -102,7 +102,7 @@ class DbBrowserController extends AbstractController
     {
         if ($this->connectedUser->get()->isWebmaster() ?? false) {
             $this->dbBrowserDataHelper->updateRecord($table, $id);
-            $this->flight->redirect('/dbbrowser/' . urlencode($table));
+            $this->redirect('/dbbrowser/' . urlencode($table));
         } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 }

@@ -112,7 +112,7 @@ class GroupController extends AbstractController implements CrudControllerInterf
     {
         if (($this->connectedUser->get()->isPersonManager() ?? false) || $this->connectedUser->isWebmaster() ?? false) {
             $this->dataHelper->set('Group', ['Inactivated' => 0], ['Id' => $id]);
-            $this->flight->redirect('/groups');
+            $this->redirect('/groups');
         } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 }

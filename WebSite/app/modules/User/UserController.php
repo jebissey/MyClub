@@ -219,7 +219,7 @@ class UserController extends AbstractController
                     $this->dataHelper->set('Person', ['Email' => $email], ['Id' => $person->Id]);
                     $_SESSION['user'] = $email;
                 }
-                $this->flight->redirect('/user');
+                $this->redirect('/user');
             } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $this->render('User/views/user_account.latte', Params::getAll([
                     'readOnly' => $person->Imported == 1 ? true : false,
@@ -244,7 +244,7 @@ class UserController extends AbstractController
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $availabilities = WebApp::getFiltered('availabilities', FilterInputRule::CheckboxMatrix->value, $this->flight->request()->data->getData()) ?? '';
                 if ($availabilities != '') $this->dataHelper->set('Person', ['Availabilities' => json_encode($availabilities)], ['Id' => $person->Id]);
-                $this->flight->redirect('/user');
+                $this->redirect('/user');
             } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $currentAvailabilities = json_decode($person->Availabilities ?? '', true);
                 $this->render('User/views/user_availabilities.latte', Params::getAll(['currentAvailabilities' => $currentAvailabilities]));
@@ -259,7 +259,7 @@ class UserController extends AbstractController
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $preferences = WebApp::getFiltered('preferences', FilterInputRule::CheckboxMatrix->value, $this->flight->request()->data->getData()) ?? '';
                 $this->dataHelper->set('Person', ['preferences' =>  json_encode($preferences)], ['Id' => $person->Id]);
-                $this->flight->redirect('/user');
+                $this->redirect('/user');
             } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $eventTypes = (new EventTypeDataHelper($this->application))->getsFor($person->Id);
                 $eventTypesWithAttributes = [];
@@ -283,7 +283,7 @@ class UserController extends AbstractController
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $groups = WebApp::getFiltered('groups', FilterInputRule::ArrayInt->value, $this->flight->request()->data->getData());
                 (new PersonGroupDataHelper($this->application))->update($person->Id, $groups ?? []);
-                $this->flight->redirect('/user');
+                $this->redirect('/user');
             } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $currentGroups = (new GroupDataHelper($this->application))->getCurrentGroups($person->Id);
 
@@ -328,7 +328,7 @@ class UserController extends AbstractController
                     'Location' => $location,
                     'InPresentationDirectory' => $inDirectory,
                 ], ['Id' => $person->Id]);
-                $this->flight->redirect('/user/directory');
+                $this->redirect('/user/directory');
             } else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
         } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
@@ -470,7 +470,7 @@ class UserController extends AbstractController
                         'success' => 'Message envoyé avec succès.',
                         'who'     => $email
                     ]);
-                    $this->flight->redirect($url);
+                    $this->redirect($url);
                 } else {
                     $params = [
                         'error' => 'Une erreur est survenue lors de l\'envoi du message. Veuillez réessayer.',
@@ -479,7 +479,7 @@ class UserController extends AbstractController
                         'old_message' => $message
                     ];
                     $queryString = http_build_query($params);
-                    $this->flight->redirect('/contact?' . $queryString);
+                    $this->redirect('/contact?' . $queryString);
                 }
             } else {
                 $params = [
@@ -489,7 +489,7 @@ class UserController extends AbstractController
                     'old_message' => $message
                 ];
                 $queryString = http_build_query($params);
-                $this->flight->redirect('/contact?' . $queryString);
+                $this->redirect('/contact?' . $queryString);
             }
         } else $this->application->getErrorManager()->raise(
             ApplicationError::BadRequest,

@@ -20,9 +20,10 @@ abstract class AbstractController
 {
     protected Engine $flight;
     private LatteEngine $latte;
+    
     protected Application $application;
-    protected ConnectedUser $connectedUser;
-    protected DataHelper $dataHelper;
+    public ConnectedUser $connectedUser;
+    public DataHelper $dataHelper;
     protected LanguagesDataHelper $languagesDataHelper;
     protected PageDataHelper $pageDataHelper;
 
@@ -87,7 +88,7 @@ abstract class AbstractController
         return $filteredNavItems;
     }
 
-    protected function render(string $name, object|array $params = []): void
+    public function render(string $name, object|array $params = []): void
     {
 #error_log("\n\n" . var_export($name,true) . "\n");        
         $content = $this->latte->renderToString($name, $params);

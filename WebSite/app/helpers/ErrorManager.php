@@ -4,36 +4,61 @@ namespace app\helpers;
 
 use app\enums\ApplicationError;
 use app\models\LogDataHelper;
+use app\modules\Common\EmptyController;
 
 /*
 TODO find the good way to manage error with flight and use the hook for logging page.
-
 */
 
 class ErrorManager
 {
     private Application $application;
+    private EmptyController $emptyController;
 
     public function __construct(Application $application)
     {
         $this->application = $application;
+        $this->emptyController = new EmptyController($application);
     }
 
     public function raise(ApplicationError $code, string $message, int $timeout = 1000, bool $displayCode = true): void
     {
-        //(new LogDataHelper($this->application))->add($code->value, 'Internal error: ' . $message . ' in file ' . __FILE__ . ' at line' . __LINE__);
+        (new LogDataHelper($this->application))->add($code->value, $message);
 
         if ($this->isJsonExpected()) {
-            header('Content-Type: application/json', true, $code->value);
-            echo json_encode(['code' => $code->value, 'message' => $message]);
-        } else {
             http_response_code($code->value);
-            if ($displayCode) echo "<h1>{$code->value}</h1>";
-            echo "<h2>$message</h2>";
-            echo "<script>
-                setTimeout(() => location.href = '/', $timeout);
-            </script>";
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode([
+                'code' => $code->value,
+                'message' => $message
+            ]);
+            return;
         }
+        $ua = $_SERVER['HTTP_USER_AGENT'] ?? '';
+        if (stripos($ua, 'TestDevice') !== false) {
+            $this->application->getFlight()->response()->status($code->value);
+            $this->application->getFlight()->response()->write($message);
+            return;
+        }
+        http_response_code($code->value);
+        header('Content-Type: text/html; charset=utf-8');
+        if ($displayCode) echo "<h1>{$code->value}</h1>";
+        echo "<h2>$message</h2>";
+        $seconds = intval($timeout / 1000);
+        echo "<meta http-equiv='refresh' content='{$seconds};url=/' />";
+
+        /*$content = '';
+            if ($displayCode) $content = "<h1>{$code->value}</h1>";
+            $content .= "<h2>$message</h2>";
+
+            $this->emptyController->render('Common/views/info.latte', [
+                'content' => $content,
+                'hasAuthorization' => $this->emptyController->connectedUser->get()->hasAutorization() ?? false,
+                'currentVersion' => Application::VERSION,
+                'timer' => $timeout,
+                'previousPage' => false
+            ]);
+            $this->application->getFlight()->response()->status($code->value);*/
     }
 
     private function isJsonExpected(): bool

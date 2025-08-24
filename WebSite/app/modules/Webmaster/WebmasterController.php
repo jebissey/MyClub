@@ -80,12 +80,12 @@ class WebmasterController extends AbstractController
     {
         if ($this->connectedUser->get()->isAdministrator() ?? false) {
             if ($this->connectedUser->hasOnlyOneAutorization()) {
-                if ($this->connectedUser->isEventManager())       $this->flight->redirect('/eventManager');
-                else if ($this->connectedUser->isPersonManager()) $this->flight->redirect('/personManager');
+                if ($this->connectedUser->isEventManager())       $this->redirect('/eventManager');
+                else if ($this->connectedUser->isPersonManager()) $this->redirect('/personManager');
                 else if ($this->connectedUser->isRedactor()) {
                     $_SESSION['navbar'] = 'redactor';
-                    $this->flight->redirect('/articles');
-                } else if ($this->connectedUser->isWebmaster())   $this->flight->redirect('/webmaster');
+                    $this->redirect('/articles');
+                } else if ($this->connectedUser->isWebmaster())   $this->redirect('/webmaster');
             } else if ($_SERVER['REQUEST_METHOD'] === 'GET') $this->render('Webmaster/views/admin.latte', Params::getAll([]));
             else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
         } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
@@ -124,7 +124,7 @@ class WebmasterController extends AbstractController
                     || $value === null || $value < 0
                     || $idPerson === null || $idPerson <= 0
                     || $idGroup === null || $idGroup <= 0
-                ) $this->flight->redirect('/arwards?error=invalid_data');
+                ) $this->redirect('/arwards?error=invalid_data');
                 else {
                     $this->dataHelper->set('Counter', [
                         'Name' => $name,
@@ -133,13 +133,11 @@ class WebmasterController extends AbstractController
                         'IdPerson' => $idPerson,
                         'IdGroup' => $idGroup
                     ]);
-                    $this->flight->redirect('/arwards?success=true');
+                    $this->redirect('/arwards?success=true');
                 }
             } else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
         } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
-
-
 
     public function sitemapGenerator()
     {

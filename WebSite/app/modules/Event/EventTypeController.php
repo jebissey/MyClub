@@ -57,7 +57,7 @@ class EventTypeController extends TableController implements CrudControllerInter
         if ($this->connectedUser->get()->isWebmaster() ?? false) {
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $id = $this->dataHelper->set('EventType', ['Name' => '']);
-                $this->flight->redirect('/EventTypes/edit/' . $id);
+                $this->redirect('/EventTypes/edit/' . $id);
             } else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
         } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
@@ -102,7 +102,7 @@ class EventTypeController extends TableController implements CrudControllerInter
             if (($_SERVER['REQUEST_METHOD'] === 'DELETE')) {
                 $this->dataHelper->set('EventType', ['Inactivated' => 1], ['Id' => $id]);
 
-                $this->flight->redirect('/eventTypes');
+                $this->redirect('/eventTypes');
             } else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
         } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }

@@ -27,7 +27,7 @@ class SurveyController extends AbstractController
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $article = $this->dataHelper->get('Article', ['Id' => $articleId], 'Title, Id, ');
                 if (!$article) {
-                    $this->flight->redirect('/articles');
+                    $this->redirect('/articles');
                     return;
                 }
 
@@ -70,7 +70,7 @@ class SurveyController extends AbstractController
                 $survey = $this->dataHelper->get('Survey', ['IdArticle' => $articleId], 'Id');
                 if ($survey) $this->dataHelper->set('Survey', $fields, ['Id' => $survey->Id]);
                 else         $this->dataHelper->set('Survey', $fields);
-                $this->flight->redirect('/article/' . $articleId);
+                $this->redirect('/article/' . $articleId);
             } else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
         } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
@@ -82,7 +82,7 @@ class SurveyController extends AbstractController
             $survey = (new SurveyDataHelper($this->application))->getWithCreator($articleId);
             if (!$survey) {
                 $this->application->getErrorManager()->raise(ApplicationError::BadRequest, "No survey for article {$articleId} in file " . __FILE__ . ' at line ' . __LINE__);
-                $this->flight->redirect('/article/' . $articleId);
+                $this->redirect('/article/' . $articleId);
                 return;
             }
             if ((new AuthorizationDataHelper($this->application))->canPersonReadSurveyResults($this->dataHelper->get('Article', ['Id' => $survey->IdArticle]), $connectedUser)) {

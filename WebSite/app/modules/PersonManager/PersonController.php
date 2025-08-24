@@ -84,7 +84,7 @@ class PersonController extends TableController implements CrudControllerInterfac
     {
         if (($this->connectedUser->get()->isPersonManager() ?? false) || $this->connectedUser->isWebmaster() ?? false) {
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-                $this->flight->redirect('/persons/edit/' . (new PersonDataHelper($this->application))->create());
+                $this->redirect('/persons/edit/' . (new PersonDataHelper($this->application))->create());
             } else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
         } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
@@ -104,7 +104,7 @@ class PersonController extends TableController implements CrudControllerInterfac
                     $input = WebApp::filterInput($schema, $this->flight->request()->data->getData());
                     $this->dataHelper->set('Person', ['FirstName' => $input['firstName'] ?? '???', 'LastName' => $input['lastName']] ?? '???', ['Id' => $person->Id]);
                     if ($person->Imported == 0) $this->dataHelper->set('Person', ['Email' => $input['email']], ['Id' => $person->Id]);
-                    $this->flight->redirect('/persons');
+                    $this->redirect('/persons');
                 } else if (($_SERVER['REQUEST_METHOD'] === 'GET')) {
                     $this->render('User/views/user_account.latte', Params::getAll([
                         'readOnly' => $person->Imported == 1 ? true : false,
@@ -124,7 +124,7 @@ class PersonController extends TableController implements CrudControllerInterfac
         if (($this->connectedUser->get()->isPersonManager() ?? false) || $this->connectedUser->isWebmaster() ?? false) {
             if (($_SERVER['REQUEST_METHOD'] === 'DELETE')) {
                 $this->dataHelper->set('Person', ['Inactivated' => 1], ['Id' => $id]);
-                $this->flight->redirect('/persons');
+                $this->redirect('/persons');
             } else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
         } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }

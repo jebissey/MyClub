@@ -306,7 +306,7 @@ class EventController extends AbstractController
             $this->application->getErrorManager()->raise(ApplicationError::Forbidden, "User not allowed in file " . __FILE__ . ' at line ' . __LINE__);
             return;
         }
-        $this->flight->redirect('/events/' . $eventId);
+        $this->redirect('/events/' . $eventId);
     }
 
     public function location(): void
@@ -426,7 +426,7 @@ class EventController extends AbstractController
                     false
                 );
                 $_SESSION['success'] = "Un courriel a été envoyé aux abonnés";
-                $this->flight->redirect('/article/' . $idArticle);
+                $this->redirect('/article/' . $idArticle);
             } else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
         } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
