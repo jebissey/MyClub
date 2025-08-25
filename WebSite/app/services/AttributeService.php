@@ -24,9 +24,9 @@ class AttributeService implements AttributeServiceInterface
         return $this->attributeDataHelper->delete_($id);
     }
 
-    public function getAllAttributes(): array
+    public function getAttributes(): array
     {
-        return $this->attributeDataHelper->getAllAttributes();
+        return $this->attributeDataHelper->getAttributes();
     }
 
     public function getAttributesByEventType(int $eventTypeId): array

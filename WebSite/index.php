@@ -42,6 +42,7 @@ use app\modules\VisitorInsights\LogController;
 use app\modules\Webmaster\DbBrowserController;
 use app\modules\Webmaster\NavBarController;
 use app\modules\Webmaster\RssController;
+use app\modules\Webmaster\WebappSettingsController;
 use app\modules\Webmaster\WebmasterController;
 use app\services\AttributeService;
 use app\services\AuthorizationService;
@@ -227,7 +228,6 @@ mapRoute($flight, 'POST /user/presentation/edit', $userController, 'savePresenta
 mapRoute($flight, 'GET  /user/presentation/@id:[0-9]+', $userController, 'showPresentation');
 mapRoute($flight, 'GET  /user/setPassword/@token:[a-f0-9]+', $userController, 'setPassword');
 mapRoute($flight, 'POST /user/setPassword/@token:[a-f0-9]+', $userController, 'setPassword');
-
 mapRoute($flight, 'GET  /user/sign/in', $userController, 'signIn');
 mapRoute($flight, 'POST /user/sign/in', $userController, 'signIn');
 mapRoute($flight, 'GET  /user/sign/out', $userController, 'signOut');
@@ -235,6 +235,10 @@ mapRoute($flight, 'GET  /user/statistics', $userController, 'showStatistics');
 mapRoute($flight, 'GET  /contact', $userController, 'contact');
 mapRoute($flight, 'POST /contact', $userController, 'contact');
 mapRoute($flight, 'GET  /contact/event/@id:[0-9]+', $userController, 'contact');
+
+$webappSettingsController = new WebappSettingsController($application);
+mapRoute($flight, 'GET  /settings', $webappSettingsController, 'editSettings');
+mapRoute($flight, 'POST /settings', $webappSettingsController, 'saveSettings');
 
 $webmasterController = new WebmasterController($application);
 mapRoute($flight, 'GET  /admin', $webmasterController, 'homeAdmin');
@@ -282,10 +286,10 @@ $eventApi = new EventApi(
     new NeedTypeService($apiNeedTypeDataHelper, $apiNeedDataHelper),
     new SupplyService($eventDataHelper)
 );
-mapRoute($flight, 'POST   /api/attributes/create', $eventApi, 'createAttribute');
-mapRoute($flight, 'DELETE /api/attributes/delete/@id:[0-9]+', $eventApi, 'deleteAttribute');
+mapRoute($flight, 'POST   /api/attribute/create', $eventApi, 'createAttribute');
+mapRoute($flight, 'DELETE /api/attribute/delete/@id:[0-9]+', $eventApi, 'deleteAttribute');
 mapRoute($flight, 'GET    /api/attributes/list', $eventApi, 'getAttributes');
-mapRoute($flight, 'POST   /api/attributes/update', $eventApi, 'updateAttribute');
+mapRoute($flight, 'POST   /api/attribute/update', $eventApi, 'updateAttribute');
 mapRoute($flight, 'GET    /api/attributes-by-event-type/@id:[0-9]+', $eventApi, 'getAttributesByEventType');
 mapRoute($flight, 'DELETE /api/event/delete/@id:[0-9]+', $eventApi, 'deleteEvent');
 mapRoute($flight, 'POST   /api/event/duplicate/@id:[0-9]+', $eventApi, 'duplicateEvent');

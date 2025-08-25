@@ -12,7 +12,7 @@ function createAttribute_() {
         return;
     }
 
-    fetch('/api/attributes/create', {
+    fetch('/api/attribute/create', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -40,7 +40,7 @@ function editAttribute(id) {
     const detail = document.getElementById(`attributeDetail${id}`).value;
     const color = document.getElementById(`attributeColor${id}`).value;
 
-    fetch('/api/attributes/update', {
+    fetch('/api/attribute/update', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -62,7 +62,7 @@ function editAttribute(id) {
 
 function deleteAttribute(id) {
     if (confirm('Êtes-vous sûr de vouloir supprimer cet attribut ?')) {
-        fetch(`/api/attributes/delete/${id}`, {
+        fetch(`/api/attribute/delete/${id}`, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json'

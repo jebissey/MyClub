@@ -89,7 +89,7 @@ class EventApi extends AbstractApi
     public function getAttributes(): void
     {
         try {
-            $this->renderJson(['success' => true, 'attributes' => $this->attributeService->getAllAttributes()]);
+            $this->renderJson(['success' => true, 'attributes' => $this->attributeService->getAttributes()]);
         } catch (Throwable $e) {
             $this->renderJson(['success' => false, 'message' => $e->getMessage()]);
         }

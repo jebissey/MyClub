@@ -116,7 +116,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const editForm = document.getElementById('edit-form') || document.getElementById('presentationForm');
     const contentInput = document.getElementById('content-input');
 
-    // Pour la vue présentation (sans edit-toggle-btn)
     if (!editToggleBtn && saveBtn && cancelBtn) {
         quill.on('text-change', function () {
             saveBtn.style.display = 'inline-block';

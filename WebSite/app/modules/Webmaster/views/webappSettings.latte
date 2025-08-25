@@ -1,0 +1,80 @@
+{layout '../../Common/views/layout.latte'}
+
+{block navbar}
+    {include '../../Webmaster/views/navbar/redactor.latte'}
+{/block}
+
+{block head}
+<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+<script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+<link href="/app/css/quill.css" rel="stylesheet">
+{/block}
+
+{block content}
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <h1>Personnalisation de l'application</h1>
+            <div class="card">
+                <div class="card-body">
+                    <form id="settingsForm" method="post">
+                        <div class="row mb-4">
+                            <div class="col-md-4">
+                                <label class="form-label">Paramètre à modifier</label>
+                                <select class="form-select" id="settingSelect">
+                                    <option value="">Sélectionner un paramètre...</option>
+                                    <option value="" disabled>--- Aides ---</option>
+                                    {foreach $settingsKeys as $key => $label}
+                                        {if strpos($key, 'Help_') === 0}
+                                            <option value="{$key}">{$label}</option>
+                                        {/if}
+                                    {/foreach}
+                                    <option value="" disabled>--- Accueil ---</option>
+                                    {foreach $settingsKeys as $key => $label}
+                                        {if strpos($key, 'Home_') === 0}
+                                            <option value="{$key}">{$label}</option>
+                                        {/if}
+                                    {/foreach}
+                                    <option value="" disabled>--- Pages d'erreur ---</option>
+                                    {foreach $settingsKeys as $key => $label}
+                                        {if strpos($key, 'Error_') === 0}
+                                            <option value="{$key}">{$label}</option>
+                                        {/if}
+                                    {/foreach}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div id="editor-container" style="display: none;">
+                            <div class="mb-3">
+                                <label class="form-label" id="current-setting-label">Contenu</label>
+                                <div id="quill-editor" style="min-height: 300px;"></div>
+                                {foreach $settingsKeys as $key => $label}
+                                    <input type="hidden" name="{$key}" id="content-{$key}" value="{$settings[$key]|escape}">
+                                {/foreach}
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-end">
+                            <button id="save-btn" type="submit" class="btn btn-success me-2">Enregistrer</button>
+                            <a href="/admin/dashboard" class="btn btn-secondary">Annuler</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}
+
+{block scripts}
+    <script src="/app/js/quill/script.js"></script>
+    <script>
+    const settingsData = {};
+    {foreach $settingsKeys as $key => $label}
+        settingsData[{$key}] = {($settings[$key] ?? '')};
+    {/foreach}
+//console.log("settingsData initial:", settingsData);
+    </script>
+    <script src="/app/modules/Webmaster/js/WebappSettings.js"></script>
+{/block}

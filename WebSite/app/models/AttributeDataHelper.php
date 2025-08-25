@@ -45,10 +45,11 @@ class AttributeDataHelper extends Data
         }
     }
 
-    public function getAllAttributes(): array
+    public function getAttributes(): array
     {
         $sql = '
-            SELECT Attribute.*
+            SELECT *
+            FROM Attribute
             ORDER BY Name
         ';
         $stmt = $this->pdo->prepare($sql);
