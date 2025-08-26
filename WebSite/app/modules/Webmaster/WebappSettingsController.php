@@ -1,7 +1,9 @@
 <?php
+
 namespace app\modules\Webmaster;
 
 use app\enums\ApplicationError;
+use app\enums\Message;
 use app\helpers\Application;
 use app\helpers\Params;
 use app\modules\Common\AbstractController;
@@ -9,6 +11,10 @@ use app\modules\Common\AbstractController;
 class WebappSettingsController extends AbstractController
 {
     private $settingsKeys = [
+        'Error_403' => 'Page d\'erreur 403',
+        'Error_404' => 'Page d\'erreur 404',
+        'Error_500' => 'Page d\'erreur 500',
+
         'Help_admin' => 'Aide administrateur',
         'Help_eventDesigner' => 'Aide concepteur d\'événements',
         'Help_eventManager' => 'Aide gestionnaire d\'événements',
@@ -18,16 +24,17 @@ class WebappSettingsController extends AbstractController
         'Help_user' => 'Aide utilisateur',
         'Help_visitorInsights' => 'Aide statistiques visiteurs',
         'Help_webmaster' => 'Aide webmaster',
+
         'Home_footer' => 'Pied de page d\'accueil',
         'Home_header' => 'En-tête d\'accueil',
-        'Error_403' => 'Page d\'erreur 403',
-        'Error_404' => 'Page d\'erreur 404',
-        'Error_500' => 'Page d\'erreur 500'
     ];
-    
+
     public function __construct(Application $application)
     {
         parent::__construct($application);
+        foreach (Message::cases() as $case) {
+            $this->settingsKeys['Message_' . $case->name] = $this->languagesDataHelper->translate('Message_' . $case->value);
+        }
     }
 
     public function editSettings()

@@ -3,6 +3,7 @@
 namespace app\helpers;
 
 use app\enums\ApplicationError;
+use app\models\DataHelper;
 use app\models\LogDataHelper;
 use app\modules\Common\EmptyController;
 
@@ -44,6 +45,11 @@ class ErrorManager
         header('Content-Type: text/html; charset=utf-8');
         if ($displayCode) echo "<h1>{$code->value}</h1>";
         echo "<h2>$message</h2>";
+        $result = (new DataHelper($this->application))->get('Settings', ['Name' => 'Error_' . $code->value], 'Value');
+        if ($result !== false) {
+            echo $result->Value;
+            $timeout = 5000;
+        }
         $seconds = intval($timeout / 1000);
         echo "<meta http-equiv='refresh' content='{$seconds};url=/' />";
 

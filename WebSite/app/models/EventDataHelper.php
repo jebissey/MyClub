@@ -176,15 +176,7 @@ class EventDataHelper extends Data implements NewsProviderInterface
 
     public function getNextWeekEvents(): array
     {
-        $today = new DateTime();
-        $startOfCurrentWeek = clone $today;
-        $dayOfWeek = (int)$startOfCurrentWeek->format('N'); // 1=Monday, 7=Sunday
-        $startOfCurrentWeek->sub(new DateInterval('P' . ($dayOfWeek - 1) . 'D'));
-        $startOfCurrentWeek->setTime(0, 0, 0);
-        $endOfThirdWeek = clone $startOfCurrentWeek;
-        $endOfThirdWeek->add(new DateInterval('P20D'));
-        $endOfThirdWeek->setTime(23, 59, 59);
-
+        [$startOfCurrentWeek, $endOfThirdWeek] = $this->getDatesOfThreeWeeks();
         $events = $this->fluent->from('Event e')
             ->select("
                 e.Id,
@@ -292,6 +284,32 @@ class EventDataHelper extends Data implements NewsProviderInterface
         return $weeklyEvents;
     }
 
+    public function getAttributesForNextWeekEvents(): array
+    {
+        [$startOfCurrentWeek, $endOfThirdWeek] = $this->getDatesOfThreeWeeks();
+        $sql = "
+            SELECT DISTINCT
+                a.Id,
+                a.Name,
+                a.Detail,
+                a.Color
+            FROM Event e
+            INNER JOIN EventType et ON e.IdEventType = et.Id
+            LEFT JOIN EventAttribute ea ON e.Id = ea.IdEvent
+            LEFT JOIN Attribute a ON ea.IdAttribute = a.Id
+            WHERE datetime(e.StartTime) >= :startOfWeek
+            AND datetime(e.StartTime) < :endOfWeek
+            AND a.Id IS NOT NULL
+            ORDER BY e.StartTime, a.Id;
+        ";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([
+            ':startOfWeek' => $startOfCurrentWeek->format('Y-m-d H:i:s'),
+            ':endOfWeek'   => $endOfThirdWeek->format('Y-m-d H:i:s'),
+        ]);
+        return $stmt->fetchAll();
+    }
+
     public function getEventNeeds($eventId): array
     {
         $sql = "
@@ -347,7 +365,7 @@ class EventDataHelper extends Data implements NewsProviderInterface
                 'id' => $event->Id,
                 'title' => $event->Summary,
                 'date' => $event->LastUpdate,
-                'url' => '/events/' . $event->Id
+                'url' => '/event/' . $event->Id
             ];
         }
 
@@ -592,5 +610,18 @@ class EventDataHelper extends Data implements NewsProviderInterface
             ->select('COUNT(m.Id) AS MessageCount')
             ->orderBy('e.StartTime');
         return $this->events($query->fetchAll());
+    }
+
+    private function getDatesOfThreeWeeks(): array
+    {
+        $today = new DateTime();
+        $startOfCurrentWeek = clone $today;
+        $dayOfWeek = (int)$startOfCurrentWeek->format('N'); // 1=Monday, 7=Sunday
+        $startOfCurrentWeek->sub(new DateInterval('P' . ($dayOfWeek - 1) . 'D'));
+        $startOfCurrentWeek->setTime(0, 0, 0);
+        $endOfThirdWeek = clone $startOfCurrentWeek;
+        $endOfThirdWeek->add(new DateInterval('P20D'));
+        $endOfThirdWeek->setTime(23, 59, 59);
+        return [$startOfCurrentWeek, $endOfThirdWeek];
     }
 }

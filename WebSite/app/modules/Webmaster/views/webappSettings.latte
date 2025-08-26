@@ -23,24 +23,34 @@
                                 <label class="form-label">Paramètre à modifier</label>
                                 <select class="form-select" id="settingSelect">
                                     <option value="">Sélectionner un paramètre...</option>
-                                    <option value="" disabled>--- Aides ---</option>
+                                    <optgroup label={='comboSeparatorHelp'|translate}>
                                     {foreach $settingsKeys as $key => $label}
                                         {if strpos($key, 'Help_') === 0}
                                             <option value="{$key}">{$label}</option>
                                         {/if}
                                     {/foreach}
-                                    <option value="" disabled>--- Accueil ---</option>
+                                    </optgroup>
+                                    <optgroup label={='comboSeparatorHome'|translate}>
                                     {foreach $settingsKeys as $key => $label}
                                         {if strpos($key, 'Home_') === 0}
                                             <option value="{$key}">{$label}</option>
                                         {/if}
                                     {/foreach}
-                                    <option value="" disabled>--- Pages d'erreur ---</option>
+                                    </optgroup>
+                                    <optgroup label={='comboSeparatorMessages'|translate}>
+                                    {foreach $settingsKeys as $key => $label}
+                                        {if strpos($key, 'Message_') === 0}
+                                            <option value="{$key}">{$label}</option>
+                                        {/if}
+                                    {/foreach}
+                                    </optgroup>
+                                    <optgroup label={='comboSeparatorErrorPages'|translate}>
                                     {foreach $settingsKeys as $key => $label}
                                         {if strpos($key, 'Error_') === 0}
                                             <option value="{$key}">{$label}</option>
                                         {/if}
                                     {/foreach}
+                                     </optgroup>
                                 </select>
                             </div>
                         </div>

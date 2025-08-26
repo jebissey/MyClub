@@ -26,7 +26,6 @@ $results = $data->query($pdo, 'SELECT * FROM users WHERE age > :age', [':age' =>
 
 abstract class Data
 {
-    protected Application $application;
     protected PDO $pdo;
     protected PDO $pdoForLog;
     protected $fluent;
@@ -34,9 +33,8 @@ abstract class Data
     private array $tables;
     private static ?array $cachedTables = null;
 
-    public function __construct(Application $application)
+    public function __construct(protected Application $application)
     {
-        $this->application = $application;
         $this->pdo = $application->getPdo();
         $this->pdoForLog = $application->getPdoForLog();
         $this->fluent = new \Envms\FluentPDO\Query($this->pdo);

@@ -73,7 +73,7 @@ class EventService implements EventServiceInterface
         } else return [['success' => false, 'message' => "Invalid recipients ($recipients)"], ApplicationError::BadRequest->value];
         if ($participants) {
             $root = Application::$root;
-            $eventLink = $root . '/events/' . $event->Id;
+            $eventLink = $root . '/event/' . $event->Id;
             $unsubscribeLink = $root . '/user/preferences';
             $eventCreatorEmail = $this->dataHelper->get('Person', ['Id' => $event->CreatedBy], 'Email')->Email;
             if (!$eventCreatorEmail) {

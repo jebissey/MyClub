@@ -90,7 +90,7 @@
                 </tr>
                 {var $previousWeek = $currentWeek}
             {/if}
-            <tr onclick="window.location.href='/events/{$event['id']}';" style="cursor: pointer;">
+            <tr onclick="window.location.href='/event/{$event['id']}';" style="cursor: pointer;">
                 <td>
                     <div class="ms-auto d-flex flex-column flex-sm-row gap-2">
                     {if $event['createdBy'] == ($person->Id ?? false) && $mode == 'next'}

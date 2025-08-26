@@ -7,130 +7,133 @@
 {/block}
 
 {block content}
-    <div class="d-flex">
-        <div class="container mt-4 d-flex justify-content-between align-items-center mb-3">
-            <h1>Designs</h1>
-            <a href="/designs/create" class="btn btn-primary">
-                <i class="fas fa-plus"></i> Ajouter un design
-            </a>
-        </div>
+    <div class="container-fluid mt-4 mb-3 d-flex justify-content-between align-items-center">
+        <h1>Designs</h1>
+        <a href="/designs/create" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Ajouter un design
+        </a>
+    </div>
 
-        <div class="card mb-4 shadow-sm">
+    <div class="container-fluid mb-4">
+        <div class="card shadow-sm w-100">
             <div class="card-header bg-info">
                 🎨 Proposez une nouvelle page pour le site !
             </div>
             <div class="card-body">
                 <p class="card-text">
-                Envie d’enrichir notre site avec une page ? C’est par ici !
+                    Envie d’enrichir notre site avec une page ? C’est par ici !
                 </p>
                 <ul class="list-group list-group-flush mb-3">
-                <li class="list-group-item">
-                    <strong>Nom du design :</strong> le nom qui apparaîtra dans la barre de navigation. Soyez clair et concis !
-                </li>
-                <li class="list-group-item">
-                    <strong>Détails :</strong> décrivez ce que cette page contiendra ou permettra de faire. Cela aidera l’équipe à comprendre votre idée.
-                </li>
-                <li class="list-group-item">
-                    <strong>Pour qui ?</strong> choisissez qui pourra accéder à cette page. Visible pour tout le monde, uniquement les membres du club, ou un groupe spécifique.
-                </li>
+                    <li class="list-group-item">
+                        <strong>Nom du design :</strong> le nom qui apparaîtra dans la barre de navigation. Soyez clair et concis !
+                    </li>
+                    <li class="list-group-item">
+                        <strong>Détails :</strong> décrivez ce que cette page contiendra ou permettra de faire. Cela aidera l’équipe à comprendre votre idée.
+                    </li>
+                    <li class="list-group-item">
+                        <strong>Pour qui ?</strong> choisissez qui pourra accéder à cette page. Visible pour tout le monde, uniquement les membres du club, ou un groupe spécifique.
+                    </li>
                 </ul>
                 <p class="card-text">
-                Votre proposition sera étudiée et, si elle est validée, elle apparaîtra dans la navigation du site.
+                    Votre proposition sera étudiée et, si elle est validée, elle apparaîtra dans la navigation du site.
                 </p>
                 <p class="mb-0">
-                Merci pour votre créativité et votre implication !
+                    Merci pour votre créativité et votre implication !
                 </p>
             </div>
         </div>
+    </div>
 
-        <div class="d-flex">
-            <div class="table-responsive">
-                <table class="table table-hover">
-                    <thead>
-                        <tr>
-                            <th>Créateur</th>
-                            <th>Nom du design</th>
-                            <th>NavBar</th>
-                            <th>Statut</th>
-                            <th>Votes</th>
-                            <th>All</th>
-                            <th>Members</th>
+    <div class="container-fluid mb-4">
+        <div class="table-responsive">
+            <table class="table table-hover w-100">
+                <thead>
+                    <tr>
+                        <th>Créateur</th>
+                        <th>Nom du design</th>
+                        <th>NavBar</th>
+                        <th>Statut</th>
+                        <th>Votes</th>
+                        <th>All</th>
+                        <th>Members</th>
+                        {foreach $groups as $group}
+                            <th>{$group->Name}</th>
+                        {/foreach}
+                    </tr>
+                </thead>
+                <tbody>
+                    {foreach $designs as $design}
+                        <tr class="design-row" 
+                            data-id="{$design->Id}" 
+                            data-name="{$design->Name}" 
+                            data-detail="{$design->Detail}">
+
+                            <td>{$design->NameOfDesigner}</td>
+                            <td data-bs-toggle="tooltip" data-bs-placement="top" title="{$design->Detail}">
+                                {$design->Name}
+                            </td>
+                            <td>{$design->NavBar}</td>
+                            <td>
+                                {if $design->Status === 'UnderReview'}
+                                    <h4>⏳</h4>
+                                {elseif $design->Status === 'Approved'}
+                                    <h4>✅</h4>
+                                {elseif $design->Status === 'Rejected'}
+                                    <h4>❌</h4>
+                                {/if}
+                            </td>
+                            <td>{$design->Votes}</td>
+                            <td class="text-center">
+                                {if $design->IdGroup == '' && $design->OnlyForMembers == 0}
+                                    <h4>✅</h4>
+                                {/if}
+                            </td>
+                            <td class="text-center">
+                                {if $design->IdGroup == '' && $design->OnlyForMembers == 1}
+                                    <h4>✅</h4>
+                                {/if}
+                            </td>
                             {foreach $groups as $group}
-                                <th>{$group->Name}</th>
-                            {/foreach}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {foreach $designs as $design}
-                            <tr class="design-row" data-id="{$design->Id}" data-name="{$design->Name}" data-detail="{$design->Detail}">
-
-                                <td>{$design->NameOfDesigner}</td>
-                                <td data-bs-toggle="tooltip" data-bs-placement="top" title="{$design->Detail}">
-                                    {$design->Name}
-                                </td>
-                                <td>{$design->NavBar}</td>
-                                <td>
-                                    {if $design->Status === 'UnderReview'}
-                                        <h4>⏳</h4>
-                                    {elseif $design->Status === 'Approved'}
-                                        <h4>✅</h4>
-                                    {elseif $design->Status === 'Rejected'}
-                                        <h4>❌</h4>
-                                    {/if}
-                                </td>
-                                <td>{$design->Votes}</td>
-                                <td class="text-center">
-                                    {if $design->IdGroup == '' && $design->OnlyForMembers == 0}
-                                    <h4>✅</h4>
-                                    {/if}
-                                </td>
-                                <td class="text-center">
-                                    {if $design->IdGroup == '' && $design->OnlyForMembers == 1}
-                                    <h4>✅</h4>
-                                    {/if}
-                                </td>
-                                {foreach $groups as $group}
                                 <td class="text-center">
                                     {if $design->IdGroup == $group->Id}
-                                    <h4>✅</h4>
+                                        <h4>✅</h4>
                                     {/if}
                                 </td>
-                                {/foreach}
-                            </tr>
-                        {/foreach}
-                    </tbody>
-                </table>
-            </div>
+                            {/foreach}
+                        </tr>
+                    {/foreach}
+                </tbody>
+            </table>
         </div>
+    </div>
 
-        <div class="modal fade" id="voteModal" tabindex="-1" aria-labelledby="voteModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="voteModalLabel">Voter pour ce design</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <h4 id="design-name"></h4>
-                        <p id="design-detail"></p>
+    <div class="modal fade" id="voteModal" tabindex="-1" aria-labelledby="voteModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="voteModalLabel">Voter pour ce design</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <h4 id="design-name"></h4>
+                    <p id="design-detail"></p>
 
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="voteOption" id="voteUp" value="voteUp">
-                            <label class="form-check-label" for="voteUp">👍 Pour</label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="voteOption" id="voteDown" value="voteDown">
-                            <label class="form-check-label" for="voteDown">👎 Contre</label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="voteOption" id="voteNeutral" value="voteNeutral">
-                            <label class="form-check-label" for="voteNeutral">🤔 Neutre</label>
-                        </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="voteOption" id="voteUp" value="voteUp">
+                        <label class="form-check-label" for="voteUp">👍 Pour</label>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                        <button type="button" class="btn btn-primary" id="submit-vote">Voter</button>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="voteOption" id="voteDown" value="voteDown">
+                        <label class="form-check-label" for="voteDown">👎 Contre</label>
                     </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="voteOption" id="voteNeutral" value="voteNeutral">
+                        <label class="form-check-label" for="voteNeutral">🤔 Neutre</label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="button" class="btn btn-primary" id="submit-vote">Voter</button>
                 </div>
             </div>
         </div>

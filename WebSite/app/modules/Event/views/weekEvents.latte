@@ -94,94 +94,118 @@
 {/block}
 
 {block content}
-<div class="container-fluid">
-    <h1>Calendrier des événements</h1>
-    
-    {if count($events) > 0}
-        <table class="weekly-calendar">
-            <thead>
-                <tr>
-                    <th style="width: 14%;">Semaine</th>
-                    <th class="day-header">Lundi</th>
-                    <th class="day-header">Mardi</th>
-                    <th class="day-header">Mercredi</th>
-                    <th class="day-header">Jeudi</th>
-                    <th class="day-header">Vendredi</th>
-                    <th class="day-header">Samedi</th>
-                    <th class="day-header">Dimanche</th>
-                </tr>
-            </thead>
-            <tbody>
-                {foreach $events as $weekData}
+    <div class="container-fluid">
+        <h1>Calendrier des événements</h1>
+        
+        {if count($events) > 0}
+            <table class="weekly-calendar">
+                <thead>
                     <tr>
-                        <td class="week-header" style="text-align: center;">
-                            <div>{$weekData['weekStart']} - {$weekData['weekEnd']}</div>
-                        </td>
-                        
-                        {for $day = 1; $day <= 7; $day++}
-                            {var $currentDayOffset = $day - 1}
-                            {var $currentDayTimestamp = strtotime($weekData['weekStartFull'] . ' +' . $currentDayOffset . ' days')}
-                            {var $todayTimestamp = strtotime('today')}
-                            {var $isToday = date('Y-m-d', $currentDayTimestamp) === date('Y-m-d', $todayTimestamp)}
-                            
-                        <td class="{if $isToday}current-day{/if}">
-                        {if count($weekData['days'][$day]) > 0}
-                            {foreach $weekData['days'][$day] as $event}
-                            {if $event['audience'] == 'All'}
-                            <a href="/contact/event/{$event['id']}" class="event-item text-decoration-none text-dark fw-bold">
-                            {else}
-                            <div class="event-item">
-                            {/if}
-                                <div class="d-flex justify-content-between" data-bs-toggle="tooltip" data-bs-placement="top" title="{$event['date']|longDate}">
-                                    <div class="event-time">{$event['startTime']}</div>
-                                    <div class="event-duration">({$event['duration']})</div>
-                                    {ifset $event['groupName']}
-                                    <div class="event-group">[{$event['groupName']}]</div>
-                                    {/ifset}
-                                </div>
-                                <div class="event-summary">{$event['summary']}</div>
-                                <div>
-                                    {if count($event['attributes']) > 0}
-                                        {foreach $event['attributes'] as $attribute}
-                                        <span 
-                                            class="attribute-badge" 
-                                            style="background-color: {$attribute['color']|noescape};" 
-                                            title="{$attribute['name']} : {$attribute['detail']}"
-                                        ></span>
-                                        {/foreach}
-                                    {else}
-                                        <span style="font-size: 16px;">⌧</span>
-                                    {/if}
-                                </div>
-                            {if $event['audience'] == 'All'}
-                            </a>
-                            {else}
-                            </div>
-                            {/if}
-                            {/foreach}
-                        {else}
-                            <div class="no-events">Aucun événement</div>
-                        {/if}
-                        </td>
-                        {/for}
+                        <th style="width: 14%;">Semaine</th>
+                        <th class="day-header">Lundi</th>
+                        <th class="day-header">Mardi</th>
+                        <th class="day-header">Mercredi</th>
+                        <th class="day-header">Jeudi</th>
+                        <th class="day-header">Vendredi</th>
+                        <th class="day-header">Samedi</th>
+                        <th class="day-header">Dimanche</th>
                     </tr>
-                {/foreach}
-            </tbody>
-        </table>
-        <div class="mb-4 p-3 bg-light border rounded">
-            <h5>📅 Bienvenue sur le calendrier des sorties !</h5>
-            <p>Retrouvez ici tous nos événements sur 3 semaines.</p>
-            <ul>
-                <li><strong>La plupart sont réservés aux membres</strong>, sauf ceux en gras avec un pointeur spécifique.</li>
-                <li><strong>Carrés colorés</strong> = infos spéciales, pointez la souris pour voir le détail.</li>
-                <li><strong>[Nom de groupe]</strong> = réservé aux membres de ce groupe.</li>
-            </ul>
-            <h5>À vos agendas ! 📆✨</h5>
-        </div>
-    {else}
-        <div class="alert alert-info">
-            <p>Aucun événement programmé pour les deux prochaines semaines.</p>
-        </div>
-    {/if}
-</div>
+                </thead>
+                <tbody>
+                    {foreach $events as $weekData}
+                        <tr>
+                            <td class="week-header" style="text-align: center;">
+                                <div>{$weekData['weekStart']} - {$weekData['weekEnd']}</div>
+                            </td>
+                            
+                            {for $day = 1; $day <= 7; $day++}
+                                {var $currentDayOffset = $day - 1}
+                                {var $currentDayTimestamp = strtotime($weekData['weekStartFull'] . ' +' . $currentDayOffset . ' days')}
+                                {var $todayTimestamp = strtotime('today')}
+                                {var $isToday = date('Y-m-d', $currentDayTimestamp) === date('Y-m-d', $todayTimestamp)}
+                                
+                            <td class="{if $isToday}current-day{/if}">
+                            {if count($weekData['days'][$day]) > 0}
+                                {foreach $weekData['days'][$day] as $event}
+                                {if $event['audience'] == 'All'}
+                                <a href="/contact/event/{$event['id']}" class="event-item text-decoration-none text-dark fw-bold">
+                                {else}
+                                <div class="event-item">
+                                {/if}
+                                    <div class="d-flex justify-content-between" data-bs-toggle="tooltip" data-bs-placement="top" title="{$event['date']|longDate}">
+                                        <div class="event-time">{$event['startTime']}</div>
+                                        <div class="event-duration">({$event['duration']})</div>
+                                        {ifset $event['groupName']}
+                                        <div class="event-group">[{$event['groupName']}]</div>
+                                        {/ifset}
+                                    </div>
+                                    <div class="event-summary">{$event['summary']}</div>
+                                    <div>
+                                        {if count($event['attributes']) > 0}
+                                            {foreach $event['attributes'] as $attribute}
+                                            <span 
+                                                class="attribute-badge" 
+                                                style="background-color: {$attribute['color']|noescape};" 
+                                                title="{$attribute['name']} : {$attribute['detail']}"
+                                            ></span>
+                                            {/foreach}
+                                        {else}
+                                            <span style="font-size: 16px;">⌧</span>
+                                        {/if}
+                                    </div>
+                                {if $event['audience'] == 'All'}
+                                </a>
+                                {else}
+                                </div>
+                                {/if}
+                                {/foreach}
+                            {else}
+                                <div class="no-events">Aucun événement</div>
+                            {/if}
+                            </td>
+                            {/for}
+                        </tr>
+                    {/foreach}
+                </tbody>
+            </table>
+
+            <div class="row">
+                <div class="col-lg-6 mb-4">
+                    <div class="p-3 bg-light border rounded h-100">
+                    <h5>📅 Bienvenue sur le calendrier des sorties !</h5>
+                    <p>Retrouvez ici tous nos événements sur 3 semaines.</p>
+                    <ul>
+                        <li><strong>La plupart sont réservés aux membres</strong>, sauf ceux en gras avec un pointeur spécifique.</li>
+                        <li><strong>Carrés colorés</strong> = infos spéciales, pointez la souris pour voir le détail.</li>
+                        <li><strong>[Nom de groupe]</strong> = réservé aux membres de ce groupe.</li>
+                    </ul>
+                    <h5>À vos agendas ! 📆✨</h5>
+                    </div>
+                </div>
+                <div class="col-lg-6 mb-4">
+                    <div class="p-3 bg-light border rounded h-100">
+                    <h5>🔍 Détail des attributs</h5>
+                    <ul class="list-group">
+                        {foreach $attributes as $attribute}
+                        <li class="list-group-item d-flex align-items-center">
+                            <span class="me-2 d-inline-block rounded" style="width:20px; height:20px; background-color:{$attribute->Color|noescape};"></span>
+                            <span><strong>{$attribute->Name}</strong> : {$attribute->Detail}</span>
+                        </li>
+                        {/foreach}
+                    </ul>
+                    </div>
+                </div>
+            </div>
+        {else}
+            <div class="alert alert-info">
+                <p>Aucun événement programmé pour les prochaines semaines.</p>
+            </div>
+        {/if}
+    </div>
+
+    <a href="/events-rss.xml" class="rss-link">
+        <img src="/app/images/Feed-icon.svg" alt="RSS" width="16" height="16"> S'abonner au flux RSS
+    </a>
 {/block}
+
+

@@ -68,8 +68,9 @@ class EventController extends AbstractController
             'events' => $this->eventDataHelper->getNextWeekEvents(),
             'eventTypes' => $this->dataHelper->gets('EventType', ['Inactivated' => 0], 'Id, Name'),
             'eventAttributes' => $this->dataHelper->gets('Attribute', [], 'Id, Name, Detail, Color'),
+            'attributes' => $this->eventDataHelper->getAttributesForNextWeekEvents(),
             'navItems' => $this->getNavItems($this->connectedUser->get()->person ?? false),
-            'layout' => $this->getLayout()
+            'layout' => $this->getLayout(),
         ]));
     }
 
@@ -181,7 +182,7 @@ class EventController extends AbstractController
                     );
 
                     $root = Application::$root;
-                    $invitationLink = $root . "/events/$eventId?t=$token";
+                    $invitationLink = $root . "/event/$eventId?t=$token";
                     $subject = "Invitation à l'événement : " . $event->Summary;
                     $body = "Bonjour" . (!empty($nickname) ? " {$nickname}" : "") . ",\n\n";
                     $body .= "Vous êtes invité(e) à participer à l'événement suivant :\n\n";
@@ -306,7 +307,7 @@ class EventController extends AbstractController
             $this->application->getErrorManager()->raise(ApplicationError::Forbidden, "User not allowed in file " . __FILE__ . ' at line ' . __LINE__);
             return;
         }
-        $this->redirect('/events/' . $eventId);
+        $this->redirect('/event/' . $eventId);
     }
 
     public function location(): void
