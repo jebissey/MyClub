@@ -42,10 +42,12 @@ class ConnectedUser
             'href' => $this->getHref($this->person->Email),
             'userImg' => $this->getUserImg($this->person),
             'userEmail' => $this->person->Email,
-            'isAdmin' => count($this->authorizations) > 0,
+            'isAdmin' => $this->isAdministrator(),
+            'isDesigner' => $this->isDesigner(),
             'isEventDesigner' => $this->isEventDesigner(),
             'isEventManager' => $this->isEventManager(),
             'isHomeDesigner' => $this->isHomeDesigner(),
+            'isNavbarDesigner' => $this->isNavbarDesigner(),
             'isPersonManager' => $this->isPersonManager(),
             'isRedactor' => $this->isRedactor(),
             'isEditor' => $this->isEditor(),
@@ -62,7 +64,12 @@ class ConnectedUser
 
     public function isAdministrator(): bool
     {
-        return $this->isEditor() || $this->isEventManager() || $this->isPersonManager() || $this->isWebmaster() || $this->isVisitorInsights();
+        return $this->isDesigner() || $this->isEditor() || $this->isEventManager() || $this->isPersonManager() || $this->isRedactor() || $this->isVisitorInsights() || $this->isWebmaster();
+    }
+
+    public function isDesigner(): bool
+    {
+        return $this->isEventDesigner() || $this->isHomeDesigner() || $this->isNavbarDesigner();
     }
 
     public function isEditor(): bool
@@ -83,6 +90,11 @@ class ConnectedUser
     public function isHomeDesigner(): bool
     {
         return in_array(Authorization::HomeDesigner->value, $this->authorizations ?? []);
+    }
+
+    public function isNavbarDesigner(): bool
+    {
+        return in_array(Authorization::NavbarDesigner->value, $this->authorizations ?? []);
     }
 
     public function isPersonManager(): bool

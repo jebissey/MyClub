@@ -18,8 +18,8 @@ class NavBarController extends AbstractController
 
     public function index()
     {
-        if ($this->connectedUser->get()->isWebmaster() ?? false) {
-            $this->render('Webmaster/views/navbar/index.latte', Params::getAll([
+        if ($this->connectedUser->get()->isNavbarDesigner() ?? false) {
+            $this->render('Webmaster/views/navbar.latte', Params::getAll([
                 'navItems' => $this->getNavItems($this->connectedUser->person),
                 'groups' => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
                 'availableRoutes' => $this->getAvailableRoutes(),

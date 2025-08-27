@@ -70,7 +70,7 @@ class GroupController extends AbstractController implements CrudControllerInterf
     public function edit($id)
     {
         if (($this->connectedUser->get()->isPersonManager() ?? false) || $this->connectedUser->isWebmaster() ?? false) {
-            $availableAuthorizations = $this->dataHelper->gets('Authorization', ['Id <> 1' => null]);
+            $availableAuthorizations = $this->dataHelper->gets('Authorization', ['Id <> 1' => null], '*', 'Name');
             $group = $this->dataHelper->get('Group', ['Id' => $id], 'Name, SelfRegistration');
 
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {

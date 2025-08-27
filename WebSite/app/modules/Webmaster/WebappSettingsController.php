@@ -16,10 +16,9 @@ class WebappSettingsController extends AbstractController
         'Error_500' => 'Page d\'erreur 500',
 
         'Help_admin' => 'Aide administrateur',
-        'Help_eventDesigner' => 'Aide concepteur d\'événements',
+        'Help_designer' => 'Aide designer',
         'Help_eventManager' => 'Aide gestionnaire d\'événements',
         'Help_home' => 'Aide accueil',
-        'Help_homeDesigner' => 'Aide concepteur d\'accueil',
         'Help_personManager' => 'Aide gestionnaire de personnes',
         'Help_user' => 'Aide utilisateur',
         'Help_visitorInsights' => 'Aide statistiques visiteurs',

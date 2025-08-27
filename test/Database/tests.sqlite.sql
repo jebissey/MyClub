@@ -110,7 +110,7 @@ INSERT INTO "Test" VALUES (102,1160,'GET','/user/directory',NULL,NULL,'{"email":
 INSERT INTO "Test" VALUES (103,1230,'GET','/user/news',NULL,NULL,'{"email":"webmaster@myclub.foo","password":"admin1234" }','200',NULL,NULL);
 INSERT INTO "Test" VALUES (104,1260,'GET','/webmaster',NULL,NULL,'{"email":"webmaster@myclub.foo","password":"admin1234" }','200',NULL,NULL);
 INSERT INTO "Test" VALUES (105,1280,'GET','/dbbrowser',NULL,NULL,'{"email":"webmaster@myclub.foo","password":"admin1234" }','200',NULL,NULL);
-INSERT INTO "Test" VALUES (106,1300,'GET','/navBar',NULL,NULL,'{"email":"webmaster@myclub.foo","password":"admin1234" }','200',NULL,NULL);
+INSERT INTO "Test" VALUES (106,1300,'GET','/navBar',NULL,NULL,'{"email":"webmaster@myclub.foo","password":"admin1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (107,1320,'GET','/arwards',NULL,NULL,'{"email":"webmaster@myclub.foo","password":"admin1234" }','200',NULL,NULL);
 INSERT INTO "Test" VALUES (108,1340,'GET','/groups',NULL,NULL,'{"email":"webmaster@myclub.foo","password":"admin1234" }','200','SELECT * From "Group"','[{"Id":1,"Name":"Webmaster","Inactivated":0,"SelfRegistration":0}]');
 INSERT INTO "Test" VALUES (109,1400,'GET','/eventTypes',NULL,NULL,'{"email":"webmaster@myclub.foo","password":"admin1234" }','200',NULL,NULL);

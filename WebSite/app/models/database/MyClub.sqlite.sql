@@ -286,6 +286,7 @@ INSERT INTO "Authorization" VALUES (5,'Editor');
 INSERT INTO "Authorization" VALUES (6,'HomeDesigner');
 INSERT INTO "Authorization" VALUES (7,'EventDesigner');
 INSERT INTO "Authorization" VALUES (8,'VisitorInsights');
+INSERT INTO "Authorization" VALUES (9,'NavbarDesigner');
 INSERT INTO "Group" VALUES (1,'Webmaster',0,0);
 INSERT INTO "GroupAuthorization" VALUES (1,1,1);
 INSERT INTO "Languages" VALUES (1,'select_language','Select language','Sélectionner la langue');
