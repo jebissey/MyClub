@@ -365,6 +365,20 @@ class EventController extends AbstractController
     public function fetchEmails()
     {
         if ($this->connectedUser->get()->isEventManager() ?? false) {
+            if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+                $this->render('Event/views/getEmails.latte', Params::getAll([
+                    'groups' => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
+                    'eventTypes' => $this->dataHelper->gets('EventType', ['Inactivated' => 0], 'Id, Name', 'Name'),
+                    'weekdayNames' => TranslationManager::getWeekdayNames(),
+                    'timeOptions' => $this->getAllLabels(),
+                ]));
+            } else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+    }
+
+    public function copyEmails()
+    {
+        if ($this->connectedUser->get()->isEventManager() ?? false) {
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $schema = [
                     'dayOfWeek' => $this->application->enumToValues(WeekdayFormat::class),
@@ -382,18 +396,11 @@ class EventController extends AbstractController
                 $eventTypeName = $idEventType != null ? $this->dataHelper->get('EventType', ['Id', $idEventType], 'Name') : '';
                 $dayOfWeekName = $dayOfWeek != null ? TranslationManager::getWeekdayNames()[$dayOfWeek] : '';
 
-                $this->render('Event/views/emails/copyToClipBoard.latte', Params::getAll([
+                $this->render('Event/views/copyToClipBoard.latte', Params::getAll([
                     'emailsJson' => json_encode($filteredEmails),
                     'emails' => $filteredEmails,
                     'filters' => "$groupName / $eventTypeName / $dayOfWeekName / $timeOfDay",
                     'people' => $this->dataHelper->gets('Person', ['Inactivated' => 0], 'Email, Phone, FirstName, LastName, NickName', '', true),
-                ]));
-            } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-                $this->render('Event/views/getEmails.latte', Params::getAll([
-                    'groups' => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
-                    'eventTypes' => $this->dataHelper->gets('EventType', ['Inactivated' => 0], 'Id, Name', 'Name'),
-                    'weekdayNames' => TranslationManager::getWeekdayNames(),
-                    'timeOptions' => $this->getAllLabels(),
                 ]));
             } else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
         } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);

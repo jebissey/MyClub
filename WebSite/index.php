@@ -116,7 +116,7 @@ mapRoute($flight, 'POST /designs/save', $designController, 'save');
 
 $eventController = new EventController($application);
 mapRoute($flight, 'GET  /emails', $eventController, 'fetchEmails');
-mapRoute($flight, 'POST /emails', $eventController, 'fetchEmails');
+mapRoute($flight, 'POST /emails', $eventController, 'copyEmails');
 mapRoute($flight, 'GET  /emails/article/@id:[0-9]+', $eventController, 'fetchEmailsForArticle');
 mapRoute($flight, 'GET  /eventManager', $eventController, 'home');
 mapRoute($flight, 'GET  /eventManager/help', $eventController, 'help');

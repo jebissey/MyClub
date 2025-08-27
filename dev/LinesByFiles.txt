@@ -1,122 +1,136 @@
 === Détail par fichier ===
-   376 ../WebSite/index.php
+   394 ../WebSite/index.php
     60 ../WebSite/app/modules/VisitorInsights/views/referent.latte
    153 ../WebSite/app/modules/VisitorInsights/views/crossTab.latte
     80 ../WebSite/app/modules/VisitorInsights/views/topPages.latte
    178 ../WebSite/app/modules/VisitorInsights/views/analytics.latte
-   100 ../WebSite/app/modules/VisitorInsights/views/topArticles.latte
    121 ../WebSite/app/modules/VisitorInsights/views/visitor.latte
    165 ../WebSite/app/modules/VisitorInsights/views/statistics.latte
-    99 ../WebSite/app/modules/VisitorInsights/views/lastVisits.latte
-   171 ../WebSite/app/modules/VisitorInsights/LogController.php
-    89 ../WebSite/app/modules/PersonManager/views/groups/edit.latte
-    90 ../WebSite/app/modules/PersonManager/views/groups/index.latte
-    93 ../WebSite/app/modules/PersonManager/views/groups/create.latte
-    27 ../WebSite/app/modules/PersonManager/views/index.latte
-   106 ../WebSite/app/modules/PersonManager/views/inport.latte
-   100 ../WebSite/app/modules/PersonManager/ImportController.php
-   244 ../WebSite/app/modules/PersonManager/PersonController.php
-    67 ../WebSite/app/modules/PersonManager/RegistrationController.php
-   113 ../WebSite/app/modules/PersonManager/GroupController.php
+    95 ../WebSite/app/modules/VisitorInsights/views/lastVisits.latte
+   177 ../WebSite/app/modules/VisitorInsights/LogController.php
+    93 ../WebSite/app/modules/PersonManager/views/group_create.latte
+   106 ../WebSite/app/modules/PersonManager/views/users_import.latte
+    38 ../WebSite/app/modules/PersonManager/views/registration_user_groups_partial.latte
+    89 ../WebSite/app/modules/PersonManager/views/group_edit.latte
+    31 ../WebSite/app/modules/PersonManager/views/registration_groups_index.latte
+    90 ../WebSite/app/modules/PersonManager/views/groups_index.latte
+    27 ../WebSite/app/modules/PersonManager/views/users_index.latte
+   104 ../WebSite/app/modules/PersonManager/ImportController.php
+   131 ../WebSite/app/modules/PersonManager/PersonController.php
+    68 ../WebSite/app/modules/PersonManager/RegistrationController.php
+   118 ../WebSite/app/modules/PersonManager/GroupController.php
    109 ../WebSite/app/modules/Event/EventTypeController.php
-   442 ../WebSite/app/modules/Event/EventController.php
-    98 ../WebSite/app/modules/Event/views/eventType/edit.latte
-    59 ../WebSite/app/modules/Event/views/eventType/index.latte
-    26 ../WebSite/app/modules/Event/views/eventType/attributes.latte
-    40 ../WebSite/app/modules/Event/views/eventType/attributes-list.latte
-    38 ../WebSite/app/modules/Event/views/registration/groups.latte
-    31 ../WebSite/app/modules/Event/views/registration/index.latte
-   266 ../WebSite/app/modules/Event/views/event/location.latte
-   292 ../WebSite/app/modules/Event/views/event/detail.latte
-    57 ../WebSite/app/modules/Event/views/event/guest.latte
-   190 ../WebSite/app/modules/Event/views/event/needs.latte
-   121 ../WebSite/app/modules/Event/views/event/chat.latte
-    74 ../WebSite/app/modules/Event/views/survey/add.latte
-    87 ../WebSite/app/modules/Event/views/survey/results.latte
+   434 ../WebSite/app/modules/Event/EventController.php
+   297 ../WebSite/app/modules/Event/views/event_detail.latte
+    57 ../WebSite/app/modules/Event/views/guest.latte
+    27 ../WebSite/app/modules/Event/views/copyToClipBoard.latte
+    98 ../WebSite/app/modules/Event/views/eventType_edit.latte
+    72 ../WebSite/app/modules/Event/views/getEmails.latte
+    26 ../WebSite/app/modules/Event/views/attributes_partial.latte
+   266 ../WebSite/app/modules/Event/views/event_location.latte
    354 ../WebSite/app/modules/Event/views/nextEvents.latte
-    27 ../WebSite/app/modules/Event/views/emails/copyToClipBoard.latte
-    72 ../WebSite/app/modules/Event/views/emails/getEmails.latte
-   187 ../WebSite/app/modules/Event/views/weekEvents.latte
+    40 ../WebSite/app/modules/Event/views/attributes-list_partial.latte
+   190 ../WebSite/app/modules/Event/views/event_needs.latte
+   121 ../WebSite/app/modules/Event/views/chat.latte
+   211 ../WebSite/app/modules/Event/views/weekEvents.latte
+    59 ../WebSite/app/modules/Event/views/eventTypes_index.latte
+    31 ../WebSite/app/modules/Event/NeedController.php
    119 ../WebSite/app/modules/Article/SurveyController.php
    129 ../WebSite/app/modules/Article/MediaController.php
-   100 ../WebSite/app/modules/Article/views/articles.latte
-   144 ../WebSite/app/modules/Article/views/designs/index.latte
-    86 ../WebSite/app/modules/Article/views/designs/create.latte
-   100 ../WebSite/app/modules/Article/views/media/list.latte
-    69 ../WebSite/app/modules/Article/views/media/gpxViewer.latte
-    43 ../WebSite/app/modules/Article/views/media/upload.latte
-   203 ../WebSite/app/modules/Article/views/article.latte
-   269 ../WebSite/app/modules/Article/ArticleController.php
+    87 ../WebSite/app/modules/Article/views/survey_results.latte
+    86 ../WebSite/app/modules/Article/views/design_create.latte
+    74 ../WebSite/app/modules/Article/views/survey_add.latte
+   100 ../WebSite/app/modules/Article/views/media_index.latte
+   101 ../WebSite/app/modules/Article/views/articles_index.latte
+   203 ../WebSite/app/modules/Article/views/article_show.latte
+    43 ../WebSite/app/modules/Article/views/media_upload.latte
+   104 ../WebSite/app/modules/Article/views/topArticles.latte
+    69 ../WebSite/app/modules/Article/views/media_gpxViewer.latte
+   147 ../WebSite/app/modules/Article/views/designs_index.latte
+   284 ../WebSite/app/modules/Article/ArticleController.php
+    75 ../WebSite/app/modules/Article/DesignController.php
    119 ../WebSite/app/modules/Article/js/article.js
     36 ../WebSite/app/modules/Article/js/articles.js
-    73 ../WebSite/app/modules/Design/DesignController.php
-   116 ../WebSite/app/modules/Common/AbstractController.php
+   143 ../WebSite/app/modules/Common/AbstractController.php
     41 ../WebSite/app/modules/Common/views/layout.latte
    115 ../WebSite/app/modules/Common/views/home.latte
    132 ../WebSite/app/modules/Common/views/dataTable.latte
     63 ../WebSite/app/modules/Common/views/contact.latte
+    60 ../WebSite/app/modules/Common/views/registration_success.latte
    156 ../WebSite/app/modules/Common/views/crosstab.latte
-    12 ../WebSite/app/modules/Common/views/info.latte
-    60 ../WebSite/app/modules/Common/views/registration-success.latte
+    63 ../WebSite/app/modules/Common/views/info.latte
     58 ../WebSite/app/modules/Common/TableController.php
-   103 ../WebSite/app/modules/Webmaster/DbBrowserController.php
-    73 ../WebSite/app/modules/Webmaster/NavBarController.php
-   268 ../WebSite/app/modules/Webmaster/WebmasterController.php
+    14 ../WebSite/app/modules/Common/EmptyController.php
+   108 ../WebSite/app/modules/Webmaster/DbBrowserController.php
+   231 ../WebSite/app/modules/Webmaster/RssController.php
+    72 ../WebSite/app/modules/Webmaster/WebappSettingsController.php
+    74 ../WebSite/app/modules/Webmaster/NavBarController.php
+   265 ../WebSite/app/modules/Webmaster/WebmasterController.php
      8 ../WebSite/app/modules/Webmaster/views/visitorInsights.latte
      5 ../WebSite/app/modules/Webmaster/views/redactor.latte
     65 ../WebSite/app/modules/Webmaster/views/dbbrowser/edit.latte
     43 ../WebSite/app/modules/Webmaster/views/dbbrowser/index.latte
    181 ../WebSite/app/modules/Webmaster/views/dbbrowser/table.latte
     65 ../WebSite/app/modules/Webmaster/views/dbbrowser/create.latte
+   128 ../WebSite/app/modules/Webmaster/views/installations.latte
+    90 ../WebSite/app/modules/Webmaster/views/webappSettings.latte
     32 ../WebSite/app/modules/Webmaster/views/navbar/visitorInsights.latte
-    32 ../WebSite/app/modules/Webmaster/views/navbar/redactor.latte
-    66 ../WebSite/app/modules/Webmaster/views/navbar/user.latte
+    29 ../WebSite/app/modules/Webmaster/views/navbar/redactor.latte
+    69 ../WebSite/app/modules/Webmaster/views/navbar/user.latte
     87 ../WebSite/app/modules/Webmaster/views/navbar/home.latte
-   128 ../WebSite/app/modules/Webmaster/views/navbar/index.latte
-    40 ../WebSite/app/modules/Webmaster/views/navbar/eventManager.latte
+    32 ../WebSite/app/modules/Webmaster/views/navbar/eventManager.latte
+    39 ../WebSite/app/modules/Webmaster/views/navbar/designer.latte
     29 ../WebSite/app/modules/Webmaster/views/navbar/personManager.latte
-    32 ../WebSite/app/modules/Webmaster/views/navbar/webmaster.latte
+    34 ../WebSite/app/modules/Webmaster/views/navbar/webmaster.latte
     18 ../WebSite/app/modules/Webmaster/views/navbar/info.latte
     10 ../WebSite/app/modules/Webmaster/views/navbar/article.latte
-    39 ../WebSite/app/modules/Webmaster/views/navbar/admin.latte
+    44 ../WebSite/app/modules/Webmaster/views/navbar/admin.latte
      4 ../WebSite/app/modules/Webmaster/views/eventManager.latte
+     5 ../WebSite/app/modules/Webmaster/views/designer.latte
+   128 ../WebSite/app/modules/Webmaster/views/navbar.latte
    106 ../WebSite/app/modules/Webmaster/views/arwards.latte
      4 ../WebSite/app/modules/Webmaster/views/personManager.latte
     13 ../WebSite/app/modules/Webmaster/views/webmaster.latte
      4 ../WebSite/app/modules/Webmaster/views/admin.latte
-   556 ../WebSite/app/modules/User/UserController.php
+    61 ../WebSite/app/modules/Webmaster/js/WebappSettings.js
+   682 ../WebSite/app/modules/User/UserController.php
     53 ../WebSite/app/modules/User/FFAController.php
+    59 ../WebSite/app/modules/User/views/user_notepad.latte
+    92 ../WebSite/app/modules/User/views/user_edit_presentation.latte
    119 ../WebSite/app/modules/User/views/news.latte
-   120 ../WebSite/app/modules/User/views/presentation.latte
+    65 ../WebSite/app/modules/User/views/user_availabilities.latte
    142 ../WebSite/app/modules/User/views/ffaSearch.latte
      4 ../WebSite/app/modules/User/views/user.latte
-    30 ../WebSite/app/modules/User/views/groups.latte
-    43 ../WebSite/app/modules/User/views/map.latte
-    94 ../WebSite/app/modules/User/views/editPresentation.latte
-    65 ../WebSite/app/modules/User/views/availabilities.latte
-    51 ../WebSite/app/modules/User/views/signIn.latte
-    37 ../WebSite/app/modules/User/views/setPassword.latte
-   136 ../WebSite/app/modules/User/views/preferences.latte
+   117 ../WebSite/app/modules/User/views/user_presentation.latte
+    30 ../WebSite/app/modules/User/views/user_groups.latte
+    37 ../WebSite/app/modules/User/views/user_set_password.latte
+   287 ../WebSite/app/modules/User/views/user_statistics.latte
+    51 ../WebSite/app/modules/User/views/user_sign_in.latte
+   102 ../WebSite/app/modules/User/views/user_account.latte
     45 ../WebSite/app/modules/User/views/publish.latte
-   102 ../WebSite/app/modules/User/views/account.latte
-    97 ../WebSite/app/modules/User/views/directory.latte
-   287 ../WebSite/app/modules/User/views/statistics.latte
+   192 ../WebSite/app/modules/User/views/user_preferences.latte
+    97 ../WebSite/app/modules/User/views/users_directory.latte
+    43 ../WebSite/app/modules/User/views/users_map.latte
+    91 ../WebSite/app/modules/User/js/preferences.js
+    22 ../WebSite/app/modules/User/js/presentation.js
     53 ../WebSite/app/services/MessageService.php
     44 ../WebSite/app/services/NeedTypeService.php
     96 ../WebSite/app/services/EventService.php
     53 ../WebSite/app/services/SupplyService.php
     58 ../WebSite/app/services/NeedService.php
-    51 ../WebSite/app/services/AuthorizationService.php
+    36 ../WebSite/app/services/AuthorizationService.php
     41 ../WebSite/app/services/AttributeService.php
-   186 ../WebSite/app/services/AuthenticationService.php
+   184 ../WebSite/app/services/AuthenticationService.php
     58 ../WebSite/app/services/EmailService.php
+    12 ../WebSite/app/enums/Message.php
     28 ../WebSite/app/enums/FilterInputRule.php
      9 ../WebSite/app/enums/EventSearchMode.php
     10 ../WebSite/app/enums/EventAudience.php
-    15 ../WebSite/app/enums/Authorization.php
+    16 ../WebSite/app/enums/Authorization.php
      9 ../WebSite/app/enums/YesNo.php
     15 ../WebSite/app/enums/Period.php
     12 ../WebSite/app/enums/SurveyVisibility.php
+    15 ../WebSite/app/enums/Help.php
     10 ../WebSite/app/enums/WeekdayFormat.php
     15 ../WebSite/app/enums/ApplicationError.php
     10 ../WebSite/app/enums/TimeOfDay.php
@@ -127,15 +141,15 @@
     12 ../WebSite/app/interfaces/AttributeServiceInterface.php
     10 ../WebSite/app/interfaces/MessageServiceInterface.php
     11 ../WebSite/app/interfaces/EventServiceInterface.php
-    14 ../WebSite/app/interfaces/AuthorizationServiceInterface.php
+    11 ../WebSite/app/interfaces/AuthorizationServiceInterface.php
     11 ../WebSite/app/interfaces/NeedServiceInterface.php
      8 ../WebSite/app/interfaces/SupplyServiceInterface.php
     10 ../WebSite/app/interfaces/DatabaseMigratorInterface.php
     11 ../WebSite/app/interfaces/CrudControllerInterface.php
     38 ../WebSite/app/models/NeedDataHelper.php
    224 ../WebSite/app/models/PersonDataHelper.php
-   763 ../WebSite/app/models/LogDataHelper.php
-   596 ../WebSite/app/models/EventDataHelper.php
+   814 ../WebSite/app/models/LogDataHelper.php
+   627 ../WebSite/app/models/EventDataHelper.php
    496 ../WebSite/app/models/PersonStatisticsDataHelper.php
     18 ../WebSite/app/models/GenericDataHelper.php
     24 ../WebSite/app/models/CarouselDataHelper.php
@@ -145,14 +159,14 @@
     62 ../WebSite/app/models/ImportDataHelper.php
    195 ../WebSite/app/models/GroupDataHelper.php
     13 ../WebSite/app/models/DataHelper.php
-   302 ../WebSite/app/models/ArticleDataHelper.php
-   224 ../WebSite/app/models/Data.php
+   293 ../WebSite/app/models/ArticleDataHelper.php
+   222 ../WebSite/app/models/Data.php
     49 ../WebSite/app/models/ArwardsDataHelper.php
     37 ../WebSite/app/models/ApiNeedTypeDataHelper.php
     37 ../WebSite/app/models/database/migrators/V1ToV2Migrator.php
-    88 ../WebSite/app/models/AttributeDataHelper.php
+    89 ../WebSite/app/models/AttributeDataHelper.php
    112 ../WebSite/app/models/SurveyDataHelper.php
-    28 ../WebSite/app/models/ParticipantDataHelper.php
+    35 ../WebSite/app/models/ParticipantDataHelper.php
    205 ../WebSite/app/models/DbBrowserDataHelper.php
    125 ../WebSite/app/models/CrosstabDataHelper.php
     65 ../WebSite/app/models/ArticleTableDataHelper.php
@@ -162,7 +176,7 @@
     46 ../WebSite/app/models/ApiNeedDataHelper.php
     92 ../WebSite/app/models/DesignDataHelper.php
     84 ../WebSite/app/models/ApiEventDataHelper.php
-    23 ../WebSite/app/models/LanguagesDataHelper.php
+    47 ../WebSite/app/models/LanguagesDataHelper.php
     63 ../WebSite/app/models/PersonGroupDataHelper.php
     36 ../WebSite/app/models/TableControllerDataHelper.php
     45 ../WebSite/app/models/ArticleCrosstabDataHelper.php
@@ -172,7 +186,7 @@
     19 ../WebSite/app/apis/ImportApi.php
     83 ../WebSite/app/apis/CarouselApi.php
    145 ../WebSite/app/apis/ArticleApi.php
-   394 ../WebSite/app/apis/EventApi.php
+   395 ../WebSite/app/apis/EventApi.php
     62 ../WebSite/app/apis/AbstractApi.php
     69 ../WebSite/app/js/layout.js
     55 ../WebSite/app/js/designs/index.js
@@ -180,21 +194,19 @@
     32 ../WebSite/app/js/groups/index.js
     90 ../WebSite/app/js/eventType/index.js
    223 ../WebSite/app/js/navbar/index.js
-   198 ../WebSite/app/js/quill/script.js
+   197 ../WebSite/app/js/quill/script.js
     44 ../WebSite/app/js/registration/index.js
    134 ../WebSite/app/js/event/chat.js
    209 ../WebSite/app/js/event/detail.js
    143 ../WebSite/app/js/event/needs.js
-   539 ../WebSite/app/js/event/nextEvents.js
+   543 ../WebSite/app/js/event/nextEvents.js
     23 ../WebSite/app/js/event/guest.js
     45 ../WebSite/app/js/logs/topArticles.js
    127 ../WebSite/app/js/admin/arwards.js
     39 ../WebSite/app/js/survey/add.js
-    75 ../WebSite/app/js/user/preferences.js
    319 ../WebSite/app/js/user/carousel.js
     19 ../WebSite/app/js/user/setPassword.js
     27 ../WebSite/app/js/user/availabilities.js
-    22 ../WebSite/app/js/user/presentation.js
     55 ../WebSite/app/js/user/map.js
     86 ../WebSite/app/js/user/signIn.js
     23 ../WebSite/app/js/user/account.js
@@ -208,23 +220,23 @@
    102 ../WebSite/app/helpers/Backup.php
     28 ../WebSite/app/helpers/News.php
     36 ../WebSite/app/helpers/GravatarHandler.php
-   141 ../WebSite/app/helpers/Application.php
+   140 ../WebSite/app/helpers/Application.php
     24 ../WebSite/app/helpers/File.php
     78 ../WebSite/app/helpers/PeriodHelper.php
-   134 ../WebSite/app/helpers/ConnectedUser.php
-   136 ../WebSite/app/helpers/WebApp.php
+   147 ../WebSite/app/helpers/ConnectedUser.php
+   135 ../WebSite/app/helpers/WebApp.php
     22 ../WebSite/app/helpers/ApiImportHelper.php
     77 ../WebSite/app/helpers/Media.php
     69 ../WebSite/app/helpers/PersonPreferences.php
     54 ../WebSite/app/helpers/Params.php
     19 ../WebSite/app/helpers/Password.php
-    35 ../WebSite/app/helpers/ErrorManager.php
- 21189 total
+    77 ../WebSite/app/helpers/ErrorManager.php
+ 22323 total
 
 === Total par type de fichier ===
 Fichiers PHP :
-11040
+11639
 Fichiers Latte :
-7087
+7542
 Fichiers Javascript :
-3062
+3142

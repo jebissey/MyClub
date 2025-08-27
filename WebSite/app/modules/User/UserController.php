@@ -356,7 +356,7 @@ class UserController extends AbstractController
 
     public function editNotepad()
     {
-        if ($person = $this->connectedUser->get()->person ?? false) {
+        if ($person = $this->connectedUser->get(1)->person ?? false) {
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $this->render('User/views/user_notepad.latte', Params::getAll([
                     'notepad' => $person->Notepad,
@@ -386,7 +386,7 @@ class UserController extends AbstractController
 
     public function showDirectory()
     {
-        if ($person = $this->connectedUser->get()->person ?? false) {
+        if ($person = $this->connectedUser->get(1)->person ?? false) {
             $groupParam = $this->flight->request()->query['group'] ?? null;
             $selectedGroup = ($groupParam !== null && ctype_digit((string)$groupParam)) ? (int)$groupParam : null;
             if ($selectedGroup) $persons = (new PersonDataHelper($this->application))->getPersonsInGroupForDirectory($selectedGroup);
