@@ -341,14 +341,25 @@ INSERT INTO "Languages" VALUES (49,'comboSeparatorHome','--- Home ---','--- Accu
 INSERT INTO "Languages" VALUES (50,'comboSeparatorMessages','--- Messages ---','--- Messages ---');
 INSERT INTO "Languages" VALUES (51,'comboSeparatorErrorPages','--- Error pages ---','--- Pages d''erreur ---');
 INSERT INTO "Languages" VALUES (52,'comboSeparatorHelp','--- Help ---','--- Aides ---');
+INSERT INTO "Languages" VALUES (53,'Help_Admin','Administratror help','Aide administrateur');
+INSERT INTO "Languages" VALUES (54,'Help_designer','Designer help','Aide designer');
+INSERT INTO "Languages" VALUES (55,'Help_eventManager','Event manager help','Aide gestionnaire d''événements');
+INSERT INTO "Languages" VALUES (56,'Help_home','Home help','Aide accueil');
+INSERT INTO "Languages" VALUES (57,'Help_personManager','People manager help','Aide gestionnaire de personnes');
+INSERT INTO "Languages" VALUES (58,'Help_redactor','Redactor help','Aide rédateur');
+INSERT INTO "Languages" VALUES (59,'Help_user','User help','Aide utilisateur');
+INSERT INTO "Languages" VALUES (60,'Help_visitorInsights','Visitor insights help','Aide statistiques visiteurs');
+INSERT INTO "Languages" VALUES (61,'Help_webmaster','Webmater help','Aide webmaster');
+INSERT INTO "Languages" VALUES (62,'Home_header','Home header','En-tête d''accueil');
+INSERT INTO "Languages" VALUES (63,'Home_footer','Home footer','Pied de page d''accueil');
 INSERT INTO "Metadata" VALUES (1,'MyClub',1);
 INSERT INTO "Person" VALUES (1,'webmaster@myclub.foo','e427c26faca947919b18b797bc143a35100e4de48c34b70b26202d3a7d8e51f7','my first name','my last name','my nick name or nothing',NULL,'0',NULL,NULL,NULL,NULL,0,0,NULL,NULL,'2025-01-01',0,NULL,NULL,NULL,NULL);
 INSERT INTO "PersonGroup" VALUES (1,1,1);
 INSERT INTO "Settings" VALUES (1,'Title','title');
 INSERT INTO "Settings" VALUES (2,'LegalNotices','LegalNotices');
 INSERT INTO "Settings" VALUES (3,'SpotlightArticle','');
-INSERT INTO "Settings" VALUES (4,'Greatings','<h1 class="text-center">🚧🔧🛠️ Under Construction 🛠️🔧🚧</h1>');
-INSERT INTO "Settings" VALUES (5,'Link','<div style="text-align:center; font-size:2.4em; line-height:1.4;">
+INSERT INTO "Settings" VALUES (4,'Home_header','<h1 class="text-center">🚧🔧🛠️ Under Construction 🛠️🔧🚧</h1>');
+INSERT INTO "Settings" VALUES (5,'Home_footer','<div style="text-align:center; font-size:2.4em; line-height:1.4;">
 🚧👷‍♂️🔧👷‍♀️🚧<br>
 <b>WORK IN PROGRESS</b><br>
 🚧👷‍♀️🔧👷‍♂️🚧

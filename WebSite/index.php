@@ -98,6 +98,7 @@ mapRoute($flight, 'GET    /articles/crosstab', $articleController, 'showArticleC
 mapRoute($flight, 'GET    /publish/article/@id:[0-9]+', $articleController, 'publish');
 mapRoute($flight, 'POST   /publish/article/@id:[0-9]+', $articleController, 'publish');
 mapRoute($flight, 'GET    /redactor', $articleController, 'home');
+mapRoute($flight, 'GET    /redactor/help', $articleController, 'home');
 
 $dbBrowserController = new DbBrowserController($application);
 mapRoute($flight, 'GET    /dbbrowser', $dbBrowserController, 'index');

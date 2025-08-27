@@ -35,16 +35,18 @@ class DesignController extends AbstractController
 
     public function create()
     {
-        if ($this->connectedUser->get()->isRedactor() ?? false) {
-            $this->render('Article/views/design_create.latte', Params::getAll([
-                'groups' => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
-            ]));
+        if ($this->connectedUser->get()->isHomeDesigner() ?? false) {
+            if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+                $this->render('Article/views/design_create.latte', Params::getAll([
+                    'groups' => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
+                ]));
+            } else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
         } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function save()
     {
-        if ($this->connectedUser->get()->isRedactor() ?? false) {
+        if ($this->connectedUser->get()->isHomeDesigner() ?? false) {
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $schema = [
                     'id' => FilterInputRule::Int->value,
@@ -64,7 +66,7 @@ class DesignController extends AbstractController
                     'OnlyForMembers' => $filterValues['onlyForMembers'] ?? 1,
                     'IdGroup' => $filterValues['idGroup']
                 ];
-                $this->dataHelper->set('Design', $values, ['Id'=> $filterValues['id'] ?? throw new RuntimeException('Missing Id in file ' . __FILE__ . ' at line ' . __LINE__)]);
+                $this->dataHelper->set('Design', $values, ['Id' => $filterValues['id'] ?? throw new RuntimeException('Missing Id in file ' . __FILE__ . ' at line ' . __LINE__)]);
 
                 $this->redirect('/designs');
             } else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);

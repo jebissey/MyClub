@@ -3,6 +3,7 @@
 namespace app\modules\Webmaster;
 
 use app\enums\ApplicationError;
+use app\enums\Help;
 use app\enums\Message;
 use app\helpers\Application;
 use app\helpers\Params;
@@ -11,29 +12,22 @@ use app\modules\Common\AbstractController;
 class WebappSettingsController extends AbstractController
 {
     private $settingsKeys = [
-        'Error_403' => 'Page d\'erreur 403',
-        'Error_404' => 'Page d\'erreur 404',
-        'Error_500' => 'Page d\'erreur 500',
-
-        'Help_admin' => 'Aide administrateur',
-        'Help_designer' => 'Aide designer',
-        'Help_eventManager' => 'Aide gestionnaire d\'événements',
-        'Help_home' => 'Aide accueil',
-        'Help_personManager' => 'Aide gestionnaire de personnes',
-        'Help_user' => 'Aide utilisateur',
-        'Help_visitorInsights' => 'Aide statistiques visiteurs',
-        'Help_webmaster' => 'Aide webmaster',
-
-        'Home_footer' => 'Pied de page d\'accueil',
-        'Home_header' => 'En-tête d\'accueil',
+        'Error_403' => 'Error 403',
+        'Error_404' => 'Error 404',
+        'Error_500' => 'Error 500',
     ];
 
     public function __construct(Application $application)
     {
         parent::__construct($application);
+        foreach (Help::cases() as $case) {
+            $this->settingsKeys['Help_' . $case->name] = $this->languagesDataHelper->translate('Help_' . $case->value);
+        }
         foreach (Message::cases() as $case) {
             $this->settingsKeys['Message_' . $case->name] = $this->languagesDataHelper->translate('Message_' . $case->value);
         }
+        $this->settingsKeys['Home_header'] = $this->languagesDataHelper->translate('Home_header');
+        $this->settingsKeys['Home_footer'] = $this->languagesDataHelper->translate('Home_footer');
     }
 
     public function editSettings()

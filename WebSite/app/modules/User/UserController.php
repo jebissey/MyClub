@@ -171,8 +171,8 @@ class UserController extends AbstractController
         $this->render('Common/views/home.latte', Params::getAll([
             'latestArticle' => $latestArticle,
             'latestArticles' => $articles['latestArticles'],
-            'greatings' => $this->dataHelper->get('Settings', ['Name' => 'Greatings'], 'Value')->Value ?? '',
-            'link' => $this->dataHelper->get('Settings', ['Name' => 'Link'], 'Value')->Value ?? '',
+            'homeHeader' => $this->dataHelper->get('Settings', ['Name' => 'Home_header'], 'Value')->Value ?? '',
+            'homeFooter' => $this->dataHelper->get('Settings', ['Name' => 'Home_footer'], 'Value')->Value ?? '',
             'navItems' => $this->getNavItems($connectedUser->person ?? false),
             'publishedBy' => $articles['latestArticle']
                 && $articles['latestArticle']->PublishedBy != $articles['latestArticle']->CreatedBy ? (new PersonDataHelper($this->application))->getPublisher($articles['latestArticle']->PublishedBy) : '',

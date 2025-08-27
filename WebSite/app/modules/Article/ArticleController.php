@@ -44,6 +44,19 @@ class ArticleController extends TableController
         } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
+        public function help(): void
+    {
+        if ($this->connectedUser->get()->isAdministrator() ?? false) {
+            $this->render('Common/views/info.latte', [
+                'content' => $this->dataHelper->get('Settings', ['Name' => 'Help_redactor'], 'Value')->Value ?? '',
+                'hasAuthorization' => $this->connectedUser->get()->isRedactor() ?? false,
+                'currentVersion' => Application::VERSION,
+                'timer' => 0,
+                'previousPage' => true
+            ]);
+        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+    }
+
     public function index()
     {
         $connectedUser = $this->connectedUser->get();
