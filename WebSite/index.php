@@ -221,6 +221,8 @@ mapRoute($flight, 'POST /user/groups', $userController, 'groups');
 mapRoute($flight, 'GET  /user/help', $userController, 'help');
 mapRoute($flight, 'GET  /user/map', $userController, 'showMap');
 mapRoute($flight, 'GET  /user/news', $userController, 'showNews');
+mapRoute($flight, 'GET  /user/notepad', $userController, 'editNotepad');
+mapRoute($flight, 'POST /user/notepad', $userController, 'saveNotepad');
 mapRoute($flight, 'GET  /user/preferences', $userController, 'preferences');
 mapRoute($flight, 'POST /user/preferences', $userController, 'preferences');
 mapRoute($flight, 'GET  /user/presentation/edit', $userController, 'editPresentation');

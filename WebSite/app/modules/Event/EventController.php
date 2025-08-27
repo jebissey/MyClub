@@ -208,7 +208,7 @@ class EventController extends AbstractController
         $person = $this->connectedUser->get()->person ?? false;
         $userEmail = $person->Email ?? '';
         if ($this->dataHelper->get('Event', ['Id' => $eventId], 'Id')) {
-            $this->render('Event/views/detail.latte', Params::getAll([
+            $this->render('Event/views/event_detail.latte', Params::getAll([
                 'eventId' => $eventId,
                 'event' => $this->eventDataHelper->getEvent($eventId),
                 'attributes' => $this->eventDataHelper->getEventAttributes($eventId),

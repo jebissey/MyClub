@@ -354,6 +354,36 @@ class UserController extends AbstractController
         } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
+    public function editNotepad()
+    {
+        if ($person = $this->connectedUser->get()->person ?? false) {
+            if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+                $this->render('User/views/user_notepad.latte', Params::getAll([
+                    'notepad' => $person->Notepad,
+                    'navItems' => $this->getNavItems($person),
+                ]));
+            } else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+    }
+
+    public function saveNotepad()
+    {
+        if ($person = $this->connectedUser->get()->person ?? false) {
+            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                $schema = [
+                    'content' => FilterInputRule::Html->value,
+                ];
+                $input = WebApp::filterInput($schema, $this->flight->request()->data->getData());
+                $notepad = $input['content'] ?? '???';
+
+                $this->dataHelper->set('Person', [
+                    'Notepad' => $notepad,
+                ], ['Id' => $person->Id]);
+                $this->redirect('/user');
+            } else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+    }
+
     public function showDirectory()
     {
         if ($person = $this->connectedUser->get()->person ?? false) {

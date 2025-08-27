@@ -241,6 +241,7 @@ CREATE TABLE IF NOT EXISTS "Person" (
 	"Location"	TEXT,
 	"LastSignIn"	TEXT,
 	"LastSignOut"	TEXT,
+	"Notepad"	TEXT,
 	PRIMARY KEY("Id")
 );
 CREATE TABLE IF NOT EXISTS "PersonGroup" (
@@ -340,7 +341,7 @@ INSERT INTO "Languages" VALUES (50,'comboSeparatorMessages','--- Messages ---','
 INSERT INTO "Languages" VALUES (51,'comboSeparatorErrorPages','--- Error pages ---','--- Pages d''erreur ---');
 INSERT INTO "Languages" VALUES (52,'comboSeparatorHelp','--- Help ---','--- Aides ---');
 INSERT INTO "Metadata" VALUES (1,'MyClub',1);
-INSERT INTO "Person" VALUES (1,'webmaster@myclub.foo','e427c26faca947919b18b797bc143a35100e4de48c34b70b26202d3a7d8e51f7','my first name','my last name','my nick name or nothing',NULL,'0',NULL,NULL,NULL,NULL,0,0,NULL,NULL,'2025-01-01',0,NULL,NULL,NULL);
+INSERT INTO "Person" VALUES (1,'webmaster@myclub.foo','e427c26faca947919b18b797bc143a35100e4de48c34b70b26202d3a7d8e51f7','my first name','my last name','my nick name or nothing',NULL,'0',NULL,NULL,NULL,NULL,0,0,NULL,NULL,'2025-01-01',0,NULL,NULL,NULL,NULL);
 INSERT INTO "PersonGroup" VALUES (1,1,1);
 INSERT INTO "Settings" VALUES (1,'Title','title');
 INSERT INTO "Settings" VALUES (2,'LegalNotices','LegalNotices');

@@ -108,11 +108,16 @@
                                 {foreach $participants as $participant}
                                     <li class="list-group-item">
                                         {if $participant->PersonId}
+                                        {if $participant->PersonId == $event->CreatedBy}<b>{/if}
                                         {$participant->FirstName} {$participant->LastName} {if $participant->NickName != ''}({$participant->NickName}){/if}
+                                        {if $participant->PersonId == $event->CreatedBy}</b>{/if}
                                         {elseif $participant->ContactId}
                                         {$participant->NickName}📩
                                         {/if}
                                         {if $participant->Email === $userEmail}👤{/if}
+                                        {if $participant->InPresentationDirectory}
+                                        <a href="/user/presentation/{$participant->PersonId}">ℹ️</a>
+                                        {/if}
                                     </li>
                                 {/foreach}
                             </ul>

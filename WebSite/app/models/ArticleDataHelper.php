@@ -176,25 +176,16 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
         return $stmt->fetch();
     }
 
-    public function getArticlesForRss(int $personId): array
+    public function getArticlesForRss(): array
     {
         $sql = "
-            SELECT DISTINCT Article.*
+            SELECT Article.*
             FROM Article
-            CROSS JOIN Person p
-            LEFT JOIN PersonGroup pg ON pg.IdPerson = p.Id
             WHERE Article.PublishedBy IS NOT NULL
-            AND (
-                (Article.IdGroup IS NULL AND Article.OnlyForMembers = 0)
-                OR (Article.IdGroup IS NULL AND Article.OnlyForMembers = 1 AND :personId <> 0)
-                OR (Article.IdGroup IS NOT NULL AND Article.IdGroup IN (
-                    SELECT IdGroup FROM PersonGroup WHERE IdPerson = :personId
-                ))
-            )
             ORDER BY Article.LastUpdate DESC
         ";
         $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([':personId' => $personId]);
+        $stmt->execute();
         return $stmt->fetchAll();
     }
 

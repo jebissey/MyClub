@@ -26,7 +26,7 @@ class RssController extends AbstractController
         $feed_url = $base_url . "articles-rss.xml";
         $feed_description = "Mises à jour de la liste d'articles";
 
-        $articles = (new ArticleDataHelper($this->application))->getArticlesForRss($this->connectedUser->get()->person->Id ?? 0);
+        $articles = (new ArticleDataHelper($this->application))->getArticlesForRss();
 
         header('Cache-Control: no-cache, no-store, must-revalidate'); // HTTP 1.1
         header('Pragma: no-cache'); // HTTP 1.0

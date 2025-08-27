@@ -13,16 +13,23 @@ class ParticipantDataHelper extends Data
 
     public function getEventParticipants($eventId)
     {
-        return $this->fluent->from('Participant pa')
-            ->leftJoin('Person pe ON pa.IdPerson = pe.Id')
-            ->leftJoin('Contact c ON pa.IdContact = c.Id')
-            ->where('pa.IdEvent', $eventId)
-            ->select('
+        $sql = "
+            SELECT
                 COALESCE(pe.Email, c.Email) AS Email,
                 COALESCE(pe.NickName, c.NickName) AS NickName,
-                pe.FirstName, pe.LastName, pe.Id AS PersonId, c.Id AS ContactId
-            ')
-            ->orderBy('pe.FirstName, pe.LastName, c.NickName')
-            ->fetchAll();
+                pe.FirstName,
+                pe.LastName,
+                pe.Id AS PersonId,
+                pe.InPresentationDirectory,
+                c.Id AS ContactId
+            FROM Participant pa
+            LEFT JOIN Person pe ON pa.IdPerson = pe.Id
+            LEFT JOIN Contact c ON pa.IdContact = c.Id
+            WHERE pa.IdEvent = :eventId
+            ORDER BY pe.FirstName, pe.LastName, c.NickName
+        ";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([':eventId' => $eventId]);
+        return $stmt->fetchAll();
     }
 }

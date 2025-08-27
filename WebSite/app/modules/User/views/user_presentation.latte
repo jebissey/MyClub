@@ -1,7 +1,5 @@
 {extends "user.latte"}
 
-{/block}
-
 {block head}
 <style>
 .presentation-content img.img-left {
@@ -19,7 +17,6 @@
     max-width: 100%;
     height: auto;
 }
-
 </style>
 {/block}
 
@@ -115,6 +112,6 @@
     <script>
             const locationStr = {$person->Location};
     </script>
-    <script src="/app/js/user/presentation.js"></script>
+    <script src="/app/modules/User/js/presentation.js"></script>
 {/if}
 {/block}

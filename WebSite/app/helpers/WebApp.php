@@ -2,8 +2,6 @@
 
 namespace app\helpers;
 
-use RuntimeException;
-
 use app\enums\FilterInputRule;
 
 class WebApp
