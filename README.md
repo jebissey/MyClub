@@ -23,6 +23,12 @@ It helps clubs manage **articles, events, and members** with an intuitive interf
   - [3) Log in with the administrator account and change email/password](#3-log-in-with-the-administrator-account-and-change-emailpassword)
   - [4) Create groups with authorizations](#4-create-groups-with-authorizations)
     - [Initial account \& Webmaster group (fresh installs)](#initial-account--webmaster-group-fresh-installs)
+  - [5) Fill in the settings \[HomeDesigner\]](#5-fill-in-the-settings-homedesigner)
+  - [6) Create event types and requirements \[EventDesigner\]](#6-create-event-types-and-requirements-eventdesigner)
+  - [7) Create navigation bars \[NavbarDesigner\]](#7-create-navigation-bars-navbardesigner)
+  - [8) Create self-registration and authorizationless groups \[PersonManager\]](#8-create-self-registration-and-authorizationless-groups-personmanager)
+  - [9) Write articles \[Redactor\]](#9-write-articles-redactor)
+  - [10) Publish public articles \[Editor\]](#10-publish-public-articles-editor)
 - [❓ FAQ](#-faq)
   - [If you encounter this error…](#if-you-encounter-this-error)
     - [“Error: could not find driver”](#error-could-not-find-driver)
@@ -50,16 +56,17 @@ Security is based on **groups**. There are three types:
 
 ### Available Authorizations  
 
-| Authorization       | Description                                                                 |
-| ------------------- | --------------------------------------------------------------------------- |
-| **Webmaster**       | Full administrative access to all features and settings of the application. |
-| **PersonManager**   | Manage members and profiles (create, edit, delete, import/export).          |
-| **EventManager**    | Create, edit, and manage events (scheduling, location, participants).       |
-| **Redactor**        | Write content and publish for restricted audiences (not public).            |
-| **Editor**          | Review, approve, publish/unpublish any content, including public articles.  |
-| **HomeDesigner**    | Customize the homepage layout, banners, and featured sections.              |
-| **EventDesigner**   | Define event types and their attributes, assign to groups.                  |
-| **VisitorInsights** | Access visitor statistics and analytics.                                    |
+| Authorization       | Description                                                                  |
+| ------------------- | ---------------------------------------------------------------------------- |
+| **Webmaster**       | Full administrative access. Manage groups with authorizations                |
+| **PersonManager**   | Manage members and their groups without authorization (CRUD, import/export). |
+| **EventManager**    | Create, edit, and manage events (scheduling, location, participants).        |
+| **Editor**          | Can publish public articles.                                                 |
+| **Redactor**        | Write content and publish for restricted audiences (not public).             |
+| **EventDesigner**   | Define event types and their attributes, assign to groups.                   |
+| **HomeDesigner**    | Customize the homepage layout, and all other settings.                       |
+| **NavbarDesigner**  | Define navigation bars.                                                      |
+| **VisitorInsights** | Access visitor statistics and analytics.                                     |
 
 ---
 
@@ -108,9 +115,38 @@ Security is based on **groups**. There are three types:
 ### Initial account & Webmaster group (fresh installs)
 On a fresh installation the application creates **one initial user account** and **one group** named **Webmaster**.  
 - The initial administrator account **cannot be deleted** and is the **only member** of the `Webmaster` group by default.  
-- The `Webmaster` group holds the highest level of access and should be treated as a recovery/guardian account.
+- The `Webmaster` group holds the highest level of access but not enable to do everything directly.
 
 **Recommended first step:** create a new group (e.g., `Full`) that is granted **all available authorizations**, then add your regular admin user(s) to that group. This lets you use a daily admin account for routine tasks while keeping the original initial account reserved for emergency recovery and sensitive operations.
+
+## 5) Fill in the settings [HomeDesigner]
+- Go to **Administration zone > Designer** 🎨🔧
+
+- Configure the **general settings** of the application (title, description, logo, etc.).
+
+## 6) Create event types and requirements [EventDesigner]
+- Go to **Administration zone > Designer** 🎨🗓️/📋
+- **Create event types** (walks, meetings, trainings, etc.).
+- Define **requirements and constraints** for each type (duration, participants, equipment, etc.).
+
+## 7) Create navigation bars [NavbarDesigner]
+- Go to **Administration zone > NavbarDesigner** 🎨📑
+- **Design and customize navigation bars** for different user roles.
+
+## 8) Create self-registration and authorizationless groups [PersonManager]
+- Go to **Administration zone > PersonManager** 👥
+- **Create groups without authorizations**, marked as self-registrable.
+- Add users to these groups.
+
+## 9) Write articles [Redactor]
+- Go to **Administration zone > Redactor** ✍️
+- **Write and manage articles** (drafts, editing, formatting).
+- **Review and publish articles** to make them visible to groups or users but not the public.
+
+## 10) Publish public articles [Editor]
+- Go to **Articles list > Editor** 📢
+- **Review and publish articles** to make them visible to groups, users or the public.
+
 
 ---
 
