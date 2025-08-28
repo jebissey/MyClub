@@ -72,7 +72,8 @@ Security is based on **groups**. There are three types:
 
 ## 🧪 Automated Route Testing  
 
-- **150+ routes** are automatically discovered and tested.  
+- **160+ routes** are automatically discovered and tested.
+- **1500+ routes** are simuled to test each route with each authorization.
 - For routes with parameters (`@`), the **JsonGetParameters** column must exist in the test database.  
 - For **POST** routes, the **JsonPostParameters** column must be filled.  
 - **Authentication** can be simulated via the **JsonConnectedUser** column.  
