@@ -2,6 +2,7 @@
 
 namespace test\Core;
 
+use RuntimeException;
 use test\Interfaces\AuthenticatorInterface;
 use test\Interfaces\HttpClientInterface;
 use test\Interfaces\MyclubDataRepositoryInterface;
@@ -27,7 +28,7 @@ class TestExecutor
         private TestConfiguration $config
     ) {}
 
-    public function testRoutes(array $routes, ?int $testFilter): array
+    public function testRoutes(array $routes, ?int $testFilter, bool $stop): array
     {
         $totalRoutes = count($routes);
         $results = [];
@@ -35,7 +36,7 @@ class TestExecutor
             $routeNumber = $i + 1;
             if ($testFilter === null || $testFilter === $routeNumber) {
                 $this->reporter->diplayTest($routeNumber, $totalRoutes, $route->method, $route->originalPath);
-                $tests = $this->runRouteTests($route, $routeNumber);
+                $tests = $this->runRouteTests($route, $routeNumber, null, $stop);
                 $results = array_merge($results, $tests);
                 foreach ($tests as $test) {
                     $this->reporter->diplayResult($test->route->testedPath, $test->response->httpCode, $test->response->responseTimeMs, []);
@@ -46,7 +47,7 @@ class TestExecutor
         return $results;
     }
 
-    public function testSimulations(array $simulations, ?int $simuFilter): array
+    public function testSimulations(array $simulations, ?int $simuFilter, bool $stop): array
     {
         $totalSimulations = count($simulations);
         $results = [];
@@ -54,7 +55,7 @@ class TestExecutor
             $simuNumber = $i + 1;
             if ($simuFilter === null || $simuFilter === $simuNumber) {
                 $this->reporter->diplayTest($simuNumber, $totalSimulations, $simulation->route->method, $simulation->route->originalPath);
-                $tests = $this->runRouteTests($simulation->route, $simulation->number, $simulation);
+                $tests = $this->runRouteTests($simulation->route, $simulation->number, $simulation, $stop);
                 $results = array_merge($results, $tests);
                 $this->reporter->diplayResult($tests[0]->route->testedPath, $tests[0]->response->httpCode, $tests[0]->response->responseTimeMs, $simulation->postParams);
             }
@@ -78,7 +79,7 @@ class TestExecutor
     }
 
     #region Private functions
-    private function runRouteTests(Route $route, int $routeNumber, ?Simulation $simulation = null): array
+    private function runRouteTests(Route $route, int $routeNumber, ?Simulation $simulation, bool $stop): array
     {
         if ($simulation == null) {
             $testData = $this->repo->getTestDataForRoute($route->originalPath, $route->method);
@@ -104,13 +105,14 @@ class TestExecutor
                 $response = $this->http->request($route->method, $url, [
                     'postfields' => json_decode($test['JsonPostParameters'], true)
                 ]);
-                $this->validateResponse($routeNumber, $test, $response);
+                $this->validateResponse($routeNumber, $test, $response, $stop);
                 $results[] = new TestResult($route, $response, $routeNumber);
                 if ($test['Query'] != null) {
                     $response = $this->myClub->executeQuery($test['Query']);
                     $jsonResponse = json_encode($response, JSON_UNESCAPED_UNICODE);
                     if ($jsonResponse != $test['QueryExpectedResponse']) {
                         $this->responseErrors[] = $this->reporter->error("Unexpected query response for test {$routeNumber}: {$test['Method']} {$test['Uri']}  \nexpected: {$test['QueryExpectedResponse']} \nreceived: {$jsonResponse}");
+                        if ($stop) throw new StopRequestedException();
                     }
                 }
             }
@@ -133,11 +135,12 @@ class TestExecutor
         return true;
     }
 
-    private function validateResponse(int $routeNumber, array $test, $response): void
+    private function validateResponse(int $routeNumber, array $test, $response, bool $stop): void
     {
         $result = $this->responseValidator->validate($response->httpCode, $test['ExpectedResponseCode']);
         if (!$result->isValid) {
             $this->responseErrors[] = $this->reporter->error("Unexpected response for test {$routeNumber}: {$test['Method']} {$test['Uri']} ; expected: {$test['ExpectedResponseCode']}, received: {$response->httpCode}");
+            if ($stop) throw new StopRequestedException();
         }
     }
 }

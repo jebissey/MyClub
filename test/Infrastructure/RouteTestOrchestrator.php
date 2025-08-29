@@ -2,6 +2,7 @@
 
 namespace test\Infrastructure;
 
+use test\Core\StopRequestedException;
 use test\Core\TestExecutor;
 use test\Core\TestResult;
 use test\Core\TestSummary;
@@ -18,28 +19,37 @@ class RouteTestOrchestrator
         private TestReporterInterface $reporter,
     ) {}
 
-    public function runTests(string $routeFilePath, ?int $test = null, ?int $simu = null): array
-    {
-        $results = [];
-        if ($simu == null) {
+public function runTests(string $routeFilePath, ?int $test, ?int $simu, bool $stop): array
+{
+    $results = [];
+    try {
+        if ($simu === null) {
             $this->reporter->sectionTitle("Routes extraction");
             $routes = $this->routeExtractor->extractRoutes($routeFilePath);
             $totalRoutes = count($routes);
             echo "Found {$totalRoutes} routes.\n";
             echo str_repeat('-', 80) . "\n";
-            $results = $this->executor->testRoutes($routes, $test);
+            $results = $this->executor->testRoutes($routes, $test, $stop);
         }
-        if ($test == null) {
+        if ($test === null) {
             $this->reporter->sectionTitle("Simulations extraction");
             $simulations = $this->simulationExtractor->extract();
             $totalSimulations = count($simulations);
             echo "Found {$totalSimulations} simulations.\n";
             echo str_repeat('-', 80) . "\n";
-            $results = array_merge($results, $this->executor->testSimulations($simulations, $simu));
+            $results = array_merge(
+                $results,
+                $this->executor->testSimulations($simulations, $simu, $stop)
+            );
         }
-        $this->reporter->displaySummary($this->summaryGenerator($results));
-        return $results;
+    } catch (StopRequestedException $e) {
+        echo "⚠️ Execution stopped: " . $e->getMessage() . "\n";
+    } catch (\Exception $e) {
+        echo "❌ Unexpected error: " . $e->getMessage() . "\n";
     }
+    $this->reporter->displaySummary($this->summaryGenerator($results));
+    return $results;
+}
 
     #region Private methods
     private function summaryGenerator(array $results): TestSummary

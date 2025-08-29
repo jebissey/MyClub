@@ -13,15 +13,16 @@ function printHelp(): void
     echo <<<EOT
 Usage: php route_tester.php [options]
 Options:
-  --base-url=URL      URL de base (défaut: http://localhost:8000)
-  --timeout=SECONDS   Timeout en secondes (défaut: 5)
-  --routes-file=FILE  Fichier contenant les routes (défaut: index.php)
-  --db-path=PATH      Chemin vers la base de données SQLite
-  --export-json       Exporter les résultats en JSON
-  --export-csv        Exporter les résultats en CSV
-  --help              Afficher cette aide
-  --test=n°           Faire uniquement le test demandé
-  --simu=n°           Faire uniquement la simulation demandée
+  --base-url=URL      Base URL  (default: http://localhost:8000)
+  --timeout=SECONDS   Timeout in secondes (default: 5)
+  --routes-file=FILE  File with routes (default: index.php)
+  --db-path=PATH      Path of SQLite website database
+  --export-json       Export results in JSON
+  --export-csv        Export results in CSV
+  --help              Display this help
+  --test=n°           Only this test
+  --simu=n°           Only this simulation
+  --stop              Stop on first error
 EOT;
 }
 
@@ -36,9 +37,10 @@ function main(): int
         'export-csv',
         'help',
         'test:',
-        'simu:'
+        'simu:',
+        'stop'
     ]);
-    if (isset($options['help']) || isset($options['h'])) {
+    if (isset($options['help'])) {
         printHelp();
         return 0;
     }
@@ -56,15 +58,17 @@ function main(): int
     $dbWebSitePath   = $options['db-path'] ?? __DIR__ . '/../WebSite/data/MyClub.sqlite';
     if (!CurrentWebSite::backup($dbWebSitePath)) throw new InvalidArgumentException("File $dbWebSitePath doesn't exist");
     if (!CurrentWebSite::remove($dbWebSitePath)) throw new InvalidArgumentException("File $dbWebSitePath doesn't removed");
+    $stop = isset($options['stop']) ? true : false;
     try {
         echo "Configuration:\n";
-        echo "  URL de base: {$config->baseUrl}\n";
+        echo "  Base URL: {$config->baseUrl}\n";
         echo "  Timeout: {$config->timeout} secondes\n";
-        echo "  Fichier de routes: $routeFile\n";
-        echo "  Base de données: " . ($dbTestsPath ?: "Non spécifiée") . "\n\n";
+        echo "  File with routes: {$routeFile}\n";
+        echo "  Data base: " . ($dbTestsPath ?: "Not specified") . "\n";
+        echo "  Stop on error: " . ($stop ? 'true' : 'false') . "\n";
 
         $orchestrator = RouteTestFactory::create($config, $dbTestsPath, $dbMyClubPath);
-        $results = $orchestrator->runTests($routeFile, $test, $simu);
+        $results = $orchestrator->runTests($routeFile, $test, $simu, $stop);
 
         if ($exportJson) (new JsonTestExporter())->export($results, 'route_test_results.json');
         if ($exportCsv) (new CsvTestExporter())->export($results, 'route_test_results.csv');

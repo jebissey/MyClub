@@ -24,6 +24,18 @@ class CurlHttpClient implements HttpClientInterface
         $ch = curl_init();
         $fullUrl = $this->buildFullUrl($url);
         $curlOptions = $this->buildCurlOptions($method, $fullUrl, $options);
+
+        $path = parse_url($url, PHP_URL_PATH) ?? '';
+        if (str_starts_with($path, '/api/')) {
+            if (isset($options['postfields'])) {
+                $json = json_encode($options['postfields'], JSON_UNESCAPED_UNICODE);
+                $curlOptions[CURLOPT_POSTFIELDS] = $json;
+                $headers = $options['headers'] ?? [];
+                $headers[] = 'Content-Type: application/json';
+                $curlOptions[CURLOPT_HTTPHEADER] = $headers;
+            }
+        }
+
         $curlOptions[CURLOPT_FAILONERROR] = false;
         $receivedData = '';
         $curlOptions[CURLOPT_WRITEFUNCTION] = function ($ch, $data) use (&$receivedData) {
