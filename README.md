@@ -98,7 +98,7 @@ Security is based on **groups**. There are three types:
 > This quick guide will take you from a freshly downloaded archive to a running and secured instance.
 
 ## 1) Download the latest release
-- Get the last relase [(https://github.com/jebissey/MyClub/releases)]here.  
+- Get the last relase [here](https://github.com/jebissey/MyClub/releases).  
 
 ## 2) Upload to your hosting
 - Unpack the archive **locally** and then **upload** *WebSite* files to your hosting.
