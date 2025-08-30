@@ -59,8 +59,7 @@ abstract class Data
     {
         $this->validateTableName($table);
         try {
-            if (empty($where)) throw new PDOException("Conditions WHERE requises pour DELETE");
-
+            if (empty($where)) throw new PDOException("DELETE requires WHERE conditions");
             $conditions = [];
             $params = [];
             foreach ($where as $field => $value) {
@@ -70,10 +69,13 @@ abstract class Data
 
             $sql = "DELETE FROM \"{$table}\" WHERE " . implode(' AND ', $conditions);
             $stmt = $this->pdo->prepare($sql);
-            $result = $stmt->execute($params);
-            return $result ? $stmt->rowCount() : false;
+            $stmt->execute($params);
+            return $stmt->rowCount();
         } catch (PDOException $e) {
-            $this->application->getErrorManager()->raise(ApplicationError::Error, 'Database error: ' . $e->getMessage() . ' in file ' . __FILE__ . ' at line ' . __LINE__);
+            $this->application->getErrorManager()->raise(
+                ApplicationError::Error,
+                'Database error: ' . $e->getMessage() . ' in file ' . __FILE__ . ' at line ' . __LINE__
+            );
             throw $e;
         }
     }

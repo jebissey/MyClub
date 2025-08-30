@@ -2,7 +2,7 @@
 
 namespace app\models;
 
-use Exception;
+use app\exceptions\UnauthorizedAccessException;
 
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
@@ -16,65 +16,69 @@ class MessageDataHelper extends Data implements NewsProviderInterface
         parent::__construct($application);
     }
 
-    public function addMessage($eventId, $personId, $text)
+    public function addMessage(int $eventId, int $personId, string $text): int|false
     {
-        $messageId = $this->fluent->insertInto(
-            'Message',
-            [
-                'EventId'  => $eventId,
-                'PersonId' => $personId,
-                'Text'     => $text,
-                'From'     => 'User'
-            ]
-        )->execute();
+        $messageId = $this->set('Message', [
+            'EventId'  => $eventId,
+            'PersonId' => $personId,
+            'Text'     => $text,
+            '"From"'     => 'User'
+        ]);
         return $messageId;
     }
 
-    public function addWebAppMessages($eventId, $participants, $text): array
+    public function addWebAppMessages(int $eventId, array $participants, string $text): array
     {
         $bccList = [];
         foreach ($participants as $participant) {
             $bccList[] = $participant->Email;
-            $this->fluent->insertInto('Message')
-                ->values([
-                    'EventId' => $eventId,
-                    'PersonId' => $participant->Id,
-                    'Text' => $text,
-                    '"From"' => 'Webapp'
-                ])
-                ->execute();
+            $this->set('Message', [
+                'EventId' => $eventId,
+                'PersonId' => $participant->Id,
+                'Text' => $text,
+                '"From"' => 'Webapp'
+            ]);
         }
         return $bccList;
     }
 
-    public function deleteMessage($messageId, $personId)
+    public function deleteMessage(int $messageId, int $personId): bool
     {
-        $message = $this->fluent->from('Message')->select('PersonId')->where('Id', $messageId)->fetch();
+        $message = $this->get('Message', ['Id', $messageId], 'PersonId');
         if (!$message || $message->PersonId != $personId) {
-            throw new Exception("Vous n'êtes pas autorisé à supprimer ce message");
+            throw new UnauthorizedAccessException("Vous n'êtes pas autorisé à supprimer ce message");
         }
-        $this->fluent->deleteFrom('Message')->where('Id', $messageId)->execute();
-        return true;
+        $result = $this->delete('Message', ['Id', $messageId]);
+        return $result > 0;
     }
 
-    public function getEventMessages($eventId)
+    public function getEventMessages(int $eventId): array
     {
-        return $this->fluent
-            ->from('Message')
-            ->select('Message.*, Person.FirstName, Person.LastName, Person.NickName, Person.Avatar, Person.UseGravatar')
-            ->leftJoin('Person ON Message.PersonId = Person.Id')
-            ->where('EventId', $eventId)
-            ->orderBy('Message.Id ASC')
-            ->fetchAll();
+        $sql = "
+            SELECT 
+                Message.*,
+                Person.FirstName,
+                Person.LastName,
+                Person.NickName,
+                Person.Avatar,
+                Person.UseGravatar
+            FROM Message
+            LEFT JOIN Person ON Message.PersonId = Person.Id
+            WHERE Message.EventId = :eventId
+            ORDER BY Message.Id ASC
+        ";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([':eventId' => $eventId]);
+        return $stmt->fetchAll();
     }
 
-    public function updateMessage($messageId, $personId, $text)
+    public function updateMessage(int $messageId, int $personId, string $text): true
     {
-        $message = $this->fluent->from('Message')->select('PersonId')->where('Id', $messageId)->fetch();
+        $message = $this->get('Message', ['Id', $messageId], 'PersonId');
         if (!$message || $message->PersonId != $personId) {
-            throw new Exception("Vous n'êtes pas autorisé à modifier ce message");
+            throw new UnauthorizedAccessException("Vous n'êtes pas autorisé à modifier ce message");
         }
-        $this->fluent->update('Message')->set(['Text' => $text, 'LastUpdate' =>  date('Y-m-d H:i:s')])->where('Id', $messageId)->execute();
+        $this->set('Message', ['Text' => $text, 'LastUpdate' =>  date('Y-m-d H:i:s')], ['Id', $messageId]);
         return true;
     }
 
@@ -92,9 +96,7 @@ class MessageDataHelper extends Data implements NewsProviderInterface
             ORDER BY m.LastUpdate DESC
         ";
         $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([
-            ':searchFrom' => $searchFrom
-        ]);
+        $stmt->execute([':searchFrom' => $searchFrom]);
         $messages = $stmt->fetchAll();
         foreach ($messages as $message) {
             $news[] = [

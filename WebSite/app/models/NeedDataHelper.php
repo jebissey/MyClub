@@ -3,6 +3,7 @@
 namespace app\models;
 
 use app\helpers\Application;
+use RuntimeException;
 
 class NeedDataHelper extends Data
 {
@@ -34,5 +35,22 @@ class NeedDataHelper extends Data
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':needTypeId' => $needTypeId]);
         return $stmt->fetchAll();
+    }
+
+    public function countForNeedType(int $needTypeid): int
+    {
+        return count($this->gets('Need', ['IdNeedType' => $needTypeid]));
+    }
+
+    public function delete_(int $id): void
+    {
+        $this->delete('Need', ['Id' => $id]);
+    }
+
+    public function insertOrUpdate(?int $id, array $needData): int
+    {
+        if ($id !== null) $this->set('Need', $needData, ['Id' => $id]);
+        else $id =  $this->set('Need', $needData);
+        return  $id;
     }
 }

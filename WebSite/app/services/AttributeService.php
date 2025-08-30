@@ -34,8 +34,8 @@ class AttributeService implements AttributeServiceInterface
         return $this->attributeDataHelper->getAttributesOf($eventTypeId);
     }
 
-    public function updateAttribute(array $data): array
+    public function updateAttribute(array $data): void
     {
-        return $this->attributeDataHelper->update($data);
+        $this->attributeDataHelper->update($data);
     }
 }

@@ -4,41 +4,36 @@ namespace app\services;
 
 use InvalidArgumentException;
 
+use app\enums\ApplicationError;
 use app\interfaces\NeedTypeServiceInterface;
+use app\models\NeedDataHelper;
+use app\models\NeedTypeDataHelper;
+use app\valueObjects\ApiResponse;
 
 class NeedTypeService implements NeedTypeServiceInterface
 {
-    private $apiNeedTypeDataHelper;
-    private $apiNeedDataHelper;
+    private $needTypeDataHelper;
+    private $needDataHelper;
 
-    public function __construct($apiNeedTypeDataHelper, $apiNeedDataHelper)
+    public function __construct(NeedTypeDataHelper $needTypeDataHelper, NeedDataHelper $needDataHelper)
     {
-        $this->apiNeedTypeDataHelper = $apiNeedTypeDataHelper;
-        $this->apiNeedDataHelper = $apiNeedDataHelper;
+        $this->needTypeDataHelper = $needTypeDataHelper;
+        $this->needDataHelper = $needDataHelper;
     }
 
-    public function deleteNeedType(int $id): array
+    public function deleteNeedType(int $id): ApiResponse
     {
-        if (!$id) {
-            throw new \InvalidArgumentException('Missing Id parameter');
-        }
+        if (!$id) throw new InvalidArgumentException('Missing Id parameter');
 
-        $countNeeds = $this->apiNeedDataHelper->countForNeedType($id);
-        if ($countNeeds > 0) {
-            return [
-                'success' => false,
-                'message' => 'Ce type de besoin est associé à ' . $countNeeds . ' besoin(s) et ne peut pas être supprimé'
-            ];
-        }
-
-        return $this->apiNeedTypeDataHelper->delete_($id);
+        $countNeeds = $this->needDataHelper->countForNeedType($id);
+        if ($countNeeds > 0) return new ApiResponse(false, ApplicationError::BadRequest->value, [], 'Ce type de besoin est associé à ' . $countNeeds . ' besoin(s) et ne peut pas être supprimé');
+        return new ApiResponse(true, ApplicationError::Ok->value, ['result' => $this->needTypeDataHelper->delete_($id)]);
     }
 
-    public function saveNeedType(array $data): array
+    public function saveNeedType(array $data): ApiResponse
     {
         $name = $data['name'] ?? '';
-        if (empty($name)) throw new InvalidArgumentException("Missing parameter name");
-
-        return $this->apiNeedTypeDataHelper->insertOrUpdate($data['id'] ?? '', $name);
+        if ($name === '') throw new InvalidArgumentException("Missing parameter name");
+        return new ApiResponse(true, ApplicationError::Ok->value, ['Id' => $this->needTypeDataHelper->insertOrUpdate($data['id'], $name)]);
     }
 }

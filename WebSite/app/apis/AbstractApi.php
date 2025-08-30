@@ -4,6 +4,7 @@ namespace app\apis;
 
 use flight;
 use Latte\Engine as LatteEngine;
+use Throwable;
 
 use app\enums\ApplicationError;
 use app\helpers\Application;
@@ -35,19 +36,24 @@ abstract class AbstractApi
         return json_decode($json, true) ?? [];
     }
 
-    protected function renderError(string $message): void
+    protected function renderJson(array $data, bool $success, int $statusCode): void
     {
-        $this->renderJson(['success' => false, 'message' => $message], ApplicationError::Error->value);
-    }
-
-    protected function renderJson(array $response, int $statusCode = ApplicationError::Ok->value): void
-    {
-        http_response_code($statusCode);
         header('Content-Type: application/json');
+        http_response_code($statusCode);
+        $response = array_merge(['success' => $success], $data);
         echo json_encode($response);
         if (ob_get_level()) ob_end_flush();
         flush();
         Flight::stop();
+    }
+
+    protected function renderJsonError(Throwable $e, int $statusCode): void
+    {
+        $this->renderJson(
+            ['error' => $e->getMessage()],
+            false,
+            $statusCode
+        );
     }
 
     protected function renderPartial(string $template, array $params = []): void
@@ -57,6 +63,6 @@ abstract class AbstractApi
 
     protected function renderUnauthorized(): void
     {
-        $this->renderJson(['success' => false, 'message' => 'User not allowed'], ApplicationError::Forbidden->value);
+        $this->renderJson(['message' => 'User not allowed'], false, ApplicationError::Forbidden->value);
     }
 }

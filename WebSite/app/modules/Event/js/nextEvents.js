@@ -70,9 +70,7 @@ document.addEventListener('DOMContentLoaded', function () {
             .then(data => {
                 if (data.success && data.event && data.attributes) {
                     openUpdateModal(data.event, data.attributes);
-                } else {
-                    alert('Erreur lors de la récupération des détails de l\'événement');
-                }
+                } else alert('Erreur lors de la récupération des détails de l\'événement');
             })
             .catch(error => {
                 console.error('Erreur:', error);
@@ -108,18 +106,13 @@ document.addEventListener('DOMContentLoaded', function () {
             loadAttributesByEventType(selectedEventTypeId);
             selectedAttributes = [];
             attributesList.innerHTML = '';
-        } else {
-            availableAttributesSelect.innerHTML = '<option value="">Sélectionnez d\'abord un type d\'événement</option>';
-        }
+        } else availableAttributesSelect.innerHTML = '<option value="">Sélectionnez d\'abord un type d\'événement</option>';
     });
 
     needTypeInput.addEventListener('change', function () {
         const selectedNeedTypeId = this.value;
-        if (selectedNeedTypeId) {
-            loadNeedsByNeedType(selectedNeedTypeId);
-        } else {
-            availableAttributesSelect.innerHTML = '<option value="">Sélectionnez d\'abord un type de besoin</option>';
-        }
+        if (selectedNeedTypeId) loadNeedsByNeedType(selectedNeedTypeId);
+        else availableAttributesSelect.innerHTML = '<option value="">Sélectionnez d\'abord un type de besoin</option>';
     });
 
     const availableAttributesSelect = document.getElementById('availableAttributesSelect');

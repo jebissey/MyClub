@@ -34,11 +34,8 @@ document.addEventListener('DOMContentLoaded', function () {
         })
             .then(response => response.json())
             .then(data => {
-                if (data.success) {
-                    location.reload();
-                } else {
-                    alert('Erreur: ' + data.message);
-                }
+                if (data.success) location.reload();
+                else alert('Erreur: ' + data.message);
             })
             .catch(error => {
                 console.error('Error:', error);

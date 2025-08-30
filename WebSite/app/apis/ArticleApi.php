@@ -28,9 +28,9 @@ class ArticleApi extends AbstractApi
     {
         if ($this->connectedUser->get()->isRedactor() ?? false) {
             if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
-                $this->renderJson($this->media->deleteFile($year, $month, $filename));
-            } else $this->renderJson(['success' => false, 'message' => 'Bad request method'], ApplicationError::MethodNotAllowed->value);
-        } else $this->renderJson(['success' => false, 'message' => 'User not allowed'], ApplicationError::Forbidden->value);
+                $this->renderJson($this->media->deleteFile($year, $month, $filename), true, ApplicationError::Ok->value);
+            } else $this->renderJson(['message' => 'Bad request method'], false, ApplicationError::MethodNotAllowed->value);
+        } else $this->renderJson(['message' => 'User not allowed'], false, ApplicationError::Forbidden->value);
     }
 
     public function designVote()
@@ -38,9 +38,9 @@ class ArticleApi extends AbstractApi
         if ($this->connectedUser->get()->isRedactor() ?? false) {
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 (new DesignDataHelper($this->application))->insertOrUpdate(json_decode(file_get_contents('php://input'), true), $this->connectedUser->person->Id);
-                $this->renderJson(['success' => true]);
-            } else $this->renderJson(['success' => false, 'message' => 'Bad request method'], ApplicationError::MethodNotAllowed->value);
-        } else $this->renderJson(['success' => false, 'message' => 'User not allowed'], ApplicationError::Forbidden->value);
+                $this->renderJson([], true, ApplicationError::Ok->value);
+            } else $this->renderJson(['message' => 'Bad request method'], false, ApplicationError::MethodNotAllowed->value);
+        } else $this->renderJson(['message' => 'User not allowed'], false, ApplicationError::Forbidden->value);
     }
 
     public function saveSurveyReply()
@@ -51,13 +51,13 @@ class ArticleApi extends AbstractApi
                 $data = json_decode($json, true);
                 $surveyId = $data['survey_id'] ?? null;
                 if (!$surveyId) {
-                    $this->renderJson(['success' => false, 'message' => 'Missing data'], ApplicationError::BadRequest->value);
+                    $this->renderJson(['message' => 'Missing data'], false, ApplicationError::BadRequest->value);
                     return;
                 }
                 $this->replyDataHelper->insertOrUpdate($person->Id, $surveyId, isset($data['survey_answers']) ? json_encode($data['survey_answers']) : '[]');
-                $this->renderJson(['success' => true]);
-            } else $this->renderJson(['success' => false, 'message' => 'Bad request method'], ApplicationError::MethodNotAllowed->value);
-        } else $this->renderJson(['success' => false, 'message' => 'User not allowed'], ApplicationError::Forbidden->value);
+                $this->renderJson([], true, ApplicationError::Ok->value);
+            } else $this->renderJson(['message' => 'Bad request method'], false, ApplicationError::MethodNotAllowed->value);
+        } else $this->renderJson(['message' => 'User not allowed'], false, ApplicationError::Forbidden->value);
     }
 
     public function showSurveyReplyForm($articleId)
@@ -66,7 +66,7 @@ class ArticleApi extends AbstractApi
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $survey = $this->dataHelper->get('Survey', ['IdArticle' => $articleId], 'Id, Question, Options');
                 if (!$survey) {
-                    $this->renderJson(['success' => false, 'message' => "Aucun sondage trouvé pour l'article $articleId"]);
+                    $this->renderJson(['message' => "Aucun sondage trouvé pour l'article $articleId"], false, ApplicationError::Ok->value);
                     return;
                 }
                 try {
@@ -75,47 +75,43 @@ class ArticleApi extends AbstractApi
                     $previousReply = $this->replyDataHelper->get_($survey->Id, $person->Id);
                     $previousAnswers = $previousReply ? json_decode($previousReply->Answers, true) : null;
                     $this->renderJson([
-                        'success' => true,
                         'survey' => [
                             'id' => $survey->Id,
                             'question' => $survey->Question,
                             'options' => $options,
                             'previousAnswers' => $previousAnswers
                         ]
-                    ]);
+                    ], true, ApplicationError::Ok->value);
                 } catch (Throwable $e) {
-                    $this->renderJson(['success' => false, 'message' => $e->getMessage()]);
+                    $this->renderJson(['message' => $e->getMessage()], false, ApplicationError::Ok->value);
                 }
-            } else $this->renderJson(['success' => false, 'message' => 'Bad request method'], ApplicationError::MethodNotAllowed->value);
-        } else $this->renderJson(['success' => false, 'message' => 'User not found'], ApplicationError::Forbidden->value);
+            } else $this->renderJson(['message' => 'Bad request method'], false, ApplicationError::MethodNotAllowed->value);
+        } else $this->renderJson(['message' => 'User not found'], false, ApplicationError::Forbidden->value);
     }
 
     public function uploadFile()
     {
         if ($this->connectedUser->get()->isRedactor() ?? false) {
-            $response = ['success' => false, 'message' => '', 'file' => null];
-
             if (empty($_FILES['file'])) {
-                $response['message'] = 'Aucun fichier sélectionné';
-                $this->renderJson($response);
+                $this->renderJson(['message' => 'Aucun fichier sélectionné'], false, ApplicationError::Ok->value);
                 return;
             }
             $file = $_FILES['file'];
             if ($file['error'] !== UPLOAD_ERR_OK) {
-                $response['message'] = 'Erreur lors de l\'upload: ' . $this->getUploadErrorMessage($file['error']);
-                $this->renderJson($response);
+                $response = ['message' => 'Erreur lors de l\'upload: ' . $this->getUploadErrorMessage($file['error'])];
+                $this->renderJson($response, false, ApplicationError::Ok->value);
                 return;
             }
-            $this->renderJson($this->media->uploadFile($file));
-        } else $this->renderJson(['success' => false, 'message' => 'User not allowed'], ApplicationError::Forbidden->value);
+            $this->renderJson($this->media->uploadFile($file), true, ApplicationError::Ok->value);
+        } else $this->renderJson(['message' => 'User not allowed'], false, ApplicationError::Forbidden->value);
     }
 
     public function getAuthor(int $articleId): void
     {
-        if ($articleId <= 0) $this->renderJson(['success' => false, 'message' => 'Unknown article'], ApplicationError::BadRequest->value);
+        if ($articleId <= 0) $this->renderJson(['message' => 'Unknown article'], false, ApplicationError::BadRequest->value);
         else {
             $result = (new ArticleDataHelper($this->application))->getAuthor($articleId);
-            $this->renderJson(['author' => $result ? [$result] : []]);
+            $this->renderJson(['author' => $result ? [$result] : []], true, ApplicationError::Ok->value);
         }
     }
 

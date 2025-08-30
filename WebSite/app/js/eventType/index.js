@@ -26,9 +26,7 @@ function createAttribute_() {
                 document.getElementById('newAttributeName').value = '';
                 document.getElementById('newAttributeDetail').value = '';
                 document.getElementById('newAttributeColor').value = '#563d7c';
-            } else {
-                alert('Une erreur est survenue (1) : ' + data.message);
-            }
+            } else alert('Error (1): ' + data.message);
         })
         .catch(error => {
             alert('Une erreur est survenue (2) : ' + error.message);
@@ -49,11 +47,8 @@ function editAttribute(id) {
     })
         .then(response => response.json())
         .then(data => {
-            if (data.success) {
-                loadAttributesList();
-            } else {
-                alert('Une erreur est survenue 3) : ' + data.message);
-            }
+            if (data.success) loadAttributesList();
+            else alert('Une erreur est survenue 3) : ' + data.message);
         })
         .catch(error => {
             alert('Une erreur est survenue (4) : ' + error.message);

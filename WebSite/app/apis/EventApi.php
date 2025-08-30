@@ -7,6 +7,7 @@ use Throwable;
 
 use app\enums\ApplicationError;
 use app\enums\Period;
+use app\exceptions\UnauthorizedAccessException;
 use app\helpers\Application;
 use app\helpers\WebApp;
 use app\interfaces\AttributeServiceInterface;
@@ -32,7 +33,6 @@ class EventApi extends AbstractApi
     private SupplyServiceInterface $supplyService;
 
     public function __construct(
-        ApiEventDataHelper $apiEventDataHelper,
         Application $application,
         AuthorizationServiceInterface $authService,
         AttributeServiceInterface $attributeService,
@@ -44,7 +44,6 @@ class EventApi extends AbstractApi
         SupplyServiceInterface $supplyService,
     ) {
         parent::__construct($application);
-        $this->apiEventDataHelper = $apiEventDataHelper;
         $this->authService = $authService;
         $this->attributeService = $attributeService;
         $this->eventDataHelper = $eventDataHelper;
@@ -62,12 +61,16 @@ class EventApi extends AbstractApi
             $this->renderUnauthorized();
             return;
         }
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->renderJson(['message' => 'Not allowed method: ' . $_SERVER['REQUEST_METHOD'] . ' in file ' . __FILE__ . ' at line ' . __LINE__], false, ApplicationError::MethodNotAllowed->value);
+            return;
+        }
         try {
             $data = $this->getJsonInput();
             [$response, $statusCode] = $this->attributeService->createAttribute($data);
-            $this->renderJson($response, $statusCode);
+            $this->renderJson($response, true, $statusCode);
         } catch (Throwable $e) {
-            $this->renderError($e->getMessage());
+            $this->renderJsonError($e, ApplicationError::Error->value);
         }
     }
 
@@ -77,34 +80,45 @@ class EventApi extends AbstractApi
             $this->renderUnauthorized();
             return;
         }
-
+        if ($_SERVER['REQUEST_METHOD'] !== 'DELETE') {
+            $this->renderJson(['message' => 'Not allowed method: ' . $_SERVER['REQUEST_METHOD'] . ' in file ' . __FILE__ . ' at line ' . __LINE__], false, ApplicationError::MethodNotAllowed->value);
+            return;
+        }
         try {
             [$response, $statusCode] = $this->attributeService->deleteAttribute($id);
-            $this->renderJson($response, $statusCode);
+            $this->renderJson($response, true, $statusCode);
         } catch (Throwable $e) {
-            $this->renderError($e->getMessage());
+            $this->renderJsonError($e, ApplicationError::Error->value);
         }
     }
 
     public function getAttributes(): void
     {
+        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+            $this->renderJson(['message' => 'Not allowed method: ' . $_SERVER['REQUEST_METHOD'] . ' in file ' . __FILE__ . ' at line ' . __LINE__], false, ApplicationError::MethodNotAllowed->value);
+            return;
+        }
         try {
-            $this->renderJson(['success' => true, 'attributes' => $this->attributeService->getAttributes()]);
+            $this->renderJson(['attributes' => $this->attributeService->getAttributes()], true, ApplicationError::Ok->value);
         } catch (Throwable $e) {
-            $this->renderJson(['success' => false, 'message' => $e->getMessage()]);
+            $this->renderJsonError($e, ApplicationError::Error->value);
         }
     }
 
     public function getAttributesByEventType(int $eventTypeId): void
     {
+        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+            $this->renderJson(['message' => 'Not allowed method: ' . $_SERVER['REQUEST_METHOD'] . ' in file ' . __FILE__ . ' at line ' . __LINE__], false, ApplicationError::MethodNotAllowed->value);
+            return;
+        }
         if ($eventTypeId <= 0) {
-            $this->renderJson(['success' => false, 'message' => 'Unknown event type'], ApplicationError::BadRequest->value);
+            $this->renderJson(['message' => 'Unknown event type'], false, ApplicationError::BadRequest->value);
             return;
         }
         try {
-            $this->renderJson(['success' => true, 'attributes' => $this->attributeService->getAttributesByEventType($eventTypeId)]);
+            $this->renderJson(['attributes' => $this->attributeService->getAttributesByEventType($eventTypeId)], true, ApplicationError::Ok->value);
         } catch (Throwable $e) {
-            $this->renderJson(['success' => false, 'message' => $e->getMessage()]);
+            $this->renderJsonError($e, ApplicationError::Error->value);
         }
     }
 
@@ -114,13 +128,16 @@ class EventApi extends AbstractApi
             $this->renderUnauthorized();
             return;
         }
-
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->renderJson(['message' => 'Not allowed method: ' . $_SERVER['REQUEST_METHOD'] . ' in file ' . __FILE__ . ' at line ' . __LINE__], false, ApplicationError::MethodNotAllowed->value);
+            return;
+        }
         try {
             $data = $this->getJsonInput();
-            [$response, $statusCode] = $this->attributeService->updateAttribute($data);
-            $this->renderJson($response, $statusCode);
+            $this->attributeService->updateAttribute($data);
+            $this->renderJson([], true, ApplicationError::Ok->value);
         } catch (Throwable $e) {
-            $this->renderError($e->getMessage());
+            $this->renderJsonError($e, ApplicationError::Error->value);
         }
     }
 
@@ -131,11 +148,15 @@ class EventApi extends AbstractApi
             $this->renderUnauthorized();
             return;
         }
+        if ($_SERVER['REQUEST_METHOD'] !== 'DELETE') {
+            $this->renderJson(['message' => 'Not allowed method: ' . $_SERVER['REQUEST_METHOD'] . ' in file ' . __FILE__ . ' at line ' . __LINE__], false, ApplicationError::MethodNotAllowed->value);
+            return;
+        }
         try {
-            [$response, $statusCode] = $this->eventService->deleteEvent($id, $this->authService->getUserId());
-            $this->renderJson($response, $statusCode);
+            [$success, $response, $statusCode] = $this->eventService->deleteEvent($id, $this->authService->getUserId());
+            $this->renderJson($response, $success, $statusCode);
         } catch (Throwable $e) {
-            $this->renderError($e->getMessage());
+            $this->renderJsonError($e, ApplicationError::Error->value);
         }
     }
 
@@ -145,15 +166,19 @@ class EventApi extends AbstractApi
             $this->renderUnauthorized();
             return;
         }
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->renderJson(['message' => 'Not allowed method: ' . $_SERVER['REQUEST_METHOD'] . ' in file ' . __FILE__ . ' at line ' . __LINE__], false, ApplicationError::MethodNotAllowed->value);
+            return;
+        }
         try {
-            [$response, $statusCode] = $this->eventService->duplicateEvent(
+            [$success, $response, $statusCode] = $this->eventService->duplicateEvent(
                 $id,
                 $this->connectedUser->person->Id,
                 WebApp::getFiltered('mode', $this->application->enumToValues(Period::class), $_GET) ?: Period::Today->value
             );
-            $this->renderJson($response, $statusCode);
+            $this->renderJson($response, $success, $statusCode);
         } catch (Throwable $e) {
-            $this->renderError($e->getMessage());
+            $this->renderJsonError($e, ApplicationError::Error->value);
         }
     }
 
@@ -163,10 +188,15 @@ class EventApi extends AbstractApi
             $this->renderUnauthorized();
             return;
         }
+        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+            $this->renderJson(['message' => 'Not allowed method: ' . $_SERVER['REQUEST_METHOD'] . ' in file ' . __FILE__ . ' at line ' . __LINE__], false, ApplicationError::MethodNotAllowed->value);
+            return;
+        }
         try {
-            $this->renderJson($this->eventService->getEvent($id));
+            $apiResponse = $this->eventService->getEvent($id);
+            $this->renderJson([$apiResponse->data], $apiResponse->success,  $apiResponse->responseCode);
         } catch (Throwable $e) {
-            $this->renderError($e->getMessage());
+            $this->renderJsonError($e, ApplicationError::Error->value);
         }
     }
 
@@ -176,12 +206,16 @@ class EventApi extends AbstractApi
             $this->renderUnauthorized();
             return;
         }
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->renderJson(['message' => 'Not allowed method: ' . $_SERVER['REQUEST_METHOD'] . ' in file ' . __FILE__ . ' at line ' . __LINE__], false, ApplicationError::MethodNotAllowed->value);
+            return;
+        }
         try {
             $data = $this->getJsonInput();
-            [$response, $statusCode] = $this->apiEventDataHelper->update($data, $this->authService->getUserId());
-            $this->renderJson($response, $statusCode);
+            [$success, $response, $statusCode] = $this->apiEventDataHelper->update($data, $this->authService->getUserId());
+            $this->renderJson($response, $success, $statusCode);
         } catch (Throwable $e) {
-            $this->renderError($e->getMessage());
+            $this->renderJsonError($e, ApplicationError::Error->value);
         }
     }
 
@@ -189,18 +223,21 @@ class EventApi extends AbstractApi
     public function addMessage(): void
     {
         $userId = $this->authService->getUserId();
-        if (!$userId) {
+        if ($userId === 0) {
             $this->renderUnauthorized();
+            return;
+        }
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->renderJson(['message' => 'Not allowed method: ' . $_SERVER['REQUEST_METHOD'] . ' in file ' . __FILE__ . ' at line ' . __LINE__], false, ApplicationError::MethodNotAllowed->value);
             return;
         }
         try {
             $data = $this->getJsonInput();
             $this->validateMessageData($data);
-
-            $response = $this->messageService->addMessage($data['eventId'], $userId, $data['text']);
-            $this->renderJson($response);
+            $apiResponse = $this->messageService->addMessage($data['eventId'], $userId, $data['text']);
+            $this->renderJson($apiResponse->data, $apiResponse->success, $apiResponse->responseCode);
         } catch (Throwable $e) {
-            $this->renderError($e->getMessage());
+            $this->renderJsonError($e, ApplicationError::Error->value);
         }
     }
 
@@ -211,14 +248,16 @@ class EventApi extends AbstractApi
             $this->renderUnauthorized();
             return;
         }
+        if ($_SERVER['REQUEST_METHOD'] !== 'DELETE') {
+            $this->renderJson(['message' => 'Not allowed method: ' . $_SERVER['REQUEST_METHOD'] . ' in file ' . __FILE__ . ' at line ' . __LINE__], false, ApplicationError::MethodNotAllowed->value);
+            return;
+        }
         try {
             $data = $this->getJsonInput();
-            $this->validateMessageData($data);
-
-            $response = $this->messageService->deleteMessage($data['messageId'], $userId);
-            $this->renderJson($response);
+            $apiResponse = $this->messageService->deleteMessage($data['messageId'] ?? 0, $userId);
+            $this->renderJson($apiResponse->data, $apiResponse->success, $apiResponse->responseCode);
         } catch (Throwable $e) {
-            $this->renderError($e->getMessage());
+            $this->renderJsonError($e, ApplicationError::Error->value);
         }
     }
 
@@ -229,15 +268,17 @@ class EventApi extends AbstractApi
             $this->renderUnauthorized();
             return;
         }
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->renderJson(['message' => 'Not allowed method: ' . $_SERVER['REQUEST_METHOD'] . ' in file ' . __FILE__ . ' at line ' . __LINE__], false, ApplicationError::MethodNotAllowed->value);
+            return;
+        }
         try {
             $data = $this->getJsonInput();
-            if (!isset($data['messageId']) || !isset($data['text'])) {
-                throw new InvalidArgumentException('Données manquantes');
-            }
-            $response = $this->messageService->updateMessage($data['messageId'], $userId, $data['text']);
-            $this->renderJson($response);
+            if (!isset($data['messageId']) || !isset($data['text'])) throw new InvalidArgumentException('Données manquantes');
+            $apiResponse = $this->messageService->updateMessage($data['messageId'], $userId, $data['text']);
+            $this->renderJson($apiResponse->data, $apiResponse->success, $apiResponse->responseCode);
         } catch (Throwable $e) {
-            $this->renderError($e->getMessage());
+            $this->renderJsonError($e, ApplicationError::Error->value);
         }
     }
 
@@ -248,20 +289,33 @@ class EventApi extends AbstractApi
             $this->renderUnauthorized();
             return;
         }
+        if ($_SERVER['REQUEST_METHOD'] !== 'DELETE') {
+            $this->renderJson(['message' => 'Not allowed method: ' . $_SERVER['REQUEST_METHOD'] . ' in file ' . __FILE__ . ' at line ' . __LINE__], false, ApplicationError::MethodNotAllowed->value);
+            return;
+        }
         try {
-            [$response, $statusCode] = $this->needService->deleteNeed($id);
-            $this->renderJson($response, $statusCode);
+            $apiResponse = $this->needService->deleteNeed($id);
+            $this->renderJson($apiResponse->data, $apiResponse->success, $apiResponse->responseCode);
         } catch (Throwable $e) {
-            $this->renderError($e->getMessage());
+            $this->renderJsonError($e, ApplicationError::Error->value);
         }
     }
 
-    public function getEventNeeds(int $id)
+    public function getEventNeeds(int $id): void
     {
+        if (!$this->authService->isEventManager()) {
+            $this->renderUnauthorized();
+            return;
+        }
+        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+            $this->renderJson(['message' => 'Not allowed method: ' . $_SERVER['REQUEST_METHOD'] . ' in file ' . __FILE__ . ' at line ' . __LINE__], false, ApplicationError::MethodNotAllowed->value);
+            return;
+        }
         try {
-            $this->renderJson($this->needService->getEventNeeds($id), ApplicationError::Ok->value);
+            $apiResponse = $this->needService->getEventNeeds($id);
+            $this->renderJson($apiResponse->data, $apiResponse->success, $apiResponse->responseCode);
         } catch (Throwable $e) {
-            $this->renderError($e->getMessage());
+            $this->renderJsonError($e, ApplicationError::Error->value);
         }
     }
 
@@ -271,12 +325,16 @@ class EventApi extends AbstractApi
             $this->renderUnauthorized();
             return;
         }
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->renderJson(['message' => 'Not allowed method: ' . $_SERVER['REQUEST_METHOD'] . ' in file ' . __FILE__ . ' at line ' . __LINE__], false, ApplicationError::MethodNotAllowed->value);
+            return;
+        }
         $data = $this->getJsonInput();
         try {
-            [$response, $statusCode] = $this->needService->saveNeed($data);
-            $this->renderJson($response, $statusCode);
+            $this->needService->saveNeed($data);
+            $this->renderJson([], true, ApplicationError::Ok->value);
         } catch (Throwable $e) {
-            $this->renderError($e->getMessage());
+            $this->renderJsonError($e, ApplicationError::Error->value);
         }
     }
 
@@ -286,100 +344,107 @@ class EventApi extends AbstractApi
             $this->renderUnauthorized();
             return;
         }
+        if ($_SERVER['REQUEST_METHOD'] !== 'DELETE') {
+            $this->renderJson(['message' => 'Not allowed method: ' . $_SERVER['REQUEST_METHOD'] . ' in file ' . __FILE__ . ' at line ' . __LINE__], false, ApplicationError::MethodNotAllowed->value);
+            return;
+        }
         try {
-            [$response, $statusCode] = $this->needTypeService->deleteNeedType($id);
-            $this->renderJson($response, $statusCode);
+            $apiResponse = $this->needTypeService->deleteNeedType($id);
+            $this->renderJson([], $apiResponse->success, $apiResponse->responseCode);
         } catch (Throwable $e) {
-            $this->renderError($e->getMessage());
+            $this->renderJsonError($e, ApplicationError::Error->value);
         }
     }
 
-    public function saveNeedType()
+    public function saveNeedType(): void
     {
         if (!$this->authService->isWebmaster()) {
             $this->renderUnauthorized();
             return;
         }
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->renderJson(['message' => 'Not allowed method: ' . $_SERVER['REQUEST_METHOD'] . ' in file ' . __FILE__ . ' at line ' . __LINE__], false, ApplicationError::MethodNotAllowed->value);
+            return;
+        }
         try {
             $data = $this->getJsonInput();
-            [$response, $statusCode] = $this->needTypeService->saveNeedType($data);
-            $this->renderJson($response, $statusCode);
+            $apiResponse = $this->needTypeService->saveNeedType($data);
+            $this->renderJson([$apiResponse->data], $apiResponse->success,  $apiResponse->responseCode);
         } catch (Throwable $e) {
-            $this->renderError($e->getMessage());
+            $this->renderJsonError($e, ApplicationError::Error->value);
         }
     }
 
     public function getNeedsByNeedType(int $id): void
     {
         try {
-            $result = $this->needService->getNeedsByNeedType($id);
-            [$response, $statusCode] = [['success' => true, 'needs' => $result], ApplicationError::Ok->value];
-            $this->renderJson($response, $statusCode);
+            $apiResponse = $this->needService->getNeedsByNeedType($id);
+            $this->renderJson([$apiResponse->data], $apiResponse->success,  $apiResponse->responseCode);
         } catch (Throwable $e) {
-            $this->renderError($e->getMessage());
+            $this->renderJsonError($e, ApplicationError::Error->value);
         }
     }
 
     #region Supply
     public function updateSupply(): void
     {
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            $this->renderJson(['success' => false, 'message' => 'Not allowed method: ' . $_SERVER['REQUEST_METHOD'] . ' in file ' . __FILE__ . ' at line ' . __LINE__], ApplicationError::Forbidden->value);
-            return;
-        }
+
         $userEmail = $this->authService->getUserEmail();
         if (empty($userEmail)) {
-            $this->renderJson(['success' => false, 'message' => 'Non authentifié'], ApplicationError::Unauthorized->value);
+            $this->renderJson(['message' => 'Non authentifié'], false, ApplicationError::Unauthorized->value);
+            return;
+        }
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->renderJson(['message' => 'Not allowed method: ' . $_SERVER['REQUEST_METHOD'] . ' in file ' . __FILE__ . ' at line ' . __LINE__], false, ApplicationError::MethodNotAllowed->value);
             return;
         }
         try {
             $input = $this->getJsonInput();
             $this->validateSupplyData($input);
-            $response = $this->supplyService->updateSupply(
+            $apiResponse = $this->supplyService->updateSupply(
                 $input['eventId'],
                 $userEmail,
                 $input['needId'],
                 intval($input['supply'])
             );
-            $this->renderJson($response);
+            $this->renderJson([$apiResponse->data], $apiResponse->success,  $apiResponse->responseCode);
+        } catch (UnauthorizedAccessException $e) {
+            $this->renderJsonError($e, ApplicationError::Forbidden->value);
         } catch (Throwable $e) {
-            $this->renderError($e->getMessage());
+            $this->renderJsonError($e, ApplicationError::Error->value);
         }
     }
 
     #region Emails
     public function sendEmails()
     {
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            $this->renderJson(['success' => false, 'message' => 'Method ' + $_SERVER['REQUEST_METHOD'] + ' invalid in file ' + __FILE__ + ' at line ' + __LINE__], ApplicationError::Forbidden->value);
-            return;
-        }
         if (!$this->authService->isEventManager()) {
             $this->renderUnauthorized();
             return;
         }
-
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->renderJson(['message' => 'Method ' + $_SERVER['REQUEST_METHOD'] + ' invalid in file ' + __FILE__ + ' at line ' + __LINE__], false, ApplicationError::MethodNotAllowed->value);
+            return;
+        }
         try {
             $data = $this->getJsonInput();
             $eventId = $data['EventId'] ?? '';
             $event = $this->eventDataHelper->getEvent($eventId);
             if (!$event) {
-                $this->renderJson(['success' => false, 'message' => "Unknown event ($eventId)"], ApplicationError::Forbidden->value);
+                $this->renderJson(['message' => "Unknown event ($eventId)"], false, ApplicationError::Forbidden->value);
                 return;
             }
-            [$message, $code] = $this->eventService->sendEventEmails($event, $data['Title'] ?? '', $data['Body'] ?? '', $data['Recipients'] ?? '');
-            $this->renderJson($message, $code);
+            $apiResponse = $this->eventService->sendEventEmails($event, $data['Title'] ?? '', $data['Body'] ?? '', $data['Recipients'] ?? '');
+            $this->renderJson([$apiResponse->data], $apiResponse->success,  $apiResponse->responseCode);
         } catch (Throwable $e) {
-            $this->renderError($e->getMessage());
+            $this->renderJsonError($e, ApplicationError::Error->value);
         }
     }
 
     #region Private functions
     private function validateMessageData(array $data): void
     {
-        if (!isset($data['eventId']) || !isset($data['text'])) {
-            throw new InvalidArgumentException('Données manquantes');
-        }
+        if (!isset($data['eventId']) || !isset($data['text'])) throw new InvalidArgumentException('Données manquantes');
     }
 
     private function validateSupplyData(array $data): void
@@ -388,8 +453,6 @@ class EventApi extends AbstractApi
         $needId = $data['needId'] ?? null;
         $supply = intval($data['supply'] ?? 0);
 
-        if (!$eventId || !$needId || $supply < 0) {
-            throw new InvalidArgumentException("Invalid parameters");
-        }
+        if (!$eventId || !$needId || $supply < 0) throw new InvalidArgumentException("Invalid parameters");
     }
 }

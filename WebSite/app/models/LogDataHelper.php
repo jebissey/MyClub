@@ -25,12 +25,12 @@ class LogDataHelper extends Data
 
     public function add(string $code, string $message): void
     {
-        $client = new Client();;
+        $client = new Client();
         try {
             $stmt = $this->pdoForLog->prepare("
-                INSERT INTO Log (IpAddress, Referer, Os, Browser, ScreenResolution, Type, Uri, Token, Who, Code, Message, CreatedAt)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))
-            ");
+            INSERT INTO Log (IpAddress, Referer, Os, Browser, ScreenResolution, Type, Uri, Token, Who, Code, Message, CreatedAt)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%d %H:%M:%f', 'now'))
+        ");
             $stmt->execute([
                 $client->getIp(),
                 $client->getReferer(),

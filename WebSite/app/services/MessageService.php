@@ -2,52 +2,60 @@
 
 namespace app\services;
 
+use app\enums\ApplicationError;
+use app\exceptions\UnauthorizedAccessException;
 use app\interfaces\MessageServiceInterface;
+use app\models\MessageDataHelper;
+use app\valueObjects\ApiResponse;
+use PDOException;
+use Throwable;
 
 class MessageService implements MessageServiceInterface
 {
-    private $messageDataHelper;
-    private $eventDataHelper;
+    private MessageDataHelper $messageDataHelper;
 
-    public function __construct($messageDataHelper, $eventDataHelper)
+    public function __construct($messageDataHelper)
     {
         $this->messageDataHelper = $messageDataHelper;
-        $this->eventDataHelper = $eventDataHelper;
     }
 
-    public function addMessage(int $eventId, int $personId, string $text): array
+    public function addMessage(int $eventId, int $personId, string $text): ApiResponse
     {
-        $messageId = $this->messageDataHelper->addMessage($eventId, $personId, $text);
-        $messages = $this->messageDataHelper->getEventMessages($eventId);
-        
-        foreach ($messages as $message) {
-            if ($message->Id == $messageId) {
-                return ['success' => true, 'message' => 'Message ajouté', 'data' => $message];
-            }
+        try {
+            $messageId = $this->messageDataHelper->addMessage($eventId, $personId, $text);
+            return new ApiResponse($messageId !== false, $messageId === false ? ApplicationError::BadRequest->value : ApplicationError::Ok->value, ['messageId' => $messageId], 'Message ajouté');
+        } catch (PDOException $e) {
+            return new ApiResponse(false, ApplicationError::BadRequest->value, [], $e->getMessage());
+        } catch (Throwable $e) {
+            return new ApiResponse(false, ApplicationError::Error->value, [], $e->getMessage());
         }
-        
-        throw new \RuntimeException('Message not found after creation');
     }
 
-    public function updateMessage(int $messageId, int $personId, string $text): array
+    public function updateMessage(int $messageId, int $personId, string $text): ApiResponse
     {
-        $this->messageDataHelper->updateMessage($messageId, $personId, $text);
-        
-        return [
-            'success' => true,
-            'message' => 'Message mis à jour',
-            'data' => ['messageId' => $messageId, 'text' => $text]
-        ];
+        try {
+            $this->messageDataHelper->updateMessage($messageId, $personId, $text);
+            return new ApiResponse(true, ApplicationError::Ok->value, ['data' => ['messageId' => $messageId, 'text' => $text]], 'Message mis à jour');
+        } catch (UnauthorizedAccessException $e) {
+            return new ApiResponse(false, ApplicationError::Forbidden->value, [], $e->getMessage());
+        } catch (PDOException $e) {
+            return new ApiResponse(false, ApplicationError::BadRequest->value, [], $e->getMessage());
+        } catch (Throwable $e) {
+            return new ApiResponse(false, ApplicationError::Error->value, [], $e->getMessage());
+        }
     }
 
-    public function deleteMessage(int $messageId, int $personId): array
+    public function deleteMessage(int $messageId, int $personId): ApiResponse
     {
-        $this->messageDataHelper->deleteMessage($messageId, $personId);
-        
-        return [
-            'success' => true,
-            'message' => 'Message supprimé',
-            'data' => ['messageId' => $messageId]
-        ];
+        try {
+            $this->messageDataHelper->deleteMessage($messageId, $personId);
+            return new ApiResponse(true, ApplicationError::Ok->value, ['data' => ['messageId' => $messageId]], 'Message supprimé');
+        } catch (UnauthorizedAccessException $e) {
+            return new ApiResponse(false, ApplicationError::Forbidden->value, [], $e->getMessage());
+        } catch (PDOException $e) {
+            return new ApiResponse(false, ApplicationError::BadRequest->value, [], $e->getMessage());
+        } catch (Throwable $e) {
+            return new ApiResponse(false, ApplicationError::Error->value, [], $e->getMessage());
+        }
     }
 }

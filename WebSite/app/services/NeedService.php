@@ -4,10 +4,13 @@ namespace app\services;
 
 use InvalidArgumentException;
 
+use app\enums\ApplicationError;
+use app\helpers\Application;
 use app\interfaces\NeedServiceInterface;
 use app\models\DataHelper;
 use app\models\NeedDataHelper;
 use app\models\EventNeedHelper;
+use app\valueObjects\ApiResponse;
 
 class NeedService implements NeedServiceInterface
 {
@@ -21,12 +24,14 @@ class NeedService implements NeedServiceInterface
         $this->eventNeedHelper = $eventNeedHelper;
     }
 
-    public function deleteNeed(int $id): int
+    public function deleteNeed(int $id): ApiResponse
     {
-        return $this->dataHelper->delete('Need', ['Id' => $id]);
+        $result = $this->dataHelper->delete('Need', ['Id' => $id]);
+        $success = $result === 1;
+        return new ApiResponse($success,$success?ApplicationError::Ok->value:ApplicationError::Error->value);
     }
 
-    public function saveNeed(array $data): int|bool
+    public function saveNeed(array $data): ApiResponse
     {
         $this->validateNeedData($data);
         $needData = [
@@ -35,17 +40,19 @@ class NeedService implements NeedServiceInterface
             'ParticipantDependent' => intval($data['participantDependent'] ?? 0),
             'IdNeedType' => $data['idNeedType']
         ];
-        return $this->dataHelper->set('Need', $needData, $data['id'] == null ? [] : ['Id' => $data['id']]);
+        $result = $this->dataHelper->set('Need', $needData, $data['id'] == null ? [] : ['Id' => $data['id']]);
+        $success = is_bool($result) ? $result : (is_int($result) ? true : Application::unreachable($result));
+        return new ApiResponse($success,$success?ApplicationError::Ok->value:ApplicationError::Error->value);
     }
 
-    public function getEventNeeds(int $eventId): array
+    public function getEventNeeds(int $eventId): ApiResponse
     {
-        return ['success' => true, 'needs' => $this->eventNeedHelper->needsForEvent($eventId)];
+        return new ApiResponse(true, ApplicationError::Ok->value, ['needs' => $this->eventNeedHelper->needsForEvent($eventId)]);
     }
 
-    public function getNeedsByNeedType(int $needTypeId): array
+    public function getNeedsByNeedType(int $needTypeId): ApiResponse
     {
-        return $this->needDataHelper->needsforNeedType($needTypeId);
+        return new ApiResponse(true, ApplicationError::Ok->value, [$this->needDataHelper->needsforNeedType($needTypeId)]);
     }
 
     #region Private functions

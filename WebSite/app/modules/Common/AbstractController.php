@@ -90,7 +90,7 @@ abstract class AbstractController
 
     public function render(string $name, object|array $params = []): void
     {
-#error_log("\n\n" . var_export($name,true) . "\n");        
+#error_log("\n\n" . var_export($name, true) . "\n");        
         $content = $this->latte->renderToString($name, $params);
         echo $content;
         if (ob_get_level()) ob_end_flush();

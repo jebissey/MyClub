@@ -13,6 +13,7 @@ use app\models\EventDataHelper;
 use app\models\MessageDataHelper;
 use app\models\ParticipantDataHelper;
 use app\models\PersonDataHelper;
+use app\valueObjects\ApiResponse;
 
 class EventService implements EventServiceInterface
 {
@@ -39,26 +40,26 @@ class EventService implements EventServiceInterface
         $this->personPreferences = $personPreferences;
     }
 
-    public function deleteEvent(int $id, int $userId): array
+    public function deleteEvent(int $id, int $userId): ApiResponse
     {
-        return $this->eventDataHelper->delete_($id, $userId);
+        $this->eventDataHelper->delete_($id, $userId);
+        return new ApiResponse(true, ApplicationError::Ok->value);
     }
 
-    public function duplicateEvent(int $id, int $userId, string $mode): array
+    public function duplicateEvent(int $id, int $userId, string $mode): ApiResponse
     {
         return $this->eventDataHelper->duplicate($id, $userId, $mode);
     }
 
-    public function getEvent(int $id): array
+    public function getEvent(int $id): ApiResponse
     {
-        return [
-            'success' => true,
+        return new ApiResponse(true, ApplicationError::Ok->value, [
             'event' => $this->eventDataHelper->getEvent($id),
             'attributes' => $this->eventDataHelper->getEventAttributes($id),
-        ];
+        ]);
     }
 
-    public function sendEventEmails(object $event, string $title, string $body, string $recipients): array
+    public function sendEventEmails(object $event, string $title, string $body, string $recipients): ApiResponse
     {
         if ($recipients === 'registered') $participants = $this->participantDataHelper->getEventParticipants($event->Id);
         else if ($recipients === 'unregistered') {
@@ -70,14 +71,14 @@ class EventService implements EventServiceInterface
                 (new DateTime($event->StartTime))->format('N') - 1,
                 $this->personPreferences->getPeriodOfDay($event->StartTime)
             );
-        } else return [['success' => false, 'message' => "Invalid recipients ($recipients)"], ApplicationError::BadRequest->value];
+        } else return new ApiResponse(false, ApplicationError::BadRequest->value, [], "Invalid recipients ($recipients)");
         if ($participants) {
             $root = Application::$root;
             $eventLink = $root . '/event/' . $event->Id;
             $unsubscribeLink = $root . '/user/preferences';
             $eventCreatorEmail = $this->dataHelper->get('Person', ['Id' => $event->CreatedBy], 'Email')->Email;
             if (!$eventCreatorEmail) {
-                return [['success' => false, 'message' => 'Invalid Email in file ' + __FILE__ + ' at line ' + __LINE__], ApplicationError::BadRequest->value];
+                return new ApiResponse(false, ApplicationError::BadRequest->value, [],  'Invalid Email in file ' + __FILE__ + ' at line ' + __LINE__);
             }
             $ccList = $this->messageDataHelper->addWebAppMessages($event->Id, $participants, $title . "\n\n" . $body);
             $result = EmailService::send(
@@ -89,8 +90,8 @@ class EventService implements EventServiceInterface
                 null,
                 false
             );
-            return [['success' => $result], $result ? ApplicationError::Ok->value : ApplicationError::Error->value];
+            return new ApiResponse($result, $result ? ApplicationError::Ok->value : ApplicationError::Error->value);
         }
-        return [['success' => false, 'message' => 'No participant'], ApplicationError::BadRequest->value];
+        return new ApiResponse(false, ApplicationError::BadRequest->value, [], 'No participant');
     }
 }

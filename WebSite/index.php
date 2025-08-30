@@ -14,9 +14,6 @@ use app\enums\ApplicationError;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
 use app\helpers\PersonPreferences;
-use app\models\ApiEventDataHelper;
-use app\models\ApiNeedDataHelper;
-use app\models\ApiNeedTypeDataHelper;
 use app\models\AttributeDataHelper;
 use app\models\DataHelper;
 use app\models\EventDataHelper;
@@ -24,6 +21,7 @@ use app\models\EventNeedHelper;
 use app\models\LogDataHelper;
 use app\models\MessageDataHelper;
 use app\models\NeedDataHelper;
+use app\models\NeedTypeDataHelper;
 use app\models\ParticipantDataHelper;
 use app\models\PersonDataHelper;
 use app\modules\Article\DesignController;
@@ -74,13 +72,11 @@ $flight->map('getData', function ($key) {
     return Flight::get($key);
 });
 
-$apiEventDataHelper = new ApiEventDataHelper($application);
-$apiNeedDataHelper = new ApiNeedDataHelper($application);
-$apiNeedTypeDataHelper = new ApiNeedTypeDataHelper($application);
 $connectedUser = new ConnectedUser($application);
 $dataHelper = new DataHelper($application);
 $eventDataHelper = new EventDataHelper($application);
 $eventNeedHelper = new EventNeedHelper($application);
+$needTypeDataHelper = new NeedTypeDataHelper($application);
 $messageDataHelper = new MessageDataHelper($application);
 $needDataHelper = new NeedDataHelper($application);
 $participantDataHelper = new ParticipantDataHelper($application);
@@ -273,7 +269,6 @@ mapRoute($flight, 'POST   /api/carousel/save', $carouselApi, 'saveItem');
 mapRoute($flight, 'DELETE /api/carousel/delete/@id:[0-9]+', $carouselApi, 'deleteItem');
 
 $eventApi = new EventApi(
-    $apiEventDataHelper,
     $application,
     new AuthorizationService($connectedUser),
     new AttributeService(new AttributeDataHelper($application)),
@@ -286,9 +281,9 @@ $eventApi = new EventApi(
         $personDataHelper,
         $personPreferences
     ),
-    new MessageService($messageDataHelper, $eventDataHelper),
+    new MessageService($messageDataHelper),
     new NeedService($needDataHelper, $eventNeedHelper),
-    new NeedTypeService($apiNeedTypeDataHelper, $apiNeedDataHelper),
+    new NeedTypeService($needTypeDataHelper, $needDataHelper),
     new SupplyService($eventDataHelper)
 );
 mapRoute($flight, 'POST   /api/attribute/create', $eventApi, 'createAttribute');

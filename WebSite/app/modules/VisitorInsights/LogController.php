@@ -25,7 +25,7 @@ class LogController extends AbstractController
 
     public function index()
     {
-        if ($this->connectedUser->get()->isWebmaster() ?? false) {
+        if ($this->connectedUser->get()->isVisitorInsights() ?? false) {
             $logPage = max(1, (int)($this->flight->request()->query['logPage'] ?? 1));
             $perPage = 10;
             [$logs, $totalPages] = $this->logDataHelper->getVisitedPages($perPage, $logPage, $this->flight->request()->query->getData());
@@ -41,7 +41,7 @@ class LogController extends AbstractController
 
     public function referents()
     {
-        if ($this->connectedUser->get()->isWebmaster() ?? false) {
+        if ($this->connectedUser->get()->isVisitorInsights() ?? false) {
             $currentParams = $this->flight->request()->query->getData();
             $period = $currentParams['period'] ?? 'day';
             $currentDate = $currentParams['date'] ?? date('Y-m-d');
@@ -62,7 +62,7 @@ class LogController extends AbstractController
     private $defaultPeriodType = 'day';
     public function visitorsGraf()
     {
-        if ($this->connectedUser->get()->isWebmaster() ?? false) {
+        if ($this->connectedUser->get()->isVisitorInsights() ?? false) {
             $periodType = $this->flight->request()->query->periodType ?? $this->defaultPeriodType;
             $periodType = in_array($periodType, $this->periodTypes) ? $periodType : $this->defaultPeriodType;
 
@@ -82,7 +82,7 @@ class LogController extends AbstractController
 
     public function analytics()
     {
-        if ($this->connectedUser->get()->isWebmaster() ?? false) {
+        if ($this->connectedUser->get()->isVisitorInsights() ?? false) {
 
             $this->render('VisitorInsights/views/analytics.latte', Params::getAll([
                 'osData' => $this->logDataHelper->getOsDistribution(),
@@ -97,7 +97,7 @@ class LogController extends AbstractController
     const TOP = 50;
     public function topPagesByPeriod()
     {
-        if ($this->connectedUser->get()->isWebmaster() ?? false) {
+        if ($this->connectedUser->get()->isVisitorInsights() ?? false) {
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $period =  WebApp::getFiltered('period', $this->application->enumToValues(Period::class), $this->flight->request()->query->getData()) ?: Period::Week->value;
                 $dateCondition = PeriodHelper::getDateConditions($period);
@@ -131,7 +131,7 @@ class LogController extends AbstractController
 
     public function crossTab()
     {
-        if ($this->connectedUser->get()->isWebmaster() ?? false) {
+        if ($this->connectedUser->get()->isVisitorInsights() ?? false) {
             $schema = [
                 'uri' => FilterInputRule::Uri->value,
                 'email' => FilterInputRule::Email->value,
@@ -163,7 +163,7 @@ class LogController extends AbstractController
     public function showLastVisits()
     {
         $person = $this->connectedUser->get()->person ?? false;
-        if ($person && $this->connectedUser->isWebmaster()) {
+        if ($person && $this->connectedUser->isVisitorInsights()) {
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $activePersons = $this->dataHelper->gets('Person', ['Inactivated' => 0]);
                 $this->render('VisitorInsights/views/lastVisits.latte', Params::getAll([

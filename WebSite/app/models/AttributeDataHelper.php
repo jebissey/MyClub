@@ -33,9 +33,9 @@ class AttributeDataHelper extends Data
         try {
             $this->pdo->beginTransaction();
             $this->set('Attribute', [
-                'Name'   => $data['name'],
-                'Detail' => $data['detail'],
-                'Color'  => $data['color']
+                'Name'   => $data['name'] ?? '???',
+                'Detail' => $data['detail'] ?? '???',
+                'Color'  => $data['color'] ?? '???'
             ]);
             $this->pdo->commit();
             return [['success' => true], ApplicationError::Ok->value];
@@ -70,20 +70,14 @@ class AttributeDataHelper extends Data
         return $stmt->fetchAll();
     }
 
-    public function update($data)
+    public function update(array $data): void
     {
-        try {
-            $this->pdo->beginTransaction();
-            $this->set('Attribute', [
-                'Name'   => $data['name'],
-                'Detail' => $data['detail'],
-                'Color'  => $data['color']
-            ], ['Id' => $data['id']]);
-            $this->pdo->commit();
-            return ['success' => true];
-        } catch (Throwable $e) {
-            $this->pdo->rollBack();
-            return [['success' => false, 'message' => $e->getMessage()], ApplicationError::Error->value];
-        }
+        $this->pdo->beginTransaction();
+        $this->set('Attribute', [
+            'Name'   => $data['name'],
+            'Detail' => $data['detail'],
+            'Color'  => $data['color']
+        ], ['Id' => $data['id']]);
+        $this->pdo->commit();
     }
 }

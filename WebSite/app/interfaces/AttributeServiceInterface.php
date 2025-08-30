@@ -8,5 +8,5 @@ interface AttributeServiceInterface
     public function deleteAttribute(int $id): array;
     public function getAttributes(): array;
     public function getAttributesByEventType(int $eventTypeId): array;
-    public function updateAttribute(array $data): array;
+    public function updateAttribute(array $data): void;
 }

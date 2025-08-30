@@ -5,6 +5,7 @@ namespace app\modules\User;
 use RuntimeException;
 
 use app\enums\ApplicationError;
+use app\enums\EventAudience;
 use app\enums\FilterInputRule;
 use app\enums\Period;
 use app\enums\YesNo;
@@ -215,7 +216,7 @@ class UserController extends AbstractController
                     'useGravatar' => $input['useGravatar'] ?? YesNo::No->value,
                 ], ['Id' => $person->Id]);
                 if ($person->Imported == 0) {
-                    $email = urldecode($input['email']);
+                    $email = urldecode($input['email'] ?? '');
                     $this->dataHelper->set('Person', ['Email' => $email], ['Id' => $person->Id]);
                     $_SESSION['user'] = $email;
                 }
@@ -459,9 +460,14 @@ class UserController extends AbstractController
     public function contact($eventId = null): void
     {
         if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+            $event = null;
+            if ($eventId !== null) {
+                $event = $this->dataHelper->get('Event', ['Id' => $eventId], 'Id, Summary, StartTime, Audience');
+                if (!$event || $event->Audience != EventAudience::ForAll->value) $eventId = $event = null;
+            }
             $this->render('Common/views/contact.latte', Params::getAll([
                 'navItems' => $this->getNavItems($this->connectedUser->get()->person ?? false),
-                'event' => $eventId != null ? $this->dataHelper->get('Event', ['Id' => $eventId], 'Id, Summary') : null,
+                'event' => $event,
             ]));
         } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $schema = [

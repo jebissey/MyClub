@@ -10,16 +10,16 @@ class ConsoleTestReporter implements TestReporterInterface
     {
         echo $this->formatSummary($summary);
 
-        echo "\nRépartition par code de statut:\n";
+        echo "\nBreakdown by status code:\n";
         foreach ($summary->statusCodes as $code => $count) {
             $color = $this->getStatusColor($code);
             echo sprintf("  %s%d%s: %d\n", $color, $code, Color::Reset->value, $count);
         }
 
         if ($summary->hasDatabase) {
-            $this->displayErrorSection("ERREURS DE RÉPONSE", $summary->responseErrors);
-            $this->displayErrorSection("ERREURS D'AUTHENTIFICATION", $summary->testErrors);
-            $this->displayErrorSection("ERREURS DE PARAMÈTRES", $summary->parameterErrors);
+            $this->displayErrorSection("RESPONSE ERRORS", $summary->responseErrors);
+            $this->displayErrorSection("AUTHENTIFICATION ERRORS", $summary->testErrors);
+            $this->displayErrorSection("PARAMETER ERRORS", $summary->parameterErrors);
         }
     }
 
@@ -76,20 +76,20 @@ class ConsoleTestReporter implements TestReporterInterface
     {
         $out = [];
         $out[] = "\n" . str_repeat('=', 80);
-        $out[] = "RÉSUMÉ DES TESTS";
+        $out[] = "TEST SUMMARY";
         $out[] = str_repeat('=', 80);
-        $out[] = "Total des tests exécutés: {$summary->totalTests}";
-        $out[] = "Succès (2xx-3xx): {$summary->successful}";
-        $out[] = "Erreurs HTTP (5xx): {$summary->errors}";
-        $out[] = "Autres: " . ($summary->totalTests - $summary->successful - $summary->errors);
+        $out[] = "Total tests executed: {$summary->totalTests}";
+        $out[] = "Success (2xx-3xx): {$summary->successful}";
+        $out[] = "HTTP errors (5xx): {$summary->errors}";
+        $out[] = "Others: " . ($summary->totalTests - $summary->successful - $summary->errors);
 
         if ($summary->hasDatabase) {
             $out[] = "\n" . str_repeat('=', 80);
-            $out[] = "ERREURS DE VALIDATION:";
+            $out[] = "VALIDATION ERRORS:";
             $out[] = str_repeat('=', 80);
-            $out[] = "Erreurs de paramètres: " . count($summary->parameterErrors);
-            $out[] = "Erreurs de réponse: " . count($summary->responseErrors);
-            $out[] = "Erreurs d'authentification: " . count($summary->testErrors);
+            $out[] = "Parameter errors: " . count($summary->parameterErrors);
+            $out[] = "Response errors: " . count($summary->responseErrors);
+            $out[] = "Authentification error: " . count($summary->testErrors);
         }
 
         return implode("\n", $out) . "\n";

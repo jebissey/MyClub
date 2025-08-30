@@ -8,24 +8,6 @@ use test\Core\CsvTestExporter;
 use test\Infrastructure\RouteTestFactory;
 use test\Infrastructure\CurrentWebSite;
 
-function printHelp(): void
-{
-    echo <<<EOT
-Usage: php route_tester.php [options]
-Options:
-  --base-url=URL      Base URL  (default: http://localhost:8000)
-  --timeout=SECONDS   Timeout in secondes (default: 5)
-  --routes-file=FILE  File with routes (default: index.php)
-  --db-path=PATH      Path of SQLite website database
-  --export-json       Export results in JSON
-  --export-csv        Export results in CSV
-  --help              Display this help
-  --test=n°           Only this test
-  --simu=n°           Only this simulation
-  --stop              Stop on first error
-EOT;
-}
-
 function main(): int
 {
     $options = getopt('', [
@@ -82,3 +64,21 @@ function main(): int
 }
 
 if (basename(__FILE__) === basename($_SERVER['SCRIPT_NAME'] ?? '')) exit(main($argv));
+
+function printHelp(): void
+{
+    echo <<<EOT
+Usage: php route_tester.php [options]
+Options:
+  --base-url=URL      Base URL  (default: http://localhost:8000)
+  --timeout=SECONDS   Timeout in secondes (default: 5)
+  --routes-file=FILE  File with routes (default: index.php)
+  --db-path=PATH      Path of SQLite website database
+  --export-json       Export results in JSON
+  --export-csv        Export results in CSV
+  --help              Display this help
+  --test=n°           Only this test
+  --simu=n°           Only this simulation
+  --stop              Stop on first error
+EOT;
+}

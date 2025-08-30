@@ -23,35 +23,35 @@ class CarouselApi extends AbstractApi
     {
         $connectedUser = $this->connectedUser->get();
         if (!($connectedUser->person ?? false) || !(new AuthorizationDataHelper($this->application))->getArticle($idArticle, $connectedUser)) {
-            $this->renderJson(['error' => 'Accès non autorisé'], ApplicationError::Forbidden->value);
+            $this->renderJson(['error' => 'Accès non autorisé'], false, ApplicationError::Forbidden->value);
             return;
         }
         $items = $this->dataHelper->gets('Carousel', ['IdArticle' => $idArticle]);
-        $this->renderJson(['success' => true, 'items' => $items]);
+        $this->renderJson(['items' => $items], true, ApplicationError::Ok->value);
     }
 
     public function saveItem()
     {
         $person = $this->connectedUser->get()->person ?? false;
         if (!$person) {
-            $this->renderJson(['error' => 'Utilisateur non connecté'], ApplicationError::Forbidden->value);
+            $this->renderJson(['error' => 'Utilisateur non connecté'], false, ApplicationError::Forbidden->value);
             return;
         }
         $data = json_decode(file_get_contents('php://input'), true);
         if (!$data || !isset($data['idArticle']) || !isset($data['item'])) {
-            $this->renderJson(['error' => 'Données invalides'], ApplicationError::BadRequest->value);
+            $this->renderJson(['error' => 'Données invalides'], false, ApplicationError::BadRequest->value);
             return;
         }
         if (!(new AuthorizationDataHelper($this->application))->getArticle($data['idArticle'], $person)) {
-            $this->renderJson(['error' => 'Vous n\'êtes pas autorisé à modifier cet article'], ApplicationError::Forbidden->value);
+            $this->renderJson(['error' => 'Vous n\'êtes pas autorisé à modifier cet article'], false, ApplicationError::Forbidden->value);
             return;
         }
         $item = WebApp::sanitizeHtml($data['item']);
         try {
             $message = (new CarouselDataHelper($this->application))->set_($data, $item);
-            $this->renderJson(['success' => true, 'message' => $message]);
+            $this->renderJson(['message' => $message], true, ApplicationError::Ok->value);
         } catch (Throwable $e) {
-            $this->renderJson(['error' => 'Erreur lors de l\'enregistrement: ' . $e->getMessage()], ApplicationError::Error->value);
+            $this->renderJson(['error' => 'Erreur lors de l\'enregistrement: ' . $e->getMessage()], false, ApplicationError::Error->value);
         }
     }
 
@@ -60,24 +60,24 @@ class CarouselApi extends AbstractApi
         if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
             $person = $this->connectedUser->get()->person ?? false;
             if (!$person) {
-                $this->renderJson(['error' => 'Utilisateur non connecté'], ApplicationError::Unauthorized->value);
+                $this->renderJson(['error' => 'Utilisateur non connecté'], false, ApplicationError::Unauthorized->value);
                 return;
             }
             $item = (new DataHelper($this->application))->get('Carousel', ['Id' => $id], 'IdArticle');
             if (!$item) {
-                $this->renderJson(['error' => 'Élément non trouvé'], ApplicationError::PageNotFound->value);
+                $this->renderJson(['error' => 'Élément non trouvé'], false, ApplicationError::PageNotFound->value);
                 return;
             }
             if (!(new AuthorizationDataHelper($this->application))->getArticle($item->IdArticle, $person)) {
-                $this->renderJson(['error' => 'Vous n\'êtes pas autorisé à modifier cet article'], ApplicationError::Forbidden->value);
+                $this->renderJson(['error' => 'Vous n\'êtes pas autorisé à modifier cet article'], false, ApplicationError::Forbidden->value);
                 return;
             }
             try {
                 (new DataHelper($this->application))->delete('Carousel', ['Id' => $id]);
-                $this->renderJson(['success' => true, 'message' => 'Élément supprimé avec succès']);
+                $this->renderJson(['message' => 'Élément supprimé avec succès'], true, ApplicationError::Ok->value);
             } catch (Throwable $e) {
-                $this->renderJson(['error' => 'Erreur lors de la suppression: ' . $e->getMessage()], ApplicationError::Error->value);
+                $this->renderJson(['error' => 'Erreur lors de la suppression: ' . $e->getMessage()], false, ApplicationError::Error->value);
             }
-        } else $this->renderJson(['success' => false, 'message' => 'Bad request method'], ApplicationError::MethodNotAllowed->value);
+        } else $this->renderJson(['message' => 'Bad request method'], false, ApplicationError::MethodNotAllowed->value);
     }
 }

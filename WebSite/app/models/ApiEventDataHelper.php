@@ -45,11 +45,10 @@ class ApiEventDataHelper extends Data
             $this->insertEventAttributes($eventId, $data['attributes'] ?? []);
             $this->insertEventNeeds($eventId, $data['needs'] ?? []);
             $this->pdo->commit();
-            return [['success' => true, 'eventId' => $eventId], ApplicationError::Ok->value];
+            return [true, ['eventId' => $eventId], ApplicationError::Ok->value];
         } catch (Throwable $e) {
             $this->pdo->rollBack();
-            return [[
-                'success' => false,
+            return [false, [
                 'message' => 'Erreur lors de l\'insertion en base de données',
                 'error'   => $e->getMessage()
             ], ApplicationError::Error->value];

@@ -16,6 +16,7 @@ use app\helpers\ConnectedUser;
 use app\helpers\PersonPreferences;
 use app\helpers\TranslationManager;
 use app\interfaces\NewsProviderInterface;
+use app\valueObjects\ApiResponse;
 
 class EventDataHelper extends Data implements NewsProviderInterface
 {
@@ -39,18 +40,17 @@ class EventDataHelper extends Data implements NewsProviderInterface
             // TODO manage participant and paticipantSupply
             $this->fluent->deleteFrom('Event')->where('Id', $id)->execute();
             $this->pdo->commit();
-            return [['success' => true], ApplicationError::Ok->value];
+            return [true, [], ApplicationError::Ok->value];
         } catch (Throwable $e) {
             $this->pdo->rollBack();
-            return [[
-                'success' => false,
+            return [false, [
                 'message' => 'Erreur lors de la suppression en base de données',
                 'error' => $e->getMessage()
             ], ApplicationError::Error->value];
         }
     }
 
-    public function duplicate(int $id, int $personId, string $mode): array
+    public function duplicate(int $id, int $personId, string $mode): ApiResponse
     {
         try {
             $this->pdo->beginTransaction();
@@ -58,7 +58,7 @@ class EventDataHelper extends Data implements NewsProviderInterface
             $event = $this->fluent->from('Event')->where('Id', $id)->fetch();
             if (!$event) {
                 $this->pdo->rollBack();
-                return [['success' => false, 'message' => 'Unknown event'], 471];
+                new ApiResponse(false, ApplicationError::BadRequest->value, [], 'Unknown event');
             }
             $newStartTime = $this->calculateNewStartTime($event->StartTime, $mode);
             $newEvent = [
@@ -81,10 +81,10 @@ class EventDataHelper extends Data implements NewsProviderInterface
                 ])->execute();
             }
             $this->pdo->commit();
-            return ['success' => true, 'newEventId' => $newEventId];
+            return new ApiResponse(true, ApplicationError::Ok->value, ['newEventId' => $newEventId]);
         } catch (Throwable $e) {
             $this->pdo->rollBack();
-            return [['success' => false, 'message' => 'Erreur serveur : ' . $e->getMessage()], ApplicationError::Error->value];
+            return new ApiResponse(false, ApplicationError::Error->value, [], 'Error: ' . $e->getMessage());
         }
     }
 

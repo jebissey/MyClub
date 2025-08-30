@@ -2,10 +2,12 @@
 
 namespace app\interfaces;
 
+use app\valueObjects\ApiResponse;
+
 interface NeedServiceInterface
 {
-    public function deleteNeed(int $id): int;
-    public function saveNeed(array $data): int|bool;
-    public function getEventNeeds(int $eventId): array;
-    public function getNeedsByNeedType(int $needTypeId): array;
+    public function deleteNeed(int $id): ApiResponse;
+    public function saveNeed(array $data): ApiResponse;
+    public function getEventNeeds(int $eventId): ApiResponse;
+    public function getNeedsByNeedType(int $needTypeId): ApiResponse;
 }

@@ -9,6 +9,7 @@ use test\Core\TestSummary;
 use test\Infrastructure\SimulationExtractor;
 use test\Interfaces\RouteExtractorInterface;
 use test\Interfaces\TestReporterInterface;
+use Throwable;
 
 class RouteTestOrchestrator
 {
@@ -43,8 +44,8 @@ public function runTests(string $routeFilePath, ?int $test, ?int $simu, bool $st
             );
         }
     } catch (StopRequestedException $e) {
-        echo "⚠️ Execution stopped: " . $e->getMessage() . "\n";
-    } catch (\Exception $e) {
+        echo "⚠️ Execution stopped\n";
+    } catch (Throwable $e) {
         echo "❌ Unexpected error: " . $e->getMessage() . "\n";
     }
     $this->reporter->displaySummary($this->summaryGenerator($results));

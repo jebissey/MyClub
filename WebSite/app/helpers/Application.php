@@ -5,6 +5,7 @@ namespace app\helpers;
 use flight\Engine;
 use Latte\Engine as LatteEngine;
 use Latte\Loaders\FileLoader;
+use LogicException;
 use PDO;
 use RuntimeException;
 use Throwable;
@@ -104,6 +105,24 @@ class Application
     public function enumToValues(string $enumClass): array
     {
         return array_map(fn($case) => $case->value, $enumClass::cases());
+    }
+
+    /**
+     * Helper to signal an unreachable state.
+     *
+     * @param mixed $value Unexpected value (optional, useful for debugging)
+     * @throws LogicException Always thrown
+     * @return never
+     */
+    public static function unreachable(mixed $value = null): never
+    {
+        $msg = "Unreachable code executed";
+        if ($value !== null) {
+            if (is_object($value) && enum_exists($value::class)) $msg .= " (enum " . $value::class . "::" . $value->name . ")";
+            elseif (is_object($value))                           $msg .= " (object of type " . $value::class . ")";
+            else                                                 $msg .= " (value: " . var_export($value, true) . ")";
+        }
+        throw new LogicException($msg);
     }
 
     #region Private functions

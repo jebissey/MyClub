@@ -29,6 +29,7 @@ It helps clubs manage **articles, events, and members** with an intuitive interf
   - [8) Create self-registration and authorizationless groups \[PersonManager\]](#8-create-self-registration-and-authorizationless-groups-personmanager)
   - [9) Write articles \[Redactor\]](#9-write-articles-redactor)
   - [10) Publish public articles \[Editor\]](#10-publish-public-articles-editor)
+- [💾 Data \& Backup](#-data--backup)
 - [❓ FAQ](#-faq)
   - [If you encounter this error…](#if-you-encounter-this-error)
     - [“Error: could not find driver”](#error-could-not-find-driver)
@@ -148,6 +149,19 @@ On a fresh installation the application creates **one initial user account** and
 - Go to **Articles list > Editor** 📢
 - **Review and publish articles** to make them visible to groups, users or the public.
 
+---
+
+# 💾 Data & Backup  
+
+All the site content is stored in a **SQLite database**:  
+- Main data: `WebSite/data/MyClub.sqlite`  
+- Logs: `WebSite/data/LogMyClub.sqlite`  
+
+A **GFS backup** is created every time an article is saved, stored under:  
+`WebSite/backup/<years>/<months>/<weekdays>/`  
+
+> As the IT saying goes: *“Any data stored on a single medium is doomed to disappear.”*  
+It is essential to **regularly copy `MyClub.sqlite` to another physical storage** to ensure data safety.
 
 ---
 
@@ -161,14 +175,9 @@ On a fresh installation the application creates **one initial user account** and
 - **Fix**:
   - Add/Enable `extension=pdo_sqlite`.
 
-
 ### Internal error: Class ”IntlDateFormatter" not found
 - **Causes**:
   - intl extension not installed/activated.
 - **Fix**:
   - Add/Enable `extension=intl`.
 
----
-
-💡 **Tip**  
-After each installation or update, log in with a **non-admin account** and go through the key screens (event creation, writing, publishing) to validate that **roles and authorizations** are properly set up.

@@ -2,6 +2,7 @@
 
 namespace app\apis;
 
+use app\enums\ApplicationError;
 use app\helpers\ApiImportHelper;
 use app\helpers\Application;
 
@@ -14,6 +15,6 @@ class ImportApi extends AbstractApi
 
     public function getHeadersFromCSV()
     {
-        $this->renderJson((new ApiImportHelper())->getHeadersFromCSV(intval($_POST['headerRow'] ?? 1)));
+        $this->renderJson((new ApiImportHelper())->getHeadersFromCSV(intval($_POST['headerRow'] ?? 1)), true, ApplicationError::Ok->value);
     }
 }
