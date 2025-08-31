@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS "Article" (
 	"IdGroup"	INTEGER DEFAULT NULL,
 	"OnlyForMembers"	INTEGER NOT NULL DEFAULT 1,
 	"LastUpdate"	TEXT NOT NULL DEFAULT current_timestamp,
+	"Language"	TEXT NOT NULL DEFAULT 'fr_FR',
 	PRIMARY KEY("Id"),
 	FOREIGN KEY("CreatedBy") REFERENCES "Person"("Id"),
 	FOREIGN KEY("IdGroup") REFERENCES "Group"("Id"),
@@ -352,6 +353,161 @@ INSERT INTO "Languages" VALUES (60,'Help_visitorInsights','Visitor insights help
 INSERT INTO "Languages" VALUES (61,'Help_webmaster','Webmater help','Aide webmaster');
 INSERT INTO "Languages" VALUES (62,'Home_header','Home header','En-tête d''accueil');
 INSERT INTO "Languages" VALUES (63,'Home_footer','Home footer','Pied de page d''accueil');
+INSERT INTO "Languages" VALUES (64,'Error403','<div class="container text-center mt-5">
+  <div class="card shadow-lg rounded-3 p-4">
+    <h1 class="text-danger">🚫 Error 403 – Unauthorized Access</h1>
+    
+    <p class="mt-3">
+      It looks like you’re trying to access a protected page.<br>
+      Don’t worry! If this page appears right after opening your browser, it’s probably because:
+    </p>
+    <ul class="text-start mx-auto d-inline-block">
+      <li>Your browser automatically reopened the <strong>last pages visited</strong>.</li>
+      <li>During your last visit to our site, you did not <strong>log out</strong>.</li>
+    </ul>
+    <p class="mt-3">
+      👉 In this case, it’s perfectly normal.
+    </p>
+    <p class="fw-bold">
+      💡 Tip: If you check the <em>“Remember me”</em> option when logging in, you’ll be automatically reconnected next time, and this page won’t show up anymore.
+    </p>
+
+    <hr class="my-4">
+
+    <h5>ℹ️ Other possible situations:</h5>
+    <ul class="text-start mx-auto d-inline-block">
+      <li>➡️ If the application itself triggered this error: <strong>please notify the webmaster</strong>.</li>
+      <li>➡️ If you tried to reach a page by typing its address directly: nice try 😉 but this page requires specific permissions.</li>
+      <li>➡️ If you manage to display protected information <strong>without seeing this page</strong>: <strong>please notify the webmaster immediately</strong> so it can be fixed.</li>
+    </ul>
+	  
+	<a href="/" class="btn btn-primary mt-3">🏠 Back to homepage</a>
+  </div>
+</div>
+','<div class="container text-center mt-5">
+  <div class="card shadow-lg rounded-3 p-4">
+    <h1 class="text-danger">🚫 Erreur 403 – Accès non autorisé</h1>
+    
+    <p class="mt-3">
+      Il semble que vous essayiez d’accéder à une page protégée.<br>
+      Pas de panique ! Si cette page s’affiche juste après l’ouverture de votre navigateur, c’est probablement parce que :
+    </p>
+    <ul class="text-start mx-auto d-inline-block">
+      <li>Votre navigateur a rouvert automatiquement les <strong>dernières pages visitées</strong>.</li>
+      <li>Lors de votre dernière visite sur notre site, vous ne vous étiez pas <strong>déconnecté(e)</strong>.</li>
+    </ul>
+    <p class="mt-3">
+      👉 Dans ce cas, c’est tout à fait normal.
+    </p>
+    <p class="fw-bold">
+      💡 Astuce : Si vous cochez l’option <em>« Se souvenir de moi »</em> lors de votre connexion, vous serez reconnecté(e) automatiquement la prochaine fois, et cette page ne s’affichera plus.
+    </p>
+
+    <hr class="my-4">
+
+    <h5>ℹ️ Autres situations possibles :</h5>
+    <ul class="text-start mx-auto d-inline-block">
+      <li>➡️ Si c’est l’application qui a provoqué cette erreur : <strong>merci de prévenir le webmaster</strong>.</li>
+      <li>➡️ Si vous avez essayé d’accéder à une page en tapant directement son adresse : bien tenté 😉 mais cette page nécessite des droits spécifiques.</li>
+      <li>➡️ Si vous parvenez à afficher des informations protégées <strong>sans voir cette page</strong> : <strong>merci de prévenir immédiatement le webmaster</strong> pour correction.</li>
+    </ul>
+	
+    <a href="/" class="btn btn-primary mt-3">🏠 Retour à l’accueil</a>
+  </div>
+</div>
+');
+INSERT INTO "Languages" VALUES (65,'Error404','<div class="container text-center mt-5">
+  <div class="card shadow-lg rounded-3 p-4">
+    <h1 class="text-warning">🔍 Error 404 – Page not found</h1>
+    
+    <p class="mt-3">
+      The page you are looking for doesn’t exist or is no longer available.
+    </p>
+
+    <hr class="my-4">
+
+    <h5>ℹ️ Possible causes:</h5>
+    <ul class="text-start mx-auto d-inline-block">
+      <li>➡️ The application mistakenly sent you here: <strong>please notify the webmaster</strong>.</li>
+      <li>➡️ You tried to guess an address in your browser bar: <em>nice try 😉 but this page doesn’t exist</em>.</li>
+    </ul>
+
+    <a href="/" class="btn btn-primary mt-3">🏠 Back to homepage</a>
+  </div>
+</div>
+','<div class="container text-center mt-5">
+  <div class="card shadow-lg rounded-3 p-4">
+    <h1 class="text-warning">🔍 Erreur 404 – Page introuvable</h1>
+    
+    <p class="mt-3">
+      La page que vous cherchez n’existe pas ou n’est plus disponible.
+    </p>
+
+    <hr class="my-4">
+
+    <h5>ℹ️ Causes possibles :</h5>
+    <ul class="text-start mx-auto d-inline-block">
+      <li>➡️ L’application vous a dirigé ici par erreur : <strong>merci de prévenir le webmaster</strong>.</li>
+      <li>➡️ Vous avez tenté de deviner une adresse dans la barre du navigateur : <em>bien tenté 😉 mais cette page n’existe pas</em>.</li>
+    </ul>
+
+    <a href="/" class="btn btn-primary mt-3">🏠 Retour à l’accueil</a>
+  </div>
+</div>
+');
+INSERT INTO "Languages" VALUES (66,'Error500','<div class="container text-center mt-5">
+  <div class="card shadow-lg rounded-3 p-4">
+    <h1 class="text-danger">💥 Error 500 – Internal Server Error</h1>
+    
+    <p class="mt-3">
+      Oops… something went wrong on our side.  
+      This error is caused by an internal problem in the application.
+    </p>
+
+    <hr class="my-4">
+
+    <h5>ℹ️ What to do?</h5>
+    <ul class="text-start mx-auto d-inline-block">
+      <li>➡️ <strong>Please notify the webmaster</strong> so the issue can be fixed.</li>
+      <li>➡️ You can also try again later — sometimes the server just needs a little coffee ☕.</li>
+    </ul>
+
+    <a href="/" class="btn btn-primary mt-3">🏠 Back to homepage</a>
+  </div>
+</div>
+','<div class="container text-center mt-5">
+  <div class="card shadow-lg rounded-3 p-4">
+    <h1 class="text-danger">💥 Erreur 500 – Erreur interne du serveur</h1>
+    
+    <p class="mt-3">
+      Oups… quelque chose s’est mal passé de notre côté.  
+      Cette erreur est due à un problème interne de l’application.
+    </p>
+
+    <hr class="my-4">
+
+    <h5>ℹ️ Que faire ?</h5>
+    <ul class="text-start mx-auto d-inline-block">
+      <li>➡️ <strong>Prévenez le webmaster</strong> afin qu’il puisse corriger le problème.</li>
+      <li>➡️ Vous pouvez aussi réessayer un peu plus tard, parfois le serveur a juste besoin d’un petit café ☕.</li>
+    </ul>
+
+    <a href="/" class="btn btn-primary mt-3">🏠 Retour à l’accueil</a>
+  </div>
+</div>
+');
+INSERT INTO "Languages" VALUES (67,'LoginRequired','<div class="alert alert-warning" role="alert">
+  <p>🔒 <strong>Oops… this resource is reserved for logged-in members!</strong></p>
+  <p>You need to log in to access it.</p>
+  <p>💡 By choosing the "Remember me" option, your browser will roll out the 🟥red carpet🟥 next time, no password required.</p>
+</div>
+','<div class="alert alert-warning" role="alert">
+  <!-- Version française -->
+  <p>🔒 <strong>Oups… cette ressource est réservée aux membres connectés !</strong></p>
+  <p>Il faut se connecter pour la découvrir.</p>
+  <p>💡 Avec l''option « Se souvenir de moi », ton navigateur te déroulera le 🟥tapis rouge🟥 la prochaine fois, sans passer par la case mot de passe.</p>
+</div>
+');
 INSERT INTO "Metadata" VALUES (1,'MyClub',1);
 INSERT INTO "Person" VALUES (1,'webmaster@myclub.foo','e427c26faca947919b18b797bc143a35100e4de48c34b70b26202d3a7d8e51f7','my first name','my last name','my nick name or nothing',NULL,'0',NULL,NULL,NULL,NULL,0,0,NULL,NULL,'2025-01-01',0,NULL,NULL,NULL,NULL);
 INSERT INTO "PersonGroup" VALUES (1,1,1);

@@ -14,7 +14,7 @@ class GroupDataHelper extends Data
         parent::__construct($application);
     }
 
-    public function getAvailableGroups(ConnectedUser $connectedUser, int $personId)
+    public function getAvailableGroups(ConnectedUser $connectedUser, int $personId): array
     {
         if ($connectedUser->isWebmaster()) {
             $query = $this->pdo->prepare("
@@ -94,7 +94,7 @@ class GroupDataHelper extends Data
         return [$availableGroupsLeftQuery->fetchAll(), $currentGroups];
     }
 
-    public function getCurrentGroups($personId)
+    public function getCurrentGroups(int $personId): array
     {
         $query = $this->pdo->prepare('
             SELECT g.*, 
@@ -131,7 +131,7 @@ class GroupDataHelper extends Data
         return $this->query($sql);
     }
 
-    public function getGroupCount()
+    public function getGroupCount(): array
     {
         $groupCounts = [];
         $groupCountResult = $this->pdo->query("
@@ -148,7 +148,7 @@ class GroupDataHelper extends Data
         return $groupCounts;
     }
 
-    public function insert($name, $selfRegistration, $selectedAuthorizations)
+    public function insert(string $name, int $selfRegistration, array $selectedAuthorizations): void
     {
         $this->pdo->beginTransaction();
         try {
@@ -166,12 +166,12 @@ class GroupDataHelper extends Data
         }
     }
 
-    public function inactive($id): int|bool
+    public function inactive(int $id): int|bool
     {
         return $this->set('Group', ['Inactivated'  => 1], ['Id' => $id]);
     }
 
-    public function update($id, $name, $selfRegistration, $selectedAuthorizations)
+    public function update(int $id, string $name, int $selfRegistration, array $selectedAuthorizations): void
     {
         $this->pdo->beginTransaction();
         try {

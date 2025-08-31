@@ -285,7 +285,7 @@ class EventApi extends AbstractApi
     #region Need
     public function deleteNeed(int $id): void
     {
-        if (!$this->authService->isWebmaster()) {
+        if (!$this->authService->isEventDesigner()) {
             $this->renderUnauthorized();
             return;
         }
@@ -321,7 +321,7 @@ class EventApi extends AbstractApi
 
     public function saveNeed(): void
     {
-        if (!$this->authService->isWebmaster()) {
+        if (!$this->authService->isEventDesigner()) {
             $this->renderUnauthorized();
             return;
         }
@@ -340,7 +340,7 @@ class EventApi extends AbstractApi
 
     public function deleteNeedType(int $id): void
     {
-        if (!$this->authService->isWebmaster()) {
+        if (!$this->authService->isEventDesigner()) {
             $this->renderUnauthorized();
             return;
         }
@@ -358,7 +358,7 @@ class EventApi extends AbstractApi
 
     public function saveNeedType(): void
     {
-        if (!$this->authService->isWebmaster()) {
+        if (!$this->authService->isEventDesigner()) {
             $this->renderUnauthorized();
             return;
         }

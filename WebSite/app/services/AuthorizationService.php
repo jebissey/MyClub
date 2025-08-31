@@ -19,6 +19,11 @@ class AuthorizationService implements AuthorizationServiceInterface
         return $this->connectedUser->get()->isWebmaster() ?? false;
     }
 
+    public function isEventDesigner(): bool
+    {
+        return $this->connectedUser->get()->isEventDesigner() ?? false;
+    }
+
     public function isEventManager(): bool
     {
         return $this->connectedUser->get()->isEventManager() ?? false;

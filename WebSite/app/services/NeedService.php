@@ -11,6 +11,7 @@ use app\models\DataHelper;
 use app\models\NeedDataHelper;
 use app\models\EventNeedHelper;
 use app\valueObjects\ApiResponse;
+use Throwable;
 
 class NeedService implements NeedServiceInterface
 {
@@ -26,9 +27,13 @@ class NeedService implements NeedServiceInterface
 
     public function deleteNeed(int $id): ApiResponse
     {
-        $result = $this->dataHelper->delete('Need', ['Id' => $id]);
-        $success = $result === 1;
-        return new ApiResponse($success,$success?ApplicationError::Ok->value:ApplicationError::Error->value);
+        try {
+            $result = $this->dataHelper->delete('Need', ['Id' => $id]);
+            $success = $result === 1;
+        } catch (Throwable $e) {
+            $success = false;
+        }
+        return new ApiResponse($success, $success ? ApplicationError::Ok->value : ApplicationError::BadRequest->value, [], $e->getMessage());
     }
 
     public function saveNeed(array $data): ApiResponse
@@ -42,7 +47,7 @@ class NeedService implements NeedServiceInterface
         ];
         $result = $this->dataHelper->set('Need', $needData, $data['id'] == null ? [] : ['Id' => $data['id']]);
         $success = is_bool($result) ? $result : (is_int($result) ? true : Application::unreachable($result));
-        return new ApiResponse($success,$success?ApplicationError::Ok->value:ApplicationError::Error->value);
+        return new ApiResponse($success, $success ? ApplicationError::Ok->value : ApplicationError::Error->value);
     }
 
     public function getEventNeeds(int $eventId): ApiResponse

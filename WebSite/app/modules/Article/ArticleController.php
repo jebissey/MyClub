@@ -44,7 +44,7 @@ class ArticleController extends TableController
         } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
-        public function help(): void
+    public function help(): void
     {
         if ($this->connectedUser->get()->isAdministrator() ?? false) {
             $this->render('Common/views/info.latte', [
@@ -113,8 +113,16 @@ class ArticleController extends TableController
 
     public function show(int $id): void
     {
+        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+            return;
+        }
         $connectedUser = $this->connectedUser->get();
         $article = $this->authorizationDatahelper->getArticle($id, $connectedUser);
+        if (!$article) {
+            if (!($connectedUser->person ?? false)) $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Il faut être connecté pour pouvoir consulter cet article', 5000);
+            return;
+        }
         if ($article) {
             $articleIds = $this->articleDataHelper->getArticleIdsBasedOnAccess($connectedUser->person?->Email ?? '');
             $chosenArticle = $this->articleDataHelper->getLatestArticle([$id]);
@@ -146,8 +154,7 @@ class ArticleController extends TableController
                 'carouselItems' => (new DataHelper($this->application))->gets('Carousel', ['IdArticle' => $id]),
                 'message' => $messages,
             ]));
-        } else if (!($connectedUser->person ?? false)) $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Il faut être connecté pour pouvoir consulter cet article', 5000);
-        else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function update(int $id): void

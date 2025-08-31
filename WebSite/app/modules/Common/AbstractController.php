@@ -7,6 +7,7 @@ use flight\Engine;
 use Latte\Engine as LatteEngine;
 use RuntimeException;
 
+use app\enums\ApplicationError;
 use app\enums\TimeOfDay;
 use app\helpers\Application;
 use app\helpers\TranslationManager;
@@ -88,9 +89,15 @@ abstract class AbstractController
         return $filteredNavItems;
     }
 
+    public function raiseMethodNotAllowed(string $file, int $line):void
+    {
+        $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, "Method not allowed in file {$file} at line {$line}");
+    }
+
     public function render(string $name, object|array $params = []): void
     {
-#error_log("\n\n" . var_export($name, true) . "\n");        
+#error_log("\n\n" . json_encode($name, JSON_PRETTY_PRINT) . "\n");
+
         $content = $this->latte->renderToString($name, $params);
         echo $content;
         if (ob_get_level()) ob_end_flush();

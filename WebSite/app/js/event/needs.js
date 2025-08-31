@@ -45,7 +45,7 @@ document.addEventListener('DOMContentLoaded', function () {
             id: document.getElementById('needTypeId').value,
             name: document.getElementById('needTypeName').value
         };
-        fetch('/api/needs/type/save', {
+        fetch('/api/need/type/save', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -76,7 +76,7 @@ document.addEventListener('DOMContentLoaded', function () {
             participantDependent: document.getElementById('needParticipantDependent').checked ? 1 : 0
         };
 
-        fetch('/api/needs/save', {
+        fetch('/api/need/save', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -120,7 +120,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     document.getElementById('confirmDelete').addEventListener('click', function () {
-        const endpoint = deleteItemType === 'type' ? '/api/needs/type/delete/' : '/api/needs/delete/';
+        const endpoint = deleteItemType === 'type' ? '/api/need/type/delete/' : '/api/need/delete/';
         fetch(endpoint + deleteItemId, {
             method: 'DELETE',
             headers: {
