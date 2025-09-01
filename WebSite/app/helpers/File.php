@@ -2,7 +2,7 @@
 
 namespace app\helpers;
 
-use RuntimeException;
+use app\exceptions\FileException;
 
 class File
 {
@@ -17,7 +17,7 @@ class File
         $destinationFile = $destinationDir . basename($sourceFile);
         if (!is_dir($destinationDir)) {
             if (!mkdir($destinationDir, 0777, true))
-                throw new RuntimeException('Error creating ' . $destinationDir . ' folder in file ' . __FILE__ . ' at line ' . __LINE__);
+                throw new FileException('Error creating ' . $destinationDir . ' folder in file ' . __FILE__ . ' at line ' . __LINE__);
         }
         return copy($sourceFile, $destinationFile);
     }

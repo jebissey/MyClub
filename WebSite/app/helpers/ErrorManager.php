@@ -4,6 +4,7 @@ namespace app\helpers;
 
 use app\enums\ApplicationError;
 use app\models\DataHelper;
+use app\models\LanguagesDataHelper;
 use app\models\LogDataHelper;
 use app\modules\Common\EmptyController;
 
@@ -44,9 +45,13 @@ class ErrorManager
         http_response_code($code->value);
         header('Content-Type: text/html; charset=utf-8');
 
-        $result = (new DataHelper($this->application))->get('Settings', ['Name' => 'Error_' . $code->value], 'Value');
-        if ($result !== false) {
-            echo $result->Value;
+        $translation = (new LanguagesDataHelper($this->application))->translate('Error' . $code->value);
+        $setting = (new DataHelper($this->application))->get('Settings', ['Name' => 'Error_' . $code->value], 'Value');
+        $result = '';
+        if ($setting !== false && $setting->Value != '') $result =  $setting->Value;
+        elseif ($translation != "-- Error{$code->value} --") $result = $translation;
+        if ($result !== '') {
+            echo $result;
             $timeout = 5000;
         } else {
             if ($displayCode) echo "<h1>{$code->value}</h1>";

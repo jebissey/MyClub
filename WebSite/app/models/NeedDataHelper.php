@@ -3,7 +3,6 @@
 namespace app\models;
 
 use app\helpers\Application;
-use RuntimeException;
 
 class NeedDataHelper extends Data
 {

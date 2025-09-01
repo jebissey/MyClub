@@ -62,7 +62,7 @@ class EventApi extends AbstractApi
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            $this->renderJson(['message' => 'Not allowed method: ' . $_SERVER['REQUEST_METHOD'] . ' in file ' . __FILE__ . ' at line ' . __LINE__], false, ApplicationError::MethodNotAllowed->value);
+            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
         try {
@@ -81,7 +81,7 @@ class EventApi extends AbstractApi
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'DELETE') {
-            $this->renderJson(['message' => 'Not allowed method: ' . $_SERVER['REQUEST_METHOD'] . ' in file ' . __FILE__ . ' at line ' . __LINE__], false, ApplicationError::MethodNotAllowed->value);
+            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
         try {
@@ -95,7 +95,7 @@ class EventApi extends AbstractApi
     public function getAttributes(): void
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
-            $this->renderJson(['message' => 'Not allowed method: ' . $_SERVER['REQUEST_METHOD'] . ' in file ' . __FILE__ . ' at line ' . __LINE__], false, ApplicationError::MethodNotAllowed->value);
+            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
         try {
@@ -108,7 +108,7 @@ class EventApi extends AbstractApi
     public function getAttributesByEventType(int $eventTypeId): void
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
-            $this->renderJson(['message' => 'Not allowed method: ' . $_SERVER['REQUEST_METHOD'] . ' in file ' . __FILE__ . ' at line ' . __LINE__], false, ApplicationError::MethodNotAllowed->value);
+            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
         if ($eventTypeId <= 0) {
@@ -129,7 +129,7 @@ class EventApi extends AbstractApi
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            $this->renderJson(['message' => 'Not allowed method: ' . $_SERVER['REQUEST_METHOD'] . ' in file ' . __FILE__ . ' at line ' . __LINE__], false, ApplicationError::MethodNotAllowed->value);
+            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
         try {
@@ -149,7 +149,7 @@ class EventApi extends AbstractApi
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'DELETE') {
-            $this->renderJson(['message' => 'Not allowed method: ' . $_SERVER['REQUEST_METHOD'] . ' in file ' . __FILE__ . ' at line ' . __LINE__], false, ApplicationError::MethodNotAllowed->value);
+            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
         try {
@@ -167,7 +167,7 @@ class EventApi extends AbstractApi
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            $this->renderJson(['message' => 'Not allowed method: ' . $_SERVER['REQUEST_METHOD'] . ' in file ' . __FILE__ . ' at line ' . __LINE__], false, ApplicationError::MethodNotAllowed->value);
+            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
         try {
@@ -189,7 +189,7 @@ class EventApi extends AbstractApi
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
-            $this->renderJson(['message' => 'Not allowed method: ' . $_SERVER['REQUEST_METHOD'] . ' in file ' . __FILE__ . ' at line ' . __LINE__], false, ApplicationError::MethodNotAllowed->value);
+            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
         try {
@@ -207,7 +207,7 @@ class EventApi extends AbstractApi
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            $this->renderJson(['message' => 'Not allowed method: ' . $_SERVER['REQUEST_METHOD'] . ' in file ' . __FILE__ . ' at line ' . __LINE__], false, ApplicationError::MethodNotAllowed->value);
+            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
         try {
@@ -228,7 +228,7 @@ class EventApi extends AbstractApi
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            $this->renderJson(['message' => 'Not allowed method: ' . $_SERVER['REQUEST_METHOD'] . ' in file ' . __FILE__ . ' at line ' . __LINE__], false, ApplicationError::MethodNotAllowed->value);
+            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
         try {
@@ -249,7 +249,7 @@ class EventApi extends AbstractApi
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'DELETE') {
-            $this->renderJson(['message' => 'Not allowed method: ' . $_SERVER['REQUEST_METHOD'] . ' in file ' . __FILE__ . ' at line ' . __LINE__], false, ApplicationError::MethodNotAllowed->value);
+            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
         try {
@@ -269,7 +269,7 @@ class EventApi extends AbstractApi
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            $this->renderJson(['message' => 'Not allowed method: ' . $_SERVER['REQUEST_METHOD'] . ' in file ' . __FILE__ . ' at line ' . __LINE__], false, ApplicationError::MethodNotAllowed->value);
+            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
         try {
@@ -290,7 +290,7 @@ class EventApi extends AbstractApi
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'DELETE') {
-            $this->renderJson(['message' => 'Not allowed method: ' . $_SERVER['REQUEST_METHOD'] . ' in file ' . __FILE__ . ' at line ' . __LINE__], false, ApplicationError::MethodNotAllowed->value);
+            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
         try {
@@ -308,7 +308,7 @@ class EventApi extends AbstractApi
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
-            $this->renderJson(['message' => 'Not allowed method: ' . $_SERVER['REQUEST_METHOD'] . ' in file ' . __FILE__ . ' at line ' . __LINE__], false, ApplicationError::MethodNotAllowed->value);
+            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
         try {
@@ -326,7 +326,7 @@ class EventApi extends AbstractApi
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            $this->renderJson(['message' => 'Not allowed method: ' . $_SERVER['REQUEST_METHOD'] . ' in file ' . __FILE__ . ' at line ' . __LINE__], false, ApplicationError::MethodNotAllowed->value);
+            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
         $data = $this->getJsonInput();
@@ -345,7 +345,7 @@ class EventApi extends AbstractApi
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'DELETE') {
-            $this->renderJson(['message' => 'Not allowed method: ' . $_SERVER['REQUEST_METHOD'] . ' in file ' . __FILE__ . ' at line ' . __LINE__], false, ApplicationError::MethodNotAllowed->value);
+            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
         try {
@@ -363,7 +363,7 @@ class EventApi extends AbstractApi
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            $this->renderJson(['message' => 'Not allowed method: ' . $_SERVER['REQUEST_METHOD'] . ' in file ' . __FILE__ . ' at line ' . __LINE__], false, ApplicationError::MethodNotAllowed->value);
+            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
         try {
@@ -395,7 +395,7 @@ class EventApi extends AbstractApi
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            $this->renderJson(['message' => 'Not allowed method: ' . $_SERVER['REQUEST_METHOD'] . ' in file ' . __FILE__ . ' at line ' . __LINE__], false, ApplicationError::MethodNotAllowed->value);
+            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
         try {
@@ -423,7 +423,7 @@ class EventApi extends AbstractApi
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            $this->renderJson(['message' => 'Method ' + $_SERVER['REQUEST_METHOD'] + ' invalid in file ' + __FILE__ + ' at line ' + __LINE__], false, ApplicationError::MethodNotAllowed->value);
+            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
         try {

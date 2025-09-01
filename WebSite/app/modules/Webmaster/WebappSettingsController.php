@@ -30,25 +30,27 @@ class WebappSettingsController extends AbstractController
         $this->settingsKeys['Home_footer'] = $this->languagesDataHelper->translate('Home_footer');
     }
 
-    public function editSettings()
+    public function editSettings(): void
     {
         if ($person = $this->connectedUser->get()->person ?? false) {
-            if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-                $settings = [];
-                foreach ($this->settingsKeys as $key => $label) {
-                    $result = $this->dataHelper->get('Settings', ['Name' => $key], 'Value');
-                    if ($result === false) {
-                        $this->dataHelper->set('Settings', ['Value' => '', 'Name' => $key]);
-                        $settings[$key] = '';
-                    } else $settings[$key] = $result->Value ?? '';
-                }
+            if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+                $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+                return;
+            }
+            $settings = [];
+            foreach ($this->settingsKeys as $key => $label) {
+                $result = $this->dataHelper->get('Settings', ['Name' => $key], 'Value');
+                if ($result === false) {
+                    $this->dataHelper->set('Settings', ['Value' => '', 'Name' => $key]);
+                    $settings[$key] = '';
+                } else $settings[$key] = $result->Value ?? '';
+            }
 
-                $this->render('Webmaster/views/webappSettings.latte', Params::getAll([
-                    'navItems' => $this->getNavItems($person),
-                    'settingsKeys' => $this->settingsKeys,
-                    'settings' => $settings
-                ]));
-            } else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
+            $this->render('Webmaster/views/webappSettings.latte', Params::getAll([
+                'navItems' => $this->getNavItems($person),
+                'settingsKeys' => $this->settingsKeys,
+                'settings' => $settings
+            ]));
         } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 

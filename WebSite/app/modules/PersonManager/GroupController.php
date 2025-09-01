@@ -21,7 +21,7 @@ class GroupController extends AbstractController implements CrudControllerInterf
         $this->groupDataHelper = new GroupDataHelper($application);
     }
 
-    public function index()
+    public function index(): void
     {
         if (($this->connectedUser->get()->isPersonManager() ?? false) || $this->connectedUser->isWebmaster() ?? false) {
             $this->render('PersonManager/views/groups_index.latte', Params::getAll([
@@ -33,7 +33,7 @@ class GroupController extends AbstractController implements CrudControllerInterf
         } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
-    public function create()
+    public function create(): void
     {
         if (($this->connectedUser->get()->isPersonManager() ?? false) || $this->connectedUser->isWebmaster() ?? false) {
 
@@ -67,7 +67,7 @@ class GroupController extends AbstractController implements CrudControllerInterf
         } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
-    public function edit($id)
+    public function edit(int $id): void
     {
         if (($this->connectedUser->get()->isPersonManager() ?? false) || $this->connectedUser->isWebmaster() ?? false) {
             $availableAuthorizations = $this->dataHelper->gets('Authorization', ['Id <> 1' => null], '*', 'Name');
@@ -108,7 +108,7 @@ class GroupController extends AbstractController implements CrudControllerInterf
         } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
-    public function delete($id)
+    public function delete(int $id): void
     {
         if (($this->connectedUser->get()->isPersonManager() ?? false) || $this->connectedUser->isWebmaster() ?? false) {
             $this->dataHelper->set('Group', ['Inactivated' => 0], ['Id' => $id]);

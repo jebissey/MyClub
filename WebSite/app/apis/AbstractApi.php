@@ -56,6 +56,15 @@ abstract class AbstractApi
         );
     }
 
+    protected function renderJsonMethodNotAllowed(string $file, int $line)
+    {
+        $this->renderJson(
+            ['message' => "Method {$_SERVER['REQUEST_METHOD']} not allowed in file {$file} at line {$line}"],
+            false,
+            ApplicationError::MethodNotAllowed->value,
+        );
+    }
+
     protected function renderPartial(string $template, array $params = []): void
     {
         $this->latte->render($template, $params);

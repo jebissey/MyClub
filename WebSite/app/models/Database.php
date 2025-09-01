@@ -3,9 +3,9 @@
 namespace app\models;
 
 use PDO;
-use RuntimeException;
 use Throwable;
 
+use app\helpers\Application;
 use app\helpers\File;
 use app\models\database\migrators\V1ToV2Migrator;
 
@@ -34,12 +34,12 @@ class Database
 
     public function getPdo(): PDO
     {
-        return self::$pdo ?? throw new RuntimeException('Fatal error in file ' . __FILE__ . ' at line ' . __LINE__);
+        return self::$pdo ?? Application::unreachable('Fatal error with null pdo in file ', __FILE__, __LINE__);
     }
 
     public function getPdoForLog(): PDO
     {
-        return self::$pdoForLog ?? throw new RuntimeException('Fatal error in file ' . __FILE__ . ' at line ' . __LINE__);
+        return self::$pdoForLog ?? Application::unreachable('Fatal error with null pdoforLog in file ', __FILE__, __LINE__);
     }
 
     private function check(): void
@@ -60,12 +60,12 @@ class Database
         $stmt = self::$pdo->query($query);
         $row = $stmt->fetch();
         if ($row) {
-            if ($row->ApplicationName != self::APPLICATION) throw new RuntimeException('Non-compliant database in file ' . __FILE__ . ' at line ' . __LINE__);
+            if ($row->ApplicationName != self::APPLICATION) Application::unreachable('Non-compliant database', __FILE__, __LINE__);
             if ($row->DatabaseVersion != self::DB_VERSION) {
-                if ($row->DatabaseVersion > self::DB_VERSION)  throw new RuntimeException('The database requires a more recent version of the applicationin  in file ' . __FILE__ . ' at line ' . __LINE__);
+                if ($row->DatabaseVersion > self::DB_VERSION) Application::unreachable('The database requires a more recent version of the application', __FILE__, __LINE__);
                 self::upgradeDatabase(self::$pdo, $row->DatabaseVersion, self::DB_VERSION);
             }
-        } else throw new RuntimeException('Empty Metadata table in file ' + __FILE__ + ' at line ' + __LINE__);
+        } else Application::unreachable('Empty Metadata table', __FILE__, __LINE__);
     }
 
     private function upgradeDatabase(PDO $pdo, int $from, int $to)
@@ -76,13 +76,13 @@ class Database
             if ($from == 1) $from = new V1ToV2Migrator($pdo);
 
 
-            if ($from != $to) throw new RuntimeException('Fatal program error in file ' + __FILE__ + ' at line ' + __LINE__);
+            if ($from != $to) Application::unreachable('Fatal program error', __FILE__, __LINE__);
 
             $stmt = $pdo->prepare("UPDATE Metadata SET DatabaseVersion = ? WHERE Id = 1");
             $stmt->execute([$to]);
         } catch (Throwable $e) {
             $pdo->rollBack();
-            throw new RuntimeException('Fatal program error ' . $e->getMessage() . ' in file ' + __FILE__ + ' at line ' + __LINE__);
+            Application::unreachable('Fatal program error: ' . $e->getMessage(), __FILE__, __LINE__);
         }
         $pdo->commit();
         return;

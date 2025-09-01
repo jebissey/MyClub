@@ -21,17 +21,19 @@ class ImportController extends AbstractController
         parent::__construct($application);
     }
 
-    public function showImportForm()
+    public function showImportForm(): void
     {
         if ($this->connectedUser->get()->isPersonManager() ?? false) {
-            if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-                $this->loadSettings();
+            if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+                $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+                return;
+            }
+            $this->loadSettings();
 
-                $this->render('PersonManager/views/users_import.latte', Params::getAll([
-                    'importSettings' => $this->importSettings,
-                    'results' => $this->results
-                ]));
-            } else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
+            $this->render('PersonManager/views/users_import.latte', Params::getAll([
+                'importSettings' => $this->importSettings,
+                'results' => $this->results
+            ]));
         } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 

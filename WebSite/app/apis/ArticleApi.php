@@ -31,7 +31,7 @@ class ArticleApi extends AbstractApi
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'DELETE') {
-            $this->renderJson(['message' => 'Not allowed method: ' . $_SERVER['REQUEST_METHOD'] . ' in file ' . __FILE__ . ' at line ' . __LINE__], false, ApplicationError::MethodNotAllowed->value);
+            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
         $this->renderJson($this->media->deleteFile($year, $month, $filename), true, ApplicationError::Ok->value);
@@ -44,7 +44,7 @@ class ArticleApi extends AbstractApi
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            $this->renderJson(['message' => 'Not allowed method: ' . $_SERVER['REQUEST_METHOD'] . ' in file ' . __FILE__ . ' at line ' . __LINE__], false, ApplicationError::MethodNotAllowed->value);
+            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
         (new DesignDataHelper($this->application))->insertOrUpdate(json_decode(file_get_contents('php://input'), true), $this->connectedUser->person->Id);
@@ -59,7 +59,7 @@ class ArticleApi extends AbstractApi
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            $this->renderJson(['message' => 'Not allowed method: ' . $_SERVER['REQUEST_METHOD'] . ' in file ' . __FILE__ . ' at line ' . __LINE__], false, ApplicationError::MethodNotAllowed->value);
+            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
         $json = file_get_contents('php://input');
@@ -81,7 +81,7 @@ class ArticleApi extends AbstractApi
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
-            $this->renderJson(['message' => 'Not allowed method: ' . $_SERVER['REQUEST_METHOD'] . ' in file ' . __FILE__ . ' at line ' . __LINE__], false, ApplicationError::MethodNotAllowed->value);
+            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
         $survey = $this->dataHelper->get('Survey', ['IdArticle' => $articleId], 'Id, Question, Options');
@@ -114,7 +114,7 @@ class ArticleApi extends AbstractApi
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            $this->renderJson(['message' => 'Not allowed method: ' . $_SERVER['REQUEST_METHOD'] . ' in file ' . __FILE__ . ' at line ' . __LINE__], false, ApplicationError::MethodNotAllowed->value);
+            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
         if (empty($_FILES['file'])) {

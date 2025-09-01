@@ -174,6 +174,7 @@ CREATE TABLE IF NOT EXISTS "Metadata" (
 	"Id"	INTEGER,
 	"ApplicationName"	TEXT NOT NULL,
 	"DatabaseVersion"	INTEGER NOT NULL,
+	"SiteUnderMaintenance"	INTEGER NOT NULL DEFAULT 0,
 	PRIMARY KEY("Id")
 );
 CREATE TABLE IF NOT EXISTS "Need" (
@@ -508,7 +509,34 @@ INSERT INTO "Languages" VALUES (67,'LoginRequired','<div class="alert alert-warn
   <p>💡 Avec l''option « Se souvenir de moi », ton navigateur te déroulera le 🟥tapis rouge🟥 la prochaine fois, sans passer par la case mot de passe.</p>
 </div>
 ');
-INSERT INTO "Metadata" VALUES (1,'MyClub',1);
+INSERT INTO "Languages" VALUES (68,'Error503','<div class="text-center full-screen d-flex flex-column justify-content-center align-items-center">
+    <div class="emoji">🚧</div>
+    <h1 class="mt-4">Site en maintenance</h1>
+    <p class="text-muted">Vous serez redirigé vers l’accueil dans 30 secondes...</p>
+    <a href="/" class="btn btn-primary mt-3">Retourner à l’accueil maintenant</a>
+</div>
+<style>
+    .full-screen {
+      height: 100vh;
+    }
+    .emoji {
+      font-size: 10rem;
+    }
+</style>','<div class="text-center full-screen d-flex flex-column justify-content-center align-items-center">
+    <div class="emoji">🚧</div>
+	<h1 class="mt-4">Site Under Maintenance</h1>
+	<p class="text-muted">You will be redirected to the homepage in 30 seconds...</p>
+	<a href="/" class="btn btn-primary mt-3">Return to Homepage Now</a>
+</div>
+<style>
+    .full-screen {
+      height: 100vh;
+    }
+    .emoji {
+      font-size: 10rem;
+    }
+</style>');
+INSERT INTO "Metadata" VALUES (1,'MyClub',1,0);
 INSERT INTO "Person" VALUES (1,'webmaster@myclub.foo','e427c26faca947919b18b797bc143a35100e4de48c34b70b26202d3a7d8e51f7','my first name','my last name','my nick name or nothing',NULL,'0',NULL,NULL,NULL,NULL,0,0,NULL,NULL,'2025-01-01',0,NULL,NULL,NULL,NULL);
 INSERT INTO "PersonGroup" VALUES (1,1,1);
 INSERT INTO "Settings" VALUES (1,'Title','title');

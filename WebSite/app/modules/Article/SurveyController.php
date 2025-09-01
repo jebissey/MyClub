@@ -2,11 +2,10 @@
 
 namespace app\modules\Article;
 
-use RuntimeException;
-
 use app\enums\ApplicationError;
 use app\enums\FilterInputRule;
 use app\enums\SurveyVisibility;
+use app\exceptions\IntegrityException;
 use app\helpers\Application;
 use app\helpers\Params;
 use app\helpers\WebApp;
@@ -24,18 +23,20 @@ class SurveyController extends AbstractController
     public function add($articleId)
     {
         if ($this->connectedUser->get()->isRedactor() ?? false) {
-            if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-                $article = $this->dataHelper->get('Article', ['Id' => $articleId], 'Title, Id, ');
-                if (!$article) {
-                    $this->redirect('/articles');
-                    return;
-                }
+            if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+                $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+                return;
+            }
+            $article = $this->dataHelper->get('Article', ['Id' => $articleId], 'Title, Id, ');
+            if (!$article) {
+                $this->redirect('/articles');
+                return;
+            }
 
-                $this->render('Article/views/survey_add.latte', Params::getAll([
-                    'article' => $article,
-                    'survey' => $this->dataHelper->get('Survey', ['IdArticle' => $article->Id], 'Question, Options, ClosingDate, Visibility')
-                ]));
-            } else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
+            $this->render('Article/views/survey_add.latte', Params::getAll([
+                'article' => $article,
+                'survey' => $this->dataHelper->get('Survey', ['IdArticle' => $article->Id], 'Question, Options, ClosingDate, Visibility')
+            ]));
         } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
@@ -51,7 +52,7 @@ class SurveyController extends AbstractController
                     'options' => FilterInputRule::ArrayString,
                 ];
                 $input = WebApp::filterInput($schema, $this->flight->request()->data->getData());
-                $articleId = $input['article_id'] ?? throw new RuntimeException('Fatal error in file ' . __FILE__ . ' at line ' . __LINE__);
+                $articleId = $input['article_id'] ?? throw new IntegrityException('Fatal error in file ' . __FILE__ . ' at line ' . __LINE__);
                 $question = $input['question'] ?? '???';
                 $closingDate = $input['closingDate'] ?? date('now', '+7 days');
                 $visibility = $input['visibility'] ?? SurveyVisibility::Redactor->value;

@@ -5,10 +5,10 @@ namespace app\models;
 use InvalidArgumentException;
 use PDO;
 use PDOException;
-use RuntimeException;
 
-use app\helpers\Application;
 use app\enums\ApplicationError;
+use app\exceptions\SqliteTableException;
+use app\helpers\Application;
 
 /*
 Examples
@@ -45,9 +45,9 @@ abstract class Data
 
     protected function validateTableName(string $table): void
     {
-        if (strlen($table) > 64)            throw new RuntimeException('Table name too long (max 64) in file ' . __FILE__ . ' at line ' . __LINE__);
-        if (!preg_match('/^[a-zA-Z0-9_]+$/', $table)) throw new RuntimeException('Invalid table name in file ' . __FILE__ . ' at line ' . __LINE__);
-        if (!in_array($table, $this->tables))   throw new RuntimeException("Table '$table' not found in file " . __FILE__ . ' at line ' . __LINE__);
+        if (strlen($table) > 64)                      throw new SqliteTableException('Table name too long (max 64) in file ' . __FILE__ . ' at line ' . __LINE__);
+        if (!preg_match('/^[a-zA-Z0-9_]+$/', $table)) throw new SqliteTableException('Invalid table name in file ' . __FILE__ . ' at line ' . __LINE__);
+        if (!in_array($table, $this->tables))         throw new SqliteTableException("Table '$table' not found in file " . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function count(string $query): int

@@ -2,7 +2,6 @@
 
 namespace test\Core;
 
-use RuntimeException;
 use test\Interfaces\AuthenticatorInterface;
 use test\Interfaces\HttpClientInterface;
 use test\Interfaces\MyclubDataRepositoryInterface;

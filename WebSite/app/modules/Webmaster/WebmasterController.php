@@ -93,7 +93,6 @@ class WebmasterController extends AbstractController
         } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
-
     public function helpVisitorInsights(): void
     {
         $this->render('Common/views/info.latte', [
@@ -120,70 +119,108 @@ class WebmasterController extends AbstractController
 
     public function homeAdmin()
     {
-        if ($this->connectedUser->get()->isAdministrator() ?? false) {
-            if ($this->connectedUser->hasOnlyOneAutorization()) {
-                if ($this->connectedUser->isDesigner())          $this->redirect('/designer');
-                elseif ($this->connectedUser->isEventManager())      $this->redirect('/eventManager');
-                elseif ($this->connectedUser->isPersonManager()) $this->redirect('/personManager');
-                elseif ($this->connectedUser->isRedactor()) {
-                    $_SESSION['navbar'] = 'redactor';
-                    $this->redirect('/articles');
-                }
-                if ($this->connectedUser->isWebmaster())   $this->redirect('/webmaster');
-            } else if ($_SERVER['REQUEST_METHOD'] === 'GET') $this->render('Webmaster/views/admin.latte', Params::getAll([]));
-            else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
-        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+        if (!($this->connectedUser->get()->isAdministrator() ?? false)) {
+            $this->raiseforbidden(__FILE__, __LINE__);
+            return;
+        }
+        if ($this->connectedUser->hasOnlyOneAutorization()) {
+            if ($this->connectedUser->isDesigner())          $this->redirect('/designer');
+            elseif ($this->connectedUser->isEventManager())  $this->redirect('/eventManager');
+            elseif ($this->connectedUser->isPersonManager()) $this->redirect('/personManager');
+            elseif ($this->connectedUser->isRedactor()) {
+                $_SESSION['navbar'] = 'redactor';
+                $this->redirect('/articles');
+            } elseif ($this->connectedUser->isWebmaster()) $this->redirect('/webmaster');
+        } else {
+            if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+                $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+                return;
+            }
+            $this->render('Webmaster/views/admin.latte', Params::getAll([]));
+        }
     }
 
     public function homeDesigner(): void
     {
         if ($this->connectedUser->get()->isDesigner() ?? false) {
 
-            if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-                $_SESSION['navbar'] = 'designer';
-                $this->render('Webmaster/views/designer.latte', Params::getAll([]));
-            } else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
+            if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+                $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+                return;
+            }
+            $_SESSION['navbar'] = 'designer';
+            $this->render('Webmaster/views/designer.latte', Params::getAll([]));
         } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function homeWebmaster(): void
     {
         if ($this->connectedUser->get()->isWebmaster() ?? false) {
+            if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+                $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+                return;
+            }
+            $_SESSION['navbar'] = 'webmaster';
 
-            if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-                $_SESSION['navbar'] = 'webmaster';
+            $newVersion = null;
+            $result = $this->getLastVersion();
+            if (!$result['success']) $newVersion = "Test for MyClub new version error : " . $result['error'];
+            elseif ($result['version'] != Application::VERSION) $newVersion = "A new version is available (V" . $result['version'] . ")";
 
-                $newVersion = null;
-                $result = $this->getLastVersion();
-                if (!$result['success']) $newVersion = "Test for MyClub new version error : " . $result['error'];
-                elseif ($result['version'] != Application::VERSION) $newVersion = "A new version is available (V" . $result['version'] . ")";
-
-                $this->render('Webmaster/views/webmaster.latte', Params::getAll([
-                    'newVersion' => $newVersion,
-                    'isMyclubWebSite' => WebApp::isMyClubWebSite(),
-                ]));
-            } else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
+            $this->render('Webmaster/views/webmaster.latte', Params::getAll([
+                'newVersion' => $newVersion,
+                'isMyclubWebSite' => WebApp::isMyClubWebSite(),
+            ]));
         } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
-    public function showInstallations()
+    public function maintenance(): void
+    {
+        if (!($this->connectedUser->get()->isWebmaster() ?? false)) {
+            $this->raiseforbidden(__FILE__, __LINE__);
+            return;
+        }
+        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+            return;
+        }
+        $this->render('Webmaster/views/maintenance.latte', Params::getAll(['isMyclubWebSite' => WebApp::isMyClubWebSite()]));
+    }
+
+    public function setSiteUnderMaintenance(): void
+    {
+        if (!($this->connectedUser->get()->isWebmaster() ?? false)) {
+            $this->raiseforbidden(__FILE__, __LINE__);
+            return;
+        }
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+            return;
+        }
+        $this->dataHelper->set('Metadata', ['SiteUnderMaintenance' => 1], ['Id' => 1]);
+        $this->redirect('/');
+    }
+
+    public function showInstallations(): void
     {
         $person = $this->connectedUser->get()->person ?? false;
-        if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-            if ($person && $this->connectedUser->isWebmaster()) {
-                $installations = (new LogDataHelper($this->application))->getInstallationsData();
+        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+            return;
+        }
+        if ($person && $this->connectedUser->isWebmaster()) {
+            $installations = (new LogDataHelper($this->application))->getInstallationsData();
 
-                $this->render('Webmaster/views/installations.latte', Params::getAll([
-                    'installations' => $installations,
-                    'totalInstallations' => count($installations),
-                    'navItems' => $this->getNavItems($person),
-                    'isMyclubWebSite' => WebApp::isMyClubWebSite(),
-                ]));
-            } else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
+            $this->render('Webmaster/views/installations.latte', Params::getAll([
+                'installations' => $installations,
+                'totalInstallations' => count($installations),
+                'navItems' => $this->getNavItems($person),
+                'isMyclubWebSite' => WebApp::isMyClubWebSite(),
+            ]));
         } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
-    public function sitemapGenerator()
+    public function sitemapGenerator(): void
     {
         $articleDataHelper = new ArticleDataHelper($this->application);
         $base_url = WebApp::getBaseUrl();
@@ -212,17 +249,18 @@ class WebmasterController extends AbstractController
     public function visitorInsights(): void
     {
         if ($this->connectedUser->get()->isVisitorInsights() ?? false) {
+            if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+                $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+                return;
+            }
+            $_SESSION['navbar'] = 'visitorInsights';
 
-            if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-                $_SESSION['navbar'] = 'visitorInsights';
-
-                $this->render('Webmaster/views/visitorInsights.latte', Params::getAll([]));
-            } else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
+            $this->render('Webmaster/views/visitorInsights.latte', Params::getAll([]));
         } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     #region Private methods
-    private function getLastVersion()
+    private function getLastVersion(): array
     {
         $url = WebApp::MYCLUB_WEBAPP . '/api/lastVersion?cv=' . Application::VERSION;
 

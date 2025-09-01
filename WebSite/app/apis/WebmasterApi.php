@@ -26,7 +26,7 @@ class WebmasterApi extends AbstractApi
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            $this->renderJson(['message' => 'Not allowed method: ' . $_SERVER['REQUEST_METHOD'] . ' in file ' . __FILE__ . ' at line ' . __LINE__], false, ApplicationError::MethodNotAllowed->value);
+            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
         try {
@@ -52,7 +52,7 @@ class WebmasterApi extends AbstractApi
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
-            $this->renderJson(['message' => 'Not allowed method: ' . $_SERVER['REQUEST_METHOD'] . ' in file ' . __FILE__ . ' at line ' . __LINE__], false, ApplicationError::MethodNotAllowed->value);
+            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
         try {
@@ -70,7 +70,7 @@ class WebmasterApi extends AbstractApi
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
-            $this->renderJson(['message' => 'Not allowed method: ' . $_SERVER['REQUEST_METHOD'] . ' in file ' . __FILE__ . ' at line ' . __LINE__], false, ApplicationError::MethodNotAllowed->value);
+            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
         (new LogDataHelper($this->application))->add(ApplicationError::Ok->value, $_SERVER['HTTP_USER_AGENT'] ?? 'HTTP_USER_AGENT not defined');
@@ -88,7 +88,7 @@ class WebmasterApi extends AbstractApi
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            $this->renderJson(['message' => 'Not allowed method: ' . $_SERVER['REQUEST_METHOD'] . ' in file ' . __FILE__ . ' at line ' . __LINE__], false, ApplicationError::MethodNotAllowed->value);
+            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
         try {
@@ -107,7 +107,7 @@ class WebmasterApi extends AbstractApi
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'DELETE') {
-            $this->renderJson(['message' => 'Not allowed method: ' . $_SERVER['REQUEST_METHOD'] . ' in file ' . __FILE__ . ' at line ' . __LINE__], false, ApplicationError::MethodNotAllowed->value);
+            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
         try {
@@ -142,7 +142,7 @@ class WebmasterApi extends AbstractApi
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            $this->renderJson(['message' => 'Not allowed method: ' . $_SERVER['REQUEST_METHOD'] . ' in file ' . __FILE__ . ' at line ' . __LINE__], false, ApplicationError::MethodNotAllowed->value);
+            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
         $data = json_decode(file_get_contents('php://input'), true);
@@ -166,7 +166,7 @@ class WebmasterApi extends AbstractApi
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            $this->renderJson(['message' => 'Not allowed method: ' . $_SERVER['REQUEST_METHOD'] . ' in file ' . __FILE__ . ' at line ' . __LINE__], false, ApplicationError::MethodNotAllowed->value);
+            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
         $data = json_decode(file_get_contents('php://input'), true);

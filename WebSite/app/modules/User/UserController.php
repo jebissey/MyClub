@@ -189,9 +189,11 @@ class UserController extends AbstractController
     {
         if ($this->connectedUser->get()->person ?? false) {
             $_SESSION['navbar'] = 'user';
-            if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-                $this->render('User/views/user.latte', Params::getAll(['page' => '']));
-            } else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
+            if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+                $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+                return;
+            }
+            $this->render('User/views/user.latte', Params::getAll(['page' => '']));
         } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
@@ -297,15 +299,17 @@ class UserController extends AbstractController
         } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
-    public function editPresentation()
+    public function editPresentation(): void
     {
         if ($person = $this->connectedUser->get()->person ?? false) {
-            if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-                $this->render('User/views/user_edit_presentation.latte', Params::getAll([
-                    'person' => $person,
-                    'navItems' => $this->getNavItems($person),
-                ]));
-            } else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
+            if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+                $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+                return;
+            }
+            $this->render('User/views/user_edit_presentation.latte', Params::getAll([
+                'person' => $person,
+                'navItems' => $this->getNavItems($person),
+            ]));
         } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
@@ -355,15 +359,17 @@ class UserController extends AbstractController
         } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
-    public function editNotepad()
+    public function editNotepad(): void
     {
         if ($person = $this->connectedUser->get(1)->person ?? false) {
-            if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-                $this->render('User/views/user_notepad.latte', Params::getAll([
-                    'notepad' => $person->Notepad,
-                    'navItems' => $this->getNavItems($person),
-                ]));
-            } else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
+            if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+                $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+                return;
+            }
+            $this->render('User/views/user_notepad.latte', Params::getAll([
+                'notepad' => $person->Notepad,
+                'navItems' => $this->getNavItems($person),
+            ]));
         } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
@@ -683,6 +689,6 @@ class UserController extends AbstractController
             $tranche = $stats['tranches'][$i];
             if ($userVisits >= $tranche['start'] && $userVisits <= $tranche['end']) return $i;
         }
-        throw new RuntimeException('$user slice not found in file ' . __FILE__ . ' at line ' . __LINE__);
+        Application::unreachable('User slice not found', __FILE__, __LINE__);
     }
 }

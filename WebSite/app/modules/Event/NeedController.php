@@ -20,12 +20,14 @@ class NeedController extends AbstractController
 
     public function needs(): void
     {
-        if ($this->connectedUser->get()->isWebmaster() ?? false) {
-            $this->render('Event/views/event_needs.latte', Params::getAll([
-                'navItems' => $this->getNavItems($this->connectedUser->person),
-                'needTypes' => $this->dataHelper->gets('NeedType', [], '*', 'Name'),
-                'needs' => $this->needDataHelper->getNeedsAndTheirTypes(),
-            ]));
-        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+        if (!($this->connectedUser->get()->isWebmaster() ?? false)) {
+            $this->raiseforbidden(__FILE__, __LINE__);
+            return;
+        }
+        $this->render('Event/views/event_needs.latte', Params::getAll([
+            'navItems' => $this->getNavItems($this->connectedUser->person),
+            'needTypes' => $this->dataHelper->gets('NeedType', [], '*', 'Name'),
+            'needs' => $this->needDataHelper->getNeedsAndTheirTypes(),
+        ]));
     }
 }

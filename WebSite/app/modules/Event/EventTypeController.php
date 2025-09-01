@@ -2,10 +2,9 @@
 
 namespace app\modules\Event;
 
-use RuntimeException;
-
 use app\enums\ApplicationError;
 use app\enums\FilterInputRule;
+use app\exceptions\IntegrityException;
 use app\helpers\Application;
 use app\helpers\Params;
 use app\helpers\WebApp;
@@ -24,45 +23,51 @@ class EventTypeController extends TableController implements CrudControllerInter
         $this->eventDataHelper = new EventDataHelper($application);
     }
 
-    public function index()
+    public function index(): void
     {
-        if ($this->connectedUser->get()->IsWebmaster() ?? false) {
-            $filterValues = [];
-            $filterConfig = [];
-            $columns = [
-                ['field' => 'EventTypeName', 'label' => 'Nom'],
-                ['field' => 'GroupName', 'label' => 'Groupe'],
-                ['field' => 'Attributes', 'label' => 'Attributs'],
-            ];
-            $data = $this->prepareTableData(
-                (new TableControllerDataHelper($this->application))->getEventTypesQuery(),
-                $filterValues,
-                (int)($this->flight->request()->query['tablePage'] ?? 1)
-            );
+        if (!($this->connectedUser->get()->IsWebmaster() ?? false)) {
+            $this->raiseforbidden(__FILE__, __LINE__);
+            return;
+        }
+        $filterValues = [];
+        $filterConfig = [];
+        $columns = [
+            ['field' => 'EventTypeName', 'label' => 'Nom'],
+            ['field' => 'GroupName', 'label' => 'Groupe'],
+            ['field' => 'Attributes', 'label' => 'Attributs'],
+        ];
+        $data = $this->prepareTableData(
+            (new TableControllerDataHelper($this->application))->getEventTypesQuery(),
+            $filterValues,
+            (int)($this->flight->request()->query['tablePage'] ?? 1)
+        );
 
-            $this->render('Event/views/eventTypes_index.latte', Params::getAll([
-                'eventTypes' => $data['items'],
-                'currentPage' => $data['currentPage'],
-                'totalPages' => $data['totalPages'],
-                'filterValues' => $filterValues,
-                'filters' => $filterConfig,
-                'columns' => $columns,
-                'resetUrl' => '/eventTypes'
-            ]));
-        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+        $this->render('Event/views/eventTypes_index.latte', Params::getAll([
+            'eventTypes' => $data['items'],
+            'currentPage' => $data['currentPage'],
+            'totalPages' => $data['totalPages'],
+            'filterValues' => $filterValues,
+            'filters' => $filterConfig,
+            'columns' => $columns,
+            'resetUrl' => '/eventTypes'
+        ]));
     }
 
-    public function create()
+    public function create(): void
     {
-        if ($this->connectedUser->get()->isWebmaster() ?? false) {
-            if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-                $id = $this->dataHelper->set('EventType', ['Name' => '']);
-                $this->redirect('/EventTypes/edit/' . $id);
-            } else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
-        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+        if (!($this->connectedUser->get()->isWebmaster() ?? false)) {
+            $this->raiseforbidden(__FILE__, __LINE__);
+            return;
+        }
+        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+            return;
+        }
+        $id = $this->dataHelper->set('EventType', ['Name' => '']);
+        $this->redirect('/EventTypes/edit/' . $id);
     }
 
-    public function edit($id)
+    public function edit(int $id): void
     {
         if ($this->connectedUser->get()->isWebmaster() ?? false) {
             $eventType = $this->dataHelper->get('EventType', ['Id', $id], 'Name, IdGroup');
@@ -72,13 +77,14 @@ class EventTypeController extends TableController implements CrudControllerInter
                     $schema = [
                         'name' => FilterInputRule::HtmlSafeName->value,
                         'idGroup' => FilterInputRule::Int->value,
-                        'groups', FilterInputRule::ArrayInt->value
+                        'groups',
+                        FilterInputRule::ArrayInt->value
                     ];
                     $input = WebApp::filterInput($schema, $this->flight->request()->data->getData());
                     $this->eventDataHelper->update(
                         $id,
                         $input['name'] ?? '???',
-                        $input['idGroup'] ??  throw new RuntimeException('Fatal error in file ' . __FILE__ . ' at line ' . __LINE__),
+                        $input['idGroup'] ??  throw new IntegrityException('Fatal error in file ' . __FILE__ . ' at line ' . __LINE__),
                         $input['groups']
                     );
                 } else if (($_SERVER['REQUEST_METHOD'] === 'GET')) {
@@ -96,14 +102,16 @@ class EventTypeController extends TableController implements CrudControllerInter
         } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
-    public function delete($id)
+    public function delete(int $id): void
     {
-        if ($this->connectedUser->get()->isWebmaster() ?? false) {
-            if (($_SERVER['REQUEST_METHOD'] === 'DELETE')) {
-                $this->dataHelper->set('EventType', ['Inactivated' => 1], ['Id' => $id]);
+        if (!($this->connectedUser->get()->isWebmaster() ?? false)) {
+            $this->raiseforbidden(__FILE__, __LINE__);
+            return;
+        }
+        if (($_SERVER['REQUEST_METHOD'] === 'DELETE')) {
+            $this->dataHelper->set('EventType', ['Inactivated' => 1], ['Id' => $id]);
 
-                $this->redirect('/eventTypes');
-            } else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
-        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+            $this->redirect('/eventTypes');
+        } else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 }

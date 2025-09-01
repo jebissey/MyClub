@@ -7,9 +7,9 @@ use Latte\Engine as LatteEngine;
 use Latte\Loaders\FileLoader;
 use LogicException;
 use PDO;
-use RuntimeException;
 use Throwable;
 
+use app\exceptions\DatabaseException;
 use app\models\Database;
 use app\models\DataHelper;
 use app\models\PersonDataHelper;
@@ -54,7 +54,7 @@ class Application
             $this->dataHelper = new DataHelper($this);
             $this->personDataHelper = new PersonDataHelper($this);
         } catch (Throwable $e) {
-            throw new RuntimeException('Database error ' . $e->getMessage() . ' in file ' . __FILE__ . ' at line ' . __LINE__);
+            throw new DatabaseException('Database error ' . $e->getMessage() . ' in file ' . __FILE__ . ' at line ' . __LINE__);
         }
         $this->errorManager = new ErrorManager($this);
     }
@@ -114,9 +114,9 @@ class Application
      * @throws LogicException Always thrown
      * @return never
      */
-    public static function unreachable(mixed $value = null): never
+    public static function unreachable(mixed $value = null, string $file, int $line): never
     {
-        $msg = "Unreachable code executed";
+        $msg = "Unreachable code executed in file {$file} at line {$line}";
         if ($value !== null) {
             if (is_object($value) && enum_exists($value::class)) $msg .= " (enum " . $value::class . "::" . $value->name . ")";
             elseif (is_object($value))                           $msg .= " (object of type " . $value::class . ")";

@@ -12,4 +12,5 @@ enum ApplicationError: int
     case MethodNotAllowed = 405;
     case InvalidSetting = 444;
     case Error = 500;
+    case ServiceUnavailable = 503;
 }

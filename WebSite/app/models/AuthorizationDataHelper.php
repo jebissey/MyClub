@@ -4,6 +4,7 @@ namespace app\models;
 
 use DateTime;
 
+use app\exceptions\QueryException;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
 
@@ -49,6 +50,7 @@ class AuthorizationDataHelper extends Data
     public function getArticle(int $id, ConnectedUser $connectedUser): object|false
     {
         $article = $this->get('Article', ['Id' => $id], 'CreatedBy, PublishedBy, OnlyForMembers, IdGroup');
+        if ($article === false) throw new QueryException("Article {$id} doesn't exist");
         if (!$this->canReadArticle($article, $connectedUser)) return false;
         return $article;
     }

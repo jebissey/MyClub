@@ -5,7 +5,6 @@ namespace app\modules\Common;
 use flight;
 use flight\Engine;
 use Latte\Engine as LatteEngine;
-use RuntimeException;
 
 use app\enums\ApplicationError;
 use app\enums\TimeOfDay;
@@ -21,7 +20,7 @@ abstract class AbstractController
 {
     protected Engine $flight;
     private LatteEngine $latte;
-    
+
     protected Application $application;
     public ConnectedUser $connectedUser;
     public DataHelper $dataHelper;
@@ -64,7 +63,7 @@ abstract class AbstractController
         else if ($navbar == 'webmaster')      return '../../Webmaster/views/webmaster.latte';
         else if ($navbar == '')               return '../../Common/views/home.latte';
 
-        throw new RuntimeException('Fatal error in file ' . __FILE__ . ' at line ' . __LINE__ . " with navbar=" . $navbar);
+        Application::unreachable("Fatal error in file  with navbar={$navbar}", __FILE__, __LINE__);
     }
 
     protected function getNavItems($person, bool $all = false)
@@ -89,15 +88,19 @@ abstract class AbstractController
         return $filteredNavItems;
     }
 
-    public function raiseMethodNotAllowed(string $file, int $line):void
+    public function raiseforbidden(string $file, int $line): void
     {
-        $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, "Method not allowed in file {$file} at line {$line}");
+        $this->application->getErrorManager()->raise(ApplicationError::Forbidden, "Access forbidden in file {$file} at line {$line}");
+    }
+
+    public function raiseMethodNotAllowed(string $file, int $line): void
+    {
+        $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, "Method {$_SERVER['REQUEST_METHOD']} not allowed in file {$file} at line {$line}");
     }
 
     public function render(string $name, object|array $params = []): void
     {
 #error_log("\n\n" . json_encode($name, JSON_PRETTY_PRINT) . "\n");
-
         $content = $this->latte->renderToString($name, $params);
         echo $content;
         if (ob_get_level()) ob_end_flush();

@@ -5,7 +5,7 @@
 {block content}
     {include '../../Common/views/dataTable.latte',
         'createButton' => [
-            'url' => '/persons/create',
+            'url' => '/person/create',
             'label' => 'Créer une personne'
         ],
         'items' => $persons,
@@ -13,13 +13,13 @@
             [
                 'type' => 'link',
                 'label' => 'Éditer',
-                'url' => '/persons/edit/{id}',
+                'url' => '/person/edit/{id}',
                 'class' => 'btn-warning'
             ],
             [
                 'type' => 'link',
                 'label' => 'Supprimer',
-                'url' => '/persons/delete/{id}',
+                'url' => '/person/delete/{id}',
                 'class' => 'btn-danger',
                 'confirm' => 'Voulez-vous vraiment supprimer cette personne ?'
             ]
