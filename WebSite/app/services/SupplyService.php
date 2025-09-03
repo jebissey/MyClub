@@ -7,11 +7,12 @@ use RuntimeException;
 use app\enums\ApplicationError;
 use app\exceptions\UnauthorizedAccessException;
 use app\interfaces\SupplyServiceInterface;
+use app\models\EventDataHelper;
 use app\valueObjects\ApiResponse;
 
 class SupplyService implements SupplyServiceInterface
 {
-    private $eventDataHelper;
+    private EventDataHelper $eventDataHelper;
 
     public function __construct($eventDataHelper)
     {

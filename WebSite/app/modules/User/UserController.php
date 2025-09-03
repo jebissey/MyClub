@@ -59,7 +59,7 @@ class UserController extends AbstractController
     {
         $email = urldecode($encodedEmail);
         $success = $this->authService->handleForgotPassword($email);
-        if ($success) $this->application->getErrorManager()->raise(ApplicationError::Ok, 'Votre mot de passe est réinitialisé', 3000, false);
+        if ($success) $this->redirect('/', ApplicationError::Ok, 'Votre mot de passe est réinitialisé');
         else $this->application->getErrorManager()->raise(ApplicationError::Error, 'Unable to send password reset email');
     }
 
@@ -68,7 +68,7 @@ class UserController extends AbstractController
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $newPassword = WebApp::getFiltered('password', FilterInputRule::Password->value, $this->flight->request()->data->getData());
             if (!$newPassword)                                               $this->application->getErrorManager()->raise(ApplicationError::BadRequest, 'Invalid password format');
-            elseif ($this->authService->resetPassword($token, $newPassword)) $this->application->getErrorManager()->raise(ApplicationError::Ok, 'Votre mot de passe est réinitialisé', 3000, false);
+            elseif ($this->authService->resetPassword($token, $newPassword)) $this->redirect('/', ApplicationError::Ok, 'Votre mot de passe est réinitialisé');
             else                                                             $this->application->getErrorManager()->raise(ApplicationError::BadRequest, 'Invalid or expired token');
         } elseif ($_SERVER['REQUEST_METHOD'] === 'GET') $this->render('User/views/user_set_password.latte', Params::getAll(['token' => $token,]));
     }
@@ -77,12 +77,12 @@ class UserController extends AbstractController
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $result = $this->authService->handleSignIn($this->flight->request()->data->getData());
-            if ($result->isSuccess()) $this->redirect('/');
+            if ($result->isSuccess()) $this->redirect('/', ApplicationError::Ok, "Sign in succeeded for {$result->getUser()->Email}");
             else $this->application->getErrorManager()->raise(ApplicationError::BadRequest, $result->getError());
         } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             $rememberMeResult = $this->authService->handleRememberMeLogin();
             if ($rememberMeResult && $rememberMeResult->isSuccess()) {
-                $this->redirect('/');
+                $this->redirect('/',ApplicationError::Ok, "Auto sign in succeeded for {$rememberMeResult->getUser()->Email}");
                 return;
             }
             $this->render('User/views/user_sign_in.latte', [
@@ -98,8 +98,9 @@ class UserController extends AbstractController
 
     public function signOut(): void
     {
+        $userEmail = $_SESSION['user'] ?? '';
         $this->authService->signOut();
-        $this->redirect('/');
+        $this->redirect('/', ApplicationError::Ok, "Sign out succeeded for {$userEmail}");
     }
     #endregion
 

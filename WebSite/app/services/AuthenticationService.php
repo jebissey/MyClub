@@ -74,7 +74,6 @@ class AuthenticationService
         );
         $_SESSION['user'] = $person->Email;
         $_SESSION['navbar'] = '';
-        $this->application->getErrorManager()->raise(ApplicationError::Ok, "Auto sign in succeeded for {$person->Email}", 1, false);
         return AuthResult::success($person);
     }
 
@@ -87,7 +86,6 @@ class AuthenticationService
                 ['LastSignOut' => date('Y-m-d H:i:s')],
                 ['Email' => $userEmail]
             );
-            $this->application->getErrorManager()->raise(ApplicationError::Ok, "Sign out succeeded with $userEmail", 1, false);
         }
         unset($_SESSION['user']);
         $_SESSION['navbar'] = '';
@@ -109,7 +107,7 @@ class AuthenticationService
     {
         $person = $this->application->getDataHelper()->get('Person', ['Token' => $token], 'Id, TokenCreatedAt');
         if (!$person || $person->TokenCreatedAt === null || (new DateTime($person->TokenCreatedAt))->diff(new DateTime())->h >= 1) return false;
-        $this->application->getPersonDataHelper()->setPassword([Password::signPassword($newPassword)], $person->Id);
+        (new PersonDataHelper($this->application))->setPassword([Password::signPassword($newPassword)], $person->Id);
         return true;
     }
 
@@ -178,7 +176,6 @@ class AuthenticationService
         if ($rememberMe) $this->setRememberMeToken($person);
         $_SESSION['user'] = $person->Email;
         $_SESSION['navbar'] = '';
-        $this->application->getErrorManager()->raise(ApplicationError::Ok, "Sign in succeeded for {$person->Email}", 1, false);
         return AuthResult::success($person);
     }
 }

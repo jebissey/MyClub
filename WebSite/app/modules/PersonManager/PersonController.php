@@ -7,13 +7,12 @@ use app\enums\FilterInputRule;
 use app\helpers\Application;
 use app\helpers\Params;
 use app\helpers\WebApp;
-use app\interfaces\CrudControllerInterface;
 use app\models\PersonDataHelper;
 use app\models\TableControllerDataHelper;
 use app\modules\Common\TableController;
 
 
-class PersonController extends TableController implements CrudControllerInterface
+class PersonController extends TableController
 {
     public function __construct(Application $application)
     {

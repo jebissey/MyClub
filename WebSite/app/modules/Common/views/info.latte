@@ -38,9 +38,9 @@
 {block scripts}
 <script>
     (function() {
-        const duration = {$timer};      // ms
+        const duration = {$timer|noescape}; // ms
         const progressBar = document.getElementById('progressBar');
-        const step = 100;               // ms
+        const step = 100;                   // ms
         let elapsed = 0;
 
         const interval = setInterval(() => {

@@ -37,7 +37,9 @@ use app\modules\PersonManager\RegistrationController;
 use app\modules\User\FFAController;
 use app\modules\User\UserController;
 use app\modules\VisitorInsights\LogController;
+use app\modules\Webmaster\ArwardsController;
 use app\modules\Webmaster\DbBrowserController;
+use app\modules\Webmaster\MaintenanceController;
 use app\modules\Webmaster\NavBarController;
 use app\modules\Webmaster\RssController;
 use app\modules\Webmaster\WebappSettingsController;
@@ -61,9 +63,12 @@ $flight = $application->getFlight();
 $flight->map('pass', function ($str) {
     return $str;
 });
-$flight->before('start', function () {
+$flight->before('start', function () use ($application) {
     session_start();
     if (!isset($_SESSION['token'])) $_SESSION['token'] = bin2hex(random_bytes(32));
+
+    (new ConnectedUser($application))->get();
+    (new MaintenanceController($application))->checkIfSiteIsUnderMaintenance();
 });
 $flight->map('setData', function ($key, $value) {
     Flight::set($key, $value);
@@ -96,6 +101,10 @@ mapRoute($flight, 'POST   /publish/article/@id:[0-9]+', $articleController, 'pub
 mapRoute($flight, 'GET    /redactor', $articleController, 'home');
 mapRoute($flight, 'GET    /redactor/help', $articleController, 'home');
 
+$arwardsController = new ArwardsController($application);
+mapRoute($flight, 'GET  /arwards', $arwardsController, 'seeArwards');
+mapRoute($flight, 'POST /arward', $arwardsController, 'setArward');
+
 $dbBrowserController = new DbBrowserController($application);
 mapRoute($flight, 'GET    /dbbrowser', $dbBrowserController, 'index');
 mapRoute($flight, 'GET    /dbbrowser/@table:[A-Za-z0-9_]+', $dbBrowserController, 'showTable', 1);
@@ -116,10 +125,8 @@ mapRoute($flight, 'POST /emails', $eventController, 'copyEmails');
 mapRoute($flight, 'GET  /emails/article/@id:[0-9]+', $eventController, 'fetchEmailsForArticle');
 mapRoute($flight, 'GET  /eventManager', $eventController, 'home');
 mapRoute($flight, 'GET  /eventManager/help', $eventController, 'help');
-mapRoute($flight, 'GET  /nextEvents', $eventController, 'nextEvents');
-mapRoute($flight, 'GET  /events/crosstab', $eventController, 'showEventCrosstab');
-mapRoute($flight, 'GET  /events/guest', $eventController, 'guest');
-mapRoute($flight, 'POST /events/guest', $eventController, 'guestInvite');
+mapRoute($flight, 'GET  /event/chat/@id:[0-9]+', $eventController, 'showEventChat');
+
 mapRoute($flight, 'GET  /event/@id:[0-9]+', $eventController, 'show');
 $flight->route('GET  /event/@id:[0-9]+/register', function ($id) use ($eventController) {
     $eventController->register($id, true);
@@ -130,9 +137,11 @@ $flight->route('GET /event/@id:[0-9]+/unregister', function ($id) use ($eventCon
 $flight->route('GET /event/@id:[0-9]+/@token:[a-f0-9]+', function ($id, $token) use ($eventController) {
     $eventController->register($id, true, $token);
 });
-mapRoute($flight, 'GET /event/location', $eventController, 'location');
-mapRoute($flight, 'GET /event/chat/@id:[0-9]+', $eventController, 'showEventChat');
-mapRoute($flight, 'GET /weekEvents', $eventController, 'weekEvents');
+mapRoute($flight, 'GET  /event/location', $eventController, 'location');
+mapRoute($flight, 'GET  /events/crosstab', $eventController, 'showEventCrosstab');
+mapRoute($flight, 'GET  /events/guest', $eventController, 'guest');
+mapRoute($flight, 'POST /events/guest', $eventController, 'guestInvite');mapRoute($flight, 'GET /nextEvents', $eventController, 'nextEvents');
+mapRoute($flight, 'GET  /weekEvents', $eventController, 'weekEvents');
 
 $eventTypeController = new EventTypeController($application);
 mapRoute($flight, 'GET    /eventTypes', $eventTypeController, 'index');
@@ -145,26 +154,31 @@ $ffaController = new FFAController($application);
 mapRoute($flight, 'GET /ffa/search', $ffaController, 'searchMember');
 
 $groupController = new GroupController($application);
-mapRoute($flight, 'GET    /groups', $groupController, 'index');
-mapRoute($flight, 'GET    /group/create', $groupController, 'create');
-mapRoute($flight, 'POST   /group/create', $groupController, 'create');
-mapRoute($flight, 'GET    /group/edit/@id:[0-9]+', $groupController, 'edit');
-mapRoute($flight, 'POST   /group/edit/@id:[0-9]+', $groupController, 'edit');
-mapRoute($flight, 'DELETE /group/delete/@id:[0-9]+', $groupController, 'delete');
+mapRoute($flight, 'GET    /groups', $groupController, 'groupIndex');
+mapRoute($flight, 'GET    /group/create', $groupController, 'groupCreate');
+mapRoute($flight, 'POST   /group/create', $groupController, 'groupCreateSave');
+mapRoute($flight, 'GET    /group/edit/@id:[0-9]+', $groupController, 'groupEdit');
+mapRoute($flight, 'POST   /group/edit/@id:[0-9]+', $groupController, 'groupEditSave');
+mapRoute($flight, 'DELETE /group/delete/@id:[0-9]+', $groupController, 'groupDelete');
 
 $importController = new ImportController($application);
 mapRoute($flight, 'GET  /import', $importController, 'showImportForm');
 mapRoute($flight, 'POST /import', $importController, 'processImport');
 
 $logController = new LogController($application);
-mapRoute($flight, 'GET /logs', $logController, 'index');
-mapRoute($flight, 'GET /referents', $logController, 'referents');
-mapRoute($flight, 'GET /visitors/graf', $logController, 'visitorsGraf');
 mapRoute($flight, 'GET /analytics', $logController, 'analytics');
-mapRoute($flight, 'GET /topPages', $logController, 'topPagesByPeriod');
-mapRoute($flight, 'GET /topArticles', $logController, 'topArticlesByPeriod');
-mapRoute($flight, 'GET /crossTab', $logController, 'crossTab');
 mapRoute($flight, 'GET /lastVisits', $logController, 'showLastVisits');
+mapRoute($flight, 'GET /logs', $logController, 'index');
+mapRoute($flight, 'GET /logs/crossTab', $logController, 'crossTab');
+mapRoute($flight, 'GET /referents', $logController, 'referents');
+mapRoute($flight, 'GET /topArticles', $logController, 'topArticlesByPeriod');
+mapRoute($flight, 'GET /topPages', $logController, 'topPagesByPeriod');
+mapRoute($flight, 'GET /visitors/graf', $logController, 'visitorsGraf');
+
+$maintenanceController = new MaintenanceController($application);
+mapRoute($flight, 'GET /maintenance', $maintenanceController, 'maintenance');
+mapRoute($flight, 'GET /maintenance/set', $maintenanceController, 'setSiteUnderMaintenance');
+mapRoute($flight, 'GET /maintenance/unset', $maintenanceController, 'setSiteOnline');
 
 $mediaController = new MediaController($application);
 mapRoute($flight, 'GET /data/media/@year:[0-9]+/@month:[0-9]+/@filename', $mediaController, 'viewFile');
@@ -248,8 +262,6 @@ mapRoute($flight, 'POST /arwards', $webmasterController, 'arwards');
 mapRoute($flight, 'GET  /designer', $webmasterController, 'homeDesigner');
 mapRoute($flight, 'GET  /designer/help', $webmasterController, 'helpDesigner');
 mapRoute($flight, 'GET  /installations', $webmasterController, 'showInstallations');
-mapRoute($flight, 'GET  /maintenance', $webmasterController, 'maintenance');
-mapRoute($flight, 'POST /maintenance', $webmasterController, 'setSiteUnderMaintenance');
 mapRoute($flight, 'GET  /sitemap.xml', $webmasterController, 'sitemapGenerator');
 mapRoute($flight, 'GET  /visitorInsights', $webmasterController, 'visitorInsights');
 mapRoute($flight, 'GET  /visitorInsights/help', $webmasterController, 'helpVisitorInsights');

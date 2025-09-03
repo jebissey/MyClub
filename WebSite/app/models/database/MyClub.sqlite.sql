@@ -511,9 +511,9 @@ INSERT INTO "Languages" VALUES (67,'LoginRequired','<div class="alert alert-warn
 ');
 INSERT INTO "Languages" VALUES (68,'Error503','<div class="text-center full-screen d-flex flex-column justify-content-center align-items-center">
     <div class="emoji">🚧</div>
-    <h1 class="mt-4">Site en maintenance</h1>
-    <p class="text-muted">Vous serez redirigé vers l’accueil dans 30 secondes...</p>
-    <a href="/" class="btn btn-primary mt-3">Retourner à l’accueil maintenant</a>
+	<h1 class="mt-4">Site Under Maintenance</h1>
+	<p class="text-muted">You will be redirected to the homepage in 30 seconds...</p>
+	<a href="/" class="btn btn-primary mt-3">Return to Homepage Now</a>
 </div>
 <style>
     .full-screen {
@@ -524,9 +524,9 @@ INSERT INTO "Languages" VALUES (68,'Error503','<div class="text-center full-scre
     }
 </style>','<div class="text-center full-screen d-flex flex-column justify-content-center align-items-center">
     <div class="emoji">🚧</div>
-	<h1 class="mt-4">Site Under Maintenance</h1>
-	<p class="text-muted">You will be redirected to the homepage in 30 seconds...</p>
-	<a href="/" class="btn btn-primary mt-3">Return to Homepage Now</a>
+    <h1 class="mt-4">Site en maintenance</h1>
+    <p class="text-muted">Vous serez redirigé vers l’accueil dans 30 secondes...</p>
+    <a href="/" class="btn btn-primary mt-3">Retourner à l’accueil maintenant</a>
 </div>
 <style>
     .full-screen {

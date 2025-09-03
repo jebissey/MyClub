@@ -72,6 +72,11 @@ class ConnectedUser
         return $this->isEventDesigner() || $this->isHomeDesigner() || $this->isNavbarDesigner();
     }
 
+    public function isGroupManager(): bool
+    {
+        return $this->isPersonManager() || $this->isWebmaster();
+    }
+
     public function isEditor(): bool
     {
         return in_array(Authorization::Editor->value, $this->authorizations ?? []);

@@ -7,6 +7,7 @@ use Throwable;
 
 use app\enums\ApplicationError;
 use app\enums\Period;
+use app\exceptions\QueryException;
 use app\exceptions\UnauthorizedAccessException;
 use app\helpers\Application;
 use app\helpers\WebApp;
@@ -408,6 +409,8 @@ class EventApi extends AbstractApi
                 intval($input['supply'])
             );
             $this->renderJson([$apiResponse->data], $apiResponse->success,  $apiResponse->responseCode);
+        } catch (QueryException $e) {
+            $this->renderJsonError($e, ApplicationError::BadRequest->value);
         } catch (UnauthorizedAccessException $e) {
             $this->renderJsonError($e, ApplicationError::Forbidden->value);
         } catch (Throwable $e) {

@@ -17,6 +17,19 @@ It helps clubs manage **articles, events, and members** with an intuitive interf
     - [Available Authorizations](#available-authorizations)
   - [🧪 Automated Route Testing](#-automated-route-testing)
   - [👁️ Examples](#️-examples)
+- [WebApp Summary - Multi-Role Management System](#webapp-summary---multi-role-management-system)
+  - [Overview](#overview)
+  - [Administrator Roles](#administrator-roles)
+    - [🗓️ Event Manager](#️-event-manager)
+    - [🎨 Designer](#-designer)
+    - [✍️ Redactor (Editor)](#️-redactor-editor)
+    - [🧑‍🤝‍🧑 Person Manager](#-person-manager)
+    - [🔍 Visitor Insights (Observer)](#-visitor-insights-observer)
+    - [🛠️ Webmaster](#️-webmaster)
+  - [End User Interface](#end-user-interface)
+    - [Personal Space](#personal-space)
+    - [Community Features](#community-features)
+  - [Authentication System](#authentication-system)
 - [🚀 Getting Started](#-getting-started)
   - [1) Download the latest release](#1-download-the-latest-release)
   - [2) Upload to your hosting](#2-upload-to-your-hosting)
@@ -93,6 +106,72 @@ Security is based on **groups**. There are three types:
 
 ---
 
+# WebApp Summary - Multi-Role Management System
+
+## Overview
+This web application is a comprehensive management system based on user roles, featuring specialized interfaces for different types of administrators and end users. The application follows a modular architecture with contextual navigation based on permissions.
+
+## Administrator Roles
+
+### 🗓️ Event Manager
+- **Weekly Calendar**: Overview of the next 3 week's events
+- **Upcoming Events**: Planning and tracking of future events  
+- **Invitation System**: Sending personalized invitations
+- **Email Management**: Communication with participants
+- **Pivot Table**: Statistical analysis of events
+
+### 🎨 Designer
+Interface divided into sub-specialties:
+- **Event Designer**: Designing event types and managing requirements
+- **Home Designer**: Configuring general settings and managing designs
+- **Navbar Designer**: Customizing the navigation bar
+
+### ✍️ Redactor (Editor)
+- **Article Management**: Creating, editing, and publishing content
+- **Media Library**: Organizing and managing media files
+- **Content Analytics**: Top 50 most viewed articles
+- **Analytical Dashboard**: Cross-analysis of content
+
+### 🧑‍🤝‍🧑 Person Manager
+- **Member Management**: Member administration
+- **Group management**: User group administration
+- **Registration management**: Managing users registrations
+- **Import members**: From CSV files
+
+### 🔍 Visitor Insights (Observer)
+- **Traffic Analysis**: Referrer sites and visitor sources
+- **Page Performance**: Page rankings by period
+- **Advanced Analytics**: Pivot tables for data analysis
+- **Visitor Monitoring**: Logs and traffic statistics
+- **Real-time Tracking**: Latest visits and user behavior
+
+### 🛠️ Webmaster
+- **Technical Administration**: Database browser
+- **Group management**: User group administration
+- **Registration management**: Managing users registrations
+- **Maintenance**: Set/unset website under maintenance mode
+
+## End User Interface
+
+### Personal Space
+- 🧑‍💼 **Account**: Personal profile management
+- 🕒 **Availability**: Schedule and available time slots
+- 🔐 **Groups**: Membership in various groups
+- ⭐ **Preferences**: Customized settings
+- 📊 **Statistics**: Personal dashboard
+
+### Community Features
+- 🧑‍🤝‍🧑 **Directory**: Member directory
+- 📰 **News**: Personalized news feed
+- 🗒️ **Notepad**: Personal note-taking space
+
+## Authentication System
+- **Custom Avatar**: Emoji display or Gravatar image
+- **Conditional Admin Access**: Admin zone access button if authorized
+- **Secure Logout**: Logout system
+- **Contextual Help**: Integrated support
+
+---
 # 🚀 Getting Started
 
 > This quick guide will take you from a freshly downloaded archive to a running and secured instance.

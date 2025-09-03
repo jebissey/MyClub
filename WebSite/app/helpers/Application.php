@@ -12,7 +12,7 @@ use Throwable;
 use app\exceptions\DatabaseException;
 use app\models\Database;
 use app\models\DataHelper;
-use app\models\PersonDataHelper;
+use app\modules\Webmaster\MaintenanceController;
 
 class Application
 {
@@ -34,8 +34,6 @@ class Application
     private PDO $pdo;
     private PDO $pdoForLog;
     private DataHelper $dataHelper;
-    private PersonDataHelper $personDataHelper;
-
     private ErrorManager $errorManager;
 
     private function __construct()
@@ -52,7 +50,6 @@ class Application
             $this->pdo = $db->getPdo();
             $this->pdoForLog = $db->getPdoForLog();
             $this->dataHelper = new DataHelper($this);
-            $this->personDataHelper = new PersonDataHelper($this);
         } catch (Throwable $e) {
             throw new DatabaseException('Database error ' . $e->getMessage() . ' in file ' . __FILE__ . ' at line ' . __LINE__);
         }
@@ -95,11 +92,6 @@ class Application
     public function getDataHelper(): DataHelper
     {
         return $this->dataHelper;
-    }
-
-    public function getPersonDataHelper(): PersonDataHelper
-    {
-        return $this->personDataHelper;
     }
 
     public function enumToValues(string $enumClass): array

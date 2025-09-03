@@ -5,6 +5,7 @@ namespace app\apis;
 use Throwable;
 
 use app\enums\ApplicationError;
+use app\exceptions\QueryException;
 use app\helpers\Application;
 use app\helpers\WebApp;
 use app\models\AuthorizationDataHelper;
@@ -21,13 +22,19 @@ class CarouselApi extends AbstractApi
 
     public function getItems($idArticle)
     {
-        $connectedUser = $this->connectedUser->get();
-        if (!($connectedUser->person ?? false) || !(new AuthorizationDataHelper($this->application))->getArticle($idArticle, $connectedUser)) {
-            $this->renderJson(['error' => 'Accès non autorisé'], false, ApplicationError::Forbidden->value);
-            return;
+        try {
+            $connectedUser = $this->connectedUser->get();
+            if (!($connectedUser->person ?? false) || !(new AuthorizationDataHelper($this->application))->getArticle($idArticle, $connectedUser)) {
+                $this->renderJson(['error' => 'Accès non autorisé'], false, ApplicationError::Forbidden->value);
+                return;
+            }
+            $items = $this->dataHelper->gets('Carousel', ['IdArticle' => $idArticle]);
+            $this->renderJson(['items' => $items], true, ApplicationError::Ok->value);
+        } catch (QueryException $e) {
+            $this->renderJson(['error' => $e->getMessage()], false, ApplicationError::BadRequest->value);
+        } catch (Throwable $e) {
+            $this->renderJson(['error' => $e->getMessage()], false, ApplicationError::Error->value);
         }
-        $items = $this->dataHelper->gets('Carousel', ['IdArticle' => $idArticle]);
-        $this->renderJson(['items' => $items], true, ApplicationError::Ok->value);
     }
 
     public function saveItem()
@@ -79,7 +86,7 @@ class CarouselApi extends AbstractApi
             (new DataHelper($this->application))->delete('Carousel', ['Id' => $id]);
             $this->renderJson(['message' => 'Élément supprimé avec succès'], true, ApplicationError::Ok->value);
         } catch (Throwable $e) {
-            $this->renderJson(['error' => 'Erreur lors de la suppression: ' . $e->getMessage()], false, ApplicationError::Error->value);
+            $this->renderJson(['error' => $e->getMessage()], false, ApplicationError::Error->value);
         }
     }
 }

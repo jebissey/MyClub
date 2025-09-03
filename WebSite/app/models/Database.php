@@ -26,7 +26,7 @@ class Database
         if (self::$pdo === null) self::check();
     }
 
-    public static function getInstance()
+    public static function getInstance(): Database
     {
         if (self::$instance === null) self::$instance = new self();
         return self::$instance;
@@ -42,6 +42,7 @@ class Database
         return self::$pdoForLog ?? Application::unreachable('Fatal error with null pdoforLog in file ', __FILE__, __LINE__);
     }
 
+    #region Private functions
     private function check(): void
     {
         $sqliteLogFile = self::SQLITE_DEST_PATH . self::SQLITE_LOG_FILE;
@@ -68,11 +69,10 @@ class Database
         } else Application::unreachable('Empty Metadata table', __FILE__, __LINE__);
     }
 
-    private function upgradeDatabase(PDO $pdo, int $from, int $to)
+    private function upgradeDatabase(PDO $pdo, int $from, int $to): void
     {
         $pdo->beginTransaction();
         try {
-
             if ($from == 1) $from = new V1ToV2Migrator($pdo);
 
 

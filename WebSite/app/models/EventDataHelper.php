@@ -10,6 +10,7 @@ use Throwable;
 use app\enums\ApplicationError;
 use app\enums\EventAudience;
 use app\enums\EventSearchMode;
+use app\exceptions\QueryException;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
 use app\helpers\PersonPreferences;
@@ -87,7 +88,7 @@ class EventDataHelper extends Data implements NewsProviderInterface
         }
     }
 
-    public function getEventsForDay($date, $userEmail)
+    public function getEventsForDay(string $date, string $userEmail): array
     {
         $query = $this->pdo->prepare("
             SELECT DISTINCT e.*, et.Name as EventTypeName
@@ -103,67 +104,107 @@ class EventDataHelper extends Data implements NewsProviderInterface
             'date' => $date,
             'userEmail' => $userEmail
         ]);
-
         return $query->fetchAll();
     }
 
-    public function getEvent($eventId)
+    public function getEvent(int $eventId): object
     {
-        return $this->fluent->from('Event e')
-            ->select('e.*, et.Name AS EventTypeName')
-            ->join('EventType et ON e.IdEventType = et.Id')
-            ->where('e.Id', $eventId)
-            ->fetch();
+        if ($this->eventExists($eventId)) {
+            $sql = "
+                SELECT e.*, et.Name AS EventTypeName
+                FROM Event e
+                INNER JOIN EventType et ON e.IdEventType = et.Id
+                WHERE e.Id = :eventId
+                LIMIT 1
+            ";
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute([':eventId' => $eventId]);
+            return $stmt->fetch() ?: throw new QueryException("Event type doesn't exist for event ({$eventId})");
+        }
+        throw new QueryException("Event ({$eventId}) doesn't exist");
     }
 
-    public function getEventAttributes($eventId)
+
+    public function getEventAttributes(int $eventId): array
+    {
+        if ($this->eventExists($eventId)) {
+            $sql = "
+                SELECT 
+                    Attribute.Name AS Name, 
+                    Attribute.Detail AS Detail, 
+                    Attribute.Color AS Color, 
+                    Attribute.Id AS AttributeId
+                FROM EventAttribute
+                JOIN Attribute ON EventAttribute.IdAttribute = Attribute.Id
+                WHERE EventAttribute.IdEvent = :eventId
+            ";
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute(['eventId' => $eventId]);
+            $result = $stmt->fetchAll();
+            return $result;
+        }
+        throw new QueryException("Event ({$eventId}) doesn't exist");
+    }
+
+    public function getEventsForAllOrGuest(): array
     {
         $sql = "
             SELECT 
-                Attribute.Name AS Name, 
-                Attribute.Detail AS Detail, 
-                Attribute.Color AS Color, 
-                Attribute.Id AS AttributeId
-            FROM EventAttribute
-            JOIN Attribute ON EventAttribute.IdAttribute = Attribute.Id
-            WHERE EventAttribute.IdEvent = :eventId
+                e.Id, 
+                e.Summary, 
+                e.StartTime,
+                CASE 
+                    WHEN p.NickName != '' 
+                    THEN p.FirstName || ' ' || p.LastName || ' (' || p.NickName || ')' 
+                    ELSE p.FirstName || ' ' || p.LastName 
+                END AS PersonName
+            FROM Event e
+            INNER JOIN Person p ON p.Id = e.CreatedBy
+            WHERE e.StartTime > :today
+            AND (e.Audience = 'All' OR e.Audience = 'Guest')
+            ORDER BY e.StartTime ASC
         ";
         $stmt = $this->pdo->prepare($sql);
-        $stmt->execute(['eventId' => $eventId]);
-        $result = $stmt->fetchAll();
+        $stmt->execute([':today' => (new DateTime())->format('Y-m-d')]);
+        return $stmt->fetchAll();
+    }
 
+    public function getEventGroup(int $eventId): ?int
+    {
+        if ($this->eventExists($eventId)) {
+            $sql = "
+                SELECT et.IdGroup AS IdGroup
+                FROM EventType et
+                INNER JOIN Event e ON et.Id = e.IdEventType
+                WHERE e.Id = :eventId
+                LIMIT 1
+            ";
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute([':eventId' => $eventId]);
+            $result = $stmt->fetch();
+            return $result['IdGroup'] ?? null;
+        }
+        throw new QueryException("Event ({$eventId}) doesn't exist");
+    }
+
+    public function getEventExternal(int $eventId): object
+    {
+        $sql = "
+            SELECT *
+            FROM Event
+            WHERE Id = :eventId
+            AND (Audience = 'All' OR Audience = 'Guest')
+            AND StartTime > :today
+            LIMIT 1
+        ";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([
+            ':eventId' => $eventId,
+            ':today'   => (new DateTime())->format('Y-m-d'),
+        ]);
+        $result = $stmt->fetch();
+        if ($result === false) throw new QueryException("Event ({$eventId}) doesn't exist");
         return $result;
-    }
-
-    public function getEventsForAllOrGuest()
-    {
-        return $this->fluent->from('Event e')
-            ->join('Person p ON p.Id = e.CreatedBy')
-            ->where('e.StartTime > ?', (new DateTime())->format('Y-m-d'))
-            ->where('e.Audience = "All" OR Audience = "Guest"')
-            ->select('e.Id, e.Summary, e.StartTime')
-            ->select('CASE WHEN p.NickName != "" THEN p.FirstName || " " || p.LastName || " (" || p.NickName || ")" ELSE p.FirstName || " " || p.LastName END AS PersonName')
-            ->orderBy('e.StartTime ASC')
-            ->fetchAll();
-    }
-
-    public function getEventGroup($eventId)
-    {
-        return ($this->fluent
-            ->from('EventType et')
-            ->select('et.IdGroup AS IdGroup')
-            ->innerJoin('Event e ON et.Id = e.IdEventType')
-            ->where('e.Id', $eventId)
-            ->fetch())->IdGroup ?? null;
-    }
-
-    public function getEventExternal($eventId)
-    {
-        return $this->fluent->from('Event')
-            ->where('Id', $eventId)
-            ->where('Audience = "All" OR Audience = "Guest"')
-            ->where('StartTime > ?', (new DateTime())->format('Y-m-d'))
-            ->fetch();
     }
 
     public function getEvents(?object $person, string $mode, int $offset, bool $filterByPreferences = false): array
@@ -367,66 +408,71 @@ class EventDataHelper extends Data implements NewsProviderInterface
                 'url' => '/event/' . $event->Id
             ];
         }
-
         return $news;
     }
 
-    public function getExistingAttibutes($id)
+    public function getParticipantSupplies(int $eventId): array
     {
-        $existingAttributesQuery = $this->pdo->prepare('
-            SELECT IdAttribute 
-            FROM EventTypeAttribute 
-            WHERE IdEventType = ?
-        ');
-        $existingAttributesQuery->execute([$id]);
-        return $existingAttributesQuery->fetchAll(PDO::FETCH_COLUMN);
+        $sql = "
+            SELECT 
+                p.FirstName,
+                p.LastName,
+                p.NickName,
+                n.Label AS NeedLabel,
+                n.Name AS NeedName,
+                ps.Supply
+            FROM ParticipantSupply ps
+            INNER JOIN Participant part ON ps.IdParticipant = part.Id
+            INNER JOIN Person p ON part.IdPerson = p.Id
+            INNER JOIN Need n ON ps.IdNeed = n.Id
+            INNER JOIN EventNeed en ON ps.IdNeed = en.IdNeed AND en.IdEvent = part.IdEvent
+            WHERE part.IdEvent = :eventId AND ps.Supply > 0
+            ORDER BY p.FirstName, p.LastName, n.Label
+        ";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([':eventId' => $eventId]);
+        return $stmt->fetchAll();
     }
 
-    public function getParticipantSupplies($eventId): array
+    public function getUserSupplies(int $eventId, string $userEmail): array
     {
-        $query = $this->fluent->from('ParticipantSupply ps')
-            ->select([
-                'p.FirstName',
-                'p.LastName',
-                'p.NickName',
-                'n.Label AS NeedLabel',
-                'n.Name AS NeedName',
-                'ps.Supply'
-            ])
-            ->innerJoin('Participant part ON ps.IdParticipant = part.Id')
-            ->innerJoin('Person p ON part.IdPerson = p.Id')
-            ->innerJoin('Need n ON ps.IdNeed = n.Id')
-            ->innerJoin('EventNeed en ON ps.IdNeed = en.IdNeed AND en.IdEvent = part.IdEvent')
-            ->where('part.IdEvent', $eventId)
-            ->where('ps.Supply > 0')
-            ->orderBy('p.FirstName')
-            ->orderBy('p.LastName')
-            ->orderBy('n.Label');
-
-        return $query->fetchAll();
+        $sql = "
+            SELECT ps.Id, ps.IdNeed, ps.Supply, n.Label, n.Name
+            FROM ParticipantSupply ps
+            INNER JOIN Participant part ON ps.IdParticipant = part.Id
+            INNER JOIN Person p ON part.IdPerson = p.Id
+            INNER JOIN Need n ON ps.IdNeed = n.Id
+            WHERE part.IdEvent = :eventId
+            AND p.Email COLLATE NOCASE = :userEmail
+        ";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([
+            ':eventId'   => $eventId,
+            ':userEmail' => $userEmail,
+        ]);
+        return $stmt->fetchAll();
     }
 
-    public function getUserSupplies($eventId, $userEmail): array
+    public function isUserRegistered(int $eventId, string $userEmail): bool
     {
-        return $this->fluent
-            ->from('ParticipantSupply ps')
-            ->select('ps.Id, ps.IdNeed, ps.Supply, n.Label, n.Name')
-            ->innerJoin('Participant part ON ps.IdParticipant = part.Id')
-            ->innerJoin('Person p ON part.IdPerson = p.Id')
-            ->innerJoin('Need n ON ps.IdNeed = n.Id')
-            ->where('part.IdEvent', $eventId)
-            ->where('p.Email COLLATE NOCASE', $userEmail)
-            ->fetchAll();
-    }
-
-    public function isUserRegistered($eventId, $userEmail)
-    {
-        return $this->fluent->from('Participant pa')
-            ->select('pe.Email')
-            ->join('Person pe ON pa.IdPerson = pe.Id')
-            ->where('pa.IdEvent', $eventId)
-            ->where('pe.Email COLLATE NOCASE', $userEmail)
-            ->fetch();
+        if ($this->eventExists($eventId)) {
+            $sql = "
+                SELECT pe.Email
+                FROM Participant pa
+                JOIN Person pe ON pa.IdPerson = pe.Id
+                WHERE pa.IdEvent = :eventId
+                AND pe.Email = :userEmail COLLATE NOCASE
+                LIMIT 1
+            ";
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute([
+                ':eventId' => $eventId,
+                ':userEmail' => $userEmail
+            ]);
+            $result = $stmt->fetch();
+            return $result !== false;
+        }
+        throw new QueryException("Event ({$eventId}) doesn't exist");
     }
 
     public function update(int $id, string $name, ?int $idGroup, array $attributes): void
@@ -492,6 +538,14 @@ class EventDataHelper extends Data implements NewsProviderInterface
         } catch (Throwable $e) {
             throw $e;
         }
+    }
+
+    public function eventExists(int $eventId): bool
+    {
+        $sql = "SELECT Id FROM Event WHERE Id = :eventId";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([':eventId' => $eventId]);
+        return $stmt->fetch() !== false;
     }
 
     #region Private functions

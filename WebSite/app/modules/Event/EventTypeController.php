@@ -8,12 +8,11 @@ use app\exceptions\IntegrityException;
 use app\helpers\Application;
 use app\helpers\Params;
 use app\helpers\WebApp;
-use app\interfaces\CrudControllerInterface;
 use app\models\EventDataHelper;
 use app\models\TableControllerDataHelper;
 use app\modules\Common\TableController;
 
-class EventTypeController extends TableController implements CrudControllerInterface
+class EventTypeController extends TableController
 {
     private EventDataHelper $eventDataHelper;
 
@@ -25,7 +24,7 @@ class EventTypeController extends TableController implements CrudControllerInter
 
     public function index(): void
     {
-        if (!($this->connectedUser->get()->IsWebmaster() ?? false)) {
+        if (!($this->connectedUser->get()->isEventDesigner() ?? false)) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
         }
@@ -55,7 +54,7 @@ class EventTypeController extends TableController implements CrudControllerInter
 
     public function create(): void
     {
-        if (!($this->connectedUser->get()->isWebmaster() ?? false)) {
+        if (!($this->connectedUser->get()->isEventDesigner() ?? false)) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
         }
@@ -69,42 +68,42 @@ class EventTypeController extends TableController implements CrudControllerInter
 
     public function edit(int $id): void
     {
-        if ($this->connectedUser->get()->isWebmaster() ?? false) {
-            $eventType = $this->dataHelper->get('EventType', ['Id', $id], 'Name, IdGroup');
-            if (!$eventType) $this->application->getErrorManager()->raise(ApplicationError::InvalidSetting, "Invalide EventType: $id in file " . __FILE__ . ' at line ' . __LINE__);
-            else {
-                if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-                    $schema = [
-                        'name' => FilterInputRule::HtmlSafeName->value,
-                        'idGroup' => FilterInputRule::Int->value,
-                        'groups',
-                        FilterInputRule::ArrayInt->value
-                    ];
-                    $input = WebApp::filterInput($schema, $this->flight->request()->data->getData());
-                    $this->eventDataHelper->update(
-                        $id,
-                        $input['name'] ?? '???',
-                        $input['idGroup'] ??  throw new IntegrityException('Fatal error in file ' . __FILE__ . ' at line ' . __LINE__),
-                        $input['groups']
-                    );
-                } else if (($_SERVER['REQUEST_METHOD'] === 'GET')) {
-                    $existingAttributes = $this->eventDataHelper->getExistingAttibutes($id);
-
-                    $this->render('Event/views/eventType_edit.latte', Params::getAll([
-                        'name' => $eventType->Name,
-                        'idGroup' => $eventType->IdGroup,
-                        'groups' => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
-                        'attributes' => $this->dataHelper->gets('Attribute', [], '*', 'Name'),
-                        'existingAttributes' => $existingAttributes
-                    ]));
-                } else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
-            }
-        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+        if (!($this->connectedUser->get()->isEventDesigner() ?? false)) {
+            $this->raiseforbidden(__FILE__, __LINE__);
+            return;
+        }
+        $eventType = $this->dataHelper->get('EventType', ['Id', $id], 'Name, IdGroup');
+        if (!$eventType) $this->application->getErrorManager()->raise(ApplicationError::InvalidSetting, "Invalide EventType: $id in file " . __FILE__ . ' at line ' . __LINE__);
+        else {
+            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                $schema = [
+                    'name' => FilterInputRule::HtmlSafeName->value,
+                    'idGroup' => FilterInputRule::Int->value,
+                    'groups',
+                    FilterInputRule::ArrayInt->value
+                ];
+                $input = WebApp::filterInput($schema, $this->flight->request()->data->getData());
+                $this->eventDataHelper->update(
+                    $id,
+                    $input['name'] ?? '???',
+                    $input['idGroup'] ??  throw new IntegrityException('Fatal error in file ' . __FILE__ . ' at line ' . __LINE__),
+                    $input['groups']
+                );
+            } else if (($_SERVER['REQUEST_METHOD'] === 'GET')) {
+                $this->render('Event/views/eventType_edit.latte', Params::getAll([
+                    'name' => $eventType->Name,
+                    'idGroup' => $eventType->IdGroup,
+                    'groups' => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
+                    'attributes' => $this->dataHelper->gets('Attribute', [], '*', 'Name'),
+                    'existingAttributes' => $this->dataHelper->gets('EventTypeAttribute', ['IdEventType' => $id], 'Id')
+                ]));
+            } else $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+        }
     }
 
     public function delete(int $id): void
     {
-        if (!($this->connectedUser->get()->isWebmaster() ?? false)) {
+        if (!($this->connectedUser->get()->isEventDesigner() ?? false)) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
         }

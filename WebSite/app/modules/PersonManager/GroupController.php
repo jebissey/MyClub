@@ -2,16 +2,18 @@
 
 namespace app\modules\PersonManager;
 
+use Throwable;
+
 use app\enums\ApplicationError;
 use app\enums\FilterInputRule;
+use app\exceptions\QueryException;
 use app\helpers\Application;
 use app\helpers\Params;
 use app\helpers\WebApp;
-use app\interfaces\CrudControllerInterface;
 use app\models\GroupDataHelper;
 use app\modules\Common\AbstractController;
 
-class GroupController extends AbstractController implements CrudControllerInterface
+class GroupController extends AbstractController
 {
     private GroupDataHelper $groupDataHelper;
 
@@ -21,98 +23,159 @@ class GroupController extends AbstractController implements CrudControllerInterf
         $this->groupDataHelper = new GroupDataHelper($application);
     }
 
-    public function index(): void
+    public function groupCreate(): void
     {
-        if (($this->connectedUser->get()->isPersonManager() ?? false) || $this->connectedUser->isWebmaster() ?? false) {
-            $this->render('PersonManager/views/groups_index.latte', Params::getAll([
-                'groups' => $this->groupDataHelper->getGroupsWithAuthorizations(),
+        if (!($this->connectedUser->get()->isGroupManager() ?? false)) {
+            $this->raiseforbidden(__FILE__, __LINE__);
+            return;
+        }
+        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+            return;
+        }
+        $availableAuthorizations = $this->dataHelper->gets('Authorization', ['Id <> 1' => null]);
+        $this->render('PersonManager/views/group_create.latte', Params::getAll([
+            'availableAuthorizations' => $availableAuthorizations,
+            'layout' => $this->getLayout(),
+            'isMyclubWebSite' => WebApp::isMyClubWebSite(),
+            'navItems' => $this->getNavItems($connectedUser->person ?? false),
+        ]));
+    }
+
+    public function groupCreateSave(): void
+    {
+        if (!($this->connectedUser->get()->isGroupManager() ?? false)) {
+            $this->raiseforbidden(__FILE__, __LINE__);
+            return;
+        }
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+            return;
+        }
+        $availableAuthorizations = $this->dataHelper->gets('Authorization', ['Id <> 1' => null]);
+        $schema = [
+            'name' => FilterInputRule::HtmlSafeName->value,
+            'selfRegistration' => FilterInputRule::Int->value,
+            'authorizations' => FilterInputRule::ArrayInt->value,
+        ];
+        $input = WebApp::filterInput($schema, $this->flight->request()->data->getData());
+        $name = $input['name'] ?? '???';
+        $selfRegistration = $input['selfRegistration'] ?? 0;
+        if ($name === '???') {
+            $this->render('PersonManager/views/group_create.latte', Params::getAll([
+                'availableAuthorizations' => $availableAuthorizations,
+                'error' => 'Le nom du groupe est requis',
                 'layout' => $this->getLayout(),
-                'navItems' => $this->getNavItems($connectedUser->person ?? false),
                 'isMyclubWebSite' => WebApp::isMyClubWebSite(),
+                'navItems' => $this->getNavItems($connectedUser->person ?? false),
             ]));
-        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+        }
+        $selectedAuthorizations = $input['authorizations'] ?? [];
+        $this->groupDataHelper->insert($name, $selfRegistration, $selectedAuthorizations);
     }
 
-    public function create(): void
+    public function groupDelete(int $id): void
     {
-        if (($this->connectedUser->get()->isPersonManager() ?? false) || $this->connectedUser->isWebmaster() ?? false) {
-
-            $availableAuthorizations = $this->dataHelper->gets('Authorization', ['Id <> 1' => null]);
-            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-                $schema = [
-                    'name' => FilterInputRule::HtmlSafeName->value,
-                    'selfRegistration' => FilterInputRule::Int->value,
-                    'authorizations' => FilterInputRule::ArrayInt->value,
-                ];
-                $input = WebApp::filterInput($schema, $this->flight->request()->data->getData());
-                $name = $input['name'] ?? '???';
-                $selfRegistration = $input['selfRegistration'] ?? 0;
-                $selectedAuthorizations = $input['authorizations'] ?? [];
-                if (empty($name)) {
-                    $this->render('PersonManager/views/group_create.latte', Params::getAll([
-                        'availableAuthorizations' => $availableAuthorizations,
-                        'error' => 'Le nom du groupe est requis',
-                        'layout' => $this->getLayout(),
-                        'isMyclubWebSite' => WebApp::isMyClubWebSite(),
-                    ]));
-                }
-                $this->groupDataHelper->insert($name, $selfRegistration, $selectedAuthorizations);
-            } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-                $this->render('PersonManager/views/group_create.latte', Params::getAll([
-                    'availableAuthorizations' => $availableAuthorizations,
-                    'layout' => $this->getLayout(),
-                    'isMyclubWebSite' => WebApp::isMyClubWebSite(),
-                ]));
-            } else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
-        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
-    }
-
-    public function edit(int $id): void
-    {
-        if (($this->connectedUser->get()->isPersonManager() ?? false) || $this->connectedUser->isWebmaster() ?? false) {
-            $availableAuthorizations = $this->dataHelper->gets('Authorization', ['Id <> 1' => null], '*', 'Name');
-            $group = $this->dataHelper->get('Group', ['Id' => $id], 'Name, SelfRegistration');
-
-            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-                $schema = [
-                    'name' => FilterInputRule::HtmlSafeName->value,
-                    'selfRegistration' => FilterInputRule::Int->value,
-                    'authorizations' => FilterInputRule::ArrayInt->value,
-                ];
-                $input = WebApp::filterInput($schema, $this->flight->request()->data->getData());
-                $name = $input['name'] ?? '???';
-                $selfRegistration = $input['selfRegistration'] ?? 0;
-                $selectedAuthorizations = $input['authorizations'] ?? [];
-
-                if (empty($name)) {
-                    $this->render('PersonManager/views/group_edit.latte', Params::getAll([
-                        'group' => $group,
-                        'availableAuthorizations' => $availableAuthorizations,
-                        'error' => 'Le nom du groupe est requis',
-                        'layout' => $this->getLayout()
-                    ]));
-                } else $this->groupDataHelper->update($id, $name, $selfRegistration, $selectedAuthorizations);
-            } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-                if (!$group) $this->application->getErrorManager()->raise(ApplicationError::BadRequest, "Unknwon group $id in file " . __FILE__ . ' at line ' . __LINE__);
-                else {
-                    $this->render('PersonManager/views/group_edit.latte', Params::getAll([
-                        'group' => $group,
-                        'availableAuthorizations' => $availableAuthorizations,
-                        'currentAuthorizations' => array_column($this->dataHelper->gets('GroupAuthorization', ['IdGroup' => $id], 'IdAuthorization'), 'IdAuthorization'),
-                        'layout' => $this->getLayout(),
-                        'isMyclubWebSite' => WebApp::isMyClubWebSite(),
-
-                    ]));
-                }
-            } else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
-        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
-    }
-
-    public function delete(int $id): void
-    {
-        if (($this->connectedUser->get()->isPersonManager() ?? false) || $this->connectedUser->isWebmaster() ?? false) {
+        if (!($this->connectedUser->get()->isGroupManager() ?? false)) {
+            $this->raiseforbidden(__FILE__, __LINE__);
+            return;
+        }
+        if ($_SERVER['REQUEST_METHOD'] !== 'DELETE') {
+            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+            return;
+        }
+        if ($id === 1) {
+            $this->application->getErrorManager()->raise(ApplicationError::BadRequest, "Group ({$id}) can't be inactivatd in file " . __FILE__ . ' at line ' . __LINE__);
+            return;
+        }
+        try {
             $this->dataHelper->set('Group', ['Inactivated' => 0], ['Id' => $id]);
             $this->redirect('/groups');
-        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+        } catch (QueryException $e) {
+            $this->application->getErrorManager()->raise(ApplicationError::BadRequest, "Error {$e->getMessage()} in file " . __FILE__ . ' at line ' . __LINE__);
+        } catch (Throwable $e) {
+            $this->application->getErrorManager()->raise(ApplicationError::Error, "Error {$e->getMessage()} in file " . __FILE__ . ' at line ' . __LINE__);
+        }
+    }
+
+    public function groupEdit(int $id): void
+    {
+        if (!($this->connectedUser->get()->isGroupManager() ?? false)) {
+            $this->raiseforbidden(__FILE__, __LINE__);
+            return;
+        }
+        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+            return;
+        }
+        if ($id === 1) {
+            $this->application->getErrorManager()->raise(ApplicationError::BadRequest, "Group ({$id}) can't be edited in file " . __FILE__ . ' at line ' . __LINE__);
+            return;
+        }
+        $group = $this->dataHelper->get('Group', ['Id' => $id], 'Name, SelfRegistration');
+        if (!$group) $this->application->getErrorManager()->raise(ApplicationError::BadRequest, "Unknwon group $id in file " . __FILE__ . ' at line ' . __LINE__);
+        else {
+            $this->render('PersonManager/views/group_edit.latte', Params::getAll([
+                'group' => $group,
+                'availableAuthorizations' => $this->dataHelper->gets('Authorization', ['Id <> 1' => null], '*', 'Name'),
+                'currentAuthorizations' => array_column($this->dataHelper->gets('GroupAuthorization', ['IdGroup' => $id], 'IdAuthorization'), 'IdAuthorization'),
+                'layout' => $this->getLayout(),
+                'isMyclubWebSite' => WebApp::isMyClubWebSite(),
+
+            ]));
+        }
+    }
+
+    public function groupEditSave(int $id): void
+    {
+        if (!($this->connectedUser->get()->isGroupManager() ?? false)) {
+            $this->raiseforbidden(__FILE__, __LINE__);
+            return;
+        }
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+            return;
+        }
+        if ($id === 1) {
+            $this->application->getErrorManager()->raise(ApplicationError::BadRequest, "Group ({$id}) can't be updated in file " . __FILE__ . ' at line ' . __LINE__);
+            return;
+        }
+        $availableAuthorizations = $this->dataHelper->gets('Authorization', ['Id <> 1' => null], '*', 'Name');
+        $group = $this->dataHelper->get('Group', ['Id' => $id], 'Name, SelfRegistration');
+        $schema = [
+            'name' => FilterInputRule::HtmlSafeName->value,
+            'selfRegistration' => FilterInputRule::Int->value,
+            'authorizations' => FilterInputRule::ArrayInt->value,
+        ];
+        $input = WebApp::filterInput($schema, $this->flight->request()->data->getData());
+        $name = $input['name'] ?? '???';
+        $selfRegistration = $input['selfRegistration'] ?? 0;
+        $selectedAuthorizations = $input['authorizations'] ?? [];
+        if (empty($name)) {
+            $this->render('PersonManager/views/group_edit.latte', Params::getAll([
+                'group' => $group,
+                'availableAuthorizations' => $availableAuthorizations,
+                'error' => 'Le nom du groupe est requis',
+                'layout' => $this->getLayout()
+            ]));
+        } else $this->groupDataHelper->update($id, $name, $selfRegistration, $selectedAuthorizations);
+    }
+
+    public function groupIndex(): void
+    {
+        if (!($this->connectedUser->get()->isGroupManager() ?? false)) {
+            $this->raiseforbidden(__FILE__, __LINE__);
+            return;
+        }
+        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+            return;
+        }
+        $this->render('PersonManager/views/groups_index.latte', Params::getAll([
+            'groups' => $this->groupDataHelper->getGroupsWithAuthorizations(),
+            'layout' => $this->getLayout(),
+            'navItems' => $this->getNavItems($connectedUser->person ?? false),
+            'isMyclubWebSite' => WebApp::isMyClubWebSite(),
+        ]));
     }
 }

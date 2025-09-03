@@ -174,33 +174,6 @@ class WebmasterController extends AbstractController
         } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
-    public function maintenance(): void
-    {
-        if (!($this->connectedUser->get()->isWebmaster() ?? false)) {
-            $this->raiseforbidden(__FILE__, __LINE__);
-            return;
-        }
-        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
-            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
-        $this->render('Webmaster/views/maintenance.latte', Params::getAll(['isMyclubWebSite' => WebApp::isMyClubWebSite()]));
-    }
-
-    public function setSiteUnderMaintenance(): void
-    {
-        if (!($this->connectedUser->get()->isWebmaster() ?? false)) {
-            $this->raiseforbidden(__FILE__, __LINE__);
-            return;
-        }
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
-        $this->dataHelper->set('Metadata', ['SiteUnderMaintenance' => 1], ['Id' => 1]);
-        $this->redirect('/');
-    }
-
     public function showInstallations(): void
     {
         $person = $this->connectedUser->get()->person ?? false;

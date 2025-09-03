@@ -55,13 +55,13 @@ abstract class AbstractController
     protected function getLayout()
     {
         $navbar = $_SESSION['navbar'] ?? '';
-        if ($navbar == 'user')                return 'user.latte';
-        else if ($navbar == 'eventManager')   return '../../Webmaster/views/eventManager.latte';
-        else if ($navbar == 'personManager')  return '../../Webmaster/views/personManager.latte';
-        else if ($navbar == 'redactor')       return '../../Webmaster/views/redactor.latte';
-        else if ($navbar == 'visitoInsights') return '../../Webmaster/views/visitorInsights.latte';
-        else if ($navbar == 'webmaster')      return '../../Webmaster/views/webmaster.latte';
-        else if ($navbar == '')               return '../../Common/views/home.latte';
+        if ($navbar == 'user')                 return 'user.latte';
+        else if ($navbar == 'eventManager')    return '../../Webmaster/views/eventManager.latte';
+        else if ($navbar == 'personManager')   return '../../Webmaster/views/personManager.latte';
+        else if ($navbar == 'redactor')        return '../../Webmaster/views/redactor.latte';
+        else if ($navbar == 'visitorInsights') return '../../Webmaster/views/visitorInsights.latte';
+        else if ($navbar == 'webmaster')       return '../../Webmaster/views/webmaster.latte';
+        else if ($navbar == '')                return '../../Common/views/home.latte';
 
         Application::unreachable("Fatal error in file  with navbar={$navbar}", __FILE__, __LINE__);
     }
@@ -98,23 +98,26 @@ abstract class AbstractController
         $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, "Method {$_SERVER['REQUEST_METHOD']} not allowed in file {$file} at line {$line}");
     }
 
-    public function render(string $name, object|array $params = []): void
+    public function render(string $templateLatteName, object|array $params = []): void
     {
 #error_log("\n\n" . json_encode($name, JSON_PRETTY_PRINT) . "\n");
-        $content = $this->latte->renderToString($name, $params);
+        $content = $this->latte->renderToString($templateLatteName, $params);
         echo $content;
         if (ob_get_level()) ob_end_flush();
         flush();
         Flight::stop();
     }
 
-    protected function redirect(string $url): void
+    protected function redirect(string $url, ?ApplicationError $applicationError = null, ?string $message = null): void
     {
+        if ($applicationError != null) $this->flight->setData('code', $applicationError->value);
+        if ($message != null) $this->flight->setData('message', $message);        
+        
         // for test with curl
         $ua = $_SERVER['HTTP_USER_AGENT'] ?? '';
         if (stripos($ua, 'TestDevice') !== false) {
-            $this->flight->response()->header('Location', '/');
-            $this->flight->response()->write('');
+            $this->application->getFlight()->response()->status($applicationError->value);
+            $this->application->getFlight()->response()->write($message);
         } else $this->application->getFlight()->redirect($url);
     }
 

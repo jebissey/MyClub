@@ -10,6 +10,7 @@ use app\enums\ApplicationError;
 use app\enums\EventSearchMode;
 use app\enums\FilterInputRule;
 use app\enums\WeekdayFormat;
+use app\exceptions\QueryException;
 use app\helpers\Application;
 use app\helpers\Params;
 use app\helpers\PeriodHelper;
@@ -64,6 +65,10 @@ class EventController extends AbstractController
 
     public function weekEvents(): void
     {
+        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+            return;
+        }
         $this->render('Event/views/weekEvents.latte', Params::getAll([
             'events' => $this->eventDataHelper->getNextWeekEvents(),
             'eventTypes' => $this->dataHelper->gets('EventType', ['Inactivated' => 0], 'Id, Name'),
@@ -80,6 +85,10 @@ class EventController extends AbstractController
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
         }
+        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+            return;
+        }
         $period = $this->flight->request()->query->period ?? 'month';
         [$dateRange, $crosstabData] = (new CrosstabDataHelper($this->application))->getevents($period);
 
@@ -94,7 +103,7 @@ class EventController extends AbstractController
         ]));
     }
 
-    public function guest($message = '', $type = '')
+    public function guest(string $message = '', string $type = ''): void
     {
         if (!($this->connectedUser->get(1)->isEventManager() ?? false)) {
             $this->raiseforbidden(__FILE__, __LINE__);
@@ -234,7 +243,7 @@ class EventController extends AbstractController
                 'message' => $message,
                 'messageType' => $messageType,
             ]));
-        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Evénement non trouvé', 3000);
+        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Evénement non trouvé', 3000, false);
     }
 
     public function register(int $eventId, bool $set, $token = null): void
@@ -243,77 +252,87 @@ class EventController extends AbstractController
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
-        if ($token === null) $token = WebApp::getFiltered('t', FilterInputRule::Token->value, $this->flight->request()->query->getData());
-        if ($this->connectedUser->get()->person ?? false) {
-            $userId = $this->connectedUser->person->Id;
-            if ($set) {
-                if ($eventId > 0 && $this->eventDataHelper->isUserRegistered($eventId, $person->Email ?? '')) {
-                    $this->dataHelper->set('Participant', [
-                        'IdEvent'  => $eventId,
-                        'IdPerson' => $userId,
-                        'IdContact' => null
-                    ]);
-                }
-            } else {
-                $this->dataHelper->delete('Participant', [
-                    'IdEvent' => $eventId,
-                    'IdPerson' => $userId
-                ]);
-            }
-        } elseif ($token != null) {
-            $event = $this->dataHelper->get('Event', ['Id', $eventId], 'Id, Audience');
-            if (!$event) {
-                $this->show($eventId, 'Evénement inconnu', 'error');
-                return;
-            }
-            $contact = $this->dataHelper->get('Contact', ['Token' => $token], 'Id, TokenCreatedAt');
-            if (!$contact) {
-                $this->show($eventId, 'Token inconnu', 'error');
-                return;
-            }
-            $tokenCreatedAt = new DateTime($contact->TokenCreatedAt);
-            $now = new DateTime();
-            $interval = $now->diff($tokenCreatedAt);
-            if ($interval->days >= 1 || ($interval->days == 0 && $interval->h >= 24)) {
-                $this->show($eventId, 'Token expiré', 'error');
-                return;
-            }
-            $existingParticipant = $this->dataHelper->get('Participant', [
-                'IdEvent' => $eventId,
-                'IdContact' => $contact->Id
-            ], 'Id');
-            if ($existingParticipant && $set) {
-                $this->show($eventId, 'Participant déjà enregistré', 'error');
-                return;
-            }
-            if ($event->Audience === 'Guest') {
-                $invitation = $this->dataHelper->get('Guest', [
-                    'IdEvent' => $event->Id,
-                    'IdContact' => $contact->Id
-                ], 'Id');
-                if (!$invitation) {
-                    $this->show($eventId, "Il faut avoir une invitation pour pouvoir s'inscrire à cet événement", 'error');
-                    return;
-                }
-            }
-            if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-                $this->dataHelper->set('Participant', [
-                    'IdEvent' => $event->Id,
-                    'IdPerson' => null,
-                    'IdContact' => $contact->Id
-                ]);
-
-                $this->render('Common/views/registration_success.latte', Params::getAll([
-                    'event' => $event,
-                    'contact' => $contact,
-                    'navItems' => $this->getNavItems($this->connectedUser->person),
-                ]));
-            }
-        } else {
-            $this->application->getErrorManager()->raise(ApplicationError::Forbidden, "User not allowed in file " . __FILE__ . ' at line ' . __LINE__);
+        if (!$this->eventDataHelper->eventExists($eventId)) {
+            $this->application->getErrorManager()->raise(ApplicationError::BadRequest, "Event ({$eventId}) doesn't exist", 3000, false);
             return;
         }
-        $this->redirect('/event/' . $eventId);
+        try {
+            if ($token === null) $token = WebApp::getFiltered('t', FilterInputRule::Token->value, $this->flight->request()->query->getData());
+            if ($this->connectedUser->get()->person ?? false) {
+                $userId = $this->connectedUser->person->Id;
+                if ($set) {
+                    if ($eventId > 0 && $this->eventDataHelper->isUserRegistered($eventId, $person->Email ?? '')) {
+                        $this->dataHelper->set('Participant', [
+                            'IdEvent'  => $eventId,
+                            'IdPerson' => $userId,
+                            'IdContact' => null
+                        ]);
+                    }
+                } else {
+                    $this->dataHelper->delete('Participant', [
+                        'IdEvent' => $eventId,
+                        'IdPerson' => $userId
+                    ]);
+                }
+            } elseif ($token != null) {
+                $event = $this->dataHelper->get('Event', ['Id', $eventId], 'Id, Audience');
+                if (!$event) {
+                    $this->show($eventId, 'Evénement inconnu', 'error');
+                    return;
+                }
+                $contact = $this->dataHelper->get('Contact', ['Token' => $token], 'Id, TokenCreatedAt');
+                if (!$contact) {
+                    $this->show($eventId, 'Token inconnu', 'error');
+                    return;
+                }
+                $tokenCreatedAt = new DateTime($contact->TokenCreatedAt);
+                $now = new DateTime();
+                $interval = $now->diff($tokenCreatedAt);
+                if ($interval->days >= 1 || ($interval->days == 0 && $interval->h >= 24)) {
+                    $this->show($eventId, 'Token expiré', 'error');
+                    return;
+                }
+                $existingParticipant = $this->dataHelper->get('Participant', [
+                    'IdEvent' => $eventId,
+                    'IdContact' => $contact->Id
+                ], 'Id');
+                if ($existingParticipant && $set) {
+                    $this->show($eventId, 'Participant déjà enregistré', 'error');
+                    return;
+                }
+                if ($event->Audience === 'Guest') {
+                    $invitation = $this->dataHelper->get('Guest', [
+                        'IdEvent' => $event->Id,
+                        'IdContact' => $contact->Id
+                    ], 'Id');
+                    if (!$invitation) {
+                        $this->show($eventId, "Il faut avoir une invitation pour pouvoir s'inscrire à cet événement", 'error');
+                        return;
+                    }
+                }
+                if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+                    $this->dataHelper->set('Participant', [
+                        'IdEvent' => $event->Id,
+                        'IdPerson' => null,
+                        'IdContact' => $contact->Id
+                    ]);
+
+                    $this->render('Common/views/registration_success.latte', Params::getAll([
+                        'event' => $event,
+                        'contact' => $contact,
+                        'navItems' => $this->getNavItems($this->connectedUser->person),
+                    ]));
+                }
+            } else {
+                $this->application->getErrorManager()->raise(ApplicationError::Forbidden, "User not allowed in file " . __FILE__ . ' at line ' . __LINE__);
+                return;
+            }
+            $this->redirect('/event/' . $eventId);
+        } catch (QueryException $e) {
+            $this->redirect('/', ApplicationError::BadRequest, $e->getMessage());
+        } catch (Throwable $e) {
+            $this->redirect('/', ApplicationError::Error, $e->getMessage());
+        }
     }
 
     public function location(): void
@@ -331,6 +350,14 @@ class EventController extends AbstractController
 
     public function help(): void
     {
+        if (!($this->connectedUser->get()->isEventManager() ?? false)) {
+            $this->raiseforbidden(__FILE__, __LINE__);
+            return;
+        }
+        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+            return;
+        }
         $this->render('Common/views/info.latte', [
             'content' => $this->dataHelper->get('Settings', ['Name' => 'Help_eventManager'], 'Value')->Value ?? '',
             'hasAuthorization' => $this->connectedUser->get()->hasAutorization() ?? false,
@@ -399,30 +426,32 @@ class EventController extends AbstractController
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
         }
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $schema = [
-                'dayOfWeek' => $this->application->enumToValues(WeekdayFormat::class),
-                'timeOfDay' => FilterInputRule::HtmlSafeName->value,
-                'idGroup' => FilterInputRule::Int->value,
-                'idEventType' => FilterInputRule::Int->value,
-            ];
-            $input = WebApp::filterInput($schema, $this->flight->request()->data->getData());
-            $idGroup = $input['idGroup'];
-            $idEventType =  $input['idEventType'];
-            $dayOfWeek = $input['dayOfWeek'] ?? '';
-            $timeOfDay = $input['timeOfDay'] ?? '';
-            $filteredEmails = (new PersonDataHelper($this->application))->getEmailsOfInterestedPeople($idGroup, $idEventType, $dayOfWeek, $timeOfDay);
-            $groupName = $idGroup != null ? $this->dataHelper->get('Group', ['Id' => $idGroup], 'Name')->Name ?? '' : '';
-            $eventTypeName = $idEventType != null ? $this->dataHelper->get('EventType', ['Id', $idEventType], 'Name') : '';
-            $dayOfWeekName = $dayOfWeek != null ? TranslationManager::getWeekdayNames()[$dayOfWeek] : '';
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+            return;
+        }
+        $schema = [
+            'dayOfWeek' => $this->application->enumToValues(WeekdayFormat::class),
+            'timeOfDay' => FilterInputRule::HtmlSafeName->value,
+            'idGroup' => FilterInputRule::Int->value,
+            'idEventType' => FilterInputRule::Int->value,
+        ];
+        $input = WebApp::filterInput($schema, $this->flight->request()->data->getData());
+        $idGroup = $input['idGroup'];
+        $idEventType =  $input['idEventType'];
+        $dayOfWeek = $input['dayOfWeek'] ?? '';
+        $timeOfDay = $input['timeOfDay'] ?? '';
+        $filteredEmails = (new PersonDataHelper($this->application))->getEmailsOfInterestedPeople($idGroup, $idEventType, $dayOfWeek, $timeOfDay);
+        $groupName = $idGroup != null ? $this->dataHelper->get('Group', ['Id' => $idGroup], 'Name')->Name ?? '' : '';
+        $eventTypeName = $idEventType != null ? $this->dataHelper->get('EventType', ['Id', $idEventType], 'Name') : '';
+        $dayOfWeekName = $dayOfWeek != null ? TranslationManager::getWeekdayNames()[$dayOfWeek] : '';
 
-            $this->render('Event/views/copyToClipBoard.latte', Params::getAll([
-                'emailsJson' => json_encode($filteredEmails),
-                'emails' => $filteredEmails,
-                'filters' => "$groupName / $eventTypeName / $dayOfWeekName / $timeOfDay",
-                'people' => $this->dataHelper->gets('Person', ['Inactivated' => 0], 'Email, Phone, FirstName, LastName, NickName', '', true),
-            ]));
-        } else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
+        $this->render('Event/views/copyToClipBoard.latte', Params::getAll([
+            'emailsJson' => json_encode($filteredEmails),
+            'emails' => $filteredEmails,
+            'filters' => "$groupName / $eventTypeName / $dayOfWeekName / $timeOfDay",
+            'people' => $this->dataHelper->gets('Person', ['Inactivated' => 0], 'Email, Phone, FirstName, LastName, NickName', '', true),
+        ]));
     }
 
     public function fetchEmailsForArticle(int $idArticle): void
