@@ -88,16 +88,54 @@ abstract class AbstractController
         return $filteredNavItems;
     }
 
-    public function raiseforbidden(string $file, int $line): void
+    protected function raiseBadRequest(string $message, string $file, int $line): void
+    {
+        $this->application->getErrorManager()->raise(ApplicationError::BadRequest, "Error {$message} in file {$file} at line {$line}");
+    }
+
+    protected function raiseError(string $message, string $file, int $line): void
+    {
+        $this->application->getErrorManager()->raise(ApplicationError::Error, "Error {$message} in file {$file} at line {$line}");
+    }
+
+    protected function raiseforbidden(string $file, int $line): void
     {
         $this->application->getErrorManager()->raise(ApplicationError::Forbidden, "Access forbidden in file {$file} at line {$line}");
     }
 
-    public function raiseMethodNotAllowed(string $file, int $line): void
+    protected function raiseMethodNotAllowed(string $file, int $line): void
     {
         $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, "Method {$_SERVER['REQUEST_METHOD']} not allowed in file {$file} at line {$line}");
     }
 
+    protected function redirect(string $url, ?ApplicationError $applicationError = null, ?string $message = null): void
+    {
+        if ($applicationError != null) $this->flight->setData('code', $applicationError->value);
+        if ($message != null) $this->flight->setData('message', $message);
+
+        // for test with curl
+        $ua = $_SERVER['HTTP_USER_AGENT'] ?? '';
+        if (stripos($ua, 'TestDevice') !== false) {
+            $this->application->getFlight()->response()->status($applicationError->value ?? ApplicationError::Ok->value);
+            $this->application->getFlight()->response()->write($message ?? '');
+        } else $this->application->getFlight()->redirect($url);
+    }
+
+    protected function userIsAllowedAndMethodIsGood(string $method, callable $permissionCheck): bool
+    {
+        $user = $this->connectedUser->get();
+        if (!$user || !$permissionCheck($user)) {
+            $this->raiseforbidden(__FILE__, __LINE__);
+            return false;
+        }
+        if ($_SERVER['REQUEST_METHOD'] !== $method) {
+            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+            return false;
+        }
+        return true;
+    }
+
+    #region Public functions
     public function render(string $templateLatteName, object|array $params = []): void
     {
 #error_log("\n\n" . json_encode($name, JSON_PRETTY_PRINT) . "\n");
@@ -106,19 +144,6 @@ abstract class AbstractController
         if (ob_get_level()) ob_end_flush();
         flush();
         Flight::stop();
-    }
-
-    protected function redirect(string $url, ?ApplicationError $applicationError = null, ?string $message = null): void
-    {
-        if ($applicationError != null) $this->flight->setData('code', $applicationError->value);
-        if ($message != null) $this->flight->setData('message', $message);        
-        
-        // for test with curl
-        $ua = $_SERVER['HTTP_USER_AGENT'] ?? '';
-        if (stripos($ua, 'TestDevice') !== false) {
-            $this->application->getFlight()->response()->status($applicationError->value);
-            $this->application->getFlight()->response()->write($message);
-        } else $this->application->getFlight()->redirect($url);
     }
 
     #region Private functions

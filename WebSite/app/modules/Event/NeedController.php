@@ -2,7 +2,6 @@
 
 namespace app\modules\Event;
 
-use app\enums\ApplicationError;
 use app\helpers\Application;
 use app\helpers\Params;
 use app\models\NeedDataHelper;
@@ -20,7 +19,7 @@ class NeedController extends AbstractController
 
     public function needs(): void
     {
-        if (!($this->connectedUser->get()->isWebmaster() ?? false)) {
+        if (!($this->connectedUser->get()->isEventDesigner() ?? false)) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
         }

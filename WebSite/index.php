@@ -147,7 +147,7 @@ $eventTypeController = new EventTypeController($application);
 mapRoute($flight, 'GET    /eventTypes', $eventTypeController, 'index');
 mapRoute($flight, 'GET    /eventTypes/create', $eventTypeController, 'create');
 mapRoute($flight, 'GET    /eventTypes/edit/@id:[0-9]+', $eventTypeController, 'edit');
-mapRoute($flight, 'POST   /eventTypes/edit/@id:[0-9]+', $eventTypeController, 'edit');
+mapRoute($flight, 'POST   /eventTypes/edit/@id:[0-9]+', $eventTypeController, 'editSave');
 mapRoute($flight, 'DELETE /eventTypes/delete/@id:[0-9]+', $eventTypeController, 'delete');
 
 $ffaController = new FFAController($application);
@@ -200,7 +200,7 @@ mapRoute($flight, 'GET    /personManager/help', $personController, 'help');
 mapRoute($flight, 'GET    /persons', $personController, 'index');
 mapRoute($flight, 'GET    /person/create', $personController, 'create');
 mapRoute($flight, 'GET    /person/edit/@id:[0-9]+', $personController, 'edit');
-mapRoute($flight, 'POST   /person/edit/@id:[0-9]+', $personController, 'edit');
+mapRoute($flight, 'POST   /person/edit/@id:[0-9]+', $personController, 'editSave');
 mapRoute($flight, 'DELETE /person/delete/@id:[0-9]+', $personController, 'delete');
 
 $registrationController = new RegistrationController($application);
@@ -212,9 +212,9 @@ mapRoute($flight, 'GET /articles-rss.xml', $rssController, 'articlesRssGenerator
 mapRoute($flight, 'GET /events-rss.xml', $rssController, 'eventsRssGenerator');
 
 $surveyController = new SurveyController($application);
-mapRoute($flight, 'GET  /surveys/add/@id:[0-9]+', $surveyController, 'add');
-mapRoute($flight, 'POST /surveys/create', $surveyController, 'createOrUpdate');
-mapRoute($flight, 'GET  /surveys/results/@id:[0-9]+', $surveyController, 'viewResults');
+mapRoute($flight, 'GET  /survey/add/@id:[0-9]+', $surveyController, 'add');
+mapRoute($flight, 'POST /survey/create', $surveyController, 'createOrUpdate');
+mapRoute($flight, 'GET  /survey/results/@id:[0-9]+', $surveyController, 'viewResults');
 
 $userController = new UserController($application);
 mapRoute($flight, 'GET  /', $userController, 'home');
@@ -222,9 +222,9 @@ mapRoute($flight, 'GET  /help', $userController, 'helpHome');
 mapRoute($flight, 'GET  /legal/notice', $userController, 'legalNotice');
 mapRoute($flight, 'GET  /user', $userController, 'user');
 mapRoute($flight, 'GET  /user/account', $userController, 'account');
-mapRoute($flight, 'POST /user/account', $userController, 'account');
+mapRoute($flight, 'POST /user/account', $userController, 'accountSave');
 mapRoute($flight, 'GET  /user/availabilities', $userController, 'availabilities');
-mapRoute($flight, 'POST /user/availabilities', $userController, 'availabilities');
+mapRoute($flight, 'POST /user/availabilities', $userController, 'availabilitiesSave');
 mapRoute($flight, 'GET  /user/directory', $userController, 'showDirectory');
 mapRoute($flight, 'GET  /user/forgotPassword/@encodedEmail', $userController, 'forgotPassword');
 mapRoute($flight, 'GET  /user/groups', $userController, 'groups');
@@ -257,8 +257,6 @@ $webmasterController = new WebmasterController($application);
 mapRoute($flight, 'GET  /admin', $webmasterController, 'homeAdmin');
 mapRoute($flight, 'GET  /admin/help', $webmasterController, 'helpAdmin');
 mapRoute($flight, 'GET  /admin/webmaster/help', $webmasterController, 'helpWebmaster');
-mapRoute($flight, 'GET  /arwards', $webmasterController, 'arwards');
-mapRoute($flight, 'POST /arwards', $webmasterController, 'arwards');
 mapRoute($flight, 'GET  /designer', $webmasterController, 'homeDesigner');
 mapRoute($flight, 'GET  /designer/help', $webmasterController, 'helpDesigner');
 mapRoute($flight, 'GET  /installations', $webmasterController, 'showInstallations');
@@ -274,8 +272,8 @@ mapRoute($flight, 'GET    /api/author/@articleId:[0-9]+', $articleApi, 'getAutho
 mapRoute($flight, 'POST   /api/designs/vote', $articleApi, 'designVote');
 mapRoute($flight, 'DELETE /api/media/delete/@year:[0-9]+/@month:[0-9]+/@filename', $articleApi, 'deleteFile');
 mapRoute($flight, 'POST   /api/media/upload', $articleApi, 'uploadFile');
-mapRoute($flight, 'POST   /api/surveys/reply', $articleApi, 'saveSurveyReply');
-mapRoute($flight, 'GET    /api/surveys/reply/@id:[0-9]+', $articleApi, 'showSurveyReplyForm');
+mapRoute($flight, 'POST   /api/survey/reply', $articleApi, 'saveSurveyReply');
+mapRoute($flight, 'GET    /api/survey/reply/@id:[0-9]+', $articleApi, 'showSurveyReplyForm');
 
 $carouselApi = new carouselApi($application);
 mapRoute($flight, 'GET    /api/carousel/@articleId:[0-9]+', $carouselApi, 'getItems');

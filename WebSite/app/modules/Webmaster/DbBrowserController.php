@@ -22,33 +22,33 @@ class DbBrowserController extends AbstractController
 
     public function createRecord(string $table): void
     {
-        if ($this->connectedUser->get()->isWebmaster() ?? false) {
+        if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isWebmaster())) {
             $this->dbBrowserDataHelper->createRecord($table);
             $this->redirect('/dbbrowser/' . urlencode($table));
-        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+        }
     }
 
     public function deleteRecord(string $table, int $id): void
     {
-        if ($this->connectedUser->get()->isWebmaster() || false) {
+        if ($this->userIsAllowedAndMethodIsGood('DELETE', fn($u) => $u->isWebmaster())) {
             $this->dbBrowserDataHelper->deleteRecord($table, $id);
             $this->redirect('/dbbrowser/' . urlencode($table));
-        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+        }
     }
 
     public function index(): void
     {
-        if ($this->connectedUser->get()->isWebmaster() ?? false) {
+        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isWebmaster())) {
             $this->render('Webmaster/views/dbbrowser/index.latte', Params::getAll([
                 'tables' => $this->dbBrowserDataHelper->getTables(),
                 'isMyclubWebSite' => WebApp::isMyClubWebSite(),
             ]));
-        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+        }
     }
 
     public function showCreateForm(string $table): void
     {
-        if ($this->connectedUser->get()->isWebmaster() ?? false) {
+        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isWebmaster())) {
             [$columns, $columnTypes] = $this->dbBrowserDataHelper->showCreateForm($table);
 
             $this->render('Webmaster/views/dbbrowser/create.latte', Params::getAll([
@@ -56,12 +56,12 @@ class DbBrowserController extends AbstractController
                 'columns' => $columns,
                 'columnTypes' => $columnTypes
             ]));
-        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+        }
     }
 
     public function showEditForm(string $table, int $id): void
     {
-        if ($this->connectedUser->get()->isWebmaster() ?? false) {
+        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isWebmaster())) {
             [$columns, $record, $primaryKey, $columnTypes] = $this->dbBrowserDataHelper->showEditForm($table, $id);
 
             $this->render('Webmaster/views/dbbrowser/edit.latte', Params::getAll([
@@ -71,12 +71,12 @@ class DbBrowserController extends AbstractController
                 'primaryKey' => $primaryKey,
                 'columnTypes' => $columnTypes
             ]));
-        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+        }
     }
 
     public function showTable(string $table): void
     {
-        if ($this->connectedUser->get()->isWebmaster() ?? false) {
+        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isWebmaster())) {
             $filters = $this->dbBrowserDataHelper->getColumnFilters($table, $this->flight->request()->query);
             [$records, $columns, $dbbPage, $totalPages, $filters] = $this->dbBrowserDataHelper->showTable(
                 $table,
@@ -95,14 +95,14 @@ class DbBrowserController extends AbstractController
                 'filters' => $filters,
                 'isMyclubWebSite' => WebApp::isMyClubWebSite(),
             ]));
-        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+        }
     }
 
     public function updateRecord(string $table, int $id): void
     {
-        if ($this->connectedUser->get()->isWebmaster() ?? false) {
+        if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isWebmaster())) {
             $this->dbBrowserDataHelper->updateRecord($table, $id);
             $this->redirect('/dbbrowser/' . urlencode($table));
-        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+        }
     }
 }

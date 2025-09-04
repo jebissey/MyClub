@@ -25,7 +25,7 @@ class LogController extends AbstractController
 
     public function index()
     {
-        if ($this->connectedUser->get()->isVisitorInsights() ?? false) {
+        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isVisitorInsights())) {
             $logPage = max(1, (int)($this->flight->request()->query['logPage'] ?? 1));
             $perPage = 10;
             [$logs, $totalPages] = $this->logDataHelper->getVisitedPages($perPage, $logPage, $this->flight->request()->query->getData());
@@ -36,12 +36,12 @@ class LogController extends AbstractController
                 'totalPages' => $totalPages,
                 'filters' => $this->flight->request()->query->getData()
             ]));
-        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+        }
     }
 
     public function referents()
     {
-        if ($this->connectedUser->get()->isVisitorInsights() ?? false) {
+        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isVisitorInsights())) {
             $currentParams = $this->flight->request()->query->getData();
             $period = $currentParams['period'] ?? 'day';
             $currentDate = $currentParams['date'] ?? date('Y-m-d');
@@ -55,14 +55,14 @@ class LogController extends AbstractController
                 'control' => new WebApp($this->application),
                 'rows' => $this->logDataHelper->getReferentStats($period, $currentDate),
             ]));
-        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+        }
     }
 
     private $periodTypes = ['day', 'week', 'month', 'year'];
     private $defaultPeriodType = 'day';
     public function visitorsGraf()
     {
-        if ($this->connectedUser->get()->isVisitorInsights() ?? false) {
+        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isVisitorInsights())) {
             $periodType = $this->flight->request()->query->periodType ?? $this->defaultPeriodType;
             $periodType = in_array($periodType, $this->periodTypes) ? $periodType : $this->defaultPeriodType;
 
@@ -77,13 +77,12 @@ class LogController extends AbstractController
                 'chartData' => $this->logDataHelper->formatDataForChart($data),
                 'periodLabel' => $this->logDataHelper->getPeriodLabel($periodType)
             ]));
-        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+        }
     }
 
     public function analytics()
     {
-        if ($this->connectedUser->get()->isVisitorInsights() ?? false) {
-
+        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isVisitorInsights())) {
             $this->render('VisitorInsights/views/analytics.latte', Params::getAll([
                 'osData' => $this->logDataHelper->getOsDistribution(),
                 'browserData' => $this->logDataHelper->getBrowserDistribution(),
@@ -91,17 +90,13 @@ class LogController extends AbstractController
                 'typeData' => $this->logDataHelper->getTypeDistribution(),
                 'title' => 'Synthèse des visiteurs'
             ]));
-        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+        }
     }
 
     const TOP = 50;
     public function topPagesByPeriod(): void
     {
-        if ($this->connectedUser->get()->isVisitorInsights() ?? false) {
-            if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
-                $this->raiseMethodNotAllowed(__FILE__, __LINE__);
-                return;
-            }
+        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isVisitorInsights())) {
             $period =  WebApp::getFiltered('period', $this->application->enumToValues(Period::class), $this->flight->request()->query->getData()) ?: Period::Week->value;
             $dateCondition = PeriodHelper::getDateConditions($period);
             $topPages = $this->logDataHelper->getTopPages($dateCondition, self::TOP);
@@ -111,16 +106,12 @@ class LogController extends AbstractController
                 'period' => $period,
                 'topPages' => $topPages
             ]));
-        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+        }
     }
 
     public function topArticlesByPeriod(): void
     {
-        if ($this->connectedUser->get()->isRedactor() ?? false) {
-            if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
-                $this->raiseMethodNotAllowed(__FILE__, __LINE__);
-                return;
-            }
+        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isVisitorInsights())) {
             $period = WebApp::getFiltered('period', $this->application->enumToValues(Period::class), $this->flight->request()->query->getData()) ?: Period::Week->value;
             $dateCondition = PeriodHelper::getDateConditions($period);
             $topPages = $this->logDataHelper->getTopArticles($dateCondition, self::TOP);
@@ -130,12 +121,12 @@ class LogController extends AbstractController
                 'period' => $period,
                 'topPages' => $topPages
             ]));
-        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+        }
     }
 
     public function crossTab()
     {
-        if ($this->connectedUser->get()->isVisitorInsights() ?? false) {
+        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isVisitorInsights())) {
             $schema = [
                 'uri' => FilterInputRule::Uri->value,
                 'email' => FilterInputRule::Email->value,
@@ -161,23 +152,18 @@ class LogController extends AbstractController
                 'emailFilter' => $emailFilter,
                 'groupFilter' => $groupFilter
             ]));
-        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+        }
     }
 
     public function showLastVisits(): void
     {
-        $person = $this->connectedUser->get()->person ?? false;
-        if ($person && $this->connectedUser->isVisitorInsights()) {
-            if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
-                $this->raiseMethodNotAllowed(__FILE__, __LINE__);
-                return;
-            }
+        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isVisitorInsights())) {
             $activePersons = $this->dataHelper->gets('Person', ['Inactivated' => 0]);
             $this->render('VisitorInsights/views/lastVisits.latte', Params::getAll([
                 'lastVisits' => $this->logDataHelper->getLastVisitPerActivePersonWithTimeAgo($activePersons),
                 'totalActiveUsers' => count($activePersons),
-                'navItems' => $this->getNavItems($person),
+                'navItems' => $this->getNavItems($this->connectedUser->get()->person),
             ]));
-        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+        }
     }
 }

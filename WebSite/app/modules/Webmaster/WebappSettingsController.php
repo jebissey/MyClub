@@ -32,43 +32,49 @@ class WebappSettingsController extends AbstractController
 
     public function editSettings(): void
     {
-        if ($person = $this->connectedUser->get()->person ?? false) {
-            if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
-                $this->raiseMethodNotAllowed(__FILE__, __LINE__);
-                return;
-            }
-            $settings = [];
-            foreach ($this->settingsKeys as $key => $label) {
-                $result = $this->dataHelper->get('Settings', ['Name' => $key], 'Value');
-                if ($result === false) {
-                    $this->dataHelper->set('Settings', ['Value' => '', 'Name' => $key]);
-                    $settings[$key] = '';
-                } else $settings[$key] = $result->Value ?? '';
-            }
+        if (!($this->connectedUser->get()->isHomeDesigner() ?? false)) {
+            $this->raiseforbidden(__FILE__, __LINE__);
+            return;
+        }
+        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+            return;
+        }
+        $settings = [];
+        foreach ($this->settingsKeys as $key => $label) {
+            $result = $this->dataHelper->get('Settings', ['Name' => $key], 'Value');
+            if ($result === false) {
+                $this->dataHelper->set('Settings', ['Value' => '', 'Name' => $key]);
+                $settings[$key] = '';
+            } else $settings[$key] = $result->Value ?? '';
+        }
 
-            $this->render('Webmaster/views/webappSettings.latte', Params::getAll([
-                'navItems' => $this->getNavItems($person),
-                'settingsKeys' => $this->settingsKeys,
-                'settings' => $settings
-            ]));
-        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+        $this->render('Webmaster/views/webappSettings.latte', Params::getAll([
+            'navItems' => $this->getNavItems($this->connectedUser->person ),
+            'settingsKeys' => $this->settingsKeys,
+            'settings' => $settings
+        ]));
     }
 
     public function saveSettings()
     {
-        if ($this->connectedUser->get()->person ?? false) {
-            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-                $input = $this->flight->request()->data->getData();
-                foreach ($this->settingsKeys as $key => $label) {
-                    if (isset($input[$key])) {
-                        $value = $input[$key] ?? '';
-                        $existing = $this->dataHelper->get('Settings', ['Name' => $key], 'Id');
-                        if ($existing) $this->dataHelper->set('Settings', ['Value' => $value], ['Name' => $key]);
-                        else           $this->dataHelper->set('Settings', ['Value' => $value, 'Name' => $key]);
-                    }
-                }
-                $this->redirect('/settings');
-            } else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
-        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+        if (!($this->connectedUser->get()->isHomeDesigner() ?? false)) {
+            $this->raiseforbidden(__FILE__, __LINE__);
+            return;
+        }
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+            return;
+        }
+        $input = $this->flight->request()->data->getData();
+        foreach ($this->settingsKeys as $key => $label) {
+            if (isset($input[$key])) {
+                $value = $input[$key] ?? '';
+                $existing = $this->dataHelper->get('Settings', ['Name' => $key], 'Id');
+                if ($existing) $this->dataHelper->set('Settings', ['Value' => $value], ['Name' => $key]);
+                else           $this->dataHelper->set('Settings', ['Value' => $value, 'Name' => $key]);
+            }
+        }
+        $this->redirect('/settings');
     }
 }

@@ -11,4 +11,3 @@ readonly class ApiResponse
         public ?string $message = null
     ) {}
 }
-

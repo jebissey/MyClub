@@ -18,14 +18,14 @@ class NavBarController extends AbstractController
 
     public function index()
     {
-        if ($this->connectedUser->get()->isNavbarDesigner() ?? false) {
+        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isNavbarDesigner())) {
             $this->render('Webmaster/views/navbar.latte', Params::getAll([
                 'navItems' => $this->getNavItems($this->connectedUser->person),
                 'groups' => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
                 'availableRoutes' => $this->getAvailableRoutes(),
                 'isMyclubWebSite' => WebApp::isMyClubWebSite(),
             ]));
-        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+        }
     }
 
     public function showArwards()

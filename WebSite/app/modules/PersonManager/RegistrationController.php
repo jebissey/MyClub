@@ -20,7 +20,7 @@ class RegistrationController extends TableController
 
     public function index()
     {
-        if (($this->connectedUser->get()->isPersonManager() ?? false) || $this->connectedUser->isWebmaster() ?? false) {
+        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isGroupManager())) {
             $schema = [
                 'lastName' => FilterInputRule::PersonName->value,
                 'firstName' => FilterInputRule::PersonName->value,
@@ -50,12 +50,12 @@ class RegistrationController extends TableController
                 'navItems' => $this->getNavItems($connectedUser->person ?? false),
                 'isMyclubWebSite' => WebApp::isMyClubWebSite(),
             ]));
-        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+        } 
     }
 
     public function getPersonGroups($personId)
     {
-        if (($this->connectedUser->get()->isPersonManager() ?? false) || $this->connectedUser->isWebmaster() ?? false) {
+        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isGroupManager())) {
             [$availableGroups, $currentGroups] = (new GroupDataHelper($this->application))->getAvailableGroups($this->connectedUser, $personId);
 
             $this->render('PersonManager/views/registration_user_groups_partial.latte', Params::getAll([
@@ -63,6 +63,6 @@ class RegistrationController extends TableController
                 'availableGroups' => $availableGroups,
                 'personId' => $personId
             ]));
-        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+        }
     }
 }

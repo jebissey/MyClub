@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', function () {
         replySurveyBtn.addEventListener('click', function () {
             const surveyModal = new bootstrap.Modal(document.getElementById('surveyModal'));
 
-            fetch(`/api/surveys/reply/${ARTICLE_ID}`)
+            fetch(`/api/survey/reply/${ARTICLE_ID}`)
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
@@ -56,7 +56,7 @@ document.addEventListener('DOMContentLoaded', function () {
                                 survey_id: document.querySelector('input[name="survey_id"]').value,
                                 survey_answers: selectedOptions,
                             };
-                            fetch('/api/surveys/reply', {
+                            fetch('/api/survey/reply', {
                                 method: 'POST',
                                 headers: {
                                     'Content-Type': 'application/json'

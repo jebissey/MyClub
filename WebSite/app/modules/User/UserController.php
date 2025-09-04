@@ -60,16 +60,16 @@ class UserController extends AbstractController
         $email = urldecode($encodedEmail);
         $success = $this->authService->handleForgotPassword($email);
         if ($success) $this->redirect('/', ApplicationError::Ok, 'Votre mot de passe est réinitialisé');
-        else $this->application->getErrorManager()->raise(ApplicationError::Error, 'Unable to send password reset email');
+        else $this->raiseError('Unable to send password reset email', __FILE__, __LINE__);
     }
 
     public function setPassword($token): void
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $newPassword = WebApp::getFiltered('password', FilterInputRule::Password->value, $this->flight->request()->data->getData());
-            if (!$newPassword)                                               $this->application->getErrorManager()->raise(ApplicationError::BadRequest, 'Invalid password format');
+            if (!$newPassword)                                               $this->raiseBadRequest('Invalid password format', __FILE__, __LINE__);
             elseif ($this->authService->resetPassword($token, $newPassword)) $this->redirect('/', ApplicationError::Ok, 'Votre mot de passe est réinitialisé');
-            else                                                             $this->application->getErrorManager()->raise(ApplicationError::BadRequest, 'Invalid or expired token');
+            else                                                             $this->raiseBadRequest('Invalid or expired token', __FILE__, __LINE__);
         } elseif ($_SERVER['REQUEST_METHOD'] === 'GET') $this->render('User/views/user_set_password.latte', Params::getAll(['token' => $token,]));
     }
 
@@ -78,11 +78,11 @@ class UserController extends AbstractController
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $result = $this->authService->handleSignIn($this->flight->request()->data->getData());
             if ($result->isSuccess()) $this->redirect('/', ApplicationError::Ok, "Sign in succeeded for {$result->getUser()->Email}");
-            else $this->application->getErrorManager()->raise(ApplicationError::BadRequest, $result->getError());
+            else $this->raiseBadRequest($result->getError(), __FILE__, __LINE__);
         } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             $rememberMeResult = $this->authService->handleRememberMeLogin();
             if ($rememberMeResult && $rememberMeResult->isSuccess()) {
-                $this->redirect('/',ApplicationError::Ok, "Auto sign in succeeded for {$rememberMeResult->getUser()->Email}");
+                $this->redirect('/', ApplicationError::Ok, "Auto sign in succeeded for {$rememberMeResult->getUser()->Email}");
                 return;
             }
             $this->render('User/views/user_sign_in.latte', [
@@ -98,6 +98,14 @@ class UserController extends AbstractController
 
     public function signOut(): void
     {
+        if (!($this->connectedUser->get()->person === null)) {
+            $this->raiseforbidden(__FILE__, __LINE__);
+            return;
+        }
+        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+            return;
+        }
         $userEmail = $_SESSION['user'] ?? '';
         $this->authService->signOut();
         $this->redirect('/', ApplicationError::Ok, "Sign out succeeded for {$userEmail}");
@@ -106,6 +114,10 @@ class UserController extends AbstractController
 
     public function helpHome(): void
     {
+        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+            return;
+        }
         $this->render('Common/views/info.latte', [
             'content' => $this->dataHelper->get('Settings', ['Name' => 'Help_home'], 'Value')->Value ?? '',
             'hasAuthorization' => $this->connectedUser->get()->hasAutorization() ?? false,
@@ -117,6 +129,10 @@ class UserController extends AbstractController
 
     public function legalNotice(): void
     {
+        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+            return;
+        }
         $content = $this->application->getLatte()->renderToString('Common/views/info.latte', [
             'content' => $this->dataHelper->get('Settings', ['Name' => 'LegalNotices'], 'Value')->Value ?? '',
             'hasAuthorization' => $this->connectedUser->get()->hasAutorization() ?? false,
@@ -128,13 +144,17 @@ class UserController extends AbstractController
     public function home(): void
     {
         $connectedUser = $this->connectedUser->get();
+        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+            return;
+        }
         $_SESSION['navbar'] = '';
         $userPendingSurveys = $userPendingDesigns = [];
         $userEmail = $_SESSION['user'] ?? '';
         if ($userEmail) {
-            if (!($connectedUser->person ?? false)) {
+            if ($connectedUser->person === null) {
                 unset($_SESSION['user']);
-                $this->application->getErrorManager()->raise(ApplicationError::BadRequest, "Unknown user with this email address: $userEmail in file " . __FILE__ . ' at line ' . __LINE__);
+                $this->raiseBadRequest("Unknown user with this email address {$userEmail}", __FILE__, __LINE__);
             }
             $pendingSurveyResponses = $this->surveyDataHelper->getPendingSurveyResponses();
             $userPendingSurveys = array_filter($pendingSurveyResponses, function ($item) use ($userEmail) {
@@ -188,62 +208,93 @@ class UserController extends AbstractController
     #region Data user
     public function user(): void
     {
-        if ($this->connectedUser->get()->person ?? false) {
-            $_SESSION['navbar'] = 'user';
-            if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
-                $this->raiseMethodNotAllowed(__FILE__, __LINE__);
-                return;
-            }
-            $this->render('User/views/user.latte', Params::getAll(['page' => '']));
-        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+        if (!($this->connectedUser->get()->person === false)) {
+            $this->raiseforbidden(__FILE__, __LINE__);
+            return;
+        }
+        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+            return;
+        }
+        $_SESSION['navbar'] = 'user';
+        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+            return;
+        }
+        $this->render('User/views/user.latte', Params::getAll(['page' => '']));
     }
 
     public function account(): void
     {
-        if ($person = $this->connectedUser->get(1)->person ?? false) {
-            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-                $schema = [
-                    'email' => FilterInputRule::Email->value,
-                    'firstName' => FilterInputRule::PersonName->value,
-                    'lastName' => FilterInputRule::PersonName->value,
-                    'nickName' => FilterInputRule::HtmlSafeName->value,
-                    'useGravatar' => $this->application->enumToValues(YesNo::class),
-                    'avatar' => FilterInputRule::Avatar->value,
-                ];
-                $input = WebApp::filterInput($schema, $this->flight->request()->data->getData());
-                $this->dataHelper->set('Person', [
-                    'FirstName' => $input['firstName'] ?? '???',
-                    'LastName' => $input['lastName'] ?? '???',
-                    'NickName' => $input['nickName'] ?? '',
-                    'Avatar' => ($input['useGravatar'] ?? YesNo::No->value) == YesNo::Yes->value ? '' : $input['avatar'] ?? '🤔',
-                    'useGravatar' => $input['useGravatar'] ?? YesNo::No->value,
-                ], ['Id' => $person->Id]);
-                if ($person->Imported == 0) {
-                    $email = urldecode($input['email'] ?? '');
-                    $this->dataHelper->set('Person', ['Email' => $email], ['Id' => $person->Id]);
-                    $_SESSION['user'] = $email;
-                }
-                $this->redirect('/user');
-            } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-                $this->render('User/views/user_account.latte', Params::getAll([
-                    'readOnly' => $person->Imported == 1 ? true : false,
-                    'email' => filter_var($person->Email, FILTER_VALIDATE_EMAIL) ?: '',
-                    'firstName' => WebApp::sanitizeInput($person->FirstName),
-                    'lastName' => WebApp::sanitizeInput($person->LastName),
-                    'nickName' => WebApp::sanitizeInput($person->NickName ?? ''),
-                    'avatar' => WebApp::sanitizeInput($person->Avatar ?? ''),
-                    'useGravatar' => WebApp::sanitizeInput($person->UseGravatar, $this->application->enumToValues(YesNo::class), YesNo::No->value),
-                    'emojis' => Application::EMOJI_LIST,
-                    'isSelfEdit' => true,
-                    'layout' => $this->getLayout(),
-                    'navItems' => $this->getNavItems($connectedUser->person ?? false),
-                ]));
-            } else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
-        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+        if (!($this->connectedUser->get()->person === false)) {
+            $this->raiseforbidden(__FILE__, __LINE__);
+            return;
+        }
+        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+            return;
+        }
+        $person = $this->connectedUser->get(1)->person;
+        $this->render('User/views/user_account.latte', Params::getAll([
+            'readOnly' => $person->Imported == 1 ? true : false,
+            'email' => filter_var($person->Email, FILTER_VALIDATE_EMAIL) ?: '',
+            'firstName' => WebApp::sanitizeInput($person->FirstName),
+            'lastName' => WebApp::sanitizeInput($person->LastName),
+            'nickName' => WebApp::sanitizeInput($person->NickName ?? ''),
+            'avatar' => WebApp::sanitizeInput($person->Avatar ?? ''),
+            'useGravatar' => WebApp::sanitizeInput($person->UseGravatar, $this->application->enumToValues(YesNo::class), YesNo::No->value),
+            'emojis' => Application::EMOJI_LIST,
+            'isSelfEdit' => true,
+            'layout' => $this->getLayout(),
+            'navItems' => $this->getNavItems($connectedUser->person ?? false),
+        ]));
+    }
+
+    public function accountSave(): void
+    {
+        if (!($this->connectedUser->get()->person === false)) {
+            $this->raiseforbidden(__FILE__, __LINE__);
+            return;
+        }
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+            return;
+        }
+        $person = $this->connectedUser->get(1)->person;
+        $schema = [
+            'email' => FilterInputRule::Email->value,
+            'firstName' => FilterInputRule::PersonName->value,
+            'lastName' => FilterInputRule::PersonName->value,
+            'nickName' => FilterInputRule::HtmlSafeName->value,
+            'useGravatar' => $this->application->enumToValues(YesNo::class),
+            'avatar' => FilterInputRule::Avatar->value,
+        ];
+        $input = WebApp::filterInput($schema, $this->flight->request()->data->getData());
+        $this->dataHelper->set('Person', [
+            'FirstName' => $input['firstName'] ?? '???',
+            'LastName' => $input['lastName'] ?? '???',
+            'NickName' => $input['nickName'] ?? '',
+            'Avatar' => ($input['useGravatar'] ?? YesNo::No->value) == YesNo::Yes->value ? '' : $input['avatar'] ?? '🤔',
+            'useGravatar' => $input['useGravatar'] ?? YesNo::No->value,
+        ], ['Id' => $person->Id]);
+        if ($person->Imported == 0) {
+            $email = urldecode($input['email'] ?? '');
+            $this->dataHelper->set('Person', ['Email' => $email], ['Id' => $person->Id]);
+            $_SESSION['user'] = $email;
+        }
+        $this->redirect('/user');
     }
 
     public function availabilities(): void
     {
+        if (!($this->connectedUser->get()->person === false)) {
+            $this->raiseforbidden(__FILE__, __LINE__);
+            return;
+        }
+        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+            return;
+        }
         if ($person = $this->connectedUser->get(1)->person ?? false) {
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $availabilities = WebApp::getFiltered('availabilities', FilterInputRule::CheckboxMatrix->value, $this->flight->request()->data->getData()) ?? '';
@@ -254,6 +305,22 @@ class UserController extends AbstractController
                 $this->render('User/views/user_availabilities.latte', Params::getAll(['currentAvailabilities' => $currentAvailabilities]));
             } else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
         } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+    }
+
+    public function availabilitiesSave(): void
+    {
+        if (!($this->connectedUser->get()->person === false)) {
+            $this->raiseforbidden(__FILE__, __LINE__);
+            return;
+        }
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+            return;
+        }
+        $person = $this->connectedUser->get(1)->person;
+        $availabilities = WebApp::getFiltered('availabilities', FilterInputRule::CheckboxMatrix->value, $this->flight->request()->data->getData()) ?? '';
+        if ($availabilities != '') $this->dataHelper->set('Person', ['Availabilities' => json_encode($availabilities)], ['Id' => $person->Id]);
+        $this->redirect('/user');
     }
 
     public function preferences(): void
@@ -348,7 +415,7 @@ class UserController extends AbstractController
                 'InPresentationDirectory' => 1
             ]);
             if (!$person) {
-                $this->application->getErrorManager()->raise(ApplicationError::BadRequest, "Unknown person id $personId in file " . __FILE__ . ' at line ' . __LINE__);
+                $this->raiseBadRequest("Unknown person {$personId}", __FILE__,  __LINE__);
                 return;
             }
 
@@ -502,7 +569,7 @@ class UserController extends AbstractController
                 if ($eventId != null) {
                     $event = $this->dataHelper->get('Event', ['Id' => $eventId], 'Id, Summary');
                     if (!$event) {
-                        $this->application->getErrorManager()->raise(ApplicationError::BadRequest, "Unknown event '$eventId' in file " . __FILE__ . ' at line ' . __LINE__);
+                        $this->raiseBadRequest("Unknown event {$eventId}", __FILE__, __LINE__);
                         return;
                     }
                 }
@@ -534,10 +601,7 @@ class UserController extends AbstractController
                 $queryString = http_build_query($params);
                 $this->redirect('/contact?' . $queryString);
             }
-        } else $this->application->getErrorManager()->raise(
-            ApplicationError::BadRequest,
-            'Method not allowed ' . $_SERVER['REQUEST_METHOD'] . ' in file ' . __FILE__ . ' at line ' . __LINE__
-        );
+        } else $this->raiseBadRequest("Method not allowed {$_SERVER['REQUEST_METHOD']}", __FILE__, __LINE__);
     }
 
     #region News

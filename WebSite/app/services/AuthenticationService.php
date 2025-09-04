@@ -50,7 +50,7 @@ class AuthenticationService
             if (!$this->verifyPassword($password, $person->Password)) return AuthResult::error("Sign in failed: wrong password for $email");
             return $this->loginUser($person, $rememberMe);
         } catch (Throwable $e) {
-            return AuthResult::error("Authentication system error: {$e->getMessage()} in {$e->getFile()}:{$e->getLine()}" );
+            return AuthResult::error("Authentication system error: {$e->getMessage()} in {$e->getFile()}:{$e->getLine()}");
         }
     }
 
@@ -81,11 +81,7 @@ class AuthenticationService
     {
         $userEmail = $_SESSION['user'] ?? '';
         if ($userEmail) {
-            $this->application->getDataHelper()->set(
-                'Person',
-                ['LastSignOut' => date('Y-m-d H:i:s')],
-                ['Email' => $userEmail]
-            );
+            $this->application->getDataHelper()->set('Person', ['LastSignOut' => date('Y-m-d H:i:s')], ['Email' => $userEmail]);
         }
         unset($_SESSION['user']);
         $_SESSION['navbar'] = '';

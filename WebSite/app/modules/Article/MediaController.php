@@ -18,72 +18,80 @@ class MediaController extends AbstractController
 
     public function showUploadForm()
     {
-        if ($this->connectedUser->get()->isRedactor() ?? false) {
-            if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
-                $this->raiseMethodNotAllowed(__FILE__, __LINE__);
-                return;
-            }
-            $this->render('Article/views/media_upload.latte', Params::getAll([]));
-        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+        if (!($this->connectedUser->get()->isRedactor() ?? false)) {
+            $this->raiseforbidden(__FILE__, __LINE__);
+            return;
+        }
+        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+            return;
+        }
+        $this->render('Article/views/media_upload.latte', Params::getAll([]));
     }
 
     public function listFiles()
     {
-        if ($this->connectedUser->get()->isRedactor() ?? false) {
-            if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
-                $this->raiseMethodNotAllowed(__FILE__, __LINE__);
-                return;
-            }
-            $year = $this->flight->request()->query->year ?? date('Y');
-            $search = $this->flight->request()->query->search ?? '';
-            $files = [];
-            $years = $this->getAvailableYears();
-            if (in_array($year, $years)) $files = $this->getFilesForYear($year, $search);
+        if (!($this->connectedUser->get()->isRedactor() ?? false)) {
+            $this->raiseforbidden(__FILE__, __LINE__);
+            return;
+        }
+        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+            return;
+        }
+        $year = $this->flight->request()->query->year ?? date('Y');
+        $search = $this->flight->request()->query->search ?? '';
+        $files = [];
+        $years = $this->getAvailableYears();
+        if (in_array($year, $years)) $files = $this->getFilesForYear($year, $search);
 
-            $this->render('Article/views/media_index.latte',  Params::getAll([
-                'files' => $files,
-                'years' => $years,
-                'currentYear' => $year,
-                'search' => $search,
-                'baseUrl' => WebApp::getBaseUrl()
-            ]));
-        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+        $this->render('Article/views/media_index.latte',  Params::getAll([
+            'files' => $files,
+            'years' => $years,
+            'currentYear' => $year,
+            'search' => $search,
+            'baseUrl' => WebApp::getBaseUrl()
+        ]));
     }
 
     public function viewFile(string $year, string $month, string $filename): void
     {
-        $filename = basename($filename);
-        if ($this->connectedUser->get()->isRedactor() ?? false) {
-            if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
-                $this->raiseMethodNotAllowed(__FILE__, __LINE__);
-                return;
-            }
-            $filePath = Media::GetMediaPath() . $year . '/' . $month . '/' . $filename;
-            if (!file_exists($filePath)) {
-                $this->application->getErrorManager()->raise(ApplicationError::PageNotFound, "File $filePath not found in file " . __FILE__ . ' at line ' . __LINE__);
-                return;
-            }
-            $finfo = finfo_open(FILEINFO_MIME_TYPE);
-            $mime = finfo_file($finfo, $filePath);
-            finfo_close($finfo);
-
-            header('Content-Type: ' . $mime);
-            header('Content-Length: ' . filesize($filePath));
-            header('Content-Disposition: inline; filename="' . $filename . '"');
-            readfile($filePath);
+        if (!($this->connectedUser->get()->isRedactor() ?? false)) {
+            $this->raiseforbidden(__FILE__, __LINE__);
             return;
-        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+        }
+        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+            return;
+        }
+        $filename = basename($filename);
+        $filePath = Media::GetMediaPath() . $year . '/' . $month . '/' . $filename;
+        if (!file_exists($filePath)) {
+            $this->application->getErrorManager()->raise(ApplicationError::PageNotFound, "File $filePath not found in file " . __FILE__ . ' at line ' . __LINE__);
+            return;
+        }
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        $mime = finfo_file($finfo, $filePath);
+        finfo_close($finfo);
+
+        header('Content-Type: ' . $mime);
+        header('Content-Length: ' . filesize($filePath));
+        header('Content-Disposition: inline; filename="' . $filename . '"');
+        readfile($filePath);
+        return;
     }
 
     public function gpxViewer(): void
     {
-        if ($this->connectedUser->get()->person ?? false) {
-            if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
-                $this->raiseMethodNotAllowed(__FILE__, __LINE__);
-                return;
-            }
-            $this->render('Article/views/media_gpxViewer.latte', Params::getAll([]));
-        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+        if (!$this->connectedUser->get()->person ?? false) {
+            $this->raiseforbidden(__FILE__, __LINE__);
+            return;
+        }
+        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+            return;
+        }
+        $this->render('Article/views/media_gpxViewer.latte', Params::getAll([]));
     }
 
     #region Private functions

@@ -162,7 +162,7 @@ class ArticleController extends TableController
                 ]));
             } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
         } catch (QueryException $e) {
-            $this->application->getErrorManager()->raise(ApplicationError::BadRequest, "Error {$e->getMessage()} in file " . __FILE__ . ' at line ' . __LINE__);
+            $this->raiseBadRequest($e->getMessage(),  __FILE__, __LINE__);
         }
     }
 

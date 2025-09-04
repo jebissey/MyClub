@@ -7,7 +7,7 @@
         {else}
         <h1>Ajouter un sondage à l'article: {$article->Title}</h1>
         {/if}
-        <form action="/surveys/create" method="POST">
+        <form action="/survey/create" method="POST">
             <input type="hidden" name="article_id" value="{$article->Id}">
             {if $survey !== false}
             <div class="alert alert-danger" role="alert">

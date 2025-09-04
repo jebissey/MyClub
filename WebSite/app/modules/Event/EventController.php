@@ -243,7 +243,7 @@ class EventController extends AbstractController
                 'message' => $message,
                 'messageType' => $messageType,
             ]));
-        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Evénement non trouvé', 3000, false);
+        } else $this->raiseForbidden('Event doesn\'t found', 3000, false);
     }
 
     public function register(int $eventId, bool $set, $token = null): void
@@ -253,7 +253,7 @@ class EventController extends AbstractController
             return;
         }
         if (!$this->eventDataHelper->eventExists($eventId)) {
-            $this->application->getErrorManager()->raise(ApplicationError::BadRequest, "Event ({$eventId}) doesn't exist", 3000, false);
+            $this->raiseBadRequest("Event ({$eventId}) doesn't exist", __FILE__, __LINE__);
             return;
         }
         try {
@@ -324,7 +324,7 @@ class EventController extends AbstractController
                     ]));
                 }
             } else {
-                $this->application->getErrorManager()->raise(ApplicationError::Forbidden, "User not allowed in file " . __FILE__ . ' at line ' . __LINE__);
+                $this->raiseForbidden('User not allowed',  __FILE__, __LINE__);
                 return;
             }
             $this->redirect('/event/' . $eventId);
@@ -385,21 +385,25 @@ class EventController extends AbstractController
 
     public function showEventChat($eventId): void
     {
-        if ($this->connectedUser->get()->person ?? false) {
-            $event = $this->dataHelper->get('Event', ['Id' => $eventId], 'CreatedBy, Summary, Id, StartTime, Duration, Location');
-            if (!$event) {
-                $this->application->getErrorManager()->raise(ApplicationError::BadRequest, "Unknown event '$eventId' in file " . __FILE__ . ' at line ' . __LINE__);
-                return;
-            }
-            $messages = (new MessageDataHelper($this->application))->getEventMessages($eventId);
-
-            $this->render('Event/views/chat.latte', Params::getAll([
-                'event' => $event,
-                'messages' => $messages,
-                'person' => $this->connectedUser->person,
-                'navItems' => $this->getNavItems($this->connectedUser->person),
-            ]));
-        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+        if ($this->connectedUser->get()->person === null) {
+            $this->raiseforbidden(__FILE__, __LINE__);
+            return;
+        }
+        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+            return;
+        }
+        $event = $this->dataHelper->get('Event', ['Id' => $eventId], 'CreatedBy, Summary, Id, StartTime, Duration, Location');
+        if ($event === false) {
+            $this->raiseBadRequest("Unknown event {$eventId}", __FILE__, __LINE__);
+            return;
+        }
+        $this->render('Event/views/chat.latte', Params::getAll([
+            'event' => $event,
+            'messages' => (new MessageDataHelper($this->application))->getEventMessages($eventId),
+            'person' => $this->connectedUser->person,
+            'navItems' => $this->getNavItems($this->connectedUser->person),
+        ]));
     }
 
     public function fetchEmails(): void
@@ -468,7 +472,7 @@ class EventController extends AbstractController
         if (!$article) throw new RuntimeException('Fatal program error in file ' + __FILE__ + ' at line ' + __LINE__);
         $articleCreatorEmail = $this->dataHelper->get('Person', ['Id', $article->CreatedBy], 'Email')->Email;
         if (!$articleCreatorEmail) {
-            $this->application->getErrorManager()->raise(ApplicationError::BadRequest, "Unknown author of article '$idArticle' in file " . __FILE__ . ' at line ' . __LINE__);
+            $this->raiseBadRequest("Unknown author of article {$idArticle}", __FILE__, __LINE__);
             return;
         }
         $filteredEmails = (new PersonDataHelper($this->application))->getPersonWantedToBeAlerted($idArticle);

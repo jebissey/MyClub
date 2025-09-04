@@ -85,16 +85,16 @@ class GroupController extends AbstractController
             return;
         }
         if ($id === 1) {
-            $this->application->getErrorManager()->raise(ApplicationError::BadRequest, "Group ({$id}) can't be inactivatd in file " . __FILE__ . ' at line ' . __LINE__);
+            $this->raiseBadRequest("Group {$id} can't be inactivatd", __FILE__, __LINE__);
             return;
         }
         try {
             $this->dataHelper->set('Group', ['Inactivated' => 0], ['Id' => $id]);
             $this->redirect('/groups');
         } catch (QueryException $e) {
-            $this->application->getErrorManager()->raise(ApplicationError::BadRequest, "Error {$e->getMessage()} in file " . __FILE__ . ' at line ' . __LINE__);
+            $this->raiseBadRequest("Error {$e->getMessage()}", __FILE__, __LINE__);
         } catch (Throwable $e) {
-            $this->application->getErrorManager()->raise(ApplicationError::Error, "Error {$e->getMessage()} in file " . __FILE__ . ' at line ' . __LINE__);
+            $this->raiseError($e->getMessage(), __FILE__, __LINE__);
         }
     }
 
@@ -109,11 +109,11 @@ class GroupController extends AbstractController
             return;
         }
         if ($id === 1) {
-            $this->application->getErrorManager()->raise(ApplicationError::BadRequest, "Group ({$id}) can't be edited in file " . __FILE__ . ' at line ' . __LINE__);
+            $this->raiseBadRequest("Group ({$id}) can't be edited", __FILE__, __LINE__);
             return;
         }
         $group = $this->dataHelper->get('Group', ['Id' => $id], 'Name, SelfRegistration');
-        if (!$group) $this->application->getErrorManager()->raise(ApplicationError::BadRequest, "Unknwon group $id in file " . __FILE__ . ' at line ' . __LINE__);
+        if (!$group) $this->raiseBadRequest("Unknwon group $id", __FILE__, __LINE__);
         else {
             $this->render('PersonManager/views/group_edit.latte', Params::getAll([
                 'group' => $group,
@@ -137,7 +137,7 @@ class GroupController extends AbstractController
             return;
         }
         if ($id === 1) {
-            $this->application->getErrorManager()->raise(ApplicationError::BadRequest, "Group ({$id}) can't be updated in file " . __FILE__ . ' at line ' . __LINE__);
+            $this->raiseBadRequest("Group {$id} can't be updated", __FILE__, __LINE__);
             return;
         }
         $availableAuthorizations = $this->dataHelper->gets('Authorization', ['Id <> 1' => null], '*', 'Name');

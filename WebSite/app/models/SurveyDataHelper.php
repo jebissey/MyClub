@@ -2,6 +2,7 @@
 
 namespace app\models;
 
+use app\exceptions\QueryException;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
 use app\interfaces\NewsProviderInterface;
@@ -31,7 +32,18 @@ class SurveyDataHelper extends Data implements NewsProviderInterface
 
     public function getWithCreator(int $articleId): object|bool
     {
-        return $this->fluent->from('Survey')->join('Article ON Survey.IdArticle = Article.Id')->where('IdArticle', $articleId)->select('Article.CreatedBy')->fetch();
+        $article = $this->get('Article', ['Id' => $articleId], 'Id');
+        if ($article === false) throw new QueryException("Article {$articleId} doesn't exist");
+
+        $sql = "
+            SELECT s.*, a.CreatedBy
+            FROM Survey s
+            INNER JOIN Article a ON s.IdArticle = a.Id
+            WHERE s.IdArticle = :articleId
+        ";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([':articleId' => $articleId]);
+        return $stmt->fetch();
     }
 
     public function getPendingSurveyResponses(): array
@@ -60,7 +72,6 @@ class SurveyDataHelper extends Data implements NewsProviderInterface
             )
             AND r.Id IS NULL
         ORDER BY s.ClosingDate, p.LastName, p.FirstName";
-
         return $this->pdo->query($query)->fetchAll();
     }
 
@@ -100,10 +111,10 @@ class SurveyDataHelper extends Data implements NewsProviderInterface
                 $news[] = [
                     'type' => 'survey',
                     'id' => $survey->IdArticle,
-                    'title' => $survey->Question. " => ({$survey->VoterFirstName} {$survey->VoterLastName})",
+                    'title' => $survey->Question . " => ({$survey->VoterFirstName} {$survey->VoterLastName})",
                     'from' => $survey->FirstName . ' ' . $survey->LastName,
                     'date' => $survey->LastUpdate,
-                    'url' => '/surveys/results/' . $survey->IdArticle
+                    'url' => '/survey/results/' . $survey->IdArticle
                 ];
             }
         }

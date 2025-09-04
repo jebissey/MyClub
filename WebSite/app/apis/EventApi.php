@@ -59,7 +59,7 @@ class EventApi extends AbstractApi
     public function createAttribute(): void
     {
         if (!$this->authService->isWebmaster()) {
-            $this->renderUnauthorized();
+            $this->renderUnauthorized(__FILE__, __LINE__);
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -78,7 +78,7 @@ class EventApi extends AbstractApi
     public function deleteAttribute(int $id): void
     {
         if (!$this->authService->isWebmaster()) {
-            $this->renderUnauthorized();
+            $this->renderUnauthorized(__FILE__, __LINE__);
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'DELETE') {
@@ -126,7 +126,7 @@ class EventApi extends AbstractApi
     public function updateAttribute(): void
     {
         if (!$this->authService->isWebmaster()) {
-            $this->renderUnauthorized();
+            $this->renderUnauthorized(__FILE__, __LINE__);
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -146,7 +146,7 @@ class EventApi extends AbstractApi
     public function deleteEvent(int $id): void
     {
         if (!$this->authService->isEventManager()) {
-            $this->renderUnauthorized();
+            $this->renderUnauthorized(__FILE__, __LINE__);
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'DELETE') {
@@ -164,7 +164,7 @@ class EventApi extends AbstractApi
     public function duplicateEvent($id): void
     {
         if (!$this->authService->isEventManager()) {
-            $this->renderUnauthorized();
+            $this->renderUnauthorized(__FILE__, __LINE__);
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -186,7 +186,7 @@ class EventApi extends AbstractApi
     public function getEvent($id): void
     {
         if (!$this->authService->isEventManager()) {
-            $this->renderUnauthorized();
+            $this->renderUnauthorized(__FILE__, __LINE__);
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
@@ -204,7 +204,7 @@ class EventApi extends AbstractApi
     public function saveEvent(): void
     {
         if (!$this->authService->isEventManager()) {
-            $this->renderUnauthorized();
+            $this->renderUnauthorized(__FILE__, __LINE__);
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -225,7 +225,7 @@ class EventApi extends AbstractApi
     {
         $userId = $this->authService->getUserId();
         if ($userId === 0) {
-            $this->renderUnauthorized();
+            $this->renderUnauthorized(__FILE__, __LINE__);
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -246,7 +246,7 @@ class EventApi extends AbstractApi
     {
         $userId = $this->authService->getUserId();
         if (!$userId) {
-            $this->renderUnauthorized();
+            $this->renderUnauthorized(__FILE__, __LINE__);
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'DELETE') {
@@ -266,7 +266,7 @@ class EventApi extends AbstractApi
     {
         $userId = $this->authService->getUserId();
         if (!$userId) {
-            $this->renderUnauthorized();
+            $this->renderUnauthorized(__FILE__, __LINE__);
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -287,7 +287,7 @@ class EventApi extends AbstractApi
     public function deleteNeed(int $id): void
     {
         if (!$this->authService->isEventDesigner()) {
-            $this->renderUnauthorized();
+            $this->renderUnauthorized(__FILE__, __LINE__);
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'DELETE') {
@@ -305,7 +305,7 @@ class EventApi extends AbstractApi
     public function getEventNeeds(int $id): void
     {
         if (!$this->authService->isEventManager()) {
-            $this->renderUnauthorized();
+            $this->renderUnauthorized(__FILE__, __LINE__);
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
@@ -323,7 +323,7 @@ class EventApi extends AbstractApi
     public function saveNeed(): void
     {
         if (!$this->authService->isEventDesigner()) {
-            $this->renderUnauthorized();
+            $this->renderUnauthorized(__FILE__, __LINE__);
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -342,7 +342,7 @@ class EventApi extends AbstractApi
     public function deleteNeedType(int $id): void
     {
         if (!$this->authService->isEventDesigner()) {
-            $this->renderUnauthorized();
+            $this->renderUnauthorized(__FILE__, __LINE__);
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'DELETE') {
@@ -360,7 +360,7 @@ class EventApi extends AbstractApi
     public function saveNeedType(): void
     {
         if (!$this->authService->isEventDesigner()) {
-            $this->renderUnauthorized();
+            $this->renderUnauthorized(__FILE__, __LINE__);
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -422,7 +422,7 @@ class EventApi extends AbstractApi
     public function sendEmails()
     {
         if (!$this->authService->isEventManager()) {
-            $this->renderUnauthorized();
+            $this->renderUnauthorized(__FILE__, __LINE__);
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {

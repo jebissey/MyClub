@@ -2,13 +2,10 @@
 
 namespace app\modules\Webmaster;
 
-use app\enums\ApplicationError;
-use app\enums\FilterInputRule;
 use app\helpers\Application;
 use app\helpers\Params;
 use app\helpers\WebApp;
 use app\models\ArticleDataHelper;
-use app\models\ArwardsDataHelper;
 use app\models\LogDataHelper;
 use app\modules\Common\AbstractController;
 
@@ -19,57 +16,9 @@ class WebmasterController extends AbstractController
         parent::__construct($application);
     }
 
-    public function arwards(): void
-    {
-        $person = $this->connectedUser->get()->person ?? false;
-        if ($person && $this->connectedUser->isWebmaster()) {
-            if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-                $arwardsDataHelper = new ArwardsDataHelper($this->application);
-                $this->render('Webmaster/views/arwards.latte', Params::getAll([
-                    'counterNames' => $counterNames = $arwardsDataHelper->getCounterNames(),
-                    'data' => $arwardsDataHelper->getData($counterNames),
-                    'groups' => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
-                    'layout' => $this->getLayout(),
-                    'navItems' => $this->getNavItems($person),
-                    'isMyclubWebSite' => WebApp::isMyClubWebSite(),
-                ]));
-            } else if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-                $schema = [
-                    'customName' => FilterInputRule::PersonName->value,
-                    'name' => FilterInputRule::PersonName->value,
-                    'detail' => FilterInputRule::HtmlSafeText->value,
-                    'value' => FilterInputRule::Int->value,
-                    'idPerson' => FilterInputRule::Int->value,
-                    'idGroup' => FilterInputRule::Int->value,
-                ];
-                $input = WebApp::filterInput($schema, $this->flight->request()->data->getData());
-                $name = $input['customName'] ?? $input['name'];
-                $value = $input['value'];
-                $idPerson = $input['idPerson'];
-                $idGroup = $input['idGroup'];
-                if (
-                    $name === null
-                    || $value === null || $value < 0
-                    || $idPerson === null || $idPerson <= 0
-                    || $idGroup === null || $idGroup <= 0
-                ) $this->redirect('/arwards?error=invalid_data');
-                else {
-                    $this->dataHelper->set('Counter', [
-                        'Name' => $name,
-                        'Detail' => $input['detail'],
-                        'Value' => $value,
-                        'IdPerson' => $idPerson,
-                        'IdGroup' => $idGroup
-                    ]);
-                    $this->redirect('/arwards?success=true');
-                }
-            } else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
-        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
-    }
-
     public function helpAdmin()
     {
-        if ($this->connectedUser->get()->isAdministrator() ?? false) {
+        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isAdministrator())) {
             $this->render('Common/views/info.latte', Params::getAll([
                 'content' => $this->dataHelper->get('Settings', ['Name' => 'Help_admin'], 'Value')->Value ?? '',
                 'hasAuthorization' => $this->connectedUser->isEventManager(),
@@ -77,12 +26,12 @@ class WebmasterController extends AbstractController
                 'timer' => 0,
                 'previousPage' => true
             ]));
-        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+        }
     }
 
     public function helpDesigner(): void
     {
-        if ($this->connectedUser->get()->isDesigner() ?? false) {
+        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isDesigner())) {
             $this->render('Common/views/info.latte', [
                 'content' => $this->dataHelper->get('Settings', ['Name' => 'Help_designer'], 'Value')->Value ?? '',
                 'hasAuthorization' => $this->connectedUser->get()->isDesigner() ?? false,
@@ -90,23 +39,25 @@ class WebmasterController extends AbstractController
                 'timer' => 0,
                 'previousPage' => true
             ]);
-        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+        }
     }
 
     public function helpVisitorInsights(): void
     {
-        $this->render('Common/views/info.latte', [
-            'content' => $this->dataHelper->get('Settings', ['Name' => 'Help_visitorInsights'], 'Value')->Value ?? '',
-            'hasAuthorization' => $this->connectedUser->get()->isVisitorInsights() ?? false,
-            'currentVersion' => Application::VERSION,
-            'timer' => 0,
-            'previousPage' => true
-        ]);
+        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isVisitorInsights())) {
+            $this->render('Common/views/info.latte', [
+                'content' => $this->dataHelper->get('Settings', ['Name' => 'Help_visitorInsights'], 'Value')->Value ?? '',
+                'hasAuthorization' => $this->connectedUser->get()->isVisitorInsights() ?? false,
+                'currentVersion' => Application::VERSION,
+                'timer' => 0,
+                'previousPage' => true
+            ]);
+        }
     }
 
     public function helpWebmaster(): void
     {
-        if ($this->connectedUser->get()->isAdministrator() ?? false) {
+        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isWebmaster())) {
             $this->render('Common/views/info.latte', [
                 'content' => $this->dataHelper->get('Settings', ['Name' => 'Help_webmaster'], 'Value')->Value ?? '',
                 'hasAuthorization' => $this->connectedUser->get()->isWebmaster() ?? false,
@@ -114,7 +65,7 @@ class WebmasterController extends AbstractController
                 'timer' => 0,
                 'previousPage' => true
             ]);
-        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+        }
     }
 
     public function homeAdmin()
@@ -142,26 +93,16 @@ class WebmasterController extends AbstractController
 
     public function homeDesigner(): void
     {
-        if ($this->connectedUser->get()->isDesigner() ?? false) {
-
-            if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
-                $this->raiseMethodNotAllowed(__FILE__, __LINE__);
-                return;
-            }
+        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isDesigner())) {
             $_SESSION['navbar'] = 'designer';
             $this->render('Webmaster/views/designer.latte', Params::getAll([]));
-        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+        }
     }
 
     public function homeWebmaster(): void
     {
-        if ($this->connectedUser->get()->isWebmaster() ?? false) {
-            if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
-                $this->raiseMethodNotAllowed(__FILE__, __LINE__);
-                return;
-            }
+        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isWebmaster())) {
             $_SESSION['navbar'] = 'webmaster';
-
             $newVersion = null;
             $result = $this->getLastVersion();
             if (!$result['success']) $newVersion = "Test for MyClub new version error : " . $result['error'];
@@ -171,30 +112,29 @@ class WebmasterController extends AbstractController
                 'newVersion' => $newVersion,
                 'isMyclubWebSite' => WebApp::isMyClubWebSite(),
             ]));
-        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+        }
     }
 
     public function showInstallations(): void
     {
-        $person = $this->connectedUser->get()->person ?? false;
-        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
-            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
-        if ($person && $this->connectedUser->isWebmaster()) {
+        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isWebmaster())) {
             $installations = (new LogDataHelper($this->application))->getInstallationsData();
 
             $this->render('Webmaster/views/installations.latte', Params::getAll([
                 'installations' => $installations,
                 'totalInstallations' => count($installations),
-                'navItems' => $this->getNavItems($person),
+                'navItems' => $this->getNavItems($this->connectedUser->person),
                 'isMyclubWebSite' => WebApp::isMyClubWebSite(),
             ]));
-        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+        }
     }
 
     public function sitemapGenerator(): void
     {
+        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+            return;
+        }
         $articleDataHelper = new ArticleDataHelper($this->application);
         $base_url = WebApp::getBaseUrl();
         header("Content-Type: application/xml; charset=utf-8");
@@ -221,15 +161,10 @@ class WebmasterController extends AbstractController
 
     public function visitorInsights(): void
     {
-        if ($this->connectedUser->get()->isVisitorInsights() ?? false) {
-            if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
-                $this->raiseMethodNotAllowed(__FILE__, __LINE__);
-                return;
-            }
+        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isVisitorInsights())) {
             $_SESSION['navbar'] = 'visitorInsights';
-
             $this->render('Webmaster/views/visitorInsights.latte', Params::getAll([]));
-        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+        }
     }
 
     #region Private methods

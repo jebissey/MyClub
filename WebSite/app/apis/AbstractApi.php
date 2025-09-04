@@ -70,8 +70,8 @@ abstract class AbstractApi
         $this->latte->render($template, $params);
     }
 
-    protected function renderUnauthorized(): void
+    protected function renderUnauthorized(string $file, int $line): void
     {
-        $this->renderJson(['message' => 'User not allowed'], false, ApplicationError::Forbidden->value);
+        $this->renderJson(['message' => "User not allowed in file {$file} at line {$line}"], false, ApplicationError::Forbidden->value);
     }
 }

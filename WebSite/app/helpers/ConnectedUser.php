@@ -29,10 +29,11 @@ class ConnectedUser
         $this->authorizations = [];
         $this->person = null;
         $userEmail = $_SESSION['user'] ?? '';
-        if (!$userEmail) return $this;
+        if ($userEmail === '') return $this;
+        
         $person = $this->dataHelper->get('Person', ['Email' => $userEmail]);
         if (!$person) {
-            $this->application->getErrorManager()->raise(ApplicationError::BadRequest, "Unknown user with this email address: $userEmail in file " . __FILE__ . ' at line ' . __LINE__);
+            $this->application->getErrorManager()->raise(ApplicationError::BadRequest, "Unknown user with this email address {$userEmail} in file " . __FILE__ . ' at line ' . __LINE__);
             return $this;
         }
         $this->person = $person;
@@ -72,11 +73,6 @@ class ConnectedUser
         return $this->isEventDesigner() || $this->isHomeDesigner() || $this->isNavbarDesigner();
     }
 
-    public function isGroupManager(): bool
-    {
-        return $this->isPersonManager() || $this->isWebmaster();
-    }
-
     public function isEditor(): bool
     {
         return in_array(Authorization::Editor->value, $this->authorizations ?? []);
@@ -90,6 +86,11 @@ class ConnectedUser
     public function isEventManager(): bool
     {
         return in_array(Authorization::EventManager->value, $this->authorizations ?? []);
+    }
+
+    public function isGroupManager(): bool
+    {
+        return $this->isPersonManager() || $this->isWebmaster();
     }
 
     public function isHomeDesigner(): bool

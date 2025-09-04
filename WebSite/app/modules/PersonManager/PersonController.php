@@ -21,7 +21,7 @@ class PersonController extends TableController
 
     public function help(): void
     {
-        if (!(($this->connectedUser->get()->isPersonManager() ?? false) || $this->connectedUser->isWebmaster() ?? false)) {
+        if (!($this->connectedUser->get()->isPersonManager() ?? false)) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
         }
@@ -40,7 +40,7 @@ class PersonController extends TableController
 
     public function home(): void
     {
-        if (!($this->connectedUser->get()->isAdministrator() ?? false)) {
+        if (!($this->connectedUser->get()->isPersonManager() ?? false)) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
         }
@@ -55,7 +55,7 @@ class PersonController extends TableController
 
     public function index(): void
     {
-        if (!(($this->connectedUser->get()->isPersonManager() ?? false) || $this->connectedUser->isWebmaster() ?? false)) {
+        if (!($this->connectedUser->get()->isPersonManager() ?? false)) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
         }
@@ -110,39 +110,58 @@ class PersonController extends TableController
 
     public function edit(int $id): void
     {
-        if (!(($this->connectedUser->get()->isPersonManager() ?? false) || $this->connectedUser->isWebmaster() ?? false)) {
+        if (!($this->connectedUser->get()->isPersonManager() ?? false)) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
         }
-        $person = $this->dataHelper->get('Person', ['Id' => $id], 'Id, Imported, Email, FirstName, LastName');
-        if (!$person) $this->application->getErrorManager()->raise(ApplicationError::BadRequest, "Unknown person id: $id in file " . __FILE__ . ' at line ' . __LINE__);
-        else {
-            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-                $schema = [
-                    'email' => FilterInputRule::Email->value,
-                    'firstName' => FilterInputRule::PersonName->value,
-                    'lastName' => FilterInputRule::PersonName->value,
-                ];
-                $input = WebApp::filterInput($schema, $this->flight->request()->data->getData());
-                $this->dataHelper->set('Person', ['FirstName' => $input['firstName'] ?? '???', 'LastName' => $input['lastName']] ?? '???', ['Id' => $person->Id]);
-                if ($person->Imported == 0) $this->dataHelper->set('Person', ['Email' => $input['email']], ['Id' => $person->Id]);
-                $this->redirect('/persons');
-            } else if (($_SERVER['REQUEST_METHOD'] === 'GET')) {
-                $this->render('User/views/user_account.latte', Params::getAll([
-                    'readOnly' => $person->Imported == 1 ? true : false,
-                    'email' => $person->Email,
-                    'firstName' => $person->FirstName,
-                    'lastName' => $person->LastName,
-                    'isSelfEdit' => false,
-                    'layout' => $this->getLayout()
-                ]));
-            } else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
+        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+            return;
         }
+        $person = $this->dataHelper->get('Person', ['Id' => $id], 'Id, Imported, Email, FirstName, LastName');
+        if (!$person) {
+            $this->raiseBadRequest("Unknown person {$id}", __FILE__, __LINE__);
+            return;
+        }
+        $this->render('User/views/user_account.latte', Params::getAll([
+            'readOnly' => $person->Imported == 1 ? true : false,
+            'email' => $person->Email,
+            'firstName' => $person->FirstName,
+            'lastName' => $person->LastName,
+            'isSelfEdit' => false,
+            'layout' => $this->getLayout()
+        ]));
+    }
+
+    public function editSave(int $id): void
+    {
+        if (!($this->connectedUser->get()->isPersonManager() ?? false)) {
+            $this->raiseforbidden(__FILE__, __LINE__);
+            return;
+        }
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+            return;
+        }
+        $person = $this->dataHelper->get('Person', ['Id' => $id], 'Id, Imported, Email, FirstName, LastName');
+        if (!$person) {
+            $this->raiseBadRequest("Unknown person {$id}", __FILE__, __LINE__);
+            return;
+        }
+        $schema = [
+            'email' => FilterInputRule::Email->value,
+            'firstName' => FilterInputRule::PersonName->value,
+            'lastName' => FilterInputRule::PersonName->value,
+        ];
+        $input = WebApp::filterInput($schema, $this->flight->request()->data->getData());
+        $this->dataHelper->set('Person', ['FirstName' => $input['firstName'] ?? '???', 'LastName' => $input['lastName']] ?? '???', ['Id' => $person->Id]);
+        if ($person->Imported == 0) $this->dataHelper->set('Person', ['Email' => $input['email']], ['Id' => $person->Id]);
+        $this->redirect('/persons');
     }
 
     public function delete(int $id): void
     {
-        if (!(($this->connectedUser->get()->isPersonManager() ?? false) || $this->connectedUser->isWebmaster() ?? false)) {
+        if (!($this->connectedUser->get()->isPersonManager() ?? false)) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
         }

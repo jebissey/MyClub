@@ -22,99 +22,117 @@ class SurveyController extends AbstractController
 
     public function add($articleId)
     {
-        if ($this->connectedUser->get()->isRedactor() ?? false) {
-            if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
-                $this->raiseMethodNotAllowed(__FILE__, __LINE__);
-                return;
-            }
-            $article = $this->dataHelper->get('Article', ['Id' => $articleId], 'Title, Id, ');
-            if (!$article) {
-                $this->redirect('/articles');
-                return;
-            }
-
-            $this->render('Article/views/survey_add.latte', Params::getAll([
-                'article' => $article,
-                'survey' => $this->dataHelper->get('Survey', ['IdArticle' => $article->Id], 'Question, Options, ClosingDate, Visibility')
-            ]));
-        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+        if (!($this->connectedUser->get()->isRedactor() ?? false)) {
+            $this->raiseforbidden(__FILE__, __LINE__);
+            return;
+        }
+        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+            return;
+        }
+        $article = $this->dataHelper->get('Article', ['Id' => $articleId], 'Title, Id, ');
+        if (!$article) {
+            $this->redirect('/articles');
+            return;
+        }
+        $this->render('Article/views/survey_add.latte', Params::getAll([
+            'article' => $article,
+            'survey' => $this->dataHelper->get('Survey', ['IdArticle' => $article->Id], 'Question, Options, ClosingDate, Visibility')
+        ]));
     }
 
     public function createOrUpdate()
     {
-        if ($this->connectedUser->get()->isRedactor() ?? false) {
-            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-                $schema = [
-                    'article_id' => FilterInputRule::Int->value,
-                    'question' => FilterInputRule::HtmlSafeText->value,
-                    'closingDate' => FilterInputRule::DateTime->value,
-                    'visibility' => $this->application->enumToValues(SurveyVisibility::class),
-                    'options' => FilterInputRule::ArrayString,
-                ];
-                $input = WebApp::filterInput($schema, $this->flight->request()->data->getData());
-                $articleId = $input['article_id'] ?? throw new IntegrityException('Fatal error in file ' . __FILE__ . ' at line ' . __LINE__);
-                $question = $input['question'] ?? '???';
-                $closingDate = $input['closingDate'] ?? date('now', '+7 days');
-                $visibility = $input['visibility'] ?? SurveyVisibility::Redactor->value;
-                $options = [];
-                foreach ($input['options'] ?? [] as $option) {
-                    $options[] = str_replace('"', "''", $option);
-                }
-                $optionsJson = json_encode($options);
-                $fields = [
-                    'Question' => $question,
-                    'Options' => $optionsJson,
-                    'ClosingDate' => $closingDate,
-                    'IdArticle' => $articleId,
-                    'Visibility' => $visibility
-                ];
-                $survey = $this->dataHelper->get('Survey', ['IdArticle' => $articleId], 'Id');
-                if ($survey) $this->dataHelper->set('Survey', $fields, ['Id' => $survey->Id]);
-                else         $this->dataHelper->set('Survey', $fields);
-                $this->redirect('/article/' . $articleId);
-            } else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
-        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+        if (!($this->connectedUser->get()->isRedactor() ?? false)) {
+            $this->raiseforbidden(__FILE__, __LINE__);
+            return;
+        }
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+            return;
+        }
+        $schema = [
+            'article_id' => FilterInputRule::Int->value,
+            'question' => FilterInputRule::HtmlSafeText->value,
+            'closingDate' => FilterInputRule::DateTime->value,
+            'visibility' => $this->application->enumToValues(SurveyVisibility::class),
+            'options' => FilterInputRule::ArrayString,
+        ];
+        $input = WebApp::filterInput($schema, $this->flight->request()->data->getData());
+        $articleId = $input['article_id'] ?? throw new IntegrityException('Fatal error in file ' . __FILE__ . ' at line ' . __LINE__);
+        $question = $input['question'] ?? '???';
+        $closingDate = $input['closingDate'] ?? date('now', '+7 days');
+        $visibility = $input['visibility'] ?? SurveyVisibility::Redactor->value;
+        $options = [];
+        foreach ($input['options'] ?? [] as $option) {
+            $options[] = str_replace('"', "''", $option);
+        }
+        $optionsJson = json_encode($options);
+        $fields = [
+            'Question' => $question,
+            'Options' => $optionsJson,
+            'ClosingDate' => $closingDate,
+            'IdArticle' => $articleId,
+            'Visibility' => $visibility
+        ];
+        $survey = $this->dataHelper->get('Survey', ['IdArticle' => $articleId], 'Id');
+        if ($survey) $this->dataHelper->set('Survey', $fields, ['Id' => $survey->Id]);
+        else         $this->dataHelper->set('Survey', $fields);
+        $this->redirect('/article/' . $articleId);
     }
 
     public function viewResults($articleId)
     {
+        if ($this->dataHelper->get('Article', ['Id' => $articleId], 'Id') === false) {
+            $this->raiseBadRequest("Article {$articleId} doesn't exist", __FILE__, __LINE__);
+            return;
+        }
         $connectedUser = $this->connectedUser->get();
-        if ($connectedUser->person != null) {
-            $survey = (new SurveyDataHelper($this->application))->getWithCreator($articleId);
-            if (!$survey) {
-                $this->application->getErrorManager()->raise(ApplicationError::BadRequest, "No survey for article {$articleId} in file " . __FILE__ . ' at line ' . __LINE__);
-                $this->redirect('/article/' . $articleId);
-                return;
-            }
-            if ((new AuthorizationDataHelper($this->application))->canPersonReadSurveyResults($this->dataHelper->get('Article', ['Id' => $survey->IdArticle]), $connectedUser)) {
-                $replies = $this->dataHelper->gets('Reply', ['IdSurvey' => $survey->Id]);
-                $participants = [];
-                $results = [];
-                $options = json_decode($survey->Options);
-                foreach ($options as $option) {
-                    $results[$option] = 0;
-                }
-                foreach ($replies as $reply) {
-                    $answers = json_decode($reply->Answers);
-                    $person = $this->dataHelper->get('Person', ['Id' => $reply->IdPerson], 'FirstName, LastName');
-                    $participants[] = [
-                        'name' => $person->FirstName . ' ' . $person->LastName,
-                        'answers' => $answers
-                    ];
-                    foreach ($answers as $answer) {
-                        if (isset($results[$answer])) $results[$answer]++;
-                    }
-                }
+        if ($connectedUser->person === null) {
+            $this->raiseforbidden(__FILE__, __LINE__);
+            return;
+        }
+        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+            return;
+        }
 
-                $this->render('Article/views/survey_results.latte', [
-                    'survey' => $survey,
-                    'options' => $options,
-                    'results' => $results,
-                    'participants' => $participants,
-                    'articleId' => $articleId,
-                    'currentVersion' => Application::VERSION
-                ]);
-            } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
-        } else $this->application->getErrorManager()->raise(ApplicationError::Unauthorized, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+
+
+        $survey = (new SurveyDataHelper($this->application))->getWithCreator($articleId);
+        if (!$survey) {
+            $this->raiseBadRequest("No survey for article {$articleId}", __FILE__, __LINE__);
+            $this->redirect('/article/' . $articleId);
+            return;
+        }
+        if ((new AuthorizationDataHelper($this->application))->canPersonReadSurveyResults($this->dataHelper->get('Article', ['Id' => $survey->IdArticle]), $connectedUser)) {
+            $replies = $this->dataHelper->gets('Reply', ['IdSurvey' => $survey->Id]);
+            $participants = [];
+            $results = [];
+            $options = json_decode($survey->Options);
+            foreach ($options as $option) {
+                $results[$option] = 0;
+            }
+            foreach ($replies as $reply) {
+                $answers = json_decode($reply->Answers);
+                $person = $this->dataHelper->get('Person', ['Id' => $reply->IdPerson], 'FirstName, LastName');
+                $participants[] = [
+                    'name' => $person->FirstName . ' ' . $person->LastName,
+                    'answers' => $answers
+                ];
+                foreach ($answers as $answer) {
+                    if (isset($results[$answer])) $results[$answer]++;
+                }
+            }
+
+            $this->render('Article/views/survey_results.latte', [
+                'survey' => $survey,
+                'options' => $options,
+                'results' => $results,
+                'participants' => $participants,
+                'articleId' => $articleId,
+                'currentVersion' => Application::VERSION
+            ]);
+        } else $this->raiseForbidden(__FILE__, __LINE__);
     }
 }
