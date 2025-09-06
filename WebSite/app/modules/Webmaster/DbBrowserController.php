@@ -69,7 +69,8 @@ class DbBrowserController extends AbstractController
                 'columns' => $columns,
                 'record' => $record,
                 'primaryKey' => $primaryKey,
-                'columnTypes' => $columnTypes
+                'columnTypes' => $columnTypes,
+                'isMyclubWebSite' =>WebApp::isMyClubWebSite(),
             ]));
         }
     }

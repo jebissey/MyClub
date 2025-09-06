@@ -7,6 +7,8 @@ use Tracy\Debugger;
 use app\apis\ArticleApi;
 use app\apis\CarouselApi;
 use app\apis\EventApi;
+use app\apis\EventAttributeApi;
+use app\apis\EventSupplyApi;
 use app\apis\ImportApi;
 use app\apis\WebmasterApi;
 use app\modules\Article\ArticleController;
@@ -34,8 +36,13 @@ use app\modules\PersonManager\GroupController;
 use app\modules\PersonManager\ImportController;
 use app\modules\PersonManager\PersonController;
 use app\modules\PersonManager\RegistrationController;
+use app\modules\User\ContactController;
 use app\modules\User\FFAController;
+use app\modules\User\HomeController;
 use app\modules\User\UserController;
+use app\modules\User\UserNewsController;
+use app\modules\User\UserPresentationController;
+use app\modules\User\UserStatisticsController;
 use app\modules\VisitorInsights\LogController;
 use app\modules\Webmaster\ArwardsController;
 use app\modules\Webmaster\DbBrowserController;
@@ -44,13 +51,11 @@ use app\modules\Webmaster\NavBarController;
 use app\modules\Webmaster\RssController;
 use app\modules\Webmaster\WebappSettingsController;
 use app\modules\Webmaster\WebmasterController;
-use app\services\AttributeService;
 use app\services\AuthorizationService;
 use app\services\EventService;
 use app\services\MessageService;
 use app\services\NeedService;
 use app\services\NeedTypeService;
-use app\services\SupplyService;
 
 if ($_SERVER['SERVER_NAME'] === 'localhost')
     Debugger::enable(Debugger::Development, __DIR__ . '/var/tracy/log');
@@ -77,6 +82,7 @@ $flight->map('getData', function ($key) {
     return Flight::get($key);
 });
 
+$attributeDataHelper = new AttributeDataHelper($application);
 $connectedUser = new ConnectedUser($application);
 $dataHelper = new DataHelper($application);
 $eventDataHelper = new EventDataHelper($application);
@@ -105,6 +111,11 @@ $arwardsController = new ArwardsController($application);
 mapRoute($flight, 'GET  /arwards', $arwardsController, 'seeArwards');
 mapRoute($flight, 'POST /arward', $arwardsController, 'setArward');
 
+$contactController = new ContactController($application);
+mapRoute($flight, 'GET  /contact', $contactController, 'contact');
+mapRoute($flight, 'POST /contact', $contactController, 'contact');
+mapRoute($flight, 'GET  /contact/event/@id:[0-9]+', $contactController, 'contact');
+
 $dbBrowserController = new DbBrowserController($application);
 mapRoute($flight, 'GET    /dbbrowser', $dbBrowserController, 'index');
 mapRoute($flight, 'GET    /dbbrowser/@table:[A-Za-z0-9_]+', $dbBrowserController, 'showTable', 1);
@@ -116,8 +127,8 @@ mapRoute($flight, 'DELETE /dbbrowser/@table:[A-Za-z0-9_]+/delete/@id:[0-9]+', $d
 
 $designController = new DesignController($application);
 mapRoute($flight, 'GET  /designs', $designController, 'index');
-mapRoute($flight, 'GET  /designs/create', $designController, 'create');
-mapRoute($flight, 'POST /designs/save', $designController, 'save');
+mapRoute($flight, 'GET  /design/create', $designController, 'create');
+mapRoute($flight, 'POST /design/save', $designController, 'save');
 
 $eventController = new EventController($application);
 mapRoute($flight, 'GET  /emails', $eventController, 'fetchEmails');
@@ -160,6 +171,11 @@ mapRoute($flight, 'POST   /group/create', $groupController, 'groupCreateSave');
 mapRoute($flight, 'GET    /group/edit/@id:[0-9]+', $groupController, 'groupEdit');
 mapRoute($flight, 'POST   /group/edit/@id:[0-9]+', $groupController, 'groupEditSave');
 mapRoute($flight, 'DELETE /group/delete/@id:[0-9]+', $groupController, 'groupDelete');
+
+$homeController = new HomeController($application);
+mapRoute($flight, 'GET  /', $homeController, 'home');
+mapRoute($flight, 'GET  /help', $homeController, 'helpHome');
+mapRoute($flight, 'GET  /legal/notice', $homeController, 'legalNotice');
 
 $importController = new ImportController($application);
 mapRoute($flight, 'GET  /import', $importController, 'showImportForm');
@@ -217,9 +233,6 @@ mapRoute($flight, 'POST /survey/create', $surveyController, 'createOrUpdate');
 mapRoute($flight, 'GET  /survey/results/@id:[0-9]+', $surveyController, 'viewResults');
 
 $userController = new UserController($application);
-mapRoute($flight, 'GET  /', $userController, 'home');
-mapRoute($flight, 'GET  /help', $userController, 'helpHome');
-mapRoute($flight, 'GET  /legal/notice', $userController, 'legalNotice');
 mapRoute($flight, 'GET  /user', $userController, 'user');
 mapRoute($flight, 'GET  /user/account', $userController, 'account');
 mapRoute($flight, 'POST /user/account', $userController, 'accountSave');
@@ -231,23 +244,31 @@ mapRoute($flight, 'GET  /user/groups', $userController, 'groups');
 mapRoute($flight, 'POST /user/groups', $userController, 'groups');
 mapRoute($flight, 'GET  /user/help', $userController, 'help');
 mapRoute($flight, 'GET  /user/map', $userController, 'showMap');
-mapRoute($flight, 'GET  /user/news', $userController, 'showNews');
 mapRoute($flight, 'GET  /user/notepad', $userController, 'editNotepad');
 mapRoute($flight, 'POST /user/notepad', $userController, 'saveNotepad');
 mapRoute($flight, 'GET  /user/preferences', $userController, 'preferences');
 mapRoute($flight, 'POST /user/preferences', $userController, 'preferences');
-mapRoute($flight, 'GET  /user/presentation/edit', $userController, 'editPresentation');
-mapRoute($flight, 'POST /user/presentation/edit', $userController, 'savePresentation');
-mapRoute($flight, 'GET  /user/presentation/@id:[0-9]+', $userController, 'showPresentation');
 mapRoute($flight, 'GET  /user/setPassword/@token:[a-f0-9]+', $userController, 'setPassword');
 mapRoute($flight, 'POST /user/setPassword/@token:[a-f0-9]+', $userController, 'setPassword');
 mapRoute($flight, 'GET  /user/sign/in', $userController, 'signIn');
 mapRoute($flight, 'POST /user/sign/in', $userController, 'signIn');
 mapRoute($flight, 'GET  /user/sign/out', $userController, 'signOut');
-mapRoute($flight, 'GET  /user/statistics', $userController, 'showStatistics');
-mapRoute($flight, 'GET  /contact', $userController, 'contact');
-mapRoute($flight, 'POST /contact', $userController, 'contact');
-mapRoute($flight, 'GET  /contact/event/@id:[0-9]+', $userController, 'contact');
+
+$userNewsController = new UserNewsController($application);
+mapRoute($flight, 'GET  /user/news', $userNewsController, 'showNews');
+
+$userPresentationController = new UserPresentationController($application);
+mapRoute($flight, 'GET  /user/presentation/edit', $userPresentationController, 'editPresentation');
+mapRoute($flight, 'POST /user/presentation/edit', $userPresentationController, 'savePresentation');
+mapRoute($flight, 'GET  /user/presentation/@id:[0-9]+', $userPresentationController, 'showPresentation');
+
+$userStatisticsController = new UserStatisticsController($application);
+mapRoute($flight, 'GET  /user/statistics', $userStatisticsController, 'showStatistics');
+
+
+
+
+
 
 $webappSettingsController = new WebappSettingsController($application);
 mapRoute($flight, 'GET  /settings', $webappSettingsController, 'editSettings');
@@ -269,7 +290,7 @@ mapRoute($flight, 'GET  /webmaster', $webmasterController, 'homeWebmaster');
 #region api
 $articleApi = new ArticleApi($application);
 mapRoute($flight, 'GET    /api/author/@articleId:[0-9]+', $articleApi, 'getAuthor');
-mapRoute($flight, 'POST   /api/designs/vote', $articleApi, 'designVote');
+mapRoute($flight, 'POST   /api/design/vote', $articleApi, 'designVote');
 mapRoute($flight, 'DELETE /api/media/delete/@year:[0-9]+/@month:[0-9]+/@filename', $articleApi, 'deleteFile');
 mapRoute($flight, 'POST   /api/media/upload', $articleApi, 'uploadFile');
 mapRoute($flight, 'POST   /api/survey/reply', $articleApi, 'saveSurveyReply');
@@ -283,7 +304,6 @@ mapRoute($flight, 'DELETE /api/carousel/delete/@id:[0-9]+', $carouselApi, 'delet
 $eventApi = new EventApi(
     $application,
     new AuthorizationService($connectedUser),
-    new AttributeService(new AttributeDataHelper($application)),
     $eventDataHelper,
     new EventService(
         $dataHelper,
@@ -295,13 +315,9 @@ $eventApi = new EventApi(
     ),
     new MessageService($messageDataHelper),
     new NeedService($needDataHelper, $eventNeedHelper),
-    new NeedTypeService($needTypeDataHelper, $needDataHelper),
-    new SupplyService($eventDataHelper)
+    new NeedTypeService($needTypeDataHelper, $needDataHelper)
 );
-mapRoute($flight, 'POST   /api/attribute/create', $eventApi, 'createAttribute');
-mapRoute($flight, 'DELETE /api/attribute/delete/@id:[0-9]+', $eventApi, 'deleteAttribute');
-mapRoute($flight, 'GET    /api/attributes/list', $eventApi, 'getAttributes');
-mapRoute($flight, 'POST   /api/attribute/update', $eventApi, 'updateAttribute');
+
 mapRoute($flight, 'GET    /api/attributes-by-event-type/@id:[0-9]+', $eventApi, 'getAttributesByEventType');
 mapRoute($flight, 'DELETE /api/event/delete/@id:[0-9]+', $eventApi, 'deleteEvent');
 mapRoute($flight, 'POST   /api/event/duplicate/@id:[0-9]+', $eventApi, 'duplicateEvent');
@@ -309,7 +325,6 @@ mapRoute($flight, 'POST   /api/event/save', $eventApi, 'saveEvent');
 mapRoute($flight, 'POST   /api/event/sendEmails', $eventApi, 'sendEmails');
 mapRoute($flight, 'GET    /api/event/@id:[0-9]+', $eventApi, 'getEvent');
 mapRoute($flight, 'GET    /api/event-needs/@id:[0-9]+', $eventApi, 'getEventNeeds');
-mapRoute($flight, 'POST   /api/event/updateSupply', $eventApi, 'updateSupply');
 mapRoute($flight, 'DELETE /api/need/delete/@id:[0-9]+', $eventApi, 'deleteNeed');
 mapRoute($flight, 'POST   /api/need/save', $eventApi, 'saveNeed');
 mapRoute($flight, 'DELETE /api/need/type/delete/@id:[0-9]+', $eventApi, 'deleteNeedType');
@@ -318,6 +333,15 @@ mapRoute($flight, 'GET    /api/needs-by-need-type/@id:[0-9]+', $eventApi, 'getNe
 mapRoute($flight, 'POST   /api/message/add', $eventApi, 'addMessage');
 mapRoute($flight, 'POST   /api/message/update', $eventApi, 'updateMessage');
 mapRoute($flight, 'DELETE /api/message/delete', $eventApi, 'deleteMessage');
+
+$eventAttributeApi = new EventAttributeApi($application, $attributeDataHelper);
+mapRoute($flight, 'POST   /api/attribute/create', $eventAttributeApi, 'createAttribute');
+mapRoute($flight, 'DELETE /api/attribute/delete/@id:[0-9]+', $eventAttributeApi, 'deleteAttribute');
+mapRoute($flight, 'GET    /api/attributes/list', $eventAttributeApi, 'getAttributes');
+mapRoute($flight, 'POST   /api/attribute/update', $eventAttributeApi, 'updateAttribute');
+
+$eventSupplyApi = new EventSupplyApi($application, $eventDataHelper);
+mapRoute($flight, 'POST /api/event/updateSupply', $eventSupplyApi, 'updateSupply');
 
 $importApi = new ImportApi($application);
 mapRoute($flight, 'POST /import/headers', $importApi, 'getHeadersFromCSV');

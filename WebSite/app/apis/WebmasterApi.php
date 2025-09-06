@@ -22,7 +22,7 @@ class WebmasterApi extends AbstractApi
     public function addToGroup(int $personId, int $groupId): void
     {
         if (!(($this->connectedUser->get()->isPersonManager() ?? false) || $this->connectedUser->isWebmaster() ?? false)) {
-            $this->renderUnauthorized(__FILE__, __LINE__);
+            $this->renderJsonUnauthorized(__FILE__, __LINE__);
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -41,14 +41,14 @@ class WebmasterApi extends AbstractApi
             $success = $this->dataHelper->set('PersonGroup', [['IdPerson' => $personId, 'idGroup' => $groupId]]) !== false;
             $this->renderJson([], $success, $success ? ApplicationError::Ok->value : ApplicationError::BadRequest->value);
         } catch (Throwable $e) {
-            $this->renderJsonError($e, ApplicationError::Error->value);
+            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value);
         }
     }
 
     public function getPersonsInGroup(?int $id): void
     {
         if (!($this->connectedUser->get()->person ?? false)) {
-            $this->renderUnauthorized(__FILE__, __LINE__);
+            $this->renderJsonUnauthorized(__FILE__, __LINE__);
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
@@ -59,14 +59,14 @@ class WebmasterApi extends AbstractApi
             $users = $this->personDataHelper->getPersonsInGroup($id);
             $this->renderJson($users, true, ApplicationError::Ok->value);
         } catch (Throwable $e) {
-            $this->renderJsonError($e, ApplicationError::Error->value);
+            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value);
         }
     }
 
     public function lastVersion(): void
     {
         if (!($this->connectedUser->get()->isWebmaster() ?? false)) {
-            $this->renderUnauthorized(__FILE__, __LINE__);
+            $this->renderJsonUnauthorized(__FILE__, __LINE__);
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
@@ -80,7 +80,7 @@ class WebmasterApi extends AbstractApi
     public function removeFromGroup(int $personId, int $groupId): void
     {
         if (!(($this->connectedUser->get()->isPersonManager() ?? false) || $this->connectedUser->isWebmaster() ?? false)) {
-            $this->renderUnauthorized(__FILE__, __LINE__);
+            $this->renderJsonUnauthorized(__FILE__, __LINE__);
             return;
         }
         if ($groupId === 1) {
@@ -95,7 +95,7 @@ class WebmasterApi extends AbstractApi
             $success = $this->dataHelper->delete('PersonGroup', ['IdPerson' => $personId, 'idGroup' => $groupId]) === 1;
             $this->renderJson([], $success, $success ? ApplicationError::Ok->value : ApplicationError::BadRequest->value);
         } catch (Throwable $e) {
-            $this->renderJsonError($e, ApplicationError::Error->value);
+            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value);
         }
     }
 
@@ -103,7 +103,7 @@ class WebmasterApi extends AbstractApi
     public function deleteNavbarItem(int $id): void
     {
         if (!($this->connectedUser->get()->isNavbarDesigner() ?? false)) {
-            $this->renderUnauthorized(__FILE__, __LINE__);
+            $this->renderJsonUnauthorized(__FILE__, __LINE__);
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'DELETE') {
@@ -114,14 +114,14 @@ class WebmasterApi extends AbstractApi
             $result = $this->pageDataHelper->del($id);
             $this->renderJson([], $result === 1, ApplicationError::Ok->value);
         } catch (Throwable $e) {
-            $this->renderJsonError($e, ApplicationError::Error->value);
+            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value);
         }
     }
 
     public function getNavbarItem(int $id): void
     {
         if (!($this->connectedUser->get()->isNavbarDesigner() ?? false)) {
-            $this->renderUnauthorized(__FILE__, __LINE__);
+            $this->renderJsonUnauthorized(__FILE__, __LINE__);
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
@@ -131,14 +131,14 @@ class WebmasterApi extends AbstractApi
         try {
             $this->renderJson(['message' => $this->pageDataHelper->get_($id)], true, ApplicationError::Ok->value);
         } catch (Throwable $e) {
-            $this->renderJsonError($e, ApplicationError::Error->value);
+            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value);
         }
     }
 
     public function saveNavbarItem(): void
     {
         if (!($this->connectedUser->get()->isNavbarDesigner() ?? false)) {
-            $this->renderUnauthorized(__FILE__, __LINE__);
+            $this->renderJsonUnauthorized(__FILE__, __LINE__);
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -155,14 +155,14 @@ class WebmasterApi extends AbstractApi
             $this->pageDataHelper->insertOrUpdate($data);
             $this->renderJson([], true, ApplicationError::Ok->value);
         } catch (Throwable $e) {
-            $this->renderJsonError($e, ApplicationError::Error->value);
+            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value);
         }
     }
 
     public function updateNavbarPositions(): void
     {
         if (!($this->connectedUser->get()->isNavbarDesigner() ?? false)) {
-            $this->renderUnauthorized(__FILE__, __LINE__);
+            $this->renderJsonUnauthorized(__FILE__, __LINE__);
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -174,7 +174,7 @@ class WebmasterApi extends AbstractApi
             $this->pageDataHelper->updates($data['positions']);
             $this->renderJson([], true, ApplicationError::Ok->value);
         } catch (Throwable $e) {
-            $this->renderJsonError($e, ApplicationError::Error->value);
+            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value);
         }
     }
 }

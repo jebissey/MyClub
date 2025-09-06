@@ -16,7 +16,7 @@ class ImportApi extends AbstractApi
     public function getHeadersFromCSV()
     {
         if (!($this->connectedUser->get(1)->isEventManager() ?? false)) {
-            $this->renderUnauthorized(__FILE__, __LINE__);
+            $this->renderJsonUnauthorized(__FILE__, __LINE__);
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'GET') {

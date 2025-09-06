@@ -5,18 +5,15 @@ namespace app\modules\User;
 use RuntimeException;
 
 use app\enums\ApplicationError;
-use app\enums\EventAudience;
 use app\enums\FilterInputRule;
 use app\enums\Period;
 use app\enums\YesNo;
 use app\helpers\Application;
 use app\helpers\News;
 use app\helpers\Params;
-use app\helpers\TranslationManager;
 use app\helpers\WebApp;
 use app\models\ArticleDataHelper;
 use app\models\AttributeDataHelper;
-use app\models\DesignDataHelper;
 use app\models\EventDataHelper;
 use app\models\EventTypeDataHelper;
 use app\models\GroupDataHelper;
@@ -32,18 +29,12 @@ use app\services\EmailService;
 
 class UserController extends AbstractController
 {
-    private ArticleDataHelper $articleDataHelper;
-    private EmailService $emailService;
     private News $news;
-    private SurveyDataHelper $surveyDataHelper;
     private AuthenticationService $authService;
 
     public function __construct(Application $application)
     {
         parent::__construct($application);
-        $this->articleDataHelper = new ArticleDataHelper($application);
-        $this->emailService = new EmailService();
-        $this->surveyDataHelper = new SurveyDataHelper($application);
         $this->news =  new News([
             new ArticleDataHelper($application),
             new SurveyDataHelper($application),
@@ -98,7 +89,7 @@ class UserController extends AbstractController
 
     public function signOut(): void
     {
-        if (!($this->connectedUser->get()->person === null)) {
+        if ($this->connectedUser->get()->person === null) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
         }
@@ -112,103 +103,11 @@ class UserController extends AbstractController
     }
     #endregion
 
-    public function helpHome(): void
-    {
-        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
-            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
-        $this->render('Common/views/info.latte', [
-            'content' => $this->dataHelper->get('Settings', ['Name' => 'Help_home'], 'Value')->Value ?? '',
-            'hasAuthorization' => $this->connectedUser->get()->hasAutorization() ?? false,
-            'currentVersion' => Application::VERSION,
-            'timer' => 0,
-            'previousPage' => true
-        ]);
-    }
-
-    public function legalNotice(): void
-    {
-        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
-            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
-        $content = $this->application->getLatte()->renderToString('Common/views/info.latte', [
-            'content' => $this->dataHelper->get('Settings', ['Name' => 'LegalNotices'], 'Value')->Value ?? '',
-            'hasAuthorization' => $this->connectedUser->get()->hasAutorization() ?? false,
-            'currentVersion' => Application::VERSION
-        ]);
-        echo $content;
-    }
-
-    public function home(): void
-    {
-        $connectedUser = $this->connectedUser->get();
-        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
-            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
-        $_SESSION['navbar'] = '';
-        $userPendingSurveys = $userPendingDesigns = [];
-        $userEmail = $_SESSION['user'] ?? '';
-        if ($userEmail) {
-            if ($connectedUser->person === null) {
-                unset($_SESSION['user']);
-                $this->raiseBadRequest("Unknown user with this email address {$userEmail}", __FILE__, __LINE__);
-            }
-            $pendingSurveyResponses = $this->surveyDataHelper->getPendingSurveyResponses();
-            $userPendingSurveys = array_filter($pendingSurveyResponses, function ($item) use ($userEmail) {
-                return strcasecmp($item->Email, $userEmail) === 0;
-            });
-            $pendingDesignResponses = (new DesignDataHelper($this->application))->getPendingDesignResponses();
-            $userPendingDesigns = array_filter($pendingDesignResponses, function ($item) use ($userEmail) {
-                return strcasecmp($item->Email, $userEmail) === 0;
-            });
-            $news = $this->news->anyNews($connectedUser);
-        } else {
-            $lang = TranslationManager::getCurrentLanguage();
-            Params::setParams([
-                'href' => '/user/sign/in',
-                'userImg' => '🫥',
-                'userEmail' => '',
-                'isAdmin' => false,
-                'currentVersion' => Application::VERSION,
-                'currentLanguage' => $lang,
-                'supportedLanguages' => TranslationManager::getSupportedLanguages(),
-                'flag' => TranslationManager::getFlag($lang),
-                'isRedactor' => false,
-            ]);
-        }
-        $articles = $this->articleDataHelper->getLatestArticles($userEmail);
-        $latestArticle = $articles['latestArticle'];
-        $spotlight = $this->articleDataHelper->getSpotlightArticle();
-        if ($spotlight !== null) {
-            $articleId = $spotlight['articleId'];
-            if ($this->articleDataHelper->isUserAllowedToReadArticle($userEmail, $articleId)) {
-                $spotlightUntil = $spotlight['spotlightUntil'];
-                if (strtotime($spotlightUntil) >= strtotime(date('Y-m-d'))) $latestArticle = $this->articleDataHelper->getWithAuthor($articleId);
-            }
-        }
-
-        $this->render('Common/views/home.latte', Params::getAll([
-            'latestArticle' => $latestArticle,
-            'latestArticles' => $articles['latestArticles'],
-            'homeHeader' => $this->dataHelper->get('Settings', ['Name' => 'Home_header'], 'Value')->Value ?? '',
-            'homeFooter' => $this->dataHelper->get('Settings', ['Name' => 'Home_footer'], 'Value')->Value ?? '',
-            'navItems' => $this->getNavItems($connectedUser->person ?? false),
-            'publishedBy' => $articles['latestArticle']
-                && $articles['latestArticle']->PublishedBy != $articles['latestArticle']->CreatedBy ? (new PersonDataHelper($this->application))->getPublisher($articles['latestArticle']->PublishedBy) : '',
-            'latestArticleHasSurvey' => $this->surveyDataHelper->articleHasSurveyNotClosed($articles['latestArticle']->Id ?? 0),
-            'pendingSurveys' => $userPendingSurveys,
-            'pendingDesigns' => $userPendingDesigns,
-            'news' => $news ?? false,
-        ]));
-    }
 
     #region Data user
     public function user(): void
     {
-        if (!($this->connectedUser->get()->person === false)) {
+        if ($this->connectedUser->get()->person === false) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
         }
@@ -226,7 +125,7 @@ class UserController extends AbstractController
 
     public function account(): void
     {
-        if (!($this->connectedUser->get()->person === false)) {
+        if ($this->connectedUser->get(1)->person === null) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
         }
@@ -234,7 +133,7 @@ class UserController extends AbstractController
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
-        $person = $this->connectedUser->get(1)->person;
+        $person = $this->connectedUser->person;
         $this->render('User/views/user_account.latte', Params::getAll([
             'readOnly' => $person->Imported == 1 ? true : false,
             'email' => filter_var($person->Email, FILTER_VALIDATE_EMAIL) ?: '',
@@ -252,7 +151,8 @@ class UserController extends AbstractController
 
     public function accountSave(): void
     {
-        if (!($this->connectedUser->get()->person === false)) {
+        $person = $this->connectedUser->get(1)->person;
+        if ($person === null) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
         }
@@ -260,7 +160,6 @@ class UserController extends AbstractController
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
-        $person = $this->connectedUser->get(1)->person;
         $schema = [
             'email' => FilterInputRule::Email->value,
             'firstName' => FilterInputRule::PersonName->value,
@@ -287,7 +186,7 @@ class UserController extends AbstractController
 
     public function availabilities(): void
     {
-        if (!($this->connectedUser->get()->person === false)) {
+        if ($this->connectedUser->get()->person === null) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
         }
@@ -309,7 +208,8 @@ class UserController extends AbstractController
 
     public function availabilitiesSave(): void
     {
-        if (!($this->connectedUser->get()->person === false)) {
+        $person = $this->connectedUser->get(1)->person;
+        if ($person === null) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
         }
@@ -317,7 +217,6 @@ class UserController extends AbstractController
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
-        $person = $this->connectedUser->get(1)->person;
         $availabilities = WebApp::getFiltered('availabilities', FilterInputRule::CheckboxMatrix->value, $this->flight->request()->data->getData()) ?? '';
         if ($availabilities != '') $this->dataHelper->set('Person', ['Availabilities' => json_encode($availabilities)], ['Id' => $person->Id]);
         $this->redirect('/user');
@@ -364,66 +263,6 @@ class UserController extends AbstractController
                     'navItems' => $this->getNavItems($connectedUser->person ?? false),
                 ]));
             } else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
-        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
-    }
-
-    public function editPresentation(): void
-    {
-        if ($person = $this->connectedUser->get()->person ?? false) {
-            if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
-                $this->raiseMethodNotAllowed(__FILE__, __LINE__);
-                return;
-            }
-            $this->render('User/views/user_edit_presentation.latte', Params::getAll([
-                'person' => $person,
-                'navItems' => $this->getNavItems($person),
-            ]));
-        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
-    }
-
-    public function savePresentation()
-    {
-        if ($person = $this->connectedUser->get()->person ?? false) {
-            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-                $schema = [
-                    'content' => FilterInputRule::Html->value,
-                    'location' => FilterInputRule::Location->value,
-                    'inPresentationDirectory' => FilterInputRule::Bool->value,
-                ];
-                $input = WebApp::filterInput($schema, $this->flight->request()->data->getData());
-                $presentation = $input['content'] ?? '???';
-                $location =  $input['location'] ?? '???';
-                $inDirectory = $input['inPresentationDirectory'] ?? 0;
-
-                $this->dataHelper->set('Person', [
-                    'Presentation' => $presentation,
-                    'PresentationLastUpdate' => date('Y-m-d H:i:s'),
-                    'Location' => $location,
-                    'InPresentationDirectory' => $inDirectory,
-                ], ['Id' => $person->Id]);
-                $this->redirect('/user/directory');
-            } else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
-        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
-    }
-
-    public function showPresentation($personId)
-    {
-        if ($loggedPerson = $this->connectedUser->get()->person ?? false) {
-            $person = $this->dataHelper->get('Person', [
-                'Id' => $personId,
-                'Inactivated' => 0,
-                'InPresentationDirectory' => 1
-            ]);
-            if (!$person) {
-                $this->raiseBadRequest("Unknown person {$personId}", __FILE__,  __LINE__);
-                return;
-            }
-
-            $this->render('User/views/user_presentation.latte', Params::getAll([
-                'person' => $person,
-                'loggedPerson' => $loggedPerson,
-                'navItems' => $this->getNavItems($person),
-            ]));
         } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
@@ -529,231 +368,5 @@ class UserController extends AbstractController
                 'previousPage' => true
             ]));
         } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
-    }
-
-    public function contact($eventId = null): void
-    {
-        if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-            $event = null;
-            if ($eventId !== null) {
-                $event = $this->dataHelper->get('Event', ['Id' => $eventId], 'Id, Summary, StartTime, Audience');
-                if (!$event || $event->Audience != EventAudience::ForAll->value) $eventId = $event = null;
-            }
-            $this->render('Common/views/contact.latte', Params::getAll([
-                'navItems' => $this->getNavItems($this->connectedUser->get()->person ?? false),
-                'event' => $event,
-            ]));
-        } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $schema = [
-                'name' => FilterInputRule::PersonName->value,
-                'email' => FilterInputRule::Email->value,
-                'message' => FilterInputRule::HtmlSafeText->value,
-                'eventId' => FilterInputRule::Int->value,
-            ];
-            $input = WebApp::filterInput($schema, $this->flight->request()->data->getData());
-            $name = $input['name'] ?? '';
-            $email = $input['email'] ?? '';
-            $message = $input['message'] ?? '';
-            $errors = [];
-            if (empty($name)) $errors[] = 'Nom et prénom sont requis.';
-            if (empty($email)) $errors[] = 'Un email valide est requis.';
-            if (empty($message)) $errors[] = 'Le message est requis.';
-            if (empty($errors)) {
-                $adminEmail = $this->dataHelper->get('Settings', ['Name' => 'contactEmail'], 'Value')->Value ?? '';
-                if ($adminEmail == '') $adminEmail = (new PersonDataHelper($this->application))->getWebmasterEmail();
-                if (!filter_var($adminEmail, FILTER_VALIDATE_EMAIL)) {
-                    $this->application->getErrorManager()->raise(ApplicationError::InvalidSetting, 'Invalid contactEmmail', __FILE__, __LINE__);
-                    return;
-                }
-                $eventId = $input['eventId'];
-                if ($eventId != null) {
-                    $event = $this->dataHelper->get('Event', ['Id' => $eventId], 'Id, Summary');
-                    if (!$event) {
-                        $this->raiseBadRequest("Unknown event {$eventId}", __FILE__, __LINE__);
-                        return;
-                    }
-                }
-                if ($eventId != null) $emailSent = (new PersonDataHelper($this->application))->sendRegistrationLink($adminEmail, $name, $email, $event);
-                else $emailSent = $this->emailService->sendContactEmail($adminEmail, $name, $email, $message);
-                if ($emailSent) {
-                    $url = '/contact' . (new WebApp($this->application))->buildUrl([
-                        'success' => 'Message envoyé avec succès.',
-                        'who'     => $email
-                    ]);
-                    $this->redirect($url);
-                } else {
-                    $params = [
-                        'error' => 'Une erreur est survenue lors de l\'envoi du message. Veuillez réessayer.',
-                        'old_name' => $name,
-                        'old_email' => $email,
-                        'old_message' => $message
-                    ];
-                    $queryString = http_build_query($params);
-                    $this->redirect('/contact?' . $queryString);
-                }
-            } else {
-                $params = [
-                    'errors' => implode('|', $errors),
-                    'old_name' => $name,
-                    'old_email' => $email,
-                    'old_message' => $message
-                ];
-                $queryString = http_build_query($params);
-                $this->redirect('/contact?' . $queryString);
-            }
-        } else $this->raiseBadRequest("Method not allowed {$_SERVER['REQUEST_METHOD']}", __FILE__, __LINE__);
-    }
-
-    #region News
-    public function showNews(): void
-    {
-        $connectedUser = $this->connectedUser->get(1);
-        if ($connectedUser->person ?? false) {
-            $searchMode = WebApp::getFiltered('from', $this->application->enumToValues(Period::class), $this->flight->request()->query->getData()) ?: Period::Signout->value;
-            if ($searchMode === Period::Signin->value)      $searchFrom = $connectedUser->person->LastSignIn ?? '';
-            elseif ($searchMode === Period::Signout->value) $searchFrom = $connectedUser->person->LastSignOut ?? '';
-            elseif ($searchMode === Period::Week->value)    $searchFrom = date('Y-m-d H:i:s', strtotime('-1 week'));
-            elseif ($searchMode === Period::Month->value)   $searchFrom = date('Y-m-d H:i:s', strtotime('-1 month'));
-
-            $this->render('User/views/news.latte', Params::getAll([
-                'news' => $this->news->getNewsForPerson($connectedUser, $searchFrom),
-                'searchFrom' => $searchFrom,
-                'searchMode' => $searchMode,
-                'navItems' => $this->getNavItems($connectedUser->person ?? false),
-                'person' => $connectedUser->person
-            ]));
-        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
-    }
-
-    #region Statistics
-    public function showStatistics(): void
-    {
-        if ($person = $this->connectedUser->get(1)->person ?? false) {
-            $personalStatistics = new PersonStatisticsDataHelper($this->application);
-            $schema = [
-                'seasonStart' => FilterInputRule::DateTime->value,
-                'seasonEnd' => FilterInputRule::DateTime->value,
-            ];
-            $input = WebApp::filterInput($schema, $this->flight->request()->query->getData());
-            $season = $personalStatistics->getSeasonRange($input['seasonStart'] ?? null, $input['seasonEnd'] ?? null);
-            $this->render('User/views/user_statistics.latte', Params::getAll([
-                'stats' => $personalStatistics->getStats($person, $season['start'], $season['end'], $this->connectedUser->isWebmaster()),
-                'seasons' => $personalStatistics->getAvailableSeasons(),
-                'currentSeason' => $season,
-                'navItems' => $this->getNavItems($person),
-                'chartData' => $this->getVisitStatsForChart($season, $person),
-            ]));
-        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
-    }
-    private function getVisitStatsForChart(array $season, object $person): array
-    {
-        $stats = $this->getVisitStats($season);
-        $currentUserTranche = $this->getCurrentUserTranche($stats, $person);
-        $chartData = [];
-        for ($i = 0; $i < count($stats['tranches']); $i++) {
-            $chartData[] = [
-                'tranche' => $stats['tranches'][$i]['label'],
-                'count' => $stats['distribution'][$i],
-                'isCurrentUser' => ($i === $currentUserTranche)
-            ];
-        }
-        return $chartData;
-    }
-
-    const SLICES = 100;
-    private function getVisitStats($season)
-    {
-        $memberVisits = $this->getMemberVisits($season);
-        $visitCounts = array_values($memberVisits);
-        if (empty($visitCounts)) {
-            return [
-                'tranches' => [],
-                'distribution' => [],
-                'currentUserTranche' => null
-            ];
-        }
-        $minVisits = min($visitCounts);
-        $maxVisits = max($visitCounts);
-        $trancheSize = max(1, ceil(($maxVisits - $minVisits) / self::SLICES));
-        $tranches = [];
-        for ($i = 0; $i < self::SLICES; $i++) {
-            $start = $minVisits + ($i * $trancheSize);
-            $end = $start + $trancheSize - 1;
-            if ($i == self::SLICES - 1) {
-                $end = $maxVisits;
-            }
-            $tranches[] = [
-                'start' => $start,
-                'end' => $end,
-                'label' => "$start-$end"
-            ];
-        }
-        $distribution = array_fill(0, count($tranches), 0);
-        foreach ($memberVisits as $visits) {
-            $index = ($trancheSize > 0)
-                ? floor(($visits - $minVisits) / $trancheSize)
-                : 0;
-            if ($index >= self::SLICES) $index = self::SLICES - 1;
-            $distribution[$index]++;
-        }
-        $mergedTranches = [];
-        $mergedDistribution = [];
-        $currentTranche = null;
-        $currentCount = 0;
-        for ($i = 0; $i < count($tranches); $i++) {
-            if ($distribution[$i] === 0) {
-                if ($currentTranche === null) {
-                    $currentTranche = $tranches[$i];
-                    $currentCount = 0;
-                } else {
-                    $currentTranche['end'] = $tranches[$i]['end'];
-                    $currentTranche['label'] = "{$currentTranche['start']}-{$currentTranche['end']}";
-                }
-            } else {
-                if ($currentTranche !== null) {
-                    $mergedTranches[] = $currentTranche;
-                    $mergedDistribution[] = $currentCount;
-                    $currentTranche = null;
-                    $currentCount = 0;
-                }
-                $mergedTranches[] = $tranches[$i];
-                $mergedDistribution[] = $distribution[$i];
-            }
-        }
-        if ($currentTranche !== null) {
-            $mergedTranches[] = $currentTranche;
-            $mergedDistribution[] = $currentCount;
-        }
-
-        return [
-            'tranches' => $mergedTranches,
-            'distribution' => $mergedDistribution,
-            'memberVisits' => $memberVisits
-        ];
-    }
-
-    private function getMemberVisits($season)
-    {
-        $visits = (new LogDataHelper($this->application))->getVisits($season);
-        $memberVisits = [];
-        $members = $this->dataHelper->gets('Person', ['Inactivated' => 0], 'Email');
-        foreach ($members as $member) {
-            $email = $member->Email;
-            $memberVisits[$email] = isset($visits[$email]) ? (int)$visits[$email] : 0;
-        }
-        return $memberVisits;
-    }
-
-    private function getCurrentUserTranche($stats, $person)
-    {
-        if (empty($person) || empty($stats['memberVisits'])) throw new RuntimeException('$person or $stats can\'t be null in file ' . __FILE__ . ' at line ' . __LINE__);
-        $email = $person->Email;
-        if (!array_key_exists($email, $stats['memberVisits'])) throw new RuntimeException('User $email not found in stats in file ' . __FILE__ . ' at line ' . __LINE__);
-        $userVisits = $stats['memberVisits'][$email];
-        for ($i = 0; $i < count($stats['tranches']); $i++) {
-            $tranche = $stats['tranches'][$i];
-            if ($userVisits >= $tranche['start'] && $userVisits <= $tranche['end']) return $i;
-        }
-        Application::unreachable('User slice not found', __FILE__, __LINE__);
     }
 }

@@ -68,8 +68,8 @@ class CarouselApi extends AbstractApi
             $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
-        $person = $this->connectedUser->get()->person ?? false;
-        if (!$person) {
+        $person = $this->connectedUser->get()->person;
+        if ($person === null) {
             $this->renderJson(['error' => 'Utilisateur non connecté'], false, ApplicationError::Unauthorized->value);
             return;
         }

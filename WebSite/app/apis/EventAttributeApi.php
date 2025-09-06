@@ -1,0 +1,106 @@
+<?php
+
+namespace app\apis;
+
+use Throwable;
+
+use app\enums\ApplicationError;
+use app\helpers\Application;
+use app\models\AttributeDataHelper;
+
+class EventAttributeApi extends AbstractApi
+{
+    private AttributeDataHelper $attributeDataHelper;
+
+    public function __construct(Application $application, AttributeDataHelper $attributeDataHelper)
+    {
+        parent::__construct($application);
+        $this->attributeDataHelper = $attributeDataHelper;
+    }
+
+    public function createAttribute(): void
+    {
+        if (!$this->connectedUser->get()->isEventDesigner()) {
+            $this->renderJsonUnauthorized(__FILE__, __LINE__);
+            return;
+        }
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
+            return;
+        }
+        try {
+            $data = $this->getJsonInput();
+            [$response, $statusCode] = $this->attributeDataHelper->insert($data);
+            $this->renderJson($response, true, $statusCode);
+        } catch (Throwable $e) {
+            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value);
+        }
+    }
+
+    public function deleteAttribute(int $id): void
+    {
+        if (!$this->connectedUser->get()->isEventDesigner()) {
+            $this->renderJsonUnauthorized(__FILE__, __LINE__);
+            return;
+        }
+        if ($_SERVER['REQUEST_METHOD'] !== 'DELETE') {
+            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
+            return;
+        }
+        try {
+            [$response, $statusCode] = $this->attributeDataHelper->delete_($id);
+            $this->renderJson($response, true, $statusCode);
+        } catch (Throwable $e) {
+            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value);
+        }
+    }
+
+    public function getAttributes(): void
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
+            return;
+        }
+        try {
+            $this->renderJson(['attributes' => $this->attributeDataHelper->getAttributes()], true, ApplicationError::Ok->value);
+        } catch (Throwable $e) {
+            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value);
+        }
+    }
+
+    public function getAttributesByEventType(int $eventTypeId): void
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
+            return;
+        }
+        if ($this->dataHelper->get('EventType', ['Id' => $eventTypeId], 'Id') === false) {
+            $this->renderJson(['message' => 'Unknown event type'], false, ApplicationError::BadRequest->value);
+            return;
+        }
+        try {
+            $this->renderJson(['attributes' => $this->attributeDataHelper->getAttributesOf($eventTypeId)], true, ApplicationError::Ok->value);
+        } catch (Throwable $e) {
+            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value);
+        }
+    }
+
+    public function updateAttribute(): void
+    {
+        if (!$this->connectedUser->get()->isEventDesigner()) {
+            $this->renderJsonUnauthorized(__FILE__, __LINE__);
+            return;
+        }
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
+            return;
+        }
+        try {
+            $data = $this->getJsonInput();
+            $this->attributeDataHelper->update($data);
+            $this->renderJson([], true, ApplicationError::Ok->value);
+        } catch (Throwable $e) {
+            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value);
+        }
+    }
+}

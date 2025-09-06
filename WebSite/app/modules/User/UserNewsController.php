@@ -1,0 +1,53 @@
+<?php
+
+namespace app\modules\User;
+
+use app\enums\ApplicationError;
+use app\helpers\Application;
+use app\helpers\News;
+use app\helpers\Params;
+use app\helpers\WebApp;
+use app\models\ArticleDataHelper;
+use app\models\EventDataHelper;
+use app\models\MessageDataHelper;
+use app\models\PersonDataHelper;
+use app\models\SurveyDataHelper;
+use app\modules\Common\AbstractController;
+
+class UserNewsController extends AbstractController
+{
+    private \app\helpers\News $news;
+
+    public function __construct(Application $application)
+    {
+        parent::__construct($application);
+        $this->news = new News([
+            new ArticleDataHelper($application),
+            new SurveyDataHelper($application),
+            new EventDataHelper($application),
+            new MessageDataHelper($application),
+            new PersonDataHelper($application),
+        ]);
+    }
+
+    public function showNews(): void
+    {
+        $connectedUser = $this->connectedUser->get(1);
+        if ($connectedUser->person ?? false) {
+            $searchMode = WebApp::getFiltered('from', $this->application->enumToValues(\app\enums\Period::class), $this->flight->request()->query->getData()) ?: \app\enums\Period::Signout->value;
+            
+            if ($searchMode === \app\enums\Period::Signin->value) $searchFrom = $connectedUser->person->LastSignIn ?? '';
+            elseif ($searchMode === \app\enums\Period::Signout->value) $searchFrom = $connectedUser->person->LastSignOut ?? '';
+            elseif ($searchMode === \app\enums\Period::Week->value)    $searchFrom = date('Y-m-d H:i:s', strtotime('-1 week'));
+            elseif ($searchMode === \app\enums\Period::Month->value)   $searchFrom = date('Y-m-d H:i:s', strtotime('-1 month'));
+
+            $this->render('User/views/news.latte', Params::getAll([
+                'news' => $this->news->getNewsForPerson($connectedUser, $searchFrom),
+                'searchFrom' => $searchFrom,
+                'searchMode' => $searchMode,
+                'navItems' => $this->getNavItems($connectedUser->person ?? false),
+                'person' => $connectedUser->person
+            ]));
+        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+    }
+}

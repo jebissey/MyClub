@@ -2,7 +2,7 @@ document.getElementById('submit-vote').addEventListener('click', function () {
     const designId = this.dataset.designId;
     const voteOption = document.querySelector('input[name="voteOption"]:checked').value;
 
-    fetch('/api/designs/vote', {
+    fetch('/api/design/vote', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

@@ -47,10 +47,10 @@ abstract class AbstractApi
         Flight::stop();
     }
 
-    protected function renderJsonError(Throwable $e, int $statusCode): void
+    protected function renderJsonError(string $message, int $statusCode): void
     {
         $this->renderJson(
-            ['error' => $e->getMessage()],
+            ['error' => $message],
             false,
             $statusCode
         );
@@ -70,7 +70,7 @@ abstract class AbstractApi
         $this->latte->render($template, $params);
     }
 
-    protected function renderUnauthorized(string $file, int $line): void
+    protected function renderJsonUnauthorized(string $file, int $line): void
     {
         $this->renderJson(['message' => "User not allowed in file {$file} at line {$line}"], false, ApplicationError::Forbidden->value);
     }

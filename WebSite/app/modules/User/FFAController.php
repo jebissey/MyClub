@@ -19,7 +19,7 @@ class FFAController extends AbstractController
 
     public function searchMember()
     {
-        if ($this->connectedUser->get()->person === false) {
+        if ($this->connectedUser->get()->person === null) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
         }

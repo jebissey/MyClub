@@ -172,6 +172,7 @@ Interface divided into sub-specialties:
 - **Contextual Help**: Integrated support
 
 ---
+
 # 🚀 Getting Started
 
 > This quick guide will take you from a freshly downloaded archive to a running and secured instance.
