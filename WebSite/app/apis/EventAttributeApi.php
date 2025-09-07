@@ -21,7 +21,7 @@ class EventAttributeApi extends AbstractApi
     public function createAttribute(): void
     {
         if (!$this->connectedUser->get()->isEventDesigner()) {
-            $this->renderJsonUnauthorized(__FILE__, __LINE__);
+            $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -40,7 +40,7 @@ class EventAttributeApi extends AbstractApi
     public function deleteAttribute(int $id): void
     {
         if (!$this->connectedUser->get()->isEventDesigner()) {
-            $this->renderJsonUnauthorized(__FILE__, __LINE__);
+            $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'DELETE') {
@@ -75,7 +75,7 @@ class EventAttributeApi extends AbstractApi
             return;
         }
         if ($this->dataHelper->get('EventType', ['Id' => $eventTypeId], 'Id') === false) {
-            $this->renderJson(['message' => 'Unknown event type'], false, ApplicationError::BadRequest->value);
+            $this->renderJsonBadRequest("Unknown event type {$eventTypeId}", __FILE__, __LINE__);
             return;
         }
         try {
@@ -88,7 +88,7 @@ class EventAttributeApi extends AbstractApi
     public function updateAttribute(): void
     {
         if (!$this->connectedUser->get()->isEventDesigner()) {
-            $this->renderJsonUnauthorized(__FILE__, __LINE__);
+            $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {

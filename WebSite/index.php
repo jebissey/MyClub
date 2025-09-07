@@ -8,6 +8,7 @@ use app\apis\ArticleApi;
 use app\apis\CarouselApi;
 use app\apis\EventApi;
 use app\apis\EventAttributeApi;
+use app\apis\EventMessageApi;
 use app\apis\EventSupplyApi;
 use app\apis\ImportApi;
 use app\apis\WebmasterApi;
@@ -53,7 +54,6 @@ use app\modules\Webmaster\WebappSettingsController;
 use app\modules\Webmaster\WebmasterController;
 use app\services\AuthorizationService;
 use app\services\EventService;
-use app\services\MessageService;
 use app\services\NeedService;
 use app\services\NeedTypeService;
 
@@ -313,7 +313,6 @@ $eventApi = new EventApi(
         $personDataHelper,
         $personPreferences
     ),
-    new MessageService($messageDataHelper),
     new NeedService($needDataHelper, $eventNeedHelper),
     new NeedTypeService($needTypeDataHelper, $needDataHelper)
 );
@@ -330,15 +329,17 @@ mapRoute($flight, 'POST   /api/need/save', $eventApi, 'saveNeed');
 mapRoute($flight, 'DELETE /api/need/type/delete/@id:[0-9]+', $eventApi, 'deleteNeedType');
 mapRoute($flight, 'POST   /api/need/type/save', $eventApi, 'saveNeedType');
 mapRoute($flight, 'GET    /api/needs-by-need-type/@id:[0-9]+', $eventApi, 'getNeedsByNeedType');
-mapRoute($flight, 'POST   /api/message/add', $eventApi, 'addMessage');
-mapRoute($flight, 'POST   /api/message/update', $eventApi, 'updateMessage');
-mapRoute($flight, 'DELETE /api/message/delete', $eventApi, 'deleteMessage');
 
 $eventAttributeApi = new EventAttributeApi($application, $attributeDataHelper);
 mapRoute($flight, 'POST   /api/attribute/create', $eventAttributeApi, 'createAttribute');
 mapRoute($flight, 'DELETE /api/attribute/delete/@id:[0-9]+', $eventAttributeApi, 'deleteAttribute');
 mapRoute($flight, 'GET    /api/attributes/list', $eventAttributeApi, 'getAttributes');
 mapRoute($flight, 'POST   /api/attribute/update', $eventAttributeApi, 'updateAttribute');
+
+$eventMessageApi = new EventMessageApi($application, $messageDataHelper);
+mapRoute($flight, 'POST   /api/message/add', $eventMessageApi, 'addMessage');
+mapRoute($flight, 'POST   /api/message/update', $eventMessageApi, 'updateMessage');
+mapRoute($flight, 'DELETE /api/message/delete', $eventMessageApi, 'deleteMessage');
 
 $eventSupplyApi = new EventSupplyApi($application, $eventDataHelper);
 mapRoute($flight, 'POST /api/event/updateSupply', $eventSupplyApi, 'updateSupply');

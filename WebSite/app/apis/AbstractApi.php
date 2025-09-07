@@ -56,6 +56,29 @@ abstract class AbstractApi
         );
     }
 
+    protected function renderPartial(string $template, array $params = []): void
+    {
+        $this->latte->render($template, $params);
+    }
+
+    protected function renderJsonBadRequest(string $message, string $file, int $line): void
+    {
+        $this->renderJson(
+            ['message' => "Bad request: {$message} in file {$file} at line {$line}"],
+            false,
+            ApplicationError::BadRequest->value
+        );
+    }
+
+    protected function renderJsonForbidden(string $file, int $line): void
+    {
+        $this->renderJson(
+            ['message' => "User not allowed in file {$file} at line {$line}"],
+            false,
+            ApplicationError::Forbidden->value
+        );
+    }
+
     protected function renderJsonMethodNotAllowed(string $file, int $line)
     {
         $this->renderJson(
@@ -63,15 +86,5 @@ abstract class AbstractApi
             false,
             ApplicationError::MethodNotAllowed->value,
         );
-    }
-
-    protected function renderPartial(string $template, array $params = []): void
-    {
-        $this->latte->render($template, $params);
-    }
-
-    protected function renderJsonUnauthorized(string $file, int $line): void
-    {
-        $this->renderJson(['message' => "User not allowed in file {$file} at line {$line}"], false, ApplicationError::Forbidden->value);
     }
 }

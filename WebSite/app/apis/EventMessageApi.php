@@ -1,0 +1,129 @@
+<?php
+
+namespace app\apis;
+
+use PDOException;
+use Throwable;
+
+use app\enums\ApplicationError;
+use app\exceptions\UnauthorizedAccessException;
+use app\helpers\Application;
+use app\models\MessageDataHelper;
+use app\valueObjects\ApiResponse;
+
+class EventMessageApi extends AbstractApi
+{
+    private MessageDataHelper $messageDataHelper;
+
+    public function __construct(Application $application, MessageDataHelper $messageDataHelper)
+    {
+        parent::__construct($application);
+        $this->messageDataHelper = $messageDataHelper;
+    }
+
+    public function addMessage(): void
+    {
+        if ($this->connectedUser->get()->person === null) {
+            $this->renderJsonForbidden(__FILE__, __LINE__);
+            return;
+        }
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
+            return;
+        }
+        if (!isset($data['eventId']) || !isset($data['text'])) {
+            $this->renderJsonBadRequest('Données manquantes', __FILE__, __LINE__);
+            return;
+        }
+        try {
+            $data = $this->getJsonInput();
+            $apiResponse = $this->addMessage_($data['eventId'], $this->connectedUser->person->Id, $data['text']);
+            $this->renderJson($apiResponse->data, $apiResponse->success, $apiResponse->responseCode);
+        } catch (Throwable $e) {
+            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value);
+        }
+    }
+
+    public function deleteMessage(): void
+    {
+        if ($this->connectedUser->get()->person === null) {
+            $this->renderJsonForbidden(__FILE__, __LINE__);
+            return;
+        }
+        if ($_SERVER['REQUEST_METHOD'] !== 'DELETE') {
+            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
+            return;
+        }
+        try {
+            $data = $this->getJsonInput();
+            $apiResponse = $this->deleteMessage_($data['messageId'] ?? 0, $this->connectedUser->person->Id);
+            $this->renderJson($apiResponse->data, $apiResponse->success, $apiResponse->responseCode);
+        } catch (Throwable $e) {
+            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value);
+        }
+    }
+
+    public function updateMessage(): void
+    {
+        if ($this->connectedUser->get()->person === null) {
+            $this->renderJsonForbidden(__FILE__, __LINE__);
+            return;
+        }
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
+            return;
+        }
+        if (!isset($data['eventId']) || !isset($data['text'])) {
+            $this->renderJsonBadRequest('Données manquantes', __FILE__, __LINE__);
+            return;
+        }
+        try {
+            $data = $this->getJsonInput();
+            $apiResponse = $this->updateMessage_($data['messageId'], $this->connectedUser->person->Id, $data['text']);
+            $this->renderJson($apiResponse->data, $apiResponse->success, $apiResponse->responseCode);
+        } catch (Throwable $e) {
+            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value);
+        }
+    }
+
+    #region Private functions
+    private function addMessage_(int $eventId, int $personId, string $text): ApiResponse
+    {
+        try {
+            $messageId = $this->messageDataHelper->addMessage($eventId, $personId, $text);
+            return new ApiResponse($messageId !== false, $messageId === false ? ApplicationError::BadRequest->value : ApplicationError::Ok->value, ['messageId' => $messageId], 'Message ajouté');
+        } catch (PDOException $e) {
+            return new ApiResponse(false, ApplicationError::BadRequest->value, [], $e->getMessage());
+        } catch (Throwable $e) {
+            return new ApiResponse(false, ApplicationError::Error->value, [], $e->getMessage());
+        }
+    }
+
+    private function deleteMessage_(int $messageId, int $personId): ApiResponse
+    {
+        try {
+            $this->messageDataHelper->deleteMessage($messageId, $personId);
+            return new ApiResponse(true, ApplicationError::Ok->value, ['data' => ['messageId' => $messageId]], 'Message supprimé');
+        } catch (UnauthorizedAccessException $e) {
+            return new ApiResponse(false, ApplicationError::Forbidden->value, [], $e->getMessage());
+        } catch (PDOException $e) {
+            return new ApiResponse(false, ApplicationError::BadRequest->value, [], $e->getMessage());
+        } catch (Throwable $e) {
+            return new ApiResponse(false, ApplicationError::Error->value, [], $e->getMessage());
+        }
+    }
+
+    private function updateMessage_(int $messageId, int $personId, string $text): ApiResponse
+    {
+        try {
+            $this->messageDataHelper->updateMessage($messageId, $personId, $text);
+            return new ApiResponse(true, ApplicationError::Ok->value, ['data' => ['messageId' => $messageId, 'text' => $text]], 'Message mis à jour');
+        } catch (UnauthorizedAccessException $e) {
+            return new ApiResponse(false, ApplicationError::Forbidden->value, [], $e->getMessage());
+        } catch (PDOException $e) {
+            return new ApiResponse(false, ApplicationError::BadRequest->value, [], $e->getMessage());
+        } catch (Throwable $e) {
+            return new ApiResponse(false, ApplicationError::Error->value, [], $e->getMessage());
+        }
+    }
+}

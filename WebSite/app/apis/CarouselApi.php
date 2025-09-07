@@ -31,7 +31,7 @@ class CarouselApi extends AbstractApi
             $items = $this->dataHelper->gets('Carousel', ['IdArticle' => $idArticle]);
             $this->renderJson(['items' => $items], true, ApplicationError::Ok->value);
         } catch (QueryException $e) {
-            $this->renderJson(['error' => $e->getMessage()], false, ApplicationError::BadRequest->value);
+            $this->renderJsonBadRequest($e->getMessage(), __FILE__, __LINE__);
         } catch (Throwable $e) {
             $this->renderJson(['error' => $e->getMessage()], false, ApplicationError::Error->value);
         }
@@ -46,7 +46,7 @@ class CarouselApi extends AbstractApi
         }
         $data = json_decode(file_get_contents('php://input'), true);
         if (!$data || !isset($data['idArticle']) || !isset($data['item'])) {
-            $this->renderJson(['error' => 'Données invalides'], false, ApplicationError::BadRequest->value);
+            $this->renderJsonBadRequest("Données invalides", __FILE__, __LINE__);
             return;
         }
         if (!(new AuthorizationDataHelper($this->application))->getArticle($data['idArticle'], $person)) {
@@ -68,16 +68,16 @@ class CarouselApi extends AbstractApi
             $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
-        $person = $this->connectedUser->get()->person;
-        if ($person === null) {
-            $this->renderJson(['error' => 'Utilisateur non connecté'], false, ApplicationError::Unauthorized->value);
+        if (!($this->connectedUser->get()->isRedactor() ?? false)) {
+            $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }
         $item = (new DataHelper($this->application))->get('Carousel', ['Id' => $id], 'IdArticle');
         if (!$item) {
-            $this->renderJson(['error' => 'Élément non trouvé'], false, ApplicationError::PageNotFound->value);
+            $this->renderJsonBadRequest("Item {$id} not found", __FILE__, __LINE__);
             return;
         }
+        $person = $this->connectedUser->get()->person;
         if (!(new AuthorizationDataHelper($this->application))->getArticle($item->IdArticle, $person)) {
             $this->renderJson(['error' => 'Vous n\'êtes pas autorisé à modifier cet article'], false, ApplicationError::Forbidden->value);
             return;

@@ -27,7 +27,7 @@ class ArticleApi extends AbstractApi
     public function deleteFile(string $year, string $month, string $filename): void
     {
         if (!($this->connectedUser->get()->isRedactor() ?? false)) {
-            $this->renderJsonUnauthorized(__FILE__, __LINE__);
+            $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'DELETE') {
@@ -40,7 +40,7 @@ class ArticleApi extends AbstractApi
     public function designVote(): void
     {
         if (!($this->connectedUser->get()->isRedactor() ?? false)) {
-            $this->renderJsonUnauthorized(__FILE__, __LINE__);
+            $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -55,7 +55,7 @@ class ArticleApi extends AbstractApi
     {
         $person = $this->connectedUser->get()->person ?? false;
         if (!$person) {
-            $this->renderJsonUnauthorized(__FILE__, __LINE__);
+            $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -66,7 +66,7 @@ class ArticleApi extends AbstractApi
         $data = json_decode($json, true);
         $surveyId = $data['survey_id'] ?? null;
         if (!$surveyId) {
-            $this->renderJson(['message' => 'Missing data'], false, ApplicationError::BadRequest->value);
+            $this->renderJsonBadRequest('Missing data', __FILE__, __LINE__);
             return;
         }
         $this->replyDataHelper->insertOrUpdate($person->Id, $surveyId, isset($data['survey_answers']) ? json_encode($data['survey_answers']) : '[]');
@@ -77,7 +77,7 @@ class ArticleApi extends AbstractApi
     {
         $person = $this->connectedUser->get()->person ?? false;
         if ($person === false) {
-            $this->renderJsonUnauthorized(__FILE__, __LINE__);
+            $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
@@ -86,7 +86,7 @@ class ArticleApi extends AbstractApi
         }
         $survey = $this->dataHelper->get('Survey', ['IdArticle' => $articleId], 'Id, Question, Options');
         if (!$survey) {
-            $this->renderJson(['message' => "Aucun sondage trouvé pour l'article $articleId"], false, ApplicationError::BadRequest->value);
+            $this->renderJsonBadRequest("Aucun sondage trouvé pour l'article {$articleId}", __FILE__, __LINE__);
             return;
         }
         try {
@@ -110,7 +110,7 @@ class ArticleApi extends AbstractApi
     public function uploadFile(): void
     {
         if (!($this->connectedUser->get()->isRedactor() ?? false)) {
-            $this->renderJsonUnauthorized(__FILE__, __LINE__);
+            $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -133,7 +133,7 @@ class ArticleApi extends AbstractApi
     public function getAuthor(int $articleId): void
     {
         $result = (new ArticleDataHelper($this->application))->getAuthor($articleId);
-        if ($result === false) $this->renderJson(['message' => "Unknown article {$articleId}"], false, ApplicationError::BadRequest->value);
+        if ($result === false) $this->renderJsonBadRequest("Unknown article {$articleId}", __FILE__, __LINE__);
         $this->renderJson(['author' => $result ? [$result] : []], true, ApplicationError::Ok->value);
     }
 

@@ -23,7 +23,6 @@ class EventApi extends AbstractApi
     private AuthorizationServiceInterface $authService;
     private EventDataHelper $eventDataHelper;
     private EventServiceInterface $eventService;
-    private MessageServiceInterface $messageService;
     private NeedServiceInterface $needService;
     private NeedTypeServiceInterface $needTypeService;
 
@@ -32,7 +31,6 @@ class EventApi extends AbstractApi
         AuthorizationServiceInterface $authService,
         EventDataHelper $eventDataHelper,
         EventServiceInterface $eventService,
-        MessageServiceInterface $messageService,
         NeedServiceInterface $needService,
         NeedTypeServiceInterface $needTypeService
     ) {
@@ -40,7 +38,6 @@ class EventApi extends AbstractApi
         $this->authService = $authService;
         $this->eventDataHelper = $eventDataHelper;
         $this->eventService = $eventService;
-        $this->messageService = $messageService;
         $this->needService = $needService;
         $this->needTypeService = $needTypeService;
     }
@@ -51,7 +48,7 @@ class EventApi extends AbstractApi
     public function deleteEvent(int $id): void
     {
         if (!$this->authService->isEventManager()) {
-            $this->renderJsonUnauthorized(__FILE__, __LINE__);
+            $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'DELETE') {
@@ -69,7 +66,7 @@ class EventApi extends AbstractApi
     public function duplicateEvent($id): void
     {
         if (!$this->authService->isEventManager()) {
-            $this->renderJsonUnauthorized(__FILE__, __LINE__);
+            $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -91,7 +88,7 @@ class EventApi extends AbstractApi
     public function getEvent($id): void
     {
         if (!$this->authService->isEventManager()) {
-            $this->renderJsonUnauthorized(__FILE__, __LINE__);
+            $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
@@ -109,7 +106,7 @@ class EventApi extends AbstractApi
     public function saveEvent(): void
     {
         if (!$this->authService->isEventManager()) {
-            $this->renderJsonUnauthorized(__FILE__, __LINE__);
+            $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -125,74 +122,12 @@ class EventApi extends AbstractApi
         }
     }
 
-    #region Message
-    public function addMessage(): void
-    {
-        $userId = $this->authService->getUserId();
-        if ($userId === 0) {
-            $this->renderJsonUnauthorized(__FILE__, __LINE__);
-            return;
-        }
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
-        try {
-            $data = $this->getJsonInput();
-            $this->validateMessageData($data);
-            $apiResponse = $this->messageService->addMessage($data['eventId'], $userId, $data['text']);
-            $this->renderJson($apiResponse->data, $apiResponse->success, $apiResponse->responseCode);
-        } catch (Throwable $e) {
-            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value);
-        }
-    }
-
-    public function deleteMessage(): void
-    {
-        $userId = $this->authService->getUserId();
-        if (!$userId) {
-            $this->renderJsonUnauthorized(__FILE__, __LINE__);
-            return;
-        }
-        if ($_SERVER['REQUEST_METHOD'] !== 'DELETE') {
-            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
-        try {
-            $data = $this->getJsonInput();
-            $apiResponse = $this->messageService->deleteMessage($data['messageId'] ?? 0, $userId);
-            $this->renderJson($apiResponse->data, $apiResponse->success, $apiResponse->responseCode);
-        } catch (Throwable $e) {
-            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value);
-        }
-    }
-
-    public function updateMessage(): void
-    {
-        $userId = $this->authService->getUserId();
-        if (!$userId) {
-            $this->renderJsonUnauthorized(__FILE__, __LINE__);
-            return;
-        }
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
-        try {
-            $data = $this->getJsonInput();
-            if (!isset($data['messageId']) || !isset($data['text'])) throw new InvalidArgumentException('Données manquantes');
-            $apiResponse = $this->messageService->updateMessage($data['messageId'], $userId, $data['text']);
-            $this->renderJson($apiResponse->data, $apiResponse->success, $apiResponse->responseCode);
-        } catch (Throwable $e) {
-            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value);
-        }
-    }
 
     #region Need
     public function deleteNeed(int $id): void
     {
         if (!$this->authService->isEventDesigner()) {
-            $this->renderJsonUnauthorized(__FILE__, __LINE__);
+            $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'DELETE') {
@@ -210,7 +145,7 @@ class EventApi extends AbstractApi
     public function getEventNeeds(int $id): void
     {
         if (!$this->authService->isEventManager()) {
-            $this->renderJsonUnauthorized(__FILE__, __LINE__);
+            $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
@@ -228,7 +163,7 @@ class EventApi extends AbstractApi
     public function saveNeed(): void
     {
         if (!$this->authService->isEventDesigner()) {
-            $this->renderJsonUnauthorized(__FILE__, __LINE__);
+            $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -247,7 +182,7 @@ class EventApi extends AbstractApi
     public function deleteNeedType(int $id): void
     {
         if (!$this->authService->isEventDesigner()) {
-            $this->renderJsonUnauthorized(__FILE__, __LINE__);
+            $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'DELETE') {
@@ -265,7 +200,7 @@ class EventApi extends AbstractApi
     public function saveNeedType(): void
     {
         if (!$this->authService->isEventDesigner()) {
-            $this->renderJsonUnauthorized(__FILE__, __LINE__);
+            $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -296,7 +231,7 @@ class EventApi extends AbstractApi
     public function sendEmails()
     {
         if (!$this->authService->isEventManager()) {
-            $this->renderJsonUnauthorized(__FILE__, __LINE__);
+            $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -318,10 +253,5 @@ class EventApi extends AbstractApi
         }
     }
 
-    #region Private functions
-    private function validateMessageData(array $data): void
-    {
-        if (!isset($data['eventId']) || !isset($data['text'])) throw new InvalidArgumentException('Données manquantes');
-    }
 
 }

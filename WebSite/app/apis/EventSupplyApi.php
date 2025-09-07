@@ -26,7 +26,7 @@ class EventSupplyApi extends AbstractApi
     public function updateSupply(): void
     {
         if ($this->connectedUser->get()->person === null) {
-            $this->renderJsonUnauthorized(__FILE__, __LINE__);
+            $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -44,9 +44,9 @@ class EventSupplyApi extends AbstractApi
             );
             $this->renderJson([$apiResponse->data], $apiResponse->success,  $apiResponse->responseCode);
         } catch (QueryException $e) {
-            $this->renderJsonError($e->getMessage(), ApplicationError::BadRequest->value);
+            $this->renderJsonBadRequest($e->getMessage(), __FILE__, __LINE__);
         } catch (UnauthorizedAccessException $e) {
-            $this->renderJsonError($e->getMessage(), ApplicationError::Forbidden->value);
+            $this->renderJsonForbidden($e->getMessage(), __FILE__, __LINE__);
         } catch (Throwable $e) {
             $this->renderJsonError($e->getMessage(), ApplicationError::Error->value);
         }

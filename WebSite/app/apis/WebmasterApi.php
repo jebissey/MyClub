@@ -22,7 +22,7 @@ class WebmasterApi extends AbstractApi
     public function addToGroup(int $personId, int $groupId): void
     {
         if (!(($this->connectedUser->get()->isPersonManager() ?? false) || $this->connectedUser->isWebmaster() ?? false)) {
-            $this->renderJsonUnauthorized(__FILE__, __LINE__);
+            $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -48,7 +48,7 @@ class WebmasterApi extends AbstractApi
     public function getPersonsInGroup(?int $id): void
     {
         if (!($this->connectedUser->get()->person ?? false)) {
-            $this->renderJsonUnauthorized(__FILE__, __LINE__);
+            $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
@@ -65,10 +65,6 @@ class WebmasterApi extends AbstractApi
 
     public function lastVersion(): void
     {
-        if (!($this->connectedUser->get()->isWebmaster() ?? false)) {
-            $this->renderJsonUnauthorized(__FILE__, __LINE__);
-            return;
-        }
         if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
             $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
             return;
@@ -80,7 +76,7 @@ class WebmasterApi extends AbstractApi
     public function removeFromGroup(int $personId, int $groupId): void
     {
         if (!(($this->connectedUser->get()->isPersonManager() ?? false) || $this->connectedUser->isWebmaster() ?? false)) {
-            $this->renderJsonUnauthorized(__FILE__, __LINE__);
+            $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }
         if ($groupId === 1) {
@@ -103,7 +99,7 @@ class WebmasterApi extends AbstractApi
     public function deleteNavbarItem(int $id): void
     {
         if (!($this->connectedUser->get()->isNavbarDesigner() ?? false)) {
-            $this->renderJsonUnauthorized(__FILE__, __LINE__);
+            $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'DELETE') {
@@ -121,7 +117,7 @@ class WebmasterApi extends AbstractApi
     public function getNavbarItem(int $id): void
     {
         if (!($this->connectedUser->get()->isNavbarDesigner() ?? false)) {
-            $this->renderJsonUnauthorized(__FILE__, __LINE__);
+            $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
@@ -138,7 +134,7 @@ class WebmasterApi extends AbstractApi
     public function saveNavbarItem(): void
     {
         if (!($this->connectedUser->get()->isNavbarDesigner() ?? false)) {
-            $this->renderJsonUnauthorized(__FILE__, __LINE__);
+            $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -162,7 +158,7 @@ class WebmasterApi extends AbstractApi
     public function updateNavbarPositions(): void
     {
         if (!($this->connectedUser->get()->isNavbarDesigner() ?? false)) {
-            $this->renderJsonUnauthorized(__FILE__, __LINE__);
+            $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
