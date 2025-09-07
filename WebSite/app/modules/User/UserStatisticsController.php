@@ -15,14 +15,14 @@ use app\modules\Common\AbstractController;
 
 class UserStatisticsController extends AbstractController
 {
-    private PersonStatisticsDataHelper $personalStatistics;
+    private PersonStatisticsDataHelper $personalStatisticsDataHelper;
     private LogDataHelper $logDataHelper;
 
-    public function __construct(Application $application)
+    public function __construct(Application $application, PersonStatisticsDataHelper $personalStatisticsDataHelper, LogDataHelper $logDataHelper)
     {
         parent::__construct($application);
-        $this->personalStatistics = new PersonStatisticsDataHelper($application);
-        $this->logDataHelper = new LogDataHelper($application);
+        $this->personalStatisticsDataHelper = $personalStatisticsDataHelper;
+        $this->logDataHelper = $logDataHelper;
     }
 
     public function showStatistics(): void
@@ -33,11 +33,11 @@ class UserStatisticsController extends AbstractController
                 'seasonEnd' => FilterInputRule::DateTime->value,
             ];
             $input = WebApp::filterInput($schema, $this->flight->request()->query->getData());
-            $season = $this->personalStatistics->getSeasonRange($input['seasonStart'] ?? null, $input['seasonEnd'] ?? null);
+            $season = $this->personalStatisticsDataHelper->getSeasonRange($input['seasonStart'] ?? null, $input['seasonEnd'] ?? null);
             
             $this->render('User/views/user_statistics.latte', Params::getAll([
-                'stats' => $this->personalStatistics->getStats($person, $season['start'], $season['end'], $this->connectedUser->isWebmaster()),
-                'seasons' => $this->personalStatistics->getAvailableSeasons(),
+                'stats' => $this->personalStatisticsDataHelper->getStats($person, $season['start'], $season['end'], $this->connectedUser->isWebmaster()),
+                'seasons' => $this->personalStatisticsDataHelper->getAvailableSeasons(),
                 'currentSeason' => $season,
                 'navItems' => $this->getNavItems($person),
                 'chartData' => $this->getVisitStatsForChart($season, $person),

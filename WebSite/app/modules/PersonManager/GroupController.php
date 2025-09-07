@@ -69,6 +69,7 @@ class GroupController extends AbstractController
                 'isMyclubWebSite' => WebApp::isMyClubWebSite(),
                 'navItems' => $this->getNavItems($connectedUser->person ?? false),
             ]));
+            return;
         }
         $selectedAuthorizations = $input['authorizations'] ?? [];
         $this->groupDataHelper->insert($name, $selfRegistration, $selectedAuthorizations);
@@ -80,7 +81,7 @@ class GroupController extends AbstractController
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
         }
-        if ($_SERVER['REQUEST_METHOD'] !== 'DELETE') {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
@@ -89,7 +90,7 @@ class GroupController extends AbstractController
             return;
         }
         try {
-            $this->dataHelper->set('Group', ['Inactivated' => 0], ['Id' => $id]);
+            $this->dataHelper->set('Group', ['Inactivated' => 1], ['Id' => $id]);
             $this->redirect('/groups');
         } catch (QueryException $e) {
             $this->raiseBadRequest("Error {$e->getMessage()}", __FILE__, __LINE__);

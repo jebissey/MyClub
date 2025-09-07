@@ -84,7 +84,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const id = this.closest('tr').dataset.id;
 
             if (confirm('Êtes-vous sûr de vouloir supprimer cet élément de navigation ?')) {
-                fetch(`/api/navBar/deleteItem/${id}`, { method: 'DELETE' })
+                fetch(`/api/navBar/deleteItem/${id}`, { method: 'POST' })
                     .then(response => response.json())
                     .then(result => {
                         if (result.success) this.closest('tr').remove();

@@ -1,0 +1,88 @@
+<?php
+
+namespace app\modules\User;
+
+use app\helpers\Application;
+use app\helpers\Params;
+use app\models\GroupDataHelper;
+use app\models\PersonDataHelper;
+use app\modules\Common\AbstractController;
+
+class UserDirectoryController extends AbstractController
+{
+    public function __construct(Application $application)
+    {
+        parent::__construct($application);
+    }
+
+    public function showDirectory()
+    {
+        $person = $this->connectedUser->get()->person;
+        if ($person === null) {
+            $this->raiseforbidden(__FILE__, __LINE__);
+            return;
+        }
+        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+            return;
+        }
+        $groupParam = $this->flight->request()->query['group'] ?? null;
+        $selectedGroup = ($groupParam !== null && ctype_digit((string)$groupParam)) ? (int)$groupParam : null;
+        if ($selectedGroup) $persons = (new PersonDataHelper($this->application))->getPersonsInGroupForDirectory($selectedGroup);
+        else {
+            $persons = $this->dataHelper->gets('Person', [
+                'InPresentationDirectory' => 1,
+                'Inactivated' => 0
+            ], 'Id, LastName, FirstName, NickName, UseGravatar, Avatar, Email');
+        }
+        $groupCounts = (new GroupDataHelper($this->application))->getGroupCount();
+        $this->render('User/views/users_directory.latte', Params::getAll([
+            'persons' => $persons,
+            'navItems' => $this->getNavItems($person),
+            'loggedPerson' => $person,
+            'groups' => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
+            'groupCounts' => $groupCounts,
+            'selectedGroup' => $selectedGroup,
+        ]));
+    }
+
+    public function showMap()
+    {
+        $person = $this->connectedUser->get()->person;
+        if ($person === null) {
+            $this->raiseforbidden(__FILE__, __LINE__);
+            return;
+        }
+        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+            return;
+        }
+        $members = $this->dataHelper->gets('Person', [
+            'InPresentationDirectory' => 1,
+            'Location IS NOT NULL' => null,
+            'Inactivated' => 0
+        ]);
+        $locationData = [];
+        foreach ($members as $member) {
+            if (!empty($member->Location) && preg_match('/^[-+]?([1-8]?\d(\.\d+)?|90(\.0+)?),\s*[-+]?(180(\.0+)?|((1[0-7]\d)|([1-9]?\d))(\.\d+)?)$/', $member->Location)) {
+                list($lat, $lng) = explode(',', $member->Location);
+                $locationData[] = [
+                    'id' => $member->Id,
+                    'name' => $member->FirstName . ' ' . $member->LastName,
+                    'nickname' => $member->NickName,
+                    'avatar' => $member->Avatar,
+                    'useGravatar' => $member->UseGravatar,
+                    'email' => $member->Email,
+                    'lat' => trim($lat),
+                    'lng' => trim($lng)
+                ];
+            }
+        }
+
+        $this->render('User/views/users_map.latte', Params::getAll([
+            'locationData' => $locationData,
+            'membersCount' => count($locationData),
+            'navItems' => $this->getNavItems($person),
+        ]));
+    }
+}

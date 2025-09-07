@@ -10,7 +10,7 @@ INSERT INTO Test (
     QueryExpectedResponse
 )
 SELECT
-    Step + 10000,
+    Step + 100000,
     Method,
     Uri,
     JsonGetParameters,
@@ -20,5 +20,5 @@ SELECT
     Query,
     QueryExpectedResponse
 FROM Test
-WHERE Step BETWEEN 1000 AND 2400;
+WHERE Step BETWEEN 2410 AND 4030;
 

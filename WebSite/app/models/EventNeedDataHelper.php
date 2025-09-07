@@ -4,7 +4,7 @@ namespace app\models;
 
 use app\helpers\Application;
 
-class EventNeedHelper extends Data
+class EventNeedDataHelper extends Data
 {
     public function __construct(Application $application)
     {

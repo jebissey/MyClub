@@ -29,14 +29,12 @@ class EventService implements EventServiceInterface
         EventDataHelper $eventDataHelper,
         MessageDataHelper $messageDataHelper,
         ParticipantDataHelper $participantDataHelper,
-        PersonDataHelper $personDataHelper,
         PersonPreferences $personPreferences
     ) {
         $this->dataHelper = $dataHelper;
         $this->eventDataHelper = $eventDataHelper;
         $this->messageDataHelper = $messageDataHelper;
         $this->participantDataHelper = $participantDataHelper;
-        $this->personDataHelper = $personDataHelper;
         $this->personPreferences = $personPreferences;
     }
 
