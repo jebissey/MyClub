@@ -14,12 +14,9 @@ use app\modules\Common\TableController;
 
 class EventTypeController extends TableController
 {
-    private EventDataHelper $eventDataHelper;
-
-    public function __construct(Application $application)
+    public function __construct(Application $application, private EventDataHelper $eventDataHelper)
     {
         parent::__construct($application);
-        $this->eventDataHelper = new EventDataHelper($application);
     }
 
     public function index(): void
@@ -101,7 +98,7 @@ class EventTypeController extends TableController
 
     public function delete(int $id): void
     {
-        if ($this->userIsAllowedAndMethodIsGood('DELETE', fn($u) => $u->isEventDesigner()) && $this->eventTypeExists($id)) {
+        if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isEventDesigner()) && $this->eventTypeExists($id)) {
             $this->dataHelper->set('EventType', ['Inactivated' => 1], ['Id' => $id]);
             $this->redirect('/eventTypes');
         }

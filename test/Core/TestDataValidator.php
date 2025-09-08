@@ -14,7 +14,7 @@ class TestDataValidator
             }
             return [$decoded, null];
         };
-        if (in_array($route->method, ['GET', 'DELETE'])) {
+        if (in_array($route->method, ['GET', 'POST'])) {
             if ($route->hasParameters) {
                 foreach ($testData as $test) {
                     [$getParams, $error] = $validateJson($test['JsonGetParameters'], 'JsonGetParameters');

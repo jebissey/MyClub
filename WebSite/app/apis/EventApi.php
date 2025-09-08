@@ -10,27 +10,20 @@ use app\helpers\Application;
 use app\helpers\WebApp;
 use app\interfaces\AuthorizationServiceInterface;
 use app\interfaces\EventServiceInterface;
-use app\interfaces\NeedTypeServiceInterface;
 use app\models\ApiEventDataHelper;
 use app\models\EventDataHelper;
 
 class EventApi extends AbstractApi
 {
     private ApiEventDataHelper $apiEventDataHelper;
-    private AuthorizationServiceInterface $authService;
-    private EventDataHelper $eventDataHelper;
-    private EventServiceInterface $eventService;
 
     public function __construct(
         Application $application,
-        AuthorizationServiceInterface $authService,
-        EventDataHelper $eventDataHelper,
-        EventServiceInterface $eventService,
+        private AuthorizationServiceInterface $authService,
+        private EventDataHelper $eventDataHelper,
+        private EventServiceInterface $eventService
     ) {
         parent::__construct($application);
-        $this->authService = $authService;
-        $this->eventDataHelper = $eventDataHelper;
-        $this->eventService = $eventService;
     }
 
     public function deleteEvent(int $id): void
@@ -39,7 +32,7 @@ class EventApi extends AbstractApi
             $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }
-        if ($_SERVER['REQUEST_METHOD'] !== 'DELETE') {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
             return;
         }

@@ -5,9 +5,7 @@ namespace test\Database;
 use InvalidArgumentException;
 use PDO;
 use PDOException;
-
-use app\exceptions\QueryException;
-
+use RuntimeException;
 use test\Interfaces\MyClubDataRepositoryInterface;
 
 class SqliteMyClubDataRepository implements MyClubDataRepositoryInterface
@@ -38,7 +36,7 @@ class SqliteMyClubDataRepository implements MyClubDataRepositoryInterface
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
-            throw new QueryException("Query error: " . $e->getMessage());
+            throw new RuntimeException("Query error: " . $e->getMessage() . " with $query");
         }
     }
 }

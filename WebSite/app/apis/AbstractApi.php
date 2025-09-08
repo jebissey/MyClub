@@ -4,7 +4,6 @@ namespace app\apis;
 
 use flight;
 use Latte\Engine as LatteEngine;
-use Throwable;
 
 use app\enums\ApplicationError;
 use app\helpers\Application;
@@ -16,14 +15,12 @@ abstract class AbstractApi
 {
     private LatteEngine $latte;
 
-    protected Application $application;
     protected ConnectedUser $connectedUser;
     protected DataHelper $dataHelper;
     protected PersonDataHelper $personDataHelper;
 
-    public function __construct(Application $application)
+    public function __construct(protected Application $application)
     {
-        $this->application = $application;
         $this->latte = $application->getLatte();
         $this->connectedUser = new ConnectedUser($application);
         $this->dataHelper = new DataHelper($application);

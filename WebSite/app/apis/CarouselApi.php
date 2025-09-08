@@ -14,7 +14,6 @@ use app\models\DataHelper;
 
 class CarouselApi extends AbstractApi
 {
-
     public function __construct(Application $application)
     {
         parent::__construct($application);
@@ -64,7 +63,7 @@ class CarouselApi extends AbstractApi
 
     public function deleteItem($id)
     {
-        if ($_SERVER['REQUEST_METHOD'] !== 'DELETE') {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
             return;
         }

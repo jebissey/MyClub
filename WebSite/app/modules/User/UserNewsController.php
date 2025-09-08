@@ -7,27 +7,13 @@ use app\helpers\Application;
 use app\helpers\News;
 use app\helpers\Params;
 use app\helpers\WebApp;
-use app\models\ArticleDataHelper;
-use app\models\EventDataHelper;
-use app\models\MessageDataHelper;
-use app\models\PersonDataHelper;
-use app\models\SurveyDataHelper;
 use app\modules\Common\AbstractController;
 
 class UserNewsController extends AbstractController
 {
-    private \app\helpers\News $news;
-
-    public function __construct(Application $application)
+    public function __construct(Application $application, private News $news)
     {
         parent::__construct($application);
-        $this->news = new News([
-            new ArticleDataHelper($application),
-            new SurveyDataHelper($application),
-            new EventDataHelper($application),
-            new MessageDataHelper($application),
-            new PersonDataHelper($application),
-        ]);
     }
 
     public function showNews(): void

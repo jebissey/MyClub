@@ -15,12 +15,9 @@ use app\modules\Common\AbstractController;
 
 class LogController extends AbstractController
 {
-    private LogDataHelper $logDataHelper;
-
-    public function __construct(Application $application)
+    public function __construct(Application $application, private LogDataHelper $logDataHelper)
     {
         parent::__construct($application);
-        $this->logDataHelper = new LogDataHelper($this->application);
     }
 
     public function index()

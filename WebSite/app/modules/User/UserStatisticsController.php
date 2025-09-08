@@ -15,14 +15,9 @@ use app\modules\Common\AbstractController;
 
 class UserStatisticsController extends AbstractController
 {
-    private PersonStatisticsDataHelper $personalStatisticsDataHelper;
-    private LogDataHelper $logDataHelper;
-
-    public function __construct(Application $application, PersonStatisticsDataHelper $personalStatisticsDataHelper, LogDataHelper $logDataHelper)
+    public function __construct(Application $application, private PersonStatisticsDataHelper $personalStatisticsDataHelper, private LogDataHelper $logDataHelper)
     {
         parent::__construct($application);
-        $this->personalStatisticsDataHelper = $personalStatisticsDataHelper;
-        $this->logDataHelper = $logDataHelper;
     }
 
     public function showStatistics(): void

@@ -11,12 +11,9 @@ use app\valueObjects\ApiResponse;
 
 class EventNeedApi extends AbstractApi
 {
-    private EventNeedDataHelper $eventNeedDataHelper;
-
-    public function __construct(Application $application, EventNeedDataHelper $eventNeedDataHelper)
+    public function __construct(Application $application, private EventNeedDataHelper $eventNeedDataHelper)
     {
         parent::__construct($application);
-        $this->eventNeedDataHelper = $eventNeedDataHelper;
     }
 
     public function deleteNeed(int $id): void
@@ -25,7 +22,7 @@ class EventNeedApi extends AbstractApi
             $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }
-        if ($_SERVER['REQUEST_METHOD'] !== 'DELETE') {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
             return;
         }

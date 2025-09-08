@@ -81,7 +81,7 @@ document.addEventListener('DOMContentLoaded', function () {
     function confirmAndDeleteEvent(eventId) {
         if (confirm('Êtes-vous sûr de vouloir supprimer cet événement ?')) {
             fetch('/api/event/delete/' + eventId, {
-                method: 'DELETE',
+                method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 }

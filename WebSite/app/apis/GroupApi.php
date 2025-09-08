@@ -24,16 +24,24 @@ class GroupApi extends AbstractApi
             $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
+        if ($groupId === 1) {
+            $this->renderJson(['error' => 'group 1 is locked'], false, ApplicationError::BadRequest->value);
+            return;
+        }
         try {
-            if ($groupId === 1) {
-                $this->renderJson(['error' => 'group 1 is locked'], false, ApplicationError::BadRequest->value);
+            if (!$this->dataHelper->get('Person', ['Id' => $personId])) {
+                $this->renderJson(['error' => "person ({$personId}) does't exist)"], false, ApplicationError::BadRequest->value);
+                return;
+            }
+            if (!$this->dataHelper->get('Group', ['Id' => $groupId])) {
+                $this->renderJson(['error' => "group ({$groupId}) does't exist)"], false, ApplicationError::BadRequest->value);
                 return;
             }
             if ($this->dataHelper->get('PersonGroup', ['IdPerson' => $personId, 'idGroup' => $groupId])) {
                 $this->renderJson(['error' => "person ({$personId}) is already in group ({$groupId})"], false, ApplicationError::BadRequest->value);
                 return;
             }
-            $success = $this->dataHelper->set('PersonGroup', [['IdPerson' => $personId, 'IdGroup' => $groupId]]) !== false;
+            $success = $this->dataHelper->set('PersonGroup', ['IdPerson' => $personId, 'IdGroup' => $groupId]) !== false;
             $this->renderJson([], $success, $success ? ApplicationError::Ok->value : ApplicationError::BadRequest->value);
         } catch (Throwable $e) {
             $this->renderJsonError($e->getMessage(), ApplicationError::Error->value);

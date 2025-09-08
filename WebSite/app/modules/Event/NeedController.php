@@ -9,12 +9,9 @@ use app\modules\Common\AbstractController;
 
 class NeedController extends AbstractController
 {
-    private NeedDataHelper $needDataHelper;
-
-    public function __construct(Application $application, NeedDataHelper $needDataHelper)
+    public function __construct(Application $application, private NeedDataHelper $needDataHelper)
     {
         parent::__construct($application);
-        $this->needDataHelper = $needDataHelper;
     }
 
     public function needs(): void

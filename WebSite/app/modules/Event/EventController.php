@@ -28,12 +28,9 @@ use app\modules\Common\AbstractController;
 
 class EventController extends AbstractController
 {
-    private EventDataHelper $eventDataHelper;
-
-    public function __construct(Application $application)
+    public function __construct(Application $application, private EventDataHelper $eventDataHelper)
     {
         parent::__construct($application);
-        $this->eventDataHelper = new EventDataHelper($application);
     }
 
     public function nextEvents(): void

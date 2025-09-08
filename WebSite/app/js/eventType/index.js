@@ -58,7 +58,7 @@ function editAttribute(id) {
 function deleteAttribute(id) {
     if (confirm('Êtes-vous sûr de vouloir supprimer cet attribut ?')) {
         fetch(`/api/attribute/delete/${id}`, {
-            method: 'DELETE',
+            method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             }

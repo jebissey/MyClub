@@ -17,26 +17,14 @@ use app\valueObjects\ApiResponse;
 
 class EventService implements EventServiceInterface
 {
-    private DataHelper $dataHelper;
-    private EventDataHelper $eventDataHelper;
-    private MessageDataHelper $messageDataHelper;
-    private ParticipantDataHelper $participantDataHelper;
-    private PersonDataHelper $personDataHelper;
-    private PersonPreferences $personPreferences;
-
     public function __construct(
-        DataHelper $dataHelper,
-        EventDataHelper $eventDataHelper,
-        MessageDataHelper $messageDataHelper,
-        ParticipantDataHelper $participantDataHelper,
-        PersonPreferences $personPreferences
-    ) {
-        $this->dataHelper = $dataHelper;
-        $this->eventDataHelper = $eventDataHelper;
-        $this->messageDataHelper = $messageDataHelper;
-        $this->participantDataHelper = $participantDataHelper;
-        $this->personPreferences = $personPreferences;
-    }
+        private DataHelper $dataHelper,
+        private EventDataHelper $eventDataHelper,
+        private MessageDataHelper $messageDataHelper,
+        private ParticipantDataHelper $participantDataHelper,
+        private PersonPreferences $personPreferences,
+        private PersonDataHelper $personDataHelper
+    ) {}
 
     public function deleteEvent(int $id, int $userId): ApiResponse
     {

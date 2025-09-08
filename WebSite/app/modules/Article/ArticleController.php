@@ -21,16 +21,14 @@ use app\modules\Common\TableController;
 
 class ArticleController extends TableController
 {
-    private ArticleDataHelper $articleDataHelper;
-    private ArticleTableDataHelper $articleTableDataHelper;
-    private AuthorizationDataHelper $authorizationDatahelper;
 
-    public function __construct(Application $application)
-    {
+    public function __construct(
+        Application $application,
+        private ArticleDataHelper $articleDataHelper,
+        private ArticleTableDataHelper $articleTableDataHelper,
+        private AuthorizationDataHelper $authorizationDatahelper
+    ) {
         parent::__construct($application);
-        $this->articleDataHelper = new ArticleDataHelper($application);
-        $this->articleTableDataHelper = new ArticleTableDataHelper($application);
-        $this->authorizationDatahelper = new AuthorizationDataHelper($application);
     }
 
     public function home(): void
@@ -276,7 +274,7 @@ class ArticleController extends TableController
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
         }
-        if (($_SERVER['REQUEST_METHOD'] === 'DELETE')) {
+        if (($_SERVER['REQUEST_METHOD'] === 'POST')) {
             $article = $this->articleDataHelper->getLatestArticle([$id]);
             if (!$article || $this->connectedUser->person->Id != $article->CreatedBy) {
                 $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);

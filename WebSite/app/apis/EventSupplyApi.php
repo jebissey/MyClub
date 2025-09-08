@@ -3,7 +3,6 @@
 namespace app\apis;
 
 use InvalidArgumentException;
-use RuntimeException;
 use Throwable;
 
 use app\enums\ApplicationError;
@@ -15,12 +14,9 @@ use app\valueObjects\ApiResponse;
 
 class EventSupplyApi extends AbstractApi
 {
-    private EventDataHelper $eventDataHelper;
-
-    public function __construct(Application $application, EventDataHelper $eventDataHelper)
+    public function __construct(Application $application, private EventDataHelper $eventDataHelper)
     {
         parent::__construct($application);
-        $this->eventDataHelper = $eventDataHelper;
     }
 
     public function updateSupply(): void

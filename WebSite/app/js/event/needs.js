@@ -122,7 +122,7 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('confirmDelete').addEventListener('click', function () {
         const endpoint = deleteItemType === 'type' ? '/api/need/type/delete/' : '/api/need/delete/';
         fetch(endpoint + deleteItemId, {
-            method: 'DELETE',
+            method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             }

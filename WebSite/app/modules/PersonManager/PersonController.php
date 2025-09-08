@@ -165,7 +165,7 @@ class PersonController extends TableController
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
         }
-        if (($_SERVER['REQUEST_METHOD'] !== 'DELETE')) {
+        if (($_SERVER['REQUEST_METHOD'] !== 'POST')) {
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }

@@ -2,7 +2,6 @@
 
 namespace app\modules\Webmaster;
 
-use app\enums\ApplicationError;
 use app\helpers\Application;
 use app\helpers\Params;
 use app\helpers\WebApp;
@@ -12,12 +11,10 @@ use app\modules\Common\AbstractController;
 class DbBrowserController extends AbstractController
 {
     private int $itemsPerPage = 10;
-    private DbBrowserDataHelper $dbBrowserDataHelper;
 
-    public function __construct(Application $application)
+    public function __construct(Application $application, private DbBrowserDataHelper $dbBrowserDataHelper)
     {
         parent::__construct($application);
-        $this->dbBrowserDataHelper = new DbBrowserDataHelper($application);
     }
 
     public function createRecord(string $table): void
@@ -30,7 +27,7 @@ class DbBrowserController extends AbstractController
 
     public function deleteRecord(string $table, int $id): void
     {
-        if ($this->userIsAllowedAndMethodIsGood('DELETE', fn($u) => $u->isWebmaster())) {
+        if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isWebmaster())) {
             $this->dbBrowserDataHelper->deleteRecord($table, $id);
             $this->redirect('/dbbrowser/' . urlencode($table));
         }

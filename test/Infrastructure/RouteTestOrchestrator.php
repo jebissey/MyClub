@@ -2,6 +2,8 @@
 
 namespace test\Infrastructure;
 
+use Throwable;
+
 use test\Core\StopRequestedException;
 use test\Core\TestExecutor;
 use test\Core\TestResult;
@@ -9,7 +11,6 @@ use test\Core\TestSummary;
 use test\Infrastructure\SimulationExtractor;
 use test\Interfaces\RouteExtractorInterface;
 use test\Interfaces\TestReporterInterface;
-use Throwable;
 
 class RouteTestOrchestrator
 {
@@ -20,37 +21,37 @@ class RouteTestOrchestrator
         private TestReporterInterface $reporter,
     ) {}
 
-public function runTests(string $routeFilePath, ?int $test, ?int $simu, bool $stop): array
-{
-    $results = [];
-    try {
-        if ($simu === null) {
-            $this->reporter->sectionTitle("Routes extraction");
-            $routes = $this->routeExtractor->extractRoutes($routeFilePath);
-            $totalRoutes = count($routes);
-            echo "Found {$totalRoutes} routes.\n";
-            echo str_repeat('-', 80) . "\n";
-            $results = $this->executor->testRoutes($routes, $test, $stop);
+    public function runTests(string $routeFilePath, ?int $test, ?int $simu, bool $stop): array
+    {
+        $results = [];
+        try {
+            if ($simu === null) {
+                $this->reporter->sectionTitle("Routes extraction");
+                $routes = $this->routeExtractor->extractRoutes($routeFilePath);
+                $totalRoutes = count($routes);
+                echo "Found {$totalRoutes} routes.\n";
+                echo str_repeat('-', 80) . "\n";
+                $results = $this->executor->testRoutes($routes, $test, $stop);
+            }
+            if ($test === null) {
+                $this->reporter->sectionTitle("Simulations extraction");
+                $simulations = $this->simulationExtractor->extract();
+                $totalSimulations = count($simulations);
+                echo "Found {$totalSimulations} simulations.\n";
+                echo str_repeat('-', 80) . "\n";
+                $results = array_merge(
+                    $results,
+                    $this->executor->testSimulations($simulations, $simu, $stop)
+                );
+            }
+        } catch (StopRequestedException $e) {
+            echo "⚠️ Execution stopped\n";
+        } catch (Throwable $e) {
+            echo "❌ Unexpected error: " . $e->getMessage() . "\n";
         }
-        if ($test === null) {
-            $this->reporter->sectionTitle("Simulations extraction");
-            $simulations = $this->simulationExtractor->extract();
-            $totalSimulations = count($simulations);
-            echo "Found {$totalSimulations} simulations.\n";
-            echo str_repeat('-', 80) . "\n";
-            $results = array_merge(
-                $results,
-                $this->executor->testSimulations($simulations, $simu, $stop)
-            );
-        }
-    } catch (StopRequestedException $e) {
-        echo "⚠️ Execution stopped\n";
-    } catch (Throwable $e) {
-        echo "❌ Unexpected error: " . $e->getMessage() . "\n";
+        $this->reporter->displaySummary($this->summaryGenerator($results));
+        return $results;
     }
-    $this->reporter->displaySummary($this->summaryGenerator($results));
-    return $results;
-}
 
     #region Private methods
     private function summaryGenerator(array $results): TestSummary

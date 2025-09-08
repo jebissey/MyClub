@@ -4,7 +4,6 @@ namespace app\modules\PersonManager;
 
 use Throwable;
 
-use app\enums\ApplicationError;
 use app\enums\FilterInputRule;
 use app\exceptions\QueryException;
 use app\helpers\Application;
@@ -15,9 +14,7 @@ use app\modules\Common\AbstractController;
 
 class GroupController extends AbstractController
 {
-    private GroupDataHelper $groupDataHelper;
-
-    public function __construct(Application $application)
+    public function __construct(Application $application, private GroupDataHelper $groupDataHelper)
     {
         parent::__construct($application);
         $this->groupDataHelper = new GroupDataHelper($application);

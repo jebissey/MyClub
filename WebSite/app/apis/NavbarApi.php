@@ -10,13 +10,9 @@ use app\models\PageDataHelper;
 
 class NavbarApi extends AbstractApi
 {
-    private PageDataHelper $pageDataHelper;
-
-    public function __construct(Application $application, PageDataHelper $pageDataHelper)
+    public function __construct(Application $application, private PageDataHelper $pageDataHelper)
     {
         parent::__construct($application);
-        $this->pageDataHelper = $pageDataHelper;
-
     }
 
     public function deleteNavbarItem(int $id): void

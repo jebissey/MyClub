@@ -2,16 +2,12 @@
 
 namespace app\apis;
 
-use Throwable;
-
 use app\enums\ApplicationError;
 use app\helpers\Application;
 use app\models\LogDataHelper;
-use app\models\PageDataHelper;
 
 class WebmasterApi extends AbstractApi
 {
-
     public function __construct(Application $application)
     {
         parent::__construct($application);

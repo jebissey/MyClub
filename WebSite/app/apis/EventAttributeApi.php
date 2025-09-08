@@ -10,12 +10,9 @@ use app\models\AttributeDataHelper;
 
 class EventAttributeApi extends AbstractApi
 {
-    private AttributeDataHelper $attributeDataHelper;
-
-    public function __construct(Application $application, AttributeDataHelper $attributeDataHelper)
+    public function __construct(Application $application, private AttributeDataHelper $attributeDataHelper)
     {
         parent::__construct($application);
-        $this->attributeDataHelper = $attributeDataHelper;
     }
 
     public function createAttribute(): void
@@ -43,7 +40,7 @@ class EventAttributeApi extends AbstractApi
             $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }
-        if ($_SERVER['REQUEST_METHOD'] !== 'DELETE') {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
             return;
         }

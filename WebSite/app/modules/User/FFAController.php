@@ -2,7 +2,6 @@
 
 namespace app\modules\User;
 
-use app\enums\ApplicationError;
 use app\enums\FilterInputRule;
 use app\helpers\Application;
 use app\helpers\FFAScraper;

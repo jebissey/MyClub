@@ -4,7 +4,6 @@ namespace app\models;
 
 use DateInterval;
 use DateTime;
-use PDO;
 use Throwable;
 
 use app\enums\ApplicationError;
