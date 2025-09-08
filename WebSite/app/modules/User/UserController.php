@@ -2,28 +2,21 @@
 
 namespace app\modules\User;
 
-
 use app\enums\ApplicationError;
 use app\enums\FilterInputRule;
 use app\helpers\Application;
 use app\helpers\Params;
 use app\helpers\WebApp;
-use app\models\GroupDataHelper;
-use app\models\PersonGroupDataHelper;
 use app\modules\Common\AbstractController;
 use app\services\AuthenticationService;
 
 class UserController extends AbstractController
 {
-    private AuthenticationService $authService;
-
-    public function __construct(Application $application)
+    public function __construct(Application $application, private AuthenticationService $authService)
     {
         parent::__construct($application);
-        $this->authService = new AuthenticationService($application);
     }
 
-    #region Sign
     public function forgotPassword($encodedEmail): void
     {
         $email = urldecode($encodedEmail);
@@ -40,9 +33,10 @@ class UserController extends AbstractController
             elseif ($this->authService->resetPassword($token, $newPassword)) $this->redirect('/', ApplicationError::Ok, 'Votre mot de passe est réinitialisé');
             else                                                             $this->raiseBadRequest('Invalid or expired token', __FILE__, __LINE__);
         } elseif ($_SERVER['REQUEST_METHOD'] === 'GET') $this->render('User/views/user_set_password.latte', Params::getAll(['token' => $token,]));
+        else $this->raiseMethodNotAllowed(__FILE__, __LINE__);
     }
 
-    public function signIn()
+    public function signIn(): void
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $result = $this->authService->handleSignIn($this->flight->request()->data->getData());
@@ -62,7 +56,7 @@ class UserController extends AbstractController
                 'page' => basename(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH)),
                 'currentVersion' => Application::VERSION
             ]);
-        } else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid');
+        } else $this->raiseMethodNotAllowed(__FILE__, __LINE__);
     }
 
     public function signOut(): void
@@ -79,31 +73,4 @@ class UserController extends AbstractController
         $this->authService->signOut();
         $this->redirect('/', ApplicationError::Ok, "Sign out succeeded for {$userEmail}");
     }
-    #endregion
-
-
-    #region Data user
-
-
-    public function groups(): void
-    {
-        if ($person = $this->connectedUser->get(1)->person ?? false) {
-            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-                $groups = WebApp::getFiltered('groups', FilterInputRule::ArrayInt->value, $this->flight->request()->data->getData());
-                (new PersonGroupDataHelper($this->application))->update($person->Id, $groups ?? []);
-                $this->redirect('/user');
-            } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-                $currentGroups = (new GroupDataHelper($this->application))->getCurrentGroups($person->Id);
-
-                $this->render('User/views/user_groups.latte', Params::getAll([
-                    'groups' => $currentGroups,
-                    'layout' => $this->getLayout(),
-                    'navItems' => $this->getNavItems($connectedUser->person ?? false),
-                ]));
-            } else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
-        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
-    }
-
-    #endregion 
-
 }

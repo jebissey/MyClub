@@ -70,21 +70,6 @@ class PersonDataHelper extends Data implements NewsProviderInterface
         return $id;
     }
 
-    public function setPassword($password, $personId)
-    {
-        $stmt = $this->pdo->prepare('UPDATE Person SET Password = ?, Token = null, TokenCreatedAt = null WHERE Id = ?');
-        $stmt->execute($password, $personId);
-    }
-
-    public function setToken($personId): string
-    {
-        $token = bin2hex(random_bytes(32));
-        $tokenCreatedAt = (new DateTime())->format('Y-m-d H:i:s');
-        $query = $this->pdo->prepare('UPDATE Person SET Token = ?, TokenCreatedAt = ? WHERE Id = ?');
-        $query->execute([$token, $tokenCreatedAt, $personId]);
-        return $token;
-    }
-
     public function updateActivity($email)
     {
         $lastActivity = $this->fluentForLog->from('Log')

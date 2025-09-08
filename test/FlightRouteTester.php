@@ -20,6 +20,7 @@ function main(): int
         'help',
         'test:',
         'simu:',
+        'start:',
         'stop'
     ]);
     if (isset($options['help'])) {
@@ -32,6 +33,7 @@ function main(): int
     );
     $test       = $options['test'] ?? null;
     $simu       = $options['simu'] ?? null;
+    $start      = $options['start'] ?? null;
     $exportJson = isset($options['export-json']);
     $exportCsv  = isset($options['export-csv']);
     $routeFile  = $options['routes-file'] ?? __DIR__ . '/../WebSite/index.php';
@@ -50,7 +52,7 @@ function main(): int
         echo "  Stop on error: " . ($stop ? 'true' : 'false') . "\n";
 
         $orchestrator = RouteTestFactory::create($config, $dbTestsPath, $dbMyClubPath);
-        $results = $orchestrator->runTests($routeFile, $test, $simu, $stop);
+        $results = $orchestrator->runTests($routeFile, $test, $simu, $start, $stop);
 
         if ($exportJson) (new JsonTestExporter())->export($results, 'route_test_results.json');
         if ($exportCsv) (new CsvTestExporter())->export($results, 'route_test_results.csv');
@@ -77,8 +79,9 @@ Options:
   --export-json       Export results in JSON
   --export-csv        Export results in CSV
   --help              Display this help
-  --test=n°           Only this test
-  --simu=n°           Only this simulation
+  --test=n°           Only this test n°
+  --simu=n°           Only this simulation n°
+  --start=n°          Start simulation at this step n°
   --stop              Stop on first error
 EOT;
 }

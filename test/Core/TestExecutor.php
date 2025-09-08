@@ -46,13 +46,13 @@ class TestExecutor
         return $results;
     }
 
-    public function testSimulations(array $simulations, ?int $simuFilter, bool $stop): array
+    public function testSimulations(array $simulations, ?int $simuFilter, ?int $startFilter, bool $stop): array
     {
         $totalSimulations = count($simulations);
         $results = [];
         foreach ($simulations as $i =>  $simulation) {
             $simuNumber = $i + 1;
-            if ($simuFilter === null || $simuFilter === $simuNumber) {
+            if ($simuFilter === null || $simuFilter === $simuNumber || $startFilter === null || $startFilter >= $simuNumber) {
                 $this->reporter->diplayTest($simuNumber, $totalSimulations, $simulation->route->method, $simulation->route->originalPath);
                 $tests = $this->runRouteTests($simulation->route, $simulation->number, $simulation, $stop);
                 $results = array_merge($results, $tests);

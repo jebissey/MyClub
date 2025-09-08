@@ -21,11 +21,11 @@ class RouteTestOrchestrator
         private TestReporterInterface $reporter,
     ) {}
 
-    public function runTests(string $routeFilePath, ?int $test, ?int $simu, bool $stop): array
+    public function runTests(string $routeFilePath, ?int $test, ?int $simu, ?int $start, bool $stop): array
     {
         $results = [];
         try {
-            if ($simu === null) {
+            if ($simu === null && $start === null) {
                 $this->reporter->sectionTitle("Routes extraction");
                 $routes = $this->routeExtractor->extractRoutes($routeFilePath);
                 $totalRoutes = count($routes);
@@ -35,13 +35,13 @@ class RouteTestOrchestrator
             }
             if ($test === null) {
                 $this->reporter->sectionTitle("Simulations extraction");
-                $simulations = $this->simulationExtractor->extract();
+                $simulations = $this->simulationExtractor->extract($start);
                 $totalSimulations = count($simulations);
                 echo "Found {$totalSimulations} simulations.\n";
                 echo str_repeat('-', 80) . "\n";
                 $results = array_merge(
                     $results,
-                    $this->executor->testSimulations($simulations, $simu, $stop)
+                    $this->executor->testSimulations($simulations, $simu, $start, $stop)
                 );
             }
         } catch (StopRequestedException $e) {

@@ -31,10 +31,11 @@ class SqliteTestDataRepository implements TestDataRepositoryInterface
         }
     }
 
-    public function getSimulations(): array
+    public function getSimulations(?int $start): array
     {
+        $and = $start === null ? "" : "AND  Step >= {$start}";
         try {
-            $stmt = $this->db->prepare("SELECT * FROM Test WHERE Step IS NOT NULL ORDER BY Step");
+            $stmt = $this->db->prepare("SELECT * FROM Test WHERE Step IS NOT NULL $and ORDER BY Step");
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {

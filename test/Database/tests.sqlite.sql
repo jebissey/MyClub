@@ -76,7 +76,7 @@ INSERT INTO "Test" VALUES (68,NULL,'POST','/user/presentation/edit',NULL,'{"cont
 INSERT INTO "Test" VALUES (69,NULL,'POST','/survey/create',NULL,'{"question":"zz"}',NULL,'403',NULL,NULL);
 INSERT INTO "Test" VALUES (70,NULL,'POST','/user/account',NULL,'{"id":1}',NULL,'403',NULL,NULL);
 INSERT INTO "Test" VALUES (71,NULL,'POST','/user/availabilities',NULL,'{"id":1}',NULL,'403',NULL,NULL);
-INSERT INTO "Test" VALUES (72,NULL,'POST','/user/groups',NULL,'{"id":1}',NULL,'403',NULL,NULL);
+INSERT INTO "Test" VALUES (72,NULL,'POST','/user/groups',NULL,'[]',NULL,'403',NULL,NULL);
 INSERT INTO "Test" VALUES (73,NULL,'POST','/user/preferences',NULL,'{"id":1}',NULL,'403',NULL,NULL);
 INSERT INTO "Test" VALUES (74,NULL,'POST','/user/sign/in',NULL,'{"id":1}',NULL,'400',NULL,NULL);
 INSERT INTO "Test" VALUES (75,NULL,'POST','/contact',NULL,'{"name":"zz","email":"user@myclub.foo", "message":"zz"}',NULL,'200',NULL,NULL);
@@ -734,5 +734,9 @@ INSERT INTO "Test" VALUES (777,103960,'POST','/user/sign/in',NULL,'{"email":"web
 INSERT INTO "Test" VALUES (778,10000,'POST','/group/create',NULL,'{"name": "Human ressources", "authorizations": ["2"]}','{"email":"webmaster@myclub.foo","password":"admin1234" }','303','SELECT * From "Group"','[{"Id":1,"Name":"Webmaster","Inactivated":0,"SelfRegistration":0},{"Id":2,"Name":"Human ressources","Inactivated":0,"SelfRegistration":0}]');
 INSERT INTO "Test" VALUES (779,10010,'POST','/api/registration/add/1/2',NULL,NULL,'{"email":"webmaster@myclub.foo","password":"admin1234" }','200','SELECT * From PersonGroup Where IdPerson = 1','[{"Id":1,"IdPerson":1,"IdGroup":1},{"Id":2,"IdPerson":1,"IdGroup":2}]');
 INSERT INTO "Test" VALUES (780,10020,'GET','/person/create',NULL,NULL,'{"email":"webmaster@myclub.foo","password":"admin1234" }','200','SELECT Id From Person','[{"Id":2},{"Id":1}]');
-INSERT INTO "Test" VALUES (781,10030,'POST','/person/edit/2',NULL,'{"email": "personManager@myclub.foo", "firstName": "Person", "lastName": "Manager"}','{"email":"webmaster@myclub.foo","password":"admin1234" }','200','SELECT Email, FirstName, LastName from Person Where Id = 2','[{"Email":"personManager@myclub.foo","FirstName":"Person","LastName":"Manager"}]');
+INSERT INTO "Test" VALUES (781,10030,'POST','/person/edit/2',NULL,'{"email": "personManager@myclub.foo", "firstName": "Person", "lastName": "Manager"}','{"email":"webmaster@myclub.foo","password":"admin1234" }','200','Update Person Set Token = "0123456789abcdef", TokenCreatedAt = CURRENT_TIMESTAMP Where Id = 2','[]');
+INSERT INTO "Test" VALUES (782,10040,'GET','/user/setPassword/0123456789abcdef',NULL,NULL,NULL,'200','SELECT Email, FirstName, LastName, Token from Person Where Id = 2
+','[{"Email":"personManager@myclub.foo","FirstName":"Person","LastName":"Manager","Token":"0123456789abcdef"}]');
+INSERT INTO "Test" VALUES (783,10050,'POST','/user/setPassword/0123456789abcdef',NULL,'{"token": "0123456789abcdef", "password": "HumanRessources1234"}',NULL,'200','SELECT Email, FirstName, LastName, Password From Person Where Id = 2
+','[{"Email":"personManager@myclub.foo","FirstName":"Person","LastName":"Manager","Password":"9ec71e403dace1e462f2d788450fcae3492e8c759a78e3e036b1cab1c6a77281"}]');
 COMMIT;

@@ -12,9 +12,9 @@ class SimulationExtractor
 {
     public function __construct(private TestDataRepositoryInterface $repo) {}
 
-    public function extract(): array
+    public function extract(?int $start): array
     {
-        $data = $this->repo->getSimulations();
+        $data = $this->repo->getSimulations($start);
         $simulations = [];
         foreach ($data as $row) {
             try {
