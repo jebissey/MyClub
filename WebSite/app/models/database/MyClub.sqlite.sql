@@ -384,8 +384,7 @@ INSERT INTO "Languages" VALUES (64,'Error403','<div class="container text-center
 	  
 	<a href="/" class="btn btn-primary mt-3">🏠 Back to homepage</a>
   </div>
-</div>
-','<div class="container text-center mt-5">
+</div>','<div class="container text-center mt-5">
   <div class="card shadow-lg rounded-3 p-4">
     <h1 class="text-danger">🚫 Erreur 403 – Accès non autorisé</h1>
     
@@ -415,8 +414,7 @@ INSERT INTO "Languages" VALUES (64,'Error403','<div class="container text-center
 	
     <a href="/" class="btn btn-primary mt-3">🏠 Retour à l’accueil</a>
   </div>
-</div>
-');
+</div>');
 INSERT INTO "Languages" VALUES (65,'Error404','<div class="container text-center mt-5">
   <div class="card shadow-lg rounded-3 p-4">
     <h1 class="text-warning">🔍 Error 404 – Page not found</h1>
@@ -435,8 +433,7 @@ INSERT INTO "Languages" VALUES (65,'Error404','<div class="container text-center
 
     <a href="/" class="btn btn-primary mt-3">🏠 Back to homepage</a>
   </div>
-</div>
-','<div class="container text-center mt-5">
+</div>','<div class="container text-center mt-5">
   <div class="card shadow-lg rounded-3 p-4">
     <h1 class="text-warning">🔍 Erreur 404 – Page introuvable</h1>
     
@@ -454,8 +451,7 @@ INSERT INTO "Languages" VALUES (65,'Error404','<div class="container text-center
 
     <a href="/" class="btn btn-primary mt-3">🏠 Retour à l’accueil</a>
   </div>
-</div>
-');
+</div>');
 INSERT INTO "Languages" VALUES (66,'Error500','<div class="container text-center mt-5">
   <div class="card shadow-lg rounded-3 p-4">
     <h1 class="text-danger">💥 Error 500 – Internal Server Error</h1>
@@ -475,8 +471,7 @@ INSERT INTO "Languages" VALUES (66,'Error500','<div class="container text-center
 
     <a href="/" class="btn btn-primary mt-3">🏠 Back to homepage</a>
   </div>
-</div>
-','<div class="container text-center mt-5">
+</div>','<div class="container text-center mt-5">
   <div class="card shadow-lg rounded-3 p-4">
     <h1 class="text-danger">💥 Erreur 500 – Erreur interne du serveur</h1>
     
@@ -495,20 +490,17 @@ INSERT INTO "Languages" VALUES (66,'Error500','<div class="container text-center
 
     <a href="/" class="btn btn-primary mt-3">🏠 Retour à l’accueil</a>
   </div>
-</div>
-');
+</div>');
 INSERT INTO "Languages" VALUES (67,'LoginRequired','<div class="alert alert-warning" role="alert">
   <p>🔒 <strong>Oops… this resource is reserved for logged-in members!</strong></p>
   <p>You need to log in to access it.</p>
   <p>💡 By choosing the "Remember me" option, your browser will roll out the 🟥red carpet🟥 next time, no password required.</p>
-</div>
-','<div class="alert alert-warning" role="alert">
+</div>','<div class="alert alert-warning" role="alert">
   <!-- Version française -->
   <p>🔒 <strong>Oups… cette ressource est réservée aux membres connectés !</strong></p>
   <p>Il faut se connecter pour la découvrir.</p>
   <p>💡 Avec l''option « Se souvenir de moi », ton navigateur te déroulera le 🟥tapis rouge🟥 la prochaine fois, sans passer par la case mot de passe.</p>
-</div>
-');
+</div>');
 INSERT INTO "Languages" VALUES (68,'Error503','<div class="text-center full-screen d-flex flex-column justify-content-center align-items-center">
     <div class="emoji">🚧</div>
 	<h1 class="mt-4">Site Under Maintenance</h1>

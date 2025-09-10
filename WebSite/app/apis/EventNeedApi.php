@@ -6,12 +6,13 @@ use Throwable;
 
 use app\enums\ApplicationError;
 use app\helpers\Application;
+use app\models\EventDataHelper;
 use app\models\EventNeedDataHelper;
 use app\valueObjects\ApiResponse;
 
 class EventNeedApi extends AbstractApi
 {
-    public function __construct(Application $application, private EventNeedDataHelper $eventNeedDataHelper)
+    public function __construct(Application $application, private EventNeedDataHelper $eventNeedDataHelper, private EventDataHelper $eventDataHelper)
     {
         parent::__construct($application);
     }
@@ -44,6 +45,10 @@ class EventNeedApi extends AbstractApi
             $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
+        if (!$this->eventDataHelper->eventExists($id)) {
+            $this->renderJsonBadRequest("Event ({$id}) doesn't exist", __FILE__, __LINE__);
+            return;
+        }
         try {
             $apiResponse = new ApiResponse(true, ApplicationError::Ok->value, ['needs' => $this->eventNeedDataHelper->needsForEvent($id)]);
             $this->renderJson($apiResponse->data, $apiResponse->success, $apiResponse->responseCode);
@@ -71,8 +76,7 @@ class EventNeedApi extends AbstractApi
         }
     }
 
-
-#region Private functions
+    #region Private functions
     private function deleteNeed_(int $id): ApiResponse
     {
         try {

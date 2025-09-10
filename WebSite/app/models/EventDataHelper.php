@@ -123,7 +123,6 @@ class EventDataHelper extends Data implements NewsProviderInterface
         throw new QueryException("Event ({$eventId}) doesn't exist");
     }
 
-
     public function getEventAttributes(int $eventId): array
     {
         if ($this->eventExists($eventId)) {

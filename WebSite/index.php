@@ -318,11 +318,6 @@ mapRoute($flight, 'GET  /user/presentation/@id:[0-9]+', $userPresentationControl
 $userStatisticsController = new UserStatisticsController($application, $personStatisticsDataHelper, $logDataHelper);
 mapRoute($flight, 'GET  /user/statistics', $userStatisticsController, 'showStatistics');
 
-
-
-
-
-
 $webappSettingsController = new WebappSettingsController($application);
 mapRoute($flight, 'GET  /settings', $webappSettingsController, 'editSettings');
 mapRoute($flight, 'POST /settings', $webappSettingsController, 'saveSettings');
@@ -359,13 +354,15 @@ $eventApi = new EventApi(
     new AuthorizationService($connectedUser),
     $eventDataHelper,
     new EventService(
-        $dataHelper,
         $eventDataHelper,
         $messageDataHelper,
         $participantDataHelper,
         $personPreferences,
         $personDataHelper
-    )
+    ),
+    $participantDataHelper,
+    $personPreferences,
+    $messageDataHelper
 );
 mapRoute($flight, 'GET  /api/attributes-by-event-type/@id:[0-9]+', $eventApi, 'getAttributesByEventType');
 mapRoute($flight, 'POST /api/event/delete/@id:[0-9]+', $eventApi, 'deleteEvent');
@@ -385,7 +382,7 @@ mapRoute($flight, 'POST /api/message/add', $eventMessageApi, 'addMessage');
 mapRoute($flight, 'POST /api/message/update', $eventMessageApi, 'updateMessage');
 mapRoute($flight, 'POST /api/message/delete', $eventMessageApi, 'deleteMessage');
 
-$eventNeedApi = new EventNeedApi($application, $eventNeedDataHelper);
+$eventNeedApi = new EventNeedApi($application, $eventNeedDataHelper, $eventDataHelper);
 mapRoute($flight, 'GET  /api/event-needs/@id:[0-9]+', $eventNeedApi, 'getEventNeeds');
 mapRoute($flight, 'POST /api/need/delete/@id:[0-9]+', $eventNeedApi, 'deleteNeed');
 mapRoute($flight, 'POST /api/need/save', $eventNeedApi, 'saveNeed');
