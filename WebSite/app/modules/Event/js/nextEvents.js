@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', function () {
         button.addEventListener('click', function (e) {
             e.stopPropagation();
             const row = this.closest('tr');
-            const eventId = row.getAttribute('onclick').match(/\/events\/(\d+)/)[1];
+            const eventId = row.getAttribute('onclick').match(/\/event\/(\d+)/)[1];
             fetchEventDetails(eventId);
         });
     });
@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', function () {
         button.addEventListener('click', function (e) {
             e.stopPropagation();
             const row = this.closest('tr');
-            const eventId = row.getAttribute('onclick').match(/\/events\/(\d+)/)[1];
+            const eventId = row.getAttribute('onclick').match(/\/event\/(\d+)/)[1];
             confirmAndDeleteEvent(eventId);
         });
     });
@@ -404,9 +404,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (data.success) {
                     bootstrap.Modal.getInstance(eventModal).hide();
                     window.location.reload();
-                } else {
-                    alert('Erreur: ' + (data.message || 'Erreur inconnue'));
-                }
+                } else alert('Erreur: ' + (data.message || 'Erreur inconnue'));
             })
             .catch(error => {
                 alert('Erreur de communication avec le serveur (3) :' + error.message);

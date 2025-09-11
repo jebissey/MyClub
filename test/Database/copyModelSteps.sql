@@ -20,5 +20,5 @@ SELECT
     Query,
     QueryExpectedResponse
 FROM Test
-WHERE Step BETWEEN 2410 AND 4030;
+WHERE Step BETWEEN 7690 AND 9330;
 

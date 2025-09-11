@@ -7,7 +7,7 @@ use app\helpers\Params;
 use app\models\NeedDataHelper;
 use app\modules\Common\AbstractController;
 
-class NeedController extends AbstractController
+class EventNeedController extends AbstractController
 {
     public function __construct(Application $application, private NeedDataHelper $needDataHelper)
     {

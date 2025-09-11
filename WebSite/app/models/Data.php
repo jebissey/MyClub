@@ -221,4 +221,17 @@ abstract class Data
             return false;
         }
     }
+
+    public function beginTransaction(): void
+    {
+        $this->pdo->beginTransaction();
+    }
+    public function commitTransaction(): void
+    {
+        $this->pdo->commit();
+    }
+    public function rollBackTransaction(): void
+    {
+        $this->pdo->rollBack();
+    }
 }

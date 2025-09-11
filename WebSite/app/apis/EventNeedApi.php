@@ -19,7 +19,7 @@ class EventNeedApi extends AbstractApi
 
     public function deleteNeed(int $id): void
     {
-        if (!$this->connectedUser->get()->isEventManager()) {
+        if (!$this->connectedUser->get()->isEventDesigner()) {
             $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }
@@ -28,8 +28,9 @@ class EventNeedApi extends AbstractApi
             return;
         }
         try {
-            $apiResponse = $this->deleteNeed_($id);
-            $this->renderJson($apiResponse->data, $apiResponse->success, $apiResponse->responseCode);
+            $deletedRows = $this->dataHelper->delete('Need', ['Id' => $id]);
+            if ($deletedRows === 1) $this->renderJson([], true, ApplicationError::Ok->value);
+            else  $this->renderJson([], false, ApplicationError::BadRequest->value);
         } catch (Throwable $e) {
             $this->renderJsonError($e->getMessage(), ApplicationError::Error->value);
         }
@@ -59,7 +60,7 @@ class EventNeedApi extends AbstractApi
 
     public function saveNeed(): void
     {
-        if (!$this->connectedUser->get()->isEventManager()) {
+        if (!$this->connectedUser->get()->isEventDesigner()) {
             $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }
@@ -77,17 +78,6 @@ class EventNeedApi extends AbstractApi
     }
 
     #region Private functions
-    private function deleteNeed_(int $id): ApiResponse
-    {
-        try {
-            $result = $this->dataHelper->delete('Need', ['Id' => $id]);
-            $success = $result === 1;
-        } catch (Throwable $e) {
-            $success = false;
-        }
-        return new ApiResponse($success, $success ? ApplicationError::Ok->value : ApplicationError::BadRequest->value, [], $e->getMessage());
-    }
-
     private function saveNeed_(array $data): ApiResponse
     {
         if (empty($data['label']))          return new ApiResponse(false, ApplicationError::BadRequest->value, [], 'Missing parameter label');

@@ -108,7 +108,6 @@ class AuthenticationService
     public function resetPassword(string $token, string $newPassword): bool
     {
         $person = $this->dataHelper->get('Person', ['Token' => $token], 'Id, TokenCreatedAt');
-        error_log("\n\n" . json_encode($person, JSON_PRETTY_PRINT) . "\n");
         if (!$person || $person->TokenCreatedAt === null || (new DateTime($person->TokenCreatedAt))->diff(new DateTime())->h >= 1) return false;
         $this->dataHelper->set('Person', [
             'Password' => Password::signPassword($newPassword),

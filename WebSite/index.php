@@ -46,7 +46,9 @@ use app\modules\Article\MediaController;
 use app\modules\Article\SurveyController;
 use app\modules\Event\EventController;
 use app\modules\Event\EventTypeController;
-use app\modules\Event\NeedController;
+use app\modules\Event\EventEmailController;
+use app\modules\Event\EventGuestController;
+use app\modules\Event\EventNeedController;
 use app\modules\PersonManager\GroupController;
 use app\modules\PersonManager\ImportController;
 use app\modules\PersonManager\PersonController;
@@ -169,13 +171,10 @@ mapRoute($flight, 'GET  /design/create', $designController, 'create');
 mapRoute($flight, 'POST /design/save', $designController, 'save');
 
 $eventController = new EventController($application, $eventDataHelper);
-mapRoute($flight, 'GET  /emails', $eventController, 'fetchEmails');
-mapRoute($flight, 'POST /emails', $eventController, 'copyEmails');
 mapRoute($flight, 'GET  /emails/article/@id:[0-9]+', $eventController, 'fetchEmailsForArticle');
 mapRoute($flight, 'GET  /eventManager', $eventController, 'home');
 mapRoute($flight, 'GET  /eventManager/help', $eventController, 'help');
 mapRoute($flight, 'GET  /event/chat/@id:[0-9]+', $eventController, 'showEventChat');
-
 mapRoute($flight, 'GET  /event/@id:[0-9]+', $eventController, 'show');
 $flight->route('GET  /event/@id:[0-9]+/register', function ($id) use ($eventController) {
     $eventController->register($id, true);
@@ -188,10 +187,19 @@ $flight->route('GET /event/@id:[0-9]+/@token:[a-f0-9]+', function ($id, $token) 
 });
 mapRoute($flight, 'GET  /event/location', $eventController, 'location');
 mapRoute($flight, 'GET  /events/crosstab', $eventController, 'showEventCrosstab');
-mapRoute($flight, 'GET  /events/guest', $eventController, 'guest');
-mapRoute($flight, 'POST /events/guest', $eventController, 'guestInvite');
 mapRoute($flight, 'GET /nextEvents', $eventController, 'nextEvents');
 mapRoute($flight, 'GET  /weekEvents', $eventController, 'weekEvents');
+
+$eventEmailController = new EventEmailController($application);
+mapRoute($flight, 'GET  /emails', $eventEmailController, 'fetchEmails');
+mapRoute($flight, 'POST /emails', $eventEmailController, 'copyEmails');
+
+$eventGuestController = new EventGuestController($application, $eventDataHelper);
+mapRoute($flight, 'GET  /events/guest', $eventGuestController, 'guest');
+mapRoute($flight, 'POST /events/guest', $eventGuestController, 'guestInvite');
+
+$eventNeedController = new EventNeedController($application, $needDataHelper);
+mapRoute($flight, 'GET /needs', $eventNeedController, 'needs');
 
 $eventTypeController = new EventTypeController($application, $eventDataHelper);
 mapRoute($flight, 'GET  /eventTypes', $eventTypeController, 'index');
@@ -245,9 +253,6 @@ $navBarController = new NavBarController($application);
 mapRoute($flight, 'GET /navBar', $navBarController, 'index');
 mapRoute($flight, 'GET /navBar/show/article/@id:[0-9]+', $navBarController, 'showArticle');
 mapRoute($flight, 'GET /navBar/show/arwards', $navBarController, 'showArwards');
-
-$needController = new NeedController($application, $needDataHelper);
-mapRoute($flight, 'GET /needs', $needController, 'needs');
 
 $personController = new PersonController($application);
 mapRoute($flight, 'GET  /personManager', $personController, 'home');
