@@ -135,13 +135,14 @@ $news = new News([
 ]);
 
 #region web
-$articleController = new ArticleController($application, $articleDataHelper, $articleTableDataHelper, $authorizationDataHelper);
+$articleController = new ArticleController($application, $articleDataHelper, $articleTableDataHelper, $authorizationDataHelper, $personDataHelper);
 mapRoute($flight, 'GET  /article/create', $articleController, 'create');
 mapRoute($flight, 'POST /article/delete/@id:[0-9]+', $articleController, 'delete');
 mapRoute($flight, 'GET  /article/@id:[0-9]+', $articleController, 'show');
 mapRoute($flight, 'POST /article/@id:[0-9]+', $articleController, 'update');
 mapRoute($flight, 'GET  /articles', $articleController, 'index');
 mapRoute($flight, 'GET  /articles/crosstab', $articleController, 'showArticleCrosstab');
+mapRoute($flight, 'GET  /emails/article/@id:[0-9]+', $articleController, 'fetchEmailsForArticle');
 mapRoute($flight, 'GET  /publish/article/@id:[0-9]+', $articleController, 'publish');
 mapRoute($flight, 'POST /publish/article/@id:[0-9]+', $articleController, 'publish');
 mapRoute($flight, 'GET  /redactor', $articleController, 'home');
@@ -171,7 +172,6 @@ mapRoute($flight, 'GET  /design/create', $designController, 'create');
 mapRoute($flight, 'POST /design/save', $designController, 'save');
 
 $eventController = new EventController($application, $eventDataHelper);
-mapRoute($flight, 'GET  /emails/article/@id:[0-9]+', $eventController, 'fetchEmailsForArticle');
 mapRoute($flight, 'GET  /eventManager', $eventController, 'home');
 mapRoute($flight, 'GET  /eventManager/help', $eventController, 'help');
 mapRoute($flight, 'GET  /event/chat/@id:[0-9]+', $eventController, 'showEventChat');

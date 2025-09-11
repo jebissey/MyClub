@@ -3,10 +3,10 @@
 namespace app\modules\Event;
 
 use DateTime;
-use RuntimeException;
 use Throwable;
 
 use app\enums\ApplicationError;
+use app\enums\EventAudience;
 use app\enums\EventSearchMode;
 use app\enums\FilterInputRule;
 use app\exceptions\QueryException;
@@ -14,11 +14,9 @@ use app\helpers\Application;
 use app\helpers\Params;
 use app\helpers\PeriodHelper;
 use app\helpers\WebApp;
-use app\services\EmailService;
 use app\models\CrosstabDataHelper;
 use app\models\EventDataHelper;
 use app\models\MessageDataHelper;
-use app\models\PersonDataHelper;
 use app\models\ParticipantDataHelper;
 use app\modules\Common\AbstractController;
 
@@ -202,7 +200,9 @@ class EventController extends AbstractController
                     ]));
                 }
             } else {
-                $this->raiseForbidden('User not allowed',  __FILE__, __LINE__);
+                $event = $this->dataHelper->get('Event', ['Id' => $eventId], 'Audience');
+                if ($event->Audience === EventAudience::ForAll->value) $this->redirect('/contact/event/' . $eventId);
+                else  $this->raiseForbidden('User not allowed',  __FILE__, __LINE__);
                 return;
             }
             $this->redirect('/event/' . $eventId);
@@ -281,42 +281,5 @@ class EventController extends AbstractController
             'person' => $this->connectedUser->person,
             'navItems' => $this->getNavItems($this->connectedUser->person),
         ]));
-    }
-
-    public function fetchEmailsForArticle(int $idArticle): void
-    {
-        if (!($this->connectedUser->get()->isRedactor() ?? false)) {
-            $this->raiseforbidden(__FILE__, __LINE__);
-            return;
-        }
-        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
-            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
-        $article = $this->dataHelper->get('Article', ['Id', $idArticle], 'CreatedBy');
-        if (!$article) throw new RuntimeException('Fatal program error in file ' + __FILE__ + ' at line ' + __LINE__);
-        $articleCreatorEmail = $this->dataHelper->get('Person', ['Id', $article->CreatedBy], 'Email')->Email;
-        if (!$articleCreatorEmail) {
-            $this->raiseBadRequest("Unknown author of article {$idArticle}", __FILE__, __LINE__);
-            return;
-        }
-        $filteredEmails = (new PersonDataHelper($this->application))->getPersonWantedToBeAlerted($idArticle);
-        $root = Application::$root;
-        $articleLink = $root . '/article/' . $idArticle;
-        $unsubscribeLink = $root . '/user/preferences';
-        $emailTitle = 'BNW - Un nouvel article est disponible';
-        $message = "Conformément à vos souhaits, ce message vous signale la présence d'un nouvel article" . "\n\n" . $articleLink
-            . "\n\n Pour ne plus recevoir ce type de message vous pouvez mettre à jour vos préférences" . $unsubscribeLink;
-        EmailService::send(
-            $articleCreatorEmail,
-            $articleCreatorEmail,
-            $emailTitle,
-            $message,
-            null,
-            $filteredEmails,
-            false
-        );
-        $_SESSION['success'] = "Un courriel a été envoyé aux abonnés";
-        $this->redirect('/article/' . $idArticle);
     }
 }

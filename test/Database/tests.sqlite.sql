@@ -948,7 +948,7 @@ INSERT INTO "Test" VALUES (991,107790,'GET','/api/attributes-by-event-type/1',NU
 INSERT INTO "Test" VALUES (992,107800,'GET','/api/attributes/list',NULL,NULL,'{"email":"redactor@myclub.foo","password":"redactor1234" }','200',NULL,NULL);
 INSERT INTO "Test" VALUES (993,107810,'GET','/api/author/1',NULL,NULL,'{"email":"redactor@myclub.foo","password":"redactor1234" }','400',NULL,NULL);
 INSERT INTO "Test" VALUES (994,107820,'GET','/api/carousel/1',NULL,NULL,'{"email":"redactor@myclub.foo","password":"redactor1234" }','400',NULL,NULL);
-INSERT INTO "Test" VALUES (995,107830,'POST','/api/carousel/delete/1',NULL,'{}','{"email":"redactor@myclub.foo","password":"redactor1234" }','403',NULL,NULL);
+INSERT INTO "Test" VALUES (995,107830,'POST','/api/carousel/delete/1',NULL,'{}','{"email":"redactor@myclub.foo","password":"redactor1234" }','400',NULL,NULL);
 INSERT INTO "Test" VALUES (996,107840,'POST','/api/carousel/save',NULL,NULL,'{"email":"redactor@myclub.foo","password":"redactor1234" }','400',NULL,NULL);
 INSERT INTO "Test" VALUES (997,107850,'POST','/api/design/vote',NULL,NULL,'{"email":"redactor@myclub.foo","password":"redactor1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (998,107860,'GET','/api/event-needs/1',NULL,NULL,'{"email":"redactor@myclub.foo","password":"redactor1234" }','400',NULL,NULL);
@@ -1101,5 +1101,5 @@ INSERT INTO "Test" VALUES (1144,109240,'POST','/user/setPassword/0123456789abcde
 INSERT INTO "Test" VALUES (1145,109260,'POST','/user/sign/in',NULL,'{"email":"personManager@myclub.foo","password":"HumanRessources1234" }','{"email":"redactor@myclub.foo","password":"redactor1234" }','200',NULL,NULL);
 INSERT INTO "Test" VALUES (1146,107690,'GET','/user/setPassword/0123456789abcdef4',NULL,NULL,NULL,'200','SELECT Email, FirstName, LastName, Token from Person Where Id = 4
 ','[{"Email":"redactor@myclub.foo","FirstName":"Redactor","LastName":"Manager","Token":"0123456789abcdef4"}]');
-INSERT INTO "Test" VALUES (1147,107700,'POST','/user/setPassword/0123456789abcdef4',NULL,'{"token": "0123456789abcdef4", "password": "redator1234"}',NULL,'200','SELECT Email, FirstName, LastName, Password From Person Where Id = 4','[{"Email":"redactor@myclub.foo","FirstName":"Redactor","LastName":"Manager","Password":"3df0ae163b1e7e0315885b5b75941807d3df1c33ab05e1b8a5fa8fe268fbd573"}]');
+INSERT INTO "Test" VALUES (1147,107700,'POST','/user/setPassword/0123456789abcdef4',NULL,'{"token": "0123456789abcdef4", "password": "redactor1234"}',NULL,'200','SELECT Email, FirstName, LastName, Password From Person Where Id = 4','[{"Email":"redactor@myclub.foo","FirstName":"Redactor","LastName":"Manager","Password":"28f5bbf0cf07213e91923715c8d2e6a79090274806b5662ef573afd6c38bf070"}]');
 COMMIT;

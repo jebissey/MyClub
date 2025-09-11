@@ -53,11 +53,11 @@
             </a>
             <strong>{$event->Summary}</strong>
         </div>
-        {if !$userEmail && !$token}
+        {if !$userEmail && !$token && $event->Audience != 'All'}
             <div class="alert alert-info">
                 <p>
                     <b>
-                        Il faut être connecté pour pouvoir s'inscrire à un événement.
+                        Il faut être connecté pour pouvoir s'inscrire à cet événement.
                     </b>
                 </p>
             </div>

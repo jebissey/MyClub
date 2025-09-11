@@ -18,6 +18,7 @@ use app\models\AuthorizationDataHelper;
 use app\models\DataHelper;
 use app\models\PersonDataHelper;
 use app\modules\Common\TableController;
+use app\services\EmailService;
 
 class ArticleController extends TableController
 {
@@ -26,7 +27,8 @@ class ArticleController extends TableController
         Application $application,
         private ArticleDataHelper $articleDataHelper,
         private ArticleTableDataHelper $articleTableDataHelper,
-        private AuthorizationDataHelper $authorizationDatahelper
+        private AuthorizationDataHelper $authorizationDatahelper,
+        private PersonDataHelper $personDataHelper
     ) {
         parent::__construct($application);
     }
@@ -308,5 +310,45 @@ class ArticleController extends TableController
             'title' => 'Rédateurs vs audience',
             'totalLabels' => ['articles', '']
         ]));
+    }
+
+    public function fetchEmailsForArticle(int $idArticle): void
+    {
+        if (!($this->connectedUser->get()->isRedactor() ?? false)) {
+            $this->raiseforbidden(__FILE__, __LINE__);
+            return;
+        }
+        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+            return;
+        }
+        $article = $this->dataHelper->get('Article', ['Id', $idArticle], 'CreatedBy');
+        if (!$article) {
+            $this->raiseBadRequest("Article {$idArticle} doesn't exist", __FILE__, __LINE__);
+            return;
+        }
+        $articleCreatorEmail = $this->dataHelper->get('Person', ['Id', $article->CreatedBy], 'Email')->Email;
+        if (!$articleCreatorEmail) {
+            $this->raiseBadRequest("Unknown author of article {$idArticle}", __FILE__, __LINE__);
+            return;
+        }
+        $filteredEmails = $this->personDataHelper->getPersonWantedToBeAlerted($idArticle);
+        $root = Application::$root;
+        $articleLink = $root . '/article/' . $idArticle;
+        $unsubscribeLink = $root . '/user/preferences';
+        $emailTitle = 'BNW - Un nouvel article est disponible';
+        $message = "Conformément à vos souhaits, ce message vous signale la présence d'un nouvel article" . "\n\n" . $articleLink
+            . "\n\n Pour ne plus recevoir ce type de message vous pouvez mettre à jour vos préférences" . $unsubscribeLink;
+        EmailService::send(
+            $articleCreatorEmail,
+            $articleCreatorEmail,
+            $emailTitle,
+            $message,
+            null,
+            $filteredEmails,
+            false
+        );
+        $_SESSION['success'] = "Un courriel a été envoyé aux abonnés";
+        $this->redirect('/article/' . $idArticle);
     }
 }
