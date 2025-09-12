@@ -276,15 +276,21 @@ class ArticleController extends TableController
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
         }
-        if (($_SERVER['REQUEST_METHOD'] === 'POST')) {
-            $article = $this->articleDataHelper->getLatestArticle([$id]);
-            if (!$article || $this->connectedUser->person->Id != $article->CreatedBy) {
-                $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
-                return;
-            }
-            $this->dataHelper->delete('Article', ['Id' => $id]);
-            $this->redirect('/articles');
-        } else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+            return;
+        }
+        $article = $this->dataHelper->get('Article', ['Id' => $id], 'CreatedBy');
+        if (!$article) {
+            $this->raiseBadRequest("Article {$id} doesn't exist", __FILE__, __LINE__);
+            return;
+        }
+        if ($this->connectedUser->person->Id != $article->CreatedBy) {
+            $this->raiseforbidden(__FILE__, __LINE__);
+            return;
+        }
+        $this->dataHelper->delete('Article', ['Id' => $id]);
+        $this->redirect('/articles');
     }
 
     public function showArticleCrosstab()

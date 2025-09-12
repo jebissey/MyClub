@@ -1,0 +1,433 @@
+{extends '../../Webmaster/views/gameManager.latte'}
+
+{block content}
+<div id="liveAlertPlaceholder"></div>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <h2>Apprentissage du Solfège</h2>
+        </div>
+    </div>
+    
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <!-- Partition -->
+            <div class="card">
+                <div class="card-header">
+                    <h5>Partition</h5>
+                </div>
+                <div class="card-body">
+                    <div id="staff-container">
+                        <svg id="staff" width="600" height="200" viewBox="0 0 600 200">
+                            <!-- Portée -->
+                            <g id="staff-lines">
+                                <line x1="50" y1="50" x2="550" y2="50" stroke="#000" stroke-width="1"/>
+                                <line x1="50" y1="70" x2="550" y2="70" stroke="#000" stroke-width="1"/>
+                                <line x1="50" y1="90" x2="550" y2="90" stroke="#000" stroke-width="1"/>
+                                <line x1="50" y1="110" x2="550" y2="110" stroke="#000" stroke-width="1"/>
+                                <line x1="50" y1="130" x2="550" y2="130" stroke="#000" stroke-width="1"/>
+                                <!-- Clé de sol -->
+                                <text x="60" y="95" font-family="Arial" font-size="40" font-weight="bold">𝄞</text>
+                            </g>
+                            <!-- Note actuelle -->
+                            <g id="current-note">
+                                <circle cx="150" cy="90" r="8" fill="#007bff" stroke="#000" stroke-width="1"/>
+                            </g>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <!-- Statistiques -->
+            <div class="card">
+                <div class="card-header">
+                    <h5>Statistiques</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <strong>Note actuelle:</strong> <span id="current-note-name">Do (C4)</span>
+                    </div>
+                    <div class="mb-3">
+                        <strong>Tentatives:</strong> <span id="attempts">0</span>
+                    </div>
+                    <div class="mb-3">
+                        <strong>Temps:</strong> <span id="timer">0.0s</span>
+                    </div>
+                    <div class="mb-3">
+                        <strong>Score total:</strong> <span id="total-score">0</span>
+                    </div>
+                    <button class="btn btn-success" id="next-note-btn" disabled>Note suivante</button>
+                    <button class="btn btn-secondary" id="reset-btn">Recommencer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-12">
+            <!-- Piano virtuel -->
+            <div class="card">
+                <div class="card-header">
+                    <h5>Piano Virtuel</h5>
+                </div>
+                <div class="card-body">
+                    <div id="piano-container">
+                        <div class="piano-keyboard">
+                            <!-- Touches blanches -->
+                            <div class="piano-key white" data-note="C4" data-note-name="Do">
+                                <span class="note-label">Do</span>
+                            </div>
+                            <div class="piano-key black" data-note="C#4" data-note-name="Do#">
+                                <span class="note-label">Do#</span>
+                            </div>
+                            <div class="piano-key white" data-note="D4" data-note-name="Ré">
+                                <span class="note-label">Ré</span>
+                            </div>
+                            <div class="piano-key black" data-note="D#4" data-note-name="Ré#">
+                                <span class="note-label">Ré#</span>
+                            </div>
+                            <div class="piano-key white" data-note="E4" data-note-name="Mi">
+                                <span class="note-label">Mi</span>
+                            </div>
+                            <div class="piano-key white" data-note="F4" data-note-name="Fa">
+                                <span class="note-label">Fa</span>
+                            </div>
+                            <div class="piano-key black" data-note="F#4" data-note-name="Fa#">
+                                <span class="note-label">Fa#</span>
+                            </div>
+                            <div class="piano-key white" data-note="G4" data-note-name="Sol">
+                                <span class="note-label">Sol</span>
+                            </div>
+                            <div class="piano-key black" data-note="G#4" data-note-name="Sol#">
+                                <span class="note-label">Sol#</span>
+                            </div>
+                            <div class="piano-key white" data-note="A4" data-note-name="La">
+                                <span class="note-label">La</span>
+                            </div>
+                            <div class="piano-key black" data-note="A#4" data-note-name="La#">
+                                <span class="note-label">La#</span>
+                            </div>
+                            <div class="piano-key white" data-note="B4" data-note-name="Si">
+                                <span class="note-label">Si</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}
+
+{block styles}
+<style>
+.piano-keyboard {
+    display: flex;
+    position: relative;
+    margin: 20px 0;
+    user-select: none;
+}
+
+.piano-key {
+    cursor: pointer;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    transition: background-color 0.1s;
+    border: 1px solid #333;
+}
+
+.piano-key.white {
+    width: 50px;
+    height: 150px;
+    background-color: #fff;
+    z-index: 1;
+}
+
+.piano-key.black {
+    width: 30px;
+    height: 100px;
+    background-color: #333;
+    color: white;
+    position: absolute;
+    z-index: 2;
+    margin-left: -15px;
+}
+
+.piano-key.white:hover {
+    background-color: #f0f0f0;
+}
+
+.piano-key.black:hover {
+    background-color: #666;
+}
+
+.piano-key.active {
+    background-color: #007bff !important;
+    color: white !important;
+}
+
+.piano-key.correct {
+    background-color: #28a745 !important;
+    color: white !important;
+}
+
+.piano-key.incorrect {
+    background-color: #dc3545 !important;
+    color: white !important;
+}
+
+.note-label {
+    font-size: 12px;
+    margin-bottom: 5px;
+}
+
+/* Positionnement des touches noires */
+.piano-key[data-note="C#4"] { left: 35px; }
+.piano-key[data-note="D#4"] { left: 85px; }
+.piano-key[data-note="F#4"] { left: 185px; }
+.piano-key[data-note="G#4"] { left: 235px; }
+.piano-key[data-note="A#4"] { left: 285px; }
+
+#staff-container {
+    background-color: #f8f9fa;
+    border-radius: 5px;
+    padding: 20px;
+    margin: 10px 0;
+}
+
+.card {
+    margin-bottom: 20px;
+}
+
+#timer {
+    font-family: 'Courier New', monospace;
+    font-weight: bold;
+}
+</style>
+{/block}
+
+{block scripts}
+<script>
+class SolfegeGame {
+    constructor() {
+        this.notes = [
+            {note: 'C4', name: 'Do', y: 140},  // Sous la portée
+            {note: 'D4', name: 'Ré', y: 130},  // Sur la ligne
+            {note: 'E4', name: 'Mi', y: 120},  // Entre les lignes
+            {note: 'F4', name: 'Fa', y: 110},  // Sur la ligne
+            {note: 'G4', name: 'Sol', y: 100}, // Entre les lignes
+            {note: 'A4', name: 'La', y: 90},   // Sur la ligne
+            {note: 'B4', name: 'Si', y: 80},   // Entre les lignes
+        ];
+        
+        this.currentNoteIndex = 0;
+        this.attempts = 0;
+        this.startTime = null;
+        this.scores = [];
+        this.totalScore = 0;
+        
+        this.init();
+    }
+    
+    init() {
+        this.bindEvents();
+        this.startNewNote();
+    }
+    
+    bindEvents() {
+        // Événements des touches du piano
+        document.querySelectorAll('.piano-key').forEach(key => {
+            key.addEventListener('click', (e) => this.handleKeyPress(e));
+        });
+        
+        // Bouton note suivante
+        document.getElementById('next-note-btn').addEventListener('click', () => this.nextNote());
+        
+        // Bouton reset
+        document.getElementById('reset-btn').addEventListener('click', () => this.reset());
+    }
+    
+    startNewNote() {
+        this.attempts = 0;
+        this.startTime = Date.now();
+        
+        // Réinitialiser les couleurs des touches
+        document.querySelectorAll('.piano-key').forEach(key => {
+            key.classList.remove('correct', 'incorrect', 'active');
+        });
+        
+        // Afficher la nouvelle note
+        this.displayNote();
+        this.updateUI();
+        
+        // Désactiver le bouton suivant
+        document.getElementById('next-note-btn').disabled = true;
+        
+        // Démarrer le timer
+        this.updateTimer();
+    }
+    
+    displayNote() {
+        const currentNote = this.notes[this.currentNoteIndex];
+        const noteElement = document.querySelector('#current-note circle');
+        
+        // Positionner la note sur la portée
+        noteElement.setAttribute('cy', currentNote.y);
+        
+        // Ajouter une ligne supplémentaire pour Do (C4)
+        const staffLines = document.getElementById('staff-lines');
+        const existingExtraLine = document.getElementById('extra-line-c');
+        
+        if (currentNote.note === 'C4') {
+            if (!existingExtraLine) {
+                const extraLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                extraLine.setAttribute('id', 'extra-line-c');
+                extraLine.setAttribute('x1', '130');
+                extraLine.setAttribute('y1', '140');
+                extraLine.setAttribute('x2', '170');
+                extraLine.setAttribute('y2', '140');
+                extraLine.setAttribute('stroke', '#000');
+                extraLine.setAttribute('stroke-width', '1');
+                staffLines.appendChild(extraLine);
+            }
+        } else if (existingExtraLine) {
+            existingExtraLine.remove();
+        }
+    }
+    
+    updateTimer() {
+        if (this.startTime && document.getElementById('next-note-btn').disabled) {
+            const elapsed = (Date.now() - this.startTime) / 1000;
+            document.getElementById('timer').textContent = elapsed.toFixed(1) + 's';
+            setTimeout(() => this.updateTimer(), 100);
+        }
+    }
+    
+    handleKeyPress(e) {
+        if (document.getElementById('next-note-btn').disabled === false) return;
+        
+        this.attempts++;
+        const pressedNote = e.target.closest('.piano-key').dataset.note;
+        const currentNote = this.notes[this.currentNoteIndex];
+        
+        // Effet visuel sur la touche
+        e.target.closest('.piano-key').classList.add('active');
+        setTimeout(() => {
+            e.target.closest('.piano-key').classList.remove('active');
+        }, 150);
+        
+        if (pressedNote === currentNote.note) {
+            // Bonne réponse
+            const totalTime = Date.now() - this.startTime;
+            
+            // Enregistrer le score
+            this.scores.push({
+                note: currentNote.note,
+                attempts: this.attempts,
+                totalTime: totalTime
+            });
+            
+            // Effet visuel de succès
+            e.target.closest('.piano-key').classList.add('correct');
+            
+            // Calculer le score (moins d'erreurs et moins de temps = meilleur score)
+            const score = Math.max(100 - (this.attempts - 1) * 10 - Math.floor(totalTime / 1000), 10);
+            this.totalScore += score;
+            
+            // Activer le bouton suivant
+            document.getElementById('next-note-btn').disabled = false;
+            
+            // Notification de succès
+            this.showAlert('Correct ! Score: ' + score, 'success');
+            
+        } else {
+            // Mauvaise réponse
+            e.target.closest('.piano-key').classList.add('incorrect');
+            setTimeout(() => {
+                e.target.closest('.piano-key').classList.remove('incorrect');
+            }, 500);
+            
+            this.showAlert('Essayez encore !', 'warning');
+        }
+        
+        this.updateUI();
+    }
+    
+    nextNote() {
+        this.currentNoteIndex = (this.currentNoteIndex + 1) % this.notes.length;
+        this.startNewNote();
+        
+        // Sauvegarder périodiquement
+        if (this.scores.length % 5 === 0) {
+            this.saveScores();
+        }
+    }
+    
+    reset() {
+        this.currentNoteIndex = 0;
+        this.attempts = 0;
+        this.scores = [];
+        this.totalScore = 0;
+        this.startNewNote();
+        this.showAlert('Jeu réinitialisé !', 'info');
+    }
+    
+    updateUI() {
+        const currentNote = this.notes[this.currentNoteIndex];
+        document.getElementById('current-note-name').textContent = 
+            `${currentNote.name} (${currentNote.note})`;
+        document.getElementById('attempts').textContent = this.attempts;
+        document.getElementById('total-score').textContent = this.totalScore;
+    }
+    
+    saveScores() {
+        if (this.scores.length === 0) return;
+        
+        fetch('/solfege/save-score', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                scores: this.scores
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                this.showAlert('Scores sauvegardés !', 'success');
+            }
+        })
+        .catch(error => {
+            console.error('Erreur:', error);
+        });
+    }
+    
+    showAlert(message, type) {
+        const alertHtml = `
+            <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        `;
+        document.getElementById('liveAlertPlaceholder').innerHTML = alertHtml;
+        
+        // Auto-dismiss après 3 secondes
+        setTimeout(() => {
+            const alert = document.querySelector('.alert');
+            if (alert) {
+                alert.remove();
+            }
+        }, 3000);
+    }
+}
+
+// Initialiser le jeu au chargement de la page
+document.addEventListener('DOMContentLoaded', function() {
+    new SolfegeGame();
+});
+</script>
+{/block}

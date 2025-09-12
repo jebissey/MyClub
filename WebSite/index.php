@@ -49,6 +49,7 @@ use app\modules\Event\EventTypeController;
 use app\modules\Event\EventEmailController;
 use app\modules\Event\EventGuestController;
 use app\modules\Event\EventNeedController;
+use app\modules\Games\Solfege\SolfegeController;
 use app\modules\PersonManager\GroupController;
 use app\modules\PersonManager\ImportController;
 use app\modules\PersonManager\PersonController;
@@ -339,6 +340,12 @@ mapRoute($flight, 'GET  /visitorInsights', $webmasterController, 'visitorInsight
 mapRoute($flight, 'GET  /visitorInsights/help', $webmasterController, 'helpVisitorInsights');
 mapRoute($flight, 'GET  /webmaster', $webmasterController, 'homeWebmaster');
 #endregion
+
+#region games
+$solfegeController = new SolfegeController($application);
+mapRoute($flight, 'GET  /games/solfege/learn', $solfegeController, 'learn');
+mapRoute($flight, 'POST /games/solfege/save-score', $solfegeController, 'saveScore');
+#endrefion
 
 #region api
 $articleApi = new ArticleApi($application);
