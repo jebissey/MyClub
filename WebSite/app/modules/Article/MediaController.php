@@ -67,7 +67,7 @@ class MediaController extends AbstractController
         $filename = basename($filename);
         $filePath = Media::GetMediaPath() . $year . '/' . $month . '/' . $filename;
         if (!file_exists($filePath)) {
-            $this->application->getErrorManager()->raise(ApplicationError::PageNotFound, "File $filePath not found in file " . __FILE__ . ' at line ' . __LINE__);
+            $this->raiseBadRequest("File $filePath not found in file ", __FILE__, __LINE__);
             return;
         }
         $finfo = finfo_open(FILEINFO_MIME_TYPE);

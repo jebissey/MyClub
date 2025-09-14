@@ -52,12 +52,16 @@ class TestExecutor
         $results = [];
         foreach ($simulations as $i =>  $simulation) {
             $simuNumber = $i + 1;
-            if ($simuFilter === null || $simuFilter === $simuNumber || $startFilter === null || $startFilter >= $simuNumber) {
-                $this->reporter->diplayTest($simuNumber, $totalSimulations, $simulation->route->method, $simulation->route->originalPath);
-                $tests = $this->runRouteTests($simulation->route, $simulation->number, $simulation, $stop);
-                $results = array_merge($results, $tests);
-                $this->reporter->diplayResult($tests[0]->route->testedPath, $tests[0]->response->httpCode, $tests[0]->response->responseTimeMs, $simulation->postParams);
+            if ($simuFilter !== null) {
+                if ($simuNumber !== $simuFilter) continue;
             }
+            if ($startFilter !== null) {
+                if ($simuNumber < $startFilter) continue;
+            }
+            $this->reporter->diplayTest($simuNumber, $totalSimulations, $simulation->route->method, $simulation->route->originalPath);
+            $tests = $this->runRouteTests($simulation->route, $simulation->number, $simulation, $stop);
+            $results = array_merge($results, $tests);
+            $this->reporter->diplayResult($tests[0]->route->testedPath, $tests[0]->response->httpCode, $tests[0]->response->responseTimeMs, $simulation->postParams);
         }
         return $results;
     }
