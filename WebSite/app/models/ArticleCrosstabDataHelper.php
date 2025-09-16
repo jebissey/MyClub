@@ -7,7 +7,7 @@ use app\models\CrosstabDataHelper;
 
 class ArticleCrosstabDataHelper extends Data
 {
-    public function __construct(Application $application)
+    public function __construct(Application $application, private CrosstabDataHelper $crosstabDataHelper)
     {
         parent::__construct($application);
     }
@@ -34,7 +34,7 @@ class ArticleCrosstabDataHelper extends Data
             AND a.PublishedBy IS NOT NULL
             ORDER BY p.LastName, p.FirstName
         ";
-        return (new CrosstabDataHelper($this->application))->generateCrosstab(
+        return $this->crosstabDataHelper->generateCrosstab(
             $sql,
             [':start' => $dateRange['start'], ':end' => $dateRange['end']],
             'Audience',

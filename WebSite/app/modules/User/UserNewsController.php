@@ -7,21 +7,31 @@ use app\helpers\Application;
 use app\helpers\News;
 use app\helpers\Params;
 use app\helpers\WebApp;
+use app\models\AuthorizationDataHelper;
+use app\models\DataHelper;
+use app\models\LanguagesDataHelper;
+use app\models\PageDataHelper;
 use app\modules\Common\AbstractController;
 
 class UserNewsController extends AbstractController
 {
-    public function __construct(Application $application, private News $news)
-    {
-        parent::__construct($application);
+    public function __construct(
+        Application $application,
+        private News $news,
+        DataHelper $dataHelper,
+        LanguagesDataHelper $languagesDataHelper,
+        PageDataHelper $pageDataHelper,
+        AuthorizationDataHelper $authorizationDataHelper
+    ) {
+        parent::__construct($application, $dataHelper, $languagesDataHelper, $pageDataHelper, $authorizationDataHelper);
     }
 
     public function showNews(): void
     {
-        $connectedUser = $this->connectedUser->get(1);
+        $connectedUser = $this->application->getConnectedUser()->get(1);
         if ($connectedUser->person ?? false) {
             $searchMode = WebApp::getFiltered('from', $this->application->enumToValues(\app\enums\Period::class), $this->flight->request()->query->getData()) ?: \app\enums\Period::Signout->value;
-            
+
             if ($searchMode === \app\enums\Period::Signin->value) $searchFrom = $connectedUser->person->LastSignIn ?? '';
             elseif ($searchMode === \app\enums\Period::Signout->value) $searchFrom = $connectedUser->person->LastSignOut ?? '';
             elseif ($searchMode === \app\enums\Period::Week->value)    $searchFrom = date('Y-m-d H:i:s', strtotime('-1 week'));

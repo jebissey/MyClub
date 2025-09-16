@@ -6,20 +6,31 @@ use app\enums\FilterInputRule;
 use app\helpers\Application;
 use app\helpers\Params;
 use app\helpers\WebApp;
+use app\models\AuthorizationDataHelper;
+use app\models\DataHelper;
 use app\models\GroupDataHelper;
+use app\models\LanguagesDataHelper;
+use app\models\PageDataHelper;
 use app\models\PersonGroupDataHelper;
 use app\modules\Common\AbstractController;
 
 class UserGroupsController extends AbstractController
 {
-    public function __construct(Application $application, private PersonGroupDataHelper $personGroupDataHelper, private GroupDataHelper $groupDataHelper)
-    {
-        parent::__construct($application);
+    public function __construct(
+        Application $application,
+        private PersonGroupDataHelper $personGroupDataHelper,
+        private GroupDataHelper $groupDataHelper,
+        DataHelper $dataHelper,
+        LanguagesDataHelper $languagesDataHelper,
+        PageDataHelper $pageDataHelper,
+        AuthorizationDataHelper $authorizationDataHelper
+    ) {
+        parent::__construct($application, $dataHelper, $languagesDataHelper, $pageDataHelper, $authorizationDataHelper);
     }
 
     public function groups(): void
     {
-        $person = $this->connectedUser->get()->person;
+        $person = $this->application->getConnectedUser()->get()->person;
         if ($person === null) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
@@ -39,7 +50,7 @@ class UserGroupsController extends AbstractController
 
     public function groupsSave(): void
     {
-        $person = $this->connectedUser->get(1)->person;
+        $person = $this->application->getConnectedUser()->get(1)->person;
         if ($person === null) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return;

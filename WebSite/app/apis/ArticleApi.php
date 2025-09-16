@@ -7,9 +7,12 @@ use Throwable;
 
 use app\enums\ApplicationError;
 use app\helpers\Application;
+use app\helpers\ConnectedUser;
 use app\helpers\Media;
 use app\models\ArticleDataHelper;
+use app\models\DataHelper;
 use app\models\DesignDataHelper;
+use app\models\PersonDataHelper;
 use app\models\ReplyDataHelper;
 
 class ArticleApi extends AbstractApi
@@ -17,16 +20,22 @@ class ArticleApi extends AbstractApi
     private Media $media;
     private ReplyDataHelper $replyDataHelper;
 
-    public function __construct(Application $application)
-    {
-        parent::__construct($application);
+    public function __construct(
+        Application $application,
+        ConnectedUser $connectedUser,
+        DataHelper $dataHelper,
+        PersonDataHelper $personDataHelper,
+        private DesignDataHelper $designDataHelper,
+        private ArticleDataHelper $articleDataHelper
+    ) {
+        parent::__construct($application, $connectedUser, $dataHelper, $personDataHelper);
         $this->media = new Media();
         $this->replyDataHelper = new ReplyDataHelper($application);
     }
 
     public function deleteFile(string $year, string $month, string $filename): void
     {
-        if (!($this->connectedUser->get()->isRedactor() ?? false)) {
+        if (!($this->application->getConnectedUser()->get()->isRedactor() ?? false)) {
             $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }
@@ -39,7 +48,7 @@ class ArticleApi extends AbstractApi
 
     public function designVote(): void
     {
-        if (!($this->connectedUser->get()->isRedactor() ?? false)) {
+        if (!($this->application->getConnectedUser()->get()->isRedactor() ?? false)) {
             $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }
@@ -47,13 +56,13 @@ class ArticleApi extends AbstractApi
             $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
-        (new DesignDataHelper($this->application))->insertOrUpdate(json_decode(file_get_contents('php://input'), true), $this->connectedUser->person->Id);
+        $this->designDataHelper->insertOrUpdate(json_decode(file_get_contents('php://input'), true), $this->application->getConnectedUser()->person->Id);
         $this->renderJson([], true, ApplicationError::Ok->value);
     }
 
     public function saveSurveyReply(): void
     {
-        $person = $this->connectedUser->get()->person ?? false;
+        $person = $this->application->getConnectedUser()->get()->person ?? false;
         if (!$person) {
             $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
@@ -75,7 +84,7 @@ class ArticleApi extends AbstractApi
 
     public function showSurveyReplyForm(int $articleId): void
     {
-        $person = $this->connectedUser->get()->person ?? false;
+        $person = $this->application->getConnectedUser()->get()->person ?? false;
         if ($person === false) {
             $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
@@ -109,7 +118,7 @@ class ArticleApi extends AbstractApi
 
     public function uploadFile(): void
     {
-        if (!($this->connectedUser->get()->isRedactor() ?? false)) {
+        if (!($this->application->getConnectedUser()->get()->isRedactor() ?? false)) {
             $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }
@@ -132,7 +141,7 @@ class ArticleApi extends AbstractApi
 
     public function getAuthor(int $articleId): void
     {
-        $result = (new ArticleDataHelper($this->application))->getAuthor($articleId);
+        $result = $this->articleDataHelper->getAuthor($articleId);
         if ($result === false) $this->renderJsonBadRequest("Unknown article {$articleId}", __FILE__, __LINE__);
         $this->renderJson(['author' => $result ? [$result] : []], true, ApplicationError::Ok->value);
     }

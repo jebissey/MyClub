@@ -9,13 +9,24 @@ use app\helpers\Application;
 use app\helpers\WebApp;
 use app\models\ArticleDataHelper;
 use app\models\EventDataHelper;
+use app\models\AuthorizationDataHelper;
+use app\models\DataHelper;
+use app\models\LanguagesDataHelper;
+use app\models\PageDataHelper;
 use app\modules\Common\AbstractController;
 
 class RssController extends AbstractController
 {
-    public function __construct(Application $application)
-    {
-        parent::__construct($application);
+    public function __construct(
+        Application $application,
+        private ArticleDataHelper $articleDataHelper,
+        private EventDataHelper $eventDataHelper,
+        DataHelper $dataHelper,
+        LanguagesDataHelper $languagesDataHelper,
+        PageDataHelper $pageDataHelper,
+        AuthorizationDataHelper $authorizationDataHelper
+    ) {
+        parent::__construct($application, $dataHelper, $languagesDataHelper, $pageDataHelper, $authorizationDataHelper);
     }
 
     public function articlesRssGenerator()
@@ -26,7 +37,7 @@ class RssController extends AbstractController
         $feed_url = $base_url . "articles-rss.xml";
         $feed_description = "Mises à jour de la liste d'articles";
 
-        $articles = (new ArticleDataHelper($this->application))->getArticlesForRss();
+        $articles = $this->articleDataHelper->getArticlesForRss();
 
         header('Cache-Control: no-cache, no-store, must-revalidate'); // HTTP 1.1
         header('Pragma: no-cache'); // HTTP 1.0
@@ -43,7 +54,7 @@ class RssController extends AbstractController
         $feed_url = $base_url . "events-rss.xml";
         $feed_description = "Calendrier des événements et activités du club";
 
-        $weeklyEvents = (new EventDataHelper($this->application))->getNextWeekEvents();
+        $weeklyEvents = $this->eventDataHelper->getNextWeekEvents();
         $events = $this->flattenWeeklyEvents($weeklyEvents);
 
         header('Cache-Control: no-cache, no-store, must-revalidate'); // HTTP 1.1
@@ -227,5 +238,4 @@ class RssController extends AbstractController
 
         return $rss;
     }
-
 }

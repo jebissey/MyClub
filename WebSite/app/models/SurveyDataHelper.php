@@ -9,7 +9,7 @@ use app\interfaces\NewsProviderInterface;
 
 class SurveyDataHelper extends Data implements NewsProviderInterface
 {
-    public function __construct(Application $application)
+    public function __construct(Application $application, private ArticleDataHelper $articleDataHelper)
     {
         parent::__construct($application);
     }
@@ -106,7 +106,7 @@ class SurveyDataHelper extends Data implements NewsProviderInterface
         foreach ($surveys as $survey) {
             if (
                 $authorizationDataHelper->getArticle($survey->IdArticle, $connectedUser)
-                && $authorizationDataHelper->canPersonReadSurveyResults((new ArticleDataHelper($this->application))->getWithAuthor($survey->IdArticle), $connectedUser)
+                && $authorizationDataHelper->canPersonReadSurveyResults($this->articleDataHelper->getWithAuthor($survey->IdArticle), $connectedUser)
             ) {
                 $news[] = [
                     'type' => 'survey',

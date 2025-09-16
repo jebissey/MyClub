@@ -2,22 +2,32 @@
 
 namespace app\modules\VisitorInsights;
 
-use app\enums\ApplicationError;
 use app\enums\Period;
 use app\enums\FilterInputRule;
 use app\helpers\Application;
 use app\helpers\Params;
 use app\helpers\PeriodHelper;
 use app\helpers\WebApp;
+use app\models\AuthorizationDataHelper;
+use app\models\DataHelper;
+use app\models\LanguagesDataHelper;
+use app\models\PageDataHelper;
 use app\models\CrosstabDataHelper;
 use app\models\LogDataHelper;
 use app\modules\Common\AbstractController;
 
 class LogController extends AbstractController
 {
-    public function __construct(Application $application, private LogDataHelper $logDataHelper)
-    {
-        parent::__construct($application);
+    public function __construct(
+        Application $application,
+        private LogDataHelper $logDataHelper,
+        private CrosstabDataHelper $crosstabDataHelper,
+        DataHelper $dataHelper,
+        LanguagesDataHelper $languagesDataHelper,
+        PageDataHelper $pageDataHelper,
+        AuthorizationDataHelper $authorizationDataHelper
+    ) {
+        parent::__construct($application, $dataHelper, $languagesDataHelper, $pageDataHelper, $authorizationDataHelper);
     }
 
     public function index()
@@ -135,7 +145,7 @@ class LogController extends AbstractController
             $emailFilter = $input['email'];
             $groupFilter = $input['group'];
             $period = $input['period'] != null ? $input['period'] : Period::Today->value;
-            [$sortedCrossTabData, $filteredPersons, $columnTotals] = (new CrosstabDataHelper($this->application))->getPersons(PeriodHelper::getDateConditions($period), $uriFilter, $emailFilter, $groupFilter);
+            [$sortedCrossTabData, $filteredPersons, $columnTotals] = $this->crosstabDataHelper->getPersons(PeriodHelper::getDateConditions($period), $uriFilter, $emailFilter, $groupFilter);
 
             $this->render('VisitorInsights/views/crossTab.latte', Params::getAll([
                 'title' => 'Tableau croisé dynamique des visites',
@@ -159,7 +169,7 @@ class LogController extends AbstractController
             $this->render('VisitorInsights/views/lastVisits.latte', Params::getAll([
                 'lastVisits' => $this->logDataHelper->getLastVisitPerActivePersonWithTimeAgo($activePersons),
                 'totalActiveUsers' => count($activePersons),
-                'navItems' => $this->getNavItems($this->connectedUser->get()->person),
+                'navItems' => $this->getNavItems($this->application->getConnectedUser()->get()->person),
             ]));
         }
     }

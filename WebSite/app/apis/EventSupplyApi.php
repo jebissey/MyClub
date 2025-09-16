@@ -7,21 +7,24 @@ use Throwable;
 
 use app\enums\ApplicationError;
 use app\helpers\Application;
+use app\helpers\ConnectedUser;
 use app\exceptions\QueryException;
 use app\exceptions\UnauthorizedAccessException;
+use app\models\DataHelper;
 use app\models\EventDataHelper;
+use app\models\PersonDataHelper;
 use app\valueObjects\ApiResponse;
 
 class EventSupplyApi extends AbstractApi
 {
-    public function __construct(Application $application, private EventDataHelper $eventDataHelper)
+    public function __construct(Application $application, private EventDataHelper $eventDataHelper, ConnectedUser $connectedUser, DataHelper $dataHelper, PersonDataHelper $personDataHelper)
     {
-        parent::__construct($application);
+        parent::__construct($application, $connectedUser,$dataHelper, $personDataHelper);
     }
 
     public function updateSupply(): void
     {
-        if ($this->connectedUser->get()->person === null) {
+        if ($this->application->getConnectedUser()->get()->person === null) {
             $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }
@@ -34,7 +37,7 @@ class EventSupplyApi extends AbstractApi
             $this->validateSupplyData($input);
             $apiResponse = $this->updateSupply_(
                 $input['eventId'],
-                $this->connectedUser->get()->person->Email,
+                $this->application->getConnectedUser()->get()->person->Email,
                 $input['needId'],
                 intval($input['supply'])
             );

@@ -9,21 +9,31 @@ use app\enums\FilterInputRule;
 use app\helpers\Application;
 use app\helpers\Params;
 use app\helpers\WebApp;
+use app\models\AuthorizationDataHelper;
+use app\models\DataHelper;
 use app\models\EventDataHelper;
+use app\models\LanguagesDataHelper;
+use app\models\PageDataHelper;
 use app\modules\Common\AbstractController;
 use app\services\EmailService;
 
 class EventGuestController extends AbstractController
 {
-    public function __construct(Application $application, private EventDataHelper $eventDataHelper)
-    {
-        parent::__construct($application);
+    public function __construct(
+        Application $application,
+        private EventDataHelper $eventDataHelper,
+        DataHelper $dataHelper,
+        LanguagesDataHelper $languagesDataHelper,
+        PageDataHelper $pageDataHelper,
+        AuthorizationDataHelper $authorizationDataHelper
+    ) {
+        parent::__construct($application, $dataHelper, $languagesDataHelper, $pageDataHelper, $authorizationDataHelper);
     }
 
 
     public function guest(string $message = '', string $type = ''): void
     {
-        if (!($this->connectedUser->get(1)->isEventManager() ?? false)) {
+        if (!($this->application->getConnectedUser()->get(1)->isEventManager() ?? false)) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
         }
@@ -40,7 +50,7 @@ class EventGuestController extends AbstractController
 
     public function guestInvite()
     {
-        if (!($this->connectedUser->get(1)->isEventManager() ?? false)) {
+        if (!($this->application->getConnectedUser()->get(1)->isEventManager() ?? false)) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
         }
@@ -111,7 +121,7 @@ class EventGuestController extends AbstractController
                     [
                         'IdContact' => $contactId,
                         'IdEvent' => $eventId,
-                        'InvitedBy' => $this->connectedUser->person->Id
+                        'InvitedBy' => $this->application->getConnectedUser()->person->Id
                     ]
                 );
 
@@ -127,7 +137,7 @@ class EventGuestController extends AbstractController
                 $body .= "Pour confirmer votre participation, cliquez sur le lien suivant :\n";
                 $body .= $invitationLink . "\n\n";
                 $body .= "Cordialement,\nL'équipe BNW Dijon";
-                $emailFrom = $this->connectedUser->person->Email;
+                $emailFrom = $this->application->getConnectedUser()->person->Email;
                 EmailService::send($emailFrom, $email, $subject, $body);
                 $this->guest('Invitation envoyée avec succès à ' . $email, 'success');
             } catch (Throwable $e) {
@@ -136,4 +146,3 @@ class EventGuestController extends AbstractController
         } else $this->guest();
     }
 }
-

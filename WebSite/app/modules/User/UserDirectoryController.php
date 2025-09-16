@@ -4,20 +4,31 @@ namespace app\modules\User;
 
 use app\helpers\Application;
 use app\helpers\Params;
+use app\models\AuthorizationDataHelper;
+use app\models\DataHelper;
 use app\models\GroupDataHelper;
+use app\models\LanguagesDataHelper;
+use app\models\PageDataHelper;
 use app\models\PersonDataHelper;
 use app\modules\Common\AbstractController;
 
 class UserDirectoryController extends AbstractController
 {
-    public function __construct(Application $application)
-    {
-        parent::__construct($application);
+    public function __construct(
+        Application $application,
+        private PersonDataHelper $personDataHelper,
+        private GroupDataHelper $groupDataHelper,
+        DataHelper $dataHelper,
+        LanguagesDataHelper $languagesDataHelper,
+        PageDataHelper $pageDataHelper,
+        AuthorizationDataHelper $authorizationDataHelper
+    ) {
+        parent::__construct($application, $dataHelper, $languagesDataHelper, $pageDataHelper, $authorizationDataHelper);
     }
 
     public function showDirectory()
     {
-        $person = $this->connectedUser->get()->person;
+        $person = $this->application->getConnectedUser()->get()->person;
         if ($person === null) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
@@ -28,14 +39,14 @@ class UserDirectoryController extends AbstractController
         }
         $groupParam = $this->flight->request()->query['group'] ?? null;
         $selectedGroup = ($groupParam !== null && ctype_digit((string)$groupParam)) ? (int)$groupParam : null;
-        if ($selectedGroup) $persons = (new PersonDataHelper($this->application))->getPersonsInGroupForDirectory($selectedGroup);
+        if ($selectedGroup) $persons = $this->personDataHelper->getPersonsInGroupForDirectory($selectedGroup);
         else {
             $persons = $this->dataHelper->gets('Person', [
                 'InPresentationDirectory' => 1,
                 'Inactivated' => 0
             ], 'Id, LastName, FirstName, NickName, UseGravatar, Avatar, Email');
         }
-        $groupCounts = (new GroupDataHelper($this->application))->getGroupCount();
+        $groupCounts = $this->groupDataHelper->getGroupCount();
         $this->render('User/views/users_directory.latte', Params::getAll([
             'persons' => $persons,
             'navItems' => $this->getNavItems($person),
@@ -48,7 +59,7 @@ class UserDirectoryController extends AbstractController
 
     public function showMap()
     {
-        $person = $this->connectedUser->get()->person;
+        $person = $this->application->getConnectedUser()->get()->person;
         if ($person === null) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return;

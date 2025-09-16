@@ -5,15 +5,25 @@ namespace app\modules\Common;
 use \Envms\FluentPDO\Queries\Select;
 
 use app\helpers\Application;
+use app\models\AuthorizationDataHelper;
+use app\models\DataHelper;
 use app\models\GenericDataHelper;
+use app\models\LanguagesDataHelper;
+use app\models\PageDataHelper;
 
 abstract class TableController extends AbstractController
 {
     protected int $itemsPerPage = 10;
 
-    public function __construct(Application $application)
-    {
-        parent::__construct($application);
+    public function __construct(
+        Application $application,
+        private GenericDataHelper $genericDataHelper,
+        DataHelper $dataHelper,
+        LanguagesDataHelper $languagesDataHelper,
+        PageDataHelper $pageDataHelper,
+        AuthorizationDataHelper $authorizationDataHelper
+    ) {
+        parent::__construct($application, $dataHelper, $languagesDataHelper, $pageDataHelper, $authorizationDataHelper);
     }
 
     protected function prepareTableData(Select $query, array $filters = [], int $page = 1): array
@@ -25,7 +35,7 @@ abstract class TableController extends AbstractController
             }
         }
 
-        $totalItems = (new GenericDataHelper($this->application))->countOf($query->getQuery());
+        $totalItems = $this->genericDataHelper->countOf($query->getQuery());
         $totalPages = ceil($totalItems / $this->itemsPerPage);
         $currentPage = max(1, min($page, $totalPages));
         $query = $query->limit($this->itemsPerPage)->offset(($currentPage - 1) * $this->itemsPerPage);

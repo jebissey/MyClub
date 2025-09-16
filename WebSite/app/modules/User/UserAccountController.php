@@ -7,18 +7,27 @@ use app\enums\YesNo;
 use app\helpers\Application;
 use app\helpers\Params;
 use app\helpers\WebApp;
+use app\models\AuthorizationDataHelper;
+use app\models\DataHelper;
+use app\models\LanguagesDataHelper;
+use app\models\PageDataHelper;
 use app\modules\Common\AbstractController;
 
 class UserAccountController extends AbstractController
 {
-    public function __construct(Application $application)
-    {
-        parent::__construct($application);
+    public function __construct(
+        Application $application,
+        DataHelper $dataHelper,
+        LanguagesDataHelper $languagesDataHelper,
+        PageDataHelper $pageDataHelper,
+        AuthorizationDataHelper $authorizationDataHelper
+    ) {
+        parent::__construct($application, $dataHelper, $languagesDataHelper, $pageDataHelper, $authorizationDataHelper);
     }
 
     public function account(): void
     {
-        if ($this->connectedUser->get(1)->person === null) {
+        if ($this->application->getConnectedUser()->get(1)->person === null) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
         }
@@ -26,7 +35,7 @@ class UserAccountController extends AbstractController
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
-        $person = $this->connectedUser->person;
+        $person = $this->application->getConnectedUser()->person;
         $this->render('User/views/user_account.latte', Params::getAll([
             'readOnly' => $person->Imported == 1 ? true : false,
             'email' => filter_var($person->Email, FILTER_VALIDATE_EMAIL) ?: '',
@@ -44,7 +53,7 @@ class UserAccountController extends AbstractController
 
     public function accountSave(): void
     {
-        $person = $this->connectedUser->get(1)->person;
+        $person = $this->application->getConnectedUser()->get(1)->person;
         if ($person === null) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return;

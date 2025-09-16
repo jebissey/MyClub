@@ -3,25 +3,42 @@
 namespace app\helpers;
 
 use app\enums\ApplicationError;
+use app\models\AuthorizationDataHelper;
 use app\models\DataHelper;
 use app\models\LanguagesDataHelper;
 use app\models\LogDataHelper;
+use app\models\PageDataHelper;
 use app\modules\Common\EmptyController;
 
 class ErrorManager
 {
-    private Application $application;
+    private DataHelper $dataHelper;
+    private AuthorizationDataHelper $authorizationDataHelper;
+    private LanguagesDataHelper $languagesDataHelper;
+    private LogDataHelper $logDataHelper;
+    private PageDataHelper $pageDataHelper;
     private EmptyController $emptyController;
 
-    public function __construct(Application $application)
+    public function __construct(private Application $application)
     {
-        $this->application = $application;
-        $this->emptyController = new EmptyController($application);
+        $this->authorizationDataHelper = new AuthorizationDataHelper($application);
+        $this->dataHelper = new DataHelper($application);
+        $this->logDataHelper = new LogDataHelper($application);
+        $this->languagesDataHelper = new LanguagesDataHelper($application);
+        $this->pageDataHelper = new PageDataHelper($application, $this->authorizationDataHelper);
+        $this->emptyController = new EmptyController(
+            $application,
+            $this->dataHelper,
+            $this->languagesDataHelper,
+            $this->pageDataHelper,
+            $this->authorizationDataHelper,
+            $this->logDataHelper
+        );
     }
 
     public function raise(ApplicationError $code, string $message, int $timeout = 1000, bool $displayCode = true, $isWebmaster = false): void
     {
-        (new LogDataHelper($this->application))->add($code->value, $message);
+        $this->logDataHelper->add($code->value, $message);
         if ($this->isJsonExpected()) {
             http_response_code($code->value);
             header('Content-Type: application/json; charset=utf-8');
@@ -38,8 +55,8 @@ class ErrorManager
             $this->application->getFlight()->response()->write($message);
             return;
         }
-        $translation = (new LanguagesDataHelper($this->application))->translate('Error' . $code->value);
-        $setting = (new DataHelper($this->application))->get('Settings', ['Name' => 'Error_' . $code->value], 'Value');
+        $translation = $this->languagesDataHelper->translate('Error' . $code->value);
+        $setting = $this->dataHelper->get('Settings', ['Name' => 'Error_' . $code->value], 'Value');
         $result = '';
         if ($setting !== false && $setting->Value != '') $result =  $setting->Value;
         elseif ($translation != "-- Error{$code->value} --") $result = $translation;
@@ -58,7 +75,7 @@ class ErrorManager
         $this->application->getFlight()->response()->status($code->value);
         $this->emptyController->render('Common/views/info.latte', [
             'content' => $result,
-            'hasAuthorization' => $this->emptyController->connectedUser->get()->hasAutorization() ?? false,
+            'hasAuthorization' => $this->application->getConnectedUser()->get()->hasAutorization() ?? false,
             'currentVersion' => Application::VERSION,
             'timer' => $timeout,
             'previousPage' => false

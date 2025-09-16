@@ -8,19 +8,22 @@ use Throwable;
 use app\enums\ApplicationError;
 use app\exceptions\UnauthorizedAccessException;
 use app\helpers\Application;
+use app\helpers\ConnectedUser;
+use app\models\DataHelper;
 use app\models\MessageDataHelper;
+use app\models\PersonDataHelper;
 use app\valueObjects\ApiResponse;
 
 class EventMessageApi extends AbstractApi
 {
-    public function __construct(Application $application, private MessageDataHelper $messageDataHelper)
+    public function __construct(Application $application, private MessageDataHelper $messageDataHelper, ConnectedUser $connectedUser, DataHelper $dataHelper, PersonDataHelper $personDataHelper)
     {
-        parent::__construct($application);
+        parent::__construct($application, $connectedUser,$dataHelper, $personDataHelper);
     }
 
     public function addMessage(): void
     {
-        if ($this->connectedUser->get()->person === null) {
+        if ($this->application->getConnectedUser()->get()->person === null) {
             $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }
@@ -34,7 +37,7 @@ class EventMessageApi extends AbstractApi
         }
         try {
             $data = $this->getJsonInput();
-            $apiResponse = $this->addMessage_($data['eventId'], $this->connectedUser->person->Id, $data['text']);
+            $apiResponse = $this->addMessage_($data['eventId'], $this->application->getConnectedUser()->person->Id, $data['text']);
             $this->renderJson($apiResponse->data, $apiResponse->success, $apiResponse->responseCode);
         } catch (Throwable $e) {
             $this->renderJsonError($e->getMessage(), ApplicationError::Error->value);
@@ -43,7 +46,7 @@ class EventMessageApi extends AbstractApi
 
     public function deleteMessage(): void
     {
-        if ($this->connectedUser->get()->person === null) {
+        if ($this->application->getConnectedUser()->get()->person === null) {
             $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }
@@ -53,7 +56,7 @@ class EventMessageApi extends AbstractApi
         }
         try {
             $data = $this->getJsonInput();
-            $apiResponse = $this->deleteMessage_($data['messageId'] ?? 0, $this->connectedUser->person->Id);
+            $apiResponse = $this->deleteMessage_($data['messageId'] ?? 0, $this->application->getConnectedUser()->person->Id);
             $this->renderJson($apiResponse->data, $apiResponse->success, $apiResponse->responseCode);
         } catch (Throwable $e) {
             $this->renderJsonError($e->getMessage(), ApplicationError::Error->value);
@@ -62,7 +65,7 @@ class EventMessageApi extends AbstractApi
 
     public function updateMessage(): void
     {
-        if ($this->connectedUser->get()->person === null) {
+        if ($this->application->getConnectedUser()->get()->person === null) {
             $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }
@@ -76,7 +79,7 @@ class EventMessageApi extends AbstractApi
         }
         try {
             $data = $this->getJsonInput();
-            $apiResponse = $this->updateMessage_($data['messageId'], $this->connectedUser->person->Id, $data['text']);
+            $apiResponse = $this->updateMessage_($data['messageId'], $this->application->getConnectedUser()->person->Id, $data['text']);
             $this->renderJson($apiResponse->data, $apiResponse->success, $apiResponse->responseCode);
         } catch (Throwable $e) {
             $this->renderJsonError($e->getMessage(), ApplicationError::Error->value);

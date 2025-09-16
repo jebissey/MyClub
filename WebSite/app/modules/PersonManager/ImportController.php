@@ -2,12 +2,15 @@
 
 namespace app\modules\PersonManager;
 
-use app\enums\ApplicationError;
 use app\enums\FilterInputRule;
 use app\helpers\Application;
 use app\helpers\Params;
 use app\helpers\WebApp;
+use app\models\AuthorizationDataHelper;
+use app\models\DataHelper;
 use app\models\ImportDataHelper;
+use app\models\LanguagesDataHelper;
+use app\models\PageDataHelper;
 use app\modules\Common\AbstractController;
 
 class ImportController extends AbstractController
@@ -16,9 +19,15 @@ class ImportController extends AbstractController
     private $results;
     private array $foundEmails = [];
 
-    public function __construct(Application $application)
-    {
-        parent::__construct($application);
+    public function __construct(
+        Application $application,
+        private ImportDataHelper $importDataHelper,
+        DataHelper $dataHelper,
+        LanguagesDataHelper $languagesDataHelper,
+        PageDataHelper $pageDataHelper,
+        AuthorizationDataHelper $authorizationDataHelper
+    ) {
+        parent::__construct($application, $dataHelper, $languagesDataHelper, $pageDataHelper, $authorizationDataHelper);
     }
 
     public function showImportForm(): void
@@ -63,7 +72,7 @@ class ImportController extends AbstractController
                 $this->importSettings['mapping'] = $mapping;
                 $this->dataHelper->set('Settings', ['Value' => json_encode($this->importSettings)], ['Name' => 'ImportPersonParameters']);
                 $persons = $this->dataHelper->gets('Person', ['Inactivated' => 0], 'Id, Email');
-                $results = (new ImportDataHelper($this->application))->getResults($headerRow, $mapping, $this->foundEmails);
+                $results = $this->importDataHelper->getResults($headerRow, $mapping, $this->foundEmails);
                 foreach ($persons as $person) {
                     if (!in_array($person->Email, $this->foundEmails)) {
                         $this->dataHelper->set('Person', ['Inactivated' => 1], ['Id' => $person->Id]);

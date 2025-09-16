@@ -6,18 +6,21 @@ use Throwable;
 
 use app\enums\ApplicationError;
 use app\helpers\Application;
+use app\helpers\ConnectedUser;
+use app\models\DataHelper;
 use app\models\PageDataHelper;
+use app\models\PersonDataHelper;
 
 class NavbarApi extends AbstractApi
 {
-    public function __construct(Application $application, private PageDataHelper $pageDataHelper)
+    public function __construct(Application $application, private PageDataHelper $pageDataHelper, ConnectedUser $connectedUser, DataHelper $dataHelper, PersonDataHelper $personDataHelper)
     {
-        parent::__construct($application);
+        parent::__construct($application, $connectedUser,$dataHelper, $personDataHelper);
     }
 
     public function deleteNavbarItem(int $id): void
     {
-        if (!($this->connectedUser->get()->isNavbarDesigner() ?? false)) {
+        if (!($this->application->getConnectedUser()->get()->isNavbarDesigner() ?? false)) {
             $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }
@@ -35,7 +38,7 @@ class NavbarApi extends AbstractApi
 
     public function getNavbarItem(int $id): void
     {
-        if (!($this->connectedUser->get()->isNavbarDesigner() ?? false)) {
+        if (!($this->application->getConnectedUser()->get()->isNavbarDesigner() ?? false)) {
             $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }
@@ -52,7 +55,7 @@ class NavbarApi extends AbstractApi
 
     public function saveNavbarItem(): void
     {
-        if (!($this->connectedUser->get()->isNavbarDesigner() ?? false)) {
+        if (!($this->application->getConnectedUser()->get()->isNavbarDesigner() ?? false)) {
             $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }
@@ -76,7 +79,7 @@ class NavbarApi extends AbstractApi
 
     public function updateNavbarPositions(): void
     {
-        if (!($this->connectedUser->get()->isNavbarDesigner() ?? false)) {
+        if (!($this->application->getConnectedUser()->get()->isNavbarDesigner() ?? false)) {
             $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }

@@ -2,25 +2,34 @@
 
 namespace app\modules\Webmaster;
 
-use app\helpers\Application;
 use app\enums\ApplicationError;
+use app\helpers\Application;
 use app\helpers\Params;
 use app\helpers\WebApp;
 use app\models\ArwardsDataHelper;
+use app\models\AuthorizationDataHelper;
+use app\models\DataHelper;
+use app\models\LanguagesDataHelper;
+use app\models\PageDataHelper;
 use app\modules\Common\AbstractController;
 
 class NavBarController extends AbstractController
 {
-    public function __construct(Application $application)
-    {
-        parent::__construct($application);
+    public function __construct(
+        Application $application,
+        DataHelper $dataHelper,
+        LanguagesDataHelper $languagesDataHelper,
+        PageDataHelper $pageDataHelper,
+        AuthorizationDataHelper $authorizationDataHelper
+    ) {
+        parent::__construct($application, $dataHelper, $languagesDataHelper, $pageDataHelper, $authorizationDataHelper);
     }
 
     public function index()
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isNavbarDesigner())) {
             $this->render('Webmaster/views/navbar.latte', Params::getAll([
-                'navItems' => $this->getNavItems($this->connectedUser->person),
+                'navItems' => $this->getNavItems($this->application->getConnectedUser()->person),
                 'groups' => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
                 'availableRoutes' => $this->getAvailableRoutes(),
                 'isMyclubWebSite' => WebApp::isMyClubWebSite(),
@@ -30,7 +39,7 @@ class NavBarController extends AbstractController
 
     public function showArwards()
     {
-        $person = $this->connectedUser->get()->person ?? false;
+        $person = $this->application->getConnectedUser()->get()->person ?? false;
         if ($person && $this->pageDataHelper->authorizedUser('/navbar/show/arwards', $person)) {
             $arwardsDataHelper = new ArwardsDataHelper($this->application);
 
@@ -46,12 +55,12 @@ class NavBarController extends AbstractController
 
     public function showArticle($id)
     {
-        $person = $this->connectedUser->get()->person ?? false;
+        $person = $this->application->getConnectedUser()->get()->person ?? false;
         if ($this->pageDataHelper->authorizedUser("/navbar/show/article/$id", $person)) {
             $this->render('Webmaster/views/navbar/article.latte', Params::getAll([
                 'navItems' => $this->getNavItems($person),
                 'chosenArticle' => $this->dataHelper->get('Article', ['Id' => $id], 'Content'),
-                'hasAuthorization' => $this->connectedUser->hasAutorization()
+                'hasAuthorization' => $this->application->getConnectedUser()->hasAutorization()
             ]));
         } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }

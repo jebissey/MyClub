@@ -10,7 +10,6 @@ use app\enums\ApplicationError;
 use app\enums\TimeOfDay;
 use app\helpers\Application;
 use app\helpers\TranslationManager;
-use app\helpers\ConnectedUser;
 use app\models\AuthorizationDataHelper;
 use app\models\DataHelper;
 use app\models\LanguagesDataHelper;
@@ -21,20 +20,13 @@ abstract class AbstractController
     protected Engine $flight;
     private LatteEngine $latte;
 
-    protected Application $application;
-    public ConnectedUser $connectedUser;
-    public DataHelper $dataHelper;
-    protected LanguagesDataHelper $languagesDataHelper;
-    protected PageDataHelper $pageDataHelper;
-
-    public function __construct(Application $application)
-    {
-        $this->application = $application;
-        $this->dataHelper = $application->getDataHelper();
-        $this->connectedUser = new ConnectedUser($application);
-        $this->languagesDataHelper = new LanguagesDataHelper($application);
-        $this->pageDataHelper = new PageDataHelper($application);
-
+    public function __construct(
+        protected Application $application,
+        public DataHelper $dataHelper,
+        protected LanguagesDataHelper $languagesDataHelper,
+        protected PageDataHelper $pageDataHelper,
+        private AuthorizationDataHelper $authorizationDataHelper
+    ) {
         $this->flight = $application->getFlight();
         $this->latte = $application->getLatte();
         $this->addLatteFilters();
@@ -69,7 +61,7 @@ abstract class AbstractController
     protected function getNavItems($person, bool $all = false)
     {
         if (!$person) $userGroups = [];
-        else $userGroups = (new AuthorizationDataHelper($this->application))->getUserGroups($person->Email);
+        else $userGroups = $this->authorizationDataHelper->getUserGroups($person->Email);
 
         $navItems = $this->dataHelper->gets('Page');
         $filteredNavItems = [];
@@ -123,7 +115,7 @@ abstract class AbstractController
 
     protected function userIsAllowedAndMethodIsGood(string $method, callable $permissionCheck): bool
     {
-        $user = $this->connectedUser->get();
+        $user = $this->application->getConnectedUser()->get();
         if (!$user || !$permissionCheck($user)) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return false;

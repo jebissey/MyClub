@@ -11,17 +11,18 @@ use app\models\DataHelper;
 
 class ConnectedUser
 {
-    private Application $application;
-    private AuthorizationDataHelper $authorizationDataHelper;
     private array $authorizations;
-    private DataHelper $dataHelper;
     public ?object $person;
+    private GravatarHandler $gravatarHandler;
+    private DataHelper $dataHelper;
+    private AuthorizationDataHelper $authorizationDataHelper;
 
-    public function __construct(Application $application)
-    {
-        $this->application = $application;
-        $this->authorizationDataHelper = new AuthorizationDataHelper($application);
-        $this->dataHelper = new DataHelper($application);
+    public function __construct(
+        private Application $application,
+    ) {
+        $this->gravatarHandler = new GravatarHandler();
+        $this->dataHelper = new DataHelper($this->application);
+        $this->authorizationDataHelper = new AuthorizationDataHelper($this->application);
     }
 
     public function get(int $segment = 0): self
@@ -30,7 +31,7 @@ class ConnectedUser
         $this->person = null;
         $userEmail = $_SESSION['user'] ?? '';
         if ($userEmail === '') return $this;
-        
+
         $person = $this->dataHelper->get('Person', ['Email' => $userEmail]);
         if (!$person) {
             $this->application->getErrorManager()->raise(ApplicationError::BadRequest, "Unknown user with this email address {$userEmail} in file " . __FILE__ . ' at line ' . __LINE__);
@@ -141,7 +142,7 @@ class ConnectedUser
 
     private function getUserImg(object $person): string
     {
-        if ($person->UseGravatar === 'yes') return (new GravatarHandler())->getGravatar($person->Email);
+        if ($person->UseGravatar === 'yes') return $this->gravatarHandler->getGravatar($person->Email);
         else {
             if (empty($person->Avatar)) return '🤔';
             else {

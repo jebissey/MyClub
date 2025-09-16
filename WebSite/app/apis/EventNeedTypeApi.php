@@ -6,20 +6,29 @@ use Throwable;
 
 use app\enums\ApplicationError;
 use app\helpers\Application;
+use app\helpers\ConnectedUser;
+use app\models\DataHelper;
 use app\models\NeedDataHelper;
 use app\models\NeedTypeDataHelper;
+use app\models\PersonDataHelper;
 use app\valueObjects\ApiResponse;
 
 class EventNeedTypeApi extends AbstractApi
 {
-    public function __construct(Application $application, private NeedDataHelper $needDataHelper, private NeedTypeDataHelper $needTypeDataHelper)
-    {
-        parent::__construct($application);
+    public function __construct(
+        Application $application,
+        private NeedDataHelper $needDataHelper,
+        private NeedTypeDataHelper $needTypeDataHelper,
+        ConnectedUser $connectedUser,
+        DataHelper $dataHelper,
+        PersonDataHelper $personDataHelper
+    ) {
+        parent::__construct($application, $connectedUser,$dataHelper, $personDataHelper);
     }
 
     public function deleteNeedType(int $id): void
     {
-        if (!$this->connectedUser->get()->isEventDesigner()) {
+        if (!$this->application->getConnectedUser()->get()->isEventDesigner()) {
             $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }
@@ -37,7 +46,7 @@ class EventNeedTypeApi extends AbstractApi
 
     public function saveNeedType(): void
     {
-        if (!$this->connectedUser->get()->isEventDesigner()) {
+        if (!$this->application->getConnectedUser()->get()->isEventDesigner()) {
             $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }

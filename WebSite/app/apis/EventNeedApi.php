@@ -6,20 +6,29 @@ use Throwable;
 
 use app\enums\ApplicationError;
 use app\helpers\Application;
+use app\helpers\ConnectedUser;
+use app\models\DataHelper;
 use app\models\EventDataHelper;
 use app\models\EventNeedDataHelper;
+use app\models\PersonDataHelper;
 use app\valueObjects\ApiResponse;
 
 class EventNeedApi extends AbstractApi
 {
-    public function __construct(Application $application, private EventNeedDataHelper $eventNeedDataHelper, private EventDataHelper $eventDataHelper)
-    {
-        parent::__construct($application);
+    public function __construct(
+        Application $application,
+        private EventNeedDataHelper $eventNeedDataHelper,
+        private EventDataHelper $eventDataHelper,
+        ConnectedUser $connectedUser,
+        DataHelper $dataHelper,
+        PersonDataHelper $personDataHelper
+    ) {
+        parent::__construct($application, $connectedUser,$dataHelper, $personDataHelper);
     }
 
     public function deleteNeed(int $id): void
     {
-        if (!$this->connectedUser->get()->isEventDesigner()) {
+        if (!$this->application->getConnectedUser()->get()->isEventDesigner()) {
             $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }
@@ -38,7 +47,7 @@ class EventNeedApi extends AbstractApi
 
     public function getEventNeeds(int $id): void
     {
-        if (!$this->connectedUser->get()->isEventManager()) {
+        if (!$this->application->getConnectedUser()->get()->isEventManager()) {
             $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }
@@ -60,7 +69,7 @@ class EventNeedApi extends AbstractApi
 
     public function saveNeed(): void
     {
-        if (!$this->connectedUser->get()->isEventDesigner()) {
+        if (!$this->application->getConnectedUser()->get()->isEventDesigner()) {
             $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }

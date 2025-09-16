@@ -9,7 +9,7 @@ use app\helpers\PeriodHelper;
 
 class CrosstabDataHelper extends Data
 {
-    public function __construct(Application $application)
+    public function __construct(Application $application, private AuthorizationDataHelper $authorizationDataHelper)
     {
         parent::__construct($application);
     }
@@ -112,7 +112,7 @@ class CrosstabDataHelper extends Data
         foreach ($crossTabData as $row) {
             $uri = $row->Uri;
             $who = $row->Who;
-            if (!empty($groupFilter) && !(new AuthorizationDataHelper($this->application))->isUserInGroup($who, $groupFilter)) continue;
+            if (!empty($groupFilter) && !$this->authorizationDataHelper->isUserInGroup($who, $groupFilter)) continue;
             $count = (int) $row->count;
             if (!isset($sortedCrossTabData[$uri])) $sortedCrossTabData[$uri] = ['visits' => [], 'total' => 0];
             $sortedCrossTabData[$uri]['visits'][$who] = $count;

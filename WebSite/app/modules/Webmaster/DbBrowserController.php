@@ -5,16 +5,26 @@ namespace app\modules\Webmaster;
 use app\helpers\Application;
 use app\helpers\Params;
 use app\helpers\WebApp;
+use app\models\AuthorizationDataHelper;
 use app\models\DbBrowserDataHelper;
+use app\models\DataHelper;
+use app\models\LanguagesDataHelper;
+use app\models\PageDataHelper;
 use app\modules\Common\AbstractController;
 
 class DbBrowserController extends AbstractController
 {
     private int $itemsPerPage = 10;
 
-    public function __construct(Application $application, private DbBrowserDataHelper $dbBrowserDataHelper)
-    {
-        parent::__construct($application);
+    public function __construct(
+        Application $application,
+        private DbBrowserDataHelper $dbBrowserDataHelper,
+        DataHelper $dataHelper,
+        LanguagesDataHelper $languagesDataHelper,
+        PageDataHelper $pageDataHelper,
+        AuthorizationDataHelper $authorizationDataHelper
+    ) {
+        parent::__construct($application, $dataHelper, $languagesDataHelper, $pageDataHelper, $authorizationDataHelper);
     }
 
     public function createRecord(string $table): void
@@ -67,7 +77,7 @@ class DbBrowserController extends AbstractController
                 'record' => $record,
                 'primaryKey' => $primaryKey,
                 'columnTypes' => $columnTypes,
-                'isMyclubWebSite' =>WebApp::isMyClubWebSite(),
+                'isMyclubWebSite' => WebApp::isMyClubWebSite(),
             ]));
         }
     }

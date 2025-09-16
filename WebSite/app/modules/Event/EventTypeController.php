@@ -6,22 +6,37 @@ use app\enums\ApplicationError;
 use app\enums\FilterInputRule;
 use app\exceptions\IntegrityException;
 use app\helpers\Application;
+use app\helpers\ErrorManager;
 use app\helpers\Params;
 use app\helpers\WebApp;
+use app\models\AuthorizationDataHelper;
+use app\models\DataHelper;
 use app\models\EventDataHelper;
+use app\models\GenericDataHelper;
+use app\models\LanguagesDataHelper;
+use app\models\PageDataHelper;
 use app\models\TableControllerDataHelper;
 use app\modules\Common\TableController;
 
 class EventTypeController extends TableController
 {
-    public function __construct(Application $application, private EventDataHelper $eventDataHelper)
-    {
-        parent::__construct($application);
+    public function __construct(
+        Application $application,
+        private EventDataHelper $eventDataHelper,
+        private TableControllerDataHelper $tableControllerDataHelper,
+        private ErrorManager $errorManager,
+        DataHelper $dataHelper,
+        LanguagesDataHelper $languagesDataHelper,
+        PageDataHelper $pageDataHelper,
+        AuthorizationDataHelper $authorizationDataHelper,
+        GenericDataHelper $genericDataHelper
+    ) {
+        parent::__construct($application, $genericDataHelper, $dataHelper, $languagesDataHelper, $pageDataHelper, $authorizationDataHelper);
     }
 
     public function index(): void
     {
-        if (!($this->connectedUser->get()->isEventDesigner() ?? false)) {
+        if (!($this->application->getConnectedUser()->get()->isEventDesigner() ?? false)) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
         }
@@ -33,7 +48,7 @@ class EventTypeController extends TableController
             ['field' => 'Attributes', 'label' => 'Attributs'],
         ];
         $data = $this->prepareTableData(
-            (new TableControllerDataHelper($this->application))->getEventTypesQuery(),
+            $this->tableControllerDataHelper->getEventTypesQuery(),
             $filterValues,
             (int)($this->flight->request()->query['tablePage'] ?? 1)
         );
@@ -51,7 +66,7 @@ class EventTypeController extends TableController
 
     public function create(): void
     {
-        if (!($this->connectedUser->get()->isEventDesigner() ?? false)) {
+        if (!($this->application->getConnectedUser()->get()->isEventDesigner() ?? false)) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
         }
@@ -109,7 +124,7 @@ class EventTypeController extends TableController
     {
         $eventType = $this->dataHelper->get('EventType', ['Id', $eventTypeId], 'Id');
         if ($eventType === false) {
-            $this->application->getErrorManager()->raise(ApplicationError::InvalidSetting, "Invalide EventType {$eventTypeId} in file " . __FILE__ . ' at line ' . __LINE__);
+            $this->errorManager->raise(ApplicationError::InvalidSetting, "Invalide EventType {$eventTypeId} in file " . __FILE__ . ' at line ' . __LINE__);
             return false;
         }
         return true;

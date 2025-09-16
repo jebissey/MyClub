@@ -7,14 +7,24 @@ use app\enums\FilterInputRule;
 use app\helpers\Application;
 use app\helpers\Params;
 use app\helpers\WebApp;
+use app\models\AuthorizationDataHelper;
+use app\models\DataHelper;
+use app\models\LanguagesDataHelper;
+use app\models\PageDataHelper;
 use app\modules\Common\AbstractController;
 use app\services\AuthenticationService;
 
 class UserController extends AbstractController
 {
-    public function __construct(Application $application, private AuthenticationService $authService)
-    {
-        parent::__construct($application);
+    public function __construct(
+        Application $application,
+        private AuthenticationService $authService,
+        DataHelper $dataHelper,
+        LanguagesDataHelper $languagesDataHelper,
+        PageDataHelper $pageDataHelper,
+        AuthorizationDataHelper $authorizationDataHelper
+    ) {
+        parent::__construct($application, $dataHelper, $languagesDataHelper, $pageDataHelper, $authorizationDataHelper);
     }
 
     public function forgotPassword($encodedEmail): void
@@ -61,7 +71,7 @@ class UserController extends AbstractController
 
     public function signOut(): void
     {
-        if ($this->connectedUser->get()->person === null) {
+        if ($this->application->getConnectedUser()->get()->person === null) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
         }

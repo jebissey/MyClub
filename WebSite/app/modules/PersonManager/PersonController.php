@@ -2,11 +2,15 @@
 
 namespace app\modules\PersonManager;
 
-use app\enums\ApplicationError;
 use app\enums\FilterInputRule;
 use app\helpers\Application;
 use app\helpers\Params;
 use app\helpers\WebApp;
+use app\models\AuthorizationDataHelper;
+use app\models\DataHelper;
+use app\models\GenericDataHelper;
+use app\models\LanguagesDataHelper;
+use app\models\PageDataHelper;
 use app\models\PersonDataHelper;
 use app\models\TableControllerDataHelper;
 use app\modules\Common\TableController;
@@ -14,14 +18,22 @@ use app\modules\Common\TableController;
 
 class PersonController extends TableController
 {
-    public function __construct(Application $application)
-    {
-        parent::__construct($application);
+    public function __construct(
+        Application $application,
+        private TableControllerDataHelper $tableControllerDataHelper,
+        private PersonDataHelper $personDataHelper,
+        GenericDataHelper $genericDataHelper,
+        DataHelper $dataHelper,
+        LanguagesDataHelper $languagesDataHelper,
+        PageDataHelper $pageDataHelper,
+        AuthorizationDataHelper $authorizationDataHelper
+    ) {
+        parent::__construct($application, $genericDataHelper, $dataHelper, $languagesDataHelper, $pageDataHelper, $authorizationDataHelper);
     }
 
     public function help(): void
     {
-        if (!($this->connectedUser->get()->isPersonManager() ?? false)) {
+        if (!($this->application->getConnectedUser()->get()->isPersonManager() ?? false)) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
         }
@@ -31,7 +43,7 @@ class PersonController extends TableController
         }
         $this->render('Common/views/info.latte', [
             'content' => $this->dataHelper->get('Settings', ['Name' => 'Help_personManager'], 'Value')->Value ?? '',
-            'hasAuthorization' => $this->connectedUser->hasAutorization(),
+            'hasAuthorization' => $this->application->getConnectedUser()->hasAutorization(),
             'currentVersion' => Application::VERSION,
             'timer' => 0,
             'previousPage' => true
@@ -40,7 +52,7 @@ class PersonController extends TableController
 
     public function home(): void
     {
-        if (!($this->connectedUser->get()->isPersonManager() ?? false)) {
+        if (!($this->application->getConnectedUser()->get()->isPersonManager() ?? false)) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
         }
@@ -55,7 +67,7 @@ class PersonController extends TableController
 
     public function index(): void
     {
-        if (!($this->connectedUser->get()->isPersonManager() ?? false)) {
+        if (!($this->application->getConnectedUser()->get()->isPersonManager() ?? false)) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
         }
@@ -82,7 +94,7 @@ class PersonController extends TableController
             ['field' => 'Email', 'label' => 'Email'],
             ['field' => 'Phone', 'label' => 'Téléphone']
         ];
-        $data = $this->prepareTableData((new TableControllerDataHelper($this->application))->getPersonsQuery(), $filterValues, (int)($this->flight->request()->query['tablePage'] ?? 1));
+        $data = $this->prepareTableData($this->tableControllerDataHelper->getPersonsQuery(), $filterValues, (int)($this->flight->request()->query['tablePage'] ?? 1));
 
         $this->render('PersonManager/views/users_index.latte', Params::getAll([
             'persons' => $data['items'],
@@ -97,7 +109,7 @@ class PersonController extends TableController
 
     public function create(): void
     {
-        if (!($this->connectedUser->get()->isPersonManager() ?? false)) {
+        if (!($this->application->getConnectedUser()->get()->isPersonManager() ?? false)) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
         }
@@ -105,12 +117,12 @@ class PersonController extends TableController
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
-        $this->redirect('/person/edit/' . (new PersonDataHelper($this->application))->create());
+        $this->redirect('/person/edit/' . $this->personDataHelper->create());
     }
 
     public function edit(int $id): void
     {
-        if (!($this->connectedUser->get()->isPersonManager() ?? false)) {
+        if (!($this->application->getConnectedUser()->get()->isPersonManager() ?? false)) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
         }
@@ -135,7 +147,7 @@ class PersonController extends TableController
 
     public function editSave(int $id): void
     {
-        if (!($this->connectedUser->get()->isPersonManager() ?? false)) {
+        if (!($this->application->getConnectedUser()->get()->isPersonManager() ?? false)) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
         }
@@ -161,7 +173,7 @@ class PersonController extends TableController
 
     public function delete(int $id): void
     {
-        if (!($this->connectedUser->get()->isPersonManager() ?? false)) {
+        if (!($this->application->getConnectedUser()->get()->isPersonManager() ?? false)) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
         }

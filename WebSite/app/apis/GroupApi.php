@@ -6,17 +6,20 @@ use Throwable;
 
 use app\enums\ApplicationError;
 use app\helpers\Application;
+use app\helpers\ConnectedUser;
+use app\models\DataHelper;
+use app\models\PersonDataHelper;
 
 class GroupApi extends AbstractApi
 {
-    public function __construct(Application $application)
+    public function __construct(Application $application, ConnectedUser $connectedUser, DataHelper $dataHelper, PersonDataHelper $personDataHelper)
     {
-        parent::__construct($application);
+        parent::__construct($application, $connectedUser,$dataHelper, $personDataHelper);
     }
 
     public function addToGroup(int $personId, int $groupId): void
     {
-        if (!(($this->connectedUser->get()->isGroupManager() ?? false))) {
+        if (!(($this->application->getConnectedUser()->get()->isGroupManager() ?? false))) {
             $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }
@@ -50,7 +53,7 @@ class GroupApi extends AbstractApi
 
     public function getPersonsInGroup(?int $id): void
     {
-        if (!($this->connectedUser->get()->person ?? false)) {
+        if (!($this->application->getConnectedUser()->get()->person ?? false)) {
             $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }
@@ -68,7 +71,7 @@ class GroupApi extends AbstractApi
 
     public function removeFromGroup(int $personId, int $groupId): void
     {
-        if (!(($this->connectedUser->get()->isPersonManager() ?? false) || $this->connectedUser->isWebmaster() ?? false)) {
+        if (!(($this->application->getConnectedUser()->get()->isPersonManager() ?? false) || $this->application->getConnectedUser()->isWebmaster() ?? false)) {
             $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }

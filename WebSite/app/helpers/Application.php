@@ -11,19 +11,65 @@ use Throwable;
 
 use app\exceptions\DatabaseException;
 use app\models\Database;
-use app\models\DataHelper;
-use app\modules\Webmaster\MaintenanceController;
 
 class Application
 {
     public const VERSION = '0.6.0';
     public const  EMOJI_LIST = [
-        '😀', '😄', '😁', '😅', '😂', '🤣', '😊', '😇', '🤨', 
-        '🙂', '🙃', '😉', '😌', '☹️', '😐', '🙄', '😯', '🥴', 
-        '🤩', '😍', '🥰', '😘', '😚', '🧐', '🤓', '😎', '🥸', 
-        '🫣', '🤗', '🫢', '🤭', '🤫', '🤔', '🫡', '🥱', '😴', 
-        '😋', '😛', '🤪', '🤮', '🤧', '😷', '🤒', '🤕', '🤐', 
-        '😥', '😭', '😤', '😠', '🥵', '🥶', '🤑', '🤠', '🥳', 
+        '😀',
+        '😄',
+        '😁',
+        '😅',
+        '😂',
+        '🤣',
+        '😊',
+        '😇',
+        '🤨',
+        '🙂',
+        '🙃',
+        '😉',
+        '😌',
+        '☹️',
+        '😐',
+        '🙄',
+        '😯',
+        '🥴',
+        '🤩',
+        '😍',
+        '🥰',
+        '😘',
+        '😚',
+        '🧐',
+        '🤓',
+        '😎',
+        '🥸',
+        '🫣',
+        '🤗',
+        '🫢',
+        '🤭',
+        '🤫',
+        '🤔',
+        '🫡',
+        '🥱',
+        '😴',
+        '😋',
+        '😛',
+        '🤪',
+        '🤮',
+        '🤧',
+        '😷',
+        '🤒',
+        '🤕',
+        '🤐',
+        '😥',
+        '😭',
+        '😤',
+        '😠',
+        '🥵',
+        '🥶',
+        '🤑',
+        '🤠',
+        '🥳',
     ];
 
     private static self $instance;
@@ -33,8 +79,8 @@ class Application
 
     private PDO $pdo;
     private PDO $pdoForLog;
-    private DataHelper $dataHelper;
     private ErrorManager $errorManager;
+    private ConnectedUser $connectedUser;
 
     private function __construct()
     {
@@ -49,11 +95,11 @@ class Application
             $db = Database::getInstance();
             $this->pdo = $db->getPdo();
             $this->pdoForLog = $db->getPdoForLog();
-            $this->dataHelper = new DataHelper($this);
+            $this->errorManager = new ErrorManager($this);
+            $this->connectedUser = new ConnectedUser($this);
         } catch (Throwable $e) {
             throw new DatabaseException('Database error ' . $e->getMessage() . ' in file ' . __FILE__ . ' at line ' . __LINE__);
         }
-        $this->errorManager = new ErrorManager($this);
     }
 
     public static function init(): self
@@ -62,6 +108,11 @@ class Application
             self::$instance = new self();
         }
         return self::$instance;
+    }
+
+    public function getConnectedUser(): ConnectedUser
+    {
+        return $this->connectedUser;
     }
 
     public function getFlight(): Engine
@@ -87,11 +138,6 @@ class Application
     public function getErrorManager(): ErrorManager
     {
         return $this->errorManager;
-    }
-
-    public function getDataHelper(): DataHelper
-    {
-        return $this->dataHelper;
     }
 
     public function enumToValues(string $enumClass): array

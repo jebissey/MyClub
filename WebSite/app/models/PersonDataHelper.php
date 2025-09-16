@@ -2,8 +2,6 @@
 
 namespace app\models;
 
-use DateTime;
-
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
 use app\helpers\PersonPreferences;
@@ -13,7 +11,7 @@ use app\services\EmailService;
 
 class PersonDataHelper extends Data implements NewsProviderInterface
 {
-    public function __construct(Application $application)
+    public function __construct(Application $application, private PersonPreferences $personPreferences)
     {
         parent::__construct($application);
     }
@@ -133,7 +131,7 @@ class PersonDataHelper extends Data implements NewsProviderInterface
     {
         $idGroup = $this->get('Article', ['Id' => $idArticle], 'IdGroup')->IdGroup;
         $idSurvey = $this->get('Survey', ['IdArticle' => $idArticle], 'Id')->Id;
-        $persons = (new PersonDataHelper($this->application))->getPersonsInGroup($idGroup);
+        $persons = $this->getPersonsInGroup($idGroup);
         $filteredEmails = [];
         foreach ($persons as $person) {
             $include = false;
@@ -170,10 +168,10 @@ class PersonDataHelper extends Data implements NewsProviderInterface
 
     public function getInterestedPeople(?int $idGroup, ?int $idEventType, string $dayOfWeek, string $timeOfDay): array
     {
-        $persons = (new PersonDataHelper($this->application))->getPersonsInGroup($idGroup);
+        $persons = $this->getPersonsInGroup($idGroup);
         $filteredPeople = [];
         foreach ($persons as $person) {
-            if ((new PersonPreferences())->isPersonInterested($person, $idEventType, $dayOfWeek, $timeOfDay)) $filteredPeople[] = $person;
+            if ($this->personPreferences->isPersonInterested($person, $idEventType, $dayOfWeek, $timeOfDay)) $filteredPeople[] = $person;
         }
         return $filteredPeople;
     }

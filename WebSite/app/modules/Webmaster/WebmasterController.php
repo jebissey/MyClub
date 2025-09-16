@@ -6,14 +6,25 @@ use app\helpers\Application;
 use app\helpers\Params;
 use app\helpers\WebApp;
 use app\models\ArticleDataHelper;
+use app\models\AuthorizationDataHelper;
+use app\models\DataHelper;
+use app\models\LanguagesDataHelper;
 use app\models\LogDataHelper;
+use app\models\PageDataHelper;
 use app\modules\Common\AbstractController;
 
 class WebmasterController extends AbstractController
 {
-    public function __construct(Application $application)
-    {
-        parent::__construct($application);
+    public function __construct(
+        Application $application,
+        private LogDataHelper $logDataHelper,
+        private ArticleDataHelper $articleDataHelper,
+        DataHelper $dataHelper,
+        LanguagesDataHelper $languagesDataHelper,
+        PageDataHelper $pageDataHelper,
+        AuthorizationDataHelper $authorizationDataHelper
+    ) {
+        parent::__construct($application, $dataHelper, $languagesDataHelper, $pageDataHelper, $authorizationDataHelper);
     }
 
     public function helpAdmin()
@@ -21,7 +32,7 @@ class WebmasterController extends AbstractController
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isAdministrator())) {
             $this->render('Common/views/info.latte', Params::getAll([
                 'content' => $this->dataHelper->get('Settings', ['Name' => 'Help_admin'], 'Value')->Value ?? '',
-                'hasAuthorization' => $this->connectedUser->isEventManager(),
+                'hasAuthorization' => $this->application->getConnectedUser()->isEventManager(),
                 'currentVersion' => Application::VERSION,
                 'timer' => 0,
                 'previousPage' => true
@@ -34,7 +45,7 @@ class WebmasterController extends AbstractController
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isDesigner())) {
             $this->render('Common/views/info.latte', [
                 'content' => $this->dataHelper->get('Settings', ['Name' => 'Help_designer'], 'Value')->Value ?? '',
-                'hasAuthorization' => $this->connectedUser->get()->isDesigner() ?? false,
+                'hasAuthorization' => $this->application->getConnectedUser()->get()->isDesigner() ?? false,
                 'currentVersion' => Application::VERSION,
                 'timer' => 0,
                 'previousPage' => true
@@ -47,7 +58,7 @@ class WebmasterController extends AbstractController
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isVisitorInsights())) {
             $this->render('Common/views/info.latte', [
                 'content' => $this->dataHelper->get('Settings', ['Name' => 'Help_visitorInsights'], 'Value')->Value ?? '',
-                'hasAuthorization' => $this->connectedUser->get()->isVisitorInsights() ?? false,
+                'hasAuthorization' => $this->application->getConnectedUser()->get()->isVisitorInsights() ?? false,
                 'currentVersion' => Application::VERSION,
                 'timer' => 0,
                 'previousPage' => true
@@ -60,7 +71,7 @@ class WebmasterController extends AbstractController
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isWebmaster())) {
             $this->render('Common/views/info.latte', [
                 'content' => $this->dataHelper->get('Settings', ['Name' => 'Help_webmaster'], 'Value')->Value ?? '',
-                'hasAuthorization' => $this->connectedUser->get()->isWebmaster() ?? false,
+                'hasAuthorization' => $this->application->getConnectedUser()->get()->isWebmaster() ?? false,
                 'currentVersion' => Application::VERSION,
                 'timer' => 0,
                 'previousPage' => true
@@ -70,18 +81,18 @@ class WebmasterController extends AbstractController
 
     public function homeAdmin()
     {
-        if (!($this->connectedUser->get()->isAdministrator() ?? false)) {
+        if (!($this->application->getConnectedUser()->get()->isAdministrator() ?? false)) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
         }
-        if ($this->connectedUser->hasOnlyOneAutorization()) {
-            if ($this->connectedUser->isDesigner())          $this->redirect('/designer');
-            elseif ($this->connectedUser->isEventManager())  $this->redirect('/eventManager');
-            elseif ($this->connectedUser->isPersonManager()) $this->redirect('/personManager');
-            elseif ($this->connectedUser->isRedactor()) {
+        if ($this->application->getConnectedUser()->hasOnlyOneAutorization()) {
+            if ($this->application->getConnectedUser()->isDesigner())          $this->redirect('/designer');
+            elseif ($this->application->getConnectedUser()->isEventManager())  $this->redirect('/eventManager');
+            elseif ($this->application->getConnectedUser()->isPersonManager()) $this->redirect('/personManager');
+            elseif ($this->application->getConnectedUser()->isRedactor()) {
                 $_SESSION['navbar'] = 'redactor';
                 $this->redirect('/articles');
-            } elseif ($this->connectedUser->isWebmaster()) $this->redirect('/webmaster');
+            } elseif ($this->application->getConnectedUser()->isWebmaster()) $this->redirect('/webmaster');
         } else {
             if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
                 $this->raiseMethodNotAllowed(__FILE__, __LINE__);
@@ -118,12 +129,12 @@ class WebmasterController extends AbstractController
     public function showInstallations(): void
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isWebmaster())) {
-            $installations = (new LogDataHelper($this->application))->getInstallationsData();
+            $installations = $this->logDataHelper->getInstallationsData();
 
             $this->render('Webmaster/views/installations.latte', Params::getAll([
                 'installations' => $installations,
                 'totalInstallations' => count($installations),
-                'navItems' => $this->getNavItems($this->connectedUser->person),
+                'navItems' => $this->getNavItems($this->application->getConnectedUser()->person),
                 'isMyclubWebSite' => WebApp::isMyClubWebSite(),
             ]));
         }
@@ -135,7 +146,7 @@ class WebmasterController extends AbstractController
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
-        $articleDataHelper = new ArticleDataHelper($this->application);
+        $articleDataHelper = $this->articleDataHelper;
         $base_url = WebApp::getBaseUrl();
         header("Content-Type: application/xml; charset=utf-8");
         echo '<?xml version="1.0" encoding="UTF-8"?>' . PHP_EOL;

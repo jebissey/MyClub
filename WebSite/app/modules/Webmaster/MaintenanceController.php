@@ -4,39 +4,52 @@ namespace app\modules\Webmaster;
 
 use app\enums\ApplicationError;
 use app\helpers\Application;
+use app\helpers\ErrorManager;
 use app\helpers\Params;
 use app\helpers\WebApp;
+use app\models\AuthorizationDataHelper;
+use app\models\DataHelper;
+use app\models\LanguagesDataHelper;
+use app\models\LogDataHelper;
+use app\models\PageDataHelper;
 use app\modules\Common\AbstractController;
 
 class MaintenanceController extends AbstractController
 {
     private const MAINTENANCE_UNSET = '/maintenance/unset';
 
-    public function __construct(Application $application)
-    {
-        parent::__construct($application);
+    public function __construct(
+        Application $application,
+        protected ErrorManager $errorManager,
+        DataHelper $dataHelper,
+        LanguagesDataHelper $languagesDataHelper,
+        PageDataHelper $pageDataHelper,
+        AuthorizationDataHelper $authorizationDataHelper,
+        LogDataHelper $logDataHelper
+    ) {
+        parent::__construct($application, $dataHelper, $languagesDataHelper, $pageDataHelper, $authorizationDataHelper, $logDataHelper);
     }
 
     public function checkIfSiteIsUnderMaintenance(): void
     {
-error_log("\n\n" . json_encode('---###---', JSON_PRETTY_PRINT) . "\n");
+        error_log("\n\n" . json_encode('---###---', JSON_PRETTY_PRINT) . "\n");
         if (strpos($_SERVER['REQUEST_URI'] ?? '', self::MAINTENANCE_UNSET) !== false) return;
 
         $siteUnderMaintenance = $this->dataHelper->get('Metadata', ['Id' => 1], 'SiteUnderMaintenance')->SiteUnderMaintenance;
         if ($siteUnderMaintenance == 0) return;
 
-        $this->application->getErrorManager()->raise(
+        $this->errorManager->raise(
             ApplicationError::ServiceUnavailable,
             "Maintenance",
             30000,
             false,
-            $this->connectedUser->get()->isWebmaster() ?? false
+            $this->application->getConnectedUser()->get()->isWebmaster() ?? false
         );
     }
 
     public function maintenance(): void
     {
-        if (!($this->connectedUser->get()->isWebmaster() ?? false)) {
+        if (!($this->application->getConnectedUser()->get()->isWebmaster() ?? false)) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
         }
@@ -49,7 +62,7 @@ error_log("\n\n" . json_encode('---###---', JSON_PRETTY_PRINT) . "\n");
 
     public function setSiteOnline(): void
     {
-        if (!($this->connectedUser->get()->isWebmaster() ?? false)) {
+        if (!($this->application->getConnectedUser()->get()->isWebmaster() ?? false)) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
         }
@@ -63,7 +76,7 @@ error_log("\n\n" . json_encode('---###---', JSON_PRETTY_PRINT) . "\n");
 
     public function setSiteUnderMaintenance(): void
     {
-        if (!($this->connectedUser->get()->isWebmaster() ?? false)) {
+        if (!($this->application->getConnectedUser()->get()->isWebmaster() ?? false)) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
         }

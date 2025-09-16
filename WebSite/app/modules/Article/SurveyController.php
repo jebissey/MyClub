@@ -2,7 +2,6 @@
 
 namespace app\modules\Article;
 
-use app\enums\ApplicationError;
 use app\enums\FilterInputRule;
 use app\enums\SurveyVisibility;
 use app\exceptions\IntegrityException;
@@ -10,19 +9,28 @@ use app\helpers\Application;
 use app\helpers\Params;
 use app\helpers\WebApp;
 use app\models\AuthorizationDataHelper;
+use app\models\DataHelper;
+use app\models\LanguagesDataHelper;
+use app\models\PageDataHelper;
 use app\models\SurveyDataHelper;
 use app\modules\Common\AbstractController;
 
 class SurveyController extends AbstractController
 {
-    public function __construct(Application $application)
-    {
-        parent::__construct($application);
+    public function __construct(
+        Application $application,
+        private SurveyDataHelper $surveyDataHelper,
+        private AuthorizationDataHelper $authorizationDataHelper,
+        DataHelper $dataHelper,
+        LanguagesDataHelper $languagesDataHelper,
+        PageDataHelper $pageDataHelper,
+    ) {
+        parent::__construct($application, $dataHelper, $languagesDataHelper, $pageDataHelper, $authorizationDataHelper);
     }
 
     public function add($articleId)
     {
-        if (!($this->connectedUser->get()->isRedactor() ?? false)) {
+        if (!($this->application->getConnectedUser()->get()->isRedactor() ?? false)) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
         }
@@ -43,7 +51,7 @@ class SurveyController extends AbstractController
 
     public function createOrUpdate()
     {
-        if (!($this->connectedUser->get()->isRedactor() ?? false)) {
+        if (!($this->application->getConnectedUser()->get()->isRedactor() ?? false)) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
         }
@@ -87,7 +95,7 @@ class SurveyController extends AbstractController
             $this->raiseBadRequest("Article {$articleId} doesn't exist", __FILE__, __LINE__);
             return;
         }
-        $connectedUser = $this->connectedUser->get();
+        $connectedUser = $this->application->getConnectedUser()->get();
         if ($connectedUser->person === null) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
@@ -99,13 +107,13 @@ class SurveyController extends AbstractController
 
 
 
-        $survey = (new SurveyDataHelper($this->application))->getWithCreator($articleId);
+        $survey = $this->surveyDataHelper->getWithCreator($articleId);
         if (!$survey) {
             $this->raiseBadRequest("No survey for article {$articleId}", __FILE__, __LINE__);
             $this->redirect('/article/' . $articleId);
             return;
         }
-        if ((new AuthorizationDataHelper($this->application))->canPersonReadSurveyResults($this->dataHelper->get('Article', ['Id' => $survey->IdArticle]), $connectedUser)) {
+        if ($this->authorizationDataHelper->canPersonReadSurveyResults($this->dataHelper->get('Article', ['Id' => $survey->IdArticle]), $connectedUser)) {
             $replies = $this->dataHelper->gets('Reply', ['IdSurvey' => $survey->Id]);
             $participants = [];
             $results = [];

@@ -19,18 +19,30 @@ use app\apis\WebmasterApi;
 use app\modules\Article\ArticleController;
 use app\enums\ApplicationError;
 use app\helpers\Application;
+use app\helpers\Backup;
 use app\helpers\ConnectedUser;
+use app\helpers\ErrorManager;
+use app\helpers\GravatarHandler;
 use app\helpers\News;
 use app\helpers\PersonPreferences;
+use app\helpers\WebApp;
+use app\models\ArticleCrosstabDataHelper;
 use app\models\AuthorizationDataHelper;
 use app\models\ArticleDataHelper;
 use app\models\ArticleTableDataHelper;
 use app\models\AttributeDataHelper;
+use app\models\CarouselDataHelper;
+use app\models\CrosstabDataHelper;
 use app\models\DataHelper;
 use app\models\DbBrowserDataHelper;
+use app\models\DesignDataHelper;
 use app\models\EventDataHelper;
 use app\models\EventNeedDataHelper;
+use app\models\EventTypeDataHelper;
+use app\models\GenericDataHelper;
 use app\models\GroupDataHelper;
+use app\models\ImportDataHelper;
+use app\models\LanguagesDataHelper;
 use app\models\LogDataHelper;
 use app\models\MessageDataHelper;
 use app\models\NeedDataHelper;
@@ -41,9 +53,11 @@ use app\models\PersonDataHelper;
 use app\models\PersonGroupDataHelper;
 use app\models\PersonStatisticsDataHelper;
 use app\models\SurveyDataHelper;
+use app\models\TableControllerDataHelper;
 use app\modules\Article\DesignController;
 use app\modules\Article\MediaController;
 use app\modules\Article\SurveyController;
+use app\modules\Common\EmptyController;
 use app\modules\Event\EventController;
 use app\modules\Event\EventTypeController;
 use app\modules\Event\EventEmailController;
@@ -78,6 +92,7 @@ use app\modules\Webmaster\WebappSettingsController;
 use app\modules\Webmaster\WebmasterController;
 use app\services\AuthenticationService;
 use app\services\AuthorizationService;
+use app\services\EmailService;
 use app\services\EventService;
 
 if ($_SERVER['SERVER_NAME'] === 'localhost')
@@ -86,17 +101,33 @@ else Debugger::enable(Debugger::Production, __DIR__ . '/var/tracy/log');
 
 $application = Application::init();
 $flight = $application->getFlight();
-
 // Add a custom URL parser to fix issue with URL with encoded email address
 $flight->map('pass', function ($str) {
     return $str;
 });
-$flight->before('start', function () use ($application) {
+
+$authorizationDataHelper = new AuthorizationDataHelper($application);
+$dataHelper = new DataHelper($application);
+$gravatarHandler = new GravatarHandler();
+$connectedUser = new ConnectedUser($application, $gravatarHandler, $authorizationDataHelper, $dataHelper);
+$logDataHelper = new LogDataHelper($application);
+$languagesDataHelper = new LanguagesDataHelper($application);
+$pageDataHelper = new PageDataHelper($application, $authorizationDataHelper);
+$emptyController = new EmptyController($application, $dataHelper, $languagesDataHelper, $pageDataHelper, $authorizationDataHelper, $logDataHelper);
+$errorManager = new ErrorManager($application, $connectedUser, $logDataHelper, $languagesDataHelper, $dataHelper, $emptyController);
+$maintenanceController = new MaintenanceController(
+    $application,
+    $errorManager,
+    $dataHelper,
+    $languagesDataHelper,
+    $pageDataHelper,
+    $authorizationDataHelper,
+    $logDataHelper
+);
+$flight->before('start', function () use ($maintenanceController) {
     session_start();
     if (!isset($_SESSION['token'])) $_SESSION['token'] = bin2hex(random_bytes(32));
-
-    (new ConnectedUser($application))->get();
-    (new MaintenanceController($application))->checkIfSiteIsUnderMaintenance();
+    $maintenanceController->checkIfSiteIsUnderMaintenance();
 });
 $flight->map('setData', function ($key, $value) {
     Flight::set($key, $value);
@@ -105,28 +136,32 @@ $flight->map('getData', function ($key) {
     return Flight::get($key);
 });
 
-$articleDataHelper = new ArticleDataHelper($application);
+$crosstabDataHelper = new CrosstabDataHelper($application, $authorizationDataHelper);
+$articleCrosstabDataheper = new ArticleCrosstabDataHelper($application, $crosstabDataHelper);
+$articleDataHelper = new ArticleDataHelper($application, $authorizationDataHelper);
 $articleTableDataHelper = new ArticleTableDataHelper($application);
 $attributeDataHelper = new AttributeDataHelper($application);
-$dataHelper = new DataHelper($application);
+$backup = new Backup();
 $authenticationService = new AuthenticationService($dataHelper);
-$authorizationDataHelper = new AuthorizationDataHelper($application);
-$connectedUser = new ConnectedUser($application);
+$carouselDataHelper = new CarouselDataHelper($application);
 $dbBrowserDataHelper = new DbBrowserDataHelper($application);
+$designDataHelper = new DesignDataHelper($application);
+$emailService = new EmailService();
 $eventDataHelper = new EventDataHelper($application);
 $eventNeedDataHelper = new EventNeedDataHelper($application);
+$eventTypeDataHelper = new EventTypeDataHelper($application);
+$genericDataHelper = new GenericDataHelper($application);
 $groupDataHelper = new GroupDataHelper($application);
+$importDataHelper = new ImportDataHelper($application);
 $needTypeDataHelper = new NeedTypeDataHelper($application);
 $messageDataHelper = new MessageDataHelper($application);
 $needDataHelper = new NeedDataHelper($application);
-$logDataHelper = new LogDataHelper($application);
-$pageDataHelper = new PageDataHelper($application);
 $participantDataHelper = new ParticipantDataHelper($application);
-$personDataHelper = new PersonDataHelper($application);
+$personPreferences = new PersonPreferences();
+$personDataHelper = new PersonDataHelper($application, $personPreferences);
 $personGroupDataHelper = new PersonGroupDataHelper($application);
 $personStatisticsDataHelper = new PersonStatisticsDataHelper($application);
-$personPreferences = new PersonPreferences();
-$surveyDataHelper = new SurveyDataHelper($application);
+$surveyDataHelper = new SurveyDataHelper($application, $articleDataHelper);
 $news = new News([
     $articleDataHelper,
     $eventDataHelper,
@@ -134,9 +169,23 @@ $news = new News([
     $personDataHelper,
     $surveyDataHelper,
 ]);
+$tableControllerDataHelper = new TableControllerDataHelper($application);
+$webapp = new WebApp();
 
 #region web
-$articleController = new ArticleController($application, $articleDataHelper, $articleTableDataHelper, $authorizationDataHelper, $personDataHelper);
+$articleController = new ArticleController(
+    $application,
+    $articleDataHelper,
+    $articleTableDataHelper,
+    $authorizationDataHelper,
+    $personDataHelper,
+    $dataHelper,
+    $backup,
+    $articleCrosstabDataheper,
+    $genericDataHelper,
+    $languagesDataHelper,
+    $pageDataHelper
+);
 mapRoute($flight, 'GET  /article/create', $articleController, 'create');
 mapRoute($flight, 'POST /article/delete/@id:[0-9]+', $articleController, 'delete');
 mapRoute($flight, 'GET  /article/@id:[0-9]+', $articleController, 'show');
@@ -149,16 +198,38 @@ mapRoute($flight, 'POST /publish/article/@id:[0-9]+', $articleController, 'publi
 mapRoute($flight, 'GET  /redactor', $articleController, 'home');
 mapRoute($flight, 'GET  /redactor/help', $articleController, 'home');
 
-$arwardsController = new ArwardsController($application);
+$arwardsController = new ArwardsController(
+    $application,
+    $dataHelper,
+    $languagesDataHelper,
+    $pageDataHelper,
+    $authorizationDataHelper
+);
 mapRoute($flight, 'GET  /arwards', $arwardsController, 'seeArwards');
 mapRoute($flight, 'POST /arward', $arwardsController, 'setArward');
 
-$contactController = new ContactController($application);
+$contactController = new ContactController(
+    $application,
+    $emailService,
+    $personDataHelper,
+    $webapp,
+    $dataHelper,
+    $languagesDataHelper,
+    $pageDataHelper,
+    $authorizationDataHelper
+);
 mapRoute($flight, 'GET  /contact', $contactController, 'contact');
 mapRoute($flight, 'POST /contact', $contactController, 'contact');
 mapRoute($flight, 'GET  /contact/event/@id:[0-9]+', $contactController, 'contact');
 
-$dbBrowserController = new DbBrowserController($application, $dbBrowserDataHelper);
+$dbBrowserController = new DbBrowserController(
+    $application,
+    $dbBrowserDataHelper,
+    $dataHelper,
+    $languagesDataHelper,
+    $pageDataHelper,
+    $authorizationDataHelper
+);
 mapRoute($flight, 'GET  /dbbrowser', $dbBrowserController, 'index');
 mapRoute($flight, 'GET  /dbbrowser/@table:[A-Za-z0-9_]+', $dbBrowserController, 'showTable', 1);
 mapRoute($flight, 'GET  /dbbrowser/@table:[A-Za-z0-9_]+/create', $dbBrowserController, 'showCreateForm');
@@ -167,12 +238,29 @@ mapRoute($flight, 'GET  /dbbrowser/@table:[A-Za-z0-9_]+/edit/@id:[0-9]+', $dbBro
 mapRoute($flight, 'POST /dbbrowser/@table:[A-Za-z0-9_]+/edit/@id:[0-9]+', $dbBrowserController, 'updateRecord');
 mapRoute($flight, 'POST /dbbrowser/@table:[A-Za-z0-9_]+/delete/@id:[0-9]+', $dbBrowserController, 'deleteRecord');
 
-$designController = new DesignController($application);
+$designController = new DesignController(
+    $application,
+    $designDataHelper,
+    $dataHelper,
+    $languagesDataHelper,
+    $pageDataHelper,
+    $authorizationDataHelper
+);
 mapRoute($flight, 'GET  /designs', $designController, 'index');
 mapRoute($flight, 'GET  /design/create', $designController, 'create');
 mapRoute($flight, 'POST /design/save', $designController, 'save');
 
-$eventController = new EventController($application, $eventDataHelper);
+$eventController = new EventController(
+    $application,
+    $eventDataHelper,
+    $crosstabDataHelper,
+    $participantDataHelper,
+    $messageDataHelper,
+    $dataHelper,
+    $languagesDataHelper,
+    $pageDataHelper,
+    $authorizationDataHelper
+);
 mapRoute($flight, 'GET  /eventManager', $eventController, 'home');
 mapRoute($flight, 'GET  /eventManager/help', $eventController, 'help');
 mapRoute($flight, 'GET  /event/chat/@id:[0-9]+', $eventController, 'showEventChat');
@@ -191,28 +279,72 @@ mapRoute($flight, 'GET  /events/crosstab', $eventController, 'showEventCrosstab'
 mapRoute($flight, 'GET /nextEvents', $eventController, 'nextEvents');
 mapRoute($flight, 'GET  /weekEvents', $eventController, 'weekEvents');
 
-$eventEmailController = new EventEmailController($application);
+$eventEmailController = new EventEmailController(
+    $application,
+    $personDataHelper,
+    $dataHelper,
+    $languagesDataHelper,
+    $pageDataHelper,
+    $authorizationDataHelper
+);
 mapRoute($flight, 'GET  /emails', $eventEmailController, 'fetchEmails');
 mapRoute($flight, 'POST /emails', $eventEmailController, 'copyEmails');
 
-$eventGuestController = new EventGuestController($application, $eventDataHelper);
+$eventGuestController = new EventGuestController(
+    $application,
+    $eventDataHelper,
+    $dataHelper,
+    $languagesDataHelper,
+    $pageDataHelper,
+    $authorizationDataHelper
+);
 mapRoute($flight, 'GET  /events/guest', $eventGuestController, 'guest');
 mapRoute($flight, 'POST /events/guest', $eventGuestController, 'guestInvite');
 
-$eventNeedController = new EventNeedController($application, $needDataHelper);
+$eventNeedController = new EventNeedController(
+    $application,
+    $needDataHelper,
+    $dataHelper,
+    $languagesDataHelper,
+    $pageDataHelper,
+    $authorizationDataHelper
+);
 mapRoute($flight, 'GET /needs', $eventNeedController, 'needs');
 
-$eventTypeController = new EventTypeController($application, $eventDataHelper);
+$eventTypeController = new EventTypeController(
+    $application,
+    $eventDataHelper,
+    $tableControllerDataHelper,
+    $errorManager,
+    $dataHelper,
+    $languagesDataHelper,
+    $pageDataHelper,
+    $authorizationDataHelper,
+    $genericDataHelper
+);
 mapRoute($flight, 'GET  /eventTypes', $eventTypeController, 'index');
 mapRoute($flight, 'GET  /eventTypes/create', $eventTypeController, 'create');
 mapRoute($flight, 'GET  /eventTypes/edit/@id:[0-9]+', $eventTypeController, 'edit');
 mapRoute($flight, 'POST /eventTypes/edit/@id:[0-9]+', $eventTypeController, 'editSave');
 mapRoute($flight, 'POST /eventTypes/delete/@id:[0-9]+', $eventTypeController, 'delete');
 
-$ffaController = new FFAController($application);
+$ffaController = new FFAController(
+    $application,
+    $dataHelper,
+    $languagesDataHelper,
+    $pageDataHelper,
+    $authorizationDataHelper
+);
 mapRoute($flight, 'GET /ffa/search', $ffaController, 'searchMember');
 
-$groupController = new GroupController($application, $groupDataHelper);
+$groupController = new GroupController(
+    $application,
+    $groupDataHelper,
+    $dataHelper,
+    $languagesDataHelper,
+    $pageDataHelper,
+    $authorizationDataHelper
+);
 mapRoute($flight, 'GET  /groups', $groupController, 'groupIndex');
 mapRoute($flight, 'GET  /group/create', $groupController, 'groupCreate');
 mapRoute($flight, 'POST /group/create', $groupController, 'groupCreateSave');
@@ -220,16 +352,42 @@ mapRoute($flight, 'GET  /group/edit/@id:[0-9]+', $groupController, 'groupEdit');
 mapRoute($flight, 'POST /group/edit/@id:[0-9]+', $groupController, 'groupEditSave');
 mapRoute($flight, 'POST /group/delete/@id:[0-9]+', $groupController, 'groupDelete');
 
-$homeController = new HomeController($application);
+$homeController = new HomeController(
+    $application,
+    $articleDataHelper,
+    $surveyDataHelper,
+    $designDataHelper,
+    $news,
+    $personDataHelper,
+    $dataHelper,
+    $languagesDataHelper,
+    $pageDataHelper,
+    $authorizationDataHelper
+);
 mapRoute($flight, 'GET  /', $homeController, 'home');
 mapRoute($flight, 'GET  /help', $homeController, 'helpHome');
 mapRoute($flight, 'GET  /legal/notice', $homeController, 'legalNotice');
 
-$importController = new ImportController($application);
+$importController = new ImportController(
+    $application,
+    $importDataHelper,
+    $dataHelper,
+    $languagesDataHelper,
+    $pageDataHelper,
+    $authorizationDataHelper
+);
 mapRoute($flight, 'GET  /import', $importController, 'showImportForm');
 mapRoute($flight, 'POST /import', $importController, 'processImport');
 
-$logController = new LogController($application, $logDataHelper);
+$logController = new LogController(
+    $application,
+    $logDataHelper,
+    $crosstabDataHelper,
+    $dataHelper,
+    $languagesDataHelper,
+    $pageDataHelper,
+    $authorizationDataHelper
+);
 mapRoute($flight, 'GET /analytics', $logController, 'analytics');
 mapRoute($flight, 'GET /lastVisits', $logController, 'showLastVisits');
 mapRoute($flight, 'GET /logs', $logController, 'index');
@@ -239,23 +397,43 @@ mapRoute($flight, 'GET /topArticles', $logController, 'topArticlesByPeriod');
 mapRoute($flight, 'GET /topPages', $logController, 'topPagesByPeriod');
 mapRoute($flight, 'GET /visitors/graf', $logController, 'visitorsGraf');
 
-$maintenanceController = new MaintenanceController($application);
 mapRoute($flight, 'GET /maintenance', $maintenanceController, 'maintenance');
 mapRoute($flight, 'GET /maintenance/set', $maintenanceController, 'setSiteUnderMaintenance');
 mapRoute($flight, 'GET /maintenance/unset', $maintenanceController, 'setSiteOnline');
 
-$mediaController = new MediaController($application);
+$mediaController = new MediaController(
+    $application,
+    $dataHelper,
+    $languagesDataHelper,
+    $pageDataHelper,
+    $authorizationDataHelper
+);
 mapRoute($flight, 'GET /data/media/@year:[0-9]+/@month:[0-9]+/@filename', $mediaController, 'viewFile');
 mapRoute($flight, 'GET /media/upload', $mediaController, 'showUploadForm');
 mapRoute($flight, 'GET /media/list', $mediaController, 'listFiles');
 mapRoute($flight, 'GET /media/gpxViewer', $mediaController, 'gpxViewer');
 
-$navBarController = new NavBarController($application);
+$navBarController = new NavBarController(
+    $application,
+    $dataHelper,
+    $languagesDataHelper,
+    $pageDataHelper,
+    $authorizationDataHelper
+);
 mapRoute($flight, 'GET /navBar', $navBarController, 'index');
 mapRoute($flight, 'GET /navBar/show/article/@id:[0-9]+', $navBarController, 'showArticle');
 mapRoute($flight, 'GET /navBar/show/arwards', $navBarController, 'showArwards');
 
-$personController = new PersonController($application);
+$personController = new PersonController(
+    $application,
+    $tableControllerDataHelper,
+    $personDataHelper,
+    $genericDataHelper,
+    $dataHelper,
+    $languagesDataHelper,
+    $pageDataHelper,
+    $authorizationDataHelper
+);
 mapRoute($flight, 'GET  /personManager', $personController, 'home');
 mapRoute($flight, 'GET  /personManager/help', $personController, 'help');
 mapRoute($flight, 'GET  /persons', $personController, 'index');
@@ -264,20 +442,51 @@ mapRoute($flight, 'GET  /person/edit/@id:[0-9]+', $personController, 'edit');
 mapRoute($flight, 'POST /person/edit/@id:[0-9]+', $personController, 'editSave');
 mapRoute($flight, 'POST /person/delete/@id:[0-9]+', $personController, 'delete');
 
-$registrationController = new RegistrationController($application);
+$registrationController = new RegistrationController(
+    $application,
+    $tableControllerDataHelper,
+    $groupDataHelper,
+    $genericDataHelper,
+    $dataHelper,
+    $languagesDataHelper,
+    $pageDataHelper,
+    $authorizationDataHelper
+);
 mapRoute($flight, 'GET /registration', $registrationController, 'index');
 mapRoute($flight, 'GET /registration/groups/@id:[0-9]+', $registrationController, 'getPersonGroups');
 
-$rssController = new RssController($application);
+$rssController = new RssController(
+    $application,
+    $articleDataHelper,
+    $eventDataHelper,
+    $dataHelper,
+    $languagesDataHelper,
+    $pageDataHelper,
+    $authorizationDataHelper
+);
 mapRoute($flight, 'GET /articles-rss.xml', $rssController, 'articlesRssGenerator');
 mapRoute($flight, 'GET /events-rss.xml', $rssController, 'eventsRssGenerator');
 
-$surveyController = new SurveyController($application);
+$surveyController = new SurveyController(
+    $application,
+    $surveyDataHelper,
+    $authorizationDataHelper,
+    $dataHelper,
+    $languagesDataHelper,
+    $pageDataHelper,
+);
 mapRoute($flight, 'GET  /survey/add/@id:[0-9]+', $surveyController, 'add');
 mapRoute($flight, 'POST /survey/create', $surveyController, 'createOrUpdate');
 mapRoute($flight, 'GET  /survey/results/@id:[0-9]+', $surveyController, 'viewResults');
 
-$userController = new UserController($application, $authenticationService);
+$userController = new UserController(
+    $application,
+    $authenticationService,
+    $dataHelper,
+    $languagesDataHelper,
+    $pageDataHelper,
+    $authorizationDataHelper
+);
 mapRoute($flight, 'GET  /user/forgotPassword/@encodedEmail', $userController, 'forgotPassword');
 mapRoute($flight, 'GET  /user/setPassword/@token:[a-f0-9]+', $userController, 'setPassword');
 mapRoute($flight, 'POST /user/setPassword/@token:[a-f0-9]+', $userController, 'setPassword');
@@ -285,50 +494,136 @@ mapRoute($flight, 'GET  /user/sign/in', $userController, 'signIn');
 mapRoute($flight, 'POST /user/sign/in', $userController, 'signIn');
 mapRoute($flight, 'GET  /user/sign/out', $userController, 'signOut');
 
-$userAccountController = new UserAccountController($application);
+$userAccountController = new UserAccountController(
+    $application,
+    $dataHelper,
+    $languagesDataHelper,
+    $pageDataHelper,
+    $authorizationDataHelper
+);
 mapRoute($flight, 'GET  /user/account', $userAccountController, 'account');
 mapRoute($flight, 'POST /user/account', $userAccountController, 'accountSave');
 
-$userAvailabilitiesController = new UserAvailabilitiesController($application);
+$userAvailabilitiesController = new UserAvailabilitiesController(
+    $application,
+    $dataHelper,
+    $languagesDataHelper,
+    $pageDataHelper,
+    $authorizationDataHelper
+);
 mapRoute($flight, 'GET  /user/availabilities', $userAvailabilitiesController, 'availabilities');
 mapRoute($flight, 'POST /user/availabilities', $userAvailabilitiesController, 'availabilitiesSave');
 
-$userDashboardController = new UserDashboardController($application);
+$userDashboardController = new UserDashboardController(
+    $application,
+    $dataHelper,
+    $languagesDataHelper,
+    $pageDataHelper,
+    $authorizationDataHelper,
+    $logDataHelper,
+    $emptyController
+);
 mapRoute($flight, 'GET  /user', $userDashboardController, 'user');
 mapRoute($flight, 'GET  /user/help', $userDashboardController, 'help');
 
-$userDirectoryController = new UserDirectoryController($application);
+$userDirectoryController = new UserDirectoryController(
+    $application,
+    $personDataHelper,
+    $groupDataHelper,
+    $dataHelper,
+    $languagesDataHelper,
+    $pageDataHelper,
+    $authorizationDataHelper
+);
 mapRoute($flight, 'GET  /user/directory', $userDirectoryController, 'showDirectory');
 mapRoute($flight, 'GET  /user/directory/map', $userDirectoryController, 'showMap');
 
-$userGroupsController = new UserGroupsController($application, $personGroupDataHelper, $groupDataHelper);
+$userGroupsController = new UserGroupsController(
+    $application,
+    $personGroupDataHelper,
+    $groupDataHelper,
+    $dataHelper,
+    $languagesDataHelper,
+    $pageDataHelper,
+    $authorizationDataHelper
+);
 mapRoute($flight, 'GET  /user/groups', $userGroupsController, 'groups');
 mapRoute($flight, 'POST /user/groups', $userGroupsController, 'groupsSave');
 
-$userNewsController = new UserNewsController($application, $news);
+$userNewsController = new UserNewsController(
+    $application,
+    $news,
+    $dataHelper,
+    $languagesDataHelper,
+    $pageDataHelper,
+    $authorizationDataHelper
+);
 mapRoute($flight, 'GET  /user/news', $userNewsController, 'showNews');
 
-$userNotepadController = new UserNotepadController($application);
+$userNotepadController = new UserNotepadController(
+    $application,
+    $dataHelper,
+    $languagesDataHelper,
+    $pageDataHelper,
+    $authorizationDataHelper
+);
 mapRoute($flight, 'GET  /user/notepad', $userNotepadController, 'editNotepad');
 mapRoute($flight, 'POST /user/notepad', $userNotepadController, 'saveNotepad');
 
-$userPreferencesController = new UserPreferencesController($application);
+$userPreferencesController = new UserPreferencesController(
+    $application,
+    $eventTypeDataHelper,
+    $dataHelper,
+    $languagesDataHelper,
+    $pageDataHelper,
+    $authorizationDataHelper
+);
 mapRoute($flight, 'GET  /user/preferences', $userPreferencesController, 'preferences');
 mapRoute($flight, 'POST /user/preferences', $userPreferencesController, 'preferencesSave');
 
-$userPresentationController = new UserPresentationController($application);
+$userPresentationController = new UserPresentationController(
+    $application,
+    $dataHelper,
+    $languagesDataHelper,
+    $pageDataHelper,
+    $authorizationDataHelper,
+    $logDataHelper,
+    $emptyController
+);
 mapRoute($flight, 'GET  /user/presentation/edit', $userPresentationController, 'editPresentation');
 mapRoute($flight, 'POST /user/presentation/edit', $userPresentationController, 'savePresentation');
 mapRoute($flight, 'GET  /user/presentation/@id:[0-9]+', $userPresentationController, 'showPresentation');
 
-$userStatisticsController = new UserStatisticsController($application, $personStatisticsDataHelper, $logDataHelper);
+$userStatisticsController = new UserStatisticsController(
+    $application,
+    $personStatisticsDataHelper,
+    $logDataHelper,
+    $dataHelper,
+    $languagesDataHelper,
+    $pageDataHelper,
+    $authorizationDataHelper
+);
 mapRoute($flight, 'GET  /user/statistics', $userStatisticsController, 'showStatistics');
 
-$webappSettingsController = new WebappSettingsController($application);
+$webappSettingsController = new WebappSettingsController(
+    $application,
+    $dataHelper,
+    $languagesDataHelper,
+    $pageDataHelper,
+    $authorizationDataHelper
+);
 mapRoute($flight, 'GET  /settings', $webappSettingsController, 'editSettings');
 mapRoute($flight, 'POST /settings', $webappSettingsController, 'saveSettings');
 
-$webmasterController = new WebmasterController($application);
+$webmasterController = new WebmasterController(
+    $application,
+    $logDataHelper,
+    $articleDataHelper,
+    $dataHelper,
+    $languagesDataHelper,
+    $pageDataHelper,
+    $authorizationDataHelper
+);
 mapRoute($flight, 'GET  /admin', $webmasterController, 'homeAdmin');
 mapRoute($flight, 'GET  /admin/help', $webmasterController, 'helpAdmin');
 mapRoute($flight, 'GET  /admin/webmaster/help', $webmasterController, 'helpWebmaster');
@@ -342,13 +637,19 @@ mapRoute($flight, 'GET  /webmaster', $webmasterController, 'homeWebmaster');
 #endregion
 
 #region games
-$solfegeController = new SolfegeController($application);
+$solfegeController = new SolfegeController(
+    $application,
+    $dataHelper,
+    $languagesDataHelper,
+    $pageDataHelper,
+    $authorizationDataHelper
+);
 mapRoute($flight, 'GET  /games/solfege/learn', $solfegeController, 'learn');
 mapRoute($flight, 'POST /games/solfege/save-score', $solfegeController, 'saveScore');
 #endrefion
 
 #region api
-$articleApi = new ArticleApi($application);
+$articleApi = new ArticleApi($application, $connectedUser, $dataHelper, $personDataHelper, $designDataHelper, $articleDataHelper);
 mapRoute($flight, 'GET  /api/author/@articleId:[0-9]+', $articleApi, 'getAuthor');
 mapRoute($flight, 'POST /api/design/vote', $articleApi, 'designVote');
 mapRoute($flight, 'POST /api/media/delete/@year:[0-9]+/@month:[0-9]+/@filename', $articleApi, 'deleteFile');
@@ -356,7 +657,7 @@ mapRoute($flight, 'POST /api/media/upload', $articleApi, 'uploadFile');
 mapRoute($flight, 'POST /api/survey/reply', $articleApi, 'saveSurveyReply');
 mapRoute($flight, 'GET  /api/survey/reply/@id:[0-9]+', $articleApi, 'showSurveyReplyForm');
 
-$carouselApi = new carouselApi($application);
+$carouselApi = new carouselApi($application, $connectedUser, $dataHelper, $personDataHelper, $authorizationDataHelper, $carouselDataHelper);
 mapRoute($flight, 'GET  /api/carousel/@articleId:[0-9]+', $carouselApi, 'getItems');
 mapRoute($flight, 'POST /api/carousel/save', $carouselApi, 'saveItem');
 mapRoute($flight, 'POST /api/carousel/delete/@id:[0-9]+', $carouselApi, 'deleteItem');
@@ -374,7 +675,10 @@ $eventApi = new EventApi(
     ),
     $participantDataHelper,
     $personPreferences,
-    $messageDataHelper
+    $messageDataHelper,
+    $connectedUser,
+    $dataHelper,
+    $personDataHelper
 );
 mapRoute($flight, 'GET  /api/attributes-by-event-type/@id:[0-9]+', $eventApi, 'getAttributesByEventType');
 mapRoute($flight, 'POST /api/event/delete/@id:[0-9]+', $eventApi, 'deleteEvent');
@@ -383,45 +687,45 @@ mapRoute($flight, 'POST /api/event/save', $eventApi, 'saveEvent');
 mapRoute($flight, 'POST /api/event/sendEmails', $eventApi, 'sendEmails');
 mapRoute($flight, 'GET  /api/event/@id:[0-9]+', $eventApi, 'getEvent');
 
-$eventAttributeApi = new EventAttributeApi($application, $attributeDataHelper);
+$eventAttributeApi = new EventAttributeApi($application, $attributeDataHelper, $connectedUser, $dataHelper, $personDataHelper);
 mapRoute($flight, 'POST /api/attribute/create', $eventAttributeApi, 'createAttribute');
 mapRoute($flight, 'POST /api/attribute/delete/@id:[0-9]+', $eventAttributeApi, 'deleteAttribute');
 mapRoute($flight, 'GET  /api/attributes/list', $eventAttributeApi, 'getAttributes');
 mapRoute($flight, 'POST /api/attribute/update', $eventAttributeApi, 'updateAttribute');
 
-$eventMessageApi = new EventMessageApi($application, $messageDataHelper);
+$eventMessageApi = new EventMessageApi($application, $messageDataHelper, $connectedUser, $dataHelper, $personDataHelper);
 mapRoute($flight, 'POST /api/message/add', $eventMessageApi, 'addMessage');
 mapRoute($flight, 'POST /api/message/update', $eventMessageApi, 'updateMessage');
 mapRoute($flight, 'POST /api/message/delete', $eventMessageApi, 'deleteMessage');
 
-$eventNeedApi = new EventNeedApi($application, $eventNeedDataHelper, $eventDataHelper);
+$eventNeedApi = new EventNeedApi($application, $eventNeedDataHelper, $eventDataHelper, $connectedUser, $dataHelper, $personDataHelper);
 mapRoute($flight, 'GET  /api/event-needs/@id:[0-9]+', $eventNeedApi, 'getEventNeeds');
 mapRoute($flight, 'POST /api/need/delete/@id:[0-9]+', $eventNeedApi, 'deleteNeed');
 mapRoute($flight, 'POST /api/need/save', $eventNeedApi, 'saveNeed');
 
-$eventNeedTypeApi = new EventNeedTypeApi($application, $needDataHelper, $needTypeDataHelper);
+$eventNeedTypeApi = new EventNeedTypeApi($application, $needDataHelper, $needTypeDataHelper, $connectedUser, $dataHelper, $personDataHelper);
 mapRoute($flight, 'POST /api/need/type/delete/@id:[0-9]+', $eventNeedTypeApi, 'deleteNeedType');
 mapRoute($flight, 'POST /api/need/type/save', $eventNeedTypeApi, 'saveNeedType');
 mapRoute($flight, 'GET  /api/needs-by-need-type/@id:[0-9]+', $eventNeedTypeApi, 'getNeedsByNeedType');
 
-$eventSupplyApi = new EventSupplyApi($application, $eventDataHelper);
+$eventSupplyApi = new EventSupplyApi($application, $eventDataHelper, $connectedUser, $dataHelper, $personDataHelper);
 mapRoute($flight, 'POST /api/event/updateSupply', $eventSupplyApi, 'updateSupply');
 
-$groupApi = new GroupApi($application);
+$groupApi = new GroupApi($application, $connectedUser, $dataHelper, $personDataHelper);
 mapRoute($flight, 'GET  /api/personsInGroup/@id:[0-9]+', $groupApi, 'getPersonsInGroup');
 mapRoute($flight, 'POST /api/registration/add/@personId:[0-9]+/@groupId:[0-9]+', $groupApi, 'addToGroup');
 mapRoute($flight, 'POST /api/registration/remove/@personId:[0-9]+/@groupId:[0-9]+', $groupApi, 'removeFromGroup');
 
-$importApi = new ImportApi($application);
+$importApi = new ImportApi($application, $connectedUser, $dataHelper, $personDataHelper);
 mapRoute($flight, 'POST /import/headers', $importApi, 'getHeadersFromCSV');
 
-$navbarApi = new NavbarApi($application, $pageDataHelper);
+$navbarApi = new NavbarApi($application, $pageDataHelper, $connectedUser, $dataHelper, $personDataHelper);
 mapRoute($flight, 'POST /api/navBar/deleteItem/@id:[0-9]+', $navbarApi, 'deleteNavbarItem');
 mapRoute($flight, 'GET  /api/navBar/getItem/@id:[0-9]+', $navbarApi, 'getNavbarItem');
 mapRoute($flight, 'POST /api/navBar/saveItem', $navbarApi, 'saveNavbarItem');
 mapRoute($flight, 'POST /api/navBar/updatePositions', $navbarApi, 'updateNavbarPositions');
 
-$webmasterApi = new WebmasterApi($application);
+$webmasterApi = new WebmasterApi($application, $connectedUser, $dataHelper, $personDataHelper, $logDataHelper);
 mapRoute($flight, 'GET    /api/lastVersion', $webmasterApi, 'lastVersion');
 #endregion
 
@@ -438,32 +742,31 @@ $flight->route('/phpInfo', function () {
     flush();
 });
 
-$flight->route('/webCard', function () use ($application) {
-    serveFile($application, 'businessCard.html', "'Content-Type', 'text/html; charset=UTF-8'");
+$flight->route('/webCard', function () use ($errorManager) {
+    serveFile($errorManager, 'businessCard.html', "'Content-Type', 'text/html; charset=UTF-8'");
 });
-$flight->route('/favicon.ico', function () use ($application) {
-    serveFile($application, 'favicon.ico');
+$flight->route('/favicon.ico', function () use ($errorManager) {
+    serveFile($errorManager, 'favicon.ico');
 });
-$flight->route('/apple-touch-icon.png', function () use ($application) {
-    serveFile($application, 'my-club-180.png');
+$flight->route('/apple-touch-icon.png', function () use ($errorManager) {
+    serveFile($errorManager, 'my-club-180.png');
 });
-$flight->route('/apple-touch-icon-120x120.png', function () use ($application) {
-    serveFile($application, 'my-club-120.png');
+$flight->route('/apple-touch-icon-120x120.png', function () use ($errorManager) {
+    serveFile($errorManager, 'my-club-120.png');
 });
-$flight->route('/apple-touch-icon-180x180.png', function () use ($application) {
-    serveFile($application, 'my-club-180.png');
+$flight->route('/apple-touch-icon-180x180.png', function () use ($errorManager) {
+    serveFile($errorManager, 'my-club-180.png');
 });
-$flight->route('/apple-touch-icon-precomposed.png', function () use ($application) {
-    serveFile($application, 'my-club-180.png');
+$flight->route('/apple-touch-icon-precomposed.png', function () use ($errorManager) {
+    serveFile($errorManager, 'my-club-180.png');
 });
-$flight->route('/*', function () use ($application) {
-    $application->getErrorManager()->raise(ApplicationError::PageNotFound, "Page not found in file " . __FILE__ . ' at line ' . __LINE__);
+$flight->route('/*', function () use ($errorManager) {
+    $errorManager->raise(ApplicationError::PageNotFound, "Page not found in file " . __FILE__ . ' at line ' . __LINE__);
 });
 
-$logDataHelper = new LogDataHelper($application);
-$flight->map('error', function (Throwable $ex) use ($logDataHelper, $application) {
+$flight->map('error', function (Throwable $ex) use ($logDataHelper, $errorManager) {
     $logDataHelper->add(ApplicationError::Error->value, 'Internal error: ' . $ex->getMessage() . ' in file ' . $ex->getFile() . ' at line' . $ex->getLine());
-    $application->getErrorManager()->raise(ApplicationError::Error, 'Error ' . $ex->getMessage() . ' in file ' . $ex->getFile() . ' at line ' . $ex->getLine());
+    $errorManager->raise(ApplicationError::Error, 'Error ' . $ex->getMessage() . ' in file ' . $ex->getFile() . ' at line ' . $ex->getLine());
 });
 $flight->after('start', function () use ($logDataHelper, $flight) {
     $logDataHelper->add($flight->getData('code') ?? '', $flight->getData('message') ?? '');
@@ -471,7 +774,7 @@ $flight->after('start', function () use ($logDataHelper, $flight) {
 
 $flight->start();
 
-function serveFile(Application $application, string $filename, string $ContentType = "'Content-Type', 'image/png'"): void
+function serveFile(ErrorManager $errorManager, string $filename, string $ContentType = "'Content-Type', 'image/png'"): void
 {
     $filename = basename($filename);
     $path = __DIR__ . "/app/images/$filename";
@@ -481,7 +784,7 @@ function serveFile(Application $application, string $filename, string $ContentTy
             ->header('Cache-Control', 'public, max-age=604800, immutable')
             ->header('Expires', gmdate('D, d M Y H:i:s', time() + 604800) . ' GMT');
         readfile($path);
-    } else $application->getErrorManager()->raise(ApplicationError::PageNotFound, "File $filename not found in file " . __FILE__ . ' at line ' . __LINE__);
+    } else $errorManager->raise(ApplicationError::PageNotFound, "File $filename not found in file " . __FILE__ . ' at line ' . __LINE__);
     exit;
 }
 

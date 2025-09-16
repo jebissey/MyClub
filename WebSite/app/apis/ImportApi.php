@@ -3,19 +3,25 @@
 namespace app\apis;
 
 use app\enums\ApplicationError;
-use app\helpers\ApiImportHelper;
 use app\helpers\Application;
+use app\helpers\ConnectedUser;
+use app\models\DataHelper;
+use app\models\PersonDataHelper;
 
 class ImportApi extends AbstractApi
 {
-    public function __construct(Application $application)
-    {
-        parent::__construct($application);
+    public function __construct(
+        Application $application,
+        ConnectedUser $connectedUser,
+        DataHelper $dataHelper,
+        PersonDataHelper $personDataHelper,
+    ) {
+        parent::__construct($application, $connectedUser, $dataHelper, $personDataHelper);
     }
 
     public function getHeadersFromCSV()
     {
-        if (!($this->connectedUser->get(1)->isPersonManager() ?? false)) {
+        if (!($this->application->getConnectedUser()->get(1)->isPersonManager() ?? false)) {
             $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }
@@ -23,6 +29,24 @@ class ImportApi extends AbstractApi
             $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
-        $this->renderJson((new ApiImportHelper())->getHeadersFromCSV(intval($_POST['headerRow'] ?? 1)), true, ApplicationError::Ok->value);
+        $this->renderJson($this->getHeadersFromCSV_(intval($_POST['headerRow'] ?? 1)), true, ApplicationError::Ok->value);
+    }
+
+    #region Private functions
+    private function getHeadersFromCSV_(int $headerRow)
+    {
+        if (!isset($_FILES['csvFile']) || $_FILES['csvFile']['error'] != 0) return ['error' => 'Fichier non valide'];
+        $headers = [];
+        $file = fopen($_FILES['csvFile']['tmp_name'], 'r');
+        $currentRow = 0;
+        while (($data = fgetcsv($file, 0, ",", "\"", "\\")) !== false && $currentRow <= $headerRow) {
+            $currentRow++;
+            if ($currentRow == $headerRow) {
+                $headers = $data;
+                break;
+            }
+        }
+        fclose($file);
+        return ['headers' => $headers];
     }
 }

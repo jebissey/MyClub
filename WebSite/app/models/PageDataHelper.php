@@ -6,7 +6,7 @@ use app\helpers\Application;
 
 class PageDataHelper extends Data
 {
-    public function __construct(Application $application)
+    public function __construct(Application $application, private AuthorizationDataHelper $authorizationDataHelper)
     {
         parent::__construct($application);
     }
@@ -73,7 +73,7 @@ class PageDataHelper extends Data
             return false;
         }
         if (!$person) return false;
-        $userGroups = (new AuthorizationDataHelper($this->application))->getUserGroups($person->Email);
+        $userGroups = $this->authorizationDataHelper->getUserGroups($person->Email);
         return in_array($pageData->IdGroup, $userGroups);
     }
 }

@@ -12,7 +12,7 @@ class UserPresentationController extends AbstractController
 {
     public function editPresentation(): void
     {
-        if ($person = $this->connectedUser->get()->person ?? false) {
+        if ($person = $this->application->getConnectedUser()->get()->person ?? false) {
             if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
                 $this->raiseMethodNotAllowed(__FILE__, __LINE__);
                 return;
@@ -26,7 +26,7 @@ class UserPresentationController extends AbstractController
 
     public function savePresentation()
     {
-        if ($person = $this->connectedUser->get()->person ?? false) {
+        if ($person = $this->application->getConnectedUser()->get()->person ?? false) {
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $schema = [
                     'content' => FilterInputRule::Html->value,
@@ -51,7 +51,7 @@ class UserPresentationController extends AbstractController
 
     public function showPresentation($personId)
     {
-        if ($loggedPerson = $this->connectedUser->get()->person ?? false) {
+        if ($loggedPerson = $this->application->getConnectedUser()->get()->person ?? false) {
             $person = $this->dataHelper->get('Person', [
                 'Id' => $personId,
                 'Inactivated' => 0,

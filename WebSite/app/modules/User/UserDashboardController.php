@@ -10,7 +10,7 @@ class UserDashboardController extends AbstractController
 {
     public function user(): void
     {
-        if ($this->connectedUser->get()->person === null) {
+        if ($this->application->getConnectedUser()->get()->person === null) {
             $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
@@ -24,7 +24,7 @@ class UserDashboardController extends AbstractController
 
     public function help(): void
     {
-        if ($this->connectedUser->get()->person === null) {
+        if ($this->application->getConnectedUser()->get()->person === null) {
             $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
@@ -34,7 +34,7 @@ class UserDashboardController extends AbstractController
         }
         $this->render('Common/views/info.latte', Params::getAll([
             'content' => $this->dataHelper->get('Settings', ['Name' => 'Help_user'], 'Value')->Value ?? '',
-            'hasAuthorization' => $this->connectedUser->hasAutorization(),
+            'hasAuthorization' => $this->application->getConnectedUser()->hasAutorization(),
             'currentVersion' => Application::VERSION,
             'timer' => 0,
             'previousPage' => true

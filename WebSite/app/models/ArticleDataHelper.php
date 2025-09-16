@@ -13,7 +13,7 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
 {
     private const LAST_ARTICLES = 10;
 
-    public function __construct(Application $application)
+    public function __construct(Application $application, private AuthorizationDataHelper $authorizationDataHelper)
     {
         parent::__construct($application);
     }
@@ -89,7 +89,7 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
         $forMembersOnlyArticleIds = $this->getArticleIdsForMembers([$userEmail]);
         if (empty($forMembersOnlyArticleIds)) $articleIds = $noGroupArticleIds;
         else $articleIds = array_merge($noGroupArticleIds, $forMembersOnlyArticleIds);
-        $userGroups = (new AuthorizationDataHelper($this->application))->getUserGroups($userEmail);
+        $userGroups = $this->authorizationDataHelper->getUserGroups($userEmail);
         if (empty($userGroups)) return $articleIds;
         $groupArticleIds = $this->getArticleIdsByGroups($userGroups);
         return array_unique(array_merge($articleIds, $groupArticleIds));

@@ -8,24 +8,34 @@ use app\enums\FilterInputRule;
 use app\helpers\Application;
 use app\helpers\Params;
 use app\helpers\WebApp;
+use app\models\AuthorizationDataHelper;
+use app\models\DataHelper;
 use app\models\DesignDataHelper;
+use app\models\LanguagesDataHelper;
+use app\models\PageDataHelper;
 use app\modules\Common\AbstractController;
 
 class DesignController extends AbstractController
 {
 
-    public function __construct(Application $application)
-    {
-        parent::__construct($application);
+    public function __construct(
+        Application $application,
+        private DesignDataHelper $designDataHelper,
+        DataHelper $dataHelper,
+        LanguagesDataHelper $languagesDataHelper,
+        PageDataHelper $pageDataHelper,
+        AuthorizationDataHelper $authorizationDataHelper
+    ) {
+        parent::__construct($application, $dataHelper, $languagesDataHelper, $pageDataHelper, $authorizationDataHelper);
     }
 
     public function index()
     {
-        if (!($this->connectedUser->get()->isRedactor() ?? false)) {
+        if (!($this->application->getConnectedUser()->get()->isHomeDesigner() ?? false)) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
         }
-        [$designs, $userVotes] = (new DesignDataHelper($this->application))->getUsersVotes($this->connectedUser->person->Id);
+        [$designs, $userVotes] = $this->designDataHelper->getUsersVotes($this->application->getConnectedUser()->person->Id);
 
         $this->render('Article/views/designs_index.latte', Params::getAll([
             'designs' => $designs,
@@ -36,7 +46,7 @@ class DesignController extends AbstractController
 
     public function create()
     {
-        if (!($this->connectedUser->get()->isHomeDesigner() ?? false)) {
+        if (!($this->application->getConnectedUser()->get()->isHomeDesigner() ?? false)) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
         }
@@ -51,7 +61,7 @@ class DesignController extends AbstractController
 
     public function save()
     {
-        if (!($this->connectedUser->get()->isHomeDesigner() ?? false)) {
+        if (!($this->application->getConnectedUser()->get()->isHomeDesigner() ?? false)) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
         }
@@ -69,7 +79,7 @@ class DesignController extends AbstractController
         ];
         $filterValues = WebApp::filterInput($schema, $this->flight->request()->data->getData());
         $values = [
-            'IdPerson' => $this->connectedUser->person->Id,
+            'IdPerson' => $this->application->getConnectedUser()->person->Id,
             'Name' => $filterValues['name'] ?? '',
             'Detail' => $filterValues['detail'] ?? '',
             'NavBar' => $filterValues['navbar'] ?? '',

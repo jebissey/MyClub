@@ -15,16 +15,13 @@ abstract class AbstractApi
 {
     private LatteEngine $latte;
 
-    protected ConnectedUser $connectedUser;
-    protected DataHelper $dataHelper;
-    protected PersonDataHelper $personDataHelper;
-
-    public function __construct(protected Application $application)
-    {
+    public function __construct(
+        protected Application $application,
+        protected ConnectedUser $connectedUser,
+        protected DataHelper $dataHelper,
+        protected PersonDataHelper $personDataHelper
+    ) {
         $this->latte = $application->getLatte();
-        $this->connectedUser = new ConnectedUser($application);
-        $this->dataHelper = new DataHelper($application);
-        $this->personDataHelper = new PersonDataHelper($application);
     }
 
     protected function getJsonInput(): array

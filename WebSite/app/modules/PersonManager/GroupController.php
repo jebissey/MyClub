@@ -9,20 +9,29 @@ use app\exceptions\QueryException;
 use app\helpers\Application;
 use app\helpers\Params;
 use app\helpers\WebApp;
+use app\models\AuthorizationDataHelper;
+use app\models\DataHelper;
 use app\models\GroupDataHelper;
+use app\models\LanguagesDataHelper;
+use app\models\PageDataHelper;
 use app\modules\Common\AbstractController;
 
 class GroupController extends AbstractController
 {
-    public function __construct(Application $application, private GroupDataHelper $groupDataHelper)
-    {
-        parent::__construct($application);
-        $this->groupDataHelper = new GroupDataHelper($application);
+    public function __construct(
+        Application $application,
+        private GroupDataHelper $groupDataHelper,
+        DataHelper $dataHelper,
+        LanguagesDataHelper $languagesDataHelper,
+        PageDataHelper $pageDataHelper,
+        AuthorizationDataHelper $authorizationDataHelper
+    ) {
+        parent::__construct($application, $dataHelper, $languagesDataHelper, $pageDataHelper, $authorizationDataHelper);
     }
 
     public function groupCreate(): void
     {
-        if (!($this->connectedUser->get()->isGroupManager() ?? false)) {
+        if (!($this->application->getConnectedUser()->get()->isGroupManager() ?? false)) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
         }
@@ -41,7 +50,7 @@ class GroupController extends AbstractController
 
     public function groupCreateSave(): void
     {
-        if (!($this->connectedUser->get()->isGroupManager() ?? false)) {
+        if (!($this->application->getConnectedUser()->get()->isGroupManager() ?? false)) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
         }
@@ -74,7 +83,7 @@ class GroupController extends AbstractController
 
     public function groupDelete(int $id): void
     {
-        if (!($this->connectedUser->get()->isGroupManager() ?? false)) {
+        if (!($this->application->getConnectedUser()->get()->isGroupManager() ?? false)) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
         }
@@ -98,7 +107,7 @@ class GroupController extends AbstractController
 
     public function groupEdit(int $id): void
     {
-        if (!($this->connectedUser->get()->isGroupManager() ?? false)) {
+        if (!($this->application->getConnectedUser()->get()->isGroupManager() ?? false)) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
         }
@@ -126,7 +135,7 @@ class GroupController extends AbstractController
 
     public function groupEditSave(int $id): void
     {
-        if (!($this->connectedUser->get()->isGroupManager() ?? false)) {
+        if (!($this->application->getConnectedUser()->get()->isGroupManager() ?? false)) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
         }
@@ -161,7 +170,7 @@ class GroupController extends AbstractController
 
     public function groupIndex(): void
     {
-        if (!($this->connectedUser->get()->isGroupManager() ?? false)) {
+        if (!($this->application->getConnectedUser()->get()->isGroupManager() ?? false)) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
         }

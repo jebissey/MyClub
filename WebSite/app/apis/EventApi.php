@@ -10,12 +10,15 @@ use app\enums\EventAudience;
 use app\enums\Period;
 use app\exceptions\QueryException;
 use app\helpers\Application;
+use app\helpers\ConnectedUser;
 use app\helpers\WebApp;
 use app\interfaces\AuthorizationServiceInterface;
 use app\interfaces\EventServiceInterface;
+use app\models\DataHelper;
 use app\models\EventDataHelper;
 use app\models\MessageDataHelper;
 use app\models\ParticipantDataHelper;
+use app\models\PersonDataHelper;
 use app\helpers\PersonPreferences;
 use app\services\EmailService;
 use app\valueObjects\ApiResponse;
@@ -29,9 +32,12 @@ class EventApi extends AbstractApi
         private EventServiceInterface $eventService,
         private ParticipantDataHelper $participantDataHelper,
         private PersonPreferences $personPreferences,
-        private MessageDataHelper $messageDataHelper
+        private MessageDataHelper $messageDataHelper,
+        ConnectedUser $connectedUser, 
+        DataHelper $dataHelper, 
+        PersonDataHelper $personDataHelper
     ) {
-        parent::__construct($application);
+        parent::__construct($application, $connectedUser, $dataHelper, $personDataHelper);
     }
 
     public function deleteEvent(int $id): void
@@ -74,7 +80,7 @@ class EventApi extends AbstractApi
         try {
             [$success, $response, $statusCode] = $this->eventService->duplicateEvent(
                 $id,
-                $this->connectedUser->person->Id,
+                $this->application->getConnectedUser()->person->Id,
                 WebApp::getFiltered('mode', $this->application->enumToValues(Period::class), $_GET) ?: Period::Today->value
             );
             $this->renderJson($response, $success, $statusCode);
