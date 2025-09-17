@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace app\apis;
 
@@ -19,7 +20,7 @@ class EventSupplyApi extends AbstractApi
 {
     public function __construct(Application $application, private EventDataHelper $eventDataHelper, ConnectedUser $connectedUser, DataHelper $dataHelper, PersonDataHelper $personDataHelper)
     {
-        parent::__construct($application, $connectedUser,$dataHelper, $personDataHelper);
+        parent::__construct($application, $connectedUser, $dataHelper, $personDataHelper);
     }
 
     public function updateSupply(): void
@@ -45,7 +46,7 @@ class EventSupplyApi extends AbstractApi
         } catch (QueryException $e) {
             $this->renderJsonBadRequest($e->getMessage(), __FILE__, __LINE__);
         } catch (UnauthorizedAccessException $e) {
-            $this->renderJsonForbidden($e->getMessage(), __FILE__, __LINE__);
+            $this->renderJsonForbidden(__FILE__, __LINE__);
         } catch (Throwable $e) {
             $this->renderJsonError($e->getMessage(), ApplicationError::Error->value);
         }
@@ -64,7 +65,7 @@ class EventSupplyApi extends AbstractApi
     private function updateSupply_(int $eventId, string $userEmail, int $needId, int $supply): ApiResponse
     {
         if (!$this->eventDataHelper->isUserRegistered($eventId, $userEmail)) return new ApiResponse(false, ApplicationError::BadRequest->value);
-        
+
         $success = $this->eventDataHelper->updateUserSupply($eventId, $userEmail, $needId, $supply);
         if (!$success) return new ApiResponse(false, ApplicationError::BadRequest->value);
 

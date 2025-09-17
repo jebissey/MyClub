@@ -268,7 +268,7 @@ INSERT INTO "Test" VALUES (311,3000,'GET','/api/lastVersion',NULL,NULL,'{"email"
 INSERT INTO "Test" VALUES (312,3010,'POST','/api/media/delete/1/1/zz',NULL,'{}','{"email":"webmaster@myclub.foo","password":"admin1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (313,3020,'POST','/api/media/upload',NULL,NULL,'{"email":"webmaster@myclub.foo","password":"admin1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (314,3030,'POST','/api/message/add',NULL,'{"eventId":1, "text":"new message"}','{"email":"webmaster@myclub.foo","password":"admin1234" }','400',NULL,NULL);
-INSERT INTO "Test" VALUES (315,3040,'POST','/api/message/delete',NULL,'{"messageId":1}','{"email":"webmaster@myclub.foo","password":"admin1234" }','403',NULL,NULL);
+INSERT INTO "Test" VALUES (315,3040,'POST','/api/message/delete',NULL,'{"messageId":1}','{"email":"webmaster@myclub.foo","password":"admin1234" }','400',NULL,NULL);
 INSERT INTO "Test" VALUES (316,3050,'POST','/api/message/update',NULL,'{"messageId":1, "text":"message updated"}','{"email":"webmaster@myclub.foo","password":"admin1234" }','400',NULL,NULL);
 INSERT INTO "Test" VALUES (317,3060,'POST','/api/navBar/deleteItem/1',NULL,NULL,'{"email":"webmaster@myclub.foo","password":"admin1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (318,3070,'GET','/api/navBar/getItem/1',NULL,NULL,'{"email":"webmaster@myclub.foo","password":"admin1234" }','403',NULL,NULL);
@@ -594,7 +594,7 @@ INSERT INTO "Test" VALUES (637,6280,'GET','/api/lastVersion',NULL,NULL,'{"email"
 INSERT INTO "Test" VALUES (638,6290,'POST','/api/media/delete/1/1/zz',NULL,'{}','{"email":"personManager@myclub.foo","password":"HumanRessources1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (639,6300,'POST','/api/media/upload',NULL,NULL,'{"email":"personManager@myclub.foo","password":"HumanRessources1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (640,6310,'POST','/api/message/add',NULL,'{"eventId":1, "text":"new message"}','{"email":"personManager@myclub.foo","password":"HumanRessources1234" }','400',NULL,NULL);
-INSERT INTO "Test" VALUES (641,6320,'POST','/api/message/delete',NULL,'{"messageId":1}','{"email":"personManager@myclub.foo","password":"HumanRessources1234" }','403',NULL,NULL);
+INSERT INTO "Test" VALUES (641,6320,'POST','/api/message/delete',NULL,'{"messageId":1}','{"email":"personManager@myclub.foo","password":"HumanRessources1234" }','400',NULL,NULL);
 INSERT INTO "Test" VALUES (642,6330,'POST','/api/message/update',NULL,'{"messageId":1, "text":"message updated"}','{"email":"personManager@myclub.foo","password":"HumanRessources1234" }','400',NULL,NULL);
 INSERT INTO "Test" VALUES (643,6340,'POST','/api/navBar/deleteItem/1',NULL,'{}','{"email":"personManager@myclub.foo","password":"HumanRessources1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (644,6350,'GET','/api/navBar/getItem/1',NULL,NULL,'{"email":"personManager@myclub.foo","password":"HumanRessources1234" }','403',NULL,NULL);
@@ -766,7 +766,7 @@ INSERT INTO "Test" VALUES (807,7930,'GET','/api/lastVersion',NULL,NULL,'{"email"
 INSERT INTO "Test" VALUES (808,7940,'POST','/api/media/delete/1/1/zz',NULL,'{}','{"email":"eventManager@myclub.foo","password":"eventManager1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (809,7950,'POST','/api/media/upload',NULL,NULL,'{"email":"eventManager@myclub.foo","password":"eventManager1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (810,7960,'POST','/api/message/add',NULL,'{"eventId":1, "text":"new message"}','{"email":"eventManager@myclub.foo","password":"eventManager1234" }','400',NULL,NULL);
-INSERT INTO "Test" VALUES (811,7970,'POST','/api/message/delete',NULL,'{"messageId":1}','{"email":"eventManager@myclub.foo","password":"eventManager1234" }','403',NULL,NULL);
+INSERT INTO "Test" VALUES (811,7970,'POST','/api/message/delete',NULL,'{"messageId":1}','{"email":"eventManager@myclub.foo","password":"eventManager1234" }','400',NULL,NULL);
 INSERT INTO "Test" VALUES (812,7980,'POST','/api/message/update',NULL,'{"messageId":1, "text":"message updated"}','{"email":"eventManager@myclub.foo","password":"eventManager1234" }','400',NULL,NULL);
 INSERT INTO "Test" VALUES (813,7990,'POST','/api/navBar/deleteItem/1',NULL,'{}','{"email":"eventManager@myclub.foo","password":"eventManager1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (814,8000,'GET','/api/navBar/getItem/1',NULL,NULL,'{"email":"eventManager@myclub.foo","password":"eventManager1234" }','403',NULL,NULL);
@@ -962,7 +962,7 @@ INSERT INTO "Test" VALUES (1005,9580,'GET','/api/lastVersion',NULL,NULL,'{"email
 INSERT INTO "Test" VALUES (1006,9590,'POST','/api/media/delete/1/1/zz',NULL,'{}','{"email":"redactor@myclub.foo","password":"redactor1234" }','200',NULL,NULL);
 INSERT INTO "Test" VALUES (1007,9600,'POST','/api/media/upload',NULL,NULL,'{"email":"redactor@myclub.foo","password":"redactor1234" }','200',NULL,NULL);
 INSERT INTO "Test" VALUES (1008,9610,'POST','/api/message/add',NULL,'{"eventId":1, "text":"new message"}','{"email":"redactor@myclub.foo","password":"redactor1234" }','400',NULL,NULL);
-INSERT INTO "Test" VALUES (1009,9620,'POST','/api/message/delete',NULL,'{"messageId":1}','{"email":"redactor@myclub.foo","password":"redactor1234" }','403',NULL,NULL);
+INSERT INTO "Test" VALUES (1009,9620,'POST','/api/message/delete',NULL,'{"messageId":1}','{"email":"redactor@myclub.foo","password":"redactor1234" }','400',NULL,NULL);
 INSERT INTO "Test" VALUES (1010,9630,'POST','/api/message/update',NULL,'{"messageId":1, "text":"message updated"}','{"email":"redactor@myclub.foo","password":"redactor1234" }','400',NULL,NULL);
 INSERT INTO "Test" VALUES (1011,9640,'POST','/api/navBar/deleteItem/1',NULL,'{}','{"email":"redactor@myclub.foo","password":"redactor1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (1012,9650,'GET','/api/navBar/getItem/1',NULL,NULL,'{"email":"redactor@myclub.foo","password":"redactor1234" }','403',NULL,NULL);
@@ -1129,7 +1129,7 @@ INSERT INTO "Test" VALUES (1171,11240,'GET','/api/lastVersion',NULL,NULL,'{"emai
 INSERT INTO "Test" VALUES (1172,11250,'POST','/api/media/delete/1/1/zz',NULL,'{}','{"email":"editor@myclub.foo","password":"editor1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (1173,11260,'POST','/api/media/upload',NULL,NULL,'{"email":"editor@myclub.foo","password":"editor1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (1174,11270,'POST','/api/message/add',NULL,'{"eventId":1, "text":"new message"}','{"email":"editor@myclub.foo","password":"editor1234" }','400',NULL,NULL);
-INSERT INTO "Test" VALUES (1175,11280,'POST','/api/message/delete',NULL,'{"messageId":1}','{"email":"editor@myclub.foo","password":"editor1234" }','403',NULL,NULL);
+INSERT INTO "Test" VALUES (1175,11280,'POST','/api/message/delete',NULL,'{"messageId":1}','{"email":"editor@myclub.foo","password":"editor1234" }','400',NULL,NULL);
 INSERT INTO "Test" VALUES (1176,11290,'POST','/api/message/update',NULL,'{"messageId":1, "text":"message updated"}','{"email":"editor@myclub.foo","password":"editor1234" }','400',NULL,NULL);
 INSERT INTO "Test" VALUES (1177,11300,'POST','/api/navBar/deleteItem/1',NULL,'{}','{"email":"editor@myclub.foo","password":"editor1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (1178,11310,'GET','/api/navBar/getItem/1',NULL,NULL,'{"email":"editor@myclub.foo","password":"editor1234" }','403',NULL,NULL);
@@ -1295,7 +1295,7 @@ INSERT INTO "Test" VALUES (1337,12900,'GET','/api/lastVersion',NULL,NULL,'{"emai
 INSERT INTO "Test" VALUES (1338,12910,'POST','/api/media/delete/1/1/zz',NULL,'{}','{"email":"homeDesigner@myclub.foo","password":"homeD1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (1339,12920,'POST','/api/media/upload',NULL,NULL,'{"email":"homeDesigner@myclub.foo","password":"homeD1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (1340,12930,'POST','/api/message/add',NULL,'{"eventId":1, "text":"new message"}','{"email":"homeDesigner@myclub.foo","password":"homeD1234" }','400',NULL,NULL);
-INSERT INTO "Test" VALUES (1341,12940,'POST','/api/message/delete',NULL,'{"messageId":1}','{"email":"homeDesigner@myclub.foo","password":"homeD1234" }','403',NULL,NULL);
+INSERT INTO "Test" VALUES (1341,12940,'POST','/api/message/delete',NULL,'{"messageId":1}','{"email":"homeDesigner@myclub.foo","password":"homeD1234" }','400',NULL,NULL);
 INSERT INTO "Test" VALUES (1342,12950,'POST','/api/message/update',NULL,'{"messageId":1, "text":"message updated"}','{"email":"homeDesigner@myclub.foo","password":"homeD1234" }','400',NULL,NULL);
 INSERT INTO "Test" VALUES (1343,12960,'POST','/api/navBar/deleteItem/1',NULL,'{}','{"email":"homeDesigner@myclub.foo","password":"homeD1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (1344,12970,'GET','/api/navBar/getItem/1',NULL,NULL,'{"email":"homeDesigner@myclub.foo","password":"homeD1234" }','403',NULL,NULL);
@@ -1461,7 +1461,7 @@ INSERT INTO "Test" VALUES (1503,14560,'GET','/api/lastVersion',NULL,NULL,'{"emai
 INSERT INTO "Test" VALUES (1504,14570,'POST','/api/media/delete/1/1/zz',NULL,'{}','{"email":"eventDesigner@myclub.foo","password":"eventD1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (1505,14580,'POST','/api/media/upload',NULL,NULL,'{"email":"eventDesigner@myclub.foo","password":"eventD1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (1506,14590,'POST','/api/message/add',NULL,'{"eventId":1, "text":"new message"}','{"email":"eventDesigner@myclub.foo","password":"eventD1234" }','400',NULL,NULL);
-INSERT INTO "Test" VALUES (1507,14600,'POST','/api/message/delete',NULL,'{"messageId":1}','{"email":"eventDesigner@myclub.foo","password":"eventD1234" }','403',NULL,NULL);
+INSERT INTO "Test" VALUES (1507,14600,'POST','/api/message/delete',NULL,'{"messageId":1}','{"email":"eventDesigner@myclub.foo","password":"eventD1234" }','400',NULL,NULL);
 INSERT INTO "Test" VALUES (1508,14610,'POST','/api/message/update',NULL,'{"messageId":1, "text":"message updated"}','{"email":"eventDesigner@myclub.foo","password":"eventD1234" }','400',NULL,NULL);
 INSERT INTO "Test" VALUES (1509,14620,'POST','/api/navBar/deleteItem/1',NULL,'{}','{"email":"eventDesigner@myclub.foo","password":"eventD1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (1510,14630,'GET','/api/navBar/getItem/1',NULL,NULL,'{"email":"eventDesigner@myclub.foo","password":"eventD1234" }','403',NULL,NULL);
@@ -1627,7 +1627,7 @@ INSERT INTO "Test" VALUES (1669,16220,'GET','/api/lastVersion',NULL,NULL,'{"emai
 INSERT INTO "Test" VALUES (1670,16230,'POST','/api/media/delete/1/1/zz',NULL,'{}','{"email":"visitorInsights@myclub.foo","password":"observator1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (1671,16240,'POST','/api/media/upload',NULL,NULL,'{"email":"visitorInsights@myclub.foo","password":"observator1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (1672,16250,'POST','/api/message/add',NULL,'{"eventId":1, "text":"new message"}','{"email":"visitorInsights@myclub.foo","password":"observator1234" }','400',NULL,NULL);
-INSERT INTO "Test" VALUES (1673,16260,'POST','/api/message/delete',NULL,'{"messageId":1}','{"email":"visitorInsights@myclub.foo","password":"observator1234" }','403',NULL,NULL);
+INSERT INTO "Test" VALUES (1673,16260,'POST','/api/message/delete',NULL,'{"messageId":1}','{"email":"visitorInsights@myclub.foo","password":"observator1234" }','400',NULL,NULL);
 INSERT INTO "Test" VALUES (1674,16270,'POST','/api/message/update',NULL,'{"messageId":1, "text":"message updated"}','{"email":"visitorInsights@myclub.foo","password":"observator1234" }','400',NULL,NULL);
 INSERT INTO "Test" VALUES (1675,16280,'POST','/api/navBar/deleteItem/1',NULL,'{}','{"email":"visitorInsights@myclub.foo","password":"observator1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (1676,16290,'GET','/api/navBar/getItem/1',NULL,NULL,'{"email":"visitorInsights@myclub.foo","password":"observator1234" }','403',NULL,NULL);

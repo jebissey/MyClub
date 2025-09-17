@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace app\helpers;
 
@@ -11,7 +12,7 @@ class Media
         if (!file_exists(self::MEDIA_PATH)) mkdir(self::MEDIA_PATH, 0755, true);
     }
 
-    public function deleteFile(string $year, string $month, string $filename)
+    public function deleteFile(int $year, int $month, string $filename)
     {
         $filename = basename($filename);
         $filePath = self::MEDIA_PATH . $year . '/' . $month . '/' . $filename;

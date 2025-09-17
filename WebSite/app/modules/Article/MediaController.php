@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace app\modules\Article;
 
@@ -62,7 +63,7 @@ class MediaController extends AbstractController
         ]));
     }
 
-    public function viewFile(string $year, string $month, string $filename): void
+    public function viewFile(int $year, int $month, string $filename): void
     {
         if (!($this->application->getConnectedUser()->get()->isRedactor() ?? false)) {
             $this->raiseforbidden(__FILE__, __LINE__);

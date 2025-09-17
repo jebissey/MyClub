@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace app\modules\Article;
 
@@ -337,12 +338,12 @@ class ArticleController extends TableController
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
-        $article = $this->dataHelper->get('Article', ['Id', $idArticle], 'CreatedBy');
+        $article = $this->dataHelper->get('Article', ['Id' => $idArticle], 'CreatedBy');
         if (!$article) {
             $this->raiseBadRequest("Article {$idArticle} doesn't exist", __FILE__, __LINE__);
             return;
         }
-        $articleCreatorEmail = $this->dataHelper->get('Person', ['Id', $article->CreatedBy], 'Email')->Email;
+        $articleCreatorEmail = $this->dataHelper->get('Person', ['Id' => $article->CreatedBy], 'Email')->Email;
         if (!$articleCreatorEmail) {
             $this->raiseBadRequest("Unknown author of article {$idArticle}", __FILE__, __LINE__);
             return;

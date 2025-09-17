@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace app\apis;
 
 use PDOException;
@@ -18,7 +20,7 @@ class EventMessageApi extends AbstractApi
 {
     public function __construct(Application $application, private MessageDataHelper $messageDataHelper, ConnectedUser $connectedUser, DataHelper $dataHelper, PersonDataHelper $personDataHelper)
     {
-        parent::__construct($application, $connectedUser,$dataHelper, $personDataHelper);
+        parent::__construct($application, $connectedUser, $dataHelper, $personDataHelper);
     }
 
     public function addMessage(): void
@@ -56,7 +58,7 @@ class EventMessageApi extends AbstractApi
         }
         try {
             $data = $this->getJsonInput();
-            $apiResponse = $this->deleteMessage_($data['messageId'] ?? 0, $this->application->getConnectedUser()->person->Id);
+            $apiResponse = $this->deleteMessage_((int)$data['messageId'] ?? 0, $this->application->getConnectedUser()->person->Id);
             $this->renderJson($apiResponse->data, $apiResponse->success, $apiResponse->responseCode);
         } catch (Throwable $e) {
             $this->renderJsonError($e->getMessage(), ApplicationError::Error->value);
@@ -101,11 +103,17 @@ class EventMessageApi extends AbstractApi
 
     private function deleteMessage_(int $messageId, int $personId): ApiResponse
     {
+        $message = $this->dataHelper->get('Message', ['Id' => $messageId], 'PersonId');
+        if (!$message) {
+            return new ApiResponse(false, ApplicationError::BadRequest->value, [], "Message {$messageId} doesn't exist");
+        }
+        if ($message->PersonId != $personId) {
+            return new ApiResponse(false, ApplicationError::Forbidden->value, [], "Person {$personId} isn't allowed to remove message {$messageId}");
+        }
         try {
-            $this->messageDataHelper->deleteMessage($messageId, $personId);
-            return new ApiResponse(true, ApplicationError::Ok->value, ['data' => ['messageId' => $messageId]], 'Message supprimé');
-        } catch (UnauthorizedAccessException $e) {
-            return new ApiResponse(false, ApplicationError::Forbidden->value, [], $e->getMessage());
+            $result = $this->dataHelper->delete('Message', ['Id' => $messageId]);
+            if ($result > 0) return new ApiResponse(true, ApplicationError::Ok->value, ['data' => ['messageId' => $messageId]], 'Message supprimé');
+            return new ApiResponse(false, ApplicationError::BadRequest->value);
         } catch (PDOException $e) {
             return new ApiResponse(false, ApplicationError::BadRequest->value, [], $e->getMessage());
         } catch (Throwable $e) {

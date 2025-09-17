@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace app\models;
 
@@ -156,7 +157,7 @@ class PersonDataHelper extends Data implements NewsProviderInterface
         return $filteredEmails;
     }
 
-    public function getEmailsOfInterestedPeople(?int $idGroup, ?int $idEventType, string $dayOfWeek, string $timeOfDay): array
+    public function getEmailsOfInterestedPeople(?int $idGroup, ?int $idEventType, int $dayOfWeek, string $timeOfDay): array
     {
         $persons = $this->getInterestedPeople($idGroup, $idEventType, $dayOfWeek, $timeOfDay);
         $filteredEmails = [];
@@ -166,7 +167,7 @@ class PersonDataHelper extends Data implements NewsProviderInterface
         return $filteredEmails;
     }
 
-    public function getInterestedPeople(?int $idGroup, ?int $idEventType, string $dayOfWeek, string $timeOfDay): array
+    public function getInterestedPeople(?int $idGroup, ?int $idEventType, int $dayOfWeek, string $timeOfDay): array
     {
         $persons = $this->getPersonsInGroup($idGroup);
         $filteredPeople = [];

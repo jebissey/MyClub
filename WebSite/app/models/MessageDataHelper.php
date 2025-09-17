@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace app\models;
 
@@ -40,16 +41,6 @@ class MessageDataHelper extends Data implements NewsProviderInterface
             ]);
         }
         return $bccList;
-    }
-
-    public function deleteMessage(int $messageId, int $personId): bool
-    {
-        $message = $this->get('Message', ['Id', $messageId], 'PersonId');
-        if (!$message || $message->PersonId != $personId) {
-            throw new UnauthorizedAccessException("Vous n'êtes pas autorisé à supprimer ce message");
-        }
-        $result = $this->delete('Message', ['Id', $messageId]);
-        return $result > 0;
     }
 
     public function getEventMessages(int $eventId): array

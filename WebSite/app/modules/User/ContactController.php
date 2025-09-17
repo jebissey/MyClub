@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace app\modules\User;
 
 use app\enums\ApplicationError;
@@ -76,7 +78,7 @@ class ContactController extends AbstractController
         $adminEmail = $this->dataHelper->get('Settings', ['Name' => 'contactEmail'], 'Value')->Value ?? '';
         if ($adminEmail === '') $adminEmail = $this->personDataHelper->getWebmasterEmail();
         if (!filter_var($adminEmail, FILTER_VALIDATE_EMAIL)) {
-            $this->application->getErrorManager()->raise(ApplicationError::InvalidSetting, 'Invalid contactEmmail', __FILE__, __LINE__);
+            $this->application->getErrorManager()->raise(ApplicationError::InvalidSetting, 'Invalid contactEmmail', 3000, false, __FILE__, __LINE__);
             return;
         }
 

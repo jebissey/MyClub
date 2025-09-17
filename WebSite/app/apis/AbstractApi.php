@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace app\apis;
 
@@ -43,6 +44,8 @@ abstract class AbstractApi
 
     protected function renderJsonError(string $message, int $statusCode): void
     {
+        $this->application->getFlight()->setData('code', $statusCode);
+        $this->application->getFlight()->setData('message', $message);
         $this->renderJson(
             ['error' => $message],
             false,

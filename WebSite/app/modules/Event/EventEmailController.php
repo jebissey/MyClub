@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace app\modules\Event;
 
@@ -69,7 +70,7 @@ class EventEmailController extends AbstractController
         $timeOfDay = $input['timeOfDay'] ?? '';
         $filteredEmails = $this->personDataHelper->getEmailsOfInterestedPeople($idGroup, $idEventType, $dayOfWeek, $timeOfDay);
         $groupName = $idGroup != null ? $this->dataHelper->get('Group', ['Id' => $idGroup], 'Name')->Name ?? '' : '';
-        $eventTypeName = $idEventType != null ? $this->dataHelper->get('EventType', ['Id', $idEventType], 'Name') : '';
+        $eventTypeName = $idEventType != null ? $this->dataHelper->get('EventType', ['Id' => $idEventType], 'Name') : '';
         $dayOfWeekName = $dayOfWeek != null ? TranslationManager::getWeekdayNames()[$dayOfWeek] : '';
 
         $this->render('Event/views/copyToClipBoard.latte', Params::getAll([

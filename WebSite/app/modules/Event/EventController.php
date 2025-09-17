@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace app\modules\Event;
 
 use DateTime;
@@ -164,7 +166,7 @@ class EventController extends AbstractController
                     ]);
                 }
             } elseif ($token != null) {
-                $event = $this->dataHelper->get('Event', ['Id', $eventId], 'Id, Audience');
+                $event = $this->dataHelper->get('Event', ['Id' => $eventId], 'Id, Audience');
                 if (!$event) {
                     $this->show($eventId, 'Evénement inconnu', 'error');
                     return;
@@ -215,7 +217,7 @@ class EventController extends AbstractController
             } else {
                 $event = $this->dataHelper->get('Event', ['Id' => $eventId], 'Audience');
                 if ($event->Audience === EventAudience::ForAll->value) $this->redirect('/contact/event/' . $eventId);
-                else  $this->raiseForbidden('User not allowed',  __FILE__, __LINE__);
+                else  $this->raiseForbidden(__FILE__, __LINE__);
                 return;
             }
             $this->redirect('/event/' . $eventId);

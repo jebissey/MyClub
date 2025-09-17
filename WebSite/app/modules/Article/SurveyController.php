@@ -1,6 +1,9 @@
 <?php
+declare(strict_types=1);
 
 namespace app\modules\Article;
+
+use DateTime;
 
 use app\enums\FilterInputRule;
 use app\enums\SurveyVisibility;
@@ -69,7 +72,7 @@ class SurveyController extends AbstractController
         $input = WebApp::filterInput($schema, $this->flight->request()->data->getData());
         $articleId = $input['article_id'] ?? throw new IntegrityException('Fatal error in file ' . __FILE__ . ' at line ' . __LINE__);
         $question = $input['question'] ?? '???';
-        $closingDate = $input['closingDate'] ?? date('now', '+7 days');
+        $closingDate = $input['closingDate'] ?? new DateTime('+7 days');
         $visibility = $input['visibility'] ?? SurveyVisibility::Redactor->value;
         $options = [];
         foreach ($input['options'] ?? [] as $option) {

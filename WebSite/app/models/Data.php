@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace app\models;
 
@@ -196,7 +197,7 @@ abstract class Data
                 }
                 $stmt = $this->pdo->prepare($sql);
                 $result = $stmt->execute($params);
-                return $result ? $this->pdo->lastInsertId() : false;
+                return $result ? (int)$this->pdo->lastInsertId() : false;
             } else {
                 // UPDATE
                 $setClause = [];

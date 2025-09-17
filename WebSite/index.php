@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 require_once 'vendor/autoload.php';
 
 use flight\Engine;
@@ -137,7 +138,7 @@ $flight->map('getData', function ($key) {
 });
 
 $crosstabDataHelper = new CrosstabDataHelper($application, $authorizationDataHelper);
-$articleCrosstabDataheper = new ArticleCrosstabDataHelper($application, $crosstabDataHelper);
+$articleCrosstabDatahelper = new ArticleCrosstabDataHelper($application, $crosstabDataHelper);
 $articleDataHelper = new ArticleDataHelper($application, $authorizationDataHelper);
 $articleTableDataHelper = new ArticleTableDataHelper($application);
 $attributeDataHelper = new AttributeDataHelper($application);
@@ -181,7 +182,7 @@ $articleController = new ArticleController(
     $personDataHelper,
     $dataHelper,
     $backup,
-    $articleCrosstabDataheper,
+    $articleCrosstabDatahelper,
     $genericDataHelper,
     $languagesDataHelper,
     $pageDataHelper
@@ -266,13 +267,13 @@ mapRoute($flight, 'GET  /eventManager/help', $eventController, 'help');
 mapRoute($flight, 'GET  /event/chat/@id:[0-9]+', $eventController, 'showEventChat');
 mapRoute($flight, 'GET  /event/@id:[0-9]+', $eventController, 'show');
 $flight->route('GET  /event/@id:[0-9]+/register', function ($id) use ($eventController) {
-    $eventController->register($id, true);
+    $eventController->register((int)$id, true);
 });
 $flight->route('GET /event/@id:[0-9]+/unregister', function ($id) use ($eventController) {
-    $eventController->register($id, false);
+    $eventController->register((int)$id, false);
 });
 $flight->route('GET /event/@id:[0-9]+/@token:[a-f0-9]+', function ($id, $token) use ($eventController) {
-    $eventController->register($id, true, $token);
+    $eventController->register((int)$id, true, $token);
 });
 mapRoute($flight, 'GET  /event/location', $eventController, 'location');
 mapRoute($flight, 'GET  /events/crosstab', $eventController, 'showEventCrosstab');
@@ -646,7 +647,7 @@ $solfegeController = new SolfegeController(
 );
 mapRoute($flight, 'GET  /games/solfege/learn', $solfegeController, 'learn');
 mapRoute($flight, 'POST /games/solfege/save-score', $solfegeController, 'saveScore');
-#endrefion
+#endregion
 
 #region api
 $articleApi = new ArticleApi($application, $connectedUser, $dataHelper, $personDataHelper, $designDataHelper, $articleDataHelper);
@@ -657,7 +658,7 @@ mapRoute($flight, 'POST /api/media/upload', $articleApi, 'uploadFile');
 mapRoute($flight, 'POST /api/survey/reply', $articleApi, 'saveSurveyReply');
 mapRoute($flight, 'GET  /api/survey/reply/@id:[0-9]+', $articleApi, 'showSurveyReplyForm');
 
-$carouselApi = new carouselApi($application, $connectedUser, $dataHelper, $personDataHelper, $authorizationDataHelper, $carouselDataHelper);
+$carouselApi = new CarouselApi($application, $connectedUser, $dataHelper, $personDataHelper, $authorizationDataHelper, $carouselDataHelper);
 mapRoute($flight, 'GET  /api/carousel/@articleId:[0-9]+', $carouselApi, 'getItems');
 mapRoute($flight, 'POST /api/carousel/save', $carouselApi, 'saveItem');
 mapRoute($flight, 'POST /api/carousel/delete/@id:[0-9]+', $carouselApi, 'deleteItem');
@@ -765,32 +766,44 @@ $flight->route('/*', function () use ($errorManager) {
 });
 
 $flight->map('error', function (Throwable $ex) use ($logDataHelper, $errorManager) {
-    $logDataHelper->add(ApplicationError::Error->value, 'Internal error: ' . $ex->getMessage() . ' in file ' . $ex->getFile() . ' at line' . $ex->getLine());
+    $logDataHelper->add((string)ApplicationError::Error->value, 'Internal error: ' . $ex->getMessage() . ' in file ' . $ex->getFile() . ' at line' . $ex->getLine());
     $errorManager->raise(ApplicationError::Error, 'Error ' . $ex->getMessage() . ' in file ' . $ex->getFile() . ' at line ' . $ex->getLine());
 });
 $flight->after('start', function () use ($logDataHelper, $flight) {
-    $logDataHelper->add($flight->getData('code') ?? '', $flight->getData('message') ?? '');
+    $logDataHelper->add((string)$flight->getData('code') ?? '', $flight->getData('message') ?? '');
 });
 
 $flight->start();
 
-function serveFile(ErrorManager $errorManager, string $filename, string $ContentType = "'Content-Type', 'image/png'"): void
+function serveFile(ErrorManager $errorManager, string $filename, string $contentType = 'image/png'): void
 {
     $filename = basename($filename);
     $path = __DIR__ . "/app/images/$filename";
     if (file_exists($path)) {
-        Flight::response()
-            ->header($ContentType)
-            ->header('Cache-Control', 'public, max-age=604800, immutable')
-            ->header('Expires', gmdate('D, d M Y H:i:s', time() + 604800) . ' GMT');
+        $response = Flight::response();
+        $response->header('Content-Type', $contentType);
+        $response->header('Cache-Control', 'public, max-age=604800, immutable');
+        $response->header('Expires', gmdate('D, d M Y H:i:s', time() + 604800) . ' GMT');
         readfile($path);
     } else $errorManager->raise(ApplicationError::PageNotFound, "File $filename not found in file " . __FILE__ . ' at line ' . __LINE__);
-    exit;
+    Flight::stop();
 }
 
-function mapRoute(Engine $flight, string $methodPath, object $controller, string $methodName): void
+function mapRoute(Engine $flight, string $methodAndPath, object $controller, string $function): void
 {
-    $flight->route($methodPath, function (...$args) use ($controller, $methodName) {
-        $controller->$methodName(...$args);
+    preg_match_all('/@(\w+)(?::([^\/]+))?/', $methodAndPath, $matches, PREG_SET_ORDER);
+    $paramTypes = [];
+    foreach ($matches as $m) {
+        $name = $m[1];
+        $regex = $m[2] ?? null;
+        $paramTypes[] = $regex;
+    }
+    $flight->route($methodAndPath, function (...$args) use ($controller, $function, $paramTypes) {
+        foreach ($args as $i => &$arg) {
+            $regex = $paramTypes[$i] ?? null;
+            if ($regex === '[0-9]+' && ctype_digit($arg)) $arg = (int)$arg;
+        }
+        return $controller->$function(...$args);
     });
 }
+

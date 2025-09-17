@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace app\modules\Event;
 
@@ -78,7 +79,7 @@ class EventGuestController extends AbstractController
             }
             $nickname = $input['nickname'] ?? '???';
             try {
-                $contact = $this->dataHelper->get('Contact', ['Email', $email], 'Id, Token, NickName, TokenCreatedAt');
+                $contact = $this->dataHelper->get('Contact', ['Email' => $email], 'Id, Token, NickName, TokenCreatedAt');
                 if (!$contact) {
                     $token = bin2hex(random_bytes(32));
                     $contactId = $this->dataHelper->set('Contact', [

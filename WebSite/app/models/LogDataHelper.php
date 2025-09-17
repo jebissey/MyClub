@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace app\models;
 
@@ -663,7 +664,6 @@ class LogDataHelper extends Data
         $stmt->execute($params);
         return [$stmt->fetchAll(), ceil($total / $perPage)];
     }
-
 
     public function getPersons(array $filteredPersonEmails): array
     {

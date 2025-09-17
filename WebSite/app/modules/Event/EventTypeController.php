@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace app\modules\Event;
 
@@ -81,7 +82,7 @@ class EventTypeController extends TableController
     public function edit(int $id): void
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isEventDesigner()) && $this->eventTypeExists($id)) {
-            $eventType = $this->dataHelper->get('EventType', ['Id', $id], 'Name, IdGroup');
+            $eventType = $this->dataHelper->get('EventType', ['Id' => $id], 'Name, IdGroup');
             $this->render('Event/views/eventType_edit.latte', Params::getAll([
                 'name' => $eventType->Name,
                 'idGroup' => $eventType->IdGroup,
@@ -122,7 +123,7 @@ class EventTypeController extends TableController
     #region Private functions
     private function eventTypeExists(int $eventTypeId): bool
     {
-        $eventType = $this->dataHelper->get('EventType', ['Id', $eventTypeId], 'Id');
+        $eventType = $this->dataHelper->get('EventType', ['Id' => $eventTypeId], 'Id');
         if ($eventType === false) {
             $this->errorManager->raise(ApplicationError::InvalidSetting, "Invalide EventType {$eventTypeId} in file " . __FILE__ . ' at line ' . __LINE__);
             return false;

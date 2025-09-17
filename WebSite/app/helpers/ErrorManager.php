@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace app\helpers;
 
@@ -38,7 +39,7 @@ class ErrorManager
 
     public function raise(ApplicationError $code, string $message, int $timeout = 1000, bool $displayCode = true, $isWebmaster = false): void
     {
-        $this->logDataHelper->add($code->value, $message);
+        $this->logDataHelper->add((string)$code->value, $message);
         if ($this->isJsonExpected()) {
             http_response_code($code->value);
             header('Content-Type: application/json; charset=utf-8');

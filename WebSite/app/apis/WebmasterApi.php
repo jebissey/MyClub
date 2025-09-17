@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace app\apis;
 
@@ -27,7 +28,7 @@ class WebmasterApi extends AbstractApi
             $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
-        $this->logDataHelper->add(ApplicationError::Ok->value, $_SERVER['HTTP_USER_AGENT'] ?? 'HTTP_USER_AGENT not defined');
+        $this->logDataHelper->add((string)ApplicationError::Ok->value, $_SERVER['HTTP_USER_AGENT'] ?? 'HTTP_USER_AGENT not defined');
         $this->renderJson(['lastVersion' => Application::VERSION], true, ApplicationError::Ok->value);
     }
 }

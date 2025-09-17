@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace app\apis;
 
@@ -33,7 +34,7 @@ class ArticleApi extends AbstractApi
         $this->replyDataHelper = new ReplyDataHelper($application);
     }
 
-    public function deleteFile(string $year, string $month, string $filename): void
+    public function deleteFile(int $year, int $month, string $filename): void
     {
         if (!($this->application->getConnectedUser()->get()->isRedactor() ?? false)) {
             $this->renderJsonForbidden(__FILE__, __LINE__);
