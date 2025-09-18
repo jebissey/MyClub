@@ -118,7 +118,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const availableAttributesSelect = document.getElementById('availableAttributesSelect');
     function loadAttributesByEventType(eventTypeId) {
         availableAttributesSelect.innerHTML = '<option value="">Chargement...</option>';
-        fetch(`/api/attributes-by-event-type/${eventTypeId}`)
+        fetch(`/api/event/attributes/eventType/${eventTypeId}`)
             .then(response => response.json())
             .then(data => {
                 availableAttributesSelect.innerHTML = '';
