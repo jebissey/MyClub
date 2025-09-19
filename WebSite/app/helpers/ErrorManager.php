@@ -1,40 +1,28 @@
 <?php
+
 declare(strict_types=1);
 
 namespace app\helpers;
 
 use app\enums\ApplicationError;
-use app\models\AuthorizationDataHelper;
 use app\models\DataHelper;
 use app\models\LanguagesDataHelper;
 use app\models\LogDataHelper;
-use app\models\PageDataHelper;
 use app\modules\Common\EmptyController;
 
 class ErrorManager
 {
     private DataHelper $dataHelper;
-    private AuthorizationDataHelper $authorizationDataHelper;
     private LanguagesDataHelper $languagesDataHelper;
     private LogDataHelper $logDataHelper;
-    private PageDataHelper $pageDataHelper;
     private EmptyController $emptyController;
 
     public function __construct(private Application $application)
     {
-        $this->authorizationDataHelper = new AuthorizationDataHelper($application);
         $this->dataHelper = new DataHelper($application);
         $this->logDataHelper = new LogDataHelper($application);
         $this->languagesDataHelper = new LanguagesDataHelper($application);
-        $this->pageDataHelper = new PageDataHelper($application, $this->authorizationDataHelper);
-        $this->emptyController = new EmptyController(
-            $application,
-            $this->dataHelper,
-            $this->languagesDataHelper,
-            $this->pageDataHelper,
-            $this->authorizationDataHelper,
-            $this->logDataHelper
-        );
+        $this->emptyController = new EmptyController($application);
     }
 
     public function raise(ApplicationError $code, string $message, int $timeout = 1000, bool $displayCode = true, $isWebmaster = false): void
@@ -76,10 +64,11 @@ class ErrorManager
         $this->application->getFlight()->response()->status($code->value);
         $this->emptyController->render('Common/views/info.latte', [
             'content' => $result,
-            'hasAuthorization' => $this->application->getConnectedUser()->get()->hasAutorization() ?? false,
+            'hasAuthorization' => $this->application->getConnectedUser()->hasAutorization() ?? false,
             'currentVersion' => Application::VERSION,
             'timer' => $timeout,
-            'previousPage' => false
+            'previousPage' => false,
+            'page' => $this->application->getConnectedUser()->getPage(),
         ]);
         if ($code != ApplicationError::Ok) exit;
         Application::unreachable('Ok isn\'t an error', __FILE__, __LINE__);

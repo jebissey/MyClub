@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace app\modules\Event;
@@ -10,12 +11,8 @@ use app\helpers\Application;
 use app\helpers\ErrorManager;
 use app\helpers\Params;
 use app\helpers\WebApp;
-use app\models\AuthorizationDataHelper;
-use app\models\DataHelper;
 use app\models\EventDataHelper;
 use app\models\GenericDataHelper;
-use app\models\LanguagesDataHelper;
-use app\models\PageDataHelper;
 use app\models\TableControllerDataHelper;
 use app\modules\Common\TableController;
 
@@ -26,18 +23,14 @@ class EventTypeController extends TableController
         private EventDataHelper $eventDataHelper,
         private TableControllerDataHelper $tableControllerDataHelper,
         private ErrorManager $errorManager,
-        DataHelper $dataHelper,
-        LanguagesDataHelper $languagesDataHelper,
-        PageDataHelper $pageDataHelper,
-        AuthorizationDataHelper $authorizationDataHelper,
         GenericDataHelper $genericDataHelper
     ) {
-        parent::__construct($application, $genericDataHelper, $dataHelper, $languagesDataHelper, $pageDataHelper, $authorizationDataHelper);
+        parent::__construct($application, $genericDataHelper);
     }
 
     public function index(): void
     {
-        if (!($this->application->getConnectedUser()->get()->isEventDesigner() ?? false)) {
+        if (!($this->application->getConnectedUser()->isEventDesigner() ?? false)) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
         }
@@ -61,13 +54,14 @@ class EventTypeController extends TableController
             'filterValues' => $filterValues,
             'filters' => $filterConfig,
             'columns' => $columns,
-            'resetUrl' => '/eventTypes'
+            'resetUrl' => '/eventTypes',
+            'page' => $this->application->getConnectedUser()->getPage(),
         ]));
     }
 
     public function create(): void
     {
-        if (!($this->application->getConnectedUser()->get()->isEventDesigner() ?? false)) {
+        if (!($this->application->getConnectedUser()->isEventDesigner() ?? false)) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
         }
@@ -88,7 +82,8 @@ class EventTypeController extends TableController
                 'idGroup' => $eventType->IdGroup,
                 'groups' => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
                 'attributes' => $this->dataHelper->gets('Attribute', [], '*', 'Name'),
-                'existingAttributes' => $this->dataHelper->gets('EventTypeAttribute', ['IdEventType' => $id], 'Id')
+                'existingAttributes' => $this->dataHelper->gets('EventTypeAttribute', ['IdEventType' => $id], 'Id'),
+                'page' => $this->application->getConnectedUser()->getPage(),
             ]));
         }
     }

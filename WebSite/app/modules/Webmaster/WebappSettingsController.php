@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace app\modules\Webmaster;
@@ -7,10 +8,6 @@ use app\enums\Help;
 use app\enums\Message;
 use app\helpers\Application;
 use app\helpers\Params;
-use app\models\AuthorizationDataHelper;
-use app\models\DataHelper;
-use app\models\LanguagesDataHelper;
-use app\models\PageDataHelper;
 use app\modules\Common\AbstractController;
 
 class WebappSettingsController extends AbstractController
@@ -21,14 +18,9 @@ class WebappSettingsController extends AbstractController
         'Error_500' => 'Error 500',
     ];
 
-    public function __construct(
-        Application $application,
-        DataHelper $dataHelper,
-        LanguagesDataHelper $languagesDataHelper,
-        PageDataHelper $pageDataHelper,
-        AuthorizationDataHelper $authorizationDataHelper
-    ) {
-        parent::__construct($application, $dataHelper, $languagesDataHelper, $pageDataHelper, $authorizationDataHelper);
+    public function __construct(Application $application)
+    {
+        parent::__construct($application);
         foreach (Help::cases() as $case) {
             $this->settingsKeys['Help_' . $case->name] = $this->languagesDataHelper->translate('Help_' . $case->value);
         }
@@ -41,7 +33,7 @@ class WebappSettingsController extends AbstractController
 
     public function editSettings(): void
     {
-        if (!($this->application->getConnectedUser()->get()->isHomeDesigner() ?? false)) {
+        if (!($this->application->getConnectedUser()->isHomeDesigner() ?? false)) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
         }
@@ -61,13 +53,14 @@ class WebappSettingsController extends AbstractController
         $this->render('Webmaster/views/webappSettings.latte', Params::getAll([
             'navItems' => $this->getNavItems($this->application->getConnectedUser()->person),
             'settingsKeys' => $this->settingsKeys,
-            'settings' => $settings
+            'settings' => $settings,
+            'page' => $this->application->getConnectedUser()->getPage(),
         ]));
     }
 
     public function saveSettings()
     {
-        if (!($this->application->getConnectedUser()->get()->isHomeDesigner() ?? false)) {
+        if (!($this->application->getConnectedUser()->isHomeDesigner() ?? false)) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
         }

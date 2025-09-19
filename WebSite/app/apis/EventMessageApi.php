@@ -25,7 +25,7 @@ class EventMessageApi extends AbstractApi
 
     public function addMessage(): void
     {
-        if ($this->application->getConnectedUser()->get()->person === null) {
+        if ($this->application->getConnectedUser()->person === null) {
             $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }
@@ -48,7 +48,7 @@ class EventMessageApi extends AbstractApi
 
     public function deleteMessage(): void
     {
-        if ($this->application->getConnectedUser()->get()->person === null) {
+        if ($this->application->getConnectedUser()->person === null) {
             $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }
@@ -67,7 +67,7 @@ class EventMessageApi extends AbstractApi
 
     public function updateMessage(): void
     {
-        if ($this->application->getConnectedUser()->get()->person === null) {
+        if ($this->application->getConnectedUser()->person === null) {
             $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }

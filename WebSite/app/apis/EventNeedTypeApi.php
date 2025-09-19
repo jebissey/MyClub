@@ -29,7 +29,7 @@ class EventNeedTypeApi extends AbstractApi
 
     public function deleteNeedType(int $id): void
     {
-        if (!$this->application->getConnectedUser()->get()->isEventDesigner()) {
+        if (!$this->application->getConnectedUser()->isEventDesigner()) {
             $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }
@@ -47,7 +47,7 @@ class EventNeedTypeApi extends AbstractApi
 
     public function saveNeedType(): void
     {
-        if (!$this->application->getConnectedUser()->get()->isEventDesigner()) {
+        if (!$this->application->getConnectedUser()->isEventDesigner()) {
             $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }

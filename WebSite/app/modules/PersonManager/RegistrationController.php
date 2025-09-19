@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace app\modules\PersonManager;
@@ -7,12 +8,8 @@ use app\enums\FilterInputRule;
 use app\helpers\Application;
 use app\helpers\Params;
 use app\helpers\WebApp;
-use app\models\AuthorizationDataHelper;
-use app\models\DataHelper;
 use app\models\GenericDataHelper;
 use app\models\GroupDataHelper;
-use app\models\LanguagesDataHelper;
-use app\models\PageDataHelper;
 use app\models\TableControllerDataHelper;
 use app\modules\Common\TableController;
 
@@ -22,13 +19,9 @@ class RegistrationController extends TableController
         Application $application,
         private TableControllerDataHelper $tableControllerDataHelper,
         private GroupDataHelper $groupDataHelper,
-        GenericDataHelper $genericDataHelper,
-        DataHelper $dataHelper,
-        LanguagesDataHelper $languagesDataHelper,
-        PageDataHelper $pageDataHelper,
-        AuthorizationDataHelper $authorizationDataHelper
+        GenericDataHelper $genericDataHelper
     ) {
-        parent::__construct($application, $genericDataHelper, $dataHelper, $languagesDataHelper, $pageDataHelper, $authorizationDataHelper);
+        parent::__construct($application, $genericDataHelper);
     }
 
     public function index()
@@ -62,6 +55,7 @@ class RegistrationController extends TableController
                 'layout' => $this->getLayout(),
                 'navItems' => $this->getNavItems($connectedUser->person ?? false),
                 'isMyclubWebSite' => WebApp::isMyClubWebSite(),
+                'page' => $this->application->getConnectedUser()->getPage()
             ]));
         }
     }
@@ -74,7 +68,8 @@ class RegistrationController extends TableController
             $this->render('PersonManager/views/registration_user_groups_partial.latte', Params::getAll([
                 'currentGroups' => $currentGroups,
                 'availableGroups' => $availableGroups,
-                'personId' => $personId
+                'personId' => $personId,
+                'page' => $this->application->getConnectedUser()->getPage()
             ]));
         }
     }

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace app\modules\User;
@@ -11,7 +12,7 @@ class UserDashboardController extends AbstractController
 {
     public function user(): void
     {
-        if ($this->application->getConnectedUser()->get()->person === null) {
+        if ($this->application->getConnectedUser()->person === null) {
             $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
@@ -20,12 +21,14 @@ class UserDashboardController extends AbstractController
             return;
         }
         $_SESSION['navbar'] = 'user';
-        $this->render('User/views/user.latte', Params::getAll(['page' => '']));
+        $this->render('User/views/user.latte', Params::getAll([
+            'page' => ''
+        ]));
     }
 
     public function help(): void
     {
-        if ($this->application->getConnectedUser()->get()->person === null) {
+        if ($this->application->getConnectedUser()->person === null) {
             $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
@@ -38,7 +41,8 @@ class UserDashboardController extends AbstractController
             'hasAuthorization' => $this->application->getConnectedUser()->hasAutorization(),
             'currentVersion' => Application::VERSION,
             'timer' => 0,
-            'previousPage' => true
+            'previousPage' => true,
+            'page' => $this->application->getConnectedUser()->getPage(),
         ]));
     }
 }

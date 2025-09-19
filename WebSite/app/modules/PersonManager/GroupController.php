@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace app\modules\PersonManager;
@@ -10,11 +11,7 @@ use app\exceptions\QueryException;
 use app\helpers\Application;
 use app\helpers\Params;
 use app\helpers\WebApp;
-use app\models\AuthorizationDataHelper;
-use app\models\DataHelper;
 use app\models\GroupDataHelper;
-use app\models\LanguagesDataHelper;
-use app\models\PageDataHelper;
 use app\modules\Common\AbstractController;
 
 class GroupController extends AbstractController
@@ -22,17 +19,13 @@ class GroupController extends AbstractController
     public function __construct(
         Application $application,
         private GroupDataHelper $groupDataHelper,
-        DataHelper $dataHelper,
-        LanguagesDataHelper $languagesDataHelper,
-        PageDataHelper $pageDataHelper,
-        AuthorizationDataHelper $authorizationDataHelper
     ) {
-        parent::__construct($application, $dataHelper, $languagesDataHelper, $pageDataHelper, $authorizationDataHelper);
+        parent::__construct($application);
     }
 
     public function groupCreate(): void
     {
-        if (!($this->application->getConnectedUser()->get()->isGroupManager() ?? false)) {
+        if (!($this->application->getConnectedUser()->isGroupManager() ?? false)) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
         }
@@ -46,12 +39,13 @@ class GroupController extends AbstractController
             'layout' => $this->getLayout(),
             'isMyclubWebSite' => WebApp::isMyClubWebSite(),
             'navItems' => $this->getNavItems($connectedUser->person ?? false),
+            'page' => $this->application->getConnectedUser()->getPage(),
         ]));
     }
 
     public function groupCreateSave(): void
     {
-        if (!($this->application->getConnectedUser()->get()->isGroupManager() ?? false)) {
+        if (!($this->application->getConnectedUser()->isGroupManager() ?? false)) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
         }
@@ -75,6 +69,7 @@ class GroupController extends AbstractController
                 'layout' => $this->getLayout(),
                 'isMyclubWebSite' => WebApp::isMyClubWebSite(),
                 'navItems' => $this->getNavItems($connectedUser->person ?? false),
+                'page' => $this->application->getConnectedUser()->getPage(),
             ]));
             return;
         }
@@ -84,7 +79,7 @@ class GroupController extends AbstractController
 
     public function groupDelete(int $id): void
     {
-        if (!($this->application->getConnectedUser()->get()->isGroupManager() ?? false)) {
+        if (!($this->application->getConnectedUser()->isGroupManager() ?? false)) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
         }
@@ -108,7 +103,7 @@ class GroupController extends AbstractController
 
     public function groupEdit(int $id): void
     {
-        if (!($this->application->getConnectedUser()->get()->isGroupManager() ?? false)) {
+        if (!($this->application->getConnectedUser()->isGroupManager() ?? false)) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
         }
@@ -129,14 +124,14 @@ class GroupController extends AbstractController
                 'currentAuthorizations' => array_column($this->dataHelper->gets('GroupAuthorization', ['IdGroup' => $id], 'IdAuthorization'), 'IdAuthorization'),
                 'layout' => $this->getLayout(),
                 'isMyclubWebSite' => WebApp::isMyClubWebSite(),
-
+                'page' => $this->application->getConnectedUser()->getPage(),
             ]));
         }
     }
 
     public function groupEditSave(int $id): void
     {
-        if (!($this->application->getConnectedUser()->get()->isGroupManager() ?? false)) {
+        if (!($this->application->getConnectedUser()->isGroupManager() ?? false)) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
         }
@@ -164,14 +159,15 @@ class GroupController extends AbstractController
                 'group' => $group,
                 'availableAuthorizations' => $availableAuthorizations,
                 'error' => 'Le nom du groupe est requis',
-                'layout' => $this->getLayout()
+                'layout' => $this->getLayout(),
+                'page' => $this->application->getConnectedUser()->getPage(),
             ]));
         } else $this->groupDataHelper->update($id, $name, $selfRegistration, $selectedAuthorizations);
     }
 
     public function groupIndex(): void
     {
-        if (!($this->application->getConnectedUser()->get()->isGroupManager() ?? false)) {
+        if (!($this->application->getConnectedUser()->isGroupManager() ?? false)) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
         }
@@ -180,10 +176,11 @@ class GroupController extends AbstractController
             return;
         }
         $this->render('PersonManager/views/groups_index.latte', Params::getAll([
-            'groups' => $this->groupDataHelper->getGroupsWithAuthorizations(),
+            'groups' => $this->groupDataHelper->getGroupsWithAuthorizations($this->application->getConnectedUser()),
             'layout' => $this->getLayout(),
             'navItems' => $this->getNavItems($connectedUser->person ?? false),
             'isMyclubWebSite' => WebApp::isMyClubWebSite(),
+            'page' => $this->application->getConnectedUser()->getPage(),
         ]));
     }
 }

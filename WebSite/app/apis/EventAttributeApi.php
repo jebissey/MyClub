@@ -26,7 +26,7 @@ class EventAttributeApi extends AbstractApi
 
     public function createAttribute(): void
     {
-        if (!$this->application->getConnectedUser()->get()->isEventDesigner()) {
+        if (!$this->application->getConnectedUser()->isEventDesigner()) {
             $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }
@@ -45,7 +45,7 @@ class EventAttributeApi extends AbstractApi
 
     public function deleteAttribute(int $id): void
     {
-        if (!$this->application->getConnectedUser()->get()->isEventDesigner()) {
+        if (!$this->application->getConnectedUser()->isEventDesigner()) {
             $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }
@@ -93,7 +93,7 @@ class EventAttributeApi extends AbstractApi
 
     public function updateAttribute(): void
     {
-        if (!$this->application->getConnectedUser()->get()->isEventDesigner()) {
+        if (!$this->application->getConnectedUser()->isEventDesigner()) {
             $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }

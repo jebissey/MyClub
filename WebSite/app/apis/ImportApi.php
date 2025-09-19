@@ -22,7 +22,7 @@ class ImportApi extends AbstractApi
 
     public function getHeadersFromCSV()
     {
-        if (!($this->application->getConnectedUser()->get(1)->isPersonManager() ?? false)) {
+        if (!($this->application->getConnectedUser()->isPersonManager() ?? false)) {
             $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }

@@ -1,15 +1,12 @@
 <?php
+
 declare(strict_types=1);
 
 namespace app\modules\User;
 
 use app\helpers\Application;
 use app\helpers\Params;
-use app\models\AuthorizationDataHelper;
-use app\models\DataHelper;
 use app\models\GroupDataHelper;
-use app\models\LanguagesDataHelper;
-use app\models\PageDataHelper;
 use app\models\PersonDataHelper;
 use app\modules\Common\AbstractController;
 
@@ -18,18 +15,14 @@ class UserDirectoryController extends AbstractController
     public function __construct(
         Application $application,
         private PersonDataHelper $personDataHelper,
-        private GroupDataHelper $groupDataHelper,
-        DataHelper $dataHelper,
-        LanguagesDataHelper $languagesDataHelper,
-        PageDataHelper $pageDataHelper,
-        AuthorizationDataHelper $authorizationDataHelper
+        private GroupDataHelper $groupDataHelper
     ) {
-        parent::__construct($application, $dataHelper, $languagesDataHelper, $pageDataHelper, $authorizationDataHelper);
+        parent::__construct($application);
     }
 
     public function showDirectory()
     {
-        $person = $this->application->getConnectedUser()->get()->person;
+        $person = $this->application->getConnectedUser()->person;
         if ($person === null) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
@@ -55,12 +48,13 @@ class UserDirectoryController extends AbstractController
             'groups' => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
             'groupCounts' => $groupCounts,
             'selectedGroup' => $selectedGroup,
+            'page' => $this->application->getConnectedUser()->getPage(),
         ]));
     }
 
     public function showMap()
     {
-        $person = $this->application->getConnectedUser()->get()->person;
+        $person = $this->application->getConnectedUser()->person;
         if ($person === null) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
@@ -95,6 +89,7 @@ class UserDirectoryController extends AbstractController
             'locationData' => $locationData,
             'membersCount' => count($locationData),
             'navItems' => $this->getNavItems($person),
+            'page' => $this->application->getConnectedUser()->getPage(),
         ]));
     }
 }

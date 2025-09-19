@@ -20,7 +20,7 @@ class GroupApi extends AbstractApi
 
     public function addToGroup(int $personId, int $groupId): void
     {
-        if (!(($this->application->getConnectedUser()->get()->isGroupManager() ?? false))) {
+        if (!(($this->application->getConnectedUser()->isGroupManager() ?? false))) {
             $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }
@@ -54,7 +54,7 @@ class GroupApi extends AbstractApi
 
     public function getPersonsInGroup(?int $id): void
     {
-        if (!($this->application->getConnectedUser()->get()->person ?? false)) {
+        if (!($this->application->getConnectedUser()->person ?? false)) {
             $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }
@@ -72,7 +72,7 @@ class GroupApi extends AbstractApi
 
     public function removeFromGroup(int $personId, int $groupId): void
     {
-        if (!(($this->application->getConnectedUser()->get()->isPersonManager() ?? false) || $this->application->getConnectedUser()->isWebmaster() ?? false)) {
+        if (!(($this->application->getConnectedUser()->isPersonManager() ?? false) || $this->application->getConnectedUser()->isWebmaster() ?? false)) {
             $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }

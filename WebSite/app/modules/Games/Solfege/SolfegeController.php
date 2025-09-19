@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace app\modules\Games\Solfege;
@@ -7,40 +8,32 @@ use Throwable;
 
 use app\helpers\Application;
 use app\helpers\Params;
-use app\models\AuthorizationDataHelper;
-use app\models\DataHelper;
-use app\models\LanguagesDataHelper;
-use app\models\PageDataHelper;
 use app\modules\Common\AbstractController;
 
 class SolfegeController extends AbstractController
 {
-    public function __construct(
-        Application $application,
-        DataHelper $dataHelper,
-        LanguagesDataHelper $languagesDataHelper,
-        PageDataHelper $pageDataHelper,
-        AuthorizationDataHelper $authorizationDataHelper
-    ) {
-        parent::__construct($application, $dataHelper, $languagesDataHelper, $pageDataHelper, $authorizationDataHelper);
+    public function __construct(Application $application)
+    {
+        parent::__construct($application);
     }
 
     public function learn(): void
     {
-        if (!($this->application->getConnectedUser()->get()->isEventDesigner() ?? false)) {
+        if (!($this->application->getConnectedUser()->isEventDesigner() ?? false)) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
         }
 
         $this->render('Event/views/solfege_learn.latte', Params::getAll([
             'navItems' => $this->getNavItems($this->application->getConnectedUser()->person),
-            'title' => 'Apprentissage du Solfège'
+            'title' => 'Apprentissage du Solfège',
+            'page' => $this->application->getConnectedUser()->getPage(),
         ]));
     }
 
     public function saveScore(): void
     {
-        if (!($this->application->getConnectedUser()->get()->isEventDesigner() ?? false)) {
+        if (!($this->application->getConnectedUser()->isEventDesigner() ?? false)) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
         }

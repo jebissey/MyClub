@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace app\modules\User;
@@ -8,27 +9,19 @@ use app\helpers\Application;
 use app\helpers\FFAScraper;
 use app\helpers\Params;
 use app\helpers\WebApp;
-use app\models\AuthorizationDataHelper;
-use app\models\DataHelper;
-use app\models\LanguagesDataHelper;
-use app\models\PageDataHelper;
 use app\modules\Common\AbstractController;
 
 class FFAController extends AbstractController
 {
     public function __construct(
         Application $application,
-        DataHelper $dataHelper,
-        LanguagesDataHelper $languagesDataHelper,
-        PageDataHelper $pageDataHelper,
-        AuthorizationDataHelper $authorizationDataHelper
     ) {
-        parent::__construct($application, $dataHelper, $languagesDataHelper, $pageDataHelper, $authorizationDataHelper);
+        parent::__construct($application);
     }
 
     public function searchMember()
     {
-        if ($this->application->getConnectedUser()->get()->person === null) {
+        if ($this->application->getConnectedUser()->person === null) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
         }
@@ -36,13 +29,14 @@ class FFAController extends AbstractController
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
-        $person = $this->application->getConnectedUser()->get()->person;
+        $person = $this->application->getConnectedUser()->person;
         $schema = [
             'firstName' => FilterInputRule::PersonName->value,
             'lastName' => FilterInputRule::PersonName->value,
             'question' => FilterInputRule::HtmlSafeName->value,
             'year' => FilterInputRule::Int->value,
             'club' => FilterInputRule::HtmlSafeName->value,
+            'page' => $this->application->getConnectedUser()->getPage(),
         ];
         $input = WebApp::filterInput($schema, $this->flight->request()->query->getData());
         $firstName = $input['firstName'] ?? $person->FirstName ?? '???';
@@ -64,6 +58,7 @@ class FFAController extends AbstractController
             'question' => $question,
             'year' => $year,
             'club' => $club,
+            'page' => $this->application->getConnectedUser()->getPage()
         ]));
     }
 }

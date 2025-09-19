@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace app\modules\User;
@@ -8,10 +9,6 @@ use app\helpers\Application;
 use app\helpers\News;
 use app\helpers\Params;
 use app\helpers\WebApp;
-use app\models\AuthorizationDataHelper;
-use app\models\DataHelper;
-use app\models\LanguagesDataHelper;
-use app\models\PageDataHelper;
 use app\modules\Common\AbstractController;
 
 class UserNewsController extends AbstractController
@@ -19,17 +16,13 @@ class UserNewsController extends AbstractController
     public function __construct(
         Application $application,
         private News $news,
-        DataHelper $dataHelper,
-        LanguagesDataHelper $languagesDataHelper,
-        PageDataHelper $pageDataHelper,
-        AuthorizationDataHelper $authorizationDataHelper
     ) {
-        parent::__construct($application, $dataHelper, $languagesDataHelper, $pageDataHelper, $authorizationDataHelper);
+        parent::__construct($application);
     }
 
     public function showNews(): void
     {
-        $connectedUser = $this->application->getConnectedUser()->get(1);
+        $connectedUser = $this->application->getConnectedUser();
         if ($connectedUser->person ?? false) {
             $searchMode = WebApp::getFiltered('from', $this->application->enumToValues(\app\enums\Period::class), $this->flight->request()->query->getData()) ?: \app\enums\Period::Signout->value;
 
@@ -43,7 +36,8 @@ class UserNewsController extends AbstractController
                 'searchFrom' => $searchFrom,
                 'searchMode' => $searchMode,
                 'navItems' => $this->getNavItems($connectedUser->person ?? false),
-                'person' => $connectedUser->person
+                'person' => $connectedUser->person,
+                'page' => $connectedUser->getPage(1),
             ]));
         } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }

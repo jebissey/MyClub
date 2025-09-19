@@ -25,7 +25,7 @@ class EventSupplyApi extends AbstractApi
 
     public function updateSupply(): void
     {
-        if ($this->application->getConnectedUser()->get()->person === null) {
+        if ($this->application->getConnectedUser()->person === null) {
             $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }
@@ -38,7 +38,7 @@ class EventSupplyApi extends AbstractApi
             $this->validateSupplyData($input);
             $apiResponse = $this->updateSupply_(
                 $input['eventId'],
-                $this->application->getConnectedUser()->get()->person->Email,
+                $this->application->getConnectedUser()->person->Email,
                 $input['needId'],
                 intval($input['supply'])
             );

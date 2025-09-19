@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace app\modules\Webmaster;
@@ -7,11 +8,7 @@ use app\helpers\Application;
 use app\helpers\Params;
 use app\helpers\WebApp;
 use app\models\ArticleDataHelper;
-use app\models\AuthorizationDataHelper;
-use app\models\DataHelper;
-use app\models\LanguagesDataHelper;
 use app\models\LogDataHelper;
-use app\models\PageDataHelper;
 use app\modules\Common\AbstractController;
 
 class WebmasterController extends AbstractController
@@ -19,13 +16,9 @@ class WebmasterController extends AbstractController
     public function __construct(
         Application $application,
         private LogDataHelper $logDataHelper,
-        private ArticleDataHelper $articleDataHelper,
-        DataHelper $dataHelper,
-        LanguagesDataHelper $languagesDataHelper,
-        PageDataHelper $pageDataHelper,
-        AuthorizationDataHelper $authorizationDataHelper
+        private ArticleDataHelper $articleDataHelper
     ) {
-        parent::__construct($application, $dataHelper, $languagesDataHelper, $pageDataHelper, $authorizationDataHelper);
+        parent::__construct($application);
     }
 
     public function helpAdmin()
@@ -36,34 +29,9 @@ class WebmasterController extends AbstractController
                 'hasAuthorization' => $this->application->getConnectedUser()->isEventManager(),
                 'currentVersion' => Application::VERSION,
                 'timer' => 0,
-                'previousPage' => true
+                'previousPage' => true,
+                'page' => $this->application->getConnectedUser()->getPage()
             ]));
-        }
-    }
-
-    public function helpDesigner(): void
-    {
-        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isDesigner())) {
-            $this->render('Common/views/info.latte', [
-                'content' => $this->dataHelper->get('Settings', ['Name' => 'Help_designer'], 'Value')->Value ?? '',
-                'hasAuthorization' => $this->application->getConnectedUser()->get()->isDesigner() ?? false,
-                'currentVersion' => Application::VERSION,
-                'timer' => 0,
-                'previousPage' => true
-            ]);
-        }
-    }
-
-    public function helpVisitorInsights(): void
-    {
-        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isVisitorInsights())) {
-            $this->render('Common/views/info.latte', [
-                'content' => $this->dataHelper->get('Settings', ['Name' => 'Help_visitorInsights'], 'Value')->Value ?? '',
-                'hasAuthorization' => $this->application->getConnectedUser()->get()->isVisitorInsights() ?? false,
-                'currentVersion' => Application::VERSION,
-                'timer' => 0,
-                'previousPage' => true
-            ]);
         }
     }
 
@@ -72,17 +40,18 @@ class WebmasterController extends AbstractController
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isWebmaster())) {
             $this->render('Common/views/info.latte', [
                 'content' => $this->dataHelper->get('Settings', ['Name' => 'Help_webmaster'], 'Value')->Value ?? '',
-                'hasAuthorization' => $this->application->getConnectedUser()->get()->isWebmaster() ?? false,
+                'hasAuthorization' => $this->application->getConnectedUser()->isWebmaster() ?? false,
                 'currentVersion' => Application::VERSION,
                 'timer' => 0,
-                'previousPage' => true
+                'previousPage' => true,
+                'page' => $this->application->getConnectedUser()->getPage()
             ]);
         }
     }
 
     public function homeAdmin()
     {
-        if (!($this->application->getConnectedUser()->get()->isAdministrator() ?? false)) {
+        if (!($this->application->getConnectedUser()->isAdministrator() ?? false)) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
         }
@@ -99,15 +68,9 @@ class WebmasterController extends AbstractController
                 $this->raiseMethodNotAllowed(__FILE__, __LINE__);
                 return;
             }
-            $this->render('Webmaster/views/admin.latte', Params::getAll([]));
-        }
-    }
-
-    public function homeDesigner(): void
-    {
-        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isDesigner())) {
-            $_SESSION['navbar'] = 'designer';
-            $this->render('Webmaster/views/designer.latte', Params::getAll([]));
+            $this->render('Webmaster/views/admin.latte', Params::getAll([
+                'page' => $this->application->getConnectedUser()->getPage(),
+            ]));
         }
     }
 
@@ -123,6 +86,7 @@ class WebmasterController extends AbstractController
             $this->render('Webmaster/views/webmaster.latte', Params::getAll([
                 'newVersion' => $newVersion,
                 'isMyclubWebSite' => WebApp::isMyClubWebSite(),
+                'page' => $this->application->getConnectedUser()->getPage()
             ]));
         }
     }
@@ -137,6 +101,7 @@ class WebmasterController extends AbstractController
                 'totalInstallations' => count($installations),
                 'navItems' => $this->getNavItems($this->application->getConnectedUser()->person),
                 'isMyclubWebSite' => WebApp::isMyClubWebSite(),
+                'page' => $this->application->getConnectedUser()->getPage()
             ]));
         }
     }
@@ -169,14 +134,6 @@ class WebmasterController extends AbstractController
             echo '  </url>' . PHP_EOL;
         }
         echo '</urlset>';
-    }
-
-    public function visitorInsights(): void
-    {
-        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isVisitorInsights())) {
-            $_SESSION['navbar'] = 'visitorInsights';
-            $this->render('Webmaster/views/visitorInsights.latte', Params::getAll([]));
-        }
     }
 
     #region Private methods

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace app\modules\User;
@@ -10,11 +11,7 @@ use app\enums\FilterInputRule;
 use app\helpers\Application;
 use app\helpers\Params;
 use app\helpers\WebApp;
-use app\models\AuthorizationDataHelper;
-use app\models\DataHelper;
-use app\models\LanguagesDataHelper;
 use app\models\LogDataHelper;
-use app\models\PageDataHelper;
 use app\models\PersonStatisticsDataHelper;
 use app\modules\Common\AbstractController;
 
@@ -23,18 +20,14 @@ class UserStatisticsController extends AbstractController
     public function __construct(
         Application $application,
         private PersonStatisticsDataHelper $personalStatisticsDataHelper,
-        private LogDataHelper $logDataHelper,
-        DataHelper $dataHelper,
-        LanguagesDataHelper $languagesDataHelper,
-        PageDataHelper $pageDataHelper,
-        AuthorizationDataHelper $authorizationDataHelper
+        private LogDataHelper $logDataHelper
     ) {
-        parent::__construct($application, $dataHelper, $languagesDataHelper, $pageDataHelper, $authorizationDataHelper);
+        parent::__construct($application);
     }
 
     public function showStatistics(): void
     {
-        if ($person = $this->application->getConnectedUser()->get(1)->person ?? false) {
+        if ($person = $this->application->getConnectedUser()->person ?? false) {
             $schema = [
                 'seasonStart' => FilterInputRule::DateTime->value,
                 'seasonEnd' => FilterInputRule::DateTime->value,
@@ -48,6 +41,7 @@ class UserStatisticsController extends AbstractController
                 'currentSeason' => $season,
                 'navItems' => $this->getNavItems($person),
                 'chartData' => $this->getVisitStatsForChart($season, $person),
+                'page' => $this->application->getConnectedUser()->getPage(1),
             ]));
         } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }

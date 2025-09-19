@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', function () {
         button.addEventListener('click', function () {
             const id = this.closest('tr').dataset.id;
 
-            fetch(`/api/navBar/getItem/${id}`)
+            fetch(`/api/navbar/getItem/${id}`)
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
@@ -122,7 +122,7 @@ document.addEventListener('DOMContentLoaded', function () {
             forAnonymous: document.getElementById('forAnonymous').checked ? 1 : 0
         };
 
-        fetch('/api/navBar/saveItem', {
+        fetch('/api/navbar/saveItem', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -203,7 +203,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 positions[row.dataset.id] = index + 1;
             });
 
-            fetch('/api/navBar/updatePositions', {
+            fetch('/api/navbar/updatePositions', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

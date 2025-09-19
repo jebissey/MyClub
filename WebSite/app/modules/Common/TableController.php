@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace app\modules\Common;
@@ -6,25 +7,17 @@ namespace app\modules\Common;
 use \Envms\FluentPDO\Queries\Select;
 
 use app\helpers\Application;
-use app\models\AuthorizationDataHelper;
-use app\models\DataHelper;
 use app\models\GenericDataHelper;
-use app\models\LanguagesDataHelper;
-use app\models\PageDataHelper;
 
 abstract class TableController extends AbstractController
 {
-    protected int $itemsPerPage = 10;
+    private int $itemsPerPage = 10;
 
     public function __construct(
         Application $application,
         private GenericDataHelper $genericDataHelper,
-        DataHelper $dataHelper,
-        LanguagesDataHelper $languagesDataHelper,
-        PageDataHelper $pageDataHelper,
-        AuthorizationDataHelper $authorizationDataHelper
     ) {
-        parent::__construct($application, $dataHelper, $languagesDataHelper, $pageDataHelper, $authorizationDataHelper);
+        parent::__construct($application);
     }
 
     protected function prepareTableData(Select $query, array $filters = [], int $page = 1): array

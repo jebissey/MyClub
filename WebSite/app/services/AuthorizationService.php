@@ -14,11 +14,11 @@ class AuthorizationService implements AuthorizationServiceInterface
 
     public function isEventManager(): bool
     {
-        return $this->connectedUser->get()->isEventManager() ?? false;
+        return $this->connectedUser->isEventManager() ?? false;
     }
 
     public function getUserId(): int
     {
-        return $this->connectedUser->get()->person->Id ?? 0;
+        return $this->connectedUser->person->Id ?? 0;
     }
 }

@@ -15,6 +15,7 @@ use app\modules\Common\AbstractController;
 
 class DesignController extends AbstractController
 {
+
     public function __construct(
         Application $application,
         private DesignDataHelper $designDataHelper
@@ -85,5 +86,29 @@ class DesignController extends AbstractController
         $this->dataHelper->set('Design', $values, ['Id' => $filterValues['id'] ?? throw new RuntimeException('Missing Id in file ' . __FILE__ . ' at line ' . __LINE__)]);
 
         $this->redirect('/designs');
+    }
+
+    public function helpDesigner(): void
+    {
+        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isDesigner())) {
+            $this->render('Common/views/info.latte', [
+                'content' => $this->dataHelper->get('Settings', ['Name' => 'Help_designer'], 'Value')->Value ?? '',
+                'hasAuthorization' => $this->application->getConnectedUser()->isDesigner() ?? false,
+                'currentVersion' => Application::VERSION,
+                'timer' => 0,
+                'previousPage' => true,
+                'page' => $this->application->getConnectedUser()->getPage()
+            ]);
+        }
+    }
+
+    public function homeDesigner(): void
+    {
+        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isDesigner())) {
+            $_SESSION['navbar'] = 'designer';
+            $this->render('Designer/views/designer.latte', Params::getAll([
+                'page' => $this->application->getConnectedUser()->getPage()
+            ]));
+        }
     }
 }

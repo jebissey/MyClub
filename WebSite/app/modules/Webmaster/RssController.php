@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace app\modules\Webmaster;
@@ -10,10 +11,6 @@ use app\helpers\Application;
 use app\helpers\WebApp;
 use app\models\ArticleDataHelper;
 use app\models\EventDataHelper;
-use app\models\AuthorizationDataHelper;
-use app\models\DataHelper;
-use app\models\LanguagesDataHelper;
-use app\models\PageDataHelper;
 use app\modules\Common\AbstractController;
 
 class RssController extends AbstractController
@@ -21,13 +18,9 @@ class RssController extends AbstractController
     public function __construct(
         Application $application,
         private ArticleDataHelper $articleDataHelper,
-        private EventDataHelper $eventDataHelper,
-        DataHelper $dataHelper,
-        LanguagesDataHelper $languagesDataHelper,
-        PageDataHelper $pageDataHelper,
-        AuthorizationDataHelper $authorizationDataHelper
+        private EventDataHelper $eventDataHelper
     ) {
-        parent::__construct($application, $dataHelper, $languagesDataHelper, $pageDataHelper, $authorizationDataHelper);
+        parent::__construct($application);
     }
 
     public function articlesRssGenerator()

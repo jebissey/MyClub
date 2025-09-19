@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace app\helpers;
@@ -13,30 +14,29 @@ use app\models\DataHelper;
 class ConnectedUser
 {
     private array $authorizations;
-    public ?object $person;
     private GravatarHandler $gravatarHandler;
     private DataHelper $dataHelper;
     private AuthorizationDataHelper $authorizationDataHelper;
+    public ?object $person;
 
-    public function __construct(
-        private Application $application,
-    ) {
+    public function __construct(private Application $application)
+    {
         $this->gravatarHandler = new GravatarHandler();
         $this->dataHelper = new DataHelper($this->application);
         $this->authorizationDataHelper = new AuthorizationDataHelper($this->application);
     }
 
-    public function get(int $segment = 0): self
+    public function get(): void
     {
         $this->authorizations = [];
         $this->person = null;
         $userEmail = $_SESSION['user'] ?? '';
-        if ($userEmail === '') return $this;
-
+        if ($userEmail === '') return;
+        
         $person = $this->dataHelper->get('Person', ['Email' => $userEmail]);
         if (!$person) {
             $this->application->getErrorManager()->raise(ApplicationError::BadRequest, "Unknown user with this email address {$userEmail} in file " . __FILE__ . ' at line ' . __LINE__);
-            return $this;
+            return;
         }
         $this->person = $person;
         $this->authorizations = $this->authorizationDataHelper->getsFor($this);
@@ -56,13 +56,17 @@ class ConnectedUser
             'isEditor' => $this->isEditor(),
             'isVisitorInsights' => $this->isVisitorInsights(),
             'isWebmaster' => $this->isWebmaster(),
-            'page' => explode('/', trim(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/'))[$segment],
             'currentVersion' => Application::VERSION,
             'currentLanguage' => $lang,
             'supportedLanguages' => TranslationManager::getSupportedLanguages(),
             'flag' => TranslationManager::getFlag($lang),
         ]);
-        return $this;
+        return;
+    }
+
+    public function getPage(int $segment = 0)
+    {
+        return explode('/', trim(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/'))[$segment];
     }
 
     public function isAdministrator(): bool

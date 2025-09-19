@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace app\modules\Event;
@@ -9,10 +10,6 @@ use app\helpers\Application;
 use app\helpers\Params;
 use app\helpers\TranslationManager;
 use app\helpers\WebApp;
-use app\models\AuthorizationDataHelper;
-use app\models\DataHelper;
-use app\models\LanguagesDataHelper;
-use app\models\PageDataHelper;
 use app\models\PersonDataHelper;
 use app\modules\Common\AbstractController;
 
@@ -21,17 +18,13 @@ class EventEmailController extends AbstractController
     public function __construct(
         Application $application,
         private PersonDataHelper $personDataHelper,
-        DataHelper $dataHelper,
-        LanguagesDataHelper $languagesDataHelper,
-        PageDataHelper $pageDataHelper,
-        AuthorizationDataHelper $authorizationDataHelper
     ) {
-        parent::__construct($application, $dataHelper, $languagesDataHelper, $pageDataHelper, $authorizationDataHelper);
+        parent::__construct($application);
     }
 
     public function fetchEmails(): void
     {
-        if (!($this->application->getConnectedUser()->get()->isEventManager() ?? false)) {
+        if (!($this->application->getConnectedUser()->isEventManager() ?? false)) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
         }
@@ -44,12 +37,13 @@ class EventEmailController extends AbstractController
             'eventTypes' => $this->dataHelper->gets('EventType', ['Inactivated' => 0], 'Id, Name', 'Name'),
             'weekdayNames' => TranslationManager::getWeekdayNames(),
             'timeOptions' => $this->getAllLabels(),
+            'page' => $this->application->getConnectedUser()->getPage(),
         ]));
     }
 
     public function copyEmails(): void
     {
-        if (!($this->application->getConnectedUser()->get()->isEventManager() ?? false)) {
+        if (!($this->application->getConnectedUser()->isEventManager() ?? false)) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
         }
@@ -78,6 +72,7 @@ class EventEmailController extends AbstractController
             'emails' => $filteredEmails,
             'filters' => "$groupName / $eventTypeName / $dayOfWeekName / $timeOfDay",
             'people' => $this->dataHelper->gets('Person', ['Inactivated' => 0], 'Email, Phone, FirstName, LastName, NickName', '', true),
+            'page' => $this->application->getConnectedUser()->getPage(),
         ]));
     }
 }

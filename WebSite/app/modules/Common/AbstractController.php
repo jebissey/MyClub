@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace app\modules\Common;
@@ -20,17 +21,20 @@ abstract class AbstractController
 {
     protected Engine $flight;
     private LatteEngine $latte;
+    public DataHelper $dataHelper;
+    protected LanguagesDataHelper $languagesDataHelper;
+    protected PageDataHelper $pageDataHelper;
+    protected AuthorizationDataHelper $authorizationDataHelper;
 
-    public function __construct(
-        protected Application $application,
-        public DataHelper $dataHelper,
-        protected LanguagesDataHelper $languagesDataHelper,
-        protected PageDataHelper $pageDataHelper,
-        private AuthorizationDataHelper $authorizationDataHelper
-    ) {
+    public function __construct(protected Application $application)
+    {
         $this->flight = $application->getFlight();
         $this->latte = $application->getLatte();
         $this->addLatteFilters();
+        $this->dataHelper = new DataHelper($application);
+        $this->languagesDataHelper = new LanguagesDataHelper($application);
+        $this->authorizationDataHelper = new AuthorizationDataHelper($application);
+        $this->pageDataHelper = new PageDataHelper($application, $this->authorizationDataHelper);
     }
 
     #region Protected fucntions
@@ -116,7 +120,7 @@ abstract class AbstractController
 
     protected function userIsAllowedAndMethodIsGood(string $method, callable $permissionCheck): bool
     {
-        $user = $this->application->getConnectedUser()->get();
+        $user = $this->application->getConnectedUser();
         if (!$user || !$permissionCheck($user)) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return false;

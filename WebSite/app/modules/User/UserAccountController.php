@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace app\modules\User;
@@ -8,27 +9,18 @@ use app\enums\YesNo;
 use app\helpers\Application;
 use app\helpers\Params;
 use app\helpers\WebApp;
-use app\models\AuthorizationDataHelper;
-use app\models\DataHelper;
-use app\models\LanguagesDataHelper;
-use app\models\PageDataHelper;
 use app\modules\Common\AbstractController;
 
 class UserAccountController extends AbstractController
 {
-    public function __construct(
-        Application $application,
-        DataHelper $dataHelper,
-        LanguagesDataHelper $languagesDataHelper,
-        PageDataHelper $pageDataHelper,
-        AuthorizationDataHelper $authorizationDataHelper
-    ) {
-        parent::__construct($application, $dataHelper, $languagesDataHelper, $pageDataHelper, $authorizationDataHelper);
+    public function __construct(Application $application)
+    {
+        parent::__construct($application);
     }
 
     public function account(): void
     {
-        if ($this->application->getConnectedUser()->get(1)->person === null) {
+        if ($this->application->getConnectedUser()->person === null) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
         }
@@ -49,12 +41,13 @@ class UserAccountController extends AbstractController
             'isSelfEdit' => true,
             'layout' => $this->getLayout(),
             'navItems' => $this->getNavItems($connectedUser->person ?? false),
+            'page' => $this->application->getConnectedUser()->getPage(),
         ]));
     }
 
     public function accountSave(): void
     {
-        $person = $this->application->getConnectedUser()->get(1)->person;
+        $person = $this->application->getConnectedUser()->person;
         if ($person === null) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return;

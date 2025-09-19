@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace app\modules\Event;
@@ -10,11 +11,7 @@ use app\enums\FilterInputRule;
 use app\helpers\Application;
 use app\helpers\Params;
 use app\helpers\WebApp;
-use app\models\AuthorizationDataHelper;
-use app\models\DataHelper;
 use app\models\EventDataHelper;
-use app\models\LanguagesDataHelper;
-use app\models\PageDataHelper;
 use app\modules\Common\AbstractController;
 use app\services\EmailService;
 
@@ -22,19 +19,15 @@ class EventGuestController extends AbstractController
 {
     public function __construct(
         Application $application,
-        private EventDataHelper $eventDataHelper,
-        DataHelper $dataHelper,
-        LanguagesDataHelper $languagesDataHelper,
-        PageDataHelper $pageDataHelper,
-        AuthorizationDataHelper $authorizationDataHelper
+        private EventDataHelper $eventDataHelper
     ) {
-        parent::__construct($application, $dataHelper, $languagesDataHelper, $pageDataHelper, $authorizationDataHelper);
+        parent::__construct($application);
     }
 
 
     public function guest(string $message = '', string $type = ''): void
     {
-        if (!($this->application->getConnectedUser()->get(1)->isEventManager() ?? false)) {
+        if (!($this->application->getConnectedUser()->isEventManager() ?? false)) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
         }
@@ -45,13 +38,14 @@ class EventGuestController extends AbstractController
             'navbarTemplate' => '../navbar/eventManager.latte',
             'layout' => $this->getLayout(),
             'message' => $message,
-            'messageType' => $type
+            'messageType' => $type,
+            'page' => $this->application->getConnectedUser()->getPage(1),
         ]));
     }
 
     public function guestInvite()
     {
-        if (!($this->application->getConnectedUser()->get(1)->isEventManager() ?? false)) {
+        if (!($this->application->getConnectedUser()->isEventManager() ?? false)) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
         }

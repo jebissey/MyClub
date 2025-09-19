@@ -10,10 +10,6 @@ use app\enums\FilterInputRule;
 use app\helpers\Application;
 use app\helpers\Params;
 use app\helpers\WebApp;
-use app\models\AuthorizationDataHelper;
-use app\models\DataHelper;
-use app\models\LanguagesDataHelper;
-use app\models\PageDataHelper;
 use app\models\PersonDataHelper;
 use app\modules\Common\AbstractController;
 use app\services\EmailService;
@@ -25,12 +21,8 @@ class ContactController extends AbstractController
         private EmailService $emailService,
         private PersonDataHelper $personDataHelper,
         private WebApp $webApp,
-        DataHelper $dataHelper,
-        LanguagesDataHelper $languagesDataHelper,
-        PageDataHelper $pageDataHelper,
-        AuthorizationDataHelper $authorizationDataHelper
     ) {
-        parent::__construct($application, $dataHelper, $languagesDataHelper, $pageDataHelper, $authorizationDataHelper);
+        parent::__construct($application);
     }
 
     public function contact($eventId = null): void
@@ -42,8 +34,9 @@ class ContactController extends AbstractController
                 if (!$event || $event->Audience != EventAudience::ForAll->value) $eventId = $event = null;
             }
             $this->render('Common/views/contact.latte', Params::getAll([
-                'navItems' => $this->getNavItems($this->application->getConnectedUser()->get()->person ?? false),
+                'navItems' => $this->getNavItems($this->application->getConnectedUser()->person ?? false),
                 'event' => $event,
+                'page' => $this->application->getConnectedUser()->getPage(),
             ]));
         } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') $this->handleContactForm($eventId);
         else $this->raiseMethodNotAllowed(__FILE__, __LINE__);

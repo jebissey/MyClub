@@ -111,9 +111,8 @@ class GroupDataHelper extends Data
         return $query->fetchAll();
     }
 
-    public function getGroupsWithAuthorizations(): array|false
+    public function getGroupsWithAuthorizations(ConnectedUser $connectedUser): array|false
     {
-        $connectedUser = new ConnectedUser($this->application);
         $having = '';
         if ($connectedUser->isPersonManager() && !$connectedUser->isWebmaster()) {
             $having = "HAVING Authorizations IS NULL";

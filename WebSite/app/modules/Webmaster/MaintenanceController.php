@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace app\modules\Webmaster;
@@ -8,11 +9,6 @@ use app\helpers\Application;
 use app\helpers\ErrorManager;
 use app\helpers\Params;
 use app\helpers\WebApp;
-use app\models\AuthorizationDataHelper;
-use app\models\DataHelper;
-use app\models\LanguagesDataHelper;
-use app\models\LogDataHelper;
-use app\models\PageDataHelper;
 use app\modules\Common\AbstractController;
 
 class MaintenanceController extends AbstractController
@@ -21,19 +17,14 @@ class MaintenanceController extends AbstractController
 
     public function __construct(
         Application $application,
-        protected ErrorManager $errorManager,
-        DataHelper $dataHelper,
-        LanguagesDataHelper $languagesDataHelper,
-        PageDataHelper $pageDataHelper,
-        AuthorizationDataHelper $authorizationDataHelper,
-        LogDataHelper $logDataHelper
+        protected ErrorManager $errorManager
     ) {
-        parent::__construct($application, $dataHelper, $languagesDataHelper, $pageDataHelper, $authorizationDataHelper, $logDataHelper);
+        parent::__construct($application);
     }
 
     public function checkIfSiteIsUnderMaintenance(): void
     {
-        error_log("\n\n" . json_encode('---###---', JSON_PRETTY_PRINT) . "\n");
+error_log("\n\n" . json_encode('---###---', JSON_PRETTY_PRINT) . "\n");
         if (strpos($_SERVER['REQUEST_URI'] ?? '', self::MAINTENANCE_UNSET) !== false) return;
 
         $siteUnderMaintenance = $this->dataHelper->get('Metadata', ['Id' => 1], 'SiteUnderMaintenance')->SiteUnderMaintenance;
@@ -44,13 +35,13 @@ class MaintenanceController extends AbstractController
             "Maintenance",
             30000,
             false,
-            $this->application->getConnectedUser()->get()->isWebmaster() ?? false
+            $this->application->getConnectedUser()->isWebmaster() ?? false
         );
     }
 
     public function maintenance(): void
     {
-        if (!($this->application->getConnectedUser()->get()->isWebmaster() ?? false)) {
+        if (!($this->application->getConnectedUser()->isWebmaster() ?? false)) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
         }
@@ -58,12 +49,15 @@ class MaintenanceController extends AbstractController
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
-        $this->render('Webmaster/views/maintenance.latte', Params::getAll(['isMyclubWebSite' => WebApp::isMyClubWebSite()]));
+        $this->render('Webmaster/views/maintenance.latte', Params::getAll([
+            'isMyclubWebSite' => WebApp::isMyClubWebSite(),
+            'page' => $this->application->getConnectedUser()->getPage(),
+        ]));
     }
 
     public function setSiteOnline(): void
     {
-        if (!($this->application->getConnectedUser()->get()->isWebmaster() ?? false)) {
+        if (!($this->application->getConnectedUser()->isWebmaster() ?? false)) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
         }
@@ -77,7 +71,7 @@ class MaintenanceController extends AbstractController
 
     public function setSiteUnderMaintenance(): void
     {
-        if (!($this->application->getConnectedUser()->get()->isWebmaster() ?? false)) {
+        if (!($this->application->getConnectedUser()->isWebmaster() ?? false)) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
         }

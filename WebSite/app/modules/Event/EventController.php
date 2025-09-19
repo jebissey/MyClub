@@ -16,13 +16,9 @@ use app\helpers\Application;
 use app\helpers\Params;
 use app\helpers\PeriodHelper;
 use app\helpers\WebApp;
-use app\models\AuthorizationDataHelper;
 use app\models\CrosstabDataHelper;
-use app\models\DataHelper;
 use app\models\EventDataHelper;
-use app\models\LanguagesDataHelper;
 use app\models\ParticipantDataHelper;
-use app\models\PageDataHelper;
 use app\models\MessageDataHelper;
 use app\modules\Common\AbstractController;
 
@@ -34,12 +30,8 @@ class EventController extends AbstractController
         private CrosstabDataHelper $crosstabDataHelper,
         private ParticipantDataHelper $participantDataHelper,
         private MessageDataHelper $messageDataHelper,
-        DataHelper $dataHelper,
-        LanguagesDataHelper $languagesDataHelper,
-        PageDataHelper $pageDataHelper,
-        AuthorizationDataHelper $authorizationDataHelper
     ) {
-        parent::__construct($application, $dataHelper, $languagesDataHelper, $pageDataHelper, $authorizationDataHelper);
+        parent::__construct($application);
     }
 
     public function nextEvents(): void
@@ -53,7 +45,7 @@ class EventController extends AbstractController
         $offset = $input['offset'] ?? 0;
         $mode = $input['mode'] ?? EventSearchMode::Next->value;
         $filterByPreferences = $input['filterByPreferences'] ?? 0 === 1;
-        $connectedUser = $this->application->getConnectedUser()->get();
+        $connectedUser = $this->application->getConnectedUser();
 
         $this->render('Event/views/nextEvents.latte', Params::getAll([
             'navItems' => $this->getNavItems($connectedUser->person ?? false),
@@ -65,7 +57,8 @@ class EventController extends AbstractController
             'offset' => $offset,
             'mode' => $mode,
             'filterByPreferences' => $filterByPreferences,
-            'layout' => $this->getLayout()
+            'layout' => $this->getLayout(),
+            'page' => $connectedUser->getPage(),
         ]));
     }
 
@@ -80,14 +73,15 @@ class EventController extends AbstractController
             'eventTypes' => $this->dataHelper->gets('EventType', ['Inactivated' => 0], 'Id, Name'),
             'eventAttributes' => $this->dataHelper->gets('Attribute', [], 'Id, Name, Detail, Color'),
             'attributes' => $this->eventDataHelper->getAttributesForNextWeekEvents(),
-            'navItems' => $this->getNavItems($this->application->getConnectedUser()->get()->person ?? false),
+            'navItems' => $this->getNavItems($this->application->getConnectedUser()->person ?? false),
             'layout' => $this->getLayout(),
+            'page' => $this->application->getConnectedUser()->getPage(),
         ]));
     }
 
     public function showEventCrosstab()
     {
-        if (!($this->application->getConnectedUser()->get(1)->isEventManager() ?? false)) {
+        if (!($this->application->getConnectedUser()->isEventManager() ?? false)) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
         }
@@ -105,13 +99,14 @@ class EventController extends AbstractController
             'availablePeriods' => PeriodHelper::gets(),
             'navbarTemplate' => '../../Webmaster/views/navbar/eventManager.latte',
             'title' => 'Animateurs vs type d\'événement',
-            'totalLabels' => ['événements', 'participants']
+            'totalLabels' => ['événements', 'participants'],
+            'page' => $this->application->getConnectedUser()->getPage(1),
         ]));
     }
 
     public function show(int $eventId, string $message = '', string $messageType = ''): void
     {
-        $person = $this->application->getConnectedUser()->get()->person ?? false;
+        $person = $this->application->getConnectedUser()->person ?? false;
         $userEmail = $person->Email ?? '';
         if ($this->dataHelper->get('Event', ['Id' => $eventId], 'Id')) {
             $this->render('Event/views/event_detail.latte', Params::getAll([
@@ -133,6 +128,7 @@ class EventController extends AbstractController
                 'token' => WebApp::getFiltered('t', FilterInputRule::Token->value, $this->flight->request()->query->getData()) ?? false,
                 'message' => $message,
                 'messageType' => $messageType,
+                'page' => $this->application->getConnectedUser()->getPage(),
             ]));
         } else $this->raiseForbidden('Event doesn\'t found', 3000, false);
     }
@@ -149,7 +145,7 @@ class EventController extends AbstractController
         }
         try {
             if ($token === null) $token = WebApp::getFiltered('t', FilterInputRule::Token->value, $this->flight->request()->query->getData());
-            if ($this->application->getConnectedUser()->get()->person ?? false) {
+            if ($this->application->getConnectedUser()->person ?? false) {
                 $userId = $this->application->getConnectedUser()->person->Id;
                 if ($set) {
                     if ($eventId > 0 && $this->eventDataHelper->isUserRegistered($eventId, $person->Email ?? '')) {
@@ -212,6 +208,7 @@ class EventController extends AbstractController
                         'event' => $event,
                         'contact' => $contact,
                         'navItems' => $this->getNavItems($this->application->getConnectedUser()->person),
+                        'page' => $this->application->getConnectedUser()->getPage()
                     ]));
                 }
             } else {
@@ -230,7 +227,7 @@ class EventController extends AbstractController
 
     public function location(): void
     {
-        if (!($this->application->getConnectedUser()->get()->isEventManager() ?? false)) {
+        if (!($this->application->getConnectedUser()->isEventManager() ?? false)) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
         }
@@ -238,12 +235,14 @@ class EventController extends AbstractController
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
-        $this->render('Event/views/event_location.latte', Params::getAll([]));
+        $this->render('Event/views/event_location.latte', Params::getAll([
+            'page' => $this->application->getConnectedUser()->getPage(),
+        ]));
     }
 
     public function help(): void
     {
-        if (!($this->application->getConnectedUser()->get()->isEventManager() ?? false)) {
+        if (!($this->application->getConnectedUser()->isEventManager() ?? false)) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
         }
@@ -253,16 +252,17 @@ class EventController extends AbstractController
         }
         $this->render('Common/views/info.latte', [
             'content' => $this->dataHelper->get('Settings', ['Name' => 'Help_eventManager'], 'Value')->Value ?? '',
-            'hasAuthorization' => $this->application->getConnectedUser()->get()->hasAutorization() ?? false,
+            'hasAuthorization' => $this->application->getConnectedUser()->hasAutorization() ?? false,
             'currentVersion' => Application::VERSION,
             'timer' => 0,
-            'previousPage' => true
+            'previousPage' => true,
+            'page' => $this->application->getConnectedUser()->getPage(),
         ]);
     }
 
     public function home(): void
     {
-        if (!($this->application->getConnectedUser()->get()->isEventManager() ?? false)) {
+        if (!($this->application->getConnectedUser()->isEventManager() ?? false)) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
         }
@@ -272,12 +272,14 @@ class EventController extends AbstractController
         }
         $_SESSION['navbar'] = 'eventManager';
 
-        $this->render('Webmaster/views/eventManager.latte', Params::getAll([]));
+        $this->render('Webmaster/views/eventManager.latte', Params::getAll([
+            'page' => $this->application->getConnectedUser()->getPage(),
+        ]));
     }
 
     public function showEventChat($eventId): void
     {
-        if ($this->application->getConnectedUser()->get()->person === null) {
+        if ($this->application->getConnectedUser()->person === null) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
         }
@@ -295,6 +297,7 @@ class EventController extends AbstractController
             'messages' => $this->messageDataHelper->getEventMessages($eventId),
             'person' => $this->application->getConnectedUser()->person,
             'navItems' => $this->getNavItems($this->application->getConnectedUser()->person),
+            'page' => $this->application->getConnectedUser()->getPage(),
         ]));
     }
 }

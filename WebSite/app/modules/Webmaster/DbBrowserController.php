@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace app\modules\Webmaster;
@@ -6,11 +7,7 @@ namespace app\modules\Webmaster;
 use app\helpers\Application;
 use app\helpers\Params;
 use app\helpers\WebApp;
-use app\models\AuthorizationDataHelper;
 use app\models\DbBrowserDataHelper;
-use app\models\DataHelper;
-use app\models\LanguagesDataHelper;
-use app\models\PageDataHelper;
 use app\modules\Common\AbstractController;
 
 class DbBrowserController extends AbstractController
@@ -19,13 +16,9 @@ class DbBrowserController extends AbstractController
 
     public function __construct(
         Application $application,
-        private DbBrowserDataHelper $dbBrowserDataHelper,
-        DataHelper $dataHelper,
-        LanguagesDataHelper $languagesDataHelper,
-        PageDataHelper $pageDataHelper,
-        AuthorizationDataHelper $authorizationDataHelper
+        private DbBrowserDataHelper $dbBrowserDataHelper
     ) {
-        parent::__construct($application, $dataHelper, $languagesDataHelper, $pageDataHelper, $authorizationDataHelper);
+        parent::__construct($application);
     }
 
     public function createRecord(string $table): void
@@ -50,6 +43,7 @@ class DbBrowserController extends AbstractController
             $this->render('Webmaster/views/dbbrowser/index.latte', Params::getAll([
                 'tables' => $this->dbBrowserDataHelper->getTables(),
                 'isMyclubWebSite' => WebApp::isMyClubWebSite(),
+                'page' => $this->application->getConnectedUser()->getPage()
             ]));
         }
     }
@@ -62,7 +56,8 @@ class DbBrowserController extends AbstractController
             $this->render('Webmaster/views/dbbrowser/create.latte', Params::getAll([
                 'table' => $table,
                 'columns' => $columns,
-                'columnTypes' => $columnTypes
+                'columnTypes' => $columnTypes,
+                'page' => $this->application->getConnectedUser()->getPage()
             ]));
         }
     }
@@ -79,6 +74,7 @@ class DbBrowserController extends AbstractController
                 'primaryKey' => $primaryKey,
                 'columnTypes' => $columnTypes,
                 'isMyclubWebSite' => WebApp::isMyClubWebSite(),
+                'page' => $this->application->getConnectedUser()->getPage()
             ]));
         }
     }
@@ -103,6 +99,7 @@ class DbBrowserController extends AbstractController
                 'totalPages' => $totalPages,
                 'filters' => $filters,
                 'isMyclubWebSite' => WebApp::isMyClubWebSite(),
+                'page' => $this->application->getConnectedUser()->getPage()
             ]));
         }
     }

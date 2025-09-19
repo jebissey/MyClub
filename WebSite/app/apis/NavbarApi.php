@@ -21,7 +21,7 @@ class NavbarApi extends AbstractApi
 
     public function deleteNavbarItem(int $id): void
     {
-        if (!($this->application->getConnectedUser()->get()->isNavbarDesigner() ?? false)) {
+        if (!($this->application->getConnectedUser()->isNavbarDesigner() ?? false)) {
             $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }
@@ -39,7 +39,7 @@ class NavbarApi extends AbstractApi
 
     public function getNavbarItem(int $id): void
     {
-        if (!($this->application->getConnectedUser()->get()->isNavbarDesigner() ?? false)) {
+        if (!($this->application->getConnectedUser()->isNavbarDesigner() ?? false)) {
             $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }
@@ -56,7 +56,7 @@ class NavbarApi extends AbstractApi
 
     public function saveNavbarItem(): void
     {
-        if (!($this->application->getConnectedUser()->get()->isNavbarDesigner() ?? false)) {
+        if (!($this->application->getConnectedUser()->isNavbarDesigner() ?? false)) {
             $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }
@@ -80,7 +80,7 @@ class NavbarApi extends AbstractApi
 
     public function updateNavbarPositions(): void
     {
-        if (!($this->application->getConnectedUser()->get()->isNavbarDesigner() ?? false)) {
+        if (!($this->application->getConnectedUser()->isNavbarDesigner() ?? false)) {
             $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }

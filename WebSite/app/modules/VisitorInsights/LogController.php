@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace app\modules\VisitorInsights;
@@ -9,10 +10,6 @@ use app\helpers\Application;
 use app\helpers\Params;
 use app\helpers\PeriodHelper;
 use app\helpers\WebApp;
-use app\models\AuthorizationDataHelper;
-use app\models\DataHelper;
-use app\models\LanguagesDataHelper;
-use app\models\PageDataHelper;
 use app\models\CrosstabDataHelper;
 use app\models\LogDataHelper;
 use app\modules\Common\AbstractController;
@@ -22,13 +19,9 @@ class LogController extends AbstractController
     public function __construct(
         Application $application,
         private LogDataHelper $logDataHelper,
-        private CrosstabDataHelper $crosstabDataHelper,
-        DataHelper $dataHelper,
-        LanguagesDataHelper $languagesDataHelper,
-        PageDataHelper $pageDataHelper,
-        AuthorizationDataHelper $authorizationDataHelper
+        private CrosstabDataHelper $crosstabDataHelper
     ) {
-        parent::__construct($application, $dataHelper, $languagesDataHelper, $pageDataHelper, $authorizationDataHelper);
+        parent::__construct($application);
     }
 
     public function index()
@@ -42,7 +35,8 @@ class LogController extends AbstractController
                 'logs' => $logs,
                 'currentPage' => $logPage,
                 'totalPages' => $totalPages,
-                'filters' => $this->flight->request()->query->getData()
+                'filters' => $this->flight->request()->query->getData(),
+                'page' => $this->application->getConnectedUser()->getPage()
             ]));
         }
     }
@@ -62,6 +56,7 @@ class LogController extends AbstractController
                 'externalRefs' => $this->logDataHelper->getExternalReferentStats($period, $currentDate),
                 'control' => new WebApp($this->application),
                 'rows' => $this->logDataHelper->getReferentStats($period, $currentDate),
+                'page' => $this->application->getConnectedUser()->getPage()
             ]));
         }
     }
@@ -83,7 +78,8 @@ class LogController extends AbstractController
                 'currentOffset' => $offset,
                 'data' => $data,
                 'chartData' => $this->logDataHelper->formatDataForChart($data),
-                'periodLabel' => $this->logDataHelper->getPeriodLabel($periodType)
+                'periodLabel' => $this->logDataHelper->getPeriodLabel($periodType),
+                'page' => $this->application->getConnectedUser()->getPage()
             ]));
         }
     }
@@ -96,7 +92,8 @@ class LogController extends AbstractController
                 'browserData' => $this->logDataHelper->getBrowserDistribution(),
                 'screenResolutionData' => $this->logDataHelper->getScreenResolutionDistribution(),
                 'typeData' => $this->logDataHelper->getTypeDistribution(),
-                'title' => 'Synthèse des visiteurs'
+                'title' => 'Synthèse des visiteurs',
+                'page' => $this->application->getConnectedUser()->getPage()
             ]));
         }
     }
@@ -112,7 +109,8 @@ class LogController extends AbstractController
             $this->render('VisitorInsights/views/topPages.latte', Params::getAll([
                 'title' => 'Top des pages visitées',
                 'period' => $period,
-                'topPages' => $topPages
+                'topPages' => $topPages,
+                'page' => $this->application->getConnectedUser()->getPage()
             ]));
         }
     }
@@ -127,7 +125,8 @@ class LogController extends AbstractController
             $this->render('Article/views/topArticles.latte', Params::getAll([
                 'title' => 'Top des articles visités par période',
                 'period' => $period,
-                'topPages' => $topPages
+                'topPages' => $topPages,
+                'page' => $this->application->getConnectedUser()->getPage()
             ]));
         }
     }
@@ -158,7 +157,8 @@ class LogController extends AbstractController
                 'groups' => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
                 'uriFilter' => $uriFilter,
                 'emailFilter' => $emailFilter,
-                'groupFilter' => $groupFilter
+                'groupFilter' => $groupFilter,
+                'page' => $this->application->getConnectedUser()->getPage()
             ]));
         }
     }
@@ -170,7 +170,8 @@ class LogController extends AbstractController
             $this->render('VisitorInsights/views/lastVisits.latte', Params::getAll([
                 'lastVisits' => $this->logDataHelper->getLastVisitPerActivePersonWithTimeAgo($activePersons),
                 'totalActiveUsers' => count($activePersons),
-                'navItems' => $this->getNavItems($this->application->getConnectedUser()->get()->person),
+                'navItems' => $this->getNavItems($this->application->getConnectedUser()->person),
+                'page' => $this->application->getConnectedUser()->getPage()
             ]));
         }
     }

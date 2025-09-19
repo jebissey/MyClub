@@ -7,11 +7,7 @@ use app\enums\FilterInputRule;
 use app\helpers\Application;
 use app\helpers\Params;
 use app\helpers\WebApp;
-use app\models\AuthorizationDataHelper;
-use app\models\DataHelper;
 use app\models\ImportDataHelper;
-use app\models\LanguagesDataHelper;
-use app\models\PageDataHelper;
 use app\modules\Common\AbstractController;
 
 class ImportController extends AbstractController
@@ -23,12 +19,8 @@ class ImportController extends AbstractController
     public function __construct(
         Application $application,
         private ImportDataHelper $importDataHelper,
-        DataHelper $dataHelper,
-        LanguagesDataHelper $languagesDataHelper,
-        PageDataHelper $pageDataHelper,
-        AuthorizationDataHelper $authorizationDataHelper
     ) {
-        parent::__construct($application, $dataHelper, $languagesDataHelper, $pageDataHelper, $authorizationDataHelper);
+        parent::__construct($application);
     }
 
     public function showImportForm(): void
@@ -37,7 +29,8 @@ class ImportController extends AbstractController
             $this->loadSettings();
             $this->render('PersonManager/views/users_import.latte', Params::getAll([
                 'importSettings' => $this->importSettings,
-                'results' => $this->results
+                'results' => $this->results,
+                'page' => $this->application->getConnectedUser()->getPage()
             ]));
         }
     }
@@ -51,7 +44,8 @@ class ImportController extends AbstractController
 
                 $this->render('PersonManager/views/users_import.latte', Params::getAll([
                     'importSettings' => $this->importSettings,
-                    'results' => $this->results
+                    'results' => $this->results,
+                    'page' => $this->application->getConnectedUser()->getPage()
                 ]));
             } else {
                 $schema = [
@@ -83,7 +77,8 @@ class ImportController extends AbstractController
                 }
                 $this->render('app/views/import/form.latte', Params::getAll([
                     'importSettings' => $this->importSettings,
-                    'results' => $results
+                    'results' => $results,
+                    'page' => $this->application->getConnectedUser()->getPage()
                 ]));
             }
         }

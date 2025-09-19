@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace app\modules\Article;
@@ -11,29 +12,19 @@ use app\exceptions\IntegrityException;
 use app\helpers\Application;
 use app\helpers\Params;
 use app\helpers\WebApp;
-use app\models\AuthorizationDataHelper;
-use app\models\DataHelper;
-use app\models\LanguagesDataHelper;
-use app\models\PageDataHelper;
 use app\models\SurveyDataHelper;
 use app\modules\Common\AbstractController;
 
 class SurveyController extends AbstractController
 {
-    public function __construct(
-        Application $application,
-        private SurveyDataHelper $surveyDataHelper,
-        private AuthorizationDataHelper $authorizationDataHelper,
-        DataHelper $dataHelper,
-        LanguagesDataHelper $languagesDataHelper,
-        PageDataHelper $pageDataHelper,
-    ) {
-        parent::__construct($application, $dataHelper, $languagesDataHelper, $pageDataHelper, $authorizationDataHelper);
+    public function __construct(Application $application, private SurveyDataHelper $surveyDataHelper)
+    {
+        parent::__construct($application);
     }
 
     public function add($articleId)
     {
-        if (!($this->application->getConnectedUser()->get()->isRedactor() ?? false)) {
+        if (!($this->application->getConnectedUser()->isRedactor() ?? false)) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
         }
@@ -48,13 +39,14 @@ class SurveyController extends AbstractController
         }
         $this->render('Article/views/survey_add.latte', Params::getAll([
             'article' => $article,
-            'survey' => $this->dataHelper->get('Survey', ['IdArticle' => $article->Id], 'Question, Options, ClosingDate, Visibility')
+            'survey' => $this->dataHelper->get('Survey', ['IdArticle' => $article->Id], 'Question, Options, ClosingDate, Visibility'),
+            'page' => $this->application->getConnectedUser()->getPage(),
         ]));
     }
 
     public function createOrUpdate()
     {
-        if (!($this->application->getConnectedUser()->get()->isRedactor() ?? false)) {
+        if (!($this->application->getConnectedUser()->isRedactor() ?? false)) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
         }
@@ -98,7 +90,7 @@ class SurveyController extends AbstractController
             $this->raiseBadRequest("Article {$articleId} doesn't exist", __FILE__, __LINE__);
             return;
         }
-        $connectedUser = $this->application->getConnectedUser()->get();
+        $connectedUser = $this->application->getConnectedUser();
         if ($connectedUser->person === null) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
@@ -107,9 +99,6 @@ class SurveyController extends AbstractController
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
-
-
-
         $survey = $this->surveyDataHelper->getWithCreator($articleId);
         if (!$survey) {
             $this->raiseBadRequest("No survey for article {$articleId}", __FILE__, __LINE__);
@@ -142,7 +131,8 @@ class SurveyController extends AbstractController
                 'results' => $results,
                 'participants' => $participants,
                 'articleId' => $articleId,
-                'currentVersion' => Application::VERSION
+                'currentVersion' => Application::VERSION,
+                'page' => $connectedUser->getPage(),
             ]);
         } else $this->raiseForbidden(__FILE__, __LINE__);
     }

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace app\modules\Article;
@@ -7,27 +8,18 @@ use app\helpers\Application;
 use app\helpers\Media;
 use app\helpers\Params;
 use app\helpers\WebApp;
-use app\models\AuthorizationDataHelper;
-use app\models\DataHelper;
-use app\models\LanguagesDataHelper;
-use app\models\PageDataHelper;
 use app\modules\Common\AbstractController;
 
 class MediaController extends AbstractController
 {
-    public function __construct(
-        Application $application,
-        DataHelper $dataHelper,
-        LanguagesDataHelper $languagesDataHelper,
-        PageDataHelper $pageDataHelper,
-        AuthorizationDataHelper $authorizationDataHelper
-    ) {
-        parent::__construct($application, $dataHelper, $languagesDataHelper, $pageDataHelper, $authorizationDataHelper);
+    public function __construct(Application $application)
+    {
+        parent::__construct($application);
     }
 
     public function showUploadForm()
     {
-        if (!($this->application->getConnectedUser()->get()->isRedactor() ?? false)) {
+        if (!($this->application->getConnectedUser()->isRedactor() ?? false)) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
         }
@@ -35,12 +27,14 @@ class MediaController extends AbstractController
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
-        $this->render('Article/views/media_upload.latte', Params::getAll([]));
+        $this->render('Article/views/media_upload.latte', Params::getAll([
+            'page' => $this->application->getConnectedUser()->getPage(),
+        ]));
     }
 
     public function listFiles()
     {
-        if (!($this->application->getConnectedUser()->get()->isRedactor() ?? false)) {
+        if (!($this->application->getConnectedUser()->isRedactor() ?? false)) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
         }
@@ -59,13 +53,14 @@ class MediaController extends AbstractController
             'years' => $years,
             'currentYear' => $year,
             'search' => $search,
-            'baseUrl' => WebApp::getBaseUrl()
+            'baseUrl' => WebApp::getBaseUrl(),
+            'page' => $this->application->getConnectedUser()->getPage(),
         ]));
     }
 
     public function viewFile(int $year, int $month, string $filename): void
     {
-        if (!($this->application->getConnectedUser()->get()->isRedactor() ?? false)) {
+        if (!($this->application->getConnectedUser()->isRedactor() ?? false)) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
         }
@@ -92,7 +87,7 @@ class MediaController extends AbstractController
 
     public function gpxViewer(): void
     {
-        if (!$this->application->getConnectedUser()->get()->person ?? false) {
+        if (!$this->application->getConnectedUser()->person ?? false) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
         }
@@ -100,7 +95,9 @@ class MediaController extends AbstractController
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
-        $this->render('Article/views/media_gpxViewer.latte', Params::getAll([]));
+        $this->render('Article/views/media_gpxViewer.latte', Params::getAll([
+            'page' => $this->application->getConnectedUser()->getPage(),
+        ]));
     }
 
     #region Private functions

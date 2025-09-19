@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace app\modules\User;
@@ -8,11 +9,7 @@ use app\helpers\News;
 use app\helpers\Params;
 use app\helpers\TranslationManager;
 use app\models\ArticleDataHelper;
-use app\models\AuthorizationDataHelper;
-use app\models\DataHelper;
 use app\models\DesignDataHelper;
-use app\models\LanguagesDataHelper;
-use app\models\PageDataHelper;
 use app\models\PersonDataHelper;
 use app\models\SurveyDataHelper;
 use app\modules\Common\AbstractController;
@@ -26,33 +23,26 @@ class HomeController extends AbstractController
         private DesignDataHelper $designDataHelper,
         private News $news,
         private PersonDataHelper $personDataHelper,
-        DataHelper $dataHelper,
-        LanguagesDataHelper $languagesDataHelper,
-        PageDataHelper $pageDataHelper,
-        AuthorizationDataHelper $authorizationDataHelper
     ) {
-        parent::__construct($application, $dataHelper, $languagesDataHelper, $pageDataHelper, $authorizationDataHelper);
+        parent::__construct($application);
     }
 
     public function home(): void
     {
-        $connectedUser = $this->application->getConnectedUser()->get();
-
         if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
-
         $_SESSION['navbar'] = '';
         $userPendingSurveys = $userPendingDesigns = [];
         $userEmail = $_SESSION['user'] ?? '';
 
+        $connectedUser = $this->application->getConnectedUser();
         if ($userEmail) {
             if ($connectedUser->person === null) {
                 unset($_SESSION['user']);
                 $this->raiseBadRequest("Unknown user with this email address {$userEmail}", __FILE__, __LINE__);
             }
-
             $pendingSurveyResponses = $this->surveyDataHelper->getPendingSurveyResponses();
             $userPendingSurveys = array_filter($pendingSurveyResponses, function ($item) use ($userEmail) {
                 return strcasecmp($item->Email, $userEmail) === 0;
@@ -76,6 +66,7 @@ class HomeController extends AbstractController
                 'supportedLanguages' => TranslationManager::getSupportedLanguages(),
                 'flag' => \app\helpers\TranslationManager::getFlag($lang),
                 'isRedactor' => false,
+                'page' => $connectedUser->getPage(),
             ]);
         }
 
@@ -88,7 +79,7 @@ class HomeController extends AbstractController
             if ($this->articleDataHelper->isUserAllowedToReadArticle($userEmail, $articleId)) {
                 $spotlightUntil = $spotlight['spotlightUntil'];
                 if (strtotime($spotlightUntil) >= strtotime(date('Y-m-d'))) {
-                    $latestArticle = $this->articleDataHelper->getWithAuthor($articleId);
+                    $latestArticle = $this->articleDataHelper->getWithAuthor((int)$articleId);
                 }
             }
         }
@@ -106,6 +97,7 @@ class HomeController extends AbstractController
             'pendingSurveys' => $userPendingSurveys,
             'pendingDesigns' => $userPendingDesigns,
             'news' => $news ?? false,
+            'page' => $this->application->getConnectedUser()->getPage()
         ]));
     }
 
@@ -118,10 +110,11 @@ class HomeController extends AbstractController
 
         $this->render('Common/views/info.latte', [
             'content' => $this->dataHelper->get('Settings', ['Name' => 'Help_home'], 'Value')->Value ?? '',
-            'hasAuthorization' => $this->application->getConnectedUser()->get()->hasAutorization() ?? false,
+            'hasAuthorization' => $this->application->getConnectedUser()->hasAutorization() ?? false,
             'currentVersion' => Application::VERSION,
             'timer' => 0,
-            'previousPage' => true
+            'previousPage' => true,
+            'page' => $this->application->getConnectedUser()->getPage(),
         ]);
     }
 
@@ -134,8 +127,9 @@ class HomeController extends AbstractController
 
         $content = $this->application->getLatte()->renderToString('Common/views/info.latte', [
             'content' => $this->dataHelper->get('Settings', ['Name' => 'LegalNotices'], 'Value')->Value ?? '',
-            'hasAuthorization' => $this->application->getConnectedUser()->get()->hasAutorization() ?? false,
-            'currentVersion' => Application::VERSION
+            'hasAuthorization' => $this->application->getConnectedUser()->hasAutorization() ?? false,
+            'currentVersion' => Application::VERSION,
+            'page' => $this->application->getConnectedUser()->getPage(),
         ]);
         echo $content;
     }

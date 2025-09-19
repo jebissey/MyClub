@@ -1,15 +1,12 @@
 <?php
+
 declare(strict_types=1);
 
 namespace app\modules\Event;
 
 use app\helpers\Application;
 use app\helpers\Params;
-use app\models\AuthorizationDataHelper;
-use app\models\DataHelper;
-use app\models\LanguagesDataHelper;
 use app\models\NeedDataHelper;
-use app\models\PageDataHelper;
 use app\modules\Common\AbstractController;
 
 class EventNeedController extends AbstractController
@@ -17,17 +14,13 @@ class EventNeedController extends AbstractController
     public function __construct(
         Application $application,
         private NeedDataHelper $needDataHelper,
-        DataHelper $dataHelper,
-        LanguagesDataHelper $languagesDataHelper,
-        PageDataHelper $pageDataHelper,
-        AuthorizationDataHelper $authorizationDataHelper
     ) {
-        parent::__construct($application, $dataHelper, $languagesDataHelper, $pageDataHelper, $authorizationDataHelper);
+        parent::__construct($application);
     }
 
     public function needs(): void
     {
-        if (!($this->application->getConnectedUser()->get()->isEventDesigner() ?? false)) {
+        if (!($this->application->getConnectedUser()->isEventDesigner() ?? false)) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
         }
@@ -35,6 +28,7 @@ class EventNeedController extends AbstractController
             'navItems' => $this->getNavItems($this->application->getConnectedUser()->person),
             'needTypes' => $this->dataHelper->gets('NeedType', [], '*', 'Name'),
             'needs' => $this->needDataHelper->getNeedsAndTheirTypes(),
+            'page' => $this->application->getConnectedUser()->getPage(),
         ]));
     }
 }

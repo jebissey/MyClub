@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace app\modules\User;
@@ -8,29 +9,19 @@ use app\helpers\Application;
 use app\helpers\Params;
 use app\helpers\WebApp;
 use app\models\AttributeDataHelper;
-use app\models\AuthorizationDataHelper;
-use app\models\DataHelper;
 use app\models\EventTypeDataHelper;
-use app\models\LanguagesDataHelper;
-use app\models\PageDataHelper;
 use app\modules\Common\AbstractController;
 
 class UserPreferencesController extends AbstractController
 {
-    public function __construct(
-        Application $application,
-        private EventTypeDataHelper $eventTypeDataHelper,
-        DataHelper $dataHelper,
-        LanguagesDataHelper $languagesDataHelper,
-        PageDataHelper $pageDataHelper,
-        AuthorizationDataHelper $authorizationDataHelper
-    ) {
-        parent::__construct($application, $dataHelper, $languagesDataHelper, $pageDataHelper, $authorizationDataHelper);
+    public function __construct(Application $application,        private EventTypeDataHelper $eventTypeDataHelper)
+    {
+        parent::__construct($application);
     }
 
     public function preferences(): void
     {
-        $person = $this->application->getConnectedUser()->get(1)->person;
+        $person = $this->application->getConnectedUser()->person;
         if ($person === null) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
@@ -49,13 +40,14 @@ class UserPreferencesController extends AbstractController
 
         $this->render('User/views/user_preferences.latte', Params::getAll([
             'currentPreferences' => json_decode($person->Preferences ?? '', true),
-            'eventTypes' => $eventTypesWithAttributes
+            'eventTypes' => $eventTypesWithAttributes,
+            'page' => $this->application->getConnectedUser()->getPage(1),
         ]));
     }
 
     public function preferencesSave(): void
     {
-        $person = $this->application->getConnectedUser()->get(1)->person;
+        $person = $this->application->getConnectedUser()->person;
         if ($person === null) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return;

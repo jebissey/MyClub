@@ -29,7 +29,7 @@ class EventNeedApi extends AbstractApi
 
     public function deleteNeed(int $id): void
     {
-        if (!$this->application->getConnectedUser()->get()->isEventDesigner()) {
+        if (!$this->application->getConnectedUser()->isEventDesigner()) {
             $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }
@@ -48,7 +48,7 @@ class EventNeedApi extends AbstractApi
 
     public function getEventNeeds(int $id): void
     {
-        if (!$this->application->getConnectedUser()->get()->isEventManager()) {
+        if (!$this->application->getConnectedUser()->isEventManager()) {
             $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }
@@ -70,7 +70,7 @@ class EventNeedApi extends AbstractApi
 
     public function saveNeed(): void
     {
-        if (!$this->application->getConnectedUser()->get()->isEventDesigner()) {
+        if (!$this->application->getConnectedUser()->isEventDesigner()) {
             $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }

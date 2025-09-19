@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace app\modules\Article;
@@ -15,11 +16,7 @@ use app\helpers\WebApp;
 use app\models\ArticleCrosstabDataHelper;
 use app\models\ArticleDataHelper;
 use app\models\ArticleTableDataHelper;
-use app\models\AuthorizationDataHelper;
-use app\models\DataHelper;
 use app\models\GenericDataHelper;
-use app\models\LanguagesDataHelper;
-use app\models\PageDataHelper;
 use app\models\PersonDataHelper;
 use app\modules\Common\TableController;
 use app\services\EmailService;
@@ -31,21 +28,17 @@ class ArticleController extends TableController
         Application $application,
         private ArticleDataHelper $articleDataHelper,
         private ArticleTableDataHelper $articleTableDataHelper,
-        private AuthorizationDataHelper $authorizationDatahelper,
         private PersonDataHelper $personDataHelper,
-        public DataHelper $dataHelper,
         private Backup $backup,
         private ArticleCrosstabDataHelper $articleCrosstabDataHelper,
-        GenericDataHelper $genericDataHelper,
-        LanguagesDataHelper $languagesDataHelper,
-        PageDataHelper $pageDataHelper
+        GenericDataHelper $genericDataHelper
     ) {
-        parent::__construct($application, $genericDataHelper, $dataHelper, $languagesDataHelper, $pageDataHelper, $authorizationDatahelper);
+        parent::__construct($application, $genericDataHelper);
     }
 
     public function home(): void
     {
-        if (!($this->application->getConnectedUser()->get()->isRedactor() ?? false)) {
+        if (!($this->application->getConnectedUser()->isRedactor() ?? false)) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
         }
@@ -54,27 +47,30 @@ class ArticleController extends TableController
             return;
         }
         $_SESSION['navbar'] = 'redactor';
-        $this->render('Webmaster/views/redactor.latte', Params::getAll([]));
+        $this->render('Webmaster/views/redactor.latte', Params::getAll([
+            'page' => $this->application->getConnectedUser()->getPage(),
+        ]));
     }
 
     public function help(): void
     {
-        if (!($this->application->getConnectedUser()->get()->isAdministrator() ?? false)) {
+        if (!($this->application->getConnectedUser()->isAdministrator() ?? false)) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
         }
         $this->render('Common/views/info.latte', [
             'content' => $this->dataHelper->get('Settings', ['Name' => 'Help_redactor'], 'Value')->Value ?? '',
-            'hasAuthorization' => $this->application->getConnectedUser()->get()->isRedactor() ?? false,
+            'hasAuthorization' => $this->application->getConnectedUser()->isRedactor() ?? false,
             'currentVersion' => Application::VERSION,
             'timer' => 0,
-            'previousPage' => true
+            'previousPage' => true,
+            'page' => $this->application->getConnectedUser()->getPage(),
         ]);
     }
 
     public function index()
     {
-        $connectedUser = $this->application->getConnectedUser()->get();
+        $connectedUser = $this->application->getConnectedUser();
         $schema = [
             'PersonName' => FilterInputRule::PersonName->value,
             'title' => FilterInputRule::Content->value,
@@ -123,6 +119,7 @@ class ArticleController extends TableController
             'userConnected' => $connectedUser->person ?? false,
             'layout' => $this->getLayout(),
             'navItems' => $this->getNavItems($connectedUser->person ?? false),
+            'page' => $connectedUser->getPage(),
         ]));
     }
 
@@ -132,9 +129,9 @@ class ArticleController extends TableController
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
-        $connectedUser = $this->application->getConnectedUser()->get();
+        $connectedUser = $this->application->getConnectedUser();
         try {
-            $article = $this->authorizationDatahelper->getArticle($id, $connectedUser);
+            $article = $this->authorizationDataHelper->getArticle($id, $connectedUser);
             if (!$article) {
                 if (!($connectedUser->person ?? false)) $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Il faut être connecté pour pouvoir consulter cet article', 5000);
                 return;
@@ -166,9 +163,10 @@ class ArticleController extends TableController
                     'userConnected' => $connectedUser->person ?? false,
                     'navItems' => $this->getNavItems($connectedUser->person ?? false),
                     'publishedBy' => $chosenArticle->PublishedBy && $chosenArticle->PublishedBy != $chosenArticle->CreatedBy ? $this->personDataHelper->getPublisher($chosenArticle->PublishedBy) : '',
-                    'canReadPool' => $this->authorizationDatahelper->canPersonReadSurveyResults($chosenArticle, $connectedUser),
+                    'canReadPool' => $this->authorizationDataHelper->canPersonReadSurveyResults($chosenArticle, $connectedUser),
                     'carouselItems' => $this->dataHelper->gets('Carousel', ['IdArticle' => $id]),
                     'message' => $messages,
+                    'page' => $connectedUser->getPage(),
                 ]));
             } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
         } catch (QueryException $e) {
@@ -178,7 +176,7 @@ class ArticleController extends TableController
 
     public function update(int $id): void
     {
-        if (!($this->application->getConnectedUser()->get()->isRedactor() || false)) {
+        if (!($this->application->getConnectedUser()->isRedactor() || false)) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
         }
@@ -221,7 +219,7 @@ class ArticleController extends TableController
 
     public function publish(int $id): void
     {
-        if (!($this->application->getConnectedUser()->get()->isEditor() ?? false)) {
+        if (!($this->application->getConnectedUser()->isEditor() ?? false)) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
         }
@@ -258,13 +256,16 @@ class ArticleController extends TableController
             } else $_SESSION['error'] = "Une erreur est survenue lors de la mise à jour de l'article";
             $this->redirect('/article/' . $id);
         } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-            $this->render('User/views/publish.latte', Params::getAll(['article' => $this->articleDataHelper->getWithAuthor($id)]));
+            $this->render('User/views/publish.latte', Params::getAll([
+                'article' => $this->articleDataHelper->getWithAuthor($id),
+                'page' => $this->application->getConnectedUser()->getPage()
+            ]));
         } else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function create()
     {
-        if (!($this->application->getConnectedUser()->get()->isRedactor() ?? false)) {
+        if (!($this->application->getConnectedUser()->isRedactor() ?? false)) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
         }
@@ -282,7 +283,7 @@ class ArticleController extends TableController
 
     public function delete(int $id)
     {
-        if (!($this->application->getConnectedUser()->get()->isRedactor() || false)) {
+        if (!($this->application->getConnectedUser()->isRedactor() || false)) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
         }
@@ -305,7 +306,7 @@ class ArticleController extends TableController
 
     public function showArticleCrosstab()
     {
-        if (!($this->application->getConnectedUser()->get(1)->isRedactor() || false)) {
+        if (!($this->application->getConnectedUser()->isRedactor() || false)) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
         }
@@ -324,13 +325,14 @@ class ArticleController extends TableController
             'availablePeriods' => PeriodHelper::gets(),
             'navbarTemplate' => '../../Webmaster/views/navbar/redactor.latte',
             'title' => 'Rédateurs vs audience',
-            'totalLabels' => ['articles', '']
+            'totalLabels' => ['articles', ''],
+            'page' => $this->application->getConnectedUser()->getPage(1),
         ]));
     }
 
     public function fetchEmailsForArticle(int $idArticle): void
     {
-        if (!($this->application->getConnectedUser()->get()->isRedactor() ?? false)) {
+        if (!($this->application->getConnectedUser()->isRedactor() ?? false)) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
         }

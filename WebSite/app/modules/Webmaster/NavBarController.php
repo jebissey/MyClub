@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace app\modules\Webmaster;
@@ -8,22 +9,13 @@ use app\helpers\Application;
 use app\helpers\Params;
 use app\helpers\WebApp;
 use app\models\ArwardsDataHelper;
-use app\models\AuthorizationDataHelper;
-use app\models\DataHelper;
-use app\models\LanguagesDataHelper;
-use app\models\PageDataHelper;
 use app\modules\Common\AbstractController;
 
 class NavBarController extends AbstractController
 {
-    public function __construct(
-        Application $application,
-        DataHelper $dataHelper,
-        LanguagesDataHelper $languagesDataHelper,
-        PageDataHelper $pageDataHelper,
-        AuthorizationDataHelper $authorizationDataHelper
-    ) {
-        parent::__construct($application, $dataHelper, $languagesDataHelper, $pageDataHelper, $authorizationDataHelper);
+    public function __construct(Application $application)
+    {
+        parent::__construct($application);
     }
 
     public function index()
@@ -34,13 +26,14 @@ class NavBarController extends AbstractController
                 'groups' => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
                 'availableRoutes' => $this->getAvailableRoutes(),
                 'isMyclubWebSite' => WebApp::isMyClubWebSite(),
+                'page' => $this->application->getConnectedUser()->getPage()
             ]));
         }
     }
 
     public function showArwards()
     {
-        $person = $this->application->getConnectedUser()->get()->person ?? false;
+        $person = $this->application->getConnectedUser()->person ?? false;
         if ($person && $this->pageDataHelper->authorizedUser('/navbar/show/arwards', $person)) {
             $arwardsDataHelper = new ArwardsDataHelper($this->application);
 
@@ -50,18 +43,20 @@ class NavBarController extends AbstractController
                 'groups' => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
                 'layout' => $this->getLayout(),
                 'navItems' => $this->getNavItems($person),
+                'page' => $this->application->getConnectedUser()->getPage(),
             ]));
         } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function showArticle($id)
     {
-        $person = $this->application->getConnectedUser()->get()->person ?? false;
+        $person = $this->application->getConnectedUser()->person ?? false;
         if ($this->pageDataHelper->authorizedUser("/navbar/show/article/$id", $person)) {
             $this->render('Webmaster/views/navbar/article.latte', Params::getAll([
                 'navItems' => $this->getNavItems($person),
                 'chosenArticle' => $this->dataHelper->get('Article', ['Id' => $id], 'Content'),
-                'hasAuthorization' => $this->application->getConnectedUser()->hasAutorization()
+                'hasAuthorization' => $this->application->getConnectedUser()->hasAutorization(),
+                'page' => $this->application->getConnectedUser()->getPage(),
             ]));
         } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }

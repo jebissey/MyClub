@@ -31,7 +31,7 @@ class CarouselApi extends AbstractApi
     public function getItems($idArticle)
     {
         try {
-            $connectedUser = $this->application->getConnectedUser()->get();
+            $connectedUser = $this->application->getConnectedUser();
             if (!($connectedUser->person ?? false) || !$this->authorizationDataHelper->getArticle($idArticle, $connectedUser)) {
                 $this->renderJson(['error' => 'Accès non autorisé'], false, ApplicationError::Forbidden->value);
                 return;
@@ -47,7 +47,7 @@ class CarouselApi extends AbstractApi
 
     public function saveItem()
     {
-        $person = $this->application->getConnectedUser()->get()->person ?? false;
+        $person = $this->application->getConnectedUser()->person ?? false;
         if (!$person) {
             $this->renderJson(['error' => 'Utilisateur non connecté'], false, ApplicationError::Forbidden->value);
             return;
@@ -76,7 +76,7 @@ class CarouselApi extends AbstractApi
             $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
-        if (!($this->application->getConnectedUser()->get()->isRedactor() ?? false)) {
+        if (!($this->application->getConnectedUser()->isRedactor() ?? false)) {
             $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }
@@ -85,7 +85,7 @@ class CarouselApi extends AbstractApi
             $this->renderJsonBadRequest("Item {$id} not found", __FILE__, __LINE__);
             return;
         }
-        $person = $this->application->getConnectedUser()->get()->person;
+        $person = $this->application->getConnectedUser()->person;
         if (!$this->authorizationDataHelper->getArticle($item->IdArticle, $person)) {
             $this->renderJson(['error' => 'Vous n\'êtes pas autorisé à modifier cet article'], false, ApplicationError::Forbidden->value);
             return;

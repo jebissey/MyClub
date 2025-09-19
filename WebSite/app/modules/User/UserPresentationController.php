@@ -1,19 +1,26 @@
 <?php
+
 declare(strict_types=1);
 
 namespace app\modules\User;
 
 use app\enums\ApplicationError;
 use app\enums\FilterInputRule;
+use app\helpers\Application;
 use app\helpers\Params;
 use app\helpers\WebApp;
 use app\modules\Common\AbstractController;
 
 class UserPresentationController extends AbstractController
 {
+    public function __construct(Application $application)
+    {
+        parent::__construct($application);
+    }
+
     public function editPresentation(): void
     {
-        if ($person = $this->application->getConnectedUser()->get()->person ?? false) {
+        if ($person = $this->application->getConnectedUser()->person ?? false) {
             if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
                 $this->raiseMethodNotAllowed(__FILE__, __LINE__);
                 return;
@@ -21,13 +28,14 @@ class UserPresentationController extends AbstractController
             $this->render('User/views/user_edit_presentation.latte', Params::getAll([
                 'person' => $person,
                 'navItems' => $this->getNavItems($person),
+                'page' => $this->application->getConnectedUser()->getPage(),
             ]));
         } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function savePresentation()
     {
-        if ($person = $this->application->getConnectedUser()->get()->person ?? false) {
+        if ($person = $this->application->getConnectedUser()->person ?? false) {
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $schema = [
                     'content' => FilterInputRule::Html->value,
@@ -52,7 +60,7 @@ class UserPresentationController extends AbstractController
 
     public function showPresentation($personId)
     {
-        if ($loggedPerson = $this->application->getConnectedUser()->get()->person ?? false) {
+        if ($loggedPerson = $this->application->getConnectedUser()->person ?? false) {
             $person = $this->dataHelper->get('Person', [
                 'Id' => $personId,
                 'Inactivated' => 0,
@@ -67,6 +75,7 @@ class UserPresentationController extends AbstractController
                 'person' => $person,
                 'loggedPerson' => $loggedPerson,
                 'navItems' => $this->getNavItems($person),
+                'page' => $this->application->getConnectedUser()->getPage(),
             ]));
         } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }

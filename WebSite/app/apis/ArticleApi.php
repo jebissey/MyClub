@@ -36,7 +36,7 @@ class ArticleApi extends AbstractApi
 
     public function deleteFile(int $year, int $month, string $filename): void
     {
-        if (!($this->application->getConnectedUser()->get()->isRedactor() ?? false)) {
+        if (!($this->application->getConnectedUser()->isRedactor() ?? false)) {
             $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }
@@ -49,7 +49,7 @@ class ArticleApi extends AbstractApi
 
     public function designVote(): void
     {
-        if (!($this->application->getConnectedUser()->get()->isRedactor() ?? false)) {
+        if (!($this->application->getConnectedUser()->isRedactor() ?? false)) {
             $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }
@@ -63,7 +63,7 @@ class ArticleApi extends AbstractApi
 
     public function saveSurveyReply(): void
     {
-        $person = $this->application->getConnectedUser()->get()->person ?? false;
+        $person = $this->application->getConnectedUser()->person ?? false;
         if (!$person) {
             $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
@@ -85,7 +85,7 @@ class ArticleApi extends AbstractApi
 
     public function showSurveyReplyForm(int $articleId): void
     {
-        $person = $this->application->getConnectedUser()->get()->person ?? false;
+        $person = $this->application->getConnectedUser()->person ?? false;
         if ($person === false) {
             $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
@@ -119,7 +119,7 @@ class ArticleApi extends AbstractApi
 
     public function uploadFile(): void
     {
-        if (!($this->application->getConnectedUser()->get()->isRedactor() ?? false)) {
+        if (!($this->application->getConnectedUser()->isRedactor() ?? false)) {
             $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }

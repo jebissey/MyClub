@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace app\modules\User;
@@ -7,27 +8,18 @@ use app\enums\FilterInputRule;
 use app\helpers\Application;
 use app\helpers\Params;
 use app\helpers\WebApp;
-use app\models\AuthorizationDataHelper;
-use app\models\DataHelper;
-use app\models\LanguagesDataHelper;
-use app\models\PageDataHelper;
 use app\modules\Common\AbstractController;
 
 class UserNotepadController extends AbstractController
 {
-    public function __construct(
-        Application $application,
-        DataHelper $dataHelper,
-        LanguagesDataHelper $languagesDataHelper,
-        PageDataHelper $pageDataHelper,
-        AuthorizationDataHelper $authorizationDataHelper
-    ) {
-        parent::__construct($application, $dataHelper, $languagesDataHelper, $pageDataHelper, $authorizationDataHelper);
+    public function __construct(Application $application)
+    {
+        parent::__construct($application);
     }
 
     public function editNotepad(): void
     {
-        $person = $this->application->getConnectedUser()->get()->person;
+        $person = $this->application->getConnectedUser()->person;
         if ($person === null) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
@@ -40,12 +32,13 @@ class UserNotepadController extends AbstractController
         $this->render('User/views/user_notepad.latte', Params::getAll([
             'notepad' => $person->Notepad,
             'navItems' => $this->getNavItems($person),
+            'page' => $this->application->getConnectedUser()->getPage(),
         ]));
     }
 
     public function saveNotepad()
     {
-        $person = $this->application->getConnectedUser()->get(1)->person;
+        $person = $this->application->getConnectedUser()->person;
         if ($person === null) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
