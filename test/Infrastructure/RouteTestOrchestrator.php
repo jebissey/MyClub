@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace test\Infrastructure;
 
 use Throwable;
@@ -47,7 +49,7 @@ class RouteTestOrchestrator
         } catch (StopRequestedException $e) {
             echo "⚠️ Execution stopped\n";
         } catch (Throwable $e) {
-            echo "❌ Unexpected error: " . $e->getMessage() . "\n";
+            echo "❌ Unexpected error: " . $e->getMessage() . ' in ' . $e->getFile() . ' at ' . $e->getLine() . "\n";
         }
         $this->reporter->displaySummary($this->summaryGenerator($results));
         return $results;

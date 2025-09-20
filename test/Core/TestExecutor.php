@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace test\Core;
 
 use test\Interfaces\AuthenticatorInterface;
@@ -104,9 +106,9 @@ class TestExecutor
             foreach ($testData as $test) {
                 $this->http->clearSession();
                 if (!$this->authenticateIfNeeded($test, $routeNumber)) continue;
-                $route->testedPath = $url = $this->urlBuilder->build($route, json_decode($test['JsonGetParameters'], true) ?? []);
+                $route->testedPath = $url = $this->urlBuilder->build($route, json_decode($test['JsonGetParameters'] ?? '', true) ?? []);
                 $response = $this->http->request($route->method, $url, [
-                    'postfields' => json_decode($test['JsonPostParameters'], true)
+                    'postfields' => json_decode($test['JsonPostParameters'] ?? '', true)
                 ]);
                 $this->validateResponse($routeNumber, $test, $response, $stop);
                 $results[] = new TestResult($route, $response, $routeNumber);
@@ -140,7 +142,7 @@ class TestExecutor
 
     private function validateResponse(int $routeNumber, array $test, $response, bool $stop): void
     {
-        $result = $this->responseValidator->validate($response->httpCode, $test['ExpectedResponseCode']);
+        $result = $this->responseValidator->validate($response->httpCode, (int)$test['ExpectedResponseCode']);
         if (!$result->isValid) {
             $this->responseErrors[] = $this->reporter->error("Unexpected response for test {$routeNumber}: {$test['Method']} {$test['Uri']} ; expected: {$test['ExpectedResponseCode']}, received: {$response->httpCode}");
             if ($stop) throw new StopRequestedException();

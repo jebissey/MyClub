@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace test\Interfaces;
 
 use test\Core\AuthenticationResult;
