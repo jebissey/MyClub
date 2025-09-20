@@ -133,7 +133,15 @@ class EventController extends AbstractController
         } else $this->raiseForbidden('Event doesn\'t found', 3000, false);
     }
 
-    public function register(int $eventId, bool $set, $token = null): void
+    public function registerSet(int $eventId, $token = null): void
+    {
+        $this->register($eventId, true, $token);
+    }
+    public function registerUnset(int $eventId, $token = null): void
+    {
+        $this->register($eventId, false, $token);
+    }
+    private function register(int $eventId, bool $set, $token = null): void
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);

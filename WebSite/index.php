@@ -19,6 +19,7 @@ use app\apis\GroupApi;
 use app\apis\ImportApi;
 use app\apis\NavbarApi;
 use app\apis\WebmasterApi;
+use app\config\Routes;
 use app\enums\ApplicationError;
 use app\helpers\Application;
 use app\helpers\Backup;
@@ -180,104 +181,12 @@ $news = new News([
 $tableControllerDataHelper = new TableControllerDataHelper($application);
 $webapp = new WebApp();
 
+
+new Routes($application, $flight)->add();
+
+
 #region web
-$articleController = new ArticleController(
-    $application,
-    $articleDataHelper,
-    $articleTableDataHelper,
-    $personDataHelper,
-    $backup,
-    $articleCrosstabDatahelper,
-    $genericDataHelper
-);
-mapRoute($flight, 'GET  /article/create', $articleController, 'create');
-mapRoute($flight, 'POST /article/delete/@id:[0-9]+', $articleController, 'delete');
-mapRoute($flight, 'GET  /article/@id:[0-9]+', $articleController, 'show');
-mapRoute($flight, 'POST /article/@id:[0-9]+', $articleController, 'update');
-mapRoute($flight, 'GET  /articles', $articleController, 'index');
-mapRoute($flight, 'GET  /articles/crosstab', $articleController, 'showArticleCrosstab');
-mapRoute($flight, 'GET  /emails/article/@id:[0-9]+', $articleController, 'fetchEmailsForArticle');
-mapRoute($flight, 'GET  /publish/article/@id:[0-9]+', $articleController, 'publish');
-mapRoute($flight, 'POST /publish/article/@id:[0-9]+', $articleController, 'publish');
-mapRoute($flight, 'GET  /redactor', $articleController, 'home');
-mapRoute($flight, 'GET  /redactor/help', $articleController, 'home');
 
-if (str_starts_with($uri, '/arward')) {
-    $arwardsController = new ArwardsController($application);
-    mapRoute($flight, 'GET  /arwards', $arwardsController, 'seeArwards');
-    mapRoute($flight, 'POST /arward', $arwardsController, 'setArward');
-}
-
-if (str_starts_with($uri, '/contact')) {
-    $contactController = new ContactController($application, $emailService, $personDataHelper, $webapp);
-    mapRoute($flight, 'GET  /contact', $contactController, 'contact');
-    mapRoute($flight, 'POST /contact', $contactController, 'contact');
-    mapRoute($flight, 'GET  /contact/event/@id:[0-9]+', $contactController, 'contact');
-}
-
-if (str_starts_with($uri, '/dbbrowser')) {
-    $dbBrowserController = new DbBrowserController($application, $dbBrowserDataHelper);
-    mapRoute($flight, 'GET  /dbbrowser', $dbBrowserController, 'index');
-    mapRoute($flight, 'GET  /dbbrowser/@table:[A-Za-z0-9_]+', $dbBrowserController, 'showTable', 1);
-    mapRoute($flight, 'GET  /dbbrowser/@table:[A-Za-z0-9_]+/create', $dbBrowserController, 'showCreateForm');
-    mapRoute($flight, 'POST /dbbrowser/@table:[A-Za-z0-9_]+/create', $dbBrowserController, 'createRecord');
-    mapRoute($flight, 'GET  /dbbrowser/@table:[A-Za-z0-9_]+/edit/@id:[0-9]+', $dbBrowserController, 'showEditForm');
-    mapRoute($flight, 'POST /dbbrowser/@table:[A-Za-z0-9_]+/edit/@id:[0-9]+', $dbBrowserController, 'updateRecord');
-    mapRoute($flight, 'POST /dbbrowser/@table:[A-Za-z0-9_]+/delete/@id:[0-9]+', $dbBrowserController, 'deleteRecord');
-}
-
-if (str_starts_with($uri, '/design')) {
-    $designController = new DesignController($application, $designDataHelper);
-    mapRoute($flight, 'GET  /designs', $designController, 'index');
-    mapRoute($flight, 'GET  /design/create', $designController, 'create');
-    mapRoute($flight, 'POST /design/save', $designController, 'save');
-
-    $designerController = new DesignerController($application);
-    mapRoute($flight, 'GET  /designer', $designerController, 'homeDesigner');
-    mapRoute($flight, 'GET  /designer/help', $designerController, 'helpDesigner');
-}
-
-if (str_starts_with($uri, '/event') || in_array($uri, ['/nextEvents', '/weekEvents'])) {
-    $eventController = new EventController($application, $eventDataHelper, $crosstabDataHelper, $participantDataHelper, $messageDataHelper);
-    mapRoute($flight, 'GET  /eventManager', $eventController, 'home');
-    mapRoute($flight, 'GET  /eventManager/help', $eventController, 'help');
-    mapRoute($flight, 'GET  /event/chat/@id:[0-9]+', $eventController, 'showEventChat');
-    mapRoute($flight, 'GET  /event/@id:[0-9]+', $eventController, 'show');
-    $flight->route('GET  /event/@id:[0-9]+/register', function ($id) use ($eventController) {
-        $eventController->register((int)$id, true);
-    });
-    $flight->route('GET /event/@id:[0-9]+/unregister', function ($id) use ($eventController) {
-        $eventController->register((int)$id, false);
-    });
-    $flight->route('GET /event/@id:[0-9]+/@token:[a-f0-9]+', function ($id, $token) use ($eventController) {
-        $eventController->register((int)$id, true, $token);
-    });
-    mapRoute($flight, 'GET  /event/location', $eventController, 'location');
-    mapRoute($flight, 'GET  /events/crosstab', $eventController, 'showEventCrosstab');
-    mapRoute($flight, 'GET  /nextEvents', $eventController, 'nextEvents');
-    mapRoute($flight, 'GET  /weekEvents', $eventController, 'weekEvents');
-
-    $eventGuestController = new EventGuestController($application, $eventDataHelper);
-    mapRoute($flight, 'GET  /events/guest', $eventGuestController, 'guest');
-    mapRoute($flight, 'POST /events/guest', $eventGuestController, 'guestInvite');
-
-    $eventTypeController = new EventTypeController(
-        $application,
-        $eventDataHelper,
-        $tableControllerDataHelper,
-        $errorManager,
-        $genericDataHelper
-    );
-    mapRoute($flight, 'GET  /eventTypes', $eventTypeController, 'index');
-    mapRoute($flight, 'GET  /eventTypes/create', $eventTypeController, 'create');
-    mapRoute($flight, 'GET  /eventTypes/edit/@id:[0-9]+', $eventTypeController, 'edit');
-    mapRoute($flight, 'POST /eventTypes/edit/@id:[0-9]+', $eventTypeController, 'editSave');
-    mapRoute($flight, 'POST /eventTypes/delete/@id:[0-9]+', $eventTypeController, 'delete');
-}
-
-$eventEmailController = new EventEmailController($application, $personDataHelper);
-mapRoute($flight, 'GET  /emails', $eventEmailController, 'fetchEmails');
-mapRoute($flight, 'POST /emails', $eventEmailController, 'copyEmails');
 
 $eventNeedController = new EventNeedController($application, $needDataHelper);
 mapRoute($flight, 'GET /needs', $eventNeedController, 'needs');

@@ -23,13 +23,13 @@ class RouteTestOrchestrator
         private TestReporterInterface $reporter,
     ) {}
 
-    public function runTests(string $routeFilePath, ?int $test, ?int $simu, ?int $start, bool $stop): array
+    public function runTests(string $routeFilePath, string $routeDirectoryPath, ?int $test, ?int $simu, ?int $start, bool $stop): array
     {
         $results = [];
         try {
             if ($simu === null && $start === null) {
                 $this->reporter->sectionTitle("Routes extraction");
-                $routes = $this->routeExtractor->extractRoutes($routeFilePath);
+                $routes = $this->routeExtractor->extractRoutes($routeFilePath, $routeDirectoryPath);
                 $totalRoutes = count($routes);
                 echo "Found {$totalRoutes} routes.\n";
                 echo str_repeat('-', 80) . "\n";

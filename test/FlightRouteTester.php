@@ -39,6 +39,7 @@ function main(): int
     $exportJson = isset($options['export-json']);
     $exportCsv  = isset($options['export-csv']);
     $routeFile  = $options['routes-file'] ?? __DIR__ . '/../WebSite/index.php';
+    $routeDirectoryFiles = __DIR__ . '/../WebSite/app/config/routes';
     $dbTestsPath     = $options['db-path'] ?? __DIR__ . '/Database/tests.sqlite';
     $dbMyClubPath    =  __DIR__ . '/../WebSite/data/MyClub.sqlite';
     $dbWebSitePath   = $options['db-path'] ?? __DIR__ . '/../WebSite/data/MyClub.sqlite';
@@ -50,11 +51,12 @@ function main(): int
         echo "  Base URL: {$config->baseUrl}\n";
         echo "  Timeout: {$config->timeout} secondes\n";
         echo "  File with routes: {$routeFile}\n";
+        echo "  Directory files with routes: {$routeDirectoryFiles}\n";
         echo "  Data base: " . ($dbTestsPath ?: "Not specified") . "\n";
         echo "  Stop on error: " . ($stop ? 'true' : 'false') . "\n";
 
         $orchestrator = RouteTestFactory::create($config, $dbTestsPath, $dbMyClubPath);
-        $results = $orchestrator->runTests($routeFile, $test, $simu, $start, $stop);
+        $results = $orchestrator->runTests($routeFile, $routeDirectoryFiles, $test, $simu, $start, $stop);
 
         if ($exportJson) (new JsonTestExporter())->export($results, 'route_test_results.json');
         if ($exportCsv) (new CsvTestExporter())->export($results, 'route_test_results.csv');

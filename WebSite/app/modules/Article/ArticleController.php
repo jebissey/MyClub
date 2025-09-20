@@ -54,7 +54,7 @@ class ArticleController extends TableController
 
     public function help(): void
     {
-        if (!($this->application->getConnectedUser()->isAdministrator() ?? false)) {
+        if (!($this->application->getConnectedUser()->isRedactor() ?? false)) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
         }

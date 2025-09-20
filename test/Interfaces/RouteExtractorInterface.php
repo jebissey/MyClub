@@ -6,6 +6,6 @@ namespace test\Interfaces;
 
 interface RouteExtractorInterface
 {
-    public function extractRoutes(string $filePath): array;
+    public function extractRoutes(string $filePath, string $directoryPath): array;
 }
 
