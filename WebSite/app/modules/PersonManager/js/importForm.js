@@ -42,7 +42,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         headerRowInput.disabled = true;
 
-        fetch('/import/headers', {
+        fetch('/api/import/headers', {
             method: 'POST',
             body: formData
         })

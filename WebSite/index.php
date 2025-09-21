@@ -7,7 +7,6 @@ require_once 'vendor/autoload.php';
 use flight\Engine;
 use Tracy\Debugger;
 
-use app\apis\ArticleApi;
 use app\apis\CarouselApi;
 use app\apis\EventApi;
 use app\apis\EventAttributeApi;
@@ -55,45 +54,8 @@ use app\models\PersonGroupDataHelper;
 use app\models\PersonStatisticsDataHelper;
 use app\models\SurveyDataHelper;
 use app\models\TableControllerDataHelper;
-use app\modules\Article\ArticleController;
-use app\modules\Article\MediaController;
-use app\modules\Article\SurveyController;
 use app\modules\Common\EmptyController;
-use app\modules\Designer\DesignController;
-use app\modules\Designer\DesignerController;
-use app\modules\Event\EventController;
-use app\modules\Event\EventTypeController;
-use app\modules\Event\EventEmailController;
-use app\modules\Event\EventGuestController;
-use app\modules\Event\EventNeedController;
-use app\modules\Games\Solfege\SolfegeController;
-use app\modules\PersonManager\GroupController;
-use app\modules\PersonManager\ImportController;
-use app\modules\PersonManager\PersonController;
-use app\modules\PersonManager\RegistrationController;
-use app\modules\User\ContactController;
-use app\modules\User\FFAController;
-use app\modules\User\HomeController;
-use app\modules\User\UserController;
-use app\modules\User\UserAccountController;
-use app\modules\User\UserAvailabilitiesController;
-use app\modules\User\UserDashboardController;
-use app\modules\User\UserDirectoryController;
-use app\modules\User\UserGroupsController;
-use app\modules\User\UserNewsController;
-use app\modules\User\UserNotepadController;
-use app\modules\User\UserPreferencesController;
-use app\modules\User\UserPresentationController;
-use app\modules\User\UserStatisticsController;
-use app\modules\VisitorInsights\LogController;
-use app\modules\VisitorInsights\VisitorInsightsController;
-use app\modules\Webmaster\ArwardsController;
-use app\modules\Webmaster\DbBrowserController;
 use app\modules\Webmaster\MaintenanceController;
-use app\modules\Webmaster\NavBarController;
-use app\modules\Webmaster\RssController;
-use app\modules\Webmaster\WebappSettingsController;
-use app\modules\Webmaster\WebmasterController;
 use app\services\AuthenticationService;
 use app\services\AuthorizationService;
 use app\services\EmailService;
@@ -181,212 +143,14 @@ $news = new News([
 $tableControllerDataHelper = new TableControllerDataHelper($application);
 $webapp = new WebApp();
 
-
 new Routes($application, $flight)->add();
 
 
-#region web
 
-
-$eventNeedController = new EventNeedController($application, $needDataHelper);
-mapRoute($flight, 'GET /needs', $eventNeedController, 'needs');
-
-
-$ffaController = new FFAController($application);
-mapRoute($flight, 'GET /ffa/search', $ffaController, 'searchMember');
-
-if (str_starts_with($uri, '/group')) {
-    $groupController = new GroupController(
-        $application,
-        $groupDataHelper
-    );
-    mapRoute($flight, 'GET  /groups', $groupController, 'groupIndex');
-    mapRoute($flight, 'GET  /group/create', $groupController, 'groupCreate');
-    mapRoute($flight, 'POST /group/create', $groupController, 'groupCreateSave');
-    mapRoute($flight, 'GET  /group/edit/@id:[0-9]+', $groupController, 'groupEdit');
-    mapRoute($flight, 'POST /group/edit/@id:[0-9]+', $groupController, 'groupEditSave');
-    mapRoute($flight, 'POST /group/delete/@id:[0-9]+', $groupController, 'groupDelete');
-}
-
-$homeController = new HomeController($application, $articleDataHelper, $surveyDataHelper, $designDataHelper, $news, $personDataHelper);
-mapRoute($flight, 'GET  /', $homeController, 'home');
-mapRoute($flight, 'GET  /help', $homeController, 'helpHome');
-mapRoute($flight, 'GET  /legal/notice', $homeController, 'legalNotice');
-
-if (str_starts_with($uri, '/import')) {
-    $importController = new ImportController($application, $importDataHelper);
-    mapRoute($flight, 'GET  /import', $importController, 'showImportForm');
-    mapRoute($flight, 'POST /import', $importController, 'processImport');
-
-    $importApi = new ImportApi($application, $connectedUser, $dataHelper, $personDataHelper);
-    mapRoute($flight, 'POST /import/headers', $importApi, 'getHeadersFromCSV');
-}
-
-$logController = new LogController($application, $logDataHelper, $crosstabDataHelper);
-mapRoute($flight, 'GET /analytics', $logController, 'analytics');
-mapRoute($flight, 'GET /lastVisits', $logController, 'showLastVisits');
-mapRoute($flight, 'GET /logs', $logController, 'index');
-mapRoute($flight, 'GET /logs/crossTab', $logController, 'crossTab');
-mapRoute($flight, 'GET /referents', $logController, 'referents');
-mapRoute($flight, 'GET /topArticles', $logController, 'topArticlesByPeriod');
-mapRoute($flight, 'GET /topPages', $logController, 'topPagesByPeriod');
-mapRoute($flight, 'GET /visitors/graf', $logController, 'visitorsGraf');
-
-mapRoute($flight, 'GET /maintenance', $maintenanceController, 'maintenance');
-mapRoute($flight, 'GET /maintenance/set', $maintenanceController, 'setSiteUnderMaintenance');
-mapRoute($flight, 'GET /maintenance/unset', $maintenanceController, 'setSiteOnline');
-
-if (str_starts_with($uri, '/media/')) {
-    $mediaController = new MediaController($application);
-    mapRoute($flight, 'GET /media/@year:[0-9]+/@month:[0-9]+/@filename', $mediaController, 'viewFile');
-    mapRoute($flight, 'GET /media/upload', $mediaController, 'showUploadForm');
-    mapRoute($flight, 'GET /media/list', $mediaController, 'listFiles');
-    mapRoute($flight, 'GET /media/gpxViewer', $mediaController, 'gpxViewer');
-}
-
-if (str_starts_with($uri, '/navbar')) {
-    $navBarController = new NavBarController($application);
-    mapRoute($flight, 'GET /navbar', $navBarController, 'index');
-    mapRoute($flight, 'GET /navbar/show/article/@id:[0-9]+', $navBarController, 'showArticle');
-    mapRoute($flight, 'GET /navbar/show/arwards', $navBarController, 'showArwards');
-}
-
-if (str_starts_with($uri, '/person')) {
-    $personController = new PersonController(
-        $application,
-        $tableControllerDataHelper,
-        $personDataHelper,
-        $genericDataHelper,
-        $dataHelper,
-        $languagesDataHelper,
-        $pageDataHelper,
-        $authorizationDataHelper
-    );
-    mapRoute($flight, 'GET  /personManager', $personController, 'home');
-    mapRoute($flight, 'GET  /personManager/help', $personController, 'help');
-    mapRoute($flight, 'GET  /persons', $personController, 'index');
-    mapRoute($flight, 'GET  /person/create', $personController, 'create');
-    mapRoute($flight, 'GET  /person/edit/@id:[0-9]+', $personController, 'edit');
-    mapRoute($flight, 'POST /person/edit/@id:[0-9]+', $personController, 'editSave');
-    mapRoute($flight, 'POST /person/delete/@id:[0-9]+', $personController, 'delete');
-}
-
-if (str_starts_with($uri, '/registration')) {
-    $registrationController = new RegistrationController(
-        $application,
-        $tableControllerDataHelper,
-        $groupDataHelper,
-        $genericDataHelper,
-    );
-    mapRoute($flight, 'GET /registration', $registrationController, 'index');
-    mapRoute($flight, 'GET /registration/groups/@id:[0-9]+', $registrationController, 'getPersonGroups');
-}
-
-$rssController = new RssController($application, $articleDataHelper, $eventDataHelper);
-mapRoute($flight, 'GET /articles-rss.xml', $rssController, 'articlesRssGenerator');
-mapRoute($flight, 'GET /events-rss.xml', $rssController, 'eventsRssGenerator');
-
-if (str_starts_with($uri, '/survey')) {
-    $surveyController = new SurveyController($application, $surveyDataHelper);
-    mapRoute($flight, 'GET  /survey/add/@id:[0-9]+', $surveyController, 'add');
-    mapRoute($flight, 'POST /survey/create', $surveyController, 'createOrUpdate');
-    mapRoute($flight, 'GET  /survey/results/@id:[0-9]+', $surveyController, 'viewResults');
-}
-
-if (str_starts_with($uri, '/user')) {
-    $userController = new UserController($application, $authenticationService);
-    mapRoute($flight, 'GET  /user/forgotPassword/@encodedEmail', $userController, 'forgotPassword');
-    mapRoute($flight, 'GET  /user/setPassword/@token:[a-f0-9]+', $userController, 'setPassword');
-    mapRoute($flight, 'POST /user/setPassword/@token:[a-f0-9]+', $userController, 'setPassword');
-    mapRoute($flight, 'GET  /user/sign/in', $userController, 'signIn');
-    mapRoute($flight, 'POST /user/sign/in', $userController, 'signIn');
-    mapRoute($flight, 'GET  /user/sign/out', $userController, 'signOut');
-
-    $userAccountController = new UserAccountController($application);
-    mapRoute($flight, 'GET  /user/account', $userAccountController, 'account');
-    mapRoute($flight, 'POST /user/account', $userAccountController, 'accountSave');
-
-    $userAvailabilitiesController = new UserAvailabilitiesController($application);
-    mapRoute($flight, 'GET  /user/availabilities', $userAvailabilitiesController, 'availabilities');
-    mapRoute($flight, 'POST /user/availabilities', $userAvailabilitiesController, 'availabilitiesSave');
-
-    $userDashboardController = new UserDashboardController(
-        $application,
-        $dataHelper,
-        $languagesDataHelper,
-        $pageDataHelper,
-        $authorizationDataHelper,
-        $logDataHelper,
-        $emptyController
-    );
-    mapRoute($flight, 'GET /user', $userDashboardController, 'user');
-    mapRoute($flight, 'GET /user/help', $userDashboardController, 'help');
-
-    $userDirectoryController = new UserDirectoryController($application, $personDataHelper, $groupDataHelper);
-    mapRoute($flight, 'GET /user/directory', $userDirectoryController, 'showDirectory');
-    mapRoute($flight, 'GET /user/directory/map', $userDirectoryController, 'showMap');
-
-    $userGroupsController = new UserGroupsController($application, $personGroupDataHelper, $groupDataHelper);
-    mapRoute($flight, 'GET  /user/groups', $userGroupsController, 'groups');
-    mapRoute($flight, 'POST /user/groups', $userGroupsController, 'groupsSave');
-
-    $userNewsController = new UserNewsController($application, $news);
-    mapRoute($flight, 'GET /user/news', $userNewsController, 'showNews');
-
-    $userNotepadController = new UserNotepadController($application);
-    mapRoute($flight, 'GET  /user/notepad', $userNotepadController, 'editNotepad');
-    mapRoute($flight, 'POST /user/notepad', $userNotepadController, 'saveNotepad');
-
-    $userPreferencesController = new UserPreferencesController($application, $eventTypeDataHelper);
-    mapRoute($flight, 'GET  /user/preferences', $userPreferencesController, 'preferences');
-    mapRoute($flight, 'POST /user/preferences', $userPreferencesController, 'preferencesSave');
-
-    $userPresentationController = new UserPresentationController($application);
-    mapRoute($flight, 'GET  /user/presentation/edit', $userPresentationController, 'editPresentation');
-    mapRoute($flight, 'POST /user/presentation/edit', $userPresentationController, 'savePresentation');
-    mapRoute($flight, 'GET  /user/presentation/@id:[0-9]+', $userPresentationController, 'showPresentation');
-
-    $userStatisticsController = new UserStatisticsController($application, $personStatisticsDataHelper, $logDataHelper);
-    mapRoute($flight, 'GET /user/statistics', $userStatisticsController, 'showStatistics');
-}
-
-if ($uri == '/settings') {
-    $webappSettingsController = new WebappSettingsController($application);
-    mapRoute($flight, 'GET  /settings', $webappSettingsController, 'editSettings');
-    mapRoute($flight, 'POST /settings', $webappSettingsController, 'saveSettings');
-}
-
-$visitorInsightsController = new VisitorInsightsController($application);
-mapRoute($flight, 'GET  /visitorInsights', $visitorInsightsController, 'visitorInsights');
-mapRoute($flight, 'GET  /visitorInsights/help', $visitorInsightsController, 'helpVisitorInsights');
-
-$webmasterController = new WebmasterController($application, $logDataHelper, $articleDataHelper);
-mapRoute($flight, 'GET  /admin', $webmasterController, 'homeAdmin');
-mapRoute($flight, 'GET  /admin/help', $webmasterController, 'helpAdmin');
-mapRoute($flight, 'GET  /admin/webmaster/help', $webmasterController, 'helpWebmaster');
-mapRoute($flight, 'GET  /installations', $webmasterController, 'showInstallations');
-mapRoute($flight, 'GET  /sitemap.xml', $webmasterController, 'sitemapGenerator');
-
-mapRoute($flight, 'GET  /webmaster', $webmasterController, 'homeWebmaster');
-#endregion
-
-#region games
-if (str_starts_with($uri, '/games/')) {
-    $solfegeController = new SolfegeController($application);
-    mapRoute($flight, 'GET  /games/solfege/learn', $solfegeController, 'learn');
-    mapRoute($flight, 'POST /games/solfege/save-score', $solfegeController, 'saveScore');
-}
-#endregion
 
 #region api
 if (str_starts_with($uri, '/api/')) {
-    $articleApi = new ArticleApi($application, $connectedUser, $dataHelper, $personDataHelper, $designDataHelper, $articleDataHelper);
-    mapRoute($flight, 'GET  /api/author/@articleId:[0-9]+', $articleApi, 'getAuthor');
-    mapRoute($flight, 'POST /api/design/vote', $articleApi, 'designVote');
-    mapRoute($flight, 'POST /api/media/delete/@year:[0-9]+/@month:[0-9]+/@filename', $articleApi, 'deleteFile');
-    mapRoute($flight, 'POST /api/media/upload', $articleApi, 'uploadFile');
-    mapRoute($flight, 'POST /api/survey/reply', $articleApi, 'saveSurveyReply');
-    mapRoute($flight, 'GET  /api/survey/reply/@id:[0-9]+', $articleApi, 'showSurveyReplyForm');
+
 
     $carouselApi = new CarouselApi($application, $connectedUser, $dataHelper, $personDataHelper, $authorizationDataHelper, $carouselDataHelper);
     mapRoute($flight, 'GET  /api/carousel/@articleId:[0-9]+', $carouselApi, 'getItems');
@@ -433,6 +197,9 @@ if (str_starts_with($uri, '/api/')) {
     mapRoute($flight, 'GET  /api/event-needs/@id:[0-9]+', $eventNeedApi, 'getEventNeeds');
     mapRoute($flight, 'POST /api/need/delete/@id:[0-9]+', $eventNeedApi, 'deleteNeed');
     mapRoute($flight, 'POST /api/need/save', $eventNeedApi, 'saveNeed');
+
+    $importApi = new ImportApi($application, $connectedUser, $dataHelper, $personDataHelper);
+    mapRoute($flight, 'POST /api/import/headers', $importApi, 'getHeadersFromCSV');
 
     $eventNeedTypeApi = new EventNeedTypeApi($application, $needDataHelper, $needTypeDataHelper, $connectedUser, $dataHelper, $personDataHelper);
     mapRoute($flight, 'POST /api/need/type/delete/@id:[0-9]+', $eventNeedTypeApi, 'deleteNeedType');

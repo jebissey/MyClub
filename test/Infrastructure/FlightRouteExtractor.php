@@ -16,13 +16,13 @@ class FlightRouteExtractor implements RouteExtractorInterface
     private const REGEX_ICONS_ROUTE = '/(\/[A-Za-z0-9\-]+\.[A-Za-z]{3})\'\s*=>/s';
     private const REGEX_ROUTE_PARAM = '/@\w+(?::[^\s\/]+)?/';
     private const REGEX_NEW_ROUTE = '/new\s+Route\(\s*[\'"]([^\'"]+)[\'"]/';
+    private array $routes = [];
 
     public function extractRoutes(string $filePath, string $directoryPath): array
     {
         if (!file_exists($filePath)) throw new InvalidArgumentException("File $filePath doesn't exist");
 
-        $content = file_get_contents($filePath);
-        $routes = [];
+        $content = file_get_contents($filePath);        
         $this->lookingForRoutes($content, self::REGEX_MAP_ROUTE);
         $this->lookingForRoutes($content, self::REGEX_DIRECT_ROUTE);
         $this->lookingForRoutes($content, self::REGEX_ICONS_ROUTE);
@@ -32,8 +32,8 @@ class FlightRouteExtractor implements RouteExtractorInterface
             $filePath = $directoryPath . DIRECTORY_SEPARATOR . $file;
             $this->lookingForRoutes(file_get_contents($filePath), self::REGEX_NEW_ROUTE);
         }
-        usort($routes, fn(Route $a, Route $b) => strcmp($a->originalPath, $b->originalPath));
-        return $routes;
+        usort($this->routes, fn(Route $a, Route $b) => strcmp($a->originalPath, $b->originalPath));
+        return $this->routes;
     }
 
     #region Private functions
@@ -42,7 +42,7 @@ class FlightRouteExtractor implements RouteExtractorInterface
         preg_match_all($regex, $content, $matches);
         foreach ($matches[1] as $route) {
             $parsed = $this->parseRoute($route);
-            if ($parsed) $routes[] = $parsed;
+            if ($parsed) $this->routes[] = $parsed;
         }
     }
 

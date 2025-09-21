@@ -10,6 +10,11 @@ use app\modules\Common\AbstractController;
 
 class UserDashboardController extends AbstractController
 {
+    public function __construct(Application $application)
+    {
+        parent::__construct($application);
+    }
+
     public function user(): void
     {
         if ($this->application->getConnectedUser()->person === null) {
