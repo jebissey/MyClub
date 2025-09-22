@@ -197,7 +197,7 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         }
 
-        fetch(`/api/event-needs/${event.Id}`)
+        fetch(`/api/event/needs/${event.Id}`)
             .then(response => response.json())
             .then(data => {
                 if (data.success && data.needs) {

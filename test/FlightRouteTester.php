@@ -38,7 +38,7 @@ function main(): int
     $start      = $options['start'] ?? null;
     $exportJson = isset($options['export-json']);
     $exportCsv  = isset($options['export-csv']);
-    $routeFile  = $options['routes-file'] ?? __DIR__ . '/../WebSite/index.php';
+    $routeFile  = $options['routes-file'] ?? __DIR__ . '/../WebSite/app/config/Routes.php';
     $routeDirectoryFiles = __DIR__ . '/../WebSite/app/config/routes';
     $dbTestsPath     = $options['db-path'] ?? __DIR__ . '/Database/tests.sqlite';
     $dbMyClubPath    =  __DIR__ . '/../WebSite/data/MyClub.sqlite';

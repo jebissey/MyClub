@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace app\config\routes;
 
-use app\config\ControllerFactory;
+use app\config\ApiFactory;
 use app\interfaces\RouteInterface;
 use app\valueObjects\Route;
 
@@ -12,11 +12,11 @@ class ArticleApi implements RouteInterface
 {
     private array $routes = [];
 
-    public function __construct(private ControllerFactory $controllerFactory) {}
+    public function __construct(private ApiFactory $apiFactory) {}
 
     public function get(): array
     {
-        $articleApi = fn() => $this->controllerFactory->makeArticleApi();
+        $articleApi = fn() => $this->apiFactory->makeArticleApi();
 
         $this->routes[] = new Route('GET  /api/author/@articleId:[0-9]+', $articleApi, 'getAuthor');
         $this->routes[] = new Route('POST /api/design/vote', $articleApi, 'designVote');

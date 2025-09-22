@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace app\config;
 
-use app\apis\ArticleApi;
 use app\helpers\Application;
 use app\helpers\Backup;
 use app\helpers\ConnectedUser;
@@ -105,9 +104,7 @@ class ControllerFactory
         private SurveyDataHelper $surveyDataHelper,
         private TableControllerDataHelper $tableControllerDataHelper,
         private WebApp $webapp,
-    ) {
-        $connectedUser = $application->getConnectedUser();
-    }
+    ) {}
 
     public function makeArticleController(): ArticleController
     {
@@ -119,18 +116,6 @@ class ControllerFactory
             $this->backup,
             $this->articleCrosstabDataHelper,
             $this->genericDataHelper
-        );
-    }
-
-    public function makeArticleApi(): ArticleApi
-    {
-        return new ArticleApi(
-            $this->application,
-            $this->connectedUser,
-            $this->dataHelper,
-            $this->personDataHelper,
-            $this->designDataHelper,
-            $this->articleDataHelper
         );
     }
 
