@@ -15,6 +15,7 @@ use app\apis\EventSupplyApi;
 use app\apis\GroupApi;
 use app\apis\ImportApi;
 use app\apis\NavbarApi;
+use app\apis\WebmasterApi;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
 use app\helpers\PersonPreferences;
@@ -26,6 +27,7 @@ use app\models\DataHelper;
 use app\models\DesignDataHelper;
 use app\models\EventDataHelper;
 use app\models\EventNeedDataHelper;
+use app\models\LogDataHelper;
 use app\models\MessageDataHelper;
 use app\models\NeedDataHelper;
 use app\models\NeedTypeDataHelper;
@@ -47,6 +49,7 @@ class ApiFactory
         private DataHelper $dataHelper,        private EventDataHelper $eventDataHelper,
         private EventNeedDataHelper $eventNeedDataHelper,
         private EventService $eventService,
+        private LogDataHelper $logDataHelper,
         private MessageDataHelper $messageDataHelper,
         private NeedDataHelper $needDataHelper,
         private NeedTypeDataHelper $needTypeDataHelper,
@@ -185,13 +188,14 @@ class ApiFactory
         );
     }
 
-    public function makeWebmasterApi(): GroupApi
+    public function makeWebmasterApi(): WebmasterApi
     {
-        return new GroupApi(
+        return new WebmasterApi(
             $this->application,
             $this->connectedUser,
             $this->dataHelper,
-            $this->personDataHelper
+            $this->personDataHelper,
+            $this->logDataHelper
         );
     }
 }

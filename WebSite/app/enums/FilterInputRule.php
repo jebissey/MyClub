@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace app\enums;
@@ -9,12 +10,12 @@ enum FilterInputRule: string
     case ArrayString = 'array:string';
     case Avatar = '/^\p{So}$/u';
     case Bool = 'bool';
-    case Content = '/^.{1,500}$/s';
+    case Content = '/^.{1,10000}$/s';
     case DateTime = '/^(\d{4}(-\d{2}(-\d{2})?)?( \d{2}:\d{2}(:\d{2})?)?|(\d{2}:\d{2}(:\d{2})?))$/';
     case Email = '/^[a-z0-9._%+\-]*(@[a-z0-9.\-]*)?(\.[a-z]*)?$/i';
     case Float = 'float';
     case Html = '/^\s*(<[^>]+>.*?)+\s*$/is';
-    case HtmlSafeName = '/^[A-Za-zÀ-ÖØ-öø-ÿ0-9\'\-\.\s_,()&]{2,100}$/u';
+    case HtmlSafeName = '/^[\p{L}\p{N}\p{P}\p{S}\p{Z}]{2,100}$/u';
     case HtmlSafeText = '/^(.*?<\/?(b|i|u|strong|em|br|span)[^>]*>.*?|[^<>]*)*$/isu';
     case Int = 'int';
     case Integer = '/^\d+$/';

@@ -21,7 +21,7 @@ class Log implements RouteInterface
         $this->routes[] = new Route('GET /analytics', $logController, 'analytics');
         $this->routes[] = new Route('GET /lastVisits', $logController, 'showLastVisits');
         $this->routes[] = new Route('GET /logs', $logController, 'index');
-        $this->routes[] = new Route('GET /logs/crossTab', $logController, 'crossTab');
+        $this->routes[] = new Route('GET /crossTab', $logController, 'crossTab');
         $this->routes[] = new Route('GET /referents', $logController, 'referents');
         $this->routes[] = new Route('GET /topArticles', $logController, 'topArticlesByPeriod');
         $this->routes[] = new Route('GET /topPages', $logController, 'topPagesByPeriod');

@@ -76,7 +76,7 @@ INSERT INTO "Test" VALUES (68,NULL,'POST','/user/presentation/edit',NULL,'{"cont
 INSERT INTO "Test" VALUES (69,NULL,'POST','/survey/create',NULL,'{"question":"zz"}',NULL,'403',NULL,NULL);
 INSERT INTO "Test" VALUES (70,NULL,'POST','/user/account',NULL,'{"id":1}',NULL,'403',NULL,NULL);
 INSERT INTO "Test" VALUES (71,NULL,'POST','/user/availabilities',NULL,'{"id":1}',NULL,'403',NULL,NULL);
-INSERT INTO "Test" VALUES (72,NULL,'POST','/user/groups',NULL,'[]',NULL,'403',NULL,NULL);
+INSERT INTO "Test" VALUES (72,NULL,'POST','/user/groups',NULL,'{}',NULL,'403',NULL,NULL);
 INSERT INTO "Test" VALUES (73,NULL,'POST','/user/preferences',NULL,'{"id":1}',NULL,'403',NULL,NULL);
 INSERT INTO "Test" VALUES (74,NULL,'POST','/user/sign/in',NULL,'{"id":1}',NULL,'400',NULL,NULL);
 INSERT INTO "Test" VALUES (75,NULL,'POST','/contact',NULL,'{"name":"zz","email":"user@myclub.foo", "message":"zz"}',NULL,'200',NULL,NULL);
@@ -1102,7 +1102,7 @@ INSERT INTO "Test" VALUES (1145,10990,'POST','/user/sign/in',NULL,'{"email":"per
 INSERT INTO "Test" VALUES (1146,9410,'GET','/user/setPassword/0123456789abcdef4',NULL,NULL,NULL,'200','SELECT Email, FirstName, LastName, Token from Person Where Id = 4
 ','[{"Email":"redactor@myclub.foo","FirstName":"Redactor","LastName":"Manager","Token":"0123456789abcdef4"}]');
 INSERT INTO "Test" VALUES (1147,9420,'POST','/user/setPassword/0123456789abcdef4',NULL,'{"token": "0123456789abcdef4", "password": "redactor1234"}',NULL,'200','SELECT Email, FirstName, LastName, Password From Person Where Id = 4','[{"Email":"redactor@myclub.foo","FirstName":"Redactor","LastName":"Manager","Password":"28f5bbf0cf07213e91923715c8d2e6a79090274806b5662ef573afd6c38bf070"}]');
-INSERT INTO "Test" VALUES (1148,9890,'POST','/article/1',NULL,'{"content": "<p>my article<\/p>"}','{"email":"redactor@myclub.foo","password":"redactor1234" }','200','Select Id, Title, Content, CreatedBy, PublishedBy, IdGroup, OnlyForMembers, Language From Article','[{"Id":1,"Title":"???","Content":"my article","CreatedBy":4,"PublishedBy":null,"IdGroup":null,"OnlyForMembers":1,"Language":"fr_FR"}]');
+INSERT INTO "Test" VALUES (1148,9890,'POST','/article/1',NULL,'{"title":"my title", "content": "<p>my article<\/p>"}','{"email":"redactor@myclub.foo","password":"redactor1234" }','200','Select Id, Title, Content, CreatedBy, PublishedBy, IdGroup, OnlyForMembers, Language From Article','[{"Id":1,"Title":"my title","Content":"<p>my article<\/p>","CreatedBy":4,"PublishedBy":null,"IdGroup":null,"OnlyForMembers":1,"Language":"fr_FR"}]');
 INSERT INTO "Test" VALUES (1149,11090,'GET','/',NULL,NULL,'{"email":"editor@myclub.foo","password":"editor1234" }','200','','');
 INSERT INTO "Test" VALUES (1150,11100,'GET','/admin',NULL,NULL,'{"email":"editor@myclub.foo","password":"editor1234" }','200',NULL,NULL);
 INSERT INTO "Test" VALUES (1151,11110,'GET','/admin/help',NULL,NULL,'{"email":"editor@myclub.foo","password":"editor1234" }','200',NULL,NULL);
@@ -1935,9 +1935,12 @@ INSERT INTO "Test" VALUES (1977,17720,'POST','/user/setPassword/0123456789abcdef
 INSERT INTO "Test" VALUES (1978,18190,'POST','/article/1',NULL,'{"content": "<p>my article<\/p>"}','{"email":"user@myclub.foo","password":"user1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (1979,1360,'GET','/person/create',NULL,NULL,'{"email":"webmaster@myclub.foo","password":"admin1234" }','200',NULL,NULL);
 INSERT INTO "Test" VALUES (1980,1370,'POST','/person/edit/10',NULL,'{"email": "user@myclub.foo", "firstName": "Simple", "lastName": "Member"}','{"email":"webmaster@myclub.foo","password":"admin1234" }','200','Update Person Set Token = "0123456789abcdefa", TokenCreatedAt = CURRENT_TIMESTAMP Where Id = 10','[]');
-INSERT INTO "Test" VALUES (1981,1820,'PUT','/apple-touch-icon-120x120.png',NULL,NULL,NULL,'404',NULL,NULL);
-INSERT INTO "Test" VALUES (1982,1830,'PUT','/apple-touch-icon-180x180.png',NULL,NULL,NULL,'404',NULL,NULL);
-INSERT INTO "Test" VALUES (1983,1840,'PUT','/apple-touch-icon-precomposed.png',NULL,NULL,NULL,'404',NULL,NULL);
-INSERT INTO "Test" VALUES (1984,1850,'PUT','/apple-touch-icon.png',NULL,NULL,NULL,'404',NULL,NULL);
-INSERT INTO "Test" VALUES (1985,2230,'PUT','/favicon.ico',NULL,NULL,NULL,'404',NULL,NULL);
+INSERT INTO "Test" VALUES (1981,1820,'PUT','/apple-touch-icon-120x120.png',NULL,NULL,NULL,'405',NULL,NULL);
+INSERT INTO "Test" VALUES (1982,1830,'PUT','/apple-touch-icon-180x180.png',NULL,NULL,NULL,'405',NULL,NULL);
+INSERT INTO "Test" VALUES (1983,1840,'PUT','/apple-touch-icon-precomposed.png',NULL,NULL,NULL,'405',NULL,NULL);
+INSERT INTO "Test" VALUES (1984,1850,'PUT','/apple-touch-icon.png',NULL,NULL,NULL,'405',NULL,NULL);
+INSERT INTO "Test" VALUES (1985,2230,'PUT','/favicon.ico',NULL,NULL,NULL,'405',NULL,NULL);
+INSERT INTO "Test" VALUES (1986,2825,'PUT','/Webcard',NULL,NULL,NULL,'405',NULL,NULL);
+INSERT INTO "Test" VALUES (1987,4455,'GET','/Webcard',NULL,NULL,NULL,'200',NULL,NULL);
+INSERT INTO "Test" VALUES (1988,19345,'GET','/Webcard',NULL,NULL,'{"email":"user@myclub.foo","password":"user1234" }','200',NULL,NULL);
 COMMIT;

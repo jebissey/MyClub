@@ -110,6 +110,7 @@ class Routes
         $designDataHelper = new DesignDataHelper($application);
         $eventDataHelper = new EventDataHelper($application);
         $groupDataHelper = new GroupDataHelper($application);
+        $logDataHelper = new LogDataHelper($application);
         $messageDataHelper = new MessageDataHelper($application);
         $needDataHelper = new NeedDataHelper($application);
         $participantDataHelper = new ParticipantDataHelper($application);
@@ -142,7 +143,7 @@ class Routes
             new GenericDataHelper($application),
             new GroupDataHelper($application, $groupDataHelper),
             new ImportDataHelper($application),
-            new LogDataHelper($application),
+            $logDataHelper,
             $messageDataHelper,
             $needDataHelper,
             new News($newsProviders),
@@ -165,6 +166,7 @@ class Routes
             $eventDataHelper,
             new EventNeedDataHelper($application),
             new EventService($eventDataHelper),
+            $logDataHelper,
             $messageDataHelper,
             $needDataHelper,
             new NeedTypeDataHelper($application),
@@ -187,20 +189,18 @@ class Routes
             );
         }
 
-        $icons = [
-            '/favicon.ico' => ['favicon.ico', 'image/x-icon'],
-            '/Feed-icon.svg' => ['Feed-icon.svg', 'image/svg+xml'],
+        $files = [
             '/apple-touch-icon.png' => ['my-club-180.png', 'image/png'],
             '/apple-touch-icon-120x120.png' => ['my-club-120.png', 'image/png'],
             '/apple-touch-icon-180x180.png' => ['my-club-180.png', 'image/png'],
             '/apple-touch-icon-precomposed.png' => ['my-club-180.png', 'image/png'],
+            '/favicon.ico' => ['favicon.ico', 'image/x-icon'],
+            '/Feed-icon.svg' => ['Feed-icon.svg', 'image/svg+xml'],
+            '/webCard' => ['businessCard.html', 'text/html; charset=UTF-8'],
         ];
-        foreach ($icons as $route => [$file, $type]) {
+        foreach ($files as $route => [$file, $type]) {
             $this->flight->route($route, fn() => $this->serveFile($errorManager, $file, $type));
         }
-        $this->flight->route('/webCard', function () use ($errorManager) {
-            $this->serveFile($errorManager, 'businessCard.html', 'text/html; charset=UTF-8');
-        });
         $this->flight->route('/*', function () use ($errorManager) {
             $errorManager->raise(ApplicationError::PageNotFound, "Page not found in file " . __FILE__ . ' at line ' . __LINE__);
         });
@@ -288,8 +288,11 @@ class Routes
 
     private function serveFile(ErrorManager $errorManager, string $filename, string $contentType = 'image/png'): void
     {
+        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+            $errorManager->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
+        }
         $filename = basename($filename);
-        $path = __DIR__ . "/app/images/$filename";
+        $path = __DIR__ . "/../images/$filename";
         if (file_exists($path)) {
             $response = Flight::response();
             $response->header('Content-Length', (string)filesize($path));

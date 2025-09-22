@@ -188,7 +188,7 @@ class ArticleController extends TableController
             }
             $schema = [
                 'title' => FilterInputRule::HtmlSafeName->value,
-                'content' => FilterInputRule::Content->value,
+                'content' => FilterInputRule::Html->value,
                 'published' => FilterInputRule::Int->value,
                 'idGroup' => FilterInputRule::Int->value,
                 'membersOnly' => FilterInputRule::Int->value,
@@ -233,8 +233,6 @@ class ArticleController extends TableController
                 'isSpotlightActive' => FilterInputRule::Bool->value,
                 'spotlightedUntil' => FilterInputRule::DateTime->value,
                 'published' => FilterInputRule::Int->value,
-                'idGroup' => FilterInputRule::Content->value,
-                'membersOnly' => FilterInputRule::Int->value,
             ];
             $input = WebApp::filterInput($schema, $this->flight->request()->data->getData());
             $isSpotlightActive = $input['isSpotlightActive'] ?? false;
@@ -243,11 +241,7 @@ class ArticleController extends TableController
                 $this->articleDataHelper->setSpotlightArticle($id, $spotlightedUntil);
             }
             $result = $this->dataHelper->set('Article', [
-                'Title'          => '',
-                'Content'        => '',
                 'PublishedBy'    => $input['published'] ?? 0  == 1 ? $this->application->getConnectedUser()->person->Id : null,
-                'IdGroup'        => $input['idGroup'] === '' ? null : ($input['idGroup'] ?? null),
-                'OnlyForMembers' => $input['membersOnly'],
                 'LastUpdate'     => date('Y-m-d H:i:s')
             ], ['Id' => $id]);
             if ($result) {
