@@ -7,7 +7,7 @@ use app\enums\FilterInputRule;
 
 class WebApp
 {
-    public const MYCLUB_WEBAPP = "https://myclub.alwaysdata.net";
+    public const MYCLUB_WEBAPP = "https://myclub.alwaysdata.net/";
 
     public function buildUrl($newParams): string
     {

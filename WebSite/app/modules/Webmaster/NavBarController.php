@@ -22,7 +22,7 @@ class NavBarController extends AbstractController
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isNavbarDesigner())) {
             $this->render('Webmaster/views/navbar.latte', Params::getAll([
-                'navItems' => $this->getNavItems($this->application->getConnectedUser()->person),
+                'navItems' => $this->getNavItems($this->application->getConnectedUser()->person, true),
                 'groups' => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
                 'availableRoutes' => $this->getAvailableRoutes(),
                 'isMyclubWebSite' => WebApp::isMyClubWebSite(),

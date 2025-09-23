@@ -3,7 +3,7 @@
 {block title}Dernières visites{/block}
 
 {block content}
-    <div class="d-flex">
+    <div class="container-fluid">
         <div class="container mt-4 d-flex justify-content-between align-items-center mb-3">
             <h1>
                 Dernières visites
@@ -13,69 +13,66 @@
                 <span class="badge bg-secondary fs-6">{$totalActiveUsers} utilisateurs actifs</span>
             </div>
         </div>
-
-        <div class="d-flex">
-            <div class="table-responsive">
-                <table class="table table-hover">
-                    <thead class="table-dark">
-                        <tr>
-                            <th>Membre</th>
-                            <th>Email</th>
-                            <th>Dernière page</th>
-                            <th>Dernière activité</th>
-                            <th>OS</th>
-                            <th>Navigateur</th>
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Membre</th>
+                        <th>Email</th>
+                        <th>Dernière page</th>
+                        <th>Dernière activité</th>
+                        <th>OS</th>
+                        <th>Navigateur</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {foreach $lastVisits as $visit}
+                        <tr class="visit-row" data-person-id="{$visit->PersonId}">
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <strong>{$visit->FullName}</strong>
+                                </div>
+                            </td>
+                            <td>
+                                <small class="text-muted">{$visit->Email}</small>
+                            </td>
+                            <td>
+                                <code class="bg-light px-2 py-1 rounded">{$visit->LastPage}</code>
+                            </td>
+                            <td>
+                                <div>
+                                    <span class="fw-bold">{$visit->TimeAgo}</span>
+                                    <br>
+                                    <small class="text-muted">{$visit->FormattedDate}</small>
+                                </div>
+                            </td>
+                            <td>
+                                {if $visit->Os}
+                                    <span class="badge bg-light text-dark">{$visit->Os}</span>
+                                {else}
+                                    <span class="text-muted">-</span>
+                                {/if}
+                            </td>
+                            <td>
+                                {if $visit->Browser}
+                                    <span class="badge bg-light text-dark">{$visit->Browser}</span>
+                                {else}
+                                    <span class="text-muted">-</span>
+                                {/if}
+                            </td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        {foreach $lastVisits as $visit}
-                            <tr class="visit-row" data-person-id="{$visit->PersonId}">
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <strong>{$visit->FullName}</strong>
-                                    </div>
-                                </td>
-                                <td>
-                                    <small class="text-muted">{$visit->Email}</small>
-                                </td>
-                                <td>
-                                    <code class="bg-light px-2 py-1 rounded">{$visit->LastPage}</code>
-                                </td>
-                                <td>
-                                    <div>
-                                        <span class="fw-bold">{$visit->TimeAgo}</span>
-                                        <br>
-                                        <small class="text-muted">{$visit->FormattedDate}</small>
-                                    </div>
-                                </td>
-                                <td>
-                                    {if $visit->Os}
-                                        <span class="badge bg-light text-dark">{$visit->Os}</span>
-                                    {else}
-                                        <span class="text-muted">-</span>
-                                    {/if}
-                                </td>
-                                <td>
-                                    {if $visit->Browser}
-                                        <span class="badge bg-light text-dark">{$visit->Browser}</span>
-                                    {else}
-                                        <span class="text-muted">-</span>
-                                    {/if}
-                                </td>
-                            </tr>
-                        {/foreach}
-                    </tbody>
-                </table>
-                
-                {if empty($lastVisits)}
-                    <div class="text-center py-4">
-                        <div class="text-muted">
-                            <i class="fas fa-users fa-3x mb-3"></i>
-                            <p>Aucune activité récente trouvée.</p>
-                        </div>
+                    {/foreach}
+                </tbody>
+            </table>
+            
+            {if empty($lastVisits)}
+                <div class="text-center py-4">
+                    <div class="text-muted">
+                        <i class="fas fa-users fa-3x mb-3"></i>
+                        <p>Aucune activité récente trouvée.</p>
                     </div>
-                {/if}
-            </div>
+                </div>
+            {/if}
         </div>
     </div>
 {/block}

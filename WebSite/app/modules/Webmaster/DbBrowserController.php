@@ -57,6 +57,7 @@ class DbBrowserController extends AbstractController
                 'table' => $table,
                 'columns' => $columns,
                 'columnTypes' => $columnTypes,
+                'isMyclubWebSite' => WebApp::isMyClubWebSite(),
                 'page' => $this->application->getConnectedUser()->getPage()
             ]));
         }

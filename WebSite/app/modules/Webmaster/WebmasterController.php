@@ -139,7 +139,7 @@ class WebmasterController extends AbstractController
     #region Private methods
     private function getLastVersion(): array
     {
-        $url = WebApp::MYCLUB_WEBAPP . '/api/lastVersion?cv=' . Application::VERSION;
+        $url = WebApp::MYCLUB_WEBAPP . 'api/lastVersion?cv=' . Application::VERSION;
 
         $ch = curl_init($url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
