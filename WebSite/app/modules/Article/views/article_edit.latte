@@ -7,6 +7,9 @@
 {/block}
 
 {block head}
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+    <link href="/app/css/quill.css" rel="stylesheet">
     <link href="/app/css/carousel.css" rel="stylesheet">
 {/block}
 
@@ -35,13 +38,13 @@
                     </small>
                 </div>
                 <div class="d-flex justify-content-end">
-                    <button class="btn btn-primary btn-sm bi bi-arrow-left-circle fs-4" onclick="history.back()"></button>
-                {if $canReadPool}
-                    <button id="show-survey-results-btn" class="btn btn-info ms-2" onclick="window.location.href='/survey/results/{$article->Id}'">Voir résultats sondage</button>
-                {/if}
-                {if $hasSurvey && $userConnected && isset($article->PublishedBy) && $article->PublishedBy !== null && $hasSurvey->ClosingDate >= date('Y-m-d')}
-                    <button id="reply-survey-btn" class="btn btn-success ms-2">Répondre au sondage</button>
-                {/if}
+                    <a href="/emails/article/{$id}" class="btn btn-warning ms-2">Prévenir les abonnés</a>
+                    <button id="edit-toggle-btn" class="btn btn-primary ms-2">Modifier l'article</button>
+                    {if $hasSurvey}
+                    <a href="/survey/add/{$id}" class="btn btn-success ms-2">Modifier le sondage</a>
+                    {else}
+                    <a href="/survey/add/{$id}" class="btn btn-success ms-2">Ajouter un sondage</a>
+                    {/if}
                     <a href="/articles" class="btn btn-secondary ms-2">Liste des articles</a>
                 </div>
             </div>
@@ -49,7 +52,8 @@
             <div class="card-body">
                 <div id="content-display">
                     {$article->Content|noescape}
-                </div>                
+                </div>
+                
                 {if !empty($carouselItems)}
                 <div class="mt-4">
                     <h4>Galerie</h4>
@@ -77,6 +81,50 @@
                     </div>
                 </div>
                 {/if}
+
+                <div id="editor-container">
+                    <form id="edit-form" method="post">
+                        <div class="d-flex align-items-center gap-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="published-input" name="published" value="1" 
+                                    {if isset($article->PublishedBy) && $article->PublishedBy !== null}checked{/if}>
+                                <label class="form-check-label" for="published-input">
+                                    Publier
+                                </label>
+                            </div>
+
+                            <div class="d-flex align-items-center gap-2">
+                                <label for="group-select" class="form-label mb-0 text-nowrap">Groupe associé</label>
+                                <select class="form-select" id="group-select" name="idGroup">
+                                    <option value="">-- Aucun groupe --</option>
+                                    {foreach $groups as $group}
+                                    <option value="{$group->Id}" {if isset($article->IdGroup) && $article->IdGroup == $group->Id}selected{/if}>{$group->Name}</option>
+                                    {/foreach}
+                                </select>
+                            </div>
+                            <div class="d-flex align-items-center gap-2 mt-2">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="members-only-checkbox" name="membersOnly" value="1" {if isset($article->OnlyForMembers) && $article->OnlyForMembers}checked{/if}>
+                                    <label class="form-check-label" for="members-only-checkbox">Pour les membres du club uniquement</label>
+                                </div>
+                            </div>
+                            <div class="d-flex gap-2 ms-auto">
+                                <button id="save-btn" class="btn btn-success" style="display: none;">Enregistrer</button>
+                                <button id="cancel-btn" class="btn btn-secondary" style="display: none;">Annuler</button>
+                            </div>
+                        </div>
+                        <hr class="w-100 my-3">
+                        <div class="d-flex gap-2 align-items-end">
+                            <label for="title-input" class="form-label">Titre</label>
+                            <input type="text" class="form-control" id="title-input" name="title" value="{$article->Title}">
+                        </div>
+                        <div class="mb-3">
+                            <label for="quill-editor" class="form-label">Contenu</label>
+                            <div id="quill-editor"></div>
+                            <input type="hidden" name="content" id="content-input">
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
@@ -97,10 +145,11 @@
 {/block}
 
 {block scripts}
+    <script src="/app/js/quill/script.js"></script>
     <script>
         const ARTICLE_ID = {$article->Id};
         const IS_EDITOR = {$isEditor};
     </script>
-    <script src="/app/modules/Article/js/articleShow.js"></script>
+    <script src="/app/modules/Article/js/articleEdit.js"></script>
     <script src="/app/modules/Article/js/carousel.js"></script>
 {/block}

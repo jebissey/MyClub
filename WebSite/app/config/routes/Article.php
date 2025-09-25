@@ -19,9 +19,10 @@ class Article implements RouteInterface
         $articleController = fn() => $this->controllerFactory->makeArticleController();
 
         $this->routes[] = new Route('GET  /article/create', $articleController, 'create');
+        $this->routes[] = new Route('GET  /article/edit/@id:[0-9]+', $articleController, 'edit');
+        $this->routes[] = new Route('POST /article/edit/@id:[0-9]+', $articleController, 'update');
         $this->routes[] = new Route('POST /article/delete/@id:[0-9]+', $articleController, 'delete');
         $this->routes[] = new Route('GET  /article/@id:[0-9]+', $articleController, 'show');
-        $this->routes[] = new Route('POST /article/@id:[0-9]+', $articleController, 'update');
         $this->routes[] = new Route('GET  /articles', $articleController, 'index');
         $this->routes[] = new Route('GET  /articles/crosstab', $articleController, 'showArticleCrosstab');
         $this->routes[] = new Route('GET  /emails/article/@id:[0-9]+', $articleController, 'fetchEmailsForArticle');

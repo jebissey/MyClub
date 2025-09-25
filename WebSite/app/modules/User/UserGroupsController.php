@@ -38,7 +38,7 @@ class UserGroupsController extends AbstractController
             'groups' => $currentGroups,
             'layout' => $this->getLayout(),
             'navItems' => $this->getNavItems($connectedUser->person ?? false),
-            'page' => $this->application->getConnectedUser()->getPage(),
+            'page' => $this->application->getConnectedUser()->getPage(1),
         ]));
     }
 

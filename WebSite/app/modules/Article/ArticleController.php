@@ -23,7 +23,6 @@ use app\services\EmailService;
 
 class ArticleController extends TableController
 {
-
     public function __construct(
         Application $application,
         private ArticleDataHelper $articleDataHelper,
@@ -36,7 +35,7 @@ class ArticleController extends TableController
         parent::__construct($application, $genericDataHelper);
     }
 
-    public function home(): void
+    public function create(): void
     {
         if (!($this->application->getConnectedUser()->isRedactor() ?? false)) {
             $this->raiseforbidden(__FILE__, __LINE__);
@@ -46,10 +45,107 @@ class ArticleController extends TableController
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
-        $_SESSION['navbar'] = 'redactor';
-        $this->render('Webmaster/views/redactor.latte', Params::getAll([
-            'page' => $this->application->getConnectedUser()->getPage(),
+        $id = $this->dataHelper->set('Article', [
+            'Title'     => '',
+            'Content'   => '',
+            'CreatedBy' => $this->application->getConnectedUser()->person->Id ?? throw new IntegrityException('Fatal error in file ' . __FILE__ . ' at line ' . __LINE__)
+        ]);
+        $this->redirect('/article/edit/' . $id);
+    }
+
+    public function delete(int $id): void
+    {
+        if (!($this->application->getConnectedUser()->isRedactor() || false)) {
+            $this->raiseforbidden(__FILE__, __LINE__);
+            return;
+        }
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+            return;
+        }
+        $article = $this->dataHelper->get('Article', ['Id' => $id], 'CreatedBy');
+        if (!$article) {
+            $this->raiseBadRequest("Article {$id} doesn't exist", __FILE__, __LINE__);
+            return;
+        }
+        if ($this->application->getConnectedUser()->person->Id != $article->CreatedBy) {
+            $this->raiseforbidden(__FILE__, __LINE__);
+            return;
+        }
+        $this->dataHelper->delete('Article', ['Id' => $id]);
+        $this->redirect('/articles');
+    }
+
+    public function edit(int $id): void
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+            return;
+        }
+        $article = $this->dataHelper->get('Article', ['Id' => $id], 'CreatedBy');
+        if (!$article) {
+            $this->raiseBadRequest("Article {$id} doesn't exist", __FILE__, __LINE__);
+            return;
+        }
+        $connectedUser = $this->application->getConnectedUser();
+        if ($connectedUser->person->Id != $article->CreatedBy) {
+            $this->raiseforbidden(__FILE__, __LINE__);
+            return;
+        }
+        $article = $this->articleDataHelper->getLatestArticle([$id]);
+
+        $this->render('Article/views/article_edit.latte', Params::getAll([
+            'article' => $article,
+            'groups' => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
+            'hasSurvey' => $this->dataHelper->get('Survey', ['IdArticle' => $id], 'ClosingDate'),
+            'id' => $id,
+            'userConnected' => $connectedUser->person ?? false,
+            'navItems' => $this->getNavItems($connectedUser->person ?? false),
+            'publishedBy' => $article->PublishedBy != $article->CreatedBy ? $this->personDataHelper->getPublisher($article->PublishedBy) : '',
+            'carouselItems' => $this->dataHelper->gets('Carousel', ['IdArticle' => $id]),
+            'page' => $connectedUser->getPage(),
+            'isEditor' => $connectedUser->isEditor(),
         ]));
+    }
+
+    public function fetchEmailsForArticle(int $idArticle): void
+    {
+        if (!($this->application->getConnectedUser()->isRedactor() ?? false)) {
+            $this->raiseforbidden(__FILE__, __LINE__);
+            return;
+        }
+        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+            return;
+        }
+        $article = $this->dataHelper->get('Article', ['Id' => $idArticle], 'CreatedBy');
+        if (!$article) {
+            $this->raiseBadRequest("Article {$idArticle} doesn't exist", __FILE__, __LINE__);
+            return;
+        }
+        $articleCreatorEmail = $this->dataHelper->get('Person', ['Id' => $article->CreatedBy], 'Email')->Email;
+        if (!$articleCreatorEmail) {
+            $this->raiseBadRequest("Unknown author of article {$idArticle}", __FILE__, __LINE__);
+            return;
+        }
+        $filteredEmails = $this->personDataHelper->getPersonWantedToBeAlerted($idArticle);
+        $root = Application::$root;
+        $articleLink = $root . '/article/' . $idArticle;
+        $unsubscribeLink = $root . '/user/preferences';
+        $emailTitle = 'BNW - Un nouvel article est disponible';
+        $message = "Conformément à vos souhaits, ce message vous signale la présence d'un nouvel article" . "\n\n" . $articleLink
+            . "\n\n Pour ne plus recevoir ce type de message vous pouvez mettre à jour vos préférences" . $unsubscribeLink;
+        EmailService::send(
+            $articleCreatorEmail,
+            $articleCreatorEmail,
+            $emailTitle,
+            $message,
+            null,
+            $filteredEmails,
+            false
+        );
+        $_SESSION['success'] = "Un courriel a été envoyé aux abonnés";
+        $this->redirect('/article/' . $idArticle);
     }
 
     public function help(): void
@@ -68,7 +164,23 @@ class ArticleController extends TableController
         ]);
     }
 
-    public function index()
+    public function home(): void
+    {
+        if (!($this->application->getConnectedUser()->isRedactor() ?? false)) {
+            $this->raiseforbidden(__FILE__, __LINE__);
+            return;
+        }
+        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+            return;
+        }
+        $_SESSION['navbar'] = 'redactor';
+        $this->render('Webmaster/views/redactor.latte', Params::getAll([
+            'page' => $this->application->getConnectedUser()->getPage(),
+        ]));
+    }
+
+    public function index(): void
     {
         $connectedUser = $this->application->getConnectedUser();
         $schema = [
@@ -105,7 +217,7 @@ class ArticleController extends TableController
         if ($connectedUser->isEditor()) {
             $columns[] = ['field' => 'Published', 'label' => 'Publié'];
         }
-        $query = $this->articleTableDataHelper->getQuery($connectedUser);
+        $query = $this->articleTableDataHelper->getQuery($connectedUser, $this->articleDataHelper->getSpotlightArticle()['articleId'] ?? -1);
         $data = $this->prepareTableData($query, $filterValues, (int)($this->flight->request()->query['tablePage'] ?? 0));
         $this->render('Article/views/articles_index.latte', Params::getAll([
             'articles' => $data['items'],
@@ -121,100 +233,6 @@ class ArticleController extends TableController
             'navItems' => $this->getNavItems($connectedUser->person ?? false),
             'page' => $connectedUser->getPage(),
         ]));
-    }
-
-    public function show(int $id): void
-    {
-        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
-            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
-        $connectedUser = $this->application->getConnectedUser();
-        try {
-            $article = $this->authorizationDataHelper->getArticle($id, $connectedUser);
-            if (!$article) {
-                if (!($connectedUser->person ?? false)) $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Il faut être connecté pour pouvoir consulter cet article', 5000);
-                return;
-            }
-            if ($article) {
-                $articleIds = $this->articleDataHelper->getArticleIdsBasedOnAccess($connectedUser->person?->Email ?? '');
-                $chosenArticle = $this->articleDataHelper->getLatestArticle([$id]);
-                $canEdit = false;
-                if (($connectedUser->person ?? false) && $chosenArticle) {
-                    $canEdit = $connectedUser->person->Id == $chosenArticle->CreatedBy;
-                }
-                $messages = [];
-                if (isset($_SESSION['error'])) {
-                    $messages['error'] = $_SESSION['error'];
-                    $_SESSION['error'] = null;
-                }
-                if (isset($_SESSION['success'])) {
-                    $messages['success'] = $_SESSION['success'];
-                    $_SESSION['success'] = null;
-                }
-
-                $this->render('Article/views/article_show.latte', Params::getAll([
-                    'chosenArticle' => $chosenArticle,
-                    'latestArticles' => $this->articleDataHelper->getLatestArticles_($articleIds),
-                    'canEdit' => $canEdit,
-                    'groups' => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
-                    'hasSurvey' => $this->dataHelper->get('Survey', ['IdArticle' => $id], 'ClosingDate'),
-                    'id' => $id,
-                    'userConnected' => $connectedUser->person ?? false,
-                    'navItems' => $this->getNavItems($connectedUser->person ?? false),
-                    'publishedBy' => $chosenArticle->PublishedBy && $chosenArticle->PublishedBy != $chosenArticle->CreatedBy ? $this->personDataHelper->getPublisher($chosenArticle->PublishedBy) : '',
-                    'canReadPool' => $this->authorizationDataHelper->canPersonReadSurveyResults($chosenArticle, $connectedUser),
-                    'carouselItems' => $this->dataHelper->gets('Carousel', ['IdArticle' => $id]),
-                    'message' => $messages,
-                    'page' => $connectedUser->getPage(),
-                ]));
-            } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
-        } catch (QueryException $e) {
-            $this->raiseBadRequest($e->getMessage(),  __FILE__, __LINE__);
-        }
-    }
-
-    public function update(int $id): void
-    {
-        if (!($this->application->getConnectedUser()->isRedactor() || false)) {
-            $this->raiseforbidden(__FILE__, __LINE__);
-            return;
-        }
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $article = $this->articleDataHelper->getLatestArticle([$id]);
-            if (!$article || ($this->application->getConnectedUser()->person?->Id ?? 0) != $article->CreatedBy) {
-                $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
-                return;
-            }
-            $schema = [
-                'title' => FilterInputRule::HtmlSafeName->value,
-                'content' => FilterInputRule::Html->value,
-                'published' => FilterInputRule::Int->value,
-                'idGroup' => FilterInputRule::Int->value,
-                'membersOnly' => FilterInputRule::Int->value,
-            ];
-            $input = WebApp::filterInput($schema, $this->flight->request()->data->getData());
-            $title = $input['title'] ?? '???';
-            $content = $input['content'] ?? '???';
-            if (empty($title) || empty($content)) {
-                $_SESSION['error'] = "Le titre et le contenu sont obligatoires";
-                $this->redirect('/article/' . $id);
-                return;
-            }
-            $result = $this->dataHelper->set('Article', [
-                'Title'          => $title,
-                'Content'        => $content,
-                'PublishedBy'    => $input['published'] == 1 ? $this->application->getConnectedUser()->person->Id : null,
-                'IdGroup'        => $input['idGroup'],
-                'OnlyForMembers' => $input['membersOnly'] ?? 1,
-                'LastUpdate'     => date('Y-m-d H:i:s')
-            ], ['Id' => $id]);
-            if ($result) {
-                $_SESSION['success'] = "L'article a été mis à jour avec succès";
-                $this->backup->save();
-            } else $_SESSION['error'] = "Une erreur est survenue lors de la mise à jour de l'article";
-            $this->redirect('/article/' . $id);
-        } else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
     public function publish(int $id): void
@@ -257,48 +275,48 @@ class ArticleController extends TableController
         } else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
     }
 
-    public function create()
+    public function show(int $id): void
     {
-        if (!($this->application->getConnectedUser()->isRedactor() ?? false)) {
-            $this->raiseforbidden(__FILE__, __LINE__);
-            return;
-        }
         if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
-        $id = $this->dataHelper->set('Article', [
-            'Title'     => '',
-            'Content'   => '',
-            'CreatedBy' => $this->application->getConnectedUser()->person->Id ?? throw new IntegrityException('Fatal error in file ' . __FILE__ . ' at line ' . __LINE__)
-        ]);
-        $this->redirect('/article/' . $id);
-    }
-
-    public function delete(int $id)
-    {
-        if (!($this->application->getConnectedUser()->isRedactor() || false)) {
-            $this->raiseforbidden(__FILE__, __LINE__);
-            return;
-        }
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
-        $article = $this->dataHelper->get('Article', ['Id' => $id], 'CreatedBy');
+        $article = $this->dataHelper->get('Article', ['Id' => $id], 'Id, OnlyForMembers');
         if (!$article) {
             $this->raiseBadRequest("Article {$id} doesn't exist", __FILE__, __LINE__);
             return;
         }
-        if ($this->application->getConnectedUser()->person->Id != $article->CreatedBy) {
-            $this->raiseforbidden(__FILE__, __LINE__);
+        $connectedUser = $this->application->getConnectedUser();
+        if ($article->OnlyForMembers == 1 && $connectedUser->person == null) {
+            $this->raiseBadRequest("Il faut être connecté pour pouvoir consulter cet article", __FILE__, __LINE__);
             return;
         }
-        $this->dataHelper->delete('Article', ['Id' => $id]);
-        $this->redirect('/articles');
+        try {
+            $article = $this->authorizationDataHelper->getArticle($id, $connectedUser);
+            if (!$article) {
+                $this->raiseforbidden(__FILE__, __LINE__);
+                return;
+            }
+            $article = $this->articleDataHelper->getLatestArticle([$id]);
+
+            $this->render('Article/views/article_show.latte', Params::getAll([
+                'article' => $article,
+                'groups' => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
+                'hasSurvey' => $this->dataHelper->get('Survey', ['IdArticle' => $id], 'ClosingDate'),
+                'id' => $id,
+                'userConnected' => $connectedUser->person ?? false,
+                'navItems' => $this->getNavItems($connectedUser->person ?? false),
+                'publishedBy' => $article->PublishedBy && $article->PublishedBy != $article->CreatedBy ? $this->personDataHelper->getPublisher($article->PublishedBy) : '',
+                'canReadPool' => $this->authorizationDataHelper->canPersonReadSurveyResults($article, $connectedUser),
+                'carouselItems' => $this->dataHelper->gets('Carousel', ['IdArticle' => $id]),
+                'page' => $connectedUser->getPage(),
+            ]));
+        } catch (QueryException $e) {
+            $this->raiseBadRequest($e->getMessage(),  __FILE__, __LINE__);
+        }
     }
 
-    public function showArticleCrosstab()
+    public function showArticleCrosstab(): void
     {
         if (!($this->application->getConnectedUser()->isRedactor() || false)) {
             $this->raiseforbidden(__FILE__, __LINE__);
@@ -324,43 +342,48 @@ class ArticleController extends TableController
         ]));
     }
 
-    public function fetchEmailsForArticle(int $idArticle): void
+    public function update(int $id): void
     {
-        if (!($this->application->getConnectedUser()->isRedactor() ?? false)) {
+        if (!($this->application->getConnectedUser()->isRedactor() || false)) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
         }
-        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
-        $article = $this->dataHelper->get('Article', ['Id' => $idArticle], 'CreatedBy');
-        if (!$article) {
-            $this->raiseBadRequest("Article {$idArticle} doesn't exist", __FILE__, __LINE__);
+        $article = $this->articleDataHelper->getLatestArticle([$id]);
+        if (!$article || ($this->application->getConnectedUser()->person?->Id ?? 0) != $article->CreatedBy) {
+            $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
             return;
         }
-        $articleCreatorEmail = $this->dataHelper->get('Person', ['Id' => $article->CreatedBy], 'Email')->Email;
-        if (!$articleCreatorEmail) {
-            $this->raiseBadRequest("Unknown author of article {$idArticle}", __FILE__, __LINE__);
+        $schema = [
+            'title' => FilterInputRule::HtmlSafeName->value,
+            'content' => FilterInputRule::Html->value,
+            'published' => FilterInputRule::Int->value,
+            'idGroup' => FilterInputRule::Int->value,
+            'membersOnly' => FilterInputRule::Int->value,
+        ];
+        $input = WebApp::filterInput($schema, $this->flight->request()->data->getData());
+        $title = $input['title'] ?? '???';
+        $content = $input['content'] ?? '???';
+        if (empty($title) || empty($content)) {
+            $_SESSION['error'] = "Le titre et le contenu sont obligatoires";
+            $this->redirect('/article/' . $id);
             return;
         }
-        $filteredEmails = $this->personDataHelper->getPersonWantedToBeAlerted($idArticle);
-        $root = Application::$root;
-        $articleLink = $root . '/article/' . $idArticle;
-        $unsubscribeLink = $root . '/user/preferences';
-        $emailTitle = 'BNW - Un nouvel article est disponible';
-        $message = "Conformément à vos souhaits, ce message vous signale la présence d'un nouvel article" . "\n\n" . $articleLink
-            . "\n\n Pour ne plus recevoir ce type de message vous pouvez mettre à jour vos préférences" . $unsubscribeLink;
-        EmailService::send(
-            $articleCreatorEmail,
-            $articleCreatorEmail,
-            $emailTitle,
-            $message,
-            null,
-            $filteredEmails,
-            false
-        );
-        $_SESSION['success'] = "Un courriel a été envoyé aux abonnés";
-        $this->redirect('/article/' . $idArticle);
+        $result = $this->dataHelper->set('Article', [
+            'Title'          => $title,
+            'Content'        => $content,
+            'PublishedBy'    => $input['published'] == 1 ? $this->application->getConnectedUser()->person->Id : null,
+            'IdGroup'        => $input['idGroup'],
+            'OnlyForMembers' => $input['membersOnly'] ?? 0,
+            'LastUpdate'     => date('Y-m-d H:i:s')
+        ], ['Id' => $id]);
+        if ($result) {
+            $_SESSION['success'] = "L'article a été mis à jour avec succès";
+            $this->backup->save();
+        } else $_SESSION['error'] = "Une erreur est survenue lors de la mise à jour de l'article";
+        $this->redirect('/article/' . $id);
     }
 }

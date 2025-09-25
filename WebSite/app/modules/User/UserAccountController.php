@@ -41,7 +41,7 @@ class UserAccountController extends AbstractController
             'isSelfEdit' => true,
             'layout' => $this->getLayout(),
             'navItems' => $this->getNavItems($connectedUser->person ?? false),
-            'page' => $this->application->getConnectedUser()->getPage(),
+            'page' => $this->application->getConnectedUser()->getPage(1),
         ]));
     }
 

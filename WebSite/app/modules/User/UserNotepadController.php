@@ -32,7 +32,7 @@ class UserNotepadController extends AbstractController
         $this->render('User/views/user_notepad.latte', Params::getAll([
             'notepad' => $person->Notepad,
             'navItems' => $this->getNavItems($person),
-            'page' => $this->application->getConnectedUser()->getPage(),
+            'page' => $this->application->getConnectedUser()->getPage(1),
         ]));
     }
 

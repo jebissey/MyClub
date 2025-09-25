@@ -56,33 +56,6 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
         return $totals;
     }
 
-    public function isSpotlightActive(): bool
-    {
-        $spotlight = $this->getSpotlightArticle();
-        if ($spotlight === null) {
-            return false;
-        }
-        $now = date('Y-m-d H:i:s');
-        $spotlightUntil = $spotlight['spotlightUntil'];
-        return strtotime($now) < strtotime($spotlightUntil);
-    }
-
-    public function getSpotlightArticle()
-    {
-        $spotlightArticleJson = $this->get('Settings', ['Name' => 'SpotlightArticle'], 'Value')->Value ?? '';
-        if ($spotlightArticleJson === null) return null;
-        return json_decode($spotlightArticleJson, true);
-    }
-
-    public function setSpotlightArticle($articleId, $spotlightUntil)
-    {
-        $data = [
-            'articleId' => $articleId,
-            'spotlightUntil' => $spotlightUntil
-        ];
-        $this->set('Setting', ['Name' => 'SpotlightArticle'], ['Value' => json_encode($data)]);
-    }
-
     public function getArticleIdsBasedOnAccess(?string $userEmail): array
     {
         $noGroupArticleIds = $this->getNoGroupArticleIds();
@@ -96,9 +69,48 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
         return array_unique(array_merge($articleIds, $groupArticleIds));
     }
 
-    public function isUserAllowedToReadArticle(string $userEmail, $id)
+    public function getArticlesForAll(): array
     {
-        return in_array($id, $this->getArticleIdsBasedOnAccess($userEmail));
+        $sql = "
+            SELECT Id, Title, LastUpdate
+            FROM Article
+            WHERE IdGroup IS NULL AND OnlyForMembers = 0
+            ORDER BY LastUpdate DESC
+        ";
+        $stmt = $this->pdo->query($sql);
+        return $stmt->fetchAll();
+    }
+
+    public function getArticlesForRss(): array
+    {
+        $sql = "
+            SELECT Article.*
+            FROM Article
+            WHERE Article.PublishedBy IS NOT NULL
+            ORDER BY Article.LastUpdate DESC
+        ";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
+    public function getAuthor(int $articleId): object|false
+    {
+        $sql = "
+            SELECT 
+                CASE 
+                    WHEN Person.NickName != '' 
+                    THEN Person.FirstName || ' ' || Person.LastName || ' (' || Person.NickName || ')' 
+                    ELSE Person.FirstName || ' ' || Person.LastName 
+                END AS PersonName,
+                Article.Title AS ArticleTitle
+            FROM Article
+            JOIN Person ON Article.CreatedBy = Person.Id
+            WHERE Article.Id = :articleId
+        ";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([':articleId' => $articleId]);
+        return $stmt->fetch();
     }
 
     public function getLatestArticle(array $articleIds): ?object
@@ -129,6 +141,14 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
         return $article ?: null;
     }
 
+    public function getLastUpdateArticles(): ?string
+    {
+        $sql = "SELECT MAX(LastUpdate) AS LastMod FROM Article";
+        $stmt = $this->pdo->query($sql);
+        $result = $stmt->fetch();
+        return $result->LastMod ?? null;
+    }
+
     public function getLatestArticles(?string $userEmail = null): array
     {
         $articleIds = $this->getArticleIdsBasedOnAccess($userEmail);
@@ -142,72 +162,6 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
             'latestArticle' => $this->getLatestArticle($articleIds),
             'latestArticles' => $this->getLatestArticles_($articleIds)
         ];
-    }
-
-    public function getWithAuthor(int $id): object|false
-    {
-        $sql = "
-            SELECT a.*, p.FirstName, p.LastName, p.NickName
-            FROM Article a
-            LEFT JOIN Person p ON a.CreatedBy = p.Id
-            WHERE a.Id = :id
-            LIMIT 1
-        ";
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([':id' => $id]);
-        return $stmt->fetch();
-    }
-
-    public function getAuthor(int $articleId): object|false
-    {
-        $sql = "
-            SELECT 
-                CASE 
-                    WHEN Person.NickName != '' 
-                    THEN Person.FirstName || ' ' || Person.LastName || ' (' || Person.NickName || ')' 
-                    ELSE Person.FirstName || ' ' || Person.LastName 
-                END AS PersonName,
-                Article.Title AS ArticleTitle
-            FROM Article
-            JOIN Person ON Article.CreatedBy = Person.Id
-            WHERE Article.Id = :articleId
-        ";
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([':articleId' => $articleId]);
-        return $stmt->fetch();
-    }
-
-    public function getArticlesForRss(): array
-    {
-        $sql = "
-            SELECT Article.*
-            FROM Article
-            WHERE Article.PublishedBy IS NOT NULL
-            ORDER BY Article.LastUpdate DESC
-        ";
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
-    }
-
-    public function getLastUpdateArticles(): ?string
-    {
-        $sql = "SELECT MAX(LastUpdate) AS LastMod FROM Article";
-        $stmt = $this->pdo->query($sql);
-        $result = $stmt->fetch();
-        return $result->LastMod ?? null;
-    }
-
-    public function getArticlesForAll(): array
-    {
-        $sql = "
-            SELECT Id, Title, LastUpdate
-            FROM Article
-            WHERE IdGroup IS NULL AND OnlyForMembers = 0
-            ORDER BY LastUpdate DESC
-        ";
-        $stmt = $this->pdo->query($sql);
-        return $stmt->fetchAll();
     }
 
     public function getNews(ConnectedUser $connectedUser, string $searchFrom): array
@@ -238,25 +192,53 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
         return $news;
     }
 
+    public function getSpotlightArticle(): mixed
+    {
+        $spotlightArticleJson = $this->get('Settings', ['Name' => 'SpotlightArticle'], 'Value')->Value ?? '';
+        if ($spotlightArticleJson === null) return null;
+        return json_decode($spotlightArticleJson, true);
+    }
+
+    public function getWithAuthor(int $id): object|false
+    {
+        $sql = "
+            SELECT a.*, p.FirstName, p.LastName, p.NickName
+            FROM Article a
+            LEFT JOIN Person p ON a.CreatedBy = p.Id
+            WHERE a.Id = :id
+            LIMIT 1
+        ";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([':id' => $id]);
+        return $stmt->fetch();
+    }
+
+    public function isSpotlightActive(): bool
+    {
+        $spotlight = $this->getSpotlightArticle();
+        if ($spotlight === null) {
+            return false;
+        }
+        $now = date('Y-m-d H:i:s');
+        $spotlightUntil = $spotlight['spotlightUntil'];
+        return strtotime($now) < strtotime($spotlightUntil);
+    }
+
+    public function isUserAllowedToReadArticle(string $userEmail, $id)
+    {
+        return in_array($id, $this->getArticleIdsBasedOnAccess($userEmail));
+    }
+
+    public function setSpotlightArticle(int $articleId, string $spotlightUntil): void
+    {
+        $data = [
+            'articleId' => $articleId,
+            'spotlightUntil' => $spotlightUntil
+        ];
+        $this->set('Settings', ['Value' => json_encode($data)], ['Name' => 'SpotlightArticle']);
+    }
+
     #region Private funcions
-    private function getNoGroupArticleIds(): array
-    {
-        $query = $this->pdo->prepare("
-            SELECT Article.Id FROM Article 
-            WHERE Article.publishedBy IS NOT NULL AND Article.IdGroup IS NULL AND Article.OnlyForMembers = 0");
-        $query->execute();
-        return $query->fetchAll(PDO::FETCH_COLUMN);
-    }
-
-    private function getArticleIdsForMembers(): array
-    {
-        $query = $this->pdo->prepare("
-            SELECT Article.Id FROM Article 
-            WHERE Article.publishedBy IS NOT NULL AND Article.IdGroup IS NULL AND Article.OnlyForMembers = 1");
-        $query->execute();
-        return $query->fetchAll(PDO::FETCH_COLUMN);
-    }
-
     private function getArticleIdsByGroups(array $groupIds): array
     {
         if (empty($groupIds)) return [];
@@ -266,6 +248,15 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
             WHERE Article.publishedBy IS NOT NULL
             AND Article.IdGroup IN ($groups)");
         $query->execute($groupIds);
+        return $query->fetchAll(PDO::FETCH_COLUMN);
+    }
+
+    private function getArticleIdsForMembers(): array
+    {
+        $query = $this->pdo->prepare("
+            SELECT Article.Id FROM Article 
+            WHERE Article.publishedBy IS NOT NULL AND Article.IdGroup IS NULL AND Article.OnlyForMembers = 1");
+        $query->execute();
         return $query->fetchAll(PDO::FETCH_COLUMN);
     }
 
@@ -290,5 +281,14 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute($params);
         return $stmt->fetchAll() ?: [];
+    }
+
+    private function getNoGroupArticleIds(): array
+    {
+        $query = $this->pdo->prepare("
+            SELECT Article.Id FROM Article 
+            WHERE Article.publishedBy IS NOT NULL AND Article.IdGroup IS NULL AND Article.OnlyForMembers = 0");
+        $query->execute();
+        return $query->fetchAll(PDO::FETCH_COLUMN);
     }
 }

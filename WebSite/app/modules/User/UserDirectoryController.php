@@ -48,7 +48,7 @@ class UserDirectoryController extends AbstractController
             'groups' => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
             'groupCounts' => $groupCounts,
             'selectedGroup' => $selectedGroup,
-            'page' => $this->application->getConnectedUser()->getPage(),
+            'page' => $this->application->getConnectedUser()->getPage(1),
         ]));
     }
 

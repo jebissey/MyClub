@@ -15,22 +15,6 @@ class UserDashboardController extends AbstractController
         parent::__construct($application);
     }
 
-    public function user(): void
-    {
-        if ($this->application->getConnectedUser()->person === null) {
-            $this->raiseForbidden(__FILE__, __LINE__);
-            return;
-        }
-        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
-            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
-        $_SESSION['navbar'] = 'user';
-        $this->render('User/views/user.latte', Params::getAll([
-            'page' => ''
-        ]));
-    }
-
     public function help(): void
     {
         if ($this->application->getConnectedUser()->person === null) {
@@ -48,6 +32,22 @@ class UserDashboardController extends AbstractController
             'timer' => 0,
             'previousPage' => true,
             'page' => $this->application->getConnectedUser()->getPage(),
+        ]));
+    }
+
+    public function user(): void
+    {
+        if ($this->application->getConnectedUser()->person === null) {
+            $this->raiseForbidden(__FILE__, __LINE__);
+            return;
+        }
+        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+            return;
+        }
+        $_SESSION['navbar'] = 'user';
+        $this->render('User/views/user.latte', Params::getAll([
+            'page' => ''
         ]));
     }
 }

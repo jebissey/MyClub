@@ -70,13 +70,13 @@ class AuthorizationDataHelper extends Data
         return array_column($rows, 'IdGroup');
     }
 
-    public function isUserInGroup($personEmail, $groupsFilter)
+    public function isUserInGroup($personEmail, $groupsFilter): bool
     {
         return !empty(array_intersect($this->getGroups($groupsFilter), $this->getUserGroups($personEmail)));
     }
 
     #region Private functions
-    private function canReadArticle($article, ConnectedUser $connectedUser)
+    private function canReadArticle($article, ConnectedUser $connectedUser): bool
     {
         if (!$article) return false;
         if (($connectedUser->person  ?? false) && ($article->CreatedBy == $connectedUser->person->Id || $connectedUser->isEditor())) return true;

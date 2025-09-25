@@ -19,7 +19,8 @@ class UserAvailabilitiesController extends AbstractController
 
     public function availabilities(): void
     {
-        if ($this->application->getConnectedUser()->person === null) {
+        $person = $this->application->getConnectedUser()->person;
+        if ($person === null) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
         }
@@ -30,7 +31,7 @@ class UserAvailabilitiesController extends AbstractController
         $currentAvailabilities = json_decode($person->Availabilities ?? '', true);
         $this->render('User/views/user_availabilities.latte', Params::getAll([
             'currentAvailabilities' => $currentAvailabilities,
-            'page' => $this->application->getConnectedUser()->getPage(),
+            'page' => $this->application->getConnectedUser()->getPage(1),
         ]));
     }
 

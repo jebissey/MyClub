@@ -14,7 +14,7 @@ use app\modules\Common\AbstractController;
 
 class UserPreferencesController extends AbstractController
 {
-    public function __construct(Application $application,        private EventTypeDataHelper $eventTypeDataHelper)
+    public function __construct(Application $application, private EventTypeDataHelper $eventTypeDataHelper)
     {
         parent::__construct($application);
     }

@@ -18,14 +18,20 @@
             'actions' => [
                 [
                     'type' => 'link',
-                    'label' => 'Voir',
+                    'label' => '👀',
                     'url' => '/article/{id}',
+                    'class' => 'btn-success'
+                ],
+                [
+                    'type' => 'link',
+                    'label' => '✏️',
+                    'url' => '/article/edit/{id}',
                     'class' => 'btn-info'
                 ],
                 [
                     'type' => 'button',
-                    'label' => 'Gérer la publication',
-                    'class' => 'btn-primary',
+                    'label' => '🌐',
+                    'class' => 'btn-warning',
                     'onClick' => 'showPublish({id})'
                 ]
             ]
@@ -41,8 +47,14 @@
             'actions' => [
                 [
                     'type' => 'link',
-                    'label' => 'Voir',
+                    'label' => '👀',
                     'url' => '/article/{id}',
+                    'class' => 'btn-success'
+                ],
+                [
+                    'type' => 'link',
+                    'label' => '✏️',
+                    'url' => '/article/edit/{id}',
                     'class' => 'btn-info'
                 ]
             ]
@@ -53,13 +65,13 @@
             'actions' => [
                 [
                     'type' => 'link',
-                    'label' => 'Voir',
+                    'label' => '👀',
                     'url' => '/article/{id}',
-                    'class' => 'btn-info'
+                    'class' => 'btn-success'
                 ],
                 [
                     'type' => 'button',
-                    'label' => 'Gérer la publication',
+                    'label' => '🌐',
                     'class' => 'btn-primary',
                     'onClick' => 'showPublish({id})'
                 ]
@@ -71,9 +83,9 @@
             'actions' => [
                 [
                     'type' => 'link',
-                    'label' => 'Voir',
+                    'label' => '👀',
                     'url' => '/article/{id}',
-                    'class' => 'btn-info'
+                    'class' => 'btn-success'
                 ]
             ]
         }
