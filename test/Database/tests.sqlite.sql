@@ -13,8 +13,8 @@ CREATE TABLE IF NOT EXISTS "Test" (
 	PRIMARY KEY("Id")
 );
 INSERT INTO "Test" VALUES (2,NULL,'POST','/article/delete/@id:[0-9]+','{"id":1}','{}',NULL,'403',NULL,NULL);
-INSERT INTO "Test" VALUES (3,NULL,'GET','/article/@id:[0-9]+','{"id":1}',NULL,NULL,'400',NULL,NULL);
-INSERT INTO "Test" VALUES (4,NULL,'POST','/article/@id:[0-9]+','{"id":1}','{"title":"zz"}',NULL,'403',NULL,NULL);
+INSERT INTO "Test" VALUES (3,NULL,'GET','/article/edit/@id:[0-9]+','{"id":1}',NULL,NULL,'400',NULL,NULL);
+INSERT INTO "Test" VALUES (4,NULL,'POST','/article/edit/@id:[0-9]+','{"id":1}','{"title":"zz"}',NULL,'403',NULL,NULL);
 INSERT INTO "Test" VALUES (5,NULL,'GET','/publish/article/@id:[0-9]+','{"id":1}',NULL,NULL,'403',NULL,NULL);
 INSERT INTO "Test" VALUES (6,NULL,'POST','/publish/article/@id:[0-9]+','{"id":1}','{"isSpotlightActive":false}',NULL,'403',NULL,NULL);
 INSERT INTO "Test" VALUES (7,NULL,'GET','/dbbrowser/@table:[A-Za-z0-9_]+','{"table":"zz"}',NULL,NULL,'403',NULL,NULL);
@@ -152,7 +152,7 @@ INSERT INTO "Test" VALUES (195,1910,'PUT','/articles/crosstab',NULL,NULL,NULL,'4
 INSERT INTO "Test" VALUES (196,1920,'PUT','/arwards',NULL,NULL,NULL,'404',NULL,NULL);
 INSERT INTO "Test" VALUES (197,1930,'PUT','/contact',NULL,NULL,NULL,'404',NULL,NULL);
 INSERT INTO "Test" VALUES (198,1940,'PUT','/contact/event/1',NULL,NULL,NULL,'404',NULL,NULL);
-INSERT INTO "Test" VALUES (199,2350,'PUT','/logs/crossTab',NULL,NULL,NULL,'404',NULL,NULL);
+INSERT INTO "Test" VALUES (199,2350,'PUT','/crossTab',NULL,NULL,NULL,'404',NULL,NULL);
 INSERT INTO "Test" VALUES (200,1950,'PUT','/media/1/1/zz',NULL,NULL,NULL,'404',NULL,NULL);
 INSERT INTO "Test" VALUES (201,1960,'PUT','/dbbrowser',NULL,NULL,NULL,'404',NULL,NULL);
 INSERT INTO "Test" VALUES (202,1970,'PUT','/dbbrowser/zz',NULL,NULL,NULL,'404',NULL,NULL);
@@ -293,7 +293,7 @@ INSERT INTO "Test" VALUES (336,3340,'GET','/articles/crosstab',NULL,NULL,'{"emai
 INSERT INTO "Test" VALUES (337,3360,'GET','/arwards',NULL,NULL,'{"email":"webmaster@myclub.foo","password":"admin1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (338,3370,'GET','/contact',NULL,NULL,'{"email":"webmaster@myclub.foo","password":"admin1234" }','200',NULL,NULL);
 INSERT INTO "Test" VALUES (339,3390,'GET','/contact/event/1',NULL,NULL,'{"email":"webmaster@myclub.foo","password":"admin1234" }','200',NULL,NULL);
-INSERT INTO "Test" VALUES (340,3870,'GET','/logs/crossTab',NULL,NULL,'{"email":"webmaster@myclub.foo","password":"admin1234" }','403',NULL,NULL);
+INSERT INTO "Test" VALUES (340,3870,'GET','/crossTab',NULL,NULL,'{"email":"webmaster@myclub.foo","password":"admin1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (341,3400,'GET','/media/1/1/zz',NULL,NULL,'{"email":"webmaster@myclub.foo","password":"admin1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (342,3410,'GET','/dbbrowser',NULL,NULL,'{"email":"webmaster@myclub.foo","password":"admin1234" }','200',NULL,NULL);
 INSERT INTO "Test" VALUES (343,3420,'GET','/dbbrowser/zz',NULL,NULL,'{"email":"webmaster@myclub.foo","password":"admin1234" }','200',NULL,NULL);
@@ -383,7 +383,7 @@ INSERT INTO "Test" VALUES (426,4440,'GET','/visitorInsights/help',NULL,NULL,'{"e
 INSERT INTO "Test" VALUES (427,4450,'GET','/visitors/graf',NULL,NULL,'{"email":"webmaster@myclub.foo","password":"admin1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (428,4460,'GET','/webmaster',NULL,NULL,'{"email":"webmaster@myclub.foo","password":"admin1234" }','200',NULL,NULL);
 INSERT INTO "Test" VALUES (429,4470,'GET','/weekEvents',NULL,NULL,'{"email":"webmaster@myclub.foo","password":"admin1234" }','200',NULL,NULL);
-INSERT INTO "Test" VALUES (430,3290,'POST','/article/1',NULL,NULL,'{"email":"webmaster@myclub.foo","password":"admin1234" }','403',NULL,NULL);
+INSERT INTO "Test" VALUES (430,3290,'POST','/article/edit/1',NULL,NULL,'{"email":"webmaster@myclub.foo","password":"admin1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (431,3350,'POST','/arward',NULL,NULL,'{"email":"webmaster@myclub.foo","password":"admin1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (432,3380,'POST','/contact',NULL,NULL,'{"email":"webmaster@myclub.foo","password":"admin1234" }','200',NULL,NULL);
 INSERT INTO "Test" VALUES (433,3440,'POST','/dbbrowser/zz/create',NULL,NULL,'{"email":"webmaster@myclub.foo","password":"admin1234" }','200',NULL,NULL);
@@ -456,7 +456,7 @@ INSERT INTO "Test" VALUES (499,4970,'GET','/articles/crosstab',NULL,NULL,NULL,'4
 INSERT INTO "Test" VALUES (500,4990,'GET','/arwards',NULL,NULL,NULL,'403',NULL,NULL);
 INSERT INTO "Test" VALUES (501,5000,'GET','/contact',NULL,NULL,NULL,'200',NULL,NULL);
 INSERT INTO "Test" VALUES (502,5020,'GET','/contact/event/1',NULL,NULL,NULL,'200',NULL,NULL);
-INSERT INTO "Test" VALUES (503,5500,'GET','/logs/crossTab',NULL,NULL,NULL,'403',NULL,NULL);
+INSERT INTO "Test" VALUES (503,5500,'GET','/crossTab',NULL,NULL,NULL,'403',NULL,NULL);
 INSERT INTO "Test" VALUES (504,5030,'GET','/media/1/1/zz',NULL,NULL,NULL,'403',NULL,NULL);
 INSERT INTO "Test" VALUES (505,5040,'GET','/dbbrowser',NULL,NULL,NULL,'403',NULL,NULL);
 INSERT INTO "Test" VALUES (506,5050,'GET','/dbbrowser/zz',NULL,NULL,NULL,'403',NULL,NULL);
@@ -546,7 +546,7 @@ INSERT INTO "Test" VALUES (589,6070,'GET','/visitorInsights/help',NULL,NULL,NULL
 INSERT INTO "Test" VALUES (590,6080,'GET','/visitors/graf',NULL,NULL,NULL,'403',NULL,NULL);
 INSERT INTO "Test" VALUES (591,6090,'GET','/webmaster',NULL,NULL,NULL,'403',NULL,NULL);
 INSERT INTO "Test" VALUES (592,6100,'GET','/weekEvents',NULL,NULL,NULL,'200',NULL,NULL);
-INSERT INTO "Test" VALUES (593,4920,'POST','/article/1',NULL,NULL,NULL,'403',NULL,NULL);
+INSERT INTO "Test" VALUES (593,4920,'POST','/article/edit/1',NULL,NULL,NULL,'403',NULL,NULL);
 INSERT INTO "Test" VALUES (594,4980,'POST','/arward',NULL,NULL,NULL,'403',NULL,NULL);
 INSERT INTO "Test" VALUES (595,5010,'POST','/contact',NULL,NULL,NULL,'200',NULL,NULL);
 INSERT INTO "Test" VALUES (596,5070,'POST','/dbbrowser/zz/create',NULL,NULL,NULL,'403',NULL,NULL);
@@ -619,7 +619,7 @@ INSERT INTO "Test" VALUES (662,6620,'GET','/articles/crosstab',NULL,NULL,'{"emai
 INSERT INTO "Test" VALUES (663,6640,'GET','/arwards',NULL,NULL,'{"email":"personManager@myclub.foo","password":"HumanRessources1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (664,6650,'GET','/contact',NULL,NULL,'{"email":"personManager@myclub.foo","password":"HumanRessources1234" }','200',NULL,NULL);
 INSERT INTO "Test" VALUES (665,6670,'GET','/contact/event/1',NULL,NULL,'{"email":"personManager@myclub.foo","password":"HumanRessources1234" }','200',NULL,NULL);
-INSERT INTO "Test" VALUES (666,7150,'GET','/logs/crossTab',NULL,NULL,'{"email":"personManager@myclub.foo","password":"HumanRessources1234" }','403',NULL,NULL);
+INSERT INTO "Test" VALUES (666,7150,'GET','/crossTab',NULL,NULL,'{"email":"personManager@myclub.foo","password":"HumanRessources1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (667,6680,'GET','/media/1/1/zz',NULL,NULL,'{"email":"personManager@myclub.foo","password":"HumanRessources1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (668,6690,'GET','/dbbrowser',NULL,NULL,'{"email":"personManager@myclub.foo","password":"HumanRessources1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (669,6700,'GET','/dbbrowser/zz',NULL,NULL,'{"email":"personManager@myclub.foo","password":"HumanRessources1234" }','403',NULL,NULL);
@@ -709,7 +709,7 @@ INSERT INTO "Test" VALUES (752,7720,'GET','/visitorInsights/help',NULL,NULL,'{"e
 INSERT INTO "Test" VALUES (753,7730,'GET','/visitors/graf',NULL,NULL,'{"email":"personManager@myclub.foo","password":"HumanRessources1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (754,7740,'GET','/webmaster',NULL,NULL,'{"email":"personManager@myclub.foo","password":"HumanRessources1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (755,7750,'GET','/weekEvents',NULL,NULL,'{"email":"personManager@myclub.foo","password":"HumanRessources1234" }','200',NULL,NULL);
-INSERT INTO "Test" VALUES (756,6570,'POST','/article/1',NULL,NULL,'{"email":"personManager@myclub.foo","password":"HumanRessources1234" }','403',NULL,NULL);
+INSERT INTO "Test" VALUES (756,6570,'POST','/article/edit/1',NULL,NULL,'{"email":"personManager@myclub.foo","password":"HumanRessources1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (757,6630,'POST','/arward',NULL,NULL,'{"email":"personManager@myclub.foo","password":"HumanRessources1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (758,6660,'POST','/contact',NULL,NULL,'{"email":"personManager@myclub.foo","password":"HumanRessources1234" }','200',NULL,NULL);
 INSERT INTO "Test" VALUES (759,6720,'POST','/dbbrowser/zz/create',NULL,NULL,'{"email":"personManager@myclub.foo","password":"HumanRessources1234" }','403',NULL,NULL);
@@ -791,7 +791,7 @@ INSERT INTO "Test" VALUES (832,8270,'GET','/articles/crosstab',NULL,NULL,'{"emai
 INSERT INTO "Test" VALUES (833,8290,'GET','/arwards',NULL,NULL,'{"email":"eventManager@myclub.foo","password":"eventManager1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (834,8300,'GET','/contact',NULL,NULL,'{"email":"eventManager@myclub.foo","password":"eventManager1234" }','200',NULL,NULL);
 INSERT INTO "Test" VALUES (835,8320,'GET','/contact/event/1',NULL,NULL,'{"email":"eventManager@myclub.foo","password":"eventManager1234" }','200',NULL,NULL);
-INSERT INTO "Test" VALUES (836,8800,'GET','/logs/crossTab',NULL,NULL,'{"email":"eventManager@myclub.foo","password":"eventManager1234" }','403',NULL,NULL);
+INSERT INTO "Test" VALUES (836,8800,'GET','/crossTab',NULL,NULL,'{"email":"eventManager@myclub.foo","password":"eventManager1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (837,8330,'GET','/media/1/1/zz',NULL,NULL,'{"email":"eventManager@myclub.foo","password":"eventManager1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (838,8340,'GET','/dbbrowser',NULL,NULL,'{"email":"eventManager@myclub.foo","password":"eventManager1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (839,8350,'GET','/dbbrowser/zz',NULL,NULL,'{"email":"eventManager@myclub.foo","password":"eventManager1234" }','403',NULL,NULL);
@@ -881,7 +881,7 @@ INSERT INTO "Test" VALUES (922,9370,'GET','/visitorInsights/help',NULL,NULL,'{"e
 INSERT INTO "Test" VALUES (923,9380,'GET','/visitors/graf',NULL,NULL,'{"email":"eventManager@myclub.foo","password":"eventManager1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (924,9390,'GET','/webmaster',NULL,NULL,'{"email":"eventManager@myclub.foo","password":"eventManager1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (925,9400,'GET','/weekEvents',NULL,NULL,'{"email":"eventManager@myclub.foo","password":"eventManager1234" }','200',NULL,NULL);
-INSERT INTO "Test" VALUES (926,8220,'POST','/article/1',NULL,NULL,'{"email":"eventManager@myclub.foo","password":"eventManager1234" }','403',NULL,NULL);
+INSERT INTO "Test" VALUES (926,8220,'POST','/article/edit/1',NULL,NULL,'{"email":"eventManager@myclub.foo","password":"eventManager1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (927,8280,'POST','/arward',NULL,NULL,'{"email":"eventManager@myclub.foo","password":"eventManager1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (928,8310,'POST','/contact',NULL,NULL,'{"email":"eventManager@myclub.foo","password":"eventManager1234" }','200',NULL,NULL);
 INSERT INTO "Test" VALUES (929,8370,'POST','/dbbrowser/zz/create',NULL,NULL,'{"email":"eventManager@myclub.foo","password":"eventManager1234" }','403',NULL,NULL);
@@ -987,7 +987,7 @@ INSERT INTO "Test" VALUES (1030,9930,'GET','/articles/crosstab',NULL,NULL,'{"ema
 INSERT INTO "Test" VALUES (1031,9950,'GET','/arwards',NULL,NULL,'{"email":"redactor@myclub.foo","password":"redactor1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (1032,9960,'GET','/contact',NULL,NULL,'{"email":"redactor@myclub.foo","password":"redactor1234" }','200',NULL,NULL);
 INSERT INTO "Test" VALUES (1033,9980,'GET','/contact/event/1',NULL,NULL,'{"email":"redactor@myclub.foo","password":"redactor1234" }','200',NULL,NULL);
-INSERT INTO "Test" VALUES (1034,10460,'GET','/logs/crossTab',NULL,NULL,'{"email":"redactor@myclub.foo","password":"redactor1234" }','403',NULL,NULL);
+INSERT INTO "Test" VALUES (1034,10460,'GET','/crossTab',NULL,NULL,'{"email":"redactor@myclub.foo","password":"redactor1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (1035,9990,'GET','/media/1/1/zz',NULL,NULL,'{"email":"redactor@myclub.foo","password":"redactor1234" }','400',NULL,NULL);
 INSERT INTO "Test" VALUES (1036,10000,'GET','/dbbrowser',NULL,NULL,'{"email":"redactor@myclub.foo","password":"redactor1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (1037,10010,'GET','/dbbrowser/zz',NULL,NULL,'{"email":"redactor@myclub.foo","password":"redactor1234" }','403',NULL,NULL);
@@ -1077,7 +1077,7 @@ INSERT INTO "Test" VALUES (1120,11030,'GET','/visitorInsights/help',NULL,NULL,'{
 INSERT INTO "Test" VALUES (1121,11040,'GET','/visitors/graf',NULL,NULL,'{"email":"redactor@myclub.foo","password":"redactor1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (1122,11050,'GET','/webmaster',NULL,NULL,'{"email":"redactor@myclub.foo","password":"redactor1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (1123,11060,'GET','/weekEvents',NULL,NULL,'{"email":"redactor@myclub.foo","password":"redactor1234" }','200',NULL,NULL);
-INSERT INTO "Test" VALUES (1124,9870,'POST','/article/1',NULL,NULL,'{"email":"redactor@myclub.foo","password":"redactor1234" }','403',NULL,NULL);
+INSERT INTO "Test" VALUES (1124,9870,'POST','/article/edit/1',NULL,NULL,'{"email":"redactor@myclub.foo","password":"redactor1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (1125,9940,'POST','/arward',NULL,NULL,'{"email":"redactor@myclub.foo","password":"redactor1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (1126,9970,'POST','/contact',NULL,NULL,'{"email":"redactor@myclub.foo","password":"redactor1234" }','200',NULL,NULL);
 INSERT INTO "Test" VALUES (1127,10030,'POST','/dbbrowser/zz/create',NULL,NULL,'{"email":"redactor@myclub.foo","password":"redactor1234" }','403',NULL,NULL);
@@ -1102,7 +1102,7 @@ INSERT INTO "Test" VALUES (1145,10990,'POST','/user/sign/in',NULL,'{"email":"per
 INSERT INTO "Test" VALUES (1146,9410,'GET','/user/setPassword/0123456789abcdef4',NULL,NULL,NULL,'200','SELECT Email, FirstName, LastName, Token from Person Where Id = 4
 ','[{"Email":"redactor@myclub.foo","FirstName":"Redactor","LastName":"Manager","Token":"0123456789abcdef4"}]');
 INSERT INTO "Test" VALUES (1147,9420,'POST','/user/setPassword/0123456789abcdef4',NULL,'{"token": "0123456789abcdef4", "password": "redactor1234"}',NULL,'200','SELECT Email, FirstName, LastName, Password From Person Where Id = 4','[{"Email":"redactor@myclub.foo","FirstName":"Redactor","LastName":"Manager","Password":"28f5bbf0cf07213e91923715c8d2e6a79090274806b5662ef573afd6c38bf070"}]');
-INSERT INTO "Test" VALUES (1148,9890,'POST','/article/1',NULL,'{"title":"my title", "content": "<p>my article<\/p>"}','{"email":"redactor@myclub.foo","password":"redactor1234" }','200','Select Id, Title, Content, CreatedBy, PublishedBy, IdGroup, OnlyForMembers, Language From Article','[{"Id":1,"Title":"my title","Content":"<p>my article<\/p>","CreatedBy":4,"PublishedBy":null,"IdGroup":null,"OnlyForMembers":1,"Language":"fr_FR"}]');
+INSERT INTO "Test" VALUES (1148,9890,'POST','/article/edit/1',NULL,'{"title":"my title", "content": "<p>my article<\/p>"}','{"email":"redactor@myclub.foo","password":"redactor1234" }','200','Select Id, Title, Content, CreatedBy, PublishedBy, IdGroup, OnlyForMembers, Language From Article','[{"Id":1,"Title":"my title","Content":"<p>my article<\/p>","CreatedBy":4,"PublishedBy":null,"IdGroup":null,"OnlyForMembers":0,"Language":"fr_FR"}]');
 INSERT INTO "Test" VALUES (1149,11090,'GET','/',NULL,NULL,'{"email":"editor@myclub.foo","password":"editor1234" }','200','','');
 INSERT INTO "Test" VALUES (1150,11100,'GET','/admin',NULL,NULL,'{"email":"editor@myclub.foo","password":"editor1234" }','200',NULL,NULL);
 INSERT INTO "Test" VALUES (1151,11110,'GET','/admin/help',NULL,NULL,'{"email":"editor@myclub.foo","password":"editor1234" }','200',NULL,NULL);
@@ -1154,7 +1154,7 @@ INSERT INTO "Test" VALUES (1196,11590,'GET','/articles/crosstab',NULL,NULL,'{"em
 INSERT INTO "Test" VALUES (1197,11610,'GET','/arwards',NULL,NULL,'{"email":"editor@myclub.foo","password":"editor1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (1198,11620,'GET','/contact',NULL,NULL,'{"email":"editor@myclub.foo","password":"editor1234" }','200',NULL,NULL);
 INSERT INTO "Test" VALUES (1199,11640,'GET','/contact/event/1',NULL,NULL,'{"email":"editor@myclub.foo","password":"editor1234" }','200',NULL,NULL);
-INSERT INTO "Test" VALUES (1200,12120,'GET','/logs/crossTab',NULL,NULL,'{"email":"editor@myclub.foo","password":"editor1234" }','403',NULL,NULL);
+INSERT INTO "Test" VALUES (1200,12120,'GET','/crossTab',NULL,NULL,'{"email":"editor@myclub.foo","password":"editor1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (1201,11650,'GET','/media/1/1/zz',NULL,NULL,'{"email":"editor@myclub.foo","password":"editor1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (1202,11660,'GET','/dbbrowser',NULL,NULL,'{"email":"editor@myclub.foo","password":"editor1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (1203,11670,'GET','/dbbrowser/zz',NULL,NULL,'{"email":"editor@myclub.foo","password":"editor1234" }','403',NULL,NULL);
@@ -1244,7 +1244,7 @@ INSERT INTO "Test" VALUES (1286,12690,'GET','/visitorInsights/help',NULL,NULL,'{
 INSERT INTO "Test" VALUES (1287,12700,'GET','/visitors/graf',NULL,NULL,'{"email":"editor@myclub.foo","password":"editor1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (1288,12710,'GET','/webmaster',NULL,NULL,'{"email":"editor@myclub.foo","password":"editor1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (1289,12720,'GET','/weekEvents',NULL,NULL,'{"email":"editor@myclub.foo","password":"editor1234" }','200',NULL,NULL);
-INSERT INTO "Test" VALUES (1290,11530,'POST','/article/1',NULL,NULL,'{"email":"editor@myclub.foo","password":"editor1234" }','403',NULL,NULL);
+INSERT INTO "Test" VALUES (1290,11530,'POST','/article/edit/1',NULL,NULL,'{"email":"editor@myclub.foo","password":"editor1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (1291,11600,'POST','/arward',NULL,NULL,'{"email":"editor@myclub.foo","password":"editor1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (1292,11630,'POST','/contact',NULL,NULL,'{"email":"editor@myclub.foo","password":"editor1234" }','200',NULL,NULL);
 INSERT INTO "Test" VALUES (1293,11690,'POST','/dbbrowser/zz/create',NULL,NULL,'{"email":"editor@myclub.foo","password":"editor1234" }','403',NULL,NULL);
@@ -1268,7 +1268,7 @@ INSERT INTO "Test" VALUES (1310,12630,'POST','/user/setPassword/0123456789abcdef
 INSERT INTO "Test" VALUES (1311,12650,'POST','/user/sign/in',NULL,'{"email":"personManager@myclub.foo","password":"HumanRessources1234" }','{"email":"editor@myclub.foo","password":"editor1234" }','200',NULL,NULL);
 INSERT INTO "Test" VALUES (1312,11070,'GET','/user/setPassword/0123456789abcdef5',NULL,NULL,NULL,'200','SELECT Email, FirstName, LastName, Token from Person Where Id = 5','[{"Email":"editor@myclub.foo","FirstName":"Editor","LastName":"Manager","Token":"0123456789abcdef5"}]');
 INSERT INTO "Test" VALUES (1313,11080,'POST','/user/setPassword/0123456789abcdef5',NULL,'{"token": "0123456789abcdef6", "password": "editor1234"}',NULL,'200','SELECT Email, FirstName, LastName, Password From Person Where Id = 5','[{"Email":"editor@myclub.foo","FirstName":"Editor","LastName":"Manager","Password":"4bbb0d3f52d9de9702ae9bd320a10ae7b481380f752dc073d4e92a9e1f60f526"}]');
-INSERT INTO "Test" VALUES (1314,11550,'POST','/article/1',NULL,'{"content": "<p>my article<\/p>"}','{"email":"editor@myclub.foo","password":"editor1234" }','403',NULL,NULL);
+INSERT INTO "Test" VALUES (1314,11550,'POST','/article/edit/1',NULL,'{"content": "<p>my article<\/p>"}','{"email":"editor@myclub.foo","password":"editor1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (1315,12750,'GET','/',NULL,NULL,'{"email":"homeDesigner@myclub.foo","password":"homeD1234" }','200','','');
 INSERT INTO "Test" VALUES (1316,12760,'GET','/admin',NULL,NULL,'{"email":"homeDesigner@myclub.foo","password":"homeD1234" }','200',NULL,NULL);
 INSERT INTO "Test" VALUES (1317,12770,'GET','/admin/help',NULL,NULL,'{"email":"homeDesigner@myclub.foo","password":"homeD1234" }','200',NULL,NULL);
@@ -1320,7 +1320,7 @@ INSERT INTO "Test" VALUES (1362,13250,'GET','/articles/crosstab',NULL,NULL,'{"em
 INSERT INTO "Test" VALUES (1363,13270,'GET','/arwards',NULL,NULL,'{"email":"homeDesigner@myclub.foo","password":"homeD1234" }','200',NULL,NULL);
 INSERT INTO "Test" VALUES (1364,13280,'GET','/contact',NULL,NULL,'{"email":"homeDesigner@myclub.foo","password":"homeD1234" }','200',NULL,NULL);
 INSERT INTO "Test" VALUES (1365,13300,'GET','/contact/event/1',NULL,NULL,'{"email":"homeDesigner@myclub.foo","password":"homeD1234" }','200',NULL,NULL);
-INSERT INTO "Test" VALUES (1366,13780,'GET','/logs/crossTab',NULL,NULL,'{"email":"homeDesigner@myclub.foo","password":"homeD1234" }','403',NULL,NULL);
+INSERT INTO "Test" VALUES (1366,13780,'GET','/crossTab',NULL,NULL,'{"email":"homeDesigner@myclub.foo","password":"homeD1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (1367,13310,'GET','/media/1/1/zz',NULL,NULL,'{"email":"homeDesigner@myclub.foo","password":"homeD1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (1368,13320,'GET','/dbbrowser',NULL,NULL,'{"email":"homeDesigner@myclub.foo","password":"homeD1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (1369,13330,'GET','/dbbrowser/zz',NULL,NULL,'{"email":"homeDesigner@myclub.foo","password":"homeD1234" }','403',NULL,NULL);
@@ -1410,7 +1410,7 @@ INSERT INTO "Test" VALUES (1452,14350,'GET','/visitorInsights/help',NULL,NULL,'{
 INSERT INTO "Test" VALUES (1453,14360,'GET','/visitors/graf',NULL,NULL,'{"email":"homeDesigner@myclub.foo","password":"homeD1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (1454,14370,'GET','/webmaster',NULL,NULL,'{"email":"homeDesigner@myclub.foo","password":"homeD1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (1455,14380,'GET','/weekEvents',NULL,NULL,'{"email":"homeDesigner@myclub.foo","password":"homeD1234" }','200',NULL,NULL);
-INSERT INTO "Test" VALUES (1456,13190,'POST','/article/1',NULL,NULL,'{"email":"homeDesigner@myclub.foo","password":"homeD1234" }','403',NULL,NULL);
+INSERT INTO "Test" VALUES (1456,13190,'POST','/article/edit/1',NULL,NULL,'{"email":"homeDesigner@myclub.foo","password":"homeD1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (1457,13260,'POST','/arward',NULL,NULL,'{"email":"homeDesigner@myclub.foo","password":"homeD1234" }','200',NULL,NULL);
 INSERT INTO "Test" VALUES (1458,13290,'POST','/contact',NULL,NULL,'{"email":"homeDesigner@myclub.foo","password":"homeD1234" }','200',NULL,NULL);
 INSERT INTO "Test" VALUES (1459,13350,'POST','/dbbrowser/zz/create',NULL,NULL,'{"email":"homeDesigner@myclub.foo","password":"homeD1234" }','403',NULL,NULL);
@@ -1434,7 +1434,7 @@ INSERT INTO "Test" VALUES (1476,14290,'POST','/user/setPassword/0123456789abcdef
 INSERT INTO "Test" VALUES (1477,14310,'POST','/user/sign/in',NULL,'{"email":"personManager@myclub.foo","password":"HumanRessources1234" }','{"email":"homeDesigner@myclub.foo","password":"homeD1234" }','200',NULL,NULL);
 INSERT INTO "Test" VALUES (1478,12730,'GET','/user/setPassword/0123456789abcdef6',NULL,NULL,NULL,'200','SELECT Email, FirstName, LastName, Token from Person Where Id = 6','[{"Email":"homeDesigner@myclub.foo","FirstName":"Home","LastName":"Designer","Token":"0123456789abcdef6"}]');
 INSERT INTO "Test" VALUES (1479,12740,'POST','/user/setPassword/0123456789abcdef6',NULL,'{"token": "0123456789abcdef6", "password": "homeD1234"}',NULL,'200','SELECT Email, FirstName, LastName, Password From Person Where Id = 6','[{"Email":"homeDesigner@myclub.foo","FirstName":"Home","LastName":"Designer","Password":"17ef3a46b95ea65576fa50f23bb5317c2d6970236f715728e69d53671e24f8e2"}]');
-INSERT INTO "Test" VALUES (1480,13210,'POST','/article/1',NULL,'{"content": "<p>my article<\/p>"}','{"email":"homeDesigner@myclub.foo","password":"homeD1234" }','403',NULL,NULL);
+INSERT INTO "Test" VALUES (1480,13210,'POST','/article/edit/1',NULL,'{"content": "<p>my article<\/p>"}','{"email":"homeDesigner@myclub.foo","password":"homeD1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (1481,14410,'GET','/',NULL,NULL,'{"email":"eventDesigner@myclub.foo","password":"eventD1234" }','200','','');
 INSERT INTO "Test" VALUES (1482,14420,'GET','/admin',NULL,NULL,'{"email":"eventDesigner@myclub.foo","password":"eventD1234" }','200',NULL,NULL);
 INSERT INTO "Test" VALUES (1483,14430,'GET','/admin/help',NULL,NULL,'{"email":"eventDesigner@myclub.foo","password":"eventD1234" }','200',NULL,NULL);
@@ -1486,7 +1486,7 @@ INSERT INTO "Test" VALUES (1528,14910,'GET','/articles/crosstab',NULL,NULL,'{"em
 INSERT INTO "Test" VALUES (1529,14930,'GET','/arwards',NULL,NULL,'{"email":"eventDesigner@myclub.foo","password":"eventD1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (1530,14940,'GET','/contact',NULL,NULL,'{"email":"eventDesigner@myclub.foo","password":"eventD1234" }','200',NULL,NULL);
 INSERT INTO "Test" VALUES (1531,14960,'GET','/contact/event/1',NULL,NULL,'{"email":"eventDesigner@myclub.foo","password":"eventD1234" }','200',NULL,NULL);
-INSERT INTO "Test" VALUES (1532,15440,'GET','/logs/crossTab',NULL,NULL,'{"email":"eventDesigner@myclub.foo","password":"eventD1234" }','403',NULL,NULL);
+INSERT INTO "Test" VALUES (1532,15440,'GET','/crossTab',NULL,NULL,'{"email":"eventDesigner@myclub.foo","password":"eventD1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (1533,14970,'GET','/media/1/1/zz',NULL,NULL,'{"email":"eventDesigner@myclub.foo","password":"eventD1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (1534,14980,'GET','/dbbrowser',NULL,NULL,'{"email":"eventDesigner@myclub.foo","password":"eventD1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (1535,14990,'GET','/dbbrowser/zz',NULL,NULL,'{"email":"eventDesigner@myclub.foo","password":"eventD1234" }','403',NULL,NULL);
@@ -1576,7 +1576,7 @@ INSERT INTO "Test" VALUES (1618,16010,'GET','/visitorInsights/help',NULL,NULL,'{
 INSERT INTO "Test" VALUES (1619,16020,'GET','/visitors/graf',NULL,NULL,'{"email":"eventDesigner@myclub.foo","password":"eventD1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (1620,16030,'GET','/webmaster',NULL,NULL,'{"email":"eventDesigner@myclub.foo","password":"eventD1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (1621,16040,'GET','/weekEvents',NULL,NULL,'{"email":"eventDesigner@myclub.foo","password":"eventD1234" }','200',NULL,NULL);
-INSERT INTO "Test" VALUES (1622,14850,'POST','/article/1',NULL,NULL,'{"email":"eventDesigner@myclub.foo","password":"eventD1234" }','403',NULL,NULL);
+INSERT INTO "Test" VALUES (1622,14850,'POST','/article/edit/1',NULL,NULL,'{"email":"eventDesigner@myclub.foo","password":"eventD1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (1623,14920,'POST','/arward',NULL,NULL,'{"email":"eventDesigner@myclub.foo","password":"eventD1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (1624,14950,'POST','/contact',NULL,NULL,'{"email":"eventDesigner@myclub.foo","password":"eventD1234" }','200',NULL,NULL);
 INSERT INTO "Test" VALUES (1625,15010,'POST','/dbbrowser/zz/create',NULL,NULL,'{"email":"eventDesigner@myclub.foo","password":"eventD1234" }','403',NULL,NULL);
@@ -1600,7 +1600,7 @@ INSERT INTO "Test" VALUES (1642,15950,'POST','/user/setPassword/0123456789abcdef
 INSERT INTO "Test" VALUES (1643,15970,'POST','/user/sign/in',NULL,'{"email":"personManager@myclub.foo","password":"HumanRessources1234" }','{"email":"eventDesigner@myclub.foo","password":"eventD1234" }','200',NULL,NULL);
 INSERT INTO "Test" VALUES (1644,14390,'GET','/user/setPassword/0123456789abcdef7',NULL,NULL,NULL,'200','SELECT Email, FirstName, LastName, Token from Person Where Id = 7','[{"Email":"EventDesigner@myclub.foo","FirstName":"Event","LastName":"Designer","Token":"0123456789abcdef7"}]');
 INSERT INTO "Test" VALUES (1645,14400,'POST','/user/setPassword/0123456789abcdef7',NULL,'{"token": "0123456789abcdef7", "password": "eventD1234"}',NULL,'200','SELECT Email, FirstName, LastName, Password From Person Where Id = 7','[{"Email":"EventDesigner@myclub.foo","FirstName":"Event","LastName":"Designer","Password":"10ea3df33a3cfd1547352762c0d8beee6e6cfd0af984c55e7d8950720fd6ccbe"}]');
-INSERT INTO "Test" VALUES (1646,14870,'POST','/article/1',NULL,'{"content": "<p>my article<\/p>"}','{"email":"eventDesigner@myclub.foo","password":"eventD1234" }','403',NULL,NULL);
+INSERT INTO "Test" VALUES (1646,14870,'POST','/article/edit/1',NULL,'{"content": "<p>my article<\/p>"}','{"email":"eventDesigner@myclub.foo","password":"eventD1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (1647,16070,'GET','/',NULL,NULL,'{"email":"visitorInsights@myclub.foo","password":"observator1234" }','200','','');
 INSERT INTO "Test" VALUES (1648,16080,'GET','/admin',NULL,NULL,'{"email":"visitorInsights@myclub.foo","password":"observator1234" }','200',NULL,NULL);
 INSERT INTO "Test" VALUES (1649,16090,'GET','/admin/help',NULL,NULL,'{"email":"visitorInsights@myclub.foo","password":"observator1234" }','200',NULL,NULL);
@@ -1652,7 +1652,7 @@ INSERT INTO "Test" VALUES (1694,16570,'GET','/articles/crosstab',NULL,NULL,'{"em
 INSERT INTO "Test" VALUES (1695,16590,'GET','/arwards',NULL,NULL,'{"email":"visitorInsights@myclub.foo","password":"observator1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (1696,16600,'GET','/contact',NULL,NULL,'{"email":"visitorInsights@myclub.foo","password":"observator1234" }','200',NULL,NULL);
 INSERT INTO "Test" VALUES (1697,16620,'GET','/contact/event/1',NULL,NULL,'{"email":"visitorInsights@myclub.foo","password":"observator1234" }','200',NULL,NULL);
-INSERT INTO "Test" VALUES (1698,17100,'GET','/logs/crossTab',NULL,NULL,'{"email":"visitorInsights@myclub.foo","password":"observator1234" }','200',NULL,NULL);
+INSERT INTO "Test" VALUES (1698,17100,'GET','/crossTab',NULL,NULL,'{"email":"visitorInsights@myclub.foo","password":"observator1234" }','200',NULL,NULL);
 INSERT INTO "Test" VALUES (1699,16630,'GET','/media/1/1/zz',NULL,NULL,'{"email":"visitorInsights@myclub.foo","password":"observator1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (1700,16640,'GET','/dbbrowser',NULL,NULL,'{"email":"visitorInsights@myclub.foo","password":"observator1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (1701,16650,'GET','/dbbrowser/zz',NULL,NULL,'{"email":"visitorInsights@myclub.foo","password":"observator1234" }','403',NULL,NULL);
@@ -1742,7 +1742,7 @@ INSERT INTO "Test" VALUES (1784,17670,'GET','/visitorInsights/help',NULL,NULL,'{
 INSERT INTO "Test" VALUES (1785,17680,'GET','/visitors/graf',NULL,NULL,'{"email":"visitorInsights@myclub.foo","password":"observator1234" }','200',NULL,NULL);
 INSERT INTO "Test" VALUES (1786,17690,'GET','/webmaster',NULL,NULL,'{"email":"visitorInsights@myclub.foo","password":"observator1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (1787,17700,'GET','/weekEvents',NULL,NULL,'{"email":"visitorInsights@myclub.foo","password":"observator1234" }','200',NULL,NULL);
-INSERT INTO "Test" VALUES (1788,16510,'POST','/article/1',NULL,NULL,'{"email":"visitorInsights@myclub.foo","password":"observator1234" }','403',NULL,NULL);
+INSERT INTO "Test" VALUES (1788,16510,'POST','/article/edit/1',NULL,NULL,'{"email":"visitorInsights@myclub.foo","password":"observator1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (1789,16580,'POST','/arward',NULL,NULL,'{"email":"visitorInsights@myclub.foo","password":"observator1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (1790,16610,'POST','/contact',NULL,NULL,'{"email":"visitorInsights@myclub.foo","password":"observator1234" }','200',NULL,NULL);
 INSERT INTO "Test" VALUES (1791,16670,'POST','/dbbrowser/zz/create',NULL,NULL,'{"email":"visitorInsights@myclub.foo","password":"observator1234" }','403',NULL,NULL);
@@ -1766,7 +1766,7 @@ INSERT INTO "Test" VALUES (1808,17610,'POST','/user/setPassword/0123456789abcdef
 INSERT INTO "Test" VALUES (1809,17630,'POST','/user/sign/in',NULL,'{"email":"personManager@myclub.foo","password":"HumanRessources1234" }','{"email":"visitorInsights@myclub.foo","password":"observator1234" }','200',NULL,NULL);
 INSERT INTO "Test" VALUES (1810,16050,'GET','/user/setPassword/0123456789abcdef8',NULL,NULL,NULL,'200','SELECT Email, FirstName, LastName, Token from Person Where Id = 8','[{"Email":"visitorInsights@myclub.foo","FirstName":"Visitor","LastName":"Insights","Token":"0123456789abcdef8"}]');
 INSERT INTO "Test" VALUES (1811,16060,'POST','/user/setPassword/0123456789abcdef8',NULL,'{"token": "0123456789abcdef8", "password": "observator1234"}',NULL,'200','SELECT Email, FirstName, LastName, Password From Person Where Id = 8','[{"Email":"visitorInsights@myclub.foo","FirstName":"Visitor","LastName":"Insights","Password":"780158a1778f3eea579eeb5952c26647fe8883d75ea05cc14e4268331349beb4"}]');
-INSERT INTO "Test" VALUES (1812,16530,'POST','/article/1',NULL,'{"content": "<p>my article<\/p>"}','{"email":"visitorInsights@myclub.foo","password":"observator1234" }','403',NULL,NULL);
+INSERT INTO "Test" VALUES (1812,16530,'POST','/article/edit/1',NULL,'{"content": "<p>my article<\/p>"}','{"email":"visitorInsights@myclub.foo","password":"observator1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (1813,17730,'GET','/',NULL,NULL,'{"email":"user@myclub.foo","password":"user1234" }','200','','');
 INSERT INTO "Test" VALUES (1814,17740,'GET','/admin',NULL,NULL,'{"email":"user@myclub.foo","password":"user1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (1815,17750,'GET','/admin/help',NULL,NULL,'{"email":"user@myclub.foo","password":"user1234" }','403',NULL,NULL);
@@ -1818,7 +1818,7 @@ INSERT INTO "Test" VALUES (1860,18230,'GET','/articles/crosstab',NULL,NULL,'{"em
 INSERT INTO "Test" VALUES (1861,18250,'GET','/arwards',NULL,NULL,'{"email":"user@myclub.foo","password":"user1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (1862,18260,'GET','/contact',NULL,NULL,'{"email":"user@myclub.foo","password":"user1234" }','200',NULL,NULL);
 INSERT INTO "Test" VALUES (1863,18280,'GET','/contact/event/1',NULL,NULL,'{"email":"user@myclub.foo","password":"user1234" }','200',NULL,NULL);
-INSERT INTO "Test" VALUES (1864,18760,'GET','/logs/crossTab',NULL,NULL,'{"email":"user@myclub.foo","password":"user1234" }','403',NULL,NULL);
+INSERT INTO "Test" VALUES (1864,18760,'GET','/crossTab',NULL,NULL,'{"email":"user@myclub.foo","password":"user1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (1865,18290,'GET','/media/1/1/zz',NULL,NULL,'{"email":"user@myclub.foo","password":"user1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (1866,18300,'GET','/dbbrowser',NULL,NULL,'{"email":"user@myclub.foo","password":"user1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (1867,18310,'GET','/dbbrowser/zz',NULL,NULL,'{"email":"user@myclub.foo","password":"user1234" }','403',NULL,NULL);
@@ -1908,7 +1908,7 @@ INSERT INTO "Test" VALUES (1950,19330,'GET','/visitorInsights/help',NULL,NULL,'{
 INSERT INTO "Test" VALUES (1951,19340,'GET','/visitors/graf',NULL,NULL,'{"email":"user@myclub.foo","password":"user1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (1952,19350,'GET','/webmaster',NULL,NULL,'{"email":"user@myclub.foo","password":"user1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (1953,19360,'GET','/weekEvents',NULL,NULL,'{"email":"user@myclub.foo","password":"user1234" }','200',NULL,NULL);
-INSERT INTO "Test" VALUES (1954,18170,'POST','/article/1',NULL,NULL,'{"email":"user@myclub.foo","password":"user1234" }','403',NULL,NULL);
+INSERT INTO "Test" VALUES (1954,18170,'POST','/article/edit/1',NULL,NULL,'{"email":"user@myclub.foo","password":"user1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (1955,18240,'POST','/arward',NULL,NULL,'{"email":"user@myclub.foo","password":"user1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (1956,18270,'POST','/contact',NULL,NULL,'{"email":"user@myclub.foo","password":"user1234" }','200',NULL,NULL);
 INSERT INTO "Test" VALUES (1957,18330,'POST','/dbbrowser/zz/create',NULL,NULL,'{"email":"user@myclub.foo","password":"user1234" }','403',NULL,NULL);
@@ -1932,7 +1932,7 @@ INSERT INTO "Test" VALUES (1974,19270,'POST','/user/setPassword/0123456789abcdef
 INSERT INTO "Test" VALUES (1975,19290,'POST','/user/sign/in',NULL,'{"email":"personManager@myclub.foo","password":"HumanRessources1234" }','{"email":"user@myclub.foo","password":"user1234" }','200',NULL,NULL);
 INSERT INTO "Test" VALUES (1976,17710,'GET','/user/setPassword/0123456789abcdefa',NULL,NULL,NULL,'200','SELECT Email, FirstName, LastName, Token from Person Where Id = 10','[{"Email":"user@myclub.foo","FirstName":"Simple","LastName":"Member","Token":"0123456789abcdefa"}]');
 INSERT INTO "Test" VALUES (1977,17720,'POST','/user/setPassword/0123456789abcdefa',NULL,'{"token": "0123456789abcdefa", "password": "user1234"}',NULL,'200','SELECT Email, FirstName, LastName, Password From Person Where Id = 10','[{"Email":"user@myclub.foo","FirstName":"Simple","LastName":"Member","Password":"55cd6eeb8e4cd1ee8384ade7564bf65f90706a631dc04d827b7585309fe6423f"}]');
-INSERT INTO "Test" VALUES (1978,18190,'POST','/article/1',NULL,'{"content": "<p>my article<\/p>"}','{"email":"user@myclub.foo","password":"user1234" }','403',NULL,NULL);
+INSERT INTO "Test" VALUES (1978,18190,'POST','/article/edit/1',NULL,'{"content": "<p>my article<\/p>"}','{"email":"user@myclub.foo","password":"user1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (1979,1360,'GET','/person/create',NULL,NULL,'{"email":"webmaster@myclub.foo","password":"admin1234" }','200',NULL,NULL);
 INSERT INTO "Test" VALUES (1980,1370,'POST','/person/edit/10',NULL,'{"email": "user@myclub.foo", "firstName": "Simple", "lastName": "Member"}','{"email":"webmaster@myclub.foo","password":"admin1234" }','200','Update Person Set Token = "0123456789abcdefa", TokenCreatedAt = CURRENT_TIMESTAMP Where Id = 10','[]');
 INSERT INTO "Test" VALUES (1981,1820,'PUT','/apple-touch-icon-120x120.png',NULL,NULL,NULL,'405',NULL,NULL);
@@ -1943,4 +1943,5 @@ INSERT INTO "Test" VALUES (1985,2230,'PUT','/favicon.ico',NULL,NULL,NULL,'405',N
 INSERT INTO "Test" VALUES (1986,2825,'PUT','/Webcard',NULL,NULL,NULL,'405',NULL,NULL);
 INSERT INTO "Test" VALUES (1987,4455,'GET','/Webcard',NULL,NULL,NULL,'200',NULL,NULL);
 INSERT INTO "Test" VALUES (1988,19345,'GET','/Webcard',NULL,NULL,'{"email":"user@myclub.foo","password":"user1234" }','200',NULL,NULL);
+INSERT INTO "Test" VALUES (1989,NULL,'GET','/article/@id:[0-9]+','{"id":1}',NULL,NULL,'400',NULL,NULL);
 COMMIT;
