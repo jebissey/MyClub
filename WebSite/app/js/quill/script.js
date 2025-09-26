@@ -115,6 +115,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const titleInput = document.getElementById('title-input');
     const editForm = document.getElementById('edit-form') || document.getElementById('presentationForm');
     const contentInput = document.getElementById('content-input');
+    const carouselDisplay = document.getElementById('carousel-display');
 
     if (!editToggleBtn && saveBtn && cancelBtn) {
         quill.on('text-change', function () {
@@ -135,6 +136,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if (editToggleBtn) {
         editToggleBtn.addEventListener('click', function () {
             contentDisplay.style.display = 'none';
+            if (carouselDisplay) carouselDisplay.style.display = 'none';
             editorContainer.style.display = 'block';
             editToggleBtn.style.display = 'none';
             saveBtn.style.display = 'inline-block';
@@ -144,6 +146,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         cancelBtn.addEventListener('click', function () {
             contentDisplay.style.display = 'block';
+            if (carouselDisplay) carouselDisplay.style.display = 'block';
             editorContainer.style.display = 'none';
             editToggleBtn.style.display = 'inline-block';
             saveBtn.style.display = 'none';

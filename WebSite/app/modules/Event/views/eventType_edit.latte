@@ -50,7 +50,7 @@
                                                 name="attributes[]" 
                                                 id="attribute{$attribute->Id}" 
                                                 value="{$attribute->Id}"
-                                                {if in_array($attribute->Id, $existingAttributes)}checked{/if}>
+                                                {if in_array($attribute->Id, $existingAttributesIds)}checked{/if}>
                                             <label class="form-check-label" 
                                                 for="attribute{$attribute->Id}"
                                                 data-bs-toggle="tooltip" 

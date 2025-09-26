@@ -135,13 +135,12 @@ class RssController extends AbstractController
         foreach ($articles as $article) {
             $rss .= '<item>';
             $rss .= '<title>' . htmlspecialchars($article->Title) . '</title>';
-            $rss .= '<link>' . htmlspecialchars($site_url . 'articles/' . $article->Id) . '</link>';
-            $rss .= '<guid>' . htmlspecialchars($site_url . 'articles/' . $article->Id) . '</guid>';
+            $rss .= '<link>' . htmlspecialchars($site_url . 'article/' . $article->Id) . '</link>';
+            $rss .= '<guid>' . htmlspecialchars($site_url . 'article/' . $article->Id) . '</guid>';
             $rss .= '<pubDate>' . date(DATE_RSS, strtotime($article->LastUpdate)) . '</pubDate>';
             $rss .= '<description>' . $this->getFirstElement($article->Content) . '</description>';
             $rss .= '</item>';
         }
-
         $rss .= '</channel>';
         $rss .= '</rss>';
 

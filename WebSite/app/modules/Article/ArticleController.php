@@ -217,7 +217,7 @@ class ArticleController extends TableController
         if ($connectedUser->isEditor()) {
             $columns[] = ['field' => 'Published', 'label' => 'Publié'];
         }
-        $query = $this->articleTableDataHelper->getQuery($connectedUser, $this->articleDataHelper->getSpotlightArticle()['articleId'] ?? -1);
+        $query = $this->articleTableDataHelper->getQuery($connectedUser, (int)($this->articleDataHelper->getSpotlightArticle()['articleId'] ?? -1));
         $data = $this->prepareTableData($query, $filterValues, (int)($this->flight->request()->query['tablePage'] ?? 0));
         $this->render('Article/views/articles_index.latte', Params::getAll([
             'articles' => $data['items'],

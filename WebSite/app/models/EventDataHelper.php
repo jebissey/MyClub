@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace app\models;
@@ -216,34 +217,40 @@ class EventDataHelper extends Data implements NewsProviderInterface
     public function getNextWeekEvents(): array
     {
         [$startOfCurrentWeek, $endOfThirdWeek] = $this->getDatesOfThreeWeeks();
-        $events = $this->fluent->from('Event e')
-            ->select("
+        $sql = "
+            SELECT
                 e.Id,
                 e.Summary,
                 e.Description,
                 e.Location,
-                e.StartTime,
+                replace(e.StartTime, 'T', ' ') AS StartTime,
                 e.Duration,
                 e.IdEventType,
                 e.Audience,
                 et.Name AS EventTypeName,
-                'Group'.Name AS GroupName,
+                g.Name AS GroupName,
                 GROUP_CONCAT(a.Id) AS AttributeIds,
                 GROUP_CONCAT(a.Name) AS AttributeNames,
                 GROUP_CONCAT(a.Detail) AS AttributeDetails,
                 GROUP_CONCAT(a.Color) AS AttributeColors
-            ")
-            ->innerJoin('EventType et ON e.IdEventType = et.Id')
-            ->leftJoin('EventAttribute ea ON e.Id = ea.IdEvent')
-            ->leftJoin('Attribute a ON ea.IdAttribute = a.Id')
-            ->leftJoin("'Group' ON et.IdGroup = 'Group'.Id")
-            ->where('datetime(e.StartTime) >= ?', $startOfCurrentWeek->format('Y-m-d H:i:s'))
-            ->where('datetime(e.StartTime) < ?', $endOfThirdWeek->format('Y-m-d H:i:s'))
-            ->where('et.Inactivated = 0')
-            ->groupBy('e.Id')
-            ->orderBy('e.StartTime')
-            ->fetchAll();
-        $weeklyEvents = [];
+            FROM Event e
+            INNER JOIN EventType et ON e.IdEventType = et.Id
+            LEFT JOIN EventAttribute ea ON e.Id = ea.IdEvent
+            LEFT JOIN Attribute a ON ea.IdAttribute = a.Id
+            LEFT JOIN \"Group\" g ON et.IdGroup = g.Id
+            WHERE datetime(replace(e.StartTime, 'T', ' ')) >= :start
+            AND datetime(replace(e.StartTime, 'T', ' ')) < :end
+            AND et.Inactivated = 0
+            GROUP BY e.Id
+            ORDER BY datetime(replace(e.StartTime, 'T', ' '))
+        ";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([
+            ':start' => $startOfCurrentWeek->format('Y-m-d H:i:s'),
+            ':end'   => $endOfThirdWeek->format('Y-m-d H:i:s'),
+        ]);
+        $events = $stmt->fetchAll();
+
         for ($weekOffset = 0; $weekOffset < 3; $weekOffset++) {
             $weekStart = clone $startOfCurrentWeek;
             $weekStart->add(new DateInterval('P' . ($weekOffset * 7) . 'D'));
@@ -622,29 +629,47 @@ class EventDataHelper extends Data implements NewsProviderInterface
 
     private function getNextEvents(?object $person, bool $filterByPreferences = false)
     {
-        $query = $this->fluent
-            ->from('Event e')
-            ->leftJoin('EventType et ON e.IdEventType = et.Id')
-            ->leftJoin('Participant p ON e.Id = p.IdEvent AND p.IdPerson = ?', $person->Id ?? 0)
-            ->leftJoin('Message m ON m.EventId = e.Id AND m."From" = "User"');
-        if ($person == null) {
-            $audienceCondition = 'e.Audience = \'' . EventAudience::ForAll->value . '\' AND et.IdGroup IS NULL';
-            $params = [];
+        $params = [':personId' => $person?->Id ?? 0,];
+        $sql = "
+            SELECT 
+                e.*,
+                et.Name AS EventTypeName,
+                et.IdGroup AS EventTypeIdGroup,
+                p.Id AS Booked,
+                COUNT(m.Id) AS MessageCount
+            FROM Event e
+            LEFT JOIN EventType et ON e.IdEventType = et.Id
+            LEFT JOIN Participant p 
+                ON e.Id = p.IdEvent 
+            AND p.IdPerson = :personId
+            LEFT JOIN Message m 
+                ON m.EventId = e.Id 
+            AND m.\"From\" = 'User'
+            WHERE datetime(replace(e.StartTime, 'T', ' ')) > DATETIME('now')
+            AND et.Inactivated = 0
+        ";
+        if ($person === null) {
+            $sql .= " AND e.Audience = :audience AND et.IdGroup IS NULL";
+            $params[':audience'] = EventAudience::ForAll->value;
         } else {
-            $audienceCondition = '(et.IdGroup IS NULL OR et.IdGroup IN (SELECT IdGroup FROM PersonGroup WHERE IdPerson = ?))';
-            $params = [$person->Id];
+            $sql .= " AND (et.IdGroup IS NULL OR et.IdGroup IN (
+                        SELECT IdGroup 
+                        FROM PersonGroup 
+                        WHERE IdPerson = :personId
+                     ))";
         }
-        $query->where("e.StartTime > DATETIME('now') AND et.Inactivated = 0 AND " . $audienceCondition, ...$params)
-            ->groupBy('e.Id')
-            ->select('COUNT(m.Id) AS MessageCount')
-            ->select('et.Name AS EventTypeName, et.IdGroup AS EventTypeIdGroup, p.Id AS Booked')
-            ->orderBy('e.StartTime');
-        $events = $this->events($query->fetchAll());
+        $sql .= " GROUP BY e.Id ORDER BY datetime(replace(e.StartTime, 'T', ' '))";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($params);
+        $rows = $stmt->fetchAll();
+        $events = $this->events($rows);
+
         if ($filterByPreferences && $person) {
             return $this->personPreferences->filterEventsByPreferences($events, $person);
         }
         return $events;
     }
+
 
     private function getPassedEvents($person, int $offset)
     {

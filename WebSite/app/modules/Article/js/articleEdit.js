@@ -25,3 +25,9 @@ document.addEventListener('DOMContentLoaded', function () {
         membersOnlyCheckbox.addEventListener('change', updateInputsState);
     }
 });
+
+document.getElementById('edit-form').addEventListener('submit', function () {
+    this.querySelectorAll('input[type="checkbox"][disabled]').forEach(cb => {
+        cb.disabled = false;
+    });
+});
