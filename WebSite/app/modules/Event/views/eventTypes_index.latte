@@ -5,23 +5,23 @@
         <div class="col-12">
             {include '../../Common/views/dataTable.latte',
                 'createButton' => [
-                    'url' => '/eventTypes/create',
-                    'label' => "Créer un type d'évènement"
+                    'url' => '/eventType/create',
+                    'label' => "+"
                 ],
                 'items' => $eventTypes,
                 'actions' => [
                     [
                         'type' => 'link',
-                        'label' => '✏️',
-                        'url' => '/eventTypes/edit/{id}',
+                        'label' => 'bi bi-pencil',
+                        'url' => '/eventType/edit/{id}',
                         'class' => 'btn-warning'
                     ],
                     [
                         'type' => 'link',
-                        'label' => '🗑️',
-                        'url' => '/eventTypes/delete/{id}',
+                        'label' => 'bi bi-trash',
+                        'url' => '/eventType/delete/{id}',
                         'class' => 'btn-danger',
-                        'confirm' => "Voulez-vous vraiment supprimer ce type d'évènement ?"
+                        'confirm' => "Voulez-vous vraiment le supprimer ?"
                     ]
                 ]
             }
@@ -41,7 +41,7 @@
                                 <input type="text" id="newAttributeName" class="form-control flex-grow-1" placeholder="Nom de l'attribut" required>
                                 <input type="color" id="newAttributeColor" class="form-control form-control-color" value="#563d7c" style="width: 100px;">
                                 <textarea id="newAttributeDetail" class="form-control flex-grow-1" placeholder="Détail" rows="1" style="resize: none;"></textarea>
-                                <button onclick="createAttribute_()" class="btn btn-primary"><i class="bi bi-plus"></i></button>
+                                <button onclick="createAttribute_()" class="btn btn-primary"><i class="bi bi-plus-lg"></i></button>
                             </div>
                         </div>
                     </div>

@@ -7,16 +7,18 @@ function loadGroupUsers(groupId) {
         fetch(`/api/personsInGroup/${groupId}`)
             .then(response => response.json())
             .then(data => {
-                if (data.length === 0) {
-                    userList.innerHTML = "<p>Aucun utilisateur dans ce groupe.</p>";
-                } else {
-                    userList.innerHTML = "<ul class='list-unstyled'>" + data.map(user =>
-                        `<li>${user.FirstName} ${user.LastName} (${user.Email})</li>`
-                    ).join('') + "</ul>";
+                if (data.success && data.items) {
+                    if (data.items.length === 0) {
+                        userList.innerHTML = "<p>Aucun utilisateur dans ce groupe.</p>";
+                    } else {
+                        userList.innerHTML = "<ul class='list-unstyled'>" + data.items.map(user =>
+                            `<li>${user.FirstName} ${user.LastName} (${user.Email})</li>`
+                        ).join('') + "</ul>";
+                    }
                 }
             })
             .catch(error => {
-                userList.innerHTML = "<p class='text-danger'>Erreur lors du chargement.</p>";
+                userList.innerHTML = "<p class='text-danger'>Erreur lors du chargement" + error + ".</p>";
             });
 
         userRow.classList.remove("d-none");

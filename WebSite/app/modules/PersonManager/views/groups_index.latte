@@ -6,7 +6,7 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1 class="h3 m-0">Liste des groupes</h1>
         <a href="/group/create" class="btn btn-primary mt-3">
-            <i class="bi bi-plus-lg"></i> Nouveau groupe
+            <i class="bi bi-plus-lg"></i>
         </a>
     </div>
 
@@ -40,21 +40,21 @@
                             <td class="text-nowrap">
                                 {if $group->Id != 1}
                                     <a href="/group/edit/{$group->Id}" class="btn btn-sm btn-primary">
-                                        <i class="fas fa-edit"></i>Modifier
+                                        <i class="bi bi-pencil"></i>
                                     </a>
                                     <button type="button" class="btn btn-sm btn-danger" 
                                             onclick="confirmDelete({$group->Id})">
-                                        <i class="fas fa-trash"></i>Supprimer
+                                        <i class="bi bi-trash"></i>
                                     </button>
                                 {/if}
                                 <button class="btn btn-sm btn-success" onclick="loadGroupUsers({$group->Id})">
-                                    <i class="fas fa-plus"></i>Membres
+                                    <i class="bi bi-people-fill"></i>
                                 </button>
                             </td>
                         </tr>
                         <tr id="users-group-{$group->Id}" class="d-none">
                             <td colspan="4">
-                                <div id="user-list-{$group->Id}">Chargement...</div>
+                                <div id="user-list-{$group->Id}">Loading...</div>
                             </td>
                         </tr>
                         {/foreach}
@@ -87,5 +87,5 @@
 {/block}
 
 {block scripts}
-    <script src="/app/js/groups/index.js"></script>
+    <script src="/app/modules/PersonManager/js/groupsIndex.js"></script>
 {/block}

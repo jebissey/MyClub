@@ -19,10 +19,10 @@ class EventType implements RouteInterface
         $eventTypeController = fn() => $this->controllerFactory->makeEventTypeController();
 
         $this->routes[] = new Route('GET  /eventTypes', $eventTypeController, 'index');
-        $this->routes[] = new Route('GET  /eventTypes/create', $eventTypeController, 'create');
-        $this->routes[] = new Route('GET  /eventTypes/edit/@id:[0-9]+', $eventTypeController, 'edit');
-        $this->routes[] = new Route('POST /eventTypes/edit/@id:[0-9]+', $eventTypeController, 'editSave');
-        $this->routes[] = new Route('POST /eventTypes/delete/@id:[0-9]+', $eventTypeController, 'delete');
+        $this->routes[] = new Route('GET  /eventType/create', $eventTypeController, 'create');
+        $this->routes[] = new Route('GET  /eventType/edit/@id:[0-9]+', $eventTypeController, 'edit');
+        $this->routes[] = new Route('POST /eventType/edit/@id:[0-9]+', $eventTypeController, 'update');
+        $this->routes[] = new Route('GET  /eventType/delete/@id:[0-9]+', $eventTypeController, 'delete');
 
         return $this->routes;
     }

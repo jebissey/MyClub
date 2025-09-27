@@ -28,6 +28,45 @@ class EventTypeController extends TableController
         parent::__construct($application, $genericDataHelper);
     }
 
+    public function create(): void
+    {
+        if (!($this->application->getConnectedUser()->isEventDesigner() ?? false)) {
+            $this->raiseforbidden(__FILE__, __LINE__);
+            return;
+        }
+        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+            return;
+        }
+        $id = $this->dataHelper->set('EventType', ['Name' => '']);
+        $this->redirect('/EventType/edit/' . $id);
+    }
+
+    public function delete(int $id): void
+    {
+        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isEventDesigner()) && $this->eventTypeExists($id)) {
+            $this->dataHelper->set('EventType', ['Inactivated' => 1], ['Id' => $id]);
+            $this->redirect('/eventTypes');
+        }
+    }
+
+    public function edit(int $id): void
+    {
+        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isEventDesigner()) && $this->eventTypeExists($id)) {
+            $eventType = $this->dataHelper->get('EventType', ['Id' => $id], 'Name, IdGroup');
+            $existingAttributes = $this->dataHelper->gets('EventTypeAttribute', ['IdEventType' => $id], 'IdAttribute');
+
+            $this->render('Event/views/eventType_edit.latte', Params::getAll([
+                'name' => $eventType->Name,
+                'idGroup' => $eventType->IdGroup,
+                'groups' => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
+                'attributes' => $this->dataHelper->gets('Attribute', [], '*', 'Name'),
+                'existingAttributesIds' => array_map(fn($a) => $a->IdAttribute, $existingAttributes),
+                'page' => $this->application->getConnectedUser()->getPage(),
+            ]));
+        }
+    }
+
     public function index(): void
     {
         if (!($this->application->getConnectedUser()->isEventDesigner() ?? false)) {
@@ -59,38 +98,7 @@ class EventTypeController extends TableController
         ]));
     }
 
-    public function create(): void
-    {
-        if (!($this->application->getConnectedUser()->isEventDesigner() ?? false)) {
-            $this->raiseforbidden(__FILE__, __LINE__);
-            return;
-        }
-        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
-            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
-        $id = $this->dataHelper->set('EventType', ['Name' => '']);
-        $this->redirect('/EventTypes/edit/' . $id);
-    }
-
-    public function edit(int $id): void
-    {
-        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isEventDesigner()) && $this->eventTypeExists($id)) {
-            $eventType = $this->dataHelper->get('EventType', ['Id' => $id], 'Name, IdGroup');
-            $existingAttributes = $this->dataHelper->gets('EventTypeAttribute', ['IdEventType' => $id], 'IdAttribute');
-
-            $this->render('Event/views/eventType_edit.latte', Params::getAll([
-                'name' => $eventType->Name,
-                'idGroup' => $eventType->IdGroup,
-                'groups' => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
-                'attributes' => $this->dataHelper->gets('Attribute', [], '*', 'Name'),
-                'existingAttributesIds' => array_map(fn($a) => $a->IdAttribute, $existingAttributes),
-                'page' => $this->application->getConnectedUser()->getPage(),
-            ]));
-        }
-    }
-
-    public function editSave(int $id): void
+    public function update(int $id): void
     {
         if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isEventDesigner()) && $this->eventTypeExists($id)) {
             $schema = [
@@ -103,17 +111,9 @@ class EventTypeController extends TableController
                 $id,
                 $input['name'] ?? '???',
                 $input['idGroup'] === '' ? null : (int)$input['idGroup'],
-                $input['attributes']
+                $input['attributes'] ?? []
             );
             $this->redirect('/EventTypes');
-        }
-    }
-
-    public function delete(int $id): void
-    {
-        if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isEventDesigner()) && $this->eventTypeExists($id)) {
-            $this->dataHelper->set('EventType', ['Inactivated' => 1], ['Id' => $id]);
-            $this->redirect('/eventTypes');
         }
     }
 

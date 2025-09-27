@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace app\apis;
@@ -68,9 +69,13 @@ class EventAttributeApi extends AbstractApi
             return;
         }
         try {
-            $this->renderJson(['attributes' => $this->attributeDataHelper->getAttributes()], true, ApplicationError::Ok->value);
+            $this->application->getLatte()->render(
+                'Event/views/attributes-list_partial.latte',
+                ['attributes' => $this->attributeDataHelper->getAttributes()]
+            );
         } catch (Throwable $e) {
-            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value);
+            http_response_code(500);
+            echo "<div class='alert alert-danger'>Erreur : " . htmlspecialchars($e->getMessage()) . "</div>";
         }
     }
 

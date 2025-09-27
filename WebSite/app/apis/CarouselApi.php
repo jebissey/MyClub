@@ -64,8 +64,7 @@ class CarouselApi extends AbstractApi
                 $this->renderJson(['error' => 'Accès non autorisé'], false, ApplicationError::Forbidden->value);
                 return;
             }
-            $items = $this->dataHelper->gets('Carousel', ['IdArticle' => $idArticle]);
-            $this->renderJson(['items' => $items], true, ApplicationError::Ok->value);
+            $this->renderJson(['items' => $this->dataHelper->gets('Carousel', ['IdArticle' => $idArticle])], true, ApplicationError::Ok->value);
         } catch (QueryException $e) {
             $this->renderJsonBadRequest($e->getMessage(), __FILE__, __LINE__);
         } catch (Throwable $e) {

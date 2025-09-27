@@ -63,8 +63,7 @@ class GroupApi extends AbstractApi
             return;
         }
         try {
-            $users = $this->personDataHelper->getPersonsInGroup($id);
-            $this->renderJson($users, true, ApplicationError::Ok->value);
+            $this->renderJson(['items' => $this->personDataHelper->getPersonsInGroup($id)], true, ApplicationError::Ok->value);
         } catch (Throwable $e) {
             $this->renderJsonError($e->getMessage(), ApplicationError::Error->value);
         }

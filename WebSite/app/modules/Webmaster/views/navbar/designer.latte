@@ -13,16 +13,16 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav">
                 {if $isEventDesigner}
-                <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Les types d'évènements">
+                <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Les types d'évènements et leurs attributs">
                     <a class="nav-link {if $page == 'eventTypes'}active{/if}" href="/eventTypes"><h2>🗓️</h2></a>
                 </li>
-                <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Les besoins">
+                <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Les besoins associés aux événements">
                     <a class="nav-link {if $page == 'needs'}active{/if}" href="/needs"><h2>📋</h2></a>
                 </li>
                 {/if}
 
                 {if $isHomeDesigner}
-                <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Settings">
+                <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Personnalisation">
                     <a class="nav-link {if $page == 'settings'}active{/if}" href="/settings"><h2>🔧</h2></a>
                 </li>
                 <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Les designs">
@@ -31,7 +31,7 @@
                 {/if}
 
                 {if $isNavbarDesigner}
-                <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Nav bar">
+                <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Les barres de navigations">
                     <a class="nav-link {if $page == 'navBar'}active{/if}" href="/navbar"><h2>📑</h2></a>
                 </li>
                 {/if}
