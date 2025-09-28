@@ -236,7 +236,6 @@ class Routes
         $this->routes = array_merge($this->routes, (new Home($this->controllerFactory))->get());
         $this->routes = array_merge($this->routes, (new Import($this->controllerFactory))->get());
         $this->routes = array_merge($this->routes, (new ImportApi($this->apiFactory))->get());
-        $this->routes = array_merge($this->routes, (new Log($this->controllerFactory))->get());
         $this->routes = array_merge($this->routes, (new Maintenance($this->controllerFactory))->get());
         $this->routes = array_merge($this->routes, (new Media($this->controllerFactory))->get());
         $this->routes = array_merge($this->routes, (new NavBar($this->controllerFactory))->get());

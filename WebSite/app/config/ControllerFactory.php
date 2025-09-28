@@ -228,15 +228,6 @@ class ControllerFactory
         );
     }
 
-    public function makeLogController(): LogController
-    {
-        return new LogController(
-            $this->application,
-            $this->logDataHelper,
-            $this->crosstabDataHelper
-        );
-    }
-
     public function makeMaintenanceController(): MaintenanceController
     {
         return new MaintenanceController(
@@ -380,7 +371,12 @@ class ControllerFactory
 
     public function makeVisitorInsightsController(): VisitorInsightsController
     {
-        return new VisitorInsightsController($this->application);
+        return new VisitorInsightsController(
+            $this->application,
+            $this->personDataHelper,
+            $this->logDataHelper,
+            $this->crosstabDataHelper
+        );
     }
 
     public function makeWebmasterController(): WebmasterController
