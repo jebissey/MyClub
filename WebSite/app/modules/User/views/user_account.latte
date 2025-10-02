@@ -87,11 +87,7 @@
                 </div>
                 {/if}
 
-                {php $uriParts = explode('/', trim($_SERVER['REQUEST_URI'], '/'))}
-                {if isset($uriParts[0])}
-                    {php $uriRoot = '/' . $uriParts[0]}
-                {/if}
-                <a href="{$uriRoot}" class="btn btn-secondary">Annuler</a>
+                <button class="btn btn-secondary" onclick="history.back()">Annuler</button>
                 <button type="submit" class="btn btn-primary">Valider</button>
             </div>
         </div>

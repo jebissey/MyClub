@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace app\models;
@@ -21,5 +22,17 @@ class CarouselDataHelper extends Data
             $this->set('Carousel', ['Item' => $item, 'IdArticle' => $data['idArticle']]);
             return 'Élément ajouté avec succès';
         }
+    }
+
+    public function inGalery(string $path): bool
+    {
+        $sql = "SELECT 1 
+            FROM Carousel 
+            WHERE Item LIKE :path 
+            LIMIT 1";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([':path' => '%' . $path . '%']);
+
+        return (bool) $stmt->fetchColumn();
     }
 }

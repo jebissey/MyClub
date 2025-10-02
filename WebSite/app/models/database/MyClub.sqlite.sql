@@ -270,6 +270,15 @@ CREATE TABLE IF NOT EXISTS "Settings" (
 	"Value"	TEXT NOT NULL,
 	PRIMARY KEY("Id")
 );
+CREATE TABLE IF NOT EXISTS "SharedFile" (
+	"Id"	INTEGER,
+	"Item"	TEXT NOT NULL,
+	"IdGroup"	INTEGER,
+	"OnlyForMembers"	INTEGER NOT NULL DEFAULT 1,
+	"Token"	TEXT,
+	PRIMARY KEY("Id"),
+	FOREIGN KEY("IdGroup") REFERENCES "Group"("Id")
+);
 CREATE TABLE IF NOT EXISTS "Survey" (
 	"Id"	INTEGER,
 	"Question"	TEXT NOT NULL,

@@ -1,9 +1,9 @@
     <div class="container-fluid">
         <a class="navbar-brand" href="/">
-            <img src="/app/images/home.png" alt="Home" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="{='home'|translate}">
+            <img src="/app/images/home.png" alt="Home" data-bs-toggle="tooltip" data-bs-placement="bottom" title="{='home'|translate}">
         </a>
         <a class="navbar-brand" href="/admin">
-            <img src="/app/images/admin.png" alt="Admin" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Zone admin">
+            <img src="/app/images/admin.png" alt="Admin" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Zone admin">
         </a>
 
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -13,29 +13,29 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav">
                 {if $isEventDesigner}
-                <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Les types d'évènements et leurs attributs">
+                <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Les types d'évènements et leurs attributs">
                     <a class="nav-link {if $page == 'eventTypes'}active{/if}" href="/eventTypes"><h2>🗓️</h2></a>
                 </li>
-                <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Les besoins associés aux événements">
+                <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Les besoins associés aux événements">
                     <a class="nav-link {if $page == 'needs'}active{/if}" href="/needs"><h2>📋</h2></a>
                 </li>
                 {/if}
 
                 {if $isHomeDesigner}
-                <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Personnalisation">
+                <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Personnalisation">
                     <a class="nav-link {if $page == 'settings'}active{/if}" href="/settings"><h2>🔧</h2></a>
                 </li>
-                <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Les designs">
+                <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Les designs">
                     <a class="nav-link {if $page == 'designs'}active{/if}" href="/designs"><h2>🧠</h2></a>
                 </li>                
                 {/if}
 
                 {if $isNavbarDesigner}
-                <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Les barres de navigations">
+                <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Les barres de navigations">
                     <a class="nav-link {if $page == 'navBar'}active{/if}" href="/navbar"><h2>📑</h2></a>
                 </li>
                 {/if}
             </ul>
-            <a href ="/designer/help"><img src="/app/images/help.png" alt="Help" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Aide contextuelle"></a>
+            <a href ="/designer/help"><img src="/app/images/help.png" alt="Help" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Aide contextuelle"></a>
         </div>
     </div>

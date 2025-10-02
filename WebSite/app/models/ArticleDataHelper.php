@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace app\models;
@@ -211,6 +212,37 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':id' => $id]);
         return $stmt->fetch();
+    }
+
+    public function inArticle(string $path): bool
+    {
+        $sql = "SELECT 1 
+            FROM Article 
+            WHERE Content LIKE :path 
+            LIMIT 1";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([':path' => '%' . $path . '%']);
+
+        return (bool) $stmt->fetchColumn();
+    }
+
+    public function inArticles(string $path): array
+    {
+        $sql = "
+            SELECT DISTINCT a.Id, a.Title
+            FROM Article a
+            WHERE a.Content LIKE :path
+
+            UNION
+
+            SELECT DISTINCT a.Id, a.Title
+            FROM Article a
+            INNER JOIN Carousel c ON c.IdArticle = a.Id
+            WHERE c.Item LIKE :path
+        ";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([':path' => '%' . $path . '%']);
+        return $stmt->fetchAll();
     }
 
     public function isSpotlightActive(): bool

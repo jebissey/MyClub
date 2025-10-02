@@ -13,6 +13,7 @@ use app\helpers\WebApp;
 use app\models\ArticleCrosstabDataHelper;
 use app\models\ArticleDataHelper;
 use app\models\ArticleTableDataHelper;
+use app\models\CarouselDataHelper;
 use app\models\CrosstabDataHelper;
 use app\models\DataHelper;
 use app\models\DbBrowserDataHelper;
@@ -29,6 +30,7 @@ use app\models\ParticipantDataHelper;
 use app\models\PersonDataHelper;
 use app\models\PersonGroupDataHelper;
 use app\models\PersonStatisticsDataHelper;
+use app\models\SharedFileDataHelper;
 use app\models\SurveyDataHelper;
 use app\models\TableControllerDataHelper;
 use app\modules\Article\ArticleController;
@@ -60,7 +62,6 @@ use app\modules\User\UserNotepadController;
 use app\modules\User\UserPreferencesController;
 use app\modules\User\UserPresentationController;
 use app\modules\User\UserStatisticsController;
-use app\modules\VisitorInsights\LogController;
 use app\modules\VisitorInsights\VisitorInsightsController;
 use app\modules\Webmaster\ArwardsController;
 use app\modules\Webmaster\DbBrowserController;
@@ -81,6 +82,7 @@ class ControllerFactory
         private ArticleTableDataHelper $articleTableDataHelper,
         private AuthenticationService $authenticationService,
         private Backup $backup,
+        private CarouselDataHelper $carouselDataHelper,
         private ConnectedUser $connectedUser,
         private CrosstabDataHelper $crosstabDataHelper,
         private DataHelper $dataHelper,
@@ -101,6 +103,7 @@ class ControllerFactory
         private PersonDataHelper $personDataHelper,
         private PersonGroupDataHelper $personGroupDataHelper,
         private PersonStatisticsDataHelper $personStatisticsDataHelper,
+        private SharedFileDataHelper $sharedFileDataHelper,
         private SurveyDataHelper $surveyDataHelper,
         private TableControllerDataHelper $tableControllerDataHelper,
         private WebApp $webapp,
@@ -238,7 +241,7 @@ class ControllerFactory
 
     public function makeMediaController(): MediaController
     {
-        return new MediaController($this->application);
+        return new MediaController($this->application, $this->articleDataHelper, $this->carouselDataHelper, $this->personGroupDataHelper, $this->sharedFileDataHelper);
     }
 
     public function makeNavBarController(): NavBarController

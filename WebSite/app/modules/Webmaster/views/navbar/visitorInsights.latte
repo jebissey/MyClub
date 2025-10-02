@@ -1,9 +1,9 @@
     <div class="container-fluid">
         <a class="navbar-brand" href="/">
-            <img src="/app/images/home.png" alt="Home" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="{='home'|translate}">
+            <img src="/app/images/home.png" alt="Home" data-bs-toggle="tooltip" data-bs-placement="bottom" title="{='home'|translate}">
         </a>
         <a class="navbar-brand" href="/admin">
-            <img src="/app/images/admin.png" alt="Admin" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Zone admin">
+            <img src="/app/images/admin.png" alt="Admin" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Zone admin">
         </a>
 
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -12,25 +12,25 @@
 
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav">
-                <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Sites Référents">
+                <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Sites Référents">
                     <a class="nav-link {if $page == 'referents'}active{/if}" href="/referents"><h2>☁️</h2></a>
                 </li>
-                <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Top pages par période">
+                <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Top pages par période">
                     <a class="nav-link {if $page == 'topPages'}active{/if}" href="/topPages"><h2>📈</h2></a>
                 </li>
-                <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Tableau croisé dynamique">
+                <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Tableau croisé dynamique">
                     <a class="nav-link {if $page == 'crossTab'}active{/if}" href="/crossTab"><h2>🧮</h2></a>
                 </li>
-                <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Visiteurs">
+                <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Visiteurs">
                     <a class="nav-link {if $page == 'logs'}active{/if}" href="/logs"><h2>📊</h2></a>
                 </li>
-                <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Dernières visites">
+                <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Dernières visites">
                     <a class="nav-link {if $page == 'lastVisits'}active{/if}" href="/lastVisits"><h2>👁️</h2></a>
                 </li>
-                <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Alertes demandées par les membres">
+                <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Alertes demandées par les membres">
                     <a class="nav-link {if $page == 'membersAlerts'}active{/if}" href="/membersAlerts"><h2>📩</h2></a>
                 </li>
             </ul>
-            <a href ="/visitorInsights/help"><img src="/app/images/help.png" alt="Help" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Aide contextuelle"></a>
+            <a href ="/visitorInsights/help"><img src="/app/images/help.png" alt="Help" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Aide contextuelle"></a>
         </div>
     </div>

@@ -103,18 +103,18 @@
                                 data-bs-toggle="modal" 
                                 data-bs-target="#emailModal"
                                 onclick="event.stopPropagation();">
-                            <i class="bi bi-envelope" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="{='sendEmail'|translate}"></i>
+                            <i class="bi bi-envelope" data-bs-toggle="tooltip" data-bs-placement="top" title="{='sendEmail'|translate}"></i>
                         </button>
                         <button class="btn btn-sm btn-primary edit-btn">
-                            <i class="bi bi-pencil" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="{='edit'|translate}"></i>
+                            <i class="bi bi-pencil" data-bs-toggle="tooltip" data-bs-placement="top" title="{='edit'|translate}"></i>
                         </button>
                         <button class="btn btn-sm btn-danger delete-btn">
-                            <i class="bi bi-trash" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="{='delete'|translate}"></i>
+                            <i class="bi bi-trash" data-bs-toggle="tooltip" data-bs-placement="top" title="{='delete'|translate}"></i>
                         </button>
                     {/if}
                     {if $event['createdBy'] == ($person->Id ?? false) || $mode == 'past' || $isEventManager}
                         <button class="btn btn-sm btn-secondary duplicate-btn" data-id="{$event['id']}">
-                            <i class="bi bi-files" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="{='duplicate'|translate}"></i>
+                            <i class="bi bi-files" data-bs-toggle="tooltip" data-bs-placement="top" title="{='duplicate'|translate}"></i>
                         </button>
                     {/if}
                     </div>

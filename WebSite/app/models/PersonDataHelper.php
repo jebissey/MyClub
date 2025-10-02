@@ -31,7 +31,7 @@ class PersonDataHelper extends Data implements NewsProviderInterface
             $query->execute([]);
             $id = $this->pdo->lastInsertId();
         }
-        return $id;
+        return (int)$id;
     }
 
     public function getEmailsOfInterestedPeople(?int $idGroup, ?int $idEventType, int $dayOfWeek, string $timeOfDay): array
@@ -176,16 +176,17 @@ class PersonDataHelper extends Data implements NewsProviderInterface
         return $filteredEmails;
     }
 
-    public function getPublisher(int $id): string|null
+    public function getPublisher(?int $idPerson): string|null
     {
-        if ($id == null) return null;
-        $person = $this->get('Person', ['Id' => $id], 'FirstName, LastName');
+        if ($idPerson === null) return null;
+        $person = $this->get('Person', ['Id' => $idPerson], 'FirstName, LastName');
         return "publié par " . $person->FirstName . " " . $person->LastName;
     }
 
     public function getWebmasterEmail(): string
     {
-        $query = $this->pdo->query('
+        $query = $this->pdo->query(
+            '
             SELECT Email FROM Person
             INNER JOIN PersonGroup on Person.Id = PersonGroup.IdPerson
             INNER JOIN "Group" on "Group".Id = PersonGroup.IdGroup

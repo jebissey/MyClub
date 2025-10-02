@@ -1,6 +1,6 @@
               <div class="container-fluid">
                 <a class="navbar-brand" href="/">
-                  <img src="/app/images/home.png" alt="Home" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="{='home'|translate}">
+                  <img src="/app/images/home.png" alt="Home" data-bs-toggle="tooltip" data-bs-placement="bottom" title="{='home'|translate}">
                 </a>
 
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -18,7 +18,7 @@
 
                   {if $isAdmin}
                     <a href="/admin" class="me-2">
-                      <img src="/app/images/admin.png" alt="Admin" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="{='admin_zone'|translate}">
+                      <img src="/app/images/admin.png" alt="Admin" data-bs-toggle="tooltip" data-bs-placement="bottom" title="{='admin_zone'|translate}">
                     </a>
                   {/if}
 
@@ -27,7 +27,7 @@
                     <span class="user-avatar-emoji" 
                           data-bs-toggle="tooltip" 
                           data-bs-placement="bottom" 
-                          data-bs-title="{if $userEmail != ''}{='my_data'|translate}{else}{='login'|translate}{/if}"
+                          title="{if $userEmail != ''}{='my_data'|translate}{else}{='login'|translate}{/if}"
                           style="font-size: 2rem; cursor: pointer; display: inline-block; line-height: 1;">
                         {$userImg}
                     </span>
@@ -36,17 +36,17 @@
                         alt="User gravatar" 
                         data-bs-toggle="tooltip" 
                         data-bs-placement="bottom" 
-                        data-bs-title="{if $userEmail != ''}{='my_data'|translate}{else}{='login'|translate}{/if}">
+                        title="{if $userEmail != ''}{='my_data'|translate}{else}{='login'|translate}{/if}">
                   {/if}
                   </a>
                   
                   {if $userEmail != ''}
                     <a href="/user/sign/out">
-                      <img src="/app/images/SignOut.png" alt="Sign out" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="{='logout'|translate}">
+                      <img src="/app/images/SignOut.png" alt="Sign out" data-bs-toggle="tooltip" data-bs-placement="bottom" title="{='logout'|translate}">
                     </a>
                   {/if}
                   <a href="/help">
-                    <img src="/app/images/help.png" alt="Help" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="{='contextual_help'|translate}" class="me-2">
+                    <img src="/app/images/help.png" alt="Help" data-bs-toggle="tooltip" data-bs-placement="bottom" title="{='contextual_help'|translate}" class="me-2">
                   </a>
                   <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#languageModal">
                     <h2 class="modal-title" id="languageModalLabel">{$flag}</h2>

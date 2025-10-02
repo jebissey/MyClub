@@ -32,9 +32,9 @@ use app\config\routes\GroupApi;
 use app\config\routes\Home;
 use app\config\routes\Import;
 use app\config\routes\ImportApi;
-use app\config\routes\Log;
 use app\config\routes\Maintenance;
 use app\config\routes\Media;
+use app\config\routes\MediaApi;
 use app\config\routes\NavBar;
 use app\config\routes\NavbarApi;
 use app\config\routes\Person;
@@ -89,6 +89,7 @@ use app\models\ParticipantDataHelper;
 use app\models\PersonDataHelper;
 use app\models\PersonGroupDataHelper;
 use app\models\PersonStatisticsDataHelper;
+use app\models\SharedFileDataHelper;
 use app\models\SurveyDataHelper;
 use app\models\TableControllerDataHelper;
 use app\services\AuthenticationService;
@@ -131,6 +132,7 @@ class Routes
             new ArticleTableDataHelper($application),
             new AuthenticationService($dataHelper),
             new Backup(),
+            new CarouselDataHelper($application),
             $application->getConnectedUser(),
             new CrosstabDataHelper($application, $authorizationDataHelper),
             new DataHelper($application),
@@ -151,6 +153,7 @@ class Routes
             $personDataHelper,
             new PersonGroupDataHelper($application),
             new PersonStatisticsDataHelper($application),
+            new SharedFileDataHelper($application),
             $surveyDataHelper,
             new TableControllerDataHelper($application),
             new WebApp(),
@@ -174,7 +177,8 @@ class Routes
             new PageDataHelper($application, $authorizationDataHelper),
             $participantDataHelper,
             $personDataHelper,
-            $personPreferences
+            $personPreferences,
+            new SharedFileDataHelper($application)
         );
     }
 
@@ -238,6 +242,7 @@ class Routes
         $this->routes = array_merge($this->routes, (new ImportApi($this->apiFactory))->get());
         $this->routes = array_merge($this->routes, (new Maintenance($this->controllerFactory))->get());
         $this->routes = array_merge($this->routes, (new Media($this->controllerFactory))->get());
+        $this->routes = array_merge($this->routes, (new MediaApi($this->apiFactory))->get());
         $this->routes = array_merge($this->routes, (new NavBar($this->controllerFactory))->get());
         $this->routes = array_merge($this->routes, (new NavbarApi($this->apiFactory))->get());
         $this->routes = array_merge($this->routes, (new Person($this->controllerFactory))->get());

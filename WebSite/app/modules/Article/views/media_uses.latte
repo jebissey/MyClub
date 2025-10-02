@@ -1,0 +1,31 @@
+{extends '../../Webmaster/views/redactor.latte'}
+
+{block content}
+                <div class="container mt-4">
+                    <h1>Où est utilisé ce média ?</h1>
+                    <h2>{$path}</h2>
+                    <button class="btn btn-primary btn-sm bi bi-arrow-left-circle fs-4" onclick="history.back()"></button>
+                    
+                    {if $articles && count($articles)}
+                    <h3>Ce média est utilisé dans les articles suivants :</h3>
+                    <ul class="list-group mb-4">
+                        {foreach $articles as $article}
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span>
+                                <strong>{$article->Title}</strong>
+                                <small class="text-muted">#{$article->Id}</small>
+                            </span>
+                            <a href="/article/{$article->Id}" class="btn btn-sm btn-primary">
+                                Voir l'article
+                            </a>
+                        </li>
+                        {/foreach}
+                    </ul>
+                    {else}
+                    <div class="alert alert-info">
+                        Ce média n'est utilisé dans aucun article.
+                    </div>
+                    {/if}
+
+                </div>
+{/block}

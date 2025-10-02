@@ -14,6 +14,7 @@ use app\apis\EventNeedTypeApi;
 use app\apis\EventSupplyApi;
 use app\apis\GroupApi;
 use app\apis\ImportApi;
+use app\apis\MediaApi;
 use app\apis\NavbarApi;
 use app\apis\WebmasterApi;
 use app\helpers\Application;
@@ -34,6 +35,7 @@ use app\models\NeedTypeDataHelper;
 use app\models\PageDataHelper;
 use app\models\ParticipantDataHelper;
 use app\models\PersonDataHelper;
+use app\models\SharedFileDataHelper;
 use app\services\AuthorizationService;
 use app\services\EventService;
 
@@ -58,6 +60,7 @@ class ApiFactory
         private ParticipantDataHelper $participantDataHelper,
         private PersonDataHelper $personDataHelper,
         private PersonPreferences $personPreferences,
+        private SharedFileDataHelper $sharedFileDataHelper
     ) {}
 
     public function makeArticleApi(): ArticleApi
@@ -174,6 +177,17 @@ class ApiFactory
             $this->connectedUser,
             $this->dataHelper,
             $this->personDataHelper
+        );
+    }
+
+    public function makeMediaApi(): MediaApi
+    {
+        return new MediaApi(
+            $this->application,
+            $this->connectedUser,
+            $this->dataHelper,
+            $this->personDataHelper,
+            $this->sharedFileDataHelper
         );
     }
 

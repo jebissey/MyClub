@@ -70,7 +70,7 @@ class AuthorizationDataHelper extends Data
         return array_column($rows, 'IdGroup');
     }
 
-    public function isUserInGroup($personEmail, $groupsFilter): bool
+    public function isUserInGroup(string $personEmail, string $groupsFilter): bool
     {
         return !empty(array_intersect($this->getGroups($groupsFilter), $this->getUserGroups($personEmail)));
     }

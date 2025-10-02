@@ -130,6 +130,7 @@ class HomeController extends AbstractController
             'hasAuthorization' => $this->application->getConnectedUser()->hasAutorization() ?? false,
             'currentVersion' => Application::VERSION,
             'page' => $this->application->getConnectedUser()->getPage(),
+            'timer' => 0,
         ]);
         echo $content;
     }

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace app\models;
@@ -10,6 +11,12 @@ class PersonGroupDataHelper extends Data
     public function __construct(Application $application)
     {
         parent::__construct($application);
+    }
+
+    public function isPersonInGroup(int $idPerson, int $idGroup): bool
+    {
+        $personGroup = $this->get('PersonGroup', ['IdPerson' => $idPerson, 'IdGroup' => $idGroup], 'Id');
+        return $personGroup !== false;
     }
 
     public function update(int $personId, array $groups): void
