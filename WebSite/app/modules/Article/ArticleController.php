@@ -88,10 +88,6 @@ class ArticleController extends TableController
             return;
         }
         $connectedUser = $this->application->getConnectedUser();
-        if ($connectedUser->person->Id != $article->CreatedBy) {
-            $this->raiseforbidden(__FILE__, __LINE__);
-            return;
-        }
         $article = $this->articleDataHelper->getLatestArticle([$id]);
 
         $this->render('Article/views/article_edit.latte', Params::getAll([
@@ -105,6 +101,7 @@ class ArticleController extends TableController
             'carouselItems' => $this->dataHelper->gets('Carousel', ['IdArticle' => $id]),
             'page' => $connectedUser->getPage(),
             'isEditor' => $connectedUser->isEditor(),
+            'isCreator' => $connectedUser->person->Id == $article->CreatedBy
         ]));
     }
 

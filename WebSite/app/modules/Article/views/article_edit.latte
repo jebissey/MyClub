@@ -37,7 +37,8 @@
                         {/if}
                     </small>
                 </div>
-                <div class="d-flex justify-content-end">
+                <div class="d-flex justify-content-end align-items-center">
+                {if $isCreator}
                     <a href="/emails/article/{$id}" class="btn btn-warning ms-2">Prévenir les abonnés</a>
                     <button id="edit-toggle-btn" class="btn btn-primary ms-2">Modifier l'article</button>
                     {if $hasSurvey}
@@ -45,6 +46,9 @@
                     {else}
                     <a href="/survey/add/{$id}" class="btn btn-success ms-2">Ajouter un sondage</a>
                     {/if}
+                {else}
+                    <small class="text-muted">Seul le créateur de l'article peut le modifier</small>                
+                {/if}
                     <a href="/articles" class="btn btn-secondary ms-2">Liste des articles</a>
                 </div>
             </div>

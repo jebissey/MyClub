@@ -33,7 +33,7 @@ function main(): int
         baseUrl: $options['base-url'] ?? 'http://localhost:8000',
         timeout: (int)($options['timeout'] ?? 5)
     );
-    $test       = $options['test'] ?? null;
+    $test = isset($options['test']) ? (int) $options['test'] : null;
     $simu       = $options['simu'] ?? null;
     $start      = $options['start'] ?? null;
     $exportJson = isset($options['export-json']);

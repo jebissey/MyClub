@@ -24,8 +24,7 @@ document.addEventListener('DOMContentLoaded', function () {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                item: this.dataset.path,
-                idGroup: idGroup || null,
+                idGroup: idGroup,
                 membersOnly: membersOnly
             })
         })
