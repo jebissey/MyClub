@@ -1,7 +1,10 @@
 <?php
+
 declare(strict_types=1);
 
 namespace app\helpers;
+
+use InvalidArgumentException;
 
 use app\enums\FilterInputRule;
 
@@ -13,39 +16,6 @@ class WebApp
     {
         $params = array_merge($_GET, $newParams);
         return '?' . http_build_query($params);
-    }
-
-    static public function getBaseUrl(): string
-    {
-        $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https://' : 'http://';
-        $host = $_SERVER['HTTP_HOST'];
-        $baseUrl = $protocol . $host . '/';
-
-        return $baseUrl;
-    }
-
-    static public function isMyClubWebSite(): bool{
-        return self::getBaseUrl() == self::MYCLUB_WEBAPP;
-    }
-
-    static public function sanitizeHtml($html)
-    {
-        $allowed_tags = '<div><span><p><br><strong><em><ul><ol><li><a><img><h1><h2><h3><h4><h5><h6><blockquote><pre><code><table><thead><tbody><tr><th><td>';
-        $html = strip_tags($html, $allowed_tags);
-
-        $html = preg_replace('/<(.*?)[\s|>]on[a-z]+=[\'"].*?[\'"]>(.*?)<\/\\1>/i', '<$1>$2</$1>', $html);
-        $html = preg_replace('/javascript:.*?[\'"]/i', '', $html);
-
-        return $html;
-    }
-
-    static public function sanitizeInput(string $data, array $possibleValues = [], string $defaultValue = ''): string
-    {
-        $data = trim($data ?? '');
-        if (!empty($possibleValues)) {
-            if (!in_array($data, $possibleValues, true)) return $defaultValue;
-        }
-        return $data;
     }
 
     /**
@@ -114,10 +84,10 @@ class WebApp
             if (is_array($rule))                                     $filtered[$key] = in_array($value, $rule, true) ? $value : null;
             elseif (is_string($rule) && str_starts_with($rule, '/')) $filtered[$key] = preg_match($rule, $value) ? $value : null;
             elseif ($rule === FilterInputRule::Bool->value) {
-    if (is_array($raw)) {
-        $filtered[$key] = !empty($raw) ? 1 : 0;
-        continue;
-    }
+                if (is_array($raw)) {
+                    $filtered[$key] = !empty($raw) ? 1 : 0;
+                    continue;
+                }
                 if ($value === 'on' || $value === '1' || $value === 'true')                        $filtered[$key] = 1;
                 elseif ($value === 'off' || $value === '0' || $value === 'false' || $value === '') $filtered[$key] = 0;
                 else                                                                               $filtered[$key] = filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
@@ -128,9 +98,54 @@ class WebApp
         return $filtered;
     }
 
+    static public function getBaseUrl(): string
+    {
+        $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https://' : 'http://';
+        $host = $_SERVER['HTTP_HOST'];
+        $baseUrl = $protocol . $host . '/';
+
+        return $baseUrl;
+    }
+
     static public function getFiltered(string $key, string|array $rule, array $source): mixed
     {
         $result = self::filterInput([$key => $rule], $source);
         return $result[$key] !== '' ? $result[$key] : false;
+    }
+
+    static public function isMyClubWebSite(): bool
+    {
+        return self::getBaseUrl() == self::MYCLUB_WEBAPP;
+    }
+
+    static public function nullableCast(mixed $value, string $type): mixed
+    {
+        if ($value === null) return null;
+        return match ($type) {
+            'int'    => (int)$value,
+            'float'  => (float)$value,
+            'bool'   => (bool)$value,
+            default  => throw new InvalidArgumentException("Unsupported cast type: $type"),
+        };
+    }
+
+    static public function sanitizeHtml($html)
+    {
+        $allowed_tags = '<div><span><p><br><strong><em><ul><ol><li><a><img><h1><h2><h3><h4><h5><h6><blockquote><pre><code><table><thead><tbody><tr><th><td>';
+        $html = strip_tags($html, $allowed_tags);
+
+        $html = preg_replace('/<(.*?)[\s|>]on[a-z]+=[\'"].*?[\'"]>(.*?)<\/\\1>/i', '<$1>$2</$1>', $html);
+        $html = preg_replace('/javascript:.*?[\'"]/i', '', $html);
+
+        return $html;
+    }
+
+    static public function sanitizeInput(string $data, array $possibleValues = [], string $defaultValue = ''): string
+    {
+        $data = trim($data ?? '');
+        if (!empty($possibleValues)) {
+            if (!in_array($data, $possibleValues, true)) return $defaultValue;
+        }
+        return $data;
     }
 }

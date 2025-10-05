@@ -35,7 +35,7 @@
                             {/foreach}
                         </select>
                     </form>
-                    <form method="get" class="d-flex">
+                    <form id="searchForm" method="get" class="d-flex">
                         <input type="hidden" name="year" value="{$currentYear}">
                         <input type="hidden" name="month" value="{$currentMonth}">
                         <input type="hidden" name="fileExtension" value="{$currentFileExtension}">
@@ -143,7 +143,7 @@
                     </div>
                     <div class="d-flex align-items-center gap-2 mb-3">
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="members-only-checkbox" name="membersOnly" value="1" checked>
+                            <input class="form-check-input" type="checkbox" id="members-only-checkbox" name="membersOnly" value="1" checked {if !$isEditor}disabled{/if}>
                             <label class="form-check-label" for="members-only-checkbox">Pour les membres du club uniquement</label>
                         </div>
                     </div>

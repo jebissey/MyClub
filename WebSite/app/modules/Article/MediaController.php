@@ -70,7 +70,8 @@ class MediaController extends AbstractController
 
     public function listFiles(): void
     {
-        if (!($this->application->getConnectedUser()->isRedactor() ?? false)) {
+        $connectedUser = $this->application->getConnectedUser();
+        if (!($connectedUser->isRedactor() ?? false)) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
         }
@@ -99,6 +100,7 @@ class MediaController extends AbstractController
             'baseUrl' => WebApp::getBaseUrl(),
             'page' => $this->application->getConnectedUser()->getPage(),
             'groups' => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
+            'isEditor' => $connectedUser->isEditor(),
         ]));
     }
 

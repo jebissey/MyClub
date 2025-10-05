@@ -8,6 +8,7 @@ use app\enums\ApplicationError;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
 use app\helpers\Media;
+use app\helpers\WebApp;
 use app\models\DataHelper;
 use app\models\PersonDataHelper;
 use app\models\SharedFileDataHelper;
@@ -84,7 +85,7 @@ class MediaApi extends AbstractApi
             return;
         }
         $data = $this->getJsonInput();
-        $response = $this->media->sharefile($year, $month, $filename, $data['idGroup'] ?? null, $data['membersOnly']);
+        $response = $this->media->sharefile($year, $month, $filename, WebApp::nullableCast($data['idGroup'] ?? null, 'int'), $data['membersOnly']);
         $this->renderJson($response, $response['success'], $response['success'] ? ApplicationError::Ok->value : ApplicationError::BadRequest->value);
     }
 

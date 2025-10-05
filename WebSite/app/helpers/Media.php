@@ -64,8 +64,7 @@ class Media
     {
         $filePath = $this->getFilePath($year,  $month,  $filename);
         if ($filePath !== '') {
-            $sharedFile = $this->dataHelper->get('SharedFile', ['Item' => $filePath], 'Id');
-            if ($sharedFile) $this->dataHelper->set('SharedFile', ['Token' => null], ['Id' => $sharedFile->Id]);
+            $this->sharedFileDataHelper->removeShareFile($filePath);
             return ['success' => true, 'message' => ''];
         }
         return ['success' => false, 'message' => "File doesn't exist"];
@@ -77,13 +76,14 @@ class Media
         if ($filePath !== '') {
             $sharedFile = $this->dataHelper->get('SharedFile', ['Item' => $filePath], 'Id, Token');
             $newToken = bin2hex(random_bytes(32));
+            $token = $sharedFile != false ? $sharedFile->Token ?? $newToken : $newToken;
             $this->dataHelper->set('SharedFile', [
                 'Item' => $filePath,
                 'IdGroup' => $idGroup,
                 'OnlyForMembers' => $onlyForMembers,
-                'Token' => $sharedFile != false ? $sharedFile->Token ?? $newToken : $newToken
+                'Token' => $token
             ],  $sharedFile != false ? ['Id' => $sharedFile->Id] : []);
-            return ['success' => true, 'message' => ''];
+            return ['success' => true, 'message' => '', 'token' => $token];
         }
         return ['success' => false, 'message' => "File doesn't exist"];
     }

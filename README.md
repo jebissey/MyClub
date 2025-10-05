@@ -17,6 +17,7 @@ It helps clubs manage **articles, events, and members** with an intuitive interf
     - [Available Authorizations](#available-authorizations)
   - [🧪 Automated Route Testing](#-automated-route-testing)
   - [👁️ Examples](#️-examples)
+  - [�️ Manuals and tutorials (in French)](#️-manuals-and-tutorials-in-french)
 - [WebApp Summary - Multi-Role Management System](#webapp-summary---multi-role-management-system)
   - [Overview](#overview)
   - [Administrator Roles](#administrator-roles)
@@ -103,6 +104,14 @@ Security is based on **groups**. There are three types:
 👉 Nordic walking site: [https://bnw-dijon.fr/](https://bnw-dijon.fr/) 
 
 👉 Static site: [https://peinturesbribri.alwaysdata.net/navbar/show/article/3](https://peinturesbribri.alwaysdata.net/navbar/show/article/3)
+
+---
+
+## 👁️ Manuals and tutorials (in French)
+
+👉 [You are](https://myclub.alwaysdata.net/navbar/show/article/10)
+
+👉 [Short videos](https://myclub.alwaysdata.net/navbar/show/article/28)
 
 ---
 
