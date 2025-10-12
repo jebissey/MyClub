@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace app\modules\PersonManager;
 
+use Throwable;
+
 use app\enums\FilterInputRule;
 use app\helpers\Application;
 use app\helpers\Params;
@@ -65,12 +67,17 @@ class RegistrationController extends TableController
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isGroupManager())) {
             [$availableGroups, $currentGroups] = $this->groupDataHelper->getAvailableGroups($this->application->getConnectedUser(), $personId);
 
-            $this->render('PersonManager/views/registration_user_groups_partial.latte', Params::getAll([
-                'currentGroups' => $currentGroups,
-                'availableGroups' => $availableGroups,
-                'personId' => $personId,
-                'page' => $this->application->getConnectedUser()->getPage()
-            ]));
+            try {
+                $this->render('PersonManager/views/registration_user_groups_partial.latte', Params::getAll([
+                    'currentGroups' => $currentGroups,
+                    'availableGroups' => $availableGroups,
+                    'personId' => $personId,
+                    'page' => $this->application->getConnectedUser()->getPage()
+                ]));
+            } catch (Throwable $e) {
+                http_response_code(500);
+                echo "<div class='alert alert-danger'>Erreur : " . htmlspecialchars($e->getMessage()) . "</div>";
+            }
         }
     }
 }

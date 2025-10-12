@@ -2,7 +2,7 @@
 
 {block content}
     {if $readOnly}
-        {if $layout == '../admin/personManager.latte'}
+        {if $layout == '../../Webmaster/views/personManager.latte'}
             <div class="alert alert-success alert-dismissible">
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 <h4>Compte importé</h4>
@@ -24,7 +24,7 @@
     <form method="POST" class="needs-validation" data-form="account">
         <div class="row justify-content-center">
             <div class="col-12 col-md-6 col-lg-4">
-                {if $layout == '../admin/personManager.latte'}
+                {if $layout == '../../Webmaster/views/personManager.latte'}
                 <div class="mb-3">
                     <label for="email" class="form-label">Email</label>
                     <input type="email" class="form-control" id="email" name="email" value="{$email}" required>
@@ -95,5 +95,5 @@
 {/block}
 
 {block scripts}
-    <script src="/app/js/user/account.js"></script>
+    <script src="/app/modules/User/js/account.js"></script>
 {/block}

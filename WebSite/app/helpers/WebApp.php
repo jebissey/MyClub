@@ -120,7 +120,7 @@ class WebApp
 
     static public function nullableCast(mixed $value, string $type): mixed
     {
-        if ($value === null) return null;
+        if ($value === null || $value === '') return null;
         return match ($type) {
             'int'    => (int)$value,
             'float'  => (float)$value,

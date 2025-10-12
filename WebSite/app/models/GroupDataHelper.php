@@ -71,7 +71,7 @@ class GroupDataHelper extends Data
 				GROUP BY g.Name
             ";
         if ($connectedUser->isWebmaster()) $availableGroupsQuery = $availableGroupsWithAuthorisationQuery;
-        else                                                        $availableGroupsQuery = $availableGroupsWithoutAuthorisationQuery;
+        else                               $availableGroupsQuery = $availableGroupsWithoutAuthorisationQuery;
         $availableGroupsLeftQuery = $this->pdo->prepare("
                 SELECT availableGroups.*
                 FROM (
@@ -93,7 +93,7 @@ class GroupDataHelper extends Data
                     ) userGroups
                 )
             ");
-        $availableGroupsLeftQuery->execute([$connectedUser->person->Id]);
+        $availableGroupsLeftQuery->execute([$personId]);
         return [$availableGroupsLeftQuery->fetchAll(), $currentGroups];
     }
 

@@ -23,8 +23,31 @@ class UserController extends AbstractController
     {
         $email = urldecode($encodedEmail);
         $success = $this->authService->handleForgotPassword($email);
-        if ($success) $this->redirect('/', ApplicationError::Ok, 'Votre mot de passe est réinitialisé');
-        else $this->raiseError('Unable to send password reset email', __FILE__, __LINE__);
+        if ($success) {
+            $this->flight->setData('message', "Password reset email sent to {$email}");
+            $this->flight->setData('code', ApplicationError::Ok->value);
+            $content = $this->languagesDataHelper->translate('message_password_reset_sent');
+            $this->render('Common/views/info.latte', [
+                'content' => $content,
+                'hasAuthorization' => $this->application->getConnectedUser()->hasAutorization() ?? false,
+                'currentVersion' => Application::VERSION,
+                'timer' => 10000,
+                'previousPage' => false,
+                'page' => $this->application->getConnectedUser()->getPage(),
+            ]);
+        } else {
+            $this->flight->setData('message', "Unable to send password reset email to {$email}");
+            $content = $this->languagesDataHelper->translate('message_password_reset_failed');
+            $this->flight->setData('code', ApplicationError::Error->value);
+            $this->render('Common/views/info.latte', [
+                'content' => $content,
+                'hasAuthorization' => $this->application->getConnectedUser()->hasAutorization() ?? false,
+                'currentVersion' => Application::VERSION,
+                'timer' => 30000,
+                'previousPage' => false,
+                'page' => $this->application->getConnectedUser()->getPage(),
+            ]);
+        }
     }
 
     public function setPassword($token): void

@@ -5,3 +5,4 @@ WebSite/backup/*
 doc/*.pdf
 test/Database/MyClub.sqlite
 test/Database/lastMyClubTest.sqlite
+dev/FullInstall.zip

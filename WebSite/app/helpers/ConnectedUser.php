@@ -32,7 +32,7 @@ class ConnectedUser
         $this->person = null;
         $userEmail = $_SESSION['user'] ?? '';
         if ($userEmail === '') return;
-        
+
         $person = $this->dataHelper->get('Person', ['Email' => $userEmail]);
         if (!$person) {
             $this->application->getErrorManager()->raise(ApplicationError::BadRequest, "Unknown user with this email address {$userEmail} in file " . __FILE__ . ' at line ' . __LINE__);
@@ -117,6 +117,11 @@ class ConnectedUser
     public function isRedactor(): bool
     {
         return in_array(Authorization::Redactor->value, $this->authorizations ?? []);
+    }
+
+    public function isRedactorOrVisitorInsghts(): bool
+    {
+        return $this->isRedactor() || $this->isVisitorInsights();
     }
 
     public function isVisitorInsights(): bool

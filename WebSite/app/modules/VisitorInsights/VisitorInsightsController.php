@@ -153,7 +153,7 @@ class VisitorInsightsController extends AbstractController
 
     public function topArticlesByPeriod(): void
     {
-        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isVisitorInsights())) {
+        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isRedactorOrVisitorInsghts())) {
             $period = WebApp::getFiltered('period', $this->application->enumToValues(Period::class), $this->flight->request()->query->getData()) ?: Period::Week->value;
             $dateCondition = PeriodHelper::getDateConditions($period);
             $topPages = $this->logDataHelper->getTopArticles($dateCondition, self::TOP);

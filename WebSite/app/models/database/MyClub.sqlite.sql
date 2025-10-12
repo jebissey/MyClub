@@ -537,6 +537,80 @@ INSERT INTO "Languages" VALUES (68,'Error503','<div class="text-center full-scre
       font-size: 10rem;
     }
 </style>');
+INSERT INTO "Languages" VALUES (69,'message_password_reset_sent','<div class="container text-center mt-5">
+  <div class="card shadow-lg rounded-3 p-4">
+    <h1 class="text-success">📧 Email sent!</h1>
+    
+    <p class="mt-3">
+      An email with a link to <strong>create a new password</strong> has been sent to the address you entered.
+    </p>
+
+    <hr class="my-4">
+
+    <h5>ℹ️ Please note:</h5>
+    <ul class="text-start mx-auto d-inline-block">
+      <li>➡️ Check your <strong>spam</strong> or <strong>junk mail</strong> folder if you don’t see the message in your inbox.</li>
+      <li>➡️ Simply click the link in the email to set your new password.</li>
+    </ul>
+
+    <a href="/" class="btn btn-primary mt-3">🏠 Back to Home</a>
+  </div>
+</div>','<div class="container text-center mt-5">
+  <div class="card shadow-lg rounded-3 p-4">
+    <h1 class="text-success">📧 Courriel envoyé !</h1>
+    
+    <p class="mt-3">
+      Un message contenant un lien pour <strong>créer un nouveau mot de passe</strong> vient d’être envoyé à l’adresse courriel que vous avez indiquée.
+    </p>
+
+    <hr class="my-4">
+
+    <h5>ℹ️ À savoir :</h5>
+    <ul class="text-start mx-auto d-inline-block">
+      <li>➡️ Pensez à vérifier votre dossier <strong>spam</strong> ou <strong>courrier indésirable</strong> si vous ne trouvez pas le message.</li>
+      <li>➡️ Cliquez simplement sur le lien présent dans le courriel pour définir votre nouveau mot de passe.</li>
+    </ul>
+
+    <a href="/" class="btn btn-primary mt-3">🏠 Retour à l’accueil</a>
+  </div>
+</div>');
+INSERT INTO "Languages" VALUES (70,'message_password_reset_failed','<div class="container text-center mt-5">
+  <div class="card shadow-lg rounded-3 p-4">
+    <h1 class="text-danger">⚠️ Email could not be sent</h1>
+
+    <p class="mt-3">
+      The password reset email <strong>could not be sent</strong> to the address you entered.
+    </p>
+
+    <hr class="my-4">
+
+    <h5>ℹ️ Please check the following:</h5>
+    <ul class="text-start mx-auto d-inline-block">
+      <li>➡️ Make sure the email address you entered is correct and registered in our system.</li>
+      <li>➡️ If the issue continues, please contact the <strong>webmaster</strong> or site administrator.</li>
+    </ul>
+
+    <a href="/" class="btn btn-primary mt-3">🏠 Back to Home</a>
+  </div>
+</div>','<div class="container text-center mt-5">
+  <div class="card shadow-lg rounded-3 p-4">
+    <h1 class="text-danger">⚠️ Échec de l’envoi du courriel</h1>
+
+    <p class="mt-3">
+      Le message de réinitialisation du mot de passe <strong>n’a pas pu être envoyé</strong> à l’adresse courriel indiquée.
+    </p>
+
+    <hr class="my-4">
+
+    <h5>ℹ️ Vérifiez les points suivants :</h5>
+    <ul class="text-start mx-auto d-inline-block">
+      <li>➡️ Assurez-vous que l’adresse courriel saisie est correcte et enregistrée dans notre système.</li>
+      <li>➡️ Si le problème persiste, contactez le <strong>webmaster</strong> ou l’administrateur du site.</li>
+    </ul>
+
+    <a href="/" class="btn btn-primary mt-3">🏠 Retour à l’accueil</a>
+  </div>
+</div>');
 INSERT INTO "Metadata" VALUES (1,'MyClub',1,0);
 INSERT INTO "Person" VALUES (1,'webmaster@myclub.foo','e427c26faca947919b18b797bc143a35100e4de48c34b70b26202d3a7d8e51f7','my first name','my last name','my nick name or nothing',NULL,'0',NULL,NULL,NULL,NULL,0,0,NULL,NULL,'2025-01-01',0,NULL,NULL,NULL,NULL);
 INSERT INTO "PersonGroup" VALUES (1,1,1);

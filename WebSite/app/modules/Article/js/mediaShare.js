@@ -39,6 +39,19 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
+    if (groupSelect && membersOnlyCheckbox) {
+        groupSelect.addEventListener('change', function () {
+            if (this.value !== '') {
+                membersOnlyCheckbox.checked = true;
+            }
+        });
+        membersOnlyCheckbox.addEventListener('change', function () {
+            if (!this.checked) {
+                groupSelect.value = '';
+            }
+        });
+    }
+
     if (createShareBtn) {
         createShareBtn.addEventListener('click', function () {
             const idGroup = groupSelect ? groupSelect.value : '';
