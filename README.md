@@ -8,6 +8,7 @@
 It helps clubs manage **articles, events, and members** with an intuitive interface, user preferences, and built-in access control.
 
 👍 Tutorials[https://www.youtube.com/channel/UC3EmmKasCGdM2_fP2ZNdAzg]🇫🇷
+
 📖 Manuals[https://myclub.alwaysdata.net/]🇫🇷
 
 ---
