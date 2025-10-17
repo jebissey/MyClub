@@ -7,6 +7,7 @@ namespace app\services;
 use DateTime;
 
 use app\enums\FilterInputRule;
+use app\exceptions\EmailException;
 use app\helpers\Application;
 use app\helpers\Password;
 use app\helpers\WebApp;
@@ -22,7 +23,7 @@ class AuthenticationService
     public function handleForgotPassword(string $email): bool
     {
         $person = $this->findPersonByEmail($email);
-        if (!$person) return true;
+        if ($person === false) throw new EmailException();
 
         $token = bin2hex(random_bytes(32));
         $this->dataHelper->set(

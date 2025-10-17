@@ -611,6 +611,45 @@ INSERT INTO "Languages" VALUES (70,'message_password_reset_failed','<div class="
     <a href="/" class="btn btn-primary mt-3">🏠 Retour à l’accueil</a>
   </div>
 </div>');
+INSERT INTO "Languages" VALUES (71,'message_email_unknown','<div class="container text-center mt-5">
+  <div class="card shadow-lg rounded-3 p-4">
+    <h1 class="text-warning">📧 Unknown Email Address</h1>
+
+    <p class="mt-3">
+      The email address you entered <strong>does not exist</strong> in our system.
+    </p>
+
+    <hr class="my-4">
+
+    <h5>🔍 Please check the following:</h5>
+    <ul class="text-start mx-auto d-inline-block">
+      <li>➡️ Make sure you typed your email address correctly, without any spelling mistakes.</li>
+      <li>➡️ If you have never created an account, please contact the site administrator to request one.</li>
+      <li>➡️ If you are unsure, contact the <strong>webmaster</strong> or the club administrator.</li>
+    </ul>
+
+    <a href="/" class="btn btn-primary mt-3">🏠 Back to Home</a>
+  </div>
+</div>','<div class="container text-center mt-5">
+  <div class="card shadow-lg rounded-3 p-4">
+    <h1 class="text-warning">📧 Adresse courriel inconnue</h1>
+
+    <p class="mt-3">
+      L’adresse courriel que vous avez saisie <strong>n’existe pas</strong> dans notre système.
+    </p>
+
+    <hr class="my-4">
+
+    <h5>🔍 Vérifiez les points suivants :</h5>
+    <ul class="text-start mx-auto d-inline-block">
+      <li>➡️ Assurez-vous que vous avez bien saisi votre adresse courriel sans erreur de frappe.</li>
+      <li>➡️ Si vous n’avez jamais créé de compte, vous pouvez en demander un auprès de l’administrateur du site.</li>
+      <li>➡️ En cas de doute, contactez le <strong>webmaster</strong> ou le responsable du club.</li>
+    </ul>
+
+    <a href="/" class="btn btn-primary mt-3">🏠 Retour à l’accueil</a>
+  </div>
+</div>');
 INSERT INTO "Metadata" VALUES (1,'MyClub',1,0);
 INSERT INTO "Person" VALUES (1,'webmaster@myclub.foo','e427c26faca947919b18b797bc143a35100e4de48c34b70b26202d3a7d8e51f7','my first name','my last name','my nick name or nothing',NULL,'0',NULL,NULL,NULL,NULL,0,0,NULL,NULL,'2025-01-01',0,NULL,NULL,NULL,NULL);
 INSERT INTO "PersonGroup" VALUES (1,1,1);

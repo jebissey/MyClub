@@ -6,6 +6,7 @@ namespace app\modules\User;
 
 use app\enums\ApplicationError;
 use app\enums\FilterInputRule;
+use app\exceptions\EmailException;
 use app\helpers\Application;
 use app\helpers\Params;
 use app\helpers\WebApp;
@@ -22,7 +23,22 @@ class UserController extends AbstractController
     public function forgotPassword($encodedEmail): void
     {
         $email = urldecode($encodedEmail);
-        $success = $this->authService->handleForgotPassword($email);
+        try {
+            $success = $this->authService->handleForgotPassword($email);
+        } catch (EmailException) {
+            $this->flight->setData('message', "Bad email {$email}");
+            $this->flight->setData('code', ApplicationError::BadRequest->value);
+            $content = $this->languagesDataHelper->translate('message_email_unknown');
+            $this->render('Common/views/info.latte', [
+                'content' => $content,
+                'hasAuthorization' => $this->application->getConnectedUser()->hasAutorization() ?? false,
+                'currentVersion' => Application::VERSION,
+                'timer' => 10000,
+                'previousPage' => false,
+                'page' => $this->application->getConnectedUser()->getPage(),
+            ]);
+            return;
+        }
         if ($success) {
             $this->flight->setData('message', "Password reset email sent to {$email}");
             $this->flight->setData('code', ApplicationError::Ok->value);
