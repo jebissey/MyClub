@@ -2,6 +2,18 @@
 
 declare(strict_types=1);
 
+if (session_status() === PHP_SESSION_NONE) {
+    session_set_cookie_params([
+        'lifetime' => 0,
+        'path' => '/',
+        'domain' => '',
+        'secure' => (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off'),
+        'httponly' => true,
+        'samesite' => 'Lax',
+    ]);
+    session_start();
+}
+
 require_once 'vendor/autoload.php';
 
 use Tracy\Debugger;
@@ -32,15 +44,6 @@ $connectedUser = $application->getConnectedUser();
 $errorManager = new ErrorManager($application);
 $maintenanceController = new MaintenanceController($application, $errorManager);
 $flight->before('start', function () use ($maintenanceController, $connectedUser) {
-    session_set_cookie_params([
-        'lifetime' => 0,
-        'path' => '/',
-        'domain' => $_SERVER['HTTP_HOST'] ?? '',
-        'secure' => (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off'),
-        'httponly' => true,
-        'samesite' => 'Lax',
-    ]);
-    session_start();
     if (!isset($_SESSION['token'])) $_SESSION['token'] = bin2hex(random_bytes(32));
     $connectedUser->get();
     $maintenanceController->checkIfSiteIsUnderMaintenance();

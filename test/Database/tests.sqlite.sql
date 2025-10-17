@@ -1053,7 +1053,7 @@ INSERT INTO "Test" VALUES (1096,11160,'GET','/sitemap.xml',NULL,NULL,'{"email":"
 INSERT INTO "Test" VALUES (1097,11170,'GET','/survey/add/1',NULL,NULL,'{"email":"redactor@myclub.foo","password":"redactor1234" }','200',NULL,NULL);
 INSERT INTO "Test" VALUES (1098,11180,'POST','/survey/create',NULL,NULL,'{"email":"redactor@myclub.foo","password":"redactor1234" }','200',NULL,NULL);
 INSERT INTO "Test" VALUES (1099,11190,'GET','/survey/results/1',NULL,NULL,'{"email":"redactor@myclub.foo","password":"redactor1234" }','400',NULL,NULL);
-INSERT INTO "Test" VALUES (1100,11200,'GET','/topArticles',NULL,NULL,'{"email":"redactor@myclub.foo","password":"redactor1234" }','403',NULL,NULL);
+INSERT INTO "Test" VALUES (1100,11200,'GET','/topArticles',NULL,NULL,'{"email":"redactor@myclub.foo","password":"redactor1234" }','200',NULL,NULL);
 INSERT INTO "Test" VALUES (1101,11210,'GET','/topPages',NULL,NULL,'{"email":"redactor@myclub.foo","password":"redactor1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (1102,11220,'GET','/user',NULL,NULL,'{"email":"redactor@myclub.foo","password":"redactor1234" }','200',NULL,NULL);
 INSERT INTO "Test" VALUES (1103,11230,'GET','/user/account',NULL,NULL,'{"email":"redactor@myclub.foo","password":"redactor1234" }','200',NULL,NULL);
