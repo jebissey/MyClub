@@ -59,17 +59,11 @@
                         <div class="card-body text-center">
                             <a href="/user/presentation/{$person->Id}" class="text-decoration-none">
                                 {if $person->UseGravatar == 'yes' && $person->Email}
-                                <img src="{$person->UserImg}" 
-                                    alt="User gravatar" 
-                                    data-bs-toggle="tooltip" 
-                                    data-bs-placement="bottom" 
-                                    title="{if $person->Email != ''}{='my_data'|translate}{else}{='login'|translate}{/if}">
+                                <img src="{$person->UserImg}" class="img-fluid rounded-circle mt-2" style="max-width: 64px; max-height: 64px;"
+                                    alt="User gravatar">
                                 {elseif $person->Avatar}
-                                <span class="user-avatar-emoji" 
-                                    data-bs-toggle="tooltip" 
-                                    data-bs-placement="bottom" 
-                                    title="{if $person->Email != ''}{='my_data'|translate}{else}{='login'|translate}{/if}"
-                                    style="font-size: 2rem; cursor: pointer; display: inline-block; line-height: 1;">
+                                <span class="d-inline-flex align-items-center justify-content-center rounded-circle mt-2" 
+                                    style="font-size: 48px; width: 64px; height: 64px; line-height: 64px; text-align: center; background-color: #f0f0f0;">
                                     {$person->UserImg}
                                 </span>
                                 {else}
