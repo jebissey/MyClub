@@ -1,14 +1,16 @@
 <?php
+
 declare(strict_types=1);
 
 namespace app\models;
 
 use PDO;
+use RuntimeException;
 use Throwable;
 
 use app\helpers\Application;
 use app\helpers\File;
-use app\models\database\migrators\V1ToV2Migrator;
+use app\interfaces\DatabaseMigratorInterface;
 
 class Database
 {
@@ -74,18 +76,32 @@ class Database
     {
         $pdo->beginTransaction();
         try {
-            if ($from == 1) $from = new V1ToV2Migrator($pdo);
-
-
-            if ($from != $to) Application::unreachable('Fatal program error', __FILE__, __LINE__);
-
+            $currentVersion = $from;
+            while ($currentVersion < $to) {
+                $nextVersion = $currentVersion + 1;
+                $className = "app\\models\\database\\migrators\\V{$currentVersion}ToV{$nextVersion}Migrator";
+                if (!class_exists($className)) {
+                    throw new RuntimeException("Migration class not found: $className");
+                }
+                $migrator = new $className();
+                if (!($migrator instanceof DatabaseMigratorInterface)) {
+                    throw new RuntimeException("$className must implement DatabaseMigratorInterface");
+                }
+                $newVersion = $migrator->upgrade($pdo, $currentVersion);
+                if ($newVersion !== $nextVersion) {
+                    throw new RuntimeException("$className returned invalid version: $newVersion (expected $nextVersion)");
+                }
+                $currentVersion = $newVersion;
+            }
+            if ($currentVersion !== $to) {
+                Application::unreachable('Fatal program error: wrong final version', __FILE__, __LINE__);
+            }
             $stmt = $pdo->prepare("UPDATE Metadata SET DatabaseVersion = ? WHERE Id = 1");
             $stmt->execute([$to]);
+            $pdo->commit();
         } catch (Throwable $e) {
             $pdo->rollBack();
-            Application::unreachable('Fatal program error: ' . $e->getMessage(), __FILE__, __LINE__);
+            Application::unreachable('Fatal program error during migration: ' . $e->getMessage(), __FILE__, __LINE__);
         }
-        $pdo->commit();
-        return;
     }
 }
