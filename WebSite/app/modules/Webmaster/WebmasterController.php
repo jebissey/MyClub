@@ -56,13 +56,16 @@ class WebmasterController extends AbstractController
             return;
         }
         if ($this->application->getConnectedUser()->hasOnlyOneAutorization()) {
-            if ($this->application->getConnectedUser()->isDesigner())          $this->redirect('/designer');
+            if ($this->application->getConnectedUser()->isEventDesigner())     $this->redirect('/designer');
+            if ($this->application->getConnectedUser()->isHomeDesigner())      $this->redirect('/designer');
+            if ($this->application->getConnectedUser()->isNavbarDesigner())    $this->redirect('/designer');
             elseif ($this->application->getConnectedUser()->isEventManager())  $this->redirect('/eventManager');
             elseif ($this->application->getConnectedUser()->isPersonManager()) $this->redirect('/personManager');
             elseif ($this->application->getConnectedUser()->isRedactor()) {
                 $_SESSION['navbar'] = 'redactor';
                 $this->redirect('/articles');
-            } elseif ($this->application->getConnectedUser()->isWebmaster()) $this->redirect('/webmaster');
+            } elseif ($this->application->getConnectedUser()->isVisitorInsights())  $this->redirect('/visitorInsights');
+            elseif ($this->application->getConnectedUser()->isWebmaster()) $this->redirect('/webmaster');
         } else {
             if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
                 $this->raiseMethodNotAllowed(__FILE__, __LINE__);
