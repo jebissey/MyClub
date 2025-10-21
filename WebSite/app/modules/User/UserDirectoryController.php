@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace app\modules\User;
 
 use app\helpers\Application;
+use app\helpers\GravatarHandler;
 use app\helpers\Params;
+use app\helpers\WebApp;
 use app\models\GroupDataHelper;
 use app\models\PersonDataHelper;
 use app\modules\Common\AbstractController;
@@ -38,7 +40,11 @@ class UserDirectoryController extends AbstractController
             $persons = $this->dataHelper->gets('Person', [
                 'InPresentationDirectory' => 1,
                 'Inactivated' => 0
-            ], 'Id, LastName, FirstName, NickName, UseGravatar, Avatar, Email');
+            ], 'Id, LastName, FirstName, NickName, UseGravatar, Avatar, Email, InPresentationDirectory', 'FirstName, LastName');
+            $gravatarHandler = new GravatarHandler();
+            foreach ($persons as $person) {
+                $person->UserImg = WebApp::getUserImg($person, $gravatarHandler);
+            }
         }
         $groupCounts = $this->groupDataHelper->getGroupCount();
         $this->render('User/views/users_directory.latte', Params::getAll([

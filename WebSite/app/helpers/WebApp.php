@@ -113,6 +113,18 @@ class WebApp
         return $result[$key] !== '' ? $result[$key] : false;
     }
 
+    static public function getUserImg(object $person, GravatarHandler $gravatarHandler): string
+    {
+        if ($person->UseGravatar === 'yes') return $gravatarHandler->getGravatar($person->Email);
+        else {
+            if (empty($person->Avatar)) return '🤔';
+            else {
+                if (in_array($person->Avatar, Application::EMOJI_LIST)) return $person->Avatar;
+                else return '🤔';
+            }
+        }
+    }
+
     static public function isMyClubWebSite(): bool
     {
         return self::getBaseUrl() == self::MYCLUB_WEBAPP;

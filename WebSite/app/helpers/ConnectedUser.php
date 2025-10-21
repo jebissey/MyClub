@@ -14,14 +14,12 @@ use app\models\DataHelper;
 class ConnectedUser
 {
     private array $authorizations;
-    private GravatarHandler $gravatarHandler;
     private DataHelper $dataHelper;
     private AuthorizationDataHelper $authorizationDataHelper;
     public ?object $person;
 
     public function __construct(private Application $application)
     {
-        $this->gravatarHandler = new GravatarHandler();
         $this->dataHelper = new DataHelper($this->application);
         $this->authorizationDataHelper = new AuthorizationDataHelper($this->application);
     }
@@ -43,7 +41,7 @@ class ConnectedUser
         $lang = TranslationManager::getCurrentLanguage();
         Params::setParams([
             'href' => $this->getHref($this->person->Email),
-            'userImg' => $this->getUserImg($this->person),
+            'userImg' => WebApp::getUserImg($this->person, new GravatarHandler()),
             'userEmail' => $this->person->Email,
             'isAdmin' => $this->isAdministrator(),
             'isDesigner' => $this->isDesigner(),
@@ -148,17 +146,5 @@ class ConnectedUser
     private function getHref(string $userEmail): string
     {
         return $userEmail == '' ? '/user/sign/in' : '/user';
-    }
-
-    private function getUserImg(object $person): string
-    {
-        if ($person->UseGravatar === 'yes') return $this->gravatarHandler->getGravatar($person->Email);
-        else {
-            if (empty($person->Avatar)) return '🤔';
-            else {
-                if (in_array($person->Avatar, Application::EMOJI_LIST)) return $person->Avatar;
-                else return '🤔';
-            }
-        }
     }
 }

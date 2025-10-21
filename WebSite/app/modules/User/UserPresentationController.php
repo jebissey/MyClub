@@ -7,6 +7,7 @@ namespace app\modules\User;
 use app\enums\ApplicationError;
 use app\enums\FilterInputRule;
 use app\helpers\Application;
+use app\helpers\GravatarHandler;
 use app\helpers\Params;
 use app\helpers\WebApp;
 use app\modules\Common\AbstractController;
@@ -76,6 +77,7 @@ class UserPresentationController extends AbstractController
                 'loggedPerson' => $loggedPerson,
                 'navItems' => $this->getNavItems($person),
                 'page' => $this->application->getConnectedUser()->getPage(),
+                'userImg' => WebApp::getUserImg($person, new GravatarHandler()),
             ]));
         } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }

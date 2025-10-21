@@ -59,13 +59,23 @@
                         <div class="card-body text-center">
                             <a href="/user/presentation/{$person->Id}" class="text-decoration-none">
                                 {if $person->UseGravatar == 'yes' && $person->Email}
-                                    <img src="https://www.gravatar.com/avatar/{md5(strtolower(trim($person->Email)))}?s=100&d=mp" alt="Avatar" class="img-fluid rounded-circle mb-3" style="width: 100px; height: 100px; object-fit: cover;">
+                                <img src="{$person->UserImg}" 
+                                    alt="User gravatar" 
+                                    data-bs-toggle="tooltip" 
+                                    data-bs-placement="bottom" 
+                                    title="{if $person->Email != ''}{='my_data'|translate}{else}{='login'|translate}{/if}">
                                 {elseif $person->Avatar}
-                                    <img src="/app/images/{$person->Avatar}" alt="Avatar" class="img-fluid rounded-circle mb-3">
+                                <span class="user-avatar-emoji" 
+                                    data-bs-toggle="tooltip" 
+                                    data-bs-placement="bottom" 
+                                    title="{if $person->Email != ''}{='my_data'|translate}{else}{='login'|translate}{/if}"
+                                    style="font-size: 2rem; cursor: pointer; display: inline-block; line-height: 1;">
+                                    {$person->UserImg}
+                                </span>
                                 {else}
-                                    <div class="rounded-circle bg-light d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 48px; height: 48px;">
-                                        <i class="bi bi-person-circle" style="font-size: 3rem;"></i>
-                                    </div>
+                                <div class="rounded-circle bg-light d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 48px; height: 48px;">
+                                    <i class="bi bi-person-circle" style="font-size: 3rem;"></i>
+                                </div>
                                 {/if}
                                 
                                 <h5 class="card-title">{$person->FirstName} {$person->LastName}</h5>

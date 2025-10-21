@@ -6,6 +6,7 @@ namespace app\models;
 
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
+use app\helpers\GravatarHandler;
 use app\helpers\PersonPreferences;
 use app\helpers\WebApp;
 use app\interfaces\NewsProviderInterface;
@@ -141,10 +142,16 @@ class PersonDataHelper extends Data implements NewsProviderInterface
             FROM Person p
             JOIN PersonGroup pg ON p.Id = pg.IdPerson
             WHERE pg.IdGroup = ? AND p.InPresentationDirectory = 1 AND p.Inactivated = 0
-            ORDER BY p.LastName, p.FirstName
+            ORDER BY p.FirstName, p.LastName
         ");
         $stmt->execute([$groupId]);
-        return $stmt->fetchAll();
+        $persons = $stmt->fetchAll();
+
+        $gravatarHandler = new GravatarHandler();
+        foreach ($persons as $person) {
+            $person->UserImg = WebApp::getUserImg($person, $gravatarHandler);
+        }
+        return $persons;
     }
 
     public function getPersonWantedToBeAlerted(int $idArticle): array
