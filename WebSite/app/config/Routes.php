@@ -200,7 +200,9 @@ class Routes
             '/apple-touch-icon-precomposed.png' => ['my-club-180.png', 'image/png'],
             '/favicon.ico' => ['favicon.ico', 'image/x-icon'],
             '/Feed-icon.svg' => ['Feed-icon.svg', 'image/svg+xml'],
+            '/robots.txt' => ['robots.txt', 'text/plain; charset=UTF-8'],
             '/webCard' => ['businessCard.html', 'text/html; charset=UTF-8'],
+            '/.well-known/appspecific/com.chrome.devtools.json' => [null, null],
         ];
         foreach ($files as $route => [$file, $type]) {
             $this->flight->route($route, fn() => $this->serveFile($errorManager, $file, $type));
@@ -295,8 +297,20 @@ class Routes
         if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
             $errorManager->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
         }
+        if (empty($filename)) {
+            http_response_code(ApplicationError::NoContent->value);
+            Flight::stop();
+            return;
+        }
         $filename = basename($filename);
-        $path = __DIR__ . "/../images/$filename";
+        $rootDir = realpath(__DIR__ . '/../..');
+        $imageDir = "$rootDir/app/images";
+        $baseDir = match ($filename) {
+            'robots.txt',
+            'businessCard.html' => $rootDir,
+            default => $imageDir,
+        };
+        $path = "$baseDir/$filename";
         if (file_exists($path)) {
             $response = Flight::response();
             $response->header('Content-Length', (string)filesize($path));
@@ -305,7 +319,7 @@ class Routes
             $response->header('Cache-Control', 'public, max-age=604800, immutable');
             $response->header('Expires', gmdate('D, d M Y H:i:s', time() + 604800) . ' GMT');
             readfile($path);
-        } else $errorManager->raise(ApplicationError::PageNotFound, "File $filename not found in file " . __FILE__ . ' at line ' . __LINE__);
+        } else $errorManager->raise(ApplicationError::PageNotFound, "File $path not found in file " . __FILE__ . ' at line ' . __LINE__);
         Flight::stop();
     }
 }
