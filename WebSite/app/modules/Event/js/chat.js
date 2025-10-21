@@ -21,7 +21,6 @@ document.addEventListener('DOMContentLoaded', function () {
         if (!messageText.value.trim()) {
             return;
         }
-
         fetch('/api/message/add', {
             method: 'POST',
             headers: {

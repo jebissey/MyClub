@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace app\models;
@@ -7,7 +8,9 @@ use app\exceptions\UnauthorizedAccessException;
 
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
+use app\helpers\GravatarHandler;
 use app\helpers\TranslationManager;
+use app\helpers\WebApp;
 use app\interfaces\NewsProviderInterface;
 
 class MessageDataHelper extends Data implements NewsProviderInterface
@@ -23,7 +26,7 @@ class MessageDataHelper extends Data implements NewsProviderInterface
             'EventId'  => $eventId,
             'PersonId' => $personId,
             'Text'     => $text,
-            '"From"'     => 'User'
+            'From'     => 'User'
         ]);
         return $messageId;
     }
@@ -37,7 +40,7 @@ class MessageDataHelper extends Data implements NewsProviderInterface
                 'EventId' => $eventId,
                 'PersonId' => $participant->Id,
                 'Text' => $text,
-                '"From"' => 'Webapp'
+                'From' => 'Webapp'
             ]);
         }
         return $bccList;
@@ -52,7 +55,8 @@ class MessageDataHelper extends Data implements NewsProviderInterface
                 Person.LastName,
                 Person.NickName,
                 Person.Avatar,
-                Person.UseGravatar
+                Person.UseGravatar,
+                Person.Email
             FROM Message
             LEFT JOIN Person ON Message.PersonId = Person.Id
             WHERE Message.EventId = :eventId
@@ -60,7 +64,12 @@ class MessageDataHelper extends Data implements NewsProviderInterface
         ";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':eventId' => $eventId]);
-        return $stmt->fetchAll();
+        $messages = $stmt->fetchAll();
+        $gravatarHandler = new GravatarHandler();
+        foreach ($messages as $message) {
+            $message->UserImg = WebApp::getUserImg($message, $gravatarHandler);
+        }
+        return $messages;
     }
 
     public function updateMessage(int $messageId, int $personId, string $text): true

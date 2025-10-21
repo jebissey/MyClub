@@ -13,6 +13,7 @@ use app\enums\EventSearchMode;
 use app\enums\FilterInputRule;
 use app\exceptions\QueryException;
 use app\helpers\Application;
+use app\helpers\GravatarHandler;
 use app\helpers\Params;
 use app\helpers\PeriodHelper;
 use app\helpers\WebApp;
@@ -156,7 +157,7 @@ class EventController extends AbstractController
             if ($this->application->getConnectedUser()->person ?? false) {
                 $userId = $this->application->getConnectedUser()->person->Id;
                 if ($set) {
-                    if ($eventId > 0 && $this->eventDataHelper->isUserRegistered($eventId, $person->Email ?? '')) {
+                    if ($eventId > 0 && !$this->eventDataHelper->isUserRegistered($eventId, $person->Email ?? '')) {
                         $this->dataHelper->set('Participant', [
                             'IdEvent'  => $eventId,
                             'IdPerson' => $userId,
@@ -300,10 +301,12 @@ class EventController extends AbstractController
             $this->raiseBadRequest("Unknown event {$eventId}", __FILE__, __LINE__);
             return;
         }
+        $person = $this->application->getConnectedUser()->person;
+        $person->UserImg = WebApp::getUserImg($person, new GravatarHandler());
         $this->render('Event/views/chat.latte', Params::getAll([
             'event' => $event,
             'messages' => $this->messageDataHelper->getEventMessages($eventId),
-            'person' => $this->application->getConnectedUser()->person,
+            'person' => $person,
             'navItems' => $this->getNavItems($this->application->getConnectedUser()->person),
             'page' => $this->application->getConnectedUser()->getPage(),
         ]));

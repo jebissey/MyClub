@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace app\models;
@@ -185,40 +186,55 @@ abstract class Data
     public function set(string $table, array $fields, array $where = []): int|bool
     {
         $this->validateTableName($table);
+        $escape = fn(string $name) => '"' . str_replace('"', '""', $name) . '"';
         try {
             if ($where === []) {
                 // INSERT
-                $columns = implode(', ', array_keys($fields));
+                $columns = implode(', ', array_map($escape, array_keys($fields)));
                 $placeholders = ':' . implode(', :', array_keys($fields));
-                $sql = "INSERT INTO \"{$table}\" ({$columns}) VALUES ({$placeholders})";
+                $sql = "INSERT INTO {$escape($table)} ({$columns}) VALUES ({$placeholders})";
+
                 $params = [];
                 foreach ($fields as $field => $value) {
                     $params[":{$field}"] = $value;
                 }
+
                 $stmt = $this->pdo->prepare($sql);
                 $result = $stmt->execute($params);
+
                 return $result ? (int)$this->pdo->lastInsertId() : false;
             } else {
                 // UPDATE
                 $setClause = [];
                 $params = [];
+
                 foreach ($fields as $field => $value) {
-                    $setClause[] = "{$field} = :set_{$field}";
+                    $setClause[] = $escape($field) . " = :set_{$field}";
                     $params[":set_{$field}"] = $value;
                 }
+
                 $whereClause = [];
                 foreach ($where as $field => $value) {
-                    if (strtolower($field) === 'email') $whereClause[] = "{$field} COLLATE NOCASE = :where_{$field}";
-                    else                                $whereClause[] = "{$field} = :where_{$field}";
+                    $escapedField = $escape($field);
+                    if (strtolower($field) === 'email') {
+                        $whereClause[] = "{$escapedField} COLLATE NOCASE = :where_{$field}";
+                    } else {
+                        $whereClause[] = "{$escapedField} = :where_{$field}";
+                    }
                     $params[":where_{$field}"] = $value;
                 }
-                $sql = "UPDATE \"{$table}\" SET " . implode(', ', $setClause) .
-                    " WHERE " . implode(' AND ', $whereClause);
+
+                $sql = "UPDATE {$escape($table)} SET " . implode(', ', $setClause)
+                    . " WHERE " . implode(' AND ', $whereClause);
+
                 $stmt = $this->pdo->prepare($sql);
                 return $stmt->execute($params);
             }
         } catch (PDOException $e) {
-            $this->application->getErrorManager()->raise(ApplicationError::Error, 'Database error: ' . $e->getMessage() . ' in file ' . __FILE__ . ' at line ' . __LINE__);
+            $this->application->getErrorManager()->raise(
+                ApplicationError::Error,
+                'Database error: ' . $e->getMessage() . ' in file ' . __FILE__ . ' at line ' . __LINE__
+            );
             return false;
         }
     }

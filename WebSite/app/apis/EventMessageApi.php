@@ -33,13 +33,13 @@ class EventMessageApi extends AbstractApi
             $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
+        $data = $this->getJsonInput();
         if (!isset($data['eventId']) || !isset($data['text'])) {
             $this->renderJsonBadRequest('Données manquantes', __FILE__, __LINE__);
             return;
         }
         try {
-            $data = $this->getJsonInput();
-            $apiResponse = $this->addMessage_($data['eventId'], $this->application->getConnectedUser()->person->Id, $data['text']);
+            $apiResponse = $this->addMessage_((int)$data['eventId'], $this->application->getConnectedUser()->person->Id, $data['text']);
             $this->renderJson($apiResponse->data, $apiResponse->success, $apiResponse->responseCode);
         } catch (Throwable $e) {
             $this->renderJsonError($e->getMessage(), ApplicationError::Error->value);
@@ -91,8 +91,10 @@ class EventMessageApi extends AbstractApi
     #region Private functions
     private function addMessage_(int $eventId, int $personId, string $text): ApiResponse
     {
+error_log("\n\n" . json_encode($personId, JSON_PRETTY_PRINT) . "\n"); 
         try {
             $messageId = $this->messageDataHelper->addMessage($eventId, $personId, $text);
+error_log("\n\n" . json_encode($messageId, JSON_PRETTY_PRINT) . "\n");               
             return new ApiResponse($messageId !== false, $messageId === false ? ApplicationError::BadRequest->value : ApplicationError::Ok->value, ['messageId' => $messageId], 'Message ajouté');
         } catch (PDOException $e) {
             return new ApiResponse(false, ApplicationError::BadRequest->value, [], $e->getMessage());

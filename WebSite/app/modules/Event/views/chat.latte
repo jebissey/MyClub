@@ -48,12 +48,16 @@
                             <div class="card-body p-2">
                                 <div class="d-flex align-items-center mb-1">
                                 {if $message->UseGravatar == 'yes'}
-                                    <img src="https://www.gravatar.com/avatar/{md5(strtolower(trim($message->Email)))}" 
-                                        class="rounded-circle me-2" width="30" height="30" alt="Avatar">
+                                    <img src="{$message->UserImg}" class="img-fluid rounded-circle mt-2" style="max-width: 64px; max-height: 64px;" alt="User gravatar">
                                 {elseif $message->Avatar}
-                                    <img src="/app/images/{$message->Avatar}" class="rounded-circle me-2" width="30" height="30" alt="Avatar">
+                                    <span class="d-inline-flex align-items-center justify-content-center rounded-circle mt-2" 
+                                        style="font-size: 48px; width: 64px; height: 64px; line-height: 64px; text-align: center; background-color: #f0f0f0;">
+                                        {$person->UserImg}
+                                    </span>
                                 {else}
-                                    <img src="/app/images/emojiPensif.png" class="rounded-circle me-2" width="30" height="30" alt="Avatar">
+                                    <div class="rounded-circle bg-light d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 48px; height: 48px;">
+                                        <i class="bi bi-person-circle" style="font-size: 3rem;"></i>
+                                    </div>
                                 {/if}
                                     
                                     <strong class="card-title mb-0 {if $message->PersonId == $person->Id}text-dark{/if}">
