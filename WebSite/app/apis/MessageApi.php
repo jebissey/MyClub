@@ -16,7 +16,7 @@ use app\models\MessageDataHelper;
 use app\models\PersonDataHelper;
 use app\valueObjects\ApiResponse;
 
-class EventMessageApi extends AbstractApi
+class MessageApi extends AbstractApi
 {
     public function __construct(Application $application, private MessageDataHelper $messageDataHelper, ConnectedUser $connectedUser, DataHelper $dataHelper, PersonDataHelper $personDataHelper)
     {
@@ -34,12 +34,19 @@ class EventMessageApi extends AbstractApi
             return;
         }
         $data = $this->getJsonInput();
-        if (!isset($data['eventId']) || !isset($data['text'])) {
+        if ((!isset($data['eventId']) && !isset($data['articleId']) && !isset($data['groupId'])) || !isset($data['text'])) {
             $this->renderJsonBadRequest('Données manquantes', __FILE__, __LINE__);
             return;
         }
         try {
-            $apiResponse = $this->addMessage_((int)$data['eventId'], $this->application->getConnectedUser()->person->Id, $data['text']);
+            $apiResponse = $this->addMessage_(
+                isset($data['articleId']) && $data['articleId'] !== '' ? (int)$data['articleId'] : null,
+                isset($data['eventId']) && $data['eventId'] !== '' ? (int)$data['eventId'] : null,
+                isset($data['groupId']) && $data['groupId'] !== '' ? (int)$data['groupId'] : null,
+                $this->application->getConnectedUser()->person->Id,
+                (string)$data['text']
+            );
+
             $this->renderJson($apiResponse->data, $apiResponse->success, $apiResponse->responseCode);
         } catch (Throwable $e) {
             $this->renderJsonError($e->getMessage(), ApplicationError::Error->value);
@@ -89,12 +96,10 @@ class EventMessageApi extends AbstractApi
     }
 
     #region Private functions
-    private function addMessage_(int $eventId, int $personId, string $text): ApiResponse
+    private function addMessage_(?int $articleId, ?int $eventId, ?int $groupId, int $personId, string $text): ApiResponse
     {
-error_log("\n\n" . json_encode($personId, JSON_PRETTY_PRINT) . "\n"); 
         try {
-            $messageId = $this->messageDataHelper->addMessage($eventId, $personId, $text);
-error_log("\n\n" . json_encode($messageId, JSON_PRETTY_PRINT) . "\n");               
+            $messageId = $this->messageDataHelper->addMessage($articleId, $eventId, $groupId, $personId, $text);
             return new ApiResponse($messageId !== false, $messageId === false ? ApplicationError::BadRequest->value : ApplicationError::Ok->value, ['messageId' => $messageId], 'Message ajouté');
         } catch (PDOException $e) {
             return new ApiResponse(false, ApplicationError::BadRequest->value, [], $e->getMessage());

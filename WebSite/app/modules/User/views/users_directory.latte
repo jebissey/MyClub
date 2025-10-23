@@ -38,14 +38,21 @@
                             Tous
                         </a>
                         {foreach $groups as $group}
-                            <a href="/user/directory?group={$group->Id}" class="btn {if $selectedGroup === $group->Id}btn-primary{else}btn-outline-primary{/if}">
-                                {$group->Name} 
-                                {if isset($groupCounts[$group->Id])}
-                                    <span class="badge bg-light text-dark">{$groupCounts[$group->Id]}</span>
-                                {/if}
-                            </a>
+                        <a href="/user/directory?group={$group->Id}" class="btn {if $selectedGroup === $group->Id}btn-primary{else}btn-outline-primary{/if}">
+                            {$group->Name} 
+                            {if isset($groupCounts[$group->Id])}
+                                <span class="badge bg-light text-dark">{$groupCounts[$group->Id]}</span>
+                            {/if}
+                        </a>
                         {/foreach}
                     </div>
+                    {if $selectedGroup !== null && $userIsInGroup}
+                    <div class="text-center mt-3 mb-0">
+                        <a href="/group/chat/{$selectedGroup}" class="btn btn-warning ms-2">
+                            {='messages'|translate}{if $countOfMessages > 0} ({$countOfMessages}){/if}
+                        </a>
+                    </div>
+                    {/if}
                 </div>
             </div>
         </div>

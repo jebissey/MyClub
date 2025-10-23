@@ -166,8 +166,12 @@ CREATE TABLE IF NOT EXISTS "Message" (
 	"Text"	TEXT NOT NULL,
 	"LastUpdate"	TEXT NOT NULL DEFAULT current_timestamp,
 	"From"	TEXT NOT NULL DEFAULT 'User',
+	"ArticleId"	INTEGER,
+	"GroupId"	INTEGER,
 	PRIMARY KEY("Id"),
+	FOREIGN KEY("ArticleId") REFERENCES "Article"("Id"),
 	FOREIGN KEY("EventId") REFERENCES "Event"("Id"),
+	FOREIGN KEY("GroupId") REFERENCES "Group"("Id"),
 	FOREIGN KEY("PersonId") REFERENCES "Person"("Id")
 );
 CREATE TABLE IF NOT EXISTS "Metadata" (

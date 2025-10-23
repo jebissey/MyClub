@@ -8,7 +8,7 @@ use app\config\ApiFactory;
 use app\interfaces\RouteInterface;
 use app\valueObjects\Route;
 
-class EventMessageApi implements RouteInterface
+class MessageApi implements RouteInterface
 {
     private array $routes = [];
 
@@ -16,7 +16,7 @@ class EventMessageApi implements RouteInterface
 
     public function get(): array
     {
-        $eventMessageApi = fn() => $this->apiFactory->makeEventMessageApi();
+        $eventMessageApi = fn() => $this->apiFactory->makeMessageApi();
 
         $this->routes[] = new Route('POST /api/message/add', $eventMessageApi, 'addMessage');
         $this->routes[] = new Route('POST /api/message/update', $eventMessageApi, 'updateMessage');

@@ -8,13 +8,13 @@ use app\apis\ArticleApi;
 use app\apis\CarouselApi;
 use app\apis\EventApi;
 use app\apis\EventAttributeApi;
-use app\apis\EventMessageApi;
 use app\apis\EventNeedApi;
 use app\apis\EventNeedTypeApi;
 use app\apis\EventSupplyApi;
 use app\apis\GroupApi;
 use app\apis\ImportApi;
 use app\apis\MediaApi;
+use app\apis\MessageApi;
 use app\apis\NavbarApi;
 use app\apis\WebmasterApi;
 use app\helpers\Application;
@@ -114,17 +114,6 @@ class ApiFactory
         );
     }
 
-    public function makeEventMessageApi(): EventMessageApi
-    {
-        return new EventMessageApi(
-            $this->application,
-            $this->messageDataHelper,
-            $this->connectedUser,
-            $this->dataHelper,
-            $this->personDataHelper
-        );
-    }
-
     public function makeEventNeedApi(): EventNeedApi
     {
         return new EventNeedApi(
@@ -188,6 +177,17 @@ class ApiFactory
             $this->dataHelper,
             $this->personDataHelper,
             $this->sharedFileDataHelper
+        );
+    }
+
+    public function makeMessageApi(): MessageApi
+    {
+        return new MessageApi(
+            $this->application,
+            $this->messageDataHelper,
+            $this->connectedUser,
+            $this->dataHelper,
+            $this->personDataHelper
         );
     }
 

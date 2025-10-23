@@ -57,6 +57,7 @@ use app\modules\User\UserAvailabilitiesController;
 use app\modules\User\UserDashboardController;
 use app\modules\User\UserDirectoryController;
 use app\modules\User\UserGroupsController;
+use app\modules\User\UserMessagesController;
 use app\modules\User\UserNewsController;
 use app\modules\User\UserNotepadController;
 use app\modules\User\UserPreferencesController;
@@ -118,7 +119,8 @@ class ControllerFactory
             $this->personDataHelper,
             $this->backup,
             $this->articleCrosstabDataHelper,
-            $this->genericDataHelper
+            $this->genericDataHelper,
+            $this->messageDataHelper
         );
     }
 
@@ -207,7 +209,9 @@ class ControllerFactory
     {
         return new GroupController(
             $this->application,
-            $this->groupDataHelper
+            $this->groupDataHelper,
+            $this->personGroupDataHelper,
+            $this->messageDataHelper
         );
     }
 
@@ -319,7 +323,8 @@ class ControllerFactory
         return new UserDirectoryController(
             $this->application,
             $this->personDataHelper,
-            $this->groupDataHelper
+            $this->groupDataHelper,
+            $this->personGroupDataHelper
         );
     }
 
@@ -329,6 +334,14 @@ class ControllerFactory
             $this->application,
             $this->personGroupDataHelper,
             $this->groupDataHelper
+        );
+    }
+
+    public function makeUserMessagesController(): UserMessagesController
+    {
+        return new UserMessagesController(
+            $this->application,
+            $this->messageDataHelper
         );
     }
 

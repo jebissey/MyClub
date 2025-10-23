@@ -42,7 +42,12 @@
                 {if $hasSurvey && $userConnected && isset($article->PublishedBy) && $article->PublishedBy !== null && $hasSurvey->ClosingDate >= date('Y-m-d')}
                     <button id="reply-survey-btn" class="btn btn-success ms-2">Répondre au sondage</button>
                 {/if}
-                    <a href="/articles" class="btn btn-secondary ms-2">Liste des articles</a>
+                    <a href="/articles" class="btn btn-secondary ms-2" >Liste des articles</a>
+                {if $isMember}    
+                    <a href="/article/chat/{$article->Id}" class="btn btn-warning ms-2">
+                        {='messages'|translate}{if $countOfMessages > 0} ({$countOfMessages}){/if}
+                    </a>
+                {/if}
                 </div>
             </div>
 

@@ -9,9 +9,12 @@ use Throwable;
 use app\enums\FilterInputRule;
 use app\exceptions\QueryException;
 use app\helpers\Application;
+use app\helpers\GravatarHandler;
 use app\helpers\Params;
 use app\helpers\WebApp;
 use app\models\GroupDataHelper;
+use app\models\MessageDataHelper;
+use app\models\PersonGroupDataHelper;
 use app\modules\Common\AbstractController;
 
 class GroupController extends AbstractController
@@ -19,6 +22,8 @@ class GroupController extends AbstractController
     public function __construct(
         Application $application,
         private GroupDataHelper $groupDataHelper,
+        private PersonGroupDataHelper $personGroupDataHelper,
+        private MessageDataHelper $messageDataHelper,
     ) {
         parent::__construct($application);
     }
@@ -183,4 +188,38 @@ class GroupController extends AbstractController
             'page' => $this->application->getConnectedUser()->getPage(),
         ]));
     }
+
+    public function showGroupChat($groupId): void
+    {
+        if ($this->application->getConnectedUser()->person === null) {
+            $this->raiseforbidden(__FILE__, __LINE__);
+            return;
+        }
+        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+            return;
+        }
+        $group = $this->dataHelper->get('Group', ['Id' => $groupId], 'Id, Name');
+        if (!$group) {
+            $this->raiseBadRequest("Le groupe {$groupId} n'existe pas", __FILE__, __LINE__);
+            return;
+        }
+        $connectedUser = $this->application->getConnectedUser();
+        if ($connectedUser->person === null || !$this->personGroupDataHelper->isPersonInGroup($connectedUser->person->Id, $groupId)) {
+            $this->raiseforbidden(__FILE__, __LINE__);
+            return;
+        }
+        $person = $connectedUser->person;
+        $person->UserImg = WebApp::getUserImg($person, new GravatarHandler());
+        $this->render('Common/views/chat.latte', Params::getAll([
+            'article' => null,
+            'event' => null,
+            'group' => $group,
+            'messages' => $this->messageDataHelper->getGroupMessages($groupId),
+            'person' => $person,
+            'navItems' => $this->getNavItems($this->application->getConnectedUser()->person),
+            'page' => $this->application->getConnectedUser()->getPage(),
+        ]));
+    }
+
 }

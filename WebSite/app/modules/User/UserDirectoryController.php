@@ -10,6 +10,7 @@ use app\helpers\Params;
 use app\helpers\WebApp;
 use app\models\GroupDataHelper;
 use app\models\PersonDataHelper;
+use app\models\PersonGroupDataHelper;
 use app\modules\Common\AbstractController;
 
 class UserDirectoryController extends AbstractController
@@ -17,7 +18,8 @@ class UserDirectoryController extends AbstractController
     public function __construct(
         Application $application,
         private PersonDataHelper $personDataHelper,
-        private GroupDataHelper $groupDataHelper
+        private GroupDataHelper $groupDataHelper,
+        private PersonGroupDataHelper $personGroupDataHelper,
     ) {
         parent::__construct($application);
     }
@@ -55,6 +57,12 @@ class UserDirectoryController extends AbstractController
             'groupCounts' => $groupCounts,
             'selectedGroup' => $selectedGroup,
             'page' => $this->application->getConnectedUser()->getPage(1),
+            'countOfMessages' => count($this->dataHelper->gets('Message', [
+                '"From"' => 'User',
+                'GroupId' => $selectedGroup
+            ])),
+            'userIsInGroup' => $this->personGroupDataHelper->isPersonInGroup($person->Id, $selectedGroup ?? 0),
+
         ]));
     }
 

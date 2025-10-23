@@ -10,6 +10,7 @@ use app\exceptions\IntegrityException;
 use app\exceptions\QueryException;
 use app\helpers\Application;
 use app\helpers\Backup;
+use app\helpers\GravatarHandler;
 use app\helpers\Params;
 use app\helpers\PeriodHelper;
 use app\helpers\WebApp;
@@ -17,6 +18,7 @@ use app\models\ArticleCrosstabDataHelper;
 use app\models\ArticleDataHelper;
 use app\models\ArticleTableDataHelper;
 use app\models\GenericDataHelper;
+use app\models\MessageDataHelper;
 use app\models\PersonDataHelper;
 use app\modules\Common\TableController;
 use app\services\EmailService;
@@ -30,7 +32,8 @@ class ArticleController extends TableController
         private PersonDataHelper $personDataHelper,
         private Backup $backup,
         private ArticleCrosstabDataHelper $articleCrosstabDataHelper,
-        GenericDataHelper $genericDataHelper
+        GenericDataHelper $genericDataHelper,
+        private MessageDataHelper $messageDataHelper,
     ) {
         parent::__construct($application, $genericDataHelper);
     }
@@ -307,10 +310,47 @@ class ArticleController extends TableController
                 'canReadPool' => $this->authorizationDataHelper->canPersonReadSurveyResults($article, $connectedUser),
                 'carouselItems' => $this->dataHelper->gets('Carousel', ['IdArticle' => $id]),
                 'page' => $connectedUser->getPage(),
+                'countOfMessages' => count($this->dataHelper->gets('Message', [
+                    '"From"' => 'User',
+                    'ArticleId' => $id
+                ])),
             ]));
         } catch (QueryException $e) {
             $this->raiseBadRequest($e->getMessage(),  __FILE__, __LINE__);
         }
+    }
+
+    public function showArticleChat($articleId): void
+    {
+        if ($this->application->getConnectedUser()->person === null) {
+            $this->raiseforbidden(__FILE__, __LINE__);
+            return;
+        }
+        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+            return;
+        }
+        $article = $this->dataHelper->get('Article', ['Id' => $articleId], 'Id, OnlyForMembers, Title, CreatedBy, IdGroup');
+        if (!$article) {
+            $this->raiseBadRequest("L'article {$articleId} n'existe pas", __FILE__, __LINE__);
+            return;
+        }
+        $connectedUser = $this->application->getConnectedUser();
+        if ($article->OnlyForMembers == 1 && $connectedUser->person == null) {
+            $this->raiseBadRequest("Il faut être connecté pour pouvoir consulter cet article", __FILE__, __LINE__);
+            return;
+        }
+        $person = $connectedUser->person;
+        $person->UserImg = WebApp::getUserImg($person, new GravatarHandler());
+        $this->render('Common/views/chat.latte', Params::getAll([
+            'article' => $article,
+            'event' => null,
+            'group' => null,
+            'messages' => $this->messageDataHelper->getArticleMessages($articleId),
+            'person' => $person,
+            'navItems' => $this->getNavItems($this->application->getConnectedUser()->person),
+            'page' => $this->application->getConnectedUser()->getPage(),
+        ]));
     }
 
     public function showArticleCrosstab(): void

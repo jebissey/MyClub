@@ -303,8 +303,10 @@ class EventController extends AbstractController
         }
         $person = $this->application->getConnectedUser()->person;
         $person->UserImg = WebApp::getUserImg($person, new GravatarHandler());
-        $this->render('Event/views/chat.latte', Params::getAll([
+        $this->render('Common/views/chat.latte', Params::getAll([
+            'article' => null,
             'event' => $event,
+            'group' => null,
             'messages' => $this->messageDataHelper->getEventMessages($eventId),
             'person' => $person,
             'navItems' => $this->getNavItems($this->application->getConnectedUser()->person),

@@ -8,6 +8,7 @@ enum Period: string
     case Day = 'day';
     case Week = 'week';
     case Month = 'month';
+    case Quarter = 'quarter';
     case Year = 'year';
 
     case Today = 'today';

@@ -2,7 +2,9 @@ document.addEventListener('DOMContentLoaded', function () {
     const chatContainer = document.getElementById('chat-container');
     const newMessageForm = document.getElementById('new-message-form');
     const messageText = document.getElementById('message-text');
+    const articleId = document.getElementById('article-id').value;
     const eventId = document.getElementById('event-id').value;
+    const groupId = document.getElementById('group-id').value;
     const editMessageModalElement = document.getElementById('edit-message-modal');
     const editMessageModal = new bootstrap.Modal(editMessageModalElement);
     const editMessageId = document.getElementById('edit-message-id');
@@ -27,7 +29,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
+                articleId: articleId,
                 eventId: eventId,
+                groupId: groupId,
                 text: messageText.value
             })
         })
