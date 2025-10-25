@@ -184,6 +184,11 @@ class MediaController extends AbstractController
         readfile($file);
     }
 
+    private function fileShared(string $path)
+    {
+        return $this->sharedFileDataHelper->isShared($path);
+    }
+
     private function getAvailableYears(): array
     {
         $years = [];
@@ -306,10 +311,5 @@ class MediaController extends AbstractController
     private function inGalery(string $path): bool
     {
         return $this->carouselDataHelper->inGalery($path);
-    }
-
-    private function fileShared(string $path)
-    {
-        return $this->sharedFileDataHelper->isShared($path);
     }
 }

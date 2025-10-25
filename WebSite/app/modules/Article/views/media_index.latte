@@ -66,13 +66,30 @@
                         {foreach $files as $file}
                         <tr>
                             <td>
-                                {if strpos($file['name'], '.jpg') !== false || strpos($file['name'], '.jpeg') !== false || strpos($file['name'], '.png') !== false || strpos($file['name'], '.gif') !== false}
-                                    <img src="{$file['url']}" class="img-thumbnail" style="max-height: 50px; max-width: 100px;">
-                                {else}
-                                    <i class="bi bi-file-earmark text-secondary" style="font-size: 2rem;"></i>
+                            {if strpos($file['name'], '.jpg') !== false || strpos($file['name'], '.jpeg') !== false || strpos($file['name'], '.png') !== false || strpos($file['name'], '.gif') !== false}
+                                <img src="{$file['url']}" class="img-thumbnail" style="max-height: 50px; max-width: 100px;">
+                            {elseif strpos($file['name'], '.mp4') !== false || strpos($file['name'], '.webm') !== false || strpos($file['name'], '.ogg') !== false || strpos($file['name'], '.mov') !== false}
+                                <video controls preload="metadata" style="max-height: 60px; max-width: 100px; border-radius: 6px;">
+                                    <source src="{$file['url']}" type="video/{if strpos($file['name'], '.mp4') !== false}mp4{elseif strpos($file['name'], '.webm') !== false}webm{elseif strpos($file['name'], '.ogg') !== false}ogg{elseif strpos($file['name'], '.mov') !== false}quicktime{/if}">
+                                    Votre navigateur ne supporte pas la lecture vidéo.
+                                </video>
+                            {elseif strpos($file['name'], '.mp3') !== false || strpos($file['name'], '.wav') !== false || strpos($file['name'], '.ogg') !== false || strpos($file['name'], '.m4a') !== false || strpos($file['name'], '.flac') !== false}
+                                <i class="bi bi-music-note-beamed text-primary" style="font-size: 2rem;"></i>
+                            {else}
+                                <i class="bi bi-file-earmark text-secondary" style="font-size: 2rem;"></i>
+                            {/if}
+                            </td>
+                            <td>
+                                {$file['name']}
+                                {if strpos($file['name'], '.mp3') !== false || strpos($file['name'], '.wav') !== false || strpos($file['name'], '.ogg') !== false || strpos($file['name'], '.m4a') !== false || strpos($file['name'], '.flac') !== false}
+                                    <div class="mt-2">
+                                        <audio controls preload="metadata" style="max-width: 100%; height: 32px;">
+                                            <source src="{$file['url']}" type="audio/{if strpos($file['name'], '.mp3') !== false}mpeg{elseif strpos($file['name'], '.ogg') !== false}ogg{elseif strpos($file['name'], '.wav') !== false}wav{elseif strpos($file['name'], '.m4a') !== false}mp4{elseif strpos($file['name'], '.flac') !== false}flac{/if}">
+                                            Votre navigateur ne supporte pas la lecture audio.
+                                        </audio>
+                                    </div>
                                 {/if}
                             </td>
-                            <td>{$file['name']}</td>
                             <td>{$file['date']}</td>
                             <td>{$file['size']|formatFileSize}</td>
                             <td>{if $file['inArticle']}<a href="/media/uses?path={$file['path']}">Oui</a>{/if}</td>
