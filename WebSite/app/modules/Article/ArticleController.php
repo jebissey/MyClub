@@ -71,7 +71,8 @@ class ArticleController extends TableController
             $this->raiseBadRequest("Article {$id} doesn't exist", __FILE__, __LINE__);
             return;
         }
-        if ($this->application->getConnectedUser()->person->Id != $article->CreatedBy) {
+        $connectedUser = $this->application->getConnectedUser();
+        if ($connectedUser->person === null || $connectedUser->person->Id !== $article->CreatedBy) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
         }
@@ -92,6 +93,11 @@ class ArticleController extends TableController
         }
         $connectedUser = $this->application->getConnectedUser();
         $article = $this->articleDataHelper->getLatestArticle([$id]);
+
+        if ($connectedUser->person === null || $connectedUser->person->Id !== $article->CreatedBy) {
+            $this->raiseforbidden(__FILE__, __LINE__);
+            return;
+        }
 
         $this->render('Article/views/article_edit.latte', Params::getAll([
             'article' => $article,

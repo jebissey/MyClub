@@ -23,6 +23,12 @@ class MessageDataHelper extends Data implements NewsProviderInterface
 
     public function addMessage(?int $articleId, ?int $eventId, ?int $groupId, int $personId, string $text): int|false
     {
+        $nonNullCount = ($articleId !== null) + ($eventId !== null) + ($groupId !== null);
+        if ($nonNullCount !== 1) return false;
+        if ($articleId !== null && $this->get('Article', ['Id'=> $articleId]) === false) return false;
+        if ($eventId !== null && $this->get('Event', ['Id' => $eventId]) === false) return false;
+        if ($groupId !== null && $this->get('Group', ['Id' => $groupId]) === false) return false;
+
         $messageId = $this->set('Message', [
             'ArticleId' => $articleId,
             'EventId'   => $eventId,
