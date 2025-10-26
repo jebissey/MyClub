@@ -45,6 +45,7 @@ use app\config\routes\Survey;
 use app\config\routes\User;
 use app\config\routes\UserAccount;
 use app\config\routes\UserAvailabilities;
+use app\config\routes\UserConnections;
 use app\config\routes\UserDashboard;
 use app\config\routes\UserDirectory;
 use app\config\routes\UserGroups;
@@ -256,6 +257,7 @@ class Routes
         $this->routes = array_merge($this->routes, (new User($this->controllerFactory))->get());
         $this->routes = array_merge($this->routes, (new UserAccount($this->controllerFactory))->get());
         $this->routes = array_merge($this->routes, (new UserAvailabilities($this->controllerFactory))->get());
+        $this->routes = array_merge($this->routes, (new UserConnections($this->controllerFactory))->get());
         $this->routes = array_merge($this->routes, (new UserDashboard($this->controllerFactory))->get());
         $this->routes = array_merge($this->routes, (new UserDirectory($this->controllerFactory))->get());
         $this->routes = array_merge($this->routes, (new UserGroups($this->controllerFactory))->get());

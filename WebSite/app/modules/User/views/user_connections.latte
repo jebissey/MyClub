@@ -1,0 +1,85 @@
+{extends "user.latte"}
+
+{block content}
+<div class="container my-4">
+  <div class="card shadow-sm rounded-4">
+    <div class="card-body">
+      <h5 class="card-title mb-4">Détails des Connexions de {$user}</h5>
+
+      <table class="table align-middle">
+        <thead class="table-light">
+          <tr>
+            <th>Personnes</th>
+            <th class="text-center">Événements communs</th>
+            <th class="text-center">Intensité</th>
+            <th style="width: 33%;">&nbsp;</th>
+          </tr>
+        </thead>
+        <tbody>
+          {foreach $connections as $c}
+            <tr>
+              <td>
+                <a href="#"
+                   class="text-decoration-none fw-bold text-dark"
+                   data-bs-toggle="modal"
+                   data-bs-target="#modalEvents"
+                   data-person="{$c['Name']|escape}"
+                   data-events="{$c['EventList']|escape}">
+                  {$c['Name']}
+                </a>
+              {if $c['OtherPersonInPresentationDirectory'] != 0}
+                <a href="/user/presentation/{$c['OtherPerson']}">ℹ️</a>
+              {/if}
+              </td>
+
+              <td class="text-center fw-bold">
+                {$c['CommonEvents']}
+              </td>
+
+              <td class="text-center">
+                <span class="badge bg-{$c['Level']['color']} px-3 py-2">
+                  {$c['Level']['label']}
+                </span>
+              </td>
+
+              <td>
+                <div class="progress" style="height: 8px;">
+                  <div 
+                    class="progress-bar bg-{$c['Level']['color']}" 
+                    role="progressbar" 
+                    style="width: {$c['Percent']}%;" 
+                    aria-valuenow="{$c['Percent']}" 
+                    aria-valuemin="0" 
+                    aria-valuemax="100">
+                  </div>
+                </div>
+                <small class="text-muted ms-1">{$c['Percent']}%</small>
+              </td>
+            </tr>
+          {/foreach}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="modalEvents" tabindex="-1" aria-labelledby="modalEventsLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content rounded-4 shadow">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalEventsLabel">Événements communs</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+      </div>
+      <div class="modal-body">
+        <p id="modalPersonName" class="fw-bold mb-2"></p>
+        <ul id="modalEventList" class="list-group list-group-flush"></ul>
+      </div>
+    </div>
+  </div>
+</div>
+{/block}
+
+{block scripts}
+    <script src="/app/modules/User/js/connections.js"></script>
+{/block}

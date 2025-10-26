@@ -54,6 +54,7 @@ use app\modules\User\FFAController;
 use app\modules\User\UserController;
 use app\modules\User\UserAccountController;
 use app\modules\User\UserAvailabilitiesController;
+use app\modules\User\UserConnectionsController;
 use app\modules\User\UserDashboardController;
 use app\modules\User\UserDirectoryController;
 use app\modules\User\UserGroupsController;
@@ -311,6 +312,14 @@ class ControllerFactory
     public function makeUserAvailabilitiesController(): UserAvailabilitiesController
     {
         return new UserAvailabilitiesController($this->application);
+    }
+
+    public function makeUserConnectionsController(): UserConnectionsController
+    {
+        return new UserConnectionsController(
+            $this->application,
+            $this->participantDataHelper,
+        );
     }
 
     public function makeUserDashboardController(): UserDashboardController
