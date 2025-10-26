@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace app\modules\Webmaster;
 
+use \Minishlink\WebPush\VAPID;
+
 use app\helpers\Application;
 use app\helpers\Params;
 use app\helpers\WebApp;
@@ -91,6 +93,36 @@ class WebmasterController extends AbstractController
                 'isMyclubWebSite' => WebApp::isMyClubWebSite(),
                 'page' => $this->application->getConnectedUser()->getPage()
             ]));
+        }
+    }
+
+    public function notifications()
+    {
+        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isAdministrator())) {
+            $metadata = $this->dataHelper->get('Metadata', ['Id' => 1], 'VapidPublicKey, VapidPrivateKey ');
+            $message = '';
+            $publicKey = null;
+            if (empty($metadata->VapidPublicKey) || empty($metadata->VapidPrivateKey)) {
+                $newKeys = VAPID::createVapidKeys();
+                $metadata = $this->dataHelper->set('Metadata', [
+                    'VapidPublicKey' => $newKeys['publicKey'],
+                    'VapidPrivateKey' => $newKeys['privateKey']
+                ], ['Id' => 1]);
+                $message = "✅ Les clés VAPID ont été générées et enregistrées avec succès.";
+                $publicKey = $newKeys['publicKey'];
+            } else {
+                $message = "ℹ️ Les clés VAPID existent déjà dans la base de données.";
+                $publicKey = $metadata->VapidPublicKey;
+            }
+
+            $this->render('Webmaster/views/notifications.latte', [
+                'message' => $message,
+                'publicKey' => $publicKey,
+                'navItems' => $this->getNavItems($this->application->getConnectedUser()->person),
+                'isMyclubWebSite' => WebApp::isMyClubWebSite(),
+                'page' => $this->application->getConnectedUser()->getPage(),
+                'currentVersion' => Application::VERSION,
+            ]);
         }
     }
 

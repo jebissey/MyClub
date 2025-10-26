@@ -179,6 +179,8 @@ CREATE TABLE IF NOT EXISTS "Metadata" (
 	"ApplicationName"	TEXT NOT NULL,
 	"DatabaseVersion"	INTEGER NOT NULL,
 	"SiteUnderMaintenance"	INTEGER NOT NULL DEFAULT 0,
+	"VapidPublicKey"	TEXT,
+	"VapidPrivateKey"	TEXT,
 	PRIMARY KEY("Id")
 );
 CREATE TABLE IF NOT EXISTS "Need" (
@@ -256,6 +258,15 @@ CREATE TABLE IF NOT EXISTS "PersonGroup" (
 	"IdGroup"	INTEGER NOT NULL,
 	PRIMARY KEY("Id"),
 	FOREIGN KEY("IdGroup") REFERENCES "Group"("Id"),
+	FOREIGN KEY("IdPerson") REFERENCES "Person"("Id")
+);
+CREATE TABLE IF NOT EXISTS "PushSubscription" (
+	"Id"	INTEGER,
+	"IdPerson"	INTEGER NOT NULL,
+	"EndPoint"	TEXT NOT NULL UNIQUE,
+	"Auth"	TEXT NOT NULL,
+	"CreatedAt"	TEXT NOT NULL DEFAULT current_timestamp,
+	PRIMARY KEY("Id"),
 	FOREIGN KEY("IdPerson") REFERENCES "Person"("Id")
 );
 CREATE TABLE IF NOT EXISTS "Reply" (
@@ -655,7 +666,7 @@ INSERT INTO "Languages" VALUES (71,'message_email_unknown','<div class="containe
   </div>
 </div>');
 INSERT INTO "Languages" VALUES (72,'connections','Connections','Connexions');
-INSERT INTO "Metadata" VALUES (1,'MyClub',1,0);
+INSERT INTO "Metadata" VALUES (1,'MyClub',1,0,NULL,NULL);
 INSERT INTO "Person" VALUES (1,'webmaster@myclub.foo','e427c26faca947919b18b797bc143a35100e4de48c34b70b26202d3a7d8e51f7','my first name','my last name','my nick name or nothing',NULL,'0',NULL,NULL,NULL,NULL,0,0,NULL,NULL,'2025-01-01',0,NULL,NULL,NULL,NULL);
 INSERT INTO "PersonGroup" VALUES (1,1,1);
 INSERT INTO "Settings" VALUES (1,'Title','title');

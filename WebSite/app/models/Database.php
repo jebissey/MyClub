@@ -18,7 +18,7 @@ class Database
     const SQLITE_FILE = 'MyClub.sqlite';
     const SQLITE_LOG_FILE = 'LogMyClub.sqlite';
     const APPLICATION = 'MyClub';
-    const DB_VERSION = 1;              //Don't forget to update when database structure is modified
+    const DB_VERSION = 2;              //Don't forget to update when database structure is modified
 
     private static $instance = null;
     private static $pdo = null;
