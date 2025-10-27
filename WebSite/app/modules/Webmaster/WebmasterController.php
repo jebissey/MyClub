@@ -6,6 +6,7 @@ namespace app\modules\Webmaster;
 
 use \Minishlink\WebPush\VAPID;
 
+use app\enums\FilterInputRule;
 use app\helpers\Application;
 use app\helpers\Params;
 use app\helpers\WebApp;
@@ -124,6 +125,42 @@ class WebmasterController extends AbstractController
                 'currentVersion' => Application::VERSION,
             ]);
         }
+    }
+
+    public function sendEmailCredentialsEdit(): void
+    {
+        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isAdministrator())) {
+            $this->render('Webmaster/views/emailCredentials.latte', Params::getAll([
+                'navItems' => $this->getNavItems($this->application->getConnectedUser()->person),
+                'isMyclubWebSite' => WebApp::isMyClubWebSite(),
+                'page' => $this->application->getConnectedUser()->getPage()
+            ]));
+        }
+    }
+
+    public function sendEmailCredentialsSave()
+    {
+        $person = $this->application->getConnectedUser()->person;
+        if ($person === null) {
+            $this->raiseforbidden(__FILE__, __LINE__);
+            return;
+        }
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+            return;
+        }
+        $schema = [
+            'sendEmailAddress' => FilterInputRule::Email->value,
+            'sendEmailPassword' => FilterInputRule::Password->value,
+            'sendEmailHost' => FilterInputRule::Uri->value
+        ];
+        $input = WebApp::filterInput($schema, $this->flight->request()->data->getData());
+        $this->dataHelper->set('Metadata', [
+            'SendEmailAddress' => $input['sendEmailAddress'] ?? '???',
+            'SendEmailPassword' => $input['sendEmailPassword'] ?? '???',
+            'SendEmailHost' => $input['sendEmailHost'] ?? '???',
+        ], ['Id' => 1]);
+        $this->redirect('/webmaster');
     }
 
     public function showInstallations(): void

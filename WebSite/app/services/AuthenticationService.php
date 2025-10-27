@@ -18,7 +18,7 @@ use Throwable;
 
 class AuthenticationService
 {
-    public function __construct(private DataHelper $dataHelper) {}
+    public function __construct(private DataHelper $dataHelper, private EmailService $emailService) {}
 
     public function handleForgotPassword(string $email): bool
     {
@@ -37,7 +37,8 @@ class AuthenticationService
         $resetLink = Application::$root . '/user/setPassword/' . $token;
         $subject = "Initialisation du mot de passe";
         $message = "Cliquez sur ce lien pour initialiser votre mot de passe : $resetLink";
-        return EmailService::mail_($email, $subject, $message);
+        $fromEmail = 'no-reply@' . parse_url(Application::$root, PHP_URL_HOST);
+        return $this->emailService->send($fromEmail, $email, $subject, $message);
     }
 
     public function handleRememberMeLogin(): ?AuthResult

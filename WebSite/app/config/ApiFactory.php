@@ -37,6 +37,7 @@ use app\models\ParticipantDataHelper;
 use app\models\PersonDataHelper;
 use app\models\SharedFileDataHelper;
 use app\services\AuthorizationService;
+use app\services\EmailService;
 use app\services\EventService;
 
 class ApiFactory
@@ -48,7 +49,9 @@ class ApiFactory
         private AuthorizationDataHelper $authorizationDataHelper,
         private CarouselDataHelper $carouselDataHelper,
         private ConnectedUser $connectedUser,
-        private DataHelper $dataHelper,        private EventDataHelper $eventDataHelper,
+        private DataHelper $dataHelper,        
+        private EmailService $emailService,
+        private EventDataHelper $eventDataHelper,
         private EventNeedDataHelper $eventNeedDataHelper,
         private EventService $eventService,
         private LogDataHelper $logDataHelper,
@@ -60,7 +63,7 @@ class ApiFactory
         private ParticipantDataHelper $participantDataHelper,
         private PersonDataHelper $personDataHelper,
         private PersonPreferences $personPreferences,
-        private SharedFileDataHelper $sharedFileDataHelper
+        private SharedFileDataHelper $sharedFileDataHelper,
     ) {}
 
     public function makeArticleApi(): ArticleApi
@@ -97,6 +100,7 @@ class ApiFactory
             $this->participantDataHelper,
             $this->personPreferences,
             $this->messageDataHelper,
+            $this->emailService,
             $this->connectedUser,
             $this->dataHelper,
             $this->personDataHelper

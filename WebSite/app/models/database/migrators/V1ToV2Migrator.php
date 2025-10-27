@@ -33,19 +33,21 @@ class V1ToV2Migrator implements DatabaseMigratorInterface
             $stmt = $pdo->prepare($sql);
             $stmt->execute(array_merge([$emoji], $filenames));
         }
-
         $pdo->exec("ALTER TABLE Metadata ADD COLUMN VapidPublicKey TEXT");
         $pdo->exec("ALTER TABLE Metadata ADD COLUMN VapidPrivateKey TEXT");
+        $pdo->exec("ALTER TABLE Metadata ADD COLUMN SendEmailAddress TEXT");
+        $pdo->exec("ALTER TABLE Metadata ADD COLUMN SendEmailPassword TEXT");
+        $pdo->exec("ALTER TABLE Metadata ADD COLUMN SendEmailHost TEXT");
         $pdo->exec('CREATE TABLE "PushSubscription" (
-                        "Id"	INTEGER,
-                        "IdPerson"	INTEGER NOT NULL,
-                        "EndPoint"	TEXT NOT NULL UNIQUE,
-                        "Auth"	TEXT NOT NULL,
-                        "CreatedAt"	TEXT NOT NULL DEFAULT current_timestamp,
-                        PRIMARY KEY("Id"),
-                        FOREIGN KEY("IdPerson") REFERENCES "Person"("Id")
-                    )');
-
+            "Id"	INTEGER,
+            "IdPerson"	INTEGER NOT NULL,
+            "EndPoint"	TEXT NOT NULL UNIQUE,
+            "Auth"	TEXT NOT NULL,
+            "CreatedAt"	TEXT NOT NULL DEFAULT current_timestamp,
+            "P256dh"	TEXT NOT NULL DEFAULT "",
+            PRIMARY KEY("Id"),
+            FOREIGN KEY("IdPerson") REFERENCES "Person"("Id")
+        )');
 
         return 2;
     }

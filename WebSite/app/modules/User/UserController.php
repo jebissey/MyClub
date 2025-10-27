@@ -22,6 +22,10 @@ class UserController extends AbstractController
 
     public function forgotPassword($encodedEmail): void
     {
+        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+            return;
+        }
         $email = urldecode($encodedEmail);
         try {
             $success = $this->authService->handleForgotPassword($email);

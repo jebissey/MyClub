@@ -34,6 +34,7 @@ class EventApi extends AbstractApi
         private ParticipantDataHelper $participantDataHelper,
         private PersonPreferences $personPreferences,
         private MessageDataHelper $messageDataHelper,
+        private EmailService $emailService,
         ConnectedUser $connectedUser, 
         DataHelper $dataHelper, 
         PersonDataHelper $personDataHelper
@@ -184,7 +185,7 @@ class EventApi extends AbstractApi
                 return new ApiResponse(false, ApplicationError::BadRequest->value, [],  'Invalid Email in file ' + __FILE__ + ' at line ' + __LINE__);
             }
             $ccList = $this->messageDataHelper->addWebAppMessages($event->Id, $participants, $title . "\n\n" . $body);
-            $result = EmailService::send(
+            $result = $this->emailService->send(
                 $eventCreatorEmail,
                 $eventCreatorEmail,
                 $title,

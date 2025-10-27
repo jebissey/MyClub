@@ -21,6 +21,8 @@ class Webmaster implements RouteInterface
         $this->routes[] = new Route('GET  /admin', $webmasterController, 'homeAdmin');
         $this->routes[] = new Route('GET  /admin/help', $webmasterController, 'helpAdmin');
         $this->routes[] = new Route('GET  /admin/webmaster/help', $webmasterController, 'helpWebmaster');
+        $this->routes[] = new Route('GET  /sendEmails', $webmasterController, 'sendEmailCredentialsEdit');
+        $this->routes[] = new Route('POST /sendEmails/saveCredentials', $webmasterController, 'sendEmailCredentialsSave');        
         $this->routes[] = new Route('GET  /installations', $webmasterController, 'showInstallations');
         $this->routes[] = new Route('GET  /notifications', $webmasterController, 'notifications');
         $this->routes[] = new Route('GET  /sitemap.xml', $webmasterController, 'sitemapGenerator');

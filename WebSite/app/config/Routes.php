@@ -111,6 +111,7 @@ class Routes
         $crosstabDataHelper = new CrosstabDataHelper($application, $authorizationDataHelper);
         $dataHelper = new DataHelper($application);
         $designDataHelper = new DesignDataHelper($application);
+        $emailService = new EmailService($application, $dataHelper);
         $eventDataHelper = new EventDataHelper($application);
         $groupDataHelper = new GroupDataHelper($application);
         $logDataHelper = new LogDataHelper($application);
@@ -132,7 +133,7 @@ class Routes
             new ArticleCrosstabDataHelper($application, $crosstabDataHelper),
             $articleDataHelper,
             new ArticleTableDataHelper($application),
-            new AuthenticationService($dataHelper),
+            new AuthenticationService($dataHelper, $emailService),
             new Backup(),
             new CarouselDataHelper($application),
             $application->getConnectedUser(),
@@ -140,7 +141,7 @@ class Routes
             new DataHelper($application),
             new DbBrowserDataHelper($application),
             $designDataHelper,
-            new EmailService(),
+            $emailService,
             new ErrorManager($application),
             $eventDataHelper,
             new EventTypeDataHelper($application),
@@ -168,6 +169,7 @@ class Routes
             new CarouselDataHelper($application),
             $application->getConnectedUser(),
             $dataHelper,
+            $emailService,
             $eventDataHelper,
             new EventNeedDataHelper($application),
             new EventService($eventDataHelper),
@@ -180,7 +182,8 @@ class Routes
             $participantDataHelper,
             $personDataHelper,
             $personPreferences,
-            new SharedFileDataHelper($application)
+            new SharedFileDataHelper($application),
+            $emailService
         );
     }
 

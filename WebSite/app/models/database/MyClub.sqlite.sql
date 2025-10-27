@@ -181,6 +181,9 @@ CREATE TABLE IF NOT EXISTS "Metadata" (
 	"SiteUnderMaintenance"	INTEGER NOT NULL DEFAULT 0,
 	"VapidPublicKey"	TEXT,
 	"VapidPrivateKey"	TEXT,
+	"SendMailUsername"	TEXT,
+	"SendMailPassword"	TEXT,
+	"SendMailHost"	TEXT,
 	PRIMARY KEY("Id")
 );
 CREATE TABLE IF NOT EXISTS "Need" (
@@ -666,7 +669,7 @@ INSERT INTO "Languages" VALUES (71,'message_email_unknown','<div class="containe
   </div>
 </div>');
 INSERT INTO "Languages" VALUES (72,'connections','Connections','Connexions');
-INSERT INTO "Metadata" VALUES (1,'MyClub',1,0,NULL,NULL);
+INSERT INTO "Metadata" VALUES (1,'MyClub',1,0,NULL,NULL,NULL,NULL,NULL);
 INSERT INTO "Person" VALUES (1,'webmaster@myclub.foo','e427c26faca947919b18b797bc143a35100e4de48c34b70b26202d3a7d8e51f7','my first name','my last name','my nick name or nothing',NULL,'0',NULL,NULL,NULL,NULL,0,0,NULL,NULL,'2025-01-01',0,NULL,NULL,NULL,NULL);
 INSERT INTO "PersonGroup" VALUES (1,1,1);
 INSERT INTO "Settings" VALUES (1,'Title','title');
