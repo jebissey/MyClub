@@ -31,6 +31,7 @@ use app\config\routes\GroupApi;
 use app\config\routes\Home;
 use app\config\routes\Import;
 use app\config\routes\ImportApi;
+use app\config\routes\Karaoke;
 use app\config\routes\Maintenance;
 use app\config\routes\Media;
 use app\config\routes\MediaApi;
@@ -246,6 +247,7 @@ class Routes
         $this->routes = array_merge($this->routes, (new Home($this->controllerFactory))->get());
         $this->routes = array_merge($this->routes, (new Import($this->controllerFactory))->get());
         $this->routes = array_merge($this->routes, (new ImportApi($this->apiFactory))->get());
+        $this->routes = array_merge($this->routes, (new Karaoke($this->controllerFactory))->get());
         $this->routes = array_merge($this->routes, (new Maintenance($this->controllerFactory))->get());
         $this->routes = array_merge($this->routes, (new Media($this->controllerFactory))->get());
         $this->routes = array_merge($this->routes, (new MediaApi($this->apiFactory))->get());

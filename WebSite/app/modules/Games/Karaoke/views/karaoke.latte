@@ -1,0 +1,188 @@
+{layout '../../../Common/views/layout.latte'}
+
+{block title}Karaoké{/block}
+
+{block head}
+<style>
+    body {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .karaoke-container {
+        margin: 50px auto;
+        padding: 30px;
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 20px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        display: flex;
+        flex-direction: column;
+        height: 80vh; /* hauteur de la vue */
+    }
+
+    .song-info {
+        text-align: center;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #667eea;
+    }
+
+    .song-title {
+        font-size: 2rem;
+        font-weight: bold;
+        color: #667eea;
+        margin-bottom: 10px;
+    }
+
+    .song-artist {
+        font-size: 1.2rem;
+        color: #764ba2;
+    }
+
+    .lyrics-display {
+        flex: 1; /* prend tout l’espace restant */
+        background: #f8f9fa;
+        border-radius: 15px;
+        padding: 5vh 20px;
+        margin: 20px 0;
+        font-size: 1.5rem;
+        text-align: center;
+        line-height: 2.5;
+        overflow-y: auto; /* scroll interne */
+        scroll-behavior: smooth;
+    }
+
+    .lyric-line {
+        opacity: 0.4;
+        transition: all 0.3s ease;
+        margin: 10px 0;
+    }
+
+    .lyric-line.active {
+        opacity: 1;
+        font-size: 3.8rem;
+        font-weight: bold;
+        color: #667eea;
+    }
+
+    .lyric-line.next {
+        opacity: 0.7;
+        color: #764ba2;
+    }
+
+    .word {
+        display: inline-block;
+        transition: all 0.2s ease;
+        padding: 0 3px;
+    }
+
+    .word.highlighted {
+        color: #ff6b6b;
+        font-weight: bold;
+        transform: scale(1.02);
+        text-shadow: 2px 2px 4px rgba(255, 107, 107, 0.3);
+    }
+
+    .audio-controls {
+        text-align: center;
+        margin-top: 10px;
+    }
+
+    .progress-bar-container {
+        margin: 15px 0;
+        height: 8px;
+        background: #e0e0e0;
+        border-radius: 10px;
+        overflow: hidden;
+        cursor: pointer;
+    }
+
+    .progress-bar {
+        height: 100%;
+        background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        width: 0%;
+        transition: width 0.1s linear;
+    }
+
+    .time-display {
+        display: flex;
+        justify-content: space-between;
+        color: #666;
+        font-size: 0.9rem;
+        margin-top: 5px;
+    }
+
+    .control-buttons {
+        margin-top: 15px;
+        text-align: center;
+    }
+
+    .control-buttons button {
+        margin: 0 10px;
+        padding: 12px 30px;
+        font-size: 1.1rem;
+        border-radius: 50px;
+        border: none;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .control-buttons button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+    }
+
+    .control-buttons button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+</style>
+{/block}
+
+{block navbar}
+{include '../../../Webmaster/views/navbar/home.latte'}
+{/block}
+
+{block content}
+<div class="karaoke-container">
+    <div class="song-info">
+        <div class="song-title">{$metadata['ti'] ?? 'Sans titre'}</div>
+        <div class="song-artist">{$metadata['ar'] ?? 'Artiste inconnu'}</div>
+    </div>
+
+    <div class="lyrics-display" id="lyricsDisplay">
+        <div class="text-muted">Appuyez sur Play pour commencer...</div>
+    </div>
+
+    <div class="audio-controls">
+        <audio id="audioPlayer" preload="metadata">
+            <source src="{$audioFile}" type="audio/mpeg">
+            Votre navigateur ne supporte pas l'audio HTML5.
+        </audio>
+    </div>
+
+    <div class="progress-bar-container" id="progressContainer">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <div class="time-display">
+        <span id="currentTime">0:00</span>
+        <span id="duration">0:00</span>
+    </div>
+
+    <div class="control-buttons">
+        <button id="playPauseBtn" class="btn btn-primary">▶ Lecture</button>
+        <button id="restartBtn" class="btn btn-secondary">↻ Recommencer</button>
+    </div>
+</div>
+{/block}
+
+{block scripts}
+<script>
+    const lyricsData = {$lines};
+</script>
+<script src="/app/modules/Games/Karaoke/js/karaoke.js"></script>
+{/block}

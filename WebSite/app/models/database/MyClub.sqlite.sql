@@ -669,7 +669,88 @@ INSERT INTO "Languages" VALUES (71,'message_email_unknown','<div class="containe
   </div>
 </div>');
 INSERT INTO "Languages" VALUES (72,'connections','Connections','Connexions');
-INSERT INTO "Metadata" VALUES (1,'MyClub',1,0,NULL,NULL,NULL,NULL,NULL);
+INSERT INTO "Languages" VALUES (73,'ErrorLyricsFileNotFound','<div class=''''container text-center mt-5''''>
+                    <div class=''''card shadow-lg rounded-3 p-4''''>
+                        <h1 class=''''text-danger''''>📁 Lyrics File Not Found</h1>
+                        <p class=''''mt-3''''>
+                        The lyrics file could not be found.<br>
+                        Please make sure the song exists and that its lyrics file (<code>.lrc</code>) is correctly named.
+                        </p>
+                        <ul class=''''text-start mx-auto d-inline-block mt-3''''>
+                        <li>➡️ The file name might not match the song name.</li>
+                        <li>➡️ The file might have been moved or deleted.</li>
+                        </ul>
+                        <a href=''/'' class=''''btn btn-primary mt-4''''>🏠 Back to homepage</a>
+                    </div>
+                </div>','<div class=''''container text-center mt-5''''>
+                    <div class=''''card shadow-lg rounded-3 p-4''''>
+                        <h1 class=''''text-danger''''>📁 Fichier de paroles introuvable</h1>
+                        <p class=''''mt-3''''>
+                        Le fichier de paroles est introuvable.<br>
+                        Vérifie que la chanson existe et que son fichier <code>.lrc</code> porte bien le même nom.
+                        </p>
+                        <ul class=''''text-start mx-auto d-inline-block mt-3''''>
+                        <li>➡️ Le nom du fichier ne correspond pas à celui de la chanson.</li>
+                        <li>➡️ Le fichier a été déplacé ou supprimé.</li>
+                        </ul>
+                        <a href=''/'' class=''''btn btn-primary mt-4''''>🏠 Retour à l’accueil</a>
+                    </div>
+                </div>');
+INSERT INTO "Languages" VALUES (74,'ErrorLyricsFileNotReadable','<div class=''''container text-center mt-5''''>
+                    <div class=''''card shadow-lg rounded-3 p-4''''>
+                        <h1 class=''''text-danger''''>🔒 Lyrics File Not Readable</h1>
+                        <p class=''''mt-3''''>
+                        The lyrics file exists but cannot be read.<br>
+                        Please check file permissions or contact the administrator.
+                        </p>
+                        <ul class=''''text-start mx-auto d-inline-block mt-3''''>
+                        <li>➡️ The file might not have proper read permissions.</li>
+                        <li>➡️ The file might be locked or corrupted.</li>
+                        </ul>
+                        <a href=''/'' class=''''btn btn-primary mt-4''''>🏠 Back to homepage</a>
+                    </div>
+                </div>','''<div class=''''container text-center mt-5''''>
+                    <div class=''''card shadow-lg rounded-3 p-4''''>
+                        <h1 class=''''text-danger''''>🔒 Fichier de paroles non lisible</h1>
+                        <p class=''''mt-3''''>
+                        Le fichier de paroles existe mais n’a pas pu être lu.<br>
+                        Vérifie les permissions du fichier ou contacte l’administrateur.
+                        </p>
+                        <ul class=''''text-start mx-auto d-inline-block mt-3''''>
+                        <li>➡️ Le fichier n’a peut-être pas les droits de lecture suffisants.</li>
+                        <li>➡️ Le fichier est peut-être verrouillé ou corrompu.</li>
+                        </ul>
+                        <a href=''/'' class=''''btn btn-primary mt-4''''>🏠 Retour à l’accueil</a>
+                    </div>
+                </div>');
+INSERT INTO "Languages" VALUES (75,'ErrorLyricsFileReadError','''<div class=''''container text-center mt-5''''>
+                    <div class=''''card shadow-lg rounded-3 p-4''''>
+                        <h1 class=''''text-danger''''>⚠️ Lyrics File Reading Error</h1>
+                        <p class=''''mt-3''''>
+                        We encountered an unexpected error while reading the lyrics file.<br>
+                        Please verify the file content or try again later.
+                        </p>
+                        <ul class=''''text-start mx-auto d-inline-block mt-3''''>
+                        <li>➡️ The file might be corrupted.</li>
+                        <li>➡️ The server encountered a temporary I/O error.</li>
+                        </ul>
+                        <a href=''/'' class=''''btn btn-primary mt-4''''>🏠 Back to homepage</a>
+                    </div>
+                </div>','<div class=''''container text-center mt-5''''>
+                    <div class=''''card shadow-lg rounded-3 p-4''''>
+                        <h1 class=''''text-danger''''>⚠️ Erreur de lecture du fichier de paroles</h1>
+                        <p class=''''mt-3''''>
+                        Une erreur est survenue lors de la lecture du fichier de paroles.<br>
+                        Vérifie le contenu du fichier ou réessaie plus tard.
+                        </p>
+                        <ul class=''''text-start mx-auto d-inline-block mt-3''''>
+                        <li>➡️ Le fichier est peut-être corrompu.</li>
+                        <li>➡️ Le serveur a rencontré une erreur d’accès disque temporaire.</li>
+                        </ul>
+                        <a href=''/'' class=''''btn btn-primary mt-4''''>🏠 Retour à l’accueil</a>
+                    </div>
+                </div>');
+INSERT INTO "Metadata" VALUES (1,'MyClub',2,0,NULL,NULL,NULL,NULL,NULL);
 INSERT INTO "Person" VALUES (1,'webmaster@myclub.foo','e427c26faca947919b18b797bc143a35100e4de48c34b70b26202d3a7d8e51f7','my first name','my last name','my nick name or nothing',NULL,'0',NULL,NULL,NULL,NULL,0,0,NULL,NULL,'2025-01-01',0,NULL,NULL,NULL,NULL);
 INSERT INTO "PersonGroup" VALUES (1,1,1);
 INSERT INTO "Settings" VALUES (1,'Title','title');
