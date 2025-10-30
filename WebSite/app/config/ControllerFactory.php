@@ -122,7 +122,8 @@ class ControllerFactory
             $this->backup,
             $this->articleCrosstabDataHelper,
             $this->genericDataHelper,
-            $this->messageDataHelper
+            $this->messageDataHelper,
+            $this->emailService
         );
     }
 
@@ -179,7 +180,8 @@ class ControllerFactory
     {
         return new EventGuestController(
             $this->application,
-            $this->eventDataHelper
+            $this->eventDataHelper,
+            $this->emailService
         );
     }
 

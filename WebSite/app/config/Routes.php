@@ -32,6 +32,7 @@ use app\config\routes\Home;
 use app\config\routes\Import;
 use app\config\routes\ImportApi;
 use app\config\routes\Karaoke;
+use app\config\routes\KaraokeApi;
 use app\config\routes\Maintenance;
 use app\config\routes\Media;
 use app\config\routes\MediaApi;
@@ -83,6 +84,7 @@ use app\models\EventTypeDataHelper;
 use app\models\GenericDataHelper;
 use app\models\GroupDataHelper;
 use app\models\ImportDataHelper;
+use app\models\KaraokeDataHelper;
 use app\models\LogDataHelper;
 use app\models\MessageDataHelper;
 use app\models\NeedDataHelper;
@@ -120,7 +122,7 @@ class Routes
         $needDataHelper = new NeedDataHelper($application);
         $participantDataHelper = new ParticipantDataHelper($application);
         $personPreferences = new PersonPreferences($application);
-        $personDataHelper = new PersonDataHelper($application, $personPreferences);
+        $personDataHelper = new PersonDataHelper($application, $personPreferences, $emailService);
         $surveyDataHelper = new SurveyDataHelper($application, $articleDataHelper);
         $newsProviders = [
             $articleDataHelper,
@@ -174,6 +176,7 @@ class Routes
             $eventDataHelper,
             new EventNeedDataHelper($application),
             new EventService($eventDataHelper),
+            new KaraokeDataHelper($application),
             $logDataHelper,
             $messageDataHelper,
             $needDataHelper,
@@ -208,7 +211,7 @@ class Routes
             '/Feed-icon.svg' => ['Feed-icon.svg', 'image/svg+xml'],
             '/robots.txt' => ['robots.txt', 'text/plain; charset=UTF-8'],
             '/webCard' => ['businessCard.html', 'text/html; charset=UTF-8'],
-            '/.well-known/appspecific/com.chrome.devtools.json' => [null, null],
+            '/.well-known/appspecific/com.chrome.devtools.json' => ['', ''],
         ];
         foreach ($files as $route => [$file, $type]) {
             $this->flight->route($route, fn() => $this->serveFile($errorManager, $file, $type));
@@ -248,6 +251,7 @@ class Routes
         $this->routes = array_merge($this->routes, (new Import($this->controllerFactory))->get());
         $this->routes = array_merge($this->routes, (new ImportApi($this->apiFactory))->get());
         $this->routes = array_merge($this->routes, (new Karaoke($this->controllerFactory))->get());
+        $this->routes = array_merge($this->routes, (new KaraokeApi($this->apiFactory))->get());
         $this->routes = array_merge($this->routes, (new Maintenance($this->controllerFactory))->get());
         $this->routes = array_merge($this->routes, (new Media($this->controllerFactory))->get());
         $this->routes = array_merge($this->routes, (new MediaApi($this->apiFactory))->get());

@@ -34,6 +34,7 @@ class ArticleController extends TableController
         private ArticleCrosstabDataHelper $articleCrosstabDataHelper,
         GenericDataHelper $genericDataHelper,
         private MessageDataHelper $messageDataHelper,
+        private EmailService $emailService,
     ) {
         parent::__construct($application, $genericDataHelper);
     }
@@ -141,7 +142,7 @@ class ArticleController extends TableController
         $emailTitle = 'BNW - Un nouvel article est disponible';
         $message = "Conformément à vos souhaits, ce message vous signale la présence d'un nouvel article" . "\n\n" . $articleLink
             . "\n\n Pour ne plus recevoir ce type de message vous pouvez mettre à jour vos préférences" . $unsubscribeLink;
-        EmailService::send(
+        $this->emailService->send(
             $articleCreatorEmail,
             $articleCreatorEmail,
             $emailTitle,

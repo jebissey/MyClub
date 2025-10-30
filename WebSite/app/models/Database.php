@@ -18,7 +18,7 @@ class Database
     const SQLITE_FILE = 'MyClub.sqlite';
     const SQLITE_LOG_FILE = 'LogMyClub.sqlite';
     const APPLICATION = 'MyClub';
-    const DB_VERSION = 2;              //Don't forget to update when database structure is modified
+    const DB_VERSION = 3;              //Don't forget to update here and in Metadata when database structure is modified
 
     private static $instance = null;
     private static $pdo = null;
@@ -101,7 +101,7 @@ class Database
             $pdo->commit();
         } catch (Throwable $e) {
             $pdo->rollBack();
-            Application::unreachable('Fatal program error during migration: ' . $e->getMessage(), __FILE__, __LINE__);
+            Application::unreachable('Fatal program error during migration: ' . $e->getMessage(), $e->getFile(), $e->getLine());
         }
     }
 }

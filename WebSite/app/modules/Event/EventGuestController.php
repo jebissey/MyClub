@@ -19,7 +19,8 @@ class EventGuestController extends AbstractController
 {
     public function __construct(
         Application $application,
-        private EventDataHelper $eventDataHelper
+        private EventDataHelper $eventDataHelper,
+        private EmailService $emailService,
     ) {
         parent::__construct($application);
     }
@@ -133,7 +134,7 @@ class EventGuestController extends AbstractController
                 $body .= $invitationLink . "\n\n";
                 $body .= "Cordialement,\nL'équipe BNW Dijon";
                 $emailFrom = $this->application->getConnectedUser()->person->Email;
-                EmailService::send($emailFrom, $email, $subject, $body);
+                $this->emailService->send($emailFrom, $email, $subject, $body);
                 $this->guest('Invitation envoyée avec succès à ' . $email, 'success');
             } catch (Throwable $e) {
                 $this->guest('Erreur lors de l\'envoi de l\'invitation. ' . $e->getMessage(), 'error');

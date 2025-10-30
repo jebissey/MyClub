@@ -24,6 +24,7 @@ enum FilterInputRule: string
     case Password = '/^.{6,30}$/';
     case PersonName = '/^(?![ \-])[A-Za-zÀ-ÖØ-öø-ÿ\- ]{1,100}(?<![ \-])$/';
     case Phone = '/^\+?[0-9\s().\-]{6,20}$/';
+    case String = '/^[a-zA-Z0-9\-_]{1,64}$/';
     case Uri = '/^[a-zA-Z0-9\-._~\/]{1,255}$/';
     case Token = '/^[a-fA-F0-9]{32}$/';
     case CheckboxMatrix = 'checkbox:matrix';

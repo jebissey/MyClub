@@ -152,6 +152,28 @@ CREATE TABLE IF NOT EXISTS "Guest" (
 	FOREIGN KEY("IdEvent") REFERENCES "Event"("Id"),
 	FOREIGN KEY("InvitedBy") REFERENCES "Person"("Id")
 );
+CREATE TABLE IF NOT EXISTS "KaraokeClient" (
+	"Id"	INTEGER,
+	"ClientId"	TEXT NOT NULL UNIQUE,
+	"IdKaraokeSession"	INTEGER NOT NULL,
+	"IsHost"	INTEGER DEFAULT 0,
+	"LastHeartbeat"	TEXT NOT NULL DEFAULT current_timestamp,
+	"CreatedAt"	TEXT NOT NULL DEFAULT current_timestamp,
+	PRIMARY KEY("Id"),
+	FOREIGN KEY("IdKaraokeSession") REFERENCES "KaraokeSession"("Id")
+);
+CREATE TABLE IF NOT EXISTS "KaraokeSession" (
+	"Id"	INTEGER,
+	"SessionId"	TEXT NOT NULL UNIQUE,
+	"SongName"	TEXT NOT NULL,
+	"Status"	TEXT DEFAULT 'waiting',
+	"CountdownStart"	INTEGER,
+	"PlayStartTime"	INTEGER,
+	"CurrentTime"	REAL DEFAULT 0,
+	"CreatedAt"	TEXT NOT NULL DEFAULT current_timestamp,
+	"UpdatedAt"	TEXT NOT NULL DEFAULT current_timestamp,
+	PRIMARY KEY("Id")
+);
 CREATE TABLE IF NOT EXISTS "Languages" (
 	"Id"	INTEGER,
 	"Name"	TEXT NOT NULL,
@@ -750,7 +772,7 @@ INSERT INTO "Languages" VALUES (75,'ErrorLyricsFileReadError','''<div class=''''
                         <a href=''/'' class=''''btn btn-primary mt-4''''>🏠 Retour à l’accueil</a>
                     </div>
                 </div>');
-INSERT INTO "Metadata" VALUES (1,'MyClub',2,0,NULL,NULL,NULL,NULL,NULL);
+INSERT INTO "Metadata" VALUES (1,'MyClub',3,0,NULL,NULL,NULL,NULL,NULL);
 INSERT INTO "Person" VALUES (1,'webmaster@myclub.foo','e427c26faca947919b18b797bc143a35100e4de48c34b70b26202d3a7d8e51f7','my first name','my last name','my nick name or nothing',NULL,'0',NULL,NULL,NULL,NULL,0,0,NULL,NULL,'2025-01-01',0,NULL,NULL,NULL,NULL);
 INSERT INTO "PersonGroup" VALUES (1,1,1);
 INSERT INTO "Settings" VALUES (1,'Title','title');

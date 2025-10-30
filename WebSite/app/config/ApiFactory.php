@@ -13,6 +13,7 @@ use app\apis\EventNeedTypeApi;
 use app\apis\EventSupplyApi;
 use app\apis\GroupApi;
 use app\apis\ImportApi;
+use app\apis\KaraokeApi;
 use app\apis\MediaApi;
 use app\apis\MessageApi;
 use app\apis\NavbarApi;
@@ -28,6 +29,7 @@ use app\models\DataHelper;
 use app\models\DesignDataHelper;
 use app\models\EventDataHelper;
 use app\models\EventNeedDataHelper;
+use app\models\KaraokeDataHelper;
 use app\models\LogDataHelper;
 use app\models\MessageDataHelper;
 use app\models\NeedDataHelper;
@@ -54,6 +56,7 @@ class ApiFactory
         private EventDataHelper $eventDataHelper,
         private EventNeedDataHelper $eventNeedDataHelper,
         private EventService $eventService,
+        private KaraokeDataHelper $karaokeDataHelper,
         private LogDataHelper $logDataHelper,
         private MessageDataHelper $messageDataHelper,
         private NeedDataHelper $needDataHelper,
@@ -170,6 +173,17 @@ class ApiFactory
             $this->connectedUser,
             $this->dataHelper,
             $this->personDataHelper
+        );
+    }
+
+    public function makeKaraokeApi(): KaraokeApi
+    {
+        return new KaraokeApi(
+            $this->application,
+            $this->connectedUser,
+            $this->dataHelper,
+            $this->personDataHelper,
+            $this->karaokeDataHelper
         );
     }
 

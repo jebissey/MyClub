@@ -4,12 +4,16 @@
 
 {block head}
 <style>
+    /* === Fond global === */
     body {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         min-height: 100vh;
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+        padding: 0;
     }
 
+    /* === Conteneur principal === */
     .karaoke-container {
         margin: 50px auto;
         padding: 30px;
@@ -18,9 +22,11 @@
         box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
         display: flex;
         flex-direction: column;
-        height: 80vh; /* hauteur de la vue */
+        height: 80vh;
+        width: 100%;
     }
 
+    /* === Infos chanson === */
     .song-info {
         text-align: center;
         margin-bottom: 20px;
@@ -40,8 +46,9 @@
         color: #764ba2;
     }
 
+    /* === Affichage des paroles === */
     .lyrics-display {
-        flex: 1; /* prend tout l’espace restant */
+        flex: 1;
         background: #f8f9fa;
         border-radius: 15px;
         padding: 5vh 20px;
@@ -49,7 +56,7 @@
         font-size: 1.5rem;
         text-align: center;
         line-height: 2.5;
-        overflow-y: auto; /* scroll interne */
+        overflow-y: auto;
         scroll-behavior: smooth;
     }
 
@@ -73,17 +80,21 @@
 
     .word {
         display: inline-block;
-        transition: all 0.2s ease;
+        transition: color 0.2s ease, transform 0.2s ease, text-shadow 0.2s ease;
         padding: 0 3px;
+        will-change: color, transform, text-shadow;
+        -webkit-backface-visibility: hidden;
+        backface-visibility: hidden;
     }
 
     .word.highlighted {
         color: #ff6b6b;
         font-weight: bold;
-        transform: scale(1.02);
+        transform: translateZ(0) scale(1.02);
         text-shadow: 2px 2px 4px rgba(255, 107, 107, 0.3);
     }
 
+    /* === Contrôles audio === */
     .audio-controls {
         text-align: center;
         margin-top: 10px;
@@ -139,6 +150,98 @@
         opacity: 0.5;
         cursor: not-allowed;
     }
+
+    /* === Synchronisation === */
+    .sync-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 15px;
+        margin-top: 15px;
+        padding: 10px;
+        background: rgba(102, 126, 234, 0.1);
+        border-radius: 10px;
+    }
+
+    .sync-checkbox-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 1rem;
+        color: #667eea;
+        font-weight: 600;
+    }
+
+    .sync-checkbox-wrapper input[type="checkbox"] {
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+    }
+
+    #syncControls {
+        display: none;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+        margin-top: 15px;
+    }
+
+    #syncStatus {
+        color: #764ba2;
+        font-size: 1.1rem;
+        font-weight: 600;
+        text-align: center;
+        padding: 10px;
+        display: none;
+    }
+
+    #launchForAllBtn {
+        padding: 15px 40px;
+        font-size: 1.2rem;
+        border-radius: 50px;
+        border: none;
+        background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+        color: white;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-weight: bold;
+    }
+
+    #launchForAllBtn:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 20px rgba(255, 107, 107, 0.4);
+    }
+
+    #launchForAllBtn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    #connectedClients {
+        color: #764ba2;
+        font-weight: 600;
+        font-size: 1rem;
+    }
+
+    #countdownDisplay {
+        display: none;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 15rem;
+        font-weight: bold;
+        color: #667eea;
+        text-shadow: 0 0 30px rgba(102, 126, 234, 0.5);
+        z-index: 1000;
+        pointer-events: none;
+        animation: pulse 1s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+        0%, 100% { transform: translate(-50%, -50%) scale(1); }
+        50% { transform: translate(-50%, -50%) scale(1.1); }
+    }
 </style>
 {/block}
 
@@ -174,9 +277,24 @@
     </div>
 
     <div class="control-buttons">
-        <button id="playPauseBtn" class="btn btn-primary">▶ Lecture</button>
-        <button id="restartBtn" class="btn btn-secondary">↻ Recommencer</button>
+        <button id="playPauseBtn">Lecture</button>
+        <button id="restartBtn">Recommencer</button>
     </div>
+
+    <div class="sync-container">
+        <div class="sync-checkbox-wrapper">
+            <input type="checkbox" id="syncCheckbox" {if !$isAdministrator}disabled{/if}>
+            <label for="syncCheckbox">Synchronisé</label>
+        </div>
+    </div>
+
+    <div id="syncControls">
+        <button id="launchForAllBtn">Lancer la lecture pour tous</button>
+        <div id="syncStatus"></div>
+        <div id="connectedClients">0 client connecté</div>
+    </div>
+
+    <div id="countdownDisplay"></div>
 </div>
 {/block}
 

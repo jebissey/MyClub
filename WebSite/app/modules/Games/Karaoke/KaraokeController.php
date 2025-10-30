@@ -24,17 +24,18 @@ class KaraokeController extends AbstractController
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
-
         try {
             $parser = new LyricsParser($this->application, $this->languagesDataHelper);
             $parser->parse(self::MEDIA_PATH . "{$song}.lrc");
+            $connectedUser = $this->application->getConnectedUser();
 
             $this->render('Games/Karaoke/views/karaoke.latte', Params::getAll([
-                'navItems' => $this->getNavItems($this->application->getConnectedUser()->person),
+                'navItems' => $this->getNavItems($connectedUser->person),
                 'page' => $this->application->getConnectedUser()->getPage(),
                 'metadata' => $parser->getMetadata(),
                 'lines' => $parser->getLines(),
-                'audioFile' => "/game/karaoke/files/{$song}"
+                'audioFile' => "/game/karaoke/files/{$song}",
+                'isAdministrator' => $connectedUser->isAdministrator() ?? false
             ]));
         } catch (LyricsParserException $e) {
             $content = $this->languagesDataHelper->translate($e->getMessage())

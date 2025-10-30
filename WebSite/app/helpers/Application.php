@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace app\helpers;
@@ -15,7 +16,7 @@ use app\models\Database;
 
 class Application
 {
-    public const VERSION = '0.9.0';
+    public const VERSION = '0.10.0';
     public const  EMOJI_LIST = [
         '😀', '😄', '😁', '😅', '😂', '🤣', '😊', '😇', '🤨', 
         '🙂', '🙃', '😉', '😌', '☹️', '😐', '🙄', '😯', '🥴', 
@@ -24,7 +25,7 @@ class Application
         '😋', '😛', '🤪', '🤮', '🤧', '😷', '🤒', '🤕', '🤐', 
         '😥', '😭', '😤', '😠', '🥵', '🥶', '🤑', '🤠', '🥳', 
     ];
-
+    
     private static self $instance;
     private static Engine $flight;
     private static LatteEngine $latte;
@@ -51,7 +52,7 @@ class Application
             $this->errorManager = new ErrorManager($this);
             $this->connectedUser = new ConnectedUser($this);
         } catch (Throwable $e) {
-            throw new DatabaseException('Database error ' . $e->getMessage() . ' in file ' . __FILE__ . ' at line ' . __LINE__);
+            throw new DatabaseException('Database error ' . $e->getMessage() . ' in ' . $e->getFile() . ' at ' . $e->getLine());
         }
     }
 

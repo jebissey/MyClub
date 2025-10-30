@@ -14,8 +14,11 @@ use app\services\EmailService;
 
 class PersonDataHelper extends Data implements NewsProviderInterface
 {
-    public function __construct(Application $application, private PersonPreferences $personPreferences)
-    {
+    public function __construct(
+        Application $application,
+        private PersonPreferences $personPreferences,
+        private EmailService $emailService
+    ) {
         parent::__construct($application);
     }
 
@@ -230,7 +233,7 @@ class PersonDataHelper extends Data implements NewsProviderInterface
         $registrationLink = Webapp::getBaseUrl() . "events/{$event->Id}/{$contact->Token}";
         $subject = "Lien d'inscription pour " . $event->Summary;
         $body = $registrationLink;
-        return EmailService::send($adminEmail, $emailContact, $subject, $body);
+        return $this->emailService->send($adminEmail, $emailContact, $subject, $body);
     }
 
     public function updateActivity(string $email): void
