@@ -13,11 +13,42 @@ class KaraokeDataHelper extends Data
         parent::__construct($application);
     }
 
+    public function cleanup(): void
+    {
+        $stmt = $this->pdo->prepare('TRUNCATE TABLE "KaraokeClient"');
+        $stmt->execute();
+
+        $this->cleanupOldClients();
+    }
+
     public function cleanupOldClients(): void
     {
         $timeout = date('Y-m-d H:i:s', strtotime('-10 seconds'));
         $stmt = $this->pdo->prepare('DELETE FROM "KaraokeClient" WHERE "LastHeartbeat" < ?');
         $stmt->execute([$timeout]);
+    }
+
+    public function countActiveClients(int $idSession): int
+    {
+        $stmt = $this->pdo->prepare('SELECT COUNT(*) FROM "KaraokeClient" WHERE "IdKaraokeSession" = ?');
+        $stmt->execute([$idSession]);
+        return (int)$stmt->fetchColumn();
+    }
+
+    public function deleteSessionIfEmpty(int $idSession): void
+    {
+        $count = $this->countActiveClients($idSession);
+
+        if ($count === 0) {
+            $stmt = $this->pdo->prepare('DELETE FROM "KaraokeSession" WHERE "Id" = ?');
+            $stmt->execute([$idSession]);
+        }
+    }
+
+    public function disconnectClient(string $clientId): bool
+    {
+        $stmt = $this->pdo->prepare('DELETE FROM "KaraokeClient" WHERE "ClientId" = ?');
+        return $stmt->execute([$clientId]);
     }
 
     public function getOrCreateSession(string $sessionId, string $songName): int
@@ -35,15 +66,38 @@ class KaraokeDataHelper extends Data
             VALUES (?, ?, "waiting", datetime("now"), datetime("now"))
         ');
         $stmt->execute([$sessionId, $songName]);
-        
+
         return (int)$this->pdo->lastInsertId();
     }
 
-    public function countActiveClients(int $idSession): int
+    public function getSessionById(int $id): ?object
     {
-        $stmt = $this->pdo->prepare('SELECT COUNT(*) FROM "KaraokeClient" WHERE "IdKaraokeSession" = ?');
-        $stmt->execute([$idSession]);
-        return (int)$stmt->fetchColumn();
+        $stmt = $this->pdo->prepare('SELECT * FROM "KaraokeSession" WHERE "Id" = ?');
+        $stmt->execute([$id]);
+        $result = $stmt->fetch();
+
+        return $result ?: null;
+    }
+
+    public function getSessionBySessionId(string $sessionId): ?object
+    {
+        $stmt = $this->pdo->prepare('SELECT * FROM "KaraokeSession" WHERE "SessionId" = ?');
+        $stmt->execute([$sessionId]);
+        $result = $stmt->fetch();
+
+        return $result ?: null;
+    }
+
+    public function isClientHost(string $clientId, int $idSession): bool
+    {
+        $stmt = $this->pdo->prepare('
+            SELECT "IsHost" FROM "KaraokeClient" 
+            WHERE "ClientId" = ? AND "IdKaraokeSession" = ?
+        ');
+        $stmt->execute([$clientId, $idSession]);
+        $client = $stmt->fetch();
+
+        return $client && $client->IsHost == 1;
     }
 
     public function registerClient(string $clientId, int $idSession, bool $isHost): bool
@@ -56,49 +110,8 @@ class KaraokeDataHelper extends Data
                 "IsHost" = excluded."IsHost",
                 "IdKaraokeSession" = excluded."IdKaraokeSession"
         ');
-        
+
         return $stmt->execute([$clientId, $idSession, $isHost ? 1 : 0]);
-    }
-
-    public function updateHeartbeat(string $clientId): bool
-    {
-        $stmt = $this->pdo->prepare('
-            UPDATE "KaraokeClient" 
-            SET "LastHeartbeat" = datetime("now")
-            WHERE "ClientId" = ?
-        ');
-        
-        return $stmt->execute([$clientId]);
-    }
-
-    public function isClientHost(string $clientId, int $idSession): bool
-    {
-        $stmt = $this->pdo->prepare('
-            SELECT "IsHost" FROM "KaraokeClient" 
-            WHERE "ClientId" = ? AND "IdKaraokeSession" = ?
-        ');
-        $stmt->execute([$clientId, $idSession]);
-        $client = $stmt->fetch();
-        
-        return $client && $client->IsHost == 1;
-    }
-
-    public function getSessionBySessionId(string $sessionId): ?object
-    {
-        $stmt = $this->pdo->prepare('SELECT * FROM "KaraokeSession" WHERE "SessionId" = ?');
-        $stmt->execute([$sessionId]);
-        $result = $stmt->fetch();
-        
-        return $result ?: null;
-    }
-
-    public function getSessionById(int $id): ?object
-    {
-        $stmt = $this->pdo->prepare('SELECT * FROM "KaraokeSession" WHERE "Id" = ?');
-        $stmt->execute([$id]);
-        $result = $stmt->fetch();
-        
-        return $result ?: null;
     }
 
     public function startCountdown(int $idSession): bool
@@ -116,23 +129,18 @@ class KaraokeDataHelper extends Data
                 "UpdatedAt" = datetime("now")
             WHERE "Id" = ?
         ');
-        
+
         return $stmt->execute([$countdownStart, $playStartTime, $idSession]);
     }
 
-    public function disconnectClient(string $clientId): bool
+    public function updateHeartbeat(string $clientId): bool
     {
-        $stmt = $this->pdo->prepare('DELETE FROM "KaraokeClient" WHERE "ClientId" = ?');
-        return $stmt->execute([$clientId]);
-    }
+        $stmt = $this->pdo->prepare('
+            UPDATE "KaraokeClient" 
+            SET "LastHeartbeat" = datetime("now")
+            WHERE "ClientId" = ?
+        ');
 
-    public function deleteSessionIfEmpty(int $idSession): void
-    {
-        $count = $this->countActiveClients($idSession);
-        
-        if ($count === 0) {
-            $stmt = $this->pdo->prepare('DELETE FROM "KaraokeSession" WHERE "Id" = ?');
-            $stmt->execute([$idSession]);
-        }
+        return $stmt->execute([$clientId]);
     }
 }

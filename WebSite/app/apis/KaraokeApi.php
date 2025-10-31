@@ -73,6 +73,10 @@ class KaraokeApi extends AbstractApi
                 $this->handleDisconnect($clientId);
                 break;
 
+            case Karaoke::Cleanup->value:
+                $this->handleCleanup();
+                break;
+
             default:
                 $this->renderJsonError('Invalid action', ApplicationError::BadRequest->value);
                 break;
@@ -165,6 +169,12 @@ class KaraokeApi extends AbstractApi
             $this->karaokeDataHelper->deleteSessionIfEmpty($sessionDbId);
         }
 
+        $this->renderJson(['serverTime' => time()], true, ApplicationError::Ok->value);
+    }
+
+    private function handleCleanup(): void
+    {
+        $this->karaokeDataHelper->cleanup();
         $this->renderJson(['serverTime' => time()], true, ApplicationError::Ok->value);
     }
 }

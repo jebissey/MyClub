@@ -5,10 +5,10 @@ namespace app\enums;
 
 enum Karaoke: string
 {
-    case Register = 'register';
-    case Heartbeat = 'heartbeat';
-    case EventManager = 'eventManager';
-    case GetStatus = 'getStatus';
-    case StartCountdown = 'startCountdown';
+    case Cleanup = 'cleanup';
     case Disconnect = 'disconnect';
+    case GetStatus = 'getStatus';
+    case Heartbeat = 'heartbeat';
+    case Register = 'register';
+    case StartCountdown = 'startCountdown';
 }
