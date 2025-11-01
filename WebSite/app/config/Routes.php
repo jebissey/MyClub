@@ -216,6 +216,18 @@ class Routes
         foreach ($files as $route => [$file, $type]) {
             $this->flight->route($route, fn() => $this->serveFile($errorManager, $file, $type));
         }
+
+        $cssDir = __DIR__ . '/../modules/Common/css';
+        if (is_dir($cssDir)) {
+            $cssFiles = glob($cssDir . '/*.css');
+            foreach ($cssFiles as $cssFile) {
+                $filename = basename($cssFile);
+                $this->flight->route('/public/css/' . $filename, function () use ($errorManager, $cssFile) {
+                    $this->serveCssFile($errorManager, $cssFile);
+                });
+            }
+        }
+
         $this->flight->route('/*', function () use ($errorManager) {
             $errorManager->raise(ApplicationError::PageNotFound, "Page not found in file " . __FILE__ . ' at line ' . __LINE__);
         });
@@ -303,6 +315,17 @@ class Routes
             $controller = $controllerFactory();
             return $controller->$function(...$args);
         });
+    }
+
+    private function serveCssFile(ErrorManager $errorManager, string $filePath): void
+    {
+        if (!file_exists($filePath)) {
+            $errorManager->raise(ApplicationError::PageNotFound, "CSS file not found: " . $filePath);
+            return;
+        }
+        header('Content-Type: text/css; charset=UTF-8');
+        header('Cache-Control: public, max-age=31536000');
+        readfile($filePath);
     }
 
     private function serveFile(ErrorManager $errorManager, string $filename, string $contentType = 'image/png'): void

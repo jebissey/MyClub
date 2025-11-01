@@ -12,9 +12,7 @@ function initApp() {
         app = new KaraokeApp();
         app.init();
         window.karaokeApp = app;
-        console.log('Karaoke app initialized');
     } catch (error) {
-        console.error('Init failed:', error);
         alert('Erreur de démarrage. Rechargez la page.');
     }
 }

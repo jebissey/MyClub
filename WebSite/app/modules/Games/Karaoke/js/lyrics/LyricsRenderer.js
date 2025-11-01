@@ -106,7 +106,7 @@ export class LyricsRenderer {
             const containerH = this.container.clientHeight;
             const lineH = active.offsetHeight;
             const lineTop = active.offsetTop;
-            const target = lineTop + lineH / 2 - containerH / 2 - 200;
+            const target = lineTop + lineH / 2 - containerH / 2 - 220;
 
             this.container.style.scrollBehavior = 'auto';
             this.container.scrollTop = Math.max(0, target);

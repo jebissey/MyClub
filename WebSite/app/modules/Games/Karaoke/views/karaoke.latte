@@ -1,249 +1,62 @@
 {layout '../../../Common/views/layout.latte'}
-
 {block title}Karaoké{/block}
 
 {block head}
-<style>
-    /* === Fond global === */
-    body {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        min-height: 100vh;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        margin: 0;
-        padding: 0;
-    }
-
-    /* === Conteneur principal === */
-    .karaoke-container {
-        margin: 50px auto;
-        padding: 30px;
-        background: rgba(255, 255, 255, 0.95);
-        border-radius: 20px;
-        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-        display: flex;
-        flex-direction: column;
-        height: 80vh;
-        width: 95%;
-        max-width: none;
-    }
-
-    /* === Infos chanson === */
-    .song-info {
-        text-align: center;
-        margin-bottom: 20px;
-        padding-bottom: 10px;
-        border-bottom: 2px solid #667eea;
-    }
-
-    .song-title {
-        font-size: 2rem;
-        font-weight: bold;
-        color: #667eea;
-        margin-bottom: 10px;
-    }
-
-    .song-artist {
-        font-size: 1.2rem;
-        color: #764ba2;
-    }
-
-    /* === Paroles full width === */
-    .lyrics-display {
-        flex: 1;
-        background: #f8f9fa;
-        border-radius: 15px;
-        padding: 5vh 30px;
-        margin: 20px -30px;
-        width: calc(100% + 60px);
-        font-size: 1.5rem;
-        text-align: center;
-        line-height: 2.5;
-        overflow-y: auto;
-        scroll-behavior: smooth;
-    }
-
-    .lyric-line {
-        opacity: 0.4;
-        transition: all 0.3s ease;
-        margin: 10px 0;
-    }
-
-    .lyric-line.active {
-        opacity: 1;
-        font-size: 3.8rem;
-        font-weight: bold;
-        color: #667eea;
-    }
-
-    .lyric-line.next {
-        opacity: 0.7;
-        color: #764ba2;
-    }
-
-    .word {
-        display: inline-block;
-        transition: color 0.2s ease, transform 0.2s ease, text-shadow 0.2s ease;
-        padding: 0 3px;
-        will-change: color, transform, text-shadow;
-        -webkit-backface-visibility: hidden;
-        backface-visibility: hidden;
-    }
-
-    .word.highlighted {
-        color: #ff6b6b;
-        font-weight: bold;
-        transform: translateZ(0) scale(1.02);
-        text-shadow: 2px 2px 4px rgba(255, 107, 107, 0.3);
-    }
-
-    /* === Barre de progression === */
-    .progress-bar-container {
-        margin: 15px 0;
-        height: 8px;
-        background: #e0e0e0;
-        border-radius: 10px;
-        overflow: hidden;
-        cursor: pointer;
-    }
-
-    .progress-bar {
-        height: 100%;
-        background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
-        width: 0%;
-        transition: width 0.1s linear;
-    }
-
-    .time-display {
-        display: flex;
-        justify-content: space-between;
-        color: #666;
-        font-size: 0.9rem;
-        margin-top: 5px;
-    }
-
-    /* === Synchronisation === */
-    #syncControls {
-        flex-direction: column;
-        align-items: center;
-        gap: 12px;
-        margin-top: 20px;
-        padding: 18px;
-        background: rgba(102, 126, 234, 0.1);
-        border-radius: 12px;
-        border: 1px solid rgba(102, 126, 234, 0.3);
-    }
-
-    #syncStatus {
-        color: #764ba2;
-        font-size: 1.1rem;
-        font-weight: 600;
-        text-align: center;
-        min-height: 1.4em;
-        font-style: italic;
-    }
-
-    #connectedClients {
-        color: #764ba2;
-        font-weight: 600;
-        font-size: 1rem;
-        text-align: center;
-    }
-
-    #countdownDisplay {
-        display: none;
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        font-size: 15rem;
-        font-weight: bold;
-        color: #667eea;
-        text-shadow: 0 0 30px rgba(102, 126, 234, 0.5);
-        z-index: 1000;
-        pointer-events: none;
-        animation: pulse 1s ease-in-out infinite;
-    }
-
-    @keyframes pulse {
-        0%, 100% { transform: translate(-50%, -50%) scale(1); }
-        50% { transform: translate(-50%, -50%) scale(1.1); }
-    }
-
-    /* === Responsive === */
-    @media (max-width: 768px) {
-        .karaoke-container { padding: 20px; height: 85vh; }
-        .song-title { font-size: 1.6rem; }
-        .lyric-line.active { font-size: 2.8rem; }
-        #countdownDisplay { font-size: 8rem; }
-    }
-</style>
+<link rel="stylesheet" href="/public/css/karaoke.css">
 {/block}
 
 {block navbar}
-{include '../../../Webmaster/views/navbar/home.latte'}
+    {include '../../../Webmaster/views/navbar/home.latte'}
 {/block}
 
 {block content}
-<div class="karaoke-container">
-    <!-- Infos chanson -->
-    <div class="song-info">
+<div class="karaoke-wrapper d-flex flex-column">
+    <div class="song-info text-center">
         <div class="song-title">{$metadata['ti'] ?? 'Sans titre'}</div>
         <div class="song-artist">{$metadata['ar'] ?? 'Artiste inconnu'}</div>
     </div>
-
-    <!-- Paroles -->
     <div class="lyrics-display" id="lyricsDisplay">
         <h4 class="text-muted">Appuyez sur Play pour commencer...</h4>
     </div>
-
-    <!-- Audio -->
-    <div class="audio-controls">
-        <audio id="audioPlayer" preload="metadata">
-            <source src="{$audioFile}" type="audio/mpeg">
-            Votre navigateur ne supporte pas l'audio HTML5.
-        </audio>
-    </div>
-
-    <!-- Progression -->
-    <div class="progress-bar-container" id="progressContainer">
-        <div class="progress-bar" id="progressBar"></div>
-    </div>
-
-    <div class="time-display">
-        <span id="currentTime">0:00</span>
-        <span id="duration">0:00</span>
-    </div>
-
-    <!-- Boutons solo -->
-    <div class="text-center mt-3">
-        <button id="playPauseBtn" class="btn btn-primary">Lecture</button>
-        <button id="restartBtn" class="btn btn-secondary">Recommencer</button>
-    </div>
-
-    <!-- === MODE SYNCHRONISÉ === -->
-    <div id="syncControls" {if !$isAdmin}style="display: none;"{/if}>
-        <div class="form-check form-switch">
-            <input class="form-check-input" type="checkbox" id="syncCheckbox">
-            <label class="form-check-label" for="syncCheckbox">Synchronisé</label>
+    <div class="mt-auto p-3 bg-light border-top">
+        <div class="container-fluid">
+            <audio id="audioPlayer" preload="metadata">
+                <source src="{$audioFile}" type="audio/mpeg">
+                Votre navigateur ne supporte pas l'audio HTML5.
+            </audio>
+            <div class="progress-bar-container mb-2" id="progressContainer">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+            <div class="d-flex justify-content-between text-muted small mb-3">
+                <span id="currentTime">0:00</span>
+                <span id="duration">0:00</span>
+            </div>
+            <div class="d-flex justify-content-center gap-2 mb-3">
+                <button id="playPauseBtn" class="btn btn-primary">Lecture</button>
+                <button id="restartBtn" class="btn btn-secondary">Recommencer</button>
+            </div>
+            <div id="syncControls"  {if !$isAdmin}style="display: none;"{/if}>
+                <div class="form-check form-switch d-flex justify-content-between align-items-center mb-2">
+                    <div>
+                        <input class="form-check-input" type="checkbox" id="syncCheckbox">
+                        <label class="form-check-label ms-2" for="syncCheckbox">Synchronisé</label>
+                    </div>
+                    <div id="connectedClients" class="text-right">0 client connecté</div>
+                </div>
+                <div>
+                    <button id="launchForAllBtn" class="btn btn-success btn-sm" style="display: none;">
+                        Lancer pour tous
+                    </button>
+                </div>
+                <div id="syncStatus" class="my-2"></div>
+                <div id="countdownDisplay"></div>
+            </div>
         </div>
-
-        <button id="launchForAllBtn" class="btn btn-success" style="display: none;">
-            Lancer la lecture pour tous
-        </button>
-
-        <div id="syncStatus"></div>
-        <div id="countdownDisplay"></div>
-        <div id="connectedClients">0 client connecté</div>
     </div>
 </div>
 {/block}
 
 {block scripts}
-    <!-- 1. Injecte les données -->
-    <script>
-        window.lyricsData = {$lines};
-    </script>
-
-    <!-- 2. Charge le module APRÈS -->
+    <script>window.lyricsData = {$lines};</script>
     <script type="module" src="/app/modules/Games/Karaoke/js/index.js" defer></script>
 {/block}
