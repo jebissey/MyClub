@@ -42,11 +42,10 @@
                         data-bs-placement="bottom" 
                         title="{if $userEmail != ''}{='my_data'|translate}{else}{='login'|translate}{/if}">
                     {elseif $person->Avatar}
-                    <span class="user-avatar-emoji" 
-                        data-bs-toggle="tooltip" 
-                        data-bs-placement="bottom" 
-                        title="{if $userEmail != ''}{='my_data'|translate}{else}{='login'|translate}{/if}"
-                        style="font-size: 2rem; cursor: pointer; display: inline-block; line-height: 1;">
+                    <span data-bs-toggle="tooltip" 
+                          data-bs-placement="bottom" 
+                          title="{if $userEmail != ''}{='my_data'|translate}{else}{='login'|translate}{/if}"
+                          style="font-size: 2rem; cursor: pointer; display: inline-block; line-height: 1;">
                         {$userImg}
                     </span>
                     {else}

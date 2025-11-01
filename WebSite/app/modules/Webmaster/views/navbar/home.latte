@@ -24,8 +24,7 @@
 
                   <a class="nav-link" href="{$href}">
                     {if strlen($userImg) < 10}
-                    <span class="user-avatar-emoji" 
-                          data-bs-toggle="tooltip" 
+                    <span data-bs-toggle="tooltip" 
                           data-bs-placement="bottom" 
                           title="{if $userEmail != ''}{='my_data'|translate}{else}{='login'|translate}{/if}"
                           style="font-size: 2rem; cursor: pointer; display: inline-block; line-height: 1;">

@@ -117,7 +117,7 @@ class KaraokeDataHelper extends Data
     public function startCountdown(int $idSession): bool
     {
         $now = time();
-        $delay = 5; // secondes avant démarrage global
+        $delay = 5;
         $countdownStart = $now;
         $playStartTime = $now + $delay;
 
