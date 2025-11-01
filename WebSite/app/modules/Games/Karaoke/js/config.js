@@ -8,13 +8,3 @@ export const SYNC_CONFIG = Object.freeze({
     SYNC_PRECISION_THRESHOLD_MS: 100,
     REQUEST_TIMEOUT_MS: 8000
 });
-
-export const AppState = Object.freeze({
-    IDLE: 'idle',
-    SOLO_PLAYING: 'solo_playing',
-    SOLO_PAUSED: 'solo_paused',
-    SYNC_WAITING: 'sync_waiting',
-    SYNC_COUNTDOWN: 'sync_countdown',
-    SYNC_PLAYING: 'sync_playing',
-    ERROR: 'error'
-});

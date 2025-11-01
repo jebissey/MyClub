@@ -1,4 +1,3 @@
-import { AppState } from '../config.js';
 import { generateClientId } from '../utils/generateClientId.js';
 import { ApiManager } from '../api/ApiManager.js';
 import { SyncManager } from '../sync/SyncManager.js';
@@ -9,10 +8,10 @@ import { UIController } from '../ui/UIController.js';
 
 export class KaraokeApp {
     constructor() {
-        this.state = AppState.IDLE;
         this.songId = window.location.pathname.split('/').pop();
         this.clientId = generateClientId();
         this.elements = this.getDOMElements();
+        
         if (!this.elements.audioPlayer || !this.elements.lyricsDisplay) {
             console.error('Critical DOM elements missing:', {
                 audioPlayer: !!this.elements.audioPlayer,
@@ -41,6 +40,78 @@ export class KaraokeApp {
         this.scheduler = new PlaybackScheduler(this.sync, () => this.startPlayback());
         this.countdownInterval = null;
         this.sessionActive = false;
+        this.initStateMachine();
+    }
+
+    initStateMachine() {
+        this.fsm = new StateMachine({
+            init: 'idle',
+            transitions: [
+                // Transitions mode solo
+                { name: 'play',           from: 'idle',              to: 'soloPlaying' },
+                { name: 'play',           from: 'soloPaused',        to: 'soloPlaying' },
+                { name: 'pause',          from: 'soloPlaying',       to: 'soloPaused' },
+                { name: 'restart',        from: ['soloPlaying', 'soloPaused'], to: 'idle' },
+                
+                // Transitions mode sync
+                { name: 'activateSync',   from: 'idle',              to: 'syncWaiting' },
+                { name: 'activateSync',   from: ['soloPaused', 'soloPlaying'], to: 'syncWaiting' },
+                { name: 'deactivateSync', from: ['syncWaiting', 'syncCountdown', 'syncPlaying'], to: 'idle' },
+                { name: 'startCountdown', from: 'syncWaiting',       to: 'syncCountdown' },
+                { name: 'startPlaying',   from: 'syncCountdown',     to: 'syncPlaying' },
+                { name: 'stopSession',    from: ['syncCountdown', 'syncPlaying'], to: 'syncWaiting' },
+                { name: 'end',            from: ['soloPlaying', 'syncPlaying'], to: 'idle' }
+            ],
+            methods: {
+                // Hooks appelés lors des transitions
+                onLeaveState: (lifecycle) => {
+                    console.log(`Quitte l'état: ${lifecycle.from}`);
+                    this.cleanupState(lifecycle.from);
+                },
+                onEnterState: (lifecycle) => {
+                    console.log(`Entre dans l'état: ${lifecycle.to}`);
+                    this.setupState(lifecycle.to);
+                },
+                
+                // Hooks spécifiques
+                onEnterSoloPlaying: () => {
+                    this.ui.updatePlayButton(true);
+                    this.audio.startTick();
+                },
+                onLeaveSoloPlaying: () => {
+                    this.audio.stopTick();
+                },
+                
+                onEnterSyncWaiting: () => {
+                    this.ui.showSyncControls();
+                },
+                
+                onEnterSyncCountdown: () => {
+                    // Le countdown display sera géré par handleCountdownStatus
+                },
+                onLeaveSyncCountdown: () => {
+                    this.stopCountdown();
+                    this.scheduler.cancel();
+                },
+                
+                onEnterSyncPlaying: () => {
+                    this.audio.startTick();
+                    this.sync.reducePollingFrequency();
+                },
+                onLeaveSyncPlaying: () => {
+                    this.audio.stopTick();
+                },
+                
+                onEnterIdle: () => {
+                    this.ui.updatePlayButton(false);
+                },
+                
+                // Gestion des erreurs de transition
+                onInvalidTransition: (transition, from, to) => {
+                    console.warn(`Transition invalide: ${transition} de ${from} vers ${to}`);
+                }
+            }
+        });
     }
 
     getDOMElements() {
@@ -68,7 +139,6 @@ export class KaraokeApp {
             this.lyrics.render();
             this.setupEventListeners();
             await this.checkActiveSyncSession();
-            console.log('KaraokeApp initialized', { clientId: this.clientId, songId: this.songId });
         } catch (error) {
             console.error('Init failed:', error);
             this.ui.showError('Échec du chargement');
@@ -81,7 +151,9 @@ export class KaraokeApp {
                 this.ui.updateDuration(this.audio.getDuration());
             });
             this.elements.audioPlayer.addEventListener('ended', () => {
-                this.transitionTo(AppState.IDLE);
+                if (this.fsm.can('end')) {
+                    this.fsm.end();
+                }
             });
         }
         if (this.elements.playPauseBtn) {
@@ -119,67 +191,41 @@ export class KaraokeApp {
     }
 
     // ========================================================================
-    // GESTION D'ÉTAT
+    // GESTION D'ÉTAT (nettoyage/setup par état)
     // ========================================================================
-    transitionTo(newState) {
-        const oldState = this.state;
-        console.log(`State: ${oldState} → ${newState}`);
-        this.cleanupState(oldState);
-        this.state = newState;
-        this.setupState(newState);
-    }
-
     cleanupState(state) {
-        switch (state) {
-            case AppState.SOLO_PLAYING:
-                this.audio.stopTick();
-                break;
-            case AppState.SYNC_COUNTDOWN:
-                this.stopCountdown();
-                this.scheduler.cancel();
-                break;
-            case AppState.SYNC_PLAYING:
-                this.audio.stopTick();
-                break;
-        }
+        // Appelé automatiquement par le FSM lors de onLeaveState
+        // Les cleanups spécifiques sont gérés dans les hooks onLeave...
     }
 
     setupState(state) {
-        switch (state) {
-            case AppState.IDLE:
-                this.ui.updatePlayButton(false);
-                break;
-            case AppState.SOLO_PLAYING:
-                this.ui.updatePlayButton(true);
-                this.audio.startTick();
-                break;
-            case AppState.SYNC_WAITING:
-                this.ui.showSyncControls();
-                break;
-            case AppState.SYNC_PLAYING:
-                this.audio.startTick();
-                this.sync.reducePollingFrequency();
-                break;
-        }
+        // Appelé automatiquement par le FSM lors de onEnterState
+        // Les setups spécifiques sont gérés dans les hooks onEnter...
     }
 
     // ========================================================================
     // HANDLERS
     // ========================================================================
     handlePlayPauseClick() {
-        if ([AppState.SYNC_WAITING, AppState.SYNC_COUNTDOWN, AppState.SYNC_PLAYING].includes(this.state)) return;
+        // En mode sync, le play/pause n'est pas disponible
+        if (this.fsm.is('syncWaiting') || this.fsm.is('syncCountdown') || this.fsm.is('syncPlaying')) {
+            return;
+        }
 
-        if (this.state === AppState.SOLO_PLAYING) {
+        if (this.fsm.is('soloPlaying')) {
             this.audio.pause();
-            this.transitionTo(AppState.SOLO_PAUSED);
-        } else {
+            this.fsm.pause();
+        } else if (this.fsm.can('play')) {
             this.audio.play();
-            this.transitionTo(AppState.SOLO_PLAYING);
+            this.fsm.play();
         }
     }
 
     handleRestartClick() {
-        if ([AppState.SYNC_WAITING, AppState.SYNC_COUNTDOWN, AppState.SYNC_PLAYING].includes(this.state)) return;
+        // En mode sync, le restart n'est pas disponible
+        if (this.fsm.is('syncWaiting') || this.fsm.is('syncCountdown') || this.fsm.is('syncPlaying')) {
+            return;
+        }
         this.audio.seek(0);
         this.lyrics.reset();
     }
@@ -194,7 +240,10 @@ export class KaraokeApp {
     }
 
     handleProgressBarClick(e) {
-        if ([AppState.SYNC_WAITING, AppState.SYNC_COUNTDOWN, AppState.SYNC_PLAYING].includes(this.state)) return;
+        // En mode sync, la progression n'est pas modifiable
+        if (this.fsm.is('syncWaiting') || this.fsm.is('syncCountdown') || this.fsm.is('syncPlaying')) {
+            return;
+        }
         const rect = this.elements.progressContainer.getBoundingClientRect();
         const percent = (e.clientX - rect.left) / rect.width;
         const newTime = percent * this.audio.getDuration();
@@ -206,20 +255,30 @@ export class KaraokeApp {
         this.ui.updateProgress(time, this.audio.getDuration());
     }
 
-    handleAudioPlay() { this.ui.updatePlayButton(true); }
-    handleAudioPause() { this.ui.updatePlayButton(false); }
+    handleAudioPlay() { 
+        this.ui.updatePlayButton(true); 
+    }
+    
+    handleAudioPause() { 
+        this.ui.updatePlayButton(false); 
+    }
 
     handleSyncActivated({ isHost }) {
-        this.transitionTo(AppState.SYNC_WAITING);
+        if (this.fsm.can('activateSync')) {
+            this.fsm.activateSync();
+        }
     }
 
     handleSyncDeactivated() {
-        this.transitionTo(AppState.IDLE);
+        if (this.fsm.can('deactivateSync')) {
+            this.fsm.deactivateSync();
+        }
         this.ui.showSoloControls();
     }
 
     handleSyncStatusUpdate(status) {
         this.ui.updateSyncStatus(this.sync.isHost, this.sync.clientsCount);
+        
         if (status.status === 'countdown' && status.playStartTime) {
             this.handleCountdownStatus(status);
         } else {
@@ -229,13 +288,20 @@ export class KaraokeApp {
 
     handleCountdownStatus(status) {
         const remaining = status.playStartTime - this.sync.getServerNow();
+        
         if (remaining > 0) {
-            if (this.state !== AppState.SYNC_COUNTDOWN) this.transitionTo(AppState.SYNC_COUNTDOWN);
+            if (this.fsm.is('syncWaiting') && this.fsm.can('startCountdown')) {
+                this.fsm.startCountdown();
+            }
             this.ui.showCountdown(remaining);
-            if (!this.countdownInterval) this.startCountdownDisplay(status.playStartTime);
+            if (!this.countdownInterval) {
+                this.startCountdownDisplay(status.playStartTime);
+            }
         } else {
             this.ui.hideCountdown();
-            if (this.state !== AppState.SYNC_PLAYING) this.scheduler.schedule(status.playStartTime);
+            if (this.fsm.is('syncCountdown') && this.fsm.can('startPlaying')) {
+                this.scheduler.schedule(status.playStartTime);
+            }
         }
     }
 
@@ -247,7 +313,9 @@ export class KaraokeApp {
     handleCriticalError(message) {
         console.error('CRITICAL:', message);
         this.ui.showError(message);
-        if (this.elements.syncCheckbox) this.elements.syncCheckbox.checked = false;
+        if (this.elements.syncCheckbox) {
+            this.elements.syncCheckbox.checked = false;
+        }
         this.deactivateSyncMode();
     }
 
@@ -263,11 +331,18 @@ export class KaraokeApp {
             this.ui.showSyncControls();
             await this.audio.silentUnlock();
             const result = await this.sync.activate();
-            if (!result.success) throw new Error(result.error || 'Sync failed');
-            this.transitionTo(AppState.SYNC_WAITING);
+            if (!result.success) {
+                throw new Error(result.error || 'Sync failed');
+            }
+            
+            if (this.fsm.can('activateSync')) {
+                this.fsm.activateSync();
+            }
         } catch (error) {
             this.handleError(error);
-            if (this.elements.syncCheckbox) this.elements.syncCheckbox.checked = false;
+            if (this.elements.syncCheckbox) {
+                this.elements.syncCheckbox.checked = false;
+            }
             this.ui.showSoloControls();
         }
     }
@@ -275,11 +350,16 @@ export class KaraokeApp {
     async deactivateSyncMode() {
         try {
             await this.sync.deactivate();
-            if (this.audio.isPlaying) this.audio.pause();
+            if (this.audio.isPlaying) {
+                this.audio.pause();
+            }
             this.sessionActive = false;
             this.ui.setLaunchButtonState(false);
             this.ui.showSoloControls();
-            this.transitionTo(AppState.IDLE);
+            
+            if (this.fsm.can('deactivateSync')) {
+                this.fsm.deactivateSync();
+            }
         } catch (error) {
             this.handleError(error);
         }
@@ -287,6 +367,7 @@ export class KaraokeApp {
 
     async startSession() {
         if (!this.sync.isHost) return;
+        
         try {
             this.audio.seek(0);
             this.lyrics.reset();
@@ -294,11 +375,16 @@ export class KaraokeApp {
             this.ui.setLaunchButtonState(true);
 
             const result = await this.sync.initiateCountdown();
-            if (!result.success) throw new Error('Countdown failed');
+            if (!result.success) {
+                throw new Error('Countdown failed');
+            }
 
+            if (this.fsm.can('startCountdown')) {
+                this.fsm.startCountdown();
+            }
+            
             this.scheduler.schedule(result.playStartTime);
             this.startCountdownDisplay(result.playStartTime);
-            this.transitionTo(AppState.SYNC_COUNTDOWN);
         } catch (error) {
             this.handleError(error);
             this.sessionActive = false;
@@ -308,6 +394,7 @@ export class KaraokeApp {
 
     async stopSession() {
         if (!this.sync.isHost) return;
+        
         try {
             this.audio.stop();
             this.lyrics.reset();
@@ -317,7 +404,10 @@ export class KaraokeApp {
             this.sessionActive = false;
             this.ui.setLaunchButtonState(false);
             this.ui.hideCountdown();
-            this.transitionTo(AppState.SYNC_WAITING);
+            
+            if (this.fsm.can('stopSession')) {
+                this.fsm.stopSession();
+            }
         } catch (error) {
             this.handleError(error);
         }
@@ -325,8 +415,12 @@ export class KaraokeApp {
 
     startPlayback() {
         if (this.audio.isPlaying) return;
+        
         this.audio.play();
-        this.transitionTo(AppState.SYNC_PLAYING);
+        
+        if (this.fsm.can('startPlaying')) {
+            this.fsm.startPlaying();
+        }
     }
 
     startCountdownDisplay(targetTime) {
@@ -352,9 +446,22 @@ export class KaraokeApp {
     destroy() {
         this.stopCountdown();
         this.scheduler.cancel();
-        if (this.sync.isActive) this.sync.deactivate();
+        if (this.sync.isActive) {
+            this.sync.deactivate();
+        }
         this.audio.destroy();
         this.lyrics.destroy();
         this.api.destroy?.();
+    }
+
+    // ========================================================================
+    // MÉTHODES UTILITAIRES POUR LE FSM
+    // ========================================================================
+    get currentState() {
+        return this.fsm.state;
+    }
+
+    canTransition(transition) {
+        return this.fsm.can(transition);
     }
 }

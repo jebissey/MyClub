@@ -16,7 +16,6 @@ export class AudioController {
             this.audio.pause();
             this.audio.muted = false;
             this.isUnlocked = true;
-            console.log('Audio unlocked silently');
         } catch (error) {
             console.warn('Silent unlock failed:', error);
         }

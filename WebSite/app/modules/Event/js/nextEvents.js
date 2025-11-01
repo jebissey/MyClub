@@ -276,13 +276,11 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     function loadNeedsByNeedType(needTypeId) {
-//console.log("/////////////////////");          
         availableNeedsSelect.innerHTML = '<option value="">Chargement...</option>';
         fetch(`/api/needs-by-need-type/${needTypeId}`)
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-//console.log(data);                     
                     availableNeedsSelect.innerHTML = '';
                     if (data.needs && data.needs.length > 0) {
                         data.needs.forEach(need => {

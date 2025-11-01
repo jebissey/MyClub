@@ -32,7 +32,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 currentSettingLabel.textContent = 'Contenu - ' + label;
 
                 const content = settingsData[selectedKey] || '';
-                console.log("Chargement contenu pour", selectedKey, ":", content);
                 quill.clipboard.dangerouslyPasteHTML(content);
 
                 document.getElementById('content-' + selectedKey).value = content;
