@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace app\models;
 
+use Throwable;
+
 use app\helpers\Application;
 
 class KaraokeDataHelper extends Data
@@ -18,7 +20,8 @@ class KaraokeDataHelper extends Data
         $stmt = $this->pdo->prepare('TRUNCATE TABLE "KaraokeClient"');
         $stmt->execute();
 
-        $this->cleanupOldClients();
+        $stmt = $this->pdo->prepare('TRUNCATE TABLE "KaraokeSession"');
+        $stmt->execute();
     }
 
     public function cleanupOldClients(): void
@@ -56,7 +59,6 @@ class KaraokeDataHelper extends Data
         $stmt = $this->pdo->prepare('SELECT "Id" FROM "KaraokeSession" WHERE "SessionId" = ?');
         $stmt->execute([$sessionId]);
         $session = $stmt->fetch();
-
         if ($session) {
             return (int)$session->Id;
         }
@@ -66,7 +68,6 @@ class KaraokeDataHelper extends Data
             VALUES (?, ?, "waiting", datetime("now"), datetime("now"))
         ');
         $stmt->execute([$sessionId, $songName]);
-
         return (int)$this->pdo->lastInsertId();
     }
 
@@ -102,17 +103,37 @@ class KaraokeDataHelper extends Data
 
     public function registerClient(string $clientId, int $idSession, bool $isHost): bool
     {
-        $stmt = $this->pdo->prepare('
-            INSERT INTO "KaraokeClient" ("ClientId", "IdKaraokeSession", "IsHost", "LastHeartbeat", "CreatedAt")
-            VALUES (?, ?, ?, datetime("now"), datetime("now"))
-            ON CONFLICT("ClientId") DO UPDATE SET
-                "LastHeartbeat" = datetime("now"),
-                "IsHost" = excluded."IsHost",
-                "IdKaraokeSession" = excluded."IdKaraokeSession"
-        ');
+        try {
+            $this->pdo->beginTransaction();
 
-        return $stmt->execute([$clientId, $idSession, $isHost ? 1 : 0]);
+            $stmt = $this->pdo->prepare('
+                SELECT "ClientId" FROM "KaraokeClient"
+                WHERE "IdKaraokeSession" = ? AND "IsHost" = 1
+                LIMIT 1
+            ');
+            $stmt->execute([$idSession]);
+            $existingHost = $stmt->fetchColumn();
+            if ($existingHost !== false) {
+                $isHost = false;
+            }
+
+            $stmt = $this->pdo->prepare('
+                INSERT INTO "KaraokeClient" ("ClientId", "IdKaraokeSession", "IsHost", "LastHeartbeat", "CreatedAt")
+                VALUES (?, ?, ?, datetime("now"), datetime("now"))
+                ON CONFLICT("ClientId") DO UPDATE SET
+                    "LastHeartbeat" = datetime("now"),
+                    "IsHost" = excluded."IsHost",
+                    "IdKaraokeSession" = excluded."IdKaraokeSession"
+            ');
+            $ok = $stmt->execute([$clientId, $idSession, $isHost ? 1 : 0]);
+            $this->pdo->commit();
+            return $ok;
+        } catch (Throwable $e) {
+            $this->pdo->rollBack();
+            throw $e;
+        }
     }
+
 
     public function startCountdown(int $idSession): bool
     {

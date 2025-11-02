@@ -35,6 +35,7 @@ class KaraokeController extends AbstractController
                 'metadata' => $parser->getMetadata(),
                 'lines' => $parser->getLines(),
                 'audioFile' => "/game/karaoke/files/{$song}",
+                'sessionId' => session_id()
             ]));
         } catch (LyricsParserException $e) {
             $content = $this->languagesDataHelper->translate($e->getMessage())
