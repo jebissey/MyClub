@@ -202,31 +202,7 @@ class Routes
             );
         }
 
-        $files = [
-            '/apple-touch-icon.png' => ['my-club-180.png', 'image/png'],
-            '/apple-touch-icon-120x120.png' => ['my-club-120.png', 'image/png'],
-            '/apple-touch-icon-180x180.png' => ['my-club-180.png', 'image/png'],
-            '/apple-touch-icon-precomposed.png' => ['my-club-180.png', 'image/png'],
-            '/favicon.ico' => ['favicon.ico', 'image/x-icon'],
-            '/Feed-icon.svg' => ['Feed-icon.svg', 'image/svg+xml'],
-            '/robots.txt' => ['robots.txt', 'text/plain; charset=UTF-8'],
-            '/webCard' => ['businessCard.html', 'text/html; charset=UTF-8'],
-            '/.well-known/appspecific/com.chrome.devtools.json' => ['', ''],
-        ];
-        foreach ($files as $route => [$file, $type]) {
-            $this->flight->route($route, fn() => $this->serveFile($errorManager, $file, $type));
-        }
-
-        $cssDir = __DIR__ . '/../modules/Common/css';
-        if (is_dir($cssDir)) {
-            $cssFiles = glob($cssDir . '/*.css');
-            foreach ($cssFiles as $cssFile) {
-                $filename = basename($cssFile);
-                $this->flight->route('/public/css/' . $filename, function () use ($errorManager, $cssFile) {
-                    $this->serveCssFile($errorManager, $cssFile);
-                });
-            }
-        }
+        $this->registerStaticRoutes($errorManager);
 
         $this->flight->route('/*', function () use ($errorManager) {
             $errorManager->raise(ApplicationError::PageNotFound, "Page not found in file " . __FILE__ . ' at line ' . __LINE__);
@@ -317,45 +293,102 @@ class Routes
         });
     }
 
-    private function serveCssFile(ErrorManager $errorManager, string $filePath): void
+    private function registerStaticRoutes(ErrorManager $errorManager): void
     {
-        if (!file_exists($filePath)) {
-            $errorManager->raise(ApplicationError::PageNotFound, "CSS file not found: " . $filePath);
-            return;
+        $rootDir = realpath(__DIR__ . '/../..');
+
+        $staticFiles = [
+            '/apple-touch-icon.png' => ['dir' => 'images', 'file' => 'my-club-180.png', 'type' => 'image/png'],
+            '/apple-touch-icon-120x120.png' => ['dir' => 'images', 'file' => 'my-club-120.png', 'type' => 'image/png'],
+            '/apple-touch-icon-180x180.png' => ['dir' => 'images', 'file' => 'my-club-180.png', 'type' => 'image/png'],
+            '/apple-touch-icon-precomposed.png' => ['dir' => 'images', 'file' => 'my-club-180.png', 'type' => 'image/png'],
+            '/favicon.ico' => ['dir' => 'images', 'file' => 'favicon.ico', 'type' => 'image/x-icon'],
+            '/Feed-icon.svg' => ['dir' => 'images', 'file' => 'Feed-icon.svg', 'type' => 'image/svg+xml'],
+
+            '/robots.txt' => ['dir' => 'root', 'file' => 'robots.txt', 'type' => 'text/plain; charset=UTF-8'],
+            '/webCard' => ['dir' => 'root', 'file' => 'businessCard.html', 'type' => 'text/html; charset=UTF-8'],
+
+            ...array_combine(
+                array_map(fn($f) => '/' . basename($f), glob($rootDir . '/data/statics/html/*.html') ?: []),
+                array_map(fn($f) => [
+                    'dir' => 'static_html',
+                    'file' => basename($f),
+                    'type' => 'text/html; charset=UTF-8'
+                ], glob($rootDir . '/data/statics/html/*.html') ?: [])
+            ),
+
+            '/.well-known/appspecific/com.chrome.devtools.json' => ['dir' => null, 'file' => '', 'type' => ''],
+        ];
+        foreach ($staticFiles as $route => $config) {
+            $this->flight->route($route, fn() => $this->serveStaticFile($errorManager, $config));
         }
-        header('Content-Type: text/css; charset=UTF-8');
-        header('Cache-Control: public, max-age=31536000');
-        readfile($filePath);
+
+        $cssDir = __DIR__ . '/../modules/Common/css';
+        if (is_dir($cssDir)) {
+            $cssFiles = glob($cssDir . '/*.css');
+            foreach ($cssFiles as $cssFile) {
+                $filename = basename($cssFile);
+                $this->flight->route('/public/css/' . $filename, function () use ($errorManager, $cssFile) {
+                    $this->serveStaticFile($errorManager, [
+                        'dir' => 'css',
+                        'file' => $cssFile,
+                        'type' => 'text/css; charset=UTF-8',
+                        'fullPath' => true
+                    ]);
+                });
+            }
+        }
     }
 
-    private function serveFile(ErrorManager $errorManager, string $filename, string $contentType = 'image/png'): void
+    private function serveStaticFile(ErrorManager $errorManager, array $config): void
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
-            $errorManager->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
+            $errorManager->raise(
+                ApplicationError::MethodNotAllowed,
+                'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__
+            );
+            return;
         }
-        if (empty($filename)) {
+        if (empty($config['file'])) {
             http_response_code(ApplicationError::NoContent->value);
             Flight::stop();
             return;
         }
-        $filename = basename($filename);
         $rootDir = realpath(__DIR__ . '/../..');
-        $imageDir = "$rootDir/app/images";
-        $baseDir = match ($filename) {
-            'robots.txt',
-            'businessCard.html' => $rootDir,
-            default => $imageDir,
+        if (!empty($config['fullPath'])) {
+            $filePath = $config['file'];
+        } else {
+            $filename = basename($config['file']);
+            $baseDir = match ($config['dir']) {
+                'images' => $rootDir . '/app/images',
+                'static_html' => $rootDir . '/data/statics/html',
+                'root' => $rootDir,
+                'css' => __DIR__ . '/../modules/Common/css',
+                default => $rootDir,
+            };
+            $filePath = $baseDir . '/' . $filename;
+        }
+        if (!file_exists($filePath)) {
+            $errorManager->raise(
+                ApplicationError::PageNotFound,
+                "File $filePath not found in file " . __FILE__ . ' at line ' . __LINE__
+            );
+            Flight::stop();
+            return;
+        }
+        $cacheMaxAge = match ($config['dir']) {
+            'css' => 31536000,      // 1 year
+            'images' => 604800,     // 1 week
+            'static_html' => 3600,  // 1 hour
+            default => 604800,
         };
-        $path = "$baseDir/$filename";
-        if (file_exists($path)) {
-            $response = Flight::response();
-            $response->header('Content-Length', (string)filesize($path));
-            $response->header('Last-Modified', gmdate('D, d M Y H:i:s', filemtime($path)) . ' GMT');
-            $response->header('Content-Type', $contentType);
-            $response->header('Cache-Control', 'public, max-age=604800, immutable');
-            $response->header('Expires', gmdate('D, d M Y H:i:s', time() + 604800) . ' GMT');
-            readfile($path);
-        } else $errorManager->raise(ApplicationError::PageNotFound, "File $path not found in file " . __FILE__ . ' at line ' . __LINE__);
+        $response = Flight::response();
+        $response->header('Content-Type', $config['type']);
+        $response->header('Content-Length', (string)filesize($filePath));
+        $response->header('Last-Modified', gmdate('D, d M Y H:i:s', filemtime($filePath)) . ' GMT');
+        $response->header('Cache-Control', "public, max-age=$cacheMaxAge, immutable");
+        $response->header('Expires', gmdate('D, d M Y H:i:s', time() + $cacheMaxAge) . ' GMT');
+        readfile($filePath);
         Flight::stop();
     }
 }
