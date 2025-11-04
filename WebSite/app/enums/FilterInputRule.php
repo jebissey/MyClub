@@ -15,7 +15,7 @@ enum FilterInputRule: string
     case Email = '/^[a-z0-9._%+\-]*(@[a-z0-9.\-]*)?(\.[a-z]*)?$/i';
     case Float = 'float';
     case Html = '/^\s*(<[^>]+>.*?)+\s*$/is';
-    case HtmlSafeName = '/^[\p{L}\p{N}\p{P}\p{S}\p{Z}]{2,100}$/u';
+    case HtmlSafeName = '/^[\p{L}\p{N}\p{P}\p{S}\p{Z}\p{M}]{2,100}$/u';
     case HtmlSafeText = '/^(.*?<\/?(b|i|u|strong|em|br|span)[^>]*>.*?|[^<>]*)*$/isu';
     case Int = 'int';
     case Integer = '/^\d+$/';
