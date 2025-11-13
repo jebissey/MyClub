@@ -105,7 +105,7 @@ abstract class Data
             $stmt->execute($params);
             return $stmt->fetch();
         } catch (PDOException $e) {
-            $this->application->getErrorManager()->raise(ApplicationError::Error, 'Database error: ' . $e->getMessage() . ' in file ' . __FILE__ . ' at line ' . __LINE__);
+            $this->application->getErrorManager()->raise(ApplicationError::Error, "Database error {$e->getMessage()} in {$e->getFile()}:{$e->getLine()} with query {$sql}");
             throw $e;
         }
     }

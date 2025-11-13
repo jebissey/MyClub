@@ -1,0 +1,29 @@
+{layout '../../../Common/views/layout.latte'}
+{block title}Saute mouton{/block}
+
+{block head}
+<link rel="stylesheet" href="/app/css/leapfrog.css">
+{/block}
+
+{block navbar}
+    {include '../../../Webmaster/views/navbar/home.latte'}
+{/block}
+
+{block content}
+    <h1>🐑 SAUTE-MOUTON 🐑</h1>
+    <div class="bg-light rounded">
+        <h4>Cliquez sur un mouton pour le faire bouger</h4>
+        <h5>Règles du jeu :</h5>
+        <ul>
+            <li>Un mouton peut avancer d'une case si elle est libre devant lui</li>
+            <li>Un mouton peut sauter par-dessus 1 seul autre mouton s'il y a une case libre après lui</li>
+            <li>Les moutons ne peuvent pas reculer</li>
+            <li>Si un mouton est bloqué, il se secoue quand on clique dessus</li>
+        </ul>
+    </div>
+    <div id="sheep-container"></div>
+{/block}
+
+{block scripts}
+    <script src="/app/modules/Games/Leapfrog/js/leapfrog.js"></script>
+{/block}

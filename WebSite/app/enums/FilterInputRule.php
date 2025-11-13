@@ -10,7 +10,7 @@ enum FilterInputRule: string
     case ArrayString = 'array:string';
     case Avatar = '/^\p{So}$/u';
     case Bool = 'bool';
-    case Content = '/^.{1,10000}$/s';
+    case Content = '/^.{1,100000}$/s';
     case DateTime = '/^(\d{4}(-\d{2}(-\d{2})?)?( \d{2}:\d{2}(:\d{2})?)?|(\d{2}:\d{2}(:\d{2})?))$/';
     case Email = '/^[a-z0-9._%+\-]*(@[a-z0-9.\-]*)?(\.[a-z]*)?$/i';
     case Float = 'float';

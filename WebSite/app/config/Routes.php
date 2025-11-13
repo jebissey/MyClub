@@ -33,6 +33,7 @@ use app\config\routes\Import;
 use app\config\routes\ImportApi;
 use app\config\routes\Karaoke;
 use app\config\routes\KaraokeApi;
+use app\config\routes\Leapfrog;
 use app\config\routes\Maintenance;
 use app\config\routes\Media;
 use app\config\routes\MediaApi;
@@ -240,6 +241,7 @@ class Routes
         $this->routes = array_merge($this->routes, (new ImportApi($this->apiFactory))->get());
         $this->routes = array_merge($this->routes, (new Karaoke($this->controllerFactory))->get());
         $this->routes = array_merge($this->routes, (new KaraokeApi($this->apiFactory))->get());
+        $this->routes = array_merge($this->routes, (new Leapfrog($this->controllerFactory))->get());
         $this->routes = array_merge($this->routes, (new Maintenance($this->controllerFactory))->get());
         $this->routes = array_merge($this->routes, (new Media($this->controllerFactory))->get());
         $this->routes = array_merge($this->routes, (new MediaApi($this->apiFactory))->get());
@@ -308,35 +310,73 @@ class Routes
             '/robots.txt' => ['dir' => 'root', 'file' => 'robots.txt', 'type' => 'text/plain; charset=UTF-8'],
             '/webCard' => ['dir' => 'root', 'file' => 'businessCard.html', 'type' => 'text/html; charset=UTF-8'],
 
-            ...array_combine(
-                array_map(fn($f) => '/' . basename($f), glob($rootDir . '/data/statics/html/*.html') ?: []),
-                array_map(fn($f) => [
-                    'dir' => 'static_html',
-                    'file' => basename($f),
-                    'type' => 'text/html; charset=UTF-8'
-                ], glob($rootDir . '/data/statics/html/*.html') ?: [])
-            ),
+            ...(function () use ($rootDir) {
+                $htmlFiles = array_filter(
+                    glob($rootDir . '/data/statics/html/*.html') ?: [],
+                    'is_file'
+                );
+                return $htmlFiles ? array_combine(
+                    array_map(fn($f) => '/' . basename($f), $htmlFiles),
+                    array_map(fn($f) => [
+                        'dir' => 'static_html',
+                        'file' => basename($f),
+                        'type' => 'text/html; charset=UTF-8'
+                    ], $htmlFiles)
+                ) : [];
+            })(),
+
+            ...(function () use ($rootDir) {
+                $imageFiles = array_filter(
+                    glob($rootDir . '/data/statics/images/*') ?: [],
+                    'is_file'
+                );
+                return $imageFiles ? array_combine(
+                    array_map(fn($f) => '/' . basename($f), $imageFiles),
+                    array_map(fn($f) => [
+                        'dir' => 'static_image',
+                        'file' => basename($f),
+                        'type' => mime_content_type($f)
+                    ], $imageFiles)
+                ) : [];
+            })(),
+
+            ...(function () use ($rootDir) {
+                $cssFiles = array_filter(
+                    glob($rootDir . '/data/statics/css/*.css') ?: [],
+                    'is_file'
+                );
+                return $cssFiles ? array_combine(
+                    array_map(fn($f) => '/' . basename($f), $cssFiles),
+                    array_map(fn($f) => [
+                        'dir' => 'static_css',
+                        'file' => basename($f),
+                        'type' => 'text/css; charset=UTF-8',
+                    ], $cssFiles)
+                ) : [];
+            })(),
+
+            ...(function () {
+                $cssDir = __DIR__ . '/../modules/Common/css';
+                $cssFiles = array_filter(
+                    glob($cssDir . '/*.css') ?: [],
+                    'is_file'
+                );
+                return $cssFiles ? array_combine(
+                    array_map(fn($f) => '/public/css/' . basename($f), $cssFiles),
+                    array_map(fn($f) => [
+                        'dir' => 'css',
+                        'file' => $f,
+                        'type' => 'text/css; charset=UTF-8',
+                        'fullPath' => true
+                    ], $cssFiles)
+                ) : [];
+            })(),
 
             '/.well-known/appspecific/com.chrome.devtools.json' => ['dir' => null, 'file' => '', 'type' => ''],
         ];
+
         foreach ($staticFiles as $route => $config) {
             $this->flight->route($route, fn() => $this->serveStaticFile($errorManager, $config));
-        }
-
-        $cssDir = __DIR__ . '/../modules/Common/css';
-        if (is_dir($cssDir)) {
-            $cssFiles = glob($cssDir . '/*.css');
-            foreach ($cssFiles as $cssFile) {
-                $filename = basename($cssFile);
-                $this->flight->route('/public/css/' . $filename, function () use ($errorManager, $cssFile) {
-                    $this->serveStaticFile($errorManager, [
-                        'dir' => 'css',
-                        'file' => $cssFile,
-                        'type' => 'text/css; charset=UTF-8',
-                        'fullPath' => true
-                    ]);
-                });
-            }
         }
     }
 
@@ -362,6 +402,8 @@ class Routes
             $baseDir = match ($config['dir']) {
                 'images' => $rootDir . '/app/images',
                 'static_html' => $rootDir . '/data/statics/html',
+                'static_image' => $rootDir . '/data/statics/images',
+                'static_css' => $rootDir . '/data/statics/css',
                 'root' => $rootDir,
                 'css' => __DIR__ . '/../modules/Common/css',
                 default => $rootDir,

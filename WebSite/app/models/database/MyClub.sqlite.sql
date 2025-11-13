@@ -203,8 +203,8 @@ CREATE TABLE IF NOT EXISTS "Metadata" (
 	"SiteUnderMaintenance"	INTEGER NOT NULL DEFAULT 0,
 	"VapidPublicKey"	TEXT,
 	"VapidPrivateKey"	TEXT,
-	"SendMailUsername"	TEXT,
-	"SendMailPassword"	TEXT,
+	"SendEmailAddress"	TEXT,
+	"SendEmailPassword"	TEXT,
 	"SendMailHost"	TEXT,
 	PRIMARY KEY("Id")
 );

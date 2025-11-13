@@ -44,6 +44,7 @@ use app\modules\Event\EventGuestController;
 use app\modules\Event\EventNeedController;
 use app\modules\Event\EventTypeController;
 use app\modules\Games\Karaoke\KaraokeController;
+use app\modules\Games\Leapfrog\LeapfrogController;
 use app\modules\Games\Solfege\SolfegeController;
 use app\modules\PersonManager\GroupController;
 use app\modules\PersonManager\ImportController;
@@ -242,6 +243,11 @@ class ControllerFactory
     public function makeKaraokeController(): KaraokeController
     {
         return new KaraokeController($this->application);
+    }
+
+    public function makeLeapfrogController(): LeapfrogController
+    {
+        return new LeapfrogController($this->application);
     }
 
     public function makeMaintenanceController(): MaintenanceController
