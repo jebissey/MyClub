@@ -103,11 +103,13 @@ Security is based on **groups**. There are three types:
 
 ## 👁️ Examples  
 
-👉 Demo site: [https://myclub.alwaysdata.net/](https://myclub.alwaysdata.net/)  { test account = user ＠ myclub ․ foo ( user2345 ) }
+👉 Demo site : [https://myclub.alwaysdata.net/](https://myclub.alwaysdata.net/)  { test account = user ＠ myclub ․ foo ( user2345 ) }
 
-👉 Nordic walking site: [https://bnw-dijon.fr/](https://bnw-dijon.fr/) 
+👉 Nordic walking site : [https://bnw-dijon.fr/](https://bnw-dijon.fr/) 
 
-👉 Static site: [https://peinturesbribri.alwaysdata.net/navbar/show/article/3](https://peinturesbribri.alwaysdata.net/navbar/show/article/3)
+👉 Static site : [https://peinturesbribri.alwaysdata.net/navbar/show/article/3](https://peinturesbribri.alwaysdata.net/navbar/show/article/3)
+
+👉 Un blog : [https://jeblog.alwaysdata.net/](https://jeblog.alwaysdata.net/)
 
 ---
 
