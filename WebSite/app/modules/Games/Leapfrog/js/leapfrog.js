@@ -4,6 +4,7 @@ const fatSheepSVG = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTQwIiBoZWlnaHQ9I
 let container = document.getElementById('sheep-container');
 let moves = 0;
 const counterElement = document.querySelector('#gameboard-container h2');
+const sessionId = window.sessionId ?? 'no-session';
 
 container.className = 'container mt-4';
 container.innerHTML = `
@@ -50,6 +51,23 @@ function moveSheep(fromIndex, toIndex) {
     setTimeout(() => {
         if (isGameOver()) showRestartButton(checkWinOrLose());
     }, 400);
+
+    fetch('/api/leapfrog', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ message: `Session ${sessionId}: Moved sheep from ${fromIndex} to ${toIndex} at movement ${moves}` })
+    })
+        .then(response => response.json())
+        .then(result => {
+            if (!result.success) {
+                alert('Erreur lors de la mise à jour des positions : ' + result.message);
+            }
+        })
+        .catch(error => {
+            alert('Erreur lors de la mise à jour des positions : ' + error.message);
+        });
     return;
 }
 

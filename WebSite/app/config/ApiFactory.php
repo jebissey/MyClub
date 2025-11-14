@@ -14,6 +14,7 @@ use app\apis\EventSupplyApi;
 use app\apis\GroupApi;
 use app\apis\ImportApi;
 use app\apis\KaraokeApi;
+use app\apis\LeapfrogApi;
 use app\apis\MediaApi;
 use app\apis\MessageApi;
 use app\apis\NavbarApi;
@@ -184,6 +185,17 @@ class ApiFactory
             $this->dataHelper,
             $this->personDataHelper,
             $this->karaokeDataHelper
+        );
+    }
+
+    public function makeLeapfrogApi(): LeapfrogApi
+    {
+        return new LeapfrogApi(
+            $this->application,
+            $this->connectedUser,
+            $this->dataHelper,
+            $this->personDataHelper,
+            $this->logDataHelper
         );
     }
 

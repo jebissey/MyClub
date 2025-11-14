@@ -34,6 +34,7 @@ use app\config\routes\ImportApi;
 use app\config\routes\Karaoke;
 use app\config\routes\KaraokeApi;
 use app\config\routes\Leapfrog;
+use app\config\routes\LeapfrogApi;
 use app\config\routes\Maintenance;
 use app\config\routes\Media;
 use app\config\routes\MediaApi;
@@ -140,9 +141,7 @@ class Routes
             new AuthenticationService($dataHelper, $emailService),
             new Backup(),
             new CarouselDataHelper($application),
-            $application->getConnectedUser(),
             new CrosstabDataHelper($application, $authorizationDataHelper),
-            new DataHelper($application),
             new DbBrowserDataHelper($application),
             $designDataHelper,
             $emailService,
@@ -242,6 +241,7 @@ class Routes
         $this->routes = array_merge($this->routes, (new Karaoke($this->controllerFactory))->get());
         $this->routes = array_merge($this->routes, (new KaraokeApi($this->apiFactory))->get());
         $this->routes = array_merge($this->routes, (new Leapfrog($this->controllerFactory))->get());
+        $this->routes = array_merge($this->routes, (new LeapfrogApi($this->apiFactory))->get());
         $this->routes = array_merge($this->routes, (new Maintenance($this->controllerFactory))->get());
         $this->routes = array_merge($this->routes, (new Media($this->controllerFactory))->get());
         $this->routes = array_merge($this->routes, (new MediaApi($this->apiFactory))->get());

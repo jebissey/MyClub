@@ -37,6 +37,7 @@ class LeapfrogController extends AbstractController
             'page' => $this->application->getConnectedUser()->getPage(),
             'titre' => "Saute-Mouton",
             'positions' => $positions,
+            'sessionId' => session_id()
         ]));
     }
 }

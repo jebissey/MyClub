@@ -16,7 +16,7 @@ use app\models\Database;
 
 class Application
 {
-    public const VERSION = '0.11.0';
+    public const VERSION = '0.12.0';
     public const  EMOJI_LIST = [
         '😀', '😄', '😁', '😅', '😂', '🤣', '😊', '😇', '🤨', 
         '🙂', '🙃', '😉', '😌', '☹️', '😐', '🙄', '😯', '🥴', 
