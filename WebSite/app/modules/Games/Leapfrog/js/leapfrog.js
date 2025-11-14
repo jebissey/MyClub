@@ -2,6 +2,8 @@ const leanSheepSVG = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9
 const fatSheepSVG = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTQwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDE0MCAxMDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoNDAsMTUpIj4KICA8ZWxsaXBzZSBjeD0iNjAiIGN5PSI0NSIgcng9IjM4IiByeT0iMzAiIGZpbGw9IiNmZmYiLz4KICA8ZWxsaXBzZSBjeD0iNjAiIGN5PSI0NSIgcng9IjM1IiByeT0iMjciIGZpbGw9IiNlOGQ4YzQiLz4KICA8Y2lyY2xlIGN4PSIzMCIgY3k9IjQwIiByPSIxOCIgZmlsbD0iI2U4ZDhjNCIvPgogIDxjaXJjbGUgY3g9IjE4IiBjeT0iNDIiIHI9IjQiIGZpbGw9IiMzMzMiLz4KICA8Y2lyY2xlIGN4PSIxOCIgY3k9IjQyIiByPSIxIiBmaWxsPSIjZmZmIi8+CiAgPHJlY3QgeD0iNDUiIHk9IjY1IiB3aWR0aD0iOCIgaGVpZ2h0PSIxOCIgZmlsbD0iI2E4ODg3MCIgcng9IjQiLz4KICA8cmVjdCB4PSI2NSIgeT0iNjUiIHdpZHRoPSI4IiBoZWlnaHQ9IjE4IiBmaWxsPSIjYTg4ODcwIiByeD0iNCIvPgogIDxwYXRoIGQ9Ik0gMzUgMjUgQyAzNyAyNSAzOCAyMyAzOCAyMyBDIDM4IDIzIDQwIDI1IDQwIDI1IiBmaWxsPSJub25lIiBzdHJva2U9IiM2NjYiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CiAgPHBhdGggZD0iTSA1MCAyNSBDIDUyIDI1IDU1IDIzIDU1IDIzIEMgNTUgMjMgNTcgMjUgNTcgMjUiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzY2NiIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KICA8cGF0aCBkPSJNIDY1IDM1IEMgNjUgMzUgNzAgMzAgNzUgMzAgQyA4MCAzMCA4NSA0MCA4NSA0NSBDIDg1IDUwIDgwIDU1IDc1IDU1IEMgNzAgNTUgNjUgNTAgNjUgNDUiIGZpbGw9IiNlOGQ4YzQiLz4KICA8Y2lyY2xlIGN4PSI3NSIgY3k9IjM1IiByPSI0IiBmaWxsPSIjYjg5ODgwIi8+CiAgPHBhdGggZD0iTSA2MiAzOCBMIDY1IDQwIEwgNjggMzgiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2U4ZDhjNCIgc3Ryb2tlLXdpZHRoPSIyLjUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgo8L2c+PC9zdmc+';
 
 let container = document.getElementById('sheep-container');
+let moves = 0;
+const counterElement = document.querySelector('#gameboard-container h2');
 
 container.className = 'container mt-4';
 container.innerHTML = `
@@ -43,6 +45,12 @@ function moveSheep(fromIndex, toIndex) {
         sheep.style.transition = '';
         sheep.style.transform = '';
     }, 360);
+
+    updateCounter();
+    setTimeout(() => {
+        if (isGameOver()) showRestartButton(checkWinOrLose());
+    }, 400);
+    return;
 }
 
 function shakeSheep(sheep) {
@@ -64,7 +72,59 @@ function getIndex(element) {
 }
 
 function getType(sheep) {
-    return sheep.dataset.type; 
+    return sheep.dataset.type;
+}
+
+function isGameOver() {
+    const cells = Array.from(document.querySelectorAll('.sheep-col'));
+
+    for (let i = 0; i < cells.length; i++) {
+        const sheep = cells[i].querySelector('.sheep');
+        if (!sheep) continue;
+
+        const type = getType(sheep);
+        const direction = type === 'lean' ? 1 : -1;
+        const next = i + direction;
+        const jump = i + 2 * direction;
+
+        const nextCell = getCell(next);
+        const jumpCell = getCell(jump);
+
+        if (nextCell && !nextCell.querySelector('.sheep')) return false;
+        if (nextCell && nextCell.querySelector('.sheep') && jumpCell && !jumpCell.querySelector('.sheep')) return false;
+    }
+    return true;
+}
+
+function updateCounter() {
+    moves++;
+    counterElement.textContent = moves + " mouvement" + (moves > 1 ? "s" : "");
+}
+
+function checkWinOrLose() {
+    const leftCells = [getCell(0), getCell(1), getCell(2)];
+
+    const fatsAtLeft = leftCells.filter(c => {
+        const s = c.querySelector('.sheep');
+        return s && getType(s) === 'fat';
+    }).length;
+
+    if (fatsAtLeft === 3) {
+        return "win";
+    }
+    return "lose";
+}
+
+function showRestartButton(result) {
+    const div = document.createElement('div');
+    div.className = "text-center mt-3";
+
+    div.innerHTML = `
+        <h3>${result === "win" ? "🎉 Gagné !" : "❌ Perdu !"}</h3>
+        <button class="btn btn-primary mt-2" onclick="location.reload()">Rejouer</button>
+    `;
+
+    document.getElementById('gameboard-container').appendChild(div);
 }
 
 container.addEventListener('click', (e) => {
@@ -82,7 +142,6 @@ container.addEventListener('click', (e) => {
     const jumpCell = getCell(jump);
     if (nextCell && !nextCell.querySelector('.sheep')) {
         moveSheep(from, next);
-        return;
     }
     if (
         nextCell && nextCell.querySelector('.sheep') &&
