@@ -6,7 +6,6 @@ namespace app\config;
 
 use app\helpers\Application;
 use app\helpers\Backup;
-use app\helpers\ConnectedUser;
 use app\helpers\ErrorManager;
 use app\helpers\News;
 use app\helpers\WebApp;
@@ -15,12 +14,10 @@ use app\models\ArticleDataHelper;
 use app\models\ArticleTableDataHelper;
 use app\models\CarouselDataHelper;
 use app\models\CrosstabDataHelper;
-use app\models\DataHelper;
 use app\models\DbBrowserDataHelper;
 use app\models\DesignDataHelper;
 use app\models\EventDataHelper;
 use app\models\EventTypeDataHelper;
-use app\models\GenericDataHelper;
 use app\models\GroupDataHelper;
 use app\models\ImportDataHelper;
 use app\models\LogDataHelper;
@@ -94,7 +91,6 @@ class ControllerFactory
         private ErrorManager $errorManager,
         private EventDataHelper $eventDataHelper,
         private EventTypeDataHelper $eventTypeDataHelper,
-        private GenericDataHelper $genericDataHelper,
         private GroupDataHelper $groupDataHelper,
         private ImportDataHelper $importDataHelper,
         private LogDataHelper $logDataHelper,
@@ -120,7 +116,6 @@ class ControllerFactory
             $this->personDataHelper,
             $this->backup,
             $this->articleCrosstabDataHelper,
-            $this->genericDataHelper,
             $this->messageDataHelper,
             $this->emailService
         );
@@ -199,7 +194,6 @@ class ControllerFactory
             $this->eventDataHelper,
             $this->tableControllerDataHelper,
             $this->errorManager,
-            $this->genericDataHelper
         );
     }
 
@@ -245,7 +239,10 @@ class ControllerFactory
 
     public function makeLeapfrogController(): LeapfrogController
     {
-        return new LeapfrogController($this->application);
+        return new LeapfrogController(
+            $this->application,
+            $this->tableControllerDataHelper
+        );
     }
 
     public function makeMaintenanceController(): MaintenanceController
@@ -258,7 +255,13 @@ class ControllerFactory
 
     public function makeMediaController(): MediaController
     {
-        return new MediaController($this->application, $this->articleDataHelper, $this->carouselDataHelper, $this->personGroupDataHelper, $this->sharedFileDataHelper);
+        return new MediaController(
+            $this->application,
+            $this->articleDataHelper,
+            $this->carouselDataHelper,
+            $this->personGroupDataHelper,
+            $this->sharedFileDataHelper
+        );
     }
 
     public function makeNavBarController(): NavBarController
@@ -272,7 +275,6 @@ class ControllerFactory
             $this->application,
             $this->tableControllerDataHelper,
             $this->personDataHelper,
-            $this->genericDataHelper
         );
     }
 
@@ -282,7 +284,6 @@ class ControllerFactory
             $this->application,
             $this->tableControllerDataHelper,
             $this->groupDataHelper,
-            $this->genericDataHelper
         );
     }
 

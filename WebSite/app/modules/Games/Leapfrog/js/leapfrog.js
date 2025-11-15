@@ -51,23 +51,7 @@ function moveSheep(fromIndex, toIndex) {
     setTimeout(() => {
         if (isGameOver()) showRestartButton(checkWinOrLose());
     }, 400);
-
-    fetch('/api/leapfrog', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ message: `Session ${sessionId}: Moved sheep from ${fromIndex} to ${toIndex} at movement ${moves}` })
-    })
-        .then(response => response.json())
-        .then(result => {
-            if (!result.success) {
-                alert('Erreur lors de la mise à jour des positions : ' + result.message);
-            }
-        })
-        .catch(error => {
-            alert('Erreur lors de la mise à jour des positions : ' + error.message);
-        });
+    log(`Moved sheep from ${fromIndex} to ${toIndex} at movement ${moves}`);
     return;
 }
 
@@ -128,9 +112,9 @@ function checkWinOrLose() {
     }).length;
 
     if (fatsAtLeft === 3) {
-        return "win";
+        return "won";
     }
-    return "lose";
+    return "lost";
 }
 
 function showRestartButton(result) {
@@ -138,11 +122,30 @@ function showRestartButton(result) {
     div.className = "text-center mt-3";
 
     div.innerHTML = `
-        <h3>${result === "win" ? "🎉 Gagné !" : "❌ Perdu !"}</h3>
+        <h3>${result === "won" ? "🎉 Gagné !" : "❌ Perdu !"}</h3>
         <button class="btn btn-primary mt-2" onclick="location.reload()">Rejouer</button>
     `;
-
     document.getElementById('gameboard-container').appendChild(div);
+    log(`Game over: ${result} after ${moves} moves`);
+}
+
+function log(message) {
+    fetch('/api/leapfrog', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ message: `Session ${sessionId}: ${message}` })
+    })
+        .then(response => response.json())
+        .then(result => {
+            if (!result.success) {
+                console.error('Erreur lors de la journalisation du mouvement : ' + result.message);
+            }
+        })
+        .catch(error => {
+            console.error('Erreur lors de la journalisation du mouvement : ' + error.message);
+        });
 }
 
 container.addEventListener('click', (e) => {

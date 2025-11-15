@@ -17,7 +17,6 @@ use app\helpers\WebApp;
 use app\models\ArticleCrosstabDataHelper;
 use app\models\ArticleDataHelper;
 use app\models\ArticleTableDataHelper;
-use app\models\GenericDataHelper;
 use app\models\MessageDataHelper;
 use app\models\PersonDataHelper;
 use app\modules\Common\TableController;
@@ -32,11 +31,10 @@ class ArticleController extends TableController
         private PersonDataHelper $personDataHelper,
         private Backup $backup,
         private ArticleCrosstabDataHelper $articleCrosstabDataHelper,
-        GenericDataHelper $genericDataHelper,
         private MessageDataHelper $messageDataHelper,
         private EmailService $emailService,
     ) {
-        parent::__construct($application, $genericDataHelper);
+        parent::__construct($application);
     }
 
     public function create(): void
@@ -225,7 +223,7 @@ class ArticleController extends TableController
             $columns[] = ['field' => 'Published', 'label' => 'Publié'];
         }
         $query = $this->articleTableDataHelper->getQuery($connectedUser, (int)($this->articleDataHelper->getSpotlightArticle()['articleId'] ?? -1));
-        $data = $this->prepareTableData($query, $filterValues, (int)($this->flight->request()->query['tablePage'] ?? 0));
+        $data = $this->prepareTableData($query, $filterValues);
         $this->render('Article/views/articles_index.latte', Params::getAll([
             'articles' => $data['items'],
             'currentPage' => $data['currentPage'],

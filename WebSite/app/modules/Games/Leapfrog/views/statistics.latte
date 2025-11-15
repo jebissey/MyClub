@@ -1,0 +1,17 @@
+{extends '../../../Webmaster/views/gameManager.latte'}
+
+{block title}Saute mouton{/block}
+
+{block content}
+    {include '../../../Common/views/dataTable.latte',
+        'items' => $games,
+        'actions' => [
+            [
+                'type' => 'link',
+                'label' => 'bi bi-eye',
+                'url' => '/leapfrog/stat/{sessionId}',
+                'class' => 'btn-success'
+            ]
+        ]
+    }
+{/block}

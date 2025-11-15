@@ -22,7 +22,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     a.href = `/event/${id}`;
                     a.textContent = title;
                     a.className = 'fw-semibold text-decoration-none';
-                    a.target = '_blank'; // facultatif
 
                     const small = document.createElement('small');
                     small.className = 'text-muted';

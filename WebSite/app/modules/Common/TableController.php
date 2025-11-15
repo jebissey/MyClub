@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace app\modules\Common;
 
 use \Envms\FluentPDO\Queries\Select;
+use PDO;
 
 use app\helpers\Application;
-use app\models\GenericDataHelper;
 
 abstract class TableController extends AbstractController
 {
@@ -15,13 +15,17 @@ abstract class TableController extends AbstractController
 
     public function __construct(
         Application $application,
-        private GenericDataHelper $genericDataHelper,
     ) {
         parent::__construct($application);
     }
 
-    protected function prepareTableData(Select $query, array $filters = [], int $page = 1): array
+    protected function prepareTableData(Select $query, array $filters = [], bool $usePdoForLog = false): array
     {
+        $pdo = null;
+        if ($usePdoForLog) $pdo = $this->application->getPdoForLog();
+        else               $pdo = $this->application->getPdo();
+        
+        $page = (int)($this->flight->request()->query['tablePage'] ?? 1);
         foreach ($filters as $key => $value) {
             if (!empty($value)) {
                 $query = $query->where("$key LIKE ?");
@@ -29,7 +33,7 @@ abstract class TableController extends AbstractController
             }
         }
 
-        $totalItems = $this->genericDataHelper->countOf($query->getQuery());
+        $totalItems = $this->count($query->getQuery(), $pdo);
         $totalPages = ceil($totalItems / $this->itemsPerPage);
         $currentPage = max(1, min($page, $totalPages));
         $query = $query->limit($this->itemsPerPage)->offset(($currentPage - 1) * $this->itemsPerPage);
@@ -39,7 +43,7 @@ abstract class TableController extends AbstractController
         //var_dump($values ?? null);
         //die();
 
-        $stmt = $this->application->getPdo()->prepare($query->getQuery());
+        $stmt = $pdo->prepare($query->getQuery());
         $stmt->execute($values ?? null);
         $items = $stmt->fetchAll();
 
@@ -58,5 +62,11 @@ abstract class TableController extends AbstractController
             if (!empty($value)) $params[$key] = urlencode($value);
         }
         return $params;
+    }
+
+    #region private functions  
+    private function count(string $query, PDO $pdo): int
+    {
+        return $pdo->query("SELECT COUNT(*) FROM (" . $query . ")")->fetchColumn();
     }
 }

@@ -34,7 +34,7 @@ class LeapFrogApi extends AbstractApi
             $this->renderJson(['error' => 'Invalid JSON'], false, ApplicationError::BadRequest->value);
             return;
         }
-        $this->logDataHelper->add((string)ApplicationError::Error->value, $data['message'] ?? '');
+        $this->logDataHelper->add((string)ApplicationError::Ok->value, $data['message'] ?? '');
         $this->renderJson([], true, ApplicationError::Ok->value);
     }
 }

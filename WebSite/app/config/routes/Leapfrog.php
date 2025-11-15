@@ -19,6 +19,7 @@ class Leapfrog implements RouteInterface
         $leapfrogController = fn() => $this->controllerFactory->makeLeapfrogController();
 
         $this->routes[] = new Route('GET /game/leapfrog', $leapfrogController, 'play');
+        $this->routes[] = new Route('GET /game/leapfrog/statistics', $leapfrogController, 'statistics');
 
         return $this->routes;
     }

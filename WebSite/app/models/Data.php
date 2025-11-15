@@ -52,11 +52,6 @@ abstract class Data
         if (!in_array($table, $this->tables))         throw new SqliteTableException("Table '$table' not found in file " . __FILE__ . ' at line ' . __LINE__);
     }
 
-    public function count(string $query): int
-    {
-        return $this->pdo->query("SELECT COUNT(*) FROM (" . $query . ")")->fetchColumn();
-    }
-
     public function delete(string $table, array $where): int
     {
         $this->validateTableName($table);

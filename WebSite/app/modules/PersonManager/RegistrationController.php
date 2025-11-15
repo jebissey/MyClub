@@ -21,9 +21,8 @@ class RegistrationController extends TableController
         Application $application,
         private TableControllerDataHelper $tableControllerDataHelper,
         private GroupDataHelper $groupDataHelper,
-        GenericDataHelper $genericDataHelper
     ) {
-        parent::__construct($application, $genericDataHelper);
+        parent::__construct($application);
     }
 
     public function index()
@@ -45,7 +44,7 @@ class RegistrationController extends TableController
                 ['field' => 'FirstName', 'label' => 'Prénom'],
                 ['field' => 'NickName', 'label' => 'Surnom']
             ];
-            $data = $this->prepareTableData($this->tableControllerDataHelper->getPersonsQuery(), $filterValues, (int)($this->flight->request()->query['tablePage'] ?? 1));
+            $data = $this->prepareTableData($this->tableControllerDataHelper->getPersonsQuery(), $filterValues);
             $this->render('PersonManager/views/registration_groups_index.latte', Params::getAll([
                 'persons' => $data['items'],
                 'currentPage' => $data['currentPage'],

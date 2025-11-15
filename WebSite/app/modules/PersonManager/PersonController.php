@@ -8,7 +8,6 @@ use app\enums\FilterInputRule;
 use app\helpers\Application;
 use app\helpers\Params;
 use app\helpers\WebApp;
-use app\models\GenericDataHelper;
 use app\models\PersonDataHelper;
 use app\models\TableControllerDataHelper;
 use app\modules\Common\TableController;
@@ -20,9 +19,8 @@ class PersonController extends TableController
         Application $application,
         private TableControllerDataHelper $tableControllerDataHelper,
         private PersonDataHelper $personDataHelper,
-        GenericDataHelper $genericDataHelper
     ) {
-        parent::__construct($application, $genericDataHelper);
+        parent::__construct($application);
     }
 
     public function create(): void
@@ -170,7 +168,7 @@ class PersonController extends TableController
             ['field' => 'Email', 'label' => 'Email'],
             ['field' => 'Phone', 'label' => 'Téléphone']
         ];
-        $data = $this->prepareTableData($this->tableControllerDataHelper->getPersonsQuery(), $filterValues, (int)($this->flight->request()->query['tablePage'] ?? 1));
+        $data = $this->prepareTableData($this->tableControllerDataHelper->getPersonsQuery());
 
         $this->render('PersonManager/views/users_index.latte', Params::getAll([
             'persons' => $data['items'],

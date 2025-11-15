@@ -148,7 +148,6 @@ class Routes
             new ErrorManager($application),
             $eventDataHelper,
             new EventTypeDataHelper($application),
-            new GenericDataHelper($application),
             new GroupDataHelper($application, $groupDataHelper),
             new ImportDataHelper($application),
             $logDataHelper,

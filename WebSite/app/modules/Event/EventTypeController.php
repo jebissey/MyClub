@@ -6,13 +6,11 @@ namespace app\modules\Event;
 
 use app\enums\ApplicationError;
 use app\enums\FilterInputRule;
-use app\exceptions\IntegrityException;
 use app\helpers\Application;
 use app\helpers\ErrorManager;
 use app\helpers\Params;
 use app\helpers\WebApp;
 use app\models\EventDataHelper;
-use app\models\GenericDataHelper;
 use app\models\TableControllerDataHelper;
 use app\modules\Common\TableController;
 
@@ -23,9 +21,8 @@ class EventTypeController extends TableController
         private EventDataHelper $eventDataHelper,
         private TableControllerDataHelper $tableControllerDataHelper,
         private ErrorManager $errorManager,
-        GenericDataHelper $genericDataHelper
     ) {
-        parent::__construct($application, $genericDataHelper);
+        parent::__construct($application);
     }
 
     public function create(): void
@@ -80,11 +77,7 @@ class EventTypeController extends TableController
             ['field' => 'GroupName', 'label' => 'Groupe'],
             ['field' => 'Attributes', 'label' => 'Attributs'],
         ];
-        $data = $this->prepareTableData(
-            $this->tableControllerDataHelper->getEventTypesQuery(),
-            $filterValues,
-            (int)($this->flight->request()->query['tablePage'] ?? 1)
-        );
+        $data = $this->prepareTableData($this->tableControllerDataHelper->getEventTypesQuery(), $filterValues);
 
         $this->render('Event/views/eventTypes_index.latte', Params::getAll([
             'eventTypes' => $data['items'],
