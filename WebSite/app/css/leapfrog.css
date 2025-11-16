@@ -20,4 +20,15 @@
   .sheep {
       max-width: 100%;
       height: auto;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+  }
+
+  .sheep:hover {
+      transform: scale(1.05);
+      cursor: grab;
+  }
+
+  .sheep:active {
+      cursor: grabbing;
   }
