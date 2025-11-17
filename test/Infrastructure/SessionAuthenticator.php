@@ -6,7 +6,7 @@ namespace test\Infrastructure;
 
 use Throwable;
 
-use test\Core\AuthenticationResult;
+use test\Core\ValueObjects\AuthenticationResult;
 use test\Interfaces\AuthenticatorInterface;
 use test\Interfaces\HttpClientInterface;
 

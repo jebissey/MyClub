@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/bootstrap.php';
 
-use test\Core\TestConfiguration;
+use test\Core\ValueObjects\TestConfiguration;
 use test\Core\JsonTestExporter;
 use test\Core\CsvTestExporter;
 use test\Infrastructure\RouteTestFactory;

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace test\Core;
 
+use test\Core\ValueObjects\ValidationResult;
 use test\Interfaces\ResponseValidatorInterface;
 
 class ResponseValidator implements ResponseValidatorInterface

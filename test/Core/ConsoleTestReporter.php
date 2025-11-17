@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace test\Core;
 
+use test\Core\ValueObjects\TestSummary;
 use test\Interfaces\TestReporterInterface;
 
 class ConsoleTestReporter implements TestReporterInterface

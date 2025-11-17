@@ -1,6 +1,8 @@
 <?php
 
-namespace test\Core;
+namespace test\Core\ValueObjects;
+
+use test\Core\ValueObjects\HttpResponse;
 
 readonly class TestResult
 {

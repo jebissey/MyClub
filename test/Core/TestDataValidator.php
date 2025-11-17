@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace test\Core;
 
+use test\Core\ValueObjects\Route;
+
 class TestDataValidator
 {
     public function validate(Route $route, int $routeNumber, array $testData): array

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace test\Core;
+namespace test\Core\ValueObjects;
 
 readonly class Simulation
 {

@@ -6,8 +6,8 @@ namespace test\Infrastructure;
 
 use RuntimeException;
 
-use test\Core\HttpResponse;
-use test\Core\TestConfiguration;
+use test\Core\ValueObjects\HttpResponse;
+use test\Core\ValueObjects\TestConfiguration;
 use test\Interfaces\HttpClientInterface;
 
 class CurlHttpClient implements HttpClientInterface

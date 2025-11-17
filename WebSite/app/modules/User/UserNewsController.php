@@ -30,6 +30,9 @@ class UserNewsController extends AbstractController
             elseif ($searchMode === \app\enums\Period::Signout->value) $searchFrom = $connectedUser->person->LastSignOut ?? '';
             elseif ($searchMode === \app\enums\Period::Week->value)    $searchFrom = date('Y-m-d H:i:s', strtotime('-1 week'));
             elseif ($searchMode === \app\enums\Period::Month->value)   $searchFrom = date('Y-m-d H:i:s', strtotime('-1 month'));
+            elseif ($searchMode === \app\enums\Period::Quarter->value) $searchFrom = date('Y-m-d H:i:s', strtotime('-3 months'));
+            elseif ($searchMode === \app\enums\Period::Year->value)    $searchFrom = date('Y-m-d H:i:s', strtotime('-1 year'));
+            else $searchFrom = date('Y-m-d H:i:s', strtotime('-1 day'));
 
             $this->render('User/views/news.latte', Params::getAll([
                 'news' => $this->news->getNewsForPerson($connectedUser, $searchFrom),

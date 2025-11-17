@@ -6,7 +6,7 @@ namespace test\Infrastructure;
 
 use InvalidArgumentException;
 
-use test\Core\Route;
+use test\Core\ValueObjects\Route;
 use test\Interfaces\RouteExtractorInterface;
 
 class FlightRouteExtractor implements RouteExtractorInterface

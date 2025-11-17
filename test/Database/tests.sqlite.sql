@@ -2034,4 +2034,7 @@ INSERT INTO "Test" VALUES (2076,15925,'GET','/group/chat/@id:[0-9]+','{"id":1}',
 INSERT INTO "Test" VALUES (2077,17655,'GET','/group/chat/@id:[0-9]+','{"id":1}',NULL,'{"email":"visitorInsights@myclub.foo","password":"observator1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (2078,19395,'GET','/group/chat/@id:[0-9]+','{"id":1}',NULL,'{"email":"user@myclub.foo","password":"user1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (2079,12365,'GET','/group/chat/@id:[0-9]+','{"id":1}',NULL,'{"email":"editor@myclub.foo","password":"editor1234" }','403',NULL,NULL);
+INSERT INTO "Test" VALUES (2080,NULL,'GET','/game/karaoke/@song:[A-Za-z0-9_]+','{"song":"zz"}',NULL,NULL,'200',NULL,NULL);
+INSERT INTO "Test" VALUES (2081,NULL,'GET','/game/karaoke/files/@name:[A-Za-z0-9_]+','{"name":"zz"}',NULL,NULL,'400',NULL,NULL);
+INSERT INTO "Test" VALUES (2082,NULL,'GET','/user/connections/@id:[0-9]+','{"id":1}',NULL,NULL,'403',NULL,NULL);
 COMMIT;

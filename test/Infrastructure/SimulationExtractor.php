@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace test\Infrastructure;
 
-use test\Core\Route;
-use test\Core\Simulation;
+use test\Core\ValueObjects\Route;
+use test\Core\ValueObjects\Simulation;
 use test\Interfaces\TestDataRepositoryInterface;
 use RuntimeException;
 use Throwable;

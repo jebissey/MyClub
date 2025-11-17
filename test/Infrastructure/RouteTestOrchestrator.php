@@ -8,8 +8,8 @@ use Throwable;
 
 use test\Core\StopRequestedException;
 use test\Core\TestExecutor;
-use test\Core\TestResult;
-use test\Core\TestSummary;
+use test\Core\ValueObjects\TestResult;
+use test\Core\ValueObjects\TestSummary;
 use test\Infrastructure\SimulationExtractor;
 use test\Interfaces\RouteExtractorInterface;
 use test\Interfaces\TestReporterInterface;

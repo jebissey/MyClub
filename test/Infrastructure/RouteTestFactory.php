@@ -8,7 +8,7 @@ use Throwable;
 
 use test\Core\ConsoleTestReporter;
 use test\Core\ResponseValidator;
-use test\Core\TestConfiguration;
+use test\Core\ValueObjects\TestConfiguration;
 use test\Core\TestExecutor;
 use test\Core\TestDataValidator;
 use test\Core\UrlBuilder;

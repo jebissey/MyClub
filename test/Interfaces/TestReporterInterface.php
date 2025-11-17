@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace test\Interfaces;
 
-use test\Core\TestSummary;
+use test\Core\ValueObjects\TestSummary;
 
 interface TestReporterInterface
 {

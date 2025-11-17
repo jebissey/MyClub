@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace test\Core;
 
+use test\Core\ValueObjects\Route;
+use test\Core\ValueObjects\Simulation;
+use test\Core\ValueObjects\TestConfiguration;
+use test\Core\ValueObjects\TestResult;
 use test\Interfaces\AuthenticatorInterface;
 use test\Interfaces\HttpClientInterface;
 use test\Interfaces\MyclubDataRepositoryInterface;

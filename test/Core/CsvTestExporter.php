@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace test\Core;
 
+use test\Core\ValueObjects\TestResult;
 use test\Interfaces\TestExporterInterface;
 
 class CsvTestExporter implements TestExporterInterface

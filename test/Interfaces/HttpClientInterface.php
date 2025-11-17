@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace test\Interfaces;
 
-use test\Core\HttpResponse;
+use test\Core\ValueObjects\HttpResponse;
 
 interface HttpClientInterface
 {

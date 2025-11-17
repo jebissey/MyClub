@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace test\Core;
+namespace test\Core\ValueObjects;
 
 class Route
 {

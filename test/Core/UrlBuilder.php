@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace test\Core;
 
+use test\Core\ValueObjects\Route;
+
 class UrlBuilder
 {
-    public function __construct(private TestConfiguration $config) {}
+    public function __construct() {}
 
     public function build(Route $route, array $getParameters = []): string
     {
