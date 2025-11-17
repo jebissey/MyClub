@@ -53,8 +53,6 @@ class LeapfrogController extends TableController
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
-        $connectedUser = $this->application->getConnectedUser();
-
         $schema = [
             'date' => FilterInputRule::Content->value,
             'who' => FilterInputRule::Content->value,

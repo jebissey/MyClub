@@ -6,20 +6,38 @@ namespace app\helpers;
 
 class GravatarHandler
 {
-    private string $defaultImage = 'mp';    // 'mp' pour un placeholder générique
-    private int $size = 48;                 // Taille par défaut en pixels
-    private string $rating = 'g';           // Note 'g' pour tout public
+    private string $defaultImage = 'mp';
+    private int $size = 48;
+    private string $rating = 'g';
 
+    private array $existenceCache = [];
 
-    public function getGravatar(string $email): string
+    public function getGravatar(string $email, bool $useGravatar): string
     {
-        return $this->hasGravatar($email) ?  $this->getGravatarUrl($email) : '';
+        if (!$useGravatar) return '';
+        if (!$this->hasRealGravatar($email)) return '';
+        return $this->buildGravatarUrl($email);
     }
 
     #region Private functions
-    private function getGravatarUrl(string $email): string
+    private function hasRealGravatar(string $email): bool
+    {
+        $email = strtolower(trim($email));
+        if (isset($this->existenceCache[$email])) return $this->existenceCache[$email];
+
+        $hash = md5($email);
+        $url  = "https://www.gravatar.com/avatar/{$hash}?d=404&s={$this->size}";
+        $headers = @get_headers($url);
+        $exists = $headers && strpos($headers[0], '200') !== false;
+        $this->existenceCache[$email] = $exists;
+
+        return $exists;
+    }
+
+    private function buildGravatarUrl(string $email): string
     {
         $hash = md5(strtolower(trim($email)));
+
         return sprintf(
             "https://www.gravatar.com/avatar/%s?s=%d&d=%s&r=%s",
             $hash,
@@ -27,14 +45,5 @@ class GravatarHandler
             $this->defaultImage,
             $this->rating
         );
-    }
-
-    private function hasGravatar(string $email): bool
-    {
-        $hash = md5(strtolower(trim($email)));
-        $uri = "https://www.gravatar.com/avatar/{$hash}?d=404";
-
-        $headers = @get_headers($uri);
-        return $headers && strpos($headers[0], '200') !== false;
     }
 }

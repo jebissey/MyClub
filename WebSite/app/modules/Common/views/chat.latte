@@ -87,6 +87,7 @@
                                                     {$message->FirstName} {$message->LastName}
                                                 {/if}
                                             </strong>
+                                            <span class="small text-muted"> ({$message->TimeAgo} )</span>
                                             
                                             {if $message->PersonId == $person->Id}
                                                 <i class="bi bi-pencil edit-message ms-2 text-dark" title="Modifier"></i>

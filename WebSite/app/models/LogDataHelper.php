@@ -11,11 +11,11 @@ use Throwable;
 
 use app\helpers\Application;
 use app\helpers\Client;
+use app\helpers\MyClubDateTime;
 
 class LogDataHelper extends Data
 {
     private string $host;
-    private const DISPLAY_TIMEZONE = 'Europe/Paris';
     private const MAX_FILTER_LENGTH = 100;
 
     public function __construct(Application $application)
@@ -591,8 +591,8 @@ class LogDataHelper extends Data
     {
         $visits = $this->getLastVisitPerActivePerson($activePersons);
         foreach ($visits as &$visit) {
-            $visit->TimeAgo = $this->calculateTimeAgo($visit->LastActivity);
-            $visit->FormattedDate = $this->formatDateFromUTC($visit->LastActivity);
+            $visit->TimeAgo = MyClubDateTime::calculateTimeAgo($visit->LastActivity);
+            $visit->FormattedDate = MyClubDateTime::formatDateFromUTC($visit->LastActivity);
         }
         return $visits;
     }
@@ -628,26 +628,6 @@ class LogDataHelper extends Data
             return strcmp($b->LastActivity, $a->LastActivity);
         });
         return $result;
-    }
-
-
-    private function calculateTimeAgo($dateTime)
-    {
-        $datetime = new DateTime($dateTime, new DateTimeZone('UTC'));
-        $datetime->setTimezone(new DateTimeZone(self::DISPLAY_TIMEZONE));
-        $now = new DateTime('now', new DateTimeZone(self::DISPLAY_TIMEZONE));
-        $interval = $now->diff($datetime);
-        if ($interval->days > 0)  return $interval->days . ' jour' . ($interval->days > 1 ? 's' : '');
-        elseif ($interval->h > 0) return $interval->h . ' heure' . ($interval->h > 1 ? 's' : '');
-        elseif ($interval->i > 0) return $interval->i . ' minute' . ($interval->i > 1 ? 's' : '');
-        else return 'À l\'instant';
-    }
-
-    private function formatDateFromUTC($dateTime)
-    {
-        $datetime = new DateTime($dateTime, new DateTimeZone('UTC'));
-        $datetime->setTimezone(new DateTimeZone(self::DISPLAY_TIMEZONE));
-        return $datetime->format('d/m/Y H:i');
     }
 
     public function getVisitedPages(int $perPage, int $logPage, array $filtersInput): array

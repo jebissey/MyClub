@@ -10,6 +10,7 @@ use app\exceptions\UnauthorizedAccessException;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
 use app\helpers\GravatarHandler;
+use app\helpers\MyClubDateTime;
 use app\helpers\TranslationManager;
 use app\helpers\WebApp;
 use app\interfaces\NewsProviderInterface;
@@ -25,7 +26,7 @@ class MessageDataHelper extends Data implements NewsProviderInterface
     {
         $nonNullCount = ($articleId !== null) + ($eventId !== null) + ($groupId !== null);
         if ($nonNullCount !== 1) return false;
-        if ($articleId !== null && $this->get('Article', ['Id'=> $articleId]) === false) return false;
+        if ($articleId !== null && $this->get('Article', ['Id' => $articleId]) === false) return false;
         if ($eventId !== null && $this->get('Event', ['Id' => $eventId]) === false) return false;
         if ($groupId !== null && $this->get('Group', ['Id' => $groupId]) === false) return false;
 
@@ -74,10 +75,7 @@ class MessageDataHelper extends Data implements NewsProviderInterface
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':articleId' => $articleId]);
         $messages = $stmt->fetchAll();
-        $gravatarHandler = new GravatarHandler();
-        foreach ($messages as $message) {
-            $message->UserImg = WebApp::getUserImg($message, $gravatarHandler);
-        }
+        $this->addAvatarAndTimeAgoToMessages($messages);
         return $messages;
     }
 
@@ -100,10 +98,7 @@ class MessageDataHelper extends Data implements NewsProviderInterface
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':eventId' => $eventId]);
         $messages = $stmt->fetchAll();
-        $gravatarHandler = new GravatarHandler();
-        foreach ($messages as $message) {
-            $message->UserImg = WebApp::getUserImg($message, $gravatarHandler);
-        }
+        $this->addAvatarAndTimeAgoToMessages($messages);
         return $messages;
     }
 
@@ -126,10 +121,7 @@ class MessageDataHelper extends Data implements NewsProviderInterface
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':groupId' => $groupId]);
         $messages = $stmt->fetchAll();
-        $gravatarHandler = new GravatarHandler();
-        foreach ($messages as $message) {
-            $message->UserImg = WebApp::getUserImg($message, $gravatarHandler);
-        }
+        $this->addAvatarAndTimeAgoToMessages($messages);
         return $messages;
     }
 
@@ -257,5 +249,17 @@ class MessageDataHelper extends Data implements NewsProviderInterface
         $stmt->execute($params);
 
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    #region Private functions
+    private function addAvatarAndTimeAgoToMessages(array $messages): array
+    {
+        static $gravatarHandler = new GravatarHandler();
+
+        foreach ($messages as $message) {
+            $message->UserImg = WebApp::getUserImg($message, $gravatarHandler);
+            $message->TimeAgo = MyClubDateTime::calculateTimeAgo($message->LastUpdate);
+        }
+        return $messages;
     }
 }

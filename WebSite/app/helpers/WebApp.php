@@ -115,7 +115,7 @@ class WebApp
 
     static public function getUserImg(object $person, GravatarHandler $gravatarHandler): string
     {
-        if ($person->UseGravatar === 'yes') return $gravatarHandler->getGravatar($person->Email);
+        if ($person->UseGravatar === 'yes') return $gravatarHandler->getGravatar($person->Email, true);
         else {
             if (empty($person->Avatar)) return '🤔';
             else {
