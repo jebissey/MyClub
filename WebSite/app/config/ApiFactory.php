@@ -31,7 +31,7 @@ use app\models\DesignDataHelper;
 use app\models\EventDataHelper;
 use app\models\EventNeedDataHelper;
 use app\models\KaraokeDataHelper;
-use app\models\LogDataHelper;
+use app\models\LogDataWriterHelper;
 use app\models\MessageDataHelper;
 use app\models\NeedDataHelper;
 use app\models\NeedTypeDataHelper;
@@ -58,7 +58,7 @@ class ApiFactory
         private EventNeedDataHelper $eventNeedDataHelper,
         private EventService $eventService,
         private KaraokeDataHelper $karaokeDataHelper,
-        private LogDataHelper $logDataHelper,
+        private LogDataWriterHelper $logDataWriterHelper,
         private MessageDataHelper $messageDataHelper,
         private NeedDataHelper $needDataHelper,
         private NeedTypeDataHelper $needTypeDataHelper,
@@ -195,7 +195,7 @@ class ApiFactory
             $this->connectedUser,
             $this->dataHelper,
             $this->personDataHelper,
-            $this->logDataHelper
+            $this->logDataWriterHelper
         );
     }
 
@@ -239,7 +239,7 @@ class ApiFactory
             $this->connectedUser,
             $this->dataHelper,
             $this->personDataHelper,
-            $this->logDataHelper
+            $this->logDataWriterHelper
         );
     }
 }

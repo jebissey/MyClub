@@ -83,11 +83,11 @@ use app\models\DesignDataHelper;
 use app\models\EventDataHelper;
 use app\models\EventNeedDataHelper;
 use app\models\EventTypeDataHelper;
-use app\models\GenericDataHelper;
 use app\models\GroupDataHelper;
 use app\models\ImportDataHelper;
 use app\models\KaraokeDataHelper;
 use app\models\LogDataHelper;
+use app\models\LogDataWriterHelper;
 use app\models\MessageDataHelper;
 use app\models\NeedDataHelper;
 use app\models\NeedTypeDataHelper;
@@ -176,7 +176,7 @@ class Routes
             new EventNeedDataHelper($application),
             new EventService($eventDataHelper),
             new KaraokeDataHelper($application),
-            $logDataHelper,
+            new LogDataWriterHelper($application),
             $messageDataHelper,
             $needDataHelper,
             new NeedTypeDataHelper($application),

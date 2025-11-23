@@ -75,7 +75,7 @@ class Database
 
     private function upgradeDatabase(PDO $pdo, int $from, int $to): void
     {
-        $logDataHelper = new LogDataHelper(Application::init());
+        $logDataWriterHelper = new LogDataWriterHelper(Application::init());
         $pdo->beginTransaction();
         try {
             $currentVersion = $from;
@@ -90,7 +90,7 @@ class Database
                     throw new RuntimeException("$className must implement DatabaseMigratorInterface");
                 }
                 $newVersion = $migrator->upgrade($pdo, $currentVersion);
-                $logDataHelper->add((string)ApplicationError::Ok->value, "Database migrated from version {$currentVersion} to version {$newVersion} using {$className}");
+                $logDataWriterHelper->add((string)ApplicationError::Ok->value, "Database migrated from version {$currentVersion} to version {$newVersion} using {$className}");
                 if ($newVersion !== $nextVersion) {
                     throw new RuntimeException("$className returned invalid version: $newVersion (expected $nextVersion)");
                 }

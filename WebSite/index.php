@@ -23,7 +23,7 @@ use app\enums\ApplicationError;
 use app\helpers\Application;
 use app\helpers\ErrorManager;
 use app\helpers\WebApp;
-use app\models\LogDataHelper;
+use app\models\LogDataWriterHelper;
 use app\modules\Webmaster\MaintenanceController;
 
 $logDir = __DIR__ . '/var/tracy/log';
@@ -58,13 +58,13 @@ $flight->map('getData', function ($key) {
 $webapp = new WebApp();
 new Routes($application, $flight)->add($errorManager);
 
-$logDataHelper = new LogDataHelper($application);
-$flight->map('error', function (Throwable $ex) use ($logDataHelper, $errorManager) {
-    $logDataHelper->add((string)ApplicationError::Error->value, 'Internal error: ' . $ex->getMessage() . ' in file ' . $ex->getFile() . ' at line' . $ex->getLine());
+$logWriterDataHelper = new LogDataWriterHelper($application);
+$flight->map('error', function (Throwable $ex) use ($logWriterDataHelper, $errorManager) {
+    $logWriterDataHelper->add((string)ApplicationError::Error->value, 'Internal error: ' . $ex->getMessage() . ' in file ' . $ex->getFile() . ' at line' . $ex->getLine());
     $errorManager->raise(ApplicationError::Error, 'Error ' . $ex->getMessage() . ' in file ' . $ex->getFile() . ' at line ' . $ex->getLine());
 });
-$flight->after('start', function () use ($logDataHelper, $flight) {
-    $logDataHelper->add((string)$flight->getData('code') ?? '', $flight->getData('message') ?? '');
+$flight->after('start', function () use ($logWriterDataHelper, $flight) {
+    $logWriterDataHelper->add((string)$flight->getData('code') ?? '', $flight->getData('message') ?? '');
 });
 
 $flight->start();

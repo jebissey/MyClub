@@ -12,6 +12,8 @@ use app\helpers\PeriodHelper;
 use app\helpers\WebApp;
 use app\models\CrosstabDataHelper;
 use app\models\LogDataHelper;
+use app\models\LogDataAnalyticsHelper;
+use app\models\LogDataStatisticsHelper;
 use app\models\PersonDataHelper;
 use app\modules\Common\AbstractController;
 
@@ -21,7 +23,9 @@ class VisitorInsightsController extends AbstractController
         Application $application,
         private PersonDataHelper $personDataHelper,
         private LogDataHelper $logDataHelper,
-        private CrosstabDataHelper $crosstabDataHelper
+        private CrosstabDataHelper $crosstabDataHelper,
+        private LogDataAnalyticsHelper $logDataAnalyticsHelper,
+        private LogDataStatisticsHelper $logDataStatisticsHelper,
     ) {
         parent::__construct($application);
     }
@@ -88,10 +92,10 @@ class VisitorInsightsController extends AbstractController
             $this->render('VisitorInsights/views/referent.latte', Params::getAll([
                 'period' => $period,
                 'currentDate' => $currentDate,
-                'nav' => $this->logDataHelper->getReferentNavigation($period, $currentDate),
-                'externalRefs' => $this->logDataHelper->getExternalReferentStats($period, $currentDate),
+                'nav' => $this->logDataAnalyticsHelper->getReferentNavigation($period, $currentDate),
+                'externalRefs' => $this->logDataAnalyticsHelper->getExternalReferentStats($period, $currentDate),
                 'control' => new WebApp($this->application),
-                'rows' => $this->logDataHelper->getReferentStats($period, $currentDate),
+                'rows' => $this->logDataAnalyticsHelper->getReferentStats($period, $currentDate),
                 'page' => $this->application->getConnectedUser()->getPage()
             ]));
         }
@@ -106,7 +110,7 @@ class VisitorInsightsController extends AbstractController
             $periodType = in_array($periodType, $this->periodTypes) ? $periodType : $this->defaultPeriodType;
 
             $offset = (int)($this->flight->request()->query->offset ?? 0);
-            $data = $this->logDataHelper->getStatisticsData($periodType, $offset);
+            $data = $this->logDataAnalyticsHelper->getStatisticsData($periodType, $offset);
 
             $this->render('VisitorInsights/views/statistics.latte', Params::getAll([
                 'periodTypes' => $this->periodTypes,
@@ -114,7 +118,7 @@ class VisitorInsightsController extends AbstractController
                 'currentOffset' => $offset,
                 'data' => $data,
                 'chartData' => $this->logDataHelper->formatDataForChart($data),
-                'periodLabel' => $this->logDataHelper->getPeriodLabel($periodType),
+                'periodLabel' => $this->logDataAnalyticsHelper->getPeriodLabel($periodType),
                 'page' => $this->application->getConnectedUser()->getPage()
             ]));
         }
@@ -124,10 +128,10 @@ class VisitorInsightsController extends AbstractController
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isVisitorInsights())) {
             $this->render('VisitorInsights/views/analytics.latte', Params::getAll([
-                'osData' => $this->logDataHelper->getOsDistribution(),
-                'browserData' => $this->logDataHelper->getBrowserDistribution(),
-                'screenResolutionData' => $this->logDataHelper->getScreenResolutionDistribution(),
-                'typeData' => $this->logDataHelper->getTypeDistribution(),
+                'osData' => $this->logDataStatisticsHelper->getOsDistribution(),
+                'browserData' => $this->logDataStatisticsHelper->getBrowserDistribution(),
+                'screenResolutionData' => $this->logDataStatisticsHelper->getScreenResolutionDistribution(),
+                'typeData' => $this->logDataStatisticsHelper->getTypeDistribution(),
                 'title' => 'Synthèse des visiteurs',
                 'page' => $this->application->getConnectedUser()->getPage()
             ]));

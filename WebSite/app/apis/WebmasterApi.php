@@ -12,7 +12,7 @@ use app\enums\ApplicationError;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
 use app\models\DataHelper;
-use app\models\LogDataHelper;
+use app\models\LogDataWriterHelper;
 use app\models\PersonDataHelper;
 
 class WebmasterApi extends AbstractApi
@@ -24,7 +24,7 @@ class WebmasterApi extends AbstractApi
         ConnectedUser $connectedUser,
         DataHelper $dataHelper,
         PersonDataHelper $personDataHelper,
-        private LogDataHelper $logDataHelper
+        private LogDataWriterHelper $logDataWriterHelper
     ) {
         parent::__construct($application, $connectedUser, $dataHelper, $personDataHelper);
         $metadata = $this->dataHelper->get('Metadata', ['Id' => 1], 'VapidPublicKey, VapidPrivateKey ');
@@ -41,7 +41,7 @@ class WebmasterApi extends AbstractApi
             $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
-        $this->logDataHelper->add((string)ApplicationError::Ok->value, $_SERVER['HTTP_USER_AGENT'] ?? 'HTTP_USER_AGENT not defined');
+        $this->logDataWriterHelper->add((string)ApplicationError::Ok->value, $_SERVER['HTTP_USER_AGENT'] ?? 'HTTP_USER_AGENT not defined');
         $this->renderJson(['lastVersion' => Application::VERSION], true, ApplicationError::Ok->value);
     }
 

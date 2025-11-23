@@ -8,7 +8,7 @@ use app\enums\ApplicationError;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
 use app\models\DataHelper;
-use app\models\LogDataHelper;
+use app\models\LogDataWriterHelper;
 use app\models\PersonDataHelper;
 
 class LeapFrogApi extends AbstractApi
@@ -18,7 +18,7 @@ class LeapFrogApi extends AbstractApi
         ConnectedUser $connectedUser,
         DataHelper $dataHelper,
         PersonDataHelper $personDataHelper,
-        private LogDataHelper $logDataHelper,
+        private LogDataWriterHelper $logDataWriterHelper,
     ) {
         parent::__construct($application, $connectedUser, $dataHelper, $personDataHelper);
     }
@@ -34,7 +34,7 @@ class LeapFrogApi extends AbstractApi
             $this->renderJson(['error' => 'Invalid JSON'], false, ApplicationError::BadRequest->value);
             return;
         }
-        $this->logDataHelper->add((string)ApplicationError::Ok->value, $data['message'] ?? '');
+        $this->logDataWriterHelper->add((string)ApplicationError::Ok->value, $data['message'] ?? '');
         $this->renderJson([], true, ApplicationError::Ok->value);
     }
 }

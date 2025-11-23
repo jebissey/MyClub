@@ -21,6 +21,8 @@ use app\models\EventTypeDataHelper;
 use app\models\GroupDataHelper;
 use app\models\ImportDataHelper;
 use app\models\LogDataHelper;
+use app\models\LogDataAnalyticsHelper;
+use app\models\LogDataStatisticsHelper;
 use app\models\MessageDataHelper;
 use app\models\NeedDataHelper;
 use app\models\ParticipantDataHelper;
@@ -413,7 +415,9 @@ class ControllerFactory
             $this->application,
             $this->personDataHelper,
             $this->logDataHelper,
-            $this->crosstabDataHelper
+            $this->crosstabDataHelper,
+            new LogDataAnalyticsHelper($this->application),
+            new LogDataStatisticsHelper($this->application)
         );
     }
 
