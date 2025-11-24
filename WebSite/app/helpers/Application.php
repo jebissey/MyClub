@@ -13,6 +13,8 @@ use Throwable;
 
 use app\exceptions\DatabaseException;
 use app\models\Database;
+use app\models\DataHelper;
+use app\models\LogDataCompactHelper;
 
 class Application
 {
@@ -25,7 +27,7 @@ class Application
         '😋', '😛', '🤪', '🤮', '🤧', '😷', '🤒', '🤕', '🤐', 
         '😥', '😭', '😤', '😠', '🥵', '🥶', '🤑', '🤠', '🥳', 
     ];
-    
+
     private static self $instance;
     private static Engine $flight;
     private static LatteEngine $latte;
@@ -61,6 +63,8 @@ class Application
         if (!isset(self::$instance)) {
             self::$instance = new self();
         }
+        $metadata = new DataHelper(self::$instance)->get('Metadata', ['Id' => 1], 'Compact_everyXdays, Compact_removeOlderThanXmonths, Compact_compactOlderThanXmonths');
+        new LogDataCompactHelper(self::$instance)->compactLog($metadata->Compact_removeOlderThanXmonths, $metadata->Compact_compactOlderThanXmonths);
         return self::$instance;
     }
 

@@ -27,7 +27,7 @@ class WebmasterApi extends AbstractApi
         private LogDataWriterHelper $logDataWriterHelper
     ) {
         parent::__construct($application, $connectedUser, $dataHelper, $personDataHelper);
-        $metadata = $this->dataHelper->get('Metadata', ['Id' => 1], 'VapidPublicKey, VapidPrivateKey ');
+        $metadata = $this->dataHelper->get('Metadata', ['Id' => 1], 'VapidPublicKey, VapidPrivateKey');
         $this->vapid = [
             'subject' => Application::$root,
             'publicKey' => $metadata->VapidPublicKey,
