@@ -54,7 +54,7 @@ class LogDataCompactHelper extends Data
                     Uri,
                     '' AS Token,
                     Who,
-                    date(CreatedAt, 'start of month') AS CreatedAt,
+                    datetime(CreatedAt, 'start of month') AS CreatedAt,
                     '' AS Code,
                     '' AS Message,
                     COUNT(*) AS Count
@@ -88,7 +88,6 @@ class LogDataCompactHelper extends Data
             }
             $this->set('Metadata', ['Compact_lastDate' => (new DateTime())->format('Y-m-d H:i:s')], ['Id' => 1]);
             $this->pdoForLog->commit();
-
         } catch (Throwable $e) {
 
             if ($this->pdoForLog->inTransaction()) $this->pdoForLog->rollBack();
@@ -115,6 +114,8 @@ class LogDataCompactHelper extends Data
             ");
         }
         $countAfter = (int)$this->pdoForLog->query("SELECT COUNT(*) FROM Log")->fetchColumn();
-        (new LogDataWriterHelper($this->application))->add((string)ApplicationError::Ok->value, "Compact log from $countBefore to $countAfter");
+        if ($countAfter != $countBefore) {
+            (new LogDataWriterHelper($this->application))->add((string)ApplicationError::Ok->value, "Compact log from $countBefore to $countAfter");
+        }
     }
 }

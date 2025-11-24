@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace app\models;
@@ -16,47 +17,34 @@ class LogDataAnalyticsHelper extends Data
         $result = [];
 
         foreach ($periods as $period) {
-            $startDate = $period['start'];
-            $endDate = $period['end'];
-
-            $uniqueVisitorsQuery = $this->pdoForLog->prepare("
-                SELECT COUNT(DISTINCT Token) as count
-                FROM Log
-                WHERE CreatedAt BETWEEN :startDate AND :endDate
-                  AND Token IS NOT NULL AND Token != ''
-            ");
-            $uniqueVisitorsQuery->execute([
-                ':startDate' => $startDate,
-                ':endDate' => $endDate
-            ]);
-            $uniqueVisitors = $uniqueVisitorsQuery->fetch()->count ?? 0;
-
-            $pageViewsQuery = $this->pdoForLog->prepare("
-                SELECT COUNT(*) as count
+            $query = $this->pdoForLog->prepare("
+                SELECT 
+                    COUNT(DISTINCT Who) as uniqueVisitors,
+                    COALESCE(SUM(Count), 0) as pageViews
                 FROM Log
                 WHERE CreatedAt BETWEEN :startDate AND :endDate
             ");
-            $pageViewsQuery->execute([
-                ':startDate' => $startDate,
-                ':endDate' => $endDate
+            $query->execute([
+                ':startDate' => $period['start'],
+                ':endDate' => $period['end']
             ]);
-            $pageViews = $pageViewsQuery->fetch()->count ?? 0;
+            $data = $query->fetch();
 
             $result[] = [
                 'label' => $this->formatPeriodLabel($period, $periodType),
-                'start' => $startDate,
-                'end' => $endDate,
-                'uniqueVisitors' => $uniqueVisitors,
-                'pageViews' => $pageViews
+                'start' => $period['start'],
+                'end' => $period['end'],
+                'uniqueVisitors' => $data->uniqueVisitors ?? 0,
+                'pageViews' => $data->pageViews ?? 0
             ];
         }
-
+error_log("\n\n" . json_encode($result, JSON_PRETTY_PRINT) . "\n");       
         return $result;
     }
 
     public function getPeriodLabel(string $periodType): string
     {
-        return match($periodType) {
+        return match ($periodType) {
             'day' => 'Jours',
             'week' => 'Semaines',
             'month' => 'Mois',
@@ -71,7 +59,7 @@ class LogDataAnalyticsHelper extends Data
         $prev = clone $date;
         $next = clone $date;
 
-        match($period) {
+        match ($period) {
             'day' => [$prev->modify('-1 day'), $next->modify('+1 day')],
             'week' => [$prev->modify('-1 week'), $next->modify('+1 week')],
             'month' => [$prev->modify('-1 month'), $next->modify('+1 month')],
@@ -161,8 +149,8 @@ class LogDataAnalyticsHelper extends Data
                 for ($i = 0; $i < self::PERIOD_TO_SHOW; $i++) {
                     $currentDate = (clone $startPoint)->modify(sprintf('-%d days', self::PERIOD_TO_SHOW - $i - 1));
                     $periods[] = [
-                        'start' => (clone $currentDate)->setTime(0,0,0)->format('Y-m-d H:i:s'),
-                        'end' => (clone $currentDate)->setTime(23,59,59)->format('Y-m-d H:i:s'),
+                        'start' => (clone $currentDate)->setTime(0, 0, 0)->format('Y-m-d H:i:s'),
+                        'end' => (clone $currentDate)->setTime(23, 59, 59)->format('Y-m-d H:i:s'),
                         'dateObj' => clone $currentDate
                     ];
                 }
@@ -175,8 +163,8 @@ class LogDataAnalyticsHelper extends Data
                     $weekStart = (clone $startPoint)->modify(sprintf('-%d weeks', self::PERIOD_TO_SHOW - $i - 1));
                     $weekEnd = (clone $weekStart)->modify('+6 days');
                     $periods[] = [
-                        'start' => $weekStart->setTime(0,0,0)->format('Y-m-d H:i:s'),
-                        'end' => $weekEnd->setTime(23,59,59)->format('Y-m-d H:i:s'),
+                        'start' => $weekStart->setTime(0, 0, 0)->format('Y-m-d H:i:s'),
+                        'end' => $weekEnd->setTime(23, 59, 59)->format('Y-m-d H:i:s'),
                         'dateObj' => clone $weekStart
                     ];
                 }
@@ -189,8 +177,8 @@ class LogDataAnalyticsHelper extends Data
                     $monthStart = (clone $startPoint)->modify(sprintf('-%d months', self::PERIOD_TO_SHOW - $i - 1));
                     $monthEnd = (clone $monthStart)->modify('last day of this month');
                     $periods[] = [
-                        'start' => $monthStart->setTime(0,0,0)->format('Y-m-d H:i:s'),
-                        'end' => $monthEnd->setTime(23,59,59)->format('Y-m-d H:i:s'),
+                        'start' => $monthStart->setTime(0, 0, 0)->format('Y-m-d H:i:s'),
+                        'end' => $monthEnd->setTime(23, 59, 59)->format('Y-m-d H:i:s'),
                         'dateObj' => clone $monthStart
                     ];
                 }
@@ -203,8 +191,8 @@ class LogDataAnalyticsHelper extends Data
                     $yearStart = (clone $startPoint)->modify(sprintf('-%d years', self::PERIOD_TO_SHOW - $i - 1));
                     $yearEnd = (clone $yearStart)->modify('last day of December this year');
                     $periods[] = [
-                        'start' => $yearStart->setTime(0,0,0)->format('Y-m-d H:i:s'),
-                        'end' => $yearEnd->setTime(23,59,59)->format('Y-m-d H:i:s'),
+                        'start' => $yearStart->setTime(0, 0, 0)->format('Y-m-d H:i:s'),
+                        'end' => $yearEnd->setTime(23, 59, 59)->format('Y-m-d H:i:s'),
                         'dateObj' => clone $yearStart
                     ];
                 }
@@ -218,10 +206,10 @@ class LogDataAnalyticsHelper extends Data
     {
         $date = $period['dateObj'];
 
-        return match($periodType) {
+        return match ($periodType) {
             'day' => $date->format('d/m/Y'),
-            'week' => (clone $date)->modify('monday this week')->format('d/m') 
-                      . ' - ' . (clone $date)->modify('sunday this week')->format('d/m/Y'),
+            'week' => (clone $date)->modify('monday this week')->format('d/m')
+                . ' - ' . (clone $date)->modify('sunday this week')->format('d/m/Y'),
             'month' => $date->format('M Y'),
             'year' => $date->format('Y'),
             default => ''
@@ -233,7 +221,7 @@ class LogDataAnalyticsHelper extends Data
         $startDate = clone $date;
         $endDate = clone $date;
 
-        match($period) {
+        match ($period) {
             'day' => $endDate->modify('+1 day'),
             'week' => [$startDate->modify('monday this week'), $endDate->modify('monday next week')],
             'month' => [$startDate->modify('first day of this month'), $endDate->modify('first day of next month')],
