@@ -28,12 +28,10 @@ class UserStatisticsController extends AbstractController
     public function showStatistics(): void
     {
         if ($person = $this->application->getConnectedUser()->person ?? false) {
-            $schema = [
-                'seasonStart' => FilterInputRule::DateTime->value,
-                'seasonEnd' => FilterInputRule::DateTime->value,
-            ];
+            $schema = ['season' => FilterInputRule::DateInterval->value];
             $input = WebApp::filterInput($schema, $this->flight->request()->query->getData());
-            $season = $this->personalStatisticsDataHelper->getSeasonRange($input['seasonStart'] ?? null, $input['seasonEnd'] ?? null);
+            [$seasonStart, $seasonEnd] = explode('|', $input['season'] ?? '|');
+            $season = $this->personalStatisticsDataHelper->getSeasonRange($seasonStart, $seasonEnd);
 
             $this->render('User/views/user_statistics.latte', Params::getAll([
                 'stats' => $this->personalStatisticsDataHelper->getStats($person, $season['start'], $season['end'], $this->application->getConnectedUser()->isWebmaster()),

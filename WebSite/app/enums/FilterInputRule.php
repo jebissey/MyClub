@@ -11,6 +11,7 @@ enum FilterInputRule: string
     case Avatar = '/^\p{So}$/u';
     case Bool = 'bool';
     case Content = '/^.{1,65535}$/s';
+    case DateInterval = '/^\d{4}-\d{2}-\d{2}\|\d{4}-\d{2}-\d{2}$/';
     case DateTime = '/^(\d{4}(-\d{2}(-\d{2})?)?( \d{2}:\d{2}(:\d{2})?)?|(\d{2}:\d{2}(:\d{2})?))$/';
     case Email = '/^[a-z0-9._%+\-]*(@[a-z0-9.\-]*)?(\.[a-z]*)?$/i';
     case Float = 'float';

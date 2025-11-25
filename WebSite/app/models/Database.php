@@ -11,6 +11,7 @@ use Throwable;
 use app\enums\ApplicationError;
 use app\helpers\Application;
 use app\helpers\File;
+use app\helpers\LogMessage;
 use app\interfaces\DatabaseMigratorInterface;
 
 class Database
@@ -75,7 +76,8 @@ class Database
 
     private function upgradeDatabase(PDO $pdo, int $from, int $to): void
     {
-        $logDataWriterHelper = new LogDataWriterHelper(Application::init());
+        $logMessage = LogMessage::getInstance((string)ApplicationError::Ok->value);
+
         $pdo->beginTransaction();
         try {
             $currentVersion = $from;
@@ -90,7 +92,7 @@ class Database
                     throw new RuntimeException("$className must implement DatabaseMigratorInterface");
                 }
                 $newVersion = $migrator->upgrade($pdo, $currentVersion);
-                $logDataWriterHelper->add((string)ApplicationError::Ok->value, "Database migrated from version {$currentVersion} to version {$newVersion} using {$className}");
+                $logMessage->setMessage("Database migrated from version {$currentVersion} to version {$newVersion} using {$className}");
                 if ($newVersion !== $nextVersion) {
                     throw new RuntimeException("$className returned invalid version: $newVersion (expected $nextVersion)");
                 }

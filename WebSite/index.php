@@ -22,6 +22,7 @@ use app\config\Routes;
 use app\enums\ApplicationError;
 use app\helpers\Application;
 use app\helpers\ErrorManager;
+use app\helpers\LogMessage;
 use app\helpers\WebApp;
 use app\models\LogDataWriterHelper;
 use app\modules\Webmaster\MaintenanceController;
@@ -64,7 +65,8 @@ $flight->map('error', function (Throwable $ex) use ($logWriterDataHelper, $error
     $errorManager->raise(ApplicationError::Error, 'Error ' . $ex->getMessage() . ' in file ' . $ex->getFile() . ' at line ' . $ex->getLine());
 });
 $flight->after('start', function () use ($logWriterDataHelper, $flight) {
-    $logWriterDataHelper->add((string)$flight->getData('code') ?? '', $flight->getData('message') ?? '');
+    $logMessage = LogMessage::getInstance(null);
+    $logWriterDataHelper->add($logMessage->getCode() ?? (string)$flight->getData('code') ?? '', $logMessage->getCode() !== null ? $logMessage->getMessage() : ($flight->getData('message') ?? ''));
 });
 
 $flight->start();

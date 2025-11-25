@@ -17,10 +17,10 @@ class LogDataWriterHelper extends Data
     {
         parent::__construct($application);
     }
+
     public function add(string $code, string $message): void
     {
         $client = new Client();
-
 
         try {
             $stmt = $this->pdoForLog->prepare("
@@ -40,8 +40,7 @@ class LogDataWriterHelper extends Data
                 $client->getType(),
                 $client->getUri(),
                 $client->getToken(),
-                filter_var($_SESSION['user'] ?? '', FILTER_VALIDATE_EMAIL)
-                    ?: gethostbyaddr($_SERVER['REMOTE_ADDR']) ?? '',
+                filter_var($_SESSION['user'] ?? '', FILTER_VALIDATE_EMAIL) ?: '',
                 $code,
                 $message
             ]);

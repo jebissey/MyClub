@@ -160,7 +160,7 @@ class LogDataHelper extends Data
     public function getVisits($season)
     {
         $query = $this->pdoForLog->prepare("
-            SELECT Who, COUNT(Id) as VisitCount
+            SELECT Who, SUM(Count) as VisitCount
             FROM Log 
             WHERE CreatedAt BETWEEN :start AND :end
             GROUP BY Who
