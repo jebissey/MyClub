@@ -38,7 +38,6 @@ class LogDataAnalyticsHelper extends Data
                 'pageViews' => $data->pageViews ?? 0
             ];
         }
-error_log("\n\n" . json_encode($result, JSON_PRETTY_PRINT) . "\n");       
         return $result;
     }
 

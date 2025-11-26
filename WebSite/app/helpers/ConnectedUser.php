@@ -33,6 +33,7 @@ class ConnectedUser
 
         $person = $this->dataHelper->get('Person', ['Email' => $userEmail]);
         if (!$person) {
+            $_SESSION['user'] = '';
             $this->application->getErrorManager()->raise(ApplicationError::BadRequest, "Unknown user with this email address {$userEmail} in file " . __FILE__ . ' at line ' . __LINE__);
             return;
         }

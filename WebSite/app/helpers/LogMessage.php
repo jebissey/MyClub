@@ -19,7 +19,7 @@ class LogMessage
         }
     }
 
-    public static function getInstance(?string $code, string $message = '', string $separator = "\n"): LogMessage
+    public static function getInstance(?string $code, string $message = '', string $separator = " --- "): LogMessage
     {
         if (self::$instance === null) self::$instance = new self($code, $message, $separator);
         return self::$instance;
@@ -43,7 +43,7 @@ class LogMessage
 
     public function setMessage(string $message): self
     {
-        $this->messages = [$message];
+        $this->messages[] = $message;
         return $this;
     }
 
