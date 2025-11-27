@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace app\models;
@@ -17,12 +18,7 @@ class LogDataHelper extends Data
         parent::__construct($application);
     }
 
-
-
-
     const PERIOD_TO_SHOW = 13;
-
-
 
     public function formatDataForChart($data)
     {
@@ -198,7 +194,6 @@ class LogDataHelper extends Data
         if (!empty($whereClauses)) $whereSQL = 'WHERE ' . implode(' AND ', $whereClauses);
         return [$whereSQL, $params];
     }
-
 
     #region Installations
     public function getInstallationsData()

@@ -13,6 +13,14 @@
 </head>
 
 <body class="d-flex flex-column min-vh-100">
+    {if isset($productionSiteUrl)}
+        <div class="alert alert-danger alert-dismissible fade show m-0 rounded-0 text-center py-3" role="alert">
+            <h2><i class="bi bi-exclamation-triangle-fill"></i> ATTENTION : Site de test</h2>
+            Vous êtes sur un environnement de test. 
+            <a href="{$productionSiteUrl}" class="alert-link fw-bold">Accéder au site de production</a>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {/if}
     <div class="content-wrapper d-flex flex-column min-vh-100">
         <main class="flex-grow-1">
             <nav class="navbar navbar-expand-sm navbar-dark bg-dark">

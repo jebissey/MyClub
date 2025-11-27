@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace app\helpers;
@@ -7,14 +8,19 @@ use InvalidArgumentException;
 
 use app\helpers\Application;
 use app\helpers\TranslationManager;
+use app\models\MetadataDataHelper;
 
 class Params
 {
     private static array $commonParams = [];
+    private static MetadataDataHelper $metadataDataHelper;
 
     public static function getAll(array $specificParams): array
     {
-        if (self::$commonParams === []) self::setDefaultParams($_SERVER['REQUEST_URI']);
+        if (self::$commonParams === []) {
+            self::$metadataDataHelper = new MetadataDataHelper(Application::init());
+            self::setDefaultParams($_SERVER['REQUEST_URI']);
+        }
         return array_merge(self::$commonParams, $specificParams);
     }
 
@@ -52,5 +58,7 @@ class Params
             'supportedLanguages' => TranslationManager::getSupportedLanguages(),
             'flag' => TranslationManager::getFlag($lang),
         ];
+
+        if (self::$metadataDataHelper->isTestSite()) self::$commonParams['productionSiteUrl'] = self::$metadataDataHelper->getProdSiteUrl();
     }
 }

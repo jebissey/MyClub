@@ -26,6 +26,7 @@ abstract class TableController extends AbstractController
         else               $pdo = $this->application->getPdo();
         
         $page = (int)($this->flight->request()->query['tablePage'] ?? 1);
+        $values = [];
         foreach ($filters as $key => $value) {
             if (!empty($value)) {
                 $query = $query->where("$key LIKE ?");

@@ -20,7 +20,7 @@ class Database
     const SQLITE_FILE = 'MyClub.sqlite';
     const SQLITE_LOG_FILE = 'LogMyClub.sqlite';
     const APPLICATION = 'MyClub';
-    const DB_VERSION = 4;              //Don't forget to update here and in Metadata when database structure is modified
+    const DB_VERSION = 5;              //Don't forget to update here and in Metadata when database structure is modified
 
     private static $instance = null;
     private static $pdo = null;
@@ -62,7 +62,7 @@ class Database
         self::$pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_OBJ);
         self::$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-        $query = "SELECT * FROM Metadata LIMIT 1";
+        $query = "SELECT ApplicationName, DatabaseVersion FROM Metadata LIMIT 1";
         $stmt = self::$pdo->query($query);
         $row = $stmt->fetch();
         if ($row) {

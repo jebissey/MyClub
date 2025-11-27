@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace app\models;
@@ -10,6 +11,8 @@ use app\helpers\Application;
 
 class DbBrowserDataHelper extends Data
 {
+    private const COL_MAX_SIZE = 100;
+
     public function __construct(Application $application)
     {
         parent::__construct($application);
@@ -131,6 +134,7 @@ class DbBrowserDataHelper extends Data
         $offset = ($dbbPage - 1) * $itemsPerPage;
         $query = "SELECT * FROM " . $this->quoteName($table);
         $params = [];
+
         if (!empty($filters)) {
             $whereConditions = [];
             foreach ($filters as $column => $value) {
@@ -140,14 +144,16 @@ class DbBrowserDataHelper extends Data
             }
             $query .= " WHERE " . implode(' AND ', $whereConditions);
         }
+
         $countQuery = "SELECT COUNT(*) FROM (" . $query . ")";
         $stmt = $this->pdo->prepare($countQuery);
         foreach ($params as $key => $value) {
             $stmt->bindValue(':' . $key, $value);
         }
         $stmt->execute();
-        $totalRecords = $stmt->fetchColumn();
-        $totalPages = ceil($totalRecords / $itemsPerPage);
+        $totalRecords = (int)$stmt->fetchColumn();
+        $totalPages = max(1, (int)ceil($totalRecords / $itemsPerPage));
+
         $query .= " LIMIT :limit OFFSET :offset";
         $stmt = $this->pdo->prepare($query);
         foreach ($params as $key => $value) {
@@ -156,7 +162,23 @@ class DbBrowserDataHelper extends Data
         $stmt->bindValue(':limit', $itemsPerPage, PDO::PARAM_INT);
         $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
         $stmt->execute();
-        return [$stmt->fetchAll(), $this->getTableColumns($table), $dbbPage, $totalPages, $filters];
+
+        $rows = $stmt->fetchAll();
+        foreach ($rows as &$row) {
+            foreach ($row as $col => $val) {
+                if (!is_string($val)) continue;
+                $imgPos = stripos($val, '<img');
+                if ($imgPos !== false) {
+                    $val = mb_substr($val, 0, $imgPos, 'UTF-8') . '[image]';
+                }
+                if (mb_strlen($val, 'UTF-8') > self::COL_MAX_SIZE) {
+                    $val = mb_substr($val, 0, self::COL_MAX_SIZE, 'UTF-8') . '…';
+                }
+                $row->$col = $val;
+            }
+        }
+        unset($row);
+        return [$rows, $this->getTableColumns($table), $dbbPage, $totalPages, $filters];
     }
 
     public function updateRecord(string $table, int $id): void

@@ -18,6 +18,7 @@ class TableControllerDataHelper extends Data
     public function getEventTypesQuery(): Select
     {
         return $this->fluent->from('EventType')
+            ->select(null)
             ->select('EventType.Id AS EventTypeId, EventType.Name AS EventTypeName, `Group`.Name AS GroupName')
             ->select('GROUP_CONCAT(Attribute.Name, ", ") AS Attributes')
             ->leftJoin('`Group` ON EventType.IdGroup = `Group`.Id')
@@ -31,6 +32,7 @@ class TableControllerDataHelper extends Data
     public function getPersonsQuery(): Select
     {
         return $this->fluent->from('Person')
+            ->select(null)
             ->select('Id, FirstName, LastName, NickName, Email')
             ->orderBy('LastName')
             ->where('Inactivated = 0');

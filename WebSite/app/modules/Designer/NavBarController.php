@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace app\modules\Webmaster;
+namespace app\modules\Designer;
 
 use app\enums\ApplicationError;
 use app\helpers\Application;
