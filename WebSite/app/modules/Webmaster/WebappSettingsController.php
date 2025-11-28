@@ -7,7 +7,6 @@ namespace app\modules\Webmaster;
 use app\enums\Help;
 use app\enums\Message;
 use app\helpers\Application;
-use app\helpers\Params;
 use app\modules\Common\AbstractController;
 
 class WebappSettingsController extends AbstractController
@@ -50,7 +49,7 @@ class WebappSettingsController extends AbstractController
             } else $settings[$key] = $result->Value ?? '';
         }
 
-        $this->render('Webmaster/views/webappSettings.latte', Params::getAll([
+        $this->render('Webmaster/views/webappSettings.latte', $this->getAllParams([
             'navItems' => $this->getNavItems($this->application->getConnectedUser()->person),
             'settingsKeys' => $this->settingsKeys,
             'settings' => $settings,

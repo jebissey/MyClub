@@ -6,7 +6,6 @@ namespace app\modules\User;
 
 use app\enums\FilterInputRule;
 use app\helpers\Application;
-use app\helpers\Params;
 use app\helpers\WebApp;
 use app\modules\Common\AbstractController;
 
@@ -29,7 +28,7 @@ class UserNotepadController extends AbstractController
             return;
         }
 
-        $this->render('User/views/user_notepad.latte', Params::getAll([
+        $this->render('User/views/user_notepad.latte', $this->getAllParams([
             'notepad' => $person->Notepad,
             'navItems' => $this->getNavItems($person),
             'page' => $this->application->getConnectedUser()->getPage(1),

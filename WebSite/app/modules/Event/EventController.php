@@ -14,7 +14,6 @@ use app\enums\FilterInputRule;
 use app\exceptions\QueryException;
 use app\helpers\Application;
 use app\helpers\GravatarHandler;
-use app\helpers\Params;
 use app\helpers\PeriodHelper;
 use app\helpers\WebApp;
 use app\models\CrosstabDataHelper;
@@ -48,7 +47,7 @@ class EventController extends AbstractController
         $filterByPreferences = $input['filterByPreferences'] ?? 0 === 1;
         $connectedUser = $this->application->getConnectedUser();
 
-        $this->render('Event/views/nextEvents.latte', Params::getAll([
+        $this->render('Event/views/nextEvents.latte', $this->getAllParams([
             'navItems' => $this->getNavItems($connectedUser->person ?? false),
             'events' => $this->eventDataHelper->getEvents($connectedUser->person, $mode, $offset, $filterByPreferences),
             'person' => $connectedUser->person,
@@ -69,7 +68,7 @@ class EventController extends AbstractController
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
-        $this->render('Event/views/weekEvents.latte', Params::getAll([
+        $this->render('Event/views/weekEvents.latte', $this->getAllParams([
             'events' => $this->eventDataHelper->getNextWeekEvents(),
             'eventTypes' => $this->dataHelper->gets('EventType', ['Inactivated' => 0], 'Id, Name'),
             'eventAttributes' => $this->dataHelper->gets('Attribute', [], 'Id, Name, Detail, Color'),
@@ -93,7 +92,7 @@ class EventController extends AbstractController
         $period = $this->flight->request()->query->period ?? 'month';
         [$dateRange, $crosstabData] = $this->crosstabDataHelper->getevents($period);
 
-        $this->render('Common/views/crosstab.latte', Params::getAll([
+        $this->render('Common/views/crosstab.latte', $this->getAllParams([
             'crosstabData' => $crosstabData,
             'period' => $period,
             'dateRange' => $dateRange,
@@ -110,7 +109,7 @@ class EventController extends AbstractController
         $person = $this->application->getConnectedUser()->person ?? false;
         $userEmail = $person->Email ?? '';
         if ($this->dataHelper->get('Event', ['Id' => $eventId], 'Id')) {
-            $this->render('Event/views/event_detail.latte', Params::getAll([
+            $this->render('Event/views/event_detail.latte', $this->getAllParams([
                 'eventId' => $eventId,
                 'event' => $this->eventDataHelper->getEvent($eventId),
                 'attributes' => $this->eventDataHelper->getEventAttributes($eventId),
@@ -213,7 +212,7 @@ class EventController extends AbstractController
                         'IdContact' => $contact->Id
                     ]);
 
-                    $this->render('Common/views/registration_success.latte', Params::getAll([
+                    $this->render('Common/views/registration_success.latte', $this->getAllParams([
                         'event' => $event,
                         'contact' => $contact,
                         'navItems' => $this->getNavItems($this->application->getConnectedUser()->person),
@@ -244,7 +243,7 @@ class EventController extends AbstractController
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
-        $this->render('Event/views/event_location.latte', Params::getAll([
+        $this->render('Event/views/event_location.latte', $this->getAllParams([
             'page' => $this->application->getConnectedUser()->getPage(),
         ]));
     }
@@ -281,7 +280,7 @@ class EventController extends AbstractController
         }
         $_SESSION['navbar'] = 'eventManager';
 
-        $this->render('Webmaster/views/eventManager.latte', Params::getAll([
+        $this->render('Webmaster/views/eventManager.latte', $this->getAllParams([
             'page' => $this->application->getConnectedUser()->getPage(),
         ]));
     }
@@ -303,7 +302,7 @@ class EventController extends AbstractController
         }
         $person = $this->application->getConnectedUser()->person;
         $person->UserImg = WebApp::getUserImg($person, new GravatarHandler());
-        $this->render('Common/views/chat.latte', Params::getAll([
+        $this->render('Common/views/chat.latte', $this->getAllParams([
             'article' => null,
             'event' => $event,
             'group' => null,

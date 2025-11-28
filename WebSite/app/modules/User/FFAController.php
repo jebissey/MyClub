@@ -7,7 +7,6 @@ namespace app\modules\User;
 use app\enums\FilterInputRule;
 use app\helpers\Application;
 use app\helpers\FFAScraper;
-use app\helpers\Params;
 use app\helpers\WebApp;
 use app\modules\Common\AbstractController;
 
@@ -49,7 +48,7 @@ class FFAController extends AbstractController
         if ($question == 'rank') $results = $ffaScraper->searchAthleteRank($firstName, $lastName, $year, $club);
         else                    $results = $ffaScraper->searchAthleteResults($firstName, $lastName, $year, $club);
 
-        $this->render('User/views/ffaSearch.latte', Params::getAll([
+        $this->render('User/views/ffaSearch.latte', $this->getAllParams([
             'firstName' => $firstName,
             'lastName' => $lastName,
             'question' => $question,

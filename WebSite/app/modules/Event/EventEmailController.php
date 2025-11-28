@@ -7,7 +7,6 @@ namespace app\modules\Event;
 use app\enums\FilterInputRule;
 use app\enums\WeekdayFormat;
 use app\helpers\Application;
-use app\helpers\Params;
 use app\helpers\TranslationManager;
 use app\helpers\WebApp;
 use app\models\PersonDataHelper;
@@ -32,7 +31,7 @@ class EventEmailController extends AbstractController
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
-        $this->render('Event/views/getEmails.latte', Params::getAll([
+        $this->render('Event/views/getEmails.latte', $this->getAllParams([
             'groups' => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
             'eventTypes' => $this->dataHelper->gets('EventType', ['Inactivated' => 0], 'Id, Name', 'Name'),
             'weekdayNames' => TranslationManager::getWeekdayNames(),
@@ -67,7 +66,7 @@ class EventEmailController extends AbstractController
         $eventTypeName = $idEventType != null ? $this->dataHelper->get('EventType', ['Id' => $idEventType], 'Name') : '';
         $dayOfWeekName = $dayOfWeek != null ? TranslationManager::getWeekdayNames()[$dayOfWeek] : '';
 
-        $this->render('Event/views/copyToClipBoard.latte', Params::getAll([
+        $this->render('Event/views/copyToClipBoard.latte', $this->getAllParams([
             'emailsJson' => json_encode($filteredEmails),
             'emails' => $filteredEmails,
             'filters' => "$groupName / $eventTypeName / $dayOfWeekName / $timeOfDay",

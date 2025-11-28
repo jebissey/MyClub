@@ -7,7 +7,6 @@ namespace app\modules\User;
 use app\enums\FilterInputRule;
 use app\enums\YesNo;
 use app\helpers\Application;
-use app\helpers\Params;
 use app\helpers\WebApp;
 use app\modules\Common\AbstractController;
 
@@ -29,7 +28,7 @@ class UserAccountController extends AbstractController
             return;
         }
         $person = $this->application->getConnectedUser()->person;
-        $this->render('User/views/user_account.latte', Params::getAll([
+        $this->render('User/views/user_account.latte', $this->getAllParams([
             'readOnly' => $person->Imported == 1 ? true : false,
             'email' => filter_var($person->Email, FILTER_VALIDATE_EMAIL) ?: '',
             'firstName' => WebApp::sanitizeInput($person->FirstName),

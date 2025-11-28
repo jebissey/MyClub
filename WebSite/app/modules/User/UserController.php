@@ -8,7 +8,6 @@ use app\enums\ApplicationError;
 use app\enums\FilterInputRule;
 use app\exceptions\EmailException;
 use app\helpers\Application;
-use app\helpers\Params;
 use app\helpers\WebApp;
 use app\modules\Common\AbstractController;
 use app\services\AuthenticationService;
@@ -77,7 +76,7 @@ class UserController extends AbstractController
             if (!$newPassword)                                               $this->raiseBadRequest('Invalid password format', __FILE__, __LINE__);
             elseif ($this->authService->resetPassword($token, $newPassword)) $this->redirect('/', ApplicationError::Ok, 'Votre mot de passe est réinitialisé');
             else                                                             $this->raiseBadRequest('Invalid or expired token', __FILE__, __LINE__);
-        } elseif ($_SERVER['REQUEST_METHOD'] === 'GET') $this->render('User/views/user_set_password.latte', Params::getAll([
+        } elseif ($_SERVER['REQUEST_METHOD'] === 'GET') $this->render('User/views/user_set_password.latte', $this->getAllParams([
             'token' => $token,
             'page' => $this->application->getConnectedUser()->getPage()
         ]));

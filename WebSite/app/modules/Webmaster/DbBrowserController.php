@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace app\modules\Webmaster;
 
 use app\helpers\Application;
-use app\helpers\Params;
 use app\helpers\WebApp;
 use app\models\DbBrowserDataHelper;
 use app\modules\Common\AbstractController;
@@ -40,7 +39,7 @@ class DbBrowserController extends AbstractController
     public function index(): void
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isWebmaster())) {
-            $this->render('Webmaster/views/dbbrowser/index.latte', Params::getAll([
+            $this->render('Webmaster/views/dbbrowser/index.latte', $this->getAllParams([
                 'tables' => $this->dbBrowserDataHelper->getTables(),
                 'isMyclubWebSite' => WebApp::isMyClubWebSite(),
                 'page' => $this->application->getConnectedUser()->getPage()
@@ -53,7 +52,7 @@ class DbBrowserController extends AbstractController
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isWebmaster())) {
             [$columns, $columnTypes] = $this->dbBrowserDataHelper->showCreateForm($table);
 
-            $this->render('Webmaster/views/dbbrowser/create.latte', Params::getAll([
+            $this->render('Webmaster/views/dbbrowser/create.latte', $this->getAllParams([
                 'table' => $table,
                 'columns' => $columns,
                 'columnTypes' => $columnTypes,
@@ -68,7 +67,7 @@ class DbBrowserController extends AbstractController
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isWebmaster())) {
             [$columns, $record, $primaryKey, $columnTypes] = $this->dbBrowserDataHelper->showEditForm($table, $id);
 
-            $this->render('Webmaster/views/dbbrowser/edit.latte', Params::getAll([
+            $this->render('Webmaster/views/dbbrowser/edit.latte', $this->getAllParams([
                 'table' => $table,
                 'columns' => $columns,
                 'record' => $record,
@@ -91,7 +90,7 @@ class DbBrowserController extends AbstractController
                 max(1, (int)($this->flight->request()->query['dbbPage'] ?? 1))
             );
 
-            $this->render('Webmaster/views/dbbrowser/table.latte', Params::getAll([
+            $this->render('Webmaster/views/dbbrowser/table.latte', $this->getAllParams([
                 'table' => $table,
                 'columns' => $columns,
                 'records' => $records,

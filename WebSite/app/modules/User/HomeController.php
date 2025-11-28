@@ -10,12 +10,15 @@ use app\helpers\Params;
 use app\helpers\TranslationManager;
 use app\models\ArticleDataHelper;
 use app\models\DesignDataHelper;
+use app\models\MetadataDataHelper;
 use app\models\PersonDataHelper;
 use app\models\SurveyDataHelper;
 use app\modules\Common\AbstractController;
 
 class HomeController extends AbstractController
 {
+    private MetadataDataHelper $metadataDataHelper;
+
     public function __construct(
         Application $application,
         private ArticleDataHelper $articleDataHelper,
@@ -25,6 +28,7 @@ class HomeController extends AbstractController
         private PersonDataHelper $personDataHelper,
     ) {
         parent::__construct($application);
+        $this->metadataDataHelper = new MetadataDataHelper($application);
     }
 
     public function home(): void
@@ -67,7 +71,7 @@ class HomeController extends AbstractController
                 'flag' => \app\helpers\TranslationManager::getFlag($lang),
                 'isRedactor' => false,
                 'page' => $connectedUser->getPage(),
-            ]);
+            ], $this->metadataDataHelper->isTestSite() && !empty($prodSiteUrl = $this->metadataDataHelper->getProdSiteUrl()) ? $prodSiteUrl : null);
         }
 
         $articles = $this->articleDataHelper->getLatestArticles($userEmail);
@@ -84,7 +88,7 @@ class HomeController extends AbstractController
             }
         }
 
-        $this->render('Common/views/home.latte', Params::getAll([
+        $this->render('Common/views/home.latte', $this->getAllParams([
             'latestArticle' => $latestArticle,
             'latestArticles' => $articles['latestArticles'],
             'homeHeader' => $this->dataHelper->get('Settings', ['Name' => 'Home_header'], 'Value')->Value ?? '',

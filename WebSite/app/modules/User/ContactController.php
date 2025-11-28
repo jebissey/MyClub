@@ -8,7 +8,6 @@ use app\enums\ApplicationError;
 use app\enums\EventAudience;
 use app\enums\FilterInputRule;
 use app\helpers\Application;
-use app\helpers\Params;
 use app\helpers\WebApp;
 use app\models\PersonDataHelper;
 use app\modules\Common\AbstractController;
@@ -33,7 +32,7 @@ class ContactController extends AbstractController
                 $event = $this->dataHelper->get('Event', ['Id' => $eventId], 'Id, Summary, StartTime, Audience');
                 if (!$event || $event->Audience != EventAudience::ForAll->value) $eventId = $event = null;
             }
-            $this->render('Common/views/contact.latte', Params::getAll([
+            $this->render('Common/views/contact.latte', $this->getAllParams([
                 'navItems' => $this->getNavItems($this->application->getConnectedUser()->person ?? false),
                 'event' => $event,
                 'page' => $this->application->getConnectedUser()->getPage(),

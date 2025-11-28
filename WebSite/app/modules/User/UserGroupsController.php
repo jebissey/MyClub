@@ -5,7 +5,6 @@ namespace app\modules\User;
 
 use app\enums\FilterInputRule;
 use app\helpers\Application;
-use app\helpers\Params;
 use app\helpers\WebApp;
 use app\models\GroupDataHelper;
 use app\models\PersonGroupDataHelper;
@@ -34,7 +33,7 @@ class UserGroupsController extends AbstractController
         }
         $currentGroups = $this->groupDataHelper->getCurrentGroups($person->Id);
 
-        $this->render('User/views/user_groups.latte', Params::getAll([
+        $this->render('User/views/user_groups.latte', $this->getAllParams([
             'groups' => $currentGroups,
             'layout' => $this->getLayout(),
             'navItems' => $this->getNavItems($connectedUser->person ?? false),

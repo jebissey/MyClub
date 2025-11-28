@@ -10,7 +10,6 @@ use app\enums\FilterInputRule;
 use app\exceptions\QueryException;
 use app\helpers\Application;
 use app\helpers\GravatarHandler;
-use app\helpers\Params;
 use app\helpers\WebApp;
 use app\models\GroupDataHelper;
 use app\models\MessageDataHelper;
@@ -39,7 +38,7 @@ class GroupController extends AbstractController
             return;
         }
         $availableAuthorizations = $this->dataHelper->gets('Authorization', ['Id <> 1' => null]);
-        $this->render('PersonManager/views/group_create.latte', Params::getAll([
+        $this->render('PersonManager/views/group_create.latte', $this->getAllParams([
             'availableAuthorizations' => $availableAuthorizations,
             'layout' => $this->getLayout(),
             'isMyclubWebSite' => WebApp::isMyClubWebSite(),
@@ -68,7 +67,7 @@ class GroupController extends AbstractController
         $name = $input['name'] ?? '???';
         $selfRegistration = $input['selfRegistration'] ?? 0;
         if ($name === '???') {
-            $this->render('PersonManager/views/group_create.latte', Params::getAll([
+            $this->render('PersonManager/views/group_create.latte', $this->getAllParams([
                 'availableAuthorizations' => $availableAuthorizations,
                 'error' => 'Le nom du groupe est requis',
                 'layout' => $this->getLayout(),
@@ -123,7 +122,7 @@ class GroupController extends AbstractController
         $group = $this->dataHelper->get('Group', ['Id' => $id], 'Name, SelfRegistration');
         if (!$group) $this->raiseBadRequest("Unknwon group $id", __FILE__, __LINE__);
         else {
-            $this->render('PersonManager/views/group_edit.latte', Params::getAll([
+            $this->render('PersonManager/views/group_edit.latte', $this->getAllParams([
                 'group' => $group,
                 'availableAuthorizations' => $this->dataHelper->gets('Authorization', ['Id <> 1' => null], '*', 'Name'),
                 'currentAuthorizations' => array_column($this->dataHelper->gets('GroupAuthorization', ['IdGroup' => $id], 'IdAuthorization'), 'IdAuthorization'),
@@ -160,7 +159,7 @@ class GroupController extends AbstractController
         $selfRegistration = $input['selfRegistration'] ?? 0;
         $selectedAuthorizations = $input['authorizations'] ?? [];
         if (empty($name)) {
-            $this->render('PersonManager/views/group_edit.latte', Params::getAll([
+            $this->render('PersonManager/views/group_edit.latte', $this->getAllParams([
                 'group' => $group,
                 'availableAuthorizations' => $availableAuthorizations,
                 'error' => 'Le nom du groupe est requis',
@@ -180,7 +179,7 @@ class GroupController extends AbstractController
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
-        $this->render('PersonManager/views/groups_index.latte', Params::getAll([
+        $this->render('PersonManager/views/groups_index.latte', $this->getAllParams([
             'groups' => $this->groupDataHelper->getGroupsWithAuthorizations($this->application->getConnectedUser()),
             'layout' => $this->getLayout(),
             'navItems' => $this->getNavItems($connectedUser->person ?? false),
@@ -211,7 +210,7 @@ class GroupController extends AbstractController
         }
         $person = $connectedUser->person;
         $person->UserImg = WebApp::getUserImg($person, new GravatarHandler());
-        $this->render('Common/views/chat.latte', Params::getAll([
+        $this->render('Common/views/chat.latte', $this->getAllParams([
             'article' => null,
             'event' => null,
             'group' => $group,

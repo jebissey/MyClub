@@ -11,7 +11,6 @@ use app\exceptions\QueryException;
 use app\helpers\Application;
 use app\helpers\Backup;
 use app\helpers\GravatarHandler;
-use app\helpers\Params;
 use app\helpers\PeriodHelper;
 use app\helpers\WebApp;
 use app\models\ArticleCrosstabDataHelper;
@@ -98,7 +97,7 @@ class ArticleController extends TableController
             return;
         }
 
-        $this->render('Article/views/article_edit.latte', Params::getAll([
+        $this->render('Article/views/article_edit.latte', $this->getAllParams([
             'article' => $article,
             'groups' => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
             'hasSurvey' => $this->dataHelper->get('Survey', ['IdArticle' => $id], 'ClosingDate'),
@@ -180,7 +179,7 @@ class ArticleController extends TableController
             return;
         }
         $_SESSION['navbar'] = 'redactor';
-        $this->render('Webmaster/views/redactor.latte', Params::getAll([
+        $this->render('Webmaster/views/redactor.latte', $this->getAllParams([
             'page' => $this->application->getConnectedUser()->getPage(),
         ]));
     }
@@ -224,7 +223,7 @@ class ArticleController extends TableController
         }
         $query = $this->articleTableDataHelper->getQuery($connectedUser, (int)($this->articleDataHelper->getSpotlightArticle()['articleId'] ?? -1));
         $data = $this->prepareTableData($query, $filterValues);
-        $this->render('Article/views/articles_index.latte', Params::getAll([
+        $this->render('Article/views/articles_index.latte', $this->getAllParams([
             'articles' => $data['items'],
             'currentPage' => $data['currentPage'],
             'totalPages' => $data['totalPages'],
@@ -273,7 +272,7 @@ class ArticleController extends TableController
             } else $_SESSION['error'] = "Une erreur est survenue lors de la mise à jour de l'article";
             $this->redirect('/article/' . $id);
         } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-            $this->render('User/views/publish.latte', Params::getAll([
+            $this->render('User/views/publish.latte', $this->getAllParams([
                 'article' => $this->articleDataHelper->getWithAuthor($id),
                 'page' => $this->application->getConnectedUser()->getPage()
             ]));
@@ -304,7 +303,7 @@ class ArticleController extends TableController
             }
             $article = $this->articleDataHelper->getLatestArticle([$id]);
 
-            $this->render('Article/views/article_show.latte', Params::getAll([
+            $this->render('Article/views/article_show.latte', $this->getAllParams([
                 'article' => $article,
                 'groups' => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
                 'hasSurvey' => $this->dataHelper->get('Survey', ['IdArticle' => $id], 'ClosingDate'),
@@ -347,7 +346,7 @@ class ArticleController extends TableController
         }
         $person = $connectedUser->person;
         $person->UserImg = WebApp::getUserImg($person, new GravatarHandler());
-        $this->render('Common/views/chat.latte', Params::getAll([
+        $this->render('Common/views/chat.latte', $this->getAllParams([
             'article' => $article,
             'event' => null,
             'group' => null,
@@ -372,7 +371,7 @@ class ArticleController extends TableController
         $dateRange = PeriodHelper::getDateRangeFor($period);
         $crosstabData = $this->articleCrosstabDataHelper->getItems($dateRange);
 
-        $this->render('Common/views/crosstab.latte', Params::getAll([
+        $this->render('Common/views/crosstab.latte', $this->getAllParams([
             'crosstabData' => $crosstabData,
             'period' => $period,
             'dateRange' => $dateRange,

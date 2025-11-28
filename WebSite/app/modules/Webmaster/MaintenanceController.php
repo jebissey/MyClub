@@ -7,7 +7,6 @@ namespace app\modules\Webmaster;
 use app\enums\ApplicationError;
 use app\helpers\Application;
 use app\helpers\ErrorManager;
-use app\helpers\Params;
 use app\helpers\WebApp;
 use app\modules\Common\AbstractController;
 
@@ -49,7 +48,7 @@ error_log("\n\n" . json_encode('---###---', JSON_PRETTY_PRINT) . "\n");
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
-        $this->render('Webmaster/views/maintenance.latte', Params::getAll([
+        $this->render('Webmaster/views/maintenance.latte', $this->getAllParams([
             'isMyclubWebSite' => WebApp::isMyClubWebSite(),
             'page' => $this->application->getConnectedUser()->getPage(),
         ]));

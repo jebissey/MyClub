@@ -6,7 +6,6 @@ namespace app\modules\PersonManager;
 
 use app\enums\FilterInputRule;
 use app\helpers\Application;
-use app\helpers\Params;
 use app\helpers\WebApp;
 use app\models\PersonDataHelper;
 use app\models\TableControllerDataHelper;
@@ -65,7 +64,7 @@ class PersonController extends TableController
             $this->raiseBadRequest("Unknown person {$id}", __FILE__, __LINE__);
             return;
         }
-        $this->render('User/views/user_account.latte', Params::getAll([
+        $this->render('User/views/user_account.latte', $this->getAllParams([
             'readOnly' => $person->Imported == 1 ? true : false,
             'email' => $person->Email,
             'firstName' => $person->FirstName,
@@ -134,7 +133,7 @@ class PersonController extends TableController
         }
         $_SESSION['navbar'] = 'personManager';
 
-        $this->render('Webmaster/views/personManager.latte', Params::getAll([
+        $this->render('Webmaster/views/personManager.latte', $this->getAllParams([
             'page' => $this->application->getConnectedUser()->getPage(),
         ]));
     }
@@ -170,7 +169,7 @@ class PersonController extends TableController
         ];
         $data = $this->prepareTableData($this->tableControllerDataHelper->getPersonsQuery());
 
-        $this->render('PersonManager/views/users_index.latte', Params::getAll([
+        $this->render('PersonManager/views/users_index.latte', $this->getAllParams([
             'persons' => $data['items'],
             'currentPage' => $data['currentPage'],
             'totalPages' => $data['totalPages'],

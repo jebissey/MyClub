@@ -9,7 +9,6 @@ use RuntimeException;
 use app\enums\ApplicationError;
 use app\enums\FilterInputRule;
 use app\helpers\Application;
-use app\helpers\Params;
 use app\helpers\WebApp;
 use app\models\LogDataHelper;
 use app\models\PersonStatisticsDataHelper;
@@ -33,7 +32,7 @@ class UserStatisticsController extends AbstractController
             [$seasonStart, $seasonEnd] = explode('|', $input['season'] ?? '|');
             $season = $this->personalStatisticsDataHelper->getSeasonRange($seasonStart, $seasonEnd);
 
-            $this->render('User/views/user_statistics.latte', Params::getAll([
+            $this->render('User/views/user_statistics.latte', $this->getAllParams([
                 'stats' => $this->personalStatisticsDataHelper->getStats($person, $season['start'], $season['end'], $this->application->getConnectedUser()->isWebmaster()),
                 'seasons' => $this->personalStatisticsDataHelper->getAvailableSeasons(),
                 'currentSeason' => $season,

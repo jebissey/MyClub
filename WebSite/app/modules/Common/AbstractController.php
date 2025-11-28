@@ -11,10 +11,12 @@ use Latte\Engine as LatteEngine;
 use app\enums\ApplicationError;
 use app\enums\TimeOfDay;
 use app\helpers\Application;
+use app\helpers\Params;
 use app\helpers\TranslationManager;
 use app\models\AuthorizationDataHelper;
 use app\models\DataHelper;
 use app\models\LanguagesDataHelper;
+use app\models\MetadataDataHelper;
 use app\models\PageDataHelper;
 
 abstract class AbstractController
@@ -25,6 +27,7 @@ abstract class AbstractController
     protected LanguagesDataHelper $languagesDataHelper;
     protected PageDataHelper $pageDataHelper;
     protected AuthorizationDataHelper $authorizationDataHelper;
+    private MetadataDataHelper $metadataDataHelper;
 
     public function __construct(protected Application $application)
     {
@@ -35,6 +38,7 @@ abstract class AbstractController
         $this->languagesDataHelper = new LanguagesDataHelper($application);
         $this->authorizationDataHelper = new AuthorizationDataHelper($application);
         $this->pageDataHelper = new PageDataHelper($application, $this->authorizationDataHelper);
+        $this->metadataDataHelper = new MetadataDataHelper($application);
     }
 
     #region Protected fucntions
@@ -47,6 +51,11 @@ abstract class AbstractController
             ],
             TimeOfDay::cases()
         );
+    }
+
+    protected function getAllParams(array $specificParams): array
+    {
+        return Params::getAll($specificParams, $this->metadataDataHelper->isTestSite() ? $this->metadataDataHelper->getProdSiteUrl() : null);
     }
 
     protected function getLayout()
@@ -135,7 +144,7 @@ abstract class AbstractController
     #region Public functions
     public function render(string $templateLatteName, object|array $params = []): void
     {
-#error_log("\n\n" . json_encode($name, JSON_PRETTY_PRINT) . "\n");
+        #error_log("\n\n" . json_encode($name, JSON_PRETTY_PRINT) . "\n");
         $content = $this->latte->renderToString($templateLatteName, $params);
         echo $content;
         if (ob_get_level()) ob_end_flush();

@@ -6,7 +6,6 @@ namespace app\modules\Webmaster;
 
 use app\enums\FilterInputRule;
 use app\helpers\Application;
-use app\helpers\Params;
 use app\helpers\WebApp;
 use app\models\ArwardsDataHelper;
 use app\modules\Common\AbstractController;
@@ -30,7 +29,7 @@ class ArwardsController extends AbstractController
             return;
         }
         $arwardsDataHelper = new ArwardsDataHelper($this->application);
-        $this->render('Webmaster/views/arwards.latte', Params::getAll([
+        $this->render('Webmaster/views/arwards.latte', $this->getAllParams([
             'counterNames' => $counterNames = $arwardsDataHelper->getCounterNames(),
             'data' => $arwardsDataHelper->getData($counterNames),
             'groups' => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),

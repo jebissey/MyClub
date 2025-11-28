@@ -8,7 +8,6 @@ use app\enums\ApplicationError;
 use app\enums\FilterInputRule;
 use app\helpers\Application;
 use app\helpers\ErrorManager;
-use app\helpers\Params;
 use app\helpers\WebApp;
 use app\models\EventDataHelper;
 use app\models\TableControllerDataHelper;
@@ -53,7 +52,7 @@ class EventTypeController extends TableController
             $eventType = $this->dataHelper->get('EventType', ['Id' => $id], 'Name, IdGroup');
             $existingAttributes = $this->dataHelper->gets('EventTypeAttribute', ['IdEventType' => $id], 'IdAttribute');
 
-            $this->render('Event/views/eventType_edit.latte', Params::getAll([
+            $this->render('Event/views/eventType_edit.latte', $this->getAllParams([
                 'name' => $eventType->Name,
                 'idGroup' => $eventType->IdGroup,
                 'groups' => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
@@ -79,7 +78,7 @@ class EventTypeController extends TableController
         ];
         $data = $this->prepareTableData($this->tableControllerDataHelper->getEventTypesQuery(), $filterValues);
 
-        $this->render('Event/views/eventTypes_index.latte', Params::getAll([
+        $this->render('Event/views/eventTypes_index.latte', $this->getAllParams([
             'eventTypes' => $data['items'],
             'currentPage' => $data['currentPage'],
             'totalPages' => $data['totalPages'],

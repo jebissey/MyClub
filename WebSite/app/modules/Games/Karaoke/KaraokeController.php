@@ -6,7 +6,6 @@ namespace app\modules\Games\Karaoke;
 
 use app\exceptions\LyricsParserException;
 use app\helpers\Application;
-use app\helpers\Params;
 use app\modules\Common\AbstractController;
 
 class KaraokeController extends AbstractController
@@ -29,7 +28,7 @@ class KaraokeController extends AbstractController
             $parser->parse(self::MEDIA_PATH . "{$song}.lrc");
             $connectedUser = $this->application->getConnectedUser();
 
-            $this->render('Games/Karaoke/views/karaoke.latte', Params::getAll([
+            $this->render('Games/Karaoke/views/karaoke.latte', $this->getAllParams([
                 'navItems' => $this->getNavItems($connectedUser->person),
                 'page' => $this->application->getConnectedUser()->getPage(),
                 'metadata' => $parser->getMetadata(),

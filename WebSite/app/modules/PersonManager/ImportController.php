@@ -5,7 +5,6 @@ namespace app\modules\PersonManager;
 
 use app\enums\FilterInputRule;
 use app\helpers\Application;
-use app\helpers\Params;
 use app\helpers\WebApp;
 use app\models\ImportDataHelper;
 use app\modules\Common\AbstractController;
@@ -27,7 +26,7 @@ class ImportController extends AbstractController
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isPersonManager())) {
             $this->loadSettings();
-            $this->render('PersonManager/views/users_import.latte', Params::getAll([
+            $this->render('PersonManager/views/users_import.latte', $this->getAllParams([
                 'importSettings' => $this->importSettings,
                 'results' => $this->results,
                 'page' => $this->application->getConnectedUser()->getPage()
@@ -42,7 +41,7 @@ class ImportController extends AbstractController
                 $this->results['errors']++;
                 $this->results['messages'][] = 'Veuillez sélectionner un fichier CSV valide';
 
-                $this->render('PersonManager/views/users_import.latte', Params::getAll([
+                $this->render('PersonManager/views/users_import.latte', $this->getAllParams([
                     'importSettings' => $this->importSettings,
                     'results' => $this->results,
                     'page' => $this->application->getConnectedUser()->getPage()
@@ -75,7 +74,7 @@ class ImportController extends AbstractController
                         $this->results['messages'][] = '(-) ' . $person->Email;
                     }
                 }
-                $this->render('app/views/import/form.latte', Params::getAll([
+                $this->render('app/views/import/form.latte', $this->getAllParams([
                     'importSettings' => $this->importSettings,
                     'results' => $results,
                     'page' => $this->application->getConnectedUser()->getPage()

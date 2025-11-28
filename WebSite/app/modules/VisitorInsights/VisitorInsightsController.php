@@ -7,7 +7,6 @@ namespace app\modules\VisitorInsights;
 use app\enums\Period;
 use app\enums\FilterInputRule;
 use app\helpers\Application;
-use app\helpers\Params;
 use app\helpers\PeriodHelper;
 use app\helpers\WebApp;
 use app\models\CrosstabDataHelper;
@@ -37,7 +36,7 @@ class VisitorInsightsController extends AbstractController
             $perPage = 10;
             [$logs, $totalPages] = $this->logDataHelper->getVisitedPages($perPage, $logPage, $this->flight->request()->query->getData());
 
-            $this->render('VisitorInsights/views/visitor.latte', Params::getAll([
+            $this->render('VisitorInsights/views/visitor.latte', $this->getAllParams([
                 'logs' => $logs,
                 'currentPage' => $logPage,
                 'totalPages' => $totalPages,
@@ -64,7 +63,7 @@ class VisitorInsightsController extends AbstractController
     public function membersAlerts(): void
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isVisitorInsights())) {
-            $this->render('VisitorInsights/views/membersAlerts.latte', Params::getAll([
+            $this->render('VisitorInsights/views/membersAlerts.latte', $this->getAllParams([
                 'membersAlerts' => $this->personDataHelper->getMembersAlerts(),
                 'page' => $this->application->getConnectedUser()->getPage()
             ]));
@@ -75,7 +74,7 @@ class VisitorInsightsController extends AbstractController
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isVisitorInsights())) {
             $_SESSION['navbar'] = 'visitorInsights';
-            $this->render('Webmaster/views/visitorInsights.latte', Params::getAll([
+            $this->render('Webmaster/views/visitorInsights.latte', $this->getAllParams([
                 'page' => $this->application->getConnectedUser()->getPage()
             ]));
         }
@@ -89,7 +88,7 @@ class VisitorInsightsController extends AbstractController
             $currentDate = $currentParams['date'] ?? date('Y-m-d');
             if (!strtotime($currentDate)) $currentDate = date('Y-m-d');
 
-            $this->render('VisitorInsights/views/referent.latte', Params::getAll([
+            $this->render('VisitorInsights/views/referent.latte', $this->getAllParams([
                 'period' => $period,
                 'currentDate' => $currentDate,
                 'nav' => $this->logDataAnalyticsHelper->getReferentNavigation($period, $currentDate),
@@ -112,7 +111,7 @@ class VisitorInsightsController extends AbstractController
             $offset = (int)($this->flight->request()->query->offset ?? 0);
             $data = $this->logDataAnalyticsHelper->getStatisticsData($periodType, $offset);
 
-            $this->render('VisitorInsights/views/statistics.latte', Params::getAll([
+            $this->render('VisitorInsights/views/statistics.latte', $this->getAllParams([
                 'periodTypes' => $this->periodTypes,
                 'currentPeriodType' => $periodType,
                 'currentOffset' => $offset,
@@ -127,7 +126,7 @@ class VisitorInsightsController extends AbstractController
     public function analytics(): void
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isVisitorInsights())) {
-            $this->render('VisitorInsights/views/analytics.latte', Params::getAll([
+            $this->render('VisitorInsights/views/analytics.latte', $this->getAllParams([
                 'osData' => $this->logDataStatisticsHelper->getOsDistribution(),
                 'browserData' => $this->logDataStatisticsHelper->getBrowserDistribution(),
                 'screenResolutionData' => $this->logDataStatisticsHelper->getScreenResolutionDistribution(),
@@ -146,7 +145,7 @@ class VisitorInsightsController extends AbstractController
             $dateCondition = PeriodHelper::getDateConditions($period);
             $topPages = $this->logDataHelper->getTopPages($dateCondition, self::TOP);
 
-            $this->render('VisitorInsights/views/topPages.latte', Params::getAll([
+            $this->render('VisitorInsights/views/topPages.latte', $this->getAllParams([
                 'title' => 'Top des pages visitées',
                 'period' => $period,
                 'topPages' => $topPages,
@@ -162,7 +161,7 @@ class VisitorInsightsController extends AbstractController
             $dateCondition = PeriodHelper::getDateConditions($period);
             $topPages = $this->logDataHelper->getTopArticles($dateCondition, self::TOP);
 
-            $this->render('Article/views/topArticles.latte', Params::getAll([
+            $this->render('Article/views/topArticles.latte', $this->getAllParams([
                 'title' => 'Top des articles visités par période',
                 'period' => $period,
                 'topPages' => $topPages,
@@ -187,7 +186,7 @@ class VisitorInsightsController extends AbstractController
             $period = $input['period'] != null ? $input['period'] : Period::Today->value;
             [$sortedCrossTabData, $filteredPersons, $columnTotals] = $this->crosstabDataHelper->getPersons(PeriodHelper::getDateConditions($period), $uriFilter, $emailFilter, $groupFilter);
 
-            $this->render('VisitorInsights/views/crossTab.latte', Params::getAll([
+            $this->render('VisitorInsights/views/crossTab.latte', $this->getAllParams([
                 'title' => 'Tableau croisé dynamique des visites',
                 'period' => $period,
                 'uris' => $sortedCrossTabData,
@@ -207,7 +206,7 @@ class VisitorInsightsController extends AbstractController
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isVisitorInsights())) {
             $activePersons = $this->dataHelper->gets('Person', ['Inactivated' => 0]);
-            $this->render('VisitorInsights/views/lastVisits.latte', Params::getAll([
+            $this->render('VisitorInsights/views/lastVisits.latte', $this->getAllParams([
                 'lastVisits' => $this->logDataHelper->getLastVisitPerActivePersonWithTimeAgo($activePersons),
                 'totalActiveUsers' => count($activePersons),
                 'navItems' => $this->getNavItems($this->application->getConnectedUser()->person),

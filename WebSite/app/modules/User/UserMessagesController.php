@@ -7,7 +7,6 @@ namespace app\modules\User;
 use app\enums\ApplicationError;
 use app\enums\Period;
 use app\helpers\Application;
-use app\helpers\Params;
 use app\helpers\WebApp;
 use app\models\MessageDataHelper;
 use app\modules\Common\AbstractController;
@@ -37,7 +36,7 @@ class UserMessagesController extends AbstractController
 
             $messages = $this->messageDataHelper->getGroupedMessages($connectedUser->person->Id, $searchFrom);
 
-            $this->render('User/views/messages.latte', Params::getAll([
+            $this->render('User/views/messages.latte', $this->getAllParams([
                 'messages' => $messages,
                 'searchFrom' => $searchFrom,
                 'searchMode' => $searchMode,

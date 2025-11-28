@@ -8,7 +8,6 @@ use app\enums\ApplicationError;
 use app\enums\FilterInputRule;
 use app\helpers\Application;
 use app\helpers\GravatarHandler;
-use app\helpers\Params;
 use app\helpers\WebApp;
 use app\modules\Common\AbstractController;
 
@@ -26,7 +25,7 @@ class UserPresentationController extends AbstractController
                 $this->raiseMethodNotAllowed(__FILE__, __LINE__);
                 return;
             }
-            $this->render('User/views/user_edit_presentation.latte', Params::getAll([
+            $this->render('User/views/user_edit_presentation.latte', $this->getAllParams([
                 'person' => $person,
                 'navItems' => $this->getNavItems($person),
                 'page' => $this->application->getConnectedUser()->getPage(),
@@ -72,7 +71,7 @@ class UserPresentationController extends AbstractController
                 return;
             }
 
-            $this->render('User/views/user_presentation.latte', Params::getAll([
+            $this->render('User/views/user_presentation.latte', $this->getAllParams([
                 'person' => $person,
                 'loggedPerson' => $loggedPerson,
                 'navItems' => $this->getNavItems($person),

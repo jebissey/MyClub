@@ -8,7 +8,6 @@ use \Minishlink\WebPush\VAPID;
 
 use app\enums\FilterInputRule;
 use app\helpers\Application;
-use app\helpers\Params;
 use app\helpers\WebApp;
 use app\models\ArticleDataHelper;
 use app\models\LogDataHelper;
@@ -27,7 +26,7 @@ class WebmasterController extends AbstractController
     public function helpAdmin()
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isAdministrator())) {
-            $this->render('Common/views/info.latte', Params::getAll([
+            $this->render('Common/views/info.latte', $this->getAllParams([
                 'content' => $this->dataHelper->get('Settings', ['Name' => 'Help_admin'], 'Value')->Value ?? '',
                 'hasAuthorization' => $this->application->getConnectedUser()->isEventManager(),
                 'currentVersion' => Application::VERSION,
@@ -74,7 +73,7 @@ class WebmasterController extends AbstractController
                 $this->raiseMethodNotAllowed(__FILE__, __LINE__);
                 return;
             }
-            $this->render('Webmaster/views/admin.latte', Params::getAll([
+            $this->render('Webmaster/views/admin.latte', $this->getAllParams([
                 'page' => $this->application->getConnectedUser()->getPage(),
             ]));
         }
@@ -89,7 +88,7 @@ class WebmasterController extends AbstractController
             if (!$result['success']) $newVersion = "Test for MyClub new version error : " . $result['error'];
             elseif ($result['version'] != Application::VERSION) $newVersion = "A new version is available (V" . $result['version'] . ")";
 
-            $this->render('Webmaster/views/webmaster.latte', Params::getAll([
+            $this->render('Webmaster/views/webmaster.latte', $this->getAllParams([
                 'newVersion' => $newVersion,
                 'isMyclubWebSite' => WebApp::isMyClubWebSite(),
                 'page' => $this->application->getConnectedUser()->getPage()
@@ -130,7 +129,7 @@ class WebmasterController extends AbstractController
     public function sendEmailCredentialsEdit(): void
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isAdministrator())) {
-            $this->render('Webmaster/views/emailCredentials.latte', Params::getAll([
+            $this->render('Webmaster/views/emailCredentials.latte', $this->getAllParams([
                 'navItems' => $this->getNavItems($this->application->getConnectedUser()->person),
                 'isMyclubWebSite' => WebApp::isMyClubWebSite(),
                 'page' => $this->application->getConnectedUser()->getPage()
@@ -168,7 +167,7 @@ class WebmasterController extends AbstractController
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isWebmaster())) {
             $installations = $this->logDataHelper->getInstallationsData();
 
-            $this->render('Webmaster/views/installations.latte', Params::getAll([
+            $this->render('Webmaster/views/installations.latte', $this->getAllParams([
                 'installations' => $installations,
                 'totalInstallations' => count($installations),
                 'navItems' => $this->getNavItems($this->application->getConnectedUser()->person),

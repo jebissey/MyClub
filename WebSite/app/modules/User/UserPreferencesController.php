@@ -6,7 +6,6 @@ namespace app\modules\User;
 
 use app\enums\FilterInputRule;
 use app\helpers\Application;
-use app\helpers\Params;
 use app\helpers\WebApp;
 use app\models\AttributeDataHelper;
 use app\models\EventTypeDataHelper;
@@ -38,7 +37,7 @@ class UserPreferencesController extends AbstractController
             $eventTypesWithAttributes[] = $eventType;
         }
 
-        $this->render('User/views/user_preferences.latte', Params::getAll([
+        $this->render('User/views/user_preferences.latte', $this->getAllParams([
             'currentPreferences' => json_decode($person->Preferences ?? '', true),
             'eventTypes' => $eventTypesWithAttributes,
             'page' => $this->application->getConnectedUser()->getPage(1),

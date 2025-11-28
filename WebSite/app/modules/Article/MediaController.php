@@ -6,7 +6,6 @@ namespace app\modules\Article;
 
 use app\helpers\Application;
 use app\helpers\Media;
-use app\helpers\Params;
 use app\helpers\WebApp;
 use app\models\ArticleDataHelper;
 use app\models\CarouselDataHelper;
@@ -63,7 +62,7 @@ class MediaController extends AbstractController
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
-        $this->render('Article/views/media_gpxViewer.latte', Params::getAll([
+        $this->render('Article/views/media_gpxViewer.latte', $this->getAllParams([
             'page' => $this->application->getConnectedUser()->getPage(),
         ]));
     }
@@ -88,7 +87,7 @@ class MediaController extends AbstractController
         $years = $this->getAvailableYears();
         if (in_array($year, $years) || in_array($year, $years)) $files = $this->getFiles((int)$year, $month, $fileExtension, $search);
 
-        $this->render('Article/views/media_index.latte',  Params::getAll([
+        $this->render('Article/views/media_index.latte',  $this->getAllParams([
             'files' => $files,
             'years' => $years,
             'currentYear' => $year,
@@ -114,7 +113,7 @@ class MediaController extends AbstractController
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
-        $this->render('Article/views/media_upload.latte', Params::getAll([
+        $this->render('Article/views/media_upload.latte', $this->getAllParams([
             'page' => $this->application->getConnectedUser()->getPage(),
         ]));
     }
@@ -130,7 +129,7 @@ class MediaController extends AbstractController
             return;
         }
         $path = $this->flight->request()->query->path ?? '';
-        $this->render('Article/views/media_uses.latte', Params::getAll([
+        $this->render('Article/views/media_uses.latte', $this->getAllParams([
             'path' => $path,
             'articles' => $path !== '' ? $this->articleDataHelper->inArticles($path) : [],
             'page' => $this->application->getConnectedUser()->getPage(),

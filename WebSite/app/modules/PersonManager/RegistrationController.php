@@ -8,9 +8,7 @@ use Throwable;
 
 use app\enums\FilterInputRule;
 use app\helpers\Application;
-use app\helpers\Params;
 use app\helpers\WebApp;
-use app\models\GenericDataHelper;
 use app\models\GroupDataHelper;
 use app\models\TableControllerDataHelper;
 use app\modules\Common\TableController;
@@ -45,7 +43,7 @@ class RegistrationController extends TableController
                 ['field' => 'NickName', 'label' => 'Surnom']
             ];
             $data = $this->prepareTableData($this->tableControllerDataHelper->getPersonsQuery(), $filterValues);
-            $this->render('PersonManager/views/registration_groups_index.latte', Params::getAll([
+            $this->render('PersonManager/views/registration_groups_index.latte', $this->getAllParams([
                 'persons' => $data['items'],
                 'currentPage' => $data['currentPage'],
                 'totalPages' => $data['totalPages'],
@@ -67,7 +65,7 @@ class RegistrationController extends TableController
             [$availableGroups, $currentGroups] = $this->groupDataHelper->getAvailableGroups($this->application->getConnectedUser(), $personId);
 
             try {
-                $this->render('PersonManager/views/registration_user_groups_partial.latte', Params::getAll([
+                $this->render('PersonManager/views/registration_user_groups_partial.latte', $this->getAllParams([
                     'currentGroups' => $currentGroups,
                     'availableGroups' => $availableGroups,
                     'personId' => $personId,

@@ -10,7 +10,6 @@ use app\enums\FilterInputRule;
 use app\enums\SurveyVisibility;
 use app\exceptions\IntegrityException;
 use app\helpers\Application;
-use app\helpers\Params;
 use app\helpers\WebApp;
 use app\models\SurveyDataHelper;
 use app\modules\Common\AbstractController;
@@ -37,7 +36,7 @@ class SurveyController extends AbstractController
             $this->redirect('/articles');
             return;
         }
-        $this->render('Article/views/survey_add.latte', Params::getAll([
+        $this->render('Article/views/survey_add.latte', $this->getAllParams([
             'article' => $article,
             'survey' => $this->dataHelper->get('Survey', ['IdArticle' => $article->Id], 'Question, Options, ClosingDate, Visibility'),
             'page' => $this->application->getConnectedUser()->getPage(),

@@ -8,7 +8,6 @@ use RuntimeException;
 
 use app\enums\FilterInputRule;
 use app\helpers\Application;
-use app\helpers\Params;
 use app\helpers\WebApp;
 use app\models\DesignDataHelper;
 use app\modules\Common\AbstractController;
@@ -31,7 +30,7 @@ class DesignController extends AbstractController
         }
         [$designs, $userVotes] = $this->designDataHelper->getUsersVotes($this->application->getConnectedUser()->person->Id);
 
-        $this->render('Article/views/designs_index.latte', Params::getAll([
+        $this->render('Article/views/designs_index.latte', $this->getAllParams([
             'designs' => $designs,
             'groups' => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
             'userVotes' => $userVotes,
@@ -49,7 +48,7 @@ class DesignController extends AbstractController
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
-        $this->render('Article/views/design_create.latte', Params::getAll([
+        $this->render('Article/views/design_create.latte', $this->getAllParams([
             'groups' => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
             'page' => $this->application->getConnectedUser()->getPage(),
         ]));
@@ -106,7 +105,7 @@ class DesignController extends AbstractController
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isDesigner())) {
             $_SESSION['navbar'] = 'designer';
-            $this->render('Designer/views/designer.latte', Params::getAll([
+            $this->render('Designer/views/designer.latte', $this->getAllParams([
                 'page' => $this->application->getConnectedUser()->getPage()
             ]));
         }

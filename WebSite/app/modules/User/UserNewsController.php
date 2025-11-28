@@ -7,7 +7,6 @@ namespace app\modules\User;
 use app\enums\ApplicationError;
 use app\helpers\Application;
 use app\helpers\News;
-use app\helpers\Params;
 use app\helpers\WebApp;
 use app\modules\Common\AbstractController;
 
@@ -34,7 +33,7 @@ class UserNewsController extends AbstractController
             elseif ($searchMode === \app\enums\Period::Year->value)    $searchFrom = date('Y-m-d H:i:s', strtotime('-1 year'));
             else $searchFrom = date('Y-m-d H:i:s', strtotime('-1 day'));
 
-            $this->render('User/views/news.latte', Params::getAll([
+            $this->render('User/views/news.latte', $this->getAllParams([
                 'news' => $this->news->getNewsForPerson($connectedUser, $searchFrom),
                 'searchFrom' => $searchFrom,
                 'searchMode' => $searchMode,

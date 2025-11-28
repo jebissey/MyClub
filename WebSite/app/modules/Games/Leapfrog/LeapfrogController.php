@@ -6,7 +6,6 @@ namespace app\modules\Games\Leapfrog;
 
 use app\enums\FilterInputRule;
 use app\helpers\Application;
-use app\helpers\Params;
 use app\helpers\WebApp;
 use app\models\TableControllerDataHelper;
 use app\modules\Common\TableController;
@@ -38,7 +37,7 @@ class LeapfrogController extends TableController
         ];
         $gameId = bin2hex(random_bytes(8));
 
-        $this->render('Games/Leapfrog/views/leapfrog.latte', Params::getAll([
+        $this->render('Games/Leapfrog/views/leapfrog.latte', $this->getAllParams([
             'navItems' => $this->getNavItems($connectedUser->person),
             'page' => $this->application->getConnectedUser()->getPage(),
             'titre' => "Saute-Mouton",
@@ -77,7 +76,7 @@ class LeapfrogController extends TableController
         ];
         $data = $this->prepareTableData($this->tableControllerDataHelper->getLeapfrogQuery(), $filterValues, true);
 
-        $this->render('Games/Leapfrog/views/statistics.latte', Params::getAll([
+        $this->render('Games/Leapfrog/views/statistics.latte', $this->getAllParams([
             'games' => $data['items'],
             'currentPage' => $data['currentPage'],
             'totalPages' => $data['totalPages'],

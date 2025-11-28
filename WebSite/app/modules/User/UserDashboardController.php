@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace app\modules\User;
 
 use app\helpers\Application;
-use app\helpers\Params;
 use app\modules\Common\AbstractController;
 
 class UserDashboardController extends AbstractController
@@ -25,7 +24,7 @@ class UserDashboardController extends AbstractController
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
-        $this->render('Common/views/info.latte', Params::getAll([
+        $this->render('Common/views/info.latte', $this->getAllParams([
             'content' => $this->dataHelper->get('Settings', ['Name' => 'Help_user'], 'Value')->Value ?? '',
             'hasAuthorization' => $this->application->getConnectedUser()->hasAutorization(),
             'currentVersion' => Application::VERSION,
@@ -46,7 +45,7 @@ class UserDashboardController extends AbstractController
             return;
         }
         $_SESSION['navbar'] = 'user';
-        $this->render('User/views/user.latte', Params::getAll([
+        $this->render('User/views/user.latte', $this->getAllParams([
             'page' => ''
         ]));
     }

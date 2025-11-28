@@ -7,7 +7,6 @@ namespace app\modules\Games\Solfege;
 use Throwable;
 
 use app\helpers\Application;
-use app\helpers\Params;
 use app\modules\Common\AbstractController;
 
 class SolfegeController extends AbstractController
@@ -24,7 +23,7 @@ class SolfegeController extends AbstractController
             return;
         }
 
-        $this->render('Event/views/solfege_learn.latte', Params::getAll([
+        $this->render('Event/views/solfege_learn.latte', $this->getAllParams([
             'navItems' => $this->getNavItems($this->application->getConnectedUser()->person),
             'title' => 'Apprentissage du Solfège',
             'page' => $this->application->getConnectedUser()->getPage(),

@@ -9,7 +9,6 @@ use Throwable;
 
 use app\enums\FilterInputRule;
 use app\helpers\Application;
-use app\helpers\Params;
 use app\helpers\WebApp;
 use app\models\EventDataHelper;
 use app\modules\Common\AbstractController;
@@ -34,7 +33,7 @@ class EventGuestController extends AbstractController
         }
         $events = $this->eventDataHelper->getEventsForAllOrGuest();
 
-        $this->render('Event/views/guest.latte', Params::getAll([
+        $this->render('Event/views/guest.latte', $this->getAllParams([
             'events' => $events,
             'navbarTemplate' => '../navbar/eventManager.latte',
             'layout' => $this->getLayout(),

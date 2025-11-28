@@ -8,30 +8,32 @@ use InvalidArgumentException;
 
 use app\helpers\Application;
 use app\helpers\TranslationManager;
-use app\models\MetadataDataHelper;
+
 
 class Params
 {
     private static array $commonParams = [];
-    private static MetadataDataHelper $metadataDataHelper;
 
-    public static function getAll(array $specificParams): array
+    public static function getAll(array $specificParams, ?string $prodSiteUrl): array
     {
+error_log("\n\n" . json_encode($prodSiteUrl, JSON_PRETTY_PRINT) . "\n");      
         if (self::$commonParams === []) {
-            self::$metadataDataHelper = new MetadataDataHelper(Application::init());
-            self::setDefaultParams($_SERVER['REQUEST_URI']);
+            self::setDefaultParams($_SERVER['REQUEST_URI'], $prodSiteUrl);
         }
+error_log("\n\n" . json_encode(self::$commonParams, JSON_PRETTY_PRINT) . "\n");         
         return array_merge(self::$commonParams, $specificParams);
     }
 
-    public static function setParams($params)
+    public static function setParams($params, $prodSiteUrl)
     {
         self::$commonParams = $params;
+        if ($prodSiteUrl !== null) self::$commonParams['productionSiteUrl'] = $prodSiteUrl;
     }
 
     #region Private functions
-    private static function setDefaultParams(string $requestUri): void
+    private static function setDefaultParams(string $requestUri, ?string $prodSiteUrl): void
     {
+error_log("\n\n" . json_encode($requestUri, JSON_PRETTY_PRINT) . "\n");           
         $path = parse_url($requestUri, PHP_URL_PATH);
         if ($path === false || $path === null) throw new InvalidArgumentException('Invalid URI provided');
         $segments = explode('/', trim($path, '/'));
@@ -58,7 +60,6 @@ class Params
             'supportedLanguages' => TranslationManager::getSupportedLanguages(),
             'flag' => TranslationManager::getFlag($lang),
         ];
-
-        if (self::$metadataDataHelper->isTestSite()) self::$commonParams['productionSiteUrl'] = self::$metadataDataHelper->getProdSiteUrl();
+        if ($prodSiteUrl !== null) self::$commonParams['productionSiteUrl'] = $prodSiteUrl;
     }
 }

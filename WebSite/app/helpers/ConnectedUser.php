@@ -10,6 +10,7 @@ use app\helpers\Params;
 use app\helpers\TranslationManager;
 use app\models\AuthorizationDataHelper;
 use app\models\DataHelper;
+use app\models\MetadataDataHelper;
 
 class ConnectedUser
 {
@@ -17,11 +18,13 @@ class ConnectedUser
     private DataHelper $dataHelper;
     private AuthorizationDataHelper $authorizationDataHelper;
     public ?object $person;
+    private MetadataDataHelper $metadataDataHelper;
 
     public function __construct(private Application $application)
     {
         $this->dataHelper = new DataHelper($this->application);
         $this->authorizationDataHelper = new AuthorizationDataHelper($this->application);
+        $this->metadataDataHelper = new MetadataDataHelper($application);
     }
 
     public function get(): void
@@ -60,7 +63,7 @@ class ConnectedUser
             'currentLanguage' => $lang,
             'supportedLanguages' => TranslationManager::getSupportedLanguages(),
             'flag' => TranslationManager::getFlag($lang),
-        ]);
+        ], $this->metadataDataHelper->isTestSite() && !empty($prodSiteUrl = $this->metadataDataHelper->getProdSiteUrl()) ? $prodSiteUrl : null);
         return;
     }
 

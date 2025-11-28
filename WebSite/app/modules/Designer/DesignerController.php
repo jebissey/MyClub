@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace app\modules\Designer;
 
 use app\helpers\Application;
-use app\helpers\Params;
 use app\modules\Common\AbstractController;
 
 class DesignerController extends AbstractController
@@ -33,7 +32,7 @@ class DesignerController extends AbstractController
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isDesigner())) {
             $_SESSION['navbar'] = 'designer';
-            $this->render('Designer/views/designer.latte', Params::getAll([
+            $this->render('Designer/views/designer.latte', $this->getAllParams([
                 'page' => $this->application->getConnectedUser()->getPage()
             ]));
         }

@@ -6,7 +6,6 @@ namespace app\modules\User;
 
 use app\enums\FilterInputRule;
 use app\helpers\Application;
-use app\helpers\Params;
 use app\helpers\WebApp;
 use app\modules\Common\AbstractController;
 
@@ -29,7 +28,7 @@ class UserAvailabilitiesController extends AbstractController
             return;
         }
         $currentAvailabilities = json_decode($person->Availabilities ?? '', true);
-        $this->render('User/views/user_availabilities.latte', Params::getAll([
+        $this->render('User/views/user_availabilities.latte', $this->getAllParams([
             'currentAvailabilities' => $currentAvailabilities,
             'page' => $this->application->getConnectedUser()->getPage(1),
         ]));

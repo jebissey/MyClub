@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace app\modules\User;
 
 use app\helpers\Application;
-use app\helpers\Params;
 use app\models\ParticipantDataHelper;
 use app\modules\Common\AbstractController;
 
@@ -41,7 +40,7 @@ class UserConnectionsController extends AbstractController
         }
         $data = $this->participantDataHelper->getConnections($idPerson);
         $user = $this->dataHelper->get('Person', ['Id' => $idPerson], 'FirstName, LastName, NickName');
-        $this->render('User/views/user_connections.latte', Params::getAll([
+        $this->render('User/views/user_connections.latte', $this->getAllParams([
             'connections' => $data['connections'],
             'maxEvents'   => $data['maxEvents'],
             'layout' => $this->getLayout(),

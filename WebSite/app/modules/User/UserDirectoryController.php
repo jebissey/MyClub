@@ -6,7 +6,6 @@ namespace app\modules\User;
 
 use app\helpers\Application;
 use app\helpers\GravatarHandler;
-use app\helpers\Params;
 use app\helpers\WebApp;
 use app\models\GroupDataHelper;
 use app\models\PersonDataHelper;
@@ -49,7 +48,7 @@ class UserDirectoryController extends AbstractController
             }
         }
         $groupCounts = $this->groupDataHelper->getGroupCount();
-        $this->render('User/views/users_directory.latte', Params::getAll([
+        $this->render('User/views/users_directory.latte', $this->getAllParams([
             'persons' => $persons,
             'navItems' => $this->getNavItems($person),
             'loggedPerson' => $person,
@@ -104,7 +103,7 @@ class UserDirectoryController extends AbstractController
             }
         }
 
-        $this->render('User/views/users_map.latte', Params::getAll([
+        $this->render('User/views/users_map.latte', $this->getAllParams([
             'locationData' => $locationData,
             'membersCount' => count($locationData),
             'navItems' => $this->getNavItems($person),

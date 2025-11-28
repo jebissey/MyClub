@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace app\modules\Event;
 
 use app\helpers\Application;
-use app\helpers\Params;
 use app\models\NeedDataHelper;
 use app\modules\Common\AbstractController;
 
@@ -24,7 +23,7 @@ class EventNeedController extends AbstractController
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
         }
-        $this->render('Event/views/event_needs.latte', Params::getAll([
+        $this->render('Event/views/event_needs.latte', $this->getAllParams([
             'navItems' => $this->getNavItems($this->application->getConnectedUser()->person),
             'needTypes' => $this->dataHelper->gets('NeedType', [], '*', 'Name'),
             'needs' => $this->needDataHelper->getNeedsAndTheirTypes(),
