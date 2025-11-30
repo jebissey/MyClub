@@ -1,0 +1,154 @@
+{extends "user.latte"}
+
+{block content}
+<form method="POST" data-form="checkSave">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="mb-3">
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="noNotification" name="noNotification" {isset($currentNotifications['noNotification']) ? checked : ''}>
+                    <label class="form-check-label" for="noNotification">
+                        <strong>Ne recevoir aucune notification</strong>
+                    </label>
+                </div>
+            </div>
+            <div id="alertOptions">
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Sélectionnez les notifications que vous souhaitez recevoir</h5>
+                    </div>
+                    <div class="card-body">
+    <!-- Articles -->
+                        <div class="Articles mb-4">
+                            <h6 class="fw-bold mb-3">Articles</h6>
+                            
+                            <!-- Nouvel article avec sondage sur la même ligne -->
+                            <div class="d-flex align-items-center gap-2 mb-2">
+                                <div class="form-check mb-0">
+                                    <input type="checkbox" class="form-check-input" id="newArticle" name="notifications[newArticle]" {isset($currentNotifications['newArticle']) ? checked : ''}>
+                                    <label class="form-check-label" for="newArticle">Nouvel article</label>
+                                </div>
+                                <div class="form-check mb-0" id="newArticlePollWrapper" style="display: none;">
+                                    <input type="checkbox" class="form-check-input" id="newArticlePoll" name="notifications[newArticlePoll]" {isset($currentNotifications['newArticlePoll']) ? checked : ''}>
+                                    <label class="form-check-label" for="newArticlePoll">avec sondage</label>
+                                </div>
+                            </div>
+                            
+                            <!-- Article mis à jour avec sondage sur la même ligne -->
+                            <div class="d-flex align-items-center gap-2 mb-2">
+                                <div class="form-check mb-0">
+                                    <input type="checkbox" class="form-check-input" id="updatedArticle" name="notifications[updatedArticle]" {isset($currentNotifications['updatedArticle']) ? checked : ''}>
+                                    <label class="form-check-label" for="updatedArticle">Article mis à jour</label>
+                                </div>
+                                <div class="form-check mb-0" id="updatedArticlePollWrapper" style="display: none;">
+                                    <input type="checkbox" class="form-check-input" id="updatedArticlePoll" name="notifications[updatedArticlePoll]" {isset($currentNotifications['updatedArticlePoll']) ? checked : ''}>
+                                    <label class="form-check-label" for="updatedArticlePoll">avec sondage</label>
+                                </div>
+                            </div>
+                            
+                            <!-- Nouveau vote sur un sondage avec conditions sur la même ligne -->
+                            <div class="d-flex align-items-center gap-2 mt-2">
+                                <div class="form-check mb-0">
+                                    <input type="checkbox" class="form-check-input" id="newPollVote" name="notifications[newPollVote]" {isset($currentNotifications['newPollVote']) ? checked : ''}>
+                                    <label class="form-check-label" for="newPollVote">Nouveau vote sur un sondage</label>
+                                </div>
+                                <div id="newPollVoteOptionsWrapper" style="display: none;">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="form-check mb-0">
+                                            <input type="checkbox" class="form-check-input" id="newPollVoteIfVoted" name="notifications[newPollVoteIfVoted]" {isset($currentNotifications['newPollVoteIfVoted']) ? checked : ''}>
+                                            <label class="form-check-label" for="newPollVoteIfVoted">si j'ai voté</label>
+                                        </div>
+                                        <div class="form-check mb-0">
+                                            <input type="checkbox" class="form-check-input" id="newPollVoteIfAuthor" name="notifications[newPollVoteIfAuthor]" {isset($currentNotifications['newPollVoteIfAuthor']) ? checked : ''}>
+                                            <label class="form-check-label" for="newPollVoteIfAuthor">si je suis l'auteur</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+    <!-- Messages -->
+                        <div class="Messages">
+                            <h6 class="fw-bold mb-3">Messages</h6>
+                            
+                            <!-- Messages sur un article -->
+                            <div class="d-flex align-items-center gap-2 mb-2">
+                                <div class="form-check mb-0">
+                                    <input type="checkbox" class="form-check-input" id="messageOnArticle" name="notifications[messageOnArticle]" {isset($currentNotifications['messageOnArticle']) ? checked : ''}>
+                                    <label class="form-check-label" for="messageOnArticle">sur un article</label>
+                                </div>
+                                <div class="form-check mb-0" id="messageOnArticleIfAuthorWrapper" style="display: none;">
+                                    <input type="checkbox" class="form-check-input" id="messageOnArticleIfAuthor" name="notifications[messageOnArticleIfAuthor]" {isset($currentNotifications['messageOnArticleIfAuthor']) ? checked : ''}>
+                                    <label class="form-check-label" for="messageOnArticleIfAuthor">si je suis l'auteur</label>
+                                </div>
+                            </div>
+                            
+                            <!-- Messages sur un événement -->
+                            <div class="d-flex align-items-center gap-2 mb-2">
+                                <div class="form-check mb-0">
+                                    <input type="checkbox" class="form-check-input" id="messageOnEvent" name="notifications[messageOnEvent]" {isset($currentNotifications['messageOnEvent']) ? checked : ''}>
+                                    <label class="form-check-label" for="messageOnEvent">sur un événement</label>
+                                </div>
+                                <div id="messageOnEventOptionsWrapper" style="display: none;">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="form-check mb-0">
+                                            <input type="checkbox" class="form-check-input" id="messageOnEventIfRegistered" name="notifications[messageOnEventIfRegistered]" {isset($currentNotifications['messageOnEventIfRegistered']) ? checked : ''}>
+                                            <label class="form-check-label" for="messageOnEventIfRegistered">si je suis inscrit</label>
+                                        </div>
+                                        <div class="form-check mb-0">
+                                            <input type="checkbox" class="form-check-input" id="messageOnEventIfInPreferences" name="notifications[messageOnEventIfInPreferences]" {isset($currentNotifications['messageOnEventIfInPreferences']) ? checked : ''}>
+                                            <label class="form-check-label" for="messageOnEventIfInPreferences">si dans mes préférences</label>
+                                        </div>
+                                        <div class="form-check mb-0">
+                                            <input type="checkbox" class="form-check-input" id="messageOnEventIfCreator" name="notifications[messageOnEventIfCreator]" {isset($currentNotifications['messageOnEventIfCreator']) ? checked : ''}>
+                                            <label class="form-check-label" for="messageOnEventIfCreator">si je suis le créateur</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-check mt-2">
+                                <input type="checkbox" class="form-check-input" id="messageOnGroupSubscribed" name="notifications[messageOnGroupSubscribed]" {isset($currentNotifications['messageOnGroupSubscribed']) ? checked : ''}>
+                                <label class="form-check-label" for="messageOnGroupSubscribed">sur un groupe où j'ai été inscrit</label>
+                            </div>
+                            <div class="ms-4" id="groupsSubscribed">
+                                {foreach $groups as $group}
+                                    {if $group->Type === 'subscribed'}
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input group-subscribed-child" id="group_subscribed_{$group->Id}" name="notifications[groupsSubscribed][{$group->Id}]" {isset($currentNotifications['groupsSubscribed'][$group->Id]) ? checked : ''}>
+                                    <label class="form-check-label" for="group_subscribed_{$group->Id}">{$group->Name}</label>
+                                </div>
+                                    {/if}
+                                {/foreach}
+                            </div>
+                            <div class="form-check mt-2">
+                                <input type="checkbox" class="form-check-input" id="messageOnGroupJoined" name="notifications[messageOnGroupJoined]" {isset($currentNotifications['messageOnGroupJoined']) ? checked : ''}>
+                                <label class="form-check-label" for="messageOnGroupJoined">sur un groupe où je me suis inscrit</label>
+                            </div>
+                            <div class="ms-4" id="groupsJoined">
+                                {foreach $groups as $group}
+                                    {if $group->Type === 'joined'}
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input group-joined-child" id="group_joined_{$group->Id}" name="notifications[groupsJoined][{$group->Id}]" {isset($currentNotifications['groupsJoined'][$group->Id]) ? checked : ''}>
+                                    <label class="form-check-label" for="group_joined_{$group->Id}">{$group->Name}</label>
+                                </div>
+                                    {/if}
+                                {/foreach}
+                            </div>
+                            <div class="form-check mt-2">
+                                <input type="checkbox" class="form-check-input" id="messageOnGroupNotJoined" name="notifications[messageOnGroupNotJoined]" {isset($currentNotifications['messageOnGroupNotJoined']) ? checked : ''}>
+                                <label class="form-check-label" for="messageOnGroupNotJoined">sur un groupe où je ne me suis pas inscrit</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="mt-4">
+        <button type="submit" class="btn btn-primary">Valider</button>
+    </div>
+</form>
+{/block}
+
+{block scripts}
+<script src="/app/modules/User/js/notifications.js"></script>
+{/block}

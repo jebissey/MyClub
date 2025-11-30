@@ -63,6 +63,7 @@ use app\modules\User\UserGroupsController;
 use app\modules\User\UserMessagesController;
 use app\modules\User\UserNewsController;
 use app\modules\User\UserNotepadController;
+use app\modules\User\UserNotificationsController;
 use app\modules\User\UserPreferencesController;
 use app\modules\User\UserPresentationController;
 use app\modules\User\UserStatisticsController;
@@ -380,6 +381,14 @@ class ControllerFactory
     public function makeUserNotepadController(): UserNotepadController
     {
         return new UserNotepadController($this->application);
+    }
+
+    public function makeUserNotificationsController(): UserNotificationsController
+    {
+        return new UserNotificationsController(
+            $this->application,
+            $this->groupDataHelper
+        );
     }
 
     public function makeUserPreferencesController(): UserPreferencesController

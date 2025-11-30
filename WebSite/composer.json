@@ -2,7 +2,7 @@
     "require": {
         "flightphp/core": "^3.13",
         "latte/latte": "^3.0",
-        "tracy/tracy": "^2.10",
+        "tracy/tracy": "^2.11",
         "envms/fluentpdo": "^2.2",
         "ua-parser/uap-php": "^3.9",
         "guzzlehttp/guzzle": "^7.9",

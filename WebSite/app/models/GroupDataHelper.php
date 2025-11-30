@@ -133,6 +133,28 @@ class GroupDataHelper extends Data
         return $this->query($sql);
     }
 
+    public function getGroupsWithType(int $idPerson): array|false
+    {
+        $query = $this->pdo->prepare("
+            SELECT 
+                g.Id,
+                g.Name,
+                CASE
+                    WHEN pg.Id IS NOT NULL AND g.SelfRegistration = 1 THEN 'joined'
+                    WHEN pg.Id IS NOT NULL AND g.SelfRegistration = 0 THEN 'subscribed'
+                    ELSE ''
+                END AS Type
+            FROM 'Group' g
+            LEFT JOIN PersonGroup pg 
+                ON pg.IdGroup = g.Id 
+                AND pg.IdPerson = :idPerson
+            WHERE 
+                (g.SelfRegistration = 1 OR pg.Id IS NOT NULL) AND g.Inactivated = 0        
+            ORDER BY Type, g.Name;");
+        $query->execute([$idPerson]);
+        return $query->fetchAll();
+    }
+
     public function getGroupCount(): array
     {
         $groupCounts = [];

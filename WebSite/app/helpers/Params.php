@@ -16,11 +16,9 @@ class Params
 
     public static function getAll(array $specificParams, ?string $prodSiteUrl): array
     {
-error_log("\n\n" . json_encode($prodSiteUrl, JSON_PRETTY_PRINT) . "\n");      
         if (self::$commonParams === []) {
             self::setDefaultParams($_SERVER['REQUEST_URI'], $prodSiteUrl);
         }
-error_log("\n\n" . json_encode(self::$commonParams, JSON_PRETTY_PRINT) . "\n");         
         return array_merge(self::$commonParams, $specificParams);
     }
 
@@ -33,7 +31,6 @@ error_log("\n\n" . json_encode(self::$commonParams, JSON_PRETTY_PRINT) . "\n");
     #region Private functions
     private static function setDefaultParams(string $requestUri, ?string $prodSiteUrl): void
     {
-error_log("\n\n" . json_encode($requestUri, JSON_PRETTY_PRINT) . "\n");           
         $path = parse_url($requestUri, PHP_URL_PATH);
         if ($path === false || $path === null) throw new InvalidArgumentException('Invalid URI provided');
         $segments = explode('/', trim($path, '/'));

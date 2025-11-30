@@ -56,6 +56,7 @@ use app\config\routes\UserGroups;
 use app\config\routes\UserMessages;
 use app\config\routes\UserNews;
 use app\config\routes\UserNotepad;
+use app\config\routes\UserNotifications;
 use app\config\routes\UserPreferences;
 use app\config\routes\UserPresentation;
 use app\config\routes\UserStatistics;
@@ -262,6 +263,7 @@ class Routes
         $this->routes = array_merge($this->routes, (new UserMessages($this->controllerFactory))->get());
         $this->routes = array_merge($this->routes, (new UserNews($this->controllerFactory))->get());
         $this->routes = array_merge($this->routes, (new UserNotepad($this->controllerFactory))->get());
+        $this->routes = array_merge($this->routes, (new UserNotifications($this->controllerFactory))->get());
         $this->routes = array_merge($this->routes, (new UserPreferences($this->controllerFactory))->get());
         $this->routes = array_merge($this->routes, (new UserPresentation($this->controllerFactory))->get());
         $this->routes = array_merge($this->routes, (new UserStatistics($this->controllerFactory))->get());
