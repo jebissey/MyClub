@@ -200,7 +200,7 @@ class LogDataHelper extends Data
     {
         $query = "
             SELECT 
-                Who,
+                IpAddress,
                 MAX(CreatedAt) as lastCheck,
                 COUNT(*) as checkCount,
                 GROUP_CONCAT(DISTINCT 
@@ -213,21 +213,37 @@ class LogDataHelper extends Data
                 GROUP_CONCAT(DISTINCT Message) as phpVersions
             FROM Log 
             WHERE Uri LIKE '/api/lastVersion%'
-            GROUP BY Who
+            GROUP BY IpAddress
             ORDER BY MAX(CreatedAt) DESC
         ";
         $results = $this->pdoForLog->query($query)->fetchAll();
+
+        $dnsCache = [];
         foreach ($results as &$installation) {
             if ($installation->webappVersions) {
                 $versions = array_filter(array_unique(explode(',', $installation->webappVersions)));
                 $installation->webappVersions = implode(', ', $versions);
             } else $installation->webappVersions = 'Version inconnue';
+
             if ($installation->phpVersions) {
                 $phpVersions = array_filter(array_unique(explode(',', $installation->phpVersions)));
                 $installation->phpVersions = implode(', ', $phpVersions);
             } else $installation->phpVersions = 'Version inconnue';
+
             $installation->timeAgo = $this->getTimeAgo($installation->lastCheck);
-            $installation->installationType = filter_var($installation->Who, FILTER_VALIDATE_IP) ? 'IP' : 'Hostname';
+            $ip = $installation->IpAddress;
+            if (isset($dnsCache[$ip])) $hostname = $dnsCache[$ip];
+            else {
+                $hostname = @gethostbyaddr($ip);
+                $dnsCache[$ip] = $hostname;
+            }
+            if ($hostname !== false && $hostname !== $ip) {
+                $installation->hostname = $hostname;
+                $installation->installationType = 'Hostname';
+            } else {
+                $installation->hostname = $installation->IpAddress;
+                $installation->installationType = 'IP';
+            }
         }
         return $results;
     }

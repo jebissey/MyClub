@@ -95,14 +95,12 @@
                             {if $actionDisplayed}
                                 {foreach $actions as $action}
                                     {if $action['type'] == 'link'}
-                                        <a href="{str_replace('{id}', $item->Id, $action['url'])}" 
-                                        class="btn btn-sm {$action['class']}"
+                                        <a href="{str_replace('{id}', $item->Id, $action['url'])}" class="btn btn-sm {$action['class']}"
                                         {if isset($action['confirm'])}onclick="return confirm('{$action['confirm'] | noescape} {$item->{$columns[0]['field']}}')"{/if}>
                                             <i class="{$action['label']}"></i>
                                         </a>
                                     {elseif $action['type'] == 'button'}
-                                        <button class="btn btn-sm {$action['class']}" 
-                                                onclick={str_replace('{id}', $item->Id, $action['onClick']) | noescape}>
+                                        <button class="btn btn-sm {$action['class']}" onclick={str_replace('{id}', $item->Id, $action['onClick']) | noescape}>
                                             <i class="{$action['label']}"></i>
                                         </button>
                                     {/if}

@@ -1,0 +1,199 @@
+{layout '../../Common/views/layout.latte'}
+
+{block content}
+    <div class="container-fluid">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h1>📋 Kanban Board</h1>
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCardModal">
+                ➕ Nouvelle carte
+            </button>
+        </div>
+
+        {if $stats}
+            <div class="card mb-3">
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-3">
+                            <div class="h3 mb-0">{$stats['💡']}</div>
+                            <small class="text-muted">💡 Backlog</small>
+                        </div>
+                        <div class="col-3">
+                            <div class="h3 mb-0">{$stats['☑️']}</div>
+                            <small class="text-muted">☑️ Selected</small>
+                        </div>
+                        <div class="col-3">
+                            <div class="h3 mb-0">{$stats['🔧']}</div>
+                            <small class="text-muted">🔧 In Progress</small>
+                        </div>
+                        <div class="col-3">
+                            <div class="h3 mb-0">{$stats['🏁']}</div>
+                            <small class="text-muted">🏁 Done</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {/if}
+
+        <div class="kanban-board" id="kanbanBoard">
+            {foreach $columns as $col}
+                <div class="kanban-column" data-status="{$col['icon']}">
+                    <div class="kanban-column-header">
+                        {$col['icon']} {$col['label']}
+                    </div>
+
+                    <div class="kanban-cards" data-status="{$col['icon']}">
+                        {foreach $cards as $card}
+                            {if $card['CurrentStatus'] === $col['icon']}
+                                <div class="kanban-card" draggable="true" data-id="{$card['Id']}" data-status="{$col['icon']}">
+                                    <div class="kanban-card-title">{$card['Title']}</div>
+
+                                    {if $card['Detail']}
+                                        <div class="kanban-card-detail">{$card['Detail']}</div>
+                                    {/if}
+
+                                    <div class="mt-2 d-flex gap-1">
+                                        <button class="btn btn-sm btn-outline-primary edit-card"
+                                                data-id="{$card['Id']}" title="Éditer">
+                                            ✏️
+                                        </button>
+
+                                        <button class="btn btn-sm btn-outline-danger delete-card"
+                                                data-id="{$card['Id']}" title="Supprimer">
+                                            🗑️
+                                        </button>
+                                    </div>
+                                </div>
+                            {/if}
+                        {/foreach}
+                    </div>
+                </div>
+            {/foreach}
+        </div>
+    </div>
+
+    <!-- Modal pour ajouter une carte -->
+    <div class="modal fade" id="addCardModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">➕ Ajouter une carte</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="cardTitle" class="form-label">Titre <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="cardTitle" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="cardDetail" class="form-label">Détail</label>
+                        <textarea class="form-control" id="cardDetail" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="button" class="btn btn-primary" id="saveNewCard">Créer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal pour éditer une carte -->
+    <div class="modal fade" id="editCardModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">✏️ Éditer la carte</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="editCardId">
+                    <div class="mb-3">
+                        <label for="editCardTitle" class="form-label">Titre <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="editCardTitle" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editCardDetail" class="form-label">Détail</label>
+                        <textarea class="form-control" id="editCardDetail" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="button" class="btn btn-primary" id="saveEditCard">Enregistrer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+    .kanban-board {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+
+    .kanban-column {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 1rem;
+        min-height: 500px;
+    }
+
+    .kanban-column-header {
+        font-size: 1.25rem;
+        font-weight: bold;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #dee2e6;
+    }
+
+    .kanban-card {
+        background: white;
+        border: 1px solid #dee2e6;
+        border-radius: 6px;
+        padding: 0.75rem;
+        margin-bottom: 0.75rem;
+        cursor: move;
+        transition: box-shadow 0.2s;
+    }
+
+    .kanban-card:hover {
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+
+    .kanban-card-title {
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+        word-wrap: break-word;
+    }
+
+    .kanban-card-detail {
+        font-size: 0.9rem;
+        color: #6c757d;
+        margin-bottom: 0.5rem;
+        word-wrap: break-word;
+    }
+
+    .dragging {
+        opacity: 0.5;
+    }
+
+    .drag-over {
+        background: #e9ecef;
+    }
+
+    @media (max-width: 992px) {
+        .kanban-board {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @media (max-width: 576px) {
+        .kanban-board {
+            grid-template-columns: 1fr;
+        }
+    }
+    </style>
+
+    <script src="/app/modules/Kanban/js/kanban.js"></script>
+{/block}

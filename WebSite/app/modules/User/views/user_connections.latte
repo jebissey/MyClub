@@ -23,8 +23,8 @@
                    class="text-decoration-none fw-bold text-dark"
                    data-bs-toggle="modal"
                    data-bs-target="#modalEvents"
-                   data-person="{$c['Name']|escape}"
-                   data-events="{$c['EventList']|escape}">
+                   data-person="{$c['Name']|noescape}"
+                   data-events="{$c['EventList']|noescape}">
                   {$c['Name']}
                 </a>
               {if $c['OtherPersonInPresentationDirectory'] != 0}

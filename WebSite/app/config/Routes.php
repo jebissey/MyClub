@@ -31,6 +31,8 @@ use app\config\routes\GroupApi;
 use app\config\routes\Home;
 use app\config\routes\Import;
 use app\config\routes\ImportApi;
+use app\config\routes\Kanban;
+use app\config\routes\KanbanApi;
 use app\config\routes\Karaoke;
 use app\config\routes\KaraokeApi;
 use app\config\routes\Leapfrog;
@@ -86,6 +88,7 @@ use app\models\EventNeedDataHelper;
 use app\models\EventTypeDataHelper;
 use app\models\GroupDataHelper;
 use app\models\ImportDataHelper;
+use app\models\KanbanDataHelper;
 use app\models\KaraokeDataHelper;
 use app\models\LogDataHelper;
 use app\models\LogDataWriterHelper;
@@ -151,6 +154,7 @@ class Routes
             new EventTypeDataHelper($application),
             new GroupDataHelper($application, $groupDataHelper),
             new ImportDataHelper($application),
+            new KanbanDataHelper($application),
             $logDataHelper,
             $messageDataHelper,
             $needDataHelper,
@@ -176,6 +180,7 @@ class Routes
             $eventDataHelper,
             new EventNeedDataHelper($application),
             new EventService($eventDataHelper),
+            new KanbanDataHelper($application),
             new KaraokeDataHelper($application),
             new LogDataWriterHelper($application),
             $messageDataHelper,
@@ -238,6 +243,8 @@ class Routes
         $this->routes = array_merge($this->routes, (new Home($this->controllerFactory))->get());
         $this->routes = array_merge($this->routes, (new Import($this->controllerFactory))->get());
         $this->routes = array_merge($this->routes, (new ImportApi($this->apiFactory))->get());
+        $this->routes = array_merge($this->routes, (new Kanban($this->controllerFactory))->get());
+        $this->routes = array_merge($this->routes, (new KanbanApi($this->apiFactory))->get());
         $this->routes = array_merge($this->routes, (new Karaoke($this->controllerFactory))->get());
         $this->routes = array_merge($this->routes, (new KaraokeApi($this->apiFactory))->get());
         $this->routes = array_merge($this->routes, (new Leapfrog($this->controllerFactory))->get());

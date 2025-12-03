@@ -20,6 +20,7 @@ use app\models\EventDataHelper;
 use app\models\EventTypeDataHelper;
 use app\models\GroupDataHelper;
 use app\models\ImportDataHelper;
+use app\models\KanbanDataHelper;
 use app\models\LogDataHelper;
 use app\models\LogDataAnalyticsHelper;
 use app\models\LogDataStatisticsHelper;
@@ -46,6 +47,7 @@ use app\modules\Event\EventTypeController;
 use app\modules\Games\Karaoke\KaraokeController;
 use app\modules\Games\Leapfrog\LeapfrogController;
 use app\modules\Games\Solfege\SolfegeController;
+use app\modules\Kanban\KanbanController;
 use app\modules\PersonManager\GroupController;
 use app\modules\PersonManager\ImportController;
 use app\modules\PersonManager\PersonController;
@@ -96,6 +98,7 @@ class ControllerFactory
         private EventTypeDataHelper $eventTypeDataHelper,
         private GroupDataHelper $groupDataHelper,
         private ImportDataHelper $importDataHelper,
+        private KanbanDataHelper $kanbanDataHelper,
         private LogDataHelper $logDataHelper,
         private MessageDataHelper $messageDataHelper,
         private NeedDataHelper $needDataHelper,
@@ -232,6 +235,14 @@ class ControllerFactory
         return new ImportController(
             $this->application,
             $this->importDataHelper
+        );
+    }
+
+    public function makeKanbanController(): KanbanController
+    {
+        return new KanbanController(
+            $this->application,
+            $this->kanbanDataHelper
         );
     }
 

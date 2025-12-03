@@ -53,6 +53,7 @@ class ConnectedUser
             'isEventDesigner' => $this->isEventDesigner(),
             'isEventManager' => $this->isEventManager(),
             'isHomeDesigner' => $this->isHomeDesigner(),
+            'isKanbanDesigner' => $this->isKanbanDesigner(),
             'isMember' => true,
             'isNavbarDesigner' => $this->isNavbarDesigner(),
             'isPersonManager' => $this->isPersonManager(),
@@ -106,6 +107,11 @@ class ConnectedUser
     public function isHomeDesigner(): bool
     {
         return in_array(Authorization::HomeDesigner->value, $this->authorizations ?? []);
+    }
+
+    public function isKanbanDesigner(): bool
+    {
+        return in_array(Authorization::KanbanDesigner->value, $this->authorizations ?? []);
     }
 
     public function isNavbarDesigner(): bool

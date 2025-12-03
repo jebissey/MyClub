@@ -13,6 +13,7 @@ use app\apis\EventNeedTypeApi;
 use app\apis\EventSupplyApi;
 use app\apis\GroupApi;
 use app\apis\ImportApi;
+use app\apis\KanbanApi;
 use app\apis\KaraokeApi;
 use app\apis\LeapfrogApi;
 use app\apis\MediaApi;
@@ -30,6 +31,7 @@ use app\models\DataHelper;
 use app\models\DesignDataHelper;
 use app\models\EventDataHelper;
 use app\models\EventNeedDataHelper;
+use app\models\KanbanDataHelper;
 use app\models\KaraokeDataHelper;
 use app\models\LogDataWriterHelper;
 use app\models\MessageDataHelper;
@@ -57,6 +59,7 @@ class ApiFactory
         private EventDataHelper $eventDataHelper,
         private EventNeedDataHelper $eventNeedDataHelper,
         private EventService $eventService,
+        private KanbanDataHelper $kanbanDataHelper,
         private KaraokeDataHelper $karaokeDataHelper,
         private LogDataWriterHelper $logDataWriterHelper,
         private MessageDataHelper $messageDataHelper,
@@ -174,6 +177,17 @@ class ApiFactory
             $this->connectedUser,
             $this->dataHelper,
             $this->personDataHelper
+        );
+    }
+
+    public function makeKanbanApi(): KanbanApi
+    {
+        return new KanbanApi(
+            $this->application,
+            $this->connectedUser,
+            $this->dataHelper,
+            $this->personDataHelper,
+            $this->kanbanDataHelper
         );
     }
 

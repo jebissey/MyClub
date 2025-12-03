@@ -152,6 +152,23 @@ CREATE TABLE IF NOT EXISTS "Guest" (
 	FOREIGN KEY("IdEvent") REFERENCES "Event"("Id"),
 	FOREIGN KEY("InvitedBy") REFERENCES "Person"("Id")
 );
+CREATE TABLE IF NOT EXISTS "Kanban" (
+	"Id"	INTEGER,
+	"Title"	TEXT NOT NULL,
+	"Detail"	TEXT NOT NULL,
+	PRIMARY KEY("Id")
+);
+CREATE TABLE IF NOT EXISTS "KanbanStatus" (
+	"Id"	INTEGER,
+	"IdKanban"	INTEGER NOT NULL,
+	"IdPerson"	INTEGER NOT NULL,
+	"What"	TEXT NOT NULL,
+	"Remark"	TEXT NOT NULL,
+	"LastUpdate"	TEXT NOT NULL DEFAULT current_timestamp,
+	PRIMARY KEY("Id"),
+	FOREIGN KEY("IdKanban") REFERENCES "Kanban"("Id"),
+	FOREIGN KEY("IdPerson") REFERENCES "Person"("Id")
+);
 CREATE TABLE IF NOT EXISTS "KaraokeClient" (
 	"Id"	INTEGER,
 	"ClientId"	TEXT NOT NULL UNIQUE,
@@ -346,6 +363,7 @@ INSERT INTO "Authorization" VALUES (6,'HomeDesigner');
 INSERT INTO "Authorization" VALUES (7,'EventDesigner');
 INSERT INTO "Authorization" VALUES (8,'VisitorInsights');
 INSERT INTO "Authorization" VALUES (9,'NavbarDesigner');
+INSERT INTO "Authorization" VALUES (10,'KanbanDesigner');
 INSERT INTO "Group" VALUES (1,'Webmaster',0,0);
 INSERT INTO "GroupAuthorization" VALUES (1,1,1);
 INSERT INTO "Languages" VALUES (1,'select_language','Select language','Sélectionner la langue');

@@ -50,14 +50,7 @@
                             <tr>
                                 <td>
                                     <div class="d-flex align-items-center">
-                                        <div>
-                                            <div class="fw-bold">{$installation->Who}</div>
-                                            {if $installation->installationType === 'Hostname'}
-                                                <small class="text-muted">Serveur nommé</small>
-                                            {else}
-                                                <small class="text-muted">Adresse IP</small>
-                                            {/if}
-                                        </div>
+                                        <small class="text-muted">$installation->hostname</small>
                                     </div>
                                 </td>
                                 <td>

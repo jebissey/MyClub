@@ -12,20 +12,6 @@ use app\enums\ApplicationError;
 use app\exceptions\SqliteTableException;
 use app\helpers\Application;
 
-/*
-Examples
-========
-$users = $data->get($pdo, 'users', '*');
-
-$user = $data->get($pdo, 'users', ['name', 'email'], ['id' => 1]);
-
-$newId = $data->set($pdo, 'users', ['name' => 'John', 'email' => 'john@example.com']);
-
-$updated = $data->set($pdo, 'users', ['name' => 'Jane'], ['id' => 1]);
-
-$results = $data->query($pdo, 'SELECT * FROM users WHERE age > :age', [':age' => 18]);
- */
-
 abstract class Data
 {
     protected PDO $pdo;
@@ -152,6 +138,34 @@ abstract class Data
     {
         $stmt = $this->pdo->query("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' ORDER BY name");
         return $stmt->fetchAll(PDO::FETCH_COLUMN);
+    }
+
+    public function last(string $table, array $where = [], $fields = '*'): object|false
+    {
+        $this->validateTableName($table);
+        try {
+            if (is_array($fields)) $fieldsStr = implode(', ', $fields);
+            else                   $fieldsStr = $fields;
+
+            $sql = "SELECT {$fieldsStr} FROM \"{$table}\"";
+            $params = [];
+            if (!empty($where)) {
+                $conditions = [];
+                foreach ($where as $field => $value) {
+                    if (strtolower($field) === 'email') $conditions[] = "{$field} COLLATE NOCASE = :{$field}";
+                    else                                $conditions[] = "{$field} = :{$field}";
+                    $params[":{$field}"] = $value;
+                }
+                $sql .= " WHERE " . implode(' AND ', $conditions);
+            }
+            $sql .= " ORDER BY Id DESC LIMIT 1";
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute($params);
+            return $stmt->fetch();
+        } catch (PDOException $e) {
+            $this->application->getErrorManager()->raise(ApplicationError::Error, "Database error {$e->getMessage()} in {$e->getFile()}:{$e->getLine()} with query {$sql}");
+            throw $e;
+        }
     }
 
     public function query(string $sql, array $parameters = []): mixed
