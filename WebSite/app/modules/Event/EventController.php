@@ -49,7 +49,7 @@ class EventController extends AbstractController
 
         $this->render('Event/views/nextEvents.latte', $this->getAllParams([
             'navItems' => $this->getNavItems($connectedUser->person ?? false),
-            'events' => $this->eventDataHelper->getEvents($connectedUser->person, $mode, $offset, $filterByPreferences),
+            'events' => $this->eventDataHelper->getEvents($connectedUser->person, $mode, (int)$offset, $filterByPreferences),
             'person' => $connectedUser->person,
             'eventTypes' => $this->dataHelper->gets('EventType', ['Inactivated' => 0], 'Id, Name'),
             'needTypes' => $this->dataHelper->gets('NeedType', [], 'Id, Name'),

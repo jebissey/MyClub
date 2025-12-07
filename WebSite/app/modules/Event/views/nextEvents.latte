@@ -35,10 +35,9 @@
         {/if}
         </h1>
         {if $isEventManager}
-        <div class="ms-auto d-flex gap-2">
-            <a href="?mode=past&offset=0" class="btn btn-outline-secondary">&laquo;</a>
-            <a href="?mode={$mode}&offset={max(0, $offset-10)}" class="btn btn-outline-secondary">&lsaquo;</a>
-            <a href="?mode={$mode}&offset={$offset+10}" class="btn btn-outline-secondary">&rsaquo;</a>
+        <div class="ms-auto d-flex gap-2 mt-2">
+            <a href="?mode=past&offset={max(0, $offset+10)}" class="btn btn-outline-secondary">&lsaquo;</a>
+            <a href="?mode=past&offset={$offset-10}" class="btn btn-outline-secondary">&rsaquo;</a>
             <a href="?mode=next&offset=0" class="btn btn-outline-secondary">&raquo;</a>
             <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#eventModal">
                 <i class="bi bi-plus-lg"></i>

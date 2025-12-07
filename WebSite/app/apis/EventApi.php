@@ -91,7 +91,7 @@ class EventApi extends AbstractApi
         }
     }
 
-    public function getEvent($id): void
+    public function getEvent(int $id): void
     {
         if (!$this->authService->isEventManager()) {
             $this->renderJsonForbidden(__FILE__, __LINE__);
@@ -152,7 +152,7 @@ class EventApi extends AbstractApi
             return;
         }
         try {
-            $event = $this->eventDataHelper->getEvent($eventId);
+            $event = $this->eventDataHelper->getEvent((int)$eventId);
             $apiResponse = $this->sendEventEmails($event, $data['Title'] ?? '', $data['Body'] ?? '', $data['Recipients'] ?? '');
             $this->renderJson([$apiResponse->data], $apiResponse->success,  $apiResponse->responseCode);
         } catch (QueryException $e) {

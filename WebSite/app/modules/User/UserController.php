@@ -99,7 +99,7 @@ class UserController extends AbstractController
             }
             $this->render('User/views/user_sign_in.latte', [
                 'href' => '/user/sign/in',
-                'userImg' => '🫥',
+                'userImg' => '👻',
                 'userEmail' => '',
                 'isAdmin' => false,
                 'page' => basename(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH)),

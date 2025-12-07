@@ -39,7 +39,7 @@ class ArticleCrosstabDataHelper extends Data
             $sql,
             [':start' => $dateRange['start'], ':end' => $dateRange['end']],
             'Audience',
-            'Rédateurs',
+            'Rédacteurs',
         );
         return $crosstabData;
     }

@@ -670,24 +670,38 @@ class EventDataHelper extends Data implements NewsProviderInterface
         return $events;
     }
 
-
-    private function getPassedEvents($person, int $offset)
+    private function getPassedEvents(object $person, int $offset): array
     {
-        $limit = 10;
-        $query = $this->fluent->from('Event e')
-            ->leftJoin('EventType et ON et.Id = e.IdEventType')
-            ->leftJoin('Participant p ON e.Id = p.IdEvent AND p.IdPerson = ?', $person->Id ?? 0)
-            ->leftJoin('Message m ON m.EventId = e.Id AND m."From" = "User"')
-            ->leftJoin('PersonGroup pg ON et.IdGroup = pg.IdGroup AND pg.IdPerson = ?', $person->Id)
-            ->where('et.Inactivated = 0 AND (et.IdGroup IS NULL OR pg.IdPerson IS NOT NULL) AND StartTime < ?', date('Y-m-d H:i:s'))
-            ->groupBy('e.Id')
-            ->limit($limit)
-            ->offset($offset)
-            ->select('et.Name AS EventTypeName, et.IdGroup AS EventTypeIdGroup, p.Id AS Booked')
-            ->select('COUNT(m.Id) AS MessageCount')
-            ->orderBy('e.StartTime');
-        return $this->events($query->fetchAll());
+        $sql = "
+            SELECT
+                e.*,
+                et.Name AS EventTypeName,
+                et.IdGroup AS EventTypeIdGroup,
+                p.Id AS Booked,
+                COUNT(m.Id) AS MessageCount
+            FROM Event e
+            LEFT JOIN EventType et   ON et.Id = e.IdEventType
+            LEFT JOIN Participant p  ON p.IdEvent = e.Id AND p.IdPerson = :idperson
+            LEFT JOIN Message m      ON m.EventId = e.Id AND m.\"From\" = 'User'
+            LEFT JOIN PersonGroup pg ON pg.IdGroup = et.IdGroup AND pg.IdPerson = :idperson
+            WHERE et.Inactivated = 0
+            AND (et.IdGroup IS NULL OR pg.IdPerson IS NOT NULL)
+            AND e.StartTime < :now
+            GROUP BY e.Id
+            ORDER BY e.StartTime DESC
+            LIMIT :limit 
+            OFFSET :offset
+        ";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([
+            ':idperson' => $person->Id ?? 0,
+            ':now'      => date('Y-m-d H:i:s'),
+            ':limit'    => 10,
+            ':offset'   => $offset
+        ]);
+        return $this->events($stmt->fetchAll());
     }
+
 
     private function getDatesOfThreeWeeks(): array
     {

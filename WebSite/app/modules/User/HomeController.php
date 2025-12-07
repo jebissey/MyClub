@@ -62,7 +62,7 @@ class HomeController extends AbstractController
             $lang = \app\helpers\TranslationManager::getCurrentLanguage();
             Params::setParams([
                 'href' => '/user/sign/in',
-                'userImg' => '🫥',
+                'userImg' => '👻',
                 'userEmail' => '',
                 'isAdmin' => false,
                 'currentVersion' => Application::VERSION,

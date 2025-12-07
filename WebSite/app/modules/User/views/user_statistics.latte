@@ -155,7 +155,8 @@
                                 <tr>
                                     <th>Type d'événement</th>
                                     <th>Nombre</th>
-                                    <th>Total</th>
+                                    <th>Participations</th>
+                                    <th>Total de participants</th>
                                     <th>Pourcentage</th>
                                 </tr>
                             </thead>
@@ -163,8 +164,9 @@
                                 {foreach $stats['eventParticipations'] as $typeId => $participationStat}
                                     <tr {if $typeId === 'total'}class="table-active"{/if}>
                                         <td>{$participationStat['typeName']}</td>
-                                        <td>{$participationStat['user']}</td>
-                                        <td>{$participationStat['total']}</td>
+                                        <td class="text-center">{$participationStat['events']}</td>
+                                        <td class="text-center">{$participationStat['user']}</td>
+                                        <td class="text-center">{$participationStat['total']}</td>
                                         <td>
                                             <div class="progress">
                                                 <div class="progress-bar bg-info" role="progressbar" 

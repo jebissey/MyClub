@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace app\models;
@@ -68,9 +69,9 @@ class PersonStatisticsDataHelper extends Data
         return $seasons;
     }
 
-    public function getSeasonRange(?string $seasonStart, ?string $seasonEnd): array
+    public function getSeasonRange(string $seasonStart, string $seasonEnd): array
     {
-        if ($seasonStart === null || $seasonEnd === null) {
+        if ($seasonStart === '' || $seasonEnd === '') {
             $currentYear = date('Y');
             $currentMonth = date('m');
 
@@ -240,47 +241,48 @@ class PersonStatisticsDataHelper extends Data
 
     private function getEventStats($personId, $seasonStart, $seasonEnd)
     {
-        $eventTypes = $this->fluent->from('EventType')->fetchAll();
         $stats = [];
+        $stmt = $this->pdo->prepare("
+            SELECT 
+                et.Id,
+                et.Name,
+                COUNT(e.Id) AS total,
+                SUM(CASE WHEN e.CreatedBy = ? THEN 1 ELSE 0 END) AS user
+            FROM EventType et
+            LEFT JOIN Event e ON e.IdEventType = et.Id 
+                AND datetime(e.StartTime) BETWEEN datetime(?) AND datetime(?)
+            GROUP BY et.Id, et.Name
+        ");
+        $stmt->execute([$personId, $seasonStart, $seasonEnd]);
+        $eventTypes = $stmt->fetchAll();
+
         foreach ($eventTypes as $eventType) {
-            $userEventsCount = $this->fluent
-                ->from('Event')
-                ->select(null)
-                ->select('COUNT(*) AS count')
-                ->where('CreatedBy', $personId)
-                ->where('IdEventType', $eventType->Id)
-                ->where('datetime(StartTime) BETWEEN datetime(?) AND datetime(?)', [$seasonStart, $seasonEnd])
-                ->fetch('count');
-            $totalEventsCount = $this->fluent
-                ->from('Event')
-                ->select(null)
-                ->select('COUNT(*) AS count')
-                ->where('IdEventType', $eventType->Id)
-                ->where('datetime(StartTime) BETWEEN datetime(?) AND datetime(?)', [$seasonStart, $seasonEnd])
-                ->fetch('count');
+            $userCount = (int) $eventType->user;
+            $totalCount = (int) $eventType->total;
+
             $stats[$eventType->Id] = [
                 'typeName'   => $eventType->Name,
-                'user'       => $userEventsCount,
-                'total'      => $totalEventsCount,
-                'percentage' => $totalEventsCount > 0
-                    ? round(($userEventsCount / $totalEventsCount) * 100, 2)
+                'user'       => $userCount,
+                'total'      => $totalCount,
+                'percentage' => $totalCount > 0
+                    ? round(($userCount / $totalCount) * 100, 2)
                     : 0
             ];
         }
 
-        $userAllEventsCount = $this->fluent
-            ->from('Event')
-            ->select(null)
-            ->select('COUNT(*) AS count')
-            ->where('CreatedBy', $personId)
-            ->where('datetime(StartTime) BETWEEN datetime(?) AND datetime(?)', [$seasonStart, $seasonEnd])
-            ->fetch('count');
-        $totalAllEventsCount = $this->fluent
-            ->from('Event')
-            ->select(null)
-            ->select('COUNT(*) AS count')
-            ->where('datetime(StartTime) BETWEEN datetime(?) AND datetime(?)', [$seasonStart, $seasonEnd])
-            ->fetch('count');
+        $stmt = $this->pdo->prepare("
+            SELECT 
+                COUNT(*) AS total,
+                SUM(CASE WHEN CreatedBy = ? THEN 1 ELSE 0 END) AS user
+            FROM Event 
+            WHERE datetime(StartTime) BETWEEN datetime(?) AND datetime(?)
+        ");
+        $stmt->execute([$personId, $seasonStart, $seasonEnd]);
+        $totals = $stmt->fetch();
+
+        $userAllEventsCount = (int) $totals->user;
+        $totalAllEventsCount = (int) $totals->total;
+
         $stats['total'] = [
             'typeName'   => 'Total',
             'user'       => $userAllEventsCount,
@@ -290,24 +292,23 @@ class PersonStatisticsDataHelper extends Data
                 : 0
         ];
 
-        $userInvitationCount = $this->fluent
-            ->from('Guest g')
-            ->innerJoin('Event e ON e.Id = g.IdEvent')
-            ->select(null)
-            ->select('COUNT(*) AS count')
-            ->where('InvitedBy', $personId)
-            ->where('datetime(e.StartTime) BETWEEN datetime(?) AND datetime(?)', [$seasonStart, $seasonEnd])
-            ->fetch('count');
+        $stmt = $this->pdo->prepare("
+            SELECT 
+                COUNT(*) AS total,
+                SUM(CASE WHEN g.InvitedBy = ? THEN 1 ELSE 0 END) AS user
+            FROM Guest g
+            INNER JOIN Event e ON e.Id = g.IdEvent
+            WHERE datetime(e.StartTime) BETWEEN datetime(?) AND datetime(?)
+        ");
+        $stmt->execute([$personId, $seasonStart, $seasonEnd]);
+        $invitations = $stmt->fetch();
+
+        $userInvitationCount = (int) $invitations->user;
+        $totalInvitationCount = (int) $invitations->total;
+
         if ($userInvitationCount > 0) {
-            $totalInvitationCount = $this->fluent
-                ->from('Guest g')
-                ->innerJoin('Event e ON e.Id = g.IdEvent')
-                ->select(null)
-                ->select('COUNT(*) AS count')
-                ->where('datetime(e.StartTime) BETWEEN datetime(?) AND datetime(?)', [$seasonStart, $seasonEnd])
-                ->fetch('count');
             $stats['invitation'] = [
-                'typeName'   => 'Invitation envoyées',
+                'typeName'   => 'Invitations envoyées',
                 'user'       => $userInvitationCount,
                 'total'      => $totalInvitationCount,
                 'percentage' => $totalInvitationCount > 0
@@ -315,66 +316,62 @@ class PersonStatisticsDataHelper extends Data
                     : 0
             ];
         }
-
         return $stats;
     }
 
     private function getEventParticipationStats($personId, $seasonStart, $seasonEnd)
     {
-        $eventTypes = $this->fluent->from('EventType')->fetchAll();
-
         $stats = [];
 
-        foreach ($eventTypes as $eventType) {
-            $userParticipationsCount = $this->fluent
-                ->from('Participant p')
-                ->select(null)
-                ->select('COUNT(*) AS count')
-                ->join('Event e ON p.IdEvent = e.Id')
-                ->where('p.IdPerson', $personId)
-                ->where('e.IdEventType', $eventType->Id)
-                ->where('datetime(e.StartTime) BETWEEN datetime(?) AND datetime(?)', [$seasonStart, $seasonEnd])
-                ->fetch('count');
-            $totalParticipationsCount = $this->fluent
-                ->from('Participant p')
-                ->select(null)
-                ->select('COUNT(*) AS count')
-                ->join('Event e ON p.IdEvent = e.Id')
-                ->where('e.IdEventType', $eventType->Id)
-                ->where('datetime(e.StartTime) BETWEEN datetime(?) AND datetime(?)', [$seasonStart, $seasonEnd])
-                ->fetch('count');
+        $stmt = $this->pdo->query('SELECT * FROM EventType');
+        $eventTypes = $stmt->fetchAll();
 
-            $stats[$eventType->Id] = [
-                'typeName'   => $eventType->Name,
-                'user'       => $userParticipationsCount,
-                'total'      => $totalParticipationsCount,
-                'percentage' => $totalParticipationsCount > 0
-                    ? round(($userParticipationsCount / $totalParticipationsCount) * 100, 2)
+        $sql = "SELECT 
+                e.IdEventType,
+                et.Name as typeName,
+                COUNT(CASE WHEN p.IdPerson = ? THEN 1 END) as user_count,
+                COUNT(*) as total_users_count,
+                COUNT(DISTINCT e.Id) as event_count
+            FROM Participant p
+            INNER JOIN Event e ON p.IdEvent = e.Id
+            INNER JOIN EventType et ON e.IdEventType = et.Id
+            WHERE datetime(e.StartTime) BETWEEN datetime(?) AND datetime(?)
+            GROUP BY e.IdEventType, et.Name";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([$personId, $seasonStart, $seasonEnd]);
+        $results = $stmt->fetchAll();
+        foreach ($results as $result) {
+            $stats[$result->IdEventType] = [
+                'typeName'   => $result->typeName,
+                'events'     => (int)$result->event_count,
+                'user'       => (int)$result->user_count,
+                'total'      => (int)$result->total_users_count,
+                'percentage' => $result->total_users_count > 0
+                    ? round(($result->user_count / $result->total_users_count) * 100, 2)
                     : 0
             ];
         }
-        $userAllParticipationsCount = $this->fluent
-            ->from('Participant p')
-            ->select(null)
-            ->select('COUNT(*) AS count')
-            ->join('Event e ON p.IdEvent = e.Id')
-            ->where('p.IdPerson', $personId)
-            ->where('datetime(e.StartTime) BETWEEN datetime(?) AND datetime(?)', [$seasonStart, $seasonEnd])
-            ->fetch('count');
-        $totalAllParticipationsCount = $this->fluent
-            ->from('Participant p')
-            ->select(null)
-            ->select('COUNT(*) AS count')
-            ->join('Event e ON p.IdEvent = e.Id')
-            ->where('datetime(e.StartTime) BETWEEN datetime(?) AND datetime(?)', [$seasonStart, $seasonEnd])
-            ->fetch('count');
-
+        foreach ($eventTypes as $eventType) {
+            if (!isset($stats[$eventType->Id])) {
+                $stats[$eventType->Id] = [
+                    'typeName'   => $eventType->Name,
+                    'events'     => 0,
+                    'user'       => 0,
+                    'total'      => 0,
+                    'percentage' => 0
+                ];
+            }
+        }
+        $totalEvents = array_sum(array_column($stats, 'events'));
+        $totalUser = array_sum(array_column($stats, 'user'));
+        $totalParticipation = array_sum(array_column($stats, 'total'));
         $stats['total'] = [
             'typeName'   => 'Total',
-            'user'       => $userAllParticipationsCount,
-            'total'      => $totalAllParticipationsCount,
-            'percentage' => $totalAllParticipationsCount > 0
-                ? round(($userAllParticipationsCount / $totalAllParticipationsCount) * 100, 2)
+            'events'     => $totalEvents,
+            'user'       => $totalUser,
+            'total'      => $totalParticipation,
+            'percentage' => $totalParticipation > 0
+                ? round(($totalUser / $totalParticipation) * 100, 2)
                 : 0
         ];
 

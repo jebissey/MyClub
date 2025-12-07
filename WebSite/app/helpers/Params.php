@@ -39,7 +39,7 @@ class Params
 
         self::$commonParams = [
             'href' => '/user/sign/in',
-            'userImg' => '🫥',
+            'userImg' => '👻',
             'userEmail' => '',
             'isAdmin' => false,
             'isEditor' => false,
