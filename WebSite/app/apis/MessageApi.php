@@ -49,7 +49,7 @@ class MessageApi extends AbstractApi
 
             $this->renderJson($apiResponse->data, $apiResponse->success, $apiResponse->responseCode);
         } catch (Throwable $e) {
-            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value);
+            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, __FILE__, __LINE__);
         }
     }
 
@@ -68,7 +68,7 @@ class MessageApi extends AbstractApi
             $apiResponse = $this->deleteMessage_((int)$data['messageId'] ?? 0, $this->application->getConnectedUser()->person->Id);
             $this->renderJson($apiResponse->data, $apiResponse->success, $apiResponse->responseCode);
         } catch (Throwable $e) {
-            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value);
+            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, __FILE__, __LINE__);
         }
     }
 
@@ -91,7 +91,7 @@ class MessageApi extends AbstractApi
             $apiResponse = $this->updateMessage_($data['messageId'], $this->application->getConnectedUser()->person->Id, $data['text']);
             $this->renderJson($apiResponse->data, $apiResponse->success, $apiResponse->responseCode);
         } catch (Throwable $e) {
-            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value);
+            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, __FILE__, __LINE__);
         }
     }
 

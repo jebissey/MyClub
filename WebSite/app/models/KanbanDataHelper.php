@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace app\models;
 
+use app\enums\KanbanStatusChange;
 use app\helpers\Application;
 
 class KanbanDataHelper extends Data
@@ -15,29 +16,29 @@ class KanbanDataHelper extends Data
 
     public function getKanbanCards(int $personId): array
     {
-        $sql="
+        $sql = "
             SELECT 
-                k.Id, 
-                k.Title, 
-                k.Detail,
+                kp.Id, 
+                kp.Title, 
+                kp.Detail,
                 (
                     CASE 
-                        WHEN ks.What = 'Created' THEN 'Backlog'
-                        WHEN ks.What LIKE '%ToBacklog%' THEN 'Backlog'
-                        WHEN ks.What LIKE '%ToSelected%' THEN 'Selected'
-                        WHEN ks.What LIKE '%ToInProgress%' THEN 'InProgress'
-                        WHEN ks.What LIKE '%ToDone%' THEN 'Done'
+                        WHEN kcs.What = 'Created' THEN 'Backlog'
+                        WHEN kcs.What LIKE '%ToBacklog%' THEN 'Backlog'
+                        WHEN kcs.What LIKE '%ToSelected%' THEN 'Selected'
+                        WHEN kcs.What LIKE '%ToInProgress%' THEN 'InProgress'
+                        WHEN kcs.What LIKE '%ToDone%' THEN 'Done'
                         ELSE 'Backlog'
                     END
                 ) as CurrentStatus
-            FROM Kanban k
-            LEFT JOIN KanbanStatus ks ON k.Id = ks.IdKanban
-            WHERE ks.Id = (
+            FROM KanbanProject kp
+            LEFT JOIN KanbanCardStatus kcs ON kp.Id = kcs.IdKanbanCard
+            WHERE kcs.Id = (
                 SELECT MAX(Id) 
-                FROM KanbanStatus 
-                WHERE IdKanban = k.Id
+                FROM KanbanCardStatus 
+                WHERE IdKanbanCard = kp.Id
             )
-            AND ks.IdPerson = :personId
+            AND kp.IdPerson = :personId
             ORDER BY 
                 CASE CurrentStatus
                     WHEN 'Backlog' THEN 1
@@ -45,7 +46,7 @@ class KanbanDataHelper extends Data
                     WHEN 'InProgress' THEN 3
                     WHEN 'Done' THEN 4
                 END,
-                k.Title ASC";
+                kp.Title ASC";
 
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':personId' => $personId]);
@@ -68,26 +69,50 @@ class KanbanDataHelper extends Data
         return $result ?: null;
     }
 
-    public function createKanbanCard(int $personId, string $title, string $detail): int
+    public function getKanbanProject(int $id): object
     {
-        // Insérer la nouvelle carte
         $sql = "
-            INSERT INTO Kanban (IdPerson, Title, Detail, CurrentStatus, Position) 
-            VALUES (:personId, :title, :detail, '💡', 0)
+            SELECT 
+                Id, 
+                Title, 
+                Detail
+            FROM KanbanProject
+            WHERE Id = :id";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([':id' => $id]);
+        return $stmt->fetch();
+    }
+
+    public function getKanbanProjects(int $idPerson): array
+    {
+        $sql = "
+            SELECT 
+                Id, 
+                Title, 
+                Detail
+            FROM KanbanProject
+            WHERE IdPerson = :idPerson
+            ORDER BY Title";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([':idPerson' => $idPerson]);
+        return $stmt->fetchAll();
+    }
+
+    public function createKanbanCard(int $idKanbanCardType, string $title, string $detail): int
+    {
+        $sql = "
+            INSERT INTO KanbanCard (IdKanbanCardType, Title, Detail) 
+            VALUES (:idKanbanCardType, :title, :detail)
         ";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([
-            ':personId' => $personId,
+            ':idKanbanCardType' => $idKanbanCardType,
             ':title' => $title,
             ':detail' => $detail
         ]);
-
-        $kanbanId = (int)$this->pdo->lastInsertId();
-
-        // Enregistrer dans l'historique
-        $this->addKanbanStatusChange($kanbanId, $personId, 'Created', '');
-
-        return $kanbanId;
+        $kanbanCardId = (int)$this->pdo->lastInsertId();
+        $this->addKanbanStatusChange($kanbanCardId, KanbanStatusChange::Created->value, '');
+        return $kanbanCardId;
     }
 
     public function updateKanbanCard(int $kanbanId, int $personId, string $title, string $detail): bool
@@ -165,58 +190,45 @@ class KanbanDataHelper extends Data
         return $stmt->fetchAll();
     }
 
-    private function addKanbanStatusChange(int $kanbanId, int $personId, string $what, string $remark): void
+    private function addKanbanStatusChange(int $idKanbanCard, string $what, string $remark): void
     {
         $sql = "
-            INSERT INTO KanbanStatus (IdKanban, IdPerson, What, Remark, LastUpdate) 
-            VALUES (:kanbanId, :personId, :what, :remark, :lastUpdate)
+            INSERT INTO KanbanCardStatus (IdKanbanCard, What, Remark, LastUpdate) 
+            VALUES (:idKanbanCard, :what, :remark, :lastUpdate)
         ";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([
-            ':kanbanId' => $kanbanId,
-            ':personId' => $personId,
+            ':idKanbanCard' => $idKanbanCard,
             ':what' => $what,
             ':remark' => $remark,
             ':lastUpdate' => date('Y-m-d H:i:s')
         ]);
     }
 
-    public function updateKanbanCardPosition(int $kanbanId, int $personId, int $position): bool
-    {
-        $sql = "
-            UPDATE Kanban 
-            SET Position = :position 
-            WHERE Id = :kanbanId AND IdPerson = :personId
-        ";
-        $stmt = $this->pdo->prepare($sql);
-        return $stmt->execute([
-            ':position' => $position,
-            ':kanbanId' => $kanbanId,
-            ':personId' => $personId
-        ]);
-    }
 
     public function getKanbanStats(int $personId): array
     {
         $sql = "
             SELECT 
                 CASE 
-                    WHEN ks.What = 'Created' THEN 'Backlog'
-                    WHEN ks.What LIKE '%ToBacklog%' THEN 'Backlog'
-                    WHEN ks.What LIKE '%ToSelected%' THEN 'Selected'
-                    WHEN ks.What LIKE '%ToInProgress%' THEN 'InProgress'
-                    WHEN ks.What LIKE '%ToDone%' THEN 'Done'
+                    WHEN kcs.What = 'Created' THEN 'Backlog'
+                    WHEN kcs.What LIKE '%ToBacklog%' THEN 'Backlog'
+                    WHEN kcs.What LIKE '%ToSelected%' THEN 'Selected'
+                    WHEN kcs.What LIKE '%ToInProgress%' THEN 'InProgress'
+                    WHEN kcs.What LIKE '%ToDone%' THEN 'Done'
                     ELSE 'Backlog'
                 END as CurrentStatus,
                 COUNT(*) as Count
-            FROM Kanban k
-            LEFT JOIN KanbanStatus ks ON k.Id = ks.IdKanban
-            WHERE ks.Id = (
+            FROM KanbanCardStatus kcs
+            JOIN KanbanCard kc ON kc.Id = kcs.IdKanbanCard
+            JOIN KanbanCardType kct ON kct.Id = kc.IdKanbanCardType
+            JOIN KanbanProject kp ON kp.Id = kct.IdKanbanProject
+            WHERE kcs.Id = (
                 SELECT MAX(Id) 
-                FROM KanbanStatus 
-                WHERE IdKanban = k.Id
+                FROM KanbanCardStatus 
+                WHERE IdKanbanCard = kc.Id
             )
-            AND ks.IdPerson = :personId
+            AND kp.IdPerson = :personId
             GROUP BY CurrentStatus
         ";
         $stmt = $this->pdo->prepare($sql);
@@ -228,11 +240,109 @@ class KanbanDataHelper extends Data
             '🔧' => 0,
             '🏁' => 0
         ];
-
         foreach ($stmt->fetchAll() as $row) {
-            $stats[$row['CurrentStatus']] = (int)$row['Count'];
+            $stats[$row->CurrentStatus] = (int)$row->Count;
         }
-
         return $stats;
+    }
+
+    #region Project
+    public function createKanbanProject(int $idPerson, string $title, string $detail): int
+    {
+        $sql = "
+            INSERT INTO KanbanProject (IdPerson, Title, Detail) 
+            VALUES (:idPerson, :title, :detail)
+        ";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([
+            'idPerson' => $idPerson,
+            ':title' => $title,
+            ':detail' => $detail
+        ]);
+        return (int)$this->pdo->lastInsertId();
+    }
+
+    public function getProjectCards(int $idProject): array
+    {
+        $sql = "
+            SELECT
+                kc.Id,
+                Title,
+                kc.Detail,
+                (
+                    CASE 
+                        WHEN kcs.What = 'Created' THEN '💡'
+                        WHEN kcs.What LIKE '%ToBacklog%' THEN '💡'
+                        WHEN kcs.What LIKE '%ToSelected%' THEN '☑️'
+                        WHEN kcs.What LIKE '%ToInProgress%' THEN '🔧'
+                        WHEN kcs.What LIKE '%ToDone%' THEN '🏁'
+                        ELSE '💡'
+                    END
+                ) as CurrentStatus
+            FROM KanbanCardStatus kcs
+            JOIN KanbanCard kc ON kc.Id = kcs.IdKanbanCard 
+            JOIN KanbanCardType kct ON kct.Id = kc.IdKanbanCardType
+            WHERE IdKanbanProject = :idProject
+            ORDER BY CurrentStatus, Title
+        ";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([':idProject' => $idProject]);
+        return $stmt->fetchAll();
+    }
+
+    public function updateKanbanProject(int $id, string $title, string $detail, int $idPerson): bool
+    {
+        $sql = "
+            UPDATE KanbanProject 
+            SET Title = :title, Detail = :detail 
+            WHERE Id = :id AND IdPerson = :personId
+        ";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([
+            ':title' => $title,
+            ':detail' => $detail,
+            ':id' => $id,
+            ':personId' => $idPerson
+        ]);
+        return $stmt->rowCount() > 0;
+    }
+
+    #region CardType
+    public function createKanbanCardType(int $idKanbanProject, string $label, string $detail): int
+    {
+        $sql = "
+            INSERT INTO KanbanCardType (IdKanbanProject, Label, Detail) 
+            VALUES (:idKanbanProject, :label, :detail)
+        ";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([
+            'idKanbanProject' => $idKanbanProject,
+            ':label' => $label,
+            ':detail' => $detail
+        ]);
+        return (int)$this->pdo->lastInsertId();
+    }
+
+    public function deleteKanbanCardType(int $id): bool
+    {
+        $sql = "DELETE FROM KanbanCardType WHERE Id = :id";
+        $stmt = $this->pdo->prepare($sql);
+        return $stmt->execute([':id' => $id]);
+    }
+
+    public function getProjectCardTypes(int $idProject): array
+    {
+        $sql = "
+            SELECT 
+                Id,
+                Label,
+                Detail
+            FROM KanbanCardType
+            WHERE IdKanbanProject = :idProject
+            ORDER BY Detail 
+        ";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([':idProject' => $idProject]);
+        return $stmt->fetchAll();
     }
 }

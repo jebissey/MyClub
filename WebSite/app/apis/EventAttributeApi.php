@@ -40,7 +40,7 @@ class EventAttributeApi extends AbstractApi
             [$response, $statusCode] = $this->attributeDataHelper->insert($data);
             $this->renderJson($response, true, $statusCode);
         } catch (Throwable $e) {
-            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value);
+            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, __FILE__, __LINE__);
         }
     }
 
@@ -58,7 +58,7 @@ class EventAttributeApi extends AbstractApi
             [$response, $statusCode] = $this->attributeDataHelper->delete_($id);
             $this->renderJson($response, true, $statusCode);
         } catch (Throwable $e) {
-            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value);
+            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, __FILE__, __LINE__);
         }
     }
 
@@ -90,9 +90,9 @@ class EventAttributeApi extends AbstractApi
             return;
         }
         try {
-            $this->renderJson(['attributes' => $this->attributeDataHelper->getAttributesOf($eventTypeId)], true, ApplicationError::Ok->value);
+            $this->renderJsonOk(['attributes' => $this->attributeDataHelper->getAttributesOf($eventTypeId)]);
         } catch (Throwable $e) {
-            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value);
+            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, __FILE__, __LINE__);
         }
     }
 
@@ -109,9 +109,9 @@ class EventAttributeApi extends AbstractApi
         try {
             $data = $this->getJsonInput();
             $this->attributeDataHelper->update($data);
-            $this->renderJson([], true, ApplicationError::Ok->value);
+            $this->renderJsonOk();
         } catch (Throwable $e) {
-            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value);
+            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, __FILE__, __LINE__);
         }
     }
 }

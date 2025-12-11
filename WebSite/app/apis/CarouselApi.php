@@ -15,6 +15,7 @@ use app\models\AuthorizationDataHelper;
 use app\models\CarouselDataHelper;
 use app\models\DataHelper;
 use app\models\PersonDataHelper;
+use PgSql\Lob;
 
 class CarouselApi extends AbstractApi
 {
@@ -45,14 +46,14 @@ class CarouselApi extends AbstractApi
             return;
         }
         if (!$this->authorizationDataHelper->getArticle($item->IdArticle, $this->application->getConnectedUser())) {
-            $this->renderJson(['error' => 'Vous n\'êtes pas autorisé à modifier cet article'], false, ApplicationError::Forbidden->value);
+            $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }
         try {
             $this->dataHelper->delete('Carousel', ['Id' => $id]);
-            $this->renderJson(['message' => 'Élément supprimé avec succès'], true, ApplicationError::Ok->value);
+            $this->renderJsonOk(['message' => 'Élément supprimé avec succès']);
         } catch (Throwable $e) {
-            $this->renderJson(['error' => $e->getMessage()], false, ApplicationError::Error->value);
+            $this->renderJsonError('error' . $e->getMessage(), ApplicationError::Error->value, __FILE__, __LINE__);
         }
     }
 
@@ -61,14 +62,14 @@ class CarouselApi extends AbstractApi
         try {
             $connectedUser = $this->application->getConnectedUser();
             if (!($connectedUser->person ?? false) || !$this->authorizationDataHelper->getArticle($idArticle, $connectedUser)) {
-                $this->renderJson(['error' => 'Accès non autorisé'], false, ApplicationError::Forbidden->value);
+                $this->renderJsonForbidden(__FILE__, __LINE__);
                 return;
             }
-            $this->renderJson(['items' => $this->dataHelper->gets('Carousel', ['IdArticle' => $idArticle])], true, ApplicationError::Ok->value);
+            $this->renderJsonOk(['items' => $this->dataHelper->gets('Carousel', ['IdArticle' => $idArticle])]);
         } catch (QueryException $e) {
             $this->renderJsonBadRequest($e->getMessage(), __FILE__, __LINE__);
         } catch (Throwable $e) {
-            $this->renderJson(['error' => $e->getMessage()], false, ApplicationError::Error->value);
+            $this->renderJsonError('error' . $e->getMessage(), ApplicationError::Error->value, __FILE__, __LINE__);
         }
     }
 
@@ -76,7 +77,7 @@ class CarouselApi extends AbstractApi
     {
         $connectedUser = $this->application->getConnectedUser();
         if ($connectedUser->person === null) {
-            $this->renderJson(['error' => 'Utilisateur non connecté'], false, ApplicationError::Forbidden->value);
+            $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }
         $data = json_decode(file_get_contents('php://input'), true);
@@ -85,15 +86,15 @@ class CarouselApi extends AbstractApi
             return;
         }
         if (!$this->authorizationDataHelper->getArticle($data['idArticle'], $connectedUser)) {
-            $this->renderJson(['error' => 'Vous n\'êtes pas autorisé à modifier cet article'], false, ApplicationError::Forbidden->value);
+            $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }
         $item = WebApp::sanitizeHtml($data['item']);
         try {
             $message = $this->carouselDataHelper->set_($data, $item);
-            $this->renderJson(['message' => $message], true, ApplicationError::Ok->value);
+            $this->renderJsonOk(['message' => $message]);
         } catch (Throwable $e) {
-            $this->renderJson(['error' => 'Erreur lors de l\'enregistrement: ' . $e->getMessage()], false, ApplicationError::Error->value);
+            $this->renderJsonError('error' . $e->getMessage(),  ApplicationError::Error->value, __FILE__, __LINE__);
         }
     }
 }

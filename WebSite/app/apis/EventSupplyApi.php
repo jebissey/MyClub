@@ -48,7 +48,7 @@ class EventSupplyApi extends AbstractApi
         } catch (UnauthorizedAccessException $e) {
             $this->renderJsonForbidden(__FILE__, __LINE__);
         } catch (Throwable $e) {
-            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value);
+            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, __FILE__, __LINE__);
         }
     }
 

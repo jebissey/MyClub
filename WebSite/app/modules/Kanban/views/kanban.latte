@@ -1,129 +1,10 @@
 {layout '../../Common/views/layout.latte'}
 
-{block content}
-    <div class="container-fluid">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <h1>📋 Kanban Board</h1>
-            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCardModal">
-                ➕ Nouvelle carte
-            </button>
-        </div>
+{block navbar}
+    {include '../../Webmaster/views/navbar/designer.latte'}
+{/block}
 
-        {if $stats}
-            <div class="card mb-3">
-                <div class="card-body">
-                    <div class="row text-center">
-                        <div class="col-3">
-                            <div class="h3 mb-0">{$stats['💡']}</div>
-                            <small class="text-muted">💡 Backlog</small>
-                        </div>
-                        <div class="col-3">
-                            <div class="h3 mb-0">{$stats['☑️']}</div>
-                            <small class="text-muted">☑️ Selected</small>
-                        </div>
-                        <div class="col-3">
-                            <div class="h3 mb-0">{$stats['🔧']}</div>
-                            <small class="text-muted">🔧 In Progress</small>
-                        </div>
-                        <div class="col-3">
-                            <div class="h3 mb-0">{$stats['🏁']}</div>
-                            <small class="text-muted">🏁 Done</small>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        {/if}
-
-        <div class="kanban-board" id="kanbanBoard">
-            {foreach $columns as $col}
-                <div class="kanban-column" data-status="{$col['icon']}">
-                    <div class="kanban-column-header">
-                        {$col['icon']} {$col['label']}
-                    </div>
-
-                    <div class="kanban-cards" data-status="{$col['icon']}">
-                        {foreach $cards as $card}
-                            {if $card['CurrentStatus'] === $col['icon']}
-                                <div class="kanban-card" draggable="true" data-id="{$card['Id']}" data-status="{$col['icon']}">
-                                    <div class="kanban-card-title">{$card['Title']}</div>
-
-                                    {if $card['Detail']}
-                                        <div class="kanban-card-detail">{$card['Detail']}</div>
-                                    {/if}
-
-                                    <div class="mt-2 d-flex gap-1">
-                                        <button class="btn btn-sm btn-outline-primary edit-card"
-                                                data-id="{$card['Id']}" title="Éditer">
-                                            ✏️
-                                        </button>
-
-                                        <button class="btn btn-sm btn-outline-danger delete-card"
-                                                data-id="{$card['Id']}" title="Supprimer">
-                                            🗑️
-                                        </button>
-                                    </div>
-                                </div>
-                            {/if}
-                        {/foreach}
-                    </div>
-                </div>
-            {/foreach}
-        </div>
-    </div>
-
-    <!-- Modal pour ajouter une carte -->
-    <div class="modal fade" id="addCardModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">➕ Ajouter une carte</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label for="cardTitle" class="form-label">Titre <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" id="cardTitle" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="cardDetail" class="form-label">Détail</label>
-                        <textarea class="form-control" id="cardDetail" rows="3"></textarea>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                    <button type="button" class="btn btn-primary" id="saveNewCard">Créer</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal pour éditer une carte -->
-    <div class="modal fade" id="editCardModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">✏️ Éditer la carte</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <input type="hidden" id="editCardId">
-                    <div class="mb-3">
-                        <label for="editCardTitle" class="form-label">Titre <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" id="editCardTitle" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="editCardDetail" class="form-label">Détail</label>
-                        <textarea class="form-control" id="editCardDetail" rows="3"></textarea>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                    <button type="button" class="btn btn-primary" id="saveEditCard">Enregistrer</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
+{block head}
     <style>
     .kanban-board {
         display: grid;
@@ -140,11 +21,12 @@
     }
 
     .kanban-column-header {
-        font-size: 1.25rem;
+        font-size: 2.25rem;
         font-weight: bold;
         margin-bottom: 1rem;
         padding-bottom: 0.5rem;
         border-bottom: 2px solid #dee2e6;
+        text-align: center;
     }
 
     .kanban-card {
@@ -182,6 +64,18 @@
         background: #e9ecef;
     }
 
+    .card-type-item {
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 6px;
+        padding: 0.75rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .card-type-item:hover {
+        background: #e9ecef;
+    }
+
     @media (max-width: 992px) {
         .kanban-board {
             grid-template-columns: repeat(2, 1fr);
@@ -194,6 +88,252 @@
         }
     }
     </style>
+{/block}
 
+{block content}
+    <div class="container-fluid">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div class="d-flex align-items-center gap-3">
+                <h1 class="m-0">📋 Kanban Board</h1>
+                <select id="kanbanProjectSelect" class="form-select" style="width: auto;">
+                    <option value="">choisir un projet</option>
+                    {foreach $projects as $p}
+                        <option value="{$p->Id}">{$p->Title}</option>
+                    {/foreach}
+                </select>
+                <button id="editProjectBtn"
+                        type="button"
+                        class="btn btn-warning d-none"
+                        data-bs-toggle="modal"
+                        data-bs-target="#editProjectModal"
+                        title="Éditer le projet">
+                    <i class="bi bi-pencil"></i>
+                </button>
+            </div>
+            
+            <button id="addProjectBtn"
+                    type="button"
+                    class="btn btn-primary"
+                    data-bs-toggle="modal"
+                    data-bs-target="#addProjectModal"
+                    data-bs-toggle="tooltip" data-bs-placement="bottom" title="Nouveau projet">
+                <i class="bi bi-plus-lg"></i>
+            </button>
+
+            <button id="addCardBtn"
+                    type="button"
+                    class="btn btn-primary d-none"
+                    data-bs-toggle="modal"
+                    data-bs-target="#addCardModal"
+                    data-bs-toggle="tooltip" data-bs-placement="bottom" title="Nouvelle carte">
+                <i class="bi bi-plus-lg"></i>
+            </button>
+        </div>
+
+        <div id="statsContainer" class="d-none">
+            {if $stats}
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <div class="row text-center">
+                        {foreach $columns as $col}
+                            <div class="col-3">
+                                <div class="h3 mb-0">{$stats[$col['icon']]}</div>
+                            </div>
+                        {/foreach}
+                        </div>
+                    </div>
+                </div>
+            {/if}
+        </div>
+
+        <div class="kanban-board d-none" id="kanbanBoard">
+            {foreach $columns as $col}
+                <div class="kanban-column" data-status="{$col['icon']}">
+                    <div class="kanban-column-header">
+                        {$col['icon']}
+                    </div>
+
+                    <div class="kanban-cards" data-status="{$col['icon']}">
+                        {foreach $cards as $card}
+                            {if $card->CurrentStatus === $col['icon']}
+                                <div class="kanban-card" draggable="true" data-id="{$card['Id']}" data-status="{$col['icon']}">
+                                    <div class="kanban-card-title">{$card['Title']}</div>
+
+                                    {if $card['Detail']}
+                                        <div class="kanban-card-detail">{$card['Detail']}</div>
+                                    {/if}
+
+                                    <div class="mt-2 d-flex gap-1">
+                                        <button class="btn btn-sm btn-outline-primary edit-card"
+                                                data-id="{$card->Id}" title="Éditer">
+                                            ✏️
+                                        </button>
+
+                                        <button class="btn btn-sm btn-outline-danger delete-card"
+                                                data-id="{$card->Id}" title="Supprimer">
+                                            🗑️
+                                        </button>
+                                    </div>
+                                </div>
+                            {/if}
+                        {/foreach}
+                    </div>
+                </div>
+            {/foreach}
+        </div>
+    </div>
+
+    <div class="modal fade" id="addProjectModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Créer un nouveau projet</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="projectTitle" class="form-label">Titre du projet <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="projectTitle" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="projectDescription" class="form-label">Description</label>
+                        <textarea class="form-control" id="projectDescription" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="button" class="btn btn-primary" id="saveNewProject">Créer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="editProjectModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">✏️ Éditer le projet</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="editProjectId">
+                    
+                    <div class="mb-4">
+                        <h6 class="mb-3">Informations générales</h6>
+                        <div class="mb-3">
+                            <label for="editProjectTitle" class="form-label">Titre du projet <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="editProjectTitle" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editProjectDescription" class="form-label">Description</label>
+                            <textarea class="form-control" id="editProjectDescription" rows="3"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h6 class="mb-0">Types de cartes</h6>
+                            <button type="button" class="btn btn-sm btn-primary" id="addCardTypeBtn">
+                                <i class="bi bi-plus-lg"></i>
+                            </button>
+                        </div>
+                        
+                        <div id="cardTypesList">
+                            <!-- Les types de cartes seront chargés ici dynamiquement -->
+                        </div>
+
+                        <div id="newCardTypeForm" class="card d-none mt-3">
+                            <div class="card-body">
+                                <h6 class="card-title">Nouveau type de carte</h6>
+                                <div class="mb-2">
+                                    <label for="newCardTypeLabel" class="form-label">Label <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control form-control-sm" id="newCardTypeLabel" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="newCardTypeDetail" class="form-label">Description</label>
+                                    <textarea class="form-control form-control-sm" id="newCardTypeDetail" rows="2"></textarea>
+                                </div>
+                                <div class="d-flex gap-2">
+                                    <button type="button" class="btn btn-sm btn-primary" id="saveNewCardType">Enregistrer</button>
+                                    <button type="button" class="btn btn-sm btn-secondary" id="cancelNewCardType">Annuler</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" id="deleteProjectBtn">Supprimer le projet</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="button" class="btn btn-primary" id="saveEditProject">Enregistrer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="addCardModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Ajouter une carte</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="cardTitle" class="form-label">Titre <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="cardTitle" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="cardDetail" class="form-label">Détail</label>
+                        <textarea class="form-control" id="cardDetail" rows="3"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="cardType" class="form-label">Type de carte <span class="text-danger">*</span></label>
+                        <select id="cardType" class="form-select" required>
+                            <option value="">Choisir un type</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="button" class="btn btn-primary" id="saveNewCard">Créer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="editCardModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">✏️ Éditer la carte</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="editCardId">
+                    <div class="mb-3">
+                        <label for="editCardTitle" class="form-label">Titre <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="editCardTitle" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editCardDetail" class="form-label">Détail</label>
+                        <textarea class="form-control" id="editCardDetail" rows="3"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editCardType" class="form-label">Type de carte <span class="text-danger">*</span></label>
+                        <select id="editCardType" class="form-select" required>
+                            <option value="">Choisir un type</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="button" class="btn btn-primary" id="saveEditCard">Enregistrer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{/block}
+
+{block scripts}
     <script src="/app/modules/Kanban/js/kanban.js"></script>
 {/block}

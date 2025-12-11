@@ -31,7 +31,7 @@ class ImportApi extends AbstractApi
             $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
-        $this->renderJson($this->getHeadersFromCSV_(intval($_POST['headerRow'] ?? 1)), true, ApplicationError::Ok->value);
+        $this->renderJsonOk($this->getHeadersFromCSV_(intval($_POST['headerRow'] ?? 1)));
     }
 
     #region Private functions

@@ -33,7 +33,7 @@ class NavbarApi extends AbstractApi
             $result = $this->pageDataHelper->del($id);
             $this->renderJson([], $result === 1, ApplicationError::Ok->value);
         } catch (Throwable $e) {
-            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value);
+            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, __FILE__, __LINE__);
         }
     }
 
@@ -48,9 +48,9 @@ class NavbarApi extends AbstractApi
             return;
         }
         try {
-            $this->renderJson(['message' => $this->pageDataHelper->get_($id)], true, ApplicationError::Ok->value);
+            $this->renderJsonOk(['message' => $this->pageDataHelper->get_($id)]);
         } catch (Throwable $e) {
-            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value);
+            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, __FILE__, __LINE__);
         }
     }
 
@@ -67,14 +67,14 @@ class NavbarApi extends AbstractApi
         $data = json_decode(file_get_contents('php://input'), true);
 
         if (empty($data['name']) || empty($data['route'])) {
-            $this->renderJson(['message' => 'Name and Route are required'], false, ApplicationError::Ok->value);
+            $this->renderJsonOk(['message' => 'Name and Route are required']);
             return;
         }
         try {
             $this->pageDataHelper->insertOrUpdate($data);
-            $this->renderJson([], true, ApplicationError::Ok->value);
+            $this->renderJsonOk();
         } catch (Throwable $e) {
-            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value);
+            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, __FILE__, __LINE__);
         }
     }
 
@@ -91,9 +91,9 @@ class NavbarApi extends AbstractApi
         $data = json_decode(file_get_contents('php://input'), true);
         try {
             $this->pageDataHelper->updates($data['positions']);
-            $this->renderJson([], true, ApplicationError::Ok->value);
+            $this->renderJsonOk();
         } catch (Throwable $e) {
-            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value);
+            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, __FILE__, __LINE__);
         }
     }
 }

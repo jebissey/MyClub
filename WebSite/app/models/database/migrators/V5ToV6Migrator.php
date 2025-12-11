@@ -13,24 +13,45 @@ class V5ToV6Migrator implements DatabaseMigratorInterface
     public function upgrade(PDO $pdo, int $currentVersion): int
     {
         $pdo->exec("ALTER TABLE Person ADD COLUMN Notifications TEXT");
+
         $pdo->exec('
-            CREATE TABLE "Kanban" (
+            CREATE TABLE "KanbanCard" (
                 "Id"	INTEGER,
                 "Title"	TEXT NOT NULL,
                 "Detail"	TEXT NOT NULL,
-                PRIMARY KEY("Id")
+                "IdKanbanCardType"	INTEGER NOT NULL,
+                PRIMARY KEY("Id"),
+                FOREIGN KEY("IdKanbanCardType") REFERENCES "KanbanCardType"("Id")
             )'
         );
         $pdo->exec('
-            CREATE TABLE "KanbanStatus" (
+            CREATE TABLE "KanbanCardStatus" (
                 "Id"	INTEGER,
-                "IdKanban"	INTEGER NOT NULL,
-                "IdPerson"	INTEGER NOT NULL,
+                "IdKanbanCard"	INTEGER NOT NULL,
                 "What"	TEXT NOT NULL,
                 "Remark"	TEXT NOT NULL,
                 "LastUpdate"	TEXT NOT NULL DEFAULT current_timestamp,
                 PRIMARY KEY("Id"),
-                FOREIGN KEY("IdKanban") REFERENCES "Kanban"("Id"),
+                FOREIGN KEY("IdKanbanCard") REFERENCES "KanbanCard"("Id")
+            )'
+        );
+        $pdo->exec('
+            CREATE TABLE "KanbanCardType" (
+                "Id"	INTEGER,
+                "Label"	TEXT NOT NULL,
+                "Detail"	TEXT NOT NULL,
+                "IdKanbanProject"	INTEGER NOT NULL,
+                PRIMARY KEY("Id"),
+                FOREIGN KEY("IdKanbanProject") REFERENCES "KanbanProject"("Id")
+            )'
+        );
+        $pdo->exec('
+            CREATE TABLE "KanbanProject" (
+                "Id"	INTEGER,
+                "Title"	TEXT NOT NULL,
+                "Detail"	TEXT NOT NULL,
+                "IdPerson"	INTEGER NOT NULL,
+                PRIMARY KEY("Id"),
                 FOREIGN KEY("IdPerson") REFERENCES "Person"("Id")
             )'
         );

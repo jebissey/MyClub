@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace app\apis;
@@ -42,28 +43,23 @@ abstract class AbstractApi
         Flight::stop();
     }
 
-    protected function renderJsonError(string $message, int $statusCode): void
-    {
-        $this->application->getFlight()->setData('code', $statusCode);
-        $this->application->getFlight()->setData('message', $message);
-        $this->renderJson(
-            ['error' => $message],
-            false,
-            $statusCode
-        );
-    }
-
-    protected function renderPartial(string $template, array $params = []): void
-    {
-        $this->latte->render($template, $params);
-    }
-
     protected function renderJsonBadRequest(string $message, string $file, int $line): void
     {
         $this->renderJson(
             ['message' => "Bad request: {$message} in file {$file} at line {$line}"],
             false,
             ApplicationError::BadRequest->value
+        );
+    }
+
+    protected function renderJsonError(string $message, int $statusCode, string $file, int $line): void
+    {
+        $this->application->getFlight()->setData('code', $statusCode);
+        $this->application->getFlight()->setData('message', $message);
+        $this->renderJson(
+            ['message' => "{$message} in file {$file} at line {$line}"],
+            false,
+            $statusCode
         );
     }
 
@@ -83,5 +79,22 @@ abstract class AbstractApi
             false,
             ApplicationError::MethodNotAllowed->value,
         );
+    }
+
+    protected function renderJsonOk(array $data = [], string $message = 'OK'): void
+    {
+        $this->renderJson(
+            [
+                'message' => $message,
+                ...$data
+            ],
+            true,
+            ApplicationError::Ok->value
+        );
+    }
+
+    protected function renderPartial(string $template, array $params = []): void
+    {
+        $this->latte->render($template, $params);
     }
 }

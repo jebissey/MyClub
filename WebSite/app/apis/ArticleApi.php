@@ -42,14 +42,14 @@ class ArticleApi extends AbstractApi
             return;
         }
         $this->designDataHelper->insertOrUpdate(json_decode(file_get_contents('php://input'), true), $this->application->getConnectedUser()->person->Id);
-        $this->renderJson([], true, ApplicationError::Ok->value);
+        $this->renderJsonOK();
     }
 
     public function getAuthor(int $articleId): void
     {
         $result = $this->articleDataHelper->getAuthor($articleId);
         if ($result === false) $this->renderJsonBadRequest("Unknown article {$articleId}", __FILE__, __LINE__);
-        $this->renderJson(['author' => $result ? [$result] : []], true, ApplicationError::Ok->value);
+        $this->renderJsonOk(['author' => $result ? [$result] : []]);
     }
 
     public function saveSurveyReply(): void
@@ -71,7 +71,7 @@ class ArticleApi extends AbstractApi
             return;
         }
         $this->replyDataHelper->insertOrUpdate($person->Id, $surveyId, isset($data['survey_answers']) ? json_encode($data['survey_answers']) : '[]');
-        $this->renderJson([], true, ApplicationError::Ok->value);
+        $this->renderJsonOk();
     }
 
     public function showSurveyReplyForm(int $articleId): void
@@ -95,16 +95,16 @@ class ArticleApi extends AbstractApi
             if (json_last_error() !== JSON_ERROR_NONE) throw new Exception("JSON error: " . json_last_error_msg());
             $previousReply = $this->replyDataHelper->get_($survey->Id, $person->Id);
             $previousAnswers = $previousReply ? json_decode($previousReply->Answers, true) : null;
-            $this->renderJson([
+            $this->renderJsonOk([
                 'survey' => [
                     'id' => $survey->Id,
                     'question' => $survey->Question,
                     'options' => $options,
                     'previousAnswers' => $previousAnswers
                 ]
-            ], true, ApplicationError::Ok->value);
+            ]);
         } catch (Throwable $e) {
-            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value);
+            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, __FILE__, __LINE__);
         }
     }
 }

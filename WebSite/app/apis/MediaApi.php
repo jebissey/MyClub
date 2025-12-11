@@ -38,7 +38,7 @@ class MediaApi extends AbstractApi
             $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
-        $this->renderJson($this->media->deleteFile($year, $month, $filename), true, ApplicationError::Ok->value);
+        $this->renderJsonOk($this->media->deleteFile($year, $month, $filename));
     }
 
     public function isShared(): void
@@ -54,10 +54,10 @@ class MediaApi extends AbstractApi
         $data = $this->getJsonInput();
         $filePath = $data['item'] ?? null;
         if (!$filePath) {
-            $this->renderJson(['error' => 'Fichier manquant'], false, ApplicationError::BadRequest->value);
+            $this->renderJsonBadRequest('Fichier manquant',__FILE__, __LINE__);
             return;
         }
-        $this->renderJson($this->media->isShared($filePath), true, ApplicationError::Ok->value);
+        $this->renderJsonOk($this->media->isShared($filePath));
     }
 
     public function removeFileShare(int $year, int $month, string $filename): void
@@ -106,10 +106,10 @@ class MediaApi extends AbstractApi
         $file = $_FILES['file'];
         if ($file['error'] !== UPLOAD_ERR_OK) {
             $response = ['message' => 'Erreur lors de l\'upload: ' . $this->getUploadErrorMessage($file['error'])];
-            $this->renderJson($response, false, ApplicationError::Ok->value);
+            $this->renderJsonOk($response);
             return;
         }
-        $this->renderJson($this->media->uploadFile($file), true, ApplicationError::Ok->value);
+        $this->renderJsonOk($this->media->uploadFile($file));
     }
 
     #region private methods

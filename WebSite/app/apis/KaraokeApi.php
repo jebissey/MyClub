@@ -41,11 +41,11 @@ class KaraokeApi extends AbstractApi
         $clientId = $requestParam['clientId'] ?? '';
 
         if (empty($songId)) {
-            $this->renderJsonError('Song ID required', ApplicationError::BadRequest->value);
+            $this->renderJsonError('Song ID required', ApplicationError::BadRequest->value, __FILE__, __LINE__);
             return;
         }
         if (empty($clientId)) {
-            $this->renderJsonError('Client ID required', ApplicationError::BadRequest->value);
+            $this->renderJsonError('Client ID required', ApplicationError::BadRequest->value, __FILE__, __LINE__);
             return;
         }
 
@@ -78,7 +78,7 @@ class KaraokeApi extends AbstractApi
                 break;
 
             default:
-                $this->renderJsonError('Invalid action', ApplicationError::BadRequest->value);
+                $this->renderJsonError('Invalid action', ApplicationError::BadRequest->value, __FILE__, __LINE__);
                 break;
         }
     }
@@ -91,24 +91,24 @@ class KaraokeApi extends AbstractApi
         $isHost = ($count == 0);
         $this->karaokeDataHelper->registerClient($clientId, $sessionDbId, $isHost);
 
-        $this->renderJson([
+        $this->renderJsonOk([
             'serverTime' => time(),
             'isHost' => $isHost,
             'clientsCount' => $count + 1
-        ], true, ApplicationError::Ok->value);
+        ]);
     }
 
     private function handleHeartbeat(string $clientId): void
     {
         $this->karaokeDataHelper->updateHeartbeat($clientId);
-        $this->renderJson(['serverTime' => time()], true, ApplicationError::Ok->value);
+        $this->renderJsonOk(['serverTime' => time()]);
     }
 
     private function handleGetStatus(string $clientId): void
     {
         $session = $this->karaokeDataHelper->getSessionBySessionId($this->sessionId);
         if (!$session) {
-            $this->renderJson([
+            $this->renderJsonOk([
                 'serverTime' => time(),
                 'isHost' => false,
                 'clientsCount' => 0,
@@ -116,7 +116,7 @@ class KaraokeApi extends AbstractApi
                 'status' => 'waiting',
                 'countdownStart' => null,
                 'playStartTime' => null
-            ], true, ApplicationError::Ok->value);
+            ]);
             return;
         }
 
@@ -124,7 +124,7 @@ class KaraokeApi extends AbstractApi
         $isHost = $this->karaokeDataHelper->isClientHost($clientId, $sessionDbId);
         $clientsCount = $this->karaokeDataHelper->countActiveClients($sessionDbId);
 
-        $this->renderJson([
+        $this->renderJsonOk([
             'serverTime' => time(),
             'isHost' => $isHost,
             'clientsCount' => $clientsCount,
@@ -132,31 +132,31 @@ class KaraokeApi extends AbstractApi
             'status' => $session->Status,
             'countdownStart' => $session->CountdownStart,
             'playStartTime' => $session->PlayStartTime
-        ], true, ApplicationError::Ok->value);
+        ]);
     }
 
     private function handleStartCountdown(string $clientId): void
     {
         $session = $this->karaokeDataHelper->getSessionBySessionId($this->sessionId);
         if (!$session) {
-            $this->renderJsonError('Session not found', ApplicationError::PageNotFound->value);
+            $this->renderJsonError('Session not found', ApplicationError::PageNotFound->value, __FILE__, __LINE__);
             return;
         }
 
         $sessionDbId = (int)$session->Id;
         if (!$this->karaokeDataHelper->isClientHost($clientId, $sessionDbId)) {
-            $this->renderJsonError('Not host', ApplicationError::Forbidden->value);
+            $this->renderJsonError('Not host', ApplicationError::Forbidden->value, __FILE__, __LINE__);
             return;
         }
 
         $this->karaokeDataHelper->startCountdown($sessionDbId);
         $updatedSession = $this->karaokeDataHelper->getSessionById($sessionDbId);
 
-        $this->renderJson([
+        $this->renderJsonOk([
             'serverTime' => time(),
             'countdownStart' => $updatedSession->CountdownStart,
             'playStartTime' => $updatedSession->PlayStartTime
-        ], true, ApplicationError::Ok->value);
+        ]);
     }
 
     private function handleDisconnect(string $clientId): void
@@ -169,12 +169,12 @@ class KaraokeApi extends AbstractApi
             $this->karaokeDataHelper->deleteSessionIfEmpty($sessionDbId);
         }
 
-        $this->renderJson(['serverTime' => time()], true, ApplicationError::Ok->value);
+        $this->renderJsonOk(['serverTime' => time()]);
     }
 
     private function handleCleanup(): void
     {
         $this->karaokeDataHelper->cleanup();
-        $this->renderJson(['serverTime' => time()], true, ApplicationError::Ok->value);
+        $this->renderJsonOk(['serverTime' => time()]);
     }
 }

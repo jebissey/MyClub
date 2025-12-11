@@ -7,7 +7,6 @@ namespace app\modules\Kanban;
 use app\helpers\Application;
 use app\models\KanbanDataHelper;
 use app\modules\Common\AbstractController;
-use Throwable;
 
 class KanbanController extends AbstractController
 {
@@ -36,6 +35,7 @@ class KanbanController extends AbstractController
             'cards' => $cards,
             'stats' => $stats,
             'personId' => $personId,
+            'projects' => $this->kanbanDataHelper->getKanbanProjects($personId),
             'columns' => [
                 ['icon' => '💡', 'label' => 'Backlog'],
                 ['icon' => '☑️', 'label' => 'Selected'],

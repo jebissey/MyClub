@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace app\apis;
@@ -24,7 +25,7 @@ class EventNeedApi extends AbstractApi
         DataHelper $dataHelper,
         PersonDataHelper $personDataHelper
     ) {
-        parent::__construct($application, $connectedUser,$dataHelper, $personDataHelper);
+        parent::__construct($application, $connectedUser, $dataHelper, $personDataHelper);
     }
 
     public function deleteNeed(int $id): void
@@ -39,10 +40,10 @@ class EventNeedApi extends AbstractApi
         }
         try {
             $deletedRows = $this->dataHelper->delete('Need', ['Id' => $id]);
-            if ($deletedRows === 1) $this->renderJson([], true, ApplicationError::Ok->value);
-            else  $this->renderJson([], false, ApplicationError::BadRequest->value);
+            if ($deletedRows === 1) $this->renderJsonOk();
+            else  $this->renderJsonBadRequest('', __FILE__, __LINE__);
         } catch (Throwable $e) {
-            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value);
+            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, __FILE__, __LINE__);
         }
     }
 
@@ -64,7 +65,7 @@ class EventNeedApi extends AbstractApi
             $apiResponse = new ApiResponse(true, ApplicationError::Ok->value, ['needs' => $this->eventNeedDataHelper->needsForEvent($id)]);
             $this->renderJson($apiResponse->data, $apiResponse->success, $apiResponse->responseCode);
         } catch (Throwable $e) {
-            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value);
+            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, __FILE__, __LINE__);
         }
     }
 
@@ -81,9 +82,9 @@ class EventNeedApi extends AbstractApi
         $data = $this->getJsonInput();
         try {
             $this->saveNeed_($data);
-            $this->renderJson([], true, ApplicationError::Ok->value);
+            $this->renderJsonOk();
         } catch (Throwable $e) {
-            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value);
+            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, __FILE__, __LINE__);
         }
     }
 

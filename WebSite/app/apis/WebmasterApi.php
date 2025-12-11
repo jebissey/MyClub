@@ -42,7 +42,7 @@ class WebmasterApi extends AbstractApi
             return;
         }
         $this->logDataWriterHelper->add((string)ApplicationError::Ok->value, $_SERVER['HTTP_USER_AGENT'] ?? 'HTTP_USER_AGENT not defined');
-        $this->renderJson(['lastVersion' => Application::VERSION], true, ApplicationError::Ok->value);
+        $this->renderJsonOk(['lastVersion' => Application::VERSION]);
     }
 
     public function sendNotification(): void
@@ -82,7 +82,7 @@ class WebmasterApi extends AbstractApi
                 $this->application->getErrorManager()->raise(ApplicationError::Error, "Push error {$e->getMessage()} in {$e->getFile()}:{$e->getLine()}");
             }
         }
-        $this->renderJson(['sent' => $sent], true, ApplicationError::Ok->value);
+        $this->renderJsonOk(['sent' => $sent]);
     }
 
     public function subscribePush(): void
@@ -97,20 +97,12 @@ class WebmasterApi extends AbstractApi
         $auth     = trim($data['auth'] ?? '');
         $idPerson = $this->connectedUser?->person?->Id() ?? null;
         if ($endpoint === '' || $p256dh === '' || $auth === '') {
-            $this->renderJson(
-                ['message' => 'Requête incomplète.'],
-                false,
-                ApplicationError::BadRequest->value
-            );
+            $this->renderJsonBadRequest('Requête incomplète.', __FILE__, __LINE__);
             return;
         }
         $existing = $this->dataHelper->get('PushSubscription', ['EndPoint' => $endpoint]);
         if ($existing) {
-            $this->renderJson(
-                ['message' => 'Déjà abonné.'],
-                true,
-                ApplicationError::Ok->value
-            );
+            $this->renderJsonOk([], 'Déjà abonné.');
             return;
         }
         $this->dataHelper->set('PushSubscription', [
@@ -120,10 +112,6 @@ class WebmasterApi extends AbstractApi
             'Auth'     => $auth,
         ]);
 
-        $this->renderJson(
-            ['message' => 'Abonnement enregistré.'],
-            true,
-            ApplicationError::Ok->value
-        );
+        $this->renderJsonOk([], 'Abonnement enregistré.');
     }
 }

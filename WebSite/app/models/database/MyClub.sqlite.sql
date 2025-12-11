@@ -152,21 +152,37 @@ CREATE TABLE IF NOT EXISTS "Guest" (
 	FOREIGN KEY("IdEvent") REFERENCES "Event"("Id"),
 	FOREIGN KEY("InvitedBy") REFERENCES "Person"("Id")
 );
-CREATE TABLE IF NOT EXISTS "Kanban" (
+CREATE TABLE IF NOT EXISTS "KanbanCard" (
 	"Id"	INTEGER,
 	"Title"	TEXT NOT NULL,
 	"Detail"	TEXT NOT NULL,
-	PRIMARY KEY("Id")
+	"IdKanbanCardType"	INTEGER NOT NULL,
+	PRIMARY KEY("Id"),
+	FOREIGN KEY("IdKanbanCardType") REFERENCES "KanbanCardType"("Id")
 );
-CREATE TABLE IF NOT EXISTS "KanbanStatus" (
+CREATE TABLE IF NOT EXISTS "KanbanCardStatus" (
 	"Id"	INTEGER,
-	"IdKanban"	INTEGER NOT NULL,
-	"IdPerson"	INTEGER NOT NULL,
+	"IdKanbanCard"	INTEGER NOT NULL,
 	"What"	TEXT NOT NULL,
 	"Remark"	TEXT NOT NULL,
 	"LastUpdate"	TEXT NOT NULL DEFAULT current_timestamp,
 	PRIMARY KEY("Id"),
-	FOREIGN KEY("IdKanban") REFERENCES "Kanban"("Id"),
+	FOREIGN KEY("IdKanbanCard") REFERENCES "KanbanCard"("Id")
+);
+CREATE TABLE IF NOT EXISTS "KanbanCardType" (
+	"Id"	INTEGER,
+	"Label"	TEXT NOT NULL,
+	"Detail"	TEXT NOT NULL,
+	"IdKanbanProject"	INTEGER NOT NULL,
+	PRIMARY KEY("Id"),
+	FOREIGN KEY("IdKanbanProject") REFERENCES "KanbanProject"("Id")
+);
+CREATE TABLE IF NOT EXISTS "KanbanProject" (
+	"Id"	INTEGER,
+	"Title"	TEXT NOT NULL,
+	"Detail"	TEXT NOT NULL,
+	"IdPerson"	INTEGER NOT NULL,
+	PRIMARY KEY("Id"),
 	FOREIGN KEY("IdPerson") REFERENCES "Person"("Id")
 );
 CREATE TABLE IF NOT EXISTS "KaraokeClient" (
