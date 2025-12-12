@@ -25,10 +25,6 @@ class KanbanApi extends AbstractApi
         parent::__construct($application, $connectedUser, $dataHelper, $personDataHelper);
     }
 
-    /**
-     * GET /api/kanban/cards
-     * Récupère toutes les cartes de l'utilisateur connecté
-     */
     public function getCards(): void
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
@@ -41,7 +37,7 @@ class KanbanApi extends AbstractApi
             return;
         }
 
-        $personId = $this->connectedUser->person->getId();
+        $personId = $this->connectedUser->person->Id;
         $cards = $this->kanbanDataHelper->getKanbanCards($personId);
 
         $this->renderJsonOk(['cards' => $cards]);
@@ -59,7 +55,7 @@ class KanbanApi extends AbstractApi
             return;
         }
 
-        $personId = $this->connectedUser->person->getId();
+        $personId = $this->connectedUser->person->Id;
         $card = $this->kanbanDataHelper->getKanbanCard($id, $personId);
 
         if (!$card) {
@@ -141,7 +137,7 @@ class KanbanApi extends AbstractApi
         }
 
         try {
-            $personId = $this->connectedUser->person->getId();
+            $personId = $this->connectedUser->person->Id;
             $success = $this->kanbanDataHelper->updateKanbanCard($id, $personId, $title, $detail);
 
             if ($success) $this->renderJsonOk([], 'Card updated successfully');
@@ -190,7 +186,7 @@ class KanbanApi extends AbstractApi
         }
 
         try {
-            $personId = $this->connectedUser->person->getId();
+            $personId = $this->connectedUser->person->Id;
             $success = $this->kanbanDataHelper->moveKanbanCard($id, $personId, $newStatus, $changeType, $remark);
 
             if ($success) $this->renderJsonOk([], 'Card moved successfully');
@@ -222,7 +218,7 @@ class KanbanApi extends AbstractApi
             return;
         }
         try {
-            $personId = $this->connectedUser->person->getId();
+            $personId = $this->connectedUser->person->Id;
             $success = $this->kanbanDataHelper->deleteKanbanCard($id, $personId);
 
             if ($success) $this->renderJsonOk([], 'Card deleted successfully');
@@ -242,7 +238,7 @@ class KanbanApi extends AbstractApi
             $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }
-        $personId = $this->connectedUser->person->getId();
+        $personId = $this->connectedUser->person->Id;
         $card = $this->kanbanDataHelper->getKanbanCard($id, $personId);
         if (!$card) {
             $this->renderJsonBadRequest('Card not found', __FILE__, __LINE__);
@@ -265,7 +261,7 @@ class KanbanApi extends AbstractApi
             $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }
-        $personId = $this->connectedUser->person->getId();
+        $personId = $this->connectedUser->person->Id;
         $stats = $this->kanbanDataHelper->getKanbanStats($personId);
 
         $this->renderJsonOk(['stats' => $stats]);

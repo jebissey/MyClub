@@ -1,0 +1,13 @@
+import KanbanModule from "./kanbanModule.js";
+
+const statusTransitions = {
+    '💡': { '☑️': 'MovedFromBacklogToSelected', '🔧': 'MovedFromBacklogToInProgress', '🏁': 'MovedFromBacklogToDone' },
+    '☑️': { '💡': 'MovedFromSelectedToBacklog', '🔧': 'MovedFromSelectedToInProgress', '🏁': 'MovedFromSelectedToDone' },
+    '🔧': { '💡': 'MovedFromInProgressToBacklog', '☑️': 'MovedFromInProgressToSelected', '🏁': 'MovedFromInProgressToDone' },
+    '🏁': { '💡': 'MovedFromDoneToBacklog', '☑️': 'MovedFromDoneToSelected', '🔧': 'MovedFromDoneToInProgress' }
+};
+
+document.addEventListener("DOMContentLoaded", () => {
+    const module = new KanbanModule(statusTransitions);
+    module.init();
+});

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace app\models;
 
+use Throwable;
+
 use app\enums\KanbanStatusChange;
 use app\helpers\Application;
 
@@ -156,22 +158,33 @@ class KanbanDataHelper extends Data
 
     public function deleteKanbanCard(int $kanbanId, int $personId): bool
     {
-        // Supprimer d'abord l'historique
-        $sql = "DELETE FROM KanbanStatus WHERE IdKanban = :kanbanId";
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([':kanbanId' => $kanbanId]);
+        try {
+            $this->pdo->beginTransaction();
 
-        // Puis supprimer la carte
-        $sql = "
-            DELETE FROM Kanban 
-            WHERE Id = :kanbanId AND IdPerson = :personId
-        ";
-        $stmt = $this->pdo->prepare($sql);
-        return $stmt->execute([
-            ':kanbanId' => $kanbanId,
-            ':personId' => $personId
-        ]);
+            $sql = "DELETE FROM KanbanCardStatus WHERE IdKanban = :kanbanId";
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute([':kanbanId' => $kanbanId]);
+
+            $sql = "DELETE FROM Kanban WHERE Id = :kanbanId AND IdPerson = :personId";
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute([
+                ':kanbanId' => $kanbanId,
+                ':personId' => $personId
+            ]);
+            if ($stmt->rowCount() === 0) {
+                $this->pdo->rollBack();
+                return false;
+            }
+            $this->pdo->commit();
+            return true;
+        } catch (Throwable $e) {
+            if ($this->pdo->inTransaction()) {
+                $this->pdo->rollBack();
+            }
+            return false;
+        }
     }
+
 
     public function getKanbanHistory(int $kanbanId): array
     {

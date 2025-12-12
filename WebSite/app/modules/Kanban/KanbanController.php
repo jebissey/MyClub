@@ -52,7 +52,7 @@ class KanbanController extends AbstractController
             return;
         }
 
-        $personId = $this->application->getConnectedUser()->person->getId();
+        $personId = $this->application->getConnectedUser()->person->Id;
         $kanbanId = (int)($_GET['id'] ?? 0);
 
         // Vérifier que la carte appartient bien à l'utilisateur
