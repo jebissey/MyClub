@@ -1,178 +1,77 @@
 import ApiClient from "../../Common/js/apiClient.js";
+
 const apiClient = new ApiClient();
 
 export default class KanbanBoard {
     constructor(statusTransitions) {
         this.statusTransitions = statusTransitions;
         this.draggedCard = null;
+
+        this.handleDragStart = this.handleDragStart.bind(this);
+        this.handleDragEnd = this.handleDragEnd.bind(this);
+        this.handleDragOver = this.handleDragOver.bind(this);
+        this.handleDrop = this.handleDrop.bind(this);
+        this.handleDragLeave = this.handleDragLeave.bind(this);
+        this.handleClick = this.handleClick.bind(this);
     }
 
+    /* --------------------------------------------
+        INIT
+    -------------------------------------------- */
     init() {
         this.initDragAndDrop();
-        document.getElementById('saveNewCard')?.addEventListener('click', () => this.createNewCard());
-        document.getElementById('saveEditCard')?.addEventListener('click', () => this.saveEditedCard());
-    }
-    /* --------------------------------------------
-       CARD
-    -------------------------------------------- */
+        this.initGlobalEvents();
 
-    async createNewCard() {
-        const title = document.getElementById('cardTitle').value.trim();
-        const detail = document.getElementById('cardDetail').value.trim();
-        const cardType = document.getElementById('cardType').value;
+        document.getElementById('saveNewCard')
+            ?.addEventListener('click', () => this.createNewCard());
+        document.getElementById('saveEditCard')
+            ?.addEventListener('click', () => this.saveEditedCard());
 
-        if (!title) {
-            alert('Le titre est obligatoire');
-            return;
-        }
-        if (!cardType) {
-            alert('Veuillez sélectionner un type de carte');
-            return;
-        }
-        const data = await apiClient.post('/api/kanban/card/create', { title, detail, cardType });
-        if (data.success) location.reload();
-        else alert('Erreur lors de la création de la carte : ' + (data.error || 'Erreur inconnue'));
+        this.initModalEvents();
     }
 
-    async deleteCard(cardId) {
-        if (!confirm('Êtes-vous sûr de vouloir supprimer cette carte ?')) {
-            return;
-        }
-        const data = await apiClient.post('/api/kanban/card/delete', { id: parseInt(cardId) });
-        if (data.success) {
-            const card = document.querySelector(`.kanban-card[data-id="${cardId}"]`);
-            card.remove();
-        } else {
-            alert('Erreur : ' + (data.error || 'Erreur inconnue'));
-        }
+    initGlobalEvents() {
+        // Event delegation for edit / delete buttons
+        document.addEventListener('click', this.handleClick);
     }
 
-    async saveEditedCard() {
-        const cardId = document.getElementById('editCardId').value;
-        const title = document.getElementById('editCardTitle').value.trim();
-        const detail = document.getElementById('editCardDetail').value.trim();
+    initModalEvents() {
+        const addModal = document.getElementById('addCardModal');
+        const editModal = document.getElementById('editCardModal');
 
-        if (!title) {
-            alert('Le titre est obligatoire');
-            return;
-        }
-        const data = await apiClient.post('/api/kanban/card/update', { id: parseInt(cardId), title, detail, typeId: parseInt(document.getElementById('editCardType').value) });
-        if (data.success) {
-            const card = document.querySelector(`.kanban-card[data-id="${cardId}"]`);
-            card.querySelector('.kanban-card-title').textContent = title;
-            const detailElement = card.querySelector('.kanban-card-detail');
-            if (detailElement) {
-                detailElement.textContent = detail;
-            } else if (detail) {
-                const newDetailDiv = document.createElement('div');
-                newDetailDiv.className = 'kanban-card-detail';
-                newDetailDiv.textContent = detail;
-                card.querySelector('.kanban-card-title').after(newDetailDiv);
-            }
-            const modal = bootstrap.Modal.getInstance(document.getElementById('editCardModal'));
-            modal.hide();
-        } else alert('Erreur : ' + (data.error || 'Erreur inconnue'));
-    }
-
-    openEditModal(cardId) {
-        const card = document.querySelector(`.kanban-card[data-id="${cardId}"]`);
-        const title = card.querySelector('.kanban-card-title').textContent;
-        const detailElement = card.querySelector('.kanban-card-detail');
-        const detail = detailElement ? detailElement.textContent : '';
-
-        document.getElementById('editCardId').value = cardId;
-        document.getElementById('editCardTitle').value = title;
-        document.getElementById('editCardDetail').value = detail;
-        document.getElementById('editCardType').value = card.IdKanbanCardType;
-
-        const modal = new bootstrap.Modal(document.getElementById('editCardModal'));
-        modal.show();
-    }
-
-    /* --------------------------------------------
-        DRAG And DROP
-    -------------------------------------------- */
-    initDragAndDrop() {
-        document.querySelectorAll('.kanban-card').forEach(card => {
-            card.addEventListener('dragstart', e => this.handleDragStart(e, card));
-            card.addEventListener('dragend', e => this.handleDragEnd(e, card));
+        addModal?.addEventListener('show.bs.modal', () => {
+            this.reloadCardTypes(this.projectId);
         });
-        document.querySelectorAll('.kanban-cards').forEach(column => {
-            column.addEventListener('dragover', e => this.handleDragOver(e, column));
-            column.addEventListener('drop', e => this.handleDrop(e, column));
-            column.addEventListener('dragleave', () => column.classList.remove('drag-over'));
+
+        editModal?.addEventListener('show.bs.modal', () => {
+            this.reloadCardTypes(this.projectId);
         });
     }
 
-    handleDragStart(e, card) {
-        this.draggedCard = card;
-        card.classList.add('dragging');
-        e.dataTransfer.effectAllowed = 'move';
-    }
+    handleClick(e) {
+        const editBtn = e.target.closest('.edit-card');
+        const deleteBtn = e.target.closest('.delete-card');
 
-    handleDragEnd(_, card) {
-        card.classList.remove('dragging');
-    }
-
-    handleDragOver(e, column) {
-        e.preventDefault();
-        column.classList.add('drag-over');
-    }
-
-    handleDragLeave(e) {
-        this.classList.remove('drag-over');
-    }
-
-    async handleDrop(e, column) {
-        e.stopPropagation();
-        column.classList.remove('drag-over');
-        if (!this.draggedCard) return;
-
-        const oldStatus = this.draggedCard.dataset.status;
-        const newStatus = column.dataset.status;
-        const cardId = this.draggedCard.dataset.id;
-
-        if (oldStatus !== newStatus) {
-            const changeType = this.statusTransitions[oldStatus][newStatus];
-            if (changeType) {
-                column.appendChild(this.draggedCard);
-                this.draggedCard.dataset.status = newStatus;
-                await this.moveCardToStatus(cardId, newStatus, changeType);
-            }
+        if (editBtn) {
+            this.openEditModal(editBtn.dataset.id);
+        }
+        if (deleteBtn) {
+            this.deleteCard(deleteBtn.dataset.id);
         }
     }
 
-    async moveCardToStatus(cardId, newStatus, changeType) {
-        const data = await apiClient.post('/api/kanban/card/move', {
-            id: parseInt(cardId),
-            status: newStatus,
-            changeType,
-            remark: ''
-        });
-        if (!data.success) location.reload();
-    }
-
-    async updateKanbanBoard(cards) {
+    update(cards) {
         document.querySelectorAll('.kanban-cards').forEach(column => {
             column.innerHTML = '';
         });
-
         cards.forEach(card => {
-            if (!card || !card.CurrentStatus) return;
-
-            const safeStatus = CSS.escape(card.CurrentStatus);
-            const column = document.querySelector(`.kanban-cards[data-status="${safeStatus}"]`);
-
-            if (!column) {
-                console.warn("Colonne introuvable pour status:", card.CurrentStatus);
-                return;
+            const column = document.querySelector(`.kanban-cards[data-status="${card.CurrentStatus}"]`);
+            if (column) {
+                const cardElement = this.createCardElement(card);
+                column.appendChild(cardElement);
             }
-
-            const cardElement = this.createCardElement(card);
-            column.appendChild(cardElement);
         });
-
-        this.initializeDragAndDrop();
+        this.initDragAndDrop();
     }
 
     createCardElement(card) {
@@ -209,23 +108,222 @@ export default class KanbanBoard {
         cardDiv.addEventListener('dragstart', this.handleDragStart);
         cardDiv.addEventListener('dragend', this.handleDragEnd);
 
-        actionsDiv.querySelector('.edit-card').addEventListener('click', () => { this.openEditModal(card.Id); });
-        actionsDiv.querySelector('.delete-card').addEventListener('click', () => { this.deleteCard(card.Id); });
+        actionsDiv.querySelector('.edit-card').addEventListener('click', function () {
+            this.openEditModal(card.Id);
+        });
+
+        actionsDiv.querySelector('.delete-card').addEventListener('click', function () {
+            this.deleteCard(card.Id);
+        });
+
         return cardDiv;
     }
 
-    initializeDragAndDrop() {
-        const cards = document.querySelectorAll('.kanban-card');
-        cards.forEach(card => {
+    /* --------------------------------------------
+        CARD CRUD
+    -------------------------------------------- */
+    async createNewCard() {
+        const title = document.getElementById('cardTitle')?.value.trim();
+        const detail = document.getElementById('cardDetail')?.value.trim();
+        const cardType = document.getElementById('cardType')?.value;
+
+        if (!title) return alert('Le titre est obligatoire');
+        if (!cardType) return alert('Veuillez sélectionner un type de carte');
+
+        try {
+            const data = await apiClient.post('/api/kanban/card/create', {
+                title,
+                detail,
+                cardType
+            });
+
+            if (!data.success) {
+                alert(data.error || 'Erreur lors de la création');
+                return;
+            }
+            location.reload();
+        } catch (e) {
+            console.error(e);
+            alert('Erreur réseau');
+        }
+    }
+
+    async deleteCard(cardId) {
+        if (!confirm('Êtes-vous sûr de vouloir supprimer cette carte ?')) return;
+
+        try {
+            const data = await apiClient.post('/api/kanban/card/delete', {
+                id: Number(cardId)
+            });
+
+            if (!data.success) {
+                alert(data.error || 'Erreur inconnue');
+                return;
+            }
+
+            document
+                .querySelector(`.kanban-card[data-id="${cardId}"]`)
+                ?.remove();
+        } catch (e) {
+            console.error(e);
+            alert('Erreur réseau');
+        }
+    }
+
+    async saveEditedCard() {
+        const cardId = document.getElementById('editCardId')?.value;
+        const title = document.getElementById('editCardTitle')?.value.trim();
+        const detail = document.getElementById('editCardDetail')?.value.trim();
+        const typeId = Number(document.getElementById('editCardType')?.value);
+
+        if (!title) return alert('Le titre est obligatoire');
+
+        try {
+            const data = await apiClient.post('/api/kanban/card/update', {
+                id: Number(cardId),
+                title,
+                detail,
+                typeId
+            });
+
+            if (!data.success) {
+                alert(data.error || 'Erreur inconnue');
+                return;
+            }
+
+            this.updateCardInDOM(cardId, title, detail);
+            bootstrap.Modal.getInstance(
+                document.getElementById('editCardModal')
+            )?.hide();
+        } catch (e) {
+            console.error(e);
+            alert('Erreur réseau');
+        }
+    }
+
+    updateCardInDOM(cardId, title, detail) {
+        const card = document.querySelector(`.kanban-card[data-id="${cardId}"]`);
+        if (!card) return;
+
+        card.querySelector('.kanban-card-title').textContent = title;
+
+        let detailDiv = card.querySelector('.kanban-card-detail');
+        if (detail) {
+            if (!detailDiv) {
+                detailDiv = document.createElement('div');
+                detailDiv.className = 'kanban-card-detail';
+                card.querySelector('.kanban-card-title').after(detailDiv);
+            }
+            detailDiv.textContent = detail;
+        } else if (detailDiv) {
+            detailDiv.remove();
+        }
+    }
+
+    openEditModal(cardId) {
+        const card = document.querySelector(`.kanban-card[data-id="${cardId}"]`);
+        if (!card) return;
+
+        document.getElementById('editCardId').value = cardId;
+        document.getElementById('editCardTitle').value =
+            card.querySelector('.kanban-card-title').textContent;
+        document.getElementById('editCardDetail').value =
+            card.querySelector('.kanban-card-detail')?.textContent || '';
+        document.getElementById('editCardType').value = card.dataset.typeId;
+
+        new bootstrap.Modal(
+            document.getElementById('editCardModal')
+        ).show();
+    }
+
+    displayCardTypes(cardTypes) {
+        const selects = [
+            document.getElementById('cardType'),
+            document.getElementById('editCardType')
+        ];
+
+        selects.forEach(select => {
+            if (!select) return;
+
+            // Reset
+            select.innerHTML = '<option value="">Choisir un type</option>';
+
+            cardTypes.forEach(type => {
+                const option = document.createElement('option');
+                option.value = type.Id;
+                option.textContent = type.Label;
+                select.appendChild(option);
+            });
+        });
+    }
+
+    /* --------------------------------------------
+        DRAG & DROP
+    -------------------------------------------- */
+    initDragAndDrop() {
+        document.querySelectorAll('.kanban-card').forEach(card => {
             card.addEventListener('dragstart', this.handleDragStart);
             card.addEventListener('dragend', this.handleDragEnd);
         });
 
-        const columns = document.querySelectorAll('.kanban-cards');
-        columns.forEach(column => {
+        document.querySelectorAll('.kanban-cards').forEach(column => {
             column.addEventListener('dragover', this.handleDragOver);
             column.addEventListener('drop', this.handleDrop);
             column.addEventListener('dragleave', this.handleDragLeave);
         });
+    }
+
+    handleDragStart(e) {
+        this.draggedCard = e.currentTarget;
+        this.draggedCard.classList.add('dragging');
+        e.dataTransfer.effectAllowed = 'move';
+    }
+
+    handleDragEnd(e) {
+        e.currentTarget.classList.remove('dragging');
+        this.draggedCard = null;
+    }
+
+    handleDragOver(e) {
+        e.preventDefault();
+        e.currentTarget.classList.add('drag-over');
+    }
+
+    handleDragLeave(e) {
+        e.currentTarget.classList.remove('drag-over');
+    }
+
+    async handleDrop(e) {
+        e.preventDefault();
+        const column = e.currentTarget;
+        column.classList.remove('drag-over');
+
+        if (!this.draggedCard) return;
+
+        const oldStatus = this.draggedCard.dataset.status;
+        const newStatus = column.dataset.status;
+        const cardId = this.draggedCard.dataset.id;
+
+        if (oldStatus === newStatus) return;
+
+        const changeType = this.statusTransitions?.[oldStatus]?.[newStatus];
+        if (!changeType) return;
+
+        column.appendChild(this.draggedCard);
+        this.draggedCard.dataset.status = newStatus;
+
+        try {
+            const data = await apiClient.post('/api/kanban/card/move', {
+                id: Number(cardId),
+                status: newStatus,
+                changeType,
+                remark: ''
+            });
+
+            if (!data.success) location.reload();
+        } catch (e) {
+            console.error(e);
+            location.reload();
+        }
     }
 }

@@ -2,18 +2,11 @@ import KanbanBoard from "./kanbanBoard.js";
 import ProjectManager from "./project/projectManager.js";
 import CardTypeManager from "./project/cardType/cardTypeManager.js";
 
-/**
- * KanbanModule
- * Rôle : orchestrateur UI / métier pour le Kanban
- * - délègue le CRUD aux managers
- * - délègue l'affichage du board à KanbanBoard
- * - centralise la gestion des événements et erreurs
- */
 export default class KanbanModule {
     constructor(statusTransitions) {
         this.statusTransitions = statusTransitions;
 
-        this.kanban = new KanbanBoard(statusTransitions);
+        this.kanbanBoard = new KanbanBoard(statusTransitions);
         this.projectManager = new ProjectManager();
         this.cardTypeManager = new CardTypeManager();
 
@@ -24,7 +17,7 @@ export default class KanbanModule {
        INIT
     -------------------------------------------- */
     init() {
-        this.kanban.init();
+        this.kanbanBoard.init();
         this.attachEvents();
         this.handleProjectSelection();
     }
@@ -51,6 +44,9 @@ export default class KanbanModule {
             editProjectId: document.getElementById("editProjectId"),
             editProjectTitle: document.getElementById("editProjectTitle"),
             editProjectDescription: document.getElementById("editProjectDescription"),
+
+            addCardModal: document.getElementById("addCardModal"),
+            editCardModal: document.getElementById("editCardModal"),
         };
     }
 
@@ -66,9 +62,20 @@ export default class KanbanModule {
        PROJECT SELECTION
     -------------------------------------------- */
     handleProjectSelection() {
-        this.dom.projectSelect.addEventListener("change", () => {
+        this.dom.projectSelect.addEventListener("change", async () => {
             const projectId = this.dom.projectSelect.value;
-            projectId ? this.showProjectUI(projectId) : this.hideProjectUI();
+            if (!projectId) {
+                this.hideProjectUI();
+                return;
+            }
+
+            this.showProjectUI(projectId);
+
+            // recharge les types de cartes pour le projet sélectionné
+            const response = await this.cardTypeManager.load(projectId);
+            if (response.success) {
+                this.populateCardTypeSelects(response.cardTypes ?? []);
+            }
         });
     }
 
@@ -99,7 +106,7 @@ export default class KanbanModule {
             this.handleError("Impossible de charger les cartes", result);
             return;
         }
-        this.kanban.updateKanbanBoard(result.cards ?? []);
+        this.kanbanBoard.update(result.cards ?? []);
     }
 
     /* --------------------------------------------
@@ -157,14 +164,13 @@ export default class KanbanModule {
             this.handleError("Sauvegarde du projet impossible", result);
             return;
         }
-        const modal = bootstrap.Modal.getOrCreateInstance(this.dom.editProjectModal);
-        modal.hide();
+        bootstrap.Modal.getOrCreateInstance(this.dom.editProjectModal).hide();
     }
 
     /* --------------------------------------------
        CARD TYPES
     -------------------------------------------- */
-    showNewCardTypeForm() {
+        showNewCardTypeForm() {
         this.dom.newCardTypeForm.classList.remove("d-none");
     }
 
@@ -208,6 +214,7 @@ export default class KanbanModule {
             return;
         }
         this.displayCardTypes(response.cardTypes ?? []);
+        this.populateCardTypeSelects(response.cardTypes ?? []);
     }
 
     displayCardTypes(cardTypes) {
@@ -232,7 +239,6 @@ export default class KanbanModule {
             const label = document.createElement("span");
             label.className = "fw-bold";
             label.textContent = type.Label;
-
             info.appendChild(label);
 
             if (type.Detail) {
@@ -253,6 +259,24 @@ export default class KanbanModule {
         });
     }
 
+    populateCardTypeSelects(cardTypes) {
+        const selects = [
+            document.getElementById("cardType"),
+            document.getElementById("editCardType")
+        ];
+
+        selects.forEach(select => {
+            if (!select) return;
+            select.innerHTML = '<option value="">Choisir un type</option>';
+            cardTypes.forEach(type => {
+                const option = document.createElement("option");
+                option.value = type.Id;
+                option.textContent = type.Label;
+                select.appendChild(option);
+            });
+        });
+    }
+
     /* --------------------------------------------
        EVENTS
     -------------------------------------------- */
@@ -267,5 +291,22 @@ export default class KanbanModule {
         document.getElementById('addCardTypeBtn')?.addEventListener('click', () => this.showNewCardTypeForm());
         document.getElementById('saveNewCardType')?.addEventListener('click', () => this.createNewCardType());
         document.getElementById('cancelNewCardType')?.addEventListener('click', () => this.hideNewCardTypeForm());
+
+        // Charger les types de cartes à l'ouverture des modales
+        this.dom.addCardModal?.addEventListener('show.bs.modal', async () => {
+            const projectId = this.dom.projectSelect.value;
+            if (!projectId) return;
+            const response = await this.cardTypeManager.load(projectId);
+            if (response.success) this.populateCardTypeSelects(response.cardTypes ?? []);
+            else this.handleError("Chargement des types de carte impossible", response);
+        });
+
+        this.dom.editCardModal?.addEventListener('show.bs.modal', async () => {
+            const projectId = this.dom.projectSelect.value;
+            if (!projectId) return;
+            const response = await this.cardTypeManager.load(projectId);
+            if (response.success) this.populateCardTypeSelects(response.cardTypes ?? []);
+            else this.handleError("Chargement des types de carte impossible", response);
+        });
     }
 }
