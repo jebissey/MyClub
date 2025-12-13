@@ -156,20 +156,28 @@ class KanbanDataHelper extends Data
         return $success;
     }
 
-    public function deleteKanbanCard(int $kanbanId, int $personId): bool
+    public function deleteKanbanCard(int $idKanbanCard, int $idPerson): bool
     {
         try {
             $this->pdo->beginTransaction();
 
-            $sql = "DELETE FROM KanbanCardStatus WHERE IdKanban = :kanbanId";
+            $sql = "DELETE FROM KanbanCardStatus WHERE IdKanbanCard = :idKanbanCard";
             $stmt = $this->pdo->prepare($sql);
-            $stmt->execute([':kanbanId' => $kanbanId]);
+            $stmt->execute([':idKanbanCard' => $idKanbanCard]);
 
-            $sql = "DELETE FROM Kanban WHERE Id = :kanbanId AND IdPerson = :personId";
+            $sql = "
+                DELETE FROM KanbanCard
+                WHERE Id IN (
+                    SELECT kc.Id
+                    FROM KanbanCard kc
+                    JOIN KanbanCardType kct ON kct.Id = kc.IdKanbanCardType
+                    JOIN KanbanProject kp ON kp.Id = kct.IdKanbanProject
+                    WHERE kc.Id = :idKanbanCard
+                    AND kp.IdPerson = :idPerson)";
             $stmt = $this->pdo->prepare($sql);
             $stmt->execute([
-                ':kanbanId' => $kanbanId,
-                ':personId' => $personId
+                ':idKanbanCard' => $idKanbanCard,
+                ':idPerson' => $idPerson
             ]);
             if ($stmt->rowCount() === 0) {
                 $this->pdo->rollBack();
@@ -184,7 +192,6 @@ class KanbanDataHelper extends Data
             return false;
         }
     }
-
 
     public function getKanbanHistory(int $kanbanId): array
     {
@@ -217,7 +224,6 @@ class KanbanDataHelper extends Data
             ':lastUpdate' => date('Y-m-d H:i:s')
         ]);
     }
-
 
     public function getKanbanStats(int $personId): array
     {
@@ -273,6 +279,16 @@ class KanbanDataHelper extends Data
             ':detail' => $detail
         ]);
         return (int)$this->pdo->lastInsertId();
+    }
+
+    public function deleteKanbanProject(int $id, int $idPerson): bool
+    {
+        $sql = "DELETE FROM KanbanProject WHERE Id = :id  AND IdPerson = :idPerson";
+        $stmt = $this->pdo->prepare($sql);
+        return $stmt->execute([
+            ':id' => $id,
+            ':idPerson' => $idPerson
+        ]);
     }
 
     public function getProjectCards(int $idProject): array

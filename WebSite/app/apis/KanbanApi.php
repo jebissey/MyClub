@@ -25,47 +25,7 @@ class KanbanApi extends AbstractApi
         parent::__construct($application, $connectedUser, $dataHelper, $personDataHelper);
     }
 
-    public function getCards(): void
-    {
-        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
-            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
-
-        if (!$this->connectedUser->isKanbanDesigner()) {
-            $this->renderJsonForbidden(__FILE__, __LINE__);
-            return;
-        }
-
-        $personId = $this->connectedUser->person->Id;
-        $cards = $this->kanbanDataHelper->getKanbanCards($personId);
-
-        $this->renderJsonOk(['cards' => $cards]);
-    }
-
-    public function getCard(int $id): void
-    {
-        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
-            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
-
-        if (!$this->connectedUser->isKanbanDesigner()) {
-            $this->renderJsonForbidden(__FILE__, __LINE__);
-            return;
-        }
-
-        $personId = $this->connectedUser->person->Id;
-        $card = $this->kanbanDataHelper->getKanbanCard($id, $personId);
-
-        if (!$card) {
-            $this->renderJsonBadRequest('Card not found', __FILE__, __LINE__);
-            return;
-        }
-
-        $this->renderJsonOk(['card' => $card]);
-    }
-
+    #region Card
     public function createCard(): void
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -105,9 +65,38 @@ class KanbanApi extends AbstractApi
         }
     }
 
-    public function updateCard(): void
+    public function deleteCard(): void
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
+            return;
+        }
+        if (!$this->connectedUser->isKanbanDesigner()) {
+            $this->renderJsonForbidden(__FILE__, __LINE__);
+            return;
+        }
+        $data = json_decode(file_get_contents('php://input'), true);
+        if (!is_array($data)) {
+            $this->renderJsonBadRequest('Invalid JSON', __FILE__, __LINE__);
+            return;
+        }
+        $id = (int)($data['id'] ?? 0);
+        if ($id <= 0) {
+            $this->renderJsonBadRequest('Invalid card ID', __FILE__, __LINE__);
+            return;
+        }
+        try {
+            $success = $this->kanbanDataHelper->deleteKanbanCard($id, $this->connectedUser->person->Id);
+            if ($success) $this->renderJsonOk([], 'Card deleted successfully');
+            else          $this->renderJsonBadRequest('Card not found or unauthorized', __FILE__, __LINE__);
+        } catch (Throwable $e) {
+            $this->renderJsonError('Failed to delete card' .  $e->getMessage(), ApplicationError::Error->value, __FILE__, __LINE__);
+        }
+    }
+
+    public function getCard(int $id): void
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
             $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
@@ -117,34 +106,72 @@ class KanbanApi extends AbstractApi
             return;
         }
 
-        $data = json_decode(file_get_contents('php://input'), true);
-        if (!is_array($data)) {
-            $this->renderJsonBadRequest('Invalid JSON', __FILE__, __LINE__);
+        $personId = $this->connectedUser->person->Id;
+        $card = $this->kanbanDataHelper->getKanbanCard($id, $personId);
+
+        if (!$card) {
+            $this->renderJsonBadRequest('Card not found', __FILE__, __LINE__);
             return;
         }
 
-        $id = (int)($data['id'] ?? 0);
-        $title = trim($data['title'] ?? '');
-        $detail = trim($data['detail'] ?? '');
+        $this->renderJsonOk(['card' => $card]);
+    }
 
-        if ($id <= 0) {
-            $this->renderJsonBadRequest('Invalid card ID', __FILE__, __LINE__);
-            return;
-        }
-        if (empty($title)) {
-            $this->renderJsonBadRequest('Title is required', __FILE__, __LINE__);
+    public function getCards(): void
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
 
-        try {
-            $personId = $this->connectedUser->person->Id;
-            $success = $this->kanbanDataHelper->updateKanbanCard($id, $personId, $title, $detail);
-
-            if ($success) $this->renderJsonOk([], 'Card updated successfully');
-            else          $this->renderJsonBadRequest('Card not found or unauthorized', __FILE__, __LINE__);
-        } catch (Throwable $e) {
-            $this->renderJsonError('Failed to update card :' . $e->getMessage(), ApplicationError::Error->value, __FILE__, __LINE__);
+        if (!$this->connectedUser->isKanbanDesigner()) {
+            $this->renderJsonForbidden(__FILE__, __LINE__);
+            return;
         }
+
+        $personId = $this->connectedUser->person->Id;
+        $cards = $this->kanbanDataHelper->getKanbanCards($personId);
+
+        $this->renderJsonOk(['cards' => $cards]);
+    }
+
+    public function getHistory(int $id): void
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
+            return;
+        }
+        if (!$this->connectedUser->isKanbanDesigner()) {
+            $this->renderJsonForbidden(__FILE__, __LINE__);
+            return;
+        }
+        $personId = $this->connectedUser->person->Id;
+        $card = $this->kanbanDataHelper->getKanbanCard($id, $personId);
+        if (!$card) {
+            $this->renderJsonBadRequest('Card not found', __FILE__, __LINE__);
+            return;
+        }
+
+        $this->renderJsonOk([
+            'card' => $card,
+            'history' => $this->kanbanDataHelper->getKanbanHistory($id)
+        ]);
+    }
+
+    public function getStats(): void
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
+            return;
+        }
+        if (!$this->connectedUser->isKanbanDesigner()) {
+            $this->renderJsonForbidden(__FILE__, __LINE__);
+            return;
+        }
+        $personId = $this->connectedUser->person->Id;
+        $stats = $this->kanbanDataHelper->getKanbanStats($personId);
+
+        $this->renderJsonOk(['stats' => $stats]);
     }
 
     public function moveCard(): void
@@ -196,16 +223,18 @@ class KanbanApi extends AbstractApi
         }
     }
 
-    public function deleteCard(): void
+    public function updateCard(): void
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
+
         if (!$this->connectedUser->isKanbanDesigner()) {
             $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }
+
         $data = json_decode(file_get_contents('php://input'), true);
         if (!is_array($data)) {
             $this->renderJsonBadRequest('Invalid JSON', __FILE__, __LINE__);
@@ -213,58 +242,27 @@ class KanbanApi extends AbstractApi
         }
 
         $id = (int)($data['id'] ?? 0);
+        $title = trim($data['title'] ?? '');
+        $detail = trim($data['detail'] ?? '');
+
         if ($id <= 0) {
             $this->renderJsonBadRequest('Invalid card ID', __FILE__, __LINE__);
             return;
         }
+        if (empty($title)) {
+            $this->renderJsonBadRequest('Title is required', __FILE__, __LINE__);
+            return;
+        }
+
         try {
             $personId = $this->connectedUser->person->Id;
-            $success = $this->kanbanDataHelper->deleteKanbanCard($id, $personId);
+            $success = $this->kanbanDataHelper->updateKanbanCard($id, $personId, $title, $detail);
 
-            if ($success) $this->renderJsonOk([], 'Card deleted successfully');
+            if ($success) $this->renderJsonOk([], 'Card updated successfully');
             else          $this->renderJsonBadRequest('Card not found or unauthorized', __FILE__, __LINE__);
         } catch (Throwable $e) {
-            $this->renderJsonError('Failed to delete card' .  $e->getMessage(), ApplicationError::Error->value, __FILE__, __LINE__);
+            $this->renderJsonError('Failed to update card :' . $e->getMessage(), ApplicationError::Error->value, __FILE__, __LINE__);
         }
-    }
-
-    public function getHistory(int $id): void
-    {
-        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
-            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
-        if (!$this->connectedUser->isKanbanDesigner()) {
-            $this->renderJsonForbidden(__FILE__, __LINE__);
-            return;
-        }
-        $personId = $this->connectedUser->person->Id;
-        $card = $this->kanbanDataHelper->getKanbanCard($id, $personId);
-        if (!$card) {
-            $this->renderJsonBadRequest('Card not found', __FILE__, __LINE__);
-            return;
-        }
-
-        $this->renderJsonOk([
-            'card' => $card,
-            'history' => $this->kanbanDataHelper->getKanbanHistory($id)
-        ]);
-    }
-
-    public function getStats(): void
-    {
-        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
-            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
-        if (!$this->connectedUser->isKanbanDesigner()) {
-            $this->renderJsonForbidden(__FILE__, __LINE__);
-            return;
-        }
-        $personId = $this->connectedUser->person->Id;
-        $stats = $this->kanbanDataHelper->getKanbanStats($personId);
-
-        $this->renderJsonOk(['stats' => $stats]);
     }
 
     #region Project
@@ -300,7 +298,35 @@ class KanbanApi extends AbstractApi
                 'message' => 'Project created successfully'
             ]);
         } catch (Throwable $e) {
-            $this->renderJsonError('Failed to create project', ApplicationError::Error->value, __FILE__, __LINE__);
+            $this->renderJsonError('Failed to create project: ' . $e->getMessage(), ApplicationError::Error->value, __FILE__, __LINE__);
+        }
+    }
+    public function deleteProject(): void
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
+            return;
+        }
+        if (!$this->connectedUser->isKanbanDesigner()) {
+            $this->renderJsonForbidden(__FILE__, __LINE__);
+            return;
+        }
+        $data = json_decode(file_get_contents('php://input'), true);
+        if (!is_array($data)) {
+            $this->renderJsonBadRequest('Invalid JSON', __FILE__, __LINE__);
+            return;
+        }
+        $id = trim($data['id'] ?? '');
+        if (empty($id)) {
+            $this->renderJsonBadRequest('Id is required', __FILE__, __LINE__);
+            return;
+        }
+        try {
+            $success = $this->kanbanDataHelper->deleteKanbanProject((int)$id, $this->connectedUser->person->Id);
+            if ($success) $this->renderJsonOk();
+            else          $this->renderJsonBadRequest('Project not found or unauthorized', __FILE__, __LINE__);
+        } catch (Throwable $e) {
+            $this->renderJsonError('Failed to delete project: ' . $e->getMessage(), ApplicationError::Error->value, __FILE__, __LINE__);
         }
     }
 

@@ -117,38 +117,6 @@ export default class KanbanModule {
         location.reload();
     }
 
-    async loadProjectForEdit(projectId) {
-        const response = await this.projectManager.load(projectId);
-        if (!response.success || !response.project) {
-            this.handleError("Projet invalide", response);
-            return;
-        }
-
-        const { Id, Title, Detail } = response.project;
-        this.dom.editProjectId.value = Id;
-        this.dom.editProjectTitle.value = Title;
-        this.dom.editProjectDescription.value = Detail;
-
-        await this.reloadCardTypes(Id);
-        this.dom.editProjectModal.classList.remove("d-none");
-    }
-
-    async saveEditedProject() {
-        const { editProjectId, editProjectTitle, editProjectDescription } = this.dom;
-
-        const result = await this.projectManager.update(
-            editProjectId.value,
-            editProjectTitle.value.trim(),
-            editProjectDescription.value.trim()
-        );
-
-        if (!result.success) {
-            this.handleError("Sauvegarde du projet impossible", result);
-            return;
-        }
-        location.reload();
-    }
-
     async deleteProject() {
         const projectId = this.dom.projectSelect.value;
         if (!projectId) return alert("Sélectionnez un projet");
@@ -160,6 +128,37 @@ export default class KanbanModule {
             return;
         }
         location.reload();
+    }
+
+    async loadProjectForEdit(projectId) {
+        const response = await this.projectManager.load(projectId);
+        if (!response.success || !response.project) {
+            this.handleError("Projet invalide", response);
+            return;
+        }
+        const { Id, Title, Detail } = response.project;
+        this.dom.editProjectId.value = Id;
+        this.dom.editProjectTitle.value = Title;
+        this.dom.editProjectDescription.value = Detail;
+
+        await this.reloadCardTypes(Id);
+        this.dom.editProjectModal.classList.remove("d-none");
+    }
+
+    async saveEditedProject() {
+        const { editProjectId, editProjectTitle, editProjectDescription } = this.dom;
+        const result = await this.projectManager.update(
+            editProjectId.value,
+            editProjectTitle.value.trim(),
+            editProjectDescription.value.trim()
+        );
+
+        if (!result.success) {
+            this.handleError("Sauvegarde du projet impossible", result);
+            return;
+        }
+        const modal = bootstrap.Modal.getOrCreateInstance(this.dom.editProjectModal);
+        modal.hide();
     }
 
     /* --------------------------------------------
@@ -187,7 +186,6 @@ export default class KanbanModule {
             this.handleError("Création du type de carte impossible", result);
             return;
         }
-
         await this.reloadCardTypes(projectId);
         this.hideNewCardTypeForm();
     }
@@ -200,7 +198,6 @@ export default class KanbanModule {
             this.handleError("Suppression du type de carte impossible", response);
             return;
         }
-
         await this.reloadCardTypes(this.dom.editProjectId.value);
     }
 
