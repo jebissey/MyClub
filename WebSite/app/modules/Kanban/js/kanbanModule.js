@@ -2,214 +2,271 @@ import KanbanBoard from "./kanbanBoard.js";
 import ProjectManager from "./project/projectManager.js";
 import CardTypeManager from "./project/cardType/cardTypeManager.js";
 
+/**
+ * KanbanModule
+ * Rôle : orchestrateur UI / métier pour le Kanban
+ * - délègue le CRUD aux managers
+ * - délègue l'affichage du board à KanbanBoard
+ * - centralise la gestion des événements et erreurs
+ */
 export default class KanbanModule {
     constructor(statusTransitions) {
         this.statusTransitions = statusTransitions;
+
         this.kanban = new KanbanBoard(statusTransitions);
         this.projectManager = new ProjectManager();
         this.cardTypeManager = new CardTypeManager();
+
+        this.cacheDom();
     }
 
+    /* --------------------------------------------
+       INIT
+    -------------------------------------------- */
     init() {
         this.kanban.init();
         this.attachEvents();
         this.handleProjectSelection();
     }
 
-    /* -------------------------
-    Project Selection
-    ------------------------- */
-    handleProjectSelection() {
-        const select = document.getElementById("kanbanProjectSelect");
-        const addProjectBtn = document.getElementById("addProjectBtn");
-        const addCardBtn = document.getElementById("addCardBtn");
-        const editProjectBtn = document.getElementById("editProjectBtn");
-        const kanbanBoard = document.getElementById("kanbanBoard");
-        const statsContainer = document.getElementById("statsContainer");
+    /* --------------------------------------------
+       DOM CACHE
+    -------------------------------------------- */
+    cacheDom() {
+        this.dom = {
+            projectSelect: document.getElementById("kanbanProjectSelect"),
+            addProjectBtn: document.getElementById("addProjectBtn"),
+            addCardBtn: document.getElementById("addCardBtn"),
+            editProjectBtn: document.getElementById("editProjectBtn"),
+            deleteProjectBtn: document.getElementById("deleteProjectBtn"),
+            kanbanBoard: document.getElementById("kanbanBoard"),
+            statsContainer: document.getElementById("statsContainer"),
 
-        select.addEventListener("change", () => {
-            if (select.value === "") {
-                addProjectBtn.classList.remove("d-none");
-                addCardBtn.classList.add("d-none");
-                editProjectBtn.classList.add("d-none");
-                kanbanBoard.classList.add("d-none");
-                statsContainer.classList.add("d-none");
-            } else {
-                addProjectBtn.classList.add("d-none");
-                addCardBtn.classList.remove("d-none");
-                editProjectBtn.classList.remove("d-none");
-                kanbanBoard.classList.remove("d-none");
-                statsContainer.classList.remove("d-none");
+            cardTypesList: document.getElementById("cardTypesList"),
+            newCardTypeForm: document.getElementById("newCardTypeForm"),
+            newCardTypeLabel: document.getElementById("newCardTypeLabel"),
+            newCardTypeDetail: document.getElementById("newCardTypeDetail"),
 
-                this.loadProjectCards(select.value);
-            }
-        });
-    }
-
-    /* -------------------------
-       Load Project Cards
-    ------------------------- */
-    async loadProjectCards(projectId) {
-        const result = await this.projectManager.getCards(projectId);
-        if (!result.success) return;
-
-        const cards = result.cards || [];
-        this.kanban.updateKanbanBoard(cards);
+            editProjectModal: document.getElementById("editProjectModal"),
+            editProjectId: document.getElementById("editProjectId"),
+            editProjectTitle: document.getElementById("editProjectTitle"),
+            editProjectDescription: document.getElementById("editProjectDescription"),
+        };
     }
 
     /* --------------------------------------------
-       PROJECT METHODS
+       ERROR HANDLING
+    -------------------------------------------- */
+    handleError(message, details = null) {
+        console.error(message, details);
+        alert(message);
+    }
+
+    /* --------------------------------------------
+       PROJECT SELECTION
+    -------------------------------------------- */
+    handleProjectSelection() {
+        this.dom.projectSelect.addEventListener("change", () => {
+            const projectId = this.dom.projectSelect.value;
+            projectId ? this.showProjectUI(projectId) : this.hideProjectUI();
+        });
+    }
+
+    showProjectUI(projectId) {
+        this.toggleProjectUI(true);
+        this.loadProjectCards(projectId);
+    }
+
+    hideProjectUI() {
+        this.toggleProjectUI(false);
+    }
+
+    toggleProjectUI(visible) {
+        const method = visible ? "remove" : "add";
+        this.dom.addProjectBtn.classList[visible ? "add" : "remove"]("d-none");
+        this.dom.addCardBtn.classList[method]("d-none");
+        this.dom.editProjectBtn.classList[method]("d-none");
+        this.dom.kanbanBoard.classList[method]("d-none");
+        this.dom.statsContainer.classList[method]("d-none");
+    }
+
+    /* --------------------------------------------
+       KANBAN
+    -------------------------------------------- */
+    async loadProjectCards(projectId) {
+        const result = await this.projectManager.getCards(projectId);
+        if (!result.success) {
+            this.handleError("Impossible de charger les cartes", result);
+            return;
+        }
+        this.kanban.updateKanbanBoard(result.cards ?? []);
+    }
+
+    /* --------------------------------------------
+       PROJECT CRUD
     -------------------------------------------- */
     async createProject() {
         const title = document.getElementById('projectTitle').value.trim();
         const detail = document.getElementById('projectDescription').value.trim();
 
         const result = await this.projectManager.create(title, detail);
-        if (result.success) location.reload();
+        if (!result.success) {
+            this.handleError("Création du projet échouée", result);
+            return;
+        }
+        location.reload();
     }
 
     async loadProjectForEdit(projectId) {
         const response = await this.projectManager.load(projectId);
         if (!response.success || !response.project) {
-            console.error('Projet invalide', response);
-            location.reload();
+            this.handleError("Projet invalide", response);
             return;
         }
-        document.getElementById('editProjectId').value = response.project.Id;
-        document.getElementById('editProjectTitle').value = response.project.Title;
-        document.getElementById('editProjectDescription').value = response.project.Detail;
 
-        const response2 = await this.cardTypeManager.load(projectId);
-        if (!response2.success || !response2.cardTypes) {
-            console.error('Card type invalide', response2);
-            location.reload();
-            return;
-        }
-        this.displayCardTypes(response2.cardTypes);
+        const { Id, Title, Detail } = response.project;
+        this.dom.editProjectId.value = Id;
+        this.dom.editProjectTitle.value = Title;
+        this.dom.editProjectDescription.value = Detail;
 
-        document.getElementById('editProjectModal').classList.remove('d-none');
+        await this.reloadCardTypes(Id);
+        this.dom.editProjectModal.classList.remove("d-none");
     }
 
     async saveEditedProject() {
-        const id = document.getElementById('editProjectId').value;
-        const title = document.getElementById('editProjectTitle').value.trim();
-        const detail = document.getElementById('editProjectDescription').value.trim();
+        const { editProjectId, editProjectTitle, editProjectDescription } = this.dom;
 
-        const result = await this.projectManager.update(id, title, detail);
-        if (result.success) location.reload();
+        const result = await this.projectManager.update(
+            editProjectId.value,
+            editProjectTitle.value.trim(),
+            editProjectDescription.value.trim()
+        );
+
+        if (!result.success) {
+            this.handleError("Sauvegarde du projet impossible", result);
+            return;
+        }
+        location.reload();
     }
 
     async deleteProject() {
-        const id = document.getElementById('kanbanProjectSelect').value;
-        if (!id) return alert("Sélectionnez un projet.");
+        const projectId = this.dom.projectSelect.value;
+        if (!projectId) return alert("Sélectionnez un projet");
         if (!confirm("Supprimer ce projet ?")) return;
 
-        const result = await this.projectManager.delete(id);
-        if (result.success) location.reload();
+        const result = await this.projectManager.delete(projectId);
+        if (!result.success) {
+            this.handleError("Suppression du projet impossible", result);
+            return;
+        }
+        location.reload();
     }
 
     /* --------------------------------------------
-       CARD TYPES METHODS
+       CARD TYPES
     -------------------------------------------- */
     showNewCardTypeForm() {
-        document.getElementById('newCardTypeForm').classList.remove('d-none');
+        this.dom.newCardTypeForm.classList.remove("d-none");
     }
 
     hideNewCardTypeForm() {
-        document.getElementById('newCardTypeForm').classList.add('d-none');
-        document.getElementById('newCardTypeLabel').value = '';
-        document.getElementById('newCardTypeDetail').value = '';
+        this.dom.newCardTypeForm.classList.add("d-none");
+        this.dom.newCardTypeLabel.value = "";
+        this.dom.newCardTypeDetail.value = "";
     }
 
     async createNewCardType() {
-        const projectId = document.getElementById('kanbanProjectSelect').value;
-        const label = document.getElementById('newCardTypeLabel').value.trim();
-        const detail = document.getElementById('newCardTypeDetail').value.trim();
+        const projectId = this.dom.projectSelect.value;
+        if (!projectId) return alert("Sélectionnez un projet");
 
-        if (!projectId) return alert("Sélectionnez un projet.");
+        const label = this.dom.newCardTypeLabel.value.trim();
+        const detail = this.dom.newCardTypeDetail.value.trim();
 
         const result = await this.cardTypeManager.create(projectId, label, detail);
-        if (result.success) {
-            const response2 = await this.cardTypeManager.load(projectId);
-            if (!response2.success) {
-                console.error('Card type invalide', response2);
-                location.reload();
-                return;
-            }
-            this.displayCardTypes(response2.cardTypes);
-            this.hideNewCardTypeForm();
-        } else location.reload();
+        if (!result.success) {
+            this.handleError("Création du type de carte impossible", result);
+            return;
+        }
+
+        await this.reloadCardTypes(projectId);
+        this.hideNewCardTypeForm();
     }
 
     async deleteCardType(cardTypeId) {
-        if (!confirm('Êtes-vous sûr de vouloir supprimer ce type de carte ?')) {
-            return;
-        }
-        const response = await this.cardTypeManager.delete(cardTypeId);
-        if (!response.success || !response.project) {
-            console.error('Card type Id invalide', response);
-            location.reload();
-            return;
-        }
-        const projectId = document.getElementById('editProjectId').value;
-        const response2 = await this.cardTypeManager.load(projectId);
-        if (!response2.success) {
-            console.error('Card type invalide', response2);
-            location.reload();
-            return;
-        }
-        this.displayCardTypes(response2.cardTypes);
+        if (!confirm("Supprimer ce type de carte ?")) return;
 
+        const response = await this.cardTypeManager.delete(cardTypeId);
+        if (!response.success) {
+            this.handleError("Suppression du type de carte impossible", response);
+            return;
+        }
+
+        await this.reloadCardTypes(this.dom.editProjectId.value);
+    }
+
+    async reloadCardTypes(projectId) {
+        const response = await this.cardTypeManager.load(projectId);
+        if (!response.success) {
+            this.handleError("Chargement des types de carte impossible", response);
+            return;
+        }
+        this.displayCardTypes(response.cardTypes ?? []);
     }
 
     displayCardTypes(cardTypes) {
-        const container = document.getElementById('cardTypesList');
-        container.innerHTML = '';
+        const container = this.dom.cardTypesList;
+        container.innerHTML = "";
 
         if (cardTypes.length === 0) {
-            container.innerHTML = '<p class="text-muted">Aucun type de carte défini</p>';
+            const p = document.createElement("p");
+            p.className = "text-muted";
+            p.textContent = "Aucun type de carte défini";
+            container.appendChild(p);
             return;
         }
 
         cardTypes.forEach(type => {
-            const typeElement = document.createElement('div');
-            typeElement.className = 'card-type-item';
-            typeElement.innerHTML = `
-            <div class="d-flex justify-content-between align-items-start">
-                <div class="flex-grow-1">
-                    <div>
-                        <span class="fw-bold">${type.Label}</span>
-                        ${type.Detail ? `<span class="text-muted small"> - ${type.Detail}</span>` : ''}
-                    </div>
-                </div>
-                <button class="btn btn-sm btn-danger delete-card-type" 
-                        data-id="${type.Id}" 
-                        title="Supprimer">
-                    <i class="bi bi-trash"></i>
-                </button>
-            </div>
-        `;
-            typeElement.querySelector('.delete-card-type').addEventListener('click', () => {
-                this.deleteCardType(type.Id);
-            });
-            container.appendChild(typeElement);
+            const wrapper = document.createElement("div");
+            wrapper.className = "card-type-item d-flex justify-content-between align-items-start";
+
+            const info = document.createElement("div");
+            info.className = "flex-grow-1";
+
+            const label = document.createElement("span");
+            label.className = "fw-bold";
+            label.textContent = type.Label;
+
+            info.appendChild(label);
+
+            if (type.Detail) {
+                const detail = document.createElement("span");
+                detail.className = "text-muted small";
+                detail.textContent = ` - ${type.Detail}`;
+                info.appendChild(detail);
+            }
+
+            const btn = document.createElement("button");
+            btn.className = "btn btn-sm btn-danger";
+            btn.innerHTML = '<i class="bi bi-trash"></i>';
+            btn.addEventListener("click", () => this.deleteCardType(type.Id));
+
+            wrapper.appendChild(info);
+            wrapper.appendChild(btn);
+            container.appendChild(wrapper);
         });
     }
 
     /* --------------------------------------------
-       EVENT ATTACHMENT
+       EVENTS
     -------------------------------------------- */
     attachEvents() {
         document.getElementById('saveNewProject')?.addEventListener('click', () => this.createProject());
-
-        document.getElementById('editProjectBtn')?.addEventListener('click', () => {
-            const projectId = document.getElementById('kanbanProjectSelect').value;
+        this.dom.editProjectBtn?.addEventListener('click', () => {
+            const projectId = this.dom.projectSelect.value;
             if (projectId) this.loadProjectForEdit(projectId);
         });
-
         document.getElementById('saveEditProject')?.addEventListener('click', () => this.saveEditedProject());
-        document.getElementById('deleteProjectBtn')?.addEventListener('click', () => this.deleteProject());
-
+        this.dom.deleteProjectBtn?.addEventListener('click', () => this.deleteProject());
         document.getElementById('addCardTypeBtn')?.addEventListener('click', () => this.showNewCardTypeForm());
         document.getElementById('saveNewCardType')?.addEventListener('click', () => this.createNewCardType());
         document.getElementById('cancelNewCardType')?.addEventListener('click', () => this.hideNewCardTypeForm());
