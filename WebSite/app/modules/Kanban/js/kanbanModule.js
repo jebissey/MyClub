@@ -1,6 +1,6 @@
 import KanbanBoard from "./kanbanBoard.js";
-import ProjectManager from "./projectManager.js";
-import CardTypeManager from "./cardTypeManager.js";
+import ProjectManager from "./project/projectManager.js";
+import CardTypeManager from "./project/cardType/cardTypeManager.js";
 
 export default class KanbanModule {
     constructor(statusTransitions) {
@@ -69,12 +69,23 @@ export default class KanbanModule {
     }
 
     async loadProjectForEdit(projectId) {
-        const project = await this.projectManager.load(projectId);
-        if (!project.success) return;
+        const response = await this.projectManager.load(projectId);
+        if (!response.success || !response.project) {
+            console.error('Projet invalide', response);
+            location.reload();
+            return;
+        }
+        document.getElementById('editProjectId').value = response.project.Id;
+        document.getElementById('editProjectTitle').value = response.project.Title;
+        document.getElementById('editProjectDescription').value = response.project.Detail;
 
-        document.getElementById('editProjectId').value = project.data.id;
-        document.getElementById('editProjectTitle').value = project.data.title;
-        document.getElementById('editProjectDescription').value = project.data.detail;
+        const response2 = await this.cardTypeManager.load(projectId);
+        if (!response2.success || !response2.cardTypes) {
+            console.error('Card type invalide', response2);
+            location.reload();
+            return;
+        }
+        this.displayCardTypes(response2.cardTypes);
 
         document.getElementById('editProjectModal').classList.remove('d-none');
     }
@@ -106,17 +117,83 @@ export default class KanbanModule {
 
     hideNewCardTypeForm() {
         document.getElementById('newCardTypeForm').classList.add('d-none');
+        document.getElementById('newCardTypeLabel').value = '';
+        document.getElementById('newCardTypeDetail').value = '';
     }
 
     async createNewCardType() {
         const projectId = document.getElementById('kanbanProjectSelect').value;
-        const label = document.getElementById('cardTypeLabel').value.trim();
-        const detail = document.getElementById('cardTypeDetail').value.trim();
+        const label = document.getElementById('newCardTypeLabel').value.trim();
+        const detail = document.getElementById('newCardTypeDetail').value.trim();
 
         if (!projectId) return alert("Sélectionnez un projet.");
 
         const result = await this.cardTypeManager.create(projectId, label, detail);
-        if (result.success) location.reload();
+        if (result.success) {
+            const response2 = await this.cardTypeManager.load(projectId);
+            if (!response2.success) {
+                console.error('Card type invalide', response2);
+                location.reload();
+                return;
+            }
+            this.displayCardTypes(response2.cardTypes);
+            this.hideNewCardTypeForm();
+        } else location.reload();
+    }
+
+    async deleteCardType(cardTypeId) {
+        if (!confirm('Êtes-vous sûr de vouloir supprimer ce type de carte ?')) {
+            return;
+        }
+        const response = await this.cardTypeManager.delete(cardTypeId);
+        if (!response.success || !response.project) {
+            console.error('Card type Id invalide', response);
+            location.reload();
+            return;
+        }
+        const projectId = document.getElementById('editProjectId').value;
+        const response2 = await this.cardTypeManager.load(projectId);
+        if (!response2.success) {
+            console.error('Card type invalide', response2);
+            location.reload();
+            return;
+        }
+        this.displayCardTypes(response2.cardTypes);
+
+    }
+
+    displayCardTypes(cardTypes) {
+        const container = document.getElementById('cardTypesList');
+        container.innerHTML = '';
+
+        if (cardTypes.length === 0) {
+            container.innerHTML = '<p class="text-muted">Aucun type de carte défini</p>';
+            return;
+        }
+
+        cardTypes.forEach(type => {
+            const typeElement = document.createElement('div');
+            typeElement.className = 'card-type-item';
+            typeElement.innerHTML = `
+            <div class="d-flex justify-content-between align-items-start">
+                <div class="flex-grow-1">
+                    <div>
+                        <span class="fw-bold">${type.Label}</span>
+                        ${type.Detail ? `<span class="text-muted small"> - ${type.Detail}</span>` : ''}
+                    </div>
+                </div>
+                <button class="btn btn-sm btn-danger delete-card-type" 
+                        data-id="${type.Id}" 
+                        title="Supprimer">
+                    <i class="bi bi-trash"></i>
+                </button>
+            </div>
+        `;
+            typeElement.querySelector('.delete-card-type').addEventListener('click', () => {
+                this.deleteCardType(type.Id);
+            });
+            container.appendChild(typeElement);
+        });
     }
 
     /* --------------------------------------------

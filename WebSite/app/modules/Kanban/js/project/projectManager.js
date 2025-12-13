@@ -1,4 +1,4 @@
-import ApiClient from "./apiClient.js";
+import ApiClient from "../../../Common/js/apiClient.js";
 const apiClient = new ApiClient();
 
 export default class ProjectManager {
