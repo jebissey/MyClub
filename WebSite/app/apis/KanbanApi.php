@@ -123,16 +123,11 @@ class KanbanApi extends AbstractApi
             $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
-
         if (!$this->connectedUser->isKanbanDesigner()) {
             $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }
-
-        $personId = $this->connectedUser->person->Id;
-        $cards = $this->kanbanDataHelper->getKanbanCards($personId);
-
-        $this->renderJsonOk(['cards' => $cards]);
+        $this->renderJsonOk(['cards' => $this->kanbanDataHelper->getKanbanCards($this->connectedUser->person->Id)]);
     }
 
     public function getHistory(int $id): void
@@ -229,7 +224,6 @@ class KanbanApi extends AbstractApi
             $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
-
         if (!$this->connectedUser->isKanbanDesigner()) {
             $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
@@ -240,7 +234,6 @@ class KanbanApi extends AbstractApi
             $this->renderJsonBadRequest('Invalid JSON', __FILE__, __LINE__);
             return;
         }
-
         $id = (int)($data['id'] ?? 0);
         $title = trim($data['title'] ?? '');
         $detail = trim($data['detail'] ?? '');
@@ -255,8 +248,7 @@ class KanbanApi extends AbstractApi
         }
 
         try {
-            $personId = $this->connectedUser->person->Id;
-            $success = $this->kanbanDataHelper->updateKanbanCard($id, $personId, $title, $detail);
+            $success = $this->kanbanDataHelper->updateKanbanCard($id, $this->connectedUser->person->Id, $title, $detail);
 
             if ($success) $this->renderJsonOk([], 'Card updated successfully');
             else          $this->renderJsonBadRequest('Card not found or unauthorized', __FILE__, __LINE__);

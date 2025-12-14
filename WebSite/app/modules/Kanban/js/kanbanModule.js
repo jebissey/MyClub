@@ -68,10 +68,8 @@ export default class KanbanModule {
                 this.hideProjectUI();
                 return;
             }
-
             this.showProjectUI(projectId);
 
-            // recharge les types de cartes pour le projet sélectionné
             const response = await this.cardTypeManager.load(projectId);
             if (response.success) {
                 this.populateCardTypeSelects(response.cardTypes ?? []);
@@ -244,7 +242,7 @@ export default class KanbanModule {
             if (type.Detail) {
                 const detail = document.createElement("span");
                 detail.className = "text-muted small";
-                detail.textContent = ` - ${type.Detail}`;
+                detail.textContent = type.Detail;
                 info.appendChild(detail);
             }
 

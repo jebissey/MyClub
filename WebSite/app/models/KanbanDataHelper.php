@@ -16,43 +16,41 @@ class KanbanDataHelper extends Data
         parent::__construct($application);
     }
 
-    public function getKanbanCards(int $personId): array
+    public function deleteKanbanCard(int $idKanbanCard, int $idPerson): bool
     {
-        $sql = "
-            SELECT 
-                kp.Id, 
-                kp.Title, 
-                kp.Detail,
-                (
-                    CASE 
-                        WHEN kcs.What = 'Created' THEN 'Backlog'
-                        WHEN kcs.What LIKE '%ToBacklog%' THEN 'Backlog'
-                        WHEN kcs.What LIKE '%ToSelected%' THEN 'Selected'
-                        WHEN kcs.What LIKE '%ToInProgress%' THEN 'InProgress'
-                        WHEN kcs.What LIKE '%ToDone%' THEN 'Done'
-                        ELSE 'Backlog'
-                    END
-                ) as CurrentStatus
-            FROM KanbanProject kp
-            LEFT JOIN KanbanCardStatus kcs ON kp.Id = kcs.IdKanbanCard
-            WHERE kcs.Id = (
-                SELECT MAX(Id) 
-                FROM KanbanCardStatus 
-                WHERE IdKanbanCard = kp.Id
-            )
-            AND kp.IdPerson = :personId
-            ORDER BY 
-                CASE CurrentStatus
-                    WHEN 'Backlog' THEN 1
-                    WHEN 'Selected' THEN 2
-                    WHEN 'InProgress' THEN 3
-                    WHEN 'Done' THEN 4
-                END,
-                kp.Title ASC";
+        try {
+            $this->pdo->beginTransaction();
 
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([':personId' => $personId]);
-        return $stmt->fetchAll();
+            $sql = "DELETE FROM KanbanCardStatus WHERE IdKanbanCard = :idKanbanCard";
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute([':idKanbanCard' => $idKanbanCard]);
+
+            $sql = "
+                DELETE FROM KanbanCard
+                WHERE Id IN (
+                    SELECT kc.Id
+                    FROM KanbanCard kc
+                    JOIN KanbanCardType kct ON kct.Id = kc.IdKanbanCardType
+                    JOIN KanbanProject kp ON kp.Id = kct.IdKanbanProject
+                    WHERE kc.Id = :idKanbanCard
+                    AND kp.IdPerson = :idPerson)";
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute([
+                ':idKanbanCard' => $idKanbanCard,
+                ':idPerson' => $idPerson
+            ]);
+            if ($stmt->rowCount() === 0) {
+                $this->pdo->rollBack();
+                return false;
+            }
+            $this->pdo->commit();
+            return true;
+        } catch (Throwable $e) {
+            if ($this->pdo->inTransaction()) {
+                $this->pdo->rollBack();
+            }
+            return false;
+        }
     }
 
     public function getKanbanCard(int $kanbanId, int $personId): ?array
@@ -69,6 +67,54 @@ class KanbanDataHelper extends Data
         ]);
         $result = $stmt->fetch();
         return $result ?: null;
+    }
+
+    public function getKanbanCards(int $personId): array
+    {
+        $sql = "
+            SELECT 
+                kp.Id AS ProjectId, 
+                kp.Title AS ProjectTitle, 
+                kp.Detail AS ProjectDetail,
+				kc.Id AS KanbanCardId,
+				kc.Title AS KanbanCardTitle,
+				kc.Detail AS KanbanCardDetail,
+				kct.Id AS KanbanCardTypeId,
+				kct.Label AS KanbanCardTypeLabel,
+				kct.Detail AS KanbanCardTypeDetail,
+                (
+                    CASE 
+                        WHEN kcs.What = 'Created' THEN 'Backlog'
+                        WHEN kcs.What LIKE '%ToBacklog%' THEN 'Backlog'
+                        WHEN kcs.What LIKE '%ToSelected%' THEN 'Selected'
+                        WHEN kcs.What LIKE '%ToInProgress%' THEN 'InProgress'
+                        WHEN kcs.What LIKE '%ToDone%' THEN 'Done'
+                        ELSE 'Backlog'
+                    END
+                ) as KanbanCardCurrentStatus
+            FROM KanbanProject kp
+			LEFT JOIN KanbanCardType kct ON kct.IdKanbanProject = kp.Id
+			LEFT JOIN KanbanCard kc ON kc.IdKanbanCardType = kct.Id
+            LEFT JOIN KanbanCardStatus kcs ON kcs.IdKanbanCard = kc.Id
+            WHERE kcs.Id = (
+                SELECT MAX(Id) 
+                FROM KanbanCardStatus 
+                WHERE IdKanbanCard = kp.Id
+            )
+            AND kp.IdPerson = :personId
+            ORDER BY 
+				ProjectTitle,
+                CASE KanbanCardCurrentStatus
+                    WHEN 'Backlog' THEN 1
+                    WHEN 'Selected' THEN 2
+                    WHEN 'InProgress' THEN 3
+                    WHEN 'Done' THEN 4
+                END,
+                kcs.LastUpdate DESC";
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([':personId' => $personId]);
+        return $stmt->fetchAll();
     }
 
     public function getKanbanProject(int $id): object
@@ -117,19 +163,26 @@ class KanbanDataHelper extends Data
         return $kanbanCardId;
     }
 
-    public function updateKanbanCard(int $kanbanId, int $personId, string $title, string $detail): bool
+    public function updateKanbanCard(int $idKanbanCard, int $idPerson, string $title, string $detail): bool
     {
         $sql = "
-            UPDATE Kanban 
-            SET Title = :title, Detail = :detail 
-            WHERE Id = :kanbanId AND IdPerson = :personId
+            UPDATE KanbanCard
+            SET Title = :title, Detail = :detail
+            WHERE Id IN (
+                SELECT kc.Id
+                FROM KanbanCard kc
+                JOIN KanbanCardType kct ON kct.Id = kc.IdKanbanCardType
+                JOIN KanbanProject kp ON kp.Id = kct.IdKanbanProject
+                WHERE kc.Id = :idKanbanCard
+                AND kp.IdPerson = :idPerson
+            )
         ";
         $stmt = $this->pdo->prepare($sql);
         return $stmt->execute([
             ':title' => $title,
             ':detail' => $detail,
-            ':kanbanId' => $kanbanId,
-            ':personId' => $personId
+            ':idKanbanCard' => $idKanbanCard,
+            ':idPerson' => $idPerson
         ]);
     }
 
@@ -154,43 +207,6 @@ class KanbanDataHelper extends Data
         }
 
         return $success;
-    }
-
-    public function deleteKanbanCard(int $idKanbanCard, int $idPerson): bool
-    {
-        try {
-            $this->pdo->beginTransaction();
-
-            $sql = "DELETE FROM KanbanCardStatus WHERE IdKanbanCard = :idKanbanCard";
-            $stmt = $this->pdo->prepare($sql);
-            $stmt->execute([':idKanbanCard' => $idKanbanCard]);
-
-            $sql = "
-                DELETE FROM KanbanCard
-                WHERE Id IN (
-                    SELECT kc.Id
-                    FROM KanbanCard kc
-                    JOIN KanbanCardType kct ON kct.Id = kc.IdKanbanCardType
-                    JOIN KanbanProject kp ON kp.Id = kct.IdKanbanProject
-                    WHERE kc.Id = :idKanbanCard
-                    AND kp.IdPerson = :idPerson)";
-            $stmt = $this->pdo->prepare($sql);
-            $stmt->execute([
-                ':idKanbanCard' => $idKanbanCard,
-                ':idPerson' => $idPerson
-            ]);
-            if ($stmt->rowCount() === 0) {
-                $this->pdo->rollBack();
-                return false;
-            }
-            $this->pdo->commit();
-            return true;
-        } catch (Throwable $e) {
-            if ($this->pdo->inTransaction()) {
-                $this->pdo->rollBack();
-            }
-            return false;
-        }
     }
 
     public function getKanbanHistory(int $kanbanId): array
@@ -298,6 +314,7 @@ class KanbanDataHelper extends Data
                 kc.Id,
                 Title,
                 kc.Detail,
+                kct.Label,
                 (
                     CASE 
                         WHEN kcs.What = 'Created' THEN '💡'

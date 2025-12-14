@@ -22,18 +22,13 @@ class KanbanController extends AbstractController
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
         }
-
         $personId = $this->application->getConnectedUser()->person->Id;
-
-        $cards = $this->kanbanDataHelper->getKanbanCards($personId);
-        $stats = $this->kanbanDataHelper->getKanbanStats($personId);
 
         $this->render('Kanban/views/kanban.latte', $this->getAllParams([
             'navItems' => $this->getNavItems($this->application->getConnectedUser()->person),
             'title' => 'Kanban Board',
             'page' => $this->application->getConnectedUser()->getPage(),
-            'cards' => $cards,
-            'stats' => $stats,
+            'stats' => $this->kanbanDataHelper->getKanbanStats($personId),
             'personId' => $personId,
             'projects' => $this->kanbanDataHelper->getKanbanProjects($personId),
             'columns' => [
