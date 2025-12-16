@@ -1,25 +1,30 @@
 import ApiClient from "../../Common/js/apiClient.js";
+import DragDropManager from "../../Common/js/dragDropManager.js";
+import CardManager from "./project/cardType//card/cardManager.js";
 
 const apiClient = new ApiClient();
+const cardManager = new CardManager();
 
 export default class KanbanBoard {
     constructor(statusTransitions) {
         this.statusTransitions = statusTransitions;
-        this.draggedCard = null;
-
-        this.handleDragStart = this.handleDragStart.bind(this);
-        this.handleDragEnd = this.handleDragEnd.bind(this);
-        this.handleDragOver = this.handleDragOver.bind(this);
-        this.handleDrop = this.handleDrop.bind(this);
-        this.handleDragLeave = this.handleDragLeave.bind(this);
         this.handleClick = this.handleClick.bind(this);
+        this.dragDropManager = new DragDropManager({
+            itemSelector: '.kanban-card',
+            containerSelector: '.kanban-cards',
+            draggedItemClass: 'dragging',
+            dragOverClass: 'drag-over',
+            debug: true,
+            onDrop: (card, column) => this.handleCardDrop(card, column),
+            canDrop: (card, column) => this.canDropCard(card, column)
+        });
     }
 
     /* --------------------------------------------
         INIT
     -------------------------------------------- */
     init() {
-        this.initDragAndDrop();
+        this.dragDropManager.init();
         this.initGlobalEvents();
 
         document.getElementById('saveNewCard')?.addEventListener('click', () => this.createNewCard());
@@ -29,7 +34,6 @@ export default class KanbanBoard {
     }
 
     initGlobalEvents() {
-        // Event delegation pour boutons éditer / supprimer
         document.addEventListener('click', this.handleClick);
     }
 
@@ -55,13 +59,12 @@ export default class KanbanBoard {
             const column = document.querySelector(`.kanban-cards[data-status="${card.CurrentStatus}"]`);
             if (column) column.appendChild(this.createCardElement(card));
         });
-        this.initDragAndDrop();
+        this.dragDropManager.init();
     }
 
     createCardElement(card) {
         const cardDiv = document.createElement('div');
         cardDiv.className = 'kanban-card';
-        cardDiv.draggable = true;
         cardDiv.dataset.id = card.Id;
         cardDiv.dataset.status = card.CurrentStatus;
 
@@ -99,12 +102,6 @@ export default class KanbanBoard {
         `;
         cardDiv.appendChild(actionsDiv);
 
-        cardDiv.addEventListener('dragstart', this.handleDragStart);
-        cardDiv.addEventListener('dragend', this.handleDragEnd);
-
-        actionsDiv.querySelector('.edit-card').addEventListener('click', () => this.openEditModal(card.Id));
-        actionsDiv.querySelector('.delete-card').addEventListener('click', () => this.deleteCard(card.Id));
-
         return cardDiv;
     }
 
@@ -119,28 +116,17 @@ export default class KanbanBoard {
         if (!title) return alert('Le titre est obligatoire');
         if (!cardType) return alert('Veuillez sélectionner un type de carte');
 
-        try {
-            const data = await apiClient.post('/api/kanban/card/create', { title, detail, cardType });
-            if (!data.success) return alert(data.error || 'Erreur lors de la création');
-            location.reload();
-        } catch (e) {
-            console.error(e);
-            alert('Erreur réseau');
-        }
+        const response = await cardManager.create(title, detail, cardType);
+        if (!response.success) return alert(data.error || 'Create card failed');
+        location.reload();
     }
 
     async deleteCard(cardId) {
         if (!confirm('Êtes-vous sûr de vouloir supprimer cette carte ?')) return;
 
-        try {
-            const data = await apiClient.post('/api/kanban/card/delete', { id: Number(cardId) });
-            if (!data.success) return alert(data.error || 'Erreur inconnue');
-
-            document.querySelector(`.kanban-card[data-id="${cardId}"]`)?.remove();
-        } catch (e) {
-            console.error(e);
-            alert('Erreur réseau');
-        }
+        const response = await cardManager.delete(cardId);
+        if (!response.success) return alert(data.error || 'Delete card failed');
+        document.querySelector(`.kanban-card[data-id="${cardId}"]`)?.remove();
     }
 
     openEditModal(cardId) {
@@ -172,16 +158,12 @@ export default class KanbanBoard {
             const modalInstance = bootstrap.Modal.getInstance(modalEl);
             modalInstance?.hide();
 
-            const backdrops = document.querySelectorAll('.modal-backdrop');
-            backdrops.forEach(b => b.remove());
-
+            document.querySelectorAll('.modal-backdrop').forEach(b => b.remove());
             document.body.classList.remove('modal-open');
-
         } catch (e) {
             alert('Erreur réseau' + e);
         }
     }
-
 
     updateCardInDOM(cardId, title, detail) {
         const card = document.querySelector(`.kanban-card[data-id="${cardId}"]`);
@@ -201,71 +183,36 @@ export default class KanbanBoard {
     }
 
     /* --------------------------------------------
-        DRAG & DROP
+        LOGIQUE MÉTIER DRAG & DROP KANBAN
     -------------------------------------------- */
-    initDragAndDrop() {
-        document.querySelectorAll('.kanban-card').forEach(card => {
-            card.addEventListener('dragstart', this.handleDragStart);
-            card.addEventListener('dragend', this.handleDragEnd);
-        });
+    canDropCard(card, column) {
+        if (!card || !column) return false;
 
-        document.querySelectorAll('.kanban-cards').forEach(column => {
-            column.addEventListener('dragover', this.handleDragOver);
-            column.addEventListener('drop', this.handleDrop);
-            column.addEventListener('dragleave', this.handleDragLeave);
-        });
-    }
-
-    handleDragStart(e) {
-        this.draggedCard = e.currentTarget;
-        this.draggedCard.classList.add('dragging');
-        e.dataTransfer.effectAllowed = 'move';
-    }
-
-    handleDragEnd(e) {
-        e.currentTarget.classList.remove('dragging');
-        this.draggedCard = null;
-    }
-
-    handleDragOver(e) {
-        e.preventDefault();
-        e.currentTarget.classList.add('drag-over');
-    }
-
-    handleDragLeave(e) {
-        e.currentTarget.classList.remove('drag-over');
-    }
-
-    async handleDrop(e) {
-        e.preventDefault();
-        const column = e.currentTarget;
-        column.classList.remove('drag-over');
-
-        if (!this.draggedCard) return;
-
-        const oldStatus = this.draggedCard.dataset.status;
+        const oldStatus = card.dataset.status;
         const newStatus = column.dataset.status;
-        const cardId = this.draggedCard.dataset.id;
 
-        if (oldStatus === newStatus) return;
+        return oldStatus !== newStatus;
+    }
 
-        const changeType = this.statusTransitions?.[oldStatus]?.[newStatus];
-        if (!changeType) return;
+    async handleCardDrop(card, column) {
+        const oldStatus = card.dataset.status;
+        const newStatus = column.dataset.status;
+        const cardId = card.dataset.id;
 
-        column.appendChild(this.draggedCard);
-        this.draggedCard.dataset.status = newStatus;
+        if (oldStatus === newStatus) return false;
 
-        try {
-            const data = await apiClient.post('/api/kanban/card/move', {
-                id: Number(cardId),
-                status: newStatus,
-                changeType,
-                remark: ''
-            });
-            if (!data.success) location.reload();
-        } catch (e) {
-            console.error(e);
-            location.reload();
-        }
+        column.appendChild(card);
+        card.dataset.status = newStatus;
+        const what = this.statusTransitions?.[oldStatus]?.[newStatus] || '???';
+console.log(`Send API: ${cardId}, what=${what} (${oldStatus} → ${newStatus},)`);
+
+        const response = await cardManager.move(cardId, what);
+        if (response.success) return true;
+        return false;
+    }
+
+    destroy() {
+        this.dragDropManager.destroy();
+        document.removeEventListener('click', this.handleClick);
     }
 }

@@ -185,37 +185,20 @@ class KanbanApi extends AbstractApi
             $this->renderJsonBadRequest('Invalid JSON', __FILE__, __LINE__);
             return;
         }
-
-        $id = (int)($data['id'] ?? 0);
-        $newStatus = $data['status'] ?? '';
-        $changeType = $data['changeType'] ?? '';
-        $remark = trim($data['remark'] ?? '');
-
+        $id = (int)($data['idKanbanCard'] ?? 0);
+        $what = $data['what'] ?? '';
         if ($id <= 0) {
             $this->renderJsonBadRequest('Invalid card ID', __FILE__, __LINE__);
             return;
         }
-
-        $validStatuses = ['💡', '☑️', '🔧', '🏁'];
-        if (!in_array($newStatus, $validStatuses)) {
-            $this->renderJsonBadRequest('Invalid status', __FILE__, __LINE__);
+        if (empty($what)) {
+            $this->renderJsonBadRequest('What is required', __FILE__, __LINE__);
             return;
         }
 
-        if (empty($changeType)) {
-            $this->renderJsonBadRequest('Change type is required', __FILE__, __LINE__);
-            return;
-        }
-
-        try {
-            $personId = $this->connectedUser->person->Id;
-            $success = $this->kanbanDataHelper->moveKanbanCard($id, $personId, $newStatus, $changeType, $remark);
-
-            if ($success) $this->renderJsonOk([], 'Card moved successfully');
-            else          $this->renderJsonBadRequest('Card not found or unauthorized', __FILE__, __LINE__);
-        } catch (Throwable $e) {
-            $this->renderJsonError('Failed to move card', ApplicationError::Error->value, __FILE__, __LINE__);
-        }
+        $success = $this->kanbanDataHelper->moveKanbanCard($id, $what);
+        if ($success) $this->renderJsonOk([], 'Card moved successfully');
+        else          $this->renderJsonBadRequest('Card not found', __FILE__, __LINE__);
     }
 
     public function updateCard(): void
@@ -293,6 +276,7 @@ class KanbanApi extends AbstractApi
             $this->renderJsonError('Failed to create project: ' . $e->getMessage(), ApplicationError::Error->value, __FILE__, __LINE__);
         }
     }
+
     public function deleteProject(): void
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {

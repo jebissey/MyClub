@@ -50,9 +50,7 @@ class KanbanController extends AbstractController
         $personId = $this->application->getConnectedUser()->person->Id;
         $kanbanId = (int)($_GET['id'] ?? 0);
 
-        // Vérifier que la carte appartient bien à l'utilisateur
         $card = $this->kanbanDataHelper->getKanbanCard($kanbanId, $personId);
-
         if (!$card) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return;

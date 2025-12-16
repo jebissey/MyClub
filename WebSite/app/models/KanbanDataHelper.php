@@ -16,6 +16,23 @@ class KanbanDataHelper extends Data
         parent::__construct($application);
     }
 
+    public function createKanbanCard(int $idKanbanCardType, string $title, string $detail): int
+    {
+        $sql = "
+            INSERT INTO KanbanCard (IdKanbanCardType, Title, Detail) 
+            VALUES (:idKanbanCardType, :title, :detail)
+        ";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([
+            ':idKanbanCardType' => $idKanbanCardType,
+            ':title' => $title,
+            ':detail' => $detail
+        ]);
+        $kanbanCardId = (int)$this->pdo->lastInsertId();
+        $this->moveKanbanCard($kanbanCardId, KanbanStatusChange::Created->value);
+        return $kanbanCardId;
+    }
+
     public function deleteKanbanCard(int $idKanbanCard, int $idPerson): bool
     {
         try {
@@ -72,46 +89,38 @@ class KanbanDataHelper extends Data
     public function getKanbanCards(int $personId): array
     {
         $sql = "
-            SELECT 
-                kp.Id AS ProjectId, 
-                kp.Title AS ProjectTitle, 
-                kp.Detail AS ProjectDetail,
-				kc.Id AS KanbanCardId,
-				kc.Title AS KanbanCardTitle,
-				kc.Detail AS KanbanCardDetail,
-				kct.Id AS KanbanCardTypeId,
-				kct.Label AS KanbanCardTypeLabel,
-				kct.Detail AS KanbanCardTypeDetail,
-                (
-                    CASE 
-                        WHEN kcs.What = 'Created' THEN 'Backlog'
-                        WHEN kcs.What LIKE '%ToBacklog%' THEN 'Backlog'
-                        WHEN kcs.What LIKE '%ToSelected%' THEN 'Selected'
-                        WHEN kcs.What LIKE '%ToInProgress%' THEN 'InProgress'
-                        WHEN kcs.What LIKE '%ToDone%' THEN 'Done'
-                        ELSE 'Backlog'
-                    END
-                ) as KanbanCardCurrentStatus
-            FROM KanbanProject kp
-			LEFT JOIN KanbanCardType kct ON kct.IdKanbanProject = kp.Id
-			LEFT JOIN KanbanCard kc ON kc.IdKanbanCardType = kct.Id
-            LEFT JOIN KanbanCardStatus kcs ON kcs.IdKanbanCard = kc.Id
-            WHERE kcs.Id = (
-                SELECT MAX(Id) 
-                FROM KanbanCardStatus 
-                WHERE IdKanbanCard = kp.Id
+            WITH LastStatus AS (
+                SELECT
+                    kcs.*,
+                    ROW_NUMBER() OVER (
+                        PARTITION BY kcs.IdKanbanCard
+                        ORDER BY kcs.Id DESC
+                    ) AS rn
+                FROM KanbanCardStatus kcs
             )
-            AND kp.IdPerson = :personId
-            ORDER BY 
-				ProjectTitle,
-                CASE KanbanCardCurrentStatus
-                    WHEN 'Backlog' THEN 1
-                    WHEN 'Selected' THEN 2
-                    WHEN 'InProgress' THEN 3
-                    WHEN 'Done' THEN 4
-                END,
-                kcs.LastUpdate DESC";
-
+            SELECT
+                kp.IdPerson,
+                kc.Id AS KanbanCardId,
+                kc.Title,
+                kc.Detail,
+                ls.Id AS KanbanCardStatusId,
+                ls.What,
+                ls.LastUpdate,
+                kct.Label AS KanbanCardTypeLabel,
+                CASE 
+                    WHEN ls.What = 'Created' THEN 'Backlog'
+                    WHEN ls.What LIKE '%ToBacklog%' THEN 'Backlog'
+                    WHEN ls.What LIKE '%ToSelected%' THEN 'Selected'
+                    WHEN ls.What LIKE '%ToInProgress%' THEN 'InProgress'
+                    WHEN ls.What LIKE '%ToDone%' THEN 'Done'
+                    ELSE 'Backlog'
+                END AS KanbanCardCurrentStatus
+            FROM KanbanCard kc
+            JOIN KanbanCardType kct ON kct.Id = kc.IdKanbanCardType
+            JOIN KanbanProject kp ON kp.Id = kct.IdKanbanProject
+            JOIN LastStatus ls ON ls.IdKanbanCard = kc.Id AND ls.rn = 1
+            WHERE IdPerson = :personId
+            ORDER BY kc.Id";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':personId' => $personId]);
         return $stmt->fetchAll();
@@ -146,21 +155,19 @@ class KanbanDataHelper extends Data
         return $stmt->fetchAll();
     }
 
-    public function createKanbanCard(int $idKanbanCardType, string $title, string $detail): int
+    public function moveKanbanCard(int $id, string $what, string $remark = ''): bool
     {
         $sql = "
-            INSERT INTO KanbanCard (IdKanbanCardType, Title, Detail) 
-            VALUES (:idKanbanCardType, :title, :detail)
+            INSERT INTO KanbanCardStatus (IdKanbanCard, What, Remark, LastUpdate) 
+            VALUES (:idKanbanCard, :what, :remark, :lastUpdate)
         ";
         $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([
-            ':idKanbanCardType' => $idKanbanCardType,
-            ':title' => $title,
-            ':detail' => $detail
+        return $stmt->execute([
+            ':idKanbanCard' => $id,
+            ':what' => $what,
+            ':remark' => $remark,
+            ':lastUpdate' => date('Y-m-d H:i:s')
         ]);
-        $kanbanCardId = (int)$this->pdo->lastInsertId();
-        $this->addKanbanStatusChange($kanbanCardId, KanbanStatusChange::Created->value, '');
-        return $kanbanCardId;
     }
 
     public function updateKanbanCard(int $idKanbanCard, int $idPerson, string $title, string $detail): bool
@@ -186,28 +193,6 @@ class KanbanDataHelper extends Data
         ]);
     }
 
-    public function moveKanbanCard(int $kanbanId, int $personId, string $newStatus, string $changeType, string $remark = ''): bool
-    {
-        // Mettre à jour le statut actuel
-        $sql = "
-            UPDATE Kanban 
-            SET CurrentStatus = :newStatus 
-            WHERE Id = :kanbanId AND IdPerson = :personId
-        ";
-        $stmt = $this->pdo->prepare($sql);
-        $success = $stmt->execute([
-            ':newStatus' => $newStatus,
-            ':kanbanId' => $kanbanId,
-            ':personId' => $personId
-        ]);
-
-        if ($success) {
-            // Enregistrer dans l'historique
-            $this->addKanbanStatusChange($kanbanId, $personId, $changeType, $remark);
-        }
-
-        return $success;
-    }
 
     public function getKanbanHistory(int $kanbanId): array
     {
@@ -224,21 +209,6 @@ class KanbanDataHelper extends Data
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':kanbanId' => $kanbanId]);
         return $stmt->fetchAll();
-    }
-
-    private function addKanbanStatusChange(int $idKanbanCard, string $what, string $remark): void
-    {
-        $sql = "
-            INSERT INTO KanbanCardStatus (IdKanbanCard, What, Remark, LastUpdate) 
-            VALUES (:idKanbanCard, :what, :remark, :lastUpdate)
-        ";
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([
-            ':idKanbanCard' => $idKanbanCard,
-            ':what' => $what,
-            ':remark' => $remark,
-            ':lastUpdate' => date('Y-m-d H:i:s')
-        ]);
     }
 
     public function getKanbanStats(int $personId): array
@@ -310,26 +280,33 @@ class KanbanDataHelper extends Data
     public function getProjectCards(int $idProject): array
     {
         $sql = "
+            WITH LastStatus AS (
+                SELECT
+                    kcs.*,
+                    ROW_NUMBER() OVER (
+                        PARTITION BY kcs.IdKanbanCard
+                        ORDER BY kcs.Id DESC
+                    ) AS rn
+                FROM KanbanCardStatus kcs
+            )
             SELECT
                 kc.Id,
-                Title,
+                kc.Title,
                 kc.Detail,
                 kct.Label,
-                (
-                    CASE 
-                        WHEN kcs.What = 'Created' THEN '💡'
-                        WHEN kcs.What LIKE '%ToBacklog%' THEN '💡'
-                        WHEN kcs.What LIKE '%ToSelected%' THEN '☑️'
-                        WHEN kcs.What LIKE '%ToInProgress%' THEN '🔧'
-                        WHEN kcs.What LIKE '%ToDone%' THEN '🏁'
-                        ELSE '💡'
-                    END
-                ) as CurrentStatus
-            FROM KanbanCardStatus kcs
-            JOIN KanbanCard kc ON kc.Id = kcs.IdKanbanCard 
+                CASE 
+                    WHEN ls.What = 'Created' THEN '💡'
+                    WHEN ls.What LIKE '%ToBacklog%' THEN '💡'
+                    WHEN ls.What LIKE '%ToSelected%' THEN '☑️'
+                    WHEN ls.What LIKE '%ToInProgress%' THEN '🔧'
+                    WHEN ls.What LIKE '%ToDone%' THEN '🏁'
+                    ELSE '💡'
+                END AS CurrentStatus
+            FROM KanbanCard kc
             JOIN KanbanCardType kct ON kct.Id = kc.IdKanbanCardType
-            WHERE IdKanbanProject = :idProject
-            ORDER BY CurrentStatus, Title
+            JOIN LastStatus ls ON ls.IdKanbanCard = kc.Id AND ls.rn = 1
+            WHERE kct.IdKanbanProject = :idProject
+            ORDER BY CurrentStatus, kc.Title;
         ";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':idProject' => $idProject]);
