@@ -221,7 +221,7 @@ abstract class Data
                     $setClause[] = $escape($field) . " = :set_{$field}";
                     $params[":set_{$field}"] = $value;
                 }
-
+                
                 $whereClause = [];
                 foreach ($where as $field => $value) {
                     $escapedField = $escape($field);
@@ -235,7 +235,6 @@ abstract class Data
 
                 $sql = "UPDATE {$escape($table)} SET " . implode(', ', $setClause)
                     . " WHERE " . implode(' AND ', $whereClause);
-
                 $stmt = $this->pdo->prepare($sql);
                 return $stmt->execute($params);
             }

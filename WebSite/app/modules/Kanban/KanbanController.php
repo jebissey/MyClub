@@ -23,12 +23,18 @@ class KanbanController extends AbstractController
             return;
         }
         $personId = $this->application->getConnectedUser()->person->Id;
+        $selectedProjectId = $this->flight->request()->query->getData()["p"] ?? null;
+        if ($selectedProjectId !== null) {
+            $selectedProjectId = (int) $selectedProjectId;
+            if (!$this->kanbanDataHelper->userHasAccessToProject($personId, $selectedProjectId)) {
+                $selectedProjectId = null;
+            }
+        }
 
         $this->render('Kanban/views/kanban.latte', $this->getAllParams([
             'navItems' => $this->getNavItems($this->application->getConnectedUser()->person),
             'title' => 'Kanban Board',
             'page' => $this->application->getConnectedUser()->getPage(),
-            'stats' => $this->kanbanDataHelper->getKanbanStats($personId),
             'personId' => $personId,
             'projects' => $this->kanbanDataHelper->getKanbanProjects($personId),
             'columns' => [
@@ -36,34 +42,8 @@ class KanbanController extends AbstractController
                 ['icon' => '☑️', 'label' => 'Selected'],
                 ['icon' => '🔧', 'label' => 'In Progress'],
                 ['icon' => '🏁', 'label' => 'Done']
-            ]
-        ]));
-    }
-
-    public function history(): void
-    {
-        if (!($this->application->getConnectedUser()->isKanbanDesigner() ?? false)) {
-            $this->raiseforbidden(__FILE__, __LINE__);
-            return;
-        }
-
-        $personId = $this->application->getConnectedUser()->person->Id;
-        $kanbanId = (int)($_GET['id'] ?? 0);
-
-        $card = $this->kanbanDataHelper->getKanbanCard($kanbanId, $personId);
-        if (!$card) {
-            $this->raiseforbidden(__FILE__, __LINE__);
-            return;
-        }
-
-        $history = $this->kanbanDataHelper->getKanbanHistory($kanbanId);
-
-        $this->render('Kanban/views/kanban_history.latte', $this->getAllParams([
-            'navItems' => $this->getNavItems($this->application->getConnectedUser()->person),
-            'title' => 'Historique - ' . $card['Title'],
-            'page' => $this->application->getConnectedUser()->getPage(),
-            'card' => $card,
-            'history' => $history,
+            ],
+            'selectedProjectId' => $selectedProjectId
         ]));
     }
 }

@@ -19,7 +19,6 @@ class Kanban implements RouteInterface
         $kanbanController = fn() => $this->controllerFactory->makeKanbanController();
 
         $this->routes[] = new Route('GET  /kanban', $kanbanController, 'board');
-        $this->routes[] = new Route('GET  /kanban/history', $kanbanController, 'history');
 
         return $this->routes;
     }

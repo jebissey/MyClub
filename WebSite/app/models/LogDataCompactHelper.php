@@ -62,12 +62,8 @@ class LogDataCompactHelper extends Data
                 WHERE CreatedAt < datetime('now', '{$compactParam}')
                 GROUP BY Uri, Who, strftime('%Y-%m', CreatedAt)
             ")->fetchAll(PDO::FETCH_ASSOC);
-
-            if (!$compactedRows) {
-                $this->set('Metadata', [
-                    'Compact_lastDate' => (new DateTime())->format('Y-m-d H:i:s')
-                ], ['Id' => 1]);
-
+            if ($compactedRows === []) {
+                $this->set('Metadata', ['Compact_lastDate' => (new DateTime())->format('Y-m-d H:i:s')], ['Id' => 1]);
                 $this->pdoForLog->commit();
                 $this->enforceMaxRecordsAndLog($maxRecords, $countBefore);
                 return;

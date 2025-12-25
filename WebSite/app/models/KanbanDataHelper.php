@@ -70,22 +70,6 @@ class KanbanDataHelper extends Data
         }
     }
 
-    public function getKanbanCard(int $kanbanId, int $personId): ?array
-    {
-        $sql = "
-            SELECT Id, Title, Detail, CurrentStatus, Position 
-            FROM Kanban 
-            WHERE Id = :kanbanId AND IdPerson = :personId
-        ";
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([
-            ':kanbanId' => $kanbanId,
-            ':personId' => $personId
-        ]);
-        $result = $stmt->fetch();
-        return $result ?: null;
-    }
-
     public function getKanbanCards(int $personId): array
     {
         $sql = "
@@ -193,62 +177,52 @@ class KanbanDataHelper extends Data
         ]);
     }
 
-
-    public function getKanbanHistory(int $kanbanId): array
+    public function updateKanbanCardStatus(int $idKanbanCardStatus, int $idPerson, string $remark): bool
     {
         $sql = "
-            SELECT 
-                KanbanStatus.*,
-                Person.FirstName,
-                Person.LastName
-            FROM KanbanStatus
-            LEFT JOIN Person ON KanbanStatus.IdPerson = Person.Id
-            WHERE KanbanStatus.IdKanban = :kanbanId
-            ORDER BY KanbanStatus.LastUpdate DESC
+            UPDATE KanbanCardStatus
+            SET Remark = :remark, LastUpdate = :lastUpdate
+            WHERE Id IN (
+                SELECT kcs.Id
+                FROM KanbanCardStatus kcs
+                JOIN KanbanCard kc ON kc.Id = kcs.IdKanbanCard
+                JOIN KanbanCardType kct ON kct.Id = kc.IdKanbanCardType
+                JOIN KanbanProject kp ON kp.Id = kct.IdKanbanProject
+                WHERE kcs.Id = :idKanbanCardStatus
+                AND kp.IdPerson = :idPerson
+            )
         ";
         $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([':kanbanId' => $kanbanId]);
-        return $stmt->fetchAll();
+        return $stmt->execute([
+            ':remark' => $remark,
+            ':idKanbanCardStatus' => $idKanbanCardStatus,
+            ':idPerson' => $idPerson,
+            ':lastUpdate' => date('Y-m-d H:i:s')
+        ]);
     }
 
-    public function getKanbanStats(int $personId): array
+    public function getKanbanHistory(int $idKanbanCard): array
     {
         $sql = "
-            SELECT 
+            SELECT
+                Id,
                 CASE 
-                    WHEN kcs.What = 'Created' THEN 'Backlog'
-                    WHEN kcs.What LIKE '%ToBacklog%' THEN 'Backlog'
-                    WHEN kcs.What LIKE '%ToSelected%' THEN 'Selected'
-                    WHEN kcs.What LIKE '%ToInProgress%' THEN 'InProgress'
-                    WHEN kcs.What LIKE '%ToDone%' THEN 'Done'
-                    ELSE 'Backlog'
-                END as CurrentStatus,
-                COUNT(*) as Count
-            FROM KanbanCardStatus kcs
-            JOIN KanbanCard kc ON kc.Id = kcs.IdKanbanCard
-            JOIN KanbanCardType kct ON kct.Id = kc.IdKanbanCardType
-            JOIN KanbanProject kp ON kp.Id = kct.IdKanbanProject
-            WHERE kcs.Id = (
-                SELECT MAX(Id) 
-                FROM KanbanCardStatus 
-                WHERE IdKanbanCard = kc.Id
-            )
-            AND kp.IdPerson = :personId
-            GROUP BY CurrentStatus
+                    WHEN What = 'Created' THEN '💡'
+                    WHEN What LIKE '%ToBacklog%' THEN '💡'
+                    WHEN What LIKE '%ToSelected%' THEN '☑️'
+                    WHEN What LIKE '%ToInProgress%' THEN '🔧'
+                    WHEN What LIKE '%ToDone%' THEN '🏁'
+                    ELSE '💡'
+                END AS Status,
+                Remark,
+                LastUpdate
+            FROM KanbanCardStatus
+            WHERE IdKanbanCard = :idKanbanCard
+            ORDER BY Id
         ";
         $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([':personId' => $personId]);
-
-        $stats = [
-            '💡' => 0,
-            '☑️' => 0,
-            '🔧' => 0,
-            '🏁' => 0
-        ];
-        foreach ($stmt->fetchAll() as $row) {
-            $stats[$row->CurrentStatus] = (int)$row->Count;
-        }
-        return $stats;
+        $stmt->execute([':idKanbanCard' => $idKanbanCard]);
+        return $stmt->fetchAll();
     }
 
     #region Project
@@ -328,6 +302,22 @@ class KanbanDataHelper extends Data
             ':personId' => $idPerson
         ]);
         return $stmt->rowCount() > 0;
+    }
+
+    public function userHasAccessToProject(int $idPerson, int $idProject): bool
+    {
+        $sql = "
+            SELECT COUNT(*) as Count
+            FROM KanbanProject
+            WHERE Id = :idProject AND IdPerson = :idPerson
+        ";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([
+            ':idProject' => $idProject,
+            ':idPerson' => $idPerson
+        ]);
+        $row = $stmt->fetch();
+        return ((int)$row->Count) > 0;
     }
 
     #region CardType

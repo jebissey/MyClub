@@ -14,7 +14,7 @@ export default class KanbanBoard {
             containerSelector: '.kanban-cards',
             draggedItemClass: 'dragging',
             dragOverClass: 'drag-over',
-            debug: true,
+            debug: false,
             onDrop: (card, column) => this.handleCardDrop(card, column),
             canDrop: (card, column) => this.canDropCard(card, column)
         });
@@ -28,6 +28,7 @@ export default class KanbanBoard {
         this.initGlobalEvents();
 
         document.getElementById('saveNewCard')?.addEventListener('click', () => this.createNewCard());
+        document.getElementById('saveEditCard')?.addEventListener('click', () => this.saveEditedCard());
         document.getElementById('saveEditCard')?.addEventListener('click', () => this.saveEditedCard());
 
         this.initTooltips();
@@ -48,9 +49,11 @@ export default class KanbanBoard {
     handleClick(e) {
         const editBtn = e.target.closest('.edit-card');
         const deleteBtn = e.target.closest('.delete-card');
+        const viewBtn = e.target.closest('.view-card');
 
         if (editBtn) this.openEditModal(editBtn.dataset.id);
         if (deleteBtn) this.deleteCard(deleteBtn.dataset.id);
+        if (viewBtn) this.openViewModal(viewBtn.dataset.id);
     }
 
     update(cards) {
@@ -93,6 +96,9 @@ export default class KanbanBoard {
         const actionsDiv = document.createElement('div');
         actionsDiv.className = 'mt-2 d-flex gap-1';
         actionsDiv.innerHTML = `
+            <button class="btn btn-sm btn-success view-card" data-id="${card.Id}" title="Voir l'historique">
+                <i class="bi bi-eye"></i>
+            </button>
             <button class="btn btn-sm btn-warning edit-card" data-id="${card.Id}" title="Éditer">
                 <i class="bi bi-pencil"></i>
             </button>
@@ -139,6 +145,55 @@ export default class KanbanBoard {
         document.getElementById('cardTypeLabel').value = card.querySelector('.kanban-card-type')?.textContent || '';
 
         new bootstrap.Modal(document.getElementById('editCardModal')).show();
+    }
+
+    async openViewModal(cardId) {
+        const result = await cardManager.history(cardId);
+        if (result.success) {
+            const historyList = document.getElementById('cardHistoryList');
+            historyList.innerHTML = '';
+
+            result.history.forEach((entry, index) => {
+                const li = document.createElement('li');
+                li.className = 'list-group-item';
+
+                const remarkId = `remark-${index}`;
+                li.innerHTML = `
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <div>
+                            <span class="fs-5 me-2">${entry.Status}</span>
+                            <small class="text-muted">${new Date(entry.LastUpdate).toLocaleString('fr-FR')}</small>
+                        </div>
+                    </div>
+                    <div class="input-group input-group-sm">
+                        <input type="text" class="form-control" id="${remarkId}" value="${entry.Remark || ''}" placeholder="Ajouter une remarque...">
+                        <button class="btn btn-primary save-remark"
+                            data-status-id="${entry.Id}"
+                            data-input-id="${remarkId}">
+                            <i class="bi bi-save"></i>
+                        </button>
+                    </div>
+                `;
+                historyList.appendChild(li);
+                li.querySelector('.save-remark').addEventListener('click', (e) => {
+                    const btn = e.currentTarget;
+                    this.updateRemark(btn.dataset.statusId, btn.dataset.inputId);
+                });
+            });
+            new bootstrap.Modal(document.getElementById('viewCardModal')).show();
+        }
+    }
+
+    async updateRemark(statusId, remarkInputId) {
+        const input = document.getElementById(remarkInputId);
+        const remark = input.value;
+
+        const response = await cardManager.updateStatus(statusId, remark);
+        if (!response.success) return alert(data.error || 'Update card status failed');
+
+        const modalEl = document.getElementById('viewCardModal');
+        const modalInstance = bootstrap.Modal.getInstance(modalEl);
+        modalInstance?.hide();
     }
 
     async saveEditedCard() {
@@ -204,9 +259,8 @@ export default class KanbanBoard {
         column.appendChild(card);
         card.dataset.status = newStatus;
         const what = this.statusTransitions?.[oldStatus]?.[newStatus] || '???';
-console.log(`Send API: ${cardId}, what=${what} (${oldStatus} → ${newStatus},)`);
-
-        const response = await cardManager.move(cardId, what);
+        const remark = `${oldStatus} → ${newStatus}`;
+        const response = await cardManager.move(cardId, what, remark);
         if (response.success) return true;
         return false;
     }

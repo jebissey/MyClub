@@ -10,7 +10,15 @@ export default class CardManager {
         return await apiClient.post('/api/kanban/card/delete', { id: parseInt(cardId) });
     }
 
-    async move(cardId, what) {
-        return await apiClient.post('/api/kanban/card/move', { idKanbanCard: parseInt(cardId), what });
+    async history(cardId) {
+        return await apiClient.get(`/api/kanban/card/${cardId}/history`);
+    }
+
+    async move(cardId, what, remark) {
+        return await apiClient.post('/api/kanban/card/move', { idKanbanCard: parseInt(cardId), what, remark });
+    }
+
+    async updateStatus(cardId, remark) {
+        return await apiClient.post('/api/kanban/cardStatus/update', { idKanbanCardStatus: parseInt(cardId), remark });
     }
 }

@@ -6,42 +6,25 @@
 
 {block head}
     <style>
-        .kanban-board {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 1rem;
-            margin-top: 1rem;
-        }
-
         .kanban-column {
-            background: #f8f9fa;
-            border-radius: 8px;
-            padding: 1rem;
-            min-height: 500px;
-        }
-
-        .kanban-column-header {
-            font-size: 2.25rem;
-            font-weight: bold;
-            margin-bottom: 1rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 2px solid #dee2e6;
-            text-align: center;
+            min-height: 300px;
         }
 
         .kanban-card {
             background: white;
             border: 1px solid #dee2e6;
-            border-radius: 6px;
-            padding: 0.75rem;
-            margin-bottom: 0.75rem;
             cursor: grab;
             transition: box-shadow 0.2s, transform 0.2s;
         }
+        
+        .kanban-card:not(:last-child) {
+            margin-bottom: 0.5rem;
+        }
 
         .kanban-card:hover {
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
             transform: translateY(-2px);
+            border-color: #adb5bd;
         }
 
         .kanban-card:active {
@@ -53,19 +36,6 @@
             caret-color: transparent;
             border: none;
             outline: none;
-        }
-
-        .kanban-card-title {
-            font-weight: bold;
-            margin-bottom: 0.5rem;
-            word-wrap: break-word;
-        }
-
-        .kanban-card-detail {
-            font-size: 0.9rem;
-            color: #6c757d;
-            margin-bottom: 0.5rem;
-            word-wrap: break-word;
         }
 
         .dragging {
@@ -80,27 +50,13 @@
         }
 
         .drag-over {
-            background: #e9ecef;
-            border: 2px dashed #007bff;
+            border: 2px dashed #007bff !important;
             box-shadow: 0 0 10px rgba(0, 123, 255, 0.3);
         }
 
         .kanban-cards {
-            min-height: 400px;
-            padding: 10px; 
+            min-height: 200px;
             transition: all 0.2s ease; 
-        }
-
-        .card-type-item {
-            background: #f8f9fa;
-            border: 1px solid #dee2e6;
-            border-radius: 6px;
-            padding: 0.75rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .card-type-item:hover {
-            background: #e9ecef;
         }
 
         @keyframes dropSuccess {
@@ -120,35 +76,31 @@
         .kanban-card:not(.dragging) {
             animation: dropSuccess 0.3s ease;
         }
-
-        @media (max-width: 992px) {
-            .kanban-board {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-
-        @media (max-width: 576px) {
-            .kanban-board {
-                grid-template-columns: 1fr;
-            }
-        }
     </style>
 {/block}
 
 {block content}
-    <div class="container-fluid">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <div class="d-flex align-items-center gap-3">
-                <h1 class="m-0">📋 Kanban Board</h1>
-                <select id="kanbanProjectSelect" class="form-select" style="width: auto;">
-                    <option value="">choisir un projet</option>
+    <div class="container-fluid px-0">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <div class="d-flex align-items-center gap-2 mt-2">
+                <h1 class="m-0 fs-4">📋 Kanban Board</h1>
+                <form method="get" action="" class="m-0">
+                    <select id="kanbanProjectSelect" name="p" class="form-select form-select-sm" style="width: auto;" onchange="this.form.submit()">
+                        <option value="">choisir un projet</option>
                     {foreach $projects as $p}
-                        <option value="{$p->Id}">{$p->Title}</option>
+                        <option value="{$p->Id}"
+                            {if $selectedProjectId === $p->Id}selected{/if}>
+                            {$p->Title}
+                        </option>
                     {/foreach}
-                </select>
+                    </select>
+                    <noscript>
+                        <button type="submit" class="btn btn-primary btn-sm ms-2">Valider</button>
+                    </noscript>
+                </form>
                 <button id="editProjectBtn"
                         type="button"
-                        class="btn btn-warning d-none"
+                        class="btn btn-warning btn-sm d-none"
                         data-bs-toggle="modal"
                         data-bs-target="#editProjectModal"
                         title="Éditer le projet">
@@ -158,7 +110,7 @@
             
             <button id="addProjectBtn"
                     type="button"
-                    class="btn btn-primary"
+                    class="btn btn-primary btn-sm"
                     data-bs-toggle="modal"
                     data-bs-target="#addProjectModal"
                     data-bs-placement="bottom"
@@ -167,7 +119,7 @@
             </button>
             <button id="addCardBtn"
                     type="button"
-                    class="btn btn-primary d-none"
+                    class="btn btn-primary btn-sm d-none"
                     data-bs-toggle="modal"
                     data-bs-target="#addCardModal"
                     data-bs-placement="bottom"
@@ -176,29 +128,15 @@
             </button>
         </div>
 
-        <div id="statsContainer" class="d-none">
-            {if $stats}
-                <div class="card mb-3">
-                    <div class="card-body">
-                        <div class="row text-center">
-                        {foreach $columns as $col}
-                            <div class="col-3">
-                                <div class="h3 mb-0">{$stats[$col['icon']]}</div>
-                            </div>
-                        {/foreach}
-                        </div>
-                    </div>
-                </div>
-            {/if}
-        </div>
-
-        <div class="kanban-board d-none" id="kanbanBoard">
+        <div class="row g-2 d-none" id="kanbanBoard">
             {foreach $columns as $col}
-                <div class="kanban-column" data-status="{$col['icon']}">
-                    <div class="kanban-column-header">
-                        {$col['icon']}
-                    </div>
-                    <div class="kanban-cards" data-status="{$col['icon']}">
+                <div class="col-6 col-lg-3">
+                    <div class="kanban-column bg-light rounded p-2" data-status="{$col['icon']}">
+                        <div class="text-center fs-4 border rounded p-2 mb-2 bg-white">
+                            {$col['icon']}
+                        </div>
+                        <div class="kanban-cards p-1" data-status="{$col['icon']}">
+                        </div>
                     </div>
                 </div>
             {/foreach}
@@ -259,7 +197,7 @@
                         </div>
                         
                         <div id="cardTypesList">
-                            <!-- Les types de cartes seront chargés ici dynamiquement -->
+                            <!-- dynamically loaded -->
                         </div>
 
                         <div id="newCardTypeForm" class="card d-none mt-3">
@@ -346,6 +284,22 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
                     <button type="button" class="btn btn-primary" id="saveEditCard">Enregistrer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="viewCardModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">👁️ Historique de la carte</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <ul class="list-group" id="cardHistoryList">
+                        <!-- L'historique sera chargé ici dynamiquement -->
+                    </ul>
                 </div>
             </div>
         </div>

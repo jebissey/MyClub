@@ -1,21 +1,21 @@
 === Détail par fichier ===
-87 ../WebSite/app/apis/AbstractApi.php
+100 ../WebSite/app/apis/AbstractApi.php
 110 ../WebSite/app/apis/ArticleApi.php
-99 ../WebSite/app/apis/CarouselApi.php
+100 ../WebSite/app/apis/CarouselApi.php
 270 ../WebSite/app/apis/EventApi.php
 117 ../WebSite/app/apis/EventAttributeApi.php
-106 ../WebSite/app/apis/EventNeedApi.php
+107 ../WebSite/app/apis/EventNeedApi.php
 87 ../WebSite/app/apis/EventNeedTypeApi.php
 93 ../WebSite/app/apis/EventSupplyApi.php
-93 ../WebSite/app/apis/GroupApi.php
+94 ../WebSite/app/apis/GroupApi.php
 54 ../WebSite/app/apis/ImportApi.php
-327 ../WebSite/app/apis/KanbanApi.php
+479 ../WebSite/app/apis/KanbanApi.php
 180 ../WebSite/app/apis/KaraokeApi.php
 40 ../WebSite/app/apis/LeapfrogApi.php
 138 ../WebSite/app/apis/MediaApi.php
 144 ../WebSite/app/apis/MessageApi.php
 99 ../WebSite/app/apis/NavbarApi.php
-129 ../WebSite/app/apis/WebmasterApi.php
+117 ../WebSite/app/apis/WebmasterApi.php
 259 ../WebSite/app/config/ApiFactory.php
 452 ../WebSite/app/config/ControllerFactory.php
 28 ../WebSite/app/config/routes/ArticleApi.php
@@ -42,7 +42,7 @@
 27 ../WebSite/app/config/routes/Home.php
 25 ../WebSite/app/config/routes/ImportApi.php
 26 ../WebSite/app/config/routes/Import.php
-33 ../WebSite/app/config/routes/KanbanApi.php
+40 ../WebSite/app/config/routes/KanbanApi.php
 26 ../WebSite/app/config/routes/Kanban.php
 25 ../WebSite/app/config/routes/KaraokeApi.php
 26 ../WebSite/app/config/routes/Karaoke.php
@@ -146,18 +146,18 @@
 239 ../WebSite/app/models/database/migrators/V2ToV3Migrator.php
 23 ../WebSite/app/models/database/migrators/V3ToV4Migrator.php
 20 ../WebSite/app/models/database/migrators/V4ToV5Migrator.php
-41 ../WebSite/app/models/database/migrators/V5ToV6Migrator.php
+62 ../WebSite/app/models/database/migrators/V5ToV6Migrator.php
 112 ../WebSite/app/models/Database.php
 14 ../WebSite/app/models/DataHelper.php
 263 ../WebSite/app/models/Data.php
 228 ../WebSite/app/models/DbBrowserDataHelper.php
 93 ../WebSite/app/models/DesignDataHelper.php
-704 ../WebSite/app/models/EventDataHelper.php
+718 ../WebSite/app/models/EventDataHelper.php
 33 ../WebSite/app/models/EventNeedDataHelper.php
 34 ../WebSite/app/models/EventTypeDataHelper.php
 221 ../WebSite/app/models/GroupDataHelper.php
 63 ../WebSite/app/models/ImportDataHelper.php
-238 ../WebSite/app/models/KanbanDataHelper.php
+385 ../WebSite/app/models/KanbanDataHelper.php
 167 ../WebSite/app/models/KaraokeDataHelper.php
 48 ../WebSite/app/models/LanguagesDataHelper.php
 237 ../WebSite/app/models/LogDataAnalyticsHelper.php
@@ -173,7 +173,7 @@
 116 ../WebSite/app/models/ParticipantDataHelper.php
 273 ../WebSite/app/models/PersonDataHelper.php
 34 ../WebSite/app/models/PersonGroupDataHelper.php
-461 ../WebSite/app/models/PersonStatisticsDataHelper.php
+458 ../WebSite/app/models/PersonStatisticsDataHelper.php
 48 ../WebSite/app/models/ReplyDataHelper.php
 46 ../WebSite/app/models/SharedFileDataHelper.php
 124 ../WebSite/app/models/SurveyDataHelper.php
@@ -204,7 +204,9 @@
 104 ../WebSite/app/modules/Article/views/topArticles.latte
 185 ../WebSite/app/modules/Common/AbstractController.php
 16 ../WebSite/app/modules/Common/EmptyController.php
+29 ../WebSite/app/modules/Common/js/apiClient.js
 134 ../WebSite/app/modules/Common/js/chat.js
+163 ../WebSite/app/modules/Common/js/dragDropManager.js
 73 ../WebSite/app/modules/Common/TableController.php
 149 ../WebSite/app/modules/Common/views/chat.latte
 65 ../WebSite/app/modules/Common/views/contact.latte
@@ -234,7 +236,7 @@
 57 ../WebSite/app/modules/Event/views/eventTypes_index.latte
 72 ../WebSite/app/modules/Event/views/getEmails.latte
 57 ../WebSite/app/modules/Event/views/guest.latte
-354 ../WebSite/app/modules/Event/views/nextEvents.latte
+353 ../WebSite/app/modules/Event/views/nextEvents.latte
 214 ../WebSite/app/modules/Event/views/weekEvents.latte
 63 ../WebSite/app/modules/Games/Karaoke/js/api/ApiManager.js
 450 ../WebSite/app/modules/Games/Karaoke/js/app/KaraokeApp.js
@@ -256,9 +258,15 @@
 16 ../WebSite/app/modules/Games/Leapfrog/views/statistics.latte
 67 ../WebSite/app/modules/Games/Solfege/SolfegeController.php
 433 ../WebSite/app/modules/Games/Solfege/views/Solfege_learn.latte
-278 ../WebSite/app/modules/Kanban/js/kanban.js
-76 ../WebSite/app/modules/Kanban/KanbanController.php
-198 ../WebSite/app/modules/Kanban/views/kanban.latte
+19 ../WebSite/app/modules/Kanban/js/domUtils.js
+272 ../WebSite/app/modules/Kanban/js/kanbanBoard.js
+310 ../WebSite/app/modules/Kanban/js/kanbanModule.js
+13 ../WebSite/app/modules/Kanban/js/main.js
+24 ../WebSite/app/modules/Kanban/js/project/cardType/card/cardManager.js
+16 ../WebSite/app/modules/Kanban/js/project/cardType/cardTypeManager.js
+24 ../WebSite/app/modules/Kanban/js/project/projectManager.js
+69 ../WebSite/app/modules/Kanban/KanbanController.php
+372 ../WebSite/app/modules/Kanban/views/kanban.latte
 224 ../WebSite/app/modules/PersonManager/GroupController.php
 101 ../WebSite/app/modules/PersonManager/ImportController.php
 34 ../WebSite/app/modules/PersonManager/js/groupsIndex.js
@@ -318,7 +326,7 @@
 37 ../WebSite/app/modules/User/views/user_set_password.latte
 50 ../WebSite/app/modules/User/views/user_sign_in.latte
 40 ../WebSite/app/modules/User/views/users_map.latte
-259 ../WebSite/app/modules/User/views/user_statistics.latte
+261 ../WebSite/app/modules/User/views/user_statistics.latte
 178 ../WebSite/app/modules/VisitorInsights/views/analytics.latte
 153 ../WebSite/app/modules/VisitorInsights/views/crossTab.latte
 92 ../WebSite/app/modules/VisitorInsights/views/lastVisits.latte
@@ -377,11 +385,11 @@
 
 === Total par type de fichier ===
 Fichiers PHP :
-18992
+19327
 Fichiers Latte :
-9170
+9345
 Fichiers Javascript :
-5143
+5735
 
 === Total général ===
-  33305 Total tous fichiers
+  34407 Total tous fichiers

@@ -94,29 +94,6 @@ class KanbanApi extends AbstractApi
         }
     }
 
-    public function getCard(int $id): void
-    {
-        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
-            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
-
-        if (!$this->connectedUser->isKanbanDesigner()) {
-            $this->renderJsonForbidden(__FILE__, __LINE__);
-            return;
-        }
-
-        $personId = $this->connectedUser->person->Id;
-        $card = $this->kanbanDataHelper->getKanbanCard($id, $personId);
-
-        if (!$card) {
-            $this->renderJsonBadRequest('Card not found', __FILE__, __LINE__);
-            return;
-        }
-
-        $this->renderJsonOk(['card' => $card]);
-    }
-
     public function getCards(): void
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
@@ -140,33 +117,9 @@ class KanbanApi extends AbstractApi
             $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }
-        $personId = $this->connectedUser->person->Id;
-        $card = $this->kanbanDataHelper->getKanbanCard($id, $personId);
-        if (!$card) {
-            $this->renderJsonBadRequest('Card not found', __FILE__, __LINE__);
-            return;
-        }
-
         $this->renderJsonOk([
-            'card' => $card,
             'history' => $this->kanbanDataHelper->getKanbanHistory($id)
         ]);
-    }
-
-    public function getStats(): void
-    {
-        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
-            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
-        if (!$this->connectedUser->isKanbanDesigner()) {
-            $this->renderJsonForbidden(__FILE__, __LINE__);
-            return;
-        }
-        $personId = $this->connectedUser->person->Id;
-        $stats = $this->kanbanDataHelper->getKanbanStats($personId);
-
-        $this->renderJsonOk(['stats' => $stats]);
     }
 
     public function moveCard(): void
@@ -187,6 +140,7 @@ class KanbanApi extends AbstractApi
         }
         $id = (int)($data['idKanbanCard'] ?? 0);
         $what = $data['what'] ?? '';
+        $remark = $data['remark'] ?? '';
         if ($id <= 0) {
             $this->renderJsonBadRequest('Invalid card ID', __FILE__, __LINE__);
             return;
@@ -196,7 +150,7 @@ class KanbanApi extends AbstractApi
             return;
         }
 
-        $success = $this->kanbanDataHelper->moveKanbanCard($id, $what);
+        $success = $this->kanbanDataHelper->moveKanbanCard($id, $what, $remark);
         if ($success) $this->renderJsonOk([], 'Card moved successfully');
         else          $this->renderJsonBadRequest('Card not found', __FILE__, __LINE__);
     }
@@ -237,6 +191,39 @@ class KanbanApi extends AbstractApi
             else          $this->renderJsonBadRequest('Card not found or unauthorized', __FILE__, __LINE__);
         } catch (Throwable $e) {
             $this->renderJsonError('Failed to update card :' . $e->getMessage(), ApplicationError::Error->value, __FILE__, __LINE__);
+        }
+    }
+
+    public function updateCardStatus(): void
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
+            return;
+        }
+        if (!$this->connectedUser->isKanbanDesigner()) {
+            $this->renderJsonForbidden(__FILE__, __LINE__);
+            return;
+        }
+
+        $data = json_decode(file_get_contents('php://input'), true);
+        if (!is_array($data)) {
+            $this->renderJsonBadRequest('Invalid JSON', __FILE__, __LINE__);
+            return;
+        }
+        $id = (int)($data['idKanbanCardStatus'] ?? 0);
+        $remark = trim($data['remark'] ?? '');
+        if ($id <= 0) {
+            $this->renderJsonBadRequest('Invalid card status Id', __FILE__, __LINE__);
+            return;
+        }
+
+        try {
+            $success = $this->kanbanDataHelper->updateKanbanCardStatus($id, $this->connectedUser->person->Id, $remark);
+
+            if ($success) $this->renderJsonOk([], 'Card status updated successfully');
+            else          $this->renderJsonBadRequest('Card status not found or unauthorized', __FILE__, __LINE__);
+        } catch (Throwable $e) {
+            $this->renderJsonError('Failed to update card status :' . $e->getMessage(), ApplicationError::Error->value, __FILE__, __LINE__);
         }
     }
 

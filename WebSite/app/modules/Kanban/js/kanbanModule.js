@@ -16,10 +16,18 @@ export default class KanbanModule {
     /* --------------------------------------------
        INIT
     -------------------------------------------- */
-    init() {
+    async init() {
         this.kanbanBoard.init();
         this.attachEvents();
-        this.handleProjectSelection();
+
+        const projectId = this.dom.projectSelect.value;
+        if (projectId) {
+            this.showProjectUI(projectId);
+            const response = await this.cardTypeManager.load(projectId);
+            if (response.success) {
+                this.populateCardTypeSelects(response.cardTypes ?? []);
+            }
+        }
     }
 
     /* --------------------------------------------
@@ -33,7 +41,6 @@ export default class KanbanModule {
             editProjectBtn: document.getElementById("editProjectBtn"),
             deleteProjectBtn: document.getElementById("deleteProjectBtn"),
             kanbanBoard: document.getElementById("kanbanBoard"),
-            statsContainer: document.getElementById("statsContainer"),
 
             cardTypesList: document.getElementById("cardTypesList"),
             newCardTypeForm: document.getElementById("newCardTypeForm"),
@@ -61,25 +68,9 @@ export default class KanbanModule {
     /* --------------------------------------------
        PROJECT SELECTION
     -------------------------------------------- */
-    handleProjectSelection() {
-        this.dom.projectSelect.addEventListener("change", async () => {
-            const projectId = this.dom.projectSelect.value;
-            if (!projectId) {
-                this.hideProjectUI();
-                return;
-            }
-            this.showProjectUI(projectId);
-
-            const response = await this.cardTypeManager.load(projectId);
-            if (response.success) {
-                this.populateCardTypeSelects(response.cardTypes ?? []);
-            }
-        });
-    }
-
-    showProjectUI(projectId) {
+    async showProjectUI(projectId) {
         this.toggleProjectUI(true);
-        this.loadProjectCards(projectId);
+        await this.loadProjectCards(projectId);
     }
 
     hideProjectUI() {
@@ -92,7 +83,6 @@ export default class KanbanModule {
         this.dom.addCardBtn.classList[method]("d-none");
         this.dom.editProjectBtn.classList[method]("d-none");
         this.dom.kanbanBoard.classList[method]("d-none");
-        this.dom.statsContainer.classList[method]("d-none");
     }
 
     /* --------------------------------------------
@@ -168,7 +158,7 @@ export default class KanbanModule {
     /* --------------------------------------------
        CARD TYPES
     -------------------------------------------- */
-        showNewCardTypeForm() {
+    showNewCardTypeForm() {
         this.dom.newCardTypeForm.classList.remove("d-none");
     }
 
