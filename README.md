@@ -1,7 +1,7 @@
 # MyClub – The ultra-light, fully customizable CMS for your association
 
 ![PHP](https://img.shields.io/badge/PHP-%3E%3D8.1-blue)  
-![SQLite](https://img.shields.io/badge/SQLite-Supported-green)  
+![SQLite](https://img.shields.io/badge/SQLite-Used-green)  
 ![License](https://img.shields.io/badge/license-MIT-lightgrey)  
 
 **MyClub** is a lightweight CMS tailored for associations.  
@@ -84,6 +84,7 @@ Security is based on **groups**. There are three types:
 | **Redactor**        | Write content and publish for restricted audiences (not public).             |
 | **EventDesigner**   | Define event types and their attributes, assign to groups.                   |
 | **HomeDesigner**    | Customize the homepage layout, and all other settings.                       |
+| **KanbanDesigner**  | Create/manage kanban projects.                                               |
 | **NavbarDesigner**  | Define navigation bars.                                                      |
 | **VisitorInsights** | Access visitor statistics and analytics.                                     |
 
@@ -139,6 +140,7 @@ This web application is a comprehensive management system based on user roles, f
 Interface divided into sub-specialties:
 - **Event Designer**: Designing event types and managing requirements
 - **Home Designer**: Configuring general settings and managing designs
+- **Kanban Designer**: Creation Kanban projects
 - **Navbar Designer**: Customizing the navigation bar
 
 ### ✍️ Redactor (Editor)
