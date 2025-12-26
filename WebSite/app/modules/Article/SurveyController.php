@@ -21,7 +21,7 @@ class SurveyController extends AbstractController
         parent::__construct($application);
     }
 
-    public function add($articleId)
+    public function add(int $articleId): void
     {
         if (!($this->application->getConnectedUser()->isRedactor() ?? false)) {
             $this->raiseforbidden(__FILE__, __LINE__);
@@ -31,7 +31,7 @@ class SurveyController extends AbstractController
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
-        $article = $this->dataHelper->get('Article', ['Id' => $articleId], 'Title, Id, ');
+        $article = $this->dataHelper->get('Article', ['Id' => $articleId], 'Title, Id');
         if (!$article) {
             $this->redirect('/articles');
             return;
