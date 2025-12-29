@@ -23,7 +23,7 @@ class WebmasterController extends AbstractController
         parent::__construct($application);
     }
 
-    public function helpAdmin()
+    public function helpAdmin(): void
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isAdministrator())) {
             $this->render('Common/views/info.latte', $this->getAllParams([
@@ -51,7 +51,7 @@ class WebmasterController extends AbstractController
         }
     }
 
-    public function homeAdmin()
+    public function homeAdmin(): void
     {
         if (!($this->application->getConnectedUser()->isAdministrator() ?? false)) {
             $this->raiseforbidden(__FILE__, __LINE__);
@@ -96,7 +96,7 @@ class WebmasterController extends AbstractController
         }
     }
 
-    public function notifications()
+    public function notifications(): void
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isAdministrator())) {
             $metadata = $this->dataHelper->get('Metadata', ['Id' => 1], 'VapidPublicKey, VapidPrivateKey ');
@@ -137,7 +137,7 @@ class WebmasterController extends AbstractController
         }
     }
 
-    public function sendEmailCredentialsSave()
+    public function sendEmailCredentialsSave(): void
     {
         $person = $this->application->getConnectedUser()->person;
         if ($person === null) {
