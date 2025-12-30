@@ -89,7 +89,12 @@ export default class KanbanModule {
        KANBAN
     -------------------------------------------- */
     async loadProjectCards(projectId) {
-        const result = await this.projectManager.getCards(projectId);
+        const urlParams = new URLSearchParams(window.location.search);
+        const filterCt = urlParams.get('ct') || '';
+        const filterTitle = urlParams.get('title') || '';
+        const filterDetail = urlParams.get('detail') || '';
+
+        const result = await this.projectManager.getCards(projectId, filterCt, filterTitle, filterDetail);
         if (!result.success) {
             this.handleError("Impossible de charger les cartes", result);
             return;

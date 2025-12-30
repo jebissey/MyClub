@@ -94,19 +94,6 @@ class KanbanApi extends AbstractApi
         }
     }
 
-    public function getCards(): void
-    {
-        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
-            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
-        if (!$this->connectedUser->isKanbanDesigner()) {
-            $this->renderJsonForbidden(__FILE__, __LINE__);
-            return;
-        }
-        $this->renderJsonOk(['cards' => $this->kanbanDataHelper->getKanbanCards($this->connectedUser->person->Id)]);
-    }
-
     public function getHistory(int $id): void
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
@@ -426,7 +413,7 @@ class KanbanApi extends AbstractApi
         }
     }
 
-    public function getProjectCards(int $id)
+    public function getProjectCards(int $id): void
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
             $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
@@ -437,7 +424,11 @@ class KanbanApi extends AbstractApi
             return;
         }
         try {
-            $this->renderJsonOk(['cards' => $this->kanbanDataHelper->getProjectCards($id)]);
+            $query = $this->application->getFlight()->request()->query;
+            $ct = filter_var($query['ct'] ?? null, FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
+            $title  = $query['title']  ?? null;
+            $detail = $query['detail'] ?? null;
+            $this->renderJsonOk(['cards' => $this->kanbanDataHelper->getProjectCards($id, $ct, $title, $detail)]);
         } catch (Throwable $e) {
             $this->renderJsonError("Failed to get project's cards : " . $e->getMessage(), ApplicationError::Error->value, __FILE__, __LINE__);
         }

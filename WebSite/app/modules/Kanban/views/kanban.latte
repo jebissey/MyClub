@@ -108,6 +108,36 @@
                 </button>
             </div>
             
+            <form method="get" action="" class="d-flex align-items-center gap-2 border border-secondary-subtle rounded p-2 bg-light mt-2" id="filterForm">
+                <input type="hidden" name="p" value="{$selectedProjectId}">
+                <select name="ct" class="form-select form-select-sm" style="width: auto;">
+                    <option value="">Type</option>
+                {foreach $cardTypes as $type}
+                    <option value="{$type->Id}"{if ($filters['ct'] ?? null) == $type->Id}selected{/if}>
+                        {$type->Label}
+                    </option>
+                {/foreach}
+                </select>
+                <input type="text" 
+                       name="title" 
+                       class="form-control form-control-sm" 
+                       placeholder="Titre" 
+                       value="{$filters['title'] ?? ''}"
+                       style="width: 150px;">
+                <input type="text" 
+                       name="detail" 
+                       class="form-control form-control-sm" 
+                       placeholder="Détail" 
+                       value="{$filters['detail'] ?? ''}"
+                       style="width: 150px;">
+                <button type="submit" class="btn btn-secondary btn-sm" title="Filtrer">
+                    <i class="bi bi-funnel"></i>
+                </button>
+                <a href="?p={$selectedProjectId}" class="btn btn-secondary btn-sm" title="Supprimer les filtres">
+                    <i class="bi bi-x-circle"></i>
+                </a>
+            </form>
+
             <button id="addProjectBtn"
                     type="button"
                     class="btn btn-primary btn-sm"
@@ -132,11 +162,10 @@
             {foreach $columns as $col}
                 <div class="col-6 col-lg-3">
                     <div class="kanban-column bg-light rounded p-2" data-status="{$col['icon']}">
-                        <div class="text-center fs-4 border rounded p-2 mb-2 bg-white">
+                        <div class="kanban-column-title text-center fs-4 border rounded p-2 mb-2 bg-white">
                             {$col['icon']}
                         </div>
-                        <div class="kanban-cards p-1" data-status="{$col['icon']}">
-                        </div>
+                        <div class="kanban-cards p-1" data-status="{$col['icon']}"></div>
                     </div>
                 </div>
             {/foreach}

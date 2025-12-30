@@ -100,7 +100,7 @@
                                             <i class="{$action['label']}"></i>
                                         </a>
                                     {elseif $action['type'] == 'button'}
-                                        <button class="btn btn-sm {$action['class']}" onclick={str_replace('{id}', $item->Id, $action['onClick']) | noescape}>
+                                        <button class="btn btn-sm {$action['class']}" onclick={str_replace('{id}', (string)$item->Id, $action['onClick']) | noescape}>
                                             <i class="{$action['label']}"></i>
                                         </button>
                                     {/if}

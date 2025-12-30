@@ -70,46 +70,6 @@ class KanbanDataHelper extends Data
         }
     }
 
-    public function getKanbanCards(int $personId): array
-    {
-        $sql = "
-            WITH LastStatus AS (
-                SELECT
-                    kcs.*,
-                    ROW_NUMBER() OVER (
-                        PARTITION BY kcs.IdKanbanCard
-                        ORDER BY kcs.Id DESC
-                    ) AS rn
-                FROM KanbanCardStatus kcs
-            )
-            SELECT
-                kp.IdPerson,
-                kc.Id AS KanbanCardId,
-                kc.Title,
-                kc.Detail,
-                ls.Id AS KanbanCardStatusId,
-                ls.What,
-                ls.LastUpdate,
-                kct.Label AS KanbanCardTypeLabel,
-                CASE 
-                    WHEN ls.What = 'Created' THEN 'Backlog'
-                    WHEN ls.What LIKE '%ToBacklog%' THEN 'Backlog'
-                    WHEN ls.What LIKE '%ToSelected%' THEN 'Selected'
-                    WHEN ls.What LIKE '%ToInProgress%' THEN 'InProgress'
-                    WHEN ls.What LIKE '%ToDone%' THEN 'Done'
-                    ELSE 'Backlog'
-                END AS KanbanCardCurrentStatus
-            FROM KanbanCard kc
-            JOIN KanbanCardType kct ON kct.Id = kc.IdKanbanCardType
-            JOIN KanbanProject kp ON kp.Id = kct.IdKanbanProject
-            JOIN LastStatus ls ON ls.IdKanbanCard = kc.Id AND ls.rn = 1
-            WHERE IdPerson = :personId
-            ORDER BY kc.Id";
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([':personId' => $personId]);
-        return $stmt->fetchAll();
-    }
-
     public function getKanbanProject(int $id): object
     {
         $sql = "
@@ -251,14 +211,28 @@ class KanbanDataHelper extends Data
         ]);
     }
 
-    public function getProjectCards(int $idProject): array
+    public function getProjectCards(int $idProject, ?int $filterCT, ?string $filterTitle, ?string $filterDetail): array
     {
+        $params = [':idProject' => $idProject];
+        $and = '';
+        if ($filterCT !== null) {
+            $and .= " AND kct.Id = :filterCT ";
+            $params[':filterCT'] = $filterCT;
+        }
+        if ($filterTitle !== null){
+            $and .= " AND kc.Title LIKE :filterTitle ";
+            $params[':filterTitle'] = "%$filterTitle%";
+        }
+        if ($filterDetail !== null) {
+            $and .= " AND kc.Detail LIKE :filterDetail ";
+            $params[':filterDetail'] = "%$filterDetail%";
+        }
         $sql = "
             WITH LastStatus AS (
                 SELECT
                     kcs.*,
                     ROW_NUMBER() OVER (
-                        PARTITION BY kcs.IdKanbanCard
+                    PARTITION BY kcs.IdKanbanCard
                         ORDER BY kcs.Id DESC
                     ) AS rn
                 FROM KanbanCardStatus kcs
@@ -279,11 +253,11 @@ class KanbanDataHelper extends Data
             FROM KanbanCard kc
             JOIN KanbanCardType kct ON kct.Id = kc.IdKanbanCardType
             JOIN LastStatus ls ON ls.IdKanbanCard = kc.Id AND ls.rn = 1
-            WHERE kct.IdKanbanProject = :idProject
-            ORDER BY CurrentStatus, kc.Title;
+            WHERE kct.IdKanbanProject = :idProject {$and}
+            ORDER BY ls.LastUpdate DESC;
         ";
         $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([':idProject' => $idProject]);
+        $stmt->execute($params);
         return $stmt->fetchAll();
     }
 
@@ -343,8 +317,11 @@ class KanbanDataHelper extends Data
         return $stmt->execute([':id' => $id]);
     }
 
-    public function getProjectCardTypes(int $idProject): array
+    public function getProjectCardTypes(?int $idProject): array
     {
+        if ($idProject === null) {
+            return [];
+        }
         $sql = "
             SELECT 
                 Id,

@@ -57,11 +57,34 @@ export default class KanbanBoard {
     }
 
     update(cards) {
-        document.querySelectorAll('.kanban-cards').forEach(column => column.innerHTML = '');
-        cards.forEach(card => {
-            const column = document.querySelector(`.kanban-cards[data-status="${card.CurrentStatus}"]`);
-            if (column) column.appendChild(this.createCardElement(card));
+        document.querySelectorAll('.kanban-cards').forEach(column => {
+            column.innerHTML = '';
         });
+
+        const counts = {};
+        cards.forEach(card => {
+            const status = card.CurrentStatus;
+            counts[status] = (counts[status] || 0) + 1;
+
+            const column = document.querySelector(
+                `.kanban-cards[data-status="${status}"]`
+            );
+            if (column) {
+                column.appendChild(this.createCardElement(card));
+            }
+        });
+
+        document.querySelectorAll('.kanban-column').forEach(column => {
+            const status = column.dataset.status;
+            const title = column.querySelector('.kanban-column-title');
+
+            if (title) {
+                const baseLabel = status; // ou mapping si besoin
+                const count = counts[status] || 0;
+                title.textContent = `${baseLabel} (${count})`;
+            }
+        });
+
         this.dragDropManager.init();
     }
 
@@ -238,7 +261,7 @@ export default class KanbanBoard {
     }
 
     /* --------------------------------------------
-        LOGIQUE MÉTIER DRAG & DROP KANBAN
+        DRAG & DROP KANBAN
     -------------------------------------------- */
     canDropCard(card, column) {
         if (!card || !column) return false;

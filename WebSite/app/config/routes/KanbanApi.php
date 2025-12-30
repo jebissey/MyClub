@@ -18,7 +18,6 @@ class KanbanApi implements RouteInterface
     {
         $kanbanApi = fn() => $this->apiFactory->makeKanbanApi();
 
-        $this->routes[] = new Route('GET  /api/kanban/cards', $kanbanApi, 'getCards');
         $this->routes[] = new Route('GET  /api/kanban/card/@id:[0-9]+/history', $kanbanApi, 'getHistory');
         $this->routes[] = new Route('POST /api/kanban/card/create', $kanbanApi, 'createCard');
         $this->routes[] = new Route('POST /api/kanban/card/delete', $kanbanApi, 'deleteCard');

@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace app\modules\Kanban;
 
+use app\enums\FilterInputRule;
 use app\helpers\Application;
+use app\helpers\WebApp;
 use app\models\KanbanDataHelper;
 use app\modules\Common\AbstractController;
 
@@ -30,6 +32,12 @@ class KanbanController extends AbstractController
                 $selectedProjectId = null;
             }
         }
+        $schema = [
+            'ct' => FilterInputRule::Int->value,
+            'title' => FilterInputRule::Content->value,
+            'detail' => FilterInputRule::Content->value,
+        ];
+        $filters = WebApp::filterInput($schema, $this->flight->request()->query->getData());
 
         $this->render('Kanban/views/kanban.latte', $this->getAllParams([
             'navItems' => $this->getNavItems($this->application->getConnectedUser()->person),
@@ -43,7 +51,9 @@ class KanbanController extends AbstractController
                 ['icon' => '🔧', 'label' => 'In Progress'],
                 ['icon' => '🏁', 'label' => 'Done']
             ],
-            'selectedProjectId' => $selectedProjectId
+            'selectedProjectId' => $selectedProjectId,
+            'cardTypes' => $this->kanbanDataHelper->getProjectCardTypes($selectedProjectId),
+            'filters' => $filters
         ]));
     }
 }

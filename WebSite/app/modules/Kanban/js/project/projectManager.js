@@ -10,8 +10,13 @@ export default class ProjectManager {
         return await apiClient.post('/api/kanban/project/delete', { id });
     }
 
-    async getCards(projectId) {
-        return await apiClient.get(`/api/kanban/project/${projectId}/cards`);
+    async getCards(projectId, ct = '', title = '', detail = '') {
+        const params = new URLSearchParams();
+        if (ct !== '') params.append('ct', ct);
+        if (title !== '') params.append('title', title);
+        if (detail !== '') params.append('detail', detail);
+
+        return await apiClient.get(`/api/kanban/project/${projectId}/cards?${params.toString()}`);
     }
 
     async load(projectId) {
