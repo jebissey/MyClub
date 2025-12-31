@@ -99,12 +99,17 @@
                                             <small class="text-muted float-right">
                                                 {$item['date']|date:'d/m/Y H:i'}
                                             </small>
-                                        </h5>
+                                        </h5>                                          
                                         {if isset($item['from']) && $item['from']}
                                             <p class="text-muted mb-0">
                                                 <i class="fas fa-user"></i> Par {$item['from']}
                                             </p>
                                         {/if}
+                                        {if isset($item['detail']) && $item['detail']}
+                                            <small class="text-muted float-right">
+                                                {$item['detail']}
+                                            </small>
+                                        {/if}                                          
                                     </div>
                                 {/foreach}
                             </div>

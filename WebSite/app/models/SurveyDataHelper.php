@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace app\models;
@@ -82,22 +83,27 @@ class SurveyDataHelper extends Data implements NewsProviderInterface
         if (!($connectedUser->person ?? false)) return $news;
         $sql = "
             SELECT 
-                p.FirstName, 
-                p.LastName, 
-                s.Question, 
-                s.ClosingDate, 
-                s.Visibility, 
-                r.LastUpdate, 
+                p.FirstName,
+                p.LastName,
+                s.Question,
+                s.ClosingDate,
+                s.Visibility,
                 s.IdArticle,
-                v.FirstName as VoterFirstName,
-                v.LastName as VoterLastName
+                MAX(r.LastUpdate) AS LastActivity,
+                GROUP_CONCAT(
+                    v.FirstName || ' ' || v.LastName || ' (' ||
+                    strftime('%d/%m/%Y', r.LastUpdate) || ')',
+                    ', '
+                    ORDER BY r.LastUpdate
+                ) AS Voters
             FROM Reply r
             JOIN Survey s ON s.Id = r.IdSurvey
             JOIN Article a ON a.Id = s.IdArticle
             JOIN Person p ON p.Id = a.CreatedBy
-            JOIN Person v On p.Id = r.IdPerson
+            JOIN Person v ON v.Id = r.IdPerson
             WHERE r.LastUpdate >= :searchFrom
-            ORDER BY r.LastUpdate DESC
+            GROUP BY s.Id
+            ORDER BY LastActivity DESC
         ";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':searchFrom' => $searchFrom]);
@@ -110,12 +116,13 @@ class SurveyDataHelper extends Data implements NewsProviderInterface
                 && $authorizationDataHelper->canPersonReadSurveyResults($this->articleDataHelper->getWithAuthor($survey->IdArticle), $connectedUser)
             ) {
                 $news[] = [
-                    'type' => 'survey',
-                    'id' => $survey->IdArticle,
-                    'title' => $survey->Question . " => ({$survey->VoterFirstName} {$survey->VoterLastName})",
-                    'from' => $survey->FirstName . ' ' . $survey->LastName,
-                    'date' => $survey->LastUpdate,
-                    'url' => '/survey/results/' . $survey->IdArticle
+                    'type'   => 'survey',
+                    'id'     => $survey->IdArticle,
+                    'title'  => $survey->Question,
+                    'detail' => 'Votes : ' . $survey->Voters,
+                    'from'   => $survey->FirstName . ' ' . $survey->LastName,
+                    'date'   => $survey->LastActivity,
+                    'url'    => '/survey/results/' . $survey->IdArticle
                 ];
             }
         }

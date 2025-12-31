@@ -43,7 +43,7 @@ class SurveyController extends AbstractController
         ]));
     }
 
-    public function createOrUpdate()
+    public function createOrUpdate(): void
     {
         if (!($this->application->getConnectedUser()->isRedactor() ?? false)) {
             $this->raiseforbidden(__FILE__, __LINE__);
@@ -83,7 +83,7 @@ class SurveyController extends AbstractController
         $this->redirect('/article/' . $articleId);
     }
 
-    public function viewResults($articleId)
+    public function viewResults(int $articleId): void
     {
         if ($this->dataHelper->get('Article', ['Id' => $articleId], 'Id') === false) {
             $this->raiseBadRequest("Article {$articleId} doesn't exist", __FILE__, __LINE__);
