@@ -58,7 +58,7 @@ class SurveyController extends AbstractController
             'question' => FilterInputRule::HtmlSafeText->value,
             'closingDate' => FilterInputRule::DateTime->value,
             'visibility' => $this->application->enumToValues(SurveyVisibility::class),
-            'options' => FilterInputRule::ArrayString,
+            'options' => FilterInputRule::ArrayString->value,
         ];
         $input = WebApp::filterInput($schema, $this->flight->request()->data->getData());
         $articleId = $input['article_id'] ?? throw new IntegrityException('Fatal error in file ' . __FILE__ . ' at line ' . __LINE__);
