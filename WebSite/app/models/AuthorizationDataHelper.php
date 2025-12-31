@@ -36,7 +36,7 @@ class AuthorizationDataHelper extends Data
         $now = (new DateTime())->format('Y-m-d');
         $closingDate = $survey->ClosingDate;
         if (
-            $article->CreatedBy == $connectedUser->person?->Id ?? 0
+            $article->CreatedBy == ($connectedUser->person?->Id ?? 0)
             || $survey->Visibility == 'all'
             || $survey->Visibility == 'allAfterClosing' && $closingDate < $now
         ) return true;
