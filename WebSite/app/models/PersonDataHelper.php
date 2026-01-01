@@ -38,7 +38,7 @@ class PersonDataHelper extends Data implements NewsProviderInterface
         return (int)$id;
     }
 
-    public function getEmailsOfInterestedPeople(?int $idGroup, ?int $idEventType, int $dayOfWeek, string $timeOfDay): array
+    public function getEmailsOfInterestedPeople(?int $idGroup, ?int $idEventType, ?int $dayOfWeek, string $timeOfDay): array
     {
         $persons = $this->getInterestedPeople($idGroup, $idEventType, $dayOfWeek, $timeOfDay);
         $filteredEmails = [];
@@ -48,7 +48,7 @@ class PersonDataHelper extends Data implements NewsProviderInterface
         return $filteredEmails;
     }
 
-    public function getInterestedPeople(?int $idGroup, ?int $idEventType, int $dayOfWeek, string $timeOfDay): array
+    public function getInterestedPeople(?int $idGroup, ?int $idEventType, ?int $dayOfWeek, string $timeOfDay): array
     {
         $persons = $this->getPersonsInGroup($idGroup);
         $filteredPeople = [];

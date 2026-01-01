@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace app\helpers;
@@ -25,7 +26,7 @@ class PersonPreferences
         return $filteredEvents;
     }
 
-    public function isPersonInterested($person, $idEventType,  $dayOfWeek, $timeOfDay): bool
+    public function isPersonInterested(object $person, ?int $idEventType,  ?int $dayOfWeek, $timeOfDay): bool
     {
         if ($person->Preferences != '') {
             $preferences = json_decode($person->Preferences, true);
@@ -33,7 +34,7 @@ class PersonPreferences
                 return false;
             }
         }
-        if (!empty($idEventType)) {
+        if ($idEventType !== null) {
             if ($person->Preferences != '') {
                 $preferences = json_decode($person->Preferences, true);
                 if ($preferences != '' && (!isset($preferences['eventTypes'][$idEventType]))) {
@@ -47,7 +48,7 @@ class PersonPreferences
                 }
             }
         }
-        if ($dayOfWeek != '' && $timeOfDay != '') {
+        if ($dayOfWeek !== null && $timeOfDay != '') {
             if ($person->Availabilities != '') {
                 $availabilities = json_decode($person->Availabilities, true);
                 if (isset($availabilities[$dayOfWeek][$timeOfDay]) != 'on') {

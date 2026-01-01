@@ -18,7 +18,6 @@ class EventApi implements RouteInterface
     {
         $eventApi = fn() => $this->apiFactory->makeEventApi();
 
-        $this->routes[] = new Route('GET  /api/event/attributes/eventType/@id:[0-9]+', $eventApi, 'getAttributesByEventType');
         $this->routes[] = new Route('POST /api/event/delete/@id:[0-9]+', $eventApi, 'deleteEvent');
         $this->routes[] = new Route('POST /api/event/duplicate/@id:[0-9]+', $eventApi, 'duplicateEvent');
         $this->routes[] = new Route('POST /api/event/save', $eventApi, 'saveEvent');

@@ -51,25 +51,25 @@ class EventEmailController extends AbstractController
             return;
         }
         $schema = [
-            'dayOfWeek' => $this->application->enumToValues(WeekdayFormat::class),
+            'dayOfWeek' => FilterInputRule::Int->value,
             'timeOfDay' => FilterInputRule::HtmlSafeName->value,
             'idGroup' => FilterInputRule::Int->value,
             'idEventType' => FilterInputRule::Int->value,
         ];
         $input = WebApp::filterInput($schema, $this->flight->request()->data->getData());
-        $idGroup = $input['idGroup'];
-        $idEventType =  $input['idEventType'];
-        $dayOfWeek = $input['dayOfWeek'] ?? '';
+        $idGroup = isset($input['idGroup']) ? (int) $input['idGroup'] : null;
+        $idEventType = isset($input['idEventType']) ? (int) $input['idEventType'] : null;
+        $dayOfWeek = isset($input['dayOfWeek']) ? (int) $input['dayOfWeek'] : null;
         $timeOfDay = $input['timeOfDay'] ?? '';
         $filteredEmails = $this->personDataHelper->getEmailsOfInterestedPeople($idGroup, $idEventType, $dayOfWeek, $timeOfDay);
         $groupName = $idGroup != null ? $this->dataHelper->get('Group', ['Id' => $idGroup], 'Name')->Name ?? '' : '';
-        $eventTypeName = $idEventType != null ? $this->dataHelper->get('EventType', ['Id' => $idEventType], 'Name') : '';
-        $dayOfWeekName = $dayOfWeek != null ? TranslationManager::getWeekdayNames()[$dayOfWeek] : '';
+        $eventTypeName = $idEventType != null ? $this->dataHelper->get('EventType', ['Id' => $idEventType], 'Name')->Name : '';
+        $dayOfWeekName = $dayOfWeek !== null ? TranslationManager::getWeekdayNames()[$dayOfWeek] : '';
 
         $this->render('Event/views/copyToClipBoard.latte', $this->getAllParams([
             'emailsJson' => json_encode($filteredEmails),
             'emails' => $filteredEmails,
-            'filters' => "$groupName / $eventTypeName / $dayOfWeekName / $timeOfDay",
+            'filters' => "{$groupName} / {$eventTypeName} / {$dayOfWeekName} / {$this->languagesDataHelper->translate($timeOfDay)}",
             'people' => $this->dataHelper->gets('Person', ['Inactivated' => 0], 'Email, Phone, FirstName, LastName, NickName', '', true),
             'page' => $this->application->getConnectedUser()->getPage(),
         ]));

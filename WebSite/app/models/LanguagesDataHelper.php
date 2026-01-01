@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace app\models;
@@ -22,7 +23,7 @@ class LanguagesDataHelper extends Data
 
     public function translate(string $key): string
     {
-        if (empty($key))throw new InvalidArgumentException('Translation key cannot be empty');
+        if (empty($key)) return '';
 
         $lang = TranslationManager::getCurrentLanguage();
         if (!in_array($lang, $this->allowedLanguages, true)) $lang = $this->defaultLanguage;

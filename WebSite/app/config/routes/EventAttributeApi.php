@@ -20,6 +20,7 @@ class EventAttributeApi implements RouteInterface
 
         $this->routes[] = new Route('POST /api/attribute/create', $eventAttributeApi, 'createAttribute');
         $this->routes[] = new Route('POST /api/attribute/delete/@id:[0-9]+', $eventAttributeApi, 'deleteAttribute');
+        $this->routes[] = new Route('GET  /api/attributes/eventType/@id:[0-9]+', $eventAttributeApi, 'getAttributesByEventType');
         $this->routes[] = new Route('GET  /api/attributes/list', $eventAttributeApi, 'getAttributes');
         $this->routes[] = new Route('POST /api/attribute/update', $eventAttributeApi, 'updateAttribute');
 

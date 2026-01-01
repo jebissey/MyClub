@@ -94,7 +94,6 @@ class SurveyDataHelper extends Data implements NewsProviderInterface
                     v.FirstName || ' ' || v.LastName || ' (' ||
                     strftime('%d/%m/%Y', r.LastUpdate) || ')',
                     ', '
-                    ORDER BY r.LastUpdate
                 ) AS Voters
             FROM Reply r
             JOIN Survey s ON s.Id = r.IdSurvey
