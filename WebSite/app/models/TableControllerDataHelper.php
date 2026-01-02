@@ -19,7 +19,7 @@ class TableControllerDataHelper extends Data
     {
         return $this->fluent->from('EventType')
             ->select(null)
-            ->select('EventType.Id AS EventTypeId, EventType.Name AS EventTypeName, `Group`.Name AS GroupName')
+            ->select('EventType.Id, EventType.Name AS EventTypeName, `Group`.Name AS GroupName')
             ->select('GROUP_CONCAT(Attribute.Name, ", ") AS Attributes')
             ->leftJoin('`Group` ON EventType.IdGroup = `Group`.Id')
             ->leftJoin('EventTypeAttribute ON EventType.Id = EventTypeAttribute.IdEventType')
