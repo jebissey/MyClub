@@ -82,13 +82,14 @@ class MessageApi extends AbstractApi
             $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
-        if (!isset($data['eventId']) || !isset($data['text'])) {
+        $data = $this->getJsonInput();
+        if (!isset($data['messageId']) || !isset($data['text'])) {
             $this->renderJsonBadRequest('Données manquantes', __FILE__, __LINE__);
             return;
         }
         try {
             $data = $this->getJsonInput();
-            $apiResponse = $this->updateMessage_($data['messageId'], $this->application->getConnectedUser()->person->Id, $data['text']);
+            $apiResponse = $this->updateMessage_((int)$data['messageId'], $this->application->getConnectedUser()->person->Id, $data['text']);
             $this->renderJson($apiResponse->data, $apiResponse->success, $apiResponse->responseCode);
         } catch (Throwable $e) {
             $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, __FILE__, __LINE__);

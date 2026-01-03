@@ -18,7 +18,7 @@ use app\models\LogDataCompactHelper;
 
 class Application
 {
-    public const VERSION = '0.18.0';
+    public const VERSION = '0.19.0';
     public const  EMOJI_LIST = [
         '😀', '😄', '😁', '😅', '😂', '🤣', '😊', '😇', '🤨', 
         '🙂', '🙃', '😉', '😌', '☹️', '😐', '🙄', '😯', '🥴', 

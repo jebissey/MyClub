@@ -156,11 +156,11 @@ class MessageDataHelper extends Data implements NewsProviderInterface
 
     public function updateMessage(int $messageId, int $personId, string $text): true
     {
-        $message = $this->get('Message', ['Id', $messageId], 'PersonId');
+        $message = $this->get('Message', ['Id' => $messageId], 'PersonId');
         if (!$message || $message->PersonId != $personId) {
             throw new UnauthorizedAccessException("Vous n'êtes pas autorisé à modifier ce message");
         }
-        $this->set('Message', ['Text' => $text, 'LastUpdate' =>  date('Y-m-d H:i:s')], ['Id', $messageId]);
+        $this->set('Message', ['Text' => $text, 'LastUpdate' =>  date('Y-m-d H:i:s')], ['Id' => $messageId]);
         return true;
     }
 
