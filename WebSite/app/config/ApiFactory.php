@@ -22,6 +22,7 @@ use app\apis\NavbarApi;
 use app\apis\WebmasterApi;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
+use App\Helpers\NotificationSender;
 use app\helpers\PersonPreferences;
 use app\models\ArticleDataHelper;
 use app\models\AttributeDataHelper;
@@ -44,6 +45,7 @@ use app\models\SharedFileDataHelper;
 use app\services\AuthorizationService;
 use app\services\EmailService;
 use app\services\EventService;
+use app\services\MessageRecipientService;
 
 class ApiFactory
 {
@@ -55,6 +57,7 @@ class ApiFactory
         private CarouselDataHelper $carouselDataHelper,
         private ConnectedUser $connectedUser,
         private DataHelper $dataHelper,        
+        private DesignDataHelper $designDataHelper,
         private EmailService $emailService,
         private EventDataHelper $eventDataHelper,
         private EventNeedDataHelper $eventNeedDataHelper,
@@ -63,9 +66,10 @@ class ApiFactory
         private KaraokeDataHelper $karaokeDataHelper,
         private LogDataWriterHelper $logDataWriterHelper,
         private MessageDataHelper $messageDataHelper,
+        private MessageRecipientService $messageRecipientService,
         private NeedDataHelper $needDataHelper,
         private NeedTypeDataHelper $needTypeDataHelper,
-        private DesignDataHelper $designDataHelper,
+        private NotificationSender $notificationSender,
         private PageDataHelper $pageDataHelper,
         private ParticipantDataHelper $participantDataHelper,
         private PersonDataHelper $personDataHelper,
@@ -231,7 +235,9 @@ class ApiFactory
             $this->messageDataHelper,
             $this->connectedUser,
             $this->dataHelper,
-            $this->personDataHelper
+            $this->personDataHelper,
+            $this->messageRecipientService,
+            $this->notificationSender
         );
     }
 

@@ -99,9 +99,9 @@ class GroupController extends AbstractController
             $this->dataHelper->set('Group', ['Inactivated' => 1], ['Id' => $id]);
             $this->redirect('/groups');
         } catch (QueryException $e) {
-            $this->raiseBadRequest("Error {$e->getMessage()}", __FILE__, __LINE__);
+            $this->raiseBadRequest("Error {$e->getMessage()}", $e->getFile(), $e->getLine());
         } catch (Throwable $e) {
-            $this->raiseError($e->getMessage(), __FILE__, __LINE__);
+            $this->raiseError($e->getMessage(), $e->getFile(), $e->getLine());
         }
     }
 

@@ -43,7 +43,7 @@ class EventNeedApi extends AbstractApi
             if ($deletedRows === 1) $this->renderJsonOk();
             else  $this->renderJsonBadRequest('', __FILE__, __LINE__);
         } catch (Throwable $e) {
-            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, __FILE__, __LINE__);
+            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
         }
     }
 
@@ -65,7 +65,7 @@ class EventNeedApi extends AbstractApi
             $apiResponse = new ApiResponse(true, ApplicationError::Ok->value, ['needs' => $this->eventNeedDataHelper->needsForEvent($id)]);
             $this->renderJson($apiResponse->data, $apiResponse->success, $apiResponse->responseCode);
         } catch (Throwable $e) {
-            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, __FILE__, __LINE__);
+            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
         }
     }
 
@@ -84,7 +84,7 @@ class EventNeedApi extends AbstractApi
             $this->saveNeed_($data);
             $this->renderJsonOk();
         } catch (Throwable $e) {
-            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, __FILE__, __LINE__);
+            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
         }
     }
 

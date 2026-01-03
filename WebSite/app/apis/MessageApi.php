@@ -11,15 +11,25 @@ use app\enums\ApplicationError;
 use app\exceptions\UnauthorizedAccessException;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
+use app\helpers\NotificationSender;
 use app\models\DataHelper;
 use app\models\MessageDataHelper;
 use app\models\PersonDataHelper;
+use app\services\MessageRecipientService;
 use app\valueObjects\ApiResponse;
+use app\valueObjects\MessageContext;
 
 class MessageApi extends AbstractApi
 {
-    public function __construct(Application $application, private MessageDataHelper $messageDataHelper, ConnectedUser $connectedUser, DataHelper $dataHelper, PersonDataHelper $personDataHelper)
-    {
+    public function __construct(
+        Application $application,
+        private MessageDataHelper $messageDataHelper,
+        ConnectedUser $connectedUser,
+        DataHelper $dataHelper,
+        PersonDataHelper $personDataHelper,
+        private MessageRecipientService $messageRecipientService,
+        private NotificationSender $notificationSender
+    ) {
         parent::__construct($application, $connectedUser, $dataHelper, $personDataHelper);
     }
 
@@ -39,17 +49,23 @@ class MessageApi extends AbstractApi
             return;
         }
         try {
+            $articleId = isset($data['articleId']) && $data['articleId'] !== '' ? (int)$data['articleId'] : null;
+            $eventId = isset($data['eventId']) && $data['eventId'] !== '' ? (int)$data['eventId'] : null;
+            $groupId = isset($data['groupId']) && $data['groupId'] !== '' ? (int)$data['groupId'] : null;
             $apiResponse = $this->addMessage_(
-                isset($data['articleId']) && $data['articleId'] !== '' ? (int)$data['articleId'] : null,
-                isset($data['eventId']) && $data['eventId'] !== '' ? (int)$data['eventId'] : null,
-                isset($data['groupId']) && $data['groupId'] !== '' ? (int)$data['groupId'] : null,
+                $articleId,
+                $eventId,
+                $groupId,
                 $this->application->getConnectedUser()->person->Id,
                 (string)$data['text']
             );
+            if ($apiResponse->success === true && isset($apiResponse->data['messageId'])) {
+                $this->notifyMessageRecipients((int)$apiResponse->data['messageId'], $articleId, $eventId, $groupId);
+            }
 
             $this->renderJson($apiResponse->data, $apiResponse->success, $apiResponse->responseCode);
         } catch (Throwable $e) {
-            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, __FILE__, __LINE__);
+            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
         }
     }
 
@@ -68,7 +84,7 @@ class MessageApi extends AbstractApi
             $apiResponse = $this->deleteMessage_((int)$data['messageId'] ?? 0, $this->application->getConnectedUser()->person->Id);
             $this->renderJson($apiResponse->data, $apiResponse->success, $apiResponse->responseCode);
         } catch (Throwable $e) {
-            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, __FILE__, __LINE__);
+            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
         }
     }
 
@@ -92,7 +108,7 @@ class MessageApi extends AbstractApi
             $apiResponse = $this->updateMessage_((int)$data['messageId'], $this->application->getConnectedUser()->person->Id, $data['text']);
             $this->renderJson($apiResponse->data, $apiResponse->success, $apiResponse->responseCode);
         } catch (Throwable $e) {
-            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, __FILE__, __LINE__);
+            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
         }
     }
 
@@ -141,5 +157,52 @@ class MessageApi extends AbstractApi
         } catch (Throwable $e) {
             return new ApiResponse(false, ApplicationError::Error->value, [], $e->getMessage());
         }
+    }
+
+    private function notifyMessageRecipients(
+        int $messageId,
+        ?int $articleId,
+        ?int $eventId,
+        ?int $groupId
+    ): void {
+        $articleAuthorId = null;
+        $eventCreatorId = null;
+        if ($articleId !== null) {
+            $article = $this->dataHelper->get(
+                'Article',
+                ['Id' => $articleId],
+                'CreatedBy'
+            );
+            $articleAuthorId = $article?->CreatedBy;
+        }
+        if ($eventId !== null) {
+            $event = $this->dataHelper->get(
+                'Event',
+                ['Id' => $eventId],
+                'CreatedBy'
+            );
+            $eventCreatorId = $event?->CreatedBy;
+        }
+        $context = new MessageContext(
+            articleId: $articleId,
+            articleAuthorId: $articleAuthorId,
+            eventId: $eventId,
+            eventCreatorId: $eventCreatorId,
+            groupId: $groupId
+        );
+
+        $personIds = $this->messageRecipientService->getRecipientsForContext($context);
+        $notificationData = [
+            'title' => 'notificationTitle',
+            'body' => 'notificationBody',
+            'icon' => '/path/to/icon.png',
+            'badge' => '/path/to/badge.png',
+            'data' => [
+                'url' => '/group/chat/' . $context->articleId ?? $context->eventId ?? $context->groupId,
+                'messageId' => $messageId,
+                'type' => 'messageType'
+            ]
+        ];
+        $this->notificationSender->sendToRecipients($personIds, $notificationData);
     }
 }

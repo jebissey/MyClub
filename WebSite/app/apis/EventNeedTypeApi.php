@@ -41,7 +41,7 @@ class EventNeedTypeApi extends AbstractApi
             $apiResponse = $this->deleteNeedType_($id);
             $this->renderJson([], $apiResponse->success, $apiResponse->responseCode);
         } catch (Throwable $e) {
-            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, __FILE__, __LINE__);
+            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
         }
     }
 
@@ -64,7 +64,7 @@ class EventNeedTypeApi extends AbstractApi
         try {
             $this->renderJson(['Id' => $this->needTypeDataHelper->insertOrUpdate($data['id'], $name)], true,  ApplicationError::Ok->value);
         } catch (Throwable $e) {
-            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, __FILE__, __LINE__);
+            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
         }
     }
 
@@ -73,7 +73,7 @@ class EventNeedTypeApi extends AbstractApi
         try {
             $this->renderJsonOk([$this->needDataHelper->needsforNeedType($id)]);
         } catch (Throwable $e) {
-            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, __FILE__, __LINE__);
+            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
         }
     }
 

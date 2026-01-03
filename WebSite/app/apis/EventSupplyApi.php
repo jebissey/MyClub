@@ -44,11 +44,11 @@ class EventSupplyApi extends AbstractApi
             );
             $this->renderJson([$apiResponse->data], $apiResponse->success,  $apiResponse->responseCode);
         } catch (QueryException $e) {
-            $this->renderJsonBadRequest($e->getMessage(), __FILE__, __LINE__);
+            $this->renderJsonBadRequest($e->getMessage(), $e->getFile(), $e->getLine());
         } catch (UnauthorizedAccessException $e) {
             $this->renderJsonForbidden(__FILE__, __LINE__);
         } catch (Throwable $e) {
-            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, __FILE__, __LINE__);
+            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
         }
     }
 

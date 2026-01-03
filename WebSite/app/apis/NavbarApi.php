@@ -33,7 +33,7 @@ class NavbarApi extends AbstractApi
             $result = $this->pageDataHelper->del($id);
             $this->renderJson([], $result === 1, ApplicationError::Ok->value);
         } catch (Throwable $e) {
-            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, __FILE__, __LINE__);
+            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
         }
     }
 
@@ -50,7 +50,7 @@ class NavbarApi extends AbstractApi
         try {
             $this->renderJsonOk(['message' => $this->pageDataHelper->get_($id)]);
         } catch (Throwable $e) {
-            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, __FILE__, __LINE__);
+            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
         }
     }
 
@@ -74,7 +74,7 @@ class NavbarApi extends AbstractApi
             $this->pageDataHelper->insertOrUpdate($data);
             $this->renderJsonOk();
         } catch (Throwable $e) {
-            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, __FILE__, __LINE__);
+            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
         }
     }
 
@@ -93,7 +93,7 @@ class NavbarApi extends AbstractApi
             $this->pageDataHelper->updates($data['positions']);
             $this->renderJsonOk();
         } catch (Throwable $e) {
-            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, __FILE__, __LINE__);
+            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
         }
     }
 }

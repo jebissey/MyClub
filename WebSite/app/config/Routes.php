@@ -71,6 +71,7 @@ use app\helpers\Application;
 use app\helpers\Backup;
 use app\helpers\ErrorManager;
 use app\helpers\News;
+use app\helpers\NotificationSender;
 use app\helpers\PersonPreferences;
 use app\helpers\WebApp;
 use app\models\DbBrowserDataHelper;
@@ -106,6 +107,7 @@ use app\models\TableControllerDataHelper;
 use app\services\AuthenticationService;
 use app\services\EmailService;
 use app\services\EventService;
+use app\services\MessageRecipientService;
 
 class Routes
 {
@@ -176,6 +178,7 @@ class Routes
             new CarouselDataHelper($application),
             $application->getConnectedUser(),
             $dataHelper,
+            $designDataHelper,
             $emailService,
             $eventDataHelper,
             new EventNeedDataHelper($application),
@@ -184,15 +187,15 @@ class Routes
             new KaraokeDataHelper($application),
             new LogDataWriterHelper($application),
             $messageDataHelper,
+            new MessageRecipientService($dataHelper),
             $needDataHelper,
             new NeedTypeDataHelper($application),
-            $designDataHelper,
+            new NotificationSender($dataHelper),
             new PageDataHelper($application, $authorizationDataHelper),
             $participantDataHelper,
             $personDataHelper,
             $personPreferences,
             new SharedFileDataHelper($application),
-            $emailService
         );
     }
 
