@@ -18,6 +18,8 @@ document.addEventListener('DOMContentLoaded', function () {
     const messageOnArticleCheckbox = document.getElementById('messageOnArticle');
     const messageOnArticleIfAuthorWrapper = document.getElementById('messageOnArticleIfAuthorWrapper');
     const messageOnArticleIfAuthorCheckbox = document.getElementById('messageOnArticleIfAuthor');
+    const messageOnArticleIfPostWrapper = document.getElementById('messageOnArticleIfPostWrapper');
+    const messageOnArticleIfPostCheckbox = document.getElementById('messageOnArticleIfPost');
 
     const messageOnEventCheckbox = document.getElementById('messageOnEvent');
     const messageOnEventOptionsWrapper = document.getElementById('messageOnEventOptionsWrapper');
@@ -44,7 +46,6 @@ document.addEventListener('DOMContentLoaded', function () {
             newArticlePollWrapper.style.display = 'flex';
         } else {
             newArticlePollWrapper.style.display = 'none';
-            // Décocher automatiquement "avec sondage" si "Nouvel article" est décoché
             newArticlePollCheckbox.checked = false;
         }
     }
@@ -54,7 +55,6 @@ document.addEventListener('DOMContentLoaded', function () {
             updatedArticlePollWrapper.style.display = 'flex';
         } else {
             updatedArticlePollWrapper.style.display = 'none';
-            // Décocher automatiquement "avec sondage" si "Article mis à jour" est décoché
             updatedArticlePollCheckbox.checked = false;
         }
     }
@@ -64,19 +64,19 @@ document.addEventListener('DOMContentLoaded', function () {
             newPollVoteOptionsWrapper.style.display = 'flex';
         } else {
             newPollVoteOptionsWrapper.style.display = 'none';
-            // Décocher automatiquement les sous-options si "Nouveau vote sur un sondage" est décoché
             newPollVoteIfVotedCheckbox.checked = false;
             newPollVoteIfAuthorCheckbox.checked = false;
         }
     }
 
-    function toggleMessageOnArticleIfAuthor() {
+    function toggleMessageOnArticleIfAuthorOrPost() {
         if (messageOnArticleCheckbox.checked) {
             messageOnArticleIfAuthorWrapper.style.display = 'flex';
+            messageOnArticleIfPostWrapper.style.display = 'flex';
         } else {
             messageOnArticleIfAuthorWrapper.style.display = 'none';
-            // Décocher automatiquement "si je suis l'auteur" si "sur un article" est décoché
             messageOnArticleIfAuthorCheckbox.checked = false;
+            messageOnArticleIfPostCheckbox.checked = false;
         }
     }
 
@@ -85,7 +85,6 @@ document.addEventListener('DOMContentLoaded', function () {
             messageOnEventOptionsWrapper.style.display = 'flex';
         } else {
             messageOnEventOptionsWrapper.style.display = 'none';
-            // Décocher automatiquement les sous-options si "sur un événement" est décoché
             messageOnEventIfRegisteredCheckbox.checked = false;
             messageOnEventIfInPreferencesCheckbox.checked = false;
             messageOnEventIfCreatorCheckbox.checked = false;
@@ -95,7 +94,7 @@ document.addEventListener('DOMContentLoaded', function () {
     function updateGroupSubscribedParent() {
         const allChecked = Array.from(groupsSubscribedChildren).every(child => child.checked);
         const someChecked = Array.from(groupsSubscribedChildren).some(child => child.checked);
-        
+
         if (allChecked && groupsSubscribedChildren.length > 0) {
             messageOnGroupSubscribedCheckbox.checked = true;
             messageOnGroupSubscribedCheckbox.indeterminate = false;
@@ -111,7 +110,7 @@ document.addEventListener('DOMContentLoaded', function () {
     function updateGroupJoinedParent() {
         const allChecked = Array.from(groupsJoinedChildren).every(child => child.checked);
         const someChecked = Array.from(groupsJoinedChildren).some(child => child.checked);
-        
+
         if (allChecked && groupsJoinedChildren.length > 0) {
             messageOnGroupJoinedCheckbox.checked = true;
             messageOnGroupJoinedCheckbox.indeterminate = false;
@@ -140,31 +139,27 @@ document.addEventListener('DOMContentLoaded', function () {
         messageOnGroupJoinedCheckbox.indeterminate = false;
     }
 
-    // Initial check au chargement de la page
     toggleAlertOptions();
     toggleNewArticlePoll();
     toggleUpdatedArticlePoll();
     toggleNewPollVoteOptions();
-    toggleMessageOnArticleIfAuthor();
+    toggleMessageOnArticleIfAuthorOrPost();
     toggleMessageOnEventOptions();
     updateGroupSubscribedParent();
     updateGroupJoinedParent();
 
-    // Écoute des changements
     noNotificationCheckbox.addEventListener('change', toggleAlertOptions);
     newArticleCheckbox.addEventListener('change', toggleNewArticlePoll);
     updatedArticleCheckbox.addEventListener('change', toggleUpdatedArticlePoll);
     newPollVoteCheckbox.addEventListener('change', toggleNewPollVoteOptions);
-    messageOnArticleCheckbox.addEventListener('change', toggleMessageOnArticleIfAuthor);
+    messageOnArticleCheckbox.addEventListener('change', toggleMessageOnArticleIfAuthorOrPost);
     messageOnEventCheckbox.addEventListener('change', toggleMessageOnEventOptions);
-    
-    // Groupes souscrits (où j'ai été inscrit)
+
     messageOnGroupSubscribedCheckbox.addEventListener('change', toggleGroupSubscribedChildren);
     groupsSubscribedChildren.forEach(child => {
         child.addEventListener('change', updateGroupSubscribedParent);
     });
 
-    // Groupes rejoints (où je me suis inscrit)
     messageOnGroupJoinedCheckbox.addEventListener('change', toggleGroupJoinedChildren);
     groupsJoinedChildren.forEach(child => {
         child.addEventListener('change', updateGroupJoinedParent);

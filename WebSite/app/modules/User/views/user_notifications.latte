@@ -18,7 +18,6 @@
                         <h5 class="card-title mb-0">Sélectionnez les notifications que vous souhaitez recevoir</h5>
                     </div>
                     <div class="card-body">
-    <!-- Articles -->
                         <div class="Articles mb-4">
                             <h6 class="fw-bold mb-3">Articles</h6>
                             
@@ -66,11 +65,10 @@
                                 </div>
                             </div>
                         </div>
-    <!-- Messages -->
+
                         <div class="Messages">
                             <h6 class="fw-bold mb-3">Messages</h6>
                             
-                            <!-- Messages sur un article -->
                             <div class="d-flex align-items-center gap-2 mb-2">
                                 <div class="form-check mb-0">
                                     <input type="checkbox" class="form-check-input" id="messageOnArticle" name="notifications[messageOnArticle]" {isset($currentNotifications['messageOnArticle']) ? checked : ''}>
@@ -80,9 +78,12 @@
                                     <input type="checkbox" class="form-check-input" id="messageOnArticleIfAuthor" name="notifications[messageOnArticleIfAuthor]" {isset($currentNotifications['messageOnArticleIfAuthor']) ? checked : ''}>
                                     <label class="form-check-label" for="messageOnArticleIfAuthor">si je suis l'auteur</label>
                                 </div>
+                                <div class="form-check mb-0" id="messageOnArticleIfPostWrapper" style="display: none;">
+                                    <input type="checkbox" class="form-check-input" id="messageOnArticleIfPost" name="notifications[messageOnArticleIfPost]" {isset($currentNotifications['messageOnArticleIfPost']) ? checked : ''}>
+                                    <label class="form-check-label" for="messageOnArticleIfPost">si j'ai posté</label>
+                                </div>
                             </div>
                             
-                            <!-- Messages sur un événement -->
                             <div class="d-flex align-items-center gap-2 mb-2">
                                 <div class="form-check mb-0">
                                     <input type="checkbox" class="form-check-input" id="messageOnEvent" name="notifications[messageOnEvent]" {isset($currentNotifications['messageOnEvent']) ? checked : ''}>
