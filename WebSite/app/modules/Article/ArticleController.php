@@ -217,6 +217,7 @@ class ArticleController extends TableController
             ['field' => 'ForMembers', 'label' => 'Club'],
             ['field' => 'Pool', 'label' => 'Sondage'],
             ['field' => 'PoolDetail', 'label' => 'Cloture (votes) visibilité'],
+            ['field' => 'Messages', 'label' => 'Messages'],
         ];
         if ($connectedUser->isEditor()) {
             $columns[] = ['field' => 'Published', 'label' => 'Publié'];

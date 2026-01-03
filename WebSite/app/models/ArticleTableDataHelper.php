@@ -37,6 +37,11 @@ class ArticleTableDataHelper extends Data
                     Article.PublishedBy,
                     Article.OnlyForMembers,
                     Article.IdGroup,
+                    (
+                        SELECT COUNT(*)
+                        FROM Message
+                        WHERE Message.ArticleId = Article.Id
+                    ) AS Messages,
                     CASE 
                         WHEN Article.PublishedBy IS NULL THEN 'non' 
                         ELSE 'oui'
@@ -83,7 +88,7 @@ class ArticleTableDataHelper extends Data
 
         $query = $this->fluent->from('article_list_view')
             ->select(null)
-            ->select('Id, CreatedBy, Title, LastUpdate, PersonName, GroupName, Pool, PoolDetail, ForMembers')
+            ->select('Id, CreatedBy, Title, LastUpdate, PersonName, GroupName, Pool, PoolDetail, ForMembers, Messages')
             ->select('CASE 
                 WHEN PublishedBy IS NULL THEN "non" 
                 ELSE 
