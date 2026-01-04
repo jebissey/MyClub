@@ -43,6 +43,7 @@ use app\config\routes\MediaApi;
 use app\config\routes\MessageApi;
 use app\config\routes\NavBar;
 use app\config\routes\NavbarApi;
+use app\config\routes\NotificationApi;
 use app\config\routes\Person;
 use app\config\routes\Registration;
 use app\config\routes\Rss;
@@ -258,6 +259,7 @@ class Routes
         $this->routes = array_merge($this->routes, (new MessageApi($this->apiFactory))->get());
         $this->routes = array_merge($this->routes, (new NavBar($this->controllerFactory))->get());
         $this->routes = array_merge($this->routes, (new NavbarApi($this->apiFactory))->get());
+        $this->routes = array_merge($this->routes, (new NotificationApi($this->apiFactory))->get());
         $this->routes = array_merge($this->routes, (new Person($this->controllerFactory))->get());
         $this->routes = array_merge($this->routes, (new Registration($this->controllerFactory))->get());
         $this->routes = array_merge($this->routes, (new Rss($this->controllerFactory))->get());
@@ -320,6 +322,14 @@ class Routes
 
             '/robots.txt' => ['dir' => 'root', 'file' => 'robots.txt', 'type' => 'text/plain; charset=UTF-8'],
             '/webCard' => ['dir' => 'root', 'file' => 'businessCard.html', 'type' => 'text/html; charset=UTF-8'],
+
+            '/service-worker.js' => [
+                'dir' => 'root',
+                'file' => 'service-worker.js',
+                'type' => 'application/javascript; charset=UTF-8',
+                'noCache' => true,
+                'serviceWorker' => true,
+            ],
 
             ...(function () use ($rootDir) {
                 $htmlFiles = array_filter(
@@ -429,18 +439,29 @@ class Routes
             Flight::stop();
             return;
         }
-        $cacheMaxAge = match ($config['dir']) {
-            'css' => 31536000,      // 1 year
-            'images' => 604800,     // 1 week
-            'static_html' => 3600,  // 1 hour
-            default => 604800,
-        };
+        if (!empty($config['noCache'])) {
+            $cacheMaxAge = 0;
+        } else {
+            $cacheMaxAge = match ($config['dir']) {
+                'css' => 31536000,
+                'images' => 604800,
+                'static_html' => 3600,
+                default => 604800,
+            };
+        }
+
         $response = Flight::response();
         $response->header('Content-Type', $config['type']);
         $response->header('Content-Length', (string)filesize($filePath));
         $response->header('Last-Modified', gmdate('D, d M Y H:i:s', filemtime($filePath)) . ' GMT');
         $response->header('Cache-Control', "public, max-age=$cacheMaxAge, immutable");
         $response->header('Expires', gmdate('D, d M Y H:i:s', time() + $cacheMaxAge) . ' GMT');
+        if (!empty($config['serviceWorker'])) {
+            $response->header('Service-Worker-Allowed', '/');
+            $response->header('Cache-Control', 'no-store, no-cache, must-revalidate');
+            $response->header('Pragma', 'no-cache');
+            $response->header('Expires', '0');
+        }
         readfile($filePath);
         Flight::stop();
     }

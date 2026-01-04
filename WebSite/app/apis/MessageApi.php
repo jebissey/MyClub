@@ -192,13 +192,25 @@ class MessageApi extends AbstractApi
         );
 
         $personIds = $this->messageRecipientService->getRecipientsForContext($context);
+        $from = '';
+        $id = null;
+        if($articleId !== null) {
+            $from = 'article';
+            $id = $articleId;
+        } elseif ($eventId !== null) {
+            $from = 'event';
+            $id = $eventId;
+        } elseif ($groupId !== null) {
+            $from = 'group';
+            $id = $groupId;
+        }
         $notificationData = [
             'title' => 'notificationTitle',
             'body' => 'notificationBody',
             'icon' => '/path/to/icon.png',
             'badge' => '/path/to/badge.png',
             'data' => [
-                'url' => '/group/chat/' . $context->articleId ?? $context->eventId ?? $context->groupId,
+                'url' => "/{$from}/chat/{$id}",
                 'messageId' => $messageId,
                 'type' => 'messageType'
             ]

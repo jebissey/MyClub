@@ -4,13 +4,22 @@
 <form method="POST" data-form="checkSave">
     <div class="row">
         <div class="col-md-6">
-            <div class="mb-3">
-                <div class="form-check">
-                    <input type="checkbox" class="form-check-input" id="noNotification" name="notifications[noNotification]" {isset($currentNotifications['noNotification']) ? checked : ''}>
+            <div class="mt-1 mb-2 d-flex align-items-center gap-3">
+                <div class="form-check m-0">
+                    <input type="checkbox"
+                        class="form-check-input"
+                        id="noNotification"
+                        name="notifications[noNotification]"
+                        {isset($currentNotifications['noNotification']) ? checked : ''}>
                     <label class="form-check-label" for="noNotification">
                         <strong>Ne recevoir aucune notification</strong>
                     </label>
                 </div>
+                <button type="button"
+                        class="btn btn-sm btn-primary"
+                        id="pushNotificationBtn">
+                    <span id="pushBtnText">Chargement...</span>
+                </button>
             </div>
             <div id="alertOptions">
                 <div class="card mb-3">
@@ -21,7 +30,6 @@
                         <div class="Articles mb-4">
                             <h6 class="fw-bold mb-3">Articles</h6>
                             
-                            <!-- Nouvel article avec sondage sur la même ligne -->
                             <div class="d-flex align-items-center gap-2 mb-2">
                                 <div class="form-check mb-0">
                                     <input type="checkbox" class="form-check-input" id="newArticle" name="notifications[newArticle]" {isset($currentNotifications['newArticle']) ? checked : ''}>
@@ -33,7 +41,6 @@
                                 </div>
                             </div>
                             
-                            <!-- Article mis à jour avec sondage sur la même ligne -->
                             <div class="d-flex align-items-center gap-2 mb-2">
                                 <div class="form-check mb-0">
                                     <input type="checkbox" class="form-check-input" id="updatedArticle" name="notifications[updatedArticle]" {isset($currentNotifications['updatedArticle']) ? checked : ''}>
@@ -45,7 +52,6 @@
                                 </div>
                             </div>
                             
-                            <!-- Nouveau vote sur un sondage avec conditions sur la même ligne -->
                             <div class="d-flex align-items-center gap-2 mt-2">
                                 <div class="form-check mb-0">
                                     <input type="checkbox" class="form-check-input" id="newPollVote" name="notifications[newPollVote]" {isset($currentNotifications['newPollVote']) ? checked : ''}>
@@ -144,12 +150,15 @@
             </div>
         </div>
     </div>
-    <div class="mt-4">
+    <div class="mb-2">
         <button type="submit" class="btn btn-primary">Valider</button>
     </div>
 </form>
 {/block}
 
 {block scripts}
+<script>
+    const VAPID_PUBLIC_KEY = {$vapidPubliKey};
+</script>
 <script src="/app/modules/User/js/notifications.js"></script>
 {/block}

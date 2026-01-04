@@ -52,6 +52,18 @@ abstract class AbstractApi
         );
     }
 
+    protected function renderJsonCreated(array $data = [], string $message = 'Created'): void
+    {
+        $this->renderJson(
+            [
+                'message' => $message,
+                ...$data
+            ],
+            true,
+            ApplicationError::Created->value
+        );
+    }
+
     protected function renderJsonError(string $message, int $statusCode, string $file, int $line): void
     {
         $this->application->getFlight()->setData('code', $statusCode);

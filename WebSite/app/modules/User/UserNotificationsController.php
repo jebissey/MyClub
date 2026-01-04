@@ -33,6 +33,7 @@ class UserNotificationsController extends AbstractController
             'currentNotifications' => json_decode($person->Notifications ?? '{}', true) ?? [],
             'groups' => $this->groupDataHelper->getGroupsWithType($person->Id),
             'page' => $this->application->getConnectedUser()->getPage(1),
+            'vapidPubliKey' => $this->dataHelper->get('Metadata', ['Id' => 1], 'VapidPublicKey')->VapidPublicKey ?? '',
         ]));
     }
 

@@ -68,3 +68,15 @@ document.querySelectorAll('[data-tooltip-id]').forEach(el => {
         });
     }
 });
+
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/service-worker.js')
+            .then(registration => {
+                console.log('[SW] enregistré', registration);
+            })
+            .catch(error => {
+                console.error('[SW] échec enregistrement', error);
+            });
+    });
+}

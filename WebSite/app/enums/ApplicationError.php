@@ -6,6 +6,7 @@ namespace app\enums;
 enum ApplicationError: int
 {
     case Ok = 200;
+    case Created = 201;
     case NoContent = 204; 
     case BadRequest = 400;
     case Unauthorized = 401;

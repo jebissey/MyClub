@@ -19,6 +19,7 @@ use app\apis\LeapfrogApi;
 use app\apis\MediaApi;
 use app\apis\MessageApi;
 use app\apis\NavbarApi;
+use app\apis\NotificationApi;
 use app\apis\WebmasterApi;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
@@ -246,6 +247,16 @@ class ApiFactory
         return new NavbarApi(
             $this->application,
             $this->pageDataHelper,
+            $this->connectedUser,
+            $this->dataHelper,
+            $this->personDataHelper
+        );
+    }
+
+    public function makeNotificationApi(): NotificationApi
+    {
+        return new NotificationApi(
+            $this->application,
             $this->connectedUser,
             $this->dataHelper,
             $this->personDataHelper
