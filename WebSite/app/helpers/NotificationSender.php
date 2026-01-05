@@ -29,10 +29,10 @@ class NotificationSender
 
     public function sendToRecipients(array $recipients, array $notificationData): void
     {
-        error_log("\n\n" . json_encode($recipients, JSON_PRETTY_PRINT) . "\n");
-        error_log("\n\n" . json_encode($notificationData, JSON_PRETTY_PRINT) . "\n");
+error_log("\n\n" . json_encode($recipients, JSON_PRETTY_PRINT) . "\n");
+error_log("\n\n" . json_encode($notificationData, JSON_PRETTY_PRINT) . "\n");
         if (!$this->vapidPublicKey || !$this->vapidPrivateKey) {
-            error_log('VAPID keys not configured');
+error_log('VAPID keys not configured');
             return;
         }
         $auth = [
@@ -48,7 +48,7 @@ class NotificationSender
             try {
                 $subscriptionData = $this->dataHelper->gets('PushSubscription', ['IdPerson' => $recipient]);
                 if (empty($subscriptionData)) {
-                    error_log("No push subscription found for user ID: {$recipient}");
+error_log("No push subscription found for user ID: {$recipient}");
                     continue;
                 }
                 foreach ($subscriptionData as $sub) {
@@ -65,7 +65,7 @@ class NotificationSender
                     );
                 }
             } catch (Throwable $e) {
-                error_log("Error creating subscription: " . $e->getMessage());
+error_log("Error creating subscription: " . $e->getMessage());
             }
         }
 
@@ -73,7 +73,7 @@ class NotificationSender
             $endpoint = $report->getRequest()->getUri()->__toString();
 
             if (!$report->isSuccess()) {
-                error_log("Notification failed for {$endpoint}: " . $report->getReason());
+error_log("Notification failed for {$endpoint}: " . $report->getReason());
 
                 // Si l'abonnement est expiré ou invalide, le supprimer
                 if ($report->isSubscriptionExpired()) {

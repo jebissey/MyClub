@@ -2,12 +2,30 @@ import ApiClient from "../../Common/js/apiClient.js";
 
 const api = new ApiClient("");
 
-document.addEventListener("DOMContentLoaded", async () => {
+document.addEventListener("DOMContentLoaded", init);
 
-    const $ = (id) => document.getElementById(id);
-    const elements = {
+/* ================================
+ * Init global
+ * ================================ */
+async function init() {
+    const elements = cacheElements();
+
+    initUI(elements);
+    initListeners(elements);
+
+    await initPush(elements);
+}
+
+/* ================================
+ * DOM cache
+ * ================================ */
+function cacheElements() {
+    const $ = id => document.getElementById(id);
+
+    return {
         noNotification: $("noNotification"),
         alertOptions: $("alertOptions"),
+
         pushBtn: $("pushNotificationBtn"),
         pushBtnText: $("pushBtnText"),
 
@@ -42,196 +60,218 @@ document.addEventListener("DOMContentLoaded", async () => {
         messageOnGroupJoined: $("messageOnGroupJoined"),
         groupsJoinedChildren: document.querySelectorAll(".group-joined-child")
     };
+}
 
-    // ----------------------------
-    // Helpers UI
-    // ----------------------------
-    const setDisplay = (el, visible) => el && (el.style.display = visible ? "flex" : "none");
+/* ================================
+ * UI helpers
+ * ================================ */
+function setDisplay(el, visible) {
+    if (!el) return;
+    el.style.display = visible ? "flex" : "none";
+}
 
-    const toggleWrapper = (wrapper, checkbox, children = []) => {
-        const visible = checkbox.checked;
-        setDisplay(wrapper, visible);
-        if (!visible) children.forEach(c => c.checked = false);
-    };
+function toggleWrapper(wrapper, checkbox, children = []) {
+    const visible = checkbox.checked;
+    setDisplay(wrapper, visible);
 
-    const updateParent = (parent, children) => {
-        const all = [...children].every(c => c.checked);
-        const some = [...children].some(c => c.checked);
-        parent.checked = all;
-        parent.indeterminate = !all && some;
-    };
+    if (!visible) {
+        children.forEach(c => c && (c.checked = false));
+    }
+}
 
-    const toggleChildren = (parent, children) => {
-        children.forEach(c => c.checked = parent.checked);
-        parent.indeterminate = false;
-    };
+function updateParent(parent, children) {
+    const all = [...children].every(c => c.checked);
+    const some = [...children].some(c => c.checked);
 
-    // ----------------------------
-    // Toast notifications
-    // ----------------------------
-    const notify = (message, type = "info") => {
-        const div = document.createElement("div");
-        div.textContent = message;
-        div.setAttribute("role", "alert");
-        div.style.cssText = `
-            position:fixed;top:20px;right:20px;
-            padding:12px 18px;
-            background:${type === "success" ? "#4CAF50" : type === "error" ? "#f44336" : "#ff9800"};
-            color:#fff;border-radius:4px;
-            box-shadow:0 2px 5px rgba(0,0,0,.2);
-            animation:slideIn .3s ease-out;
-            z-index:10000;
-        `;
-        document.body.appendChild(div);
-        setTimeout(() => {
-            div.style.animation = "slideOut .3s ease-out";
-            setTimeout(() => div.remove(), 300);
-        }, 3000);
-    };
+    parent.checked = all;
+    parent.indeterminate = !all && some;
+}
 
-    // ----------------------------
-    // Push notifications
-    // ----------------------------
-    const hasPushSupport = () =>
-        "serviceWorker" in navigator && "PushManager" in window;
+function toggleChildren(parent, children) {
+    children.forEach(c => (c.checked = parent.checked));
+    parent.indeterminate = false;
+}
 
-    const checkSubscription = async () => {
-        if (!hasPushSupport()) return false;
-        const reg = await navigator.serviceWorker.getRegistration();
-        if (!reg) return false;
-        return !!await reg.pushManager.getSubscription();
-    };
+/* ================================
+ * UI init
+ * ================================ */
+function initUI(e) {
+    setDisplay(e.alertOptions, !e.noNotification?.checked);
+    setDisplay(e.newArticlePollWrapper, e.newArticle?.checked);
+    setDisplay(e.updatedArticlePollWrapper, e.updatedArticle?.checked);
+    setDisplay(e.newPollVoteOptionsWrapper, e.newPollVote?.checked);
+    setDisplay(e.messageOnArticleIfAuthorWrapper, e.messageOnArticle?.checked);
+    setDisplay(e.messageOnArticleIfPostWrapper, e.messageOnArticle?.checked);
+    setDisplay(e.messageOnEventOptionsWrapper, e.messageOnEvent?.checked);
 
-    const sendSubscriptionToServer = async (subscription) => {
-        const json = subscription.toJSON();
-        return api.post("/api/push-subscription", {
-            endpoint: json.endpoint,
-            auth: json.keys.auth,
-            p256dh: json.keys.p256dh
-        });
-    };
+    updateParent(e.messageOnGroupSubscribed, e.groupsSubscribedChildren);
+    updateParent(e.messageOnGroupJoined, e.groupsJoinedChildren);
+}
 
-    const subscribe = async () => {
-        if (!hasPushSupport()) return false;
+/* ================================
+ * Listeners
+ * ================================ */
+function initListeners(e) {
+    e.noNotification?.addEventListener("change", () =>
+        setDisplay(e.alertOptions, !e.noNotification.checked)
+    );
 
-        const permission = await Notification.requestPermission();
-        if (permission !== "granted") {
-            notify("Notifications refusées", "warning");
-            return false;
-        }
+    e.newArticle?.addEventListener("change", () =>
+        toggleWrapper(e.newArticlePollWrapper, e.newArticle, [e.newArticlePoll])
+    );
 
-        let reg = await navigator.serviceWorker.getRegistration();
-        if (!reg) reg = await navigator.serviceWorker.register("/service-worker.js");
+    e.updatedArticle?.addEventListener("change", () =>
+        toggleWrapper(e.updatedArticlePollWrapper, e.updatedArticle, [e.updatedArticlePoll])
+    );
 
-        const subscription = await reg.pushManager.subscribe({
-            userVisibleOnly: true,
-            applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
-        });
+    e.newPollVote?.addEventListener("change", () =>
+        toggleWrapper(e.newPollVoteOptionsWrapper, e.newPollVote, [
+            e.newPollVoteIfVoted,
+            e.newPollVoteIfAuthor
+        ])
+    );
 
-        const response = await sendSubscriptionToServer(subscription);
-        if (response.success === false) throw new Error(response.error);
+    e.messageOnGroupSubscribed?.addEventListener("change", () =>
+        toggleChildren(e.messageOnGroupSubscribed, e.groupsSubscribedChildren)
+    );
 
-        return true;
-    };
+    e.groupsSubscribedChildren.forEach(c =>
+        c.addEventListener("change", () =>
+            updateParent(e.messageOnGroupSubscribed, e.groupsSubscribedChildren)
+        )
+    );
+}
 
-    const unsubscribe = async () => {
-        if (!hasPushSupport()) return false;
+/* ================================
+ * Push Notifications
+ * ================================ */
+async function initPush(e) {
+    if (!e.pushBtn) return;
 
-        const reg = await navigator.serviceWorker.ready;
-        const sub = await reg.pushManager.getSubscription();
-        if (!sub) return false;
+    await updatePushButton(e);
 
-        await sub.unsubscribe();
-        await api.post("/api/push-subscription/delete", { endpoint: sub.endpoint });
-
-        return true;
-    };
-
-    const updatePushButton = async () => {
-        if (!elements.pushBtn) return;
-        const subscribed = await checkSubscription();
-        elements.pushBtnText.textContent = subscribed ? "Se désabonner" : "S'abonner";
-        elements.pushBtn.classList.toggle("btn-danger", subscribed);
-        elements.pushBtn.classList.toggle("btn-primary", !subscribed);
-    };
-
-    // ----------------------------
-    // Push button event
-    // ----------------------------
-    elements.pushBtn?.addEventListener("click", async () => {
-        elements.pushBtn.disabled = true;
-        elements.pushBtnText.textContent = "Traitement...";
+    e.pushBtn.addEventListener("click", async () => {
+        e.pushBtn.disabled = true;
+        e.pushBtnText.textContent = "Traitement...";
 
         try {
             const subscribed = await checkSubscription();
-            const success = subscribed ? await unsubscribe() : await subscribe();
+            const success = subscribed
+                ? await unsubscribe()
+                : await subscribe();
+
             notify(
                 success
                     ? subscribed ? "Désabonnement réussi" : "Abonnement réussi"
                     : "Erreur",
                 success ? "success" : "error"
             );
-            await updatePushButton();
-        } catch (e) {
-            console.error(e);
-            notify(e.message, "error");
+        } catch (err) {
+            console.error(err);
+            notify(err.message || "Erreur push", "error");
         } finally {
-            elements.pushBtn.disabled = false;
+            await updatePushButton(e);
+            e.pushBtn.disabled = false;
         }
     });
+}
 
-    // ----------------------------
-    // Initialisation UI
-    // ----------------------------
-    setDisplay(elements.alertOptions, !elements.noNotification.checked);
-    setDisplay(elements.newArticlePollWrapper, elements.newArticle.checked);
-    setDisplay(elements.updatedArticlePollWrapper, elements.updatedArticle.checked);
-    setDisplay(elements.newPollVoteOptionsWrapper, elements.newPollVote.checked);
-    setDisplay(elements.messageOnArticleIfAuthorWrapper, elements.messageOnArticle.checked);
-    setDisplay(elements.messageOnArticleIfPostWrapper, elements.messageOnArticle.checked);
-    setDisplay(elements.messageOnEventOptionsWrapper, elements.messageOnEvent.checked);
+function hasPushSupport() {
+    return "serviceWorker" in navigator && "PushManager" in window;
+}
 
-    updateParent(elements.messageOnGroupSubscribed, elements.groupsSubscribedChildren);
-    updateParent(elements.messageOnGroupJoined, elements.groupsJoinedChildren);
+async function checkSubscription() {
+    if (!hasPushSupport()) return false;
 
-    await updatePushButton();
+    const reg = await navigator.serviceWorker.getRegistration();
+    if (!reg) return false;
 
-    // ----------------------------
-    // Listeners UI
-    // ----------------------------
-    elements.noNotification?.addEventListener("change", () =>
-        setDisplay(elements.alertOptions, !elements.noNotification.checked)
-    );
+    return !!await reg.pushManager.getSubscription();
+}
 
-    elements.newArticle?.addEventListener("change", () =>
-        toggleWrapper(elements.newArticlePollWrapper, elements.newArticle, [elements.newArticlePoll])
-    );
+async function subscribe() {
+    if (!hasPushSupport()) return false;
 
-    elements.updatedArticle?.addEventListener("change", () =>
-        toggleWrapper(elements.updatedArticlePollWrapper, elements.updatedArticle, [elements.updatedArticlePoll])
-    );
+    const permission = await Notification.requestPermission();
+    if (permission !== "granted") return false;
 
-    elements.newPollVote?.addEventListener("change", () =>
-        toggleWrapper(elements.newPollVoteOptionsWrapper, elements.newPollVote, [
-            elements.newPollVoteIfVoted,
-            elements.newPollVoteIfAuthor
-        ])
-    );
+    const reg = await navigator.serviceWorker.register("/service-worker.js");
 
-    elements.messageOnGroupSubscribed?.addEventListener("change", () =>
-        toggleChildren(elements.messageOnGroupSubscribed, elements.groupsSubscribedChildren)
-    );
+    const sub = await reg.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
+    });
 
-    elements.groupsSubscribedChildren.forEach(c =>
-        c.addEventListener("change", () =>
-            updateParent(elements.messageOnGroupSubscribed, elements.groupsSubscribedChildren)
-        )
-    );
-});
+    const json = sub.toJSON();
+    await api.post("/api/push-subscription", {
+        endpoint: json.endpoint,
+        auth: json.keys.auth,
+        p256dh: json.keys.p256dh
+    });
+    return true;
+}
 
-// ----------------------------
-// Utils
-// ----------------------------
+
+async function unsubscribe() {
+    const reg = await navigator.serviceWorker.ready;
+    const sub = await reg.pushManager.getSubscription();
+    if (!sub) return false;
+
+    await sub.unsubscribe();
+    await api.post("/api/push-subscription/delete", { endpoint: sub.endpoint });
+    return true;
+}
+
+async function updatePushButton(e) {
+    const subscribed = await checkSubscription();
+    e.pushBtnText.textContent = subscribed ? "Se désabonner" : "S'abonner";
+    e.pushBtn.classList.toggle("btn-danger", subscribed);
+    e.pushBtn.classList.toggle("btn-primary", !subscribed);
+}
+
+/* ================================
+ * Toast
+ * ================================ */
+function notify(message, type = "info") {
+    const container = document.getElementById("toastContainer");
+    if (!container || !window.bootstrap) return;
+
+    const colorMap = {
+        success: "success",
+        error: "danger",
+        warning: "warning",
+        info: "primary"
+    };
+
+    const toastEl = document.createElement("div");
+    toastEl.className = `toast align-items-center text-bg-${colorMap[type] || "primary"} border-0`;
+    toastEl.setAttribute("role", "alert");
+    toastEl.setAttribute("aria-live", "assertive");
+    toastEl.setAttribute("aria-atomic", "true");
+
+    toastEl.innerHTML = `
+        <div class="d-flex">
+            <div class="toast-body">
+                ${message}
+            </div>
+            <button type="button"
+                    class="btn-close btn-close-white me-2 m-auto"
+                    data-bs-dismiss="toast"
+                    aria-label="Close"></button>
+        </div>
+    `;
+
+    container.appendChild(toastEl);
+
+    const toast = new bootstrap.Toast(toastEl, { delay: 3000 });
+    toast.show();
+
+    toastEl.addEventListener("hidden.bs.toast", () => toastEl.remove());
+}
+
+/* ================================
+ * Utils
+ * ================================ */
 function urlBase64ToUint8Array(base64String) {
     const padding = "=".repeat((4 - base64String.length % 4) % 4);
     const base64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/");
