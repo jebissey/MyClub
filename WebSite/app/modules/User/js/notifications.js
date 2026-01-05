@@ -1,226 +1,188 @@
-document.addEventListener('DOMContentLoaded', async () => {
-    // ----------------------------
-    // Sélection des éléments
-    // ----------------------------
+import ApiClient from "../../Common/js/apiClient.js";
+
+const api = new ApiClient("");
+
+document.addEventListener("DOMContentLoaded", async () => {
+
+    const $ = (id) => document.getElementById(id);
     const elements = {
-        noNotification: document.getElementById('noNotification'),
-        alertOptions: document.getElementById('alertOptions'),
-        pushNotificationBtn: document.getElementById('pushNotificationBtn'),
-        pushBtnText: document.getElementById('pushBtnText'),
+        noNotification: $("noNotification"),
+        alertOptions: $("alertOptions"),
+        pushBtn: $("pushNotificationBtn"),
+        pushBtnText: $("pushBtnText"),
 
-        newArticle: document.getElementById('newArticle'),
-        newArticlePollWrapper: document.getElementById('newArticlePollWrapper'),
-        newArticlePoll: document.getElementById('newArticlePoll'),
+        newArticle: $("newArticle"),
+        newArticlePollWrapper: $("newArticlePollWrapper"),
+        newArticlePoll: $("newArticlePoll"),
 
-        updatedArticle: document.getElementById('updatedArticle'),
-        updatedArticlePollWrapper: document.getElementById('updatedArticlePollWrapper'),
-        updatedArticlePoll: document.getElementById('updatedArticlePoll'),
+        updatedArticle: $("updatedArticle"),
+        updatedArticlePollWrapper: $("updatedArticlePollWrapper"),
+        updatedArticlePoll: $("updatedArticlePoll"),
 
-        newPollVote: document.getElementById('newPollVote'),
-        newPollVoteOptionsWrapper: document.getElementById('newPollVoteOptionsWrapper'),
-        newPollVoteIfVoted: document.getElementById('newPollVoteIfVoted'),
-        newPollVoteIfAuthor: document.getElementById('newPollVoteIfAuthor'),
+        newPollVote: $("newPollVote"),
+        newPollVoteOptionsWrapper: $("newPollVoteOptionsWrapper"),
+        newPollVoteIfVoted: $("newPollVoteIfVoted"),
+        newPollVoteIfAuthor: $("newPollVoteIfAuthor"),
 
-        messageOnArticle: document.getElementById('messageOnArticle'),
-        messageOnArticleIfAuthorWrapper: document.getElementById('messageOnArticleIfAuthorWrapper'),
-        messageOnArticleIfAuthor: document.getElementById('messageOnArticleIfAuthor'),
-        messageOnArticleIfPostWrapper: document.getElementById('messageOnArticleIfPostWrapper'),
-        messageOnArticleIfPost: document.getElementById('messageOnArticleIfPost'),
+        messageOnArticle: $("messageOnArticle"),
+        messageOnArticleIfAuthorWrapper: $("messageOnArticleIfAuthorWrapper"),
+        messageOnArticleIfAuthor: $("messageOnArticleIfAuthor"),
+        messageOnArticleIfPostWrapper: $("messageOnArticleIfPostWrapper"),
+        messageOnArticleIfPost: $("messageOnArticleIfPost"),
 
-        messageOnEvent: document.getElementById('messageOnEvent'),
-        messageOnEventOptionsWrapper: document.getElementById('messageOnEventOptionsWrapper'),
-        messageOnEventIfRegistered: document.getElementById('messageOnEventIfRegistered'),
-        messageOnEventIfInPreferences: document.getElementById('messageOnEventIfInPreferences'),
-        messageOnEventIfCreator: document.getElementById('messageOnEventIfCreator'),
+        messageOnEvent: $("messageOnEvent"),
+        messageOnEventOptionsWrapper: $("messageOnEventOptionsWrapper"),
+        messageOnEventIfRegistered: $("messageOnEventIfRegistered"),
+        messageOnEventIfInPreferences: $("messageOnEventIfInPreferences"),
+        messageOnEventIfCreator: $("messageOnEventIfCreator"),
 
-        messageOnGroupSubscribed: document.getElementById('messageOnGroupSubscribed'),
-        groupsSubscribedChildren: document.querySelectorAll('.group-subscribed-child'),
+        messageOnGroupSubscribed: $("messageOnGroupSubscribed"),
+        groupsSubscribedChildren: document.querySelectorAll(".group-subscribed-child"),
 
-        messageOnGroupJoined: document.getElementById('messageOnGroupJoined'),
-        groupsJoinedChildren: document.querySelectorAll('.group-joined-child')
+        messageOnGroupJoined: $("messageOnGroupJoined"),
+        groupsJoinedChildren: document.querySelectorAll(".group-joined-child")
     };
 
     // ----------------------------
-    // Fonctions utilitaires
+    // Helpers UI
     // ----------------------------
-    const setDisplay = (wrapper, visible) => wrapper.style.display = visible ? 'flex' : 'none';
+    const setDisplay = (el, visible) => el && (el.style.display = visible ? "flex" : "none");
 
-    const toggleWrapper = (wrapper, checkbox, childrenCheckboxes = []) => {
+    const toggleWrapper = (wrapper, checkbox, children = []) => {
         const visible = checkbox.checked;
         setDisplay(wrapper, visible);
-        childrenCheckboxes.forEach(c => { if (!visible) c.checked = false; });
+        if (!visible) children.forEach(c => c.checked = false);
     };
 
-    const updateParentCheckbox = (parent, children) => {
-        const allChecked = Array.from(children).every(c => c.checked);
-        const someChecked = Array.from(children).some(c => c.checked);
-        parent.checked = allChecked;
-        parent.indeterminate = !allChecked && someChecked;
+    const updateParent = (parent, children) => {
+        const all = [...children].every(c => c.checked);
+        const some = [...children].some(c => c.checked);
+        parent.checked = all;
+        parent.indeterminate = !all && some;
     };
 
-    const toggleChildrenCheckboxes = (parent, children) => {
+    const toggleChildren = (parent, children) => {
         children.forEach(c => c.checked = parent.checked);
         parent.indeterminate = false;
     };
 
     // ----------------------------
-    // Notifications toast
+    // Toast notifications
     // ----------------------------
-    const showNotification = (message, type = 'info') => {
-        const notificationDiv = document.createElement('div');
-        notificationDiv.className = `notification notification-${type}`;
-        notificationDiv.setAttribute('role', 'alert');
-        notificationDiv.textContent = message;
-        notificationDiv.style.cssText = `
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 15px 20px;
-            background-color: ${type === 'success' ? '#4CAF50' : type === 'error' ? '#f44336' : '#ff9800'};
-            color: white;
-            border-radius: 4px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-            z-index: 10000;
-            animation: slideIn 0.3s ease-out;
+    const notify = (message, type = "info") => {
+        const div = document.createElement("div");
+        div.textContent = message;
+        div.setAttribute("role", "alert");
+        div.style.cssText = `
+            position:fixed;top:20px;right:20px;
+            padding:12px 18px;
+            background:${type === "success" ? "#4CAF50" : type === "error" ? "#f44336" : "#ff9800"};
+            color:#fff;border-radius:4px;
+            box-shadow:0 2px 5px rgba(0,0,0,.2);
+            animation:slideIn .3s ease-out;
+            z-index:10000;
         `;
-        document.body.appendChild(notificationDiv);
+        document.body.appendChild(div);
         setTimeout(() => {
-            notificationDiv.style.animation = 'slideOut 0.3s ease-out';
-            setTimeout(() => notificationDiv.remove(), 300);
+            div.style.animation = "slideOut .3s ease-out";
+            setTimeout(() => div.remove(), 300);
         }, 3000);
     };
 
     // ----------------------------
     // Push notifications
     // ----------------------------
-    const checkExistingSubscription = async () => {
-        if (!('serviceWorker' in navigator) || !('PushManager' in window)) return false;
-        try {
-            const registration = await navigator.serviceWorker.getRegistration();
-            if (!registration) return false;
-            const subscription = await registration.pushManager.getSubscription();
-            return !!subscription;
-        } catch (e) {
-            console.error('Erreur vérification abonnement:', e);
-            return false;
-        }
+    const hasPushSupport = () =>
+        "serviceWorker" in navigator && "PushManager" in window;
+
+    const checkSubscription = async () => {
+        if (!hasPushSupport()) return false;
+        const reg = await navigator.serviceWorker.getRegistration();
+        if (!reg) return false;
+        return !!await reg.pushManager.getSubscription();
     };
 
     const sendSubscriptionToServer = async (subscription) => {
-        const subJson = subscription.toJSON();
-        const response = await fetch('/api/push-subscription', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                endpoint: subJson.endpoint,
-                auth: subJson.keys.auth,
-                p256dh: subJson.keys.p256dh
-            })
+        const json = subscription.toJSON();
+        return api.post("/api/push-subscription", {
+            endpoint: json.endpoint,
+            auth: json.keys.auth,
+            p256dh: json.keys.p256dh
         });
-        if (!response.ok) {
-            const err = await response.json().catch(() => ({}));
-            throw new Error(err.error || "Échec de l'enregistrement de l'abonnement");
-        }
-        return await response.json();
     };
 
-    const subscribeToPushNotifications = async () => {
-        if (!('serviceWorker' in navigator) || !('PushManager' in window)) return false;
+    const subscribe = async () => {
+        if (!hasPushSupport()) return false;
 
-        try {
-            const permission = await Notification.requestPermission();
-            if (permission !== 'granted') {
-                showNotification('Vous devez autoriser les notifications', 'warning');
-                return false;
-            }
-
-            let registration = await navigator.serviceWorker.getRegistration();
-            if (!registration) registration = await navigator.serviceWorker.register('/service-worker.js');
-
-            const subscription = await registration.pushManager.subscribe({
-                userVisibleOnly: true,
-                applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
-            });
-
-            await sendSubscriptionToServer(subscription); // ✅ fetch réintégré
-            return true;
-
-        } catch (error) {
-            console.error('Erreur abonnement push:', error);
-            showNotification('Erreur lors de l’abonnement push: ' + error.message, 'error');
+        const permission = await Notification.requestPermission();
+        if (permission !== "granted") {
+            notify("Notifications refusées", "warning");
             return false;
         }
+
+        let reg = await navigator.serviceWorker.getRegistration();
+        if (!reg) reg = await navigator.serviceWorker.register("/service-worker.js");
+
+        const subscription = await reg.pushManager.subscribe({
+            userVisibleOnly: true,
+            applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
+        });
+
+        const response = await sendSubscriptionToServer(subscription);
+        if (response.success === false) throw new Error(response.error);
+
+        return true;
     };
 
-    const unsubscribeFromPushNotifications = async () => {
-        if (!('serviceWorker' in navigator) || !('PushManager' in window)) return false;
+    const unsubscribe = async () => {
+        if (!hasPushSupport()) return false;
+
+        const reg = await navigator.serviceWorker.ready;
+        const sub = await reg.pushManager.getSubscription();
+        if (!sub) return false;
+
+        await sub.unsubscribe();
+        await api.post("/api/push-subscription/delete", { endpoint: sub.endpoint });
+
+        return true;
+    };
+
+    const updatePushButton = async () => {
+        if (!elements.pushBtn) return;
+        const subscribed = await checkSubscription();
+        elements.pushBtnText.textContent = subscribed ? "Se désabonner" : "S'abonner";
+        elements.pushBtn.classList.toggle("btn-danger", subscribed);
+        elements.pushBtn.classList.toggle("btn-primary", !subscribed);
+    };
+
+    // ----------------------------
+    // Push button event
+    // ----------------------------
+    elements.pushBtn?.addEventListener("click", async () => {
+        elements.pushBtn.disabled = true;
+        elements.pushBtnText.textContent = "Traitement...";
+
         try {
-            const registration = await navigator.serviceWorker.ready;
-            const subscription = await registration.pushManager.getSubscription();
-            if (subscription) {
-                await subscription.unsubscribe();
-                await fetch('/api/push-subscription/delete', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ endpoint: subscription.endpoint })
-                });
-                console.log('Désabonnement push réussi');
-                return true;
-            }
-            return false;
+            const subscribed = await checkSubscription();
+            const success = subscribed ? await unsubscribe() : await subscribe();
+            notify(
+                success
+                    ? subscribed ? "Désabonnement réussi" : "Abonnement réussi"
+                    : "Erreur",
+                success ? "success" : "error"
+            );
+            await updatePushButton();
         } catch (e) {
-            console.error('Erreur désabonnement push:', e);
-            return false;
+            console.error(e);
+            notify(e.message, "error");
+        } finally {
+            elements.pushBtn.disabled = false;
         }
-    };
-
-    const updatePushButtonState = async () => {
-        const { pushNotificationBtn, pushBtnText } = elements;
-        if (!pushNotificationBtn || !pushBtnText) return;
-
-        try {
-            const isSubscribed = await checkExistingSubscription();
-            pushBtnText.textContent = isSubscribed ? 'Se désabonner' : "S'abonner";
-            pushNotificationBtn.classList.toggle('btn-primary', !isSubscribed);
-            pushNotificationBtn.classList.toggle('btn-danger', isSubscribed);
-        } catch {
-            pushBtnText.textContent = "S'abonner";
-            pushNotificationBtn.classList.add('btn-primary');
-            pushNotificationBtn.classList.remove('btn-danger');
-        }
-    };
-
-    if (elements.pushNotificationBtn) {
-        elements.pushNotificationBtn.addEventListener('click', async () => {
-            const btn = elements.pushNotificationBtn;
-            const text = elements.pushBtnText;
-            btn.disabled = true;
-            text.textContent = 'Traitement...';
-            try {
-                const subscribed = await checkExistingSubscription();
-                const success = subscribed
-                    ? await unsubscribeFromPushNotifications()
-                    : await subscribeToPushNotifications();
-
-                showNotification(
-                    subscribed ? (success ? 'Désabonnement réussi' : 'Erreur lors du désabonnement')
-                               : (success ? 'Abonnement réussi' : 'Erreur lors de l\'abonnement'),
-                    success ? 'success' : 'error'
-                );
-                await updatePushButtonState();
-            } catch (err) {
-                console.error(err);
-                showNotification('Une erreur est survenue', 'error');
-            } finally {
-                btn.disabled = false;
-            }
-        });
-    }
+    });
 
     // ----------------------------
     // Initialisation UI
     // ----------------------------
-    // Respect de l'état initial du DOM
     setDisplay(elements.alertOptions, !elements.noNotification.checked);
     setDisplay(elements.newArticlePollWrapper, elements.newArticle.checked);
     setDisplay(elements.updatedArticlePollWrapper, elements.updatedArticle.checked);
@@ -229,50 +191,49 @@ document.addEventListener('DOMContentLoaded', async () => {
     setDisplay(elements.messageOnArticleIfPostWrapper, elements.messageOnArticle.checked);
     setDisplay(elements.messageOnEventOptionsWrapper, elements.messageOnEvent.checked);
 
-    updateParentCheckbox(elements.messageOnGroupSubscribed, elements.groupsSubscribedChildren);
-    updateParentCheckbox(elements.messageOnGroupJoined, elements.groupsJoinedChildren);
-    updatePushButtonState();
+    updateParent(elements.messageOnGroupSubscribed, elements.groupsSubscribedChildren);
+    updateParent(elements.messageOnGroupJoined, elements.groupsJoinedChildren);
+
+    await updatePushButton();
 
     // ----------------------------
-    // Écouteurs événements
+    // Listeners UI
     // ----------------------------
-    elements.noNotification?.addEventListener('change', () => toggleWrapper(elements.alertOptions, elements.noNotification));
-    elements.newArticle?.addEventListener('change', () => toggleWrapper(elements.newArticlePollWrapper, elements.newArticle, [elements.newArticlePoll]));
-    elements.updatedArticle?.addEventListener('change', () => toggleWrapper(elements.updatedArticlePollWrapper, elements.updatedArticle, [elements.updatedArticlePoll]));
-    elements.newPollVote?.addEventListener('change', () => toggleWrapper(elements.newPollVoteOptionsWrapper, elements.newPollVote, [elements.newPollVoteIfVoted, elements.newPollVoteIfAuthor]));
-    elements.messageOnArticle?.addEventListener('change', () => {
-        toggleWrapper(elements.messageOnArticleIfAuthorWrapper, elements.messageOnArticle, [elements.messageOnArticleIfAuthor]);
-        toggleWrapper(elements.messageOnArticleIfPostWrapper, elements.messageOnArticle, [elements.messageOnArticleIfPost]);
-    });
-    elements.messageOnEvent?.addEventListener('change', () => toggleWrapper(elements.messageOnEventOptionsWrapper, elements.messageOnEvent, [
-        elements.messageOnEventIfRegistered,
-        elements.messageOnEventIfInPreferences,
-        elements.messageOnEventIfCreator
-    ]));
+    elements.noNotification?.addEventListener("change", () =>
+        setDisplay(elements.alertOptions, !elements.noNotification.checked)
+    );
 
-    elements.messageOnGroupSubscribed?.addEventListener('change', () => toggleChildrenCheckboxes(elements.messageOnGroupSubscribed, elements.groupsSubscribedChildren));
-    elements.groupsSubscribedChildren.forEach(child => child.addEventListener('change', () => updateParentCheckbox(elements.messageOnGroupSubscribed, elements.groupsSubscribedChildren)));
+    elements.newArticle?.addEventListener("change", () =>
+        toggleWrapper(elements.newArticlePollWrapper, elements.newArticle, [elements.newArticlePoll])
+    );
 
-    elements.messageOnGroupJoined?.addEventListener('change', () => toggleChildrenCheckboxes(elements.messageOnGroupJoined, elements.groupsJoinedChildren));
-    elements.groupsJoinedChildren.forEach(child => child.addEventListener('change', () => updateParentCheckbox(elements.messageOnGroupJoined, elements.groupsJoinedChildren)));
+    elements.updatedArticle?.addEventListener("change", () =>
+        toggleWrapper(elements.updatedArticlePollWrapper, elements.updatedArticle, [elements.updatedArticlePoll])
+    );
+
+    elements.newPollVote?.addEventListener("change", () =>
+        toggleWrapper(elements.newPollVoteOptionsWrapper, elements.newPollVote, [
+            elements.newPollVoteIfVoted,
+            elements.newPollVoteIfAuthor
+        ])
+    );
+
+    elements.messageOnGroupSubscribed?.addEventListener("change", () =>
+        toggleChildren(elements.messageOnGroupSubscribed, elements.groupsSubscribedChildren)
+    );
+
+    elements.groupsSubscribedChildren.forEach(c =>
+        c.addEventListener("change", () =>
+            updateParent(elements.messageOnGroupSubscribed, elements.groupsSubscribedChildren)
+        )
+    );
 });
 
 // ----------------------------
-// Utilitaires VAPID / Base64
+// Utils
 // ----------------------------
 function urlBase64ToUint8Array(base64String) {
-    const padding = '='.repeat((4 - base64String.length % 4) % 4);
-    const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
-    const rawData = window.atob(base64);
-    return Uint8Array.from(rawData, c => c.charCodeAt(0));
+    const padding = "=".repeat((4 - base64String.length % 4) % 4);
+    const base64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/");
+    return Uint8Array.from(atob(base64), c => c.charCodeAt(0));
 }
-
-// ----------------------------
-// Styles animations
-// ----------------------------
-const style = document.createElement('style');
-style.textContent = `
-@keyframes slideIn { from {transform:translateX(400px);opacity:0;} to {transform:translateX(0);opacity:1;} }
-@keyframes slideOut { from {transform:translateX(0);opacity:1;} to {transform:translateX(400px);opacity:0;} }
-`;
-document.head.appendChild(style);
