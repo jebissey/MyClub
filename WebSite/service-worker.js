@@ -13,43 +13,46 @@ self.addEventListener('activate', event => {
     event.waitUntil(self.clients.claim());
 });
 
+self.addEventListener('push', event => {
+    console.log('[SW] Push received', event.data?.text());
+});
+
+
 /* ================================
    PUSH NOTIFICATIONS
    ================================ */
 
 self.addEventListener('push', event => {
-    console.log('[SW] Push received');
+    console.log('[SW] Push received...', event.data?.text());
 
-    let data = {
+    let payload = {
         title: 'MyClub',
         body: 'Nouvelle notification',
         icon: '/apple-touch-icon.png',
         badge: '/apple-touch-icon.png',
-        url: '/'
+        data: { url: '/' }
     };
 
     if (event.data) {
         try {
-            data = { ...data, ...event.data.json() };
+            payload = { ...payload, ...event.data.json() };
         } catch (e) {
-            console.warn('[SW] Push data is not JSON');
-            data.body = event.data.text();
+            payload.body = event.data.text();
         }
     }
 
     const options = {
-        body: data.body,
-        icon: data.icon,
-        badge: data.badge,
-        data: {
-            url: data.url
-        }
+        body: payload.body,
+        icon: payload.icon,
+        badge: payload.badge,
+        data: payload.data
     };
 
     event.waitUntil(
-        self.registration.showNotification(data.title, options)
+        self.registration.showNotification(payload.title, options)
     );
 });
+
 
 /* ================================
    CLICK SUR NOTIFICATION

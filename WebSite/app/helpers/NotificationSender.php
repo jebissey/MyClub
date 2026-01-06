@@ -53,10 +53,10 @@ error_log("No push subscription found for user ID: {$recipient}");
                 }
                 foreach ($subscriptionData as $sub) {
                     $subscription = Subscription::create([
-                        'endpoint' => $sub['EndPoint'],
+                        'endpoint' => $sub->EndPoint,
                         'keys' => [
-                            'auth' => $sub['Auth'],
-                            'p256dh' => $sub['P256dh'] ?? '',
+                            'auth' => $sub->Auth,
+                            'p256dh' => $sub->P256dh ?? '',
                         ],
                     ]);
                     $webPush->queueNotification(

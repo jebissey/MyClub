@@ -196,12 +196,10 @@ async function subscribe() {
     if (permission !== "granted") return false;
 
     const reg = await navigator.serviceWorker.register("/service-worker.js");
-
     const sub = await reg.pushManager.subscribe({
         userVisibleOnly: true,
         applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
     });
-
     const json = sub.toJSON();
     await api.post("/api/push-subscription", {
         endpoint: json.endpoint,
@@ -210,7 +208,6 @@ async function subscribe() {
     });
     return true;
 }
-
 
 async function unsubscribe() {
     const reg = await navigator.serviceWorker.ready;
