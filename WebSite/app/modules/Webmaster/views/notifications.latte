@@ -1,17 +1,53 @@
 {extends 'webmaster.latte'}
 
 {block content}
-<div class="container mt-4">
+<div class="container mt-2">
     <h2>Gestion des notifications push</h2>
     <div class="alert alert-info mt-3">
         {$message}
     </div>
 
-    <div class="card mt-3">
+    <div class="card mt-2">
         <div class="card-body">
             <h5 class="card-title">Clé publique :</h5>
             <pre>{$publicKey}</pre>
+        </div>  
+    </div>
+    
+    <div class="card mt-3">
+        <div class="card-body">
+            <h5 class="card-title">Vérification des extensions PHP</h5>
+
+            <ul class="list-group">
+                <li class="list-group-item d-flex justify-content-between">
+                    <span>php-gmp</span>
+                    {if $phpExtensions['gmp']}
+                        <span class="badge bg-success">OK</span>
+                    {else}
+                        <span class="badge bg-danger">MANQUANT</span>
+                    {/if}
+                </li>
+
+                <li class="list-group-item d-flex justify-content-between">
+                    <span>php-mbstring</span>
+                    {if $phpExtensions['mbstring']}
+                        <span class="badge bg-success">OK</span>
+                    {else}
+                        <span class="badge bg-danger">MANQUANT</span>
+                    {/if}
+                </li>
+            </ul>
         </div>
     </div>
+
+    <a href="?test=1" class="btn btn-primary mt-2">
+        🔔 Envoyer une notification de test
+    </a>  
+    {if $notification != ''}
+    <div class="alert alert-success alert-dismissible fade show mt-2" role="alert">
+        {$notification}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    {/if}
 </div>
 {/block}

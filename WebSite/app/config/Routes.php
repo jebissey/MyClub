@@ -129,6 +129,7 @@ class Routes
         $logDataHelper = new LogDataHelper($application);
         $messageDataHelper = new MessageDataHelper($application);
         $needDataHelper = new NeedDataHelper($application);
+        $notificationSender = new NotificationSender($dataHelper);
         $participantDataHelper = new ParticipantDataHelper($application);
         $personPreferences = new PersonPreferences($application);
         $personDataHelper = new PersonDataHelper($application, $personPreferences, $emailService);
@@ -162,6 +163,7 @@ class Routes
             $messageDataHelper,
             $needDataHelper,
             new News($newsProviders),
+            $notificationSender,
             $participantDataHelper,
             $personDataHelper,
             new PersonGroupDataHelper($application),
@@ -191,7 +193,7 @@ class Routes
             new MessageRecipientService($dataHelper),
             $needDataHelper,
             new NeedTypeDataHelper($application),
-            new NotificationSender($dataHelper),
+            $notificationSender,
             new PageDataHelper($application, $authorizationDataHelper),
             $participantDataHelper,
             $personDataHelper,

@@ -8,6 +8,7 @@ use \Minishlink\WebPush\VAPID;
 
 use app\enums\FilterInputRule;
 use app\helpers\Application;
+use app\helpers\NotificationSender;
 use app\helpers\WebApp;
 use app\models\ArticleDataHelper;
 use app\models\LogDataHelper;
@@ -18,7 +19,8 @@ class WebmasterController extends AbstractController
     public function __construct(
         Application $application,
         private LogDataHelper $logDataHelper,
-        private ArticleDataHelper $articleDataHelper
+        private ArticleDataHelper $articleDataHelper,
+        private NotificationSender $notificationSender
     ) {
         parent::__construct($application);
     }
@@ -101,6 +103,7 @@ class WebmasterController extends AbstractController
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isAdministrator())) {
             $metadata = $this->dataHelper->get('Metadata', ['Id' => 1], 'VapidPublicKey, VapidPrivateKey ');
             $message = '';
+            $notification = '';
             $publicKey = null;
             if (empty($metadata->VapidPublicKey) || empty($metadata->VapidPrivateKey)) {
                 $newKeys = VAPID::createVapidKeys();
@@ -114,10 +117,27 @@ class WebmasterController extends AbstractController
                 $message = "ℹ️ Les clés VAPID existent déjà dans la base de données.";
                 $publicKey = $metadata->VapidPublicKey;
             }
+            if (isset($_GET['test'])) {
+                $this->notificationSender->sendToRecipients(
+                    [1],
+                    [
+                        'title' => 'Notification de test',
+                        'body'  => 'Ceci est une notification push de test.',
+                        'url'   => '/'
+                    ]
+                );
+                $notification = "🚀 Notification de test envoyée à l’utilisateur #1.";
+            }
+            $phpExtensions = [
+                'gmp'      => extension_loaded('gmp'),
+                'mbstring' => extension_loaded('mbstring'),
+            ];
 
             $this->render('Webmaster/views/notifications.latte', [
                 'message' => $message,
+                'notification' => $notification,
                 'publicKey' => $publicKey,
+                'phpExtensions' => $phpExtensions,
                 'navItems' => $this->getNavItems($this->application->getConnectedUser()->person),
                 'isMyclubWebSite' => WebApp::isMyClubWebSite(),
                 'page' => $this->application->getConnectedUser()->getPage(),

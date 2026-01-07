@@ -8,6 +8,7 @@ use app\helpers\Application;
 use app\helpers\Backup;
 use app\helpers\ErrorManager;
 use app\helpers\News;
+use app\helpers\NotificationSender;
 use app\helpers\WebApp;
 use app\models\ArticleCrosstabDataHelper;
 use app\models\ArticleDataHelper;
@@ -103,6 +104,7 @@ class ControllerFactory
         private MessageDataHelper $messageDataHelper,
         private NeedDataHelper $needDataHelper,
         private News $news,
+        private NotificationSender $notificationSender,
         private ParticipantDataHelper $participantDataHelper,
         private PersonDataHelper $personDataHelper,
         private PersonGroupDataHelper $personGroupDataHelper,
@@ -446,7 +448,8 @@ class ControllerFactory
         return new WebmasterController(
             $this->application,
             $this->logDataHelper,
-            $this->articleDataHelper
+            $this->articleDataHelper,
+            $this->notificationSender
         );
     }
 }
