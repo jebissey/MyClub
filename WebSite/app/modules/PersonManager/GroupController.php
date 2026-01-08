@@ -220,5 +220,4 @@ class GroupController extends AbstractController
             'page' => $this->application->getConnectedUser()->getPage(),
         ]));
     }
-
 }

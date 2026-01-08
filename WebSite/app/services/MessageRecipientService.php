@@ -38,6 +38,9 @@ class MessageRecipientService
                 $person->Notifications ?? '{}',
                 true
             );
+            if ($preferences === []) {
+                continue;
+            }
             foreach ($this->resolvers as $resolver) {
                 if (
                     $resolver->supports($context)

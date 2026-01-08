@@ -14,27 +14,14 @@ class GroupRecipientResolver implements RecipientResolverInterface
         return $context->isGroup();
     }
 
-    public function shouldNotify(
-        MessageContext $context,
-        int $personId,
-        array $prefs
-    ): bool {
+    public function shouldNotify(MessageContext $context, int $personId, array $prefs): bool
+    {
         $groupId = $context->groupId;
-
-        $subscribed = $prefs['groupsSubscribed'][$groupId] ?? null;
-        $joined = $prefs['groupsJoined'][$groupId] ?? null;
-
-        return (
-                ($prefs['messageOnGroupSubscribed'] ?? null) === 'on'
-                && $subscribed === 'on'
-            )
-            || (
-                ($prefs['messageOnGroupJoined'] ?? null) === 'on'
-                && $joined === 'on'
-            )
-            || (
-                ($prefs['messageOnGroupNotJoined'] ?? null) === 'on'
-                && !$subscribed && !$joined
-            );
+        $isSubscribed = isset($prefs['groupsSubscribed'][$groupId]);
+        $isJoined     = isset($prefs['groupsJoined'][$groupId]);
+        if ($isSubscribed || $isJoined) {
+            return true;
+        }
+        return ($prefs['messageOnGroupNotJoined'] ?? null) === 'on';
     }
 }
