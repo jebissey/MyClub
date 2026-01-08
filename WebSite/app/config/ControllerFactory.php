@@ -400,7 +400,8 @@ class ControllerFactory
     {
         return new UserNotificationsController(
             $this->application,
-            $this->groupDataHelper
+            $this->groupDataHelper,
+            $this->notificationSender
         );
     }
 
