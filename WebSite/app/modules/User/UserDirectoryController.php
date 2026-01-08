@@ -43,8 +43,8 @@ class UserDirectoryController extends AbstractController
                 'Inactivated' => 0
             ], 'Id, LastName, FirstName, NickName, UseGravatar, Avatar, Email, InPresentationDirectory', 'FirstName, LastName');
             $gravatarHandler = new GravatarHandler();
-            foreach ($persons as $person) {
-                $person->UserImg = WebApp::getUserImg($person, $gravatarHandler);
+            foreach ($persons as $person_) {
+                $person_->UserImg = WebApp::getUserImg($person_, $gravatarHandler);
             }
         }
         $groupCounts = $this->groupDataHelper->getGroupCount();
