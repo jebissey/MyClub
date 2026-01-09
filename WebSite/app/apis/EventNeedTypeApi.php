@@ -62,7 +62,7 @@ class EventNeedTypeApi extends AbstractApi
             return;
         }
         try {
-            $this->renderJson(['Id' => $this->needTypeDataHelper->insertOrUpdate($data['id'], $name)], true,  ApplicationError::Ok->value);
+            $this->renderJson(['Id' => $this->needTypeDataHelper->insertOrUpdate((int)$data['id'], $name)], true,  ApplicationError::Ok->value);
         } catch (Throwable $e) {
             $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
         }

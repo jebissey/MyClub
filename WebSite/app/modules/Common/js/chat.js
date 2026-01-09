@@ -1,3 +1,8 @@
+import { getCurrentPushEndpoint } from "../../User/js/push-subscription.js";
+import ApiClient from "../../Common/js/apiClient.js";
+
+const api = new ApiClient("");
+
 document.addEventListener('DOMContentLoaded', function () {
     const chatContainer = document.getElementById('chat-container');
     const newMessageForm = document.getElementById('new-message-form');
@@ -18,32 +23,24 @@ document.addEventListener('DOMContentLoaded', function () {
 
     scrollToBottom();
 
-    newMessageForm.addEventListener('submit', function (e) {
+    newMessageForm.addEventListener('submit', async function (e) {
         e.preventDefault();
         if (!messageText.value.trim()) {
             return;
         }
-        fetch('/api/message/add', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                articleId: articleId,
-                eventId: eventId,
-                groupId: groupId,
-                text: messageText.value
-            })
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) location.reload();
-                else alert('Erreur: ' + data.message);
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Une erreur est survenue lors de l\'envoi du message');
-            });
+        const senderEndpoint = await getCurrentPushEndpoint();
+        const data = await api.post("/api/message/add", {
+            articleId: articleId,
+            eventId: eventId,
+            groupId: groupId,
+            text: messageText.value,
+            senderEndpoint: senderEndpoint
+        });
+        if (data.success) {
+            location.reload();
+        } else {
+            alert('Erreur: ' + (data.message || 'Impossible d\'envoyer le message'));
+        }
     });
 
     document.querySelectorAll('.edit-message').forEach(button => {

@@ -3,7 +3,8 @@ import { notify } from "../../Common/js/toast.js";
 import {
     isSubscribed,
     subscribePush,
-    unsubscribePush
+    unsubscribePush,
+    getCurrentPushEndpoint
 } from "./push-subscription.js";
 
 document.addEventListener("DOMContentLoaded", async () => {

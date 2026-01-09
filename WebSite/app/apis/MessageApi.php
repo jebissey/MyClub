@@ -205,14 +205,9 @@ class MessageApi extends AbstractApi
             $id = $groupId;
         }
         $notificationData = [
-            'title' => 'notificationTitle',
-            'body' => 'notificationBody',
-            'icon' => '/path/to/icon.png',
-            'badge' => '/path/to/badge.png',
             'data' => [
                 'url' => "/{$from}/chat/{$id}",
-                'messageId' => $messageId,
-                'type' => 'messageType'
+                'messageId' => $messageId
             ]
         ];
         $this->notificationSender->sendToRecipients($personIds, $notificationData);

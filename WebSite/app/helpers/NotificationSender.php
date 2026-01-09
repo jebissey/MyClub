@@ -8,9 +8,11 @@ use Minishlink\WebPush\WebPush;
 use Minishlink\WebPush\Subscription;
 use Throwable;
 
+use app\models\DataHelper;
+
 class NotificationSender
 {
-    private $dataHelper;
+    private DataHelper $dataHelper;
     private $vapidPublicKey;
     private $vapidPrivateKey;
 
@@ -27,12 +29,11 @@ class NotificationSender
         $this->vapidPrivateKey = $metadata->VapidPrivateKey ?? null;
     }
 
-    public function sendToRecipients(array $recipients, array $notificationData): void
+    public function sendToRecipients(array $recipients, array $notificationData, ?string $excludeEndpoint = null): void
     {
 error_log("\n\n" . json_encode($recipients, JSON_PRETTY_PRINT) . "\n");
 error_log("\n\n" . json_encode($notificationData, JSON_PRETTY_PRINT) . "\n");
         if (!$this->vapidPublicKey || !$this->vapidPrivateKey) {
-error_log('VAPID keys not configured');
             return;
         }
         $auth = [
@@ -43,12 +44,14 @@ error_log('VAPID keys not configured');
             ]
         ];
         $webPush = new WebPush($auth);
-
         foreach ($recipients as $recipient) {
             try {
-                $subscriptionData = $this->dataHelper->gets('PushSubscription', ['IdPerson' => $recipient]);
+                $conditions = ['IdPerson' => $recipient];
+                if ($excludeEndpoint !== null) {
+                    $conditions['EndPoint !='] = $excludeEndpoint;
+                }
+                $subscriptionData = $this->dataHelper->gets('PushSubscription', $conditions);
                 if (empty($subscriptionData)) {
-error_log("No push subscription found for user ID: {$recipient}");
                     continue;
                 }
                 foreach ($subscriptionData as $sub) {
@@ -59,10 +62,7 @@ error_log("No push subscription found for user ID: {$recipient}");
                             'p256dh' => $sub->P256dh ?? '',
                         ],
                     ]);
-                    $webPush->queueNotification(
-                        $subscription,
-                        json_encode($notificationData)
-                    );
+                    $webPush->queueNotification($subscription, json_encode($notificationData));
                 }
             } catch (Throwable $e) {
 error_log("Error creating subscription: " . $e->getMessage());

@@ -45,10 +45,17 @@ export async function unsubscribePush() {
     if (!sub) return;
 
     await sub.unsubscribe();
-    await api.post("/api/push-subscription/delete", {
-        endpoint: sub.endpoint
-    });
+    await api.post("/api/push-subscription/delete", { endpoint: sub.endpoint });
 }
+
+export async function getCurrentPushEndpoint() {
+    if (!hasPushSupport()) return null;
+
+    const reg = await navigator.serviceWorker.ready;
+    const sub = await reg.pushManager.getSubscription();
+    return sub?.endpoint ?? null;
+}
+
 
 function urlBase64ToUint8Array(base64String) {
     const padding = "=".repeat((4 - base64String.length % 4) % 4);
