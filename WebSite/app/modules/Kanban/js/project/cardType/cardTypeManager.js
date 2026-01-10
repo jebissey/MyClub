@@ -1,4 +1,4 @@
-import ApiClient from "../../../../Common/js/apiClient.js";
+import ApiClient from "../../../../Common/js/ApiClient.js";
 const apiClient = new ApiClient();
 
 export default class CardTypeManager {

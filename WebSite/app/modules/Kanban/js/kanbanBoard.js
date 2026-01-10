@@ -1,5 +1,5 @@
-import ApiClient from "../../Common/js/apiClient.js";
-import DragDropManager from "../../Common/js/dragDropManager.js";
+import ApiClient from "../../Common/js/ApiClient.js";
+import DragDropManager from "../../Common/js/DragDropManager.js";
 import CardManager from "./project/cardType//card/cardManager.js";
 
 const apiClient = new ApiClient();

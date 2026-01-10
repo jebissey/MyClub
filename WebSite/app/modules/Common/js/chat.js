@@ -1,5 +1,5 @@
 import { getCurrentPushEndpoint } from "../../User/js/push-subscription.js";
-import ApiClient from "../../Common/js/apiClient.js";
+import ApiClient from "./ApiClient.js";
 
 const api = new ApiClient("");
 
