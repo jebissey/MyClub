@@ -102,7 +102,7 @@ class EventTypeController extends TableController
             $this->eventDataHelper->update(
                 $id,
                 $input['name'] ?? '???',
-                $input['idGroup'] === '' ? null : (int)$input['idGroup'],
+                $input['idGroup'] === null ? null : (int)$input['idGroup'],
                 $input['attributes'] ?? []
             );
             $this->redirect('/EventTypes');

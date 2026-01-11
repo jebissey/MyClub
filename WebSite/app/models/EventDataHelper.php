@@ -663,7 +663,6 @@ class EventDataHelper extends Data implements NewsProviderInterface
         $stmt->execute($params);
         $rows = $stmt->fetchAll();
         $events = $this->events($rows);
-
         if ($filterByPreferences && $person) {
             return $this->personPreferences->filterEventsByPreferences($events, $person);
         }

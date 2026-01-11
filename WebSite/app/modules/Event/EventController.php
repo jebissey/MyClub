@@ -44,7 +44,7 @@ class EventController extends AbstractController
         $input = WebApp::filterInput($schema, $this->flight->request()->query->getData());
         $offset = $input['offset'] ?? 0;
         $mode = $input['mode'] ?? EventSearchMode::Next->value;
-        $filterByPreferences = $input['filterByPreferences'] ?? 0 === 1;
+        $filterByPreferences = (($input['filterByPreferences'] ?? null) === '1');
         $connectedUser = $this->application->getConnectedUser();
 
         $this->render('Event/views/nextEvents.latte', $this->getAllParams([
