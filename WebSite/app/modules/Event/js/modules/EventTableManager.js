@@ -3,10 +3,16 @@ import EventFormManager from './EventFormManager.js';
 export default class EventTableManager {
     constructor(apiClient) {
         this.api = apiClient;
+        this.eventForm = new EventFormManager(this.api);
         this._init();
     }
 
     _init() {
+        document.getElementById('createEventBtn')
+            ?.addEventListener('click', () => {
+                this.eventForm.openCreateModal();
+            });
+            
         const setupEditButtons = () => {
             document.querySelectorAll('.edit-btn').forEach(button => {
                 button.addEventListener('click', e => this.handleEdit(e));

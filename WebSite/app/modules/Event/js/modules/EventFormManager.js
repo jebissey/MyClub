@@ -26,8 +26,12 @@ export default class EventFormManager {
         document.getElementById('submitEventBtn').textContent = 'Créer';
         this.formMode.value = 'create';
 
-        this.attributeManager.handleEventTypeChange();
+        const eventTypeId = document.getElementById('eventTypeInput')?.value;
+        if (eventTypeId) {
+            this.attributeManager._loadAttributesByEventType(eventTypeId);
+        }
 
+        this.attributeManager.reset();
         this.needManager.reset();
 
         document.getElementById('maxParticipantsInput').value = 0;
@@ -35,6 +39,7 @@ export default class EventFormManager {
 
         new bootstrap.Modal(this.modal).show();
     }
+
 
     async openUpdateModal(event, attributes) {
         document.getElementById('eventModalLabel').textContent = 'Mettre à jour l\'événement';
