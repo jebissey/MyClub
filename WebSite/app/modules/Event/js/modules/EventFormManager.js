@@ -4,33 +4,18 @@ import NeedManager from "./NeedManager.js";
 export default class EventFormManager {
     constructor(apiClient) {
         this.api = apiClient;
-        this.modal = null;
-        this.form = null;
-        this.attributeManager = null;
-        this.needManager = null;
-        this.formMode = null;
-        this.eventId = null;
-    }
-
-    init() {
         this.modal = document.getElementById('eventModal');
         this.form = document.getElementById('eventForm');
-        this.formMode = document.getElementById('formMode');
-        this.eventId = document.getElementById('eventId');
-
-        if (!this.modal || !this.form) return;
-
         this.attributeManager = new AttributeManager(this.api);
         this.needManager = new NeedManager(this.api);
-
-        this.attributeManager.init();
-        this.needManager.init();
+        this.formMode = document.getElementById('formMode');
+        this.eventId = document.getElementById('eventId');
         this.setupEventListeners();
     }
 
     setupEventListeners() {
         this.form.addEventListener('submit', (e) => this.handleSubmit(e));
-        
+
         document.querySelector('[data-bs-target="#eventModal"]')?.addEventListener('click', () => {
             this.openCreateModal();
         });
@@ -81,7 +66,26 @@ export default class EventFormManager {
     async handleSubmit(e) {
         e.preventDefault();
 
-        const formData = this.buildFormData();
+        const buildFormData = () => {
+            const dateValue = document.getElementById('dateInput').value;
+            const timeValue = document.getElementById('startTimeInput').value;
+            return {
+                id: this.eventId.value,
+                formMode: this.formMode.value,
+                summary: document.getElementById('summaryInput').value,
+                description: document.getElementById('descriptionInput').value,
+                location: document.getElementById('locationInput').value,
+                idEventType: document.getElementById('eventTypeInput').value,
+                attributes: this.attributeManager.getSelectedIds(),
+                maxParticipants: parseInt(document.getElementById('maxParticipantsInput').value),
+                audience: document.getElementById('audienceInput').value,
+                needs: this.needManager.getSelectedNeeds(),
+                startTime: `${dateValue}T${timeValue}:00`,
+                duration: parseInt(document.getElementById('durationInput').value * 3600)
+            };
+        };
+
+        const formData = buildFormData();
         const result = await this.api.post('/api/event/save', formData);
 
         if (result.success) {
@@ -90,25 +94,5 @@ export default class EventFormManager {
         } else {
             alert('Erreur: ' + (result.message || 'Erreur inconnue'));
         }
-    }
-
-    buildFormData() {
-        const dateValue = document.getElementById('dateInput').value;
-        const timeValue = document.getElementById('startTimeInput').value;
-
-        return {
-            id: this.eventId.value,
-            formMode: this.formMode.value,
-            summary: document.getElementById('summaryInput').value,
-            description: document.getElementById('descriptionInput').value,
-            location: document.getElementById('locationInput').value,
-            idEventType: document.getElementById('eventTypeInput').value,
-            attributes: this.attributeManager.getSelectedIds(),
-            maxParticipants: parseInt(document.getElementById('maxParticipantsInput').value),
-            audience: document.getElementById('audienceInput').value,
-            needs: this.needManager.getSelectedNeeds(),
-            startTime: `${dateValue}T${timeValue}:00`,
-            duration: parseInt(document.getElementById('durationInput').value * 3600)
-        };
     }
 }

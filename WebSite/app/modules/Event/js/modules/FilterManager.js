@@ -1,5 +1,5 @@
 export default class FilterManager {
-    init() {
+    constructor() {
         const checkbox = document.getElementById('filterByPreferences');
         if (checkbox) {
             checkbox.addEventListener('change', () => this.togglePreferencesFilter());

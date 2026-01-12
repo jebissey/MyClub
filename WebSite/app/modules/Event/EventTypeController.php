@@ -9,7 +9,7 @@ use app\enums\FilterInputRule;
 use app\helpers\Application;
 use app\helpers\ErrorManager;
 use app\helpers\WebApp;
-use app\models\EventDataHelper;
+use app\models\EventTypeDataHelper;
 use app\models\TableControllerDataHelper;
 use app\modules\Common\TableController;
 
@@ -17,7 +17,7 @@ class EventTypeController extends TableController
 {
     public function __construct(
         Application $application,
-        private EventDataHelper $eventDataHelper,
+        private EventTypeDataHelper $eventTypeDataHelper,
         private TableControllerDataHelper $tableControllerDataHelper,
         private ErrorManager $errorManager,
     ) {
@@ -99,7 +99,7 @@ class EventTypeController extends TableController
                 'attributes' => FilterInputRule::ArrayInt->value
             ];
             $input = WebApp::filterInput($schema, $this->flight->request()->data->getData());
-            $this->eventDataHelper->update(
+            $this->eventTypeDataHelper->update(
                 $id,
                 $input['name'] ?? '???',
                 $input['idGroup'] === null ? null : (int)$input['idGroup'],

@@ -1,7 +1,10 @@
 <?php
+
 declare(strict_types=1);
 
 namespace app\models;
+
+use Throwable;
 
 use app\helpers\Application;
 
@@ -30,5 +33,28 @@ class EventTypeDataHelper extends Data
         ");
         $query->execute([$personId]);
         return $query->fetchAll();
+    }
+
+    public function update(int $id, string $name, ?int $idGroup, array $attributes): void
+    {
+        $this->pdo->beginTransaction();
+        try {
+            $query = $this->pdo->prepare('UPDATE EventType SET Name = ?, IdGroup = ? WHERE Id = ?');
+            $query->execute([$name, $idGroup, $id]);
+
+            $deleteQuery = $this->pdo->prepare('DELETE FROM EventTypeAttribute WHERE IdEventType = ?');
+            $deleteQuery->execute([$id]);
+
+            if ($attributes) {
+                $insertQuery = $this->pdo->prepare('INSERT INTO EventTypeAttribute (IdEventType, IdAttribute) VALUES (?, ?)');
+                foreach ($attributes as $attributeId) {
+                    $insertQuery->execute([$id, $attributeId]);
+                }
+            }
+            $this->pdo->commit();
+        } catch (Throwable $e) {
+            $this->pdo->rollBack();
+            throw $e;
+        }
     }
 }

@@ -199,7 +199,7 @@ class ControllerFactory
     {
         return new EventTypeController(
             $this->application,
-            $this->eventDataHelper,
+            $this->eventTypeDataHelper,
             $this->tableControllerDataHelper,
             $this->errorManager,
         );

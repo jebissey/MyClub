@@ -49,9 +49,7 @@
     {if $person != false && $mode == 'next'}
     <div class="preferences-filter">
         <div class="form-check">
-            <input class="form-check-input" type="checkbox" id="filterByPreferences" 
-                   {if $filterByPreferences}checked{/if} 
-                   onchange="togglePreferencesFilter()">
+            <input class="form-check-input" type="checkbox" id="filterByPreferences" {if $filterByPreferences}checked{/if} />
             <label class="form-check-label" for="filterByPreferences">
                 <i class="bi bi-funnel"></i> Uniquement les événements qui correspondent à mes préférences
             </label>

@@ -89,6 +89,40 @@ class EventDataHelper extends Data implements NewsProviderInterface
         }
     }
 
+    public function eventExists(int $eventId): bool
+    {
+        $sql = "SELECT Id FROM Event WHERE Id = :eventId";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([':eventId' => $eventId]);
+        return $stmt->fetch() !== false;
+    }
+
+    public function getAttributesForNextWeekEvents(): array
+    {
+        [$startOfCurrentWeek, $endOfThirdWeek] = $this->getDatesOfThreeWeeks();
+        $sql = "
+            SELECT DISTINCT
+                a.Id,
+                a.Name,
+                a.Detail,
+                a.Color
+            FROM Event e
+            INNER JOIN EventType et ON e.IdEventType = et.Id
+            LEFT JOIN EventAttribute ea ON e.Id = ea.IdEvent
+            LEFT JOIN Attribute a ON ea.IdAttribute = a.Id
+            WHERE datetime(e.StartTime) >= :startOfWeek
+            AND datetime(e.StartTime) < :endOfWeek
+            AND a.Id IS NOT NULL
+            ORDER BY e.StartTime, a.Id;
+        ";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([
+            ':startOfWeek' => $startOfCurrentWeek->format('Y-m-d H:i:s'),
+            ':endOfWeek'   => $endOfThirdWeek->format('Y-m-d H:i:s'),
+        ]);
+        return $stmt->fetchAll();
+    }
+
     public function getEventsForDay(string $date, string $userEmail): array
     {
         $query = $this->pdo->prepare("
@@ -146,6 +180,26 @@ class EventDataHelper extends Data implements NewsProviderInterface
         throw new QueryException("Event ({$eventId}) doesn't exist");
     }
 
+    public function getEventExternal(int $eventId): object
+    {
+        $sql = "
+            SELECT *
+            FROM Event
+            WHERE Id = :eventId
+            AND (Audience = 'All' OR Audience = 'Guest')
+            AND StartTime > :today
+            LIMIT 1
+        ";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([
+            ':eventId' => $eventId,
+            ':today'   => (new DateTime())->format('Y-m-d'),
+        ]);
+        $result = $stmt->fetch();
+        if ($result === false) throw new QueryException("Event ({$eventId}) doesn't exist");
+        return $result;
+    }
+
     public function getEventsForAllOrGuest(): array
     {
         $sql = "
@@ -187,24 +241,35 @@ class EventDataHelper extends Data implements NewsProviderInterface
         throw new QueryException("Event ({$eventId}) doesn't exist");
     }
 
-    public function getEventExternal(int $eventId): object
+    public function getEventNeeds($eventId): array
     {
         $sql = "
-            SELECT *
-            FROM Event
-            WHERE Id = :eventId
-            AND (Audience = 'All' OR Audience = 'Guest')
-            AND StartTime > :today
-            LIMIT 1
+            SELECT 
+                n.Id,
+                n.Label,
+                n.Name,
+                n.ParticipantDependent,
+                en.Counter,
+                CASE 
+                    WHEN n.ParticipantDependent = 1 THEN 
+                        (SELECT COUNT(*) FROM Participant WHERE IdEvent = ?)
+                    ELSE 
+                        COALESCE(en.Counter, 0)
+                END as RequiredQuantity,
+                COALESCE(SUM(ps.Supply), 0) as ProvidedQuantity
+            FROM Need n
+            INNER JOIN EventNeed en ON n.Id = en.IdNeed
+            LEFT JOIN ParticipantSupply ps ON n.Id = ps.IdNeed 
+                AND ps.IdParticipant IN (
+                    SELECT Id FROM Participant WHERE IdEvent = ?
+                )
+            WHERE en.IdEvent = ?
+            GROUP BY n.Id, n.Label, n.Name, n.ParticipantDependent, en.Counter
+            ORDER BY n.IdNeedType, n.Name
         ";
         $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([
-            ':eventId' => $eventId,
-            ':today'   => (new DateTime())->format('Y-m-d'),
-        ]);
-        $result = $stmt->fetch();
-        if ($result === false) throw new QueryException("Event ({$eventId}) doesn't exist");
-        return $result;
+        $stmt->execute([$eventId, $eventId, $eventId]);
+        return $stmt->fetchAll();
     }
 
     public function getEvents(?object $person, string $mode, int $offset, bool $filterByPreferences = false): array
@@ -330,63 +395,6 @@ class EventDataHelper extends Data implements NewsProviderInterface
         return $weeklyEvents;
     }
 
-    public function getAttributesForNextWeekEvents(): array
-    {
-        [$startOfCurrentWeek, $endOfThirdWeek] = $this->getDatesOfThreeWeeks();
-        $sql = "
-            SELECT DISTINCT
-                a.Id,
-                a.Name,
-                a.Detail,
-                a.Color
-            FROM Event e
-            INNER JOIN EventType et ON e.IdEventType = et.Id
-            LEFT JOIN EventAttribute ea ON e.Id = ea.IdEvent
-            LEFT JOIN Attribute a ON ea.IdAttribute = a.Id
-            WHERE datetime(e.StartTime) >= :startOfWeek
-            AND datetime(e.StartTime) < :endOfWeek
-            AND a.Id IS NOT NULL
-            ORDER BY e.StartTime, a.Id;
-        ";
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([
-            ':startOfWeek' => $startOfCurrentWeek->format('Y-m-d H:i:s'),
-            ':endOfWeek'   => $endOfThirdWeek->format('Y-m-d H:i:s'),
-        ]);
-        return $stmt->fetchAll();
-    }
-
-    public function getEventNeeds($eventId): array
-    {
-        $sql = "
-            SELECT 
-                n.Id,
-                n.Label,
-                n.Name,
-                n.ParticipantDependent,
-                en.Counter,
-                CASE 
-                    WHEN n.ParticipantDependent = 1 THEN 
-                        (SELECT COUNT(*) FROM Participant WHERE IdEvent = ?)
-                    ELSE 
-                        COALESCE(en.Counter, 0)
-                END as RequiredQuantity,
-                COALESCE(SUM(ps.Supply), 0) as ProvidedQuantity
-            FROM Need n
-            INNER JOIN EventNeed en ON n.Id = en.IdNeed
-            LEFT JOIN ParticipantSupply ps ON n.Id = ps.IdNeed 
-                AND ps.IdParticipant IN (
-                    SELECT Id FROM Participant WHERE IdEvent = ?
-                )
-            WHERE en.IdEvent = ?
-            GROUP BY n.Id, n.Label, n.Name, n.ParticipantDependent, en.Counter
-            ORDER BY n.IdNeedType, n.Name
-        ";
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([$eventId, $eventId, $eventId]);
-        return $stmt->fetchAll();
-    }
-
     public function getNews(ConnectedUser $connectedUser, string $searchFrom): array
     {
         $news = [];
@@ -481,22 +489,33 @@ class EventDataHelper extends Data implements NewsProviderInterface
         throw new QueryException("Event ({$eventId}) doesn't exist");
     }
 
-    public function update(int $id, string $name, ?int $idGroup, array $attributes): void
+    public function update(array $data, int $personId): void
     {
+        $values = [
+            'Summary'         => $data['summary'] ?? '',
+            'Description'     => $data['description'] ?? '',
+            'Location'        => $data['location'] ?? '',
+            'StartTime'       => $data['startTime'] ?? date('Y-m-d H:i:s'),
+            'Duration'        => $data['duration'] ?? 1,
+            'IdEventType'     => $data['idEventType'] ?? 0,
+            'CreatedBy'       => $personId,
+            'MaxParticipants' => $data['maxParticipants'] ?? 0,
+            'Audience'        => $data['audience'] ?? EventAudience::ForClubMembersOnly->value,
+            'LastUpdate'      => date('Y-m-d H:i:s'),
+        ];
         $this->pdo->beginTransaction();
         try {
-            $query = $this->pdo->prepare('UPDATE EventType SET Name = ?, IdGroup = ? WHERE Id = ?');
-            $query->execute([$name, $idGroup, $id]);
-
-            $deleteQuery = $this->pdo->prepare('DELETE FROM EventTypeAttribute WHERE IdEventType = ?');
-            $deleteQuery->execute([$id]);
-
-            if ($attributes) {
-                $insertQuery = $this->pdo->prepare('INSERT INTO EventTypeAttribute (IdEventType, IdAttribute) VALUES (?, ?)');
-                foreach ($attributes as $attributeId) {
-                    $insertQuery->execute([$id, $attributeId]);
-                }
-            }
+            if ($data['formMode'] == 'create') {
+                $eventId = $this->set('Event', $values);
+            } elseif ($data['formMode'] == 'update') {
+                $eventId = (int)$data['id'];
+                if (!$this->get('Event', ['Id' => $eventId], 'Id')) throw new QueryException("Event {$eventId} doesn't exist");
+                $this->set('Event', $values, ['Id' => $data['id']]);
+                $this->delete('EventAttribute', ['IdEvent' => $eventId]);
+                $this->delete('EventNeed', ['IdEvent' => $eventId]);
+            } else Application::unreachable($data['formMode'], __FILE__, __LINE__);
+            $this->insertEventAttributes($eventId, $data['attributes'] ?? []);
+            $this->insertEventNeeds($eventId, $data['needs'] ?? []);
             $this->pdo->commit();
         } catch (Throwable $e) {
             $this->pdo->rollBack();
@@ -544,14 +563,6 @@ class EventDataHelper extends Data implements NewsProviderInterface
         } catch (Throwable $e) {
             throw $e;
         }
-    }
-
-    public function eventExists(int $eventId): bool
-    {
-        $sql = "SELECT Id FROM Event WHERE Id = :eventId";
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([':eventId' => $eventId]);
-        return $stmt->fetch() !== false;
     }
 
     #region Private functions
@@ -713,5 +724,30 @@ class EventDataHelper extends Data implements NewsProviderInterface
         $endOfThirdWeek->add(new DateInterval('P20D'));
         $endOfThirdWeek->setTime(23, 59, 59);
         return [$startOfCurrentWeek, $endOfThirdWeek];
+    }
+
+    private function insertEventAttributes(int $eventId, array $attributes): void
+    {
+        if (!empty($attributes)) {
+            foreach ($attributes as $attributeId) {
+                $this->set('EventAttribute', [
+                    'IdEvent'     => $eventId,
+                    'IdAttribute' => $attributeId
+                ]);
+            }
+        }
+    }
+
+    private function insertEventNeeds(int $eventId, array $needs): void
+    {
+        if (!empty($needs)) {
+            foreach ($needs as $need) {
+                $this->set('EventNeed', [
+                    'IdEvent' => $eventId,
+                    'IdNeed'  => $need['id'],
+                    'Counter' => $need['counter'],
+                ]);
+            }
+        }
     }
 }
