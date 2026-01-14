@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace app\apis;
@@ -24,7 +25,7 @@ class EventNeedTypeApi extends AbstractApi
         DataHelper $dataHelper,
         PersonDataHelper $personDataHelper
     ) {
-        parent::__construct($application, $connectedUser,$dataHelper, $personDataHelper);
+        parent::__construct($application, $connectedUser, $dataHelper, $personDataHelper);
     }
 
     public function deleteNeedType(int $id): void
@@ -71,7 +72,8 @@ class EventNeedTypeApi extends AbstractApi
     public function getNeedsByNeedType(int $id): void
     {
         try {
-            $this->renderJsonOk([$this->needDataHelper->needsforNeedType($id)]);
+            $needs = $this->needDataHelper->needsforNeedType($id);
+            $this->renderJsonOk(['needs' => $needs]);
         } catch (Throwable $e) {
             $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
         }

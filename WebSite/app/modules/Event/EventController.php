@@ -233,21 +233,6 @@ class EventController extends AbstractController
         }
     }
 
-    public function location(): void
-    {
-        if (!($this->application->getConnectedUser()->isEventManager() ?? false)) {
-            $this->raiseforbidden(__FILE__, __LINE__);
-            return;
-        }
-        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
-            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
-        $this->render('Event/views/event_location.latte', $this->getAllParams([
-            'page' => $this->application->getConnectedUser()->getPage(),
-        ]));
-    }
-
     public function help(): void
     {
         if (!($this->application->getConnectedUser()->isEventManager() ?? false)) {

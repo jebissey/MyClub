@@ -37,9 +37,9 @@ class EventSupplyApi extends AbstractApi
             $input = $this->getJsonInput();
             $this->validateSupplyData($input);
             $apiResponse = $this->updateSupply_(
-                $input['eventId'],
+                (int)$input['eventId'],
                 $this->application->getConnectedUser()->person->Email,
-                $input['needId'],
+                (int)$input['needId'],
                 intval($input['supply'])
             );
             $this->renderJson([$apiResponse->data], $apiResponse->success,  $apiResponse->responseCode);
