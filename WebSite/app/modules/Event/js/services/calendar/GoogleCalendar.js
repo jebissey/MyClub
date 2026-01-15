@@ -1,5 +1,5 @@
 import CalendarService from './CalendarService.js';
-import DateUtils from '../utils/DateUtils.js';
+import DateUtils from './DateUtils.js';
 
 export default class GoogleCalendar extends CalendarService {
 
