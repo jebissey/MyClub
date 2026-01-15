@@ -1,35 +1,73 @@
-function loadGroupUsers(groupId) {
-    let userRow = document.getElementById(`users-group-${groupId}`);
-    let userList = document.getElementById(`user-list-${groupId}`);
+import ApiClient from '../../Common/js/ApiClient.js';
 
-    if (userRow.classList.contains("d-none")) {
-        userList.innerHTML = "Chargement...";
-        fetch(`/api/personsInGroup/${groupId}`)
-            .then(response => response.json())
-            .then(data => {
-                if (data.success && data.items) {
-                    if (data.items.length === 0) {
-                        userList.innerHTML = "<p>Aucun utilisateur dans ce groupe.</p>";
-                    } else {
-                        userList.innerHTML = "<ul class='list-unstyled'>" + data.items.map(user =>
-                            `<li>${user.FirstName} ${user.LastName} (${user.Email})</li>`
-                        ).join('') + "</ul>";
-                    }
+const api = new ApiClient('/api');
+
+document.addEventListener('DOMContentLoaded', () => {
+
+    document.querySelectorAll('.btn-load-users').forEach(btn => {
+        btn.addEventListener('click', async () => {
+            const groupId = btn.dataset.groupId;
+            await loadGroupUsers(groupId);
+        });
+    });
+
+    document.querySelectorAll('.btn-confirm-delete').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const groupId = btn.dataset.groupId;
+            confirmDelete(groupId);
+        });
+    });
+
+});
+
+async function loadGroupUsers(groupId) {
+    const userRow = document.getElementById(`users-group-${groupId}`);
+    const userList = document.getElementById(`user-list-${groupId}`);
+
+    if (!userRow || !userList) {
+        console.error('Éléments DOM manquants pour le groupe', groupId);
+        return;
+    }
+
+    if (userRow.classList.contains('d-none')) {
+        userList.innerHTML = 'Chargement…';
+
+        try {
+            const data = await api.get(`/api/personsInGroup/${groupId}`);
+            if (data.success && Array.isArray(data.items)) {
+                if (data.items.length === 0) {
+                    userList.innerHTML = '<p>Aucun utilisateur dans ce groupe.</p>';
+                } else {
+                    userList.innerHTML = `
+                        <ul class="list-unstyled mb-0">
+                            ${data.items.map(u =>
+                                `<li>${u.FirstName} ${u.LastName} (${u.Email})</li>`
+                            ).join('')}
+                        </ul>
+                    `;
                 }
-            })
-            .catch(error => {
-                userList.innerHTML = "<p class='text-danger'>Erreur lors du chargement" + error + ".</p>";
-            });
+            } else {
+                userList.innerHTML = '<p class="text-warning">Réponse inattendue.</p>';
+            }
 
-        userRow.classList.remove("d-none");
+            userRow.classList.remove('d-none');
+
+        } catch (err) {
+            console.error(err);
+            userList.innerHTML = `<p class="text-danger">Erreur de chargement.</p>`;
+        }
+
     } else {
-        userRow.classList.add("d-none");
+        userRow.classList.add('d-none');
     }
 }
 
-function confirmDelete(id) {
-    document.getElementById('deleteForm').action = '/group/delete/' + id;
-    const deleteModal = document.getElementById('deleteModal');
-    const modal = new bootstrap.Modal(deleteModal);
+function confirmDelete(groupId) {
+    const deleteForm = document.getElementById('deleteForm');
+    deleteForm.action = `/group/delete/${groupId}`;
+
+    const modal = new bootstrap.Modal(
+        document.getElementById('deleteModal')
+    );
     modal.show();
 }

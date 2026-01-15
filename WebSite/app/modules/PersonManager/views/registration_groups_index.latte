@@ -29,4 +29,19 @@
 
 {block scripts}
     <script src="/app/modules/PersonManager/js/registrationIndex.js"></script>
+    <script type="module">
+    import {
+        initGroups,
+        showGroups,
+        addToGroup,
+        removeFromGroup
+    } from '/app/modules/PersonManager/js/GroupsModule.js';
+
+    initGroups();
+
+    window.showGroups = showGroups;
+    window.addToGroup = addToGroup;
+    window.removeFromGroup = removeFromGroup;
+</script>
+
 {/block}

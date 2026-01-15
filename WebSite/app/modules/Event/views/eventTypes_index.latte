@@ -54,5 +54,19 @@
 {/block}
 
 {block scripts}
-    <script src="/app/modules/Event/js/eventType/index.js"></script>
+    <script type="module">
+    import {
+        initAttributes,
+        createAttribute,
+        editAttribute,
+        deleteAttribute
+    } from '/app/modules/Event/js/eventType/index.js';
+
+    initAttributes();
+
+    window.createAttribute = createAttribute;
+    window.editAttribute = editAttribute;
+    window.deleteAttribute = deleteAttribute;
+</script>
+
 {/block}

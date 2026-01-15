@@ -124,13 +124,12 @@ class EventController extends AbstractController
                 'eventNeeds' => $this->eventDataHelper->getEventNeeds($eventId),
                 'participantSupplies' => $this->eventDataHelper->getParticipantSupplies($eventId),
                 'userSupplies' => $this->eventDataHelper->getUserSupplies($eventId, $userEmail),
-                'isEventManager' => $this->application->getConnectedUser()->isEventManager() || false,
                 'token' => WebApp::getFiltered('t', FilterInputRule::Token->value, $this->flight->request()->query->getData()) ?? false,
                 'message' => $message,
                 'messageType' => $messageType,
                 'page' => $this->application->getConnectedUser()->getPage(),
             ]));
-        } else $this->raiseForbidden('Event doesn\'t found', 3000, false);
+        } else $this->raiseBadRequest('Event doesn\'t found', __FILE__, __LINE__);
     }
 
     public function registerSet(int $eventId, $token = null): void

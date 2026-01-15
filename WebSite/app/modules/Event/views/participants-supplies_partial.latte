@@ -1,0 +1,46 @@
+
+            {if $isRegistered && count($participantSupplies) > 0}
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <strong><i class="bi bi-people me-2"></i>Apports des participants</strong>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>Participant</th>
+                                            <th>Besoin</th>
+                                            <th class="text-end">Quantité</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {foreach $participantSupplies as $supply}
+                                        <tr>
+                                            <td>
+                                                {$supply->FirstName} {$supply->LastName}
+                                                {if $supply->NickName != ''}
+                                                    ({$supply->NickName})
+                                                {/if}
+                                            </td>
+                                            <td>
+                                                {$supply->NeedLabel}
+                                                {if $supply->NeedName != $supply->NeedLabel}
+                                                    <br><small class="text-muted">{$supply->NeedName}</small>
+                                                {/if}
+                                            </td>
+                                            <td class="text-end">
+                                                <span class="badge bg-success">{$supply->Supply}</span>
+                                            </td>
+                                        </tr>
+                                        {/foreach}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {/if}

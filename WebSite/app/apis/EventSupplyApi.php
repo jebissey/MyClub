@@ -8,8 +8,10 @@ use InvalidArgumentException;
 use Throwable;
 
 use app\enums\ApplicationError;
+use app\enums\FilterInputRule;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
+use app\helpers\WebApp;
 use app\exceptions\QueryException;
 use app\exceptions\UnauthorizedAccessException;
 use app\models\DataHelper;
@@ -19,8 +21,13 @@ use app\valueObjects\ApiResponse;
 
 class EventSupplyApi extends AbstractApi
 {
-    public function __construct(Application $application, private EventDataHelper $eventDataHelper, ConnectedUser $connectedUser, DataHelper $dataHelper, PersonDataHelper $personDataHelper)
-    {
+    public function __construct(
+        Application $application,
+        private EventDataHelper $eventDataHelper,
+        ConnectedUser $connectedUser,
+        DataHelper $dataHelper,
+        PersonDataHelper $personDataHelper
+    ) {
         parent::__construct($application, $connectedUser, $dataHelper, $personDataHelper);
     }
 
@@ -50,6 +57,38 @@ class EventSupplyApi extends AbstractApi
             $this->renderJsonForbidden($e->getFile(), $e->getLine());
         } catch (Throwable $e) {
             $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
+        }
+    }
+
+    public function participantsSupplies(): void
+    {
+        $person = $this->application->getConnectedUser()->person ?? false;
+        if (!$person) {
+            $this->renderJsonForbidden(__FILE__, __LINE__);
+            return;
+        }
+        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
+            return;
+        }
+        $eventId = WebApp::getFiltered('eventId', FilterInputRule::Int->value, $this->application->getFlight()->request()->query->getData());
+        if ($eventId === null || !is_numeric($eventId)) {
+            $this->renderJsonBadRequest("Invalid parameters", __FILE__, __LINE__);
+            return;
+        }
+        $eventId = (int)$eventId;
+        $userEmail = $person->Email ?? '';
+        try {
+            $this->application->getLatte()->render(
+                'Event/views/participants-supplies_partial.latte',
+                [
+                    'participantSupplies' => $this->eventDataHelper->getParticipantSupplies($eventId),
+                    'isRegistered' => $this->eventDataHelper->isUserRegistered($eventId, $userEmail),
+                ]
+            );
+        } catch (Throwable $e) {
+            http_response_code(500);
+            echo "<div class='alert alert-danger'>Erreur : " . htmlspecialchars($e->getMessage()) . "</div>";
         }
     }
 

@@ -1,12 +1,16 @@
-document.addEventListener('DOMContentLoaded', function () {
+import ApiClient from '../../Common/js/ApiClient.js';
+
+document.addEventListener('DOMContentLoaded', () => {
+    const api = new ApiClient();
+
     const csvFileInput = document.getElementById('csvFile');
     const headerRowSection = document.getElementById('headerRow');
     const mappingSection = document.getElementById('mappingSection');
     const submitBtn = document.getElementById('submitBtn');
     const headerRowInput = headerRowSection.querySelector('input[name="headerRow"]');
 
-    csvFileInput.addEventListener('change', function () {
-        if (this.files.length > 0) {
+    csvFileInput.addEventListener('change', () => {
+        if (csvFileInput.files.length > 0) {
             headerRowSection.style.display = 'block';
             mappingSection.style.display = 'none';
             submitBtn.style.display = 'none';
@@ -18,8 +22,8 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    headerRowInput.addEventListener('input', function () {
-        if (this.value.trim() !== '') {
+    headerRowInput.addEventListener('input', () => {
+        if (headerRowInput.value.trim() !== '') {
             mappingSection.style.display = 'block';
             submitBtn.style.display = 'block';
             updateHeaders();
@@ -29,8 +33,8 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    function updateHeaders() {
-        if (!csvFileInput.files.length > 0) {
+    async function updateHeaders() {
+        if (csvFileInput.files.length === 0) {
             mappingSection.style.display = 'none';
             submitBtn.style.display = 'none';
             return;
@@ -42,47 +46,43 @@ document.addEventListener('DOMContentLoaded', function () {
 
         headerRowInput.disabled = true;
 
-        fetch('/api/import/headers', {
-            method: 'POST',
-            body: formData
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.error) {
-                    alert(data.error);
-                    return;
-                }
+        try {
+            const data = await api.postFormData('/api/import/headers', formData);
 
-                const headers = data.headers;
-                const selects = ['emailColumn', 'firstNameColumn', 'lastNameColumn', 'phoneColumn'];
+            if (data.error) {
+                alert(data.error);
+                return;
+            }
 
-                selects.forEach(selectId => {
-                    const select = document.getElementById(selectId);
-                    select.innerHTML = '<option value="">Sélectionnez une colonne</option>';
+            const headers = data.headers;
+            const selects = ['emailColumn', 'firstNameColumn', 'lastNameColumn', 'phoneColumn'];
 
-                    headers.forEach((header, index) => {
-                        const option = document.createElement('option');
-                        option.value = index;
-                        option.textContent = `${header} (colonne ${index + 1})`;
-                        select.appendChild(option);
-                    });
+            selects.forEach(selectId => {
+                const select = document.getElementById(selectId);
+                select.innerHTML = '<option value="">Sélectionnez une colonne</option>';
 
-                    if (importSettings && importSettings.mapping) {
-                        const mappingKey = selectId.replace('Column', '');
-                        if (importSettings.mapping[mappingKey] !== undefined) {
-                            select.value = importSettings.mapping[mappingKey];
-                        }
-                    }
+                headers.forEach((header, index) => {
+                    const option = document.createElement('option');
+                    option.value = index;
+                    option.textContent = `${header} (colonne ${index + 1})`;
+                    select.appendChild(option);
                 });
 
-                mappingSection.style.display = 'block';
-                submitBtn.style.display = 'block';
-            })
-            .catch(error => {
-                alert('Erreur lors de la lecture du fichier: ' + error.message);
-            })
-            .finally(() => {
-                headerRowInput.disabled = false;
+                if (importSettings && importSettings.mapping) {
+                    const mappingKey = selectId.replace('Column', '');
+                    if (importSettings.mapping[mappingKey] !== undefined) {
+                        select.value = importSettings.mapping[mappingKey];
+                    }
+                }
             });
+
+            mappingSection.style.display = 'block';
+            submitBtn.style.display = 'block';
+
+        } catch (error) {
+            alert('Erreur lors de la lecture du fichier: ' + error.message);
+        } finally {
+            headerRowInput.disabled = false;
+        }
     }
 });

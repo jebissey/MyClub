@@ -42,12 +42,13 @@
                                     <a href="/group/edit/{$group->Id}" class="btn btn-sm btn-primary">
                                         <i class="bi bi-pencil"></i>
                                     </a>
-                                    <button type="button" class="btn btn-sm btn-danger" 
-                                            onclick="confirmDelete({$group->Id})">
+                                    <button type="button" class="btn btn-sm btn-danger btn-confirm-delete" 
+                                            data-group-id="{$group->Id}">
                                         <i class="bi bi-trash"></i>
                                     </button>
                                 {/if}
-                                <button class="btn btn-sm btn-success" onclick="loadGroupUsers({$group->Id})">
+                                <button class="btn btn-sm btn-success btn-load-users" 
+                                        data-group-id="{$group->Id}">
                                     <i class="bi bi-people-fill"></i>
                                 </button>
                             </td>
@@ -87,5 +88,5 @@
 {/block}
 
 {block scripts}
-    <script src="/app/modules/PersonManager/js/groupsIndex.js"></script>
+    <script type="module" src="/app/modules/PersonManager/js/groupsIndex.js"></script>
 {/block}

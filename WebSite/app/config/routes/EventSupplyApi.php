@@ -19,6 +19,7 @@ class EventSupplyApi implements RouteInterface
         $eventSupplyApi = fn() => $this->apiFactory->makeEventSupplyApi();
 
         $this->routes[] = new Route('POST /api/event/updateSupply', $eventSupplyApi, 'updateSupply');
+        $this->routes[] = new Route('GET  /api/participants/supplies', $eventSupplyApi, 'participantsSupplies');
 
         return $this->routes;
     }

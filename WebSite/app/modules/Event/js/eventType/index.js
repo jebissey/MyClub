@@ -1,86 +1,74 @@
-document.addEventListener("DOMContentLoaded", function () {
-    loadAttributesList();
-});
+import ApiClient from '../../../Common/js/ApiClient.js';
 
-function createAttribute_() {
+const api = new ApiClient('');
+
+export function initAttributes() {
+    document.addEventListener('DOMContentLoaded', () => {
+        loadAttributesList();
+    });
+}
+
+export async function createAttribute() {
     const name = document.getElementById('newAttributeName').value;
     const detail = document.getElementById('newAttributeDetail').value;
     const color = document.getElementById('newAttributeColor').value;
 
     if (!name) {
-        alert('Le nom de l\'attribut est requis');
+        alert("Le nom de l'attribut est requis");
         return;
     }
 
-    fetch('/api/attribute/create', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ name, detail, color })
-    })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                loadAttributesList();
-                document.getElementById('newAttributeName').value = '';
-                document.getElementById('newAttributeDetail').value = '';
-                document.getElementById('newAttributeColor').value = '#563d7c';
-            } else alert('Error (1): ' + data.message);
-        })
-        .catch(error => {
-            alert('Une erreur est survenue (2) : ' + error.message);
-        });
+    const result = await api.post('/api/attribute/create', { name, detail, color });
+
+    if (result.success) {
+        await loadAttributesList();
+        document.getElementById('newAttributeName').value = '';
+        document.getElementById('newAttributeDetail').value = '';
+        document.getElementById('newAttributeColor').value = '#563d7c';
+    } else {
+        alert('Erreur : ' + result.message);
+    }
 }
 
-function editAttribute(id) {
+export async function editAttribute(id) {
     const name = document.getElementById(`attributeName${id}`).value;
     const detail = document.getElementById(`attributeDetail${id}`).value;
     const color = document.getElementById(`attributeColor${id}`).value;
 
-    fetch('/api/attribute/update', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ id, name, detail, color })
-    })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) loadAttributesList();
-            else alert('Une erreur est survenue 3) : ' + data.message);
-        })
-        .catch(error => {
-            alert('Une erreur est survenue (4) : ' + error.message);
-        });
-}
+    const result = await api.post('/api/attribute/update', {
+        id,
+        name,
+        detail,
+        color
+    });
 
-function deleteAttribute(id) {
-    if (confirm('Êtes-vous sûr de vouloir supprimer cet attribut ?')) {
-        fetch(`/api/attribute/delete/${id}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) loadAttributesList();
-                else alert('Une erreur est survenue (5) : ' + data.message);
-            })
-            .catch(error => {
-                alert('Une erreur est survenue(6) : ' + error.message);
-            });
+    if (result.success) {
+        await loadAttributesList();
+    } else {
+        alert('Erreur : ' + result.message);
     }
 }
 
-function loadAttributesList() {
-    fetch('/api/attributes/list')
-        .then(response => response.text())
-        .then(html => {
-            document.getElementById('attributesList').innerHTML = html;
-        })
-        .catch(error => {
-            alert('Impossible de charger la liste des attributs : ' + error.message);
-        });
+export async function deleteAttribute(id) {
+    if (!confirm('Êtes-vous sûr de vouloir supprimer cet attribut ?')) {
+        return;
+    }
+
+    const result = await api.post(`/api/attribute/delete/${id}`, {});
+
+    if (result.success) {
+        await loadAttributesList();
+    } else {
+        alert('Erreur : ' + result.message);
+    }
+}
+
+export async function loadAttributesList() {
+    try {
+        const response = await fetch('/api/attributes/list');
+        const html = await response.text();
+        document.getElementById('attributesList').innerHTML = html;
+    } catch (err) {
+        alert('Impossible de charger la liste des attributs : ' + err.message);
+    }
 }
