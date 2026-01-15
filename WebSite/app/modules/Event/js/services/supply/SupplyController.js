@@ -46,11 +46,9 @@ export default class SupplyController {
     _bindButton(button) {
         const handleClick = async () => {
             const { eventId, needId } = button.dataset;
-            const input = document.querySelector(
-                `.user-supply-input[data-need-id="${needId}"]`
-            );
+            const input = document.querySelector(`.user-supply-input[data-need-id="${needId}"]`);
 
-            const updateUI = (needId, supply, updatedNeed) => {
+            const updateUI = (needId, updatedNeed) => {
                 if (!updatedNeed) return;
 
                 const container = document.querySelector(
@@ -96,14 +94,14 @@ export default class SupplyController {
             try {
                 const data = await this.api.post('/api/event/updateSupply', {
                     eventId: eventId,
-                    needId: needId, 
+                    needId: needId,
                     supply: supply
                 });
                 if (!data.success) {
                     throw new Error(data.message || 'Erreur serveur');
                 }
 
-                updateUI(needId, supply, data.updatedNeed);
+                updateUI(needId, data.updatedNeed);
                 input.dataset.originalValue = supply;
                 button.style.display = 'none';
 

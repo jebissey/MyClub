@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace app\apis;
@@ -42,11 +43,11 @@ class EventSupplyApi extends AbstractApi
                 (int)$input['needId'],
                 intval($input['supply'])
             );
-            $this->renderJson([$apiResponse->data], $apiResponse->success,  $apiResponse->responseCode);
+            $this->renderJson($apiResponse->data, $apiResponse->success,  $apiResponse->responseCode);
         } catch (QueryException $e) {
             $this->renderJsonBadRequest($e->getMessage(), $e->getFile(), $e->getLine());
         } catch (UnauthorizedAccessException $e) {
-            $this->renderJsonForbidden(__FILE__, __LINE__);
+            $this->renderJsonForbidden($e->getFile(), $e->getLine());
         } catch (Throwable $e) {
             $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
         }
