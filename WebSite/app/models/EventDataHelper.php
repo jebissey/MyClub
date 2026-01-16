@@ -31,15 +31,19 @@ class EventDataHelper extends Data implements NewsProviderInterface
 
     public function delete_($id, $personId)
     {
-        if (!$this->fluent->from('Event')->where('Id', $id)->where('CreatedBy', $personId)->fetch()) {
+        if (!$this->get('Event', ['Id' => $id, 'CreatedBy' => $personId])) {
             return [['success' => false, 'message' => 'User not allowed'], ApplicationError::Forbidden->value];
+        }
+        if ($this->gets('Participant', ['IdEvent' => $id])) {
+            $this->set('Event', ['Canceled' => 1], ['Id' => $id]);
+            return [['success' => true, 'message' => 'Evénement annulé'], ApplicationError::Unauthorized->value];
         }
         try {
             $this->pdo->beginTransaction();
 
-            $this->fluent->deleteFrom('EventAttribute')->where('IdEvent', $id)->execute();
-            // TODO manage participant and paticipantSupply
-            $this->fluent->deleteFrom('Event')->where('Id', $id)->execute();
+            $this->delete('EventAttribute', ['IdEvent' => $id]);
+            $this->delete('EventNeed', ['IdEvent' => $id]);
+            $this->delete('Event', ['Id' => $id]);
             $this->pdo->commit();
             return [true, [], ApplicationError::Ok->value];
         } catch (Throwable $e) {
@@ -622,7 +626,8 @@ class EventDataHelper extends Data implements NewsProviderInterface
                 'audience' => $event->Audience,
                 'createdBy' => $event->CreatedBy,
                 'messages' => $event->MessageCount,
-                'webappMessages' => $this->getEventMessagesCount($event->Id, 'Webapp')
+                'webappMessages' => $this->getEventMessagesCount($event->Id, 'Webapp'),
+                'canceled' => $event->Canceled,
             ];
         }, $events);
     }

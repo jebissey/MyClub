@@ -90,6 +90,7 @@ CREATE TABLE IF NOT EXISTS "Event" (
 	"MaxParticipants"	INTEGER NOT NULL DEFAULT 0,
 	"Audience"	TEXT NOT NULL DEFAULT 'ClubMembersOnly',
 	"LastUpdate"	TEXT NOT NULL DEFAULT current_timestamp,
+	"Canceled"	INTEGER NOT NULL DEFAULT 0,
 	PRIMARY KEY("Id"),
 	FOREIGN KEY("CreatedBy") REFERENCES "Person"("Id"),
 	FOREIGN KEY("IdEventType") REFERENCES "EventType"("Id")

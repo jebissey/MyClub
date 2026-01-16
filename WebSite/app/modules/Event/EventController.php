@@ -163,10 +163,15 @@ class EventController extends AbstractController
                         ]);
                     }
                 } else {
-                    $this->dataHelper->delete('Participant', [
+                    $result = $this->dataHelper->get('Participant', [
                         'IdEvent' => $eventId,
                         'IdPerson' => $userId
-                    ]);
+                    ], 'Id');
+                    if ($result) {
+                        $idParticipant = (int)$result->Id;
+                        $this->dataHelper->delete('ParticipantSupply', ['IdParticipant' => $idParticipant]);
+                        $this->dataHelper->delete('Participant', ['Id' => $idParticipant]);
+                    }
                 }
             } elseif ($token != null) {
                 $event = $this->dataHelper->get('Event', ['Id' => $eventId], 'Id, Audience');

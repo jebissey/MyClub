@@ -116,8 +116,13 @@
                     {/if}
                     </div>
                 </td>
-                <td>{$event['eventTypeName']} {if $event['groupName']}({$event['groupName']}){/if}</td>
-                <td>{=$event['startTime']|longDateTime}</td>
+                <td class="{if $event['canceled'] == 1}double-strike{/if}">
+                    {$event['eventTypeName']}
+                    {if $event['groupName']}({$event['groupName']}){/if}
+                </td>
+                <td class="{if $event['canceled'] == 1}double-strike{/if}">
+                    {=$event['startTime']|longDateTime}
+                </td>
                 <td>{$event['duration']}</td>
                 <td>
                 {if count($event['attributes']) > 0}

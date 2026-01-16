@@ -67,3 +67,8 @@
     cursor: help;
     border: 1px solid rgba(0, 0, 0, 0.2);
 }
+
+.double-strike {
+    text-decoration-line: line-through;
+    text-decoration-style: double;
+}

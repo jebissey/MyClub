@@ -12,7 +12,7 @@ class V6ToV7Migrator implements DatabaseMigratorInterface
 {
     public function upgrade(PDO $pdo, int $currentVersion): int
     {
-
+        $pdo->exec("ALTER TABLE Event ADD COLUMN Canceled INTEGER NOT NULL DEFAULT 0");
 
         return 7;
     }
