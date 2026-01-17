@@ -197,7 +197,7 @@ class EventDataHelper extends Data implements NewsProviderInterface
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([
             ':eventId' => $eventId,
-            ':today'   => (new DateTime())->format('Y-m-d'),
+            ':today'   => (new DateTime())->format('Y-m-d\TH:i:s'),
         ]);
         $result = $stmt->fetch();
         if ($result === false) throw new QueryException("Event ({$eventId}) doesn't exist");
@@ -223,7 +223,7 @@ class EventDataHelper extends Data implements NewsProviderInterface
             ORDER BY e.StartTime ASC
         ";
         $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([':today' => (new DateTime())->format('Y-m-d')]);
+        $stmt->execute([':today' => (new DateTime())->format('Y-m-d\TH:i:s')]);
         return $stmt->fetchAll();
     }
 

@@ -18,9 +18,9 @@ class Contact implements RouteInterface
     {
         $contactController = fn() => $this->controllerFactory->makeContactController();
 
+        $this->routes[] = new Route('GET  /contact/event/@id:[0-9]+', $contactController, 'contact');
         $this->routes[] = new Route('GET  /contact', $contactController, 'contact');
         $this->routes[] = new Route('POST /contact', $contactController, 'contact');
-        $this->routes[] = new Route('GET  /contact/event/@id:[0-9]+', $contactController, 'contact');
 
         return $this->routes;
     }

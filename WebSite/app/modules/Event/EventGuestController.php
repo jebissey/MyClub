@@ -66,7 +66,7 @@ class EventGuestController extends AbstractController
                 $this->guest('Veuillez sélectionner un événement', 'error');
                 return;
             }
-            $event = $this->eventDataHelper->getEventExternal($eventId);
+            $event = $this->eventDataHelper->getEventExternal((int)$eventId);
             if (!$event) {
                 $this->guest('Événement non trouvé ou non accessible', 'error');
                 return;

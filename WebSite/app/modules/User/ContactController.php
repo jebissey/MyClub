@@ -37,12 +37,12 @@ class ContactController extends AbstractController
                 'event' => $event,
                 'page' => $this->application->getConnectedUser()->getPage(),
             ]));
-        } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') $this->handleContactForm($eventId);
+        } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') $this->handleContactForm();
         else $this->raiseMethodNotAllowed(__FILE__, __LINE__);
     }
 
     #region Private functions
-    private function handleContactForm($eventId): void
+    private function handleContactForm(): void
     {
         $schema = [
             'name' => FilterInputRule::PersonName->value,
@@ -55,11 +55,12 @@ class ContactController extends AbstractController
         $name = $input['name'] ?? '';
         $email = $input['email'] ?? '';
         $message = $input['message'] ?? '';
+        $eventId = $input['eventId'] ?? null;
 
         $errors = [];
         if (empty($name)) $errors[] = 'Nom et prénom sont requis.';
         if (empty($email)) $errors[] = 'Un email valide est requis.';
-        if (empty($message)) $errors[] = 'Le message est requis.';
+        if ($eventId === null && empty($message)) $errors[] = 'Le message est requis.';
 
         if (empty($errors)) $this->sendContactMessage($input, $eventId);
         else $this->redirectWithErrors($errors, $name, $email, $message);
