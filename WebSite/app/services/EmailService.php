@@ -31,13 +31,13 @@ class EmailService
         if (!filter_var($emailTo, FILTER_VALIDATE_EMAIL)) {
             throw new InvalidArgumentException("Invalid to email: $emailTo");
         }
-        $metadata = $this->dataHelper->get('Metadata', ['Id' => 1], 'SendEmailAddress, SendEmailPassword');
+        $metadata = $this->dataHelper->get('Metadata', ['Id' => 1], 'SendEmailAddress, SendEmailPassword, SendEmailHost');
         $smtpUser = $metadata->SendEmailAddress ?? null;
         $smtpPass = $metadata->SendEmailPassword ?? null;
         $smtpHost = $metadata->SendEmailHost ?? null;
 
         if ($smtpUser && $smtpPass  && $smtpHost) {
-            return $this->sendWithPHPMailer($emailFrom, $emailTo, $subject, $body, $cc, $bcc, $isHtml, $smtpUser, $smtpPass, $smtpHost);
+            return $this->sendWithPHPMailer($emailTo, $subject, $body, $cc, $bcc, $isHtml, $smtpUser, $smtpPass, $smtpHost);
         }
         return $this->sendWithNativeMail($emailFrom, $emailTo, $subject, $body, $cc, $bcc, $isHtml);
     }
@@ -91,7 +91,6 @@ class EmailService
     }
 
     private function sendWithPHPMailer(
-        string $emailFrom,
         string $emailTo,
         string $subject,
         string $body,
@@ -109,10 +108,15 @@ class EmailService
             $mail->SMTPAuth   = true;
             $mail->Username   = $smtpUser;
             $mail->Password   = $smtpPass;
+            $mail->AuthType   = 'LOGIN';
             $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
             $mail->Port       = 587;
-            $mail->setFrom($emailFrom);
+            $mail->setFrom($smtpUser, 'No Reply');
             $mail->addAddress($emailTo);
+
+//$mail->SMTPDebug  = 2;
+//$mail->Debugoutput = 'error_log';
+
             if ($cc) {
                 $ccList = is_array($cc) ? $cc : explode(',', $cc);
                 foreach ($ccList as $email) {

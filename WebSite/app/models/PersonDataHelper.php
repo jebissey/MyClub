@@ -209,7 +209,7 @@ class PersonDataHelper extends Data implements NewsProviderInterface
 
     public function sendRegistrationLink($adminEmail, $name, $emailContact, $event): bool
     {
-        $contact = $this->fluent->from('Contact')->where('Email', $emailContact)->fetch();
+        $contact = $this->get('Contact', ['Email' => $emailContact]);
         if (!$contact) {
             $contactData = [
                 'Email' => $emailContact,
@@ -217,20 +217,21 @@ class PersonDataHelper extends Data implements NewsProviderInterface
                 'Token' => bin2hex(random_bytes(32)),
                 'TokenCreatedAt' => date('Y-m-d H:i:s')
             ];
-            $contactId = $this->fluent->insertInto('Contact')->values($contactData)->execute();
+            $contactId = $this->set('Contact', $contactData);
         } else {
             $token = bin2hex(random_bytes(32));
-            $this->fluent->update('Contact')
-                ->set([
+            $this->set(
+                'Contact',
+                [
                     'Token' => $token,
                     'TokenCreatedAt' => date('Y-m-d H:i:s')
-                ])
-                ->where('Id', $contact->Id)
-                ->execute();
+                ],
+                ['Id' => $contact->Id]
+            );
             $contact->Token = $token;
         }
-        if (!$contact) $contact = $this->fluent->from('Contact')->where('Id', $contactId)->fetch();
-        $registrationLink = Webapp::getBaseUrl() . "events/{$event->Id}/{$contact->Token}";
+        if (!$contact) $contact = $this->get('Contact', ['Id' => $contactId]);
+        $registrationLink = Webapp::getBaseUrl() . "event/{$event->Id}/{$contact->Token}";
         $subject = "Lien d'inscription pour " . $event->Summary;
         $body = $registrationLink;
         return $this->emailService->send($adminEmail, $emailContact, $subject, $body);

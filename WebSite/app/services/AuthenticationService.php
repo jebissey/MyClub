@@ -37,7 +37,13 @@ class AuthenticationService
         $resetLink = Application::$root . '/user/setPassword/' . $token;
         $subject = "Initialisation du mot de passe";
         $message = "Cliquez sur ce lien pour initialiser votre mot de passe : $resetLink";
-        $fromEmail = 'no-reply@' . parse_url(Application::$root, PHP_URL_HOST);
+        
+        $host = parse_url(Application::$root, PHP_URL_HOST);
+        if ($host === 'localhost' || $host === null) {
+            $host = 'myclub.foo';
+        }
+        $fromEmail = 'no-reply@' . $host;
+
         return $this->emailService->send($fromEmail, $email, $subject, $message);
     }
 
