@@ -37,6 +37,7 @@ class ArticleTableDataHelper extends Data
                     Article.PublishedBy,
                     Article.OnlyForMembers,
                     Article.IdGroup,
+                    Article.Content,
                     (
                         SELECT COUNT(*)
                         FROM Message

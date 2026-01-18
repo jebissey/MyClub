@@ -112,11 +112,15 @@ Security is based on **groups**. There are three types:
 
 👉 Un blog : [https://jeblog.alwaysdata.net/](https://jeblog.alwaysdata.net/)
 
+👉 Test site : [https://testmyclub.alwaysdata.net/](https://testmyclub.alwaysdata.net/)
+
 ---
 
 ## 👁️ Manuals and tutorials (in French)
 
 👉 [You are](https://myclub.alwaysdata.net/navbar/show/article/10)
+
+👉 [MyClub Dictionary](https://myclub.alwaysdata.net/navbar/show/article/47)
 
 👉 [Short videos](https://myclub.alwaysdata.net/navbar/show/article/28)
 

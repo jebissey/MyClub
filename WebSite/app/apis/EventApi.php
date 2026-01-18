@@ -185,11 +185,15 @@ class EventApi extends AbstractApi
                 return new ApiResponse(false, ApplicationError::BadRequest->value, [],  'Invalid Email in file ' + __FILE__ + ' at line ' + __LINE__);
             }
             $ccList = $this->messageDataHelper->addWebAppMessages($event->Id, $participants, $title . "\n\n" . $body);
+            $htmlBody = nl2br(htmlspecialchars($body, ENT_QUOTES, 'UTF-8')) . "<br>" .
+            '<a href="' . htmlspecialchars($eventLink, ENT_QUOTES, 'UTF-8') . '">' . htmlspecialchars($eventLink, ENT_QUOTES, 'UTF-8') . '</a>' . "<br><br>" .
+            "Pour ne plus recevoir ce type de message vous pouvez mettre à jour vos préférences<br>" .
+            '<a href="' . htmlspecialchars($unsubscribeLink, ENT_QUOTES, 'UTF-8') . '">Se désinscrire</a>';
             $result = $this->emailService->send(
                 $eventCreatorEmail,
                 $eventCreatorEmail,
                 $title,
-                $body . "\n" . $eventLink . "\n\n Pour ne plus recevoir ce type de message vous pouvez mettre à jour vos préférences\n" . $unsubscribeLink,
+                $htmlBody,
                 $ccList,
                 null,
                 false
@@ -198,6 +202,4 @@ class EventApi extends AbstractApi
         }
         return new ApiResponse(false, ApplicationError::BadRequest->value, [], 'No participant');
     }
-
-
 }

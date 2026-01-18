@@ -111,6 +111,8 @@ class EmailService
             $mail->AuthType   = 'LOGIN';
             $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
             $mail->Port       = 587;
+            $mail->CharSet = 'UTF-8';
+            $mail->Encoding = 'base64';
             $mail->setFrom($smtpUser, 'No Reply');
             $mail->addAddress($emailTo);
 

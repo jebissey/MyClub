@@ -48,7 +48,7 @@ class MessageDataHelper extends Data implements NewsProviderInterface
             $bccList[] = $participant->Email;
             $this->set('Message', [
                 'EventId' => $eventId,
-                'PersonId' => $participant->Id,
+                'PersonId' => $participant->PersonId,
                 'Text' => $text,
                 'From' => 'Webapp'
             ]);

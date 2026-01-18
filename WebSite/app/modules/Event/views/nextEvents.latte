@@ -97,6 +97,7 @@
                                 data-participants-count="{$event['participants']}"
                                 data-messages-count="{$event['messages']}"
                                 data-webapp-messages-count="{$event['webappMessages']}"
+                                data-canceled="{$event['canceled'] == 1 ? 'true' : 'false'}"
                                 data-bs-toggle="modal" 
                                 data-bs-target="#emailModal"
                                 onclick="event.stopPropagation();">
@@ -137,8 +138,12 @@
                     Aucun attribut
                 {/if}
                 </td>
-                <td>{$event['summary']}</td>
-                <td>{$event['location']}</td>
+                <td class="{if $event['canceled'] == 1}double-strike{/if}">
+                    {$event['summary']}
+                </td>
+                <td class="{if $event['canceled'] == 1}double-strike{/if}">
+                    {$event['location']}
+                </td>
                 <td>{$event['participants']}{if $event['maxParticipants'] > 0} / {$event['maxParticipants']}{/if}{if isset($event['booked'])}👤{/if}</td>
                 <td>{$event['messages']}</td>
                 <td>{=$event['audience']|translate}</td>

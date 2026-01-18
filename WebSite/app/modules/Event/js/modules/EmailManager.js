@@ -12,77 +12,136 @@ export default class EmailManager {
         this.form = document.getElementById('emailForm');
         if (!this.modal || !this.form) return;
 
+        const emailTypeSelect = document.getElementById('emailTypeSelect');
+        const recipientsSelect = document.getElementById('recipientsSelect');
+
         const openModal = e => {
             const btn = e.target.closest('.email-btn');
+            if (!btn) return;
 
             this.currentEventData = {
                 eventId: btn.dataset.eventId,
                 eventTitle: btn.dataset.eventTitle,
-                participantsCount: parseInt(btn.dataset.participantsCount),
-                messagesCount: parseInt(btn.dataset.webappMessagesCount)
+                participantsCount: parseInt(btn.dataset.participantsCount, 10) || 0,
+                messagesCount: parseInt(btn.dataset.webappMessagesCount, 10) || 0,
+                canceled: btn.dataset.canceled === 'true'
             };
 
-            document.getElementById('emailEventId').value = this.currentEventData.eventId;
-            updateEmailTypeOptions();
+            document.getElementById('emailEventId').value =
+                this.currentEventData.eventId;
+
             resetForm();
+            updateEmailTypeOptions();
         };
 
         const updateEmailTypeOptions = () => {
             const hasMessages = this.currentEventData.messagesCount > 0;
-            const select = document.getElementById('emailTypeSelect');
+            const canceled = this.currentEventData.canceled;
 
-            select.innerHTML = '<option value="">Sélectionnez un type</option>';
+            let autoSelectValue = null;
 
-            if (!hasMessages) {
-                select.innerHTML += '<option value="nouvel-evenement">Nouvel évènement</option>';
+            emailTypeSelect.innerHTML = '';
+            emailTypeSelect.disabled = false;
+
+            if (canceled) {
+                emailTypeSelect.innerHTML =
+                    '<option value="annule">Annulé</option>';
+                autoSelectValue = 'annule';
+            } else if (!hasMessages) {
+                emailTypeSelect.innerHTML =
+                    '<option value="nouvel-evenement">Nouvel évènement</option>';
+                autoSelectValue = 'nouvel-evenement';
             } else {
-                select.innerHTML += '<option value="rappel">Rappel</option>';
-                select.innerHTML += '<option value="annule">Annulé</option>';
-                select.innerHTML += '<option value="modifie">Modifié</option>';
+                emailTypeSelect.innerHTML =
+                    '<option value="">Sélectionnez un type</option>' +
+                    '<option value="rappel">Rappel</option>' +
+                    '<option value="modifie">Modifié</option>';
+            }
+
+            if (autoSelectValue) {
+                emailTypeSelect.value = autoSelectValue;
+                emailTypeSelect.disabled = true;
+                updateRecipientsOptions(autoSelectValue);
             }
         };
 
         const updateRecipientsOptions = messageType => {
-            const select = document.getElementById('recipientsSelect');
-            select.innerHTML = '<option value="">Sélectionnez les destinataires</option>';
+            recipientsSelect.innerHTML = '';
+            recipientsSelect.disabled = false;
+
+            recipientsSelect.innerHTML =
+                '<option value="">Sélectionnez les destinataires</option>';
 
             const options = {
-                'nouvel-evenement': '<option value="all">Tous</option>',
-                'rappel': '<option value="unregistered">Tous les non-inscrits</option>',
-                'annule': '<option value="registered">Tous les inscrits</option>',
-                'modifie': '<option value="registered">Tous les inscrits</option>'
+                'nouvel-evenement': [
+                    { value: 'all', label: 'Tous' }
+                ],
+                'rappel': [
+                    { value: 'unregistered', label: 'Tous les non-inscrits' }
+                ],
+                'annule': [
+                    { value: 'registered', label: 'Tous les inscrits' }
+                ],
+                'modifie': [
+                    { value: 'registered', label: 'Tous les inscrits' }
+                ]
             };
 
-            select.innerHTML += options[messageType] || '';
+            const list = options[messageType] || [];
+
+            list.forEach(opt => {
+                const option = document.createElement('option');
+                option.value = opt.value;
+                option.textContent = opt.label;
+                recipientsSelect.appendChild(option);
+            });
+
+            if (list.length === 1) {
+                recipientsSelect.value = list[0].value;
+                recipientsSelect.disabled = true;
+            }
         };
 
         const handleSubmit = async e => {
             e.preventDefault();
 
             const formData = new FormData(this.form);
-            const emailTypeSelect = document.getElementById('emailTypeSelect');
+            const selectedType =
+                emailTypeSelect.options[emailTypeSelect.selectedIndex];
 
             const emailData = {
                 EventId: this.currentEventData.eventId,
-                Title: emailTypeSelect.options[emailTypeSelect.selectedIndex].text,
+                Title: selectedType?.text || '',
                 Body: formData.get('message'),
-                Recipients: formData.get('recipients')
+                Recipients: recipientsSelect.value
             };
 
-            const result = await this.api.post('/api/event/sendEmails', emailData);
+            const result = await this.api.post(
+                '/api/event/sendEmails',
+                emailData
+            );
 
             if (result.success) {
                 alert('Courriel envoyé avec succès !');
                 bootstrap.Modal.getInstance(this.modal).hide();
                 resetForm();
             } else {
-                alert("Erreur lors de l'envoi du courriel : " + (result.message || 'Erreur inconnue'));
+                alert(
+                    "Erreur lors de l'envoi du courriel : " +
+                    (result.message || 'Erreur inconnue')
+                );
             }
         };
 
         const resetForm = () => {
             this.form.reset();
-            document.getElementById('recipientsSelect').innerHTML =
+
+            emailTypeSelect.disabled = false;
+            emailTypeSelect.innerHTML =
+                '<option value="">Sélectionnez un type</option>';
+
+            recipientsSelect.disabled = false;
+            recipientsSelect.innerHTML =
                 '<option value="">Sélectionnez d\'abord un type de message</option>';
         };
 
@@ -91,8 +150,9 @@ export default class EmailManager {
             btn.addEventListener('click', openModal);
         });
 
-        document.getElementById('emailTypeSelect')
-            ?.addEventListener('change', e => updateRecipientsOptions(e.target.value));
+        emailTypeSelect?.addEventListener('change', e => {
+            updateRecipientsOptions(e.target.value);
+        });
 
         this.form.addEventListener('submit', handleSubmit);
     }
