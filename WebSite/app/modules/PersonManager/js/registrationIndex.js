@@ -1,10 +1,10 @@
-import ApiClient from '../../../Common/js/ApiClient.js';
+import ApiClient from '../../Common/js/ApiClient.js';
 
 const api = new ApiClient('');
 
 let groupsModal = null;
 
-export function initGroups() {
+function initGroups() {
     document.addEventListener('DOMContentLoaded', () => {
         const modalEl = document.getElementById('groupsModal');
         if (!modalEl) {
@@ -15,7 +15,7 @@ export function initGroups() {
     });
 }
 
-export async function showGroups(personId) {
+async function showGroups(personId) {
     try {
         const response = await fetch(`/registration/groups/${personId}`);
         const html = await response.text();
@@ -28,7 +28,7 @@ export async function showGroups(personId) {
     }
 }
 
-export async function addToGroup(personId, groupId) {
+async function addToGroup(personId, groupId) {
     const result = await api.post(
         `/api/registration/add/${personId}/${groupId}`,
         {}
@@ -41,7 +41,7 @@ export async function addToGroup(personId, groupId) {
     }
 }
 
-export async function removeFromGroup(personId, groupId) {
+async function removeFromGroup(personId, groupId) {
     const result = await api.post(
         `/api/registration/remove/${personId}/${groupId}`,
         {}
@@ -53,3 +53,9 @@ export async function removeFromGroup(personId, groupId) {
         alert(result.message || 'Une erreur est survenue');
     }
 }
+
+initGroups();
+
+window.showGroups = showGroups;
+window.addToGroup = addToGroup;
+window.removeFromGroup = removeFromGroup;
