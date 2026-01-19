@@ -102,17 +102,25 @@ Security is based on **groups**. There are three types:
 
 ---
 
-## 👁️ Examples  
+## 👁️ Examples
 
-👉 Demo site : [https://myclub.alwaysdata.net/](https://myclub.alwaysdata.net/)  { test account = user ＠ myclub ․ foo ( user2345 ) }
+👉 **MyClub web application**  
+[Presentation of the web app, with articles and videos](https://myclub.alwaysdata.net/)  
 
-👉 Nordic walking site : [https://bnw-dijon.fr/](https://bnw-dijon.fr/) 
+👉 **Nordic Walking club website**  
+[BNW – Burgundy Nordic Walking](https://bnw-dijon.fr/)
 
-👉 Static site : [https://peinturesbribri.alwaysdata.net/navbar/show/article/3](https://peinturesbribri.alwaysdata.net/navbar/show/article/3)
+👉 **Static website (artist portfolio)**  
+[Paintings by an artist 😉](https://peinturesbribri.alwaysdata.net/navbar/show/article/3)
 
-👉 Un blog : [https://jeblog.alwaysdata.net/](https://jeblog.alwaysdata.net/)
+👉 **Static website**  
+[About the Sinclair ZX Spectrum](https://jeblog.alwaysdata.net/spectrum_FR.html)
 
-👉 Test site : [https://testmyclub.alwaysdata.net/](https://testmyclub.alwaysdata.net/)
+👉 **Personal blog**  
+[Personal blog written and maintained by me](https://jeblog.alwaysdata.net/)
+
+👉 **Test environment**  
+[Test MyClub instance](https://testmyclub.alwaysdata.net/)
 
 ---
 
