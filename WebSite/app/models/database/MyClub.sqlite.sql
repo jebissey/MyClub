@@ -239,7 +239,7 @@ CREATE TABLE IF NOT EXISTS "Metadata" (
 	"VapidPrivateKey"	TEXT,
 	"SendEmailAddress"	TEXT,
 	"SendEmailPassword"	TEXT,
-	"SendMailHost"	TEXT,
+	"SendEmailHost"	TEXT,
 	"Compact_maxRecords"	INTEGER NOT NULL DEFAULT 1000000,
 	"Compact_lastDate"	TEXT,
 	"Compact_everyXdays"	INTEGER NOT NULL DEFAULT 10,
