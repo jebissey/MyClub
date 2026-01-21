@@ -71,6 +71,8 @@ class HomeController extends AbstractController
                 'flag' => \app\helpers\TranslationManager::getFlag($lang),
                 'isRedactor' => false,
                 'page' => $connectedUser->getPage(),
+                'currentUrl' => $_SERVER['REQUEST_URI'],
+                'currentPath' => parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH),
             ], $this->metadataDataHelper->isTestSite() && !empty($prodSiteUrl = $this->metadataDataHelper->getProdSiteUrl()) ? $prodSiteUrl : null);
         }
 

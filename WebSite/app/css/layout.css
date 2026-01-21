@@ -72,3 +72,8 @@
     text-decoration-line: line-through;
     text-decoration-style: double;
 }
+
+nav.navbar .navbar-nav .nav-link {
+  padding-top: 0.1rem;
+  padding-bottom: 0.1rem;
+}

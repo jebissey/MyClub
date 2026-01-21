@@ -8,10 +8,10 @@
                 </button>
 
                 <div class="collapse navbar-collapse" id="navbarNav">
-                  <ul class="navbar-nav me-auto">
+                  <ul class="navbar-nav d-flex justify-content-center flex-wrap w-100">
                     {foreach $navItems as $navItem}
                     <li class="nav-item">
-                      <a class="nav-link" href="{$navItem->Route}">{$navItem->Name|noescape}</a>
+                      <a class="nav-link {if $currentPath === $navItem->Route}active{/if}" href="{$navItem->Route}">{$navItem->Name|noescape}</a>
                     </li>
                     {/foreach}
                   </ul>

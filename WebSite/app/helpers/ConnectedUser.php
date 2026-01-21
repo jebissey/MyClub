@@ -64,6 +64,8 @@ class ConnectedUser
             'currentLanguage' => $lang,
             'supportedLanguages' => TranslationManager::getSupportedLanguages(),
             'flag' => TranslationManager::getFlag($lang),
+            'currentUrl' => $_SERVER['REQUEST_URI'],
+            'currentPath' => parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH),
         ], $this->metadataDataHelper->isTestSite() && !empty($prodSiteUrl = $this->metadataDataHelper->getProdSiteUrl()) ? $prodSiteUrl : null);
         return;
     }
