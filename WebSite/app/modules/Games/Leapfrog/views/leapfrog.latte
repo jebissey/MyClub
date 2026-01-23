@@ -2,7 +2,42 @@
 {block title}Saute mouton{/block}
 
 {block head}
-<link rel="stylesheet" href="/app/css/leapfrog.css">
+    <style>
+        .sheep-col {
+            min-height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .bergerie {
+            background-color: #f3e9d2;
+        }
+
+        .pre {
+            background-color: #baf2bb;
+        }
+
+        .separation {
+            background-color: #ffffff;
+        }
+
+        .sheep {
+            max-width: 100%;
+            height: auto;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .sheep:hover {
+            transform: scale(1.05);
+            cursor: grab;
+        }
+
+        .sheep:active {
+            cursor: grabbing;
+        }
+    </style>
 {/block}
 
 {block navbar}
