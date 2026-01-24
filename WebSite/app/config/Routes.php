@@ -95,6 +95,7 @@ use app\models\KaraokeDataHelper;
 use app\models\LogDataHelper;
 use app\models\LogDataWriterHelper;
 use app\models\MessageDataHelper;
+use app\models\MetadataDataHelper;
 use app\models\NeedDataHelper;
 use app\models\NeedTypeDataHelper;
 use app\models\PageDataHelper;
@@ -161,6 +162,7 @@ class Routes
             new KanbanDataHelper($application),
             $logDataHelper,
             $messageDataHelper,
+            new MetadataDataHelper($application),
             $needDataHelper,
             new News($newsProviders),
             $notificationSender,

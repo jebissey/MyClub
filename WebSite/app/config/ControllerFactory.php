@@ -26,6 +26,7 @@ use app\models\LogDataHelper;
 use app\models\LogDataAnalyticsHelper;
 use app\models\LogDataStatisticsHelper;
 use app\models\MessageDataHelper;
+use app\models\MetadataDataHelper;
 use app\models\NeedDataHelper;
 use app\models\ParticipantDataHelper;
 use app\models\PersonDataHelper;
@@ -102,6 +103,7 @@ class ControllerFactory
         private KanbanDataHelper $kanbanDataHelper,
         private LogDataHelper $logDataHelper,
         private MessageDataHelper $messageDataHelper,
+        private MetadataDataHelper $metadataDataHelper,
         private NeedDataHelper $needDataHelper,
         private News $news,
         private NotificationSender $notificationSender,
@@ -228,7 +230,8 @@ class ControllerFactory
             $this->surveyDataHelper,
             $this->designDataHelper,
             $this->news,
-            $this->personDataHelper
+            $this->personDataHelper,
+            $this->metadataDataHelper
         );
     }
 

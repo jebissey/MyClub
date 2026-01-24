@@ -1,5 +1,5 @@
 <?php
-declare(strict_types=1);
+
 declare(strict_types=1);
 
 namespace app\helpers;
@@ -8,6 +8,7 @@ use DateTime;
 use IntlDateFormatter;
 
 use app\enums\WeekdayFormat;
+use app\models\MetadataDataHelper;
 
 class TranslationManager
 {
@@ -21,6 +22,16 @@ class TranslationManager
     const COOKIE_EXPIRATION = 86400 * 30; // 30 days
     const COOKIE_PATH = '/';
 
+    private static ?string $forcedLanguage = null;
+    private static function getForcedLanguage(): ?string
+    {
+        if (self::$forcedLanguage === null) {
+            self::$forcedLanguage = (new MetadataDataHelper(Application::init()))
+                ->getForcedLanguage();
+        }
+        return self::$forcedLanguage;
+    }
+
     public static function setLanguage($language)
     {
         $language = in_array($language, self::SUPPORTED_LANGUAGES) ? $language : self::DEFAULT_LANGUAGE;
@@ -30,9 +41,13 @@ class TranslationManager
         header('Location: ' . $_SERVER['PHP_SELF']);
     }
 
-    public static function getCurrentLanguage()
+    public static function getCurrentLanguage(): string
     {
-        return $_COOKIE['user_language'] ?? self::DEFAULT_LANGUAGE;
+        $forcedLanguage = self::getForcedLanguage();
+        if ($forcedLanguage !== '' && in_array($forcedLanguage, self::SUPPORTED_LANGUAGES, true)) {
+            return $forcedLanguage;
+        }
+        return $_COOKIE[self::COOKIE_NAME] ?? self::DEFAULT_LANGUAGE;
     }
 
     public static function getSupportedLanguages()
@@ -42,6 +57,7 @@ class TranslationManager
 
     public static function getFlag(string $locale): string
     {
+        if (self::getForcedLanguage() != '') return '';
         return self::FLAGS[$locale] ?? '🏳️';
     }
 

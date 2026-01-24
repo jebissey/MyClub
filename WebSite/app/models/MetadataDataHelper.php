@@ -18,8 +18,18 @@ class MetadataDataHelper extends Data
         return $this->get('Metadata', ['Id' => 1], 'ThisIsTestSite')->ThisIsTestSite == 1;
     }
 
+    public function getForcedLanguage(): string
+    {
+        return $this->get('Metadata', ['Id' => 1], 'ThisIsForcedLanguage')->ThisIsForcedLanguage ?? '';
+    }
+
     public function getProdSiteUrl(): string
     {
         return $this->get('Metadata', ['Id' => 1], 'ThisIsProdSiteUrl')->ThisIsProdSiteUrl;
+    }
+
+    public function setForcedLanguage(?string $language): void
+    {
+        $this->set('Metadata', ['ThisIsForcedLanguage' => $language], ['Id' => 1]);
     }
 }

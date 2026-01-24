@@ -47,9 +47,11 @@
                   <a href="/help">
                     <img src="/app/images/help.png" alt="Help" data-bs-toggle="tooltip" data-bs-placement="bottom" title="{='contextual_help'|translate}" class="me-2">
                   </a>
+                  {if $flag != ''}
                   <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#languageModal">
                     <h2 class="modal-title" id="languageModalLabel">{$flag}</h2>
                   </button>
+                  {/if}
                 </div>
               </div>
 

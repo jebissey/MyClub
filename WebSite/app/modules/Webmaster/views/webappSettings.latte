@@ -8,6 +8,39 @@
 
 {block content}
 <div class="container-fluid mt-4">
+    <form id="languageForm" method="post" action="/settings-language">
+        <div class="mb-3">
+            <h1 for="lang" class="form-label">{='select_language'|translate}</h1>
+            <select name="lang" id="languageSelect" class="form-select">
+                {foreach $supportedLanguages as $lang}
+                    <option value="{$lang}" {$lang === $currentLanguage ? 'selected' : ''}>
+                        {$lang}
+                    </option>
+                {/foreach}
+            </select>
+        </div>
+
+        <div class="form-check mb-3">
+            <input
+                class="form-check-input"
+                type="checkbox"
+                id="useLanguage"
+                name="use_language"
+                value="1"
+                {if $currentLanguage}checked{/if}
+            >
+            <label class="form-check-label" for="useLanguage">
+                Utiliser cette langue (sinon l'utilisateur pourra choisir sa langue préférée)
+            </label>
+        </div>
+
+        <div class="d-flex justify-content-end">
+            <button type="submit" class="btn btn-success">
+                {='save'|translate}
+            </button>
+        </div>
+    </form>
+
     <div class="row">
         <div class="col-md-12">
             <h1>Personnalisation de l'application</h1>
@@ -62,8 +95,8 @@
                         </div>
 
                         <div class="d-flex justify-content-end">
-                            <button id="save-btn" type="submit" class="btn btn-success me-2">Enregistrer</button>
-                            <a href="/admin/dashboard" class="btn btn-secondary">Annuler</a>
+                            <button id="save-btn" type="submit" class="btn btn-success me-2">{='save'|translate}</button>
+                            <a href="/admin/dashboard" class="btn btn-secondary">{='cancel'|translate}</a>
                         </div>
                     </form>
                 </div>

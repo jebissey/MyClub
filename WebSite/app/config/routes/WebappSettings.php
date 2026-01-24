@@ -20,6 +20,7 @@ class WebappSettings implements RouteInterface
 
         $this->routes[] = new Route('GET  /settings', $webappSettingsController, 'editSettings');
         $this->routes[] = new Route('POST /settings', $webappSettingsController, 'saveSettings');
+        $this->routes[] = new Route('POST /settings-language', $webappSettingsController, 'saveLanguage');
 
         return $this->routes;
     }

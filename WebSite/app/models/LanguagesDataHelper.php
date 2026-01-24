@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace app\models;
 
-use InvalidArgumentException;
 use PDO;
 
 use app\helpers\Application;

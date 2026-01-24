@@ -57,7 +57,6 @@ class Params
             'currentLanguage' => $lang,
             'supportedLanguages' => TranslationManager::getSupportedLanguages(),
             'flag' => TranslationManager::getFlag($lang),
-            'currentUrl' => $_SERVER['REQUEST_URI'],
             'currentPath' => parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH),
         ];
         if ($prodSiteUrl !== null) self::$commonParams['productionSiteUrl'] = $prodSiteUrl;

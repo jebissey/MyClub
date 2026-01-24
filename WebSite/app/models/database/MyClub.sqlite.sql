@@ -247,6 +247,7 @@ CREATE TABLE IF NOT EXISTS "Metadata" (
 	"Compact_compactOlderThanXmonths"	INTEGER NOT NULL DEFAULT 6,
 	"ThisIsProdSiteUrl"	TEXT,
 	"ThisIsTestSite"	INTEGER NOT NULL DEFAULT 0,
+	"ThisIsForcedLanguage"	TEXT,
 	PRIMARY KEY("Id")
 );
 CREATE TABLE IF NOT EXISTS "Need" (
@@ -816,7 +817,9 @@ INSERT INTO "Languages" VALUES (75,'ErrorLyricsFileReadError','''<div class=''''
                         <a href=''/'' class=''''btn btn-primary mt-4''''>🏠 Retour à l’accueil</a>
                     </div>
                 </div>');
-INSERT INTO "Metadata" VALUES (1,'MyClub',7,0,NULL,NULL,NULL,NULL,NULL,1000000,NULL,10,36,6,NULL,0);
+INSERT INTO "Languages" VALUES (76,'save','Save','Enregistrer');
+INSERT INTO "Languages" VALUES (77,'cancel','Cancel','Annuler');
+INSERT INTO "Metadata" VALUES (1,'MyClub',8,0,NULL,NULL,NULL,NULL,NULL,1000000,NULL,10,36,6,NULL,0,NULL);
 INSERT INTO "Person" VALUES (1,'webmaster@myclub.foo','e427c26faca947919b18b797bc143a35100e4de48c34b70b26202d3a7d8e51f7','my first name','my last name','my nick name or nothing',NULL,'0',NULL,NULL,NULL,NULL,NULL,0,0,NULL,NULL,'2025-01-01',0,NULL,NULL,NULL,NULL);
 INSERT INTO "PersonGroup" VALUES (1,1,1);
 INSERT INTO "Settings" VALUES (1,'Title','title');

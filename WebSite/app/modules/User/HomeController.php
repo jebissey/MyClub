@@ -17,8 +17,6 @@ use app\modules\Common\AbstractController;
 
 class HomeController extends AbstractController
 {
-    private MetadataDataHelper $metadataDataHelper;
-
     public function __construct(
         Application $application,
         private ArticleDataHelper $articleDataHelper,
@@ -26,9 +24,9 @@ class HomeController extends AbstractController
         private DesignDataHelper $designDataHelper,
         private News $news,
         private PersonDataHelper $personDataHelper,
+        private MetadataDataHelper $metadataDataHelper,
     ) {
         parent::__construct($application);
-        $this->metadataDataHelper = new MetadataDataHelper($application);
     }
 
     public function home(): void
@@ -59,7 +57,7 @@ class HomeController extends AbstractController
 
             $news = $this->news->anyNews($connectedUser);
         } else {
-            $lang = \app\helpers\TranslationManager::getCurrentLanguage();
+            $lang = TranslationManager::getCurrentLanguage();
             Params::setParams([
                 'href' => '/user/sign/in',
                 'userImg' => '👻',
@@ -68,10 +66,9 @@ class HomeController extends AbstractController
                 'currentVersion' => Application::VERSION,
                 'currentLanguage' => $lang,
                 'supportedLanguages' => TranslationManager::getSupportedLanguages(),
-                'flag' => \app\helpers\TranslationManager::getFlag($lang),
+                'flag' => TranslationManager::getFlag($lang),
                 'isRedactor' => false,
                 'page' => $connectedUser->getPage(),
-                'currentUrl' => $_SERVER['REQUEST_URI'],
                 'currentPath' => parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH),
             ], $this->metadataDataHelper->isTestSite() && !empty($prodSiteUrl = $this->metadataDataHelper->getProdSiteUrl()) ? $prodSiteUrl : null);
         }

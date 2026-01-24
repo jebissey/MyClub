@@ -24,7 +24,7 @@ class KaraokeController extends AbstractController
             return;
         }
         try {
-            $parser = new LyricsParser($this->application, $this->languagesDataHelper);
+            $parser = new LyricsParser();
             $parser->parse(self::MEDIA_PATH . "{$song}.lrc");
             $connectedUser = $this->application->getConnectedUser();
 
