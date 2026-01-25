@@ -25,7 +25,7 @@ class UserDashboardController extends AbstractController
             return;
         }
         $this->render('Common/views/info.latte', $this->getAllParams([
-            'content' => $this->dataHelper->get('Settings', ['Name' => 'Help_user'], 'Value')->Value ?? '',
+            'content' => $this->dataHelper->get('Settings', ['Name' => 'Help_User'], 'Value')->Value ?? '',
             'hasAuthorization' => $this->application->getConnectedUser()->hasAutorization(),
             'currentVersion' => Application::VERSION,
             'timer' => 0,

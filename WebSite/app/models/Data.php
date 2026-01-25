@@ -221,7 +221,7 @@ abstract class Data
                     $setClause[] = $escape($field) . " = :set_{$field}";
                     $params[":set_{$field}"] = $value;
                 }
-                
+
                 $whereClause = [];
                 foreach ($where as $field => $value) {
                     $escapedField = $escape($field);
