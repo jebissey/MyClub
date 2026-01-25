@@ -43,36 +43,6 @@
               <a class="nav-link {if $page == 'connections'}active{/if}" href="/user/connections" data-bs-toggle="tooltip" data-bs-placement="bottom" title="{='connections'|translate}"><h2>🕸️</h2></a>
           </li>
       </ul>
-
-      <a class="nav-link" href="{$href}">
-      {if strlen($userImg) < 10}
-        <span data-bs-toggle="tooltip" 
-              data-bs-placement="bottom" 
-              title="{if $userEmail != ''}{='my_data'|translate}{else}{='login'|translate}{/if}"
-              style="font-size: 2rem; cursor: pointer; display: inline-block; line-height: 1;">
-            {$userImg}
-        </span>
-      {else}
-        <img id="userAvatar" src="{$userImg}" 
-            alt="User gravatar" 
-            data-bs-toggle="tooltip" 
-            data-bs-placement="bottom" 
-            title="{if $userEmail != ''}{='my_data'|translate}{else}{='login'|translate}{/if}">
-      {/if}
-      </a>
-
-      {if $isAdmin}
-        <a href="/admin" class="me-2">
-        <img src="/app/images/admin.png" alt="Admin" data-bs-toggle="tooltip" data-bs-placement="bottom" title="{='admin_zone'|translate}">
-      </a>
-      {/if}
-      {if $userEmail != ''}
-      <a href="/user/sign/out">
-        <img src="/app/images/SignOut.png" alt="Sign out" data-bs-toggle="tooltip" data-bs-placement="bottom" title="{='logout'|translate}">
-      </a>
-      {/if}
-      <a href="/user/help">
-        <img src="/app/images/help.png" alt="Help" data-bs-toggle="tooltip" data-bs-placement="bottom" title="{='contextual_help'|translate}" class="me-2">
-      </a>
+      {include '_right.latte'}
     </div>
   </div>

@@ -1,0 +1,50 @@
+
+                  <div class="d-flex align-items-center gap-3 ms-auto">
+                    <a class="nav-link p-0" href="{$href}">
+                      {if strlen($userImg) < 10}
+                        <span data-bs-toggle="tooltip"
+                              data-bs-placement="bottom"
+                              title="{if $userEmail != ''}{='my_data'|translate}{else}{='login'|translate}{/if}"
+                              style="font-size: 2rem; cursor: pointer; line-height: 1;">
+                          {$userImg}
+                        </span>
+                      {else}
+                        <img src="{$userImg}"
+                            alt="User gravatar"
+                            data-bs-toggle="tooltip"
+                            data-bs-placement="bottom"
+                            title="{if $userEmail != ''}{='my_data'|translate}{else}{='login'|translate}{/if}">
+                      {/if}
+                    </a>
+
+                    {if $isAdmin}
+                      <a href="/admin"
+                        data-bs-toggle="tooltip"
+                        title="{='admin_zone'|translate}">
+                        <i class="bi bi-key-fill fs-1 text-warning"></i>
+                      </a>
+                    {/if}
+
+                    {if $userEmail != ''}
+                      <a href="/user/sign/out"
+                        data-bs-toggle="tooltip"
+                        title="{='logout'|translate}">
+                        <i class="bi bi-box-arrow-right fs-1 text-warning"></i>
+                      </a>
+                    {/if}
+
+                    <a href="/help"
+                      data-bs-toggle="tooltip"
+                      title="{='contextual_help'|translate}">
+                      <i class="bi bi-question-circle-fill fs-2 text-warning"></i>
+                    </a>
+
+                    {if $flag != ''}
+                      <button type="button"
+                              class="btn btn-outline-secondary"
+                              data-bs-toggle="modal"
+                              data-bs-target="#languageModal">
+                        <h2 class="modal-title mb-0">{$flag}</h2>
+                      </button>
+                    {/if}
+                  </div>
