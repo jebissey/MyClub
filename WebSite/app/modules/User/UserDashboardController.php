@@ -46,7 +46,8 @@ class UserDashboardController extends AbstractController
         }
         $_SESSION['navbar'] = 'user';
         $this->render('User/views/user.latte', $this->getAllParams([
-            'page' => ''
+            'page' => '',
+            'content' => $this->languagesDataHelper->translate('User')
         ]));
     }
 }

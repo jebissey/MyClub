@@ -3,9 +3,12 @@ import ApiClient from '../../../Common/js/ApiClient.js';
 const api = new ApiClient('');
 
 export function initAttributes() {
-    document.addEventListener('DOMContentLoaded', () => {
-        loadAttributesList();
-    });
+    loadAttributesList();
+
+    const btn = document.getElementById('btnCreateAttribute');
+    if (btn) {
+        btn.addEventListener('click', createAttribute);
+    }
 }
 
 export async function createAttribute() {

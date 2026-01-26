@@ -5,19 +5,5 @@
 {/block}
 
 {block content}
-<div class="alert alert-info mt-2">
-    <h5 class="alert-heading">Bienvenue dans votre espace personnel</h5>
-
-    <p>
-        Ici, vous pouvez consulter et mettre à jour vos informations.
-    </p>
-
-    <p class="mb-1">
-        👉 Si les icônes sont visibles dans le menu, cliquez simplement sur celle qui correspond à ce que vous souhaitez modifier.
-    </p>
-    <p class="mb-0">
-        👉 Si elles ne sont pas visibles, ouvrez le menu à l’aide du bouton ☰ en haut à droite.
-    </p>
-</div>
-
+{$content|noescape}
 {/block}

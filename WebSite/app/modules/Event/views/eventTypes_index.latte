@@ -41,7 +41,9 @@
                                 <input type="text" id="newAttributeName" class="form-control flex-grow-1" placeholder="Nom de l'attribut" required>
                                 <input type="color" id="newAttributeColor" class="form-control form-control-color" value="#563d7c" style="width: 100px;">
                                 <textarea id="newAttributeDetail" class="form-control flex-grow-1" placeholder="Détail" rows="1" style="resize: none;"></textarea>
-                                <button onclick="createAttribute_()" class="btn btn-primary"><i class="bi bi-plus-lg"></i></button>
+                                <button id="btnCreateAttribute" class="btn btn-primary">
+                                    <i class="bi bi-plus-lg"></i>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -54,19 +56,16 @@
 {/block}
 
 {block scripts}
-    <script type="module">
+<script type="module">
     import {
         initAttributes,
-        createAttribute,
         editAttribute,
         deleteAttribute
     } from '/app/modules/Event/js/eventType/index.js';
 
-    initAttributes();
-
-    window.createAttribute = createAttribute;
     window.editAttribute = editAttribute;
     window.deleteAttribute = deleteAttribute;
-</script>
 
+    initAttributes();
+</script>
 {/block}

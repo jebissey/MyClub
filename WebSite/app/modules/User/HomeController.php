@@ -111,8 +111,10 @@ class HomeController extends AbstractController
             return;
         }
 
+        $content = $this->dataHelper->get('Settings', ['Name' => 'Help_Home'], 'Value')->Value ?? '';
+        if ($content === '') $content = $this->languagesDataHelper->translate('Help_Home');
         $this->render('Common/views/info.latte', [
-            'content' => $this->dataHelper->get('Settings', ['Name' => 'Help_Home'], 'Value')->Value ?? '',
+            'content' => $content,
             'hasAuthorization' => $this->application->getConnectedUser()->hasAutorization() ?? false,
             'currentVersion' => Application::VERSION,
             'timer' => 0,
