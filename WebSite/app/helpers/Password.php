@@ -15,6 +15,6 @@ class Password
 
     public static function verifyPassword(string $password, string $signedPassword): bool
     {
-        return hash_hmac(self::ALGO, $password, self::SECRET_KEY) == $signedPassword;
+        return hash_hmac(self::ALGO, $password, self::SECRET_KEY) === $signedPassword;
     }
 }

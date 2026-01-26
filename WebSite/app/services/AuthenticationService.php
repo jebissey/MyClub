@@ -120,7 +120,7 @@ class AuthenticationService
             $person = $this->findPersonByEmail($email);
             if ($person === false)                                       return AuthResult::error("Sign in failed: unknown email {$email}");
             if ($person->Inactivated == 1)                               return AuthResult::error("Sign in failed: inactivated user {$email}");
-            if (!Password::verifyPassword($password, $person->Password)) return AuthResult::error("Sign in failed: wrong password for {$email}");
+            if (!Password::verifyPassword($password, $person->Password ?? '')) return AuthResult::error("Sign in failed: wrong password for {$email}");
             return $this->loginUser($person, $rememberMe);
         } catch (Throwable $e) {
             return AuthResult::error("Authentication error: {$e->getMessage()} in {$e->getFile()} at line {$e->getLine()}");

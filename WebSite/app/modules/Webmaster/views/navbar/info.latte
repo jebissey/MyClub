@@ -3,9 +3,9 @@
       <img src="/app/images/home.png" alt="Home">
     </a>
     {if $hasAuthorization}
-      <a class="navbar-brand" href="/admin">
-          <img src="/app/images/admin.png" alt="Admin" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Zone admin">
-      </a>
+    <a class="navbar-brand" href="/admin" data-bs-toggle="tooltip" data-bs-placement="bottom" title="{='admin_zone'|translate}">
+        <i class="bi bi-key-fill fs-1 text-warning"></i>
+    </a>
     {/if}
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">

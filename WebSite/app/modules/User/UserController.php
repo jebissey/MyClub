@@ -8,6 +8,7 @@ use app\enums\ApplicationError;
 use app\enums\FilterInputRule;
 use app\exceptions\EmailException;
 use app\helpers\Application;
+use app\helpers\TranslationManager;
 use app\helpers\WebApp;
 use app\modules\Common\AbstractController;
 use app\services\AuthenticationService;
@@ -97,6 +98,7 @@ class UserController extends AbstractController
                 $this->redirect('/', ApplicationError::Ok, "Auto sign in succeeded for {$rememberMeResult->getUser()->Email}");
                 return;
             }
+            $lang = TranslationManager::getCurrentLanguage();
             $this->render('User/views/user_sign_in.latte', [
                 'href' => '/user/sign/in',
                 'userImg' => '👻',
@@ -104,7 +106,8 @@ class UserController extends AbstractController
                 'isAdmin' => false,
                 'page' => basename(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH)),
                 'currentVersion' => Application::VERSION,
-                'page' => $this->application->getConnectedUser()->getPage()
+                'page' => $this->application->getConnectedUser()->getPage(),
+                'flag' => TranslationManager::getFlag($lang),
             ]);
         } else $this->raiseMethodNotAllowed(__FILE__, __LINE__);
     }
