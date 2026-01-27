@@ -124,7 +124,7 @@ class Routes
         $crosstabDataHelper = new CrosstabDataHelper($application, $authorizationDataHelper);
         $dataHelper = new DataHelper($application);
         $designDataHelper = new DesignDataHelper($application);
-        $emailService = new EmailService($application, $dataHelper);
+        $emailService = new EmailService($dataHelper);
         $eventDataHelper = new EventDataHelper($application);
         $groupDataHelper = new GroupDataHelper($application);
         $logDataHelper = new LogDataHelper($application);

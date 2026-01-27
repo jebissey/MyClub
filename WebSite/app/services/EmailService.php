@@ -8,13 +8,12 @@ use InvalidArgumentException;
 use PHPMailer\PHPMailer\PHPMailer;
 use Throwable;
 
-use app\enums\ApplicationError;
-use app\helpers\Application;
+use app\exceptions\EmailException;
 use app\models\DataHelper;
 
 class EmailService
 {
-    public function __construct(private Application $application ,private DataHelper $dataHelper) {}
+    public function __construct(private DataHelper $dataHelper) {}
 
     public function send(
         string $emailFrom,
@@ -116,8 +115,8 @@ class EmailService
             $mail->setFrom($smtpUser, 'No Reply');
             $mail->addAddress($emailTo);
 
-//$mail->SMTPDebug  = 2;
-//$mail->Debugoutput = 'error_log';
+            //$mail->SMTPDebug  = 2;
+            //$mail->Debugoutput = 'error_log';
 
             if ($cc) {
                 $ccList = is_array($cc) ? $cc : explode(',', $cc);
@@ -145,9 +144,7 @@ class EmailService
             $mail->send();
             return true;
         } catch (Throwable $e) {
-            $this->application->getErrorManager()->raise(ApplicationError::Error, 'PHPMailer error: ' . $mail->ErrorInfo . "{$e->getMessage()} in {$e->getFile()}:{$e->getLine()}");
-            return false;
+            throw new EmailException('PHPMailer error: ' . $mail->ErrorInfo, previous: $e);
         }
     }
-
 }

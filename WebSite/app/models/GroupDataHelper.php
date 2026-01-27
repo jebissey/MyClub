@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace app\models;
@@ -19,83 +20,64 @@ class GroupDataHelper extends Data
 
     public function getAvailableGroups(ConnectedUser $connectedUser, int $personId): array
     {
-        if ($connectedUser->isWebmaster()) {
-            $query = $this->pdo->prepare("
-                    SELECT 
-                        g.Id,
-                        g.Name,
-                        GROUP_CONCAT(a.Name) AS Authorizations
-                    FROM `Group` g
-                    INNER JOIN PersonGroup pg ON pg.IdGroup = g.Id
-                    INNER JOIN GroupAuthorization ga ON g.Id = ga.IdGroup
-                    INNER JOIN Authorization a ON ga.IdAuthorization = a.Id
-                    WHERE pg.IdPerson = ? AND g.Inactivated = 0 AND g.Id <>1 AND g.SelfRegistration = 0
-                    GROUP BY g.Id, g.Name
-                ");
-        } else {
-            $query = $this->pdo->prepare("
-                    SELECT 
-                        g.Id,
-                        g.Name,
-                        GROUP_CONCAT(a.Name) AS Authorizations
-                    FROM `Group` g
-                    INNER JOIN PersonGroup pg ON pg.IdGroup = g.Id
-                    LEFT JOIN GroupAuthorization ga ON g.Id = ga.IdGroup
-                    LEFT JOIN Authorization a ON ga.IdAuthorization = a.Id
-                    WHERE pg.IdPerson = ? AND g.Inactivated = 0 AND g.Id <>1 AND g.SelfRegistration = 0
-                    GROUP BY g.Id, g.Name
-					HAVING Authorizations is NULL
-                ");
+        $having = $this->getAuthorizationHavingClause($connectedUser);
+        if ($having === 'HAVING 1 = 0') {
+            return [[], []];
         }
-        $query->execute([$personId]);
-        $currentGroups = $query->fetchAll();
 
-        $availableGroupsWithoutAuthorisationQuery = "
-                SELECT 
-					g.Id, 
-					g.Name,
-					'' AS Authorizations
-                FROM 'Group' g
-                LEFT JOIN GroupAuthorization ga ON g.Id = ga.IdGroup
-                WHERE ga.IdGroup IS NULL AND g.Inactivated = 0 AND g.SelfRegistration = 0
-            ";
-        $availableGroupsWithAuthorisationQuery = "
-                SELECT 
-					g.Id,
-					g.Name,
-					GROUP_CONCAT(a.Name) AS Authorizations
-                FROM 'Group' g
-                INNER JOIN GroupAuthorization ga ON g.Id = ga.IdGroup
-				INNER JOIN Authorization a ON ga.IdAuthorization = a.Id
-                WHERE g.Inactivated = 0 AND g.Id <> 1
-				GROUP BY g.Name
-            ";
-        if ($connectedUser->isWebmaster()) $availableGroupsQuery = $availableGroupsWithAuthorisationQuery;
-        else                               $availableGroupsQuery = $availableGroupsWithoutAuthorisationQuery;
+        $currentGroupsQuery = $this->pdo->prepare("
+            SELECT 
+                g.Id,
+                g.Name,
+                GROUP_CONCAT(a.Name) AS Authorizations
+            FROM `Group` g
+            INNER JOIN PersonGroup pg ON pg.IdGroup = g.Id
+            LEFT JOIN GroupAuthorization ga ON g.Id = ga.IdGroup
+            LEFT JOIN Authorization a ON ga.IdAuthorization = a.Id
+            WHERE pg.IdPerson = ?
+            AND g.Inactivated = 0
+            AND g.Id <> 1
+            AND g.SelfRegistration = 0
+            GROUP BY g.Id, g.Name
+            $having
+        ");
+        $currentGroupsQuery->execute([$personId]);
+        $currentGroups = $currentGroupsQuery->fetchAll();
+
+        $availableGroupsQuery = "
+            SELECT 
+                g.Id,
+                g.Name,
+                GROUP_CONCAT(a.Name) AS Authorizations
+            FROM `Group` g
+            LEFT JOIN GroupAuthorization ga ON g.Id = ga.IdGroup
+            LEFT JOIN Authorization a ON ga.IdAuthorization = a.Id
+            WHERE g.Inactivated = 0
+            AND g.SelfRegistration = 0
+            AND g.Id <> 1
+            GROUP BY g.Id, g.Name
+            $having
+        ";
         $availableGroupsLeftQuery = $this->pdo->prepare("
-                SELECT availableGroups.*
-                FROM (
-                    $availableGroupsQuery
-                ) availableGroups
-                WHERE availableGroups.Id NOT IN (
-                    SELECT userGroups.Id
-                    FROM ( 
-                        SELECT 
-                            g.Id,
-                            g.Name,
-                            GROUP_CONCAT(a.Name) AS Authorizations
-                        FROM 'Group' g
-                        INNER JOIN PersonGroup pg ON g.Id = pg.IdGroup
-                        LEFT JOIN GroupAuthorization ga ON g.Id = ga.IdGroup
-                        LEFT JOIN Authorization a ON ga.IdAuthorization = a.Id
-                        WHERE pg.IdPerson = ?
-                        GROUP BY g.Name
-                    ) userGroups
-                )
-            ");
+            SELECT ag.*
+            FROM (
+                $availableGroupsQuery
+            ) ag
+            WHERE ag.Id NOT IN (
+                SELECT g.Id
+                FROM `Group` g
+                INNER JOIN PersonGroup pg ON g.Id = pg.IdGroup
+                WHERE pg.IdPerson = ?
+            )
+        ");
         $availableGroupsLeftQuery->execute([$personId]);
-        return [$availableGroupsLeftQuery->fetchAll(), $currentGroups];
+
+        return [
+            $availableGroupsLeftQuery->fetchAll(),
+            $currentGroups
+        ];
     }
+
 
     public function getCurrentGroups(int $personId): array
     {
@@ -113,25 +95,29 @@ class GroupDataHelper extends Data
 
     public function getGroupsWithAuthorizations(ConnectedUser $connectedUser): array|false
     {
-        $having = '';
-        if ($connectedUser->isPersonManager() && !$connectedUser->isWebmaster()) {
-            $having = "HAVING Authorizations IS NULL";
+        $having = $this->getAuthorizationHavingClause($connectedUser);
+        if ($having === 'HAVING 1 = 0') {
+            return [];
         }
+
         $sql = "
-            SELECT 
-                g.Id, 
-                g.Name, 
-                g.SelfRegistration,
-                GROUP_CONCAT(a.Name) AS Authorizations
-            FROM 'Group' g
-            LEFT JOIN GroupAuthorization ga ON g.Id = ga.IdGroup
-            LEFT JOIN Authorization a ON ga.IdAuthorization = a.Id
-            WHERE Inactivated = 0
-            GROUP BY g.Id, g.Name
-            $having
-            ORDER BY g.Name";
+        SELECT 
+            g.Id,
+            g.Name,
+            g.SelfRegistration,
+            GROUP_CONCAT(a.Name) AS Authorizations
+        FROM `Group` g
+        LEFT JOIN GroupAuthorization ga ON g.Id = ga.IdGroup
+        LEFT JOIN Authorization a ON ga.IdAuthorization = a.Id
+        WHERE g.Inactivated = 0
+        GROUP BY g.Id, g.Name, g.SelfRegistration
+        $having
+        ORDER BY g.Name
+    ";
+
         return $this->query($sql);
     }
+
 
     public function getGroupsWithType(int $idPerson): array|false
     {
@@ -217,5 +203,23 @@ class GroupDataHelper extends Data
             $this->pdo->rollBack();
             throw $e;
         }
+    }
+
+    #region Private functions
+    private function getAuthorizationHavingClause(ConnectedUser $connectedUser): string
+    {
+        $isWebmaster = $connectedUser->isWebmaster();
+        $isPersonManager = $connectedUser->isPersonManager();
+
+        if (!$isWebmaster && !$isPersonManager) {
+            return 'HAVING 1 = 0';
+        }
+        if ($isWebmaster && !$isPersonManager) {
+            return 'HAVING COUNT(a.Id) > 0';
+        }
+        if ($isPersonManager && !$isWebmaster) {
+            return 'HAVING COUNT(a.Id) = 0';
+        }
+        return '';
     }
 }

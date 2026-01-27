@@ -1115,8 +1115,7 @@ INSERT INTO "Languages" VALUES (78,'User','<div class="alert alert-info mt-2">
         <a href="/user/notepad" class="{if $page == ''account''}active{/if} text-decoration-none">🗒️ Notepad</a>
         <a href="/user/connections" class="{if $page == ''account''}active{/if} text-decoration-none">🕸️ Connections</a>
     </div>
-</div>
-','<div class="alert alert-info mt-2">
+</div>','<div class="alert alert-info mt-2">
     <h5 class="alert-heading">Bienvenue dans votre espace personnel</h5>
     <p>
         Ici, vous pouvez consulter et mettre à jour vos informations.

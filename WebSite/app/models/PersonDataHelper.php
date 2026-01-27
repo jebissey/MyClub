@@ -130,7 +130,7 @@ class PersonDataHelper extends Data implements NewsProviderInterface
             $and = 'AND PersonGroup.IdGroup = ' . $idGroup;
         }
         return $this->pdo->query("
-            SELECT Person.Id, FirstName, LastName, Email, Preferences, Availabilities
+            SELECT Person.Id as PersonId, FirstName, LastName, Email, Preferences, Availabilities
             FROM Person
             $innerJoin
             WHERE Person.Inactivated = 0 $and

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace app\apis;
@@ -7,8 +8,8 @@ use DateTime;
 use Throwable;
 
 use app\enums\ApplicationError;
-use app\enums\EventAudience;
 use app\enums\Period;
+use app\exceptions\EmailException;
 use app\exceptions\QueryException;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
@@ -35,8 +36,8 @@ class EventApi extends AbstractApi
         private PersonPreferences $personPreferences,
         private MessageDataHelper $messageDataHelper,
         private EmailService $emailService,
-        ConnectedUser $connectedUser, 
-        DataHelper $dataHelper, 
+        ConnectedUser $connectedUser,
+        DataHelper $dataHelper,
         PersonDataHelper $personDataHelper
     ) {
         parent::__construct($application, $connectedUser, $dataHelper, $personDataHelper);
@@ -154,7 +155,7 @@ class EventApi extends AbstractApi
         try {
             $event = $this->eventDataHelper->getEvent((int)$eventId);
             $apiResponse = $this->sendEventEmails($event, $data['Title'] ?? '', $data['Body'] ?? '', $data['Recipients'] ?? '');
-            $this->renderJson([$apiResponse->data], $apiResponse->success,  $apiResponse->responseCode);
+            $this->renderJson([$apiResponse->data], $apiResponse->success,  $apiResponse->responseCode, $apiResponse->message);
         } catch (QueryException $e) {
             $this->renderJsonError($e->getMessage(), ApplicationError::BadRequest->value, $e->getFile(), $e->getLine());
         } catch (Throwable $e) {
@@ -186,19 +187,23 @@ class EventApi extends AbstractApi
             }
             $ccList = $this->messageDataHelper->addWebAppMessages($event->Id, $participants, $title . "\n\n" . $body);
             $htmlBody = nl2br(htmlspecialchars($body, ENT_QUOTES, 'UTF-8')) . "<br>" .
-            '<a href="' . htmlspecialchars($eventLink, ENT_QUOTES, 'UTF-8') . '">' . htmlspecialchars($eventLink, ENT_QUOTES, 'UTF-8') . '</a>' . "<br><br>" .
-            "Pour ne plus recevoir ce type de message vous pouvez mettre à jour vos préférences<br>" .
-            '<a href="' . htmlspecialchars($unsubscribeLink, ENT_QUOTES, 'UTF-8') . '">Se désinscrire</a>';
-            $result = $this->emailService->send(
-                $eventCreatorEmail,
-                $eventCreatorEmail,
-                $title,
-                $htmlBody,
-                $ccList,
-                null,
-                false
-            );
-            return new ApiResponse($result, $result ? ApplicationError::Ok->value : ApplicationError::Error->value);
+                '<a href="' . htmlspecialchars($eventLink, ENT_QUOTES, 'UTF-8') . '">' . htmlspecialchars($eventLink, ENT_QUOTES, 'UTF-8') . '</a>' . "<br><br>" .
+                "Pour ne plus recevoir ce type de message vous pouvez mettre à jour vos préférences<br>" .
+                '<a href="' . htmlspecialchars($unsubscribeLink, ENT_QUOTES, 'UTF-8') . '">Se désinscrire</a>';
+            try {
+                $result = $this->emailService->send(
+                    $eventCreatorEmail,
+                    $eventCreatorEmail,
+                    $title,
+                    $htmlBody,
+                    $ccList,
+                    null,
+                    false
+                );
+                return new ApiResponse($result, $result ? ApplicationError::Ok->value : ApplicationError::Error->value);
+            } catch (EmailException $e) {
+                return new ApiResponse(false, ApplicationError::BadRequest->value, [], "Error {$e->getCode()} in {$e->getFile()} at {$e->getLine()}: {$e->getMessage()}");
+            }
         }
         return new ApiResponse(false, ApplicationError::BadRequest->value, [], 'No participant');
     }

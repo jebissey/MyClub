@@ -32,11 +32,15 @@ abstract class AbstractApi
         return json_decode($json, true) ?? [];
     }
 
-    protected function renderJson(array $data, bool $success, int $statusCode): void
+    protected function renderJson(array $data, bool $success, int $statusCode, string $message = ''): void
     {
         header('Content-Type: application/json');
         http_response_code($statusCode);
-        $response = array_merge(['success' => $success], $data);
+        $response = [
+            'success' => $success,
+            'message' => $message,
+            'data'    => $data,
+        ];
         echo json_encode($response);
         if (ob_get_level()) ob_end_flush();
         flush();

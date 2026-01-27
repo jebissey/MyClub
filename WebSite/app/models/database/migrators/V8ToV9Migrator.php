@@ -307,7 +307,7 @@ SQL);
         $pdo->exec("UPDATE Languages SET Name = 'Home_Footer'          WHERE Name = 'Home_footer';");
 
 
-        $pdo->exec(<<<SQL
+        $pdo->exec(<<<'SQL'
 INSERT INTO Languages (Name, en_US, fr_FR)
 VALUES (
     'User',

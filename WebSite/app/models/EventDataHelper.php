@@ -240,7 +240,7 @@ class EventDataHelper extends Data implements NewsProviderInterface
             $stmt = $this->pdo->prepare($sql);
             $stmt->execute([':eventId' => $eventId]);
             $result = $stmt->fetch();
-            return $result['IdGroup'] ?? null;
+            return $result->IdGroup ?? null;
         }
         throw new QueryException("Event ({$eventId}) doesn't exist");
     }
