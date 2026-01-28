@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace app\helpers;
 
+use RuntimeException;
+
 use app\models\DataHelper;
 use app\models\SharedFileDataHelper;
 
@@ -88,37 +90,42 @@ class Media
         return ['success' => false, 'message' => "File doesn't exist"];
     }
 
-    public function uploadFile($file): array
+    public function uploadFile(array $file): array
     {
         $year = date('Y');
         $month = date('m');
         $targetDir = self::MEDIA_PATH . $year . '/' . $month . '/';
-        if (!file_exists($targetDir)) mkdir($targetDir, 0755, true);
+
+        if (!file_exists($targetDir)) {
+            mkdir($targetDir, 0755, true);
+        }
+
         $originalName = $file['name'];
         $extension = pathinfo($originalName, PATHINFO_EXTENSION);
         $baseFilename = pathinfo($originalName, PATHINFO_FILENAME);
         $safeFilename = File::sanitizeFilename($baseFilename);
+
         $targetFile = $targetDir . $safeFilename . '.' . $extension;
         $counter = 1;
+
         while (file_exists($targetFile)) {
             $targetFile = $targetDir . $safeFilename . '_' . $counter . '.' . $extension;
             $counter++;
         }
-        if (move_uploaded_file($file['tmp_name'], $targetFile)) {
-            $relativePath = 'data/media/' . $year . '/' . $month . '/' . basename($targetFile);
-            $response = [
-                'success' => true,
-                'message' => 'Fichier uploadé avec succès',
-                'file' => [
-                    'name' => basename($targetFile),
-                    'path' => $relativePath,
-                    'url' => WebApp::getBaseUrl() . $relativePath,
-                    'size' => $file['size'],
-                    'type' => $file['type']
-                ]
-            ];
-        } else $response['message'] = 'Erreur lors de l\'enregistrement du fichier';
-        return $response;
+        if (!move_uploaded_file($file['tmp_name'], $targetFile)) {
+            throw new RuntimeException('Erreur lors de l’enregistrement du fichier');
+        }
+        $relativePath = 'data/media/' . $year . '/' . $month . '/' . basename($targetFile);
+
+        return [
+            'file' => [
+                'name' => basename($targetFile),
+                'path' => $relativePath,
+                'url'  => WebApp::getBaseUrl() . $relativePath,
+                'size' => $file['size'],
+                'type' => $file['type']
+            ]
+        ];
     }
 
     #region Private functions

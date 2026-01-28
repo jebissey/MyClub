@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace app\apis;
 
+use Throwable;
+
 use app\enums\ApplicationError;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
@@ -54,7 +56,7 @@ class MediaApi extends AbstractApi
         $data = $this->getJsonInput();
         $filePath = $data['item'] ?? null;
         if (!$filePath) {
-            $this->renderJsonBadRequest('Fichier manquant',__FILE__, __LINE__);
+            $this->renderJsonBadRequest('Fichier manquant', __FILE__, __LINE__);
             return;
         }
         $this->renderJsonOk($this->media->isShared($filePath));
@@ -109,7 +111,17 @@ class MediaApi extends AbstractApi
             $this->renderJsonOk($response);
             return;
         }
-        $this->renderJsonOk($this->media->uploadFile($file));
+        try {
+            $data = $this->media->uploadFile($file);
+            $this->renderJsonOk($data, 'Fichier uploadé avec succès');
+        } catch (Throwable $e) {
+            $this->renderJson(
+                [],
+                false,
+                ApplicationError::Error->value,
+                $e->getMessage()
+            );
+        }
     }
 
     #region private methods

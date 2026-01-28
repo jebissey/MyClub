@@ -1,4 +1,8 @@
-document.addEventListener('DOMContentLoaded', function () {
+import ApiClient from '../../Common/js/ApiClient.js';
+
+const api = new ApiClient('/api');
+
+document.addEventListener('DOMContentLoaded', () => {
     const uploadForm = document.getElementById('uploadForm');
     const uploadStatus = document.getElementById('uploadStatus');
     const uploadResult = document.getElementById('uploadResult');
@@ -6,46 +10,64 @@ document.addEventListener('DOMContentLoaded', function () {
     const fileUrlEl = document.getElementById('fileUrl');
     const copyUrlBtn = document.getElementById('copyUrlBtn');
 
-    uploadForm.addEventListener('submit', function (e) {
+    if (!uploadForm) {
+        console.warn('uploadForm introuvable');
+        return;
+    }
+
+    /* ============================
+       Upload fichier
+       ============================ */
+
+    uploadForm.addEventListener('submit', async (e) => {
         e.preventDefault();
 
-        const formData = new FormData(this);
+        const formData = new FormData(uploadForm);
 
-        uploadStatus.innerHTML = '<div class="alert alert-info">Upload en cours...</div>';
+        uploadStatus.innerHTML =
+            '<div class="alert alert-info">Upload en cours…</div>';
         uploadStatus.style.display = 'block';
         uploadResult.style.display = 'none';
 
-        fetch('/api/media/upload', {
-            method: 'POST',
-            body: formData
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    uploadStatus.innerHTML = '<div class="alert alert-success">' + data.message + '</div>';
-                    fileNameEl.textContent = data.file.name;
-                    fileUrlEl.value = data.file.url;
-                    uploadResult.style.display = 'block';
-                } else {
-                    uploadStatus.innerHTML = '<div class="alert alert-danger">' + data.message + '</div>';
-                }
-            })
-            .catch(error => {
-                uploadStatus.innerHTML = '<div class="alert alert-danger">Erreur: ' + error.message + '</div>';
-            });
+        try {
+            const data = await api.postFormData('/api/media/upload', formData);
+            if (data.success && data.data.file) {
+                uploadStatus.innerHTML =
+                    `<div class="alert alert-success">${data.message}</div>`;
+
+                fileNameEl.textContent = data.data.file.name;
+                fileUrlEl.value = data.data.file.url;
+                uploadResult.style.display = 'block';
+            } else {
+                uploadStatus.innerHTML =
+                    `<div class="alert alert-danger">${data.message || 'Erreur lors de l’upload'}</div>`;
+            }
+
+        } catch (err) {
+            console.error(err);
+            uploadStatus.innerHTML =
+                `<div class="alert alert-danger">Erreur : ${err.message}</div>`;
+        }
     });
 
-    copyUrlBtn.addEventListener('click', function () {
-        fileUrlEl.select();
-        document.execCommand('copy');
+    /* ============================
+       Copier URL
+       ============================ */
 
-        const originalText = copyUrlBtn.innerHTML;
-        copyUrlBtn.innerHTML = '<i class="bi bi-check"></i> Copié!';
+    copyUrlBtn?.addEventListener('click', () => {
+        fileUrlEl.select();
+        fileUrlEl.setSelectionRange(0, 99999); // mobile
+
+        navigator.clipboard.writeText(fileUrlEl.value);
+
+        const originalHTML = copyUrlBtn.innerHTML;
+
+        copyUrlBtn.innerHTML = '<i class="bi bi-check"></i> Copié !';
         copyUrlBtn.classList.add('btn-success');
         copyUrlBtn.classList.remove('btn-outline-secondary');
 
-        setTimeout(function () {
-            copyUrlBtn.innerHTML = originalText;
+        setTimeout(() => {
+            copyUrlBtn.innerHTML = originalHTML;
             copyUrlBtn.classList.remove('btn-success');
             copyUrlBtn.classList.add('btn-outline-secondary');
         }, 2000);
