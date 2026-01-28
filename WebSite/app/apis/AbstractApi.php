@@ -50,21 +50,20 @@ abstract class AbstractApi
     protected function renderJsonBadRequest(string $message, string $file, int $line): void
     {
         $this->renderJson(
-            ['message' => "Bad request: {$message} in file {$file} at line {$line}"],
+            [],
             false,
-            ApplicationError::BadRequest->value
+            ApplicationError::BadRequest->value,
+            "Bad request: {$message} in file {$file} at line {$line}"
         );
     }
 
     protected function renderJsonCreated(array $data = [], string $message = 'Created'): void
     {
         $this->renderJson(
-            [
-                'message' => $message,
-                ...$data
-            ],
+            $data,
             true,
-            ApplicationError::Created->value
+            ApplicationError::Created->value,
+            $message
         );
     }
 
@@ -73,39 +72,40 @@ abstract class AbstractApi
         $this->application->getFlight()->setData('code', $statusCode);
         $this->application->getFlight()->setData('message', $message);
         $this->renderJson(
-            ['message' => "{$message} in file {$file} at line {$line}"],
+            [],
             false,
-            $statusCode
+            $statusCode,
+            "{$message} in file {$file} at line {$line}"
         );
     }
 
     protected function renderJsonForbidden(string $file, int $line): void
     {
         $this->renderJson(
-            ['message' => "User not allowed in file {$file} at line {$line}"],
+            [],
             false,
-            ApplicationError::Forbidden->value
+            ApplicationError::Forbidden->value,
+            "User not allowed in file {$file} at line {$line}"
         );
     }
 
-    protected function renderJsonMethodNotAllowed(string $file, int $line)
+    protected function renderJsonMethodNotAllowed(string $file, int $line): void
     {
         $this->renderJson(
-            ['message' => "Method {$_SERVER['REQUEST_METHOD']} not allowed in file {$file} at line {$line}"],
+            [],
             false,
             ApplicationError::MethodNotAllowed->value,
+            "Method {$_SERVER['REQUEST_METHOD']} not allowed in file {$file} at line {$line}"
         );
     }
 
     protected function renderJsonOk(array $data = [], string $message = 'OK'): void
     {
         $this->renderJson(
-            [
-                'message' => $message,
-                ...$data
-            ],
+            $data,
             true,
-            ApplicationError::Ok->value
+            ApplicationError::Ok->value,
+            $message
         );
     }
 

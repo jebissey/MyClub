@@ -33,16 +33,16 @@ async function loadGroupUsers(groupId) {
         userList.innerHTML = 'Chargement…';
 
         try {
-            const data = await api.get(`/api/personsInGroup/${groupId}`);
-            if (data.success && Array.isArray(data.items)) {
-                if (data.items.length === 0) {
+            const response = await api.get(`/api/personsInGroup/${groupId}`);
+            if (response.success && Array.isArray(response.data.items)) {
+                if (response.data.items.length === 0) {
                     userList.innerHTML = '<p>Aucun utilisateur dans ce groupe.</p>';
                 } else {
                     userList.innerHTML = `
                         <ul class="list-unstyled mb-0">
-                            ${data.items.map(u =>
-                                `<li>${u.FirstName} ${u.LastName} (${u.Email})</li>`
-                            ).join('')}
+                            ${response.data.items.map(u =>
+                        `<li>${u.FirstName} ${u.LastName} (${u.Email})</li>`
+                    ).join('')}
                         </ul>
                     `;
                 }
