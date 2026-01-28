@@ -91,9 +91,13 @@ class WebApp
                 if ($value === 'on' || $value === '1' || $value === 'true')                        $filtered[$key] = 1;
                 elseif ($value === 'off' || $value === '0' || $value === 'false' || $value === '') $filtered[$key] = 0;
                 else                                                                               $filtered[$key] = filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
-            } elseif ($rule === FilterInputRule::Int) $filtered[$key] = filter_var($value, FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
-            elseif ($rule === FilterInputRule::Float) $filtered[$key] = filter_var($value, FILTER_VALIDATE_FLOAT, FILTER_NULL_ON_FAILURE);
-            else                                      $filtered[$key] = $value !== '' ? $value : null;
+            } elseif ($rule === FilterInputRule::Int->value) {
+                $val = filter_var($value, FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
+                $filtered[$key] = $val !== null ? (int) $val : null;
+            } elseif ($rule === FilterInputRule::Float->value) {
+                $val = filter_var($value, FILTER_VALIDATE_FLOAT, FILTER_NULL_ON_FAILURE);
+                $filtered[$key] = $val !== null ? (float) $val : null;
+            } else $filtered[$key] = $value !== '' ? $value : null;
         }
         return $filtered;
     }

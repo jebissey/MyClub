@@ -99,25 +99,22 @@ class GroupDataHelper extends Data
         if ($having === 'HAVING 1 = 0') {
             return [];
         }
-
         $sql = "
-        SELECT 
-            g.Id,
-            g.Name,
-            g.SelfRegistration,
-            GROUP_CONCAT(a.Name) AS Authorizations
-        FROM `Group` g
-        LEFT JOIN GroupAuthorization ga ON g.Id = ga.IdGroup
-        LEFT JOIN Authorization a ON ga.IdAuthorization = a.Id
-        WHERE g.Inactivated = 0
-        GROUP BY g.Id, g.Name, g.SelfRegistration
-        $having
-        ORDER BY g.Name
-    ";
-
+            SELECT 
+                g.Id,
+                g.Name,
+                g.SelfRegistration,
+                GROUP_CONCAT(a.Name) AS Authorizations
+            FROM `Group` g
+            LEFT JOIN GroupAuthorization ga ON g.Id = ga.IdGroup
+            LEFT JOIN Authorization a ON ga.IdAuthorization = a.Id
+            WHERE g.Inactivated = 0
+            GROUP BY g.Id, g.Name, g.SelfRegistration
+            $having
+            ORDER BY g.Name
+        ";
         return $this->query($sql);
     }
-
 
     public function getGroupsWithType(int $idPerson): array|false
     {
