@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\modules\Designer;
 
 use app\helpers\Application;
+use app\helpers\WebApp;
 use app\modules\Common\AbstractController;
 
 class DesignerController extends AbstractController
@@ -32,8 +33,19 @@ class DesignerController extends AbstractController
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isDesigner())) {
             $_SESSION['navbar'] = 'designer';
+            $connectedUser = $this->application->getConnectedUser();
+            $content = $this->languagesDataHelper->translate('Designer');
+            $params = [
+                'isEventDesigner' => $connectedUser->isEventDesigner(),
+                'isHomeDesigner' => $connectedUser->isHomeDesigner(),
+                'isKanbanDesigner' => $connectedUser->isKanbanDesigner(),
+                'isNavbarDesigner' => $connectedUser->isNavbarDesigner(),
+            ];
+            $compiledContent = WebApp::getcompiledContent($content, $params);
+
             $this->render('Designer/views/designer.latte', $this->getAllParams([
-                'page' => $this->application->getConnectedUser()->getPage()
+                'page' => $this->application->getConnectedUser()->getPage(),
+                'content' => $compiledContent
             ]));
         }
     }

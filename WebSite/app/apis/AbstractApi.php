@@ -15,7 +15,7 @@ use app\models\PersonDataHelper;
 
 abstract class AbstractApi
 {
-    private LatteEngine $latte;
+    protected LatteEngine $latte;
 
     public function __construct(
         protected Application $application,

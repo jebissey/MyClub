@@ -3,3 +3,7 @@
 {block navbar}
     {include 'navbar/redactor.latte'}
 {/block}
+
+{block content}
+{$content|noescape}
+{/block}

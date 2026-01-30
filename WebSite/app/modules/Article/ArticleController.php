@@ -181,6 +181,7 @@ class ArticleController extends TableController
         $_SESSION['navbar'] = 'redactor';
         $this->render('Webmaster/views/redactor.latte', $this->getAllParams([
             'page' => $this->application->getConnectedUser()->getPage(),
+            'content' => $this->languagesDataHelper->translate('Redactor')
         ]));
     }
 

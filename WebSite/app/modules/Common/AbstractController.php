@@ -22,7 +22,7 @@ use app\models\PageDataHelper;
 abstract class AbstractController
 {
     protected Engine $flight;
-    private LatteEngine $latte;
+    protected LatteEngine $latte;
     public DataHelper $dataHelper;
     protected LanguagesDataHelper $languagesDataHelper;
     protected PageDataHelper $pageDataHelper;

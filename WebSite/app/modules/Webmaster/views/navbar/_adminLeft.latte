@@ -1,0 +1,25 @@
+<div class="container-fluid">    
+    <div class="d-flex align-items-center">
+        <a class="navbar-brand" href="/">
+            <img src="/app/images/home.png"
+                 alt="Home"
+                 data-bs-toggle="tooltip"
+                 data-bs-placement="bottom"
+                 title="{='home'|translate}">
+        </a>
+        {if $isAdmin}
+        <a class="navbar-brand" href="/admin"
+            data-bs-toggle="tooltip"
+            title="{='admin_zone'|translate}">
+            <i class="bi bi-key-fill fs-1 text-warning"></i>
+        </a>
+        {/if}
+    </div>
+    <button class="navbar-toggler" type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav mx-auto">

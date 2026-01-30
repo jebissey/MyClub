@@ -49,7 +49,7 @@ export default class EmailManager {
                 autoSelectValue = 'annule';
             } else if (!hasMessages) {
                 emailTypeSelect.innerHTML =
-                    '<option value="nouvel-evenement">Nouvel évènement</option>';
+                    '<option value="nouvel-evenement">Nouvel événement</option>';
                 autoSelectValue = 'nouvel-evenement';
             } else {
                 emailTypeSelect.innerHTML =

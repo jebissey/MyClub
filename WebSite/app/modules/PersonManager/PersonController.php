@@ -135,6 +135,7 @@ class PersonController extends TableController
 
         $this->render('Webmaster/views/personManager.latte', $this->getAllParams([
             'page' => $this->application->getConnectedUser()->getPage(),
+            'content' => $this->languagesDataHelper->translate('PersonManager')
         ]));
     }
 

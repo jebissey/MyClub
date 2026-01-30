@@ -15,6 +15,7 @@ use app\exceptions\DatabaseException;
 use app\models\Database;
 use app\models\DataHelper;
 use app\models\LogDataCompactHelper;
+use app\models\LogDataWriterHelper;
 
 class Application
 {
@@ -110,13 +111,16 @@ class Application
      * @throws LogicException Always thrown
      * @return never
      */
-    public static function unreachable(mixed $value = null, string $file, int $line): never
+    public static function unreachable(mixed $value = null, string $file, int $line, bool $log = true): never
     {
         $msg = "Unreachable code executed in file {$file} at line {$line}";
         if ($value !== null) {
             if (is_object($value) && enum_exists($value::class)) $msg .= " (enum " . $value::class . "::" . $value->name . ")";
             elseif (is_object($value))                           $msg .= " (object of type " . $value::class . ")";
             else                                                 $msg .= " (value: " . var_export($value, true) . ")";
+        }
+        if ($log) {
+            new logDataWriterHelper(self::init())->add('UNREACHABLE', $msg);
         }
         throw new LogicException($msg);
     }

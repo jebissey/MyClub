@@ -3,3 +3,7 @@
 {block navbar}
     {include '../../Webmaster/views/navbar/designer.latte'}
 {/block}
+
+{block content}
+{$content|noescape}
+{/block}

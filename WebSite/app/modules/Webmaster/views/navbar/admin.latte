@@ -1,47 +1,39 @@
-                <div class="container-fluid">
-                    <a class="navbar-brand" href="/">
-                        <img src="/app/images/home.png" alt="Home" data-bs-toggle="tooltip" data-bs-placement="bottom" title="{='home'|translate}">
-                    </a>
+{include '_adminLeft.latte'}
 
-                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                        <span class="navbar-toggler-icon"></span>
-                    </button>
-
-                    <div class="collapse navbar-collapse" id="navbarNav">
-                        <ul class="navbar-nav">
                             {if $isEventManager}
                             <li class="nav-item">
                                 <a class="nav-link" href="/eventManager" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Animateur"><h2>🗓️</h2></a>
                             </li>
                             {/if}
+
                             {if $isDesigner}
                             <li class="nav-item">
                                 <a class="nav-link" href="/designer" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Designer"><h2>🎨</h2></a>
                             </li>
                             {/if}
+
                             {if $isRedactor}
                             <li class="nav-item">
                                 <a class="nav-link" href="/redactor" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Rédacteur"><h2>✍️</h2></a>
                             </li>
                             {/if}
+
                             {if $isPersonManager}
                             <li class="nav-item">
                                 <a class="nav-link" href="/personManager" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Secrétaire"><h2>📇</h2></a>
                             </li>
                             {/if}
+                            
                             {if $isVisitorInsights}
                             <li class="nav-item">
                                 <a class="nav-link" href="/visitorInsights" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Observateur"><h2>🔍</h2></a>
                             </li>
                             {/if}
+
                             {if $isWebmaster}
                             <li class="nav-item">
                                 <a class="nav-link" href="/webmaster" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Webmaster"><h2>🛠️</h2></a>
                             </li>
                             {/if}
-                        </ul>
-                        <a class="navbar-brand" href="/admin/help" data-bs-toggle="tooltip" title="{='contextual_help'|translate}">
-                            <i class="bi bi-question-circle-fill fs-2 text-warning"></i>
-                        </a>
-                    </div>
-                </div>
+
+{include '_adminRight.latte'}

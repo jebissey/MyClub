@@ -130,7 +130,7 @@ class HomeController extends AbstractController
             return;
         }
 
-        $content = $this->application->getLatte()->renderToString('Common/views/info.latte', [
+        $content = $this->latte->renderToString('Common/views/info.latte', [
             'content' => $this->dataHelper->get('Settings', ['Name' => 'LegalNotices'], 'Value')->Value ?? '',
             'hasAuthorization' => $this->application->getConnectedUser()->hasAutorization() ?? false,
             'currentVersion' => Application::VERSION,

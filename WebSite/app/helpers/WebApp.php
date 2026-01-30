@@ -111,6 +111,27 @@ class WebApp
         return $baseUrl;
     }
 
+    static public function getCompiledContent(string $content, array $params): string
+    {
+        $tempFile = sys_get_temp_dir() . '/admin_' . uniqid('', true) . '.latte';
+        file_put_contents($tempFile, $content);
+
+        $tempCacheDir = sys_get_temp_dir() . '/latte_cache_admin_runtime';
+        if (!is_dir($tempCacheDir)) {
+            mkdir($tempCacheDir, 0777, true);
+        }
+
+        try {
+            $latte = new \Latte\Engine();
+            $latte->setTempDirectory($tempCacheDir);
+            $latte->setAutoRefresh(true);
+            $latte->setStrictTypes(true);
+            return $latte->renderToString($tempFile, $params);
+        } finally {
+            @unlink($tempFile);
+        }
+    }
+
     static public function getFiltered(string $key, string|array $rule, array $source): mixed
     {
         $result = self::filterInput([$key => $rule], $source);

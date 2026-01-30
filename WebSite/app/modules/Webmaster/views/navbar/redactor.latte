@@ -1,32 +1,43 @@
-    <div class="container-fluid">
-        <a class="navbar-brand" href="/">
-            <img src="/app/images/home.png" alt="Home" data-bs-toggle="tooltip" data-bs-placement="bottom" title="{='home'|translate}">
-        </a>
-        <a class="navbar-brand" href="/admin" data-bs-toggle="tooltip" data-bs-placement="bottom" title="{='admin_zone'|translate}">
-            <i class="bi bi-key-fill fs-1 text-warning"></i>
-        </a>
+{include '_adminLeft.latte'}
 
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-        <span class="navbar-toggler-icon"></span>
-        </button>
+            <li class="nav-item">
+                <a class="nav-link {if $page == 'articles'}active{/if}"
+                   href="/articles"
+                   data-bs-toggle="tooltip"
+                   data-bs-placement="bottom"
+                   title="Articles">
+                    <h2>📰</h2>
+                </a>
+            </li>
 
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav">
-                <li class="nav-item">
-                    <a class="nav-link {if $page == 'articles'}active{/if}" href="/articles" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Articles"><h2>📰</h2></a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link {if $page == 'media'}active{/if}" href="/media/list" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Médias"><h2>📂</h2></a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link {if $page == 'topArticles'}active{/if}" href="/topArticles" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Top50"><h2>📈</h2></a>
-                </li>
-                <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Tableau croisé dynamique">
-                    <a class="nav-link {if $page == 'crossTab'}active{/if}" href="/articles/crossTab"><h2>🧮</h2></a>
-                </li>
-            </ul>
-            <a class="navbar-brand" href="/redactor/help" data-bs-toggle="tooltip" title="{='contextual_help'|translate}">
-                <i class="bi bi-question-circle-fill fs-2 text-warning"></i>
-            </a>
-        </div>
-    </div>
+            <li class="nav-item">
+                <a class="nav-link {if $page == 'media'}active{/if}"
+                   href="/media/list"
+                   data-bs-toggle="tooltip"
+                   data-bs-placement="bottom"
+                   title="Médias">
+                    <h2>📂</h2>
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link {if $page == 'topArticles'}active{/if}"
+                   href="/topArticles"
+                   data-bs-toggle="tooltip"
+                   data-bs-placement="bottom"
+                   title="Top50">
+                    <h2>📈</h2>
+                </a>
+            </li>
+
+            <li class="nav-item"
+                data-bs-toggle="tooltip"
+                data-bs-placement="bottom"
+                title="Tableau croisé dynamique">
+                <a class="nav-link {if $page == 'crossTab'}active{/if}"
+                   href="/articles/crossTab">
+                    <h2>🧮</h2>
+                </a>
+            </li>
+
+{include '_adminRight.latte'}

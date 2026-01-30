@@ -75,7 +75,8 @@ class VisitorInsightsController extends AbstractController
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isVisitorInsights())) {
             $_SESSION['navbar'] = 'visitorInsights';
             $this->render('Webmaster/views/visitorInsights.latte', $this->getAllParams([
-                'page' => $this->application->getConnectedUser()->getPage()
+                'page' => $this->application->getConnectedUser()->getPage(),
+                'content' => $this->languagesDataHelper->translate('VisitorInsights')
             ]));
         }
     }

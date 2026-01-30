@@ -79,7 +79,7 @@ class EventSupplyApi extends AbstractApi
         $eventId = (int)$eventId;
         $userEmail = $person->Email ?? '';
         try {
-            $this->application->getLatte()->render(
+            $this->latte->render(
                 'Event/views/participants-supplies_partial.latte',
                 [
                     'participantSupplies' => $this->eventDataHelper->getParticipantSupplies($eventId),

@@ -55,28 +55,41 @@ class WebmasterController extends AbstractController
 
     public function homeAdmin(): void
     {
-        if (!($this->application->getConnectedUser()->isAdministrator() ?? false)) {
+        $connectedUser = $this->application->getConnectedUser();
+        if (!($connectedUser->isAdministrator() ?? false)) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
         }
-        if ($this->application->getConnectedUser()->hasOnlyOneAutorization()) {
-            if ($this->application->getConnectedUser()->isEventDesigner())     $this->redirect('/designer');
-            if ($this->application->getConnectedUser()->isHomeDesigner())      $this->redirect('/designer');
-            if ($this->application->getConnectedUser()->isNavbarDesigner())    $this->redirect('/designer');
-            elseif ($this->application->getConnectedUser()->isEventManager())  $this->redirect('/eventManager');
-            elseif ($this->application->getConnectedUser()->isPersonManager()) $this->redirect('/personManager');
-            elseif ($this->application->getConnectedUser()->isRedactor()) {
+        if ($connectedUser->hasOnlyOneAutorization()) {
+            if ($connectedUser->isEventDesigner())     $this->redirect('/designer');
+            if ($connectedUser->isHomeDesigner())      $this->redirect('/designer');
+            if ($connectedUser->isNavbarDesigner())    $this->redirect('/designer');
+            elseif ($connectedUser->isEventManager())  $this->redirect('/eventManager');
+            elseif ($connectedUser->isPersonManager()) $this->redirect('/personManager');
+            elseif ($connectedUser->isRedactor()) {
                 $_SESSION['navbar'] = 'redactor';
                 $this->redirect('/articles');
-            } elseif ($this->application->getConnectedUser()->isVisitorInsights())  $this->redirect('/visitorInsights');
-            elseif ($this->application->getConnectedUser()->isWebmaster()) $this->redirect('/webmaster');
+            } elseif ($connectedUser->isVisitorInsights())  $this->redirect('/visitorInsights');
+            elseif ($connectedUser->isWebmaster()) $this->redirect('/webmaster');
         } else {
             if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
                 $this->raiseMethodNotAllowed(__FILE__, __LINE__);
                 return;
             }
+            $content = $this->languagesDataHelper->translate('Admin');
+            $params = [
+                'isEventManager' => $connectedUser->isEventManager(),
+                'isDesigner' => $connectedUser->isDesigner(),
+                'isRedactor' => $connectedUser->isRedactor(),
+                'isPersonManager' => $connectedUser->isPersonManager(),
+                'isVisitorInsights' => $connectedUser->isVisitorInsights(),
+                'isWebmaster' => $connectedUser->isWebmaster(),
+            ];
+            $compiledContent = WebApp::getcompiledContent($content, $params);
+
             $this->render('Webmaster/views/admin.latte', $this->getAllParams([
-                'page' => $this->application->getConnectedUser()->getPage(),
+                'page' => $connectedUser->getPage(),
+                'content' => $compiledContent
             ]));
         }
     }
@@ -89,11 +102,17 @@ class WebmasterController extends AbstractController
             $result = $this->getLastVersion();
             if (!$result['success']) $newVersion = "Test for MyClub new version error : " . $result['error'];
             elseif ($result['version'] != Application::VERSION) $newVersion = "A new version is available (V" . $result['version'] . ")";
+            $content = $this->languagesDataHelper->translate('Webmaster');
+            $params = [
+                'isMyclubWebSite' => WebApp::isMyClubWebSite(),
+            ];
+            $compiledContent = WebApp::getcompiledContent($content, $params);
 
             $this->render('Webmaster/views/webmaster.latte', $this->getAllParams([
                 'newVersion' => $newVersion,
                 'isMyclubWebSite' => WebApp::isMyClubWebSite(),
-                'page' => $this->application->getConnectedUser()->getPage()
+                'page' => $this->application->getConnectedUser()->getPage(),
+                'content' => $compiledContent
             ]));
         }
     }

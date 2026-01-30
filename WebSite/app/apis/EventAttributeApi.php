@@ -69,7 +69,7 @@ class EventAttributeApi extends AbstractApi
             return;
         }
         try {
-            $this->application->getLatte()->render(
+            $this->latte->render(
                 'Event/views/attributes-list_partial.latte',
                 ['attributes' => $this->attributeDataHelper->getAttributes()]
             );

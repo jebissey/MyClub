@@ -1,49 +1,33 @@
-    <div class="container-fluid">
-        <a class="navbar-brand" href="/">
-            <img src="/app/images/home.png" alt="Home" data-bs-toggle="tooltip" data-bs-placement="bottom" title="{='home'|translate}">
-        </a>
-        <a class="navbar-brand" href="/admin" data-bs-toggle="tooltip" data-bs-placement="bottom" title="{='admin_zone'|translate}">
-            <i class="bi bi-key-fill fs-1 text-warning"></i>
-        </a>
+{include '_adminLeft.latte'}
 
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-        <span class="navbar-toggler-icon"></span>
-        </button>
+            {if $isEventDesigner}
+            <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Les types d'événements et leurs attributs">
+                <a class="nav-link {if $page == 'eventTypes'}active{/if}" href="/eventTypes"><h2>🗓️</h2></a>
+            </li>
+            <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Les besoins associés aux événements">
+                <a class="nav-link {if $page == 'needs'}active{/if}" href="/needs"><h2>📋</h2></a>
+            </li>
+            {/if}
 
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav">
-                {if $isEventDesigner}
-                <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Les types d'évènements et leurs attributs">
-                    <a class="nav-link {if $page == 'eventTypes'}active{/if}" href="/eventTypes"><h2>🗓️</h2></a>
-                </li>
-                <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Les besoins associés aux événements">
-                    <a class="nav-link {if $page == 'needs'}active{/if}" href="/needs"><h2>📋</h2></a>
-                </li>
-                {/if}
+            {if $isHomeDesigner}
+            <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Personnalisation">
+                <a class="nav-link {if $page == 'settings'}active{/if}" href="/settings"><h2>🔧</h2></a>
+            </li>
+            <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Les designs">
+                <a class="nav-link {if $page == 'designs'}active{/if}" href="/designs"><h2>🧠</h2></a>
+            </li>
+            {/if}
 
-                {if $isHomeDesigner}
-                <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Personnalisation">
-                    <a class="nav-link {if $page == 'settings'}active{/if}" href="/settings"><h2>🔧</h2></a>
-                </li>
-                <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Les designs">
-                    <a class="nav-link {if $page == 'designs'}active{/if}" href="/designs"><h2>🧠</h2></a>
-                </li>                
-                {/if}
+            {if $isKanbanDesigner}
+            <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Kanban">
+                <a class="nav-link {if $page == 'kanban'}active{/if}" href="/kanban"><h2>🟨</h2></a>
+            </li>
+            {/if}
 
-                {if $isKanbanDesigner}
-                <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Kanban">
-                    <a class="nav-link {if $page == 'kanban'}active{/if}" href="/kanban"><h2>🟨</h2></a>
-                </li>              
-                {/if}
+            {if $isNavbarDesigner}
+            <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Les barres de navigations">
+                <a class="nav-link {if $page == 'navBar'}active{/if}" href="/navbar"><h2>📑</h2></a>
+            </li>
+            {/if}
 
-                {if $isNavbarDesigner}
-                <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Les barres de navigations">
-                    <a class="nav-link {if $page == 'navBar'}active{/if}" href="/navbar"><h2>📑</h2></a>
-                </li>
-                {/if}
-            </ul>
-            <a class="navbar-brand" href="/designer/help" data-bs-toggle="tooltip" title="{='contextual_help'|translate}">
-                <i class="bi bi-question-circle-fill fs-2 text-warning"></i>
-            </a>
-        </div>
-    </div>
+{include '_adminRight.latte'}
