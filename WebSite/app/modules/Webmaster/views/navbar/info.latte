@@ -8,6 +8,10 @@
     </a>
     {/if}
 
+    {ifset $previousPage}
+    <button class="btn btn-primary bi bi-arrow-left-circle fs-5" onclick="history.back()"></button>
+    {/ifset}
+
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
       <span class="navbar-toggler-icon"></span>
     </button>

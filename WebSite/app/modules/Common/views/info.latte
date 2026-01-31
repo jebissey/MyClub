@@ -11,12 +11,6 @@
         {ifset $content}
             {$content|noescape}
         {/ifset}
-
-        {ifset $previousPage}
-            <div class="mt-3">
-                <button class="btn btn-primary btn-sm bi bi-arrow-left-circle fs-4" onclick="history.back()"></button>
-            </div>
-        {/ifset}
     </div>
 
     {if $timer > 0}
@@ -37,15 +31,21 @@
 
 {block scripts}
 <script>
-    (function() {
+    (function () {
         const duration = {$timer|noescape}; // ms
         const progressBar = document.getElementById('progressBar');
-        const step = 100;                   // ms
+
+        if (!progressBar) {
+            return;
+        }
+
+        const step = 100; // ms
         let elapsed = 0;
 
         const interval = setInterval(() => {
             elapsed += step;
-            let percent = Math.min((elapsed / duration) * 100, 100);
+            const percent = Math.min((elapsed / duration) * 100, 100);
+
             progressBar.style.width = percent + "%";
             progressBar.setAttribute("aria-valuenow", percent);
 
