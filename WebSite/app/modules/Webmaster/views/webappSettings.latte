@@ -1,16 +1,39 @@
-{extends '../../Designer/views/designer.latte'}
+{layout '../../Common/views/layout.latte'}
 
 {block head}
-<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
-<script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
-<link href="/app/modules/Common/css/quill.css" rel="stylesheet">
+<style>
+    html, body {
+        height: 100%;
+    }
+
+    #editor-container {
+        min-height: 300px;
+    }
+
+    .tox-tinymce {
+        min-height: 300px;
+        border: 1px solid #ddd;
+    }
+</style>
 {/block}
 
-{block content}
-<div class="container-fluid mt-4">
-    <form id="languageForm" method="post" action="/settings-language">
-        <div class="mb-3">
-            <h1 for="lang" class="form-label">{='select_language'|translate}</h1>
+{block navbar}
+<div class="container-fluid d-flex align-items-center">
+    <div class="d-flex gap-2">
+        <a class="navbar-brand" href="/">
+            <img src="/app/images/home.png" alt="Home">
+        </a>
+        <button class="btn btn-primary fs-5" onclick="history.back()">
+            <i class="bi bi-arrow-left-circle"></i>
+        </button>
+    </div>
+
+    <form 
+        id="languageForm" 
+        method="post" 
+        action="/settings-language" 
+        class="d-flex align-items-center gap-2 border border-secondary-subtle rounded p-2 bg-light mx-auto">
+        <div>
             <select name="lang" id="languageSelect" class="form-select">
                 {foreach $supportedLanguages as $lang}
                     <option value="{$lang}" {$lang === $currentLanguage ? 'selected' : ''}>
@@ -20,7 +43,6 @@
             </select>
         </div>
 
-        <div class="form-check mb-3">
             <input
                 class="form-check-input"
                 type="checkbox"
@@ -32,26 +54,37 @@
             <label class="form-check-label" for="useLanguage">
                 Utiliser cette langue (sinon l'utilisateur pourra choisir sa langue préférée)
             </label>
-        </div>
 
-        <div class="d-flex justify-content-end">
             <button type="submit" class="btn btn-success">
                 {='save'|translate}
             </button>
-        </div>
     </form>
 
-    <div class="row">
+    <div class="ms-auto">
+        <button type="submit" form="edit-form" class="btn btn-success">
+            <i class="bi bi-check-circle"></i> Enregistrer
+        </button>
+        <a href="/designer" class="btn btn-secondary bi bi-x-circle"> Annuler</a>
+    </div>
+</div>
+{/block}
+
+{block content}
+<div class="container-fluid mt-4">
+    <div class="row mt-4">
         <div class="col-md-12">
             <h1>Personnalisation de l'application</h1>
+
             <div class="card">
                 <div class="card-body">
                     <form id="settingsForm" method="post">
+
                         <div class="row mb-4">
                             <div class="col-md-4">
                                 <label class="form-label">Paramètre à modifier</label>
                                 <select class="form-select" id="settingSelect">
                                     <option value="">Sélectionner un paramètre...</option>
+
                                     <optgroup label={='comboSeparatorHelp'|translate}>
                                     {foreach $settingsKeys as $key => $label}
                                         {if strpos($key, 'Help_') === 0}
@@ -59,6 +92,7 @@
                                         {/if}
                                     {/foreach}
                                     </optgroup>
+
                                     <optgroup label={='comboSeparatorHome'|translate}>
                                     {foreach $settingsKeys as $key => $label}
                                         {if strpos($key, 'Home_') === 0}
@@ -66,6 +100,7 @@
                                         {/if}
                                     {/foreach}
                                     </optgroup>
+
                                     <optgroup label={='comboSeparatorMessages'|translate}>
                                     {foreach $settingsKeys as $key => $label}
                                         {if strpos($key, 'Message_') === 0}
@@ -73,31 +108,44 @@
                                         {/if}
                                     {/foreach}
                                     </optgroup>
+
                                     <optgroup label={='comboSeparatorErrorPages'|translate}>
                                     {foreach $settingsKeys as $key => $label}
                                         {if strpos($key, 'Error_') === 0}
                                             <option value="{$key}">{$label}</option>
                                         {/if}
                                     {/foreach}
-                                     </optgroup>
+                                    </optgroup>
                                 </select>
                             </div>
                         </div>
 
-                        <div id="editor-container" style="display: none;">
+                        <div id="editor-container" style="display:none;">
                             <div class="mb-3">
                                 <label class="form-label" id="current-setting-label">Contenu</label>
-                                <div id="quill-editor" style="min-height: 300px;"></div>
+
+                                <textarea id="tinymce-editor"></textarea>
+
                                 {foreach $settingsKeys as $key => $label}
-                                    <input type="hidden" name="{$key}" id="content-{$key}" value="{$settings[$key]}">
+                                    <input
+                                        type="hidden"
+                                        name="{$key}"
+                                        id="content-{$key}"
+                                        value="{$settings[$key]|noescape}"
+                                    >
                                 {/foreach}
                             </div>
                         </div>
 
                         <div class="d-flex justify-content-end">
-                            <button id="save-btn" type="submit" class="btn btn-success me-2">{='save'|translate}</button>
-                            <a href="/admin/dashboard" class="btn btn-secondary">{='cancel'|translate}</a>
+                            <button type="submit" class="btn btn-success me-2">
+                                {='save'|translate}
+                            </button>
+                            <a href="/admin/dashboard" class="btn btn-secondary">
+                                {='cancel'|translate}
+                            </a>
                         </div>
+
                     </form>
                 </div>
             </div>
@@ -107,12 +155,40 @@
 {/block}
 
 {block scripts}
-    <script src="/app/js/quill/script.js"></script>
+    <script src="/app/modules/Common/js/tinymce/tinymce.min.js"></script>
+    <script src="/app/modules/Common/js/tinymce-config.js"></script>
+
     <script>
     const settingsData = {};
     {foreach $settingsKeys as $key => $label}
         settingsData[{$key}] = {($settings[$key] ?? '')};
     {/foreach}
+
+    let currentSetting = null;
+
+    initTinyMCE('#tinymce-editor');
+
+    document.getElementById('settingSelect').addEventListener('change', function () {
+        const key = this.value;
+        const editorContainer = document.getElementById('editor-container');
+
+        if (!key) {
+            editorContainer.style.display = 'none';
+            return;
+        }
+
+        currentSetting = key;
+        editorContainer.style.display = 'block';
+
+        tinymce.get('tinymce-editor').setContent(settingsData[key] || '');
+        document.getElementById('current-setting-label').innerText = this.options[this.selectedIndex].text;
+    });
+
+    document.getElementById('settingsForm').addEventListener('submit', function () {
+        if (!currentSetting) return;
+
+        const content = tinymce.get('tinymce-editor').getContent();
+        document.getElementById('content-' + currentSetting).value = content;
+    });
     </script>
-    <script src="/app/modules/Webmaster/js/WebappSettings.js"></script>
 {/block}
