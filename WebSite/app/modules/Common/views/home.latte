@@ -106,17 +106,57 @@
         </div>
         {/if}
     </div>
+
+    <div class="modal fade" id="languageModal" tabindex="-1" aria-labelledby="languageModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title" id="languageModalLabel">{='language'|translate}</h2>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="languageSelect" class="form-label">{='select_language'|translate}</label>
+                        <select id="languageSelect" class="form-select">
+                            {foreach $supportedLanguages as $lang}
+                                <option value="{$lang}" {$lang === $currentLanguage ? 'selected' : ''}>
+                                    {$lang}
+                                </option>
+                            {/foreach}
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 {/block}
 
 {block scripts}
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        var toastElList = [].slice.call(document.querySelectorAll('.toast'));
-        var toastList = toastElList.map(function(toastEl) {
-            return new bootstrap.Toast(toastEl);
-        });
-        
-        toastList.forEach(toast => toast.show());
+document.addEventListener('DOMContentLoaded', function() {
+    var toastElList = [].slice.call(document.querySelectorAll('.toast'));
+    var toastList = toastElList.map(function(toastEl) {
+        return new bootstrap.Toast(toastEl);
     });
+    toastList.forEach(toast => toast.show());
+
+    const languageSelect = document.getElementById('languageSelect');
+    if (languageSelect) {
+        languageSelect.addEventListener('change', function() {
+            document.cookie = "user_language=" + this.value + "; path=/; max-age=31536000";
+
+            const languageModalEl = document.getElementById('languageModal');
+            if (languageModalEl) {
+                const modalInstance = bootstrap.Modal.getInstance(languageModalEl) 
+                                     || new bootstrap.Modal(languageModalEl);
+                modalInstance.hide();
+            }
+
+            setTimeout(() => {
+                location.reload();
+            }, 300);
+        });
+    }
+});
 </script>
 {/block}

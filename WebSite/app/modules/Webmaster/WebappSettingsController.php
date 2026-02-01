@@ -92,7 +92,7 @@ class WebappSettingsController extends AbstractController
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
         }
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
@@ -100,7 +100,7 @@ class WebappSettingsController extends AbstractController
             'lang' => FilterInputRule::String->value,
             'use_language' => FilterInputRule::String->value,
         ];
-        $requestParam = WebApp::filterInput($schema, $this->application->getFlight()->request()->data->getData());
+        $requestParam = WebApp::filterInput($schema, $this->application->getFlight()->request()->query->getData());
         $language = $requestParam['lang'] ?? '';
         $action = $requestParam['use_language'] ?? null;
         if ($action === null || $language === '') {

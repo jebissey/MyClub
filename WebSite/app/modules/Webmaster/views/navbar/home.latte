@@ -1,52 +1,35 @@
-              <div class="container-fluid">
+            <div class="container-fluid">
                 <a class="navbar-brand" href="/">
-                  <img src="/app/images/home.png" alt="Home" data-bs-toggle="tooltip" data-bs-placement="bottom" title="{='home'|translate}">
+                    <img src="/app/images/home.png" alt="Home" data-bs-toggle="tooltip" data-bs-placement="bottom" title="{='home'|translate}">
                 </a>
 
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                  <span class="navbar-toggler-icon"></span>
+                    <span class="navbar-toggler-icon"></span>
                 </button>
 
                 <div class="collapse navbar-collapse" id="navbarNav">
-                  <ul class="navbar-nav d-flex justify-content-center flex-wrap w-100">
+                    <ul class="navbar-nav d-flex justify-content-center flex-wrap w-100">
                     {foreach $navItems as $navItem}
                     <li class="nav-item">
-                      <a class="nav-link {if $currentPath === $navItem->Route}active{/if}" href="{$navItem->Route}">{$navItem->Name|noescape}</a>
+                        <a class="nav-link {if $currentPath === $navItem->Route}active{/if}" href="{$navItem->Route}">{$navItem->Name|noescape}</a>
                     </li>
                     {/foreach}
-                  </ul>
-                  {include '_right.latte'}
+                    </ul>
+                    {include '_right.latte'}
                 </div>
-              </div>
+            </div>
 
-              <div class="modal fade" id="languageModal" tabindex="-1" aria-labelledby="languageModalLabel" aria-hidden="true">
-                  <div class="modal-dialog">
-                      <div class="modal-content">
-                          <div class="modal-header">
-                              <h2 class="modal-title" id="languageModalLabel">{='language'|translate}</h2>
-                              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                          </div>
-                          <div class="modal-body">
-                              <form id="languageForm" method="get">
-                                  <div class="mb-3">
-                                      <label for="lang" class="form-label">{='select_language'|translate}</label>
-                                      <select name="lang" id="languageSelect" class="form-select">
-                                          {foreach $supportedLanguages as $lang}
-                                              <option value="{$lang}" {$lang === $currentLanguage ? 'selected' : ''}>
-                                                  {$lang}
-                                              </option>
-                                          {/foreach}
-                                      </select>
-                                  </div>
-                              </form>
-                          </div>
-                      </div>
-                  </div>
-              </div>
+            <script n:syntax=off>
+            document.addEventListener('DOMContentLoaded', function() {
+                const selectEl = document.getElementById('languageSelect');
+                const checkboxEl = document.getElementById('forceLanguageCheck');
 
-              <script>
-              document.getElementById('languageSelect').addEventListener('change', function() {
-                  document.cookie = "user_language=" + this.value + "; path=/; max-age=31536000";
-                  document.getElementById('languageForm').submit();
-              });
-              </script>
+                selectEl.addEventListener('change', function() {
+                    const selectedLang = encodeURIComponent(this.value);
+                    const useLanguage = checkboxEl.checked ? 1 : 0;
+                    window.location.href = `/settings-language?lang=${selectedLang}&use_language=${useLanguage}`;
+                });
+            });
+            </script>
+
+
