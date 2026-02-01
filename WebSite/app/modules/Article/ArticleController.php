@@ -345,7 +345,7 @@ class ArticleController extends TableController
                     '"From"' => 'User',
                     'ArticleId' => $id
                 ])),
-                'isCreator' => $connectedUser->person->Id == $article->CreatedBy
+                'isCreator' => $connectedUser != null && $connectedUser?->person?->Id == $article->CreatedBy
             ]));
         } catch (QueryException $e) {
             $this->raiseBadRequest($e->getMessage(),  __FILE__, __LINE__);
