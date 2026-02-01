@@ -1,12 +1,21 @@
 {layout '../../Common/views/layout.latte'}
 
+{block navbar}
+<div class="container-fluid d-flex align-items-center">
+    <div class="d-flex gap-2">
+        <a class="navbar-brand" href="/"><img src="/app/images/home.png" alt="Home"></a>
+        <button class="btn btn-primary bi bi-arrow-left-circle fs-5" onclick="history.back()"></button>
+    </div>
+
+    <div class="ms-auto">
+        <a href="/article/{$articleId}" class="btn btn-secondary fs-5">Retour à l'article</a>
+    </div>
+</div>
+{/block}
+
 {block content}
     <div class="container-fluid">
         <h1>Résultats du sondage</h1>
-        <div class="d-flex align-items-center gap-2 mb-3">
-            <button class="btn btn-primary bi bi-arrow-left-circle fs-4" onclick="history.back()"></button>
-            <a href="/article/{$articleId}" class="btn btn-secondary fs-4">Retour à l'article</a>
-        </div>
         <div class="card mb-4">
             <div class="card-body">
                 <h2 class="card-title">{$survey->Question}</h2>
@@ -85,7 +94,5 @@
                 </div>
             </div>
         </div>
-        
-        <a href="/article/{$articleId}" class="btn btn-secondary">Retour à l'article</a>
     </div>
 {/block}

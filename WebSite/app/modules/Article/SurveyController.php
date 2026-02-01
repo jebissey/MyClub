@@ -85,6 +85,10 @@ class SurveyController extends AbstractController
 
     public function viewResults(int $articleId): void
     {
+        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+            return;
+        }
         if ($this->dataHelper->get('Article', ['Id' => $articleId], 'Id') === false) {
             $this->raiseBadRequest("Article {$articleId} doesn't exist", __FILE__, __LINE__);
             return;

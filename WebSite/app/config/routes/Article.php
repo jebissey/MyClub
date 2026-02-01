@@ -18,6 +18,7 @@ class Article implements RouteInterface
     {
         $articleController = fn() => $this->controllerFactory->makeArticleController();
 
+        $this->routes[] = new Route('GET  /article/carousel/@id:[0-9]+', $articleController, 'carousel');
         $this->routes[] = new Route('GET  /article/chat/@id:[0-9]+', $articleController, 'showArticleChat');
         $this->routes[] = new Route('GET  /article/create', $articleController, 'create');
         $this->routes[] = new Route('GET  /article/edit/@id:[0-9]+', $articleController, 'edit');

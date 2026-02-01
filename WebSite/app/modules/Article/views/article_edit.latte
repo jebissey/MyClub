@@ -1,16 +1,42 @@
 {layout '../../Common/views/layout.latte'}
 
-{block title}Articles{/block}
+{block title}Édition - {$article->Title}{/block}
 
 {block navbar}
-    {include '../../Webmaster/views/navbar/home.latte'}
+<div class="container-fluid d-flex align-items-center">
+    <div class="d-flex gap-2">
+        <a class="navbar-brand" href="/"><img src="/app/images/home.png" alt="Home"></a>
+        <button class="btn btn-primary fs-5" onclick="history.back()">
+            <i class="bi bi-arrow-left-circle"></i>
+        </button>
+    </div>
+
+    <div class="ms-auto">
+        <button type="submit" id="save-btn" class="btn btn-success">
+            <i class="bi bi-check-circle"></i> Enregistrer
+        </button>
+        <a href="/article/{$article->Id}" id="cancel-btn" class="btn btn-secondary">
+            <i class="bi bi-x-circle"></i> Annuler
+        </a>
+        <a href="/article/{$article->Id}" class="btn btn-success">
+            <i class="bi bi-eye"></i>
+        </a>
+        <a href="/articles" class="btn btn-secondary">Liste des articles</a>
+    </div>
+</div>
 {/block}
 
 {block head}
-    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
-    <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
-    <link href="/app/modules/Common/css/quill.css" rel="stylesheet">
-    <link href="/app/modules/Common/css/carousel.css" rel="stylesheet">
+<style>
+/* Conteneur de l'éditeur */
+.editor-wrapper {
+    min-height: 600px;
+}
+
+.tox-tinymce {
+    border: 1px solid #ced4da !important;
+}
+</style>
 {/block}
 
 {block content}
@@ -37,123 +63,117 @@
                         {/if}
                     </small>
                 </div>
-                <div class="d-flex justify-content-end align-items-center">
-                {if $isCreator}
-                    <a href="/emails/article/{$id}" class="btn btn-warning ms-2">Prévenir les abonnés</a>
-                    <button id="edit-toggle-btn" class="btn btn-primary ms-2">Modifier l'article</button>
-                    {if $hasSurvey}
-                    <a href="/survey/add/{$id}" class="btn btn-success ms-2">Modifier le sondage</a>
-                    {else}
-                    <a href="/survey/add/{$id}" class="btn btn-success ms-2">Ajouter un sondage</a>
-                    {/if}
-                {else}
-                    <small class="text-muted">Seul le créateur de l'article peut le modifier</small>                
-                {/if}
-                    <a href="/articles" class="btn btn-secondary ms-2">Liste des articles</a>
-                </div>
             </div>
 
             <div class="card-body">
-                <div id="content-display">
-                    {$article->Content|noescape}
-                </div>
-                
-                {if !empty($carouselItems)}
-                <div class="mt-4" id="carousel-display">
-                    <h4>Galerie</h4>
-                    <div id="articleCarousel" class="carousel slide" data-bs-ride="carousel">
-                        <div class="carousel-indicators">
-                            {foreach $carouselItems as $index => $item}
-                                <button type="button" data-bs-target="#articleCarousel" data-bs-slide-to="{$index}" {if $index === 0}class="active" aria-current="true"{/if} aria-label="Slide {$index + 1}"></button>
-                            {/foreach}
+                <form id="edit-form" method="post">
+                    <div class="d-flex align-items-center gap-4 flex-wrap mb-4">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="published-input" name="published" value="1" 
+                                {if isset($article->PublishedBy) && $article->PublishedBy !== null}checked{/if}>
+                            <label class="form-check-label" for="published-input">
+                                Publier
+                            </label>
                         </div>
-                        <div class="carousel-inner">
-                            {foreach $carouselItems as $index => $item}
-                                <div class="carousel-item {if $index === 0}active{/if}">
-                                    {$item->Item|noescape}
-                                </div>
-                            {/foreach}
+
+                        <div class="d-flex align-items-center gap-2">
+                            <label for="group-select" class="form-label mb-0 text-nowrap">Groupe associé</label>
+                            <select class="form-select" id="group-select" name="idGroup">
+                                <option value="">-- Aucun groupe --</option>
+                                {foreach $groups as $group}
+                                <option value="{$group->Id}" {if isset($article->IdGroup) && $article->IdGroup == $group->Id}selected{/if}>{$group->Name}</option>
+                                {/foreach}
+                            </select>
                         </div>
-                        <button class="carousel-control-prev" type="button" data-bs-target="#articleCarousel" data-bs-slide="prev">
-                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                            <span class="visually-hidden">Précédent</span>
-                        </button>
-                        <button class="carousel-control-next" type="button" data-bs-target="#articleCarousel" data-bs-slide="next">
-                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                            <span class="visually-hidden">Suivant</span>
-                        </button>
+                        
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="members-only-checkbox" name="membersOnly" value="1" 
+                                {if isset($article->OnlyForMembers) && $article->OnlyForMembers}checked{/if}>
+                            <label class="form-check-label" for="members-only-checkbox">Pour les membres du club uniquement</label>
+                        </div>                        
                     </div>
-                </div>
-                {/if}
-
-                <div id="editor-container">
-                    <form id="edit-form" method="post">
-                        <div class="d-flex align-items-center gap-4">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="published-input" name="published" value="1" 
-                                    {if isset($article->PublishedBy) && $article->PublishedBy !== null}checked{/if}>
-                                <label class="form-check-label" for="published-input">
-                                    Publier
-                                </label>
-                            </div>
-
-                            <div class="d-flex align-items-center gap-2">
-                                <label for="group-select" class="form-label mb-0 text-nowrap">Groupe associé</label>
-                                <select class="form-select" id="group-select" name="idGroup">
-                                    <option value="">-- Aucun groupe --</option>
-                                    {foreach $groups as $group}
-                                    <option value="{$group->Id}" {if isset($article->IdGroup) && $article->IdGroup == $group->Id}selected{/if}>{$group->Name}</option>
-                                    {/foreach}
-                                </select>
-                            </div>
-                            <div class="d-flex align-items-center gap-2 mt-2">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="members-only-checkbox" name="membersOnly" value="1" {if isset($article->OnlyForMembers) && $article->OnlyForMembers}checked{/if}>
-                                    <label class="form-check-label" for="members-only-checkbox">Pour les membres du club uniquement</label>
-                                </div>
-                            </div>
-                            <div class="d-flex gap-2 ms-auto">
-                                <button id="save-btn" class="btn btn-success" style="display: none;">Enregistrer</button>
-                                <button id="cancel-btn" class="btn btn-secondary" style="display: none;">Annuler</button>
-                            </div>
+                    
+                    <hr class="w-100 my-3">
+                    
+                    <div class="mb-3">
+                        <label for="title-input" class="form-label">Titre</label>
+                        <input type="text" class="form-control" id="title-input" name="title" value="{$article->Title}" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="tinymce-editor" class="form-label">Contenu</label>
+                        <div class="editor-wrapper">
+                            <textarea name="content" id="tinymce-editor">{if isset($article->Content)}{$article->Content|noescape}{/if}</textarea>
                         </div>
-                        <hr class="w-100 my-3">
-                        <div class="d-flex gap-2 align-items-end">
-                            <label for="title-input" class="form-label">Titre</label>
-                            <input type="text" class="form-control" id="title-input" name="title" value="{$article->Title}">
-                        </div>
-                        <div class="mb-3">
-                            <label for="quill-editor" class="form-label">Contenu</label>
-                            <div id="quill-editor"></div>
-                            <input type="hidden" name="content" id="content-input">
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal fade" id="surveyModal" tabindex="-1" aria-labelledby="surveyModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="surveyModalLabel">Répondre au sondage</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body" id="survey-form-container">
-                    <p>Chargement du sondage...</p>
-                </div>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
 {/block}
 
 {block scripts}
-    <script src="/app/js/quill/script.js"></script>
-    <script>
-        const ARTICLE_ID = {$article->Id};
-        const IS_EDITOR = {$isEditor};
-    </script>
-    <script src="/app/modules/Article/js/articleEdit.js"></script>
-    <script src="/app/modules/Article/js/carousel.js"></script>
+<script src="/app/modules/Common/js/tinymce/tinymce.min.js"></script>
+<script src="/app/modules/Common/js/tinymce-config.js"></script>
+<script>
+const ARTICLE_ID = {$article->Id};
+</script>
+<script n:syntax="off">
+
+// ===== INITIALISATION =====
+document.addEventListener('DOMContentLoaded', function() {
+    
+    const textarea = document.getElementById('tinymce-editor');
+    if (!textarea) {
+        console.error('❌ Textarea #tinymce-editor introuvable !');
+        return;
+    }
+    
+    initTinyMCE('#tinymce-editor', {
+        height: 600,
+        imageMaxWidth: 1600,
+        imageQuality: 0.85,
+        onSave: function(editor) {
+            document.getElementById('edit-form').submit();
+        },
+        onInit: function(editor) {
+            console.log('✅ TinyMCE initialisé avec succès !');
+        }
+    });
+    
+    document.getElementById('save-btn').addEventListener('click', function(e) {
+        e.preventDefault();
+        document.getElementById('edit-form').requestSubmit();
+    });
+    
+    // Validation du formulaire
+    document.getElementById('edit-form').addEventListener('submit', function(e) {
+        const title = document.getElementById('title-input').value.trim();
+        
+        // Vérifier que TinyMCE est initialisé
+        const editor = tinymce.get('tinymce-editor');
+        if (!editor) {
+            e.preventDefault();
+            appendAlert('L\'éditeur n\'est pas encore chargé. Veuillez patienter.', 'warning');
+            return false;
+        }
+        
+        const content = editor.getContent().trim();
+        
+        if (!title) {
+            e.preventDefault();
+            appendAlert('Le titre est obligatoire.', 'danger');
+            return false;
+        }
+        
+        if (!content || content === '' || content === '<p><br></p>') {
+            e.preventDefault();
+            appendAlert('Le contenu ne peut pas être vide.', 'danger');
+            return false;
+        }
+        
+        console.log('✅ Formulaire validé, soumission...');
+    });
+});
+</script>
 {/block}

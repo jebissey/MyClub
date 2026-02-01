@@ -2,52 +2,52 @@
 
 {block head}
 <style>
-html, body {
-    height: 100%;
-}
+    html, body {
+        height: 100%;
+    }
 
-/* Conteneur principal */
-.editor-wrapper {
-    height: calc(100vh - 180px);
-    display: flex;
-    flex-direction: column;
-}
+    /* Conteneur principal */
+    .editor-wrapper {
+        height: calc(100vh - 180px);
+        display: flex;
+        flex-direction: column;
+    }
 
-/* Formulaire et conteneur */
-#edit-form,
-.editor-container {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    min-height: 0;
-}
+    /* Formulaire et conteneur */
+    #edit-form,
+    .editor-container {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+    }
 
-/* TinyMCE pleine hauteur */
-.tox-tinymce {
-    height: 100% !important;
-    border: 1px solid #ddd;
-}
+    /* TinyMCE pleine hauteur */
+    .tox-tinymce {
+        height: 100% !important;
+        border: 1px solid #ddd;
+    }
 
-/* Styles pour l'affichage du contenu */
-.notepad-content img {
-    max-width: 100%;
-    height: auto;
-}
+    /* Styles pour l'affichage du contenu */
+    .notepad-content img {
+        max-width: 100%;
+        height: auto;
+    }
 
-.notepad-content .img-left {
-    float: left;
-    margin: 0 15px 10px 0;
-}
+    .notepad-content .img-left {
+        float: left;
+        margin: 0 15px 10px 0;
+    }
 
-.notepad-content .img-right {
-    float: right;
-    margin: 0 0 10px 15px;
-}
+    .notepad-content .img-right {
+        float: right;
+        margin: 0 0 10px 15px;
+    }
 
-.notepad-content .img-center {
-    display: block;
-    margin: 10px auto;
-}
+    .notepad-content .img-center {
+        display: block;
+        margin: 10px auto;
+    }
 </style>
 {/block}
 
@@ -64,9 +64,9 @@ html, body {
 
     <div class="ms-auto">
         <button type="submit" form="edit-form" class="btn btn-success">
-            <i class="bi bi-save"></i> Enregistrer
+            <i class="bi bi-check-circle"></i> Enregistrer
         </button>
-        <a href="/user" class="btn btn-secondary">Annuler</a>
+        <a href="/user" class="btn btn-secondary bi bi-x-circle"> Annuler</a>
     </div>
 </div>
 {/block}

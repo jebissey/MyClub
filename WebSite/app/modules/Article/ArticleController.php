@@ -36,6 +36,32 @@ class ArticleController extends TableController
         parent::__construct($application);
     }
 
+    public function carousel(int $id): void
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+            return;
+        }
+        $article = $this->dataHelper->get('Article', ['Id' => $id], 'CreatedBy');
+        if (!$article) {
+            $this->raiseBadRequest("Article {$id} doesn't exist", __FILE__, __LINE__);
+            return;
+        }
+        $connectedUser = $this->application->getConnectedUser();
+        $article = $this->articleDataHelper->getLatestArticle([$id]);
+
+        if ($connectedUser->person === null || $connectedUser->person->Id !== $article->CreatedBy) {
+            $this->raiseforbidden(__FILE__, __LINE__);
+            return;
+        }
+
+        $this->render('Article/views/article_carousel.latte', $this->getAllParams([
+            'article' => $article,
+            'carouselItems' => $this->dataHelper->gets('Carousel', ['IdArticle' => $id]),
+            'page' => $connectedUser->getPage(),
+        ]));
+    }
+
     public function create(): void
     {
         if (!($this->application->getConnectedUser()->isRedactor() ?? false)) {
@@ -108,7 +134,6 @@ class ArticleController extends TableController
             'carouselItems' => $this->dataHelper->gets('Carousel', ['IdArticle' => $id]),
             'page' => $connectedUser->getPage(),
             'isEditor' => $connectedUser->isEditor(),
-            'isCreator' => $connectedUser->person->Id == $article->CreatedBy
         ]));
     }
 
@@ -320,6 +345,7 @@ class ArticleController extends TableController
                     '"From"' => 'User',
                     'ArticleId' => $id
                 ])),
+                'isCreator' => $connectedUser->person->Id == $article->CreatedBy
             ]));
         } catch (QueryException $e) {
             $this->raiseBadRequest($e->getMessage(),  __FILE__, __LINE__);

@@ -1,26 +1,44 @@
-{extends "user.latte"}
-
-{block title}Édition de ma présentation{/block}
+{layout '../../Common/views/layout.latte'}
 
 {block head}
 <style>
-.editor-container {
-    min-height: 400px;
-}
+    .editor-container {
+        min-height: 400px;
+    }
 
-.tox-tinymce {
-    border: 1px solid #ddd;
-}
+    .tox-tinymce {
+        border: 1px solid #ddd;
+    }
 
-#map {
-    border: 1px solid #ddd;
-    border-radius: 4px;
-}
+    #map {
+        border: 1px solid #ddd;
+        border-radius: 4px;
+    }
 </style>
 {/block}
 
+{block navbar}
+<div class="container-fluid d-flex align-items-center">
+    <div class="d-flex gap-2">
+        <a class="navbar-brand" href="/">
+            <img src="/app/images/home.png" alt="Home">
+        </a>
+        <button class="btn btn-primary fs-5" onclick="history.back()">
+            <i class="bi bi-arrow-left-circle"></i>
+        </button>
+    </div>
+
+    <div class="ms-auto">
+        <button type="submit" form="presentationForm" class="btn btn-success">
+            <i class="bi bi-save"></i> Enregistrer
+        </button>
+        <a href="/user" class="btn btn-secondary">Annuler</a>
+    </div>
+</div>
+{/block}
+
 {block content}
-<div class="container mt-4">
+<div class="container-fluid mt-2 mb-2">
     <div class="row">
         <div class="col-md-12">
             <h1>Édition de ma présentation</h1>
@@ -51,13 +69,6 @@
                             <div id="map" style="height: 300px;"></div>
                             <input type="hidden" id="location" name="location" value="{$person->Location}">
                             <div class="form-text">Cliquez sur la carte pour indiquer votre quartier d'habitation</div>
-                        </div>
-
-                        <div class="d-flex justify-content-end gap-2">
-                            <a href="/user/directory" class="btn btn-secondary">Annuler</a>
-                            <button id="save-btn" type="submit" class="btn btn-success">
-                                <i class="bi bi-save"></i> Enregistrer
-                            </button>
                         </div>
                     </form>
                 </div>

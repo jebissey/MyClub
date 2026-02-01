@@ -1,0 +1,198 @@
+{layout '../../Common/views/layout.latte'}
+
+{block title}Gestion du carousel - {$article->Title}{/block}
+
+{block head}
+    <style>
+        .carousel-item-wrapper {
+            transition: all 0.3s ease;
+        }
+
+        .carousel-item-wrapper:hover {
+            transform: translateY(-5px);
+        }
+
+        .carousel-item-wrapper .card {
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: box-shadow 0.3s ease;
+        }
+
+        .carousel-item-wrapper:hover .card {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .carousel-item-content {
+            height: 200px;
+            overflow: hidden;
+            background-color: #f8f9fa;
+        }
+
+        .carousel-item-content img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .delete-btn {
+            opacity: 0.9;
+            transition: opacity 0.2s ease;
+        }
+
+        .delete-btn:hover {
+            opacity: 1;
+        }
+
+        .alert {
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+    </style>
+{/block}
+
+{block navbar}
+<div class="container-fluid d-flex align-items-center">
+    <div class="d-flex gap-2">
+        <a class="navbar-brand" href="/"><img src="/app/images/home.png" alt="Home"></a>
+        <button class="btn btn-primary fs-5" onclick="history.back()">
+            <i class="bi bi-arrow-left-circle"></i>
+        </button>
+    </div>
+
+    <div class="ms-auto">
+        <button type="submit" id="save-btn" class="btn btn-success">
+            <i class="bi bi-check-circle"></i> Enregistrer
+        </button>
+        <a href="/article/{$article->Id}" id="cancel-btn" class="btn btn-secondary">
+            <i class="bi bi-x-circle"></i> Annuler
+        </a>
+        <a href="/article/{$article->Id}" class="btn btn-success">
+            <i class="bi bi-eye"></i>
+        </a>
+        <a href="/articles" class="btn btn-secondary">Liste des articles</a>
+    </div>
+</div>
+{/block}
+
+{block content}
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col">
+            <h1>Gestion du carousel</h1>
+            <p class="text-muted">Article : {$article->Title}</p>
+        </div>
+    </div>
+
+    {* Formulaire d'ajout d'image *}
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0"><i class="bi bi-plus-circle"></i> Ajouter une image</h5>
+        </div>
+        <div class="card-body">
+            <form id="addImageForm">
+                <div class="row">
+                    <div class="col-md-8 mb-3">
+                        <label for="imageSrc" class="form-label">Source de l'image (URL)</label>
+                        <input type="text" class="form-control" id="imageSrc" name="imageSrc" 
+                               placeholder="http://localhost/data/media/2026/01/image.jpg" required>
+                        <small class="form-text text-muted">Entrez l'URL complète de l'image</small>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="imageAlt" class="form-label">Texte alternatif</label>
+                        <input type="text" class="form-control" id="imageAlt" name="imageAlt" 
+                               placeholder="Description de l'image" required>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-plus-lg"></i> Ajouter l'image
+                </button>
+            </form>
+        </div>
+    </div>
+
+    {* Messages de feedback *}
+    <div id="alertContainer"></div>
+
+    {* Galerie d'images *}
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0"><i class="bi bi-images"></i> Images du carousel</h5>
+            <span class="badge bg-secondary" id="itemCount">{count($carouselItems)} image(s)</span>
+        </div>
+        <div class="card-body">
+            {if count($carouselItems) > 0}
+                <div class="row g-3" id="carouselGallery">
+                    {foreach $carouselItems as $item}
+                        {var $itemHtml = $item->Item}
+                        <div class="col-md-3 col-sm-4 col-6 carousel-item-wrapper" data-id="{$item->Id}" data-item-html="{$itemHtml|escapeHtml}">
+                            <div class="card h-100">
+                                <div class="position-relative carousel-item-content">
+                                    {$itemHtml|noescape}
+                                    <button type="button" 
+                                            class="btn btn-danger btn-sm position-absolute top-0 end-0 m-2 delete-btn" 
+                                            data-id="{$item->Id}"
+                                            title="Supprimer cette image">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                                <div class="card-body p-2">
+                                    <p class="card-text small mb-0 item-info">
+                                        <small class="text-muted">ID: {$item->Id}</small>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    {/foreach}
+                </div>
+            {else}
+                <div class="text-center py-5" id="emptyState">
+                    <i class="bi bi-images text-muted" style="font-size: 4rem;"></i>
+                    <p class="text-muted mt-3">Aucune image dans le carousel</p>
+                    <p class="text-muted">Ajoutez votre première image avec le formulaire ci-dessus</p>
+                </div>
+            {/if}
+        </div>
+    </div>
+</div>
+
+{* Modal de confirmation de suppression *}
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmer la suppression</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Êtes-vous sûr de vouloir supprimer cette image du carousel ?</p>
+                <div class="text-center">
+                    <img id="deletePreview" src="" alt="" class="img-thumbnail" style="max-height: 150px;">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <button type="button" class="btn btn-danger" id="confirmDelete">
+                    <i class="bi bi-trash"></i> Supprimer
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}
+
+{block scripts}
+<script>
+    const ARTICLE_ID = {$article->Id};
+</script>
+<script type="module" src="/app/modules/Article/js/CarouselManager.js"></script>
+{/block}
+

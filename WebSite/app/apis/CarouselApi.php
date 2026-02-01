@@ -15,7 +15,6 @@ use app\models\AuthorizationDataHelper;
 use app\models\CarouselDataHelper;
 use app\models\DataHelper;
 use app\models\PersonDataHelper;
-use PgSql\Lob;
 
 class CarouselApi extends AbstractApi
 {
