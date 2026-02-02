@@ -35,7 +35,6 @@ class ArwardsController extends AbstractController
             'groups' => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
             'layout' => $this->getLayout(),
             'navItems' => $this->getNavItems($person),
-            'isMyclubWebSite' => WebApp::isMyClubWebSite(),
             'page' => $this->application->getConnectedUser()->getPage(),
         ]));
     }

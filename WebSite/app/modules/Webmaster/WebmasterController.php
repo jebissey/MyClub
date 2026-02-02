@@ -97,25 +97,25 @@ class WebmasterController extends AbstractController
     public function homeWebmaster(): void
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isWebmaster())) {
+
             $_SESSION['navbar'] = 'webmaster';
-            $newVersion = null;
-            $result = $this->getLastVersion();
-            if (!$result['success']) $newVersion = "Test for MyClub new version error : " . $result['error'];
-            elseif ($result['version'] != Application::VERSION) $newVersion = "A new version is available (V" . $result['version'] . ")";
             $content = $this->languagesDataHelper->translate('Webmaster');
             $params = [
                 'isMyclubWebSite' => WebApp::isMyClubWebSite(),
             ];
             $compiledContent = WebApp::getcompiledContent($content, $params);
 
-            $this->render('Webmaster/views/webmaster.latte', $this->getAllParams([
-                'newVersion' => $newVersion,
-                'isMyclubWebSite' => WebApp::isMyClubWebSite(),
-                'page' => $this->application->getConnectedUser()->getPage(),
-                'content' => $compiledContent
-            ]));
+            $this->render(
+                'Webmaster/views/webmaster.latte',
+                $this->getAllParams([
+                    'newVersion'       => $this->getLastVersion(),
+                    'page'             => $this->application->getConnectedUser()->getPage(),
+                    'content'          => $compiledContent
+                ])
+            );
         }
     }
+
 
     public function notifications(): void
     {
@@ -170,7 +170,6 @@ class WebmasterController extends AbstractController
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isAdministrator())) {
             $this->render('Webmaster/views/emailCredentials.latte', $this->getAllParams([
                 'navItems' => $this->getNavItems($this->application->getConnectedUser()->person),
-                'isMyclubWebSite' => WebApp::isMyClubWebSite(),
                 'page' => $this->application->getConnectedUser()->getPage()
             ]));
         }
@@ -210,7 +209,6 @@ class WebmasterController extends AbstractController
                 'installations' => $installations,
                 'totalInstallations' => count($installations),
                 'navItems' => $this->getNavItems($this->application->getConnectedUser()->person),
-                'isMyclubWebSite' => WebApp::isMyClubWebSite(),
                 'page' => $this->application->getConnectedUser()->getPage()
             ]));
         }
@@ -247,44 +245,40 @@ class WebmasterController extends AbstractController
     }
 
     #region Private methods
-    private function getLastVersion(): array
+    private function getLastVersion(): ?string
     {
         $url = WebApp::MYCLUB_WEBAPP . 'api/lastVersion?cv=' . Application::VERSION;
-
         $ch = curl_init($url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_USERAGENT, "PHP/" . PHP_VERSION);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, ["Accept: application/json"]);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
-        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 1);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 2);
-        curl_setopt($ch, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_1);
-
+        curl_setopt_array($ch, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_USERAGENT      => "PHP/" . PHP_VERSION,
+            CURLOPT_HTTPHEADER     => ["Accept: application/json"],
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_SSL_VERIFYHOST => false,
+            CURLOPT_CONNECTTIMEOUT => 1,
+            CURLOPT_TIMEOUT        => 2,
+            CURLOPT_HTTP_VERSION   => CURL_HTTP_VERSION_1_1,
+        ]);
         $response = curl_exec($ch);
         if ($response === false) {
             $error = curl_error($ch);
-            curl_close($ch);
-            return [
-                'success' => false,
-                'version' => null,
-                'error'   => "Erreur cURL : $error"
-            ];
+            unset($ch);
+            return "Test for MyClub new version error : Erreur cURL ($error)";
         }
-        curl_close($ch);
+        unset($ch);
         $data = json_decode($response, true);
-        if ($data === null || !isset($data["lastVersion"])) {
-            return [
-                'success' => false,
-                'version' => null,
-                'error'   => "Réponse JSON invalide ou champ 'lastVersion' absent."
-            ];
+        if (
+            $data === null ||
+            ($data['success'] ?? false) !== true ||
+            !isset($data['data']['lastVersion'])
+        ) {
+            return "Test for MyClub new version error : Réponse API invalide.";
         }
 
-        return [
-            'success' => true,
-            'version' => $data["lastVersion"],
-            'error'   => null
-        ];
+        $lastVersion = $data['data']['lastVersion'];
+        if ($lastVersion === Application::VERSION) {
+            return null;
+        }
+        return "A new version is available (V{$lastVersion})";
     }
 }

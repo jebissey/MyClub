@@ -58,6 +58,7 @@ class Params
             'supportedLanguages' => TranslationManager::getSupportedLanguages(),
             'flag' => TranslationManager::getFlag($lang),
             'currentPath' => parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH),
+            'isMyclubWebSite'  => WebApp::isMyClubWebSite(),
         ];
         if ($prodSiteUrl !== null) self::$commonParams['productionSiteUrl'] = $prodSiteUrl;
     }

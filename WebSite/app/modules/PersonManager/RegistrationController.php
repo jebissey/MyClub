@@ -53,7 +53,6 @@ class RegistrationController extends TableController
                 'resetUrl' => '/registration',
                 'layout' => $this->getLayout(),
                 'navItems' => $this->getNavItems($connectedUser->person ?? false),
-                'isMyclubWebSite' => WebApp::isMyClubWebSite(),
                 'page' => $this->application->getConnectedUser()->getPage()
             ]));
         }

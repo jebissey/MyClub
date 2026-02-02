@@ -24,7 +24,6 @@ class NavBarController extends AbstractController
                 'navItems' => $this->getNavItems($this->application->getConnectedUser()->person, true),
                 'groups' => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
                 'availableRoutes' => $this->getAvailableRoutes(),
-                'isMyclubWebSite' => WebApp::isMyClubWebSite(),
                 'page' => $this->application->getConnectedUser()->getPage()
             ]));
         }

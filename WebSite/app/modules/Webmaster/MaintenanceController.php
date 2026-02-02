@@ -49,7 +49,6 @@ error_log("\n\n" . json_encode('---###---', JSON_PRETTY_PRINT) . "\n");
             return;
         }
         $this->render('Webmaster/views/maintenance.latte', $this->getAllParams([
-            'isMyclubWebSite' => WebApp::isMyClubWebSite(),
             'page' => $this->application->getConnectedUser()->getPage(),
         ]));
     }

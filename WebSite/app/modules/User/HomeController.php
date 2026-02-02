@@ -8,6 +8,7 @@ use app\helpers\Application;
 use app\helpers\News;
 use app\helpers\Params;
 use app\helpers\TranslationManager;
+use app\helpers\WebApp;
 use app\models\ArticleDataHelper;
 use app\models\DesignDataHelper;
 use app\models\MetadataDataHelper;
@@ -70,6 +71,7 @@ class HomeController extends AbstractController
                 'isRedactor' => false,
                 'page' => $connectedUser->getPage(),
                 'currentPath' => parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH),
+                'isMyclubWebSite'  => WebApp::isMyClubWebSite(),
             ], $this->metadataDataHelper->isTestSite() && !empty($prodSiteUrl = $this->metadataDataHelper->getProdSiteUrl()) ? $prodSiteUrl : null);
         }
 

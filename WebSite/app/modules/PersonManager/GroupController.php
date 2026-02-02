@@ -41,7 +41,6 @@ class GroupController extends AbstractController
         $this->render('PersonManager/views/group_create.latte', $this->getAllParams([
             'availableAuthorizations' => $availableAuthorizations,
             'layout' => $this->getLayout(),
-            'isMyclubWebSite' => WebApp::isMyClubWebSite(),
             'navItems' => $this->getNavItems($connectedUser->person ?? false),
             'page' => $this->application->getConnectedUser()->getPage(),
         ]));
@@ -71,7 +70,6 @@ class GroupController extends AbstractController
                 'availableAuthorizations' => $availableAuthorizations,
                 'error' => 'Le nom du groupe est requis',
                 'layout' => $this->getLayout(),
-                'isMyclubWebSite' => WebApp::isMyClubWebSite(),
                 'navItems' => $this->getNavItems($connectedUser->person ?? false),
                 'page' => $this->application->getConnectedUser()->getPage(),
             ]));
@@ -127,7 +125,6 @@ class GroupController extends AbstractController
                 'availableAuthorizations' => $this->dataHelper->gets('Authorization', ['Id <> 1' => null], '*', 'Name'),
                 'currentAuthorizations' => array_column($this->dataHelper->gets('GroupAuthorization', ['IdGroup' => $id], 'IdAuthorization'), 'IdAuthorization'),
                 'layout' => $this->getLayout(),
-                'isMyclubWebSite' => WebApp::isMyClubWebSite(),
                 'page' => $this->application->getConnectedUser()->getPage(),
             ]));
         }
@@ -183,7 +180,6 @@ class GroupController extends AbstractController
             'groups' => $this->groupDataHelper->getGroupsWithAuthorizations($this->application->getConnectedUser()),
             'layout' => $this->getLayout(),
             'navItems' => $this->getNavItems($connectedUser->person ?? false),
-            'isMyclubWebSite' => WebApp::isMyClubWebSite(),
             'page' => $this->application->getConnectedUser()->getPage(),
         ]));
     }

@@ -65,6 +65,7 @@ class ConnectedUser
             'supportedLanguages' => TranslationManager::getSupportedLanguages(),
             'flag' => TranslationManager::getFlag($lang),
             'currentPath' => parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH),
+            'isMyclubWebSite'  => WebApp::isMyClubWebSite(),
         ], $this->metadataDataHelper->isTestSite() && !empty($prodSiteUrl = $this->metadataDataHelper->getProdSiteUrl()) ? $prodSiteUrl : null);
         return;
     }

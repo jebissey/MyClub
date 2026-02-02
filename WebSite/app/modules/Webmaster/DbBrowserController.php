@@ -41,7 +41,6 @@ class DbBrowserController extends AbstractController
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isWebmaster())) {
             $this->render('Webmaster/views/dbbrowser/index.latte', $this->getAllParams([
                 'tables' => $this->dbBrowserDataHelper->getTables(),
-                'isMyclubWebSite' => WebApp::isMyClubWebSite(),
                 'page' => $this->application->getConnectedUser()->getPage()
             ]));
         }
@@ -56,7 +55,6 @@ class DbBrowserController extends AbstractController
                 'table' => $table,
                 'columns' => $columns,
                 'columnTypes' => $columnTypes,
-                'isMyclubWebSite' => WebApp::isMyClubWebSite(),
                 'page' => $this->application->getConnectedUser()->getPage()
             ]));
         }
@@ -73,7 +71,6 @@ class DbBrowserController extends AbstractController
                 'record' => $record,
                 'primaryKey' => $primaryKey,
                 'columnTypes' => $columnTypes,
-                'isMyclubWebSite' => WebApp::isMyClubWebSite(),
                 'page' => $this->application->getConnectedUser()->getPage()
             ]));
         }
@@ -98,7 +95,6 @@ class DbBrowserController extends AbstractController
                 'currentPage' => $dbbPage,
                 'totalPages' => $totalPages,
                 'filters' => $filters,
-                'isMyclubWebSite' => WebApp::isMyClubWebSite(),
                 'page' => $this->application->getConnectedUser()->getPage()
             ]));
         }
