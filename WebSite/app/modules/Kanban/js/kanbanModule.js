@@ -25,7 +25,7 @@ export default class KanbanModule {
             this.showProjectUI(projectId);
             const response = await this.cardTypeManager.load(projectId);
             if (response.success) {
-                this.populateCardTypeSelects(response.cardTypes ?? []);
+                this.populateCardTypeSelects(response.data.cardTypes ?? []);
             }
         }
     }
@@ -99,7 +99,7 @@ export default class KanbanModule {
             this.handleError("Impossible de charger les cartes", result);
             return;
         }
-        this.kanbanBoard.update(result.cards ?? []);
+        this.kanbanBoard.update(result.data.cards ?? []);
     }
 
     /* --------------------------------------------
@@ -132,11 +132,11 @@ export default class KanbanModule {
 
     async loadProjectForEdit(projectId) {
         const response = await this.projectManager.load(projectId);
-        if (!response.success || !response.project) {
+        if (!response.success || !response.data.project) {
             this.handleError("Projet invalide", response);
             return;
         }
-        const { Id, Title, Detail } = response.project;
+        const { Id, Title, Detail } = response.data.project;
         this.dom.editProjectId.value = Id;
         this.dom.editProjectTitle.value = Title;
         this.dom.editProjectDescription.value = Detail;
@@ -206,8 +206,8 @@ export default class KanbanModule {
             this.handleError("Chargement des types de carte impossible", response);
             return;
         }
-        this.displayCardTypes(response.cardTypes ?? []);
-        this.populateCardTypeSelects(response.cardTypes ?? []);
+        this.displayCardTypes(response.data.cardTypes ?? []);
+        this.populateCardTypeSelects(response.data.cardTypes ?? []);
     }
 
     displayCardTypes(cardTypes) {
@@ -290,7 +290,7 @@ export default class KanbanModule {
             const projectId = this.dom.projectSelect.value;
             if (!projectId) return;
             const response = await this.cardTypeManager.load(projectId);
-            if (response.success) this.populateCardTypeSelects(response.cardTypes ?? []);
+            if (response.success) this.populateCardTypeSelects(response.data.cardTypes ?? []);
             else this.handleError("Chargement des types de carte impossible", response);
         });
 
@@ -298,7 +298,7 @@ export default class KanbanModule {
             const projectId = this.dom.projectSelect.value;
             if (!projectId) return;
             const response = await this.cardTypeManager.load(projectId);
-            if (response.success) this.populateCardTypeSelects(response.cardTypes ?? []);
+            if (response.success) this.populateCardTypeSelects(response.data.cardTypes ?? []);
             else this.handleError("Chargement des types de carte impossible", response);
         });
     }
