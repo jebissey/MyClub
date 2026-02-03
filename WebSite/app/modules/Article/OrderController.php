@@ -99,7 +99,6 @@ class OrderController extends AbstractController
             $this->raiseBadRequest("Article {$articleId} doesn't exist", __FILE__, __LINE__);
             return;
         }
-
         $connectedUser = $this->application->getConnectedUser();
         if ($connectedUser->person === null) {
             $this->raiseForbidden(__FILE__, __LINE__);
@@ -119,11 +118,9 @@ class OrderController extends AbstractController
             $participants = [];
             $results      = [];
             $options      = json_decode($order->Options);
-
             foreach ($options as $option) {
                 $results[$option] = 0;
             }
-
             foreach ($replies as $reply) {
                 $answers = json_decode($reply->Answers);
                 $person  = $this->dataHelper->get('Person', ['Id' => $reply->IdPerson], 'FirstName, LastName');
@@ -133,10 +130,11 @@ class OrderController extends AbstractController
                     'answers' => $answers,
                 ];
 
-                foreach ($answers as $answer) {
-                    if (isset($results[$answer])) $results[$answer]++;
+                foreach ($answers as $article => $quantity) {
+                    if (isset($results[$article])) $results[$article] += $quantity;
                 }
             }
+error_log("\n\n" . json_encode($participants, JSON_PRETTY_PRINT) . "\n");          
 
             $this->render('Article/views/order_results.latte', [
                 'order'          => $order,
