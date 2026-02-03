@@ -28,8 +28,11 @@ class WebmasterController extends AbstractController
     public function helpAdmin(): void
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isAdministrator())) {
+            $content = $this->dataHelper->get('Settings', ['Name' => 'Help_Admin'], 'Value')->Value ?? '';
+            if ($content === '') $content = $this->languagesDataHelper->translate('Help_Admin');
+
             $this->render('Common/views/info.latte', $this->getAllParams([
-                'content' => $this->dataHelper->get('Settings', ['Name' => 'Help_admin'], 'Value')->Value ?? '',
+                'content' => $content,
                 'hasAuthorization' => $this->application->getConnectedUser()->isEventManager(),
                 'currentVersion' => Application::VERSION,
                 'timer' => 0,

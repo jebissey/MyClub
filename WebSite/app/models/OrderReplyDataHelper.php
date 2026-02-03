@@ -6,25 +6,25 @@ namespace app\models;
 
 use app\helpers\Application;
 
-class ReplyDataHelper extends Data
+class OrderReplyDataHelper extends Data
 {
     public function __construct(Application $application)
     {
         parent::__construct($application);
     }
 
-    public function insertOrUpdate(int $personId, int $surveyId, string $answers): void
+    public function insertOrUpdate(int $personId, int $orderId, string $answers): void
     {
-        $existingReply = $this->get('Reply', ['IdPerson' => $personId, 'IdSurvey' => $surveyId], 'Id');
+        $existingReply = $this->get('OrderReply', ['IdPerson' => $personId, 'IdOrder' => $orderId], 'Id');
         if ($existingReply) {
-            $this->set('Reply', [
+            $this->set('OrderReply', [
                 'Answers' => $answers,
                 'LastUpdate' => date('Y-m-d H:i:s')
             ], ['Id' => $existingReply->Id]);
         } else {
-            $this->set('Reply', [
+            $this->set('OrderReply', [
                 'IdPerson'   => $personId,
-                'IdSurvey'   => $surveyId,
+                'IdOrder'   => $orderId,
                 'Answers' => $answers,
                 'LastUpdate' => date('Y-m-d H:i:s')
             ]);

@@ -264,6 +264,26 @@ CREATE TABLE IF NOT EXISTS "NeedType" (
 	"Name"	TEXT NOT NULL,
 	PRIMARY KEY("Id")
 );
+CREATE TABLE IF NOT EXISTS "Order" (
+	"Id"	INTEGER,
+	"Question"	TEXT NOT NULL,
+	"Options"	TEXT NOT NULL,
+	"IdArticle"	INTEGER NOT NULL,
+	"ClosingDate"	TEXT NOT NULL,
+	"Visibility"	TEXT NOT NULL,
+	PRIMARY KEY("Id"),
+	FOREIGN KEY("IdArticle") REFERENCES "Article"("Id")
+);
+CREATE TABLE IF NOT EXISTS "OrderReply" (
+	"Id"	INTEGER,
+	"IdPerson"	INTEGER NOT NULL,
+	"IdOrder"	INTEGER NOT NULL,
+	"Answers"	TEXT NOT NULL,
+	"LastUpdate"	TEXT NOT NULL,
+	PRIMARY KEY("Id"),
+	FOREIGN KEY("IdOrder") REFERENCES "Order"("Id"),
+	FOREIGN KEY("IdPerson") REFERENCES "Person"("Id")
+);
 CREATE TABLE IF NOT EXISTS "Page" (
 	"Id"	INTEGER,
 	"Name"	TEXT NOT NULL,
@@ -1687,7 +1707,7 @@ INSERT INTO "Languages" VALUES (86,'Webmaster','	<div class="alert alert-info mt
 
         </ul>
     </div>');
-INSERT INTO "Metadata" VALUES (1,'MyClub',10,0,NULL,NULL,NULL,NULL,NULL,1000000,NULL,10,36,6,NULL,0,NULL);
+INSERT INTO "Metadata" VALUES (1,'MyClub',11,0,NULL,NULL,NULL,NULL,NULL,1000000,NULL,10,36,6,NULL,0,NULL);
 INSERT INTO "Person" VALUES (1,'webmaster@myclub.foo','e427c26faca947919b18b797bc143a35100e4de48c34b70b26202d3a7d8e51f7','my first name','my last name','my nick name or nothing',NULL,'0',NULL,NULL,NULL,NULL,NULL,0,0,NULL,NULL,'2025-01-01',0,NULL,NULL,NULL,NULL);
 INSERT INTO "PersonGroup" VALUES (1,1,1);
 INSERT INTO "Settings" VALUES (1,'Title','title');

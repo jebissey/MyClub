@@ -1,0 +1,109 @@
+{layout '../../Common/views/layout.latte'}
+
+{block navbar}
+<div class="container-fluid d-flex align-items-center">
+    <div class="d-flex gap-2">
+        <a class="navbar-brand" href="/"><img src="/app/images/home.png" alt="Home"></a>
+        <button class="btn btn-primary bi bi-arrow-left-circle fs-5" onclick="history.back()"></button>
+    </div>
+
+    <div class="ms-auto">
+        <a href="/article/{$articleId}" class="btn btn-secondary fs-5">Retour à l'article</a>
+    </div>
+</div>
+{/block}
+
+{block content}
+<div class="container-fluid">
+    <h1>Résultats de la commande groupée</h1>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <h2 class="card-title">{$order->Question}</h2>
+
+            <div class="mt-4">
+                <h3>Résultats :</h3>
+
+                <div class="list-group">
+                    {if count($participants) > 0}
+                        {foreach $options as $option}
+                            <div class="list-group-item">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span>{$option}</span>
+                                    <span class="badge bg-primary rounded-pill">{$results[$option]}</span>
+                                </div>
+
+                                {var $percentage = $results[$option] / count($participants) * 100}
+                                <div class="progress mt-2">
+                                    <div class="progress-bar" role="progressbar" style="width: {$percentage|number}%;"
+                                         aria-valuenow="{$percentage|number}"
+                                         aria-valuemin="0"
+                                         aria-valuemax="100">
+                                        {number_format($percentage, 1)}%
+                                    </div>
+                                </div>
+                            </div>
+                        {/foreach}
+                    {else}
+                        Aucune commande
+                    {/if}
+                </div>
+            </div>
+
+            <div class="row mt-4">
+                <div class="col-md-4">
+                    <h3>Commandants ({count($participants)})</h3>
+
+                    <ul class="list-group">
+                        {foreach $participants as $participant}
+                            <li class="list-group-item">
+                                <strong>{$participant['name']}</strong> :
+                            {foreach $participant['answers'] as $label => $quantity}
+                                <span class="badge bg-info">
+                                    {$label} : {$quantity}
+                                </span>
+                            {/foreach}
+                            </li>
+                        {/foreach}
+                    </ul>
+                </div>
+
+                <div class="col-md-8">
+                    <h3 class="text-center p-2 mb-3" style="background-color: #f8f9fa;">Tableau des commandants par article</h3>
+
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    {foreach $options as $option}
+                                        <th class="text-center">{$option}</th>
+                                    {/foreach}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    {foreach $options as $option}
+                                        <td class="align-top">
+                                            <ul class="list-unstyled mb-0">
+                                            {foreach $participants as $participant}
+                                                {var $answers = (array) $participant['answers']}
+                                                {if isset($answers[$option])}
+                                                <li>
+                                                    {$participant['name']}
+                                                    <span class="badge bg-secondary ms-1">{$answers[$option]}</span>
+                                                </li>
+                                                {/if}
+                                            {/foreach}
+                                            </ul>
+                                        </td>
+                                    {/foreach}
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}

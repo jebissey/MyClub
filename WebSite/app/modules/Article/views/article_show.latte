@@ -22,6 +22,11 @@
         {else}
         <a href="/survey/add/{$id}" class="btn btn-success ms-2">Ajouter un sondage</a>
         {/if}
+        {if $hasOrder}
+        <a href="/order/add/{$id}" class="btn btn-danger ms-2">Modifier la commande groupée</a>
+        {else}
+        <a href="/order/add/{$id}" class="btn btn-success ms-2">Ajouter une commande groupée</a>
+        {/if}
     {else}
         <small class="text-muted">Seul le créateur de l'article peut le modifier</small>                
     {/if}
@@ -35,6 +40,12 @@
     {/if}
     {if $hasSurvey && $userConnected && isset($article->PublishedBy) && $article->PublishedBy !== null && $hasSurvey->ClosingDate >= date('Y-m-d')}
         <button id="reply-survey-btn" class="btn btn-success ms-2">Répondre au sondage</button>
+    {/if}
+    {if $canReadOrder}
+        <button class="btn btn-info ms-2" onclick="window.location.href='/order/results/{$article->Id}'">Voir résultats commande</button>
+    {/if}
+    {if $hasOrder && $userConnected && isset($article->PublishedBy) && $article->PublishedBy !== null && $hasOrder->ClosingDate >= date('Y-m-d')}
+        <button id="reply-order-btn" class="btn btn-success ms-2">Répondre pour la commande groupée</button>
     {/if}
     {if $isEditor}
         <button class="btn btn-warning ms-2" onclick="window.location.href='/article/edit/{$article->Id}'">
@@ -51,7 +62,6 @@
 {/block}
 
 {block content}
-    <!-- Zone d'alertes -->
     <div id="liveAlertPlaceholder"></div>
 
     <div class="container-fluid" 
@@ -118,9 +128,8 @@
         </div>
     </div>
 
-    <!-- Modal pour le sondage -->
     <div class="modal fade" id="surveyModal" tabindex="-1" aria-labelledby="surveyModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="surveyModalLabel">Répondre au sondage</h5>
@@ -132,18 +141,24 @@
             </div>
         </div>
     </div>
+
+    <div class="modal fade" id="orderModal" tabindex="-1" aria-labelledby="orderModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="orderModalLabel">Répondre à la commande</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="order-form-container">
+                    <p>Chargement de la commande...</p>
+                </div>
+            </div>
+        </div>
+    </div>
 {/block}
 
 {block scripts}
-    <!-- Fonction helper pour les alertes (requise par les modules) -->
     <script n:syntax="off">
-        /**
-         * Affiche une alerte Bootstrap
-         * @param {string} message - Le message à afficher
-         * @param {string} type - Le type d'alerte (info, success, warning, danger)
-         */
-
-        // Gestion du mode édition
         document.addEventListener('DOMContentLoaded', function() {
             const editToggleBtn = document.getElementById('edit-toggle-btn');
             const contentDisplay = document.getElementById('content-display');
@@ -156,14 +171,12 @@
                     isEditMode = !isEditMode;
                     
                     if (isEditMode) {
-                        // Passer en mode édition
                         contentDisplay.style.display = 'none';
                         editorContainer.style.display = 'block';
                         editToggleBtn.innerHTML = '<i class="bi bi-eye"></i> Mode lecture';
                         editToggleBtn.classList.remove('btn-primary');
                         editToggleBtn.classList.add('btn-secondary');
                     } else {
-                        // Passer en mode lecture
                         contentDisplay.style.display = 'block';
                         editorContainer.style.display = 'none';
                         editToggleBtn.innerHTML = '<i class="bi bi-pencil"></i> Mode édition';

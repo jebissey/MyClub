@@ -44,6 +44,7 @@ use app\config\routes\MessageApi;
 use app\config\routes\NavBar;
 use app\config\routes\NavbarApi;
 use app\config\routes\NotificationApi;
+use app\config\routes\Order;
 use app\config\routes\Person;
 use app\config\routes\Registration;
 use app\config\routes\Rss;
@@ -98,6 +99,7 @@ use app\models\MessageDataHelper;
 use app\models\MetadataDataHelper;
 use app\models\NeedDataHelper;
 use app\models\NeedTypeDataHelper;
+use app\models\OrderDataHelper;
 use app\models\PageDataHelper;
 use app\models\ParticipantDataHelper;
 use app\models\PersonDataHelper;
@@ -131,6 +133,7 @@ class Routes
         $messageDataHelper = new MessageDataHelper($application);
         $needDataHelper = new NeedDataHelper($application);
         $notificationSender = new NotificationSender($dataHelper);
+        $orderDataHelper = new OrderDataHelper($application, $articleDataHelper);
         $participantDataHelper = new ParticipantDataHelper($application);
         $personPreferences = new PersonPreferences($application);
         $personDataHelper = new PersonDataHelper($application, $personPreferences, $emailService);
@@ -166,6 +169,7 @@ class Routes
             $needDataHelper,
             new News($newsProviders),
             $notificationSender,
+            $orderDataHelper,
             $participantDataHelper,
             $personDataHelper,
             new PersonGroupDataHelper($application),
@@ -264,6 +268,7 @@ class Routes
         $this->routes = array_merge($this->routes, (new NavBar($this->controllerFactory))->get());
         $this->routes = array_merge($this->routes, (new NavbarApi($this->apiFactory))->get());
         $this->routes = array_merge($this->routes, (new NotificationApi($this->apiFactory))->get());
+        $this->routes = array_merge($this->routes, (new Order($this->controllerFactory))->get());
         $this->routes = array_merge($this->routes, (new Person($this->controllerFactory))->get());
         $this->routes = array_merge($this->routes, (new Registration($this->controllerFactory))->get());
         $this->routes = array_merge($this->routes, (new Rss($this->controllerFactory))->get());

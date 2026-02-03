@@ -18,7 +18,7 @@ export default class SurveyReplyManager {
     async handleReplyClick() {
         try {
             const data = await this.api.get(`/api/survey/reply/${this.articleId}`);
-            
+
             if (data.success) {
                 this.showSurveyModal(data.survey);
             } else {
@@ -51,10 +51,10 @@ export default class SurveyReplyManager {
 
     buildSurveyForm(survey) {
         const optionsHtml = survey.options.map(option => {
-            const isChecked = survey.previousAnswers && 
+            const isChecked = survey.previousAnswers &&
                 survey.previousAnswers.includes(option) ? 'checked' : '';
             const optionId = `option-${this.sanitizeId(option)}`;
-            
+
             return `
                 <div class="form-check">
                     <input class="form-check-input" type="checkbox" 

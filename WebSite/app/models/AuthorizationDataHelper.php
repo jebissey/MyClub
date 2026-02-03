@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace app\models;
@@ -27,6 +28,25 @@ class AuthorizationDataHelper extends Data
             WHERE Person.Id = ?");
         $query->execute([$connectedUser->person?->Id ?? 0]);
         return array_column($query->fetchAll(), 'Name');
+    }
+
+    public function canPersonReadOrderResults(object $article, ConnectedUser $connectedUser): bool
+    {
+        $order = $this->get('Order', ['IdArticle' => $article->Id], 'ClosingDate, Visibility, Id');
+        if (!$order || !($connectedUser->person ?? false)) return false;
+        $now = (new DateTime())->format('Y-m-d');
+        $closingDate = $order->ClosingDate;
+        if (
+            $article->CreatedBy == ($connectedUser->person?->Id ?? 0)
+            || $order->Visibility == 'all'
+            || $order->Visibility == 'allAfterClosing' && $closingDate < $now
+        ) return true;
+        $stmt = $this->pdo->prepare('SELECT COUNT(*) FROM OrderReply WHERE IdOrder = ? AND IdPerson = ?');
+        $stmt->execute([$order->Id, $connectedUser->person?->Id ?? 0]);
+        $hasOrdered = $stmt->fetchColumn() > 0;
+        if ($hasOrdered && ($order->Visibility == 'orderers' || ($order->Visibility == 'orderersAfterClosing' && $closingDate < $now)))
+            return true;
+        return false;
     }
 
     public function canPersonReadSurveyResults(object $article, ConnectedUser $connectedUser): bool

@@ -28,6 +28,7 @@ use app\models\LogDataStatisticsHelper;
 use app\models\MessageDataHelper;
 use app\models\MetadataDataHelper;
 use app\models\NeedDataHelper;
+use app\models\OrderDataHelper;
 use app\models\ParticipantDataHelper;
 use app\models\PersonDataHelper;
 use app\models\PersonGroupDataHelper;
@@ -37,6 +38,7 @@ use app\models\SurveyDataHelper;
 use app\models\TableControllerDataHelper;
 use app\modules\Article\ArticleController;
 use app\modules\Article\MediaController;
+use app\modules\Article\OrderController;    
 use app\modules\Article\SurveyController;
 use app\modules\Designer\DesignController;
 use app\modules\Designer\DesignerController;
@@ -107,6 +109,7 @@ class ControllerFactory
         private NeedDataHelper $needDataHelper,
         private News $news,
         private NotificationSender $notificationSender,
+        private OrderDataHelper $orderDataHelper,
         private ParticipantDataHelper $participantDataHelper,
         private PersonDataHelper $personDataHelper,
         private PersonGroupDataHelper $personGroupDataHelper,
@@ -286,6 +289,14 @@ class ControllerFactory
     public function makeNavBarController(): NavBarController
     {
         return new NavBarController($this->application);
+    }
+
+    public function makeOrderController(): OrderController
+    {
+        return new OrderController(
+            $this->application,
+            $this->orderDataHelper
+        );
     }
 
     public function makePersonController(): PersonController

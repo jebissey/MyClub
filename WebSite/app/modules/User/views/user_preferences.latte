@@ -130,8 +130,10 @@
                                             Lorsqu'un nouvel événement est disponible
                                         </label>
                                     </div>
+
                                     <div class="form-check">
-                                        <input type="checkbox" class="form-check-input event-type-checkbox" 
+                                        <input type="checkbox"
+                                            class="form-check-input event-type-checkbox"
                                             id="eventTypeNewArticle"
                                             name="preferences[eventTypes][newArticle][enabled]"
                                             {isset($currentPreferences['eventTypes']['newArticle']['enabled']) ? checked : ''}>
@@ -139,18 +141,46 @@
                                             Lorsqu'un nouvel article est publié
                                         </label>
                                     </div>
-                                </div>
-                                <div class="availability-options" 
-                                    id="availabilityOptionsNewArticle" 
-                                    {if !isset($currentPreferences['eventTypes']['newArticle']['enabled']) || !$currentPreferences['eventTypes']['newArticle']['enabled']}style="display: none;"{/if}>
-                                    <div class="form-check">
-                                        <input type="checkbox" class="form-check-input" 
-                                            id="pollOnlyNewArticle"
-                                            name="preferences[eventTypes][newArticle][pollOnly]"
-                                            {isset($currentPreferences['eventTypes']['newArticle']['pollOnly']) ? checked : '' }>
-                                        <label class="form-check-label" for="pollOnlyNewArticle">
-                                            Uniquement s'il y a un sondage
-                                        </label>
+
+                                    <div class="availability-options ms-4 mt-2"
+                                        id="availabilityOptionsNewArticle"
+                                        {if !isset($currentPreferences['eventTypes']['newArticle']['enabled']) || !$currentPreferences['eventTypes']['newArticle']['enabled']}
+                                            style="display: none;"
+                                        {/if}>
+
+                                        <div class="form-check">
+                                            <input type="checkbox"
+                                                class="form-check-input"
+                                                id="newArticlePollOnly"
+                                                name="preferences[eventTypes][newArticle][pollOnly]"
+                                                {isset($currentPreferences['eventTypes']['newArticle']['pollOnly']) ? checked : ''}>
+                                            <label class="form-check-label" for="newArticlePollOnly">
+                                                Uniquement s'il y a un sondage
+                                            </label>
+                                        </div>
+
+                                        <div class="form-check">
+                                            <input type="checkbox"
+                                                class="form-check-input"
+                                                id="newArticleOrderOnly"
+                                                name="preferences[eventTypes][newArticle][orderOnly]"
+                                                {isset($currentPreferences['eventTypes']['newArticle']['orderOnly']) ? checked : ''}>
+                                            <label class="form-check-label" for="newArticleOrderOnly">
+                                                Uniquement s'il y a une commande groupée
+                                            </label>
+                                        </div>
+
+                                        <div class="form-check">
+                                            <input type="checkbox"
+                                                class="form-check-input"
+                                                id="newArticlePollOrOrder"
+                                                name="preferences[eventTypes][newArticle][poll_or_order]"
+                                                {isset($currentPreferences['eventTypes']['newArticle']['poll_or_order']) ? checked : ''}>
+                                            <label class="form-check-label" for="newArticlePollOrOrder">
+                                                S'il y a un sondage ou une commande groupée
+                                            </label>
+                                        </div>
+
                                     </div>
                                 </div>
                             </div>

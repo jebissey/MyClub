@@ -20,6 +20,8 @@ class ArticleApi implements RouteInterface
 
         $this->routes[] = new Route('GET  /api/author/@articleId:[0-9]+', $articleApi, 'getAuthor');
         $this->routes[] = new Route('POST /api/design/vote', $articleApi, 'designVote');
+        $this->routes[] = new Route('POST /api/order/reply', $articleApi, 'saveOrderReply');
+        $this->routes[] = new Route('GET  /api/order/reply/@id:[0-9]+', $articleApi, 'showOrderReplyForm');
         $this->routes[] = new Route('POST /api/survey/reply', $articleApi, 'saveSurveyReply');
         $this->routes[] = new Route('GET  /api/survey/reply/@id:[0-9]+', $articleApi, 'showSurveyReplyForm');
 

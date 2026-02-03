@@ -159,27 +159,48 @@ class PersonDataHelper extends Data implements NewsProviderInterface
 
     public function getPersonWantedToBeAlerted(int $idArticle): array
     {
-        $idGroup = $this->get('Article', ['Id' => $idArticle], 'IdGroup')->IdGroup;
-        $idSurvey = $this->get('Survey', ['IdArticle' => $idArticle], 'Id')->Id;
+        $idGroup = null;
+        if ($group = $this->get('Article', ['Id' => $idArticle], 'IdGroup')) {
+            $idGroup = $group->IdGroup;
+        }
+        $idSurvey = null;
+        if ($survey = $this->get('Survey', ['IdArticle' => $idArticle], 'Id')) {
+            $idSurvey = $survey->Id;
+        }
+        $idOrder = null;
+        if ($order = $this->get('Order', ['IdArticle' => $idArticle], 'Id')) {
+            $idOrder = $order->Id;
+        }
         $persons = $this->getPersonsInGroup($idGroup);
         $filteredEmails = [];
         foreach ($persons as $person) {
-            $include = false;
-            if ($person->Preferences ?? '' != '') {
-                $preferences = json_decode($person->Preferences ?? '', true);
-                if ($preferences != '' && isset($preferences['eventTypes']['newArticle'])) {
-                    if (isset($preferences['eventTypes']['newArticle']['pollOnly'])) {
-                        if ($idSurvey) $include = true;
-                    } else $include = true;
-                }
+            if (empty($person->Preferences)) {
+                continue;
             }
+            $preferences = json_decode($person->Preferences, true);
+            if (!$preferences || empty($preferences['eventTypes']['newArticle']['enabled'])) {
+                continue;
+            }
+            $articlePrefs = $preferences['eventTypes']['newArticle'];
+            $include = false;
+
+            if (isset($articlePrefs['pollOnly'])) {
+                $include = (bool) $idSurvey;
+            } elseif (isset($articlePrefs['orderOnly'])) {
+                $include = (bool) $idOrder;
+            } elseif (isset($articlePrefs['poll_or_order'])) {
+                $include = ($idSurvey || $idOrder);
+            } else {
+                $include = true;
+            }
+
             if ($include) {
                 $filteredEmails[] = $person->Email;
                 $this->set('Message', [
-                    'EventId' => null,
-                    'PersonId' => $person->Id,
-                    'Text' =>  "New article \n\n /article/" . $idArticle,
-                    '"From"' => 'Webapp'
+                    'EventId'  => null,
+                    'PersonId' => $person->PersonId,
+                    'Text'    => "Nouvel article publié\n\n/article/" . $idArticle,
+                    'From'    => 'Webapp'
                 ]);
             }
         }
