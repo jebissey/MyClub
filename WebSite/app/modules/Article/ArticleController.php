@@ -118,8 +118,11 @@ class ArticleController extends TableController
         $connectedUser = $this->application->getConnectedUser();
         $article = $this->articleDataHelper->getLatestArticle([$id]);
 
-        if ($connectedUser->person === null || $connectedUser->person->Id !== $article->CreatedBy) {
+        if ($connectedUser->person === null) {
             $this->raiseforbidden(__FILE__, __LINE__);
+            return;
+        } else if ($connectedUser->person->Id !== $article->CreatedBy) {
+            $this->show($id);
             return;
         }
 
@@ -259,7 +262,6 @@ class ArticleController extends TableController
             'filters' => $filterConfig,
             'columns' => $columns,
             'resetUrl' => '/articles',
-            'isRedactor' => $connectedUser->isRedactor() ?? false,
             'userConnected' => $connectedUser->person ?? false,
             'layout' => $this->getLayout(),
             'navItems' => $this->getNavItems($connectedUser->person ?? false),
@@ -348,7 +350,7 @@ class ArticleController extends TableController
                     '"From"' => 'User',
                     'ArticleId' => $id
                 ])),
-                'isCreator' => $connectedUser != null && $connectedUser?->person?->Id == $article->CreatedBy
+                'isCreator' => $connectedUser !== null && $connectedUser?->person?->Id === $article->CreatedBy
             ]));
         } catch (QueryException $e) {
             $this->raiseBadRequest($e->getMessage(),  __FILE__, __LINE__);

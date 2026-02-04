@@ -33,7 +33,7 @@ class WebmasterController extends AbstractController
 
             $this->render('Common/views/info.latte', $this->getAllParams([
                 'content' => $content,
-                'hasAuthorization' => $this->application->getConnectedUser()->isEventManager(),
+                'hasAuthorization' => $this->application->getConnectedUser()->isAdministrator(),
                 'currentVersion' => Application::VERSION,
                 'timer' => 0,
                 'previousPage' => true,

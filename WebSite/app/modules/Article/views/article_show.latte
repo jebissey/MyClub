@@ -47,7 +47,7 @@
     {if $hasOrder && $userConnected && isset($article->PublishedBy) && $article->PublishedBy !== null && $hasOrder->ClosingDate >= date('Y-m-d')}
         <button id="reply-order-btn" class="btn btn-success ms-2">Répondre pour la commande groupée</button>
     {/if}
-    {if $isEditor}
+    {if $isCreator}
         <button class="btn btn-warning ms-2" onclick="window.location.href='/article/edit/{$article->Id}'">
             <i class="bi bi-pencil"></i>
         </button>

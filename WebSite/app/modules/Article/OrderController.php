@@ -134,7 +134,6 @@ class OrderController extends AbstractController
                     if (isset($results[$article])) $results[$article] += $quantity;
                 }
             }
-error_log("\n\n" . json_encode($participants, JSON_PRETTY_PRINT) . "\n");          
 
             $this->render('Article/views/order_results.latte', [
                 'order'          => $order,
