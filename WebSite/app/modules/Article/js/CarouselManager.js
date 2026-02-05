@@ -44,13 +44,8 @@ export default class CarouselManager {
     }
 
     attachEventListeners() {
-        // Formulaire d'ajout
         this.elements.addImageForm?.addEventListener('submit', (e) => this.handleAddImage(e));
-
-        // Boutons de suppression (délégation d'événements)
         document.addEventListener('click', (e) => this.handleDeleteClick(e));
-
-        // Confirmation de suppression
         this.elements.confirmDelete?.addEventListener('click', () => this.handleConfirmDelete());
     }
 
@@ -73,11 +68,29 @@ export default class CarouselManager {
         });
 
         if (result.success !== false) {
-            this.showAlert(result.message || 'Image ajoutée avec succès', 'success');
-            await this.loadCarouselItems();
+            if (result.item) {
+                this.addItemToGallery(result.item);
+            } else {
+                window.location.reload();
+            }
             this.elements.addImageForm.reset();
         } else {
             this.showAlert(result.message || 'Erreur lors de l\'ajout', 'danger');
+        }
+    }
+
+    addItemToGallery(item) {
+        const emptyState = document.getElementById('emptyState');
+        if (emptyState) {
+            const container = emptyState.parentElement;
+            container.innerHTML = `<div class="row g-3" id="carouselGallery"></div>`;
+            this.elements.carouselGallery = document.getElementById('carouselGallery');
+        }
+
+        if (this.elements.carouselGallery) {
+            const itemElement = this.getItemHtml(item);
+            this.elements.carouselGallery.insertAdjacentHTML('beforeend', itemElement);
+            this.updateItemCount();
         }
     }
 
@@ -87,7 +100,6 @@ export default class CarouselManager {
 
         this.itemToDelete = deleteBtn.dataset.id;
 
-        // Récupérer le HTML de l'item depuis l'attribut data
         const itemWrapper = deleteBtn.closest('.carousel-item-wrapper');
         const itemHtml = itemWrapper?.dataset.itemHtml;
 
@@ -106,41 +118,12 @@ export default class CarouselManager {
         const result = await this.apiClient.post(`/api/carousel/delete/${this.itemToDelete}`, {});
 
         if (result.success !== false) {
-            this.showAlert(result.message || 'Image supprimée avec succès', 'success');
             this.removeItemVisually(this.itemToDelete);
             this.deleteModal?.hide();
             this.itemToDelete = null;
         } else {
             this.showAlert(result.message || 'Erreur lors de la suppression', 'danger');
         }
-    }
-
-    async loadCarouselItems() {
-        const result = await this.apiClient.get(`/api/carousel/items/${this.articleId}`);
-
-        if (result.success === false) {
-            console.error('Error loading items:', result.error);
-            return;
-        }
-
-        if (!result.items) return;
-
-        const container = this.elements.carouselGallery?.parentElement ||
-            document.querySelector('.card-body');
-
-        if (!container) return;
-
-        if (result.items.length === 0) {
-            container.innerHTML = this.getEmptyStateHtml();
-        } else {
-            const galleryHtml = result.items.map(item => this.getItemHtml(item)).join('');
-            container.innerHTML = `<div class="row g-3" id="carouselGallery">${galleryHtml}</div>`;
-
-            // Recacher l'élément de galerie après rechargement
-            this.elements.carouselGallery = document.getElementById('carouselGallery');
-        }
-
-        this.updateItemCount();
     }
 
     getItemHtml(item) {
