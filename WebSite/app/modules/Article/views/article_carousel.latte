@@ -164,7 +164,6 @@
     </div>
 </div>
 
-{* Modal de confirmation de suppression *}
 <div class="modal fade" id="deleteModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -191,7 +190,7 @@
 
 {block scripts}
 <script>
-    const ARTICLE_ID = {$article->Id};
+    window.ARTICLE_ID = {$article->Id};
 </script>
 <script type="module" src="/app/modules/Article/js/CarouselManager.js"></script>
 {/block}

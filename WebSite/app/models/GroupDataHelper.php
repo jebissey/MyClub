@@ -78,7 +78,6 @@ class GroupDataHelper extends Data
         ];
     }
 
-
     public function getCurrentGroups(int $personId): array
     {
         $query = $this->pdo->prepare('

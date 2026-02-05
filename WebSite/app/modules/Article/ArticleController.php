@@ -16,13 +16,18 @@ use app\helpers\WebApp;
 use app\models\ArticleCrosstabDataHelper;
 use app\models\ArticleDataHelper;
 use app\models\ArticleTableDataHelper;
+use app\models\AuthorizationDataHelper;
 use app\models\MessageDataHelper;
 use app\models\PersonDataHelper;
+use app\modules\Article\services\ArticleAuthorizationService;
 use app\modules\Common\TableController;
+use app\services\AuthenticationService;
 use app\services\EmailService;
 
 class ArticleController extends TableController
 {
+    private ArticleAuthorizationService $authorizationService;
+
     public function __construct(
         Application $application,
         private ArticleDataHelper $articleDataHelper,
@@ -34,6 +39,11 @@ class ArticleController extends TableController
         private EmailService $emailService,
     ) {
         parent::__construct($application);
+        $this->authorizationService = new ArticleAuthorizationService(
+            $this->dataHelper,
+            new AuthenticationService($this->dataHelper, $this->emailService),
+            new AuthorizationDataHelper($this->application)
+        );
     }
 
     public function carousel(int $id): void
@@ -44,22 +54,25 @@ class ArticleController extends TableController
         }
         $article = $this->dataHelper->get('Article', ['Id' => $id], 'CreatedBy');
         if (!$article) {
-            $this->raiseBadRequest("Article {$id} doesn't exist", __FILE__, __LINE__);
+            $msg = str_replace(
+                '{id}',
+                (string)$id,
+                $this->languagesDataHelper->translate('article.error.not_found')
+            );
+            $this->raiseBadRequest($msg, __FILE__, __LINE__);
             return;
         }
         $connectedUser = $this->application->getConnectedUser();
         $article = $this->articleDataHelper->getLatestArticle([$id]);
-
-        if ($connectedUser->person === null || $connectedUser->person->Id !== $article->CreatedBy) {
+        if ($this->authorizationService->canEdit($id, $connectedUser)) {
+            $this->render('Article/views/article_carousel.latte', $this->getAllParams([
+                'article' => $article,
+                'carouselItems' => $this->dataHelper->gets('Carousel', ['IdArticle' => $id]),
+                'page' => $connectedUser->getPage(),
+            ]));
+        } else {
             $this->raiseforbidden(__FILE__, __LINE__);
-            return;
         }
-
-        $this->render('Article/views/article_carousel.latte', $this->getAllParams([
-            'article' => $article,
-            'carouselItems' => $this->dataHelper->gets('Carousel', ['IdArticle' => $id]),
-            'page' => $connectedUser->getPage(),
-        ]));
     }
 
     public function create(): void
@@ -92,16 +105,20 @@ class ArticleController extends TableController
         }
         $article = $this->dataHelper->get('Article', ['Id' => $id], 'CreatedBy');
         if (!$article) {
-            $this->raiseBadRequest("Article {$id} doesn't exist", __FILE__, __LINE__);
+            $msg = str_replace(
+                '{id}',
+                (string)$id,
+                $this->languagesDataHelper->translate('article.error.not_found')
+            );
+            $this->raiseBadRequest($msg, __FILE__, __LINE__);
             return;
         }
-        $connectedUser = $this->application->getConnectedUser();
-        if ($connectedUser->person === null || $connectedUser->person->Id !== $article->CreatedBy) {
+        if ($this->authorizationService->canDelete($id, $this->application->getConnectedUser())) {
+            $this->dataHelper->delete('Article', ['Id' => $id]);
+            $this->redirect('/articles');
+        } else {
             $this->raiseforbidden(__FILE__, __LINE__);
-            return;
         }
-        $this->dataHelper->delete('Article', ['Id' => $id]);
-        $this->redirect('/articles');
     }
 
     public function edit(int $id): void
@@ -112,7 +129,12 @@ class ArticleController extends TableController
         }
         $article = $this->dataHelper->get('Article', ['Id' => $id], 'CreatedBy');
         if (!$article) {
-            $this->raiseBadRequest("Article {$id} doesn't exist", __FILE__, __LINE__);
+            $msg = str_replace(
+                '{id}',
+                (string)$id,
+                $this->languagesDataHelper->translate('article.error.not_found')
+            );
+            $this->raiseBadRequest($msg, __FILE__, __LINE__);
             return;
         }
         $connectedUser = $this->application->getConnectedUser();
@@ -122,8 +144,13 @@ class ArticleController extends TableController
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
         } else if ($connectedUser->person->Id !== $article->CreatedBy) {
-            $this->show($id);
-            return;
+            if ($this->authorizationService->canRead($id, $connectedUser)) {
+                $this->show($id);
+                return;
+            } else {
+                $this->raiseforbidden(__FILE__, __LINE__);
+                return;
+            }
         }
 
         $this->render('Article/views/article_edit.latte', $this->getAllParams([
@@ -158,26 +185,40 @@ class ArticleController extends TableController
         }
         $articleCreatorEmail = $this->dataHelper->get('Person', ['Id' => $article->CreatedBy], 'Email')->Email;
         if (!$articleCreatorEmail) {
-            $this->raiseBadRequest("Unknown author of article {$idArticle}", __FILE__, __LINE__);
+            $msg = str_replace(
+                '{id}',
+                (string)$idArticle,
+                $this->languagesDataHelper->translate('article.error.unknown_author')
+            );
+            $this->raiseBadRequest($msg, __FILE__, __LINE__);
             return;
         }
         $filteredEmails = $this->personDataHelper->getPersonWantedToBeAlerted($idArticle);
         $root = Application::$root;
         $articleLink = $root . '/article/' . $idArticle;
         $unsubscribeLink = $root . '/user/preferences';
-        $emailTitle = 'BNW - Un nouvel article est disponible';
-        $message = "Conformément à vos souhaits, ce message vous signale la présence d'un nouvel article" . "\n\n" . $articleLink
-            . "\n\n Pour ne plus recevoir ce type de message vous pouvez mettre à jour vos préférences" . $unsubscribeLink;
+        $title = str_replace(
+            '{root}',
+            $root,
+            $this->languagesDataHelper->translate('article.email.new_title')
+        );
+        $intro = $this->languagesDataHelper->translate('article.email.body_intro');
+        $unsubscribe = $this->languagesDataHelper->translate('article.email.unsubscribe');
+        $message =
+            $intro . "\n\n" .
+            $articleLink . "\n\n" .
+            $unsubscribe . "\n" .
+            $unsubscribeLink;
         $this->emailService->send(
             $articleCreatorEmail,
             $articleCreatorEmail,
-            $emailTitle,
+            $title,
             $message,
             null,
             $filteredEmails,
             false
         );
-        $_SESSION['success'] = "Un courriel a été envoyé aux abonnés";
+        $_SESSION['success'] = $this->languagesDataHelper->translate('article.success.email_sent');
         $this->redirect('/article/' . $idArticle);
     }
 
@@ -229,12 +270,12 @@ class ArticleController extends TableController
         ];
         $filterValues = WebApp::filterInput($schema, $this->flight->request()->query->getData());
         $filterConfig = [
-            ['name' => 'PersonName', 'label' => 'Créé par'],
-            ['name' => 'title', 'label' => 'Titre'],
-            ['name' => 'lastUpdate', 'label' => 'Dernière modification'],
-            ['name' => 'pool', 'label' => 'Sondage'],
-            ['name' => 'GroupName', 'label' => 'Groupe'],
-            ['name' => 'Content', 'label' => 'Contenu'],
+            ['name' => 'PersonName', 'label' => $this->languagesDataHelper->translate('article.label.created_by')],
+            ['name' => 'title', 'label' => $this->languagesDataHelper->translate('article.label.title')],
+            ['name' => 'lastUpdate', 'label' => $this->languagesDataHelper->translate('article.label.last_update')],
+            ['name' => 'pool', 'label' => $this->languagesDataHelper->translate('article.label.pool')],
+            ['name' => 'GroupName', 'label' => $this->languagesDataHelper->translate('article.label.group')],
+            ['name' => 'Content', 'label' => $this->languagesDataHelper->translate('article.label.content')],
         ];
         if ($connectedUser->isEditor() || false) {
             $filterConfig[] = ['name' => 'published', 'label' => 'Publié'];
@@ -271,14 +312,13 @@ class ArticleController extends TableController
 
     public function publish(int $id): void
     {
-        if (!($this->application->getConnectedUser()->isEditor() ?? false)) {
+        if (!($this->application->getConnectedUser()->isRedactor() ?? false)) {
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $article = $this->articleDataHelper->getLatestArticle([$id]);
-            if (!$article || ($this->application->getConnectedUser()->person->Id != $article->CreatedBy && !$this->application->getConnectedUser()->isEditor())) {
-                $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+            if (!$this->authorizationService->canPublish($id, $this->application->getConnectedUser())) {
+                $this->raiseforbidden(__FILE__, __LINE__);
                 return;
             }
             $schema = [
@@ -297,16 +337,16 @@ class ArticleController extends TableController
                 'LastUpdate'     => date('Y-m-d H:i:s')
             ], ['Id' => $id]);
             if ($result) {
-                $_SESSION['success'] = "L'article a été mis à jour avec succès";
+                $_SESSION['success'] = $this->languagesDataHelper->translate('article.success.updated');
                 $this->backup->save();
-            } else $_SESSION['error'] = "Une erreur est survenue lors de la mise à jour de l'article";
+            } else $_SESSION['error'] = $this->languagesDataHelper->translate('article.error.update_failed');
             $this->redirect('/article/' . $id);
         } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             $this->render('User/views/publish.latte', $this->getAllParams([
                 'article' => $this->articleDataHelper->getWithAuthor($id),
                 'page' => $this->application->getConnectedUser()->getPage()
             ]));
-        } else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
+        } else $this->raiseMethodNotAllowed(__FILE__, __LINE__);
     }
 
     public function show(int $id): void
@@ -317,12 +357,17 @@ class ArticleController extends TableController
         }
         $article = $this->dataHelper->get('Article', ['Id' => $id], 'Id, OnlyForMembers');
         if (!$article) {
-            $this->raiseBadRequest("Article {$id} doesn't exist", __FILE__, __LINE__);
+            $msg = str_replace(
+                '{id}',
+                (string)$id,
+                $this->languagesDataHelper->translate('article.error.not_found')
+            );
+            $this->raiseBadRequest($msg, __FILE__, __LINE__);
             return;
         }
         $connectedUser = $this->application->getConnectedUser();
-        if ($article->OnlyForMembers == 1 && $connectedUser->person == null) {
-            $this->raiseBadRequest("Il faut être connecté pour pouvoir consulter cet article", __FILE__, __LINE__);
+        if (!$this->authorizationService->canRead($id, $connectedUser)) {
+            $this->raiseBadRequest($this->languagesDataHelper->translate('article.error.login_required'), __FILE__, __LINE__);
             return;
         }
         try {
@@ -373,8 +418,8 @@ class ArticleController extends TableController
             return;
         }
         $connectedUser = $this->application->getConnectedUser();
-        if ($article->OnlyForMembers == 1 && $connectedUser->person == null) {
-            $this->raiseBadRequest("Il faut être connecté pour pouvoir consulter cet article", __FILE__, __LINE__);
+        if (!$this->authorizationService->canRead($articleId, $connectedUser)) {
+            $this->raiseBadRequest($this->languagesDataHelper->translate('article.error.login_required'), __FILE__, __LINE__);
             return;
         }
         $person = $connectedUser->person;
@@ -442,7 +487,7 @@ class ArticleController extends TableController
         $title = $input['title'] ?? '???';
         $content = $input['content'] ?? '???';
         if (empty($title) || empty($content)) {
-            $_SESSION['error'] = "Le titre et le contenu sont obligatoires";
+            $_SESSION['error'] = $this->languagesDataHelper->translate('article.error.title_content_required');
             $this->redirect('/article/' . $id);
             return;
         }
@@ -455,9 +500,9 @@ class ArticleController extends TableController
             'LastUpdate'     => date('Y-m-d H:i:s')
         ], ['Id' => $id]);
         if ($result) {
-            $_SESSION['success'] = "L'article a été mis à jour avec succès";
+            $_SESSION['success'] = $this->languagesDataHelper->translate('article.success.updated');
             $this->backup->save();
-        } else $_SESSION['error'] = "Une erreur est survenue lors de la mise à jour de l'article";
+        } else $_SESSION['error'] = $this->languagesDataHelper->translate('article.error.update_failed');
         $this->redirect('/article/' . $id);
     }
 }
