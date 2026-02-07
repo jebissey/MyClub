@@ -41,32 +41,37 @@ class ConnectedUser
             return;
         }
         $this->person = $person;
+        if ($this->person->Alert !== null) Params::setMemberAlert($this->person->Alert);
         $this->authorizations = $this->authorizationDataHelper->getsFor($this);
         $lang = TranslationManager::getCurrentLanguage();
-        Params::setParams([
-            'href' => $this->getHref($this->person->Email),
-            'userImg' => WebApp::getUserImg($this->person, new GravatarHandler()),
-            'userEmail' => $this->person->Email,
-            'isAdmin' => $this->isAdministrator(),
-            'isDesigner' => $this->isDesigner(),
-            'isEditor' => $this->isEditor(),
-            'isEventDesigner' => $this->isEventDesigner(),
-            'isEventManager' => $this->isEventManager(),
-            'isHomeDesigner' => $this->isHomeDesigner(),
-            'isKanbanDesigner' => $this->isKanbanDesigner(),
-            'isMember' => true,
-            'isNavbarDesigner' => $this->isNavbarDesigner(),
-            'isPersonManager' => $this->isPersonManager(),
-            'isRedactor' => $this->isRedactor(),
-            'isVisitorInsights' => $this->isVisitorInsights(),
-            'isWebmaster' => $this->isWebmaster(),
-            'currentVersion' => Application::VERSION,
-            'currentLanguage' => $lang,
-            'supportedLanguages' => TranslationManager::getSupportedLanguages(),
-            'flag' => TranslationManager::getFlag($lang),
-            'currentPath' => parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH),
-            'isMyclubWebSite'  => WebApp::isMyClubWebSite(),
-        ], $this->metadataDataHelper->isTestSite() && !empty($prodSiteUrl = $this->metadataDataHelper->getProdSiteUrl()) ? $prodSiteUrl : null);
+        Params::setParams(
+            [
+                'href' => $this->getHref($this->person->Email),
+                'userImg' => WebApp::getUserImg($this->person, new GravatarHandler()),
+                'userEmail' => $this->person->Email,
+                'isAdmin' => $this->isAdministrator(),
+                'isDesigner' => $this->isDesigner(),
+                'isEditor' => $this->isEditor(),
+                'isEventDesigner' => $this->isEventDesigner(),
+                'isEventManager' => $this->isEventManager(),
+                'isHomeDesigner' => $this->isHomeDesigner(),
+                'isKanbanDesigner' => $this->isKanbanDesigner(),
+                'isMember' => true,
+                'isNavbarDesigner' => $this->isNavbarDesigner(),
+                'isPersonManager' => $this->isPersonManager(),
+                'isRedactor' => $this->isRedactor(),
+                'isVisitorInsights' => $this->isVisitorInsights(),
+                'isWebmaster' => $this->isWebmaster(),
+                'currentVersion' => Application::VERSION,
+                'currentLanguage' => $lang,
+                'supportedLanguages' => TranslationManager::getSupportedLanguages(),
+                'flag' => TranslationManager::getFlag($lang),
+                'currentPath' => parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH),
+                'isMyclubWebSite'  => WebApp::isMyClubWebSite(),
+            ],
+            $this->metadataDataHelper->isTestSite() && !empty($prodSiteUrl = $this->metadataDataHelper->getProdSiteUrl()) ? $prodSiteUrl : null,
+            $person->Alert
+        );
         return;
     }
 

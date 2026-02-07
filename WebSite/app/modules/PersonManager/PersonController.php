@@ -59,7 +59,7 @@ class PersonController extends TableController
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
-        $person = $this->dataHelper->get('Person', ['Id' => $id], 'Id, Imported, Email, FirstName, LastName');
+        $person = $this->dataHelper->get('Person', ['Id' => $id], 'Id, Imported, Email, FirstName, LastName, Alert');
         if (!$person) {
             $this->raiseBadRequest("Unknown person {$id}", __FILE__, __LINE__);
             return;
@@ -69,6 +69,7 @@ class PersonController extends TableController
             'email' => $person->Email,
             'firstName' => $person->FirstName,
             'lastName' => $person->LastName,
+            'alert' => $person->Alert,
             'isSelfEdit' => false,
             'layout' => $this->getLayout(),
             'page' => $this->application->getConnectedUser()->getPage(),
@@ -94,10 +95,19 @@ class PersonController extends TableController
             'email' => FilterInputRule::Email->value,
             'firstName' => FilterInputRule::PersonName->value,
             'lastName' => FilterInputRule::PersonName->value,
+            'alert' => FilterInputRule::Content->value,
         ];
         $input = WebApp::filterInput($schema, $this->flight->request()->data->getData());
-        $this->dataHelper->set('Person', ['FirstName' => $input['firstName'] ?? '???', 'LastName' => $input['lastName']] ?? '???', ['Id' => $person->Id]);
+        $this->dataHelper->set(
+            'Person',
+            [
+                'FirstName' => $input['firstName'] ?? '???',
+                'LastName' => $input['lastName'] ?? '???',
+            ],
+            ['Id' => $person->Id]
+        );
         if ($person->Imported == 0) $this->dataHelper->set('Person', ['Email' => $input['email']], ['Id' => $person->Id]);
+        if ($this->application->getConnectedUser()->isPersonManager()) $this->dataHelper->set('Person', ['Alert' => $input['alert']], ['Id' => $person->Id]);
         $this->redirect('/persons');
     }
 
@@ -154,19 +164,22 @@ class PersonController extends TableController
             'lastName' => FilterInputRule::PersonName->value,
             'nickName' => FilterInputRule::PersonName->value,
             'email' => FilterInputRule::Email->value,
+            'alert' => FilterInputRule::Content->value,
         ];
         $filterValues = WebApp::filterInput($schema, $this->flight->request()->query->getData());
         $filterConfig = [
             ['name' => 'firstName', 'label' => 'Prénom'],
             ['name' => 'lastName', 'label' => 'Nom'],
             ['name' => 'nickName', 'label' => 'Surnom'],
-            ['name' => 'email', 'label' => 'Email']
+            ['name' => 'email', 'label' => 'Email'],
+            ['name' => 'alert', 'label' => 'Alerte']
         ];
         $columns = [
             ['field' => 'LastName', 'label' => 'Nom'],
             ['field' => 'FirstName', 'label' => 'Prénom'],
             ['field' => 'Email', 'label' => 'Email'],
-            ['field' => 'Phone', 'label' => 'Téléphone']
+            ['field' => 'Phone', 'label' => 'Téléphone'],
+            ['field' => 'Alert', 'label' => 'Alerte'],
         ];
         $data = $this->prepareTableData($this->tableControllerDataHelper->getPersonsQuery());
 

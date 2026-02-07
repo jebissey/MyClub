@@ -9,27 +9,32 @@ use InvalidArgumentException;
 use app\helpers\Application;
 use app\helpers\TranslationManager;
 
-
 class Params
 {
     private static array $commonParams = [];
 
-    public static function getAll(array $specificParams, ?string $prodSiteUrl): array
+    public static function getAll(array $specificParams, ?string $prodSiteUrl, ?string $memberAlert): array
     {
         if (self::$commonParams === []) {
-            self::setDefaultParams($_SERVER['REQUEST_URI'], $prodSiteUrl);
+            self::setDefaultParams($_SERVER['REQUEST_URI'], $prodSiteUrl, $memberAlert);
         }
         return array_merge(self::$commonParams, $specificParams);
     }
 
-    public static function setParams($params, $prodSiteUrl)
+    public static function setMemberAlert(?string $memberAlert): void
+    {
+        self::$commonParams['memberAlert'] = $memberAlert;
+    }
+
+    public static function setParams(array $params, ?string $prodSiteUrl, ?string $memberAlert)
     {
         self::$commonParams = $params;
         if ($prodSiteUrl !== null) self::$commonParams['productionSiteUrl'] = $prodSiteUrl;
+        if ($memberAlert !== null) self::$commonParams['memberAlert'] = $memberAlert;
     }
 
     #region Private functions
-    private static function setDefaultParams(string $requestUri, ?string $prodSiteUrl): void
+    private static function setDefaultParams(string $requestUri, ?string $prodSiteUrl, ?string $memberAlert): void
     {
         $path = parse_url($requestUri, PHP_URL_PATH);
         if ($path === false || $path === null) throw new InvalidArgumentException('Invalid URI provided');
@@ -61,5 +66,6 @@ class Params
             'isMyclubWebSite'  => WebApp::isMyClubWebSite(),
         ];
         if ($prodSiteUrl !== null) self::$commonParams['productionSiteUrl'] = $prodSiteUrl;
+        if ($memberAlert !== null) self::$commonParams['memberAlert'] = $memberAlert;
     }
 }

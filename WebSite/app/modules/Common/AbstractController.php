@@ -11,6 +11,7 @@ use Latte\Engine as LatteEngine;
 use app\enums\ApplicationError;
 use app\enums\TimeOfDay;
 use app\helpers\Application;
+use app\helpers\ConnectedUser;
 use app\helpers\Params;
 use app\helpers\TranslationManager;
 use app\models\AuthorizationDataHelper;
@@ -28,6 +29,8 @@ abstract class AbstractController
     protected PageDataHelper $pageDataHelper;
     protected AuthorizationDataHelper $authorizationDataHelper;
     private MetadataDataHelper $metadataDataHelper;
+    private ?string $prodSiteUrl;
+    private ?string $memberAlert = null;
 
     public function __construct(protected Application $application)
     {
@@ -39,6 +42,7 @@ abstract class AbstractController
         $this->authorizationDataHelper = new AuthorizationDataHelper($application);
         $this->pageDataHelper = new PageDataHelper($application, $this->authorizationDataHelper);
         $this->metadataDataHelper = new MetadataDataHelper($application);
+        $this->prodSiteUrl = $this->metadataDataHelper->isTestSite() ? $this->metadataDataHelper->getProdSiteUrl() : null;
     }
 
     #region Protected fucntions
@@ -55,7 +59,7 @@ abstract class AbstractController
 
     protected function getAllParams(array $specificParams): array
     {
-        return Params::getAll($specificParams, $this->metadataDataHelper->isTestSite() ? $this->metadataDataHelper->getProdSiteUrl() : null);
+        return Params::getAll($specificParams, $this->prodSiteUrl, $this->memberAlert);
     }
 
     protected function getLayout()

@@ -33,7 +33,7 @@ class TableControllerDataHelper extends Data
     {
         return $this->fluent->from('Person')
             ->select(null)
-            ->select('Id, FirstName, LastName, NickName, Email, Phone')
+            ->select('Id, FirstName, LastName, NickName, Email, Phone, Alert')
             ->orderBy('LastName')
             ->where('Inactivated = 0');
     }

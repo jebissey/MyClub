@@ -59,20 +59,24 @@ class HomeController extends AbstractController
             $news = $this->news->anyNews($connectedUser);
         } else {
             $lang = TranslationManager::getCurrentLanguage();
-            Params::setParams([
-                'href' => '/user/sign/in',
-                'userImg' => '👻',
-                'userEmail' => '',
-                'isAdmin' => false,
-                'currentVersion' => Application::VERSION,
-                'currentLanguage' => $lang,
-                'supportedLanguages' => TranslationManager::getSupportedLanguages(),
-                'flag' => TranslationManager::getFlag($lang),
-                'isRedactor' => false,
-                'page' => $connectedUser->getPage(),
-                'currentPath' => parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH),
-                'isMyclubWebSite'  => WebApp::isMyClubWebSite(),
-            ], $this->metadataDataHelper->isTestSite() && !empty($prodSiteUrl = $this->metadataDataHelper->getProdSiteUrl()) ? $prodSiteUrl : null);
+            Params::setParams(
+                [
+                    'href' => '/user/sign/in',
+                    'userImg' => '👻',
+                    'userEmail' => '',
+                    'isAdmin' => false,
+                    'currentVersion' => Application::VERSION,
+                    'currentLanguage' => $lang,
+                    'supportedLanguages' => TranslationManager::getSupportedLanguages(),
+                    'flag' => TranslationManager::getFlag($lang),
+                    'isRedactor' => false,
+                    'page' => $connectedUser->getPage(),
+                    'currentPath' => parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH),
+                    'isMyclubWebSite'  => WebApp::isMyClubWebSite(),
+                ],
+                $this->metadataDataHelper->isTestSite() && !empty($prodSiteUrl = $this->metadataDataHelper->getProdSiteUrl()) ? $prodSiteUrl : null,
+                $connectedUser?->person?->Alert ?? null
+            );
         }
 
         $articles = $this->articleDataHelper->getLatestArticles($userEmail);

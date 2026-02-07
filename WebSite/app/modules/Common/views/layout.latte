@@ -123,6 +123,12 @@
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     {/if}
+    {if isset($memberAlert)}
+        <div class="alert alert-danger alert-dismissible fade show m-0 rounded-0 text-center py-3" role="alert">
+            <h2><i class="bi bi-exclamation-triangle-fill"></i> {$memberAlert}</h2>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {/if}
 
     <div class="toast-container position-fixed top-0 end-0 p-3" id="toastContainer"></div>
 
