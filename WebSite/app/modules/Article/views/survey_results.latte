@@ -26,10 +26,13 @@
                 
                 <div class="list-group">
                     {if count($participants) > 0 }
-                        {foreach $options as $option}
+                        {foreach $options as $index => $option}
                     <div class="list-group-item">
                         <div class="d-flex justify-content-between align-items-center">
-                            <span>{$option}</span>
+                            <span>
+                                <span class="badge bg-danger rounded-circle me-2">{$index + 1}</span>
+                                {$option}
+                            </span>
                             <span class="badge bg-primary rounded-pill">{$results[$option]}</span>
                         </div>
                         {var $percentage = $results[$option] / count($participants) * 100}
@@ -56,8 +59,10 @@
                         {foreach $participants as $participant}
                         <li class="list-group-item">
                             <strong>{$participant['name']}</strong>: 
-                            {foreach $participant['answers'] as $answer}
-                            <span class="badge bg-info">{$answer}</span>
+                            {foreach $options as $index => $option}
+                                {if in_array($option, $participant['answers'])}
+                                <span class="badge bg-danger rounded-circle">{$index + 1}</span>
+                                {/if}
                             {/foreach}
                         </li>
                         {/foreach}
@@ -70,8 +75,10 @@
                         <table class="table table-bordered">
                             <thead>
                                 <tr>
-                                    {foreach $options as $option}
-                                    <th class="text-center">{$option}</th>
+                                    {foreach $options as $index => $option}
+                                    <th class="text-center">
+                                        <span class="badge bg-danger rounded-circle">{$index + 1}</span>
+                                    </th>
                                     {/foreach}
                                 </tr>
                             </thead>
