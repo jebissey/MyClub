@@ -199,50 +199,74 @@ class LogDataHelper extends Data
     public function getInstallationsData()
     {
         $query = "
-            SELECT 
-                IpAddress,
-                MAX(CreatedAt) as lastCheck,
-                COUNT(*) as checkCount,
-                GROUP_CONCAT(DISTINCT 
-                    CASE 
-                        WHEN Uri LIKE '%cv=%' 
-                        THEN SUBSTRING(Uri, INSTR(Uri, 'cv=') + 3)
-                        ELSE NULL 
+SELECT
+    IpAddress,
+    COALESCE(
+        (SELECT 
+            CASE
+                WHEN INSTR(Uri,'url=') > 0 THEN
+                    CASE
+                        WHEN INSTR(SUBSTR(Uri, INSTR(Uri,'url=')+4),'&') > 0 THEN
+                            SUBSTR(
+                                SUBSTR(Uri, INSTR(Uri,'url=')+4),
+                                1,
+                                INSTR(SUBSTR(Uri, INSTR(Uri,'url=')+4),'&')-1
+                            )
+                        ELSE SUBSTR(Uri, INSTR(Uri,'url=')+4)
                     END
-                ) as webappVersions,
-                GROUP_CONCAT(DISTINCT Message) as phpVersions
-            FROM Log 
-            WHERE Uri LIKE '/api/lastVersion%'
-            GROUP BY IpAddress
-            ORDER BY MAX(CreatedAt) DESC
+            END
+         FROM Log l2 
+         WHERE l2.IpAddress = Log.IpAddress 
+           AND l2.Uri LIKE '/api/lastVersion%'
+           AND INSTR(l2.Uri,'url=') > 0
+         LIMIT 1),
+        IpAddress
+    ) as Host,
+    MAX(CreatedAt) as lastCheck,
+    COUNT(*) as checkCount,
+    GROUP_CONCAT(DISTINCT
+        CASE
+            WHEN INSTR(Uri,'cv=') > 0 THEN
+                CASE
+                    WHEN INSTR(SUBSTR(Uri, INSTR(Uri,'cv=')+3),'&') > 0 THEN
+                        SUBSTR(
+                            SUBSTR(Uri, INSTR(Uri,'cv=')+3),
+                            1,
+                            INSTR(SUBSTR(Uri, INSTR(Uri,'cv=')+3),'&')-1
+                        )
+                    ELSE SUBSTR(Uri, INSTR(Uri,'cv=')+3)
+                END
+        END
+    ) as webappVersions,
+    GROUP_CONCAT(DISTINCT Message) as phpVersions
+FROM Log 
+WHERE Uri LIKE '/api/lastVersion%'
+GROUP BY IpAddress
+ORDER BY MAX(CreatedAt) DESC
         ";
         $results = $this->pdoForLog->query($query)->fetchAll();
 
         $dnsCache = [];
         foreach ($results as &$installation) {
-            if ($installation->webappVersions) {
-                $versions = array_filter(array_unique(explode(',', $installation->webappVersions)));
-                $installation->webappVersions = implode(', ', $versions);
-            } else $installation->webappVersions = 'Version inconnue';
-
-            if ($installation->phpVersions) {
-                $phpVersions = array_filter(array_unique(explode(',', $installation->phpVersions)));
-                $installation->phpVersions = implode(', ', $phpVersions);
-            } else $installation->phpVersions = 'Version inconnue';
-
             $installation->timeAgo = $this->getTimeAgo($installation->lastCheck);
-            $ip = $installation->IpAddress;
-            if (isset($dnsCache[$ip])) $hostname = $dnsCache[$ip];
-            else {
-                $hostname = @gethostbyaddr($ip);
-                $dnsCache[$ip] = $hostname;
+            $host = $installation->Host;
+            if (strpos($host, '%') !== false) {
+                $decoded = urldecode($host);
+                $parsedHost = parse_url($decoded, PHP_URL_HOST);
+                $installation->Host = $parsedHost ?: $decoded;
+                continue;
             }
-            if ($hostname !== false && $hostname !== $ip) {
-                $installation->hostname = $hostname;
-                $installation->installationType = 'Hostname';
-            } else {
-                $installation->hostname = $installation->IpAddress;
-                $installation->installationType = 'IP';
+            $hostname = null;
+            if (filter_var($host, FILTER_VALIDATE_IP)) {
+                if (isset($dnsCache[$host])) {
+                    $hostname = $dnsCache[$host];
+                } else {
+                    $hostname = @gethostbyaddr($host);
+                    $dnsCache[$host] = $hostname;
+                }
+                if ($hostname && $hostname !== $host) {
+                    $installation->Host = $hostname;
+                }
             }
         }
         return $results;

@@ -36,8 +36,7 @@
                     <table class="table table-hover">
                         <thead class="table-dark">
                             <tr>
-                                <th>Installation</th>
-                                <th>Type</th>
+                                <th>Host</th>
                                 <th>Version Webapp</th>
                                 <th>Version PHP</th>
                                 <th>Dernière vérification</th>
@@ -50,15 +49,8 @@
                             <tr>
                                 <td>
                                     <div class="d-flex align-items-center">
-                                        <small class="text-muted">{$installation->hostname}</small>
+                                        <small class="text-muted">{$installation->Host}</small>
                                     </div>
-                                </td>
-                                <td>
-                                {if $installation->installationType === 'Hostname'}
-                                    <span class="badge bg-success">Hostname</span>
-                                {else}
-                                    <span class="badge bg-info">IP</span>
-                                {/if}
                                 </td>
                                 <td>
                                 {if $installation->webappVersions === 'Version inconnue'}
@@ -85,9 +77,9 @@
                                 </td>
                                 <td>
                                 {var $daysSinceLastCheck = (time() - strtotime($installation->lastCheck)) / 86400}
-                                {if $daysSinceLastCheck < 1}
+                                {if $daysSinceLastCheck < 7}
                                     <span class="badge bg-success">Actif</span>
-                                {elseif $daysSinceLastCheck < 7}
+                                {elseif $daysSinceLastCheck < 30}
                                     <span class="badge bg-warning">Récent</span>
                                 {else}
                                     <span class="badge bg-danger">Inactif</span>
