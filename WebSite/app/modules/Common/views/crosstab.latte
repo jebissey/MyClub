@@ -33,7 +33,7 @@
                 <div class="card-body">
                     {ifset $dateRange}
                     <div class="alert alert-info">
-                        <i class="fa fa-info-circle"></i> Période sélectionnée :
+                        <i class="bi bi-info-circle-fill"></i> Période sélectionnée :
                         <strong>{date('d/m/Y', strtotime($dateRange['start']))}</strong> au
                         <strong>{date('d/m/Y', strtotime($dateRange['end']))}</strong>
                     </div>
@@ -146,7 +146,7 @@
                         </div>
                     {else}
                         <div class="alert alert-warning">
-                            <i class="fa fa-exclamation-triangle"></i> Aucun résultat trouvé pour la période sélectionnée.
+                            <i class="bi bi-exclamation-triangle-fill"></i> Aucun résultat trouvé pour la période sélectionnée.
                         </div>
                     {/if}
                 </div>

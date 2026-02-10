@@ -176,7 +176,7 @@ export default class KanbanBoard {
             const historyList = document.getElementById('cardHistoryList');
             historyList.innerHTML = '';
 
-            result.history.forEach((entry, index) => {
+            result.data.history.forEach((entry, index) => {
                 const li = document.createElement('li');
                 li.className = 'list-group-item';
 
