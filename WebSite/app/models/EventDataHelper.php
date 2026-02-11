@@ -404,12 +404,18 @@ class EventDataHelper extends Data implements NewsProviderInterface
         $news = [];
         if (!($connectedUser->person ?? false)) return $news;
         $sql = "
-            SELECT e.Id, e.Summary, e.LastUpdate
-            FROM Event e
-            JOIN EventType et ON e.IdEventType = et.Id
-            LEFT JOIN PersonGroup pg ON et.IdGroup = pg.IdGroup AND pg.IdPerson = :personId
-            WHERE e.LastUpdate >= :searchFrom AND pg.Id IS NOT NULL
-            ORDER BY e.LastUpdate DESC
+SELECT e.Id, e.Summary, e.LastUpdate
+FROM Event e
+JOIN EventType et ON e.IdEventType = et.Id
+LEFT JOIN PersonGroup pg 
+    ON et.IdGroup = pg.IdGroup 
+    AND pg.IdPerson = :personId
+WHERE e.LastUpdate >= :searchFrom
+AND (
+    et.IdGroup IS NULL
+    OR pg.IdPerson IS NOT NULL
+)
+ORDER BY e.LastUpdate DESC
         ";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([

@@ -103,6 +103,11 @@ class MessageApi extends AbstractApi
             $this->renderJsonBadRequest('Données manquantes', __FILE__, __LINE__);
             return;
         }
+        $message = $this->dataHelper->get('Message', ['Id' => (int)$data['messageId']], 'Id');
+        if (!$message) {
+            $this->renderJsonBadRequest('Message introuvable', __FILE__, __LINE__);
+            return;
+        }
         try {
             $data = $this->getJsonInput();
             $apiResponse = $this->updateMessage_((int)$data['messageId'], $this->application->getConnectedUser()->person->Id, $data['text']);
@@ -194,7 +199,7 @@ class MessageApi extends AbstractApi
         $personIds = $this->messageRecipientService->getRecipientsForContext($context);
         $from = '';
         $id = null;
-        if($articleId !== null) {
+        if ($articleId !== null) {
             $from = 'article';
             $id = $articleId;
         } elseif ($eventId !== null) {
