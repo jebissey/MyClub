@@ -129,7 +129,7 @@ class EventController extends AbstractController
                 'messageType' => $messageType,
                 'page' => $this->application->getConnectedUser()->getPage(),
             ]));
-        } else $this->raiseBadRequest('Event doesn\'t found', __FILE__, __LINE__);
+        } else $this->raiseBadRequest("Event {$eventId} doesn't exist", __FILE__, __LINE__);
     }
 
     public function registerSet(int $eventId, $token = null): void

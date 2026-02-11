@@ -33,9 +33,9 @@ function main(): int
         baseUrl: $options['base-url'] ?? 'http://localhost:8000',
         timeout: (int)($options['timeout'] ?? 5)
     );
-    $test = isset($options['test']) ? (int) $options['test'] : null;
-    $simu       = $options['simu'] ?? null;
-    $start      = $options['start'] ?? null;
+    $test  = optInt($options, 'test');
+    $simu  = optInt($options, 'simu');
+    $start = optInt($options, 'start');
     $exportJson = isset($options['export-json']);
     $exportCsv  = isset($options['export-csv']);
     $routeFile  = $options['routes-file'] ?? __DIR__ . '/../WebSite/app/config/Routes.php';
@@ -55,8 +55,12 @@ function main(): int
         echo "  Data base: " . ($dbTestsPath ?: "Not specified") . "\n";
         echo "  Stop on error: " . ($stop ? 'true' : 'false') . "\n";
 
+        $startTime = microtime(true);
+
         $orchestrator = RouteTestFactory::create($config, $dbTestsPath, $dbMyClubPath);
         $results = $orchestrator->runTests($routeFile, $routeDirectoryFiles, $test, $simu, $start, $stop);
+
+        $totalTimeMs = (microtime(true) - $startTime) * 1000;
 
         if ($exportJson) (new JsonTestExporter())->export($results, 'route_test_results.json');
         if ($exportCsv) (new CsvTestExporter())->export($results, 'route_test_results.csv');
@@ -65,6 +69,10 @@ function main(): int
         return 1;
     } finally {
         if (!CurrentWebSite::restore($dbWebSitePath)) throw new InvalidArgumentException("File $dbWebSitePath doesn't restored");
+        echo "\n" . str_repeat('=', 60) . "\n";
+        echo "✓ Tests terminés\n";
+        echo sprintf("  Temps total: %.2f s (%.2f min)\n", $totalTimeMs / 1000, $totalTimeMs / (1000 * 60));
+        echo str_repeat('=', 60) . "\n";
     }
     return 0;
 }
@@ -88,4 +96,15 @@ Options:
   --start=n°          Start simulation at this step n°
   --stop              Stop on first error
 EOT;
+}
+
+function optInt(array $options, string $name): ?int
+{
+    if (!isset($options[$name])) {
+        return null;
+    }
+    if ($options[$name] === false || $options[$name] === '') {
+        return null;
+    }
+    return (int)$options[$name];
 }
