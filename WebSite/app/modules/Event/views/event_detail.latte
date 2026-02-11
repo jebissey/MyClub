@@ -164,13 +164,12 @@
                     </div>
                         {/if}
                     {/if}
-                    
+                    <a href="/event/chat/{$eventId}" class="btn btn-warning">{='messages'|translate}{if $countOfMessages > 0} ({$countOfMessages}){/if}</a>
                     <div class="mt-3">
                         {if $isRegistered}
                             {if strtotime($event->StartTime) > time()}
                         <a href="/event/{$eventId}/unregister" class="btn btn-success">{='unregister'|translate}</a>
                             {/if}
-                        <a href="/event/chat/{$eventId}" class="btn btn-warning">{='messages'|translate}{if $countOfMessages > 0} ({$countOfMessages}){/if}</a>
                         {elseif count($participants) < $event->MaxParticipants || $event->MaxParticipants == 0}
                             {if strtotime($event->StartTime) > time()}
                                 {if $isCanceled}
