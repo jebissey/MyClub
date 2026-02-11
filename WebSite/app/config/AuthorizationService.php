@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace app\services;
+namespace app\config;
 
 use app\helpers\ConnectedUser;
 use app\interfaces\AuthorizationServiceInterface;

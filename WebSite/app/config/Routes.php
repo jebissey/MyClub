@@ -108,10 +108,10 @@ use app\models\PersonStatisticsDataHelper;
 use app\models\SharedFileDataHelper;
 use app\models\SurveyDataHelper;
 use app\models\TableControllerDataHelper;
-use app\services\AuthenticationService;
-use app\services\EmailService;
-use app\services\EventService;
-use app\services\MessageRecipientService;
+use app\modules\Common\services\AuthenticationService;
+use app\modules\Common\services\EmailService;
+use app\modules\Common\services\EventService;
+use app\modules\Common\services\MessageRecipientService;
 
 class Routes
 {

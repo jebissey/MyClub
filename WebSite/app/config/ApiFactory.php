@@ -43,10 +43,9 @@ use app\models\PageDataHelper;
 use app\models\ParticipantDataHelper;
 use app\models\PersonDataHelper;
 use app\models\SharedFileDataHelper;
-use app\services\AuthorizationService;
-use app\services\EmailService;
-use app\services\EventService;
-use app\services\MessageRecipientService;
+use app\modules\Common\services\EmailService;
+use app\modules\Common\services\EventService;
+use app\modules\Common\services\MessageRecipientService;
 
 class ApiFactory
 {

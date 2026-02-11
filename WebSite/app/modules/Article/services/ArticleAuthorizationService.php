@@ -6,7 +6,7 @@ namespace app\modules\Article\services;
 
 use app\models\AuthorizationDataHelper;
 use app\models\DataHelper;
-use app\services\AuthenticationService;
+use app\modules\Common\services\AuthenticationService;
 
 
 class ArticleAuthorizationService

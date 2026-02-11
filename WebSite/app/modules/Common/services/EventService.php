@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace app\services;
+namespace app\modules\Common\services;
 
 use app\interfaces\EventServiceInterface;
 use app\models\EventDataHelper;

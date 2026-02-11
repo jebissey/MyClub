@@ -12,7 +12,7 @@ use app\helpers\Application;
 use app\helpers\WebApp;
 use app\models\EventDataHelper;
 use app\modules\Common\AbstractController;
-use app\services\EmailService;
+use app\modules\Common\services\EmailService;
 
 class EventGuestController extends AbstractController
 {

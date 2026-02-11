@@ -15,7 +15,7 @@ use app\helpers\NotificationSender;
 use app\models\DataHelper;
 use app\models\MessageDataHelper;
 use app\models\PersonDataHelper;
-use app\services\MessageRecipientService;
+use app\modules\Common\services\MessageRecipientService;
 use app\valueObjects\ApiResponse;
 use app\valueObjects\MessageContext;
 

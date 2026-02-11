@@ -10,7 +10,7 @@ use app\helpers\GravatarHandler;
 use app\helpers\PersonPreferences;
 use app\helpers\WebApp;
 use app\interfaces\NewsProviderInterface;
-use app\services\EmailService;
+use app\modules\Common\services\EmailService;
 
 class PersonDataHelper extends Data implements NewsProviderInterface
 {

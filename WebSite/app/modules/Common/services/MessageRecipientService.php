@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace app\services;
+namespace app\modules\Common\services;
 
 use app\interfaces\RecipientResolverInterface;
 use app\models\DataHelper;

@@ -21,8 +21,8 @@ use app\models\MessageDataHelper;
 use app\models\PersonDataHelper;
 use app\modules\Article\services\ArticleAuthorizationService;
 use app\modules\Common\TableController;
-use app\services\AuthenticationService;
-use app\services\EmailService;
+use app\modules\Common\services\AuthenticationService;
+use app\modules\Common\services\EmailService;
 
 class ArticleController extends TableController
 {

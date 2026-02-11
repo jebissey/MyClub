@@ -21,8 +21,8 @@ use app\models\EventDataHelper;
 use app\models\MessageDataHelper;
 use app\models\ParticipantDataHelper;
 use app\models\PersonDataHelper;
+use app\modules\Common\services\EmailService;
 use app\helpers\PersonPreferences;
-use app\services\EmailService;
 use app\valueObjects\ApiResponse;
 
 class EventApi extends AbstractApi

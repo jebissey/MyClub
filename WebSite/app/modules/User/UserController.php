@@ -11,7 +11,7 @@ use app\helpers\Application;
 use app\helpers\TranslationManager;
 use app\helpers\WebApp;
 use app\modules\Common\AbstractController;
-use app\services\AuthenticationService;
+use app\modules\Common\services\AuthenticationService;
 
 class UserController extends AbstractController
 {

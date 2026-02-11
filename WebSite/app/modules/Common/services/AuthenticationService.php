@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace app\services;
+namespace app\modules\Common\services;
 
 use DateTime;
 
@@ -13,7 +13,7 @@ use app\helpers\Password;
 use app\helpers\WebApp;
 use app\models\AuthResult;
 use app\models\DataHelper;
-use app\services\EmailService;
+use app\modules\Common\services\EmailService;
 use Throwable;
 
 class AuthenticationService

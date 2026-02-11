@@ -40,6 +40,8 @@ use app\modules\Article\ArticleController;
 use app\modules\Article\MediaController;
 use app\modules\Article\OrderController;    
 use app\modules\Article\SurveyController;
+use app\modules\Common\services\AuthenticationService;
+use app\modules\Common\services\EmailService;
 use app\modules\Designer\DesignController;
 use app\modules\Designer\DesignerController;
 use app\modules\Designer\NavBarController;
@@ -80,8 +82,6 @@ use app\modules\Webmaster\MaintenanceController;
 use app\modules\Webmaster\RssController;
 use app\modules\Webmaster\WebappSettingsController;
 use app\modules\Webmaster\WebmasterController;
-use app\services\AuthenticationService;
-use app\services\EmailService;
 
 class ControllerFactory
 {

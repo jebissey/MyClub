@@ -11,7 +11,7 @@ use app\helpers\Application;
 use app\helpers\WebApp;
 use app\models\PersonDataHelper;
 use app\modules\Common\AbstractController;
-use app\services\EmailService;
+use app\modules\Common\services\EmailService;
 
 class ContactController extends AbstractController
 {
