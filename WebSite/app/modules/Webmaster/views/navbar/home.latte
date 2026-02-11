@@ -23,7 +23,9 @@
             document.addEventListener('DOMContentLoaded', function() {
                 const selectEl = document.getElementById('languageSelect');
                 const checkboxEl = document.getElementById('forceLanguageCheck');
-
+                if (!selectEl || !checkboxEl) {
+                    return;
+                }
                 selectEl.addEventListener('change', function() {
                     const selectedLang = encodeURIComponent(this.value);
                     const useLanguage = checkboxEl.checked ? 1 : 0;

@@ -12,7 +12,7 @@ export default class EventTableManager {
             ?.addEventListener('click', () => {
                 this.eventForm.openCreateModal();
             });
-            
+
         const setupEditButtons = () => {
             document.querySelectorAll('.edit-btn').forEach(button => {
                 button.addEventListener('click', e => this.handleEdit(e));
@@ -43,11 +43,10 @@ export default class EventTableManager {
             row.getAttribute('onclick').match(/\/event\/(\d+)/)[1];
 
         const fetchAndEdit = async eventId => {
-            const data = await this.api.get(`/api/event/${eventId}`);
+            const response = await this.api.get(`/api/event/${eventId}`);
 
-            if (data.success && data.event && data.attributes) {
-                const eventForm = new EventFormManager(this.api);
-                await eventForm.openUpdateModal(data.event, data.attributes);
+            if (response.success && response.data.event && response.data.attributes) {
+                await this.eventForm.openUpdateModal(response.data.event, response.data.attributes);
             } else {
                 alert("Erreur lors de la récupération des détails de l'événement");
             }

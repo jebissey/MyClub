@@ -30,15 +30,14 @@ export default class AttributeManager {
 
         const loadAttributesByEventType = async eventTypeId => {
             this.availableAttributesSelect.innerHTML = `<option value="">Chargement...</option>`;
-            const data = await this.api.get(`/api/attributes/eventType/${eventTypeId}`);
+            const response = await this.api.get(`/api/attributes/eventType/${eventTypeId}`);
 
             this.availableAttributesSelect.innerHTML = '';
-            if (!data.attributes || data.attributes.length === 0) {
+            if (!response.data || !response.data.attributes || response.data.attributes.length === 0) {
                 this.availableAttributesSelect.innerHTML = `<option value="">Aucun attribut disponible</option>`;
                 return;
             }
-
-            data.attributes.forEach(attr => {
+            response.data.attributes.forEach(attr => {
                 const option = document.createElement('option');
                 option.value = attr.Id;
                 option.textContent = attr.Name;
@@ -116,9 +115,11 @@ export default class AttributeManager {
         };
 
         this.eventTypeInput.addEventListener('change', handleEventTypeChange);
-        document.getElementById('addAttributeBtn')?.addEventListener('click', addAttribute);
-
-        // expose reset for loadForEvent
+        document.addEventListener('click', (e) => {
+            if (e.target.closest('#addAttributeBtn')) {
+                addAttribute();
+            }
+        });
         this._resetInternal = reset;
         this._loadAttributesByEventType = loadAttributesByEventType;
         this._createAttributeElement = createAttributeElement;
