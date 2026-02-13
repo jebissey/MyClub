@@ -65,6 +65,8 @@ class Database
         $query = "SELECT ApplicationName, DatabaseVersion FROM Metadata LIMIT 1";
         $stmt = self::$pdo->query($query);
         $row = $stmt->fetch();
+        $stmt = null;
+
         if ($row) {
             if ($row->ApplicationName != self::APPLICATION) Application::unreachable('Non-compliant database', __FILE__, __LINE__);
             if ($row->DatabaseVersion != self::DB_VERSION) {
@@ -77,6 +79,9 @@ class Database
     private function upgradeDatabase(PDO $pdo, int $from, int $to): void
     {
         $logMessage = LogMessage::getInstance((string)ApplicationError::Ok->value);
+        $pdo->exec('PRAGMA foreign_keys = OFF');
+
+        $this->deleteOrphans($pdo, $logMessage);
 
         $pdo->beginTransaction();
         try {
@@ -107,6 +112,56 @@ class Database
         } catch (Throwable $e) {
             $pdo->rollBack();
             Application::unreachable('Fatal program error during migration: ' . $e->getMessage(), $e->getFile(), $e->getLine());
+        } finally {
+            $pdo->exec('PRAGMA foreign_keys = ON');
+        }
+
+        $this->checkOrphans($pdo);
+        $pdo->exec('VACUUM');
+    }
+
+    private function deleteOrphans(PDO $pdo, LogMessage $logMessage): void
+    {
+        $tables = $pdo
+            ->query("SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%'")
+            ->fetchAll(PDO::FETCH_COLUMN);
+
+        foreach ($tables as $table) {
+            $foreignKeys = $pdo
+                ->query("PRAGMA foreign_key_list(" . $pdo->quote($table) . ")")
+                ->fetchAll(PDO::FETCH_ASSOC);
+
+            foreach ($foreignKeys as $fk) {
+                $sql = sprintf(
+                    'DELETE FROM "%s" WHERE "%s" IS NOT NULL AND "%s" NOT IN (SELECT "%s" FROM "%s")',
+                    $table,
+                    $fk['from'],
+                    $fk['from'],
+                    $fk['to'],
+                    $fk['table']
+                );
+                $deleted = $pdo->exec($sql);
+                if ($deleted > 0) {
+                    $logMessage->setMessage("Orphans deleted in {$table}.{$fk['from']} referencing {$fk['table']}.{$fk['to']}: {$deleted} row(s)");
+                }
+            }
+        }
+    }
+
+    private function checkOrphans(PDO $pdo): void
+    {
+        $violations = $pdo->query('PRAGMA foreign_key_check')->fetchAll(PDO::FETCH_ASSOC);
+
+        if (!empty($violations)) {
+            $details = implode('; ', array_map(
+                fn(array $v) => "table={$v['table']} rowid={$v['rowid']} parent={$v['parent']} fkid={$v['fkid']}",
+                $violations
+            ));
+            Application::unreachable(
+                "Orphaned records found after migration: {$details}",
+                __FILE__,
+                __LINE__
+            );
         }
     }
 }
