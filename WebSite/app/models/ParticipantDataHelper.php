@@ -36,7 +36,7 @@ ORDER BY pe.FirstName, pe.LastName, c.NickName
     ";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':eventId' => $eventId]);
-        return $stmt->fetchAll();
+        return $stmt->fetchAll(PDO::FETCH_OBJ);
     }
 
 

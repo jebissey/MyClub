@@ -46,7 +46,7 @@ abstract class TableController extends AbstractController
 
         $stmt = $pdo->prepare($query->getQuery());
         $stmt->execute($values ?? null);
-        $items = $stmt->fetchAll();
+        $items = $stmt->fetchAll(PDO::FETCH_OBJ);
 
         return [
             'items' => $items,

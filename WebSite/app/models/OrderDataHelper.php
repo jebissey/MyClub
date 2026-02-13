@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace app\models;
 
+use PDO;
+
 use app\exceptions\QueryException;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
@@ -74,7 +76,7 @@ class OrderDataHelper extends Data implements NewsProviderInterface
             )
             AND r.Id IS NULL
         ORDER BY o.ClosingDate, p.LastName, p.FirstName";
-        return $this->pdo->query($query)->fetchAll();
+        return $this->pdo->query($query)->fetchAll(PDO::FETCH_OBJ);
     }
 
     public function getNews(ConnectedUser $connectedUser, $searchFrom): array
@@ -106,7 +108,7 @@ class OrderDataHelper extends Data implements NewsProviderInterface
         ";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':searchFrom' => $searchFrom]);
-        $orders = $stmt->fetchAll();
+        $orders = $stmt->fetchAll(PDO::FETCH_OBJ);
         $news = [];
         $authorizationDataHelper = new AuthorizationDataHelper($this->application);
         foreach ($orders as $order) {

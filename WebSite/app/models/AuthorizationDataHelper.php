@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\models;
 
 use DateTime;
+use PDO;
 
 use app\exceptions\QueryException;
 use app\helpers\Application;
@@ -86,7 +87,7 @@ class AuthorizationDataHelper extends Data
         ';
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':email' => $userEmail]);
-        $rows = $stmt->fetchAll();
+        $rows = $stmt->fetchAll(PDO::FETCH_OBJ);
         return array_column($rows, 'IdGroup');
     }
 

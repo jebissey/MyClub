@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace app\models;
 
-use app\helpers\Application;
 use DateTime;
+use PDO;
+
+use app\helpers\Application;
 
 class LogDataAnalyticsHelper extends Data
 {
@@ -109,7 +111,7 @@ class LogDataAnalyticsHelper extends Data
             ':host' => $this->getHost(),
         ]);
 
-        return $query->fetchAll();
+        return $query->fetchAll(PDO::FETCH_OBJ);
     }
 
     public function getExternalReferentStats(string $period, string $currentDate): array
@@ -133,7 +135,7 @@ class LogDataAnalyticsHelper extends Data
             ':host' => $this->getHost(),
         ]);
 
-        return $query->fetchAll();
+        return $query->fetchAll(PDO::FETCH_OBJ);
     }
 
     #region Private helper methods

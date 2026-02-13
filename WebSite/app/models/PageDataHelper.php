@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace app\models;
 
+use PDO;
+
 use app\helpers\Application;
 
 class PageDataHelper extends Data
@@ -29,7 +31,7 @@ class PageDataHelper extends Data
             ->leftJoin("'Group' ON Page.IdGroup = 'Group'.Id")
             ->select("'Group'.Name AS GroupName")
             ->orderBy('Position')
-            ->fetchAll();
+            ->fetchAll(PDO::FETCH_OBJ);
     }
 
     public function insertOrUpdate($data)

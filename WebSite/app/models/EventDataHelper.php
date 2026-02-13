@@ -6,6 +6,7 @@ namespace app\models;
 
 use DateInterval;
 use DateTime;
+use PDO;
 use Throwable;
 
 use app\enums\ApplicationError;
@@ -78,7 +79,7 @@ class EventDataHelper extends Data implements NewsProviderInterface
                 'Audience' => $event->Audience
             ];
             $newEventId = $this->fluent->insertInto('Event')->values($newEvent)->execute();
-            $attributes = $this->fluent->from('EventAttribute')->where('IdEvent', $id)->fetchAll();
+            $attributes = $this->fluent->from('EventAttribute')->where('IdEvent', $id)->fetchAll(PDO::FETCH_OBJ);
             foreach ($attributes as $attr) {
                 $this->fluent->insertInto('EventAttribute')->values([
                     'IdEvent' => $newEventId,
@@ -124,7 +125,7 @@ class EventDataHelper extends Data implements NewsProviderInterface
             ':startOfWeek' => $startOfCurrentWeek->format('Y-m-d H:i:s'),
             ':endOfWeek'   => $endOfThirdWeek->format('Y-m-d H:i:s'),
         ]);
-        return $stmt->fetchAll();
+        return $stmt->fetchAll(PDO::FETCH_OBJ);
     }
 
     public function getEventsForDay(string $date, string $userEmail): array
@@ -143,7 +144,7 @@ class EventDataHelper extends Data implements NewsProviderInterface
             'date' => $date,
             'userEmail' => $userEmail
         ]);
-        return $query->fetchAll();
+        return $query->fetchAll(PDO::FETCH_OBJ);
     }
 
     public function getEvent(int $eventId): object
@@ -178,7 +179,7 @@ class EventDataHelper extends Data implements NewsProviderInterface
             ";
             $stmt = $this->pdo->prepare($sql);
             $stmt->execute(['eventId' => $eventId]);
-            $result = $stmt->fetchAll();
+            $result = $stmt->fetchAll(PDO::FETCH_OBJ);
             return $result;
         }
         throw new QueryException("Event ({$eventId}) doesn't exist");
@@ -224,7 +225,7 @@ class EventDataHelper extends Data implements NewsProviderInterface
         ";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':today' => (new DateTime())->format('Y-m-d\TH:i:s')]);
-        return $stmt->fetchAll();
+        return $stmt->fetchAll(PDO::FETCH_OBJ);
     }
 
     public function getEventGroup(int $eventId): ?int
@@ -273,7 +274,7 @@ class EventDataHelper extends Data implements NewsProviderInterface
         ";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([$eventId, $eventId, $eventId]);
-        return $stmt->fetchAll();
+        return $stmt->fetchAll(PDO::FETCH_OBJ);
     }
 
     public function getEvents(?object $person, string $mode, int $offset, bool $filterByPreferences = false): array
@@ -318,7 +319,7 @@ class EventDataHelper extends Data implements NewsProviderInterface
             ':start' => $startOfCurrentWeek->format('Y-m-d H:i:s'),
             ':end'   => $endOfThirdWeek->format('Y-m-d H:i:s'),
         ]);
-        $events = $stmt->fetchAll();
+        $events = $stmt->fetchAll(PDO::FETCH_OBJ);
 
         for ($weekOffset = 0; $weekOffset < 3; $weekOffset++) {
             $weekStart = clone $startOfCurrentWeek;
@@ -422,7 +423,7 @@ ORDER BY e.LastUpdate DESC
             ':personId'   => $connectedUser->person?->Id ?? 0,
             ':searchFrom' => $searchFrom
         ]);
-        $events = $stmt->fetchAll();
+        $events = $stmt->fetchAll(PDO::FETCH_OBJ);
         foreach ($events as $event) {
             $news[] = [
                 'type' => 'event',
@@ -455,7 +456,7 @@ ORDER BY e.LastUpdate DESC
         ";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':eventId' => $eventId]);
-        return $stmt->fetchAll();
+        return $stmt->fetchAll(PDO::FETCH_OBJ);
     }
 
     public function getUserSupplies(int $eventId, string $userEmail): array
@@ -474,7 +475,7 @@ ORDER BY e.LastUpdate DESC
             ':eventId'   => $eventId,
             ':userEmail' => $userEmail,
         ]);
-        return $stmt->fetchAll();
+        return $stmt->fetchAll(PDO::FETCH_OBJ);
     }
 
     public function isUserRegistered(int $eventId, string $userEmail): bool
@@ -604,7 +605,7 @@ ORDER BY e.LastUpdate DESC
                 ->select('ea.IdEvent, a.Id, a.Name, a.Detail, a.Color')
                 ->join('Attribute a ON ea.IdAttribute = a.Id')
                 ->where('ea.IdEvent', $eventIds)
-                ->fetchAll();
+                ->fetchAll(PDO::FETCH_OBJ);
 
             foreach ($rows as $row) {
                 $attributes[$row->IdEvent][] = [
@@ -683,7 +684,7 @@ ORDER BY e.LastUpdate DESC
         $sql .= " GROUP BY e.Id ORDER BY datetime(replace(e.StartTime, 'T', ' '))";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute($params);
-        $rows = $stmt->fetchAll();
+        $rows = $stmt->fetchAll(PDO::FETCH_OBJ);
         $events = $this->events($rows);
         if ($filterByPreferences && $person) {
             return $this->personPreferences->filterEventsByPreferences($events, $person);

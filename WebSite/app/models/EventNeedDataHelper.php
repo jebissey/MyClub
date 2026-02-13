@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace app\models;
 
+use PDO;
+
 use app\helpers\Application;
 
 class EventNeedDataHelper extends Data
@@ -28,6 +30,6 @@ class EventNeedDataHelper extends Data
         ";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':eventId' => $eventId]);
-        return $stmt->fetchAll();
+        return $stmt->fetchAll(PDO::FETCH_OBJ);
     }
 }

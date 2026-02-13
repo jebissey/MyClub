@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace app\models;
 
+use PDO;
+
 use app\helpers\Application;
 
 class ArwardsDataHelper extends Data
@@ -21,7 +23,7 @@ class ArwardsDataHelper extends Data
             GROUP BY p.Id, p.FirstName, p.LastName, p.NickName, c.Name
             HAVING Total > 0
             ORDER BY Total DESC');
-        $results =  $query->fetchAll();
+        $results =  $query->fetchAll(PDO::FETCH_OBJ);
         $data = [];
         foreach ($results as $row) {
             $personId = $row->Id;

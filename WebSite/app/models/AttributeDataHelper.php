@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace app\models;
 
+use PDO;
 use Throwable;
 
 use app\enums\ApplicationError;
@@ -55,7 +56,7 @@ class AttributeDataHelper extends Data
         ';
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([]);
-        return $stmt->fetchAll();
+        return $stmt->fetchAll(PDO::FETCH_OBJ);
     }
 
     public function getAttributesOf(int $eventTypeId): array
@@ -68,7 +69,7 @@ class AttributeDataHelper extends Data
         ';
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':id' => $eventTypeId]);
-        return $stmt->fetchAll();
+        return $stmt->fetchAll(PDO::FETCH_OBJ);
     }
 
     public function update(array $data): void

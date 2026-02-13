@@ -103,7 +103,7 @@ class CrosstabDataHelper extends Data
         $sql .= ' GROUP BY Uri, Who';
         $stmt = $this->pdoForLog->prepare($sql);
         $stmt->execute($params);
-        $crossTabData = $stmt->fetchAll();
+        $crossTabData = $stmt->fetchAll(PDO::FETCH_OBJ);
         $filteredPersons = array_values(array_filter(
             array_unique(array_column($crossTabData, 'Who')),
             fn($email) => filter_var($email, FILTER_VALIDATE_EMAIL) ?: ""

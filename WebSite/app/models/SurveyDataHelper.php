@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace app\models;
 
+use PDO;
+
 use app\exceptions\QueryException;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
@@ -106,7 +108,7 @@ class SurveyDataHelper extends Data implements NewsProviderInterface
         ";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':searchFrom' => $searchFrom]);
-        $surveys = $stmt->fetchAll();
+        $surveys = $stmt->fetchAll(PDO::FETCH_OBJ);
         $news = [];
         $authorizationDataHelper = new AuthorizationDataHelper($this->application);
         foreach ($surveys as $survey) {

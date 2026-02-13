@@ -111,7 +111,7 @@ class LogDataHelper extends Data
         }
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute($params);
-        return $stmt->fetchAll();
+        return $stmt->fetchAll(PDO::FETCH_OBJ);
     }
 
     public function getTopArticles(string $dateCondition, int $top): array
@@ -138,7 +138,7 @@ class LogDataHelper extends Data
         ';
         $stmt = $this->pdoForLog->prepare($sql);
         $stmt->execute([':top' => $top]);
-        return $stmt->fetchAll();
+        return $stmt->fetchAll(PDO::FETCH_OBJ);
     }
 
     public function getTopPages($dateCondition, $top)
@@ -150,7 +150,7 @@ class LogDataHelper extends Data
             ->groupBy('Uri')
             ->orderBy('visits DESC')
             ->limit($top);
-        return $query->fetchAll();
+        return $query->fetchAll(PDO::FETCH_OBJ);
     }
 
     public function getVisits($season)
@@ -244,7 +244,7 @@ WHERE Uri LIKE '/api/lastVersion%'
 GROUP BY IpAddress
 ORDER BY MAX(CreatedAt) DESC
         ";
-        $results = $this->pdoForLog->query($query)->fetchAll();
+        $results = $this->pdoForLog->query($query)->fetchAll(PDO::FETCH_OBJ);
 
         $dnsCache = [];
         foreach ($results as &$installation) {

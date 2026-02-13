@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace app\models;
 
+use PDO;
+
 use app\helpers\Application;
 
 class DesignDataHelper extends Data
@@ -61,7 +63,7 @@ class DesignDataHelper extends Data
             LEFT JOIN DesignVote dv ON d.Id = dv.IdDesign
             JOIN Person p ON d.IdPerson = p.Id
             GROUP BY d.Id";
-        $designs = $this->pdo->query($query)->fetchAll();
+        $designs = $this->pdo->query($query)->fetchAll(PDO::FETCH_OBJ);
 
         $userVotes = [];
         $votes = $this->gets('DesignVote', ['IdPerson' => $personId]);
@@ -88,6 +90,6 @@ class DesignDataHelper extends Data
             AND dv.Id IS NULL
         ORDER BY d.LastUpdate";
 
-        return $this->pdo->query($query)->fetchAll();
+        return $this->pdo->query($query)->fetchAll(PDO::FETCH_OBJ);
     }
 }

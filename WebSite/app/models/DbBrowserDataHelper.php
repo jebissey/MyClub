@@ -163,7 +163,7 @@ class DbBrowserDataHelper extends Data
         $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
         $stmt->execute();
 
-        $rows = $stmt->fetchAll();
+        $rows = $stmt->fetchAll(PDO::FETCH_OBJ);
         foreach ($rows as &$row) {
             foreach ($row as $col => $val) {
                 if (!is_string($val)) continue;

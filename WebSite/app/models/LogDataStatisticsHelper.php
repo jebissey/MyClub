@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace app\models;
 
+use PDO;
 
 class LogDataStatisticsHelper extends Data
 {
@@ -16,7 +17,7 @@ class LogDataStatisticsHelper extends Data
         ';
         $stmt = $this->pdoForLog->prepare($sql);
         $stmt->execute();
-        $results = $stmt->fetchAll();
+        $results = $stmt->fetchAll(PDO::FETCH_OBJ);
         $labels = [];
         $data = [];
         foreach ($results as $row) {
@@ -51,7 +52,7 @@ class LogDataStatisticsHelper extends Data
             GROUP BY word
             ORDER BY count DESC
         ");
-        $results = $query->fetchAll();
+        $results = $query->fetchAll(PDO::FETCH_OBJ);
         $labels = [];
         $data = [];
         foreach ($results as $row) {
@@ -71,7 +72,7 @@ class LogDataStatisticsHelper extends Data
         ';
         $stmt = $this->pdoForLog->prepare($sql);
         $stmt->execute();
-        $results = $stmt->fetchAll();
+        $results = $stmt->fetchAll(PDO::FETCH_OBJ);
 
         $typeGroups = [];
         $typeResolutions = [];
@@ -118,7 +119,7 @@ class LogDataStatisticsHelper extends Data
         ';
         $stmt = $this->pdoForLog->prepare($sql);
         $stmt->execute();
-        $results = $stmt->fetchAll();
+        $results = $stmt->fetchAll(PDO::FETCH_OBJ);
         $labels = [];
         $data = [];
         foreach ($results as $row) {

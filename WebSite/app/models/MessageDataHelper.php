@@ -74,7 +74,7 @@ class MessageDataHelper extends Data implements NewsProviderInterface
         ";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':articleId' => $articleId]);
-        $messages = $stmt->fetchAll();
+        $messages = $stmt->fetchAll(PDO::FETCH_OBJ);
         $this->addAvatarAndTimeAgoToMessages($messages);
         return $messages;
     }
@@ -97,7 +97,7 @@ class MessageDataHelper extends Data implements NewsProviderInterface
         ";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':eventId' => $eventId]);
-        $messages = $stmt->fetchAll();
+        $messages = $stmt->fetchAll(PDO::FETCH_OBJ);
         $this->addAvatarAndTimeAgoToMessages($messages);
         return $messages;
     }
@@ -120,7 +120,7 @@ class MessageDataHelper extends Data implements NewsProviderInterface
         ";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':groupId' => $groupId]);
-        $messages = $stmt->fetchAll();
+        $messages = $stmt->fetchAll(PDO::FETCH_OBJ);
         $this->addAvatarAndTimeAgoToMessages($messages);
         return $messages;
     }
@@ -140,7 +140,7 @@ class MessageDataHelper extends Data implements NewsProviderInterface
         ";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':searchFrom' => $searchFrom]);
-        $messages = $stmt->fetchAll();
+        $messages = $stmt->fetchAll(PDO::FETCH_OBJ);
         foreach ($messages as $message) {
             $news[] = [
                 'type' => 'message',

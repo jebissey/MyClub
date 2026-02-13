@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace app\models;
 
+use PDO;
+
 use app\helpers\Application;
 
 class NeedDataHelper extends Data
@@ -21,7 +23,7 @@ class NeedDataHelper extends Data
             ORDER BY NeedType.Name, Need.Name
         ";
         $stmt = $this->pdo->query($sql);
-        return $stmt->fetchAll();
+        return $stmt->fetchAll(PDO::FETCH_OBJ);
     }
 
     public function needsforNeedType(int $needTypeId): array
@@ -34,7 +36,7 @@ class NeedDataHelper extends Data
         ";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':needTypeId' => $needTypeId]);
-        return $stmt->fetchAll();
+        return $stmt->fetchAll(PDO::FETCH_OBJ);
     }
 
     public function countForNeedType(int $needTypeid): int

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace app\models;
 
+use PDO;
 use Throwable;
 
 use app\enums\KanbanStatusChange;
@@ -96,7 +97,7 @@ class KanbanDataHelper extends Data
             ORDER BY Title";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':idPerson' => $idPerson]);
-        return $stmt->fetchAll();
+        return $stmt->fetchAll(PDO::FETCH_OBJ);
     }
 
     public function moveKanbanCard(int $id, string $what, string $remark = ''): bool
@@ -182,7 +183,7 @@ class KanbanDataHelper extends Data
         ";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':idKanbanCard' => $idKanbanCard]);
-        return $stmt->fetchAll();
+        return $stmt->fetchAll(PDO::FETCH_OBJ);
     }
 
     #region Project
@@ -258,7 +259,7 @@ class KanbanDataHelper extends Data
         ";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute($params);
-        return $stmt->fetchAll();
+        return $stmt->fetchAll(PDO::FETCH_OBJ);
     }
 
     public function updateKanbanProject(int $id, string $title, string $detail, int $idPerson): bool
@@ -333,6 +334,6 @@ class KanbanDataHelper extends Data
         ";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':idProject' => $idProject]);
-        return $stmt->fetchAll();
+        return $stmt->fetchAll(PDO::FETCH_OBJ);
     }
 }

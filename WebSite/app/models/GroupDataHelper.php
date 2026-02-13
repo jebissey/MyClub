@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace app\models;
 
+use PDO;
 use Throwable;
 
 use app\enums\ApplicationError;
@@ -42,7 +43,7 @@ class GroupDataHelper extends Data
             $having
         ");
         $currentGroupsQuery->execute([$personId]);
-        $currentGroups = $currentGroupsQuery->fetchAll();
+        $currentGroups = $currentGroupsQuery->fetchAll(PDO::FETCH_OBJ);
 
         $availableGroupsQuery = "
             SELECT 
@@ -89,7 +90,7 @@ class GroupDataHelper extends Data
             WHERE g.Inactivated = 0 AND (g.SelfRegistration = 1 OR pg.Id IS NOT NULL)
             ORDER BY g.Name');
         $query->execute([$personId]);
-        return $query->fetchAll();
+        return $query->fetchAll(PDO::FETCH_OBJ);
     }
 
     public function getGroupsWithAuthorizations(ConnectedUser $connectedUser): array|false
@@ -134,7 +135,7 @@ class GroupDataHelper extends Data
                 (g.SelfRegistration = 1 OR pg.Id IS NOT NULL) AND g.Inactivated = 0        
             ORDER BY Type, g.Name;");
         $query->execute([$idPerson]);
-        return $query->fetchAll();
+        return $query->fetchAll(PDO::FETCH_OBJ);
     }
 
     public function getGroupCount(): array
@@ -147,7 +148,7 @@ class GroupDataHelper extends Data
             JOIN Person p ON pg.IdPerson = p.Id
             WHERE p.InPresentationDirectory = 'yes'
             GROUP BY g.Id
-            ")->fetchAll();
+            ")->fetchAll(PDO::FETCH_OBJ);
         foreach ($groupCountResult as $count) {
             $groupCounts[$count->Id] = $count['Count'];
         }

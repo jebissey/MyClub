@@ -127,7 +127,7 @@ abstract class Data
                 }
                 return $keyPairArray;
             }
-            return $stmt->fetchAll();
+            return $stmt->fetchAll(PDO::FETCH_OBJ);
         } catch (PDOException $e) {
             $this->application->getErrorManager()->raise(ApplicationError::Error, 'Database error: ' . $e->getMessage() . ' in file ' . __FILE__ . ' at line ' . __LINE__);
             throw $e;
@@ -177,7 +177,7 @@ abstract class Data
             $queryType = strtoupper(substr(trim($sql), 0, 6));
             switch ($queryType) {
                 case 'SELECT':
-                    return $stmt->fetchAll();
+                    return $stmt->fetchAll(PDO::FETCH_OBJ);
                 case 'INSERT':
                     return $this->pdo->lastInsertId();
                 case 'UPDATE':

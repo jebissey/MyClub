@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace app\models;
 
+use PDO;
+
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
 use app\helpers\GravatarHandler;
@@ -87,7 +89,7 @@ class PersonDataHelper extends Data implements NewsProviderInterface
             ORDER BY clubMember
         ";
         $stmt = $this->pdo->query($query);
-        return $stmt->fetchAll();
+        return $stmt->fetchAll(PDO::FETCH_OBJ);
     }
 
     public function getNews(ConnectedUser $connectedUser, string $searchFrom): array
@@ -107,7 +109,7 @@ class PersonDataHelper extends Data implements NewsProviderInterface
             ':searchFrom' => $searchFrom,
             ':email' => $connectedUser->person->Email
         ]);
-        $presentations = $stmt->fetchAll();
+        $presentations = $stmt->fetchAll(PDO::FETCH_OBJ);
         foreach ($presentations as $presentation) {
             $fullName = trim($presentation->FirstName . ' ' . $presentation->LastName);
             if (empty($fullName)) $fullName = $presentation->Email;
@@ -135,7 +137,7 @@ class PersonDataHelper extends Data implements NewsProviderInterface
             $innerJoin
             WHERE Person.Inactivated = 0 $and
             ORDER BY FirstName, LastName
-        ")->fetchAll();
+        ")->fetchAll(PDO::FETCH_OBJ);
     }
 
     public function getPersonsInGroupForDirectory(int $groupId): array
@@ -148,7 +150,7 @@ class PersonDataHelper extends Data implements NewsProviderInterface
             ORDER BY p.FirstName, p.LastName
         ");
         $stmt->execute([$groupId]);
-        $persons = $stmt->fetchAll();
+        $persons = $stmt->fetchAll(PDO::FETCH_OBJ);
 
         $gravatarHandler = new GravatarHandler();
         foreach ($persons as $person) {

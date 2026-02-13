@@ -79,7 +79,7 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
             ORDER BY LastUpdate DESC
         ";
         $stmt = $this->pdo->query($sql);
-        return $stmt->fetchAll();
+        return $stmt->fetchAll(PDO::FETCH_OBJ);
     }
 
     public function getArticlesForRss(): array
@@ -92,7 +92,7 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
         ";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute();
-        return $stmt->fetchAll();
+        return $stmt->fetchAll(PDO::FETCH_OBJ);
     }
 
     public function getAuthor(int $articleId): object|false
@@ -177,7 +177,7 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
         ";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':searchFrom' => $searchFrom]);
-        $articles = $stmt->fetchAll();
+        $articles = $stmt->fetchAll(PDO::FETCH_OBJ);
         $authHelper = new AuthorizationDataHelper($this->application);
         $news = [];
         foreach ($articles as $article) {
@@ -243,7 +243,7 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
         ";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':path' => '%' . $path . '%']);
-        return $stmt->fetchAll();
+        return $stmt->fetchAll(PDO::FETCH_OBJ);
     }
 
     public function isSpotlightActive(): bool

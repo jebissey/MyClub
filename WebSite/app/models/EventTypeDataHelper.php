@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace app\models;
 
+use PDO;
 use Throwable;
 
 use app\helpers\Application;
@@ -32,7 +33,7 @@ class EventTypeDataHelper extends Data
             ORDER BY et.Name
         ");
         $query->execute([$personId]);
-        return $query->fetchAll();
+        return $query->fetchAll(PDO::FETCH_OBJ);
     }
 
     public function update(int $id, string $name, ?int $idGroup, array $attributes): void

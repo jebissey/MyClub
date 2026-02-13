@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace app\models;
 
+use PDO;
+
 use app\helpers\Application;
 
 class PersonStatisticsDataHelper extends Data
@@ -254,7 +256,7 @@ class PersonStatisticsDataHelper extends Data
             GROUP BY et.Id, et.Name
         ");
         $stmt->execute([$personId, $seasonStart, $seasonEnd]);
-        $eventTypes = $stmt->fetchAll();
+        $eventTypes = $stmt->fetchAll(PDO::FETCH_OBJ);
 
         foreach ($eventTypes as $eventType) {
             $userCount = (int) $eventType->user;
@@ -324,7 +326,7 @@ class PersonStatisticsDataHelper extends Data
         $stats = [];
 
         $stmt = $this->pdo->query('SELECT * FROM EventType');
-        $eventTypes = $stmt->fetchAll();
+        $eventTypes = $stmt->fetchAll(PDO::FETCH_OBJ);
 
         $sql = "SELECT 
                 e.IdEventType,
@@ -339,7 +341,7 @@ class PersonStatisticsDataHelper extends Data
             GROUP BY e.IdEventType, et.Name";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([$personId, $seasonStart, $seasonEnd]);
-        $results = $stmt->fetchAll();
+        $results = $stmt->fetchAll(PDO::FETCH_OBJ);
         foreach ($results as $result) {
             $stats[$result->IdEventType] = [
                 'typeName'   => $result->typeName,
