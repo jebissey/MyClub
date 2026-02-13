@@ -405,18 +405,18 @@ class EventDataHelper extends Data implements NewsProviderInterface
         $news = [];
         if (!($connectedUser->person ?? false)) return $news;
         $sql = "
-SELECT e.Id, e.Summary, e.LastUpdate
-FROM Event e
-JOIN EventType et ON e.IdEventType = et.Id
-LEFT JOIN PersonGroup pg 
-    ON et.IdGroup = pg.IdGroup 
-    AND pg.IdPerson = :personId
-WHERE e.LastUpdate >= :searchFrom
-AND (
-    et.IdGroup IS NULL
-    OR pg.IdPerson IS NOT NULL
-)
-ORDER BY e.LastUpdate DESC
+            SELECT e.Id, e.Summary, e.LastUpdate
+            FROM Event e
+            JOIN EventType et ON e.IdEventType = et.Id
+            LEFT JOIN PersonGroup pg 
+                ON et.IdGroup = pg.IdGroup 
+                AND pg.IdPerson = :personId
+            WHERE e.LastUpdate >= :searchFrom
+            AND (
+                et.IdGroup IS NULL
+                OR pg.IdPerson IS NOT NULL
+            )
+            ORDER BY e.LastUpdate DESC
         ";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([
@@ -601,11 +601,22 @@ ORDER BY e.LastUpdate DESC
         $eventIds = array_column($events, 'Id');
         $attributes = [];
         if (!empty($eventIds)) {
-            $rows = $this->fluent->from('EventAttribute ea')
-                ->select('ea.IdEvent, a.Id, a.Name, a.Detail, a.Color')
-                ->join('Attribute a ON ea.IdAttribute = a.Id')
-                ->where('ea.IdEvent', $eventIds)
-                ->fetchAll(PDO::FETCH_OBJ);
+            $placeholders = implode(',', array_fill(0, count($eventIds), '?'));
+            $sql = "
+                SELECT 
+                    ea.IdEvent,
+                    a.Id,
+                    a.Name,
+                    a.Detail,
+                    a.Color
+                FROM EventAttribute ea
+                JOIN Attribute a ON ea.IdAttribute = a.Id
+                WHERE ea.IdEvent IN ($placeholders)
+            ";
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute($eventIds);
+
+            $rows = $stmt->fetchAll(PDO::FETCH_OBJ);
 
             foreach ($rows as $row) {
                 $attributes[$row->IdEvent][] = [
@@ -723,7 +734,6 @@ ORDER BY e.LastUpdate DESC
         ]);
         return $this->events($stmt->fetchAll());
     }
-
 
     private function getDatesOfThreeWeeks(): array
     {

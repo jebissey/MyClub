@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace app\models;
@@ -26,12 +27,17 @@ class PageDataHelper extends Data
 
     public function gets_(): array
     {
-        return $this->fluent
-            ->from('Page')
-            ->leftJoin("'Group' ON Page.IdGroup = 'Group'.Id")
-            ->select("'Group'.Name AS GroupName")
-            ->orderBy('Position')
-            ->fetchAll(PDO::FETCH_OBJ);
+        $sql = "
+            SELECT 
+                Page.*,
+                \"Group\".Name AS GroupName
+            FROM Page
+            LEFT JOIN \"Group\" ON Page.IdGroup = \"Group\".Id
+            ORDER BY Position
+        ";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_OBJ);
     }
 
     public function insertOrUpdate($data)

@@ -306,7 +306,7 @@ INSERT INTO "Test" VALUES (350,3630,'GET','/design/create',NULL,NULL,'{"email":"
 INSERT INTO "Test" VALUES (351,3640,'POST','/design/save',NULL,NULL,'{"email":"webmaster@myclub.foo","password":"admin1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (352,3650,'GET','/emails',NULL,NULL,'{"email":"webmaster@myclub.foo","password":"admin1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (353,3670,'GET','/emails/article/1',NULL,NULL,'{"email":"webmaster@myclub.foo","password":"admin1234" }','403',NULL,NULL);
-INSERT INTO "Test" VALUES (354,3680,'GET','/event/1',NULL,NULL,'{"email":"webmaster@myclub.foo","password":"admin1234" }','403',NULL,NULL);
+INSERT INTO "Test" VALUES (354,3680,'GET','/event/1',NULL,NULL,'{"email":"webmaster@myclub.foo","password":"admin1234" }','400',NULL,NULL);
 INSERT INTO "Test" VALUES (355,3690,'GET','/event/1/0123456789abcdef0123456789abcdef',NULL,NULL,'{"email":"webmaster@myclub.foo","password":"admin1234" }','400',NULL,NULL);
 INSERT INTO "Test" VALUES (356,3700,'GET','/event/1/register',NULL,NULL,'{"email":"webmaster@myclub.foo","password":"admin1234" }','400',NULL,NULL);
 INSERT INTO "Test" VALUES (357,3710,'GET','/event/1/unregister',NULL,NULL,'{"email":"webmaster@myclub.foo","password":"admin1234" }','400',NULL,NULL);
@@ -411,7 +411,7 @@ INSERT INTO "Test" VALUES (456,4690,'GET','/analytics',NULL,NULL,NULL,'403',NULL
 INSERT INTO "Test" VALUES (457,4700,'POST','/api/attribute/create',NULL,'{"name":"attribute name", "detail":"attribute detail", "color":"#112233" }',NULL,'403',NULL,NULL);
 INSERT INTO "Test" VALUES (458,4720,'POST','/api/attribute/delete/1',NULL,'{}',NULL,'403',NULL,NULL);
 INSERT INTO "Test" VALUES (459,4710,'POST','/api/attribute/update',NULL,'{"id":1, "name":"attribute name updated", "detail":"attribute detail updated", "color":"#223344" }',NULL,'403',NULL,NULL);
-INSERT INTO "Test" VALUES (460,4730,'GET','/api/attributes/eventType/1',NULL,NULL,NULL,'200',NULL,NULL);
+INSERT INTO "Test" VALUES (460,4730,'GET','/api/attributes/eventType/1',NULL,NULL,NULL,'400',NULL,NULL);
 INSERT INTO "Test" VALUES (461,4740,'GET','/api/attributes/list',NULL,NULL,NULL,'200',NULL,NULL);
 INSERT INTO "Test" VALUES (462,4750,'GET','/api/author/1',NULL,NULL,NULL,'400',NULL,NULL);
 INSERT INTO "Test" VALUES (463,4760,'GET','/api/carousel/1',NULL,NULL,NULL,'403',NULL,NULL);
@@ -468,7 +468,7 @@ INSERT INTO "Test" VALUES (513,5340,'GET','/design/create',NULL,NULL,NULL,'403',
 INSERT INTO "Test" VALUES (514,5350,'POST','/design/save',NULL,NULL,NULL,'403',NULL,NULL);
 INSERT INTO "Test" VALUES (515,5360,'GET','/emails',NULL,NULL,NULL,'403',NULL,NULL);
 INSERT INTO "Test" VALUES (516,5380,'GET','/emails/article/1',NULL,NULL,NULL,'403',NULL,NULL);
-INSERT INTO "Test" VALUES (517,5390,'GET','/event/1',NULL,NULL,NULL,'403',NULL,NULL);
+INSERT INTO "Test" VALUES (517,5390,'GET','/event/1',NULL,NULL,NULL,'400',NULL,NULL);
 INSERT INTO "Test" VALUES (518,5400,'GET','/event/1/0123456789abcdef0123456789abcdef',NULL,NULL,NULL,'400',NULL,NULL);
 INSERT INTO "Test" VALUES (519,5410,'GET','/event/1/register',NULL,NULL,NULL,'400',NULL,NULL);
 INSERT INTO "Test" VALUES (520,5420,'GET','/event/1/unregister',NULL,NULL,NULL,'400',NULL,NULL);
@@ -573,7 +573,7 @@ INSERT INTO "Test" VALUES (619,6410,'GET','/analytics',NULL,NULL,'{"email":"pers
 INSERT INTO "Test" VALUES (620,6420,'POST','/api/attribute/create',NULL,'{"name":"attribute name", "detail":"attribute detail", "color":"#112233" }','{"email":"personManager@myclub.foo","password":"HumanRessources1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (621,6440,'POST','/api/attribute/delete/1',NULL,'{}','{"email":"personManager@myclub.foo","password":"HumanRessources1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (622,6430,'POST','/api/attribute/update',NULL,'{"id":1, "name":"attribute name updated", "detail":"attribute detail updated", "color":"#223344" }','{"email":"personManager@myclub.foo","password":"HumanRessources1234" }','403',NULL,NULL);
-INSERT INTO "Test" VALUES (623,6450,'GET','/api/attributes/eventType/1',NULL,NULL,'{"email":"personManager@myclub.foo","password":"HumanRessources1234" }','200',NULL,NULL);
+INSERT INTO "Test" VALUES (623,6450,'GET','/api/attributes/eventType/1',NULL,NULL,'{"email":"personManager@myclub.foo","password":"HumanRessources1234" }','400',NULL,NULL);
 INSERT INTO "Test" VALUES (624,6460,'GET','/api/attributes/list',NULL,NULL,'{"email":"personManager@myclub.foo","password":"HumanRessources1234" }','200',NULL,NULL);
 INSERT INTO "Test" VALUES (625,6470,'GET','/api/author/1',NULL,NULL,'{"email":"personManager@myclub.foo","password":"HumanRessources1234" }','400',NULL,NULL);
 INSERT INTO "Test" VALUES (626,6480,'GET','/api/carousel/1',NULL,NULL,'{"email":"personManager@myclub.foo","password":"HumanRessources1234" }','400',NULL,NULL);
@@ -630,7 +630,7 @@ INSERT INTO "Test" VALUES (676,7060,'GET','/design/create',NULL,NULL,'{"email":"
 INSERT INTO "Test" VALUES (677,7070,'POST','/design/save',NULL,NULL,'{"email":"personManager@myclub.foo","password":"HumanRessources1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (678,7080,'GET','/emails',NULL,NULL,'{"email":"personManager@myclub.foo","password":"HumanRessources1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (679,7100,'GET','/emails/article/1',NULL,NULL,'{"email":"personManager@myclub.foo","password":"HumanRessources1234" }','403',NULL,NULL);
-INSERT INTO "Test" VALUES (680,7110,'GET','/event/1',NULL,NULL,'{"email":"personManager@myclub.foo","password":"HumanRessources1234" }','403',NULL,NULL);
+INSERT INTO "Test" VALUES (680,7110,'GET','/event/1',NULL,NULL,'{"email":"personManager@myclub.foo","password":"HumanRessources1234" }','400',NULL,NULL);
 INSERT INTO "Test" VALUES (681,7120,'GET','/event/1/0123456789abcdef0123456789abcdef',NULL,NULL,'{"email":"personManager@myclub.foo","password":"HumanRessources1234" }','400',NULL,NULL);
 INSERT INTO "Test" VALUES (682,7130,'GET','/event/1/register',NULL,NULL,'{"email":"personManager@myclub.foo","password":"HumanRessources1234" }','400',NULL,NULL);
 INSERT INTO "Test" VALUES (683,7140,'GET','/event/1/unregister',NULL,NULL,'{"email":"personManager@myclub.foo","password":"HumanRessources1234" }','400',NULL,NULL);
@@ -744,7 +744,7 @@ INSERT INTO "Test" VALUES (789,8130,'GET','/analytics',NULL,NULL,'{"email":"even
 INSERT INTO "Test" VALUES (790,8140,'POST','/api/attribute/create',NULL,'{"name":"attribute name", "detail":"attribute detail", "color":"#112233" }','{"email":"eventManager@myclub.foo","password":"eventManager1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (791,8160,'POST','/api/attribute/delete/1',NULL,'{}','{"email":"eventManager@myclub.foo","password":"eventManager1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (792,8150,'POST','/api/attribute/update',NULL,'{"id":1, "name":"attribute name updated", "detail":"attribute detail updated", "color":"#223344" }','{"email":"eventManager@myclub.foo","password":"eventManager1234" }','403',NULL,NULL);
-INSERT INTO "Test" VALUES (793,8170,'GET','/api/attributes/eventType/1',NULL,NULL,'{"email":"eventManager@myclub.foo","password":"eventManager1234" }','200',NULL,NULL);
+INSERT INTO "Test" VALUES (793,8170,'GET','/api/attributes/eventType/1',NULL,NULL,'{"email":"eventManager@myclub.foo","password":"eventManager1234" }','400',NULL,NULL);
 INSERT INTO "Test" VALUES (794,8180,'GET','/api/attributes/list',NULL,NULL,'{"email":"eventManager@myclub.foo","password":"eventManager1234" }','200',NULL,NULL);
 INSERT INTO "Test" VALUES (795,8190,'GET','/api/author/1',NULL,NULL,'{"email":"eventManager@myclub.foo","password":"eventManager1234" }','400',NULL,NULL);
 INSERT INTO "Test" VALUES (796,8200,'GET','/api/carousel/1',NULL,NULL,'{"email":"eventManager@myclub.foo","password":"eventManager1234" }','400',NULL,NULL);
@@ -801,7 +801,7 @@ INSERT INTO "Test" VALUES (846,8780,'GET','/design/create',NULL,NULL,'{"email":"
 INSERT INTO "Test" VALUES (847,8790,'POST','/design/save',NULL,NULL,'{"email":"eventManager@myclub.foo","password":"eventManager1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (848,8800,'GET','/emails',NULL,NULL,'{"email":"eventManager@myclub.foo","password":"eventManager1234" }','200',NULL,NULL);
 INSERT INTO "Test" VALUES (849,8820,'GET','/emails/article/1',NULL,NULL,'{"email":"eventManager@myclub.foo","password":"eventManager1234" }','403',NULL,NULL);
-INSERT INTO "Test" VALUES (850,8830,'GET','/event/1',NULL,NULL,'{"email":"eventManager@myclub.foo","password":"eventManager1234" }','403',NULL,NULL);
+INSERT INTO "Test" VALUES (850,8830,'GET','/event/1',NULL,NULL,'{"email":"eventManager@myclub.foo","password":"eventManager1234" }','400',NULL,NULL);
 INSERT INTO "Test" VALUES (851,8840,'GET','/event/1/0123456789abcdef0123456789abcdef',NULL,NULL,'{"email":"eventManager@myclub.foo","password":"eventManager1234" }','400',NULL,NULL);
 INSERT INTO "Test" VALUES (852,8850,'GET','/event/1/register',NULL,NULL,'{"email":"eventManager@myclub.foo","password":"eventManager1234" }','400',NULL,NULL);
 INSERT INTO "Test" VALUES (853,8860,'GET','/event/1/unregister',NULL,NULL,'{"email":"eventManager@myclub.foo","password":"eventManager1234" }','400',NULL,NULL);
@@ -939,7 +939,7 @@ INSERT INTO "Test" VALUES (987,9850,'GET','/analytics',NULL,NULL,'{"email":"reda
 INSERT INTO "Test" VALUES (988,9860,'POST','/api/attribute/create',NULL,'{"name":"attribute name", "detail":"attribute detail", "color":"#112233" }','{"email":"redactor@myclub.foo","password":"redactor1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (989,9880,'POST','/api/attribute/delete/1',NULL,'{}','{"email":"redactor@myclub.foo","password":"redactor1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (990,9870,'POST','/api/attribute/update',NULL,'{"id":1, "name":"attribute name updated", "detail":"attribute detail updated", "color":"#223344" }','{"email":"redactor@myclub.foo","password":"redactor1234" }','403',NULL,NULL);
-INSERT INTO "Test" VALUES (991,9890,'GET','/api/attributes/eventType/1',NULL,NULL,'{"email":"redactor@myclub.foo","password":"redactor1234" }','200',NULL,NULL);
+INSERT INTO "Test" VALUES (991,9890,'GET','/api/attributes/eventType/1',NULL,NULL,'{"email":"redactor@myclub.foo","password":"redactor1234" }','400',NULL,NULL);
 INSERT INTO "Test" VALUES (992,9900,'GET','/api/attributes/list',NULL,NULL,'{"email":"redactor@myclub.foo","password":"redactor1234" }','200',NULL,NULL);
 INSERT INTO "Test" VALUES (993,9910,'GET','/api/author/1',NULL,NULL,'{"email":"redactor@myclub.foo","password":"redactor1234" }','400',NULL,NULL);
 INSERT INTO "Test" VALUES (994,9920,'GET','/api/carousel/1',NULL,NULL,'{"email":"redactor@myclub.foo","password":"redactor1234" }','400',NULL,NULL);
@@ -996,7 +996,7 @@ INSERT INTO "Test" VALUES (1044,10510,'GET','/design/create',NULL,NULL,'{"email"
 INSERT INTO "Test" VALUES (1045,10520,'POST','/design/save',NULL,NULL,'{"email":"redactor@myclub.foo","password":"redactor1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (1046,10530,'GET','/emails',NULL,NULL,'{"email":"redactor@myclub.foo","password":"redactor1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (1047,10550,'GET','/emails/article/1',NULL,NULL,'{"email":"redactor@myclub.foo","password":"redactor1234" }','400',NULL,NULL);
-INSERT INTO "Test" VALUES (1048,10560,'GET','/event/1',NULL,NULL,'{"email":"redactor@myclub.foo","password":"redactor1234" }','403',NULL,NULL);
+INSERT INTO "Test" VALUES (1048,10560,'GET','/event/1',NULL,NULL,'{"email":"redactor@myclub.foo","password":"redactor1234" }','400',NULL,NULL);
 INSERT INTO "Test" VALUES (1049,10570,'GET','/event/1/0123456789abcdef0123456789abcdef',NULL,NULL,'{"email":"redactor@myclub.foo","password":"redactor1234" }','400',NULL,NULL);
 INSERT INTO "Test" VALUES (1050,10580,'GET','/event/1/register',NULL,NULL,'{"email":"redactor@myclub.foo","password":"redactor1234" }','400',NULL,NULL);
 INSERT INTO "Test" VALUES (1051,10590,'GET','/event/1/unregister',NULL,NULL,'{"email":"redactor@myclub.foo","password":"redactor1234" }','400',NULL,NULL);
@@ -1036,7 +1036,7 @@ INSERT INTO "Test" VALUES (1085,11020,'GET','/persons',NULL,NULL,'{"email":"reda
 INSERT INTO "Test" VALUES (1086,11030,'GET','/person/create',NULL,NULL,'{"email":"redactor@myclub.foo","password":"redactor1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (1087,11040,'GET','/person/delete/1',NULL,'{}','{"email":"redactor@myclub.foo","password":"redactor1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (1088,11050,'GET','/person/edit/1',NULL,NULL,'{"email":"redactor@myclub.foo","password":"redactor1234" }','403',NULL,NULL);
-INSERT INTO "Test" VALUES (1089,11070,'GET','/publish/article/1',NULL,NULL,'{"email":"redactor@myclub.foo","password":"redactor1234" }','403',NULL,NULL);
+INSERT INTO "Test" VALUES (1089,11070,'GET','/publish/article/1',NULL,NULL,'{"email":"redactor@myclub.foo","password":"redactor1234" }','400',NULL,NULL);
 INSERT INTO "Test" VALUES (1090,11090,'GET','/redactor',NULL,NULL,'{"email":"redactor@myclub.foo","password":"redactor1234" }','200',NULL,NULL);
 INSERT INTO "Test" VALUES (1091,11100,'GET','/redactor/help',NULL,NULL,'{"email":"redactor@myclub.foo","password":"redactor1234" }','200',NULL,NULL);
 INSERT INTO "Test" VALUES (1092,11110,'GET','/referents',NULL,NULL,'{"email":"redactor@myclub.foo","password":"redactor1234" }','403',NULL,NULL);
@@ -1083,7 +1083,7 @@ INSERT INTO "Test" VALUES (1132,10750,'POST','/group/create',NULL,NULL,'{"email"
 INSERT INTO "Test" VALUES (1133,10780,'POST','/group/edit/1',NULL,NULL,'{"email":"redactor@myclub.foo","password":"redactor1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (1134,10820,'POST','/import',NULL,NULL,'{"email":"redactor@myclub.foo","password":"redactor1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (1135,11060,'POST','/person/edit/1',NULL,NULL,'{"email":"redactor@myclub.foo","password":"redactor1234" }','403',NULL,NULL);
-INSERT INTO "Test" VALUES (1136,11080,'POST','/publish/article/1',NULL,NULL,'{"email":"redactor@myclub.foo","password":"redactor1234" }','403',NULL,NULL);
+INSERT INTO "Test" VALUES (1136,11080,'POST','/publish/article/1',NULL,NULL,'{"email":"redactor@myclub.foo","password":"redactor1234" }','400',NULL,NULL);
 INSERT INTO "Test" VALUES (1137,11150,'POST','/settings',NULL,NULL,'{"email":"redactor@myclub.foo","password":"redactor1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (1138,11240,'POST','/user/account',NULL,'{"email":"personManager@myclub.foo", "firstName":"first name updated","lastName": "last name updated", "nickName": "nickname updated", "avatar":"\ud83e\udd20"}','{"email":"redactor@myclub.foo","password":"redactor1234" }','200','SELECT FirstName, LastName, NickName, Avatar, UseGravatar From Person Where Id = 2','[{"FirstName":"first name updated","LastName":"last name updated","NickName":"nickname updated","Avatar":"🤠","UseGravatar":"no"}]');
 INSERT INTO "Test" VALUES (1139,11260,'POST','/user/availabilities',NULL,'{"availabilities": {"4": {"morning": "on"}, "5": {"morning": "on"}, "0": {"evening": "on"}, "2": {"evening": "on"}}}','{"email":"redactor@myclub.foo","password":"redactor1234" }','200','SELECT Availabilities From Person Where Id = 2','[{"Availabilities":"{\"4\":{\"morning\":\"on\"},\"5\":{\"morning\":\"on\"},\"0\":{\"evening\":\"on\"},\"2\":{\"evening\":\"on\"}}"}]');
@@ -1105,7 +1105,7 @@ INSERT INTO "Test" VALUES (1153,11580,'GET','/analytics',NULL,NULL,'{"email":"ed
 INSERT INTO "Test" VALUES (1154,11590,'POST','/api/attribute/create',NULL,'{"name":"attribute name", "detail":"attribute detail", "color":"#112233" }','{"email":"editor@myclub.foo","password":"editor1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (1155,11610,'POST','/api/attribute/delete/1',NULL,'{}','{"email":"editor@myclub.foo","password":"editor1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (1156,11600,'POST','/api/attribute/update',NULL,'{"id":1, "name":"attribute name updated", "detail":"attribute detail updated", "color":"#223344" }','{"email":"editor@myclub.foo","password":"editor1234" }','403',NULL,NULL);
-INSERT INTO "Test" VALUES (1157,11620,'GET','/api/attributes/eventType/1',NULL,NULL,'{"email":"editor@myclub.foo","password":"editor1234" }','200',NULL,NULL);
+INSERT INTO "Test" VALUES (1157,11620,'GET','/api/attributes/eventType/1',NULL,NULL,'{"email":"editor@myclub.foo","password":"editor1234" }','400',NULL,NULL);
 INSERT INTO "Test" VALUES (1158,11630,'GET','/api/attributes/list',NULL,NULL,'{"email":"editor@myclub.foo","password":"editor1234" }','200',NULL,NULL);
 INSERT INTO "Test" VALUES (1159,11640,'GET','/api/author/1',NULL,NULL,'{"email":"editor@myclub.foo","password":"editor1234" }','400',NULL,NULL);
 INSERT INTO "Test" VALUES (1160,11650,'GET','/api/carousel/1',NULL,NULL,'{"email":"editor@myclub.foo","password":"editor1234" }','400',NULL,NULL);
@@ -1162,7 +1162,7 @@ INSERT INTO "Test" VALUES (1210,12240,'GET','/design/create',NULL,NULL,'{"email"
 INSERT INTO "Test" VALUES (1211,12250,'POST','/design/save',NULL,NULL,'{"email":"editor@myclub.foo","password":"editor1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (1212,12260,'GET','/emails',NULL,NULL,'{"email":"editor@myclub.foo","password":"editor1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (1213,12280,'GET','/emails/article/1',NULL,NULL,'{"email":"editor@myclub.foo","password":"editor1234" }','403',NULL,NULL);
-INSERT INTO "Test" VALUES (1214,12290,'GET','/event/1',NULL,NULL,'{"email":"editor@myclub.foo","password":"editor1234" }','403',NULL,NULL);
+INSERT INTO "Test" VALUES (1214,12290,'GET','/event/1',NULL,NULL,'{"email":"editor@myclub.foo","password":"editor1234" }','400',NULL,NULL);
 INSERT INTO "Test" VALUES (1215,12300,'GET','/event/1/0123456789abcdef0123456789abcdef',NULL,NULL,'{"email":"editor@myclub.foo","password":"editor1234" }','400',NULL,NULL);
 INSERT INTO "Test" VALUES (1216,12310,'GET','/event/1/register',NULL,NULL,'{"email":"editor@myclub.foo","password":"editor1234" }','400',NULL,NULL);
 INSERT INTO "Test" VALUES (1217,12320,'GET','/event/1/unregister',NULL,NULL,'{"email":"editor@myclub.foo","password":"editor1234" }','400',NULL,NULL);
@@ -1202,7 +1202,7 @@ INSERT INTO "Test" VALUES (1251,12750,'GET','/persons',NULL,NULL,'{"email":"edit
 INSERT INTO "Test" VALUES (1252,12760,'GET','/person/create',NULL,NULL,'{"email":"editor@myclub.foo","password":"editor1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (1253,12770,'GET','/person/delete/1',NULL,'{}','{"email":"editor@myclub.foo","password":"editor1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (1254,12780,'GET','/person/edit/1',NULL,NULL,'{"email":"editor@myclub.foo","password":"editor1234" }','403',NULL,NULL);
-INSERT INTO "Test" VALUES (1255,12800,'GET','/publish/article/1',NULL,NULL,'{"email":"editor@myclub.foo","password":"editor1234" }','200',NULL,NULL);
+INSERT INTO "Test" VALUES (1255,12800,'GET','/publish/article/1',NULL,NULL,'{"email":"editor@myclub.foo","password":"editor1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (1256,12820,'GET','/redactor',NULL,NULL,'{"email":"editor@myclub.foo","password":"editor1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (1257,12830,'GET','/redactor/help',NULL,NULL,'{"email":"editor@myclub.foo","password":"editor1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (1258,12840,'GET','/referents',NULL,NULL,'{"email":"editor@myclub.foo","password":"editor1234" }','403',NULL,NULL);
@@ -1270,7 +1270,7 @@ INSERT INTO "Test" VALUES (1319,13310,'GET','/analytics',NULL,NULL,'{"email":"ho
 INSERT INTO "Test" VALUES (1320,13320,'POST','/api/attribute/create',NULL,'{"name":"attribute name", "detail":"attribute detail", "color":"#112233" }','{"email":"homeDesigner@myclub.foo","password":"homeD1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (1321,13340,'POST','/api/attribute/delete/1',NULL,'{}','{"email":"homeDesigner@myclub.foo","password":"homeD1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (1322,13330,'POST','/api/attribute/update',NULL,'{"id":1, "name":"attribute name updated", "detail":"attribute detail updated", "color":"#223344" }','{"email":"homeDesigner@myclub.foo","password":"homeD1234" }','403',NULL,NULL);
-INSERT INTO "Test" VALUES (1323,13350,'GET','/api/attributes/eventType/1',NULL,NULL,'{"email":"homeDesigner@myclub.foo","password":"homeD1234" }','200',NULL,NULL);
+INSERT INTO "Test" VALUES (1323,13350,'GET','/api/attributes/eventType/1',NULL,NULL,'{"email":"homeDesigner@myclub.foo","password":"homeD1234" }','400',NULL,NULL);
 INSERT INTO "Test" VALUES (1324,13360,'GET','/api/attributes/list',NULL,NULL,'{"email":"homeDesigner@myclub.foo","password":"homeD1234" }','200',NULL,NULL);
 INSERT INTO "Test" VALUES (1325,13370,'GET','/api/author/1',NULL,NULL,'{"email":"homeDesigner@myclub.foo","password":"homeD1234" }','400',NULL,NULL);
 INSERT INTO "Test" VALUES (1326,13380,'GET','/api/carousel/1',NULL,NULL,'{"email":"homeDesigner@myclub.foo","password":"homeD1234" }','400',NULL,NULL);
@@ -1327,7 +1327,7 @@ INSERT INTO "Test" VALUES (1376,13970,'GET','/design/create',NULL,NULL,'{"email"
 INSERT INTO "Test" VALUES (1377,13980,'POST','/design/save',NULL,NULL,'{"email":"homeDesigner@myclub.foo","password":"homeD1234" }','200',NULL,NULL);
 INSERT INTO "Test" VALUES (1378,13990,'GET','/emails',NULL,NULL,'{"email":"homeDesigner@myclub.foo","password":"homeD1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (1379,14010,'GET','/emails/article/1',NULL,NULL,'{"email":"homeDesigner@myclub.foo","password":"homeD1234" }','403',NULL,NULL);
-INSERT INTO "Test" VALUES (1380,14020,'GET','/event/1',NULL,NULL,'{"email":"homeDesigner@myclub.foo","password":"homeD1234" }','403',NULL,NULL);
+INSERT INTO "Test" VALUES (1380,14020,'GET','/event/1',NULL,NULL,'{"email":"homeDesigner@myclub.foo","password":"homeD1234" }','400',NULL,NULL);
 INSERT INTO "Test" VALUES (1381,14030,'GET','/event/1/0123456789abcdef0123456789abcdef',NULL,NULL,'{"email":"homeDesigner@myclub.foo","password":"homeD1234" }','400',NULL,NULL);
 INSERT INTO "Test" VALUES (1382,14040,'GET','/event/1/register',NULL,NULL,'{"email":"homeDesigner@myclub.foo","password":"homeD1234" }','400',NULL,NULL);
 INSERT INTO "Test" VALUES (1383,14050,'GET','/event/1/unregister',NULL,NULL,'{"email":"homeDesigner@myclub.foo","password":"homeD1234" }','400',NULL,NULL);
@@ -1435,7 +1435,7 @@ INSERT INTO "Test" VALUES (1485,15040,'GET','/analytics',NULL,NULL,'{"email":"ev
 INSERT INTO "Test" VALUES (1486,15050,'POST','/api/attribute/create',NULL,'{"name":"attribute name", "detail":"attribute detail", "color":"#112233" }','{"email":"eventDesigner@myclub.foo","password":"eventD1234" }','200',NULL,NULL);
 INSERT INTO "Test" VALUES (1487,15070,'POST','/api/attribute/delete/1',NULL,'{}','{"email":"eventDesigner@myclub.foo","password":"eventD1234" }','200','SELECT * From Attribute','[]');
 INSERT INTO "Test" VALUES (1488,15060,'POST','/api/attribute/update',NULL,'{"id":1, "name":"attribute name updated", "detail":"attribute detail updated", "color":"#223344" }','{"email":"eventDesigner@myclub.foo","password":"eventD1234" }','200',NULL,NULL);
-INSERT INTO "Test" VALUES (1489,15080,'GET','/api/attributes/eventType/1',NULL,NULL,'{"email":"eventDesigner@myclub.foo","password":"eventD1234" }','200',NULL,NULL);
+INSERT INTO "Test" VALUES (1489,15080,'GET','/api/attributes/eventType/1',NULL,NULL,'{"email":"eventDesigner@myclub.foo","password":"eventD1234" }','400',NULL,NULL);
 INSERT INTO "Test" VALUES (1490,15090,'GET','/api/attributes/list',NULL,NULL,'{"email":"eventDesigner@myclub.foo","password":"eventD1234" }','200',NULL,NULL);
 INSERT INTO "Test" VALUES (1491,15100,'GET','/api/author/1',NULL,NULL,'{"email":"eventDesigner@myclub.foo","password":"eventD1234" }','400',NULL,NULL);
 INSERT INTO "Test" VALUES (1492,15110,'GET','/api/carousel/1',NULL,NULL,'{"email":"eventDesigner@myclub.foo","password":"eventD1234" }','400',NULL,NULL);
@@ -1492,7 +1492,7 @@ INSERT INTO "Test" VALUES (1542,15700,'GET','/design/create',NULL,NULL,'{"email"
 INSERT INTO "Test" VALUES (1543,15710,'POST','/design/save',NULL,NULL,'{"email":"eventDesigner@myclub.foo","password":"eventD1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (1544,15720,'GET','/emails',NULL,NULL,'{"email":"eventDesigner@myclub.foo","password":"eventD1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (1545,15740,'GET','/emails/article/1',NULL,NULL,'{"email":"eventDesigner@myclub.foo","password":"eventD1234" }','403',NULL,NULL);
-INSERT INTO "Test" VALUES (1546,15750,'GET','/event/1',NULL,NULL,'{"email":"eventDesigner@myclub.foo","password":"eventD1234" }','403',NULL,NULL);
+INSERT INTO "Test" VALUES (1546,15750,'GET','/event/1',NULL,NULL,'{"email":"eventDesigner@myclub.foo","password":"eventD1234" }','400',NULL,NULL);
 INSERT INTO "Test" VALUES (1547,15760,'GET','/event/1/0123456789abcdef0123456789abcdef',NULL,NULL,'{"email":"eventDesigner@myclub.foo","password":"eventD1234" }','400',NULL,NULL);
 INSERT INTO "Test" VALUES (1548,15770,'GET','/event/1/register',NULL,NULL,'{"email":"eventDesigner@myclub.foo","password":"eventD1234" }','400',NULL,NULL);
 INSERT INTO "Test" VALUES (1549,15780,'GET','/event/1/unregister',NULL,NULL,'{"email":"eventDesigner@myclub.foo","password":"eventD1234" }','400',NULL,NULL);
@@ -1657,7 +1657,7 @@ INSERT INTO "Test" VALUES (1708,17430,'GET','/design/create',NULL,NULL,'{"email"
 INSERT INTO "Test" VALUES (1709,17440,'POST','/design/save',NULL,NULL,'{"email":"visitorInsights@myclub.foo","password":"observator1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (1710,17450,'GET','/emails',NULL,NULL,'{"email":"visitorInsights@myclub.foo","password":"observator1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (1711,17470,'GET','/emails/article/1',NULL,NULL,'{"email":"visitorInsights@myclub.foo","password":"observator1234" }','403',NULL,NULL);
-INSERT INTO "Test" VALUES (1712,17480,'GET','/event/1',NULL,NULL,'{"email":"visitorInsights@myclub.foo","password":"observator1234" }','403',NULL,NULL);
+INSERT INTO "Test" VALUES (1712,17480,'GET','/event/1',NULL,NULL,'{"email":"visitorInsights@myclub.foo","password":"observator1234" }','400',NULL,NULL);
 INSERT INTO "Test" VALUES (1713,17490,'GET','/event/1/0123456789abcdef0123456789abcdef',NULL,NULL,'{"email":"visitorInsights@myclub.foo","password":"observator1234" }','400',NULL,NULL);
 INSERT INTO "Test" VALUES (1714,17500,'GET','/event/1/register',NULL,NULL,'{"email":"visitorInsights@myclub.foo","password":"observator1234" }','400',NULL,NULL);
 INSERT INTO "Test" VALUES (1715,17510,'GET','/event/1/unregister',NULL,NULL,'{"email":"visitorInsights@myclub.foo","password":"observator1234" }','400',NULL,NULL);
@@ -2028,12 +2028,12 @@ INSERT INTO "Test" VALUES (2081,NULL,'GET','/game/karaoke/files/@name:[A-Za-z0-9
 INSERT INTO "Test" VALUES (2082,NULL,'GET','/user/connections/@id:[0-9]+','{"id":1}',NULL,NULL,'403',NULL,NULL);
 INSERT INTO "Test" VALUES (2083,NULL,'GET','/api/attributes/eventType/@id:[0-9]+','{"id":1}',NULL,NULL,'400',NULL,NULL);
 INSERT INTO "Test" VALUES (2084,NULL,'GET','/api/kanban/card/@id:[0-9]+','{"id":1}',NULL,NULL,'200',NULL,NULL);
-INSERT INTO "Test" VALUES (2085,NULL,'GET','/api/kanban/project/@id:[0-9]+','{"id":1}',NULL,NULL,'200',NULL,NULL);
-INSERT INTO "Test" VALUES (2086,NULL,'GET','/api/kanban/project/@id:[0-9]+/cards','{"id":1}',NULL,NULL,'200',NULL,NULL);
-INSERT INTO "Test" VALUES (2087,NULL,'GET','/api/kanban/project/@id:[0-9]+/cardTypes','{"id":1}',NULL,NULL,'200',NULL,NULL);
-INSERT INTO "Test" VALUES (2088,NULL,'GET','/api/kanban/card/@id:[0-9]+/history','{"id":1}',NULL,NULL,'200',NULL,NULL);
-INSERT INTO "Test" VALUES (2089,NULL,'GET','/api/order/reply/@id:[0-9]+','{"id":1}',NULL,NULL,'200',NULL,NULL);
-INSERT INTO "Test" VALUES (2090,NULL,'GET','/article/carousel/@id:[0-9]+','{"id":1}',NULL,NULL,'200',NULL,NULL);
-INSERT INTO "Test" VALUES (2091,NULL,'GET','/order/add/@id:[0-9]+','{"id":1}',NULL,NULL,'200',NULL,NULL);
-INSERT INTO "Test" VALUES (2092,NULL,'GET','/order/results/@id:[0-9]+','{"id":1}',NULL,NULL,'200',NULL,NULL);
+INSERT INTO "Test" VALUES (2085,NULL,'GET','/api/kanban/project/@id:[0-9]+','{"id":1}',NULL,NULL,'403',NULL,NULL);
+INSERT INTO "Test" VALUES (2086,NULL,'GET','/api/kanban/project/@id:[0-9]+/cards','{"id":1}',NULL,NULL,'403',NULL,NULL);
+INSERT INTO "Test" VALUES (2087,NULL,'GET','/api/kanban/project/@id:[0-9]+/cardTypes','{"id":1}',NULL,NULL,'403',NULL,NULL);
+INSERT INTO "Test" VALUES (2088,NULL,'GET','/api/kanban/card/@id:[0-9]+/history','{"id":1}',NULL,NULL,'403',NULL,NULL);
+INSERT INTO "Test" VALUES (2089,NULL,'GET','/api/order/reply/@id:[0-9]+','{"id":1}',NULL,NULL,'403',NULL,NULL);
+INSERT INTO "Test" VALUES (2090,NULL,'GET','/article/carousel/@id:[0-9]+','{"id":1}',NULL,NULL,'400',NULL,NULL);
+INSERT INTO "Test" VALUES (2091,NULL,'GET','/order/add/@id:[0-9]+','{"id":1}',NULL,NULL,'403',NULL,NULL);
+INSERT INTO "Test" VALUES (2092,NULL,'GET','/order/results/@id:[0-9]+','{"id":1}',NULL,NULL,'400',NULL,NULL);
 COMMIT;

@@ -316,6 +316,10 @@ class ArticleController extends TableController
             $this->raiseforbidden(__FILE__, __LINE__);
             return;
         }
+        if (!$this->dataHelper->get('Article', ['Id' => $id], 'Id')) {
+            $this->raiseBadRequest("Article {$id} doesn't exist", __FILE__, __LINE__);
+            return;
+        }
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (!$this->authorizationService->canPublish($id, $this->application->getConnectedUser())) {
                 $this->raiseforbidden(__FILE__, __LINE__);

@@ -131,6 +131,8 @@ class EventApi extends AbstractApi
             $data = $this->getJsonInput();
             $this->eventDataHelper->update($data, $this->authService->getUserId());
             $this->renderJsonOk();
+        } catch (QueryException $e) {
+            $this->renderJsonBadRequest($e->getMessage(), $e->getFile(), $e->getLine());
         } catch (Throwable $e) {
             $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
         }
