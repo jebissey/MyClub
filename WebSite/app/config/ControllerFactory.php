@@ -20,7 +20,6 @@ use app\models\DesignDataHelper;
 use app\models\EventDataHelper;
 use app\models\EventTypeDataHelper;
 use app\models\GroupDataHelper;
-use app\models\ImportDataHelper;
 use app\models\KanbanDataHelper;
 use app\models\LogDataHelper;
 use app\models\LogDataAnalyticsHelper;
@@ -101,7 +100,6 @@ class ControllerFactory
         private EventDataHelper $eventDataHelper,
         private EventTypeDataHelper $eventTypeDataHelper,
         private GroupDataHelper $groupDataHelper,
-        private ImportDataHelper $importDataHelper,
         private KanbanDataHelper $kanbanDataHelper,
         private LogDataHelper $logDataHelper,
         private MessageDataHelper $messageDataHelper,
@@ -242,7 +240,7 @@ class ControllerFactory
     {
         return new ImportController(
             $this->application,
-            $this->importDataHelper
+            $this->personDataHelper
         );
     }
 

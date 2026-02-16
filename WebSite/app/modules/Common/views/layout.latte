@@ -140,7 +140,7 @@
     <div class="content-wrapper d-flex flex-column min-vh-100">
         <main class="flex-grow-1">
 
-        {if file_exists('app/images/header-banner.jpg')}
+        {if isset($currentPath) && $currentPath === '/' && file_exists('app/images/header-banner.jpg')}
             <div class="text-center">
                 <img src="/app/images/header-banner.jpg"
                      class="img-fluid custom-img"

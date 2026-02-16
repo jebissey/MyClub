@@ -1,4 +1,4 @@
-{extends '../../Webmaster/views/personManager.latte'}
+{extends $layout}
 
 {block content}
     <div class="container-fluid">
@@ -32,7 +32,7 @@
                         <ul>
                             <li>Nouveaux enregistrements : {$results['created']}</li>
                             <li>Enregistrements mis à jour : {$results['updated']}</li>
-                            <li>Enregistrements inactivés : {$results['inactivated']}</li>
+                            <li>Enregistrements inactivés : {$results['deactivated']}</li>
                             {if $results['messages']}
                             <hr>
                             <h5>Détails :</h5>
@@ -91,6 +91,9 @@
                     </select>
                 </div>
             </div>
+            <div id="emailColumnWarning" class="alert alert-warning py-1 px-2 mt-1" style="display: none;">
+                ⚠️ La colonne sélectionnée n'a pas de nom d'en-tête. L'email est obligatoire pour l'import.
+            </div>
 
             <button type="submit" class="btn btn-primary" id="submitBtn" style="display: none;">Importer</button>
         </form>
@@ -101,6 +104,6 @@
     <script>
         const importSettings = {$importSettings};
     </script>
-    <script src="/app/modules/PersonManager/js/importForm.js"></script>
+    <script type="module" src="/app/modules/PersonManager/js/importForm.js"></script>
 {/block}
  

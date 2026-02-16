@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace app\models;
 
+use InvalidArgumentException;
 use PDO;
+use RuntimeException;
+use Throwable;
 
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
@@ -38,6 +41,15 @@ class PersonDataHelper extends Data implements NewsProviderInterface
             $id = $this->pdo->lastInsertId();
         }
         return (int)$id;
+    }
+
+    public function getAllPersons(): array
+    {
+        $rows = $this->pdo
+            ->query("SELECT Id, LOWER(Email) AS EmailKey FROM Person")
+            ->fetchAll(PDO::FETCH_OBJ);
+
+        return array_column($rows, 'Id', 'EmailKey');
     }
 
     public function getEmailsOfInterestedPeople(?int $idGroup, ?int $idEventType, ?int $dayOfWeek, string $timeOfDay): array
@@ -228,6 +240,132 @@ class PersonDataHelper extends Data implements NewsProviderInterface
             WHERE Authorization.Name = "Webmaster"'
         );
         return $query->fetchColumn();
+    }
+
+    /**
+     * Imports persons from a CSV file.
+     *
+     * @param  string               $filePath        Absolute path to the CSV file (validated upstream by the controller)
+     * @param  int                  $headerRow       Last header line number (lines <= this value are skipped)
+     * @param  array                $mapping         Column mapping : ['email' => 0, 'firstName' => 1, ...]
+     * @param  array<string,int>    $existingPersons Existing persons map : ['lowercase_email' => id, ...]
+     *
+     * @return array{created: int, updated: int, deactivated: int, errors: int, processedEmails: string[], messages: string[]}
+     *
+     * @throws InvalidArgumentException If a mapping key is missing
+     * @throws RuntimeException         If the file is unreadable
+     */
+    public function importFromCsvFile(
+        string $filePath,
+        int    $headerRow,
+        array  $mapping,
+        array  $existingPersons
+    ): array {
+
+        foreach (['email', 'firstName', 'lastName', 'phone'] as $key) {
+            if (!array_key_exists($key, $mapping)) {
+                throw new InvalidArgumentException("Clé de mapping manquante : {$key}");
+            }
+        }
+        if (!is_file($filePath) || !is_readable($filePath)) {
+            throw new RuntimeException("Fichier CSV introuvable ou illisible : $filePath");
+        }
+        $file = fopen($filePath, 'r');
+        if ($file === false) {
+            throw new RuntimeException("Impossible d'ouvrir le fichier CSV : $filePath");
+        }
+
+        $results = [
+            'created'         => 0,
+            'updated'         => 0,
+            'deactivated'     => 0,
+            'errors'          => 0,
+            'processedEmails' => [],
+            'messages'        => [],
+        ];
+
+        $this->pdo->beginTransaction();
+
+        try {
+            $stmtUpsert = $this->pdo->prepare("
+                INSERT INTO Person (Email, FirstName, LastName, Phone, Imported, Inactivated)
+                VALUES (:email, :firstName, :lastName, :phone, 1, 0)
+                ON CONFLICT(Email) DO UPDATE SET
+                    FirstName   = excluded.FirstName,
+                    LastName    = excluded.LastName,
+                    Phone       = excluded.Phone,
+                    Imported    = 1,
+                    Inactivated = 0
+            ");
+
+            $processedEmailKeys = [];
+            $currentRow = 0;
+            while (($data = fgetcsv($file, 0, ',', '"', '')) !== false) {
+                $currentRow++;
+                if ($currentRow <= $headerRow) {
+                    continue;
+                }
+                $email = filter_var($data[$mapping['email']] ?? '', FILTER_VALIDATE_EMAIL);
+                if ($email === false) {
+                    $results['errors']++;
+                    $results['messages'][] = "Ligne $currentRow : adresse email invalide.";
+                    continue;
+                }
+                $personData = [
+                    'email'     => $email,
+                    'firstName' => mb_substr(trim($data[$mapping['firstName']] ?? ''), 0, 100),
+                    'lastName'  => mb_substr(trim($data[$mapping['lastName']] ?? ''), 0, 100),
+                    'phone'     => mb_substr(preg_replace('/[^\d\s+\-()\.]/', '', $data[$mapping['phone']] ?? ''), 0, 20),
+                ];
+
+                $emailKey   = strtolower($personData['email']);
+                $existingId = $existingPersons[$emailKey] ?? null;
+
+                $stmtUpsert->execute([
+                    ':email'     => $personData['email'],
+                    ':firstName' => $personData['firstName'],
+                    ':lastName'  => $personData['lastName'],
+                    ':phone'     => $personData['phone'],
+                ]);
+
+                if ($existingId !== null) {
+                    $results['updated']++;
+                } else {
+                    $results['created']++;
+                    $results['messages'][]     = '(+) ' . $personData['email'];
+                    $existingPersons[$emailKey] = (int) $this->pdo->lastInsertId();
+                }
+
+                $processedEmailKeys[$emailKey] = true;
+                $results['processedEmails'][]  = $personData['email'];
+            }
+
+            $idsToDeactivate = [];
+            foreach ($existingPersons as $emailKey => $id) {
+                if (!isset($processedEmailKeys[$emailKey])) {
+                    $idsToDeactivate[] = $id;
+                }
+            }
+            if (!empty($idsToDeactivate)) {
+                $placeholders = implode(',', array_fill(0, count($idsToDeactivate), '?'));
+                $stmtDeactivate = $this->pdo->prepare("
+                    UPDATE Person
+                    SET Inactivated = 1
+                    WHERE Id IN ($placeholders)
+                ");
+                $stmtDeactivate->execute($idsToDeactivate);
+                $results['deactivated'] = $stmtDeactivate->rowCount();
+            }
+
+            $this->pdo->commit();
+        } catch (Throwable $e) {
+            $this->pdo->rollBack();
+            throw $e;
+        } finally {
+            fclose($file);
+        }
+
+        return $results;
     }
 
     public function sendRegistrationLink($adminEmail, $name, $emailContact, $event): bool

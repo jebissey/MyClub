@@ -37,7 +37,6 @@ class PersonController extends TableController
         $this->redirect('/persons');
     }
 
-
     public function create(): void
     {
         if (!($this->application->getConnectedUser()->isPersonManager() ?? false)) {

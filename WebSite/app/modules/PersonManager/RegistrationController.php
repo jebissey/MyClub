@@ -42,7 +42,7 @@ class RegistrationController extends TableController
                 ['field' => 'FirstName', 'label' => 'Prénom'],
                 ['field' => 'NickName', 'label' => 'Surnom']
             ];
-            $data = $this->prepareTableData($this->tableControllerDataHelper->getPersonsQuery(), $filterValues);
+            $data = $this->prepareTableData($this->tableControllerDataHelper->getActivePersonsQuery(), $filterValues);
             $this->render('PersonManager/views/registration_groups_index.latte', $this->getAllParams([
                 'persons' => $data['items'],
                 'currentPage' => $data['currentPage'],

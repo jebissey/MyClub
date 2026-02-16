@@ -90,7 +90,6 @@ use app\models\EventDataHelper;
 use app\models\EventNeedDataHelper;
 use app\models\EventTypeDataHelper;
 use app\models\GroupDataHelper;
-use app\models\ImportDataHelper;
 use app\models\KanbanDataHelper;
 use app\models\KaraokeDataHelper;
 use app\models\LogDataHelper;
@@ -161,7 +160,6 @@ class Routes
             $eventDataHelper,
             new EventTypeDataHelper($application),
             new GroupDataHelper($application, $groupDataHelper),
-            new ImportDataHelper($application),
             new KanbanDataHelper($application),
             $logDataHelper,
             $messageDataHelper,
