@@ -3,6 +3,25 @@
 {block title}Personnes{/block}
 
 {block content}
+    <ul class="nav nav-tabs mb-3">
+        <li class="nav-item">
+            <a class="nav-link {if $status === 'active'}active{/if}"
+            href="/persons?status=active">
+                <i class="bi bi-people"></i>
+                Actifs
+            </a>
+        </li>
+
+        <li class="nav-item">
+            <a class="nav-link {if $status === 'desactivated'}active{/if}"
+            href="/persons?status=desactivated">
+                <i class="bi bi-archive"></i>
+                Désactivés
+            </a>
+        </li>
+    </ul>
+
+{if $status === 'active'}
     {include '../../Common/views/dataTable.latte',
         'createButton' => [
             'url' => '/person/create',
@@ -22,7 +41,33 @@
                 'url' => '/person/delete/{id}',
                 'class' => 'btn-danger',
                 'confirm' => 'Voulez-vous vraiment supprimer cette personne ?'
-            ]
+            ],
         ]
     }
+{/if}    
+{if $status === 'desactivated'}
+    {include '../../Common/views/dataTable.latte',
+        'createButton' => [
+            'url' => '/person/create',
+            'label' => 'bi bi-plus'
+        ],
+        'items' => $persons,
+        'actions' => [
+            [
+                'type' => 'link',
+                'label' => 'bi bi-pencil',
+                'url' => '/person/edit/{id}',
+                'class' => 'btn-warning'
+            ],
+            [
+                'type' => 'link',
+                'label' => 'bi bi-arrow-clockwise',
+                'url' => '/person/activate/{id}',
+                'class' => 'btn-secondary',
+                'confirm' => 'Voulez-vous vraiment réactiver cette personne ?'
+            ],
+        ]
+    }
+{/if} 
+
 {/block}

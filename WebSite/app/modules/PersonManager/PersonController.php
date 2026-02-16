@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\modules\PersonManager;
 
 use app\enums\FilterInputRule;
+use app\enums\PersonStatus;
 use app\helpers\Application;
 use app\helpers\WebApp;
 use app\models\PersonDataHelper;
@@ -21,6 +22,21 @@ class PersonController extends TableController
     ) {
         parent::__construct($application);
     }
+
+    public function activate(int $id): void
+    {
+        if (!($this->application->getConnectedUser()->isPersonManager() ?? false)) {
+            $this->raiseforbidden(__FILE__, __LINE__);
+            return;
+        }
+        if (($_SERVER['REQUEST_METHOD'] !== 'GET')) {
+            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+            return;
+        }
+        $this->dataHelper->set('Person', ['Inactivated' => 0], ['Id' => $id]);
+        $this->redirect('/persons');
+    }
+
 
     public function create(): void
     {
@@ -165,6 +181,7 @@ class PersonController extends TableController
             'nickName' => FilterInputRule::PersonName->value,
             'email' => FilterInputRule::Email->value,
             'alert' => FilterInputRule::Content->value,
+            'status' => $this->application->enumToValues(PersonStatus::class),
         ];
         $filterValues = WebApp::filterInput($schema, $this->flight->request()->query->getData());
         $filterConfig = [
@@ -172,7 +189,7 @@ class PersonController extends TableController
             ['name' => 'lastName', 'label' => 'Nom'],
             ['name' => 'nickName', 'label' => 'Surnom'],
             ['name' => 'email', 'label' => 'Email'],
-            ['name' => 'alert', 'label' => 'Alerte']
+            ['name' => 'alert', 'label' => 'Alerte'],
         ];
         $columns = [
             ['field' => 'LastName', 'label' => 'Nom'],
@@ -181,7 +198,14 @@ class PersonController extends TableController
             ['field' => 'Phone', 'label' => 'Téléphone'],
             ['field' => 'Alert', 'label' => 'Alerte'],
         ];
-        $data = $this->prepareTableData($this->tableControllerDataHelper->getPersonsQuery());
+
+        $status = $filterValues['status'] ?? PersonStatus::Active->value;
+        $data = match ($status) {
+            PersonStatus::Active->value => $this->prepareTableData($this->tableControllerDataHelper->getActivePersonsQuery()),
+            PersonStatus::Desactivated->value => $this->prepareTableData($this->tableControllerDataHelper->getDesactivatedPersonsQuery()),
+
+            default => Application::unreachable("Unknown status {$status}", __FILE__, __LINE__)
+        };
 
         $this->render('PersonManager/views/users_index.latte', $this->getAllParams([
             'persons' => $data['items'],
@@ -192,6 +216,7 @@ class PersonController extends TableController
             'columns' => $columns,
             'resetUrl' => '/persons',
             'page' => $this->application->getConnectedUser()->getPage(),
+            'status' => $status,
         ]));
     }
 }

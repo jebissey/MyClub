@@ -21,6 +21,7 @@ class Person implements RouteInterface
         $this->routes[] = new Route('GET  /personManager', $personController, 'home');
         $this->routes[] = new Route('GET  /personManager/help', $personController, 'help');
         $this->routes[] = new Route('GET  /persons', $personController, 'index');
+        $this->routes[] = new Route('GET  /person/activate/@id:[0-9]+', $personController, 'activate');
         $this->routes[] = new Route('GET  /person/create', $personController, 'create');
         $this->routes[] = new Route('GET  /person/edit/@id:[0-9]+', $personController, 'edit');
         $this->routes[] = new Route('POST /person/edit/@id:[0-9]+', $personController, 'editSave');

@@ -29,7 +29,7 @@ class TableControllerDataHelper extends Data
             ->orderBy('EventType.Name');
     }
 
-    public function getPersonsQuery(): Select
+    public function getActivePersonsQuery(): Select
     {
         return $this->fluent->from('Person')
             ->select(null)
@@ -37,6 +37,16 @@ class TableControllerDataHelper extends Data
             ->orderBy('LastName')
             ->where('Inactivated = 0');
     }
+
+    public function getDesactivatedPersonsQuery(): Select
+    {
+        return $this->fluent->from('Person')
+            ->select(null)
+            ->select('Id, FirstName, LastName, NickName, Email, Phone, Alert')
+            ->orderBy('LastName')
+            ->where('Inactivated = 1');
+    }
+
 
     public function getLeapfrogQuery(): Select
     {
