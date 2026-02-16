@@ -49,6 +49,8 @@ class V1ToV2Migrator implements DatabaseMigratorInterface
             PRIMARY KEY("Id"),
             FOREIGN KEY("IdPerson") REFERENCES "Person"("Id")
         )');
+        $pdo->exec("UPDATE Settings SET Name = 'Home_header' WHERE Name = 'Greatings'");
+        $pdo->exec("UPDATE Settings SET Name = 'Home_footer' WHERE Name = 'Link'");
 
         return 2;
     }

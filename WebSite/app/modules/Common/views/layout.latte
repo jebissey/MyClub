@@ -110,6 +110,11 @@
             max-width: 100%;
             height: auto;
         }
+        .custom-img {
+            height: 220px;
+            width: 100%;
+            object-fit: cover;
+        }
     </style>
     {block head}{/block}
 </head>
@@ -134,6 +139,15 @@
 
     <div class="content-wrapper d-flex flex-column min-vh-100">
         <main class="flex-grow-1">
+
+        {if file_exists('app/images/header-banner.jpg')}
+            <div class="text-center">
+                <img src="/app/images/header-banner.jpg"
+                     class="img-fluid custom-img"
+                     alt="Bannière">
+            </div>
+        {/if}
+
             <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
                 {block navbar}{/block}
             </nav>

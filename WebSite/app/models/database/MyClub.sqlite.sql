@@ -703,7 +703,7 @@ In the footer,
 
             <div class="list-group-item d-flex align-items-center">
                 <span class="fs-3 me-3">👻</span>
-                <span><strong>Mode Public :</strong> Vous n''''êtes pas connecté. Accès limité aux ressources publiques uniquement.</span>
+                <span><strong>Mode Public :</strong> Vous n''êtes pas connecté. Accès limité aux ressources publiques uniquement.</span>
             </div>
 
             <div class="list-group-item d-flex align-items-center">
