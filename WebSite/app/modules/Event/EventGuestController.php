@@ -13,6 +13,7 @@ use app\helpers\WebApp;
 use app\models\EventDataHelper;
 use app\modules\Common\AbstractController;
 use app\modules\Common\services\EmailService;
+use app\valueObjects\EmailMessage;
 
 class EventGuestController extends AbstractController
 {
@@ -132,9 +133,19 @@ class EventGuestController extends AbstractController
                 $body .= "Pour confirmer votre participation, cliquez sur le lien suivant :\n";
                 $body .= $invitationLink . "\n\n";
                 $body .= "Cordialement,\nL'équipe BNW Dijon";
-                $emailFrom = $this->application->getConnectedUser()->person->Email;
-                $this->emailService->send($emailFrom, $email, $subject, $body);
-                $this->guest('Invitation envoyée avec succès à ' . $email, 'success');
+
+                $emailMessage = new EmailMessage(
+                    from: $this->application->getConnectedUser()->person->Email,
+                    to: $email,
+                    subject: $subject,
+                    body: $body,
+                    isHtml: false
+                );
+                if ($this->emailService->send($emailMessage)) {
+                    $this->guest("Invitation envoyée avec succès à {$email}", 'success');
+                } else {
+                    $this->guest("Erreur lors de l'envoi de l'invitation à {$email}", 'error');
+                }
             } catch (Throwable $e) {
                 $this->guest('Erreur lors de l\'envoi de l\'invitation. ' . $e->getMessage(), 'error');
             }

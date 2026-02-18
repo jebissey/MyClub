@@ -4,147 +4,122 @@ declare(strict_types=1);
 
 namespace app\modules\Common\services;
 
-use InvalidArgumentException;
 use PHPMailer\PHPMailer\PHPMailer;
-use Throwable;
+use PHPMailer\PHPMailer\Exception as PHPMailerException;
 
+use app\interfaces\SmtpConfigProviderInterface;
+use app\valueObjects\EmailMessage;
+use app\valueObjects\SmtpConfig;
 use app\exceptions\EmailException;
-use app\models\DataHelper;
 
-class EmailService
+final class EmailService
 {
-    public function __construct(private DataHelper $dataHelper) {}
+    public function __construct(
+        private readonly ?SmtpConfigProviderInterface $configProvider = null
+    ) {}
 
-    public function send(
-        string $emailFrom,
-        string $emailTo,
-        string $subject,
-        string $body,
-        $cc = null,
-        $bcc = null,
-        bool $isHtml = false
-    ): bool {
-        if (!filter_var($emailFrom, FILTER_VALIDATE_EMAIL)) {
-            throw new InvalidArgumentException("Invalid from email: $emailFrom");
-        }
-        if (!filter_var($emailTo, FILTER_VALIDATE_EMAIL)) {
-            throw new InvalidArgumentException("Invalid to email: $emailTo");
-        }
-        $metadata = $this->dataHelper->get('Metadata', ['Id' => 1], 'SendEmailAddress, SendEmailPassword, SendEmailHost');
-        $smtpUser = $metadata->SendEmailAddress ?? null;
-        $smtpPass = $metadata->SendEmailPassword ?? null;
-        $smtpHost = $metadata->SendEmailHost ?? null;
-
-        if ($smtpUser && $smtpPass  && $smtpHost) {
-            return $this->sendWithPHPMailer($emailTo, $subject, $body, $cc, $bcc, $isHtml, $smtpUser, $smtpPass, $smtpHost);
-        }
-        return $this->sendWithNativeMail($emailFrom, $emailTo, $subject, $body, $cc, $bcc, $isHtml);
-    }
-
-    public function sendContactEmail($adminEmail, $name, $email, $message): bool
+    public function send(EmailMessage $message): bool
     {
-        $subject = 'Nouveau message de contact - ' . $name;
-        $body = "Nouveau message de contact reçu :\n\n";
-        $body .= "Nom & Prénom : " . $name . "\n";
-        $body .= "Email : " . $email . "\n";
-        $body .= "Message :\n" . $message . "\n\n";
-        $body .= "---\n";
-        $body .= "Envoyé le : " . date('d/m/Y à H:i') . "\n";
-        $body .= "IP : " . ($_SERVER['REMOTE_ADDR'] ?? 'Inconnue');
+        $config = $this->configProvider?->get();
 
-        return $this->send($email, $adminEmail, $subject, $body);
+        if ($config !== null) {
+            return $this->sendWithPHPMailer($message, $config);
+        }
+
+        return $this->sendWithNativeMail($message);
     }
 
-    #region Private functions
-    private function sendWithNativeMail(
-        string $emailFrom,
-        string $emailTo,
-        string $subject,
-        string $body,
-        $cc = null,
-        $bcc = null,
-        bool $isHtml = false
-    ): bool {
+    #Private functions
+    private function sendWithNativeMail(EmailMessage $message): bool
+    {
         $headers = [
-            'From' => $emailFrom,
-            'Reply-To' => $emailFrom,
-            'Return-Path' => $emailFrom,
+            'From' => $message->from,
+            'Reply-To' => $message->replyTo ?? $message->from,
             'X-Mailer' => 'PHP/' . phpversion(),
-            'Content-Type' => $isHtml ? 'text/html; charset=UTF-8' : 'text/plain; charset=UTF-8'
+            'Content-Type' => $message->isHtml
+                ? 'text/html; charset=UTF-8'
+                : 'text/plain; charset=UTF-8'
         ];
-        if ($cc) {
-            $ccList = is_array($cc) ? $cc : explode(',', $cc);
-            $ccList = array_filter(array_map('trim', $ccList), fn($email) => filter_var($email, FILTER_VALIDATE_EMAIL));
-            if ($ccList) $headers['Cc'] = implode(', ', $ccList);
+
+        if ($message->cc !== []) {
+            $headers['Cc'] = implode(', ', $message->cc);
         }
-        if ($bcc) {
-            $bccList = is_array($bcc) ? $bcc : explode(',', $bcc);
-            $bccList = array_filter(array_map('trim', $bccList), fn($email) => filter_var($email, FILTER_VALIDATE_EMAIL));
-            if ($bccList) $headers['Bcc'] = implode(', ', $bccList);
+
+        if ($message->bcc !== []) {
+            $headers['Bcc'] = implode(', ', $message->bcc);
         }
+
         $headerString = '';
+
         foreach ($headers as $key => $value) {
-            $headerString .= $key . ': ' . $value . "\r\n";
+            $headerString .= "{$key}: {$value}\r\n";
         }
-        return mail($emailTo, $subject, $body, $headerString);
+
+        return mail(
+            $message->to,
+            $message->subject,
+            $message->body,
+            $headerString
+        );
     }
 
     private function sendWithPHPMailer(
-        string $emailTo,
-        string $subject,
-        string $body,
-        $cc,
-        $bcc,
-        bool $isHtml,
-        string $smtpUser,
-        string $smtpPass,
-        string $smtpHost
+        EmailMessage $message,
+        SmtpConfig $config
     ): bool {
+
         $mail = new PHPMailer(true);
+
         try {
             $mail->isSMTP();
-            $mail->Host       = $smtpHost;
+            $mail->Host       = $config->host;
             $mail->SMTPAuth   = true;
-            $mail->Username   = $smtpUser;
-            $mail->Password   = $smtpPass;
-            $mail->AuthType   = 'LOGIN';
-            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-            $mail->Port       = 587;
-            $mail->CharSet = 'UTF-8';
-            $mail->Encoding = 'base64';
-            $mail->setFrom($smtpUser, 'No Reply');
-            $mail->addAddress($emailTo);
+            $mail->Username   = $config->username;
+            $mail->Password   = $config->password;
+            $mail->Port       = $config->port;
+            $mail->Timeout    = 10;
+            $mail->CharSet    = 'UTF-8';
 
-            //$mail->SMTPDebug  = 2;
-            //$mail->Debugoutput = 'error_log';
+            match ($config->encryption) {
+                'tls' => $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS,
+                'ssl' => $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS,
+                default => null,
+            };
 
-            if ($cc) {
-                $ccList = is_array($cc) ? $cc : explode(',', $cc);
-                foreach ($ccList as $email) {
-                    $email = trim($email);
-                    if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                        $mail->addCC($email);
-                    }
-                }
+            // 🔐 IMPORTANT : always use authenticated sender
+            $mail->setFrom(
+                $config->username,
+                'MyClub'
+            );
+
+            $mail->addAddress($message->to);
+
+            // Reply-To (utilisateur par ex)
+            if ($message->replyTo !== null) {
+                $mail->addReplyTo($message->replyTo);
             }
-            if ($bcc) {
-                $bccList = is_array($bcc) ? $bcc : explode(',', $bcc);
-                foreach ($bccList as $email) {
-                    $email = trim($email);
-                    if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                        $mail->addBCC($email);
-                    }
-                }
+
+            foreach ($message->cc as $email) {
+                $mail->addCC($email);
             }
-            $mail->isHTML($isHtml);
-            $mail->Subject = $subject;
-            $mail->Body    = $body;
-            $mail->AltBody = strip_tags($body);
+
+            foreach ($message->bcc as $email) {
+                $mail->addBCC($email);
+            }
+
+            $mail->isHTML($message->isHtml);
+            $mail->Subject = $message->subject;
+            $mail->Body    = $message->body;
+            $mail->AltBody = strip_tags($message->body);
 
             $mail->send();
+
             return true;
-        } catch (Throwable $e) {
-            throw new EmailException('PHPMailer error: ' . $mail->ErrorInfo, previous: $e);
+        } catch (PHPMailerException $e) {
+            throw new EmailException(
+                'Email sending failed: ' . $mail->ErrorInfo,
+                previous: $e
+            );
         }
     }
 }

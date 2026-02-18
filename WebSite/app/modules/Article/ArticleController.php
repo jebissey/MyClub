@@ -23,6 +23,7 @@ use app\modules\Article\services\ArticleAuthorizationService;
 use app\modules\Common\TableController;
 use app\modules\Common\services\AuthenticationService;
 use app\modules\Common\services\EmailService;
+use app\valueObjects\EmailMessage;
 
 class ArticleController extends TableController
 {
@@ -209,16 +210,21 @@ class ArticleController extends TableController
             $articleLink . "\n\n" .
             $unsubscribe . "\n" .
             $unsubscribeLink;
-        $this->emailService->send(
-            $articleCreatorEmail,
-            $articleCreatorEmail,
-            $title,
-            $message,
-            null,
-            $filteredEmails,
-            false
+
+        $emailMessage = new EmailMessage(
+            from: $articleCreatorEmail,
+            to: $articleCreatorEmail,
+            subject: $title,
+            body: $message,
+            isHtml: false,
+            cc: $filteredEmails
         );
-        $_SESSION['success'] = $this->languagesDataHelper->translate('article.success.email_sent');
+        if ($this->emailService->send($emailMessage)) {
+            $_SESSION['success'] = $this->languagesDataHelper->translate('article.success.email_sent');
+        } else {
+            $_SESSION['error'] = $this->languagesDataHelper->translate('article.error.email_failed');
+        }
+
         $this->redirect('/article/' . $idArticle);
     }
 

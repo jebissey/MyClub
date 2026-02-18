@@ -24,6 +24,7 @@ use app\models\PersonDataHelper;
 use app\modules\Common\services\EmailService;
 use app\helpers\PersonPreferences;
 use app\valueObjects\ApiResponse;
+use app\valueObjects\EmailMessage;
 
 class EventApi extends AbstractApi
 {
@@ -193,15 +194,16 @@ class EventApi extends AbstractApi
                 "Pour ne plus recevoir ce type de message vous pouvez mettre à jour vos préférences<br>" .
                 '<a href="' . htmlspecialchars($unsubscribeLink, ENT_QUOTES, 'UTF-8') . '">Se désinscrire</a>';
             try {
-                $result = $this->emailService->send(
-                    $eventCreatorEmail,
-                    $eventCreatorEmail,
-                    $title,
-                    $htmlBody,
-                    $ccList,
-                    null,
-                    false
+                $emailMessage = new EmailMessage(
+                    from: $eventCreatorEmail,
+                    to: $eventCreatorEmail,
+                    subject: $title,
+                    body: $htmlBody,
+                    isHtml: true,
+                    cc: $ccList
                 );
+                $result = $this->emailService->send($emailMessage);
+
                 return new ApiResponse($result, $result ? ApplicationError::Ok->value : ApplicationError::Error->value);
             } catch (EmailException $e) {
                 return new ApiResponse(false, ApplicationError::BadRequest->value, [], "Error {$e->getCode()} in {$e->getFile()} at {$e->getLine()}: {$e->getMessage()}");

@@ -108,9 +108,11 @@ use app\models\SharedFileDataHelper;
 use app\models\SurveyDataHelper;
 use app\models\TableControllerDataHelper;
 use app\modules\Common\services\AuthenticationService;
+use app\modules\Common\services\DatabaseSmtpConfigProvider;
 use app\modules\Common\services\EmailService;
 use app\modules\Common\services\EventService;
 use app\modules\Common\services\MessageRecipientService;
+use app\valueObjects\SmtpConfig;
 
 class Routes
 {
@@ -120,12 +122,14 @@ class Routes
 
     public function __construct(private Application $application, private Engine $flight)
     {
+        $dataHelper = new DataHelper($application);
+        $smtpProvider = new DatabaseSmtpConfigProvider($dataHelper);
+
         $authorizationDataHelper = new AuthorizationDataHelper($application);
         $articleDataHelper = new ArticleDataHelper($application, $authorizationDataHelper);
         $crosstabDataHelper = new CrosstabDataHelper($application, $authorizationDataHelper);
-        $dataHelper = new DataHelper($application);
         $designDataHelper = new DesignDataHelper($application);
-        $emailService = new EmailService($dataHelper);
+        $emailService = new EmailService($smtpProvider);
         $eventDataHelper = new EventDataHelper($application);
         $groupDataHelper = new GroupDataHelper($application);
         $logDataHelper = new LogDataHelper($application);

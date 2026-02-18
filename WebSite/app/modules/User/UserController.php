@@ -29,8 +29,8 @@ class UserController extends AbstractController
         $email = urldecode($encodedEmail);
         try {
             $success = $this->authService->handleForgotPassword($email);
-        } catch (EmailException) {
-            $this->flight->setData('message', "Bad email {$email}");
+        } catch (EmailException $e) {
+            $this->flight->setData('message', "Error {$e->getMessage()} with email {$email}");
             $this->flight->setData('code', ApplicationError::BadRequest->value);
             $content = $this->languagesDataHelper->translate('message_email_unknown');
             $this->render('Common/views/info.latte', [

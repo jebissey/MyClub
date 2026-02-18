@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\modules\Common\services;
 
 use DateTime;
+use Throwable;
 
 use app\enums\FilterInputRule;
 use app\exceptions\EmailException;
@@ -14,7 +15,7 @@ use app\helpers\WebApp;
 use app\models\AuthResult;
 use app\models\DataHelper;
 use app\modules\Common\services\EmailService;
-use Throwable;
+use app\valueObjects\EmailMessage;
 
 class AuthenticationService
 {
@@ -37,14 +38,21 @@ class AuthenticationService
         $resetLink = Application::$root . '/user/setPassword/' . $token;
         $subject = "Initialisation du mot de passe";
         $message = "Cliquez sur ce lien pour initialiser votre mot de passe : $resetLink";
-        
+
         $host = parse_url(Application::$root, PHP_URL_HOST);
         if ($host === 'localhost' || $host === null) {
             $host = 'myclub.foo';
         }
         $fromEmail = 'no-reply@' . $host;
 
-        return $this->emailService->send($fromEmail, $email, $subject, $message);
+        $emailMessage = new EmailMessage(
+            from: $fromEmail,
+            to: $email,
+            subject: $subject,
+            body: $message,
+            isHtml: false
+        );
+        return $this->emailService->send($emailMessage);
     }
 
     public function handleRememberMeLogin(): ?AuthResult
