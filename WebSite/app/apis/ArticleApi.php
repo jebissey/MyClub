@@ -96,7 +96,7 @@ class ArticleApi extends AbstractApi
             $this->renderJsonBadRequest('Missing data', __FILE__, __LINE__);
             return;
         }
-        $this->replyDataHelper->insertOrUpdate($person->Id, $surveyId, isset($data['survey_answers']) ? json_encode($data['survey_answers']) : '[]');
+        $this->replyDataHelper->insertOrUpdate($person->Id, (int)$surveyId, isset($data['survey_answers']) ? json_encode($data['survey_answers']) : '[]');
         $this->renderJsonOk();
     }
 

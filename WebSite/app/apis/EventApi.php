@@ -8,7 +8,7 @@ use DateTime;
 use Throwable;
 
 use app\enums\ApplicationError;
-use app\enums\Period;
+use app\enums\DuplicationEventMode;
 use app\exceptions\EmailException;
 use app\exceptions\QueryException;
 use app\helpers\Application;
@@ -81,12 +81,12 @@ class EventApi extends AbstractApi
             return;
         }
         try {
-            [$success, $response, $statusCode] = $this->eventService->duplicateEvent(
+            $apiResponse = $this->eventService->duplicateEvent(
                 $id,
                 $this->application->getConnectedUser()->person->Id,
-                WebApp::getFiltered('mode', $this->application->enumToValues(Period::class), $_GET) ?: Period::Today->value
+                WebApp::getFiltered('mode', array_column(DuplicationEventMode::cases(), 'value'), $_GET) ?: DuplicationEventMode::Today->value
             );
-            $this->renderJson($response, $success, $statusCode);
+            $this->renderJson($apiResponse->data, $apiResponse->success, $apiResponse->responseCode);
         } catch (Throwable $e) {
             $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
         }
@@ -111,7 +111,7 @@ class EventApi extends AbstractApi
                 'event' => $this->eventDataHelper->getEvent($id),
                 'attributes' => $this->eventDataHelper->getEventAttributes($id),
             ]);
-            $this->renderJson($apiResponse->data, $apiResponse->success, $apiResponse->responseCode);
+            $this->renderJson($apiResponse->data, $apiResponse->success, $apiResponse->responseCode, $apiResponse->message ?? '');
         } catch (Throwable $e) {
             $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
         }

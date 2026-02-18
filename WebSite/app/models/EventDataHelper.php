@@ -61,11 +61,12 @@ class EventDataHelper extends Data implements NewsProviderInterface
         try {
             $this->pdo->beginTransaction();
 
-            $event = $this->fluent->from('Event')->where('Id', $id)->fetch();
+            $event = $this->get('Event', ['Id' => $id]);
             if (!$event) {
                 $this->pdo->rollBack();
-                new ApiResponse(false, ApplicationError::BadRequest->value, [], 'Unknown event');
+                return new ApiResponse(false, ApplicationError::BadRequest->value, [], 'Unknown event');
             }
+
             $newStartTime = $this->calculateNewStartTime($event->StartTime, $mode);
             $newEvent = [
                 'Summary' => $event->Summary,
@@ -78,13 +79,13 @@ class EventDataHelper extends Data implements NewsProviderInterface
                 'MaxParticipants' => $event->MaxParticipants,
                 'Audience' => $event->Audience
             ];
-            $newEventId = $this->fluent->insertInto('Event')->values($newEvent)->execute();
-            $attributes = $this->fluent->from('EventAttribute')->where('IdEvent', $id)->fetchAll(PDO::FETCH_OBJ);
+            $newEventId = $this->set('Event', $newEvent);
+            $attributes = $this->gets('EventAttribute', ['IdEvent' => $id]);
             foreach ($attributes as $attr) {
-                $this->fluent->insertInto('EventAttribute')->values([
+                $this->set('EventAttribute', [
                     'IdEvent' => $newEventId,
                     'IdAttribute' => $attr->IdAttribute,
-                ])->execute();
+                ]);
             }
             $this->pdo->commit();
             return new ApiResponse(true, ApplicationError::Ok->value, ['newEventId' => $newEventId]);

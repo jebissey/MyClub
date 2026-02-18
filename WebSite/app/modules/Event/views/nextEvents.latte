@@ -334,24 +334,30 @@
     <div class="modal fade" id="duplicateModal" tabindex="-1" aria-labelledby="duplicateModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="duplicateModalLabel">Que souhaitez-vous faire ?</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
-            </div>
-            <div class="modal-body">
-                <div class="form-check">
-                <input class="form-check-input" type="radio" name="duplicateChoice" value="1" id="choiceToday">
-                <label class="form-check-label" for="choiceToday">Dupliquer aujourd'hui à 23:59</label>
+                <div class="modal-header">
+                    <h5 class="modal-title" id="duplicateModalLabel">Que souhaitez-vous faire ?</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
                 </div>
-                <div class="form-check">
-                <input class="form-check-input" type="radio" name="duplicateChoice" value="2" id="choiceWeek">
-                <label class="form-check-label" for="choiceWeek">Dupliquer même jour/heure la semaine prochaine</label>
+                <div class="modal-body">
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="duplicateChoice"
+                            value="{$duplicateModeToday}" id="choice-today">
+                        <label class="form-check-label" for="choice-today">
+                            Dupliquer aujourd'hui à 23:59
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="duplicateChoice"
+                            value="{$duplicateModeNextWeek}" id="choice-next-week">
+                        <label class="form-check-label" for="choice-next-week">
+                            Dupliquer même jour/heure la semaine prochaine
+                        </label>
+                    </div>
                 </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                <button type="button" class="btn btn-primary" id="confirmDuplicate">Confirmer</button>
-            </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="button" class="btn btn-primary" id="confirmDuplicate">Confirmer</button>
+                </div>
             </div>
         </div>
     </div>

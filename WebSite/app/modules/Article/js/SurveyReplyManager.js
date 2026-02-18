@@ -17,12 +17,12 @@ export default class SurveyReplyManager {
 
     async handleReplyClick() {
         try {
-            const data = await this.api.get(`/api/survey/reply/${this.articleId}`);
+            const response = await this.api.get(`/api/survey/reply/${this.articleId}`);
 
-            if (data.success) {
-                this.showSurveyModal(data.survey);
+            if (response.success) {
+                this.showSurveyModal(response.data.survey);
             } else {
-                this.showAlert('Erreur : ' + data.message, 'danger');
+                this.showAlert('Erreur : ' + response.message, 'danger');
             }
         } catch (error) {
             this.showAlert('Erreur lors du chargement du sondage : ' + error.message, 'danger');

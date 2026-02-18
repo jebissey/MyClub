@@ -8,6 +8,7 @@ use DateTime;
 use Throwable;
 
 use app\enums\ApplicationError;
+use app\enums\DuplicationEventMode;
 use app\enums\EventAudience;
 use app\enums\EventSearchMode;
 use app\enums\FilterInputRule;
@@ -59,6 +60,8 @@ class EventController extends AbstractController
             'filterByPreferences' => $filterByPreferences,
             'layout' => $this->getLayout(),
             'page' => $connectedUser->getPage(),
+            'duplicateModeToday' => DuplicationEventMode::Today->value,
+            'duplicateModeNextWeek' => DuplicationEventMode::NextWeek->value,
         ]));
     }
 

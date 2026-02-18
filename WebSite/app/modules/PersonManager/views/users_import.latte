@@ -7,14 +7,14 @@
         {if $results}
             <div class="container-fluid">
                 {if $results['errors'] > 0}
-                    <div class="alert alert-danger alert-dismissible">{$error}</div>
+                    <div class="alert alert-danger alert-dismissible">
                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         <div class="alert alert-warning">
                             <h4>Résultat de l'import :</h4>
                             <ul>
                                 <li>Nouveaux enregistrements : {$results['created']}</li>
                                 <li>Enregistrements mis à jour : {$results['updated']}</li>
-                                <li>Enregistrements inactivé : {$results['inactivated']}</li>
+                                <li>Enregistrements inactivé : {$results['deactivated']}</li>
                                 <li>Erreurs : {$results['errors']}</li>
                             </ul>
                             <h4>Détail des erreurs :</h4>
@@ -86,7 +86,7 @@
 
                 <div class="mb-3 d-flex align-items-end">
                     <label for="phoneColumn" class="form-label me-2">Téléphone</label>
-                    <select class="form-control w-auto" id="phoneColumn" name="phoneColumn" required>
+                    <select class="form-control w-auto" id="phoneColumn" name="phoneColumn">
                         <option value="">Sélectionnez une colonne</option>
                     </select>
                 </div>

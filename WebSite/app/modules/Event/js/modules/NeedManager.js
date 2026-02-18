@@ -28,15 +28,15 @@ export default class NeedManager {
 
         const loadNeedsByNeedType = async needTypeId => {
             this.availableNeedsSelect.innerHTML = `<option value="">Chargement...</option>`;
-            const data = await this.api.get(`/api/needs-by-need-type/${needTypeId}`);
+            const response = await this.api.get(`/api/needs-by-need-type/${needTypeId}`);
 
             this.availableNeedsSelect.innerHTML = '';
-            if (!data.success || !data.needs || data.needs.length === 0) {
+            if (!response.success || !response.data.needs || response.data.needs.length === 0) {
                 this.availableNeedsSelect.innerHTML = `<option value="">Aucun besoin disponible</option>`;
                 return;
             }
 
-            data.needs.forEach(need => {
+            response.data.needs.forEach(need => {
                 const option = document.createElement('option');
                 option.value = need.Id;
                 option.textContent = need.Name;

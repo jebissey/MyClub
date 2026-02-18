@@ -308,7 +308,7 @@ class PersonDataHelper extends Data implements NewsProviderInterface
                 $email = filter_var($data[$mapping['email']] ?? '', FILTER_VALIDATE_EMAIL);
                 if ($email === false) {
                     $results['errors']++;
-                    $results['messages'][] = "Ligne $currentRow : adresse email invalide.";
+                    $results['messages'][] = "Ligne $currentRow : adresse email invalide {$data[$mapping['email']]}.";
                     continue;
                 }
                 $personData = [
@@ -364,7 +364,6 @@ class PersonDataHelper extends Data implements NewsProviderInterface
         } finally {
             fclose($file);
         }
-
         return $results;
     }
 
