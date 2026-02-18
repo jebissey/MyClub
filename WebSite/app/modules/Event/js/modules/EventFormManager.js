@@ -40,7 +40,6 @@ export default class EventFormManager {
         new bootstrap.Modal(this.modal).show();
     }
 
-
     async openUpdateModal(event, attributes) {
         document.getElementById('eventModalLabel').textContent = 'Mettre à jour l\'événement';
         document.getElementById('submitEventBtn').textContent = 'Mettre à jour';

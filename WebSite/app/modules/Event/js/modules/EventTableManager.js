@@ -191,12 +191,12 @@ export default class EventTableManager {
         const freshBtn = confirmBtn.cloneNode(true);
         confirmBtn.replaceWith(freshBtn);
 
-        freshBtn.addEventListener('click', async () => {
+        const onConfirm = async () => {
             const choice = modalEl.querySelector("input[name='duplicateChoice']:checked");
 
             if (!choice) {
                 this.showError('Please select an option.');
-                return;
+                return; // Listener stays active — user can try again
             }
 
             const mode = choice.value;
@@ -206,6 +206,7 @@ export default class EventTableManager {
                 const result = await this.api.post(`/api/event/duplicate/${eventId}?mode=${mode}`, {});
 
                 if (result.success) {
+                    freshBtn.removeEventListener('click', onConfirm); // Clean up only on success
                     duplicateModal.hide();
                     this.onDuplicateSuccess();
                 } else {
@@ -217,6 +218,13 @@ export default class EventTableManager {
             } finally {
                 freshBtn.disabled = false;
             }
+        };
+
+        freshBtn.addEventListener('click', onConfirm);
+
+        // Clean up if the modal is closed without confirming
+        modalEl.addEventListener('hidden.bs.modal', () => {
+            freshBtn.removeEventListener('click', onConfirm);
         }, { once: true });
     }
 }

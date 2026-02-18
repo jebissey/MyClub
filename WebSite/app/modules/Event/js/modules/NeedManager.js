@@ -132,14 +132,14 @@ export default class NeedManager {
     }
 
     async loadForEvent(eventId) {
-        const data = await this.api.get(`/api/event/needs/${eventId}`);
+        const response = await this.api.get(`/api/event/needs/${eventId}`);
 
         this.needsList.innerHTML = '';
         this.selectedNeeds = [];
 
-        if (!data.success || !data.needs) return;
+        if (!response.success || !response.data?.needs) return;
 
-        data.needs.forEach(need => {
+        response.data.needs.forEach(need => {
             const element = this._createNeedElement(
                 String(need.IdNeed),
                 need.Label,
