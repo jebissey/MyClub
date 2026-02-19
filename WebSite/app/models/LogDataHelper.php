@@ -8,6 +8,7 @@ use PDO;
 
 use app\helpers\Application;
 use app\helpers\MyClubDateTime;
+use app\helpers\PeriodHelper;
 
 class LogDataHelper extends Data
 {
@@ -141,16 +142,23 @@ class LogDataHelper extends Data
         return $stmt->fetchAll(PDO::FETCH_OBJ);
     }
 
-    public function getTopPages($dateCondition, $top)
+    public function getTopPages(string $period, int $top): array
     {
-        $query = $this->fluentForLog
-            ->from('Log')
-            ->select('Uri, COUNT(*) AS visits')
-            ->where($dateCondition)
-            ->groupBy('Uri')
-            ->orderBy('visits DESC')
-            ->limit($top);
-        return $query->fetchAll(PDO::FETCH_OBJ);
+        $dateCondition = PeriodHelper::getDateConditions($period);
+
+        $sql = "
+            SELECT Uri, COUNT(*) AS visits
+            FROM Log
+            WHERE $dateCondition
+            GROUP BY Uri
+            ORDER BY visits DESC
+            LIMIT :limit
+        ";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->bindValue(':limit', $top, PDO::PARAM_INT);
+        $stmt->execute();
+
+        return $stmt->fetchAll(PDO::FETCH_OBJ);
     }
 
     public function getVisits($season)
@@ -199,50 +207,50 @@ class LogDataHelper extends Data
     public function getInstallationsData()
     {
         $query = "
-SELECT
-    IpAddress,
-    COALESCE(
-        (SELECT 
-            CASE
-                WHEN INSTR(Uri,'url=') > 0 THEN
+            SELECT
+                IpAddress,
+                COALESCE(
+                    (SELECT 
+                        CASE
+                            WHEN INSTR(Uri,'url=') > 0 THEN
+                                CASE
+                                    WHEN INSTR(SUBSTR(Uri, INSTR(Uri,'url=')+4),'&') > 0 THEN
+                                        SUBSTR(
+                                            SUBSTR(Uri, INSTR(Uri,'url=')+4),
+                                            1,
+                                            INSTR(SUBSTR(Uri, INSTR(Uri,'url=')+4),'&')-1
+                                        )
+                                    ELSE SUBSTR(Uri, INSTR(Uri,'url=')+4)
+                                END
+                        END
+                     FROM Log l2 
+                     WHERE l2.IpAddress = Log.IpAddress 
+                       AND l2.Uri LIKE '/api/lastVersion%'
+                       AND INSTR(l2.Uri,'url=') > 0
+                     LIMIT 1),
+                    IpAddress
+                ) as Host,
+                MAX(CreatedAt) as lastCheck,
+                COUNT(*) as checkCount,
+                GROUP_CONCAT(DISTINCT
                     CASE
-                        WHEN INSTR(SUBSTR(Uri, INSTR(Uri,'url=')+4),'&') > 0 THEN
-                            SUBSTR(
-                                SUBSTR(Uri, INSTR(Uri,'url=')+4),
-                                1,
-                                INSTR(SUBSTR(Uri, INSTR(Uri,'url=')+4),'&')-1
-                            )
-                        ELSE SUBSTR(Uri, INSTR(Uri,'url=')+4)
+                        WHEN INSTR(Uri,'cv=') > 0 THEN
+                            CASE
+                                WHEN INSTR(SUBSTR(Uri, INSTR(Uri,'cv=')+3),'&') > 0 THEN
+                                    SUBSTR(
+                                        SUBSTR(Uri, INSTR(Uri,'cv=')+3),
+                                        1,
+                                        INSTR(SUBSTR(Uri, INSTR(Uri,'cv=')+3),'&')-1
+                                    )
+                                ELSE SUBSTR(Uri, INSTR(Uri,'cv=')+3)
+                            END
                     END
-            END
-         FROM Log l2 
-         WHERE l2.IpAddress = Log.IpAddress 
-           AND l2.Uri LIKE '/api/lastVersion%'
-           AND INSTR(l2.Uri,'url=') > 0
-         LIMIT 1),
-        IpAddress
-    ) as Host,
-    MAX(CreatedAt) as lastCheck,
-    COUNT(*) as checkCount,
-    GROUP_CONCAT(DISTINCT
-        CASE
-            WHEN INSTR(Uri,'cv=') > 0 THEN
-                CASE
-                    WHEN INSTR(SUBSTR(Uri, INSTR(Uri,'cv=')+3),'&') > 0 THEN
-                        SUBSTR(
-                            SUBSTR(Uri, INSTR(Uri,'cv=')+3),
-                            1,
-                            INSTR(SUBSTR(Uri, INSTR(Uri,'cv=')+3),'&')-1
-                        )
-                    ELSE SUBSTR(Uri, INSTR(Uri,'cv=')+3)
-                END
-        END
-    ) as webappVersions,
-    GROUP_CONCAT(DISTINCT Message) as phpVersions
-FROM Log 
-WHERE Uri LIKE '/api/lastVersion%'
-GROUP BY IpAddress
-ORDER BY MAX(CreatedAt) DESC
+                ) as webappVersions,
+                GROUP_CONCAT(DISTINCT Message) as phpVersions
+            FROM Log 
+            WHERE Uri LIKE '/api/lastVersion%'
+            GROUP BY IpAddress
+            ORDER BY MAX(CreatedAt) DESC
         ";
         $results = $this->pdoForLog->query($query)->fetchAll(PDO::FETCH_OBJ);
 

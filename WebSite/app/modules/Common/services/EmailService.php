@@ -85,19 +85,9 @@ final class EmailService
                 'ssl' => $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS,
                 default => null,
             };
-
-            // 🔐 IMPORTANT : always use authenticated sender
-            $mail->setFrom(
-                $config->username,
-                'MyClub'
-            );
-
+            $mail->setFrom($config->username, 'MyClub');
+            $mail->addReplyTo($config->username);
             $mail->addAddress($message->to);
-
-            // Reply-To (utilisateur par ex)
-            if ($message->replyTo !== null) {
-                $mail->addReplyTo($message->replyTo);
-            }
 
             foreach ($message->cc as $email) {
                 $mail->addCC($email);

@@ -143,13 +143,11 @@ class VisitorInsightsController extends AbstractController
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isVisitorInsights())) {
             $period =  WebApp::getFiltered('period', $this->application->enumToValues(Period::class), $this->flight->request()->query->getData()) ?: Period::Week->value;
-            $dateCondition = PeriodHelper::getDateConditions($period);
-            $topPages = $this->logDataHelper->getTopPages($dateCondition, self::TOP);
 
             $this->render('VisitorInsights/views/topPages.latte', $this->getAllParams([
                 'title' => 'Top des pages visitées',
                 'period' => $period,
-                'topPages' => $topPages,
+                'topPages' => $this->logDataHelper->getTopPages($period, self::TOP),
                 'page' => $this->application->getConnectedUser()->getPage()
             ]));
         }

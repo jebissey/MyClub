@@ -16,6 +16,7 @@ use app\helpers\PersonPreferences;
 use app\helpers\WebApp;
 use app\interfaces\NewsProviderInterface;
 use app\modules\Common\services\EmailService;
+use app\valueObjects\EmailMessage;
 
 class PersonDataHelper extends Data implements NewsProviderInterface
 {
@@ -342,7 +343,7 @@ class PersonDataHelper extends Data implements NewsProviderInterface
 
             $idsToDeactivate = [];
             foreach ($existingPersons as $emailKey => $id) {
-                if (!isset($processedEmailKeys[$emailKey])) {
+                if (!isset($processedEmailKeys[$emailKey]) && $id !== 1) {
                     $idsToDeactivate[] = $id;
                 }
             }
@@ -394,7 +395,15 @@ class PersonDataHelper extends Data implements NewsProviderInterface
         $registrationLink = Webapp::getBaseUrl() . "event/{$event->Id}/{$contact->Token}";
         $subject = "Lien d'inscription pour " . $event->Summary;
         $body = $registrationLink;
-        return $this->emailService->send($adminEmail, $emailContact, $subject, $body);
+
+        $emailMessage = new EmailMessage(
+            from: $adminEmail,
+            to: $emailContact,
+            subject: $subject,
+            body: $body,
+            isHtml: false
+        );
+        return $this->emailService->send($emailMessage);
     }
 
     public function updateActivity(string $email): void
