@@ -21,7 +21,7 @@ class LogDataAnalyticsHelper extends Data
         foreach ($periods as $period) {
             $query = $this->pdoForLog->prepare("
                 SELECT 
-                    COUNT(DISTINCT Who) as uniqueVisitors,
+                    COUNT(DISTINCT Token) as uniqueVisitors,
                     COALESCE(SUM(Count), 0) as pageViews
                 FROM Log
                 WHERE CreatedAt BETWEEN :startDate AND :endDate

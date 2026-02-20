@@ -154,7 +154,7 @@ class LogDataHelper extends Data
             ORDER BY visits DESC
             LIMIT :limit
         ";
-        $stmt = $this->pdo->prepare($sql);
+        $stmt = $this->pdoForLog->prepare($sql);
         $stmt->bindValue(':limit', $top, PDO::PARAM_INT);
         $stmt->execute();
 
