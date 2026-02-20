@@ -180,7 +180,6 @@ class PersonController extends TableController
             'nickName' => FilterInputRule::PersonName->value,
             'email' => FilterInputRule::Email->value,
             'alert' => FilterInputRule::Content->value,
-            'status' => $this->application->enumToValues(PersonStatus::class),
         ];
         $filterValues = WebApp::filterInput($schema, $this->flight->request()->query->getData());
         $filterConfig = [
@@ -198,10 +197,10 @@ class PersonController extends TableController
             ['field' => 'Alert', 'label' => 'Alerte'],
         ];
 
-        $status = $filterValues['status'] ?? PersonStatus::Active->value;
+        $status = WebApp::getFiltered('status', $this->application->enumToValues(PersonStatus::class), $this->flight->request()->query->getData()) ?: PersonStatus::Active->value;
         $data = match ($status) {
-            PersonStatus::Active->value => $this->prepareTableData($this->tableControllerDataHelper->getActivePersonsQuery()),
-            PersonStatus::Desactivated->value => $this->prepareTableData($this->tableControllerDataHelper->getDesactivatedPersonsQuery()),
+            PersonStatus::Active->value => $this->prepareTableData($this->tableControllerDataHelper->getActivePersonsQuery(), $filterValues),
+            PersonStatus::Desactivated->value => $this->prepareTableData($this->tableControllerDataHelper->getDesactivatedPersonsQuery(), $filterValues),
 
             default => Application::unreachable("Unknown status {$status}", __FILE__, __LINE__)
         };
