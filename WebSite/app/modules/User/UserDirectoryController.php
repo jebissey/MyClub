@@ -41,7 +41,7 @@ class UserDirectoryController extends AbstractController
             $persons = $this->dataHelper->gets('Person', [
                 'InPresentationDirectory' => 1,
                 'Inactivated' => 0
-            ], 'Id, LastName, FirstName, NickName, UseGravatar, Avatar, Email, InPresentationDirectory', 'FirstName, LastName');
+            ], 'Id, LastName, FirstName, NickName, UseGravatar, Avatar, Email, InPresentationDirectory, Location', 'FirstName, LastName');
             $gravatarHandler = new GravatarHandler();
             foreach ($persons as $person_) {
                 $person_->UserImg = WebApp::getUserImg($person_, $gravatarHandler);
@@ -61,7 +61,7 @@ class UserDirectoryController extends AbstractController
                 'GroupId' => $selectedGroup
             ])),
             'userIsInGroup' => $this->personGroupDataHelper->isPersonInGroup($person->Id, $selectedGroup ?? 0),
-
+            'countOfLocatedMembers' => count($this->getLocationData($persons)),
         ]));
     }
 
@@ -85,6 +85,19 @@ class UserDirectoryController extends AbstractController
         foreach ($members as $member) {
             $member->UserImg = WebApp::getUserImg($member, $gravatarHandler);
         }
+        $locationData = $this->getLocationData($members);
+
+        $this->render('User/views/users_map.latte', $this->getAllParams([
+            'locationData' => $locationData,
+            'membersCount' => count($locationData),
+            'navItems' => $this->getNavItems($person),
+            'page' => $this->application->getConnectedUser()->getPage(),
+        ]));
+    }
+
+    #region Private functions
+    private function getLocationData(array $members): array
+    {
         $locationData = [];
         foreach ($members as $member) {
             if (!empty($member->Location) && preg_match('/^[-+]?([1-8]?\d(\.\d+)?|90(\.0+)?),\s*[-+]?(180(\.0+)?|((1[0-7]\d)|([1-9]?\d))(\.\d+)?)$/', $member->Location)) {
@@ -102,12 +115,6 @@ class UserDirectoryController extends AbstractController
                 ];
             }
         }
-
-        $this->render('User/views/users_map.latte', $this->getAllParams([
-            'locationData' => $locationData,
-            'membersCount' => count($locationData),
-            'navItems' => $this->getNavItems($person),
-            'page' => $this->application->getConnectedUser()->getPage(),
-        ]));
+        return $locationData;
     }
 }
