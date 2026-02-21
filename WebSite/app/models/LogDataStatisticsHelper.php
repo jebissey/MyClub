@@ -1,22 +1,34 @@
 <?php
+
 declare(strict_types=1);
 
 namespace app\models;
 
+use DateTime;
 use PDO;
+
+use app\helpers\MyClubDateTime;
+
 
 class LogDataStatisticsHelper extends Data
 {
-    public function getOsDistribution(): array
+    public function getOsDistribution(string $period, string $currentDate): array
     {
+        $date = new DateTime($currentDate);
+        [$startDate, $endDate] = MyClubDateTime::getPeriodStartEnd($period, $date);
+
         $sql = '
             SELECT Os, COUNT(*) AS count
             FROM Log
+            WHERE CreatedAt BETWEEN :startDate AND :endDate
             GROUP BY Os
             ORDER BY count DESC
         ';
         $stmt = $this->pdoForLog->prepare($sql);
-        $stmt->execute();
+        $stmt->execute([
+            ':startDate' => $startDate->format('Y-m-d H:i:s'),
+            ':endDate' => $endDate->format('Y-m-d H:i:s')
+        ]);
         $results = $stmt->fetchAll(PDO::FETCH_OBJ);
         $labels = [];
         $data = [];
@@ -27,32 +39,52 @@ class LogDataStatisticsHelper extends Data
         return ['labels' => $labels, 'data' => $data];
     }
 
-    public function getBrowserDistribution(): array
+    public function getBrowserDistribution(string $period, string $currentDate): array
     {
-        $query = $this->pdoForLog->query("
+        $date = new DateTime($currentDate);
+        [$startDate, $endDate] = MyClubDateTime::getPeriodStartEnd($period, $date);
+
+        $sql = "
             WITH RECURSIVE
             split(id, browser, word, rest, position) AS (
-                SELECT rowid, Browser, '', Browser || ' ', 1
+                SELECT 
+                    rowid,
+                    Browser,
+                    '',
+                    Browser || ' ',
+                    1
                 FROM Log
+                WHERE CreatedAt BETWEEN :startDate AND :endDate
+
                 UNION ALL
+
                 SELECT 
                     id,
                     browser,
-                    CASE WHEN word = '' THEN SUBSTR(rest, 0, INSTR(rest, ' '))
+                    CASE 
+                        WHEN word = '' 
+                            THEN SUBSTR(rest, 0, INSTR(rest, ' '))
                         ELSE word || ' ' || SUBSTR(rest, 0, INSTR(rest, ' '))
                     END,
                     LTRIM(SUBSTR(rest, INSTR(rest, ' '))),
                     position + 1
                 FROM split
-                WHERE rest != '' AND SUBSTR(rest, 0, INSTR(rest, ' ')) NOT GLOB '[0-9]*'
+                WHERE rest != ''
+                AND SUBSTR(rest, 0, INSTR(rest, ' ')) NOT GLOB '[0-9]*'
             )
+
             SELECT word AS Browser, COUNT(*) as count
             FROM split
-            WHERE rest = '' OR SUBSTR(rest, 0, INSTR(rest, ' ')) GLOB '[0-9]*'
+            WHERE rest = ''
+            OR SUBSTR(rest, 0, INSTR(rest, ' ')) GLOB '[0-9]*'
             GROUP BY word
-            ORDER BY count DESC
-        ");
-        $results = $query->fetchAll(PDO::FETCH_OBJ);
+            ORDER BY count DESC";
+        $stmt = $this->pdoForLog->prepare($sql);
+        $stmt->execute([
+            ':startDate' => $startDate->format('Y-m-d H:i:s'),
+            ':endDate' => $endDate->format('Y-m-d H:i:s')
+        ]);
+        $results = $stmt->fetchAll(PDO::FETCH_OBJ);
         $labels = [];
         $data = [];
         foreach ($results as $row) {
@@ -62,16 +94,23 @@ class LogDataStatisticsHelper extends Data
         return ['labels' => $labels, 'data' => $data];
     }
 
-    public function getScreenResolutionDistribution(): array
+    public function getScreenResolutionDistribution(string $period, string $currentDate): array
     {
+        $date = new DateTime($currentDate);
+        [$startDate, $endDate] = MyClubDateTime::getPeriodStartEnd($period, $date);
+
         $sql = '
             SELECT ScreenResolution, COUNT(*) AS count
             FROM Log
+            WHERE CreatedAt BETWEEN :startDate AND :endDate
             GROUP BY ScreenResolution
             ORDER BY count DESC
         ';
         $stmt = $this->pdoForLog->prepare($sql);
-        $stmt->execute();
+        $stmt->execute([
+            ':startDate' => $startDate->format('Y-m-d H:i:s'),
+            ':endDate' => $endDate->format('Y-m-d H:i:s')
+        ]);
         $results = $stmt->fetchAll(PDO::FETCH_OBJ);
 
         $typeGroups = [];
@@ -109,16 +148,23 @@ class LogDataStatisticsHelper extends Data
         return ['labels' => $labels, 'data' => $data];
     }
 
-    public function getTypeDistribution(): array
+    public function getTypeDistribution(string $period, string $currentDate): array
     {
+        $date = new DateTime($currentDate);
+        [$startDate, $endDate] = MyClubDateTime::getPeriodStartEnd($period, $date);
+
         $sql = '
             SELECT Type, COUNT(*) AS count
             FROM Log
+            WHERE CreatedAt BETWEEN :startDate AND :endDate
             GROUP BY Type
             ORDER BY count DESC
         ';
         $stmt = $this->pdoForLog->prepare($sql);
-        $stmt->execute();
+        $stmt->execute([
+            ':startDate' => $startDate->format('Y-m-d H:i:s'),
+            ':endDate' => $endDate->format('Y-m-d H:i:s')
+        ]);
         $results = $stmt->fetchAll(PDO::FETCH_OBJ);
         $labels = [];
         $data = [];
@@ -185,7 +231,7 @@ class LogDataStatisticsHelper extends Data
     private function getResolutionType(?string $resolution): string
     {
         if (!$resolution) return 'Inconnu';
-        [$width, $height] = explode('x', $resolution) + [0,0];
+        [$width, $height] = explode('x', $resolution) + [0, 0];
         $maxDimension = max((int)$width, (int)$height);
 
         return match (true) {

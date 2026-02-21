@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace app\models;
 
+use Envms\FluentPDO\Queries\Select;
 use PDO;
 
 use app\helpers\Application;
@@ -85,19 +86,12 @@ class LogDataHelper extends Data
         return $result;
     }
 
-    public function getVisitedPages(int $perPage, int $logPage, array $filtersInput): array
+    public function getVisitedPages(): Select
     {
-        $offset = max(0, ($logPage - 1) * $perPage);
-        [$whereSQL, $params] = $this->buildWhereClauseFromFilters($filtersInput);
-        $countStmt = $this->pdoForLog->prepare("SELECT COUNT(*) as total FROM Log $whereSQL");
-        $countStmt->execute($params);
-        $total = (int) $countStmt->fetchColumn();
-        $sql = "SELECT * FROM Log $whereSQL ORDER BY CreatedAt DESC LIMIT ? OFFSET ?";
-        $stmt = $this->pdoForLog->prepare($sql);
-        $params[] = (int) $perPage;
-        $params[] = (int) $offset;
-        $stmt->execute($params);
-        return [$stmt->fetchAll(), ceil($total / $perPage)];
+        return $this->fluentForLog->from('Log')
+            ->select(null)
+            ->select('CreatedAt, Type, Browser, Os, Uri, Who, Code, Message')
+            ->orderBy('CreatedAt DESC');
     }
 
     public function getPersons(array $filteredPersonEmails): array

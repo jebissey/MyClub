@@ -9,9 +9,15 @@
                 <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Tableau croisé dynamique">
                     <a class="nav-link {if $page == 'crossTab'}active{/if}" href="/crossTab"><h2>🧮</h2></a>
                 </li>
-                <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Visiteurs">
-                    <a class="nav-link {if $page == 'logs'}active{/if}" href="/logs"><h2>📊</h2></a>
+                <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Détails des visites">
+                    <a class="nav-link {if $page == 'logs'}active{/if}" href="/logs"><h2>📋</h2></a>
                 </li>
+                <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Visiteurs">
+                    <a class="nav-link {if $page == 'visitorsGraf'}active{/if}" href="/visitorsGraf"><h2>📊</h2></a>
+                </li>
+                <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Synthèse des visites">
+                    <a class="nav-link {if $page == 'analytics'}active{/if}" href="/analytics"><h2>🥧</h2></a>
+                </li>                                
                 <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Dernières visites">
                     <a class="nav-link {if $page == 'lastVisits'}active{/if}" href="/lastVisits"><h2>👁️</h2></a>
                 </li>

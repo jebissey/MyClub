@@ -14,9 +14,9 @@ use app\models\LogDataHelper;
 use app\models\LogDataAnalyticsHelper;
 use app\models\LogDataStatisticsHelper;
 use app\models\PersonDataHelper;
-use app\modules\Common\AbstractController;
+use app\modules\Common\TableController;
 
-class VisitorInsightsController extends AbstractController
+class VisitorInsightsController extends TableController
 {
     public function __construct(
         Application $application,
@@ -32,16 +32,50 @@ class VisitorInsightsController extends AbstractController
     public function index(): void
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isVisitorInsights())) {
-            $logPage = max(1, (int)($this->flight->request()->query['logPage'] ?? 1));
-            $perPage = 10;
-            [$logs, $totalPages] = $this->logDataHelper->getVisitedPages($perPage, $logPage, $this->flight->request()->query->getData());
+
+            $schema = [
+                'CreatedAt' => FilterInputRule::DateTime->value,
+                'Type' => FilterInputRule::Content->value,
+                'Browser' => FilterInputRule::String->value,
+                'Os' => FilterInputRule::String->value,
+                'Uri' => FilterInputRule::Uri->value,
+                'Who' => FilterInputRule::Email->value,
+                'Code' => FilterInputRule::Integer->value,
+                'Message' => FilterInputRule::Content->value,
+            ];
+            $filterValues = WebApp::filterInput($schema, $this->flight->request()->query->getData());
+            $filterConfig = [
+                ['name' => 'Type', 'label' => 'Type'],
+                ['name' => 'Browser', 'label' => 'Navigateur'],
+                ['name' => 'Os', 'label' => 'OS'],
+                ['name' => 'Uri', 'label' => 'Page visitée'],
+                ['name' => 'Who', 'label' => 'Visiteur (email)'],
+                ['name' => 'Code', 'label' => 'Code'],
+                ['name' => 'Message', 'label' => 'Message'],
+            ];
+            $columns = [
+                ['field' => 'CreatedAt', 'label' => 'Date'],
+                ['field' => 'Type', 'label' => 'Type'],
+                ['field' => 'Browser', 'label' => 'Navigateur'],
+                ['field' => 'Os', 'label' => 'OS'],
+                ['field' => 'Uri', 'label' => 'Page visitée'],
+                ['field' => 'Who', 'label' => 'Visiteur (email)'],
+                ['field' => 'Code', 'label' => 'Code'],
+                ['field' => 'Message', 'label' => 'Message'],
+            ];
+
+            $query = $this->logDataHelper->getVisitedPages();
+            $data = $this->prepareTableData($query, $filterValues, true);
 
             $this->render('VisitorInsights/views/visitor.latte', $this->getAllParams([
-                'logs' => $logs,
-                'currentPage' => $logPage,
-                'totalPages' => $totalPages,
-                'filters' => $this->flight->request()->query->getData(),
-                'page' => $this->application->getConnectedUser()->getPage()
+                'logs' => $data['items'],
+                'currentPage' => $data['currentPage'],
+                'totalPages' => $data['totalPages'],
+                'filterValues' => $filterValues,
+                'filters' => $filterConfig,
+                'columns' => $columns,
+                'page' => $this->application->getConnectedUser()->getPage(),
+                'resetUrl' => '/logs',
             ]));
         }
     }
@@ -127,13 +161,21 @@ class VisitorInsightsController extends AbstractController
     public function analytics(): void
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isVisitorInsights())) {
+            $currentParams = $this->flight->request()->query->getData();
+            $period = $currentParams['period'] ?? 'day';
+            $currentDate = $currentParams['date'] ?? date('Y-m-d');
+            if (!strtotime($currentDate)) $currentDate = date('Y-m-d');
+
             $this->render('VisitorInsights/views/analytics.latte', $this->getAllParams([
-                'osData' => $this->logDataStatisticsHelper->getOsDistribution(),
-                'browserData' => $this->logDataStatisticsHelper->getBrowserDistribution(),
-                'screenResolutionData' => $this->logDataStatisticsHelper->getScreenResolutionDistribution(),
-                'typeData' => $this->logDataStatisticsHelper->getTypeDistribution(),
+                'osData' => $this->logDataStatisticsHelper->getOsDistribution($period, $currentDate),
+                'browserData' => $this->logDataStatisticsHelper->getBrowserDistribution($period, $currentDate),
+                'screenResolutionData' => $this->logDataStatisticsHelper->getScreenResolutionDistribution($period, $currentDate),
+                'typeData' => $this->logDataStatisticsHelper->getTypeDistribution($period, $currentDate),
                 'title' => 'Synthèse des visiteurs',
-                'page' => $this->application->getConnectedUser()->getPage()
+                'page' => $this->application->getConnectedUser()->getPage(),
+                'control' => new WebApp($this->application),
+                'period' => $period,
+                'nav' => $this->logDataAnalyticsHelper->getReferentNavigation($period, $currentDate),
             ]));
         }
     }

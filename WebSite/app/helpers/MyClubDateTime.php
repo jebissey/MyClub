@@ -1,11 +1,11 @@
 <?php
+
 declare(strict_types=1);
 
 namespace app\helpers;
 
 use DateTime;
 use DateTimeZone;
-
 
 class MyClubDateTime
 {
@@ -30,4 +30,18 @@ class MyClubDateTime
         return $datetime->format('d/m/Y H:i');
     }
 
+    static function getPeriodStartEnd(string $period, DateTime $date): array
+    {
+        $startDate = clone $date;
+        $endDate = clone $date;
+
+        match ($period) {
+            'day' => $endDate->modify('+1 day'),
+            'week' => [$startDate->modify('monday this week'), $endDate->modify('monday next week')],
+            'month' => [$startDate->modify('first day of this month'), $endDate->modify('first day of next month')],
+            'year' => [$startDate->modify('first day of january this year'), $endDate->modify('first day of january next year')],
+        };
+
+        return [$startDate, $endDate];
+    }
 }

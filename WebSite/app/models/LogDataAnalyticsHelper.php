@@ -8,6 +8,7 @@ use DateTime;
 use PDO;
 
 use app\helpers\Application;
+use app\helpers\MyClubDateTime;
 
 class LogDataAnalyticsHelper extends Data
 {
@@ -82,7 +83,7 @@ class LogDataAnalyticsHelper extends Data
     public function getReferentStats(string $period, string $currentDate): array
     {
         $date = new DateTime($currentDate);
-        [$startDate, $endDate] = $this->getPeriodStartEnd($period, $date);
+        [$startDate, $endDate] = MyClubDateTime::getPeriodStartEnd($period, $date);
 
         $query = $this->pdoForLog->prepare("
             WITH PeriodData AS (
@@ -117,7 +118,7 @@ class LogDataAnalyticsHelper extends Data
     public function getExternalReferentStats(string $period, string $currentDate): array
     {
         $date = new DateTime($currentDate);
-        [$startDate, $endDate] = $this->getPeriodStartEnd($period, $date);
+        [$startDate, $endDate] = MyClubDateTime::getPeriodStartEnd($period, $date);
 
         $query = $this->pdoForLog->prepare("
             SELECT Referer as source, COUNT(*) as count
@@ -215,21 +216,6 @@ class LogDataAnalyticsHelper extends Data
             'year' => $date->format('Y'),
             default => ''
         };
-    }
-
-    private function getPeriodStartEnd(string $period, DateTime $date): array
-    {
-        $startDate = clone $date;
-        $endDate = clone $date;
-
-        match ($period) {
-            'day' => $endDate->modify('+1 day'),
-            'week' => [$startDate->modify('monday this week'), $endDate->modify('monday next week')],
-            'month' => [$startDate->modify('first day of this month'), $endDate->modify('first day of next month')],
-            'year' => [$startDate->modify('first day of january this year'), $endDate->modify('first day of january next year')],
-        };
-
-        return [$startDate, $endDate];
     }
 
     private function getHost(): string
