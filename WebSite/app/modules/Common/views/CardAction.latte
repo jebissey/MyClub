@@ -1,0 +1,26 @@
+{parameters
+    string $href,
+    string $icon,
+    string $title,
+    string $desc
+}
+
+<div class="col-12 col-sm-6 col-lg-4 col-xl-3">
+    <a href="{$href}" class="text-decoration-none text-dark">
+        <div class="card h-100 shadow-sm border-0">
+            <div class="card-body d-flex gap-3 align-items-start">
+                <div class="fs-3 flex-shrink-0">
+                    {$icon}
+                </div>
+                <div>
+                    <div class="fw-semibold">
+                        {$title}
+                    </div>
+                    <div class="text-muted small">
+                        {$desc}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </a>
+</div>

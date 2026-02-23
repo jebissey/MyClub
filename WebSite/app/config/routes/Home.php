@@ -21,6 +21,7 @@ class Home implements RouteInterface
         $this->routes[] = new Route('GET  /', $homeController, 'home');
         $this->routes[] = new Route('GET  /help', $homeController, 'helpHome');
         $this->routes[] = new Route('GET  /legal/notice', $homeController, 'legalNotice');
+        $this->routes[] = new Route('GET  /signpost', $homeController, 'signpost');
 
         return $this->routes;
     }

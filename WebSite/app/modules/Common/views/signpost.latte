@@ -1,0 +1,440 @@
+{layout '../../Common/views/layout.latte'}
+
+{block navbar}
+<div class="container-fluid d-flex align-items-center">
+    <div class="d-flex gap-2">
+        <a class="navbar-brand" href="/">
+            <img src="/app/images/home.png" alt="Home">
+        </a>
+        <button class="btn btn-primary fs-5" onclick="history.back()">
+            <i class="bi bi-arrow-left-circle"></i>
+        </button>
+    </div>
+</div>
+{/block}
+
+{block content}
+<div class="container mt-4">
+
+    <h1 class="mb-1">Que souhaitez-vous faire ?</h1>
+    <p class="text-muted mb-4">
+        Sélectionnez une action ci-dessous pour commencer.
+    </p>
+
+    {if !$isMember}
+
+        <h6 class="text-muted fw-bold mb-3 small">
+            🌎 L'espace public
+        </h6>
+
+        <div class="row g-4">
+
+            {include 'CardAction.latte',
+                href: '/contact',
+                icon: '✉️',
+                title: 'Contacter le Club',
+                desc: 'Envoyer un message aux responsables'}
+
+            {include 'CardAction.latte',
+                href: '/user/sign/in',
+                icon: '👻',
+                title: 'Me connecter',
+                desc: 'Accéder à mon espace membre'}
+
+            {include 'CardAction.latte',
+                href: '/articles',
+                icon: '📄',
+                title: 'Rechercher un article',
+                desc: 'Trouver des articles du club'}
+
+            {include 'CardAction.latte',
+                href: '/weekEvents',
+                icon: '📅',
+                title: 'Voir le calendrier',
+                desc: 'Visualiser les événements à venir'}
+
+        </div>
+
+    {/if}
+
+
+    {if $isMember}
+
+        {if $isAdmin}
+            <ul class="nav nav-tabs mb-0">
+                <li class="nav-item">
+                    <button class="nav-link active"
+                            data-bs-toggle="tab"
+                            data-bs-target="#tab-member"
+                            type="button">
+                        👤 Mon espace membre
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link"
+                            data-bs-toggle="tab"
+                            data-bs-target="#tab-roles"
+                            type="button">
+                        🔑 Mes autorisations
+                    </button>
+                </li>
+            </ul>
+        {/if}
+
+        <div class="{if $isAdmin}tab-content border border-top-0 rounded-bottom p-4 bg-light{else}border rounded p-4 bg-light{/if}">
+
+            <div class="{if $isAdmin}tab-pane fade show active{/if}" id="tab-member">
+
+                <h6 class="text-muted fw-bold mb-3 small">
+                    👥 Actions disponibles pour tous les membres
+                </h6>
+
+                <div class="row g-4">
+
+                    {include 'CardAction.latte',
+                        href: '/user/account',
+                        icon: '👤',
+                        title: 'Profil',
+                        desc: 'Mettre à jour mes informations'}
+
+                    {include 'CardAction.latte',
+                        href: '/user/statistics',
+                        icon: '📊',
+                        title: 'Statistiques',
+                        desc: 'Historique et activité'}
+
+                    {include 'CardAction.latte',
+                        href: '/user/connections',
+                        icon: '🕸️',
+                        title: 'Connexions',
+                        desc: 'Mes événements en commun avec les autres membres'}
+
+                    {include 'CardAction.latte',
+                        href: '/articles',
+                        icon: '📄',
+                        title: 'Rechercher un article',
+                        desc: 'Trouver des articles du club'}
+
+                    {include 'CardAction.latte',
+                        href: '/weekEvents',
+                        icon: '📅',
+                        title: 'Voir le calendrier',
+                        desc: 'Consulter les événements'}
+
+                    {include 'CardAction.latte',
+                        href: '/nextEvents',
+                        icon: '📅',
+                        title: "Evénements à venir",
+                        desc: "Consulter et m’inscrire aux prochaines séances"}
+
+                    {include 'CardAction.latte',
+                        href: '/user/directory',
+                        icon: '🎭',
+                        title: "Trombinoscope",
+                        desc: 'Voir les membres du club et créer/modifier ma présentation'}
+
+                    {include 'CardAction.latte',
+                        href: '/user/news',
+                        icon: '📰',
+                        title: "News",
+                        desc: 'Voir les dernières nouvelles du club (articles, événements, sondages, présentation ...)'}
+                </div>
+            </div>
+
+            {* ───── Onglet rôles spéciaux ───── *}
+            {if $isAdmin}
+            <div class="tab-pane fade" id="tab-roles">
+
+                <div class="accordion" id="rolesAccordion">
+
+                    {if $isEventManager}
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingEventManager">
+                            <button class="accordion-button collapsed"
+                                    type="button"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#collapseEventManager">
+                                🗓️ Animateur
+                            </button>
+                        </h2>
+                        <div id="collapseEventManager"
+                            class="accordion-collapse collapse"
+                            data-bs-parent="#rolesAccordion">
+                            <div class="accordion-body">
+                                <div class="row g-4">
+
+                                    {include 'CardAction.latte',
+                                        href: '/nextEvents',
+                                        icon: '📅',
+                                        title: 'Gérer les séances',
+                                        desc: 'Créer, modifier, annuler une séance et suivre les inscriptions'}
+
+                                    {include 'CardAction.latte',
+                                        href: '/events/guest',
+                                        icon: '📩',
+                                        title: 'Envoyer une invitation',
+                                        desc: 'Envoyer une invitation à une personne non membre du club pour une séance'}
+
+                                    {include 'CardAction.latte',
+                                        href: '/events/crossTab',
+                                        icon: '🧮',
+                                        title: 'Statistiques animateurs',
+                                        desc: 'Voir les statistiques des animateurs du club (nombre de séances animées par types et participants'}
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {/if}
+
+                    {if $isDesigner}
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingDesigner">
+                            <button class="accordion-button collapsed"
+                                    type="button"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#collapseDesigner">
+                                🎨 Designer
+                            </button>
+                        </h2>
+                        <div id="collapseDesigner"
+                            class="accordion-collapse collapse"
+                            data-bs-parent="#rolesAccordion">
+                            <div class="accordion-body">
+                                <div class="row g-4">
+                                    {if $isEventDesigner}
+                                    {include 'CardAction.latte',
+                                        href: '/eventTypes',
+                                        icon: '🗓️',
+                                        title: "Types d'événements et leurs attributs",
+                                        desc: "Définir les types d'événements du club et les attributs associés"}
+
+                                    {include 'CardAction.latte',
+                                        href: '/needs',
+                                        icon: '📋',
+                                        title: "Les besoins d'une séance",
+                                        desc: "Définir les besoins associés à chaque type d'événement du club"}
+                                    {/if}
+                                    {if $isHomeDesigner}
+                                    {include 'CardAction.latte',
+                                        href: '/settings',
+                                        icon: '🔧',
+                                        title: "Paramètres du site",
+                                        desc: "Définir les paramètres généraux du site web du club et la(les) langues disponibles"}
+                                    {/if}
+                                    {if $isKanbanDesigner}
+                                    {include 'CardAction.latte',
+                                        href: '/kanban',
+                                        icon: '🟨',
+                                        title: "Kanban",
+                                        desc: "Gérer des projets via des tableaux Kanban"}
+                                    {/if}
+                                    {if $isNavbarDesigner}
+                                    {include 'CardAction.latte',
+                                        href: '/navbar',
+                                        icon: '📑',
+                                        title: "Navigation",
+                                        desc: "Gérer les barres de navigation du site web du club"}
+                                    {/if}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {/if}
+
+                    {if $isRedactor}
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingRedactor">
+                            <button class="accordion-button collapsed"
+                                    type="button"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#collapseRedactor">
+                                ✍️ Rédacteur
+                            </button>
+                        </h2>
+                        <div id="collapseRedactor"
+                            class="accordion-collapse collapse"
+                            data-bs-parent="#rolesAccordion">
+                            <div class="accordion-body">
+                                <div class="row g-4">
+
+                                    {include 'CardAction.latte',
+                                        href: '/articles',
+                                        icon: '📰',
+                                        title: 'Article',
+                                        desc: 'Rédiger et publier un nouvel article'}
+
+                                    {include 'CardAction.latte',
+                                        href: 'media/list',
+                                        icon: '📂',
+                                        title: 'Medias',
+                                        desc: 'Gérer les médias du club (photos, documents ...)'}
+
+                                    {include 'CardAction.latte',
+                                        href: 'topArticles',
+                                        icon: '📈',
+                                        title: 'Articles populaires',
+                                        desc: 'Voir les articles les plus populaires du club par période'}
+
+                                    {include 'CardAction.latte',
+                                        href: '/articles/crossTab',
+                                        icon: '🧮',
+                                        title: 'Statistiques rédacteurs',
+                                        desc: "Voir les statistiques des rédacteurs du club (nombre d'articles publiés par rédacteur et par période"}
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {/if}
+
+                    {if $isPersonManager}
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingPersonManager">
+                            <button class="accordion-button collapsed"
+                                    type="button"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#collapsePersonManager">
+                                📇 Secrétaire
+                            </button>
+                        </h2>
+                        <div id="collapsePersonManager"
+                            class="accordion-collapse collapse"
+                            data-bs-parent="#rolesAccordion">
+                            <div class="accordion-body">
+                                <div class="row g-4">
+
+                                    {include 'CardAction.latte',
+                                        href: '/persons',
+                                        icon: '👥',
+                                        title: 'Gérer les membres',
+                                        desc: 'Consulter et administrer les adhérents'}
+
+                                    {include 'CardAction.latte',
+                                        href: '/groups',
+                                        icon: '👫',
+                                        title: 'Gérer les groupes',
+                                        desc: 'Consulter et administrer les groupes (sans autorisation) de membres'}
+
+                                    {include 'CardAction.latte',
+                                        href: '/registration',
+                                        icon: '🎟️',
+                                        title: 'Gérer les inscriptions',
+                                        desc: 'Consulter et administrer les inscriptions des adhérents aux groupes sans autorisation'}
+
+                                    {include 'CardAction.latte',
+                                        href: '/import',
+                                        icon: '📥',
+                                        title: 'Importer des membres',
+                                        desc: 'Importer des adhérents à partir d’un fichier CSV'}
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {/if}
+
+                    {if $isVisitorInsights}
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingVisitorInsights">
+                            <button class="accordion-button collapsed"
+                                    type="button"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#collapseVisitorInsights">
+                                🔍 Observateur
+                            </button>
+                        </h2>
+                        <div id="collapseVisitorInsights"
+                            class="accordion-collapse collapse"
+                            data-bs-parent="#rolesAccordion">
+                            <div class="accordion-body">
+                                <div class="row g-4">
+
+                                    {include 'CardAction.latte',
+                                        href: '/referents',
+                                        icon: '☁️',
+                                        title: 'Site référents',
+                                        desc: "Voir d'où viennent les visiteurs du site web du club"}
+
+                                    {include 'CardAction.latte',
+                                        href: 'topPages',
+                                        icon: '📈',
+                                        title: 'Pages populaires',
+                                        desc: 'Voir les pages les plus populaires du club par période'}
+
+                                    {include 'CardAction.latte',
+                                        href: '/crossTab',
+                                        icon: '🧮',
+                                        title: 'Statistiques visiteurs (membres)',
+                                        desc: "Voir les statistiques des visiteurs du site web du club (nombre de pages vues par visiteur et par période"}
+
+                                    {include 'CardAction.latte',
+                                        href: '/logs',
+                                        icon: '📋',
+                                        title: 'Logs visiteurs',
+                                        desc: "Voir les logs des visiteurs du site web du club"}
+
+                                    {include 'CardAction.latte',
+                                        href: '/visitorsGraf',
+                                        icon: '📊',
+                                        title: 'Graphiques visiteurs',
+                                        desc: "Voir les graphiques des visiteurs du site web du club"}
+
+                                    {include 'CardAction.latte',
+                                        href: '/analytics',
+                                        icon: '🥧',
+                                        title: 'Analyses des visiteurs',
+                                        desc: "Voir les graphiques des visiteurs du site web du club (OS, navigateurs, matériel, résolution d'écran)"}
+
+                                    {include 'CardAction.latte',
+                                        href: '/lastVisits',
+                                        icon: '👁️',
+                                        title: 'Dernières visites',
+                                        desc: "Voir la dernière visites des membresdu club"}
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {/if}
+
+
+                    {* ───────────── Webmaster ───────────── *}
+                    {if $isWebmaster}
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingWebmaster">
+                            <button class="accordion-button collapsed"
+                                    type="button"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#collapseWebmaster">
+                                🛠️ Webmaster
+                            </button>
+                        </h2>
+                        <div id="collapseWebmaster"
+                            class="accordion-collapse collapse"
+                            data-bs-parent="#rolesAccordion">
+                            <div class="accordion-body">
+                                <div class="row g-4">
+
+                                    {include 'CardAction.latte',
+                                        href: '/webmaster',
+                                        icon: '⚙️',
+                                        title: 'Configuration site',
+                                        desc: 'Paramètres techniques'}
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {/if}
+
+                </div>
+
+            </div>
+            {/if}
+
+        </div>
+    {/if}
+
+</div>
+{/block}

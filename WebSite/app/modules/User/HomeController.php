@@ -145,4 +145,16 @@ class HomeController extends AbstractController
         ]);
         echo $content;
     }
+
+    public function signpost(): void
+    {
+        $user = $this->application->getConnectedUser();
+
+        $this->render('Common/views/signpost.latte', $this->getAllParams([
+            'navItems' => $this->getNavItems($user->person),
+            'title'   => 'Que souhaitez-vous faire ?',
+            'page'    => $user->getPage(),
+            'user'    => $user,
+        ]));
+    }
 }
