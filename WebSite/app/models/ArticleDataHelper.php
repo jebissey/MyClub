@@ -95,10 +95,16 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
         return $stmt->fetchAll(PDO::FETCH_OBJ);
     }
 
-    public function getAuthor(int $articleId): object|false
+    public function getAuthorsByArticleIds(array $articleIds): array
     {
+        if (empty($articleIds)) {
+            return [];
+        }
+
+        $placeholders = implode(',', array_fill(0, count($articleIds), '?'));
         $sql = "
             SELECT 
+                Article.Id,
                 CASE 
                     WHEN Person.NickName != '' 
                     THEN Person.FirstName || ' ' || Person.LastName || ' (' || Person.NickName || ')' 
@@ -107,11 +113,20 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
                 Article.Title AS ArticleTitle
             FROM Article
             JOIN Person ON Article.CreatedBy = Person.Id
-            WHERE Article.Id = :articleId
+            WHERE Article.Id IN ($placeholders)
         ";
+
         $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([':articleId' => $articleId]);
-        return $stmt->fetch();
+        $stmt->execute($articleIds);
+
+        $results = $stmt->fetchAll(PDO::FETCH_OBJ);
+
+        $indexed = [];
+        foreach ($results as $row) {
+            $indexed[$row->Id] = $row;
+        }
+
+        return $indexed;
     }
 
     public function getLatestArticle(array $articleIds): ?object

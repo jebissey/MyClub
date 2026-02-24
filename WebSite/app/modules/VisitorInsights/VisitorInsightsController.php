@@ -9,6 +9,7 @@ use app\enums\FilterInputRule;
 use app\helpers\Application;
 use app\helpers\PeriodHelper;
 use app\helpers\WebApp;
+use app\models\ArticleDataHelper;
 use app\models\CrosstabDataHelper;
 use app\models\LogDataHelper;
 use app\models\LogDataAnalyticsHelper;
@@ -25,6 +26,7 @@ class VisitorInsightsController extends TableController
         private CrosstabDataHelper $crosstabDataHelper,
         private LogDataAnalyticsHelper $logDataAnalyticsHelper,
         private LogDataStatisticsHelper $logDataStatisticsHelper,
+        private ArticleDataHelper $articleDataHelper
     ) {
         parent::__construct($application);
     }
@@ -198,9 +200,29 @@ class VisitorInsightsController extends TableController
     public function topArticlesByPeriod(): void
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isRedactorOrVisitorInsghts())) {
-            $period = WebApp::getFiltered('period', $this->application->enumToValues(Period::class), $this->flight->request()->query->getData()) ?: Period::Week->value;
+
+            $period = WebApp::getFiltered(
+                'period',
+                $this->application->enumToValues(Period::class),
+                $this->flight->request()->query->getData()
+            ) ?: Period::Week->value;
+
             $dateCondition = PeriodHelper::getDateConditions($period);
+
             $topPages = $this->logDataHelper->getTopArticles($dateCondition, self::TOP);
+            $articleIds = array_values(array_filter(
+                array_map(fn($p) => $p->articleId ?? null, $topPages)
+            ));
+            $authors = $this->articleDataHelper->getAuthorsByArticleIds($articleIds);
+            foreach ($topPages as $page) {
+                if (isset($page->articleId) && isset($authors[$page->articleId])) {
+                    $page->AuthorName = $authors[$page->articleId]->PersonName;
+                    $page->ArticleTitle = $authors[$page->articleId]->ArticleTitle;
+                } else {
+                    $page->AuthorName = null;
+                    $page->ArticleTitle = null;
+                }
+            }
 
             $this->render('Article/views/topArticles.latte', $this->getAllParams([
                 'title' => 'Top des articles visités par période',

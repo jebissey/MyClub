@@ -116,7 +116,7 @@ class LogDataHelper extends Data
                 Uri,
                 COUNT(*) AS visits,
                 CASE
-                    WHEN Uri LIKE "/article/%" THEN CAST(substr(Uri, 11) AS INTEGER)
+                    WHEN Uri LIKE "/article/%" THEN CAST(substr(Uri, 10) AS INTEGER)
                     WHEN Uri LIKE "/navbar/show/article/%" THEN CAST(substr(Uri, 22) AS INTEGER)
                     ELSE NULL
                 END AS articleId

@@ -49,13 +49,6 @@ class ArticleApi extends AbstractApi
         $this->renderJsonOK();
     }
 
-    public function getAuthor(int $articleId): void
-    {
-        $result = $this->articleDataHelper->getAuthor($articleId);
-        if ($result === false) $this->renderJsonBadRequest("Unknown article {$articleId}", __FILE__, __LINE__);
-        $this->renderJsonOk(['author' => $result ? [$result] : []]);
-    }
-
     public function saveOrderReply(): void
     {
         $person = $this->application->getConnectedUser()->person ?? false;

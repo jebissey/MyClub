@@ -37,7 +37,7 @@ use app\models\SurveyDataHelper;
 use app\models\TableControllerDataHelper;
 use app\modules\Article\ArticleController;
 use app\modules\Article\MediaController;
-use app\modules\Article\OrderController;    
+use app\modules\Article\OrderController;
 use app\modules\Article\SurveyController;
 use app\modules\Common\services\AuthenticationService;
 use app\modules\Common\services\EmailService;
@@ -452,7 +452,8 @@ class ControllerFactory
             $this->logDataHelper,
             $this->crosstabDataHelper,
             new LogDataAnalyticsHelper($this->application),
-            new LogDataStatisticsHelper($this->application)
+            new LogDataStatisticsHelper($this->application),
+            $this->articleDataHelper
         );
     }
 

@@ -52,19 +52,23 @@
                             {foreach $topPages as $index => $pageData}
                             <tr>
                                 <td>{$index + 1}</td>
-                                <td>{$pageData->Uri|truncate:80}</td>
                                 <td>
-                                    {if isset($pageData->articleId)}
-                                        <span class="article-title" data-article-id="{$pageData->articleId}">Chargement...</span>
+                                    <a href="{$pageData->Uri}" class="text-decoration-none">
+                                        {$pageData->Uri|truncate:80}
+                                    </a>
+                                </td>
+                                <td>
+                                    {if $pageData->ArticleTitle}
+                                        {$pageData->ArticleTitle}
                                     {else}
-                                        -
+                                        (Sans titre)
                                     {/if}
                                 </td>
                                 <td>
-                                    {if isset($pageData->articleId)}
-                                        <span class="author-name" data-article-id="{$pageData->articleId}">Chargement...</span>
+                                    {if $pageData->AuthorName}
+                                        {$pageData->AuthorName}
                                     {else}
-                                        -
+                                        (Non spécifié)
                                     {/if}
                                 </td>
                                 <td>{$pageData->visits}</td>
@@ -98,8 +102,4 @@
         </div>
         {/if}
     </div>
-{/block}
-
-{block scripts}
-    <script src="/app/modules/Article/js/topArticles.js"></script>
 {/block}
