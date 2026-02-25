@@ -26,6 +26,12 @@
             border-color: #000 !important;
             box-shadow: 0 0 0 2px #fff, 0 0 0 4px #000;
         }
+
+        {if !$isOwner}
+        .kanban-card          { cursor: not-allowed; }
+        .kanban-card:hover    { transform: none; }
+        .kanban-card:active   { cursor: not-allowed; }
+        {/if}
     </style>
 {/block}
 
@@ -48,6 +54,7 @@
                         <button type="submit" class="btn btn-primary btn-sm ms-2">Valider</button>
                     </noscript>
                 </form>
+                {if $isOwner}
                 <button id="editProjectBtn"
                         type="button"
                         class="btn btn-warning btn-sm d-none"
@@ -56,6 +63,7 @@
                         title="Éditer le projet">
                     <i class="bi bi-pencil"></i>
                 </button>
+                {/if}
             </div>
             
             <form method="get" action="" class="d-flex align-items-center gap-2 border border-secondary-subtle rounded p-2 bg-light mt-2" id="filterForm">
@@ -97,6 +105,7 @@
                     data-bs-title="Nouveau projet">
                 <i class="bi bi-plus-lg"></i>
             </button>
+            {if $isOwner}
             <button id="addCardBtn"
                     type="button"
                     class="btn btn-primary btn-sm d-none"
@@ -106,6 +115,7 @@
                     data-bs-title="Nouvelle carte">
                 <i class="bi bi-plus-lg"></i>
             </button>
+            {/if}
         </div>
 
         <div class="row g-2 d-none" id="kanbanBoard">
@@ -121,15 +131,19 @@
             {/foreach}
         </div>
     </div>
-
+{if $isOwner}
 {include 'partials/addProjectModal.latte'}
 {include 'partials/editProjectModal.latte'}
 {include 'partials/addCardModal.latte'}
 {include 'partials/editCardModal.latte'}
+{/if}
 {include 'partials/viewCardModal.latte'}
 
 {/block}
 
 {block scripts}
+    <script>
+        window.IS_OWNER = {$isOwner ? 'true' : 'false'};
+    </script>
     <script type="module" src="/app/modules/Kanban/js/main.js"></script>
 {/block}

@@ -85,7 +85,7 @@ class KanbanDataHelper extends Data
         return $stmt->fetch();
     }
 
-    public function getKanbanProjects(int $idPerson): array
+    public function getKanbanProjects(): array
     {
         $sql = "
             SELECT 
@@ -93,10 +93,9 @@ class KanbanDataHelper extends Data
                 Title, 
                 Detail
             FROM KanbanProject
-            WHERE IdPerson = :idPerson
             ORDER BY Title";
         $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([':idPerson' => $idPerson]);
+        $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_OBJ);
     }
 

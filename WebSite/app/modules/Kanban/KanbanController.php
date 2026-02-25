@@ -26,10 +26,13 @@ class KanbanController extends AbstractController
         }
         $personId = $this->application->getConnectedUser()->person->Id;
         $selectedProjectId = $this->flight->request()->query->getData()["p"] ?? null;
+        $isOwner = null;
         if ($selectedProjectId !== null) {
             $selectedProjectId = (int) $selectedProjectId;
             if (!$this->kanbanDataHelper->userHasAccessToProject($personId, $selectedProjectId)) {
-                $selectedProjectId = null;
+                $isOwner = false;
+            } else {
+                $isOwner = true;    
             }
         }
         $schema = [
@@ -53,7 +56,8 @@ class KanbanController extends AbstractController
             ],
             'selectedProjectId' => $selectedProjectId,
             'cardTypes' => $this->kanbanDataHelper->getProjectCardTypes($selectedProjectId),
-            'filters' => $filters
+            'filters' => $filters,
+            'isOwner' => $isOwner,
         ]));
     }
 }

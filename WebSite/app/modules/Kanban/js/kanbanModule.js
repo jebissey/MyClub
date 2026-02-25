@@ -3,10 +3,11 @@ import ProjectManager from "./project/projectManager.js";
 import CardTypeManager from "./project/cardType/cardTypeManager.js";
 
 export default class KanbanModule {
-    constructor(statusTransitions) {
+    constructor(statusTransitions, isOwner) {
         this.statusTransitions = statusTransitions;
+        this.isOwner = isOwner;
 
-        this.kanbanBoard = new KanbanBoard(statusTransitions);
+        this.kanbanBoard = new KanbanBoard(statusTransitions, isOwner);
         this.projectManager = new ProjectManager();
         this.cardTypeManager = new CardTypeManager();
         this.cardTypes = [];
@@ -82,10 +83,10 @@ export default class KanbanModule {
 
     toggleProjectUI(visible) {
         const method = visible ? "remove" : "add";
-        this.dom.addProjectBtn.classList[visible ? "add" : "remove"]("d-none");
-        this.dom.addCardBtn.classList[method]("d-none");
-        this.dom.editProjectBtn.classList[method]("d-none");
-        this.dom.kanbanBoard.classList[method]("d-none");
+        this.dom.addProjectBtn?.classList[visible ? "add" : "remove"]("d-none");
+        this.dom.addCardBtn?.classList[method]("d-none");
+        this.dom.editProjectBtn?.classList[method]("d-none");
+        this.dom.kanbanBoard?.classList[method]("d-none");
     }
 
     /* --------------------------------------------

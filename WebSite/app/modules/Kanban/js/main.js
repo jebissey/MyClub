@@ -8,6 +8,7 @@ const statusTransitions = {
 };
 
 document.addEventListener("DOMContentLoaded", () => {
-    const module = new KanbanModule(statusTransitions);
+    const isOwner = window.IS_OWNER === 'true';
+    const module = new KanbanModule(statusTransitions, isOwner);
     module.init();
 });

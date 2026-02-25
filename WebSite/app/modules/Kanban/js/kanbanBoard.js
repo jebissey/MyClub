@@ -6,8 +6,9 @@ const apiClient = new ApiClient();
 const cardManager = new CardManager();
 
 export default class KanbanBoard {
-    constructor(statusTransitions) {
+    constructor(statusTransitions, isOwner) {
         this.statusTransitions = statusTransitions;
+        this.isOwner = isOwner;
         this.handleClick = this.handleClick.bind(this);
         this.cardTypesMap = {};
         this.dragDropManager = new DragDropManager({
@@ -25,7 +26,9 @@ export default class KanbanBoard {
         INIT
     -------------------------------------------- */
     init() {
-        this.dragDropManager.init();
+        if (this.isOwner) {
+            this.dragDropManager.init();
+        }
         this.initGlobalEvents();
 
         document.getElementById('saveNewCard')?.addEventListener('click', () => this.createNewCard());
@@ -89,8 +92,9 @@ export default class KanbanBoard {
                 title.textContent = `${baseLabel} (${count})`;
             }
         });
-
-        this.dragDropManager.init();
+        if (this.isOwner) {
+            this.dragDropManager.init();
+        }
     }
 
     createCardElement(card) {
@@ -127,18 +131,20 @@ export default class KanbanBoard {
 
         const actionsDiv = document.createElement('div');
         actionsDiv.className = 'mt-2 d-flex gap-1';
-        actionsDiv.innerHTML = `
+
+        const viewBtn = `
             <button class="btn btn-sm btn-success view-card" data-id="${card.Id}" title="Voir l'historique">
                 <i class="bi bi-eye"></i>
-            </button>
+            </button>`;
+        const ownerBtns = this.isOwner ? `
             <button class="btn btn-sm btn-warning edit-card" data-id="${card.Id}" title="Éditer">
                 <i class="bi bi-pencil"></i>
             </button>
             <button class="btn btn-sm btn-danger delete-card" data-id="${card.Id}" title="Supprimer">
                 <i class="bi bi-trash"></i>
-            </button>
-        `;
-        cardDiv.appendChild(actionsDiv);
+            </button>` : '';
+        actionsDiv.innerHTML = viewBtn + ownerBtns;
+        cardDiv.appendChild(actionsDiv);;
 
         return cardDiv;
     }
@@ -198,20 +204,27 @@ export default class KanbanBoard {
                         </div>
                     </div>
                     <div class="input-group input-group-sm">
-                        <input type="text" class="form-control" id="${remarkId}" value="${entry.Remark || ''}" placeholder="Ajouter une remarque...">
-                        <button class="btn btn-primary save-remark"
-                            data-status-id="${entry.Id}"
-                            data-input-id="${remarkId}">
-                            <i class="bi bi-save"></i>
-                        </button>
+                        <input type="text" class="form-control" id="${remarkId}" value="${entry.Remark || ''}" placeholder="Ajouter une remarque..."
+                            ${this.isOwner ? '' : 'disabled'}>
+                        ${this.isOwner
+                        ? `<button class="btn btn-primary save-remark"
+                                data-status-id="${entry.Id}"
+                                data-input-id="${remarkId}">
+                                <i class="bi bi-save"></i>
+                            </button>`
+                        : ''}
                     </div>
                 `;
                 historyList.appendChild(li);
-                li.querySelector('.save-remark').addEventListener('click', (e) => {
-                    const btn = e.currentTarget;
-                    this.updateRemark(btn.dataset.statusId, btn.dataset.inputId);
-                });
+
+                if (this.isOwner) {
+                    li.querySelector('.save-remark').addEventListener('click', (e) => {
+                        const btn = e.currentTarget;
+                        this.updateRemark(btn.dataset.statusId, btn.dataset.inputId);
+                    });
+                }
             });
+
             new bootstrap.Modal(document.getElementById('viewCardModal')).show();
         }
     }
