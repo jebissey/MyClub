@@ -1,0 +1,30 @@
+    <div class="modal fade" id="addCardModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Ajouter une carte</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="cardTitle" class="form-label">Titre <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="cardTitle" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="cardDetail" class="form-label">Détail</label>
+                        <textarea class="form-control" id="cardDetail" rows="3"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="cardType" class="form-label">Type de carte <span class="text-danger">*</span></label>
+                        <select id="cardType" class="form-select" required>
+                            <option value="">Choisir un type</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="button" class="btn btn-primary" id="saveNewCard">Créer</button>
+                </div>
+            </div>
+        </div>
+    </div>

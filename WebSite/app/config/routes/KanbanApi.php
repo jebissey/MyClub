@@ -26,6 +26,7 @@ class KanbanApi implements RouteInterface
         $this->routes[] = new Route('POST /api/kanban/cardStatus/update', $kanbanApi, 'updateCardStatus');
         $this->routes[] = new Route('POST /api/kanban/cardType/create', $kanbanApi, 'createCardType');
         $this->routes[] = new Route('POST /api/kanban/cardType/delete', $kanbanApi, 'deleteCardType');
+        $this->routes[] = new Route('POST /api/kanban/cardType/update', $kanbanApi, 'updateCardType');
         $this->routes[] = new Route('GET  /api/kanban/project/@id:[0-9]+', $kanbanApi, 'getProject');
         $this->routes[] = new Route('GET  /api/kanban/project/@id:[0-9]+/cards', $kanbanApi, 'getProjectCards');
         $this->routes[] = new Route('GET  /api/kanban/project/@id:[0-9]+/cardTypes', $kanbanApi, 'getProjectCardTypes');

@@ -1,0 +1,29 @@
+    <div class="modal fade" id="editCardModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">✏️ Éditer la carte</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="editCardId">
+                    <div class="mb-3">
+                        <label for="editCardTitle" class="form-label">Titre <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="editCardTitle" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editCardDetail" class="form-label">Détail</label>
+                        <textarea class="form-control" id="editCardDetail" rows="3"></textarea>
+                    </div>
+                    <div class="mb-3 d-flex align-items-center">
+                        <label for="cardTypeLabel" class="me-2 mb-0">Type de carte</label>
+                        <input type="text" class="kanban-card-type" id="cardTypeLabel" readonly>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="button" class="btn btn-primary" id="saveEditCard">Enregistrer</button>
+                </div>
+            </div>
+        </div>
+    </div>

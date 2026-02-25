@@ -9,6 +9,7 @@ export default class KanbanBoard {
     constructor(statusTransitions) {
         this.statusTransitions = statusTransitions;
         this.handleClick = this.handleClick.bind(this);
+        this.cardTypesMap = {};
         this.dragDropManager = new DragDropManager({
             itemSelector: '.kanban-card',
             containerSelector: '.kanban-cards',
@@ -56,7 +57,11 @@ export default class KanbanBoard {
         if (viewBtn) this.openViewModal(viewBtn.dataset.id);
     }
 
-    update(cards) {
+    update(cards, cardTypes = []) {
+        this.cardTypesMap = Object.fromEntries(
+            cardTypes.map(t => [String(t.Id), t])
+        );
+
         document.querySelectorAll('.kanban-cards').forEach(column => {
             column.innerHTML = '';
         });
@@ -79,7 +84,7 @@ export default class KanbanBoard {
             const title = column.querySelector('.kanban-column-title');
 
             if (title) {
-                const baseLabel = status; // ou mapping si besoin
+                const baseLabel = status;
                 const count = counts[status] || 0;
                 title.textContent = `${baseLabel} (${count})`;
             }
@@ -89,10 +94,14 @@ export default class KanbanBoard {
     }
 
     createCardElement(card) {
+        const type = this.cardTypesMap[String(card.IdKanbanCardType)];
+        const color = type?.Color || 'bg-warning-subtle';
+
         const cardDiv = document.createElement('div');
-        cardDiv.className = 'kanban-card';
+        cardDiv.className = `kanban-card card p-2 mb-2 ${color}`;
         cardDiv.dataset.id = card.Id;
         cardDiv.dataset.status = card.CurrentStatus;
+        cardDiv.dataset.color = color;
 
         const titleDiv = document.createElement('div');
         titleDiv.className = 'kanban-card-title fw-bold';

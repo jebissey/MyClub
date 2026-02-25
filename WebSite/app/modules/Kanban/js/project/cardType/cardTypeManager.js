@@ -6,11 +6,15 @@ export default class CardTypeManager {
         return await apiClient.get(`/api/kanban/project/${projectId}/cardTypes`);
     }
 
-    async create(projectId, label, detail) {
-        return await apiClient.post('/api/kanban/cardType/create', { projectId, label, detail });
+    async create(projectId, label, detail, color) {
+        return await apiClient.post('/api/kanban/cardType/create', { projectId, label, detail, color });
     }
 
     async delete(cardTypeId) {
         return await apiClient.post('/api/kanban/cardType/delete', { id: parseInt(cardTypeId) });
+    }
+
+    async update(cardTypeId, label, detail, color) {
+        return await apiClient.post('/api/kanban/cardType/update', { id: parseInt(cardTypeId), label, detail, color });
     }
 }

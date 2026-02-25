@@ -357,6 +357,7 @@ class KanbanApi extends AbstractApi
 
         $label = trim($data['label'] ?? '');
         $detail = trim($data['detail'] ?? '');
+        $color = trim($data['color'] ?? '');
         $projectId = (int)($data['projectId'] ?? '');
 
         if (empty($label)) {
@@ -369,7 +370,7 @@ class KanbanApi extends AbstractApi
         }
 
         try {
-            $kanbanCardTypeId = $this->kanbanDataHelper->createKanbanCardType($projectId, $label, $detail);
+            $kanbanCardTypeId = $this->kanbanDataHelper->createKanbanCardType($projectId, $label, $detail, $color);
             $this->renderJsonOk([
                 'id' => $kanbanCardTypeId,
                 'message' => 'KabanCardType created successfully'
@@ -449,6 +450,47 @@ class KanbanApi extends AbstractApi
             $this->renderJsonOk(['cardTypes' => $this->kanbanDataHelper->getProjectCardTypes($id)]);
         } catch (Throwable $e) {
             $this->renderJsonError("Failed to get project's card types : " . $e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
+        }
+    }
+
+    public function updateCardType(): void
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
+            return;
+        }
+        if (!$this->connectedUser->isKanbanDesigner()) {
+            $this->renderJsonForbidden(__FILE__, __LINE__);
+            return;
+        }
+        $data = json_decode(file_get_contents('php://input'), true);
+        if (!is_array($data)) {
+            $this->renderJsonBadRequest('Invalid JSON', __FILE__, __LINE__);
+            return;
+        }
+
+        $label = trim($data['label'] ?? '');
+        $detail = trim($data['detail'] ?? '');
+        $color = trim($data['color'] ?? '');
+        $id = (int)($data['id'] ?? '');
+
+        if (empty($label)) {
+            $this->renderJsonBadRequest('Label is required', __FILE__, __LINE__);
+            return;
+        }
+        if (empty($id)) {
+            $this->renderJsonBadRequest('Id is required', __FILE__, __LINE__);
+            return;
+        }
+
+        try {
+            $kanbanCardTypeId = $this->kanbanDataHelper->updateKanbanCardType($id, $label, $detail, $color);
+            $this->renderJsonOk([
+                'id' => $kanbanCardTypeId,
+                'message' => 'KabanCardType updated successfully'
+            ]);
+        } catch (Throwable $e) {
+            $this->renderJsonError('Failed to update cardType' . $e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
         }
     }
 }

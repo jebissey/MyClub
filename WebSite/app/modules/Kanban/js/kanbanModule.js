@@ -9,6 +9,8 @@ export default class KanbanModule {
         this.kanbanBoard = new KanbanBoard(statusTransitions);
         this.projectManager = new ProjectManager();
         this.cardTypeManager = new CardTypeManager();
+        this.cardTypes = [];
+        this.editingCardTypeId = null;
 
         this.cacheDom();
     }
@@ -22,11 +24,12 @@ export default class KanbanModule {
 
         const projectId = this.dom.projectSelect.value;
         if (projectId) {
-            this.showProjectUI(projectId);
             const response = await this.cardTypeManager.load(projectId);
             if (response.success) {
-                this.populateCardTypeSelects(response.data.cardTypes ?? []);
+                this.cardTypes = response.data.cardTypes ?? [];
+                this.populateCardTypeSelects(this.cardTypes);
             }
+            this.showProjectUI(projectId);
         }
     }
 
@@ -99,7 +102,7 @@ export default class KanbanModule {
             this.handleError("Impossible de charger les cartes", result);
             return;
         }
-        this.kanbanBoard.update(result.data.cards ?? []);
+        this.kanbanBoard.update(result.data.cards ?? [], this.cardTypes);
     }
 
     /* --------------------------------------------
@@ -171,20 +174,48 @@ export default class KanbanModule {
         this.dom.newCardTypeForm.classList.add("d-none");
         this.dom.newCardTypeLabel.value = "";
         this.dom.newCardTypeDetail.value = "";
+
+        // Remettre la couleur par défaut (bg-warning-subtle)
+        const defaultColor = this.dom.newCardTypeForm.querySelector('input[name="newCardTypeColor"][value="bg-warning-subtle"]');
+        if (defaultColor) defaultColor.checked = true;
     }
 
     async createNewCardType() {
+
         const projectId = this.dom.projectSelect.value;
         if (!projectId) return alert("Sélectionnez un projet");
 
         const label = this.dom.newCardTypeLabel.value.trim();
         const detail = this.dom.newCardTypeDetail.value.trim();
 
-        const result = await this.cardTypeManager.create(projectId, label, detail);
+        const color = this.dom.newCardTypeForm
+            .querySelector('input[name="newCardTypeColor"]:checked')
+            ?.value ?? 'bg-warning-subtle';
+
+        let result;
+
+        if (this.editingCardTypeId) {
+            result = await this.cardTypeManager.update(
+                this.editingCardTypeId,
+                label,
+                detail,
+                color
+            );
+        } else {
+            result = await this.cardTypeManager.create(
+                projectId,
+                label,
+                detail,
+                color
+            );
+        }
+
         if (!result.success) {
-            this.handleError("Création du type de carte impossible", result);
+            this.handleError("Opération impossible", result);
             return;
         }
+
+        this.editingCardTypeId = null;
         await this.reloadCardTypes(projectId);
         this.hideNewCardTypeForm();
     }
@@ -200,14 +231,39 @@ export default class KanbanModule {
         await this.reloadCardTypes(this.dom.editProjectId.value);
     }
 
+    async editCardType(cardTypeId) {
+
+        const projectId = this.dom.projectSelect.value;
+        if (!projectId) return alert("Sélectionnez un projet");
+
+        const cardType = this.cardTypes.find(t => t.Id === cardTypeId);
+        if (!cardType) {
+            this.handleError("Type de carte introuvable");
+            return;
+        }
+
+        this.editingCardTypeId = cardTypeId;
+
+        this.dom.newCardTypeLabel.value = cardType.Label ?? "";
+        this.dom.newCardTypeDetail.value = cardType.Detail ?? "";
+
+        const color = cardType.Color ?? "bg-warning-subtle";
+        const radio = this.dom.newCardTypeForm
+            .querySelector(`input[name="newCardTypeColor"][value="${color}"]`);
+        if (radio) radio.checked = true;
+
+        this.showNewCardTypeForm();
+    }
+
     async reloadCardTypes(projectId) {
         const response = await this.cardTypeManager.load(projectId);
         if (!response.success) {
             this.handleError("Chargement des types de carte impossible", response);
             return;
         }
-        this.displayCardTypes(response.data.cardTypes ?? []);
-        this.populateCardTypeSelects(response.data.cardTypes ?? []);
+        this.cardTypes = response.data.cardTypes ?? [];
+        this.displayCardTypes(this.cardTypes);
+        this.populateCardTypeSelects(this.cardTypes);
     }
 
     displayCardTypes(cardTypes) {
@@ -224,10 +280,15 @@ export default class KanbanModule {
 
         cardTypes.forEach(type => {
             const wrapper = document.createElement("div");
-            wrapper.className = "card-type-item d-flex justify-content-between align-items-start";
+            wrapper.className = "card-type-item d-flex justify-content-between align-items-center mb-2";
 
             const info = document.createElement("div");
-            info.className = "flex-grow-1";
+            info.className = "d-flex align-items-center gap-2 flex-grow-1";
+
+            const swatch = document.createElement("span");
+            swatch.className = `border rounded ${type.Color || 'bg-warning-subtle'}`;
+            swatch.style.cssText = "display:inline-block; width:1.2rem; height:1.2rem; flex-shrink:0;";
+            info.appendChild(swatch);
 
             const label = document.createElement("span");
             label.className = "fw-bold";
@@ -236,18 +297,29 @@ export default class KanbanModule {
 
             if (type.Detail) {
                 const detail = document.createElement("span");
-                detail.className = "text-muted small";
+                detail.className = "text-muted small ms-1";
                 detail.textContent = type.Detail;
                 info.appendChild(detail);
             }
 
-            const btn = document.createElement("button");
-            btn.className = "btn btn-sm btn-danger";
-            btn.innerHTML = '<i class="bi bi-trash"></i>';
-            btn.addEventListener("click", () => this.deleteCardType(type.Id));
+            const actions = document.createElement("div");
+            actions.className = "d-flex gap-2";
+
+            const editBtn = document.createElement("button");
+            editBtn.className = "btn btn-sm btn-warning";
+            editBtn.innerHTML = '<i class="bi bi-pencil"></i>';
+            editBtn.addEventListener("click", () => this.editCardType(type.Id));
+
+            const deleteBtn = document.createElement("button");
+            deleteBtn.className = "btn btn-sm btn-danger";
+            deleteBtn.innerHTML = '<i class="bi bi-trash"></i>';
+            deleteBtn.addEventListener("click", () => this.deleteCardType(type.Id));
+
+            actions.appendChild(editBtn);
+            actions.appendChild(deleteBtn);
 
             wrapper.appendChild(info);
-            wrapper.appendChild(btn);
+            wrapper.appendChild(actions);
             container.appendChild(wrapper);
         });
     }

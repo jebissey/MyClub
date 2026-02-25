@@ -220,7 +220,7 @@ class KanbanDataHelper extends Data
             $and .= " AND kct.Id = :filterCT ";
             $params[':filterCT'] = $filterCT;
         }
-        if ($filterTitle !== null){
+        if ($filterTitle !== null) {
             $and .= " AND kc.Title LIKE :filterTitle ";
             $params[':filterTitle'] = "%$filterTitle%";
         }
@@ -242,6 +242,7 @@ class KanbanDataHelper extends Data
                 kc.Id,
                 kc.Title,
                 kc.Detail,
+                kc.IdKanbanCardType,
                 kct.Label,
                 CASE 
                     WHEN ls.What = 'Created' THEN '💡'
@@ -296,17 +297,18 @@ class KanbanDataHelper extends Data
     }
 
     #region CardType
-    public function createKanbanCardType(int $idKanbanProject, string $label, string $detail): int
+    public function createKanbanCardType(int $idKanbanProject, string $label, string $detail, string $color): int
     {
         $sql = "
-            INSERT INTO KanbanCardType (IdKanbanProject, Label, Detail) 
-            VALUES (:idKanbanProject, :label, :detail)
+            INSERT INTO KanbanCardType (IdKanbanProject, Label, Detail, Color) 
+            VALUES (:idKanbanProject, :label, :detail, :color)
         ";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([
             'idKanbanProject' => $idKanbanProject,
             ':label' => $label,
-            ':detail' => $detail
+            ':detail' => $detail,
+            ':color' => $color
         ]);
         return (int)$this->pdo->lastInsertId();
     }
@@ -327,7 +329,8 @@ class KanbanDataHelper extends Data
             SELECT 
                 Id,
                 Label,
-                Detail
+                Detail,
+                Color
             FROM KanbanCardType
             WHERE IdKanbanProject = :idProject
             ORDER BY Detail 
@@ -335,5 +338,22 @@ class KanbanDataHelper extends Data
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':idProject' => $idProject]);
         return $stmt->fetchAll(PDO::FETCH_OBJ);
+    }
+
+    public function updateKanbanCardType(int $idKanbanCardType, string $label, string $detail, string $color): int
+    {
+        $sql = "
+            UPDATE KanbanCardType 
+            SET Label = :label, Detail = :detail, Color = :color
+            WHERE Id = :idKanbanCardType
+        ";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([
+            ':idKanbanCardType' => $idKanbanCardType,
+            ':label' => $label,
+            ':detail' => $detail,
+            ':color' => $color
+        ]);
+        return (int)$this->pdo->lastInsertId();
     }
 }

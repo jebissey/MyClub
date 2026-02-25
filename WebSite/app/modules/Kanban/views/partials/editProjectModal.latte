@@ -1,0 +1,89 @@
+<div class="modal fade" id="editProjectModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">✏️ Éditer le projet</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="editProjectId">
+                
+                <div class="mb-4">
+                    <div class="mb-3">
+                        <label for="editProjectTitle" class="form-label">Titre du projet <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="editProjectTitle" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editProjectDescription" class="form-label">Description</label>
+                        <textarea class="form-control" id="editProjectDescription" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="mb-0">Types de cartes</h6>
+                        <button type="button" class="btn btn-sm btn-primary" id="addCardTypeBtn">
+                            <i class="bi bi-plus-lg"></i>
+                        </button>
+                    </div>
+                    
+                    <div id="cardTypesList">
+                        <!-- dynamically loaded -->
+                    </div>
+
+                    <div id="newCardTypeForm" class="card d-none mt-3">
+                        <div class="card-body">
+                            <h6 class="card-title">Nouveau type de carte</h6>
+                            <div class="mb-2">
+                                <label for="newCardTypeLabel" class="form-label">Label <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control form-control-sm" id="newCardTypeLabel" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="newCardTypeDetail" class="form-label">Description</label>
+                                <textarea class="form-control form-control-sm" id="newCardTypeDetail" rows="2"></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Couleur de fond</label>
+                                <div class="d-flex flex-wrap gap-2" id="newCardTypeColorPicker">
+                                    {foreach [
+                                        'bg-primary-subtle'   => 'Bleu',
+                                        'bg-secondary-subtle' => 'Gris',
+                                        'bg-success-subtle'   => 'Vert',
+                                        'bg-danger-subtle'    => 'Rouge',
+                                        'bg-warning-subtle'   => 'Jaune',
+                                        'bg-info-subtle'      => 'Cyan',
+                                        'bg-light-subtle'     => 'Blanc',
+                                        'bg-dark-subtle'      => 'Sombre',
+                                    ] as $class => $label}
+                                        <div>
+                                            <input type="radio"
+                                                class="btn-check"
+                                                name="newCardTypeColor"
+                                                id="color-new-{$class}"
+                                                value="{$class}"
+                                                {if $class === 'bg-light-subtle'}checked{/if}
+                                                autocomplete="off">
+                                            <label class="btn btn-sm color-swatch {$class} border border-2"
+                                                for="color-new-{$class}"
+                                                title="{$label}"
+                                                style="width:2rem; height:2rem;">
+                                            </label>
+                                        </div>
+                                    {/foreach}
+                                </div>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <button type="button" class="btn btn-sm btn-primary" id="saveNewCardType">Enregistrer</button>
+                                <button type="button" class="btn btn-sm btn-secondary" id="cancelNewCardType">Annuler</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" id="deleteProjectBtn">Supprimer le projet</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <button type="button" class="btn btn-primary" id="saveEditProject">Enregistrer</button>
+            </div>
+        </div>
+    </div>
+</div>
