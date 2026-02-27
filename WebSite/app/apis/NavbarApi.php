@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace app\apis;
@@ -16,7 +17,7 @@ class NavbarApi extends AbstractApi
 {
     public function __construct(Application $application, private PageDataHelper $pageDataHelper, ConnectedUser $connectedUser, DataHelper $dataHelper, PersonDataHelper $personDataHelper)
     {
-        parent::__construct($application, $connectedUser,$dataHelper, $personDataHelper);
+        parent::__construct($application, $connectedUser, $dataHelper, $personDataHelper);
     }
 
     public function deleteNavbarItem(int $id): void
@@ -48,7 +49,7 @@ class NavbarApi extends AbstractApi
             return;
         }
         try {
-            $this->renderJsonOk(['message' => $this->pageDataHelper->get_($id)]);
+            $this->renderJsonOk(['item' => $this->dataHelper->get('Page', ['Id' => $id])]);
         } catch (Throwable $e) {
             $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
         }

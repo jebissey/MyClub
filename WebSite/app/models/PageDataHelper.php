@@ -20,11 +20,6 @@ class PageDataHelper extends Data
         return $this->fluent->deleteFrom('Page')->where('Id', $id)->execute();
     }
 
-    public function get_($id): mixed
-    {
-        return $this->fluent->from('Page')->where('Id', $id)->fetch();
-    }
-
     public function gets_(): array
     {
         $sql = "

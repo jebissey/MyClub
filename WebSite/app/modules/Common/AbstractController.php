@@ -78,23 +78,44 @@ abstract class AbstractController
 
     protected function getNavItems($person, bool $all = false)
     {
-        if (!$person) $userGroups = [];
-        else $userGroups = $this->authorizationDataHelper->getUserGroups($person->Email);
+        if (!$person) {
+            $userGroups = [];
+        } else {
+            $userGroups = $this->authorizationDataHelper->getUserGroups($person->Email);
+        }
 
         $navItems = $this->dataHelper->gets('Page');
         $filteredNavItems = [];
+
         foreach ($navItems as $navItem) {
             if (
                 ($person === false && $navItem->ForAnonymous == 1)
                 || ($person && $navItem->ForMembers == 1 &&
                     (
                         $navItem->IdGroup === null
-                        || ($userGroups != [] && in_array($navItem->IdGroup, $userGroups))
+                        || (!empty($userGroups) && in_array($navItem->IdGroup, $userGroups))
                     )
                 )
                 || $all
-            ) $filteredNavItems[] = $navItem;
+            ) {
+                $filteredNavItems[] = $navItem;
+            }
         }
+
+        $groups = $this->dataHelper->gets('Group', ['Inactivated' => 0]);
+        $groupsById = [];
+        foreach ($groups as $group) {
+            $groupsById[$group->Id] = $group->Name;
+        }
+
+        foreach ($filteredNavItems as $navItem) {
+            if ($navItem->IdGroup !== null && isset($groupsById[$navItem->IdGroup])) {
+                $navItem->GroupName = $groupsById[$navItem->IdGroup];
+            } else {
+                $navItem->GroupName = null;
+            }
+        }
+
         return $filteredNavItems;
     }
 

@@ -71,6 +71,7 @@ class NavBarController extends AbstractController
             '/user/statistics',
             '/ffa/search',
             '/contact',
+            '/kanban',
             '/webCard',
         ];
     }
