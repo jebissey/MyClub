@@ -84,7 +84,7 @@ abstract class AbstractController
             $userGroups = $this->authorizationDataHelper->getUserGroups($person->Email);
         }
 
-        $navItems = $this->dataHelper->gets('Page');
+        $navItems = $this->dataHelper->gets('Page', [], 'Id, Name, Route, IdGroup, ForMembers, ForAnonymous', 'Position');
         $filteredNavItems = [];
 
         foreach ($navItems as $navItem) {
