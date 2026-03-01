@@ -9,6 +9,128 @@
     <title>{block title}MyClub{/block}</title>
     {php Tracy\Debugger::renderLoader()}
     <style>
+        /* ─── Sidebar layout ─────────────────────────────────────── */
+        :root {
+            --sidebar-width: 260px;
+            --sidebar-collapsed-width: 0px;
+            --sidebar-bg: #212529;
+            --sidebar-link: rgba(255,255,255,.75);
+            --sidebar-link-hover: #fff;
+            --sidebar-heading: rgba(255,255,255,.4);
+            --transition-speed: 0.3s;
+        }
+
+        body.sidebar-enabled #sidebar-wrapper {
+            display: flex !important;
+        }
+
+        #wrapper {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* Sidebar */
+        #sidebar-wrapper {
+            display: none;
+            flex-direction: column;
+            width: var(--sidebar-width);
+            min-width: var(--sidebar-width);
+            min-height: 100%;
+            background-color: var(--sidebar-bg);
+            transition: width var(--transition-speed) ease, min-width var(--transition-speed) ease;
+            overflow: hidden;
+            position: sticky;
+            top: 56px; /* navbar height */
+            height: calc(100vh - 56px);
+            overflow-y: auto;
+            z-index: 100;
+            flex-shrink: 0;
+        }
+
+        #sidebar-wrapper.collapsed {
+            width: 0;
+            min-width: 0;
+        }
+
+        .sidebar-heading {
+            padding: 0.875rem 1.25rem;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            color: var(--sidebar-heading);
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        #sidebar-wrapper .nav-link {
+            color: var(--sidebar-link);
+            padding: 0.5rem 1.25rem;
+            white-space: nowrap;
+            font-size: 0.9rem;
+            border-left: 3px solid transparent;
+            transition: color .15s, border-color .15s, background .15s;
+        }
+
+        #sidebar-wrapper .nav-link:hover,
+        #sidebar-wrapper .nav-link.active {
+            color: var(--sidebar-link-hover);
+            background-color: rgba(255,255,255,.06);
+            border-left-color: #0d6efd;
+        }
+
+        #sidebar-wrapper .nav-link i {
+            width: 18px;
+            text-align: center;
+            margin-right: .5rem;
+            flex-shrink: 0;
+        }
+
+        /* Divider */
+        .sidebar-divider {
+            border-top: 1px solid rgba(255,255,255,.1);
+            margin: .5rem 0;
+        }
+
+        /* Submenu */
+        #sidebar-wrapper .collapse-submenu .nav-link {
+            padding-left: 2.75rem;
+            font-size: 0.85rem;
+        }
+
+        /* Toggle button in navbar */
+        #sidebarToggle {
+            width: 34px;
+            height: 34px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            background: transparent;
+            color: rgba(255,255,255,.75);
+            font-size: 1.1rem;
+            border-radius: 6px;
+            transition: background .15s, color .15s;
+            cursor: pointer;
+        }
+
+        #sidebarToggle:hover {
+            background: rgba(255,255,255,.1);
+            color: #fff;
+        }
+
+        body.sidebar-enabled #sidebarToggle {
+            display: flex;
+        }
+
+        /* Page content */
+        #page-content-wrapper {
+            flex: 1;
+            min-width: 0;
+            transition: all var(--transition-speed) ease;
+        }
+
+        /* ─── Background watermark ───────────────────────────────── */
         .content-wrapper {
             position: relative;
             min-height: 100%;
@@ -28,19 +150,18 @@
             height: 100%;
             pointer-events: none;
             z-index: -1;
-            /* Valeur négative pour être sous le contenu */
         }
 
+        /* ─── Modals ──────────────────────────────────────────────── */
         .modal {
             z-index: 1055 !important;
-            /* Valeur par défaut de Bootstrap */
         }
 
         .modal-backdrop {
             z-index: 1050 !important;
-            /* Valeur par défaut de Bootstrap */
         }
 
+        /* ─── Save indicator ─────────────────────────────────────── */
         #saveIndicator {
             position: fixed;
             bottom: 20px;
@@ -50,10 +171,10 @@
             border-radius: 50%;
             width: 50px;
             height: 50px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 2px 10px rgba(0,0,0,.2);
             z-index: 1050;
             cursor: pointer;
-            transition: transform 0.2s;
+            transition: transform .2s;
         }
 
         #saveIndicator:hover {
@@ -69,6 +190,7 @@
             color: #0d6efd;
         }
 
+        /* ─── Utilities ──────────────────────────────────────────── */
         .attribute-badge {
             display: inline-block;
             width: 20px;
@@ -76,7 +198,7 @@
             margin-right: 5px;
             border-radius: 4px;
             cursor: help;
-            border: 1px solid rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(0,0,0,.2);
         }
 
         .double-strike {
@@ -85,8 +207,8 @@
         }
 
         nav.navbar .navbar-nav .nav-link {
-        padding-top: 0.1rem;
-        padding-bottom: 0.1rem;
+            padding-top: 0.1rem;
+            padding-bottom: 0.1rem;
         }
 
         .img-left {
@@ -110,20 +232,56 @@
             max-width: 100%;
             height: auto;
         }
+
         .custom-img {
             height: 220px;
             width: 100%;
             object-fit: cover;
         }
+
+        /* ─── Responsive ─────────────────────────────────────────── */
+        @media (max-width: 768px) {
+            #sidebar-wrapper {
+                position: fixed;
+                top: 56px;
+                left: 0;
+                height: calc(100vh - 56px);
+                z-index: 1040;
+                box-shadow: 4px 0 15px rgba(0,0,0,.3);
+            }
+
+            #sidebar-wrapper.collapsed {
+                width: 0;
+                min-width: 0;
+            }
+
+            /* Overlay on mobile when sidebar open */
+            #sidebarOverlay {
+                display: none;
+                position: fixed;
+                top: 56px;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,.4);
+                z-index: 1039;
+            }
+
+            body.sidebar-enabled.sidebar-open #sidebarOverlay {
+                display: block;
+            }
+        }
     </style>
     {block head}{/block}
 </head>
 
-<body class="d-flex flex-column min-vh-100">
+<body class="d-flex flex-column min-vh-100{if isset($sidebarMenu) && count($sidebarMenu) > 0} sidebar-enabled sidebar-open{/if}">
+
+    {* ── Alerts ──────────────────────────────────────────────────── *}
     {if isset($productionSiteUrl)}
         <div class="alert alert-danger alert-dismissible fade show m-0 rounded-0 text-center py-3" role="alert">
             <h2><i class="bi bi-exclamation-triangle-fill"></i> ATTENTION : Site de test</h2>
-            Vous êtes sur un environnement de test. 
+            Vous êtes sur un environnement de test.
             <a href="{$productionSiteUrl}" class="alert-link fw-bold">Accéder au site de production</a>
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
@@ -138,41 +296,169 @@
     <div class="toast-container position-fixed top-0 end-0 p-3" id="toastContainer"></div>
 
     <div class="content-wrapper d-flex flex-column min-vh-100">
-        <main class="flex-grow-1">
+        <main class="flex-grow-1 d-flex flex-column">
 
-        {if isset($currentPath) && $currentPath === '/' && file_exists('app/images/header-banner.jpg')}
-            <div class="text-center">
-                <img src="/app/images/header-banner.jpg"
-                     class="img-fluid custom-img"
-                     alt="Bannière">
-            </div>
-        {/if}
+            {* ── Banner (home only) ───────────────────────────────── *}
+            {if isset($currentPath) && $currentPath === '/' && file_exists('app/images/header-banner.jpg')}
+                <div class="text-center">
+                    <img src="/app/images/header-banner.jpg" class="img-fluid custom-img" alt="Bannière">
+                </div>
+            {/if}
 
+            {* ── Navbar ──────────────────────────────────────────── *}
             <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+                {* Sidebar toggle button — visible only when sidebar is enabled *}
+                <button id="sidebarToggle" title="Afficher/masquer le menu">
+                    <i class="bi bi-layout-sidebar"></i>
+                </button>
                 {block navbar}{/block}
             </nav>
 
-            <div class="container-fluid">
-                {block content}{/block}
-                <div id="saveIndicator" title="Penser à enregistrer les modifications">
-                    <i class="bi bi-save"></i>
+            {* ── Sidebar + content wrapper ───────────────────────── *}
+            <div id="wrapper" class="flex-grow-1">
+
+                {* Mobile overlay *}
+                <div id="sidebarOverlay"></div>
+
+                {* ── Sidebar ────────────────────────────────────── *}
+                <div id="sidebar-wrapper">
+                    {block sidebar}
+                        {* Default sidebar built from $sidebarMenu array passed by presenter.
+                           Expected structure:
+                           $sidebarMenu = [
+                             ['type' => 'heading', 'label' => 'Section'],
+                             ['type' => 'link',    'label' => 'Dashboard', 'icon' => 'bi-speedometer2', 'url' => '/'],
+                             ['type' => 'divider'],
+                             ['type' => 'submenu', 'label' => 'Paramètres', 'icon' => 'bi-gear',
+                               'children' => [
+                                 ['label' => 'Profil', 'url' => '/profile'],
+                                 ['label' => 'Sécurité', 'url' => '/security'],
+                               ]
+                             ],
+                           ]
+                        *}
+                        {if isset($sidebarMenu)}
+                            <nav class="py-2">
+                                {foreach $sidebarMenu as $item}
+                                    {if $item['type'] === 'heading'}
+                                        <div class="sidebar-heading">{$item['label']}</div>
+
+                                    {elseif $item['type'] === 'divider'}
+                                        <hr class="sidebar-divider">
+
+                                    {elseif $item['type'] === 'link'}
+                                        <a href="{$item['url']}"
+                                           class="nav-link{if isset($currentPath) && $currentPath === $item['url']} active{/if}">
+                                            <i class="bi {isset($item['icon']) ? $item['icon'] : 'bi-circle'}"></i>
+                                            {$item['label']}
+                                        </a>
+
+                                    {elseif $item['type'] === 'submenu'}
+                                        {var $submenuId = 'submenu-' . $iterator->counter}
+                                        <a class="nav-link d-flex align-items-center justify-content-between"
+                                           data-bs-toggle="collapse"
+                                           href="#{$submenuId}"
+                                           role="button"
+                                           aria-expanded="false">
+                                            <span>
+                                                <i class="bi {isset($item['icon']) ? $item['icon'] : 'bi-folder'}"></i>
+                                                {$item['label']}
+                                            </span>
+                                            <i class="bi bi-chevron-down small ms-1" style="transition:transform .2s"></i>
+                                        </a>
+                                        <div class="collapse collapse-submenu" id="{$submenuId}">
+                                            {foreach $item['children'] as $child}
+                                                <a href="{$child['url']}"
+                                                   class="nav-link{if isset($currentPath) && $currentPath === $child['url']} active{/if}">
+                                                    <i class="bi bi-dash"></i>
+                                                    {$child['label']}
+                                                </a>
+                                            {/foreach}
+                                        </div>
+                                    {/if}
+                                {/foreach}
+                            </nav>
+                        {/if}
+                    {/block}
+                </div>{* /sidebar-wrapper *}
+
+                {* ── Page content ───────────────────────────────── *}
+                <div id="page-content-wrapper">
+                    <div class="container-fluid">
+                        {block content}{/block}
+                        <div id="saveIndicator" title="Penser à enregistrer les modifications">
+                            <i class="bi bi-save"></i>
+                        </div>
+                    </div>
                 </div>
-            </div>
+
+            </div>{* /wrapper *}
         </main>
 
         <footer class="bg-dark text-white">
             <div class="container-fluid">
                 <p class="mb-0">
-                    <a href ="https://github.com/jebissey/MyClub/releases">V{$currentVersion}</a> &#169; JEB 
+                    <a href="https://github.com/jebissey/MyClub/releases">V{$currentVersion}</a> &#169; JEB
                     <a href="/legal/notice">Mentions légales</a>
                     <a href="https://myclub.alwaysdata.net/navbar/show/article/28" target="_blank">Tutoriels</a>
                 </p>
             </div>
         </footer>
     </div>
-            
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/app/modules/Common/js/layout.js"></script>
+    <script>
+        // ── Sidebar toggle ────────────────────────────────────────────
+        (function () {
+            const body       = document.body;
+            const sidebar    = document.getElementById('sidebar-wrapper');
+            const toggleBtn  = document.getElementById('sidebarToggle');
+            const overlay    = document.getElementById('sidebarOverlay');
+            const STORAGE_KEY = 'myclub_sidebar_open';
+
+            if (!sidebar || !toggleBtn) return;
+
+            // Restore saved state (default: open)
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (saved === 'closed') {
+                sidebar.classList.add('collapsed');
+                body.classList.remove('sidebar-open');
+            }
+
+            toggleBtn.addEventListener('click', function () {
+                const isCollapsed = sidebar.classList.toggle('collapsed');
+                body.classList.toggle('sidebar-open', !isCollapsed);
+                localStorage.setItem(STORAGE_KEY, isCollapsed ? 'closed' : 'open');
+            });
+
+            // Close on mobile overlay click
+            if (overlay) {
+                overlay.addEventListener('click', function () {
+                    sidebar.classList.add('collapsed');
+                    body.classList.remove('sidebar-open');
+                    localStorage.setItem(STORAGE_KEY, 'closed');
+                });
+            }
+
+            // Rotate chevron on submenu toggle
+            document.querySelectorAll('[data-bs-toggle="collapse"]').forEach(function (el) {
+                const chevron = el.querySelector('.bi-chevron-down');
+                if (!chevron) return;
+                const target = document.querySelector(el.getAttribute('href'));
+                if (!target) return;
+                target.addEventListener('show.bs.collapse',  () => chevron.style.transform = 'rotate(-180deg)');
+                target.addEventListener('hide.bs.collapse',  () => chevron.style.transform = 'rotate(0deg)');
+            });
+
+            // Auto-expand submenu that contains the active link
+            document.querySelectorAll('.collapse-submenu').forEach(function (submenu) {
+                if (submenu.querySelector('.nav-link.active')) {
+                    new bootstrap.Collapse(submenu, { toggle: true });
+                }
+            });
+        })();
+    </script>
     {block scripts}{/block}
 </body>
 </html>

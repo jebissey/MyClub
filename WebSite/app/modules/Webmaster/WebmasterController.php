@@ -119,7 +119,6 @@ class WebmasterController extends AbstractController
         }
     }
 
-
     public function notifications(): void
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isAdministrator())) {

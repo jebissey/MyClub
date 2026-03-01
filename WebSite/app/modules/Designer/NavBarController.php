@@ -6,7 +6,6 @@ namespace app\modules\Designer;
 
 use app\enums\ApplicationError;
 use app\helpers\Application;
-use app\helpers\WebApp;
 use app\models\ArwardsDataHelper;
 use app\modules\Common\AbstractController;
 
@@ -20,7 +19,7 @@ class NavBarController extends AbstractController
     public function index()
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isNavbarDesigner())) {
-            $this->render('Webmaster/views/navbar.latte', $this->getAllParams([
+            $this->render('Designer/views/navbar.latte', $this->getAllParams([
                 'navItems' => $this->getNavItems($this->application->getConnectedUser()->person, true),
                 'groups' => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
                 'availableRoutes' => $this->getAvailableRoutes(),

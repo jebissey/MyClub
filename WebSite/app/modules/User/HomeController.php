@@ -106,7 +106,7 @@ class HomeController extends AbstractController
             'pendingSurveys' => $userPendingSurveys,
             'pendingDesigns' => $userPendingDesigns,
             'news' => $news ?? false,
-            'page' => $this->application->getConnectedUser()->getPage()
+            'page' => $this->application->getConnectedUser()->getPage(),
         ]));
     }
 
