@@ -214,6 +214,7 @@ CREATE TABLE IF NOT EXISTS "Languages" (
 	"Name"	TEXT NOT NULL,
 	"en_US"	TEXT NOT NULL,
 	"fr_FR"	TEXT NOT NULL,
+	"pl_PL"	TEXT NOT NULL,
 	PRIMARY KEY("Id")
 );
 CREATE TABLE IF NOT EXISTS "Message" (
@@ -405,63 +406,64 @@ INSERT INTO "Authorization" VALUES (7,'EventDesigner');
 INSERT INTO "Authorization" VALUES (8,'VisitorInsights');
 INSERT INTO "Authorization" VALUES (9,'NavbarDesigner');
 INSERT INTO "Authorization" VALUES (10,'KanbanDesigner');
+INSERT INTO "Authorization" VALUES (11,'Translator');
 INSERT INTO "Group" VALUES (1,'Webmaster',0,0);
 INSERT INTO "GroupAuthorization" VALUES (1,1,1);
-INSERT INTO "Languages" VALUES (1,'select_language','Select language','Sélectionner la langue');
-INSERT INTO "Languages" VALUES (2,'language','Language','Langue');
-INSERT INTO "Languages" VALUES (3,'my_data','My ddata','Mes données');
-INSERT INTO "Languages" VALUES (4,'admin_zone','Admin zone','Zone d''administration');
-INSERT INTO "Languages" VALUES (5,'logout','Logout','Déconnexion');
-INSERT INTO "Languages" VALUES (6,'contextual_help','Contextual help','Aide contextuelle');
-INSERT INTO "Languages" VALUES (7,'vote','Vote','Voter');
-INSERT INTO "Languages" VALUES (8,'connection_required','(You must be connected)','(Vous devez être connecté)');
-INSERT INTO "Languages" VALUES (9,'home','Home','Accueil');
-INSERT INTO "Languages" VALUES (10,'created_by','Created by','Créé par');
-INSERT INTO "Languages" VALUES (11,'modified_on','modified on','modifié le');
-INSERT INTO "Languages" VALUES (12,'on','on','le');
-INSERT INTO "Languages" VALUES (13,'eventsAvailableForYou','Your events','Vos événements');
-INSERT INTO "Languages" VALUES (14,'eventsAvailableForAll','The events','Les événements');
-INSERT INTO "Languages" VALUES (15,'type','Type','Type');
-INSERT INTO "Languages" VALUES (16,'summary','Summary','Sommaire');
-INSERT INTO "Languages" VALUES (17,'location','Location','Lieu');
-INSERT INTO "Languages" VALUES (18,'date_time','Date and time','Date et heure');
-INSERT INTO "Languages" VALUES (19,'duration','Duration','Durée');
-INSERT INTO "Languages" VALUES (20,'attributes','Attributes','Attribut');
-INSERT INTO "Languages" VALUES (21,'description','Description','Description');
-INSERT INTO "Languages" VALUES (22,'participants','Participants','Participants');
-INSERT INTO "Languages" VALUES (23,'audience','Audience','Audience');
-INSERT INTO "Languages" VALUES (24,'ClubMembersOnly','Members','Membres');
-INSERT INTO "Languages" VALUES (25,'All','Public','Public');
-INSERT INTO "Languages" VALUES (26,'register','Register','S''inscrire');
-INSERT INTO "Languages" VALUES (27,'unregister','Unregister','Se désinscrire');
-INSERT INTO "Languages" VALUES (28,'fullyBooked','Fully booked','Complet');
-INSERT INTO "Languages" VALUES (29,'noAttributes','No attributes','Aucun attribut');
-INSERT INTO "Languages" VALUES (30,'noParticipant','No participant at this time','Aucun participant pour le moment');
-INSERT INTO "Languages" VALUES (31,'login','Login','Connexion');
-INSERT INTO "Languages" VALUES (32,'edit','Edit','Modifier');
-INSERT INTO "Languages" VALUES (33,'messages','Messages','Messages');
-INSERT INTO "Languages" VALUES (34,'delete','Delete','Supprimer');
-INSERT INTO "Languages" VALUES (35,'duplicate','Duplicate','Dupliquer');
-INSERT INTO "Languages" VALUES (36,'sendEmail','Send email','Envoyer courriel');
-INSERT INTO "Languages" VALUES (37,'news','News','News');
-INSERT INTO "Languages" VALUES (38,'directory','Directory','Trombinoscope');
-INSERT INTO "Languages" VALUES (39,'statistics','Statistics','Statistiques');
-INSERT INTO "Languages" VALUES (40,'preferences','Preferences','Préférences');
-INSERT INTO "Languages" VALUES (41,'groups','Groups','Groupes');
-INSERT INTO "Languages" VALUES (42,'availabilities','Availabilities','Disponibilités');
-INSERT INTO "Languages" VALUES (43,'account','Account','Compte');
-INSERT INTO "Languages" VALUES (44,'Guest','Guest','Invité');
-INSERT INTO "Languages" VALUES (45,'morning','Morning','Matin');
-INSERT INTO "Languages" VALUES (46,'afternoon','Afternoon','Après-midi');
-INSERT INTO "Languages" VALUES (47,'evening','Evening','Soir');
-INSERT INTO "Languages" VALUES (48,'Message_UnknownUser','Unknown user (email)','Utilisateur inconnu (courriel)');
-INSERT INTO "Languages" VALUES (49,'comboSeparatorHome','--- Home ---','--- Accueil ---');
-INSERT INTO "Languages" VALUES (50,'comboSeparatorMessages','--- Messages ---','--- Messages ---');
-INSERT INTO "Languages" VALUES (51,'comboSeparatorErrorPages','--- Error pages ---','--- Pages d''erreur ---');
-INSERT INTO "Languages" VALUES (52,'comboSeparatorHelp','--- Help ---','--- Aides ---');
-INSERT INTO "Languages" VALUES (53,'Help_Admin','Administratror help','Aide administrateur');
-INSERT INTO "Languages" VALUES (54,'Help_Designer','Designer help','Aide designer');
-INSERT INTO "Languages" VALUES (55,'Help_EventManager','Event manager help','Aide gestionnaire d''événements');
+INSERT INTO "Languages" VALUES (1,'select_language','Select language','Sélectionner la langue',' ');
+INSERT INTO "Languages" VALUES (2,'language','Language','Langue',' ');
+INSERT INTO "Languages" VALUES (3,'my_data','My ddata','Mes données',' ');
+INSERT INTO "Languages" VALUES (4,'admin_zone','Admin zone','Zone d''administration',' ');
+INSERT INTO "Languages" VALUES (5,'logout','Logout','Déconnexion',' ');
+INSERT INTO "Languages" VALUES (6,'contextual_help','Contextual help','Aide contextuelle',' ');
+INSERT INTO "Languages" VALUES (7,'vote','Vote','Voter',' ');
+INSERT INTO "Languages" VALUES (8,'connection_required','(You must be connected)','(Vous devez être connecté)',' ');
+INSERT INTO "Languages" VALUES (9,'home','Home','Accueil',' ');
+INSERT INTO "Languages" VALUES (10,'created_by','Created by','Créé par',' ');
+INSERT INTO "Languages" VALUES (11,'modified_on','modified on','modifié le',' ');
+INSERT INTO "Languages" VALUES (12,'on','on','le',' ');
+INSERT INTO "Languages" VALUES (13,'eventsAvailableForYou','Your events','Vos événements',' ');
+INSERT INTO "Languages" VALUES (14,'eventsAvailableForAll','The events','Les événements',' ');
+INSERT INTO "Languages" VALUES (15,'type','Type','Type',' ');
+INSERT INTO "Languages" VALUES (16,'summary','Summary','Sommaire',' ');
+INSERT INTO "Languages" VALUES (17,'location','Location','Lieu',' ');
+INSERT INTO "Languages" VALUES (18,'date_time','Date and time','Date et heure',' ');
+INSERT INTO "Languages" VALUES (19,'duration','Duration','Durée',' ');
+INSERT INTO "Languages" VALUES (20,'attributes','Attributes','Attribut',' ');
+INSERT INTO "Languages" VALUES (21,'description','Description','Description',' ');
+INSERT INTO "Languages" VALUES (22,'participants','Participants','Participants',' ');
+INSERT INTO "Languages" VALUES (23,'audience','Audience','Audience',' ');
+INSERT INTO "Languages" VALUES (24,'ClubMembersOnly','Members','Membres',' ');
+INSERT INTO "Languages" VALUES (25,'All','Public','Public',' ');
+INSERT INTO "Languages" VALUES (26,'register','Register','S''inscrire',' ');
+INSERT INTO "Languages" VALUES (27,'unregister','Unregister','Se désinscrire',' ');
+INSERT INTO "Languages" VALUES (28,'fullyBooked','Fully booked','Complet',' ');
+INSERT INTO "Languages" VALUES (29,'noAttributes','No attributes','Aucun attribut',' ');
+INSERT INTO "Languages" VALUES (30,'noParticipant','No participant at this time','Aucun participant pour le moment',' ');
+INSERT INTO "Languages" VALUES (31,'login','Login','Connexion',' ');
+INSERT INTO "Languages" VALUES (32,'edit','Edit','Modifier',' ');
+INSERT INTO "Languages" VALUES (33,'messages','Messages','Messages',' ');
+INSERT INTO "Languages" VALUES (34,'delete','Delete','Supprimer',' ');
+INSERT INTO "Languages" VALUES (35,'duplicate','Duplicate','Dupliquer',' ');
+INSERT INTO "Languages" VALUES (36,'sendEmail','Send email','Envoyer courriel',' ');
+INSERT INTO "Languages" VALUES (37,'news','News','News',' ');
+INSERT INTO "Languages" VALUES (38,'directory','Directory','Trombinoscope',' ');
+INSERT INTO "Languages" VALUES (39,'statistics','Statistics','Statistiques',' ');
+INSERT INTO "Languages" VALUES (40,'preferences','Preferences','Préférences',' ');
+INSERT INTO "Languages" VALUES (41,'groups','Groups','Groupes',' ');
+INSERT INTO "Languages" VALUES (42,'availabilities','Availabilities','Disponibilités',' ');
+INSERT INTO "Languages" VALUES (43,'account','Account','Compte',' ');
+INSERT INTO "Languages" VALUES (44,'Guest','Guest','Invité',' ');
+INSERT INTO "Languages" VALUES (45,'morning','Morning','Matin',' ');
+INSERT INTO "Languages" VALUES (46,'afternoon','Afternoon','Après-midi',' ');
+INSERT INTO "Languages" VALUES (47,'evening','Evening','Soir',' ');
+INSERT INTO "Languages" VALUES (48,'Message_UnknownUser','Unknown user (email)','Utilisateur inconnu (courriel)',' ');
+INSERT INTO "Languages" VALUES (49,'comboSeparatorHome','--- Home ---','--- Accueil ---',' ');
+INSERT INTO "Languages" VALUES (50,'comboSeparatorMessages','--- Messages ---','--- Messages ---',' ');
+INSERT INTO "Languages" VALUES (51,'comboSeparatorErrorPages','--- Error pages ---','--- Pages d''erreur ---',' ');
+INSERT INTO "Languages" VALUES (52,'comboSeparatorHelp','--- Help ---','--- Aides ---',' ');
+INSERT INTO "Languages" VALUES (53,'Help_Admin','Administratror help','Aide administrateur',' ');
+INSERT INTO "Languages" VALUES (54,'Help_Designer','Designer help','Aide designer',' ');
+INSERT INTO "Languages" VALUES (55,'Help_EventManager','Event manager help','Aide gestionnaire d''événements',' ');
 INSERT INTO "Languages" VALUES (56,'Help_Home','<div class="container my-5">
     <header class="mb-5 border-bottom pb-3">
         <h1 class="display-5 fw-bold text-primary">Contextual Help: MyClub</h1>
@@ -732,14 +734,14 @@ En pied de page
   <strong><i><u>MyClub</u></i></strong>. 
   Vous y trouverez des <strong>vidéos</strong>, des <strong>articles</strong>, 
   un <strong>dictionnaire</strong> et d’autres ressources pour vous accompagner.
-</div>');
-INSERT INTO "Languages" VALUES (57,'Help_PersonManager','People manager help','Aide gestionnaire de personnes');
-INSERT INTO "Languages" VALUES (58,'Help_Redactor','Redactor help','Aide rédateur');
-INSERT INTO "Languages" VALUES (59,'Help_User','User help','Aide utilisateur');
-INSERT INTO "Languages" VALUES (60,'Help_VisitorInsights','Visitor insights help','Aide statistiques visiteurs');
-INSERT INTO "Languages" VALUES (61,'Help_Webmaster','Webmater help','Aide webmaster');
-INSERT INTO "Languages" VALUES (62,'Home_Header','Home header','En-tête d''accueil');
-INSERT INTO "Languages" VALUES (63,'Home_Footer','Home footer','Pied de page d''accueil');
+</div>',' ');
+INSERT INTO "Languages" VALUES (57,'Help_PersonManager','People manager help','Aide gestionnaire de personnes',' ');
+INSERT INTO "Languages" VALUES (58,'Help_Redactor','Redactor help','Aide rédateur',' ');
+INSERT INTO "Languages" VALUES (59,'Help_User','User help','Aide utilisateur',' ');
+INSERT INTO "Languages" VALUES (60,'Help_VisitorInsights','Visitor insights help','Aide statistiques visiteurs',' ');
+INSERT INTO "Languages" VALUES (61,'Help_Webmaster','Webmater help','Aide webmaster',' ');
+INSERT INTO "Languages" VALUES (62,'Home_Header','Home header','En-tête d''accueil',' ');
+INSERT INTO "Languages" VALUES (63,'Home_Footer','Home footer','Pied de page d''accueil',' ');
 INSERT INTO "Languages" VALUES (64,'Error403','<div class="container text-center mt-5">
   <div class="card shadow-lg rounded-3 p-4">
     <h1 class="text-danger">🚫 Error 403 – Unauthorized Access</h1>
@@ -800,7 +802,7 @@ INSERT INTO "Languages" VALUES (64,'Error403','<div class="container text-center
 	
     <a href="/" class="btn btn-primary mt-3">🏠 Retour à l’accueil</a>
   </div>
-</div>');
+</div>',' ');
 INSERT INTO "Languages" VALUES (65,'Error404','<div class="container text-center mt-5">
   <div class="card shadow-lg rounded-3 p-4">
     <h1 class="text-warning">🔍 Error 404 – Page not found</h1>
@@ -837,7 +839,7 @@ INSERT INTO "Languages" VALUES (65,'Error404','<div class="container text-center
 
     <a href="/" class="btn btn-primary mt-3">🏠 Retour à l’accueil</a>
   </div>
-</div>');
+</div>',' ');
 INSERT INTO "Languages" VALUES (66,'Error500','<div class="container text-center mt-5">
   <div class="card shadow-lg rounded-3 p-4">
     <h1 class="text-danger">💥 Error 500 – Internal Server Error</h1>
@@ -876,7 +878,7 @@ INSERT INTO "Languages" VALUES (66,'Error500','<div class="container text-center
 
     <a href="/" class="btn btn-primary mt-3">🏠 Retour à l’accueil</a>
   </div>
-</div>');
+</div>',' ');
 INSERT INTO "Languages" VALUES (67,'LoginRequired','<div class="alert alert-warning" role="alert">
   <p>🔒 <strong>Oops… this resource is reserved for logged-in members!</strong></p>
   <p>You need to log in to access it.</p>
@@ -886,7 +888,7 @@ INSERT INTO "Languages" VALUES (67,'LoginRequired','<div class="alert alert-warn
   <p>🔒 <strong>Oups… cette ressource est réservée aux membres connectés !</strong></p>
   <p>Il faut se connecter pour la découvrir.</p>
   <p>💡 Avec l''option « Se souvenir de moi », ton navigateur te déroulera le 🟥tapis rouge🟥 la prochaine fois, sans passer par la case mot de passe.</p>
-</div>');
+</div>',' ');
 INSERT INTO "Languages" VALUES (68,'Error503','<div class="text-center full-screen d-flex flex-column justify-content-center align-items-center">
     <div class="emoji">🚧</div>
 	<h1 class="mt-4">Site Under Maintenance</h1>
@@ -913,7 +915,7 @@ INSERT INTO "Languages" VALUES (68,'Error503','<div class="text-center full-scre
     .emoji {
       font-size: 10rem;
     }
-</style>');
+</style>',' ');
 INSERT INTO "Languages" VALUES (69,'message_password_reset_sent','<div class="container text-center mt-5">
   <div class="card shadow-lg rounded-3 p-4">
     <h1 class="text-success">📧 Email sent!</h1>
@@ -950,7 +952,7 @@ INSERT INTO "Languages" VALUES (69,'message_password_reset_sent','<div class="co
 
     <a href="/" class="btn btn-primary mt-3">🏠 Retour à l’accueil</a>
   </div>
-</div>');
+</div>',' ');
 INSERT INTO "Languages" VALUES (70,'message_password_reset_failed','<div class="container text-center mt-5">
   <div class="card shadow-lg rounded-3 p-4">
     <h1 class="text-danger">⚠️ Email could not be sent</h1>
@@ -987,7 +989,7 @@ INSERT INTO "Languages" VALUES (70,'message_password_reset_failed','<div class="
 
     <a href="/" class="btn btn-primary mt-3">🏠 Retour à l’accueil</a>
   </div>
-</div>');
+</div>',' ');
 INSERT INTO "Languages" VALUES (71,'message_email_unknown','<div class="container text-center mt-5">
   <div class="card shadow-lg rounded-3 p-4">
     <h1 class="text-warning">📧 Unknown Email Address</h1>
@@ -1026,8 +1028,8 @@ INSERT INTO "Languages" VALUES (71,'message_email_unknown','<div class="containe
 
     <a href="/" class="btn btn-primary mt-3">🏠 Retour à l’accueil</a>
   </div>
-</div>');
-INSERT INTO "Languages" VALUES (72,'connections','Connections','Connexions');
+</div>',' ');
+INSERT INTO "Languages" VALUES (72,'connections','Connections','Connexions',' ');
 INSERT INTO "Languages" VALUES (73,'ErrorLyricsFileNotFound','<div class=''''container text-center mt-5''''>
                     <div class=''''card shadow-lg rounded-3 p-4''''>
                         <h1 class=''''text-danger''''>📁 Lyrics File Not Found</h1>
@@ -1054,7 +1056,7 @@ INSERT INTO "Languages" VALUES (73,'ErrorLyricsFileNotFound','<div class=''''con
                         </ul>
                         <a href=''/'' class=''''btn btn-primary mt-4''''>🏠 Retour à l’accueil</a>
                     </div>
-                </div>');
+                </div>',' ');
 INSERT INTO "Languages" VALUES (74,'ErrorLyricsFileNotReadable','<div class=''''container text-center mt-5''''>
                     <div class=''''card shadow-lg rounded-3 p-4''''>
                         <h1 class=''''text-danger''''>🔒 Lyrics File Not Readable</h1>
@@ -1081,7 +1083,7 @@ INSERT INTO "Languages" VALUES (74,'ErrorLyricsFileNotReadable','<div class=''''
                         </ul>
                         <a href=''/'' class=''''btn btn-primary mt-4''''>🏠 Retour à l’accueil</a>
                     </div>
-                </div>');
+                </div>',' ');
 INSERT INTO "Languages" VALUES (75,'ErrorLyricsFileReadError','''<div class=''''container text-center mt-5''''>
                     <div class=''''card shadow-lg rounded-3 p-4''''>
                         <h1 class=''''text-danger''''>⚠️ Lyrics File Reading Error</h1>
@@ -1108,9 +1110,9 @@ INSERT INTO "Languages" VALUES (75,'ErrorLyricsFileReadError','''<div class=''''
                         </ul>
                         <a href=''/'' class=''''btn btn-primary mt-4''''>🏠 Retour à l’accueil</a>
                     </div>
-                </div>');
-INSERT INTO "Languages" VALUES (76,'save','Save','Enregistrer');
-INSERT INTO "Languages" VALUES (77,'cancel','Cancel','Annuler');
+                </div>',' ');
+INSERT INTO "Languages" VALUES (76,'save','Save','Enregistrer',' ');
+INSERT INTO "Languages" VALUES (77,'cancel','Cancel','Annuler',' ');
 INSERT INTO "Languages" VALUES (78,'User','<div class="alert alert-info mt-2">
     <h5 class="alert-heading">Welcome to your personal space</h5>
     <p>
@@ -1163,8 +1165,8 @@ INSERT INTO "Languages" VALUES (78,'User','<div class="alert alert-info mt-2">
         <a href="/user/notepad" class="{if $page == ''account''}active{/if} text-decoration-none">🗒️ Bloc-notes</a>
         <a href="/user/connections" class="{if $page == ''account''}active{/if} text-decoration-none">🕸️ Connexions</a>
     </div>
-</div>');
-INSERT INTO "Languages" VALUES (79,'notepad','Notepad','Bloc-notes');
+</div>',' ');
+INSERT INTO "Languages" VALUES (79,'notepad','Notepad','Bloc-notes',' ');
 INSERT INTO "Languages" VALUES (80,'Admin','<div class="alert alert-warning mt-2">
         <h5 class="alert-heading">Administration access</h5>
         <p>
@@ -1263,7 +1265,7 @@ INSERT INTO "Languages" VALUES (80,'Admin','<div class="alert alert-warning mt-2
             {/if}
 
         </ul>
-    </div>');
+    </div>',' ');
 INSERT INTO "Languages" VALUES (81,'Designer','<div class="alert alert-info mt-2">
         <h5 class="alert-heading">Design administration</h5>
         <p>
@@ -1351,7 +1353,7 @@ INSERT INTO "Languages" VALUES (81,'Designer','<div class="alert alert-info mt-2
             </li>
             {/if}
         </ul>
-    </div>');
+    </div>',' ');
 INSERT INTO "Languages" VALUES (82,'EventManager','<div class="alert alert-info mt-2">
         <h5 class="alert-heading">Event management</h5>
         <p>
@@ -1420,7 +1422,7 @@ INSERT INTO "Languages" VALUES (82,'EventManager','<div class="alert alert-info 
             </li>
 
         </ul>
-    </div>');
+    </div>',' ');
 INSERT INTO "Languages" VALUES (83,'Redactor','<div class="alert alert-info mt-2">
         <h5 class="alert-heading">Editorial space</h5>
         <p>
@@ -1481,7 +1483,7 @@ INSERT INTO "Languages" VALUES (83,'Redactor','<div class="alert alert-info mt-2
             </li>
 
         </ul>
-    </div>');
+    </div>',' ');
 INSERT INTO "Languages" VALUES (84,'PersonManager','<div class="alert alert-info mt-2">
         <h5 class="alert-heading">Member management</h5>
         <p>
@@ -1542,7 +1544,7 @@ INSERT INTO "Languages" VALUES (84,'PersonManager','<div class="alert alert-info
                 <a class="nav-link" href="/import">📥 Importer</a>
             </li>
         </ul>
-    </div>');
+    </div>',' ');
 INSERT INTO "Languages" VALUES (85,'VisitorInsights','<div class="alert alert-info mt-2">
         <h5 class="alert-heading">Visitor insights</h5>
         <p>
@@ -1619,7 +1621,7 @@ INSERT INTO "Languages" VALUES (85,'VisitorInsights','<div class="alert alert-in
             </li>
 
         </ul>
-    </div>');
+    </div>',' ');
 INSERT INTO "Languages" VALUES (86,'Webmaster','	<div class="alert alert-info mt-2">
         <h5 class="alert-heading">Webmaster Area</h5>
         <p>
@@ -1708,8 +1710,8 @@ INSERT INTO "Languages" VALUES (86,'Webmaster','	<div class="alert alert-info mt
             {/if}
 
         </ul>
-    </div>');
-INSERT INTO "Metadata" VALUES (1,'MyClub',14,0,NULL,NULL,NULL,NULL,NULL,1000000,NULL,10,36,6,NULL,0,NULL);
+    </div>',' ');
+INSERT INTO "Metadata" VALUES (1,'MyClub',15,0,NULL,NULL,NULL,NULL,NULL,1000000,NULL,10,36,6,NULL,0,NULL);
 INSERT INTO "Person" VALUES (1,'webmaster@myclub.foo','e427c26faca947919b18b797bc143a35100e4de48c34b70b26202d3a7d8e51f7','my first name','my last name','my nick name or nothing',NULL,'0',NULL,NULL,NULL,NULL,NULL,0,0,NULL,NULL,'2025-01-01',0,NULL,NULL,NULL,NULL,NULL);
 INSERT INTO "PersonGroup" VALUES (1,1,1);
 INSERT INTO "Settings" VALUES (1,'Title','title');

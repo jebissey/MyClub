@@ -12,10 +12,11 @@ use app\models\MetadataDataHelper;
 
 class TranslationManager
 {
-    const SUPPORTED_LANGUAGES = ['en_US', 'fr_FR'];
+    const SUPPORTED_LANGUAGES = ['en_US', 'fr_FR', 'pl_PL'];
     const FLAGS = [
         'en_US' => '🇺🇸',
         'fr_FR' => '🇫🇷',
+        'pl_PL' => '🇵🇱',
     ];
     const DEFAULT_LANGUAGE = 'fr_FR';
     const COOKIE_NAME = 'user_language';

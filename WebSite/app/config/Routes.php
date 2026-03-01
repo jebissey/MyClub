@@ -50,6 +50,8 @@ use app\config\routes\Registration;
 use app\config\routes\Rss;
 use app\config\routes\Solfege;
 use app\config\routes\Survey;
+use app\config\routes\Translator;
+use app\config\routes\TranslatorApi;
 use app\config\routes\User;
 use app\config\routes\UserAccount;
 use app\config\routes\UserAvailabilities;
@@ -112,7 +114,6 @@ use app\modules\Common\services\DatabaseSmtpConfigProvider;
 use app\modules\Common\services\EmailService;
 use app\modules\Common\services\EventService;
 use app\modules\Common\services\MessageRecipientService;
-use app\valueObjects\SmtpConfig;
 
 class Routes
 {
@@ -276,6 +277,8 @@ class Routes
         $this->routes = array_merge($this->routes, (new Rss($this->controllerFactory))->get());
         $this->routes = array_merge($this->routes, (new Solfege($this->controllerFactory))->get());
         $this->routes = array_merge($this->routes, (new Survey($this->controllerFactory))->get());
+        $this->routes = array_merge($this->routes, (new Translator($this->controllerFactory))->get());
+        $this->routes = array_merge($this->routes, (new TranslatorApi($this->apiFactory))->get());
         $this->routes = array_merge($this->routes, (new User($this->controllerFactory))->get());
         $this->routes = array_merge($this->routes, (new UserAccount($this->controllerFactory))->get());
         $this->routes = array_merge($this->routes, (new UserAvailabilities($this->controllerFactory))->get());

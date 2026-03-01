@@ -12,6 +12,7 @@ use app\helpers\WebApp;
 use app\models\PersonDataHelper;
 use app\modules\Common\AbstractController;
 use app\modules\Common\services\EmailService;
+use app\valueObjects\EmailMessage;
 
 class ContactController extends AbstractController
 {
@@ -86,7 +87,16 @@ class ContactController extends AbstractController
                 return;
             }
             $emailSent = $this->personDataHelper->sendRegistrationLink($adminEmail, $name, $email, $event);
-        } else $emailSent = $this->emailService->sendContactEmail($adminEmail, $name, $email, $message);
+        } else {
+            $emailMessage = new EmailMessage(
+                from: $email,
+                to: $adminEmail,
+                subject: "Message de contact de {$name} ({$email})",
+                body: $message,
+                isHtml: false
+            );
+            $emailSent = $this->emailService->send($emailMessage);
+        }
 
         if ($emailSent) {
             $url = '/contact' . $this->webApp->buildUrl([

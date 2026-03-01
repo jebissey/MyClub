@@ -37,7 +37,7 @@ class GroupController extends AbstractController
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
-        $availableAuthorizations = $this->dataHelper->gets('Authorization', ['Id <> 1' => null]);
+        $availableAuthorizations = $this->dataHelper->gets('Authorization', ['Id <> 1' => null], '*', 'Name');
         $this->render('PersonManager/views/group_create.latte', $this->getAllParams([
             'availableAuthorizations' => $availableAuthorizations,
             'layout' => $this->getLayout(),

@@ -20,6 +20,7 @@ use app\apis\MediaApi;
 use app\apis\MessageApi;
 use app\apis\NavbarApi;
 use app\apis\NotificationApi;
+use app\apis\TranslatorApi;
 use app\apis\WebmasterApi;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
@@ -35,6 +36,7 @@ use app\models\EventDataHelper;
 use app\models\EventNeedDataHelper;
 use app\models\KanbanDataHelper;
 use app\models\KaraokeDataHelper;
+use app\models\LanguagesDataHelper;
 use app\models\LogDataWriterHelper;
 use app\models\MessageDataHelper;
 use app\models\NeedDataHelper;
@@ -259,6 +261,17 @@ class ApiFactory
             $this->connectedUser,
             $this->dataHelper,
             $this->personDataHelper
+        );
+    }
+
+    public function makeTranslatorApi(): TranslatorApi
+    {
+        return new TranslatorApi(
+            $this->application,
+            $this->connectedUser,
+            $this->dataHelper,
+            $this->personDataHelper,
+            new LanguagesDataHelper($this->application)
         );
     }
 

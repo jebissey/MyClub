@@ -14,6 +14,7 @@ enum Authorization: string
     case NavbarDesigner = 'NavbarDesigner';
     case PersonManager = 'PersonManager';
     case Redactor = 'Redactor';
+    case Translator = 'Translator';
     case VisitorInsights = 'VisitorInsights';
     case Webmaster = 'Webmaster';
 }

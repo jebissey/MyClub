@@ -1,0 +1,152 @@
+{layout '../../Common/views/layout.latte'}
+
+{block head}
+<style>
+    .translation-td {
+        padding: 4px !important;
+        vertical-align: top;
+    }
+
+    .tab-edit-wrap {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+
+    .tab-edit-body {
+        height: 100%;
+    }
+
+    .translation-field {
+        width: 100%;
+        height: 100%;
+        min-height: 60px;
+        resize: vertical;
+        box-sizing: border-box;
+    }
+    .ref-value { cursor: pointer; }
+    .nav-tabs .nav-link { padding: 0 .5rem; font-size: .75rem; line-height: 1.8; }
+</style>
+{/block}
+
+{block navbar}
+    {include '../../Webmaster/views/navbar/designer.latte'}
+{/block}
+
+{block content}
+<div class="container-fluid mt-3">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+
+        <h1 class="fs-4 m-0">🌍 Translation Manager</h1>
+
+        <div class="d-flex align-items-center gap-3">
+            <div class="form-check">
+                <input class="form-check-input"
+                       type="checkbox"
+                       name="missing"
+                       value="1"
+                       {if $missingOnly}checked{/if}
+                       form="translator-form"
+                       onchange="document.getElementById('translator-form').submit()">
+                <label class="form-check-label">Manquantes uniquement</label>
+            </div>
+
+            <div class="badge bg-warning text-dark">
+                {$missingCount} traductions manquantes
+            </div>
+        </div>
+
+    </div>
+
+    <form id="translator-form" method="get">
+    <div class="table-responsive">
+        <table class="table table-sm table-bordered align-middle">
+
+            <thead class="table-light">
+                <tr>
+                    <th class="col-2">Clé</th>
+
+                    <th class="col-4">
+                        <select name="ref" class="form-select form-select-sm">
+                            {foreach $languages as $lang}
+                                <option value="{$lang}"
+                                    {if $referenceLang === $lang}selected{/if}>
+                                    {$lang}
+                                </option>
+                            {/foreach}
+                        </select>
+                    </th>
+
+                    <th class="col-6">
+                        <select name="lang" class="form-select form-select-sm">
+                            {foreach $languages as $lang}
+                                <option value="{$lang}"
+                                    {if $targetLang === $lang}selected{/if}>
+                                    {$lang}
+                                </option>
+                            {/foreach}
+                        </select>
+                    </th>
+                </tr>
+            </thead>
+
+            <tbody>
+            {foreach $translations as $row}
+
+            {var $targetHasHtml = str_contains($row->target_value ?? '', '<')}
+
+            <tr>
+                <td>{$row->Name}</td>
+
+                <td class="text-muted ref-value" title="Cliquer pour copier" data-raw="{$row->ref_value}">
+                    {$row->ref_value|noescape}
+                </td>
+
+                <td class="translation-td">
+                    {if $targetHasHtml}
+                    <div class="tab-edit-wrap">
+                        <ul class="nav nav-tabs mb-1 flex-shrink-0">
+                            <li class="nav-item">
+                                <a class="nav-link active" href="#" data-tab="edit">Éditer</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#" data-tab="preview">Aperçu</a>
+                            </li>
+                        </ul>
+                        <div data-content="edit" class="tab-edit-body">
+                            <textarea
+                                class="form-control form-control-sm translation-field"
+                                data-id="{$row->Id}"
+                                data-lang="{$targetLang}"
+                                data-original="{$row->target_value|noescape}"
+                            >{$row->target_value|noescape}</textarea>
+                        </div>
+                        <div data-content="preview" class="d-none small p-1">{$row->target_value|noescape}</div>
+                    </div>
+                    {else}
+                    <textarea
+                        class="form-control form-control-sm translation-field"
+                        data-id="{$row->Id}"
+                        data-lang="{$targetLang}"
+                        data-original="{$row->target_value|noescape}"
+                    >{$row->target_value|noescape}</textarea>
+                    {/if}
+                    <span class="translation-status small ms-1"></span>
+                </td>
+            </tr>
+
+            {/foreach}
+            </tbody>
+
+        </table>
+    </div>
+    </form>
+
+</div>
+
+{/block}
+
+{block scripts}
+<script type="module" src="/app/modules/Translator/js/main.js"></script>
+{/block}

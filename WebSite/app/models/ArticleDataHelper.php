@@ -143,7 +143,7 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
             SELECT Article.*, 
                 Person.FirstName, 
                 Person.LastName, 
-                \"Group\".Name || '(' || \"Group\".Id || ')' AS GroupName,
+                \"Group\".Name AS GroupName,
                 Article.CreatedBy
             FROM Article
             LEFT JOIN Person ON Person.Id = Article.CreatedBy

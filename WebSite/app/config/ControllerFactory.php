@@ -21,6 +21,7 @@ use app\models\EventDataHelper;
 use app\models\EventTypeDataHelper;
 use app\models\GroupDataHelper;
 use app\models\KanbanDataHelper;
+use app\models\LanguagesDataHelper;
 use app\models\LogDataHelper;
 use app\models\LogDataAnalyticsHelper;
 use app\models\LogDataStatisticsHelper;
@@ -57,6 +58,7 @@ use app\modules\PersonManager\GroupController;
 use app\modules\PersonManager\ImportController;
 use app\modules\PersonManager\PersonController;
 use app\modules\PersonManager\RegistrationController;
+use app\modules\Translator\TranslatorController;
 use app\modules\User\ContactController;
 use app\modules\User\HomeController;
 use app\modules\User\FFAController;
@@ -342,6 +344,13 @@ class ControllerFactory
         return new UserController(
             $this->application,
             $this->authenticationService
+        );
+    }
+
+    public function makeTranslatorController(): TranslatorController
+    {
+        return new TranslatorController(
+            $this->application,
         );
     }
 

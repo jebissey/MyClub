@@ -141,6 +141,11 @@ class ConnectedUser
         return $this->isRedactor() || $this->isVisitorInsights();
     }
 
+    public function isTranslator(): bool
+    {
+        return in_array(Authorization::Translator->value, $this->authorizations ?? []);
+    }
+
     public function isVisitorInsights(): bool
     {
         return in_array(Authorization::VisitorInsights->value, $this->authorizations ?? []);

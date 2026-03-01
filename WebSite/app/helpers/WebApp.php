@@ -168,7 +168,11 @@ class WebApp
 
     static public function sanitizeHtml($html)
     {
-        $allowed_tags = '<div><span><p><br><strong><em><ul><ol><li><a><img><h1><h2><h3><h4><h5><h6><blockquote><pre><code><table><thead><tbody><tr><th><td>';
+        $allowed_tags = '<div><span><p><br><strong><em><ul><ol><li><a><img>'
+            . '<h1><h2><h3><h4><h5><h6><blockquote><pre><code>'
+            . '<table><thead><tbody><tr><th><td>'
+            . '<section><i>';
+
         $html = strip_tags($html, $allowed_tags);
 
         $html = preg_replace('/<(.*?)[\s|>]on[a-z]+=[\'"].*?[\'"]>(.*?)<\/\\1>/i', '<$1>$2</$1>', $html);
