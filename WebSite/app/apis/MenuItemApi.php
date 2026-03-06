@@ -9,20 +9,21 @@ use Throwable;
 use app\enums\ApplicationError;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
+use app\models\Data;
 use app\models\DataHelper;
-use app\models\PageDataHelper;
+use app\models\MenuItemDataHelper;
 use app\models\PersonDataHelper;
 
-class NavbarApi extends AbstractApi
+class MenuItemApi extends AbstractApi
 {
-    public function __construct(Application $application, private PageDataHelper $pageDataHelper, ConnectedUser $connectedUser, DataHelper $dataHelper, PersonDataHelper $personDataHelper)
+    public function __construct(Application $application, private MenuItemDataHelper $menuItemDataHelper, ConnectedUser $connectedUser, DataHelper $dataHelper, PersonDataHelper $personDataHelper)
     {
         parent::__construct($application, $connectedUser, $dataHelper, $personDataHelper);
     }
 
-    public function deleteNavbarItem(int $id): void
+    public function deleteItem(int $id)
     {
-        if (!($this->application->getConnectedUser()->isNavbarDesigner() ?? false)) {
+        if (!($this->application->getConnectedUser()->isMenuDesigner() ?? false)) {
             $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }
@@ -31,16 +32,16 @@ class NavbarApi extends AbstractApi
             return;
         }
         try {
-            $result = $this->pageDataHelper->del($id);
-            $this->renderJson([], $result === 1, ApplicationError::Ok->value);
+            $result = $this->menuItemDataHelper->del($id);
+            $this->renderJson([], $result >= 1, ApplicationError::Ok->value);
         } catch (Throwable $e) {
             $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
         }
     }
 
-    public function getNavbarItem(int $id): void
+    public function getMenuItem(int $id): void
     {
-        if (!($this->application->getConnectedUser()->isNavbarDesigner() ?? false)) {
+        if (!($this->application->getConnectedUser()->isMenuDesigner() ?? false)) {
             $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }
@@ -49,15 +50,15 @@ class NavbarApi extends AbstractApi
             return;
         }
         try {
-            $this->renderJsonOk(['item' => $this->dataHelper->get('Page', ['Id' => $id])]);
+            $this->renderJsonOk(['item' => $this->dataHelper->get('MenuItem', ['Id' => $id])]);
         } catch (Throwable $e) {
             $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
         }
     }
 
-    public function saveNavbarItem(): void
+    public function saveMenuItem(): void
     {
-        if (!($this->application->getConnectedUser()->isNavbarDesigner() ?? false)) {
+        if (!($this->application->getConnectedUser()->isMenuDesigner() ?? false)) {
             $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }
@@ -66,22 +67,21 @@ class NavbarApi extends AbstractApi
             return;
         }
         $data = json_decode(file_get_contents('php://input'), true);
-
-        if (empty($data['name']) || empty($data['route'])) {
-            $this->renderJsonOk(['message' => 'Name and Route are required']);
+        if (!Data::requireFields($data, ['what', 'type', 'label', 'url', 'forMembers', 'forContacts', 'forAnonymous'])) {
+            $this->renderJsonBadRequest('Missing required fields', __FILE__, __LINE__);
             return;
         }
         try {
-            $this->pageDataHelper->insertOrUpdate($data);
+            $this->menuItemDataHelper->insertOrUpdate($data);
             $this->renderJsonOk();
         } catch (Throwable $e) {
             $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
         }
     }
 
-    public function updateNavbarPositions(): void
+    public function updatePositions()
     {
-        if (!($this->application->getConnectedUser()->isNavbarDesigner() ?? false)) {
+        if (!($this->application->getConnectedUser()->isMenuDesigner() ?? false)) {
             $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }
@@ -89,9 +89,10 @@ class NavbarApi extends AbstractApi
             $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
+
         $data = json_decode(file_get_contents('php://input'), true);
         try {
-            $this->pageDataHelper->updates($data['positions']);
+            $this->menuItemDataHelper->updates($data['positions']);
             $this->renderJsonOk();
         } catch (Throwable $e) {
             $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());

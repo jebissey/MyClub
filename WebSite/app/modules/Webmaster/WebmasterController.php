@@ -66,7 +66,7 @@ class WebmasterController extends AbstractController
         if ($connectedUser->hasOnlyOneAutorization()) {
             if ($connectedUser->isEventDesigner())     $this->redirect('/designer');
             if ($connectedUser->isHomeDesigner())      $this->redirect('/designer');
-            if ($connectedUser->isNavbarDesigner())    $this->redirect('/designer');
+            if ($connectedUser->isMenuDesigner())    $this->redirect('/designer');
             elseif ($connectedUser->isEventManager())  $this->redirect('/eventManager');
             elseif ($connectedUser->isPersonManager()) $this->redirect('/personManager');
             elseif ($connectedUser->isRedactor()) {

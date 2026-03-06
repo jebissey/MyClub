@@ -57,9 +57,10 @@ class ConnectedUser
                 'isHomeDesigner' => $this->isHomeDesigner(),
                 'isKanbanDesigner' => $this->isKanbanDesigner(),
                 'isMember' => true,
-                'isNavbarDesigner' => $this->isNavbarDesigner(),
+                'isMenuDesigner' => $this->isMenuDesigner(),
                 'isPersonManager' => $this->isPersonManager(),
                 'isRedactor' => $this->isRedactor(),
+                'isTranslator' => $this->isTranslator(),
                 'isVisitorInsights' => $this->isVisitorInsights(),
                 'isWebmaster' => $this->isWebmaster(),
                 'currentVersion' => Application::VERSION,
@@ -88,7 +89,7 @@ class ConnectedUser
 
     public function isDesigner(): bool
     {
-        return $this->isEventDesigner() || $this->isHomeDesigner() || $this->isNavbarDesigner();
+        return $this->isEventDesigner() || $this->isHomeDesigner() || $this->isMenuDesigner();
     }
 
     public function isEditor(): bool
@@ -121,9 +122,9 @@ class ConnectedUser
         return in_array(Authorization::KanbanDesigner->value, $this->authorizations ?? []);
     }
 
-    public function isNavbarDesigner(): bool
+    public function isMenuDesigner(): bool
     {
-        return in_array(Authorization::NavbarDesigner->value, $this->authorizations ?? []);
+        return in_array(Authorization::MenuDesigner->value, $this->authorizations ?? []);
     }
 
     public function isPersonManager(): bool
@@ -140,7 +141,7 @@ class ConnectedUser
     {
         return $this->isRedactor() || $this->isVisitorInsights();
     }
-
+    
     public function isTranslator(): bool
     {
         return in_array(Authorization::Translator->value, $this->authorizations ?? []);

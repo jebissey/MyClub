@@ -21,7 +21,6 @@ use app\models\EventDataHelper;
 use app\models\EventTypeDataHelper;
 use app\models\GroupDataHelper;
 use app\models\KanbanDataHelper;
-use app\models\LanguagesDataHelper;
 use app\models\LogDataHelper;
 use app\models\LogDataAnalyticsHelper;
 use app\models\LogDataStatisticsHelper;
@@ -44,7 +43,7 @@ use app\modules\Common\services\AuthenticationService;
 use app\modules\Common\services\EmailService;
 use app\modules\Designer\DesignController;
 use app\modules\Designer\DesignerController;
-use app\modules\Designer\NavBarController;
+use app\modules\Designer\MenuItemController;
 use app\modules\Event\EventController;
 use app\modules\Event\EventEmailController;
 use app\modules\Event\EventGuestController;
@@ -286,9 +285,9 @@ class ControllerFactory
         );
     }
 
-    public function makeNavBarController(): NavBarController
+    public function makeMenuItemController(): MenuItemController
     {
-        return new NavBarController($this->application);
+        return new MenuItemController($this->application);
     }
 
     public function makeOrderController(): OrderController

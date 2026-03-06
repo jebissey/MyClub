@@ -1,27 +1,27 @@
 {include '_adminLeft.latte'}
 
-                <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Sites Référents">
+                <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" title="{='navbar.visitor_insights.referents'|translate}">
                     <a class="nav-link {if $page == 'referents'}active{/if}" href="/referents"><h2>☁️</h2></a>
                 </li>
-                <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Top pages par période">
+                <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" title="{='navbar.visitor_insights.top_pages'|translate}">
                     <a class="nav-link {if $page == 'topPages'}active{/if}" href="/topPages"><h2>📈</h2></a>
                 </li>
-                <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Tableau croisé dynamique">
+                <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" title="{='navbar.visitor_insights.crosstab'|translate}">
                     <a class="nav-link {if $page == 'crossTab'}active{/if}" href="/crossTab"><h2>🧮</h2></a>
                 </li>
-                <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Détails des visites">
+                <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" title="{='navbar.visitor_insights.logs'|translate}">
                     <a class="nav-link {if $page == 'logs'}active{/if}" href="/logs"><h2>📋</h2></a>
                 </li>
-                <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Visiteurs">
+                <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" title="{='navbar.visitor_insights.visitors'|translate}">
                     <a class="nav-link {if $page == 'visitorsGraf'}active{/if}" href="/visitorsGraf"><h2>📊</h2></a>
                 </li>
-                <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Synthèse des visites">
+                <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" title="{='navbar.visitor_insights.analytics'|translate}">
                     <a class="nav-link {if $page == 'analytics'}active{/if}" href="/analytics"><h2>🥧</h2></a>
                 </li>                                
-                <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Dernières visites">
+                <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" title="{='navbar.visitor_insights.last_visits'|translate}">
                     <a class="nav-link {if $page == 'lastVisits'}active{/if}" href="/lastVisits"><h2>👁️</h2></a>
                 </li>
-                <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Alertes demandées par les membres">
+                <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" title="{='navbar.visitor_insights.members_alerts'|translate}">
                     <a class="nav-link {if $page == 'membersAlerts'}active{/if}" href="/membersAlerts"><h2>📩</h2></a>
                 </li>
 

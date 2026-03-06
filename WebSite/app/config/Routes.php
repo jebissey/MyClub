@@ -40,9 +40,9 @@ use app\config\routes\LeapfrogApi;
 use app\config\routes\Maintenance;
 use app\config\routes\Media;
 use app\config\routes\MediaApi;
+use app\config\routes\MenuItem;
+use app\config\routes\MenuItemApi;
 use app\config\routes\MessageApi;
-use app\config\routes\NavBar;
-use app\config\routes\NavbarApi;
 use app\config\routes\NotificationApi;
 use app\config\routes\Order;
 use app\config\routes\Person;
@@ -96,12 +96,12 @@ use app\models\KanbanDataHelper;
 use app\models\KaraokeDataHelper;
 use app\models\LogDataHelper;
 use app\models\LogDataWriterHelper;
+use app\models\MenuItemDataHelper;
 use app\models\MessageDataHelper;
 use app\models\MetadataDataHelper;
 use app\models\NeedDataHelper;
 use app\models\NeedTypeDataHelper;
 use app\models\OrderDataHelper;
-use app\models\PageDataHelper;
 use app\models\ParticipantDataHelper;
 use app\models\PersonDataHelper;
 use app\models\PersonGroupDataHelper;
@@ -198,12 +198,12 @@ class Routes
             new KanbanDataHelper($application),
             new KaraokeDataHelper($application),
             new LogDataWriterHelper($application),
+            new MenuItemDataHelper($application, $authorizationDataHelper),
             $messageDataHelper,
             new MessageRecipientService($dataHelper),
             $needDataHelper,
             new NeedTypeDataHelper($application),
             $notificationSender,
-            new PageDataHelper($application, $authorizationDataHelper),
             $participantDataHelper,
             $personDataHelper,
             $personPreferences,
@@ -267,9 +267,9 @@ class Routes
         $this->routes = array_merge($this->routes, (new Maintenance($this->controllerFactory))->get());
         $this->routes = array_merge($this->routes, (new Media($this->controllerFactory))->get());
         $this->routes = array_merge($this->routes, (new MediaApi($this->apiFactory))->get());
+        $this->routes = array_merge($this->routes, (new MenuItem($this->controllerFactory))->get());
+        $this->routes = array_merge($this->routes, (new MenuItemApi($this->apiFactory))->get());
         $this->routes = array_merge($this->routes, (new MessageApi($this->apiFactory))->get());
-        $this->routes = array_merge($this->routes, (new NavBar($this->controllerFactory))->get());
-        $this->routes = array_merge($this->routes, (new NavbarApi($this->apiFactory))->get());
         $this->routes = array_merge($this->routes, (new NotificationApi($this->apiFactory))->get());
         $this->routes = array_merge($this->routes, (new Order($this->controllerFactory))->get());
         $this->routes = array_merge($this->routes, (new Person($this->controllerFactory))->get());

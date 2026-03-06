@@ -63,6 +63,12 @@
 
 {block content}
     <div id="liveAlertPlaceholder"></div>
+    {if isset($message) && $message !=''}
+    <div class="alert alert-{if $messageType === 'success'}success{else}danger{/if} alert-dismissible">
+        {$message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {/if}
 
     <div class="container-fluid" 
          data-article-id="{$article->Id}" 

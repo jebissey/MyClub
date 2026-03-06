@@ -11,7 +11,7 @@ enum Authorization: string
     case EventManager = 'EventManager';
     case HomeDesigner = 'HomeDesigner';
     case KanbanDesigner = 'KanbanDesigner';
-    case NavbarDesigner = 'NavbarDesigner';
+    case MenuDesigner = 'MenuDesigner';
     case PersonManager = 'PersonManager';
     case Redactor = 'Redactor';
     case Translator = 'Translator';

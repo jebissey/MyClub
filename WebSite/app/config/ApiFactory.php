@@ -17,8 +17,8 @@ use app\apis\KanbanApi;
 use app\apis\KaraokeApi;
 use app\apis\LeapfrogApi;
 use app\apis\MediaApi;
+use app\apis\MenuItemApi;
 use app\apis\MessageApi;
-use app\apis\NavbarApi;
 use app\apis\NotificationApi;
 use app\apis\TranslatorApi;
 use app\apis\WebmasterApi;
@@ -38,10 +38,10 @@ use app\models\KanbanDataHelper;
 use app\models\KaraokeDataHelper;
 use app\models\LanguagesDataHelper;
 use app\models\LogDataWriterHelper;
+use app\models\MenuItemDataHelper;
 use app\models\MessageDataHelper;
 use app\models\NeedDataHelper;
 use app\models\NeedTypeDataHelper;
-use app\models\PageDataHelper;
 use app\models\ParticipantDataHelper;
 use app\models\PersonDataHelper;
 use app\models\SharedFileDataHelper;
@@ -58,7 +58,7 @@ class ApiFactory
         private AuthorizationDataHelper $authorizationDataHelper,
         private CarouselDataHelper $carouselDataHelper,
         private ConnectedUser $connectedUser,
-        private DataHelper $dataHelper,        
+        private DataHelper $dataHelper,
         private DesignDataHelper $designDataHelper,
         private EmailService $emailService,
         private EventDataHelper $eventDataHelper,
@@ -67,12 +67,12 @@ class ApiFactory
         private KanbanDataHelper $kanbanDataHelper,
         private KaraokeDataHelper $karaokeDataHelper,
         private LogDataWriterHelper $logDataWriterHelper,
+        private MenuItemDataHelper $menuItemDataHelper,
         private MessageDataHelper $messageDataHelper,
         private MessageRecipientService $messageRecipientService,
         private NeedDataHelper $needDataHelper,
         private NeedTypeDataHelper $needTypeDataHelper,
         private NotificationSender $notificationSender,
-        private PageDataHelper $pageDataHelper,
         private ParticipantDataHelper $participantDataHelper,
         private PersonDataHelper $personDataHelper,
         private PersonPreferences $personPreferences,
@@ -230,6 +230,17 @@ class ApiFactory
         );
     }
 
+    public function makeMenuItemApi(): MenuItemApi
+    {
+        return new MenuItemApi(
+            $this->application,
+            $this->menuItemDataHelper,
+            $this->connectedUser,
+            $this->dataHelper,
+            $this->personDataHelper
+        );
+    }
+
     public function makeMessageApi(): MessageApi
     {
         return new MessageApi(
@@ -240,17 +251,6 @@ class ApiFactory
             $this->personDataHelper,
             $this->messageRecipientService,
             $this->notificationSender
-        );
-    }
-
-    public function makeNavbarApi(): NavbarApi
-    {
-        return new NavbarApi(
-            $this->application,
-            $this->pageDataHelper,
-            $this->connectedUser,
-            $this->dataHelper,
-            $this->personDataHelper
         );
     }
 

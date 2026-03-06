@@ -214,7 +214,7 @@ class PersonDataHelper extends Data implements NewsProviderInterface
                 $this->set('Message', [
                     'EventId'  => null,
                     'PersonId' => $person->PersonId,
-                    'Text'    => "Nouvel article publié\n\n/article/" . $idArticle,
+                    'Text'     => "Nouvel article publié\n\n/article/{$idArticle} (->{$person->Email})",
                     'From'    => 'Webapp'
                 ]);
             }

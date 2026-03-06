@@ -217,6 +217,22 @@ CREATE TABLE IF NOT EXISTS "Languages" (
 	"pl_PL"	TEXT NOT NULL,
 	PRIMARY KEY("Id")
 );
+CREATE TABLE IF NOT EXISTS "MenuItem" (
+	"Id"	INTEGER,
+	"Type"	TEXT NOT NULL CHECK("Type" IN ('heading', 'link', 'divider', 'submenu')),
+	"Label"	TEXT,
+	"Icon"	TEXT,
+	"Url"	TEXT,
+	"ParentId"	INTEGER,
+	"Position"	INTEGER NOT NULL DEFAULT 1,
+	"IdGroup"	INTEGER DEFAULT NULL,
+	"ForMembers"	INTEGER NOT NULL DEFAULT 0,
+	"ForContacts"	INTEGER NOT NULL DEFAULT 0,
+	"ForAnonymous"	INTEGER NOT NULL DEFAULT 0,
+	PRIMARY KEY("Id"),
+	FOREIGN KEY("IdGroup") REFERENCES "Group"("Id"),
+	FOREIGN KEY("ParentId") REFERENCES "MenuItem"("Id") ON DELETE CASCADE
+);
 CREATE TABLE IF NOT EXISTS "Message" (
 	"Id"	INTEGER,
 	"EventId"	INTEGER,
@@ -285,17 +301,6 @@ CREATE TABLE IF NOT EXISTS "OrderReply" (
 	PRIMARY KEY("Id"),
 	FOREIGN KEY("IdOrder") REFERENCES "Order"("Id"),
 	FOREIGN KEY("IdPerson") REFERENCES "Person"("Id")
-);
-CREATE TABLE IF NOT EXISTS "Page" (
-	"Id"	INTEGER,
-	"Name"	TEXT NOT NULL,
-	"Position"	INTEGER NOT NULL,
-	"Route"	TEXT NOT NULL,
-	"IdGroup"	INTEGER DEFAULT NULL,
-	"ForMembers"	INTEGER NOT NULL DEFAULT 1,
-	"ForAnonymous"	INTEGER NOT NULL DEFAULT 0,
-	PRIMARY KEY("Id"),
-	FOREIGN KEY("IdGroup") REFERENCES "Group"("Id")
 );
 CREATE TABLE IF NOT EXISTS "Participant" (
 	"Id"	INTEGER,
@@ -404,7 +409,7 @@ INSERT INTO "Authorization" VALUES (5,'Editor');
 INSERT INTO "Authorization" VALUES (6,'HomeDesigner');
 INSERT INTO "Authorization" VALUES (7,'EventDesigner');
 INSERT INTO "Authorization" VALUES (8,'VisitorInsights');
-INSERT INTO "Authorization" VALUES (9,'NavbarDesigner');
+INSERT INTO "Authorization" VALUES (9,'MenuDesigner');
 INSERT INTO "Authorization" VALUES (10,'KanbanDesigner');
 INSERT INTO "Authorization" VALUES (11,'Translator');
 INSERT INTO "Group" VALUES (1,'Webmaster',0,0);
@@ -1622,7 +1627,7 @@ INSERT INTO "Languages" VALUES (85,'VisitorInsights','<div class="alert alert-in
 
         </ul>
     </div>',' ');
-INSERT INTO "Languages" VALUES (86,'Webmaster','	<div class="alert alert-info mt-2">
+INSERT INTO "Languages" VALUES (86,'Webmaster','<div class="alert alert-info mt-2">
         <h5 class="alert-heading">Webmaster Area</h5>
         <p>
             This area allows you to manage the website, databases, notifications, and maintenance.
@@ -1634,39 +1639,20 @@ INSERT INTO "Languages" VALUES (86,'Webmaster','	<div class="alert alert-info mt
 
     <div class="webmaster-links mt-3 mb-3">
         <ul class="nav nav-pills gap-3">
+            <li class="nav-item"><a class="nav-link" href="/dbbrowser">🗂️ DB Browser</a></li>
 
-            <li class="nav-item">
-                <a class="nav-link" href="/dbbrowser">🗂️ DB Browser</a>
-            </li>
-
-            <li class="nav-item">
-                <a class="nav-link" href="/groups">🧑‍🤝‍🧑 Groups</a>
-            </li>
-
-            <li class="nav-item">
-                <a class="nav-link" href="/registration">🎟️ Registrations</a>
-            </li>
-
-            <li class="nav-item">
-                <a class="nav-link" href="/notifications">🔔 Notifications</a>
-            </li>
-
-            <li class="nav-item">
-                <a class="nav-link" href="/sendEmails">📥 Emails</a>
-            </li>
-
-            <li class="nav-item">
-                <a class="nav-link" href="/maintenance">🚧 Maintenance</a>
-            </li>
+            <li class="nav-item"><a class="nav-link" href="/groups">🧑‍🤝‍🧑 Groups</a></li>
+            <li class="nav-item"><a class="nav-link" href="/registration">🎟️ Registrations</a></li>
+            <li class="nav-item"><a class="nav-link" href="/notifications">🔔 Notifications</a></li>
+            <li class="nav-item"><a class="nav-link" href="/sendEmails">📥 Emails</a></li>
+            <li class="nav-item"><a class="nav-link" href="/maintenance">🚧 Maintenance</a></li>
 
             {if $isMyclubWebSite}
-            <li class="nav-item">
-                <a class="nav-link" href="/installations">🌐 Installations</a>
-            </li>
+            <li class="nav-item"><a class="nav-link" href="/installations">🌐 Installations</a></li>
             {/if}
-
         </ul>
-    </div>','	<div class="alert alert-info mt-2">
+    </div>
+','<div class="alert alert-info mt-2">
         <h5 class="alert-heading">Zone Webmaster</h5>
         <p>
             Cette zone permet de gérer le site, les bases de données, les notifications et la maintenance.
@@ -1678,40 +1664,105 @@ INSERT INTO "Languages" VALUES (86,'Webmaster','	<div class="alert alert-info mt
 
     <div class="webmaster-links mt-3 mb-3">
         <ul class="nav nav-pills gap-3">
+            <li class="nav-item"><a class="nav-link" href="/dbbrowser">🗂️ DB Browser</a></li>
+            <li class="nav-item"><a class="nav-link" href="/groups">🧑‍🤝‍🧑 Groupes</a></li> 
+            <li class="nav-item"><a class="nav-link" href="/registration">🎟️ Inscriptions</a></li>
+            <li class="nav-item"><a class="nav-link" href="/notifications">🔔 Notifications</a></li>
+            <li class="nav-item"><a class="nav-link" href="/sendEmails">📥 Courriels</a></li>
+            <li class="nav-item"><a class="nav-link" href="/maintenance">🚧 Maintenance</a></li>
 
-            <li class="nav-item" title="DB Browser">
-                <a class="nav-link" href="/dbbrowser"><h2>🗂️</h2></a>
-            </li>
-
-            <li class="nav-item" title="Groupes">
-                <a class="nav-link" href="/groups"><h2>🧑‍🤝‍🧑</h2></a>
-            </li>
-
-            <li class="nav-item" title="Inscriptions">
-                <a class="nav-link" href="/registration"><h2>🎟️</h2></a>
-            </li>
-
-            <li class="nav-item" title="Notifications">
-                <a class="nav-link" href="/notifications"><h2>🔔</h2></a>
-            </li>
-
-            <li class="nav-item" title="Courriels">
-                <a class="nav-link" href="/sendEmails"><h2>📥</h2></a>
-            </li>
-
-            <li class="nav-item" title="Maintenance">
-                <a class="nav-link" href="/maintenance"><h2>🚧</h2></a>
-            </li>
-
-            {if $isMyclubWebSite}
-            <li class="nav-item" title="Installations">
-                <a class="nav-link" href="/installations"><h2>🌐</h2></a>
-            </li>
-            {/if}
-
+            {if $isMyclubWebSite} 
+            <li class="nav-item"><a class="nav-link" href="/installations">🌐 Installations</a></li>
+            {/if} 
         </ul>
-    </div>',' ');
-INSERT INTO "Metadata" VALUES (1,'MyClub',15,0,NULL,NULL,NULL,NULL,NULL,1000000,NULL,10,36,6,NULL,0,NULL);
+    </div>
+',' ');
+INSERT INTO "Languages" VALUES (87,'article.error.not_found','Article {id} does not exist','L''article {id} n''existe pas','');
+INSERT INTO "Languages" VALUES (88,'article.error.unknown_author','Unknown author for article {id}','Auteur inconnu pour l''article {id}','');
+INSERT INTO "Languages" VALUES (89,'article.error.login_required','You must be logged in to view this article','Il faut être connecté pour pouvoir consulter cet article','');
+INSERT INTO "Languages" VALUES (90,'article.error.update_failed','An error occurred while updating the article','Une erreur est survenue lors de la mise à jour de l''article','');
+INSERT INTO "Languages" VALUES (91,'article.error.title_content_required','Title and content are required','Le titre et le contenu sont obligatoires','');
+INSERT INTO "Languages" VALUES (92,'article.success.updated','Article successfully updated','L''article a été mis à jour avec succès','');
+INSERT INTO "Languages" VALUES (93,'article.success.email_sent','Email sent to subscribers','Un courriel a été envoyé aux abonnés','');
+INSERT INTO "Languages" VALUES (94,'article.email.new_title','A new article is available on {root}','Un nouvel article est disponible sur le site {root}','');
+INSERT INTO "Languages" VALUES (95,'article.email.body_intro','According to your preferences, this message informs you about a new article','Conformément à vos souhaits, ce message vous signale la présence d''un nouvel article','');
+INSERT INTO "Languages" VALUES (96,'article.email.unsubscribe','To stop receiving these emails update your preferences','Pour ne plus recevoir ce type de message vous pouvez mettre à jour vos préférences','');
+INSERT INTO "Languages" VALUES (97,'article.title.crosstab','Redactors vs audience','Rédacteurs vs audience','');
+INSERT INTO "Languages" VALUES (98,'article.label.created_by','Created by','Créé par','');
+INSERT INTO "Languages" VALUES (99,'article.label.title','Title','Titre','');
+INSERT INTO "Languages" VALUES (100,'article.label.last_update','Last update','Dernière modification','');
+INSERT INTO "Languages" VALUES (101,'article.label.group','Group','Groupe','');
+INSERT INTO "Languages" VALUES (102,'article.label.published','Published','Publié','');
+INSERT INTO "Languages" VALUES (103,'article.label.pool','Survey','Sondage','');
+INSERT INTO "Languages" VALUES (104,'article.label.content','Content','Contenu','');
+INSERT INTO "Languages" VALUES (105,'article.error.email_failed','Failed to send email to subscribers','Échec de l''envoi du courriel aux abonnés','Nie można wysłać emaila do subskrybentów');
+INSERT INTO "Languages" VALUES (106,'navbar.designer.event_types','Event types and their attributes','Les types d''événements et leurs attributs','Typy wydarzeń i ich atrybuty');
+INSERT INTO "Languages" VALUES (107,'navbar.designer.needs','Needs associated with events','Les besoins associés aux événements','Wymagania związane z wydarzeniami');
+INSERT INTO "Languages" VALUES (108,'navbar.designer.settings','Customization','Personnalisation','Personalizacja');
+INSERT INTO "Languages" VALUES (109,'navbar.designer.designs','Designs','Les designs','Projekty');
+INSERT INTO "Languages" VALUES (110,'navbar.designer.kanban','Kanban board','Kanban','Tablica Kanban');
+INSERT INTO "Languages" VALUES (111,'navbar.designer.menu','Navigation menus','Les menus de navigation','Menu nawigacyjne');
+INSERT INTO "Languages" VALUES (112,'navbar.designer.translator','Translations','Les traductions','Tłumaczenia');
+INSERT INTO "Languages" VALUES (113,'navbar.designer.event_types','Event types and their attributes','Les types d''événements et leurs attributs','Typy wydarzeń i ich atrybuty');
+INSERT INTO "Languages" VALUES (114,'navbar.designer.needs','Needs associated with events','Les besoins associés aux événements','Wymagania związane z wydarzeniami');
+INSERT INTO "Languages" VALUES (115,'navbar.designer.settings','Customization','Personnalisation','Personalizacja');
+INSERT INTO "Languages" VALUES (116,'navbar.designer.designs','Designs','Les designs','Projekty');
+INSERT INTO "Languages" VALUES (117,'navbar.designer.kanban','Kanban board','Kanban','Tablica Kanban');
+INSERT INTO "Languages" VALUES (118,'navbar.designer.menu','Navigation menus','Les menus de navigation','Menu nawigacyjne');
+INSERT INTO "Languages" VALUES (119,'navbar.designer.translator','Translations','Les traductions','Tłumaczenia');
+INSERT INTO "Languages" VALUES (120,'navbar.admin.event_manager','Event manager','Animateur','Koordynator wydarzeń');
+INSERT INTO "Languages" VALUES (121,'navbar.admin.designer','Designer','Designer','Projektant');
+INSERT INTO "Languages" VALUES (122,'navbar.admin.redactor','Redactor','Rédacteur','Redaktor');
+INSERT INTO "Languages" VALUES (123,'navbar.admin.person_manager','Secretary','Secrétaire','Sekretarz');
+INSERT INTO "Languages" VALUES (124,'navbar.admin.visitor_insights','Observer','Observateur','Obserwator');
+INSERT INTO "Languages" VALUES (125,'navbar.admin.webmaster','Webmaster','Webmaster','Webmaster');
+INSERT INTO "Languages" VALUES (126,'navbar.designer.event_types','Event types and their attributes','Les types d''événements et leurs attributs','Typy wydarzeń i ich atrybuty');
+INSERT INTO "Languages" VALUES (127,'navbar.designer.needs','Needs associated with events','Les besoins associés aux événements','Wymagania związane z wydarzeniami');
+INSERT INTO "Languages" VALUES (128,'navbar.designer.settings','Customization','Personnalisation','Personalizacja');
+INSERT INTO "Languages" VALUES (129,'navbar.designer.designs','Designs','Les designs','Projekty');
+INSERT INTO "Languages" VALUES (130,'navbar.designer.kanban','Kanban board','Kanban','Tablica Kanban');
+INSERT INTO "Languages" VALUES (131,'navbar.designer.menu','Navigation menus','Les menus de navigation','Menu nawigacyjne');
+INSERT INTO "Languages" VALUES (132,'navbar.designer.translator','Translations','Les traductions','Tłumaczenia');
+INSERT INTO "Languages" VALUES (133,'navbar.admin.event_manager','Event manager','Animateur','Koordynator wydarzeń');
+INSERT INTO "Languages" VALUES (134,'navbar.admin.designer','Designer','Designer','Projektant');
+INSERT INTO "Languages" VALUES (135,'navbar.admin.redactor','Redactor','Rédacteur','Redaktor');
+INSERT INTO "Languages" VALUES (136,'navbar.admin.person_manager','Secretary','Secrétaire','Sekretarz');
+INSERT INTO "Languages" VALUES (137,'navbar.admin.visitor_insights','Observer','Observateur','Obserwator');
+INSERT INTO "Languages" VALUES (138,'navbar.admin.webmaster','Webmaster','Webmaster','Webmaster');
+INSERT INTO "Languages" VALUES (139,'navbar.event_manager.week_events','Weekly calendar','Calendrier hebdomadaire','Kalendarz tygodniowy');
+INSERT INTO "Languages" VALUES (140,'navbar.event_manager.next_events','Upcoming events','Les prochains événements','Nadchodzące wydarzenia');
+INSERT INTO "Languages" VALUES (141,'navbar.event_manager.guest_invitation','Send an invitation','Envoyer une « invitation »','Wyślij zaproszenie');
+INSERT INTO "Languages" VALUES (142,'navbar.event_manager.emails','Email extraction','Extraction des emails','Eksport adresów e-mail');
+INSERT INTO "Languages" VALUES (143,'navbar.event_manager.crosstab','Cross-tabulation table','Tableau croisé dynamique','Tabela przestawna');
+INSERT INTO "Languages" VALUES (144,'navbar.person_manager.persons','Members','Membres','Członkowie');
+INSERT INTO "Languages" VALUES (145,'navbar.person_manager.groups','Groups','Groupes','Grupy');
+INSERT INTO "Languages" VALUES (146,'navbar.person_manager.registration','Registrations','Inscriptions','Rejestracje');
+INSERT INTO "Languages" VALUES (147,'navbar.person_manager.import','Import','Importer','Import');
+INSERT INTO "Languages" VALUES (148,'navbar.redactor.articles','Articles','Articles','Artykuły');
+INSERT INTO "Languages" VALUES (149,'navbar.redactor.media','Media','Médias','Media');
+INSERT INTO "Languages" VALUES (150,'navbar.redactor.top_articles','Top 50 articles','Top 50 articles','Top 50 artykułów');
+INSERT INTO "Languages" VALUES (151,'navbar.redactor.crosstab','Cross-tabulation table','Tableau croisé dynamique','Tabela przestawna');
+INSERT INTO "Languages" VALUES (152,'navbar.visitor_insights.referents','Referring sites','Sites référents','Strony odsyłające');
+INSERT INTO "Languages" VALUES (153,'navbar.visitor_insights.top_pages','Top pages by period','Top pages par période','Najpopularniejsze strony w okresie');
+INSERT INTO "Languages" VALUES (154,'navbar.visitor_insights.crosstab','Cross-tabulation table','Tableau croisé dynamique','Tabela przestawna');
+INSERT INTO "Languages" VALUES (155,'navbar.visitor_insights.logs','Visit details','Détails des visites','Szczegóły wizyt');
+INSERT INTO "Languages" VALUES (156,'navbar.visitor_insights.visitors','Visitors','Visiteurs','Odwiedzający');
+INSERT INTO "Languages" VALUES (157,'navbar.visitor_insights.analytics','Visit summary','Synthèse des visites','Podsumowanie wizyt');
+INSERT INTO "Languages" VALUES (158,'navbar.visitor_insights.last_visits','Latest visits','Dernières visites','Ostatnie wizyty');
+INSERT INTO "Languages" VALUES (159,'navbar.visitor_insights.members_alerts','Alerts requested by members','Alertes demandées par les membres','Alerty żądane przez członków');
+INSERT INTO "Languages" VALUES (160,'navbar.webmaster.dbbrowser','Database browser','Navigateur de base de données','Przeglądarka bazy danych');
+INSERT INTO "Languages" VALUES (161,'navbar.webmaster.groups','Groups','Groupes','Grupy');
+INSERT INTO "Languages" VALUES (162,'navbar.webmaster.registration','Registrations','Inscriptions','Rejestracje');
+INSERT INTO "Languages" VALUES (163,'navbar.webmaster.notifications','Notifications','Notifications','Powiadomienia');
+INSERT INTO "Languages" VALUES (164,'navbar.webmaster.send_emails','Emails','Courriels','Wiadomości e-mail');
+INSERT INTO "Languages" VALUES (165,'navbar.webmaster.maintenance','Maintenance','Maintenance','Konserwacja');
+INSERT INTO "Languages" VALUES (166,'navbar.webmaster.installations','Installations','Installations','Instalacje');
+INSERT INTO "Languages" VALUES (167,'emailCredentials.title','Account to use for sending emails','Compte à utiliser pour envoyer des courriels','Konto do użycia do wysyłania wiadomości e-mail');
+INSERT INTO "Languages" VALUES (168,'emailCredentials.email','Email','Email','Email');
+INSERT INTO "Languages" VALUES (169,'emailCredentials.password','Password','Mot de passe','Hasło');
+INSERT INTO "Languages" VALUES (170,'emailCredentials.host','Host','Hôte','Host');
+INSERT INTO "Languages" VALUES (171,'emailCredentials.invalid_email','Please enter a valid email','Veuillez entrer un email valide','Proszę wprowadzić prawidłowy email');
+INSERT INTO "Metadata" VALUES (1,'MyClub',16,0,NULL,NULL,NULL,NULL,NULL,1000000,NULL,10,36,6,NULL,0,NULL);
 INSERT INTO "Person" VALUES (1,'webmaster@myclub.foo','e427c26faca947919b18b797bc143a35100e4de48c34b70b26202d3a7d8e51f7','my first name','my last name','my nick name or nothing',NULL,'0',NULL,NULL,NULL,NULL,NULL,0,0,NULL,NULL,'2025-01-01',0,NULL,NULL,NULL,NULL,NULL);
 INSERT INTO "PersonGroup" VALUES (1,1,1);
 INSERT INTO "Settings" VALUES (1,'Title','title');

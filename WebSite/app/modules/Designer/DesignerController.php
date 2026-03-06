@@ -39,7 +39,7 @@ class DesignerController extends AbstractController
                 'isEventDesigner' => $connectedUser->isEventDesigner(),
                 'isHomeDesigner' => $connectedUser->isHomeDesigner(),
                 'isKanbanDesigner' => $connectedUser->isKanbanDesigner(),
-                'isNavbarDesigner' => $connectedUser->isNavbarDesigner(),
+                'isMenuDesigner' => $connectedUser->isMenuDesigner(),
             ];
             $compiledContent = WebApp::getcompiledContent($content, $params);
 

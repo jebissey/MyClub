@@ -31,6 +31,28 @@ abstract class Data
         $this->tables = self::$cachedTables;
     }
 
+    #region Protected methods
+    protected function getCheckValues($table, $column)
+    {
+        $sql = "SELECT sql FROM sqlite_master WHERE type='table' AND name=?";
+        $tableDef = $this->pdo->prepare($sql);
+        $tableDef->execute([$table]);
+        $row = $tableDef->fetch(PDO::FETCH_ASSOC);
+
+        if (!$row) return [];
+
+        $sqlText = $row['sql'];
+        if (preg_match("/\"$column\"[^\n]*CHECK\s*\(\s*\"$column\"\s+IN\s*\(([^)]+)\)\)/i", $sqlText, $matches)) {
+            $values = explode(',', $matches[1]);
+            $values = array_map(function ($v) {
+                return trim($v, " '\"");
+            }, $values);
+            return $values;
+        }
+
+        return [];
+    }
+
     protected function validateTableName(string $table): void
     {
         if (strlen($table) > 64)                      throw new SqliteTableException('Table name too long (max 64) in file ' . __FILE__ . ' at line ' . __LINE__);
@@ -38,6 +60,7 @@ abstract class Data
         if (!in_array($table, $this->tables))         throw new SqliteTableException("Table '$table' not found in file " . __FILE__ . ' at line ' . __LINE__);
     }
 
+    #region Public methods
     public function delete(string $table, array $where): int
     {
         $this->validateTableName($table);
@@ -245,5 +268,15 @@ abstract class Data
             );
             return false;
         }
+    }
+
+    static function requireFields(array $data, array $fields): bool
+    {
+        foreach ($fields as $field) {
+            if (!array_key_exists($field, $data)) {
+                return false;
+            }
+        }
+        return true;
     }
 }

@@ -132,7 +132,7 @@ class EventGuestController extends AbstractController
                 $body .= "Date : " . (new DateTime($event->StartTime))->format('d/m/Y à H:i') . "\n\n";
                 $body .= "Pour confirmer votre participation, cliquez sur le lien suivant :\n";
                 $body .= $invitationLink . "\n\n";
-                $body .= "Cordialement,\nL'équipe BNW Dijon";
+                $body .= "Cordialement,\nL'équipe des animateurs";
 
                 $emailMessage = new EmailMessage(
                     from: $this->application->getConnectedUser()->person->Email,

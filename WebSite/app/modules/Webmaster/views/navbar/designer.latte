@@ -1,32 +1,38 @@
 {include '_adminLeft.latte'}
 
             {if $isEventDesigner}
-            <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Les types d'événements et leurs attributs">
+            <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" title="{='navbar.designer.event_types'|translate}">
                 <a class="nav-link {if $page == 'eventTypes'}active{/if}" href="/eventTypes"><h2>🗓️</h2></a>
             </li>
-            <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Les besoins associés aux événements">
+            <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" title="{='navbar.designer.needs'|translate}">
                 <a class="nav-link {if $page == 'needs'}active{/if}" href="/needs"><h2>📋</h2></a>
             </li>
             {/if}
 
             {if $isHomeDesigner}
-            <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Personnalisation">
+            <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" title="{='navbar.designer.settings'|translate}">
                 <a class="nav-link {if $page == 'settings'}active{/if}" href="/settings"><h2>🔧</h2></a>
             </li>
-            <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Les designs">
+            <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" title="{='navbar.designer.designs'|translate}">
                 <a class="nav-link {if $page == 'designs'}active{/if}" href="/designs"><h2>🧠</h2></a>
             </li>
             {/if}
 
             {if $isKanbanDesigner}
-            <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Kanban">
+            <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" title="{='navbar.designer.kanban'|translate}">
                 <a class="nav-link {if $page == 'kanban'}active{/if}" href="/kanban"><h2>🟨</h2></a>
             </li>
             {/if}
 
-            {if $isNavbarDesigner}
-            <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Les barres de navigations">
-                <a class="nav-link {if $page == 'navBar'}active{/if}" href="/navbar"><h2>📑</h2></a>
+            {if $isMenuDesigner}
+            <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" title="{='navbar.designer.menu'|translate}">
+                <a class="nav-link {if $page == 'menu'}active{/if}" href="/menu"><h2>📑</h2></a>
+            </li>
+            {/if}
+
+            {if $isTranslator}
+            <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" title="{='navbar.designer.translator'|translate}">
+                <a class="nav-link {if $page == 'translator'}active{/if}" href="/translator"><h2>🌍</h2></a>
             </li>
             {/if}
 

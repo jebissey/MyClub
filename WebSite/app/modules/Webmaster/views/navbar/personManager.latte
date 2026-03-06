@@ -1,15 +1,15 @@
 {include '_adminLeft.latte'}
 
-                <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Membres">
+                <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" title="{='navbar.person_manager.persons'|translate}">
                     <a class="nav-link {if $page == 'persons'}active{/if}" href="/persons"><h2>👥</h2></a>
                 </li>
-                <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Groupes">
+                <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" title="{='navbar.person_manager.groups'|translate}">
                     <a class="nav-link {if $page == 'groups'}active{/if}" href="/groups"><h2>👫</h2></a>
                 </li>
-                <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Inscriptions">
+                <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" title="{='navbar.person_manager.registration'|translate}">
                     <a class="nav-link {if $page == 'registration'}active{/if}" href="/registration"><h2>🎟️</h2></a>
                 </li>
-                <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Importer">
+                <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" title="{='navbar.person_manager.import'|translate}">
                     <a class="nav-link {if $page == 'import'}active{/if}" href="/import"><h2>📥</h2></a>
                 </li>
 

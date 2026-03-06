@@ -170,33 +170,6 @@ class LogDataHelper extends Data
         return $query->fetchAll(PDO::FETCH_KEY_PAIR);
     }
 
-    #region Private functions
-    private function buildWhereClauseFromFilters(array $filtersInput): array
-    {
-        $filters = [
-            'type' => 'Type',
-            'browser' => 'Browser',
-            'os' => 'Os',
-            'who' => 'Who',
-            'code' => 'Code',
-            'uri' => 'Uri',
-            'message' => 'Message',
-        ];
-        $whereClauses = [];
-        $params = [];
-        foreach ($filters as $param => $column) {
-            if (isset($filtersInput[$param]) && trim($filtersInput[$param]) !== '') {
-                $value = trim($filtersInput[$param]);
-                if (mb_strlen($value) > self::MAX_FILTER_LENGTH) $value = mb_substr($value, 0, self::MAX_FILTER_LENGTH);
-                $whereClauses[] = "$column LIKE ?";
-                $params[] = '%' . $value . '%';
-            }
-        }
-        $whereSQL = '';
-        if (!empty($whereClauses)) $whereSQL = 'WHERE ' . implode(' AND ', $whereClauses);
-        return [$whereSQL, $params];
-    }
-
     #region Installations
     public function getInstallationsData()
     {

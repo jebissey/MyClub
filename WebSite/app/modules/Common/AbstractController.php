@@ -11,14 +11,13 @@ use Latte\Engine as LatteEngine;
 use app\enums\ApplicationError;
 use app\enums\TimeOfDay;
 use app\helpers\Application;
-use app\helpers\ConnectedUser;
 use app\helpers\Params;
 use app\helpers\TranslationManager;
 use app\models\AuthorizationDataHelper;
 use app\models\DataHelper;
 use app\models\LanguagesDataHelper;
+use app\models\MenuItemDataHelper;
 use app\models\MetadataDataHelper;
-use app\models\PageDataHelper;
 
 abstract class AbstractController
 {
@@ -26,7 +25,7 @@ abstract class AbstractController
     protected LatteEngine $latte;
     public DataHelper $dataHelper;
     protected LanguagesDataHelper $languagesDataHelper;
-    protected PageDataHelper $pageDataHelper;
+    protected MenuItemDataHelper $menuItemDataHelper;
     protected AuthorizationDataHelper $authorizationDataHelper;
     private MetadataDataHelper $metadataDataHelper;
     private ?string $prodSiteUrl;
@@ -40,7 +39,7 @@ abstract class AbstractController
         $this->dataHelper = new DataHelper($application);
         $this->languagesDataHelper = new LanguagesDataHelper($application);
         $this->authorizationDataHelper = new AuthorizationDataHelper($application);
-        $this->pageDataHelper = new PageDataHelper($application, $this->authorizationDataHelper);
+        $this->menuItemDataHelper = new MenuItemDataHelper($application, $this->authorizationDataHelper);
         $this->metadataDataHelper = new MetadataDataHelper($application);
         $this->prodSiteUrl = $this->metadataDataHelper->isTestSite() ? $this->metadataDataHelper->getProdSiteUrl() : null;
     }
@@ -76,27 +75,38 @@ abstract class AbstractController
         Application::unreachable("Fatal error in file  with navbar={$navbar}", __FILE__, __LINE__);
     }
 
-    protected function getNavItems($person, bool $all = false)
+    /**
+     * Retrieves navigation items filtered according to the current user and their groups.
+     *
+     * @param object|false|null $person The current user object, false for anonymous.
+     * @param bool $all If true, returns all items without filtering.
+     * @return array<int, object> Array of navigation item objects.
+     */
+    protected function getNavItems(object|false|null $person, bool $all = false): array
     {
-        if (!$person) {
-            $userGroups = [];
-        } else {
+        $userGroups = [];
+        if ($person && $person !== false) {
             $userGroups = $this->authorizationDataHelper->getUserGroups($person->Email);
         }
+        $filter = !$all ? ['What' => 'navbar'] : [];
 
-        $navItems = $this->dataHelper->gets('Page', [], 'Id, Name, Route, IdGroup, ForMembers, ForAnonymous', 'Position');
+        $navItems = $this->dataHelper->gets(
+            'MenuItem',
+            $filter,
+            'Id, Label AS Name, Url AS Route, IdGroup, ForMembers, ForContacts, ForAnonymous, What, Type, Label, Icon, Url', 'Position'
+        );
+
         $filteredNavItems = [];
-
         foreach ($navItems as $navItem) {
             if (
-                ($person === false && $navItem->ForAnonymous == 1)
-                || ($person && $navItem->ForMembers == 1 &&
+                ($person === false && $navItem->ForAnonymous == 1) ||
+                ($person && $navItem->ForMembers == 1 &&
                     (
-                        $navItem->IdGroup === null
-                        || (!empty($userGroups) && in_array($navItem->IdGroup, $userGroups))
+                        $navItem->IdGroup === null ||
+                        (!empty($userGroups) && in_array($navItem->IdGroup, $userGroups, true))
                     )
-                )
-                || $all
+                ) ||
+                $all
             ) {
                 $filteredNavItems[] = $navItem;
             }
@@ -109,11 +119,9 @@ abstract class AbstractController
         }
 
         foreach ($filteredNavItems as $navItem) {
-            if ($navItem->IdGroup !== null && isset($groupsById[$navItem->IdGroup])) {
-                $navItem->GroupName = $groupsById[$navItem->IdGroup];
-            } else {
-                $navItem->GroupName = null;
-            }
+            $navItem->GroupName = $navItem->IdGroup !== null && isset($groupsById[$navItem->IdGroup])
+                ? $groupsById[$navItem->IdGroup]
+                : null;
         }
 
         return $filteredNavItems;

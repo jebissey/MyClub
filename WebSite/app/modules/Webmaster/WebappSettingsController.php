@@ -103,7 +103,7 @@ class WebappSettingsController extends AbstractController
         $requestParam = WebApp::filterInput($schema, $this->application->getFlight()->request()->query->getData());
         $language = $requestParam['lang'] ?? '';
         $action = $requestParam['use_language'] ?? null;
-        if ($action === null || $language === '') {
+        if ($action === null || $action == 0 || $language === '') {
             $language = null;
         }
         $this->metadataDataHelper->setForcedLanguage($language);

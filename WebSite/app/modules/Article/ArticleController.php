@@ -23,6 +23,7 @@ use app\modules\Article\services\ArticleAuthorizationService;
 use app\modules\Common\TableController;
 use app\modules\Common\services\AuthenticationService;
 use app\modules\Common\services\EmailService;
+use app\modules\Common\services\MessageService;
 use app\valueObjects\EmailMessage;
 
 class ArticleController extends TableController
@@ -220,9 +221,9 @@ class ArticleController extends TableController
             cc: $filteredEmails
         );
         if ($this->emailService->send($emailMessage)) {
-            $_SESSION['success'] = $this->languagesDataHelper->translate('article.success.email_sent');
+            MessageService::set($this->languagesDataHelper->translate('article.success.email_sent') . " ({count($filteredEmails)})");
         } else {
-            $_SESSION['error'] = $this->languagesDataHelper->translate('article.error.email_failed');
+            MessageService::set($this->languagesDataHelper->translate('article.error.email_failed'), 'danger');
         }
 
         $this->redirect('/article/' . $idArticle);
@@ -387,6 +388,7 @@ class ArticleController extends TableController
                 return;
             }
             $article = $this->articleDataHelper->getLatestArticle([$id]);
+            [$message, $messageType] = MessageService::get();
 
             $this->render('Article/views/article_show.latte', $this->getAllParams([
                 'article' => $article,
@@ -405,7 +407,9 @@ class ArticleController extends TableController
                     '"From"' => 'User',
                     'ArticleId' => $id
                 ])),
-                'isCreator' => $connectedUser !== null && $connectedUser?->person?->Id === $article->CreatedBy
+                'isCreator' => $connectedUser !== null && $connectedUser?->person?->Id === $article->CreatedBy,
+                'message' => $message ?? '',
+                'messageType' => $messageType ?? '',
             ]));
         } catch (QueryException $e) {
             $this->raiseBadRequest($e->getMessage(),  __FILE__, __LINE__);

@@ -55,6 +55,7 @@ class Params
             'isMember' => false,
             'isPersonManager' => false,
             'isRedactor' => false,
+            'isTranslator' => false,
             'isVisitorInsights' => false,
             'isWebmaster' => false,
             'page' => $page,

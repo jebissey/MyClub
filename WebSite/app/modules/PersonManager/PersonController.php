@@ -215,6 +215,7 @@ class PersonController extends TableController
             'resetUrl' => '/persons',
             'page' => $this->application->getConnectedUser()->getPage(),
             'status' => $status,
+            'extraParams' => $status !== PersonStatus::Active->value ? ['status' => $status] : [],
         ]));
     }
 }

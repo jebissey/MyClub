@@ -44,7 +44,7 @@ class LanguagesDataHelper extends Data
 
         $result = $stmt->fetchColumn();
 
-        return $result === false ? "-- $key --" : (string)$result;
+        return $result === false || $result === '' ? "-- $key --" : (string)$result;
     }
 
     #endregion
@@ -128,7 +128,6 @@ class LanguagesDataHelper extends Data
     #endregion
 
     #region Private helpers
-
     private function initializeLanguages(): void
     {
         $stmt = $this->pdo->query("PRAGMA table_info(Languages)");

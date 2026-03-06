@@ -1,0 +1,93 @@
+<div class="modal fade" id="editModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editModalTitle">Menu Item</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="itemId">
+                <input type="hidden" id="itemWhat">
+
+                {* ── LABEL (navbar + sidebar link/heading/submenu) ── *}
+                <div class="mb-3 field-navbar field-sidebar field-hide-divider">
+                    <label for="itemLabel" class="form-label">Label :</label>
+                    <input type="text" class="form-control" id="itemLabel">
+                </div>
+
+                {* ── URL (navbar + sidebar link) ── *}
+                <div class="mb-3 field-navbar field-sidebar-link">
+                    <label for="itemUrl" class="form-label">Adresse :</label>
+                    <input type="text" class="form-control" id="itemUrl" placeholder="/ma/route">
+                </div>
+
+                {* ── GROUP ── *}
+                <div class="mb-3">
+                    <label for="itemGroup" class="form-label">Groupe :</label>
+                    <select class="form-select" id="itemGroup">
+                        <option value="">Aucun</option>
+                        {foreach $groups as $group}
+                        <option value="{$group->Id}">{$group->Name}</option>
+                        {/foreach}
+                    </select>
+                </div>
+
+                {* ── VISIBILITY ── *}
+                <div class="mb-3">
+                    <label class="form-label mb-1">Visible pour :</label>
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input" id="forMembers">
+                        <label class="form-check-label" for="forMembers">Membres</label>
+                    </div>
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input" id="forContacts">
+                        <label class="form-check-label" for="forContacts">Contacts</label>
+                    </div>
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input" id="forAnonymous">
+                        <label class="form-check-label" for="forAnonymous">Anonymes</label>
+                    </div>
+                </div>
+
+                {* ══ SIDEBAR UNIQUEMENT ══ *}
+
+                {* ── TYPE ── *}
+                <div class="mb-3 field-sidebar">
+                    <label for="itemType" class="form-label">Type :</label>
+                    <select class="form-select" id="itemType">
+                        <option value="link">Lien</option>
+                        <option value="heading">Titre</option>
+                        <option value="divider">Séparateur</option>
+                        <option value="submenu">Sous-menu</option>
+                    </select>
+                </div>
+
+                {* ── ICON ── *}
+                <div class="mb-3 field-sidebar field-hide-divider">
+                    <label for="itemIcon" class="form-label">Icône <small class="text-muted">bi-*</small> :</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i id="iconPreview" class="bi"></i></span>
+                        <input type="text" class="form-control" id="itemIcon" placeholder="bi-house">
+                    </div>
+                </div>
+
+                {* ── PARENT ── *}
+                <div class="mb-3 field-sidebar field-hide-heading">
+                    <label for="itemParent" class="form-label">Parent :</label>
+                    <select class="form-select" id="itemParent">
+                        <option value="">Aucun</option>
+                        {foreach $sidebarItems as $parent}
+                            {if $parent->Type === 'submenu'}
+                        <option value="{$parent->Id}">{$parent->Label}</option>
+                            {/if}
+                        {/foreach}
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <button type="button" class="btn btn-primary" id="saveChanges">Enregistrer</button>
+            </div>
+        </div>
+    </div>
+</div>

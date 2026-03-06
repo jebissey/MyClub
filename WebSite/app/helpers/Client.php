@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace app\helpers;
@@ -16,7 +17,7 @@ class Client
     public function __construct()
     {
         try {
-            if ($_SERVER['HTTP_USER_AGENT'] ?? '' != '' ) {
+            if ($_SERVER['HTTP_USER_AGENT'] ?? '' != '') {
                 $parser = Parser::create();
                 $result = $parser->parse($_SERVER['HTTP_USER_AGENT']);
 
@@ -51,6 +52,11 @@ class Client
             ?? $_SERVER['HTTP_X_FORWARDED_FOR']
             ?? $_SERVER['REMOTE_ADDR']
             ?? '0.0.0.0';
+    }
+
+    public function getMethod(): string
+    {
+        return $_SERVER['REQUEST_METHOD'] ?? 'CLI';
     }
 
     public function getReferer(): string

@@ -1,26 +1,26 @@
 {include '_adminLeft.latte'}
 
-                        <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" title="DB Browser">
+                        <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" title="{='navbar.webmaster.dbbrowser'|translate}">
                             <a class="nav-link {if $page == 'dbbrowser'}active{/if}" href="/dbbrowser"><h2>🗂️</h2></a>
                         </li>
-                        <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Groupes">
+                        <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" title="{='navbar.webmaster.groups'|translate}">
                             <a class="nav-link {if $page == 'groups'}active{/if}" href="/groups"><h2>🧑‍🤝‍🧑</h2></a>
                         </li>
-                        <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Inscriptions">
+                        <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" title="{='navbar.webmaster.registration'|translate}">
                             <a class="nav-link {if $page == 'registration'}active{/if}" href="/registration"><h2>🎟️</h2></a>
                         </li>
-                        <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Notifications">
+                        <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" title="{='navbar.webmaster.notifications'|translate}">
                             <a class="nav-link {if $page == 'notifications'}active{/if}" href="/notifications"><h2>🔔</h2></a>
                         </li>
-                        <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Courriels">
+                        <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" title="{='navbar.webmaster.send_emails'|translate}">
                             <a class="nav-link {if $page == 'sendEmails'}active{/if}" href="/sendEmails"><h2>📥</h2></a>
                         </li>
-                        <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Maintenance">
+                        <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" title="{='navbar.webmaster.maintenance'|translate}">
                             <a class="nav-link {if $page == 'maintenance'}active{/if}" href="/maintenance"><h2>🚧</h2></a>
                         </li>
                         
                         {if $isMyclubWebSite}
-                        <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Installations">
+                        <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" title="{='navbar.webmaster.installations'|translate}">
                             <a class="nav-link {if $page == 'installations'}active{/if}" href="/installations"><h2>🌐</h2></a>
                         </li>
                         {/if}
