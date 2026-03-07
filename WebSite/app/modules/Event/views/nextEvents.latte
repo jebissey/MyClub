@@ -165,7 +165,7 @@
 
                         <div class="mb-3">
                             <label for="emailTypeSelect" class="form-label">Type de message</label>
-                            <select class="form-control" id="emailTypeSelect" name="emailType" required>
+                            <select class="form-select" id="emailTypeSelect" name="emailType" required>
                                 <option value="">Sélectionnez un type</option>
                                 <option value="nouvel-evenement">Nouvel événement</option>
                                 <option value="rappel">Rappel</option>
@@ -176,7 +176,7 @@
 
                         <div class="mb-3">
                             <label for="recipientsSelect" class="form-label">Destinataires</label>
-                            <select class="form-control" id="recipientsSelect" name="recipients" required>
+                            <select class="form-select" id="recipientsSelect" name="recipients" required>
                                 <option value="">Sélectionnez d'abord un type de message</option>
                             </select>
                         </div>
@@ -229,7 +229,7 @@
                         <div class="mb-3 row align-items-center">
                             <label for="eventTypeInput" class="col-auto col-form-label">Type d'événement</label>
                             <div class="col">
-                                <select class="form-control" id="eventTypeInput" name="eventType" required>
+                                <select class="form-select" id="eventTypeInput" name="eventType" required>
                                     {foreach $eventTypes as $eventType}
                                         <option value="{$eventType->Id}">{$eventType->Name}</option>
                                     {/foreach}
@@ -288,7 +288,7 @@
                                     <!-- Dynamically populated needs list will go here -->
                                 </div>
                                 <div class="mb-3">
-                                    <select class="form-control" id="needTypeInput" name="needType" required>
+                                    <select class="form-select" id="needTypeInput" name="needType" required>
                                         <option value="0">Type de besoin</option>
                                         {foreach $needTypes as $needType}
                                             <option value="{$needType->Id}">{$needType->Name}</option>
@@ -316,7 +316,7 @@
                         <div class="mb-3 row align-items-center">
                             <label for="audienceInput" class="col-auto col-form-label">Public</label>
                             <div class="col">
-                                <select class="form-control" id="audienceInput" name="audience" required>
+                                <select class="form-select" id="audienceInput" name="audience" required>
                                     <option value="ClubMembersOnly">Membres du club uniquement</option>
                                     <option value="Guest">Membres du club et sur « invitation »</option>
                                     <option value="All">Tous</option>

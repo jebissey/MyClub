@@ -22,7 +22,7 @@
             <form method="get" class="row">
                 <div class="col-md-3 mb-3">
                     <label for="period" class="mr-2">Période:</label>
-                    <select class="form-control" id="period" name="period" onchange="this.form.submit()">
+                    <select class="form-select" id="period" name="period" onchange="this.form.submit()">
                         <option value="all" {if $period == 'all'}selected{/if}>Tout</option>
                         <option value="today" {if $period == 'today'}selected{/if}>Aujourd'hui</option>
                         <option value="yesterday" {if $period == 'yesterday'}selected{/if}>Hier</option>
@@ -43,7 +43,7 @@
                 </div>
                 <div class="col-md-3 mb-3">
                     <label for="group">Filtrer par Groupe:</label>
-                    <select class="form-control" id="group" name="group">
+                    <select class="form-select" id="group" name="group">
                         <option value="">Tous les groupes</option>
                         {foreach $groups as $group}
                         <option value="{$group->Name}" {if $groupFilter == $group->Name}selected{/if}>{$group->Name}</option>

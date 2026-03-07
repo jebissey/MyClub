@@ -13,7 +13,7 @@
             <form method="get" class="form-inline">
                 <div class="form-group mr-2">
                     <label for="period" class="mr-2">Période:</label>
-                    <select class="form-control" id="period" name="period" onchange="this.form.submit()">
+                    <select class="form-select" id="period" name="period" onchange="this.form.submit()">
                         <option value="all" {if $period == 'all'}selected{/if}>Tout</option>
                         <option value="today" {if $period == 'today'}selected{/if}>Aujourd'hui</option>
                         <option value="week" {if $period == 'week'}selected{/if}>7 derniers jours</option>

@@ -55,7 +55,7 @@
 
             <div class="mb-3">
                 <label for="visibility" class="form-label">Visibilité</label>
-                <select class="form-control w-auto" id="visibility" name="visibility" required>
+                <select class="form-select w-auto" id="visibility" name="visibility" required>
                     <option value="redactor"            {if $order !== false && $order->Visibility == 'redactor'}selected{/if}>Rédacteur 👁️‍🗨️📝</option>
                     <option value="all"                 {if $order !== false && $order->Visibility == 'all'}selected{/if}>Tout le monde 👁️‍🗨️👥</option>
                     <option value="allAfterClosing"     {if $order !== false && $order->Visibility == 'allAfterClosing'}selected{/if}>Tout le monde après la cloture 👁️‍🗨️👥📅</option>

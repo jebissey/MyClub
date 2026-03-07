@@ -33,6 +33,7 @@ class EventGuestController extends AbstractController
             return;
         }
         $events = $this->eventDataHelper->getEventsForAllOrGuest();
+        $connectedUser = $this->application->getConnectedUser();
 
         $this->render('Event/views/guest.latte', $this->getAllParams([
             'events' => $events,
@@ -40,7 +41,8 @@ class EventGuestController extends AbstractController
             'layout' => $this->getLayout(),
             'message' => $message,
             'messageType' => $type,
-            'page' => $this->application->getConnectedUser()->getPage(1),
+            'page' => $connectedUser->getPage(1),
+            'navItems' => $this->getNavItems($connectedUser->person ?? false),
         ]));
     }
 

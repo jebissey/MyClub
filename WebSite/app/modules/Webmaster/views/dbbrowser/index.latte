@@ -16,7 +16,7 @@
             <div class="card-body">
                 <div class="form-group">
                     <label for="tableSelect">Tables disponibles:</label>
-                    <select class="form-control" id="tableSelect" onchange="window.location.href='/dbbrowser/' + this.value">
+                    <select class="form-select" id="tableSelect" onchange="window.location.href='/dbbrowser/' + this.value">
                         <option value="">-- Sélectionnez une table --</option>
                         {foreach $tables as $table}
                             <option value="{$table}">{$table}</option>

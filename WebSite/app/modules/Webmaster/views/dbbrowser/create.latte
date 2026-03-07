@@ -38,7 +38,7 @@
                             <input type="number" step="0.01" class="form-control" id="{$column}" name="{$column}" 
                                 value="{$columnInfo['dflt_value']}" {if $columnInfo['notnull']}required{/if}>
                         {elseif strpos($columnInfo['type'], 'BOOL') !== false}
-                            <select class="form-control" id="{$column}" name="{$column}" {if $columnInfo['notnull']}required{/if}>
+                            <select class="form-select" id="{$column}" name="{$column}" {if $columnInfo['notnull']}required{/if}>
                                 <option value="0" {if $columnInfo['dflt_value'] == '0'}selected{/if}>Faux (0)</option>
                                 <option value="1" {if $columnInfo['dflt_value'] == '1'}selected{/if}>Vrai (1)</option>
                             </select>
