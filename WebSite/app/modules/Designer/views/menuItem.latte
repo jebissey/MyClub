@@ -19,37 +19,38 @@
     <div class="container-fluid mt-4">
         <div class="row">
             <div class="col-12">
-                <h3>Menu Items</h3>
+                <h3>{='menu.page_title'|translate}</h3>
 
                 <ul class="nav nav-tabs mb-3" id="menuTabs" role="tablist">
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link active" id="navbar-tab" data-bs-toggle="tab"
-                                data-bs-target="#navbar-pane" type="button" role="tab">
-                            <i class="bi bi-menu-button-wide"></i> Navbar
-                        </button>
+                        <a class="nav-link {if $activeTab === \app\enums\MenuItemTab::Navbar}active{/if}"
+                        href="?tab={=\app\enums\MenuItemTab::Navbar->value}" role="tab">
+                            <i class="bi bi-menu-button-wide"></i> {='menu.tab_navbar'|translate}
+                        </a>
                     </li>
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="sidebar-tab" data-bs-toggle="tab"
-                                data-bs-target="#sidebar-pane" type="button" role="tab">
-                            <i class="bi bi-layout-sidebar"></i> Sidebar
-                        </button>
+                        <a class="nav-link {if $activeTab === \app\enums\MenuItemTab::Sidebar}active{/if}"
+                        href="?tab={=\app\enums\MenuItemTab::Sidebar->value}" role="tab">
+                            <i class="bi bi-layout-sidebar"></i> {='menu.tab_sidebar'|translate}
+                        </a>
                     </li>
                 </ul>
 
                 <div class="tab-content" id="menuTabsContent">
 
                     {* ── NAVBAR TAB ── *}
-                    <div class="tab-pane fade show active" id="navbar-pane" role="tabpanel">
+                    <div class="tab-pane {if $activeTab === \app\enums\MenuItemTab::Navbar}show active{/if}" id="navbar-pane" role="tabpanel">
+
                         <table class="table table-striped table-hover align-middle">
                             <thead>
                                 <tr>
-                                    <th>Nom</th>
-                                    <th>URL</th>
-                                    <th>Groupe</th>
-                                    <th class="text-center">Membres</th>
-                                    <th class="text-center">Contacts</th>
-                                    <th class="text-center">Anonymes</th>
-                                    <th class="text-end">Actions</th>
+                                    <th>{='menu.col_name'|translate}</th>
+                                    <th>{='menu.col_url'|translate}</th>
+                                    <th>{='menu.col_group'|translate}</th>
+                                    <th class="text-center">{='menu.col_members'|translate}</th>
+                                    <th class="text-center">{='menu.col_contacts'|translate}</th>
+                                    <th class="text-center">{='menu.col_anonymous'|translate}</th>
+                                    <th class="text-end">{='menu.col_actions'|translate}</th>
                                 </tr>
                             </thead>
                             <tbody id="navList">
@@ -85,20 +86,21 @@
                     </div>
 
                     {* ── SIDEBAR TAB ── *}
-                    <div class="tab-pane fade" id="sidebar-pane" role="tabpanel">
+                    <div class="tab-pane {if $activeTab === \app\enums\MenuItemTab::Sidebar}show active{/if}" id="sidebar-pane" role="tabpanel">
+
                         <table class="table table-striped table-hover align-middle">
                             <thead>
                                 <tr>
-                                    <th>Type</th>
-                                    <th>Icône</th>
-                                    <th>Label</th>
-                                    <th>URL</th>
-                                    <th>Parent</th>
-                                    <th>Groupe</th>
-                                    <th class="text-center">Membres</th>
-                                    <th class="text-center">Contacts</th>
-                                    <th class="text-center">Anonymes</th>
-                                    <th class="text-end">Actions</th>
+                                    <th>{='menu.col_type'|translate}</th>
+                                    <th>{='menu.col_icon'|translate}</th>
+                                    <th>{='menu.col_label'|translate}</th>
+                                    <th>{='menu.col_url'|translate}</th>
+                                    <th>{='menu.col_parent'|translate}</th>
+                                    <th>{='menu.col_group'|translate}</th>
+                                    <th class="text-center">{='menu.col_members'|translate}</th>
+                                    <th class="text-center">{='menu.col_contacts'|translate}</th>
+                                    <th class="text-center">{='menu.col_anonymous'|translate}</th>
+                                    <th class="text-end">{='menu.col_actions'|translate}</th>
                                 </tr>
                             </thead>
                             <tbody id="sidebarList">
@@ -151,5 +153,12 @@
 {/block}
 
 {block scripts}
+    <script>
+        window.i18n = {=json_encode($translations)|noescape};
+
+        window.t = function(key) {
+            return window.i18n?.[key] ?? key;
+        };
+    </script>
     <script type="module" src="/app/modules/Designer/js/menuItem.js"></script>
 {/block}

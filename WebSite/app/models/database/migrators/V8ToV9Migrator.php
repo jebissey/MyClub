@@ -295,7 +295,7 @@ In the footer,
   a <strong>dictionary</strong>, and other resources to support you.
 </div>
 '
-WHERE Name = 'Help_home';
+WHERE Id = 56;
 SQL);
 
         $pdo->exec("UPDATE Languages SET Name = 'Help_PersonManager'   WHERE Name = 'Help_personManager';");

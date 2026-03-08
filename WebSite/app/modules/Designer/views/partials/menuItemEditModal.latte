@@ -2,30 +2,42 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="editModalTitle">Menu Item</h5>
+                <h5 class="modal-title" id="editModalTitle">{$translations['modal_title']}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <input type="hidden" id="itemId">
                 <input type="hidden" id="itemWhat">
 
-                {* ── LABEL (navbar + sidebar link/heading/submenu) ── *}
+                {* ── TYPE ── *}
+                <div class="mb-3 field-sidebar">
+                    <label for="itemType" class="form-label">{$translations['field_type']}</label>
+                    <select class="form-select" id="itemType">
+                        <option value="link">{$translations['type_link']}</option>
+                        <option value="heading">{$translations['type_heading']}</option>
+                        <option value="divider">{$translations['type_divider']}</option>
+                        <option value="submenu">{$translations['type_submenu']}</option>
+                    </select>
+                </div>
+
+                {* ── LABEL ── *}
                 <div class="mb-3 field-navbar field-sidebar field-hide-divider">
-                    <label for="itemLabel" class="form-label">Label :</label>
+                    <label for="itemLabel" class="form-label">{$translations['field_label']}</label>
                     <input type="text" class="form-control" id="itemLabel">
                 </div>
 
-                {* ── URL (navbar + sidebar link) ── *}
+                {* ── URL ── *}
                 <div class="mb-3 field-navbar field-sidebar-link">
-                    <label for="itemUrl" class="form-label">Adresse :</label>
-                    <input type="text" class="form-control" id="itemUrl" placeholder="/ma/route">
+                    <label for="itemUrl" class="form-label">{$translations['field_url']}</label>
+                    <input type="text" class="form-control" id="itemUrl"
+                           placeholder="{$translations['field_url_placeholder']}">
                 </div>
 
                 {* ── GROUP ── *}
                 <div class="mb-3">
-                    <label for="itemGroup" class="form-label">Groupe :</label>
+                    <label for="itemGroup" class="form-label">{$translations['field_group']}</label>
                     <select class="form-select" id="itemGroup">
-                        <option value="">Aucun</option>
+                        <option value="">{$translations['field_none']}</option>
                         {foreach $groups as $group}
                         <option value="{$group->Id}">{$group->Name}</option>
                         {/foreach}
@@ -34,48 +46,38 @@
 
                 {* ── VISIBILITY ── *}
                 <div class="mb-3">
-                    <label class="form-label mb-1">Visible pour :</label>
+                    <label class="form-label mb-1">{$translations['field_visible_for']}</label>
                     <div class="form-check">
                         <input type="checkbox" class="form-check-input" id="forMembers">
-                        <label class="form-check-label" for="forMembers">Membres</label>
+                        <label class="form-check-label" for="forMembers">{$translations['field_members']}</label>
                     </div>
                     <div class="form-check">
                         <input type="checkbox" class="form-check-input" id="forContacts">
-                        <label class="form-check-label" for="forContacts">Contacts</label>
+                        <label class="form-check-label" for="forContacts">{$translations['field_contacts']}</label>
                     </div>
                     <div class="form-check">
                         <input type="checkbox" class="form-check-input" id="forAnonymous">
-                        <label class="form-check-label" for="forAnonymous">Anonymes</label>
+                        <label class="form-check-label" for="forAnonymous">{$translations['field_anonymous']}</label>
                     </div>
-                </div>
-
-                {* ══ SIDEBAR UNIQUEMENT ══ *}
-
-                {* ── TYPE ── *}
-                <div class="mb-3 field-sidebar">
-                    <label for="itemType" class="form-label">Type :</label>
-                    <select class="form-select" id="itemType">
-                        <option value="link">Lien</option>
-                        <option value="heading">Titre</option>
-                        <option value="divider">Séparateur</option>
-                        <option value="submenu">Sous-menu</option>
-                    </select>
                 </div>
 
                 {* ── ICON ── *}
                 <div class="mb-3 field-sidebar field-hide-divider">
-                    <label for="itemIcon" class="form-label">Icône <small class="text-muted">bi-*</small> :</label>
+                    <label for="itemIcon" class="form-label">
+                        {$translations['field_icon']} <small class="text-muted">bi-*</small> :
+                    </label>
                     <div class="input-group">
                         <span class="input-group-text"><i id="iconPreview" class="bi"></i></span>
-                        <input type="text" class="form-control" id="itemIcon" placeholder="bi-house">
+                        <input type="text" class="form-control" id="itemIcon"
+                               placeholder="{$translations['field_icon_placeholder']}">
                     </div>
                 </div>
 
                 {* ── PARENT ── *}
                 <div class="mb-3 field-sidebar field-hide-heading">
-                    <label for="itemParent" class="form-label">Parent :</label>
+                    <label for="itemParent" class="form-label">{$translations['field_parent']}</label>
                     <select class="form-select" id="itemParent">
-                        <option value="">Aucun</option>
+                        <option value="">{$translations['field_none']}</option>
                         {foreach $sidebarItems as $parent}
                             {if $parent->Type === 'submenu'}
                         <option value="{$parent->Id}">{$parent->Label}</option>
@@ -85,8 +87,10 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                <button type="button" class="btn btn-primary" id="saveChanges">Enregistrer</button>
+                <button type="button" class="btn btn-secondary"
+                        data-bs-dismiss="modal">{$translations['btn_cancel']}</button>
+                <button type="button" class="btn btn-primary"
+                        id="saveChanges">{$translations['btn_save']}</button>
             </div>
         </div>
     </div>

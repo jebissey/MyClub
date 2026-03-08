@@ -23,7 +23,6 @@ SET
                 <p class="lead text-muted mb-4">
                     This page provides access to administration tools based on your permissions.
                 </p>
-
                 <div class="row g-4">
                     <div class="col-md-6">
                         <div class="d-flex align-items-start mb-3">
@@ -175,7 +174,7 @@ SET
         </div>
     </section>
 </div>'
-WHERE Name = 'Help_Admin';
+WHERE Id = 53;
 SQL);
 
         $pdo->exec(

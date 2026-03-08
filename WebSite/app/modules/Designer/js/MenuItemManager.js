@@ -1,5 +1,8 @@
+import ApiClient from '../../Common/js/ApiClient.js';
+
 export default class MenuItemManager {
     constructor() {
+        this.api = new ApiClient();
         this.modalEl = document.getElementById('editModal');
 
         this.lists = {
@@ -11,7 +14,7 @@ export default class MenuItemManager {
     }
 
     init() {
-        this.initModalFields();   // ← nouveau
+        this.initModalFields();
         this.initEditButtons();
         this.initDeleteButtons();
         this.initSaveButton();
@@ -29,17 +32,14 @@ export default class MenuItemManager {
     /* ================= MODAL FIELDS ================= */
 
     initModalFields() {
-        // Changement de type → recalcul visibilité
         document.getElementById('itemType')
             .addEventListener('change', () => this.refreshFields());
 
-        // Prévisualisation icône
         document.getElementById('itemIcon')
             .addEventListener('input', function () {
                 document.getElementById('iconPreview').className = 'bi ' + this.value.trim();
             });
 
-        // Exposé globalement pour les boutons add/edit
         window.openMenuItemModal = (item = null, what = 'navbar') => {
             document.getElementById('itemId').value = item?.Id ?? '';
             document.getElementById('itemWhat').value = what;
@@ -55,7 +55,7 @@ export default class MenuItemManager {
 
             document.getElementById('iconPreview').className = 'bi ' + (item?.Icon ?? '');
             document.getElementById('editModalTitle').textContent =
-                item ? 'Modifier un élément' : 'Ajouter un élément';
+                item ? window.t('edit_item') : window.t('add_item');
 
             this.refreshFields();
             this.modal.show();
@@ -73,7 +73,6 @@ export default class MenuItemManager {
         this.modalEl.querySelectorAll('.field-sidebar').forEach(el =>
             el.classList.toggle('d-none', !isSidebar));
 
-        // URL : toujours visible en navbar, visible en sidebar seulement si type=link
         this.modalEl.querySelectorAll('.field-sidebar-link').forEach(el =>
             el.classList.toggle('d-none', isSidebar && type !== 'link'));
 
@@ -97,20 +96,14 @@ export default class MenuItemManager {
     async handleEdit(e) {
         const id = e.currentTarget.closest('tr').dataset.id;
 
-        try {
-            const response = await fetch(`/api/menuItem/get/${id}`);
-            const data = await response.json();
+        const data = await this.api.get(`/api/menuItem/get/${id}`);
 
-            if (!data.success) {
-                alert('Erreur : ' + data.message);
-                return;
-            }
-
-            window.openMenuItemModal(data.data.item, data.data.item.What);
-
-        } catch (error) {
-            alert('Erreur lors du chargement : ' + error.message);
+        if (!data.success) {
+            alert(`${window.t('error')} ${data.message}`);
+            return;
         }
+
+        window.openMenuItemModal(data.data.item, data.data.item.What);
     }
 
     /* ================= DELETE ================= */
@@ -125,19 +118,14 @@ export default class MenuItemManager {
         const row = e.currentTarget.closest('tr');
         const id = row.dataset.id;
 
-        if (!confirm('Supprimer cet élément ?')) return;
+        if (!confirm(window.t('delete_confirm'))) return;
 
-        try {
-            const response = await fetch(`/api/menuItem/delete/${id}`, { method: 'POST' });
-            const result = await response.json();
+        const result = await this.api.post(`/api/menuItem/delete/${id}`);
 
-            if (result.success) {
-                row.remove();
-            } else {
-                alert(result.message || 'Échec de la suppression.');
-            }
-        } catch (error) {
-            alert('Erreur lors de la suppression.');
+        if (result.success) {
+            row.remove();
+        } else {
+            alert(result.message || window.t('delete_failed'));
         }
     }
 
@@ -155,11 +143,11 @@ export default class MenuItemManager {
         const url = document.getElementById('itemUrl').value.trim();
 
         if (what === 'navbar' && !label) {
-            alert('Le label est requis.');
+            alert(window.t('label_required'));
             return;
         }
         if (what === 'sidebar' && type === 'link' && !url) {
-            alert("L'URL est requise pour un lien.");
+            alert(window.t('url_required'));
             return;
         }
 
@@ -177,23 +165,13 @@ export default class MenuItemManager {
             forAnonymous: document.getElementById('forAnonymous').checked ? 1 : 0,
         };
 
-        try {
-            const response = await fetch('/api/menuItem/save', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data),
-            });
+        const result = await this.api.post('/api/menuItem/save', data);
 
-            const result = await response.json();
-
-            if (result.success) {
-                this.modal.hide();
-                location.reload();
-            } else {
-                alert(result.message || 'Échec de la sauvegarde.');
-            }
-        } catch (error) {
-            alert('Erreur lors de la sauvegarde : ' + error.message);
+        if (result.success) {
+            this.modal.hide();
+            location.reload();
+        } else {
+            alert(result.message || window.t('save_failed'));
         }
     }
 
@@ -251,19 +229,10 @@ export default class MenuItemManager {
             positions[row.dataset.id] = index + 1;
         });
 
-        try {
-            const response = await fetch('/api/menuitem/updatePositions', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ positions }),
-            });
+        const result = await this.api.post('/api/menuitem/updatePositions', { positions });
 
-            const result = await response.json();
-            if (!result.success) {
-                alert('Erreur mise à jour positions : ' + result.message);
-            }
-        } catch (error) {
-            alert('Erreur mise à jour positions.');
+        if (!result.success) {
+            alert(`${window.t('positions_error')} ${result.message}`);
         }
     }
 }
