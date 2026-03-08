@@ -13,6 +13,7 @@ use app\helpers\WebApp;
 use app\models\ArticleDataHelper;
 use app\models\LogDataHelper;
 use app\modules\Common\AbstractController;
+use app\modules\Common\services\CredentialService;
 
 class WebmasterController extends AbstractController
 {
@@ -20,7 +21,8 @@ class WebmasterController extends AbstractController
         Application $application,
         private LogDataHelper $logDataHelper,
         private ArticleDataHelper $articleDataHelper,
-        private NotificationSender $notificationSender
+        private NotificationSender $notificationSender,
+        private CredentialService $credentials
     ) {
         parent::__construct($application);
     }
@@ -28,14 +30,13 @@ class WebmasterController extends AbstractController
     public function helpAdmin(): void
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isAdministrator())) {
-            
             $this->render('Common/views/info.latte', $this->getAllParams([
-                'content' => $this->languagesDataHelper->translate('Help_Admin'),
+                'content'          => $this->languagesDataHelper->translate('Help_Admin'),
                 'hasAuthorization' => $this->application->getConnectedUser()->isAdministrator(),
-                'currentVersion' => Application::VERSION,
-                'timer' => 0,
-                'previousPage' => true,
-                'page' => $this->application->getConnectedUser()->getPage()
+                'currentVersion'   => Application::VERSION,
+                'timer'            => 0,
+                'previousPage'     => true,
+                'page'             => $this->application->getConnectedUser()->getPage()
             ]));
         }
     }
@@ -44,12 +45,12 @@ class WebmasterController extends AbstractController
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isWebmaster())) {
             $this->render('Common/views/info.latte', [
-                'content' => $this->dataHelper->get('Settings', ['Name' => 'Help_webmaster'], 'Value')->Value ?? '',
+                'content'          => $this->dataHelper->get('Settings', ['Name' => 'Help_webmaster'], 'Value')->Value ?? '',
                 'hasAuthorization' => $this->application->getConnectedUser()->isWebmaster() ?? false,
-                'currentVersion' => Application::VERSION,
-                'timer' => 0,
-                'previousPage' => true,
-                'page' => $this->application->getConnectedUser()->getPage()
+                'currentVersion'   => Application::VERSION,
+                'timer'            => 0,
+                'previousPage'     => true,
+                'page'             => $this->application->getConnectedUser()->getPage()
             ]);
         }
     }
@@ -64,33 +65,31 @@ class WebmasterController extends AbstractController
         if ($connectedUser->hasOnlyOneAutorization()) {
             if ($connectedUser->isEventDesigner())     $this->redirect('/designer');
             if ($connectedUser->isHomeDesigner())      $this->redirect('/designer');
-            if ($connectedUser->isMenuDesigner())    $this->redirect('/designer');
+            if ($connectedUser->isMenuDesigner())      $this->redirect('/designer');
             elseif ($connectedUser->isEventManager())  $this->redirect('/eventManager');
             elseif ($connectedUser->isPersonManager()) $this->redirect('/personManager');
             elseif ($connectedUser->isRedactor()) {
                 $_SESSION['navbar'] = 'redactor';
                 $this->redirect('/articles');
-            } elseif ($connectedUser->isVisitorInsights())  $this->redirect('/visitorInsights');
-            elseif ($connectedUser->isWebmaster()) $this->redirect('/webmaster');
+            } elseif ($connectedUser->isVisitorInsights()) $this->redirect('/visitorInsights');
+            elseif ($connectedUser->isWebmaster())         $this->redirect('/webmaster');
         } else {
             if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
                 $this->raiseMethodNotAllowed(__FILE__, __LINE__);
                 return;
             }
             $content = $this->languagesDataHelper->translate('Admin');
-            $params = [
-                'isEventManager' => $connectedUser->isEventManager(),
-                'isDesigner' => $connectedUser->isDesigner(),
-                'isRedactor' => $connectedUser->isRedactor(),
-                'isPersonManager' => $connectedUser->isPersonManager(),
+            $params  = [
+                'isEventManager'    => $connectedUser->isEventManager(),
+                'isDesigner'        => $connectedUser->isDesigner(),
+                'isRedactor'        => $connectedUser->isRedactor(),
+                'isPersonManager'   => $connectedUser->isPersonManager(),
                 'isVisitorInsights' => $connectedUser->isVisitorInsights(),
-                'isWebmaster' => $connectedUser->isWebmaster(),
+                'isWebmaster'       => $connectedUser->isWebmaster(),
             ];
-            $compiledContent = WebApp::getcompiledContent($content, $params);
-
             $this->render('Webmaster/views/admin.latte', $this->getAllParams([
-                'page' => $connectedUser->getPage(),
-                'content' => $compiledContent
+                'page'    => $connectedUser->getPage(),
+                'content' => WebApp::getcompiledContent($content, $params),
             ]));
         }
     }
@@ -98,69 +97,59 @@ class WebmasterController extends AbstractController
     public function homeWebmaster(): void
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isWebmaster())) {
-
             $_SESSION['navbar'] = 'webmaster';
             $content = $this->languagesDataHelper->translate('Webmaster');
-            $params = [
-                'isMyclubWebSite' => WebApp::isMyClubWebSite(),
-            ];
-            $compiledContent = WebApp::getcompiledContent($content, $params);
+            $params  = ['isMyclubWebSite' => WebApp::isMyClubWebSite()];
 
-            $this->render(
-                'Webmaster/views/webmaster.latte',
-                $this->getAllParams([
-                    'newVersion'       => $this->getLastVersion(),
-                    'page'             => $this->application->getConnectedUser()->getPage(),
-                    'content'          => $compiledContent
-                ])
-            );
+            $this->render('Webmaster/views/webmaster.latte', $this->getAllParams([
+                'newVersion'     => $this->getLastVersion(),
+                'page'           => $this->application->getConnectedUser()->getPage(),
+                'content'        => WebApp::getcompiledContent($content, $params),
+            ]));
         }
     }
 
     public function notifications(): void
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isAdministrator())) {
-            $metadata = $this->dataHelper->get('Metadata', ['Id' => 1], 'VapidPublicKey, VapidPrivateKey ');
-            $message = '';
-            $notification = '';
-            $publicKey = null;
-            if (empty($metadata->VapidPublicKey) || empty($metadata->VapidPrivateKey)) {
+            $publicKey  = $this->credentials->get('vapid', 'publicKey');
+            $privateKey = $this->credentials->get('vapid', 'privateKey');
+
+            if (!$publicKey || !$privateKey) {
                 $newKeys = VAPID::createVapidKeys();
-                $metadata = $this->dataHelper->set('Metadata', [
-                    'VapidPublicKey' => $newKeys['publicKey'],
-                    'VapidPrivateKey' => $newKeys['privateKey']
-                ], ['Id' => 1]);
-                $message = "✅ Les clés VAPID ont été générées et enregistrées avec succès.";
+                $this->credentials->set('vapid', 'publicKey',  $newKeys['publicKey']);
+                $this->credentials->set('vapid', 'privateKey', $newKeys['privateKey']);
+                $message   = "✅ Les clés VAPID ont été générées et enregistrées avec succès.";
                 $publicKey = $newKeys['publicKey'];
             } else {
                 $message = "ℹ️ Les clés VAPID existent déjà dans la base de données.";
-                $publicKey = $metadata->VapidPublicKey;
             }
+
+            $notification = '';
             if (isset($_GET['test'])) {
                 $this->notificationSender->sendToRecipients(
                     [1],
                     [
                         'title' => 'Notification de test',
                         'body'  => 'Ceci est une notification push de test.',
-                        'url'   => '/'
+                        'url'   => '/',
                     ]
                 );
-                $notification = "🚀 Notification de test envoyée à l’utilisateur #1.";
+                $notification = "🚀 Notification de test envoyée à l'utilisateur #1.";
             }
-            $phpExtensions = [
-                'gmp'      => extension_loaded('gmp'),
-                'mbstring' => extension_loaded('mbstring'),
-            ];
 
             $this->render('Webmaster/views/notifications.latte', [
-                'message' => $message,
-                'notification' => $notification,
-                'publicKey' => $publicKey,
-                'phpExtensions' => $phpExtensions,
-                'navItems' => $this->getNavItems($this->application->getConnectedUser()->person),
+                'message'         => $message,
+                'notification'    => $notification,
+                'publicKey'       => $publicKey,
+                'phpExtensions'   => [
+                    'gmp'      => extension_loaded('gmp'),
+                    'mbstring' => extension_loaded('mbstring'),
+                ],
+                'navItems'        => $this->getNavItems($this->application->getConnectedUser()->person),
                 'isMyclubWebSite' => WebApp::isMyClubWebSite(),
-                'page' => $this->application->getConnectedUser()->getPage(),
-                'currentVersion' => Application::VERSION,
+                'page'            => $this->application->getConnectedUser()->getPage(),
+                'currentVersion'  => Application::VERSION,
             ]);
         }
     }
@@ -170,7 +159,7 @@ class WebmasterController extends AbstractController
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isAdministrator())) {
             $this->render('Webmaster/views/emailCredentials.latte', $this->getAllParams([
                 'navItems' => $this->getNavItems($this->application->getConnectedUser()->person),
-                'page' => $this->application->getConnectedUser()->getPage()
+                'page'     => $this->application->getConnectedUser()->getPage(),
             ]));
         }
     }
@@ -186,17 +175,18 @@ class WebmasterController extends AbstractController
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
+
         $schema = [
-            'sendEmailAddress' => FilterInputRule::Email->value,
+            'sendEmailAddress'  => FilterInputRule::Email->value,
             'sendEmailPassword' => FilterInputRule::Password->value,
-            'sendEmailHost' => FilterInputRule::Uri->value
+            'sendEmailHost'     => FilterInputRule::Uri->value,
         ];
         $input = WebApp::filterInput($schema, $this->flight->request()->data->getData());
-        $this->dataHelper->set('Metadata', [
-            'SendEmailAddress' => $input['sendEmailAddress'] ?? '???',
-            'SendEmailPassword' => $input['sendEmailPassword'] ?? '???',
-            'SendEmailHost' => $input['sendEmailHost'] ?? '???',
-        ], ['Id' => 1]);
+
+        $this->credentials->set('smtp', 'username', $input['sendEmailAddress']  ?? '???');
+        $this->credentials->set('smtp', 'password', $input['sendEmailPassword'] ?? '???');
+        $this->credentials->set('smtp', 'host',     $input['sendEmailHost']     ?? '???');
+
         $this->redirect('/webmaster');
     }
 
@@ -206,10 +196,10 @@ class WebmasterController extends AbstractController
             $installations = $this->logDataHelper->getInstallationsData();
 
             $this->render('Webmaster/views/installations.latte', $this->getAllParams([
-                'installations' => $installations,
+                'installations'      => $installations,
                 'totalInstallations' => count($installations),
-                'navItems' => $this->getNavItems($this->application->getConnectedUser()->person),
-                'page' => $this->application->getConnectedUser()->getPage()
+                'navItems'           => $this->getNavItems($this->application->getConnectedUser()->person),
+                'page'               => $this->application->getConnectedUser()->getPage(),
             ]));
         }
     }
@@ -220,20 +210,18 @@ class WebmasterController extends AbstractController
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
-        $articleDataHelper = $this->articleDataHelper;
         $base_url = WebApp::getBaseUrl();
         header("Content-Type: application/xml; charset=utf-8");
         echo '<?xml version="1.0" encoding="UTF-8"?>' . PHP_EOL;
         echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . PHP_EOL;
         echo '  <url>' . PHP_EOL;
         echo '    <loc>' . $base_url . '</loc>' . PHP_EOL;
-        echo '    <lastmod>' . $articleDataHelper->getLastUpdateArticles() . '</lastmod>' . PHP_EOL;
+        echo '    <lastmod>' . $this->articleDataHelper->getLastUpdateArticles() . '</lastmod>' . PHP_EOL;
         echo '    <changefreq>daily</changefreq>' . PHP_EOL;
         echo '    <priority>1.0</priority>' . PHP_EOL;
         echo '  </url>' . PHP_EOL;
 
-        $articles = $articleDataHelper->getArticlesForAll();
-        foreach ($articles as $article) {
+        foreach ($this->articleDataHelper->getArticlesForAll() as $article) {
             echo '  <url>' . PHP_EOL;
             echo '    <loc>' . $base_url . '/article/' . $article->Id . '</loc>' . PHP_EOL;
             echo '    <lastmod>' . $article->LastUpdate . '</lastmod>' . PHP_EOL;
@@ -248,7 +236,7 @@ class WebmasterController extends AbstractController
     private function getLastVersion(): ?string
     {
         $url = WebApp::MYCLUB_WEBAPP . 'api/lastVersion?cv=' . Application::VERSION . '&url=' . urlencode(WebApp::getBaseUrl());
-        $ch = curl_init($url);
+        $ch  = curl_init($url);
         curl_setopt_array($ch, [
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_USERAGENT      => "PHP/" . PHP_VERSION,
@@ -267,18 +255,10 @@ class WebmasterController extends AbstractController
         }
         unset($ch);
         $data = json_decode($response, true);
-        if (
-            $data === null ||
-            ($data['success'] ?? false) !== true ||
-            !isset($data['data']['lastVersion'])
-        ) {
+        if ($data === null || ($data['success'] ?? false) !== true || !isset($data['data']['lastVersion'])) {
             return "Test for MyClub new version error : Réponse API invalide.";
         }
-
         $lastVersion = $data['data']['lastVersion'];
-        if ($lastVersion === Application::VERSION) {
-            return null;
-        }
-        return "A new version is available (V{$lastVersion})";
+        return $lastVersion === Application::VERSION ? null : "A new version is available (V{$lastVersion})";
     }
 }

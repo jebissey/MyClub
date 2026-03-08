@@ -10,11 +10,16 @@ use app\helpers\NotificationSender;
 use app\helpers\WebApp;
 use app\models\GroupDataHelper;
 use app\modules\Common\AbstractController;
+use app\modules\Common\services\CredentialService;
 
 class UserNotificationsController extends AbstractController
 {
-    public function __construct(Application $application, private GroupDataHelper $groupDataHelper, private NotificationSender $notificationSender)
-    {
+    public function __construct(
+        Application $application,
+        private GroupDataHelper $groupDataHelper,
+        private NotificationSender $notificationSender,
+        private CredentialService $credentials
+    ) {
         parent::__construct($application);
     }
 
@@ -29,6 +34,7 @@ class UserNotificationsController extends AbstractController
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
+
         $notification = '';
         if (isset($_GET['test'])) {
             $this->notificationSender->sendToRecipients(
@@ -36,18 +42,18 @@ class UserNotificationsController extends AbstractController
                 [
                     'title' => 'Notification de test',
                     'body'  => 'Ceci est une notification push de test.',
-                    'url'   => '/'
+                    'url'   => '/',
                 ]
             );
-            $notification = "🚀 Notification de test envoyée à l’utilisateur #{$person->Id}.";
+            $notification = "🚀 Notification de test envoyée à l'utilisateur #{$person->Id}.";
         }
 
         $this->render('User/views/user_notifications.latte', $this->getAllParams([
             'currentNotifications' => json_decode($person->Notifications ?? '{}', true) ?? [],
-            'groups' => $this->groupDataHelper->getGroupsWithType($person->Id),
-            'page' => $this->application->getConnectedUser()->getPage(1),
-            'vapidPubliKey' => $this->dataHelper->get('Metadata', ['Id' => 1], 'VapidPublicKey')->VapidPublicKey ?? '',
-            'notification' => $notification,
+            'groups'               => $this->groupDataHelper->getGroupsWithType($person->Id),
+            'page'                 => $this->application->getConnectedUser()->getPage(1),
+            'vapidPubliKey'        => $this->credentials->get('vapid', 'publicKey') ?? '',
+            'notification'         => $notification,
         ]));
     }
 
@@ -62,6 +68,7 @@ class UserNotificationsController extends AbstractController
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
+
         $notifications = WebApp::getFiltered('notifications', FilterInputRule::CheckboxMatrix->value, $this->flight->request()->data->getData()) ?? [];
         unset(
             $notifications['messageOnGroupSubscribed'],

@@ -14,24 +14,28 @@ use app\helpers\ConnectedUser;
 use app\models\DataHelper;
 use app\models\LogDataWriterHelper;
 use app\models\PersonDataHelper;
+use app\modules\Common\services\CredentialService;
 
 class WebmasterApi extends AbstractApi
 {
-    private $vapid;
+    private const SERVICE = 'vapid';
+
+    private array $vapid;
 
     public function __construct(
         Application $application,
         ConnectedUser $connectedUser,
         DataHelper $dataHelper,
         PersonDataHelper $personDataHelper,
-        private LogDataWriterHelper $logDataWriterHelper
+        private LogDataWriterHelper $logDataWriterHelper,
+        private CredentialService $credentials
     ) {
         parent::__construct($application, $connectedUser, $dataHelper, $personDataHelper);
-        $metadata = $this->dataHelper->get('Metadata', ['Id' => 1], 'VapidPublicKey, VapidPrivateKey');
+
         $this->vapid = [
-            'subject' => Application::$root,
-            'publicKey' => $metadata->VapidPublicKey,
-            'privateKey' => $metadata->VapidPrivateKey
+            'subject'    => Application::$root,
+            'publicKey'  => $this->credentials->get(self::SERVICE, 'publicKey')  ?? '',
+            'privateKey' => $this->credentials->get(self::SERVICE, 'privateKey') ?? '',
         ];
     }
 
@@ -47,7 +51,7 @@ class WebmasterApi extends AbstractApi
 
     public function sendNotification(): void
     {
-        if (empty($this->vapid->VapidPublicKey) || empty($this->vapid->VapidPrivateKey)) {
+        if (empty($this->vapid['publicKey']) || empty($this->vapid['privateKey'])) {
             $this->renderJson(
                 ['message' => 'Les clés VAPID ne sont pas encore configurées.'],
                 false,
@@ -57,29 +61,34 @@ class WebmasterApi extends AbstractApi
         }
         $request = $this->getJsonInput();
         $title = $request['title'] ?? 'Nouveau message';
-        $body = $request['body'] ?? 'Cliquez pour voir !';
+        $body  = $request['body']  ?? 'Cliquez pour voir !';
         $webPush = new WebPush($this->vapid);
         $subscriptions = $this->dataHelper->gets('PushSubscription');
         $sent = 0;
         foreach ($subscriptions as $subData) {
             try {
                 $subscription = Subscription::create([
-                    'endpoint' => $subData->EndPoint,
+                    'endpoint'  => $subData->EndPoint,
                     'publicKey' => $subData->P256dh,
-                    'authToken' => $subData->Auth
+                    'authToken' => $subData->Auth,
                 ]);
                 $payload = json_encode([
                     'title' => $title,
-                    'body' => $body,
-                    'url' => '/user/messages'
+                    'body'  => $body,
+                    'url'   => '/user/messages',
                 ]);
-                $report = $webPush->sendOneNotification($subscription, $payload);
+                $report   = $webPush->sendOneNotification($subscription, $payload);
                 $response = $report->getResponse();
                 if ($response && $response->getStatusCode() === ApplicationError::Gone->value) {
                     $this->dataHelper->delete('PushSubscription', ['EndPoint' => $subData->EndPoint]);
-                } else $sent++;
+                } else {
+                    $sent++;
+                }
             } catch (Throwable $e) {
-                $this->application->getErrorManager()->raise(ApplicationError::Error, "Push error {$e->getMessage()} in {$e->getFile()}:{$e->getLine()}");
+                $this->application->getErrorManager()->raise(
+                    ApplicationError::Error,
+                    "Push error {$e->getMessage()} in {$e->getFile()}:{$e->getLine()}"
+                );
             }
         }
         $this->renderJsonOk(['sent' => $sent]);
@@ -91,17 +100,17 @@ class WebmasterApi extends AbstractApi
             $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
-        $data = $this->getJsonInput();
+        $data     = $this->getJsonInput();
         $endpoint = trim($data['endpoint'] ?? '');
-        $p256dh   = trim($data['p256dh'] ?? '');
-        $auth     = trim($data['auth'] ?? '');
+        $p256dh   = trim($data['p256dh']   ?? '');
+        $auth     = trim($data['auth']     ?? '');
         $idPerson = $this->connectedUser?->person?->Id() ?? null;
+
         if ($endpoint === '' || $p256dh === '' || $auth === '') {
             $this->renderJsonBadRequest('Requête incomplète.', __FILE__, __LINE__);
             return;
         }
-        $existing = $this->dataHelper->get('PushSubscription', ['EndPoint' => $endpoint]);
-        if ($existing) {
+        if ($this->dataHelper->get('PushSubscription', ['EndPoint' => $endpoint])) {
             $this->renderJsonOk([], 'Déjà abonné.');
             return;
         }
@@ -111,7 +120,6 @@ class WebmasterApi extends AbstractApi
             'p256dh'   => $p256dh,
             'Auth'     => $auth,
         ]);
-
         $this->renderJsonOk([], 'Abonnement enregistré.');
     }
 }

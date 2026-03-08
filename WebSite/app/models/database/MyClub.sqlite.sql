@@ -253,11 +253,6 @@ CREATE TABLE IF NOT EXISTS "Metadata" (
 	"ApplicationName"	TEXT NOT NULL,
 	"DatabaseVersion"	INTEGER NOT NULL,
 	"SiteUnderMaintenance"	INTEGER NOT NULL DEFAULT 0,
-	"VapidPublicKey"	TEXT,
-	"VapidPrivateKey"	TEXT,
-	"SendEmailAddress"	TEXT,
-	"SendEmailPassword"	TEXT,
-	"SendEmailHost"	TEXT,
 	"Compact_maxRecords"	INTEGER NOT NULL DEFAULT 1000000,
 	"Compact_lastDate"	TEXT,
 	"Compact_everyXdays"	INTEGER NOT NULL DEFAULT 10,
@@ -1901,7 +1896,7 @@ INSERT INTO "Languages" VALUES (168,'emailCredentials.email','Email','Email','Em
 INSERT INTO "Languages" VALUES (169,'emailCredentials.password','Password','Mot de passe','Hasło');
 INSERT INTO "Languages" VALUES (170,'emailCredentials.host','Host','Hôte','Host');
 INSERT INTO "Languages" VALUES (171,'emailCredentials.invalid_email','Please enter a valid email','Veuillez entrer un email valide','Proszę wprowadzić prawidłowy email');
-INSERT INTO "Metadata" VALUES (1,'MyClub',17,0,NULL,NULL,NULL,NULL,NULL,1000000,NULL,10,36,6,NULL,0,NULL);
+INSERT INTO "Metadata" VALUES (1,'MyClub',18,0,1000000,NULL,10,36,6,NULL,0,NULL);
 INSERT INTO "Person" VALUES (1,'webmaster@myclub.foo','e427c26faca947919b18b797bc143a35100e4de48c34b70b26202d3a7d8e51f7','my first name','my last name','my nick name or nothing',NULL,'0',NULL,NULL,NULL,NULL,NULL,0,0,NULL,NULL,'2025-01-01',0,NULL,NULL,NULL,NULL,NULL);
 INSERT INTO "PersonGroup" VALUES (1,1,1);
 INSERT INTO "Settings" VALUES (1,'Title','title');

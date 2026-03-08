@@ -45,6 +45,7 @@ use app\models\NeedTypeDataHelper;
 use app\models\ParticipantDataHelper;
 use app\models\PersonDataHelper;
 use app\models\SharedFileDataHelper;
+use app\modules\Common\services\CredentialService;
 use app\modules\Common\services\EmailService;
 use app\modules\Common\services\EventService;
 use app\modules\Common\services\MessageRecipientService;
@@ -282,7 +283,8 @@ class ApiFactory
             $this->connectedUser,
             $this->dataHelper,
             $this->personDataHelper,
-            $this->logDataWriterHelper
+            $this->logDataWriterHelper,
+            CredentialService::getInstance()
         );
     }
 }

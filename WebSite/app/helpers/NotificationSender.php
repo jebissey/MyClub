@@ -9,41 +9,37 @@ use Minishlink\WebPush\Subscription;
 use Throwable;
 
 use app\models\DataHelper;
+use app\Modules\Common\services\CredentialService;
 
 class NotificationSender
 {
-    private DataHelper $dataHelper;
-    private $vapidPublicKey;
-    private $vapidPrivateKey;
+    private const SERVICE = 'vapid';
 
-    public function __construct($dataHelper)
-    {
-        $this->dataHelper = $dataHelper;
-        $this->loadVapidKeys();
-    }
+    private ?string $vapidPublicKey;
+    private ?string $vapidPrivateKey;
 
-    private function loadVapidKeys(): void
-    {
-        $metadata = $this->dataHelper->get('Metadata', ['Id' => 1], 'VapidPublicKey, VapidPrivateKey');
-        $this->vapidPublicKey = $metadata->VapidPublicKey ?? null;
-        $this->vapidPrivateKey = $metadata->VapidPrivateKey ?? null;
+    public function __construct(
+        private DataHelper $dataHelper,
+        CredentialService $credentials
+    ) {
+        $this->vapidPublicKey  = $credentials->get(self::SERVICE, 'publicKey');
+        $this->vapidPrivateKey = $credentials->get(self::SERVICE, 'privateKey');
     }
 
     public function sendToRecipients(array $recipients, array $notificationData, ?string $excludeEndpoint = null): void
     {
-error_log("\n\n" . json_encode($recipients, JSON_PRETTY_PRINT) . "\n");
-error_log("\n\n" . json_encode($notificationData, JSON_PRETTY_PRINT) . "\n");
         if (!$this->vapidPublicKey || !$this->vapidPrivateKey) {
             return;
         }
-        $auth = [
+
+        $webPush = new WebPush([
             'VAPID' => [
-                'subject' => 'mailto:admin@example.com', // Changez ceci
-                'publicKey' => $this->vapidPublicKey,
+                'subject'    => 'mailto:admin@example.com',
+                'publicKey'  => $this->vapidPublicKey,
                 'privateKey' => $this->vapidPrivateKey,
-            ]
-        ];
-        $webPush = new WebPush($auth);
+            ],
+        ]);
+
         foreach ($recipients as $recipient) {
             try {
                 $conditions = ['IdPerson' => $recipient];
@@ -57,8 +53,8 @@ error_log("\n\n" . json_encode($notificationData, JSON_PRETTY_PRINT) . "\n");
                 foreach ($subscriptionData as $sub) {
                     $subscription = Subscription::create([
                         'endpoint' => $sub->EndPoint,
-                        'keys' => [
-                            'auth' => $sub->Auth,
+                        'keys'     => [
+                            'auth'   => $sub->Auth,
                             'p256dh' => $sub->P256dh ?? '',
                         ],
                     ]);
@@ -71,11 +67,8 @@ error_log("Error creating subscription: " . $e->getMessage());
 
         foreach ($webPush->flush() as $report) {
             $endpoint = $report->getRequest()->getUri()->__toString();
-
             if (!$report->isSuccess()) {
 error_log("Notification failed for {$endpoint}: " . $report->getReason());
-
-                // Si l'abonnement est expiré ou invalide, le supprimer
                 if ($report->isSubscriptionExpired()) {
                     $this->dataHelper->delete('PushSubscription', ['EndPoint' => $endpoint]);
                 }

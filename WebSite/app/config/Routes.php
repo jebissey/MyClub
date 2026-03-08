@@ -111,6 +111,7 @@ use app\models\SurveyDataHelper;
 use app\models\TableControllerDataHelper;
 use app\modules\Common\services\AuthenticationService;
 use app\modules\Common\services\DatabaseSmtpConfigProvider;
+use app\modules\Common\services\CredentialService;
 use app\modules\Common\services\EmailService;
 use app\modules\Common\services\EventService;
 use app\modules\Common\services\MessageRecipientService;
@@ -124,7 +125,7 @@ class Routes
     public function __construct(private Application $application, private Engine $flight)
     {
         $dataHelper = new DataHelper($application);
-        $smtpProvider = new DatabaseSmtpConfigProvider($dataHelper);
+        $smtpProvider = new DatabaseSmtpConfigProvider(CredentialService::getInstance());
 
         $authorizationDataHelper = new AuthorizationDataHelper($application);
         $articleDataHelper = new ArticleDataHelper($application, $authorizationDataHelper);
@@ -136,7 +137,7 @@ class Routes
         $logDataHelper = new LogDataHelper($application);
         $messageDataHelper = new MessageDataHelper($application);
         $needDataHelper = new NeedDataHelper($application);
-        $notificationSender = new NotificationSender($dataHelper);
+        $notificationSender = new NotificationSender($dataHelper, CredentialService::getInstance());
         $orderDataHelper = new OrderDataHelper($application, $articleDataHelper);
         $participantDataHelper = new ParticipantDataHelper($application);
         $personPreferences = new PersonPreferences($application);

@@ -40,6 +40,7 @@ use app\modules\Article\MediaController;
 use app\modules\Article\OrderController;
 use app\modules\Article\SurveyController;
 use app\modules\Common\services\AuthenticationService;
+use app\modules\Common\services\CredentialService;
 use app\modules\Common\services\EmailService;
 use app\modules\Designer\DesignController;
 use app\modules\Designer\DesignerController;
@@ -421,7 +422,8 @@ class ControllerFactory
         return new UserNotificationsController(
             $this->application,
             $this->groupDataHelper,
-            $this->notificationSender
+            $this->notificationSender,
+            CredentialService::getInstance()
         );
     }
 
@@ -471,7 +473,8 @@ class ControllerFactory
             $this->application,
             $this->logDataHelper,
             $this->articleDataHelper,
-            $this->notificationSender
+            $this->notificationSender,
+            CredentialService::getInstance()
         );
     }
 }

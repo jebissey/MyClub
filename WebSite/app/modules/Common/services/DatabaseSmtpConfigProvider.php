@@ -5,16 +5,18 @@ declare(strict_types=1);
 namespace app\modules\Common\services;
 
 use app\interfaces\SmtpConfigProviderInterface;
-use app\models\DataHelper;
+use app\modules\Common\services\CredentialService;
 use app\valueObjects\SmtpConfig;
 
 final class DatabaseSmtpConfigProvider implements SmtpConfigProviderInterface
 {
+    private const SERVICE = 'smtp';
+
     private ?SmtpConfig $cached = null;
     private bool $resolved = false;
 
     public function __construct(
-        private readonly DataHelper $dataHelper
+        private readonly CredentialService $credentials
     ) {}
 
     public function get(): ?SmtpConfig
@@ -25,30 +27,20 @@ final class DatabaseSmtpConfigProvider implements SmtpConfigProviderInterface
 
         $this->resolved = true;
 
-        $metadata = $this->dataHelper->get(
-            'Metadata',
-            ['Id' => 1],
-            'SendEmailAddress, SendEmailPassword, SendEmailHost'
-        );
+        $host     = $this->credentials->get(self::SERVICE, 'host');
+        $username = $this->credentials->get(self::SERVICE, 'username');
+        $password = $this->credentials->get(self::SERVICE, 'password');
 
-        if (!$metadata) {
-            return null;
-        }
-
-        $smtpUser = $metadata->SendEmailAddress ?? null;
-        $smtpPass = $metadata->SendEmailPassword ?? null;
-        $smtpHost = $metadata->SendEmailHost ?? null;
-
-        if (!$smtpUser || !$smtpPass || !$smtpHost) {
+        if (!$host || !$username || !$password) {
             return null;
         }
 
         $this->cached = new SmtpConfig(
-            host: $smtpHost,
-            username: $smtpUser,
-            password: $smtpPass,
-            port: 587,
-            encryption: 'tls'
+            host:       $host,
+            username:   $username,
+            password:   $password,
+            port:       (int) ($this->credentials->get(self::SERVICE, 'port')       ?? 587),
+            encryption:        $this->credentials->get(self::SERVICE, 'encryption') ?? 'tls',
         );
 
         return $this->cached;
