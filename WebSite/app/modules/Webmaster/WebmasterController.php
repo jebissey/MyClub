@@ -160,34 +160,60 @@ class WebmasterController extends AbstractController
             $this->render('Webmaster/views/emailCredentials.latte', $this->getAllParams([
                 'navItems' => $this->getNavItems($this->application->getConnectedUser()->person),
                 'page'     => $this->application->getConnectedUser()->getPage(),
+                'sendMethod'           => $this->credentials->get('email', 'method'),
+                'sendEmailAddress'     => $this->credentials->get('smtp', 'username'),
+                'sendEmailHost'        => $this->credentials->get('smtp', 'host'),
+                'sendEmailPort'        => $this->credentials->get('smtp', 'port'),
+                'sendEmailEncryption'  => $this->credentials->get('smtp', 'encryption'),
+                'mailjetApiKey'        => $this->credentials->get('mailjet', 'api_key'),
+                'mailjetSender'        => $this->credentials->get('mailjet', 'sender'),
             ]));
         }
     }
 
     public function sendEmailCredentialsSave(): void
     {
-        $person = $this->application->getConnectedUser()->person;
-        if ($person === null) {
-            $this->raiseforbidden(__FILE__, __LINE__);
-            return;
+        if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isAdministrator())) {
+
+            $schema = [
+                'sendMethod'           => FilterInputRule::Text->value,
+                'sendEmailAddress'     => FilterInputRule::Email->value,
+                'sendEmailPassword'    => FilterInputRule::Password->value,
+                'sendEmailHost'        => FilterInputRule::Uri->value,
+                'sendEmailPort'        => FilterInputRule::Integer->value,
+                'sendEmailEncryption'  => FilterInputRule::Text->value,
+                'mailjetApiKey'        => FilterInputRule::Text->value,
+                'mailjetApiSecret'     => FilterInputRule::Text->value,
+                'mailjetSender'        => FilterInputRule::Email->value,
+            ];
+            $input = WebApp::filterInput($schema, $this->flight->request()->data->getData());
+            $method = $input['sendMethod'] ?? 'smtp';
+
+            $this->credentials->set('email', 'method', $method);
+            match ($method) {
+                'smtp' => (function () use ($input) {
+                    $this->credentials->set('smtp', 'username',   $input['sendEmailAddress']    ?? '');
+                    if (!empty($input['sendEmailPassword'])) {
+                        $this->credentials->set('smtp', 'password', $input['sendEmailPassword']);
+                    }
+                    $this->credentials->set('smtp', 'host',       $input['sendEmailHost']       ?? '');
+                    $this->credentials->set('smtp', 'port',       $input['sendEmailPort']       ?? '587');
+                    $this->credentials->set('smtp', 'encryption', $input['sendEmailEncryption'] ?? 'tls');
+                })(),
+
+                'mailjet' => (function () use ($input) {
+                    $this->credentials->set('mailjet', 'api_key', $input['mailjetApiKey']    ?? '');
+                    if (!empty($input['mailjetApiSecret'])) {
+                        $this->credentials->set('mailjet', 'api_secret', $input['mailjetApiSecret']);
+                    }
+                    $this->credentials->set('mailjet', 'sender',  $input['mailjetSender']   ?? '');
+                })(),
+
+                default => null,
+            };
+
+            $this->redirect('/webmaster');
         }
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
-
-        $schema = [
-            'sendEmailAddress'  => FilterInputRule::Email->value,
-            'sendEmailPassword' => FilterInputRule::Password->value,
-            'sendEmailHost'     => FilterInputRule::Uri->value,
-        ];
-        $input = WebApp::filterInput($schema, $this->flight->request()->data->getData());
-
-        $this->credentials->set('smtp', 'username', $input['sendEmailAddress']  ?? '???');
-        $this->credentials->set('smtp', 'password', $input['sendEmailPassword'] ?? '???');
-        $this->credentials->set('smtp', 'host',     $input['sendEmailHost']     ?? '???');
-
-        $this->redirect('/webmaster');
     }
 
     public function showInstallations(): void

@@ -27,6 +27,7 @@ enum FilterInputRule: string
     case Phone = '/^\+?[0-9\s().\-]{6,20}$/';
     case String = '/^[a-zA-Z0-9\-_]{1,64}$/';
     case Uri = '/^[a-zA-Z0-9\-._~\/]{1,255}$/';
+    case Text = '/^.{1,256}$/s';
     case Token = '/^[a-fA-F0-9]{64}$/';
     case CheckboxMatrix = 'checkbox:matrix';
 }
