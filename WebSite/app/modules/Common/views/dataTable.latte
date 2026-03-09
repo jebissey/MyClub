@@ -9,7 +9,7 @@
                 </div>
             {/foreach}
             <div class="col-12 d-flex justify-content-between align-items-center">
-                {var $urlParams = array_filter(array_merge($filterValues ?? [], $extraParams ?? []), fn($v) => $v !== '')}
+                {var $urlParams = array_filter(array_merge($filterValues ?? [], $extraParams ?? []), fn($v) => $v !== '' && $v !== null && trim((string)$v) !== '')}
                 <div class="d-flex gap-2">
                     <button type="submit" class="btn btn-primary">Filtrer</button>
                     {foreach $extraParams ?? [] as $key => $value}
@@ -24,7 +24,7 @@
                         <nav aria-label="Navigation des pages">
                             <ul class="pagination mb-0">
                                 <li class="page-item {if $currentPage == 1}disabled{/if}">
-                                    <a class="page-link" href="?tablePage=1 {foreach $urlParams as $key => $value}&{$key}={$value}{/foreach}"
+                                    <a class="page-link" href="?tablePage=1{foreach $urlParams as $key => $value}&{$key}={$value}{/foreach}"
                                         aria-label="Première page"><span aria-hidden="true">&laquo;</span>
                                     </a>
                                 </li>

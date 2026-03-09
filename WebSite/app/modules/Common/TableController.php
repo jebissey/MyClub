@@ -24,7 +24,7 @@ abstract class TableController extends AbstractController
         $pdo = null;
         if ($usePdoForLog) $pdo = $this->application->getPdoForLog();
         else               $pdo = $this->application->getPdo();
-        
+
         $page = (int)($this->flight->request()->query['tablePage'] ?? 1);
         $values = [];
         foreach ($filters as $key => $value) {
@@ -34,7 +34,7 @@ abstract class TableController extends AbstractController
             }
         }
 
-        $totalItems = $this->count($query->getQuery(), $pdo);
+        $totalItems = $this->count($query->getQuery(), $pdo, $values);
         $totalPages = ceil($totalItems / $this->itemsPerPage);
         $currentPage = max(1, min($page, $totalPages));
         $query = $query->limit($this->itemsPerPage)->offset(($currentPage - 1) * $this->itemsPerPage);
@@ -66,8 +66,11 @@ abstract class TableController extends AbstractController
     }
 
     #region private functions  
-    private function count(string $query, PDO $pdo): int
+    private function count(string $sql, PDO $pdo, array $values = []): int
     {
-        return $pdo->query("SELECT COUNT(*) FROM (" . $query . ")")->fetchColumn();
+        $countSql = "SELECT COUNT(*) FROM ({$sql}) AS sub";
+        $stmt = $pdo->prepare($countSql);
+        $stmt->execute($values);
+        return (int) $stmt->fetchColumn();
     }
 }
