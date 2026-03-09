@@ -14,12 +14,13 @@ use app\interfaces\EmailQuotaTrackerInterface;
 use app\valueObjects\EmailMessage;
 use app\valueObjects\SmtpConfig;
 use app\exceptions\EmailException;
+use InvalidArgumentException;
 
 final class EmailService
 {
     public function __construct(
-        private readonly ?SmtpConfigProviderInterface $configProvider = null,
-        private readonly ?EmailQuotaTrackerInterface  $quotaTracker   = null,
+        private readonly ?SmtpConfigProviderInterface $configProvider,
+        private readonly ?EmailQuotaTrackerInterface  $quotaTracker,
     ) {}
 
     public function send(EmailMessage $message): bool
@@ -63,8 +64,7 @@ final class EmailService
         return $sent;
     }
 
-    // ── Implémentations privées ───────────────────────────────────────────────
-
+    #Private functions
     private function sendWithNativeMail(EmailMessage $message): bool
     {
         $headers = [
@@ -116,8 +116,12 @@ final class EmailService
             $mail->addReplyTo($message->replyTo ?? $config->username);
             $mail->addAddress($message->to);
 
-            foreach ($message->cc  as $email) { $mail->addCC($email);  }
-            foreach ($message->bcc as $email) { $mail->addBCC($email); }
+            foreach ($message->cc  as $email) {
+                $mail->addCC($email);
+            }
+            foreach ($message->bcc as $email) {
+                $mail->addBCC($email);
+            }
 
             $mail->isHTML($message->isHtml);
             $mail->Subject = $message->subject;
@@ -127,7 +131,6 @@ final class EmailService
             $mail->send();
 
             return true;
-
         } catch (PHPMailerException $e) {
             throw new EmailException(
                 'SMTP sending failed: ' . $mail->ErrorInfo,
@@ -138,6 +141,11 @@ final class EmailService
 
     private function sendWithMailjet(EmailMessage $message, SmtpConfig $config): bool
     {
+        if ($config->apiKey === '' || $config->apiSecret === '') {
+            throw new InvalidArgumentException(
+                'Mailjet credentials are not configured (api_key or api_secret is empty).'
+            );
+        }
         $mj = new MailjetClient(
             $config->apiKey,
             $config->apiSecret,

@@ -1,0 +1,44 @@
+<div id="fields-smtp" class="d-none">
+    <div class="mb-3">
+        <label class="form-label">{='emailCredentials.email'|translate}</label>
+        <input type="email" class="form-control" id="sendEmailAddress"
+               name="sendEmailAddress" value="{$sendEmailAddress ?? ''}">
+        <div class="invalid-feedback">{='emailCredentials.invalid_email'|translate}</div>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">{='emailCredentials.password'|translate}</label>
+        <div class="input-group">
+            <input type="password" class="form-control" id="sendEmailPassword"
+                   name="sendEmailPassword">
+            <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                <i class="bi bi-eye"></i>
+            </button>
+        </div>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">{='emailCredentials.host'|translate}</label>
+        <input type="text" class="form-control" id="sendEmailHost"
+               name="sendEmailHost" value="{$sendEmailHost ?? ''}">
+    </div>
+    <div class="mb-3">
+        <label class="form-label">{='emailCredentials.port'|translate}</label>
+        <input type="number" class="form-control" id="sendEmailPort"
+               name="sendEmailPort" value="{$sendEmailPort ?? 587}" min="1" max="65535">
+    </div>
+    <div class="mb-3">
+        <label class="form-label">{='emailCredentials.encryption'|translate}</label>
+        <select class="form-select" id="sendEmailEncryption" name="sendEmailEncryption">
+            <option value="tls"  {if ($sendEmailEncryption ?? 'tls') === 'tls' }selected{/if}>TLS (STARTTLS – port 587)</option>
+            <option value="ssl"  {if ($sendEmailEncryption ?? '')    === 'ssl' }selected{/if}>SSL (port 465)</option>
+            <option value="none" {if ($sendEmailEncryption ?? '')    === 'none'}selected{/if}>{='emailCredentials.no_encryption'|translate}</option>
+        </select>
+    </div>
+
+    {include 'emailLimits.latte',
+        dailyLimit   => $smtpDailyLimit   ?? '',
+        monthlyLimit => $smtpMonthlyLimit ?? '',
+        dailyId      => 'smtpDailyLimit',
+        monthlyId    => 'smtpMonthlyLimit',
+        dailyPlaceholder   => '∞',
+        monthlyPlaceholder => '∞'}
+</div>

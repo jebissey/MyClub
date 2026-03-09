@@ -79,7 +79,22 @@ VALUES
 ('emailCredentials.mailjet_sender',
  'Verified sender address',
  'Adresse expéditeur vérifiée',
- 'Zweryfikowany adres nadawcy');
+ 'Zweryfikowany adres nadawcy'),
+
+ ('emailCredentials.daily_limit',
+ 'Daily sending limit (0 = unlimited)',
+ 'Limite d''envoi quotidienne (0 = illimitée)',
+ 'Dzienny limit wysyłki (0 = bez limitu)'),
+
+('emailCredentials.monthly_limit',
+ 'Monthly sending limit (0 = unlimited)',
+ 'Limite d''envoi mensuelle (0 = illimitée)',
+ 'Miesięczny limit wysyłki (0 = bez limitu)'),
+
+('emailCredentials.limits_hint',
+ 'Leave blank or set 0 for no limit.',
+ 'Laisser vide ou mettre 0 pour ne pas limiter.',
+ 'Pozostaw puste lub wpisz 0, aby nie ograniczać.');
 
 SQL;
         $pdo->exec($sql);

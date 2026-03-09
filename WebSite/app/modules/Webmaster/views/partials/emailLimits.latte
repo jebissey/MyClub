@@ -1,0 +1,20 @@
+<hr class="my-3">
+<p class="text-muted small mb-2">
+    <i class="bi bi-speedometer2 me-1"></i>{='emailCredentials.limits_hint'|translate}
+</p>
+<div class="row g-3 mb-3">
+    <div class="col-sm-6">
+        <label class="form-label">{='emailCredentials.daily_limit'|translate}</label>
+        <input type="number" class="form-control"
+               id="{$dailyId}" name="{$dailyId}"
+               min="0" placeholder="{$dailyPlaceholder}"
+               value="{$dailyLimit}">
+    </div>
+    <div class="col-sm-6">
+        <label class="form-label">{='emailCredentials.monthly_limit'|translate}</label>
+        <input type="number" class="form-control"
+               id="{$monthlyId}" name="{$monthlyId}"
+               min="0" placeholder="{$monthlyPlaceholder}"
+               value="{$monthlyLimit}">
+    </div>
+</div>

@@ -114,6 +114,7 @@ use app\modules\Common\services\DatabaseSmtpConfigProvider;
 use app\modules\Common\services\CredentialService;
 use app\modules\Common\services\EmailService;
 use app\modules\Common\services\EventService;
+use app\modules\Common\services\JsonEmailQuotaTracker;
 use app\modules\Common\services\MessageRecipientService;
 
 class Routes
@@ -125,13 +126,15 @@ class Routes
     public function __construct(private Application $application, private Engine $flight)
     {
         $dataHelper = new DataHelper($application);
-        $smtpProvider = new DatabaseSmtpConfigProvider(CredentialService::getInstance());
 
         $authorizationDataHelper = new AuthorizationDataHelper($application);
         $articleDataHelper = new ArticleDataHelper($application, $authorizationDataHelper);
         $crosstabDataHelper = new CrosstabDataHelper($application, $authorizationDataHelper);
         $designDataHelper = new DesignDataHelper($application);
-        $emailService = new EmailService($smtpProvider);
+        $emailService = new EmailService(
+            new DatabaseSmtpConfigProvider(CredentialService::getInstance()),
+            new JsonEmailQuotaTracker(__DIR__ . '/../../data/email_quota.json')
+        );
         $eventDataHelper = new EventDataHelper($application);
         $groupDataHelper = new GroupDataHelper($application);
         $logDataHelper = new LogDataHelper($application);

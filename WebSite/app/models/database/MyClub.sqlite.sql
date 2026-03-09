@@ -1909,6 +1909,9 @@ INSERT INTO "Languages" VALUES (181,'emailCredentials.no_encryption','None','Auc
 INSERT INTO "Languages" VALUES (182,'emailCredentials.mailjet_api_key','Mailjet API key','Clé API Mailjet','Klucz API Mailjet');
 INSERT INTO "Languages" VALUES (183,'emailCredentials.mailjet_api_secret','Mailjet API secret','Secret API Mailjet','Sekret API Mailjet');
 INSERT INTO "Languages" VALUES (184,'emailCredentials.mailjet_sender','Verified sender address','Adresse expéditeur vérifiée','Zweryfikowany adres nadawcy');
+INSERT INTO "Languages" VALUES (185,'emailCredentials.daily_limit','Daily sending limit (0 = unlimited)','Limite d''envoi quotidienne (0 = illimitée)','Dzienny limit wysyłki (0 = bez limitu)');
+INSERT INTO "Languages" VALUES (186,'emailCredentials.monthly_limit','Monthly sending limit (0 = unlimited)','Limite d''envoi mensuelle (0 = illimitée)','Miesięczny limit wysyłki (0 = bez limitu)');
+INSERT INTO "Languages" VALUES (187,'emailCredentials.limits_hint','Leave blank or set 0 for no limit.','Laisser vide ou mettre 0 pour ne pas limiter.','Pozostaw puste lub wpisz 0, aby nie ograniczać.');
 INSERT INTO "Metadata" VALUES (1,'MyClub',19,0,1000000,NULL,10,36,6,NULL,0,NULL);
 INSERT INTO "Person" VALUES (1,'webmaster@myclub.foo','e427c26faca947919b18b797bc143a35100e4de48c34b70b26202d3a7d8e51f7','my first name','my last name','my nick name or nothing',NULL,'0',NULL,NULL,NULL,NULL,NULL,0,0,NULL,NULL,'2025-01-01',0,NULL,NULL,NULL,NULL,NULL);
 INSERT INTO "PersonGroup" VALUES (1,1,1);

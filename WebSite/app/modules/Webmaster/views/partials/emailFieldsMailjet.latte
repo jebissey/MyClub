@@ -1,0 +1,30 @@
+<div id="fields-mailjet" class="d-none">
+    <div class="mb-3">
+        <label class="form-label">{='emailCredentials.mailjet_api_key'|translate}</label>
+        <input type="text" class="form-control" id="mailjetApiKey"
+               name="mailjetApiKey" value="{$mailjetApiKey ?? ''}">
+    </div>
+    <div class="mb-3">
+        <label class="form-label">{='emailCredentials.mailjet_api_secret'|translate}</label>
+        <div class="input-group">
+            <input type="password" class="form-control" id="mailjetApiSecret"
+                   name="mailjetApiSecret">
+            <button class="btn btn-outline-secondary" type="button" id="toggleSecret">
+                <i class="bi bi-eye"></i>
+            </button>
+        </div>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">{='emailCredentials.mailjet_sender'|translate}</label>
+        <input type="email" class="form-control" id="mailjetSender"
+               name="mailjetSender" value="{$mailjetSender ?? ''}">
+    </div>
+
+    {include 'emailLimits.latte',
+        dailyLimit   => $mailjetDailyLimit   ?? 200,
+        monthlyLimit => $mailjetMonthlyLimit ?? 6000,
+        dailyId      => 'mailjetDailyLimit',
+        monthlyId    => 'mailjetMonthlyLimit',
+        dailyPlaceholder   => '200',
+        monthlyPlaceholder => '6000'}
+</div>

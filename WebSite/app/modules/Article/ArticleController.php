@@ -412,7 +412,7 @@ class ArticleController extends TableController
                 'messageType' => $messageType ?? '',
             ]));
         } catch (QueryException $e) {
-            $this->raiseBadRequest($e->getMessage(),  __FILE__, __LINE__);
+            $this->raiseBadRequest($e->getMessage(),  $e->getFile(), $e->getLine());
         }
     }
 

@@ -50,7 +50,7 @@ class AuthenticationService
             to: $email,
             subject: $subject,
             body: $message,
-            isHtml: false
+            isHtml: true
         );
         return $this->emailService->send($emailMessage);
     }

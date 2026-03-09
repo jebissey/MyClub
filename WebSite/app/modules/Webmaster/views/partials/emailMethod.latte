@@ -1,0 +1,23 @@
+<div class="mb-4">
+    <label for="sendMethod" class="form-label fw-semibold">
+        {='emailCredentials.method'|translate}
+    </label>
+    <select class="form-select" id="sendMethod" name="sendMethod">
+        <option value="mail"    {if ($sendMethod ?? '') === 'mail'    }selected{/if}>{='emailCredentials.method_mail'    |translate}</option>
+        <option value="smtp"    {if ($sendMethod ?? '') === 'smtp'    }selected{/if}>{='emailCredentials.method_smtp'    |translate}</option>
+        <option value="mailjet" {if ($sendMethod ?? '') === 'mailjet' }selected{/if}>{='emailCredentials.method_mailjet' |translate}</option>
+    </select>
+</div>
+
+<div id="alert-mail" class="alert alert-warning d-none" role="alert">
+    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+    {='emailCredentials.info_mail'|translate}
+</div>
+<div id="alert-smtp" class="alert alert-info d-none" role="alert">
+    <i class="bi bi-info-circle-fill me-2"></i>
+    {='emailCredentials.info_smtp'|translate}
+</div>
+<div id="alert-mailjet" class="alert alert-success d-none" role="alert">
+    <i class="bi bi-envelope-check-fill me-2"></i>
+    {='emailCredentials.info_mailjet'|translate}
+</div>

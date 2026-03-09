@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace app\modules\User;
 
+use InvalidArgumentException;
+
 use app\enums\ApplicationError;
 use app\enums\FilterInputRule;
 use app\exceptions\EmailException;
@@ -42,6 +44,8 @@ class UserController extends AbstractController
                 'page' => $this->application->getConnectedUser()->getPage(),
             ]);
             return;
+        } catch (InvalidArgumentException $e) {
+            $this->raiseBadRequest($e->getMessage(),  $e->getFile(), $e->getLine());
         }
         if ($success) {
             $this->flight->setData('message', "Password reset email sent to {$email}");
