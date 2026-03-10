@@ -133,6 +133,7 @@ class MediaController extends AbstractController
             'path' => $path,
             'articles' => $path !== '' ? $this->articleDataHelper->inArticles($path) : [],
             'page' => $this->application->getConnectedUser()->getPage(),
+            'btn_HistoryBack' => true,
         ]));
     }
 

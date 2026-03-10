@@ -131,6 +131,8 @@ class EventController extends AbstractController
                 'message' => $message,
                 'messageType' => $messageType,
                 'page' => $this->application->getConnectedUser()->getPage(),
+                'btn_HistoryBack' => true,
+                'btn_Parent' => "/nextEvents",
             ]));
         } else $this->raiseBadRequest("Event {$eventId} doesn't exist", __FILE__, __LINE__);
     }
@@ -303,6 +305,7 @@ class EventController extends AbstractController
             'person' => $person,
             'navItems' => $this->getNavItems($this->application->getConnectedUser()->person),
             'page' => $this->application->getConnectedUser()->getPage(),
+            'btn_HistoryBack' => true,
         ]));
     }
 }

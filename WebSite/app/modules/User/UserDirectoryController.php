@@ -92,6 +92,7 @@ class UserDirectoryController extends AbstractController
             'membersCount' => count($locationData),
             'navItems' => $this->getNavItems($person),
             'page' => $this->application->getConnectedUser()->getPage(),
+            'btn_HistoryBack' => true,
         ]));
     }
 

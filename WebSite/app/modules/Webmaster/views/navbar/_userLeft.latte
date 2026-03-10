@@ -1,0 +1,14 @@
+                <a class="navbar-brand" href="/">
+                    <img src="/app/images/home.png" alt="Home" data-bs-toggle="tooltip" data-bs-placement="bottom" title="{='home'|translate}">
+                </a>
+
+                {if isset($btn_Parent)}
+                    <a class="btn btn btn-primary fs-4 me-2" href="{$btn_Parent}">
+                        <i class="bi bi-arrow-up-circle"></i>
+                    </a>
+                {/if}
+                {if isset($btn_HistoryBack)}
+                    <button class="btn btn btn-primary fs-4" onclick="history.back()">
+                        <i class="bi bi-arrow-left-circle"></i>
+                    </button>
+                {/if}

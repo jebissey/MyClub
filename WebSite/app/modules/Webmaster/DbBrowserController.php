@@ -55,7 +55,8 @@ class DbBrowserController extends AbstractController
                 'table' => $table,
                 'columns' => $columns,
                 'columnTypes' => $columnTypes,
-                'page' => $this->application->getConnectedUser()->getPage()
+                'page' => $this->application->getConnectedUser()->getPage(),
+                'btn_HistoryBack' => true,
             ]));
         }
     }
@@ -71,7 +72,8 @@ class DbBrowserController extends AbstractController
                 'record' => $record,
                 'primaryKey' => $primaryKey,
                 'columnTypes' => $columnTypes,
-                'page' => $this->application->getConnectedUser()->getPage()
+                'page' => $this->application->getConnectedUser()->getPage(),
+                'btn_HistoryBack' => true,
             ]));
         }
     }
@@ -95,7 +97,10 @@ class DbBrowserController extends AbstractController
                 'currentPage' => $dbbPage,
                 'totalPages' => $totalPages,
                 'filters' => $filters,
-                'page' => $this->application->getConnectedUser()->getPage()
+                'page' => $this->application->getConnectedUser()->getPage(),
+                'btn_HistoryBack' => true,
+                'btn_Parent' => "/dbbrowser",
+                'btn_Plus' => "/dbbrowser/{$table}/create",
             ]));
         }
     }
