@@ -75,12 +75,15 @@
                         <h5 class="card-title mb-0">Contact</h5>
                     </div>
                     <div class="card-body">
-                        {if $person->Phone}
-                            <p><i class="bi bi-telephone"></i> {$person->Phone}</p>
-                        {/if}
-                        {if $person->Email}
-                            <p><i class="bi bi-envelope"></i> {$person->Email}</p>
-                        {/if}
+                    {if $person->ShowPhoneInPresentationDirectory && $person->Phone}
+                        <p><i class="bi bi-telephone"></i> {$person->Phone}</p>
+                    {/if}
+                    {if $person->ShowEmailInPresentationDirectory && $person->Email}
+                        <p><i class="bi bi-envelope"></i> {$person->Email}</p>
+                    {/if}
+                    {if !$person->ShowPhoneInPresentationDirectory && !$person->ShowEmailInPresentationDirectory}
+                        <p class="text-muted"><i class="bi bi-lock"></i> Coordonnées non partagées</p>
+                    {/if}
                     </div>
                 </div>
             {/if}

@@ -41,6 +41,8 @@ class UserPresentationController extends AbstractController
                     'content' => FilterInputRule::Html->value,
                     'location' => FilterInputRule::Location->value,
                     'inPresentationDirectory' => FilterInputRule::Bool->value,
+                    'showPhoneInPresentationDirectory' => FilterInputRule::Bool->value,
+                    'showEmailInPresentationDirectory' => FilterInputRule::Bool->value,
                 ];
                 $input = WebApp::filterInput($schema, $this->flight->request()->data->getData());
                 $presentation = $input['content'] ?? '???';
@@ -52,6 +54,8 @@ class UserPresentationController extends AbstractController
                     'PresentationLastUpdate' => date('Y-m-d H:i:s'),
                     'Location' => $location,
                     'InPresentationDirectory' => $inDirectory,
+                    'ShowPhoneInPresentationDirectory' => $input['showPhoneInPresentationDirectory'] ?? 0,
+                    'ShowEmailInPresentationDirectory' => $input['showEmailInPresentationDirectory'] ?? 0,
                 ], ['Id' => $person->Id]);
                 $this->redirect('/user/directory');
             } else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);

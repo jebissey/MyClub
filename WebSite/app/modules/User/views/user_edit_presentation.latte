@@ -45,14 +45,36 @@
             <div class="card">
                 <div class="card-body">
                     <form id="presentationForm" method="post" enctype="multipart/form-data">
+                        
                         <div class="row mb-4">
                             <div class="col-md-6">
                                 <div class="form-check mb-3">
-                                    <input class="form-check-input" type="checkbox" id="inPresentationDirectory" name="inPresentationDirectory" {if $person->InPresentationDirectory}checked{/if}>
+                                    <input class="form-check-input" type="checkbox" id="inPresentationDirectory"
+                                        name="inPresentationDirectory"
+                                        {if $person->InPresentationDirectory}checked{/if}>
                                     <label class="form-check-label" for="inPresentationDirectory">
                                         Je souhaite figurer dans le trombinoscope
                                     </label>
                                     <div class="form-text">Votre présentation sera visible par les autres membres</div>
+                                </div>
+
+                                <div id="directoryOptions" class="ms-4 mt-2 {if !$person->InPresentationDirectory}d-none{/if}">
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="checkbox" id="showPhoneInPresentationDirectory"
+                                            name="showPhoneInPresentationDirectory"
+                                            {if $person->ShowPhoneInPresentationDirectory}checked{/if}>
+                                        <label class="form-check-label" for="showPhoneInPresentationDirectory">
+                                            Afficher mon numéro de téléphone dans le trombinoscope
+                                        </label>
+                                    </div>
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="checkbox" id="showEmailInPresentationDirectory"
+                                            name="showEmailInPresentationDirectory"
+                                            {if $person->ShowEmailInPresentationDirectory}checked{/if}>
+                                        <label class="form-check-label" for="showEmailInPresentationDirectory">
+                                            Afficher mon adresse e-mail dans le trombinoscope
+                                        </label>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -79,11 +101,9 @@
 {/block}
 
 {block scripts}
-<!-- Leaflet pour la carte -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 
-<!-- TinyMCE -->
 <script src="/app/modules/Common/js/tinymce/tinymce.min.js"></script>
 <script src="/app/modules/Common/js/tinymce-config.js"></script>
 
@@ -139,6 +159,19 @@
                 return false;
             }
         });
+    });
+
+    const inDirectoryCheckbox = document.getElementById('inPresentationDirectory');
+    const directoryOptions = document.getElementById('directoryOptions');
+
+    inDirectoryCheckbox.addEventListener('change', function () {
+        if (this.checked) {
+            directoryOptions.classList.remove('d-none');
+        } else {
+            directoryOptions.classList.add('d-none');
+            document.getElementById('showPhoneInPresentationDirectory').checked = false;
+            document.getElementById('showEmailInPresentationDirectory').checked = false;
+        }
     });
 </script>
 {/block}
