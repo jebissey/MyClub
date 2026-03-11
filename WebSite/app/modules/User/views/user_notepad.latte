@@ -53,14 +53,7 @@
 
 {block navbar}
 <div class="container-fluid d-flex align-items-center">
-    <div class="d-flex gap-2">
-        <a class="navbar-brand" href="/">
-            <img src="/app/images/home.png" alt="Home">
-        </a>
-        <button class="btn btn-primary fs-4" onclick="history.back()">
-            <i class="bi bi-arrow-left-circle"></i>
-        </button>
-    </div>
+    {include '../../Webmaster/views/navbar/_userLeft.latte'}
 
     <div class="ms-auto">
         <button type="submit" form="edit-form" class="btn btn-success">

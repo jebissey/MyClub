@@ -31,6 +31,8 @@ class UserAvailabilitiesController extends AbstractController
         $this->render('User/views/user_availabilities.latte', $this->getAllParams([
             'currentAvailabilities' => $currentAvailabilities,
             'page' => $this->application->getConnectedUser()->getPage(1),
+            'btn_HistoryBack' => true,
+            'btn_Parent' => "/user",            
         ]));
     }
 

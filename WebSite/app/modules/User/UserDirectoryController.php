@@ -62,6 +62,8 @@ class UserDirectoryController extends AbstractController
             ])),
             'userIsInGroup' => $this->personGroupDataHelper->isPersonInGroup($person->Id, $selectedGroup ?? 0),
             'countOfLocatedMembers' => count($this->getLocationData($persons)),
+            'btn_HistoryBack' => true,
+            'btn_Parent' => "/user",            
         ]));
     }
 

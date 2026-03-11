@@ -214,6 +214,7 @@ class GroupController extends AbstractController
             'person' => $person,
             'navItems' => $this->getNavItems($this->application->getConnectedUser()->person),
             'page' => $this->application->getConnectedUser()->getPage(),
+            'btn_HistoryBack' => true,
         ]));
     }
 }

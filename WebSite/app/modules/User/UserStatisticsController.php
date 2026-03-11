@@ -39,6 +39,8 @@ class UserStatisticsController extends AbstractController
                 'navItems' => $this->getNavItems($person),
                 'chartData' => $this->getVisitStatsForChart($season, $person),
                 'page' => $this->application->getConnectedUser()->getPage(1),
+                'btn_HistoryBack' => true,
+                'btn_Parent' => "/user",                
             ]));
         } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }

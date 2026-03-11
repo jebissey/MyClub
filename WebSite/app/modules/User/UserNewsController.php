@@ -40,6 +40,8 @@ class UserNewsController extends AbstractController
                 'navItems' => $this->getNavItems($connectedUser->person ?? false),
                 'person' => $connectedUser->person,
                 'page' => $connectedUser->getPage(1),
+                'btn_HistoryBack' => true,
+                'btn_Parent' => "/user",                
             ]));
         } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }

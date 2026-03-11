@@ -47,6 +47,8 @@ class UserConnectionsController extends AbstractController
             'navItems' => $this->getNavItems($connectedUser->person ?? false),
             'page' => $this->application->getConnectedUser()->getPage(1),
             'user' => $user->FirstName . ' ' . $user->LastName . ($user->NickName != '' ? ' (' . $user->NickName . ')' : ''),
+            'btn_HistoryBack' => true,
+            'btn_Parent' => "/user",            
         ]));
     }
 }

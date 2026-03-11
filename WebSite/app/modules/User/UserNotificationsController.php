@@ -54,6 +54,8 @@ class UserNotificationsController extends AbstractController
             'page'                 => $this->application->getConnectedUser()->getPage(1),
             'vapidPubliKey'        => $this->credentials->get('vapid', 'publicKey') ?? '',
             'notification'         => $notification,
+            'btn_HistoryBack' => true,
+            'btn_Parent' => "/user",            
         ]));
     }
 

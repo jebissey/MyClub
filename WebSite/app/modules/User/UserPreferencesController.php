@@ -41,6 +41,8 @@ class UserPreferencesController extends AbstractController
             'currentPreferences' => json_decode($person->Preferences ?? '', true),
             'eventTypes' => $eventTypesWithAttributes,
             'page' => $this->application->getConnectedUser()->getPage(1),
+            'btn_HistoryBack' => true,
+            'btn_Parent' => "/user",            
         ]));
     }
 
