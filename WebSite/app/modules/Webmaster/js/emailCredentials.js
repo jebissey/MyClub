@@ -32,7 +32,6 @@ class EmailCredentials {
             this.applyMethod(e.target.value);
         });
 
-        // IMPORTANT : appliquer l'état initial
         this.applyMethod(this.select.value);
 
         this.setupPasswordToggle('togglePassword', 'sendEmailPassword');

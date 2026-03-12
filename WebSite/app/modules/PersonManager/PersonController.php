@@ -25,161 +25,168 @@ class PersonController extends TableController
 
     public function activate(int $id): void
     {
-        if (!($this->application->getConnectedUser()->isPersonManager() ?? false)) {
-            $this->raiseforbidden(__FILE__, __LINE__);
-            return;
+        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isPersonManager())) {
+            $this->dataHelper->set('Person', ['Inactivated' => 0], ['Id' => $id]);
+            $this->redirect('/persons');
         }
-        if (($_SERVER['REQUEST_METHOD'] !== 'GET')) {
-            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
-        $this->dataHelper->set('Person', ['Inactivated' => 0], ['Id' => $id]);
-        $this->redirect('/persons');
     }
 
     public function create(): void
     {
-        if (!($this->application->getConnectedUser()->isPersonManager() ?? false)) {
-            $this->raiseforbidden(__FILE__, __LINE__);
-            return;
+        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isPersonManager())) {
+            $this->redirect('/person/edit/' . $this->personDataHelper->create());
         }
-        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
-            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
-        $this->redirect('/person/edit/' . $this->personDataHelper->create());
     }
 
     public function delete(int $id): void
     {
-        if (!($this->application->getConnectedUser()->isPersonManager() ?? false)) {
-            $this->raiseforbidden(__FILE__, __LINE__);
-            return;
+        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isPersonManager())) {
+            $this->dataHelper->set('Person', ['Inactivated' => 1], ['Id' => $id]);
+            $this->redirect('/persons');
         }
-        if (($_SERVER['REQUEST_METHOD'] !== 'GET')) {
-            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
-        $this->dataHelper->set('Person', ['Inactivated' => 1], ['Id' => $id]);
-        $this->redirect('/persons');
     }
 
     public function edit(int $id): void
     {
-        if (!($this->application->getConnectedUser()->isPersonManager() ?? false)) {
-            $this->raiseforbidden(__FILE__, __LINE__);
-            return;
+        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isPersonManager())) {
+            $person = $this->dataHelper->get('Person', ['Id' => $id], 'Id, Imported, Email, FirstName, LastName, Alert');
+            if (!$person) {
+                $this->raiseBadRequest("Unknown person {$id}", __FILE__, __LINE__);
+                return;
+            }
+            $this->render('User/views/user_account.latte', $this->getAllParams([
+                'readOnly' => $person->Imported == 1 ? true : false,
+                'email' => $person->Email,
+                'firstName' => $person->FirstName,
+                'lastName' => $person->LastName,
+                'alert' => $person->Alert ?? '',
+                'memberInfo' => $person->MemberInfo ?? '',
+                'isSelfEdit' => false,
+                'layout' => $this->getLayout(),
+                'page' => $this->application->getConnectedUser()->getPage(),
+            ]));
         }
-        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
-            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
-        $person = $this->dataHelper->get('Person', ['Id' => $id], 'Id, Imported, Email, FirstName, LastName, Alert');
-        if (!$person) {
-            $this->raiseBadRequest("Unknown person {$id}", __FILE__, __LINE__);
-            return;
-        }
-        $this->render('User/views/user_account.latte', $this->getAllParams([
-            'readOnly' => $person->Imported == 1 ? true : false,
-            'email' => $person->Email,
-            'firstName' => $person->FirstName,
-            'lastName' => $person->LastName,
-            'alert' => $person->Alert,
-            'isSelfEdit' => false,
-            'layout' => $this->getLayout(),
-            'page' => $this->application->getConnectedUser()->getPage(),
-        ]));
     }
 
     public function editSave(int $id): void
     {
-        if (!($this->application->getConnectedUser()->isPersonManager() ?? false)) {
-            $this->raiseforbidden(__FILE__, __LINE__);
-            return;
+        if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isPersonManager())) {
+            $person = $this->dataHelper->get('Person', ['Id' => $id], 'Id, Imported, Email, FirstName, LastName');
+            if (!$person) {
+                $this->raiseBadRequest("Unknown person {$id}", __FILE__, __LINE__);
+                return;
+            }
+            $schema = [
+                'email'     => FilterInputRule::Email->value,
+                'firstName' => FilterInputRule::PersonName->value,
+                'lastName'  => FilterInputRule::PersonName->value,
+                'alert'     => FilterInputRule::Content->value,
+            ];
+            $input = WebApp::filterInput($schema, $this->flight->request()->data->getData());
+
+            $email = strtolower(trim($input['email'] ?? ''));
+            if (!empty($email)) {
+                $existing = $this->dataHelper->get(
+                    'Person',
+                    ['Email' => $email],
+                    'Id, FirstName, LastName, IsActive'
+                );
+                $isNewRecord = (
+                    $person->Email === '' &&
+                    $person->FirstName === '' &&
+                    $person->LastName === '' &&
+                    $person->Imported == 0
+                );
+                $isDuplicate = $isNewRecord
+                    ? $existing !== null
+                    : ($existing && $existing->Id !== $person->Id);
+
+                if ($isDuplicate) {
+                    $fullName = trim(($existing->FirstName ?? '') . ' ' . ($existing->LastName ?? ''));
+                    $status = ($existing->IsActive ?? 1) ? 'Active' : 'Disabled';
+
+                    $message = $this->languagesDataHelper->translate('person.add.emailAlreadyExistsDetailed');
+                    $message = str_replace(
+                        ['{name}', '{status}', '{email}'],
+                        [$fullName, $status, $email],
+                        $message
+                    );
+
+                    $this->render('Common/views/info.latte', [
+                        'content' => $message,
+                        'hasAuthorization' => $this->application->getConnectedUser()->hasAutorization() ?? false,
+                        'currentVersion' => Application::VERSION,
+                        'timer' => 10000,
+                        'previousPage' => true,
+                        'page' => $this->application->getConnectedUser()->getPage(),
+                    ]);
+
+                    return;
+                }
+            }
+
+            $this->dataHelper->set(
+                'Person',
+                [
+                    'FirstName' => $input['firstName'] ?? '???',
+                    'LastName'  => $input['lastName'] ?? '???',
+                ],
+                ['Id' => $person->Id]
+            );
+
+            // Email is the sync key for imported records — never update it
+            if ($person->Imported == 0) {
+                $this->dataHelper->set('Person', ['Email' => $email], ['Id' => $person->Id]);
+            }
+
+            if ($this->application->getConnectedUser()->isPersonManager()) {
+                $this->dataHelper->set('Person', ['Alert' => $input['alert']], ['Id' => $person->Id]);
+            }
+
+            $this->redirect('/persons');
         }
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
-        $person = $this->dataHelper->get('Person', ['Id' => $id], 'Id, Imported, Email, FirstName, LastName');
-        if (!$person) {
-            $this->raiseBadRequest("Unknown person {$id}", __FILE__, __LINE__);
-            return;
-        }
-        $schema = [
-            'email' => FilterInputRule::Email->value,
-            'firstName' => FilterInputRule::PersonName->value,
-            'lastName' => FilterInputRule::PersonName->value,
-            'alert' => FilterInputRule::Content->value,
-        ];
-        $input = WebApp::filterInput($schema, $this->flight->request()->data->getData());
-        $this->dataHelper->set(
-            'Person',
-            [
-                'FirstName' => $input['firstName'] ?? '???',
-                'LastName' => $input['lastName'] ?? '???',
-            ],
-            ['Id' => $person->Id]
-        );
-        if ($person->Imported == 0) $this->dataHelper->set('Person', ['Email' => $input['email']], ['Id' => $person->Id]);
-        if ($this->application->getConnectedUser()->isPersonManager()) $this->dataHelper->set('Person', ['Alert' => $input['alert']], ['Id' => $person->Id]);
-        $this->redirect('/persons');
     }
 
     public function help(): void
     {
-        if (!($this->application->getConnectedUser()->isPersonManager() ?? false)) {
-            $this->raiseforbidden(__FILE__, __LINE__);
-            return;
+        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isPersonManager())) {
+            $this->render('Common/views/info.latte', [
+                'content' => $this->dataHelper->get('Settings', ['Name' => 'Help_personManager'], 'Value')->Value ?? '',
+                'hasAuthorization' => $this->application->getConnectedUser()->hasAutorization(),
+                'currentVersion' => Application::VERSION,
+                'timer' => 0,
+                'previousPage' => true,
+                'page' => $this->application->getConnectedUser()->getPage(),
+            ]);
         }
-        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
-            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
-        $this->render('Common/views/info.latte', [
-            'content' => $this->dataHelper->get('Settings', ['Name' => 'Help_personManager'], 'Value')->Value ?? '',
-            'hasAuthorization' => $this->application->getConnectedUser()->hasAutorization(),
-            'currentVersion' => Application::VERSION,
-            'timer' => 0,
-            'previousPage' => true,
-            'page' => $this->application->getConnectedUser()->getPage(),
-        ]);
     }
 
     public function home(): void
     {
-        if (!($this->application->getConnectedUser()->isPersonManager() ?? false)) {
-            $this->raiseforbidden(__FILE__, __LINE__);
-            return;
-        }
-        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
-            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
-        $_SESSION['navbar'] = 'personManager';
+        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isPersonManager())) {
+            $_SESSION['navbar'] = 'personManager';
 
-        $this->render('Webmaster/views/personManager.latte', $this->getAllParams([
-            'page' => $this->application->getConnectedUser()->getPage(),
-            'content' => $this->languagesDataHelper->translate('PersonManager')
-        ]));
+            $this->render('Webmaster/views/personManager.latte', $this->getAllParams([
+                'page' => $this->application->getConnectedUser()->getPage(),
+                'content' => $this->languagesDataHelper->translate('PersonManager')
+            ]));
+        }
     }
 
     public function index(): void
     {
-        if (!($this->application->getConnectedUser()->isPersonManager() ?? false)) {
-            $this->raiseforbidden(__FILE__, __LINE__);
+        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isPersonManager())) {
             return;
         }
-        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
-            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
+
         $schema = [
             'firstName' => FilterInputRule::PersonName->value,
             'lastName' => FilterInputRule::PersonName->value,
             'nickName' => FilterInputRule::PersonName->value,
             'email' => FilterInputRule::Email->value,
-            'alert' => FilterInputRule::Content->value,
+            'alert' => FilterInputRule::Text->value,
+            'passwordCreated' => ['oui', 'non'],
+            'presentInDirectory' => ['oui', 'non'],
         ];
         $filterValues = WebApp::filterInput($schema, $this->flight->request()->query->getData());
         $filterConfig = [
@@ -188,6 +195,8 @@ class PersonController extends TableController
             ['name' => 'nickName', 'label' => 'Surnom'],
             ['name' => 'email', 'label' => 'Email'],
             ['name' => 'alert', 'label' => 'Alerte'],
+            ['name' => 'passwordCreated', 'label' => 'Mot de passe'],
+            ['name' => 'presentInDirectory', 'label' => 'Présentation'],
         ];
         $columns = [
             ['field' => 'LastName', 'label' => 'Nom'],
@@ -195,6 +204,8 @@ class PersonController extends TableController
             ['field' => 'Email', 'label' => 'Email'],
             ['field' => 'Phone', 'label' => 'Téléphone'],
             ['field' => 'Alert', 'label' => 'Alerte'],
+            ['field' => 'PasswordCreated', 'label' => 'Mot de passe'],
+            ['field' => 'PresentInDirectory', 'label' => 'Présentation'],
         ];
 
         $status = WebApp::getFiltered('status', $this->application->enumToValues(PersonStatus::class), $this->flight->request()->query->getData()) ?: PersonStatus::Active->value;

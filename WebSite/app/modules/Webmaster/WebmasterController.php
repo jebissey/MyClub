@@ -167,6 +167,8 @@ class WebmasterController extends AbstractController
                 'sendEmailEncryption'  => $this->credentials->get('smtp', 'encryption'),
                 'mailjetApiKey'        => $this->credentials->get('mailjet', 'api_key'),
                 'mailjetSender'        => $this->credentials->get('mailjet', 'sender'),
+                'dailyLimit'          => $this->credentials->get('email', 'daily_limit'),
+                'monthlyLimit'        => $this->credentials->get('email', 'monthly_limit')
             ]));
         }
     }
@@ -185,8 +187,13 @@ class WebmasterController extends AbstractController
                 'mailjetApiKey'        => FilterInputRule::Text->value,
                 'mailjetApiSecret'     => FilterInputRule::Text->value,
                 'mailjetSender'        => FilterInputRule::Email->value,
+                'smtpDailyLimit'       => FilterInputRule::Integer->value,
+                'smtpMonthlyLimit'     => FilterInputRule::Integer->value,
+                'mailjetDailyLimit'    => FilterInputRule::Integer->value,
+                'mailjetMonthlyLimit'  => FilterInputRule::Integer->value,
             ];
             $input = WebApp::filterInput($schema, $this->flight->request()->data->getData());
+            error_log("\n\n" . json_encode($input, JSON_PRETTY_PRINT) . "\n");
             $method = $input['sendMethod'] ?? 'smtp';
 
             $this->credentials->set('email', 'method', $method);
@@ -199,6 +206,8 @@ class WebmasterController extends AbstractController
                     $this->credentials->set('smtp', 'host',       $input['sendEmailHost']       ?? '');
                     $this->credentials->set('smtp', 'port',       $input['sendEmailPort']       ?? '587');
                     $this->credentials->set('smtp', 'encryption', $input['sendEmailEncryption'] ?? 'tls');
+                    $this->credentials->set('email', 'daily_limit', (string)($input['smtpDailyLimit'] ?? "0"));
+                    $this->credentials->set('email', 'monthly_limit', (string)($input['smtpMonthlyLimit'] ?? "0"));
                 })(),
 
                 'mailjet' => (function () use ($input) {
@@ -207,6 +216,8 @@ class WebmasterController extends AbstractController
                         $this->credentials->set('mailjet', 'api_secret', $input['mailjetApiSecret']);
                     }
                     $this->credentials->set('mailjet', 'sender',  $input['mailjetSender']   ?? '');
+                    $this->credentials->set('email', 'daily_limit', (string)($input['mailjetDailyLimit'] ?? "0"));
+                    $this->credentials->set('email', 'monthly_limit', (string)($input['mailjetMonthlyLimit'] ?? "0"));
                 })(),
 
                 default => null,

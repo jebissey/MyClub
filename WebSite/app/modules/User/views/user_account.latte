@@ -87,6 +87,24 @@
                 </div>
                 {/if}
 
+                {if !$isSelfEdit}
+                <hr class="my-4">
+                <p class="text-muted small">
+                    <i class="bi bi-shield-lock"></i>
+                    Champs visibles et modifiables uniquement par le PersonManager
+                </p>
+
+                <div class="mb-3">
+                    <label for="alert" class="form-label">Alerte</label>
+                    <input type="text" class="form-control" id="alert" name="alert" value="{$alert}">
+                </div>
+
+                <div class="mb-3">
+                    <label for="memberInfo" class="form-label">Info membre</label>
+                    <textarea class="form-control" id="memberInfo" name="memberInfo" rows="3">{$memberInfo}</textarea>
+                </div>
+                {/if}
+
                 <button class="btn btn-secondary" onclick="history.back()">Annuler</button>
                 <button type="submit" class="btn btn-primary">Valider</button>
             </div>

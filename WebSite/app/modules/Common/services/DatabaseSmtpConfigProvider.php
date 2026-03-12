@@ -24,28 +24,23 @@ final class DatabaseSmtpConfigProvider implements SmtpConfigProviderInterface
         if ($this->resolved) {
             return $this->cached;
         }
-
         $this->resolved = true;
-        $method     = $this->credentials->get('email', 'method');
-        $host       = $this->credentials->get(self::SERVICE, 'host');
-        $username   = $this->credentials->get(self::SERVICE, 'username');
-        $password   = $this->credentials->get(self::SERVICE, 'password');
-        $port       = (int) ($this->credentials->get(self::SERVICE, 'port') ?? 587);
-        $encryption = $this->credentials->get(self::SERVICE, 'encryption') ?? 'tls';
-
-        if (!$method || !$host || !$username || !$password) {
+        $method = $this->credentials->get('email', 'method');
+        if (!$method) {
             return null;
         }
         $this->cached = new SmtpConfig(
             $method,
-            $host,
-            $username,
-            $password,
-            $port,
-            $encryption,
+            $this->credentials->get(self::SERVICE, 'host') ?? '',
+            $this->credentials->get(self::SERVICE, 'username') ?? '',
+            $this->credentials->get(self::SERVICE, 'password') ?? '',
+            (int) ($this->credentials->get(self::SERVICE, 'port') ?? 587),
+            $this->credentials->get(self::SERVICE, 'encryption') ?? 'tls',
             $this->credentials->get('mailjet', 'api_key') ?? '',
             $this->credentials->get('mailjet', 'api_secret') ?? '',
             $this->credentials->get('mailjet', 'sender') ?? '',
+            (int) ($this->credentials->get('email', 'daily_limit') ?? 0),
+            (int) ($this->credentials->get('email', 'monthly_limit') ?? 0),
         );
 
         return $this->cached;

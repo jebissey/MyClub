@@ -1915,7 +1915,70 @@ INSERT INTO "Languages" VALUES (184,'emailCredentials.mailjet_sender','Verified 
 INSERT INTO "Languages" VALUES (185,'emailCredentials.daily_limit','Daily sending limit (0 = unlimited)','Limite d''envoi quotidienne (0 = illimitée)','Dzienny limit wysyłki (0 = bez limitu)');
 INSERT INTO "Languages" VALUES (186,'emailCredentials.monthly_limit','Monthly sending limit (0 = unlimited)','Limite d''envoi mensuelle (0 = illimitée)','Miesięczny limit wysyłki (0 = bez limitu)');
 INSERT INTO "Languages" VALUES (187,'emailCredentials.limits_hint','Leave blank or set 0 for no limit.','Laisser vide ou mettre 0 pour ne pas limiter.','Pozostaw puste lub wpisz 0, aby nie ograniczać.');
-INSERT INTO "Metadata" VALUES (1,'MyClub',20,0,1000000,NULL,10,36,6,NULL,0,NULL);
+INSERT INTO "Languages" VALUES (188,'person.add.emailAlreadyExistsDetailed','<div class="alert alert-warning">
+<h5>⚠️ Email already used</h5>
+<p>
+A person with this email address already exists in the system.
+</p>
+<p>
+<strong>Existing account:</strong> {name}<br>
+<strong>Status:</strong> {status}
+</p>
+<p class="mt-3">
+Before creating a new person, please check:
+</p>
+<ul>
+<li>the list of <strong>active accounts</strong></li>
+<li>the list of <strong>disabled accounts</strong></li>
+</ul>
+<p class="mt-3">
+If the account already exists but is disabled, you can simply
+<strong>reactivate the existing account</strong> instead of creating a new one.
+</p>
+</div>','<div class="alert alert-warning">
+<h5>⚠️ Adresse courriel déjà utilisée</h5>
+<p>
+Une personne avec cette adresse courriel existe déjà dans le système.
+</p>
+<p>
+<strong>Compte existant :</strong> {name}<br>
+<strong>Statut :</strong> {status}
+</p>
+<p class="mt-3">
+Avant de créer une nouvelle fiche, veuillez vérifier :
+</p>
+<ul>
+<li>la liste des <strong>comptes actifs</strong></li>
+<li>la liste des <strong>comptes désactivés</strong></li>
+</ul>
+<p class="mt-3">
+Si la personne existe déjà mais que son compte est désactivé,
+vous pouvez simplement <strong>réactiver le compte existant</strong>
+au lieu d''en créer un nouveau.
+</p>
+</div>','<div class="alert alert-warning">
+<h5>⚠️ Adres email już użyty</h5>
+<p>
+Osoba z tym adresem email już istnieje w systemie.
+</p>
+<p>
+<strong>Istniejące konto:</strong> {name}<br>
+<strong>Status:</strong> {status}
+</p>
+<p class="mt-3">
+Przed utworzeniem nowej osoby sprawdź:
+</p>
+<ul>
+<li>listę <strong>aktywnych kont</strong></li>
+<li>listę <strong>wyłączonych kont</strong></li>
+</ul>
+<p class="mt-3">
+Jeśli konto istnieje, ale jest wyłączone, możesz je po prostu
+<strong>ponownie aktywować</strong> zamiast tworzyć nowe.
+</p>
+</div>');
+INSERT INTO "Languages" VALUES (189,'quick_actions','Quick actions','Vous voulez gagner du temps ? Accédez aux actions rapides.','Chcesz zaoszczędzić czas? Przejdź do szybkich działań.');
+INSERT INTO "Metadata" VALUES (1,'MyClub',21,0,1000000,NULL,10,36,6,NULL,0,NULL);
 INSERT INTO "Person" VALUES (1,'webmaster@myclub.foo','e427c26faca947919b18b797bc143a35100e4de48c34b70b26202d3a7d8e51f7','my first name','my last name','my nick name or nothing',NULL,'0',NULL,NULL,NULL,NULL,NULL,0,0,NULL,NULL,'2025-01-01',0,0,0,NULL,NULL,NULL,NULL,NULL,'');
 INSERT INTO "PersonGroup" VALUES (1,1,1);
 INSERT INTO "Settings" VALUES (1,'Title','title');
