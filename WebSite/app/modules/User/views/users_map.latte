@@ -3,7 +3,7 @@
 {block title}Localisation des membres{/block}
 
 {block navbar}
-    {include '../../Webmaster/views/navbar/user.latte'}
+    {include '../../Webmaster/views/navbar/_userLeft.latte'}
 {/block}
 
 {block content}
@@ -12,7 +12,7 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-header">
-                    <h1 class="card-title">Carte des membres</h1>
+                    <h1 class="card-title">{$title}</h1>
                     <h6 class="card-subtitle mb-2 text-muted">{$membersCount} membres localisés</h6>
                 </div>
                 <div class="card-body">
@@ -31,6 +31,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/blueimp-md5/2.19.0/js/md5.min.js"></script>
 <script>
     const locationData = {$locationData};
+    const isPublicMap = {$isPublic ? 'true' : 'false'} === 'true';
 </script>
 <script src="/app/modules/User/js/map.js"></script>
 {/block}

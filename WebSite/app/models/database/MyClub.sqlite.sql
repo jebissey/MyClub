@@ -344,6 +344,7 @@ CREATE TABLE IF NOT EXISTS "Person" (
 	"Notepad"	TEXT,
 	"Alert"	TEXT,
 	"MemberInfo"	TEXT DEFAULT '',
+	"MyPublicDataInPresentationDirectory"	TEXT,
 	PRIMARY KEY("Id")
 );
 CREATE TABLE IF NOT EXISTS "PersonGroup" (
@@ -1978,8 +1979,32 @@ Jeśli konto istnieje, ale jest wyłączone, możesz je po prostu
 </p>
 </div>');
 INSERT INTO "Languages" VALUES (189,'quick_actions','Quick actions','Vous voulez gagner du temps ? Accédez aux actions rapides.','Chcesz zaoszczędzić czas? Przejdź do szybkich działań.');
-INSERT INTO "Metadata" VALUES (1,'MyClub',21,0,1000000,NULL,10,36,6,NULL,0,NULL);
-INSERT INTO "Person" VALUES (1,'webmaster@myclub.foo','e427c26faca947919b18b797bc143a35100e4de48c34b70b26202d3a7d8e51f7','my first name','my last name','my nick name or nothing',NULL,'0',NULL,NULL,NULL,NULL,NULL,0,0,NULL,NULL,'2025-01-01',0,0,0,NULL,NULL,NULL,NULL,NULL,'');
+INSERT INTO "Languages" VALUES (190,'presentation.edit.title','Edit my presentation','Édition de ma présentation','Edytuj moją prezentację');
+INSERT INTO "Languages" VALUES (191,'presentation.edit.inDirectory','I wish to appear in the directory','Je souhaite figurer dans le trombinoscope','Chcę figurować w katalogu');
+INSERT INTO "Languages" VALUES (192,'presentation.edit.inDirectory.hint','Your presentation will be visible to other members','Votre présentation sera visible par les autres membres','Twoja prezentacja będzie widoczna dla innych członków');
+INSERT INTO "Languages" VALUES (193,'presentation.edit.showPhone','Display my phone number in the directory','Afficher mon numéro de téléphone dans le trombinoscope','Wyświetl mój numer telefonu w katalogu');
+INSERT INTO "Languages" VALUES (194,'presentation.edit.showEmail','Display my email address in the directory','Afficher mon adresse e-mail dans le trombinoscope','Wyświetl mój adres e-mail w katalogu');
+INSERT INTO "Languages" VALUES (195,'presentation.edit.showLocation','Display my location on the public map','Afficher ma localisation sur la carte publique','Wyświetl moją lokalizację na publicznej mapie');
+INSERT INTO "Languages" VALUES (196,'presentation.edit.publicLocation.label','Description of your public location','Description de votre localisation publique','Opis Twojej publicznej lokalizacji');
+INSERT INTO "Languages" VALUES (197,'presentation.edit.publicLocation.placeholder','E.g.: Near the city park...','Ex : Quartier des Grésilles, proche du parc...','Np.: W pobliżu parku miejskiego...');
+INSERT INTO "Languages" VALUES (198,'presentation.edit.publicLocation.hint','This text will be displayed when clicking on your pin in the directory','Ce texte sera affiché lors du clic sur votre punaise dans le trombinoscope','Ten tekst będzie wyświetlany po kliknięciu pinezki w katalogu');
+INSERT INTO "Languages" VALUES (199,'presentation.edit.content.label','My presentation','Ma présentation','Moja prezentacja');
+INSERT INTO "Languages" VALUES (200,'presentation.edit.location.label','Place of residence (neighborhood)','Lieu d''habitation (quartier)','Miejsce zamieszkania (dzielnica)');
+INSERT INTO "Languages" VALUES (201,'presentation.edit.location.hint','Click on the map to indicate your neighborhood','Cliquez sur la carte pour indiquer votre quartier d''habitation','Kliknij na mapę, aby wskazać swoją dzielnicę');
+INSERT INTO "Languages" VALUES (202,'presentation.edit.validation.noContent','Please write your presentation before appearing in the directory','Veuillez rédiger votre présentation avant de figurer dans le trombinoscope','Proszę napisać swoją prezentację przed pojawieniem się w katalogu');
+INSERT INTO "Languages" VALUES (203,'directory.index.title','Trombinoscope','Trombinoscope','Trombinoskop');
+INSERT INTO "Languages" VALUES (204,'directory.index.subtitle','Browse members who have chosen to share their profile','Découvrez les membres qui ont choisi de partager leur présentation','Przeglądaj członków, którzy zdecydowali się udostępnić swój profil');
+INSERT INTO "Languages" VALUES (205,'directory.index.locate_public','Locate public members','Localiser les membres publics','Znajdź publicznych członków');
+INSERT INTO "Languages" VALUES (206,'directory.index.locate_members','Locate members','Localiser les membres','Znajdź członków');
+INSERT INTO "Languages" VALUES (207,'directory.index.edit_presentation','Edit my presentation','Modifier ma présentation','Edytuj moją prezentację');
+INSERT INTO "Languages" VALUES (208,'directory.index.create_presentation','Create my presentation','Créer ma présentation','Utwórz moją prezentację');
+INSERT INTO "Languages" VALUES (209,'directory.index.filter_by_group','Filter by group','Filtrer par groupe','Filtruj według grupy');
+INSERT INTO "Languages" VALUES (210,'directory.index.all','All','Tous','Wszyscy');
+INSERT INTO "Languages" VALUES (211,'directory.index.view_profile','View profile','Voir le profil','Zobacz profil');
+INSERT INTO "Languages" VALUES (212,'directory.index.no_members','No member has yet created a presentation in the directory.','Aucun membre n''a encore créé de présentation dans le trombinoscope.','Żaden członek nie utworzył jeszcze prezentacji w katalogu.');
+INSERT INTO "Languages" VALUES (213,'directory.index.no_members_group','No member of this group has yet created a presentation in the directory.','Aucun membre de ce groupe n''a encore créé de présentation dans le trombinoscope.','Żaden członek tej grupy nie utworzył jeszcze prezentacji w katalogu.');
+INSERT INTO "Metadata" VALUES (1,'MyClub',22,0,1000000,NULL,10,36,6,NULL,0,NULL);
+INSERT INTO "Person" VALUES (1,'webmaster@myclub.foo','e427c26faca947919b18b797bc143a35100e4de48c34b70b26202d3a7d8e51f7','my first name','my last name','my nick name or nothing',NULL,'0',NULL,NULL,NULL,NULL,NULL,0,0,NULL,NULL,'2025-01-01',0,0,0,NULL,NULL,NULL,NULL,NULL,'',NULL);
 INSERT INTO "PersonGroup" VALUES (1,1,1);
 INSERT INTO "Settings" VALUES (1,'Title','title');
 INSERT INTO "Settings" VALUES (2,'LegalNotices','LegalNotices');

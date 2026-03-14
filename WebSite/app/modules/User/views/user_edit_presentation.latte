@@ -30,9 +30,9 @@
 
     <div class="ms-auto">
         <button type="submit" form="presentationForm" class="btn btn-success">
-            <i class="bi bi-save"></i> Enregistrer
+            <i class="bi bi-save"></i> {='save'|translate}
         </button>
-        <a href="/user" class="btn btn-secondary">Annuler</a>
+        <a href="/user" class="btn btn-secondary">{='cancel'|translate}</a>
     </div>
 </div>
 {/block}
@@ -41,11 +41,11 @@
 <div class="container-fluid mt-2 mb-2">
     <div class="row">
         <div class="col-md-12">
-            <h1>Édition de ma présentation</h1>
+            <h1>{='presentation.edit.title'|translate}</h1>
             <div class="card">
                 <div class="card-body">
                     <form id="presentationForm" method="post" enctype="multipart/form-data">
-                        
+
                         <div class="row mb-4">
                             <div class="col-md-6">
                                 <div class="form-check mb-3">
@@ -53,9 +53,9 @@
                                         name="inPresentationDirectory"
                                         {if $person->InPresentationDirectory}checked{/if}>
                                     <label class="form-check-label" for="inPresentationDirectory">
-                                        Je souhaite figurer dans le trombinoscope
+                                        {='presentation.edit.inDirectory'|translate}
                                     </label>
-                                    <div class="form-text">Votre présentation sera visible par les autres membres</div>
+                                    <div class="form-text">{='presentation.edit.inDirectory.hint'|translate}</div>
                                 </div>
 
                                 <div id="directoryOptions" class="ms-4 mt-2 {if !$person->InPresentationDirectory}d-none{/if}">
@@ -64,7 +64,7 @@
                                             name="showPhoneInPresentationDirectory"
                                             {if $person->ShowPhoneInPresentationDirectory}checked{/if}>
                                         <label class="form-check-label" for="showPhoneInPresentationDirectory">
-                                            Afficher mon numéro de téléphone dans le trombinoscope
+                                            {='presentation.edit.showPhone'|translate}
                                         </label>
                                     </div>
                                     <div class="form-check mb-2">
@@ -72,26 +72,48 @@
                                             name="showEmailInPresentationDirectory"
                                             {if $person->ShowEmailInPresentationDirectory}checked{/if}>
                                         <label class="form-check-label" for="showEmailInPresentationDirectory">
-                                            Afficher mon adresse e-mail dans le trombinoscope
+                                            {='presentation.edit.showEmail'|translate}
                                         </label>
+                                    </div>
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="checkbox" id="showLocationInDirectory"
+                                            name="showLocationInDirectory"
+                                            {if $person->MyPublicDataInPresentationDirectory}checked{/if}>
+                                        <label class="form-check-label" for="showLocationInDirectory">
+                                            {='presentation.edit.showLocation'|translate}
+                                        </label>
+                                    </div>
+
+                                    <div id="publicLocationZone" class="mt-2 {if !$person->MyPublicDataInPresentationDirectory}d-none{/if}">
+                                        <label class="form-label" for="myPublicDataInPresentationDirectory">
+                                            {='presentation.edit.publicLocation.label'|translate}
+                                        </label>
+                                        <textarea class="form-control"
+                                                  id="myPublicDataInPresentationDirectory"
+                                                  name="myPublicDataInPresentationDirectory"
+                                                  rows="3"
+                                                  placeholder="{='presentation.edit.publicLocation.placeholder'|translate}"
+                                        >{$person->MyPublicDataInPresentationDirectory}</textarea>
+                                        <div class="form-text">{='presentation.edit.publicLocation.hint'|translate}</div>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
                         <div class="mb-4">
-                            <label class="form-label">Ma présentation</label>
+                            <label class="form-label">{='presentation.edit.content.label'|translate}</label>
                             <div class="editor-container">
                                 <textarea name="content" id="tinymce">{if isset($person->Presentation)}{$person->Presentation|noescape}{/if}</textarea>
                             </div>
                         </div>
-                        
+
                         <div class="mb-4">
-                            <label class="form-label">Lieu d'habitation (quartier)</label>
+                            <label class="form-label">{='presentation.edit.location.label'|translate}</label>
                             <div id="map" style="height: 300px;"></div>
                             <input type="hidden" id="location" name="location" value="{$person->Location}">
-                            <div class="form-text">Cliquez sur la carte pour indiquer votre quartier d'habitation</div>
+                            <div class="form-text">{='presentation.edit.location.hint'|translate}</div>
                         </div>
+
                     </form>
                 </div>
             </div>
@@ -103,24 +125,27 @@
 {block scripts}
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
-
 <script src="/app/modules/Common/js/tinymce/tinymce.min.js"></script>
 <script src="/app/modules/Common/js/tinymce-config.js"></script>
 
+<script>
+window.validationMsg = {$validationMsg};
+</script>
 <script n:syntax="off">
-    document.addEventListener('DOMContentLoaded', function() {
-        
-        // ===== INITIALISATION TINYMCE =====
+    document.addEventListener('DOMContentLoaded', function () {
+
+        // ===== TINYMCE =====
         initTinyMCE('#tinymce', {
             height: 400,
             imageMaxWidth: 1200,
             imageQuality: 0.85,
-            onSave: function(editor) {
+            onSave: function (editor) {
                 document.getElementById('presentationForm').submit();
             }
         });
 
-        const map = L.map('map').setView([47.3220, 5.0415], 12); // Dijon
+        // ===== CARTE PRIVÉE =====
+        const map = L.map('map').setView([47.3220, 5.0415], 12);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         }).addTo(map);
@@ -138,40 +163,54 @@
                 console.error('Erreur lors du parsing des coordonnées', e);
             }
         }
-
-        map.on('click', function(e) {
-            if (marker) {
-                map.removeLayer(marker);
-            }
+        map.on('click', function (e) {
+            if (marker) map.removeLayer(marker);
             marker = L.marker(e.latlng).addTo(map);
             locationInput.value = e.latlng.lat + ',' + e.latlng.lng;
         });
 
-        // ===== VALIDATION DU FORMULAIRE =====
-        document.getElementById('presentationForm').addEventListener('submit', function(e) {
-            const content = tinymce.get('tinymce').getContent().trim();
+        // ===== TROMBINOSCOPE =====
+        const inDirectoryCheckbox = document.getElementById('inPresentationDirectory');
+        const directoryOptions    = document.getElementById('directoryOptions');
+
+        inDirectoryCheckbox.addEventListener('change', function () {
+            if (this.checked) {
+                directoryOptions.classList.remove('d-none');
+            } else {
+                directoryOptions.classList.add('d-none');
+                document.getElementById('showPhoneInPresentationDirectory').checked = false;
+                document.getElementById('showEmailInPresentationDirectory').checked = false;
+                document.getElementById('showLocationInDirectory').checked = false;
+                publicLocationZone.classList.add('d-none');
+                publicLocationInput.value = '';
+            }
+        });
+
+        // ===== LOCALISATION PUBLIQUE =====
+        const showLocationCheckbox = document.getElementById('showLocationInDirectory');
+        const publicLocationZone   = document.getElementById('publicLocationZone');
+        const publicLocationInput  = document.getElementById('myPublicDataInPresentationDirectory');
+
+        showLocationCheckbox.addEventListener('change', function () {
+            if (this.checked) {
+                publicLocationZone.classList.remove('d-none');
+                publicLocationInput.focus();
+            } else {
+                publicLocationZone.classList.add('d-none');
+                publicLocationInput.value = '';
+            }
+        });
+
+        // ===== VALIDATION =====
+        document.getElementById('presentationForm').addEventListener('submit', function (e) {
+            const content  = tinymce.get('tinymce').getContent().trim();
             const checkbox = document.getElementById('inPresentationDirectory');
-            
-            // Si la case est cochée, vérifier qu'il y a du contenu
             if (checkbox.checked && (!content || content === '' || content === '<p><br></p>')) {
                 e.preventDefault();
-                alert('Veuillez rédiger votre présentation avant de figurer dans le trombinoscope.');
+                alert(validationMsg);
                 return false;
             }
         });
-    });
-
-    const inDirectoryCheckbox = document.getElementById('inPresentationDirectory');
-    const directoryOptions = document.getElementById('directoryOptions');
-
-    inDirectoryCheckbox.addEventListener('change', function () {
-        if (this.checked) {
-            directoryOptions.classList.remove('d-none');
-        } else {
-            directoryOptions.classList.add('d-none');
-            document.getElementById('showPhoneInPresentationDirectory').checked = false;
-            document.getElementById('showEmailInPresentationDirectory').checked = false;
-        }
     });
 </script>
 {/block}

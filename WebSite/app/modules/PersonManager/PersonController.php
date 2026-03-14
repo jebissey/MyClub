@@ -89,7 +89,7 @@ class PersonController extends TableController
                 $existing = $this->dataHelper->get(
                     'Person',
                     ['Email' => $email],
-                    'Id, FirstName, LastName, IsActive'
+                    'Id, FirstName, LastName, Inactivated'
                 );
                 $isNewRecord = (
                     $person->Email === '' &&
@@ -103,7 +103,7 @@ class PersonController extends TableController
 
                 if ($isDuplicate) {
                     $fullName = trim(($existing->FirstName ?? '') . ' ' . ($existing->LastName ?? ''));
-                    $status = ($existing->IsActive ?? 1) ? 'Active' : 'Disabled';
+                    $status = ($existing->Inactivated ?? 1) ? 'Disabled' : 'Active';
 
                     $message = $this->languagesDataHelper->translate('person.add.emailAlreadyExistsDetailed');
                     $message = str_replace(

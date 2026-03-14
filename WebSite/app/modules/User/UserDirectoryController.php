@@ -61,9 +61,14 @@ class UserDirectoryController extends AbstractController
                 'GroupId' => $selectedGroup
             ])),
             'userIsInGroup' => $this->personGroupDataHelper->isPersonInGroup($person->Id, $selectedGroup ?? 0),
-            'countOfLocatedMembers' => count($this->getLocationData($persons)),
+            'countOfLocatedMembers' => count($persons),
+            'numberOfPublicMembers' => count($this->dataHelper->gets('Person', [
+                'InPresentationDirectory' => 1,
+                'Inactivated' => 0,
+                'MyPublicDataInPresentationDirectory IS NOT NULL' => null
+            ], 'Id')),
             'btn_HistoryBack' => true,
-            'btn_Parent' => "/user",            
+            'btn_Parent' => "/user",
         ]));
     }
 
@@ -82,11 +87,7 @@ class UserDirectoryController extends AbstractController
             'InPresentationDirectory' => 1,
             'Location IS NOT NULL' => null,
             'Inactivated' => 0
-        ]);
-        $gravatarHandler = new GravatarHandler();
-        foreach ($members as $member) {
-            $member->UserImg = WebApp::getUserImg($member, $gravatarHandler);
-        }
+        ], 'Id, FirstName, LastName, NickName, Avatar, UseGravatar, Email, Location, MyPublicDataInPresentationDirectory');
         $locationData = $this->getLocationData($members);
 
         $this->render('User/views/users_map.latte', $this->getAllParams([
@@ -95,12 +96,42 @@ class UserDirectoryController extends AbstractController
             'navItems' => $this->getNavItems($person),
             'page' => $this->application->getConnectedUser()->getPage(),
             'btn_HistoryBack' => true,
+            'title' => 'Carte des membres',
+            'isPublic' => false,
+        ]));
+    }
+
+    public function showPublicMap()
+    {
+        $person = $this->application->getConnectedUser()->person;
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+            return;
+        }
+        $members = $this->dataHelper->gets('Person', [
+            'InPresentationDirectory' => 1,
+            'Location IS NOT NULL' => null,
+            'Inactivated' => 0,
+            'MyPublicDataInPresentationDirectory IS NOT NULL' => null
+        ], 'Id, FirstName, LastName, NickName, Avatar, UseGravatar, Email, Location, MyPublicDataInPresentationDirectory');
+        $locationData = $this->getLocationData($members);
+
+        $this->render('User/views/users_map.latte', $this->getAllParams([
+            'locationData' => $locationData,
+            'membersCount' => count($locationData),
+            'navItems' => $this->getNavItems($person),
+            'page' => $this->application->getConnectedUser()->getPage(),
+            'btn_HistoryBack' => true,
+            'title' => "Carte des membres publics",
+            'isPublic' => true,
         ]));
     }
 
     #region Private functions
     private function getLocationData(array $members): array
     {
+        $gravatarHandler = new GravatarHandler();
         $locationData = [];
         foreach ($members as $member) {
             if (!empty($member->Location) && preg_match('/^[-+]?([1-8]?\d(\.\d+)?|90(\.0+)?),\s*[-+]?(180(\.0+)?|((1[0-7]\d)|([1-9]?\d))(\.\d+)?)$/', $member->Location)) {
@@ -114,7 +145,8 @@ class UserDirectoryController extends AbstractController
                     'email' => $member->Email,
                     'lat' => trim($lat),
                     'lng' => trim($lng),
-                    'userImg' => $member->UserImg,
+                    'userImg' => WebApp::getUserImg($member, $gravatarHandler),
+                    'myPublicData' => $member->MyPublicDataInPresentationDirectory
                 ];
             }
         }

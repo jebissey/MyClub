@@ -29,6 +29,7 @@ class UserPresentationController extends AbstractController
                 'person' => $person,
                 'navItems' => $this->getNavItems($person),
                 'page' => $this->application->getConnectedUser()->getPage(),
+                'validationMsg' => $this->languagesDataHelper->translate('presentation.edit.validation.noContent'),
             ]));
         } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }
@@ -43,6 +44,7 @@ class UserPresentationController extends AbstractController
                     'inPresentationDirectory' => FilterInputRule::Bool->value,
                     'showPhoneInPresentationDirectory' => FilterInputRule::Bool->value,
                     'showEmailInPresentationDirectory' => FilterInputRule::Bool->value,
+                    'myPublicDataInPresentationDirectory' => FilterInputRule::Text->value,
                 ];
                 $input = WebApp::filterInput($schema, $this->flight->request()->data->getData());
                 $presentation = $input['content'] ?? '???';
@@ -56,6 +58,7 @@ class UserPresentationController extends AbstractController
                     'InPresentationDirectory' => $inDirectory,
                     'ShowPhoneInPresentationDirectory' => $input['showPhoneInPresentationDirectory'] ?? 0,
                     'ShowEmailInPresentationDirectory' => $input['showEmailInPresentationDirectory'] ?? 0,
+                    'MyPublicDataInPresentationDirectory' => $input['myPublicDataInPresentationDirectory'] ?? '',
                 ], ['Id' => $person->Id]);
                 $this->redirect('/user/directory');
             } else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);

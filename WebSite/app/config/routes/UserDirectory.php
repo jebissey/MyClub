@@ -20,6 +20,7 @@ class UserDirectory implements RouteInterface
 
         $this->routes[] = new Route('GET /user/directory', $userDirectoryController, 'showDirectory');
         $this->routes[] = new Route('GET /user/directory/map', $userDirectoryController, 'showMap');
+        $this->routes[] = new Route('GET /user/directory/public/map', $userDirectoryController, 'showPublicMap');
 
         return $this->routes;
     }

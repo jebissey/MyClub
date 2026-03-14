@@ -8,6 +8,9 @@ document.addEventListener('DOMContentLoaded', function () {
   }).addTo(map);
 
   function createPopupContent(member) {
+    if (isPublicMap) {
+      return createPublicPopupContent(member);
+    }
     let content = `<div class="text-center mb-2">
             <strong>${member.name}</strong>`;
 
@@ -28,6 +31,15 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     content += `</div>`;
     return content;
+  }
+
+  function createPublicPopupContent(member) {
+    return `<div class="text-center mb-2">
+    <strong>${member.name}</strong>
+    ${member.myPublicData
+        ? `<div class="mt-2 text-start" style="max-width: 220px;">${member.myPublicData}</div>`
+        : ''}
+  </div>`;
   }
 
   const markers = L.markerClusterGroup({
