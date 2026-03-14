@@ -1,58 +1,60 @@
 {layout '../../Common/views/layout.latte'}
 
-{block title}Articles{/block}
+{block title}{='article.show.title'|translate}{/block}
 
 {block navbar}
 <div class="container-fluid d-flex align-items-center">
-    <div class="d-flex gap-2">
+    <div class="d-flex align-items-center">
         <a class="navbar-brand" href="/"><img src="/app/images/home.png" alt="Home"></a>
-        <button class="btn btn-primary fs-5 " onclick="history.back()">
+        <button class="btn btn-primary fs-4" onclick="history.back()">
             <i class="bi bi-arrow-left-circle"></i>
         </button>
+        <a class="btn btn btn-primary fs-4 ms-2" href="/articles">
+            <i class="bi bi-arrow-up-circle"></i>
+        </a>
     </div>
 
-    <div class="ms-auto">
+    <div class="ms-auto d-flex flex-wrap align-items-center justify-content-end row-gap-2">
     {if $isCreator}
-        <a href="/emails/article/{$id}" class="btn btn-warning ms-2">Prévenir les abonnés</a>
+        <a href="/emails/article/{$id}" class="btn btn-warning ms-2">{='article.show.notify_subscribers'|translate}</a>
         <a href="/article/carousel/{$id}" class="btn btn-info ms-2">
-            <i class="bi bi-images"></i> Gérer la galerie
+            <i class="bi bi-images"></i> {='article.show.manage_gallery'|translate}
         </a>
         {if $hasSurvey}
-        <a href="/survey/add/{$id}" class="btn btn-danger ms-2">Modifier le sondage</a>
+        <a href="/survey/add/{$id}" class="btn btn-danger ms-2">{='article.show.edit_survey'|translate}</a>
         {else}
-        <a href="/survey/add/{$id}" class="btn btn-success ms-2">Ajouter un sondage</a>
+        <a href="/survey/add/{$id}" class="btn btn-success ms-2">{='article.show.add_survey'|translate}</a>
         {/if}
         {if $hasOrder}
-        <a href="/order/add/{$id}" class="btn btn-danger ms-2">Modifier la commande groupée</a>
+        <a href="/order/add/{$id}" class="btn btn-danger ms-2">{='article.show.edit_order'|translate}</a>
         {else}
-        <a href="/order/add/{$id}" class="btn btn-success ms-2">Ajouter une commande groupée</a>
+        <a href="/order/add/{$id}" class="btn btn-success ms-2">{='article.show.add_order'|translate}</a>
         {/if}
     {else}
-        <small class="text-muted">Seul le créateur de l'article peut le modifier</small>                
+        <small class="text-muted">{='article.show.only_creator_can_edit'|translate}</small>
     {/if}
-    {if $isMember}    
+    {if $isMember}
         <a href="/article/chat/{$article->Id}" class="btn btn-warning ms-2">
             {='messages'|translate}{if $countOfMessages > 0} ({$countOfMessages}){/if}
         </a>
     {/if}
     {if $canReadPool}
-        <button class="btn btn-info ms-2" onclick="window.location.href='/survey/results/{$article->Id}'">Voir résultats sondage</button>
+        <button class="btn btn-info ms-2" onclick="window.location.href='/survey/results/{$article->Id}'">{='article.show.view_survey_results'|translate}</button>
     {/if}
     {if $hasSurvey && $userConnected && isset($article->PublishedBy) && $article->PublishedBy !== null && $hasSurvey->ClosingDate >= date('Y-m-d')}
-        <button id="reply-survey-btn" class="btn btn-success ms-2">Répondre au sondage</button>
+        <button id="reply-survey-btn" class="btn btn-success ms-2">{='article.show.reply_survey'|translate}</button>
     {/if}
     {if $canReadOrder}
-        <button class="btn btn-info ms-2" onclick="window.location.href='/order/results/{$article->Id}'">Voir résultats commande</button>
+        <button class="btn btn-info ms-2" onclick="window.location.href='/order/results/{$article->Id}'">{='article.show.view_order_results'|translate}</button>
     {/if}
     {if $hasOrder && $userConnected && isset($article->PublishedBy) && $article->PublishedBy !== null && $hasOrder->ClosingDate >= date('Y-m-d')}
-        <button id="reply-order-btn" class="btn btn-success ms-2">Répondre pour la commande groupée</button>
+        <button id="reply-order-btn" class="btn btn-success ms-2">{='article.show.reply_order'|translate}</button>
     {/if}
     {if $isCreator}
         <button class="btn btn-warning ms-2" onclick="window.location.href='/article/edit/{$article->Id}'">
             <i class="bi bi-pencil"></i>
         </button>
     {/if}
-        <a href="/articles" class="btn btn-secondary ms-2">Liste des articles</a>
     </div>
 </div>
 {/block}
@@ -70,29 +72,29 @@
     </div>
     {/if}
 
-    <div class="container-fluid" 
-         data-article-id="{$article->Id}" 
+    <div class="container-fluid"
+         data-article-id="{$article->Id}"
          data-user-email="{if $userConnected}{$userEmail}{/if}"
          data-is-editor="{$isEditor ? '1' : '0'}">
-        
+
         <div class="card mb-4">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <div>
                     <h2 class="card-title" id="article-title-display">{$article->Title}</h2>
                     <small class="text-muted">
-                        Créé par {$article->FirstName} {$article->LastName} 
-                        le {date('d/m/Y', strtotime($article->Timestamp))}
+                        {='article.show.created_by'|translate} {$article->FirstName} {$article->LastName}
+                        {='article.show.on_date'|translate} {date('d/m/Y', strtotime($article->Timestamp))}
                         {$publishedBy}
                         {if date('Y-m-d', strtotime($article->Timestamp)) !== date('Y-m-d', strtotime($article->LastUpdate))}
-                        modifié le {date('d/m/Y', strtotime($article->LastUpdate))}
+                        {='article.show.modified_on'|translate} {date('d/m/Y', strtotime($article->LastUpdate))}
                         {/if}
                         {if isset($article->PublishedBy) && $article->PublishedBy !== null}
-                            <span class="badge bg-success">Publié</span>
+                            <span class="badge bg-success">{='article.show.published'|translate}</span>
                         {else}
-                            <span class="badge bg-secondary">Non publié</span>
+                            <span class="badge bg-secondary">{='article.show.not_published'|translate}</span>
                         {/if}
                         {if isset($article->GroupName) && $article->GroupName}
-                            <span class="badge bg-info">Groupe: {$article->GroupName}</span>
+                            <span class="badge bg-info">{='article.show.group_label'|translate} {$article->GroupName}</span>
                         {/if}
                     </small>
                 </div>
@@ -101,11 +103,11 @@
             <div class="card-body">
                 <div id="content-display">
                     {$article->Content|noescape}
-                </div>            
-                
+                </div>
+
                 {if !empty($carouselItems)}
                 <div class="mt-4">
-                    <h4>Galerie</h4>
+                    <h4>{='article.show.gallery'|translate}</h4>
                     <div id="articleCarousel" class="carousel slide" data-bs-ride="carousel">
                         <div class="carousel-indicators">
                             {foreach $carouselItems as $index => $item}
@@ -121,11 +123,11 @@
                         </div>
                         <button class="carousel-control-prev" type="button" data-bs-target="#articleCarousel" data-bs-slide="prev">
                             <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                            <span class="visually-hidden">Précédent</span>
+                            <span class="visually-hidden">{='article.show.previous'|translate}</span>
                         </button>
                         <button class="carousel-control-next" type="button" data-bs-target="#articleCarousel" data-bs-slide="next">
                             <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                            <span class="visually-hidden">Suivant</span>
+                            <span class="visually-hidden">{='article.show.next'|translate}</span>
                         </button>
                     </div>
                 </div>
@@ -138,11 +140,11 @@
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="surveyModalLabel">Répondre au sondage</h5>
+                    <h5 class="modal-title" id="surveyModalLabel">{='article.show.modal_survey_title'|translate}</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body" id="survey-form-container">
-                    <p>Chargement du sondage...</p>
+                    <p>{='article.show.modal_survey_loading'|translate}</p>
                 </div>
             </div>
         </div>
@@ -152,11 +154,11 @@
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="orderModalLabel">Répondre à la commande</h5>
+                    <h5 class="modal-title" id="orderModalLabel">{='article.show.modal_order_title'|translate}</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body" id="order-form-container">
-                    <p>Chargement de la commande...</p>
+                    <p>{='article.show.modal_order_loading'|translate}</p>
                 </div>
             </div>
         </div>
@@ -193,13 +195,10 @@
             }
         });
     </script>
-
-    <!-- Module ES6 principal -->
     <script type="module">
         import ArticleShow from '/app/modules/Article/js/ArticleShow.js';
 
         document.addEventListener('DOMContentLoaded', () => {
-            // Récupérer la configuration depuis les attributs data
             const container = document.querySelector('.container-fluid[data-article-id]');
             
             if (!container) {
@@ -213,18 +212,15 @@
                 isEditor: container.dataset.isEditor === '1'
             };
 
-            // Vérifier que l'article ID est valide
             if (!config.articleId) {
                 console.error('Invalid article ID');
                 return;
             }
 
-            // Initialiser l'application
             try {
                 const articleShow = new ArticleShow(config);
                 articleShow.init();
 
-                // Exposer globalement pour debugging et tests
                 window.articleShow = articleShow;
 
                 console.log('✓ ArticleShow initialized successfully', config);
