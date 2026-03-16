@@ -1,4 +1,10 @@
 {include '_adminLeft.latte'}
+                            
+                            {if $isCommunicationManager}
+                            <li class="nav-item">
+                                <a class="nav-link" href="/communication" data-bs-toggle="tooltip" data-bs-placement="bottom" title="{='navbar.admin.communication_manager'|translate}"><h2>📢</h2></a>
+                            </li>
+                            {/if}
 
                             {if $isEventManager}
                             <li class="nav-item">
@@ -23,7 +29,7 @@
                                 <a class="nav-link" href="/personManager" data-bs-toggle="tooltip" data-bs-placement="bottom" title="{='navbar.admin.person_manager'|translate}"><h2>📇</h2></a>
                             </li>
                             {/if}
-                            
+
                             {if $isVisitorInsights}
                             <li class="nav-item">
                                 <a class="nav-link" href="/visitorInsights" data-bs-toggle="tooltip" data-bs-placement="bottom" title="{='navbar.admin.visitor_insights'|translate}"><h2>🔍</h2></a>

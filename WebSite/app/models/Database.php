@@ -20,7 +20,7 @@ class Database
     const SQLITE_FILE = 'MyClub.sqlite';
     const SQLITE_LOG_FILE = 'LogMyClub.sqlite';
     const APPLICATION = 'MyClub';
-    const DB_VERSION = 23;              //Don't forget to update here and in Metadata when database structure is modified
+    const DB_VERSION = 24;              //Don't forget to update here and in Metadata when database structure is modified
 
     private static $instance = null;
     private static $pdo = null;
@@ -97,6 +97,8 @@ class Database
                     throw new RuntimeException("$className must implement DatabaseMigratorInterface");
                 }
                 $newVersion = $migrator->upgrade($pdo, $currentVersion);
+                unset($migrator);
+                gc_collect_cycles();
                 $logMessage->setMessage("Database migrated from version {$currentVersion} to version {$newVersion} using {$className}");
                 if ($newVersion !== $nextVersion) {
                     throw new RuntimeException("$className returned invalid version: $newVersion (expected $nextVersion)");

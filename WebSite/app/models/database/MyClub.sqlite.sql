@@ -338,13 +338,13 @@ CREATE TABLE IF NOT EXISTS "Person" (
 	"InPresentationDirectory"	INTEGER NOT NULL DEFAULT 0,
 	"ShowPhoneInPresentationDirectory"	INTEGER NOT NULL DEFAULT 0 CHECK("ShowPhoneInPresentationDirectory" IN (0, 1)),
 	"ShowEmailInPresentationDirectory"	INTEGER NOT NULL DEFAULT 0 CHECK("ShowEmailInPresentationDirectory" IN (0, 1)),
+	"MyPublicDataInPresentationDirectory"	TEXT,
 	"Location"	TEXT,
 	"LastSignIn"	TEXT,
 	"LastSignOut"	TEXT,
 	"Notepad"	TEXT,
 	"Alert"	TEXT,
 	"MemberInfo"	TEXT DEFAULT '',
-	"MyPublicDataInPresentationDirectory"	TEXT,
 	PRIMARY KEY("Id")
 );
 CREATE TABLE IF NOT EXISTS "PersonGroup" (
@@ -411,6 +411,7 @@ INSERT INTO "Authorization" VALUES (8,'VisitorInsights');
 INSERT INTO "Authorization" VALUES (9,'MenuDesigner');
 INSERT INTO "Authorization" VALUES (10,'KanbanDesigner');
 INSERT INTO "Authorization" VALUES (11,'Translator');
+INSERT INTO "Authorization" VALUES (12,'CommunicationManager');
 INSERT INTO "Group" VALUES (1,'Webmaster',0,0);
 INSERT INTO "GroupAuthorization" VALUES (1,1,1);
 INSERT INTO "Languages" VALUES (1,'select_language','Select language','Sélectionner la langue',' ');
@@ -627,7 +628,8 @@ INSERT INTO "Languages" VALUES (53,'Help_Admin','<div class="container my-3">
 </div>',' ');
 INSERT INTO "Languages" VALUES (54,'Help_Designer','Designer help','Aide designer',' ');
 INSERT INTO "Languages" VALUES (55,'Help_EventManager','Event manager help','Aide gestionnaire d''événements',' ');
-INSERT INTO "Languages" VALUES (56,'Help_Home','<div class="container my-5">
+INSERT INTO "Languages" VALUES (56,'Help_Home','
+<div class="container my-5">
     <header class="mb-5 border-bottom pb-3">
         <h1 class="display-5 fw-bold text-primary">Contextual Help: MyClub</h1>
         <p class="lead">Simplify the management of your association in just a few clicks.</p>
@@ -757,11 +759,13 @@ INSERT INTO "Languages" VALUES (56,'Help_Home','<div class="container my-5">
 </div>
 <div class="mt-4 text-center text-muted">
 In the footer, 
-  <strong><a href="https://myclub.alwaysdata.net/navbar/show/article/28">Tutorials</a></strong> will take you to the 
+  <strong><a href="https://myclub.alwaysdata.net/menu/show/article/28">Tutorials</a></strong> will take you to the 
   <strong><i><u>MyClub</u></i></strong> website. 
   There you will find <strong>videos</strong>, <strong>articles</strong>, 
   a <strong>dictionary</strong>, and other resources to support you.
-</div>','<div class="container my-5">
+</div>
+','
+<div class="container my-5">
     <header class="mb-5 border-bottom pb-3">
         <h1 class="display-5 fw-bold text-primary">Aide Contextuelle : MyClub</h1>
         <p class="lead">Simplifiez la gestion de votre vie associative en quelques clics.</p>
@@ -769,7 +773,7 @@ In the footer,
     <section class="mb-5">
         <div class="card shadow-sm">
             <div class="card-body">
-                <h2 class="card-title h4 mb-4">Présentation de l''''application</h2>
+                <h2 class="card-title h4 mb-4">Présentation de l''application</h2>
 
                 <div class="row g-4">
                     <div class="col-md-6">
@@ -814,7 +818,7 @@ In the footer,
                             <div>
                                 <strong>Préférences &amp; Filtres</strong>
                                 <p class="text-muted small">
-                                    Paramétrez vos types d''''événements favoris et vos disponibilités pour un affichage sur mesure.
+                                    Paramétrez vos types d''événements favoris et vos disponibilités pour un affichage sur mesure.
                                 </p>
                             </div>
                         </div>
@@ -847,23 +851,23 @@ In the footer,
     </section>
     <hr class="my-5">
     <section>
-        <h2 class="h4 mb-4">Ce qu''''il faut retenir</h2>
+        <h2 class="h4 mb-4">Ce qu''il faut retenir</h2>
         <p class="text-muted">
-            La navigation se fait principalement via la barre située en haut de l''''écran.
+            La navigation se fait principalement via la barre située en haut de l''écran.
         </p>
 
         <div class="list-group">
             <div class="list-group-item d-flex align-items-center">
                 <span class="badge bg-secondary me-3">[Logo]</span>
                 <span>
-                    Situé en haut à gauche, il vous ramène instantanément sur la <strong>page d''''accueil</strong>.
+                    Situé en haut à gauche, il vous ramène instantanément sur la <strong>page d''accueil</strong>.
                 </span>
             </div>
 
             <div class="list-group-item d-flex align-items-center">
                 <i class="bi bi-list fs-3 me-3"></i>
                 <span>
-                    <strong>Menu Burger :</strong> Sur mobile, en haut à droite, il permet d''''afficher les options de navigation masquées.
+                    <strong>Menu Burger :</strong> Sur mobile, en haut à droite, il permet d''afficher les options de navigation masquées.
                 </span>
             </div>
 
@@ -885,7 +889,7 @@ In the footer,
             <div class="list-group-item d-flex align-items-center bg-light">
                 <i class="bi bi-question-circle-fill fs-3 text-warning me-3"></i>
                 <span>
-                    <strong>Aide :</strong> C''''est ici que vous trouverez toutes les informations pour naviguer sur MyClub.
+                    <strong>Aide :</strong> C''est ici que vous trouverez toutes les informations pour naviguer sur MyClub.
                 </span>
             </div>
         </div>
@@ -893,11 +897,148 @@ In the footer,
 </div>
 <div class="mt-4 text-center text-muted">
 En pied de page 
-  <strong><a href="https://myclub.alwaysdata.net/navbar/show/article/28">Tutoriels</a></strong> vous conduit vers le site de 
+  <strong><a href="https://myclub.alwaysdata.net/menu/show/article/28">Tutoriels</a></strong> vous conduit vers le site de 
   <strong><i><u>MyClub</u></i></strong>. 
   Vous y trouverez des <strong>vidéos</strong>, des <strong>articles</strong>, 
   un <strong>dictionnaire</strong> et d’autres ressources pour vous accompagner.
-</div>',' ');
+</div>
+','
+<div class="container my-5">
+    <header class="mb-5 border-bottom pb-3">
+        <h1 class="display-5 fw-bold text-primary">Pomoc kontekstowa: MyClub</h1>
+        <p class="lead">Uprość zarządzanie swoim stowarzyszeniem w kilku kliknięciach.</p>
+    </header>
+    <section class="mb-5">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h2 class="card-title h4 mb-4">Przegląd aplikacji</h2>
+
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <div class="d-flex align-items-start mb-3">
+                            <div class="bg-primary text-white rounded p-2 me-3">
+                                <i class="bi bi-shield-lock-fill"></i>
+                            </div>
+                            <div>
+                                <strong>Bezpieczne logowanie</strong>
+                                <p class="text-muted small">
+                                    Logowanie za pomocą adresu e-mail.
+                                    <span class="d-block mt-1 text-dark">
+                                        👉 <em>Pierwsze logowanie? Użyj opcji "Utwórz / zmień hasło", aby aktywować swoje konto.</em>
+                                    </span>
+                                </p>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-start mb-3">
+                            <div class="bg-primary text-white rounded p-2 me-3">
+                                <i class="bi bi-newspaper"></i>
+                            </div>
+                            <div>
+                                <strong>Przeglądanie artykułów</strong>
+                                <p class="text-muted small">
+                                    Czytaj i udostępniaj wiadomości tworzone przez społeczność.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-start">
+                            <div class="bg-primary text-white rounded p-2 me-3">
+                                <i class="bi bi-calendar-check"></i>
+                            </div>
+                            <div>
+                                <strong>Zarządzanie wydarzeniami</strong>
+                                <p class="text-muted small">
+                                    Zapisuj się na wydarzenia i synchronizuj je ze swoim kalendarzem.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="d-flex align-items-start mb-3">
+                            <div class="bg-primary text-white rounded p-2 me-3">
+                                <i class="bi bi-sliders"></i>
+                            </div>
+                            <div>
+                                <strong>Preferencje i filtry</strong>
+                                <p class="text-muted small">
+                                    Ustaw ulubione typy wydarzeń oraz dostępność, aby uzyskać spersonalizowany widok.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-start mb-3">
+                            <div class="bg-primary text-white rounded p-2 me-3">
+                                <i class="bi bi-people-fill"></i>
+                            </div>
+                            <div>
+                                <strong>Grupy i zasoby</strong>
+                                <p class="text-muted small">
+                                    Dołącz do określonych grup, aby uzyskać dostęp do ich zasobów.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-start">
+                            <div class="bg-primary text-white rounded p-2 me-3">
+                                <i class="bi bi-person-badge"></i>
+                            </div>
+                            <div>
+                                <strong>Katalog członków</strong>
+                                <p class="text-muted small">
+                                    Przedstaw się innym członkom, uzupełniając swój profil.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <hr class="my-5">
+    <section>
+        <h2 class="h4 mb-4">Najważniejsze informacje</h2>
+        <p class="text-muted">
+            Nawigacja odbywa się głównie za pomocą paska menu u góry ekranu.
+        </p>
+        <div class="list-group">
+            <div class="list-group-item d-flex align-items-center">
+                <span class="badge bg-secondary me-3">[Logo]</span>
+                <span>
+                    Znajduje się w lewym górnym rogu i przenosi Cię bezpośrednio na <strong>stronę główną</strong>.
+                </span>
+            </div>
+            <div class="list-group-item d-flex align-items-center">
+                <i class="bi bi-list fs-3 me-3"></i>
+                <span>
+                    <strong>Menu Burger:</strong> Na urządzeniach mobilnych, w prawym górnym rogu, pokazuje ukryte opcje nawigacji.
+                </span>
+            </div>
+            <div class="list-group-item d-flex align-items-center">
+                <span class="fs-3 me-3">👻</span>
+                <span><strong>Tryb publiczny:</strong> Nie jesteś zalogowany. Dostęp tylko do zasobów publicznych.</span>
+            </div>
+            <div class="list-group-item d-flex align-items-center">
+                <span class="fs-3 me-3">😊</span>
+                <span><strong>Tryb członka:</strong> Jesteś zalogowany. Pełny dostęp do zasobów Twoich grup.</span>
+            </div>
+            <div class="list-group-item d-flex align-items-center">
+                <i class="bi bi-box-arrow-right fs-3 text-warning me-3"></i>
+                <span><strong>Wylogowanie:</strong> Kliknij tutaj, aby bezpiecznie zakończyć sesję.</span>
+            </div>
+            <div class="list-group-item d-flex align-items-center bg-light">
+                <i class="bi bi-question-circle-fill fs-3 text-warning me-3"></i>
+                <span>
+                    <strong>Pomoc:</strong> Tutaj znajdziesz wszystkie informacje potrzebne do korzystania z MyClub.
+                </span>
+            </div>
+        </div>
+    </section>
+</div>
+<div class="mt-4 text-center text-muted">
+W stopce strony 
+  <strong><a href="https://myclub.alwaysdata.net/menu/show/article/28">Samouczki</a></strong> prowadzą do strony 
+  <strong><i><u>MyClub</u></i></strong>. 
+  Znajdziesz tam <strong>wideo</strong>, <strong>artykuły</strong>, 
+  <strong>słownik</strong> oraz inne materiały pomocnicze.
+</div>
+');
 INSERT INTO "Languages" VALUES (57,'Help_PersonManager','People manager help','Aide gestionnaire de personnes',' ');
 INSERT INTO "Languages" VALUES (58,'Help_Redactor','Redactor help','Aide rédateur',' ');
 INSERT INTO "Languages" VALUES (59,'Help_User','User help','Aide utilisateur',' ');
@@ -2028,8 +2169,37 @@ INSERT INTO "Languages" VALUES (235,'article.show.modal_survey_title','Reply to 
 INSERT INTO "Languages" VALUES (236,'article.show.modal_survey_loading','Loading survey...','Chargement du sondage...','Ładowanie ankiety...');
 INSERT INTO "Languages" VALUES (237,'article.show.modal_order_title','Reply to order','Répondre à la commande','Odpowiedz na zamówienie');
 INSERT INTO "Languages" VALUES (238,'article.show.modal_order_loading','Loading order...','Chargement de la commande...','Ładowanie zamówienia...');
-INSERT INTO "Metadata" VALUES (1,'MyClub',23,0,1000000,NULL,10,36,6,NULL,0,NULL);
-INSERT INTO "Person" VALUES (1,'webmaster@myclub.foo','e427c26faca947919b18b797bc143a35100e4de48c34b70b26202d3a7d8e51f7','my first name','my last name','my nick name or nothing',NULL,'0',NULL,NULL,NULL,NULL,NULL,0,0,NULL,NULL,'2025-01-01',0,0,0,NULL,NULL,NULL,NULL,NULL,'',NULL);
+INSERT INTO "Languages" VALUES (239,'communication.index.title','Communication Manager','Gestionnaire de communication','Menedżer komunikacji');
+INSERT INTO "Languages" VALUES (240,'communication.index.today','Today','Aujourd''hui','Dzisiaj');
+INSERT INTO "Languages" VALUES (241,'communication.index.this_month','This month','Ce mois','Ten miesiąc');
+INSERT INTO "Languages" VALUES (242,'communication.index.dest','dest.','dest.','odb.');
+INSERT INTO "Languages" VALUES (243,'communication.index.send','Send','Envoyer','Wyślij');
+INSERT INTO "Languages" VALUES (244,'communication.index.cancel','Cancel','Annuler','Anuluj');
+INSERT INTO "Languages" VALUES (245,'communication.index.filter_members','Filter members','Filtrer les membres','Filtruj członków');
+INSERT INTO "Languages" VALUES (246,'communication.index.group','Group','Groupe','Grupa');
+INSERT INTO "Languages" VALUES (247,'communication.index.all_members','— All members —','— Tous les membres —','— Wszyscy członkowie —');
+INSERT INTO "Languages" VALUES (248,'communication.index.password','Password','Mot de passe','Hasło');
+INSERT INTO "Languages" VALUES (249,'communication.index.filter_all','All','Tous','Wszyscy');
+INSERT INTO "Languages" VALUES (250,'communication.index.filter_created','Created','Créé','Utworzone');
+INSERT INTO "Languages" VALUES (251,'communication.index.filter_not_created','Not created','Non créé','Nie utworzone');
+INSERT INTO "Languages" VALUES (252,'communication.index.presentation','Presentation','Présentation','Prezentacja');
+INSERT INTO "Languages" VALUES (253,'communication.index.filter_filled','Filled','Renseignée','Uzupełniona');
+INSERT INTO "Languages" VALUES (254,'communication.index.filter_not_filled','Not filled','Non renseignée','Nieuzupełniona');
+INSERT INTO "Languages" VALUES (255,'communication.index.in_public_map','In the public map','Dans la carte publique','Na publicznej mapie');
+INSERT INTO "Languages" VALUES (256,'communication.index.filter_yes','Yes','Oui','Tak');
+INSERT INTO "Languages" VALUES (257,'communication.index.filter_no','No','Non','Nie');
+INSERT INTO "Languages" VALUES (258,'communication.index.refresh','Refresh','Actualiser','Odśwież');
+INSERT INTO "Languages" VALUES (259,'communication.index.select_all','Select all','Tout sél.','Zaznacz wszystko');
+INSERT INTO "Languages" VALUES (260,'communication.index.subject','Subject','Objet','Temat');
+INSERT INTO "Languages" VALUES (261,'communication.index.subject_placeholder','Message subject…','Objet du message…','Temat wiadomości…');
+INSERT INTO "Languages" VALUES (262,'communication.index.content','Content','Contenu','Treść');
+INSERT INTO "Languages" VALUES (263,'communication.index.modal_confirm_title','Confirm sending','Confirmer l''envoi','Potwierdź wysyłkę');
+INSERT INTO "Languages" VALUES (264,'communication.index.modal_cancel','Cancel','Annuler','Anuluj');
+INSERT INTO "Languages" VALUES (265,'communication.index.modal_confirm','Confirm','Confirmer','Potwierdź');
+INSERT INTO "Languages" VALUES (266,'communication.index.sending','Sending…','Envoi en cours…','Wysyłanie…');
+INSERT INTO "Languages" VALUES (267,'navbar.admin.communication_manager','Communication Manager','Gestionnaire de communication','Menedżer komunikacji');
+INSERT INTO "Metadata" VALUES (1,'MyClub',24,0,1000000,NULL,10,36,6,NULL,0,NULL);
+INSERT INTO "Person" VALUES (1,'webmaster@myclub.foo','e427c26faca947919b18b797bc143a35100e4de48c34b70b26202d3a7d8e51f7','my first name','my last name','my nick name or nothing',NULL,'0',NULL,NULL,NULL,NULL,NULL,0,0,NULL,NULL,'2025-01-01',0,0,0,NULL,NULL,NULL,NULL,NULL,NULL,'');
 INSERT INTO "PersonGroup" VALUES (1,1,1);
 INSERT INTO "Settings" VALUES (1,'Title','title');
 INSERT INTO "Settings" VALUES (2,'LegalNotices','LegalNotices');

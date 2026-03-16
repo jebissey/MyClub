@@ -42,6 +42,7 @@ use app\modules\Article\SurveyController;
 use app\modules\Common\services\AuthenticationService;
 use app\modules\Common\services\CredentialService;
 use app\modules\Common\services\EmailService;
+use app\modules\Communication\CommunicationController;
 use app\modules\Designer\DesignController;
 use app\modules\Designer\DesignerController;
 use app\modules\Designer\MenuItemController;
@@ -142,6 +143,15 @@ class ControllerFactory
     public function makeDbBrowserController(): DbBrowserController
     {
         return new DbBrowserController($this->application, $this->dbBrowserDataHelper);
+    }
+
+    public function makeCommunicationController(): CommunicationController
+    {
+        return new CommunicationController(
+            $this->application,
+            $this->emailService,
+            $this->personDataHelper,
+        );
     }
 
     public function makeContactController(): ContactController

@@ -22,4 +22,13 @@ final readonly class SmtpConfig
         public ?int    $dailyLimit     = null,
         public ?int    $monthlyLimit   = null,
     ) {}
+
+    public function getSenderAddress(string $connectedUserEmail): string
+    {
+        return match ($this->method) {
+            'smtp'    => $this->username,
+            'mailjet' => $this->senderEmail,
+            default   => $connectedUserEmail,
+        };
+    }
 }

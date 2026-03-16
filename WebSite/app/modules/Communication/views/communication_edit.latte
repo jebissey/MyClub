@@ -1,0 +1,199 @@
+{layout '../../Common/views/layout.latte'}
+
+{block head}
+<style>
+    /* TinyMCE ne peut pas être piloté via classes Bootstrap */
+    .tox-tinymce { height: 100% !important; }
+</style>
+{/block}
+
+{block navbar}
+<div class="container-fluid d-flex align-items-center gap-3">
+    {include '../../Webmaster/views/navbar/_userLeft.latte'}
+
+    <div class="ms-auto d-flex align-items-center gap-3 flex-wrap">
+        <div class="d-flex flex-column gap-1 px-2 py-1 rounded bg-dark-subtle" style="min-width:180px">
+            <div class="d-flex align-items-center gap-2 small">
+                <span class="flex-shrink-0">{='communication.index.today'|translate}</span>
+                <div class="progress flex-grow-1" style="height:6px">
+                    <div id="quota-daily-bar" class="progress-bar" style="width:0%"></div>
+                </div>
+                <span id="quota-daily-text" class="flex-shrink-0 fw-semibold">0</span>
+            </div>
+            <div class="d-flex align-items-center gap-2 small">
+                <span class="flex-shrink-0">{='communication.index.this_month'|translate}</span>
+                <div class="progress flex-grow-1" style="height:6px">
+                    <div id="quota-monthly-bar" class="progress-bar" style="width:0%"></div>
+                </div>
+                <span id="quota-monthly-text" class="flex-shrink-0 fw-semibold">0</span>
+            </div>
+        </div>
+        <div class="d-flex align-items-center gap-1">
+            <span class="badge bg-primary fs-6" id="recipient-count">0</span>
+            <span class="text-muted small">{='communication.index.dest'|translate}</span>
+        </div>
+
+        <button type="button" id="btn-send" class="btn btn-success" disabled>
+            <i class="bi bi-send"></i> {='communication.index.send'|translate}
+        </button>
+        <a href="/admin" class="btn btn-secondary">
+            <i class="bi bi-x-circle"></i> {='communication.index.cancel'|translate}
+        </a>
+    </div>
+</div>
+{/block}
+
+{block content}
+<div class="container-fluid mt-3 d-flex flex-column" style="height:calc(100vh - 120px)">
+
+    <h2 class="mb-3 flex-shrink-0">
+        <i class="bi bi-envelope-paper"></i> {='communication.index.title'|translate}
+    </h2>
+
+    <div id="quota-alert" class="alert d-none py-2 flex-shrink-0" role="alert">
+        <i class="bi bi-exclamation-triangle-fill"></i>
+        <span id="quota-alert-text"></span>
+    </div>
+
+    <div class="d-grid flex-grow-1 gap-3" style="grid-template-columns:360px 1fr;min-height:0">
+
+        {* ── Panneau gauche ── *}
+        <div class="d-flex flex-column gap-3" style="min-height:0">
+            <div class="card shadow-sm flex-shrink-0">
+                <div class="card-header py-2 fw-semibold">
+                    <i class="bi bi-funnel"></i> {='communication.index.filter_members'|translate}
+                </div>
+                <div class="card-body py-2">
+                    <div class="mb-2">
+                        <label for="group-select" class="form-label mb-1 small fw-medium">{='communication.index.group'|translate}</label>
+                        <select id="group-select" class="form-select form-select-sm">
+                            <option value="">{='communication.index.all_members'|translate}</option>
+                            {foreach $groups as $group}
+                            <option value="{$group->Id}">{$group->Name}</option>
+                            {/foreach}
+                        </select>
+                    </div>
+
+                    <div class="mb-2">
+                        <label class="form-label mb-1 small fw-medium">{='communication.index.password'|translate}</label>
+                        <div class="btn-group btn-group-sm w-100" role="group">
+                            <input type="radio" class="btn-check" name="filter-password" id="pw-any" value="" checked>
+                            <label class="btn btn-outline-secondary" for="pw-any">{='communication.index.filter_all'|translate}</label>
+                            <input type="radio" class="btn-check" name="filter-password" id="pw-yes" value="1">
+                            <label class="btn btn-outline-success" for="pw-yes">{='communication.index.filter_created'|translate}</label>
+                            <input type="radio" class="btn-check" name="filter-password" id="pw-no" value="0">
+                            <label class="btn btn-outline-danger" for="pw-no">{='communication.index.filter_not_created'|translate}</label>
+                        </div>
+                    </div>
+
+                    <div class="mb-2">
+                        <label class="form-label mb-1 small fw-medium">{='communication.index.presentation'|translate}</label>
+                        <div class="btn-group btn-group-sm w-100" role="group">
+                            <input type="radio" class="btn-check" name="filter-presentation" id="fp-any" value="" checked>
+                            <label class="btn btn-outline-secondary" for="fp-any">{='communication.index.filter_all'|translate}</label>
+                            <input type="radio" class="btn-check" name="filter-presentation" id="fp-yes" value="1">
+                            <label class="btn btn-outline-success" for="fp-yes">{='communication.index.filter_filled'|translate}</label>
+                            <input type="radio" class="btn-check" name="filter-presentation" id="fp-no" value="0">
+                            <label class="btn btn-outline-danger" for="fp-no">{='communication.index.filter_not_filled'|translate}</label>
+                        </div>
+                    </div>
+
+                    <div class="mb-2">
+                        <label class="form-label mb-1 small fw-medium">{='communication.index.in_public_map'|translate}</label>
+                        <div class="btn-group btn-group-sm w-100" role="group">
+                            <input type="radio" class="btn-check" name="filter-in-public-map" id="inpm-any" value="" checked>
+                            <label class="btn btn-outline-secondary" for="inpm-any">{='communication.index.filter_all'|translate}</label>
+                            <input type="radio" class="btn-check" name="filter-in-public-map" id="inpm-yes" value="1">
+                            <label class="btn btn-outline-success" for="inpm-yes">{='communication.index.filter_yes'|translate}</label>
+                            <input type="radio" class="btn-check" name="filter-in-public-map" id="inpm-no" value="0">
+                            <label class="btn btn-outline-danger" for="inpm-no">{='communication.index.filter_no'|translate}</label>
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="button" id="btn-apply-filter" class="btn btn-sm btn-primary flex-grow-1">
+                            <i class="bi bi-arrow-clockwise"></i> {='communication.index.refresh'|translate}
+                        </button>
+                        <button type="button" id="btn-select-all" class="btn btn-sm btn-outline-secondary">
+                            <i class="bi bi-check2-all"></i> {='communication.index.select_all'|translate}
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+            <div class="flex-grow-1 overflow-auto border rounded bg-white" style="min-height:0">
+                <ul class="list-group list-group-flush" id="member-ul">
+                    {* Chargé via POST /api/communication/members au clic sur Actualiser *}
+                </ul>
+            </div>
+        </div>
+
+        {* ── Panneau droit ── *}
+        <div class="d-flex flex-column gap-3" style="min-height:0">
+            <div class="card shadow-sm flex-shrink-0">
+                <div class="card-body py-2">
+                    <label for="email-subject" class="form-label mb-1 fw-semibold">
+                        <i class="bi bi-card-heading"></i> {='communication.index.subject'|translate} <span class="text-danger">*</span>
+                    </label>
+                    <input type="text" id="email-subject" class="form-control"
+                           placeholder="{='communication.index.subject_placeholder'|translate}" maxlength="255" required>
+                </div>
+            </div>
+
+            <div class="d-flex flex-column flex-grow-1" style="min-height:0">
+                <label class="form-label fw-semibold flex-shrink-0 mb-1">
+                    <i class="bi bi-body-text"></i> {='communication.index.content'|translate} <span class="text-danger">*</span>
+                </label>
+                <textarea id="tinymce-email"></textarea>
+            </div>
+        </div>
+    </div>
+</div>
+
+{* ── Modal confirmation ── *}
+<div class="modal fade" id="modal-confirm" tabindex="-1" aria-labelledby="modal-confirm-label" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modal-confirm-label">
+                    <i class="bi bi-send"></i> {='communication.index.modal_confirm_title'|translate}
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="modal-confirm-body"></div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{='communication.index.modal_cancel'|translate}</button>
+                <button type="button" class="btn btn-success" id="btn-confirm-send">
+                    <i class="bi bi-send-check"></i> {='communication.index.modal_confirm'|translate}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{* ── Overlay ── *}
+<div id="loading-overlay"
+     class="position-fixed top-0 start-0 w-100 h-100 d-none align-items-center justify-content-center bg-dark bg-opacity-50"
+     style="z-index:9999">
+    <div class="text-center text-white">
+        <div class="spinner-border mb-2" style="width:3rem;height:3rem;" role="status"></div>
+        <div>{='communication.index.sending'|translate}</div>
+    </div>
+</div>
+
+{* ── Toast ── *}
+<div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index:9998">
+    <div id="result-toast" class="toast align-items-center border-0 text-white" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body" id="toast-body"></div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    </div>
+</div>
+{/block}
+
+{block scripts}
+    <script src="/app/modules/Common/js/tinymce/tinymce.min.js"></script>
+    <script src="/app/modules/Common/js/tinymce-config.js"></script>
+    <script type="module" src="/app/modules/Communication/js/main.js"></script>
+{/block}

@@ -137,6 +137,53 @@ class PersonDataHelper extends Data implements NewsProviderInterface
         return $news;
     }
 
+    public function getPersonsForCommunication(
+        ?int  $groupId,
+        ?bool $presentation = null,
+        ?bool $password     = null,
+        ?bool $inPublicMap  = null,
+    ): array {
+        $joins  = '';
+        $wheres = ['p.Inactivated = 0', "p.Email != ''"];
+        $params = [];
+
+        if ($groupId !== null) {
+            $joins     = 'INNER JOIN PersonGroup pg ON pg.IdPerson = p.Id';
+            $wheres[]  = 'pg.IdGroup = :groupId';
+            $params[':groupId'] = $groupId;
+        }
+
+        if ($presentation === true) {
+            $wheres[] = 'p.InPresentationDirectory = 1';
+        } elseif ($presentation === false) {
+            $wheres[] = 'p.InPresentationDirectory = 0';
+        }
+
+        if ($password === true) {
+            $wheres[] = "(p.Password IS NOT NULL AND p.Password != '')";
+        } elseif ($password === false) {
+            $wheres[] = "(p.Password IS NULL OR p.Password = '')";
+        }
+
+        if ($inPublicMap === true) {
+            $wheres[] = "(p.MyPublicDataInPresentationDirectory IS NOT NULL AND p.MyPublicDataInPresentationDirectory <> '')";
+        } elseif ($inPublicMap === false) {
+            $wheres[] = "(p.MyPublicDataInPresentationDirectory IS NULL OR p.MyPublicDataInPresentationDirectory = '')";
+        }
+
+        $where = implode(' AND ', $wheres);
+        $sql = "
+            SELECT DISTINCT p.Id, p.FirstName, p.LastName, p.Email
+            FROM Person p
+            $joins
+            WHERE $where
+            ORDER BY p.FirstName, p.LastName";
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($params);
+        return $stmt->fetchAll(PDO::FETCH_OBJ);
+    }
+
     public function getPersonsInGroup(?int $idGroup): array
     {
         $innerJoin = $and = '';

@@ -117,7 +117,7 @@ class LogDataHelper extends Data
                 COUNT(*) AS visits,
                 CASE
                     WHEN Uri LIKE "/article/%" THEN CAST(substr(Uri, 10) AS INTEGER)
-                    WHEN Uri LIKE "/navbar/show/article/%" THEN CAST(substr(Uri, 22) AS INTEGER)
+                    WHEN Uri LIKE "/menu/show/article/%" THEN CAST(substr(Uri, 22) AS INTEGER)
                     ELSE NULL
                 END AS articleId
             FROM Log
@@ -125,7 +125,7 @@ class LogDataHelper extends Data
                 AND (
                     (Uri LIKE "/article/%" AND Uri GLOB "/article/[0-9]*" AND Uri NOT LIKE "/article/%/%")
                     OR
-                    (Uri LIKE "/navbar/show/article/%" AND Uri GLOB "/navbar/show/article/[0-9]*" AND Uri NOT LIKE "/navbar/show/article/%/%")
+                    (Uri LIKE "/menu/show/article/%" AND Uri GLOB "/menu/show/article/[0-9]*" AND Uri NOT LIKE "/menu/show/article/%/%")
                 )
             GROUP BY Uri
             ORDER BY visits DESC

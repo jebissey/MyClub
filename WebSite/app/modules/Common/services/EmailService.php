@@ -23,6 +23,11 @@ final class EmailService
         private readonly ?EmailQuotaTrackerInterface  $quotaTracker,
     ) {}
 
+    public function getSmtpConfig(): ?SmtpConfig
+    {
+        return $this->configProvider?->get();
+    }
+    
     public function send(EmailMessage $message): bool
     {
         $count  = 1 + count($message->cc) + count($message->bcc);

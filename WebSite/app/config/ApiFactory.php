@@ -6,6 +6,7 @@ namespace app\config;
 
 use app\apis\ArticleApi;
 use app\apis\CarouselApi;
+use app\apis\CommunicationApi;
 use app\apis\EventApi;
 use app\apis\EventAttributeApi;
 use app\apis\EventNeedApi;
@@ -48,6 +49,7 @@ use app\models\SharedFileDataHelper;
 use app\modules\Common\services\CredentialService;
 use app\modules\Common\services\EmailService;
 use app\modules\Common\services\EventService;
+use app\modules\Common\services\JsonEmailQuotaTracker;
 use app\modules\Common\services\MessageRecipientService;
 
 class ApiFactory
@@ -65,6 +67,7 @@ class ApiFactory
         private EventDataHelper $eventDataHelper,
         private EventNeedDataHelper $eventNeedDataHelper,
         private EventService $eventService,
+        private JsonEmailQuotaTracker $quotaTracker,
         private KanbanDataHelper $kanbanDataHelper,
         private KaraokeDataHelper $karaokeDataHelper,
         private LogDataWriterHelper $logDataWriterHelper,
@@ -101,6 +104,18 @@ class ApiFactory
             $this->personDataHelper,
             $this->authorizationDataHelper,
             $this->carouselDataHelper
+        );
+    }
+
+    public function makeCommunicationApi(): CommunicationApi
+    {
+        return new CommunicationApi(
+            $this->application,
+            $this->connectedUser,
+            $this->dataHelper,
+            $this->personDataHelper,
+            $this->emailService,
+            $this->quotaTracker
         );
     }
 

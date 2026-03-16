@@ -66,21 +66,14 @@
 
 {block content}
 <div class="container-fluid mt-3">
-
     <h1 class="mb-3">Mon calepin numérique</h1>
-
     <div class="editor-wrapper">
-
         <form id="edit-form" method="post">
-
             <div class="editor-container">
                 <textarea name="content" id="tinymce">{if isset($notepad)}{$notepad|noescape}{/if}</textarea>
             </div>
-
         </form>
-
     </div>
-
 </div>
 {/block}
 

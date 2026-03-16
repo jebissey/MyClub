@@ -50,6 +50,7 @@ class ConnectedUser
                 'userImg' => WebApp::getUserImg($this->person, new GravatarHandler()),
                 'userEmail' => $this->person->Email,
                 'isAdmin' => $this->isAdministrator(),
+                'isCommunicationManager' => $this->isCommunicationManager(),
                 'isDesigner' => $this->isDesigner(),
                 'isEditor' => $this->isEditor(),
                 'isEventDesigner' => $this->isEventDesigner(),
@@ -85,6 +86,11 @@ class ConnectedUser
     {
         return $this->isDesigner() || $this->isEditor() || $this->isEventManager() || $this->isPersonManager()
             || $this->isRedactor() || $this->isVisitorInsights() || $this->isWebmaster();
+    }
+
+    public function isCommunicationManager(): bool
+    {
+        return in_array(Authorization::CommunicationManager->value, $this->authorizations ?? []);
     }
 
     public function isDesigner(): bool

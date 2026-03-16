@@ -47,6 +47,7 @@ class Params
             'userImg' => '👻',
             'userEmail' => '',
             'isAdmin' => false,
+            'isCommunicationManager' => false,
             'isEditor' => false,
             'isEventDesigner' => false,
             'isEventManager' => false,
