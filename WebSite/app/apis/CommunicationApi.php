@@ -59,12 +59,14 @@ class CommunicationApi extends AbstractApi
             $presentation = isset($data['presentation']) ? (bool)$data['presentation'] : null;
             $password     = isset($data['password'])     ? (bool)$data['password']     : null;
             $inPublicMap  = isset($data['inPublicMap'])  ? (bool)$data['inPublicMap']  : null;
+            $desactivated = isset($data['desactivated']) ? (bool)$data['desactivated'] : null;
 
             $members = $this->personDataHelper->getPersonsForCommunication(
                 groupId     : isset($data['groupId']) ? (int)$data['groupId'] : null,
                 presentation: $presentation,
                 password    : $password,
                 inPublicMap : $inPublicMap,
+                desactivated: $desactivated,
             );
 
             $this->renderJsonOk([

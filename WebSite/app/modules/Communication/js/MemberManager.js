@@ -17,10 +17,11 @@ export default class MemberManager {
 
     async load() {
         const data = await api.post('/api/communication/members', {
-            groupId     : document.getElementById('group-select').value || null,
-            presentation: this.#readTriState('filter-presentation'),
-            inPublicMap : this.#readTriState('filter-in-public-map'),
-            password    : this.#readTriState('filter-password'),
+            groupId      : document.getElementById('group-select').value || null,
+            presentation : this.#readTriState('filter-presentation'),
+            inPublicMap  : this.#readTriState('filter-in-public-map'),
+            password     : this.#readTriState('filter-password'),
+            desactivated : this.#readTriState('filter-desactivated-account'),
         });
 
         const members = data.data?.members;

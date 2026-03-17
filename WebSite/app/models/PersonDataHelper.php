@@ -142,9 +142,10 @@ class PersonDataHelper extends Data implements NewsProviderInterface
         ?bool $presentation = null,
         ?bool $password     = null,
         ?bool $inPublicMap  = null,
+        ?bool $desactivated = null
     ): array {
         $joins  = '';
-        $wheres = ['p.Inactivated = 0', "p.Email != ''"];
+        $wheres = ["p.Email != ''"];
         $params = [];
 
         if ($groupId !== null) {
@@ -169,6 +170,12 @@ class PersonDataHelper extends Data implements NewsProviderInterface
             $wheres[] = "(p.MyPublicDataInPresentationDirectory IS NOT NULL AND p.MyPublicDataInPresentationDirectory <> '')";
         } elseif ($inPublicMap === false) {
             $wheres[] = "(p.MyPublicDataInPresentationDirectory IS NULL OR p.MyPublicDataInPresentationDirectory = '')";
+        }
+
+        if ($desactivated === true) {
+            $wheres[] = "p.Inactivated = 1";
+        } elseif ($desactivated === null) {
+            $wheres[] = "p.Inactivated = 0";
         }
 
         $where = implode(' AND ', $wheres);

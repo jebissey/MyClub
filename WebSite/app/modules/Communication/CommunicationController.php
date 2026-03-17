@@ -106,7 +106,7 @@ class CommunicationController extends AbstractController
             'content'          => $message,
             'hasAuthorization' => $this->application->getConnectedUser()->hasAutorization() ?? false,
             'currentVersion'   => Application::VERSION,
-            'timer'            => 10000,
+            'timer'            => 30000,
             'previousPage'     => true,
             'page'             => $this->application->getConnectedUser()->getPage(),
         ]);

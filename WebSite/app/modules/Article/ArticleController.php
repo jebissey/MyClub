@@ -267,13 +267,14 @@ class ArticleController extends TableController
         $connectedUser = $this->application->getConnectedUser();
         $schema = [
             'PersonName' => FilterInputRule::PersonName->value,
-            'title' => FilterInputRule::Content->value,
-            'timestamp' => FilterInputRule::DateTime->value,
+            'title'      => FilterInputRule::Content->value,
+            'timestamp'  => FilterInputRule::DateTime->value,
             'lastUpdate' => FilterInputRule::DateTime->value,
-            'published' => ['oui', 'non'],
-            'pool' => ['oui', 'non'],
-            'GroupName' => FilterInputRule::HtmlSafeName->value,
-            'Content' => FilterInputRule::Content->value,
+            'published'  => ['oui', 'non'],
+            'pool'       => ['oui', 'non'],
+            'GroupName'  => FilterInputRule::HtmlSafeName->value,
+            'Content'    => FilterInputRule::Content->value,
+            'Id'         => FilterInputRule::Int->value,
         ];
         $filterValues = WebApp::filterInput($schema, $this->flight->request()->query->getData());
         $filterConfig = [
@@ -283,6 +284,7 @@ class ArticleController extends TableController
             ['name' => 'pool', 'label' => $this->languagesDataHelper->translate('article.label.pool')],
             ['name' => 'GroupName', 'label' => $this->languagesDataHelper->translate('article.label.group')],
             ['name' => 'Content', 'label' => $this->languagesDataHelper->translate('article.label.content')],
+            ['name' => 'Id', 'label' => 'ID'],
         ];
         if ($connectedUser->isEditor() || false) {
             $filterConfig[] = ['name' => 'published', 'label' => 'Publié'];
