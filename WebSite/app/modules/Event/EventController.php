@@ -85,7 +85,7 @@ class EventController extends AbstractController
     public function showEventCrosstab()
     {
         if (!($this->application->getConnectedUser()->isEventManager() ?? false)) {
-            $this->raiseforbidden(__FILE__, __LINE__);
+            $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
@@ -245,7 +245,7 @@ class EventController extends AbstractController
     public function help(): void
     {
         if (!($this->application->getConnectedUser()->isEventManager() ?? false)) {
-            $this->raiseforbidden(__FILE__, __LINE__);
+            $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
@@ -265,7 +265,7 @@ class EventController extends AbstractController
     public function home(): void
     {
         if (!($this->application->getConnectedUser()->isEventManager() ?? false)) {
-            $this->raiseforbidden(__FILE__, __LINE__);
+            $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
@@ -283,7 +283,7 @@ class EventController extends AbstractController
     public function showEventChat($eventId): void
     {
         if ($this->application->getConnectedUser()->person === null) {
-            $this->raiseforbidden(__FILE__, __LINE__);
+            $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'GET') {

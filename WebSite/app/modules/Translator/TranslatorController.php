@@ -23,7 +23,7 @@ class TranslatorController extends AbstractController
         $user = $this->application->getConnectedUser();
 
         if (!($user->isTranslator() ?? false)) {
-            $this->raiseforbidden(__FILE__, __LINE__);
+            $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
 

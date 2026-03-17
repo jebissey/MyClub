@@ -27,7 +27,7 @@ class UserNotificationsController extends AbstractController
     {
         $person = $this->application->getConnectedUser()->person;
         if ($person === null) {
-            $this->raiseforbidden(__FILE__, __LINE__);
+            $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
@@ -63,7 +63,7 @@ class UserNotificationsController extends AbstractController
     {
         $person = $this->application->getConnectedUser()->person;
         if ($person === null) {
-            $this->raiseforbidden(__FILE__, __LINE__);
+            $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {

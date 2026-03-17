@@ -25,7 +25,7 @@ class DesignController extends AbstractController
     public function index()
     {
         if (!($this->application->getConnectedUser()->isHomeDesigner() ?? false)) {
-            $this->raiseforbidden(__FILE__, __LINE__);
+            $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
         [$designs, $userVotes] = $this->designDataHelper->getUsersVotes($this->application->getConnectedUser()->person->Id);
@@ -41,7 +41,7 @@ class DesignController extends AbstractController
     public function create()
     {
         if (!($this->application->getConnectedUser()->isHomeDesigner() ?? false)) {
-            $this->raiseforbidden(__FILE__, __LINE__);
+            $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
@@ -57,7 +57,7 @@ class DesignController extends AbstractController
     public function save()
     {
         if (!($this->application->getConnectedUser()->isHomeDesigner() ?? false)) {
-            $this->raiseforbidden(__FILE__, __LINE__);
+            $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {

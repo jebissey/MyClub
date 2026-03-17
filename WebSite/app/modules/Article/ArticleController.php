@@ -73,14 +73,14 @@ class ArticleController extends TableController
                 'page' => $connectedUser->getPage(),
             ]));
         } else {
-            $this->raiseforbidden(__FILE__, __LINE__);
+            $this->raiseForbidden(__FILE__, __LINE__);
         }
     }
 
     public function create(): void
     {
         if (!($this->application->getConnectedUser()->isRedactor() ?? false)) {
-            $this->raiseforbidden(__FILE__, __LINE__);
+            $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
@@ -98,7 +98,7 @@ class ArticleController extends TableController
     public function delete(int $id): void
     {
         if (!($this->application->getConnectedUser()->isRedactor() || false)) {
-            $this->raiseforbidden(__FILE__, __LINE__);
+            $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -119,7 +119,7 @@ class ArticleController extends TableController
             $this->dataHelper->delete('Article', ['Id' => $id]);
             $this->redirect('/articles');
         } else {
-            $this->raiseforbidden(__FILE__, __LINE__);
+            $this->raiseForbidden(__FILE__, __LINE__);
         }
     }
 
@@ -143,14 +143,14 @@ class ArticleController extends TableController
         $article = $this->articleDataHelper->getLatestArticle([$id]);
 
         if ($connectedUser->person === null) {
-            $this->raiseforbidden(__FILE__, __LINE__);
+            $this->raiseForbidden(__FILE__, __LINE__);
             return;
         } else if ($connectedUser->person->Id !== $article->CreatedBy) {
             if ($this->authorizationService->canRead($id, $connectedUser)) {
                 $this->show($id);
                 return;
             } else {
-                $this->raiseforbidden(__FILE__, __LINE__);
+                $this->raiseForbidden(__FILE__, __LINE__);
                 return;
             }
         }
@@ -173,7 +173,7 @@ class ArticleController extends TableController
     public function fetchEmailsForArticle(int $idArticle): void
     {
         if (!($this->application->getConnectedUser()->isRedactor() ?? false)) {
-            $this->raiseforbidden(__FILE__, __LINE__);
+            $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
@@ -232,7 +232,7 @@ class ArticleController extends TableController
     public function help(): void
     {
         if (!($this->application->getConnectedUser()->isRedactor() ?? false)) {
-            $this->raiseforbidden(__FILE__, __LINE__);
+            $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
         $this->render('Common/views/info.latte', [
@@ -248,7 +248,7 @@ class ArticleController extends TableController
     public function home(): void
     {
         if (!($this->application->getConnectedUser()->isRedactor() ?? false)) {
-            $this->raiseforbidden(__FILE__, __LINE__);
+            $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
@@ -322,7 +322,7 @@ class ArticleController extends TableController
     public function publish(int $id): void
     {
         if (!($this->application->getConnectedUser()->isRedactor() ?? false)) {
-            $this->raiseforbidden(__FILE__, __LINE__);
+            $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
         if (!$this->dataHelper->get('Article', ['Id' => $id], 'Id')) {
@@ -331,7 +331,7 @@ class ArticleController extends TableController
         }
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (!$this->authorizationService->canPublish($id, $this->application->getConnectedUser())) {
-                $this->raiseforbidden(__FILE__, __LINE__);
+                $this->raiseForbidden(__FILE__, __LINE__);
                 return;
             }
             $schema = [
@@ -386,7 +386,7 @@ class ArticleController extends TableController
         try {
             $article = $this->authorizationDataHelper->getArticle($id, $connectedUser);
             if (!$article) {
-                $this->raiseforbidden(__FILE__, __LINE__);
+                $this->raiseForbidden(__FILE__, __LINE__);
                 return;
             }
             $article = $this->articleDataHelper->getLatestArticle([$id]);
@@ -421,7 +421,7 @@ class ArticleController extends TableController
     public function showArticleChat($articleId): void
     {
         if ($this->application->getConnectedUser()->person === null) {
-            $this->raiseforbidden(__FILE__, __LINE__);
+            $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
@@ -455,7 +455,7 @@ class ArticleController extends TableController
     public function showArticleCrosstab(): void
     {
         if (!($this->application->getConnectedUser()->isRedactor() || false)) {
-            $this->raiseforbidden(__FILE__, __LINE__);
+            $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
@@ -481,7 +481,7 @@ class ArticleController extends TableController
     public function update(int $id): void
     {
         if (!($this->application->getConnectedUser()->isRedactor() || false)) {
-            $this->raiseforbidden(__FILE__, __LINE__);
+            $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {

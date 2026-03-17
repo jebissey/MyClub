@@ -137,7 +137,7 @@ abstract class AbstractController
         $this->application->getErrorManager()->raise(ApplicationError::Error, "Error {$message} in file {$file} at line {$line}");
     }
 
-    protected function raiseforbidden(string $file, int $line): void
+    protected function raiseForbidden(string $file, int $line): void
     {
         $this->application->getErrorManager()->raise(ApplicationError::Forbidden, "Access forbidden in file {$file} at line {$line}");
     }
@@ -164,7 +164,7 @@ abstract class AbstractController
     {
         $user = $this->application->getConnectedUser();
         if (!$user || !$permissionCheck($user)) {
-            $this->raiseforbidden(__FILE__, __LINE__);
+            $this->raiseForbidden(__FILE__, __LINE__);
             return false;
         }
         if ($_SERVER['REQUEST_METHOD'] !== $method) {

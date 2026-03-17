@@ -29,7 +29,7 @@ class EventGuestController extends AbstractController
     public function guest(string $message = '', string $type = ''): void
     {
         if (!($this->application->getConnectedUser()->isEventManager() ?? false)) {
-            $this->raiseforbidden(__FILE__, __LINE__);
+            $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
         $events = $this->eventDataHelper->getEventsForAllOrGuest();
@@ -49,7 +49,7 @@ class EventGuestController extends AbstractController
     public function guestInvite()
     {
         if (!($this->application->getConnectedUser()->isEventManager() ?? false)) {
-            $this->raiseforbidden(__FILE__, __LINE__);
+            $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {

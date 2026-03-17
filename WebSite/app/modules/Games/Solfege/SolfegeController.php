@@ -19,7 +19,7 @@ class SolfegeController extends AbstractController
     public function learn(): void
     {
         if (!($this->application->getConnectedUser()->isEventDesigner() ?? false)) {
-            $this->raiseforbidden(__FILE__, __LINE__);
+            $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
 
@@ -33,7 +33,7 @@ class SolfegeController extends AbstractController
     public function saveScore(): void
     {
         if (!($this->application->getConnectedUser()->isEventDesigner() ?? false)) {
-            $this->raiseforbidden(__FILE__, __LINE__);
+            $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
 

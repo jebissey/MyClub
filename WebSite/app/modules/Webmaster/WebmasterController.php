@@ -59,7 +59,7 @@ class WebmasterController extends AbstractController
     {
         $connectedUser = $this->application->getConnectedUser();
         if (!($connectedUser->isAdministrator() ?? false)) {
-            $this->raiseforbidden(__FILE__, __LINE__);
+            $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
         if ($connectedUser->hasOnlyOneAutorization()) {

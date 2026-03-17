@@ -30,7 +30,7 @@ class GroupController extends AbstractController
     public function groupCreate(): void
     {
         if (!($this->application->getConnectedUser()->isGroupManager() ?? false)) {
-            $this->raiseforbidden(__FILE__, __LINE__);
+            $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
@@ -49,7 +49,7 @@ class GroupController extends AbstractController
     public function groupCreateSave(): void
     {
         if (!($this->application->getConnectedUser()->isGroupManager() ?? false)) {
-            $this->raiseforbidden(__FILE__, __LINE__);
+            $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -82,7 +82,7 @@ class GroupController extends AbstractController
     public function groupDelete(int $id): void
     {
         if (!($this->application->getConnectedUser()->isGroupManager() ?? false)) {
-            $this->raiseforbidden(__FILE__, __LINE__);
+            $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -106,7 +106,7 @@ class GroupController extends AbstractController
     public function groupEdit(int $id): void
     {
         if (!($this->application->getConnectedUser()->isGroupManager() ?? false)) {
-            $this->raiseforbidden(__FILE__, __LINE__);
+            $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
@@ -133,7 +133,7 @@ class GroupController extends AbstractController
     public function groupEditSave(int $id): void
     {
         if (!($this->application->getConnectedUser()->isGroupManager() ?? false)) {
-            $this->raiseforbidden(__FILE__, __LINE__);
+            $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -169,7 +169,7 @@ class GroupController extends AbstractController
     public function groupIndex(): void
     {
         if (!($this->application->getConnectedUser()->isGroupManager() ?? false)) {
-            $this->raiseforbidden(__FILE__, __LINE__);
+            $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
@@ -187,7 +187,7 @@ class GroupController extends AbstractController
     public function showGroupChat($groupId): void
     {
         if ($this->application->getConnectedUser()->person === null) {
-            $this->raiseforbidden(__FILE__, __LINE__);
+            $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
@@ -201,7 +201,7 @@ class GroupController extends AbstractController
         }
         $connectedUser = $this->application->getConnectedUser();
         if ($connectedUser->person === null || !$this->personGroupDataHelper->isPersonInGroup($connectedUser->person->Id, $groupId)) {
-            $this->raiseforbidden(__FILE__, __LINE__);
+            $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
         $person = $connectedUser->person;

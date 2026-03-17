@@ -41,7 +41,7 @@ error_log("\n\n" . json_encode('---###---', JSON_PRETTY_PRINT) . "\n");
     public function maintenance(): void
     {
         if (!($this->application->getConnectedUser()->isWebmaster() ?? false)) {
-            $this->raiseforbidden(__FILE__, __LINE__);
+            $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
@@ -56,7 +56,7 @@ error_log("\n\n" . json_encode('---###---', JSON_PRETTY_PRINT) . "\n");
     public function setSiteOnline(): void
     {
         if (!($this->application->getConnectedUser()->isWebmaster() ?? false)) {
-            $this->raiseforbidden(__FILE__, __LINE__);
+            $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
@@ -70,7 +70,7 @@ error_log("\n\n" . json_encode('---###---', JSON_PRETTY_PRINT) . "\n");
     public function setSiteUnderMaintenance(): void
     {
         if (!($this->application->getConnectedUser()->isWebmaster() ?? false)) {
-            $this->raiseforbidden(__FILE__, __LINE__);
+            $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'GET') {

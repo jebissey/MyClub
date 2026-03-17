@@ -27,7 +27,7 @@ class EventTypeController extends TableController
     public function create(): void
     {
         if (!($this->application->getConnectedUser()->isEventDesigner() ?? false)) {
-            $this->raiseforbidden(__FILE__, __LINE__);
+            $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
@@ -66,7 +66,7 @@ class EventTypeController extends TableController
     public function index(): void
     {
         if (!($this->application->getConnectedUser()->isEventDesigner() ?? false)) {
-            $this->raiseforbidden(__FILE__, __LINE__);
+            $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
         $filterValues = [];

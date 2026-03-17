@@ -24,7 +24,7 @@ class EventEmailController extends AbstractController
     public function fetchEmails(): void
     {
         if (!($this->application->getConnectedUser()->isEventManager() ?? false)) {
-            $this->raiseforbidden(__FILE__, __LINE__);
+            $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
@@ -43,7 +43,7 @@ class EventEmailController extends AbstractController
     public function copyEmails(): void
     {
         if (!($this->application->getConnectedUser()->isEventManager() ?? false)) {
-            $this->raiseforbidden(__FILE__, __LINE__);
+            $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {

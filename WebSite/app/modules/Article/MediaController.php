@@ -39,13 +39,13 @@ class MediaController extends AbstractController
         $connectedUser = $this->application->getConnectedUser();
         if ($sharedFile->OnlyForMembers !== 0) {
             if ($connectedUser->person === null) {
-                $this->raiseforbidden(__FILE__, __LINE__);
+                $this->raiseForbidden(__FILE__, __LINE__);
                 return;
             }
         }
         if ($sharedFile->IdGroup !== null) {
             if (!$this->personGroupDataHelper->isPersonInGroup($connectedUser->person->Id, $sharedFile->IdGroup)) {
-                $this->raiseforbidden(__FILE__, __LINE__);
+                $this->raiseForbidden(__FILE__, __LINE__);
                 return;
             }
         }
@@ -55,7 +55,7 @@ class MediaController extends AbstractController
     public function gpxViewer(): void
     {
         if (!$this->application->getConnectedUser()->person ?? false) {
-            $this->raiseforbidden(__FILE__, __LINE__);
+            $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
@@ -71,7 +71,7 @@ class MediaController extends AbstractController
     {
         $connectedUser = $this->application->getConnectedUser();
         if (!($connectedUser->isRedactor() ?? false)) {
-            $this->raiseforbidden(__FILE__, __LINE__);
+            $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
@@ -106,7 +106,7 @@ class MediaController extends AbstractController
     public function showUploadForm(): void
     {
         if (!($this->application->getConnectedUser()->isRedactor() ?? false)) {
-            $this->raiseforbidden(__FILE__, __LINE__);
+            $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
@@ -121,7 +121,7 @@ class MediaController extends AbstractController
     public function showUses(): void
     {
         if (!($this->application->getConnectedUser()->isRedactor() ?? false)) {
-            $this->raiseforbidden(__FILE__, __LINE__);
+            $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
@@ -140,7 +140,7 @@ class MediaController extends AbstractController
     public function viewFile(int $year, int $month, string $filename): void
     {
         if (!($this->application->getConnectedUser()->isRedactor() ?? false)) {
-            $this->raiseforbidden(__FILE__, __LINE__);
+            $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'GET') {

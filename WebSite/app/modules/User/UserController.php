@@ -119,7 +119,7 @@ class UserController extends AbstractController
     public function signOut(): void
     {
         if ($this->application->getConnectedUser()->person === null) {
-            $this->raiseforbidden(__FILE__, __LINE__);
+            $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'GET') {

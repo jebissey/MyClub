@@ -24,7 +24,7 @@ class SurveyController extends AbstractController
     public function add(int $articleId): void
     {
         if (!($this->application->getConnectedUser()->isRedactor() ?? false)) {
-            $this->raiseforbidden(__FILE__, __LINE__);
+            $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
@@ -46,7 +46,7 @@ class SurveyController extends AbstractController
     public function createOrUpdate(): void
     {
         if (!($this->application->getConnectedUser()->isRedactor() ?? false)) {
-            $this->raiseforbidden(__FILE__, __LINE__);
+            $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -95,7 +95,7 @@ class SurveyController extends AbstractController
         }
         $connectedUser = $this->application->getConnectedUser();
         if ($connectedUser->person === null) {
-            $this->raiseforbidden(__FILE__, __LINE__);
+            $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'GET') {

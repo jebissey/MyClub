@@ -21,7 +21,7 @@ class KanbanController extends AbstractController
     public function board(): void
     {
         if (!($this->application->getConnectedUser()->isKanbanDesigner() ?? false)) {
-            $this->raiseforbidden(__FILE__, __LINE__);
+            $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
         $personId = $this->application->getConnectedUser()->person->Id;
