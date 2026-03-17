@@ -33,7 +33,7 @@ class TableControllerDataHelper extends Data
     {
         return $this->fluent->from('Person')
             ->select(null)
-            ->select('Id, FirstName, LastName, NickName, Email, Phone, Alert')
+            ->select('Id, FirstName, LastName, NickName, Email, Phone, Alert, MemberInfo')
             ->select("CASE WHEN Password IS NOT NULL THEN 'oui' ELSE 'non' END AS PasswordCreated")
             ->select("CASE WHEN InPresentationDirectory = 1 THEN 'oui' ELSE 'non' END AS PresentInDirectory")
             ->orderBy('LastName')
@@ -44,7 +44,7 @@ class TableControllerDataHelper extends Data
     {
         return $this->fluent->from('Person')
             ->select(null)
-            ->select('Id, FirstName, LastName, NickName, Email, Phone, Alert')
+            ->select('Id, FirstName, LastName, NickName, Email, Phone, Alert, MemberInfo')
             ->select("CASE WHEN Password IS NOT NULL THEN 'oui' ELSE 'non' END AS PasswordCreated")
             ->select("CASE WHEN InPresentationDirectory = 1 THEN 'oui' ELSE 'non' END AS PresentInDirectory")            
             ->orderBy('LastName')

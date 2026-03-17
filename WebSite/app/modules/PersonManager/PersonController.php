@@ -187,6 +187,7 @@ class PersonController extends TableController
             'alert' => FilterInputRule::Text->value,
             'passwordCreated' => ['oui', 'non'],
             'presentInDirectory' => ['oui', 'non'],
+            'memberInfo' => FilterInputRule::Text->value,
         ];
         $filterValues = WebApp::filterInput($schema, $this->flight->request()->query->getData());
         $filterConfig = [
@@ -197,6 +198,7 @@ class PersonController extends TableController
             ['name' => 'alert', 'label' => 'Alerte'],
             ['name' => 'passwordCreated', 'label' => 'Mot de passe'],
             ['name' => 'presentInDirectory', 'label' => 'Présentation'],
+            ['name' => 'memberInfo', 'label' => 'Informations sur le membre'],
         ];
         $columns = [
             ['field' => 'LastName', 'label' => 'Nom'],
@@ -206,6 +208,7 @@ class PersonController extends TableController
             ['field' => 'Alert', 'label' => 'Alerte'],
             ['field' => 'PasswordCreated', 'label' => 'Mot de passe'],
             ['field' => 'PresentInDirectory', 'label' => 'Présentation'],
+            ['field' => 'MemberInfo', 'label' => 'Informations sur le membre'],
         ];
 
         $status = WebApp::getFiltered('status', $this->application->enumToValues(PersonStatus::class), $this->flight->request()->query->getData()) ?: PersonStatus::Active->value;
