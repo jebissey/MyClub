@@ -160,13 +160,13 @@ class WebmasterController extends AbstractController
             $this->render('Webmaster/views/emailCredentials.latte', $this->getAllParams([
                 'navItems' => $this->getNavItems($this->application->getConnectedUser()->person),
                 'page'     => $this->application->getConnectedUser()->getPage(),
-                'sendMethod'           => $this->credentials->get('email', 'method'),
-                'sendEmailAddress'     => $this->credentials->get('smtp', 'username'),
-                'sendEmailHost'        => $this->credentials->get('smtp', 'host'),
-                'sendEmailPort'        => $this->credentials->get('smtp', 'port'),
-                'sendEmailEncryption'  => $this->credentials->get('smtp', 'encryption'),
-                'mailjetApiKey'        => $this->credentials->get('mailjet', 'api_key'),
-                'mailjetSender'        => $this->credentials->get('mailjet', 'sender'),
+                'sendMethod'          => $this->credentials->get('email', 'method'),
+                'sendEmailAddress'    => $this->credentials->get('smtp', 'username'),
+                'sendEmailHost'       => $this->credentials->get('smtp', 'host'),
+                'sendEmailPort'       => $this->credentials->get('smtp', 'port'),
+                'sendEmailEncryption' => $this->credentials->get('smtp', 'encryption'),
+                'mailjetApiKey'       => $this->credentials->get('mailjet', 'api_key'),
+                'mailjetSender'       => $this->credentials->get('mailjet', 'sender'),
                 'dailyLimit'          => $this->credentials->get('email', 'daily_limit'),
                 'monthlyLimit'        => $this->credentials->get('email', 'monthly_limit')
             ]));

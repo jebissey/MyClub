@@ -152,7 +152,7 @@ class WebApp
 
     static public function isMyClubWebSite(): bool
     {
-        return self::getBaseUrl() == self::MYCLUB_WEBAPP;
+        return self::getBaseUrl() === self::MYCLUB_WEBAPP;
     }
 
     static public function nullableCast(mixed $value, string $type): mixed

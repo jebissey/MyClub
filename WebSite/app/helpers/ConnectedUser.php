@@ -79,7 +79,7 @@ class ConnectedUser
 
     public function getPage(int $segment = 0)
     {
-        return explode('/', trim(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/'))[$segment];
+        return explode('/', trim(parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH), '/'))[$segment];
     }
 
     public function isAdministrator(): bool
