@@ -30,7 +30,44 @@
 {/block}
 
 {block navbar}
-    {include '../../Webmaster/views/navbar/designer.latte'}
+<div class="container-fluid d-flex align-items-center gap-2">
+
+    <div class="d-flex align-items-center">
+        <a class="navbar-brand" href="/"><img src="/app/images/home.png" alt="Home"></a>
+        <button class="btn btn-primary fs-4" onclick="history.back()">
+            <i class="bi bi-arrow-left-circle"></i>
+        </button>
+        <a class="btn btn btn-primary fs-4 ms-2" href="/designer">
+            <i class="bi bi-arrow-up-circle"></i>
+        </a>
+    </div>
+
+    <div class="d-flex align-items-center gap-3 px-2 py-1 rounded bg-dark-subtle">
+        <div class="input-group input-group-sm" style="width: 260px;">
+            <span class="input-group-text" id="translation-search-count">🔍</span>
+            <input type="text"
+                id="translation-search"
+                class="form-control"
+                placeholder="Filtrer les traductions…"
+                autocomplete="off">
+            <button class="btn btn-outline-secondary" id="translation-search-clear" type="button">✕</button>
+        </div>        
+        <div class="form-check">
+            <input class="form-check-input"
+                    type="checkbox"
+                    name="missing"
+                    value="1"
+                    {if $missingOnly}checked{/if}
+                    form="translator-form"
+                    onchange="document.getElementById('translator-form').submit()">
+            <label class="form-check-label">Manquantes uniquement</label>
+        </div>
+
+        <div class="badge bg-warning text-dark">
+            {$missingCount} traductions manquantes
+        </div>
+    </div>
+
 {/block}
 
 {block content}
@@ -40,22 +77,7 @@
 
         <h1 class="fs-4 m-0">🌍 Translation Manager</h1>
 
-        <div class="d-flex align-items-center gap-3">
-            <div class="form-check">
-                <input class="form-check-input"
-                       type="checkbox"
-                       name="missing"
-                       value="1"
-                       {if $missingOnly}checked{/if}
-                       form="translator-form"
-                       onchange="document.getElementById('translator-form').submit()">
-                <label class="form-check-label">Manquantes uniquement</label>
-            </div>
 
-            <div class="badge bg-warning text-dark">
-                {$missingCount} traductions manquantes
-            </div>
-        </div>
 
     </div>
 

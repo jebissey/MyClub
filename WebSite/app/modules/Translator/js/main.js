@@ -14,10 +14,54 @@ class TranslatorController {
         this.#bindLangSelects();
         this.#bindRefCells();
         this.#bindPreviewTabs();
+        this.#bindSearch();
 
         document
             .querySelectorAll('.translation-field')
             .forEach(textarea => this.#bindField(textarea));
+    }
+
+    #bindSearch() {
+        const input = document.getElementById('translation-search');
+        const clear = document.getElementById('translation-search-clear');
+        const count = document.getElementById('translation-search-count');
+        if (!input) return;
+
+        const rows = [...document.querySelectorAll('tbody tr')];
+
+        const filter = () => {
+            const q = input.value.trim().toLowerCase();
+            clear.style.display = q ? '' : 'none';
+            let visible = 0;
+
+            rows.forEach(row => {
+                if (!q) {
+                    row.hidden = false;
+                    visible++;
+                    return;
+                }
+
+                const key = row.cells[0]?.textContent ?? '';
+                const refCell = row.cells[1];
+                const ref = refCell?.dataset.raw ?? refCell?.textContent ?? '';
+                const textarea = row.cells[2]?.querySelector('.translation-field');
+                const target = textarea?.value ?? row.cells[2]?.textContent ?? '';
+
+                const match = [key, ref, target].some(v => v.toLowerCase().includes(q));
+                row.hidden = !match;
+                if (match) visible++;
+            });
+            count.textContent = q ? `${visible} / ${rows.length}` : '🔍';
+        };
+
+        input.addEventListener('input', filter);
+
+        clear.style.display = 'none';
+        clear.addEventListener('click', () => {
+            input.value = '';
+            filter();
+            input.focus();
+        });
     }
 
     #bindLangSelects() {
