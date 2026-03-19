@@ -759,7 +759,7 @@ INSERT INTO "Languages" VALUES (56,'Help_Home','
 </div>
 <div class="mt-4 text-center text-muted">
 In the footer, 
-  <strong><a href="https://myclub.alwaysdata.net/menu/show/article/28">Tutorials</a></strong> will take you to the 
+  <strong><a href="https://myclub.ovh/menu/show/article/28">Tutorials</a></strong> will take you to the 
   <strong><i><u>MyClub</u></i></strong> website. 
   There you will find <strong>videos</strong>, <strong>articles</strong>, 
   a <strong>dictionary</strong>, and other resources to support you.
@@ -897,7 +897,7 @@ In the footer,
 </div>
 <div class="mt-4 text-center text-muted">
 En pied de page 
-  <strong><a href="https://myclub.alwaysdata.net/menu/show/article/28">Tutoriels</a></strong> vous conduit vers le site de 
+  <strong><a href="https://myclub.ovh/menu/show/article/28">Tutoriels</a></strong> vous conduit vers le site de 
   <strong><i><u>MyClub</u></i></strong>. 
   Vous y trouverez des <strong>vidéos</strong>, des <strong>articles</strong>, 
   un <strong>dictionnaire</strong> et d’autres ressources pour vous accompagner.
@@ -1033,7 +1033,7 @@ En pied de page
 </div>
 <div class="mt-4 text-center text-muted">
 W stopce strony 
-  <strong><a href="https://myclub.alwaysdata.net/menu/show/article/28">Samouczki</a></strong> prowadzą do strony 
+  <strong><a href="https://myclub.ovh/menu/show/article/28">Samouczki</a></strong> prowadzą do strony 
   <strong><i><u>MyClub</u></i></strong>. 
   Znajdziesz tam <strong>wideo</strong>, <strong>artykuły</strong>, 
   <strong>słownik</strong> oraz inne materiały pomocnicze.
@@ -2198,7 +2198,117 @@ INSERT INTO "Languages" VALUES (264,'communication.index.modal_cancel','Cancel',
 INSERT INTO "Languages" VALUES (265,'communication.index.modal_confirm','Confirm','Confirmer','Potwierdź');
 INSERT INTO "Languages" VALUES (266,'communication.index.sending','Sending…','Envoi en cours…','Wysyłanie…');
 INSERT INTO "Languages" VALUES (267,'navbar.admin.communication_manager','Communication Manager','Gestionnaire de communication','Menedżer komunikacji');
-INSERT INTO "Metadata" VALUES (1,'MyClub',24,0,1000000,NULL,10,36,6,NULL,0,NULL);
+INSERT INTO "Languages" VALUES (268,'communication.filters.desactivated_accounts','Deactivated accounts','Comptes désactivés','Konta dezaktywowane');
+INSERT INTO "Languages" VALUES (269,'designer.home_settings.title','Home page customization','Personnalisation de la page d''accueil','Personalizacja strony głównej');
+INSERT INTO "Languages" VALUES (270,'designer.home_settings.force_language','Force this language','Forcer cette langue','Wymuś ten język');
+INSERT INTO "Languages" VALUES (271,'designer.home_settings.preview_hint','Preview — click to edit','Aperçu — cliquez pour éditer','Podgląd — kliknij, aby edytować');
+INSERT INTO "Languages" VALUES (272,'designer.home_settings.section_header','Header','En-tête','Nagłówek');
+INSERT INTO "Languages" VALUES (273,'designer.home_settings.section_article','Main article','Article principal','Główny artykuł');
+INSERT INTO "Languages" VALUES (274,'designer.home_settings.section_latest','Latest articles','Derniers articles','Ostatnie artykuły');
+INSERT INTO "Languages" VALUES (275,'designer.home_settings.section_footer','Footer','Pied de page','Stopka');
+INSERT INTO "Languages" VALUES (276,'designer.home_settings.preview_empty','Empty','Vide','Pusty');
+INSERT INTO "Languages" VALUES (277,'designer.home_settings.preview_article_auto','1st paragraph of the latest article / featured article','1er paragraphe du dernier article / article mis en avant','1. akapit ostatniego artykułu / wyróżnionego artykułu');
+INSERT INTO "Languages" VALUES (278,'designer.home_settings.preview_hidden','Section hidden','Section masquée','Sekcja ukryta');
+INSERT INTO "Languages" VALUES (279,'designer.home_settings.preview_latest_more','more…','autres…','więcej…');
+INSERT INTO "Languages" VALUES (280,'designer.home_settings.editor_placeholder_title','Click on a section','Cliquez sur une section','Kliknij sekcję');
+INSERT INTO "Languages" VALUES (281,'designer.home_settings.editor_placeholder_subtitle','to display its editor','pour afficher son éditeur','aby wyświetlić jej edytor');
+INSERT INTO "Languages" VALUES (282,'designer.home_settings.editor_select_hint','Select a section in the preview','Sélectionnez une section dans l''aperçu','Wybierz sekcję w podglądzie');
+INSERT INTO "Languages" VALUES (283,'designer.home_settings.header_description','HTML content displayed at the top of the home page. Active language:','Contenu HTML affiché en haut de la page d''accueil. Langue active :','Zawartość HTML wyświetlana na górze strony głównej. Aktywny język:');
+INSERT INTO "Languages" VALUES (284,'designer.home_settings.header_table_hint','(Languages table)','(table Languages)','(tabela Languages)');
+INSERT INTO "Languages" VALUES (285,'designer.home_settings.footer_description','HTML content displayed at the bottom of the home page. Active language:','Contenu HTML affiché en bas de la page d''accueil. Langue active :','Zawartość HTML wyświetlana na dole strony głównej. Aktywny język:');
+INSERT INTO "Languages" VALUES (286,'designer.home_settings.article_label','ID of the article to feature','ID de l''article à mettre en avant','ID artykułu do wyróżnienia');
+INSERT INTO "Languages" VALUES (287,'designer.home_settings.article_description','Enter the identifier of a specific article. Enter 0 to automatically display the first paragraph of the latest published article or the currently featured article.','Entrez l''identifiant d''un article spécifique. Saisissez 0 pour afficher automatiquement le premier paragraphe du dernier article publié ou de l''article actuellement mis en avant.','Wprowadź identyfikator konkretnego artykułu. Wpisz 0, aby automatycznie wyświetlić pierwszy akapit ostatniego opublikowanego artykułu lub aktualnie wyróżnionego artykułu.');
+INSERT INTO "Languages" VALUES (288,'designer.home_settings.article_zero_hint','0 = latest article or featured article','0 = dernier article ou article mis en avant','0 = ostatni artykuł lub wyróżniony artykuł');
+INSERT INTO "Languages" VALUES (289,'designer.home_settings.latest_label','Number of latest articles to display','Nombre de derniers articles à afficher','Liczba ostatnich artykułów do wyświetlenia');
+INSERT INTO "Languages" VALUES (290,'designer.home_settings.latest_description','Indicate how many recent articles to list. Enter 0 to completely hide this section. Value between 0 and 50.','Indiquez combien d''articles récents lister. Saisissez 0 pour masquer complètement cette section. Valeur entre 0 et 50.','Podaj, ile ostatnich artykułów wyświetlić. Wpisz 0, aby całkowicie ukryć tę sekcję. Wartość od 0 do 50.');
+INSERT INTO "Languages" VALUES (291,'designer.home_settings.title_edit_header','Edit the header','Éditer l''en-tête','Edytuj nagłówek');
+INSERT INTO "Languages" VALUES (292,'designer.home_settings.title_edit_article','Configure the main article','Configurer l''article principal','Skonfiguruj główny artykuł');
+INSERT INTO "Languages" VALUES (293,'designer.home_settings.title_edit_latest','Configure the latest articles list','Configurer la liste des derniers articles','Skonfiguruj listę ostatnich artykułów');
+INSERT INTO "Languages" VALUES (294,'designer.home_settings.title_edit_footer','Edit the footer','Éditer le pied de page','Edytuj stopkę');
+INSERT INTO "Languages" VALUES (295,'home.index.title','What do you want to do?','Que souhaitez-vous faire ?','Co chcesz zrobić?');
+INSERT INTO "Languages" VALUES (296,'home.index.subtitle','Select an action below to get started.','Sélectionnez une action ci-dessous pour commencer.','Wybierz działanie poniżej, aby rozpocząć.');
+INSERT INTO "Languages" VALUES (297,'home.index.public_space','🌎 Public space','🌎 L''espace public','🌎 Przestrzeń publiczna');
+INSERT INTO "Languages" VALUES (298,'home.index.tab_member','👤 My member space','👤 Mon espace membre','👤 Moja przestrzeń członka');
+INSERT INTO "Languages" VALUES (299,'home.index.tab_roles','🔑 My permissions','🔑 Mes autorisations','🔑 Moje uprawnienia');
+INSERT INTO "Languages" VALUES (300,'home.index.member_actions','👥 Actions available to all members','👥 Actions disponibles pour tous les membres','👥 Działania dostępne dla wszystkich członków');
+INSERT INTO "Languages" VALUES (301,'home.action.contact.title','Contact the Club','Contacter le Club','Skontaktuj się z Klubem');
+INSERT INTO "Languages" VALUES (302,'home.action.contact.desc','Send a message to the administrators','Envoyer un message aux responsables','Wyślij wiadomość do administratorów');
+INSERT INTO "Languages" VALUES (303,'home.action.signin.title','Sign in','Me connecter','Zaloguj się');
+INSERT INTO "Languages" VALUES (304,'home.action.signin.desc','Access my member space','Accéder à mon espace membre','Uzyskaj dostęp do mojej przestrzeni członka');
+INSERT INTO "Languages" VALUES (305,'home.action.search_article.title','Search for an article','Rechercher un article','Wyszukaj artykuł');
+INSERT INTO "Languages" VALUES (306,'home.action.search_article.desc','Find club articles','Trouver des articles du club','Znajdź artykuły klubu');
+INSERT INTO "Languages" VALUES (307,'home.action.calendar.title','View calendar','Voir le calendrier','Zobacz kalendarz');
+INSERT INTO "Languages" VALUES (308,'home.action.calendar.desc_public','View upcoming events','Visualiser les événements à venir','Wyświetl nadchodzące wydarzenia');
+INSERT INTO "Languages" VALUES (309,'home.action.calendar.desc_member','Browse events','Consulter les événements','Przeglądaj wydarzenia');
+INSERT INTO "Languages" VALUES (310,'home.action.profile.title','Profile','Profil','Profil');
+INSERT INTO "Languages" VALUES (311,'home.action.profile.desc','Update my information','Mettre à jour mes informations','Zaktualizuj moje informacje');
+INSERT INTO "Languages" VALUES (312,'home.action.statistics.title','Statistics','Statistiques','Statystyki');
+INSERT INTO "Languages" VALUES (313,'home.action.statistics.desc','History and activity','Historique et activité','Historia i aktywność');
+INSERT INTO "Languages" VALUES (314,'home.action.connections.title','Connections','Connexions','Połączenia');
+INSERT INTO "Languages" VALUES (315,'home.action.connections.desc','My events in common with other members','Mes événements en commun avec les autres membres','Moje wspólne wydarzenia z innymi członkami');
+INSERT INTO "Languages" VALUES (316,'home.action.next_events.title','Upcoming events','Evénements à venir','Nadchodzące wydarzenia');
+INSERT INTO "Languages" VALUES (317,'home.action.next_events.desc','Browse and register for upcoming sessions','Consulter et m''inscrire aux prochaines séances','Przeglądaj i zapisuj się na nadchodzące sesje');
+INSERT INTO "Languages" VALUES (318,'home.action.directory.title','Member directory','Trombinoscope','Katalog członków');
+INSERT INTO "Languages" VALUES (319,'home.action.directory.desc','View club members and create/edit my presentation','Voir les membres du club et créer/modifier ma présentation','Przeglądaj członków klubu i utwórz/edytuj swoją prezentację');
+INSERT INTO "Languages" VALUES (320,'home.action.news.title','News','News','Aktualności');
+INSERT INTO "Languages" VALUES (321,'home.action.news.desc','View club news (articles, events, surveys, presentations...) from the last 7 days','Voir les nouvelles du club (articles, événements, sondages, présentation ...) des 7 derniers jours','Zobacz nowości klubu (artykuły, wydarzenia, ankiety, prezentacje...) z ostatnich 7 dni');
+INSERT INTO "Languages" VALUES (322,'home.action.messages.title','Messages','Messages','Wiadomości');
+INSERT INTO "Languages" VALUES (323,'home.action.messages.desc','View messages from the last 7 days','Voir les messages des 7 derniers jours','Zobacz wiadomości z ostatnich 7 dni');
+INSERT INTO "Languages" VALUES (324,'home.role.event_manager','🗓️ Event manager','🗓️ Animateur','🗓️ Animator');
+INSERT INTO "Languages" VALUES (325,'home.action.manage_sessions.title','Manage sessions','Gérer les séances','Zarządzaj sesjami');
+INSERT INTO "Languages" VALUES (326,'home.action.manage_sessions.desc','Create, edit, cancel a session and track registrations','Créer, modifier, annuler une séance et suivre les inscriptions','Twórz, edytuj, anuluj sesję i śledź rejestracje');
+INSERT INTO "Languages" VALUES (327,'home.action.send_invitation.title','Send an invitation','Envoyer une invitation','Wyślij zaproszenie');
+INSERT INTO "Languages" VALUES (328,'home.action.send_invitation.desc','Send an invitation to a non-member for a session','Envoyer une invitation à une personne non membre du club pour une séance','Wyślij zaproszenie do osoby niebędącej członkiem klubu na sesję');
+INSERT INTO "Languages" VALUES (329,'home.action.stats_animators.title','Animator statistics','Statistiques animateurs','Statystyki animatorów');
+INSERT INTO "Languages" VALUES (330,'home.action.stats_animators.desc','View animator statistics (number of sessions led by type and participants)','Voir les statistiques des animateurs du club (nombre de séances animées par types et participants)','Zobacz statystyki animatorów klubu (liczba sesji prowadzonych według typów i uczestników)');
+INSERT INTO "Languages" VALUES (331,'home.role.designer','🎨 Designer','🎨 Designer','🎨 Projektant');
+INSERT INTO "Languages" VALUES (332,'home.action.event_types.title','Event types and their attributes','Types d''événements et leurs attributs','Typy wydarzeń i ich atrybuty');
+INSERT INTO "Languages" VALUES (333,'home.action.event_types.desc','Define club event types and associated attributes','Définir les types d''événements du club et les attributs associés','Zdefiniuj typy wydarzeń klubu i powiązane atrybuty');
+INSERT INTO "Languages" VALUES (334,'home.action.session_needs.title','Session needs','Les besoins d''une séance','Potrzeby sesji');
+INSERT INTO "Languages" VALUES (335,'home.action.session_needs.desc','Define the needs associated with each club event type','Définir les besoins associés à chaque type d''événement du club','Zdefiniuj potrzeby powiązane z każdym typem wydarzenia klubu');
+INSERT INTO "Languages" VALUES (336,'home.action.site_settings.title','Site settings','Paramètres du site','Ustawienia witryny');
+INSERT INTO "Languages" VALUES (337,'home.action.site_settings.desc','Define general website settings and available language(s)','Définir les paramètres généraux du site web du club et la(les) langues disponibles','Zdefiniuj ogólne ustawienia witryny klubu i dostępne języki');
+INSERT INTO "Languages" VALUES (338,'home.action.kanban.title','Kanban','Kanban','Kanban');
+INSERT INTO "Languages" VALUES (339,'home.action.kanban.desc','Manage projects via Kanban boards','Gérer des projets via des tableaux Kanban','Zarządzaj projektami za pomocą tablic Kanban');
+INSERT INTO "Languages" VALUES (340,'home.action.navigation.title','Navigation','Navigation','Nawigacja');
+INSERT INTO "Languages" VALUES (341,'home.action.navigation.desc','Manage the club website navigation bars','Gérer les barres de navigation du site web du club','Zarządzaj paskami nawigacyjnymi witryny klubu');
+INSERT INTO "Languages" VALUES (342,'home.role.redactor','✍️ Redactor','✍️ Rédacteur','✍️ Redaktor');
+INSERT INTO "Languages" VALUES (343,'home.action.article.title','Article','Article','Artykuł');
+INSERT INTO "Languages" VALUES (344,'home.action.article.desc','Write and publish a new article','Rédiger et publier un nouvel article','Napisz i opublikuj nowy artykuł');
+INSERT INTO "Languages" VALUES (345,'home.action.medias.title','Media','Medias','Media');
+INSERT INTO "Languages" VALUES (346,'home.action.medias.desc','Manage club media (photos, documents...)','Gérer les médias du club (photos, documents ...)','Zarządzaj mediami klubu (zdjęcia, dokumenty...)');
+INSERT INTO "Languages" VALUES (347,'home.action.top_articles.title','Popular articles','Articles populaires','Popularne artykuły');
+INSERT INTO "Languages" VALUES (348,'home.action.top_articles.desc','View the most popular club articles by period','Voir les articles les plus populaires du club par période','Zobacz najpopularniejsze artykuły klubu według okresu');
+INSERT INTO "Languages" VALUES (349,'home.action.stats_redactors.title','Redactor statistics','Statistiques rédacteurs','Statystyki redaktorów');
+INSERT INTO "Languages" VALUES (350,'home.action.stats_redactors.desc','View redactor statistics (number of articles published per redactor and period)','Voir les statistiques des rédacteurs du club (nombre d''articles publiés par rédacteur et par période)','Zobacz statystyki redaktorów klubu (liczba artykułów opublikowanych na redaktora i okres)');
+INSERT INTO "Languages" VALUES (351,'home.role.secretary','📇 Secretary','📇 Secrétaire','📇 Sekretarz');
+INSERT INTO "Languages" VALUES (352,'home.action.manage_members.title','Manage members','Gérer les membres','Zarządzaj członkami');
+INSERT INTO "Languages" VALUES (353,'home.action.manage_members.desc','View and administer club members','Consulter et administrer les adhérents','Przeglądaj i administruj członkami klubu');
+INSERT INTO "Languages" VALUES (354,'home.action.manage_groups.title','Manage groups','Gérer les groupes','Zarządzaj grupami');
+INSERT INTO "Languages" VALUES (355,'home.action.manage_groups.desc','View and administer member groups (without permissions)','Consulter et administrer les groupes (sans autorisation) de membres','Przeglądaj i administruj grupami członków (bez uprawnień)');
+INSERT INTO "Languages" VALUES (356,'home.action.manage_registrations.title','Manage registrations','Gérer les inscriptions','Zarządzaj rejestracjami');
+INSERT INTO "Languages" VALUES (357,'home.action.manage_registrations.desc','View and administer member registrations to groups without permissions','Consulter et administrer les inscriptions des adhérents aux groupes sans autorisation','Przeglądaj i administruj rejestracjami członków do grup bez uprawnień');
+INSERT INTO "Languages" VALUES (358,'home.action.import_members.title','Import members','Importer des membres','Importuj członków');
+INSERT INTO "Languages" VALUES (359,'home.action.import_members.desc','Import members from a CSV file','Importer des adhérents à partir d''un fichier CSV','Importuj członków z pliku CSV');
+INSERT INTO "Languages" VALUES (360,'home.role.observer','🔍 Observer','🔍 Observateur','🔍 Obserwator');
+INSERT INTO "Languages" VALUES (361,'home.action.referrers.title','Referrer sites','Site référents','Witryny odsyłające');
+INSERT INTO "Languages" VALUES (362,'home.action.referrers.desc','See where club website visitors come from','Voir d''où viennent les visiteurs du site web du club','Zobacz skąd przychodzą odwiedzający witrynę klubu');
+INSERT INTO "Languages" VALUES (363,'home.action.top_pages.title','Popular pages','Pages populaires','Popularne strony');
+INSERT INTO "Languages" VALUES (364,'home.action.top_pages.desc','View the most popular club pages by period','Voir les pages les plus populaires du club par période','Zobacz najpopularniejsze strony klubu według okresu');
+INSERT INTO "Languages" VALUES (365,'home.action.stats_visitors.title','Visitor statistics (members)','Statistiques visiteurs (membres)','Statystyki odwiedzających (członkowie)');
+INSERT INTO "Languages" VALUES (366,'home.action.stats_visitors.desc','View visitor statistics (number of pages viewed per visitor and period)','Voir les statistiques des visiteurs du site web du club (nombre de pages vues par visiteur et par période)','Zobacz statystyki odwiedzających (liczba wyświetlonych stron na odwiedzającego i okres)');
+INSERT INTO "Languages" VALUES (367,'home.action.visitor_logs.title','Visitor logs','Logs visiteurs','Logi odwiedzających');
+INSERT INTO "Languages" VALUES (368,'home.action.visitor_logs.desc','View club website visitor logs','Voir les logs des visiteurs du site web du club','Zobacz logi odwiedzających witrynę klubu');
+INSERT INTO "Languages" VALUES (369,'home.action.visitor_charts.title','Visitor charts','Graphiques visiteurs','Wykresy odwiedzających');
+INSERT INTO "Languages" VALUES (370,'home.action.visitor_charts.desc','View club website visitor charts','Voir les graphiques des visiteurs du site web du club','Zobacz wykresy odwiedzających witrynę klubu');
+INSERT INTO "Languages" VALUES (371,'home.action.visitor_analytics.title','Visitor analytics','Analyses des visiteurs','Analizy odwiedzających');
+INSERT INTO "Languages" VALUES (372,'home.action.visitor_analytics.desc','View visitor charts (OS, browsers, hardware, screen resolution)','Voir les graphiques des visiteurs du site web du club (OS, navigateurs, matériel, résolution d''écran)','Zobacz wykresy odwiedzających (OS, przeglądarki, sprzęt, rozdzielczość ekranu)');
+INSERT INTO "Languages" VALUES (373,'home.action.last_visits.title','Last visits','Dernières visites','Ostatnie wizyty');
+INSERT INTO "Languages" VALUES (374,'home.action.last_visits.desc','View the last visits of club members','Voir la dernière visites des membres du club','Zobacz ostatnie wizyty członków klubu');
+INSERT INTO "Languages" VALUES (375,'home.role.webmaster','🛠️ Webmaster','🛠️ Webmaster','🛠️ Webmaster');
+INSERT INTO "Languages" VALUES (376,'home.action.site_config.title','Site configuration','Configuration site','Konfiguracja witryny');
+INSERT INTO "Languages" VALUES (377,'home.action.site_config.desc','Technical settings','Paramètres techniques','Ustawienia techniczne');
+INSERT INTO "Metadata" VALUES (1,'MyClub',25,0,1000000,NULL,10,36,6,NULL,0,NULL);
 INSERT INTO "Person" VALUES (1,'webmaster@myclub.foo','e427c26faca947919b18b797bc143a35100e4de48c34b70b26202d3a7d8e51f7','my first name','my last name','my nick name or nothing',NULL,'0',NULL,NULL,NULL,NULL,NULL,0,0,NULL,NULL,'2025-01-01',0,0,0,NULL,NULL,NULL,NULL,NULL,NULL,'');
 INSERT INTO "PersonGroup" VALUES (1,1,1);
 INSERT INTO "Settings" VALUES (1,'Title','title');
@@ -2210,4 +2320,7 @@ INSERT INTO "Settings" VALUES (5,'Home_footer','<div style="text-align:center; f
 <b>WORK IN PROGRESS</b><br>
 🚧👷‍♀️🔧👷‍♂️🚧
 </div>');
+CREATE UNIQUE INDEX IF NOT EXISTS "idx_languages_name" ON "Languages" (
+	"Name"
+);
 COMMIT;

@@ -24,5 +24,4 @@ quota.onChange(() => {
 // ── Init ──────────────────────────────────────────────────────────────────────
 members.bindEvents();
 form.bindEvents();
-initTinyMCE('#tinymce-email');
 quota.refresh();

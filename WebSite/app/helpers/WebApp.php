@@ -10,7 +10,7 @@ use app\enums\FilterInputRule;
 
 class WebApp
 {
-    public const MYCLUB_WEBAPP = "https://myclub.alwaysdata.net/";
+    public const MYCLUB_WEBAPP = "https://myclub.ovh/";
 
     public function buildUrl($newParams): string
     {
@@ -169,7 +169,7 @@ class WebApp
     static public function sanitizeHtml($html)
     {
         $allowed_tags = '<div><span><p><br><strong><em><ul><ol><li><a><img>'
-            . '<h1><h2><h3><h4><h5><h6><blockquote><pre><code>'
+            . '<hr><h1><h2><h3><h4><h5><h6><blockquote><pre><code>'
             . '<table><thead><tbody><tr><th><td>'
             . '<section><i>';
 

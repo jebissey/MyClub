@@ -38,16 +38,13 @@ class TranslatorApi extends AbstractApi
             $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
-
         $connectedUser = $this->application->getConnectedUser();
-
         if (!($connectedUser->isTranslator() ?? false)) {
             $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }
 
         $data = json_decode(file_get_contents('php://input'), true);
-
         if (
             !$data ||
             !isset($data['id']) ||
@@ -76,9 +73,7 @@ class TranslatorApi extends AbstractApi
 
         try {
 
-            $success = $this->languagesDataHelper
-                ->updateTranslation($id, $lang, $value);
-
+            $success = $this->languagesDataHelper->updateTranslation($id, $lang, $value);
             if (!$success) {
                 $this->renderJsonError(
                     "Échec mise à jour",

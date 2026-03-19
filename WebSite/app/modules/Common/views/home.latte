@@ -7,37 +7,39 @@
 {/block}
 
 {block content}
-    <div class="container-fluid">
-        {$homeHeader|noescape}
+<div class="container-fluid">
+    {if $homeHeader !== ''}
+    {$homeHeader|noescape}
+    {/if}
+    {if isset($message) && $message !== ''}
+    <div class="alert alert-success alert-dismissible">
+        {$message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {/if}
 
-        {if isset($message) && $message !=''}
-        <div class="alert alert-success alert-dismissible">
-            {$message}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-        {/if}
-
-        <div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
         {foreach $pendingSurveys as $survey}
-            <div class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="false">
-                <div class="toast-header">
-                    <strong class="me-auto">Sondage en attente: {$survey->ArticleTitle}</strong>
-                    <small>Fermeture: {$survey->ClosingDate|shortDate}</small>
-                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-                </div>
-                <div class="toast-body">
-                    {$survey->SurveyQuestion}
-                    <div class="mt-2 pt-2 border-top">
-                        <a href="/article/{$survey->ArticleId}" class="btn btn-primary btn-sm">Répondre au sondage</a>
-                    </div>
+        <div class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="false">
+            <div class="toast-header">
+                <strong class="me-auto">Sondage en attente : {$survey->ArticleTitle}</strong>
+                <small>Fermeture : {$survey->ClosingDate|shortDate}</small>
+                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body">
+                {$survey->SurveyQuestion}
+                <div class="mt-2 pt-2 border-top">
+                    <a href="/article/{$survey->ArticleId}" class="btn btn-primary btn-sm">Répondre au sondage</a>
                 </div>
             </div>
+        </div>
         {/foreach}
+
         {if $isRedactor}
-            {foreach $pendingDesigns as $design}
+        {foreach $pendingDesigns as $design}
             <div class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="false">
                 <div class="toast-header">
-                    <strong class="me-auto">Design en attente: {$design->DesignName}</strong>
+                    <strong class="me-auto">Design en attente : {$design->DesignName}</strong>
                     <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
                 </div>
                 <div class="toast-body">
@@ -48,115 +50,85 @@
                     </div>
                 </div>
             </div>
-            {/foreach}
+        {/foreach}
         {/if}
-        </div>
+    </div>
 
-        {if $news}
-        <div class="alert alert-info" role="alert">
-            <a href="/user/news" class="btn btn-primary btn-sm">Voir les nouveautés</a>
-        </div>
-        {/if}
+    {if $news}
+    <div class="alert alert-info" role="alert">
+        <a href="/user/news" class="btn btn-primary btn-sm">Voir les nouveautés</a>
+    </div>
+    {/if}
 
-        {if $latestArticle}
-        <div class="card mb-4">
-            <div class="card-header">
-                <h2 class="card-title">{$latestArticle->Title}</h2>
-                <small class="text-muted">
-                    {='created_by'|translate} {$latestArticle->FirstName} {$latestArticle->LastName} 
-                    {='on'|translate} {=$latestArticle->Timestamp|shortDate}
-                    {$publishedBy}
-                    {if date('Y-m-d', strtotime($latestArticle->Timestamp)) !== date('Y-m-d', strtotime($latestArticle->LastUpdate))}
+    {if $latestArticle}
+    <div class="card mb-4">
+        <div class="card-header">
+            <h2 class="card-title">{$latestArticle->Title}</h2>
+            <small class="text-muted">
+                {='created_by'|translate} {$latestArticle->FirstName} {$latestArticle->LastName}
+                {='on'|translate} {=$latestArticle->Timestamp|shortDate}
+                {$publishedBy}
+                {if date('Y-m-d', strtotime($latestArticle->Timestamp)) !== date('Y-m-d', strtotime($latestArticle->LastUpdate))}
                     {='modified_on'|translate} {=$latestArticle->LastUpdate|shortDate}
-                    {/if}
-                    {if $latestArticleHasSurvey}
-                    <a href="/article/{$latestArticle->Id}" class="btn btn-success ms-2">{='vote'|translate}{if $userEmail == ''} {='connection_required'|translate}{/if}</a>
-                    {/if}
-                </small>
-            </div>
-            <div class="card-body">
-                {$latestArticle->Content|extractFirstElement|noescape}
-                <div class="mt-3">
-                    <a href="/article/{$latestArticle->Id}" class="btn btn-primary btn-sm">Lire l'article</a>
-                </div>
+                {/if}
+                {if $latestArticleHasSurvey}
+                    <a href="/article/{$latestArticle->Id}" class="btn btn-success ms-2">
+                        {='vote'|translate}{if $userEmail === ''} {='connection_required'|translate}{/if}
+                    </a>
+                {/if}
+            </small>
+        </div>
+        <div class="card-body">
+            {$latestArticle->Content|extractFirstElement|noescape}
+            <div class="mt-3">
+                <a href="/article/{$latestArticle->Id}" class="btn btn-primary btn-sm">Lire l'article</a>
             </div>
         </div>
-        {/if}        
-        
-        {if count($latestArticles) > 0}
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h3 class="mb-0">Articles récents</h3>
-                <a href="/articles" class="btn btn-secondary">Liste de tous les articles</a>
-            </div>
-
-            <ul class="list-group">
-                {foreach $latestArticles as $article}
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <a href="/article/{$article->Id}">{$article->Title}</a>
-                        <span class="badge bg-secondary rounded-pill">
-                            {$article->LastUpdate|shortDate}
-                        </span>
-                    </li>
-                {/foreach}
-            </ul>
-        {/if}
-        {if isset($homeFooter) && $homeFooter !=''}
-        <div class="alert alert-info">
-            {$homeFooter|noescape}
-        </div>
-        {/if}
     </div>
+    {/if}
 
-    <div class="modal fade" id="languageModal" tabindex="-1" aria-labelledby="languageModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h2 class="modal-title" id="languageModalLabel">{='language'|translate}</h2>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label for="languageSelect" class="form-label">{='select_language'|translate}</label>
-                        <select id="languageSelect" class="form-select">
-                            {foreach $supportedLanguages as $lang}
-                                <option value="{$lang}" {$lang === $currentLanguage ? 'selected' : ''}>
-                                    {$lang}
-                                </option>
-                            {/foreach}
-                        </select>
-                    </div>
+    {if $latestArticlesCount > 0 && count($latestArticles) > 0}
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3 class="mb-0">Articles récents</h3>
+        <a href="/articles" class="btn btn-secondary">Liste de tous les articles</a>
+    </div>
+    <ul class="list-group mb-4">
+        {foreach $latestArticles as $article}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <a href="/article/{$article->Id}">{$article->Title}</a>
+                <span class="badge bg-secondary rounded-pill">{$article->LastUpdate|shortDate}</span>
+            </li>
+        {/foreach}
+    </ul>
+    {/if}
+
+    {if isset($homeFooter) && $homeFooter !== ''}
+    {$homeFooter|noescape}
+    {/if}
+</div>
+
+<div class="modal fade" id="languageModal" tabindex="-1" aria-labelledby="languageModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="languageModalLabel">{='language'|translate}</h2>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="languageSelect" class="form-label">{='select_language'|translate}</label>
+                    <select id="languageSelect" class="form-select">
+                        {foreach $supportedLanguages as $lang}
+                            <option value="{$lang}" {$lang === $currentLanguage ? 'selected' : ''}>{$lang}</option>
+                        {/foreach}
+                    </select>
                 </div>
             </div>
         </div>
     </div>
+</div>
 {/block}
 
 {block scripts}
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    var toastElList = [].slice.call(document.querySelectorAll('.toast'));
-    var toastList = toastElList.map(function(toastEl) {
-        return new bootstrap.Toast(toastEl);
-    });
-    toastList.forEach(toast => toast.show());
-
-    const languageSelect = document.getElementById('languageSelect');
-    if (languageSelect) {
-        languageSelect.addEventListener('change', function() {
-            document.cookie = "user_language=" + this.value + "; path=/; max-age=31536000";
-
-            const languageModalEl = document.getElementById('languageModal');
-            if (languageModalEl) {
-                const modalInstance = bootstrap.Modal.getInstance(languageModalEl) 
-                                     || new bootstrap.Modal(languageModalEl);
-                modalInstance.hide();
-            }
-
-            setTimeout(() => {
-                location.reload();
-            }, 300);
-        });
-    }
-});
-</script>
+<script type="module" src="/app/modules/Common/js/home.js"></script>
 {/block}

@@ -27,27 +27,6 @@
         height: 100% !important;
         border: 1px solid #ddd;
     }
-
-    /* Styles pour l'affichage du contenu */
-    .notepad-content img {
-        max-width: 100%;
-        height: auto;
-    }
-
-    .notepad-content .img-left {
-        float: left;
-        margin: 0 15px 10px 0;
-    }
-
-    .notepad-content .img-right {
-        float: right;
-        margin: 0 0 10px 15px;
-    }
-
-    .notepad-content .img-center {
-        display: block;
-        margin: 10px auto;
-    }
 </style>
 {/block}
 
@@ -79,20 +58,5 @@
 
 {block scripts}
 <script src="/app/modules/Common/js/tinymce/tinymce.min.js"></script>
-<script src="/app/modules/Common/js/tinymce-config.js"></script>
-<script>
-initTinyMCE('#tinymce', {
-    onSave: function(editor) {
-        document.getElementById('edit-form').submit();
-    }
-});
-
-document.getElementById('edit-form').addEventListener('submit', function(e) {
-    const content = tinymce.get('tinymce').getContent().trim();
-    if (!content || content === '' || content === '<p><br></p>') {
-        e.preventDefault();
-        alert('Le contenu ne peut pas être vide.');
-    }
-});
-</script>
+<script type="module" src="/app/modules/User/js/edit_notepad.js"></script>
 {/block}

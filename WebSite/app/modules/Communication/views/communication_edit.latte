@@ -2,7 +2,6 @@
 
 {block head}
 <style>
-    /* TinyMCE ne peut pas être piloté via classes Bootstrap */
     .tox-tinymce { height: 100% !important; }
 </style>
 {/block}
@@ -206,6 +205,9 @@
 
 {block scripts}
     <script src="/app/modules/Common/js/tinymce/tinymce.min.js"></script>
-    <script src="/app/modules/Common/js/tinymce-config.js"></script>
+    <script type="module">
+        import { initTinyMCE } from '/app/modules/Common/js/tinymce-config.js';
+        initTinyMCE('#tinymce-email', {  mode: 'normal' });
+    </script>
     <script type="module" src="/app/modules/Communication/js/main.js"></script>
 {/block}

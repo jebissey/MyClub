@@ -134,10 +134,16 @@
                         desc: 'Voir les membres du club et créer/modifier ma présentation'}
 
                     {include 'CardAction.latte',
-                        href: '/user/news',
+                        href: '/user/news?from=week',
                         icon: '📰',
                         title: "News",
-                        desc: 'Voir les dernières nouvelles du club (articles, événements, sondages, présentation ...)'}
+                        desc: 'Voir les nouvelles du club (articles, événements, sondages, présentation ...) des 7 derniers jours'}
+
+                    {include 'CardAction.latte',
+                        href: '/user/messages?from=week',
+                        icon: '💬',
+                        title: "Messages",
+                        desc: 'Voir les messages des 7 derniers jours'}
                 </div>
             </div>
 

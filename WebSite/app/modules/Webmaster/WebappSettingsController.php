@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace app\modules\Webmaster;
 
 use app\enums\FilterInputRule;
-use app\enums\Help;
-use app\enums\Message;
 use app\helpers\Application;
 use app\helpers\TranslationManager;
 use app\helpers\WebApp;
@@ -15,81 +13,116 @@ use app\modules\Common\AbstractController;
 
 class WebappSettingsController extends AbstractController
 {
-    private $settingsKeys = [
-        'Error_403' => 'Error 403',
-        'Error_404' => 'Error 404',
-        'Error_500' => 'Error 500',
-    ];
     private MetadataDataHelper $metadataDataHelper;
+    private array $htmlSettingsKeys = [
+        'Home_Header' => 'En-tête de la page d\'accueil',
+        'Home_Footer' => 'Pied de page de la page d\'accueil',
+    ];
+    private array $numericSettingsKeys = [
+        'Home_LatestArticlesCount' => [
+            'label'   => 'Nombre de derniers articles à afficher',
+            'default' => 10,
+            'min'     => 0,
+            'max'     => 50,
+        ],
+        'Home_FeaturedArticleId' => [
+            'label'   => 'ID de l\'article mis en avant (0 = dernier article)',
+            'default' => 0,
+            'min'     => 0,
+            'max'     => null,
+        ],
+    ];
 
     public function __construct(Application $application)
     {
         parent::__construct($application);
         $this->metadataDataHelper = new MetadataDataHelper($application);
-        foreach (Help::cases() as $case) {
-            $this->settingsKeys['Help_' . $case->name] = $this->languagesDataHelper->translate('Help_' . $case->value);
-        }
-        foreach (Message::cases() as $case) {
-            $this->settingsKeys['Message_' . $case->name] = $this->languagesDataHelper->translate('Message_' . $case->value);
-        }
-        $this->settingsKeys['Home_header'] = $this->languagesDataHelper->translate('Home_header');
-        $this->settingsKeys['Home_footer'] = $this->languagesDataHelper->translate('Home_footer');
     }
 
     public function editSettings(): void
     {
-        if (!($this->application->getConnectedUser()->isHomeDesigner() ?? false)) {
-            $this->raiseforbidden(__FILE__, __LINE__);
+        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isHomeDesigner())) {
             return;
         }
-        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
-            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
+
+        $lang     = TranslationManager::getCurrentLanguage();
         $settings = [];
-        foreach ($this->settingsKeys as $key => $label) {
+        foreach ($this->htmlSettingsKeys as $key => $label) {
+            $result = $this->dataHelper->get('Languages', ['Name' => $key], $lang);
+            if ($result === false) {
+                $settings[$key] = '';
+            } else {
+                $settings[$key] = $result->$lang ?? '';
+            }
+        }
+        foreach ($this->numericSettingsKeys as $key => $config) {
             $result = $this->dataHelper->get('Settings', ['Name' => $key], 'Value');
             if ($result === false) {
-                $this->dataHelper->set('Settings', ['Value' => '', 'Name' => $key]);
-                $settings[$key] = '';
-            } else $settings[$key] = $result->Value ?? '';
+                $this->dataHelper->set('Settings', [
+                    'Name'  => $key,
+                    'Value' => (string) $config['default'],
+                ]);
+                $settings[$key] = $config['default'];
+            } else {
+                $settings[$key] = (int) ($result->Value ?? $config['default']);
+            }
         }
 
         $this->render('Webmaster/views/webappSettings.latte', $this->getAllParams([
-            'navItems' => $this->getNavItems($this->application->getConnectedUser()->person),
-            'settingsKeys' => $this->settingsKeys,
-            'settings' => $settings,
-            'page' => $this->application->getConnectedUser()->getPage(),
-            'supportedLanguages' => TranslationManager::getSupportedLanguages(),
+            'navItems'            => $this->getNavItems($this->application->getConnectedUser()->person),
+            'htmlSettingsKeys'    => $this->htmlSettingsKeys,
+            'numericSettingsKeys' => $this->numericSettingsKeys,
+            'settings'            => $settings,
+            'page'                => $this->application->getConnectedUser()->getPage(),
+            'supportedLanguages'  => TranslationManager::getSupportedLanguages(),
+            'currentLanguage'     => $lang,
+            'forcedLanguage'      => $this->metadataDataHelper->getForcedLanguage(),
         ]));
     }
 
-    public function saveSettings()
+    public function saveSettings(): void
     {
-        if (!($this->application->getConnectedUser()->isHomeDesigner() ?? false)) {
-            $this->raiseforbidden(__FILE__, __LINE__);
+        if (!$this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isHomeDesigner())) {
             return;
         }
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
-        $input = $this->flight->request()->data->getData();
-        foreach ($this->settingsKeys as $key => $label) {
-            if (isset($input[$key])) {
-                $value = $input[$key] ?? '';
-                $existing = $this->dataHelper->get('Settings', ['Name' => $key], 'Id');
-                if ($existing) $this->dataHelper->set('Settings', ['Value' => $value], ['Name' => $key]);
-                else           $this->dataHelper->set('Settings', ['Value' => $value, 'Name' => $key]);
+
+        $schema = [
+            'Home_Header'              => FilterInputRule::Html->value,
+            'Home_Footer'              => FilterInputRule::Html->value,
+            'Home_FeaturedArticleId'   => FilterInputRule::Int->value,
+            'Home_LatestArticlesCount' => FilterInputRule::Int->value,
+        ];
+        $input = WebApp::filterInput($schema, $this->flight->request()->data->getData());
+
+        $lang = TranslationManager::getCurrentLanguage();
+        foreach ($this->htmlSettingsKeys as $key => $label) {
+            $value    = $input[$key] ?? '';
+            $existing = $this->dataHelper->get('Languages', ['Name' => $key], $lang);
+            if ($existing === false) {
+                $this->dataHelper->set('Languages', ['Name' => $key, $lang => $value]);
+            } else {
+                $this->dataHelper->set('Languages', [$lang => $value], ['Name' => $key]);
             }
         }
-        $this->redirect('/settings');
+
+        foreach ($this->numericSettingsKeys as $key => $config) {
+            $raw      = (int) ($input[$key] ?? $config['default']);
+            $value    = max($config['min'], $config['max'] !== null ? min($config['max'], $raw) : $raw);
+            $existing = $this->dataHelper->get('Settings', ['Name' => $key], 'Value');
+            if ($existing === false) {
+                $this->dataHelper->set('Settings', ['Name' => $key, 'Value' => (string) $value]);
+            } else {
+                $this->dataHelper->set('Settings', ['Value' => (string) $value], ['Name' => $key]);
+            }
+        }
+
+        $this->redirect('/designer');
     }
 
     public function saveLanguage()
     {
         if (!($this->application->getConnectedUser()->isHomeDesigner() ?? false)) {
-            $this->raiseforbidden(__FILE__, __LINE__);
+            $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'GET') {

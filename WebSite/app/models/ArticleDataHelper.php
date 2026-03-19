@@ -13,8 +13,6 @@ use app\interfaces\NewsProviderInterface;
 
 class ArticleDataHelper extends Data implements NewsProviderInterface
 {
-    private const LAST_ARTICLES = 10;
-
     public function __construct(Application $application, private AuthorizationDataHelper $authorizationDataHelper)
     {
         parent::__construct($application);
@@ -55,19 +53,6 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
         }
 
         return $totals;
-    }
-
-    public function getArticleIdsBasedOnAccess(?string $userEmail): array
-    {
-        $noGroupArticleIds = $this->getNoGroupArticleIds();
-        if (empty($userEmail)) return $noGroupArticleIds;
-        $forMembersOnlyArticleIds = $this->getArticleIdsForMembers([$userEmail]);
-        if (empty($forMembersOnlyArticleIds)) $articleIds = $noGroupArticleIds;
-        else $articleIds = array_merge($noGroupArticleIds, $forMembersOnlyArticleIds);
-        $userGroups = $this->authorizationDataHelper->getUserGroups($userEmail);
-        if (empty($userGroups)) return $articleIds;
-        $groupArticleIds = $this->getArticleIdsByGroups($userGroups);
-        return array_unique(array_merge($articleIds, $groupArticleIds));
     }
 
     public function getArticlesForAll(): array
@@ -166,7 +151,7 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
         return $result->LastMod ?? null;
     }
 
-    public function getLatestArticles(?string $userEmail = null): array
+    public function getLatestArticles(?string $userEmail = null, int $latestArticlesCount): array
     {
         $articleIds = $this->getArticleIdsBasedOnAccess($userEmail);
         if (empty($articleIds)) {
@@ -177,7 +162,7 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
         }
         return [
             'latestArticle' => $this->getLatestArticle($articleIds),
-            'latestArticles' => $this->getLatestArticles_($articleIds)
+            'latestArticles' => $this->getLatestArticles_($articleIds, $latestArticlesCount)
         ];
     }
 
@@ -287,6 +272,19 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
     }
 
     #region Private funcions
+    private function getArticleIdsBasedOnAccess(?string $userEmail): array
+    {
+        $noGroupArticleIds = $this->getNoGroupArticleIds();
+        if (empty($userEmail)) return $noGroupArticleIds;
+        $forMembersOnlyArticleIds = $this->getArticleIdsForMembers([$userEmail]);
+        if (empty($forMembersOnlyArticleIds)) $articleIds = $noGroupArticleIds;
+        else $articleIds = array_merge($noGroupArticleIds, $forMembersOnlyArticleIds);
+        $userGroups = $this->authorizationDataHelper->getUserGroups($userEmail);
+        if (empty($userGroups)) return $articleIds;
+        $groupArticleIds = $this->getArticleIdsByGroups($userGroups);
+        return array_unique(array_merge($articleIds, $groupArticleIds));
+    }
+
     private function getArticleIdsByGroups(array $groupIds): array
     {
         if (empty($groupIds)) return [];
@@ -308,7 +306,7 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
         return $query->fetchAll(PDO::FETCH_COLUMN);
     }
 
-    public function getLatestArticles_(array $articleIds): array
+    private function getLatestArticles_(array $articleIds, int $latestArticlesCount): array
     {
         if (empty($articleIds)) return [];
 
@@ -325,7 +323,7 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
             WHERE Id IN (" . implode(',', $placeholders) . ")
             AND PublishedBy IS NOT NULL
             ORDER BY LastUpdate DESC
-            LIMIT " . self::LAST_ARTICLES;
+            LIMIT " . $latestArticlesCount;
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute($params);
         return $stmt->fetchAll() ?: [];

@@ -9,7 +9,7 @@ It helps clubs manage **articles, events, and members** with an intuitive interf
 
 👍 [Tutorials](https://www.youtube.com/channel/UC3EmmKasCGdM2_fP2ZNdAzg)🇫🇷
 
-📖 [Manuals](https://myclub.alwaysdata.net/)🇫🇷
+📖 [Manuals](https://myclub.ovh/)🇫🇷
 
 ---
 
@@ -105,7 +105,7 @@ Security is based on **groups**. There are three types:
 ## 👁️ Examples
 
 👉 **MyClub web application**  
-[Presentation of the web app, with articles and videos](https://myclub.alwaysdata.net/)  
+[Presentation of the web app, with articles and videos](https://myclub.ovh/)  
 
 👉 **Nordic Walking club website**  
 [BNW – Burgundy Nordic Walking](https://bnw-dijon.fr/)
@@ -126,11 +126,11 @@ Security is based on **groups**. There are three types:
 
 ## 👁️ Manuals and tutorials (in French)
 
-👉 [You are](https://myclub.alwaysdata.net/navbar/show/article/10)
+👉 [You are](https://myclub.ovh/navbar/show/article/10)
 
-👉 [MyClub Dictionary](https://myclub.alwaysdata.net/navbar/show/article/47)
+👉 [MyClub Dictionary](https://myclub.ovh/navbar/show/article/47)
 
-👉 [Short videos](https://myclub.alwaysdata.net/navbar/show/article/28)
+👉 [Short videos](https://myclub.ovh/navbar/show/article/28)
 
 ---
 
