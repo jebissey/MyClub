@@ -2,6 +2,12 @@
 
 {block title}Édition - {$article->Title}{/block}
 
+{block head}
+<style>
+    .tox-tinymce { height: 100% !important; }
+</style>
+{/block}
+
 {block navbar}
 <div class="container-fluid d-flex align-items-center">
     <div class="d-flex gap-2">
@@ -26,28 +32,15 @@
 </div>
 {/block}
 
-{block head}
-<style>
-/* Conteneur de l'éditeur */
-.editor-wrapper {
-    min-height: 600px;
-}
-
-.tox-tinymce {
-    border: 1px solid #ced4da !important;
-}
-</style>
-{/block}
-
 {block content}
     <div id="liveAlertPlaceholder"></div>
-    <div class="container-fluid">
-        <div class="card mb-4">
+    <div class="container-fluid mt-3 d-flex flex-column" style="height:calc(100vh - 120px)">
+        <div class="card mb-3 flex-shrink-0">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <div>
                     <h2 class="card-title" id="article-title-display">{$article->Title}</h2>
                     <small class="text-muted">
-                        Créé par {$article->FirstName} {$article->LastName} 
+                        Créé par {$article->FirstName} {$article->LastName}
                         le {date('d/m/Y', strtotime($article->Timestamp))}
                         {$publishedBy}
                         {if date('Y-m-d', strtotime($article->Timestamp)) !== date('Y-m-d', strtotime($article->LastUpdate))}
@@ -65,15 +58,13 @@
                 </div>
             </div>
 
-            <div class="card-body">
-                <form id="edit-form" method="post">
-                    <div class="d-flex align-items-center gap-4 flex-wrap mb-4">
+            <div class="card-body py-2">
+                <form id="edit-form" method="post" class="d-flex flex-column gap-2">
+                    <div class="d-flex align-items-center gap-4 flex-wrap">
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="published-input" name="published" value="1" 
+                            <input class="form-check-input" type="checkbox" id="published-input" name="published" value="1"
                                 {if isset($article->PublishedBy) && $article->PublishedBy !== null}checked{/if}>
-                            <label class="form-check-label" for="published-input">
-                                Publier
-                            </label>
+                            <label class="form-check-label" for="published-input">Publier</label>
                         </div>
 
                         <div class="d-flex align-items-center gap-2">
@@ -85,98 +76,36 @@
                                 {/foreach}
                             </select>
                         </div>
-                        
+
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="members-only-checkbox" name="membersOnly" value="1" 
+                            <input class="form-check-input" type="checkbox" id="members-only-checkbox" name="membersOnly" value="1"
                                 {if isset($article->OnlyForMembers) && $article->OnlyForMembers}checked{/if}>
                             <label class="form-check-label" for="members-only-checkbox">Pour les membres du club uniquement</label>
-                        </div>                        
-                    </div>
-                    
-                    <hr class="w-100 my-3">
-                    
-                    <div class="mb-3">
-                        <label for="title-input" class="form-label">Titre</label>
-                        <input type="text" class="form-control" id="title-input" name="title" value="{$article->Title}" required>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label for="tinymce-editor" class="form-label">Contenu</label>
-                        <div class="editor-wrapper">
-                            <textarea name="content" id="tinymce-editor">{if isset($article->Content)}{$article->Content|noescape}{/if}</textarea>
                         </div>
                     </div>
+
+                    <hr class="my-2">
+
+                    <div>
+                        <label for="title-input" class="form-label mb-1">Titre</label>
+                        <input type="text" class="form-control" id="title-input" name="title" value="{$article->Title}" required>
+                    </div>
+                    <input type="hidden" id="content-input" name="content">
                 </form>
             </div>
+        </div>
+
+        <div class="d-flex flex-column flex-grow-1" style="min-height:0">
+            <label class="form-label fw-semibold flex-shrink-0 mb-1">
+                <i class="bi bi-body-text"></i> Contenu <span class="text-danger">*</span>
+            </label>
+            <textarea name="content" id="tinymce-editor" class="flex-grow-1">{if isset($article->Content)}{$article->Content|noescape}{/if}</textarea>
         </div>
     </div>
 {/block}
 
 {block scripts}
-<script src="/app/modules/Common/js/tinymce/tinymce.min.js"></script>
-<script type="module">
-    import { initTinyMCE } from '/app/modules/Common/js/tinymce-config.js';
-    initTinyMCE('#editorArticle', {  mode: 'normal' });
-</script>
-<script>
-const ARTICLE_ID = {$article->Id};
-</script>
-<script n:syntax="off">
-
-// ===== INITIALISATION =====
-document.addEventListener('DOMContentLoaded', function() {
-    
-    const textarea = document.getElementById('tinymce-editor');
-    if (!textarea) {
-        console.error('❌ Textarea #tinymce-editor introuvable !');
-        return;
-    }
-    
-    initTinyMCE('#tinymce-editor', {
-        height: 600,
-        imageMaxWidth: 1600,
-        imageQuality: 0.85,
-        onSave: function(editor) {
-            document.getElementById('edit-form').submit();
-        },
-        onInit: function(editor) {
-            console.log('✅ TinyMCE initialisé avec succès !');
-        }
-    });
-    
-    document.getElementById('save-btn').addEventListener('click', function(e) {
-        e.preventDefault();
-        document.getElementById('edit-form').requestSubmit();
-    });
-    
-    // Validation du formulaire
-    document.getElementById('edit-form').addEventListener('submit', function(e) {
-        const title = document.getElementById('title-input').value.trim();
-        
-        // Vérifier que TinyMCE est initialisé
-        const editor = tinymce.get('tinymce-editor');
-        if (!editor) {
-            e.preventDefault();
-            appendAlert('L\'éditeur n\'est pas encore chargé. Veuillez patienter.', 'warning');
-            return false;
-        }
-        
-        const content = editor.getContent().trim();
-        
-        if (!title) {
-            e.preventDefault();
-            appendAlert('Le titre est obligatoire.', 'danger');
-            return false;
-        }
-        
-        if (!content || content === '' || content === '<p><br></p>') {
-            e.preventDefault();
-            appendAlert('Le contenu ne peut pas être vide.', 'danger');
-            return false;
-        }
-        
-        console.log('✅ Formulaire validé, soumission...');
-    });
-});
-</script>
+    <script src="/app/modules/Common/js/tinymce/tinymce.min.js"></script>
+    <script>const ARTICLE_ID = {$article->Id};</script>
+    <script type="module" src="/app/modules/Article/js/edit.js"></script>
 {/block}
