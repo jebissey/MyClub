@@ -41,7 +41,8 @@ class WebApp
         $filtered = [];
         foreach ($schema as $key => $rule) {
             $raw = $source[$key] ?? null;
-            if (!isset($raw) || (is_string($raw) && strlen($raw) > 1024 * 1024)) {
+            $maxLen = ($rule === FilterInputRule::DataUrl->value) ? 5 * 1024 * 1024 : 1024 * 1024;
+            if (!isset($raw) || (is_string($raw) && strlen($raw) > $maxLen)) {
                 $filtered[$key] = null;
                 continue;
             }
@@ -77,6 +78,13 @@ class WebApp
             }
             if (is_array($raw)) {
                 $filtered[$key] = null;
+                continue;
+            }
+            if ($rule === FilterInputRule::DataUrl->value) {
+                $filtered[$key] = (
+                    is_string($raw) &&
+                    preg_match('/^data:image\/(png|jpeg|gif|webp);base64,[A-Za-z0-9+\/]+=*$/', $raw)
+                ) ? $raw : null;
                 continue;
             }
             if ($rule === FilterInputRule::Html->value) $value = trim($raw);

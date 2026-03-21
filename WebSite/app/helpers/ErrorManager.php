@@ -45,10 +45,7 @@ class ErrorManager
             return;
         }
         $translation = $this->languagesDataHelper->translate('Error' . $code->value);
-        $setting = $this->dataHelper->get('Settings', ['Name' => 'Error_' . $code->value], 'Value');
-        $result = '';
-        if ($setting !== false && $setting->Value != '') $result =  $setting->Value;
-        elseif ($translation != "-- Error{$code->value} --") $result = $translation;
+        if ($translation != "-- Error{$code->value} --") $result = $translation;
         if ($result == '') {
             if ($displayCode) $result .= "<h1>{$code->value}</h1>";
             $result .= "<h2>$message</h2>";

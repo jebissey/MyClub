@@ -39,6 +39,7 @@ mkdir -p backup
 mkdir -p var/latte/temp
 mkdir -p var/tracy/log
 mkdir -p var/tracy/sessions
+mkdir -p app/images
 
 # Clear caches
 echo -e "${YELLOW}🧹 Clearing caches...${NC}"
@@ -51,6 +52,7 @@ echo -e "${YELLOW}👥 Setting group ownership to www-data...${NC}"
 sudo chgrp -R www-data data 2>/dev/null
 sudo chgrp -R www-data backup 2>/dev/null
 sudo chgrp -R www-data var 2>/dev/null
+sudo chgrp -R www-data app/images 2>/dev/null
 echo -e "${GREEN}✓ Group ownership set${NC}"
 
 # Fix directory permissions (rwxrwxr-x with setgid)
@@ -58,12 +60,14 @@ echo -e "${YELLOW}🔒 Setting directory permissions...${NC}"
 sudo chmod 2775 data 2>/dev/null
 sudo chmod 2775 backup 2>/dev/null
 sudo find var -type d -exec chmod 2775 {} \; 2>/dev/null
+sudo chmod 2775 app/images 2>/dev/null
 echo -e "${GREEN}✓ Directory permissions set (2775)${NC}"
 
 # Fix file permissions (rw-rw-r--)
 echo -e "${YELLOW}🔒 Setting file permissions...${NC}"
 sudo find data -type f -exec chmod 664 {} \; 2>/dev/null
 sudo find var -type f -exec chmod 664 {} \; 2>/dev/null
+sudo find app/images -type f -exec chmod 664 {} \; 2>/dev/null
 echo -e "${GREEN}✓ File permissions set (664)${NC}"
 
 # Add current user to www-data group if not already member
@@ -82,5 +86,6 @@ echo -e "${YELLOW}Summary:${NC}"
 echo -e "  - Folders: ${GREEN}2775${NC} (rwxrwxr-x with setgid)"
 echo -e "  - Files: ${GREEN}664${NC} (rw-rw-r--)"
 echo -e "  - Group: ${GREEN}www-data${NC}"
+echo -e "  - Writable by www-data: ${GREEN}data, backup, var, app/images${NC}"
 echo ""
 echo -e "${YELLOW}Now both you and nginx (www-data) can read/write to these folders${NC}"

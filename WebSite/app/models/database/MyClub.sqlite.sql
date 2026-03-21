@@ -2304,10 +2304,10 @@ INSERT INTO "Languages" VALUES (109,'navbar.designer.designs','Designs','Les des
 INSERT INTO "Languages" VALUES (110,'navbar.designer.kanban','Kanban board','Kanban','Tablica Kanban');
 INSERT INTO "Languages" VALUES (111,'navbar.designer.menu','Navigation menus','Les menus de navigation','Menu nawigacyjne');
 INSERT INTO "Languages" VALUES (112,'navbar.designer.translator','Translations','Les traductions','Tłumaczenia');
-INSERT INTO "Languages" VALUES (113,'navbar.admin.event_manager','Event manager','Animateur','Koordynator wydarzeń');
+INSERT INTO "Languages" VALUES (113,'navbar.admin.event_manager','Event manager','Gestionnaire d''événement','Koordynator wydarzeń');
 INSERT INTO "Languages" VALUES (114,'navbar.admin.designer','Designer','Designer','Projektant');
 INSERT INTO "Languages" VALUES (115,'navbar.admin.redactor','Redactor','Rédacteur','Redaktor');
-INSERT INTO "Languages" VALUES (116,'navbar.admin.person_manager','Secretary','Secrétaire','Sekretarz');
+INSERT INTO "Languages" VALUES (116,'navbar.admin.person_manager','Secretary','Gestionnaire des membres','Sekretarz');
 INSERT INTO "Languages" VALUES (117,'navbar.admin.visitor_insights','Observer','Observateur','Obserwator');
 INSERT INTO "Languages" VALUES (118,'navbar.admin.webmaster','Webmaster','Webmaster','Webmaster');
 INSERT INTO "Languages" VALUES (119,'navbar.event_manager.week_events','Weekly calendar','Calendrier hebdomadaire','Kalendarz tygodniowy');
@@ -2656,7 +2656,13 @@ INSERT INTO "Languages" VALUES (400,'home.role.webmaster','🛠️ Webmaster','�
 INSERT INTO "Languages" VALUES (401,'home.action.site_config.title','Site configuration','Configuration site','Konfiguracja witryny');
 INSERT INTO "Languages" VALUES (402,'home.action.site_config.desc','Technical settings','Paramètres techniques','Ustawienia techniczne');
 INSERT INTO "Languages" VALUES (403,'LegalNotices','Your legal notices here','Vos mentions légales ici','Twoje informacje prawne tutaj');
-INSERT INTO "Metadata" VALUES (1,'MyClub',26,0,1000000,NULL,10,36,6,NULL,0,NULL);
+INSERT INTO "Languages" VALUES (404,'communication.index.deactivated_accounts','Deactivated accounts','Comptes désactivés','Dezaktywowane konta');
+INSERT INTO "Languages" VALUES (405,'designer.home_settings.image_banner_desc','Image for the banner','Image pour la bannière','Obraz dla bannera');
+INSERT INTO "Languages" VALUES (406,'designer.home_settings.image_home_desc','Image for the Home button in the navigation bar','Image pour le bouton Home de la barre de navigation','Obraz przycisku Home na pasku nawigacji');
+INSERT INTO "Languages" VALUES (407,'designer.home_settings.image_logo_desc','Watermark image','Image en filigrane','Obraz znaku wodnego');
+INSERT INTO "Languages" VALUES (408,'designer.home_settings.title_edit_images','Image editing','Édition des images','Edycja obrazów');
+INSERT INTO "Languages" VALUES (409,'navbar.redactor.crossTab','Editors cross-tab','Tableau croisé des rédacteurs','Tabela krzyżowa redaktorów');
+INSERT INTO "Metadata" VALUES (1,'MyClub',27,0,1000000,NULL,10,36,6,NULL,0,NULL);
 INSERT INTO "Person" VALUES (1,'webmaster@myclub.foo','e427c26faca947919b18b797bc143a35100e4de48c34b70b26202d3a7d8e51f7','my first name','my last name','my nick name or nothing',NULL,'0',NULL,NULL,NULL,NULL,NULL,0,0,NULL,NULL,'2025-01-01',0,0,0,NULL,NULL,NULL,NULL,NULL,NULL,'');
 INSERT INTO "PersonGroup" VALUES (1,1,1);
 INSERT INTO "Settings" VALUES (1,'Title','title');

@@ -9,6 +9,7 @@ use \Minishlink\WebPush\VAPID;
 use app\enums\FilterInputRule;
 use app\helpers\Application;
 use app\helpers\NotificationSender;
+use app\helpers\TranslationManager;
 use app\helpers\WebApp;
 use app\models\ArticleDataHelper;
 use app\models\LogDataHelper;
@@ -44,8 +45,9 @@ class WebmasterController extends AbstractController
     public function helpWebmaster(): void
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isWebmaster())) {
+            $lang = TranslationManager::getCurrentLanguage();
             $this->render('Common/views/info.latte', [
-                'content'          => $this->dataHelper->get('Settings', ['Name' => 'Help_webmaster'], 'Value')->Value ?? '',
+                'content'          => $this->dataHelper->get('Languages', ['Name' => 'Help_Webmaster'], $lang)->$lang ?? '',
                 'hasAuthorization' => $this->application->getConnectedUser()->isWebmaster() ?? false,
                 'currentVersion'   => Application::VERSION,
                 'timer'            => 0,

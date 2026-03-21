@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\modules\Designer;
 
 use app\helpers\Application;
+use app\helpers\TranslationManager;
 use app\helpers\WebApp;
 use app\modules\Common\AbstractController;
 
@@ -18,8 +19,9 @@ class DesignerController extends AbstractController
     public function helpDesigner(): void
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isDesigner())) {
+            $lang = TranslationManager::getCurrentLanguage();
             $this->render('Common/views/info.latte', [
-                'content' => $this->dataHelper->get('Settings', ['Name' => 'Help_designer'], 'Value')->Value ?? '',
+                'content' => $this->dataHelper->get('Languages', ['Name' => 'Help_Designer'], $lang)->$lang ?? '',
                 'hasAuthorization' => $this->application->getConnectedUser()->isDesigner() ?? false,
                 'currentVersion' => Application::VERSION,
                 'timer' => 0,

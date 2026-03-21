@@ -12,6 +12,7 @@ use app\helpers\Application;
 use app\helpers\Backup;
 use app\helpers\GravatarHandler;
 use app\helpers\PeriodHelper;
+use app\helpers\TranslationManager;
 use app\helpers\WebApp;
 use app\models\ArticleCrosstabDataHelper;
 use app\models\ArticleDataHelper;
@@ -235,8 +236,9 @@ class ArticleController extends TableController
             $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
+        $lang = TranslationManager::getCurrentLanguage();
         $this->render('Common/views/info.latte', [
-            'content' => $this->dataHelper->get('Settings', ['Name' => 'Help_redactor'], 'Value')->Value ?? '',
+            'content' => $this->dataHelper->get('Languages', ['Name' => 'Help_Redactor'], $lang)->$lang ?? '',
             'hasAuthorization' => $this->application->getConnectedUser()->isRedactor() ?? false,
             'currentVersion' => Application::VERSION,
             'timer' => 0,

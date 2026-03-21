@@ -8,6 +8,7 @@ use app\enums\Period;
 use app\enums\FilterInputRule;
 use app\helpers\Application;
 use app\helpers\PeriodHelper;
+use app\helpers\TranslationManager;
 use app\helpers\WebApp;
 use app\models\ArticleDataHelper;
 use app\models\CrosstabDataHelper;
@@ -85,8 +86,9 @@ class VisitorInsightsController extends TableController
     public function helpVisitorInsights(): void
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isVisitorInsights())) {
+            $lang = TranslationManager::getCurrentLanguage();
             $this->render('Common/views/info.latte', [
-                'content' => $this->dataHelper->get('Settings', ['Name' => 'Help_visitorInsights'], 'Value')->Value ?? '',
+                'content' => $this->dataHelper->get('Languages', ['Name' => 'Help_VisitorInsights'], $lang)->$lang ?? '',
                 'hasAuthorization' => $this->application->getConnectedUser()->isVisitorInsights() ?? false,
                 'currentVersion' => Application::VERSION,
                 'timer' => 0,

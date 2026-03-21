@@ -8,6 +8,7 @@ use RuntimeException;
 
 use app\enums\FilterInputRule;
 use app\helpers\Application;
+use app\helpers\TranslationManager;
 use app\helpers\WebApp;
 use app\models\DesignDataHelper;
 use app\modules\Common\AbstractController;
@@ -90,8 +91,9 @@ class DesignController extends AbstractController
     public function helpDesigner(): void
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isDesigner())) {
+            $lang = TranslationManager::getCurrentLanguage();
             $this->render('Common/views/info.latte', [
-                'content' => $this->dataHelper->get('Settings', ['Name' => 'Help_designer'], 'Value')->Value ?? '',
+                'content' => $this->dataHelper->get('Languages', ['Name' => 'Help_Designer'], $lang)->$lang ?? '',
                 'hasAuthorization' => $this->application->getConnectedUser()->isDesigner() ?? false,
                 'currentVersion' => Application::VERSION,
                 'timer' => 0,

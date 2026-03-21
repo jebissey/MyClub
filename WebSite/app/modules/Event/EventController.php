@@ -16,6 +16,7 @@ use app\exceptions\QueryException;
 use app\helpers\Application;
 use app\helpers\GravatarHandler;
 use app\helpers\PeriodHelper;
+use app\helpers\TranslationManager;
 use app\helpers\WebApp;
 use app\models\CrosstabDataHelper;
 use app\models\EventDataHelper;
@@ -252,8 +253,9 @@ class EventController extends AbstractController
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
+        $lang = TranslationManager::getCurrentLanguage();
         $this->render('Common/views/info.latte', [
-            'content' => $this->dataHelper->get('Settings', ['Name' => 'Help_eventManager'], 'Value')->Value ?? '',
+            'content' => $this->dataHelper->get('Languages', ['Name' => 'Help_EventManager'], $lang)->$lang ?? '',
             'hasAuthorization' => $this->application->getConnectedUser()->hasAutorization() ?? false,
             'currentVersion' => Application::VERSION,
             'timer' => 0,

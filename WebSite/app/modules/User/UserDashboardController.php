@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\modules\User;
 
 use app\helpers\Application;
+use app\helpers\TranslationManager;
 use app\modules\Common\AbstractController;
 
 class UserDashboardController extends AbstractController
@@ -24,8 +25,9 @@ class UserDashboardController extends AbstractController
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
+        $lang = TranslationManager::getCurrentLanguage();
         $this->render('Common/views/info.latte', $this->getAllParams([
-            'content' => $this->dataHelper->get('Settings', ['Name' => 'Help_User'], 'Value')->Value ?? '',
+            'content' => $this->dataHelper->get('Languages', ['Name' => 'Help_User'], $lang)->$lang ?? '',
             'hasAuthorization' => $this->application->getConnectedUser()->hasAutorization(),
             'currentVersion' => Application::VERSION,
             'timer' => 0,

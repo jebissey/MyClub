@@ -27,13 +27,10 @@ class LanguagesDataHelper extends Data
         if ($key === '') {
             return '';
         }
-
         $lang = TranslationManager::getCurrentLanguage();
-
         if (!in_array($lang, $this->allowedLanguages, true)) {
             $lang = $this->defaultLanguage;
         }
-
         $escapedLang = $this->escapeColumn($lang);
 
         $stmt = $this->pdo->prepare(

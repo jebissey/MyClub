@@ -6,6 +6,7 @@ const SECTIONS = {
     article: { color: '#198754', label: 'Article principal', hasTiny: false },
     latest:  { color: '#ffc107', label: 'Derniers articles', hasTiny: false },
     footer:  { color: '#6f42c1', label: 'Pied de page',      hasTiny: true  },
+    images:  { color: '#d63384', label: 'Images',            hasTiny: false },
 };
 
 let activeSection     = null;
@@ -110,6 +111,198 @@ function refreshLatestStatus() {
     }
 }
 
+// ── Gestion des images ────────────────────────────────────────────────────
+
+/**
+ * Redimensionne une image via Canvas selon la stratégie choisie.
+ *
+ * @param {File}   file        Fichier image source
+ * @param {Object} opts
+ * @param {number} opts.maxW   Largeur max (px)
+ * @param {number} opts.maxH   Hauteur max (px)
+ * @param {'fit'|'cover'|'exact'} opts.mode
+ *   - 'fit'   : redimensionne pour tenir dans maxW×maxH, conserve le ratio
+ *   - 'cover' : recadre au centre pour remplir exactement maxW×maxH
+ *   - 'exact' : force exactement maxW×maxH (étire si nécessaire)
+ * @param {'image/png'|'image/jpeg'} opts.mimeType
+ * @param {number} [opts.quality=0.92]  Qualité JPEG (0–1)
+ * @returns {Promise<{dataURL: string, width: number, height: number, sizeKB: number}>}
+ */
+function resizeImage(file, { maxW, maxH, mode = 'fit', mimeType = 'image/png', quality = 0.92 }) {
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        const url = URL.createObjectURL(file);
+        img.onload = () => {
+            URL.revokeObjectURL(url);
+
+            let srcX = 0, srcY = 0, srcW = img.width, srcH = img.height;
+            let dstW, dstH;
+
+            if (mode === 'exact') {
+                dstW = maxW; dstH = maxH;
+            } else if (mode === 'fit') {
+                const ratio = Math.min(maxW / img.width, maxH / img.height, 1);
+                dstW = Math.round(img.width  * ratio);
+                dstH = Math.round(img.height * ratio);
+            } else if (mode === 'cover') {
+                // Calcule le crop centré
+                dstW = maxW; dstH = maxH;
+                const scale = Math.max(maxW / img.width, maxH / img.height);
+                const scaledW = img.width  * scale;
+                const scaledH = img.height * scale;
+                srcX = (img.width  - scaledW / scale) / 2;
+                srcY = (img.height - scaledH / scale) / 2;
+                srcW = img.width  - srcX * 2;
+                srcH = img.height - srcY * 2;
+            }
+
+            const canvas = document.createElement('canvas');
+            canvas.width  = dstW;
+            canvas.height = dstH;
+            const ctx = canvas.getContext('2d');
+            ctx.imageSmoothingEnabled = true;
+            ctx.imageSmoothingQuality = 'high';
+            ctx.drawImage(img, srcX, srcY, srcW, srcH, 0, 0, dstW, dstH);
+
+            const dataURL = canvas.toDataURL(mimeType, quality);
+            // Estimation de la taille en ko (base64 → octets)
+            const sizeKB  = Math.round((dataURL.length * 3 / 4) / 1024);
+            resolve({ dataURL, width: dstW, height: dstH, sizeKB });
+        };
+        img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Impossible de lire l\'image.')); };
+        img.src = url;
+    });
+}
+
+/** Configs par clé */
+const IMAGE_CONFIGS = {
+    home: {
+        maxW: 48, maxH: 48,
+        mode: 'cover',          // carré exact centré
+        mimeType: 'image/png',
+        previewStyle: '',       // taille naturelle (64px wrap)
+    },
+    logo: {
+        maxW: 1200, maxH: 1200,
+        mode: 'fit',            // conserve le ratio, réduit si besoin
+        mimeType: 'image/png',
+        previewStyle: 'max-height:64px;',
+    },
+    banner: {
+        maxW: 1920, maxH: 600,
+        mode: 'fit',            // conserve le ratio, réduit si besoin
+        mimeType: 'image/jpeg',
+        quality: 0.88,
+        previewStyle: 'width:100%;height:64px;object-fit:cover;',
+    },
+};
+
+/**
+ * Affiche le badge de statut dans la card.
+ * @param {string} key   'home'|'logo'|'banner'
+ * @param {'pending'|'ok'|'error'} state
+ * @param {string} [msg]
+ */
+function setImageInfo(key, state, msg = '') {
+    const el = document.getElementById('info-' + key);
+    if (!el) return;
+    const map = {
+        pending: 'alert-info',
+        ok:      'alert-success',
+        error:   'alert-danger',
+    };
+    el.className = `alert ${map[state] ?? 'alert-secondary'} py-1 px-2 small mb-0`;
+    el.innerHTML  = msg;
+}
+
+/**
+ * Traite un fichier image pour une clé donnée :
+ * redimensionne, affiche la prévisualisation, stocke le dataURL dans le hidden input.
+ */
+async function handleImageFile(key, file) {
+    const cfg = IMAGE_CONFIGS[key];
+    if (!cfg) return;
+
+    setImageInfo(key, 'pending', `<i class="bi bi-hourglass-split me-1"></i>Traitement en cours…`);
+
+    try {
+        const { dataURL, width, height, sizeKB } = await resizeImage(file, cfg);
+
+        // Prévisualisation dans le panneau éditeur
+        const previewEl     = document.getElementById('preview-' + key);
+        const placeholderEl = document.getElementById('placeholder-' + key);
+        const dotEl         = document.getElementById('dot-' + key);
+
+        if (previewEl) {
+            previewEl.src           = dataURL;
+            previewEl.style.cssText = cfg.previewStyle;
+            previewEl.style.display = '';
+        }
+        if (placeholderEl) placeholderEl.style.display = 'none';
+        if (dotEl)         dotEl.style.background      = '#ffc107'; // jaune = modifié, pas encore sauvegardé
+
+        // Pour la bannière : mettre à jour aussi la zone en haut de la colonne gauche
+        if (key === 'banner') {
+            const thumb = document.getElementById('prev-thumb-banner');
+            if (thumb) {
+                if (thumb.tagName === 'IMG') {
+                    thumb.src           = dataURL;
+                    thumb.style.display = '';
+                    thumb.style.cssText = 'width:100%;height:50px;object-fit:cover;display:block;';
+                } else {
+                    // Le placeholder était un div (pas de bannière existante) → le remplacer par une img
+                    const img = document.createElement('img');
+                    img.id          = 'prev-thumb-banner';
+                    img.src         = dataURL;
+                    img.alt         = '';
+                    img.style.cssText = 'width:100%;height:50px;object-fit:cover;display:block;';
+                    thumb.replaceWith(img);
+                }
+            }
+        }
+
+        // Stocker la donnée dans le champ caché
+        const hiddenEl = document.getElementById('hidden-' + key);
+        if (hiddenEl) hiddenEl.value = dataURL;
+
+        setImageInfo(key, 'ok',
+            `<i class="bi bi-check-circle me-1"></i>${width} × ${height} px — ${sizeKB} ko` +
+            `<span class="ms-2 text-warning fw-semibold"><i class="bi bi-floppy me-1"></i>À sauvegarder</span>`
+        );
+    } catch (err) {
+        setImageInfo(key, 'error', `<i class="bi bi-exclamation-triangle me-1"></i>${err.message}`);
+    }
+}
+
+/** Initialise les file inputs et le drag-and-drop pour une card image. */
+function initImageUpload(key) {
+    const fileInput = document.getElementById('file-' + key);
+    const card      = document.getElementById('upload-card-' + key);
+    if (!fileInput || !card) return;
+
+    // Clic sur la card → ouvre le sélecteur de fichier
+    // (l'input est positionné en absolu sur toute la card, donc le clic arrive directement)
+
+    fileInput.addEventListener('change', () => {
+        const file = fileInput.files?.[0];
+        if (file) handleImageFile(key, file);
+        fileInput.value = ''; // reset pour permettre de re-sélectionner le même fichier
+    });
+
+    // Drag-and-drop
+    card.addEventListener('dragover', e => {
+        e.preventDefault();
+        card.classList.add('drag-over');
+    });
+    card.addEventListener('dragleave', () => card.classList.remove('drag-over'));
+    card.addEventListener('drop', e => {
+        e.preventDefault();
+        card.classList.remove('drag-over');
+        const file = e.dataTransfer?.files?.[0];
+        if (file && file.type.startsWith('image/')) handleImageFile(key, file);
+    });
+}
+
 // ── Initialisation au chargement ──────────────────────────────────────────
 // type="module" est différé par défaut : le DOM est déjà prêt à ce stade.
 
@@ -132,6 +325,9 @@ document.getElementById('saveLanguage')?.addEventListener('click', () => {
     const useLang = document.getElementById('useLanguage').checked ? 1 : 0;
     window.location.href = `/settings-language?lang=${encodeURIComponent(lang)}&use_language=${useLang}`;
 });
+
+// Initialisation des uploads d'images
+['home', 'logo', 'banner'].forEach(initImageUpload);
 
 // Exposé sur window car appelé depuis les attributs onclick du HTML
 window.activateSection = activateSection;

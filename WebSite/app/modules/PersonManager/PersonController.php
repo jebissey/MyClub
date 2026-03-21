@@ -7,6 +7,7 @@ namespace app\modules\PersonManager;
 use app\enums\FilterInputRule;
 use app\enums\PersonStatus;
 use app\helpers\Application;
+use app\helpers\TranslationManager;
 use app\helpers\WebApp;
 use app\models\PersonDataHelper;
 use app\models\TableControllerDataHelper;
@@ -150,8 +151,9 @@ class PersonController extends TableController
     public function help(): void
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isPersonManager())) {
+            $lang = TranslationManager::getCurrentLanguage();
             $this->render('Common/views/info.latte', [
-                'content' => $this->dataHelper->get('Settings', ['Name' => 'Help_personManager'], 'Value')->Value ?? '',
+                'content' => $this->dataHelper->get('Languages', ['Name' => 'Help_PersonManager'], $lang)->$lang ?? '',
                 'hasAuthorization' => $this->application->getConnectedUser()->hasAutorization(),
                 'currentVersion' => Application::VERSION,
                 'timer' => 0,
