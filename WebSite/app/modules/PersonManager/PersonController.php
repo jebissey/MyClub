@@ -78,52 +78,56 @@ class PersonController extends TableController
                 return;
             }
             $schema = [
-                'email'     => FilterInputRule::Email->value,
-                'firstName' => FilterInputRule::PersonName->value,
-                'lastName'  => FilterInputRule::PersonName->value,
-                'alert'     => FilterInputRule::Content->value,
+                'email'      => FilterInputRule::Email->value,
+                'firstName'  => FilterInputRule::PersonName->value,
+                'lastName'   => FilterInputRule::PersonName->value,
+                'alert'      => FilterInputRule::Content->value,
+                'memberInfo' => FilterInputRule::Content->value,
             ];
             $input = WebApp::filterInput($schema, $this->flight->request()->data->getData());
 
             $email = strtolower(trim($input['email'] ?? ''));
-            if (!empty($email)) {
-                $existing = $this->dataHelper->get(
-                    'Person',
-                    ['Email' => $email],
-                    'Id, FirstName, LastName, Inactivated'
+            if (empty($email)) {
+                $this->raiseBadRequest("Missing email", __FILE__, __LINE__);
+                return;
+            }
+            $existing = $this->dataHelper->get(
+                'Person',
+                ['Email' => $email],
+                'Id, FirstName, LastName, Inactivated'
+            );
+            $isNewRecord = (
+                $existing !== false &&
+                $person->Email === '' &&
+                $person->FirstName === '' &&
+                $person->LastName === '' &&
+                $person->Imported == 0
+            );
+            $isDuplicate = $isNewRecord
+                ? $existing !== null
+                : ($existing && $existing->Id !== $person->Id);
+       
+            if ($isDuplicate) {
+                $fullName = trim(($existing->FirstName ?? '') . ' ' . ($existing->LastName ?? ''));
+                $status = ($existing->Inactivated ?? 1) ? 'Disabled' : 'Active';
+
+                $message = $this->languagesDataHelper->translate('person.add.emailAlreadyExistsDetailed');
+                $message = str_replace(
+                    ['{name}', '{status}', '{email}'],
+                    [$fullName, $status, $email],
+                    $message
                 );
-                $isNewRecord = (
-                    $person->Email === '' &&
-                    $person->FirstName === '' &&
-                    $person->LastName === '' &&
-                    $person->Imported == 0
-                );
-                $isDuplicate = $isNewRecord
-                    ? $existing !== null
-                    : ($existing && $existing->Id !== $person->Id);
 
-                if ($isDuplicate) {
-                    $fullName = trim(($existing->FirstName ?? '') . ' ' . ($existing->LastName ?? ''));
-                    $status = ($existing->Inactivated ?? 1) ? 'Disabled' : 'Active';
+                $this->render('Common/views/info.latte', [
+                    'content' => $message,
+                    'hasAuthorization' => $this->application->getConnectedUser()->hasAutorization() ?? false,
+                    'currentVersion' => Application::VERSION,
+                    'timer' => 10000,
+                    'previousPage' => true,
+                    'page' => $this->application->getConnectedUser()->getPage(),
+                ]);
 
-                    $message = $this->languagesDataHelper->translate('person.add.emailAlreadyExistsDetailed');
-                    $message = str_replace(
-                        ['{name}', '{status}', '{email}'],
-                        [$fullName, $status, $email],
-                        $message
-                    );
-
-                    $this->render('Common/views/info.latte', [
-                        'content' => $message,
-                        'hasAuthorization' => $this->application->getConnectedUser()->hasAutorization() ?? false,
-                        'currentVersion' => Application::VERSION,
-                        'timer' => 10000,
-                        'previousPage' => true,
-                        'page' => $this->application->getConnectedUser()->getPage(),
-                    ]);
-
-                    return;
-                }
+                return;
             }
 
             $this->dataHelper->set(
