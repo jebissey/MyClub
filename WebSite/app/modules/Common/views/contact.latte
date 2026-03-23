@@ -2,6 +2,21 @@
 
 {block title}Contact{/block}
 
+{block head}
+    {* Honeypot *}
+    <style>
+        .contact-trap {
+            position: absolute;
+            left: -9999px;
+            top: -9999px;
+            opacity: 0;
+            height: 0;
+            overflow: hidden;
+            pointer-events: none;
+        }
+    </style>
+{/block}
+
 {block navbar}
     {include '../../Webmaster/views/navbar/home.latte'}
 {/block}
@@ -10,23 +25,25 @@
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-md-6">
-                <h1 class="mb-4"><strong>{if $event}Vous inscrire à l'événement du {$event->StartTime|longDate}{else}Nous contacter{/if}</strong></h1>
+                <h1 class="mb-4">
+                    <strong>{if $event}Vous inscrire à l'événement du {$event->StartTime|longDate}{else}Nous contacter{/if}</strong>
+                </h1>
                 {if $event}
-                <h2>{$event->Summary}</h2>
+                    <h2>{$event->Summary}</h2>
                 {/if}
-                
+
                 {if isset($_GET['success'])}
                     <div class="alert alert-success" role="alert">
                         {$_GET['success']}
                     </div>
                 {/if}
-                
+
                 {if isset($_GET['error'])}
                     <div class="alert alert-danger" role="alert">
                         {$_GET['error']}
                     </div>
                 {/if}
-                
+
                 {if isset($_GET['errors'])}
                     <div class="alert alert-danger" role="alert">
                         <ul class="mb-0">
@@ -36,25 +53,36 @@
                         </ul>
                     </div>
                 {/if}
-                
+
                 <form id="emailForm" method="POST" action="/contact">
                     {if $event}
-                    <input type="hidden" id="eventId" name="eventId" value="{$event->Id}">
+                        <input type="hidden" id="eventId" name="eventId" value="{$event->Id}">
                     {/if}
+
+                    {* ── Honeypot ── *}
+                    <div class="contact-trap" aria-hidden="true">
+                        <label for="website">Laisser ce champ vide</label>
+                        <input type="text" id="website" name="website"
+                            tabindex="-1" autocomplete="off" value="">
+                    </div>
+
                     <div class="mb-3">
                         <label for="name" class="form-label"><strong>Nom & Prénom *</strong></label>
-                        <input type="text" class="form-control" id="name" name="name" value="{if isset($_GET['old_name'])}{$_GET['old_name']}{/if}" required>
+                        <input type="text" class="form-control" id="name" name="name"
+                            value="{if isset($_GET['old_name'])}{$_GET['old_name']}{/if}" required>
                     </div>
-                    
+
                     <div class="mb-3">
                         <label for="email" class="form-label"><strong>Email *</strong></label>
-                        <input type="email" class="form-control" id="email" name="email" value="{if isset($_GET['old_email'])}{$_GET['old_email']}{/if}" required>
+                        <input type="email" class="form-control" id="email" name="email"
+                            value="{if isset($_GET['old_email'])}{$_GET['old_email']}{/if}" required>
                     </div>
-                    
+
                     {if !$event}
                     <div class="mb-3">
                         <label for="message" class="form-label"><strong>Votre message *</strong></label>
-                        <textarea class="form-control" id="message" name="message" rows="5" required>{if isset($_GET['old_message'])}{$_GET['old_message']}{/if}</textarea>
+                        <textarea class="form-control" id="message" name="message"
+                                rows="5" required>{if isset($_GET['old_message'])}{$_GET['old_message']}{/if}</textarea>
                     </div>
                     {/if}
 

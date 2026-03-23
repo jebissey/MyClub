@@ -12,7 +12,7 @@ class WebApp
 {
     public const MYCLUB_WEBAPP = "https://myclub.ovh/";
 
-    public function buildUrl($newParams): string
+    public function buildUrl(array $newParams): string
     {
         $params = array_merge($_GET, $newParams);
         return '?' . http_build_query($params);

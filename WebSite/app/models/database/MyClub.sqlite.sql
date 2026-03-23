@@ -42,6 +42,12 @@ CREATE TABLE IF NOT EXISTS "Contact" (
 	"TokenCreatedAt"	TEXT,
 	PRIMARY KEY("Id")
 );
+CREATE TABLE IF NOT EXISTS "ContactRateLimit" (
+	"ip_hash"	TEXT NOT NULL,
+	"attempts"	INTEGER NOT NULL DEFAULT 1,
+	"since"	INTEGER NOT NULL,
+	PRIMARY KEY("ip_hash")
+);
 CREATE TABLE IF NOT EXISTS "Counter" (
 	"Id"	INTEGER,
 	"Name"	TEXT NOT NULL,
@@ -2662,7 +2668,7 @@ INSERT INTO "Languages" VALUES (406,'designer.home_settings.image_home_desc','Im
 INSERT INTO "Languages" VALUES (407,'designer.home_settings.image_logo_desc','Watermark image','Image en filigrane','Obraz znaku wodnego');
 INSERT INTO "Languages" VALUES (408,'designer.home_settings.title_edit_images','Image editing','Édition des images','Edycja obrazów');
 INSERT INTO "Languages" VALUES (409,'navbar.redactor.crossTab','Editors cross-tab','Tableau croisé des rédacteurs','Tabela krzyżowa redaktorów');
-INSERT INTO "Metadata" VALUES (1,'MyClub',27,0,1000000,NULL,10,36,6,NULL,0,NULL);
+INSERT INTO "Metadata" VALUES (1,'MyClub',28,0,1000000,NULL,10,36,6,NULL,0,NULL);
 INSERT INTO "Person" VALUES (1,'webmaster@myclub.foo','e427c26faca947919b18b797bc143a35100e4de48c34b70b26202d3a7d8e51f7','my first name','my last name','my nick name or nothing',NULL,'0',NULL,NULL,NULL,NULL,NULL,0,0,NULL,NULL,'2025-01-01',0,0,0,NULL,NULL,NULL,NULL,NULL,NULL,'');
 INSERT INTO "PersonGroup" VALUES (1,1,1);
 INSERT INTO "Settings" VALUES (1,'Title','title');

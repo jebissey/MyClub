@@ -19,7 +19,7 @@ use app\models\LogDataWriterHelper;
 
 class Application
 {
-    public const VERSION = '0.42';
+    public const VERSION = '0.43';
     public const  EMOJI_LIST = [
         '😀', '😄', '😁', '😅', '😂', '🤣', '😊', '😇', '🤨', 
         '🙂', '🙃', '😉', '😌', '☹️', '😐', '🙄', '😯', '🥴', 
