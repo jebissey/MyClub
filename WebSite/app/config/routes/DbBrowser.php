@@ -19,7 +19,7 @@ class DbBrowser implements RouteInterface
         $dbBrowserController = fn() => $this->controllerFactory->makeDbBrowserController();
 
         $this->routes[] = new Route('GET  /dbbrowser', $dbBrowserController, 'index');
-        $this->routes[] = new Route('GET  /dbbrowser/@table:[A-Za-z0-9_]+', $dbBrowserController, 'showTable', 1);
+        $this->routes[] = new Route('GET  /dbbrowser/@table:[A-Za-z0-9_]+', $dbBrowserController, 'showTable');
         $this->routes[] = new Route('GET  /dbbrowser/@table:[A-Za-z0-9_]+/create', $dbBrowserController, 'showCreateForm');
         $this->routes[] = new Route('POST /dbbrowser/@table:[A-Za-z0-9_]+/create', $dbBrowserController, 'createRecord');
         $this->routes[] = new Route('GET  /dbbrowser/@table:[A-Za-z0-9_]+/edit/@id:[0-9]+', $dbBrowserController, 'showEditForm');

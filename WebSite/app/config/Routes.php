@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace app\config;
 
+use Closure;
 use flight;
 use flight\Engine;
 
@@ -227,7 +228,8 @@ class Routes
                 $this->flight,
                 $route->methodAndPath,
                 $route->controllerFactory,
-                $route->function
+                $route->function,
+                $route->args
             );
         }
 
@@ -312,24 +314,23 @@ class Routes
         return $this->routes;
     }
 
-    private function mapRoute(Engine $flight, string $methodAndPath, \Closure $controllerFactory, string $function): void
+    private function mapRoute(Engine $flight, string $methodAndPath, Closure $controllerFactory, string $function, array $extraArgs = []): void
     {
         preg_match_all('/@(\w+)(?::([^\/]+))?/', $methodAndPath, $matches, PREG_SET_ORDER);
         $paramTypes = [];
         foreach ($matches as $m) {
-            $regex = $m[2] ?? null;
-            $paramTypes[] = $regex;
+            $paramTypes[] = $m[2] ?? null;
         }
 
-        $flight->route($methodAndPath, function (...$args) use ($controllerFactory, $function, $paramTypes) {
-            foreach ($args as $i => &$arg) {
+        $flight->route($methodAndPath, function (...$routeArgs) use ($controllerFactory, $function, $paramTypes, $extraArgs) {
+            foreach ($routeArgs as $i => &$arg) {
                 $regex = $paramTypes[$i] ?? null;
                 if ($regex === '[0-9]+' && ctype_digit($arg)) {
                     $arg = (int)$arg;
                 }
             }
             $controller = $controllerFactory();
-            return $controller->$function(...$args);
+            return $controller->$function(...$extraArgs, ...$routeArgs);
         });
     }
 

@@ -6,6 +6,7 @@ namespace app\modules\Kanban;
 
 use app\enums\FilterInputRule;
 use app\helpers\Application;
+use app\helpers\TranslationManager;
 use app\helpers\WebApp;
 use app\models\KanbanDataHelper;
 use app\modules\Common\AbstractController;
@@ -32,7 +33,7 @@ class KanbanController extends AbstractController
             if (!$this->kanbanDataHelper->userHasAccessToProject($personId, $selectedProjectId)) {
                 $isOwner = false;
             } else {
-                $isOwner = true;    
+                $isOwner = true;
             }
         }
         $schema = [
@@ -59,5 +60,22 @@ class KanbanController extends AbstractController
             'filters' => $filters,
             'isOwner' => $isOwner,
         ]));
+    }
+
+    public function help(): void
+    {
+        if (!($this->application->getConnectedUser()->isKanbanDesigner() ?? false)) {
+            $this->raiseForbidden(__FILE__, __LINE__);
+            return;
+        }
+        $lang = TranslationManager::getCurrentLanguage();
+        $this->render('Common/views/info.latte', [
+            'content' => $this->dataHelper->get('Languages', ['Name' => 'Help_KanbanDesigner'], $lang)->$lang ?? '',
+            'hasAuthorization' => $this->application->getConnectedUser()->isRedactor() ?? false,
+            'currentVersion' => Application::VERSION,
+            'timer' => 0,
+            'previousPage' => true,
+            'page' => $this->application->getConnectedUser()->getPage(),
+        ]);
     }
 }

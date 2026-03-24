@@ -77,9 +77,12 @@ class ConnectedUser
         return;
     }
 
-    public function getPage(int $segment = 0)
+    public function getPage(int $segment = 0): ?string
     {
-        return explode('/', trim(parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH), '/'))[$segment];
+        $path = trim(parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH) ?? '', '/');
+        $segments = explode('/', $path);
+
+        return $segments[$segment] ?? null;
     }
 
     public function isAdministrator(): bool
@@ -147,7 +150,7 @@ class ConnectedUser
     {
         return $this->isRedactor() || $this->isVisitorInsights();
     }
-    
+
     public function isTranslator(): bool
     {
         return in_array(Authorization::Translator->value, $this->authorizations ?? []);

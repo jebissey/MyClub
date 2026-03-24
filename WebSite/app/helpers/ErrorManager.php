@@ -45,8 +45,9 @@ class ErrorManager
             return;
         }
         $translation = $this->languagesDataHelper->translate('Error' . $code->value);
+        $result = '';
         if ($translation != "-- Error{$code->value} --") $result = $translation;
-        if ($result == '') {
+        if ($result === '') {
             if ($displayCode) $result .= "<h1>{$code->value}</h1>";
             $result .= "<h2>$message</h2>";
         } else $timeout = max($code === ApplicationError::Error ? 30000 : 5000, $timeout);
