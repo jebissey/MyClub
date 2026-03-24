@@ -4,77 +4,50 @@ declare(strict_types=1);
 
 namespace app\helpers;
 
+use app\enums\Period;
+
 class PeriodHelper
 {
-    static function getDateRangeFor($period)
+    public static function getDateRangeFor(Period $period): array
     {
         $end = date('Y-m-d H:i:s');
-        $start = '';
 
-        switch ($period) {
-            case 'week':
-                $start = date('Y-m-d H:i:s', strtotime('-1 week'));
-                break;
-            case 'month':
-                $start = date('Y-m-d H:i:s', strtotime('-1 month'));
-                break;
-            case 'quarter':
-                $start = date('Y-m-d H:i:s', strtotime('-3 months'));
-                break;
-            case 'year':
-                $start = date('Y-m-d H:i:s', strtotime('-1 year'));
-                break;
-            case 'all':
-            default:
-                $start = '1970-01-01 00:00:00';
-                break;
-        }
+        $start = match ($period) {
+            Period::Week    => date('Y-m-d H:i:s', strtotime('-1 week')),
+            Period::Month   => date('Y-m-d H:i:s', strtotime('-1 month')),
+            Period::Quarter => date('Y-m-d H:i:s', strtotime('-3 months')),
+            Period::Year    => date('Y-m-d H:i:s', strtotime('-1 year')),
+            default         => '1970-01-01 00:00:00',
+        };
+
         return [
             'start' => $start,
-            'end' => $end
+            'end'   => $end,
         ];
     }
 
-    static function gets()
+    /** @return array<string, string> */
+    public static function gets(): array
     {
         return [
-            'week' => 'Dernière semaine',
-            'month' => 'Dernier mois',
-            'quarter' => 'Dernier trimestre',
-            'year' => 'Dernière année',
-            'all' => 'Tout'
+            Period::Week->value    => 'Dernière semaine',
+            Period::Month->value   => 'Dernier mois',
+            Period::Quarter->value => 'Dernier trimestre',
+            Period::Year->value    => 'Dernière année',
         ];
     }
 
-    static function getDateConditions($period)
+    public static function getDateConditions(Period $period): string
     {
-        $dateCondition = '';
-        switch ($period) {
-            case 'today':
-                $dateCondition = "date(CreatedAt) = date('now')";
-                break;
-            case 'yesterday':
-                $dateCondition = "date(CreatedAt) = date('now', '-1 days')";
-                break;
-            case 'beforeYesterday':
-                $dateCondition = "date(CreatedAt) = date('now', '-2 days')";
-                break;
-
-            case 'week':
-                $dateCondition = "date(CreatedAt) >= date('now', '-7 days')";
-                break;
-            case 'month':
-                $dateCondition = "date(CreatedAt) >= date('now', '-30 days')";
-                break;
-            case 'quarter':
-                $dateCondition = "date(CreatedAt) >= date('now', '-3 months')";
-                break;
-            case 'year':
-                $dateCondition = "date(CreatedAt) >= date('now', '-1 years')";
-                break;
-            default:
-                $dateCondition = "1=1";
-        }
-        return $dateCondition;
+        return match ($period) {
+            Period::Today           => "date(CreatedAt) = date('now')",
+            Period::Yesterday       => "date(CreatedAt) = date('now', '-1 days')",
+            Period::BeforeYesterday => "date(CreatedAt) = date('now', '-2 days')",
+            Period::Week            => "date(CreatedAt) >= date('now', '-7 days')",
+            Period::Month           => "date(CreatedAt) >= date('now', '-30 days')",
+            Period::Quarter         => "date(CreatedAt) >= date('now', '-3 months')",
+            Period::Year            => "date(CreatedAt) >= date('now', '-1 years')",
+            default                 => '1=1',
+        };
     }
 }

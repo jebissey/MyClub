@@ -13,6 +13,9 @@ enum Period: string
     case Year = 'year';
 
     case Today = 'today';
+    case Yesterday = 'yesterday';
+    case BeforeYesterday = 'beforeYesterday';
+
     case Signin = 'signin';
     case Signout = 'signout';
 }

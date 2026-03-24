@@ -12,6 +12,7 @@ use app\enums\DuplicationEventMode;
 use app\enums\EventAudience;
 use app\enums\EventSearchMode;
 use app\enums\FilterInputRule;
+use app\enums\Period;
 use app\exceptions\QueryException;
 use app\helpers\Application;
 use app\helpers\GravatarHandler;
@@ -93,7 +94,7 @@ class EventController extends AbstractController
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
-        $period = $this->flight->request()->query->period ?? 'month';
+        $period = Period::from($this->flight->request()->query->period ?? 'month');
         [$dateRange, $crosstabData] = $this->crosstabDataHelper->getevents($period);
 
         $this->render('Common/views/crosstab.latte', $this->getAllParams([

@@ -285,7 +285,7 @@ class VisitorInsightsController extends TableController
         $uriFilter   = $input['uri'];
         $emailFilter = $input['email'];
         $groupFilter = $input['group'];
-        $period      = $input['period'] ?? Period::Today->value;
+        $period      = Period::tryFrom($input['period'] ?? '') ?? Period::Today;
 
         [$sortedCrossTabData, $filteredPersons, $columnTotals] = $this->crosstabDataHelper->getPersons(
             PeriodHelper::getDateConditions($period),
@@ -350,12 +350,12 @@ class VisitorInsightsController extends TableController
     /**
      * Reads and validates the `period` query param against the Period enum.
      */
-    private function getValidPeriod(): string
+    private function getValidPeriod(): Period
     {
         return WebApp::getFiltered(
             'period',
             $this->application->enumToValues(Period::class),
             $this->flight->request()->query->getData()
-        ) ?: Period::Week->value;
+        ) ?: Period::Week;
     }
 }

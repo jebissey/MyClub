@@ -7,14 +7,13 @@ namespace app\models;
 use Envms\FluentPDO\Queries\Select;
 use PDO;
 
+use app\enums\Period;
 use app\helpers\Application;
 use app\helpers\MyClubDateTime;
 use app\helpers\PeriodHelper;
 
 class LogDataHelper extends Data
 {
-    private const MAX_FILTER_LENGTH = 100;
-
     public function __construct(Application $application)
     {
         parent::__construct($application);
@@ -136,7 +135,7 @@ class LogDataHelper extends Data
         return $stmt->fetchAll(PDO::FETCH_OBJ);
     }
 
-    public function getTopPages(string $period, int $top): array
+    public function getTopPages(Period $period, int $top): array
     {
         $dateCondition = PeriodHelper::getDateConditions($period);
 
