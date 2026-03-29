@@ -20,6 +20,7 @@ class CommunicationApi implements RouteInterface
 
         $this->routes[] = new Route('GET  /api/communication/quota', $communicationApi, 'getQuota');
         $this->routes[] = new Route('POST /api/communication/members', $communicationApi, 'getMembers');
+        $this->routes[] = new Route('POST /api/communication/send', $communicationApi, 'sendCommunication');
 
         return $this->routes;
     }

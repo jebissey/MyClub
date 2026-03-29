@@ -52,23 +52,30 @@ export default class EmailForm {
         bootstrap.Modal.getInstance(document.getElementById('modal-confirm')).hide();
         showOverlay();
 
-        const formData = new FormData();
-        formData.append('subject', document.getElementById('email-subject').value.trim());
-        formData.append('content', tinymce.get('tinymce-email')?.getContent() ?? '');
-        this.#members.getCheckedIds().forEach(id => formData.append('recipient_ids[]', id));
+        try {
+            const payload = {
+                subject: document.getElementById('email-subject').value.trim(),
+                content: tinymce.get('tinymce-email')?.getContent() ?? '',
+                recipient_ids: this.#members.getCheckedIds(),
+            };
 
-        const data = await api.postFormData('/communication', formData);
+            const response = await api.post('/api/communication/send', payload);
+            const data = response.data ?? {};
 
-        this.#quota.applyResponse(data);
+            this.#quota.applyResponse(data);
 
-        if (data.quotaHit) {
-            showToast(`✗ ${data.toast}`, false);
-        } else if (data.success) {
-            showToast(`✓ ${data.toast}`, true);
-        } else {
-            showToast(`✗ ${data.toast ?? 'Échec de l\'envoi.'}`, false);
+            if (data.quotaHit) {
+                showToast(`✗ ${data.toast}`, false);
+            } else if (response.success) {
+                showToast(`✓ ${data.toast}`, true);
+            } else {
+                showToast(`✗ ${response.message ?? 'Échec de l\'envoi.'}`, false);
+            }
+        } catch (e) {
+            console.error('Erreur lors de l\'envoi :', e);
+            showToast('✗ Une erreur inattendue est survenue.', false);
+        } finally {
+            hideOverlay();
         }
-
-        hideOverlay();
     }
 }

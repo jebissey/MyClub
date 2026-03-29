@@ -1,0 +1,57 @@
+{parameters
+    array  $filters      = [],
+    string $action,
+    string $resetUrl,
+    array  $filterValues = [],
+    array  $extraParams  = [],
+    int    $currentPage  = 1,
+    int    $totalPages   = 0,
+    string $pageParam    = 'page'
+}
+
+{var $normalizedFilters = array_map(
+    fn($f) => is_string($f) ? ['name' => $f, 'label' => $f] : $f,
+    $filters
+)}
+
+{var $urlParams = array_filter(
+    array_merge($filterValues, $extraParams),
+    fn($v) => $v !== '' && $v !== null && trim((string) $v) !== ''
+)}
+
+<form method="GET" action="{$action}" class="row g-3 mb-4">
+
+    {foreach $normalizedFilters as $filter}
+        <div class="col-md-2">
+            {include 'FilterField.latte',
+                name:        $filter['name'],
+                label:       $filter['label'],
+                type:        $filter['type']        ?? 'text',
+                value:       $filterValues[$filter['name']] ?? '',
+                options:     $filter['options']     ?? [],
+                optionValue: $filter['optionValue'] ?? 'value',
+                optionLabel: $filter['optionLabel'] ?? 'label',
+                placeholder: $filter['placeholder'] ?? '',
+                autosubmit:  $filter['autosubmit']  ?? false}
+        </div>
+    {/foreach}
+
+    {foreach $extraParams as $key => $value}
+        <input type="hidden" name="{$key}" value="{$value}">
+    {/foreach}
+
+    <div class="col-12 d-flex flex-wrap justify-content-between align-items-center gap-3">
+        <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary">Filtrer</button>
+            {var $resetQuery = http_build_query($extraParams)}
+            <a href="{$resetUrl}{if $resetQuery}?{$resetQuery}{/if}" class="btn btn-secondary">Réinitialiser</a>
+        </div>
+
+        {include 'Pagination.latte',
+            currentPage: $currentPage,
+            totalPages:  $totalPages,
+            pageParam:   $pageParam,
+            urlParams:   $urlParams}
+    </div>
+
+</form>

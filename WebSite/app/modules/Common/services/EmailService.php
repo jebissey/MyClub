@@ -18,6 +18,8 @@ use InvalidArgumentException;
 
 final class EmailService
 {
+    private const MAILJET_BATCH_SIZE = 50;
+
     public function __construct(
         private readonly ?SmtpConfigProviderInterface $configProvider,
         private readonly ?EmailQuotaTrackerInterface  $quotaTracker,
@@ -27,7 +29,7 @@ final class EmailService
     {
         return $this->configProvider?->get();
     }
-    
+
     public function send(EmailMessage $message): bool
     {
         $count  = 1 + count($message->cc) + count($message->bcc);
@@ -151,6 +153,7 @@ final class EmailService
                 'Mailjet credentials are not configured (api_key or api_secret is empty).'
             );
         }
+
         $mj = new MailjetClient(
             $config->apiKey,
             $config->apiSecret,
@@ -161,32 +164,38 @@ final class EmailService
             'Email' => $config->senderEmail !== '' ? $config->senderEmail : $message->from,
             'Name'  => 'MyClub',
         ];
-        $msg = [
+        $baseMsg = [
             'From'     => $from,
             'To'       => [['Email' => $message->to]],
             'Subject'  => $message->subject,
-            'HTMLPart' => $message->isHtml  ? $message->body              : null,
-            'TextPart' => !$message->isHtml ? $message->body              : strip_tags($message->body),
+            'HTMLPart' => $message->isHtml  ? $message->body : null,
+            'TextPart' => !$message->isHtml ? $message->body : strip_tags($message->body),
         ];
         if ($message->replyTo !== null) {
-            $msg['ReplyTo'] = ['Email' => $message->replyTo];
+            $baseMsg['ReplyTo'] = ['Email' => $message->replyTo];
         }
         if ($message->cc !== []) {
-            $msg['Cc'] = array_map(static fn($e) => ['Email' => $e], $message->cc);
+            $baseMsg['Cc'] = array_map(static fn($e) => ['Email' => $e], $message->cc);
         }
-        if ($message->bcc !== []) {
-            $msg['Bcc'] = array_map(static fn($e) => ['Email' => $e], $message->bcc);
+        $baseMsg = array_filter($baseMsg, static fn($v) => $v !== null);
+        $messages = [$baseMsg];
+        foreach ($message->bcc as $bccEmail) {
+            $bccMsg        = $baseMsg;
+            $bccMsg['To']  = [['Email' => $bccEmail]];
+            $messages[] = $bccMsg;
+        }
+        foreach (array_chunk($messages, self::MAILJET_BATCH_SIZE) as $chunk) {
+            $response = $mj->post(MailjetResources::$Email, ['body' => ['Messages' => $chunk]]);
+
+            if (!$response->success()) {
+                throw new EmailException(sprintf(
+                    'Mailjet sending failed (HTTP %d): %s',
+                    $response->getStatus(),
+                    json_encode($response->getData(), JSON_UNESCAPED_UNICODE)
+                ));
+            }
         }
 
-        $msg = array_filter($msg, static fn($v) => $v !== null);
-        $response = $mj->post(MailjetResources::$Email, ['body' => ['Messages' => [$msg]]]);
-        if (!$response->success()) {
-            throw new EmailException(sprintf(
-                'Mailjet sending failed (HTTP %d): %s',
-                $response->getStatus(),
-                json_encode($response->getData(), JSON_UNESCAPED_UNICODE)
-            ));
-        }
         return true;
     }
 }

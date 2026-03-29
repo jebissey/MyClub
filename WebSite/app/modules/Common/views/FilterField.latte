@@ -1,0 +1,42 @@
+{parameters
+    string $name,
+    string $label,
+    string $type         = 'text',
+    mixed  $value        = null,
+    array  $options      = [],
+    string $optionValue  = 'value',
+    string $optionLabel  = 'label',
+    string $placeholder  = '',
+    bool   $autosubmit   = false
+}
+
+<label for="{$name}" class="form-label">{$label}</label>
+
+{if $type === 'select'}
+    <select class="form-select" id="{$name}" name="{$name}"{if $autosubmit} onchange="this.form.submit()"{/if}>
+        {if $placeholder !== ''}
+            <option value="">{$placeholder}</option>
+        {/if}
+        {foreach $options as $optKey => $optItem}
+            {if is_object($optItem)}
+                <option value="{$optItem->$optionValue}"
+                    {if (string) $value === (string) $optItem->$optionValue}selected{/if}>
+                    {$optItem->$optionLabel}
+                </option>
+            {elseif is_array($optItem)}
+                <option value="{$optItem[$optionValue]}"
+                    {if (string) $value === (string) $optItem[$optionValue]}selected{/if}>
+                    {$optItem[$optionLabel]}
+                </option>
+            {else}
+                {{* tableau associatif simple : ['all' => 'Tout', …] *}}
+                <option value="{$optKey}"
+                    {if (string) $value === (string) $optKey}selected{/if}>
+                    {$optItem}
+                </option>
+            {/if}
+        {/foreach}
+    </select>
+{else}
+    <input type="text" class="form-control" id="{$name}" name="{$name}" value="{$value ?? ''}">
+{/if}

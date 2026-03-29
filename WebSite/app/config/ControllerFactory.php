@@ -149,8 +149,6 @@ class ControllerFactory
     {
         return new CommunicationController(
             $this->application,
-            $this->emailService,
-            $this->personDataHelper,
         );
     }
 
