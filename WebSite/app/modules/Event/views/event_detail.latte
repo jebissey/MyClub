@@ -92,6 +92,19 @@
                             <p>{$event->Description|nl2br|noescape}</p>
                         </div>
                     </div>
+                    <div class="card mb-3">
+                        <div class="card-header"><strong>{='attribute_details'|translate}</strong></div>
+                        <div class="card-body">            
+                            <ul class="list-group">
+                            {foreach $attributes as $attribute}
+                                <li class="list-group-item d-flex align-items-center">
+                                    <span class="me-2 d-inline-block rounded" style="width:20px; height:20px; background-color:{$attribute->Color|noescape};"></span>
+                                    <span><strong>{$attribute->Name}</strong> : {$attribute->Detail}</span>
+                                </li>
+                            {/foreach}
+                            </ul>
+                        </div>
+                    </div>
                 </div>
                 
                 <div class="col-md-6">

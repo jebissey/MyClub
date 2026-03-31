@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace app\modules\Webmaster;
+namespace app\modules\Designer;
 
 use app\enums\FilterInputRule;
 use app\helpers\Application;
@@ -27,6 +27,12 @@ class WebappSettingsController extends AbstractController
         ],
         'Home_FeaturedArticleId' => [
             'label'   => 'ID de l\'article mis en avant (0 = dernier article)',
+            'default' => 0,
+            'min'     => 0,
+            'max'     => null,
+        ],
+        'Home_FeaturedArticleParagraphs' => [
+            'label'   => 'Nombre de paragraphes à afficher (0 = article entier)',
             'default' => 0,
             'min'     => 0,
             'max'     => null,
@@ -73,7 +79,7 @@ class WebappSettingsController extends AbstractController
             }
         }
 
-        $this->render('Webmaster/views/webappSettings.latte', $this->getAllParams([
+        $this->render('Designer/views/webappSettings.latte', $this->getAllParams([
             'navItems'            => $this->getNavItems($this->application->getConnectedUser()->person),
             'htmlSettingsKeys'    => $this->htmlSettingsKeys,
             'numericSettingsKeys' => $this->numericSettingsKeys,
@@ -82,6 +88,11 @@ class WebappSettingsController extends AbstractController
             'supportedLanguages'  => TranslationManager::getSupportedLanguages(),
             'currentLanguage'     => $lang,
             'forcedLanguage'      => $this->metadataDataHelper->getForcedLanguage(),
+            'translations' => [
+                'imageProcessing'         => $this->languagesDataHelper->translate('designer.home_settings.image_processing'),
+                'imageToSave'             => $this->languagesDataHelper->translate('designer.home_settings.image_to_save'),
+                'imageReadError'          => $this->languagesDataHelper->translate('designer.home_settings.image_read_error'),
+            ],
         ]));
     }
 
@@ -91,13 +102,14 @@ class WebappSettingsController extends AbstractController
             return;
         }
         $schema = [
-            'Home_Header'              => FilterInputRule::Html->value,
-            'Home_Footer'              => FilterInputRule::Html->value,
-            'Home_FeaturedArticleId'   => FilterInputRule::Int->value,
-            'Home_LatestArticlesCount' => FilterInputRule::Int->value,
-            'img_home'                 => FilterInputRule::DataUrl->value,
-            'img_logo'                 => FilterInputRule::DataUrl->value,
-            'img_banner'               => FilterInputRule::DataUrl->value,
+            'Home_Header'                    => FilterInputRule::Html->value,
+            'Home_Footer'                    => FilterInputRule::Html->value,
+            'Home_FeaturedArticleId'         => FilterInputRule::Int->value,
+            'Home_FeaturedArticleParagraphs' => FilterInputRule::Int->value,
+            'Home_LatestArticlesCount'       => FilterInputRule::Int->value,
+            'img_home'                       => FilterInputRule::DataUrl->value,
+            'img_logo'                       => FilterInputRule::DataUrl->value,
+            'img_banner'                     => FilterInputRule::DataUrl->value,
         ];
         $input = WebApp::filterInput($schema, $this->flight->request()->data->getData());
         $lang = TranslationManager::getCurrentLanguage();

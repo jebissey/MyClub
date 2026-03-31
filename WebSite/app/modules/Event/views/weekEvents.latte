@@ -187,15 +187,15 @@
                 </div>
                 <div class="col-lg-6 mb-4">
                     <div class="p-3 bg-light border rounded h-100">
-                    <h5>🔍 Détail des attributs</h5>
-                    <ul class="list-group">
-                        {foreach $attributes as $attribute}
-                        <li class="list-group-item d-flex align-items-center">
-                            <span class="me-2 d-inline-block rounded" style="width:20px; height:20px; background-color:{$attribute->Color|noescape};"></span>
-                            <span><strong>{$attribute->Name}</strong> : {$attribute->Detail}</span>
-                        </li>
-                        {/foreach}
-                    </ul>
+                        <h5>{='attribute_details'|translate}</h5>
+                        <ul class="list-group">
+                            {foreach $attributes as $attribute}
+                            <li class="list-group-item d-flex align-items-center">
+                                <span class="me-2 d-inline-block rounded" style="width:20px; height:20px; background-color:{$attribute->Color|noescape};"></span>
+                                <span><strong>{$attribute->Name}</strong> : {$attribute->Detail}</span>
+                            </li>
+                            {/foreach}
+                        </ul>
                     </div>
                 </div>
             </div>

@@ -46,6 +46,7 @@ use app\modules\Communication\CommunicationController;
 use app\modules\Designer\DesignController;
 use app\modules\Designer\DesignerController;
 use app\modules\Designer\MenuItemController;
+use app\modules\Designer\WebappSettingsController;
 use app\modules\Event\EventController;
 use app\modules\Event\EventEmailController;
 use app\modules\Event\EventGuestController;
@@ -82,7 +83,6 @@ use app\modules\Webmaster\ArwardsController;
 use app\modules\Webmaster\DbBrowserController;
 use app\modules\Webmaster\MaintenanceController;
 use app\modules\Webmaster\RssController;
-use app\modules\Webmaster\WebappSettingsController;
 use app\modules\Webmaster\WebmasterController;
 
 class ControllerFactory
