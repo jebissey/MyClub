@@ -23,22 +23,30 @@ class LogDataAnalyticsHelper extends Data
             $query = $this->pdoForLog->prepare("
                 SELECT 
                     COUNT(DISTINCT Token) as uniqueVisitors,
-                    COALESCE(SUM(Count), 0) as pageViews
+                    COALESCE(SUM(Count), 0) as pageViews,
+                    COALESCE(SUM(CASE WHEN CAST(Code AS INTEGER) BETWEEN 200 AND 299 OR Code IS NULL OR Code = '' THEN Count ELSE 0 END), 0) as views2xx,
+                    COALESCE(SUM(CASE WHEN CAST(Code AS INTEGER) BETWEEN 300 AND 399 THEN Count ELSE 0 END), 0) as views3xx,
+                    COALESCE(SUM(CASE WHEN CAST(Code AS INTEGER) BETWEEN 400 AND 499 THEN Count ELSE 0 END), 0) as views4xx,
+                    COALESCE(SUM(CASE WHEN CAST(Code AS INTEGER) BETWEEN 500 AND 599 THEN Count ELSE 0 END), 0) as views5xx
                 FROM Log
                 WHERE CreatedAt BETWEEN :startDate AND :endDate
             ");
             $query->execute([
                 ':startDate' => $period['start'],
-                ':endDate' => $period['end']
+                ':endDate'   => $period['end']
             ]);
             $data = $query->fetch();
 
             $result[] = [
-                'label' => $this->formatPeriodLabel($period, $periodType),
-                'start' => $period['start'],
-                'end' => $period['end'],
+                'label'          => $this->formatPeriodLabel($period, $periodType),
+                'start'          => $period['start'],
+                'end'            => $period['end'],
                 'uniqueVisitors' => $data->uniqueVisitors ?? 0,
-                'pageViews' => $data->pageViews ?? 0
+                'pageViews'      => $data->pageViews ?? 0,
+                'views2xx'       => $data->views2xx ?? 0,
+                'views3xx'       => $data->views3xx ?? 0,
+                'views4xx'       => $data->views4xx ?? 0,
+                'views5xx'       => $data->views5xx ?? 0,
             ];
         }
         return $result;

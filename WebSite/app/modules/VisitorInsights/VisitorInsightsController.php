@@ -28,15 +28,15 @@ class VisitorInsightsController extends TableController
      * Maps help route suffixes to their Languages table keys.
      */
     private const HELP_KEYS = [
-        'analytics'      => 'Help_Analytics',
-        'crossTab'       => 'Help_Crosstab',
-        'lastVisits'     => 'Help_LastVisits',
-        'logs'           => 'Help_VisitorInsights',
-        'membersAlerts'  => 'Help_AlertAsked',
-        'referents'      => 'Help_Referents',
-        'topPages'       => 'Help_TopPages',
-        'visitorInsights'=> 'Help_Observers',
-        'visitorsGraf'   => 'Help_VisitorGraf',
+        'analytics'       => 'Help_Analytics',
+        'crossTab'        => 'Help_Crosstab',
+        'lastVisits'      => 'Help_LastVisits',
+        'logs'            => 'Help_VisitorInsights',
+        'membersAlerts'   => 'Help_AlertAsked',
+        'referents'       => 'Help_Referents',
+        'topPages'        => 'Help_TopPages',
+        'visitorInsights' => 'Help_Observers',
+        'visitorsGraf'    => 'Help_VisitorGraf',
     ];
 
     public function __construct(
@@ -200,6 +200,14 @@ class VisitorInsightsController extends TableController
             'chartData'         => $this->logDataHelper->formatDataForChart($data),
             'periodLabel'       => $this->logDataAnalyticsHelper->getPeriodLabel($periodType),
             'page'              => $this->application->getConnectedUser()->getPage(),
+            'translations'      => [
+                'uniqueVisitors' => $this->languagesDataHelper->translate('visitor_insights.statistics.unique_visitors'),
+                'pageViews'      => $this->languagesDataHelper->translate('visitor_insights.statistics.page_views'),
+                's2xx'           => $this->languagesDataHelper->translate('visitor_insights.statistics.chart.2xx'),
+                's3xx'           => $this->languagesDataHelper->translate('visitor_insights.statistics.chart.3xx'),
+                's4xx'           => $this->languagesDataHelper->translate('visitor_insights.statistics.chart.4xx'),
+                's5xx'           => $this->languagesDataHelper->translate('visitor_insights.statistics.chart.5xx'),
+            ],
         ]));
     }
 

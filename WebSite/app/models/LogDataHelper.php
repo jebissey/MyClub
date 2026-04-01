@@ -21,22 +21,34 @@ class LogDataHelper extends Data
 
     const PERIOD_TO_SHOW = 13;
 
-    public function formatDataForChart($data)
+    public function formatDataForChart($data): array
     {
-        $labels = [];
+        $labels         = [];
         $uniqueVisitors = [];
-        $pageViews = [];
+        $pageViews      = [];
+        $views2xx       = [];
+        $views3xx       = [];
+        $views4xx       = [];
+        $views5xx       = [];
 
         foreach ($data as $item) {
-            $labels[] = $item['label'];
+            $labels[]         = $item['label'];
             $uniqueVisitors[] = $item['uniqueVisitors'];
-            $pageViews[] = $item['pageViews'];
+            $pageViews[]      = $item['pageViews'];
+            $views2xx[]       = $item['views2xx'];
+            $views3xx[]       = $item['views3xx'];
+            $views4xx[]       = $item['views4xx'];
+            $views5xx[]       = $item['views5xx'];
         }
 
         return [
-            'labels' => $labels,
+            'labels'         => $labels,
             'uniqueVisitors' => $uniqueVisitors,
-            'pageViews' => $pageViews
+            'pageViews'      => $pageViews,
+            'views2xx'       => $views2xx,
+            'views3xx'       => $views3xx,
+            'views4xx'       => $views4xx,
+            'views5xx'       => $views5xx,
         ];
     }
 

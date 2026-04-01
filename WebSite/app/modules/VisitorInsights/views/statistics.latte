@@ -2,7 +2,7 @@
 
 {block content}
     <div class="container-fluid">
-        <h1 class="my-4">Statistiques des visiteurs</h1>
+        <h1 class="my-4">{='visitor_insights.statistics.title'|translate}</h1>
         
         <div class="card mb-4">
             <div class="card-body">
@@ -11,7 +11,15 @@
                         {foreach $periodTypes as $type}
                             <a href="?periodType={$type}&offset={$currentOffset}" 
                             class="btn {$type === $currentPeriodType ? 'btn-primary' : 'btn-outline-secondary'}">
-                                Par {$type === 'day' ? 'jour' : ($type === 'week' ? 'semaine' : ($type === 'month' ? 'mois' : 'année'))}
+                                {if $type === 'day'}
+                                    {='visitor_insights.statistics.by_day'|translate}
+                                {elseif $type === 'week'}
+                                    {='visitor_insights.statistics.by_week'|translate}
+                                {elseif $type === 'month'}
+                                    {='visitor_insights.statistics.by_month'|translate}
+                                {else}
+                                    {='visitor_insights.statistics.by_year'|translate}
+                                {/if}
                             </a>
                         {/foreach}
                     </div>
@@ -24,7 +32,7 @@
                             <i class="bi bi-chevron-left"></i>
                         </a>
                         <a href="?periodType={$currentPeriodType}&offset=0" class="btn {$currentOffset === 0 ? 'btn-primary' : 'btn-outline-secondary'}">
-                            Aujourd'hui
+                            {='visitor_insights.statistics.today'|translate}
                         </a>
                         <a href="?periodType={$currentPeriodType}&offset={max(0, $currentOffset - 1)}" class="btn btn-outline-secondary" {if $currentOffset <= 0}disabled{/if}>
                             <i class="bi bi-chevron-right"></i>
@@ -43,7 +51,7 @@
         
         <div class="card">
             <div class="card-header">
-                <h5 class="mb-0">Détails des {$periodLabel}</h5>
+                <h5 class="mb-0">{='visitor_insights.statistics.details_of'|translate} {$periodLabel}</h5>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
@@ -51,9 +59,9 @@
                         <thead>
                             <tr>
                                 <th>{$periodLabel}</th>
-                                <th class="text-end">Visiteurs uniques</th>
-                                <th class="text-end">Pages vues</th>
-                                <th class="text-end">Pages/Visiteur</th>
+                                <th class="text-end">{='visitor_insights.statistics.unique_visitors'|translate}</th>
+                                <th class="text-end">{='visitor_insights.statistics.page_views'|translate}</th>
+                                <th class="text-end">{='visitor_insights.statistics.pages_per_visitor'|translate}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -80,87 +88,13 @@
 {/block}
 
 {block scripts}
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const ctx = document.getElementById('visitorStatsChart').getContext('2d');
-    const chartData = {$chartData};
-    
-    const chart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: chartData.labels,
-            datasets: [
-                {
-                    label: 'Visiteurs uniques',
-                    data: chartData.uniqueVisitors,
-                    type: 'line',
-                    borderColor: 'rgba(54, 162, 235, 1)',
-                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                    borderWidth: 2,
-                    tension: 0.1,
-                    yAxisID: 'y',
-                    pointRadius: 4,
-                    pointHoverRadius: 6,
-                    fill: true
-                },
-                {
-                    label: 'Pages vues',
-                    data: chartData.pageViews,
-                    backgroundColor: 'rgba(75, 192, 192, 0.6)',
-                    borderColor: 'rgba(75, 192, 192, 1)',
-                    borderWidth: 1,
-                    yAxisID: 'y1'
-                }
-            ]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                x: {
-                    grid: {
-                        display: false
-                    }
-                },
-                y: {
-                    position: 'left',
-                    title: {
-                        display: true,
-                        text: 'Visiteurs uniques'
-                    },
-                    beginAtZero: true
-                },
-                y1: {
-                    position: 'right',
-                    title: {
-                        display: true,
-                        text: 'Pages vues'
-                    },
-                    beginAtZero: true,
-                    grid: {
-                        drawOnChartArea: false
-                    }
-                }
-            },
-            interaction: {
-                mode: 'index',
-                intersect: false,
-            },
-            plugins: {
-                tooltip: {
-                    callbacks: {
-                        title: function(tooltipItems) {
-                            return tooltipItems[0].label;
-                        }
-                    }
-                },
-                legend: {
-                    position: 'top',
-                }
-            }
-        }
-    });
-});
-</script>
+    <script>
+        window.i18n      = {=json_encode($translations)|noescape};
+        window.chartData = {$chartData};
+
+        window.t = function(key) {
+            return window.i18n?.[key] ?? key;
+        };
+    </script>
+    <script type="module" src="/app/modules/VisitorInsights/js/statistics.js"></script>
 {/block}
