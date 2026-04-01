@@ -97,7 +97,7 @@ class VisitorInsightsController extends TableController
             'Os'        => FilterInputRule::String->value,
             'Uri'       => FilterInputRule::Uri->value,
             'Who'       => FilterInputRule::Email->value,
-            'Code'      => FilterInputRule::Integer->value,
+            'Code'      => FilterInputRule::String->value,
             'Message'   => FilterInputRule::Content->value,
         ];
         $filterValues = WebApp::filterInput($schema, $this->flight->request()->query->getData());

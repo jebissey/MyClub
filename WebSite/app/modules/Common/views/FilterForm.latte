@@ -19,7 +19,8 @@
     fn($v) => $v !== '' && $v !== null && trim((string) $v) !== ''
 )}
 
-<form method="GET" action="{$action}" class="row g-3 mb-4">
+<form method="GET" action="{$action}" class="row g-3 mb-4"
+      onsubmit="this.querySelectorAll(':is(input,select,textarea)').forEach(el => { if (el.value.trim() === '') el.disabled = true })">
 
     {foreach $normalizedFilters as $filter}
         <div class="col-md-2">
