@@ -19,6 +19,7 @@ export default class MenuItemManager {
         this.initDeleteButtons();
         this.initSaveButton();
         this.initAddButtons();
+        this.initPreview();
 
         Object.values(this.lists).forEach(list => {
             if (list) this.initDragAndDrop(list);
@@ -225,14 +226,79 @@ export default class MenuItemManager {
 
     async updatePositions(list) {
         const positions = {};
+        const orderedIds = [];
+
         list.querySelectorAll('tr').forEach((row, index) => {
-            positions[row.dataset.id] = index + 1;
+            const id = Number(row.dataset.id);
+            positions[id] = index + 1;
+            orderedIds.push(id);
         });
 
         const result = await this.api.post('/api/menuitem/updatePositions', { positions });
 
-        if (!result.success) {
+        if (result.success) {
+            // re-trier previewItems selon le nouvel ordre du DOM
+            this.previewItems.sort((a, b) =>
+                orderedIds.indexOf(a.Id) - orderedIds.indexOf(b.Id)
+            );
+            this.renderPreview();
+        } else {
             alert(`${window.t('positions_error')} ${result.message}`);
         }
+    }
+
+    /* ================= PRÉVISUALISATION NAVBAR ================= */
+
+    initPreview() {
+        this.previewEl = document.getElementById('navbarPreview');
+        if (!this.previewEl) return;
+
+        // état courant des items (mis à jour côté client après drag & drop)
+        this.previewItems = [...(window.navbarItemsData ?? [])];
+
+        const controls = [
+            ...document.querySelectorAll('input[name="previewRole"]'),
+            document.getElementById('previewGroup'),
+        ];
+        controls.forEach(el => el?.addEventListener('change', () => this.renderPreview()));
+
+        // valeur par défaut : anonyme
+        const defaultRadio = document.getElementById('previewAnonymous');
+        if (defaultRadio) defaultRadio.checked = true;
+
+        this.renderPreview();
+    }
+
+    renderPreview() {
+        if (!this.previewEl) return;
+
+        const role = document.querySelector('input[name="previewRole"]:checked')?.value ?? '';
+        const groupId = document.getElementById('previewGroup')?.value ?? '';
+
+        const visible = this.previewItems.filter(item => {
+            // item réservé à un groupe précis
+            if (item.IdGroup) {
+                return groupId && String(item.IdGroup) === groupId;
+            }
+            // item sans groupe : filtrage par rôle
+            if (role === 'members') return !!item.ForMembers;
+            if (role === 'contacts') return !!item.ForContacts;
+            if (role === 'anonymous') return !!item.ForAnonymous;
+            return false;
+        });
+
+        if (!visible.length) {
+            this.previewEl.innerHTML =
+                '<li class="nav-item"><span class="nav-link text-muted fst-italic small">— aucun élément visible —</span></li>';
+            return;
+        }
+
+        this.previewEl.innerHTML = visible.map(item => `
+        <li class="nav-item">
+            <a class="nav-link py-1" href="${item.Url ?? '#'}" tabindex="-1">
+                ${item.Label ?? ''}
+            </a>
+        </li>`
+        ).join('');
     }
 }
