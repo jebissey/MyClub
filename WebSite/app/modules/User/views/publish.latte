@@ -1,20 +1,20 @@
 <form method="post" action="/publish/article/{$article->Id}">
     <div class="row mb-4">
         <div class="col-12">
-            <h4>Publication de l'article</h4>
+            <h4>{='article.publish.title'|translate}</h4>
             <div class="card">
                 <div class="card-body">
                     <h5 class="card-title">{$article->Title}</h5>
                     <p class="card-text">
-                        <strong>Créé par :</strong> {$article->FirstName} {$article->LastName} {$article->NickName ? "({$article->NickName})" : ''}
+                        <strong>{='article.publish.created_by'|translate}</strong> {$article->FirstName} {$article->LastName} {$article->NickName ? "({$article->NickName})" : ''}
                     </p>
                     <div class="form-check form-switch mt-3">
                         <input class="form-check-input" type="checkbox" id="published" name="published" value="1" {if $article->PublishedBy}checked{/if}>
                         <label class="form-check-label" for="published">
                             {if $article->PublishedBy}
-                                Article publié
+                                {='article.publish.is_published'|translate}
                             {else}
-                                Publier cet article
+                                {='article.publish.do_publish'|translate}
                             {/if}
                         </label>
                     </div>
@@ -24,13 +24,13 @@
                             <input type="hidden" name="isSpotlightActive" value="0">
                             <input class="form-check-input" type="checkbox" value="1" id="isSpotlightActive" name="isSpotlightActive">
                             <label class="form-check-label" for="isSpotlightActive">
-                                <strong>Mettre à la une</strong>
+                                <strong>{='article.publish.spotlight'|translate}</strong>
                             </label>
                         </div>
                     </div>
                     <div class="mb-3" id="isSpotlightedUntil" style="display: none;">
                         <div class="form-text">
-                            Sélectionnez la date jusqu'à laquelle l'article sera mis à la une
+                            {='article.publish.spotlight_date'|translate}
                         </div>
                         <input type="date" class="form-control mx-auto" style="width: auto;" id="spotlightedUntil" name="spotlightedUntil">
                     </div>
@@ -38,9 +38,9 @@
             </div>
         </div>
     </div>
-    
+
     <div class="d-flex justify-content-end">
-        <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">Annuler</button>
-        <button type="submit" class="btn btn-primary">Enregistrer</button>
+        <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">{='cancel'|translate}</button>
+        <button type="submit" class="btn btn-primary">{='save'|translate}</button>
     </div>
 </form>

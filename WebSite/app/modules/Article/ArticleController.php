@@ -79,6 +79,48 @@ class ArticleController extends TableController
         }
     }
 
+    public function changeOwner(int $id): void
+    {
+        if (!($this->application->getConnectedUser()->isEditor() ?? false)) {
+            $this->raiseForbidden(__FILE__, __LINE__);
+            return;
+        }
+        if (!$this->dataHelper->get('Article', ['Id' => $id], 'Id')) {
+            $this->raiseBadRequest("Article {$id} doesn't exist", __FILE__, __LINE__);
+            return;
+        }
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $schema = [
+                'newOwnerId' => FilterInputRule::Int->value,
+            ];
+            $input = WebApp::filterInput($schema, $this->flight->request()->data->getData());
+            $newOwnerId = $input['newOwnerId'] ?? null;
+            if (!$newOwnerId) {
+                $_SESSION['error'] = $this->languagesDataHelper->translate('article.error.owner_required');
+                $this->redirect('/articles');
+                return;
+            }
+            $result = $this->dataHelper->set('Article', [
+                'CreatedBy'  => $newOwnerId,
+                'LastUpdate' => date('Y-m-d H:i:s')
+            ], ['Id' => $id]);
+            if ($result) {
+                $_SESSION['success'] = $this->languagesDataHelper->translate('article.success.updated');
+                $this->backup->save();
+            } else {
+                $_SESSION['error'] = $this->languagesDataHelper->translate('article.error.update_failed');
+            }
+            $this->redirect('/article/' . $id);
+        } elseif ($_SERVER['REQUEST_METHOD'] === 'GET') {
+            $this->render('User/views/changeOwner.latte', $this->getAllParams([
+                'article' => $this->articleDataHelper->getWithAuthor($id),
+                'redactors' => $this->personDataHelper->getRedactors(),
+            ]));
+        } else {
+            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+        }
+    }
+
     public function create(): void
     {
         if (!($this->application->getConnectedUser()->isRedactor() ?? false)) {

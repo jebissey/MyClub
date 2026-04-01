@@ -30,6 +30,12 @@
                 ],
                 [
                     'type' => 'button',
+                    'label' => 'bi bi-arrow-left-right',
+                    'class' => 'btn-secondary',
+                    'onClick' => 'changeOwner({id})'
+                ],
+                [
+                    'type' => 'button',
                     'label' => 'bi bi-globe',
                     'class' => 'btn-secondary',
                     'onClick' => 'showPublish({id})'
@@ -71,6 +77,12 @@
                 ],
                 [
                     'type' => 'button',
+                    'label' => 'bi bi-arrow-left-right',
+                    'class' => 'btn-secondary',
+                    'onClick' => 'changeOwner({id})'
+                ],
+                [
+                    'type' => 'button',
                     'label' => 'bi bi-globe',
                     'class' => 'btn-primary',
                     'onClick' => 'showPublish({id})'
@@ -107,6 +119,19 @@
             </div>
         </div>
     </div>
+
+    <div class="modal fade" id="changeOwnerModal" tabindex="-1" aria-labelledby="changeOwnerModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="changeOwnerModalLabel">Changer le propriétaire</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="changeOwnerContent">
+            </div>
+        </div>
+    </div>
+</div>
 {/block}
 
 {block scripts}

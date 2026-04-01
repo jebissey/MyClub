@@ -282,6 +282,20 @@ class PersonDataHelper extends Data implements NewsProviderInterface
         $person = $this->get('Person', ['Id' => $idPerson], 'FirstName, LastName');
         return "publié par " . $person->FirstName . " " . $person->LastName;
     }
+    
+    public function getRedactors(): array
+    {
+        return $this->pdo->query("
+            SELECT Person.Id AS PersonId, FirstName, LastName, NickName, Email
+            FROM Person
+            INNER JOIN PersonGroup        ON PersonGroup.IdPerson        = Person.Id
+            INNER JOIN GroupAuthorization ON GroupAuthorization.IdGroup = PersonGroup.IdGroup
+            WHERE Person.Inactivated = 0
+            AND GroupAuthorization.IdAuthorization = 4
+            GROUP BY Person.Id
+            ORDER BY FirstName, LastName
+        ")->fetchAll(PDO::FETCH_OBJ);
+    }
 
     public function getWebmasterEmail(): string
     {

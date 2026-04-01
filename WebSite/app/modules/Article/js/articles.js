@@ -1,7 +1,9 @@
 let publishModal;
+let changeOwnerModal;
 
 document.addEventListener('DOMContentLoaded', function () {
     publishModal = new bootstrap.Modal(document.getElementById('publishModal'));
+    changeOwnerModal = new bootstrap.Modal(document.getElementById('changeOwnerModal'));
 });
 
 function showPublish(articleId) {
@@ -34,4 +36,13 @@ function initializeModalFeatures() {
             }
         });
     }
+}
+
+function changeOwner(articleId) {
+    fetch(`/article/change-owner/${articleId}`)
+        .then(response => response.text())
+        .then(html => {
+            document.getElementById('changeOwnerContent').innerHTML = html;
+            changeOwnerModal.show();
+        });
 }

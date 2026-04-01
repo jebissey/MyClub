@@ -20,6 +20,8 @@ class Article implements RouteInterface
 
         $this->routes[] = new Route('GET  /article/carousel/@id:[0-9]+', $articleController, 'carousel');
         $this->routes[] = new Route('GET  /article/chat/@id:[0-9]+', $articleController, 'showArticleChat');
+        $this->routes[] = new Route('GET  /article/change-owner/@id:[0-9]+', $articleController, 'changeOwner');
+        $this->routes[] = new Route('POST /article/change-owner/@id:[0-9]+', $articleController, 'changeOwner');
         $this->routes[] = new Route('GET  /article/create', $articleController, 'create');
         $this->routes[] = new Route('GET  /article/edit/@id:[0-9]+', $articleController, 'edit');
         $this->routes[] = new Route('POST /article/edit/@id:[0-9]+', $articleController, 'update');

@@ -1,0 +1,31 @@
+<form method="post" action="/article/change-owner/{$article->Id}">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h4>{='article.change_owner.title'|translate}</h4>
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">{$article->Title}</h5>
+                    <p class="card-text">
+                        <strong>{='article.change_owner.current_owner'|translate}</strong> {$article->FirstName} {$article->LastName} {$article->NickName ? "({$article->NickName})" : ''}
+                    </p>
+                    <div class="mb-3 mt-3">
+                        <label for="newOwnerId" class="form-label"><strong>{='article.change_owner.new_owner'|translate}</strong></label>
+                        <select class="form-select" id="newOwnerId" name="newOwnerId" required>
+                            <option value="">{='article.change_owner.select_redactor'|translate}</option>
+                            {foreach $redactors as $redactor}
+                                <option value="{$redactor->PersonId}" {if $redactor->PersonId === $article->CreatedBy}selected{/if}>
+                                    {$redactor->FirstName} {$redactor->LastName} {$redactor->NickName ? "({$redactor->NickName})" : ''}
+                                </option>
+                            {/foreach}
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-end">
+        <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">{='cancel'|translate}</button>
+        <button type="submit" class="btn btn-primary">{='save'|translate}</button>
+    </div>
+</form>

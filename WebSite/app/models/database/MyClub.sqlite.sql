@@ -4668,7 +4668,17 @@ INSERT INTO "Languages" VALUES (430,'designer.home_settings.latest_count_status'
 INSERT INTO "Languages" VALUES (431,'designer.home_settings.image_processing','Processing…','Traitement en cours…','Przetwarzanie…');
 INSERT INTO "Languages" VALUES (432,'designer.home_settings.image_to_save','Unsaved','À sauvegarder','Do zapisania');
 INSERT INTO "Languages" VALUES (433,'designer.home_settings.image_read_error','Unable to read the image.','Impossible de lire l''image.','Nie można odczytać obrazu.');
-INSERT INTO "Metadata" VALUES (1,'MyClub',32,0,1000000,NULL,10,36,6,NULL,0,NULL);
+INSERT INTO "Languages" VALUES (434,'article.change_owner.title','Change owner','Changer le propriétaire','Zmień właściciela');
+INSERT INTO "Languages" VALUES (435,'article.change_owner.current_owner','Current owner:','Propriétaire actuel :','Aktualny właściciel:');
+INSERT INTO "Languages" VALUES (436,'article.change_owner.new_owner','New owner','Nouveau propriétaire','Nowy właściciel');
+INSERT INTO "Languages" VALUES (437,'article.change_owner.select_redactor','-- Select a redactor --','-- Sélectionner un rédacteur --','-- Wybierz redaktora --');
+INSERT INTO "Languages" VALUES (438,'article.publish.title','Article publication','Publication de l''article','Publikacja artykułu');
+INSERT INTO "Languages" VALUES (439,'article.publish.created_by','Created by:','Créé par :','Utworzony przez:');
+INSERT INTO "Languages" VALUES (440,'article.publish.is_published','Article published','Article publié','Artykuł opublikowany');
+INSERT INTO "Languages" VALUES (441,'article.publish.do_publish','Publish this article','Publier cet article','Opublikuj ten artykuł');
+INSERT INTO "Languages" VALUES (442,'article.publish.spotlight','Feature this article','Mettre à la une','Wyróżnij ten artykuł');
+INSERT INTO "Languages" VALUES (443,'article.publish.spotlight_date','Select the date until which the article will be featured','Sélectionnez la date jusqu''à laquelle l''article sera mis à la une','Wybierz datę, do której artykuł będzie wyróżniony');
+INSERT INTO "Metadata" VALUES (1,'MyClub',33,0,1000000,NULL,10,36,6,NULL,0,NULL);
 INSERT INTO "Person" VALUES (1,'webmaster@myclub.foo','e427c26faca947919b18b797bc143a35100e4de48c34b70b26202d3a7d8e51f7','my first name','my last name','my nick name or nothing',NULL,'0',NULL,NULL,NULL,NULL,NULL,0,0,NULL,NULL,'2025-01-01',0,0,0,NULL,NULL,NULL,NULL,NULL,NULL,'');
 INSERT INTO "PersonGroup" VALUES (1,1,1);
 INSERT INTO "Settings" VALUES (1,'Title','title');
