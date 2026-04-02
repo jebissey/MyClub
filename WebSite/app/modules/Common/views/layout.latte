@@ -234,9 +234,15 @@
         }
 
         .custom-img {
-            height: 220px;
+            height: clamp(80px, 20vw, 220px);
             width: 100%;
             object-fit: cover;
+        }
+
+        @media (max-width: 576px) {
+            .custom-img {
+                height: clamp(60px, 18vw, 110px);
+            }
         }
 
         /* ─── Responsive ─────────────────────────────────────────── */

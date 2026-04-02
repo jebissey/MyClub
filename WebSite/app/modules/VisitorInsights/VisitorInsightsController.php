@@ -156,7 +156,7 @@ class VisitorInsightsController extends TableController
         }
 
         $_SESSION['navbar'] = 'visitorInsights';
-        $this->render('Webmaster/views/visitorInsights.latte', $this->getAllParams([
+        $this->render('VisitorInsights/views/visitorInsights.latte', $this->getAllParams([
             'page'    => $this->application->getConnectedUser()->getPage(),
             'content' => $this->languagesDataHelper->translate('VisitorInsights'),
         ]));

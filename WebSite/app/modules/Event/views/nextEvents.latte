@@ -58,99 +58,101 @@
     <h4 class="text-center bg-light py-2">Cliquer sur la ligne d'un événement pour voir le détail, s'inscrire ou se désinscrire</h4>
     {/if}
 
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th></th>
-                <th>{='type'|translate}</th>
-                <th>{='date_time'|translate}</th>
-                <th>{='duration'|translate}</th>
-                <th>{='attributes'|translate}</th>
-                <th>{='summary'|translate}</th>
-                <th>{='location'|translate}</th>
-                <th>{='participants'|translate}</th>
-                <th>{='messages'|translate}</th>
-                <th>{='audience'|translate}</th>
-            </tr>
-        </thead>
-        <tbody>
-        {var $previousWeek = null}
-        {foreach $events as $event}
-            {var $currentWeek = date('o-W', strtotime($event['startTime']))}
-            {if $currentWeek != $previousWeek}
-                {var $weekStart = date('Y-m-d', strtotime('monday this week', strtotime($event['startTime'])))}
-                {var $weekEnd = date('Y-m-d', strtotime('sunday this week', strtotime($event['startTime'])))}
+    <div style="overflow-x: auto; -webkit-overflow-scrolling: touch;">
+        <table class="table table-striped">
+            <thead>
                 <tr>
-                    <td colspan="10" class="table-secondary fw-bold">
-                        📅 Semaine du {$weekStart|longDate} au {$weekEnd|longDate}
-                    </td>
+                    <th></th>
+                    <th>{='type'|translate}</th>
+                    <th>{='date_time'|translate}</th>
+                    <th>{='duration'|translate}</th>
+                    <th>{='attributes'|translate}</th>
+                    <th>{='summary'|translate}</th>
+                    <th>{='location'|translate}</th>
+                    <th>{='participants'|translate}</th>
+                    <th>{='messages'|translate}</th>
+                    <th>{='audience'|translate}</th>
                 </tr>
-                {var $previousWeek = $currentWeek}
-            {/if}
-            <tr onclick="window.location.href='/event/{$event['id']}';" style="cursor: pointer;">
-                <td>
-                    <div class="ms-auto d-flex flex-column flex-sm-row gap-2">
-                    {if $event['createdBy'] == ($person->Id ?? false) && $mode == 'next'}
-                        <button class="btn btn-sm btn-info email-btn" 
-                                data-event-id="{$event['id']}"
-                                data-event-title="{$event['summary']}"
-                                data-participants-count="{$event['participants']}"
-                                data-messages-count="{$event['messages']}"
-                                data-webapp-messages-count="{$event['webappMessages']}"
-                                data-canceled="{$event['canceled'] == 1 ? 'true' : 'false'}"
-                                data-bs-toggle="modal" 
-                                data-bs-target="#emailModal"
-                                onclick="event.stopPropagation();">
-                            <i class="bi bi-envelope" data-bs-toggle="tooltip" data-bs-placement="top" title="{='sendEmail'|translate}"></i>
-                        </button>
-                        <button class="btn btn-sm btn-primary edit-btn">
-                            <i class="bi bi-pencil" data-bs-toggle="tooltip" data-bs-placement="top" title="{='edit'|translate}"></i>
-                        </button>
-                        <button class="btn btn-sm btn-danger delete-btn">
-                            <i class="bi bi-trash" data-bs-toggle="tooltip" data-bs-placement="top" title="{='delete'|translate}"></i>
-                        </button>
-                    {/if}
-                    {if $event['createdBy'] == ($person->Id ?? false) || $mode == 'past' || $isEventManager}
-                        <button class="btn btn-sm btn-secondary duplicate-btn" data-id="{$event['id']}">
-                            <i class="bi bi-files" data-bs-toggle="tooltip" data-bs-placement="top" title="{='duplicate'|translate}"></i>
-                        </button>
-                    {/if}
-                    </div>
-                </td>
-                <td class="{if $event['canceled'] == 1}double-strike{/if}">
-                    {$event['eventTypeName']}
-                    {if $event['groupName']}({$event['groupName']}){/if}
-                </td>
-                <td class="{if $event['canceled'] == 1}double-strike{/if}">
-                    {=$event['startTime']|longDateTime}
-                </td>
-                <td>{$event['duration']}</td>
-                <td>
-                {if count($event['attributes']) > 0}
-                    {foreach $event['attributes'] as $attribute}
-                    <span 
-                        class="attribute-badge" 
-                        style="background-color: {$attribute['color']|noescape};"
-                        title="{$attribute['name']} : {$attribute['detail']}"
-                    ></span>
-                    {/foreach}
-                {else}
-                    Aucun attribut
+            </thead>
+            <tbody>
+            {var $previousWeek = null}
+            {foreach $events as $event}
+                {var $currentWeek = date('o-W', strtotime($event['startTime']))}
+                {if $currentWeek != $previousWeek}
+                    {var $weekStart = date('Y-m-d', strtotime('monday this week', strtotime($event['startTime'])))}
+                    {var $weekEnd = date('Y-m-d', strtotime('sunday this week', strtotime($event['startTime'])))}
+                    <tr>
+                        <td colspan="10" class="table-secondary fw-bold">
+                            📅 Semaine du {$weekStart|longDate} au {$weekEnd|longDate}
+                        </td>
+                    </tr>
+                    {var $previousWeek = $currentWeek}
                 {/if}
-                </td>
-                <td class="{if $event['canceled'] == 1}double-strike{/if}">
-                    {$event['summary']}
-                </td>
-                <td class="{if $event['canceled'] == 1}double-strike{/if}">
-                    {$event['location']}
-                </td>
-                <td>{$event['participants']}{if $event['maxParticipants'] > 0} / {$event['maxParticipants']}{/if}{if isset($event['booked'])}👤{/if}</td>
-                <td>{$event['messages']}</td>
-                <td>{=$event['audience']|translate}</td>
-            </tr>
-        {/foreach}
-        </tbody>
-    </table>
+                <tr onclick="window.location.href='/event/{$event['id']}';" style="cursor: pointer;">
+                    <td>
+                        <div class="ms-auto d-flex flex-column flex-sm-row gap-2">
+                        {if $event['createdBy'] == ($person->Id ?? false) && $mode == 'next'}
+                            <button class="btn btn-sm btn-info email-btn" 
+                                    data-event-id="{$event['id']}"
+                                    data-event-title="{$event['summary']}"
+                                    data-participants-count="{$event['participants']}"
+                                    data-messages-count="{$event['messages']}"
+                                    data-webapp-messages-count="{$event['webappMessages']}"
+                                    data-canceled="{$event['canceled'] == 1 ? 'true' : 'false'}"
+                                    data-bs-toggle="modal" 
+                                    data-bs-target="#emailModal"
+                                    onclick="event.stopPropagation();">
+                                <i class="bi bi-envelope" data-bs-toggle="tooltip" data-bs-placement="top" title="{='sendEmail'|translate}"></i>
+                            </button>
+                            <button class="btn btn-sm btn-primary edit-btn">
+                                <i class="bi bi-pencil" data-bs-toggle="tooltip" data-bs-placement="top" title="{='edit'|translate}"></i>
+                            </button>
+                            <button class="btn btn-sm btn-danger delete-btn">
+                                <i class="bi bi-trash" data-bs-toggle="tooltip" data-bs-placement="top" title="{='delete'|translate}"></i>
+                            </button>
+                        {/if}
+                        {if $event['createdBy'] == ($person->Id ?? false) || $mode == 'past' || $isEventManager}
+                            <button class="btn btn-sm btn-secondary duplicate-btn" data-id="{$event['id']}">
+                                <i class="bi bi-files" data-bs-toggle="tooltip" data-bs-placement="top" title="{='duplicate'|translate}"></i>
+                            </button>
+                        {/if}
+                        </div>
+                    </td>
+                    <td class="{if $event['canceled'] == 1}double-strike{/if}">
+                        {$event['eventTypeName']}
+                        {if $event['groupName']}({$event['groupName']}){/if}
+                    </td>
+                    <td class="{if $event['canceled'] == 1}double-strike{/if}">
+                        {=$event['startTime']|longDateTime}
+                    </td>
+                    <td>{$event['duration']}</td>
+                    <td>
+                    {if count($event['attributes']) > 0}
+                        {foreach $event['attributes'] as $attribute}
+                        <span 
+                            class="attribute-badge" 
+                            style="background-color: {$attribute['color']|noescape};"
+                            title="{$attribute['name']} : {$attribute['detail']}"
+                        ></span>
+                        {/foreach}
+                    {else}
+                        Aucun attribut
+                    {/if}
+                    </td>
+                    <td class="{if $event['canceled'] == 1}double-strike{/if}">
+                        {$event['summary']}
+                    </td>
+                    <td class="{if $event['canceled'] == 1}double-strike{/if}">
+                        {$event['location']}
+                    </td>
+                    <td>{$event['participants']}{if $event['maxParticipants'] > 0} / {$event['maxParticipants']}{/if}{if isset($event['booked'])}👤{/if}</td>
+                    <td>{$event['messages']}</td>
+                    <td>{=$event['audience']|translate}</td>
+                </tr>
+            {/foreach}
+            </tbody>
+        </table>
+    </div>
 
     <div class="modal fade" id="emailModal" tabindex="-1" aria-labelledby="emailModalLabel" aria-hidden="true">
         <div class="modal-dialog">
