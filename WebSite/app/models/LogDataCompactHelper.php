@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace app\models;
 
 use DateTime;
-use PDO;
+use InvalidArgumentException;
 use Throwable;
 
 use app\enums\ApplicationError;
@@ -20,80 +20,95 @@ class LogDataCompactHelper extends Data
 
     public function compactLog(int $removeOlderThanXmonths, int $compactOlderThanXmonths): void
     {
-        $countBefore = (int)$this->pdoForLog->query("SELECT COUNT(*) FROM Log")->fetchColumn();
         $metadata = $this->get('Metadata', ['Id' => 1], 'Compact_lastDate, Compact_everyXdays, Compact_maxRecords');
         $maxRecords = isset($metadata->Compact_maxRecords) ? (int)$metadata->Compact_maxRecords : 0;
         if (!empty($metadata->Compact_everyXdays) && !empty($metadata->Compact_lastDate)) {
             $last = new DateTime($metadata->Compact_lastDate);
             $now  = new DateTime();
             $daysSinceLast = (int)$last->diff($now)->format('%a');
-            if ($daysSinceLast < (int)$metadata->Compact_everyXdays) {
-                $this->enforceMaxRecordsAndLog($maxRecords, $countBefore);
-                return;
+            if ($daysSinceLast >= (int)$metadata->Compact_everyXdays) {
+                $countBefore = (int)$this->pdoForLog->query("SELECT COUNT(*) FROM Log")->fetchColumn();
+                if ($this->compactRows($removeOlderThanXmonths, $compactOlderThanXmonths)) {
+                    $this->set('Metadata', ['Compact_lastDate' => (new DateTime())->format('Y-m-d H:i:s')], ['Id' => 1]);
+                    $this->enforceMaxRecordsAndLog($maxRecords, $countBefore);
+                }
             }
         }
-        $removeParam  = "-{$removeOlderThanXmonths} months";
-        $compactParam = "-{$compactOlderThanXmonths} months";
-        try {
-            $this->pdoForLog->beginTransaction();
-
-            $stmtDeleteOld = $this->pdoForLog->prepare("
-                DELETE FROM Log
-                WHERE CreatedAt < datetime('now', ?)
-            ");
-            $stmtDeleteOld->execute([$removeParam]);
-
-            $compactedRows = $this->pdoForLog->query("
-                SELECT 
-                    '' AS IpAddress,
-                    '' AS Referer,
-                    '' AS Os,
-                    '' AS Browser,
-                    '' AS ScreenResolution,
-                    '' AS Type,
-                    Uri,
-                    '' AS Token,
-                    Who,
-                    datetime(CreatedAt, 'start of month') AS CreatedAt,
-                    '' AS Code,
-                    '' AS Message,
-                    COUNT(*) AS Count
-                FROM Log
-                WHERE CreatedAt < datetime('now', '{$compactParam}')
-                GROUP BY Uri, Who, strftime('%Y-%m', CreatedAt)
-            ")->fetchAll(PDO::FETCH_ASSOC);
-            if ($compactedRows === []) {
-                $this->set('Metadata', ['Compact_lastDate' => (new DateTime())->format('Y-m-d H:i:s')], ['Id' => 1]);
-                $this->pdoForLog->commit();
-                $this->enforceMaxRecordsAndLog($maxRecords, $countBefore);
-                return;
-            }
-
-            $stmtDeleteCompact = $this->pdoForLog->prepare("
-                DELETE FROM Log
-                WHERE CreatedAt < datetime('now', ?)
-            ");
-            $stmtDeleteCompact->execute([$compactParam]);
-
-            $insert = $this->pdoForLog->prepare("
-                INSERT INTO Log (IpAddress, Referer, Os, Browser, ScreenResolution, Type, Uri, Token, Who, CreatedAt, Code, Message, Count)
-                VALUES (:IpAddress, :Referer, :Os, :Browser, :ScreenResolution, :Type, :Uri, :Token, :Who, :CreatedAt, :Code, :Message, :Count)
-            ");
-            foreach ($compactedRows as $row) {
-                $insert->execute($row);
-            }
-            $this->set('Metadata', ['Compact_lastDate' => (new DateTime())->format('Y-m-d H:i:s')], ['Id' => 1]);
-            $this->pdoForLog->commit();
-        } catch (Throwable $e) {
-
-            if ($this->pdoForLog->inTransaction()) $this->pdoForLog->rollBack();
-            (new LogDataWriterHelper($this->application))->add((string)ApplicationError::Error->value, "Compact log FAILED: " . $e->getMessage());
-            return;
-        }
-        $this->enforceMaxRecordsAndLog($maxRecords, $countBefore);
     }
 
     #region Private functions
+    private function compactRows(int $removeOlderThanXmonths, int $compactOlderThanXmonths): bool
+    {
+        if ($removeOlderThanXmonths <= $compactOlderThanXmonths) {
+            throw new InvalidArgumentException(
+                "removeOlderThanXmonths ($removeOlderThanXmonths) must be strictly greater than compactOlderThanXmonths ($compactOlderThanXmonths)"
+            );
+        }
+
+        $this->pdoForLog->beginTransaction();
+
+        try {
+            $emptyCondition = "IpAddress = '' AND Referer = '' AND Os = '' AND Browser = '' 
+                          AND ScreenResolution = '' AND Type = '' AND Token = '' 
+                          AND Code = '' AND Message = ''";
+
+            $stmtDelete = $this->pdoForLog->prepare("
+                DELETE FROM Log 
+                WHERE CreatedAt < datetime('now', ?)
+            ");
+            $stmtDelete->execute(["-{$removeOlderThanXmonths} months"]);
+            $deletedRows = $stmtDelete->rowCount();
+
+            $stmtCompact = $this->pdoForLog->prepare("
+                INSERT INTO Log (
+                    IpAddress, Referer, Os, Browser, ScreenResolution, Type, Uri, 
+                    Token, Who, CreatedAt, Code, Message, Count
+                )
+                SELECT 
+                    '', '', '', '', '', '',
+                    Uri,
+                    '',
+                    Who,
+                    datetime(CreatedAt, 'start of month') AS CompactedDate,
+                    '', '',
+                    SUM(Count) AS TotalCount
+                FROM Log
+                WHERE CreatedAt < datetime('now', ?)
+                AND NOT ($emptyCondition)
+                GROUP BY Uri, Who, strftime('%Y-%m', CreatedAt)
+                HAVING SUM(Count) > 0;
+            ");
+            $stmtCompact->execute(["-{$compactOlderThanXmonths} months"]);
+            $compactedInserted = $stmtCompact->rowCount();
+
+            $stmtDeleteOld = $this->pdoForLog->prepare("
+                DELETE FROM Log 
+                WHERE CreatedAt < datetime('now', ?)
+                AND NOT ($emptyCondition)
+            ");
+            $stmtDeleteOld->execute(["-{$compactOlderThanXmonths} months"]);
+            $compactedDeleted = $stmtDeleteOld->rowCount();
+
+            $this->pdoForLog->commit();
+            $this->pdoForLog->exec("VACUUM");
+
+            (new LogDataWriterHelper($this->application))->add((string)ApplicationError::Ok->value, "Compact log: {$deletedRows} old deleted, {$compactedInserted} compacted, {$compactedDeleted} compacted deleted");
+
+            return $deletedRows + $compactedDeleted > 0;
+        } catch (Throwable $e) {
+            if ($this->pdoForLog->inTransaction()) {
+                $this->pdoForLog->rollBack();
+            }
+
+            (new LogDataWriterHelper($this->application))->add(
+                (string)ApplicationError::Error->value,
+                "Compact log FAILED: " . $e->getMessage()
+            );
+
+            return false;
+        }
+    }
+
     private function enforceMaxRecordsAndLog(int $maxRecords, int $countBefore): void
     {
         if ($maxRecords <= 0) return;
