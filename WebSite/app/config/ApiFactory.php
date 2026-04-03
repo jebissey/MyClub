@@ -91,7 +91,6 @@ class ApiFactory
             $this->dataHelper,
             $this->personDataHelper,
             $this->designDataHelper,
-            $this->articleDataHelper
         );
     }
 

@@ -10,7 +10,6 @@ use Throwable;
 use app\enums\ApplicationError;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
-use app\models\ArticleDataHelper;
 use app\models\DataHelper;
 use app\models\DesignDataHelper;
 use app\models\OrderReplyDataHelper;
@@ -28,7 +27,6 @@ class ArticleApi extends AbstractApi
         DataHelper $dataHelper,
         PersonDataHelper $personDataHelper,
         private DesignDataHelper $designDataHelper,
-        private ArticleDataHelper $articleDataHelper
     ) {
         parent::__construct($application, $connectedUser, $dataHelper, $personDataHelper);
         $this->replyDataHelper = new ReplyDataHelper($application);

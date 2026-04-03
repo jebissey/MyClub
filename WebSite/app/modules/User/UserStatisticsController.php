@@ -62,7 +62,7 @@ class UserStatisticsController extends AbstractController
         return $chartData;
     }
 
-    const SLICES = 100;
+    const SLICES = 20;
 
     private function getVisitStats($season)
     {
@@ -159,12 +159,12 @@ class UserStatisticsController extends AbstractController
     private function getCurrentUserTranche($stats, $person)
     {
         if (empty($person) || empty($stats['memberVisits'])) {
-            throw new \RuntimeException('$person or $stats can\'t be null in file ' . __FILE__ . ' at line ' . __LINE__);
+            throw new RuntimeException('$person or $stats can\'t be null in file ' . __FILE__ . ' at line ' . __LINE__);
         }
 
         $email = $person->Email;
         if (!array_key_exists($email, $stats['memberVisits'])) {
-            throw new \RuntimeException('User $email not found in stats in file ' . __FILE__ . ' at line ' . __LINE__);
+            throw new RuntimeException('User $email not found in stats in file ' . __FILE__ . ' at line ' . __LINE__);
         }
 
         $userVisits = $stats['memberVisits'][$email];

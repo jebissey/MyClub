@@ -79,10 +79,9 @@
 
 {block scripts}
 <script>
-    // Actualiser automatiquement toutes les 30 secondes
     setInterval(function() {
         location.reload();
-    }, 30000);
+    }, 600000);
     
     // Initialiser les tooltips si nécessaire
     var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));

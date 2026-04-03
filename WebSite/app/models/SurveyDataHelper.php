@@ -129,4 +129,17 @@ class SurveyDataHelper extends Data implements NewsProviderInterface
         }
         return $news;
     }
+
+    public function GetRepliesForActivePersons(int $surveyId): array
+    {
+        $sql = "
+            SELECT r.*
+            FROM Reply r
+            JOIN Person p ON r.IdPerson = p.Id
+            WHERE r.IdSurvey = :surveyId and p.Inactivated = 0
+        ";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([':surveyId' => $surveyId]);
+        return $stmt->fetchAll(PDO::FETCH_OBJ);
+    }
 }

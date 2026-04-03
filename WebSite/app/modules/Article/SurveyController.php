@@ -109,7 +109,7 @@ class SurveyController extends AbstractController
             return;
         }
         if ($this->authorizationDataHelper->canPersonReadSurveyResults($this->dataHelper->get('Article', ['Id' => $survey->IdArticle]), $connectedUser)) {
-            $replies = $this->dataHelper->gets('Reply', ['IdSurvey' => $survey->Id]);
+            $replies = $this->surveyDataHelper->GetRepliesForActivePersons($survey->Id);
             $participants = [];
             $results = [];
             $options = json_decode($survey->Options);
