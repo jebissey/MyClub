@@ -86,9 +86,20 @@
                     </div>
                     {/if}
 
+                    <div class="mb-3">
+                        <div class="cf-turnstile"
+                             data-sitekey="{$turnstileSiteKey}"
+                             data-theme="light">
+                        </div>
+                    </div>
+
                     <button type="submit" class="btn btn-primary"><strong>Envoyer</strong></button>
                 </form>
             </div>
         </div>
     </div>
+{/block}
+
+{block scripts}
+    <script src="https://challenges.cloudflare.com/turnstile/v1/api.js" async defer></script>
 {/block}

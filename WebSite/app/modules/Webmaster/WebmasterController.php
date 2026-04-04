@@ -113,7 +113,7 @@ class WebmasterController extends AbstractController
 
     public function notifications(): void
     {
-        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isAdministrator())) {
+        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isWebmaster())) {
             $publicKey  = $this->credentials->get('vapid', 'publicKey');
             $privateKey = $this->credentials->get('vapid', 'privateKey');
 
@@ -158,7 +158,7 @@ class WebmasterController extends AbstractController
 
     public function sendEmailCredentialsEdit(): void
     {
-        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isAdministrator())) {
+        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isWebmaster())) {
             $this->render('Webmaster/views/emailCredentials.latte', $this->getAllParams([
                 'navItems' => $this->getNavItems($this->application->getConnectedUser()->person),
                 'page'     => $this->application->getConnectedUser()->getPage(),
@@ -177,7 +177,7 @@ class WebmasterController extends AbstractController
 
     public function sendEmailCredentialsSave(): void
     {
-        if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isAdministrator())) {
+        if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isWebmaster())) {
 
             $schema = [
                 'sendMethod'           => FilterInputRule::Text->value,
@@ -269,6 +269,36 @@ class WebmasterController extends AbstractController
             echo '  </url>' . PHP_EOL;
         }
         echo '</urlset>';
+    }
+
+    public function turnstileCredentialsEdit(): void
+    {
+        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isWebmaster())) {
+            $this->render('Webmaster/views/turnstileCredentials.latte', $this->getAllParams([
+                'navItems'           => $this->getNavItems($this->application->getConnectedUser()->person),
+                'page'               => $this->application->getConnectedUser()->getPage(),
+                'turnstileSiteKey'   => $this->credentials->get('turnstile', 'site_key'),
+                'turnstileConfigured' => !empty($this->credentials->get('turnstile', 'secret_key')),
+            ]));
+        }
+    }
+
+    public function turnstileCredentialsSave(): void
+    {
+        if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isWebmaster())) {
+            $schema = [
+                'turnstileSiteKey'   => FilterInputRule::Text->value,
+                'turnstileSecretKey' => FilterInputRule::Text->value,
+            ];
+            $input = WebApp::filterInput($schema, $this->flight->request()->data->getData());
+
+            $this->credentials->set('turnstile', 'site_key', $input['turnstileSiteKey'] ?? '');
+            if (!empty($input['turnstileSecretKey'])) {
+                $this->credentials->set('turnstile', 'secret_key', $input['turnstileSecretKey']);
+            }
+
+            $this->redirect('/webmaster');
+        }
     }
 
     #region Private methods

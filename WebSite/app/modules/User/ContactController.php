@@ -11,20 +11,23 @@ use app\helpers\Application;
 use app\helpers\WebApp;
 use app\models\PersonDataHelper;
 use app\modules\Common\AbstractController;
+use app\modules\Common\services\CredentialService;
 use app\modules\Common\services\EmailService;
 use app\valueObjects\EmailMessage;
 
 class ContactController extends AbstractController
 {
-    private const MIN_FILL_SECONDS  = 5;
-    private const RATE_LIMIT_MAX    = 3;
-    private const RATE_LIMIT_WINDOW = 600; // 10 minutes
+    private const MIN_FILL_SECONDS       = 5;
+    private const RATE_LIMIT_MAX         = 3;
+    private const RATE_LIMIT_WINDOW      = 600; // 10 minutes
+    private const TURNSTILE_VERIFY_URL   = 'https://challenges.cloudflare.com/turnstile/v1/siteverify';
 
     public function __construct(
         Application $application,
         private EmailService $emailService,
         private PersonDataHelper $personDataHelper,
         private WebApp $webApp,
+        private CredentialService $credentials
     ) {
         parent::__construct($application);
     }
@@ -40,15 +43,18 @@ class ContactController extends AbstractController
                 if (!$event || $event->Audience != EventAudience::ForAll->value) $eventId = $event = null;
             }
             $this->render('Common/views/contact.latte', $this->getAllParams([
-                'navItems' => $this->getNavItems($this->application->getConnectedUser()->person ?? false),
-                'event'    => $event,
-                'page'     => $this->application->getConnectedUser()->getPage(),
+                'navItems'          => $this->getNavItems($this->application->getConnectedUser()->person ?? false),
+                'event'             => $event,
+                'page'              => $this->application->getConnectedUser()->getPage(),
+                'turnstileSiteKey'  => $this->credentials->get('turnstile', 'site_key') ?? '',
+
             ]));
         } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') $this->handleContactForm();
         else $this->raiseMethodNotAllowed(__FILE__, __LINE__);
     }
 
     #region Private functions
+
     private function handleContactForm(): void
     {
         $honeypot = $_POST['website'] ?? '';
@@ -56,6 +62,7 @@ class ContactController extends AbstractController
             $this->silentFail("honey pot field filling with {$honeypot}");
             return;
         }
+
         $formLoadedAt = $_SESSION['contact_form_loaded'] ?? 0;
         if (time() - $formLoadedAt < self::MIN_FILL_SECONDS) {
             $this->silentFail('too fast for a human');
@@ -65,7 +72,13 @@ class ContactController extends AbstractController
 
         $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
         if (!$this->checkRateLimit($ip)) {
-            $this->silentFail('too many attemps');
+            $this->silentFail('too many attempts');
+            return;
+        }
+
+        $turnstileToken = $_POST['cf-turnstile-response'] ?? '';
+        if (!$this->verifyTurnstile($turnstileToken, $ip)) {
+            $this->silentFail('turnstile challenge failed');
             return;
         }
 
@@ -83,12 +96,39 @@ class ContactController extends AbstractController
         $eventId = $input['eventId'] ?? null;
 
         $errors = [];
-        if (empty($name))                          $errors[] = 'Nom et prénom sont requis.';
-        if (empty($email))                         $errors[] = 'Un email valide est requis.';
-        if ($eventId === null && empty($message))  $errors[] = 'Le message est requis.';
+        if (empty($name))                         $errors[] = 'Nom et prénom sont requis.';
+        if (empty($email))                        $errors[] = 'Un email valide est requis.';
+        if ($eventId === null && empty($message)) $errors[] = 'Le message est requis.';
 
         if (empty($errors)) $this->sendContactMessage($input, $eventId);
         else $this->redirectWithErrors($errors, $name, $email, $message);
+    }
+
+    private function verifyTurnstile(string $token, string $ip): bool
+    {
+        $secret = $this->credentials->get('turnstile', 'secret_key') ?? '';
+        if ($secret === '') return true;
+        if ($token === '') return false;
+
+        $payload = http_build_query([
+            'secret'   => $secret,
+            'response' => $token,
+            'remoteip' => $ip,
+        ]);
+        $ctx = stream_context_create([
+            'http' => [
+                'method'  => 'POST',
+                'header'  => "Content-Type: application/x-www-form-urlencoded\r\n",
+                'content' => $payload,
+                'timeout' => 5,
+            ],
+        ]);
+
+        $result = @file_get_contents(self::TURNSTILE_VERIFY_URL, false, $ctx);
+        if ($result === false) return true;
+
+        $data = json_decode($result, true);
+        return ($data['success'] ?? false) === true;
     }
 
     private function silentFail(string $message): void
@@ -123,7 +163,7 @@ class ContactController extends AbstractController
         $adminEmail = $this->dataHelper->get('Settings', ['Name' => 'contactEmail'], 'Value')->Value ?? '';
         if ($adminEmail === '') $adminEmail = $this->personDataHelper->getWebmasterEmail();
         if (!filter_var($adminEmail, FILTER_VALIDATE_EMAIL)) {
-            $this->application->getErrorManager()->raise(ApplicationError::InvalidSetting, 'Invalid contactEmmail', 3000, false, __FILE__, __LINE__);
+            $this->application->getErrorManager()->raise(ApplicationError::InvalidSetting, 'Invalid contactEmail', 3000, false, __FILE__, __LINE__);
             return;
         }
 

@@ -158,7 +158,8 @@ class ControllerFactory
             $this->application,
             $this->emailService,
             $this->personDataHelper,
-            $this->webapp
+            $this->webapp,
+            CredentialService::getInstance()
         );
     }
 
