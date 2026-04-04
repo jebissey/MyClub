@@ -102,17 +102,19 @@ class ContactController extends AbstractController
         $hash = md5($ip);
         $now  = time();
         $row  = $this->dataHelper->get('ContactRateLimit', ['ip_hash' => $hash], 'attempts, since');
+
         if (!$row || $now - $row->since > self::RATE_LIMIT_WINDOW) {
             $this->dataHelper->set('ContactRateLimit', [
                 'ip_hash'  => $hash,
                 'attempts' => 1,
                 'since'    => $now,
-            ]);
+            ], $row ? ['ip_hash' => $hash] : []);
             return true;
         }
+
         if ($row->attempts >= self::RATE_LIMIT_MAX) return false;
 
-        $this->dataHelper->set('ContactRateLimit', ['attempts' => $row->attempts + 1], ['ip_hash'  => $hash]);
+        $this->dataHelper->set('ContactRateLimit', ['attempts' => $row->attempts + 1], ['ip_hash' => $hash]);
         return true;
     }
 
