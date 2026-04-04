@@ -142,15 +142,24 @@ class GroupDataHelper extends Data
     {
         $groupCounts = [];
         $groupCountResult = $this->pdo->query("
-            SELECT g.Id, COUNT(DISTINCT pg.IdPerson) as Count 
+            SELECT 
+                g.Id, 
+                g.Name,
+                COUNT(DISTINCT pg.IdPerson) as Total,
+                COUNT(DISTINCT CASE WHEN p.InPresentationDirectory = '1' THEN pg.IdPerson END) as WithPresentation
             FROM `Group` g
             JOIN PersonGroup pg ON g.Id = pg.IdGroup
             JOIN Person p ON pg.IdPerson = p.Id
-            WHERE p.InPresentationDirectory = 'yes'
-            GROUP BY g.Id
-            ")->fetchAll(PDO::FETCH_OBJ);
-        foreach ($groupCountResult as $count) {
-            $groupCounts[$count->Id] = $count['Count'];
+            WHERE p.Inactivated = 0
+            GROUP BY g.Id, g.Name
+        ")->fetchAll(PDO::FETCH_OBJ);
+
+        foreach ($groupCountResult as $row) {
+            $groupCounts[$row->Id] = [
+                'name'             => $row->Name,
+                'total'            => (int) $row->Total,
+                'withPresentation' => (int) $row->WithPresentation,
+            ];
         }
         return $groupCounts;
     }

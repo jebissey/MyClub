@@ -40,14 +40,19 @@
                 <div class="card-body">
                     <h5 class="card-title">{='directory.index.filter_by_group'|translate}</h5>
                     <div class="d-flex flex-wrap gap-2">
-                        <a href="/user/directory" class="btn {if $selectedGroup === null}btn-primary{else}btn-outline-primary{/if}">
-                            {='directory.index.all'|translate}
-                        </a>
+                         <a href="/user/directory" class="btn {if $selectedGroup === null}btn-primary{else}btn-outline-primary{/if}">
+                             {='directory.index.all'|translate}
+                             <span class="badge bg-light text-dark">
+                                 ({$totalWithPresentation}/{$totalPersons})
+                             </span>
+                         </a>
                         {foreach $groups as $group}
                         <a href="/user/directory?group={$group->Id}" class="btn {if $selectedGroup === $group->Id}btn-primary{else}btn-outline-primary{/if}">
                             {$group->Name}
                             {if isset($groupCounts[$group->Id])}
-                                <span class="badge bg-light text-dark">{$groupCounts[$group->Id]}</span>
+                                <span class="badge bg-light text-dark">
+                                    ({$groupCounts[$group->Id]['withPresentation']}/{$groupCounts[$group->Id]['total']})
+                                </span>
                             {/if}
                         </a>
                         {/foreach}

@@ -47,13 +47,12 @@ class UserDirectoryController extends AbstractController
                 $person_->UserImg = WebApp::getUserImg($person_, $gravatarHandler);
             }
         }
-        $groupCounts = $this->groupDataHelper->getGroupCount();
         $this->render('User/views/users_directory.latte', $this->getAllParams([
             'persons' => $persons,
             'navItems' => $this->getNavItems($person),
             'loggedPerson' => $person,
             'groups' => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
-            'groupCounts' => $groupCounts,
+            'groupCounts' => $this->groupDataHelper->getGroupCount(),
             'selectedGroup' => $selectedGroup,
             'page' => $this->application->getConnectedUser()->getPage(1),
             'countOfMessages' => count($this->dataHelper->gets('Message', [
@@ -69,6 +68,13 @@ class UserDirectoryController extends AbstractController
             ], 'Id')),
             'btn_HistoryBack' => true,
             'btn_Parent' => "/user",
+            'totalWithPresentation' => count($this->dataHelper->gets('Person', [
+                'InPresentationDirectory' => 1,
+                'Inactivated' => 0
+            ], 'Id')),
+            'totalPersons' => count($this->dataHelper->gets('Person', [
+                'Inactivated' => 0
+            ], 'Id')),
         ]));
     }
 
