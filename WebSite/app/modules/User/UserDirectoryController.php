@@ -65,7 +65,7 @@ class UserDirectoryController extends AbstractController
             'numberOfPublicMembers' => count($this->dataHelper->gets('Person', [
                 'InPresentationDirectory' => 1,
                 'Inactivated' => 0,
-                'MyPublicDataInPresentationDirectory IS NOT NULL' => null
+                'MyPublicDataInPresentationDirectory IS NOT NULL AND MyPublicDataInPresentationDirectory != ""' => null
             ], 'Id')),
             'btn_HistoryBack' => true,
             'btn_Parent' => "/user",
@@ -113,7 +113,7 @@ class UserDirectoryController extends AbstractController
             'InPresentationDirectory' => 1,
             'Location IS NOT NULL' => null,
             'Inactivated' => 0,
-            'MyPublicDataInPresentationDirectory IS NOT NULL' => null
+            'MyPublicDataInPresentationDirectory IS NOT NULL AND MyPublicDataInPresentationDirectory != ""' => null
         ], 'Id, FirstName, LastName, NickName, Avatar, UseGravatar, Email, Location, MyPublicDataInPresentationDirectory');
         $locationData = $this->getLocationData($members);
 
