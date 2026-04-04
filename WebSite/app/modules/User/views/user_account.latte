@@ -5,19 +5,14 @@
         {if $layout == '../../Webmaster/views/personManager.latte'}
             <div class="alert alert-success alert-dismissible">
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                <h4>Compte importé</h4>
-                <p>
-                    Il faut mettre à jour les informations du compte dans le système externe.
-                    <b>En cas de changement d'adresse courriel</b>, il faut d'abord la mettre à jour ici avant de faire une nouvelle importation.
-                </p>
+                <h4>{='account.form.imported.title'|translate}</h4>
+                <p>{='account.form.imported.webmaster_message'|translate}</p>
             </div>
         {else}
             <div class="alert alert-success alert-dismissible">
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                <h4>Compte importé</h4>
-                <p>
-                    Les champs grisés ne sont pas modifiables ici. Ils sont synchronisés avec le système externe.
-                </p>
+                <h4>{='account.form.imported.title'|translate}</h4>
+                <p>{='account.form.imported.readonly_message'|translate}</p>
             </div>
         {/if}
     {/if}
@@ -26,63 +21,76 @@
             <div class="col-12 col-md-6 col-lg-4">
                 {if $layout == '../../Webmaster/views/personManager.latte'}
                 <div class="mb-3">
-                    <label for="email" class="form-label">Email</label>
+                    <label for="email" class="form-label">{='account.form.email.label'|translate}</label>
                     <input type="email" class="form-control" id="email" name="email" value="{$email}" required>
-                    <div class="invalid-feedback">Veuillez saisir une adresse email valide</div>
+                    <div class="invalid-feedback">{='account.form.email.invalid'|translate}</div>
                 </div>
                 {else}
                 <div class="mb-3">
-                    <label for="email" class="form-label">Email</label>
+                    <label for="email" class="form-label">{='account.form.email.label'|translate}</label>
                     <input type="email" class="form-control {if $readOnly}bg-light text-muted{/if}" id="email" name="email" value="{$email}" {if $readOnly}readonly{else}required{/if}>
-                    <div class="invalid-feedback">Veuillez saisir une adresse email valide</div>
+                    <div class="invalid-feedback">{='account.form.email.invalid'|translate}</div>
                 </div>
                 {/if}
 
                 <div class="mb-3">
-                    <label for="firstName" class="form-label">Prénom</label>
-                    <input type="text" class="form-control {if $readOnly}bg-light text-muted{/if}" id="firstName" name="firstName" 
+                    <label for="firstName" class="form-label">{='account.form.firstname.label'|translate}</label>
+                    <input type="text" class="form-control {if $readOnly}bg-light text-muted{/if}" id="firstName" name="firstName"
                         value="{$firstName}" {if $readOnly}readonly{else}required{/if}>
-                    <div class="invalid-feedback">
-                        Le prénom est requis.
-                    </div>
+                    <div class="invalid-feedback">{='account.form.firstname.required'|translate}</div>
                 </div>
 
                 <div class="mb-3">
-                    <label for="lastName" class="form-label">Nom</label>
-                    <input type="text" class="form-control {if $readOnly}bg-light text-muted{/if}" id="lastName" name="lastName" 
+                    <label for="lastName" class="form-label">{='account.form.lastname.label'|translate}</label>
+                    <input type="text" class="form-control {if $readOnly}bg-light text-muted{/if}" id="lastName" name="lastName"
                         value="{$lastName}" {if $readOnly}readonly{else}required{/if}>
-                    <div class="invalid-feedback">
-                        Le nom est requis.
-                    </div>
+                    <div class="invalid-feedback">{='account.form.lastname.required'|translate}</div>
                 </div>
 
                 {if $isSelfEdit}
                 <div class="mb-3">
-                    <label for="nickName" class="form-label">Pseudo</label>
-                    <input type="text" class="form-control" id="nickName" name="nickName" 
+                    <label for="nickName" class="form-label">{='account.form.nickname.label'|translate}</label>
+                    <input type="text" class="form-control" id="nickName" name="nickName"
                         value="{$nickName}">
                 </div>
 
                 <div class="mb-3">
-                    <div class="dropdown" id="emojiDropdown">
-                        <button class="btn btn-outline-primary dropdown-toggle" type="button" id="emojiSelect" data-bs-toggle="dropdown" aria-expanded="false">
-                            <span id="selectedEmoji"></span>
-                            Sélectionnez un Emoji
-                        </button>
-                        <ul class="dropdown-menu emoji-dropdown" id="emojiList" style="max-height: 300px; overflow-y: auto;">
-                            {foreach $emojis as $emoji}
-                                <li>
-                                    <a class="dropdown-item emoji-item" href="#" data-emoji="{$emoji}" style="font-size: 1.5rem; padding: 8px 12px;">
-                                        {$emoji}
-                                    </a>
-                                </li>
-                            {/foreach}                
-                        </ul>
-                        <input type="hidden" class="form-control" id="avatar" name="avatar" value="{$avatar}">
+                    <div id="emojiSelectorWrapper">
+                        <div class="dropdown" id="emojiDropdown">
+                            <button class="btn btn-outline-primary dropdown-toggle" type="button" id="emojiSelect" data-bs-toggle="dropdown" aria-expanded="false">
+                                <span id="selectedEmoji"></span><span id="emojiLabel">{='account.form.emoji.select_label'|translate}</span>
+                            </button>
+                            <ul class="dropdown-menu emoji-dropdown" id="emojiList" style="max-height: 300px; overflow-y: auto;">
+                                {foreach $emojis as $emoji}
+                                    <li>
+                                        <a class="dropdown-item emoji-item" href="#" data-emoji="{$emoji}" style="font-size: 1.5rem; padding: 8px 12px;">
+                                            {$emoji}
+                                        </a>
+                                    </li>
+                                {/foreach}
+                            </ul>
+                            <input type="hidden" id="avatar" name="avatar" value="{$avatar}">
+                        </div>
+
+                        <div class="mt-2 d-flex align-items-center gap-2" id="getemoji-row">
+                            <a href="https://getemoji.com/" target="_blank" rel="noopener noreferrer"
+                            class="btn btn-sm btn-outline-secondary"
+                            title="{='account.form.emoji.getemoji_title'|translate}">
+                                <i class="bi bi-box-arrow-up-right"></i> getemoji.com
+                            </a>
+                            <input type="text"
+                                id="emojiPasteInput"
+                                class="form-control form-control-sm"
+                                placeholder="{='account.form.emoji.paste_placeholder'|translate}"
+                                style="max-width: 160px;"
+                                maxlength="10">
+                            <span id="emojiPasteFeedback" class="small text-muted"></span>
+                        </div>
                     </div>
-                    <label for="gravatar"> 
-                        <input type="checkbox" id="useGravatar" name="useGravatar" {if $useGravatar == 'yes'}checked{/if} value="yes"> 
-                        Utiliser mon <a href="https://gravatar.com/" target="_blank" rel="noopener noreferrer">gravatar</a>
+
+                    <label for="useGravatar" class="mt-2">
+                        <input type="checkbox" id="useGravatar" name="useGravatar" {if $useGravatar == 'yes'}checked{/if} value="yes">
+                        {='account.form.gravatar.use'|translate} <a href="https://gravatar.com/" target="_blank" rel="noopener noreferrer">gravatar</a>
                     </label>
                 </div>
                 {/if}
@@ -91,27 +99,31 @@
                 <hr class="my-4">
                 <p class="text-muted small">
                     <i class="bi bi-shield-lock"></i>
-                    Champs visibles et modifiables uniquement par le PersonManager
+                    {='account.form.admin_only.note'|translate}
                 </p>
 
                 <div class="mb-3">
-                    <label for="alert" class="form-label">Alerte</label>
+                    <label for="alert" class="form-label">{='account.form.alert.label'|translate}</label>
                     <input type="text" class="form-control" id="alert" name="alert" value="{$alert}">
                 </div>
 
                 <div class="mb-3">
-                    <label for="memberInfo" class="form-label">Info membre</label>
+                    <label for="memberInfo" class="form-label">{='account.form.member_info.label'|translate}</label>
                     <textarea class="form-control" id="memberInfo" name="memberInfo" rows="3">{$memberInfo}</textarea>
                 </div>
                 {/if}
 
-                <button class="btn btn-secondary" onclick="history.back()">Annuler</button>
-                <button type="submit" class="btn btn-primary">Valider</button>
+                <button class="btn btn-secondary" onclick="history.back()">{='account.form.cancel'|translate}</button>
+                <button type="submit" class="btn btn-primary">{='account.form.submit'|translate}</button>
             </div>
         </div>
     </form>
 {/block}
 
 {block scripts}
-    <script src="/app/modules/User/js/account.js"></script>
+    <script>
+        window.i18n = {=json_encode($translations)|noescape};
+        window.t = function(key) { return window.i18n?.[key] ?? key; };
+    </script>
+    <script type="module" src="/app/modules/User/js/account.js"></script>
 {/block}

@@ -151,10 +151,7 @@ class WebApp
         if ($person->UseGravatar === 'yes') return $gravatarHandler->getGravatar($person->Email, true);
         else {
             if (empty($person->Avatar)) return '🤔';
-            else {
-                if (in_array($person->Avatar, Application::EMOJI_LIST)) return $person->Avatar;
-                else return '🤔';
-            }
+            else return $person->Avatar;
         }
     }
 

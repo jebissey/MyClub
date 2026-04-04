@@ -8,7 +8,7 @@ enum FilterInputRule: string
 {
     case ArrayInt = 'array:int';
     case ArrayString = 'array:string';
-    case Avatar = '/^\p{So}$/u';
+    case Avatar = '/^\X{1,5}$/u';
     case Bool = 'bool';
     case Content = '/^.{1,65535}$/s';
     case DataUrl = 'dataurl';
