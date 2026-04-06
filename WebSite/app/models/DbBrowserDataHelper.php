@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace app\models;
 
+use \Envms\FluentPDO\Queries\Select;
 use PDO;
 use RuntimeException;
 
+use app\enums\FilterInputRule;
 use app\helpers\Application;
 
 class DbBrowserDataHelper extends Data
@@ -220,7 +222,93 @@ class DbBrowserDataHelper extends Data
         return $filters;
     }
 
+
+
+    public function generateFilterConfig(string $table): array
+    {
+        $this->validateTableName($table);
+        $stmt = $this->pdo->query(
+            "PRAGMA table_info(" . $this->quoteName($table) . ")"
+        );
+
+        return array_map(
+            fn($col) => ['name' => $col->name, 'label' => $col->name],
+            $stmt->fetchAll(PDO::FETCH_OBJ)
+        );
+    }
+
+    public function generateFilterSchema(string $table): array
+    {
+        $this->validateTableName($table);
+        $checkConstraints = $this->extractCheckInConstraints($table);
+        $stmt = $this->pdo->query(
+            "PRAGMA table_info(" . $this->quoteName($table) . ")"
+        );
+
+        $schema = [];
+        foreach ($stmt->fetchAll(PDO::FETCH_OBJ) as $col) {
+            $name = $col->name;
+
+            if (isset($checkConstraints[$name])) {
+                $schema[$name] = $checkConstraints[$name];
+                continue;
+            }
+
+            $schema[$name] = match (strtolower(trim($col->type))) {
+                'integer'  => FilterInputRule::Int->value,
+                default    => FilterInputRule::Content->value, // TEXT, DATE, datetime, vide…
+            };
+        }
+
+        return $schema;
+    }
+
+    public function getQuery(string $table): Select
+    {
+        return $this->fluent->from($table);
+    }
+
     #region Private functions
+    private function extractCheckInConstraints(string $table): array
+    {
+        $stmt = $this->pdo->prepare(
+            "SELECT sql FROM sqlite_master WHERE type = 'table' AND name = :table"
+        );
+        $stmt->execute([':table' => $table]);
+        $sql = (string) $stmt->fetchColumn();
+
+        if ($sql === '') {
+            return [];
+        }
+
+        $constraints = [];
+
+        preg_match_all(
+            '/CHECK\s*\(\s*"?(\w+)"?\s+IN\s*\(([^)]+)\)\s*\)/i',
+            $sql,
+            $matches,
+            PREG_SET_ORDER
+        );
+
+        foreach ($matches as $match) {
+            $colName    = $match[1];
+            $rawValues  = $match[2];
+
+            preg_match_all("/'([^']+)'|(\d+)/", $rawValues, $valMatches, PREG_SET_ORDER);
+
+            $values = array_map(
+                fn($v) => $v[1] !== '' ? $v[1] : (int) $v[2],
+                $valMatches
+            );
+
+            if (!empty($values)) {
+                $constraints[$colName] = $values;
+            }
+        }
+
+        return $constraints;
+    }
+
     private function quoteName(string $name): string
     {
         return '"' . str_replace('"', '""', $name) . '"';

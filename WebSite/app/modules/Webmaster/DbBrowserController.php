@@ -7,12 +7,10 @@ namespace app\modules\Webmaster;
 use app\helpers\Application;
 use app\helpers\WebApp;
 use app\models\DbBrowserDataHelper;
-use app\modules\Common\AbstractController;
+use app\modules\Common\TableController;
 
-class DbBrowserController extends AbstractController
+class DbBrowserController extends TableController
 {
-    private int $itemsPerPage = 10;
-
     public function __construct(
         Application $application,
         private DbBrowserDataHelper $dbBrowserDataHelper
@@ -30,7 +28,7 @@ class DbBrowserController extends AbstractController
 
     public function deleteRecord(string $table, int $id): void
     {
-        if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isWebmaster())) {
+        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isWebmaster())) {
             $this->dbBrowserDataHelper->deleteRecord($table, $id);
             $this->redirect('/dbbrowser/' . urlencode($table));
         }
@@ -81,26 +79,33 @@ class DbBrowserController extends AbstractController
     public function showTable(string $table): void
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isWebmaster())) {
-            $filters = $this->dbBrowserDataHelper->getColumnFilters($table, $this->flight->request()->query);
-            [$records, $columns, $dbbPage, $totalPages, $filters] = $this->dbBrowserDataHelper->showTable(
-                $table,
-                $this->itemsPerPage,
-                $filters,
-                max(1, (int)($this->flight->request()->query['dbbPage'] ?? 1))
+
+            $schema = $this->dbBrowserDataHelper->generateFilterSchema($table);
+            $filterConfig = $this->dbBrowserDataHelper->generateFilterConfig($table);
+            $columns = array_map(
+                fn($col) => [
+                    'field' => $col['name'],
+                    'label' => $col['label']
+                ],
+                $filterConfig
             );
+            $filterValues = WebApp::filterInput($schema, $this->flight->request()->query->getData());
+            $data = $this->prepareTableData($this->dbBrowserDataHelper->getQuery($table), $filterValues);
 
             $this->render('Webmaster/views/dbbrowser/table.latte', $this->getAllParams([
-                'table' => $table,
+                'records' => $data['items'],
+                'currentPage' => $data['currentPage'],
+                'totalPages' => $data['totalPages'],
+                'filterValues' => $filterValues,
+                'filters' => $filterConfig,
                 'columns' => $columns,
-                'records' => $records,
-                'primaryKey' => $this->dbBrowserDataHelper->getPrimaryKey($table),
-                'currentPage' => $dbbPage,
-                'totalPages' => $totalPages,
-                'filters' => $filters,
+                'table' => $table,
                 'page' => $this->application->getConnectedUser()->getPage(),
                 'btn_HistoryBack' => true,
                 'btn_Parent' => "/dbbrowser",
                 'btn_Plus' => "/dbbrowser/{$table}/create",
+                'resetUrl' => '/dbbrowser',
+                'confirmDeleteMessage' => $this->languagesDataHelper->translate('dbbrowser.delete.confirm'),
             ]));
         }
     }

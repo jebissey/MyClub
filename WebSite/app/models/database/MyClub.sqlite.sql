@@ -4726,7 +4726,9 @@ INSERT INTO "Languages" VALUES (488,'turnstile.field.secret_key','Secret Key','S
 INSERT INTO "Languages" VALUES (489,'turnstile.field.secret_key.private','private key','clé privée','klucz prywatny');
 INSERT INTO "Languages" VALUES (490,'turnstile.field.secret_key.not_configured','Not configured','Non configurée','Nieskonfigurowany');
 INSERT INTO "Languages" VALUES (491,'turnstile.field.secret_key.hint','Leave empty to keep the current key.','Laisser vide pour conserver la clé actuelle.','Pozostaw puste, aby zachować bieżący klucz.');
-INSERT INTO "Metadata" VALUES (1,'MyClub',36,0,1000000,NULL,10,36,6,NULL,0,NULL);
+INSERT INTO "Languages" VALUES (492,'dbbrowser.records.empty','No records found.','Aucun enregistrement trouvé.','Nie znaleziono żadnych rekordów.');
+INSERT INTO "Languages" VALUES (493,'dbbrowser.delete.confirm','Are you sure you want to delete this record?','Voulez-vous vraiment supprimer cet enregistrement ?','Czy na pewno chcesz usunąć ten rekord?');
+INSERT INTO "Metadata" VALUES (1,'MyClub',37,0,1000000,NULL,10,36,6,NULL,0,NULL);
 INSERT INTO "Person" VALUES (1,'webmaster@myclub.foo','e427c26faca947919b18b797bc143a35100e4de48c34b70b26202d3a7d8e51f7','my first name','my last name','my nick name or nothing',NULL,'0',NULL,NULL,NULL,NULL,NULL,0,0,NULL,NULL,'2025-01-01',0,0,0,NULL,NULL,NULL,NULL,NULL,NULL,'');
 INSERT INTO "PersonGroup" VALUES (1,1,1);
 INSERT INTO "Settings" VALUES (1,'Title','title');

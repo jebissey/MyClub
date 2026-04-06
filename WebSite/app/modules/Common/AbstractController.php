@@ -156,7 +156,7 @@ abstract class AbstractController
         $ua = $_SERVER['HTTP_USER_AGENT'] ?? '';
         if (stripos($ua, 'TestDevice') !== false) {
             $this->application->getFlight()->response()->status($applicationError->value ?? ApplicationError::Ok->value);
-            $this->application->getFlight()->response()->write($message ?? '');
+            $this->application->getFlight()->response()->write((string)($message ?? ''));
         } else $this->application->getFlight()->redirect($url);
     }
 

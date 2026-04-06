@@ -1,94 +1,32 @@
 {extends "../webmaster.latte"}
 
-{block head}
-    <style>
-        .col-max {
-            max-width: 400px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-    </style>
-{/block}
-
 {block content}
     <div class="container-fluid mt-4">
         <h1>Table: {$table}</h1>
-        
-        {include '../../../Common/views/FilterForm.latte',
-            filters:      $columns,
-            action:       '/dbbrowser/' . $table,
-            resetUrl:     '/dbbrowser/' . $table,
-            filterValues: $filters,
-            currentPage:  $currentPage,
-            totalPages:   $totalPages,
-            pageParam:    'dbbPage'}
-        
+
         {if count($records) > 0}
-        <div class="table-responsive">
-            <table class="table table-striped table-bordered table-max">
-                <thead class="thead-dark">
-                    <tr>
-                        {foreach $columns as $column}
-                        <th>{$column}</th>
-                        {/foreach}
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {foreach $records as $record}
-                    <tr>
-                        {foreach $columns as $column}
-                        <td class="col-max">{$record->$column}</td>
-                        {/foreach}
-                        <td class="text-nowrap">
-                            <a href="/dbbrowser/{$table}/edit/{$record->$primaryKey}" class="btn btn-sm btn-warning">
-                                <i class="bi bi-pencil"></i>
-                            </a>
-                            <button type="button" class="btn btn-sm btn-danger" onclick="confirmDelete({$table}, {$record->$primaryKey})">
-                                <i class="bi bi-trash"></i>
-                            </button>
-                        </td>
-                    </tr>
-                    {/foreach}
-                </tbody>
-            </table>
-        </div>        
+            {include '../../../Common/views/dataTable.latte',
+                'items' => $records,
+                'actions' => [
+                    [
+                        'type'  => 'link',
+                        'label' => 'bi bi-pencil',
+                        'url'   => '/dbbrowser/{table}/edit/{id}',
+                        'class' => 'btn-warning'
+                    ],
+                    [
+                        'type'    => 'link',
+                        'label'   => 'bi bi-trash',
+                        'url'     => '/dbbrowser/{table}/delete/{id}',
+                        'class'   => 'btn-danger',
+                        'confirm' => $confirmDeleteMessage
+                    ],
+                ]
+            }
         {else}
-        <div class="alert alert-info">
-            Aucun enregistrement trouvé.
-        </div>
+            <div class="alert alert-info">
+                {='dbbrowser.records.empty'|translate}
+            </div>
         {/if}
     </div>
-
-    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-        <div class="modal-header">
-            <h5 class="modal-title" id="deleteModalLabel">Confirmation de suppression</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
-        </div>
-        <div class="modal-body">
-            Êtes-vous sûr de vouloir supprimer cet enregistrement?
-        </div>
-        <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-            <form id="deleteForm" method="POST">
-            <button type="submit" class="btn btn-danger">Supprimer</button>
-            </form>
-        </div>
-        </div>
-    </div>
-    </div>
-{/block}
-
-{block scripts}
-<script>
-    function confirmDelete(table, id) {
-        document.getElementById('deleteForm').action = '/dbbrowser/' + table + '/delete/' + id;
-        const deleteModal = document.getElementById('deleteModal');
-        const modal = new bootstrap.Modal(deleteModal);
-        modal.show();
-    }
-</script>
 {/block}

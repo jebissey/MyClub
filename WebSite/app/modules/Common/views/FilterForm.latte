@@ -16,7 +16,7 @@
 
 {var $urlParams = array_filter(
     array_merge($filterValues, $extraParams),
-    fn($v) => $v !== '' && $v !== null && trim((string) $v) !== ''
+    fn($v) => $v !== '' && $v !== null && !is_array($v) && trim((string) $v) !== ''
 )}
 
 <form method="GET" action="{$action}" class="row g-3 mb-4"
