@@ -164,30 +164,22 @@ class MessageApi extends AbstractApi
         }
     }
 
-    private function notifyMessageRecipients(
-        int $messageId,
-        ?int $articleId,
-        ?int $eventId,
-        ?int $groupId
-    ): void {
+    private function notifyMessageRecipients(int $messageId, ?int $articleId, ?int $eventId, ?int $groupId): void
+    {
         $articleAuthorId = null;
         $eventCreatorId = null;
         if ($articleId !== null) {
-            $article = $this->dataHelper->get(
-                'Article',
-                ['Id' => $articleId],
-                'CreatedBy'
-            );
+            $article = $this->dataHelper->get('Article', ['Id' => $articleId], 'CreatedBy');
             $articleAuthorId = $article?->CreatedBy;
         }
         if ($eventId !== null) {
-            $event = $this->dataHelper->get(
-                'Event',
-                ['Id' => $eventId],
-                'CreatedBy'
-            );
+            $event = $this->dataHelper->get('Event', ['Id' => $eventId], 'CreatedBy');
             $eventCreatorId = $event?->CreatedBy;
         }
+        if ($groupId !== null) {
+            $group = $this->dataHelper->get('Group', ['Id' => $groupId], 'Name');
+        }
+
         $context = new MessageContext(
             articleId: $articleId,
             articleAuthorId: $articleAuthorId,
@@ -197,19 +189,26 @@ class MessageApi extends AbstractApi
         );
 
         $personIds = $this->messageRecipientService->getRecipientsForContext($context);
+        $title = 'Nouveau message';
+        $body = 'Un nouveau message a été ajouté ';
         $from = '';
         $id = null;
         if ($articleId !== null) {
             $from = 'article';
             $id = $articleId;
+            $body .= "à l'article {$article->Title}";
         } elseif ($eventId !== null) {
             $from = 'event';
             $id = $eventId;
+            $body .= "à l'événement {$event->Summary}";
         } elseif ($groupId !== null) {
             $from = 'group';
             $id = $groupId;
+            $body .= "au groupe {$group->Name}";
         }
         $notificationData = [
+            'title' => $title,
+            'body' => $body,
             'data' => [
                 'url' => "/{$from}/chat/{$id}",
                 'messageId' => $messageId

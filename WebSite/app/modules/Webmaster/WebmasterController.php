@@ -140,7 +140,7 @@ class WebmasterController extends AbstractController
                 $notification = "🚀 Notification de test envoyée à l'utilisateur #1.";
             }
 
-            $this->render('Webmaster/views/notifications.latte', [
+            $this->render('Webmaster/views/notifications.latte', $this->getAllParams([
                 'message'         => $message,
                 'notification'    => $notification,
                 'publicKey'       => $publicKey,
@@ -152,7 +152,7 @@ class WebmasterController extends AbstractController
                 'isMyclubWebSite' => WebApp::isMyClubWebSite(),
                 'page'            => $this->application->getConnectedUser()->getPage(),
                 'currentVersion'  => Application::VERSION,
-            ]);
+            ]));
         }
     }
 
