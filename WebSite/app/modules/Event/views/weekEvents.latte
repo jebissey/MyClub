@@ -1,214 +1,147 @@
 {extends $layout}
 
-{block title}Evénements des prochaines semaines{/block}
-
-{block head}
-<style>
-    .attribute-badge {
-        display: inline-block;
-        width: 20px;
-        height: 20px;
-        margin-right: 5px;
-        border-radius: 4px;
-        cursor: help;
-        border: 1px solid rgba(0,0,0,0.2);
-    }
-
-    .weekly-calendar {
-        margin: 20px 0;
-        border-collapse: collapse;
-        width: 100%;
-        font-size: 14px;
-    }
-
-    .weekly-calendar th,
-    .weekly-calendar td {
-        border: 1px solid #ddd;
-        padding: 8px;
-        vertical-align: top;
-        text-align: left;
-    }
-
-    .weekly-calendar th {
-        background-color: #f5f5f5;
-        font-weight: bold;
-        text-align: center;
-    }
-
-    .week-header {
-        background-color: #f5f5f5;
-        font-weight: bold;
-        text-align: center;
-    }
-
-    .day-header {
-        background-color: #f0f8ff;
-        font-weight: bold;
-        text-align: center;
-        width: 12%;
-    }
-
-    .current-day {
-        background-color: #fff3cd;
-        border: 2px solid #ffc107;
-    }
-
-    .event-item {
-        margin-bottom: 8px;
-        padding: 4px;
-        background-color: #f8f9fa;
-        border-radius: 3px;
-        font-size: 12px;
-    }
-
-    .event-time {
-        font-weight: bold;
-        color: #007bff;
-    }
-
-    .event-summary {
-        margin: 2px 0;
-    }
-
-    .event-duration {
-        font-style: italic;
-        color: #6c757d;
-    }
-
-    .event-group {
-        font-weight: bold;
-        color: #6c757d;
-    }
-
-    .no-events {
-        color: #999;
-        font-style: italic;
-        text-align: center;
-    }
-
-    .week-dates {
-        font-size: 12px;
-        color: #666;
-    }
-</style>
-{/block}
+{block title}{='events.calendar.page_title'|translate}{/block}
 
 {block content}
-    <div class="container-fluid">
-        <h1>Calendrier des événements</h1>
-        
-        {if count($events) > 0}
-            <table class="weekly-calendar">
-                <thead>
+<div class="container-fluid">
+    <h1 class="mb-4">{='events.calendar.heading'|translate}</h1>
+    
+    {if count($events) > 0}
+    <div class="table-responsive">
+        <table class="table table-bordered table-sm align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th class="text-center" style="width: 14%;">{='events.calendar.week'|translate}</th>
+                {var $startOfWeek = new DateTime('monday this week')}
+                {for $i = 0; $i < 7; $i++}
+                    {var $day = (clone $startOfWeek)->modify("+$i days")}
+                    <th class="bg-primary-subtle text-center">
+                        {$day|dayName}
+                    </th>
+                {/for}
+                </tr>
+            </thead>
+            <tbody>
+                {foreach $events as $weekData}
                     <tr>
-                        <th style="width: 14%;">Semaine</th>
-                        <th class="day-header">Lundi</th>
-                        <th class="day-header">Mardi</th>
-                        <th class="day-header">Mercredi</th>
-                        <th class="day-header">Jeudi</th>
-                        <th class="day-header">Vendredi</th>
-                        <th class="day-header">Samedi</th>
-                        <th class="day-header">Dimanche</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {foreach $events as $weekData}
-                        <tr>
-                            <td class="week-header" style="text-align: center;">
-                                <div>{$weekData['weekStart']} - {$weekData['weekEnd']}</div>
-                            </td>
+                        <td class="table-secondary fw-bold text-center small">
+                            <div>{$weekData['weekStart']} - {$weekData['weekEnd']}</div>
+                        </td>
+                        
+                        {for $day = 1; $day <= 7; $day++}
+                            {var $currentDayOffset = $day - 1}
+                            {var $currentDayTimestamp = strtotime($weekData['weekStartFull'] . ' +' . $currentDayOffset . ' days')}
+                            {var $todayTimestamp = strtotime('today')}
+                            {var $isToday = date('Y-m-d', $currentDayTimestamp) === date('Y-m-d', $todayTimestamp)}
                             
-                            {for $day = 1; $day <= 7; $day++}
-                                {var $currentDayOffset = $day - 1}
-                                {var $currentDayTimestamp = strtotime($weekData['weekStartFull'] . ' +' . $currentDayOffset . ' days')}
-                                {var $todayTimestamp = strtotime('today')}
-                                {var $isToday = date('Y-m-d', $currentDayTimestamp) === date('Y-m-d', $todayTimestamp)}
-                                
-                            <td class="{if $isToday}current-day{/if}">
-                            {if count($weekData['days'][$day]) > 0}
-                                {foreach $weekData['days'][$day] as $event}
-                                {if $event['audience'] == 'All'}
-                                <a href="/contact/event/{$event['id']}" class="event-item text-decoration-none text-dark fw-bold">
-                                {else}
-                                <div class="event-item">
-                                {/if}
-                                    <div class="d-flex justify-content-between" data-bs-toggle="tooltip" data-bs-placement="top" title="{$event['date']|longDate}">
-                                        <div class="event-time">{$event['startTime']}</div>
-                                        <div class="event-duration">({$event['duration']})</div>
-                                        {ifset $event['groupName']}
-                                        <div class="event-group">[{$event['groupName']}]</div>
-                                        {/ifset}
-                                    </div>
-                                    <div class="event-summary">{$event['summary']}</div>
-                                    <div>
-                                        {if count($event['attributes']) > 0}
-                                            {foreach $event['attributes'] as $attribute}
-                                            <span 
-                                                class="attribute-badge" 
-                                                style="background-color: {$attribute['color']|noescape};" 
-                                                title="{$attribute['name']} : {$attribute['detail']}"
-                                            ></span>
-                                            {/foreach}
-                                        {else}
-                                            <span style="font-size: 16px;">⌧</span>
-                                        {/if}
-                                    </div>
-                                {if $event['audience'] == 'All'}
-                                </a>
-                                {else}
-                                </div>
-                                {/if}
-                                {/foreach}
-                            {else}
-                                <div class="no-events">Aucun événement</div>
-                            {/if}
-                            </td>
-                            {/for}
-                        </tr>
-                    {/foreach}
-                </tbody>
-            </table>
+                            <td class="{if $isToday}bg-warning-subtle border border-warning border-2{/if}">
+                                {if count($weekData['days'][$day]) > 0}
+                                    {foreach $weekData['days'][$day] as $event}
 
-            <div class="row">
-                <div class="col-lg-6 mb-4">
-                    <div class="p-3 bg-light border rounded h-100">
-                        <h5>📅 Bienvenue sur le calendrier des sorties !</h5>
-                        <p>Retrouvez ici tous nos événements sur 3 semaines.</p>
-                        <ul>
-                            <li><strong>La plupart sont réservés aux membres</strong>, sauf ceux en gras avec un pointeur spécifique.</li>
-                            <li><strong>Carrés colorés</strong> = infos spéciales, pointez la souris pour voir le détail.</li>
-                            <li><strong>[Nom de groupe]</strong> = réservé aux membres de ce groupe.</li>
-                        </ul>
-                        <h5>À vos agendas ! 📆✨</h5>
-                        <a href="/nextEvents" class="btn btn-primary">
-                            <i class="bi bi-calendar-event"></i> S'inscrire à un événement public
-                        </a>
-                    </div>
-                </div>
-                <div class="col-lg-6 mb-4">
-                    <div class="p-3 bg-light border rounded h-100">
-                        <h5>{='attribute_details'|translate}</h5>
-                        <ul class="list-group">
-                            {foreach $attributes as $attribute}
-                            <li class="list-group-item d-flex align-items-center">
-                                <span class="me-2 d-inline-block rounded" style="width:20px; height:20px; background-color:{$attribute->Color|noescape};"></span>
-                                <span><strong>{$attribute->Name}</strong> : {$attribute->Detail}</span>
-                            </li>
-                            {/foreach}
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        {else}
-            <div class="alert alert-info">
-                <p>Aucun événement programmé pour les prochaines semaines.</p>
-            </div>
-        {/if}
+                                        {if $event['audience'] == 'All'}
+                                        <a href="/contact/event/{$event['id']}" 
+                                           class="mb-2 p-2 bg-light rounded d-block text-decoration-none text-dark fw-bold small">
+                                        {else}
+                                        <div class="mb-2 p-2 bg-light rounded small">
+                                        {/if}
+
+                                            <div class="d-flex justify-content-between align-items-center"
+                                                 data-bs-toggle="tooltip"
+                                                 title="{$event['date']|longDate}">
+                                                
+                                                <div class="fw-bold text-primary">
+                                                    {$event['startTime']}
+                                                </div>
+
+                                                <div class="fst-italic text-muted small">
+                                                    ({$event['duration']})
+                                                </div>
+
+                                                {ifset $event['groupName']}
+                                                <div class="fw-bold text-muted small">
+                                                    [{$event['groupName']}]
+                                                </div>
+                                                {/ifset}
+                                            </div>
+
+                                            <div class="my-1">
+                                                {$event['summary']}
+                                            </div>
+
+                                            <div>
+                                                {if count($event['attributes']) > 0}
+                                                    {foreach $event['attributes'] as $attribute}
+                                                        <span 
+                                                            class="d-inline-block me-1 border rounded"
+                                                            style="width:20px; height:20px; background-color: {$attribute['color']|noescape};"
+                                                            data-bs-toggle="tooltip"
+                                                            title="{$attribute['name']} : {$attribute['detail']}"
+                                                        ></span>
+                                                    {/foreach}
+                                                {else}
+                                                    <span class="fs-6">⌧</span>
+                                                {/if}
+                                            </div>
+
+                                        {if $event['audience'] == 'All'}
+                                        </a>
+                                        {else}
+                                        </div>
+                                        {/if}
+
+                                    {/foreach}
+                                {else}
+                                    <div class="text-secondary fst-italic text-center small">
+                                        {='events.calendar.no_event'|translate}
+                                    </div>
+                                {/if}
+                            </td>
+                        {/for}
+                    </tr>
+                {/foreach}
+            </tbody>
+        </table>
     </div>
 
-    <a href="/events-rss.xml" class="rss-link">
-        <img src="/Feed-icon.svg" alt="RSS" width="16" height="16"> S'abonner au flux RSS
+    <div class="row mt-4">
+        <div class="col-lg-6 mb-4">
+            <div class="p-3 bg-light border rounded h-100">
+                {='events.calendar.welcome.block'|translate|noescape}
+            </div>
+        </div>
+
+        <div class="col-lg-6 mb-4">
+            <div class="p-3 bg-light border rounded h-100">
+                <h5>{='attribute_details'|translate}</h5>
+                <ul class="list-group">
+                    {foreach $attributes as $attribute}
+                        <li class="list-group-item d-flex align-items-center">
+                            <span 
+                                class="me-2 d-inline-block rounded border"
+                                style="width:20px; height:20px; background-color:{$attribute->Color|noescape};">
+                            </span>
+                            <span>
+                                <strong>{$attribute->Name}</strong> : {$attribute->Detail}
+                            </span>
+                        </li>
+                    {/foreach}
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    {else}
+    <div class="alert alert-info">
+        {='events.calendar.no_events_scheduled'|translate}
+    </div>
+    {/if}
+</div>
+
+<div class="text-end mt-3">
+    <a href="/events-rss.xml" class="text-decoration-none">
+        <img src="/Feed-icon.svg" alt="RSS" width="16" height="16">
+        {='events.calendar.rss_subscribe'|translate}
     </a>
+</div>
+
 {/block}
-
-

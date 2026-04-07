@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\helpers;
 
 use DateTime;
+use DateTimeInterface;
 use IntlDateFormatter;
 
 use app\enums\WeekdayFormat;
@@ -51,6 +52,17 @@ class TranslationManager
         return $_COOKIE[self::COOKIE_NAME] ?? self::DEFAULT_LANGUAGE;
     }
 
+    public static function getDayName(DateTimeInterface $date): string
+    {
+        $formatter = new IntlDateFormatter(
+            self::getCurrentLanguage(),
+            IntlDateFormatter::FULL,
+            IntlDateFormatter::NONE
+        );
+        $formatter->setPattern('EEEE'); // Full name (ex: lundi, Monday)
+        return $formatter->format($date) ?: '';
+    }
+
     public static function getSupportedLanguages()
     {
         return self::SUPPORTED_LANGUAGES;
@@ -87,15 +99,13 @@ class TranslationManager
         return ($durationHours > 0 ? "$durationHours h " : '') . ($durationMinutes > 0 ? "$durationMinutes min" : '');
     }
 
-    public static function getWeekdayNames(WeekdayFormat $format = WeekdayFormat::Full): array
+    public static function getWeekdayNames(): array
     {
-        $formatter = new IntlDateFormatter(self::getCurrentLanguage(), IntlDateFormatter::FULL, IntlDateFormatter::NONE);
-        $formatter->setPattern($format->value);
         $days = [];
-        for ($i = 1; $i <= 7; $i++) {
-            $date = new DateTime();
-            $date->setISODate(2024, 1, $i); //2024-01-01 = Monday
-            $days[] = $formatter->format($date);
+        $monday = new DateTime('monday this week');
+        for ($i = 0; $i < 7; $i++) {
+            $date = (clone $monday)->modify("+$i days");
+            $days[] = self::getDayName($date);
         }
         return $days;
     }

@@ -1,20 +1,24 @@
 {extends "user.latte"}
 
 {block content}
-<div class="container my-4">
+<div style="overflow-x: auto; -webkit-overflow-scrolling: touch; touch-action: pan-x pan-y;">
   <div class="card shadow-sm rounded-4">
     <div class="card-body">
-      <h5 class="card-title mb-4">Détails des Connexions de {$user}</h5>
+
+      <h5 class="card-title mb-4">
+        {='user_connections.details.title'|translate} {$user}
+      </h5>
 
       <table class="table align-middle">
         <thead class="table-light">
           <tr>
-            <th>Personnes</th>
-            <th class="text-center">Événements communs</th>
-            <th class="text-center">Intensité</th>
+            <th>{='user_connections.table.people'|translate}</th>
+            <th class="text-center">{='user_connections.table.common_events'|translate}</th>
+            <th class="text-center">{='user_connections.table.intensity'|translate}</th>
             <th style="width: 33%;">&nbsp;</th>
           </tr>
         </thead>
+
         <tbody>
           {foreach $connections as $c}
             <tr>
@@ -27,9 +31,10 @@
                    data-events="{$c['EventList']|noescape}">
                   {$c['Name']}
                 </a>
-              {if $c['OtherPersonInPresentationDirectory'] != 0}
-                <a href="/user/presentation/{$c['OtherPerson']}">ℹ️</a>
-              {/if}
+
+                {if $c['OtherPersonInPresentationDirectory'] != 0}
+                  <a href="/user/presentation/{$c['OtherPerson']}">ℹ️</a>
+                {/if}
               </td>
 
               <td class="text-center fw-bold">
@@ -59,6 +64,7 @@
           {/foreach}
         </tbody>
       </table>
+
     </div>
   </div>
 </div>
@@ -67,19 +73,29 @@
 <div class="modal fade" id="modalEvents" tabindex="-1" aria-labelledby="modalEventsLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content rounded-4 shadow">
+
       <div class="modal-header">
-        <h5 class="modal-title" id="modalEventsLabel">Événements communs</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+        <h5 class="modal-title" id="modalEventsLabel">
+          {='user_connections.modal.common_events'|translate}
+        </h5>
+
+        <button type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="{='user_connections.modal.close'|translate}">
+        </button>
       </div>
+
       <div class="modal-body">
         <p id="modalPersonName" class="fw-bold mb-2"></p>
         <ul id="modalEventList" class="list-group list-group-flush"></ul>
       </div>
+
     </div>
   </div>
 </div>
 {/block}
 
 {block scripts}
-    <script src="/app/modules/User/js/connections.js"></script>
+<script src="/app/modules/User/js/connections.js"></script>
 {/block}

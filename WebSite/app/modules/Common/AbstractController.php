@@ -204,6 +204,10 @@ abstract class AbstractController
             return TranslationManager::getLongDateTime($date);
         });
 
+        $this->latte->addFilter('dayName', function ($date) {
+            return TranslationManager::getDayName($date);
+        });
+
         $this->latte->addFilter('formatFileSize', function ($bytes) {
             if ($bytes >= 1073741824)  return number_format($bytes / 1073741824, 2) . ' GB';
             elseif ($bytes >= 1048576) return number_format($bytes / 1048576, 2) . ' MB';
