@@ -62,8 +62,9 @@ class EventController extends AbstractController
             'filterByPreferences' => $filterByPreferences,
             'layout' => $this->getLayout(),
             'page' => $connectedUser->getPage(),
-            'duplicateModeToday' => DuplicationEventMode::Today->value,
-            'duplicateModeNextWeek' => DuplicationEventMode::NextWeek->value,
+            'duplicateModeToday' => Period::Today->value,
+            'duplicateModeTomorrow' => Period::Tomorrow->value,
+            'duplicateModeNextWeek' => Period::NextWeek->value,
         ]));
     }
 

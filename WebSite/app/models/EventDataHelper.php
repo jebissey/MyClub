@@ -6,12 +6,14 @@ namespace app\models;
 
 use DateInterval;
 use DateTime;
+use DateTimeImmutable;
 use PDO;
 use Throwable;
 
 use app\enums\ApplicationError;
 use app\enums\EventAudience;
 use app\enums\EventSearchMode;
+use app\enums\Period;
 use app\exceptions\QueryException;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
@@ -56,7 +58,7 @@ class EventDataHelper extends Data implements NewsProviderInterface
         }
     }
 
-    public function duplicate(int $id, int $personId, string $mode): ApiResponse
+    public function duplicate(int $id, int $personId, Period $mode): ApiResponse
     {
         try {
             $this->pdo->beginTransaction();
@@ -66,7 +68,6 @@ class EventDataHelper extends Data implements NewsProviderInterface
                 $this->pdo->rollBack();
                 return new ApiResponse(false, ApplicationError::BadRequest->value, [], 'Unknown event');
             }
-
             $newStartTime = $this->calculateNewStartTime($event->StartTime, $mode);
             $newEvent = [
                 'Summary' => $event->Summary,
@@ -578,23 +579,15 @@ class EventDataHelper extends Data implements NewsProviderInterface
     }
 
     #region Private functions
-    private function calculateNewStartTime($originalStartTime, $mode)
+    private function calculateNewStartTime(string|DateTimeImmutable $originalStartTime, Period $mode): string
     {
-        switch ($mode) {
-            case 'today':
-                return (new DateTime('today 23:59'))->format('Y-m-d H:i:s');
-
-            case 'week':
-                $now = new DateTime();
-                $newDate = clone new DateTime($originalStartTime);
-                do {
-                    $newDate->add(new DateInterval('P7D'));
-                } while ($newDate <= $now);
-                return $newDate->format('Y-m-d H:i:s');
-
-            default:
-                return (new DateTime('today 23:59'))->format('Y-m-d H:i:s');
+        if (is_string($originalStartTime)) {
+            $originalStartTime = str_replace('T', ' ', $originalStartTime);
+            $from = new DateTimeImmutable($originalStartTime);
+        } else {
+            $from = $originalStartTime;
         }
+        return $mode->next($from)->format('Y-m-d H:i:s');
     }
 
     private function events($events): array
@@ -704,7 +697,7 @@ class EventDataHelper extends Data implements NewsProviderInterface
         return $events;
     }
 
-    private function getPassedEvents(object $person, int $offset): array
+    private function getPassedEvents(?object $person, int $offset): array
     {
         $sql = "
             SELECT
@@ -728,7 +721,7 @@ class EventDataHelper extends Data implements NewsProviderInterface
         ";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([
-            ':idperson' => $person->Id ?? 0,
+            ':idperson' => $person?->Id ?? 0,
             ':now'      => date('Y-m-d H:i:s'),
             ':limit'    => 10,
             ':offset'   => $offset

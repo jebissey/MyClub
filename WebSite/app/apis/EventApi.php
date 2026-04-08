@@ -8,7 +8,7 @@ use DateTime;
 use Throwable;
 
 use app\enums\ApplicationError;
-use app\enums\DuplicationEventMode;
+use app\enums\Period;
 use app\exceptions\EmailException;
 use app\exceptions\QueryException;
 use app\helpers\Application;
@@ -46,123 +46,98 @@ class EventApi extends AbstractApi
 
     public function deleteEvent(int $id): void
     {
-        if (!$this->authService->isEventManager()) {
-            $this->renderJsonForbidden(__FILE__, __LINE__);
-            return;
-        }
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
         if (!$this->eventDataHelper->eventExists($id)) {
             $this->renderJsonBadRequest("Event ({$id}) doesn't exist", __FILE__, __LINE__);
             return;
         }
-        try {
-            $this->eventDataHelper->delete_($id, $this->authService->getUserId());
-            $apiResponse = new ApiResponse(true, ApplicationError::Ok->value);
-            $this->renderJson([$apiResponse->data], $apiResponse->success, $apiResponse->responseCode);
-        } catch (Throwable $e) {
-            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
+        if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isEventManager())) {
+            try {
+                $this->eventDataHelper->delete_($id, $this->authService->getUserId());
+                $apiResponse = new ApiResponse(true, ApplicationError::Ok->value);
+                $this->renderJson([$apiResponse->data], $apiResponse->success, $apiResponse->responseCode);
+            } catch (Throwable $e) {
+                $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
+            }
         }
     }
 
     public function duplicateEvent($id): void
     {
-        if (!$this->authService->isEventManager()) {
-            $this->renderJsonForbidden(__FILE__, __LINE__);
-            return;
-        }
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
         if (!$this->eventDataHelper->eventExists($id)) {
             $this->renderJsonBadRequest("Event ({$id}) doesn't exist", __FILE__, __LINE__);
             return;
         }
-        try {
-            $apiResponse = $this->eventService->duplicateEvent(
-                $id,
-                $this->application->getConnectedUser()->person->Id,
-                WebApp::getFiltered('mode', array_column(DuplicationEventMode::cases(), 'value'), $_GET) ?: DuplicationEventMode::Today->value
-            );
-            $this->renderJson($apiResponse->data, $apiResponse->success, $apiResponse->responseCode);
-        } catch (Throwable $e) {
-            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
+        if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isEventManager())) {
+            try {
+                $modeString = WebApp::getFiltered(
+                    'mode',
+                    array_column(Period::cases(), 'value'),
+                    $_GET
+                ) ?: Period::Today->value;
+                $apiResponse = $this->eventService->duplicateEvent(
+                    $id,
+                    $this->application->getConnectedUser()->person->Id,
+                    Period::from($modeString)
+                );
+                $this->renderJson($apiResponse->data, $apiResponse->success, $apiResponse->responseCode);
+            } catch (Throwable $e) {
+                $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
+            }
         }
     }
 
     public function getEvent(int $id): void
     {
-        if (!$this->authService->isEventManager()) {
-            $this->renderJsonForbidden(__FILE__, __LINE__);
-            return;
-        }
-        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
-            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
         if (!$this->eventDataHelper->eventExists($id)) {
             $this->renderJsonBadRequest("Event ({$id}) doesn't exist", __FILE__, __LINE__);
             return;
         }
-        try {
-            $apiResponse = new ApiResponse(true, ApplicationError::Ok->value, [
-                'event' => $this->eventDataHelper->getEvent($id),
-                'attributes' => $this->eventDataHelper->getEventAttributes($id),
-            ]);
-            $this->renderJson($apiResponse->data, $apiResponse->success, $apiResponse->responseCode, $apiResponse->message ?? '');
-        } catch (Throwable $e) {
-            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
+        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isEventManager())) {
+            try {
+                $apiResponse = new ApiResponse(true, ApplicationError::Ok->value, [
+                    'event' => $this->eventDataHelper->getEvent($id),
+                    'attributes' => $this->eventDataHelper->getEventAttributes($id),
+                ]);
+                $this->renderJson($apiResponse->data, $apiResponse->success, $apiResponse->responseCode, $apiResponse->message ?? '');
+            } catch (Throwable $e) {
+                $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
+            }
         }
     }
 
     public function saveEvent(): void
     {
-        if (!$this->authService->isEventManager()) {
-            $this->renderJsonForbidden(__FILE__, __LINE__);
-            return;
-        }
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
-        try {
-            $data = $this->getJsonInput();
-            $this->eventDataHelper->update($data, $this->authService->getUserId());
-            $this->renderJsonOk();
-        } catch (QueryException $e) {
-            $this->renderJsonBadRequest($e->getMessage(), $e->getFile(), $e->getLine());
-        } catch (Throwable $e) {
-            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
+        if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isEventManager())) {
+            try {
+                $data = $this->getJsonInput();
+                $this->eventDataHelper->update($data, $this->authService->getUserId());
+                $this->renderJsonOk();
+            } catch (QueryException $e) {
+                $this->renderJsonBadRequest($e->getMessage(), $e->getFile(), $e->getLine());
+            } catch (Throwable $e) {
+                $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
+            }
         }
     }
 
     public function sendEmails()
     {
-        if (!$this->authService->isEventManager()) {
-            $this->renderJsonForbidden(__FILE__, __LINE__);
-            return;
-        }
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
-        $data = $this->getJsonInput();
-        $eventId = $data['EventId'] ?? 0;
-        if ($eventId === 0) {
-            $this->renderJsonError("Missing EvendId data", ApplicationError::BadRequest->value, __FILE__, __LINE__);
-            return;
-        }
-        try {
-            $event = $this->eventDataHelper->getEvent((int)$eventId);
-            $apiResponse = $this->sendEventEmails($event, $data['Title'] ?? '', $data['Body'] ?? '', $data['Recipients'] ?? '');
-            $this->renderJson([$apiResponse->data], $apiResponse->success,  $apiResponse->responseCode, $apiResponse->message);
-        } catch (QueryException $e) {
-            $this->renderJsonError($e->getMessage(), ApplicationError::BadRequest->value, $e->getFile(), $e->getLine());
-        } catch (Throwable $e) {
-            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
+        if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isEventManager())) {
+            $data = $this->getJsonInput();
+            $eventId = $data['EventId'] ?? 0;
+            if ($eventId === 0) {
+                $this->renderJsonError("Missing EvendId data", ApplicationError::BadRequest->value, __FILE__, __LINE__);
+                return;
+            }
+            try {
+                $event = $this->eventDataHelper->getEvent((int)$eventId);
+                $apiResponse = $this->sendEventEmails($event, $data['Title'] ?? '', $data['Body'] ?? '', $data['Recipients'] ?? '');
+                $this->renderJson([$apiResponse->data], $apiResponse->success,  $apiResponse->responseCode, $apiResponse->message);
+            } catch (QueryException $e) {
+                $this->renderJsonError($e->getMessage(), ApplicationError::BadRequest->value, $e->getFile(), $e->getLine());
+            } catch (Throwable $e) {
+                $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
+            }
         }
     }
 

@@ -51,11 +51,11 @@
         <div class="form-check">
             <input class="form-check-input" type="checkbox" id="filterByPreferences" {if $filterByPreferences}checked{/if} />
             <label class="form-check-label" for="filterByPreferences">
-                <i class="bi bi-funnel"></i> Uniquement les événements qui correspondent à mes préférences
+                <i class="bi bi-funnel"></i> {='events.filter.by_preferences'|translate}
             </label>
         </div>
     </div>
-    <h4 class="text-center bg-light py-2">Cliquer sur la ligne d'un événement pour voir le détail, s'inscrire ou se désinscrire</h4>
+    <h4 class="text-center bg-light py-2">{='events.click_to_detail'|translate}</h4>
     {/if}
 
     <div style="overflow-x: auto; -webkit-overflow-scrolling: touch; touch-action: pan-x pan-y;">
@@ -136,7 +136,7 @@
                         ></span>
                         {/foreach}
                     {else}
-                        Aucun attribut
+                        {='events.no_attribute'|translate}
                     {/if}
                     </td>
                     <td class="{if $event['canceled'] == 1}double-strike{/if}">
@@ -158,39 +158,39 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="emailModalLabel">Envoyer un courriel</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                    <h5 class="modal-title" id="emailModalLabel">{='events.email.modal_title'|translate}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{='close'|translate}"></button>
                 </div>
                 <div class="modal-body">
                     <form id="emailForm">
                         <input type="hidden" id="emailEventId" name="eventId">
 
                         <div class="mb-3">
-                            <label for="emailTypeSelect" class="form-label">Type de message</label>
+                            <label for="emailTypeSelect" class="form-label">{='events.email.message_type'|translate}</label>
                             <select class="form-select" id="emailTypeSelect" name="emailType" required>
-                                <option value="">Sélectionnez un type</option>
-                                <option value="nouvel-evenement">Nouvel événement</option>
-                                <option value="rappel">Rappel</option>
-                                <option value="annule">Annulé</option>
-                                <option value="modifie">Modifié</option>
+                                <option value="">{='events.email.select_type'|translate}</option>
+                                <option value="nouvel-evenement">{='events.email.type.new'|translate}</option>
+                                <option value="rappel">{='events.email.type.reminder'|translate}</option>
+                                <option value="annule">{='events.email.type.canceled'|translate}</option>
+                                <option value="modifie">{='events.email.type.modified'|translate}</option>
                             </select>
                         </div>
 
                         <div class="mb-3">
-                            <label for="recipientsSelect" class="form-label">Destinataires</label>
+                            <label for="recipientsSelect" class="form-label">{='events.email.recipients'|translate}</label>
                             <select class="form-select" id="recipientsSelect" name="recipients" required>
-                                <option value="">Sélectionnez d'abord un type de message</option>
+                                <option value="">{='events.email.select_type_first'|translate}</option>
                             </select>
                         </div>
 
                         <div class="mb-3">
-                            <label for="emailMessage" class="form-label">Message</label>
-                            <textarea class="form-control" id="emailMessage" name="message" rows="5" placeholder="Saisissez votre message..." required></textarea>
+                            <label for="emailMessage" class="form-label">{='events.email.message'|translate}</label>
+                            <textarea class="form-control" id="emailMessage" name="message" rows="5" placeholder="{='events.email.message_placeholder'|translate}" required></textarea>
                         </div>
 
                         <div class="d-flex justify-content-end gap-2">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                            <button type="submit" class="btn btn-primary">Envoyer</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{='cancel'|translate}</button>
+                            <button type="submit" class="btn btn-primary">{='events.email.send'|translate}</button>
                         </div>
                     </form>
                 </div>
@@ -202,8 +202,8 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="eventModalLabel">Gérer un événement</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                    <h5 class="modal-title" id="eventModalLabel">{='events.form.modal_title'|translate}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{='close'|translate}"></button>
                 </div>
                 <div class="modal-body">
                     <form id="eventForm">
@@ -211,25 +211,25 @@
                         <input type="hidden" id="formMode" name="formMode" value="create">
 
                         <div class="mb-3 row align-items-center">
-                            <label for="summaryInput" class="col-auto col-form-label">Titre</label>
+                            <label for="summaryInput" class="col-auto col-form-label">{='events.form.title_label'|translate}</label>
                             <div class="col">
-                                <input type="text" class="form-control" id="summaryInput" name="summary" placeholder="Titre dans le calendrier" required>
+                                <input type="text" class="form-control" id="summaryInput" name="summary" placeholder="{='events.form.title_placeholder'|translate}" required>
                             </div>
                         </div>
 
                         <div class="mb-3">
-                            <textarea class="form-control" id="descriptionInput" name="description" placeholder="Détails de l'événement" required></textarea>
+                            <textarea class="form-control" id="descriptionInput" name="description" placeholder="{='events.form.description_placeholder'|translate}" required></textarea>
                         </div>
 
                         <div class="mb-3 row align-items-center">
-                            <label for="locationInput" class="col-auto col-form-label">Lieu</label>
+                            <label for="locationInput" class="col-auto col-form-label">{='events.form.location_label'|translate}</label>
                             <div class="col">
-                                <input type="text" class="form-control" id="locationInput" name="location" placeholder="rue / lieu dit , ville" required>
+                                <input type="text" class="form-control" id="locationInput" name="location" placeholder="{='events.form.location_placeholder'|translate}" required>
                             </div>
                         </div>
 
                         <div class="mb-3 row align-items-center">
-                            <label for="eventTypeInput" class="col-auto col-form-label">Type d'événement</label>
+                            <label for="eventTypeInput" class="col-auto col-form-label">{='events.form.event_type'|translate}</label>
                             <div class="col">
                                 <select class="form-select" id="eventTypeInput" name="eventType" required>
                                     {foreach $eventTypes as $eventType}
@@ -242,7 +242,7 @@
                         <div class="mb-3">
                             <div class="row text-center">
                                 <div class="col-12">
-                                    <label class="form-label">Date / Heure / Durée (h)</label>
+                                    <label class="form-label">{='events.form.date_time_duration'|translate}</label>
                                 </div>
                             </div>
                             <div class="d-flex justify-content-center gap-3 flex-wrap">
@@ -260,7 +260,7 @@
 
                         <div class="card mb-4">
                             <div class="card-header">
-                                <h5 class="mb-0">Attributs</h5>
+                                <h5 class="mb-0">{='events.form.attributes'|translate}</h5>
                             </div>
                             <div class="card-body">
                                 <div id="attributesList" class="mb-3">
@@ -275,7 +275,7 @@
                                         {/foreach}
                                     </select>
                                     <button type="button" id="addAttributeBtn" class="btn btn-secondary">
-                                        <i class="bi bi-plus-lg"></i> Ajouter
+                                        <i class="bi bi-plus-lg"></i> {='events.form.add'|translate}
                                     </button>
                                 </div>
                             </div>
@@ -283,7 +283,7 @@
 
                         <div class="card mb-4">
                             <div class="card-header">
-                                <h5 class="mb-0">Besoins</h5>
+                                <h5 class="mb-0">{='events.form.needs'|translate}</h5>
                             </div>
                             <div class="card-body">
                                 <div id="needsList" class="mb-3 d-flex flex-wrap gap-2">
@@ -291,7 +291,7 @@
                                 </div>
                                 <div class="mb-3">
                                     <select class="form-select" id="needTypeInput" name="needType" required>
-                                        <option value="0">Type de besoin</option>
+                                        <option value="0">{='events.form.need_type_placeholder'|translate}</option>
                                         {foreach $needTypes as $needType}
                                             <option value="{$needType->Id}">{$needType->Name}</option>
                                         {/foreach}
@@ -299,34 +299,33 @@
                                 </div>
                                 <div class="input-group">
                                     <select id="availableNeedsSelect" class="form-control">
-                                        <option value="">Sélectionnez d'abord un type de besoin</option>
+                                        <option value="">{='events.form.select_need_type_first'|translate}</option>
                                     </select>
                                     <button type="button" id="addNeedBtn" class="btn btn-secondary">
-                                        <i class="bi bi-plus-lg"></i> Ajouter
+                                        <i class="bi bi-plus-lg"></i> {='events.form.add'|translate}
                                     </button>
                                 </div>
                             </div>
                         </div>
 
-
                         <div class="mb-3 d-flex align-items-center">
-                            <label for="maxParticipantsInput" class="me-2 mb-0">Nombre max de participants</label>
+                            <label for="maxParticipantsInput" class="me-2 mb-0">{='events.form.max_participants'|translate}</label>
                             <input type="number" class="form-control form-control-sm" id="maxParticipantsInput" name="maxParticipants" min="0" value="0" style="width: 70px;">
-                            <small class="form-text text-muted ms-2">0 = illimité</small>
+                            <small class="form-text text-muted ms-2">{='events.form.unlimited'|translate}</small>
                         </div>
 
                         <div class="mb-3 row align-items-center">
-                            <label for="audienceInput" class="col-auto col-form-label">Public</label>
+                            <label for="audienceInput" class="col-auto col-form-label">{='events.form.audience_label'|translate}</label>
                             <div class="col">
                                 <select class="form-select" id="audienceInput" name="audience" required>
-                                    <option value="ClubMembersOnly">Membres du club uniquement</option>
-                                    <option value="Guest">Membres du club et sur « invitation »</option>
-                                    <option value="All">Tous</option>
+                                    <option value="ClubMembersOnly">{='events.form.audience.members_only'|translate}</option>
+                                    <option value="Guest">{='events.form.audience.guests'|translate}</option>
+                                    <option value="All">{='events.form.audience.all'|translate}</option>
                                 </select>
                             </div>
                         </div>
 
-                        <button type="submit" id="submitEventBtn" class="btn btn-success">Créer</button>
+                        <button type="submit" id="submitEventBtn" class="btn btn-success">{='events.form.create'|translate}</button>
                     </form>
                 </div>
             </div>
@@ -337,28 +336,35 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="duplicateModalLabel">Que souhaitez-vous faire ?</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                    <h5 class="modal-title" id="duplicateModalLabel">{='events.duplicate.modal_title'|translate}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{='close'|translate}"></button>
                 </div>
                 <div class="modal-body">
                     <div class="form-check">
                         <input class="form-check-input" type="radio" name="duplicateChoice"
                             value="{$duplicateModeToday}" id="choice-today">
                         <label class="form-check-label" for="choice-today">
-                            Dupliquer aujourd'hui à 23:59
+                            {='events.duplicate.today'|translate}
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="duplicateChoice"
+                            value="{$duplicateModeTomorrow}" id="choice-tomorrow">
+                        <label class="form-check-label" for="choice-tomorrow">
+                            {='events.duplicate.tomorrow'|translate}
                         </label>
                     </div>
                     <div class="form-check">
                         <input class="form-check-input" type="radio" name="duplicateChoice"
                             value="{$duplicateModeNextWeek}" id="choice-next-week">
                         <label class="form-check-label" for="choice-next-week">
-                            Dupliquer même jour/heure la semaine prochaine
+                            {='events.duplicate.next_week'|translate}
                         </label>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                    <button type="button" class="btn btn-primary" id="confirmDuplicate">Confirmer</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{='cancel'|translate}</button>
+                    <button type="button" class="btn btn-primary" id="confirmDuplicate">{='events.duplicate.confirm'|translate}</button>
                 </div>
             </div>
         </div>

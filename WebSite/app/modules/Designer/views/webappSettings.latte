@@ -1,68 +1,11 @@
 {layout '../../Common/views/layout.latte'}
 
-{block head}
-<style>
-    .prev-section {
-        cursor: pointer;
-        transition: border-color .18s, box-shadow .18s, transform .12s;
-    }
-    .prev-section:hover {
-        border-color: #86b7fe !important;
-        box-shadow: 0 0 0 3px rgba(13,110,253,.1) !important;
-        transform: translateY(-1px);
-    }
-    .prev-section.active {
-        border-color: #0d6efd !important;
-        box-shadow: 0 0 0 4px rgba(13,110,253,.15) !important;
-    }
-    .prev-section-badge::before {
-        content: '';
-        display: inline-block;
-        width: 8px; height: 8px;
-        border-radius: 2px;
-        background: currentColor;
-        flex-shrink: 0;
-    }
-    .tox-tinymce { height: 100% !important; }
-
-    /* ── Image upload cards ── */
-    .img-upload-card {
-        border: 2px dashed #dee2e6;
-        border-radius: .5rem;
-        transition: border-color .18s, box-shadow .18s;
-        cursor: pointer;
-        position: relative;
-    }
-    .img-upload-card:hover {
-        border-color: #86b7fe;
-        box-shadow: 0 0 0 3px rgba(13,110,253,.08);
-    }
-    .img-upload-card.drag-over {
-        border-color: #0d6efd;
-        box-shadow: 0 0 0 4px rgba(13,110,253,.15);
-        background: rgba(13,110,253,.03);
-    }
-    .img-upload-card input[type="file"] {
-        position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
-    }
-    .img-preview-wrap {
-        background: repeating-conic-gradient(#e9ecef 0% 25%, #fff 0% 50%) 0 0 / 12px 12px;
-        border-radius: .3rem;
-        overflow: hidden;
-        display: flex; align-items: center; justify-content: center;
-    }
-    .img-preview-wrap img { display: block; max-width: 100%; max-height: 100%; object-fit: contain; }
-    .img-status-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-</style>
-{/block}
-
-
 {block navbar}
 <div class="container-fluid d-flex align-items-center gap-2">
 
     <div class="d-flex gap-2 flex-shrink-0">
         <a class="navbar-brand" href="/">
-            <img src="/app/images/home.png" alt="Home">
+            <img src="/app/images/home.png" alt="Home" height="32">
         </a>
         <button class="btn btn-primary fs-4" onclick="history.back()">
             <i class="bi bi-arrow-left-circle"></i>
@@ -70,7 +13,7 @@
     </div>
 
     <div id="languageSelector"
-         class="d-flex align-items-center gap-2 border border-secondary-subtle rounded p-2 bg-light mx-auto">
+         class="d-flex align-items-center gap-2 border border-secondary-subtle rounded-3 p-3 bg-light mx-auto">
         <select id="languageSelect" class="form-select form-select-sm" style="width:auto;">
             {foreach $supportedLanguages as $lang}
                 <option value="{$lang}" {$lang === $currentLanguage ? 'selected' : ''}>{$lang}</option>
@@ -106,27 +49,29 @@
     <form id="settingsForm" method="post">
         <div class="row g-4">
 
-            <div class="col-lg-8">
+            <!-- Colonne Preview -->
+            <div class="col-lg-6">
                 <p class="text-muted small mb-2">
                     <i class="bi bi-eye me-1"></i>{='designer.home_settings.preview_hint'|translate}
                 </p>
                 <div style="height:calc(100vh - 200px); overflow-y:auto;">
                     <div class="border border-2 rounded-3 overflow-hidden shadow-sm bg-light">
 
-                        <div class="prev-section border-0 border-bottom border-2 rounded-0"
-                                id="prev-images"
-                                style="cursor:pointer;border-bottom-style:dashed !important;border-color:#d63384 !important;"
-                                onclick="activateSection('images')"
-                                title="{='designer.home_settings.title_edit_images'|translate}">
+                        <!-- Images Section -->
+                        <div class="prev-section border-0 border-bottom border-2 rounded-0 p-0"
+                             id="prev-images"
+                             onclick="activateSection('images')"
+                             title="{='designer.home_settings.title_edit_images'|translate}"
+                             style="cursor:pointer;border-bottom-style:dashed !important;border-color:#d63384 !important;">
                             {if file_exists('app/images/header-banner.jpg')}
                                 <img id="prev-thumb-banner"
-                                    src="/app/images/header-banner.jpg"
-                                    alt=""
-                                    style="width:100%;height:50px;object-fit:cover;display:block;">
+                                     src="/app/images/header-banner.jpg"
+                                     alt=""
+                                     style="width:100%;height:50px;object-fit:cover;display:block;">
                             {else}
                                 <div id="prev-thumb-banner"
-                                    class="d-flex align-items-center justify-content-center gap-2 text-muted small fst-italic"
-                                    style="height:50px;background:repeating-conic-gradient(#e9ecef 0% 25%,#fff 0% 50%) 0 0/12px 12px;">
+                                     class="d-flex align-items-center justify-content-center gap-2 text-muted small fst-italic py-3"
+                                     style="height:50px;background:repeating-conic-gradient(#e9ecef 0% 25%,#fff 0% 50%) 0 0/12px 12px;">
                                     <i class="bi bi-panorama" style="color:#d63384;"></i>
                                     header-banner.jpg — {='designer.home_settings.preview_empty'|translate}
                                 </div>
@@ -136,29 +81,31 @@
                         {if $isMenuDesigner}
                         <a href="/menu" class="text-decoration-none">
                         {/if}
-                        <div class="d-flex align-items-center gap-2 px-3 bg-dark" style="height:38px;">
-                            <div class="rounded-1 bg-secondary" style="width:70px;height:20px;opacity:.6;"></div>
+                        <div class="d-flex align-items-center gap-2 px-3 bg-dark text-white" style="height:38px;">
+                            <div class="rounded bg-secondary" style="width:70px;height:20px;opacity:.6;"></div>
                             <div class="d-flex gap-2 ms-auto">
-                                <div class="d-flex gap-2 ms-auto align-items-center">
-                                    <i class="bi bi-question-circle-fill text-warning" style="font-size:1.2rem;opacity:.7;"></i>
-                                    <i class="bi bi-signpost-split-fill text-warning" style="font-size:1.2rem;opacity:.7;"></i>
-                                    <i class="bi bi-key-fill text-warning" style="font-size:1.3rem;opacity:.7;"></i>
-                                    <span style="font-size:1.2rem;opacity:.7;">🤫</span>
-                                    <i class="bi bi-box-arrow-right text-warning" style="font-size:1.3rem;opacity:.7;"></i>
-                                </div>
+                                <i class="bi bi-question-circle-fill text-warning" style="font-size:1.2rem;opacity:.7;"></i>
+                                <i class="bi bi-signpost-split-fill text-warning" style="font-size:1.2rem;opacity:.7;"></i>
+                                <i class="bi bi-key-fill text-warning" style="font-size:1.3rem;opacity:.7;"></i>
+                                <span style="font-size:1.2rem;opacity:.7;">🤫</span>
+                                <i class="bi bi-box-arrow-right text-warning" style="font-size:1.3rem;opacity:.7;"></i>
                             </div>
                         </div>
                         {if $isMenuDesigner}
                         </a>
                         {/if}
 
-                        <div class="p-2 d-flex flex-column gap-2">
-                            <div class="prev-section rounded p-2 border border-2 bg-primary bg-opacity-10"
-                                    id="prev-header"
-                                    style="border-style:dashed;"
-                                    onclick="activateSection('header')"
-                                    title="{='designer.home_settings.title_edit_header'|translate}">
-                                <div class="prev-section-badge d-flex align-items-center gap-1 small fw-bold text-uppercase text-primary mb-1">{='designer.home_settings.section_header'|translate}</div>
+                        <div class="p-3 d-flex flex-column gap-3">
+
+                            <!-- Header Section -->
+                            <div class="prev-section rounded-3 p-3 border border-2 border-dashed bg-primary bg-opacity-10"
+                                 id="prev-header"
+                                 onclick="activateSection('header')"
+                                 title="{='designer.home_settings.title_edit_header'|translate}">
+                                <div class="d-flex align-items-center gap-2 small fw-bold text-uppercase text-primary mb-2">
+                                    <span class="d-inline-block rounded-circle" style="width:8px;height:8px;background:currentColor;"></span>
+                                    {='designer.home_settings.section_header'|translate}
+                                </div>
                                 <div id="preview-header-html" class="prev-html-render small text-secondary">
                                     {if $settings['Home_Header'] !== ''}
                                         {$settings['Home_Header']|noescape}
@@ -170,12 +117,15 @@
                                 </div>
                             </div>
 
-                            <div class="prev-section rounded p-2 border border-2 bg-white"
-                                    id="prev-article"
-                                    style="border-style:dashed;"
-                                    onclick="activateSection('article')"
-                                    title="{='designer.home_settings.title_edit_article'|translate}">
-                                <div class="prev-section-badge d-flex align-items-center gap-1 small fw-bold text-uppercase text-success mb-1">{='designer.home_settings.section_article'|translate}</div>
+                            <!-- Article Section -->
+                            <div class="prev-section rounded-3 p-3 border border-2 border-dashed bg-white"
+                                 id="prev-article"
+                                 onclick="activateSection('article')"
+                                 title="{='designer.home_settings.title_edit_article'|translate}">
+                                <div class="d-flex align-items-center gap-2 small fw-bold text-uppercase text-success mb-2">
+                                    <span class="d-inline-block rounded-circle" style="width:8px;height:8px;background:currentColor;"></span>
+                                    {='designer.home_settings.section_article'|translate}
+                                </div>
                                 <div id="preview-article-content">
                                     {if (int)$settings['Home_FeaturedArticleId'] > 0}
                                         <div class="d-flex align-items-center gap-2 small text-success fw-semibold">
@@ -184,9 +134,9 @@
                                         </div>
                                     {else}
                                         <div class="d-flex flex-column gap-1">
-                                            <div class="rounded-1 bg-secondary-subtle" style="width:80%;height:8px;"></div>
-                                            <div class="rounded-1 bg-secondary-subtle" style="width:95%;height:8px;"></div>
-                                            <div class="rounded-1 bg-secondary-subtle" style="width:70%;height:8px;"></div>
+                                            <div class="rounded bg-secondary-subtle" style="width:80%;height:8px;"></div>
+                                            <div class="rounded bg-secondary-subtle" style="width:95%;height:8px;"></div>
+                                            <div class="rounded bg-secondary-subtle" style="width:70%;height:8px;"></div>
                                             <span class="fst-italic text-muted d-flex align-items-center gap-1 small mt-1">
                                                 <i class="bi bi-arrow-return-right"></i>
                                                 {='designer.home_settings.preview_article_auto'|translate}
@@ -196,12 +146,15 @@
                                 </div>
                             </div>
 
-                            <div class="prev-section rounded p-2 border border-2 bg-warning bg-opacity-10"
-                                    id="prev-latest"
-                                    style="border-style:dashed;"
-                                    onclick="activateSection('latest')"
-                                    title="{='designer.home_settings.title_edit_latest'|translate}">
-                                <div class="prev-section-badge d-flex align-items-center gap-1 small fw-bold text-uppercase text-warning mb-1">{='designer.home_settings.section_latest'|translate}</div>
+                            <!-- Latest Articles Section -->
+                            <div class="prev-section rounded-3 p-3 border border-2 border-dashed bg-warning bg-opacity-10"
+                                 id="prev-latest"
+                                 onclick="activateSection('latest')"
+                                 title="{='designer.home_settings.title_edit_latest'|translate}">
+                                <div class="d-flex align-items-center gap-2 small fw-bold text-uppercase text-warning mb-2">
+                                    <span class="d-inline-block rounded-circle" style="width:8px;height:8px;background:currentColor;"></span>
+                                    {='designer.home_settings.section_latest'|translate}
+                                </div>
                                 <div id="preview-latest-content">
                                     {var $latestCount = (int)$settings['Home_LatestArticlesCount']}
                                     {if $latestCount === 0}
@@ -210,8 +163,8 @@
                                         </span>
                                     {else}
                                         {for $i = 1; $i <= min($latestCount, 6); $i++}
-                                            <div class="d-flex justify-content-between align-items-center py-1 border-bottom">
-                                                <div class="rounded-1 bg-secondary-subtle" style="width:65%;height:8px;"></div>
+                                            <div class="d-flex justify-content-between align-items-center py-1 border-bottom border-secondary-subtle">
+                                                <div class="rounded bg-secondary-subtle" style="width:65%;height:8px;"></div>
                                                 <span class="badge bg-secondary rounded-pill" style="font-size:.6rem;">01/01</span>
                                             </div>
                                         {/for}
@@ -224,12 +177,16 @@
                                 </div>
                             </div>
 
-                            <div class="prev-section rounded p-2 border border-2 bg-primary bg-opacity-10"
-                                    id="prev-footer"
-                                    style="border-style:dashed;border-color:#6f42c1 !important;"
-                                    onclick="activateSection('footer')"
-                                    title="{='designer.home_settings.title_edit_footer'|translate}">
-                                <div class="prev-section-badge d-flex align-items-center gap-1 small fw-bold text-uppercase mb-1" style="color:#6f42c1;">{='designer.home_settings.section_footer'|translate}</div>
+                            <!-- Footer Section -->
+                            <div class="prev-section rounded-3 p-3 border border-2 border-dashed bg-primary bg-opacity-10"
+                                 id="prev-footer"
+                                 onclick="activateSection('footer')"
+                                 title="{='designer.home_settings.title_edit_footer'|translate}"
+                                 style="border-color:#6f42c1 !important;">
+                                <div class="d-flex align-items-center gap-2 small fw-bold text-uppercase mb-2" style="color:#6f42c1;">
+                                    <span class="d-inline-block rounded-circle" style="width:8px;height:8px;background:currentColor;"></span>
+                                    {='designer.home_settings.section_footer'|translate}
+                                </div>
                                 <div id="preview-footer-html" class="prev-html-render small text-secondary">
                                     {if $settings['Home_Footer'] !== ''}
                                         {$settings['Home_Footer']|noescape}
@@ -245,34 +202,39 @@
                 </div>
             </div>
 
-            <div class="col-lg-4">
+            <!-- Colonne Éditeur -->
+            <div class="col-lg-6">
                 <div class="card border-0 rounded-3 shadow-sm d-flex flex-column" style="height:calc(100vh - 140px);overflow:hidden;">
-                    <div class="card-header bg-white border-bottom border-2 d-flex align-items-center gap-2 py-3 flex-shrink-0">
+                    <div class="card-header bg-white border-bottom d-flex align-items-center gap-2 py-3 flex-shrink-0">
                         <span id="editor-section-icon"
-                                class="d-inline-block rounded-1"
-                                style="width:10px;height:10px;background:#dee2e6;flex-shrink:0;"></span>
+                              class="d-inline-block rounded-circle flex-shrink-0"
+                              style="width:10px;height:10px;background:#dee2e6;"></span>
                         <span id="editor-section-title" class="text-muted">
                             {='designer.home_settings.editor_select_hint'|translate}
                         </span>
                     </div>
 
                     <div class="card-body p-4 flex-grow-1 overflow-y-auto d-flex flex-column">
-                        <div id="editor-placeholder" class="d-flex flex-column align-items-center justify-content-center text-muted text-center">
-                            <span class="fs-1">👈</span>
+
+                        <!-- Placeholder -->
+                        <div id="editor-placeholder" class="d-flex flex-column align-items-center justify-content-center text-muted text-center h-100">
+                            <span class="fs-1 mb-3">👈</span>
                             <span class="fw-semibold">{='designer.home_settings.editor_placeholder_title'|translate}</span>
                             <span class="small">{='designer.home_settings.editor_placeholder_subtitle'|translate}</span>
                         </div>
 
+                        <!-- Header Editor -->
                         <div class="d-none flex-column flex-grow-1" id="editor-header">
-                            <p class="text-muted small mb-3 flex-shrink-0">
+                            <p class="text-muted small mb-3">
                                 <i class="bi bi-translate me-1"></i>
                                 {='designer.home_settings.header_description'|translate}
                                 <strong>{$currentLanguage}</strong>
                                 {='designer.home_settings.header_table_hint'|translate}
                             </p>
-                            <textarea id="tinymce-header" name="Home_Header" style="flex:1;">{$settings['Home_Header']|noescape}</textarea>
+                            <textarea id="tinymce-header" name="Home_Header" class="form-control" style="flex:1; resize:none;">{$settings['Home_Header']|noescape}</textarea>
                         </div>
 
+                        <!-- Article Editor -->
                         <div class="d-none" id="editor-article">
                             <label class="form-label fw-semibold" for="input-featured-article">
                                 {='designer.home_settings.article_label'|translate}
@@ -284,15 +246,16 @@
                                 <div class="input-group" style="max-width:180px;">
                                     <span class="input-group-text"><i class="bi bi-hash"></i></span>
                                     <input type="number" class="form-control"
-                                            id="input-featured-article"
-                                            name="Home_FeaturedArticleId"
-                                            value="{$settings['Home_FeaturedArticleId']}"
-                                            min="0" step="1">
+                                           id="input-featured-article"
+                                           name="Home_FeaturedArticleId"
+                                           value="{$settings['Home_FeaturedArticleId']}"
+                                           min="0" step="1">
                                 </div>
                                 <div class="form-text mb-0">{='designer.home_settings.article_zero_hint'|translate}</div>
                             </div>
 
-                            <hr class="my-3">
+                            <hr class="my-4">
+
                             <label class="form-label fw-semibold" for="input-featured-paragraphs">
                                 {='designer.home_settings.paragraphs_label'|translate}
                             </label>
@@ -303,10 +266,10 @@
                                 <div class="input-group" style="max-width:180px;">
                                     <span class="input-group-text"><i class="bi bi-text-paragraph"></i></span>
                                     <input type="number" class="form-control"
-                                        id="input-featured-paragraphs"
-                                        name="Home_FeaturedArticleParagraphs"
-                                        value="{$settings['Home_FeaturedArticleParagraphs']}"
-                                        min="0" step="1">
+                                           id="input-featured-paragraphs"
+                                           name="Home_FeaturedArticleParagraphs"
+                                           value="{$settings['Home_FeaturedArticleParagraphs']}"
+                                           min="0" step="1">
                                 </div>
                                 <div class="form-text mb-0">{='designer.home_settings.paragraphs_zero_hint'|translate}</div>
                             </div>
@@ -314,6 +277,7 @@
                             <div id="article-status" class="alert mb-0"></div>
                         </div>
 
+                        <!-- Latest Articles Editor -->
                         <div class="d-none" id="editor-latest">
                             <label class="form-label fw-semibold" for="input-latest-count">
                                 {='designer.home_settings.latest_label'|translate}
@@ -325,42 +289,44 @@
                                 <div class="input-group" style="max-width:160px;">
                                     <span class="input-group-text"><i class="bi bi-list-ol"></i></span>
                                     <input type="number" class="form-control"
-                                            id="input-latest-count"
-                                            name="Home_LatestArticlesCount"
-                                            value="{$settings['Home_LatestArticlesCount']}"
-                                            min="0" max="50" step="1">
+                                           id="input-latest-count"
+                                           name="Home_LatestArticlesCount"
+                                           value="{$settings['Home_LatestArticlesCount']}"
+                                           min="0" max="50" step="1">
                                 </div>
-                                <input type="range" class="form-range" style="width:200px;"
-                                        id="slider-latest-count"
-                                        min="0" max="50" step="1"
-                                        value="{$settings['Home_LatestArticlesCount']}">
+                                <input type="range" class="form-range flex-grow-1" style="max-width:200px;"
+                                       id="slider-latest-count"
+                                       min="0" max="50" step="1"
+                                       value="{$settings['Home_LatestArticlesCount']}">
                             </div>
                             <div id="latest-count-status" class="alert mb-0"></div>
                         </div>
 
+                        <!-- Footer Editor -->
                         <div class="d-none flex-column flex-grow-1" id="editor-footer">
-                            <p class="text-muted small mb-3 flex-shrink-0">
+                            <p class="text-muted small mb-3">
                                 <i class="bi bi-translate me-1"></i>
                                 {='designer.home_settings.footer_description'|translate}
                                 <strong>{$currentLanguage}</strong>
                                 {='designer.home_settings.header_table_hint'|translate}
                             </p>
-                            <textarea id="tinymce-footer" name="Home_Footer" style="flex:1;">{$settings['Home_Footer']|noescape}</textarea>
+                            <textarea id="tinymce-footer" name="Home_Footer" class="form-control" style="flex:1; resize:none;">{$settings['Home_Footer']|noescape}</textarea>
                         </div>
 
-                        {* ── Éditeur images (unique, 3 cards empilées) ── *}
+                        <!-- Images Editor -->
                         <div class="d-none" id="editor-images">
                             <div class="d-flex flex-column gap-3">
 
-                                <div class="img-upload-card p-3" id="upload-card-home" data-target="home">
+                                <!-- home.png -->
+                                <div class="img-upload-card p-3 border border-2 border-dashed rounded-3" id="upload-card-home" data-target="home">
                                     <input type="file" id="file-home" accept="image/*" aria-label="home.png">
                                     <div class="d-flex align-items-center gap-2 mb-2">
-                                        <span class="img-status-dot" id="dot-home" style="background:#198754;"></span>
+                                        <span class="img-status-dot rounded-circle" id="dot-home" style="background:#198754;width:8px;height:8px;"></span>
                                         <span class="fw-semibold small">home.png</span>
                                         <span class="ms-auto badge bg-secondary-subtle text-secondary border">48 × 48 px</span>
                                     </div>
                                     <div class="d-flex align-items-center gap-3">
-                                        <div class="img-preview-wrap flex-shrink-0" style="height:48px;width:48px;">
+                                        <div class="img-preview-wrap flex-shrink-0 rounded overflow-hidden" style="height:48px;width:48px;background:#f8f9fa;">
                                             <img id="preview-home" src="/app/images/home.png" alt="">
                                         </div>
                                         <p class="text-muted small mb-0">
@@ -371,15 +337,16 @@
                                     <input type="hidden" name="img_home" id="hidden-home">
                                 </div>
 
-                                <div class="img-upload-card p-3" id="upload-card-logo" data-target="logo">
+                                <!-- logo.png -->
+                                <div class="img-upload-card p-3 border border-2 border-dashed rounded-3" id="upload-card-logo" data-target="logo">
                                     <input type="file" id="file-logo" accept="image/*" aria-label="logo.png">
                                     <div class="d-flex align-items-center gap-2 mb-2">
-                                        <span class="img-status-dot" id="dot-logo" style="background:#198754;"></span>
+                                        <span class="img-status-dot rounded-circle" id="dot-logo" style="background:#198754;width:8px;height:8px;"></span>
                                         <span class="fw-semibold small">logo.png</span>
                                         <span class="ms-auto badge bg-secondary-subtle text-secondary border">max 1200 × 1200 px</span>
                                     </div>
                                     <div class="d-flex align-items-center gap-3">
-                                        <div class="img-preview-wrap flex-shrink-0" style="height:48px;width:80px;">
+                                        <div class="img-preview-wrap flex-shrink-0 rounded overflow-hidden" style="height:48px;width:80px;background:#f8f9fa;">
                                             <img id="preview-logo" src="/app/images/logo.png" alt="" style="max-height:48px;">
                                         </div>
                                         <p class="text-muted small mb-0">
@@ -390,22 +357,23 @@
                                     <input type="hidden" name="img_logo" id="hidden-logo">
                                 </div>
 
-                                <div class="img-upload-card p-3" id="upload-card-banner" data-target="banner">
+                                <!-- header-banner.jpg -->
+                                <div class="img-upload-card p-3 border border-2 border-dashed rounded-3" id="upload-card-banner" data-target="banner">
                                     <input type="file" id="file-banner" accept="image/*" aria-label="header-banner.jpg">
                                     <div class="d-flex align-items-center gap-2 mb-2">
-                                        <span class="img-status-dot" id="dot-banner"
-                                              style="background:{file_exists('app/images/header-banner.jpg') ? '#198754' : '#adb5bd'};"></span>
+                                        <span class="img-status-dot rounded-circle" id="dot-banner"
+                                              style="background:{file_exists('app/images/header-banner.jpg') ? '#198754' : '#adb5bd'};width:8px;height:8px;"></span>
                                         <span class="fw-semibold small">header-banner.jpg</span>
                                         <span class="ms-auto badge bg-secondary-subtle text-secondary border">max 1920 × 600 px</span>
                                     </div>
-                                    <div class="img-preview-wrap mb-2" style="height:50px;">
+                                    <div class="img-preview-wrap mb-2 rounded overflow-hidden" style="height:50px;background:#f8f9fa;">
                                         {if file_exists('app/images/header-banner.jpg')}
                                             <img id="preview-banner" src="/app/images/header-banner.jpg"
                                                  alt="" style="width:100%;height:50px;object-fit:cover;">
-                                            <i class="bi bi-panorama text-secondary fs-4" id="placeholder-banner" style="display:none;"></i>
                                         {else}
-                                            <img id="preview-banner" src="" alt="" style="display:none;">
-                                            <i class="bi bi-panorama text-secondary fs-4" id="placeholder-banner"></i>
+                                            <div class="h-100 d-flex align-items-center justify-content-center text-secondary">
+                                                <i class="bi bi-panorama fs-4"></i>
+                                            </div>
                                         {/if}
                                     </div>
                                     <p class="text-muted small mb-0">
@@ -421,7 +389,6 @@
                 </div>
             </div>
         </div>
-
     </form>
 </div>
 {/block}
