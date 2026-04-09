@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const deleteMessageBtn = document.getElementById('delete-message-btn');
 
     function scrollToBottom() {
-        chatContainer.scrollTop = chatContainer.scrollHeight;
+        if (chatContainer) chatContainer.scrollTop = chatContainer.scrollHeight;
     }
 
     scrollToBottom();
@@ -129,3 +129,55 @@ document.addEventListener('DOMContentLoaded', function () {
             });
     });
 });
+
+// ── Active users frieze ──────────────────────────────────────────────────────
+
+const REFRESH_INTERVAL_MS = 30_000;
+
+function renderAvatar({ useGravatar, userImg, displayName, timeAgo, browser, os }) {
+    const tooltip = `${displayName} — ${timeAgo}\n${browser} / ${os}`;
+
+    if (useGravatar === 'yes' && userImg) {
+        return `<img src="${userImg}"
+                     class="rounded-circle border border-2 border-success"
+                     style="width:48px;height:48px;object-fit:cover;cursor:default"
+                     title="${tooltip}"
+                     alt="${displayName}">`;
+    }
+
+    if (userImg && userImg !== '🤔') {
+        return `<span class="d-inline-flex align-items-center justify-content-center rounded-circle"
+                      style="font-size:32px;width:48px;height:48px;line-height:48px;text-align:center;background-color:#f0f0f0;cursor:default"
+                      title="${tooltip}">${userImg}</span>`;
+    }
+
+    return `<div class="rounded-circle bg-light d-flex align-items-center justify-content-center"
+                 style="width:48px;height:48px;cursor:default"
+                 title="${tooltip}">
+                <i class="bi bi-person-circle" style="font-size:3rem"></i>
+            </div>`;
+}
+
+async function refreshActiveUsers() {
+    try {
+        const json = await api.get('/api/chat/active-users');
+
+        if (!json.success) return;
+
+        const container = document.getElementById('active-users-list');
+        if (!container) return;
+
+        if (json.data.length === 0) {
+            container.innerHTML = '<span class="text-muted small">Aucun utilisateur actif</span>';
+            return;
+        }
+
+        container.innerHTML = json.data.map(renderAvatar).join('');
+
+    } catch (e) {
+        console.warn('active-users refresh failed', e);
+    }
+}
+
+refreshActiveUsers();
+setInterval(refreshActiveUsers, REFRESH_INTERVAL_MS);

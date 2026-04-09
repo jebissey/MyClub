@@ -3,6 +3,14 @@ export default class ApiClient {
     async get(endpoint) {
         try {
             const response = await fetch(endpoint);
+
+            const contentType = response.headers.get("content-type");
+            if (!contentType || !contentType.includes("application/json")) {
+                const text = await response.text();
+                console.error("Non-JSON response:", text);
+                throw new Error("Réponse serveur non JSON");
+            }
+
             return await response.json();
         } catch (err) {
             console.error("GET error:", err);

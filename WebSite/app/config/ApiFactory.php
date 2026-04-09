@@ -6,6 +6,7 @@ namespace app\config;
 
 use app\apis\ArticleApi;
 use app\apis\CarouselApi;
+use app\apis\ChatApi;
 use app\apis\CommunicationApi;
 use app\apis\EventApi;
 use app\apis\EventAttributeApi;
@@ -25,6 +26,7 @@ use app\apis\TranslatorApi;
 use app\apis\WebmasterApi;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
+use app\helpers\GravatarHandler;
 use App\Helpers\NotificationSender;
 use app\helpers\PersonPreferences;
 use app\models\ArticleDataHelper;
@@ -38,6 +40,7 @@ use app\models\EventNeedDataHelper;
 use app\models\KanbanDataHelper;
 use app\models\KaraokeDataHelper;
 use app\models\LanguagesDataHelper;
+use app\models\LogDataHelper;
 use app\models\LogDataWriterHelper;
 use app\models\MenuItemDataHelper;
 use app\models\MessageDataHelper;
@@ -56,7 +59,6 @@ class ApiFactory
 {
     public function __construct(
         private Application $application,
-        private ArticleDataHelper $articleDataHelper,
         private AttributeDataHelper $attributeDataHelper,
         private AuthorizationDataHelper $authorizationDataHelper,
         private CarouselDataHelper $carouselDataHelper,
@@ -70,6 +72,7 @@ class ApiFactory
         private JsonEmailQuotaTracker $quotaTracker,
         private KanbanDataHelper $kanbanDataHelper,
         private KaraokeDataHelper $karaokeDataHelper,
+        private LogDataHelper $logDataHelper,
         private LogDataWriterHelper $logDataWriterHelper,
         private MenuItemDataHelper $menuItemDataHelper,
         private MessageDataHelper $messageDataHelper,
@@ -103,6 +106,18 @@ class ApiFactory
             $this->personDataHelper,
             $this->authorizationDataHelper,
             $this->carouselDataHelper
+        );
+    }
+
+    public function makeChatApi(): ChatApi
+    {
+        return new ChatApi(
+            $this->application,
+            $this->connectedUser,
+            $this->dataHelper,
+            $this->personDataHelper,
+            $this->logDataHelper,
+            new GravatarHandler()
         );
     }
 

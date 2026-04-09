@@ -13,196 +13,9 @@
     {include '../../Webmaster/views/navbar/home.latte'}
 {/block}
 
-{block head}
-    <style>
-        #chat-container {
-            border: 1px solid #e0e0e0;
-            border-radius: 5px;
-            background-color: #f8f9fa;
-            flex: 1 1 auto;
-            overflow-y: auto;
-            min-height: 0;
-            max-height: calc(100vh - 280px);
-        }
-
-        .edit-message {
-            cursor: pointer;
-            opacity: 0.7;
-        }
-
-        .edit-message:hover {
-            opacity: 1;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .mb-3 {
-            animation: fadeIn 0.3s ease;
-        }
-
-        .bg-light-primary {
-            background-color: #e6f2ff;
-            border: 1px solid #cce0ff;
-        }
-
-        .text-dark {
-            color: #212529 !important;
-        }
-
-        .card-body {
-            display: flex;
-            flex-direction: column;
-            flex: 1;
-            min-height: 0;
-            padding: 0;
-        }
-
-        .content-wrapper {
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-        }
-
-        .navbar {
-            flex-shrink: 0 !important;
-        }
-
-        .navbar .container-fluid {
-            display: flex !important;
-            flex-wrap: wrap !important;
-            align-items: center !important;
-            justify-content: space-between !important;
-        }
-
-        .navbar-nav {
-            display: flex !important;
-            flex-direction: row !important;
-            flex-wrap: nowrap !important;
-        }
-
-        main.flex-grow-1 {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            min-height: 0;
-        }
-
-        main.flex-grow-1>.container-fluid {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            min-height: 0;
-        }
-
-        main .container-fluid .container-fluid.d-flex.flex-column {
-            flex: 1;
-            min-height: 0;
-        }
-
-        main .card.flex-grow-1.d-flex.flex-column {
-            flex: 1;
-            min-height: 0;
-            height: 100%;
-        }
-
-        #chat-container::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        #chat-container::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 4px;
-        }
-
-        #chat-container::-webkit-scrollbar-thumb {
-            background: #c1c1c1;
-            border-radius: 4px;
-        }
-
-        #chat-container::-webkit-scrollbar-thumb:hover {
-            background: #a8a8a8;
-        }
-
-        .message-form {
-            flex-shrink: 0;
-            background-color: white;
-            border-top: 1px solid #dee2e6;
-        }
-
-        .scroll-indicator {
-            position: absolute;
-            bottom: 80px;
-            right: 20px;
-            background: #007bff;
-            color: white;
-            padding: 8px 16px;
-            border-radius: 20px;
-            cursor: pointer;
-            z-index: 1000;
-            font-size: 12px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-            display: none;
-            transition: all 0.3s ease;
-        }
-
-        .scroll-indicator:hover {
-            background: #0056b3;
-            transform: translateY(-2px);
-        }
-
-        .card-body {
-            position: relative;
-        }
-
-        @media (max-height: 600px) {
-            #chat-container {
-                max-height: calc(100vh - 220px);
-                min-height: 200px;
-            }
-        }
-
-        @media (max-width: 768px) {
-            #chat-container {
-                max-height: calc(100vh - 300px);
-            }
-
-            .scroll-indicator {
-                bottom: 70px;
-                right: 15px;
-                padding: 6px 12px;
-                font-size: 11px;
-            }
-        }
-
-        .mb-3:hover .edit-message {
-            opacity: 1;
-        }
-
-        .card.bg-light-primary,
-        .card.bg-light {
-            transition: box-shadow 0.2s ease;
-        }
-
-        .card.bg-light-primary:hover,
-        .card.bg-light:hover {
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        }
-    </style>
-{/block}
-
 {block content}
-    <div class="container-fluid d-flex flex-column mt-3 mb-2">
-        <div class="card flex-grow-1 d-flex flex-column">
+    <div class="container-fluid d-flex flex-column mt-3 mb-2" style="flex:1 1 0; min-height:0">
+        <div class="card d-flex flex-column h-100" style="min-height:0">
             <div class="card-header bg-secondary text-white">
                 <div class="d-flex align-items-center mb-2">
                     <h2 class="mb-0">
@@ -223,7 +36,7 @@
                                 <i class="bi bi-calendar"></i>
                                 {$event->StartTime|longDate}
                                 <i class="bi bi-clock ms-3"></i>
-                                {date('H:i', strtotime($event->StartTime))} - 
+                                {date('H:i', strtotime($event->StartTime))} -
                                 {date('H:i', strtotime($event->StartTime) + $event->Duration)}
                             </div>
                             <div class="col-md-6">
@@ -234,48 +47,54 @@
                 {/if}
             </div>
 
-            <div class="card-body d-flex flex-column p-0">
-                <div id="chat-container" class="flex-grow-1 overflow-auto p-3">
+            <div class="card-body d-flex flex-column p-0 position-relative" style="min-height:0; flex: 1 1 auto">
+                <div class="overflow-auto p-3 flex-grow-1" style="min-height:0">
                     {if count($messages) == 0}
-                        <div class="text-center text-muted">
-                            <p>Aucun message pour le moment. Soyez le premier à écrire !</p>
+                        <div class="text-center text-muted py-5">
+                            <p>Aucun message pour le moment.<br>Soyez le premier à écrire !</p>
                         </div>
                     {else}
                         {foreach $messages as $message}
-                            <div class="mb-3 {if $message->PersonId == $person->Id}text-end{/if}" 
-                                data-message-id="{$message->Id}" 
+                            <div class="mb-3 {if $message->PersonId == $person->Id}text-end{/if}"
+                                data-message-id="{$message->Id}"
                                 data-author-id="{$message->PersonId}">
-                                <div class="card {if $message->PersonId == $person->Id}bg-light-primary{else}bg-light{/if}" style="max-width: 70%; display: inline-block;">
+
+                                <div class="card d-inline-block {if $message->PersonId == $person->Id}bg-primary bg-opacity-10 border-primary border-opacity-25{else}bg-light{/if}"
+                                    style="max-width:70%">
                                     <div class="card-body p-2">
-                                        <div class="d-flex align-items-center mb-1">
+                                        <div class="d-flex align-items-center gap-2 mb-1">
 
                                             {if $message->UseGravatar == 'yes'}
-                                                <img src="{$message->UserImg}" class="img-fluid rounded-circle mt-2" style="max-width: 64px; max-height: 64px;" alt="User gravatar">
+                                                <img src="{$message->UserImg}"
+                                                    class="rounded-circle"
+                                                    style="width:48px;height:48px;object-fit:cover"
+                                                    alt="User gravatar">
                                             {elseif $message->Avatar}
-                                                <span class="d-inline-flex align-items-center justify-content-center rounded-circle mt-2" 
-                                                    style="font-size: 48px; width: 64px; height: 64px; line-height: 64px; text-align: center; background-color: #f0f0f0;">
+                                                <span class="d-inline-flex align-items-center justify-content-center rounded-circle bg-light"
+                                                    style="width:48px;height:48px;font-size:32px">
                                                     {$message->UserImg}
                                                 </span>
                                             {else}
-                                                <div class="rounded-circle bg-light d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 48px; height: 48px;">
-                                                    <i class="bi bi-person-circle" style="font-size: 3rem;"></i>
-                                                </div>
+                                                <i class="bi bi-person-circle text-secondary" style="font-size:3rem"></i>
                                             {/if}
-                                                
-                                            <strong class="card-title mb-0 {if $message->PersonId == $person->Id}text-dark{/if}">
+
+                                            <strong class="text-dark">
                                                 {if $message->NickName}
                                                     {$message->NickName}
                                                 {else}
                                                     {$message->FirstName} {$message->LastName}
                                                 {/if}
                                             </strong>
-                                            <span class="small text-muted"> ({$message->TimeAgo} )</span>
-                                            
+                                            <span class="small text-muted">({$message->TimeAgo})</span>
+
                                             {if $message->PersonId == $person->Id}
-                                                <i class="bi bi-pencil edit-message ms-2 text-dark" title="Modifier"></i>
+                                                <i class="bi bi-pencil text-dark opacity-50 edit-message"
+                                                    role="button"
+                                                    title="Modifier"></i>
                                             {/if}
                                         </div>
-                                        <p class="card-text mb-0 {if $message->PersonId == $person->Id}text-dark{/if}">
+
+                                        <p class="card-text mb-0 text-dark">
                                             {$message->Text}
                                         </p>
                                     </div>
@@ -285,20 +104,42 @@
                     {/if}
                 </div>
 
-                <div class="message-form p-3 border-top">
-                    <form id="new-message-form" class="d-flex">
-                        <input type="hidden" id="article-id" value="{$article->Id ?? null}">    
-                        <input type="hidden" id="event-id" value="{$event->Id ?? null}">
-                        <input type="hidden" id="group-id" value="{$group->Id ?? null}">
-                        <input type="text" id="message-text" class="form-control" placeholder="Écrivez votre message..." required>
-                        <button type="submit" class="btn btn-primary ms-2">Envoyer</button>
+                <div class="flex-shrink-0 border-top bg-white">
+
+                    <div id="active-users-bar"
+                        class="d-flex align-items-center gap-2 px-3 py-1 border-bottom bg-light overflow-auto"
+                        style="min-height:44px; white-space:nowrap">
+                        <span class="text-muted small me-1" style="flex-shrink:0">
+                            <i class="bi bi-circle-fill text-success" style="font-size:.5rem"></i>
+                            En ligne :
+                        </span>
+                        <span id="active-users-list" class="d-flex gap-2 align-items-center">
+                            <!-- rempli par JS -->
+                        </span>
+                    </div>
+
+                    <form id="new-message-form" class="d-flex flex-wrap gap-2 align-items-end p-3">
+                        <input type="hidden" id="article-id" value="{$article->Id ?? null}">
+                        <input type="hidden" id="event-id"   value="{$event->Id ?? null}">
+                        <input type="hidden" id="group-id"   value="{$group->Id ?? null}">
+
+                        <div class="flex-grow-1">
+                            <input type="text"
+                                id="message-text"
+                                class="form-control"
+                                placeholder="Écrivez votre message..."
+                                required>
+                        </div>
+                        <button type="submit" class="btn btn-primary flex-shrink-0">Envoyer</button>
                     </form>
                 </div>
+
             </div>
         </div>
     </div>
 
-    <div class="modal fade" id="edit-message-modal" tabindex="-1" role="dialog" aria-labelledby="edit-message-modal-label" aria-hidden="true">
+    <div class="modal fade" id="edit-message-modal" tabindex="-1" role="dialog"
+        aria-labelledby="edit-message-modal-label" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -310,8 +151,8 @@
                 <div class="modal-body">
                     <form id="edit-message-form">
                         <input type="hidden" id="edit-message-id">
-                        <div class="form-group">
-                            <label for="edit-message-text">Message :</label>
+                        <div class="mb-3">
+                            <label for="edit-message-text" class="form-label">Message :</label>
                             <textarea class="form-control" id="edit-message-text" rows="3" required></textarea>
                         </div>
                     </form>

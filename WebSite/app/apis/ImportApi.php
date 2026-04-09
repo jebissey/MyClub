@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace app\apis;
 
-use app\enums\ApplicationError;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
 use app\models\DataHelper;

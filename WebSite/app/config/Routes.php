@@ -12,6 +12,7 @@ use app\config\routes\Article;
 use app\config\routes\ArticleApi;
 use app\config\routes\Arward;
 use app\config\routes\CarouselApi;
+use app\config\routes\ChatApi;
 use app\config\routes\Communication;
 use app\config\routes\CommunicationApi;
 use app\config\routes\Contact;
@@ -142,7 +143,7 @@ class Routes
         );
         $eventDataHelper = new EventDataHelper($application);
         $groupDataHelper = new GroupDataHelper($application);
-        $logDataHelper = new LogDataHelper($application);
+        $logDataHelper = new LogDataHelper($application, $dataHelper);
         $messageDataHelper = new MessageDataHelper($application);
         $needDataHelper = new NeedDataHelper($application);
         $notificationSender = new NotificationSender($dataHelper, CredentialService::getInstance());
@@ -193,7 +194,6 @@ class Routes
         );
         $this->apiFactory = new ApiFactory(
             $application,
-            $articleDataHelper,
             new AttributeDataHelper($application),
             $authorizationDataHelper,
             new CarouselDataHelper($application),
@@ -207,6 +207,7 @@ class Routes
             $this->quotaTracker,
             new KanbanDataHelper($application),
             new KaraokeDataHelper($application),
+            $logDataHelper,
             new LogDataWriterHelper($application),
             new MenuItemDataHelper($application, $authorizationDataHelper),
             $messageDataHelper,
@@ -249,6 +250,7 @@ class Routes
         $this->routes = array_merge($this->routes, (new ArticleApi($this->apiFactory))->get());
         $this->routes = array_merge($this->routes, (new Arward($this->controllerFactory))->get());
         $this->routes = array_merge($this->routes, (new CarouselApi($this->apiFactory))->get());
+        $this->routes = array_merge($this->routes, (new ChatApi($this->apiFactory))->get());
         $this->routes = array_merge($this->routes, (new Communication($this->controllerFactory))->get());
         $this->routes = array_merge($this->routes, (new CommunicationApi($this->apiFactory))->get());
         $this->routes = array_merge($this->routes, (new Contact($this->controllerFactory))->get());

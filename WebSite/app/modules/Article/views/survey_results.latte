@@ -2,13 +2,14 @@
 
 {block navbar}
 <div class="container-fluid d-flex align-items-center">
-    <div class="d-flex gap-2">
+    <div class="d-flex align-items-center">
         <a class="navbar-brand" href="/"><img src="/app/images/home.png" alt="Home"></a>
-        <button class="btn btn-primary bi bi-arrow-left-circle fs-4" onclick="history.back()"></button>
-    </div>
-
-    <div class="ms-auto">
-        <a href="/article/{$articleId}" class="btn btn-secondary fs-5">Retour à l'article</a>
+        <button class="btn btn-primary fs-4" onclick="history.back()">
+            <i class="bi bi-arrow-left-circle"></i>
+        </button>
+        <a class="btn btn btn-primary fs-4 ms-2" href="/article/{$articleId}">
+            <i class="bi bi-arrow-up-circle"></i>
+        </a>
     </div>
 </div>
 {/block}

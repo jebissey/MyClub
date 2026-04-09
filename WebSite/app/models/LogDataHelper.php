@@ -14,7 +14,7 @@ use app\helpers\PeriodHelper;
 
 class LogDataHelper extends Data
 {
-    public function __construct(Application $application)
+    public function __construct(Application $application, private DataHelper $dataHelper)
     {
         parent::__construct($application);
     }
@@ -54,46 +54,70 @@ class LogDataHelper extends Data
 
 
     #region Last visits
-    public function getLastVisitPerActivePersonWithTimeAgo($activePersons)
+    public function getLastVisitPerActivePersonWithTimeAgo(array $activePersons): array
     {
         $visits = $this->getLastVisitPerActivePerson($activePersons);
         foreach ($visits as &$visit) {
-            $visit->TimeAgo = MyClubDateTime::calculateTimeAgo($visit->LastActivity);
+            $visit->TimeAgo       = MyClubDateTime::calculateTimeAgo($visit->LastActivity);
             $visit->FormattedDate = MyClubDateTime::formatDateFromUTC($visit->LastActivity);
+
+            $person = $this->dataHelper->get('Person', ['Email' => $visit->Email], 'Email, UseGravatar, Avatar');
+            $visit->UseGravatar = $person->UseGravatar ?? 'no';
+            $visit->Avatar      = $person->Avatar      ?? '';
         }
         return $visits;
     }
     private function getLastVisitPerActivePerson(array $activePersons): array
     {
-        $result = [];
+        if (empty($activePersons)) {
+            return [];
+        }
 
-        $sql = '
-            SELECT Uri, CreatedAt, Os, Browser
-            FROM Log
-            WHERE Who COLLATE NOCASE = :email
-            ORDER BY CreatedAt DESC
-            LIMIT 1
-        ';
+        $placeholders = [];
+        $params       = [];
+        foreach ($activePersons as $i => $person) {
+            $key              = ':e' . $i;
+            $placeholders[]   = $key;
+            $params[$key]     = strtolower($person->Email);
+        }
+        $in = implode(', ', $placeholders);
+        $sql = "
+            SELECT l.Who, l.CreatedAt, l.Os, l.Browser
+            FROM Log l
+            INNER JOIN (
+                SELECT LOWER(Who) AS Who, MAX(CreatedAt) AS MaxCreatedAt
+                FROM Log
+                WHERE LOWER(Who) IN ($in)
+                GROUP BY LOWER(Who)
+            ) latest
+                ON LOWER(l.Who) = latest.Who
+            AND l.CreatedAt  = latest.MaxCreatedAt
+        ";
         $stmt = $this->pdoForLog->prepare($sql);
+        $stmt->execute($params);
+        $logs = $stmt->fetchAll(PDO::FETCH_OBJ);
+
+        $logByEmail = [];
+        foreach ($logs as $log) {
+            $logByEmail[strtolower($log->Who)] = $log;
+        }
+
+        $result = [];
         foreach ($activePersons as $person) {
-            $stmt->execute([':email' => $person->Email]);
-            $lastLog = $stmt->fetch();
-            if ($lastLog) {
+            $email = strtolower($person->Email);
+            if (isset($logByEmail[$email])) {
+                $log      = $logByEmail[$email];
                 $result[] = (object)[
                     'PersonId'     => $person->Id,
                     'FullName'     => $person->FirstName . ' ' . $person->LastName,
                     'Email'        => $person->Email,
-                    'Avatar'       => $person->Avatar,
-                    'LastPage'     => $lastLog->Uri,
-                    'LastActivity' => $lastLog->CreatedAt,
-                    'Os'           => $lastLog->Os,
-                    'Browser'      => $lastLog->Browser
+                    'LastActivity' => $log->CreatedAt,
+                    'Os'           => $log->Os,
+                    'Browser'      => $log->Browser,
                 ];
             }
         }
-        usort($result, function ($a, $b) {
-            return strcmp($b->LastActivity, $a->LastActivity);
-        });
+        usort($result, fn($a, $b) => strcmp($b->LastActivity, $a->LastActivity));
         return $result;
     }
 

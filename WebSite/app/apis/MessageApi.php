@@ -169,11 +169,11 @@ class MessageApi extends AbstractApi
         $articleAuthorId = null;
         $eventCreatorId = null;
         if ($articleId !== null) {
-            $article = $this->dataHelper->get('Article', ['Id' => $articleId], 'CreatedBy');
+            $article = $this->dataHelper->get('Article', ['Id' => $articleId], 'CreatedBy, Title');
             $articleAuthorId = $article?->CreatedBy;
         }
         if ($eventId !== null) {
-            $event = $this->dataHelper->get('Event', ['Id' => $eventId], 'CreatedBy');
+            $event = $this->dataHelper->get('Event', ['Id' => $eventId], 'CreatedBy, Summary');
             $eventCreatorId = $event?->CreatedBy;
         }
         if ($groupId !== null) {
@@ -196,11 +196,11 @@ class MessageApi extends AbstractApi
         if ($articleId !== null) {
             $from = 'article';
             $id = $articleId;
-            $body .= "à l'article {$article->Title}";
+            $body .= "à l'article {$article->Title} ({$articleId})";
         } elseif ($eventId !== null) {
             $from = 'event';
             $id = $eventId;
-            $body .= "à l'événement {$event->Summary}";
+            $body .= "à l'événement {$event->Summary} ({$eventId})";
         } elseif ($groupId !== null) {
             $from = 'group';
             $id = $groupId;

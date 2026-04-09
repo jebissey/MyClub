@@ -98,10 +98,6 @@ class SurveyController extends AbstractController
             $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
-        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
-            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
         $survey = $this->surveyDataHelper->getWithCreator($articleId);
         if (!$survey) {
             $this->raiseBadRequest("No survey for article {$articleId}", __FILE__, __LINE__);
