@@ -59,6 +59,7 @@ class LogDataHelper extends Data
         $visits = $this->getLastVisitPerActivePerson($activePersons);
         foreach ($visits as &$visit) {
             $visit->TimeAgo       = MyClubDateTime::calculateTimeAgo($visit->LastActivity);
+            $visit->MinutesAgo    = MyClubDateTime::calculateMinutesAgo($visit->LastActivity);
             $visit->FormattedDate = MyClubDateTime::formatDateFromUTC($visit->LastActivity);
 
             $person = $this->dataHelper->get('Person', ['Email' => $visit->Email], 'Email, UseGravatar, Avatar');

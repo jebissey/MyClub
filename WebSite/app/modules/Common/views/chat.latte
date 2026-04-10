@@ -51,7 +51,7 @@
                 <div class="overflow-auto p-3 flex-grow-1" style="min-height:0">
                     {if count($messages) == 0}
                         <div class="text-center text-muted py-5">
-                            <p>Aucun message pour le moment.<br>Soyez le premier à écrire !</p>
+                            <p>{='chat.no_messages'|translate}</p>
                         </div>
                     {else}
                         {foreach $messages as $message}
@@ -90,7 +90,7 @@
                                             {if $message->PersonId == $person->Id}
                                                 <i class="bi bi-pencil text-dark opacity-50 edit-message"
                                                     role="button"
-                                                    title="Modifier"></i>
+                                                    title="{='chat.edit_icon_title'|translate}"></i>
                                             {/if}
                                         </div>
 
@@ -111,11 +111,11 @@
                         style="min-height:44px; white-space:nowrap">
                         <span class="text-muted small me-1" style="flex-shrink:0">
                             <i class="bi bi-circle-fill text-success" style="font-size:.5rem"></i>
-                            En ligne :
+                            {='chat.online'|translate}
                         </span>
-                        <span id="active-users-list" class="d-flex gap-2 align-items-center">
+                        <div id="active-users-list" class="flex-grow-1 overflow-hidden">
                             <!-- rempli par JS -->
-                        </span>
+                        </div>
                     </div>
 
                     <form id="new-message-form" class="d-flex flex-wrap gap-2 align-items-end p-3">
@@ -127,10 +127,10 @@
                             <input type="text"
                                 id="message-text"
                                 class="form-control"
-                                placeholder="Écrivez votre message..."
+                                placeholder="{='chat.placeholder'|translate}"
                                 required>
                         </div>
-                        <button type="submit" class="btn btn-primary flex-shrink-0">Envoyer</button>
+                        <button type="submit" class="btn btn-primary flex-shrink-0">{='chat.send'|translate}</button>
                     </form>
                 </div>
 
@@ -143,7 +143,7 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="edit-message-modal-label">Modifier le message</h5>
+                    <h5 class="modal-title" id="edit-message-modal-label">{'chat.edit_title'|translate}</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Fermer">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -152,15 +152,15 @@
                     <form id="edit-message-form">
                         <input type="hidden" id="edit-message-id">
                         <div class="mb-3">
-                            <label for="edit-message-text" class="form-label">Message :</label>
+                            <label for="edit-message-text" class="form-label">{='chat.message_label'|translate}</label>
                             <textarea class="form-control" id="edit-message-text" rows="3" required></textarea>
                         </div>
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-danger" id="delete-message-btn">Supprimer</button>
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
-                    <button type="button" class="btn btn-primary" id="save-edit-message-btn">Enregistrer</button>
+                    <button type="button" class="btn btn-danger" id="delete-message-btn">{='chat.delete'|translate}</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">{='chat.cancel'|translate}</button>
+                    <button type="button" class="btn btn-primary" id="save-edit-message-btn">{='chat.save'|translate}</button>
                 </div>
             </div>
         </div>

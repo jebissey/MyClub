@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\apis;
 
 use DateTime;
+use DateTimeZone;
 
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
@@ -35,15 +36,19 @@ class ChatApi extends AbstractApi
             $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
+        $minutes = (int) ($_GET['m'] ?? self::ACTIVE_WINDOW_MINUTES);
         $visits = $this->logDataHelper->getLastVisitPerActivePersonWithTimeAgo($this->dataHelper->gets('Person', ['Inactivated' => 0]));
-        $cutoff = new DateTime('-' . self::ACTIVE_WINDOW_MINUTES . ' minutes');
+        $cutoff = new DateTime("-{$minutes} minutes", new DateTimeZone('UTC'));
         $result = [];
         foreach ($visits as $visit) {
-            if (new DateTime($visit->LastActivity) < $cutoff) continue;
+            $visitDate = new DateTime($visit->LastActivity, new DateTimeZone('UTC'));
+            if ($visitDate < $cutoff) continue;
+
             $result[] = [
                 'personId'      => $visit->PersonId,
                 'displayName'   => $visit->NickName ?? $visit->FullName,
                 'timeAgo'       => $visit->TimeAgo,
+                'minutesAgo'    => $visit->MinutesAgo,
                 'formattedDate' => $visit->FormattedDate,
                 'useGravatar'   => $visit->UseGravatar,
                 'userImg'       => WebApp::getUserImg($visit, $this->gravatarHandler),

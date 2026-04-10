@@ -4801,7 +4801,15 @@ INSERT INTO "Languages" VALUES (563,'chat.confirm.delete','Are you sure you want
 INSERT INTO "Languages" VALUES (564,'chat.error.update_failed','An error occurred while editing the message','Une erreur est survenue lors de la modification du message','Wystąpił błąd podczas edycji wiadomości');
 INSERT INTO "Languages" VALUES (565,'chat.error.delete_failed','An error occurred while deleting the message','Une erreur est survenue lors de la suppression du message','Wystąpił błąd podczas usuwania wiadomości');
 INSERT INTO "Languages" VALUES (566,'chat.no_active_users','No active users','Aucun utilisateur actif','Brak aktywnych użytkowników');
-INSERT INTO "Metadata" VALUES (1,'MyClub',40,0,1000000,NULL,10,36,6,NULL,0,NULL);
+INSERT INTO "Languages" VALUES (567,'chat.no_messages','No messages yet.\nBe the first to write!','Aucun message pour le moment.\nSoyez le premier à écrire !','Brak wiadomości.\nBądź pierwszy!');
+INSERT INTO "Languages" VALUES (568,'chat.online','Online:','En ligne :','Online:');
+INSERT INTO "Languages" VALUES (571,'chat.edit_title','Edit message','Modifier le message','Edytuj wiadomość');
+INSERT INTO "Languages" VALUES (572,'chat.edit_icon_title','Edit','Modifier','Edytuj');
+INSERT INTO "Languages" VALUES (573,'chat.message_label','Message:','Message :','Wiadomość:');
+INSERT INTO "Languages" VALUES (574,'chat.delete','Delete','Supprimer','Usuń');
+INSERT INTO "Languages" VALUES (575,'chat.cancel','Cancel','Annuler','Anuluj');
+INSERT INTO "Languages" VALUES (576,'chat.save','Save','Enregistrer','Zapisz');
+INSERT INTO "Metadata" VALUES (1,'MyClub',41,0,1000000,NULL,10,36,6,NULL,0,NULL);
 INSERT INTO "Person" VALUES (1,'webmaster@myclub.foo','e427c26faca947919b18b797bc143a35100e4de48c34b70b26202d3a7d8e51f7','my first name','my last name','my nick name or nothing',NULL,'0',NULL,NULL,NULL,NULL,NULL,0,0,NULL,NULL,'2025-01-01',0,0,0,NULL,NULL,NULL,NULL,NULL,NULL,'');
 INSERT INTO "PersonGroup" VALUES (1,1,1);
 INSERT INTO "Settings" VALUES (1,'Title','title');

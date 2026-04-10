@@ -11,7 +11,16 @@ class MyClubDateTime
 {
     private const DISPLAY_TIMEZONE = 'Europe/Paris';
 
-    static function calculateTimeAgo($dateTime)
+    static function calculateMinutesAgo($dateTime): int
+    {
+        $datetime = new DateTime($dateTime, new DateTimeZone('UTC'));
+        $datetime->setTimezone(new DateTimeZone(self::DISPLAY_TIMEZONE));
+        $now = new DateTime('now', new DateTimeZone(self::DISPLAY_TIMEZONE));
+        $interval = $now->diff($datetime);
+        return (int) ($interval->days * 24 * 60 + $interval->h * 60 + $interval->i);
+    }
+
+    static function calculateTimeAgo($dateTime): string
     {
         $datetime = new DateTime($dateTime, new DateTimeZone('UTC'));
         $datetime->setTimezone(new DateTimeZone(self::DISPLAY_TIMEZONE));
