@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace app\models;
@@ -42,17 +43,5 @@ class NeedDataHelper extends Data
     public function countForNeedType(int $needTypeid): int
     {
         return count($this->gets('Need', ['IdNeedType' => $needTypeid]));
-    }
-
-    public function delete_(int $id): void
-    {
-        $this->delete('Need', ['Id' => $id]);
-    }
-
-    public function insertOrUpdate(?int $id, array $needData): int
-    {
-        if ($id !== null) $this->set('Need', $needData, ['Id' => $id]);
-        else $id =  $this->set('Need', $needData);
-        return  $id;
     }
 }

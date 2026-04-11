@@ -30,61 +30,45 @@ class EventNeedApi extends AbstractApi
 
     public function deleteNeed(int $id): void
     {
-        if (!$this->application->getConnectedUser()->isEventDesigner()) {
-            $this->renderJsonForbidden(__FILE__, __LINE__);
-            return;
-        }
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
-        try {
-            $deletedRows = $this->dataHelper->delete('Need', ['Id' => $id]);
-            if ($deletedRows === 1) $this->renderJsonOk();
-            else  $this->renderJsonBadRequest('', __FILE__, __LINE__);
-        } catch (Throwable $e) {
-            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
+        if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isEventDesigner())) {
+            try {
+                $deletedRows = $this->dataHelper->delete('Need', ['Id' => $id]);
+                if ($deletedRows === 1) $this->renderJsonOk();
+                else  $this->renderJsonBadRequest('', __FILE__, __LINE__);
+            } catch (Throwable $e) {
+                $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
+            }
         }
     }
 
     public function getEventNeeds(int $id): void
     {
-        if (!$this->application->getConnectedUser()->isEventManager()) {
-            $this->renderJsonForbidden(__FILE__, __LINE__);
-            return;
-        }
-        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
-            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
+
         if (!$this->eventDataHelper->eventExists($id)) {
             $this->renderJsonBadRequest("Event ({$id}) doesn't exist", __FILE__, __LINE__);
             return;
         }
-        try {
-            $apiResponse = new ApiResponse(true, ApplicationError::Ok->value, ['needs' => $this->eventNeedDataHelper->needsForEvent($id)]);
-            $this->renderJson($apiResponse->data, $apiResponse->success, $apiResponse->responseCode);
-        } catch (Throwable $e) {
-            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
+        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isEventDesigner())) {
+            try {
+                $apiResponse = new ApiResponse(true, ApplicationError::Ok->value, ['needs' => $this->eventNeedDataHelper->needsForEvent($id)]);
+                $this->renderJson($apiResponse->data, $apiResponse->success, $apiResponse->responseCode);
+            } catch (Throwable $e) {
+                $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
+            }
         }
     }
 
     public function saveNeed(): void
     {
-        if (!$this->application->getConnectedUser()->isEventDesigner()) {
-            $this->renderJsonForbidden(__FILE__, __LINE__);
-            return;
-        }
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
-        $data = $this->getJsonInput();
-        try {
-            $this->saveNeed_($data);
-            $this->renderJsonOk();
-        } catch (Throwable $e) {
-            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
+        if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isEventDesigner())) {
+
+            $data = $this->getJsonInput();
+            try {
+                $this->saveNeed_($data);
+                $this->renderJsonOk();
+            } catch (Throwable $e) {
+                $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
+            }
         }
     }
 

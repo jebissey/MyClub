@@ -108,7 +108,13 @@ enum Period: string
                 (int)$from->format('s')
             );
         }
-
+        
+        // If the result is still in the past (e.g. $from was an old date),
+        // keep jumping forward by 7 days until we land in the future.
+        $now = new DateTimeImmutable();
+        while ($next <= $now) {
+            $next = $next->modify('+7 days');
+        }
         return $next;
     }
 }
