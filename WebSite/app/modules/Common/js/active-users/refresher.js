@@ -10,7 +10,8 @@ const adapter = new WindowAdapter(INITIAL_WINDOW_MINUTES);
 
 async function refreshActiveUsers() {
     try {
-        const json = await api.get(`/api/chat/active-users?m=${adapter.minutes}`);
+        const currentMinutes = adapter.minutes;
+        const json = await api.get(`/api/chat/active-users?m=${currentMinutes}`);
         if (!json.success) return;
 
         const container = document.getElementById('active-users-list');
@@ -20,7 +21,7 @@ async function refreshActiveUsers() {
 
         container.innerHTML = json.data.length === 0
             ? '<span class="text-muted small">Aucun utilisateur actif</span>'
-            : buildActiveUsersGrid(json.data, adapter.minutes);
+            : buildActiveUsersGrid(json.data, currentMinutes);
 
     } catch (e) {
         console.warn('active-users refresh failed', e);

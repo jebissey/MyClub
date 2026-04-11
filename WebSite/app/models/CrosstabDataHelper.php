@@ -100,7 +100,10 @@ class CrosstabDataHelper extends Data
         ?string $groupFilter = null
     ): array {
         $sql = '
-            SELECT Uri, Who, COUNT(*) as count
+            SELECT 
+                Uri, 
+                LOWER(Who) AS Who, 
+                COUNT(*) as count   
             FROM Log
             WHERE ' . $dateCondition . '
         ';
@@ -116,8 +119,7 @@ class CrosstabDataHelper extends Data
             $params[':emailFilter'] = "%$emailFilter%";
         }
 
-        $sql .= ' GROUP BY Uri, Who';
-
+        $sql .= ' GROUP BY Uri, LOWER(Who)';
         $stmt = $this->pdoForLog->prepare($sql);
         $stmt->execute($params);
         $crossTabData = $stmt->fetchAll(PDO::FETCH_OBJ);

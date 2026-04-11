@@ -1,5 +1,5 @@
 const ACTIVE_WINDOW_MINUTES_MIN = 1;
-const ACTIVE_WINDOW_MINUTES_MAX = 60 * 24;
+const ACTIVE_WINDOW_MINUTES_MAX = 60 * 8;
 const ACTIVE_USERS_MAX = 10;
 
 export class WindowAdapter {

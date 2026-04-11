@@ -33,7 +33,17 @@
                     <tr>
                         {php $actionDisplayed = !isset($conditionValue)}
                         {foreach $columns as $column}
-                            <td>{$item->{$column['field']}}</td>
+                            <td title="{$item->{$column['field']}}">
+                                {var $v = $item->{$column['field']}}
+                                {if $v !== null}
+                                    {var $s = (string) $v}
+                                    {if mb_strlen($s) > 200}
+                                        {$s|truncate:50}
+                                    {else}
+                                        {$s}
+                                    {/if}
+                                {/if}
+                            </td>
                             {if isset($conditionValue) && $column->field == $conditionColumn && $item[$column->field] == $conditionValue}
                                 {php $actionDisplayed = true}
                             {/if}
