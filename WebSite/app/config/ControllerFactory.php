@@ -131,7 +131,8 @@ class ControllerFactory
             $this->backup,
             $this->articleCrosstabDataHelper,
             $this->messageDataHelper,
-            $this->emailService
+            $this->emailService,
+            $this->logDataHelper
         );
     }
 
@@ -472,7 +473,6 @@ class ControllerFactory
             $this->crosstabDataHelper,
             new LogDataAnalyticsHelper($this->application),
             new LogDataStatisticsHelper($this->application),
-            $this->articleDataHelper
         );
     }
 

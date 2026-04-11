@@ -7,10 +7,8 @@ namespace app\modules\VisitorInsights;
 use app\enums\Period;
 use app\enums\FilterInputRule;
 use app\helpers\Application;
-use app\helpers\PeriodHelper;
 use app\helpers\TranslationManager;
 use app\helpers\WebApp;
-use app\models\ArticleDataHelper;
 use app\models\CrosstabDataHelper;
 use app\models\LogDataHelper;
 use app\models\LogDataAnalyticsHelper;
@@ -46,15 +44,9 @@ class VisitorInsightsController extends TableController
         private CrosstabDataHelper $crosstabDataHelper,
         private LogDataAnalyticsHelper $logDataAnalyticsHelper,
         private LogDataStatisticsHelper $logDataStatisticsHelper,
-        private ArticleDataHelper $articleDataHelper
     ) {
         parent::__construct($application);
     }
-
-    // -------------------------------------------------------------------------
-    // Help pages (single entry point)
-    // -------------------------------------------------------------------------
-
 
     public function helpPage(string $section): void
     {
@@ -79,10 +71,6 @@ class VisitorInsightsController extends TableController
             'page'             => $this->application->getConnectedUser()->getPage(),
         ]);
     }
-
-    // -------------------------------------------------------------------------
-    // Feature pages
-    // -------------------------------------------------------------------------
 
     public function index(): void
     {
@@ -242,37 +230,8 @@ class VisitorInsightsController extends TableController
 
         $this->render('VisitorInsights/views/topPages.latte', $this->getAllParams([
             'title'    => 'Top des pages visitées',
-            'period'   => $period,
+            'period'   => $period->value,
             'topPages' => $this->logDataHelper->getTopPages($period, self::TOP),
-            'page'     => $this->application->getConnectedUser()->getPage(),
-        ]));
-    }
-
-    public function topArticlesByPeriod(): void
-    {
-        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isRedactorOrVisitorInsghts())) {
-            return;
-        }
-
-        $period        = $this->getValidPeriod();
-        $dateCondition = PeriodHelper::getDateConditions($period);
-        $topPages      = $this->logDataHelper->getTopArticles($dateCondition, self::TOP);
-
-        $articleIds = array_values(array_filter(
-            array_map(fn($p) => $p->articleId ?? null, $topPages)
-        ));
-        $authors = $this->articleDataHelper->getAuthorsByArticleIds($articleIds);
-
-        foreach ($topPages as $page) {
-            $author             = $authors[$page->articleId ?? null] ?? null;
-            $page->AuthorName   = $author?->PersonName;
-            $page->ArticleTitle = $author?->ArticleTitle;
-        }
-
-        $this->render('Article/views/topArticles.latte', $this->getAllParams([
-            'title'    => 'Top des articles visités par période',
-            'period'   => $period,
-            'topPages' => $topPages,
             'page'     => $this->application->getConnectedUser()->getPage(),
         ]));
     }
@@ -296,7 +255,7 @@ class VisitorInsightsController extends TableController
         $period      = Period::tryFrom($input['period'] ?? '') ?? Period::Today;
 
         [$sortedCrossTabData, $filteredPersons, $columnTotals] = $this->crosstabDataHelper->getPersons(
-            PeriodHelper::getDateConditions($period),
+            $period->dateConditions('CreatedAt'),
             $uriFilter,
             $emailFilter,
             $groupFilter
@@ -333,15 +292,7 @@ class VisitorInsightsController extends TableController
         ]));
     }
 
-    // -------------------------------------------------------------------------
-    // Private helpers
-    // -------------------------------------------------------------------------
-
-    /**
-     * Reads `period` and `date` from the query string with safe defaults.
-     *
-     * @return array{string, string}  [$period, $currentDate]
-     */
+    #region Private functions
     private function getPeriodAndDate(): array
     {
         $params      = $this->flight->request()->query->getData();
@@ -351,19 +302,18 @@ class VisitorInsightsController extends TableController
         if (!strtotime($currentDate)) {
             $currentDate = date('Y-m-d');
         }
-
         return [$period, $currentDate];
     }
 
-    /**
-     * Reads and validates the `period` query param against the Period enum.
-     */
     private function getValidPeriod(): Period
     {
-        return WebApp::getFiltered(
+        $value = WebApp::getFiltered(
             'period',
             $this->application->enumToValues(Period::class),
             $this->flight->request()->query->getData()
-        ) ?: Period::Week;
+        );
+        return is_string($value)
+            ? (Period::tryFrom($value) ?? Period::Week)
+            : Period::Week;
     }
 }

@@ -25,7 +25,6 @@ class VisitorInsights implements RouteInterface
         $this->routes[] = new Route('GET /logs',            $c, 'index');
         $this->routes[] = new Route('GET /membersAlerts',   $c, 'membersAlerts');
         $this->routes[] = new Route('GET /referents',       $c, 'referents');
-        $this->routes[] = new Route('GET /topArticles',     $c, 'topArticlesByPeriod');
         $this->routes[] = new Route('GET /topPages',        $c, 'topPagesByPeriod');
         $this->routes[] = new Route('GET /visitorInsights', $c, 'visitorInsights');
         $this->routes[] = new Route('GET /visitorsGraf',    $c, 'visitorsGraf');

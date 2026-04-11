@@ -1,0 +1,102 @@
+{parameters
+    array  $topPages,
+    string $period,
+    string $cardTitle,
+    array  $columns      = ['uri', 'visits', 'percentage']
+}
+
+<div class="mb-4">
+    <form method="get" class="form-inline">
+        <div class="form-group mr-2">
+            <label for="period" class="mr-2">{='common.period.label'|translate} :</label>
+            <select class="form-select" id="period" name="period" onchange="this.form.submit()">
+                {foreach ['today' => 'common.period.today', 'week' => 'common.period.week', 'month' => 'common.period.month', 'quarter' => 'common.period.quarter', 'year' => 'common.period.year'] as $value => $key}
+                    <option value="{$value}" {if $period === $value}selected{/if}>
+                        {=$key|translate}
+                    </option>
+                {/foreach}
+            </select>
+        </div>
+    </form>
+</div>
+
+{if count($topPages) > 0}
+    {* Compute total visits for percentage calculation *}
+    {var $totalVisits = 0}
+    {foreach $topPages as $pageItem}
+        {do $totalVisits += $pageItem->visits}
+    {/foreach}
+
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h5 class="card-title mb-0">{$cardTitle}</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            {if in_array('uri', $columns)}<th>{='common.table.column.uri'|translate}</th>{/if}
+                            {if in_array('title', $columns)}<th>{='common.table.column.title'|translate}</th>{/if}
+                            {if in_array('author', $columns)}<th>{='common.table.column.author'|translate}</th>{/if}
+                            {if in_array('visits', $columns)}<th>{='common.table.column.visits'|translate}</th>{/if}
+                            {if in_array('percentage', $columns)}<th>{='common.table.column.percentage'|translate}</th>{/if}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {foreach $topPages as $index => $pageData}
+                        <tr>
+                            <td>{$index + 1}</td>
+
+                            {if in_array('uri', $columns)}
+                            <td>
+                                <a href="{$pageData->Uri}" class="text-decoration-none">
+                                    {$pageData->Uri|truncate:80}
+                                </a>
+                            </td>
+                            {/if}
+
+                            {if in_array('title', $columns)}
+                            <td>{$pageData->ArticleTitle ?? ('common.unknown.title'|translate)}</td>
+                            {/if}
+
+                            {if in_array('author', $columns)}
+                            <td>{$pageData->AuthorName ?? ('common.unknown.author'|translate)}</td>
+                            {/if}
+
+                            {if in_array('visits', $columns)}
+                            <td>{$pageData->visits}</td>
+                            {/if}
+
+                            {if in_array('percentage', $columns)}
+                            <td>
+                                {* Display percentage as a progress bar; show label outside if below 10% *}
+                                {var $percentage = ($pageData->visits / $totalVisits) * 100}
+                                <div class="progress">
+                                    <div class="progress-bar" role="progressbar"
+                                         style="width: {$percentage|number}%;"
+                                         aria-valuenow="{$percentage|number}"
+                                         aria-valuemin="0"
+                                         aria-valuemax="100">
+                                        {if $percentage >= 10}{number_format($percentage, 1)}%{/if}
+                                    </div>
+                                    {if $percentage < 10}
+                                    <span class="small text-dark ms-2">{number_format($percentage, 1)}%</span>
+                                    {/if}
+                                </div>
+                            </td>
+                            {/if}
+                        </tr>
+                        {/foreach}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{else}
+    {* No data fallback *}
+    <div class="alert alert-info">
+        {='common.table.no_data'|translate}
+    </div>
+{/if}

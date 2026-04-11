@@ -5,6 +5,11 @@ declare(strict_types=1);
 namespace app\enums;
 
 use DateTimeImmutable;
+use \flight\net\Request;
+
+use app\helpers\Application;
+use app\helpers\WebApp;
+use app\models\LanguagesDataHelper;
 
 enum Period: string
 {
@@ -24,6 +29,58 @@ enum Period: string
     case Signout = 'signout';
 
 
+    public function dateRange(): array
+    {
+        $end = date('Y-m-d H:i:s');
+        $start = match ($this) {
+            self::Week    => date('Y-m-d H:i:s', strtotime('-1 week')),
+            self::Month   => date('Y-m-d H:i:s', strtotime('-1 month')),
+            self::Quarter => date('Y-m-d H:i:s', strtotime('-3 months')),
+            self::Year    => date('Y-m-d H:i:s', strtotime('-1 year')),
+            default       => '1970-01-01 00:00:00',
+        };
+        return ['start' => $start, 'end' => $end];
+    }
+
+    public function dateConditions(string $field): string
+    {
+        return match ($this) {
+            self::Today           => "date({$field}) = date('now')",
+            self::Yesterday       => "date({$field}) = date('now', '-1 days')",
+            self::BeforeYesterday => "date({$field}) = date('now', '-2 days')",
+            self::Week            => "date({$field}) >= date('now', '-7 days')",
+            self::Month           => "date({$field}) >= date('now', '-30 days')",
+            self::Quarter         => "date({$field}) >= date('now', '-3 months')",
+            self::Year            => "date({$field}) >= date('now', '-1 years')",
+            default               => '1=1',
+        };
+    }
+
+    public static function fromRequest(Application $application, Request $request): self
+    {
+        $value = WebApp::getFiltered(
+            'period',
+            $application->enumToValues(self::class),
+            $request->query->getData()
+        );
+        return is_string($value)
+            ? (self::tryFrom($value) ?? self::Week)
+            : self::Week;
+    }
+
+    /** @return array<string, string> */
+    public static function gets(LanguagesDataHelper $lang): array
+    {
+        return array_column(
+            array_map(
+                fn(self $p) => [$p->value, $lang->translate($p->value)],
+                [self::Week, self::Month, self::Quarter, self::Year]
+            ),
+            1,
+            0
+        );
+    }
+
     public function next(DateTimeImmutable $from): DateTimeImmutable
     {
         return match ($this) {
@@ -34,6 +91,7 @@ enum Period: string
         };
     }
 
+    #region Private functions
     private function nextWeek(DateTimeImmutable $from): DateTimeImmutable
     {
         // Compute the next occurrence of the same weekday.

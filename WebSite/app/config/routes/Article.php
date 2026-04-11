@@ -34,6 +34,7 @@ class Article implements RouteInterface
         $this->routes[] = new Route('POST /publish/article/@id:[0-9]+', $articleController, 'publish');
         $this->routes[] = new Route('GET  /redactor', $articleController, 'home');
         $this->routes[] = new Route('GET  /redactor/help', $articleController, 'help');
+        $this->routes[] = new Route('GET  /topArticles', $articleController, 'topArticlesByPeriod');
 
         return $this->routes;
     }

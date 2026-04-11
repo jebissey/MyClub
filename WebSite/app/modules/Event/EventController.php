@@ -8,7 +8,6 @@ use DateTime;
 use Throwable;
 
 use app\enums\ApplicationError;
-use app\enums\DuplicationEventMode;
 use app\enums\EventAudience;
 use app\enums\EventSearchMode;
 use app\enums\FilterInputRule;
@@ -16,7 +15,6 @@ use app\enums\Period;
 use app\exceptions\QueryException;
 use app\helpers\Application;
 use app\helpers\GravatarHandler;
-use app\helpers\PeriodHelper;
 use app\helpers\TranslationManager;
 use app\helpers\WebApp;
 use app\models\CrosstabDataHelper;
@@ -102,7 +100,7 @@ class EventController extends AbstractController
             'crosstabData' => $crosstabData,
             'period' => $period,
             'dateRange' => $dateRange,
-            'availablePeriods' => PeriodHelper::gets(),
+            'availablePeriods' => Period::gets($this->languagesDataHelper),
             'navbarTemplate' => '../../Webmaster/views/navbar/eventManager.latte',
             'title' => 'Animateurs vs type d\'événement',
             'totalLabels' => ['événements', 'participants'],

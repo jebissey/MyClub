@@ -10,7 +10,6 @@ use PDO;
 use app\enums\Period;
 use app\helpers\Application;
 use app\helpers\MyClubDateTime;
-use app\helpers\PeriodHelper;
 
 class LogDataHelper extends Data
 {
@@ -174,7 +173,7 @@ class LogDataHelper extends Data
 
     public function getTopPages(Period $period, int $top): array
     {
-        $dateCondition = PeriodHelper::getDateConditions($period);
+        $dateCondition = $period->dateConditions('CreatedAt');
 
         $sql = "
             SELECT Uri, COUNT(*) AS visits

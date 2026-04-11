@@ -8,7 +8,6 @@ use PDO;
 
 use app\enums\Period;
 use app\helpers\Application;
-use app\helpers\PeriodHelper;
 
 class CrosstabDataHelper extends Data
 {
@@ -82,7 +81,7 @@ class CrosstabDataHelper extends Data
             ORDER BY p.LastName, p.FirstName
         ";
 
-        $dateRange    = PeriodHelper::getDateRangeFor($period);
+        $dateRange    = $period->dateRange();
         $crosstabData = $this->generateCrosstab(
             $sql,
             [':start' => $dateRange['start'], ':end' => $dateRange['end']],

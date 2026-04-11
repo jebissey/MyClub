@@ -12,13 +12,13 @@ use app\exceptions\QueryException;
 use app\helpers\Application;
 use app\helpers\Backup;
 use app\helpers\GravatarHandler;
-use app\helpers\PeriodHelper;
 use app\helpers\TranslationManager;
 use app\helpers\WebApp;
 use app\models\ArticleCrosstabDataHelper;
 use app\models\ArticleDataHelper;
 use app\models\ArticleTableDataHelper;
 use app\models\AuthorizationDataHelper;
+use app\models\LogDataHelper;
 use app\models\MessageDataHelper;
 use app\models\PersonDataHelper;
 use app\modules\Article\services\ArticleAuthorizationService;
@@ -30,6 +30,7 @@ use app\valueObjects\EmailMessage;
 
 class ArticleController extends TableController
 {
+    private const TOP = 50;
     private ArticleAuthorizationService $authorizationService;
 
     public function __construct(
@@ -41,6 +42,7 @@ class ArticleController extends TableController
         private ArticleCrosstabDataHelper $articleCrosstabDataHelper,
         private MessageDataHelper $messageDataHelper,
         private EmailService $emailService,
+        private LogDataHelper $logDataHelper,
     ) {
         parent::__construct($application);
         $this->authorizationService = new ArticleAuthorizationService(
@@ -508,20 +510,50 @@ class ArticleController extends TableController
             return;
         }
         $period = Period::from($this->flight->request()->query->period ?? 'month');
-        $dateRange = PeriodHelper::getDateRangeFor($period);
+        $dateRange = $period->dateRange();
         $crosstabData = $this->articleCrosstabDataHelper->getItems($dateRange);
 
         $this->render('Common/views/crosstab.latte', $this->getAllParams([
             'crosstabData' => $crosstabData,
             'period' => $period,
             'dateRange' => $dateRange,
-            'availablePeriods' => PeriodHelper::gets(),
+            'availablePeriods' => Period::gets($this->languagesDataHelper),
             'navbarTemplate' => '../../Webmaster/views/navbar/redactor.latte',
             'title' => 'Rédacteurs vs audience',
             'totalLabels' => ['articles', ''],
             'page' => $this->application->getConnectedUser()->getPage(1),
         ]));
     }
+
+    public function topArticlesByPeriod(): void
+    {
+        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isRedactor())) {
+            return;
+        }
+
+        $period        = Period::fromRequest($this->application, $this->flight->request());
+        $dateCondition = $period->dateConditions('CreatedAt');
+        $topPages      = $this->logDataHelper->getTopArticles($dateCondition, self::TOP);
+
+        $articleIds = array_values(array_filter(
+            array_map(fn($p) => $p->articleId ?? null, $topPages)
+        ));
+        $authors = $this->articleDataHelper->getAuthorsByArticleIds($articleIds);
+
+        foreach ($topPages as $page) {
+            $author             = $authors[$page->articleId ?? null] ?? null;
+            $page->AuthorName   = $author?->PersonName;
+            $page->ArticleTitle = $author?->ArticleTitle;
+        }
+
+        $this->render('Article/views/topArticles.latte', $this->getAllParams([
+            'title'    => 'Top des articles visités par période',
+            'period'   => $period->value,
+            'topPages' => $topPages,
+            'page'     => $this->application->getConnectedUser()->getPage(),
+        ]));
+    }
+
 
     public function update(int $id): void
     {

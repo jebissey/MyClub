@@ -37,7 +37,7 @@
                                 {var $v = $item->{$column['field']}}
                                 {if $v !== null}
                                     {var $s = (string) $v}
-                                    {if mb_strlen($s) > 200}
+                                    {if mb_strlen($s) > 400}
                                         {$s|truncate:50}
                                     {else}
                                         {$s}

@@ -8,7 +8,6 @@ use DateTime;
 use DateTimeInterface;
 use IntlDateFormatter;
 
-use app\enums\WeekdayFormat;
 use app\models\MetadataDataHelper;
 
 class TranslationManager
