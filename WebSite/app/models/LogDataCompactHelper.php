@@ -26,10 +26,12 @@ class LogDataCompactHelper extends Data
             $last = new DateTime($metadata->Compact_lastDate);
             $now  = new DateTime();
             $daysSinceLast = (int)$last->diff($now)->format('%a');
+            $countBefore = (int)$this->pdoForLog->query("SELECT COUNT(*) FROM Log")->fetchColumn();
             if ($daysSinceLast >= (int)$metadata->Compact_everyXdays) {
-                $countBefore = (int)$this->pdoForLog->query("SELECT COUNT(*) FROM Log")->fetchColumn();
-                if ($this->compactRows($removeOlderThanXmonths, $compactOlderThanXmonths)) {
-                    $this->set('Metadata', ['Compact_lastDate' => (new DateTime())->format('Y-m-d H:i:s')], ['Id' => 1]);
+                $this->compactRows($removeOlderThanXmonths, $compactOlderThanXmonths);
+                $this->set('Metadata', ['Compact_lastDate' => (new DateTime())->format('Y-m-d H:i:s')], ['Id' => 1]);
+            } else {
+                if (random_int(1, 1000) === 1) {
                     $this->enforceMaxRecordsAndLog($maxRecords, $countBefore);
                 }
             }
@@ -37,7 +39,7 @@ class LogDataCompactHelper extends Data
     }
 
     #region Private functions
-    private function compactRows(int $removeOlderThanXmonths, int $compactOlderThanXmonths): bool
+    private function compactRows(int $removeOlderThanXmonths, int $compactOlderThanXmonths): void
     {
         if ($removeOlderThanXmonths <= $compactOlderThanXmonths) {
             throw new InvalidArgumentException(
@@ -93,8 +95,6 @@ class LogDataCompactHelper extends Data
             $this->pdoForLog->exec("VACUUM");
 
             (new LogDataWriterHelper($this->application))->add((string)ApplicationError::Ok->value, "Compact log: {$deletedRows} old deleted, {$compactedInserted} compacted, {$compactedDeleted} compacted deleted");
-
-            return $deletedRows + $compactedDeleted > 0;
         } catch (Throwable $e) {
             if ($this->pdoForLog->inTransaction()) {
                 $this->pdoForLog->rollBack();
@@ -104,8 +104,6 @@ class LogDataCompactHelper extends Data
                 (string)ApplicationError::Error->value,
                 "Compact log FAILED: " . $e->getMessage()
             );
-
-            return false;
         }
     }
 
