@@ -53,7 +53,11 @@ class RegistrationController extends TableController
                 'resetUrl' => '/registration',
                 'layout' => $this->getLayout(),
                 'navItems' => $this->getNavItems($connectedUser->person ?? false),
-                'page' => $this->application->getConnectedUser()->getPage()
+                'page' => $this->application->getConnectedUser()->getPage(),
+                'translations' => [
+                    'errorLoadGroups' => $this->languagesDataHelper->translate('person_manager.registration.error.load_groups'),
+                    'errorGeneric'    => $this->languagesDataHelper->translate('person_manager.registration.error.generic'),
+                ],
             ]));
         }
     }
@@ -61,7 +65,7 @@ class RegistrationController extends TableController
     public function getPersonGroups($personId)
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isGroupManager())) {
-            [$availableGroups, $currentGroups] = $this->groupDataHelper->getAvailableGroups($this->application->getConnectedUser(), $personId);
+            [$availableGroups, $currentGroups] = $this->groupDataHelper->getAvailableGroups($this->application->getConnectedUser());
 
             try {
                 $this->render('PersonManager/views/registration_user_groups_partial.latte', $this->getAllParams([

@@ -90,15 +90,3 @@
     </div>
 </div>
 {/if}
-
-<script>
-document.getElementById('filterForm').addEventListener('submit', function () {
-    const inputs = this.querySelectorAll('input[name]');
-    
-    inputs.forEach(input => {
-        if (!input.value.trim()) {
-            input.disabled = true;
-        }
-    });
-});
-</script>

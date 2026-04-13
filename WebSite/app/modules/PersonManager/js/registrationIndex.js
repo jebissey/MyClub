@@ -1,6 +1,6 @@
 import ApiClient from '../../Common/js/ApiClient.js';
 
-const api = new ApiClient('');
+const api = new ApiClient();
 
 let groupsModal = null;
 
@@ -17,14 +17,11 @@ function initGroups() {
 
 async function showGroups(personId) {
     try {
-        const response = await fetch(`/registration/groups/${personId}`);
-        const html = await response.text();
-
+        const html = await api.getHtml(`/registration/groups/${personId}`);
         document.getElementById('groupsContent').innerHTML = html;
         groupsModal?.show();
-
     } catch (err) {
-        alert('Impossible de charger les groupes : ' + err.message);
+        alert(`${window.t('errorLoadGroups')} : ${err.message}`);
     }
 }
 
@@ -37,7 +34,7 @@ async function addToGroup(personId, groupId) {
     if (result.success) {
         await showGroups(personId);
     } else {
-        alert(result.message || 'Une erreur est survenue');
+        alert(result.message || window.t('errorGeneric'));
     }
 }
 
@@ -50,7 +47,7 @@ async function removeFromGroup(personId, groupId) {
     if (result.success) {
         await showGroups(personId);
     } else {
-        alert(result.message || 'Une erreur est survenue');
+        alert(result.message || window.t('errorGeneric'));
     }
 }
 

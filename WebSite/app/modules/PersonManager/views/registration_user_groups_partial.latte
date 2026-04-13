@@ -1,35 +1,34 @@
 <div class="row">
     <div class="col-md-6">
-        <h4>Groupes actuels supprimables</h4>
+        <h4>{='person_manager.registration.groups.current'|translate}</h4>
         <ul class="list-group">
             {foreach $currentGroups as $group}
                 <li class="list-group-item">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
                             <strong>{$group->Name}</strong>
-
                         </div>
-                        <button class="btn btn-danger btn-sm" 
+                        <button class="btn btn-danger btn-sm"
                                 onclick="removeFromGroup({$personId}, {$group->Id})"
                                 {if $group->Authorizations && !$isWebmaster}disabled{/if}>
-                            Retirer
+                            {='person_manager.registration.action.remove'|translate}
                         </button>
                     </div>
                 </li>
             {/foreach}
         </ul>
     </div>
-    
+
     <div class="col-md-6">
-        <h4>Groupes disponibles ajoutables</h4>
+        <h4>{='person_manager.registration.groups.available'|translate}</h4>
         <ul class="list-group">
             {foreach $availableGroups as $group}
                 <li class="list-group-item">
                     <div class="d-flex justify-content-between align-items-center">
                         {$group->Name}
-                        <button class="btn btn-success btn-sm" 
+                        <button class="btn btn-success btn-sm"
                                 onclick="addToGroup({$personId}, {$group->Id})">
-                            Ajouter
+                            {='person_manager.registration.action.add'|translate}
                         </button>
                     </div>
                 </li>

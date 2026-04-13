@@ -1,14 +1,14 @@
 {extends $layout}
 
-{block title}Inscriptions{/block}
+{block title}{='person_manager.registration.title'|translate}{/block}
 
 {block content}
-    <h2>Inscription aux groupes</h2>    
+    <h2>{='person_manager.registration.page_title'|translate}</h2>
     {include '../../Common/views/dataTable.latte',
         'columns' => [
-            ['field' => 'LastName', 'label' => 'Nom'],
-            ['field' => 'FirstName', 'label' => 'Prénom'],
-            ['field' => 'NickName', 'label' => 'Surnom'],
+            ['field' => 'LastName', 'label' => ('person_manager.registration.column.last_name'|translate)],
+            ['field' => 'FirstName', 'label' => ('person_manager.registration.column.first_name'|translate)],
+            ['field' => 'NickName', 'label' => ('person_manager.registration.column.nickname'|translate)],
         ],
         'items' => $persons,
         'actions' => [
@@ -21,12 +21,18 @@
         ],
         'modal' => [
             'id' => 'groupsModal',
-            'title' => 'Gestion des groupes',
+            'title' => ('person_manager.registration.modal.title'|translate),
             'contentId' => 'groupsContent'
         ]
     }
 {/block}
 
 {block scripts}
+    <script>
+        window.i18n = {=json_encode($translations)|noescape};
+        window.t = function(key) {
+            return window.i18n?.[key] ?? key;
+        };
+    </script>
     <script type="module" src="/app/modules/PersonManager/js/registrationIndex.js"></script>
 {/block}

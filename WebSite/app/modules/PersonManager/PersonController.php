@@ -65,6 +65,12 @@ class PersonController extends TableController
                 'isSelfEdit' => false,
                 'layout' => $this->getLayout(),
                 'page' => $this->application->getConnectedUser()->getPage(),
+                'translations' => [
+                    'account.form.emoji.select_label'     => $this->languagesDataHelper->translate('account.form.emoji.select_label'),
+                    'account.form.emoji.missing_elements' => $this->languagesDataHelper->translate('account.form.emoji.missing_elements'),
+                    'account.form.emoji.none_detected'    => $this->languagesDataHelper->translate('account.form.emoji.none_detected'),
+                    'account.form.emoji.selected'         => $this->languagesDataHelper->translate('account.form.emoji.selected'),
+                ],
             ]));
         }
     }
@@ -106,7 +112,7 @@ class PersonController extends TableController
             $isDuplicate = $isNewRecord
                 ? $existing !== null
                 : ($existing && $existing->Id !== $person->Id);
-       
+
             if ($isDuplicate) {
                 $fullName = trim(($existing->FirstName ?? '') . ' ' . ($existing->LastName ?? ''));
                 $status = ($existing->Inactivated ?? 1) ? 'Disabled' : 'Active';
