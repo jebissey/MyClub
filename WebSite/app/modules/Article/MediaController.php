@@ -70,36 +70,47 @@ class MediaController extends AbstractController
     public function listFiles(): void
     {
         $connectedUser = $this->application->getConnectedUser();
+
         if (!($connectedUser->isRedactor() ?? false)) {
             $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
+
         if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
-        $flightRequestQuery = $this->flight->request()->query;
-        $year = $flightRequestQuery->year ?? date('Y');
-        $month = $flightRequestQuery->month ?? '';
-        $fileExtension = $flightRequestQuery->fileExtension ?? '';
-        $search = $flightRequestQuery->search ?? '';
-        $files = [];
-        $years = $this->getAvailableYears();
-        if (in_array($year, $years) || in_array($year, $years)) $files = $this->getFiles((int)$year, $month, $fileExtension, $search);
 
-        $this->render('Article/views/media_index.latte',  $this->getAllParams([
-            'files' => $files,
-            'years' => $years,
-            'currentYear' => $year,
-            'months' => $this->getMonths((int)$year),
-            'currentMonth' => $month,
-            'fileExtensions' => $this->getFileExtensions($year),
+        $query = $this->flight->request()->query;
+
+        $year          = isset($query->year) && $query->year !== '' ? (int)$query->year : (int)date('Y');
+        $month         = $query->month         ?? '';
+        $fileExtension = $query->fileExtension ?? '';
+        $search        = trim($query->search ?? '');
+        $unusedOnly    = isset($query->unusedOnly) && $query->unusedOnly === '1';
+
+        $years = $this->getAvailableYears();
+        if (!in_array($year, $years)) {
+            $year = (int)date('Y');
+        }
+        if ($month !== '' && !in_array($month, $this->getMonths($year))) {
+            $month = '';
+        }
+
+        $this->render('Article/views/media_index.latte', $this->getAllParams([
+            'files'                => $this->getFiles($year, $month, $fileExtension, $search, $unusedOnly),
+            'years'                => $years,
+            'currentYear'          => $year,
+            'months'               => $this->getMonths($year),
+            'currentMonth'         => $month,
+            'fileExtensions'       => $this->getFileExtensions($year),
             'currentFileExtension' => $fileExtension,
-            'search' => $search,
-            'baseUrl' => WebApp::getBaseUrl(),
-            'page' => $this->application->getConnectedUser()->getPage(),
-            'groups' => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
-            'isEditor' => $connectedUser->isEditor(),
+            'search'               => $search,
+            'unusedOnly'           => $unusedOnly,
+            'baseUrl'              => WebApp::getBaseUrl(),
+            'page'                 => $connectedUser->getPage(),
+            'groups'               => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
+            'isEditor'             => $connectedUser->isEditor(),
         ]));
     }
 
@@ -130,9 +141,9 @@ class MediaController extends AbstractController
         }
         $path = $this->flight->request()->query->path ?? '';
         $this->render('Article/views/media_uses.latte', $this->getAllParams([
-            'path' => $path,
-            'articles' => $path !== '' ? $this->articleDataHelper->inArticles($path) : [],
-            'page' => $this->application->getConnectedUser()->getPage(),
+            'path'            => $path,
+            'articles'        => $path !== '' ? $this->articleDataHelper->inArticles($path) : [],
+            'page'            => $this->application->getConnectedUser()->getPage(),
             'btn_HistoryBack' => true,
         ]));
     }
@@ -154,14 +165,13 @@ class MediaController extends AbstractController
             return;
         }
         $finfo = finfo_open(FILEINFO_MIME_TYPE);
-        $mime = finfo_file($finfo, $filePath);
+        $mime  = finfo_file($finfo, $filePath);
         finfo_close($finfo);
 
         header('Content-Type: ' . $mime);
         header('Content-Length: ' . filesize($filePath));
         header('Content-Disposition: inline; filename="' . $filename . '"');
         readfile($filePath);
-        return;
     }
 
     #region Private functions
@@ -184,7 +194,7 @@ class MediaController extends AbstractController
         readfile($file);
     }
 
-    private function fileShared(string $path)
+    private function fileShared(string $path): bool
     {
         return $this->sharedFileDataHelper->isShared($path);
     }
@@ -195,7 +205,9 @@ class MediaController extends AbstractController
         if (file_exists(Media::GetMediaPath()) && is_dir(Media::GetMediaPath())) {
             $dirs = scandir(Media::GetMediaPath());
             foreach ($dirs as $dir) {
-                if ($dir !== '.' && $dir !== '..' && is_dir(Media::GetMediaPath() . $dir) && is_numeric($dir)) $years[] = $dir;
+                if ($dir !== '.' && $dir !== '..' && is_dir(Media::GetMediaPath() . $dir) && is_numeric($dir)) {
+                    $years[] = $dir;
+                }
             }
             rsort($years);
         }
@@ -212,7 +224,7 @@ class MediaController extends AbstractController
                 if ($year !== '.' && $year !== '..' && is_dir($basePath . $year)) {
                     $months = scandir($basePath . $year);
                     foreach ($months as $month) {
-                        if ($month !== '.' && $month !== '..' && is_dir($basePath . $year . DIRECTORY_SEPARATOR .  $month)) {
+                        if ($month !== '.' && $month !== '..' && is_dir($basePath . $year . DIRECTORY_SEPARATOR . $month)) {
                             $files = scandir($basePath . $year . DIRECTORY_SEPARATOR . $month);
                             foreach ($files as $file) {
                                 if (is_file($basePath . $year . DIRECTORY_SEPARATOR . $month . DIRECTORY_SEPARATOR . $file)) {
@@ -242,7 +254,7 @@ class MediaController extends AbstractController
                     if (!(is_numeric($year) && (int)$year === $yearRequested)) continue;
                     $months = scandir($basePath . $year);
                     foreach ($months as $month) {
-                        if ($month !== '.' && $month !== '..' && is_dir($basePath . $year . DIRECTORY_SEPARATOR .  $month)) {
+                        if ($month !== '.' && $month !== '..' && is_dir($basePath . $year . DIRECTORY_SEPARATOR . $month)) {
                             $files = scandir($basePath . $year . DIRECTORY_SEPARATOR . $month);
                             foreach ($files as $file) {
                                 if (is_file($basePath . $year . DIRECTORY_SEPARATOR . $month . DIRECTORY_SEPARATOR . $file)) {
@@ -260,7 +272,7 @@ class MediaController extends AbstractController
         return $foundMonths;
     }
 
-    private function getFiles(int $year, string $monthFiltered, string $fileExtension, string $search = ''): array
+    private function getFiles(int $year, string $monthFiltered, string $fileExtension, string $search = '', bool $unusedOnly = false): array
     {
         $files = [];
         $yearPath = Media::GetMediaPath() . $year . '/';
@@ -269,7 +281,7 @@ class MediaController extends AbstractController
             $months = scandir($yearPath);
             foreach ($months as $month) {
                 if ($month !== '.' && $month !== '..' && is_dir($yearPath . $month)) {
-                    $monthPath = $yearPath . $month . '/';
+                    $monthPath  = $yearPath . $month . '/';
                     $monthFiles = scandir($monthPath);
                     foreach ($monthFiles as $file) {
                         $testedFile = $monthPath . $file;
@@ -279,17 +291,25 @@ class MediaController extends AbstractController
                             && ($monthFiltered === '' || $monthFiltered === $month)
                         ) {
                             if (empty($search) || stripos($file, $search) !== false) {
-                                $path = 'data' . DIRECTORY_SEPARATOR . 'media' . DIRECTORY_SEPARATOR . $year . DIRECTORY_SEPARATOR . $month . DIRECTORY_SEPARATOR . $file;
+                                $path      = 'data' . DIRECTORY_SEPARATOR . 'media' . DIRECTORY_SEPARATOR . $year . DIRECTORY_SEPARATOR . $month . DIRECTORY_SEPARATOR . $file;
+                                $inGalery  = $this->inGalery($path);
+                                $inArticle = $this->inArticle($path);
+                                $shared    = $this->fileShared($path);
+
+                                if ($unusedOnly && ($inGalery || $inArticle || $shared)) {
+                                    continue;
+                                }
+
                                 $files[] = [
-                                    'name' => $file,
-                                    'path' =>  $path,
-                                    'url' => WebApp::getBaseUrl() . $path,
-                                    'size' => filesize($monthPath . $file),
-                                    'date' => date('Y-m-d H:i:s', filemtime($monthPath . $file)),
-                                    'month' => $month,
-                                    'inGalery' => $this->inGalery($path),
-                                    'inArticle' => $this->inArticle($path),
-                                    'shared' => $this->fileShared($path),
+                                    'name'      => $file,
+                                    'path'      => $path,
+                                    'url'       => WebApp::getBaseUrl() . $path,
+                                    'size'      => filesize($monthPath . $file),
+                                    'date'      => date('Y-m-d H:i:s', filemtime($monthPath . $file)),
+                                    'month'     => $month,
+                                    'inGalery'  => $inGalery,
+                                    'inArticle' => $inArticle,
+                                    'shared'    => $shared,
                                 ];
                             }
                         }
@@ -297,9 +317,7 @@ class MediaController extends AbstractController
                 }
             }
         }
-        usort($files, function ($a, $b) {
-            return strtotime($b['date']) - strtotime($a['date']);
-        });
+        usort($files, fn($a, $b) => strtotime($b['date']) - strtotime($a['date']));
         return $files;
     }
 
