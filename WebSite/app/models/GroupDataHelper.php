@@ -104,7 +104,19 @@ class GroupDataHelper extends Data
                 g.Id,
                 g.Name,
                 g.SelfRegistration,
-                GROUP_CONCAT(a.Name) AS Authorizations
+                REPLACE(
+                    (
+                        SELECT GROUP_CONCAT(Name)
+                        FROM (
+                            SELECT a2.Name
+                            FROM Authorization a2
+                            JOIN GroupAuthorization ga2 ON ga2.IdAuthorization = a2.Id
+                            WHERE ga2.IdGroup = g.Id
+                            ORDER BY a2.Name
+                        )
+                    ),
+                    ',', ', '
+                ) AS Authorizations                
             FROM `Group` g
             LEFT JOIN GroupAuthorization ga ON g.Id = ga.IdGroup
             LEFT JOIN Authorization a ON ga.IdAuthorization = a.Id

@@ -61,18 +61,20 @@ abstract class AbstractController
         return Params::getAll($specificParams, $this->prodSiteUrl, $this->memberAlert);
     }
 
-    protected function getLayout()
+    protected function getLayout(): string
     {
         $navbar = $_SESSION['navbar'] ?? '';
-        if ($navbar == 'user')                 return 'user.latte';
-        else if ($navbar == 'eventManager')    return '../../Webmaster/views/eventManager.latte';
-        else if ($navbar == 'personManager')   return '../../Webmaster/views/personManager.latte';
-        else if ($navbar == 'redactor')        return '../../Webmaster/views/redactor.latte';
-        else if ($navbar == 'visitorInsights') return '../../Webmaster/views/visitorInsights.latte';
-        else if ($navbar == 'webmaster')       return '../../Webmaster/views/webmaster.latte';
-        else if ($navbar == '')                return '../../Common/views/home.latte';
 
-        Application::unreachable("Fatal error in file  with navbar={$navbar}", __FILE__, __LINE__);
+        return match ($navbar) {
+            'user'              => '../../User/views/user.latte',
+            'eventManager'      => '../../Webmaster/views/eventManager.latte',
+            'personManager'     => '../../Webmaster/views/personManager.latte',
+            'redactor'          => '../../Webmaster/views/redactor.latte',
+            'visitorInsights'   => '../../Webmaster/views/visitorInsights.latte',
+            'webmaster'         => '../../Webmaster/views/webmaster.latte',
+            ''                  => '../../Common/views/home.latte',
+            default => Application::unreachable("Fatal error in file with navbar={$navbar}", __FILE__, __LINE__),
+        };
     }
 
     /**
@@ -93,7 +95,8 @@ abstract class AbstractController
         $navItems = $this->dataHelper->gets(
             'MenuItem',
             $filter,
-            'Id, Label AS Name, Url AS Route, IdGroup, ForMembers, ForContacts, ForAnonymous, What, Type, Label, Icon, Url', 'Position'
+            'Id, Label AS Name, Url AS Route, IdGroup, ForMembers, ForContacts, ForAnonymous, What, Type, Label, Icon, Url',
+            'Position'
         );
 
         $filteredNavItems = [];
@@ -149,15 +152,17 @@ abstract class AbstractController
 
     protected function redirect(string $url, ?ApplicationError $applicationError = null, ?string $message = null): void
     {
-        if ($applicationError != null) $this->flight->setData('code', $applicationError->value);
-        if ($message != null) $this->flight->setData('message', $message);
+        if ($applicationError !== null) $this->flight->setData('code', $applicationError->value);
+        if ($message !== null) $this->flight->setData('message', $message);
 
-        // for test with curl
         $ua = $_SERVER['HTTP_USER_AGENT'] ?? '';
         if (stripos($ua, 'TestDevice') !== false) {
-            $this->application->getFlight()->response()->status($applicationError->value ?? ApplicationError::Ok->value);
+            $statusCode = $applicationError?->value ?? ApplicationError::Ok->value;
+            $this->application->getFlight()->response()->status($statusCode);
             $this->application->getFlight()->response()->write((string)($message ?? ''));
-        } else $this->application->getFlight()->redirect($url);
+        } else {
+            $this->application->getFlight()->redirect($url);
+        }
     }
 
     protected function userIsAllowedAndMethodIsGood(string $method, callable $permissionCheck): bool
@@ -177,7 +182,7 @@ abstract class AbstractController
     #region Public functions
     public function render(string $templateLatteName, object|array $params = []): void
     {
-#error_log("\n\n" . json_encode($templateLatteName, JSON_PRETTY_PRINT) . "\n");
+        #error_log("\n\n" . json_encode($templateLatteName, JSON_PRETTY_PRINT) . "\n");
         $content = $this->latte->renderToString($templateLatteName, $params);
         echo $content;
         if (ob_get_level()) ob_end_flush();
