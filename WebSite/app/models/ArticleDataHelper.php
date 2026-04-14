@@ -194,6 +194,25 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
         return $news;
     }
 
+    public function getPathsUsedInArticles(array $paths): array
+    {
+        if (empty($paths)) return [];
+
+        $stmt = $this->pdo->query("SELECT Content FROM Article WHERE PublishedBy IS NOT NULL");
+        $contents = $stmt->fetchAll(PDO::FETCH_COLUMN);
+
+        $used = [];
+        foreach ($paths as $path) {
+            foreach ($contents as $content) {
+                if ($content !== null && str_contains($content, $path)) {
+                    $used[$path] = true;
+                    break;
+                }
+            }
+        }
+        return $used; // ['data/media/2024/01/photo.jpg' => true, ...]
+    }
+
     public function getSpotlightArticle(): mixed
     {
         $spotlightArticleJson = $this->get('Settings', ['Name' => 'SpotlightArticle'], 'Value')->Value ?? '';
@@ -213,18 +232,6 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':id' => $id]);
         return $stmt->fetch();
-    }
-
-    public function inArticle(string $path): bool
-    {
-        $sql = "SELECT 1 
-            FROM Article 
-            WHERE Content LIKE :path 
-            LIMIT 1";
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([':path' => '%' . $path . '%']);
-
-        return (bool) $stmt->fetchColumn();
     }
 
     public function inArticles(string $path): array

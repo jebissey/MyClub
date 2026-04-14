@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace app\models;
 
+use PDO;
+
 use app\helpers\Application;
 
 class CarouselDataHelper extends Data
@@ -30,15 +32,23 @@ class CarouselDataHelper extends Data
         }
     }
 
-    public function inGalery(string $path): bool
-    {
-        $sql = "SELECT 1 
-            FROM Carousel 
-            WHERE Item LIKE :path 
-            LIMIT 1";
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([':path' => '%' . $path . '%']);
 
-        return (bool) $stmt->fetchColumn();
+    public function getPathsUsedInGalery(array $paths): array
+    {
+        if (empty($paths)) return [];
+
+        $stmt = $this->pdo->query("SELECT Item FROM Carousel");
+        $items = $stmt->fetchAll(PDO::FETCH_COLUMN);
+
+        $used = [];
+        foreach ($paths as $path) {
+            foreach ($items as $item) {
+                if ($item !== null && str_contains($item, $path)) {
+                    $used[$path] = true;
+                    break;
+                }
+            }
+        }
+        return $used;
     }
 }

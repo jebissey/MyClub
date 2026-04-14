@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace app\models;
 
+use PDO;
+
 use app\helpers\Application;
 
 class SharedFileDataHelper extends Data
@@ -13,15 +15,23 @@ class SharedFileDataHelper extends Data
         parent::__construct($application);
     }
 
-    public function isShared(string $path): bool
+    public function getPathsShared(array $paths): array
     {
-        $sql = "SELECT 1 
-            FROM SharedFile
-            WHERE Item LIKE :path AND Token IS NOT NULL
-            LIMIT 1";
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([':path' => '%' . $path]);
-        return (bool) $stmt->fetchColumn();
+        if (empty($paths)) return [];
+
+        $stmt = $this->pdo->query("SELECT Item FROM SharedFile WHERE Token IS NOT NULL");
+        $items = $stmt->fetchAll(PDO::FETCH_COLUMN);
+
+        $used = [];
+        foreach ($paths as $path) {
+            foreach ($items as $item) {
+                if ($item !== null && str_ends_with($item, $path)) {
+                    $used[$path] = true;
+                    break;
+                }
+            }
+        }
+        return $used;
     }
 
     public function getSharedFile(string $path): object | false

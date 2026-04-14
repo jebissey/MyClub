@@ -194,11 +194,6 @@ class MediaController extends AbstractController
         readfile($file);
     }
 
-    private function fileShared(string $path): bool
-    {
-        return $this->sharedFileDataHelper->isShared($path);
-    }
-
     private function getAvailableYears(): array
     {
         $years = [];
@@ -274,60 +269,69 @@ class MediaController extends AbstractController
 
     private function getFiles(int $year, string $monthFiltered, string $fileExtension, string $search = '', bool $unusedOnly = false): array
     {
-        $files = [];
         $yearPath = Media::GetMediaPath() . $year . '/';
 
-        if (file_exists($yearPath) && is_dir($yearPath)) {
-            $months = scandir($yearPath);
-            foreach ($months as $month) {
-                if ($month !== '.' && $month !== '..' && is_dir($yearPath . $month)) {
-                    $monthPath  = $yearPath . $month . '/';
-                    $monthFiles = scandir($monthPath);
-                    foreach ($monthFiles as $file) {
-                        $testedFile = $monthPath . $file;
-                        if (
-                            is_file($testedFile)
-                            && ($fileExtension === '' || $fileExtension === pathinfo($testedFile, PATHINFO_EXTENSION))
-                            && ($monthFiltered === '' || $monthFiltered === $month)
-                        ) {
-                            if (empty($search) || stripos($file, $search) !== false) {
-                                $path      = 'data' . DIRECTORY_SEPARATOR . 'media' . DIRECTORY_SEPARATOR . $year . DIRECTORY_SEPARATOR . $month . DIRECTORY_SEPARATOR . $file;
-                                $inGalery  = $this->inGalery($path);
-                                $inArticle = $this->inArticle($path);
-                                $shared    = $this->fileShared($path);
+        if (!file_exists($yearPath) || !is_dir($yearPath)) {
+            return [];
+        }
 
-                                if ($unusedOnly && ($inGalery || $inArticle || $shared)) {
-                                    continue;
-                                }
+        $candidates = [];
+        foreach (scandir($yearPath) as $month) {
+            if ($month === '.' || $month === '..' || !is_dir($yearPath . $month)) continue;
+            if ($monthFiltered !== '' && $monthFiltered !== $month) continue;
 
-                                $files[] = [
-                                    'name'      => $file,
-                                    'path'      => $path,
-                                    'url'       => WebApp::getBaseUrl() . $path,
-                                    'size'      => filesize($monthPath . $file),
-                                    'date'      => date('Y-m-d H:i:s', filemtime($monthPath . $file)),
-                                    'month'     => $month,
-                                    'inGalery'  => $inGalery,
-                                    'inArticle' => $inArticle,
-                                    'shared'    => $shared,
-                                ];
-                            }
-                        }
-                    }
-                }
+            $monthPath = $yearPath . $month . '/';
+            foreach (scandir($monthPath) as $file) {
+                $testedFile = $monthPath . $file;
+                if (!is_file($testedFile)) continue;
+                if ($fileExtension !== '' && pathinfo($testedFile, PATHINFO_EXTENSION) !== $fileExtension) continue;
+                if ($search !== '' && stripos($file, $search) === false) continue;
+
+                $path = 'data' . DIRECTORY_SEPARATOR . 'media' . DIRECTORY_SEPARATOR
+                    . $year . DIRECTORY_SEPARATOR . $month . DIRECTORY_SEPARATOR . $file;
+
+                $candidates[] = [
+                    'name'      => $file,
+                    'path'      => $path,
+                    'monthPath' => $monthPath,
+                    'month'     => $month,
+                ];
             }
         }
+
+        if (empty($candidates)) return [];
+
+        $allPaths  = array_column($candidates, 'path');
+        $inArticle = $this->articleDataHelper->getPathsUsedInArticles($allPaths);
+        $inGalery  = $this->carouselDataHelper->getPathsUsedInGalery($allPaths);
+        $shared    = $this->sharedFileDataHelper->getPathsShared($allPaths);
+
+        $files = [];
+        foreach ($candidates as $c) {
+            $path      = $c['path'];
+            $usedInArt = $inArticle[$path] ?? false;
+            $usedInGal = $inGalery[$path]  ?? false;
+            $isShared  = $shared[$path]    ?? false;
+
+            if ($unusedOnly && ($usedInGal || $usedInArt || $isShared)) {
+                continue;
+            }
+
+            $fullPath  = $c['monthPath'] . $c['name'];
+            $files[] = [
+                'name'      => $c['name'],
+                'path'      => $path,
+                'url'       => WebApp::getBaseUrl() . $path,
+                'size'      => filesize($fullPath),
+                'date'      => date('Y-m-d H:i:s', filemtime($fullPath)),
+                'month'     => $c['month'],
+                'inGalery'  => $usedInGal,
+                'inArticle' => $usedInArt,
+                'shared'    => $isShared,
+            ];
+        }
+
         usort($files, fn($a, $b) => strtotime($b['date']) - strtotime($a['date']));
         return $files;
-    }
-
-    private function inArticle(string $path): bool
-    {
-        return $this->articleDataHelper->inArticle($path);
-    }
-
-    private function inGalery(string $path): bool
-    {
-        return $this->carouselDataHelper->inGalery($path);
     }
 }
