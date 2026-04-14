@@ -295,11 +295,16 @@ class MediaController extends AbstractController
             if ($monthFiltered !== '' && $monthFiltered !== $month) continue;
 
             $monthPath = $yearPath . $month . '/';
+            $fileExtension = strtolower($fileExtension);
             foreach (scandir($monthPath) as $file) {
                 $testedFile = $monthPath . $file;
-                if (!is_file($testedFile)) continue;
-                if ($fileExtension !== '' && pathinfo($testedFile, PATHINFO_EXTENSION) !== $fileExtension) continue;
-                if ($search !== '' && stripos($file, $search) === false) continue;
+                $ext = strtolower(pathinfo($testedFile, PATHINFO_EXTENSION));
+
+                if (
+                    !is_file($testedFile)
+                    || ($fileExtension !== '' && $ext !== $fileExtension)
+                    || ($search !== '' && stripos($file, $search) === false)
+                ) continue;
 
                 $path = 'data' . DIRECTORY_SEPARATOR . 'media' . DIRECTORY_SEPARATOR
                     . $year . DIRECTORY_SEPARATOR . $month . DIRECTORY_SEPARATOR . $file;

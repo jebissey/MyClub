@@ -17,7 +17,7 @@
                     <span class="text-muted rounded bg-dark-subtle px-2 py-1">
                         <strong>{$filteredCount}</strong> / {$totalCount}
                         {if $filteredCount !== $totalCount}
-                            <span class="text-warning">({='media.manager.filtered'|translate})</span>
+                            <span class="text-danger">{='media.manager.filtered'|translate}</span>
                         {/if}
                     </span>
                 </div>
@@ -80,7 +80,6 @@
                         <tr>
                             <th>{='media.manager.table.preview'|translate}</th>
                             <th>{='media.manager.table.name'|translate}</th>
-                            <th>{='media.manager.table.date'|translate}</th>
                             <th>{='media.manager.table.size'|translate}</th>
                             <th>{='media.manager.table.article'|translate}</th>
                             <th>{='media.manager.table.carousel'|translate}</th>
@@ -116,7 +115,6 @@
                                     </div>
                                 {/if}
                             </td>
-                            <td>{$file['date']}</td>
                             <td>{$file['size']|formatFileSize}</td>
                             <td>{if $file['inArticle']}<a href="/media/uses?path={$file['path']}">{='media.manager.table.yes'|translate}</a>{/if}</td>
                             <td>{if $file['inGalery']}<a href="/media/uses?path={$file['path']}">{='media.manager.table.yes'|translate}</a>{/if}</td>
