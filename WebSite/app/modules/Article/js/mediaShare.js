@@ -1,310 +1,151 @@
-document.addEventListener('DOMContentLoaded', function () {
-    let currentFilePath = '';
+const t = (key) => window.t?.(key) ?? key;
 
-    const shareModalElement = document.getElementById('shareModal');
-    const createShareBtn = document.getElementById('createShareBtn');
-    const deleteShareBtn = document.getElementById('deleteShareBtn');
-    const copyShareLink = document.getElementById('copyShareLink');
-    const shareFileName = document.getElementById('shareFileName');
-    const groupSelect = document.getElementById('group-select');
-    const membersOnlyCheckbox = document.getElementById('members-only-checkbox');
-    const shareStatus = document.getElementById('shareStatus');
-    const shareLink = document.getElementById('shareLink');
-    const shareLinkInput = document.getElementById('shareLinkInput');
+// ── Copy URL buttons ──────────────────────────────────────────────────────────
 
-    if (!shareModalElement) {
-        console.error('Modal shareModal introuvable');
-        return;
-    }
+document.querySelectorAll('.copy-url-btn').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+        const url = btn.dataset.url;
+        await navigator.clipboard.writeText(url);
 
-    const shareModal = new bootstrap.Modal(shareModalElement);
-    let currentFileRow = null;
-
-    shareModalElement.addEventListener('hidden.bs.modal', function () {
-        if (currentFileRow && currentFilePath) {
-            updateFileRow(currentFilePath, currentFileRow);
-        }
+        const original = btn.innerHTML;
+        btn.innerHTML = '<i class="bi bi-check"></i>';
+        btn.title = t('urlCopied');
+        setTimeout(() => {
+            btn.innerHTML = original;
+            btn.title = '';
+        }, 1500);
     });
+});
 
-    document.querySelectorAll('.share-file-btn').forEach(btn => {
-        btn.addEventListener('click', function () {
-            currentFilePath = this.dataset.path;
-            currentFileRow = this.closest('tr');
-            const fileName = this.dataset.filename;
-            if (shareFileName) {
-                shareFileName.textContent = fileName;
-            }
-            loadShareInfo(currentFilePath);
-            shareModal.show();
-        });
-    });
+// ── Delete file buttons ───────────────────────────────────────────────────────
 
-    if (groupSelect && membersOnlyCheckbox) {
-        groupSelect.addEventListener('change', function () {
-            if (this.value !== '') {
-                membersOnlyCheckbox.checked = true;
-            }
-        });
-        membersOnlyCheckbox.addEventListener('change', function () {
-            if (!this.checked) {
-                groupSelect.value = '';
-            }
-        });
-    }
+document.querySelectorAll('.delete-file-btn').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+        if (!confirm(t('deleteConfirm'))) return;
 
-    if (createShareBtn) {
-        createShareBtn.addEventListener('click', function () {
-            const idGroup = groupSelect ? groupSelect.value : '';
-            const membersOnly = membersOnlyCheckbox ? (membersOnlyCheckbox.checked ? 1 : 0) : 0;
-            const path = currentFilePath;
-            const pathParts = path.split('/');
-            const year = pathParts[0];
-            const month = pathParts[1];
-            const file = pathParts[2];
+        const path = btn.dataset.path;
 
-            fetch(`/api/media/shareFile/${year}/${month}/${file}`, {
+        try {
+            const res = await fetch('/media/delete', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    idGroup: idGroup,
-                    membersOnly: membersOnly
-                })
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        showShareLink(data.token);
-                        createShareBtn.classList.add('d-none');
-                        if (deleteShareBtn) {
-                            deleteShareBtn.classList.remove('d-none');
-                        }
-                    } else {
-                        alert('Erreur lors de la création du partage: ' + (data.error || 'Erreur inconnue'));
-                    }
-                })
-                .catch(error => {
-                    console.error('Erreur:', error);
-                    alert('Erreur lors de la création du partage');
-                });
-        });
-    }
-
-    if (deleteShareBtn) {
-        deleteShareBtn.addEventListener('click', function () {
-            if (!confirm('Êtes-vous sûr de vouloir supprimer ce partage ?')) return;
-
-            const path = currentFilePath;
-            const pathParts = path.split('/');
-            const year = pathParts[0];
-            const month = pathParts[1];
-            const file = pathParts[2];
-
-            fetch(`/api/media/removeShare/${year}/${month}/${file}`, { method: 'POST' })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        if (shareLink) {
-                            shareLink.classList.add('d-none');
-                        }
-                        if (createShareBtn) {
-                            createShareBtn.classList.remove('d-none');
-                        }
-                        deleteShareBtn.classList.add('d-none');
-                        if (shareStatus) {
-                            shareStatus.innerHTML = '<div class="alert alert-info">Aucun partage actif</div>';
-                        }
-                    } else {
-                        alert('Erreur lors de la suppression du partage: ' + (data.error || 'Erreur inconnue'));
-                    }
-                })
-                .catch(error => {
-                    alert('Erreur lors de la suppression du partage: ' + error);
-                });
-        });
-    }
-
-    if (copyShareLink) {
-        copyShareLink.addEventListener('click', function () {
-            if (!shareLinkInput) return;
-
-            shareLinkInput.select();
-
-            if (navigator.clipboard) {
-                navigator.clipboard.writeText(shareLinkInput.value).then(() => {
-                    const btn = this;
-                    const originalHTML = btn.innerHTML;
-                    btn.innerHTML = '<i class="bi bi-check"></i> Copié !';
-                    setTimeout(() => {
-                        btn.innerHTML = originalHTML;
-                    }, 2000);
-                });
-            } else {
-                // Fallback for old browsers
-                document.execCommand('copy');
-                const btn = this;
-                const originalHTML = btn.innerHTML;
-                btn.innerHTML = '<i class="bi bi-check"></i> Copié !';
-                setTimeout(() => {
-                    btn.innerHTML = originalHTML;
-                }, 2000);
-            }
-        });
-    }
-
-    function loadShareInfo(filePath) {
-        fetch('/api/media/isShared', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ item: filePath })
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success && data.data) {
-                    if (groupSelect) {
-                        groupSelect.value = data.data.IdGroup || '';
-                    }
-                    if (membersOnlyCheckbox) {
-                        membersOnlyCheckbox.checked = data.data.MembersOnly == 1;
-                    }
-                    showShareLink(data.data.Token);
-                    if (createShareBtn) {
-                        createShareBtn.classList.add('d-none');
-                    }
-                    if (deleteShareBtn) {
-                        deleteShareBtn.classList.remove('d-none');
-                    }
-                    if (shareStatus) {
-                        shareStatus.innerHTML = '<div class="alert alert-success">Partage actif</div>';
-                    }
-                } else {
-                    if (groupSelect) {
-                        groupSelect.value = '';
-                    }
-                    if (membersOnlyCheckbox) {
-                        membersOnlyCheckbox.checked = true;
-                    }
-                    if (shareLink) {
-                        shareLink.classList.add('d-none');
-                    }
-                    if (createShareBtn) {
-                        createShareBtn.classList.remove('d-none');
-                    }
-                    if (deleteShareBtn) {
-                        deleteShareBtn.classList.add('d-none');
-                    }
-                    const editShareBtn = document.getElementById('editShareBtn');
-                    if (editShareBtn) {
-                        editShareBtn.classList.add('d-none');
-                    }
-                    if (shareStatus) {
-                        shareStatus.innerHTML = '<div class="alert alert-info">Aucun partage actif</div>';
-                    }
-                }
-            })
-            .catch(error => {
-                console.error('Erreur:', error);
-                if (shareStatus) {
-                    shareStatus.innerHTML = '<div class="alert alert-warning">Erreur lors du chargement des informations</div>';
-                }
+                body: JSON.stringify({ path }),
             });
-    }
 
-    function showShareLink(token) {
-        const baseUrl = window.location.origin;
-        const shareUrl = `${baseUrl}/media/sharedFile/${token}`;
-        if (shareLinkInput) {
-            shareLinkInput.value = shareUrl;
+            if (!res.ok) throw new Error();
+
+            btn.closest('tr').remove();
+        } catch {
+            alert(t('deleteError'));
         }
-        if (shareLink) {
-            shareLink.classList.remove('d-none');
+    });
+});
+
+// ── Share modal ───────────────────────────────────────────────────────────────
+
+const shareModal     = new bootstrap.Modal(document.getElementById('shareModal'));
+const shareFileName  = document.getElementById('shareFileName');
+const shareStatus    = document.getElementById('shareStatus');
+const shareForm      = document.getElementById('shareForm');
+const shareLinkBox   = document.getElementById('shareLink');
+const shareLinkInput = document.getElementById('shareLinkInput');
+const groupSelect    = document.getElementById('group-select');
+const membersOnly    = document.getElementById('members-only-checkbox');
+const createShareBtn = document.getElementById('createShareBtn');
+const deleteShareBtn = document.getElementById('deleteShareBtn');
+const copyShareLink  = document.getElementById('copyShareLink');
+
+let currentPath = null;
+
+function setStatus(message, type = 'info') {
+    shareStatus.innerHTML = `<div class="alert alert-${type} py-2">${message}</div>`;
+}
+
+function clearStatus() {
+    shareStatus.innerHTML = '';
+}
+
+async function loadShareState(path) {
+    try {
+        const res = await fetch(`/media/shareInfo?path=${encodeURIComponent(path)}`);
+        if (!res.ok) throw new Error();
+
+        const data = await res.json();
+
+        if (data.shared) {
+            groupSelect.value    = data.idGroup ?? '';
+            membersOnly.checked  = !!data.membersOnly;
+            shareLinkInput.value = data.link ?? '';
+            shareLinkBox.classList.remove('d-none');
+            deleteShareBtn.classList.remove('d-none');
+            createShareBtn.classList.add('d-none');
+        } else {
+            shareLinkBox.classList.add('d-none');
+            deleteShareBtn.classList.add('d-none');
+            createShareBtn.classList.remove('d-none');
         }
+    } catch {
+        setStatus(t('shareError'), 'danger');
     }
+}
 
-    function updateFileRow(filePath, row) {
-        fetch('/api/media/isShared', {
+document.querySelectorAll('.share-file-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+        currentPath = btn.dataset.path;
+        shareFileName.textContent = btn.dataset.filename;
+        clearStatus();
+        loadShareState(currentPath);
+        shareModal.show();
+    });
+});
+
+createShareBtn.addEventListener('click', async () => {
+    try {
+        const res = await fetch('/media/share', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ item: filePath })
-        })
-            .then(response => response.json())
-            .then(data => {
-                const sharedCell = row.querySelector('td:nth-child(7)');
-                if (sharedCell) {
-                    if (data.success && data.data) {
-                        sharedCell.textContent = 'Oui';
-                    } else {
-                        sharedCell.textContent = '';
-                    }
-                }
-            })
-            .catch(error => {
-                console.error('Erreur lors de la mise à jour de la ligne:', error);
-            });
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                path:        currentPath,
+                idGroup:     groupSelect.value,
+                membersOnly: membersOnly.checked ? 1 : 0,
+            }),
+        });
+
+        if (!res.ok) throw new Error();
+
+        const data = await res.json();
+        shareLinkInput.value = data.link;
+        shareLinkBox.classList.remove('d-none');
+        deleteShareBtn.classList.remove('d-none');
+        createShareBtn.classList.add('d-none');
+        setStatus(t('shareCreated'), 'success');
+    } catch {
+        setStatus(t('shareError'), 'danger');
     }
+});
 
-    document.querySelectorAll('.copy-url-btn').forEach(btn => {
-        btn.addEventListener('click', function () {
-            const url = this.dataset.url;
-            navigator.clipboard.writeText(url).then(() => {
-                const icon = this.querySelector('i');
-                if (icon) {
-                    icon.classList.remove('bi-clipboard');
-                    icon.classList.add('bi-check');
-                    setTimeout(() => {
-                        icon.classList.remove('bi-check');
-                        icon.classList.add('bi-clipboard');
-                    }, 2000);
-                }
-            });
+deleteShareBtn.addEventListener('click', async () => {
+    try {
+        const res = await fetch('/media/shareDelete', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ path: currentPath }),
         });
-    });
 
-    const deleteBtns = document.querySelectorAll('.delete-file-btn');
-    deleteBtns.forEach(btn => {
-        btn.addEventListener('click', function () {
-            const filename = this.getAttribute('data-filename');
-            if (!confirm(`Êtes-vous sûr de vouloir supprimer le fichier "${filename}" ?`)) return;
+        if (!res.ok) throw new Error();
 
-            const path = this.getAttribute('data-path');
-            const pathParts = path.split('/');
-            const year = pathParts[0];
-            const month = pathParts[1];
-            const file = pathParts[2];
+        shareLinkBox.classList.add('d-none');
+        deleteShareBtn.classList.add('d-none');
+        createShareBtn.classList.remove('d-none');
+        setStatus(t('shareDeleted'), 'warning');
+    } catch {
+        setStatus(t('shareError'), 'danger');
+    }
+});
 
-            fetch(`/api/media/delete/${year}/${month}/${file}`, { method: 'POST' })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        const alertDiv = document.createElement('div');
-                        alertDiv.className = 'alert alert-success alert-dismissible fade show';
-                        alertDiv.innerHTML = `${data.message}<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>`;
-                        const cardBody = document.querySelector('.card-body');
-                        if (cardBody) {
-                            cardBody.prepend(alertDiv);
-                        }
-                        this.closest('tr').remove();
-                        const tbody = document.querySelector('tbody');
-                        if (tbody && tbody.children.length === 0) {
-                            const tableContainer = document.querySelector('.table-responsive');
-                            const yearSelect = document.querySelector('select[name="year"]');
-                            const currentYear = yearSelect ? yearSelect.value : '';
-                            if (tableContainer) {
-                                tableContainer.innerHTML = `<div class="alert alert-info">
-                                    Aucun fichier pour l'année ${currentYear}.
-                                </div>`;
-                            }
-                        }
-                    } else {
-                        alert(`Erreur: ${data.message}`);
-                    }
-                })
-                .catch(error => {
-                    alert(`Erreur lors de la suppression : ${error.message}`);
-                });
-        });
-    });
+copyShareLink.addEventListener('click', async () => {
+    await navigator.clipboard.writeText(shareLinkInput.value);
+    const original = copyShareLink.innerHTML;
+    copyShareLink.innerHTML = `<i class="bi bi-check"></i> ${t('linkCopied')}`;
+    setTimeout(() => { copyShareLink.innerHTML = original; }, 1500);
 });

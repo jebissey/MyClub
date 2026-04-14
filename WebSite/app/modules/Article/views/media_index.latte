@@ -2,64 +2,74 @@
 
 {block content}
 <div class="container-fluid">
-    <h1>Gestionnaire de médias</h1>
+    <h1>{='media.manager.title'|translate}</h1>
     
     <div class="card mb-4">
         <div class="card-body">
-            <div class="d-flex justify-content-between mb-3">
-                <div>
+            <div class="d-flex align-items-center mb-3">
+                <div class="flex-shrink-0">
                     <a href="/media/upload" class="btn btn-primary">
-                        <i class="bi bi-upload"></i> Uploader un fichier
+                        <i class="bi bi-upload"></i> {='media.manager.upload_button'|translate}
                     </a>
                 </div>
-                <div class="d-flex">
-<form method="get" id="filtersForm" class="d-flex align-items-center gap-2 flex-nowrap overflow-auto">
 
-    <select name="year" class="form-select form-select-sm w-auto" onchange="this.form.submit()">
-        {foreach $years as $y}
-            <option value="{$y}" {if $y == $currentYear}selected{/if}>{$y}</option>
-        {/foreach}
-    </select>
+                <div class="flex-grow-1 text-center">
+                    <span class="text-muted rounded bg-dark-subtle px-2 py-1">
+                        <strong>{$filteredCount}</strong> / {$totalCount}
+                        {if $filteredCount !== $totalCount}
+                            <span class="text-warning">({='media.manager.filtered'|translate})</span>
+                        {/if}
+                    </span>
+                </div>
 
-    <select name="month" class="form-select form-select-sm w-auto" onchange="this.form.submit()">
-        <option value="">Mois</option>
-        {foreach $months as $m}
-            <option value="{$m}" {if $m == $currentMonth}selected{/if}>{$m}</option>
-        {/foreach}
-    </select>
+                <div class="flex-shrink-0 d-flex">
+                    <form method="get" id="filtersForm" class="d-flex align-items-center gap-2 flex-nowrap overflow-auto">
 
-    <select name="fileExtension" class="form-select form-select-sm w-auto" onchange="this.form.submit()">
-        <option value="">Type</option>
-        {foreach $fileExtensions as $fe}
-            <option value="{$fe}" {if $fe == $currentFileExtension}selected{/if}>{$fe}</option>
-        {/foreach}
-    </select>
+                        <select name="year" class="form-select form-select-sm w-auto" onchange="this.form.submit()">
+                            {foreach $years as $y}
+                                <option value="{$y}" {if $y == $currentYear}selected{/if}>{$y}</option>
+                            {/foreach}
+                        </select>
 
-    <div class="form-check ms-2">
-        <input class="form-check-input"
-               type="checkbox"
-               name="unusedOnly"
-               value="1"
-               id="unusedOnly"
-               {if $unusedOnly}checked{/if}
-               onchange="this.form.submit()">
-        <label class="form-check-label" for="unusedOnly">
-            Non utilisés
-        </label>
-    </div>
+                        <select name="month" class="form-select form-select-sm w-auto" onchange="this.form.submit()">
+                            <option value="">{='media.manager.month_placeholder'|translate}</option>
+                            {foreach $months as $m}
+                                <option value="{$m}" {if $m == $currentMonth}selected{/if}>{$m}</option>
+                            {/foreach}
+                        </select>
 
-    <div class="d-flex align-items-center ms-2">
-        <input type="text"
-               name="search"
-               class="form-control form-control-sm"
-               placeholder="Rechercher..."
-               value="{$search}"
-               style="width: 180px;">
-        <button type="submit" class="btn btn-outline-secondary btn-sm ms-2">
-            <i class="bi bi-search"></i>
-        </button>
-    </div>
-</form>
+                        <select name="fileExtension" class="form-select form-select-sm w-auto" onchange="this.form.submit()">
+                            <option value="">{='media.manager.type_placeholder'|translate}</option>
+                            {foreach $fileExtensions as $fe}
+                                <option value="{$fe}" {if $fe == $currentFileExtension}selected{/if}>{$fe}</option>
+                            {/foreach}
+                        </select>
+
+                        <div class="form-check ms-2">
+                            <input class="form-check-input"
+                                type="checkbox"
+                                name="unusedOnly"
+                                value="1"
+                                id="unusedOnly"
+                                {if $unusedOnly}checked{/if}
+                                onchange="this.form.submit()">
+                            <label class="form-check-label" for="unusedOnly">
+                                {='media.manager.unused_only'|translate}
+                            </label>
+                        </div>
+
+                        <div class="d-flex align-items-center ms-2">
+                            <input type="text"
+                                name="search"
+                                class="form-control form-control-sm"
+                                placeholder="{='media.manager.search_placeholder'|translate}"
+                                value="{$search}"
+                                style="width: 180px;">
+                            <button type="submit" class="btn btn-outline-secondary btn-sm ms-2">
+                                <i class="bi bi-search"></i>
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
             
@@ -68,14 +78,14 @@
                 <table class="table table-striped">
                     <thead>
                         <tr>
-                            <th>Aperçu</th>
-                            <th>Nom</th>
-                            <th>Date</th>
-                            <th>Taille</th>
-                            <th>Article</th>
-                            <th>Carousel</th>
-                            <th>Partagé</th>
-                            <th>Actions</th>
+                            <th>{='media.manager.table.preview'|translate}</th>
+                            <th>{='media.manager.table.name'|translate}</th>
+                            <th>{='media.manager.table.date'|translate}</th>
+                            <th>{='media.manager.table.size'|translate}</th>
+                            <th>{='media.manager.table.article'|translate}</th>
+                            <th>{='media.manager.table.carousel'|translate}</th>
+                            <th>{='media.manager.table.shared'|translate}</th>
+                            <th>{='media.manager.table.actions'|translate}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -87,7 +97,7 @@
                             {elseif strpos($file['name'], '.mp4') !== false || strpos($file['name'], '.webm') !== false || strpos($file['name'], '.ogg') !== false || strpos($file['name'], '.mov') !== false}
                                 <video controls preload="metadata" style="max-height: 60px; max-width: 100px; border-radius: 6px;">
                                     <source src="{$file['url']}" type="video/{if strpos($file['name'], '.mp4') !== false}mp4{elseif strpos($file['name'], '.webm') !== false}webm{elseif strpos($file['name'], '.ogg') !== false}ogg{elseif strpos($file['name'], '.mov') !== false}quicktime{/if}">
-                                    Votre navigateur ne supporte pas la lecture vidéo.
+                                    {='media.manager.video_unsupported'|translate}
                                 </video>
                             {elseif strpos($file['name'], '.mp3') !== false || strpos($file['name'], '.wav') !== false || strpos($file['name'], '.ogg') !== false || strpos($file['name'], '.m4a') !== false || strpos($file['name'], '.flac') !== false}
                                 <i class="bi bi-music-note-beamed text-primary" style="font-size: 2rem;"></i>
@@ -101,39 +111,42 @@
                                     <div class="mt-2">
                                         <audio controls preload="metadata" style="max-width: 100%; height: 32px;">
                                             <source src="{$file['url']}" type="audio/{if strpos($file['name'], '.mp3') !== false}mpeg{elseif strpos($file['name'], '.ogg') !== false}ogg{elseif strpos($file['name'], '.wav') !== false}wav{elseif strpos($file['name'], '.m4a') !== false}mp4{elseif strpos($file['name'], '.flac') !== false}flac{/if}">
-                                            Votre navigateur ne supporte pas la lecture audio.
+                                            {='media.manager.audio_unsupported'|translate}
                                         </audio>
                                     </div>
                                 {/if}
                             </td>
                             <td>{$file['date']}</td>
                             <td>{$file['size']|formatFileSize}</td>
-                            <td>{if $file['inArticle']}<a href="/media/uses?path={$file['path']}">Oui</a>{/if}</td>
-                            <td>{if $file['inGalery']}<a href="/media/uses?path={$file['path']}">Oui</a>{/if}</td>
-                            <td>{if $file['shared']}Oui{/if}</td>
+                            <td>{if $file['inArticle']}<a href="/media/uses?path={$file['path']}">{='media.manager.table.yes'|translate}</a>{/if}</td>
+                            <td>{if $file['inGalery']}<a href="/media/uses?path={$file['path']}">{='media.manager.table.yes'|translate}</a>{/if}</td>
+                            <td>{if $file['shared']}{='media.manager.table.yes'|translate}{/if}</td>
                             <td>
                                 <div class="btn-group" role="group">
                                 {if strpos($file['name'], '.gpx') !== false}
-                                    <a href="/media/gpxViewer?file={$file['url']}" target="_blank" class="btn btn-sm btn-success me-2" title="Voir sur carte">
+                                    <a href="/media/gpxViewer?file={$file['url']}" target="_blank" class="btn btn-sm btn-success me-2" title="{='media.manager.action.view_map'|translate}">
                                         <i class="bi bi-map"></i>
                                     </a>
                                 {else}
-                                    <a href="{$file['url']}" target="_blank" class="btn btn-sm btn-success me-2" title="Voir">
+                                    <a href="{$file['url']}" target="_blank" class="btn btn-sm btn-success me-2" title="{='media.manager.action.view'|translate}">
                                         <i class="bi bi-eye"></i>
                                     </a>
                                 {/if}
                                     <button type="button" class="btn btn-sm btn-warning copy-url-btn me-2" 
-                                            data-url="{if strpos($file['name'], '.gpx') !== false}/media/gpxViewer?file={/if}{$file['url']}" title="Copier l'URL">
+                                            data-url="{if strpos($file['name'], '.gpx') !== false}/media/gpxViewer?file={/if}{$file['url']}"
+                                            title="{='media.manager.action.copy_url'|translate}">
                                         <i class="bi bi-clipboard"></i>
                                     </button>
                                     <button type="button" class="btn btn-sm btn-info share-file-btn me-2" 
                                             data-path="{substr($file['path'], 11)}" 
-                                            data-filename="{$file['name']}" title="Partager">
+                                            data-filename="{$file['name']}"
+                                            title="{='media.manager.action.share'|translate}">
                                         <i class="bi bi-share"></i>
                                     </button>
                                     <button type="button" class="btn btn-sm btn-danger delete-file-btn" 
                                             data-path="{substr($file['path'], 11)}" 
-                                            data-filename="{$file['name']}" title="Supprimer">
+                                            data-filename="{$file['name']}"
+                                            title="{='media.manager.action.delete'|translate}">
                                         <i class="bi bi-trash"></i>
                                     </button>
                                 </div>
@@ -145,7 +158,7 @@
             </div>
             {else}
             <div class="alert alert-info">
-                Aucun fichier ne correspond à votre recherche.
+                {='media.manager.no_results'|translate}
             </div>
             {/if}
         </div>
@@ -156,19 +169,19 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="shareModalLabel">Partager le fichier</h5>
+                <h5 class="modal-title" id="shareModalLabel">{='media.manager.share.modal_title'|translate}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <p><strong>Fichier :</strong> <span id="shareFileName"></span></p>
+                <p><strong>{='media.manager.share.file_label'|translate}</strong> <span id="shareFileName"></span></p>
                 
                 <div id="shareStatus"></div>
                 
                 <div id="shareForm">
                     <div class="d-flex align-items-center gap-2 mb-3">
-                        <label for="group-select" class="form-label mb-0 text-nowrap">Groupe associé</label>
+                        <label for="group-select" class="form-label mb-0 text-nowrap">{='media.manager.share.group_label'|translate}</label>
                         <select class="form-select" id="group-select" name="idGroup">
-                            <option value="">-- Aucun groupe --</option>
+                            <option value="">{='media.manager.share.no_group'|translate}</option>
                             {foreach $groups as $group}
                             <option value="{$group->Id}">{$group->Name}</option>
                             {/foreach}
@@ -177,28 +190,28 @@
                     <div class="d-flex align-items-center gap-2 mb-3">
                         <div class="form-check">
                             <input class="form-check-input" type="checkbox" id="members-only-checkbox" name="membersOnly" value="1" checked {if !$isEditor}disabled{/if}>
-                            <label class="form-check-label" for="members-only-checkbox">Pour les membres du club uniquement</label>
+                            <label class="form-check-label" for="members-only-checkbox">{='media.manager.share.members_only'|translate}</label>
                         </div>
                     </div>
                 </div>
                 
                 <div id="shareLink" class="alert alert-success d-none">
-                    <label class="form-label">Lien de partage :</label>
+                    <label class="form-label">{='media.manager.share.link_label'|translate}</label>
                     <div class="input-group">
                         <input type="text" class="form-control" id="shareLinkInput" readonly>
                         <button class="btn btn-outline-secondary" type="button" id="copyShareLink">
-                            <i class="bi bi-clipboard"></i> Copier
+                            <i class="bi bi-clipboard"></i> {='media.manager.share.copy'|translate}
                         </button>
                     </div>
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{='media.manager.share.close'|translate}</button>
                 <button type="button" class="btn btn-primary" id="createShareBtn">
-                    <i class="bi bi-share"></i> Créer le partage
+                    <i class="bi bi-share"></i> {='media.manager.share.create'|translate}
                 </button>             
                 <button type="button" class="btn btn-warning" id="deleteShareBtn">
-                    <i class="bi bi-share"></i> Supprimer le partage
+                    <i class="bi bi-share"></i> {='media.manager.share.delete'|translate}
                 </button>
             </div>
         </div>
@@ -207,5 +220,9 @@
 {/block}
 
 {block scripts}
-    <script src="/app/modules/Article/js/mediaShare.js"></script>
+<script>
+    window.i18n = {=json_encode($translations)|noescape};
+    window.t = function(key) { return window.i18n?.[key] ?? key; };
+</script>
+<script type="module" src="/app/modules/Article/js/mediaShare.js"></script>
 {/block}

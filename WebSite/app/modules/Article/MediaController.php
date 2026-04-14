@@ -96,9 +96,13 @@ class MediaController extends AbstractController
         if ($month !== '' && !in_array($month, $this->getMonths($year))) {
             $month = '';
         }
+        $filteredFiles = $this->getFiles($year, $month, $fileExtension, $search, $unusedOnly);
+        $totalFiles    = $this->getFiles($year, $month, '', '', false);
 
         $this->render('Article/views/media_index.latte', $this->getAllParams([
-            'files'                => $this->getFiles($year, $month, $fileExtension, $search, $unusedOnly),
+            'files'                => $filteredFiles,
+            'filteredCount'        => count($filteredFiles),
+            'totalCount'           => count($totalFiles),
             'years'                => $years,
             'currentYear'          => $year,
             'months'               => $this->getMonths($year),
@@ -111,6 +115,16 @@ class MediaController extends AbstractController
             'page'                 => $connectedUser->getPage(),
             'groups'               => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
             'isEditor'             => $connectedUser->isEditor(),
+            'translations' => [
+                'urlCopied'     => $this->languagesDataHelper->translate('media.manager.share.url_copied'),
+                'linkCopied'    => $this->languagesDataHelper->translate('media.manager.share.link_copied'),
+                'shareCreated'  => $this->languagesDataHelper->translate('media.manager.share.created'),
+                'shareDeleted'  => $this->languagesDataHelper->translate('media.manager.share.deleted'),
+                'shareError'    => $this->languagesDataHelper->translate('media.manager.share.error'),
+                'deleteConfirm' => $this->languagesDataHelper->translate('media.manager.delete.confirm'),
+                'deleteSuccess' => $this->languagesDataHelper->translate('media.manager.delete.success'),
+                'deleteError'   => $this->languagesDataHelper->translate('media.manager.delete.error'),
+            ],
         ]));
     }
 
