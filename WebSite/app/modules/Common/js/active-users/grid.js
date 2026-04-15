@@ -1,4 +1,5 @@
 import { renderAvatar } from './avatar.js';
+import { ACTIVE_USERS_MAX } from './constants.js';
 
 const AVATAR_SIZE = 32;
 const AVATAR_OVERLAP = 10;
@@ -41,16 +42,22 @@ export function pickColumnCount(userCount) {
 }
 
 export function buildActiveUsersGrid(users, windowMinutes = 240) {
-    const colCount = pickColumnCount(users.length);
+    const sorted = [...users].sort((a, b) => a.minutesAgo - b.minutesAgo);
+    const truncated = sorted.length > ACTIVE_USERS_MAX;
+    const visible = truncated ? sorted.slice(0, ACTIVE_USERS_MAX) : sorted;
+
+    const effectiveWindow = truncated
+        ? Math.ceil(visible.at(-1).minutesAgo)
+        : windowMinutes;
+
+    const colCount = pickColumnCount(visible.length);
     const colWidth = colWidthPx(colCount);
     const maxAvatarsPerSlot = maxAvatarsForWidth(colWidth);
-
     const bsCol = Math.floor(12 / colCount);
-
-    const slotWidthMin = windowMinutes / colCount;
+    const slotWidthMin = effectiveWindow / colCount;
 
     const slots = Array.from({ length: colCount }, () => []);
-    for (const user of users) {
+    for (const user of visible) {
         let idx = Math.floor(user.minutesAgo / slotWidthMin);
         idx = Math.min(colCount - 1, Math.max(0, idx));
         slots[idx].push(user);
@@ -65,10 +72,10 @@ export function buildActiveUsersGrid(users, windowMinutes = 240) {
     };
 
     const columnsHtml = slots.map((slotUsers, i) => {
-        const visible = slotUsers.slice(0, maxAvatarsPerSlot);
+        const vis = slotUsers.slice(0, maxAvatarsPerSlot);
         const overflow = slotUsers.length - maxAvatarsPerSlot;
 
-        const avatarsHtml = visible.map((u, j) => `
+        const avatarsHtml = vis.map((u, j) => `
             <span style="position:relative; display:inline-block;
                          margin-left: ${j > 0 ? `-${AVATAR_OVERLAP}px` : '0'};
                          z-index: ${maxAvatarsPerSlot - j};">
@@ -77,7 +84,7 @@ export function buildActiveUsersGrid(users, windowMinutes = 240) {
         `).join('');
 
         const badge = overflow > 0 ? `
-            <span class="badge rounded-pill bg-secondary ms-1" 
+            <span class="badge rounded-pill bg-secondary ms-1"
                   style="font-size:0.55rem; vertical-align:middle;">
                 +${overflow}
             </span>` : '';
@@ -93,7 +100,7 @@ export function buildActiveUsersGrid(users, windowMinutes = 240) {
     const axisHtml = `
         <div class="row g-0 w-100 mt-1">
             <div class="col text-start text-muted" style="font-size:0.65rem">maintenant</div>
-            <div class="col text-end text-muted" style="font-size:0.65rem">${windowMinutes} min</div>
+            <div class="col text-end text-muted" style="font-size:0.65rem">${effectiveWindow} min</div>
         </div>`;
 
     return `

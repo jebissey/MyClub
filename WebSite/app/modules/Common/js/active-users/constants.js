@@ -1,0 +1,1 @@
+export const ACTIVE_USERS_MAX = 10;

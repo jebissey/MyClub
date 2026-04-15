@@ -17,7 +17,7 @@ async function refreshActiveUsers() {
         const container = document.getElementById('active-users-list');
         if (!container) return;
 
-        adapter.update(json.data.length);
+        adapter.update(json.data);
 
         container.innerHTML = json.data.length === 0
             ? '<span class="text-muted small">Aucun utilisateur actif</span>'
