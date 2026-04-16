@@ -182,7 +182,7 @@ abstract class AbstractController
     #region Public functions
     public function render(string $templateLatteName, object|array $params = []): void
     {
-        #error_log("\n\n" . json_encode($templateLatteName, JSON_PRETTY_PRINT) . "\n");
+#error_log("\n\n" . json_encode($templateLatteName, JSON_PRETTY_PRINT) . "\n");
         $content = $this->latte->renderToString($templateLatteName, $params);
         echo $content;
         if (ob_get_level()) ob_end_flush();

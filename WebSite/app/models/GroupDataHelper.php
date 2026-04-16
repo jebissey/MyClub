@@ -194,10 +194,22 @@ class GroupDataHelper extends Data
         }
     }
 
-    public function inactive(int $id): int|bool
+    public function inactive(int $id): void
     {
-        if ($id === 1) throw new QueryException('Group (1) can\'t be inactivated', ApplicationError::BadRequest->value);
-        return $this->set('Group', ['Inactivated'  => 1], ['Id' => $id]);
+        if ($id === 1) throw new QueryException("Group (1) can't be inactivated", ApplicationError::BadRequest->value);
+
+        $this->pdo->beginTransaction();
+        try {
+            $this->set('Group', ['Inactivated' => 1], ['Id' => $id]);
+            $query = $this->pdo->prepare('
+                DELETE FROM PersonGroup
+                WHERE IdGroup = ?');
+            $query->execute([$id]);
+            $this->pdo->commit();
+        } catch (Throwable $e) {
+            $this->pdo->rollBack();
+            throw $e;
+        }
     }
 
     public function update(int $id, string $name, int $selfRegistration, array $selectedAuthorizations): void

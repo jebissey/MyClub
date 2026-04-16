@@ -265,7 +265,7 @@ class DbBrowserDataHelper extends Data
 
     public function getQuery(string $table): Select
     {
-        return $this->fluent->from($table);
+        return $this->fluent->from("`{$table}`");
     }
 
     #region Private functions

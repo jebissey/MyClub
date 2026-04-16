@@ -33,25 +33,22 @@ document.addEventListener("DOMContentLoaded", async () => {
         btn.disabled = true;
 
         try {
+            if (!("Notification" in window)) {
+                throw new Error("Notifications non supportées");
+            }
+
             const subscribed = await isSubscribed();
 
             if (subscribed) {
-                // Désabonnement
                 await unsubscribePush();
                 notify("Désabonnement réussi", "success");
             } else {
-                // 🔥 FIX EDGE : Appeler requestPermission() AVANT tout await
-                // Edge exige que ce soit appelé directement dans le handler de clic
-                const permissionPromise = Notification.requestPermission();
-                
-                // Maintenant on peut attendre le résultat
-                const permission = await permissionPromise;
-                
+                const permission = await Notification.requestPermission();
+
                 if (permission !== "granted") {
                     throw new Error("Autorisation refusée");
                 }
 
-                // Abonnement push
                 await subscribePush(VAPID_PUBLIC_KEY);
                 notify("Abonnement réussi", "success");
             }
