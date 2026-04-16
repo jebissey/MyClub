@@ -2,13 +2,13 @@
 
 {block content}
     <div class="container-fluid">
-        <h1>Statistiques pour {$stats['person']->FirstName} {$stats['person']->LastName}</h1>
+        <h1>{='user.statistics.page_title'|translate} {$stats['person']->FirstName} {$stats['person']->LastName}</h1>
 
         <div class="card mb-4">
             <div class="card-header">
                 <div class="row">
                     <div class="col">
-                        <h5>Période : {date('d/m/Y', strtotime($currentSeason['start']))} - {date('d/m/Y', strtotime($currentSeason['end']))}</h5>
+                        <h5>{='user.statistics.period'|translate} : {date('d/m/Y', strtotime($currentSeason['start']))} - {date('d/m/Y', strtotime($currentSeason['end']))}</h5>
                     </div>
                     <div class="col-md-4">
                         <form method="get" class="form-inline">
@@ -21,109 +21,109 @@
                                     {/foreach}
                                 </select>
                                 <div class="input-group-append">
-                                    <button class="btn btn-outline-secondary" type="submit">Filtrer</button>
+                                    <button class="btn btn-outline-secondary" type="submit">{='user.statistics.filter_btn'|translate}</button>
                                 </div>
                             </div>
                         </form>
                     </div>
                 </div>
             </div>
-            
+
             <div class="card-body">
                 <div class="row">
                     <div class="col-md-6">
-                        <h3>Activités éditoriales</h3>
-                        
+                        <h3>{='user.statistics.editorial_activities'|translate}</h3>
+
                         {if $isRedactor}
                         <div class="mb-3">
-                            <h5>Articles</h5>
+                            <h5>{='user.statistics.articles'|translate}</h5>
                             <div class="progress" style="height: 25px;">
-                                <div class="progress-bar" role="progressbar" style="width: {$stats['articles']['percentage']}%;" 
+                                <div class="progress-bar" role="progressbar" style="width: {$stats['articles']['percentage']}%;"
                                     aria-valuenow="{$stats['articles']['percentage']}" aria-valuemin="0" aria-valuemax="100">
                                     {$stats['articles']['percentage']}%
                                 </div>
                             </div>
                             <small class="text-muted">
-                                {$stats['articles']['user']} article(s) sur un total de {$stats['articles']['total']} articles
+                                {$stats['articles']['user']} / {$stats['articles']['total']}
                             </small>
                         </div>
-                        
+
                         <div class="mb-3">
-                            <h5>Sondages</h5>
+                            <h5>{='user.statistics.surveys'|translate}</h5>
                             <div class="progress" style="height: 25px;">
-                                <div class="progress-bar bg-info" role="progressbar" style="width: {$stats['surveys']['percentage']}%;" 
+                                <div class="progress-bar bg-info" role="progressbar" style="width: {$stats['surveys']['percentage']}%;"
                                     aria-valuenow="{$stats['surveys']['percentage']}" aria-valuemin="0" aria-valuemax="100">
                                     {$stats['surveys']['percentage']}%
                                 </div>
                             </div>
                             <small class="text-muted">
-                                {$stats['surveys']['user']} sondage(s) sur un total de {$stats['surveys']['total']} sondages
+                                {$stats['surveys']['user']} / {$stats['surveys']['total']}
                             </small>
                         </div>
                         {/if}
 
                         <div class="mb-3">
-                            <h5>Réponses aux sondages</h5>
+                            <h5>{='user.statistics.survey_replies'|translate}</h5>
                             <div class="progress" style="height: 25px;">
-                                <div class="progress-bar bg-success" role="progressbar" style="width: {$stats['surveyReplies']['percentage']}%;" 
+                                <div class="progress-bar bg-success" role="progressbar" style="width: {$stats['surveyReplies']['percentage']}%;"
                                     aria-valuenow="{$stats['surveyReplies']['percentage']}" aria-valuemin="0" aria-valuemax="100">
                                     {$stats['surveyReplies']['percentage']}%
                                 </div>
                             </div>
                             <small class="text-muted">
-                                {$stats['surveyReplies']['user']} réponse(s) sur un total de {$stats['surveyReplies']['total']} réponses
+                                {$stats['surveyReplies']['user']} / {$stats['surveyReplies']['total']}
                             </small>
                         </div>
                     </div>
-                    
+
                     {if $isRedactor}
                     <div class="col-md-6">
-                        <h3>Designs et votes</h3>
-                        
+                        <h3>{='user.statistics.designs_and_votes'|translate}</h3>
+
                         {if $isRedactor}
                         <div class="mb-3">
-                            <h5>Designs créés</h5>
+                            <h5>{='user.statistics.designs_created'|translate}</h5>
                             <div class="progress" style="height: 25px;">
-                                <div class="progress-bar bg-warning" role="progressbar" style="width: {$stats['designs']['percentage']}%;" 
+                                <div class="progress-bar bg-warning" role="progressbar" style="width: {$stats['designs']['percentage']}%;"
                                     aria-valuenow="{$stats['designs']['percentage']}" aria-valuemin="0" aria-valuemax="100">
                                     {$stats['designs']['percentage']}%
                                 </div>
                             </div>
                             <small class="text-muted">
-                                {$stats['designs']['user']} design(s) sur un total de {$stats['designs']['total']} designs
+                                {$stats['designs']['user']} / {$stats['designs']['total']}
                             </small>
                         </div>
                         {/if}
-                        
+
                         <div class="mb-3">
-                            <h5>Votes sur les designs</h5>
+                            <h5>{='user.statistics.design_votes'|translate}</h5>
                             <div class="progress" style="height: 25px;">
-                                <div class="progress-bar bg-danger" role="progressbar" style="width: {$stats['designVotes']['percentage']}%;" 
+                                <div class="progress-bar bg-danger" role="progressbar" style="width: {$stats['designVotes']['percentage']}%;"
                                     aria-valuenow="{$stats['designVotes']['percentage']}" aria-valuemin="0" aria-valuemax="100">
                                     {$stats['designVotes']['percentage']}%
                                 </div>
                             </div>
                             <small class="text-muted">
-                                {$stats['designVotes']['user']} vote(s) sur un total de {$stats['designVotes']['total']} votes
+                                {$stats['designVotes']['user']} / {$stats['designVotes']['total']}
                             </small>
                         </div>
                     </div>
                     {/if}
                 </div>
-                
+
                 <hr>
-                
+
                 <div class="row mt-4">
                     {if $isEventManager}
                     <div class="col-md-6">
-                        <h3>Événements créés</h3>
+                        <h3>{='user.statistics.events_created'|translate}</h3>
                         <table class="table table-striped">
                             <thead>
                                 <tr>
-                                    <th>Type d'événement</th>
-                                    <th>Nombre</th>
-                                    <th>Total</th>
-                                    <th>Pourcentage</th>
+                                    <th>{='user.statistics.table.event_type'|translate}</th>
+                                    <th>{='user.statistics.table.count'|translate}</th>
+                                    <th>{='user.statistics.table.total'|translate}</th>
+                                    <th>{='user.statistics.table.percentage'|translate}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -134,9 +134,9 @@
                                         <td>{$eventStat['total']}</td>
                                         <td>
                                             <div class="progress">
-                                                <div class="progress-bar bg-primary" role="progressbar" 
-                                                    style="width: {$eventStat['percentage']}%;" 
-                                                    aria-valuenow="{$eventStat['percentage']}" 
+                                                <div class="progress-bar bg-primary" role="progressbar"
+                                                    style="width: {$eventStat['percentage']}%;"
+                                                    aria-valuenow="{$eventStat['percentage']}"
                                                     aria-valuemin="0" aria-valuemax="100">
                                                     {$eventStat['percentage']}%
                                                 </div>
@@ -148,16 +148,17 @@
                         </table>
                     </div>
                     {/if}
+
                     <div class="col-md-6">
-                        <h3>Participations aux événements</h3>
+                        <h3>{='user.statistics.event_participations'|translate}</h3>
                         <table class="table table-striped">
                             <thead>
                                 <tr>
-                                    <th>Type d'événement</th>
-                                    <th>Nombre</th>
-                                    <th>Participations</th>
-                                    <th>Total de participants</th>
-                                    <th>Pourcentage</th>
+                                    <th>{='user.statistics.table.event_type'|translate}</th>
+                                    <th>{='user.statistics.table.count'|translate}</th>
+                                    <th>{='user.statistics.table.participations'|translate}</th>
+                                    <th>{='user.statistics.table.total_participants'|translate}</th>
+                                    <th>{='user.statistics.table.percentage'|translate}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -169,9 +170,9 @@
                                         <td class="text-center">{$participationStat['total']}</td>
                                         <td>
                                             <div class="progress">
-                                                <div class="progress-bar bg-info" role="progressbar" 
-                                                    style="width: {$participationStat['percentage']}%;" 
-                                                    aria-valuenow="{$participationStat['percentage']}" 
+                                                <div class="progress-bar bg-info" role="progressbar"
+                                                    style="width: {$participationStat['percentage']}%;"
+                                                    aria-valuenow="{$participationStat['percentage']}"
                                                     aria-valuemin="0" aria-valuemax="100">
                                                     {$participationStat['percentage']}%
                                                 </div>
@@ -184,56 +185,64 @@
                     </div>
 
                     <div class="col-md-6">
-                        <h3>Contributions aux besoins des événements</h3>
+                        <h3>{='user.statistics.event_supplies'|translate}</h3>
                         <div class="mb-3">
                             <div class="progress" style="height: 25px;">
-                                <div class="progress-bar bg-success" role="progressbar" 
-                                    style="width: {$stats['participantSupplies']['percentage']}%;" 
-                                    aria-valuenow="{$stats['participantSupplies']['percentage']}" 
+                                <div class="progress-bar bg-success" role="progressbar"
+                                    style="width: {$stats['participantSupplies']['percentage']}%;"
+                                    aria-valuenow="{$stats['participantSupplies']['percentage']}"
                                     aria-valuemin="0" aria-valuemax="100">
                                     {$stats['participantSupplies']['percentage']}%
                                 </div>
                             </div>
                             <small class="text-muted">
-                                {$stats['participantSupplies']['user']} contribution(s) sur un total de {$stats['participantSupplies']['total']}
+                                {$stats['participantSupplies']['user']} / {$stats['participantSupplies']['total']}
                             </small>
                         </div>
                     </div>
 
                     <div class="col-md-6">
-                        <h3>Messages des événements</h3>
+                        <h3>{='user.statistics.event_messages'|translate}</h3>
                         <div class="mb-3">
                             <div class="progress" style="height: 25px;">
-                                <div class="progress-bar bg-success" role="progressbar" 
-                                    style="width: {$stats['participantMessages']['percentage']}%;" 
-                                    aria-valuenow="{$stats['participantMessages']['percentage']}" 
+                                <div class="progress-bar bg-success" role="progressbar"
+                                    style="width: {$stats['participantMessages']['percentage']}%;"
+                                    aria-valuenow="{$stats['participantMessages']['percentage']}"
                                     aria-valuemin="0" aria-valuemax="100">
                                     {$stats['participantMessages']['percentage']}%
                                 </div>
                             </div>
                             <small class="text-muted">
-                                {$stats['participantMessages']['user']} message(s) créés sur un total de {$stats['participantMessages']['totalUsers']}
+                                {$stats['participantMessages']['user']} / {$stats['participantMessages']['totalUsers']}
                             </small>
                         </div>
                         <div class="mb-3">
                             <div class="progress" style="height: 25px;">
-                                <div class="progress-bar bg-success" role="progressbar" 
-                                    style="width: {$stats['participantMessages']['percentage']}%;" 
-                                    aria-valuenow="{$stats['participantMessages']['percentage']}" 
+                                <div class="progress-bar bg-success" role="progressbar"
+                                    style="width: {$stats['participantMessages']['percentageWebapp']}%;"
+                                    aria-valuenow="{$stats['participantMessages']['percentageWebapp']}"
                                     aria-valuemin="0" aria-valuemax="100">
                                     {$stats['participantMessages']['percentageWebapp']}%
                                 </div>
                             </div>
                             <small class="text-muted">
-                                {$stats['participantMessages']['webapp']} message(s) reçus sur un total de {$stats['participantMessages']['totalWebapp']}
+                                {$stats['participantMessages']['webapp']} / {$stats['participantMessages']['totalWebapp']}
                             </small>
                         </div>
                     </div>
                 </div>
 
+                <div class="row mt-4">
+                    <div class="col-md-12">
+                        <h3>{='user.statistics.participation_distribution'|translate}</h3>
+                        <div style="width: 100%; height: 200px;">
+                            <canvas id="participationChart"></canvas>
+                        </div>
+                    </div>
+                </div>
                 <div class="row">
                     <div class="col-md-12">
-                        <h3>Distribution des visites</h3>
+                        <h3>{='user.statistics.visit_distribution'|translate}</h3>
                         <div style="width: 100%; height: 200px;">
                             <canvas id="visitorChart"></canvas>
                         </div>
@@ -242,9 +251,8 @@
                 <div class="row mt-3">
                     <div class="col-md-12">
                         <div class="alert alert-info">
-                            <i class="bi bi-info-circle"></i> 
-                            <strong>Information:</strong> Ce graphique montre la distribution des membres par nombre de pages visitées.
-                            Votre position est indiquée par un point plus gros.
+                            <i class="bi bi-info-circle"></i>
+                            <strong>Information:</strong> {='user.statistics.chart_info'|translate}
                         </div>
                     </div>
                 </div>
@@ -256,7 +264,12 @@
 {block scripts}
 <script>
 const chartData = {$chartData};
+const participationChartData = {$participationChartData};
+window.i18n = {=json_encode($translations)|noescape};
+window.t = function(key) {
+    return window.i18n?.[key] ?? key;
+};
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
-<script src="/app/modules/User/js/statistics.js"></script>
+<script type="module" src="/app/modules/User/js/statistics.js"></script>
 {/block}

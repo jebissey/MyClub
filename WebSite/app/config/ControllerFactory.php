@@ -6,6 +6,7 @@ namespace app\config;
 
 use app\helpers\Application;
 use app\helpers\Backup;
+use app\helpers\DistributionCalculator;
 use app\helpers\ErrorManager;
 use app\helpers\News;
 use app\helpers\NotificationSender;
@@ -467,7 +468,9 @@ class ControllerFactory
         return new UserStatisticsController(
             $this->application,
             $this->personStatisticsDataHelper,
-            $this->logDataHelper
+            $this->logDataHelper,
+            $this->participantDataHelper,
+            new DistributionCalculator(),
         );
     }
 

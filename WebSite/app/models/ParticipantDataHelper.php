@@ -15,30 +15,48 @@ class ParticipantDataHelper extends Data
         parent::__construct($application);
     }
 
-    public function getEventParticipants($eventId)
+    public function getEventParticipants(int $eventId): array
     {
         $sql = "
-SELECT
-    COALESCE(pe.Email, c.Email) AS Email,
-    COALESCE(pe.NickName, c.NickName) AS NickName,
-    pe.FirstName,
-    pe.LastName,
-    pe.Id AS PersonId,
-    pe.InPresentationDirectory,
-    c.Id AS ContactId
-FROM Participant pa
-LEFT JOIN Person pe ON pa.IdPerson = pe.Id
-LEFT JOIN Contact c ON pa.IdContact = c.Id
-INNER JOIN Event e ON pa.IdEvent = e.Id
-WHERE pa.IdEvent = :eventId
-    AND e.Canceled = 0
-ORDER BY pe.FirstName, pe.LastName, c.NickName
-    ";
+            SELECT
+                COALESCE(pe.Email, c.Email) AS Email,
+                COALESCE(pe.NickName, c.NickName) AS NickName,
+                pe.FirstName,
+                pe.LastName,
+                pe.Id AS PersonId,
+                pe.InPresentationDirectory,
+                c.Id AS ContactId
+            FROM Participant pa
+            LEFT JOIN Person pe ON pa.IdPerson = pe.Id
+            LEFT JOIN Contact c ON pa.IdContact = c.Id
+            INNER JOIN Event e ON pa.IdEvent = e.Id
+            WHERE pa.IdEvent = :eventId
+                AND e.Canceled = 0
+            ORDER BY pe.FirstName, pe.LastName, c.NickName
+        ";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':eventId' => $eventId]);
         return $stmt->fetchAll(PDO::FETCH_OBJ);
     }
 
+    public function getParticipations(array $season): array
+    {
+        $query = $this->pdo->prepare("
+            SELECT LOWER(p.Email) as Email, COUNT(pa.Id) as ParticipationCount
+            FROM Participant pa
+            JOIN Person p ON p.Id = pa.IdPerson
+            JOIN Event e ON e.Id = pa.IdEvent
+            WHERE e.StartTime BETWEEN :start AND :end
+            AND e.Canceled = 0
+            AND pa.IdPerson IS NOT NULL
+            GROUP BY p.Email
+        ");
+        $query->execute([
+            ':start' => $season['start'],
+            ':end'   => $season['end']
+        ]);
+        return $query->fetchAll(PDO::FETCH_KEY_PAIR);
+    }
 
     public function getConnections(int $idPerson): array
     {
