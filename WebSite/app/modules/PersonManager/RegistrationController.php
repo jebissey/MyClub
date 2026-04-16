@@ -30,17 +30,20 @@ class RegistrationController extends TableController
                 'lastName' => FilterInputRule::PersonName->value,
                 'firstName' => FilterInputRule::PersonName->value,
                 'nickName' => FilterInputRule::PersonName->value,
+                'email' => FilterInputRule::Email->value,
             ];
             $filterValues = WebApp::filterInput($schema, $this->flight->request()->query->getData());
             $filterConfig = [
                 ['name' => 'lastName', 'label' => 'Nom'],
                 ['name' => 'firstName', 'label' => 'Prénom'],
-                ['name' => 'nickName', 'label' => 'Surnom']
+                ['name' => 'nickName', 'label' => 'Surnom'],
+                ['name' => 'email', 'label' => 'Email'],
             ];
             $columns = [
                 ['field' => 'LastName', 'label' => 'Nom'],
                 ['field' => 'FirstName', 'label' => 'Prénom'],
-                ['field' => 'NickName', 'label' => 'Surnom']
+                ['field' => 'NickName', 'label' => 'Surnom'],
+                ['field' => 'Email', 'label' => 'Email'],
             ];
             $data = $this->prepareTableData($this->tableControllerDataHelper->getActivePersonsQuery(), $filterValues);
             $this->render('PersonManager/views/registration_groups_index.latte', $this->getAllParams([
@@ -65,7 +68,7 @@ class RegistrationController extends TableController
     public function getPersonGroups($personId)
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isGroupManager())) {
-            [$availableGroups, $currentGroups] = $this->groupDataHelper->getAvailableGroups($this->application->getConnectedUser());
+            [$availableGroups, $currentGroups] = $this->groupDataHelper->getAvailableGroups($this->application->getConnectedUser(), $personId);
 
             try {
                 $this->render('PersonManager/views/registration_user_groups_partial.latte', $this->getAllParams([

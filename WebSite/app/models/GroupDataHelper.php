@@ -19,7 +19,7 @@ class GroupDataHelper extends Data
         parent::__construct($application);
     }
 
-    public function getAvailableGroups(ConnectedUser $connectedUser): array
+    public function getAvailableGroups(ConnectedUser $connectedUser, int $personId): array
     {
         $having = $this->getAuthorizationHavingClause($connectedUser);
         if ($having === 'HAVING 1 = 0') {
@@ -42,7 +42,7 @@ class GroupDataHelper extends Data
             GROUP BY g.Id, g.Name
             $having
         ");
-        $currentGroupsQuery->execute([$connectedUser->person->Id]);
+        $currentGroupsQuery->execute([$personId]);
         $currentGroups = $currentGroupsQuery->fetchAll(PDO::FETCH_OBJ);
 
         $availableGroupsQuery = "
@@ -71,7 +71,7 @@ class GroupDataHelper extends Data
                 WHERE pg.IdPerson = ?
             )
         ");
-        $availableGroupsLeftQuery->execute([$connectedUser->person->Id]);
+        $availableGroupsLeftQuery->execute([$personId]);
 
         return [
             $availableGroupsLeftQuery->fetchAll(),
