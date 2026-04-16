@@ -23,6 +23,7 @@ use app\models\MessageDataHelper;
 use app\models\PersonDataHelper;
 use app\modules\Article\services\ArticleAuthorizationService;
 use app\modules\Common\TableController;
+use app\modules\Common\services\ArticleService;
 use app\modules\Common\services\AuthenticationService;
 use app\modules\Common\services\EmailService;
 use app\modules\Common\services\MessageService;
@@ -43,6 +44,7 @@ class ArticleController extends TableController
         private MessageDataHelper $messageDataHelper,
         private EmailService $emailService,
         private LogDataHelper $logDataHelper,
+        private ArticleService $articleService
     ) {
         parent::__construct($application);
         $this->authorizationService = new ArticleAuthorizationService(
@@ -133,12 +135,13 @@ class ArticleController extends TableController
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
-        $id = $this->dataHelper->set('Article', [
-            'Title'     => '',
-            'Content'   => '',
-            'CreatedBy' => $this->application->getConnectedUser()->person->Id ?? throw new IntegrityException('Fatal error in file ' . __FILE__ . ' at line ' . __LINE__)
-        ]);
-        $this->redirect('/article/edit/' . $id);
+
+        $userId = $this->application->getConnectedUser()->person->Id
+            ?? throw new IntegrityException('Fatal error in file ' . __FILE__ . ' at line ' . __LINE__);
+
+        $articleId = $this->articleService->createWithMedia($userId);
+
+        $this->redirect('/article/edit/' . $articleId);
     }
 
     public function delete(int $id): void

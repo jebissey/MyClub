@@ -39,6 +39,7 @@ use app\modules\Article\ArticleController;
 use app\modules\Article\MediaController;
 use app\modules\Article\OrderController;
 use app\modules\Article\SurveyController;
+use app\modules\Common\services\ArticleService;
 use app\modules\Common\services\AuthenticationService;
 use app\modules\Common\services\CredentialService;
 use app\modules\Common\services\EmailService;
@@ -60,6 +61,7 @@ use app\modules\PersonManager\GroupController;
 use app\modules\PersonManager\ImportController;
 use app\modules\PersonManager\PersonController;
 use app\modules\PersonManager\RegistrationController;
+use app\modules\Pwa\PwaController;
 use app\modules\Translator\TranslatorController;
 use app\modules\User\ContactController;
 use app\modules\User\HomeController;
@@ -91,6 +93,7 @@ class ControllerFactory
         private Application $application,
         private ArticleCrosstabDataHelper $articleCrosstabDataHelper,
         private ArticleDataHelper $articleDataHelper,
+        private ArticleService $articleService,
         private ArticleTableDataHelper $articleTableDataHelper,
         private AuthenticationService $authenticationService,
         private Backup $backup,
@@ -132,7 +135,8 @@ class ControllerFactory
             $this->articleCrosstabDataHelper,
             $this->messageDataHelper,
             $this->emailService,
-            $this->logDataHelper
+            $this->logDataHelper,
+            $this->articleService,
         );
     }
 
@@ -315,6 +319,14 @@ class ControllerFactory
             $this->application,
             $this->tableControllerDataHelper,
             $this->personDataHelper,
+        );
+    }
+
+    public function MakePwaController(): PwaController
+    {
+        return new PwaController(
+            $this->application,
+            $this->articleService
         );
     }
 

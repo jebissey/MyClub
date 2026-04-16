@@ -4881,7 +4881,14 @@ INSERT INTO "Languages" VALUES (645,'media.manager.share.error','An error occurr
 INSERT INTO "Languages" VALUES (646,'media.manager.delete.confirm','Are you sure you want to delete this file?','Êtes-vous sûr de vouloir supprimer ce fichier ?','Czy na pewno chcesz usunąć ten plik?');
 INSERT INTO "Languages" VALUES (647,'media.manager.delete.success','File deleted.','Fichier supprimé.','Plik usunięty.');
 INSERT INTO "Languages" VALUES (648,'media.manager.delete.error','Error deleting file.','Erreur lors de la suppression du fichier.','Błąd podczas usuwania pliku.');
-INSERT INTO "Metadata" VALUES (1,'MyClub',44,0,1000000,NULL,10,36,6,NULL,0,NULL);
+INSERT INTO "Languages" VALUES (649,'navbar.webmaster.club_customization','Club customization','Personnalisation du club','Dostosowanie klubu');
+INSERT INTO "Languages" VALUES (650,'webmaster.clubCustomization.title','Club customization','Personnalisation du club','Dostosowanie klubu');
+INSERT INTO "Languages" VALUES (651,'webmaster.clubCustomization.description','Configure the appearance of your application (name, colors, PWA branding).','Configure l’apparence de ton application (nom, couleurs, branding PWA).','Skonfiguruj wygląd aplikacji (nazwa, kolory, branding PWA).');
+INSERT INTO "Languages" VALUES (652,'webmaster.clubCustomization.clubName','Club name','Nom du club','Nazwa klubu');
+INSERT INTO "Languages" VALUES (653,'webmaster.clubCustomization.clubShortName','Short name','Nom court','Krótka nazwa');
+INSERT INTO "Languages" VALUES (654,'webmaster.clubCustomization.themeColor','Primary color','Couleur principale','Kolor główny');
+INSERT INTO "Languages" VALUES (655,'webmaster.clubCustomization.backgroundColor','Background color','Couleur fond','Kolor tła');
+INSERT INTO "Metadata" VALUES (1,'MyClub',45,0,1000000,NULL,10,36,6,NULL,0,NULL);
 INSERT INTO "Person" VALUES (1,'webmaster@myclub.foo','e427c26faca947919b18b797bc143a35100e4de48c34b70b26202d3a7d8e51f7','my first name','my last name','my nick name or nothing',NULL,'0',NULL,NULL,NULL,NULL,NULL,0,0,NULL,NULL,'2025-01-01',0,0,0,NULL,NULL,NULL,NULL,NULL,NULL,'');
 INSERT INTO "PersonGroup" VALUES (1,1,1);
 INSERT INTO "Settings" VALUES (1,'Title','title');

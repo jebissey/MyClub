@@ -50,6 +50,7 @@ use app\config\routes\MessageApi;
 use app\config\routes\NotificationApi;
 use app\config\routes\Order;
 use app\config\routes\Person;
+use app\config\routes\Pwa;
 use app\config\routes\Registration;
 use app\config\routes\Rss;
 use app\config\routes\Solfege;
@@ -78,6 +79,7 @@ use app\enums\ApplicationError;
 use app\helpers\Application;
 use app\helpers\Backup;
 use app\helpers\ErrorManager;
+use app\helpers\MediaManager;
 use app\helpers\News;
 use app\helpers\NotificationSender;
 use app\helpers\PersonPreferences;
@@ -113,6 +115,7 @@ use app\models\PersonStatisticsDataHelper;
 use app\models\SharedFileDataHelper;
 use app\models\SurveyDataHelper;
 use app\models\TableControllerDataHelper;
+use app\modules\Common\services\ArticleService;
 use app\modules\Common\services\AuthenticationService;
 use app\modules\Common\services\DatabaseSmtpConfigProvider;
 use app\modules\Common\services\CredentialService;
@@ -159,10 +162,12 @@ class Routes
             $personDataHelper,
             $surveyDataHelper,
         ];
+        $sharedFileDataHelper = new SharedFileDataHelper($application);
         $this->controllerFactory = new ControllerFactory(
             $application,
             new ArticleCrosstabDataHelper($application, $crosstabDataHelper),
             $articleDataHelper,
+            new ArticleService(new CarouselDataHelper($application), new MediaManager($dataHelper, $sharedFileDataHelper), $dataHelper),
             new ArticleTableDataHelper($application),
             new AuthenticationService($dataHelper, $emailService),
             new Backup(),
@@ -187,7 +192,7 @@ class Routes
             $personDataHelper,
             new PersonGroupDataHelper($application),
             new PersonStatisticsDataHelper($application),
-            new SharedFileDataHelper($application),
+            $sharedFileDataHelper,
             $surveyDataHelper,
             new TableControllerDataHelper($application),
             new WebApp(),
@@ -218,7 +223,7 @@ class Routes
             $participantDataHelper,
             $personDataHelper,
             $personPreferences,
-            new SharedFileDataHelper($application),
+            $sharedFileDataHelper,
         );
     }
 
@@ -288,6 +293,7 @@ class Routes
         $this->routes = array_merge($this->routes, (new NotificationApi($this->apiFactory))->get());
         $this->routes = array_merge($this->routes, (new Order($this->controllerFactory))->get());
         $this->routes = array_merge($this->routes, (new Person($this->controllerFactory))->get());
+        $this->routes = array_merge($this->routes, (new Pwa($this->controllerFactory))->get());
         $this->routes = array_merge($this->routes, (new Registration($this->controllerFactory))->get());
         $this->routes = array_merge($this->routes, (new Rss($this->controllerFactory))->get());
         $this->routes = array_merge($this->routes, (new Solfege($this->controllerFactory))->get());

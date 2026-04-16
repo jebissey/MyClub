@@ -1,0 +1,54 @@
+{extends 'webmaster.latte'}
+
+{block content}
+<div class="container mt-4">
+    <h2 class="mb-4"><strong>🏷️ {='webmaster.clubCustomization.title'|translate}</strong></h2>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <p class="text-muted mb-0">
+                {='webmaster.clubCustomization.description'|translate}
+            </p>
+        </div>
+    </div>
+
+    <form method="POST" action="/webmaster/club-customization/save">
+
+        <div class="mb-3">
+            <label class="form-label"><strong>{='webmaster.clubCustomization.clubName'|translate}</strong></label>
+            <input type="text" class="form-control"
+                   name="clubName"
+                   value="{$settings['clubName']}">
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label"><strong>{='webmaster.clubCustomization.clubShortName'|translate}</strong></label>
+            <input type="text" class="form-control"
+                   name="clubShortName"
+                   value="{$settings['clubShortName']}">
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label"><strong>{='webmaster.clubCustomization.themeColor'|translate}</strong></label>
+            <input type="color" class="form-control form-control-color"
+                   name="themeColor"
+                   value="{$settings['themeColor']}">
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label"><strong>{='webmaster.clubCustomization.backgroundColor'|translate}</strong></label>
+            <input type="color" class="form-control form-control-color"
+                   name="background"
+                   value="{$settings['background']}">
+        </div>
+
+        <div class="d-flex justify-content-end gap-2 mt-4">
+            <a href="/webmaster" class="btn btn-secondary">{='cancel'|translate}</a>
+            <button type="submit" class="btn btn-primary">
+                <i class="bi bi-floppy me-1"></i>{='save'|translate}
+            </button>
+        </div>
+
+    </form>
+</div>
+{/block}

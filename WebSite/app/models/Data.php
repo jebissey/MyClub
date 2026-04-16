@@ -114,6 +114,12 @@ abstract class Data
         }
     }
 
+    public function getSetting(string $name, string $default): string
+    {
+        $row = $this->get('Settings', ['Name' => $name], 'Value');
+        return $row !== false ? $row->Value : $default;
+    }
+
     public function gets(string $table, array $where = [], string $fields = '*', string $orderBy = '', bool $keyPair = false): array
     {
         $this->validateTableName($table);
@@ -267,6 +273,18 @@ abstract class Data
                 'Database error: ' . $e->getMessage() . ' in file ' . __FILE__ . ' at line ' . __LINE__
             );
             return false;
+        }
+    }
+
+    public function setSetting(string $name, string $value): void
+    {
+        if ($this->get('Settings', ['Name' => $name], 'Id')) {
+            $this->set('Settings', ['Value' => $value], ['Name' => $name]);
+        } else {
+            $this->set('Settings', [
+                'Name'  => $name,
+                'Value' => $value
+            ]);
         }
     }
 

@@ -9,7 +9,7 @@ use RuntimeException;
 use app\models\DataHelper;
 use app\models\SharedFileDataHelper;
 
-class Media
+class MediaManager
 {
     private const MEDIA_PATH =  __DIR__ . '/../../data/media/';
 

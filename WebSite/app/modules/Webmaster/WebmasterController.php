@@ -28,6 +28,47 @@ class WebmasterController extends AbstractController
         parent::__construct($application);
     }
 
+    public function clubCustomizationEdit(): void
+    {
+        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isWebmaster())) {
+
+            $settings = [
+                'clubName'      => $this->dataHelper->getSetting('PWA_Name', 'MyClub'),
+                'clubShortName' => $this->dataHelper->getSetting('PWA_ShortName', 'MyClub'),
+                'themeColor'    => $this->dataHelper->getSetting('PWA_ThemeColor', '#0d6efd'),
+                'background'    => $this->dataHelper->getSetting('PWA_BackgroundColor', '#ffffff'),
+            ];
+
+            $this->render('Webmaster/views/clubCustomization.latte', $this->getAllParams([
+                'navItems' => $this->getNavItems($this->application->getConnectedUser()->person),
+                'page'     => 'clubCustomization',
+                'settings' => $settings,
+            ]));
+        }
+    }
+
+    public function clubCustomizationSave(): void
+    {
+        if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isWebmaster())) {
+
+            $schema = [
+                'clubName'      => FilterInputRule::Text->value,
+                'clubShortName' => FilterInputRule::Text->value,
+                'themeColor'    => FilterInputRule::Text->value,
+                'background'    => FilterInputRule::Text->value,
+            ];
+
+            $input = WebApp::filterInput($schema, $this->flight->request()->data->getData());
+
+            $this->dataHelper->setSetting('PWA_Name', $input['clubName'] ?? 'MyClub');
+            $this->dataHelper->setSetting('PWA_ShortName', $input['clubShortName'] ?? 'MyClub');
+            $this->dataHelper->setSetting('PWA_ThemeColor', $input['themeColor'] ?? '#0d6efd');
+            $this->dataHelper->setSetting('PWA_BackgroundColor', $input['background'] ?? '#ffffff');
+
+            $this->redirect('/webmaster');
+        }
+    }
+
     public function helpAdmin(): void
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isAdministrator())) {
