@@ -4922,7 +4922,17 @@ INSERT INTO "Languages" VALUES (686,'emailCredentials.encryption_ssl','SSL (port
 INSERT INTO "Languages" VALUES (687,'emailCredentials.smtpFrom','SMTP From address','Adresse d''expédition SMTP','Adres nadawcy SMTP');
 INSERT INTO "Languages" VALUES (688,'emailCredentials.smtpFrom_placeholder','sender@example.com','expediteur@exemple.com','nadawca@przyklad.pl');
 INSERT INTO "Languages" VALUES (689,'emailCredentials.smtpFrom_help','Email address used as sender. Must be allowed by your SMTP server.','Adresse e-mail utilisée comme expéditeur. Doit être autorisée par votre serveur SMTP.','Adres e-mail nadawcy. Musi być dozwolony przez serwer SMTP.');
-INSERT INTO "Metadata" VALUES (1,'MyClub',47,0,1000000,NULL,10,36,6,NULL,0,NULL);
+INSERT INTO "Languages" VALUES (690,'visitor_insights.analytics.title','Visitor overview','Synthèse des visiteurs','Podsumowanie odwiedzających');
+INSERT INTO "Languages" VALUES (691,'visitor_insights.analytics.period.day','Day','Jour','Dzień');
+INSERT INTO "Languages" VALUES (692,'visitor_insights.analytics.period.week','Week','Semaine','Tydzień');
+INSERT INTO "Languages" VALUES (693,'visitor_insights.analytics.period.month','Month','Mois','Miesiąc');
+INSERT INTO "Languages" VALUES (694,'visitor_insights.analytics.period.year','Year','Année','Rok');
+INSERT INTO "Languages" VALUES (695,'visitor_insights.analytics.os','Operating systems','Systèmes d''exploitation','Systemy operacyjne');
+INSERT INTO "Languages" VALUES (696,'visitor_insights.analytics.browser','Browsers','Navigateurs','Przeglądarki');
+INSERT INTO "Languages" VALUES (697,'visitor_insights.analytics.resolution','Screen resolutions','Résolutions d''écran','Rozdzielczości ekranu');
+INSERT INTO "Languages" VALUES (698,'visitor_insights.analytics.device','Devices','Matériel','Urządzenia');
+INSERT INTO "Languages" VALUES (699,'visitor_insights.analytics.visits','Visits','Visites','Wizyty');
+INSERT INTO "Metadata" VALUES (1,'MyClub',48,0,1000000,NULL,10,36,6,NULL,0,NULL);
 INSERT INTO "Person" VALUES (1,'webmaster@myclub.foo','e427c26faca947919b18b797bc143a35100e4de48c34b70b26202d3a7d8e51f7','my first name','my last name','my nick name or nothing',NULL,'0',NULL,NULL,NULL,NULL,NULL,0,0,NULL,NULL,'2025-01-01',0,0,0,NULL,NULL,NULL,NULL,NULL,NULL,'');
 INSERT INTO "PersonGroup" VALUES (1,1,1);
 INSERT INTO "Settings" VALUES (1,'Title','title');

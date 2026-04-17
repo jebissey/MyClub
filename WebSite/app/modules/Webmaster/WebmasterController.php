@@ -205,6 +205,7 @@ class WebmasterController extends AbstractController
                 'page'     => $this->application->getConnectedUser()->getPage(),
                 'sendMethod'          => $this->credentials->get('email', 'method'),
                 'smtpAccount'         => $this->credentials->get('smtp', 'username'),
+                'smtpFrom'            => $this->credentials->get('smtp', 'from'),
                 'smtpHost'            => $this->credentials->get('smtp', 'host'),
                 'smtpPort'            => $this->credentials->get('smtp', 'port'),
                 'smtpEncryption'      => $this->credentials->get('smtp', 'encryption'),

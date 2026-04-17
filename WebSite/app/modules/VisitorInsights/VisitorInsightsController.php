@@ -217,6 +217,9 @@ class VisitorInsightsController extends TableController
             'control'              => new WebApp($this->application),
             'period'               => $period,
             'nav'                  => $this->logDataAnalyticsHelper->getReferentNavigation($period, $currentDate),
+            'translations' => [
+                'visits' => $this->languagesDataHelper->translate('visitor_insights.analytics.visits'),
+            ],
         ]));
     }
 

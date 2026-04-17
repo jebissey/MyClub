@@ -135,8 +135,8 @@
     </div>
 
     {include 'emailLimits.latte',
-        dailyLimit   => $smtpDailyLimit   ?? '',
-        monthlyLimit => $smtpMonthlyLimit ?? '',
+        dailyLimit   => $dailyLimit   ?? '',
+        monthlyLimit => $monthlyLimit ?? '',
         dailyId      => 'smtpDailyLimit',
         monthlyId    => 'smtpMonthlyLimit',
         dailyPlaceholder   => '∞',
