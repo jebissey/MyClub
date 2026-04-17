@@ -39,8 +39,8 @@ final class EmailService
             $dailySent   = $this->quotaTracker->getDailySent();
             $monthlySent = $this->quotaTracker->getMonthlySent();
 
-            $dailyOk   = $config->dailyLimit   === null || ($dailySent   + $count) <= $config->dailyLimit;
-            $monthlyOk = $config->monthlyLimit === null || ($monthlySent + $count) <= $config->monthlyLimit;
+            $dailyOk   = $config->dailyLimit   === 0 || ($dailySent   + $count) <= $config->dailyLimit;
+            $monthlyOk = $config->monthlyLimit === 0 || ($monthlySent + $count) <= $config->monthlyLimit;
 
             if (!$dailyOk || !$monthlyOk) {
                 if ($count === 1) {
@@ -102,7 +102,6 @@ final class EmailService
     private function sendWithPHPMailer(EmailMessage $message, SmtpConfig $config): bool
     {
         $mail = new PHPMailer(true);
-
         try {
             $mail->isSMTP();
             $mail->Host     = $config->host;
@@ -119,8 +118,8 @@ final class EmailService
                 default => null,
             };
 
-            $mail->setFrom($config->username, 'MyClub');
-            $mail->addReplyTo($message->replyTo ?? $config->username);
+            $mail->setFrom($config->from, 'MyClub');
+            $mail->addReplyTo($message->replyTo ?? $config->from);
             $mail->addAddress($message->to);
 
             foreach ($message->cc  as $email) {

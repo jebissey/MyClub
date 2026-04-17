@@ -1,37 +1,137 @@
 <div id="fields-smtp" class="d-none">
+
     <div class="mb-3">
-        <label class="form-label">{='emailCredentials.email'|translate}</label>
-        <input type="email" class="form-control" id="sendEmailAddress"
-               name="sendEmailAddress" value="{$sendEmailAddress ?? ''}">
-        <div class="invalid-feedback">{='emailCredentials.invalid_email'|translate}</div>
+        <label for="smtpAccount" class="form-label d-flex align-items-center">
+            {='emailCredentials.smtpAccount'|translate}            
+        </label>
+        
+        <input type="text" 
+               class="form-control {if $error['smtpAccount'] ?? false}is-invalid{/if}"
+               id="smtpAccount"
+               name="smtpAccount" 
+               value="{$smtpAccount ?? ''}"
+               placeholder="{='emailCredentials.smtpAccount_placeholder'|translate}">
+        
+        <div class="form-text text-muted">
+            {='emailCredentials.smtpAccount_help'|translate}
+        </div>
+
+        {if $error['smtpAccount'] ?? false}
+            <div class="invalid-feedback">
+                {$error['smtpAccount']}
+            </div>
+        {/if}
     </div>
+
     <div class="mb-3">
-        <label class="form-label">{='emailCredentials.password'|translate}</label>
+        <label for="smtpPassword" class="form-label">
+            {='emailCredentials.password'|translate}
+        </label>
+        
         <div class="input-group">
-            <input type="password" class="form-control" id="sendEmailPassword"
-                   name="sendEmailPassword">
+            <input type="password" 
+                   class="form-control {if $error['smtpPassword'] ?? false}is-invalid{/if}"
+                   id="smtpPassword"
+                   name="smtpPassword">
+            
             <button class="btn btn-outline-secondary" type="button" id="togglePassword">
                 <i class="bi bi-eye"></i>
             </button>
         </div>
+
+        {if $error['smtpPassword'] ?? false}
+            <div class="invalid-feedback">
+                {$error['smtpPassword']}
+            </div>
+        {/if}
     </div>
+
     <div class="mb-3">
-        <label class="form-label">{='emailCredentials.host'|translate}</label>
-        <input type="text" class="form-control" id="sendEmailHost"
-               name="sendEmailHost" value="{$sendEmailHost ?? ''}">
+        <label for="smtpFrom" class="form-label">
+            {='emailCredentials.smtpFrom'|translate}
+        </label>
+        
+        <input type="email" 
+            class="form-control {if $error['smtpFrom'] ?? false}is-invalid{/if}"
+            id="smtpFrom"
+            name="smtpFrom" 
+            value="{$smtpFrom ?? ''}"
+            placeholder="{='emailCredentials.smtpFrom_placeholder'|translate}">
+        
+        <div class="form-text text-muted">
+            {='emailCredentials.smtpFrom_help'|translate}
+        </div>
+
+        {if $error['smtpFrom'] ?? false}
+            <div class="invalid-feedback">
+                {$error['smtpFrom']}
+            </div>
+        {/if}
     </div>
+
     <div class="mb-3">
-        <label class="form-label">{='emailCredentials.port'|translate}</label>
-        <input type="number" class="form-control" id="sendEmailPort"
-               name="sendEmailPort" value="{$sendEmailPort ?? 587}" min="1" max="65535">
+        <label for="smtpHost" class="form-label">
+            {='emailCredentials.host'|translate}
+        </label>
+        <input type="text" 
+               class="form-control {if $error['smtpHost'] ?? false}is-invalid{/if}"
+               id="smtpHost"
+               name="smtpHost" 
+               value="{$smtpHost ?? ''}">
+        
+        {if $error['smtpHost'] ?? false}
+            <div class="invalid-feedback">
+                {$error['smtpHost']}
+            </div>
+        {/if}
     </div>
+
     <div class="mb-3">
-        <label class="form-label">{='emailCredentials.encryption'|translate}</label>
-        <select class="form-select" id="sendEmailEncryption" name="sendEmailEncryption">
-            <option value="tls"  {if ($sendEmailEncryption ?? 'tls') === 'tls' }selected{/if}>TLS (STARTTLS – port 587)</option>
-            <option value="ssl"  {if ($sendEmailEncryption ?? '')    === 'ssl' }selected{/if}>SSL (port 465)</option>
-            <option value="none" {if ($sendEmailEncryption ?? '')    === 'none'}selected{/if}>{='emailCredentials.no_encryption'|translate}</option>
+        <label for="smtpPort" class="form-label">
+            {='emailCredentials.port'|translate}
+        </label>
+        <input type="number" 
+               class="form-control {if $error['smtpPort'] ?? false}is-invalid{/if}"
+               id="smtpPort"
+               name="smtpPort" 
+               value="{$smtpPort ?? 587}" 
+               min="1" 
+               max="65535">
+        
+        {if $error['smtpPort'] ?? false}
+            <div class="invalid-feedback">
+                {$error['smtpPort']}
+            </div>
+        {/if}
+    </div>
+
+    <div class="mb-3">
+        <label for="smtpEncryption" class="form-label">
+            {='emailCredentials.encryption'|translate}
+        </label>
+        <select class="form-select {if $error['smtpEncryption'] ?? false}is-invalid{/if}" 
+                id="smtpEncryption" 
+                name="smtpEncryption">
+
+            <option value="tls" {if ($smtpEncryption ?? 'tls') === 'tls'}selected{/if}>
+                {='emailCredentials.encryption_tls'|translate}
+            </option>
+
+            <option value="ssl" {if ($smtpEncryption ?? '') === 'ssl'}selected{/if}>
+                {='emailCredentials.encryption_ssl'|translate}
+            </option>
+
+            <option value="none" {if ($smtpEncryption ?? '') === 'none'}selected{/if}>
+                {='emailCredentials.no_encryption'|translate}
+            </option>
+
         </select>
+        
+        {if $error['smtpEncryption'] ?? false}
+            <div class="invalid-feedback">
+                {$error['smtpEncryption']}
+            </div>
+        {/if}
     </div>
 
     {include 'emailLimits.latte',
@@ -41,4 +141,5 @@
         monthlyId    => 'smtpMonthlyLimit',
         dailyPlaceholder   => '∞',
         monthlyPlaceholder => '∞'}
+
 </div>

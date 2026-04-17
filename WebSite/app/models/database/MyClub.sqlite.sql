@@ -2674,7 +2674,7 @@ INSERT INTO "Languages" VALUES (144,'navbar.webmaster.send_emails','Emails','Cou
 INSERT INTO "Languages" VALUES (145,'navbar.webmaster.maintenance','Maintenance','Maintenance','Konserwacja');
 INSERT INTO "Languages" VALUES (146,'navbar.webmaster.installations','Installations','Installations','Instalacje');
 INSERT INTO "Languages" VALUES (147,'emailCredentials.title','Account to use for sending emails','Compte à utiliser pour envoyer des courriels','Konto do użycia do wysyłania wiadomości e-mail');
-INSERT INTO "Languages" VALUES (148,'emailCredentials.email','Email','Email','Email');
+INSERT INTO "Languages" VALUES (148,'emailCredentials.smtpAccount','SMTP Account','Compte SMTP','Konto SMTP');
 INSERT INTO "Languages" VALUES (149,'emailCredentials.password','Password','Mot de passe','Hasło');
 INSERT INTO "Languages" VALUES (150,'emailCredentials.host','Host','Hôte','Host');
 INSERT INTO "Languages" VALUES (151,'emailCredentials.invalid_email','Please enter a valid email','Veuillez entrer un email valide','Proszę wprowadzić prawidłowy email');
@@ -4915,7 +4915,14 @@ INSERT INTO "Languages" VALUES (679,'user.statistics.chart.visits.y_axis','Visit
 INSERT INTO "Languages" VALUES (680,'user.statistics.chart.visits.x_axis','Number of pages visited','Nombre de pages visitées','Liczba odwiedzonych stron');
 INSERT INTO "Languages" VALUES (681,'user.statistics.chart.participations.y_axis','Members','Membres','Członkowie');
 INSERT INTO "Languages" VALUES (682,'user.statistics.chart.participations.x_axis','Number of events','Nombre d''événements','Liczba wydarzeń');
-INSERT INTO "Metadata" VALUES (1,'MyClub',46,0,1000000,NULL,10,36,6,NULL,0,NULL);
+INSERT INTO "Languages" VALUES (683,'emailCredentials.smtpAccount_placeholder','SMTP username','Nom d''utilisateur SMTP','Nazwa użytkownika SMTP');
+INSERT INTO "Languages" VALUES (684,'emailCredentials.smtpAccount_help','Login used to connect to the SMTP server (not necessarily an email address).','Identifiant de connexion au serveur SMTP (pas forcément une adresse e-mail).','Login do serwera SMTP (niekoniecznie adres e-mail).');
+INSERT INTO "Languages" VALUES (685,'emailCredentials.encryption_tls','TLS (STARTTLS – port 587)','TLS (STARTTLS – port 587)','TLS (STARTTLS – port 587)');
+INSERT INTO "Languages" VALUES (686,'emailCredentials.encryption_ssl','SSL (port 465)','SSL (port 465)','SSL (port 465)');
+INSERT INTO "Languages" VALUES (687,'emailCredentials.smtpFrom','SMTP From address','Adresse d''expédition SMTP','Adres nadawcy SMTP');
+INSERT INTO "Languages" VALUES (688,'emailCredentials.smtpFrom_placeholder','sender@example.com','expediteur@exemple.com','nadawca@przyklad.pl');
+INSERT INTO "Languages" VALUES (689,'emailCredentials.smtpFrom_help','Email address used as sender. Must be allowed by your SMTP server.','Adresse e-mail utilisée comme expéditeur. Doit être autorisée par votre serveur SMTP.','Adres e-mail nadawcy. Musi być dozwolony przez serwer SMTP.');
+INSERT INTO "Metadata" VALUES (1,'MyClub',47,0,1000000,NULL,10,36,6,NULL,0,NULL);
 INSERT INTO "Person" VALUES (1,'webmaster@myclub.foo','e427c26faca947919b18b797bc143a35100e4de48c34b70b26202d3a7d8e51f7','my first name','my last name','my nick name or nothing',NULL,'0',NULL,NULL,NULL,NULL,NULL,0,0,NULL,NULL,'2025-01-01',0,0,0,NULL,NULL,NULL,NULL,NULL,NULL,'');
 INSERT INTO "PersonGroup" VALUES (1,1,1);
 INSERT INTO "Settings" VALUES (1,'Title','title');

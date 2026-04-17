@@ -9,7 +9,7 @@ use InvalidArgumentException;
 readonly class EmailMessage
 {
     public function __construct(
-        public string $from,
+        public ?string $from,
         public string $to,
         public string $subject,
         public string $body,
@@ -37,8 +37,10 @@ readonly class EmailMessage
     }
 
     #region Private functions
-    private static function assertValidEmail(string $email): void
+    private static function assertValidEmail(?string $email): void
     {
+        if ($email === null) return;
+        
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             throw new InvalidArgumentException("Invalid email: {$email}");
         }

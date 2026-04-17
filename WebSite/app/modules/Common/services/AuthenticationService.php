@@ -43,10 +43,9 @@ class AuthenticationService
         if ($host === 'localhost' || $host === null) {
             $host = 'myclub.foo';
         }
-        $fromEmail = 'no-reply@' . $host;
 
         $emailMessage = new EmailMessage(
-            from: $fromEmail,
+            from: null,
             to: $email,
             subject: $subject,
             body: $message,

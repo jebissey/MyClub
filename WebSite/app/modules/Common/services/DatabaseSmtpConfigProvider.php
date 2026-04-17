@@ -34,6 +34,7 @@ final class DatabaseSmtpConfigProvider implements SmtpConfigProviderInterface
             $this->credentials->get(self::SERVICE, 'host') ?? '',
             $this->credentials->get(self::SERVICE, 'username') ?? '',
             $this->credentials->get(self::SERVICE, 'password') ?? '',
+            $this->credentials->get(self::SERVICE, 'from') ?? '',
             (int) ($this->credentials->get(self::SERVICE, 'port') ?? 587),
             $this->credentials->get(self::SERVICE, 'encryption') ?? 'tls',
             $this->credentials->get('mailjet', 'api_key') ?? '',

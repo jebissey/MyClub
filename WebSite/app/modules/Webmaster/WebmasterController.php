@@ -204,10 +204,10 @@ class WebmasterController extends AbstractController
                 'navItems' => $this->getNavItems($this->application->getConnectedUser()->person),
                 'page'     => $this->application->getConnectedUser()->getPage(),
                 'sendMethod'          => $this->credentials->get('email', 'method'),
-                'sendEmailAddress'    => $this->credentials->get('smtp', 'username'),
-                'sendEmailHost'       => $this->credentials->get('smtp', 'host'),
-                'sendEmailPort'       => $this->credentials->get('smtp', 'port'),
-                'sendEmailEncryption' => $this->credentials->get('smtp', 'encryption'),
+                'smtpAccount'         => $this->credentials->get('smtp', 'username'),
+                'smtpHost'            => $this->credentials->get('smtp', 'host'),
+                'smtpPort'            => $this->credentials->get('smtp', 'port'),
+                'smtpEncryption'      => $this->credentials->get('smtp', 'encryption'),
                 'mailjetApiKey'       => $this->credentials->get('mailjet', 'api_key'),
                 'mailjetSender'       => $this->credentials->get('mailjet', 'sender'),
                 'dailyLimit'          => $this->credentials->get('email', 'daily_limit'),
@@ -219,14 +219,14 @@ class WebmasterController extends AbstractController
     public function sendEmailCredentialsSave(): void
     {
         if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isWebmaster())) {
-
             $schema = [
                 'sendMethod'           => FilterInputRule::Text->value,
-                'sendEmailAddress'     => FilterInputRule::Email->value,
-                'sendEmailPassword'    => FilterInputRule::Password->value,
-                'sendEmailHost'        => FilterInputRule::Uri->value,
-                'sendEmailPort'        => FilterInputRule::Integer->value,
-                'sendEmailEncryption'  => FilterInputRule::Text->value,
+                'smtpAccount'          => FilterInputRule::Email->value,
+                'smtpPassword'         => FilterInputRule::Password->value,
+                'smtpFrom'             => FilterInputRule::Email->value,
+                'smtpHost'             => FilterInputRule::Uri->value,
+                'smtpPort'             => FilterInputRule::Integer->value,
+                'smtpEncryption'       => FilterInputRule::Text->value,
                 'mailjetApiKey'        => FilterInputRule::Text->value,
                 'mailjetApiSecret'     => FilterInputRule::Text->value,
                 'mailjetSender'        => FilterInputRule::Email->value,
@@ -236,19 +236,19 @@ class WebmasterController extends AbstractController
                 'mailjetMonthlyLimit'  => FilterInputRule::Integer->value,
             ];
             $input = WebApp::filterInput($schema, $this->flight->request()->data->getData());
-            error_log("\n\n" . json_encode($input, JSON_PRETTY_PRINT) . "\n");
             $method = $input['sendMethod'] ?? 'smtp';
 
             $this->credentials->set('email', 'method', $method);
             match ($method) {
                 'smtp' => (function () use ($input) {
-                    $this->credentials->set('smtp', 'username',   $input['sendEmailAddress']    ?? '');
-                    if (!empty($input['sendEmailPassword'])) {
-                        $this->credentials->set('smtp', 'password', $input['sendEmailPassword']);
+                    $this->credentials->set('smtp', 'username',   $input['smtpAccount']    ?? '');
+                    if (!empty($input['smtpPassword'])) {
+                        $this->credentials->set('smtp', 'password', $input['smtpPassword']);
                     }
-                    $this->credentials->set('smtp', 'host',       $input['sendEmailHost']       ?? '');
-                    $this->credentials->set('smtp', 'port',       $input['sendEmailPort']       ?? '587');
-                    $this->credentials->set('smtp', 'encryption', $input['sendEmailEncryption'] ?? 'tls');
+                    $this->credentials->set('smtp', 'from',       $input['smtpFrom']       ?? '');
+                    $this->credentials->set('smtp', 'host',       $input['smtpHost']       ?? '');
+                    $this->credentials->set('smtp', 'port',       $input['smtpPort']       ?? '587');
+                    $this->credentials->set('smtp', 'encryption', $input['smtpEncryption'] ?? 'tls');
                     $this->credentials->set('email', 'daily_limit', (string)($input['smtpDailyLimit'] ?? "0"));
                     $this->credentials->set('email', 'monthly_limit', (string)($input['smtpMonthlyLimit'] ?? "0"));
                 })(),

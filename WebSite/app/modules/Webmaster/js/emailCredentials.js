@@ -10,11 +10,12 @@ class EmailCredentials {
         };
 
         this.smtpFields = [
-            'sendEmailAddress',
-            'sendEmailPassword',
-            'sendEmailHost',
-            'sendEmailPort',
-            'sendEmailEncryption'
+            'smtpAccount',
+            'smtpPassword',
+            'smtpFrom',
+            'smtpHost',
+            'smtpPort',
+            'smtpEncryption'
         ];
 
         this.mailjetFields = [
@@ -34,7 +35,7 @@ class EmailCredentials {
 
         this.applyMethod(this.select.value);
 
-        this.setupPasswordToggle('togglePassword', 'sendEmailPassword');
+        this.setupPasswordToggle('togglePassword', 'smtpPassword');
         this.setupPasswordToggle('toggleSecret', 'mailjetApiSecret');
     }
 
