@@ -110,6 +110,7 @@ class HomeController extends AbstractController
             'homeHeader'             => $homeHeader,
             'homeFooter'             => $homeFooter,
             'navItems'               => $this->getNavItems($connectedUser->person ?? false),
+            'sidebarMenu'            => $this->getSidebarMenuItems($connectedUser->person ?? false),
             'publishedBy'            => $articles['latestArticle']
                 && $articles['latestArticle']->PublishedBy != $articles['latestArticle']->CreatedBy
                 ? $this->personDataHelper->getPublisher($articles['latestArticle']->PublishedBy) : '',

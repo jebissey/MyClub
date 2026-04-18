@@ -130,6 +130,78 @@ abstract class AbstractController
         return $filteredNavItems;
     }
 
+    /**
+     * Retrieves sidebar menu items filtered according to the current user and their groups,
+     * structured as a nested array matching the expected sidebar format.
+     *
+     * @param object|false|null $person The current user object, false for anonymous.
+     * @param bool $all If true, returns all items without filtering.
+     * @return array<int, array> Structured sidebar menu array.
+     */
+    protected function getSidebarMenuItems(object|false|null $person, bool $all = false): array
+    {
+        $userGroups = [];
+        if ($person && $person !== false) {
+            $userGroups = $this->authorizationDataHelper->getUserGroups($person->Email);
+        }
+
+        $navItems = $this->dataHelper->gets(
+            'MenuItem',
+            ['What' => 'sidebar'],
+            'Id, ParentId, Type, Label, Icon, Url, IdGroup, ForMembers, ForContacts, ForAnonymous',
+            'Position'
+        );
+
+        $filteredNavItems = [];
+        foreach ($navItems as $navItem) {
+            if (
+                ($person === false && $navItem->ForAnonymous == 1) ||
+                ($person && $navItem->ForMembers == 1 &&
+                    (
+                        $navItem->IdGroup === null ||
+                        (!empty($userGroups) && in_array($navItem->IdGroup, $userGroups, true))
+                    )
+                ) ||
+                $all
+            ) {
+                $filteredNavItems[$navItem->Id] = $navItem;
+            }
+        }
+
+        // Build structured menu from flat filtered list
+        $sidebarMenu = [];
+        foreach ($filteredNavItems as $navItem) {
+            if ($navItem->ParentId !== null) {
+                continue; // children are attached below
+            }
+
+            $entry = ['type' => $navItem->Type];
+
+            match ($navItem->Type) {
+                'heading' => $entry['label'] = $navItem->Label,
+                'divider' => null,
+                'link'    => $entry += ['label' => $navItem->Label, 'icon' => $navItem->Icon, 'url' => $navItem->Url],
+                'submenu' => $entry += [
+                    'label'    => $navItem->Label,
+                    'icon'     => $navItem->Icon,
+                    'children' => array_values(
+                        array_map(
+                            fn($child) => ['label' => $child->Label, 'url' => $child->Url],
+                            array_filter(
+                                $filteredNavItems,
+                                fn($child) => $child->ParentId === $navItem->Id
+                            )
+                        )
+                    ),
+                ],
+            };
+
+            $sidebarMenu[] = $entry;
+        }
+
+        return $sidebarMenu;
+    }
+
     protected function raiseBadRequest(string $message, string $file, int $line): void
     {
         $this->application->getErrorManager()->raise(ApplicationError::BadRequest, "Error {$message} in file {$file} at line {$line}");
