@@ -1,10 +1,11 @@
 document.addEventListener('DOMContentLoaded', function () {
   const map = L.map('memberMap', {
-    maxZoom: 12
+    maxZoom: mapMaxZoom
   }).setView([47.3220, 5.0415], 10);
 
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    maxZoom: mapMaxZoom
   }).addTo(map);
 
   function createPopupContent(member) {

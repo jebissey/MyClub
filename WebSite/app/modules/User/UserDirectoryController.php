@@ -104,6 +104,7 @@ class UserDirectoryController extends AbstractController
             'btn_HistoryBack' => true,
             'title' => 'Carte des membres',
             'isPublic' => false,
+            'maxZoom' => 12,
         ]));
     }
 
@@ -131,6 +132,7 @@ class UserDirectoryController extends AbstractController
             'btn_HistoryBack' => true,
             'title' => "Carte des membres publics",
             'isPublic' => true,
+            'maxZoom' => 10,
         ]));
     }
 
