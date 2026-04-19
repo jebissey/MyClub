@@ -24,7 +24,7 @@ class UserMessagesController extends AbstractController
     {
         $connectedUser = $this->application->getConnectedUser();
         if ($connectedUser->person ?? false) {
-            $searchMode = WebApp::getFiltered('from', $this->application->enumToValues(\app\enums\Period::class), $this->flight->request()->query->getData()) ?: \app\enums\Period::Signout->value;
+            $searchMode = WebApp::getFiltered('from', $this->application->enumToValues(\app\enums\Period::class), $this->flight->request()->query->getData()) ?: Period::Signout->value;
 
             if ($searchMode === Period::Signin->value) $searchFrom = $connectedUser->person->LastSignIn ?? '';
             elseif ($searchMode === Period::Signout->value) $searchFrom = $connectedUser->person->LastSignOut ?? '';
@@ -34,10 +34,8 @@ class UserMessagesController extends AbstractController
             elseif ($searchMode === Period::Year->value)     $searchFrom = date('Y-m-d H:i:s', strtotime('-1 year'));
             else $searchFrom = '';
 
-            $messages = $this->messageDataHelper->getGroupedMessages($connectedUser->person->Id, $searchFrom);
-
             $this->render('User/views/messages.latte', $this->getAllParams([
-                'messages' => $messages,
+                'messages' => $this->messageDataHelper->getGroupedMessages($connectedUser->person->Id, $searchFrom),
                 'searchFrom' => $searchFrom,
                 'searchMode' => $searchMode,
                 'navItems' => $this->getNavItems($connectedUser->person ?? false),

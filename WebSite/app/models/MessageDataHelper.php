@@ -177,21 +177,20 @@ class MessageDataHelper extends Data implements NewsProviderInterface
             COUNT(m.Id) AS message_count,
             'event' AS type
         FROM Event e
-        INNER JOIN Message m ON m.EventId = e.Id
-        WHERE (
-            m.'From' = 'User' AND (
-                e.CreatedBy = ? 
-                OR EXISTS (
-                    SELECT 1 FROM Participant ep 
-                    WHERE ep.IdEvent = e.Id 
-                    AND ep.IdPerson = ?
-                )
+        INNER JOIN EventType et ON e.IdEventType = et.Id
+        INNER JOIN Message m ON m.EventId = e.Id AND m.\"From\" = 'User'
+        WHERE et.Inactivated = 0
+        AND (
+            et.IdGroup IS NULL 
+            OR et.IdGroup IN (
+                SELECT IdGroup 
+                FROM PersonGroup 
+                WHERE IdPerson = ?
             )
         )
         $whereClause
         GROUP BY e.Id, e.Summary, e.LastUpdate
         HAVING message_count > 0";
-        $params[] = $personId;
         $params[] = $personId;
         if ($searchFrom) $params[] = $searchFrom;
 
@@ -199,19 +198,20 @@ class MessageDataHelper extends Data implements NewsProviderInterface
         SELECT 
             a.Id,
             a.Title AS title,
-            a.LastUpdate,
+            MAX(m.LastUpdate) AS LastUpdate,
             COUNT(m.Id) AS message_count,
             'article' AS type
         FROM Article a
-        INNER JOIN Message m ON m.ArticleId = a.Id
-        WHERE (
-            a.CreatedBy = ? 
-            OR a.IdGroup IN (
-                SELECT gm.IdGroup 
-                FROM PersonGroup gm 
-                WHERE gm.IdPerson = ?
-            )
+        INNER JOIN Message m ON m.ArticleId = a.Id AND m.\"From\" = 'User'
+        WHERE a.PublishedBy IS NOT NULL
+        AND (
+            a.CreatedBy = ?
             OR a.IdGroup IS NULL
+            OR a.IdGroup IN (
+                SELECT IdGroup 
+                FROM PersonGroup 
+                WHERE IdPerson = ?
+            )
         )
         $whereClause
         GROUP BY a.Id, a.Title, a.LastUpdate
@@ -228,9 +228,10 @@ class MessageDataHelper extends Data implements NewsProviderInterface
             COUNT(m.Id) AS message_count,
             'group' AS type
         FROM `Group` g
-        INNER JOIN PersonGroup gm ON gm.IdGroup = g.Id
-        INNER JOIN Message m ON m.GroupId = g.Id
-        WHERE gm.IdPerson = ?
+        LEFT JOIN PersonGroup pg ON pg.IdGroup = g.Id AND pg.IdPerson = ?
+        INNER JOIN Message m ON m.GroupId = g.Id AND m.\"From\" = 'User'
+        WHERE g.Inactivated = 0
+        AND (g.SelfRegistration = 1 OR pg.Id IS NOT NULL)
         $whereClause
         GROUP BY g.Id, g.Name
         HAVING message_count > 0";
