@@ -240,6 +240,13 @@ abstract class AbstractController
     protected function userIsAllowedAndMethodIsGood(string $method, callable $permissionCheck): bool
     {
         $user = $this->application->getConnectedUser();
+        if ($user->person === null) {
+            $result = $this->application->getAuthenticationService()->handleRememberMeLogin();
+            if ($result && $result->isSuccess()) {
+                $this->redirect($_SERVER['REQUEST_URI'], ApplicationError::Ok, "Auto sign in succeeded for {$result->getUser()->Email}");
+                return true;
+            }
+        }
         if (!$user || !$permissionCheck($user)) {
             $this->raiseForbidden(__FILE__, __LINE__);
             return false;

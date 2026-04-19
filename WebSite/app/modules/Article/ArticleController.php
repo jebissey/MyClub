@@ -430,6 +430,13 @@ class ArticleController extends TableController
         }
         $connectedUser = $this->application->getConnectedUser();
         if (!$this->authorizationService->canRead($id, $connectedUser)) {
+            if ($connectedUser->person === null) {
+                $result = $this->application->getAuthenticationService()->handleRememberMeLogin();
+                if ($result && $result->isSuccess()) {
+                    $this->redirect($_SERVER['REQUEST_URI'], ApplicationError::Ok, "Auto sign in succeeded for {$result->getUser()->Email}");
+                    return;
+                }
+            }
             $this->raiseBadRequest($this->languagesDataHelper->translate('article.error.login_required'), __FILE__, __LINE__);
             return;
         }
@@ -556,7 +563,6 @@ class ArticleController extends TableController
             'page'     => $this->application->getConnectedUser()->getPage(),
         ]));
     }
-
 
     public function update(int $id): void
     {

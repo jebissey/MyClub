@@ -16,10 +16,11 @@ use app\models\Database;
 use app\models\DataHelper;
 use app\models\LogDataCompactHelper;
 use app\models\LogDataWriterHelper;
+use app\modules\Common\services\AuthenticationService;
 
 class Application
 {
-    public const VERSION = '0.60';
+    public const VERSION = '0.61';
     public const  EMOJI_LIST = [
         '😀', '😄', '😁', '😅', '😂', '🤣', '😊', '😇', '🤨', 
         '🙂', '🙃', '😉', '😌', '☹️', '😐', '🙄', '😯', '🥴', 
@@ -43,6 +44,7 @@ class Application
     private PDO $pdoForLog;
     private ErrorManager $errorManager;
     private ConnectedUser $connectedUser;
+    private AuthenticationService $authenticationService;
 
     private function __construct()
     {
@@ -128,6 +130,17 @@ class Application
             new logDataWriterHelper(self::init())->add('UNREACHABLE', $msg);
         }
         throw new LogicException($msg);
+    }
+
+
+    public function setAuthenticationService(AuthenticationService $service): void
+    {
+        $this->authenticationService = $service;
+    }
+
+    public function getAuthenticationService(): AuthenticationService
+    {
+        return $this->authenticationService;
     }
 
     #region Private functions

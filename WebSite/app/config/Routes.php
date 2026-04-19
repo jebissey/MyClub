@@ -163,13 +163,15 @@ class Routes
             $surveyDataHelper,
         ];
         $sharedFileDataHelper = new SharedFileDataHelper($application);
+        $authenticationService = new AuthenticationService($dataHelper, $emailService);
+        $application->setAuthenticationService($authenticationService);
         $this->controllerFactory = new ControllerFactory(
             $application,
             new ArticleCrosstabDataHelper($application, $crosstabDataHelper),
             $articleDataHelper,
             new ArticleService(new CarouselDataHelper($application), new MediaManager($dataHelper, $sharedFileDataHelper), $dataHelper),
             new ArticleTableDataHelper($application),
-            new AuthenticationService($dataHelper, $emailService),
+            $authenticationService,
             new Backup(),
             new CarouselDataHelper($application),
             new CrosstabDataHelper($application, $authorizationDataHelper),

@@ -52,12 +52,7 @@ class ArticleAuthorizationService
             return true;
         }
         if ($user->person === null) {
-            $rememberMeResult = $this->authService->handleRememberMeLogin();
-            if ($rememberMeResult && $rememberMeResult->isSuccess()) {
-                return true;
-            } else {
-                return false;
-            }
+            return false;
         }
         return $this->authorizationDataHelper->getArticle($articleId, $user) != false;
     }

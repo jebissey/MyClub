@@ -173,7 +173,7 @@
                 {* Sidebar toggle — visible uniquement sur grands écrans si sidebar active *}
                 {if isset($sidebarMenu) && count($sidebarMenu) > 0}
                     <button id="sidebarToggle"
-                            class="d-none d-lg-flex align-items-center justify-content-center me-2 border-0 bg-transparent text-white-50 rounded"
+                            class="d-none d-sm-flex align-items-center justify-content-center me-2 border-0 bg-transparent text-white-50 rounded"
                             style="width:34px;height:34px;font-size:1.1rem;transition:background .15s,color .15s;cursor:pointer;"
                             title="Afficher/masquer le menu">
                         <i class="bi bi-layout-sidebar"></i>
@@ -187,7 +187,7 @@
 
                 {* ── Sidebar — masquée sur mobile, visible dès lg ── *}
                 {if isset($sidebarMenu) && count($sidebarMenu) > 0}
-                    <div id="sidebar-wrapper" class="d-none d-lg-flex flex-column bg-dark flex-shrink-0">
+                    <div id="sidebar-wrapper" class="d-none d-sm-flex flex-column bg-dark flex-shrink-0">
                         {block sidebar}
                             <nav class="py-2">
                                 {foreach $sidebarMenu as $item}
