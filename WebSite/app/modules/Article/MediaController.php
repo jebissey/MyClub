@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace app\modules\Article;
 
 use app\helpers\Application;
-use app\helpers\Media;
+use app\helpers\MediaManager;
 use app\helpers\WebApp;
 use app\models\ArticleDataHelper;
 use app\models\CarouselDataHelper;
@@ -173,7 +173,7 @@ class MediaController extends AbstractController
             return;
         }
         $filename = basename($filename);
-        $filePath = Media::GetMediaPath() . $year . '/' . $month . '/' . $filename;
+        $filePath = MediaManager::GetMediaPath() . $year . '/' . $month . '/' . $filename;
         if (!file_exists($filePath)) {
             $this->raiseBadRequest("File $filePath not found in file ", __FILE__, __LINE__);
             return;
@@ -211,10 +211,10 @@ class MediaController extends AbstractController
     private function getAvailableYears(): array
     {
         $years = [];
-        if (file_exists(Media::GetMediaPath()) && is_dir(Media::GetMediaPath())) {
-            $dirs = scandir(Media::GetMediaPath());
+        if (file_exists(MediaManager::GetMediaPath()) && is_dir(MediaManager::GetMediaPath())) {
+            $dirs = scandir(MediaManager::GetMediaPath());
             foreach ($dirs as $dir) {
-                if ($dir !== '.' && $dir !== '..' && is_dir(Media::GetMediaPath() . $dir) && is_numeric($dir)) {
+                if ($dir !== '.' && $dir !== '..' && is_dir(MediaManager::GetMediaPath() . $dir) && is_numeric($dir)) {
                     $years[] = $dir;
                 }
             }
@@ -226,7 +226,7 @@ class MediaController extends AbstractController
     private function getFileExtensions(): array
     {
         $fileExtensions = [];
-        $basePath = Media::GetMediaPath();
+        $basePath = MediaManager::GetMediaPath();
         if (file_exists($basePath) && is_dir($basePath)) {
             $dirs = scandir($basePath);
             foreach ($dirs as $year) {
@@ -255,7 +255,7 @@ class MediaController extends AbstractController
     private function getMonths(int $yearRequested): array
     {
         $foundMonths = [];
-        $basePath = Media::GetMediaPath();
+        $basePath = MediaManager::GetMediaPath();
         if (file_exists($basePath) && is_dir($basePath)) {
             $dirs = scandir($basePath);
             foreach ($dirs as $year) {
@@ -283,7 +283,7 @@ class MediaController extends AbstractController
 
     private function getFiles(int $year, string $monthFiltered, string $fileExtension, string $search = '', bool $unusedOnly = false): array
     {
-        $yearPath = Media::GetMediaPath() . $year . '/';
+        $yearPath = MediaManager::GetMediaPath() . $year . '/';
 
         if (!file_exists($yearPath) || !is_dir($yearPath)) {
             return [];

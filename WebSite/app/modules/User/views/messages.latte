@@ -1,59 +1,51 @@
 {extends "user.latte"}
 
 {block content}
+{var $filterButtons = [
+    'signout' => 'user.messages.filter.since_signout',
+    'signin'  => 'user.messages.filter.since_signin',
+    'week'    => 'user.messages.filter.since_week',
+    'month'   => 'user.messages.filter.since_month',
+    'quarter' => 'user.messages.filter.since_quarter',
+    'year'    => 'user.messages.filter.since_year',
+]}
+
+{var $groups = [
+    'event'   => ['key' => 'user.messages.group.events',   'url' => '/event/chat/'],
+    'article' => ['key' => 'user.messages.group.articles', 'url' => '/article/chat/'],
+    'group'   => ['key' => 'user.messages.group.groups',   'url' => '/group/chat/'],
+]}
+
 <div class="container-fluid">
     <div class="row">
         <div class="col-12">
             <div class="card">
+
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h3 class="card-title">
-                        <i class="bi bi-chat-dots"></i> Les Messages
+                        <i class="bi bi-chat-dots"></i>
+                        {='user.messages.title'|translate}
                     </h3>
                     <div class="card-tools">
                         <div class="btn-group" role="group">
-                            <a href="/user/messages?from=signout" 
-                               class="btn btn-sm {if $searchMode === 'signout'}btn-primary{else}btn-outline-primary{/if}">
-                                Depuis votre dernière déconnexion
-                            </a>
-                            <a href="/user/messages?from=signin" 
-                               class="btn btn-sm {if $searchMode === 'signin'}btn-primary{else}btn-outline-primary{/if}">
-                                Depuis votre connexion
-                            </a>
-                            <a href="/user/messages?from=week" 
-                               class="btn btn-sm {if $searchMode === 'week'}btn-primary{else}btn-outline-primary{/if}">
-                                Depuis une semaine
-                            </a>
-                            <a href="/user/messages?from=month" 
-                               class="btn btn-sm {if $searchMode === 'month'}btn-primary{else}btn-outline-primary{/if}">
-                                Depuis un mois
-                            </a>
-                            <a href="/user/messages?from=quarter" 
-                               class="btn btn-sm {if $searchMode === 'quarter'}btn-primary{else}btn-outline-primary{/if}">
-                                Depuis un trimestre
-                            </a>
-                            <a href="/user/messages?from=year" 
-                               class="btn btn-sm {if $searchMode === 'year'}btn-primary{else}btn-outline-primary{/if}">
-                                Depuis un an
-                            </a>
+                            {foreach $filterButtons as $mode => $key}
+                                <a href="/user/messages?from={$mode}"
+                                   class="btn btn-sm {if $searchMode === $mode}btn-primary{else}btn-outline-primary{/if}">
+                                    {=$key|translate}
+                                </a>
+                            {/foreach}
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="card-body">
+
                     {if $searchFrom}
                         <div class="alert alert-info">
                             <i class="bi bi-info-circle"></i>
-                            Affichage des messages depuis le 
+                            {='user.messages.info.showing_since'|translate}
                             <strong>{$searchFrom|date:'d/m/Y à H:i'}</strong>
-                            {if $searchMode === 'signout'}
-                                (dernière déconnexion)
-                            {elseif $searchMode === 'signin'}
-                                (dernière connexion)
-                            {elseif $searchMode === 'week'}
-                                (1 semaine)
-                            {elseif $searchMode === 'month'}
-                                (1 mois)
-                            {/if}
+                            {=("user.messages.info.label_{$searchMode}")|translate}
                         </div>
                     {/if}
 
@@ -64,144 +56,67 @@
                         {/foreach}
 
                         <div class="table-responsive mb-2">
-                            <table class="table table-hover mb-0 text-nowrap align-middle">
+                            <table class="table mb-0 text-nowrap align-middle">
                                 <thead class="table-light">
                                     <tr class="row mx-0 w-100">
                                         <th class="col-7"></th>
-                                        <th class="col-2 text-center">Nombre de messages</th>
-                                        <th class="col-2 text-center">Dernière mise à jour</th>
-                                        <th class="col-1 text-center">Actions</th>
+                                        <th class="col-2 text-center">{='user.messages.table.message_count'|translate}</th>
+                                        <th class="col-2 text-center">{='user.messages.table.last_update'|translate}</th>
+                                        <th class="col-1 text-center">{='user.messages.table.actions'|translate}</th>
                                     </tr>
                                 </thead>
                             </table>
                         </div>
 
-                        {if count($groupedMessages['event']) > 0}
-                        <div class="card mb-4">
-                            <div class="card-header bg-success text-white">
-                                <h5 class="mb-0">📅 Événements</h5>
-                            </div>
-                            <div class="card-body p-0">
-                                <table class="table table-hover mb-0 text-nowrap align-middle">
-                                    <tbody>
-                                        {foreach $groupedMessages['event'] as $item}
-                                        <tr class="row mx-0 w-100">
-                                            <td class="col-7">
-                                                <strong>{$item['title']}</strong>
-                                            </td>
-                                            <td class="col-2 text-center">
-                                                <span class="badge rounded-pill bg-info text-dark">
-                                                    {$item['message_count']}
-                                                </span>
-                                            </td>
-                                            <td class="col-2 text-center">
-                                                <small class="text-muted">
-                                                    {$item['LastUpdate']|date:'d/m/Y H:i'}
-                                                </small>
-                                            </td>
-                                            <td class="col-1 text-center">
-                                                <a href="/event/chat/{$item['Id']}" class="btn btn-sm btn-primary">
-                                                    <i class="bi bi-chat-dots"></i> Voir le chat
-                                                </a>
-                                            </td>
-                                        </tr>
-                                        {/foreach}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                        {/if}
-
-                        {if count($groupedMessages['article']) > 0}
-                        <div class="card mb-4">
-                            <div class="card-header bg-primary text-white">
-                                <h5 class="mb-0">📄 Articles</h5>
-                            </div>
-                            <div class="card-body p-0">
-                                <table class="table table-hover mb-0 text-nowrap align-middle">
-                                    <tbody>
-                                        {foreach $groupedMessages['article'] as $item}
-                                        <tr class="row mx-0 w-100">
-                                            <td class="col-7">
-                                                <strong>{$item['title']}</strong>
-                                            </td>
-                                            <td class="col-2 text-center">
-                                                <span class="badge rounded-pill bg-info text-dark">
-                                                    {$item['message_count']}
-                                                </span>
-                                            </td>
-                                            <td class="col-2 text-center">
-                                                <small class="text-muted">
-                                                    {$item['LastUpdate']|date:'d/m/Y H:i'}
-                                                </small>
-                                            </td>
-                                            <td class="col-1 text-center">
-                                                <a href="/article/chat/{$item['Id']}" class="btn btn-sm btn-primary">
-                                                    <i class="bi bi-chat-dots"></i> Voir le chat
-                                                </a>
-                                            </td>
-                                        </tr>
-                                        {/foreach}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                        {/if}
-
-                        {if count($groupedMessages['group']) > 0}
-                        <div class="card mb-4">
-                            <div class="card-header bg-info text-white">
-                                <h5 class="mb-0">👥 Groupes</h5>
-                            </div>
-                            <div class="card-body p-0">
-                                <table class="table table-hover mb-0 text-nowrap align-middle">
-                                    <tbody>
-                                        {foreach $groupedMessages['group'] as $item}
-                                        <tr class="row mx-0 w-100">
-                                            <td class="col-7">
-                                                <strong>{$item['title']}</strong>
-                                            </td>
-                                            <td class="col-2 text-center">
-                                                <span class="badge rounded-pill bg-info text-dark">
-                                                    {$item['message_count']}
-                                                </span>
-                                            </td>
-                                            <td class="col-2 text-center">
-                                                <small class="text-muted">
-                                                    {$item['LastUpdate']|date:'d/m/Y H:i'}
-                                                </small>
-                                            </td>
-                                            <td class="col-1 text-center">
-                                                <a href="/group/chat/{$item['Id']}" class="btn btn-sm btn-primary">
-                                                    <i class="bi bi-chat-dots"></i> Voir le chat
-                                                </a>
-                                            </td>
-                                        </tr>
-                                        {/foreach}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                        {/if}
+                        {foreach $groups as $type => $group}
+                            {if count($groupedMessages[$type]) > 0}
+                                <div class="card mb-4">
+                                    <div class="card-header bg-{if $type === 'event'}success{elseif $type === 'article'}primary{else}info{/if} text-white">
+                                        <h5 class="mb-0">{=$group['key']|translate}</h5>
+                                    </div>
+                                    <div class="card-body p-0">
+                                        <table class="table table-hover mb-0 text-nowrap align-middle">
+                                            <tbody>
+                                                {foreach $groupedMessages[$type] as $item}
+                                                    <tr class="row mx-0 w-100">
+                                                        <td class="col-7">
+                                                            <strong>{$item['title']}</strong>
+                                                        </td>
+                                                        <td class="col-2 text-center">
+                                                            <span class="badge rounded-pill bg-info text-dark">
+                                                                {$item['message_count']}
+                                                            </span>
+                                                        </td>
+                                                        <td class="col-2 text-center">
+                                                            <small class="text-muted">
+                                                                {$item['LastUpdate']|date:'d/m/Y H:i'}
+                                                            </small>
+                                                        </td>
+                                                        <td class="col-1 text-center">
+                                                            <a href="{$group['url']}{$item['Id']}" class="btn btn-sm btn-primary">
+                                                                <i class="bi bi-chat-dots"></i>
+                                                                {='user.messages.action.view_chat'|translate}
+                                                            </a>
+                                                        </td>
+                                                    </tr>
+                                                {/foreach}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            {/if}
+                        {/foreach}
 
                     {else}
                         <div class="text-center py-5">
-                            <i class="bi bi-inbox fs-1 text-muted mb-3"></i>
-                            <h4 class="text-muted">Aucun message</h4>
+                            <i class="bi bi-inbox fs-1 text-muted mb-3 d-block"></i>
+                            <h4 class="text-muted">{='user.messages.empty.title'|translate}</h4>
                             <p class="text-muted">
-                                Aucun message 
-                                {if $searchMode === 'signout'}
-                                    depuis votre dernière déconnexion
-                                {elseif $searchMode === 'signin'}
-                                    depuis votre dernière connexion
-                                {elseif $searchMode === 'week'}
-                                    depuis une semaine
-                                {elseif $searchMode === 'month'}
-                                    depuis un mois
-                                {/if}.
+                                {=("user.messages.empty.since_{$searchMode}")|translate}
                             </p>
                         </div>
                     {/if}
+
                 </div>
             </div>
         </div>

@@ -1,4 +1,7 @@
-const t = (key) => window.t?.(key) ?? key;
+import ApiClient from '../../Common/js/ApiClient.js';
+
+const api = new ApiClient();
+const t   = (key) => window.t?.(key) ?? key;
 
 // ── Copy URL buttons ──────────────────────────────────────────────────────────
 
@@ -23,21 +26,18 @@ document.querySelectorAll('.delete-file-btn').forEach((btn) => {
     btn.addEventListener('click', async () => {
         if (!confirm(t('deleteConfirm'))) return;
 
-        const path = btn.dataset.path;
+        // path = "2024/01/fichier.ext"
+        const [year, month, ...rest] = btn.dataset.path.split('/');
+        const filename = rest.join('/');
 
-        try {
-            const res = await fetch('/media/delete', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ path }),
-            });
+        const data = await api.post(`/api/media/delete/${year}/${month}/${filename}`, {});
 
-            if (!res.ok) throw new Error();
-
-            btn.closest('tr').remove();
-        } catch {
+        if (data.success === false) {
             alert(t('deleteError'));
+            return;
         }
+
+        btn.closest('tr').remove();
     });
 });
 
@@ -66,26 +66,24 @@ function clearStatus() {
 }
 
 async function loadShareState(path) {
-    try {
-        const res = await fetch(`/media/shareInfo?path=${encodeURIComponent(path)}`);
-        if (!res.ok) throw new Error();
+    const data = await api.get(`/media/shareInfo?path=${encodeURIComponent(path)}`);
 
-        const data = await res.json();
-
-        if (data.shared) {
-            groupSelect.value    = data.idGroup ?? '';
-            membersOnly.checked  = !!data.membersOnly;
-            shareLinkInput.value = data.link ?? '';
-            shareLinkBox.classList.remove('d-none');
-            deleteShareBtn.classList.remove('d-none');
-            createShareBtn.classList.add('d-none');
-        } else {
-            shareLinkBox.classList.add('d-none');
-            deleteShareBtn.classList.add('d-none');
-            createShareBtn.classList.remove('d-none');
-        }
-    } catch {
+    if (data.success === false) {
         setStatus(t('shareError'), 'danger');
+        return;
+    }
+
+    if (data.shared) {
+        groupSelect.value    = data.idGroup ?? '';
+        membersOnly.checked  = !!data.membersOnly;
+        shareLinkInput.value = data.link ?? '';
+        shareLinkBox.classList.remove('d-none');
+        deleteShareBtn.classList.remove('d-none');
+        createShareBtn.classList.add('d-none');
+    } else {
+        shareLinkBox.classList.add('d-none');
+        deleteShareBtn.classList.add('d-none');
+        createShareBtn.classList.remove('d-none');
     }
 }
 
@@ -100,47 +98,36 @@ document.querySelectorAll('.share-file-btn').forEach((btn) => {
 });
 
 createShareBtn.addEventListener('click', async () => {
-    try {
-        const res = await fetch('/media/share', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                path:        currentPath,
-                idGroup:     groupSelect.value,
-                membersOnly: membersOnly.checked ? 1 : 0,
-            }),
-        });
+    const data = await api.post('/media/share', {
+        path:        currentPath,
+        idGroup:     groupSelect.value,
+        membersOnly: membersOnly.checked ? 1 : 0,
+    });
 
-        if (!res.ok) throw new Error();
-
-        const data = await res.json();
-        shareLinkInput.value = data.link;
-        shareLinkBox.classList.remove('d-none');
-        deleteShareBtn.classList.remove('d-none');
-        createShareBtn.classList.add('d-none');
-        setStatus(t('shareCreated'), 'success');
-    } catch {
+    if (data.success === false) {
         setStatus(t('shareError'), 'danger');
+        return;
     }
+
+    shareLinkInput.value = data.link;
+    shareLinkBox.classList.remove('d-none');
+    deleteShareBtn.classList.remove('d-none');
+    createShareBtn.classList.add('d-none');
+    setStatus(t('shareCreated'), 'success');
 });
 
 deleteShareBtn.addEventListener('click', async () => {
-    try {
-        const res = await fetch('/media/shareDelete', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ path: currentPath }),
-        });
+    const data = await api.post('/media/shareDelete', { path: currentPath });
 
-        if (!res.ok) throw new Error();
-
-        shareLinkBox.classList.add('d-none');
-        deleteShareBtn.classList.add('d-none');
-        createShareBtn.classList.remove('d-none');
-        setStatus(t('shareDeleted'), 'warning');
-    } catch {
+    if (data.success === false) {
         setStatus(t('shareError'), 'danger');
+        return;
     }
+
+    shareLinkBox.classList.add('d-none');
+    deleteShareBtn.classList.add('d-none');
+    createShareBtn.classList.remove('d-none');
+    setStatus(t('shareDeleted'), 'warning');
 });
 
 copyShareLink.addEventListener('click', async () => {

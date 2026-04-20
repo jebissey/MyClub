@@ -173,7 +173,7 @@ class MessageDataHelper extends Data implements NewsProviderInterface
         SELECT 
             e.Id,
             e.Summary AS title,
-            e.LastUpdate,
+            datetime(MAX(m.LastUpdate), 'localtime') AS LastUpdate,
             COUNT(m.Id) AS message_count,
             'event' AS type
         FROM Event e
@@ -189,7 +189,7 @@ class MessageDataHelper extends Data implements NewsProviderInterface
             )
         )
         $whereClause
-        GROUP BY e.Id, e.Summary, e.LastUpdate
+        GROUP BY e.Id, e.Summary
         HAVING message_count > 0";
         $params[] = $personId;
         if ($searchFrom) $params[] = $searchFrom;
@@ -198,7 +198,7 @@ class MessageDataHelper extends Data implements NewsProviderInterface
         SELECT 
             a.Id,
             a.Title AS title,
-            MAX(m.LastUpdate) AS LastUpdate,
+            datetime(MAX(m.LastUpdate), 'localtime') AS LastUpdate,
             COUNT(m.Id) AS message_count,
             'article' AS type
         FROM Article a
@@ -214,7 +214,7 @@ class MessageDataHelper extends Data implements NewsProviderInterface
             )
         )
         $whereClause
-        GROUP BY a.Id, a.Title, a.LastUpdate
+        GROUP BY a.Id, a.Title
         HAVING message_count > 0";
         $params[] = $personId;
         $params[] = $personId;
@@ -224,7 +224,7 @@ class MessageDataHelper extends Data implements NewsProviderInterface
         SELECT 
             g.Id,
             g.Name AS title,
-            MAX(m.LastUpdate) AS LastUpdate,
+            datetime(MAX(m.LastUpdate), 'localtime') AS LastUpdate,
             COUNT(m.Id) AS message_count,
             'group' AS type
         FROM `Group` g
