@@ -91,11 +91,20 @@
                                                             <small class="text-muted">
                                                                 {$item['LastUpdate']|date:'d/m/Y H:i'}
                                                             </small>
+                                                        {var $isUrl = strlen($item['UserImg']) > 10}
+                                                        {if $isUrl}
+                                                            <img src="{$item['UserImg']}" 
+                                                                alt="User gravatar"
+                                                                style="width: 2rem; height: 2rem; object-fit: cover; border-radius: 50%;">
+                                                        {else}
+                                                            <span style="font-size: 1.6rem; line-height: 2rem; display: inline-block;">
+                                                                {$item['UserImg']}
+                                                            </span>
+                                                        {/if}
                                                         </td>
                                                         <td class="col-1 text-center">
-                                                            <a href="{$group['url']}{$item['Id']}" class="btn btn-sm btn-primary">
-                                                                <i class="bi bi-chat-dots"></i>
-                                                                {='user.messages.action.view_chat'|translate}
+                                                            <a href="{$group['url']}{$item['Id']}" class="btn btn-success">
+                                                                <i class="bi bi-eye"></i>
                                                             </a>
                                                         </td>
                                                     </tr>

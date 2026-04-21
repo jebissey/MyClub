@@ -164,21 +164,36 @@ class MessageDataHelper extends Data implements NewsProviderInterface
         return true;
     }
 
-
-    public function getGroupedMessages(int $personId, string $searchFrom): array
+    public function getGroupedMessages(int $personId, string $searchFrom, GravatarHandler $gravatarHandler): array
     {
         $params = [];
         $whereClause = $searchFrom ? "AND m.LastUpdate >= ?" : '';
+
         $eventsQuery = "
         SELECT 
             e.Id,
             e.Summary AS title,
             datetime(MAX(m.LastUpdate), 'localtime') AS LastUpdate,
             COUNT(m.Id) AS message_count,
-            'event' AS type
+            'event' AS type,
+            lp_e.Avatar,
+            lp_e.UseGravatar,
+            lp_e.Email
         FROM Event e
         INNER JOIN EventType et ON e.IdEventType = et.Id
         INNER JOIN Message m ON m.EventId = e.Id AND m.\"From\" = 'User'
+        LEFT JOIN (
+            SELECT m2.EventId, p.Avatar, p.UseGravatar, p.Email
+            FROM Message m2
+            INNER JOIN Person p ON p.Id = m2.PersonId
+            WHERE m2.`From` = 'User'
+            AND m2.LastUpdate = (
+                SELECT MAX(m3.LastUpdate)
+                FROM Message m3
+                WHERE m3.EventId = m2.EventId
+                    AND m3.`From` = 'User'
+            )
+        ) lp_e ON lp_e.EventId = e.Id
         WHERE et.Inactivated = 0
         AND (
             et.IdGroup IS NULL 
@@ -189,8 +204,9 @@ class MessageDataHelper extends Data implements NewsProviderInterface
             )
         )
         $whereClause
-        GROUP BY e.Id, e.Summary
+        GROUP BY e.Id, e.Summary, lp_e.Avatar, lp_e.UseGravatar
         HAVING message_count > 0";
+
         $params[] = $personId;
         if ($searchFrom) $params[] = $searchFrom;
 
@@ -200,9 +216,24 @@ class MessageDataHelper extends Data implements NewsProviderInterface
             a.Title AS title,
             datetime(MAX(m.LastUpdate), 'localtime') AS LastUpdate,
             COUNT(m.Id) AS message_count,
-            'article' AS type
+            'article' AS type,
+            lp_a.Avatar,
+            lp_a.UseGravatar,
+            lp_a.Email
         FROM Article a
         INNER JOIN Message m ON m.ArticleId = a.Id AND m.\"From\" = 'User'
+        LEFT JOIN (
+            SELECT m2.ArticleId, p.Avatar, p.UseGravatar, p.Email
+            FROM Message m2
+            INNER JOIN Person p ON p.Id = m2.PersonId
+            WHERE m2.`From` = 'User'
+            AND m2.LastUpdate = (
+                SELECT MAX(m3.LastUpdate)
+                FROM Message m3
+                WHERE m3.ArticleId = m2.ArticleId
+                    AND m3.`From` = 'User'
+            )
+        ) lp_a ON lp_a.ArticleId = a.Id
         WHERE a.PublishedBy IS NOT NULL
         AND (
             a.CreatedBy = ?
@@ -214,8 +245,9 @@ class MessageDataHelper extends Data implements NewsProviderInterface
             )
         )
         $whereClause
-        GROUP BY a.Id, a.Title
+        GROUP BY a.Id, a.Title, lp_a.Avatar, lp_a.UseGravatar
         HAVING message_count > 0";
+
         $params[] = $personId;
         $params[] = $personId;
         if ($searchFrom) $params[] = $searchFrom;
@@ -226,15 +258,31 @@ class MessageDataHelper extends Data implements NewsProviderInterface
             g.Name AS title,
             datetime(MAX(m.LastUpdate), 'localtime') AS LastUpdate,
             COUNT(m.Id) AS message_count,
-            'group' AS type
+            'group' AS type,
+            lp_g.Avatar,
+            lp_g.UseGravatar,
+            lp_g.Email
         FROM `Group` g
         LEFT JOIN PersonGroup pg ON pg.IdGroup = g.Id AND pg.IdPerson = ?
         INNER JOIN Message m ON m.GroupId = g.Id AND m.\"From\" = 'User'
+        LEFT JOIN (
+            SELECT m2.GroupId, p.Avatar, p.UseGravatar, p.Email
+            FROM Message m2
+            INNER JOIN Person p ON p.Id = m2.PersonId
+            WHERE m2.`From` = 'User'
+            AND m2.LastUpdate = (
+                SELECT MAX(m3.LastUpdate)
+                FROM Message m3
+                WHERE m3.GroupId = m2.GroupId
+                    AND m3.`From` = 'User'
+            )
+        ) lp_g ON lp_g.GroupId = g.Id
         WHERE g.Inactivated = 0
         AND (g.SelfRegistration = 1 OR pg.Id IS NOT NULL)
         $whereClause
-        GROUP BY g.Id, g.Name
+        GROUP BY g.Id, g.Name, lp_g.Avatar, lp_g.UseGravatar
         HAVING message_count > 0";
+
         $params[] = $personId;
         if ($searchFrom) $params[] = $searchFrom;
 
@@ -248,8 +296,16 @@ class MessageDataHelper extends Data implements NewsProviderInterface
 
         $stmt = $this->pdo->prepare($query);
         $stmt->execute($params);
+        $rows = $stmt->fetchAll(PDO::FETCH_OBJ);
+        return array_map(function (object $row) use ($gravatarHandler): array {
+            $userImg = WebApp::getUserImg($row, $gravatarHandler);
 
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $result = (array) $row;
+            $result['UserImg'] = $userImg;
+            unset($result['Avatar'], $result['UseGravatar'], $result['Email']);
+
+            return $result;
+        }, $rows);
     }
 
     #region Private functions

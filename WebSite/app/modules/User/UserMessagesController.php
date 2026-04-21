@@ -7,6 +7,7 @@ namespace app\modules\User;
 use app\enums\ApplicationError;
 use app\enums\Period;
 use app\helpers\Application;
+use app\helpers\GravatarHandler;
 use app\helpers\WebApp;
 use app\models\MessageDataHelper;
 use app\modules\Common\AbstractController;
@@ -48,7 +49,7 @@ class UserMessagesController extends AbstractController
         };
 
         $this->render('User/views/messages.latte', $this->getAllParams([
-            'messages'       => $this->messageDataHelper->getGroupedMessages($connectedUser->person->Id, $searchFrom),
+            'messages'       => $this->messageDataHelper->getGroupedMessages($connectedUser->person->Id, $searchFrom, new GravatarHandler()),
             'searchFrom'     => $searchFrom,
             'searchMode'     => $searchMode,
             'navItems'       => $this->getNavItems($connectedUser->person),
