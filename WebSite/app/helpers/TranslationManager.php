@@ -7,6 +7,7 @@ namespace app\helpers;
 use DateTime;
 use DateTimeInterface;
 use IntlDateFormatter;
+use IntlDatePatternGenerator;
 
 use app\models\MetadataDataHelper;
 
@@ -73,21 +74,38 @@ class TranslationManager
         return self::FLAGS[$locale] ?? '🏳️';
     }
 
-    public static function getShortDate($date)
-    {
-        $formatter = new IntlDateFormatter(self::getCurrentLanguage(), IntlDateFormatter::SHORT, IntlDateFormatter::NONE);
-        return $formatter->format(new DateTime($date));
-    }
-
     public static function getLongDate($date)
     {
         $formatter = new IntlDateFormatter(self::getCurrentLanguage(), IntlDateFormatter::FULL, IntlDateFormatter::NONE);
         return $formatter->format(new DateTime($date));
     }
 
+    public static function getShortDate($date)
+    {
+        $formatter = new IntlDateFormatter(self::getCurrentLanguage(), IntlDateFormatter::SHORT, IntlDateFormatter::NONE);
+        return $formatter->format(new DateTime($date));
+    }
+
     public static function getLongDateTime($date)
     {
         $formatter = new IntlDateFormatter(self::getCurrentLanguage(), IntlDateFormatter::FULL, IntlDateFormatter::SHORT);
+        return $formatter->format(new DateTime($date));
+    }
+
+    public static function getShortDateTime($date)
+    {
+        $locale = self::getCurrentLanguage();
+        $gen = new IntlDatePatternGenerator($locale);
+        $pattern = $gen->getBestPattern("EEEddMMMHHmm");
+
+        $formatter = new IntlDateFormatter(
+            $locale,
+            IntlDateFormatter::NONE,
+            IntlDateFormatter::NONE,
+            null,
+            null,
+            $pattern
+        );
         return $formatter->format(new DateTime($date));
     }
 

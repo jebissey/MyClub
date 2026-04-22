@@ -288,6 +288,10 @@ abstract class AbstractController
             return TranslationManager::getLongDateTime($date);
         });
 
+        $this->latte->addFilter('shortDateTime', function ($date) {
+            return TranslationManager::getShortDateTime($date);
+        });
+
         $this->latte->addFilter('dayName', function ($date) {
             return TranslationManager::getDayName($date);
         });

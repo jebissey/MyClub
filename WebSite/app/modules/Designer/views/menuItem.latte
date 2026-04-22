@@ -19,12 +19,19 @@
     <div class="container-fluid mt-4">
         <div class="row">
             <div class="col-12">
-                <h3>{='menu.page_title'|translate}</h3>
+                {* ── TITRE + BOUTON ── *}
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h3 class="mb-0">{='menu.page_title'|translate}</h3>
+                    <button class="btn btn-success add-btn" id="mainAddBtn"
+                            data-what="{=$activeTab === \app\enums\MenuItemTab::Sidebar ? 'sidebar' : 'navbar'}">
+                        <i class="bi bi-plus-lg"></i>
+                    </button>
+                </div>
 
                 {* ── PRÉVISUALISATION NAVBAR ── *}
-                <div class="card mb-4 border-secondary">
+                <div class="card mb-3 border-secondary">
                     <div class="card-header bg-secondary-subtle d-flex align-items-center gap-3 flex-wrap py-2">
-                        <strong class="me-2"><i class="bi bi-eye"></i> Prévisualisation</strong>
+                        <strong><i class="bi bi-eye"></i> Prévisualisation</strong>
 
                         <div class="d-flex align-items-center gap-2">
                             <label class="form-label mb-0 text-nowrap">{='menu.field_group'|translate}</label>
@@ -36,31 +43,21 @@
                             </select>
                         </div>
 
-                        <div class="d-flex gap-3 ms-2">
+                        <div class="d-flex gap-3">
                             <div class="form-check form-check-inline mb-0">
-                                <input class="form-check-input" type="radio" name="previewRole"
-                                    id="previewMembers" value="members">
-                                <label class="form-check-label" for="previewMembers">
-                                    {='menu.field_members'|translate}
-                                </label>
+                                <input class="form-check-input" type="radio" name="previewRole" id="previewMembers" value="members">
+                                <label class="form-check-label" for="previewMembers">{='menu.field_members'|translate}</label>
                             </div>
                             <div class="form-check form-check-inline mb-0">
-                                <input class="form-check-input" type="radio" name="previewRole"
-                                    id="previewContacts" value="contacts">
-                                <label class="form-check-label" for="previewContacts">
-                                    {='menu.field_contacts'|translate}
-                                </label>
+                                <input class="form-check-input" type="radio" name="previewRole" id="previewContacts" value="contacts">
+                                <label class="form-check-label" for="previewContacts">{='menu.field_contacts'|translate}</label>
                             </div>
                             <div class="form-check form-check-inline mb-0">
-                                <input class="form-check-input" type="radio" name="previewRole"
-                                    id="previewAnonymous" value="anonymous">
-                                <label class="form-check-label" for="previewAnonymous">
-                                    {='menu.field_anonymous'|translate}
-                                </label>
+                                <input class="form-check-input" type="radio" name="previewRole" id="previewAnonymous" value="anonymous">
+                                <label class="form-check-label" for="previewAnonymous">{='menu.field_anonymous'|translate}</label>
                             </div>
                         </div>
                     </div>
-
                     <div class="card-body p-0">
                         <nav class="navbar navbar-expand bg-light px-3 py-1">
                             <ul class="navbar-nav flex-wrap" id="navbarPreview"></ul>
@@ -68,129 +65,112 @@
                     </div>
                 </div>
 
-                <ul class="nav nav-tabs mb-3" id="menuTabs" role="tablist">
-                    <li class="nav-item" role="presentation">
-                        <a class="nav-link {if $activeTab === \app\enums\MenuItemTab::Navbar}active{/if}"
-                        href="?tab={=\app\enums\MenuItemTab::Navbar->value}" role="tab">
-                            <i class="bi bi-menu-button-wide"></i> {='menu.tab_navbar'|translate}
-                        </a>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <a class="nav-link {if $activeTab === \app\enums\MenuItemTab::Sidebar}active{/if}"
-                        href="?tab={=\app\enums\MenuItemTab::Sidebar->value}" role="tab">
-                            <i class="bi bi-layout-sidebar"></i> {='menu.tab_sidebar'|translate}
-                        </a>
-                    </li>
-                </ul>
+                {* ── LAYOUT SIDEBAR PREVIEW + ONGLETS ── *}
+                <div class="row g-3 align-items-start">
 
-                <div class="tab-content" id="menuTabsContent">
-
-                    {* ── NAVBAR TAB ── *}
-                    <div class="tab-pane {if $activeTab === \app\enums\MenuItemTab::Navbar}show active{/if}" id="navbar-pane" role="tabpanel">
-
-                        <table class="table table-striped table-hover align-middle">
-                            <thead>
-                                <tr>
-                                    <th>{='menu.col_name'|translate}</th>
-                                    <th>{='menu.col_url'|translate}</th>
-                                    <th>{='menu.col_group'|translate}</th>
-                                    <th class="text-center">{='menu.col_members'|translate}</th>
-                                    <th class="text-center">{='menu.col_contacts'|translate}</th>
-                                    <th class="text-center">{='menu.col_anonymous'|translate}</th>
-                                    <th class="text-end">{='menu.col_actions'|translate}</th>
-                                </tr>
-                            </thead>
-                            <tbody id="navList">
-                                {foreach $navbarItems as $item}
-                                <tr data-id="{$item->Id}">
-                                    <td>{$item->Label}</td>
-                                    <td>{$item->Url}</td>
-                                    <td>{$item->GroupName ?? ''}</td>
-                                    <td class="text-center">
-                                        <input type="checkbox" class="form-check-input" {if $item->ForMembers}checked{/if} disabled>
-                                    </td>
-                                    <td class="text-center">
-                                        <input type="checkbox" class="form-check-input" {if $item->ForContacts}checked{/if} disabled>
-                                    </td>
-                                    <td class="text-center">
-                                        <input type="checkbox" class="form-check-input" {if $item->ForAnonymous}checked{/if} disabled>
-                                    </td>
-                                    <td class="text-end">
-                                        <button class="btn btn-sm btn-primary edit-btn">
-                                            <i class="bi bi-pencil"></i>
-                                        </button>
-                                        <button class="btn btn-sm btn-danger delete-btn">
-                                            <i class="bi bi-trash"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                                {/foreach}
-                            </tbody>
-                        </table>
-                        <button class="btn btn-success add-btn" data-what="navbar">
-                            <i class="bi bi-plus-lg"></i>
-                        </button>
+                    {* ── SIDEBAR PREVIEW ── *}
+                    <div class="col-auto">
+                        <div class="card border-secondary" style="width:210px; min-height:200px">
+                            <div class="card-header bg-secondary-subtle py-1 small fw-bold">
+                                <i class="bi bi-layout-sidebar"></i> Sidebar
+                            </div>
+                            <div class="card-body p-0" id="sidebarPreview"></div>
+                        </div>
                     </div>
 
-                    {* ── SIDEBAR TAB ── *}
-                    <div class="tab-pane {if $activeTab === \app\enums\MenuItemTab::Sidebar}show active{/if}" id="sidebar-pane" role="tabpanel">
+                    {* ── ONGLETS ── *}
+                    <div class="col">
+                        <ul class="nav nav-tabs mb-3" id="menuTabs" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <a class="nav-link {if $activeTab === \app\enums\MenuItemTab::Navbar}active{/if}"
+                                href="?tab={=\app\enums\MenuItemTab::Navbar->value}" role="tab">
+                                    <i class="bi bi-menu-button-wide"></i> {='menu.tab_navbar'|translate}
+                                </a>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <a class="nav-link {if $activeTab === \app\enums\MenuItemTab::Sidebar}active{/if}"
+                                href="?tab={=\app\enums\MenuItemTab::Sidebar->value}" role="tab">
+                                    <i class="bi bi-layout-sidebar"></i> {='menu.tab_sidebar'|translate}
+                                </a>
+                            </li>
+                        </ul>
 
-                        <table class="table table-striped table-hover align-middle">
-                            <thead>
-                                <tr>
-                                    <th>{='menu.col_type'|translate}</th>
-                                    <th>{='menu.col_icon'|translate}</th>
-                                    <th>{='menu.col_label'|translate}</th>
-                                    <th>{='menu.col_url'|translate}</th>
-                                    <th>{='menu.col_parent'|translate}</th>
-                                    <th>{='menu.col_group'|translate}</th>
-                                    <th class="text-center">{='menu.col_members'|translate}</th>
-                                    <th class="text-center">{='menu.col_contacts'|translate}</th>
-                                    <th class="text-center">{='menu.col_anonymous'|translate}</th>
-                                    <th class="text-end">{='menu.col_actions'|translate}</th>
-                                </tr>
-                            </thead>
-                            <tbody id="sidebarList">
-                                {foreach $sidebarItems as $item}
-                                <tr data-id="{$item->Id}" data-parent="{$item->ParentId ?? ''}">
-                                    <td>
-                                        <span class="badge bg-secondary">{$item->Type}</span>
-                                    </td>
-                                    <td>
-                                        {if $item->Icon}
-                                            <i class="bi {$item->Icon}"></i>
-                                        {/if}
-                                    </td>
-                                    <td>{$item->Label ?? '<em class="text-muted">—</em>'|noescape}</td>
-                                    <td>{$item->Url ?? ''}</td>
-                                    <td>{$item->ParentLabel ?? ''}</td>
-                                    <td>{$item->GroupName ?? ''}</td>
-                                    <td class="text-center">
-                                        <input type="checkbox" class="form-check-input" {if $item->ForMembers}checked{/if} disabled>
-                                    </td>
-                                    <td class="text-center">
-                                        <input type="checkbox" class="form-check-input" {if $item->ForContacts}checked{/if} disabled>
-                                    </td>
-                                    <td class="text-center">
-                                        <input type="checkbox" class="form-check-input" {if $item->ForAnonymous}checked{/if} disabled>
-                                    </td>
-                                    <td class="text-end">
-                                        <button class="btn btn-sm btn-primary edit-btn">
-                                            <i class="bi bi-pencil"></i>
-                                        </button>
-                                        <button class="btn btn-sm btn-danger delete-btn">
-                                            <i class="bi bi-trash"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                                {/foreach}
-                            </tbody>
-                        </table>
-                        <button class="btn btn-success add-btn" data-what="sidebar">
-                            <i class="bi bi-plus-lg"></i>
-                        </button>
+                        <div class="tab-content" id="menuTabsContent">
+
+                            {* ── NAVBAR TAB ── *}
+                            <div class="tab-pane {if $activeTab === \app\enums\MenuItemTab::Navbar}show active{/if}" id="navbar-pane" role="tabpanel">
+                                <table class="table table-striped table-hover align-middle">
+                                    <thead>
+                                        <tr>
+                                            <th>{='menu.col_name'|translate}</th>
+                                            <th>{='menu.col_url'|translate}</th>
+                                            <th>{='menu.col_group'|translate}</th>
+                                            <th class="text-center">{='menu.col_members'|translate}</th>
+                                            <th class="text-center">{='menu.col_contacts'|translate}</th>
+                                            <th class="text-center">{='menu.col_anonymous'|translate}</th>
+                                            <th class="text-end">{='menu.col_actions'|translate}</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="navList">
+                                        {foreach $navbarItems as $item}
+                                        <tr data-id="{$item->Id}">
+                                            <td>{$item->Label}</td>
+                                            <td>{$item->Url}</td>
+                                            <td>{$item->GroupName ?? ''}</td>
+                                            <td class="text-center"><input type="checkbox" class="form-check-input" {if $item->ForMembers}checked{/if} disabled></td>
+                                            <td class="text-center"><input type="checkbox" class="form-check-input" {if $item->ForContacts}checked{/if} disabled></td>
+                                            <td class="text-center"><input type="checkbox" class="form-check-input" {if $item->ForAnonymous}checked{/if} disabled></td>
+                                            <td class="text-end">
+                                                <button class="btn btn-sm btn-primary edit-btn"><i class="bi bi-pencil"></i></button>
+                                                <button class="btn btn-sm btn-danger delete-btn"><i class="bi bi-trash"></i></button>
+                                            </td>
+                                        </tr>
+                                        {/foreach}
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            {* ── SIDEBAR TAB ── *}
+                            <div class="tab-pane {if $activeTab === \app\enums\MenuItemTab::Sidebar}show active{/if}" id="sidebar-pane" role="tabpanel">
+                                <table class="table table-striped table-hover align-middle">
+                                    <thead>
+                                        <tr>
+                                            <th>{='menu.col_type'|translate}</th>
+                                            <th>{='menu.col_icon'|translate}</th>
+                                            <th>{='menu.col_label'|translate}</th>
+                                            <th>{='menu.col_url'|translate}</th>
+                                            <th>{='menu.col_parent'|translate}</th>
+                                            <th>{='menu.col_group'|translate}</th>
+                                            <th class="text-center">{='menu.col_members'|translate}</th>
+                                            <th class="text-center">{='menu.col_contacts'|translate}</th>
+                                            <th class="text-center">{='menu.col_anonymous'|translate}</th>
+                                            <th class="text-end">{='menu.col_actions'|translate}</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="sidebarList">
+                                        {foreach $sidebarItems as $item}
+                                        <tr data-id="{$item->Id}" data-parent="{$item->ParentId ?? ''}">
+                                            <td><span class="badge bg-secondary">{$item->Type}</span></td>
+                                            <td>{if $item->Icon}<i class="bi {$item->Icon}"></i>{/if}</td>
+                                            <td>{$item->Label ?? '<em class="text-muted">—</em>'|noescape}</td>
+                                            <td>{$item->Url ?? ''}</td>
+                                            <td>{$item->ParentLabel ?? ''}</td>
+                                            <td>{$item->GroupName ?? ''}</td>
+                                            <td class="text-center"><input type="checkbox" class="form-check-input" {if $item->ForMembers}checked{/if} disabled></td>
+                                            <td class="text-center"><input type="checkbox" class="form-check-input" {if $item->ForContacts}checked{/if} disabled></td>
+                                            <td class="text-center"><input type="checkbox" class="form-check-input" {if $item->ForAnonymous}checked{/if} disabled></td>
+                                            <td class="text-end">
+                                                <button class="btn btn-sm btn-primary edit-btn"><i class="bi bi-pencil"></i></button>
+                                                <button class="btn btn-sm btn-danger delete-btn"><i class="bi bi-trash"></i></button>
+                                            </td>
+                                        </tr>
+                                        {/foreach}
+                                    </tbody>
+                                </table>
+                            </div>
+
+                        </div>
                     </div>
-
                 </div>
             </div>
         </div>

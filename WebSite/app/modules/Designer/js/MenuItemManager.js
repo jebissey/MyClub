@@ -250,55 +250,101 @@ export default class MenuItemManager {
     /* ================= PRÉVISUALISATION NAVBAR ================= */
 
     initPreview() {
-        this.previewEl = document.getElementById('navbarPreview');
-        if (!this.previewEl) return;
+        this.previewNavEl = document.getElementById('navbarPreview');
+        this.previewSidebarEl = document.getElementById('sidebarPreview');
 
-        // état courant des items (mis à jour côté client après drag & drop)
-        this.previewItems = [...(window.navbarItemsData ?? [])];
+        this.previewItems = Object.values(window.navbarItemsData ?? {});
+        this.previewSideItems = Object.values(window.sidebarItemsData ?? {});
+
+        if (!this.previewNavEl && !this.previewSidebarEl) return;
 
         const controls = [
             ...document.querySelectorAll('input[name="previewRole"]'),
             document.getElementById('previewGroup'),
         ];
-        controls.forEach(el => el?.addEventListener('change', () => this.renderPreview()));
+        controls.forEach(el => el?.addEventListener('change', () => this.renderPreviews()));
 
-        // valeur par défaut : anonyme
-        const defaultRadio = document.getElementById('previewAnonymous');
+        const defaultRadio = document.getElementById('previewMembers');
         if (defaultRadio) defaultRadio.checked = true;
 
-        this.renderPreview();
+        this.renderPreviews();
     }
 
-    renderPreview() {
-        if (!this.previewEl) return;
+    renderPreviews() {
+        this.renderNavbarPreview();
+        this.renderSidebarPreview();
+    }
+
+    renderNavbarPreview() {
+        if (!this.previewNavEl) return;
 
         const role = document.querySelector('input[name="previewRole"]:checked')?.value ?? '';
         const groupId = document.getElementById('previewGroup')?.value ?? '';
 
-        const visible = this.previewItems.filter(item => {
-            // item réservé à un groupe précis
-            if (item.IdGroup) {
-                return groupId && String(item.IdGroup) === groupId;
-            }
-            // item sans groupe : filtrage par rôle
-            if (role === 'members') return !!item.ForMembers;
-            if (role === 'contacts') return !!item.ForContacts;
-            if (role === 'anonymous') return !!item.ForAnonymous;
-            return false;
-        });
+        const visible = this.previewItems.filter(item => this.isVisible(item, role, groupId));
 
         if (!visible.length) {
-            this.previewEl.innerHTML =
+            this.previewNavEl.innerHTML =
                 '<li class="nav-item"><span class="nav-link text-muted fst-italic small">— aucun élément visible —</span></li>';
             return;
         }
 
-        this.previewEl.innerHTML = visible.map(item => `
+        this.previewNavEl.innerHTML = visible.map(item => `
         <li class="nav-item">
             <a class="nav-link py-1" href="${item.Url ?? '#'}" tabindex="-1">
                 ${item.Label ?? ''}
             </a>
         </li>`
         ).join('');
+    }
+
+    renderSidebarPreview() {
+        if (!this.previewSidebarEl) return;
+
+        const role = document.querySelector('input[name="previewRole"]:checked')?.value ?? '';
+        const groupId = document.getElementById('previewGroup')?.value ?? '';
+
+        const visible = this.previewSideItems.filter(item => this.isVisible(item, role, groupId));
+
+        if (!visible.length) {
+            this.previewSidebarEl.innerHTML =
+                '<p class="text-muted fst-italic small px-2 py-2 mb-0">— aucun élément —</p>';
+            return;
+        }
+
+        const roots = visible.filter(i => !i.ParentId);
+        const html = roots.map(item => this.renderSidebarItem(item, visible)).join('');
+        this.previewSidebarEl.innerHTML = `<ul class="list-unstyled mb-0 py-1">${html}</ul>`;
+    }
+
+    renderSidebarItem(item, all) {
+        const children = all.filter(i => i.ParentId === item.Id);
+        const icon = item.Icon ? `<i class="bi ${item.Icon} me-1"></i>` : '';
+
+        if (item.Type === 'divider') {
+            return '<li><hr class="my-1 mx-2"></li>';
+        }
+        if (item.Type === 'heading') {
+            return `<li class="px-3 pt-2 pb-1 text-muted small fw-bold text-uppercase" style="font-size:.7rem">${icon}${item.Label ?? ''}</li>`;
+        }
+        if (children.length) {
+            const childHtml = children.map(c => this.renderSidebarItem(c, all)).join('');
+            return `
+            <li class="px-3 py-1 small fw-semibold">${icon}${item.Label ?? ''}</li>
+            <li><ul class="list-unstyled ps-2">${childHtml}</ul></li>`;
+        }
+        return `<li>
+        <a class="d-flex align-items-center px-3 py-1 text-decoration-none text-body small" href="${item.Url ?? '#'}" tabindex="-1">
+            ${icon}${item.Label ?? ''}
+        </a>
+    </li>`;
+    }
+
+    isVisible(item, role, groupId) {
+        if (item.IdGroup) return groupId !== '' && String(item.IdGroup) === groupId;
+        if (role === 'members') return !!item.ForMembers;
+        if (role === 'contacts') return !!item.ForContacts;
+        if (role === 'anonymous') return !!item.ForAnonymous;
+        return false;
     }
 }
