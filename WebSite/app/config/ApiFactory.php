@@ -18,6 +18,7 @@ use app\apis\ImportApi;
 use app\apis\KanbanApi;
 use app\apis\KaraokeApi;
 use app\apis\LeapfrogApi;
+use app\apis\LoanApi;
 use app\apis\MediaApi;
 use app\apis\MenuItemApi;
 use app\apis\MessageApi;
@@ -29,7 +30,6 @@ use app\helpers\ConnectedUser;
 use app\helpers\GravatarHandler;
 use App\Helpers\NotificationSender;
 use app\helpers\PersonPreferences;
-use app\models\ArticleDataHelper;
 use app\models\AttributeDataHelper;
 use app\models\AuthorizationDataHelper;
 use app\models\CarouselDataHelper;
@@ -40,6 +40,7 @@ use app\models\EventNeedDataHelper;
 use app\models\KanbanDataHelper;
 use app\models\KaraokeDataHelper;
 use app\models\LanguagesDataHelper;
+use app\models\LoanDataHelper;
 use app\models\LogDataHelper;
 use app\models\LogDataWriterHelper;
 use app\models\MenuItemDataHelper;
@@ -72,6 +73,7 @@ class ApiFactory
         private JsonEmailQuotaTracker $quotaTracker,
         private KanbanDataHelper $kanbanDataHelper,
         private KaraokeDataHelper $karaokeDataHelper,
+        private LoanDataHelper $loanDataHelper,
         private LogDataHelper $logDataHelper,
         private LogDataWriterHelper $logDataWriterHelper,
         private MenuItemDataHelper $menuItemDataHelper,
@@ -246,6 +248,17 @@ class ApiFactory
             $this->dataHelper,
             $this->personDataHelper,
             $this->logDataWriterHelper
+        );
+    }
+
+    public function makeLoanApi(): LoanApi
+    {
+        return new LoanApi(
+            $this->application,
+            $this->connectedUser,
+            $this->dataHelper,
+            $this->personDataHelper,
+            $this->loanDataHelper
         );
     }
 

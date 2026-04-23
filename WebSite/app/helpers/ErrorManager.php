@@ -5,21 +5,18 @@ declare(strict_types=1);
 namespace app\helpers;
 
 use app\enums\ApplicationError;
-use app\models\DataHelper;
 use app\models\LanguagesDataHelper;
 use app\models\LogDataWriterHelper;
 use app\modules\Common\EmptyController;
 
 class ErrorManager
 {
-    private DataHelper $dataHelper;
     private LanguagesDataHelper $languagesDataHelper;
     private LogDataWriterHelper $logDataWriterHelper;
     private EmptyController $emptyController;
 
     public function __construct(private Application $application)
     {
-        $this->dataHelper = new DataHelper($application);
         $this->logDataWriterHelper = new LogDataWriterHelper($application);
         $this->languagesDataHelper = new LanguagesDataHelper($application);
         $this->emptyController = new EmptyController($application);

@@ -24,6 +24,7 @@ use app\models\GroupDataHelper;
 use app\models\KanbanDataHelper;
 use app\models\LogDataHelper;
 use app\models\LogDataAnalyticsHelper;
+use app\models\LoanDataHelper;
 use app\models\LogDataStatisticsHelper;
 use app\models\MessageDataHelper;
 use app\models\MetadataDataHelper;
@@ -58,6 +59,7 @@ use app\modules\Games\Karaoke\KaraokeController;
 use app\modules\Games\Leapfrog\LeapfrogController;
 use app\modules\Games\Solfege\SolfegeController;
 use app\modules\Kanban\KanbanController;
+use app\modules\Loan\LoanController;
 use app\modules\PersonManager\GroupController;
 use app\modules\PersonManager\ImportController;
 use app\modules\PersonManager\PersonController;
@@ -108,6 +110,7 @@ class ControllerFactory
         private EventTypeDataHelper $eventTypeDataHelper,
         private GroupDataHelper $groupDataHelper,
         private KanbanDataHelper $kanbanDataHelper,
+        private LoanDataHelper $loanDataHelper,
         private LogDataHelper $logDataHelper,
         private MessageDataHelper $messageDataHelper,
         private MetadataDataHelper $metadataDataHelper,
@@ -279,6 +282,14 @@ class ControllerFactory
         return new LeapfrogController(
             $this->application,
             $this->tableControllerDataHelper
+        );
+    }
+
+    public function makeLoanController(): LoanController
+    {
+        return new LoanController(
+            $this->application,
+            $this->loanDataHelper,
         );
     }
 

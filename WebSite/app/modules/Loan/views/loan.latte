@@ -1,0 +1,54 @@
+{layout '../../Common/views/layout.latte'}
+
+{block title}{='loan.nav.designer'|translate}{/block}
+
+{block content}
+<div class="container-fluid px-4 py-3">
+
+    {* Onglets de navigation *}
+    <ul class="nav nav-tabs mb-4" id="loanTabs">
+        {if $isLoanDesigner}
+        <li class="nav-item">
+            <a class="nav-link {if $activeTab === 'designer'}active{/if}"
+               href="/loan">
+                <i class="bi bi-box-seam me-1"></i>
+                {='loan.nav.designer'|translate}
+            </a>
+        </li>
+        {/if}
+        {if $isLoanManager}
+        <li class="nav-item">
+            <a class="nav-link {if $activeTab === 'manager'}active{/if}"
+               href="/loan/manager">
+                <i class="bi bi-arrow-left-right me-1"></i>
+                {='loan.nav.manager'|translate}
+            </a>
+        </li>
+        {/if}
+        <li class="nav-item">
+            <a class="nav-link {if $activeTab === 'user'}active{/if}"
+               href="/loan/reservations">
+                <i class="bi bi-calendar-check me-1"></i>
+                {='loan.nav.user'|translate}
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {if $activeTab === 'calendar'}active{/if}"
+               href="/loan/calendar">
+                <i class="bi bi-calendar3 me-1"></i>
+                {='loan.nav.calendar'|translate}
+            </a>
+        </li>
+    </ul>
+
+    {block loanContent}{/block}
+</div>
+{/block}
+
+{block scripts}
+<script>
+window.i18n = {=json_encode($translations)|noescape};
+window.t    = key => window.i18n?.[key] ?? key;
+</script>
+{block loanScripts}{/block}
+{/block}

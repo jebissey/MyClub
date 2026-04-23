@@ -41,6 +41,8 @@ use app\config\routes\Karaoke;
 use app\config\routes\KaraokeApi;
 use app\config\routes\Leapfrog;
 use app\config\routes\LeapfrogApi;
+use app\config\routes\Loan;
+use app\config\routes\LoanApi;
 use app\config\routes\Maintenance;
 use app\config\routes\Media;
 use app\config\routes\MediaApi;
@@ -100,6 +102,7 @@ use app\models\EventTypeDataHelper;
 use app\models\GroupDataHelper;
 use app\models\KanbanDataHelper;
 use app\models\KaraokeDataHelper;
+use app\models\LoanDataHelper;
 use app\models\LogDataHelper;
 use app\models\LogDataWriterHelper;
 use app\models\MenuItemDataHelper;
@@ -165,6 +168,7 @@ class Routes
         $sharedFileDataHelper = new SharedFileDataHelper($application);
         $authenticationService = new AuthenticationService($dataHelper, $emailService);
         $application->setAuthenticationService($authenticationService);
+        $loanDataHelper = new LoanDataHelper($application);
         $this->controllerFactory = new ControllerFactory(
             $application,
             new ArticleCrosstabDataHelper($application, $crosstabDataHelper),
@@ -183,6 +187,7 @@ class Routes
             new EventTypeDataHelper($application),
             new GroupDataHelper($application, $groupDataHelper),
             new KanbanDataHelper($application),
+            $loanDataHelper,
             $logDataHelper,
             $messageDataHelper,
             new MetadataDataHelper($application),
@@ -214,6 +219,7 @@ class Routes
             $this->quotaTracker,
             new KanbanDataHelper($application),
             new KaraokeDataHelper($application),
+            $loanDataHelper,
             $logDataHelper,
             new LogDataWriterHelper($application),
             new MenuItemDataHelper($application, $authorizationDataHelper),
@@ -286,6 +292,8 @@ class Routes
         $this->routes = array_merge($this->routes, (new KaraokeApi($this->apiFactory))->get());
         $this->routes = array_merge($this->routes, (new Leapfrog($this->controllerFactory))->get());
         $this->routes = array_merge($this->routes, (new LeapfrogApi($this->apiFactory))->get());
+        $this->routes = array_merge($this->routes, (new Loan($this->controllerFactory))->get());
+        $this->routes = array_merge($this->routes, (new LoanApi($this->apiFactory))->get());
         $this->routes = array_merge($this->routes, (new Maintenance($this->controllerFactory))->get());
         $this->routes = array_merge($this->routes, (new Media($this->controllerFactory))->get());
         $this->routes = array_merge($this->routes, (new MediaApi($this->apiFactory))->get());

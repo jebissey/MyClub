@@ -1,0 +1,231 @@
+{extends 'loan.latte'}
+{var $activeTab = 'manager'}
+
+{block loanContent}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="h4 mb-0">
+        <i class="bi bi-arrow-left-right me-2 text-primary"></i>
+        {='loan.record.title'|translate}
+    </h2>
+    <div class="d-flex gap-2">
+        <select class="form-select form-select-sm" id="filterStatus" style="width:auto">
+            <option value="">{='loan.record.status'|translate} – Tous</option>
+            <option value="active">{='loan.record.status.active'|translate}</option>
+            <option value="overdue">{='loan.record.status.overdue'|translate}</option>
+            <option value="returned">{='loan.record.status.returned'|translate}</option>
+            <option value="cancelled">{='loan.record.status.cancelled'|translate}</option>
+        </select>
+        <button class="btn btn-primary btn-sm" id="btnAddLoan">
+            <i class="bi bi-plus-lg me-1"></i>{='loan.record.add'|translate}
+        </button>
+    </div>
+</div>
+
+<div id="loanAlert" class="alert d-none" role="alert"></div>
+
+<div class="card shadow-sm">
+    <div class="card-body p-0">
+        <table class="table table-hover table-striped mb-0" id="tblLoans">
+            <thead class="table-dark">
+                <tr>
+                    <th>{='loan.record.item'|translate}</th>
+                    <th>{='loan.record.borrower'|translate}</th>
+                    <th>{='loan.record.lender'|translate}</th>
+                    <th>{='loan.record.loan_date'|translate}</th>
+                    <th>{='loan.record.due_date'|translate}</th>
+                    <th class="text-center">{='loan.record.quantity'|translate}</th>
+                    <th>{='loan.record.status'|translate}</th>
+                    <th class="text-end"></th>
+                </tr>
+            </thead>
+            <tbody id="tbodyLoans">
+            {foreach $loans as $loan}
+                {var $statusClass = match($loan['Status']) {
+                    'returned'  => 'bg-success',
+                    'overdue'   => 'bg-danger',
+                    'cancelled' => 'bg-secondary',
+                    default     => 'bg-primary'
+                }}
+                <tr data-id="{$loan['Id']}" data-status="{$loan['Status']}">
+                    <td class="fw-semibold">{$loan['ItemName']}</td>
+                    <td>{$loan['BorrowerName']}</td>
+                    <td class="text-muted small">{$loan['LenderName']}</td>
+                    <td>{$loan['LoanDate']}</td>
+                    <td>
+                        {$loan['DueDate']}
+                        {if $loan['Status'] === 'overdue'}
+                            <i class="bi bi-exclamation-triangle-fill text-danger ms-1"></i>
+                        {/if}
+                    </td>
+                    <td class="text-center">{$loan['QuantityLent']}</td>
+                    <td>
+                        <span class="badge {$statusClass}">
+                            {=('loan.record.status.' . $loan['Status'])|translate}
+                        </span>
+                    </td>
+                    <td class="text-end text-nowrap">
+                        {if $loan['Status'] === 'active' || $loan['Status'] === 'overdue'}
+                        <button class="btn btn-sm btn-outline-success btn-return me-1"
+                                data-id="{$loan['Id']}" title="{='loan.record.return_action'|translate}">
+                            <i class="bi bi-check2-circle"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-secondary btn-edit-loan me-1"
+                                data-id="{$loan['Id']}">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger btn-cancel-loan"
+                                data-id="{$loan['Id']}">
+                            <i class="bi bi-x-lg"></i>
+                        </button>
+                        {/if}
+                    </td>
+                </tr>
+            {else}
+                <tr id="noLoansRow">
+                    <td colspan="8" class="text-center text-muted py-4">
+                        {='loan.record.no_records'|translate}
+                    </td>
+                </tr>
+            {/foreach}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{* ── Modal nouveau/édition prêt ───────────────────────────────────── *}
+<div class="modal fade" id="modalLoan" tabindex="-1" aria-labelledby="modalLoanLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalLoanLabel"></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="loanId">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold" for="loanItem">
+                            {='loan.record.item'|translate} <span class="text-danger">*</span>
+                        </label>
+                        <select class="form-select" id="loanItem" required>
+                            <option value="">–</option>
+                            {foreach $loanItems as $item}
+                            <option value="{$item['Id']}" data-qty="{$item['Quantity']}">{$item['Name']}</option>
+                            {/foreach}
+                        </select>
+                        <div class="form-text" id="loanItemAvail"></div>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label fw-semibold" for="loanQty">
+                            {='loan.record.quantity'|translate}
+                        </label>
+                        <input type="number" class="form-control" id="loanQty" min="1" value="1">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold" for="loanBorrower">
+                            {='loan.record.borrower'|translate} <span class="text-danger">*</span>
+                        </label>
+                        <select class="form-select" id="loanBorrower" required>
+                            <option value="">–</option>
+                            {foreach $persons as $p}
+                            <option value="{$p['Id']}">{$p['FullName']}</option>
+                            {/foreach}
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold" for="loanLender">
+                            {='loan.record.lender'|translate} <span class="text-danger">*</span>
+                        </label>
+                        <select class="form-select" id="loanLender" required>
+                            <option value="">–</option>
+                            {foreach $persons as $p}
+                            <option value="{$p['Id']}">{$p['FullName']}</option>
+                            {/foreach}
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold" for="loanDate">
+                            {='loan.record.loan_date'|translate} <span class="text-danger">*</span>
+                        </label>
+                        <input type="date" class="form-control" id="loanDate" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold" for="loanDue">
+                            {='loan.record.due_date'|translate} <span class="text-danger">*</span>
+                        </label>
+                        <input type="date" class="form-control" id="loanDue" required>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label" for="loanNotes">
+                            {='loan.record.notes'|translate}
+                        </label>
+                        <textarea class="form-control" id="loanNotes" rows="2"></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    {='loan.action.cancel'|translate}
+                </button>
+                <button type="button" class="btn btn-primary" id="btnSaveLoan">
+                    <span class="spinner-border spinner-border-sm d-none me-1" id="saveLoanSpinner"></span>
+                    {='loan.action.save'|translate}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{* ── Modal retour ─────────────────────────────────────────────────── *}
+<div class="modal fade" id="modalReturn" tabindex="-1" aria-labelledby="modalReturnLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalReturnLabel">
+                    {='loan.record.return_action'|translate}
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="returnLoanId">
+                <div class="mb-3">
+                    <label class="form-label fw-semibold" for="returnDate">
+                        {='loan.record.return_date'|translate}
+                    </label>
+                    <input type="date" class="form-control" id="returnDate">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold" for="returnedTo">
+                        {='loan.record.returned_to'|translate} <span class="text-danger">*</span>
+                    </label>
+                    <select class="form-select" id="returnedTo" required>
+                        <option value="">–</option>
+                        {foreach $persons as $p}
+                        <option value="{$p['Id']}">{$p['FullName']}</option>
+                        {/foreach}
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    {='loan.action.cancel'|translate}
+                </button>
+                <button type="button" class="btn btn-success" id="btnConfirmReturn">
+                    <span class="spinner-border spinner-border-sm d-none me-1" id="returnSpinner"></span>
+                    {='loan.record.return_action'|translate}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{* Données sérialisées pour JS *}
+<script>
+window.loanPersons = {$persons};
+window.loanItems   = {$loanItems};
+</script>
+{/block}
+
+{block loanScripts}
+<script type="module" src="/app/modules/Loan/js/manager.js"></script>
+{/block}

@@ -57,6 +57,8 @@ class ConnectedUser
                 'isEventManager' => $this->isEventManager(),
                 'isHomeDesigner' => $this->isHomeDesigner(),
                 'isKanbanDesigner' => $this->isKanbanDesigner(),
+                'isLoanDesigner' => $this->isLoanDesigner(),
+                'isLoanManager' => $this->isLoanManager(),
                 'isMember' => true,
                 'isMenuDesigner' => $this->isMenuDesigner(),
                 'isPersonManager' => $this->isPersonManager(),
@@ -96,6 +98,11 @@ class ConnectedUser
         return in_array(Authorization::CommunicationManager->value, $this->authorizations ?? []);
     }
 
+    public function isConnected(): bool
+    {
+        return $this->person !== null;
+    }
+
     public function isDesigner(): bool
     {
         return $this->isEventDesigner() || $this->isHomeDesigner() || $this->isMenuDesigner();
@@ -129,6 +136,16 @@ class ConnectedUser
     public function isKanbanDesigner(): bool
     {
         return in_array(Authorization::KanbanDesigner->value, $this->authorizations ?? []);
+    }
+
+    public function isLoanDesigner(): bool
+    {
+        return in_array(Authorization::LoanDesigner->value, $this->authorizations ?? []);
+    }
+
+    public function isLoanManager(): bool
+    {
+        return in_array(Authorization::LoanManager->value, $this->authorizations ?? []);
     }
 
     public function isMenuDesigner(): bool

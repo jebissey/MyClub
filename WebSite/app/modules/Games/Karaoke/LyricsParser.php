@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace app\modules\Games\Karaoke;
 
 use app\exceptions\LyricsParserException;
-use app\helpers\Application;
-use app\models\LanguagesDataHelper;
 
 class LyricsParser
 {
