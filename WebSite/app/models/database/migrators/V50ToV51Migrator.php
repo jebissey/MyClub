@@ -173,7 +173,7 @@ WHERE Name IN (
     'user.messages.empty.since_week',
     'user.messages.empty.since_month',
     'user.messages.empty.since_quarter',
-    'user.messages.empty.since_year',
+    'user.messages.empty.since_year'
 
 );
 SQL;

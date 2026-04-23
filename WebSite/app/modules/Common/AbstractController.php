@@ -263,9 +263,7 @@ abstract class AbstractController
     {
 #error_log("\n\n" . json_encode($templateLatteName, JSON_PRETTY_PRINT) . "\n");
         $content = $this->latte->renderToString($templateLatteName, $params);
-        echo $content;
-        if (ob_get_level()) ob_end_flush();
-        flush();
+        Flight::response()->write($content);
         Flight::stop();
     }
 
