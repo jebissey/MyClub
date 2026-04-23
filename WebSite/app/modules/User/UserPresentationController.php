@@ -87,6 +87,7 @@ class UserPresentationController extends AbstractController
                 'userImg' => WebApp::getUserImg($person, new GravatarHandler()),
                 'btn_HistoryBack' => true,
                 'btn_Parent' => "/user/directory",
+                'maxZoom' => 12,
             ]));
         } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }

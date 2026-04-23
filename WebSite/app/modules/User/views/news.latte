@@ -1,133 +1,53 @@
 {extends "user.latte"}
 
 {block content}
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h3 class="card-title">
-                        <i class="bi bi-bell"></i> Nouvelles
-                    </h3>
-                    <div class="card-tools">
-                        <div class="btn-group" role="group">
-                            <a href="/user/news?from=signout" 
-                               class="btn btn-sm {if $searchMode === 'signout'}btn-primary{else}btn-outline-primary{/if}">
-                                Depuis votre dernière déconnexion
-                            </a>
-                            <a href="/user/news?from=signin" 
-                               class="btn btn-sm {if $searchMode === 'signin'}btn-primary{else}btn-outline-primary{/if}">
-                                Depuis votre connexion
-                            </a>
-                            <a href="/user/news?from=week" 
-                               class="btn btn-sm {if $searchMode === 'week'}btn-primary{else}btn-outline-primary{/if}">
-                                Depuis une semaine
-                            </a>
-                            <a href="/user/news?from=month" 
-                               class="btn btn-sm {if $searchMode === 'month'}btn-primary{else}btn-outline-primary{/if}">
-                                Depuis un mois
-                            </a>
-                            <a href="/user/news?from=quarter" 
-                               class="btn btn-sm {if $searchMode === 'quarter'}btn-primary{else}btn-outline-primary{/if}">
-                                Depuis un trimestre
-                            </a>
-                            <a href="/user/news?from=year" 
-                               class="btn btn-sm {if $searchMode === 'year'}btn-primary{else}btn-outline-primary{/if}">
-                                Depuis un an
-                            </a>                            
-                        </div>
+
+{var $groupConfig = [
+    'article'      => ['label' => 'user.news.group.articles',      'icon' => 'bi-file-text',      'bg' => 'primary'],
+    'event'        => ['label' => 'user.news.group.events',        'icon' => 'bi-calendar-event', 'bg' => 'success'],
+    'message'      => ['label' => 'user.news.group.messages',      'icon' => 'bi-envelope',       'bg' => 'info'],
+    'presentation' => ['label' => 'user.news.group.presentations', 'icon' => 'bi-person-badge',   'bg' => 'warning'],
+    'survey'       => ['label' => 'user.news.group.surveys',       'icon' => 'bi-bar-chart',      'bg' => 'secondary'],
+]}
+
+{embed 'partials/_filter_card.latte', baseUrl: '/user/news', searchMode: $searchMode, searchFrom: $searchFrom}
+    {block body}
+
+        {embed 'partials/_grouped_list.latte',
+            items: $news,
+            groupConfig: $groupConfig,
+            emptyKey: 'user.news.empty.title',
+            emptyDescKey: "user.news.empty.since_{$searchMode}"}
+
+            {block item}
+                <div class="d-flex align-items-start gap-2">
+                    <div class="flex-grow-1 text-truncate">
+                        <a href="{$item['url']}" class="fw-semibold small text-dark text-decoration-none">
+                            {$item['title']}
+                        </a>
                     </div>
+                    <small class="text-muted flex-shrink-0">
+                        {$item['date']|shortDateTime}
+                    </small>
                 </div>
-                
-                {var $groupedNews = []}
-                {foreach $news as $item}
-                    {var $groupedNews[$item['type']][] = $item}
-                {/foreach}
-                <div class="card-body">
-                    {if $searchFrom}
-                        <div class="alert alert-info">
-                            <i class="bi bi-info-circle"></i>
-                            Affichage des nouveautés depuis le 
-                            <strong>{$searchFrom|date:'d/m/Y à H:i'}</strong>
-                            {if $searchMode === 'signout'}
-                                (dernière déconnexion)
-                            {elseif $searchMode === 'signin'}
-                                (dernière connexion)
-                            {elseif $searchMode === 'week'}
-                                (1 semaine)
-                            {elseif $searchMode === 'month'}
-                                (1 mois)
-                            {/if}
-                        </div>
-                    {/if}
 
-                    {if count($news) > 0}
-                        {var $groupedNews = []}
-                        {foreach $news as $item}
-                            {var $groupedNews[$item['type']][] = $item}
-                        {/foreach}
+                {if (isset($item['from']) && $item['from']) || (isset($item['detail']) && $item['detail'])}
+                    <div class="d-flex flex-wrap gap-2 mt-1">
+                        {if isset($item['from']) && $item['from']}
+                            <small class="text-muted">
+                                <i class="bi bi-person me-1"></i>{='user.news.item.by'|translate} {$item['from']}
+                            </small>
+                        {/if}
+                        {if isset($item['detail']) && $item['detail']}
+                            <small class="text-muted fst-italic">{$item['detail']}</small>
+                        {/if}
+                    </div>
+                {/if}
+            {/block}
 
-                        {foreach $groupedNews as $type => $items}
-                        <div class="card mb-4">
-                            <div class="card-header 
-                                {if $type === 'article'}bg-primary text-white
-                                {elseif $type === 'event'}bg-success text-white
-                                {elseif $type === 'message'}bg-info text-white
-                                {elseif $type === 'presentation'}bg-warning
-                                {/if}">
-                                <h5 class="mb-0">
-                                    {if $type === 'article'}
-                                        📄 Articles
-                                    {elseif $type === 'event'}
-                                        📅 Événements
-                                    {elseif $type === 'message'}
-                                        ✉️ Messages
-                                    {elseif $type === 'presentation'}
-                                        🙋 Présentations
-                                    {elseif $type === 'survey'}
-                                        🗳️ Sondages
-                                    {/if}
-                                </h5>
-                            </div>
-                            <div class="card-body">
-                                {foreach $items as $item}
-                                    <div class="mb-3 border-bottom pb-2">
-                                        <h5>
-                                            <a href="{$item['url']}" class="text-dark">
-                                                {$item['title']}
-                                            </a>
-                                            <small class="text-muted float-right">
-                                                {$item['date']|date:'d/m/Y H:i'}
-                                            </small>
-                                        </h5>                                          
-                                        {if isset($item['from']) && $item['from']}
-                                            <p class="text-muted mb-0">
-                                                <i class="bi bi-person"></i> Par {$item['from']}
-                                            </p>
-                                        {/if}
-                                        {if isset($item['detail']) && $item['detail']}
-                                            <small class="text-muted float-right">
-                                                {$item['detail']}
-                                            </small>
-                                        {/if}                                          
-                                    </div>
-                                {/foreach}
-                            </div>
-                        </div>
-                        {/foreach}
-                    {else}
-                        <div class="text-center py-5">
-                            <i class="bi bi-inbox fs-1 text-muted mb-3"></i>
-                            <h4 class="text-muted">Aucune nouvelle</h4>
-                            <p class="text-muted">
-                                Aucune création ou modification depuis 
-                                {if $searchMode === 'signout'}votre dernière déconnexion{else}votre dernière connexion{/if}.
-                            </p>
-                        </div>
-                    {/if}
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+        {/embed}
+
+    {/block}
+{/embed}
+
 {/block}

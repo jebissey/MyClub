@@ -1,129 +1,65 @@
 {extends "user.latte"}
 
 {block content}
-{var $filterButtons = [
-    'signout' => 'user.messages.filter.since_signout',
-    'signin'  => 'user.messages.filter.since_signin',
-    'week'    => 'user.messages.filter.since_week',
-    'month'   => 'user.messages.filter.since_month',
-    'quarter' => 'user.messages.filter.since_quarter',
-    'year'    => 'user.messages.filter.since_year',
+
+{var $groupConfig = [
+    'event'   => ['label' => 'user.messages.group.events',   'icon' => 'bi-calendar-event', 'bg' => 'success'],
+    'article' => ['label' => 'user.messages.group.articles', 'icon' => 'bi-file-text',       'bg' => 'primary'],
+    'group'   => ['label' => 'user.messages.group.groups',   'icon' => 'bi-people',          'bg' => 'info'],
 ]}
 
-{var $groups = [
-    'event'   => ['key' => 'user.messages.group.events',   'url' => '/event/chat/',   'icon' => 'bi-calendar-event'],
-    'article' => ['key' => 'user.messages.group.articles', 'url' => '/article/chat/', 'icon' => 'bi-file-text'],
-    'group'   => ['key' => 'user.messages.group.groups',   'url' => '/group/chat/',   'icon' => 'bi-people'],
-]}
+{embed 'partials/_filter_card.latte', baseUrl: '/user/messages', searchMode: $searchMode, searchFrom: $searchFrom}
+    {block body}
 
-<div class="container-fluid px-2 px-md-3">
-    <div class="row">
-        <div class="col-12">
-            <div class="card shadow-sm">
+        {embed 'partials/_grouped_list.latte',
+            items: $messages,
+            groupConfig: $groupConfig,
+            emptyKey: 'user.messages.empty.title',
+            emptyDescKey: "user.messages.empty.since_{$searchMode}"}
 
-                <div class="card-header py-2">
-                    <div class="d-flex flex-wrap gap-1" role="group">
-                        {foreach $filterButtons as $mode => $key}
-                            <a href="/user/messages?from={$mode}"
-                               class="btn btn-sm {if $searchMode === $mode}btn-primary{else}btn-outline-primary{/if} flex-fill text-center"
-                               style="min-width: 90px;">
-                                {=$key|translate}
-                            </a>
-                        {/foreach}
+            {block item}
+                <div class="d-flex align-items-center gap-2">
+
+                    <div class="flex-grow-1 text-truncate fw-semibold small">
+                        {$item['title']}
                     </div>
-                </div>
 
-                <div class="card-body p-2 p-md-3">
+                    <span class="badge rounded-pill bg-info text-dark flex-shrink-0"
+                          title="{$item['message_count']} messages">
+                        {$item['message_count']}
+                    </span>
 
-                    {if $searchFrom}
-                        <div class="alert alert-info py-2 small">
-                            <i class="bi bi-info-circle me-1"></i>
-                            {='user.messages.info.showing_since'|translate}
-                            <strong>{$searchFrom|longDateTime}</strong>
-                            {=("user.messages.info.label_{$searchMode}")|translate}
-                        </div>
-                    {/if}
+                    <small class="text-muted flex-shrink-0 d-none d-sm-inline">
+                        {$item['LastUpdate']|shortDateTime}
+                    </small>
 
-                    {if count($messages) > 0}
-                        {var $groupedMessages = ['event' => [], 'article' => [], 'group' => []]}
-                        {foreach $messages as $item}
-                            {var $groupedMessages[$item['type']][] = $item}
-                        {/foreach}
+                    {var $isUrl = strlen($item['UserImg']) > 10}
+                    <div class="flex-shrink-0" style="width:2rem; height:2rem;">
+                        {if $isUrl}
+                            <img src="{$item['UserImg']}" alt="Avatar" class="rounded-circle"
+                                 style="width:2rem; height:2rem; object-fit:cover;">
+                        {else}
+                            <span style="font-size:1.5rem; line-height:2rem; display:block; text-align:center;">
+                                {$item['UserImg']}
+                            </span>
+                        {/if}
+                    </div>
 
-                        {foreach $groups as $type => $group}
-                            {if count($groupedMessages[$type]) > 0}
-                                <div class="card mb-3 border-0 shadow-sm overflow-hidden">
-
-                                    <div class="card-header bg-{if $type === 'event'}success{elseif $type === 'article'}primary{else}info{/if} text-white py-2">
-                                        <h6 class="mb-0 fw-semibold">
-                                            <i class="bi {$group['icon']} me-2"></i>
-                                            {=$group['key']|translate}
-                                        </h6>
-                                    </div>
-
-                                    <ul class="list-group list-group-flush">
-                                        {foreach $groupedMessages[$type] as $item}
-                                            <li class="list-group-item px-2 px-md-3 py-2">
-                                                <div class="d-flex align-items-center gap-2">
-
-                                                    <div class="flex-grow-1 text-truncate fw-semibold small">
-                                                        {$item['title']}
-                                                    </div>
-
-                                                    <span class="badge rounded-pill bg-info text-dark flex-shrink-0"
-                                                          title="{$item['message_count']} messages">
-                                                        {$item['message_count']}
-                                                    </span>
-
-                                                    <small class="text-muted flex-shrink-0 d-none d-sm-inline">
-                                                        {$item['LastUpdate']|shortDateTime}
-                                                    </small>
-
-                                                    {var $isUrl = strlen($item['UserImg']) > 10}
-                                                    <div class="flex-shrink-0" style="width:2rem; height:2rem;">
-                                                        {if $isUrl}
-                                                            <img src="{$item['UserImg']}"
-                                                                 alt="Avatar"
-                                                                 class="rounded-circle"
-                                                                 style="width:2rem; height:2rem; object-fit:cover;">
-                                                        {else}
-                                                            <span style="font-size:1.5rem; line-height:2rem; display:block; text-align:center;">
-                                                                {$item['UserImg']}
-                                                            </span>
-                                                        {/if}
-                                                    </div>
-
-                                                    <a href="{$group['url']}{$item['Id']}"
-                                                       class="btn btn-success btn-sm flex-shrink-0"
-                                                       title="{='user.messages.action.view'|translate}">
-                                                        <i class="bi bi-eye"></i>
-                                                    </a>
-                                                </div>
-
-                                                <div class="d-sm-none text-muted mt-1" style="font-size:.75rem;">
-                                                    <i class="bi bi-clock me-1"></i>{$item['LastUpdate']|shortDateTime}
-                                                </div>
-                                            </li>
-                                        {/foreach}
-                                    </ul>
-
-                                </div>
-                            {/if}
-                        {/foreach}
-
-                    {else}
-                        <div class="text-center py-5">
-                            <i class="bi bi-inbox fs-1 text-muted mb-3 d-block"></i>
-                            <h5 class="text-muted">{='user.messages.empty.title'|translate}</h5>
-                            <p class="text-muted small mb-0">
-                                {=("user.messages.empty.since_{$searchMode}")|translate}
-                            </p>
-                        </div>
-                    {/if}
+                    <a href="/group/chat/{$item['Id']}"
+                       class="btn btn-success btn-sm flex-shrink-0"
+                       title="{='user.messages.action.view'|translate}">
+                        <i class="bi bi-eye"></i>
+                    </a>
 
                 </div>
-            </div>
-        </div>
-    </div>
-</div>
+                <div class="d-sm-none text-muted mt-1" style="font-size:.75rem;">
+                    <i class="bi bi-clock me-1"></i>{$item['LastUpdate']|date:'d/m/Y H:i'}
+                </div>
+            {/block}
+
+        {/embed}
+
+    {/block}
+{/embed}
+
 {/block}

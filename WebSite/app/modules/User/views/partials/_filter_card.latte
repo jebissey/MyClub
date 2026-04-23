@@ -1,0 +1,51 @@
+{*
+ * Paramètres attendus :
+ *   $baseUrl    — ex. '/user/messages'
+ *   $searchMode — mode actif
+ *   $searchFrom — datetime|null
+ *}
+
+{var $filterButtons = [
+    'signout' => 'user.filter.since_signout',
+    'signin'  => 'user.filter.since_signin',
+    'week'    => 'user.filter.since_week',
+    'month'   => 'user.filter.since_month',
+    'quarter' => 'user.filter.since_quarter',
+    'year'    => 'user.filter.since_year',
+]}
+
+<div class="container-fluid px-2 px-md-3">
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm">
+
+                <div class="card-header py-2">
+                    <div class="d-flex flex-wrap gap-1" role="group">
+                        {foreach $filterButtons as $mode => $key}
+                            <a href="{$baseUrl}?from={$mode}"
+                               class="btn btn-sm {if $searchMode === $mode}btn-primary{else}btn-outline-primary{/if} flex-fill text-center"
+                               style="min-width: 90px;">
+                                {=$key|translate}
+                            </a>
+                        {/foreach}
+                    </div>
+                </div>
+
+                <div class="card-body p-2 p-md-3">
+
+                    {if $searchFrom}
+                        <div class="alert alert-info py-2 small">
+                            <i class="bi bi-info-circle me-1"></i>
+                            {='user.filter.info.showing_since'|translate}
+                            <strong>{$searchFrom|longDateTime}</strong>
+                            {=("user.filter.info.label_{$searchMode}")|translate}
+                        </div>
+                    {/if}
+
+                    {block body}{/block}
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

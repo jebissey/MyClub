@@ -129,9 +129,10 @@ echo bold("» Scan des fichiers .latte dans :") . PHP_EOL;
 echo dim("  $scanDir") . PHP_EOL . PHP_EOL;
 
 $latteResult = scanFiles($scanDir, '/\.latte$/i', [
-    '/\{=\s*[\'"]([a-zA-Z0-9_.]+)[\'"]\s*\|translate\s*\}/', // {='some.key'|translate}
-    '/\(\s*[\'"]([a-zA-Z0-9_.]+)[\'"]\s*\|translate\s*\)/',  // ('some.key'|translate)
-], $usedKeys);
+     '/\{=\s*[\'"]([a-zA-Z0-9_.]+)[\'"]\s*\|translate\s*\}/',               // {='some.key'|translate}
+     '/\(\s*[\'"]([a-zA-Z0-9_.]+)[\'"]\s*\|translate\s*\)/',                // ('some.key'|translate)
+     '/=>\s*[\'"]([a-z][a-zA-Z0-9]*(?:\.[a-zA-Z0-9]+){1,})[\'"]\s*[,\]]/',  // => 'some.key', (valeur de tableau)
+ ], $usedKeys);
 
 echo sprintf("  %d fichier(s) — %d occurrence(s) trouvée(s).",
     $latteResult['files'], $latteResult['matches']
