@@ -215,6 +215,11 @@ class ArticleController extends TableController
             'publishedBy' => $article->PublishedBy != $article->CreatedBy ? $this->personDataHelper->getPublisher($article->PublishedBy) : '',
             'carouselItems' => $this->dataHelper->gets('Carousel', ['IdArticle' => $id]),
             'page' => $connectedUser->getPage(),
+            'translations' => [
+                'editorNotReady' => $this->languagesDataHelper->translate('article.edit.error.editor_not_ready'),
+                'titleRequired' => $this->languagesDataHelper->translate('article.edit.error.title_required'),
+                'contentRequired' => $this->languagesDataHelper->translate('article.edit.error.content_required'),
+            ],
         ]));
     }
 

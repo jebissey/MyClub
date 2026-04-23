@@ -19,15 +19,15 @@
 
     <div class="ms-auto">
         <button type="submit" id="save-btn" class="btn btn-success">
-            <i class="bi bi-check-circle"></i> Enregistrer
+            <i class="bi bi-check-circle"></i> {='save'|translate}
         </button>
         <a href="/article/{$article->Id}" id="cancel-btn" class="btn btn-secondary">
-            <i class="bi bi-x-circle"></i> Annuler
+            <i class="bi bi-x-circle"></i> {='cancel'|translate}
         </a>
         <a href="/article/{$article->Id}" class="btn btn-success">
             <i class="bi bi-eye"></i>
         </a>
-        <a href="/articles" class="btn btn-secondary">Liste des articles</a>
+        <a href="/articles" class="btn btn-secondary">{='article.edit.list'|translate}</a>
     </div>
 </div>
 {/block}
@@ -47,12 +47,12 @@
                         modifié le {date('d/m/Y', strtotime($article->LastUpdate))}
                         {/if}
                         {if isset($article->PublishedBy) && $article->PublishedBy !== null}
-                            <span class="badge bg-success">Publié</span>
+                            <span class="badge bg-success">{='article.edit.published'|translate}</span>
                         {else}
-                            <span class="badge bg-secondary">Non publié</span>
+                            <span class="badge bg-secondary">{='article.edit.not_published'|translate}</span>
                         {/if}
                         {if isset($article->GroupName) && $article->GroupName}
-                            <span class="badge bg-info">Groupe: {$article->GroupName}</span>
+                            <span class="badge bg-info">{='article.edit.group_label'|translate}: {$article->GroupName}</span>
                         {/if}
                     </small>
                 </div>
@@ -62,19 +62,19 @@
                 <form id="edit-form" method="post" class="d-flex flex-column gap-2">
                     <div class="d-flex align-items-center gap-4 flex-wrap">
                         <div class="form-check">
-<input 
-    class="form-check-input" 
-    type="checkbox" 
-    id="published-input" 
-    name="published" 
-    value="1"
-    {if isset($article->PublishedBy) && $article->PublishedBy !== null}checked{/if}
->
-                            <label class="form-check-label" for="published-input">Publier</label>
+                            <input 
+                                class="form-check-input" 
+                                type="checkbox" 
+                                id="published-input" 
+                                name="published" 
+                                value="1"
+                                {if isset($article->PublishedBy) && $article->PublishedBy !== null}checked{/if}
+                            >
+                            <label class="form-check-label" for="published-input">{='article.edit.publish'|translate}</label>
                         </div>
 
                         <div class="d-flex align-items-center gap-2">
-                            <label for="group-select" class="form-label mb-0 text-nowrap">Groupe associé</label>
+                            <label for="group-select" class="form-label mb-0 text-nowrap">{='article.edit.group'|translate}</label>
                             <select class="form-select" id="group-select" name="idGroup">
                                 <option value="">-- Aucun groupe --</option>
                                 {foreach $groups as $group}
@@ -86,14 +86,14 @@
                         <div class="form-check">
                             <input class="form-check-input" type="checkbox" id="members-only-checkbox" name="membersOnly" value="1"
                                 {if isset($article->OnlyForMembers) && $article->OnlyForMembers}checked{/if}>
-                            <label class="form-check-label" for="members-only-checkbox">Pour les membres du club uniquement</label>
+                            <label class="form-check-label" for="members-only-checkbox">{='article.edit.members_only'|translate}</label>
                         </div>
                     </div>
 
                     <hr class="my-2">
 
                     <div>
-                        <label for="title-input" class="form-label mb-1">Titre</label>
+                        <label for="title-input" class="form-label mb-1">{='article.edit.title'|translate}</label>
                         <input type="text" class="form-control" id="title-input" name="title" value="{$article->Title}" required>
                     </div>
                     <input type="hidden" id="content-input" name="content">
@@ -103,7 +103,7 @@
 
         <div class="d-flex flex-column flex-grow-1" style="min-height:0">
             <label class="form-label fw-semibold flex-shrink-0 mb-1">
-                <i class="bi bi-body-text"></i> Contenu <span class="text-danger">*</span>
+                <i class="bi bi-body-text"></i> {='article.edit.content'|translate} <span class="text-danger">*</span>
             </label>
             <textarea name="content" id="tinymce-editor" class="flex-grow-1">{if isset($article->Content)}{$article->Content|noescape}{/if}</textarea>
         </div>
@@ -115,6 +115,11 @@
     <script>
         const ARTICLE_ID = {$article->Id};
         const isEditor = {$isEditor ? 'true' : 'false'} === 'true';
+        
+        window.i18n = {=json_encode($translations)|noescape};
+        window.t = function(key) {
+            return window.i18n?.[key] ?? key;
+        };
     </script>
     <script type="module" src="/app/modules/Article/js/edit.js"></script>
 {/block}

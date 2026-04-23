@@ -34,7 +34,7 @@
                                 <select class="form-select" id="event" name="eventId" required>
                                     <option value="">Sélectionnez un événement</option>
                                     {foreach $events as $event}
-                                        <option value="{$event->Id}">{$event->Summary} - {$event->StartTime|date:'d/m/Y H:i'} - {$event->PersonName}</option>
+                                        <option value="{$event->Id}">{$event->Summary} - {$event->StartTime|shortDateTime} - {$event->PersonName}</option>
                                     {/foreach}
                                 </select>
                                 <div class="invalid-feedback">Veuillez sélectionner un événement</div>

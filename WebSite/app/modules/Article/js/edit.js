@@ -2,6 +2,8 @@ import { initTinyMCE } from '/app/modules/Common/js/tinymce-config.js';
 
 document.addEventListener('DOMContentLoaded', function () {
 
+    const t = window.t;
+
     // =========================
     // TinyMCE
     // =========================
@@ -34,7 +36,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         if (!editor) {
             e.preventDefault();
-            appendAlert("L'éditeur n'est pas encore chargé. Veuillez patienter.", 'warning');
+            appendAlert(t('editorNotReady'), 'warning');
             return;
         }
 
@@ -42,13 +44,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
         if (!title) {
             e.preventDefault();
-            appendAlert('Le titre est obligatoire.', 'danger');
+            appendAlert(t('titleRequired'), 'danger');
             return;
         }
 
         if (!content || content === '<p><br></p>') {
             e.preventDefault();
-            appendAlert('Le contenu ne peut pas être vide.', 'danger');
+            appendAlert(t('contentRequired'), 'danger');
             return;
         }
 
