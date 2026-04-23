@@ -22,7 +22,7 @@ class LoanApi extends AbstractApi
         parent::__construct($application, $connectedUser, $dataHelper, $personDataHelper);
     }
 
-    #region LoadDesigner functions
+    #region LoanDesigner functions
     public function getItems(): void
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isLoanDesigner())) {
@@ -70,7 +70,7 @@ class LoanApi extends AbstractApi
         }
     }
 
-    #region LoadManager functions
+    #region LoanManager functions
     public function getLoans(): void
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isLoanDesigner())) {
@@ -161,7 +161,7 @@ class LoanApi extends AbstractApi
 
     public function getReservations(): void
     {
-        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isLoanDesigner())) {
+        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isLoan())) {
 
             $user = $this->application->getConnectedUser();
             // Un manager voit tout, un utilisateur ne voit que les siennes

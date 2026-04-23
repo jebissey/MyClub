@@ -100,6 +100,7 @@ class LoanController extends AbstractController
         $this->render('Loan/views/designer.latte', $this->getAllParams([
             'items'        => $this->loanDataHelper->getAllItems(),
             'translations' => $this->translations(),
+            'page' => $this->application->getConnectedUser()->getPage(),
         ]));
     }
 
@@ -135,6 +136,7 @@ class LoanController extends AbstractController
             'isManager'         => $user->isLoanManager(),
             'currentUserId'     => $userId,
             'translations'      => $this->translations(),
+            'page' => $this->application->getConnectedUser()->getPage(),
         ]));
     }
 
@@ -146,6 +148,7 @@ class LoanController extends AbstractController
 
         $this->render('Loan/views/calendar.latte', $this->getAllParams([
             'translations' => $this->translations(),
+            'page' => $this->application->getConnectedUser()->getPage(),
         ]));
     }
 

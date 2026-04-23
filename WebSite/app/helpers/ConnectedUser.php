@@ -138,6 +138,11 @@ class ConnectedUser
         return in_array(Authorization::KanbanDesigner->value, $this->authorizations ?? []);
     }
 
+    public function isLoan(): bool
+    {
+        return $this->isLoanDesigner() || $this->isLoanManager();
+    }
+
     public function isLoanDesigner(): bool
     {
         return in_array(Authorization::LoanDesigner->value, $this->authorizations ?? []);
