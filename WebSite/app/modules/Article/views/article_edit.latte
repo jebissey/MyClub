@@ -62,8 +62,14 @@
                 <form id="edit-form" method="post" class="d-flex flex-column gap-2">
                     <div class="d-flex align-items-center gap-4 flex-wrap">
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="published-input" name="published" value="1"
-                                {if isset($article->PublishedBy) && $article->PublishedBy !== null}checked{/if}>
+<input 
+    class="form-check-input" 
+    type="checkbox" 
+    id="published-input" 
+    name="published" 
+    value="1"
+    {if isset($article->PublishedBy) && $article->PublishedBy !== null}checked{/if}
+>
                             <label class="form-check-label" for="published-input">Publier</label>
                         </div>
 
@@ -106,6 +112,9 @@
 
 {block scripts}
     <script src="/app/modules/Common/js/tinymce/tinymce.min.js"></script>
-    <script>const ARTICLE_ID = {$article->Id};</script>
+    <script>
+        const ARTICLE_ID = {$article->Id};
+        const isEditor = {$isEditor ? 'true' : 'false'} === 'true';
+    </script>
     <script type="module" src="/app/modules/Article/js/edit.js"></script>
 {/block}

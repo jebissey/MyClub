@@ -3,9 +3,9 @@
 {block content}
 
 {var $groupConfig = [
-    'event'   => ['label' => 'user.messages.group.events',   'icon' => 'bi-calendar-event', 'bg' => 'success'],
-    'article' => ['label' => 'user.messages.group.articles', 'icon' => 'bi-file-text',       'bg' => 'primary'],
-    'group'   => ['label' => 'user.messages.group.groups',   'icon' => 'bi-people',          'bg' => 'info'],
+    'event'   => ['label' => 'user.messages.group.events',   'icon' => 'bi-calendar-event', 'bg' => 'success', 'url' => '/event/chat/'],
+    'article' => ['label' => 'user.messages.group.articles', 'icon' => 'bi-file-text',      'bg' => 'primary', 'url' => '/article/chat/'],
+    'group'   => ['label' => 'user.messages.group.groups',   'icon' => 'bi-people',         'bg' => 'info',    'url' => '/group/chat/'],
 ]}
 
 {embed 'partials/_filter_card.latte', baseUrl: '/user/messages', searchMode: $searchMode, searchFrom: $searchFrom}
@@ -45,7 +45,7 @@
                         {/if}
                     </div>
 
-                    <a href="/group/chat/{$item['Id']}"
+                    <a href="{$cfg['url']}{$item['Id']}"
                        class="btn btn-success btn-sm flex-shrink-0"
                        title="{='user.messages.action.view'|translate}">
                         <i class="bi bi-eye"></i>

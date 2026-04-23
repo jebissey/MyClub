@@ -215,7 +215,6 @@ class ArticleController extends TableController
             'publishedBy' => $article->PublishedBy != $article->CreatedBy ? $this->personDataHelper->getPublisher($article->PublishedBy) : '',
             'carouselItems' => $this->dataHelper->gets('Carousel', ['IdArticle' => $id]),
             'page' => $connectedUser->getPage(),
-            'isEditor' => $connectedUser->isEditor(),
         ]));
     }
 
