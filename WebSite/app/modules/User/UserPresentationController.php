@@ -84,7 +84,7 @@ class UserPresentationController extends AbstractController
                 'loggedPerson' => $loggedPerson,
                 'navItems' => $this->getNavItems($person),
                 'page' => $this->application->getConnectedUser()->getPage(),
-                'userImg' => WebApp::getUserImg($person, new GravatarHandler()),
+                'userImg_' => WebApp::getUserImg($person, new GravatarHandler()),
                 'btn_HistoryBack' => true,
                 'btn_Parent' => "/user/directory",
                 'maxZoom' => 12,

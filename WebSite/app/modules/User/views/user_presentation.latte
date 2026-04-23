@@ -27,7 +27,7 @@
             <div class="card">
                 <div class="card-body text-center">                    
                     {if $person->UseGravatar == 'yes' && $person->Email}
-                    <img src="{$userImg}" 
+                    <img src="{$userImg_}" class="rounded-circle"
                         alt="User gravatar" 
                         data-bs-toggle="tooltip" 
                         data-bs-placement="bottom" 
@@ -37,7 +37,7 @@
                           data-bs-placement="bottom" 
                           title="{if $userEmail != ''}{='my_data'|translate}{else}{='login'|translate}{/if}"
                           style="font-size: 2rem; cursor: pointer; display: inline-block; line-height: 1;">
-                        {$userImg}
+                        {$userImg_}
                     </span>
                     {else}
                     <div class="rounded-circle bg-light d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 48px; height: 48px;">
