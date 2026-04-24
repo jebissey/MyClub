@@ -310,7 +310,7 @@ class ArticleController extends TableController
             return;
         }
         $_SESSION['navbar'] = 'redactor';
-        $this->render('Webmaster/views/redactor.latte', $this->getAllParams([
+        $this->render('Article/views/redactor.latte', $this->getAllParams([
             'page' => $this->application->getConnectedUser()->getPage(),
             'content' => $this->languagesDataHelper->translate('Redactor')
         ]));

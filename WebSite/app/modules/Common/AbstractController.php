@@ -69,7 +69,7 @@ abstract class AbstractController
             'user'              => '../../User/views/user.latte',
             'eventManager'      => '../../Webmaster/views/eventManager.latte',
             'personManager'     => '../../Webmaster/views/personManager.latte',
-            'redactor'          => '../../Webmaster/views/redactor.latte',
+            'redactor'          => '../../Article/views/redactor.latte',
             'visitorInsights'   => '../../Webmaster/views/visitorInsights.latte',
             'webmaster'         => '../../Webmaster/views/webmaster.latte',
             ''                  => '../../Common/views/home.latte',

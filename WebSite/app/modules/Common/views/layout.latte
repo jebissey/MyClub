@@ -236,7 +236,6 @@
                 {* ── Page content ───────────────────────────────── *}
                 <div id="page-content-wrapper" class="flex-grow-1 overflow-hidden">
 
-                    {* Banner déplacé ici pour éviter la bande blanche au-dessus de la sidebar *}
                     {if isset($currentPath) && $currentPath === '/' && file_exists('app/images/header-banner.jpg')}
                         <img src="/app/images/header-banner.jpg" class="img-fluid custom-img w-100 d-block" alt="Bannière">
                     {/if}
