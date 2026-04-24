@@ -101,6 +101,9 @@ class LoanController extends AbstractController
             'items'        => $this->loanDataHelper->getAllItems(),
             'translations' => $this->translations(),
             'page' => $this->application->getConnectedUser()->getPage(),
+            'activeTab' => 'designer',
+            'btn_Parent' => "/admin",
+            'btn_HistoryBack' => true,
         ]));
     }
 
@@ -117,6 +120,9 @@ class LoanController extends AbstractController
             'loanItems'    => $this->loanDataHelper->getActiveItems('loan'),
             'persons'      => $this->loanDataHelper->getAllPersons(),
             'translations' => $this->translations(),
+            'activeTab' => 'manager',
+            'btn_Parent' => "/user",
+            'btn_HistoryBack' => true,
         ]));
     }
 
@@ -137,6 +143,9 @@ class LoanController extends AbstractController
             'currentUserId'     => $userId,
             'translations'      => $this->translations(),
             'page' => $this->application->getConnectedUser()->getPage(),
+            'activeTab' => 'user',
+            'btn_Parent' => "/user",
+            'btn_HistoryBack' => true,
         ]));
     }
 
@@ -149,6 +158,9 @@ class LoanController extends AbstractController
         $this->render('Loan/views/calendar.latte', $this->getAllParams([
             'translations' => $this->translations(),
             'page' => $this->application->getConnectedUser()->getPage(),
+            'activeTab' => 'calendar',
+            'btn_Parent' => "/user",
+            'btn_HistoryBack' => true,
         ]));
     }
 

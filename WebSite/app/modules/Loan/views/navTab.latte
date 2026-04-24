@@ -1,11 +1,4 @@
-{extends '../../Designer/views/designer.latte'}
-
-{block title}{='loan.nav.designer'|translate}{/block}
-
-{block content}
 <div class="container-fluid px-4 py-3">
-
-    {* Onglets de navigation *}
     <ul class="nav nav-tabs mb-4" id="loanTabs">
         {if $isLoanDesigner}
         <li class="nav-item">
@@ -40,15 +33,4 @@
             </a>
         </li>
     </ul>
-
-    {block loanContent}{/block}
 </div>
-{/block}
-
-{block scripts}
-<script>
-window.i18n = {=json_encode($translations)|noescape};
-window.t    = key => window.i18n?.[key] ?? key;
-</script>
-{block loanScripts}{/block}
-{/block}

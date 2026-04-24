@@ -1,16 +1,23 @@
-{extends 'loan.latte'}
-{var $activeTab = 'designer'}
+{layout '../../Common/views/layout.latte'}
 
-{block loanContent}
+{block navbar}
+    {include '../../Webmaster/views/navbar/_userLeft.latte'}
+{/block}
+
+{block content}
+
+{include 'navTab.latte'}
+
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h2 class="h4 mb-0">
         <i class="bi bi-box-seam me-2 text-primary"></i>
         {='loan.item.title'|translate}
     </h2>
     <button class="btn btn-primary btn-sm" id="btnAddItem">
-        <i class="bi bi-plus-lg me-1"></i>{='loan.item.add'|translate}
+        <i class="bi bi-plus-lg"></i>
     </button>
 </div>
+
 
 {* Alerte *}
 <div id="loanAlert" class="alert d-none" role="alert"></div>
@@ -52,11 +59,11 @@
                         {/if}
                     </td>
                     <td class="text-end">
-                        <button class="btn btn-sm btn-outline-secondary btn-edit-item me-1"
+                        <button class="btn btn-sm btn-warning"
                                 data-id="{$item['Id']}">
                             <i class="bi bi-pencil"></i>
                         </button>
-                        <button class="btn btn-sm btn-outline-danger btn-delete-item"
+                        <button class="btn btn-sm btn-danger"
                                 data-id="{$item['Id']}" data-name="{$item['Name']}">
                             <i class="bi bi-trash"></i>
                         </button>
@@ -121,11 +128,11 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                    {='loan.action.cancel'|translate}
+                    {='cancel'|translate}
                 </button>
                 <button type="button" class="btn btn-primary" id="btnSaveItem">
                     <span class="spinner-border spinner-border-sm d-none me-1" id="saveItemSpinner"></span>
-                    {='loan.action.save'|translate}
+                    {='save'|translate}
                 </button>
             </div>
         </div>
@@ -133,6 +140,12 @@
 </div>
 {/block}
 
-{block loanScripts}
-<script type="module" src="/app/modules/Loan/js/designer.js"></script>
+{block scripts}
+    <script>
+        window.i18n = {=json_encode($translations)|noescape};
+        window.t    = function(key) {
+            return window.i18n?.[key] ?? key;
+        };
+    </script>
+    <script type="module" src="/app/modules/Loan/js/designer.js"></script>
 {/block}

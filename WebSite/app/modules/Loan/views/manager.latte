@@ -1,7 +1,13 @@
-{extends 'loan.latte'}
-{var $activeTab = 'manager'}
+{layout '../../Common/views/layout.latte'}
 
-{block loanContent}
+{block navbar}
+    {include '../../Webmaster/views/navbar/_userLeft.latte'}
+{/block}
+
+{block content}
+
+{include 'navTab.latte'}
+
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h2 class="h4 mb-0">
         <i class="bi bi-arrow-left-right me-2 text-primary"></i>
@@ -16,7 +22,7 @@
             <option value="cancelled">{='loan.record.status.cancelled'|translate}</option>
         </select>
         <button class="btn btn-primary btn-sm" id="btnAddLoan">
-            <i class="bi bi-plus-lg me-1"></i>{='loan.record.add'|translate}
+            <i class="bi bi-plus-lg"></i>
         </button>
     </div>
 </div>
@@ -165,11 +171,11 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                    {='loan.action.cancel'|translate}
+                    {='cancel'|translate}
                 </button>
                 <button type="button" class="btn btn-primary" id="btnSaveLoan">
                     <span class="spinner-border spinner-border-sm d-none me-1" id="saveLoanSpinner"></span>
-                    {='loan.action.save'|translate}
+                    {='save'|translate}
                 </button>
             </div>
         </div>
@@ -208,7 +214,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                    {='loan.action.cancel'|translate}
+                    {='cancel'|translate}
                 </button>
                 <button type="button" class="btn btn-success" id="btnConfirmReturn">
                     <span class="spinner-border spinner-border-sm d-none me-1" id="returnSpinner"></span>
@@ -219,13 +225,16 @@
     </div>
 </div>
 
-{* Données sérialisées pour JS *}
-<script>
-window.loanPersons = {$persons};
-window.loanItems   = {$loanItems};
-</script>
-{/block}
+{block scripts}
+    <script>
+        window.loanPersons = {$persons};
+        window.loanItems   = {$loanItems};
 
-{block loanScripts}
-<script type="module" src="/app/modules/Loan/js/manager.js"></script>
+        window.i18n = {=json_encode($translations)|noescape};
+        window.t    = function(key) {
+            return window.i18n?.[key] ?? key;
+        };
+    </script>
+
+    <script type="module" src="/app/modules/Loan/js/manager.js"></script>
 {/block}

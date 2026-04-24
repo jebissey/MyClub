@@ -184,7 +184,7 @@ class LoanApi extends AbstractApi
 
     public function saveReservation(): void
     {
-        if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isLoanManager())) {
+        if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isConnected())) {
 
             $data = $this->getJsonInput();
 
@@ -246,7 +246,7 @@ class LoanApi extends AbstractApi
 
     public function getCalendarEvents(): void
     {
-        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isLoanDesigner())) {
+        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isConnected())) {
 
             $start = $_GET['start'] ?? date('Y-m-01');
             $end   = $_GET['end']   ?? date('Y-m-t');

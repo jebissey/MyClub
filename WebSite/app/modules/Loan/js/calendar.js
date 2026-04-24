@@ -1,7 +1,6 @@
-/**
- * calendar.js – Calendrier FullCalendar v6 (prêts + réservations)
- * FullCalendar est chargé via CDN (script global), pas en module ES6.
- */
+import ApiClient from '../../Common/js/ApiClient.js';
+
+const api = new ApiClient();
 
 document.addEventListener('DOMContentLoaded', () => {
     const calEl = document.getElementById('loanCalendar');
@@ -13,7 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
         locale: document.documentElement.lang || 'fr',
         initialView: 'dayGridMonth',
         height: 'auto',
-        firstDay: 1,          // Lundi
+        firstDay: 1,
         nowIndicator: true,
         headerToolbar: {
             left: 'prev,next today',
@@ -27,30 +26,26 @@ document.addEventListener('DOMContentLoaded', () => {
             list: "Liste",
         },
         events: async (info, successCb, failureCb) => {
-            try {
-                const start = info.startStr.slice(0, 10);
-                const end = info.endStr.slice(0, 10);
-                const res = await fetch(`/api/loan/calendar?start=${start}&end=${end}`);
-                const json = await res.json();
-                if (json.success) {
-                    successCb(json.data);
-                } else {
-                    failureCb(json.message);
-                }
-            } catch (e) {
-                failureCb(e.message);
+            const start = info.startStr.slice(0, 10);
+            const end   = info.endStr.slice(0, 10);
+
+            const json = await api.get(`/api/loan/calendar?start=${start}&end=${end}`);
+
+            if (json.success) {
+                successCb(json.data);
+            } else {
+                failureCb(json.error ?? json.message);
             }
         },
         eventClick: (info) => {
             const props = info.event.extendedProps;
-            const ev = info.event;
+            const ev    = info.event;
 
             detailTitle.textContent = ev.title;
 
             let html = '';
             if (props.type === 'loan') {
                 const start = ev.startStr;
-                // FullCalendar stocke end exclusif pour allDay → on recule d'un jour
                 const endDate = ev.end
                     ? new Date(ev.end.getTime() - 86400000).toISOString().slice(0, 10)
                     : start;
@@ -82,7 +77,7 @@ document.addEventListener('DOMContentLoaded', () => {
 function badgeClass(status) {
     return {
         returned: 'bg-success',
-        overdue: 'bg-danger',
+        overdue:  'bg-danger',
         cancelled: 'bg-secondary',
     }[status] ?? 'bg-primary';
 }

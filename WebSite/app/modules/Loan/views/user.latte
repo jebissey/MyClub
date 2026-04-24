@@ -1,14 +1,20 @@
-{extends 'loan.latte'}
-{var $activeTab = 'user'}
+{layout '../../Common/views/layout.latte'}
 
-{block loanContent}
+{block navbar}
+    {include '../../Webmaster/views/navbar/_userLeft.latte'}
+{/block}
+
+{block content}
+
+{include 'navTab.latte'}
+
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h2 class="h4 mb-0">
         <i class="bi bi-calendar-check me-2 text-warning"></i>
         {='loan.reservation.title'|translate}
     </h2>
-    <button class="btn btn-warning btn-sm text-white" id="btnAddReservation">
-        <i class="bi bi-plus-lg me-1"></i>{='loan.reservation.add'|translate}
+    <button class="btn btn-primary btn-sm" id="btnAddReservation">
+        <i class="bi bi-plus-lg"></i>
     </button>
 </div>
 
@@ -51,13 +57,13 @@
                     </td>
                     <td class="text-end text-nowrap">
                         {if $res['Status'] === 'active'}
-                        <button class="btn btn-sm btn-outline-secondary btn-edit-res me-1"
+                        <button class="btn btn-sm btn-warning btn-edit-res me-1"
                                 data-id="{$res['Id']}">
                             <i class="bi bi-pencil"></i>
                         </button>
-                        <button class="btn btn-sm btn-outline-danger btn-cancel-res"
+                        <button class="btn btn-sm btn-danger btn-cancel-res"
                                 data-id="{$res['Id']}">
-                            <i class="bi bi-x-lg"></i>
+                            <i class="bi bi-trash"></i>
                         </button>
                         {/if}
                     </td>
@@ -142,25 +148,28 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                    {='loan.action.cancel'|translate}
+                    {='cancel'|translate}
                 </button>
                 <button type="button" class="btn btn-warning text-white" id="btnSaveRes">
                     <span class="spinner-border spinner-border-sm d-none me-1" id="saveResSpinner"></span>
-                    {='loan.action.save'|translate}
+                    {='save'|translate}
                 </button>
             </div>
         </div>
     </div>
 </div>
 
+{block scripts}
 <script>
-window.isManager      = {=json_encode($isManager)|noescape};
-window.currentUserId  = {=json_encode($currentUserId)|noescape};
-window.resPersons     = {=json_encode($persons)|noescape};
-window.resItems       = {=json_encode($reservationItems)|noescape};
+    window.isManager      = {=json_encode($isLoanManager)|noescape};
+    window.currentUserId  = {$currentUserId};
+    window.resPersons     = {=json_encode($persons)|noescape};
+    window.resItems       = {=json_encode($reservationItems)|noescape};
+    
+    window.i18n = {=json_encode($translations)|noescape};
+    window.t    = function(key) {
+        return window.i18n?.[key] ?? key;
+    };
 </script>
-{/block}
-
-{block loanScripts}
 <script type="module" src="/app/modules/Loan/js/user.js"></script>
 {/block}
