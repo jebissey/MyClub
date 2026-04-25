@@ -76,6 +76,9 @@ class Client
 
     public function getUri(): string
     {
-        return $_SERVER['REQUEST_URI'] ?? '';
+        $uri = $_SERVER['REQUEST_URI'] ?? '';
+        $method = $_SERVER['REQUEST_METHOD'] ?? '';
+
+        return $uri . ' (' . $method . ')';
     }
 }
