@@ -97,15 +97,15 @@ class RssController extends AbstractController
         $rss .= '<atom:link href="' . htmlspecialchars($feed_url, ENT_XML1, 'UTF-8') . '" rel="self" type="application/rss+xml" />';
 
         foreach ($articles as $article) {
-            $guid        = $site_url . 'article/' . $article->Id;
+            $guid        = $site_url . 'article/' . $article->Id . '?v=' . strtotime($article->LastUpdate);
             $description = $this->getFirstElement($article->Content ?? '');
-            $pubDate     = date(DATE_RSS, strtotime($article->CreationDate));
+            $pubDate     = date(DATE_RSS, strtotime($article->LastUpdate));
             $atomUpdated = (new DateTime($article->LastUpdate))->format(DateTime::ATOM);
 
             $rss .= '<item>';
             $rss .= '<title>'       . htmlspecialchars($article->Title, ENT_XML1, 'UTF-8') . '</title>';
             $rss .= '<link>'        . htmlspecialchars($guid,           ENT_XML1, 'UTF-8') . '</link>';
-            $rss .= '<guid isPermaLink="true">' . htmlspecialchars($guid, ENT_XML1, 'UTF-8') . '</guid>';
+            $rss .= '<guid isPermaLink="false">' . htmlspecialchars($guid, ENT_XML1, 'UTF-8') . '</guid>';
             $rss .= '<pubDate>'     . $pubDate     . '</pubDate>';
             $rss .= '<atom:updated>' . $atomUpdated . '</atom:updated>';
             $rss .= '<description>' . $description . '</description>';

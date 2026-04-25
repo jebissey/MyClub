@@ -75,7 +75,7 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
                 Article.Title,
                 Article.Content,
                 Article.LastUpdate,
-                Article.Timestamp AS CreationDate,
+                Article.Timestamp AS CreationDate
             FROM Article
             WHERE Article.PublishedBy IS NOT NULL
             ORDER BY Article.LastUpdate DESC
