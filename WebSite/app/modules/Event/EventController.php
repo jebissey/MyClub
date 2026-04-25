@@ -45,6 +45,10 @@ class EventController extends AbstractController
         $input = WebApp::filterInput($schema, $this->flight->request()->query->getData());
         $offset = $input['offset'] ?? 0;
         $mode = $input['mode'] ?? EventSearchMode::Next->value;
+        if ($offset < 0) {
+            $offset = 0;
+            $mode = EventSearchMode::Next->value;
+        }
         $filterByPreferences = (($input['filterByPreferences'] ?? null) === '1');
         $connectedUser = $this->application->getConnectedUser();
 

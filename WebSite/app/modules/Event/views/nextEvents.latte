@@ -34,16 +34,16 @@
             {='eventsAvailableForAll'|translate}
         {/if}
         </h1>
-        {if $isEventManager}
         <div class="ms-auto d-flex gap-2 mt-2">
             <a href="?mode=past&offset={max(0, $offset+10)}" class="btn btn-outline-secondary">&lsaquo;</a>
             <a href="?mode=past&offset={$offset-10}" class="btn btn-outline-secondary">&rsaquo;</a>
-            <a href="?mode=next&offset=0" class="btn btn-outline-secondary">&raquo;</a>
+            <a href="?mode=next&offset=0" class="btn btn-secondary">&raquo;</a>
+        {if $isEventManager}
             <button type="button" class="btn btn-primary" id="createEventBtn">
                 <i class="bi bi-plus-lg"></i>
             </button>
-        </div>
         {/if}
+        </div>
     </div>
 
     {if $person != false && $mode == 'next'}
