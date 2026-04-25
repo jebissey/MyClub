@@ -70,10 +70,16 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
     public function getArticlesForRss(): array
     {
         $sql = "
-            SELECT Article.*
+            SELECT
+                Article.Id,
+                Article.Title,
+                Article.Content,
+                Article.LastUpdate,
+                Article.Timestamp AS CreationDate,
             FROM Article
             WHERE Article.PublishedBy IS NOT NULL
             ORDER BY Article.LastUpdate DESC
+            LIMIT 50
         ";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute();

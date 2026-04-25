@@ -289,6 +289,7 @@ class EventDataHelper extends Data implements NewsProviderInterface
     public function getNextWeekEvents(): array
     {
         [$startOfCurrentWeek, $endOfThirdWeek] = $this->getDatesOfThreeWeeks();
+        $sep = 'char(31)';
         $sql = "
             SELECT
                 e.Id,
@@ -300,11 +301,11 @@ class EventDataHelper extends Data implements NewsProviderInterface
                 e.IdEventType,
                 e.Audience,
                 et.Name AS EventTypeName,
-                g.Name AS GroupName,
-                GROUP_CONCAT(a.Id) AS AttributeIds,
-                GROUP_CONCAT(a.Name) AS AttributeNames,
-                GROUP_CONCAT(a.Detail) AS AttributeDetails,
-                GROUP_CONCAT(a.Color) AS AttributeColors
+                g.Name  AS GroupName,
+                GROUP_CONCAT(a.Id,     $sep) AS AttributeIds,
+                GROUP_CONCAT(a.Name,   $sep) AS AttributeNames,
+                GROUP_CONCAT(a.Detail, $sep) AS AttributeDetails,
+                GROUP_CONCAT(a.Color,  $sep) AS AttributeColors
             FROM Event e
             INNER JOIN EventType et ON e.IdEventType = et.Id
             LEFT JOIN EventAttribute ea ON e.Id = ea.IdEvent
@@ -316,6 +317,7 @@ class EventDataHelper extends Data implements NewsProviderInterface
             GROUP BY e.Id
             ORDER BY datetime(replace(e.StartTime, 'T', ' '))
         ";
+
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([
             ':start' => $startOfCurrentWeek->format('Y-m-d H:i:s'),
@@ -323,81 +325,35 @@ class EventDataHelper extends Data implements NewsProviderInterface
         ]);
         $events = $stmt->fetchAll(PDO::FETCH_OBJ);
 
+        $weeklyEvents = []; // ← déclaration explicite avant la boucle
+
         for ($weekOffset = 0; $weekOffset < 3; $weekOffset++) {
             $weekStart = clone $startOfCurrentWeek;
-            $weekStart->add(new DateInterval('P' . ($weekOffset * 7) . 'D'));
+            $weekStart->modify('+' . ($weekOffset * 7) . ' days'); // plus lisible que DateInterval
             $weekEnd = clone $weekStart;
-            $weekEnd->add(new DateInterval('P6D'));
+            $weekEnd->modify('+6 days');
             $weekKey = $weekStart->format('Y-W');
             $weeklyEvents[$weekKey] = [
-                'weekStart' => $weekStart->format('d/m'),
-                'weekEnd' => $weekEnd->format('d/m'),
+                'weekStart'     => $weekStart->format('d/m'),
+                'weekEnd'       => $weekEnd->format('d/m'),
                 'weekStartFull' => $weekStart->format('Y-m-d'),
-                'days' => array_fill(1, 7, [])
+                'days'          => array_fill(1, 7, []),
             ];
         }
 
         foreach ($events as $event) {
-            $eventDate = new DateTime($event->StartTime);
-            $weekNumber = (int)$eventDate->format('W');
-            $year = (int)$eventDate->format('o');
-            $dayOfWeek = (int)$eventDate->format('N');
-
-            $eventWeekStart = new DateTime();
-            $eventWeekStart->setISODate($year, $weekNumber);
-            $weekKey = $eventWeekStart->format('Y-W');
+            $startTime  = new DateTime($event->StartTime);
+            $dayOfWeek  = (int)$startTime->format('N');
+            $weekKey = $startTime->format('o-W');
             if (!isset($weeklyEvents[$weekKey])) {
                 continue;
             }
-            $attributes = [];
-            if (!empty($event->AttributeIds)) {
-                $ids = explode(',', $event->AttributeIds);
-                $names = explode(',', $event->AttributeNames);
-                $details = explode(',', $event->AttributeDetails);
-                $colors = explode(',', $event->AttributeColors);
-
-                for ($i = 0; $i < count($ids); $i++) {
-                    $attributes[] = [
-                        'id' => $ids[$i],
-                        'name' => $names[$i] ?? '',
-                        'detail' => $details[$i] ?? '',
-                        'color' => $colors[$i] ?? '#cccccc'
-                    ];
-                }
-            }
-
-            $startTime = new DateTime($event->StartTime);
-            $durationMinutes = $event->Duration / 60;
-            $durationFormatted = '';
-
-            if ($durationMinutes >= 60) {
-                $hours = floor($durationMinutes / 60);
-                $minutes = $durationMinutes % 60;
-                $durationFormatted = $hours . 'h';
-                if ($minutes > 0) {
-                    $durationFormatted .= sprintf('%02d', $minutes);
-                }
-            } else {
-                $durationFormatted = $durationMinutes . 'min';
-            }
-
-            $eventFormatted = [
-                'id' => $event->Id,
-                'summary' => $event->Summary,
-                'description' => $event->Description,
-                'location' => $event->Location,
-                'startTime' => $startTime->format('H:i'),
-                'duration' => $durationFormatted,
-                'eventType' => $event->EventTypeName,
-                'audience' => $event->Audience,
-                'attributes' => $attributes,
-                'fullDateTime' => $event->StartTime,
-                'groupName' => $event->GroupName,
-                'date' => $startTime->format('Y-m-d'),
-            ];
-
-            $weeklyEvents[$weekKey]['days'][$dayOfWeek][] = $eventFormatted;
+            $weeklyEvents[$weekKey]['days'][$dayOfWeek][] = $this->buildEventArray(
+                $event,
+                $startTime
+            );
         }
+
         ksort($weeklyEvents);
         return $weeklyEvents;
     }
@@ -765,5 +721,71 @@ class EventDataHelper extends Data implements NewsProviderInterface
                 ]);
             }
         }
+    }
+
+    private function buildEventArray(object $event, DateTime $startTime): array
+    {
+        return [
+            'id'          => $event->Id,
+            'summary'     => $event->Summary,
+            'description' => $event->Description,
+            'location'    => $event->Location,
+            'startTime'   => $startTime->format('H:i'),
+            'duration'    => $this->formatDuration((int)($event->Duration ?? 0)),
+            'eventType'   => $event->EventTypeName,
+            'audience'    => $event->Audience,
+            'attributes'  => $this->parseAttributes($event),
+            'fullDateTime' => $event->StartTime,
+            'groupName'   => $event->GroupName,
+            'date'        => $startTime->format('Y-m-d'),
+        ];
+    }
+
+    private function formatDuration(int $durationSeconds): string
+    {
+        if ($durationSeconds <= 0) {
+            return '';
+        }
+
+        $totalMinutes = intdiv($durationSeconds, 60); 
+
+        if ($totalMinutes >= 60) {
+            $hours   = intdiv($totalMinutes, 60);
+            $minutes = $totalMinutes % 60;
+            return $minutes > 0
+                ? $hours . 'h' . sprintf('%02d', $minutes)
+                : $hours . 'h';
+        }
+
+        return $totalMinutes . 'min';
+    }
+
+    private function parseAttributes(object $event): array
+    {
+        if (empty($event->AttributeIds)) {
+            return [];
+        }
+
+        $sep     = chr(31); // ASCII Unit Separator, cohérent avec char(31) en SQL
+        $ids     = explode($sep, $event->AttributeIds);
+        $names   = explode($sep, $event->AttributeNames   ?? '');
+        $details = explode($sep, $event->AttributeDetails ?? '');
+        $colors  = explode($sep, $event->AttributeColors  ?? '');
+        $count   = count($ids);
+
+        $attributes = [];
+        for ($i = 0; $i < $count; $i++) {
+            if (empty($ids[$i])) {
+                continue;
+            }
+            $attributes[] = [
+                'id'     => $ids[$i],
+                'name'   => $names[$i]   ?? '',
+                'detail' => $details[$i] ?? '',
+                'color'  => $colors[$i]  ?? '#cccccc',
+            ];
+        }
+
+        return $attributes;
     }
 }
