@@ -62,12 +62,47 @@ new Routes($application, $flight)->add($errorManager);
 
 $logWriterDataHelper = new LogDataWriterHelper($application);
 $flight->map('error', function (Throwable $ex) use ($logWriterDataHelper, $errorManager) {
-    $logWriterDataHelper->add((string)ApplicationError::Error->value, 'Internal error: ' . $ex->getMessage() . ' in file ' . $ex->getFile() . ' at line' . $ex->getLine());
-    $errorManager->raise(ApplicationError::Error, 'Error ' . $ex->getMessage() . ' in file ' . $ex->getFile() . ' at line ' . $ex->getLine());
+    $appFrames = array_filter(
+        $ex->getTrace(),
+        fn($frame) => isset($frame['file']) && !str_contains($frame['file'], '/vendor/')
+    );
+
+    $traceLines = array_map(function ($frame) {
+        $file = $frame['file'] ?? '[internal]';
+        $line = $frame['line'] ?? '?';
+        $call = ($frame['class'] ?? '') . ($frame['type'] ?? '') . ($frame['function'] ?? '');
+        return "  {$file}:{$line} → {$call}()";
+    }, array_values($appFrames));
+
+    $traceStr = implode("\n", $traceLines) ?: '  (aucune frame applicative trouvée)';
+
+    $message = sprintf(
+        "Internal error: %s\nin file %s at line %d\nMyClub stack:\n%s",
+        $ex->getMessage(),
+        $ex->getFile(),
+        $ex->getLine(),
+        $traceStr
+    );
+
+    $logWriterDataHelper->add((string)ApplicationError::Error->value, $message);
+    Flight::set('_error_already_logged', true);
+
+    $errorManager->raise(
+        ApplicationError::Error,
+        'Error ' . $ex->getMessage() . ' in file ' . $ex->getFile() . ' at line ' . $ex->getLine()
+    );
 });
+
 $flight->after('start', function () use ($logWriterDataHelper, $flight) {
+    if ($flight->getData('_error_already_logged')) return;
+
     $logMessage = LogMessage::getInstance(null);
-    $logWriterDataHelper->add($logMessage->getCode() ?? (string)$flight->getData('code') ?? '', $logMessage->getCode() !== null ? $logMessage->getMessage() : ($flight->getData('message') ?? ''));
+    $logWriterDataHelper->add(
+        $logMessage->getCode() ?? (string)$flight->getData('code') ?? '',
+        $logMessage->getCode() !== null
+            ? $logMessage->getMessage()
+            : ($flight->getData('message') ?? '')
+    );
 });
 
 $flight->start();
