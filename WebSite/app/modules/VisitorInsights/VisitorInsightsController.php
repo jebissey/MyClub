@@ -264,9 +264,11 @@ class VisitorInsightsController extends TableController
             $groupFilter
         );
 
+        $t = fn(string $key) => $this->languagesDataHelper->translate($key);
+
         $this->render('VisitorInsights/views/crossTab.latte', $this->getAllParams([
-            'title'        => 'Tableau croisé dynamique des visites',
-            'period'       => $period,
+            'title'        => $t('visitor_insights.cross_tab.title'),
+            'period'       => $period->value,
             'uris'         => $sortedCrossTabData,
             'persons'      => $this->logDataHelper->getPersons($filteredPersons),
             'columnTotals' => $columnTotals,
@@ -276,6 +278,10 @@ class VisitorInsightsController extends TableController
             'emailFilter'  => $emailFilter,
             'groupFilter'  => $groupFilter,
             'page'         => $this->application->getConnectedUser()->getPage(),
+            'translations' => [
+                'tableHide' => $t('visitor_insights.cross_tab.table.hide'),
+                'tableShow' => $t('visitor_insights.cross_tab.table.show'),
+            ],
         ]));
     }
 
