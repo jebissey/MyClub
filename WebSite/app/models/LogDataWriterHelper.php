@@ -18,18 +18,18 @@ class LogDataWriterHelper extends Data
         parent::__construct($application);
     }
 
-    public function add(string $code, string $message): void
+    public function add(string $code, string $message, ?float $duration = null): void
     {
         $client = new Client();
 
         try {
             $stmt = $this->pdoForLog->prepare("
-                INSERT INTO Log (
-                IpAddress, Referer, Os, Browser, ScreenResolution, Type, Uri, Token,
-                Who, Code, Message, CreatedAt
-                )
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%d %H:%M:%f', 'now'))
-            ");
+            INSERT INTO Log (
+            IpAddress, Referer, Os, Browser, ScreenResolution, Type, Uri, Token,
+            Who, Code, Message, Duration, CreatedAt
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%d %H:%M:%f', 'now'))
+        ");
 
             $stmt->execute([
                 $client->getIp(),
@@ -42,7 +42,8 @@ class LogDataWriterHelper extends Data
                 $client->getToken(),
                 filter_var($_SESSION['user'] ?? '', FILTER_VALIDATE_EMAIL) ?: '',
                 $code,
-                $message
+                $message,
+                $duration,
             ]);
         } catch (Throwable $e) {
             throw new RuntimeException("Failed to write log entry: " . $e->getMessage());

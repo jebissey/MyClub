@@ -27,6 +27,8 @@ use app\helpers\WebApp;
 use app\models\LogDataWriterHelper;
 use app\modules\Webmaster\MaintenanceController;
 
+$startTime = microtime(true);
+
 $logDir = __DIR__ . '/var/tracy/log';
 if (!is_dir($logDir)) mkdir($logDir, 0777, true);
 $local_access = ($_SERVER['REMOTE_ADDR'] === '127.0.0.1' || $_SERVER['REMOTE_ADDR'] === '::1');
@@ -61,7 +63,7 @@ $webapp = new WebApp();
 new Routes($application, $flight)->add($errorManager);
 
 $logWriterDataHelper = new LogDataWriterHelper($application);
-$flight->map('error', function (Throwable $ex) use ($logWriterDataHelper, $errorManager) {
+$flight->map('error', function (Throwable $ex) use ($logWriterDataHelper, $errorManager, $startTime) {
     $appFrames = array_filter(
         $ex->getTrace(),
         fn($frame) => isset($frame['file']) && !str_contains($frame['file'], '/vendor/')
@@ -84,7 +86,9 @@ $flight->map('error', function (Throwable $ex) use ($logWriterDataHelper, $error
         $traceStr
     );
 
-    $logWriterDataHelper->add((string)ApplicationError::Error->value, $message);
+    $duration = round((microtime(true) - $startTime) * 1000, 2);
+    $logWriterDataHelper->add((string)ApplicationError::Error->value, $message, $duration);
+
     Flight::set('_error_already_logged', true);
 
     $errorManager->raise(
@@ -93,15 +97,17 @@ $flight->map('error', function (Throwable $ex) use ($logWriterDataHelper, $error
     );
 });
 
-$flight->after('start', function () use ($logWriterDataHelper, $flight) {
+$flight->after('start', function () use ($logWriterDataHelper, $flight, $startTime) {
     if ($flight->getData('_error_already_logged')) return;
 
+    $duration = round((microtime(true) - $startTime) * 1000, 2);
     $logMessage = LogMessage::getInstance(null);
     $logWriterDataHelper->add(
         $logMessage->getCode() ?? (string)$flight->getData('code') ?? '',
         $logMessage->getCode() !== null
             ? $logMessage->getMessage()
-            : ($flight->getData('message') ?? '')
+            : ($flight->getData('message') ?? ''),
+        $duration
     );
 });
 

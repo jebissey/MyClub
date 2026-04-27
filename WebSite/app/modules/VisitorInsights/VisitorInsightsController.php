@@ -101,6 +101,7 @@ class VisitorInsightsController extends TableController
         ];
         $columns = [
             ['field' => 'CreatedAt', 'label' => 'Date'],
+            ['field' => 'Duration', 'label' => 'Durée (ms)'],
             ['field' => 'Type',      'label' => 'Type'],
             ['field' => 'Browser',   'label' => 'Navigateur'],
             ['field' => 'Os',        'label' => 'OS'],

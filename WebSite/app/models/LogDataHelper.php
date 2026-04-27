@@ -125,7 +125,7 @@ class LogDataHelper extends Data
     {
         return $this->fluentForLog->from('Log')
             ->select(null)
-            ->select('CreatedAt, Type, Browser, Os, Uri, Who, Code, Message')
+            ->select('CreatedAt, Type, Browser, Os, Uri, Who, Code, Message, Duration')
             ->orderBy('CreatedAt DESC');
     }
 

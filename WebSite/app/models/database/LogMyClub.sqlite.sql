@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS "Log" (
 	"Code"	TEXT,
 	"Message"	TEXT,
 	"Count"	INTEGER NOT NULL DEFAULT 1,
+	"Duration"	REAL,
 	PRIMARY KEY("Id")
 );
 CREATE VIEW leapfrog_statistics AS
