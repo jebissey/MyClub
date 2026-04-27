@@ -12,13 +12,13 @@
                             <a href="?periodType={$type}&offset={$currentOffset}" 
                             class="btn {$type === $currentPeriodType ? 'btn-primary' : 'btn-outline-secondary'}">
                                 {if $type === 'day'}
-                                    {='visitor_insights.statistics.by_day'|translate}
+                                    {='period.day'|translate}
                                 {elseif $type === 'week'}
-                                    {='visitor_insights.statistics.by_week'|translate}
+                                    {='period.week'|translate}
                                 {elseif $type === 'month'}
-                                    {='visitor_insights.statistics.by_month'|translate}
+                                    {='period.month'|translate}
                                 {else}
-                                    {='visitor_insights.statistics.by_year'|translate}
+                                    {='period.year'|translate}
                                 {/if}
                             </a>
                         {/foreach}

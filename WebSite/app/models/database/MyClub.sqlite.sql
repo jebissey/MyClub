@@ -5615,7 +5615,13 @@ INSERT INTO "Languages" VALUES (836,'article.edit.group_label','Group','Groupe',
 INSERT INTO "Languages" VALUES (837,'article.edit.created_by','Created by','Créé par','Utworzony przez');
 INSERT INTO "Languages" VALUES (838,'article.edit.modified_on','Modified on','modifié le','zmodyfikowany');
 INSERT INTO "Languages" VALUES (839,'article.edit.on','on','le','dnia');
-INSERT INTO "Metadata" VALUES (1,'MyClub',52,0,1000000,NULL,10,36,6,NULL,0,NULL);
+INSERT INTO "Languages" VALUES (840,'navbar.designer.loan','Loan','Prêt','Pożyczka');
+INSERT INTO "Languages" VALUES (841,'period.day','Day','Jour','Dzień');
+INSERT INTO "Languages" VALUES (842,'period.week','Week','Semaine','Tydzień');
+INSERT INTO "Languages" VALUES (843,'period.month','Month','Mois','Miesiąc');
+INSERT INTO "Languages" VALUES (844,'period.quarter','Quarter','Trimestre','Kwartał');
+INSERT INTO "Languages" VALUES (845,'period.year','Year','An','Rok');
+INSERT INTO "Metadata" VALUES (1,'MyClub',53,0,1000000,NULL,10,36,6,NULL,0,NULL);
 INSERT INTO "Person" VALUES (1,'webmaster@myclub.foo','e427c26faca947919b18b797bc143a35100e4de48c34b70b26202d3a7d8e51f7','my first name','my last name','my nick name or nothing',NULL,'0',NULL,NULL,NULL,NULL,NULL,0,0,NULL,NULL,'2025-01-01',0,0,0,NULL,NULL,NULL,NULL,NULL,NULL,'');
 INSERT INTO "PersonGroup" VALUES (1,1,1);
 INSERT INTO "Settings" VALUES (1,'Title','title');
@@ -5627,4 +5633,66 @@ INSERT INTO "Settings" VALUES (5,'Home_footer','<div style="text-align:center; f
 <b>WORK IN PROGRESS</b><br>
 🚧👷‍♀️🔧👷‍♂️🚧
 </div>');
+CREATE VIEW article_list_view AS
+            SELECT 
+                Article.Id,
+                Article.CreatedBy,
+                Article.Title,
+                Article.LastUpdate,
+                Article.PublishedBy,
+                Article.OnlyForMembers,
+                Article.IdGroup,
+                Article.Content,
+                (
+                    SELECT COUNT(*)
+                    FROM Message
+                    WHERE Message.ArticleId = Article.Id
+                ) AS Messages,
+                CASE 
+                    WHEN Article.PublishedBy IS NULL THEN 'non' 
+                    ELSE 'oui'
+                END AS Published,
+                CASE 
+                    WHEN Article.OnlyForMembers = 1 THEN 'oui' 
+                    ELSE 'non' 
+                END AS ForMembers,
+                CASE 
+                    WHEN Survey.IdArticle IS NULL THEN 'non' 
+                    ELSE 'oui' 
+                END AS Pool,
+                CASE 
+                    WHEN Survey.IdArticle IS NULL THEN ''
+                    ELSE 
+                        (
+                            CASE 
+                                WHEN Survey.ClosingDate < CURRENT_DATE THEN 'clos'
+                                ELSE strftime('%d/%m/%Y', Survey.ClosingDate)
+                            END
+                            || ' (' || COALESCE((SELECT COUNT(*) FROM Reply WHERE Reply.IdSurvey = Survey.Id), 0) || ') '
+                            || CASE Survey.Visibility
+                                WHEN 'all' THEN '👁️‍🗨️👥'
+                                WHEN 'allAfterClosing' THEN '👁️‍🗨️👥📅'
+                                WHEN 'voters' THEN '👁️‍🗨️🗳️'
+                                WHEN 'votersAfterClosing' THEN '👁️‍🗨️🗳️📅'
+                                WHEN 'redactor' THEN '👁️‍🗨️📝'
+                                ELSE ''
+                            END
+                        )
+                END AS PoolDetail,
+                CASE 
+                    WHEN Person.NickName != '' THEN Person.FirstName || ' ' || Person.LastName || ' (' || Person.NickName || ')' 
+                    ELSE Person.FirstName || ' ' || Person.LastName 
+                END AS PersonName,
+                'Group'.Name AS GroupName,
+                CASE 
+                    WHEN EXISTS (
+                        SELECT 1 FROM MenuItem
+                        WHERE MenuItem.Url = '/menu/show/article/' || Article.Id
+                    ) THEN 'oui'
+                    ELSE 'non'
+                END AS Menu
+            FROM Article
+            INNER JOIN Person ON Article.CreatedBy = Person.Id
+            LEFT JOIN Survey ON Article.Id = Survey.IdArticle
+            LEFT JOIN 'Group' ON 'Group'.Id = Article.IdGroup;
 COMMIT;

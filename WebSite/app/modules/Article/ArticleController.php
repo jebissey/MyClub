@@ -326,6 +326,7 @@ class ArticleController extends TableController
             'lastUpdate' => FilterInputRule::DateTime->value,
             'published'  => ['oui', 'non'],
             'pool'       => ['oui', 'non'],
+            'menu'       => ['oui', 'non'],
             'GroupName'  => FilterInputRule::HtmlSafeName->value,
             'Content'    => FilterInputRule::Content->value,
             'Id'         => FilterInputRule::Int->value,
@@ -342,6 +343,7 @@ class ArticleController extends TableController
         ];
         if ($connectedUser->isEditor() || false) {
             $filterConfig[] = ['name' => 'published', 'label' => 'Publié'];
+            $filterConfig[] = ['name' => 'menu', 'label' => 'Menu'];
         }
         $columns = [
             ['field' => 'PersonName', 'label' => 'Créé par'],
@@ -355,6 +357,7 @@ class ArticleController extends TableController
         ];
         if ($connectedUser->isEditor()) {
             $columns[] = ['field' => 'Published', 'label' => 'Publié'];
+            $columns[] = ['field' => 'Menu', 'label' => 'Menu'];
         }
         $query = $this->articleTableDataHelper->getQuery($connectedUser, (int)($this->articleDataHelper->getSpotlightArticle()['articleId'] ?? -1));
         $data = $this->prepareTableData($query, $filterValues);

@@ -8,16 +8,16 @@
         <div class="col-md-6">
             <div class="btn-group">
                 <a href="{$control->buildUrl(['period' => 'day'])}" class="btn btn-outline-primary {if $period === 'day'}active{/if}">
-                    {='visitor_insights.analytics.period.day'|translate}
+                    {='period.day'|translate}
                 </a>
                 <a href="{$control->buildUrl(['period' => 'week'])}" class="btn btn-outline-primary {if $period === 'week'}active{/if}">
-                    {='visitor_insights.analytics.period.week'|translate}
+                    {='period.week'|translate}
                 </a>
                 <a href="{$control->buildUrl(['period' => 'month'])}" class="btn btn-outline-primary {if $period === 'month'}active{/if}">
-                    {='visitor_insights.analytics.period.month'|translate}
+                    {='period.month'|translate}
                 </a>
                 <a href="{$control->buildUrl(['period' => 'year'])}" class="btn btn-outline-primary {if $period === 'year'}active{/if}">
-                    {='visitor_insights.analytics.period.year'|translate}
+                    {='period.year'|translate}
                 </a>
             </div>
         </div>
