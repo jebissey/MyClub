@@ -5582,12 +5582,6 @@ INSERT INTO "Languages" VALUES (803,'user.messages.group.articles','Articles','A
 INSERT INTO "Languages" VALUES (804,'user.messages.group.groups','Groups','Groupes','Grupy');
 INSERT INTO "Languages" VALUES (805,'user.messages.action.view','View','Voir','Zobacz');
 INSERT INTO "Languages" VALUES (806,'user.messages.empty.title','No messages','Aucun message','Brak wiadomości');
-INSERT INTO "Languages" VALUES (807,'user.messages.empty.since_signout','No messages since your last sign-out.','Aucun message depuis votre dernière déconnexion.','Brak wiadomości od ostatniego wylogowania.');
-INSERT INTO "Languages" VALUES (808,'user.messages.empty.since_signin','No messages since your last sign-in.','Aucun message depuis votre dernière connexion.','Brak wiadomości od ostatniego logowania.');
-INSERT INTO "Languages" VALUES (809,'user.messages.empty.since_week','No messages in the past week.','Aucun message depuis une semaine.','Brak wiadomości od tygodnia.');
-INSERT INTO "Languages" VALUES (810,'user.messages.empty.since_month','No messages in the past month.','Aucun message depuis un mois.','Brak wiadomości od miesiąca.');
-INSERT INTO "Languages" VALUES (811,'user.messages.empty.since_quarter','No messages in the past quarter.','Aucun message depuis un trimestre.','Brak wiadomości od kwartału.');
-INSERT INTO "Languages" VALUES (812,'user.messages.empty.since_year','No messages in the past year.','Aucun message depuis un an.','Brak wiadomości od roku.');
 INSERT INTO "Languages" VALUES (813,'user.news.group.articles','Articles','Articles','Artykuły');
 INSERT INTO "Languages" VALUES (814,'user.news.group.events','Events','Événements','Wydarzenia');
 INSERT INTO "Languages" VALUES (815,'user.news.group.messages','Messages','Messages','Wiadomości');

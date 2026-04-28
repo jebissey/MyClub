@@ -81,7 +81,7 @@ class ConnectedUser
 
     public function getPage(int $segment = 0): ?string
     {
-        $path = trim(parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH) ?? '', '/');
+        $path = trim((string) (parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH) ?: ''), '/');
         $segments = explode('/', $path);
 
         return $segments[$segment] ?? null;

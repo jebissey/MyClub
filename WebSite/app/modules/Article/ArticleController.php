@@ -513,6 +513,7 @@ class ArticleController extends TableController
             'navItems' => $this->getNavItems($this->application->getConnectedUser()->person),
             'page' => $this->application->getConnectedUser()->getPage(),
             'btn_HistoryBack' => true,
+            'btn_Parent'      => "/article/{$articleId}",
         ]));
     }
 

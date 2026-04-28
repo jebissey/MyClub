@@ -148,7 +148,7 @@ class GroupController extends AbstractController
         }
     }
 
-    public function showGroupChat($groupId): void
+    public function showGroupChat(int $groupId): void
     {
         if ($this->application->getConnectedUser()->person === null) {
             $this->raiseForbidden(__FILE__, __LINE__);
@@ -179,6 +179,7 @@ class GroupController extends AbstractController
             'navItems' => $this->getNavItems($this->application->getConnectedUser()->person),
             'page' => $this->application->getConnectedUser()->getPage(),
             'btn_HistoryBack' => true,
+            'btn_Parent'      => "/user/directory?group={$groupId}",
         ]));
     }
 }

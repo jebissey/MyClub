@@ -286,7 +286,7 @@ class EventController extends AbstractController
         ]));
     }
 
-    public function showEventChat($eventId): void
+    public function showEventChat(int $eventId): void
     {
         if ($this->application->getConnectedUser()->person === null) {
             $this->raiseForbidden(__FILE__, __LINE__);
@@ -312,6 +312,7 @@ class EventController extends AbstractController
             'navItems' => $this->getNavItems($this->application->getConnectedUser()->person),
             'page' => $this->application->getConnectedUser()->getPage(),
             'btn_HistoryBack' => true,
+            'btn_Parent'      => "/event/{$eventId}",
         ]));
     }
 }

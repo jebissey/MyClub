@@ -64,7 +64,7 @@ class LogDataCompactHelper extends Data
             $stmtCompact = $this->pdoForLog->prepare("
                 INSERT INTO Log (
                     IpAddress, Referer, Os, Browser, ScreenResolution, Type, Uri, 
-                    Token, Who, CreatedAt, Code, Message, Count
+                    Token, Who, CreatedAt, Code, Message, Count, Duration
                 )
                 SELECT 
                     '', '', '', '', '', '',
@@ -73,7 +73,8 @@ class LogDataCompactHelper extends Data
                     Who,
                     datetime(CreatedAt, 'start of month') AS CompactedDate,
                     '', '',
-                    SUM(Count) AS TotalCount
+                    SUM(Count) AS TotalCount,
+                    ROUND(AVG(Duration), 2) AS AvgDuration
                 FROM Log
                 WHERE CreatedAt < datetime('now', ?)
                 AND NOT ($emptyCondition)
