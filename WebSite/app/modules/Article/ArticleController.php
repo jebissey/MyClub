@@ -482,7 +482,7 @@ class ArticleController extends TableController
         }
     }
 
-    public function showArticleChat($articleId): void
+    public function showArticleChat(int $articleId): void
     {
         if ($this->application->getConnectedUser()->person === null) {
             $this->raiseForbidden(__FILE__, __LINE__);
@@ -564,10 +564,11 @@ class ArticleController extends TableController
         }
 
         $this->render('Article/views/topArticles.latte', $this->getAllParams([
-            'title'    => 'Top des articles visités par période',
+            'title'    => $this->languagesDataHelper->translate('visitor_insights.top_articles.title'),
             'period'   => $period->value,
             'topPages' => $topPages,
             'page'     => $this->application->getConnectedUser()->getPage(),
+            'translations' => TranslationManager::getCreationTimeModalTranslations($this->languagesDataHelper),
         ]));
     }
 

@@ -24,6 +24,7 @@ use app\apis\MenuItemApi;
 use app\apis\MessageApi;
 use app\apis\NotificationApi;
 use app\apis\TranslatorApi;
+use app\apis\VisitorInsightsApi;
 use app\apis\WebmasterApi;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
@@ -315,6 +316,17 @@ class ApiFactory
             $this->dataHelper,
             $this->personDataHelper,
             new LanguagesDataHelper($this->application)
+        );
+    }
+
+    public function makeVisitorInsightsApi(): VisitorInsightsApi
+    {
+        return new VisitorInsightsApi(
+            $this->application,
+            $this->connectedUser,
+            $this->dataHelper,
+            $this->personDataHelper,
+            $this->logDataHelper
         );
     }
 

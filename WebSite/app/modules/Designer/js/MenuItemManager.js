@@ -68,11 +68,14 @@ export default class MenuItemManager {
         const type = document.getElementById('itemType').value;
         const isSidebar = what === 'sidebar';
 
-        this.modalEl.querySelectorAll('.field-navbar').forEach(el =>
+        this.modalEl.querySelectorAll('.field-navbar:not(.field-sidebar)').forEach(el =>
             el.classList.toggle('d-none', isSidebar));
 
-        this.modalEl.querySelectorAll('.field-sidebar').forEach(el =>
+        this.modalEl.querySelectorAll('.field-sidebar:not(.field-navbar)').forEach(el =>
             el.classList.toggle('d-none', !isSidebar));
+
+        this.modalEl.querySelectorAll('.field-navbar.field-sidebar').forEach(el =>
+            el.classList.remove('d-none'));
 
         this.modalEl.querySelectorAll('.field-sidebar-link').forEach(el =>
             el.classList.toggle('d-none', isSidebar && type !== 'link'));

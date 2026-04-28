@@ -16,15 +16,15 @@ const LOGARITHMIC_Y_AXIS = {
 };
 
 /**
- * @param {Array<{tranche: string, count: number, isCurrentUser: boolean}>} data
- * @returns {Array<{x: string, y: number, isCurrentUser: boolean, radius: number}>}
+ * @param {Array<{tranche: string, count: number, isHighlighted: boolean}>} data
+ * @returns {Array<{x: string, y: number, isHighlighted: boolean, radius: number}>}
  */
 const toPoints = data =>
-    data.map(({ tranche, count, isCurrentUser }) => ({
+    data.map(({ tranche, count, isHighlighted }) => ({
         x: tranche,
         y: count,
-        isCurrentUser,
-        radius: isCurrentUser ? POINT.currentUser : POINT.default,
+        isHighlighted,
+        radius: isHighlighted ? POINT.currentUser : POINT.default,
     }));
 
 /**
@@ -33,7 +33,7 @@ const toPoints = data =>
  * @returns {string[]}
  */
 const pointColors = (points, defaultColor) =>
-    points.map(p => p.isCurrentUser ? COLORS.highlight : defaultColor);
+    points.map(p => p.isHighlighted ? COLORS.highlight : defaultColor);
 
 
 function createDistributionChart(canvasId, rawData, palette, labels) {

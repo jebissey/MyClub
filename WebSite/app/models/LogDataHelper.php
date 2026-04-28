@@ -20,7 +20,7 @@ class LogDataHelper extends Data
 
     const PERIOD_TO_SHOW = 13;
 
-    public function formatDataForChart($data): array
+    public function formatDataForChart(array $data): array
     {
         $labels         = [];
         $uniqueVisitors = [];
@@ -67,6 +67,7 @@ class LogDataHelper extends Data
         }
         return $visits;
     }
+
     private function getLastVisitPerActivePerson(array $activePersons): array
     {
         if (empty($activePersons)) {
@@ -148,21 +149,30 @@ class LogDataHelper extends Data
     {
         $sql = '
             SELECT
-                Uri,
+                CleanUri AS Uri,
                 COUNT(*) AS visits,
+                ROUND(AVG(CASE WHEN Duration IS NOT NULL THEN Duration END), 2) AS avg_duration,
                 CASE
-                    WHEN Uri LIKE "/article/%" THEN CAST(substr(Uri, 10) AS INTEGER)
-                    WHEN Uri LIKE "/menu/show/article/%" THEN CAST(substr(Uri, 22) AS INTEGER)
+                    WHEN CleanUri LIKE "/article/%" THEN CAST(substr(CleanUri, 10) AS INTEGER)
+                    WHEN CleanUri LIKE "/menu/show/article/%" THEN CAST(substr(CleanUri, 20) AS INTEGER)
                     ELSE NULL
                 END AS articleId
-            FROM Log
-            WHERE ' . $dateCondition . '
-                AND (
-                    (Uri LIKE "/article/%" AND Uri GLOB "/article/[0-9]*" AND Uri NOT LIKE "/article/%/%")
-                    OR
-                    (Uri LIKE "/menu/show/article/%" AND Uri GLOB "/menu/show/article/[0-9]*" AND Uri NOT LIKE "/menu/show/article/%/%")
-                )
-            GROUP BY Uri
+            FROM (
+                SELECT
+                    CASE
+                        WHEN INSTR(Uri, " (") > 0 THEN SUBSTR(Uri, 1, INSTR(Uri, " (") - 1)
+                        ELSE Uri
+                    END AS CleanUri,
+                    Duration
+                FROM Log
+                WHERE ' . $dateCondition . '
+            )
+            WHERE (
+                (CleanUri LIKE "/article/%" AND CleanUri GLOB "/article/[0-9]*" AND CleanUri NOT LIKE "/article/%/%")
+                OR
+                (CleanUri LIKE "/menu/show/article/%" AND CleanUri GLOB "/menu/show/article/[0-9]*" AND CleanUri NOT LIKE "/menu/show/article/%/%")
+            )
+            GROUP BY CleanUri
             ORDER BY visits DESC
             LIMIT :top
         ';
@@ -176,13 +186,25 @@ class LogDataHelper extends Data
         $dateCondition = $period->dateConditions('CreatedAt');
 
         $sql = "
-            SELECT Uri, COUNT(*) AS visits
-            FROM Log
-            WHERE $dateCondition
-            GROUP BY Uri
+            SELECT 
+                CleanUri AS Uri, 
+                COUNT(*) AS visits,
+                ROUND(AVG(CASE WHEN Duration IS NOT NULL THEN Duration END), 2) AS avg_duration
+            FROM (
+                SELECT
+                    CASE
+                        WHEN INSTR(Uri, ' (') > 0 THEN SUBSTR(Uri, 1, INSTR(Uri, ' (') - 1)
+                        ELSE Uri
+                    END AS CleanUri,
+                    Duration
+                FROM Log
+                WHERE $dateCondition
+            )
+            GROUP BY CleanUri
             ORDER BY visits DESC
             LIMIT :limit
         ";
+
         $stmt = $this->pdoForLog->prepare($sql);
         $stmt->bindValue(':limit', $top, PDO::PARAM_INT);
         $stmt->execute();
@@ -190,7 +212,7 @@ class LogDataHelper extends Data
         return $stmt->fetchAll(PDO::FETCH_OBJ);
     }
 
-    public function getVisits($season)
+    public function getVisits(array $season): array
     {
         $query = $this->pdoForLog->prepare("
             SELECT Who, SUM(Count) as VisitCount
@@ -200,13 +222,13 @@ class LogDataHelper extends Data
         ");
         $query->execute([
             ':start' => $season['start'],
-            ':end' => $season['end']
+            ':end'   => $season['end'],
         ]);
         return $query->fetchAll(PDO::FETCH_KEY_PAIR);
     }
 
     #region Installations
-    public function getInstallationsData()
+    public function getInstallationsData(): array
     {
         $query = "
             SELECT
@@ -282,16 +304,95 @@ class LogDataHelper extends Data
         return $results;
     }
 
-    private function getTimeAgo($datetime)
+    private function getTimeAgo(string $datetime): string
     {
         $time = time() - strtotime($datetime);
 
-        if ($time < 60) return 'Il y a ' . $time . ' secondes';
-        if ($time < 3600) return 'Il y a ' . round($time / 60) . ' minutes';
-        if ($time < 86400) return 'Il y a ' . round($time / 3600) . ' heures';
-        if ($time < 2592000) return 'Il y a ' . round($time / 86400) . ' jours';
+        if ($time < 60)       return 'Il y a ' . $time . ' secondes';
+        if ($time < 3600)     return 'Il y a ' . round($time / 60) . ' minutes';
+        if ($time < 86400)    return 'Il y a ' . round($time / 3600) . ' heures';
+        if ($time < 2592000)  return 'Il y a ' . round($time / 86400) . ' jours';
         if ($time < 31536000) return 'Il y a ' . round($time / 2592000) . ' mois';
 
         return 'Il y a ' . round($time / 31536000) . ' ans';
+    }
+
+    #region Creation time distribution
+    /**
+     * Retourne la répartition des temps de génération (Duration) pour une URI donnée,
+     * regroupés par tranches dynamiques selon la plage observée.
+     *
+     * Chaque élément du tableau retourné est compatible avec le format attendu
+     * par createDistributionChart() côté JS :
+     *   { tranche: string, count: int, isHighlighted: bool }
+     *
+     * `isHighlighted` est positionné à true sur la tranche qui contient
+     * la médiane, afin de la mettre en évidence dans le graphique.
+     *
+     * @return array<int, array{tranche: string, count: int, isHighlighted: bool}>
+     */
+
+    public function getCreationTimeDistribution(string $uri): array
+    {
+        $sql = "
+            SELECT CAST(Duration AS INTEGER) AS duration
+            FROM   Log
+            WHERE  Uri      LIKE :uri
+            AND  Duration IS NOT NULL
+            AND  Duration  > 0
+            ORDER  BY duration ASC
+        ";
+        $stmt = $this->pdoForLog->prepare($sql);
+        $stmt->execute([':uri' => $uri . ' (%']);
+        $durations = $stmt->fetchAll(PDO::FETCH_COLUMN);
+        if (empty($durations)) {
+            return [];
+        }
+
+        $min       = (int) $durations[0];
+        $max       = (int) $durations[count($durations) - 1];
+        $stepSize  = $this->computeStepSize($min, $max);
+
+        $buckets = [];
+        foreach ($durations as $d) {
+            $bucketIndex         = (int) floor($d / $stepSize);
+            $buckets[$bucketIndex] = ($buckets[$bucketIndex] ?? 0) + 1;
+        }
+        ksort($buckets);
+
+        $medianIndex  = (int) floor(count($durations) / 2);
+        $medianValue  = (int) $durations[$medianIndex];
+        $medianBucket = (int) floor($medianValue / $stepSize);
+
+        $result = [];
+        foreach ($buckets as $index => $count) {
+            $from    = $index * $stepSize;
+            $to      = $from + $stepSize - 1;
+            $tranche = $from . '–' . $to . ' ms';
+
+            $result[] = [
+                'tranche'       => $tranche,
+                'count'         => $count,
+                'isHighlighted' => ($index === $medianBucket),
+            ];
+        }
+
+        return $result;
+    }
+
+    private function computeStepSize(int $min, int $max): int
+    {
+        $range = max(1, $max - $min);
+        $rawStep = $range / 10;
+        $magnitude = pow(10, floor(log10($rawStep)));
+        $normalized = $rawStep / $magnitude;
+        $niceStep = match (true) {
+            $normalized < 1.5 => 1,
+            $normalized < 3.5 => 2,
+            $normalized < 7.5 => 5,
+            default           => 10,
+        };
+
+        return max(1, (int) ($niceStep * $magnitude));
     }
 }

@@ -5643,7 +5643,11 @@ INSERT INTO "Languages" VALUES (864,'visitor_insights.cross_tab.table.show','Sho
 INSERT INTO "Languages" VALUES (865,'visitor_insights.cross_tab.table.uri','URI','URI','URI');
 INSERT INTO "Languages" VALUES (866,'visitor_insights.cross_tab.table.total','Total','Total','Łącznie');
 INSERT INTO "Languages" VALUES (867,'visitor_insights.cross_tab.no_data','No data matches the selected filter criteria.','Aucune donnée ne correspond aux critères de filtrage sélectionnés.','Brak danych spełniających wybrane kryteria filtrowania.');
-INSERT INTO "Metadata" VALUES (1,'MyClub',54,0,1000000,NULL,10,36,6,NULL,0,NULL);
+INSERT INTO "Languages" VALUES (868,'visitor_insights.top_articles.card_title','Top visited articles','Top des articles visités','Najpopularniejsze artykuły');
+INSERT INTO "Languages" VALUES (870,'common.creation_time_modal.title','⏱️ Creation time distribution','⏱️ Répartition des temps de création','⏱️ Rozkład czasu tworzenia');
+INSERT INTO "Languages" VALUES (871,'loading','Loading…','Chargement…','Ładowanie…');
+INSERT INTO "Languages" VALUES (872,'common.creation_time_modal.info','Each point represents a generation time slot. The median point is highlighted to give an idea of the typical creation time.','Chaque point représente une tranche de temps de génération. Le point médian est mis en évidence pour donner une idée du temps de création typique.','Każdy punkt reprezentuje przedział czasu generowania. Punkt mediany jest wyróżniony, aby dać wyobrażenie o typowym czasie tworzenia.');
+INSERT INTO "Metadata" VALUES (1,'MyClub',55,0,1000000,NULL,10,36,6,NULL,0,NULL);
 INSERT INTO "Person" VALUES (1,'webmaster@myclub.foo','e427c26faca947919b18b797bc143a35100e4de48c34b70b26202d3a7d8e51f7','my first name','my last name','my nick name or nothing',NULL,'0',NULL,NULL,NULL,NULL,NULL,0,0,NULL,NULL,'2025-01-01',0,0,0,NULL,NULL,NULL,NULL,NULL,NULL,'');
 INSERT INTO "PersonGroup" VALUES (1,1,1);
 INSERT INTO "Settings" VALUES (1,'Title','title');

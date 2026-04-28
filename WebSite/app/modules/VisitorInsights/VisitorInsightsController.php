@@ -233,10 +233,11 @@ class VisitorInsightsController extends TableController
         $period = $this->getValidPeriod();
 
         $this->render('VisitorInsights/views/topPages.latte', $this->getAllParams([
-            'title'    => 'Top des pages visitées',
+            'title'    => $this->languagesDataHelper->translate('visitor_insights.top_pages.card_title'),
             'period'   => $period->value,
             'topPages' => $this->logDataHelper->getTopPages($period, self::TOP),
             'page'     => $this->application->getConnectedUser()->getPage(),
+            'translations' => TranslationManager::getCreationTimeModalTranslations($this->languagesDataHelper),
         ]));
     }
 

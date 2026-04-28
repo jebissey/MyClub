@@ -104,7 +104,7 @@ class UserStatisticsController extends AbstractController
             fn($i, $tranche) => [
                 'tranche'       => $tranche['label'],
                 'count'         => $dist['distribution'][$i],
-                'isCurrentUser' => ($i === $currentUserSlice),
+                'isHighlighted' => ($i === $currentUserSlice),
             ],
             array_keys($dist['tranches']),
             $dist['tranches']

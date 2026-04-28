@@ -20,11 +20,11 @@ class Database
     const SQLITE_FILE = 'MyClub.sqlite';
     const SQLITE_LOG_FILE = 'LogMyClub.sqlite';
     const APPLICATION = 'MyClub';
-    const DB_VERSION = 54;              //Don't forget to update here and in Metadata when database structure is modified
+    const DB_VERSION = 55;              //Don't forget to update here and in Metadata when database structure is modified
 
-    private static $instance = null;
-    private static $pdo = null;
-    private static $pdoForLog = null;
+    private static ?Database $instance = null;
+    private static ?PDO $pdo = null;
+    private static ?PDO $pdoForLog = null;
 
     private function __construct()
     {

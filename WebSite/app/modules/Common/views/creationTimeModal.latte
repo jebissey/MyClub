@@ -1,0 +1,36 @@
+<div class="modal fade" id="creationTimeModal" tabindex="-1"
+     aria-labelledby="creationTimeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="creationTimeModalLabel">
+                    {='common.creation_time_modal.title'|translate}
+                </h5>
+                <button type="button" class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="{='close'|translate}"></button>
+            </div>
+            <div class="modal-body">
+                <p class="text-muted small mb-3" id="creationTimeModalUri"></p>
+
+                <div id="creationTimeChartWrapper" style="width:100%; height:260px;">
+                    <canvas id="creationTimeChart"></canvas>
+                </div>
+
+                <div id="creationTimeSpinner" class="text-center py-4 d-none">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">{='loading'|translate}</span>
+                    </div>
+                </div>
+
+                <div id="creationTimeError" class="alert alert-danger d-none"></div>
+            </div>
+            <div class="modal-footer">
+                <div class="alert alert-info mb-0 py-2 px-3 small flex-grow-1">
+                    <i class="bi bi-info-circle"></i>
+                    {='common.creation_time_modal.info'|translate}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -10,8 +10,15 @@
         {include '../../Common/views/TopXTable.latte',
             topPages:  $topPages,
             period:    $period,
-            cardTitle: 'Top des articles visités',
-            columns:   ['uri', 'title', 'author', 'visits', 'percentage']
+            cardTitle: ('visitor_insights.top_articles.card_title'|translate),
+            columns:   ['uri', 'title', 'author', 'visits', 'percentage', 'avg_duration']
         }
     </div>
+    {include '../../Common/views/creationTimeModal.latte'}
+
+{/block}
+
+{block scripts}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+<script type="module" src="/app/modules/Common/js/creationTimeModal.js"></script>
 {/block}

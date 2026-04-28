@@ -9,6 +9,7 @@ use DateTimeInterface;
 use IntlDateFormatter;
 use IntlDatePatternGenerator;
 
+use app\models\LanguagesDataHelper;
 use app\models\MetadataDataHelper;
 
 class TranslationManager
@@ -34,7 +35,7 @@ class TranslationManager
         return self::$forcedLanguage;
     }
 
-    public static function setLanguage($language)
+    public static function setLanguage(string $language)
     {
         $language = in_array($language, self::SUPPORTED_LANGUAGES) ? $language : self::DEFAULT_LANGUAGE;
 
@@ -125,5 +126,17 @@ class TranslationManager
             $days[] = self::getDayName($date);
         }
         return $days;
+    }
+
+    public static function getCreationTimeModalTranslations(LanguagesDataHelper $languagesDataHelper): array
+    {
+        $t = fn(string $key) => $languagesDataHelper->translate($key);
+
+        return [
+            'yAxisLabel'   => $t('common.creation_time_modal.y_axis_label'),
+            'xAxisLabel'   => $t('common.creation_time_modal.x_axis_label'),
+            'errorGeneric' => $t('common.creation_time_modal.error_generic'),
+            'errorNoData'  => $t('common.creation_time_modal.error_no_data'),
+        ];
     }
 }

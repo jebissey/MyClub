@@ -37,6 +37,7 @@
                     <thead>
                         <tr>
                             <th>#</th>
+                            {if in_array('avg_duration', $columns)}<th>⏱️</th>{/if}
                             {if in_array('uri', $columns)}<th>{='common.table.column.uri'|translate}</th>{/if}
                             {if in_array('title', $columns)}<th>{='common.table.column.title'|translate}</th>{/if}
                             {if in_array('author', $columns)}<th>{='common.table.column.author'|translate}</th>{/if}
@@ -48,6 +49,23 @@
                         {foreach $topPages as $index => $pageData}
                         <tr>
                             <td>{$index + 1}</td>
+
+                            {if in_array('avg_duration', $columns)}
+                            <td>
+                                {if isset($pageData->avg_duration) && $pageData->avg_duration !== null}
+                                    <button
+                                        type="button"
+                                        class="btn btn-link btn-sm p-0 text-decoration-none creation-time-trigger"
+                                        data-uri="{$pageData->Uri}"
+                                        title="{='common.table.column.avg_duration.tooltip'|translate}"
+                                    >
+                                        ⏱️ {$pageData->avg_duration} ms
+                                    </button>
+                                {else}
+                                    <span class="text-muted">—</span>
+                                {/if}
+                            </td>
+                            {/if}
 
                             {if in_array('uri', $columns)}
                             <td>

@@ -74,6 +74,7 @@ use app\config\routes\UserPreferences;
 use app\config\routes\UserPresentation;
 use app\config\routes\UserStatistics;
 use app\config\routes\VisitorInsights;
+use app\config\routes\VisitorInsightsApi;
 use app\config\routes\WebappSettings;
 use app\config\routes\Webmaster;
 use app\config\routes\WebmasterApi;
@@ -325,6 +326,7 @@ class Routes
         $this->routes = array_merge($this->routes, (new UserPresentation($this->controllerFactory))->get());
         $this->routes = array_merge($this->routes, (new UserStatistics($this->controllerFactory))->get());
         $this->routes = array_merge($this->routes, (new VisitorInsights($this->controllerFactory))->get());
+        $this->routes = array_merge($this->routes, (new VisitorInsightsApi($this->apiFactory))->get());
         $this->routes = array_merge($this->routes, (new WebappSettings($this->controllerFactory))->get());
         $this->routes = array_merge($this->routes, (new Webmaster($this->controllerFactory))->get());
         $this->routes = array_merge($this->routes, (new WebmasterApi($this->apiFactory))->get());
