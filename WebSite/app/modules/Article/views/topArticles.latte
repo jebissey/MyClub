@@ -8,10 +8,12 @@
     <div class="container-fluid">
         <h1>{$title}</h1>
         {include '../../Common/views/TopXTable.latte',
-            topPages:  $topPages,
-            period:    $period,
-            cardTitle: ('visitor_insights.top_articles.card_title'|translate),
-            columns:   ['uri', 'title', 'author', 'visits', 'percentage', 'avg_duration']
+            topPages:   $topPages,
+            period:     $period,
+            periodFrom: $periodFrom,
+            periodTo:   $periodTo,
+            cardTitle:  ('visitor_insights.top_articles.card_title'|translate),
+            columns:    ['uri', 'title', 'author', 'visits', 'percentage', 'avg_duration']
         }
     </div>
     {include '../../Common/views/creationTimeModal.latte'}

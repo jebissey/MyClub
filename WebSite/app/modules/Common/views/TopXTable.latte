@@ -1,6 +1,8 @@
 {parameters
     array  $topPages,
     string $period,
+    string $periodFrom,
+    string $periodTo,
     string $cardTitle,
     array  $columns      = ['uri', 'visits', 'percentage']
 }
@@ -57,6 +59,8 @@
                                         type="button"
                                         class="btn btn-link btn-sm p-0 text-decoration-none creation-time-trigger"
                                         data-uri="{$pageData->Uri}"
+                                        data-from="{$periodFrom}"
+                                        data-to="{$periodTo}"
                                         title="{='common.table.column.avg_duration.tooltip'|translate}"
                                     >
                                         ⏱️ {$pageData->avg_duration} ms

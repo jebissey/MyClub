@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace app\models;
 
+use DateTimeImmutable;
 use Envms\FluentPDO\Queries\Select;
 use PDO;
 
@@ -374,6 +375,63 @@ class LogDataHelper extends Data
                 'tranche'       => $tranche,
                 'count'         => $count,
                 'isHighlighted' => ($index === $medianBucket),
+            ];
+        }
+
+        return $result;
+    }
+
+    const CREATION_TIME_TREND_STEP_SIZE = 12;
+    public function getCreationTimeTrend(string $uri, DateTimeImmutable $from, DateTimeImmutable $to): array
+    {
+        $sql = "
+            SELECT CAST(Duration AS INTEGER) AS duration,
+                CreatedAt
+            FROM   Log
+            WHERE  Uri      LIKE :uri
+            AND    Duration IS NOT NULL
+            AND    Duration > 0
+            AND    CreatedAt BETWEEN :from AND :to
+            ORDER  BY CreatedAt ASC
+        ";
+        $stmt = $this->pdoForLog->prepare($sql);
+        $stmt->execute([
+            ':uri'  => $uri . ' (%',
+            ':from' => $from->format('Y-m-d 00:00:00'),
+            ':to'   => $to->format('Y-m-d 23:59:59'),
+        ]);
+        $rows = $stmt->fetchAll(\PDO::FETCH_OBJ);
+
+        if (empty($rows)) {
+            return [];
+        }
+
+        $fromTs     = $from->getTimestamp();
+        $toTs       = $to->getTimestamp();
+        $bucketSize = ($toTs - $fromTs) / self::CREATION_TIME_TREND_STEP_SIZE;
+
+        $buckets = array_fill(0, self::CREATION_TIME_TREND_STEP_SIZE, ['total' => 0, 'count' => 0]);
+
+        foreach ($rows as $row) {
+            $ts    = strtotime($row->CreatedAt);
+            $index = min(self::CREATION_TIME_TREND_STEP_SIZE - 1, (int) floor(($ts - $fromTs) / $bucketSize));
+            $buckets[$index]['total'] += (int) $row->duration;
+            $buckets[$index]['count']++;
+        }
+
+        $result = [];
+        for ($i = 0; $i < self::CREATION_TIME_TREND_STEP_SIZE; $i++) {
+            $sliceFrom = (new DateTimeImmutable())->setTimestamp((int) ($fromTs + $i * $bucketSize));
+            $sliceTo   = (new DateTimeImmutable())->setTimestamp((int) ($fromTs + ($i + 1) * $bucketSize - 1));
+            $sameDay = $sliceFrom->format('Ymd') === $sliceTo->format('Ymd');
+            $label = $sameDay
+                ? $sliceFrom->format('d/m H\h') . '–' . $sliceTo->format('H\h')
+                : $sliceFrom->format('d/m') . '–' . $sliceTo->format('d/m');
+            $count = $buckets[$i]['count'];
+            $result[] = [
+                'label'       => $label,
+                'avgDuration' => $count > 0 ? (int) round($buckets[$i]['total'] / $count) : null,
+                'count'       => $count,
             ];
         }
 

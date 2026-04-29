@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\apis;
 
 use flight;
+use JsonException;
 use Latte\Engine as LatteEngine;
 
 use app\enums\ApplicationError;
@@ -34,17 +35,27 @@ abstract class AbstractApi
 
     protected function renderJson(array $data, bool $success, int $statusCode, string $message = ''): void
     {
-        header('Content-Type: application/json');
-        http_response_code($statusCode);
         $response = [
             'success' => $success,
             'message' => $message,
             'data'    => $data,
         ];
-        echo json_encode($response);
-        if (ob_get_level()) ob_end_flush();
-        flush();
-        Flight::stop();
+
+        try {
+            $json = json_encode($response, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE);
+        } catch (JsonException $e) {
+            $json = json_encode([
+                'success' => false,
+                'message' => 'JSON encoding error: ' . $e->getMessage(),
+                'data'    => [],
+            ], JSON_THROW_ON_ERROR);
+        }
+
+        Flight::response()
+            ->status($statusCode)
+            ->header('Content-Type', 'application/json; charset=utf-8')
+            ->write($json)
+            ->send();
     }
 
     protected function renderJsonBadRequest(string $message, string $file, int $line): void

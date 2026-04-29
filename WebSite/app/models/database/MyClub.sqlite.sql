@@ -4780,7 +4780,6 @@ INSERT INTO "Languages" VALUES (495,'user_connections.table.people','People','Pe
 INSERT INTO "Languages" VALUES (496,'user_connections.table.common_events','Common events','Événements communs','Wspólne wydarzenia');
 INSERT INTO "Languages" VALUES (497,'user_connections.table.intensity','Intensity','Intensité','Intensywność');
 INSERT INTO "Languages" VALUES (498,'user_connections.modal.common_events','Common events','Événements communs','Wspólne wydarzenia');
-INSERT INTO "Languages" VALUES (499,'user_connections.modal.close','Close','Fermer','Zamknij');
 INSERT INTO "Languages" VALUES (500,'events.calendar.page_title','Upcoming Events','Évènements des prochaines semaines','Nadchodzące wydarzenia');
 INSERT INTO "Languages" VALUES (501,'events.calendar.heading','Events Calendar','Calendrier des événements','Kalendarz wydarzeń');
 INSERT INTO "Languages" VALUES (502,'events.calendar.week','Week','Semaine','Tydzień');
@@ -4917,7 +4916,6 @@ INSERT INTO "Languages" VALUES (634,'media.manager.share.no_group','-- No group 
 INSERT INTO "Languages" VALUES (635,'media.manager.share.members_only','For club members only','Pour les membres du club uniquement','Tylko dla członków klubu');
 INSERT INTO "Languages" VALUES (636,'media.manager.share.link_label','Share link:','Lien de partage :','Link udostępniania:');
 INSERT INTO "Languages" VALUES (637,'media.manager.share.copy','Copy','Copier','Kopiuj');
-INSERT INTO "Languages" VALUES (638,'media.manager.share.close','Close','Fermer','Zamknij');
 INSERT INTO "Languages" VALUES (639,'media.manager.share.create','Create share','Créer le partage','Utwórz udostępnienie');
 INSERT INTO "Languages" VALUES (640,'media.manager.share.delete','Delete share','Supprimer le partage','Usuń udostępnienie');
 INSERT INTO "Languages" VALUES (641,'media.manager.share.url_copied','URL copied!','URL copié !','URL skopiowany!');
@@ -5641,7 +5639,16 @@ INSERT INTO "Languages" VALUES (868,'visitor_insights.top_articles.card_title','
 INSERT INTO "Languages" VALUES (870,'common.creation_time_modal.title','⏱️ Creation time distribution','⏱️ Répartition des temps de création','⏱️ Rozkład czasu tworzenia');
 INSERT INTO "Languages" VALUES (871,'loading','Loading…','Chargement…','Ładowanie…');
 INSERT INTO "Languages" VALUES (872,'common.creation_time_modal.info','Each point represents a generation time slot. The median point is highlighted to give an idea of the typical creation time.','Chaque point représente une tranche de temps de génération. Le point médian est mis en évidence pour donner une idée du temps de création typique.','Każdy punkt reprezentuje przedział czasu generowania. Punkt mediany jest wyróżniony, aby dać wyobrażenie o typowym czasie tworzenia.');
-INSERT INTO "Metadata" VALUES (1,'MyClub',55,0,1000000,NULL,10,36,6,NULL,0,NULL);
+INSERT INTO "Languages" VALUES (873,'article.edit.error.content_required','Content is required.','Le contenu est obligatoire.','Treść jest wymagana.');
+INSERT INTO "Languages" VALUES (874,'article.edit.error.editor_not_ready','The editor is not ready yet.','L''éditeur n''est pas encore prêt.','Edytor nie jest jeszcze gotowy.');
+INSERT INTO "Languages" VALUES (875,'article.edit.error.title_required','Title is required.','Le titre est obligatoire.','Tytuł jest wymagany.');
+INSERT INTO "Languages" VALUES (876,'article.error.owner_required','An owner is required.','Un propriétaire est obligatoire.','Właściciel jest wymagany.');
+INSERT INTO "Languages" VALUES (877,'close','Close','Fermer','Zamknij');
+INSERT INTO "Languages" VALUES (878,'common.creation_time_modal.tab_distribution','Distribution','Distribution','Rozkład');
+INSERT INTO "Languages" VALUES (879,'common.creation_time_modal.tab_trend','Trend','Tendance','Tendencja');
+INSERT INTO "Languages" VALUES (880,'common.table.column.avg_duration.tooltip','Average page creation time','Temps de création moyen de la page','Średni czas tworzenia strony');
+INSERT INTO "Languages" VALUES (881,'visitor_insights.top_articles.title','Top Articles','Articles les plus consultés','Najpopularniejsze artykuły');
+INSERT INTO "Metadata" VALUES (1,'MyClub',56,0,1000000,NULL,10,36,6,NULL,0,NULL);
 INSERT INTO "Person" VALUES (1,'webmaster@myclub.foo','e427c26faca947919b18b797bc143a35100e4de48c34b70b26202d3a7d8e51f7','my first name','my last name','my nick name or nothing',NULL,'0',NULL,NULL,NULL,NULL,NULL,0,0,NULL,NULL,'2025-01-01',0,0,0,NULL,NULL,NULL,NULL,NULL,NULL,'');
 INSERT INTO "PersonGroup" VALUES (1,1,1);
 INSERT INTO "Settings" VALUES (1,'Title','title');

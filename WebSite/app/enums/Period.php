@@ -68,6 +68,26 @@ enum Period: string
             : self::Week;
     }
 
+    public function getStart(): DateTimeImmutable
+    {
+        return new DateTimeImmutable(match ($this) {
+            self::Today           => 'today 00:00:00',
+            self::Yesterday       => 'yesterday 00:00:00',
+            self::BeforeYesterday => date('Y-m-d 00:00:00', strtotime('-2 days')),
+            self::Week            => date('Y-m-d 00:00:00', strtotime('-7 days')),
+            self::Month           => date('Y-m-d 00:00:00', strtotime('-30 days')),
+            self::Quarter         => date('Y-m-d 00:00:00', strtotime('-3 months')),
+            self::Year            => date('Y-m-d 00:00:00', strtotime('-1 year')),
+            default               => '1970-01-01 00:00:00',
+        });
+    }
+
+    public function getEnd(): DateTimeImmutable
+    {
+        return new DateTimeImmutable('today 23:59:59');
+    }
+
+
     /** @return array<string, string> */
     public static function gets(LanguagesDataHelper $lang): array
     {

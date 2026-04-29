@@ -565,10 +565,12 @@ class ArticleController extends TableController
         }
 
         $this->render('Article/views/topArticles.latte', $this->getAllParams([
-            'title'    => $this->languagesDataHelper->translate('visitor_insights.top_articles.title'),
-            'period'   => $period->value,
-            'topPages' => $topPages,
-            'page'     => $this->application->getConnectedUser()->getPage(),
+            'title'       => $this->languagesDataHelper->translate('visitor_insights.top_articles.title'),
+            'period'      => $period->value,
+            'periodFrom'  => $period->getStart()->format('Y-m-d H:i:s'),
+            'periodTo'    => $period->getEnd()->format('Y-m-d H:i:s'),
+            'topPages'    => $topPages,
+            'page'        => $this->application->getConnectedUser()->getPage(),
             'translations' => TranslationManager::getCreationTimeModalTranslations($this->languagesDataHelper),
         ]));
     }

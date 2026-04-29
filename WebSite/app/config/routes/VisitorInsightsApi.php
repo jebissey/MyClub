@@ -19,6 +19,7 @@ class VisitorInsightsApi implements RouteInterface
         $api = fn() => $this->apiFactory->makeVisitorInsightsApi();
 
         $this->routes[] = new Route('GET /api/visitor-insights/creation-time-distribution', $api, 'getCreationTimeDistribution');
+        $this->routes[] = new Route('GET /api/visitor-insights/creation-time-trend',        $api, 'getCreationTimeTrend');
 
         return $this->routes;
     }

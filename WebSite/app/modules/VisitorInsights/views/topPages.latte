@@ -6,6 +6,8 @@
         {include '../../Common/views/TopXTable.latte',
             topPages:  $topPages,
             period:    $period,
+            periodFrom: $periodFrom,
+            periodTo:   $periodTo,
             cardTitle: ('visitor_insights.top_pages.card_title'|translate),
             columns:   ['uri', 'visits', 'percentage', 'avg_duration'],
         }

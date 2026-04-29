@@ -235,6 +235,8 @@ class VisitorInsightsController extends TableController
         $this->render('VisitorInsights/views/topPages.latte', $this->getAllParams([
             'title'    => $this->languagesDataHelper->translate('visitor_insights.top_pages.card_title'),
             'period'   => $period->value,
+            'periodFrom'  => $period->getStart()->format('Y-m-d H:i:s'),
+            'periodTo'    => $period->getEnd()->format('Y-m-d H:i:s'),            
             'topPages' => $this->logDataHelper->getTopPages($period, self::TOP),
             'page'     => $this->application->getConnectedUser()->getPage(),
             'translations' => TranslationManager::getCreationTimeModalTranslations($this->languagesDataHelper),
