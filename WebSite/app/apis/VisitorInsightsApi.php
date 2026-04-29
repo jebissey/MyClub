@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace app\apis;
 
+use DateTimeImmutable;
+
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
 use app\models\DataHelper;
@@ -29,15 +31,24 @@ class VisitorInsightsApi extends AbstractApi
             return;
         }
 
-        $uri = trim($_GET['uri'] ?? '');
-        if ($uri === '') {
-            $this->renderJsonBadRequest('Missing required parameter: uri', __FILE__, __LINE__);
+        $uri  = trim($_GET['uri']  ?? '');
+        $from = trim($_GET['from'] ?? '');
+        $to   = trim($_GET['to']   ?? '');
+
+        if ($uri === '' || $from === '' || $to === '') {
+            $this->renderJsonBadRequest('Missing required parameters: uri, from, to', __FILE__, __LINE__);
             return;
         }
 
-        // Returns Array<{tranche: string, count: int, isHighlighted: bool}>
-        $distribution = $this->logDataHelper->getCreationTimeDistribution($uri);
+        try {
+            $dateFrom = new DateTimeImmutable($from);
+            $dateTo   = new DateTimeImmutable($to);
+        } catch (\Exception) {
+            $this->renderJsonBadRequest('Invalid date format for from/to', __FILE__, __LINE__);
+            return;
+        }
 
+        $distribution = $this->logDataHelper->getCreationTimeDistribution($uri, $dateFrom, $dateTo);
         $this->renderJsonOk($distribution);
     }
 
@@ -58,8 +69,8 @@ class VisitorInsightsApi extends AbstractApi
         }
 
         try {
-            $dateFrom = new \DateTimeImmutable($from);
-            $dateTo   = new \DateTimeImmutable($to);
+            $dateFrom = new DateTimeImmutable($from);
+            $dateTo   = new DateTimeImmutable($to);
         } catch (\Exception) {
             $this->renderJsonBadRequest('Invalid date format for from/to', __FILE__, __LINE__);
             return;

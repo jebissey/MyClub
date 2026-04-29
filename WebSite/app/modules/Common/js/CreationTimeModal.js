@@ -1,18 +1,18 @@
-import ApiClient         from './ApiClient.js';
+import ApiClient from './ApiClient.js';
 import DistributionChart from './DistributionChart.js';
-import TrendChart        from './TrendChart.js';
+import TrendChart from './TrendChart.js';
 
-const ERR_GENERIC   = 'Une erreur est survenue.';
-const ERR_NO_DATA   = 'Aucune donnée disponible pour cette page.';
+const ERR_GENERIC = 'Une erreur est survenue.';
+const ERR_NO_DATA = 'Aucune donnée disponible pour cette page.';
 
 export default class CreationTimeModal {
-    #api              = new ApiClient();
-    #distribution     = new DistributionChart();
-    #trend            = new TrendChart();
+    #api = new ApiClient();
+    #distribution = new DistributionChart();
+    #trend = new TrendChart();
 
-    #modal    = document.getElementById('creationTimeModal');
+    #modal = document.getElementById('creationTimeModal');
     #uriLabel = document.getElementById('creationTimeModalUri');
-    #footer   = document.getElementById('creationTimeModalFooter');
+    #footer = document.getElementById('creationTimeModalFooter');
 
     bind() {
         document.addEventListener('click', e => {
@@ -42,7 +42,7 @@ export default class CreationTimeModal {
 
         bootstrap.Modal.getOrCreateInstance(this.#modal).show();
 
-        this.#loadDistribution(uri);
+        this.#loadDistribution(uri, from, to);
         this.#loadTrend(uri, from, to);
     }
 
@@ -51,11 +51,11 @@ export default class CreationTimeModal {
         this.#trend.destroy();
     }
 
-    async #loadDistribution(uri) {
+    async #loadDistribution(uri, from, to) {
         this.#distribution.destroy();
         this.#distribution.setLoading(true);
 
-        const params   = new URLSearchParams({ uri });
+        const params = new URLSearchParams({ uri, from, to });
         const response = await this.#api.get(`/api/visitor-insights/creation-time-distribution?${params}`);
 
         if (response?.success === false) {
@@ -76,7 +76,7 @@ export default class CreationTimeModal {
         this.#trend.destroy();
         this.#trend.setLoading(true);
 
-        const params   = new URLSearchParams({ uri, from, to });
+        const params = new URLSearchParams({ uri, from, to });
         const response = await this.#api.get(`/api/visitor-insights/creation-time-trend?${params}`);
 
         if (response?.success === false) {

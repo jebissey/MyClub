@@ -333,18 +333,23 @@ class LogDataHelper extends Data
      * @return array<int, array{tranche: string, count: int, isHighlighted: bool}>
      */
 
-    public function getCreationTimeDistribution(string $uri): array
+    public function getCreationTimeDistribution(string $uri, DateTimeImmutable $from, DateTimeImmutable $to): array
     {
         $sql = "
             SELECT CAST(Duration AS INTEGER) AS duration
             FROM   Log
-            WHERE  Uri      LIKE :uri
-            AND  Duration IS NOT NULL
-            AND  Duration  > 0
+            WHERE  Uri      LIKE :uri_pattern
+            AND    Duration IS NOT NULL
+            AND    Duration > 0
+            AND    CreatedAt BETWEEN :from AND :to
             ORDER  BY duration ASC
         ";
         $stmt = $this->pdoForLog->prepare($sql);
-        $stmt->execute([':uri' => $uri . ' (%']);
+        $stmt->execute([
+            ':uri_pattern' => $uri . ' (%',
+            ':from'        => $from->format('Y-m-d 00:00:00'),
+            ':to'          => $to->format('Y-m-d 23:59:59'),
+        ]);
         $durations = $stmt->fetchAll(PDO::FETCH_COLUMN);
         if (empty($durations)) {
             return [];
