@@ -72,7 +72,7 @@ function initAlertHelper() {
 
 // ─── Sidebar toggle ───────────────────────────────────────────────────────────
 function initSidebar() {
-    const sidebar   = document.getElementById('sidebar-wrapper');
+    const sidebar = document.getElementById('sidebar-wrapper');
     const toggleBtn = document.getElementById('sidebarToggle');
     const STORAGE_KEY = 'myclub_sidebar_open';
 
@@ -119,10 +119,53 @@ function registerServiceWorker() {
     if (!('serviceWorker' in navigator)) return;
     window.addEventListener('load', () => {
         navigator.serviceWorker.register('/service-worker.js')
-            .then(reg  => console.log('[SW] enregistré', reg))
+            .then(reg => console.log('[SW] enregistré', reg))
             .catch(err => console.error('[SW] échec enregistrement', err));
     });
 }
+
+function showIosInstallBanner() {
+    const isIos = /iphone|ipad|ipod/i.test(navigator.userAgent);
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches
+        || navigator.standalone === true;
+    const dismissed = sessionStorage.getItem('iosBannerDismissed');
+
+    if (!isIos || isStandalone || dismissed) return;
+
+    const banner = document.createElement('div');
+    banner.id = 'ios-install-banner';
+    banner.innerHTML = `
+        <div style="
+            position: fixed; bottom: 0; left: 0; right: 0; z-index: 9999;
+            background: #fff; border-top: 1px solid #ddd;
+            padding: 12px 16px; display: flex;
+            align-items: center; gap: 12px;
+            font-family: sans-serif; font-size: 14px;
+            box-shadow: 0 -2px 8px rgba(0,0,0,.15);
+        ">
+            <img src="/apple-touch-icon.png" width="40" height="40"
+                 style="border-radius:8px; flex-shrink:0">
+            <span style="flex:1">
+                Installez <strong>MyClub</strong> sur votre iPhone :
+                appuyez sur <strong>⎋ Partager</strong>
+                puis <strong>« Sur l'écran d'accueil »</strong>
+            </span>
+            <button id="ios-banner-close" style="
+                background:none; border:none; font-size:20px;
+                cursor:pointer; padding:4px; color:#666;
+            ">✕</button>
+        </div>
+    `;
+
+    document.body.appendChild(banner);
+
+    document.getElementById('ios-banner-close').addEventListener('click', () => {
+        banner.remove();
+        sessionStorage.setItem('iosBannerDismissed', '1');
+    });
+}
+
+document.addEventListener('DOMContentLoaded', showIosInstallBanner);
 
 // ─── Entry point ──────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {

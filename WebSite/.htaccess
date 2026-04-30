@@ -3,6 +3,10 @@
     Require all denied
 </FilesMatch>
 
+<FilesMatch "^manifest\.json$">
+    Require all granted
+</FilesMatch>
+
 <IfModule mod_rewrite.c>
     RewriteEngine On
 
