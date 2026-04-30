@@ -5648,7 +5648,16 @@ INSERT INTO "Languages" VALUES (878,'common.creation_time_modal.tab_distribution
 INSERT INTO "Languages" VALUES (879,'common.creation_time_modal.tab_trend','Trend','Tendance','Tendencja');
 INSERT INTO "Languages" VALUES (880,'common.table.column.avg_duration.tooltip','Average page creation time','Temps de création moyen de la page','Średni czas tworzenia strony');
 INSERT INTO "Languages" VALUES (881,'visitor_insights.top_articles.title','Top Articles','Articles les plus consultés','Najpopularniejsze artykuły');
-INSERT INTO "Metadata" VALUES (1,'MyClub',56,0,1000000,NULL,10,36,6,NULL,0,NULL);
+INSERT INTO "Languages" VALUES (882,'layout.alert.test_site.title','ATTENTION: Test Site','ATTENTION : Site de test','UWAGA: Witryna testowa');
+INSERT INTO "Languages" VALUES (883,'layout.alert.test_site.message','You are on a test environment.','Vous êtes sur un environnement de test.','Jesteś w środowisku testowym.');
+INSERT INTO "Languages" VALUES (884,'layout.alert.test_site.link','Access the production site','Accéder au site de production','Przejdź do witryny produkcyjnej');
+INSERT INTO "Languages" VALUES (885,'layout.sidebar.toggle.title','Show/hide menu','Afficher/masquer le menu','Pokaż/ukryj menu');
+INSERT INTO "Languages" VALUES (886,'layout.save_indicator.title','Remember to save your changes','Penser à enregistrer les modifications','Pamiętaj o zapisaniu zmian');
+INSERT INTO "Languages" VALUES (887,'layout.footer.legal_notice','Legal notice','Mentions légales','Informacje prawne');
+INSERT INTO "Languages" VALUES (888,'layout.footer.tutorials','Tutorials','Tutoriels','Samouczki');
+INSERT INTO "Languages" VALUES (889,'layout.save_guard.unsaved_warning','Unsaved changes will be lost. Do you want to leave the page?','Des modifications non enregistrées seront perdues. Voulez-vous quitter la page ?','Niezapisane zmiany zostaną utracone. Czy chcesz opuścić stronę?');
+INSERT INTO "Languages" VALUES (890,'layout.pwa.ios_install.message','Install <strong>MyClub</strong> on your iPhone: tap <strong>⎋ Share</strong> then <strong>«Add to Home Screen»</strong>','Installez <strong>MyClub</strong> sur votre iPhone : appuyez sur <strong>⎋ Partager</strong> puis <strong>« Sur l''écran d''accueil »</strong>','Zainstaluj <strong>MyClub</strong> na swoim iPhonie: naciśnij <strong>⎋ Udostępnij</strong> a następnie <strong>«Na ekranie głównym»</strong>');
+INSERT INTO "Metadata" VALUES (1,'MyClub',57,0,1000000,NULL,10,36,6,NULL,0,NULL);
 INSERT INTO "Person" VALUES (1,'webmaster@myclub.foo','e427c26faca947919b18b797bc143a35100e4de48c34b70b26202d3a7d8e51f7','my first name','my last name','my nick name or nothing',NULL,'0',NULL,NULL,NULL,NULL,NULL,0,0,NULL,NULL,'2025-01-01',0,0,0,NULL,NULL,NULL,NULL,NULL,NULL,'');
 INSERT INTO "PersonGroup" VALUES (1,1,1);
 INSERT INTO "Settings" VALUES (1,'Title','title');

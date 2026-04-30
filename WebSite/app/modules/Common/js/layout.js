@@ -46,7 +46,7 @@ function initSaveGuard() {
 
     window.addEventListener('beforeunload', e => {
         if (formModified) {
-            const message = 'Des modifications non enregistrées seront perdues. Voulez-vous quitter la page?';
+            const message = window.layoutI18n?.unsavedWarning ?? 'Unsaved changes will be lost. Do you want to leave the page?';
             e.returnValue = message;
             return message;
         }
@@ -132,6 +132,9 @@ function showIosInstallBanner() {
 
     if (!isIos || isStandalone || dismissed) return;
 
+    const installMessage = window.layoutI18n?.iosInstallMessage
+        ?? 'Install <strong>MyClub</strong> on your iPhone: tap <strong>⎋ Share</strong> then <strong>«Add to Home Screen»</strong>';
+
     const banner = document.createElement('div');
     banner.id = 'ios-install-banner';
     banner.innerHTML = `
@@ -145,11 +148,7 @@ function showIosInstallBanner() {
         ">
             <img src="/apple-touch-icon.png" width="40" height="40"
                  style="border-radius:8px; flex-shrink:0">
-            <span style="flex:1">
-                Installez <strong>MyClub</strong> sur votre iPhone :
-                appuyez sur <strong>⎋ Partager</strong>
-                puis <strong>« Sur l'écran d'accueil »</strong>
-            </span>
+            <span style="flex:1">${installMessage}</span>
             <button id="ios-banner-close" style="
                 background:none; border:none; font-size:20px;
                 cursor:pointer; padding:4px; color:#666;

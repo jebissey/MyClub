@@ -146,9 +146,9 @@
     {* ── Alerts ──────────────────────────────────────────────────── *}
     {if isset($productionSiteUrl)}
         <div class="alert alert-danger alert-dismissible fade show m-0 rounded-0 text-center py-3" role="alert">
-            <h2><i class="bi bi-exclamation-triangle-fill"></i> ATTENTION : Site de test</h2>
-            Vous êtes sur un environnement de test.
-            <a href="{$productionSiteUrl}" class="alert-link fw-bold">Accéder au site de production</a>
+            <h2><i class="bi bi-exclamation-triangle-fill"></i> {='layout.alert.test_site.title'|translate}</h2>
+            {='layout.alert.test_site.message'|translate}
+            <a href="{$productionSiteUrl}" class="alert-link fw-bold">{='layout.alert.test_site.link'|translate}</a>
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     {/if}
@@ -171,7 +171,7 @@
                     <button id="sidebarToggle"
                             class="d-none d-sm-flex align-items-center justify-content-center me-2 border-0 bg-transparent text-white-50 rounded"
                             style="width:34px;height:34px;font-size:1.1rem;transition:background .15s,color .15s;cursor:pointer;"
-                            title="Afficher/masquer le menu">
+                            title="{='layout.sidebar.toggle.title'|translate}">
                         <i class="bi bi-layout-sidebar"></i>
                     </button>
                 {/if}
@@ -238,7 +238,7 @@
 
                     <div class="container-fluid">
                         {block content}{/block}
-                        <div id="saveIndicator" class="bg-white rounded-circle shadow" title="Penser à enregistrer les modifications">
+                        <div id="saveIndicator" class="bg-white rounded-circle shadow" title="{='layout.save_indicator.title'|translate}">
                             <i class="bi bi-save"></i>
                         </div>
                     </div>
@@ -251,8 +251,8 @@
             <div class="container-fluid">
                 <p class="mb-0">
                     <a href="https://github.com/jebissey/MyClub/releases">V{$currentVersion}</a> &#169; JEB
-                    <a href="/legal/notice">Mentions légales</a>
-                    <a href="https://myclub.ovh/menu/show/article/28" target="_blank">Tutoriels</a>
+                    <a href="/legal/notice">{='layout.footer.legal_notice'|translate}</a>
+                    <a href="https://myclub.ovh/menu/show/article/28" target="_blank">{='layout.footer.tutorials'|translate}</a>
                 </p>
             </div>
         </footer>
@@ -260,6 +260,13 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script type="module" src="/app/modules/Common/js/layout.js"></script>
+    {* ── Layout translations for JS ──────────────────────────────── *}
+    <script>
+        window.layoutI18n = {
+            unsavedWarning:   {='layout.save_guard.unsaved_warning'|translate},
+            iosInstallMessage:{='layout.pwa.ios_install.message'|translate}
+        };
+    </script>
     {block scripts}{/block}
 </body>
 </html>
