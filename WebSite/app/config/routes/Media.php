@@ -24,7 +24,8 @@ class Media implements RouteInterface
         $this->routes[] = new Route('GET /media/isShared', $mediaController, 'isShared');
         $this->routes[] = new Route('GET /media/sharedFile/@token:[a-f0-9]+', $mediaController, 'getSharedFile');
         $this->routes[] = new Route('GET /media/upload', $mediaController, 'showUploadForm');
-        $this->routes[] = new Route('GET /media/uses', $mediaController, 'showUses');
+        $this->routes[] = new Route('GET /media/uses/inArticles', $mediaController, 'showUsesInArticles');
+        $this->routes[] = new Route('GET /media/uses/inMessages', $mediaController, 'showUsesInMessages');
 
         return $this->routes;
     }

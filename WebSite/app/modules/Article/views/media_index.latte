@@ -83,6 +83,7 @@
                             <th>{='media.manager.table.size'|translate}</th>
                             <th>{='media.manager.table.article'|translate}</th>
                             <th>{='media.manager.table.carousel'|translate}</th>
+                            <th>{='media.manager.table.message'|translate}</th>
                             <th>{='media.manager.table.shared'|translate}</th>
                             <th>{='media.manager.table.actions'|translate}</th>
                         </tr>
@@ -116,8 +117,9 @@
                                 {/if}
                             </td>
                             <td>{$file['size']|formatFileSize}</td>
-                            <td>{if $file['inArticle']}<a href="/media/uses?path={$file['path']}">{='media.manager.table.yes'|translate}</a>{/if}</td>
-                            <td>{if $file['inGalery']}<a href="/media/uses?path={$file['path']}">{='media.manager.table.yes'|translate}</a>{/if}</td>
+                            <td>{if $file['inArticle']}<a href="/media/uses/inArticles?path={$file['path']}">{='media.manager.table.yes'|translate}</a>{/if}</td>
+                            <td>{if $file['inGalery']}<a href="/media/uses/inArticles?path={$file['path']}">{='media.manager.table.yes'|translate}</a>{/if}</td>
+                            <td>{if $file['inMessage']}<a href="/media/uses/inMessages?path={$file['path']}">{='media.manager.table.yes'|translate}</a>{/if}</td>
                             <td>{if $file['shared']}{='media.manager.table.yes'|translate}{/if}</td>
                             <td>
                                 <div class="btn-group" role="group">

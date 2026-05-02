@@ -9,6 +9,7 @@ use app\helpers\MediaManager;
 use app\helpers\WebApp;
 use app\models\ArticleDataHelper;
 use app\models\CarouselDataHelper;
+use app\models\MessageDataHelper;
 use app\models\PersonGroupDataHelper;
 use app\models\SharedFileDataHelper;
 use app\modules\Common\AbstractController;
@@ -20,7 +21,8 @@ class MediaController extends AbstractController
         private ArticleDataHelper $articleDataHelper,
         private CarouselDataHelper $carouselDataHelper,
         private PersonGroupDataHelper $personGroupDataHelper,
-        private SharedFileDataHelper $sharedFileDataHelper
+        private SharedFileDataHelper $sharedFileDataHelper,
+        private MessageDataHelper $messageDataHelper,
     ) {
         parent::__construct($application);
     }
@@ -107,7 +109,7 @@ class MediaController extends AbstractController
             'currentYear'          => $year,
             'months'               => $this->getMonths($year),
             'currentMonth'         => $month,
-            'fileExtensions'       => $this->getFileExtensions($year),
+            'fileExtensions'       => $this->getFileExtensions(),
             'currentFileExtension' => $fileExtension,
             'search'               => $search,
             'unusedOnly'           => $unusedOnly,
@@ -143,7 +145,7 @@ class MediaController extends AbstractController
         ]));
     }
 
-    public function showUses(): void
+    public function showUsesInArticles(): void
     {
         if (!($this->application->getConnectedUser()->isRedactor() ?? false)) {
             $this->raiseForbidden(__FILE__, __LINE__);
@@ -154,9 +156,31 @@ class MediaController extends AbstractController
             return;
         }
         $path = $this->flight->request()->query->path ?? '';
-        $this->render('Article/views/media_uses.latte', $this->getAllParams([
+        $this->render('Article/views/media_uses_articles.latte', $this->getAllParams([
             'path'            => $path,
             'articles'        => $path !== '' ? $this->articleDataHelper->inArticles($path) : [],
+            'page'            => $this->application->getConnectedUser()->getPage(),
+            'btn_HistoryBack' => true,
+        ]));
+    }
+
+    public function showUsesInMessages(): void
+    {
+        if (!($this->application->getConnectedUser()->isRedactor() ?? false)) {
+            $this->raiseForbidden(__FILE__, __LINE__);
+            return;
+        }
+        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+            return;
+        }
+        $path = $this->flight->request()->query->path ?? '';
+        $uses = $path !== '' ? $this->messageDataHelper->getMessageUses($path) : ['events' => [], 'articles' => [], 'groups' => []];
+        $this->render('Article/views/media_uses_messages.latte', $this->getAllParams([
+            'path'            => $path,
+            'events'          => $uses['events'],
+            'articles'        => $uses['articles'],
+            'groups'          => $uses['groups'],
             'page'            => $this->application->getConnectedUser()->getPage(),
             'btn_HistoryBack' => true,
         ]));
@@ -324,6 +348,7 @@ class MediaController extends AbstractController
         $inArticle = $this->articleDataHelper->getPathsUsedInArticles($allPaths);
         $inGalery  = $this->carouselDataHelper->getPathsUsedInGalery($allPaths);
         $shared    = $this->sharedFileDataHelper->getPathsShared($allPaths);
+        $inMessage = $this->messageDataHelper->getPathsUsedInMessages($allPaths);
 
         $files = [];
         foreach ($candidates as $c) {
@@ -331,8 +356,9 @@ class MediaController extends AbstractController
             $usedInArt = $inArticle[$path] ?? false;
             $usedInGal = $inGalery[$path]  ?? false;
             $isShared  = $shared[$path]    ?? false;
+            $usedInMsg = $inMessage[$path] ?? false;
 
-            if ($unusedOnly && ($usedInGal || $usedInArt || $isShared)) {
+            if ($unusedOnly && ($usedInGal || $usedInArt || $isShared || $usedInMsg)) {
                 continue;
             }
 
@@ -347,6 +373,7 @@ class MediaController extends AbstractController
                 'inGalery'  => $usedInGal,
                 'inArticle' => $usedInArt,
                 'shared'    => $isShared,
+                'inMessage' => $usedInMsg,
             ];
         }
 

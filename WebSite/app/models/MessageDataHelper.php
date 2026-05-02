@@ -157,6 +157,47 @@ class MessageDataHelper extends Data implements NewsProviderInterface
         return [(int)$year, (int)$month, $filename];
     }
 
+    public function getMessageUses(string $path): array
+    {
+        $like = '%' . $path . '%';
+
+        $events = $this->pdo->prepare("
+            SELECT DISTINCT e.Id, e.Summary AS Title, e.StartTime
+            FROM Message m
+            JOIN Event e ON e.Id = m.EventId
+            WHERE m.EventId IS NOT NULL
+            AND m.ImagePath LIKE :path
+            ORDER BY e.StartTime DESC
+        ");
+        $events->execute([':path' => $like]);
+
+        $articles = $this->pdo->prepare("
+            SELECT DISTINCT a.Id, a.Title
+            FROM Message m
+            JOIN Article a ON a.Id = m.ArticleId
+            WHERE m.ArticleId IS NOT NULL
+            AND m.ImagePath LIKE :path
+            ORDER BY a.Title ASC
+        ");
+        $articles->execute([':path' => $like]);
+
+        $groups = $this->pdo->prepare("
+            SELECT DISTINCT g.Id, g.Name AS Title
+            FROM Message m
+            JOIN `Group` g ON g.Id = m.GroupId
+            WHERE m.GroupId IS NOT NULL
+            AND m.ImagePath LIKE :path
+            ORDER BY g.Name ASC
+        ");
+        $groups->execute([':path' => $like]);
+
+        return [
+            'events'   => $events->fetchAll(PDO::FETCH_OBJ),
+            'articles' => $articles->fetchAll(PDO::FETCH_OBJ),
+            'groups'   => $groups->fetchAll(PDO::FETCH_OBJ),
+        ];
+    }
+
     public function getNews(ConnectedUser $connectedUser, string $searchFrom): array
     {
         $news = [];
@@ -184,6 +225,25 @@ class MessageDataHelper extends Data implements NewsProviderInterface
             ];
         }
         return $news;
+    }
+
+    public function getPathsUsedInMessages(array $paths): array
+    {
+        if (empty($paths)) return [];
+
+        $stmt = $this->pdo->query("SELECT ImagePath FROM Message WHERE ImagePath IS NOT NULL");
+        $imagePaths = $stmt->fetchAll(PDO::FETCH_COLUMN);
+
+        $used = [];
+        foreach ($paths as $path) {
+            foreach ($imagePaths as $imagePath) {
+                if ($imagePath !== null && str_contains($imagePath, $path)) {
+                    $used[$path] = true;
+                    break;
+                }
+            }
+        }
+        return $used; // ['data/media/2024/01/photo.jpg' => true, ...]
     }
 
     public function updateMessage(int $messageId, int $personId, string $text): true

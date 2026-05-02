@@ -308,7 +308,8 @@ class ControllerFactory
             $this->articleDataHelper,
             $this->carouselDataHelper,
             $this->personGroupDataHelper,
-            $this->sharedFileDataHelper
+            $this->sharedFileDataHelper,
+            $this->messageDataHelper,
         );
     }
 
