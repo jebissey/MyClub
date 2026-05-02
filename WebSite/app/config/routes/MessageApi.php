@@ -16,11 +16,12 @@ class MessageApi implements RouteInterface
 
     public function get(): array
     {
-        $eventMessageApi = fn() => $this->apiFactory->makeMessageApi();
+        $messageApi = fn() => $this->apiFactory->makeMessageApi();
 
-        $this->routes[] = new Route('POST /api/message/add', $eventMessageApi, 'addMessage');
-        $this->routes[] = new Route('POST /api/message/update', $eventMessageApi, 'updateMessage');
-        $this->routes[] = new Route('POST /api/message/delete', $eventMessageApi, 'deleteMessage');
+        $this->routes[] = new Route('POST /api/message/add', $messageApi, 'addMessage');
+        $this->routes[] = new Route('POST /api/message/update', $messageApi, 'updateMessage');
+        $this->routes[] = new Route('POST /api/message/delete', $messageApi, 'deleteMessage');
+        $this->routes[] = new Route('POST /api/message/delete-image', $messageApi, 'deleteMessageImage');
 
         return $this->routes;
     }

@@ -132,7 +132,6 @@ class Application
         throw new LogicException($msg);
     }
 
-
     public function setAuthenticationService(AuthenticationService $service): void
     {
         $this->authenticationService = $service;

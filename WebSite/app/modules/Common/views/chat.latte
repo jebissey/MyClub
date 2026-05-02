@@ -98,6 +98,15 @@
                                         <p class="card-text mb-0 text-dark">
                                             {$message->Text}
                                         </p>
+
+                                        {if isset($message->ImagePath) && $message->ImagePath}
+                                            <img src="{$message->ImagePath}"
+                                                 alt="image"
+                                                 class="img-fluid rounded mt-2 message-image"
+                                                 style="max-height:300px; cursor:pointer"
+                                                 onclick="this.requestFullscreen?.()">
+                                        {/if}
+
                                     </div>
                                 </div>
                             </div>
@@ -124,6 +133,19 @@
                         <input type="hidden" id="event-id"   value="{$event->Id ?? null}">
                         <input type="hidden" id="group-id"   value="{$group->Id ?? null}">
 
+                        <div id="image-preview-wrapper" class="w-100 d-none">
+                            <div class="position-relative d-inline-block">
+                                <img id="image-preview" src="" alt="preview"
+                                     class="rounded border"
+                                     style="max-height:120px; max-width:100%; object-fit:contain">
+                                <button type="button" id="remove-image-btn"
+                                        class="btn btn-sm btn-danger position-absolute top-0 end-0"
+                                        style="transform:translate(50%,-50%); line-height:1; padding:2px 6px">
+                                    &times;
+                                </button>
+                            </div>
+                        </div>
+
                         <div class="flex-grow-1">
                             <input type="text"
                                 id="message-text"
@@ -131,6 +153,12 @@
                                 placeholder="{='chat.placeholder'|translate}"
                                 required>
                         </div>
+
+                        <label for="message-image" class="btn btn-secondary flex-shrink-0 mb-0" title="{='chat.attach_image'|translate}">
+                            <i class="bi bi-camera"></i>
+                            <input type="file" id="message-image" accept="image/*" class="d-none">
+                        </label>
+
                         <button type="submit" class="btn btn-primary flex-shrink-0">{='chat.send'|translate}</button>
                     </form>
                 </div>
@@ -144,7 +172,7 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="edit-message-modal-label">{'chat.edit_title'|translate}</h5>
+                    <h5 class="modal-title" id="edit-message-modal-label">{='chat.edit_title'|translate}</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Fermer">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -155,6 +183,18 @@
                         <div class="mb-3">
                             <label for="edit-message-text" class="form-label">{='chat.message_label'|translate}</label>
                             <textarea class="form-control" id="edit-message-text" rows="3" required></textarea>
+                        </div>
+
+                        <div id="edit-image-wrapper" class="mb-3 d-none">
+                            <label class="form-label">{='chat.current_image'|translate}</label>
+                            <div class="d-flex align-items-start gap-3">
+                                <img id="edit-image-preview" src="" alt="image"
+                                    class="rounded border"
+                                    style="max-height:120px; max-width:100%; object-fit:contain">
+                                <button type="button" class="btn btn-outline-danger btn-sm" id="delete-image-btn">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
                         </div>
                     </form>
                 </div>

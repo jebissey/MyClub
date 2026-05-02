@@ -5,50 +5,144 @@ declare(strict_types=1);
 namespace app\helpers;
 
 use RuntimeException;
-
 use app\models\DataHelper;
+use app\models\LanguagesDataHelper;
 use app\models\SharedFileDataHelper;
 
 class MediaManager
 {
-    private const MEDIA_PATH =  __DIR__ . '/../../data/media/';
+    private const MEDIA_PATH = __DIR__ . '/../../data/media/';
 
-    public function __construct(private DataHelper $dataHelper, private SharedFileDataHelper $sharedFileDataHelper)
-    {
-        if (!file_exists(self::MEDIA_PATH)) mkdir(self::MEDIA_PATH, 0755, true);
+    public function __construct(
+        private DataHelper $dataHelper,
+        private SharedFileDataHelper $sharedFileDataHelper,
+        private LanguagesDataHelper $languagesDataHelper,
+
+    ) {
+        $this->ensureBaseDirectoryExists();
     }
+
+    /* ===================== PUBLIC API ===================== */
 
     public function deleteFile(int $year, int $month, string $filename): array
     {
-        $filename = basename($filename);
-        $filePath = self::MEDIA_PATH . $year . DIRECTORY_SEPARATOR . sprintf("%02d", $month) . DIRECTORY_SEPARATOR . $filename;
-        $response = ['success' => false, 'message' => ''];
-        if (!file_exists($filePath)) $response['message'] = 'Fichier non trouvé';
-        else {
-            if (unlink($filePath)) {
-                $response['success'] = true;
-                $response['message'] = 'Fichier supprimé avec succès';
-
-                $monthDir = self::MEDIA_PATH . $year . DIRECTORY_SEPARATOR . sprintf("%02d", $month);
-                if (count(glob("$monthDir/*")) === 0) {
-                    rmdir($monthDir);
-
-                    $yearDir = self::MEDIA_PATH . $year;
-                    if (count(glob("$yearDir/*")) === 0) rmdir($yearDir);
-                }
-            } else $response['message'] = 'Erreur lors de la suppression du fichier';
+        $filePath = $this->buildFilePath($year, $month, $filename);
+        if ($filePath === null) {
+            return $this->error($this->languagesDataHelper->translate('media_manager.file_not_found'));
         }
-        return $response;
+        if (!unlink($filePath)) {
+            return $this->error($this->languagesDataHelper->translate('media_manager.file_delete_error'));
+        }
+        $this->cleanupEmptyDirectories($year, $month);
+        return $this->success($this->languagesDataHelper->translate('media_manager.file_deleted_success'));
     }
 
-    public function getSharefile(int $year, int $month, string $filename): array | false
+    public function uploadFile(array $file): array
     {
-        $filePath = $this->getFilePath($year,  $month,  $filename);
-        if ($filePath !== '') {
-            $sharedFile = $this->dataHelper->get('SharedFile', ['Item' => $filePath], 'IdGroup, OnlyForMembers');
-            return ['success' => $sharedFile !== false, 'data' => $sharedFile];
+        $year = (int)date('Y');
+        $month = (int)date('m');
+
+        $targetDir = $this->getOrCreateDirectory($year, $month);
+
+        $safeName = $this->generateSafeFilename($file['name']);
+        $targetFile = $this->resolveDuplicate($targetDir, $safeName);
+
+        if (!copy($file['tmp_name'], $targetFile)) {
+            throw new RuntimeException($this->languagesDataHelper->translate('media_manager.file_upload_error'));
         }
-        return ['success' => false, 'message' => "File doesn't exist"];
+
+        return [
+            'file' => [
+                'name' => basename($targetFile),
+                'path' => $this->toRelativePath($targetFile),
+                'url'  => WebApp::getBaseUrl() . $this->toRelativePath($targetFile),
+                'size' => (int)$file['size'],
+                'type' => (string)$file['type']
+            ]
+        ];
+    }
+
+    public function getShareFile(int $year, int $month, string $filename): array
+    {
+        $filePath = $this->buildFilePath($year, $month, $filename);
+
+        if ($filePath === null) {
+            return $this->error($this->languagesDataHelper->translate('media_manager.file_not_exists'));
+        }
+
+        $sharedFile = $this->dataHelper->get(
+            'SharedFile',
+            ['Item' => $filePath],
+            'IdGroup, OnlyForMembers'
+        );
+
+        return [
+            'success' => $sharedFile !== false,
+            'data' => $sharedFile
+        ];
+    }
+
+    public function shareFile(
+        int $year,
+        int $month,
+        string $filename,
+        ?int $idGroup,
+        int $onlyForMembers
+    ): array {
+        $filePath = $this->buildFilePath($year, $month, $filename);
+
+        if ($filePath === null) {
+            return $this->error($this->languagesDataHelper->translate('media_manager.file_not_exists'));
+        }
+
+        $sharedFile = $this->dataHelper->get(
+            'SharedFile',
+            ['Item' => $filePath],
+            'Id, Token'
+        );
+
+        $token = $sharedFile !== false && $sharedFile->Token !== null
+            ? $sharedFile->Token
+            : bin2hex(random_bytes(32));
+
+        $this->dataHelper->set(
+            'SharedFile',
+            [
+                'Item' => $filePath,
+                'IdGroup' => $idGroup,
+                'OnlyForMembers' => $onlyForMembers,
+                'Token' => $token
+            ],
+            $sharedFile !== false ? ['Id' => $sharedFile->Id] : []
+        );
+
+        return [
+            'success' => true,
+            'token' => $token
+        ];
+    }
+
+    public function removeFileShare(int $year, int $month, string $filename): array
+    {
+        $filePath = $this->buildFilePath($year, $month, $filename);
+
+        if ($filePath === null) {
+            return $this->error($this->languagesDataHelper->translate('media_manager.file_not_exists'));
+        }
+
+        $this->sharedFileDataHelper->removeShareFile($filePath);
+
+        return $this->success();
+    }
+
+    public function isShared(string $filePath): array
+    {
+        $sharedFile = $this->sharedFileDataHelper->getSharedFile($filePath);
+
+        return [
+            'success' => $sharedFile !== false && $sharedFile->Token !== null,
+            'data' => $sharedFile
+        ];
     }
 
     public static function getMediaPath(): string
@@ -56,83 +150,106 @@ class MediaManager
         return self::MEDIA_PATH;
     }
 
-    public function isShared(string $filePath): array
+    /* ===================== PRIVATE ===================== */
+
+    private function ensureBaseDirectoryExists(): void
     {
-        $sharedFile = $this->sharedFileDataHelper->getSharedFile($filePath);
-        return ['success' => $sharedFile !== false && $sharedFile->Token !== null, 'data' => $sharedFile];
+        if (!is_dir(self::MEDIA_PATH)) {
+            mkdir(self::MEDIA_PATH, 0755, true);
+        }
     }
 
-    public function removeFileShare(int $year, int $month, string $filename): array
+    private function buildFilePath(int $year, int $month, string $filename): ?string
     {
-        $filePath = $this->getFilePath($year,  $month,  $filename);
-        if ($filePath !== '') {
-            $this->sharedFileDataHelper->removeShareFile($filePath);
-            return ['success' => true, 'message' => ''];
-        }
-        return ['success' => false, 'message' => "File doesn't exist"];
+        $safeFilename = basename($filename);
+
+        $path = self::MEDIA_PATH
+            . sprintf('%04d', $year) . DIRECTORY_SEPARATOR
+            . sprintf('%02d', $month) . DIRECTORY_SEPARATOR
+            . $safeFilename;
+
+        return file_exists($path) ? $path : null;
     }
 
-    public function sharefile(int $year, int $month, string $filename, ?int $idGroup, int $onlyForMembers): array
+    private function getOrCreateDirectory(int $year, int $month): string
     {
-        $filePath = $this->getFilePath($year,  $month,  $filename);
-        if ($filePath !== '') {
-            $sharedFile = $this->dataHelper->get('SharedFile', ['Item' => $filePath], 'Id, Token');
-            $newToken = bin2hex(random_bytes(32));
-            $token = $sharedFile != false ? $sharedFile->Token ?? $newToken : $newToken;
-            $this->dataHelper->set('SharedFile', [
-                'Item' => $filePath,
-                'IdGroup' => $idGroup,
-                'OnlyForMembers' => $onlyForMembers,
-                'Token' => $token
-            ],  $sharedFile != false ? ['Id' => $sharedFile->Id] : []);
-            return ['success' => true, 'message' => '', 'token' => $token];
+        $dir = self::MEDIA_PATH . "$year/$month/";
+
+        if (!is_dir($dir)) {
+            mkdir($dir, 0755, true);
         }
-        return ['success' => false, 'message' => "File doesn't exist"];
+
+        return $dir;
     }
 
-    public function uploadFile(array $file): array
+    private function generateSafeFilename(string $originalName): string
     {
-        $year = date('Y');
-        $month = date('m');
-        $targetDir = self::MEDIA_PATH . $year . '/' . $month . '/';
-
-        if (!file_exists($targetDir)) {
-            mkdir($targetDir, 0755, true);
-        }
-
-        $originalName = $file['name'];
         $extension = pathinfo($originalName, PATHINFO_EXTENSION);
-        $baseFilename = pathinfo($originalName, PATHINFO_FILENAME);
-        $safeFilename = File::sanitizeFilename($baseFilename);
+        $base = pathinfo($originalName, PATHINFO_FILENAME);
 
-        $targetFile = $targetDir . $safeFilename . '.' . $extension;
+        $safe = File::sanitizeFilename($base);
+
+        return $safe . '.' . $extension;
+    }
+
+    private function resolveDuplicate(string $dir, string $filename): string
+    {
+        $path = $dir . $filename;
+
         $counter = 1;
 
-        while (file_exists($targetFile)) {
-            $targetFile = $targetDir . $safeFilename . '_' . $counter . '.' . $extension;
+        while (file_exists($path)) {
+            $info = pathinfo($filename);
+
+            $path = $dir
+                . $info['filename']
+                . "_$counter."
+                . $info['extension'];
+
             $counter++;
         }
-        if (!move_uploaded_file($file['tmp_name'], $targetFile)) {
-            throw new RuntimeException('Erreur lors de l’enregistrement du fichier');
-        }
-        $relativePath = 'data/media/' . $year . '/' . $month . '/' . basename($targetFile);
 
+        return $path;
+    }
+
+    private function cleanupEmptyDirectories(int $year, int $month): void
+    {
+        $monthDir = self::MEDIA_PATH . "$year/" . sprintf('%02d', $month);
+
+        if ($this->isDirectoryEmpty($monthDir)) {
+            rmdir($monthDir);
+
+            $yearDir = self::MEDIA_PATH . $year;
+
+            if ($this->isDirectoryEmpty($yearDir)) {
+                rmdir($yearDir);
+            }
+        }
+    }
+
+    private function isDirectoryEmpty(string $dir): bool
+    {
+        return is_dir($dir) && count(glob("$dir/*")) === 0;
+    }
+
+    private function toRelativePath(string $absolutePath): string
+    {
+        return str_replace(__DIR__ . '/../../', '', $absolutePath);
+    }
+
+    private function success(?string $message = null): array
+    {
         return [
-            'file' => [
-                'name' => basename($targetFile),
-                'path' => $relativePath,
-                'url'  => WebApp::getBaseUrl() . $relativePath,
-                'size' => $file['size'],
-                'type' => $file['type']
-            ]
+            'success' => true,
+            'message' => $message
         ];
     }
 
-    #region Private functions
-    private function getFilePath(int $year, int $month, string $filename): string
+    private function error(string $message): array
     {
-        $filePath = self::MEDIA_PATH . sprintf("%04d", $year) . DIRECTORY_SEPARATOR . sprintf("%02d", $month) . DIRECTORY_SEPARATOR . $filename;
-        if (file_exists($filePath)) return $filePath;
-        return '';
+        return [
+            'success' => false,
+            'message' => $message
+        ];
     }
 }

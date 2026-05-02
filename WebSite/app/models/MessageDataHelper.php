@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\models;
 
 use PDO;
+use RuntimeException;
 
 use app\exceptions\UnauthorizedAccessException;
 use app\helpers\Application;
@@ -17,12 +18,12 @@ use app\interfaces\NewsProviderInterface;
 
 class MessageDataHelper extends Data implements NewsProviderInterface
 {
-    public function __construct(Application $application)
+    public function __construct(Application $application, private LanguagesDataHelper $languagesDataHelper)
     {
         parent::__construct($application);
     }
 
-    public function addMessage(?int $articleId, ?int $eventId, ?int $groupId, int $personId, string $text): int|false
+    public function addMessage(?int $articleId, ?int $eventId, ?int $groupId, int $personId, string $text, ?string $imagePath = null): int|false
     {
         $nonNullCount = ($articleId !== null) + ($eventId !== null) + ($groupId !== null);
         if ($nonNullCount !== 1) return false;
@@ -36,7 +37,8 @@ class MessageDataHelper extends Data implements NewsProviderInterface
             'GroupId'   => $groupId,
             'PersonId'  => $personId,
             'Text'      => $text,
-            'From'      => 'User'
+            'From'      => 'User',
+            'ImagePath' => $imagePath
         ]);
         return $messageId;
     }
@@ -123,6 +125,36 @@ class MessageDataHelper extends Data implements NewsProviderInterface
         $messages = $stmt->fetchAll(PDO::FETCH_OBJ);
         $this->addAvatarAndTimeAgoToMessages($messages);
         return $messages;
+    }
+
+    public function getImageInfoFromMessage(int $messageId): array
+    {
+        $message = $this->get('Message', ['Id' => $messageId], 'ImagePath');
+        if (!$message) {
+            throw new RuntimeException(
+                $this->languagesDataHelper->translate('message.image_not_found')
+            );
+        }
+        if (empty($message->ImagePath)) {
+            throw new RuntimeException(
+                $this->languagesDataHelper->translate('message.image_not_attached')
+            );
+        }
+        $path = parse_url($message->ImagePath, PHP_URL_PATH);
+        if (!$path) {
+            throw new RuntimeException(
+                $this->languagesDataHelper->translate('message.image_invalid_path')
+            );
+        }
+        $filename = basename($path);
+        $month = basename(dirname($path));
+        $year = basename(dirname(dirname($path)));
+        if (!is_numeric($year) || !is_numeric($month) || empty($filename)) {
+            throw new RuntimeException(
+                $this->languagesDataHelper->translate('message.image_invalid_structure')
+            );
+        }
+        return [(int)$year, (int)$month, $filename];
     }
 
     public function getNews(ConnectedUser $connectedUser, string $searchFrom): array

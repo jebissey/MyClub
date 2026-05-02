@@ -32,9 +32,8 @@ $startTime = microtime(true);
 $logDir = __DIR__ . '/var/tracy/log';
 if (!is_dir($logDir)) mkdir($logDir, 0777, true);
 $local_access = ($_SERVER['REMOTE_ADDR'] === '127.0.0.1' || $_SERVER['REMOTE_ADDR'] === '::1');
-if ($local_access)
-    Debugger::enable(Debugger::Development, $logDir);
-else Debugger::enable(Debugger::Production, $logDir);
+if ($local_access) Debugger::enable(Debugger::Development, $logDir);
+else               Debugger::enable(Debugger::Production, $logDir);
 
 $uri = $_SERVER['REQUEST_URI'] ?? '/';
 $application = Application::init();

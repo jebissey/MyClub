@@ -293,6 +293,7 @@ CREATE TABLE IF NOT EXISTS "Message" (
 	"From"	TEXT NOT NULL DEFAULT 'User',
 	"ArticleId"	INTEGER,
 	"GroupId"	INTEGER,
+	"ImagePath"	TEXT,
 	PRIMARY KEY("Id"),
 	FOREIGN KEY("ArticleId") REFERENCES "Article"("Id"),
 	FOREIGN KEY("EventId") REFERENCES "Event"("Id"),
@@ -5657,7 +5658,24 @@ INSERT INTO "Languages" VALUES (887,'layout.footer.legal_notice','Legal notice',
 INSERT INTO "Languages" VALUES (888,'layout.footer.tutorials','Tutorials','Tutoriels','Samouczki');
 INSERT INTO "Languages" VALUES (889,'layout.save_guard.unsaved_warning','Unsaved changes will be lost. Do you want to leave the page?','Des modifications non enregistrées seront perdues. Voulez-vous quitter la page ?','Niezapisane zmiany zostaną utracone. Czy chcesz opuścić stronę?');
 INSERT INTO "Languages" VALUES (890,'layout.pwa.ios_install.message','Install <strong>MyClub</strong> on your iPhone: tap <strong>⎋ Share</strong> then <strong>«Add to Home Screen»</strong>','Installez <strong>MyClub</strong> sur votre iPhone : appuyez sur <strong>⎋ Partager</strong> puis <strong>« Sur l''écran d''accueil »</strong>','Zainstaluj <strong>MyClub</strong> na swoim iPhonie: naciśnij <strong>⎋ Udostępnij</strong> a następnie <strong>«Na ekranie głównym»</strong>');
-INSERT INTO "Metadata" VALUES (1,'MyClub',57,0,1000000,NULL,10,36,6,NULL,0,NULL);
+INSERT INTO "Languages" VALUES (891,'media_manager.file_not_found','File not found','Fichier non trouvé','Plik nie został znaleziony');
+INSERT INTO "Languages" VALUES (892,'media_manager.file_deleted_success','File deleted successfully','Fichier supprimé avec succès','Plik został pomyślnie usunięty');
+INSERT INTO "Languages" VALUES (893,'media_manager.file_delete_error','Error while deleting file','Erreur lors de la suppression du fichier','Błąd podczas usuwania pliku');
+INSERT INTO "Languages" VALUES (894,'media_manager.file_not_exists','File doesn''t exist','Le fichier n''existe pas','Plik nie istnieje');
+INSERT INTO "Languages" VALUES (895,'media_manager.file_upload_error','Error while saving file','Erreur lors de l’enregistrement du fichier','Błąd podczas zapisywania pliku');
+INSERT INTO "Languages" VALUES (896,'chat.current_image','Current image','Image actuelle','Aktualne zdjęcie');
+INSERT INTO "Languages" VALUES (897,'chat.delete_image','Delete image','Supprimer l''image','Usuń zdjęcie');
+INSERT INTO "Languages" VALUES (898,'chat.attach_image','Attach an image','Joindre une image','Dołącz zdjęcie');
+INSERT INTO "Languages" VALUES (899,'media_manager.file_not_found','File not found','Fichier non trouvé','Plik nie został znaleziony');
+INSERT INTO "Languages" VALUES (900,'media_manager.file_deleted_success','File deleted successfully','Fichier supprimé avec succès','Plik został pomyślnie usunięty');
+INSERT INTO "Languages" VALUES (901,'media_manager.file_delete_error','Error while deleting file','Erreur lors de la suppression du fichier','Błąd podczas usuwania pliku');
+INSERT INTO "Languages" VALUES (902,'media_manager.file_not_exists','File doesn''t exist','Le fichier n''existe pas','Plik nie istnieje');
+INSERT INTO "Languages" VALUES (903,'media_manager.file_upload_error','Error while saving file','Erreur lors de l’enregistrement du fichier','Błąd podczas zapisywania pliku');
+INSERT INTO "Languages" VALUES (904,'message.image_not_found','Message not found','Message introuvable','Wiadomość nie została znaleziona');
+INSERT INTO "Languages" VALUES (905,'message.image_not_attached','No image attached to this message','Aucune image associée à ce message','Brak obrazu powiązanego z tą wiadomością');
+INSERT INTO "Languages" VALUES (906,'message.image_invalid_path','Invalid image path','Chemin d''image invalide','Nieprawidłowa ścieżka obrazu');
+INSERT INTO "Languages" VALUES (907,'message.image_invalid_structure','Invalid image path structure','Structure du chemin d''image invalide','Nieprawidłowa struktura ścieżki obrazu');
+INSERT INTO "Metadata" VALUES (1,'MyClub',58,0,1000000,NULL,10,36,6,NULL,0,NULL);
 INSERT INTO "Person" VALUES (1,'webmaster@myclub.foo','e427c26faca947919b18b797bc143a35100e4de48c34b70b26202d3a7d8e51f7','my first name','my last name','my nick name or nothing',NULL,'0',NULL,NULL,NULL,NULL,NULL,0,0,NULL,NULL,'2025-01-01',0,0,0,NULL,NULL,NULL,NULL,NULL,NULL,'');
 INSERT INTO "PersonGroup" VALUES (1,1,1);
 INSERT INTO "Settings" VALUES (1,'Title','title');

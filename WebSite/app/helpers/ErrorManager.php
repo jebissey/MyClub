@@ -22,7 +22,7 @@ class ErrorManager
         $this->emptyController = new EmptyController($application);
     }
 
-    public function raise(ApplicationError $code, string $message, int $timeout = 1000, bool $displayCode = true, $isWebmaster = false): void
+    public function raise(ApplicationError $code, string $message, int $timeout = 1000, bool $displayCode = true, bool $isWebmaster = false): void
     {
         $this->logDataWriterHelper->add((string)$code->value, $message);
         if ($this->isJsonExpected()) {
@@ -66,7 +66,7 @@ class ErrorManager
             'page' => $this->application->getConnectedUser()->getPage(),
         ]);
         if ($code != ApplicationError::Ok) exit;
-        Application::unreachable('Ok isn\'t an error', __FILE__, __LINE__);
+        Application::unreachable("Ok isn't an error", __FILE__, __LINE__);
     }
 
     private function isJsonExpected(): bool

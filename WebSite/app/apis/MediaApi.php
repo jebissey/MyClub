@@ -13,21 +13,18 @@ use app\helpers\MediaManager;
 use app\helpers\WebApp;
 use app\models\DataHelper;
 use app\models\PersonDataHelper;
-use app\models\SharedFileDataHelper;
 
 class MediaApi extends AbstractApi
 {
-    private MediaManager $mediaManager;
 
     public function __construct(
         Application $application,
         ConnectedUser $connectedUser,
         DataHelper $dataHelper,
         PersonDataHelper $personDataHelper,
-        SharedFileDataHelper $sharedFileDataHelper
+        private MediaManager $mediaManager
     ) {
         parent::__construct($application, $connectedUser, $dataHelper, $personDataHelper);
-        $this->mediaManager = new MediaManager($dataHelper, $sharedFileDataHelper);
     }
 
     public function deleteFile(int $year, int $month, string $filename): void

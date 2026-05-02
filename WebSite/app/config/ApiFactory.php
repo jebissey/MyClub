@@ -29,6 +29,7 @@ use app\apis\WebmasterApi;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
 use app\helpers\GravatarHandler;
+use app\helpers\MediaManager;
 use App\Helpers\NotificationSender;
 use app\helpers\PersonPreferences;
 use app\models\AttributeDataHelper;
@@ -74,9 +75,11 @@ class ApiFactory
         private JsonEmailQuotaTracker $quotaTracker,
         private KanbanDataHelper $kanbanDataHelper,
         private KaraokeDataHelper $karaokeDataHelper,
+        private LanguagesDataHelper $languagesDataHelper,
         private LoanDataHelper $loanDataHelper,
         private LogDataHelper $logDataHelper,
         private LogDataWriterHelper $logDataWriterHelper,
+        private MediaManager $mediaManager,
         private MenuItemDataHelper $menuItemDataHelper,
         private MessageDataHelper $messageDataHelper,
         private MessageRecipientService $messageRecipientService,
@@ -270,7 +273,7 @@ class ApiFactory
             $this->connectedUser,
             $this->dataHelper,
             $this->personDataHelper,
-            $this->sharedFileDataHelper
+            $this->mediaManager,
         );
     }
 
@@ -294,7 +297,8 @@ class ApiFactory
             $this->dataHelper,
             $this->personDataHelper,
             $this->messageRecipientService,
-            $this->notificationSender
+            $this->notificationSender,
+            $this->mediaManager
         );
     }
 

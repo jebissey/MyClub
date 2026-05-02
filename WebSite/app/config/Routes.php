@@ -103,6 +103,7 @@ use app\models\EventTypeDataHelper;
 use app\models\GroupDataHelper;
 use app\models\KanbanDataHelper;
 use app\models\KaraokeDataHelper;
+use app\models\LanguagesDataHelper;
 use app\models\LoanDataHelper;
 use app\models\LogDataHelper;
 use app\models\LogDataWriterHelper;
@@ -151,7 +152,7 @@ class Routes
         $eventDataHelper = new EventDataHelper($application);
         $groupDataHelper = new GroupDataHelper($application);
         $logDataHelper = new LogDataHelper($application, $dataHelper);
-        $messageDataHelper = new MessageDataHelper($application);
+        $messageDataHelper = new MessageDataHelper($application, new LanguagesDataHelper($application));
         $needDataHelper = new NeedDataHelper($application);
         $notificationSender = new NotificationSender($dataHelper, CredentialService::getInstance());
         $orderDataHelper = new OrderDataHelper($application, $articleDataHelper);
@@ -170,11 +171,13 @@ class Routes
         $authenticationService = new AuthenticationService($dataHelper, $emailService);
         $application->setAuthenticationService($authenticationService);
         $loanDataHelper = new LoanDataHelper($application);
+        $languagesDataHelper = new LanguagesDataHelper($application);
+        $mediaManager = new MediaManager($dataHelper, $sharedFileDataHelper, $languagesDataHelper);
         $this->controllerFactory = new ControllerFactory(
             $application,
             new ArticleCrosstabDataHelper($application, $crosstabDataHelper),
             $articleDataHelper,
-            new ArticleService(new CarouselDataHelper($application), new MediaManager($dataHelper, $sharedFileDataHelper), $dataHelper),
+            new ArticleService(new CarouselDataHelper($application), $mediaManager, $dataHelper),
             new ArticleTableDataHelper($application),
             $authenticationService,
             new Backup(),
@@ -186,7 +189,7 @@ class Routes
             new ErrorManager($application),
             $eventDataHelper,
             new EventTypeDataHelper($application),
-            new GroupDataHelper($application, $groupDataHelper),
+            $groupDataHelper,
             new KanbanDataHelper($application),
             $loanDataHelper,
             $logDataHelper,
@@ -220,9 +223,11 @@ class Routes
             $this->quotaTracker,
             new KanbanDataHelper($application),
             new KaraokeDataHelper($application),
+            $languagesDataHelper,
             $loanDataHelper,
             $logDataHelper,
             new LogDataWriterHelper($application),
+            $mediaManager,
             new MenuItemDataHelper($application, $authorizationDataHelper),
             $messageDataHelper,
             new MessageRecipientService($dataHelper),
@@ -359,12 +364,13 @@ class Routes
         $rootDir = realpath(__DIR__ . '/../..');
 
         $staticFiles = [
-            '/apple-touch-icon.png' => ['dir' => 'images', 'file' => 'my-club-180.png', 'type' => 'image/png'],
-            '/apple-touch-icon-120x120.png' => ['dir' => 'images', 'file' => 'my-club-120.png', 'type' => 'image/png'],
-            '/apple-touch-icon-180x180.png' => ['dir' => 'images', 'file' => 'my-club-180.png', 'type' => 'image/png'],
+            '/icon-512.png' =>                     ['dir' => 'images', 'file' => 'icon-512.png',    'type' => 'image/png'],
+            '/apple-touch-icon.png' =>             ['dir' => 'images', 'file' => 'my-club-180.png', 'type' => 'image/png'],
+            '/apple-touch-icon-120x120.png' =>     ['dir' => 'images', 'file' => 'my-club-120.png', 'type' => 'image/png'],
+            '/apple-touch-icon-180x180.png' =>     ['dir' => 'images', 'file' => 'my-club-180.png', 'type' => 'image/png'],
             '/apple-touch-icon-precomposed.png' => ['dir' => 'images', 'file' => 'my-club-180.png', 'type' => 'image/png'],
-            '/favicon.ico' => ['dir' => 'images', 'file' => 'favicon.ico', 'type' => 'image/x-icon'],
-            '/Feed-icon.svg' => ['dir' => 'images', 'file' => 'Feed-icon.svg', 'type' => 'image/svg+xml'],
+            '/favicon.ico' =>                      ['dir' => 'images', 'file' => 'favicon.ico',     'type' => 'image/x-icon'],
+            '/Feed-icon.svg' =>                    ['dir' => 'images', 'file' => 'Feed-icon.svg', '  type' => 'image/svg+xml'],
 
             '/robots.txt' => ['dir' => 'root', 'file' => 'robots.txt', 'type' => 'text/plain; charset=UTF-8'],
             '/webCard' => ['dir' => 'root', 'file' => 'businessCard.html', 'type' => 'text/html; charset=UTF-8'],
