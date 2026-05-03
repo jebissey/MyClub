@@ -2,10 +2,86 @@ import Chart from 'https://cdn.jsdelivr.net/npm/chart.js@3.9.1/auto/+esm';
 
 const chartData = window.chartData;
 
-const chart = new Chart(
+// ─── Plugin : trait min/moy/max style boursier ────────────────────────────────
+const minMaxPlugin = {
+    id: 'minMaxPlugin',
+
+    afterDatasetsDraw(chart) {
+        if (!chartData.showMinMaxAvg) return;
+
+        const ctx    = chart.ctx;
+        const yScale = chart.scales['y'];
+        const xScale = chart.scales['x'];
+
+        const COLOR      = 'rgb(0, 0, 0)';
+        const TICK_W     = 10;
+        const LINE_W     = 2;
+        const DOT_RADIUS = 5;
+
+        chartData.minVisitors.forEach((min, i) => {
+            const avg = chartData.avgVisitors[i];
+            const max = chartData.maxVisitors[i];
+
+            if (min === null || avg === null || max === null) return;
+
+            const x    = xScale.getPixelForValue(i);
+            const yMin = yScale.getPixelForValue(min);
+            const yAvg = yScale.getPixelForValue(avg);
+            const yMax = yScale.getPixelForValue(max);
+
+            ctx.save();
+            ctx.strokeStyle = COLOR;
+            ctx.fillStyle   = COLOR;
+            ctx.lineWidth   = LINE_W;
+
+            // Trait vertical min → max
+            ctx.beginPath();
+            ctx.moveTo(x, yMax);
+            ctx.lineTo(x, yMin);
+            ctx.stroke();
+
+            // Barre horizontale MAX
+            ctx.beginPath();
+            ctx.moveTo(x - TICK_W, yMax);
+            ctx.lineTo(x + TICK_W, yMax);
+            ctx.stroke();
+
+            // Barre horizontale MIN
+            ctx.beginPath();
+            ctx.moveTo(x - TICK_W, yMin);
+            ctx.lineTo(x + TICK_W, yMin);
+            ctx.stroke();
+
+            // Point plein MOYENNE
+            ctx.beginPath();
+            ctx.arc(x, yAvg, DOT_RADIUS, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.restore();
+        });
+    }
+};
+
+// ─── Dataset fantôme pour la légende ─────────────────────────────────────────
+const minMaxLegendDataset = chartData.showMinMaxAvg ? [{
+    label: window.t('minMaxAvg'),
+    data: [],
+    type: 'line',
+    borderColor: 'rgb(0, 0, 0)',
+    backgroundColor: 'rgb(0, 0, 0)',
+    pointStyle: 'circle',
+    pointRadius: 5,
+    showLine: false,
+    yAxisID: 'y',
+    order: -1,
+}] : [];
+
+// ─── Graphique ────────────────────────────────────────────────────────────────
+new Chart(
     document.getElementById('visitorStatsChart').getContext('2d'),
     {
         type: 'bar',
+        plugins: [minMaxPlugin],
         data: {
             labels: chartData.labels,
             datasets: [
@@ -13,16 +89,17 @@ const chart = new Chart(
                     label: window.t('uniqueVisitors'),
                     data: chartData.uniqueVisitors,
                     type: 'line',
-                    borderColor: 'rgba(54, 162, 235, 1)',
-                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                    borderWidth: 2,
+                    borderColor: 'rgba(54, 162, 235, 0.35)',
+                    backgroundColor: 'rgba(54, 162, 235, 0.08)',
+                    borderWidth: 1.5,
+                    borderDash: [4, 3],
                     tension: 0.1,
                     yAxisID: 'y',
-                    pointRadius: 4,
-                    pointHoverRadius: 6,
+                    pointRadius: 0,
                     fill: true,
                     order: 0
                 },
+                ...minMaxLegendDataset,
                 {
                     label: window.t('s2xx'),
                     data: chartData.views2xx,
@@ -91,7 +168,21 @@ const chart = new Chart(
                 intersect: false,
             },
             plugins: {
-                legend: { position: 'top' }
+                legend: { position: 'top' },
+                tooltip: {
+                    callbacks: {
+                        afterBody(items) {
+                            if (!chartData.showMinMaxAvg) return [];
+                            const i = items[0]?.dataIndex;
+                            if (i === undefined) return [];
+                            return [
+                                `  ↑ max/jour : ${chartData.maxVisitors[i]}`,
+                                `  ● moy/jour : ${chartData.avgVisitors[i]}`,
+                                `  ↓ min/jour : ${chartData.minVisitors[i]}`,
+                            ];
+                        }
+                    }
+                }
             }
         }
     }

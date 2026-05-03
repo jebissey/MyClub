@@ -196,6 +196,10 @@ class VisitorInsightsController extends TableController
                 's3xx'           => $this->languagesDataHelper->translate('visitor_insights.statistics.chart.3xx'),
                 's4xx'           => $this->languagesDataHelper->translate('visitor_insights.statistics.chart.4xx'),
                 's5xx'           => $this->languagesDataHelper->translate('visitor_insights.statistics.chart.5xx'),
+                'minMaxAvg'      => $this->languagesDataHelper->translate('visitor_insights.statistics.chart.min_max_avg'),
+                'tooltipMax'     => $this->languagesDataHelper->translate('visitor_insights.statistics.tooltip.max_per_day'),
+                'tooltipAvg'     => $this->languagesDataHelper->translate('visitor_insights.statistics.tooltip.avg_per_day'),
+                'tooltipMin'     => $this->languagesDataHelper->translate('visitor_insights.statistics.tooltip.min_per_day'),
             ],
         ]));
     }
@@ -236,7 +240,7 @@ class VisitorInsightsController extends TableController
             'title'    => $this->languagesDataHelper->translate('visitor_insights.top_pages.card_title'),
             'period'   => $period->value,
             'periodFrom'  => $period->getStart()->format('Y-m-d H:i:s'),
-            'periodTo'    => $period->getEnd()->format('Y-m-d H:i:s'),            
+            'periodTo'    => $period->getEnd()->format('Y-m-d H:i:s'),
             'topPages' => $this->logDataHelper->getTopPages($period, self::TOP),
             'page'     => $this->application->getConnectedUser()->getPage(),
             'translations' => TranslationManager::getCreationTimeModalTranslations($this->languagesDataHelper),

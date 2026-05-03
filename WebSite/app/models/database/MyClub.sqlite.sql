@@ -5686,7 +5686,11 @@ INSERT INTO "Languages" VALUES (915,'media.uses.in_group_messages','This media a
 INSERT INTO "Languages" VALUES (916,'media.uses.no_messages','This media is not used in any message.','Ce média n''est utilisé dans aucun message.','To medium nie jest używane w żadnej wiadomości.');
 INSERT INTO "Languages" VALUES (917,'media.uses.view_event','View event','Voir l''événement','Zobacz wydarzenie');
 INSERT INTO "Languages" VALUES (918,'media.uses.view_group','View group','Voir le groupe','Zobacz grupę');
-INSERT INTO "Metadata" VALUES (1,'MyClub',59,0,1000000,NULL,10,36,6,NULL,0,NULL);
+INSERT INTO "Languages" VALUES (919,'visitor_insights.statistics.chart.min_max_avg','Min / Avg / Max','Min / Moy / Max','Min / Śr / Max');
+INSERT INTO "Languages" VALUES (920,'visitor_insights.statistics.tooltip.max_per_day','Max per day','Max par jour','Maks dziennie');
+INSERT INTO "Languages" VALUES (921,'visitor_insights.statistics.tooltip.avg_per_day','Avg per day','Moy par jour','Śr dziennie');
+INSERT INTO "Languages" VALUES (922,'visitor_insights.statistics.tooltip.min_per_day','Min per day','Min par jour','Min dziennie');
+INSERT INTO "Metadata" VALUES (1,'MyClub',60,0,1000000,NULL,10,36,6,NULL,0,NULL);
 INSERT INTO "Person" VALUES (1,'webmaster@myclub.foo','e427c26faca947919b18b797bc143a35100e4de48c34b70b26202d3a7d8e51f7','my first name','my last name','my nick name or nothing',NULL,'0',NULL,NULL,NULL,NULL,NULL,0,0,NULL,NULL,'2025-01-01',0,0,0,NULL,NULL,NULL,NULL,NULL,NULL,'');
 INSERT INTO "PersonGroup" VALUES (1,1,1);
 INSERT INTO "Settings" VALUES (1,'Title','title');

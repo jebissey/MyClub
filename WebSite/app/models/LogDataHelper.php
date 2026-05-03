@@ -25,33 +25,48 @@ class LogDataHelper extends Data
     {
         $labels         = [];
         $uniqueVisitors = [];
-        $pageViews      = [];
         $views2xx       = [];
         $views3xx       = [];
         $views4xx       = [];
         $views5xx       = [];
+        $minVisitors    = [];
+        $avgVisitors    = [];
+        $maxVisitors    = [];
+        $showMinMaxAvg  = false;
 
         foreach ($data as $item) {
             $labels[]         = $item['label'];
             $uniqueVisitors[] = $item['uniqueVisitors'];
-            $pageViews[]      = $item['pageViews'];
-            $views2xx[]       = $item['views2xx'];
-            $views3xx[]       = $item['views3xx'];
-            $views4xx[]       = $item['views4xx'];
-            $views5xx[]       = $item['views5xx'];
+            $views2xx[]       = $item['views2xx']  ?? 0;
+            $views3xx[]       = $item['views3xx']  ?? 0;
+            $views4xx[]       = $item['views4xx']  ?? 0;
+            $views5xx[]       = $item['views5xx']  ?? 0;
+
+            if (isset($item['minDailyVisitors'])) {
+                $showMinMaxAvg = true;
+                $minVisitors[] = $item['minDailyVisitors'];
+                $avgVisitors[] = round($item['avgDailyVisitors'], 1);
+                $maxVisitors[] = $item['maxDailyVisitors'];
+            } else {
+                $minVisitors[] = null;
+                $avgVisitors[] = null;
+                $maxVisitors[] = null;
+            }
         }
 
         return [
             'labels'         => $labels,
             'uniqueVisitors' => $uniqueVisitors,
-            'pageViews'      => $pageViews,
             'views2xx'       => $views2xx,
             'views3xx'       => $views3xx,
             'views4xx'       => $views4xx,
             'views5xx'       => $views5xx,
+            'showMinMaxAvg'  => $showMinMaxAvg,
+            'minVisitors'    => $minVisitors,
+            'avgVisitors'    => $avgVisitors,
+            'maxVisitors'    => $maxVisitors,
         ];
     }
-
 
     #region Last visits
     public function getLastVisitPerActivePersonWithTimeAgo(array $activePersons): array
