@@ -370,7 +370,7 @@ class Routes
             '/apple-touch-icon-180x180.png' =>     ['dir' => 'images', 'file' => 'my-club-180.png', 'type' => 'image/png'],
             '/apple-touch-icon-precomposed.png' => ['dir' => 'images', 'file' => 'my-club-180.png', 'type' => 'image/png'],
             '/favicon.ico' =>                      ['dir' => 'images', 'file' => 'favicon.ico',     'type' => 'image/x-icon'],
-            '/Feed-icon.svg' =>                    ['dir' => 'images', 'file' => 'Feed-icon.svg', '  type' => 'image/svg+xml'],
+            '/Feed-icon.svg' =>                    ['dir' => 'images', 'file' => 'Feed-icon.svg',   'type' => 'image/svg+xml'],
 
             '/robots.txt' => ['dir' => 'root', 'file' => 'robots.txt', 'type' => 'text/plain; charset=UTF-8'],
             '/webCard' => ['dir' => 'root', 'file' => 'businessCard.html', 'type' => 'text/html; charset=UTF-8'],
