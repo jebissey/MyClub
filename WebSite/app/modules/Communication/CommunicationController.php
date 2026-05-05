@@ -6,11 +6,12 @@ namespace app\modules\Communication;
 
 use app\helpers\Application;
 use app\modules\Common\AbstractController;
+use app\modules\Common\services\EmailService;
 
 class CommunicationController extends AbstractController
 {
     public function __construct(
-        Application $application,
+        Application $application, private EmailService $emailService
     ) {
         parent::__construct($application);
     }
@@ -20,11 +21,16 @@ class CommunicationController extends AbstractController
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isCommunicationManager())) {
             $connectedUser = $this->application->getConnectedUser();
 
+            $smtpConfig   = $this->emailService->getSmtpConfig();
+            $smtpFrom     = $smtpConfig?->from ?? '';
+
             $this->render('Communication/views/communication_edit.latte', $this->getAllParams([
                 'groups'          => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
                 'navItems'        => $this->getNavItems($connectedUser->person ?? false),
                 'page'            => $connectedUser->getPage(),
                 'btn_HistoryBack' => true,
+                'smtpFrom'        => $smtpFrom,
+                'userEmail'       => $connectedUser->person?->Email ?? '',
                 'translations' => [
                     'subjectRequired' => $this->languagesDataHelper->translate('communication.email.subject_required'),
                     'contentRequired' => $this->languagesDataHelper->translate('communication.email.content_required'),

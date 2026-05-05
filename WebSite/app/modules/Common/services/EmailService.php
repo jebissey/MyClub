@@ -76,12 +76,15 @@ final class EmailService
     {
         $headers = [
             'From'         => $message->from,
-            'Reply-To'     => $message->replyTo ?? $message->from,
             'X-Mailer'     => 'PHP/' . phpversion(),
             'Content-Type' => $message->isHtml
                 ? 'text/html; charset=UTF-8'
                 : 'text/plain; charset=UTF-8',
         ];
+
+        if ($message->replyTo !== null) {
+            $headers['Reply-To'] = $message->replyTo;
+        }
 
         if ($message->cc !== []) {
             $headers['Cc'] = implode(', ', $message->cc);
@@ -119,7 +122,11 @@ final class EmailService
             };
 
             $mail->setFrom($config->from, 'MyClub');
-            $mail->addReplyTo($message->replyTo ?? $config->from);
+
+            if ($message->replyTo !== null) {
+                $mail->addReplyTo($message->replyTo);
+            }
+
             $mail->addAddress($message->to);
 
             foreach ($message->cc  as $email) {

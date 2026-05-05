@@ -24,7 +24,11 @@ export default class EmailForm {
             () => this.#onConfirmSend());
     }
 
-    // Handle email sending form logic
+    #resolveReplyTo() {
+        return document.getElementById('reply-to-select')?.value || null;
+        // null | "smtp" | "user" — résolution de l'adresse réelle côté serveur
+    }
+
     #onSendClick() {
         const subject = document.getElementById('email-subject').value.trim();
         const content = tinymce.get('tinymce-email')?.getContent()?.trim();
@@ -41,13 +45,12 @@ export default class EmailForm {
         }
 
         const count = this.#members.getCheckedIds().length;
-
         const quotaLine = this.#quota.buildConfirmQuotaLine();
 
         document.getElementById('modal-confirm-body').innerHTML = `
-        <p>${window.t('confirmSend').replace('%d', count)}</p>
-        ${quotaLine ? `<p class="text-muted small mb-0">${quotaLine}</p>` : ''}
-    `;
+            <p>${window.t('confirmSend').replace('%d', count)}</p>
+            ${quotaLine ? `<p class="text-muted small mb-0">${quotaLine}</p>` : ''}
+        `;
 
         bootstrap.Modal.getOrCreateInstance(
             document.getElementById('modal-confirm')
@@ -66,6 +69,7 @@ export default class EmailForm {
                 subject: document.getElementById('email-subject').value.trim(),
                 content: tinymce.get('tinymce-email')?.getContent() ?? '',
                 recipient_ids: this.#members.getCheckedIds(),
+                reply_to: this.#resolveReplyTo(),
             };
 
             const response = await api.post('/api/communication/send', payload);

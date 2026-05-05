@@ -135,7 +135,8 @@ class ApiFactory
             $this->dataHelper,
             $this->personDataHelper,
             $this->emailService,
-            $this->quotaTracker
+            $this->quotaTracker,
+            $this->languagesDataHelper,
         );
     }
 

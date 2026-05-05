@@ -151,7 +151,14 @@ class PersonController extends TableController
             }
 
             if ($this->application->getConnectedUser()->isPersonManager()) {
-                $this->dataHelper->set('Person', ['Alert' => $input['alert']], ['Id' => $person->Id]);
+                $this->dataHelper->set(
+                    'Person',
+                    [
+                        'Alert' => $input['alert'] ?? '',
+                        'MemberInfo' => $input['memberInfo'] ?? ''
+                    ],
+                    ['Id' => $person->Id]
+                );
             }
 
             $this->redirect('/persons');

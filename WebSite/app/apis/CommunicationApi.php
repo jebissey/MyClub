@@ -12,6 +12,7 @@ use app\helpers\Application;
 use app\helpers\ConnectedUser;
 use app\interfaces\EmailQuotaTrackerInterface;
 use app\models\DataHelper;
+use app\models\LanguagesDataHelper;
 use app\models\PersonDataHelper;
 use app\modules\Common\services\EmailService;
 use app\valueObjects\EmailMessage;
@@ -25,6 +26,7 @@ class CommunicationApi extends AbstractApi
         PersonDataHelper $personDataHelper,
         private readonly EmailService $emailService,
         private readonly ?EmailQuotaTrackerInterface  $quotaTracker,
+        private readonly LanguagesDataHelper $languagesDataHelper,
     ) {
         parent::__construct($application, $connectedUser, $dataHelper, $personDataHelper);
     }
@@ -87,9 +89,14 @@ class CommunicationApi extends AbstractApi
                 $recipientIds = array_filter(array_map('intval', $input['recipient_ids'] ?? []));
                 $subject      = trim($input['subject'] ?? '');
                 $content      = trim($input['content'] ?? '');
+                $replyToMode  = $input['reply_to'] ?? null;
 
                 if (empty($recipientIds) || $subject === '' || $content === '') {
-                    $this->renderJsonBadRequest('Champs obligatoires manquants.', __FILE__, __LINE__);
+                    $this->renderJsonBadRequest(
+                        $this->languagesDataHelper->translate('communication.api.missing_fields'),
+                        __FILE__,
+                        __LINE__
+                    );
                     return;
                 }
 
@@ -104,23 +111,37 @@ class CommunicationApi extends AbstractApi
                 }
 
                 if (empty($bcc)) {
-                    $this->renderJsonBadRequest('Aucun destinataire valide trouvé.', __FILE__, __LINE__);
+                    $this->renderJsonBadRequest(
+                        $this->languagesDataHelper->translate('communication.api.no_valid_recipients'),
+                        __FILE__,
+                        __LINE__
+                    );
                     return;
                 }
 
-                // Vérification quota avant envoi
                 $config = $this->emailService->getSmtpConfig();
                 $count  = count($bcc);
+
                 if ($config->dailyLimit !== null && ($this->quotaTracker?->getDailySent() ?? 0) + $count > $config->dailyLimit) {
-                    $this->renderJsonOk([...$this->buildQuotaStats(), 'quotaHit' => true, 'toast' => 'Quota journalier dépassé.']);
+                    $this->renderJsonOk([
+                        ...$this->buildQuotaStats(),
+                        'quotaHit' => true,
+                        'toast'    => $this->languagesDataHelper->translate('communication.api.quota_daily_exceeded'),
+                    ]);
                     return;
                 }
                 if ($config->monthlyLimit !== null && ($this->quotaTracker?->getMonthlySent() ?? 0) + $count > $config->monthlyLimit) {
-                    $this->renderJsonOk([...$this->buildQuotaStats(), 'quotaHit' => true, 'toast' => 'Quota mensuel dépassé.']);
+                    $this->renderJsonOk([
+                        ...$this->buildQuotaStats(),
+                        'quotaHit' => true,
+                        'toast'    => $this->languagesDataHelper->translate('communication.api.quota_monthly_exceeded'),
+                    ]);
                     return;
                 }
 
-                $from = $config->getSenderAddress($this->connectedUser->person->Email);
+                $from    = $config->getSenderAddress($this->connectedUser->person->Email);
+                $replyTo = $this->resolveReplyTo($replyToMode, $config->from ?? '', $this->connectedUser->person->Email ?? '');
+
                 $emailMessage = new EmailMessage(
                     from: $from,
                     to: $from,
@@ -128,6 +149,7 @@ class CommunicationApi extends AbstractApi
                     subject: $subject,
                     body: $content,
                     isHtml: true,
+                    replyTo: $replyTo,
                 );
 
                 $emailSent = $this->emailService->send($emailMessage);
@@ -136,13 +158,26 @@ class CommunicationApi extends AbstractApi
                 if ($emailSent) {
                     $this->renderJsonOk([
                         ...$this->buildQuotaStats(),
-                        'toast'   => 'Message envoyé avec succès à ' . $count . ' destinataire(s) en copie cachée.',
+                        'toast' => sprintf(
+                            $this->languagesDataHelper->translate('communication.api.send_success'),
+                            $count
+                        ),
                     ]);
                 } else {
-                    $this->renderJsonError('L\'envoi a échoué. Veuillez réessayer ou contacter l\'administrateur.', ApplicationError::Error->value, __FILE__, __LINE__);
+                    $this->renderJsonError(
+                        $this->languagesDataHelper->translate('communication.api.send_failed'),
+                        ApplicationError::Error->value,
+                        __FILE__,
+                        __LINE__
+                    );
                 }
             } catch (EmailException $e) {
-                $this->renderJsonError('Envoi impossible : ' . $e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
+                $this->renderJsonError(
+                    $this->languagesDataHelper->translate('communication.api.send_impossible') . $e->getMessage(),
+                    ApplicationError::Error->value,
+                    $e->getFile(),
+                    $e->getLine()
+                );
             } catch (Throwable $e) {
                 $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
             }
@@ -164,5 +199,26 @@ class CommunicationApi extends AbstractApi
             'monthlyLimit'     => $config->monthlyLimit,
             'monthlyRemaining' => $config->monthlyLimit !== null ? max(0, $config->monthlyLimit - $monthlySent) : null,
         ];
+    }
+
+    private function resolveReplyTo(?string $mode, string $smtpFrom, string $userEmail): ?string
+    {
+        return match ($mode) {
+            'smtp'  => $smtpFrom !== '' ? $smtpFrom : null,
+            'user'  => $userEmail !== '' ? $userEmail : null,
+            default => $this->buildNoReplyAddress($smtpFrom),
+        };
+    }
+
+    private function buildNoReplyAddress(string $smtpFrom): ?string
+    {
+        $atPos  = strrpos($smtpFrom, '@');
+        if ($atPos === false) {
+            return null;
+        }
+
+        $domain = substr($smtpFrom, $atPos + 1);
+
+        return "noreply@{$domain}";
     }
 }
