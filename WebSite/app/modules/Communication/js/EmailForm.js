@@ -24,32 +24,41 @@ export default class EmailForm {
             () => this.#onConfirmSend());
     }
 
+    // Handle email sending form logic
     #onSendClick() {
         const subject = document.getElementById('email-subject').value.trim();
         const content = tinymce.get('tinymce-email')?.getContent()?.trim();
 
         if (!subject) {
-            showToast('Veuillez renseigner l\'objet du message.', false);
+            showToast(window.t('subjectRequired'), false);
             document.getElementById('email-subject').focus();
             return;
         }
+
         if (!content || content === '<p><br></p>') {
-            showToast('Veuillez renseigner le contenu du message.', false);
+            showToast(window.t('contentRequired'), false);
             return;
         }
 
-        const quotaLine = this.#quota.buildConfirmQuotaLine();
-        document.getElementById('modal-confirm-body').innerHTML = `
-            <p>Vous êtes sur le point d'envoyer ce message à
-            <strong>${this.#members.getCheckedIds().length}</strong>
-            destinataire(s) en copie cachée (BCC).</p>
-            ${quotaLine ? `<p class="text-muted small mb-0"><i class="bi bi-info-circle"></i> ${quotaLine}</p>` : ''}`;
+        const count = this.#members.getCheckedIds().length;
 
-        bootstrap.Modal.getOrCreateInstance(document.getElementById('modal-confirm')).show();
+        const quotaLine = this.#quota.buildConfirmQuotaLine();
+
+        document.getElementById('modal-confirm-body').innerHTML = `
+        <p>${window.t('confirmSend').replace('%d', count)}</p>
+        ${quotaLine ? `<p class="text-muted small mb-0">${quotaLine}</p>` : ''}
+    `;
+
+        bootstrap.Modal.getOrCreateInstance(
+            document.getElementById('modal-confirm')
+        ).show();
     }
 
     async #onConfirmSend() {
-        bootstrap.Modal.getInstance(document.getElementById('modal-confirm')).hide();
+        bootstrap.Modal.getInstance(
+            document.getElementById('modal-confirm')
+        ).hide();
+
         showOverlay();
 
         try {
@@ -68,12 +77,15 @@ export default class EmailForm {
                 showToast(`✗ ${data.toast}`, false);
             } else if (response.success) {
                 showToast(`✓ ${data.toast}`, true);
+                document.getElementById('email-subject').value = '';
+                tinymce.get('tinymce-email')?.setContent('');
+                this.#members.clearSelection();
             } else {
-                showToast(`✗ ${response.message ?? 'Échec de l\'envoi.'}`, false);
+                showToast(`✗ ${response.message ?? window.t('sendError')}`, false);
             }
         } catch (e) {
-            console.error('Erreur lors de l\'envoi :', e);
-            showToast('✗ Une erreur inattendue est survenue.', false);
+            console.error('Send error:', e);
+            showToast(`✗ ${window.t('unexpectedError')}`, false);
         } finally {
             hideOverlay();
         }

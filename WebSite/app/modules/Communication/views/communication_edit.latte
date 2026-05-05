@@ -204,5 +204,11 @@
         import { initTinyMCE } from '/app/modules/Common/js/tinymce-config.js';
         initTinyMCE('#tinymce-email', {  mode: 'normal' });
     </script>
+    <script>
+        window.i18n = {=json_encode($translations)|noescape};
+        window.t = function(key) {
+            return window.i18n?.[key] ?? key;
+        };
+    </script>
     <script type="module" src="/app/modules/Communication/js/main.js"></script>
 {/block}

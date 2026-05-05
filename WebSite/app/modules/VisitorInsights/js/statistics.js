@@ -2,7 +2,7 @@ import Chart from 'https://cdn.jsdelivr.net/npm/chart.js@3.9.1/auto/+esm';
 
 const chartData = window.chartData;
 
-// ─── Plugin : trait min/moy/max style boursier ────────────────────────────────
+// ─── Plugin: Min / Avg / Max stock-style overlay ─────────────────────────────
 const minMaxPlugin = {
     id: 'minMaxPlugin',
 
@@ -34,25 +34,25 @@ const minMaxPlugin = {
             ctx.fillStyle   = COLOR;
             ctx.lineWidth   = LINE_W;
 
-            // Trait vertical min → max
+            // Vertical line from min to max
             ctx.beginPath();
             ctx.moveTo(x, yMax);
             ctx.lineTo(x, yMin);
             ctx.stroke();
 
-            // Barre horizontale MAX
+            // Horizontal tick for MAX
             ctx.beginPath();
             ctx.moveTo(x - TICK_W, yMax);
             ctx.lineTo(x + TICK_W, yMax);
             ctx.stroke();
 
-            // Barre horizontale MIN
+            // Horizontal tick for MIN
             ctx.beginPath();
             ctx.moveTo(x - TICK_W, yMin);
             ctx.lineTo(x + TICK_W, yMin);
             ctx.stroke();
 
-            // Point plein MOYENNE
+            // Filled dot for AVERAGE
             ctx.beginPath();
             ctx.arc(x, yAvg, DOT_RADIUS, 0, Math.PI * 2);
             ctx.fill();
@@ -62,7 +62,7 @@ const minMaxPlugin = {
     }
 };
 
-// ─── Dataset fantôme pour la légende ─────────────────────────────────────────
+// ─── Ghost dataset for legend ────────────────────────────────────────────────
 const minMaxLegendDataset = chartData.showMinMaxAvg ? [{
     label: window.t('minMaxAvg'),
     data: [],
@@ -76,7 +76,7 @@ const minMaxLegendDataset = chartData.showMinMaxAvg ? [{
     order: -1,
 }] : [];
 
-// ─── Graphique ────────────────────────────────────────────────────────────────
+// ─── Chart ───────────────────────────────────────────────────────────────────
 new Chart(
     document.getElementById('visitorStatsChart').getContext('2d'),
     {
@@ -175,10 +175,11 @@ new Chart(
                             if (!chartData.showMinMaxAvg) return [];
                             const i = items[0]?.dataIndex;
                             if (i === undefined) return [];
+
                             return [
-                                `  ↑ max/jour : ${chartData.maxVisitors[i]}`,
-                                `  ● moy/jour : ${chartData.avgVisitors[i]}`,
-                                `  ↓ min/jour : ${chartData.minVisitors[i]}`,
+                                `↑ ${window.t('tooltipMax')} : ${chartData.maxVisitors[i]}`,
+                                `● ${window.t('tooltipAvg')} : ${chartData.avgVisitors[i]}`,
+                                `↓ ${window.t('tooltipMin')} : ${chartData.minVisitors[i]}`
                             ];
                         }
                     }

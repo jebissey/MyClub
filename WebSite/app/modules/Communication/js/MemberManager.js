@@ -17,19 +17,20 @@ export default class MemberManager {
 
     async load() {
         const data = await api.post('/api/communication/members', {
-            groupId      : document.getElementById('group-select').value || null,
-            presentation : this.#readTriState('filter-presentation'),
-            inPublicMap  : this.#readTriState('filter-in-public-map'),
-            password     : this.#readTriState('filter-password'),
-            desactivated : this.#readTriState('filter-desactivated-account'),
+            groupId: document.getElementById('group-select').value || null,
+            presentation: this.#readTriState('filter-presentation'),
+            inPublicMap: this.#readTriState('filter-in-public-map'),
+            password: this.#readTriState('filter-password'),
+            desactivated: this.#readTriState('filter-desactivated-account'),
         });
 
         const members = data.data?.members;
         if (!data.success || !Array.isArray(members)) return;
 
+        // Load members based on filters
         document.getElementById('member-ul').innerHTML = members.length
             ? members.map(m => this.#buildItem(m)).join('')
-            : '<li class="list-group-item text-muted small py-2 px-2">Aucun membre trouvé.</li>';
+            : `<li class="list-group-item text-muted small py-2 px-2">${window.t('noMembers')}</li>`;
 
         this.#onChangeCallback?.();
     }
@@ -59,6 +60,14 @@ export default class MemberManager {
         });
 
         document.getElementById('btn-apply-filter').addEventListener('click', () => this.load());
+    }
+
+    clearSelection() {
+        document.querySelectorAll('.member-checkbox').forEach(cb => {
+            cb.checked = false;
+            cb.closest('.list-group-item')?.classList.remove('list-group-item-primary');
+        });
+        this.#onChangeCallback?.();
     }
 
     /** Tri-état : "" → null, "1" → true, "0" → false */
