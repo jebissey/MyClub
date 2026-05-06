@@ -65,7 +65,7 @@ class MessageApi extends AbstractApi
             return;
         }
 
-        $data = $this->getJsonInput(); // retour au JSON
+        $data = $this->getJsonInput();
 
         if (
             (!isset($data['eventId']) && !isset($data['articleId']) && !isset($data['groupId']))

@@ -82,15 +82,9 @@ class MediaManager
         ];
     }
 
-    public function shareFile(
-        int $year,
-        int $month,
-        string $filename,
-        ?int $idGroup,
-        int $onlyForMembers
-    ): array {
+    public function shareFile(int $year, int $month, string $filename, ?int $idGroup, int $onlyForMembers): array
+    {
         $filePath = $this->buildFilePath($year, $month, $filename);
-
         if ($filePath === null) {
             return $this->error($this->languagesDataHelper->translate('media_manager.file_not_exists'));
         }
@@ -125,7 +119,6 @@ class MediaManager
     public function removeFileShare(int $year, int $month, string $filename): array
     {
         $filePath = $this->buildFilePath($year, $month, $filename);
-
         if ($filePath === null) {
             return $this->error($this->languagesDataHelper->translate('media_manager.file_not_exists'));
         }
@@ -137,11 +130,17 @@ class MediaManager
 
     public function isShared(string $filePath): array
     {
-        $sharedFile = $this->sharedFileDataHelper->getSharedFile($filePath);
-
+        $sharedFile = $this->sharedFileDataHelper->getSharedFile(realpath(self::MEDIA_PATH . $filePath));
+        if ($sharedFile === false || empty($sharedFile->Token)) {
+            return [
+                'shared' => false
+            ];
+        }
         return [
-            'success' => $sharedFile !== false && $sharedFile->Token !== null,
-            'data' => $sharedFile
+            'shared' => true,
+            'idGroup' => $sharedFile->idGroup,
+            'membersOnly' => $sharedFile->membersOnly === 1,
+            'link' => WebApp::getBaseUrl() . 'media/sharedFile/' . $sharedFile->Token
         ];
     }
 
@@ -163,22 +162,19 @@ class MediaManager
     {
         $safeFilename = basename($filename);
 
-        $path = self::MEDIA_PATH
+        $path = realpath(self::MEDIA_PATH
             . sprintf('%04d', $year) . DIRECTORY_SEPARATOR
             . sprintf('%02d', $month) . DIRECTORY_SEPARATOR
-            . $safeFilename;
-
+            . $safeFilename);
         return file_exists($path) ? $path : null;
     }
 
     private function getOrCreateDirectory(int $year, int $month): string
     {
-        $dir = self::MEDIA_PATH . "$year/$month/";
-
+        $dir = self::MEDIA_PATH . sprintf("%04d/%02d/", $year, $month);
         if (!is_dir($dir)) {
             mkdir($dir, 0755, true);
         }
-
         return $dir;
     }
 

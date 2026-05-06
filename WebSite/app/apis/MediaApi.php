@@ -42,82 +42,83 @@ class MediaApi extends AbstractApi
 
     public function isShared(): void
     {
-        if (!($this->application->getConnectedUser()->isRedactor() ?? false)) {
-            $this->renderJsonForbidden(__FILE__, __LINE__);
-            return;
+        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isRedactor())) {
+            $filePath = trim($_GET['path']  ?? '');
+            $data['path'] ?? null;
+            if (!$filePath) {
+                $this->renderJsonBadRequest('Fichier manquant', __FILE__, __LINE__);
+                return;
+            }
+            $this->renderJsonOk($this->mediaManager->isShared($filePath));
         }
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
-        $data = $this->getJsonInput();
-        $filePath = $data['item'] ?? null;
-        if (!$filePath) {
-            $this->renderJsonBadRequest('Fichier manquant', __FILE__, __LINE__);
-            return;
-        }
-        $this->renderJsonOk($this->mediaManager->isShared($filePath));
     }
 
     public function removeFileShare(int $year, int $month, string $filename): void
     {
-        if (!($this->application->getConnectedUser()->isRedactor() ?? false)) {
-            $this->renderJsonForbidden(__FILE__, __LINE__);
-            return;
+        if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isRedactor())) {
+            $response = $this->mediaManager->removeFileShare($year, $month, $filename);
+            $this->renderJson($response, $response['success'], $response['success'] ? ApplicationError::Ok->value : ApplicationError::BadRequest->value);
         }
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
-        $response = $this->mediaManager->removeFileShare($year, $month, $filename);
-        $this->renderJson($response, $response['success'], $response['success'] ? ApplicationError::Ok->value : ApplicationError::BadRequest->value);
     }
 
-    public function shareFile(int $year, int $month, string $filename): void
+    public function shareFile(): void
     {
-        if (!($this->application->getConnectedUser()->isRedactor() ?? false)) {
-            $this->renderJsonForbidden(__FILE__, __LINE__);
-            return;
+        if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isRedactor())) {
+            $data = $this->getJsonInput();
+
+            $path = $data['path'] ?? null;
+            if (!$path) {
+                $this->renderJsonBadRequest('Missing path', __FILE__, __LINE__);
+                return;
+            }
+            $parts = explode('/', $path);
+            if (count($parts) !== 3) {
+                $this->renderJsonBadRequest('Invalid path format', __FILE__, __LINE__);
+                return;
+            }
+            [$year, $month, $filename] = $parts;
+
+            $response = $this->mediaManager->sharefile(
+                (int)$year,
+                (int)$month,
+                $filename,
+                WebApp::nullableCast($data['idGroup'] ?? null, 'int'),
+                $data['membersOnly']
+            );
+
+            $this->renderJson(
+                $response,
+                $response['success'],
+                $response['success'] ? ApplicationError::Ok->value : ApplicationError::BadRequest->value
+            );
         }
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
-        $data = $this->getJsonInput();
-        $response = $this->mediaManager->sharefile($year, $month, $filename, WebApp::nullableCast($data['idGroup'] ?? null, 'int'), $data['membersOnly']);
-        $this->renderJson($response, $response['success'], $response['success'] ? ApplicationError::Ok->value : ApplicationError::BadRequest->value);
     }
 
     public function uploadFile(): void
     {
-        if (!($this->application->getConnectedUser()->isRedactor() ?? false)) {
-            $this->renderJsonForbidden(__FILE__, __LINE__);
-            return;
-        }
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
-        if (empty($_FILES['file'])) {
-            $this->renderJson(['message' => 'Aucun fichier sélectionné'], false, ApplicationError::Ok->value);
-            return;
-        }
-        $file = $_FILES['file'];
-        if ($file['error'] !== UPLOAD_ERR_OK) {
-            $response = ['message' => 'Erreur lors de l\'upload: ' . $this->getUploadErrorMessage($file['error'])];
-            $this->renderJsonOk($response);
-            return;
-        }
-        try {
-            $data = $this->mediaManager->uploadFile($file);
-            $this->renderJsonOk($data, 'Fichier uploadé avec succès');
-        } catch (Throwable $e) {
-            $this->renderJson(
-                [],
-                false,
-                ApplicationError::Error->value,
-                $e->getMessage()
-            );
+        if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isRedactor())) {
+
+            if (empty($_FILES['file'])) {
+                $this->renderJson(['message' => 'Aucun fichier sélectionné'], false, ApplicationError::Ok->value);
+                return;
+            }
+            $file = $_FILES['file'];
+            if ($file['error'] !== UPLOAD_ERR_OK) {
+                $response = ['message' => "Erreur lors de l'upload: " . $this->getUploadErrorMessage($file['error'])];
+                $this->renderJsonOk($response);
+                return;
+            }
+            try {
+                $data = $this->mediaManager->uploadFile($file);
+                $this->renderJsonOk($data, 'Fichier uploadé avec succès');
+            } catch (Throwable $e) {
+                $this->renderJson(
+                    [],
+                    false,
+                    ApplicationError::Error->value,
+                    $e->getMessage()
+                );
+            }
         }
     }
 

@@ -1,7 +1,7 @@
 import ApiClient from '../../Common/js/ApiClient.js';
 
 const api = new ApiClient();
-const t   = (key) => window.t?.(key) ?? key;
+const t = (key) => window.t?.(key) ?? key;
 
 // ── Copy URL buttons ──────────────────────────────────────────────────────────
 
@@ -43,17 +43,17 @@ document.querySelectorAll('.delete-file-btn').forEach((btn) => {
 
 // ── Share modal ───────────────────────────────────────────────────────────────
 
-const shareModal     = new bootstrap.Modal(document.getElementById('shareModal'));
-const shareFileName  = document.getElementById('shareFileName');
-const shareStatus    = document.getElementById('shareStatus');
-const shareForm      = document.getElementById('shareForm');
-const shareLinkBox   = document.getElementById('shareLink');
+const shareModal = new bootstrap.Modal(document.getElementById('shareModal'));
+const shareFileName = document.getElementById('shareFileName');
+const shareStatus = document.getElementById('shareStatus');
+const shareForm = document.getElementById('shareForm');
+const shareLinkBox = document.getElementById('shareLink');
 const shareLinkInput = document.getElementById('shareLinkInput');
-const groupSelect    = document.getElementById('group-select');
-const membersOnly    = document.getElementById('members-only-checkbox');
+const groupSelect = document.getElementById('group-select');
+const membersOnly = document.getElementById('members-only-checkbox');
 const createShareBtn = document.getElementById('createShareBtn');
 const deleteShareBtn = document.getElementById('deleteShareBtn');
-const copyShareLink  = document.getElementById('copyShareLink');
+const copyShareLink = document.getElementById('copyShareLink');
 
 let currentPath = null;
 
@@ -66,16 +66,16 @@ function clearStatus() {
 }
 
 async function loadShareState(path) {
-    const data = await api.get(`/media/shareInfo?path=${encodeURIComponent(path)}`);
-
-    if (data.success === false) {
+    const response = await api.get(`/api/media/isShared?path=${encodeURIComponent(path)}`);
+    if (response.success === false) {
         setStatus(t('shareError'), 'danger');
         return;
     }
 
+    const data = response.data;
     if (data.shared) {
-        groupSelect.value    = data.idGroup ?? '';
-        membersOnly.checked  = !!data.membersOnly;
+        groupSelect.value = data.idGroup ?? '';
+        membersOnly.checked = !!data.membersOnly;
         shareLinkInput.value = data.link ?? '';
         shareLinkBox.classList.remove('d-none');
         deleteShareBtn.classList.remove('d-none');
@@ -98,9 +98,9 @@ document.querySelectorAll('.share-file-btn').forEach((btn) => {
 });
 
 createShareBtn.addEventListener('click', async () => {
-    const data = await api.post('/media/share', {
-        path:        currentPath,
-        idGroup:     groupSelect.value,
+    const data = await api.post('/api/media/shareFile', {
+        path: currentPath,
+        idGroup: groupSelect.value,
         membersOnly: membersOnly.checked ? 1 : 0,
     });
 
@@ -117,7 +117,7 @@ createShareBtn.addEventListener('click', async () => {
 });
 
 deleteShareBtn.addEventListener('click', async () => {
-    const data = await api.post('/media/shareDelete', { path: currentPath });
+    const data = await api.post('/api/media/shareDelete', { path: currentPath });
 
     if (data.success === false) {
         setStatus(t('shareError'), 'danger');

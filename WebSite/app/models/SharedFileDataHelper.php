@@ -36,13 +36,18 @@ class SharedFileDataHelper extends Data
 
     public function getSharedFile(string $path): object | false
     {
-        $sql = "SELECT *
-            FROM SharedFile
-            WHERE Item LIKE :path 
-            LIMIT 1";
+        $sql = "SELECT 
+                    IdGroup AS idGroup,
+                    OnlyForMembers AS membersOnly,
+                    Token
+                FROM SharedFile
+                WHERE Item = :path
+                LIMIT 1";
+
         $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([':path' => '%' . $path]);
-        return $stmt->fetch();
+        $stmt->execute([':path' => $path]);
+
+        return $stmt->fetch(PDO::FETCH_OBJ);
     }
 
     public function removeShareFile(string $path): void

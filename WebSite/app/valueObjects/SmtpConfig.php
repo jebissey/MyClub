@@ -27,7 +27,7 @@ final readonly class SmtpConfig
     public function getSenderAddress(string $connectedUserEmail): string
     {
         return match ($this->method) {
-            'smtp'    => $this->username,
+            'smtp'    => $this->from,
             'mailjet' => $this->senderEmail,
             default   => $connectedUserEmail,
         };
