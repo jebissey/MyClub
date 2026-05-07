@@ -50,7 +50,7 @@ class PersonController extends TableController
     public function edit(int $id): void
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isPersonManager())) {
-            $person = $this->dataHelper->get('Person', ['Id' => $id], 'Id, Imported, Email, FirstName, LastName, Alert');
+            $person = $this->dataHelper->get('Person', ['Id' => $id], 'Id, Imported, Email, FirstName, LastName, Alert, MemberInfo');
             if (!$person) {
                 $this->raiseBadRequest("Unknown person {$id}", __FILE__, __LINE__);
                 return;
@@ -154,8 +154,8 @@ class PersonController extends TableController
                 $this->dataHelper->set(
                     'Person',
                     [
-                        'Alert' => $input['alert'] ?? '',
-                        'MemberInfo' => $input['memberInfo'] ?? ''
+                        'Alert' => $input['alert'],
+                        'MemberInfo' => $input['memberInfo']
                     ],
                     ['Id' => $person->Id]
                 );
