@@ -421,7 +421,7 @@ class ArticleController extends TableController
 
     public function show(int $id): void
     {
-        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+        if (!in_array($_SERVER['REQUEST_METHOD'], ['GET', 'HEAD'])) {
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }

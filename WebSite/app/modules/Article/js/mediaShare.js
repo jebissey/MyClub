@@ -57,8 +57,9 @@ const copyShareLink = document.getElementById('copyShareLink');
 
 let currentPath = null;
 
-function setStatus(message, type = 'info') {
-    shareStatus.innerHTML = `<div class="alert alert-${type} py-2">${message}</div>`;
+function setStatus(message, type = 'info', detail = '') {
+    const detailHtml = detail ? `<br><small class="opacity-75">${detail}</small>` : '';
+    shareStatus.innerHTML = `<div class="alert alert-${type} py-2">${message}${detailHtml}</div>`;
 }
 
 function clearStatus() {
@@ -117,9 +118,15 @@ createShareBtn.addEventListener('click', async () => {
 });
 
 deleteShareBtn.addEventListener('click', async () => {
-    const data = await api.post('/api/media/shareDelete', { path: currentPath });
+    let data;
+    try {
+        data = await api.post('/api/media/removeShare', { path: currentPath });
+    } catch (err) {
+        setStatus(t('shareError'), 'danger', err.message);
+        return;
+    }
 
-    if (data.success === false) {
+    if (!data?.success) {
         setStatus(t('shareError'), 'danger');
         return;
     }

@@ -29,15 +29,9 @@ class MediaApi extends AbstractApi
 
     public function deleteFile(int $year, int $month, string $filename): void
     {
-        if (!($this->application->getConnectedUser()->isRedactor() ?? false)) {
-            $this->renderJsonForbidden(__FILE__, __LINE__);
-            return;
+        if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isRedactor())) {
+            $this->renderJsonOk($this->mediaManager->deleteFile($year, $month, $filename));
         }
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
-        $this->renderJsonOk($this->mediaManager->deleteFile($year, $month, $filename));
     }
 
     public function isShared(): void
@@ -53,10 +47,16 @@ class MediaApi extends AbstractApi
         }
     }
 
-    public function removeFileShare(int $year, int $month, string $filename): void
+    public function removeFileShare(): void
     {
         if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isRedactor())) {
-            $response = $this->mediaManager->removeFileShare($year, $month, $filename);
+            $data = $this->getJsonInput();
+            $filePath = trim($data['path'] ?? '');
+            if (!$filePath) {
+                $this->renderJsonBadRequest('Missing path', __FILE__, __LINE__);
+                return;
+            }
+            $response = $this->mediaManager->removeFileShare($filePath);
             $this->renderJson($response, $response['success'], $response['success'] ? ApplicationError::Ok->value : ApplicationError::BadRequest->value);
         }
     }

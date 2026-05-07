@@ -116,9 +116,8 @@ class MediaManager
         ];
     }
 
-    public function removeFileShare(int $year, int $month, string $filename): array
+    public function removeFileShare(string $filePath): array
     {
-        $filePath = $this->buildFilePath($year, $month, $filename);
         if ($filePath === null) {
             return $this->error($this->languagesDataHelper->translate('media_manager.file_not_exists'));
         }
@@ -130,7 +129,7 @@ class MediaManager
 
     public function isShared(string $filePath): array
     {
-        $sharedFile = $this->sharedFileDataHelper->getSharedFile(realpath(self::MEDIA_PATH . $filePath));
+        $sharedFile = $this->sharedFileDataHelper->getSharedFile($filePath);
         if ($sharedFile === false || empty($sharedFile->Token)) {
             return [
                 'shared' => false
@@ -160,13 +159,8 @@ class MediaManager
 
     private function buildFilePath(int $year, int $month, string $filename): ?string
     {
-        $safeFilename = basename($filename);
-
-        $path = realpath(self::MEDIA_PATH
-            . sprintf('%04d', $year) . DIRECTORY_SEPARATOR
-            . sprintf('%02d', $month) . DIRECTORY_SEPARATOR
-            . $safeFilename);
-        return file_exists($path) ? $path : null;
+        $path = sprintf('%04d', $year) . DIRECTORY_SEPARATOR . sprintf('%02d', $month) . DIRECTORY_SEPARATOR . basename($filename);
+        return file_exists(realpath(self::MEDIA_PATH . $path)) ? $path : null;
     }
 
     private function getOrCreateDirectory(int $year, int $month): string

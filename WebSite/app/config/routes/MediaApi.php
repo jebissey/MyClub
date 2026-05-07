@@ -20,7 +20,7 @@ class MediaApi implements RouteInterface
 
         $this->routes[] = new Route('POST /api/media/delete/@year:[0-9]+/@month:[0-9]+/@filename', $mediaApi, 'deleteFile');
         $this->routes[] = new Route('GET  /api/media/isShared', $mediaApi, 'isShared');
-        $this->routes[] = new Route('POST /api/media/removeShare/@year:[0-9]+/@month:[0-9]+/@filename', $mediaApi, 'removeFileShare');
+        $this->routes[] = new Route('POST /api/media/removeShare', $mediaApi, 'removeFileShare');
         $this->routes[] = new Route('POST /api/media/shareFile', $mediaApi, 'shareFile');
         $this->routes[] = new Route('POST /api/media/upload', $mediaApi, 'uploadFile');
 

@@ -54,8 +54,8 @@ class SharedFileDataHelper extends Data
     {
         $sql = "UPDATE SharedFile 
                 SET Token = null
-                WHERE Item LIKE :path";
+                WHERE Item = :path";
         $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([':path' => '%' . $path]);
+        $stmt->execute([':path' => $path]);
     }
 }
