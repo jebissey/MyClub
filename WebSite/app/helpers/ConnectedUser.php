@@ -55,6 +55,7 @@ class ConnectedUser
                 'isEditor' => $this->isEditor(),
                 'isEventDesigner' => $this->isEventDesigner(),
                 'isEventManager' => $this->isEventManager(),
+                'isExerciseDesigner' => $this->isExerciseDesigner(),
                 'isHomeDesigner' => $this->isHomeDesigner(),
                 'isKanbanDesigner' => $this->isKanbanDesigner(),
                 'isLoanDesigner' => $this->isLoanDesigner(),
@@ -105,7 +106,7 @@ class ConnectedUser
 
     public function isDesigner(): bool
     {
-        return $this->isEventDesigner() || $this->isHomeDesigner() || $this->isMenuDesigner();
+        return $this->isEventDesigner() || $this->isExerciseDesigner() || $this->isHomeDesigner() || $this->isMenuDesigner();
     }
 
     public function isEditor(): bool
@@ -121,6 +122,11 @@ class ConnectedUser
     public function isEventManager(): bool
     {
         return in_array(Authorization::EventManager->value, $this->authorizations ?? []);
+    }
+
+    public function isExerciseDesigner(): bool
+    {
+        return in_array(Authorization::ExerciseDesigner->value, $this->authorizations ?? []);
     }
 
     public function isGroupManager(): bool

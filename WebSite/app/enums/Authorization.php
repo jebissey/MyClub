@@ -10,6 +10,7 @@ enum Authorization: string
     case Editor = 'Editor';
     case EventDesigner = 'EventDesigner';
     case EventManager = 'EventManager';
+    case ExerciseDesigner = 'ExerciseDesigner';
     case HomeDesigner = 'HomeDesigner';
     case KanbanDesigner = 'KanbanDesigner';
     case LoanDesigner = 'LoanDesigner';

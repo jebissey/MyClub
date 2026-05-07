@@ -29,6 +29,8 @@ use app\config\routes\EventNeedApi;
 use app\config\routes\EventNeedTypeApi;
 use app\config\routes\EventSupplyApi;
 use app\config\routes\EventType;
+use app\config\routes\Exercise;
+use app\config\routes\ExerciseApi;
 use app\config\routes\Ffa;
 use app\config\routes\Group;
 use app\config\routes\GroupApi;
@@ -210,6 +212,7 @@ class Routes
         );
         $this->apiFactory = new ApiFactory(
             $application,
+            new ArticleDataHelper($application, $authorizationDataHelper),
             new AttributeDataHelper($application),
             $authorizationDataHelper,
             new CarouselDataHelper($application),
@@ -237,7 +240,6 @@ class Routes
             $participantDataHelper,
             $personDataHelper,
             $personPreferences,
-            $sharedFileDataHelper,
         );
     }
 
@@ -286,6 +288,8 @@ class Routes
         $this->routes = array_merge($this->routes, (new EventNeedTypeApi($this->apiFactory))->get());
         $this->routes = array_merge($this->routes, (new EventSupplyApi($this->apiFactory))->get());
         $this->routes = array_merge($this->routes, (new EventType($this->controllerFactory))->get());
+        $this->routes = array_merge($this->routes, (new Exercise($this->controllerFactory))->get());
+        $this->routes = array_merge($this->routes, (new ExerciseApi($this->apiFactory))->get());
         $this->routes = array_merge($this->routes, (new Ffa($this->controllerFactory))->get());
         $this->routes = array_merge($this->routes, (new Group($this->controllerFactory))->get());
         $this->routes = array_merge($this->routes, (new GroupApi($this->apiFactory))->get());

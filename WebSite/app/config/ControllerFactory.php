@@ -55,6 +55,7 @@ use app\modules\Event\EventEmailController;
 use app\modules\Event\EventGuestController;
 use app\modules\Event\EventNeedController;
 use app\modules\Event\EventTypeController;
+use app\modules\Exercise\ExerciseController;
 use app\modules\Games\Karaoke\KaraokeController;
 use app\modules\Games\Leapfrog\LeapfrogController;
 use app\modules\Games\Solfege\SolfegeController;
@@ -191,6 +192,15 @@ class ControllerFactory
             $this->crosstabDataHelper,
             $this->participantDataHelper,
             $this->messageDataHelper
+        );
+    }
+
+    public function makeExerciseController(): ExerciseController
+    {
+        return new ExerciseController(
+            $this->application,
+            $this->articleService,
+            $this->articleDataHelper,
         );
     }
 

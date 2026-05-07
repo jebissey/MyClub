@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{$title}</title>
+    <link rel="stylesheet" href="/app/modules/Common/css/bootstrap.min.css">
+    <style>
+        body { background: #000; color: #fff; overflow: hidden; }
+
+        /* ── Préparation ── */
+        #screenPrep {
+            display: none;
+            position: fixed; inset: 0;
+            background: #111;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+        }
+        #screenPrep img { max-height: 40vh; object-fit: contain; margin-bottom: 1.5rem; border-radius: .5rem; }
+        #prepTitle { font-size: 2.5rem; font-weight: 700; }
+        #prepText  { font-size: 1.3rem; color: #ccc; margin-top: 1rem; }
+        #prepTimer { font-size: 1rem; color: #888; margin-top: 1.5rem; }
+
+        /* ── Exercice ── */
+        #screenEx {
+            display: none;
+            position: fixed; inset: 0;
+            background: #000;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        #exName  { font-size: 2rem; color: #aaa; margin-bottom: 1rem; }
+        #exTimer { font-size: min(25vw, 20rem); font-weight: 900; font-variant-numeric: tabular-nums; line-height: 1; }
+        #exTimer.warning { color: #fd7e14; }
+        #exTimer.urgent  { color: #dc3545; }
+
+        /* ── Fin ── */
+        #screenEnd {
+            display: none;
+            position: fixed; inset: 0;
+            background: #1a1a2e;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<div id="screenPrep" style="display:flex">
+    <img id="prepImage" src="" alt="" style="display:none">
+    <div id="prepTitle"></div>
+    <div id="prepText"></div>
+    <div id="prepTimer"></div>
+</div>
+
+<div id="screenEx" style="display:flex">
+    <div id="exName"></div>
+    <div id="exTimer">0</div>
+</div>
+
+<div id="screenEnd" style="display:flex">
+    <div>✅ Terminé !</div>
+    <small style="font-size:1rem;color:#aaa;margin-top:1rem">Appuyez pour recommencer</small>
+</div>
+
+<script>
+    window.exercises = {=json_encode($exercises)|noescape};
+    window.setTitle  = {=json_encode($title)|noescape};
+</script>
+<script type="module" src="/app/modules/Exercise/js/player.js"></script>
+</body>
+</html>

@@ -1,0 +1,122 @@
+{layout '../../Common/views/layout.latte'}
+
+{block navbar}
+    {include '../../Webmaster/views/navbar/_userLeft.latte'}
+{/block}
+
+{block content}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="h4 mb-0">
+        <i class="bi bi-clipboard2-pulse me-2 text-primary"></i>
+        {='exercise.title'|translate}
+    </h2>
+    <div class="d-flex gap-2">
+        <a href="/exercise/play/{$articleId}" class="btn btn-success btn-sm" target="_blank">
+            <i class="bi bi-play-fill"></i> {='exercise.nav.player'|translate}
+        </a>
+        <button class="btn btn-primary btn-sm" id="btnAddExercise">
+            <i class="bi bi-plus-lg"></i> {='exercise.add'|translate}
+        </button>
+    </div>
+</div>
+
+<div class="mb-3">
+    <input type="text" class="form-control" id="setTitle"
+           placeholder="Titre de l'ensemble" value="{$title}">
+</div>
+
+<div id="exerciseList" class="d-flex flex-column gap-3"></div>
+
+<div class="mt-3 d-flex justify-content-end">
+    <button class="btn btn-warning text-white" id="btnSaveAll">
+        <i class="bi bi-floppy"></i> {='exercise.save'|translate}
+    </button>
+</div>
+
+{* Template card d'un exercice (cloné par JS) *}
+<template id="tplExercise">
+    <div class="card shadow-sm exercise-card" data-index="">
+        <div class="card-header d-flex justify-content-between align-items-center bg-primary text-white">
+            <span class="fw-semibold exercise-label">Exercice #<span class="idx"></span></span>
+            <div class="d-flex gap-1">
+                <button class="btn btn-sm btn-light btn-move-up"   title="Monter">↑</button>
+                <button class="btn btn-sm btn-light btn-move-down" title="Descendre">↓</button>
+                <button class="btn btn-sm btn-danger btn-del-exercise">
+                    <i class="bi bi-trash"></i>
+                </button>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+
+                {* ── Préparation ── *}
+                <div class="col-12"><h6 class="text-muted text-uppercase small">Préparation</h6></div>
+
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">{='exercise.prep.title'|translate}</label>
+                    <input type="text" class="form-control ex-prep-title">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">{='exercise.prep.duration'|translate}</label>
+                    <input type="number" class="form-control ex-prep-duration" min="0" value="0">
+                </div>
+                <div class="col-12">
+                    <label class="form-label fw-semibold">{='exercise.prep.text'|translate}</label>
+                    <textarea class="form-control ex-prep-text" rows="2"></textarea>
+                </div>
+
+                {* Image *}
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">{='exercise.prep.image'|translate}</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control ex-prep-image" placeholder="chemin/image.jpg" readonly>
+                        <button class="btn btn-outline-secondary btn-pick-image" type="button">
+                            <i class="bi bi-image"></i>
+                        </button>
+                        <button class="btn btn-outline-danger btn-clear-image" type="button">
+                            <i class="bi bi-x"></i>
+                        </button>
+                    </div>
+                    <div class="ex-image-preview mt-1"></div>
+                </div>
+
+                {* Son *}
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">{='exercise.prep.sound'|translate}</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control ex-prep-sound" placeholder="chemin/son.mp3" readonly>
+                        <button class="btn btn-outline-secondary btn-pick-sound" type="button">
+                            <i class="bi bi-music-note"></i>
+                        </button>
+                        <button class="btn btn-outline-danger btn-clear-sound" type="button">
+                            <i class="bi bi-x"></i>
+                        </button>
+                    </div>
+                    <small class="text-muted ex-sound-duration"></small>
+                </div>
+
+                {* ── Exercice ── *}
+                <div class="col-12"><hr><h6 class="text-muted text-uppercase small">Exercice</h6></div>
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">{='exercise.ex.duration'|translate}</label>
+                    <input type="number" class="form-control ex-ex-duration" min="1" value="60">
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+{include 'partials/modalPickImage.latte'}
+{include 'partials/modalPickSound.latte'}
+
+{/block}
+
+{block scripts}
+<script>
+    window.articleId  = {$articleId};
+    window.exercises  = {=json_encode($exercises)|noescape};
+    window.i18n = {=json_encode($translations)|noescape};
+    window.t = k => window.i18n?.[k] ?? k;
+</script>
+<script type="module" src="/app/modules/Exercise/js/editor.js"></script>
+{/block}

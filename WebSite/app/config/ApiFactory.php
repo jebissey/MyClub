@@ -13,6 +13,7 @@ use app\apis\EventAttributeApi;
 use app\apis\EventNeedApi;
 use app\apis\EventNeedTypeApi;
 use app\apis\EventSupplyApi;
+use app\apis\ExerciseApi;
 use app\apis\GroupApi;
 use app\apis\ImportApi;
 use app\apis\KanbanApi;
@@ -32,6 +33,7 @@ use app\helpers\GravatarHandler;
 use app\helpers\MediaManager;
 use App\Helpers\NotificationSender;
 use app\helpers\PersonPreferences;
+use app\models\ArticleDataHelper;
 use app\models\AttributeDataHelper;
 use app\models\AuthorizationDataHelper;
 use app\models\CarouselDataHelper;
@@ -51,7 +53,6 @@ use app\models\NeedDataHelper;
 use app\models\NeedTypeDataHelper;
 use app\models\ParticipantDataHelper;
 use app\models\PersonDataHelper;
-use app\models\SharedFileDataHelper;
 use app\modules\Common\services\CredentialService;
 use app\modules\Common\services\EmailService;
 use app\modules\Common\services\EventService;
@@ -62,6 +63,7 @@ class ApiFactory
 {
     public function __construct(
         private Application $application,
+        private ArticleDataHelper $articleDataHelper,
         private AttributeDataHelper $attributeDataHelper,
         private AuthorizationDataHelper $authorizationDataHelper,
         private CarouselDataHelper $carouselDataHelper,
@@ -89,7 +91,6 @@ class ApiFactory
         private ParticipantDataHelper $participantDataHelper,
         private PersonDataHelper $personDataHelper,
         private PersonPreferences $personPreferences,
-        private SharedFileDataHelper $sharedFileDataHelper,
     ) {}
 
     public function makeArticleApi(): ArticleApi
@@ -201,6 +202,17 @@ class ApiFactory
             $this->dataHelper,
             $this->personDataHelper
         );
+    }
+
+    public function makeExerciseApi(): ExerciseApi
+    {
+        return new ExerciseApi(
+            $this->application,
+            $this->connectedUser,
+            $this->dataHelper,
+            $this->personDataHelper,
+            $this->articleDataHelper
+         );
     }
 
     public function makeGroupApi(): GroupApi

@@ -9,6 +9,12 @@
             </li>
             {/if}
 
+            {if $isExerciseDesigner}
+            <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" title="{='navbar.designer.exercise'|translate}">
+                <a class="nav-link {if $page == 'exercise'}active{/if}" href="/exercise"><h2>🏋️</h2></a>
+            </li>
+            {/if}
+
             {if $isHomeDesigner}
             <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" title="{='navbar.designer.settings'|translate}">
                 <a class="nav-link {if $page == 'settings'}active{/if}" href="/settings"><h2>🔧</h2></a>
