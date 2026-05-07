@@ -25,7 +25,7 @@ class SharedFileDataHelper extends Data
         $used = [];
         foreach ($paths as $path) {
             foreach ($items as $item) {
-                if ($item !== null && str_ends_with($item, $path)) {
+                if ($item === $path) {
                     $used[$path] = true;
                     break;
                 }

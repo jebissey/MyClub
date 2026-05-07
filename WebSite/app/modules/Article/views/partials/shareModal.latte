@@ -1,0 +1,52 @@
+<div class="modal fade" id="shareModal" tabindex="-1" aria-labelledby="shareModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="shareModalLabel">{='media.manager.share.modal_title'|translate}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p><strong>{='media.manager.share.file_label'|translate}</strong> <span id="shareFileName"></span></p>
+                
+                <div id="shareStatus"></div>
+                
+                <div id="shareForm">
+                    <div class="d-flex align-items-center gap-2 mb-3">
+                        <label for="group-select" class="form-label mb-0 text-nowrap">{='media.manager.share.group_label'|translate}</label>
+                        <select class="form-select" id="group-select" name="idGroup">
+                            <option value="">{='media.manager.share.no_group'|translate}</option>
+                            {foreach $groups as $group}
+                            <option value="{$group->Id}">{$group->Name}</option>
+                            {/foreach}
+                        </select>
+                    </div>
+                    <div class="d-flex align-items-center gap-2 mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="members-only-checkbox" name="membersOnly" value="1" checked {if !$isEditor}disabled{/if}>
+                            <label class="form-check-label" for="members-only-checkbox">{='media.manager.share.members_only'|translate}</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="shareLink" class="alert alert-success d-none">
+                    <label class="form-label">{='media.manager.share.link_label'|translate}</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="shareLinkInput" readonly>
+                        <button class="btn btn-outline-secondary" type="button" id="copyShareLink">
+                            <i class="bi bi-clipboard"></i> {='media.manager.share.copy'|translate}
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{='close'|translate}</button>
+                <button type="button" class="btn btn-primary" id="createShareBtn">
+                    <i class="bi bi-share"></i> {='media.manager.share.create'|translate}
+                </button>             
+                <button type="button" class="btn btn-warning" id="deleteShareBtn">
+                    <i class="bi bi-share"></i> {='media.manager.share.delete'|translate}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -276,35 +276,6 @@ class MediaController extends AbstractController
         return $fileExtensions;
     }
 
-    private function getMonths(int $yearRequested): array
-    {
-        $foundMonths = [];
-        $basePath = MediaManager::GetMediaPath();
-        if (file_exists($basePath) && is_dir($basePath)) {
-            $dirs = scandir($basePath);
-            foreach ($dirs as $year) {
-                if ($year !== '.' && $year !== '..' && is_dir($basePath . $year)) {
-                    if (!(is_numeric($year) && (int)$year === $yearRequested)) continue;
-                    $months = scandir($basePath . $year);
-                    foreach ($months as $month) {
-                        if ($month !== '.' && $month !== '..' && is_dir($basePath . $year . DIRECTORY_SEPARATOR . $month)) {
-                            $files = scandir($basePath . $year . DIRECTORY_SEPARATOR . $month);
-                            foreach ($files as $file) {
-                                if (is_file($basePath . $year . DIRECTORY_SEPARATOR . $month . DIRECTORY_SEPARATOR . $file)) {
-                                    $foundMonths[] = $month;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            $foundMonths = array_unique($foundMonths);
-            sort($foundMonths);
-        }
-        array_unshift($foundMonths, "");
-        return $foundMonths;
-    }
-
     private function getFiles(int $year, string $monthFiltered, string $fileExtension, string $search = '', bool $unusedOnly = false): array
     {
         $yearPath = MediaManager::GetMediaPath() . $year . '/';
@@ -330,9 +301,7 @@ class MediaController extends AbstractController
                     || ($search !== '' && stripos($file, $search) === false)
                 ) continue;
 
-                $path = 'data' . DIRECTORY_SEPARATOR . 'media' . DIRECTORY_SEPARATOR
-                    . $year . DIRECTORY_SEPARATOR . $month . DIRECTORY_SEPARATOR . $file;
-
+                $path = $year . DIRECTORY_SEPARATOR . $month . DIRECTORY_SEPARATOR . $file;
                 $candidates[] = [
                     'name'      => $file,
                     'path'      => $path,
@@ -379,5 +348,34 @@ class MediaController extends AbstractController
 
         usort($files, fn($a, $b) => strtotime($b['date']) - strtotime($a['date']));
         return $files;
+    }
+
+    private function getMonths(int $yearRequested): array
+    {
+        $foundMonths = [];
+        $basePath = MediaManager::GetMediaPath();
+        if (file_exists($basePath) && is_dir($basePath)) {
+            $dirs = scandir($basePath);
+            foreach ($dirs as $year) {
+                if ($year !== '.' && $year !== '..' && is_dir($basePath . $year)) {
+                    if (!(is_numeric($year) && (int)$year === $yearRequested)) continue;
+                    $months = scandir($basePath . $year);
+                    foreach ($months as $month) {
+                        if ($month !== '.' && $month !== '..' && is_dir($basePath . $year . DIRECTORY_SEPARATOR . $month)) {
+                            $files = scandir($basePath . $year . DIRECTORY_SEPARATOR . $month);
+                            foreach ($files as $file) {
+                                if (is_file($basePath . $year . DIRECTORY_SEPARATOR . $month . DIRECTORY_SEPARATOR . $file)) {
+                                    $foundMonths[] = $month;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            $foundMonths = array_unique($foundMonths);
+            sort($foundMonths);
+        }
+        array_unshift($foundMonths, "");
+        return $foundMonths;
     }
 }

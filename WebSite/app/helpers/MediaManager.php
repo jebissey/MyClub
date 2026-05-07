@@ -110,10 +110,7 @@ class MediaManager
             $sharedFile !== false ? ['Id' => $sharedFile->Id] : []
         );
 
-        return [
-            'success' => true,
-            'token' => $token
-        ];
+        return $this->isShared($filePath);
     }
 
     public function removeFileShare(string $filePath): array

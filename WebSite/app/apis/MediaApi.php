@@ -88,8 +88,8 @@ class MediaApi extends AbstractApi
 
             $this->renderJson(
                 $response,
-                $response['success'],
-                $response['success'] ? ApplicationError::Ok->value : ApplicationError::BadRequest->value
+                true,
+                ApplicationError::Ok->value
             );
         }
     }

@@ -88,6 +88,20 @@ async function loadShareState(path) {
     }
 }
 
+function updateSharedColumn(path, isShared) {
+    const row = document.querySelector(`tr .share-file-btn[data-path="${CSS.escape(path)}"]`)?.closest('tr');
+    if (!row) return;
+
+    const sharedCell = row.querySelector('td:nth-child(7)'); // 7ème colonne = "Partagé"
+    if (!sharedCell) return;
+
+    if (isShared) {
+        sharedCell.innerHTML = `<span class="text-success">Oui</span>`;
+    } else {
+        sharedCell.innerHTML = '';
+    }
+}
+
 document.querySelectorAll('.share-file-btn').forEach((btn) => {
     btn.addEventListener('click', () => {
         currentPath = btn.dataset.path;
@@ -98,25 +112,28 @@ document.querySelectorAll('.share-file-btn').forEach((btn) => {
     });
 });
 
+// ── Create Share ─────────────────────────────────────────────────────────────
 createShareBtn.addEventListener('click', async () => {
-    const data = await api.post('/api/media/shareFile', {
+    const response = await api.post('/api/media/shareFile', {
         path: currentPath,
         idGroup: groupSelect.value,
         membersOnly: membersOnly.checked ? 1 : 0,
     });
 
-    if (data.success === false) {
+    if (response.success === false) {
         setStatus(t('shareError'), 'danger');
         return;
     }
 
-    shareLinkInput.value = data.link;
+    shareLinkInput.value = response.data.link;
     shareLinkBox.classList.remove('d-none');
     deleteShareBtn.classList.remove('d-none');
     createShareBtn.classList.add('d-none');
     setStatus(t('shareCreated'), 'success');
+    updateSharedColumn(currentPath, true);
 });
 
+// ── Delete Share ─────────────────────────────────────────────────────────────
 deleteShareBtn.addEventListener('click', async () => {
     let data;
     try {
@@ -135,6 +152,7 @@ deleteShareBtn.addEventListener('click', async () => {
     deleteShareBtn.classList.add('d-none');
     createShareBtn.classList.remove('d-none');
     setStatus(t('shareDeleted'), 'warning');
+    updateSharedColumn(currentPath, false);
 });
 
 copyShareLink.addEventListener('click', async () => {
