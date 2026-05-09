@@ -7,6 +7,7 @@ namespace app\models;
 use DateTime;
 use PDO;
 
+use app\enums\EventAudience;
 use app\exceptions\QueryException;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
@@ -29,6 +30,41 @@ class AuthorizationDataHelper extends Data
             WHERE Person.Id = ?");
         $query->execute([$connectedUser->person?->Id ?? 0]);
         return array_column($query->fetchAll(), 'Name');
+    }
+
+    public function canPersonReadMediaFile(int $year, int $month, string $filename, ConnectedUser $connectedUser): bool
+    {
+        $path = sprintf('%04d/%02d/%s', $year, $month, $filename);
+
+        $stmt = $this->pdo->prepare(
+            "SELECT CreatedBy, PublishedBy, OnlyForMembers, IdGroup
+             FROM Article
+             WHERE Content LIKE :pattern"
+        );
+        $stmt->execute([':pattern' => '%' . $path . '%']);
+        $articles = $stmt->fetchAll(PDO::FETCH_OBJ);
+
+        foreach ($articles as $article) {
+            if ($this->canReadArticle($article, $connectedUser)) {
+                return true;
+            }
+        }
+
+        $stmt = $this->pdo->prepare(
+            "SELECT ArticleId, EventId, GroupId
+             FROM Message
+             WHERE ImagePath LIKE :pattern"
+        );
+        $stmt->execute([':pattern' => '%' . $path . '%']);
+        $messages = $stmt->fetchAll(PDO::FETCH_OBJ);
+
+        foreach ($messages as $message) {
+            if ($this->canReadMessageParent($message, $connectedUser)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public function canPersonReadOrderResults(object $article, ConnectedUser $connectedUser): bool
@@ -97,7 +133,7 @@ class AuthorizationDataHelper extends Data
     }
 
     #region Private functions
-    private function canReadArticle($article, ConnectedUser $connectedUser): bool
+    private function canReadArticle(object $article, ConnectedUser $connectedUser): bool
     {
         if (!$article) return false;
         if (($connectedUser->person  ?? false) && ($article->CreatedBy == $connectedUser->person->Id || $connectedUser->isEditor())) return true;
@@ -112,5 +148,62 @@ class AuthorizationDataHelper extends Data
         $groupsFilter = preg_replace('/[^\p{L}]/u', '', $groupsFilter);
         $rows = $this->gets('Group', ['Name LIKE "%' . $groupsFilter . '%"' => null]);
         return array_column($rows, 'Id');
+    }
+
+
+
+    private function canReadMessageParent(object $message, ConnectedUser $connectedUser): bool
+    {
+        if (!empty($message->ArticleId)) {
+            $article = $this->get('Article', ['Id' => $message->ArticleId], 'CreatedBy, PublishedBy, OnlyForMembers, IdGroup');
+            return $article && $this->canReadArticle($article, $connectedUser);
+        }
+
+        if (!empty($message->EventId)) {
+            return $this->canReadEventById($message->EventId, $connectedUser);
+        }
+
+        if (!empty($message->GroupId)) {
+            if (!($connectedUser->person ?? false)) return false;
+            return in_array($message->GroupId, $this->getUserGroups($connectedUser->person->Email), true);
+        }
+
+        return false;
+    }
+
+    private function canReadEventById(int $eventId, ConnectedUser $connectedUser): bool
+    {
+        if (!($connectedUser->person ?? false)) {
+            $stmt = $this->pdo->prepare("
+                SELECT e.Id FROM Event e
+                JOIN EventType et ON et.Id = e.IdEventType
+                WHERE e.Id = :id
+                  AND et.Inactivated = 0
+                  AND et.IdGroup IS NULL
+                  AND e.Audience = :audience
+            ");
+            $stmt->execute([
+                ':id'       => $eventId,
+                ':audience' => EventAudience::ForAll->value,
+            ]);
+        } else {
+            $stmt = $this->pdo->prepare("
+                SELECT e.Id FROM Event e
+                JOIN EventType et ON et.Id = e.IdEventType
+                WHERE e.Id = :id
+                  AND et.Inactivated = 0
+                  AND (
+                      et.IdGroup IS NULL
+                      OR et.IdGroup IN (
+                          SELECT IdGroup FROM PersonGroup WHERE IdPerson = :personId
+                      )
+                  )
+            ");
+            $stmt->execute([
+                ':id'       => $eventId,
+                ':personId' => $connectedUser->person->Id,
+            ]);
+        }
+        return (bool) $stmt->fetch();
     }
 }

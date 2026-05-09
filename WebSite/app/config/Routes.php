@@ -368,25 +368,57 @@ class Routes
         $rootDir = realpath(__DIR__ . '/../..');
 
         $staticFiles = [
-            '/icon-512.png' =>                     ['dir' => 'images', 'file' => 'icon-512.png',    'type' => 'image/png'],
+            // --- Manifest ---
+            '/manifest.json' => ['dir' => 'root', 'file' => 'manifest.json', 'type' => 'application/manifest+json; charset=UTF-8'],
+
+            // --- App icons ---
             '/apple-touch-icon.png' =>             ['dir' => 'images', 'file' => 'my-club-180.png', 'type' => 'image/png'],
             '/apple-touch-icon-120x120.png' =>     ['dir' => 'images', 'file' => 'my-club-120.png', 'type' => 'image/png'],
             '/apple-touch-icon-180x180.png' =>     ['dir' => 'images', 'file' => 'my-club-180.png', 'type' => 'image/png'],
             '/apple-touch-icon-precomposed.png' => ['dir' => 'images', 'file' => 'my-club-180.png', 'type' => 'image/png'],
             '/favicon.ico' =>                      ['dir' => 'images', 'file' => 'favicon.ico',     'type' => 'image/x-icon'],
             '/Feed-icon.svg' =>                    ['dir' => 'images', 'file' => 'Feed-icon.svg',   'type' => 'image/svg+xml'],
+            '/icon-512.png' =>                     ['dir' => 'images', 'file' => 'icon-512.png',    'type' => 'image/png'],
 
-            '/robots.txt' => ['dir' => 'root', 'file' => 'robots.txt', 'type' => 'text/plain; charset=UTF-8'],
-            '/webCard' => ['dir' => 'root', 'file' => 'businessCard.html', 'type' => 'text/html; charset=UTF-8'],
+            // --- Root static files ---
+            '/robots.txt' => ['dir' => 'root', 'file' => 'robots.txt',        'type' => 'text/plain; charset=UTF-8'],
+            '/webCard'    => ['dir' => 'root', 'file' => 'businessCard.html', 'type' => 'text/html; charset=UTF-8'],
 
+            // --- Service worker (no cache, scope header required) ---
             '/service-worker.js' => [
-                'dir' => 'root',
-                'file' => 'service-worker.js',
-                'type' => 'application/javascript; charset=UTF-8',
-                'noCache' => true,
+                'dir'           => 'root',
+                'file'          => 'service-worker.js',
+                'type'          => 'application/javascript; charset=UTF-8',
+                'noCache'       => true,
                 'serviceWorker' => true,
             ],
 
+            // --- Dynamic: app/images/* ---
+            ...(function () use ($rootDir) {
+                $alreadyRegistered = [
+                    'favicon.ico',
+                    'Feed-icon.svg',
+                    'icon-512.png',
+                    'my-club-120.png',
+                    'my-club-180.png',
+                ];
+
+                $imageFiles = array_filter(
+                    glob($rootDir . '/app/images/*') ?: [],
+                    fn($f) => is_file($f) && !in_array(basename($f), $alreadyRegistered)
+                );
+
+                return $imageFiles ? array_combine(
+                    array_map(fn($f) => '/app/images/' . basename($f), $imageFiles),
+                    array_map(fn($f) => [
+                        'dir'  => 'images',
+                        'file' => basename($f),
+                        'type' => mime_content_type($f),
+                    ], $imageFiles)
+                ) : [];
+            })(),
+
+            // --- Dynamic: HTML files from data/statics/html/ ---
             ...(function () use ($rootDir) {
                 $htmlFiles = array_filter(
                     glob($rootDir . '/data/statics/html/*.html') ?: [],
@@ -395,13 +427,14 @@ class Routes
                 return $htmlFiles ? array_combine(
                     array_map(fn($f) => '/' . basename($f), $htmlFiles),
                     array_map(fn($f) => [
-                        'dir' => 'static_html',
+                        'dir'  => 'static_html',
                         'file' => basename($f),
-                        'type' => 'text/html; charset=UTF-8'
+                        'type' => 'text/html; charset=UTF-8',
                     ], $htmlFiles)
                 ) : [];
             })(),
 
+            // --- Dynamic: images from data/statics/images/ (MIME auto-detected) ---
             ...(function () use ($rootDir) {
                 $imageFiles = array_filter(
                     glob($rootDir . '/data/statics/images/*') ?: [],
@@ -410,13 +443,14 @@ class Routes
                 return $imageFiles ? array_combine(
                     array_map(fn($f) => '/' . basename($f), $imageFiles),
                     array_map(fn($f) => [
-                        'dir' => 'static_image',
+                        'dir'  => 'static_image',
                         'file' => basename($f),
-                        'type' => mime_content_type($f)
+                        'type' => mime_content_type($f),
                     ], $imageFiles)
                 ) : [];
             })(),
 
+            // --- Dynamic: CSS files from data/statics/css/ ---
             ...(function () use ($rootDir) {
                 $cssFiles = array_filter(
                     glob($rootDir . '/data/statics/css/*.css') ?: [],
@@ -425,30 +459,14 @@ class Routes
                 return $cssFiles ? array_combine(
                     array_map(fn($f) => '/' . basename($f), $cssFiles),
                     array_map(fn($f) => [
-                        'dir' => 'static_css',
+                        'dir'  => 'static_css',
                         'file' => basename($f),
                         'type' => 'text/css; charset=UTF-8',
                     ], $cssFiles)
                 ) : [];
             })(),
 
-            ...(function () {
-                $cssDir = __DIR__ . '/../modules/Common/css';
-                $cssFiles = array_filter(
-                    glob($cssDir . '/*.css') ?: [],
-                    'is_file'
-                );
-                return $cssFiles ? array_combine(
-                    array_map(fn($f) => '/public/css/' . basename($f), $cssFiles),
-                    array_map(fn($f) => [
-                        'dir' => 'css',
-                        'file' => $f,
-                        'type' => 'text/css; charset=UTF-8',
-                        'fullPath' => true
-                    ], $cssFiles)
-                ) : [];
-            })(),
-
+            // --- Silently absorb Chrome DevTools probe (avoids 404 noise in logs) ---
             '/.well-known/appspecific/com.chrome.devtools.json' => ['dir' => null, 'file' => '', 'type' => ''],
         ];
 

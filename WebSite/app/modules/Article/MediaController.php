@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace app\modules\Article;
 
+use Flight;
+
 use app\helpers\Application;
 use app\helpers\MediaManager;
 use app\helpers\WebApp;
@@ -71,145 +73,134 @@ class MediaController extends AbstractController
 
     public function listFiles(): void
     {
-        $connectedUser = $this->application->getConnectedUser();
+        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isRedactor())) {
+            $query = $this->flight->request()->query;
+            $year          = isset($query->year) && $query->year !== '' ? (int)$query->year : (int)date('Y');
+            $month         = $query->month         ?? '';
+            $fileExtension = $query->fileExtension ?? '';
+            $search        = trim($query->search ?? '');
+            $unusedOnly    = isset($query->unusedOnly) && $query->unusedOnly === '1';
 
-        if (!($connectedUser->isRedactor() ?? false)) {
-            $this->raiseForbidden(__FILE__, __LINE__);
-            return;
+            $years = $this->getAvailableYears();
+            if (!in_array($year, $years)) {
+                $year = (int)date('Y');
+            }
+            if ($month !== '' && !in_array($month, $this->getMonths($year))) {
+                $month = '';
+            }
+            $filteredFiles = $this->getFiles($year, $month, $fileExtension, $search, $unusedOnly);
+            $totalFiles    = $this->getFiles($year, $month, '', '', false);
+            $connectedUser = $this->application->getConnectedUser();
+
+            $this->render('Article/views/media_index.latte', $this->getAllParams([
+                'files'                => $filteredFiles,
+                'filteredCount'        => count($filteredFiles),
+                'totalCount'           => count($totalFiles),
+                'years'                => $years,
+                'currentYear'          => $year,
+                'months'               => $this->getMonths($year),
+                'currentMonth'         => $month,
+                'fileExtensions'       => $this->getFileExtensions(),
+                'currentFileExtension' => $fileExtension,
+                'search'               => $search,
+                'unusedOnly'           => $unusedOnly,
+                'baseUrl'              => WebApp::getBaseUrl(),
+                'page'                 => $connectedUser->getPage(),
+                'groups'               => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
+                'isEditor'             => $connectedUser->isEditor(),
+                'translations' => [
+                    'urlCopied'     => $this->languagesDataHelper->translate('media.manager.share.url_copied'),
+                    'linkCopied'    => $this->languagesDataHelper->translate('media.manager.share.link_copied'),
+                    'shareCreated'  => $this->languagesDataHelper->translate('media.manager.share.created'),
+                    'shareDeleted'  => $this->languagesDataHelper->translate('media.manager.share.deleted'),
+                    'shareError'    => $this->languagesDataHelper->translate('media.manager.share.error'),
+                    'deleteConfirm' => $this->languagesDataHelper->translate('media.manager.delete.confirm'),
+                    'deleteSuccess' => $this->languagesDataHelper->translate('media.manager.delete.success'),
+                    'deleteError'   => $this->languagesDataHelper->translate('media.manager.delete.error'),
+                ],
+            ]));
         }
+    }
 
+    public function serveFile(string $year, string $month, string $filename): void
+    {
+        $year = (int) $year;
+        $month = (int) $month;
+        
         if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
 
-        $query = $this->flight->request()->query;
+        $filename = basename($filename);
+        $filePath = sprintf('%s/%04d/%02d/%s', MediaManager::GetMediaPath(), $year, $month, $filename);
 
-        $year          = isset($query->year) && $query->year !== '' ? (int)$query->year : (int)date('Y');
-        $month         = $query->month         ?? '';
-        $fileExtension = $query->fileExtension ?? '';
-        $search        = trim($query->search ?? '');
-        $unusedOnly    = isset($query->unusedOnly) && $query->unusedOnly === '1';
-
-        $years = $this->getAvailableYears();
-        if (!in_array($year, $years)) {
-            $year = (int)date('Y');
+        if (!file_exists($filePath)) {
+            $this->raiseBadRequest("File $filePath not found", __FILE__, __LINE__);
+            return;
         }
-        if ($month !== '' && !in_array($month, $this->getMonths($year))) {
-            $month = '';
-        }
-        $filteredFiles = $this->getFiles($year, $month, $fileExtension, $search, $unusedOnly);
-        $totalFiles    = $this->getFiles($year, $month, '', '', false);
 
-        $this->render('Article/views/media_index.latte', $this->getAllParams([
-            'files'                => $filteredFiles,
-            'filteredCount'        => count($filteredFiles),
-            'totalCount'           => count($totalFiles),
-            'years'                => $years,
-            'currentYear'          => $year,
-            'months'               => $this->getMonths($year),
-            'currentMonth'         => $month,
-            'fileExtensions'       => $this->getFileExtensions(),
-            'currentFileExtension' => $fileExtension,
-            'search'               => $search,
-            'unusedOnly'           => $unusedOnly,
-            'baseUrl'              => WebApp::getBaseUrl(),
-            'page'                 => $connectedUser->getPage(),
-            'groups'               => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
-            'isEditor'             => $connectedUser->isEditor(),
-            'translations' => [
-                'urlCopied'     => $this->languagesDataHelper->translate('media.manager.share.url_copied'),
-                'linkCopied'    => $this->languagesDataHelper->translate('media.manager.share.link_copied'),
-                'shareCreated'  => $this->languagesDataHelper->translate('media.manager.share.created'),
-                'shareDeleted'  => $this->languagesDataHelper->translate('media.manager.share.deleted'),
-                'shareError'    => $this->languagesDataHelper->translate('media.manager.share.error'),
-                'deleteConfirm' => $this->languagesDataHelper->translate('media.manager.delete.confirm'),
-                'deleteSuccess' => $this->languagesDataHelper->translate('media.manager.delete.success'),
-                'deleteError'   => $this->languagesDataHelper->translate('media.manager.delete.error'),
-            ],
-        ]));
+        $connectedUser = $this->application->getConnectedUser();
+        $allowed = $connectedUser->isRedactor()
+            || $this->authorizationDataHelper->canPersonReadMediaFile($year, $month, $filename, $connectedUser);
+
+        if (!$allowed) {
+            $this->raiseForbidden(__FILE__, __LINE__);
+            return;
+        }
+
+        $this->streamFile($filePath, $filename);
     }
 
     public function showUploadForm(): void
     {
-        if (!($this->application->getConnectedUser()->isRedactor() ?? false)) {
-            $this->raiseForbidden(__FILE__, __LINE__);
-            return;
+        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isRedactor())) {
+            $this->render('Article/views/media_upload.latte', $this->getAllParams([
+                'page' => $this->application->getConnectedUser()->getPage(),
+            ]));
         }
-        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
-            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
-        $this->render('Article/views/media_upload.latte', $this->getAllParams([
-            'page' => $this->application->getConnectedUser()->getPage(),
-        ]));
     }
 
     public function showUsesInArticles(): void
     {
-        if (!($this->application->getConnectedUser()->isRedactor() ?? false)) {
-            $this->raiseForbidden(__FILE__, __LINE__);
-            return;
+        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isRedactor())) {
+            $path = $this->flight->request()->query->path ?? '';
+            $this->render('Article/views/media_uses_articles.latte', $this->getAllParams([
+                'path'            => $path,
+                'articles'        => $path !== '' ? $this->articleDataHelper->inArticles($path) : [],
+                'page'            => $this->application->getConnectedUser()->getPage(),
+                'btn_HistoryBack' => true,
+            ]));
         }
-        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
-            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
-        $path = $this->flight->request()->query->path ?? '';
-        $this->render('Article/views/media_uses_articles.latte', $this->getAllParams([
-            'path'            => $path,
-            'articles'        => $path !== '' ? $this->articleDataHelper->inArticles($path) : [],
-            'page'            => $this->application->getConnectedUser()->getPage(),
-            'btn_HistoryBack' => true,
-        ]));
     }
 
     public function showUsesInMessages(): void
     {
-        if (!($this->application->getConnectedUser()->isRedactor() ?? false)) {
-            $this->raiseForbidden(__FILE__, __LINE__);
-            return;
+        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isRedactor())) {
+            $path = $this->flight->request()->query->path ?? '';
+            $uses = $path !== '' ? $this->messageDataHelper->getMessageUses($path) : ['events' => [], 'articles' => [], 'groups' => []];
+            $this->render('Article/views/media_uses_messages.latte', $this->getAllParams([
+                'path'            => $path,
+                'events'          => $uses['events'],
+                'articles'        => $uses['articles'],
+                'groups'          => $uses['groups'],
+                'page'            => $this->application->getConnectedUser()->getPage(),
+                'btn_HistoryBack' => true,
+            ]));
         }
-        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
-            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
-        $path = $this->flight->request()->query->path ?? '';
-        $uses = $path !== '' ? $this->messageDataHelper->getMessageUses($path) : ['events' => [], 'articles' => [], 'groups' => []];
-        $this->render('Article/views/media_uses_messages.latte', $this->getAllParams([
-            'path'            => $path,
-            'events'          => $uses['events'],
-            'articles'        => $uses['articles'],
-            'groups'          => $uses['groups'],
-            'page'            => $this->application->getConnectedUser()->getPage(),
-            'btn_HistoryBack' => true,
-        ]));
     }
 
     public function viewFile(int $year, int $month, string $filename): void
     {
-        if (!($this->application->getConnectedUser()->isRedactor() ?? false)) {
-            $this->raiseForbidden(__FILE__, __LINE__);
-            return;
+        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isRedactor())) {
+            $filename = basename($filename);
+            $filePath = sprintf('%s/%04d/%02d/%s', MediaManager::GetMediaPath(), $year, $month, basename($filename));
+            if (!file_exists($filePath)) {
+                $this->raiseBadRequest("File $filePath not found", __FILE__, __LINE__);
+                return;
+            }
+            $this->streamFile($filePath, $filename);
         }
-        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
-            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
-        $filename = basename($filename);
-        $filePath = MediaManager::GetMediaPath() . $year . '/' . $month . '/' . $filename;
-        if (!file_exists($filePath)) {
-            $this->raiseBadRequest("File $filePath not found in file ", __FILE__, __LINE__);
-            return;
-        }
-        $finfo = finfo_open(FILEINFO_MIME_TYPE);
-        $mime  = finfo_file($finfo, $filePath);
-        finfo_close($finfo);
-
-        header('Content-Type: ' . $mime);
-        header('Content-Length: ' . filesize($filePath));
-        header('Content-Disposition: inline; filename="' . $filename . '"');
-        readfile($filePath);
     }
 
     #region Private functions
@@ -335,7 +326,7 @@ class MediaController extends AbstractController
             $files[] = [
                 'name'      => $c['name'],
                 'path'      => $path,
-                'url'       => WebApp::getBaseUrl() . $path,
+                'url'       => WebApp::getBaseUrl() . 'data/media/' . $path,
                 'size'      => filesize($fullPath),
                 'date'      => date('Y-m-d H:i:s', filemtime($fullPath)),
                 'month'     => $c['month'],

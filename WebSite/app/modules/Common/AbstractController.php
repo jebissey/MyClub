@@ -237,6 +237,17 @@ abstract class AbstractController
         }
     }
 
+    protected function streamFile(string $filePath, string $filename): void
+    {
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        $mime  = finfo_file($finfo, $filePath);
+
+        header('Content-Type: ' . $mime);
+        header('Content-Length: ' . filesize($filePath));
+        header('Content-Disposition: inline; filename="' . $filename . '"');
+        readfile($filePath);
+    }
+
     protected function userIsAllowedAndMethodIsGood(string $method, callable $permissionCheck): bool
     {
         $user = $this->application->getConnectedUser();
@@ -261,13 +272,13 @@ abstract class AbstractController
     #region Public functions
     public function render(string $templateLatteName, object|array $params = []): void
     {
-#error_log("\n\n" . json_encode($templateLatteName, JSON_PRETTY_PRINT) . "\n");
+        #error_log("\n\n" . json_encode($templateLatteName, JSON_PRETTY_PRINT) . "\n");
         $content = $this->latte->renderToString($templateLatteName, $params);
         echo $content;
         if (ob_get_level()) ob_end_flush();
         flush();
         Flight::stop();
-    }   
+    }
 
     #region Private functions
     private function addLatteFilters(): void

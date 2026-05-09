@@ -1,18 +1,37 @@
-# Block access to sensitive files
-<FilesMatch "\.(sqlite|sqlite3|db|sql|env|log|json|lock|md|sh|bak)$">
+# ============================================================
+# DEFAULT CHARACTER ENCODING
+# ============================================================
+AddDefaultCharset UTF-8
+
+# ============================================================
+# PROTECT .htaccess ITSELF
+# ============================================================
+<Files ".htaccess">
+    Require all denied
+</Files>
+
+# ============================================================
+# BLOCK ACCESS TO SENSITIVE FILES
+# manifest.json is intentionally included — it is served
+# via the PHP router and must not be accessible directly.
+# ============================================================
+<FilesMatch "(?i)\.(env|json|sqlite|sqlite3|db|sql|log|lock|bak|md|sh|htpasswd|yaml|yml|config|ini|pem|key|crt|conf)$">
     Require all denied
 </FilesMatch>
 
-<FilesMatch "^manifest\.json$">
-    Require all granted
-</FilesMatch>
-
+# ============================================================
+# URL REWRITING
+# ============================================================
 <IfModule mod_rewrite.c>
     RewriteEngine On
+    RewriteBase /
 
-    # Redirect all requests to index.php except for existing files/directories
-    RewriteCond %{REQUEST_FILENAME} !-f
-    RewriteCond %{REQUEST_FILENAME} !-d
+    # --- 1. Fonts: always serve directly ---
+    RewriteRule \.(woff|woff2|ttf|eot|otf)$ - [NC,L]
+
+    # --- 2. CSS and JS → serve directly from disk (like fonts) ---
+    RewriteRule \.(css|js)$ - [NC,L]
+
+    # --- 3. Everything else → front controller ---
     RewriteRule ^ index.php [QSA,L]
 </IfModule>
-

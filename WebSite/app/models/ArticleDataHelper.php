@@ -18,7 +18,7 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
         parent::__construct($application);
     }
 
-    public function calculateTotals($crosstabData)
+    public function calculateTotals(array $crosstabData): array
     {
         $totals = [
             'byAuthor' => [],
@@ -289,7 +289,7 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
     {
         $noGroupArticleIds = $this->getNoGroupArticleIds();
         if (empty($userEmail)) return $noGroupArticleIds;
-        $forMembersOnlyArticleIds = $this->getArticleIdsForMembers([$userEmail]);
+        $forMembersOnlyArticleIds = $this->getArticleIdsForMembers();
         if (empty($forMembersOnlyArticleIds)) $articleIds = $noGroupArticleIds;
         else $articleIds = array_merge($noGroupArticleIds, $forMembersOnlyArticleIds);
         $userGroups = $this->authorizationDataHelper->getUserGroups($userEmail);
