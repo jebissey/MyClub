@@ -51,6 +51,7 @@ class Params
             'isEditor' => false,
             'isEventDesigner' => false,
             'isEventManager' => false,
+            'isExerciseDesigner' => false,
             'isHomeDesigner' => false,
             'isKanbanDesigner' => false,
             'isLoanDesigner' => false,

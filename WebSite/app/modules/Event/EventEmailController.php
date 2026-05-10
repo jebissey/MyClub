@@ -72,6 +72,10 @@ class EventEmailController extends AbstractController
             'filters' => "{$groupName} / {$eventTypeName} / {$dayOfWeekName} / {$this->languagesDataHelper->translate($timeOfDay)}",
             'people' => $this->dataHelper->gets('Person', ['Inactivated' => 0], 'Email, Phone, FirstName, LastName, NickName', '', true),
             'page' => $this->application->getConnectedUser()->getPage(),
+            'translations' => [
+                'copySuccess' => $this->languagesDataHelper->translate('event.copy_emails.clipboard.success'),
+                'copyError'   => $this->languagesDataHelper->translate('event.copy_emails.clipboard.error'),
+            ],
         ]));
     }
 }

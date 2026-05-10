@@ -5,59 +5,99 @@ declare(strict_types=1);
 namespace app\modules\Exercise;
 
 use app\enums\ApplicationError;
-use app\exceptions\IntegrityException;
+use app\enums\FilterInputRule;
 use app\helpers\Application;
-use app\models\ArticleDataHelper;
-use app\modules\Common\AbstractController;
-use app\modules\Common\services\ArticleService;
+use app\helpers\WebApp;
+use app\models\exerciseTableDataHelper;
+use app\modules\Common\TableController;
 
-class ExerciseController extends AbstractController
+class ExerciseController extends TableController
 {
     public function __construct(
         Application $application,
-        private ArticleService $articleService,
-        private ArticleDataHelper $articleDataHelper,
+        private ExerciseTableDataHelper $exerciseTableDataHelper,
     ) {
         parent::__construct($application);
     }
 
     public function create(): void
     {
-        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isExerciseDesigner())) {
-            return;
+        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isExerciseDesigner())) {
+            $exerciseId = $this->dataHelper->set('Exercise', [
+                'Title' => '',
+                'Detail' => '',
+                'Content' => '[]',
+                'CreatedBy' => $this->application->getConnectedUser()->person->Id,
+            ]);
+            $this->redirect('/exercise/edit/' . $exerciseId);
         }
-
-        $userId = $this->application->getConnectedUser()->person->Id
-            ?? throw new IntegrityException('Fatal error in file ' . __FILE__ . ' at line ' . __LINE__);
-
-        // Crée un article vierge et y stocke un tableau JSON vide
-        $articleId = $this->articleService->createWithMedia($userId);
-        $this->dataHelper->set('Article', ['Content' => '[]'], ['Id' => $articleId]);
-
-        $this->redirect('/exercise/edit/' . $articleId);
     }
 
     public function edit(int $id): void
     {
-        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isExerciseDesigner())) {
-            return;
+        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isExerciseDesigner())) {
+            $exercise = $this->dataHelper->get('Exercise', ['Id' => $id], 'Content, Title, CreatedBy');
+            if (!$exercise) {
+                $this->raiseForbidden(__FILE__, __LINE__);
+                return;
+            }
+
+            $this->render('Exercise/views/editor.latte', $this->getAllParams([
+                'articleId'   => $id,
+                'title'       => $exercise->Title ?? '',
+                'exercises'   => json_decode($exercise->Content ?? '[]', true) ?? [],
+                'translations' => $this->translations(),
+                'btn_Parent'  => '/admin',
+                'btn_HistoryBack' => true,
+            ]));
         }
+    }
 
-        $article = $this->articleDataHelper->getLatestArticle([$id]);
-        if (!$article) {
-            $this->raiseForbidden(__FILE__, __LINE__);
-            return;
-        }
-
-        $exercises = json_decode($article->Content ?? '[]', true) ?? [];
-
-        $this->render('Exercise/views/editor.latte', $this->getAllParams([
-            'articleId'   => $id,
-            'title'       => $article->Title ?? '',
-            'exercises'   => $exercises,
-            'translations' => $this->translations(),
-            'btn_Parent'  => '/admin',
-            'btn_HistoryBack' => true,
+    public function index(): void
+    {
+        $connectedUser = $this->application->getConnectedUser();
+        $schema = [
+            'PersonName' => FilterInputRule::PersonName->value,
+            'title'      => FilterInputRule::Content->value,
+            'detail'     => FilterInputRule::Content->value,
+            'timestamp'  => FilterInputRule::DateTime->value,
+            'lastUpdate' => FilterInputRule::DateTime->value,
+            'menu'       => ['oui', 'non'],
+            'GroupName'  => FilterInputRule::HtmlSafeName->value,
+            'Content'    => FilterInputRule::Content->value,
+            'Id'         => FilterInputRule::Int->value,
+        ];
+        $filterValues = WebApp::filterInput($schema, $this->flight->request()->query->getData());
+        $filterConfig = [
+            ['name' => 'PersonName', 'label' => $this->languagesDataHelper->translate('article.label.created_by')],
+            ['name' => 'title', 'label' => $this->languagesDataHelper->translate('article.label.title')],
+            ['name' => 'lastUpdate', 'label' => $this->languagesDataHelper->translate('article.label.last_update')],
+            ['name' => 'GroupName', 'label' => $this->languagesDataHelper->translate('article.label.group')],
+            ['name' => 'Content', 'label' => $this->languagesDataHelper->translate('article.label.content')],
+            ['name' => 'Id', 'label' => 'ID'],
+        ];
+        $columns = [
+            ['field' => 'PersonName', 'label' => 'Créé par'],
+            ['field' => 'Title', 'label' => 'Titre'],
+            ['field' => 'Detail', 'label' => 'Détails'],
+            ['field' => 'LastUpdate', 'label' => 'Dernière modification'],
+            ['field' => 'GroupName', 'label' => 'Groupe'],
+            ['field' => 'ForMembers', 'label' => 'Club'],
+        ];
+        $query = $this->exerciseTableDataHelper->getQuery($connectedUser);
+        $data = $this->prepareTableData($query, $filterValues);
+        $this->render('Exercise/views/exercises_index.latte', $this->getAllParams([
+            'exercises' => $data['items'],
+            'currentPage' => $data['currentPage'],
+            'totalPages' => $data['totalPages'],
+            'filterValues' => $filterValues,
+            'filters' => $filterConfig,
+            'columns' => $columns,
+            'resetUrl' => '/articles',
+            'userConnected' => $connectedUser->person ?? false,
+            'layout' => $this->getLayout(),
+            'navItems' => $this->getNavItems($connectedUser->person ?? false),
+            'page' => $connectedUser->getPage(),
         ]));
     }
 
@@ -67,8 +107,8 @@ class ExerciseController extends AbstractController
             return;
         }
 
-        $article = $this->articleDataHelper->getLatestArticle([$id]);
-        if (!$article || ($this->application->getConnectedUser()->person?->Id ?? 0) != $article->CreatedBy) {
+        $exercise = $this->dataHelper->get('Exercise', ['Id' => $id], 'Content, Title, CreatedBy');
+        if (!$exercise || ($this->application->getConnectedUser()->person?->Id ?? 0) != $exercise->CreatedBy) {
             $this->application->getErrorManager()->raise(
                 ApplicationError::Forbidden,
                 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__
@@ -87,7 +127,7 @@ class ExerciseController extends AbstractController
 
         $title = trim($this->flight->request()->data->getData()['title'] ?? '');
 
-        $this->dataHelper->set('Article', [
+        $this->dataHelper->set('Exercise', [
             'Title'      => $title ?: 'Exercices',
             'Content'    => json_encode($exercises, JSON_UNESCAPED_UNICODE),
             'LastUpdate' => date('Y-m-d H:i:s'),
@@ -103,22 +143,22 @@ class ExerciseController extends AbstractController
             return;
         }
 
-        $article = $this->articleDataHelper->getLatestArticle([$id]);
-        if (!$article) {
+        $exercise = $this->dataHelper->get('Exercise', ['Id' => $id], 'Content, Title, CreatedBy');
+        if (!$exercise) {
             $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
 
-        $exercises = json_decode($article->Content ?? '[]', true) ?? [];
+        $exercises = json_decode($exercise->Content ?? '[]', true) ?? [];
 
         $this->render('Exercise/views/player.latte', $this->getAllParams([
             'articleId' => $id,
-            'title'     => $article->Title ?? '',
+            'title'     => $exercise->Title ?? '',
             'exercises' => $exercises,
             'translations' => $this->translations(),
         ]));
     }
-    
+
     #region Private functions
     private function translations(): array
     {

@@ -102,11 +102,11 @@ class EventController extends AbstractController
 
         $this->render('Common/views/crosstab.latte', $this->getAllParams([
             'crosstabData' => $crosstabData,
-            'period' => $period,
+            'period' => $period->value,
             'dateRange' => $dateRange,
             'availablePeriods' => Period::gets($this->languagesDataHelper),
             'navbarTemplate' => '../../Webmaster/views/navbar/eventManager.latte',
-            'title' => 'Animateurs vs type d\'événement',
+            'title' => "Animateurs vs type d'événement",
             'totalLabels' => ['événements', 'participants'],
             'page' => $this->application->getConnectedUser()->getPage(1),
         ]));
@@ -280,7 +280,7 @@ class EventController extends AbstractController
         }
         $_SESSION['navbar'] = 'eventManager';
 
-        $this->render('Webmaster/views/eventManager.latte', $this->getAllParams([
+        $this->render('Event/views/eventManager.latte', $this->getAllParams([
             'page' => $this->application->getConnectedUser()->getPage(),
             'content' => $this->languagesDataHelper->translate('EventManager')
         ]));

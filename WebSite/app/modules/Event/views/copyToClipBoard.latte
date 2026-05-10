@@ -1,9 +1,9 @@
-{extends '../../Webmaster/views/eventManager.latte'}
+{extends 'eventManager.latte'}
 
 {block content}
 <div id="liveAlertPlaceholder"></div>
 <div class="container-fluid">
-    <h2>Liste des adresses email ({count($emails)}) avec {$filters}</h2>
+    <h2>{='event.copy_emails.title'|translate} ({count($emails)}) {='event.copy_emails.title.with'|translate} {$filters}</h2>
     <ul>
         {foreach $emails as $email}
             <li>{$email} (📞{$people[$email]->Phone} 👤{$people[$email]->FirstName} {$people[$email]->LastName}{if $people[$email]->NickName != ''}-><b>{$people[$email]->NickName}</b>{/if})</li>
@@ -13,16 +13,12 @@
 {/block}
 
 {block scripts}
-<script>
-    function copyToClipboard() {
-        var emailsArray = JSON.parse({$emailsJson});
-        var emailsString = emailsArray.join(' , ');
-        navigator.clipboard.writeText(emailsString).then(function() {
-            appendAlert('Les emails ont été copiés dans le presse-papiers', 'info');
-        }, function(err) {
-            appendAlert('Erreur lors de la copie dans le presse-papiers: ' + err, 'danger');
-        });
-    }
-    copyToClipboard();
-</script>
+    <script>
+        window.emailsJson = {$emailsJson|noescape};
+        window.i18n = {=json_encode($translations)|noescape};
+        window.t = function(key) {
+            return window.i18n?.[key] ?? key;
+        };
+    </script>
+    <script type="module" src="/app/modules/Event/js/copyToClipBoard.js"></script>
 {/block}

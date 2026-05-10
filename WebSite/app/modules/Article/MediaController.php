@@ -126,7 +126,7 @@ class MediaController extends AbstractController
     {
         $year = (int) $year;
         $month = (int) $month;
-        
+
         if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
@@ -190,7 +190,7 @@ class MediaController extends AbstractController
         }
     }
 
-    public function viewFile(int $year, int $month, string $filename): void
+    public function viewFile(string $year, string $month, string $filename): void
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isRedactor())) {
             $filename = basename($filename);
@@ -206,8 +206,10 @@ class MediaController extends AbstractController
     #region Private functions
     private function download(string $file): void
     {
-        if (!file_exists($file) || !is_readable($file)) {
-            $this->raiseBadRequest("File {$file} unknown", __FILE__, __LINE__);
+        $fullPath = MediaManager::GetMediaPath() . $file;
+        $realPath = realpath($fullPath);
+        if (!$realPath || !file_exists($realPath) || !is_readable($realPath)) {
+            $this->raiseBadRequest("File {$realPath} ({$fullPath}) unknown", __FILE__, __LINE__);
             return;
         }
         $filename = basename($file);
@@ -218,9 +220,9 @@ class MediaController extends AbstractController
         header("Expires: 0");
         header("Cache-Control: must-revalidate");
         header("Pragma: public");
-        header("Content-Length: " . filesize($file));
+        header("Content-Length: " . filesize($realPath));
         flush();
-        readfile($file);
+        readfile($realPath);
     }
 
     private function getAvailableYears(): array

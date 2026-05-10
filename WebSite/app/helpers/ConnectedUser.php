@@ -106,7 +106,7 @@ class ConnectedUser
 
     public function isDesigner(): bool
     {
-        return $this->isEventDesigner() || $this->isExerciseDesigner() || $this->isHomeDesigner() || $this->isMenuDesigner();
+        return $this->isEventDesigner() || $this->isExerciseDesigner() || $this->isHomeDesigner() || $this->isKanbanDesigner() || $this->isLoanDesigner() || $this->isMenuDesigner();
     }
 
     public function isEditor(): bool

@@ -39,6 +39,7 @@ class DesignerController extends AbstractController
             $content = $this->languagesDataHelper->translate('Designer');
             $params = [
                 'isEventDesigner' => $connectedUser->isEventDesigner(),
+                'isExerciseDesigner' => $connectedUser->isExerciseDesigner(),
                 'isHomeDesigner' => $connectedUser->isHomeDesigner(),
                 'isKanbanDesigner' => $connectedUser->isKanbanDesigner(),
                 'isLoanDesigner' => $connectedUser->isLoanDesigner(),

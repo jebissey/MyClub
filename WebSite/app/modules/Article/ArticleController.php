@@ -533,7 +533,7 @@ class ArticleController extends TableController
 
         $this->render('Common/views/crosstab.latte', $this->getAllParams([
             'crosstabData' => $crosstabData,
-            'period' => $period,
+            'period' => $period->value,
             'dateRange' => $dateRange,
             'availablePeriods' => Period::gets($this->languagesDataHelper),
             'navbarTemplate' => '../../Webmaster/views/navbar/redactor.latte',

@@ -66,10 +66,10 @@ abstract class AbstractController
         $navbar = $_SESSION['navbar'] ?? '';
 
         return match ($navbar) {
-            'user'              => '../../User/views/user.latte',
-            'eventManager'      => '../../Webmaster/views/eventManager.latte',
-            'personManager'     => '../../Webmaster/views/personManager.latte',
+            'eventManager'      => '../../Event/views/eventManager.latte',
+            'personManager'     => '../../PersonManager/views/personManager.latte',
             'redactor'          => '../../Article/views/redactor.latte',
+            'user'              => '../../User/views/user.latte',
             'visitorInsights'   => '../../Webmaster/views/visitorInsights.latte',
             'webmaster'         => '../../Webmaster/views/webmaster.latte',
             ''                  => '../../Common/views/home.latte',

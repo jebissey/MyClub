@@ -134,6 +134,19 @@ CREATE TABLE IF NOT EXISTS "EventTypeAttribute" (
 	FOREIGN KEY("IdAttribute") REFERENCES "Attribute"("Id"),
 	FOREIGN KEY("IdEventType") REFERENCES "EventType"("Id")
 );
+CREATE TABLE IF NOT EXISTS "Exercise" (
+	"Id"	INTEGER,
+	"Title"	TEXT NOT NULL,
+	"Detail"	TEXT NOT NULL,
+	"Content"	TEXT NOT NULL,
+	"CreatedBy"	INTEGER NOT NULL,
+	"LastUpdate"	TEXT NOT NULL DEFAULT current_timestamp,
+	"IdGroup"	INTEGER,
+	"OnlyForMembers"	INTEGER NOT NULL DEFAULT 1,
+	PRIMARY KEY("Id"),
+	FOREIGN KEY("CreatedBy") REFERENCES "Person"("Id"),
+	FOREIGN KEY("IdGroup") REFERENCES "Group"("Id")
+);
 CREATE TABLE IF NOT EXISTS "Group" (
 	"Id"	INTEGER,
 	"Name"	TEXT NOT NULL,
@@ -5726,7 +5739,20 @@ INSERT INTO "Languages" VALUES (954,'exercise.ex.duration','Exercise duration (s
 INSERT INTO "Languages" VALUES (955,'exercise.save','Save','Enregistrer','Zapisz');
 INSERT INTO "Languages" VALUES (956,'exercise.msg.saved','Saved.','Enregistré.','Zapisano.');
 INSERT INTO "Languages" VALUES (957,'exercise.msg.error','Error.','Erreur.','Błąd.');
-INSERT INTO "Metadata" VALUES (1,'MyClub',63,0,1000000,NULL,10,36,6,NULL,0,NULL);
+INSERT INTO "Languages" VALUES (958,'event.copy_emails.clipboard.success','Emails copied to clipboard.','Les emails ont été copiés dans le presse-papiers.','E-maile zostały skopiowane do schowka.');
+INSERT INTO "Languages" VALUES (959,'event.copy_emails.clipboard.error','Error copying to clipboard: ','Erreur lors de la copie dans le presse-papiers : ','Błąd podczas kopiowania do schowka: ');
+INSERT INTO "Languages" VALUES (960,'event.copy_emails.title','List of email addresses','Liste des adresses email','Lista adresów email');
+INSERT INTO "Languages" VALUES (961,'event.copy_emails.title.with','with','avec','z');
+INSERT INTO "Languages" VALUES (962,'event.get_emails.label.group','Group','Groupe','Grupa');
+INSERT INTO "Languages" VALUES (963,'event.get_emails.option.all_groups','All groups','Tous les groupes','Wszystkie grupy');
+INSERT INTO "Languages" VALUES (964,'event.get_emails.label.event_type','Event type','Type d''événement','Typ wydarzenia');
+INSERT INTO "Languages" VALUES (965,'event.get_emails.option.choose_type','Choose a type','Choisir un type','Wybierz typ');
+INSERT INTO "Languages" VALUES (966,'event.get_emails.label.day','Day','Jour','Dzień');
+INSERT INTO "Languages" VALUES (967,'event.get_emails.option.choose_day','Choose a day','Choisir un jour','Wybierz dzień');
+INSERT INTO "Languages" VALUES (968,'event.get_emails.label.time_of_day','Time of day','Moment de la journée','Pora dnia');
+INSERT INTO "Languages" VALUES (969,'event.get_emails.option.choose_time','Choose a time','Choisir un moment','Wybierz porę');
+INSERT INTO "Languages" VALUES (970,'event.get_emails.button.submit','Get emails','Obtenir les emails','Pobierz e-maile');
+INSERT INTO "Metadata" VALUES (1,'MyClub',64,0,1000000,NULL,10,36,6,NULL,0,NULL);
 INSERT INTO "Person" VALUES (1,'webmaster@myclub.foo','e427c26faca947919b18b797bc143a35100e4de48c34b70b26202d3a7d8e51f7','my first name','my last name','my nick name or nothing',NULL,'0',NULL,NULL,NULL,NULL,NULL,0,0,NULL,NULL,'2025-01-01',0,0,0,NULL,NULL,NULL,NULL,NULL,NULL,'');
 INSERT INTO "PersonGroup" VALUES (1,1,1);
 INSERT INTO "Settings" VALUES (1,'Title','title');
@@ -5800,4 +5826,26 @@ CREATE VIEW article_list_view AS
             INNER JOIN Person ON Article.CreatedBy = Person.Id
             LEFT JOIN Survey ON Article.Id = Survey.IdArticle
             LEFT JOIN 'Group' ON 'Group'.Id = Article.IdGroup;
+CREATE VIEW exercise_list_view AS
+            SELECT 
+                Exercise.Id,
+                Exercise.CreatedBy,
+                Exercise.Title,
+                Exercise.Detail,
+				Exercise.LastUpdate,
+                Exercise.CreatedBy,
+                Exercise.OnlyForMembers,
+                Exercise.IdGroup,               
+                CASE 
+                    WHEN Exercise.OnlyForMembers = 1 THEN 'oui' 
+                    ELSE 'non' 
+                END AS ForMembers,
+                CASE 
+                    WHEN Person.NickName != '' THEN Person.FirstName || ' ' || Person.LastName || ' (' || Person.NickName || ')' 
+                    ELSE Person.FirstName || ' ' || Person.LastName 
+                END AS PersonName,
+                'Group'.Name AS GroupName
+            FROM Exercise
+            INNER JOIN Person ON Exercise.CreatedBy = Person.Id           
+            LEFT JOIN 'Group' ON 'Group'.Id = Exercise.IdGroup;
 COMMIT;

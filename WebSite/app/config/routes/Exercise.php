@@ -22,6 +22,7 @@ class Exercise implements RouteInterface
         $this->routes[] = new Route('GET  /exercise/edit/@id:[0-9]+', $ctrl, 'edit');
         $this->routes[] = new Route('POST /exercise/save/@id:[0-9]+', $ctrl, 'save');
         $this->routes[] = new Route('GET  /exercise/play/@id:[0-9]+', $ctrl, 'play');
+        $this->routes[] = new Route('GET  /exercises',                $ctrl, 'index');
 
         return $this->routes;
     }

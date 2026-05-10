@@ -37,7 +37,7 @@ class EventGuestController extends AbstractController
 
         $this->render('Event/views/guest.latte', $this->getAllParams([
             'events' => $events,
-            'navbarTemplate' => '../navbar/eventManager.latte',
+            'navbarTemplate' => '../../Webmaster/views/navbar/eventManager.latte',
             'layout' => $this->getLayout(),
             'message' => $message,
             'messageType' => $type,

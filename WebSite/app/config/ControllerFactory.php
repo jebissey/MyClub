@@ -20,6 +20,7 @@ use app\models\DbBrowserDataHelper;
 use app\models\DesignDataHelper;
 use app\models\EventDataHelper;
 use app\models\EventTypeDataHelper;
+use app\models\ExerciseTableDataHelper;
 use app\models\GroupDataHelper;
 use app\models\KanbanDataHelper;
 use app\models\LogDataHelper;
@@ -109,6 +110,7 @@ class ControllerFactory
         private ErrorManager $errorManager,
         private EventDataHelper $eventDataHelper,
         private EventTypeDataHelper $eventTypeDataHelper,
+        private ExerciseTableDataHelper $exerciseTableDataHelper,
         private GroupDataHelper $groupDataHelper,
         private KanbanDataHelper $kanbanDataHelper,
         private LoanDataHelper $loanDataHelper,
@@ -199,8 +201,7 @@ class ControllerFactory
     {
         return new ExerciseController(
             $this->application,
-            $this->articleService,
-            $this->articleDataHelper,
+            $this->exerciseTableDataHelper,
         );
     }
 

@@ -1,23 +1,23 @@
-{extends '../../Webmaster/views/eventManager.latte'}
+{extends 'eventManager.latte'}
 
 {block content}
     <div class="container-fluid">
         <form method="POST" id="emailFilterForm" class="mb-4">
             <div class="row">
                 <div class="col-md-3">
-                    <label for="groupSelect" class="form-label">Groupe</label>
+                    <label for="groupSelect" class="form-label">{='event.get_emails.label.group'|translate}</label>
                     <select class="form-select" id="groupSelect" name="idGroup">
-                        <option value="">Tous les groupes</option>
+                        <option value="">{='event.get_emails.option.all_groups'|translate}</option>
                         {foreach $groups as $group}
                             <option value="{$group->Id}">{$group->Name}</option>
                         {/foreach}
                     </select>
                 </div>
-                
+
                 <div class="col-md-3">
-                    <label for="eventTypeSelect" class="form-label">Type d'événement</label>
+                    <label for="eventTypeSelect" class="form-label">{='event.get_emails.label.event_type'|translate}</label>
                     <select class="form-select" id="eventTypeSelect" name="idEventType">
-                        <option value="">Choisir un type</option>
+                        <option value="">{='event.get_emails.option.choose_type'|translate}</option>
                         {foreach $eventTypes as $type}
                             <option value="{$type->Id}">{$type->Name}</option>
                         {/foreach}
@@ -25,21 +25,21 @@
                 </div>
 
                 <div class="col-md-3">
-                    <label for="daySelect" class="form-label">Jour</label>
+                    <label for="daySelect" class="form-label">{='event.get_emails.label.day'|translate}</label>
                     <select class="form-select" id="daySelect" name="dayOfWeek">
-                        <option value="">Choisir un jour</option>
+                        <option value="">{='event.get_emails.option.choose_day'|translate}</option>
                         {foreach $weekdayNames as $index => $weekdayName}
-                        <option value="{$index}">{$weekdayName}</option>
+                            <option value="{$index}">{$weekdayName}</option>
                         {/foreach}
                     </select>
                 </div>
 
                 <div class="col-md-3">
-                    <label for="timeSelect" class="form-label">Moment de la journée</label>
+                    <label for="timeSelect" class="form-label">{='event.get_emails.label.time_of_day'|translate}</label>
                     <select class="form-select" id="timeSelect" name="timeOfDay" disabled>
-                        <option value="">Choisir un moment</option>
+                        <option value="">{='event.get_emails.option.choose_time'|translate}</option>
                         {foreach $timeOptions as $option}
-                        <option value="{$option['value']}">{$option['label']}</option>
+                            <option value="{$option['value']}">{$option['label']}</option>
                         {/foreach}
                     </select>
                 </div>
@@ -47,7 +47,7 @@
 
             <div class="row mt-3">
                 <div class="col">
-                    <button type="submit" class="btn btn-primary">Get emails</button>            
+                    <button type="submit" class="btn btn-primary">{='event.get_emails.button.submit'|translate}</button>
                 </div>
             </div>
         </form>

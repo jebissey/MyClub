@@ -2,7 +2,7 @@
 
 {block content}
     {if $readOnly}
-        {if $layout == '../../Webmaster/views/personManager.latte'}
+        {if $layout == '../../PersonManager/views/personManager.latte'}
             <div class="alert alert-success alert-dismissible">
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 <h4>{='account.form.imported.title'|translate}</h4>
@@ -19,7 +19,7 @@
     <form method="POST" class="needs-validation" data-form="account">
         <div class="row justify-content-center">
             <div class="col-12 col-md-6 col-lg-4">
-                {if $layout == '../../Webmaster/views/personManager.latte'}
+                {if $layout == '../../PersonManager/views/personManager.latte'}
                 <div class="mb-3">
                     <label for="email" class="form-label">{='account.form.email.label'|translate}</label>
                     <input type="email" class="form-control" id="email" name="email" value="{$email}" required>

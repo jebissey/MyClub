@@ -185,7 +185,7 @@ class PersonController extends TableController
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isPersonManager())) {
             $_SESSION['navbar'] = 'personManager';
 
-            $this->render('Webmaster/views/personManager.latte', $this->getAllParams([
+            $this->render('PersonManager/views/personManager.latte', $this->getAllParams([
                 'page' => $this->application->getConnectedUser()->getPage(),
                 'content' => $this->languagesDataHelper->translate('PersonManager')
             ]));

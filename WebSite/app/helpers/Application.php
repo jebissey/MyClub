@@ -20,7 +20,7 @@ use app\modules\Common\services\AuthenticationService;
 
 class Application
 {
-    public const VERSION = '0.72.1';
+    public const VERSION = '0.73';
     public const  EMOJI_LIST = [
         '😀', '😄', '😁', '😅', '😂', '🤣', '😊', '😇', '🤨', 
         '🙂', '🙃', '😉', '😌', '☹️', '😐', '🙄', '😯', '🥴', 
@@ -118,7 +118,7 @@ class Application
      * @throws LogicException Always thrown
      * @return never
      */
-    public static function unreachable(mixed $value = null, string $file, int $line, bool $log = true): never
+    public static function unreachable(mixed $value, string $file, int $line, bool $log = true): never
     {
         $msg = "Unreachable code executed in file {$file} at line {$line}";
         if ($value !== null) {

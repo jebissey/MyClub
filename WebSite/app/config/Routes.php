@@ -102,6 +102,7 @@ use app\models\DesignDataHelper;
 use app\models\EventDataHelper;
 use app\models\EventNeedDataHelper;
 use app\models\EventTypeDataHelper;
+use app\models\ExerciseTableDataHelper;
 use app\models\GroupDataHelper;
 use app\models\KanbanDataHelper;
 use app\models\KaraokeDataHelper;
@@ -191,6 +192,7 @@ class Routes
             new ErrorManager($application),
             $eventDataHelper,
             new EventTypeDataHelper($application),
+            new ExerciseTableDataHelper($application),
             $groupDataHelper,
             new KanbanDataHelper($application),
             $loanDataHelper,
