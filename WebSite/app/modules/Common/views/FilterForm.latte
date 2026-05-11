@@ -19,40 +19,80 @@
     fn($v) => $v !== '' && $v !== null && !is_array($v) && trim((string) $v) !== ''
 )}
 
-<form method="GET" action="{$action}" class="row g-3 mb-4"
-      onsubmit="this.querySelectorAll(':is(input,select,textarea)').forEach(el => { if (el.value.trim() === '') el.disabled = true })">
+{var $hasActiveFilters = !empty(array_filter(
+    $filterValues,
+    fn($v) => $v !== '' && $v !== null && trim((string) $v) !== ''
+))}
 
-    {foreach $normalizedFilters as $filter}
-        <div class="col-md-2">
-            {include 'FilterField.latte',
-                name:        $filter['name'],
-                label:       $filter['label'],
-                type:        $filter['type']        ?? 'text',
-                value:       $filterValues[$filter['name']] ?? '',
-                options:     $filter['options']     ?? [],
-                optionValue: $filter['optionValue'] ?? 'value',
-                optionLabel: $filter['optionLabel'] ?? 'label',
-                placeholder: $filter['placeholder'] ?? '',
-                autosubmit:  $filter['autosubmit']  ?? false}
+<div class="accordion mb-3" id="filtersAccordion">
+    <div class="accordion-item border">
+
+        <h2 class="accordion-header" id="filtersHeading">
+            <button class="accordion-button {if !$hasActiveFilters}collapsed{/if} gap-2"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#filtersCollapse"
+                    aria-expanded="{if $hasActiveFilters}true{else}false{/if}"
+                    aria-controls="filtersCollapse">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                     class="bi bi-search flex-shrink-0" viewBox="0 0 16 16">
+                    <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.099zm-5.242 1.156a5.5 5.5 0 1 1 0-11 5.5 5.5 0 0 1 0 11"/>
+                </svg>
+                {='filters'|translate}
+                {if $hasActiveFilters}
+                    <span class="badge text-bg-primary ms-1">
+                        {count(array_filter($filterValues, fn($v) => $v !== '' && $v !== null && trim((string) $v) !== ''))}
+                    </span>
+                {/if}
+            </button>
+        </h2>
+
+        <div id="filtersCollapse"
+             class="accordion-collapse collapse {if $hasActiveFilters}show{/if}"
+             aria-labelledby="filtersHeading">
+            <div class="accordion-body">
+
+                <form method="GET" action="{$action}" class="row g-3"
+                      onsubmit="this.querySelectorAll(':is(input,select,textarea)').forEach(el => { if (el.value.trim() === '') el.disabled = true })">
+
+                    {foreach $normalizedFilters as $filter}
+                        <div class="col-md-2">
+                            {include 'FilterField.latte',
+                                name:        $filter['name'],
+                                label:       $filter['label'],
+                                type:        $filter['type']        ?? 'text',
+                                value:       $filterValues[$filter['name']] ?? '',
+                                options:     $filter['options']     ?? [],
+                                optionValue: $filter['optionValue'] ?? 'value',
+                                optionLabel: $filter['optionLabel'] ?? 'label',
+                                placeholder: $filter['placeholder'] ?? '',
+                                autosubmit:  $filter['autosubmit']  ?? false}
+                        </div>
+                    {/foreach}
+
+                    {foreach $extraParams as $key => $value}
+                        <input type="hidden" name="{$key}" value="{$value}">
+                    {/foreach}
+
+                    <div class="col-12 d-flex gap-2">
+                        <button type="submit" class="btn btn-primary" title="{='filter'|translate}">
+                            <i class="bi bi-search"></i>
+                        </button>
+                        {var $resetQuery = http_build_query($extraParams)}
+                        <a href="{$resetUrl}{if $resetQuery}?{$resetQuery}{/if}" class="btn btn-secondary" title="{='reset'|translate}">
+                            <i class="bi bi-arrow-counterclockwise"></i>
+                        </a>
+                    </div>
+                </form>
+            </div>
         </div>
-    {/foreach}
-
-    {foreach $extraParams as $key => $value}
-        <input type="hidden" name="{$key}" value="{$value}">
-    {/foreach}
-
-    <div class="col-12 d-flex flex-wrap justify-content-between align-items-center gap-3">
-        <div class="d-flex gap-2">
-            <button type="submit" class="btn btn-primary">Filtrer</button>
-            {var $resetQuery = http_build_query($extraParams)}
-            <a href="{$resetUrl}{if $resetQuery}?{$resetQuery}{/if}" class="btn btn-secondary">Réinitialiser</a>
-        </div>
-
-        {include 'Pagination.latte',
-            currentPage: $currentPage,
-            totalPages:  $totalPages,
-            pageParam:   $pageParam,
-            urlParams:   $urlParams}
     </div>
+</div>
 
-</form>
+<div class="mb-4 d-flex justify-content-end">
+    {include 'Pagination.latte',
+        currentPage: $currentPage,
+        totalPages:  $totalPages,
+        pageParam:   $pageParam,
+        urlParams:   $urlParams}
+</div>

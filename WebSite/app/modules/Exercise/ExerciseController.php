@@ -47,7 +47,7 @@ class ExerciseController extends TableController
                 'title'       => $exercise->Title ?? '',
                 'exercises'   => json_decode($exercise->Content ?? '[]', true) ?? [],
                 'translations' => $this->translations(),
-                'btn_Parent'  => '/admin',
+                'btn_Parent'  => '/exercises',
                 'btn_HistoryBack' => true,
             ]));
         }

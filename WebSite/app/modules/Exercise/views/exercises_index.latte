@@ -5,25 +5,25 @@
 
 
 {block content}
-    {if $isEditor && $isExerciseManager}
+    {if $isEditor && $isExerciseDesigner}
         {include '../../Common/views/dataTable.latte',
             'createButton' => [
-                'url' => '/article/create',
+                'url' => '/exercise/create',
                 'label' => 'bi bi-plus',
                 'alignment' => 'end',
             ],
-            'items' => $articles,
+            'items' => $exercises,
             'actions' => [
                 [
                     'type' => 'link',
                     'label' => 'bi bi-eye',
-                    'url' => '/article/{id}',
+                    'url' => '/exercise/{id}',
                     'class' => 'btn-success'
                 ],
                 [
                     'type' => 'link',
                     'label' => 'bi bi-pencil',
-                    'url' => '/article/edit/{id}',
+                    'url' => '/exercise/edit/{id}',
                     'class' => 'btn-warning'
                 ],
                 [
@@ -43,34 +43,34 @@
     {elseif $isRedactor}
         {include '../../Common/views/dataTable.latte',
             'createButton' => [
-                'url' => '/article/create',
+                'url' => '/exercise/create',
                 'label' => 'bi bi-plus',
                 'alignment' => 'end',
             ],
-            'items' => $articles,
+            'items' => $exercises,
             'actions' => [
                 [
                     'type' => 'link',
                     'label' => 'bi bi-eye',
-                    'url' => '/article/{id}',
+                    'url' => '/exercise/{id}',
                     'class' => 'btn-success'
                 ],
                 [
                     'type' => 'link',
                     'label' => 'bi bi-pencil',
-                    'url' => '/article/edit/{id}',
+                    'url' => '/exercise/edit/{id}',
                     'class' => 'btn-warning'
                 ]
             ]
         }
     {elseif $isEditor}
         {include '../../Common/views/dataTable.latte',
-            'items' => $articles,
+            'items' => $exercises,
             'actions' => [
                 [
                     'type' => 'link',
                     'label' => 'bi bi-eye',
-                    'url' => '/article/{id}',
+                    'url' => '/exercise/{id}',
                     'class' => 'btn-success'
                 ],
                 [
@@ -89,19 +89,19 @@
         }
     {else}
         {include '../../Common/views/dataTable.latte',
-            'items' => $articles,
+            'items' => $exercises,
             'actions' => [
                 [
                     'type' => 'link',
                     'label' => 'bi bi-eye',
-                    'url' => '/article/{id}',
+                    'url' => '/exercise/{id}',
                     'class' => 'btn-success'
                 ]
             ]
         }
     {/if}
     
-    <a href="/articles-rss.xml" class="rss-link">
+    <a href="/exercises-rss.xml" class="rss-link">
         <img src="/Feed-icon.svg" alt="RSS" width="16" height="16"> S'abonner au flux RSS
     </a>
 
@@ -133,5 +133,5 @@
 {/block}
 
 {block scripts}
-    <script src="/app/modules/Article/js/articles.js"></script>
+    <script src="/app/modules/Exercise/js/exercises.js"></script>
 {/block}

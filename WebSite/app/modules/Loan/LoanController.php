@@ -18,7 +18,99 @@ class LoanController extends AbstractController
         parent::__construct($application);
     }
 
+    public function calendar(): void
+    {
+        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isConnected())) {
+            return;
+        }
 
+        $this->render('Loan/views/calendar.latte', $this->getAllParams([
+            'translations' => $this->translations(),
+            'page' => $this->application->getConnectedUser()->getPage(),
+            'activeTab' => 'calendar',
+            'btn_Parent' => "/user",
+            'btn_HistoryBack' => true,
+        ]));
+    }
+
+    public function designer(): void
+    {
+        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isLoanDesigner())) {
+            return;
+        }
+
+        $this->loanDataHelper->updateOverdueLoans();
+
+        $this->render('Loan/views/designer.latte', $this->getAllParams([
+            'items'        => $this->loanDataHelper->getAllItems(),
+            'translations' => $this->translations(),
+            'page' => $this->application->getConnectedUser()->getPage(),
+            'activeTab' => 'designer',
+            'btn_Parent' => "/admin",
+            'btn_HistoryBack' => true,
+        ]));
+    }
+
+    public function designerHelp(): void
+    {
+        if (!($this->application->getConnectedUser()->isLoanDesigner() ?? false)) {
+            $this->raiseForbidden(__FILE__, __LINE__);
+            return;
+        }
+        $lang = TranslationManager::getCurrentLanguage();
+        $this->render('Common/views/info.latte', [
+            'content' => $this->dataHelper->get('Languages', ['Name' => 'Help_LoanDesigner'], $lang)->$lang ?? '',
+            'hasAuthorization' => $this->application->getConnectedUser()->isRedactor() ?? false,
+            'currentVersion' => Application::VERSION,
+            'timer' => 0,
+            'previousPage' => true,
+            'page' => $this->application->getConnectedUser()->getPage(),
+        ]);
+    }
+
+    public function manager(): void
+    {
+        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isLoanManager())) {
+            return;
+        }
+
+        $this->loanDataHelper->updateOverdueLoans();
+
+        $this->render('Loan/views/manager.latte', $this->getAllParams([
+            'loans'        => $this->loanDataHelper->getAllLoans(),
+            'loanItems'    => $this->loanDataHelper->getActiveItems('loan'),
+            'persons'      => $this->loanDataHelper->getAllPersons(),
+            'translations' => $this->translations(),
+            'activeTab' => 'manager',
+            'btn_Parent' => "/user",
+            'btn_HistoryBack' => true,
+        ]));
+    }
+
+    public function reservations(): void
+    {
+        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isConnected())) {
+            return;
+        }
+
+        $user   = $this->application->getConnectedUser();
+        $userId = $user->isLoanManager() ? 0 : $user->person->Id;
+
+        $this->render('Loan/views/user.latte', $this->getAllParams([
+            'reservations'      => $this->loanDataHelper->getAllReservations($userId),
+            'reservationItems'  => $this->loanDataHelper->getActiveItems('reservation'),
+            'persons'           => $this->loanDataHelper->getAllPersons(),
+            'isManager'         => $user->isLoanManager(),
+            'currentUserId'     => $userId,
+            'translations'      => $this->translations(),
+            'page' => $this->application->getConnectedUser()->getPage(),
+            'activeTab' => 'user',
+            'btn_Parent' => "/user",
+            'btn_HistoryBack' => true,
+        ]));
+    }
+
+    #region Private methods
     private function translations(): array
     {
         $keys = [
@@ -86,98 +178,5 @@ class LoanController extends AbstractController
             $trans[$k] = $this->languagesDataHelper->translate('loan.' . $k);
         }
         return $trans;
-    }
-
-
-    public function designer(): void
-    {
-        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isLoanDesigner())) {
-            return;
-        }
-
-        $this->loanDataHelper->updateOverdueLoans();
-
-        $this->render('Loan/views/designer.latte', $this->getAllParams([
-            'items'        => $this->loanDataHelper->getAllItems(),
-            'translations' => $this->translations(),
-            'page' => $this->application->getConnectedUser()->getPage(),
-            'activeTab' => 'designer',
-            'btn_Parent' => "/admin",
-            'btn_HistoryBack' => true,
-        ]));
-    }
-
-    public function manager(): void
-    {
-        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isLoanManager())) {
-            return;
-        }
-
-        $this->loanDataHelper->updateOverdueLoans();
-
-        $this->render('Loan/views/manager.latte', $this->getAllParams([
-            'loans'        => $this->loanDataHelper->getAllLoans(),
-            'loanItems'    => $this->loanDataHelper->getActiveItems('loan'),
-            'persons'      => $this->loanDataHelper->getAllPersons(),
-            'translations' => $this->translations(),
-            'activeTab' => 'manager',
-            'btn_Parent' => "/user",
-            'btn_HistoryBack' => true,
-        ]));
-    }
-
-    public function reservations(): void
-    {
-        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isConnected())) {
-            return;
-        }
-
-        $user   = $this->application->getConnectedUser();
-        $userId = $user->isLoanManager() ? 0 : $user->person->Id;
-
-        $this->render('Loan/views/user.latte', $this->getAllParams([
-            'reservations'      => $this->loanDataHelper->getAllReservations($userId),
-            'reservationItems'  => $this->loanDataHelper->getActiveItems('reservation'),
-            'persons'           => $this->loanDataHelper->getAllPersons(),
-            'isManager'         => $user->isLoanManager(),
-            'currentUserId'     => $userId,
-            'translations'      => $this->translations(),
-            'page' => $this->application->getConnectedUser()->getPage(),
-            'activeTab' => 'user',
-            'btn_Parent' => "/user",
-            'btn_HistoryBack' => true,
-        ]));
-    }
-
-    public function calendar(): void
-    {
-        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isConnected())) {
-            return;
-        }
-
-        $this->render('Loan/views/calendar.latte', $this->getAllParams([
-            'translations' => $this->translations(),
-            'page' => $this->application->getConnectedUser()->getPage(),
-            'activeTab' => 'calendar',
-            'btn_Parent' => "/user",
-            'btn_HistoryBack' => true,
-        ]));
-    }
-
-    public function designerHelp(): void
-    {
-        if (!($this->application->getConnectedUser()->isLoanDesigner() ?? false)) {
-            $this->raiseForbidden(__FILE__, __LINE__);
-            return;
-        }
-        $lang = TranslationManager::getCurrentLanguage();
-        $this->render('Common/views/info.latte', [
-            'content' => $this->dataHelper->get('Languages', ['Name' => 'Help_LoanDesigner'], $lang)->$lang ?? '',
-            'hasAuthorization' => $this->application->getConnectedUser()->isRedactor() ?? false,
-            'currentVersion' => Application::VERSION,
-            'timer' => 0,
-            'previousPage' => true,
-            'page' => $this->application->getConnectedUser()->getPage(),
-        ]);
     }
 }

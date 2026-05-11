@@ -18,11 +18,8 @@
     </button>
 </div>
 
-
-{* Alerte *}
 <div id="loanAlert" class="alert d-none" role="alert"></div>
 
-{* Tableau des matériels *}
 <div class="card shadow-sm">
     <div class="card-body p-0">
         <table class="table table-hover table-striped mb-0" id="tblItems">
@@ -59,11 +56,11 @@
                         {/if}
                     </td>
                     <td class="text-end">
-                        <button class="btn btn-sm btn-warning"
+                        <button class="btn btn-sm btn-warning btn-edit-item"
                                 data-id="{$item['Id']}">
                             <i class="bi bi-pencil"></i>
                         </button>
-                        <button class="btn btn-sm btn-danger"
+                        <button class="btn btn-sm btn-danger btn-delete-item"
                                 data-id="{$item['Id']}" data-name="{$item['Name']}">
                             <i class="bi bi-trash"></i>
                         </button>
@@ -81,63 +78,8 @@
     </div>
 </div>
 
-{* Modal ajout / modification *}
-<div class="modal fade" id="modalItem" tabindex="-1" aria-labelledby="modalItemLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="modalItemLabel"></h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <input type="hidden" id="itemId">
-                <div class="mb-3">
-                    <label class="form-label fw-semibold" for="itemName">
-                        {='loan.item.name'|translate} <span class="text-danger">*</span>
-                    </label>
-                    <input type="text" class="form-control" id="itemName" maxlength="200" required>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label" for="itemDescription">
-                        {='loan.item.description'|translate}
-                    </label>
-                    <textarea class="form-control" id="itemDescription" rows="2"></textarea>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label fw-semibold" for="itemType">
-                        {='loan.item.type'|translate}
-                    </label>
-                    <select class="form-select" id="itemType">
-                        <option value="loan">{='loan.item.type.loan'|translate}</option>
-                        <option value="reservation">{='loan.item.type.reservation'|translate}</option>
-                        <option value="both">{='loan.item.type.both'|translate}</option>
-                    </select>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label fw-semibold" for="itemQuantity">
-                        {='loan.item.quantity'|translate}
-                    </label>
-                    <input type="number" class="form-control" id="itemQuantity" min="1" value="1">
-                </div>
-                <div class="form-check form-switch">
-                    <input class="form-check-input" type="checkbox" id="itemActive" checked>
-                    <label class="form-check-label" for="itemActive">
-                        {='loan.item.active'|translate}
-                    </label>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                    {='cancel'|translate}
-                </button>
-                <button type="button" class="btn btn-primary" id="btnSaveItem">
-                    <span class="spinner-border spinner-border-sm d-none me-1" id="saveItemSpinner"></span>
-                    {='save'|translate}
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
+{include 'partials/modalItem.latte'}
+
 {/block}
 
 {block scripts}

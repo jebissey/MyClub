@@ -66,11 +66,12 @@ abstract class AbstractController
         $navbar = $_SESSION['navbar'] ?? '';
 
         return match ($navbar) {
+            'designer'          => '../../Designer/views/designer.latte',
             'eventManager'      => '../../Event/views/eventManager.latte',
             'personManager'     => '../../PersonManager/views/personManager.latte',
             'redactor'          => '../../Article/views/redactor.latte',
             'user'              => '../../User/views/user.latte',
-            'visitorInsights'   => '../../Webmaster/views/visitorInsights.latte',
+            'visitorInsights'   => '../../VisitorInsights/views/visitorInsights.latte',
             'webmaster'         => '../../Webmaster/views/webmaster.latte',
             ''                  => '../../Common/views/home.latte',
             default => Application::unreachable("Fatal error in file with navbar={$navbar}", __FILE__, __LINE__),
