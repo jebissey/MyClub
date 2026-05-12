@@ -34,7 +34,7 @@ class UserController extends AbstractController
         } catch (EmailException $e) {
             $this->flight->setData('message', "Error {$e->getMessage()} with email {$email}");
             $this->flight->setData('code', ApplicationError::BadRequest->value);
-            $content = $this->languagesDataHelper->translate('message_email_unknown');
+            $content = ($this->t)('message_email_unknown');
             $this->render('Common/views/info.latte', [
                 'content' => $content,
                 'hasAuthorization' => $this->application->getConnectedUser()->hasAutorization() ?? false,
@@ -50,7 +50,7 @@ class UserController extends AbstractController
         if ($success) {
             $this->flight->setData('message', "Password reset email sent to {$email}");
             $this->flight->setData('code', ApplicationError::Ok->value);
-            $content = $this->languagesDataHelper->translate('message_password_reset_sent');
+            $content = ($this->t)('message_password_reset_sent');
             $this->render('Common/views/info.latte', [
                 'content' => $content,
                 'hasAuthorization' => $this->application->getConnectedUser()->hasAutorization() ?? false,
@@ -61,7 +61,7 @@ class UserController extends AbstractController
             ]);
         } else {
             $this->flight->setData('message', "Unable to send password reset email to {$email}");
-            $content = $this->languagesDataHelper->translate('message_password_reset_failed');
+            $content = ($this->t)('message_password_reset_failed');
             $this->flight->setData('code', ApplicationError::Error->value);
             $this->render('Common/views/info.latte', [
                 'content' => $content,

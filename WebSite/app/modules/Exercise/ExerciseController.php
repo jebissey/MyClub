@@ -69,11 +69,11 @@ class ExerciseController extends TableController
         ];
         $filterValues = WebApp::filterInput($schema, $this->flight->request()->query->getData());
         $filterConfig = [
-            ['name' => 'PersonName', 'label' => $this->languagesDataHelper->translate('article.label.created_by')],
-            ['name' => 'title', 'label' => $this->languagesDataHelper->translate('article.label.title')],
-            ['name' => 'lastUpdate', 'label' => $this->languagesDataHelper->translate('article.label.last_update')],
-            ['name' => 'GroupName', 'label' => $this->languagesDataHelper->translate('article.label.group')],
-            ['name' => 'Content', 'label' => $this->languagesDataHelper->translate('article.label.content')],
+            ['name' => 'PersonName', 'label' => ($this->t)('article.label.created_by')],
+            ['name' => 'title', 'label' => ($this->t)('article.label.title')],
+            ['name' => 'lastUpdate', 'label' => ($this->t)('article.label.last_update')],
+            ['name' => 'GroupName', 'label' => ($this->t)('article.label.group')],
+            ['name' => 'Content', 'label' => ($this->t)('article.label.content')],
             ['name' => 'Id', 'label' => 'ID'],
         ];
         $columns = [
@@ -120,7 +120,7 @@ class ExerciseController extends TableController
         $exercises = json_decode($rawJson, true);
 
         if (!is_array($exercises)) {
-            $_SESSION['error'] = 'JSON invalide';
+            $_SESSION['error'] = ($this->t)('exercise.msg.invalid_json');
             $this->redirect('/exercise/edit/' . $id);
             return;
         }
@@ -133,7 +133,7 @@ class ExerciseController extends TableController
             'LastUpdate' => date('Y-m-d H:i:s'),
         ], ['Id' => $id]);
 
-        $_SESSION['success'] = $this->languagesDataHelper->translate('exercise.msg.saved');
+        $_SESSION['success'] = ($this->t)('exercise.msg.saved');
         $this->redirect('/exercise/edit/' . $id);
     }
 
@@ -179,7 +179,7 @@ class ExerciseController extends TableController
         ];
         $trans = [];
         foreach ($keys as $k) {
-            $trans[$k] = $this->languagesDataHelper->translate('exercise.' . $k);
+            $trans[$k] = ($this->t)('exercise.' . $k);
         }
         return $trans;
     }

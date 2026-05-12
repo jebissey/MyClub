@@ -65,7 +65,7 @@ class ArticleController extends TableController
             $msg = str_replace(
                 '{id}',
                 (string)$id,
-                $this->languagesDataHelper->translate('article.error.not_found')
+                ($this->t)('article.error.not_found')
             );
             $this->raiseBadRequest($msg, __FILE__, __LINE__);
             return;
@@ -100,7 +100,7 @@ class ArticleController extends TableController
             $input = WebApp::filterInput($schema, $this->flight->request()->data->getData());
             $newOwnerId = $input['newOwnerId'] ?? null;
             if (!$newOwnerId) {
-                $_SESSION['error'] = $this->languagesDataHelper->translate('article.error.owner_required');
+                $_SESSION['error'] = ($this->t)('article.error.owner_required');
                 $this->redirect('/articles');
                 return;
             }
@@ -109,10 +109,10 @@ class ArticleController extends TableController
                 'LastUpdate' => date('Y-m-d H:i:s')
             ], ['Id' => $id]);
             if ($result) {
-                $_SESSION['success'] = $this->languagesDataHelper->translate('article.success.updated');
+                $_SESSION['success'] = ($this->t)('article.success.updated');
                 $this->backup->save();
             } else {
-                $_SESSION['error'] = $this->languagesDataHelper->translate('article.error.update_failed');
+                $_SESSION['error'] = ($this->t)('article.error.update_failed');
             }
             $this->redirect('/article/' . $id);
         } elseif ($_SERVER['REQUEST_METHOD'] === 'GET') {
@@ -159,7 +159,7 @@ class ArticleController extends TableController
             $msg = str_replace(
                 '{id}',
                 (string)$id,
-                $this->languagesDataHelper->translate('article.error.not_found')
+                ($this->t)('article.error.not_found')
             );
             $this->raiseBadRequest($msg, __FILE__, __LINE__);
             return;
@@ -183,7 +183,7 @@ class ArticleController extends TableController
             $msg = str_replace(
                 '{id}',
                 (string)$id,
-                $this->languagesDataHelper->translate('article.error.not_found')
+                ($this->t)('article.error.not_found')
             );
             $this->raiseBadRequest($msg, __FILE__, __LINE__);
             return;
@@ -216,9 +216,9 @@ class ArticleController extends TableController
             'carouselItems' => $this->dataHelper->gets('Carousel', ['IdArticle' => $id]),
             'page' => $connectedUser->getPage(),
             'translations' => [
-                'editorNotReady' => $this->languagesDataHelper->translate('article.edit.error.editor_not_ready'),
-                'titleRequired' => $this->languagesDataHelper->translate('article.edit.error.title_required'),
-                'contentRequired' => $this->languagesDataHelper->translate('article.edit.error.content_required'),
+                'editorNotReady' => ($this->t)('article.edit.error.editor_not_ready'),
+                'titleRequired' => ($this->t)('article.edit.error.title_required'),
+                'contentRequired' => ($this->t)('article.edit.error.content_required'),
             ],
         ]));
     }
@@ -243,7 +243,7 @@ class ArticleController extends TableController
             $msg = str_replace(
                 '{id}',
                 (string)$idArticle,
-                $this->languagesDataHelper->translate('article.error.unknown_author')
+                ($this->t)('article.error.unknown_author')
             );
             $this->raiseBadRequest($msg, __FILE__, __LINE__);
             return;
@@ -255,10 +255,10 @@ class ArticleController extends TableController
         $title = str_replace(
             '{root}',
             $root,
-            $this->languagesDataHelper->translate('article.email.new_title')
+            ($this->t)('article.email.new_title')
         );
-        $intro = $this->languagesDataHelper->translate('article.email.body_intro');
-        $unsubscribe = $this->languagesDataHelper->translate('article.email.unsubscribe');
+        $intro = ($this->t)('article.email.body_intro');
+        $unsubscribe = ($this->t)('article.email.unsubscribe');
         $message =
             $intro . "\n\n" .
             $articleLink . "\n\n" .
@@ -274,9 +274,9 @@ class ArticleController extends TableController
             cc: $filteredEmails
         );
         if ($this->emailService->send($emailMessage)) {
-            MessageService::set($this->languagesDataHelper->translate('article.success.email_sent') . " ({count($filteredEmails)})");
+            MessageService::set(($this->t)('article.success.email_sent') . " ({count($filteredEmails)})");
         } else {
-            MessageService::set($this->languagesDataHelper->translate('article.error.email_failed'), 'danger');
+            MessageService::set(($this->t)('article.error.email_failed'), 'danger');
         }
 
         $this->redirect('/article/' . $idArticle);
@@ -312,7 +312,7 @@ class ArticleController extends TableController
         $_SESSION['navbar'] = 'redactor';
         $this->render('Article/views/redactor.latte', $this->getAllParams([
             'page' => $this->application->getConnectedUser()->getPage(),
-            'content' => $this->languagesDataHelper->translate('Redactor')
+            'content' => ($this->t)('Redactor')
         ]));
     }
 
@@ -333,12 +333,12 @@ class ArticleController extends TableController
         ];
         $filterValues = WebApp::filterInput($schema, $this->flight->request()->query->getData());
         $filterConfig = [
-            ['name' => 'PersonName', 'label' => $this->languagesDataHelper->translate('article.label.created_by')],
-            ['name' => 'title', 'label' => $this->languagesDataHelper->translate('article.label.title')],
-            ['name' => 'lastUpdate', 'label' => $this->languagesDataHelper->translate('article.label.last_update')],
-            ['name' => 'pool', 'label' => $this->languagesDataHelper->translate('article.label.pool')],
-            ['name' => 'GroupName', 'label' => $this->languagesDataHelper->translate('article.label.group')],
-            ['name' => 'Content', 'label' => $this->languagesDataHelper->translate('article.label.content')],
+            ['name' => 'PersonName', 'label' => ($this->t)('article.label.created_by')],
+            ['name' => 'title', 'label' => ($this->t)('article.label.title')],
+            ['name' => 'lastUpdate', 'label' => ($this->t)('article.label.last_update')],
+            ['name' => 'pool', 'label' => ($this->t)('article.label.pool')],
+            ['name' => 'GroupName', 'label' => ($this->t)('article.label.group')],
+            ['name' => 'Content', 'label' => ($this->t)('article.label.content')],
             ['name' => 'Id', 'label' => 'ID'],
         ];
         if ($connectedUser->isEditor() || false) {
@@ -346,18 +346,18 @@ class ArticleController extends TableController
             $filterConfig[] = ['name' => 'menu', 'label' => 'Menu'];
         }
         $columns = [
-            ['field' => 'PersonName', 'label' => 'Créé par'],
-            ['field' => 'Title', 'label' => 'Titre'],
-            ['field' => 'LastUpdate', 'label' => 'Dernière modification'],
-            ['field' => 'GroupName', 'label' => 'Groupe'],
-            ['field' => 'ForMembers', 'label' => 'Club'],
-            ['field' => 'Pool', 'label' => 'Sondage'],
-            ['field' => 'PoolDetail', 'label' => 'Cloture (votes) visibilité'],
-            ['field' => 'Messages', 'label' => 'Messages'],
+            ['field' => 'PersonName', 'label' => ($this->t)('article.label.created_by')],
+            ['field' => 'Title', 'label' => ($this->t)('article.label.title')],
+            ['field' => 'LastUpdate', 'label' => ($this->t)('article.label.last_update')],
+            ['field' => 'GroupName', 'label' => ($this->t)('article.label.group')],
+            ['field' => 'ForMembers', 'label' => ($this->t)('article.label.for_members')],
+            ['field' => 'Pool', 'label' => ($this->t)('article.label.pool')],
+            ['field' => 'PoolDetail', 'label' => ($this->t)('article.label.pool_detail')],
+            ['field' => 'Messages', 'label' => ($this->t)('article.label.messages')],
         ];
         if ($connectedUser->isEditor()) {
-            $columns[] = ['field' => 'Published', 'label' => 'Publié'];
-            $columns[] = ['field' => 'Menu', 'label' => 'Menu'];
+            $columns[] = ['field' => 'Published', 'label' => ($this->t)('article.label.published')];
+            $columns[] = ['field' => 'Menu', 'label' => ($this->t)('article.label.menu')];
         }
         $query = $this->articleTableDataHelper->getQuery($connectedUser, (int)($this->articleDataHelper->getSpotlightArticle()['articleId'] ?? -1));
         $data = $this->prepareTableData($query, $filterValues);
@@ -407,9 +407,9 @@ class ArticleController extends TableController
                 'LastUpdate'     => date('Y-m-d H:i:s')
             ], ['Id' => $id]);
             if ($result) {
-                $_SESSION['success'] = $this->languagesDataHelper->translate('article.success.updated');
+                $_SESSION['success'] = ($this->t)('article.success.updated');
                 $this->backup->save();
-            } else $_SESSION['error'] = $this->languagesDataHelper->translate('article.error.update_failed');
+            } else $_SESSION['error'] = ($this->t)('article.error.update_failed');
             $this->redirect('/article/' . $id);
         } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             $this->render('User/views/publish.latte', $this->getAllParams([
@@ -430,7 +430,7 @@ class ArticleController extends TableController
             $msg = str_replace(
                 '{id}',
                 (string)$id,
-                $this->languagesDataHelper->translate('article.error.not_found')
+                ($this->t)('article.error.not_found')
             );
             $this->raiseBadRequest($msg, __FILE__, __LINE__);
             return;
@@ -444,7 +444,7 @@ class ArticleController extends TableController
                     return;
                 }
             }
-            $this->raiseBadRequest($this->languagesDataHelper->translate('article.error.login_required'), __FILE__, __LINE__);
+            $this->raiseBadRequest(($this->t)('article.error.login_required'), __FILE__, __LINE__);
             return;
         }
         try {
@@ -499,7 +499,7 @@ class ArticleController extends TableController
         }
         $connectedUser = $this->application->getConnectedUser();
         if (!$this->authorizationService->canRead($articleId, $connectedUser)) {
-            $this->raiseBadRequest($this->languagesDataHelper->translate('article.error.login_required'), __FILE__, __LINE__);
+            $this->raiseBadRequest(($this->t)('article.error.login_required'), __FILE__, __LINE__);
             return;
         }
         $person = $connectedUser->person;
@@ -565,7 +565,7 @@ class ArticleController extends TableController
         }
 
         $this->render('Article/views/topArticles.latte', $this->getAllParams([
-            'title'       => $this->languagesDataHelper->translate('visitor_insights.top_articles.title'),
+            'title'       => ($this->t)('visitor_insights.top_articles.title'),
             'period'      => $period->value,
             'periodFrom'  => $period->getStart()->format('Y-m-d H:i:s'),
             'periodTo'    => $period->getEnd()->format('Y-m-d H:i:s'),
@@ -601,7 +601,7 @@ class ArticleController extends TableController
         $title = $input['title'] ?? '???';
         $content = $input['content'] ?? '???';
         if (empty($title) || empty($content)) {
-            $_SESSION['error'] = $this->languagesDataHelper->translate('article.error.title_content_required');
+            $_SESSION['error'] = ($this->t)('article.error.title_content_required');
             $this->redirect('/article/' . $id);
             return;
         }
@@ -614,9 +614,9 @@ class ArticleController extends TableController
             'LastUpdate'     => date('Y-m-d H:i:s')
         ], ['Id' => $id]);
         if ($result) {
-            $_SESSION['success'] = $this->languagesDataHelper->translate('article.success.updated');
+            $_SESSION['success'] = ($this->t)('article.success.updated');
             $this->backup->save();
-        } else $_SESSION['error'] = $this->languagesDataHelper->translate('article.error.update_failed');
+        } else $_SESSION['error'] = ($this->t)('article.error.update_failed');
         $this->redirect('/article/' . $id);
     }
 }

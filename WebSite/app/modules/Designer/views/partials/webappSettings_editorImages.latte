@@ -1,0 +1,154 @@
+<div class="d-none" id="editor-images">
+    <div class="d-flex flex-column gap-3">
+
+        <!-- Navbar colors -->
+        <div class="p-3 border border-2 border-dashed rounded-3">
+            <div class="d-flex align-items-center gap-2 mb-3">
+                <i class="bi bi-palette2 text-primary"></i>
+                <span class="fw-semibold small">{='designer.home_settings.navbar_colors_title'|translate}</span>
+            </div>
+            <div class="d-flex flex-column gap-3">
+
+                <div class="d-flex align-items-center gap-3">
+                    <input type="color"
+                           id="input-navbar-bg"
+                           name="Navbar_BgColor"
+                           value="{$settings['Navbar_BgColor']}"
+                           class="form-control form-control-color flex-shrink-0"
+                           style="width:48px;height:38px;padding:2px;">
+                    <div>
+                        <label class="form-label fw-semibold mb-0 small" for="input-navbar-bg">
+                            {='designer.home_settings.navbar_bg_label'|translate}
+                        </label>
+                        <div class="text-muted small" id="label-navbar-bg">{$settings['Navbar_BgColor']}</div>
+
+                        <div id="navbar-contrast-info" class="small mt-2"></div>
+                    </div>
+                </div>
+
+                <div class="d-flex align-items-center gap-3">
+                    <input type="color"
+                           id="input-navbar-ink"
+                           name="Navbar_InkColor"
+                           value="{$settings['Navbar_InkColor']}"
+                           class="form-control form-control-color flex-shrink-0"
+                           style="width:48px;height:38px;padding:2px;">
+                    <div>
+                        <label class="form-label fw-semibold mb-0 small" for="input-navbar-ink">
+                            {='designer.home_settings.navbar_ink_label'|translate}
+                        </label>
+                        <div class="text-muted small" id="label-navbar-ink">{$settings['Navbar_InkColor']}</div>
+                    </div>
+                </div>
+
+                <div class="d-flex align-items-center gap-3">
+                    <input type="color"
+                        id="input-navbar-icon"
+                        name="Navbar_IconColor"
+                        value="{$settings['Navbar_IconColor']}"
+                        class="form-control form-control-color flex-shrink-0"
+                        style="width:48px;height:38px;padding:2px;">
+                    <div>
+                        <label class="form-label fw-semibold mb-0 small" for="input-navbar-icon">
+                            {='designer.home_settings.navbar_icon_label'|translate}
+                        </label>
+                        <div class="text-muted small" id="label-navbar-icon">{$settings['Navbar_IconColor']}</div>
+                    </div>
+                </div>
+
+                <hr class="my-3">
+
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                    <span class="fw-semibold small">
+                        <i class="bi bi-ui-radios-grid me-1"></i>
+                        {='designer.home_settings.navbar_harmony_title'|translate}
+                    </span>
+                    <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-2" id="btn-toggle-wheel">
+                        <i class="bi bi-chevron-down" id="icon-toggle-wheel"></i>
+                    </button>
+                </div>
+
+                <div id="color-wheel-panel" class="d-none">
+                    <div class="d-flex gap-3 align-items-start flex-wrap">
+                        <canvas id="color-wheel" width="160" height="160"
+                                style="border-radius:50%;cursor:crosshair;flex-shrink:0;"></canvas>
+                        <div class="flex-grow-1">
+                            <p class="text-muted mb-2" style="font-size:.72rem;">
+                                {='designer.home_settings.navbar_harmony_hint'|translate}
+                            </p>
+                            <div id="harmony-presets" class="d-flex flex-wrap gap-2"></div>
+                        </div>
+                    </div>
+                </div>                
+
+            </div>
+        </div>
+
+        <!-- home.png -->
+        <div class="img-upload-card p-3 border border-2 border-dashed rounded-3" id="upload-card-home" data-target="home">
+            <input type="file" id="file-home" accept="image/*" aria-label="home.png">
+            <div class="d-flex align-items-center gap-2 mb-2">
+                <span class="img-status-dot rounded-circle" id="dot-home" style="background:#198754;width:8px;height:8px;"></span>
+                <span class="fw-semibold small">home.png</span>
+                <span class="ms-auto badge bg-secondary-subtle text-secondary border">48 × 48 px</span>
+            </div>
+            <div class="d-flex align-items-center gap-3">
+                <div class="img-preview-wrap flex-shrink-0 rounded overflow-hidden" style="height:48px;width:48px;background:#f8f9fa;">
+                    <img id="preview-home" src="/app/images/home.png" alt="">
+                </div>
+                <p class="text-muted small mb-0">
+                    <i class="bi bi-info-circle me-1"></i>{='designer.home_settings.image_home_desc'|translate}
+                </p>
+            </div>
+            <div id="info-home" class="mt-2"></div>
+            <input type="hidden" name="img_home" id="hidden-home">
+        </div>
+
+        <!-- logo.png -->
+        <div class="img-upload-card p-3 border border-2 border-dashed rounded-3" id="upload-card-logo" data-target="logo">
+            <input type="file" id="file-logo" accept="image/*" aria-label="logo.png">
+            <div class="d-flex align-items-center gap-2 mb-2">
+                <span class="img-status-dot rounded-circle" id="dot-logo" style="background:#198754;width:8px;height:8px;"></span>
+                <span class="fw-semibold small">logo.png</span>
+                <span class="ms-auto badge bg-secondary-subtle text-secondary border">max 1200 × 1200 px</span>
+            </div>
+            <div class="d-flex align-items-center gap-3">
+                <div class="img-preview-wrap flex-shrink-0 rounded overflow-hidden" style="height:48px;width:80px;background:#f8f9fa;">
+                    <img id="preview-logo" src="/app/images/logo.png" alt="" style="max-height:48px;">
+                </div>
+                <p class="text-muted small mb-0">
+                    <i class="bi bi-info-circle me-1"></i>{='designer.home_settings.image_logo_desc'|translate}
+                </p>
+            </div>
+            <div id="info-logo" class="mt-2"></div>
+            <input type="hidden" name="img_logo" id="hidden-logo">
+        </div>
+
+        <!-- header-banner.jpg -->
+        <div class="img-upload-card p-3 border border-2 border-dashed rounded-3" id="upload-card-banner" data-target="banner">
+            <input type="file" id="file-banner" accept="image/*" aria-label="header-banner.jpg">
+            <div class="d-flex align-items-center gap-2 mb-2">
+                <span class="img-status-dot rounded-circle" id="dot-banner"
+                      style="background:{file_exists('app/images/header-banner.jpg') ? '#198754' : '#adb5bd'};width:8px;height:8px;"></span>
+                <span class="fw-semibold small">header-banner.jpg</span>
+                <span class="ms-auto badge bg-secondary-subtle text-secondary border">max 1920 × 600 px</span>
+            </div>
+            <div class="img-preview-wrap mb-2 rounded overflow-hidden" style="height:50px;background:#f8f9fa;">
+                {if file_exists('app/images/header-banner.jpg')}
+                    <img id="preview-banner" src="/app/images/header-banner.jpg"
+                         alt="" style="width:100%;height:50px;object-fit:cover;">
+                {else}
+                    <div class="h-100 d-flex align-items-center justify-content-center text-secondary">
+                        <i class="bi bi-panorama fs-4"></i>
+                    </div>
+                {/if}
+            </div>
+            <p class="text-muted small mb-0">
+                <i class="bi bi-info-circle me-1"></i>{='designer.home_settings.image_banner_desc'|translate}
+            </p>
+            <div id="info-banner" class="mt-2"></div>
+            <input type="hidden" name="img_banner" id="hidden-banner">
+        </div>
+
+    </div>
+</div>

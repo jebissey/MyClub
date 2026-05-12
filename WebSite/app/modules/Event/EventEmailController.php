@@ -69,12 +69,12 @@ class EventEmailController extends AbstractController
         $this->render('Event/views/copyToClipBoard.latte', $this->getAllParams([
             'emailsJson' => json_encode($filteredEmails),
             'emails' => $filteredEmails,
-            'filters' => "{$groupName} / {$eventTypeName} / {$dayOfWeekName} / {$this->languagesDataHelper->translate($timeOfDay)}",
+            'filters' => "{$groupName} / {$eventTypeName} / {$dayOfWeekName} / {($this->t)($timeOfDay)}",
             'people' => $this->dataHelper->gets('Person', ['Inactivated' => 0], 'Email, Phone, FirstName, LastName, NickName', '', true),
             'page' => $this->application->getConnectedUser()->getPage(),
             'translations' => [
-                'copySuccess' => $this->languagesDataHelper->translate('event.copy_emails.clipboard.success'),
-                'copyError'   => $this->languagesDataHelper->translate('event.copy_emails.clipboard.error'),
+                'copySuccess' => ($this->t)('event.copy_emails.clipboard.success'),
+                'copyError'   => ($this->t)('event.copy_emails.clipboard.error'),
             ],
         ]));
     }

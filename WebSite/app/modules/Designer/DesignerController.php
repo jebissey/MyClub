@@ -36,7 +36,7 @@ class DesignerController extends AbstractController
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isDesigner())) {
             $_SESSION['navbar'] = 'designer';
             $connectedUser = $this->application->getConnectedUser();
-            $content = $this->languagesDataHelper->translate('Designer');
+            $content = ($this->t)('Designer');
             $params = [
                 'isEventDesigner' => $connectedUser->isEventDesigner(),
                 'isExerciseDesigner' => $connectedUser->isExerciseDesigner(),

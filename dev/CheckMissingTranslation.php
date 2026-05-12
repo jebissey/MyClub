@@ -139,14 +139,17 @@ echo sprintf("  %d fichier(s) — %d occurrence(s) trouvée(s).",
 ) . PHP_EOL . PHP_EOL;
 
 // — .php ───────────────────────────────────────────────────────────────────────
-// Syntaxe 1 : ->translate('some.key')
-// Syntaxe 2 : ->get('Languages', ['Name' => 'some.key'], ...)
-
 echo bold("» Scan des fichiers .php dans :") . PHP_EOL;
 echo dim("  $scanDir") . PHP_EOL . PHP_EOL;
 
 $phpResult = scanFiles($scanDir, '/\.php$/i', [
+    // $this->languagesDataHelper->translate('key')
     '/->translate\(\s*[\'"]([a-zA-Z0-9_.]+)[\'"]\s*\)/',
+
+    // $this->t('key') ou ($this->t)('key')
+    '/(?:->t|\$t)\s*\)?\s*\(\s*[\'"]([a-zA-Z0-9_.]+)[\'"]\s*\)/',
+
+    // $this->db->get('Languages', ['Name' => 'key'])
     '/->get\(\s*[\'"]Languages[\'"]\s*,\s*\[\s*[\'"]Name[\'"]\s*=>\s*[\'"]([a-zA-Z0-9_.]+)[\'"]\s*\]/',
 ], $usedKeys);
 

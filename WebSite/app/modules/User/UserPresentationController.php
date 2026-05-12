@@ -29,7 +29,7 @@ class UserPresentationController extends AbstractController
                 'person' => $person,
                 'navItems' => $this->getNavItems($person),
                 'page' => $this->application->getConnectedUser()->getPage(),
-                'validationMsg' => $this->languagesDataHelper->translate('presentation.edit.validation.noContent'),
+                'validationMsg' => ($this->t)('presentation.edit.validation.noContent'),
                 'maxZoom' => 18,
             ]));
         } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);

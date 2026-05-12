@@ -105,7 +105,7 @@ class DbBrowserController extends TableController
                 'btn_Parent' => "/dbbrowser",
                 'btn_Plus' => "/dbbrowser/{$table}/create",
                 'resetUrl' => '/dbbrowser',
-                'confirmDeleteMessage' => $this->languagesDataHelper->translate('dbbrowser.delete.confirm'),
+                'confirmDeleteMessage' => ($this->t)('dbbrowser.delete.confirm'),
             ]));
         }
     }

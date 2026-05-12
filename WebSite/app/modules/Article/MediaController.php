@@ -109,14 +109,14 @@ class MediaController extends AbstractController
                 'groups'               => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
                 'isEditor'             => $connectedUser->isEditor(),
                 'translations' => [
-                    'urlCopied'     => $this->languagesDataHelper->translate('media.manager.share.url_copied'),
-                    'linkCopied'    => $this->languagesDataHelper->translate('media.manager.share.link_copied'),
-                    'shareCreated'  => $this->languagesDataHelper->translate('media.manager.share.created'),
-                    'shareDeleted'  => $this->languagesDataHelper->translate('media.manager.share.deleted'),
-                    'shareError'    => $this->languagesDataHelper->translate('media.manager.share.error'),
-                    'deleteConfirm' => $this->languagesDataHelper->translate('media.manager.delete.confirm'),
-                    'deleteSuccess' => $this->languagesDataHelper->translate('media.manager.delete.success'),
-                    'deleteError'   => $this->languagesDataHelper->translate('media.manager.delete.error'),
+                    'urlCopied'     => ($this->t)('media.manager.share.url_copied'),
+                    'linkCopied'    => ($this->t)('media.manager.share.link_copied'),
+                    'shareCreated'  => ($this->t)('media.manager.share.created'),
+                    'shareDeleted'  => ($this->t)('media.manager.share.deleted'),
+                    'shareError'    => ($this->t)('media.manager.share.error'),
+                    'deleteConfirm' => ($this->t)('media.manager.delete.confirm'),
+                    'deleteSuccess' => ($this->t)('media.manager.delete.success'),
+                    'deleteError'   => ($this->t)('media.manager.delete.error'),
                 ],
             ]));
         }

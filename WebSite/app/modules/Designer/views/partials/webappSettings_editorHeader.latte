@@ -1,0 +1,9 @@
+<div class="d-none flex-column flex-grow-1" id="editor-header">
+    <p class="text-muted small mb-3">
+        <i class="bi bi-translate me-1"></i>
+        {='designer.home_settings.header_description'|translate}
+        <strong>{$currentLanguage}</strong>
+        {='designer.home_settings.header_table_hint'|translate}
+    </p>
+    <textarea id="tinymce-header" name="Home_Header" class="form-control" style="flex:1; resize:none;">{$settings['Home_Header']|noescape}</textarea>
+</div>

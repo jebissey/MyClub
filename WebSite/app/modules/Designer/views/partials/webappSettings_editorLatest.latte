@@ -1,0 +1,25 @@
+<div class="d-none" id="editor-latest">
+
+    <label class="form-label fw-semibold" for="input-latest-count">
+        {='designer.home_settings.latest_label'|translate}
+    </label>
+    <p class="text-muted small">
+        {='designer.home_settings.latest_description'|translate}
+    </p>
+    <div class="d-flex align-items-center gap-3 flex-wrap mb-3">
+        <div class="input-group" style="max-width:160px;">
+            <span class="input-group-text"><i class="bi bi-list-ol"></i></span>
+            <input type="number" class="form-control"
+                   id="input-latest-count"
+                   name="Home_LatestArticlesCount"
+                   value="{$settings['Home_LatestArticlesCount']}"
+                   min="0" max="50" step="1">
+        </div>
+        <input type="range" class="form-range flex-grow-1" style="max-width:200px;"
+               id="slider-latest-count"
+               min="0" max="50" step="1"
+               value="{$settings['Home_LatestArticlesCount']}">
+    </div>
+    <div id="latest-count-status" class="alert mb-0"></div>
+
+</div>

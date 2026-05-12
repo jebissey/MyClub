@@ -52,10 +52,10 @@ class UserStatisticsController extends AbstractController
             'btn_HistoryBack'        => true,
             'btn_Parent'             => "/user",
             'translations'           => [
-                'visitsYAxis'          => $this->languagesDataHelper->translate('user.statistics.chart.visits.y_axis'),
-                'visitsXAxis'          => $this->languagesDataHelper->translate('user.statistics.chart.visits.x_axis'),
-                'participationsYAxis'  => $this->languagesDataHelper->translate('user.statistics.chart.participations.y_axis'),
-                'participationsXAxis'  => $this->languagesDataHelper->translate('user.statistics.chart.participations.x_axis'),
+                'visitsYAxis'          => ($this->t)('user.statistics.chart.visits.y_axis'),
+                'visitsXAxis'          => ($this->t)('user.statistics.chart.visits.x_axis'),
+                'participationsYAxis'  => ($this->t)('user.statistics.chart.participations.y_axis'),
+                'participationsXAxis'  => ($this->t)('user.statistics.chart.participations.x_axis'),
             ],
         ]));
     }

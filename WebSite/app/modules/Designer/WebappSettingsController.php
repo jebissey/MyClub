@@ -43,6 +43,11 @@ class WebappSettingsController extends AbstractController
         'img_logo'   => ['path' => 'app/images/logo.png',           'mime' => ['image/png']],
         'img_banner' => ['path' => 'app/images/header-banner.jpg',  'mime' => ['image/jpeg']],
     ];
+    private array $colorSettingsKeys = [
+        'Navbar_BgColor'   => ['default' => '#212529'],
+        'Navbar_InkColor'  => ['default' => '#ffffff'],
+        'Navbar_IconColor' => ['default' => '#ffc107'],
+    ];
 
     public function __construct(Application $application)
     {
@@ -78,6 +83,18 @@ class WebappSettingsController extends AbstractController
                 $settings[$key] = (int) ($result->Value ?? $config['default']);
             }
         }
+        foreach ($this->colorSettingsKeys as $key => $config) {
+            $result = $this->dataHelper->get('Settings', ['Name' => $key], 'Value');
+            if ($result === false) {
+                $this->dataHelper->set('Settings', [
+                    'Name'  => $key,
+                    'Value' => $config['default'],
+                ]);
+                $settings[$key] = $config['default'];
+            } else {
+                $settings[$key] = $result->Value ?? $config['default'];
+            }
+        }
 
         $this->render('Designer/views/webappSettings.latte', $this->getAllParams([
             'navItems'            => $this->getNavItems($this->application->getConnectedUser()->person),
@@ -89,9 +106,9 @@ class WebappSettingsController extends AbstractController
             'currentLanguage'     => $lang,
             'forcedLanguage'      => $this->metadataDataHelper->getForcedLanguage(),
             'translations' => [
-                'imageProcessing'         => $this->languagesDataHelper->translate('designer.home_settings.image_processing'),
-                'imageToSave'             => $this->languagesDataHelper->translate('designer.home_settings.image_to_save'),
-                'imageReadError'          => $this->languagesDataHelper->translate('designer.home_settings.image_read_error'),
+                'imageProcessing' => ($this->t)('designer.home_settings.image_processing'),
+                'imageToSave'     => ($this->t)('designer.home_settings.image_to_save'),
+                'imageReadError'  => ($this->t)('designer.home_settings.image_read_error'),
             ],
         ]));
     }
@@ -107,9 +124,12 @@ class WebappSettingsController extends AbstractController
             'Home_FeaturedArticleId'         => FilterInputRule::Int->value,
             'Home_FeaturedArticleParagraphs' => FilterInputRule::Int->value,
             'Home_LatestArticlesCount'       => FilterInputRule::Int->value,
-            'img_home'                       => FilterInputRule::DataUrl->value,
-            'img_logo'                       => FilterInputRule::DataUrl->value,
-            'img_banner'                     => FilterInputRule::DataUrl->value,
+            'img_home'   => FilterInputRule::DataUrl->value,
+            'img_logo'   => FilterInputRule::DataUrl->value,
+            'img_banner' => FilterInputRule::DataUrl->value,
+            'Navbar_BgColor'  => FilterInputRule::Color->value,
+            'Navbar_InkColor' => FilterInputRule::Color->value,
+            'Navbar_IconColor' => FilterInputRule::Color->value,
         ];
         $input = WebApp::filterInput($schema, $this->flight->request()->data->getData());
         $lang = TranslationManager::getCurrentLanguage();
@@ -123,13 +143,22 @@ class WebappSettingsController extends AbstractController
             }
         }
         foreach ($this->numericSettingsKeys as $key => $config) {
-            $raw      = (int) ($input[$key] ?? $config['default']);
-            $value    = max($config['min'], $config['max'] !== null ? min($config['max'], $raw) : $raw);
+            $value    = $input[$key] ?? $config['default'];
             $existing = $this->dataHelper->get('Settings', ['Name' => $key], 'Value');
             if ($existing === false) {
                 $this->dataHelper->set('Settings', ['Name' => $key, 'Value' => (string) $value]);
             } else {
                 $this->dataHelper->set('Settings', ['Value' => (string) $value], ['Name' => $key]);
+            }
+        }
+        foreach ($this->colorSettingsKeys as $key => $config) {
+            $raw   = $input[$key] ?? $config['default'];
+            $value = preg_match('/^#[0-9a-fA-F]{6}$/', $raw) ? $raw : $config['default'];
+            $existing = $this->dataHelper->get('Settings', ['Name' => $key], 'Value');
+            if ($existing === false) {
+                $this->dataHelper->set('Settings', ['Name' => $key, 'Value' => $value]);
+            } else {
+                $this->dataHelper->set('Settings', ['Value' => $value], ['Name' => $key]);
             }
         }
         foreach ($this->imageTargets as $field => $target) {

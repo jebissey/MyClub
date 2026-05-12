@@ -282,7 +282,7 @@ class EventController extends AbstractController
 
         $this->render('Event/views/eventManager.latte', $this->getAllParams([
             'page' => $this->application->getConnectedUser()->getPage(),
-            'content' => $this->languagesDataHelper->translate('EventManager')
+            'content' => ($this->t)('EventManager')
         ]));
     }
 

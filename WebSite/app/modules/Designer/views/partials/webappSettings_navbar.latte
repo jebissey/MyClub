@@ -1,0 +1,36 @@
+<div class="container-fluid d-flex align-items-center gap-2">
+
+    <div class="d-flex gap-2 flex-shrink-0">
+        <a class="navbar-brand" href="/">
+            <img src="/app/images/home.png" alt="Home" height="32">
+        </a>
+        <button class="btn btn-primary fs-4" onclick="history.back()">
+            <i class="bi bi-arrow-left-circle"></i>
+        </button>
+    </div>
+
+    <div id="languageSelector"
+         class="d-flex align-items-center gap-2 border border-secondary-subtle rounded-3 p-3 bg-light mx-auto">
+        <select id="languageSelect" class="form-select form-select-sm" style="width:auto;">
+            {foreach $supportedLanguages as $lang}
+                <option value="{$lang}" {$lang === $currentLanguage ? 'selected' : ''}>{$lang}</option>
+            {/foreach}
+        </select>
+        <div class="form-check mb-0">
+            <input class="form-check-input" type="checkbox" id="useLanguage" value="1"
+                   {if $forcedLanguage != ''}checked{/if}>
+            <label class="form-check-label small" for="useLanguage">{='designer.home_settings.force_language'|translate}</label>
+        </div>
+        <button id="saveLanguage" class="btn btn-sm btn-success">{='save'|translate}</button>
+    </div>
+
+    <div class="ms-auto d-flex gap-2 flex-shrink-0">
+        <button type="submit" form="settingsForm" class="btn btn-success">
+            <i class="bi bi-check-circle"></i> {='save'|translate}
+        </button>
+        <a href="/designer" class="btn btn-secondary">
+            <i class="bi bi-x-circle"></i> {='cancel'|translate}
+        </a>
+    </div>
+
+</div>

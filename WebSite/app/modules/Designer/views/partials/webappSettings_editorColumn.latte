@@ -1,0 +1,30 @@
+<div class="col-lg-6">
+    <div class="card border-0 rounded-3 shadow-sm d-flex flex-column" style="height:calc(100vh - 140px);overflow:hidden;">
+
+        <div class="card-header bg-white border-bottom d-flex align-items-center gap-2 py-3 flex-shrink-0">
+            <span id="editor-section-icon"
+                  class="d-inline-block rounded-circle flex-shrink-0"
+                  style="width:10px;height:10px;background:#dee2e6;"></span>
+            <span id="editor-section-title" class="text-muted">
+                {='designer.home_settings.editor_select_hint'|translate}
+            </span>
+        </div>
+
+        <div class="card-body p-4 flex-grow-1 overflow-y-auto d-flex flex-column">
+
+            <!-- Placeholder -->
+            <div id="editor-placeholder" class="d-flex flex-column align-items-center justify-content-center text-muted text-center h-100">
+                <span class="fs-1 mb-3">👈</span>
+                <span class="fw-semibold">{='designer.home_settings.editor_placeholder_title'|translate}</span>
+                <span class="small">{='designer.home_settings.editor_placeholder_subtitle'|translate}</span>
+            </div>
+
+            {include 'webappSettings_editorHeader.latte'}
+            {include 'webappSettings_editorArticle.latte'}
+            {include 'webappSettings_editorLatest.latte'}
+            {include 'webappSettings_editorFooter.latte'}
+            {include 'webappSettings_editorImages.latte'}
+
+        </div>
+    </div>
+</div>

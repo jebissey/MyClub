@@ -1,0 +1,155 @@
+<div class="col-lg-6">
+    <p class="text-muted small mb-2">
+        <i class="bi bi-eye me-1"></i>{='designer.home_settings.preview_hint'|translate}
+    </p>
+    <div style="height:calc(100vh - 200px); overflow-y:auto;">
+        <div class="border border-2 rounded-3 overflow-hidden shadow-sm bg-light">
+
+            <!-- Banner -->
+            <div class="prev-section border-0 border-bottom border-2 rounded-0 p-0"
+                 id="prev-images"
+                 onclick="activateSection('images')"
+                 title="{='designer.home_settings.title_edit_images'|translate}"
+                 style="cursor:pointer;border-bottom-style:dashed !important;border-color:#d63384 !important;">
+                {if file_exists('app/images/header-banner.jpg')}
+                    <img id="prev-thumb-banner"
+                         src="/app/images/header-banner.jpg"
+                         alt=""
+                         style="width:100%;height:50px;object-fit:cover;display:block;">
+                {else}
+                    <div id="prev-thumb-banner"
+                         class="d-flex align-items-center justify-content-center gap-2 text-muted small fst-italic py-3"
+                         style="height:50px;background:repeating-conic-gradient(#e9ecef 0% 25%,#fff 0% 50%) 0 0/12px 12px;">
+                        <i class="bi bi-panorama" style="color:#d63384;"></i>
+                        header-banner.jpg — {='designer.home_settings.preview_empty'|translate}
+                    </div>
+                {/if}
+            </div>
+
+            <!-- Navbar -->
+            {if $isMenuDesigner}<a href="/menu" class="text-decoration-none">{/if}
+            <div id="prev-navbar"
+                class="d-flex align-items-center gap-2 px-3"
+                data-bg="{$settings['Navbar_BgColor']}"
+                data-ink="{$settings['Navbar_InkColor']}"
+                data-icon="{$settings['Navbar_IconColor']}"
+                title="{='navbar.designer.menu'|translate}"
+                style="height:38px;transition:background-color .2s,color .2s;">
+                <div>Lorem Ipsum</div>
+                <div id="prev-navbar-icons" class="d-flex gap-2 ms-auto">
+                    <i class="bi bi-question-circle-fill" style="font-size:1.2rem;opacity:.7;"></i>
+                    <i class="bi bi-signpost-split-fill"  style="font-size:1.2rem;opacity:.7;"></i>
+                    <i class="bi bi-key-fill"             style="font-size:1.3rem;opacity:.7;"></i>
+                    <span style="font-size:1.2rem;opacity:.7;">🤫</span>
+                    <i class="bi bi-box-arrow-right"      style="font-size:1.3rem;opacity:.7;"></i>
+                </div>
+            </div>
+            {if $isMenuDesigner}</a>{/if}
+
+            <div class="p-3 d-flex flex-column gap-3">
+
+                <!-- Header -->
+                <div class="prev-section rounded-3 p-3 border border-2 border-dashed bg-primary bg-opacity-10"
+                     id="prev-header"
+                     onclick="activateSection('header')"
+                     title="{='designer.home_settings.title_edit_header'|translate}">
+                    <div class="d-flex align-items-center gap-2 small fw-bold text-uppercase text-primary mb-2">
+                        <span class="d-inline-block rounded-circle" style="width:8px;height:8px;background:currentColor;"></span>
+                        {='designer.home_settings.section_header'|translate}
+                    </div>
+                    <div id="preview-header-html" class="prev-html-render small text-secondary">
+                        {if $settings['Home_Header'] !== ''}
+                            {$settings['Home_Header']|noescape}
+                        {else}
+                            <span class="fst-italic text-muted d-flex align-items-center gap-1 py-1">
+                                <i class="bi bi-dash-circle"></i> {='designer.home_settings.preview_empty'|translate}
+                            </span>
+                        {/if}
+                    </div>
+                </div>
+
+                <!-- Article -->
+                <div class="prev-section rounded-3 p-3 border border-2 border-dashed bg-white"
+                     id="prev-article"
+                     onclick="activateSection('article')"
+                     title="{='designer.home_settings.title_edit_article'|translate}">
+                    <div class="d-flex align-items-center gap-2 small fw-bold text-uppercase text-success mb-2">
+                        <span class="d-inline-block rounded-circle" style="width:8px;height:8px;background:currentColor;"></span>
+                        {='designer.home_settings.section_article'|translate}
+                    </div>
+                    <div id="preview-article-content">
+                        {if (int)$settings['Home_FeaturedArticleId'] > 0}
+                            <div class="d-flex align-items-center gap-2 small text-success fw-semibold">
+                                <i class="bi bi-file-earmark-text"></i>
+                                Article ID&nbsp;<strong>{$settings['Home_FeaturedArticleId']}</strong>
+                            </div>
+                        {else}
+                            <div class="d-flex flex-column gap-1">
+                                <div class="rounded bg-secondary-subtle" style="width:80%;height:8px;"></div>
+                                <div class="rounded bg-secondary-subtle" style="width:95%;height:8px;"></div>
+                                <div class="rounded bg-secondary-subtle" style="width:70%;height:8px;"></div>
+                                <span class="fst-italic text-muted d-flex align-items-center gap-1 small mt-1">
+                                    <i class="bi bi-arrow-return-right"></i>
+                                    {='designer.home_settings.preview_article_auto'|translate}
+                                </span>
+                            </div>
+                        {/if}
+                    </div>
+                </div>
+
+                <!-- Latest articles -->
+                <div class="prev-section rounded-3 p-3 border border-2 border-dashed bg-warning bg-opacity-10"
+                     id="prev-latest"
+                     onclick="activateSection('latest')"
+                     title="{='designer.home_settings.title_edit_latest'|translate}">
+                    <div class="d-flex align-items-center gap-2 small fw-bold text-uppercase text-warning mb-2">
+                        <span class="d-inline-block rounded-circle" style="width:8px;height:8px;background:currentColor;"></span>
+                        {='designer.home_settings.section_latest'|translate}
+                    </div>
+                    <div id="preview-latest-content">
+                        {var $latestCount = (int)$settings['Home_LatestArticlesCount']}
+                        {if $latestCount === 0}
+                            <span class="fst-italic text-muted d-flex align-items-center gap-1 small">
+                                <i class="bi bi-eye-slash"></i> {='designer.home_settings.preview_hidden'|translate}
+                            </span>
+                        {else}
+                            {for $i = 1; $i <= min($latestCount, 6); $i++}
+                                <div class="d-flex justify-content-between align-items-center py-1 border-bottom border-secondary-subtle">
+                                    <div class="rounded bg-secondary-subtle" style="width:65%;height:8px;"></div>
+                                    <span class="badge bg-secondary rounded-pill" style="font-size:.6rem;">01/01</span>
+                                </div>
+                            {/for}
+                            {if $latestCount > 6}
+                                <div class="text-center text-muted mt-1" style="font-size:.62rem;">
+                                    + {$latestCount - 6} {='designer.home_settings.preview_latest_more'|translate}
+                                </div>
+                            {/if}
+                        {/if}
+                    </div>
+                </div>
+
+                <!-- Footer -->
+                <div class="prev-section rounded-3 p-3 border border-2 border-dashed bg-primary bg-opacity-10"
+                     id="prev-footer"
+                     onclick="activateSection('footer')"
+                     title="{='designer.home_settings.title_edit_footer'|translate}"
+                     style="border-color:#6f42c1 !important;">
+                    <div class="d-flex align-items-center gap-2 small fw-bold text-uppercase mb-2" style="color:#6f42c1;">
+                        <span class="d-inline-block rounded-circle" style="width:8px;height:8px;background:currentColor;"></span>
+                        {='designer.home_settings.section_footer'|translate}
+                    </div>
+                    <div id="preview-footer-html" class="prev-html-render small text-secondary">
+                        {if $settings['Home_Footer'] !== ''}
+                            {$settings['Home_Footer']|noescape}
+                        {else}
+                            <span class="fst-italic text-muted d-flex align-items-center gap-1 py-1">
+                                <i class="bi bi-dash-circle"></i> {='designer.home_settings.preview_empty'|translate}
+                            </span>
+                        {/if}
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>

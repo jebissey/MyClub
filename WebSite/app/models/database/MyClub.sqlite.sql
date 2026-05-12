@@ -505,7 +505,6 @@ INSERT INTO "Languages" VALUES (20,'attributes','Attributes','Attribut','Atrybut
 INSERT INTO "Languages" VALUES (21,'description','Description','Description','Opis');
 INSERT INTO "Languages" VALUES (22,'participants','Participants','Participants','Uczestnicy');
 INSERT INTO "Languages" VALUES (23,'audience','Audience','Audience','Odbiorcy');
-INSERT INTO "Languages" VALUES (24,'ClubMembersOnly','Members','Membres','Członkowie');
 INSERT INTO "Languages" VALUES (25,'All','Public','Public','Publiczne');
 INSERT INTO "Languages" VALUES (26,'register','Register','S''inscrire','Zapisz się');
 INSERT INTO "Languages" VALUES (27,'unregister','Unregister','Se désinscrire','Wypisz się');
@@ -529,11 +528,6 @@ INSERT INTO "Languages" VALUES (44,'Guest','Guest','Invité','Gość');
 INSERT INTO "Languages" VALUES (45,'morning','Morning','Matin','Rano');
 INSERT INTO "Languages" VALUES (46,'afternoon','Afternoon','Après-midi','Południe');
 INSERT INTO "Languages" VALUES (47,'evening','Evening','Soir','Wieczór');
-INSERT INTO "Languages" VALUES (48,'Message_UnknownUser','Unknown user (email)','Utilisateur inconnu (courriel)','Nieznany użytkownik (e-mail)');
-INSERT INTO "Languages" VALUES (49,'comboSeparatorHome','--- Home ---','--- Accueil ---','--- Strona główna ---');
-INSERT INTO "Languages" VALUES (50,'comboSeparatorMessages','--- Messages ---','--- Messages ---','--- Wiadomości ---');
-INSERT INTO "Languages" VALUES (51,'comboSeparatorErrorPages','--- Error pages ---','--- Pages d''erreur ---','--- Strony błędów ---');
-INSERT INTO "Languages" VALUES (52,'comboSeparatorHelp','--- Help ---','--- Aides ---','--- Pomoce ---');
 INSERT INTO "Languages" VALUES (53,'Help_Admin','<div class="container my-3">
     <section class="mb-3">
         <div class="card shadow-sm">
@@ -1721,60 +1715,6 @@ INSERT INTO "Languages" VALUES (66,'Error500','<div class="container text-center
     <a href="/" class="btn btn-primary mt-3">🏠 Powrót do strony głównej</a>
   </div>
 </div>');
-INSERT INTO "Languages" VALUES (67,'LoginRequired','<div class="alert alert-warning" role="alert">
-  <p>🔒 <strong>Oops… this resource is reserved for logged-in members!</strong></p>
-  <p>You need to log in to access it.</p>
-  <p>💡 By choosing the "Remember me" option, your browser will roll out the 🟥red carpet🟥 next time, no password required.</p>
-</div>','<div class="alert alert-warning" role="alert">
-  <!-- Version française -->
-  <p>🔒 <strong>Oups… cette ressource est réservée aux membres connectés !</strong></p>
-  <p>Il faut se connecter pour la découvrir.</p>
-  <p>💡 Avec l''option « Se souvenir de moi », ton navigateur te déroulera le 🟥tapis rouge🟥 la prochaine fois, sans passer par la case mot de passe.</p>
-</div>','<div class="alert alert-warning" role="alert">
-  <p>🔒 <strong>Ups… ten zasób jest zarezerwowany dla zalogowanych członków!</strong></p>
-  <p>Musisz się zalogować, aby uzyskać do niego dostęp.</p>
-  <p>💡 Wybierając opcję „Zapamiętaj mnie", Twoja przeglądarka następnym razem rozłoży przed Tobą 🟥czerwony dywan🟥 — bez podawania hasła.</p>
-</div>');
-INSERT INTO "Languages" VALUES (68,'Error503','<div class="text-center full-screen d-flex flex-column justify-content-center align-items-center">
-    <div class="emoji">🚧</div>
-	<h1 class="mt-4">Site Under Maintenance</h1>
-	<p class="text-muted">You will be redirected to the homepage in 30 seconds...</p>
-	<a href="/" class="btn btn-primary mt-3">Return to Homepage Now</a>
-</div>
-<style>
-    .full-screen {
-      height: 100vh;
-    }
-    .emoji {
-      font-size: 10rem;
-    }
-</style>','<div class="text-center full-screen d-flex flex-column justify-content-center align-items-center">
-    <div class="emoji">🚧</div>
-    <h1 class="mt-4">Site en maintenance</h1>
-    <p class="text-muted">Vous serez redirigé vers l’accueil dans 30 secondes...</p>
-    <a href="/" class="btn btn-primary mt-3">Retourner à l’accueil maintenant</a>
-</div>
-<style>
-    .full-screen {
-      height: 100vh;
-    }
-    .emoji {
-      font-size: 10rem;
-    }
-</style>','<div class="text-center full-screen d-flex flex-column justify-content-center align-items-center">
-    <div class="emoji">🚧</div>
-    <h1 class="mt-4">Strona w trakcie konserwacji</h1>
-    <p class="text-muted">Za 30 sekund zostaniesz przekierowany/a na stronę główną...</p>
-    <a href="/" class="btn btn-primary mt-3">Wróć teraz na stronę główną</a>
-</div>
-<style>
-    .full-screen {
-      height: 100vh;
-    }
-    .emoji {
-      font-size: 10rem;
-    }
-</style>');
 INSERT INTO "Languages" VALUES (69,'message_password_reset_sent','<div class="container text-center mt-5">
   <div class="card shadow-lg rounded-3 p-4">
     <h1 class="text-success">📧 Email sent!</h1>
@@ -2690,7 +2630,6 @@ INSERT INTO "Languages" VALUES (98,'article.label.created_by','Created by','Cré
 INSERT INTO "Languages" VALUES (99,'article.label.title','Title','Titre','Tytuł');
 INSERT INTO "Languages" VALUES (100,'article.label.last_update','Last update','Dernière modification','Ostatnia modyfikacja');
 INSERT INTO "Languages" VALUES (101,'article.label.group','Group','Groupe','Grupa');
-INSERT INTO "Languages" VALUES (102,'article.label.published','Published','Publié','Opublikowany');
 INSERT INTO "Languages" VALUES (103,'article.label.pool','Survey','Sondage','Ankieta');
 INSERT INTO "Languages" VALUES (104,'article.label.content','Content','Contenu','Treść');
 INSERT INTO "Languages" VALUES (105,'article.error.email_failed','Failed to send email to subscribers','Échec de l''envoi du courriel aux abonnés','Nie można wysłać emaila do subskrybentów');
@@ -2739,7 +2678,6 @@ INSERT INTO "Languages" VALUES (147,'emailCredentials.title','Account to use for
 INSERT INTO "Languages" VALUES (148,'emailCredentials.smtpAccount','SMTP Account','Compte SMTP','Konto SMTP');
 INSERT INTO "Languages" VALUES (149,'emailCredentials.password','Password','Mot de passe','Hasło');
 INSERT INTO "Languages" VALUES (150,'emailCredentials.host','Host','Hôte','Host');
-INSERT INTO "Languages" VALUES (151,'emailCredentials.invalid_email','Please enter a valid email','Veuillez entrer un email valide','Proszę wprowadzić prawidłowy email');
 INSERT INTO "Languages" VALUES (152,'menu.add_item','Add item','Ajouter un élément','Dodaj element');
 INSERT INTO "Languages" VALUES (153,'menu.edit_item','Edit item','Modifier un élément','Edytuj element');
 INSERT INTO "Languages" VALUES (154,'menu.delete_confirm','Delete this item?','Supprimer cet élément ?','Usunąć ten element?');
@@ -2942,7 +2880,6 @@ INSERT INTO "Languages" VALUES (289,'communication.index.modal_cancel','Cancel',
 INSERT INTO "Languages" VALUES (290,'communication.index.modal_confirm','Confirm','Confirmer','Potwierdź');
 INSERT INTO "Languages" VALUES (291,'communication.index.sending','Sending…','Envoi en cours…','Wysyłanie…');
 INSERT INTO "Languages" VALUES (292,'navbar.admin.communication_manager','Communication Manager','Gestionnaire de communication','Menedżer komunikacji');
-INSERT INTO "Languages" VALUES (293,'communication.filters.desactivated_accounts','Deactivated accounts','Comptes désactivés','Konta dezaktywowane');
 INSERT INTO "Languages" VALUES (294,'designer.home_settings.title','Home page customization','Personnalisation de la page d''accueil','Personalizacja strony głównej');
 INSERT INTO "Languages" VALUES (295,'designer.home_settings.force_language','Force this language','Forcer cette langue','Wymuś ten język');
 INSERT INTO "Languages" VALUES (296,'designer.home_settings.preview_hint','Preview — click to edit','Aperçu — cliquez pour éditer','Podgląd — kliknij, aby edytować');
@@ -4719,14 +4656,6 @@ INSERT INTO "Languages" VALUES (419,'attribute_details','🔍 Attribute details'
 INSERT INTO "Languages" VALUES (420,'designer.home_settings.paragraphs_label','Number of paragraphs to display','Nombre de paragraphes à afficher','Liczba akapitów do wyświetlenia');
 INSERT INTO "Languages" VALUES (421,'designer.home_settings.paragraphs_description','Limits the number of paragraphs shown from the featured article on the home page.','Limite le nombre de paragraphes affichés de l''article mis en avant sur la page d''accueil.','Ogranicza liczbę akapitów wyświetlanych z wyróżnionego artykułu na stronie głównej.');
 INSERT INTO "Languages" VALUES (422,'designer.home_settings.paragraphs_zero_hint','0 = display the entire article','0 = afficher l''article entier','0 = wyświetl cały artykuł');
-INSERT INTO "Languages" VALUES (423,'designer.home_settings.section_images','Images','Images','Obrazy');
-INSERT INTO "Languages" VALUES (424,'designer.home_settings.article_featured_status','Article #{n} will be displayed on the home page.','L''article #{n} sera affiché en page d''accueil.','Artykuł #{n} zostanie wyświetlony na stronie głównej.');
-INSERT INTO "Languages" VALUES (425,'designer.home_settings.article_auto_status','The first paragraph of the last published article (or featured one) will be displayed.','Le 1er paragraphe du dernier article publié (ou celui mis en avant) sera affiché.','Zostanie wyświetlony pierwszy akapit ostatniego opublikowanego artykułu (lub wyróżnionego).');
-INSERT INTO "Languages" VALUES (426,'designer.home_settings.paragraphs_all','(entire article)','(article entier)','(cały artykuł)');
-INSERT INTO "Languages" VALUES (427,'designer.home_settings.paragraphs_count','({n} paragraph(s))','({n} paragraphe(s))','({n} akapit(y))');
-INSERT INTO "Languages" VALUES (428,'designer.home_settings.article_auto_preview_label','1st paragraph of last article / featured article','1er paragraphe du dernier article / article mis en avant','1. akapit ostatniego artykułu / wyróżnionego artykułu');
-INSERT INTO "Languages" VALUES (429,'designer.home_settings.latest_hidden_status','The "latest articles" section <strong>will not be displayed</strong>.','La section « derniers articles » <strong>ne sera pas affichée</strong>.','Sekcja „ostatnie artykuły" <strong>nie będzie wyświetlana</strong>.');
-INSERT INTO "Languages" VALUES (430,'designer.home_settings.latest_count_status','The <strong>{n}</strong> latest articles will be listed.','Les <strong>{n}</strong> derniers articles seront listés.','<strong>{n}</strong> ostatnich artykułów zostanie wylistowanych.');
 INSERT INTO "Languages" VALUES (431,'designer.home_settings.image_processing','Processing…','Traitement en cours…','Przetwarzanie…');
 INSERT INTO "Languages" VALUES (432,'designer.home_settings.image_to_save','Unsaved','À sauvegarder','Do zapisania');
 INSERT INTO "Languages" VALUES (433,'designer.home_settings.image_read_error','Unable to read the image.','Impossible de lire l''image.','Nie można odczytać obrazu.');
@@ -4741,10 +4670,6 @@ INSERT INTO "Languages" VALUES (441,'article.publish.do_publish','Publish this a
 INSERT INTO "Languages" VALUES (442,'article.publish.spotlight','Feature this article','Mettre à la une','Wyróżnij ten artykuł');
 INSERT INTO "Languages" VALUES (443,'article.publish.spotlight_date','Select the date until which the article will be featured','Sélectionnez la date jusqu''à laquelle l''article sera mis à la une','Wybierz datę, do której artykuł będzie wyróżniony');
 INSERT INTO "Languages" VALUES (444,'visitor_insights.statistics.title','Visitor Statistics','Statistiques des visiteurs','Statystyki odwiedzających');
-INSERT INTO "Languages" VALUES (445,'visitor_insights.statistics.by_day','By day','Par jour','Według dnia');
-INSERT INTO "Languages" VALUES (446,'visitor_insights.statistics.by_week','By week','Par semaine','Według tygodnia');
-INSERT INTO "Languages" VALUES (447,'visitor_insights.statistics.by_month','By month','Par mois','Według miesiąca');
-INSERT INTO "Languages" VALUES (448,'visitor_insights.statistics.by_year','By year','Par année','Według roku');
 INSERT INTO "Languages" VALUES (449,'visitor_insights.statistics.today','Today','Aujourd''hui','Dzisiaj');
 INSERT INTO "Languages" VALUES (450,'visitor_insights.statistics.details_of','Details of','Détails des','Szczegóły');
 INSERT INTO "Languages" VALUES (451,'visitor_insights.statistics.unique_visitors','Unique visitors','Visiteurs uniques','Unikalni odwiedzający');
@@ -4800,12 +4725,7 @@ INSERT INTO "Languages" VALUES (501,'events.calendar.heading','Events Calendar',
 INSERT INTO "Languages" VALUES (502,'events.calendar.week','Week','Semaine','Tydzień');
 INSERT INTO "Languages" VALUES (503,'events.calendar.no_event','No event','Aucun événement','Brak wydarzeń');
 INSERT INTO "Languages" VALUES (504,'events.calendar.no_events_scheduled','No events scheduled for the coming weeks.','Aucun événement programmé pour les prochaines semaines.','Brak zaplanowanych wydarzeń na najbliższe tygodnie.');
-INSERT INTO "Languages" VALUES (505,'events.calendar.welcome.title','Welcome to the outings calendar!','Bienvenue sur le calendrier des sorties !','Witamy w kalendarzu wyjazdów!');
-INSERT INTO "Languages" VALUES (506,'events.calendar.welcome.description','Find all our events here over 3 weeks.','Retrouvez ici tous nos événements sur 3 semaines.','Znajdź tutaj wszystkie nasze wydarzenia na 3 tygodnie.');
 INSERT INTO "Languages" VALUES (507,'events.calendar.welcome.members_only','Most are reserved for members, except those in bold with a link.','La plupart sont réservés aux membres, sauf ceux en gras avec un lien.','Większość jest zarezerwowana dla członków, z wyjątkiem tych pogrubionych z linkiem.');
-INSERT INTO "Languages" VALUES (508,'events.calendar.welcome.colored_squares','Colored squares = special info, hover to see details.','Carrés colorés = infos spéciales, survolez pour voir le détail.','Kolorowe kwadraty = specjalne informacje, najedź, aby zobaczyć szczegóły.');
-INSERT INTO "Languages" VALUES (509,'events.calendar.welcome.group_name','[Group name] = reserved for members of that group.','[Nom de groupe] = réservé aux membres de ce groupe.','[Nazwa grupy] = zarezerwowane dla członków tej grupy.');
-INSERT INTO "Languages" VALUES (510,'events.calendar.welcome.agenda','Mark your calendars! 📆✨','À vos agendas ! 📆✨','Do kalendarzy! 📆✨');
 INSERT INTO "Languages" VALUES (511,'events.calendar.welcome.register_button','Register for a public event','S''inscrire à un événement public','Zarejestruj się na wydarzenie publiczne');
 INSERT INTO "Languages" VALUES (512,'events.calendar.rss_subscribe','Subscribe to RSS feed','S''abonner au flux RSS','Subskrybuj kanał RSS');
 INSERT INTO "Languages" VALUES (513,'events.filter.by_preferences','Only events matching my preferences','Uniquement les événements qui correspondent à mes préférences','Tylko wydarzenia pasujące do moich preferencji');
@@ -4852,16 +4772,7 @@ INSERT INTO "Languages" VALUES (553,'chat.no_messages','No messages yet.\nBe the
 INSERT INTO "Languages" VALUES (554,'chat.online','Online:','En ligne :','Online:');
 INSERT INTO "Languages" VALUES (555,'chat.placeholder','Write your message...','Écrivez votre message...','Napisz wiadomość...');
 INSERT INTO "Languages" VALUES (556,'chat.send','Send','Envoyer','Wyślij');
-INSERT INTO "Languages" VALUES (557,'chat.edit_modal.title','Edit message','Modifier le message','Edytuj wiadomość');
-INSERT INTO "Languages" VALUES (558,'chat.edit_modal.message_label','Message:','Message :','Wiadomość:');
-INSERT INTO "Languages" VALUES (559,'chat.edit_modal.delete','Delete','Supprimer','Usuń');
-INSERT INTO "Languages" VALUES (560,'chat.edit_modal.cancel','Cancel','Annuler','Anuluj');
-INSERT INTO "Languages" VALUES (561,'chat.edit_modal.save','Save','Enregistrer','Zapisz');
-INSERT INTO "Languages" VALUES (562,'chat.error.send_failed','Unable to send message','Impossible d''envoyer le message','Nie można wysłać wiadomości');
-INSERT INTO "Languages" VALUES (563,'chat.confirm.delete','Are you sure you want to delete this message?','Êtes-vous sûr de vouloir supprimer ce message ?','Czy na pewno chcesz usunąć tę wiadomość?');
-INSERT INTO "Languages" VALUES (564,'chat.error.update_failed','An error occurred while editing the message','Une erreur est survenue lors de la modification du message','Wystąpił błąd podczas edycji wiadomości');
 INSERT INTO "Languages" VALUES (565,'chat.error.delete_failed','An error occurred while deleting the message','Une erreur est survenue lors de la suppression du message','Wystąpił błąd podczas usuwania wiadomości');
-INSERT INTO "Languages" VALUES (566,'chat.no_active_users','No active users','Aucun utilisateur actif','Brak aktywnych użytkowników');
 INSERT INTO "Languages" VALUES (567,'chat.no_messages','No messages yet.\nBe the first to write!','Aucun message pour le moment.\nSoyez le premier à écrire !','Brak wiadomości.\nBądź pierwszy!');
 INSERT INTO "Languages" VALUES (568,'chat.online','Online:','En ligne :','Online:');
 INSERT INTO "Languages" VALUES (571,'chat.edit_title','Edit message','Modifier le message','Edytuj wiadomość');
@@ -4870,10 +4781,7 @@ INSERT INTO "Languages" VALUES (573,'chat.message_label','Message:','Message :',
 INSERT INTO "Languages" VALUES (574,'chat.delete','Delete','Supprimer','Usuń');
 INSERT INTO "Languages" VALUES (575,'chat.cancel','Cancel','Annuler','Anuluj');
 INSERT INTO "Languages" VALUES (576,'chat.save','Save','Enregistrer','Zapisz');
-INSERT INTO "Languages" VALUES (577,'visitor_insights.top_pages.title','Top Visited Pages','Top des pages visitées','Top odwiedzanych stron');
 INSERT INTO "Languages" VALUES (578,'visitor_insights.top_pages.card_title','Top Visited Pages','Top des pages visitées','Top odwiedzanych stron');
-INSERT INTO "Languages" VALUES (579,'article.top_articles.title','Top Articles Visited by Period','Top des articles visités par période','Top artykułów odwiedzanych według okresu');
-INSERT INTO "Languages" VALUES (580,'article.top_articles.card_title','Top Visited Articles','Top des articles visités','Top odwiedzanych artykułów');
 INSERT INTO "Languages" VALUES (581,'common.period.label','Period','Période','Okres');
 INSERT INTO "Languages" VALUES (582,'common.period.today','Today','Aujourd''hui','Dzisiaj');
 INSERT INTO "Languages" VALUES (583,'common.period.week','Last 7 days','7 derniers jours','Ostatnie 7 dni');
@@ -4992,17 +4900,6 @@ INSERT INTO "Languages" VALUES (696,'visitor_insights.analytics.browser','Browse
 INSERT INTO "Languages" VALUES (697,'visitor_insights.analytics.resolution','Screen resolutions','Résolutions d''écran','Rozdzielczości ekranu');
 INSERT INTO "Languages" VALUES (698,'visitor_insights.analytics.device','Devices','Matériel','Urządzenia');
 INSERT INTO "Languages" VALUES (699,'visitor_insights.analytics.visits','Visits','Visites','Wizyty');
-INSERT INTO "Languages" VALUES (700,'user.messages.title','Messages','Les Messages','Wiadomości');
-INSERT INTO "Languages" VALUES (707,'user.messages.info.showing_since','Showing messages since','Affichage des messages depuis le','Wyświetlanie wiadomości od');
-INSERT INTO "Languages" VALUES (708,'user.messages.info.label_signout','(last sign-out)','(dernière déconnexion)','(ostatnie wylogowanie)');
-INSERT INTO "Languages" VALUES (709,'user.messages.info.label_signin','(last sign-in)','(dernière connexion)','(ostatnie logowanie)');
-INSERT INTO "Languages" VALUES (710,'user.messages.info.label_week','(1 week)','(1 semaine)','(1 tydzień)');
-INSERT INTO "Languages" VALUES (711,'user.messages.info.label_month','(1 month)','(1 mois)','(1 miesiąc)');
-INSERT INTO "Languages" VALUES (712,'user.messages.info.label_quarter','(1 quarter)','(1 trimestre)','(1 kwartał)');
-INSERT INTO "Languages" VALUES (713,'user.messages.info.label_year','(1 year)','(1 an)','(1 rok)');
-INSERT INTO "Languages" VALUES (714,'user.messages.table.message_count','Messages','Nombre de messages','Liczba wiadomości');
-INSERT INTO "Languages" VALUES (715,'user.messages.table.last_update','Last update','Dernière mise à jour','Ostatnia aktualizacja');
-INSERT INTO "Languages" VALUES (716,'user.messages.table.actions','Actions','Actions','Akcje');
 INSERT INTO "Languages" VALUES (717,'user.messages.group.events','📅 Events','📅 Événements','📅 Wydarzenia');
 INSERT INTO "Languages" VALUES (718,'user.messages.group.articles','📄 Articles','📄 Articles','📄 Artykuły');
 INSERT INTO "Languages" VALUES (719,'user.messages.group.groups','👥 Groups','👥 Groupes','👥 Grupy');
@@ -5054,7 +4951,6 @@ INSERT INTO "Languages" VALUES (770,'loan.reservation.notes','Notes','Notes','Uw
 INSERT INTO "Languages" VALUES (771,'loan.reservation.status','Status','Statut','Status');
 INSERT INTO "Languages" VALUES (772,'loan.reservation.status.active','Active','Active','Aktywna');
 INSERT INTO "Languages" VALUES (773,'loan.reservation.status.cancelled','Cancelled','Annulée','Anulowana');
-INSERT INTO "Languages" VALUES (774,'loan.reservation.cancel_confirm','Cancel this reservation?','Annuler cette réservation ?','Anulować tę rezerwację?');
 INSERT INTO "Languages" VALUES (775,'loan.reservation.no_reservations','No reservations.','Aucune réservation.','Brak rezerwacji.');
 INSERT INTO "Languages" VALUES (776,'loan.calendar.title','Loans & Reservations','Prêts et réservations','Pożyczki i rezerwacje');
 INSERT INTO "Languages" VALUES (777,'loan.calendar.loans','Loans','Prêts','Pożyczki');
@@ -5602,26 +5498,15 @@ INSERT INTO "Languages" VALUES (816,'user.news.group.presentations','Presentatio
 INSERT INTO "Languages" VALUES (817,'user.news.group.surveys','Surveys','Sondages','Ankiety');
 INSERT INTO "Languages" VALUES (818,'user.news.item.by','By','Par','Przez');
 INSERT INTO "Languages" VALUES (819,'user.news.empty.title','No news','Aucune nouvelle','Brak nowości');
-INSERT INTO "Languages" VALUES (820,'user.news.empty.since_signout','No updates since your last sign-out.','Aucune nouveauté depuis votre dernière déconnexion.','Brak nowości od ostatniego wylogowania.');
-INSERT INTO "Languages" VALUES (821,'user.news.empty.since_signin','No updates since your last sign-in.','Aucune nouveauté depuis votre dernière connexion.','Brak nowości od ostatniego logowania.');
-INSERT INTO "Languages" VALUES (822,'user.news.empty.since_week','No updates in the past week.','Aucune nouveauté depuis une semaine.','Brak nowości od tygodnia.');
-INSERT INTO "Languages" VALUES (823,'user.news.empty.since_month','No updates in the past month.','Aucune nouveauté depuis un mois.','Brak nowości od miesiąca.');
-INSERT INTO "Languages" VALUES (824,'user.news.empty.since_quarter','No updates in the past quarter.','Aucune nouveauté depuis un trimestre.','Brak nowości od kwartału.');
-INSERT INTO "Languages" VALUES (825,'user.news.empty.since_year','No updates in the past year.','Aucune nouveauté depuis un an.','Brak nowości od roku.');
-INSERT INTO "Languages" VALUES (826,'article.edit.view','View','Voir','Zobacz');
 INSERT INTO "Languages" VALUES (827,'article.edit.list','Articles list','Liste des articles','Lista artykułów');
 INSERT INTO "Languages" VALUES (828,'article.edit.publish','Publish','Publier','Publikuj');
 INSERT INTO "Languages" VALUES (829,'article.edit.group','Associated group','Groupe associé','Powiązana grupa');
-INSERT INTO "Languages" VALUES (830,'article.edit.no_group','No group','Aucun groupe','Brak grupy');
 INSERT INTO "Languages" VALUES (831,'article.edit.members_only','Members only','Pour les membres du club uniquement','Tylko dla członków');
 INSERT INTO "Languages" VALUES (832,'article.edit.title','Title','Titre','Tytuł');
 INSERT INTO "Languages" VALUES (833,'article.edit.content','Content','Contenu','Treść');
 INSERT INTO "Languages" VALUES (834,'article.edit.published','Published','Publié','Opublikowany');
 INSERT INTO "Languages" VALUES (835,'article.edit.not_published','Not published','Non publié','Nieopublikowany');
 INSERT INTO "Languages" VALUES (836,'article.edit.group_label','Group','Groupe','Grupa');
-INSERT INTO "Languages" VALUES (837,'article.edit.created_by','Created by','Créé par','Utworzony przez');
-INSERT INTO "Languages" VALUES (838,'article.edit.modified_on','Modified on','modifié le','zmodyfikowany');
-INSERT INTO "Languages" VALUES (839,'article.edit.on','on','le','dnia');
 INSERT INTO "Languages" VALUES (840,'navbar.designer.loan','Loan','Prêt','Pożyczka');
 INSERT INTO "Languages" VALUES (841,'period.day','Day','Jour','Dzień');
 INSERT INTO "Languages" VALUES (842,'period.week','Week','Semaine','Tydzień');
@@ -5643,7 +5528,7 @@ INSERT INTO "Languages" VALUES (857,'visitor_insights.cross_tab.filter.email','F
 INSERT INTO "Languages" VALUES (858,'visitor_insights.cross_tab.filter.group','Filter by Group','Filtrer par Groupe','Filtruj według Grupy');
 INSERT INTO "Languages" VALUES (859,'visitor_insights.cross_tab.filter.all_groups','All groups','Tous les groupes','Wszystkie grupy');
 INSERT INTO "Languages" VALUES (860,'visitor_insights.cross_tab.filter.submit','Filter','Filtrer','Filtruj');
-INSERT INTO "Languages" VALUES (861,'visitor_insights.cross_tab.filter.reset','Reset','Réinitialiser','Resetuj');
+INSERT INTO "Languages" VALUES (861,'reset','Reset','Réinitialiser','Resetuj');
 INSERT INTO "Languages" VALUES (862,'visitor_insights.cross_tab.table.title','Visit cross-tab (URI × User)','Tableau croisé des visites (URI × Utilisateur)','Tabela krzyżowa wizyt (URI × Użytkownik)');
 INSERT INTO "Languages" VALUES (863,'visitor_insights.cross_tab.table.hide','Hide','Masquer','Ukryj');
 INSERT INTO "Languages" VALUES (864,'visitor_insights.cross_tab.table.show','Show','Afficher','Pokaż');
@@ -5678,7 +5563,6 @@ INSERT INTO "Languages" VALUES (893,'media_manager.file_delete_error','Error whi
 INSERT INTO "Languages" VALUES (894,'media_manager.file_not_exists','File doesn''t exist','Le fichier n''existe pas','Plik nie istnieje');
 INSERT INTO "Languages" VALUES (895,'media_manager.file_upload_error','Error while saving file','Erreur lors de l’enregistrement du fichier','Błąd podczas zapisywania pliku');
 INSERT INTO "Languages" VALUES (896,'chat.current_image','Current image','Image actuelle','Aktualne zdjęcie');
-INSERT INTO "Languages" VALUES (897,'chat.delete_image','Delete image','Supprimer l''image','Usuń zdjęcie');
 INSERT INTO "Languages" VALUES (898,'chat.attach_image','Attach an image','Joindre une image','Dołącz zdjęcie');
 INSERT INTO "Languages" VALUES (899,'media_manager.file_not_found','File not found','Fichier non trouvé','Plik nie został znaleziony');
 INSERT INTO "Languages" VALUES (900,'media_manager.file_deleted_success','File deleted successfully','Fichier supprimé avec succès','Plik został pomyślnie usunięty');
@@ -5724,8 +5608,6 @@ INSERT INTO "Languages" VALUES (939,'communication.members.none_found','No membe
 INSERT INTO "Languages" VALUES (940,'communication.quota.daily_reached','Daily limit reached — this send (%d credits) would exceed the limit of %d.','Plafond journalier atteint — cet envoi (%d crédit(s)) dépasserait la limite de %d.','Osiągnięto dzienny limit — ta wysyłka (%d kredytów) przekroczyłaby limit %d.');
 INSERT INTO "Languages" VALUES (941,'communication.quota.monthly_reached','Monthly limit reached — this send (%d credits) would exceed the limit of %d.','Plafond mensuel atteint — cet envoi (%d crédit(s)) dépasserait la limite de %d.','Osiągnięto miesięczny limit — ta wysyłka (%d kredytów) przekroczyłaby limit %d.');
 INSERT INTO "Languages" VALUES (942,'communication.quota.almost_exceeded','Quota almost exhausted — daily: %s remaining, monthly: %s remaining.','Quota presque épuisé — journalier : %s restant(s), mensuel : %s restant(s).','Limit prawie wyczerpany — dzienny: %s pozostało, miesięczny: %s pozostało.');
-INSERT INTO "Languages" VALUES (943,'communication.quota.daily_label','daily','journalier','dzienny');
-INSERT INTO "Languages" VALUES (944,'communication.quota.monthly_label','monthly','mensuel','miesięczny');
 INSERT INTO "Languages" VALUES (945,'exercise.nav.designer','Exercise Designer','Concepteur d''exercices','Projektant ćwiczeń');
 INSERT INTO "Languages" VALUES (946,'exercise.nav.player','Play','Lancer','Uruchom');
 INSERT INTO "Languages" VALUES (947,'exercise.title','Exercises','Exercices','Ćwiczenia');
@@ -5752,7 +5634,18 @@ INSERT INTO "Languages" VALUES (967,'event.get_emails.option.choose_day','Choose
 INSERT INTO "Languages" VALUES (968,'event.get_emails.label.time_of_day','Time of day','Moment de la journée','Pora dnia');
 INSERT INTO "Languages" VALUES (969,'event.get_emails.option.choose_time','Choose a time','Choisir un moment','Wybierz porę');
 INSERT INTO "Languages" VALUES (970,'event.get_emails.button.submit','Get emails','Obtenir les emails','Pobierz e-maile');
-INSERT INTO "Metadata" VALUES (1,'MyClub',64,0,1000000,NULL,10,36,6,NULL,0,NULL);
+INSERT INTO "Languages" VALUES (971,'designer.home_settings.navbar_colors_title','Navbar colors','Couleurs de la barre de navigation','Kolory paska nawigacji');
+INSERT INTO "Languages" VALUES (972,'designer.home_settings.navbar_bg_label','Background color','Couleur de fond','Kolor tła');
+INSERT INTO "Languages" VALUES (973,'designer.home_settings.navbar_ink_label','Ink color','Couleur de l''encre','Kolor tekstu');
+INSERT INTO "Languages" VALUES (974,'designer.home_settings.navbar_icon_label','Icon','Icône','Ikona');
+INSERT INTO "Languages" VALUES (975,'filter','Filter','Filtrer','Filtruj');
+INSERT INTO "Languages" VALUES (976,'filters','Filters','Filtres','Filtry');
+INSERT INTO "Languages" VALUES (977,'media.uses.in_events','Used in events','Utilisé dans des événements','Używane w wydarzeniach');
+INSERT INTO "Languages" VALUES (978,'media.uses.no_events','Not used in any event','Non utilisé dans aucun événement','Nieużywane w żadnym wydarzeniu');
+INSERT INTO "Languages" VALUES (979,'navbar.designer.exercise','Exercise','Exercice','Ćwiczenie');
+INSERT INTO "Languages" VALUES (980,'designer.home_settings.navbar_harmony_title','Color harmony','Harmonie des couleurs','Harmonia kolorów');
+INSERT INTO "Languages" VALUES (981,'designer.home_settings.navbar_harmony_hint','Automatically adjusts ink and background colors to ensure contrast and visual consistency.','Ajuste automatiquement les couleurs d''encre et de fond pour garantir le contraste et la cohérence visuelle.','Automatycznie dostosowuje kolory tekstu i tła, aby zapewnić kontrast i spójność wizualną.');
+INSERT INTO "Metadata" VALUES (1,'MyClub',65,0,1000000,NULL,10,36,6,NULL,0,NULL);
 INSERT INTO "Person" VALUES (1,'webmaster@myclub.foo','e427c26faca947919b18b797bc143a35100e4de48c34b70b26202d3a7d8e51f7','my first name','my last name','my nick name or nothing',NULL,'0',NULL,NULL,NULL,NULL,NULL,0,0,NULL,NULL,'2025-01-01',0,0,0,NULL,NULL,NULL,NULL,NULL,NULL,'');
 INSERT INTO "PersonGroup" VALUES (1,1,1);
 INSERT INTO "Settings" VALUES (1,'Title','title');

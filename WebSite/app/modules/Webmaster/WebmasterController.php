@@ -73,7 +73,7 @@ class WebmasterController extends AbstractController
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isAdministrator())) {
             $this->render('Common/views/info.latte', $this->getAllParams([
-                'content'          => $this->languagesDataHelper->translate('Help_Admin'),
+                'content'          => ($this->t)('Help_Admin'),
                 'hasAuthorization' => $this->application->getConnectedUser()->isAdministrator(),
                 'currentVersion'   => Application::VERSION,
                 'timer'            => 0,
@@ -125,7 +125,7 @@ class WebmasterController extends AbstractController
                 $this->raiseMethodNotAllowed(__FILE__, __LINE__);
                 return;
             }
-            $content = $this->languagesDataHelper->translate('Admin');
+            $content = ($this->t)('Admin');
             $params  = [
                 'isEventManager'    => $connectedUser->isEventManager(),
                 'isDesigner'        => $connectedUser->isDesigner(),
@@ -145,7 +145,7 @@ class WebmasterController extends AbstractController
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isWebmaster())) {
             $_SESSION['navbar'] = 'webmaster';
-            $content = $this->languagesDataHelper->translate('Webmaster');
+            $content = ($this->t)('Webmaster');
             $params  = ['isMyclubWebSite' => WebApp::isMyClubWebSite()];
 
             $this->render('Webmaster/views/webmaster.latte', $this->getAllParams([

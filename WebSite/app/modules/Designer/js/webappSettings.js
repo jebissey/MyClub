@@ -2,11 +2,11 @@ import { initTinyMCE } from '/app/modules/Common/js/tinymce-config.js';
 
 // ── Métadonnées des sections ──────────────────────────────────────────────
 const SECTIONS = {
-    header:  { color: '#0d6efd', label: 'En-tête', hasTiny: true },
+    header: { color: '#0d6efd', label: 'En-tête', hasTiny: true },
     article: { color: '#198754', label: 'Article principal', hasTiny: false },
-    latest:  { color: '#ffc107', label: 'Derniers articles', hasTiny: false },
-    footer:  { color: '#6f42c1', label: 'Pied de page', hasTiny: true },
-    images:  { color: '#d63384', label: 'Images', hasTiny: false },
+    latest: { color: '#ffc107', label: 'Derniers articles', hasTiny: false },
+    footer: { color: '#6f42c1', label: 'Pied de page', hasTiny: true },
+    images: { color: '#d63384', label: 'Images', hasTiny: false },
 };
 
 let activeSection = null;
@@ -307,6 +307,256 @@ function initImageUpload(key) {
     });
 }
 
+// ── Roue chromatique ───────────────────────────────────────────────────────
+function initColorWheel() {
+    const canvas = document.getElementById('color-wheel');
+    const panel = document.getElementById('color-wheel-panel');
+    const btnToggle = document.getElementById('btn-toggle-wheel');
+    const iconToggle = document.getElementById('icon-toggle-wheel');
+    if (!canvas || !panel) return;
+
+    const ctx = canvas.getContext('2d');
+    const SIZE = 160, CX = SIZE / 2, CY = SIZE / 2, R = SIZE / 2 - 4;
+
+    // ── Conversions couleur ──────────────────────────────────────────────
+    function hexToHsl(hex) {
+        let r = parseInt(hex.slice(1, 3), 16) / 255,
+            g = parseInt(hex.slice(3, 5), 16) / 255,
+            b = parseInt(hex.slice(5, 7), 16) / 255;
+        const mx = Math.max(r, g, b), mn = Math.min(r, g, b);
+        let h, s, l = (mx + mn) / 2;
+        if (mx === mn) { h = s = 0; } else {
+            const d = mx - mn;
+            s = l > .5 ? d / (2 - mx - mn) : d / (mx + mn);
+            switch (mx) {
+                case r: h = ((g - b) / d + (g < b ? 6 : 0)) / 6; break;
+                case g: h = ((b - r) / d + 2) / 6; break;
+                default: h = ((r - g) / d + 4) / 6;
+            }
+        }
+        return [h * 360, s * 100, l * 100];
+    }
+
+    function hslToHex(h, s, l) {
+        s /= 100; l /= 100;
+        const a = s * Math.min(l, 1 - l);
+        const f = n => { const k = (n + h / 30) % 12; return l - a * Math.max(-1, Math.min(k - 3, 9 - k, 1)); };
+        return '#' + [f(0), f(8), f(4)].map(x => Math.round(x * 255).toString(16).padStart(2, '0')).join('');
+    }
+
+    function hslToPos(h, s) {
+        const angle = (h - 90) * Math.PI / 180;
+        const dist = (s / 100) * R;
+        return { x: CX + dist * Math.cos(angle), y: CY + dist * Math.sin(angle) };
+    }
+
+    // ── Harmonies ────────────────────────────────────────────────────────
+    const HARMONIES = [
+        { key: 'comp', name: 'Complémentaire', fn: (h, s, l) => [[h, s, l], [(h + 180) % 360, s, Math.min(l + 20, 90)], [(h + 180) % 360, s, Math.max(l - 15, 10)]] },
+        { key: 'ana', name: 'Analogue', fn: (h, s, l) => [[h, s, l], [(h + 30) % 360, s, l], [(h - 30 + 360) % 360, s, l]] },
+        { key: 'tri', name: 'Triadique', fn: (h, s, l) => [[h, s, l], [(h + 120) % 360, s, l], [(h + 240) % 360, s, l]] },
+        { key: 'split', name: 'Split-comp.', fn: (h, s, l) => [[h, s, l], [(h + 150) % 360, s, l], [(h + 210) % 360, s, l]] },
+        { key: 'sq', name: 'Carré', fn: (h, s, l) => [[h, s, l], [(h + 90) % 360, s, l], [(h + 270) % 360, s, l]] },
+        { key: 'mono', name: 'Monochrome', fn: (h, s, l) => [[h, s, Math.min(l + 30, 90)], [h, s, l], [h, Math.max(s - 30, 10), Math.max(l - 30, 15)]] },
+    ];
+
+    // ── Dessin de la roue ────────────────────────────────────────────────
+    function drawWheel() {
+        ctx.clearRect(0, 0, SIZE, SIZE);
+        for (let deg = 0; deg < 360; deg++) {
+            const g = ctx.createRadialGradient(CX, CY, 0, CX, CY, R);
+            g.addColorStop(0, '#fff');
+            g.addColorStop(1, `hsl(${deg},100%,50%)`);
+            ctx.beginPath();
+            ctx.moveTo(CX, CY);
+            ctx.arc(CX, CY, R, (deg - 1) * Math.PI / 180, (deg + 1) * Math.PI / 180);
+            ctx.closePath();
+            ctx.fillStyle = g;
+            ctx.fill();
+        }
+        const dk = ctx.createRadialGradient(CX, CY, R * .55, CX, CY, R);
+        dk.addColorStop(0, 'rgba(0,0,0,0)');
+        dk.addColorStop(1, 'rgba(0,0,0,.35)');
+        ctx.beginPath();
+        ctx.arc(CX, CY, R, 0, Math.PI * 2);
+        ctx.fillStyle = dk;
+        ctx.fill();
+    }
+
+    function drawDots() {
+        [
+            { id: 'input-navbar-bg', label: 'BG' },
+            { id: 'input-navbar-ink', label: 'I' },
+            { id: 'input-navbar-icon', label: '★' },
+        ].forEach(({ id, label }) => {
+            const inp = document.getElementById(id);
+            if (!inp) return;
+            const [h, s] = hexToHsl(inp.value);
+            const { x, y } = hslToPos(h, s);
+            ctx.beginPath();
+            ctx.arc(x, y, 8, 0, Math.PI * 2);
+            ctx.fillStyle = inp.value;
+            ctx.fill();
+            ctx.strokeStyle = '#fff'; ctx.lineWidth = 2.5; ctx.stroke();
+            ctx.strokeStyle = 'rgba(0,0,0,.4)'; ctx.lineWidth = 1; ctx.stroke();
+            ctx.fillStyle = 'rgba(0,0,0,.75)';
+            ctx.font = 'bold 8px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(label, x, y);
+        });
+    }
+
+    function renderPresets() {
+        const bgInp = document.getElementById('input-navbar-bg');
+        if (!bgInp) return;
+        const [h, s, l] = hexToHsl(bgInp.value);
+        const cont = document.getElementById('harmony-presets');
+        cont.innerHTML = '';
+        HARMONIES.forEach(({ key, name, fn }) => {
+            const cols = fn(h, s, l).map(([ch, cs, cl]) => hslToHex(ch, cs, cl));
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'btn btn-sm btn-outline-secondary d-flex flex-column align-items-center gap-1 py-2 px-2';
+            btn.style.minWidth = '78px';
+            btn.dataset.key = key;
+            btn.innerHTML =
+                `<div class="d-flex gap-1">${cols.map(c =>
+                    `<span style="width:16px;height:16px;background:${c};border-radius:3px;border:1px solid rgba(0,0,0,.12);display:inline-block;"></span>`
+                ).join('')}</div>` +
+                `<span style="font-size:.65rem;">${name}</span>`;
+            btn.addEventListener('click', () => applyHarmony(cols, key));
+            cont.appendChild(btn);
+        });
+    }
+
+    function applyHarmony(cols, key) {
+        document.querySelectorAll('#harmony-presets .btn').forEach(b => b.classList.remove('active'));
+        document.querySelector(`#harmony-presets [data-key="${key}"]`)?.classList.add('active');
+        [
+            ['input-navbar-bg', 'label-navbar-bg'],
+            ['input-navbar-ink', 'label-navbar-ink'],
+            ['input-navbar-icon', 'label-navbar-icon'],
+        ].forEach(([inpId, lblId], i) => {
+            const inp = document.getElementById(inpId);
+            const lbl = document.getElementById(lblId);
+            if (inp) {
+                inp.value = cols[i];
+                if (lbl) lbl.textContent = cols[i];
+                inp.dispatchEvent(new Event('input')); // met à jour la preview navbar
+            }
+        });
+        redraw();
+    }
+
+    function redraw() {
+        drawWheel();
+        drawDots();
+        renderPresets();
+    }
+
+    // ── Ouverture / fermeture ────────────────────────────────────────────
+    btnToggle?.addEventListener('click', () => {
+        panel.classList.toggle('d-none');
+        if (iconToggle) {
+            iconToggle.className = panel.classList.contains('d-none')
+                ? 'bi bi-chevron-down'
+                : 'bi bi-chevron-up';
+        }
+        if (!panel.classList.contains('d-none')) redraw();
+    });
+
+    // ── Mise à jour live quand l'utilisateur change une couleur ──────────
+    ['input-navbar-bg', 'input-navbar-ink', 'input-navbar-icon'].forEach(id => {
+        document.getElementById(id)?.addEventListener('input', () => {
+            if (!panel.classList.contains('d-none')) redraw();
+        });
+    });
+}
+
+
+function hexToRgb(hex) {
+    hex = hex.replace('#', '');
+
+    if (hex.length === 3) {
+        hex = hex.split('').map(c => c + c).join('');
+    }
+
+    const num = parseInt(hex, 16);
+
+    return {
+        r: (num >> 16) & 255,
+        g: (num >> 8) & 255,
+        b: num & 255
+    };
+}
+
+function luminance(r, g, b) {
+    const a = [r, g, b].map(v => {
+        v /= 255;
+
+        return v <= 0.03928
+            ? v / 12.92
+            : Math.pow((v + 0.055) / 1.055, 2.4);
+    });
+
+    return 0.2126 * a[0]
+        + 0.7152 * a[1]
+        + 0.0722 * a[2];
+}
+
+function contrastRatio(color1, color2) {
+    const c1 = hexToRgb(color1);
+    const c2 = hexToRgb(color2);
+
+    const l1 = luminance(c1.r, c1.g, c1.b);
+    const l2 = luminance(c2.r, c2.g, c2.b);
+
+    const brightest = Math.max(l1, l2);
+    const darkest = Math.min(l1, l2);
+
+    return ((brightest + 0.05) / (darkest + 0.05)).toFixed(2);
+}
+
+function updateNavbarContrast() {
+    const bg = document.getElementById('input-navbar-bg').value;
+    const ink = document.getElementById('input-navbar-ink').value;
+
+    const ratio = parseFloat(contrastRatio(bg, ink));
+
+    const info = document.getElementById('navbar-contrast-info');
+
+    let badge = '';
+    let cls = '';
+
+    if (ratio >= 7) {
+        badge = 'Excellent';
+        cls = 'text-success';
+    } else if (ratio >= 4.5) {
+        badge = 'Correct';
+        cls = 'text-warning';
+    } else {
+        badge = 'Insuffisant';
+        cls = 'text-danger';
+    }
+
+    info.className = `small mt-2 fw-semibold ${cls}`;
+
+    info.innerHTML = `
+        <i class="bi bi-circle-fill me-1"></i>
+        Contraste : ${ratio}:1 — ${badge}
+    `;
+}
+
+document.getElementById('input-navbar-bg')
+    .addEventListener('input', updateNavbarContrast);
+
+document.getElementById('input-navbar-ink')
+    .addEventListener('input', updateNavbarContrast);
+
+updateNavbarContrast();
+
+
 // ── Initialisation au chargement ──────────────────────────────────────────
 // type="module" est différé par défaut : le DOM est déjà prêt à ce stade.
 
@@ -335,6 +585,44 @@ document.getElementById('input-featured-paragraphs')
 
 // Initialisation des uploads d'images
 ['home', 'logo', 'banner'].forEach(initImageUpload);
+
+initColorWheel();
+
+// ── Couleurs navbar ────────────────────────────────────────────────────────
+(function initNavbarColors() {
+    const navbarPreview = document.getElementById('prev-navbar');
+    const navbarIcons = document.getElementById('prev-navbar-icons');
+
+    // Couleurs initiales depuis les data attributes
+    if (navbarPreview) {
+        navbarPreview.style.backgroundColor = navbarPreview.dataset.bg ?? '#212529';
+        navbarPreview.style.color = navbarPreview.dataset.ink ?? '#ffffff';
+    }
+    if (navbarIcons && navbarPreview) {
+        navbarIcons.style.color = navbarPreview.dataset.icon ?? '#ffc107';
+    }
+
+    const inputs = {
+        bg: { input: document.getElementById('input-navbar-bg'), label: document.getElementById('label-navbar-bg') },
+        ink: { input: document.getElementById('input-navbar-ink'), label: document.getElementById('label-navbar-ink') },
+        icon: { input: document.getElementById('input-navbar-icon'), label: document.getElementById('label-navbar-icon') },
+    };
+
+    function applyColors() {
+        if (!navbarPreview) return;
+        if (inputs.bg.input) navbarPreview.style.backgroundColor = inputs.bg.input.value;
+        if (inputs.ink.input) navbarPreview.style.color = inputs.ink.input.value;
+        if (inputs.icon.input && navbarIcons) navbarIcons.style.color = inputs.icon.input.value;
+    }
+
+    Object.entries(inputs).forEach(([, { input, label }]) => {
+        if (!input) return;
+        input.addEventListener('input', () => {
+            label.textContent = input.value;
+            applyColors();
+        });
+    });
+})();
 
 // Exposé sur window car appelé depuis les attributs onclick du HTML
 window.activateSection = activateSection;

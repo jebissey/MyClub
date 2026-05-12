@@ -147,7 +147,7 @@ class VisitorInsightsController extends TableController
         $_SESSION['navbar'] = 'visitorInsights';
         $this->render('VisitorInsights/views/visitorInsights.latte', $this->getAllParams([
             'page'    => $this->application->getConnectedUser()->getPage(),
-            'content' => $this->languagesDataHelper->translate('VisitorInsights'),
+            'content' => ($this->t)('VisitorInsights'),
         ]));
     }
 
@@ -190,16 +190,16 @@ class VisitorInsightsController extends TableController
             'periodLabel'       => $this->logDataAnalyticsHelper->getPeriodLabel($periodType),
             'page'              => $this->application->getConnectedUser()->getPage(),
             'translations'      => [
-                'uniqueVisitors' => $this->languagesDataHelper->translate('visitor_insights.statistics.unique_visitors'),
-                'pageViews'      => $this->languagesDataHelper->translate('visitor_insights.statistics.page_views'),
-                's2xx'           => $this->languagesDataHelper->translate('visitor_insights.statistics.chart.2xx'),
-                's3xx'           => $this->languagesDataHelper->translate('visitor_insights.statistics.chart.3xx'),
-                's4xx'           => $this->languagesDataHelper->translate('visitor_insights.statistics.chart.4xx'),
-                's5xx'           => $this->languagesDataHelper->translate('visitor_insights.statistics.chart.5xx'),
-                'minMaxAvg'      => $this->languagesDataHelper->translate('visitor_insights.statistics.chart.min_max_avg'),
-                'tooltipMax'     => $this->languagesDataHelper->translate('visitor_insights.statistics.tooltip.max_per_day'),
-                'tooltipAvg'     => $this->languagesDataHelper->translate('visitor_insights.statistics.tooltip.avg_per_day'),
-                'tooltipMin'     => $this->languagesDataHelper->translate('visitor_insights.statistics.tooltip.min_per_day'),
+                'uniqueVisitors' => ($this->t)('visitor_insights.statistics.unique_visitors'),
+                'pageViews'      => ($this->t)('visitor_insights.statistics.page_views'),
+                's2xx'           => ($this->t)('visitor_insights.statistics.chart.2xx'),
+                's3xx'           => ($this->t)('visitor_insights.statistics.chart.3xx'),
+                's4xx'           => ($this->t)('visitor_insights.statistics.chart.4xx'),
+                's5xx'           => ($this->t)('visitor_insights.statistics.chart.5xx'),
+                'minMaxAvg'      => ($this->t)('visitor_insights.statistics.chart.min_max_avg'),
+                'tooltipMax'     => ($this->t)('visitor_insights.statistics.tooltip.max_per_day'),
+                'tooltipAvg'     => ($this->t)('visitor_insights.statistics.tooltip.avg_per_day'),
+                'tooltipMin'     => ($this->t)('visitor_insights.statistics.tooltip.min_per_day'),
             ],
         ]));
     }
@@ -223,7 +223,7 @@ class VisitorInsightsController extends TableController
             'period'               => $period,
             'nav'                  => $this->logDataAnalyticsHelper->getReferentNavigation($period, $currentDate),
             'translations' => [
-                'visits' => $this->languagesDataHelper->translate('visitor_insights.analytics.visits'),
+                'visits' => ($this->t)('visitor_insights.analytics.visits'),
             ],
         ]));
     }
@@ -237,7 +237,7 @@ class VisitorInsightsController extends TableController
         $period = $this->getValidPeriod();
 
         $this->render('VisitorInsights/views/topPages.latte', $this->getAllParams([
-            'title'    => $this->languagesDataHelper->translate('visitor_insights.top_pages.card_title'),
+            'title'    => ($this->t)('visitor_insights.top_pages.card_title'),
             'period'   => $period->value,
             'periodFrom'  => $period->getStart()->format('Y-m-d H:i:s'),
             'periodTo'    => $period->getEnd()->format('Y-m-d H:i:s'),
@@ -272,10 +272,8 @@ class VisitorInsightsController extends TableController
             $groupFilter
         );
 
-        $t = fn(string $key) => $this->languagesDataHelper->translate($key);
-
         $this->render('VisitorInsights/views/crossTab.latte', $this->getAllParams([
-            'title'        => $t('visitor_insights.cross_tab.title'),
+            'title'        => ($this->t)('visitor_insights.cross_tab.title'),
             'period'       => $period->value,
             'uris'         => $sortedCrossTabData,
             'persons'      => $this->logDataHelper->getPersons($filteredPersons),
@@ -287,8 +285,8 @@ class VisitorInsightsController extends TableController
             'groupFilter'  => $groupFilter,
             'page'         => $this->application->getConnectedUser()->getPage(),
             'translations' => [
-                'tableHide' => $t('visitor_insights.cross_tab.table.hide'),
-                'tableShow' => $t('visitor_insights.cross_tab.table.show'),
+                'tableHide' => ($this->t)('visitor_insights.cross_tab.table.hide'),
+                'tableShow' => ($this->t)('visitor_insights.cross_tab.table.show'),
             ],
         ]));
     }

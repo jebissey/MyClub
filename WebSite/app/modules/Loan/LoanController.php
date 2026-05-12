@@ -175,7 +175,7 @@ class LoanController extends AbstractController
 
         $trans = [];
         foreach ($keys as $k) {
-            $trans[$k] = $this->languagesDataHelper->translate('loan.' . $k);
+            $trans[$k] = ($this->t)('loan.' . $k);
         }
         return $trans;
     }

@@ -10,6 +10,7 @@ enum FilterInputRule: string
     case ArrayString = 'array:string';
     case Avatar = '/^\X{1,5}$/u';
     case Bool = 'bool';
+    case Color = '/^#[0-9a-fA-F]{6}$/';
     case Content = '/^.{1,65535}$/s';
     case DataUrl = 'dataurl';
     case DateInterval = '/^\d{4}-\d{2}-\d{2}\|\d{4}-\d{2}-\d{2}$/';

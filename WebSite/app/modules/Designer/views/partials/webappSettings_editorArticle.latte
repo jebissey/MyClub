@@ -1,0 +1,43 @@
+<div class="d-none" id="editor-article">
+
+    <label class="form-label fw-semibold" for="input-featured-article">
+        {='designer.home_settings.article_label'|translate}
+    </label>
+    <p class="text-muted small">
+        {='designer.home_settings.article_description'|translate}
+    </p>
+    <div class="d-flex align-items-center gap-3 flex-wrap mb-3">
+        <div class="input-group" style="max-width:180px;">
+            <span class="input-group-text"><i class="bi bi-hash"></i></span>
+            <input type="number" class="form-control"
+                   id="input-featured-article"
+                   name="Home_FeaturedArticleId"
+                   value="{$settings['Home_FeaturedArticleId']}"
+                   min="0" step="1">
+        </div>
+        <div class="form-text mb-0">{='designer.home_settings.article_zero_hint'|translate}</div>
+    </div>
+
+    <hr class="my-4">
+
+    <label class="form-label fw-semibold" for="input-featured-paragraphs">
+        {='designer.home_settings.paragraphs_label'|translate}
+    </label>
+    <p class="text-muted small">
+        {='designer.home_settings.paragraphs_description'|translate}
+    </p>
+    <div class="d-flex align-items-center gap-3 flex-wrap mb-3">
+        <div class="input-group" style="max-width:180px;">
+            <span class="input-group-text"><i class="bi bi-text-paragraph"></i></span>
+            <input type="number" class="form-control"
+                   id="input-featured-paragraphs"
+                   name="Home_FeaturedArticleParagraphs"
+                   value="{$settings['Home_FeaturedArticleParagraphs']}"
+                   min="0" step="1">
+        </div>
+        <div class="form-text mb-0">{='designer.home_settings.paragraphs_zero_hint'|translate}</div>
+    </div>
+
+    <div id="article-status" class="alert mb-0"></div>
+
+</div>

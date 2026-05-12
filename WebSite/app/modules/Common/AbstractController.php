@@ -6,6 +6,7 @@ namespace app\modules\Common;
 
 use flight;
 use flight\Engine;
+use Closure;
 use Latte\Engine as LatteEngine;
 
 use app\enums\ApplicationError;
@@ -30,6 +31,7 @@ abstract class AbstractController
     private MetadataDataHelper $metadataDataHelper;
     private ?string $prodSiteUrl;
     private ?string $memberAlert = null;
+    protected Closure $t;
 
     public function __construct(protected Application $application)
     {
@@ -42,6 +44,7 @@ abstract class AbstractController
         $this->menuItemDataHelper = new MenuItemDataHelper($application, $this->authorizationDataHelper);
         $this->metadataDataHelper = new MetadataDataHelper($application);
         $this->prodSiteUrl = $this->metadataDataHelper->isTestSite() ? $this->metadataDataHelper->getProdSiteUrl() : null;
+        $this->t = fn(string $key): string => $this->languagesDataHelper->translate($key);
     }
 
     #region Protected fucntions
@@ -50,7 +53,7 @@ abstract class AbstractController
         return array_map(
             fn(TimeOfDay $case) => [
                 'value' => $case->value,
-                'label' => $this->languagesDataHelper->translate($case->value)
+                'label' => ($this->t)($case->value)
             ],
             TimeOfDay::cases()
         );
@@ -285,7 +288,7 @@ abstract class AbstractController
     private function addLatteFilters(): void
     {
         $this->latte->addFilter('translate', function ($key) {
-            return $this->languagesDataHelper->translate($key);
+            return ($this->t)($key);
         });
 
         $this->latte->addFilter('shortDate', function ($date) {

@@ -44,10 +44,10 @@ class UserAccountController extends AbstractController
             'btn_HistoryBack' => true,
             'btn_Parent' => "/user",
             'translations' => [
-                'account.form.emoji.select_label'     => $this->languagesDataHelper->translate('account.form.emoji.select_label'),
-                'account.form.emoji.missing_elements' => $this->languagesDataHelper->translate('account.form.emoji.missing_elements'),
-                'account.form.emoji.none_detected'    => $this->languagesDataHelper->translate('account.form.emoji.none_detected'),
-                'account.form.emoji.selected'         => $this->languagesDataHelper->translate('account.form.emoji.selected'),
+                'account.form.emoji.select_label'     => ($this->t)('account.form.emoji.select_label'),
+                'account.form.emoji.missing_elements' => ($this->t)('account.form.emoji.missing_elements'),
+                'account.form.emoji.none_detected'    => ($this->t)('account.form.emoji.none_detected'),
+                'account.form.emoji.selected'         => ($this->t)('account.form.emoji.selected'),
             ],
         ]));
     }
