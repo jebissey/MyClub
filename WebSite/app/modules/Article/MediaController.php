@@ -131,15 +131,12 @@ class MediaController extends AbstractController
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
-
         $filename = basename($filename);
         $filePath = sprintf('%s/%04d/%02d/%s', MediaManager::GetMediaPath(), $year, $month, $filename);
-
         if (!file_exists($filePath)) {
             $this->raiseBadRequest("File $filePath not found", __FILE__, __LINE__);
             return;
         }
-
         $connectedUser = $this->application->getConnectedUser();
         $allowed = $connectedUser->isRedactor()
             || $this->authorizationDataHelper->canPersonReadMediaFile($year, $month, $filename, $connectedUser);

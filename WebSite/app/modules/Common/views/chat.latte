@@ -99,7 +99,7 @@
                                             {$message->Text}
                                         </p>
 
-                                        {if isset($message->ImagePath) && $message->ImagePath}
+                                        {if isset($message->ImagePath) && $message->ImagePath !== null && $message->ImagePath !== ''}
                                             <img src="{$message->ImagePath}"
                                                  alt="image"
                                                  class="img-fluid rounded mt-2 message-image"

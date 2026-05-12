@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PHP Dependencies — Tableau Croisé</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600;700&family=Syne:wght@400;700;800&display=swap');
+
+  :root {
+    --bg: #0d0f14;
+    --surface: #151820;
+    --surface2: #1c2030;
+    --border: #252a3a;
+    --accent-ext: #f97316;
+    --accent-int: #3b82f6;
+    --accent-ext-dim: rgba(249,115,22,0.12);
+    --accent-int-dim: rgba(59,130,246,0.12);
+    --text: #e2e8f0;
+    --text-dim: #64748b;
+    --text-muted: #334155;
+    --hit: #22c55e;
+    --hit-dim: rgba(34,197,94,0.18);
+    --header-h: 52px;
+    --col-w: 28px;
+    --row-label-w: 340px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* ── TOOLBAR ── */
+  .toolbar {
+    flex-shrink: 0;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .toolbar h1 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 18px;
+    letter-spacing: -0.5px;
+    color: #fff;
+    white-space: nowrap;
+  }
+  .toolbar h1 span { color: var(--accent-int); }
+
+  .search-wrap {
+    flex: 1;
+    min-width: 200px;
+    max-width: 360px;
+    position: relative;
+  }
+  .search-wrap input {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 7px 12px 7px 34px;
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    outline: none;
+    transition: border-color .15s;
+  }
+  .search-wrap input:focus { border-color: var(--accent-int); }
+  .search-wrap svg {
+    position: absolute; left: 10px; top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-dim); pointer-events: none;
+  }
+
+  .toggle-group {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+  .toggle-btn {
+    display: flex; align-items: center; gap: 6px;
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: var(--surface2);
+    cursor: pointer;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+    transition: all .15s;
+    user-select: none;
+  }
+  .toggle-btn.active-ext { border-color: var(--accent-ext); color: var(--accent-ext); background: var(--accent-ext-dim); }
+  .toggle-btn.active-int { border-color: var(--accent-int); color: var(--accent-int); background: var(--accent-int-dim); }
+  .toggle-btn .dot { width: 8px; height: 8px; border-radius: 50%; }
+  .dot-ext { background: var(--accent-ext); }
+  .dot-int { background: var(--accent-int); }
+
+  .stats {
+    margin-left: auto;
+    color: var(--text-dim);
+    font-size: 10px;
+    white-space: nowrap;
+  }
+  .stats b { color: var(--text); }
+
+  /* ── PIVOT CONTAINER ── */
+  .pivot-wrap {
+    flex: 1;
+    overflow: auto;
+    position: relative;
+  }
+
+  table {
+    border-collapse: separate;
+    border-spacing: 0;
+    table-layout: fixed;
+  }
+
+  /* Sticky column headers (rotated) */
+  thead tr th {
+    position: sticky;
+    top: 0;
+    z-index: 3;
+    background: var(--surface);
+    border-bottom: 2px solid var(--border);
+    padding: 0;
+    width: var(--col-w);
+    min-width: var(--col-w);
+    max-width: var(--col-w);
+    height: 160px;
+    vertical-align: bottom;
+  }
+
+  thead tr th:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 10;
+    width: var(--row-label-w);
+    min-width: var(--row-label-w);
+    max-width: var(--row-label-w);
+    background: var(--surface);
+    border-right: 2px solid var(--border);
+    padding: 10px 14px;
+    vertical-align: bottom;
+    text-align: left;
+  }
+
+  .col-label-wrap {
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    white-space: nowrap;
+    font-size: 10px;
+    padding: 6px 4px;
+    color: var(--text-dim);
+    cursor: default;
+    transition: color .1s;
+    letter-spacing: 0.3px;
+  }
+  .col-label-wrap:hover { color: var(--text); }
+  th.group-ext .col-label-wrap { color: rgba(249,115,22,0.6); }
+  th.group-ext .col-label-wrap:hover { color: var(--accent-ext); }
+  th.group-int .col-label-wrap { color: rgba(59,130,246,0.6); }
+  th.group-int .col-label-wrap:hover { color: var(--accent-int); }
+
+  /* Group separator */
+  th.group-sep {
+    width: 12px; min-width: 12px; max-width: 12px;
+    background: var(--bg);
+    border-left: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+  }
+  td.group-sep {
+    background: var(--bg);
+    border-left: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+  }
+
+  /* Group header row */
+  tr.group-header th {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    height: 26px;
+    text-align: center;
+    font-family: 'Syne', sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+  }
+  tr.group-header th:first-child { text-align: left; padding-left: 14px; background: var(--surface); z-index: 10; }
+  tr.group-header th.g-ext { background: var(--accent-ext-dim); color: var(--accent-ext); }
+  tr.group-header th.g-int { background: var(--accent-int-dim); color: var(--accent-int); }
+  tr.group-header th.g-none { background: var(--surface); }
+  tr.group-header th.group-sep { background: var(--bg); }
+
+  /* Data rows */
+  tbody tr {
+    transition: background .08s;
+  }
+  tbody tr:hover { background: var(--surface2); }
+  tbody tr:hover td:first-child { background: var(--surface2); }
+  tbody tr.hidden { display: none; }
+
+  tbody td {
+    width: var(--col-w);
+    min-width: var(--col-w);
+    max-width: var(--col-w);
+    height: 22px;
+    text-align: center;
+    vertical-align: middle;
+    border-bottom: 1px solid var(--border);
+    border-right: 1px solid rgba(37,42,58,0.5);
+    padding: 0;
+    font-size: 10px;
+    position: relative;
+  }
+
+  /* Row label cell */
+  td:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 2;
+    background: var(--surface);
+    border-right: 2px solid var(--border);
+    width: var(--row-label-w);
+    min-width: var(--row-label-w);
+    max-width: var(--row-label-w);
+    padding: 0 10px 0 14px;
+    text-align: left;
+    color: var(--text-dim);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    cursor: default;
+  }
+  td:first-child .path-prefix { color: var(--text-muted); }
+  td:first-child .path-file { color: var(--text); font-weight: 600; }
+
+  /* Hit cell */
+  .hit {
+    display: inline-block;
+    width: 10px; height: 10px;
+    border-radius: 2px;
+    background: var(--hit);
+    opacity: 0.85;
+    transition: opacity .1s, transform .1s;
+  }
+  tr:hover .hit { opacity: 1; transform: scale(1.2); }
+  td.group-ext .hit { background: var(--accent-ext); }
+  td.group-int .hit { background: var(--accent-int); }
+
+  /* Zebra */
+  tbody tr:nth-child(even) td:first-child { background: #141620; }
+  tbody tr:nth-child(even):hover td:first-child { background: var(--surface2); }
+
+  /* Highlighted column */
+  td.col-hover { background: rgba(255,255,255,0.03); }
+
+  /* Scrollbar */
+  .pivot-wrap::-webkit-scrollbar { width: 8px; height: 8px; }
+  .pivot-wrap::-webkit-scrollbar-track { background: var(--bg); }
+  .pivot-wrap::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+  .pivot-wrap::-webkit-scrollbar-thumb:hover { background: #3a4060; }
+
+  .no-results {
+    padding: 40px;
+    color: var(--text-dim);
+    text-align: center;
+    display: none;
+  }
+
+  /* Tooltip */
+  .tip {
+    position: fixed;
+    background: #1e2535;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-size: 10px;
+    color: var(--text);
+    pointer-events: none;
+    z-index: 1000;
+    max-width: 320px;
+    word-break: break-all;
+    opacity: 0;
+    transition: opacity .1s;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+  }
+</style>
+</head>
+<body>
+
+<div class="toolbar">
+  <h1>PHP <span>Dependencies</span> Pivot</h1>
+  <div class="search-wrap">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    <input type="text" id="searchInput" placeholder="Filtrer les fichiers…">
+  </div>
+  <div class="toggle-group">
+    <button class="toggle-btn active-ext" id="btnExt" onclick="toggleGroup('ext')">
+      <span class="dot dot-ext"></span>Externes
+    </button>
+    <button class="toggle-btn active-int" id="btnInt" onclick="toggleGroup('int')">
+      <span class="dot dot-int"></span>App classes
+    </button>
+  </div>
+  <div class="stats" id="stats"></div>
+</div>
+
+<div class="pivot-wrap" id="pivotWrap">
+  <table id="pivotTable"></table>
+</div>
+<div class="no-results" id="noResults">Aucun fichier ne correspond à la recherche.</div>
+<div class="tip" id="tip"></div>
+
+<script>
+const RAW = `../WebSite/app/apis/AbstractApi.php depends on: flight,JsonException,Latte\\Engine as LatteEngine,app\\enums\\ApplicationError,app\\helpers\\Application,app\\helpers\\ConnectedUser,app\\models\\DataHelper,app\\models\\PersonDataHelper
+../WebSite/app/apis/ArticleApi.php depends on: Exception,Throwable,app\\enums\\ApplicationError,app\\helpers\\Application,app\\helpers\\ConnectedUser,app\\models\\DataHelper,app\\models\\DesignDataHelper,app\\models\\OrderReplyDataHelper,app\\models\\PersonDataHelper,app\\models\\ReplyDataHelper
+../WebSite/app/apis/CarouselApi.php depends on: Throwable,app\\enums\\ApplicationError,app\\exceptions\\QueryException,app\\helpers\\Application,app\\helpers\\ConnectedUser,app\\helpers\\WebApp,app\\models\\AuthorizationDataHelper,app\\models\\CarouselDataHelper,app\\models\\DataHelper,app\\models\\PersonDataHelper
+../WebSite/app/apis/ChatApi.php depends on: DateTime,DateTimeZone,app\\helpers\\Application,app\\helpers\\ConnectedUser,app\\helpers\\GravatarHandler,app\\helpers\\WebApp,app\\models\\DataHelper,app\\models\\LogDataHelper,app\\models\\PersonDataHelper
+../WebSite/app/apis/CommunicationApi.php depends on: Throwable,app\\enums\\ApplicationError,app\\exceptions\\EmailException,app\\helpers\\Application,app\\helpers\\ConnectedUser,app\\interfaces\\EmailQuotaTrackerInterface,app\\models\\DataHelper,app\\models\\LanguagesDataHelper,app\\models\\PersonDataHelper,app\\modules\\Common\\services\\EmailService,app\\valueObjects\\EmailMessage
+../WebSite/app/apis/EventApi.php depends on: DateTime,Throwable,app\\enums\\ApplicationError,app\\enums\\Period,app\\exceptions\\EmailException,app\\exceptions\\QueryException,app\\helpers\\Application,app\\helpers\\ConnectedUser,app\\helpers\\WebApp,app\\interfaces\\AuthorizationServiceInterface,app\\interfaces\\EventServiceInterface,app\\models\\DataHelper,app\\models\\EventDataHelper,app\\models\\MessageDataHelper,app\\models\\ParticipantDataHelper,app\\models\\PersonDataHelper,app\\modules\\Common\\services\\EmailService,app\\helpers\\PersonPreferences,app\\valueObjects\\ApiResponse,app\\valueObjects\\EmailMessage
+../WebSite/app/apis/EventAttributeApi.php depends on: Throwable,app\\enums\\ApplicationError,app\\helpers\\Application,app\\helpers\\ConnectedUser,app\\models\\AttributeDataHelper,app\\models\\DataHelper,app\\models\\PersonDataHelper
+../WebSite/app/apis/EventNeedApi.php depends on: Throwable,app\\enums\\ApplicationError,app\\helpers\\Application,app\\helpers\\ConnectedUser,app\\models\\DataHelper,app\\models\\EventDataHelper,app\\models\\EventNeedDataHelper,app\\models\\PersonDataHelper,app\\valueObjects\\ApiResponse
+../WebSite/app/apis/EventNeedTypeApi.php depends on: Throwable,app\\enums\\ApplicationError,app\\helpers\\Application,app\\helpers\\ConnectedUser,app\\models\\DataHelper,app\\models\\NeedDataHelper,app\\models\\NeedTypeDataHelper,app\\models\\PersonDataHelper,app\\valueObjects\\ApiResponse
+../WebSite/app/apis/EventSupplyApi.php depends on: InvalidArgumentException,Throwable,app\\enums\\ApplicationError,app\\enums\\FilterInputRule,app\\helpers\\Application,app\\helpers\\ConnectedUser,app\\helpers\\WebApp,app\\exceptions\\QueryException,app\\exceptions\\UnauthorizedAccessException,app\\models\\DataHelper,app\\models\\EventDataHelper,app\\models\\PersonDataHelper,app\\valueObjects\\ApiResponse
+../WebSite/app/apis/ExerciseApi.php depends on: app\\helpers\\Application,app\\helpers\\ConnectedUser,app\\models\\ArticleDataHelper,app\\models\\DataHelper,app\\models\\PersonDataHelper
+../WebSite/app/apis/GroupApi.php depends on: Throwable,app\\enums\\ApplicationError,app\\helpers\\Application,app\\helpers\\ConnectedUser,app\\models\\DataHelper,app\\models\\PersonDataHelper
+../WebSite/app/apis/ImportApi.php depends on: app\\helpers\\Application,app\\helpers\\ConnectedUser,app\\models\\DataHelper,app\\models\\PersonDataHelper
+../WebSite/app/apis/KanbanApi.php depends on: Throwable,app\\enums\\ApplicationError,app\\helpers\\Application,app\\helpers\\ConnectedUser,app\\models\\DataHelper,app\\models\\kanbanDataHelper,app\\models\\PersonDataHelper
+../WebSite/app/apis/KaraokeApi.php depends on: app\\enums\\ApplicationError,app\\enums\\FilterInputRule,app\\enums\\Karaoke,app\\helpers\\Application,app\\helpers\\ConnectedUser,app\\helpers\\WebApp,app\\models\\DataHelper,app\\models\\PersonDataHelper,app\\models\\KaraokeDataHelper
+../WebSite/app/apis/LeapfrogApi.php depends on: app\\enums\\ApplicationError,app\\helpers\\Application,app\\helpers\\ConnectedUser,app\\models\\DataHelper,app\\models\\LogDataWriterHelper,app\\models\\PersonDataHelper
+../WebSite/app/apis/LoanApi.php depends on: app\\helpers\\Application,app\\helpers\\ConnectedUser,app\\models\\DataHelper,app\\models\\LoanDataHelper,app\\models\\PersonDataHelper
+../WebSite/app/apis/MediaApi.php depends on: Throwable,app\\enums\\ApplicationError,app\\helpers\\Application,app\\helpers\\ConnectedUser,app\\helpers\\MediaManager,app\\helpers\\WebApp,app\\models\\DataHelper,app\\models\\PersonDataHelper
+../WebSite/app/apis/MenuItemApi.php depends on: Throwable,app\\enums\\ApplicationError,app\\helpers\\Application,app\\helpers\\ConnectedUser,app\\models\\Data,app\\models\\DataHelper,app\\models\\MenuItemDataHelper,app\\models\\PersonDataHelper
+../WebSite/app/apis/MessageApi.php depends on: PDOException,InvalidArgumentException,Throwable,finfo,function imagecreatefromstring,function imagesx,function imagesy,function imagecreatetruecolor,function imagealphablending,function imagesavealpha,function imagecolorallocatealpha,function imagefilledrectangle,function imagecopyresampled,function imagejpeg,function imagepng,function imagewebp,function imagegif,app\\enums\\ApplicationError,app\\exceptions\\UnauthorizedAccessException,app\\helpers\\Application,app\\helpers\\ConnectedUser,app\\helpers\\MediaManager,app\\helpers\\NotificationSender,app\\helpers\\WebApp,app\\models\\DataHelper,app\\models\\MessageDataHelper,app\\models\\PersonDataHelper,app\\modules\\Common\\services\\MessageRecipientService,app\\valueObjects\\ApiResponse,app\\valueObjects\\MessageContext
+../WebSite/app/apis/NotificationApi.php depends on: Throwable,app\\enums\\ApplicationError,app\\helpers\\Application,app\\helpers\\ConnectedUser,app\\models\\DataHelper,app\\models\\PersonDataHelper
+../WebSite/app/apis/TranslatorApi.php depends on: Throwable,app\\enums\\ApplicationError,app\\exceptions\\QueryException,app\\helpers\\Application,app\\helpers\\ConnectedUser,app\\helpers\\WebApp,app\\models\\DataHelper,app\\models\\PersonDataHelper,app\\models\\LanguagesDataHelper
+../WebSite/app/apis/VisitorInsightsApi.php depends on: DateTimeImmutable,app\\helpers\\Application,app\\helpers\\ConnectedUser,app\\models\\DataHelper,app\\models\\LogDataHelper,app\\models\\PersonDataHelper
+../WebSite/app/apis/WebmasterApi.php depends on: Minishlink\\WebPush\\Subscription,Minishlink\\WebPush\\WebPush,Throwable,app\\enums\\ApplicationError,app\\helpers\\Application,app\\helpers\\ConnectedUser,app\\models\\DataHelper,app\\models\\LogDataWriterHelper,app\\models\\PersonDataHelper,app\\modules\\Common\\services\\CredentialService
+../WebSite/app/config/ApiFactory.php depends on: app\\apis\\ArticleApi,app\\apis\\CarouselApi,app\\apis\\ChatApi,app\\apis\\CommunicationApi,app\\apis\\EventApi,app\\apis\\EventAttributeApi,app\\apis\\EventNeedApi,app\\apis\\EventNeedTypeApi,app\\apis\\EventSupplyApi,app\\apis\\ExerciseApi,app\\apis\\GroupApi,app\\apis\\ImportApi,app\\apis\\KanbanApi,app\\apis\\KaraokeApi,app\\apis\\LeapfrogApi,app\\apis\\LoanApi,app\\apis\\MediaApi,app\\apis\\MenuItemApi,app\\apis\\MessageApi,app\\apis\\NotificationApi,app\\apis\\TranslatorApi,app\\apis\\VisitorInsightsApi,app\\apis\\WebmasterApi,app\\helpers\\Application,app\\helpers\\ConnectedUser,app\\helpers\\GravatarHandler,app\\helpers\\MediaManager,App\\Helpers\\NotificationSender,app\\helpers\\PersonPreferences,app\\models\\ArticleDataHelper,app\\models\\AttributeDataHelper,app\\models\\AuthorizationDataHelper,app\\models\\CarouselDataHelper,app\\models\\DataHelper,app\\models\\DesignDataHelper,app\\models\\EventDataHelper,app\\models\\EventNeedDataHelper,app\\models\\KanbanDataHelper,app\\models\\KaraokeDataHelper,app\\models\\LanguagesDataHelper,app\\models\\LoanDataHelper,app\\models\\LogDataHelper,app\\models\\LogDataWriterHelper,app\\models\\MenuItemDataHelper,app\\models\\MessageDataHelper,app\\models\\NeedDataHelper,app\\models\\NeedTypeDataHelper,app\\models\\ParticipantDataHelper,app\\models\\PersonDataHelper,app\\modules\\Common\\services\\CredentialService,app\\modules\\Common\\services\\EmailService,app\\modules\\Common\\services\\EventService,app\\modules\\Common\\services\\JsonEmailQuotaTracker,app\\modules\\Common\\services\\MessageRecipientService
+../WebSite/app/config/AuthorizationService.php depends on: app\\helpers\\ConnectedUser,app\\interfaces\\AuthorizationServiceInterface
+../WebSite/app/config/ControllerFactory.php depends on: app\\helpers\\Application,app\\helpers\\Backup,app\\helpers\\DistributionCalculator,app\\helpers\\ErrorManager,app\\helpers\\News,app\\helpers\\NotificationSender,app\\helpers\\WebApp,app\\models\\ArticleCrosstabDataHelper,app\\models\\ArticleDataHelper,app\\models\\ArticleTableDataHelper,app\\models\\CarouselDataHelper,app\\models\\CrosstabDataHelper,app\\models\\DbBrowserDataHelper,app\\models\\DesignDataHelper,app\\models\\EventDataHelper,app\\models\\EventTypeDataHelper,app\\models\\ExerciseTableDataHelper,app\\models\\GroupDataHelper,app\\models\\KanbanDataHelper,app\\models\\LogDataHelper,app\\models\\LogDataAnalyticsHelper,app\\models\\LoanDataHelper,app\\models\\LogDataStatisticsHelper,app\\models\\MessageDataHelper,app\\models\\MetadataDataHelper,app\\models\\NeedDataHelper,app\\models\\OrderDataHelper,app\\models\\ParticipantDataHelper,app\\models\\PersonDataHelper,app\\models\\PersonGroupDataHelper,app\\models\\PersonStatisticsDataHelper,app\\models\\SharedFileDataHelper,app\\models\\SurveyDataHelper,app\\models\\TableControllerDataHelper,app\\modules\\Article\\ArticleController,app\\modules\\Article\\MediaController,app\\modules\\Article\\OrderController,app\\modules\\Article\\SurveyController,app\\modules\\Common\\services\\ArticleService,app\\modules\\Common\\services\\AuthenticationService,app\\modules\\Common\\services\\CredentialService,app\\modules\\Common\\services\\EmailService,app\\modules\\Communication\\CommunicationController,app\\modules\\Designer\\DesignController,app\\modules\\Designer\\DesignerController,app\\modules\\Designer\\MenuItemController,app\\modules\\Designer\\WebappSettingsController,app\\modules\\Event\\EventController,app\\modules\\Event\\EventEmailController,app\\modules\\Event\\EventGuestController,app\\modules\\Event\\EventNeedController,app\\modules\\Event\\EventTypeController,app\\modules\\Exercise\\ExerciseController,app\\modules\\Games\\Karaoke\\KaraokeController,app\\modules\\Games\\Leapfrog\\LeapfrogController,app\\modules\\Games\\Solfege\\SolfegeController,app\\modules\\Kanban\\KanbanController,app\\modules\\Loan\\LoanController,app\\modules\\PersonManager\\GroupController,app\\modules\\PersonManager\\ImportController,app\\modules\\PersonManager\\PersonController,app\\modules\\PersonManager\\RegistrationController,app\\modules\\Pwa\\PwaController,app\\modules\\Translator\\TranslatorController,app\\modules\\User\\ContactController,app\\modules\\User\\HomeController,app\\modules\\User\\FFAController,app\\modules\\User\\UserController,app\\modules\\User\\UserAccountController,app\\modules\\User\\UserAvailabilitiesController,app\\modules\\User\\UserConnectionsController,app\\modules\\User\\UserDashboardController,app\\modules\\User\\UserDirectoryController,app\\modules\\User\\UserGroupsController,app\\modules\\User\\UserMessagesController,app\\modules\\User\\UserNewsController,app\\modules\\User\\UserNotepadController,app\\modules\\User\\UserNotificationsController,app\\modules\\User\\UserPreferencesController,app\\modules\\User\\UserPresentationController,app\\modules\\User\\UserStatisticsController,app\\modules\\VisitorInsights\\VisitorInsightsController,app\\modules\\Webmaster\\ArwardsController,app\\modules\\Webmaster\\DbBrowserController,app\\modules\\Webmaster\\MaintenanceController,app\\modules\\Webmaster\\RssController,app\\modules\\Webmaster\\WebmasterController
+../WebSite/app/enums/ApplicationError.php depends on: 
+../WebSite/app/enums/Authorization.php depends on: 
+../WebSite/app/enums/EventAudience.php depends on: 
+../WebSite/app/enums/EventSearchMode.php depends on: 
+../WebSite/app/enums/FilterInputRule.php depends on: 
+../WebSite/app/enums/KanbanStatusChange.php depends on: 
+../WebSite/app/enums/Karaoke.php depends on: 
+../WebSite/app/enums/MenuItemTab.php depends on: 
+../WebSite/app/enums/OrderVisibility.php depends on: 
+../WebSite/app/enums/Period.php depends on: DateTimeImmutable,\\flight\\net\\Request,app\\helpers\\Application,app\\helpers\\WebApp,app\\models\\LanguagesDataHelper
+../WebSite/app/enums/PersonStatus.php depends on: 
+../WebSite/app/enums/PersonType.php depends on: 
+../WebSite/app/enums/SurveyVisibility.php depends on: 
+../WebSite/app/enums/TimeOfDay.php depends on: 
+../WebSite/app/enums/WeekdayFormat.php depends on: 
+../WebSite/app/enums/YesNo.php depends on: 
+../WebSite/app/exceptions/AuthenticationException.php depends on: Exception,app\\enums\\ApplicationError
+../WebSite/app/exceptions/DatabaseException.php depends on: Exception,app\\enums\\ApplicationError
+../WebSite/app/exceptions/EmailException.php depends on: Exception,Throwable,app\\enums\\ApplicationError
+../WebSite/app/exceptions/FileException.php depends on: Exception,app\\enums\\ApplicationError
+../WebSite/app/exceptions/IntegrityException.php depends on: Exception,app\\enums\\ApplicationError
+../WebSite/app/exceptions/LyricsParserException.php depends on: Exception
+../WebSite/app/exceptions/QueryException.php depends on: Exception,app\\enums\\ApplicationError
+../WebSite/app/exceptions/SqliteTableException.php depends on: Exception,app\\enums\\ApplicationError
+../WebSite/app/exceptions/UnauthorizedAccessException.php depends on: Exception,app\\enums\\ApplicationError
+../WebSite/app/helpers/Application.php depends on: flight\\Engine,Latte\\Engine as LatteEngine,Latte\\Loaders\\FileLoader,LogicException,PDO,Throwable,app\\exceptions\\DatabaseException,app\\models\\Database,app\\models\\DataHelper,app\\models\\LogDataCompactHelper,app\\models\\LogDataWriterHelper,app\\modules\\Common\\services\\AuthenticationService
+../WebSite/app/helpers/Backup.php depends on: 
+../WebSite/app/helpers/Client.php depends on: UAParser\\Parser,Throwable
+../WebSite/app/helpers/ConnectedUser.php depends on: app\\enums\\ApplicationError,app\\enums\\Authorization,app\\helpers\\Params,app\\helpers\\TranslationManager,app\\models\\AuthorizationDataHelper,app\\models\\DataHelper,app\\models\\MetadataDataHelper
+../WebSite/app/helpers/DistributionCalculator.php depends on: RuntimeException
+../WebSite/app/helpers/ErrorManager.php depends on: app\\enums\\ApplicationError,app\\models\\LanguagesDataHelper,app\\models\\LogDataWriterHelper,app\\modules\\Common\\EmptyController
+../WebSite/app/helpers/FFAScraper.php depends on: GuzzleHttp\\Client,GuzzleHttp\\Exception\\GuzzleException,DOMDocument,DOMXPath
+../WebSite/app/helpers/File.php depends on: app\\exceptions\\FileException
+../WebSite/app/helpers/GravatarHandler.php depends on: 
+../WebSite/app/helpers/LogMessage.php depends on: 
+../WebSite/app/helpers/MediaManager.php depends on: RuntimeException,app\\models\\DataHelper,app\\models\\LanguagesDataHelper,app\\models\\SharedFileDataHelper
+../WebSite/app/helpers/MyClubDateTime.php depends on: DateTime,DateTimeZone
+../WebSite/app/helpers/News.php depends on: 
+../WebSite/app/helpers/NotificationSender.php depends on: Minishlink\\WebPush\\WebPush,Minishlink\\WebPush\\Subscription,Throwable,app\\models\\DataHelper,app\\Modules\\Common\\services\\CredentialService
+../WebSite/app/helpers/Params.php depends on: InvalidArgumentException,app\\helpers\\Application,app\\helpers\\TranslationManager
+../WebSite/app/helpers/Password.php depends on: 
+../WebSite/app/helpers/PersonPreferences.php depends on: DateTime
+../WebSite/app/helpers/TranslationManager.php depends on: DateTime,DateTimeInterface,IntlDateFormatter,IntlDatePatternGenerator,app\\models\\LanguagesDataHelper,app\\models\\MetadataDataHelper
+../WebSite/app/helpers/WebApp.php depends on: InvalidArgumentException,app\\enums\\FilterInputRule
+../WebSite/app/interfaces/AuthorizationServiceInterface.php depends on: 
+../WebSite/app/interfaces/DatabaseMigratorInterface.php depends on: PDO
+../WebSite/app/interfaces/EmailQuotaTrackerInterface.php depends on: 
+../WebSite/app/interfaces/EventServiceInterface.php depends on: app\\enums\\Period,app\\valueObjects\\ApiResponse
+../WebSite/app/interfaces/NewsProviderInterface.php depends on: app\\helpers\\ConnectedUser
+../WebSite/app/interfaces/RecipientResolverInterface.php depends on: app\\valueObjects\\MessageContext
+../WebSite/app/interfaces/RouteInterface.php depends on: 
+../WebSite/app/interfaces/SmtpConfigProviderInterface.php depends on: app\\valueObjects\\SmtpConfig
+../WebSite/app/models/ArticleCrosstabDataHelper.php depends on: app\\helpers\\Application,app\\models\\CrosstabDataHelper
+../WebSite/app/models/ArticleDataHelper.php depends on: PDO,app\\helpers\\Application,app\\helpers\\ConnectedUser,app\\interfaces\\NewsProviderInterface
+../WebSite/app/models/ArticleTableDataHelper.php depends on: \\Envms\\FluentPDO\\Queries\\Select,app\\helpers\\Application,app\\helpers\\ConnectedUser
+../WebSite/app/models/ArwardsDataHelper.php depends on: PDO,app\\helpers\\Application
+../WebSite/app/models/AttributeDataHelper.php depends on: PDO,Throwable,app\\enums\\ApplicationError,app\\helpers\\Application
+../WebSite/app/models/AuthorizationDataHelper.php depends on: DateTime,PDO,app\\enums\\EventAudience,app\\exceptions\\QueryException,app\\helpers\\Application,app\\helpers\\ConnectedUser
+../WebSite/app/models/AuthResult.php depends on: 
+../WebSite/app/models/CarouselDataHelper.php depends on: PDO,app\\helpers\\Application
+../WebSite/app/models/CrosstabDataHelper.php depends on: PDO,app\\enums\\Period,app\\helpers\\Application
+../WebSite/app/models/Database.php depends on: PDO,RuntimeException,Throwable,app\\enums\\ApplicationError,app\\helpers\\Application,app\\helpers\\File,app\\helpers\\LogMessage,app\\interfaces\\DatabaseMigratorInterface
+../WebSite/app/models/DataHelper.php depends on: app\\helpers\\Application
+../WebSite/app/models/Data.php depends on: InvalidArgumentException,PDO,PDOException,app\\enums\\ApplicationError,app\\exceptions\\SqliteTableException,app\\helpers\\Application
+../WebSite/app/models/DbBrowserDataHelper.php depends on: \\Envms\\FluentPDO\\Queries\\Select,PDO,RuntimeException,app\\enums\\FilterInputRule,app\\helpers\\Application
+../WebSite/app/models/DesignDataHelper.php depends on: PDO,app\\helpers\\Application
+../WebSite/app/models/EventDataHelper.php depends on: DateInterval,DateTime,DateTimeImmutable,PDO,Throwable,app\\enums\\ApplicationError,app\\enums\\EventAudience,app\\enums\\EventSearchMode,app\\enums\\Period,app\\exceptions\\QueryException,app\\helpers\\Application,app\\helpers\\ConnectedUser,app\\helpers\\PersonPreferences,app\\helpers\\TranslationManager,app\\interfaces\\NewsProviderInterface,app\\valueObjects\\ApiResponse
+../WebSite/app/models/EventNeedDataHelper.php depends on: PDO,app\\helpers\\Application
+../WebSite/app/models/EventTypeDataHelper.php depends on: PDO,Throwable,app\\helpers\\Application
+../WebSite/app/models/ExerciseTableDataHelper.php depends on: \\Envms\\FluentPDO\\Queries\\Select,app\\helpers\\Application,app\\helpers\\ConnectedUser
+../WebSite/app/models/GroupDataHelper.php depends on: PDO,Throwable,app\\enums\\ApplicationError,app\\exceptions\\QueryException,app\\helpers\\Application,app\\helpers\\ConnectedUser
+../WebSite/app/models/KanbanDataHelper.php depends on: PDO,Throwable,app\\enums\\KanbanStatusChange,app\\helpers\\Application
+../WebSite/app/models/KaraokeDataHelper.php depends on: Throwable,app\\helpers\\Application
+../WebSite/app/models/LanguagesDataHelper.php depends on: PDO,app\\helpers\\Application,app\\helpers\\TranslationManager
+../WebSite/app/models/LoanDataHelper.php depends on: app\\helpers\\Application,PDO
+../WebSite/app/models/LogDataAnalyticsHelper.php depends on: DateTime,PDO,app\\helpers\\Application,app\\helpers\\MyClubDateTime
+../WebSite/app/models/LogDataCompactHelper.php depends on: DateTime,InvalidArgumentException,Throwable,app\\enums\\ApplicationError,app\\helpers\\Application
+../WebSite/app/models/LogDataHelper.php depends on: DateTimeImmutable,Envms\\FluentPDO\\Queries\\Select,PDO,app\\enums\\Period,app\\helpers\\Application,app\\helpers\\MyClubDateTime
+../WebSite/app/models/LogDataStatisticsHelper.php depends on: DateTime,PDO,app\\helpers\\MyClubDateTime
+../WebSite/app/models/LogDataWriterHelper.php depends on: RuntimeException,Throwable,app\\helpers\\Application,app\\helpers\\Client
+../WebSite/app/models/MemberDataHelper.php depends on: PDO,app\\helpers\\Application,app\\helpers\\ConnectedUser,app\\helpers\\GravatarHandler,app\\helpers\\PersonPreferences,app\\helpers\\WebApp,app\\interfaces\\NewsProviderInterface,app\\modules\\Common\\services\\EmailService,app\\valueObjects\\EmailMessage
+../WebSite/app/models/MemberGroupDataHelper.php depends on: app\\helpers\\Application
+../WebSite/app/models/MemberStatisticsDataHelper.php depends on: PDO,app\\helpers\\Application
+../WebSite/app/models/MenuItemDataHelper.php depends on: InvalidArgumentException,PDO,Throwable,app\\helpers\\Application
+../WebSite/app/models/MessageDataHelper.php depends on: PDO,RuntimeException,app\\exceptions\\UnauthorizedAccessException,app\\helpers\\Application,app\\helpers\\ConnectedUser,app\\helpers\\GravatarHandler,app\\helpers\\MyClubDateTime,app\\helpers\\TranslationManager,app\\helpers\\WebApp,app\\interfaces\\NewsProviderInterface
+../WebSite/app/models/MetadataDataHelper.php depends on: app\\helpers\\Application
+../WebSite/app/models/NeedDataHelper.php depends on: PDO,app\\helpers\\Application
+../WebSite/app/models/NeedTypeDataHelper.php depends on: app\\helpers\\Application
+../WebSite/app/models/OrderDataHelper.php depends on: PDO,app\\exceptions\\QueryException,app\\helpers\\Application,app\\helpers\\ConnectedUser,app\\interfaces\\NewsProviderInterface
+../WebSite/app/models/OrderReplyDataHelper.php depends on: app\\helpers\\Application
+../WebSite/app/models/ParticipantDataHelper.php depends on: PDO,app\\helpers\\Application
+../WebSite/app/models/PersonDataHelper.php depends on: InvalidArgumentException,PDO,RuntimeException,Throwable,app\\helpers\\Application,app\\helpers\\ConnectedUser,app\\helpers\\GravatarHandler,app\\helpers\\PersonPreferences,app\\helpers\\WebApp,app\\interfaces\\NewsProviderInterface,app\\modules\\Common\\services\\EmailService,app\\valueObjects\\EmailMessage
+../WebSite/app/models/PersonGroupDataHelper.php depends on: app\\helpers\\Application
+../WebSite/app/models/PersonStatisticsDataHelper.php depends on: PDO,app\\helpers\\Application
+../WebSite/app/models/ReplyDataHelper.php depends on: app\\helpers\\Application
+../WebSite/app/models/SharedFileDataHelper.php depends on: PDO,app\\helpers\\Application
+../WebSite/app/models/SurveyDataHelper.php depends on: PDO,app\\exceptions\\QueryException,app\\helpers\\Application,app\\helpers\\ConnectedUser,app\\interfaces\\NewsProviderInterface
+../WebSite/app/models/TableControllerDataHelper.php depends on: \\Envms\\FluentPDO\\Queries\\Select,app\\helpers\\Application
+../WebSite/app/modules/Article/ArticleController.php depends on: app\\enums\\ApplicationError,app\\enums\\FilterInputRule,app\\enums\\Period,app\\exceptions\\IntegrityException,app\\exceptions\\QueryException,app\\helpers\\Application,app\\helpers\\Backup,app\\helpers\\GravatarHandler,app\\helpers\\TranslationManager,app\\helpers\\WebApp,app\\models\\ArticleCrosstabDataHelper,app\\models\\ArticleDataHelper,app\\models\\ArticleTableDataHelper,app\\models\\AuthorizationDataHelper,app\\models\\LogDataHelper,app\\models\\MessageDataHelper,app\\models\\PersonDataHelper,app\\modules\\Article\\services\\ArticleAuthorizationService,app\\modules\\Common\\TableController,app\\modules\\Common\\services\\ArticleService,app\\modules\\Common\\services\\AuthenticationService,app\\modules\\Common\\services\\EmailService,app\\modules\\Common\\services\\MessageService,app\\valueObjects\\EmailMessage
+../WebSite/app/modules/Article/DesignController.php depends on: RuntimeException,app\\enums\\FilterInputRule,app\\helpers\\Application,app\\helpers\\WebApp,app\\models\\DesignDataHelper,app\\modules\\Common\\AbstractController
+../WebSite/app/modules/Article/MediaController.php depends on: Flight,app\\helpers\\Application,app\\helpers\\MediaManager,app\\helpers\\WebApp,app\\models\\ArticleDataHelper,app\\models\\CarouselDataHelper,app\\models\\MessageDataHelper,app\\models\\PersonGroupDataHelper,app\\models\\SharedFileDataHelper,app\\modules\\Common\\AbstractController
+../WebSite/app/modules/Article/OrderController.php depends on: DateTime,app\\enums\\FilterInputRule,app\\enums\\OrderVisibility,app\\exceptions\\IntegrityException,app\\helpers\\Application,app\\helpers\\WebApp,app\\models\\OrderDataHelper,app\\modules\\Common\\AbstractController
+../WebSite/app/modules/Article/services/ArticleAuthorizationService.php depends on: app\\models\\AuthorizationDataHelper,app\\models\\DataHelper,app\\modules\\Common\\services\\AuthenticationService
+../WebSite/app/modules/Article/SurveyController.php depends on: DateTime,app\\enums\\FilterInputRule,app\\enums\\SurveyVisibility,app\\exceptions\\IntegrityException,app\\helpers\\Application,app\\helpers\\WebApp,app\\models\\SurveyDataHelper,app\\modules\\Common\\AbstractController
+../WebSite/app/modules/Common/AbstractController.php depends on: flight,flight\\Engine,Latte\\Engine as LatteEngine,app\\enums\\ApplicationError,app\\enums\\TimeOfDay,app\\helpers\\Application,app\\helpers\\Params,app\\helpers\\TranslationManager,app\\models\\AuthorizationDataHelper,app\\models\\DataHelper,app\\models\\LanguagesDataHelper,app\\models\\MenuItemDataHelper,app\\models\\MetadataDataHelper
+../WebSite/app/modules/Common/AbstractShowController.php depends on: app\\enums\\ApplicationError,app\\enums\\Period,app\\helpers\\WebApp
+../WebSite/app/modules/Common/EmptyController.php depends on: app\\helpers\\Application,app\\modules\\Common\\AbstractController
+../WebSite/app/modules/Common/services/ArticleService.php depends on: app\\helpers\\MediaManager,app\\models\\CarouselDataHelper,app\\models\\DataHelper
+../WebSite/app/modules/Common/services/AuthenticationService.php depends on: DateTime,Throwable,app\\enums\\FilterInputRule,app\\exceptions\\EmailException,app\\helpers\\Application,app\\helpers\\Password,app\\helpers\\WebApp,app\\models\\AuthResult,app\\models\\DataHelper,app\\modules\\Common\\services\\EmailService,app\\valueObjects\\EmailMessage
+../WebSite/app/modules/Common/services/CredentialService.php depends on: DateTimeImmutable,PDO,app\\helpers\\Application
+../WebSite/app/modules/Common/services/DatabaseSmtpConfigProvider.php depends on: app\\interfaces\\SmtpConfigProviderInterface,app\\modules\\Common\\services\\CredentialService,app\\valueObjects\\SmtpConfig
+../WebSite/app/modules/Common/services/EmailService.php depends on: Mailjet\\Client as MailjetClient,Mailjet\\Resources as MailjetResources,PHPMailer\\PHPMailer\\PHPMailer,PHPMailer\\PHPMailer\\Exception as PHPMailerException,app\\interfaces\\SmtpConfigProviderInterface,app\\interfaces\\EmailQuotaTrackerInterface,app\\valueObjects\\EmailMessage,app\\valueObjects\\SmtpConfig,app\\exceptions\\EmailException,InvalidArgumentException
+../WebSite/app/modules/Common/services/EventService.php depends on: app\\enums\\Period,app\\interfaces\\EventServiceInterface,app\\models\\EventDataHelper,app\\valueObjects\\ApiResponse
+../WebSite/app/modules/Common/services/JsonEmailQuotaTracker.php depends on: RuntimeException,app\\interfaces\\EmailQuotaTrackerInterface
+../WebSite/app/modules/Common/services/MessageRecipientService.php depends on: app\\interfaces\\RecipientResolverInterface,app\\models\\DataHelper,app\\modules\\Notifications\\ArticleRecipientResolver,app\\modules\\Notifications\\EventRecipientResolver,app\\modules\\Notifications\\GroupRecipientResolver,app\\valueObjects\\MessageContext
+../WebSite/app/modules/Common/services/MessageService.php depends on: 
+../WebSite/app/modules/Common/TableController.php depends on: \\Envms\\FluentPDO\\Queries\\Select,PDO,app\\helpers\\Application
+../WebSite/app/modules/Communication/CommunicationController.php depends on: app\\helpers\\Application,app\\modules\\Common\\AbstractController,app\\modules\\Common\\services\\EmailService
+../WebSite/app/modules/Designer/DesignController.php depends on: RuntimeException,app\\enums\\FilterInputRule,app\\helpers\\Application,app\\helpers\\TranslationManager,app\\helpers\\WebApp,app\\models\\DesignDataHelper,app\\modules\\Common\\AbstractController
+../WebSite/app/modules/Designer/DesignerController.php depends on: app\\helpers\\Application,app\\helpers\\TranslationManager,app\\helpers\\WebApp,app\\modules\\Common\\AbstractController
+../WebSite/app/modules/Designer/MenuItemController.php depends on: app\\enums\\ApplicationError,app\\enums\\MenuItemTab,app\\helpers\\Application,app\\models\\ArwardsDataHelper,app\\modules\\Common\\AbstractController
+../WebSite/app/modules/Designer/WebappSettingsController.php depends on: app\\enums\\FilterInputRule,app\\helpers\\Application,app\\helpers\\TranslationManager,app\\helpers\\WebApp,app\\models\\MetadataDataHelper,app\\modules\\Common\\AbstractController
+../WebSite/app/modules/Event/EventController.php depends on: DateTime,Throwable,app\\enums\\ApplicationError,app\\enums\\EventAudience,app\\enums\\EventSearchMode,app\\enums\\FilterInputRule,app\\enums\\Period,app\\exceptions\\QueryException,app\\helpers\\Application,app\\helpers\\GravatarHandler,app\\helpers\\TranslationManager,app\\helpers\\WebApp,app\\models\\CrosstabDataHelper,app\\models\\EventDataHelper,app\\models\\ParticipantDataHelper,app\\models\\MessageDataHelper,app\\modules\\Common\\AbstractController
+../WebSite/app/modules/Event/EventEmailController.php depends on: app\\enums\\FilterInputRule,app\\enums\\WeekdayFormat,app\\helpers\\Application,app\\helpers\\TranslationManager,app\\helpers\\WebApp,app\\models\\PersonDataHelper,app\\modules\\Common\\AbstractController
+../WebSite/app/modules/Event/EventGuestController.php depends on: DateTime,Throwable,app\\enums\\FilterInputRule,app\\helpers\\Application,app\\helpers\\WebApp,app\\models\\EventDataHelper,app\\modules\\Common\\AbstractController,app\\modules\\Common\\services\\EmailService,app\\valueObjects\\EmailMessage
+../WebSite/app/modules/Event/EventNeedController.php depends on: app\\helpers\\Application,app\\models\\NeedDataHelper,app\\modules\\Common\\AbstractController
+../WebSite/app/modules/Event/EventTypeController.php depends on: app\\enums\\ApplicationError,app\\enums\\FilterInputRule,app\\helpers\\Application,app\\helpers\\ErrorManager,app\\helpers\\WebApp,app\\models\\EventTypeDataHelper,app\\models\\TableControllerDataHelper,app\\modules\\Common\\TableController
+../WebSite/app/modules/Exercise/ExerciseController.php depends on: app\\enums\\ApplicationError,app\\enums\\FilterInputRule,app\\helpers\\Application,app\\helpers\\WebApp,app\\models\\exerciseTableDataHelper,app\\modules\\Common\\TableController
+../WebSite/app/modules/Games/Karaoke/KaraokeController.php depends on: app\\exceptions\\LyricsParserException,app\\helpers\\Application,app\\modules\\Common\\AbstractController
+../WebSite/app/modules/Games/Karaoke/LyricsParser.php depends on: app\\exceptions\\LyricsParserException
+../WebSite/app/modules/Games/Leapfrog/LeapfrogController.php depends on: app\\enums\\FilterInputRule,app\\helpers\\Application,app\\helpers\\WebApp,app\\models\\TableControllerDataHelper,app\\modules\\Common\\TableController
+../WebSite/app/modules/Games/Solfege/SolfegeController.php depends on: Throwable,app\\helpers\\Application,app\\modules\\Common\\AbstractController
+../WebSite/app/modules/Kanban/KanbanController.php depends on: app\\enums\\FilterInputRule,app\\helpers\\Application,app\\helpers\\TranslationManager,app\\helpers\\WebApp,app\\models\\KanbanDataHelper,app\\modules\\Common\\AbstractController
+../WebSite/app/modules/Loan/LoanController.php depends on: app\\helpers\\Application,app\\helpers\\TranslationManager,app\\models\\LoanDataHelper,app\\modules\\Common\\AbstractController
+../WebSite/app/modules/Notifications/ArticleRecipientResolver.php depends on: app\\interfaces\\RecipientResolverInterface,app\\valueObjects\\MessageContext
+../WebSite/app/modules/Notifications/EventRecipientResolver.php depends on: app\\interfaces\\RecipientResolverInterface,app\\valueObjects\\MessageContext
+../WebSite/app/modules/Notifications/GroupRecipientResolver.php depends on: app\\interfaces\\RecipientResolverInterface,app\\valueObjects\\MessageContext
+../WebSite/app/modules/PersonManager/GroupController.php depends on: Throwable,app\\enums\\FilterInputRule,app\\exceptions\\QueryException,app\\helpers\\Application,app\\helpers\\GravatarHandler,app\\helpers\\WebApp,app\\models\\GroupDataHelper,app\\models\\MessageDataHelper,app\\models\\PersonGroupDataHelper,app\\modules\\Common\\AbstractController
+../WebSite/app/modules/PersonManager/ImportController.php depends on: app\\enums\\FilterInputRule,app\\helpers\\Application,app\\helpers\\WebApp,app\\models\\PersonDataHelper,app\\modules\\Common\\AbstractController
+../WebSite/app/modules/PersonManager/PersonController.php depends on: app\\enums\\FilterInputRule,app\\enums\\PersonStatus,app\\helpers\\Application,app\\helpers\\TranslationManager,app\\helpers\\WebApp,app\\models\\PersonDataHelper,app\\models\\TableControllerDataHelper,app\\modules\\Common\\TableController
+../WebSite/app/modules/PersonManager/RegistrationController.php depends on: Throwable,app\\enums\\FilterInputRule,app\\helpers\\Application,app\\helpers\\WebApp,app\\models\\GroupDataHelper,app\\models\\TableControllerDataHelper,app\\modules\\Common\\TableController
+../WebSite/app/modules/Pwa/PwaController.php depends on: app\\helpers\\Application,app\\helpers\\WebApp,app\\modules\\Common\\AbstractController,app\\modules\\Common\\services\\ArticleService
+../WebSite/app/modules/Translator/TranslatorController.php depends on: app\\enums\\FilterInputRule,app\\helpers\\Application,app\\helpers\\TranslationManager,app\\helpers\\WebApp,app\\modules\\Common\\AbstractController
+../WebSite/app/modules/User/ContactController.php depends on: app\\enums\\ApplicationError,app\\enums\\EventAudience,app\\enums\\FilterInputRule,app\\helpers\\Application,app\\helpers\\WebApp,app\\models\\PersonDataHelper,app\\modules\\Common\\AbstractController,app\\modules\\Common\\services\\CredentialService,app\\modules\\Common\\services\\EmailService,app\\valueObjects\\EmailMessage
+../WebSite/app/modules/User/FFAController.php depends on: app\\enums\\FilterInputRule,app\\helpers\\Application,app\\helpers\\FFAScraper,app\\helpers\\WebApp,app\\modules\\Common\\AbstractController
+../WebSite/app/modules/User/HomeController.php depends on: app\\helpers\\Application,app\\helpers\\News,app\\helpers\\Params,app\\helpers\\TranslationManager,app\\helpers\\WebApp,app\\models\\ArticleDataHelper,app\\models\\DesignDataHelper,app\\models\\MetadataDataHelper,app\\models\\PersonDataHelper,app\\models\\SurveyDataHelper,app\\modules\\Common\\AbstractController
+../WebSite/app/modules/User/UserAccountController.php depends on: app\\enums\\FilterInputRule,app\\enums\\YesNo,app\\helpers\\Application,app\\helpers\\WebApp,app\\modules\\Common\\AbstractController
+../WebSite/app/modules/User/UserAvailabilitiesController.php depends on: app\\enums\\FilterInputRule,app\\helpers\\Application,app\\helpers\\WebApp,app\\modules\\Common\\AbstractController
+../WebSite/app/modules/User/UserConnectionsController.php depends on: app\\helpers\\Application,app\\models\\ParticipantDataHelper,app\\modules\\Common\\AbstractController
+../WebSite/app/modules/User/UserController.php depends on: InvalidArgumentException,app\\enums\\ApplicationError,app\\enums\\FilterInputRule,app\\exceptions\\EmailException,app\\helpers\\Application,app\\helpers\\TranslationManager,app\\helpers\\WebApp,app\\modules\\Common\\AbstractController,app\\modules\\Common\\services\\AuthenticationService
+../WebSite/app/modules/User/UserDashboardController.php depends on: app\\helpers\\Application,app\\helpers\\TranslationManager,app\\modules\\Common\\AbstractController
+../WebSite/app/modules/User/UserDirectoryController.php depends on: app\\helpers\\Application,app\\helpers\\GravatarHandler,app\\helpers\\WebApp,app\\models\\GroupDataHelper,app\\models\\PersonDataHelper,app\\models\\PersonGroupDataHelper,app\\modules\\Common\\AbstractController
+../WebSite/app/modules/User/UserGroupsController.php depends on: app\\enums\\FilterInputRule,app\\helpers\\Application,app\\helpers\\WebApp,app\\models\\GroupDataHelper,app\\models\\PersonGroupDataHelper,app\\modules\\Common\\AbstractController
+../WebSite/app/modules/User/UserMessagesController.php depends on: app\\helpers\\Application,app\\helpers\\GravatarHandler,app\\models\\MessageDataHelper,app\\modules\\Common\\AbstractShowController
+../WebSite/app/modules/User/UserNewsController.php depends on: app\\helpers\\Application,app\\helpers\\News,app\\modules\\Common\\AbstractShowController
+../WebSite/app/modules/User/UserNotepadController.php depends on: app\\enums\\FilterInputRule,app\\helpers\\Application,app\\helpers\\WebApp,app\\modules\\Common\\AbstractController
+../WebSite/app/modules/User/UserNotificationsController.php depends on: app\\enums\\FilterInputRule,app\\helpers\\Application,app\\helpers\\NotificationSender,app\\helpers\\WebApp,app\\models\\GroupDataHelper,app\\modules\\Common\\AbstractController,app\\modules\\Common\\services\\CredentialService
+../WebSite/app/modules/User/UserPreferencesController.php depends on: app\\enums\\FilterInputRule,app\\helpers\\Application,app\\helpers\\WebApp,app\\models\\AttributeDataHelper,app\\models\\EventTypeDataHelper,app\\modules\\Common\\AbstractController
+../WebSite/app/modules/User/UserPresentationController.php depends on: app\\enums\\ApplicationError,app\\enums\\FilterInputRule,app\\helpers\\Application,app\\helpers\\GravatarHandler,app\\helpers\\WebApp,app\\modules\\Common\\AbstractController
+../WebSite/app/modules/User/UserStatisticsController.php depends on: app\\enums\\ApplicationError,app\\enums\\FilterInputRule,app\\helpers\\Application,app\\helpers\\DistributionCalculator,app\\helpers\\WebApp,app\\models\\LogDataHelper,app\\models\\ParticipantDataHelper,app\\models\\PersonStatisticsDataHelper,app\\modules\\Common\\AbstractController
+../WebSite/app/modules/VisitorInsights/VisitorInsightsController.php depends on: app\\enums\\Period,app\\enums\\FilterInputRule,app\\helpers\\Application,app\\helpers\\TranslationManager,app\\helpers\\WebApp,app\\models\\CrosstabDataHelper,app\\models\\LogDataHelper,app\\models\\LogDataAnalyticsHelper,app\\models\\LogDataStatisticsHelper,app\\models\\PersonDataHelper,app\\modules\\Common\\TableController
+../WebSite/app/modules/Webmaster/ArwardsController.php depends on: app\\enums\\FilterInputRule,app\\helpers\\Application,app\\helpers\\WebApp,app\\models\\ArwardsDataHelper,app\\modules\\Common\\AbstractController
+../WebSite/app/modules/Webmaster/DbBrowserController.php depends on: app\\helpers\\Application,app\\helpers\\WebApp,app\\models\\DbBrowserDataHelper,app\\modules\\Common\\TableController
+../WebSite/app/modules/Webmaster/MaintenanceController.php depends on: app\\enums\\ApplicationError,app\\helpers\\Application,app\\helpers\\ErrorManager,app\\helpers\\WebApp,app\\modules\\Common\\AbstractController
+../WebSite/app/modules/Webmaster/RssController.php depends on: DateInterval,DateTime,app\\helpers\\Application,app\\helpers\\WebApp,app\\models\\ArticleDataHelper,app\\models\\EventDataHelper,app\\modules\\Common\\AbstractController
+../WebSite/app/modules/Webmaster/WebmasterController.php depends on: \\Minishlink\\WebPush\\VAPID,app\\enums\\FilterInputRule,app\\helpers\\Application,app\\helpers\\NotificationSender,app\\helpers\\TranslationManager,app\\helpers\\WebApp,app\\models\\ArticleDataHelper,app\\models\\LogDataHelper,app\\modules\\Common\\AbstractController,app\\modules\\Common\\services\\CredentialService
+../WebSite/app/valueObjects/ApiResponse.php depends on: 
+../WebSite/app/valueObjects/EmailMessage.php depends on: InvalidArgumentException
+../WebSite/app/valueObjects/MessageContext.php depends on: 
+../WebSite/app/valueObjects/Route.php depends on: Closure
+../WebSite/app/valueObjects/SmtpConfig.php depends on: `;
+
+// ── Parse ──────────────────────────────────────────────────────────────
+function parse(raw) {
+  const rows = [];
+  for (const line of raw.trim().split('\n')) {
+    const m = line.match(/^(.+?) depends on: (.*)$/);
+    if (!m) continue;
+    const file = m[1].replace('../WebSite/', '');
+    const deps = m[2] ? m[2].split(',').map(d => d.trim()).filter(Boolean) : [];
+    rows.push({ file, deps });
+  }
+  return rows;
+}
+
+function normalize(dep) {
+  // lowercase first char for consistency, remove leading backslash
+  return dep.replace(/^\\/, '').toLowerCase();
+}
+
+function isAppClass(dep) {
+  const n = normalize(dep);
+  return n.startsWith('app\\') || n.startsWith('app/');
+}
+
+const data = parse(RAW);
+
+// Collect all unique deps
+const extSet = new Set(), intSet = new Set();
+for (const row of data) {
+  for (const dep of row.deps) {
+    if (isAppClass(dep)) intSet.add(dep);
+    else extSet.add(dep);
+  }
+}
+
+const extCols = [...extSet].sort((a,b) => a.localeCompare(b));
+const intCols = [...intSet].sort((a,b) => a.localeCompare(b));
+const allCols = [...extCols, ...intCols]; // ext first, then int
+
+// Build lookup: row -> set of normalized deps
+const rowDeps = data.map(r => new Set(r.deps.map(normalize)));
+
+// State
+let showExt = true, showInt = true, filter = '';
+
+function shortLabel(dep) {
+  // show just last segment for readability
+  const parts = dep.replace(/\\/g, '/').split('/');
+  return parts[parts.length - 1];
+}
+
+function buildTable() {
+  const table = document.getElementById('pivotTable');
+  const wrap = document.getElementById('pivotWrap');
+  table.innerHTML = '';
+
+  const visibleExt = showExt ? extCols : [];
+  const visibleInt = showInt ? intCols : [];
+  const hasSep = visibleExt.length > 0 && visibleInt.length > 0;
+
+  // ── Group header row ──
+  const ghr = document.createElement('tr');
+  ghr.className = 'group-header';
+  // corner
+  const cornerGH = document.createElement('th');
+  cornerGH.className = 'g-none';
+  cornerGH.textContent = '';
+  ghr.appendChild(cornerGH);
+
+  if (visibleExt.length) {
+    const th = document.createElement('th');
+    th.colSpan = visibleExt.length;
+    th.className = 'g-ext';
+    th.textContent = `Externes (${visibleExt.length})`;
+    ghr.appendChild(th);
+  }
+  if (hasSep) {
+    const sep = document.createElement('th');
+    sep.className = 'group-sep';
+    ghr.appendChild(sep);
+  }
+  if (visibleInt.length) {
+    const th = document.createElement('th');
+    th.colSpan = visibleInt.length;
+    th.className = 'g-int';
+    th.textContent = `App Classes (${visibleInt.length})`;
+    ghr.appendChild(th);
+  }
+
+  // ── Column header row ──
+  const thead = document.createElement('thead');
+  thead.appendChild(ghr);
+  const hr = document.createElement('tr');
+
+  // Corner cell
+  const corner = document.createElement('th');
+  corner.style.height = '160px';
+  const cornerLabel = document.createElement('div');
+  cornerLabel.style.cssText = 'font-family:Syne,sans-serif;font-size:11px;color:var(--text-dim);padding:4px 0;';
+  cornerLabel.textContent = `${data.length} fichiers`;
+  corner.appendChild(cornerLabel);
+  hr.appendChild(corner);
+
+  const allVisible = [...visibleExt.map(d=>({d,g:'ext'})), ...(hasSep?[{d:null,g:'sep'}]:[]), ...visibleInt.map(d=>({d,g:'int'}))];
+
+  for (const {d, g} of allVisible) {
+    const th = document.createElement('th');
+    if (g === 'sep') { th.className = 'group-sep'; hr.appendChild(th); continue; }
+    th.className = `group-${g}`;
+    th.dataset.col = normalize(d);
+    const wrap2 = document.createElement('div');
+    wrap2.className = 'col-label-wrap';
+    wrap2.textContent = shortLabel(d);
+    wrap2.title = d;
+    th.appendChild(wrap2);
+    hr.appendChild(th);
+  }
+  thead.appendChild(hr);
+  table.appendChild(thead);
+
+  // ── Body ──
+  const tbody = document.createElement('tbody');
+  let visCount = 0;
+
+  for (let ri = 0; ri < data.length; ri++) {
+    const row = data[ri];
+    const tr = document.createElement('tr');
+    const lc = filter.toLowerCase();
+    if (lc && !row.file.toLowerCase().includes(lc)) {
+      tr.className = 'hidden';
+    } else {
+      visCount++;
+    }
+
+    // Label cell
+    const td0 = document.createElement('td');
+    // split into prefix / filename
+    const parts = row.file.split('/');
+    const fname = parts.pop();
+    const prefix = parts.join('/') + '/';
+    td0.innerHTML = `<span class="path-prefix">${escHtml(prefix)}</span><span class="path-file">${escHtml(fname)}</span>`;
+    td0.title = row.file;
+    tr.appendChild(td0);
+
+    const deps = rowDeps[ri];
+
+    for (const {d, g} of allVisible) {
+      const td = document.createElement('td');
+      if (g === 'sep') { td.className = 'group-sep'; tr.appendChild(td); continue; }
+      td.className = `group-${g}`;
+      td.dataset.col = normalize(d);
+      if (deps.has(normalize(d))) {
+        const dot = document.createElement('span');
+        dot.className = 'hit';
+        dot.title = d;
+        td.appendChild(dot);
+      }
+      tr.appendChild(td);
+    }
+    tbody.appendChild(tr);
+  }
+  table.appendChild(tbody);
+
+  // Stats
+  document.getElementById('stats').innerHTML =
+    `<b>${visCount}</b> / ${data.length} fichiers &nbsp;·&nbsp; <b>${visibleExt.length + visibleInt.length}</b> dépendances`;
+
+  document.getElementById('noResults').style.display = (visCount === 0 && filter) ? 'block' : 'none';
+  wrap.style.display = (visCount === 0 && filter) ? 'none' : '';
+
+  // Column hover highlight
+  table.addEventListener('mouseover', colHover);
+  table.addEventListener('mouseout', colUnhover);
+
+  // Tooltip
+  table.addEventListener('mousemove', showTip);
+  table.addEventListener('mouseleave', hideTip);
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+let hoverCol = null;
+function colHover(e) {
+  const col = e.target.closest('[data-col]');
+  if (!col) return;
+  const key = col.dataset.col;
+  if (key === hoverCol) return;
+  if (hoverCol) unhighlightCol(hoverCol);
+  hoverCol = key;
+  highlightCol(key);
+}
+function colUnhover() {
+  if (hoverCol) { unhighlightCol(hoverCol); hoverCol = null; }
+}
+function highlightCol(key) {
+  document.querySelectorAll(`[data-col="${key}"]`).forEach(el => el.classList.add('col-hover'));
+}
+function unhighlightCol(key) {
+  document.querySelectorAll(`[data-col="${key}"]`).forEach(el => el.classList.remove('col-hover'));
+}
+
+const tip = document.getElementById('tip');
+function showTip(e) {
+  const hit = e.target.closest('.hit');
+  const th = e.target.closest('th[data-col]');
+  if (hit) {
+    tip.textContent = hit.title;
+    tip.style.opacity = '1';
+    positionTip(e);
+  } else if (th) {
+    const label = th.querySelector('.col-label-wrap');
+    tip.textContent = label ? label.title : '';
+    tip.style.opacity = '1';
+    positionTip(e);
+  } else {
+    tip.style.opacity = '0';
+  }
+}
+function positionTip(e) {
+  tip.style.left = (e.clientX + 12) + 'px';
+  tip.style.top = (e.clientY + 12) + 'px';
+}
+function hideTip() { tip.style.opacity = '0'; }
+
+function toggleGroup(g) {
+  if (g === 'ext') {
+    showExt = !showExt;
+    document.getElementById('btnExt').classList.toggle('active-ext', showExt);
+  } else {
+    showInt = !showInt;
+    document.getElementById('btnInt').classList.toggle('active-int', showInt);
+  }
+  buildTable();
+}
+
+document.getElementById('searchInput').addEventListener('input', function() {
+  filter = this.value;
+  // just toggle hidden on rows without rebuilding
+  const lc = filter.toLowerCase();
+  const trs = document.querySelectorAll('#pivotTable tbody tr');
+  let vis = 0;
+  trs.forEach(tr => {
+    const label = tr.querySelector('td:first-child');
+    if (!label) return;
+    const text = label.title || '';
+    const hidden = lc && !text.toLowerCase().includes(lc);
+    tr.classList.toggle('hidden', hidden);
+    if (!hidden) vis++;
+  });
+  document.getElementById('stats').innerHTML =
+    `<b>${vis}</b> / ${data.length} fichiers &nbsp;·&nbsp; <b>${(showExt?extCols.length:0)+(showInt?intCols.length:0)}</b> dépendances`;
+  document.getElementById('noResults').style.display = (vis === 0 && lc) ? 'block' : 'none';
+  document.getElementById('pivotWrap').style.display = (vis === 0 && lc) ? 'none' : '';
+});
+
+buildTable();
+</script>
+</body>
+</html>

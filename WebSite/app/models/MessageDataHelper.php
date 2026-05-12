@@ -108,7 +108,11 @@ class MessageDataHelper extends Data implements NewsProviderInterface
     {
         $sql = "
             SELECT 
-                Message.*,
+                Message.Id,
+                Message.PersonId,
+                Message.Text,
+                Message.ImagePath,
+                Message.LastUpdate,
                 Person.FirstName,
                 Person.LastName,
                 Person.NickName,

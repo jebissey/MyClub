@@ -66,7 +66,6 @@ class MessageApi extends AbstractApi
         }
 
         $data = $this->getJsonInput();
-
         if (
             (!isset($data['eventId']) && !isset($data['articleId']) && !isset($data['groupId']))
             || !isset($data['text'])
@@ -95,7 +94,7 @@ class MessageApi extends AbstractApi
                 $groupId,
                 $this->application->getConnectedUser()->person->Id,
                 (string)$data['text'],
-                Webapp::getBaseUrl() . $imagePath,
+                $imagePath !== null ? Webapp::getBaseUrl() . $imagePath : null,
             );
 
             if ($apiResponse->success === true && isset($apiResponse->data['messageId'])) {
