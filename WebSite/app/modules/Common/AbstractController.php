@@ -252,6 +252,15 @@ abstract class AbstractController
         readfile($filePath);
     }
 
+    protected function translations(array $keys, string $prefix): array
+    {
+        $trans = [];
+        foreach ($keys as $k) {
+            $trans[$k] = ($this->t)($prefix . $k);
+        }
+        return $trans;
+    }
+
     protected function userIsAllowedAndMethodIsGood(string $method, callable $permissionCheck): bool
     {
         $user = $this->application->getConnectedUser();

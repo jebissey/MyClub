@@ -40,22 +40,25 @@ if (!is_file($sqlFile)) {
     exit(1);
 }
 
-// ─── Helper : scan de fichiers ────────────────────────────────────────────────
+// ─── Helper : scan ligne par ligne ───────────────────────────────────────────
 
 /**
  * Scanne récursivement $dir pour les fichiers dont l'extension correspond à
- * $extensionRegex, et extrait les clés de traduction via un ou plusieurs
- * patterns (groupe de capture 1 de chaque pattern).
+ * $extensionRegex, et extrait :
+ *   - les clés de traduction statiques via $patterns (groupe capture 1)
+ *   - les préfixes de clés dynamiques ("prefix_{$var}")|translate  (latte)
  *
  * @param string[]                                           $patterns
- * @param array<string, list<array{file:string, line:int}>> $usedKeys  (par référence)
+ * @param array<string, list<array{file:string, line:int}>> $usedKeys        (par référence)
+ * @param array<string, true>                               $dynamicPrefixes (par référence)
  * @return array{files: int, matches: int}
  */
 function scanFiles(
     string $dir,
     string $extensionRegex,
     array  $patterns,
-    array  &$usedKeys
+    array  &$usedKeys,
+    array  &$dynamicPrefixes = []
 ): array {
     $fileCount  = 0;
     $matchCount = 0;
@@ -79,6 +82,7 @@ function scanFiles(
         }
 
         foreach ($lines as $lineNo => $lineContent) {
+            // ── Clés statiques ─────────────────────────────────────────────
             foreach ($patterns as $pattern) {
                 if (preg_match_all($pattern, $lineContent, $matches)) {
                     foreach ($matches[1] as $key) {
@@ -89,6 +93,105 @@ function scanFiles(
                         ];
                     }
                 }
+            }
+
+            // ── Préfixes dynamiques latte : ("prefix_{$var}")|translate ────
+            if (preg_match_all(
+                '/\(\s*[\'"]([a-zA-Z0-9_.]+_)\{\$[a-zA-Z0-9_]+\}[\'"]\s*\|translate\s*\)/',
+                $lineContent,
+                $dynMatches
+            )) {
+                foreach ($dynMatches[1] as $prefix) {
+                    $dynamicPrefixes[$prefix] = true;
+                }
+            }
+        }
+    }
+
+    return ['files' => $fileCount, 'matches' => $matchCount];
+}
+
+// ─── Helper : scan des tableaux de traduction PHP ────────────────────────────
+
+/**
+ * Détecte dans les fichiers PHP le pattern :
+ *
+ *   $keys = ['key1', 'key2', ...];
+ *   foreach ($keys as $k) {
+ *       $trans[$k] = ($this->t)('prefix.' . $k);
+ *   }
+ *
+ * Extrait toutes les clés complètes (préfixe + literal) et les enregistre
+ * dans $usedKeys.
+ *
+ * @param array<string, list<array{file:string, line:int}>> $usedKeys (par référence)
+ * @return array{files: int, matches: int}
+ */
+function scanPhpTranslationArrays(string $dir, array &$usedKeys): array
+{
+    $fileCount  = 0;
+    $matchCount = 0;
+
+    $iterator = new RegexIterator(
+        new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($dir, RecursiveDirectoryIterator::SKIP_DOTS)
+        ),
+        '/\.php$/i',
+        RegexIterator::MATCH
+    );
+
+    foreach ($iterator as $fileInfo) {
+        $filePath = $fileInfo->getPathname();
+        $fileCount++;
+
+        $content = file_get_contents($filePath);
+        if ($content === false) {
+            continue;
+        }
+
+        // ── Étape 1 : trouver les appels translate avec concaténation ─────
+        // ($this->t)('prefix.' . $varName)  ou  ->translate('prefix.' . $varName)
+        // Capture : [1] => préfixe  [2] => nom de variable
+        $translatePattern = '/(?:->translate|\(\s*\$this->t\s*\)|->t)\s*\(\s*'
+            . '[\'"]([a-zA-Z0-9_.]+)[\'"]\s*\.\s*\$([a-zA-Z_][a-zA-Z0-9_]*)'
+            . '\s*\)/';
+
+        if (!preg_match_all($translatePattern, $content, $tMatches, PREG_SET_ORDER)) {
+            continue;
+        }
+
+        // ── Étape 2 : pour chaque (préfixe, variable), extraire le tableau ─
+        foreach ($tMatches as $tMatch) {
+            $prefix  = $tMatch[1]; // ex: 'loan.'
+            $varName = $tMatch[2]; // ex: 'k'  -> on cherche l'array $keys
+
+            // Chercher le nom de la variable tableau via : foreach ($arrayVar as $varName)
+            $foreachPattern = '/foreach\s*\(\s*\$([a-zA-Z_][a-zA-Z0-9_]*)\s+as\s+\$'
+                . preg_quote($varName, '/') . '\s*\)/';
+            if (!preg_match($foreachPattern, $content, $fMatch)) {
+                continue;
+            }
+            $arrayVar = $fMatch[1]; // ex: 'keys'
+
+            // Extraire le contenu du tableau $arrayVar = [ ... ]
+            $arrayPattern = '/\$' . preg_quote($arrayVar, '/') . '\s*=\s*\[([^\]]+)\]/s';
+            if (!preg_match($arrayPattern, $content, $aMatch)) {
+                continue;
+            }
+            $arrayBody = $aMatch[1];
+
+            // Extraire tous les string literals du tableau
+            if (!preg_match_all('/[\'"]([a-zA-Z0-9_.]+)[\'"]/', $arrayBody, $kMatches)) {
+                continue;
+            }
+
+            foreach ($kMatches[1] as $suffix) {
+                $fullKey = $prefix . $suffix;
+                $matchCount++;
+                $usedKeys[$fullKey][] = [
+                    'file' => $filePath,
+                    'line' => 0, // ligne exacte non triviale en mode multi-lignes
+                ];
             }
         }
     }
@@ -122,23 +225,24 @@ echo green(sprintf("  %d clé(s) trouvée(s) dans Languages.", count($definedKey
 /** @var array<string, list<array{file:string, line:int}>> $usedKeys */
 $usedKeys = [];
 
-// — .latte ─────────────────────────────────────────────────────────────────────
-// {='some.key'|translate}
+/** @var array<string, true> $dynamicPrefixes */
+$dynamicPrefixes = [];
 
+// — .latte ─────────────────────────────────────────────────────────────────────
 echo bold("» Scan des fichiers .latte dans :") . PHP_EOL;
 echo dim("  $scanDir") . PHP_EOL . PHP_EOL;
 
 $latteResult = scanFiles($scanDir, '/\.latte$/i', [
-     '/\{=\s*[\'"]([a-zA-Z0-9_.]+)[\'"]\s*\|translate\s*\}/',               // {='some.key'|translate}
-     '/\(\s*[\'"]([a-zA-Z0-9_.]+)[\'"]\s*\|translate\s*\)/',                // ('some.key'|translate)
-     '/=>\s*[\'"]([a-z][a-zA-Z0-9]*(?:\.[a-zA-Z0-9]+){1,})[\'"]\s*[,\]]/',  // => 'some.key', (valeur de tableau)
- ], $usedKeys);
+    '/\{=\s*[\'"]([a-zA-Z0-9_.]+)[\'"]\s*\|translate\s*\}/',                  // {='some.key'|translate}
+    '/\(\s*[\'"]([a-zA-Z0-9_.]+)[\'"]\s*\|translate\s*\)/',                   // ('some.key'|translate)
+    '/=>\s*[\'"]([a-z][a-zA-Z0-9_]*(?:\.[a-zA-Z0-9_]+){1,})[\'"]\s*[,\]]/',  // => 'some.key', (valeur de tableau)
+], $usedKeys, $dynamicPrefixes);
 
 echo sprintf("  %d fichier(s) — %d occurrence(s) trouvée(s).",
     $latteResult['files'], $latteResult['matches']
 ) . PHP_EOL . PHP_EOL;
 
-// — .php ───────────────────────────────────────────────────────────────────────
+// — .php (patterns ligne par ligne) ───────────────────────────────────────────
 echo bold("» Scan des fichiers .php dans :") . PHP_EOL;
 echo dim("  $scanDir") . PHP_EOL . PHP_EOL;
 
@@ -151,10 +255,19 @@ $phpResult = scanFiles($scanDir, '/\.php$/i', [
 
     // $this->db->get('Languages', ['Name' => 'key'])
     '/->get\(\s*[\'"]Languages[\'"]\s*,\s*\[\s*[\'"]Name[\'"]\s*=>\s*[\'"]([a-zA-Z0-9_.]+)[\'"]\s*\]/',
-], $usedKeys);
+], $usedKeys, $dynamicPrefixes);
 
 echo sprintf("  %d fichier(s) — %d occurrence(s) trouvée(s).",
     $phpResult['files'], $phpResult['matches']
+) . PHP_EOL . PHP_EOL;
+
+// — .php (tableaux de traduction multi-lignes) ─────────────────────────────────
+echo bold("» Scan des tableaux de traduction PHP (multi-lignes)...") . PHP_EOL;
+
+$phpArrayResult = scanPhpTranslationArrays($scanDir, $usedKeys);
+
+echo sprintf("  %d fichier(s) — %d clé(s) extraite(s) depuis les tableaux.",
+    $phpArrayResult['files'], $phpArrayResult['matches']
 ) . PHP_EOL . PHP_EOL;
 
 // — Résumé global ─────────────────────────────────────────────────────────────
@@ -162,9 +275,17 @@ echo sprintf("  %d fichier(s) — %d occurrence(s) trouvée(s).",
 echo dim(sprintf(
     "  Total : %d fichier(s) — %d occurrence(s) — %d clé(s) unique(s).",
     $latteResult['files'] + $phpResult['files'],
-    $latteResult['matches'] + $phpResult['matches'],
+    $latteResult['matches'] + $phpResult['matches'] + $phpArrayResult['matches'],
     count($usedKeys)
 )) . PHP_EOL . PHP_EOL;
+
+if (!empty($dynamicPrefixes)) {
+    echo dim(sprintf(
+        "  Préfixes dynamiques détectés (%d) : %s",
+        count($dynamicPrefixes),
+        implode(', ', array_keys($dynamicPrefixes))
+    )) . PHP_EOL . PHP_EOL;
+}
 
 // ─── Étape 3 : Analyse ───────────────────────────────────────────────────────
 
@@ -179,6 +300,16 @@ foreach ($usedKeys as $key => $occurrences) {
 
 foreach (array_keys($definedKeys) as $key) {
     if (!isset($usedKeys[$key])) {
+        // Clés réservées : Error + 3 chiffres, Help_ + lettres
+        if (preg_match('/^Error\d{3}$/', $key) || preg_match('/^Help_[A-Za-z]+$/', $key)) {
+            continue;
+        }
+        // Clé couverte par un préfixe dynamique latte (ex: "label_{$var}")
+        foreach (array_keys($dynamicPrefixes) as $prefix) {
+            if (str_starts_with($key, $prefix)) {
+                continue 2;
+            }
+        }
         $orphanKeys[$key] = true;
     }
 }
@@ -202,13 +333,15 @@ if (empty($missingKeys)) {
 
         if ($verbose) {
             foreach ($occurrences as $occ) {
-                $rel = str_replace($scanDir . DIRECTORY_SEPARATOR, '', $occ['file']);
-                echo dim(sprintf("      → %s (ligne %d)", $rel, $occ['line'])) . PHP_EOL;
+                $rel     = str_replace($scanDir . DIRECTORY_SEPARATOR, '', $occ['file']);
+                $lineStr = $occ['line'] > 0 ? sprintf(" (ligne %d)", $occ['line']) : ' (tableau multi-lignes)';
+                echo dim(sprintf("      → %s%s", $rel, $lineStr)) . PHP_EOL;
             }
         } else {
-            $rel   = str_replace($scanDir . DIRECTORY_SEPARATOR, '', $occurrences[0]['file']);
-            $extra = count($occurrences) > 1 ? sprintf(" (+%d autre(s))", count($occurrences) - 1) : '';
-            echo dim(sprintf("      → %s (ligne %d)%s", $rel, $occurrences[0]['line'], $extra)) . PHP_EOL;
+            $rel     = str_replace($scanDir . DIRECTORY_SEPARATOR, '', $occurrences[0]['file']);
+            $lineStr = $occurrences[0]['line'] > 0 ? sprintf(" (ligne %d)", $occurrences[0]['line']) : ' (tableau multi-lignes)';
+            $extra   = count($occurrences) > 1 ? sprintf(" (+%d autre(s))", count($occurrences) - 1) : '';
+            echo dim(sprintf("      → %s%s%s", $rel, $lineStr, $extra)) . PHP_EOL;
         }
 
         echo dim(sprintf(

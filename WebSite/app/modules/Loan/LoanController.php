@@ -25,7 +25,7 @@ class LoanController extends AbstractController
         }
 
         $this->render('Loan/views/calendar.latte', $this->getAllParams([
-            'translations' => $this->translations(),
+            'translations' => $this->translations_(),
             'page' => $this->application->getConnectedUser()->getPage(),
             'activeTab' => 'calendar',
             'btn_Parent' => "/user",
@@ -43,7 +43,7 @@ class LoanController extends AbstractController
 
         $this->render('Loan/views/designer.latte', $this->getAllParams([
             'items'        => $this->loanDataHelper->getAllItems(),
-            'translations' => $this->translations(),
+            'translations' => $this->translations_(),
             'page' => $this->application->getConnectedUser()->getPage(),
             'activeTab' => 'designer',
             'btn_Parent' => "/admin",
@@ -80,7 +80,7 @@ class LoanController extends AbstractController
             'loans'        => $this->loanDataHelper->getAllLoans(),
             'loanItems'    => $this->loanDataHelper->getActiveItems('loan'),
             'persons'      => $this->loanDataHelper->getAllPersons(),
-            'translations' => $this->translations(),
+            'translations' => $this->translations_(),
             'activeTab' => 'manager',
             'btn_Parent' => "/user",
             'btn_HistoryBack' => true,
@@ -102,7 +102,7 @@ class LoanController extends AbstractController
             'persons'           => $this->loanDataHelper->getAllPersons(),
             'isManager'         => $user->isLoanManager(),
             'currentUserId'     => $userId,
-            'translations'      => $this->translations(),
+            'translations'      => $this->translations_(),
             'page' => $this->application->getConnectedUser()->getPage(),
             'activeTab' => 'user',
             'btn_Parent' => "/user",
@@ -111,7 +111,7 @@ class LoanController extends AbstractController
     }
 
     #region Private methods
-    private function translations(): array
+    private function translations_(): array
     {
         $keys = [
             'nav.designer',
@@ -172,11 +172,6 @@ class LoanController extends AbstractController
             'msg.error',
             'msg.qty_exceeded',
         ];
-
-        $trans = [];
-        foreach ($keys as $k) {
-            $trans[$k] = ($this->t)('loan.' . $k);
-        }
-        return $trans;
+        return $this->translations($keys, 'loan.');
     }
 }
