@@ -29,7 +29,7 @@ class GroupController extends AbstractController
 
     public function groupCreate(): void
     {
-        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isGroupManager())) {
+        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isGroupManager(), __FILE__, __LINE__)) {
             $availableAuthorizations = $this->dataHelper->gets('Authorization', ['Id <> 1' => null], '*', 'Name');
             $this->render('PersonManager/views/group_create.latte', $this->getAllParams([
                 'availableAuthorizations' => $availableAuthorizations,
@@ -42,7 +42,7 @@ class GroupController extends AbstractController
 
     public function groupCreateSave(): void
     {
-        if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isGroupManager())) {
+        if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isGroupManager(), __FILE__, __LINE__)) {
             $availableAuthorizations = $this->dataHelper->gets('Authorization', ['Id <> 1' => null]);
             $schema = [
                 'name' => FilterInputRule::HtmlSafeName->value,
@@ -73,7 +73,7 @@ class GroupController extends AbstractController
             $this->raiseBadRequest("Group {$id} can't be deleted", __FILE__, __LINE__);
             return;
         }
-        if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isGroupManager())) {
+        if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isGroupManager(), __FILE__, __LINE__)) {
             try {
                 $this->groupDataHelper->inactive($id);
                 $this->redirect('/groups');
@@ -91,7 +91,7 @@ class GroupController extends AbstractController
             $this->raiseBadRequest("Group ({$id}) can't be edited", __FILE__, __LINE__);
             return;
         }
-        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isGroupManager())) {
+        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isGroupManager(), __FILE__, __LINE__)) {
             $group = $this->dataHelper->get('Group', ['Id' => $id], 'Name, SelfRegistration');
             if (!$group) $this->raiseBadRequest("Unknwon group $id", __FILE__, __LINE__);
             else {
@@ -108,7 +108,7 @@ class GroupController extends AbstractController
 
     public function groupEditSave(int $id): void
     {
-        if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isGroupManager())) {
+        if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isGroupManager(), __FILE__, __LINE__)) {
             if ($id === 1) {
                 $this->raiseBadRequest("Group {$id} can't be updated", __FILE__, __LINE__);
                 return;
@@ -138,7 +138,7 @@ class GroupController extends AbstractController
 
     public function groupIndex(): void
     {
-        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isGroupManager())) {
+        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isGroupManager(), __FILE__, __LINE__)) {
             $this->render('PersonManager/views/groups_index.latte', $this->getAllParams([
                 'groups' => $this->groupDataHelper->getGroupsWithAuthorizations($this->application->getConnectedUser()),
                 'layout' => $this->getLayout(),

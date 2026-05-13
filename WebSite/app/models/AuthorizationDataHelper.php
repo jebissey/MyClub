@@ -32,14 +32,21 @@ class AuthorizationDataHelper extends Data
         return array_column($query->fetchAll(), 'Name');
     }
 
-    public function canPersonReadMediaFile(int $year, int $month, string $filename, ConnectedUser $connectedUser): bool
+    public function personCanReadMediaFile(int $year, int $month, string $filename, ConnectedUser $connectedUser): bool
     {
         $path = sprintf('%04d/%02d/%s', $year, $month, $filename);
 
         $stmt = $this->pdo->prepare(
-            "SELECT CreatedBy, PublishedBy, OnlyForMembers, IdGroup
-             FROM Article
-             WHERE Content LIKE :pattern"
+            "SELECT a.CreatedBy, a.PublishedBy, a.OnlyForMembers, a.IdGroup
+            FROM Article a
+            WHERE a.Content LIKE :pattern
+
+            UNION
+
+            SELECT a.CreatedBy, a.PublishedBy, a.OnlyForMembers, a.IdGroup
+            FROM Article a
+            INNER JOIN Carousel c ON c.IdArticle = a.Id
+            WHERE c.Item LIKE :pattern"
         );
         $stmt->execute([':pattern' => '%' . $path . '%']);
         $articles = $stmt->fetchAll(PDO::FETCH_OBJ);
@@ -138,8 +145,8 @@ class AuthorizationDataHelper extends Data
         if (!$article) return false;
         if (($connectedUser->person  ?? false) && ($article->CreatedBy == $connectedUser->person->Id || $connectedUser->isEditor())) return true;
         if ($article->PublishedBy === null) return false;
-        if (!($connectedUser->person ?? false)) return $article->OnlyForMembers == 0 && ($article->IdGroup === null);
-        if ($article->OnlyForMembers == 1 && $article->IdGroup === null) return true;
+        if (!($connectedUser->person ?? false)) return $article->OnlyForMembers === 0 && ($article->IdGroup === null);
+        if ($article->OnlyForMembers === 1 && $article->IdGroup === null) return true;
         return $article->IdGroup === null || !empty(array_intersect([$article->IdGroup], $this->getUserGroups($connectedUser->person?->Email ?? '')));
     }
 

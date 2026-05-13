@@ -40,7 +40,7 @@ class EventTypeController extends TableController
 
     public function delete(int $id): void
     {
-        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isEventDesigner()) && $this->eventTypeExists($id)) {
+        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isEventDesigner(), __FILE__, __LINE__) && $this->eventTypeExists($id)) {
             $this->dataHelper->set('EventType', ['Inactivated' => 1], ['Id' => $id]);
             $this->redirect('/eventTypes');
         }
@@ -48,7 +48,7 @@ class EventTypeController extends TableController
 
     public function edit(int $id): void
     {
-        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isEventDesigner()) && $this->eventTypeExists($id)) {
+        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isEventDesigner(), __FILE__, __LINE__) && $this->eventTypeExists($id)) {
             $eventType = $this->dataHelper->get('EventType', ['Id' => $id], 'Name, IdGroup');
             $existingAttributes = $this->dataHelper->gets('EventTypeAttribute', ['IdEventType' => $id], 'IdAttribute');
 
@@ -92,7 +92,7 @@ class EventTypeController extends TableController
 
     public function update(int $id): void
     {
-        if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isEventDesigner()) && $this->eventTypeExists($id)) {
+        if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isEventDesigner(), __FILE__, __LINE__) && $this->eventTypeExists($id)) {
             $schema = [
                 'name' => FilterInputRule::HtmlSafeName->value,
                 'idGroup' => FilterInputRule::Int->value,

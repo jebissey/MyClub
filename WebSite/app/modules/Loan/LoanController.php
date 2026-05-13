@@ -20,7 +20,7 @@ class LoanController extends AbstractController
 
     public function calendar(): void
     {
-        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isConnected())) {
+        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isConnected(), __FILE__, __LINE__)) {
             return;
         }
 
@@ -35,7 +35,7 @@ class LoanController extends AbstractController
 
     public function designer(): void
     {
-        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isLoanDesigner())) {
+        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isLoanDesigner(), __FILE__, __LINE__)) {
             return;
         }
 
@@ -70,7 +70,7 @@ class LoanController extends AbstractController
 
     public function manager(): void
     {
-        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isLoanManager())) {
+        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isLoanManager(), __FILE__, __LINE__)) {
             return;
         }
 
@@ -89,7 +89,7 @@ class LoanController extends AbstractController
 
     public function reservations(): void
     {
-        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isConnected())) {
+        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isConnected(), __FILE__, __LINE__)) {
             return;
         }
 

@@ -19,7 +19,7 @@ class Media implements RouteInterface
         $mediaController = fn() => $this->controllerFactory->makeMediaController();
 
         $this->routes[] = new Route('GET /data/media/@year:[0-9]{4}/@month:[0-9]{2}/@filename', $mediaController, 'serveFile');
-        $this->routes[] = new Route('GET /media/@year:[0-9]{4}/@month:[0-9]{2}/@filename', $mediaController, 'viewFile');
+        $this->routes[] = new Route('GET /media/@year:[0-9]{4}/@month:[0-9]{2}/@filename', $mediaController, 'viewFileForRedactor');
         $this->routes[] = new Route('GET /media/list', $mediaController, 'listFiles');
         $this->routes[] = new Route('GET /media/gpxViewer', $mediaController, 'gpxViewer');
         $this->routes[] = new Route('GET /media/isShared', $mediaController, 'isShared');

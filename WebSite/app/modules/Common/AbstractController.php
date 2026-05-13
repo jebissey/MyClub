@@ -261,7 +261,7 @@ abstract class AbstractController
         return $trans;
     }
 
-    protected function userIsAllowedAndMethodIsGood(string $method, callable $permissionCheck): bool
+    protected function userIsAllowedAndMethodIsGood(string $method, callable $permissionCheck, string $file, int $line): bool
     {
         $user = $this->application->getConnectedUser();
         if ($user->person === null) {
@@ -272,11 +272,11 @@ abstract class AbstractController
             }
         }
         if (!$user || !$permissionCheck($user)) {
-            $this->raiseForbidden(__FILE__, __LINE__);
+            $this->raiseForbidden($file, $line);
             return false;
         }
         if ($_SERVER['REQUEST_METHOD'] !== $method) {
-            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+            $this->raiseMethodNotAllowed($file, $line);
             return false;
         }
         return true;

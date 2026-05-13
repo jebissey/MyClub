@@ -50,7 +50,7 @@ class VisitorInsightsController extends TableController
 
     public function helpPage(string $section): void
     {
-        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isVisitorInsights())) {
+        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isVisitorInsights(), __FILE__, __LINE__)) {
             return;
         }
 
@@ -74,7 +74,7 @@ class VisitorInsightsController extends TableController
 
     public function index(): void
     {
-        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isVisitorInsights())) {
+        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isVisitorInsights(), __FILE__, __LINE__)) {
             return;
         }
 
@@ -128,7 +128,7 @@ class VisitorInsightsController extends TableController
 
     public function membersAlerts(): void
     {
-        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isVisitorInsights())) {
+        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isVisitorInsights(), __FILE__, __LINE__)) {
             return;
         }
 
@@ -140,7 +140,7 @@ class VisitorInsightsController extends TableController
 
     public function visitorInsights(): void
     {
-        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isVisitorInsights())) {
+        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isVisitorInsights(), __FILE__, __LINE__)) {
             return;
         }
 
@@ -153,7 +153,7 @@ class VisitorInsightsController extends TableController
 
     public function referents(): void
     {
-        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isVisitorInsights())) {
+        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isVisitorInsights(), __FILE__, __LINE__)) {
             return;
         }
 
@@ -172,7 +172,7 @@ class VisitorInsightsController extends TableController
 
     public function visitorsGraf(): void
     {
-        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isVisitorInsights())) {
+        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isVisitorInsights(), __FILE__, __LINE__)) {
             return;
         }
 
@@ -206,7 +206,7 @@ class VisitorInsightsController extends TableController
 
     public function analytics(): void
     {
-        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isVisitorInsights())) {
+        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isVisitorInsights(), __FILE__, __LINE__)) {
             return;
         }
 
@@ -230,7 +230,7 @@ class VisitorInsightsController extends TableController
 
     public function topPagesByPeriod(): void
     {
-        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isVisitorInsights())) {
+        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isVisitorInsights(), __FILE__, __LINE__)) {
             return;
         }
 
@@ -249,7 +249,7 @@ class VisitorInsightsController extends TableController
 
     public function crossTab(): void
     {
-        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isVisitorInsights())) {
+        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isVisitorInsights(), __FILE__, __LINE__)) {
             return;
         }
 
@@ -293,7 +293,7 @@ class VisitorInsightsController extends TableController
 
     public function showLastVisits(): void
     {
-        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isVisitorInsights())) {
+        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isVisitorInsights(), __FILE__, __LINE__)) {
             return;
         }
 

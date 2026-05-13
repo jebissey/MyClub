@@ -30,7 +30,7 @@ class WebmasterController extends AbstractController
 
     public function clubCustomizationEdit(): void
     {
-        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isWebmaster())) {
+        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isWebmaster(), __FILE__, __LINE__)) {
 
             $settings = [
                 'clubName'      => $this->dataHelper->getSetting('PWA_Name', 'MyClub'),
@@ -49,7 +49,7 @@ class WebmasterController extends AbstractController
 
     public function clubCustomizationSave(): void
     {
-        if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isWebmaster())) {
+        if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isWebmaster(), __FILE__, __LINE__)) {
 
             $schema = [
                 'clubName'      => FilterInputRule::Text->value,
@@ -71,7 +71,7 @@ class WebmasterController extends AbstractController
 
     public function helpAdmin(): void
     {
-        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isAdministrator())) {
+        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isAdministrator(), __FILE__, __LINE__)) {
             $this->render('Common/views/info.latte', $this->getAllParams([
                 'content'          => ($this->t)('Help_Admin'),
                 'hasAuthorization' => $this->application->getConnectedUser()->isAdministrator(),
@@ -85,7 +85,7 @@ class WebmasterController extends AbstractController
 
     public function helpWebmaster(): void
     {
-        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isWebmaster())) {
+        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isWebmaster(), __FILE__, __LINE__)) {
             $lang = TranslationManager::getCurrentLanguage();
             $this->render('Common/views/info.latte', [
                 'content'          => $this->dataHelper->get('Languages', ['Name' => 'Help_Webmaster'], $lang)->$lang ?? '',
@@ -143,7 +143,7 @@ class WebmasterController extends AbstractController
 
     public function homeWebmaster(): void
     {
-        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isWebmaster())) {
+        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isWebmaster(), __FILE__, __LINE__)) {
             $_SESSION['navbar'] = 'webmaster';
             $content = ($this->t)('Webmaster');
             $params  = ['isMyclubWebSite' => WebApp::isMyClubWebSite()];
@@ -158,7 +158,7 @@ class WebmasterController extends AbstractController
 
     public function notifications(): void
     {
-        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isWebmaster())) {
+        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isWebmaster(), __FILE__, __LINE__)) {
             $publicKey  = $this->credentials->get('vapid', 'publicKey');
             $privateKey = $this->credentials->get('vapid', 'privateKey');
 
@@ -203,7 +203,7 @@ class WebmasterController extends AbstractController
 
     public function sendEmailCredentialsEdit(): void
     {
-        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isWebmaster())) {
+        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isWebmaster(), __FILE__, __LINE__)) {
             $this->render('Webmaster/views/emailCredentials.latte', $this->getAllParams([
                 'navItems' => $this->getNavItems($this->application->getConnectedUser()->person),
                 'page'     => $this->application->getConnectedUser()->getPage(),
@@ -223,7 +223,7 @@ class WebmasterController extends AbstractController
 
     public function sendEmailCredentialsSave(): void
     {
-        if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isWebmaster())) {
+        if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isWebmaster(), __FILE__, __LINE__)) {
             $schema = [
                 'sendMethod'           => FilterInputRule::Text->value,
                 'smtpAccount'          => FilterInputRule::Email->value,
@@ -277,7 +277,7 @@ class WebmasterController extends AbstractController
 
     public function showInstallations(): void
     {
-        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isWebmaster())) {
+        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isWebmaster(), __FILE__, __LINE__)) {
             $installations = $this->logDataHelper->getInstallationsData();
 
             $this->render('Webmaster/views/installations.latte', $this->getAllParams([
@@ -319,7 +319,7 @@ class WebmasterController extends AbstractController
 
     public function turnstileCredentialsEdit(): void
     {
-        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isWebmaster())) {
+        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isWebmaster(), __FILE__, __LINE__)) {
             $this->render('Webmaster/views/turnstileCredentials.latte', $this->getAllParams([
                 'navItems'           => $this->getNavItems($this->application->getConnectedUser()->person),
                 'page'               => $this->application->getConnectedUser()->getPage(),
@@ -331,7 +331,7 @@ class WebmasterController extends AbstractController
 
     public function turnstileCredentialsSave(): void
     {
-        if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isWebmaster())) {
+        if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isWebmaster(), __FILE__, __LINE__)) {
             $schema = [
                 'turnstileSiteKey'   => FilterInputRule::Text->value,
                 'turnstileSecretKey' => FilterInputRule::Text->value,

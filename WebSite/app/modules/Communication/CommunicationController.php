@@ -19,7 +19,7 @@ class CommunicationController extends AbstractController
 
     public function edit(): void
     {
-        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isCommunicationManager())) {
+        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isCommunicationManager(), __FILE__, __LINE__)) {
             $connectedUser = $this->application->getConnectedUser();
             $userEmail = $connectedUser->person?->Email ?? '';
 

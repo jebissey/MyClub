@@ -545,7 +545,7 @@ class ArticleController extends TableController
 
     public function topArticlesByPeriod(): void
     {
-        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isRedactor())) {
+        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isRedactor(), __FILE__, __LINE__)) {
             return;
         }
 

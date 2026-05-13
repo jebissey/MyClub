@@ -22,7 +22,7 @@ class MenuItemController extends AbstractController
         $menuItems = $this->getNavItems($this->application->getConnectedUser()->person, true);
         $tab = MenuItemTab::tryFrom($this->flight->request()->query->tab ?? '') ?? MenuItemTab::Navbar;
 
-        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isMenuDesigner())) {
+        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isMenuDesigner(), __FILE__, __LINE__)) {
             $this->render('Designer/views/menuItem.latte', $this->getAllParams([
                 'navbarItems'  => array_filter($menuItems, fn($i) => $i->What === 'navbar'),
                 'sidebarItems' => array_filter($menuItems, fn($i) => $i->What === 'sidebar'),

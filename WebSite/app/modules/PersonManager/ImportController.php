@@ -25,7 +25,7 @@ class ImportController extends AbstractController
 
     public function showImportForm(): void
     {
-        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isPersonManager())) {
+        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isPersonManager(), __FILE__, __LINE__)) {
             $this->loadSettings();
             $this->render('PersonManager/views/users_import.latte', $this->getAllParams([
                 'importSettings' => $this->importSettings,
@@ -38,7 +38,7 @@ class ImportController extends AbstractController
 
     public function processImport(): void
     {
-        if (!$this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isPersonManager())) {
+        if (!$this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isPersonManager(), __FILE__, __LINE__)) {
             return;
         }
         $this->results = array_merge([

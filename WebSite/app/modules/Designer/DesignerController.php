@@ -18,7 +18,7 @@ class DesignerController extends AbstractController
 
     public function helpDesigner(): void
     {
-        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isDesigner())) {
+        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isDesigner(), __FILE__, __LINE__)) {
             $lang = TranslationManager::getCurrentLanguage();
             $this->render('Common/views/info.latte', [
                 'content' => $this->dataHelper->get('Languages', ['Name' => 'Help_Designer'], $lang)->$lang ?? '',
@@ -33,7 +33,7 @@ class DesignerController extends AbstractController
 
     public function homeDesigner(): void
     {
-        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isDesigner())) {
+        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isDesigner(), __FILE__, __LINE__)) {
             $_SESSION['navbar'] = 'designer';
             $connectedUser = $this->application->getConnectedUser();
             $content = ($this->t)('Designer');

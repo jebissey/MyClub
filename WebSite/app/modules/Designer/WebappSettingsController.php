@@ -57,7 +57,7 @@ class WebappSettingsController extends AbstractController
 
     public function editSettings(): void
     {
-        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isHomeDesigner())) {
+        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isHomeDesigner(), __FILE__, __LINE__)) {
             return;
         }
 
@@ -115,7 +115,7 @@ class WebappSettingsController extends AbstractController
 
     public function saveSettings(): void
     {
-        if (!$this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isHomeDesigner())) {
+        if (!$this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isHomeDesigner(), __FILE__, __LINE__)) {
             return;
         }
         $schema = [

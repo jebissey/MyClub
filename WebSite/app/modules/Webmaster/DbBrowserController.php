@@ -20,7 +20,7 @@ class DbBrowserController extends TableController
 
     public function createRecord(string $table): void
     {
-        if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isWebmaster())) {
+        if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isWebmaster(), __FILE__, __LINE__)) {
             $this->dbBrowserDataHelper->createRecord($table);
             $this->redirect('/dbbrowser/' . urlencode($table));
         }
@@ -28,7 +28,7 @@ class DbBrowserController extends TableController
 
     public function deleteRecord(string $table, int $id): void
     {
-        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isWebmaster())) {
+        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isWebmaster(), __FILE__, __LINE__)) {
             $this->dbBrowserDataHelper->deleteRecord($table, $id);
             $this->redirect('/dbbrowser/' . urlencode($table));
         }
@@ -36,7 +36,7 @@ class DbBrowserController extends TableController
 
     public function index(): void
     {
-        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isWebmaster())) {
+        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isWebmaster(), __FILE__, __LINE__)) {
             $this->render('Webmaster/views/dbbrowser/index.latte', $this->getAllParams([
                 'tables' => $this->dbBrowserDataHelper->getTables(),
                 'page' => $this->application->getConnectedUser()->getPage()
@@ -46,7 +46,7 @@ class DbBrowserController extends TableController
 
     public function showCreateForm(string $table): void
     {
-        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isWebmaster())) {
+        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isWebmaster(), __FILE__, __LINE__)) {
             [$columns, $columnTypes] = $this->dbBrowserDataHelper->showCreateForm($table);
 
             $this->render('Webmaster/views/dbbrowser/create.latte', $this->getAllParams([
@@ -61,7 +61,7 @@ class DbBrowserController extends TableController
 
     public function showEditForm(string $table, int $id): void
     {
-        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isWebmaster())) {
+        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isWebmaster(), __FILE__, __LINE__)) {
             [$columns, $record, $primaryKey, $columnTypes] = $this->dbBrowserDataHelper->showEditForm($table, $id);
 
             $this->render('Webmaster/views/dbbrowser/edit.latte', $this->getAllParams([
@@ -78,7 +78,7 @@ class DbBrowserController extends TableController
 
     public function showTable(string $table): void
     {
-        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isWebmaster())) {
+        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isWebmaster(), __FILE__, __LINE__)) {
 
             $schema = $this->dbBrowserDataHelper->generateFilterSchema($table);
             $filterConfig = $this->dbBrowserDataHelper->generateFilterConfig($table);
@@ -112,7 +112,7 @@ class DbBrowserController extends TableController
 
     public function updateRecord(string $table, int $id): void
     {
-        if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isWebmaster())) {
+        if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isWebmaster(), __FILE__, __LINE__)) {
             $this->dbBrowserDataHelper->updateRecord($table, $id);
             $this->redirect('/dbbrowser/' . urlencode($table));
         }

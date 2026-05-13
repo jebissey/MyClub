@@ -22,7 +22,7 @@ class ExerciseController extends TableController
 
     public function create(): void
     {
-        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isExerciseDesigner())) {
+        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isExerciseDesigner(), __FILE__, __LINE__)) {
             $exerciseId = $this->dataHelper->set('Exercise', [
                 'Title' => '',
                 'Detail' => '',
@@ -35,7 +35,7 @@ class ExerciseController extends TableController
 
     public function edit(int $id): void
     {
-        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isExerciseDesigner())) {
+        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isExerciseDesigner(), __FILE__, __LINE__)) {
             $exercise = $this->dataHelper->get('Exercise', ['Id' => $id], 'Content, Title, CreatedBy');
             if (!$exercise) {
                 $this->raiseForbidden(__FILE__, __LINE__);
@@ -46,7 +46,7 @@ class ExerciseController extends TableController
                 'articleId'   => $id,
                 'title'       => $exercise->Title ?? '',
                 'exercises'   => json_decode($exercise->Content ?? '[]', true) ?? [],
-                'translations' => $this->translations(),
+                'translations' => $this->translations_(),
                 'btn_Parent'  => '/exercises',
                 'btn_HistoryBack' => true,
             ]));
@@ -103,7 +103,7 @@ class ExerciseController extends TableController
 
     public function save(int $id): void
     {
-        if (!$this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isExerciseDesigner())) {
+        if (!$this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isExerciseDesigner(), __FILE__, __LINE__)) {
             return;
         }
 
@@ -139,7 +139,7 @@ class ExerciseController extends TableController
 
     public function play(int $id): void
     {
-        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isConnected())) {
+        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isConnected(), __FILE__, __LINE__)) {
             return;
         }
 
@@ -155,12 +155,12 @@ class ExerciseController extends TableController
             'articleId' => $id,
             'title'     => $exercise->Title ?? '',
             'exercises' => $exercises,
-            'translations' => $this->translations(),
+            'translations' => $this->translations_(),
         ]));
     }
 
     #region Private functions
-    private function translations(): array
+    private function translations_(): array
     {
         $keys = [
             'nav.designer',
@@ -177,10 +177,6 @@ class ExerciseController extends TableController
             'msg.saved',
             'msg.error',
         ];
-        $trans = [];
-        foreach ($keys as $k) {
-            $trans[$k] = ($this->t)('exercise.' . $k);
-        }
-        return $trans;
+        return $this->translations($keys, 'exercise.');
     }
 }

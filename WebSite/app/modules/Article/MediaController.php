@@ -73,7 +73,7 @@ class MediaController extends AbstractController
 
     public function listFiles(): void
     {
-        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isRedactor())) {
+        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isRedactor(), __FILE__, __LINE__)) {
             $query = $this->flight->request()->query;
             $year          = isset($query->year) && $query->year !== '' ? (int)$query->year : (int)date('Y');
             $month         = $query->month         ?? '';
@@ -124,34 +124,18 @@ class MediaController extends AbstractController
 
     public function serveFile(string $year, string $month, string $filename): void
     {
-        $year = (int) $year;
-        $month = (int) $month;
-
         if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
-        $filename = basename($filename);
-        $filePath = sprintf('%s/%04d/%02d/%s', MediaManager::GetMediaPath(), $year, $month, $filename);
-        if (!file_exists($filePath)) {
-            $this->raiseBadRequest("File $filePath not found", __FILE__, __LINE__);
-            return;
-        }
-        $connectedUser = $this->application->getConnectedUser();
-        $allowed = $connectedUser->isRedactor()
-            || $this->authorizationDataHelper->canPersonReadMediaFile($year, $month, $filename, $connectedUser);
-
-        if (!$allowed) {
-            $this->raiseForbidden(__FILE__, __LINE__);
-            return;
-        }
-
-        $this->streamFile($filePath, $filename);
+        if ($this->authorizationDataHelper->personCanReadMediaFile((int)$year, (int)$month, $filename, $this->application->getConnectedUser())) {
+            $this->viewFile((int)$year, (int)$month, $filename);
+        } else $this->raiseForbidden(__FILE__, __LINE__);
     }
 
     public function showUploadForm(): void
     {
-        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isRedactor())) {
+        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isRedactor(), __FILE__, __LINE__)) {
             $this->render('Article/views/media_upload.latte', $this->getAllParams([
                 'page' => $this->application->getConnectedUser()->getPage(),
             ]));
@@ -160,7 +144,7 @@ class MediaController extends AbstractController
 
     public function showUsesInArticles(): void
     {
-        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isRedactor())) {
+        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isRedactor(), __FILE__, __LINE__)) {
             $path = $this->flight->request()->query->path ?? '';
             $this->render('Article/views/media_uses_articles.latte', $this->getAllParams([
                 'path'            => $path,
@@ -173,7 +157,7 @@ class MediaController extends AbstractController
 
     public function showUsesInMessages(): void
     {
-        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isRedactor())) {
+        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isRedactor(), __FILE__, __LINE__)) {
             $path = $this->flight->request()->query->path ?? '';
             $uses = $path !== '' ? $this->messageDataHelper->getMessageUses($path) : ['events' => [], 'articles' => [], 'groups' => []];
             $this->render('Article/views/media_uses_messages.latte', $this->getAllParams([
@@ -187,16 +171,10 @@ class MediaController extends AbstractController
         }
     }
 
-    public function viewFile(string $year, string $month, string $filename): void
+    public function viewFileForRedactor(string $year, string $month, string $filename): void
     {
-        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isRedactor())) {
-            $filename = basename($filename);
-            $filePath = sprintf('%s/%04d/%02d/%s', MediaManager::GetMediaPath(), $year, $month, basename($filename));
-            if (!file_exists($filePath)) {
-                $this->raiseBadRequest("File $filePath not found", __FILE__, __LINE__);
-                return;
-            }
-            $this->streamFile($filePath, $filename);
+        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isRedactor(), __FILE__, __LINE__)) {
+            $this->viewFile((int)$year, (int)$month, $filename);
         }
     }
 
@@ -367,5 +345,16 @@ class MediaController extends AbstractController
         }
         array_unshift($foundMonths, "");
         return $foundMonths;
+    }
+
+    private function viewFile(int $year, int $month, string $filename): void
+    {
+        $filename = basename($filename);
+        $filePath = sprintf('%s/%04d/%02d/%s', MediaManager::GetMediaPath(), $year, $month, basename($filename));
+        if (!file_exists($filePath)) {
+            $this->raiseBadRequest("File $filePath not found", __FILE__, __LINE__);
+            return;
+        }
+        $this->streamFile($filePath, $filename);
     }
 }

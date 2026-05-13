@@ -25,7 +25,7 @@ class RegistrationController extends TableController
 
     public function index()
     {
-        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isGroupManager())) {
+        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isGroupManager(), __FILE__, __LINE__)) {
             $schema = [
                 'lastName' => FilterInputRule::PersonName->value,
                 'firstName' => FilterInputRule::PersonName->value,
@@ -65,9 +65,11 @@ class RegistrationController extends TableController
         }
     }
 
-    public function getPersonGroups($personId)
+    public function getPersonGroups(string $personId)
     {
-        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isGroupManager())) {
+        $personId = (int)$personId;
+        
+        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isGroupManager(), __FILE__, __LINE__)) {
             [$availableGroups, $currentGroups] = $this->groupDataHelper->getAvailableGroups($this->application->getConnectedUser(), $personId);
 
             try {

@@ -26,7 +26,7 @@ class PersonController extends TableController
 
     public function activate(int $id): void
     {
-        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isPersonManager())) {
+        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isPersonManager(), __FILE__, __LINE__)) {
             $this->dataHelper->set('Person', ['Inactivated' => 0], ['Id' => $id]);
             $this->redirect('/persons');
         }
@@ -34,14 +34,14 @@ class PersonController extends TableController
 
     public function create(): void
     {
-        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isPersonManager())) {
+        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isPersonManager(), __FILE__, __LINE__)) {
             $this->redirect('/person/edit/' . $this->personDataHelper->create());
         }
     }
 
     public function delete(int $id): void
     {
-        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isPersonManager())) {
+        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isPersonManager(), __FILE__, __LINE__)) {
             $this->dataHelper->set('Person', ['Inactivated' => 1], ['Id' => $id]);
             $this->redirect('/persons');
         }
@@ -49,7 +49,7 @@ class PersonController extends TableController
 
     public function edit(int $id): void
     {
-        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isPersonManager())) {
+        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isPersonManager(), __FILE__, __LINE__)) {
             $person = $this->dataHelper->get('Person', ['Id' => $id], 'Id, Imported, Email, FirstName, LastName, Alert, MemberInfo');
             if (!$person) {
                 $this->raiseBadRequest("Unknown person {$id}", __FILE__, __LINE__);
@@ -77,7 +77,7 @@ class PersonController extends TableController
 
     public function editSave(int $id): void
     {
-        if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isPersonManager())) {
+        if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isPersonManager(), __FILE__, __LINE__)) {
             $person = $this->dataHelper->get('Person', ['Id' => $id], 'Id, Imported, Email, FirstName, LastName');
             if (!$person) {
                 $this->raiseBadRequest("Unknown person {$id}", __FILE__, __LINE__);
@@ -167,7 +167,7 @@ class PersonController extends TableController
 
     public function help(): void
     {
-        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isPersonManager())) {
+        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isPersonManager(), __FILE__, __LINE__)) {
             $lang = TranslationManager::getCurrentLanguage();
             $this->render('Common/views/info.latte', [
                 'content' => $this->dataHelper->get('Languages', ['Name' => 'Help_PersonManager'], $lang)->$lang ?? '',
@@ -182,7 +182,7 @@ class PersonController extends TableController
 
     public function home(): void
     {
-        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isPersonManager())) {
+        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isPersonManager(), __FILE__, __LINE__)) {
             $_SESSION['navbar'] = 'personManager';
 
             $this->render('PersonManager/views/personManager.latte', $this->getAllParams([
@@ -194,7 +194,7 @@ class PersonController extends TableController
 
     public function index(): void
     {
-        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isPersonManager())) {
+        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isPersonManager(), __FILE__, __LINE__)) {
             return;
         }
 
