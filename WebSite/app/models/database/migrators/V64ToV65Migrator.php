@@ -32,7 +32,6 @@ SQL);
 
         $pdo->exec("DELETE FROM Languages WHERE Name IN (
             'ClubMembersOnly', 
-            'Error503', 
             'LoginRequired', 
             'Message_UnknownUser', 
             'article.edit.created_by', 
