@@ -124,7 +124,7 @@ class SurveyController extends AbstractController
                 }
             }
 
-            $this->render('Article/views/survey_results.latte', [
+            $this->render('Article/views/survey_results.latte', $this->getAllParams([
                 'survey' => $survey,
                 'options' => $options,
                 'results' => $results,
@@ -132,7 +132,9 @@ class SurveyController extends AbstractController
                 'articleId' => $articleId,
                 'currentVersion' => Application::VERSION,
                 'page' => $connectedUser->getPage(),
-            ]);
+                'btn_HistoryBack' => true,
+                'btn_Parent'      => "/article/{$articleId}",
+            ]));
         } else $this->raiseForbidden(__FILE__, __LINE__);
     }
 }

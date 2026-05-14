@@ -1,0 +1,11 @@
+{layout '../../Common/views/layout.latte'}      
+
+{block navbar}
+{include '../../Common/views/navbar/_userLeft.latte'} 
+{/block}
+
+{block content}
+    <div id="content-display">
+        {$chosenArticle->Content|noescape}
+    </div>
+{/block}

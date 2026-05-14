@@ -28,6 +28,8 @@ class EventNeedController extends AbstractController
             'needTypes' => $this->dataHelper->gets('NeedType', [], '*', 'Name'),
             'needs' => $this->needDataHelper->getNeedsAndTheirTypes(),
             'page' => $this->application->getConnectedUser()->getPage(),
+            'btn_HistoryBack' => true,
+            'btn_Parent'      => "/designer",            
         ]));
     }
 }

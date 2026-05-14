@@ -78,6 +78,8 @@ class MenuItemController extends AbstractController
                     'col_label'               => ($this->t)('menu.col_label'),
                     'col_parent'              => ($this->t)('menu.col_parent'),
                 ],
+                'btn_HistoryBack' => true,
+                'btn_Parent'      => "/designer",                
             ]));
         }
     }
@@ -101,15 +103,16 @@ class MenuItemController extends AbstractController
         }
     }
 
-    public function showArticle($id)
+    public function showArticle(int $id)
     {
         $person = $this->application->getConnectedUser()->person ?? false;
         if ($this->menuItemDataHelper->authorizedUser("/menu/show/article/$id", $person)) {
-            $this->render('Webmaster/views/navbar/article.latte', $this->getAllParams([
+            $this->render('Article/views/showArticle.latte', $this->getAllParams([
                 'navItems'         => $this->getNavItems($person),
                 'chosenArticle'    => $this->dataHelper->get('Article', ['Id' => $id], 'Content'),
                 'hasAuthorization' => $this->application->getConnectedUser()->hasAutorization(),
                 'page'             => $this->application->getConnectedUser()->getPage(),
+                'btn_HistoryBack'  => true,
             ]));
         } else {
             $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);

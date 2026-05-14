@@ -1,0 +1,28 @@
+                <div class="d-flex align-items-center">
+                    
+                    <a class="navbar-brand" href="/">
+                        <img src="/app/images/home.png"
+                            alt="Home"
+                            title="{='home'|translate}"
+                            data-bs-toggle="tooltip"
+                            data-bs-placement="bottom"
+                            class="ms-2">
+                    </a>
+
+                    {if isset($btn_Parent)}
+                        <a class="btn fs-4 "
+                            href="{$btn_Parent}"
+                            style="background-color: {$navbarIconColor|noescape}; border-color: {$navbarIconColor|noescape};">
+                            <i class="bi bi-arrow-up-circle" style="color: {$navbarInkColor|noescape};"></i>
+                        </a>
+                    {/if}
+
+                    {if isset($btn_HistoryBack)}
+                        <button class="btn fs-4 ms-2"
+                                onclick="history.back()"
+                                style="background-color: {$navbarIconColor|noescape}; border-color: {$navbarIconColor|noescape};">
+                            <i class="bi bi-arrow-left-circle" style="color: {$navbarInkColor|noescape};"></i>
+                        </button>
+                    {/if}
+
+                </div>                

@@ -123,6 +123,8 @@ class VisitorInsightsController extends TableController
             'columns'      => $columns,
             'page'         => $this->application->getConnectedUser()->getPage(),
             'resetUrl'     => '/logs',
+            'btn_HistoryBack' => true,
+            'btn_Parent'      => "/admin",
         ]));
     }
 
@@ -135,6 +137,8 @@ class VisitorInsightsController extends TableController
         $this->render('VisitorInsights/views/membersAlerts.latte', $this->getAllParams([
             'membersAlerts' => $this->personDataHelper->getMembersAlerts(),
             'page'          => $this->application->getConnectedUser()->getPage(),
+            'btn_HistoryBack' => true,
+            'btn_Parent'      => "/admin",            
         ]));
     }
 
@@ -148,6 +152,8 @@ class VisitorInsightsController extends TableController
         $this->render('VisitorInsights/views/visitorInsights.latte', $this->getAllParams([
             'page'    => $this->application->getConnectedUser()->getPage(),
             'content' => ($this->t)('VisitorInsights'),
+            'btn_HistoryBack' => true,
+            'btn_Parent'      => "/admin",
         ]));
     }
 
@@ -167,6 +173,8 @@ class VisitorInsightsController extends TableController
             'control'      => new WebApp($this->application),
             'rows'         => $this->logDataAnalyticsHelper->getReferentStats($period, $currentDate),
             'page'         => $this->application->getConnectedUser()->getPage(),
+            'btn_HistoryBack' => true,
+            'btn_Parent'      => "/admin",            
         ]));
     }
 
@@ -201,6 +209,8 @@ class VisitorInsightsController extends TableController
                 'tooltipAvg'     => ($this->t)('visitor_insights.statistics.tooltip.avg_per_day'),
                 'tooltipMin'     => ($this->t)('visitor_insights.statistics.tooltip.min_per_day'),
             ],
+            'btn_HistoryBack' => true,
+            'btn_Parent'      => "/admin",            
         ]));
     }
 
@@ -225,6 +235,8 @@ class VisitorInsightsController extends TableController
             'translations' => [
                 'visits' => ($this->t)('visitor_insights.analytics.visits'),
             ],
+            'btn_HistoryBack' => true,
+            'btn_Parent'      => "/admin",            
         ]));
     }
 
@@ -244,6 +256,8 @@ class VisitorInsightsController extends TableController
             'topPages' => $this->logDataHelper->getTopPages($period, self::TOP),
             'page'     => $this->application->getConnectedUser()->getPage(),
             'translations' => TranslationManager::getCreationTimeModalTranslations($this->languagesDataHelper),
+            'btn_HistoryBack' => true,
+            'btn_Parent'      => "/admin",            
         ]));
     }
 
@@ -288,6 +302,8 @@ class VisitorInsightsController extends TableController
                 'tableHide' => ($this->t)('visitor_insights.cross_tab.table.hide'),
                 'tableShow' => ($this->t)('visitor_insights.cross_tab.table.show'),
             ],
+            'btn_HistoryBack' => true,
+            'btn_Parent'      => "/admin",            
         ]));
     }
 
@@ -304,6 +320,8 @@ class VisitorInsightsController extends TableController
             'totalActiveUsers' => count($activePersons),
             'navItems'         => $this->getNavItems($this->application->getConnectedUser()->person),
             'page'             => $this->application->getConnectedUser()->getPage(),
+            'btn_HistoryBack' => true,
+            'btn_Parent'      => "/admin",            
         ]));
     }
 

@@ -59,6 +59,7 @@ class HomeController extends AbstractController
 
             $news = $this->news->anyNews($connectedUser);
         } else {
+            $defaultColors = $this->dataHelper->getDefaultColors();
             Params::setParams(
                 [
                     'href'               => '/user/sign/in',
@@ -73,6 +74,9 @@ class HomeController extends AbstractController
                     'page'               => $connectedUser->getPage(),
                     'currentPath'        => parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH),
                     'isMyclubWebSite'    => WebApp::isMyClubWebSite(),
+                    'navbarBgColor'   => $defaultColors['navbarBgColor'],
+                    'navbarInkColor'  => $defaultColors['navbarInkColor'],
+                    'navbarIconColor' => $defaultColors['navbarIconColor'],
                 ],
                 $this->metadataDataHelper->isTestSite() && !empty($prodSiteUrl = $this->metadataDataHelper->getProdSiteUrl()) ? $prodSiteUrl : null,
                 $connectedUser?->person?->Alert ?? null
@@ -166,6 +170,7 @@ class HomeController extends AbstractController
             'title'   => 'Que souhaitez-vous faire ?',
             'page'    => $user->getPage(),
             'user'    => $user,
+            'btn_HistoryBack' => true,
         ]));
     }
 }

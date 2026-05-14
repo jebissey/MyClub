@@ -13,10 +13,10 @@ class Params
 {
     private static array $commonParams = [];
 
-    public static function getAll(array $specificParams, ?string $prodSiteUrl, ?string $memberAlert): array
+    public static function getAll(array $specificParams, ?string $prodSiteUrl, ?string $memberAlert, array $defaultColors): array
     {
         if (self::$commonParams === []) {
-            self::setDefaultParams($_SERVER['REQUEST_URI'], $prodSiteUrl, $memberAlert);
+            self::setDefaultParams($_SERVER['REQUEST_URI'], $prodSiteUrl, $memberAlert, $defaultColors);
         }
         return array_merge(self::$commonParams, $specificParams);
     }
@@ -34,7 +34,7 @@ class Params
     }
 
     #region Private functions
-    private static function setDefaultParams(string $requestUri, ?string $prodSiteUrl, ?string $memberAlert): void
+    private static function setDefaultParams(string $requestUri, ?string $prodSiteUrl, ?string $memberAlert, array $defaultColors): void
     {
         $path = parse_url($requestUri, PHP_URL_PATH);
         if ($path === false || $path === null) throw new InvalidArgumentException('Invalid URI provided');
@@ -68,7 +68,10 @@ class Params
             'supportedLanguages' => TranslationManager::getSupportedLanguages(),
             'flag' => TranslationManager::getFlag($lang),
             'currentPath' => parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH),
-            'isMyclubWebSite'  => WebApp::isMyClubWebSite(),
+            'isMyclubWebSite' => WebApp::isMyClubWebSite(),
+            'navbarBgColor'   => $defaultColors['navbarBgColor'],
+            'navbarInkColor'  => $defaultColors['navbarInkColor'],
+            'navbarIconColor' => $defaultColors['navbarIconColor'],
         ];
         if ($prodSiteUrl !== null) self::$commonParams['productionSiteUrl'] = $prodSiteUrl;
         if ($memberAlert !== null) self::$commonParams['memberAlert'] = $memberAlert;

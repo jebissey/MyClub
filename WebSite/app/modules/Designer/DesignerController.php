@@ -49,7 +49,9 @@ class DesignerController extends AbstractController
 
             $this->render('Designer/views/designer.latte', $this->getAllParams([
                 'page' => $this->application->getConnectedUser()->getPage(),
-                'content' => $compiledContent
+                'content' => $compiledContent,
+                'btn_HistoryBack' => true,
+                'btn_Parent'      => "/admin",
             ]));
         }
     }

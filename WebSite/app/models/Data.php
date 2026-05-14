@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace app\models;
 
+use Envms\FluentPDO\Query;
 use InvalidArgumentException;
 use PDO;
 use PDOException;
@@ -16,8 +17,8 @@ abstract class Data
 {
     protected PDO $pdo;
     protected PDO $pdoForLog;
-    protected $fluent;
-    protected $fluentForLog;
+    protected Query $fluent;
+    protected Query $fluentForLog;
     private array $tables;
     private static ?array $cachedTables = null;
 
@@ -25,14 +26,14 @@ abstract class Data
     {
         $this->pdo = $application->getPdo();
         $this->pdoForLog = $application->getPdoForLog();
-        $this->fluent = new \Envms\FluentPDO\Query($this->pdo);
-        $this->fluentForLog = new \Envms\FluentPDO\Query($this->pdoForLog);
+        $this->fluent = new Query($this->pdo);
+        $this->fluentForLog = new Query($this->pdoForLog);
         self::$cachedTables ??= $this->getTables();
         $this->tables = self::$cachedTables;
     }
 
     #region Protected methods
-    protected function getCheckValues($table, $column)
+    protected function getCheckValues(string $table, string $column): array
     {
         $sql = "SELECT sql FROM sqlite_master WHERE type='table' AND name=?";
         $tableDef = $this->pdo->prepare($sql);
@@ -49,7 +50,6 @@ abstract class Data
             }, $values);
             return $values;
         }
-
         return [];
     }
 
@@ -112,6 +112,15 @@ abstract class Data
             $this->application->getErrorManager()->raise(ApplicationError::Error, "Database error {$e->getMessage()} in {$e->getFile()}:{$e->getLine()} with query {$sql}");
             throw $e;
         }
+    }
+
+    public function getDefaultColors(): array
+    {
+        return [
+            'navbarBgColor'   => $this->get('Settings', ['Name' => 'Navbar_BgColor'],   'Value')->Value ?? '#212529',
+            'navbarInkColor'  => $this->get('Settings', ['Name' => 'Navbar_InkColor'],  'Value')->Value ?? '#ffffff',
+            'navbarIconColor' => $this->get('Settings', ['Name' => 'Navbar_IconColor'], 'Value')->Value ?? '#ffc107',
+        ];
     }
 
     public function getSetting(string $name, string $default): string

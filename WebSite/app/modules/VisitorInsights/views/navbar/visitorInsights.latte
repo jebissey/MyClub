@@ -1,4 +1,4 @@
-{include '_adminLeft.latte'}
+{include '../../../Common/views/navbar/_adminLeft.latte'}
 
                 <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" title="{='navbar.visitor_insights.referents'|translate}">
                     <a class="nav-link {if $page == 'referents'}active{/if}" href="/referents"><h2>☁️</h2></a>
@@ -25,4 +25,4 @@
                     <a class="nav-link {if $page == 'membersAlerts'}active{/if}" href="/membersAlerts"><h2>📩</h2></a>
                 </li>
 
-{include '_adminRight.latte'}
+{include '../../../Common/views/navbar/_adminRight.latte'}

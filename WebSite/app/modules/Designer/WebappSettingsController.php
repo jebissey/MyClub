@@ -105,10 +105,13 @@ class WebappSettingsController extends AbstractController
             'supportedLanguages'  => TranslationManager::getSupportedLanguages(),
             'currentLanguage'     => $lang,
             'forcedLanguage'      => $this->metadataDataHelper->getForcedLanguage(),
+            'btn_HistoryBack' => true,
+            'btn_Parent'      => "/designer",
             'translations' => [
                 'imageProcessing' => ($this->t)('designer.home_settings.image_processing'),
                 'imageToSave'     => ($this->t)('designer.home_settings.image_to_save'),
                 'imageReadError'  => ($this->t)('designer.home_settings.image_read_error'),
+
             ],
         ]));
     }
@@ -127,8 +130,8 @@ class WebappSettingsController extends AbstractController
             'img_home'   => FilterInputRule::DataUrl->value,
             'img_logo'   => FilterInputRule::DataUrl->value,
             'img_banner' => FilterInputRule::DataUrl->value,
-            'Navbar_BgColor'  => FilterInputRule::Color->value,
-            'Navbar_InkColor' => FilterInputRule::Color->value,
+            'Navbar_BgColor'   => FilterInputRule::Color->value,
+            'Navbar_InkColor'  => FilterInputRule::Color->value,
             'Navbar_IconColor' => FilterInputRule::Color->value,
         ];
         $input = WebApp::filterInput($schema, $this->flight->request()->data->getData());

@@ -135,7 +135,7 @@ class OrderController extends AbstractController
                 }
             }
 
-            $this->render('Article/views/order_results.latte', [
+            $this->render('Article/views/order_results.latte', $this->getAllParams([
                 'order'          => $order,
                 'options'        => $options,
                 'results'        => $results,
@@ -143,7 +143,9 @@ class OrderController extends AbstractController
                 'articleId'      => $articleId,
                 'currentVersion' => Application::VERSION,
                 'page'           => $connectedUser->getPage(),
-            ]);
+                'btn_HistoryBack' => true,
+                'btn_Parent'      => "/article/{$articleId}",                
+            ]));
         } else {
             $this->raiseForbidden(__FILE__, __LINE__);
         }

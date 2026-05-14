@@ -1,17 +1,7 @@
 {layout '../../Common/views/layout.latte'}
 
 {block navbar}
-<div class="container-fluid d-flex align-items-center">
-    <div class="d-flex align-items-center">
-        <a class="navbar-brand" href="/"><img src="/app/images/home.png" alt="Home"></a>
-        <button class="btn btn-primary fs-4" onclick="history.back()">
-            <i class="bi bi-arrow-left-circle"></i>
-        </button>
-        <a class="btn btn btn-primary fs-4 ms-2" href="/article/{$articleId}">
-            <i class="bi bi-arrow-up-circle"></i>
-        </a>
-    </div>
-</div>
+{include '../../Common/views/navbar/_userLeft.latte'}
 {/block}
 
 {block content}

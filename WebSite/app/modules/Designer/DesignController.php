@@ -36,6 +36,8 @@ class DesignController extends AbstractController
             'groups' => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
             'userVotes' => $userVotes,
             'page' => $this->application->getConnectedUser()->getPage(),
+            'btn_HistoryBack' => true,
+            'btn_Parent'      => "/designer",               
         ]));
     }
 
@@ -108,7 +110,7 @@ class DesignController extends AbstractController
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isDesigner(), __FILE__, __LINE__)) {
             $_SESSION['navbar'] = 'designer';
             $this->render('Designer/views/designer.latte', $this->getAllParams([
-                'page' => $this->application->getConnectedUser()->getPage()
+                'page' => $this->application->getConnectedUser()->getPage(),
             ]));
         }
     }

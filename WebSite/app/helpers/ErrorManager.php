@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace app\helpers;
 
 use app\enums\ApplicationError;
+use app\models\DataHelper;
 use app\models\LanguagesDataHelper;
 use app\models\LogDataWriterHelper;
 use app\modules\Common\EmptyController;
 
 class ErrorManager
 {
+    private DataHelper $dataHelper;
     private LanguagesDataHelper $languagesDataHelper;
     private LogDataWriterHelper $logDataWriterHelper;
     private EmptyController $emptyController;
@@ -18,6 +20,7 @@ class ErrorManager
     public function __construct(private Application $application)
     {
         $this->logDataWriterHelper = new LogDataWriterHelper($application);
+        $this->dataHelper = new DataHelper($application);
         $this->languagesDataHelper = new LanguagesDataHelper($application);
         $this->emptyController = new EmptyController($application);
     }
@@ -56,6 +59,7 @@ class ErrorManager
                 $result
             );
         }
+        $defaultColors = $this->dataHelper->getDefaultColors();
         $this->application->getFlight()->response()->status($code->value);
         $this->emptyController->render('Common/views/info.latte', [
             'content' => $result,
@@ -64,6 +68,9 @@ class ErrorManager
             'timer' => $timeout,
             'previousPage' => false,
             'page' => $this->application->getConnectedUser()->getPage(),
+            'navbarBgColor'   => $defaultColors['navbarBgColor'],
+            'navbarInkColor'  => $defaultColors['navbarInkColor'],
+            'navbarIconColor' => $defaultColors['navbarIconColor'],
         ]);
         if ($code != ApplicationError::Ok) exit;
         Application::unreachable("Ok isn't an error", __FILE__, __LINE__);

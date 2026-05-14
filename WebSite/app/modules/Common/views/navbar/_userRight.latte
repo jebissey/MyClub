@@ -3,13 +3,13 @@
                     <a href="/help"
                       data-bs-toggle="tooltip"
                       title="{='contextual_help'|translate}">
-                      <i class="bi bi-question-circle-fill fs-2 text-warning"></i>
+                      <i class="bi bi-question-circle-fill fs-2" style="color: {$navbarIconColor|noescape};"></i>
                     </a>
 
                     <a href="/signpost"
                       data-bs-toggle="tooltip"
                       title="{='quick_actions'|translate}">
-                      <i class="bi bi-signpost-split-fill fs-2 text-warning"></i>
+                      <i class="bi bi-signpost-split-fill fs-2" style="color: {$navbarIconColor|noescape};"></i>
                     </a>
 
                     {if $flag != ''}
@@ -25,7 +25,7 @@
                       <a href="/admin"
                         data-bs-toggle="tooltip"
                         title="{='admin_zone'|translate}">
-                        <i class="bi bi-key-fill fs-1 text-warning"></i>
+                        <i class="bi bi-key-fill fs-1" style="color: {$navbarIconColor|noescape};"></i>
                       </a>
                     {/if}
 
@@ -50,7 +50,7 @@
                       <a href="/user/sign/out"
                         data-bs-toggle="tooltip"
                         title="{='logout'|translate}">
-                        <i class="bi bi-box-arrow-right fs-1 text-warning"></i>
+                        <i class="bi bi-box-arrow-right fs-1" style="color: {$navbarIconColor|noescape};"></i>
                       </a>
                     {/if}
                   </div>

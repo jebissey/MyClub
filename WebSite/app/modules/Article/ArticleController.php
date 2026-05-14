@@ -476,6 +476,8 @@ class ArticleController extends TableController
                 'isCreator' => $connectedUser !== null && $connectedUser?->person?->Id === $article->CreatedBy,
                 'message' => $message ?? '',
                 'messageType' => $messageType ?? '',
+                'btn_HistoryBack' => true,
+                'btn_Parent'      => "/articles",
             ]));
         } catch (QueryException $e) {
             $this->raiseBadRequest($e->getMessage(),  $e->getFile(), $e->getLine());

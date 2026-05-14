@@ -56,22 +56,18 @@ class TranslatorController extends AbstractController
             $missingOnly === 1
         );
 
-        $missingCount = $this->languagesDataHelper
-            ->countMissingTranslations($targetLang);
-
-        $this->render(
-            'Translator/views/translator.latte',
-            $this->getAllParams([
-                'navItems'      => $this->getNavItems($user->person),
-                'title'         => 'Translations',
-                'page'          => $user->getPage(),
-                'translations'  => $translations,
-                'referenceLang' => $referenceLang,
-                'targetLang'    => $targetLang,
-                'missingOnly'   => $missingOnly,
-                'missingCount'  => $missingCount,
-                'languages'     => $languages,
-            ])
-        );
+        $this->render('Translator/views/translator.latte', $this->getAllParams([
+            'navItems'      => $this->getNavItems($user->person),
+            'title'         => 'Translations',
+            'page'          => $user->getPage(),
+            'translations'  => $translations,
+            'referenceLang' => $referenceLang,
+            'targetLang'    => $targetLang,
+            'missingOnly'   => $missingOnly,
+            'missingCount'  => $this->languagesDataHelper->countMissingTranslations($targetLang),
+            'languages'     => $languages,
+            'btn_HistoryBack' => true,
+            'btn_Parent'      => "/designer",
+        ]));
     }
 }

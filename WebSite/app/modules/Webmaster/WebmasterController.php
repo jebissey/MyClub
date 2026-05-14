@@ -149,9 +149,10 @@ class WebmasterController extends AbstractController
             $params  = ['isMyclubWebSite' => WebApp::isMyClubWebSite()];
 
             $this->render('Webmaster/views/webmaster.latte', $this->getAllParams([
-                'newVersion'     => $this->getLastVersion(),
-                'page'           => $this->application->getConnectedUser()->getPage(),
-                'content'        => WebApp::getcompiledContent($content, $params),
+                'newVersion'   => $this->getLastVersion(),
+                'page'         => $this->application->getConnectedUser()->getPage(),
+                'content'      => WebApp::getcompiledContent($content, $params),
+                'previousPage' => true,
             ]));
         }
     }
@@ -194,7 +195,6 @@ class WebmasterController extends AbstractController
                     'mbstring' => extension_loaded('mbstring'),
                 ],
                 'navItems'        => $this->getNavItems($this->application->getConnectedUser()->person),
-                'isMyclubWebSite' => WebApp::isMyClubWebSite(),
                 'page'            => $this->application->getConnectedUser()->getPage(),
                 'currentVersion'  => Application::VERSION,
             ]));

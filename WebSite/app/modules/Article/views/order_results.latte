@@ -1,16 +1,7 @@
 {layout '../../Common/views/layout.latte'}
 
 {block navbar}
-<div class="container-fluid d-flex align-items-center">
-    <div class="d-flex gap-2">
-        <a class="navbar-brand" href="/"><img src="/app/images/home.png" alt="Home"></a>
-        <button class="btn btn-primary bi bi-arrow-left-circle fs-4" onclick="history.back()"></button>
-    </div>
-
-    <div class="ms-auto">
-        <a href="/article/{$articleId}" class="btn btn-secondary fs-5">Retour à l'article</a>
-    </div>
-</div>
+{include '../../Common/views/navbar/_userLeft.latte'}
 {/block}
 
 {block content}

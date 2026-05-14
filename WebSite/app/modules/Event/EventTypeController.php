@@ -87,6 +87,8 @@ class EventTypeController extends TableController
             'columns' => $columns,
             'resetUrl' => '/eventTypes',
             'page' => $this->application->getConnectedUser()->getPage(),
+            'btn_HistoryBack' => true,
+            'btn_Parent'      => "/designer",            
         ]));
     }
 

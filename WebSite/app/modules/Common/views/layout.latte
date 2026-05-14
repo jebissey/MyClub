@@ -154,7 +154,15 @@
         <main class="flex-grow-1 d-flex flex-column">
 
             {* ── Navbar ──────────────────────────────────────────── *}
-            <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+            <nav class="navbar navbar-expand-lg sticky-top"
+                style="
+                    background-color: {$navbarBgColor|noescape};
+                    --bs-navbar-color: {$navbarInkColor|noescape};
+                    --bs-navbar-hover-color: {$navbarInkColor|noescape};
+                    --bs-navbar-active-color: {$navbarInkColor|noescape};
+                    --bs-navbar-brand-color: {$navbarInkColor|noescape};
+                    --bs-nav-link-color: {$navbarInkColor|noescape};
+                ">
                 {* Sidebar toggle — visible uniquement sur grands écrans si sidebar active *}
                 {if isset($sidebarMenu) && count($sidebarMenu) > 0}
                     <button id="sidebarToggle"
@@ -249,7 +257,6 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script type="module" src="/app/modules/Common/js/layout.js"></script>
-    {* ── Layout translations for JS ──────────────────────────────── *}
     <script>
         window.layoutI18n = {
             unsavedWarning:   {='layout.save_guard.unsaved_warning'|translate},

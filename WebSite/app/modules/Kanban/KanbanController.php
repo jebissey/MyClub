@@ -59,6 +59,8 @@ class KanbanController extends AbstractController
             'cardTypes' => $this->kanbanDataHelper->getProjectCardTypes($selectedProjectId),
             'filters' => $filters,
             'isOwner' => $isOwner,
+            'btn_HistoryBack' => true,
+            'btn_Parent'      => "/designer",
         ]));
     }
 

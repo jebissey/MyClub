@@ -61,7 +61,7 @@ abstract class AbstractController
 
     protected function getAllParams(array $specificParams): array
     {
-        return Params::getAll($specificParams, $this->prodSiteUrl, $this->memberAlert);
+        return Params::getAll($specificParams, $this->prodSiteUrl, $this->memberAlert, $this->dataHelper->getDefaultColors());
     }
 
     protected function getLayout(): string
@@ -285,7 +285,7 @@ abstract class AbstractController
     #region Public functions
     public function render(string $templateLatteName, object|array $params = []): void
     {
-        #error_log("\n\n" . json_encode($templateLatteName, JSON_PRETTY_PRINT) . "\n");
+#error_log("\n\n" . json_encode($templateLatteName, JSON_PRETTY_PRINT) . "\n");
         $content = $this->latte->renderToString($templateLatteName, $params);
         echo $content;
         if (ob_get_level()) ob_end_flush();

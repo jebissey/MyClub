@@ -31,6 +31,7 @@ class UserPresentationController extends AbstractController
                 'page' => $this->application->getConnectedUser()->getPage(),
                 'validationMsg' => ($this->t)('presentation.edit.validation.noContent'),
                 'maxZoom' => 18,
+                'btn_HistoryBack' => true,
             ]));
         } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
     }

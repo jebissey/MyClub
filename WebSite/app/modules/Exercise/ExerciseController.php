@@ -98,6 +98,8 @@ class ExerciseController extends TableController
             'layout' => $this->getLayout(),
             'navItems' => $this->getNavItems($connectedUser->person ?? false),
             'page' => $connectedUser->getPage(),
+            'btn_HistoryBack' => true,
+            'btn_Parent'      => "/designer",               
         ]));
     }
 

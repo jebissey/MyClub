@@ -22,13 +22,14 @@ class UserController extends AbstractController
         parent::__construct($application);
     }
 
-    public function forgotPassword($encodedEmail): void
+    public function forgotPassword(string $encodedEmail): void
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
         $email = urldecode($encodedEmail);
+        $success = false;
         try {
             $success = $this->authService->handleForgotPassword($email);
         } catch (EmailException $e) {
@@ -74,7 +75,7 @@ class UserController extends AbstractController
         }
     }
 
-    public function setPassword($token): void
+    public function setPassword(string $token): void
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $newPassword = WebApp::getFiltered('password', FilterInputRule::Password->value, $this->flight->request()->data->getData());
@@ -103,15 +104,18 @@ class UserController extends AbstractController
                 return;
             }
             $lang = TranslationManager::getCurrentLanguage();
+            $defaultColors = $this->dataHelper->getDefaultColors();
             $this->render('User/views/user_sign_in.latte', [
                 'href' => '/user/sign/in',
                 'userImg' => '👻',
                 'userEmail' => '',
                 'isAdmin' => false,
-                'page' => basename(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH)),
                 'currentVersion' => Application::VERSION,
                 'page' => $this->application->getConnectedUser()->getPage(),
                 'flag' => TranslationManager::getFlag($lang),
+                'navbarBgColor'   => $defaultColors['navbarBgColor'],
+                'navbarInkColor'  => $defaultColors['navbarInkColor'],
+                'navbarIconColor' => $defaultColors['navbarIconColor'],
             ]);
         } else $this->raiseMethodNotAllowed(__FILE__, __LINE__);
     }

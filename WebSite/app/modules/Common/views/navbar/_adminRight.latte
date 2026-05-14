@@ -1,0 +1,19 @@
+        </ul>
+        <div class="d-flex align-items-center ms-auto">
+            <a class="navbar-brand" href="{$currentPath|trim:'/'}/help"
+               data-bs-toggle="tooltip"
+               data-bs-placement="bottom"
+               title="{='contextual_help'|translate}">
+                <i class="bi bi-question-circle-fill fs-2" style="color: {$navbarIconColor|noescape};"></i>
+            </a>
+        </div>      
+
+        {if $isAdmin}
+        <a class="navbar-brand" href="/admin"
+           data-bs-toggle="tooltip"
+           title="{='admin_zone'|translate}">
+            <i class="bi bi-key-fill fs-1" style="color: {$navbarIconColor|noescape};"></i>
+        </a>
+        {/if}
+    </div>
+</div>
