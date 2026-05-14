@@ -133,14 +133,15 @@ class HomeController extends AbstractController
             return;
         }
         $lang = TranslationManager::getCurrentLanguage();
-        $this->render('Common/views/info.latte', [
+        $this->render('Common/views/info.latte', $this->getAllParams([
             'content' => $this->dataHelper->get('Languages', ['Name' => 'Help_Home'], $lang)->$lang ?? '',
             'hasAuthorization' => $this->application->getConnectedUser()->hasAutorization() ?? false,
             'currentVersion' => Application::VERSION,
             'timer' => 0,
             'previousPage' => true,
             'page' => $this->application->getConnectedUser()->getPage(),
-        ]);
+            'btn_HistoryBack' => true,
+        ]));
     }
 
     public function legalNotice(): void
@@ -151,13 +152,14 @@ class HomeController extends AbstractController
         }
         $lang = TranslationManager::getCurrentLanguage();
 
-        $content = $this->latte->renderToString('Common/views/info.latte', [
+        $content = $this->latte->renderToString('Common/views/info.latte', $this->getAllParams([
             'content' => $this->dataHelper->get('Languages', ['Name' => 'LegalNotices'], $lang)->$lang ?? '',
             'hasAuthorization' => $this->application->getConnectedUser()->hasAutorization() ?? false,
             'currentVersion' => Application::VERSION,
             'page' => $this->application->getConnectedUser()->getPage(),
             'timer' => 0,
-        ]);
+            'btn_HistoryBack' => true,
+        ]));
         echo $content;
     }
 

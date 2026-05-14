@@ -39,7 +39,6 @@ SQL);
             'article.edit.no_group', 
             'article.edit.on', 
             'article.edit.view', 
-            'article.label.published',
             'article.label.published', 
             'article.top_articles.card_title', 
             'article.top_articles.title', 

@@ -39,7 +39,9 @@ class DbBrowserController extends TableController
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isWebmaster(), __FILE__, __LINE__)) {
             $this->render('Webmaster/views/dbbrowser/index.latte', $this->getAllParams([
                 'tables' => $this->dbBrowserDataHelper->getTables(),
-                'page' => $this->application->getConnectedUser()->getPage()
+                'page' => $this->application->getConnectedUser()->getPage(),
+                'btn_HistoryBack' => true,
+                'btn_Parent' => '/webmaster',
             ]));
         }
     }

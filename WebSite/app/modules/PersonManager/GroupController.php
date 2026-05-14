@@ -144,6 +144,8 @@ class GroupController extends AbstractController
                 'layout' => $this->getLayout(),
                 'navItems' => $this->getNavItems($connectedUser->person ?? false),
                 'page' => $this->application->getConnectedUser()->getPage(),
+                'btn_HistoryBack' => true,
+                'btn_Parent' => '/webmaster',
             ]));
         }
     }

@@ -61,6 +61,8 @@ class RegistrationController extends TableController
                     'errorLoadGroups' => ($this->t)('person_manager.registration.error.load_groups'),
                     'errorGeneric'    => ($this->t)('person_manager.registration.error.generic'),
                 ],
+                'btn_HistoryBack' => true,
+                'btn_Parent' => '/webmaster',
             ]));
         }
     }

@@ -67,6 +67,7 @@ class EventController extends AbstractController
             'duplicateModeToday' => Period::Today->value,
             'duplicateModeTomorrow' => Period::Tomorrow->value,
             'duplicateModeNextWeek' => Period::NextWeek->value,
+            'btn_HistoryBack' => true,
         ]));
     }
 
@@ -84,32 +85,27 @@ class EventController extends AbstractController
             'navItems' => $this->getNavItems($this->application->getConnectedUser()->person ?? false),
             'layout' => $this->getLayout(),
             'page' => $this->application->getConnectedUser()->getPage(),
+            'btn_HistoryBack' => true,
         ]));
     }
 
     public function showEventCrosstab()
     {
-        if (!($this->application->getConnectedUser()->isEventManager() ?? false)) {
-            $this->raiseForbidden(__FILE__, __LINE__);
-            return;
-        }
-        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
-            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
-        $period = Period::from($this->flight->request()->query->period ?? 'month');
-        [$dateRange, $crosstabData] = $this->crosstabDataHelper->getevents($period);
+        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isEventManager(), __FILE__, __LINE__)) {
+            $period = Period::from($this->flight->request()->query->period ?? 'month');
+            [$dateRange, $crosstabData] = $this->crosstabDataHelper->getevents($period);
 
-        $this->render('Common/views/crosstab.latte', $this->getAllParams([
-            'crosstabData' => $crosstabData,
-            'period' => $period->value,
-            'dateRange' => $dateRange,
-            'availablePeriods' => Period::gets($this->languagesDataHelper),
-            'navbarTemplate' => '../../Webmaster/views/navbar/eventManager.latte',
-            'title' => "Animateurs vs type d'événement",
-            'totalLabels' => ['événements', 'participants'],
-            'page' => $this->application->getConnectedUser()->getPage(1),
-        ]));
+            $this->render('Common/views/crosstab.latte', $this->getAllParams([
+                'crosstabData' => $crosstabData,
+                'period' => $period->value,
+                'dateRange' => $dateRange,
+                'availablePeriods' => Period::gets($this->languagesDataHelper),
+                'navbarTemplate' => '../../Webmaster/views/navbar/eventManager.latte',
+                'title' => "Animateurs vs type d'événement",
+                'totalLabels' => ['événements', 'participants'],
+                'page' => $this->application->getConnectedUser()->getPage(1),
+            ]));
+        }
     }
 
     public function show(int $eventId, string $message = '', string $messageType = ''): void
@@ -249,41 +245,31 @@ class EventController extends AbstractController
 
     public function help(): void
     {
-        if (!($this->application->getConnectedUser()->isEventManager() ?? false)) {
-            $this->raiseForbidden(__FILE__, __LINE__);
-            return;
+        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isEventManager(), __FILE__, __LINE__)) {
+            $lang = TranslationManager::getCurrentLanguage();
+            $this->render('Common/views/info.latte', [
+                'content' => $this->dataHelper->get('Languages', ['Name' => 'Help_EventManager'], $lang)->$lang ?? '',
+                'hasAuthorization' => $this->application->getConnectedUser()->hasAutorization() ?? false,
+                'currentVersion' => Application::VERSION,
+                'timer' => 0,
+                'previousPage' => true,
+                'page' => $this->application->getConnectedUser()->getPage(),
+            ]);
         }
-        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
-            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
-        $lang = TranslationManager::getCurrentLanguage();
-        $this->render('Common/views/info.latte', [
-            'content' => $this->dataHelper->get('Languages', ['Name' => 'Help_EventManager'], $lang)->$lang ?? '',
-            'hasAuthorization' => $this->application->getConnectedUser()->hasAutorization() ?? false,
-            'currentVersion' => Application::VERSION,
-            'timer' => 0,
-            'previousPage' => true,
-            'page' => $this->application->getConnectedUser()->getPage(),
-        ]);
     }
 
     public function home(): void
     {
-        if (!($this->application->getConnectedUser()->isEventManager() ?? false)) {
-            $this->raiseForbidden(__FILE__, __LINE__);
-            return;
-        }
-        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
-            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
-        $_SESSION['navbar'] = 'eventManager';
+        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isEventManager(), __FILE__, __LINE__)) {
+            $_SESSION['navbar'] = 'eventManager';
 
-        $this->render('Event/views/eventManager.latte', $this->getAllParams([
-            'page' => $this->application->getConnectedUser()->getPage(),
-            'content' => ($this->t)('EventManager')
-        ]));
+            $this->render('Event/views/eventManager.latte', $this->getAllParams([
+                'page' => $this->application->getConnectedUser()->getPage(),
+                'content' => ($this->t)('EventManager'),
+                'btn_HistoryBack' => true,
+                'btn_Parent' => '/admin',
+            ]));
+        }
     }
 
     public function showEventChat(int $eventId): void

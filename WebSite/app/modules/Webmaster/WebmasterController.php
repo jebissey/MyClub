@@ -43,6 +43,8 @@ class WebmasterController extends AbstractController
                 'navItems' => $this->getNavItems($this->application->getConnectedUser()->person),
                 'page'     => 'clubCustomization',
                 'settings' => $settings,
+                'btn_HistoryBack' => true,
+                'btn_Parent' => '/webmaster',                
             ]));
         }
     }
@@ -153,6 +155,8 @@ class WebmasterController extends AbstractController
                 'page'         => $this->application->getConnectedUser()->getPage(),
                 'content'      => WebApp::getcompiledContent($content, $params),
                 'previousPage' => true,
+                'btn_HistoryBack' => true,
+                'btn_Parent' => '/admin',
             ]));
         }
     }
@@ -197,6 +201,8 @@ class WebmasterController extends AbstractController
                 'navItems'        => $this->getNavItems($this->application->getConnectedUser()->person),
                 'page'            => $this->application->getConnectedUser()->getPage(),
                 'currentVersion'  => Application::VERSION,
+                'btn_HistoryBack' => true,
+                'btn_Parent' => '/webmaster',                
             ]));
         }
     }
@@ -216,7 +222,9 @@ class WebmasterController extends AbstractController
                 'mailjetApiKey'       => $this->credentials->get('mailjet', 'api_key'),
                 'mailjetSender'       => $this->credentials->get('mailjet', 'sender'),
                 'dailyLimit'          => $this->credentials->get('email', 'daily_limit'),
-                'monthlyLimit'        => $this->credentials->get('email', 'monthly_limit')
+                'monthlyLimit'        => $this->credentials->get('email', 'monthly_limit'),
+                'btn_HistoryBack' => true,
+                'btn_Parent' => '/webmaster',                
             ]));
         }
     }
@@ -325,6 +333,8 @@ class WebmasterController extends AbstractController
                 'page'               => $this->application->getConnectedUser()->getPage(),
                 'turnstileSiteKey'   => $this->credentials->get('turnstile', 'site_key'),
                 'turnstileConfigured' => !empty($this->credentials->get('turnstile', 'secret_key')),
+                'btn_HistoryBack' => true,
+                'btn_Parent' => '/webmaster',                
             ]));
         }
     }

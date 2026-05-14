@@ -7,7 +7,6 @@ namespace app\modules\Webmaster;
 use app\enums\ApplicationError;
 use app\helpers\Application;
 use app\helpers\ErrorManager;
-use app\helpers\WebApp;
 use app\modules\Common\AbstractController;
 
 class MaintenanceController extends AbstractController
@@ -40,44 +39,28 @@ error_log("\n\n" . json_encode('---###---', JSON_PRETTY_PRINT) . "\n");
 
     public function maintenance(): void
     {
-        if (!($this->application->getConnectedUser()->isWebmaster() ?? false)) {
-            $this->raiseForbidden(__FILE__, __LINE__);
-            return;
+        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isWebmaster(), __FILE__, __LINE__)) {
+            $this->render('Webmaster/views/maintenance.latte', $this->getAllParams([
+                'page' => $this->application->getConnectedUser()->getPage(),
+                'btn_HistoryBack' => true,
+                'btn_Parent' => '/webmaster',
+            ]));
         }
-        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
-            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
-        $this->render('Webmaster/views/maintenance.latte', $this->getAllParams([
-            'page' => $this->application->getConnectedUser()->getPage(),
-        ]));
     }
 
     public function setSiteOnline(): void
     {
-        if (!($this->application->getConnectedUser()->isWebmaster() ?? false)) {
-            $this->raiseForbidden(__FILE__, __LINE__);
-            return;
+        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isWebmaster(), __FILE__, __LINE__)) {
+            $this->dataHelper->set('Metadata', ['SiteUnderMaintenance' => 0], ['Id' => 1]);
+            $this->redirect('/');
         }
-        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
-            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
-        $this->dataHelper->set('Metadata', ['SiteUnderMaintenance' => 0], ['Id' => 1]);
-        $this->redirect('/');
     }
 
     public function setSiteUnderMaintenance(): void
     {
-        if (!($this->application->getConnectedUser()->isWebmaster() ?? false)) {
-            $this->raiseForbidden(__FILE__, __LINE__);
-            return;
+        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isWebmaster(), __FILE__, __LINE__)) {
+            $this->dataHelper->set('Metadata', ['SiteUnderMaintenance' => 1], ['Id' => 1]);
+            $this->redirect('/');
         }
-        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
-            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
-        $this->dataHelper->set('Metadata', ['SiteUnderMaintenance' => 1], ['Id' => 1]);
-        $this->redirect('/');
     }
 }

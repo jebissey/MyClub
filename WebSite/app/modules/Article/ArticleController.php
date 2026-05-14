@@ -289,14 +289,14 @@ class ArticleController extends TableController
             return;
         }
         $lang = TranslationManager::getCurrentLanguage();
-        $this->render('Common/views/info.latte', [
+        $this->render('Common/views/info.latte', $this->getAllParams([
             'content' => $this->dataHelper->get('Languages', ['Name' => 'Help_Redactor'], $lang)->$lang ?? '',
             'hasAuthorization' => $this->application->getConnectedUser()->isRedactor() ?? false,
             'currentVersion' => Application::VERSION,
             'timer' => 0,
             'previousPage' => true,
             'page' => $this->application->getConnectedUser()->getPage(),
-        ]);
+        ]));
     }
 
     public function home(): void
