@@ -30,7 +30,18 @@ class MediaApi extends AbstractApi
     public function deleteFile(int $year, int $month, string $filename): void
     {
         if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isRedactor())) {
-            $this->renderJsonOk($this->mediaManager->deleteFile($year, $month, $filename));
+            $result = $this->mediaManager->deleteFile($year, $month, $filename);
+
+            if ($result['success']) {
+                $this->renderJsonOk($result);
+            } else {
+                $this->renderJsonError(
+                    $result['message'],
+                    ApplicationError::Error->value,
+                    $result['file'],
+                    $result['line']
+                );
+            }
         }
     }
 

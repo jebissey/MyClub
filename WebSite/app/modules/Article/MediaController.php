@@ -128,7 +128,8 @@ class MediaController extends AbstractController
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
-        if ($this->authorizationDataHelper->personCanReadMediaFile((int)$year, (int)$month, $filename, $this->application->getConnectedUser())) {
+        $connectedUser = $this->application->getConnectedUser();
+        if ($this->authorizationDataHelper->personCanReadMediaFile((int)$year, (int)$month, $filename, $connectedUser, $this->getNavItems($connectedUser->person ?? false))) {
             $this->viewFile((int)$year, (int)$month, $filename);
         } else $this->raiseForbidden(__FILE__, __LINE__);
     }
@@ -304,6 +305,7 @@ class MediaController extends AbstractController
                 'name'      => $c['name'],
                 'path'      => $path,
                 'url'       => WebApp::getBaseUrl() . 'data/media/' . $path,
+                'urlRedactor' => WebApp::getBaseUrl() . 'media/' . $path,
                 'size'      => filesize($fullPath),
                 'date'      => date('Y-m-d H:i:s', filemtime($fullPath)),
                 'month'     => $c['month'],
@@ -350,7 +352,7 @@ class MediaController extends AbstractController
     private function viewFile(int $year, int $month, string $filename): void
     {
         $filename = basename($filename);
-        $filePath = sprintf('%s/%04d/%02d/%s', MediaManager::GetMediaPath(), $year, $month, basename($filename));
+        $filePath = sprintf('%s/%04d/%02d/%s', realpath(MediaManager::GetMediaPath()), $year, $month, basename($filename));
         if (!file_exists($filePath)) {
             $this->raiseBadRequest("File $filePath not found", __FILE__, __LINE__);
             return;

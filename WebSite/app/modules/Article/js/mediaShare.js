@@ -26,14 +26,13 @@ document.querySelectorAll('.delete-file-btn').forEach((btn) => {
     btn.addEventListener('click', async () => {
         if (!confirm(t('deleteConfirm'))) return;
 
-        // path = "2024/01/fichier.ext"
         const [year, month, ...rest] = btn.dataset.path.split('/');
         const filename = rest.join('/');
 
         const data = await api.post(`/api/media/delete/${year}/${month}/${filename}`, {});
 
         if (data.success === false) {
-            alert(t('deleteError'));
+            alert(data.message || t('deleteError'));
             return;
         }
 

@@ -28,11 +28,25 @@ class MediaManager
     {
         $filePath = $this->buildFilePath($year, $month, $filename);
         if ($filePath === null) {
-            return $this->error($this->languagesDataHelper->translate('media_manager.file_not_found'));
+            return $this->error(
+                $this->languagesDataHelper->translate('media_manager.file_not_found'),
+                __FILE__,
+                __LINE__
+            );
         }
-        if (!unlink($filePath)) {
-            return $this->error($this->languagesDataHelper->translate('media_manager.file_delete_error'));
+
+        $filePath = realpath(self::MEDIA_PATH) . DIRECTORY_SEPARATOR . $filePath;
+
+        if (!@unlink($filePath)) {
+            $err = error_get_last();
+            return $this->error(
+                $this->languagesDataHelper->translate('media_manager.file_delete_error')
+                    . ' (' . ($err['message'] ?? 'unknown error') . ')',
+                __FILE__,
+                __LINE__
+            );
         }
+
         $this->cleanupEmptyDirectories($year, $month);
         return $this->success($this->languagesDataHelper->translate('media_manager.file_deleted_success'));
     }
@@ -169,6 +183,16 @@ class MediaManager
         return $dir;
     }
 
+    private function error(string $message, string $file = '', int $line = 0): array
+    {
+        return [
+            'success' => false,
+            'message' => $message,
+            'file'    => $file,
+            'line'    => $line,
+        ];
+    }
+
     private function generateSafeFilename(string $originalName): string
     {
         $extension = pathinfo($originalName, PATHINFO_EXTENSION);
@@ -228,14 +252,6 @@ class MediaManager
     {
         return [
             'success' => true,
-            'message' => $message
-        ];
-    }
-
-    private function error(string $message): array
-    {
-        return [
-            'success' => false,
             'message' => $message
         ];
     }

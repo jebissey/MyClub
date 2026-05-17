@@ -2,7 +2,7 @@ document.getElementById('add-option').addEventListener('click', function () {
     const container = document.getElementById('options-container');
     const optionCount = container.querySelectorAll('input[name="options[]"]').length;
 
-    if (optionCount < 10) {
+    if (optionCount < 15) {
         const newOption = document.createElement('div');
         newOption.className = 'd-flex mb-2';
         newOption.innerHTML = `

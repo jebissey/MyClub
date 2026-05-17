@@ -32,18 +32,18 @@ class AuthorizationDataHelper extends Data
         return array_column($query->fetchAll(), 'Name');
     }
 
-    public function personCanReadMediaFile(int $year, int $month, string $filename, ConnectedUser $connectedUser): bool
+    public function personCanReadMediaFile(int $year, int $month, string $filename, ConnectedUser $connectedUser, array $navItems): bool
     {
         $path = sprintf('%04d/%02d/%s', $year, $month, $filename);
 
-        $stmt = $this->pdo->prepare(
-            "SELECT a.CreatedBy, a.PublishedBy, a.OnlyForMembers, a.IdGroup
+        $stmt = $this->pdo->prepare("
+            SELECT a.CreatedBy, a.PublishedBy, a.OnlyForMembers, a.IdGroup, a.Id
             FROM Article a
             WHERE a.Content LIKE :pattern
 
             UNION
 
-            SELECT a.CreatedBy, a.PublishedBy, a.OnlyForMembers, a.IdGroup
+            SELECT a.CreatedBy, a.PublishedBy, a.OnlyForMembers, a.IdGroup, a.Id
             FROM Article a
             INNER JOIN Carousel c ON c.IdArticle = a.Id
             WHERE c.Item LIKE :pattern"
@@ -51,16 +51,25 @@ class AuthorizationDataHelper extends Data
         $stmt->execute([':pattern' => '%' . $path . '%']);
         $articles = $stmt->fetchAll(PDO::FETCH_OBJ);
 
+        $menuArticleIds = [];
+        foreach ($navItems as $navItem) {
+            if (preg_match('#/menu/show/article/(\d+)$#', $navItem->Url ?? '', $matches)) {
+                $menuArticleIds[] = (int)$matches[1];
+            }
+        }
         foreach ($articles as $article) {
             if ($this->canReadArticle($article, $connectedUser)) {
                 return true;
             }
+            if (in_array((int)$article->Id, $menuArticleIds, true)) {
+                return true;
+            }
         }
 
-        $stmt = $this->pdo->prepare(
-            "SELECT ArticleId, EventId, GroupId
-             FROM Message
-             WHERE ImagePath LIKE :pattern"
+        $stmt = $this->pdo->prepare("
+            SELECT ArticleId, EventId, GroupId
+            FROM Message
+            WHERE ImagePath LIKE :pattern"
         );
         $stmt->execute([':pattern' => '%' . $path . '%']);
         $messages = $stmt->fetchAll(PDO::FETCH_OBJ);

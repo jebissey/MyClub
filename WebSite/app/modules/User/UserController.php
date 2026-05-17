@@ -116,6 +116,7 @@ class UserController extends AbstractController
                 'navbarBgColor'   => $defaultColors['navbarBgColor'],
                 'navbarInkColor'  => $defaultColors['navbarInkColor'],
                 'navbarIconColor' => $defaultColors['navbarIconColor'],
+                'btn_HistoryBack' => true,
             ]);
         } else $this->raiseMethodNotAllowed(__FILE__, __LINE__);
     }
