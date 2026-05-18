@@ -62,28 +62,35 @@ function initAlertHelper() {
 
 // ─── Sidebar toggle ───────────────────────────────────────────────────────────
 function initSidebar() {
-    const sidebar = document.getElementById('sidebar-wrapper');
-    const toggleBtn = document.getElementById('sidebarToggle');
-    const STORAGE_KEY = 'myclub_sidebar_open';
+    const sidebar      = document.getElementById('sidebar');
+    const contentInner = document.getElementById('content-inner');
+    const toggleBtn    = document.getElementById('sidebarToggle');
+    const STORAGE_KEY  = 'myclub_sidebar_open';
 
     if (!sidebar || !toggleBtn) return;
 
-    // Restore saved state (default: open)
-    if (localStorage.getItem(STORAGE_KEY) === 'closed') {
-        sidebar.classList.replace('d-lg-flex', 'd-none');
-    }
+    const cssVar = name =>
+        getComputedStyle(document.documentElement).getPropertyValue(name).trim();
 
-    toggleBtn.addEventListener('click', () => {
-        const isHidden = sidebar.classList.contains('d-none');
-        if (isHidden) {
+    // ── Applique l'état visuel (ouvert / fermé) ───────────────────
+    const applyState = (open) => {
+        if (open) {
             sidebar.classList.remove('d-none');
-            sidebar.classList.add('d-lg-flex');
-            localStorage.setItem(STORAGE_KEY, 'open');
+            if (contentInner) contentInner.style.paddingLeft = cssVar('--content-padding-side');
         } else {
             sidebar.classList.add('d-none');
-            sidebar.classList.remove('d-lg-flex');
-            localStorage.setItem(STORAGE_KEY, 'closed');
+            if (contentInner) contentInner.style.paddingLeft = '1rem';
         }
+    };
+
+    // ── Restaure l'état sauvegardé (défaut : ouvert) ──────────────
+    applyState(localStorage.getItem(STORAGE_KEY) !== 'closed');
+
+    // ── Toggle au clic ────────────────────────────────────────────
+    toggleBtn.addEventListener('click', () => {
+        const willOpen = sidebar.classList.contains('d-none');
+        applyState(willOpen);
+        localStorage.setItem(STORAGE_KEY, willOpen ? 'open' : 'closed');
     });
 
     // Rotate chevron on submenu open/close
