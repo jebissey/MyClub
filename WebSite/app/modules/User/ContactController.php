@@ -47,6 +47,7 @@ class ContactController extends AbstractController
                 'event'             => $event,
                 'page'              => $this->application->getConnectedUser()->getPage(),
                 'turnstileSiteKey'  => $this->credentials->get('turnstile', 'site_key') ?? '',
+                'btn_HistoryBack' => true,
 
             ]));
         } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') $this->handleContactForm();
@@ -54,7 +55,6 @@ class ContactController extends AbstractController
     }
 
     #region Private functions
-
     private function handleContactForm(): void
     {
         $honeypot = $_POST['website'] ?? '';
@@ -158,12 +158,12 @@ class ContactController extends AbstractController
         return true;
     }
 
-    private function sendContactMessage(array $input, $eventId): void
+    private function sendContactMessage(array $input, ?int $eventId): void
     {
         $adminEmail = $this->dataHelper->get('Settings', ['Name' => 'contactEmail'], 'Value')->Value ?? '';
         if ($adminEmail === '') $adminEmail = $this->personDataHelper->getWebmasterEmail();
         if (!filter_var($adminEmail, FILTER_VALIDATE_EMAIL)) {
-            $this->application->getErrorManager()->raise(ApplicationError::InvalidSetting, 'Invalid contactEmail', 3000, false, __FILE__, __LINE__);
+            $this->application->getErrorManager()->raise(ApplicationError::InvalidSetting, 'Invalid contactEmail', 3000, false);
             return;
         }
 
@@ -171,7 +171,7 @@ class ContactController extends AbstractController
         $email   = $input['email'];
         $message = $input['message'];
 
-        if ($eventId != null) {
+        if ($eventId !== null) {
             $event = $this->dataHelper->get('Event', ['Id' => $eventId], 'Id, Summary');
             if (!$event) {
                 $this->raiseBadRequest("Unknown event {$eventId}", __FILE__, __LINE__);
