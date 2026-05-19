@@ -444,7 +444,7 @@ class ArticleController extends TableController
                     return;
                 }
             }
-            $this->raiseBadRequest(($this->t)('article.error.login_required'), __FILE__, __LINE__);
+            $this->redirect('/user/sign/in?redirect=' . urlencode($_SERVER['REQUEST_URI']));
             return;
         }
         try {

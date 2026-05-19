@@ -91,16 +91,17 @@ class UserController extends AbstractController
 
     public function signIn(): void
     {
+        $redirect = $this->flight->request()->query->getData()['redirect'] ?? '/';
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $result = $this->authService->handleSignIn($this->flight->request()->data->getData());
             if ($result->isSuccess()) {
                 $this->application->getConnectedUser()->get();
-                $this->redirect('/', ApplicationError::Ok, "Sign in succeeded for {$result->getUser()->Email}");
+                $this->redirect($redirect, ApplicationError::Ok, "Sign in succeeded for {$result->getUser()->Email}");
             } else $this->raiseBadRequest($result->getError(), __FILE__, __LINE__);
         } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             $rememberMeResult = $this->authService->handleRememberMeLogin();
             if ($rememberMeResult && $rememberMeResult->isSuccess()) {
-                $this->redirect('/', ApplicationError::Ok, "Auto sign in succeeded for {$rememberMeResult->getUser()->Email}");
+                $this->redirect($redirect, ApplicationError::Ok, "Auto sign in succeeded for {$rememberMeResult->getUser()->Email}");
                 return;
             }
             $lang = TranslationManager::getCurrentLanguage();
@@ -117,6 +118,7 @@ class UserController extends AbstractController
                 'navbarInkColor'  => $defaultColors['navbarInkColor'],
                 'navbarIconColor' => $defaultColors['navbarIconColor'],
                 'btn_HistoryBack' => true,
+                'redirect' => $redirect,
             ]);
         } else $this->raiseMethodNotAllowed(__FILE__, __LINE__);
     }
