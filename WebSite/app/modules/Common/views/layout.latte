@@ -13,28 +13,21 @@
             --navbar-bg:     color-mix(in srgb, var(--navbar-bg-raw) 60%, transparent); 
             --navbar-ink:    {$navbarInkColor|noescape};
             --navbar-icon:   {$navbarIconColor|noescape};
-
-            /* ── Navbar ───────────────────────────────────────────── */
             --navbar-blur:   4px;
             --navbar-border: rgba(255, 255, 255, 0.15);
             --navbar-height: 56px;
 
-            /* ── Sidebar : même fond et encre que la navbar ───────── */
             --sidebar-bg:               color-mix(in srgb, var(--navbar-bg) 60%, transparent);
             --sidebar-blur:             var(--navbar-blur);
             --sidebar-border:           rgba(255, 255, 255, 0.15);
             --sidebar-width:            220px;
             --sidebar-gap:              1px;
-
             --sidebar-link-color:        var(--navbar-ink);
             --sidebar-link-color-muted:  color-mix(in srgb, var(--navbar-ink) 55%, transparent);
 
-            /* ── Contenu ──────────────────────────────────────────── */
             --content-bg:           #f8f9fa;
-            --content-padding-top:  76px;
             --content-padding-side: 240px;
 
-            /* ── Footer ───────────────────────────────────────────── */
             --footer-bg:     rgba(20, 20, 30, 0.04);
             --footer-border: rgba(0, 0, 0, 0.1);
             --footer-text:   #6c757d;
@@ -44,16 +37,6 @@
 
         body { overflow: hidden; }
 
-        .navbar-toggler-icon {
-            background-image: none;
-            background-color: var(--navbar-ink);
-
-            -webkit-mask-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='white' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
-            mask-image:         url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='white' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
-
-            -webkit-mask-size: 100%;
-            mask-size:         100%;
-        }
 
         /* ─── Navbar ─────────────────────────────────────────────── */
         .navbar {
@@ -75,10 +58,7 @@
 
         .navbar .bi { color: var(--navbar-icon); }
 
-        nav.navbar .navbar-nav .nav-link {
-            padding-top: .1rem;
-            padding-bottom: .1rem;
-        }
+
 
         /* ─── Sidebar toggle : icône plus grande ─────────────────── */
         #sidebarToggle .bi-layout-sidebar {
@@ -349,7 +329,10 @@
             {if isset($currentPath) && $currentPath === '/' && file_exists('app/images/header-banner.jpg')}
                 <img src="/app/images/header-banner.jpg"
                      class="img-fluid custom-img w-100 d-block object-fit-cover"
+                     style="margin-top: var(--navbar-height);"
                      alt="Bannière">
+            {else}
+                <div style="height: var(--navbar-height);"></div>
             {/if}
 
             <div id="content-inner"

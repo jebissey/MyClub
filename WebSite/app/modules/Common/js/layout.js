@@ -161,6 +161,13 @@ function showIosInstallBanner() {
     });
 }
 
+function syncNavbarHeight() {
+    const h = document.querySelector('.navbar')?.offsetHeight ?? 56;
+    document.documentElement.style.setProperty('--navbar-height', h + 'px');
+}
+syncNavbarHeight();
+window.addEventListener('resize', syncNavbarHeight);
+
 document.addEventListener('DOMContentLoaded', showIosInstallBanner);
 
 // ─── Entry point ──────────────────────────────────────────────────────────────
