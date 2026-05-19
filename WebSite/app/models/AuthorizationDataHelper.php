@@ -36,7 +36,8 @@ class AuthorizationDataHelper extends Data
     {
         $path = sprintf('%04d/%02d/%s', $year, $month, $filename);
 
-        $stmt = $this->pdo->prepare("
+        $stmt = $this->pdo->prepare(
+            "
             SELECT a.CreatedBy, a.PublishedBy, a.OnlyForMembers, a.IdGroup, a.Id
             FROM Article a
             WHERE a.Content LIKE :pattern
@@ -66,7 +67,8 @@ class AuthorizationDataHelper extends Data
             }
         }
 
-        $stmt = $this->pdo->prepare("
+        $stmt = $this->pdo->prepare(
+            "
             SELECT ArticleId, EventId, GroupId
             FROM Message
             WHERE ImagePath LIKE :pattern"
@@ -152,9 +154,9 @@ class AuthorizationDataHelper extends Data
     private function canReadArticle(object $article, ConnectedUser $connectedUser): bool
     {
         if (!$article) return false;
-        if (($connectedUser->person  ?? false) && ($article->CreatedBy == $connectedUser->person->Id || $connectedUser->isEditor())) return true;
+        if (($connectedUser->person ?? false) && ($article->CreatedBy === $connectedUser->person->Id || $connectedUser->isEditor())) return true;
         if ($article->PublishedBy === null) return false;
-        if (!($connectedUser->person ?? false)) return $article->OnlyForMembers === 0 && ($article->IdGroup === null);
+        if ($connectedUser->person !== null) return $article->OnlyForMembers === 0 && ($article->IdGroup === null);
         if ($article->OnlyForMembers === 1 && $article->IdGroup === null) return true;
         return $article->IdGroup === null || !empty(array_intersect([$article->IdGroup], $this->getUserGroups($connectedUser->person?->Email ?? '')));
     }

@@ -204,7 +204,7 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
     {
         if (empty($paths)) return [];
 
-        $stmt = $this->pdo->query("SELECT Content FROM Article WHERE PublishedBy IS NOT NULL");
+        $stmt = $this->pdo->query("SELECT Content FROM Article");
         $contents = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
         $used = [];
@@ -242,6 +242,7 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
 
     public function inArticles(string $path): array
     {
+error_log("\n\n" . json_encode($path, JSON_PRETTY_PRINT) . "\n");
         $sql = "
             SELECT DISTINCT a.Id, a.Title
             FROM Article a

@@ -15,8 +15,9 @@
                                 <strong>{$article->Title}</strong>
                                 <small class="text-muted">#{$article->Id}</small>
                             </span>
-                            <a href="/article/{$article->Id}" class="btn btn-sm btn-primary">
+                            <a href="/article/{$article->Id}" class="btn btn-sm btn-success">
                                 {='media.uses.view_article'|translate}
+                                <i class="bi bi-eye"></i>
                             </a>
                         </li>
                         {/foreach}
