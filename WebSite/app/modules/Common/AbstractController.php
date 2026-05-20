@@ -216,9 +216,9 @@ abstract class AbstractController
         $this->application->getErrorManager()->raise(ApplicationError::Error, "Error {$message} in file {$file} at line {$line}");
     }
 
-    protected function raiseForbidden(string $file, int $line): void
+    protected function raiseForbidden(string $file, int $line, int $timeout = 5000, bool $displayCode = false): void
     {
-        $this->application->getErrorManager()->raise(ApplicationError::Forbidden, "Access forbidden in file {$file} at line {$line}");
+        $this->application->getErrorManager()->raise(ApplicationError::Forbidden, "Access forbidden in file {$file} at line {$line}", $timeout, $displayCode);
     }
 
     protected function raiseMethodNotAllowed(string $file, int $line): void

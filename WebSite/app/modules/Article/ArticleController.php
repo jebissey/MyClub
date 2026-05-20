@@ -440,11 +440,14 @@ class ArticleController extends TableController
             if ($connectedUser->person === null) {
                 $result = $this->application->getAuthenticationService()->handleRememberMeLogin();
                 if ($result && $result->isSuccess()) {
+                    $this->application->getConnectedUser()->get();
                     $this->redirect($_SERVER['REQUEST_URI'], ApplicationError::Ok, "Auto sign in succeeded for {$result->getUser()->Email}");
                     return;
                 }
+                $this->redirect('/user/sign/in?redirect=' . urlencode($_SERVER['REQUEST_URI']));
+            } else {
+                $this->raiseForbidden(__FILE__, __LINE__, 10000, false);
             }
-            $this->redirect('/user/sign/in?redirect=' . urlencode($_SERVER['REQUEST_URI']));
             return;
         }
         try {

@@ -25,7 +25,7 @@ class ErrorManager
         $this->emptyController = new EmptyController($application);
     }
 
-    public function raise(ApplicationError $code, string $message, int $timeout = 1000, bool $displayCode = true, bool $isWebmaster = false): void
+    public function raise(ApplicationError $code, string $message, int $timeout = 3000, bool $displayCode = true, bool $isWebmaster = false): void
     {
         $this->logDataWriterHelper->add((string)$code->value, $message);
         if ($this->isJsonExpected()) {
