@@ -124,14 +124,14 @@ class PersonController extends TableController
                     $message
                 );
 
-                $this->render('Common/views/info.latte', [
+                $this->render('Common/views/info.latte', $this->getAllParams([
                     'content' => $message,
                     'hasAuthorization' => $this->application->getConnectedUser()->hasAutorization() ?? false,
                     'currentVersion' => Application::VERSION,
                     'timer' => 10000,
                     'previousPage' => true,
                     'page' => $this->application->getConnectedUser()->getPage(),
-                ]);
+                ]));
 
                 return;
             }
@@ -169,14 +169,14 @@ class PersonController extends TableController
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isPersonManager(), __FILE__, __LINE__)) {
             $lang = TranslationManager::getCurrentLanguage();
-            $this->render('Common/views/info.latte', [
+            $this->render('Common/views/info.latte', $this->getAllParams([
                 'content' => $this->dataHelper->get('Languages', ['Name' => 'Help_PersonManager'], $lang)->$lang ?? '',
                 'hasAuthorization' => $this->application->getConnectedUser()->hasAutorization(),
                 'currentVersion' => Application::VERSION,
                 'timer' => 0,
                 'previousPage' => true,
                 'page' => $this->application->getConnectedUser()->getPage(),
-            ]);
+            ]));
         }
     }
 

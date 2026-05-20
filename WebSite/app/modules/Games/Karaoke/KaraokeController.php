@@ -40,14 +40,14 @@ class KaraokeController extends AbstractController
             $content = ($this->t)($e->getMessage())
                 ?? ($this->t)('Error500');
 
-            $this->render('Common/views/info.latte', [
+            $this->render('Common/views/info.latte', $this->getAllParams([
                 'content' => $content,
                 'hasAuthorization' => $this->application->getConnectedUser()?->hasAutorization() ?? false,
                 'currentVersion' => Application::VERSION,
                 'timer' => 10000,
                 'previousPage' => false,
                 'page' => $this->application->getConnectedUser()?->getPage(),
-            ]);
+            ]));
         }
     }
 

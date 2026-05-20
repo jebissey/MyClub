@@ -89,14 +89,14 @@ class WebmasterController extends AbstractController
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isWebmaster(), __FILE__, __LINE__)) {
             $lang = TranslationManager::getCurrentLanguage();
-            $this->render('Common/views/info.latte', [
+            $this->render('Common/views/info.latte', $this->getAllParams([
                 'content'          => $this->dataHelper->get('Languages', ['Name' => 'Help_Webmaster'], $lang)->$lang ?? '',
                 'hasAuthorization' => $this->application->getConnectedUser()->isWebmaster() ?? false,
                 'currentVersion'   => Application::VERSION,
                 'timer'            => 0,
                 'previousPage'     => true,
                 'page'             => $this->application->getConnectedUser()->getPage()
-            ]);
+            ]));
         }
     }
 

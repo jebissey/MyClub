@@ -247,14 +247,14 @@ class EventController extends AbstractController
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isEventManager(), __FILE__, __LINE__)) {
             $lang = TranslationManager::getCurrentLanguage();
-            $this->render('Common/views/info.latte', [
+            $this->render('Common/views/info.latte', $this->getAllParams([
                 'content' => $this->dataHelper->get('Languages', ['Name' => 'Help_EventManager'], $lang)->$lang ?? '',
                 'hasAuthorization' => $this->application->getConnectedUser()->hasAutorization() ?? false,
                 'currentVersion' => Application::VERSION,
                 'timer' => 0,
                 'previousPage' => true,
                 'page' => $this->application->getConnectedUser()->getPage(),
-            ]);
+            ]));
         }
     }
 

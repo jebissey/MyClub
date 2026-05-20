@@ -54,7 +54,6 @@ class FFAController extends AbstractController
             'question' => $question,
             'results' => $results,
             'navItems' => $this->getNavItems($person),
-            'question' => $question,
             'year' => $year,
             'club' => $club,
             'page' => $this->application->getConnectedUser()->getPage()

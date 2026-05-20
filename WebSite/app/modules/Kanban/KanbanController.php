@@ -48,7 +48,7 @@ class KanbanController extends AbstractController
             'title' => 'Kanban Board',
             'page' => $this->application->getConnectedUser()->getPage(),
             'personId' => $personId,
-            'projects' => $this->kanbanDataHelper->getKanbanProjects($personId),
+            'projects' => $this->kanbanDataHelper->getKanbanProjects(),
             'columns' => [
                 ['icon' => '💡', 'label' => 'Backlog'],
                 ['icon' => '☑️', 'label' => 'Selected'],
@@ -71,13 +71,13 @@ class KanbanController extends AbstractController
             return;
         }
         $lang = TranslationManager::getCurrentLanguage();
-        $this->render('Common/views/info.latte', [
+        $this->render('Common/views/info.latte', $this->getAllParams([
             'content' => $this->dataHelper->get('Languages', ['Name' => 'Help_KanbanDesigner'], $lang)->$lang ?? '',
             'hasAuthorization' => $this->application->getConnectedUser()->isRedactor() ?? false,
             'currentVersion' => Application::VERSION,
             'timer' => 0,
             'previousPage' => true,
             'page' => $this->application->getConnectedUser()->getPage(),
-        ]);
+        ]));
     }
 }
