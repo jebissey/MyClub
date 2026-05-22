@@ -72,7 +72,6 @@ function initSidebar() {
     const cssVar = name =>
         getComputedStyle(document.documentElement).getPropertyValue(name).trim();
 
-    // ── Applique l'état visuel (ouvert / fermé) ───────────────────
     const applyState = (open) => {
         if (open) {
             sidebar.classList.remove('d-none');

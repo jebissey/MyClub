@@ -7,19 +7,8 @@
 }
 
 .carousel-item {
-  background-color: #f8f9fa;
-}
-
-@media (min-height: 1000px) {
-  .carousel-item {
-    height: 70vh;
-  }
-}
-
-@media (max-height: 999px) {
-  .carousel-item {
-    height: 90vh;
-  }
+    background-color: #f8f9fa;
+    height: calc(100vh - var(--navbar-height, 56px));
 }
 
 .carousel-item img {

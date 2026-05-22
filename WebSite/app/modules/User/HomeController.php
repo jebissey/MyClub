@@ -123,6 +123,8 @@ class HomeController extends AbstractController
             'pendingDesigns'         => $userPendingDesigns,
             'news'                   => $news ?? false,
             'page'                   => $this->application->getConnectedUser()->getPage(),
+            'carouselItems'          => $latestArticle ? $this->dataHelper->gets('Carousel', ['IdArticle' => $latestArticle->Id], 'Item') : [],
+            'homeParagraphsCount'    => (int) ($this->dataHelper->get('Settings', ['Name' => 'Home_FeaturedArticleParagraphs'], 'Value')->Value ?? 1),
         ]));
     }
 

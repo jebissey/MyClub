@@ -1,0 +1,9 @@
+.home-banner {
+    height: clamp(80px, 20vw, 220px);
+}
+
+@media (max-width: 576px) {
+    .home-banner {
+        height: clamp(60px, 18vw, 110px);
+    }
+}

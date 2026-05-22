@@ -1,0 +1,189 @@
+/* ─── Variables statiques (ne dépendent pas des couleurs PHP) ─── */
+:root {
+    --navbar-blur:   4px;
+    --navbar-border: rgba(255, 255, 255, 0.15);
+    --navbar-height: 56px;
+
+    --sidebar-blur:   4px;
+    --sidebar-border: rgba(255, 255, 255, 0.15);
+
+    --content-bg:           #f8f9fa;
+
+    --footer-bg:     rgba(20, 20, 30, 0.04);
+    --footer-border: rgba(0, 0, 0, 0.1);
+    --footer-text:   #6c757d;
+
+    --transition-speed: 0.3s;
+}
+
+body { overflow: hidden; }
+
+
+/* ─── Navbar ─────────────────────────────────────────────────── */
+.navbar {
+    position: fixed !important;
+    top: 0; left: 0; right: 0;
+    z-index: 200;
+    backdrop-filter: blur(var(--navbar-blur));
+    -webkit-backdrop-filter: blur(var(--navbar-blur));
+    border-bottom: 1px solid var(--navbar-border);
+    flex-wrap: nowrap !important;
+}
+
+
+/* ─── Sidebar toggle : icône plus grande ─────────────────────── */
+#sidebarToggle .bi-layout-sidebar {
+    font-size: 2.0rem;
+}
+
+/* ─── Burger navbar-toggler : bordure couleur encre ──────────── */
+.navbar-toggler {
+    border-color: color-mix(in srgb, var(--navbar-ink) 40%, transparent) !important;
+}
+
+/* ─── App body ───────────────────────────────────────────────── */
+#app-body {
+    margin-top: 0;
+}
+
+/* ─── Sidebar ────────────────────────────────────────────────── */
+#sidebar {
+    height: 100%;
+    width: fit-content;
+    min-width: 0;
+    flex-shrink: 0;
+    z-index: 100;
+    backdrop-filter: blur(var(--sidebar-blur));
+    -webkit-backdrop-filter: blur(var(--sidebar-blur));
+    border-right: 1px solid var(--sidebar-border);
+    overflow-y: auto;
+    transition: width var(--transition-speed) ease,
+                opacity var(--transition-speed) ease;
+}
+
+#sidebar.d-none { display: none !important; }
+
+/* ── Liens sidebar ────────────────────────────────────────────── */
+#sidebarNav .nav-link {
+    padding: .5rem 1.25rem;
+    font-size: .9rem;
+    white-space: nowrap;
+    border-left: 3px solid transparent;
+    transition: color .15s, border-color .15s, background .15s, opacity .15s;
+}
+
+#sidebarNav .nav-link:hover,
+#sidebarNav .nav-link.active {
+    background-color: rgba(255, 255, 255, 0.15);
+    border-left-color: currentColor;
+}
+
+#sidebarNav .nav-link i {
+    width: 18px;
+    text-align: center;
+    margin-right: .5rem;
+}
+
+.sidebar-heading {
+    padding: .875rem 1.25rem .25rem;
+    font-size: .75rem;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    font-weight: 700;
+}
+
+/* Liens enfants des sous-menus */
+#sidebarNav .collapse-submenu .nav-link {
+    padding-left: 2.75rem;
+    font-size: .85rem;
+}
+
+/* ─── Contenu principal ──────────────────────────────────────── */
+#content {
+    flex: 1 1 0;             /* prend l'espace restant */
+    min-width: 0;
+    background: var(--content-bg);
+}
+
+#content-inner {
+    padding-left: 1rem;
+    padding-right: 1rem;
+    padding-top: var(--content-padding-top);
+    transition: none;
+}
+
+/* Sans sidebar : pas de padding latéral */
+#content-inner.no-sidebar {
+    padding-left: 1rem;
+}
+
+/* ─── Watermark logo ─────────────────────────────────────────── */
+#content::before {
+    content: "";
+    background: url('/app/images/logo.png') no-repeat center / 50%;
+    opacity: .2;
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: -1;
+}
+
+/* ─── Indicateur de sauvegarde ───────────────────────────────── */
+#saveIndicator {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    display: none;
+    width: 50px;
+    height: 50px;
+    z-index: 1050;
+    cursor: pointer;
+    transition: transform .2s;
+}
+
+#saveIndicator:hover { transform: scale(1.1); }
+
+#saveIndicator i {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 1.5rem;
+    color: #0d6efd;
+}
+
+/* ─── Footer ─────────────────────────────────────────────────── */
+#app-footer {
+    background: var(--footer-bg);
+    border-top: 1px solid var(--footer-border);
+    font-size: 0.8rem;
+    color: var(--footer-text);
+}
+
+#app-footer a {
+    color: var(--footer-text);
+    text-decoration: none;
+    margin-right: 1rem;
+}
+
+#app-footer a:hover {
+    color: #0d6efd;
+    text-decoration: underline;
+}
+
+/* ─── Utilitaires ────────────────────────────────────────────── */
+.attribute-badge {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    margin-right: 5px;
+    border-radius: 4px;
+    cursor: help;
+    border: 1px solid rgba(0,0,0,.2);
+}
+
+.double-strike { text-decoration: line-through double; }
+
+.img-left   { float: left !important;  margin: 0 15px 10px 0 !important; max-width: 100%; height: auto; }
+.img-right  { float: right !important; margin: 0 0 10px 15px !important; max-width: 100%; height: auto; }
+.img-center { display: block !important; margin: 10px auto !important; float: none !important; max-width: 100%; height: auto; }

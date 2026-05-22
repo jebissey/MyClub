@@ -13,17 +13,90 @@
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
     <link rel="apple-touch-icon" sizes="120x120" href="/apple-touch-icon-120x120.png">
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon-180x180.png">
+    <link rel="stylesheet" href="/app/modules/Common/css/home.css">
+    <link rel="stylesheet" href="/app/modules/Common/css/carousel.css">
+{/block}
+
+{block sidebar_toggle}
+    <button id="sidebarToggle"
+            class="btn btn-sm me-2 border-0"
+            style="color: var(--navbar-ink); background: color-mix(in srgb, var(--navbar-ink) 12%, transparent);"
+            title="{='layout.sidebar.toggle.title'|translate}">
+        <i class="bi bi-layout-sidebar" style="color: var(--navbar-ink);"></i>
+    </button>
 {/block}
 
 {block navbar}
     {include 'navbar/home.latte'}
 {/block}
 
+{block banner}
+    {if file_exists('app/images/header-banner.jpg')}
+        <img src="/app/images/header-banner.jpg"
+             class="img-fluid home-banner w-100 d-block object-fit-cover"
+             alt="Bannière">
+    {/if}
+{/block}
+
+{block sidebar}
+    <nav id="sidebar" class="d-flex flex-column flex-shrink-0 py-2">
+        <ul class="nav nav-pills flex-column gap-1" id="sidebarNav">
+            {foreach $sidebarMenu as $item}
+                {if $item['type'] === 'heading'}
+                    <li class="sidebar-heading fw-bold">{$item['label']}</li>
+                {elseif $item['type'] === 'divider'}
+                    <li><hr class="my-2 mx-3"
+                            style="border-color: var(--sidebar-link-color-muted); opacity:.5;"></li>
+                {elseif $item['type'] === 'link'}
+                    <li class="nav-item">
+                        <a href="{$item['url']}"
+                           class="nav-link fw-bold{if isset($currentPath) && $currentPath === $item['url']} active{/if}">
+                            <i class="bi {isset($item['icon']) ? $item['icon'] : 'bi-circle'}"></i>
+                            {$item['label']}
+                        </a>
+                    </li>
+                {elseif $item['type'] === 'submenu'}
+                    {var $submenuId = 'submenu-' . $iterator->counter}
+                    <li class="nav-item">
+                        <a class="nav-link fw-bold d-flex align-items-center justify-content-between"
+                           data-bs-toggle="collapse"
+                           href="#{$submenuId}"
+                           role="button"
+                           aria-expanded="false">
+                            <span>
+                                <i class="bi {isset($item['icon']) ? $item['icon'] : 'bi-folder'}"></i>
+                                {$item['label']}
+                            </span>
+                            <i class="bi bi-chevron-down small ms-1" style="transition:transform .2s"></i>
+                        </a>
+                        <div class="collapse collapse-submenu" id="{$submenuId}">
+                            <ul class="nav flex-column ms-3 gap-1 mt-1">
+                                {foreach $item['children'] as $child}
+                                    <li>
+                                        <a href="{$child['url']}"
+                                           class="nav-link fw-bold py-1{if isset($currentPath) && $currentPath === $child['url']} active{/if}">
+                                            <i class="bi bi-dash"></i>
+                                            {$child['label']}
+                                        </a>
+                                    </li>
+                                {/foreach}
+                            </ul>
+                        </div>
+                    </li>
+                {/if}
+            {/foreach}
+        </ul>
+    </nav>
+{/block}
+
+{block content_inner_class}{/block}
+
 {block content}
 <div class="container-fluid">
     {if $homeHeader !== ''}
-    {$homeHeader|noescape}
+        {$homeHeader|noescape}
     {/if}
+
     {if isset($message) && $message !== ''}
     <div class="alert alert-success alert-dismissible">
         {$message}
@@ -75,6 +148,7 @@
 
     {if $latestArticle}
     <div class="card mb-4">
+        {if $homeParagraphsCount !== 0}
         <div class="card-header">
             <h2 class="card-title">{$latestArticle->Title}</h2>
             <small class="text-muted">
@@ -91,11 +165,41 @@
                 {/if}
             </small>
         </div>
+        {/if}
         <div class="card-body">
-            {$latestArticle->Content|extractFirstElement|noescape}
+            {if $homeParagraphsCount === 0}
+                {$latestArticle->Content|noescape}
+                {if $carouselItems && count($carouselItems) > 0}
+                    <div id="homeCarousel-{$latestArticle->Id}" class="carousel slide mt-3" data-bs-ride="carousel">
+                        <div class="carousel-inner">
+                            {foreach $carouselItems as $key => $item}
+                                <div class="carousel-item {if $key === 0}active{/if}">
+                                    {$item->Item|noescape}
+                                </div>
+                            {/foreach}
+                        </div>
+                        {if count($carouselItems) > 1}
+                            <button class="carousel-control-prev" type="button"
+                                    data-bs-target="#homeCarousel-{$latestArticle->Id}" data-bs-slide="prev">
+                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                <span class="visually-hidden">{='previous'|translate}</span>
+                            </button>
+                            <button class="carousel-control-next" type="button"
+                                    data-bs-target="#homeCarousel-{$latestArticle->Id}" data-bs-slide="next">
+                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                <span class="visually-hidden">{='next'|translate}</span>
+                            </button>
+                        {/if}
+                    </div>
+                {/if}
+            {else}
+                {$latestArticle->Content|extractFirstElement|noescape}
+            {/if}
+            {if $homeParagraphsCount !== 0}
             <div class="mt-3">
                 <a href="/article/{$latestArticle->Id}" class="btn btn-primary btn-sm">Lire l'article</a>
             </div>
+            {/if}
         </div>
     </div>
     {/if}
@@ -116,7 +220,7 @@
     {/if}
 
     {if isset($homeFooter) && $homeFooter !== ''}
-    {$homeFooter|noescape}
+        {$homeFooter|noescape}
     {/if}
 </div>
 
@@ -140,6 +244,13 @@
         </div>
     </div>
 </div>
+{/block}
+
+{block footer}
+    <a href="https://github.com/jebissey/MyClub/releases">V{$currentVersion}</a>
+    &#169; JEB
+    <a href="/legal/notice">{='layout.footer.legal_notice'|translate}</a>
+    <a href="https://myclub.ovh/menu/show/article/28" target="_blank">{='layout.footer.tutorials'|translate}</a>
 {/block}
 
 {block scripts}

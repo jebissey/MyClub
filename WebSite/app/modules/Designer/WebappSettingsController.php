@@ -26,7 +26,7 @@ class WebappSettingsController extends AbstractController
             'max'     => 50,
         ],
         'Home_FeaturedArticleId' => [
-            'label'   => 'ID de l\'article mis en avant (0 = dernier article)',
+            'label'   => "ID de l'article mis en avant (0 = dernier article)",
             'default' => 0,
             'min'     => 0,
             'max'     => null,

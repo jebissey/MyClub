@@ -6,235 +6,43 @@
     <title>{block title}MyClub{/block}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
-    {php Tracy\Debugger::renderLoader()}
+    <link rel="stylesheet" href="/app/css/layout.css">
     <style>
         :root {
-            --navbar-bg-raw: {$navbarBgColor|noescape}; 
-            --navbar-bg:     color-mix(in srgb, var(--navbar-bg-raw) 60%, transparent); 
-            --navbar-ink:    {$navbarInkColor|noescape};
-            --navbar-icon:   {$navbarIconColor|noescape};
-            --navbar-blur:   4px;
-            --navbar-border: rgba(255, 255, 255, 0.15);
-            --navbar-height: 56px;
-
-            --sidebar-bg:               color-mix(in srgb, var(--navbar-bg) 60%, transparent);
-            --sidebar-blur:             var(--navbar-blur);
-            --sidebar-border:           rgba(255, 255, 255, 0.15);
-            --sidebar-width:            220px;
-            --sidebar-gap:              1px;
-            --sidebar-link-color:        var(--navbar-ink);
-            --sidebar-link-color-muted:  color-mix(in srgb, var(--navbar-ink) 55%, transparent);
-
-            --content-bg:           #f8f9fa;
-            --content-padding-side: 240px;
-
-            --footer-bg:     rgba(20, 20, 30, 0.04);
-            --footer-border: rgba(0, 0, 0, 0.1);
-            --footer-text:   #6c757d;
-
-            --transition-speed: 0.3s;
+            --navbar-ink:  {$navbarInkColor|noescape};
+            --navbar-icon: {$navbarIconColor|noescape};
         }
 
-        body { overflow: hidden; }
-
-
-        /* ─── Navbar ─────────────────────────────────────────────── */
         .navbar {
-            position: fixed !important;
-            top: 0; left: 0; right: 0;
-            z-index: 200;
-            background: var(--navbar-bg) !important;
-            backdrop-filter: blur(var(--navbar-blur));
-            -webkit-backdrop-filter: blur(var(--navbar-blur));
-            border-bottom: 1px solid var(--navbar-border);
-            flex-wrap: nowrap !important;
-            /* Couleurs des liens Bootstrap via variables */
-            --bs-navbar-color:        var(--navbar-ink);
-            --bs-navbar-hover-color:  var(--navbar-ink);
-            --bs-navbar-active-color: var(--navbar-ink);
-            --bs-navbar-brand-color:  var(--navbar-ink);
-            --bs-nav-link-color:      var(--navbar-ink);
+            background-color: {$navbarBgColor|noescape} !important;
+            --bs-navbar-color:        {$navbarInkColor|noescape};
+            --bs-navbar-hover-color:  {$navbarInkColor|noescape};
+            --bs-navbar-active-color: {$navbarInkColor|noescape};
+            --bs-navbar-brand-color:  {$navbarInkColor|noescape};
+            --bs-nav-link-color:      {$navbarInkColor|noescape};
         }
+        .navbar .bi { color: {$navbarIconColor|noescape}; }
 
-        .navbar .bi { color: var(--navbar-icon); }
-
-
-
-        /* ─── Sidebar toggle : icône plus grande ─────────────────── */
-        #sidebarToggle .bi-layout-sidebar {
-            font-size: 2.0rem;
-        }
-
-        /* ─── Burger navbar-toggler : bordure couleur encre ──────── */
-        .navbar-toggler {
-            border-color: color-mix(in srgb, var(--navbar-ink) 40%, transparent) !important;
-        }        
-
-        /* ─── App body ───────────────────────────────────────────── */
-        #app-body {
-            position: relative;
-            margin-top: 0;
-        }
-
-        /* ─── Sidebar ────────────────────────────────────────────── */
         #sidebar {
-            position: absolute;
-            top: var(--navbar-height);
-            left: 0;
-            height: 100%;
-            width: var(--sidebar-width);
-            z-index: 100;
-            background: var(--sidebar-bg);
-            backdrop-filter: blur(var(--sidebar-blur));
-            -webkit-backdrop-filter: blur(var(--sidebar-blur));
-            border-right: 1px solid var(--sidebar-border);
-            overflow-y: auto;
-            transition: transform var(--transition-speed) ease,
-                        opacity  var(--transition-speed) ease;
+            background-color: {$navbarBgColor|noescape};
         }
-
-        #sidebar.d-none { display: none !important; }
-
-        /* ── Liens sidebar ────────────────────────────────────────── */
-        #sidebarNav .nav-link {
-            color: var(--sidebar-link-color-muted);
-            padding: .5rem 1.25rem;
-            font-size: .9rem;
-            white-space: nowrap;
-            border-left: 3px solid transparent;
-            transition: color .15s, border-color .15s, background .15s;
+        #sidebarNav .nav-link,
+        #sidebarNav .collapse-submenu .nav-link,
+        .sidebar-heading {
+            color: {$navbarInkColor|noescape} !important;
+            opacity: 0.7;
         }
-
         #sidebarNav .nav-link:hover,
         #sidebarNav .nav-link.active {
-            color: var(--sidebar-link-color) !important;
-            background-color: color-mix(in srgb, var(--navbar-ink) 10%, transparent);
-            border-left-color: var(--navbar-ink);
-        }
-
-        #sidebarNav .nav-link i {
-            width: 18px;
-            text-align: center;
-            margin-right: .5rem;
-        }
-
-        .sidebar-heading {
-            padding: .875rem 1.25rem .25rem;
-            font-size: .75rem;
-            text-transform: uppercase;
-            letter-spacing: .08em;
-            color: var(--sidebar-link-color-muted);
-            font-weight: 700;
-        }
-
-        /* Liens enfants des sous-menus */
-        #sidebarNav .collapse-submenu .nav-link {
-            color: var(--sidebar-link-color-muted);
-            padding-left: 2.75rem;
-            font-size: .85rem;
-        }
-
-        /* ─── Contenu principal ──────────────────────────────────── */
-        #content {
-            width: 100%;
-            background: var(--content-bg);
-        }
-
-        #content-inner {
-            padding-left: var(--content-padding-side);
-            padding-top:  var(--content-padding-top);
-            transition: padding-left var(--transition-speed) ease;
-        }
-
-        /* Sans sidebar : pas de padding latéral */
-        #content-inner.no-sidebar {
-            padding-left: 1rem;
-        }
-
-        /* ─── Watermark logo ─────────────────────────────────────── */
-        #content::before {
-            content: "";
-            background: url('/app/images/logo.png') no-repeat center / 50%;
-            opacity: .2;
-            position: fixed;
-            inset: 0;
-            pointer-events: none;
-            z-index: -1;
-        }
-
-        /* ─── Indicateur de sauvegarde ───────────────────────────── */
-        #saveIndicator {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            display: none;
-            width: 50px;
-            height: 50px;
-            z-index: 1050;
-            cursor: pointer;
-            transition: transform .2s;
-        }
-
-        #saveIndicator:hover { transform: scale(1.1); }
-
-        #saveIndicator i {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 1.5rem;
-            color: #0d6efd;
-        }
-
-        /* ─── Footer ─────────────────────────────────────────────── */
-        #app-footer {
-            background: var(--footer-bg);
-            border-top: 1px solid var(--footer-border);
-            font-size: 0.8rem;
-            color: var(--footer-text);
-        }
-
-        #app-footer a {
-            color: var(--footer-text);
-            text-decoration: none;
-            margin-right: 1rem;
-        }
-
-        #app-footer a:hover {
-            color: #0d6efd;
-            text-decoration: underline;
-        }
-
-        /* ─── Utilitaires ────────────────────────────────────────── */
-        .attribute-badge {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            margin-right: 5px;
-            border-radius: 4px;
-            cursor: help;
-            border: 1px solid rgba(0,0,0,.2);
-        }
-
-        .double-strike { text-decoration: line-through double; }
-
-        .img-left   { float: left !important;  margin: 0 15px 10px 0 !important; max-width: 100%; height: auto; }
-        .img-right  { float: right !important; margin: 0 0 10px 15px !important; max-width: 100%; height: auto; }
-        .img-center { display: block !important; margin: 10px auto !important; float: none !important; max-width: 100%; height: auto; }
-
-        .custom-img { height: clamp(80px, 20vw, 220px); }
-
-        @media (max-width: 576px) {
-            .custom-img { height: clamp(60px, 18vw, 110px); }
+            opacity: 1;
         }
     </style>
-
+    {php Tracy\Debugger::renderLoader()}
     {block head}{/block}
 </head>
 
 <body>
 
-    {* ── Alertes ─────────────────────────────────────────────────── *}
     {if isset($productionSiteUrl)}
         <div class="alert alert-danger alert-dismissible fade show m-0 rounded-0 text-center py-3" role="alert"
              style="position:relative; z-index:300;">
@@ -254,89 +62,20 @@
 
     <div class="toast-container position-fixed top-0 end-0 p-3" id="toastContainer" style="z-index:1100;"></div>
 
-    {* ── Navbar (fixe) ───────────────────────────────────────────── *}
     <nav class="navbar navbar-expand-lg shadow-sm">
-        {if isset($sidebarMenu) && count($sidebarMenu) > 0}
-            <button id="sidebarToggle"
-                    class="btn btn-sm me-2 border-0"
-                    style="color: var(--navbar-ink); background: color-mix(in srgb, var(--navbar-ink) 12%, transparent);"
-                    title="{='layout.sidebar.toggle.title'|translate}">
-                <i class="bi bi-layout-sidebar" style="color: var(--navbar-ink);"></i>
-            </button>
-        {/if}
+        {block sidebar_toggle}{/block}
         {block navbar}{/block}
     </nav>
 
-    {* ── Corps principal ─────────────────────────────────────────── *}
-    <div id="app-body" class="d-flex overflow-hidden" style="height: 100vh;">
+    <div id="app-body" class="d-flex overflow-hidden" style="height: calc(100vh - var(--navbar-height));">
 
-        {if isset($sidebarMenu) && count($sidebarMenu) > 0}
-            <nav id="sidebar" class="d-flex flex-column flex-shrink-0 py-2">
-                {block sidebar}
-                    <ul class="nav nav-pills flex-column gap-1" id="sidebarNav">
-                        {foreach $sidebarMenu as $item}
-                            {if $item['type'] === 'heading'}
-                                <li class="sidebar-heading fw-bold">{$item['label']}</li>
-                            {elseif $item['type'] === 'divider'}
-                                <li><hr class="my-2 mx-3"
-                                        style="border-color: var(--sidebar-link-color-muted); opacity:.5;"></li>
-                            {elseif $item['type'] === 'link'}
-                                <li class="nav-item">
-                                    <a href="{$item['url']}"
-                                    class="nav-link fw-bold{if isset($currentPath) && $currentPath === $item['url']} active{/if}">
-                                        <i class="bi {isset($item['icon']) ? $item['icon'] : 'bi-circle'}"></i>
-                                        {$item['label']}
-                                    </a>
-                                </li>
-                            {elseif $item['type'] === 'submenu'}
-                                {var $submenuId = 'submenu-' . $iterator->counter}
-                                <li class="nav-item">
-                                    <a class="nav-link fw-bold d-flex align-items-center justify-content-between"
-                                        data-bs-toggle="collapse"
-                                        href="#{$submenuId}"
-                                        role="button"
-                                        aria-expanded="false">
-                                        <span>
-                                            <i class="bi {isset($item['icon']) ? $item['icon'] : 'bi-folder'}"></i>
-                                            {$item['label']}
-                                        </span>
-                                        <i class="bi bi-chevron-down small ms-1" style="transition:transform .2s"></i>
-                                    </a>
-                                    <div class="collapse collapse-submenu" id="{$submenuId}">
-                                        <ul class="nav flex-column ms-3 gap-1 mt-1">
-                                            {foreach $item['children'] as $child}
-                                                <li>
-                                                    <a href="{$child['url']}"
-                                                    class="nav-link fw-bold py-1{if isset($currentPath) && $currentPath === $child['url']} active{/if}">
-                                                        <i class="bi bi-dash"></i>
-                                                        {$child['label']}
-                                                    </a>
-                                                </li>
-                                            {/foreach}
-                                        </ul>
-                                    </div>
-                                </li>
-                            {/if}
-                        {/foreach}
-                    </ul>
-                {/block}
-            </nav>
-        {/if}
+        {block sidebar}{/block}
 
-        {* ── Zone de contenu (scrollable) ────────────────────────── *}
         <main id="content" class="overflow-y-auto d-flex flex-column">
 
-            {if isset($currentPath) && $currentPath === '/' && file_exists('app/images/header-banner.jpg')}
-                <img src="/app/images/header-banner.jpg"
-                     class="img-fluid custom-img w-100 d-block object-fit-cover"
-                     style="margin-top: 0;"
-                     alt="Bannière">
-            {else}
-                <div style="height: var(--navbar-height);"></div>
-            {/if}
+            {block banner}{/block}
 
-            <div id="content-inner"
-                 class="container-fluid flex-grow-1{if !isset($sidebarMenu) || count($sidebarMenu) === 0} no-sidebar{/if}">
+            <div id="content-inner" class="container-fluid flex-grow-1 {block content_inner_class}no-sidebar{/block}">
                 {block content}{/block}
 
                 <div id="saveIndicator" class="bg-white rounded-circle shadow"
@@ -346,10 +85,7 @@
             </div>
 
             <footer id="app-footer" class="py-2 px-3">
-                <a href="https://github.com/jebissey/MyClub/releases">V{$currentVersion}</a>
-                &#169; JEB
-                <a href="/legal/notice">{='layout.footer.legal_notice'|translate}</a>
-                <a href="https://myclub.ovh/menu/show/article/28" target="_blank">{='layout.footer.tutorials'|translate}</a>
+                {block footer}{/block}
             </footer>
 
         </main>
