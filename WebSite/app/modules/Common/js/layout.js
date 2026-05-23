@@ -69,6 +69,9 @@ function initSidebar() {
 
     if (!sidebar || !toggleBtn) return;
 
+    const topNavCollapse = document.querySelector('.navbar-collapse');
+    const navbarToggler  = document.querySelector('.navbar-toggler');
+
     const cssVar = name =>
         getComputedStyle(document.documentElement).getPropertyValue(name).trim();
 
@@ -82,17 +85,24 @@ function initSidebar() {
         }
     };
 
-    // ── Restaure l'état sauvegardé (défaut : ouvert) ──────────────
     applyState(localStorage.getItem(STORAGE_KEY) !== 'closed');
 
-    // ── Toggle au clic ────────────────────────────────────────────
     toggleBtn.addEventListener('click', () => {
+        if (topNavCollapse?.classList.contains('show')) {
+            navbarToggler?.click();
+        }
         const willOpen = sidebar.classList.contains('d-none');
         applyState(willOpen);
         localStorage.setItem(STORAGE_KEY, willOpen ? 'open' : 'closed');
     });
 
-    // Rotate chevron on submenu open/close
+    topNavCollapse?.addEventListener('show.bs.collapse', () => {
+        if (!sidebar.classList.contains('d-none')) {
+            applyState(false);
+            localStorage.setItem(STORAGE_KEY, 'closed');
+        }
+    });
+
     document.querySelectorAll('[data-bs-toggle="collapse"]').forEach(el => {
         const chevron = el.querySelector('.bi-chevron-down');
         if (!chevron) return;
@@ -102,7 +112,6 @@ function initSidebar() {
         target.addEventListener('hide.bs.collapse', () => chevron.style.transform = 'rotate(0deg)');
     });
 
-    // Auto-expand submenu that contains the active link
     document.querySelectorAll('.collapse-submenu').forEach(submenu => {
         if (submenu.querySelector('.nav-link.active')) {
             new bootstrap.Collapse(submenu, { toggle: true });

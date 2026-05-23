@@ -505,6 +505,7 @@ INSERT INTO "Languages" VALUES (20,'attributes','Attributes','Attribut','Atrybut
 INSERT INTO "Languages" VALUES (21,'description','Description','Description','Opis');
 INSERT INTO "Languages" VALUES (22,'participants','Participants','Participants','Uczestnicy');
 INSERT INTO "Languages" VALUES (23,'audience','Audience','Audience','Odbiorcy');
+INSERT INTO "Languages" VALUES (24,'ClubMembersOnly','Members','Membres','Członkowie');
 INSERT INTO "Languages" VALUES (25,'All','Public','Public','Publiczne');
 INSERT INTO "Languages" VALUES (26,'register','Register','S''inscrire','Zapisz się');
 INSERT INTO "Languages" VALUES (27,'unregister','Unregister','Se désinscrire','Wypisz się');
@@ -5646,7 +5647,12 @@ INSERT INTO "Languages" VALUES (989,'common.creation_time_modal.error_no_data','
 INSERT INTO "Languages" VALUES (990,'common.creation_time_modal.x_axis_label','Date','Date','Data');
 INSERT INTO "Languages" VALUES (991,'common.creation_time_modal.y_axis_label','Count','Nombre','Liczba');
 INSERT INTO "Languages" VALUES (992,'exercise.msg.invalid_json','Invalid JSON format','Format JSON invalide','Nieprawidłowy format JSON');
-INSERT INTO "Metadata" VALUES (1,'MyClub',66,0,1000000,NULL,10,36,6,NULL,0,NULL);
+INSERT INTO "Languages" VALUES (993,'designer.home_settings.section_footer_accordion','Footer accordion','Accordéon pied de page','Akordeon stopki');
+INSERT INTO "Languages" VALUES (994,'designer.home_settings.title_edit_footer_accordion','Edit footer accordion article','Modifier l''article de l''accordéon du pied de page','Edytuj artykuł akordeonu stopki');
+INSERT INTO "Languages" VALUES (995,'designer.home_settings.footer_accordion_hint','0 = no article; otherwise enter the article ID to display in the footer accordion.','0 = aucun article ; sinon, saisir l''ID de l''article à afficher dans l''accordéon du pied de page.','0 = brak artykułu; w przeciwnym razie podaj ID artykułu do wyświetlenia w akordeonie stopki.');
+INSERT INTO "Languages" VALUES (996,'previous','Previous','Précédent','Poprzedni');
+INSERT INTO "Languages" VALUES (997,'next','Next','Suivant','Następny');
+INSERT INTO "Metadata" VALUES (1,'MyClub',67,0,1000000,NULL,10,36,6,NULL,0,NULL);
 INSERT INTO "Person" VALUES (1,'webmaster@myclub.foo','e427c26faca947919b18b797bc143a35100e4de48c34b70b26202d3a7d8e51f7','my first name','my last name','my nick name or nothing',NULL,'0',NULL,NULL,NULL,NULL,NULL,0,0,NULL,NULL,'2025-01-01',0,0,0,NULL,NULL,NULL,NULL,NULL,NULL,'');
 INSERT INTO "PersonGroup" VALUES (1,1,1);
 INSERT INTO "Settings" VALUES (1,'Title','title');

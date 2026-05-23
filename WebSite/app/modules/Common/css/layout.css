@@ -1,28 +1,32 @@
 /* ─── Variables statiques (ne dépendent pas des couleurs PHP) ─── */
 :root {
-    --navbar-blur:   4px;
+    --navbar-blur: 4px;
     --navbar-border: rgba(255, 255, 255, 0.15);
     --navbar-height: 56px;
 
-    --sidebar-blur:   4px;
+    --sidebar-blur: 4px;
     --sidebar-border: rgba(255, 255, 255, 0.15);
 
-    --content-bg:           #f8f9fa;
+    --content-bg: #f8f9fa;
 
-    --footer-bg:     rgba(20, 20, 30, 0.04);
+    --footer-bg: rgba(20, 20, 30, 0.04);
     --footer-border: rgba(0, 0, 0, 0.1);
-    --footer-text:   #6c757d;
+    --footer-text: #6c757d;
 
     --transition-speed: 0.3s;
 }
 
-body { overflow: hidden; }
+body {
+    overflow: hidden;
+}
 
 
 /* ─── Navbar ─────────────────────────────────────────────────── */
 .navbar {
     position: fixed !important;
-    top: 0; left: 0; right: 0;
+    top: 0;
+    left: 0;
+    right: 0;
     z-index: 200;
     backdrop-filter: blur(var(--navbar-blur));
     -webkit-backdrop-filter: blur(var(--navbar-blur));
@@ -30,6 +34,27 @@ body { overflow: hidden; }
     flex-wrap: nowrap !important;
 }
 
+/* ─── Trait sous le lien navbar actif ───────────────────────── */
+.navbar .nav-link {
+    position: relative;
+}
+
+.navbar .nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: 4px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 2px;
+    background-color: var(--navbar-ink);
+    border-radius: 2px;
+    transition: width var(--transition-speed) ease;
+}
+
+.navbar .nav-link.active::after {
+    width: 60%;
+}
 
 /* ─── Sidebar toggle : icône plus grande ─────────────────────── */
 #sidebarToggle .bi-layout-sidebar {
@@ -41,9 +66,10 @@ body { overflow: hidden; }
     border-color: color-mix(in srgb, var(--navbar-ink) 40%, transparent) !important;
 }
 
-/* ─── App body ───────────────────────────────────────────────── */
 #app-body {
-    margin-top: 0;
+    margin-top: 0 !important;
+    height: 100vh; 
+    position: relative;
 }
 
 /* ─── Sidebar ────────────────────────────────────────────────── */
@@ -58,10 +84,12 @@ body { overflow: hidden; }
     border-right: 1px solid var(--sidebar-border);
     overflow-y: auto;
     transition: width var(--transition-speed) ease,
-                opacity var(--transition-speed) ease;
+        opacity var(--transition-speed) ease;
 }
 
-#sidebar.d-none { display: none !important; }
+#sidebar.d-none {
+    display: none !important;
+}
 
 /* ── Liens sidebar ────────────────────────────────────────────── */
 #sidebarNav .nav-link {
@@ -100,7 +128,7 @@ body { overflow: hidden; }
 
 /* ─── Contenu principal ──────────────────────────────────────── */
 #content {
-    flex: 1 1 0;             /* prend l'espace restant */
+    flex: 1 1 0;
     min-width: 0;
     background: var(--content-bg);
 }
@@ -108,7 +136,7 @@ body { overflow: hidden; }
 #content-inner {
     padding-left: 1rem;
     padding-right: 1rem;
-    padding-top: var(--content-padding-top);
+    padding-top: 1rem;
     transition: none;
 }
 
@@ -141,7 +169,9 @@ body { overflow: hidden; }
     transition: transform .2s;
 }
 
-#saveIndicator:hover { transform: scale(1.1); }
+#saveIndicator:hover {
+    transform: scale(1.1);
+}
 
 #saveIndicator i {
     position: absolute;
@@ -160,15 +190,54 @@ body { overflow: hidden; }
     color: var(--footer-text);
 }
 
-#app-footer a {
-    color: var(--footer-text);
-    text-decoration: none;
-    margin-right: 1rem;
+#app-footer .footer-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.45rem 1rem;
 }
 
-#app-footer a:hover {
+#app-footer .footer-bar a {
+    color: var(--footer-text);
+    text-decoration: none;
+}
+
+#app-footer .footer-bar a:hover {
     color: #0d6efd;
     text-decoration: underline;
+}
+
+#app-footer .footer-bar .footer-center {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+#app-footer .accordion-button {
+    padding: 0.3rem 1rem;
+    font-size: 0.78rem;
+    background: transparent;
+    color: var(--footer-text);
+    box-shadow: none !important;
+    border: none;
+}
+
+#app-footer .accordion-button:not(.collapsed) {
+    color: #0d6efd;
+    background: transparent;
+}
+
+#app-footer .accordion-button::after {
+    filter: opacity(0.5);
+}
+
+#app-footer .accordion-body {
+    padding: 0.75rem 1rem 1rem;
+}
+
+#app-footer .accordion-item {
+    border: none;
+    background: transparent;
 }
 
 /* ─── Utilitaires ────────────────────────────────────────────── */
@@ -179,11 +248,31 @@ body { overflow: hidden; }
     margin-right: 5px;
     border-radius: 4px;
     cursor: help;
-    border: 1px solid rgba(0,0,0,.2);
+    border: 1px solid rgba(0, 0, 0, .2);
 }
 
-.double-strike { text-decoration: line-through double; }
+.double-strike {
+    text-decoration: line-through double;
+}
 
-.img-left   { float: left !important;  margin: 0 15px 10px 0 !important; max-width: 100%; height: auto; }
-.img-right  { float: right !important; margin: 0 0 10px 15px !important; max-width: 100%; height: auto; }
-.img-center { display: block !important; margin: 10px auto !important; float: none !important; max-width: 100%; height: auto; }
+.img-left {
+    float: left !important;
+    margin: 0 15px 10px 0 !important;
+    max-width: 100%;
+    height: auto;
+}
+
+.img-right {
+    float: right !important;
+    margin: 0 0 10px 15px !important;
+    max-width: 100%;
+    height: auto;
+}
+
+.img-center {
+    display: block !important;
+    margin: 10px auto !important;
+    float: none !important;
+    max-width: 100%;
+    height: auto;
+}

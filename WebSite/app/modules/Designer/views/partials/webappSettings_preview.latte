@@ -5,6 +5,26 @@
     <div style="height:calc(100vh - 200px); overflow-y:auto;">
         <div class="border border-2 rounded-3 overflow-hidden shadow-sm bg-light">
 
+            <!-- Navbar -->
+            {if $isMenuDesigner}<a href="/menu" class="text-decoration-none">{/if}
+            <div id="prev-navbar"
+                class="d-flex align-items-center gap-2 px-3"
+                data-bg="{$settings['Navbar_BgColor']}"
+                data-ink="{$settings['Navbar_InkColor']}"
+                data-icon="{$settings['Navbar_IconColor']}"
+                title="{='navbar.designer.menu'|translate}"
+                style="height:38px;transition:background-color .2s,color .2s;">
+                <div>Lorem Ipsum</div>
+                <div id="prev-navbar-icons" class="d-flex gap-2 ms-auto">
+                    <i class="bi bi-question-circle-fill" style="font-size:1.2rem;opacity:.7;"></i>
+                    <i class="bi bi-signpost-split-fill"  style="font-size:1.2rem;opacity:.7;"></i>
+                    <i class="bi bi-key-fill"             style="font-size:1.3rem;opacity:.7;"></i>
+                    <span style="font-size:1.2rem;opacity:.7;">🤫</span>
+                    <i class="bi bi-box-arrow-right"      style="font-size:1.3rem;opacity:.7;"></i>
+                </div>
+            </div>
+            {if $isMenuDesigner}</a>{/if}
+
             <!-- Banner -->
             <div class="prev-section border-0 border-bottom border-2 rounded-0 p-0"
                  id="prev-images"
@@ -25,26 +45,6 @@
                     </div>
                 {/if}
             </div>
-
-            <!-- Navbar -->
-            {if $isMenuDesigner}<a href="/menu" class="text-decoration-none">{/if}
-            <div id="prev-navbar"
-                class="d-flex align-items-center gap-2 px-3"
-                data-bg="{$settings['Navbar_BgColor']}"
-                data-ink="{$settings['Navbar_InkColor']}"
-                data-icon="{$settings['Navbar_IconColor']}"
-                title="{='navbar.designer.menu'|translate}"
-                style="height:38px;transition:background-color .2s,color .2s;">
-                <div>Lorem Ipsum</div>
-                <div id="prev-navbar-icons" class="d-flex gap-2 ms-auto">
-                    <i class="bi bi-question-circle-fill" style="font-size:1.2rem;opacity:.7;"></i>
-                    <i class="bi bi-signpost-split-fill"  style="font-size:1.2rem;opacity:.7;"></i>
-                    <i class="bi bi-key-fill"             style="font-size:1.3rem;opacity:.7;"></i>
-                    <span style="font-size:1.2rem;opacity:.7;">🤫</span>
-                    <i class="bi bi-box-arrow-right"      style="font-size:1.3rem;opacity:.7;"></i>
-                </div>
-            </div>
-            {if $isMenuDesigner}</a>{/if}
 
             <div class="p-3 d-flex flex-column gap-3">
 
@@ -145,6 +145,33 @@
                             <span class="fst-italic text-muted d-flex align-items-center gap-1 py-1">
                                 <i class="bi bi-dash-circle"></i> {='designer.home_settings.preview_empty'|translate}
                             </span>
+                        {/if}
+                    </div>
+                </div>
+
+                <!-- Footer accordion article -->
+                <div class="prev-section rounded-3 p-3 border border-2 border-dashed"
+                    id="prev-accordion"
+                    onclick="activateSection('accordion')"
+                    title="{='designer.home_settings.title_edit_footer_accordion'|translate}"
+                    style="border-color:#0dcaf0 !important; background:rgba(13,202,240,.07);">
+                    <div class="d-flex align-items-center gap-2 small fw-bold text-uppercase mb-2"
+                        style="color:#0097b2;">
+                        <span class="d-inline-block rounded-circle"
+                            style="width:8px;height:8px;background:currentColor;"></span>
+                        {='designer.home_settings.section_footer_accordion'|translate}
+                    </div>
+                    <div id="preview-accordion-content">
+                        {var $accordionId = (int)$settings['Home_FooterArticleId']}
+                        {if $accordionId === 0}
+                            <span class="fst-italic text-muted d-flex align-items-center gap-1 small">
+                                <i class="bi bi-eye-slash"></i> {='designer.home_settings.preview_hidden'|translate}
+                            </span>
+                        {else}
+                            <div class="d-flex align-items-center gap-2 small fw-semibold" style="color:#0097b2;">
+                                <i class="bi bi-chevron-bar-expand"></i>
+                                Article ID&nbsp;<strong>{$accordionId}</strong>
+                            </div>
                         {/if}
                     </div>
                 </div>

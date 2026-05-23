@@ -1,0 +1,43 @@
+    <div class="modal fade" id="emailModal" tabindex="-1" aria-labelledby="emailModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="emailModalLabel">{='events.email.modal_title'|translate}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{='close'|translate}"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="emailForm">
+                        <input type="hidden" id="emailEventId" name="eventId">
+
+                        <div class="mb-3">
+                            <label for="emailTypeSelect" class="form-label">{='events.email.message_type'|translate}</label>
+                            <select class="form-select" id="emailTypeSelect" name="emailType" required>
+                                <option value="">{='events.email.select_type'|translate}</option>
+                                <option value="nouvel-evenement">{='events.email.type.new'|translate}</option>
+                                <option value="rappel">{='events.email.type.reminder'|translate}</option>
+                                <option value="annule">{='events.email.type.canceled'|translate}</option>
+                                <option value="modifie">{='events.email.type.modified'|translate}</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="recipientsSelect" class="form-label">{='events.email.recipients'|translate}</label>
+                            <select class="form-select" id="recipientsSelect" name="recipients" required>
+                                <option value="">{='events.email.select_type_first'|translate}</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="emailMessage" class="form-label">{='events.email.message'|translate}</label>
+                            <textarea class="form-control" id="emailMessage" name="message" rows="5" placeholder="{='events.email.message_placeholder'|translate}" required></textarea>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{='cancel'|translate}</button>
+                            <button type="submit" class="btn btn-primary">{='events.email.send'|translate}</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>

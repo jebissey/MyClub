@@ -37,6 +37,7 @@ class WebappSettingsController extends AbstractController
             'min'     => 0,
             'max'     => null,
         ],
+        'Home_FooterArticleId' => ['default' => 0],
     ];
     private array $imageTargets = [
         'img_home'   => ['path' => 'app/images/home.png',           'mime' => ['image/png']],
@@ -127,6 +128,7 @@ class WebappSettingsController extends AbstractController
             'Home_FeaturedArticleId'         => FilterInputRule::Int->value,
             'Home_FeaturedArticleParagraphs' => FilterInputRule::Int->value,
             'Home_LatestArticlesCount'       => FilterInputRule::Int->value,
+            'Home_FooterArticleId'           => FilterInputRule::Int->value,
             'img_home'   => FilterInputRule::DataUrl->value,
             'img_logo'   => FilterInputRule::DataUrl->value,
             'img_banner' => FilterInputRule::DataUrl->value,

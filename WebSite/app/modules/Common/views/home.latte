@@ -33,7 +33,7 @@
 {block banner}
     {if file_exists('app/images/header-banner.jpg')}
         <img src="/app/images/header-banner.jpg"
-             class="img-fluid home-banner w-100 d-block object-fit-cover"
+             class="home-banner w-100 d-block"
              alt="Bannière">
     {/if}
 {/block}
@@ -41,6 +41,7 @@
 {block sidebar}
     <nav id="sidebar" class="d-flex flex-column flex-shrink-0 py-2">
         <ul class="nav nav-pills flex-column gap-1" id="sidebarNav">
+        {if isset($sidebarMenu) && is_array($sidebarMenu)}
             {foreach $sidebarMenu as $item}
                 {if $item['type'] === 'heading'}
                     <li class="sidebar-heading fw-bold">{$item['label']}</li>
@@ -85,172 +86,178 @@
                     </li>
                 {/if}
             {/foreach}
+        {/if}
         </ul>
     </nav>
 {/block}
 
-{block content_inner_class}{/block}
-
 {block content}
-<div class="container-fluid">
-    {if $homeHeader !== ''}
-        {$homeHeader|noescape}
-    {/if}
+    <div class="container-fluid">
+        {if $homeHeader !== ''}
+            {$homeHeader|noescape}
+        {/if}
 
-    {if isset($message) && $message !== ''}
-    <div class="alert alert-success alert-dismissible">
-        {$message}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-    {/if}
-
-    <div class="toast-container position-fixed bottom-0 end-0 p-3">
-        {foreach $pendingSurveys as $survey}
-        <div class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="false">
-            <div class="toast-header">
-                <strong class="me-auto">Sondage en attente : {$survey->ArticleTitle}</strong>
-                <small>Fermeture : {$survey->ClosingDate|shortDate}</small>
-                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-            </div>
-            <div class="toast-body">
-                {$survey->SurveyQuestion}
-                <div class="mt-2 pt-2 border-top">
-                    <a href="/article/{$survey->ArticleId}" class="btn btn-primary btn-sm">Répondre au sondage</a>
-                </div>
-            </div>
+        {if isset($message) && $message !== ''}
+        <div class="alert alert-success alert-dismissible">
+            {$message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
-        {/foreach}
+        {/if}
 
-        {if $isRedactor}
-        {foreach $pendingDesigns as $design}
+        <div class="toast-container position-fixed bottom-0 end-0 p-3">
+            {foreach $pendingSurveys as $survey}
             <div class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="false">
                 <div class="toast-header">
-                    <strong class="me-auto">Design en attente : {$design->DesignName}</strong>
+                    <strong class="me-auto">Sondage en attente : {$survey->ArticleTitle}</strong>
+                    <small>Fermeture : {$survey->ClosingDate|shortDate}</small>
                     <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
                 </div>
                 <div class="toast-body">
-                    {$design->DesignDetail}
-                    <small>Cliquer sur la ligne pour donner votre avis</small>
+                    {$survey->SurveyQuestion}
                     <div class="mt-2 pt-2 border-top">
-                        <a href="/designs/" class="btn btn-primary btn-sm">Donner votre avis</a>
+                        <a href="/article/{$survey->ArticleId}" class="btn btn-primary btn-sm">Répondre au sondage</a>
                     </div>
                 </div>
             </div>
-        {/foreach}
-        {/if}
-    </div>
+            {/foreach}
 
-    {if $news}
-    <div class="alert alert-info" role="alert">
-        <a href="/user/news" class="btn btn-primary btn-sm">Voir les nouveautés</a>
-    </div>
-    {/if}
-
-    {if $latestArticle}
-    <div class="card mb-4">
-        {if $homeParagraphsCount !== 0}
-        <div class="card-header">
-            <h2 class="card-title">{$latestArticle->Title}</h2>
-            <small class="text-muted">
-                {='created_by'|translate} {$latestArticle->FirstName} {$latestArticle->LastName}
-                {='on'|translate} {=$latestArticle->Timestamp|shortDate}
-                {$publishedBy}
-                {if date('Y-m-d', strtotime($latestArticle->Timestamp)) !== date('Y-m-d', strtotime($latestArticle->LastUpdate))}
-                    {='modified_on'|translate} {=$latestArticle->LastUpdate|shortDate}
-                {/if}
-                {if $latestArticleHasSurvey}
-                    <a href="/article/{$latestArticle->Id}" class="btn btn-success ms-2">
-                        {='vote'|translate}{if $userEmail === ''} {='connection_required'|translate}{/if}
-                    </a>
-                {/if}
-            </small>
-        </div>
-        {/if}
-        <div class="card-body">
-            {if $homeParagraphsCount === 0}
-                {$latestArticle->Content|noescape}
-                {if $carouselItems && count($carouselItems) > 0}
-                    <div id="homeCarousel-{$latestArticle->Id}" class="carousel slide mt-3" data-bs-ride="carousel">
-                        <div class="carousel-inner">
-                            {foreach $carouselItems as $key => $item}
-                                <div class="carousel-item {if $key === 0}active{/if}">
-                                    {$item->Item|noescape}
-                                </div>
-                            {/foreach}
+            {if $isRedactor}
+            {foreach $pendingDesigns as $design}
+                <div class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="false">
+                    <div class="toast-header">
+                        <strong class="me-auto">Design en attente : {$design->DesignName}</strong>
+                        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                    <div class="toast-body">
+                        {$design->DesignDetail}
+                        <small>Cliquer sur la ligne pour donner votre avis</small>
+                        <div class="mt-2 pt-2 border-top">
+                            <a href="/designs/" class="btn btn-primary btn-sm">Donner votre avis</a>
                         </div>
-                        {if count($carouselItems) > 1}
-                            <button class="carousel-control-prev" type="button"
-                                    data-bs-target="#homeCarousel-{$latestArticle->Id}" data-bs-slide="prev">
-                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                                <span class="visually-hidden">{='previous'|translate}</span>
-                            </button>
-                            <button class="carousel-control-next" type="button"
-                                    data-bs-target="#homeCarousel-{$latestArticle->Id}" data-bs-slide="next">
-                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                                <span class="visually-hidden">{='next'|translate}</span>
-                            </button>
-                        {/if}
                     </div>
-                {/if}
-            {else}
-                {$latestArticle->Content|extractFirstElement|noescape}
-            {/if}
-            {if $homeParagraphsCount !== 0}
-            <div class="mt-3">
-                <a href="/article/{$latestArticle->Id}" class="btn btn-primary btn-sm">Lire l'article</a>
-            </div>
-            {/if}
-        </div>
-    </div>
-    {/if}
-
-    {if $latestArticlesCount > 0 && count($latestArticles) > 0}
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h3 class="mb-0">Articles récents</h3>
-        <a href="/articles" class="btn btn-secondary">Liste de tous les articles</a>
-    </div>
-    <ul class="list-group mb-4">
-        {foreach $latestArticles as $article}
-            <li class="list-group-item d-flex justify-content-between align-items-center">
-                <a href="/article/{$article->Id}">{$article->Title}</a>
-                <span class="badge bg-secondary rounded-pill">{$article->LastUpdate|shortDate}</span>
-            </li>
-        {/foreach}
-    </ul>
-    {/if}
-
-    {if isset($homeFooter) && $homeFooter !== ''}
-        {$homeFooter|noescape}
-    {/if}
-</div>
-
-<div class="modal fade" id="languageModal" tabindex="-1" aria-labelledby="languageModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 class="modal-title" id="languageModalLabel">{='language'|translate}</h2>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div class="mb-3">
-                    <label for="languageSelect" class="form-label">{='select_language'|translate}</label>
-                    <select id="languageSelect" class="form-select">
-                        {foreach $supportedLanguages as $lang}
-                            <option value="{$lang}" {$lang === $currentLanguage ? 'selected' : ''}>{$lang}</option>
-                        {/foreach}
-                    </select>
                 </div>
+            {/foreach}
+            {/if}
+        </div>
+
+        {if $news}
+        <div class="alert alert-info" role="alert">
+            <a href="/user/news" class="btn btn-primary btn-sm">Voir les nouveautés</a>
+        </div>
+        {/if}
+
+        {if $latestArticle}
+        <div class="card mb-4">
+            {if $homeParagraphsCount !== 0}
+            <div class="card-header">
+                <h2 class="card-title">{$latestArticle->Title}</h2>
+                <small class="text-muted">
+                    {='created_by'|translate} {$latestArticle->FirstName} {$latestArticle->LastName}
+                    {='on'|translate} {=$latestArticle->Timestamp|shortDate}
+                    {$publishedBy}
+                    {if date('Y-m-d', strtotime($latestArticle->Timestamp)) !== date('Y-m-d', strtotime($latestArticle->LastUpdate))}
+                        {='modified_on'|translate} {=$latestArticle->LastUpdate|shortDate}
+                    {/if}
+                    {if $latestArticleHasSurvey}
+                        <a href="/article/{$latestArticle->Id}" class="btn btn-success ms-2">
+                            {='vote'|translate}{if $userEmail === ''} {='connection_required'|translate}{/if}
+                        </a>
+                    {/if}
+                </small>
+            </div>
+            {/if}
+            <div class="card-body">
+                {if $homeParagraphsCount === 0}
+                    {$latestArticle->Content|noescape}
+                    {if $carouselItems && count($carouselItems) > 0}
+                        <div id="homeCarousel-{$latestArticle->Id}" class="carousel slide mt-3" data-bs-ride="carousel">
+                            <div class="carousel-inner">
+                                {foreach $carouselItems as $key => $item}
+                                    <div class="carousel-item {if $key === 0}active{/if}">
+                                        {$item->Item|noescape}
+                                    </div>
+                                {/foreach}
+                            </div>
+                            {if count($carouselItems) > 1}
+                                <button class="carousel-control-prev" type="button"
+                                        data-bs-target="#homeCarousel-{$latestArticle->Id}" data-bs-slide="prev">
+                                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                    <span class="visually-hidden">{='previous'|translate}</span>
+                                </button>
+                                <button class="carousel-control-next" type="button"
+                                        data-bs-target="#homeCarousel-{$latestArticle->Id}" data-bs-slide="next">
+                                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                    <span class="visually-hidden">{='next'|translate}</span>
+                                </button>
+                            {/if}
+                        </div>
+                    {/if}
+                {else}
+                    {$latestArticle->Content|extractFirstElement|noescape}
+                {/if}
+                {if $homeParagraphsCount !== 0}
+                <div class="mt-3">
+                    <a href="/article/{$latestArticle->Id}" class="btn btn-primary btn-sm">Lire l'article</a>
+                </div>
+                {/if}
             </div>
         </div>
+        {/if}
+
+        {if $latestArticlesCount > 0 && count($latestArticles) > 0}
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h3 class="mb-0">Articles récents</h3>
+            <a href="/articles" class="btn btn-secondary">Liste de tous les articles</a>
+        </div>
+        <ul class="list-group mb-4">
+            {foreach $latestArticles as $article}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <a href="/article/{$article->Id}">{$article->Title}</a>
+                    <span class="badge bg-secondary rounded-pill">{$article->LastUpdate|shortDate}</span>
+                </li>
+            {/foreach}
+        </ul>
+        {/if}
+
+        {if isset($homeFooter) && $homeFooter !== ''}
+            {$homeFooter|noescape}
+        {/if}
     </div>
-</div>
+
+    {include 'partials/languageModal.latte'}
 {/block}
 
-{block footer}
-    <a href="https://github.com/jebissey/MyClub/releases">V{$currentVersion}</a>
-    &#169; JEB
+{block footerContent}
+<div class="footer-bar position-relative">
     <a href="/legal/notice">{='layout.footer.legal_notice'|translate}</a>
     <a href="https://myclub.ovh/menu/show/article/28" target="_blank">{='layout.footer.tutorials'|translate}</a>
+{/block}
+{block footer}
+    <footer id="app-footer">
+        <div class="footer-bar position-relative">
+            <a href="https://github.com/jebissey/MyClub/releases">V{$currentVersion}</a>
+            <span class="footer-center">
+                <a href="/legal/notice">{='layout.footer.legal_notice'|translate}</a>
+            </span>
+            {if isset($footerArticle)}
+            <div class="accordion accordion-flush" id="footerAccordion">
+                <div class="accordion-item">
+                    <button class="accordion-button collapsed py-0 px-2" type="button"
+                            data-bs-toggle="collapse" data-bs-target="#footerHelp">
+                        {$footerArticle->Title}
+                    </button>
+                </div>
+            </div>
+            {/if}
+        </div>
+        {if isset($footerArticle)}
+        <div id="footerHelp" class="accordion-collapse collapse">
+            <div class="accordion-body">
+                {$footerArticle->Content|noescape}
+            </div>
+        </div>
+        {/if}
+    </footer>  
 {/block}
 
 {block scripts}

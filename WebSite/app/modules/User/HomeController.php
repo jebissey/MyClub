@@ -107,6 +107,11 @@ class HomeController extends AbstractController
             }
         }
 
+        $footerArticleId = (int) ($this->dataHelper->get('Settings', ['Name' => 'Home_FooterArticleId'], 'Value')->Value ?? 0);
+        $footerArticle   = $footerArticleId > 0
+            ? $this->dataHelper->get('Article', ['Id' => $footerArticleId], 'Title, content')
+            : null;
+
         $this->render('Common/views/home.latte', $this->getAllParams([
             'latestArticle'          => $latestArticle,
             'latestArticles'         => $articles['latestArticles'],
@@ -125,6 +130,7 @@ class HomeController extends AbstractController
             'page'                   => $this->application->getConnectedUser()->getPage(),
             'carouselItems'          => $latestArticle ? $this->dataHelper->gets('Carousel', ['IdArticle' => $latestArticle->Id], 'Item') : [],
             'homeParagraphsCount'    => (int) ($this->dataHelper->get('Settings', ['Name' => 'Home_FeaturedArticleParagraphs'], 'Value')->Value ?? 1),
+            'footerArticle'          => $footerArticle,
         ]));
     }
 
