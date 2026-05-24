@@ -13,3 +13,8 @@ if (languageSelect) {
         setTimeout(() => location.reload(), 300);
     });
 }
+
+// Scroll footer accordion into view on open
+document.getElementById('footerHelp')?.addEventListener('shown.bs.collapse', () => {
+    document.getElementById('app-footer')?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+});

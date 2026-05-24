@@ -92,7 +92,7 @@
 {/block}
 
 {block content}
-    <div class="container-fluid">
+    <div class="container-fluid"{if file_exists('app/images/header-banner.jpg')}style="margin-top: calc(-1 * var(--navbar-height));"{/if}>
         {if $homeHeader !== ''}
             {$homeHeader|noescape}
         {/if}
@@ -227,11 +227,6 @@
     {include 'partials/languageModal.latte'}
 {/block}
 
-{block footerContent}
-<div class="footer-bar position-relative">
-    <a href="/legal/notice">{='layout.footer.legal_notice'|translate}</a>
-    <a href="https://myclub.ovh/menu/show/article/28" target="_blank">{='layout.footer.tutorials'|translate}</a>
-{/block}
 {block footer}
     <footer id="app-footer">
         <div class="footer-bar position-relative">
