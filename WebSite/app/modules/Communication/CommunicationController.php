@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\modules\Communication;
 
 use app\helpers\Application;
+use app\helpers\TranslationManager;
 use app\modules\Common\AbstractController;
 use app\modules\Common\services\EmailService;
 
@@ -41,7 +42,25 @@ class CommunicationController extends AbstractController
                     'quotaMonthlyReached' => ($this->t)('communication.quota.monthly_reached'),
                     'quotaAlmost'         => ($this->t)('communication.quota.almost_exceeded'),
                 ],
+                'connectedPersonId' => $connectedUser->person?->Id ?? null,
             ]));
         }
+    }
+
+    public function helpCommunication(): void
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+            return;
+        }
+        $lang = TranslationManager::getCurrentLanguage();
+        $this->render('Common/views/info.latte', $this->getAllParams([
+            'content' => $this->dataHelper->get('Languages', ['Name' => 'Help_Communication'], $lang)->$lang ?? '',
+            'hasAuthorization' => $this->application->getConnectedUser()->hasAutorization() ?? false,
+            'currentVersion' => Application::VERSION,
+            'timer' => 0,
+            'previousPage' => true,
+            'btn_HistoryBack' => true,
+        ]));
     }
 }

@@ -48,11 +48,19 @@
                 </select>
             </div>
 
+            <button type="button" id="btn-test" class="btn btn-info">
+                <i class="bi bi-send-check"></i> {='communication.index.test'|translate}
+            </button>
             <button type="button" id="btn-send" class="btn btn-success" disabled>
                 <i class="bi bi-send"></i> {='communication.index.send'|translate}
             </button>
             <a href="/admin" class="btn btn-secondary">
-                <i class="bi bi-x-circle"></i> {='communication.index.cancel'|translate}
+                <i class="bi bi-x-circle"></i> {='cancel'|translate}
+            </a>
+            <a href="/help/communication"
+                data-bs-toggle="tooltip"
+                title="{='contextual_help'|translate}">
+                <i class="bi bi-question-circle-fill fs-2" style="color: {$navbarIconColor|noescape};"></i>
             </a>
         </div>
     </div>
@@ -225,6 +233,7 @@
         window.t = function(key) {
             return window.i18n?.[key] ?? key;
         };
+        window.connectedPersonId = {$connectedPersonId};
     </script>
     <script type="module" src="/app/modules/Communication/js/main.js"></script>
 {/block}

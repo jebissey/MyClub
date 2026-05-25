@@ -18,12 +18,14 @@
 {/block}
 
 {block sidebar_toggle}
+    {if isset($sidebarMenu) && is_array($sidebarMenu) && count($sidebarMenu) > 0}
     <button id="sidebarToggle"
             class="btn btn-sm me-2 border-0"
             style="color: var(--navbar-ink); background: color-mix(in srgb, var(--navbar-ink) 12%, transparent);"
             title="{='layout.sidebar.toggle.title'|translate}">
         <i class="bi bi-layout-sidebar" style="color: var(--navbar-ink);"></i>
     </button>
+    {/if}
 {/block}
 
 {block navbar}
@@ -41,7 +43,7 @@
 {block sidebar}
     <nav id="sidebar" class="d-flex flex-column flex-shrink-0 py-2">
         <ul class="nav nav-pills flex-column gap-1" id="sidebarNav">
-        {if isset($sidebarMenu) && is_array($sidebarMenu)}
+        {if isset($sidebarMenu) && is_array($sidebarMenu) && count($sidebarMenu) > 0}
             {foreach $sidebarMenu as $item}
                 {if $item['type'] === 'heading'}
                     <li class="sidebar-heading fw-bold">{$item['label']}</li>

@@ -4,15 +4,11 @@ import { showToast, showOverlay, hideOverlay } from './ui.js';
 const api = new ApiClient();
 
 export default class EmailForm {
-    #quota = null;
+    #quota   = null;
     #members = null;
 
-    /**
-     * @param {import('./quota.js').default}   quota
-     * @param {import('./members.js').default} members
-     */
     constructor(quota, members) {
-        this.#quota = quota;
+        this.#quota   = quota;
         this.#members = members;
     }
 
@@ -22,29 +18,67 @@ export default class EmailForm {
 
         document.getElementById('btn-confirm-send').addEventListener('click',
             () => this.#onConfirmSend());
+
+        document.getElementById('btn-test').addEventListener('click',
+            () => this.#onTestClick());
     }
+
+    // ── Privé ─────────────────────────────────────────────────────────────────
 
     #resolveReplyTo() {
         return document.getElementById('reply-to-select')?.value || null;
-        // null | "smtp" | "user" — résolution de l'adresse réelle côté serveur
     }
 
-    #onSendClick() {
+    #validateForm() {
         const subject = document.getElementById('email-subject').value.trim();
         const content = tinymce.get('tinymce-email')?.getContent()?.trim();
 
         if (!subject) {
             showToast(window.t('subjectRequired'), false);
             document.getElementById('email-subject').focus();
-            return;
+            return null;
         }
-
         if (!content || content === '<p><br></p>') {
             showToast(window.t('contentRequired'), false);
-            return;
+            return null;
         }
+        return { subject, content };
+    }
 
-        const count = this.#members.getCheckedIds().length;
+    async #onTestClick() {
+        const fields = this.#validateForm();
+        if (!fields) return;
+
+        showOverlay();
+        try {
+            const payload = {
+                subject:       fields.subject,
+                content:       fields.content,
+                recipient_ids: [window.connectedPersonId],
+                reply_to:      this.#resolveReplyTo(),
+            };
+
+            const response = await api.post('/api/communication/send', payload);
+            const data     = response.data ?? {};
+
+            if (response.success) {
+                showToast(`✓ ${data.toast ?? ''}`, true);
+            } else {
+                showToast(`✗ ${response.message ?? window.t('sendError')}`, false);
+            }
+        } catch (e) {
+            console.error('Test send error:', e);
+            showToast(`✗ ${window.t('unexpectedError')}`, false);
+        } finally {
+            hideOverlay();
+        }
+    }
+
+    #onSendClick() {
+        const fields = this.#validateForm();
+        if (!fields) return;
+
+        const count     = this.#members.getCheckedIds().length;
         const quotaLine = this.#quota.buildConfirmQuotaLine();
 
         document.getElementById('modal-confirm-body').innerHTML = `
@@ -63,17 +97,16 @@ export default class EmailForm {
         ).hide();
 
         showOverlay();
-
         try {
             const payload = {
-                subject: document.getElementById('email-subject').value.trim(),
-                content: tinymce.get('tinymce-email')?.getContent() ?? '',
+                subject:       document.getElementById('email-subject').value.trim(),
+                content:       tinymce.get('tinymce-email')?.getContent() ?? '',
                 recipient_ids: this.#members.getCheckedIds(),
-                reply_to: this.#resolveReplyTo(),
+                reply_to:      this.#resolveReplyTo(),
             };
 
             const response = await api.post('/api/communication/send', payload);
-            const data = response.data ?? {};
+            const data     = response.data ?? {};
 
             this.#quota.applyResponse(data);
 

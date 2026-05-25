@@ -16,7 +16,7 @@ readonly class EmailMessage
         public bool $isHtml = false,
         public array $cc = [],
         public array $bcc = [],
-        public ?string $replyTo = null
+        public ?string $replyTo = null,
     ) {
         self::assertValidEmail($this->from);
         self::assertValidEmail($this->to);
@@ -40,7 +40,7 @@ readonly class EmailMessage
     private static function assertValidEmail(?string $email): void
     {
         if ($email === null) return;
-        
+
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             throw new InvalidArgumentException("Invalid email: {$email}");
         }
@@ -54,4 +54,5 @@ readonly class EmailMessage
             throw new InvalidArgumentException('Header injection detected');
         }
     }
+    #endregion
 }

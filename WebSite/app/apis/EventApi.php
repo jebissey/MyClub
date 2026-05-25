@@ -144,6 +144,7 @@ class EventApi extends AbstractApi
     #region Private functions
     private function sendEventEmails(object $event, string $title, string $body, string $recipients): ApiResponse
     {
+        $participants = null;
         if ($recipients === 'registered') $participants = $this->participantDataHelper->getEventParticipants($event->Id);
         else if ($recipients === 'unregistered') {
             //TODO

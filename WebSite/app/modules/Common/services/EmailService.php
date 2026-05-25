@@ -140,7 +140,6 @@ final class EmailService
             $mail->Subject = $message->subject;
             $mail->Body    = $message->body;
             $mail->AltBody = strip_tags($message->body);
-
             $mail->send();
 
             return true;

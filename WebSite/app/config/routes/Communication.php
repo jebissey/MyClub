@@ -19,6 +19,7 @@ class Communication implements RouteInterface
         $communicationController = fn() => $this->controllerFactory->makeCommunicationController();
 
         $this->routes[] = new Route('GET  /communication', $communicationController, 'edit');
+        $this->routes[] = new Route('GET  /help/communication', $communicationController, 'helpCommunication');
 
         return $this->routes;
     }
