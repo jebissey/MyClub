@@ -109,6 +109,7 @@ class MediaController extends AbstractController
                 'groups'               => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
                 'isEditor'             => $connectedUser->isEditor(),
                 'translations' => [
+                    // mediaShare.js
                     'urlCopied'     => ($this->t)('media.manager.share.url_copied'),
                     'linkCopied'    => ($this->t)('media.manager.share.link_copied'),
                     'shareCreated'  => ($this->t)('media.manager.share.created'),
@@ -117,6 +118,10 @@ class MediaController extends AbstractController
                     'deleteConfirm' => ($this->t)('media.manager.delete.confirm'),
                     'deleteSuccess' => ($this->t)('media.manager.delete.success'),
                     'deleteError'   => ($this->t)('media.manager.delete.error'),
+                    // mediaEdit.js
+                    'editSaved'     => ($this->t)('media.manager.edit.saved'),
+                    'editError'     => ($this->t)('media.manager.edit.error'),
+                    'saving'        => ($this->t)('media.manager.edit.saving'),
                 ],
             ]));
         }

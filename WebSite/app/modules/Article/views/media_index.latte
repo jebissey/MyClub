@@ -143,12 +143,21 @@
                                             title="{='media.manager.action.share'|translate}">
                                         <i class="bi bi-share"></i>
                                     </button>
-                                    <button type="button" class="btn btn-sm btn-danger delete-file-btn" 
+                                    <button type="button" class="btn btn-sm btn-danger delete-file-btn me-2" 
                                             data-path="{$file['path']}" 
                                             data-filename="{$file['name']}"
                                             title="{='media.manager.action.delete'|translate}">
                                         <i class="bi bi-trash"></i>
                                     </button>
+                                    {if strpos($file['name'], '.jpg') !== false || strpos($file['name'], '.jpeg') !== false || strpos($file['name'], '.png') !== false || strpos($file['name'], '.gif') !== false}
+                                    <button type="button" class="btn btn-sm btn-secondary edit-image-btn me-2"
+                                            data-url="{$file['url']}"
+                                            data-path="{$file['path']}"
+                                            data-filename="{$file['name']}"
+                                            title="{='media.manager.action.edit'|translate}">
+                                        <i class="bi bi-crop"></i>
+                                    </button>
+                                    {/if}                                    
                                 </div>
                             </td>
                         </tr>
@@ -165,14 +174,18 @@
     </div>
 </div>
 
+{include 'partials/editImageModal.latte'}
 {include 'partials/shareModal.latte'}
-
 {/block}
 
 {block scripts}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
+
 <script>
     window.i18n = {=json_encode($translations)|noescape};
     window.t = function(key) { return window.i18n?.[key] ?? key; };
 </script>
 <script type="module" src="/app/modules/Article/js/mediaShare.js"></script>
+<script type="module" src="/app/modules/Article/js/mediaEdit.js"></script>
 {/block}

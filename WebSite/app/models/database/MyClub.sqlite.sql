@@ -6118,7 +6118,13 @@ INSERT INTO "Languages" VALUES (998,'Help_Communication','<div class="container 
   </footer>
 </div>');
 INSERT INTO "Languages" VALUES (999,'communication.index.test','Send a test to myself','M''envoyer un test','Wyślij test do mnie');
-INSERT INTO "Metadata" VALUES (1,'MyClub',68,0,1000000,NULL,10,36,6,NULL,0,NULL);
+INSERT INTO "Languages" VALUES (1000,'media.manager.action.edit','Edit image','Modifier l''image','Edytuj obraz');
+INSERT INTO "Languages" VALUES (1001,'media.manager.edit.max_size','Max size','Taille max','Maks. rozmiar');
+INSERT INTO "Languages" VALUES (1002,'media.manager.edit.reset_crop','Reset','Réinitialiser','Resetuj');
+INSERT INTO "Languages" VALUES (1003,'media.manager.edit.saving','Saving…','Enregistrement…','Zapisywanie…');
+INSERT INTO "Languages" VALUES (1004,'media.manager.edit.saved','Image saved','Image enregistrée','Obraz zapisany');
+INSERT INTO "Languages" VALUES (1005,'media.manager.edit.error','Error while saving the image','Erreur lors de l''enregistrement de l''image','Błąd podczas zapisywania obrazu');
+INSERT INTO "Metadata" VALUES (1,'MyClub',69,0,1000000,NULL,10,36,6,NULL,0,NULL);
 INSERT INTO "Person" VALUES (1,'webmaster@myclub.foo','e427c26faca947919b18b797bc143a35100e4de48c34b70b26202d3a7d8e51f7','my first name','my last name','my nick name or nothing',NULL,'0',NULL,NULL,NULL,NULL,NULL,0,0,NULL,NULL,'2025-01-01',0,0,0,NULL,NULL,NULL,NULL,NULL,NULL,'');
 INSERT INTO "PersonGroup" VALUES (1,1,1);
 INSERT INTO "Settings" VALUES (1,'Title','title');

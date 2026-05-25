@@ -45,6 +45,82 @@ class MediaApi extends AbstractApi
         }
     }
 
+    public function editImage(): void
+    {
+        if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isRedactor())) {
+            $data = $this->getJsonInput();
+            $path      = $data['path']      ?? '';
+            $imageData = $data['imageData'] ?? '';  // data:image/jpeg;base64,...
+            $maxSize   = min((int)($data['maxSize'] ?? 1200), 1200);
+
+            if (!preg_match('#^[\w/-]+\.(jpg|jpeg|png|gif)$#i', $path)) {
+                $this->renderJsonError(
+                    'Invalid path',
+                    ApplicationError::Error->value,
+                    __FILE__,
+                    __LINE__
+                );
+                return;
+            }
+
+            $fullPath = MediaManager::GetMediaPath() . '/' . $path;
+            if (!file_exists($fullPath)) {
+                $this->renderJsonError(
+                    'File not found',
+                    ApplicationError::Error->value,
+                    __FILE__,
+                    __LINE__
+                );
+                return;
+            }
+
+            if (!preg_match('#^data:image/(\w+);base64,#', $imageData, $m)) {
+                $this->renderJsonError(
+                    'Invalid image data',
+                    ApplicationError::Error->value,
+                    __FILE__,
+                    __LINE__
+                );
+                return;
+            }
+            $binary = base64_decode(preg_replace('#^data:image/\w+;base64,#', '', $imageData));
+            $img    = imagecreatefromstring($binary);
+            if (!$img) {
+                $this->renderJsonError(
+                    'Cannot decode image',
+                    ApplicationError::Error->value,
+                    __FILE__,
+                    __LINE__
+                );
+                return;
+            }
+
+            // Sécurité : redimensionner côté serveur si nécessaire
+            $w = imagesx($img);
+            $h = imagesy($img);
+            if ($w > $maxSize || $h > $maxSize) {
+                $ratio  = min($maxSize / $w, $maxSize / $h);
+                $newW   = (int)round($w * $ratio);
+                $newH   = (int)round($h * $ratio);
+                $resized = imagecreatetruecolor($newW, $newH);
+                imagecopyresampled($resized, $img, 0, 0, 0, 0, $newW, $newH, $w, $h);
+                unset($img);
+                $img = $resized;
+            }
+
+            // Sauvegarder en écrasant l'original
+            $ext = strtolower(pathinfo($fullPath, PATHINFO_EXTENSION));
+            match ($ext) {
+                'png'         => imagepng($img, $fullPath, 8),
+                'gif'         => imagegif($img, $fullPath),
+                default       => imagejpeg($img, $fullPath, 92),
+            };
+            unset($img);
+
+            $this->renderJsonOk();
+        }
+    }
+
     public function isShared(): void
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isRedactor())) {
