@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace app\modules\Webmaster;
 
+use DateTime;
 use \Minishlink\WebPush\VAPID;
 
 use app\enums\FilterInputRule;
@@ -311,25 +312,37 @@ class WebmasterController extends AbstractController
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
-        $base_url = WebApp::getBaseUrl();
-        header("Content-Type: application/xml; charset=utf-8");
+        $base_url = htmlspecialchars(
+            WebApp::getBaseUrl(),
+            ENT_XML1 | ENT_QUOTES,
+            'UTF-8'
+        );
+        $articles = $this->articleDataHelper->getArticlesForAll();
+        $homepageLastmod = !empty($articles)
+            ? (new DateTime($articles[0]->LastUpdate))->format(DateTime::ATOM)
+            : (new DateTime())->format(DateTime::ATOM);
+
+        header('Content-Type: application/xml; charset=utf-8');
+
         echo '<?xml version="1.0" encoding="UTF-8"?>' . PHP_EOL;
         echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . PHP_EOL;
         echo '  <url>' . PHP_EOL;
         echo '    <loc>' . $base_url . '</loc>' . PHP_EOL;
-        echo '    <lastmod>' . $this->articleDataHelper->getLastUpdateArticles() . '</lastmod>' . PHP_EOL;
-        echo '    <changefreq>daily</changefreq>' . PHP_EOL;
-        echo '    <priority>1.0</priority>' . PHP_EOL;
+        echo '    <lastmod>' . $homepageLastmod . '</lastmod>' . PHP_EOL;
         echo '  </url>' . PHP_EOL;
 
-        foreach ($this->articleDataHelper->getArticlesForAll() as $article) {
+        foreach ($articles as $article) {
+            try {
+                $lastmod = (new DateTime($article->LastUpdate))->format(DateTime::ATOM);
+            } catch (\Exception $e) {
+                $lastmod = (new DateTime())->format(DateTime::ATOM);
+            }
             echo '  <url>' . PHP_EOL;
-            echo '    <loc>' . $base_url . '/article/' . $article->Id . '</loc>' . PHP_EOL;
-            echo '    <lastmod>' . $article->LastUpdate . '</lastmod>' . PHP_EOL;
-            echo '    <changefreq>monthly</changefreq>' . PHP_EOL;
-            echo '    <priority>0.5</priority>' . PHP_EOL;
+            echo '    <loc>' . $base_url . '/article/' . (int)$article->Id . '</loc>' . PHP_EOL;
+            echo '    <lastmod>' . $lastmod . '</lastmod>' . PHP_EOL;
             echo '  </url>' . PHP_EOL;
         }
+
         echo '</urlset>';
     }
 

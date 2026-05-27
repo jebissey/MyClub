@@ -58,9 +58,11 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
     public function getArticlesForAll(): array
     {
         $sql = "
-            SELECT Id, Title, LastUpdate
+            SELECT Id, LastUpdate
             FROM Article
-            WHERE IdGroup IS NULL AND OnlyForMembers = 0
+            WHERE IdGroup IS NULL 
+                AND OnlyForMembers = 0
+                AND PublishedBy IS NOT NULL
             ORDER BY LastUpdate DESC
         ";
         $stmt = $this->pdo->query($sql);
@@ -147,14 +149,6 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
         $stmt->execute($params);
         $article = $stmt->fetch();
         return $article ?: null;
-    }
-
-    public function getLastUpdateArticles(): ?string
-    {
-        $sql = "SELECT MAX(LastUpdate) AS LastMod FROM Article";
-        $stmt = $this->pdo->query($sql);
-        $result = $stmt->fetch();
-        return $result->LastMod ?? null;
     }
 
     public function getLatestArticles(?string $userEmail = null, int $latestArticlesCount): array

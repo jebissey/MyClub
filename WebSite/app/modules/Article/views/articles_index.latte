@@ -1,4 +1,8 @@
-{extends $layout}
+{layout '../../Common/views/layout.latte'}
+
+{block navbar}
+    {include '../../Common/views/navbar/_userLeft.latte'}
+{/block}
 
 {block title}Articles{/block}
 
@@ -107,31 +111,9 @@
         <img src="/Feed-icon.svg" alt="RSS" width="16" height="16"> S'abonner au flux RSS
     </a>
 
-    <div class="modal fade" id="publishModal" tabindex="-1" aria-labelledby="publishModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="publishModalLabel">Gérer la publication</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body" id="publishContent">
-                </div>
-            </div>
-        </div>
-    </div>
+    {include 'partials/publishModal.latte'}
+    {include 'partials/changeOwnerModal.latte'}
 
-    <div class="modal fade" id="changeOwnerModal" tabindex="-1" aria-labelledby="changeOwnerModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="changeOwnerModalLabel">Changer le propriétaire</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body" id="changeOwnerContent">
-            </div>
-        </div>
-    </div>
-</div>
 {/block}
 
 {block scripts}

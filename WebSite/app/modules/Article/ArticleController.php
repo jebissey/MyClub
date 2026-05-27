@@ -349,15 +349,15 @@ class ArticleController extends TableController
             ['field' => 'PersonName', 'label' => ($this->t)('article.label.created_by')],
             ['field' => 'Title', 'label' => ($this->t)('article.label.title')],
             ['field' => 'LastUpdate', 'label' => ($this->t)('article.label.last_update')],
-            ['field' => 'GroupName', 'label' => ($this->t)('article.label.group')],
-            ['field' => 'ForMembers', 'label' => ($this->t)('article.label.for_members')],
             ['field' => 'Pool', 'label' => ($this->t)('article.label.pool')],
             ['field' => 'PoolDetail', 'label' => ($this->t)('article.label.pool_detail')],
             ['field' => 'Messages', 'label' => ($this->t)('article.label.messages')],
+            ['field' => 'GroupName', 'label' => ($this->t)('article.label.group')],
+            ['field' => 'ForMembers', 'label' => ($this->t)('article.label.for_members')],            
         ];
         if ($connectedUser->isEditor()) {
-            $columns[] = ['field' => 'Published', 'label' => ($this->t)('article.label.published')];
             $columns[] = ['field' => 'Menu', 'label' => ($this->t)('article.label.menu')];
+            $columns[] = ['field' => 'Published', 'label' => ($this->t)('article.label.published')];
         }
         $query = $this->articleTableDataHelper->getQuery($connectedUser, (int)($this->articleDataHelper->getSpotlightArticle()['articleId'] ?? -1));
         $data = $this->prepareTableData($query, $filterValues);
@@ -370,9 +370,10 @@ class ArticleController extends TableController
             'columns' => $columns,
             'resetUrl' => '/articles',
             'userConnected' => $connectedUser->person ?? false,
-            'layout' => $this->getLayout(),
             'navItems' => $this->getNavItems($connectedUser->person ?? false),
             'page' => $connectedUser->getPage(),
+            'btn_HistoryBack' => true,
+            'btn_Parent'      => "/",
         ]));
     }
 

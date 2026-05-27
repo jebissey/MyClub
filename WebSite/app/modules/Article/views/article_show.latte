@@ -45,8 +45,10 @@
         <button id="reply-order-btn" class="btn btn-success ms-2">{='article.show.reply_order'|translate}</button>
     {/if}
     {if $isCreator}
-        <button class="btn btn-warning ms-2" onclick="window.location.href='/article/edit/{$article->Id}'">
-            <i class="bi bi-pencil"></i>
+        <button class="btn ms-2" 
+                onclick="window.location.href='/article/edit/{$article->Id}'" 
+                style="background-color: {$navbarIconColor|noescape}; border-color: {$navbarIconColor|noescape};">
+            <i class="bi bi-pencil" style="color: {$navbarInkColor|noescape};"></i>
         </button>
     {/if}
     </div>
