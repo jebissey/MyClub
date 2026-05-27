@@ -1,0 +1,17 @@
+<div id="fields-brevo" class="d-none">
+    <div class="mb-3">
+        <label class="form-label">{='emailCredentials.brevo_api_key'|translate}</label>
+        <div class="input-group">
+            <input type="password" class="form-control" id="brevoApiKey"
+                   name="brevoApiKey" value="{$brevoApiKey ?? ''}">
+            <button class="btn btn-outline-secondary" type="button" id="toggleBrevoKey">
+                <i class="bi bi-eye"></i>
+            </button>
+        </div>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">{='emailCredentials.brevo_sender'|translate}</label>
+        <input type="email" class="form-control" id="brevoSender"
+               name="brevoSender" value="{$brevoSender ?? ''}">
+    </div>
+</div>

@@ -7,7 +7,7 @@ namespace app\valueObjects;
 final readonly class SmtpConfig
 {
     public function __construct(
-        public string $method,           // 'mail' | 'smtp' | 'mailjet'
+        public string $method,           // 'mail' | 'smtp' | 'mailjet' | 'brevo'
         // SMTP / PHPMailer
         public string $host           = '',
         public string $username       = '',
@@ -19,6 +19,9 @@ final readonly class SmtpConfig
         public string $apiKey         = '',
         public string $apiSecret      = '',
         public string $senderEmail    = '',
+        // Brevo
+        public string $brevoApikey         = '',
+        public string $brevoSenderEmail    = '',        
         // Quotas
         public ?int   $dailyLimit     = null,
         public ?int   $monthlyLimit   = null,
@@ -29,6 +32,7 @@ final readonly class SmtpConfig
         return match ($this->method) {
             'smtp'    => $this->from,
             'mailjet' => $this->senderEmail,
+            'brevo'   => $this->brevoSenderEmail,
             default   => $connectedUserEmail,
         };
     }

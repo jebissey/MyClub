@@ -4,6 +4,14 @@ declare(strict_types=1);
 
 namespace app\modules\Common\services;
 
+use Brevo\Brevo;
+use Brevo\TransactionalEmails\Requests\SendTransacEmailRequest;
+use Brevo\TransactionalEmails\Types\SendTransacEmailRequestSender;
+use Brevo\TransactionalEmails\Types\SendTransacEmailRequestToItem;
+use Brevo\TransactionalEmails\Types\SendTransacEmailRequestCcItem;
+use Brevo\TransactionalEmails\Types\SendTransacEmailRequestBccItem;
+use Brevo\TransactionalEmails\Types\SendTransacEmailRequestReplyTo;
+use Brevo\Exceptions\BrevoApiException;
 use Mailjet\Client as MailjetClient;
 use Mailjet\Resources as MailjetResources;
 use PHPMailer\PHPMailer\PHPMailer;
@@ -61,6 +69,7 @@ final class EmailService
         $sent = match ($config?->method) {
             'smtp'    => $this->sendWithPHPMailer($message, $config),
             'mailjet' => $this->sendWithMailjet($message, $config),
+            'brevo'   => $this->sendWithBrevoApi($message, $config),
             default   => $this->sendWithNativeMail($message),
         };
 
@@ -202,5 +211,55 @@ final class EmailService
         }
 
         return true;
+    }
+
+    private function sendWithBrevoApi(EmailMessage $message, SmtpConfig $config): bool
+    {
+        if ($config->brevoApikey === '') {
+            throw new InvalidArgumentException('Brevo credentials are not configured (brevoApikey is empty).');
+        }
+        $senderEmail = $config->brevoSenderEmail !== '' ? $config->brevoSenderEmail : $message->from;
+        $params = [
+            'subject' => $message->subject,
+            'sender'  => new SendTransacEmailRequestSender([
+                'name'  => 'MyClub',
+                'email' => $senderEmail,
+            ]),
+            'to' => [new SendTransacEmailRequestToItem(['email' => $message->to])],
+            'trackClicks'  => false,
+            'trackOpens'   => false,
+        ];
+        if ($message->isHtml) {
+            $params['htmlContent'] = $message->body;
+            $params['textContent'] = strip_tags($message->body);
+        } else {
+            $params['textContent'] = $message->body;
+        }
+        if ($message->replyTo !== null) {
+            $params['replyTo'] = new SendTransacEmailRequestReplyTo(['email' => $message->replyTo]);
+        }
+        if ($message->cc !== []) {
+            $params['cc'] = array_map(
+                static fn($e) => new SendTransacEmailRequestCcItem(['email' => $e]),
+                $message->cc
+            );
+        }
+        if ($message->bcc !== []) {
+            $params['bcc'] = array_map(
+                static fn($e) => new SendTransacEmailRequestBccItem(['email' => $e]),
+                $message->bcc
+            );
+        }
+        try {
+            (new Brevo($config->brevoApikey))
+                ->transactionalEmails
+                ->sendTransacEmail(new SendTransacEmailRequest($params));
+            return true;
+        } catch (BrevoApiException $e) {
+            throw new EmailException(
+                sprintf('Brevo sending failed (HTTP %d): %s', $e->getCode(), $e->getMessage()),
+                previous: $e
+            );
+        }
     }
 }

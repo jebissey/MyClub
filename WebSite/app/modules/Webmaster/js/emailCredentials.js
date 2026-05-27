@@ -4,9 +4,10 @@ class EmailCredentials {
         this.select = document.getElementById('sendMethod');
 
         this.sections = {
-            mail:    { alert: 'alert-mail', fields: null },
-            smtp:    { alert: 'alert-smtp', fields: 'fields-smtp' },
+            mail: { alert: 'alert-mail', fields: null },
+            smtp: { alert: 'alert-smtp', fields: 'fields-smtp' },
             mailjet: { alert: 'alert-mailjet', fields: 'fields-mailjet' },
+            brevo: { alert: 'alert-brevo', fields: 'fields-brevo' },
         };
 
         this.smtpFields = [
@@ -23,6 +24,18 @@ class EmailCredentials {
             'mailjetApiSecret',
             'mailjetSender'
         ];
+
+        this.brevoFields = [
+            'brevoApiKey',
+            'brevoSender'
+        ];
+
+        this.limitPlaceholders = {
+            mail: { daily: '0', monthly: '0' },
+            smtp: { daily: '0', monthly: '0' },
+            mailjet: { daily: '200', monthly: '6000' },
+            brevo: { daily: '300', monthly: '9000' },
+        };
     }
 
     init() {
@@ -37,6 +50,7 @@ class EmailCredentials {
 
         this.setupPasswordToggle('togglePassword', 'smtpPassword');
         this.setupPasswordToggle('toggleSecret', 'mailjetApiSecret');
+        this.setupPasswordToggle('toggleBrevoKey', 'brevoApiKey');
     }
 
     applyMethod(method) {
@@ -58,6 +72,13 @@ class EmailCredentials {
 
         this.setRequired(this.smtpFields, method === 'smtp');
         this.setRequired(this.mailjetFields, method === 'mailjet');
+        this.setRequired(this.brevoFields, method === 'brevo');
+
+        const placeholders = this.limitPlaceholders[method] ?? { daily: '0', monthly: '0' };
+        const dailyEl = document.getElementById('dailyLimit');
+        const monthlyEl = document.getElementById('monthlyLimit');
+        if (dailyEl) dailyEl.placeholder = placeholders.daily;
+        if (monthlyEl) monthlyEl.placeholder = placeholders.monthly;
     }
 
     setRequired(fields, required) {
@@ -83,10 +104,9 @@ class EmailCredentials {
                 : 'password';
 
             if (icon) {
-                icon.className =
-                    input.type === 'password'
-                        ? 'bi bi-eye'
-                        : 'bi bi-eye-slash';
+                icon.className = input.type === 'password'
+                    ? 'bi bi-eye'
+                    : 'bi bi-eye-slash';
             }
         });
     }

@@ -8,11 +8,17 @@
         "guzzlehttp/guzzle": "^7.9",
         "minishlink/web-push": "^9.0",
         "phpmailer/phpmailer": "^7.0",
-        "mailjet/mailjet-apiv3-php": "^1.6"
+        "mailjet/mailjet-apiv3-php": "^1.6",
+        "getbrevo/brevo-php": "^4.0"
     },
     "autoload": {
         "psr-4": {
             "app\\": "app/"
+        }
+    },
+    "config": {
+        "allow-plugins": {
+            "php-http/discovery": true
         }
     }
 }

@@ -19,12 +19,4 @@
         <input type="email" class="form-control" id="mailjetSender"
                name="mailjetSender" value="{$mailjetSender ?? ''}">
     </div>
-
-    {include 'emailLimits.latte',
-        dailyLimit   => $mailjetDailyLimit   ?? 200,
-        monthlyLimit => $mailjetMonthlyLimit ?? 6000,
-        dailyId      => 'mailjetDailyLimit',
-        monthlyId    => 'mailjetMonthlyLimit',
-        dailyPlaceholder   => '200',
-        monthlyPlaceholder => '6000'}
 </div>

@@ -134,12 +134,4 @@
         {/if}
     </div>
 
-    {include 'emailLimits.latte',
-        dailyLimit   => $dailyLimit   ?? '',
-        monthlyLimit => $monthlyLimit ?? '',
-        dailyId      => 'smtpDailyLimit',
-        monthlyId    => 'smtpMonthlyLimit',
-        dailyPlaceholder   => '∞',
-        monthlyPlaceholder => '∞'}
-
 </div>

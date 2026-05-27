@@ -44,7 +44,7 @@ class WebmasterController extends AbstractController
                 'page'     => 'clubCustomization',
                 'settings' => $settings,
                 'btn_HistoryBack' => true,
-                'btn_Parent' => '/webmaster',                
+                'btn_Parent' => '/webmaster',
             ]));
         }
     }
@@ -202,7 +202,7 @@ class WebmasterController extends AbstractController
                 'page'            => $this->application->getConnectedUser()->getPage(),
                 'currentVersion'  => Application::VERSION,
                 'btn_HistoryBack' => true,
-                'btn_Parent' => '/webmaster',                
+                'btn_Parent' => '/webmaster',
             ]));
         }
     }
@@ -221,10 +221,12 @@ class WebmasterController extends AbstractController
                 'smtpEncryption'      => $this->credentials->get('smtp', 'encryption'),
                 'mailjetApiKey'       => $this->credentials->get('mailjet', 'api_key'),
                 'mailjetSender'       => $this->credentials->get('mailjet', 'sender'),
+                'brevoApiKey'         => $this->credentials->get('brevo', 'api_key'),
+                'brevoSender'         => $this->credentials->get('brevo', 'sender'),
                 'dailyLimit'          => $this->credentials->get('email', 'daily_limit'),
                 'monthlyLimit'        => $this->credentials->get('email', 'monthly_limit'),
                 'btn_HistoryBack' => true,
-                'btn_Parent' => '/webmaster',                
+                'btn_Parent' => '/webmaster',
             ]));
         }
     }
@@ -233,25 +235,28 @@ class WebmasterController extends AbstractController
     {
         if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isWebmaster(), __FILE__, __LINE__)) {
             $schema = [
-                'sendMethod'           => FilterInputRule::Text->value,
-                'smtpAccount'          => FilterInputRule::Email->value,
-                'smtpPassword'         => FilterInputRule::Password->value,
-                'smtpFrom'             => FilterInputRule::Email->value,
-                'smtpHost'             => FilterInputRule::Uri->value,
-                'smtpPort'             => FilterInputRule::Integer->value,
-                'smtpEncryption'       => FilterInputRule::Text->value,
-                'mailjetApiKey'        => FilterInputRule::Text->value,
-                'mailjetApiSecret'     => FilterInputRule::Text->value,
-                'mailjetSender'        => FilterInputRule::Email->value,
-                'smtpDailyLimit'       => FilterInputRule::Integer->value,
-                'smtpMonthlyLimit'     => FilterInputRule::Integer->value,
-                'mailjetDailyLimit'    => FilterInputRule::Integer->value,
-                'mailjetMonthlyLimit'  => FilterInputRule::Integer->value,
+                'sendMethod'       => FilterInputRule::Text->value,
+                'smtpAccount'      => FilterInputRule::Email->value,
+                'smtpPassword'     => FilterInputRule::Password->value,
+                'smtpFrom'         => FilterInputRule::Email->value,
+                'smtpHost'         => FilterInputRule::Uri->value,
+                'smtpPort'         => FilterInputRule::Integer->value,
+                'smtpEncryption'   => FilterInputRule::Text->value,
+                'mailjetApiKey'    => FilterInputRule::Text->value,
+                'mailjetApiSecret' => FilterInputRule::Text->value,
+                'mailjetSender'    => FilterInputRule::Email->value,
+                'brevoApiKey'      => FilterInputRule::Text->value,
+                'brevoSender'      => FilterInputRule::Email->value,
+                'dailyLimit'       => FilterInputRule::Integer->value,
+                'monthlyLimit'     => FilterInputRule::Integer->value,
             ];
-            $input = WebApp::filterInput($schema, $this->flight->request()->data->getData());
+            $input  = WebApp::filterInput($schema, $this->flight->request()->data->getData());
             $method = $input['sendMethod'] ?? 'smtp';
 
-            $this->credentials->set('email', 'method', $method);
+            $this->credentials->set('email', 'method',        $method);
+            $this->credentials->set('email', 'daily_limit',   (string)($input['dailyLimit']   ?? '0'));
+            $this->credentials->set('email', 'monthly_limit', (string)($input['monthlyLimit'] ?? '0'));
+
             match ($method) {
                 'smtp' => (function () use ($input) {
                     $this->credentials->set('smtp', 'username',   $input['smtpAccount']    ?? '');
@@ -262,18 +267,21 @@ class WebmasterController extends AbstractController
                     $this->credentials->set('smtp', 'host',       $input['smtpHost']       ?? '');
                     $this->credentials->set('smtp', 'port',       $input['smtpPort']       ?? '587');
                     $this->credentials->set('smtp', 'encryption', $input['smtpEncryption'] ?? 'tls');
-                    $this->credentials->set('email', 'daily_limit', (string)($input['smtpDailyLimit'] ?? "0"));
-                    $this->credentials->set('email', 'monthly_limit', (string)($input['smtpMonthlyLimit'] ?? "0"));
                 })(),
 
                 'mailjet' => (function () use ($input) {
-                    $this->credentials->set('mailjet', 'api_key', $input['mailjetApiKey']    ?? '');
+                    $this->credentials->set('mailjet', 'api_key', $input['mailjetApiKey'] ?? '');
                     if (!empty($input['mailjetApiSecret'])) {
                         $this->credentials->set('mailjet', 'api_secret', $input['mailjetApiSecret']);
                     }
-                    $this->credentials->set('mailjet', 'sender',  $input['mailjetSender']   ?? '');
-                    $this->credentials->set('email', 'daily_limit', (string)($input['mailjetDailyLimit'] ?? "0"));
-                    $this->credentials->set('email', 'monthly_limit', (string)($input['mailjetMonthlyLimit'] ?? "0"));
+                    $this->credentials->set('mailjet', 'sender', $input['mailjetSender'] ?? '');
+                })(),
+
+                'brevo' => (function () use ($input) {
+                    if (!empty($input['brevoApiKey'])) {
+                        $this->credentials->set('brevo', 'api_key', $input['brevoApiKey']);
+                    }
+                    $this->credentials->set('brevo', 'sender', $input['brevoSender'] ?? '');
                 })(),
 
                 default => null,
@@ -334,7 +342,7 @@ class WebmasterController extends AbstractController
                 'turnstileSiteKey'   => $this->credentials->get('turnstile', 'site_key'),
                 'turnstileConfigured' => !empty($this->credentials->get('turnstile', 'secret_key')),
                 'btn_HistoryBack' => true,
-                'btn_Parent' => '/webmaster',                
+                'btn_Parent' => '/webmaster',
             ]));
         }
     }

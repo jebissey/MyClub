@@ -6124,7 +6124,11 @@ INSERT INTO "Languages" VALUES (1002,'media.manager.edit.reset_crop','Reset','R�
 INSERT INTO "Languages" VALUES (1003,'media.manager.edit.saving','Saving…','Enregistrement…','Zapisywanie…');
 INSERT INTO "Languages" VALUES (1004,'media.manager.edit.saved','Image saved','Image enregistrée','Obraz zapisany');
 INSERT INTO "Languages" VALUES (1005,'media.manager.edit.error','Error while saving the image','Erreur lors de l''enregistrement de l''image','Błąd podczas zapisywania obrazu');
-INSERT INTO "Metadata" VALUES (1,'MyClub',69,0,1000000,NULL,10,36,6,NULL,0,NULL);
+INSERT INTO "Languages" VALUES (1006,'emailCredentials.method_brevo','Brevo (API)','Brevo (API)','Brevo (API)');
+INSERT INTO "Languages" VALUES (1007,'emailCredentials.info_brevo','Emails will be sent via the Brevo API.','Les emails seront envoyés via l''API Brevo.','Emaile będą wysyłane przez API Brevo.');
+INSERT INTO "Languages" VALUES (1008,'emailCredentials.brevo_api_key','API Key','Clé API','Klucz API');
+INSERT INTO "Languages" VALUES (1009,'emailCredentials.brevo_sender','Sender address','Adresse d''expédition','Adres nadawcy');
+INSERT INTO "Metadata" VALUES (1,'MyClub',70,0,1000000,NULL,10,36,6,NULL,0,NULL);
 INSERT INTO "Person" VALUES (1,'webmaster@myclub.foo','e427c26faca947919b18b797bc143a35100e4de48c34b70b26202d3a7d8e51f7','my first name','my last name','my nick name or nothing',NULL,'0',NULL,NULL,NULL,NULL,NULL,0,0,NULL,NULL,'2025-01-01',0,0,0,NULL,NULL,NULL,NULL,NULL,NULL,'');
 INSERT INTO "PersonGroup" VALUES (1,1,1);
 INSERT INTO "Settings" VALUES (1,'Title','title');

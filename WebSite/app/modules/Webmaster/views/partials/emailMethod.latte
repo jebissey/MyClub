@@ -6,6 +6,7 @@
         <option value="mail"    {if ($sendMethod ?? '') === 'mail'    }selected{/if}>{='emailCredentials.method_mail'    |translate}</option>
         <option value="smtp"    {if ($sendMethod ?? '') === 'smtp'    }selected{/if}>{='emailCredentials.method_smtp'    |translate}</option>
         <option value="mailjet" {if ($sendMethod ?? '') === 'mailjet' }selected{/if}>{='emailCredentials.method_mailjet' |translate}</option>
+        <option value="brevo"   {if ($sendMethod ?? '') === 'brevo'   }selected{/if}>{='emailCredentials.method_brevo'   |translate}</option>
     </select>
 </div>
 
@@ -20,4 +21,8 @@
 <div id="alert-mailjet" class="alert alert-success d-none" role="alert">
     <i class="bi bi-envelope-check-fill me-2"></i>
     {='emailCredentials.info_mailjet'|translate}
+</div>
+<div id="alert-brevo" class="alert alert-success d-none" role="alert">
+    <i class="bi bi-envelope-check-fill me-2"></i>
+    {='emailCredentials.info_brevo'|translate}
 </div>
