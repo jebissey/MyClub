@@ -58,12 +58,50 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
     public function getArticlesForAll(): array
     {
         $sql = "
-            SELECT Id, LastUpdate
+            SELECT
+                Id,
+                LastUpdate,
+                Title,
+                CASE
+                    WHEN Id IN (
+                        SELECT CAST(Value AS INTEGER)
+                        FROM Settings
+                        WHERE Name = 'Home_FeaturedArticleId' AND Value != '0'
+                    ) THEN 'Home_Featured'
+
+                    WHEN Id IN (
+                        SELECT CAST(Value AS INTEGER)
+                        FROM Settings
+                        WHERE Name = 'Home_FooterArticleId' AND Value != '0'
+                    ) THEN 'Home_Footer'
+
+                    WHEN Id IN (
+                        SELECT CAST(REPLACE(Url, '/menu/show/article/', '') AS INTEGER)
+                        FROM MenuItem
+                        WHERE ForAnonymous = 1
+                        AND Url LIKE '/menu/show/article/%'
+                    ) THEN 'Menu'
+
+                    ELSE 'Public'
+                END AS ReferenceSource
             FROM Article
-            WHERE IdGroup IS NULL 
-                AND OnlyForMembers = 0
-                AND PublishedBy IS NOT NULL
-            ORDER BY LastUpdate DESC
+            WHERE
+                (
+                    (IdGroup IS NULL AND OnlyForMembers = 0 AND PublishedBy IS NOT NULL)
+                    OR Id IN (
+                        SELECT CAST(REPLACE(Url, '/menu/show/article/', '') AS INTEGER)
+                        FROM MenuItem
+                        WHERE ForAnonymous = 1
+                        AND Url LIKE '/menu/show/article/%'
+                    )
+                    OR Id IN (
+                        SELECT CAST(Value AS INTEGER)
+                        FROM Settings
+                        WHERE Name IN ('Home_FeaturedArticleId', 'Home_FooterArticleId')
+                        AND Value != '0'
+                    )
+                )
+            ORDER BY LastUpdate DESC;
         ";
         $stmt = $this->pdo->query($sql);
         return $stmt->fetchAll(PDO::FETCH_OBJ);

@@ -6128,7 +6128,7 @@ INSERT INTO "Languages" VALUES (1006,'emailCredentials.method_brevo','Brevo (API
 INSERT INTO "Languages" VALUES (1007,'emailCredentials.info_brevo','Emails will be sent via the Brevo API.','Les emails seront envoyés via l''API Brevo.','Emaile będą wysyłane przez API Brevo.');
 INSERT INTO "Languages" VALUES (1008,'emailCredentials.brevo_api_key','API Key','Clé API','Klucz API');
 INSERT INTO "Languages" VALUES (1009,'emailCredentials.brevo_sender','Sender address','Adresse d''expédition','Adres nadawcy');
-INSERT INTO "Metadata" VALUES (1,'MyClub',70,0,1000000,NULL,10,36,6,NULL,0,NULL);
+INSERT INTO "Metadata" VALUES (1,'MyClub',71,0,1000000,NULL,10,36,6,NULL,0,NULL);
 INSERT INTO "Person" VALUES (1,'webmaster@myclub.foo','e427c26faca947919b18b797bc143a35100e4de48c34b70b26202d3a7d8e51f7','my first name','my last name','my nick name or nothing',NULL,'0',NULL,NULL,NULL,NULL,NULL,0,0,NULL,NULL,'2025-01-01',0,0,0,NULL,NULL,NULL,NULL,NULL,NULL,'');
 INSERT INTO "PersonGroup" VALUES (1,1,1);
 INSERT INTO "Settings" VALUES (1,'Title','title');
@@ -6224,4 +6224,49 @@ CREATE VIEW exercise_list_view AS
             FROM Exercise
             INNER JOIN Person ON Exercise.CreatedBy = Person.Id           
             LEFT JOIN 'Group' ON 'Group'.Id = Exercise.IdGroup;
+CREATE VIEW public_article_list_view AS            
+			SELECT
+                Id,
+                LastUpdate,
+                Title,
+                CASE
+                    WHEN Id IN (
+                        SELECT CAST(Value AS INTEGER)
+                        FROM Settings
+                        WHERE Name = 'Home_FeaturedArticleId' AND Value != '0'
+                    ) THEN 'Home_Featured'
+
+                    WHEN Id IN (
+                        SELECT CAST(Value AS INTEGER)
+                        FROM Settings
+                        WHERE Name = 'Home_FooterArticleId' AND Value != '0'
+                    ) THEN 'Home_Footer'
+
+                    WHEN Id IN (
+                        SELECT CAST(REPLACE(Url, '/menu/show/article/', '') AS INTEGER)
+                        FROM MenuItem
+                        WHERE ForAnonymous = 1
+                        AND Url LIKE '/menu/show/article/%'
+                    ) THEN 'Menu'
+
+                    ELSE 'Public'
+                END AS ReferenceSource
+            FROM Article
+            WHERE
+                (
+                    (IdGroup IS NULL AND OnlyForMembers = 0 AND PublishedBy IS NOT NULL)
+                    OR Id IN (
+                        SELECT CAST(REPLACE(Url, '/menu/show/article/', '') AS INTEGER)
+                        FROM MenuItem
+                        WHERE ForAnonymous = 1
+                        AND Url LIKE '/menu/show/article/%'
+                    )
+                    OR Id IN (
+                        SELECT CAST(Value AS INTEGER)
+                        FROM Settings
+                        WHERE Name IN ('Home_FeaturedArticleId', 'Home_FooterArticleId')
+                        AND Value != '0'
+                    )
+                )
+            ORDER BY LastUpdate DESC;
 COMMIT;

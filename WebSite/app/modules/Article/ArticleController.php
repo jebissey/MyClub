@@ -353,7 +353,7 @@ class ArticleController extends TableController
             ['field' => 'PoolDetail', 'label' => ($this->t)('article.label.pool_detail')],
             ['field' => 'Messages', 'label' => ($this->t)('article.label.messages')],
             ['field' => 'GroupName', 'label' => ($this->t)('article.label.group')],
-            ['field' => 'ForMembers', 'label' => ($this->t)('article.label.for_members')],            
+            ['field' => 'ForMembers', 'label' => ($this->t)('article.label.for_members')],
         ];
         if ($connectedUser->isEditor()) {
             $columns[] = ['field' => 'Menu', 'label' => ($this->t)('article.label.menu')];
@@ -362,6 +362,46 @@ class ArticleController extends TableController
         $query = $this->articleTableDataHelper->getQuery($connectedUser, (int)($this->articleDataHelper->getSpotlightArticle()['articleId'] ?? -1));
         $data = $this->prepareTableData($query, $filterValues);
         $this->render('Article/views/articles_index.latte', $this->getAllParams([
+            'articles' => $data['items'],
+            'currentPage' => $data['currentPage'],
+            'totalPages' => $data['totalPages'],
+            'filterValues' => $filterValues,
+            'filters' => $filterConfig,
+            'columns' => $columns,
+            'resetUrl' => '/articles',
+            'userConnected' => $connectedUser->person ?? false,
+            'navItems' => $this->getNavItems($connectedUser->person ?? false),
+            'page' => $connectedUser->getPage(),
+            'btn_HistoryBack' => true,
+            'btn_Parent'      => "/",
+        ]));
+    }
+
+    public function publicIndex(): void
+    {
+        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isEditor(), __FILE__, __LINE__)) {
+            return;
+        }
+        $connectedUser = $this->application->getConnectedUser();
+        $schema = [
+            'title'      => FilterInputRule::Content->value,
+            'lastUpdate' => FilterInputRule::DateTime->value,
+            'Id'         => FilterInputRule::Int->value,
+        ];
+        $filterValues = WebApp::filterInput($schema, $this->flight->request()->query->getData());
+        $filterConfig = [
+            ['name' => 'title', 'label' => ($this->t)('article.label.title')],
+            ['name' => 'lastUpdate', 'label' => ($this->t)('article.label.last_update')],
+            ['name' => 'Id', 'label' => 'ID'],
+        ];
+        $columns = [
+            ['field' => 'Title', 'label' => ($this->t)('article.label.title')],
+            ['field' => 'LastUpdate', 'label' => ($this->t)('article.label.last_update')],
+            ['field' => 'ReferenceSource', 'label' => ($this->t)('article.label.reference_source')],
+        ];
+        $query = $this->articleTableDataHelper->getQueryForPublicArticles();
+        $data = $this->prepareTableData($query, $filterValues);
+        $this->render('Article/views/publicArticles_index.latte', $this->getAllParams([
             'articles' => $data['items'],
             'currentPage' => $data['currentPage'],
             'totalPages' => $data['totalPages'],

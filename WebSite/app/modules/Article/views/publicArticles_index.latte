@@ -1,0 +1,28 @@
+{layout '../../Common/views/layout.latte'}
+
+{block navbar}
+    {include '../../Common/views/navbar/_userLeft.latte'}
+    <div class="text-center w-100" style="color: var(--navbar-ink);">
+        <h3>⚖️ Tous ces articles sont visibles par tous les visiteurs ⚖️</h3>
+    </div>
+{/block}
+
+{block content}
+
+    {include '../../Common/views/dataTable.latte',
+        'items' => $articles,
+        'actions' => [
+            [
+                'type' => 'link',
+                'label' => 'bi bi-eye',
+                'url' => '/article/{id}',
+                'class' => 'btn-success'
+            ]
+        ]
+    }
+
+{/block}
+
+{block scripts}
+    <script src="/app/modules/Article/js/articles.js"></script>
+{/block}

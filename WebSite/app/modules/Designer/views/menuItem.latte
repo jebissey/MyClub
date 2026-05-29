@@ -1,7 +1,7 @@
 {layout '../../Common/views/layout.latte'}
 
 {block navbar}
-    {include '../../Webmaster/views/navbar/designer.latte'}
+    {include '../../Common/views/navbar/_userLeft.latte'}
 {/block}
 
 {block head}
@@ -11,6 +11,15 @@
         }
         #navList tr:active, #sidebarList tr:active {
             cursor: grabbing;
+        }
+        #navbarPreviewContainer {
+            background-color: color-mix(in srgb, {$navbarBgColor|noescape} 55%, transparent);
+            --bs-navbar-color:     {$navbarInkColor|noescape};
+            --bs-nav-link-color:   {$navbarInkColor|noescape};
+        }
+        #navbarPreviewContainer .nav-link {
+            color: {$navbarInkColor|noescape};
+            padding: 0.25rem 0.75rem;
         }
     </style>
 {/block}
@@ -56,10 +65,10 @@
                             </div>
                         </div>
                     </div>
-                    <div class="card-body p-0">
-                        <nav class="navbar navbar-expand bg-light px-3 py-1">
-                            <ul class="navbar-nav flex-wrap" id="navbarPreview"></ul>
-                        </nav>
+                    <div class="card-body p-0" id="navbarPreviewContainer">
+                        <div class="d-flex flex-wrap align-items-center px-3 py-1">
+                            <ul class="navbar-nav flex-wrap flex-row" id="navbarPreview"></ul>
+                        </div>
                     </div>
                 </div>
 

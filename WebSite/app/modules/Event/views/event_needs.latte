@@ -96,88 +96,10 @@
         </div>
     </div>
 
-    <div class="modal fade" id="addNeedTypeModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="needTypeModalTitle">Ajouter un type de besoin</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="needTypeForm">
-                        <input type="hidden" id="needTypeId" name="id">
-                        <div class="mb-3">
-                            <label for="needTypeName" class="form-label">Nom</label>
-                            <input type="text" class="form-control" id="needTypeName" name="name" required>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                    <button type="button" class="btn btn-primary" id="saveNeedType">Enregistrer</button>
-                </div>
-            </div>
-        </div>
-    </div>
+{include 'partials/addNeedTypeModal.latte'}
+{include 'partials/addNeedModal.latte'}
+{include 'partials/deleteConfirmModal.latte'}
 
-    <div class="modal fade" id="addNeedModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="needModalTitle">Ajouter un besoin</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="needForm">
-                        <input type="hidden" id="needId" name="id">
-                        <div class="mb-3">
-                            <label for="needType" class="form-label">Type</label>
-                            <select class="form-select" id="needType" name="idNeedType" required>
-                                <option value="">Sélectionnez un type</option>
-                                {foreach $needTypes as $type}
-                                <option value="{$type->Id}">{$type->Name}</option>
-                                {/foreach}
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label for="needLabel" class="form-label">Label</label>
-                            <input type="text" class="form-control" id="needLabel" name="label" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="needName" class="form-label">Nom</label>
-                            <input type="text" class="form-control" id="needName" name="name" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="needParticipantDependent" class="form-label">En fonction du nombre de participants</label>
-                            <input class="form-check-input" type="checkbox" id="needParticipantDependent" name="participantDependent" value="1">
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                    <button type="button" class="btn btn-primary" id="saveNeed">Enregistrer</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Confirmer la suppression</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <p id="deleteConfirmMessage">Êtes-vous sûr de vouloir supprimer cet élément ?</p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                    <button type="button" class="btn btn-danger" id="confirmDelete">Supprimer</button>
-                </div>
-            </div>
-        </div>
-    </div>
 {/block}
 
 {block scripts}

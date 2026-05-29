@@ -42,4 +42,13 @@ class ArticleTableDataHelper extends Data
         $query = $query->orderBy('LastUpdate DESC');
         return $query;
     }
+
+    public function getQueryForPublicArticles(): Select
+    {
+        $query = $this->fluent->from('public_article_list_view')
+            ->select(null)
+            ->select('Id, Title, LastUpdate, ReferenceSource');
+        $query = $query->orderBy('LastUpdate DESC');
+        return $query;
+    }
 }

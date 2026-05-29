@@ -79,7 +79,7 @@ class MenuItemController extends AbstractController
                     'col_parent'              => ($this->t)('menu.col_parent'),
                 ],
                 'btn_HistoryBack' => true,
-                'btn_Parent'      => "/designer",                
+                'btn_Parent'      => "/designer",
             ]));
         }
     }
