@@ -3,7 +3,7 @@
 {block navbar}
     {include '../../Common/views/navbar/_userLeft.latte'}
     <div class="text-center w-100" style="color: var(--navbar-ink);">
-        <h3>⚖️ Tous ces articles sont visibles par tous les visiteurs ⚖️</h3>
+        {='redactor.public_articles.page_title'|translate|noescape}
     </div>
 {/block}
 

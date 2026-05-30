@@ -67,7 +67,7 @@ class RegistrationController extends TableController
         }
     }
 
-    public function getPersonGroups(string $personId)
+    public function getPersonGroups(int $personId)
     {
         $personId = (int)$personId;
         
