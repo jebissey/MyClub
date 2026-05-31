@@ -492,7 +492,7 @@ class EventDataHelper extends Data implements NewsProviderInterface
         }
     }
 
-    public function updateUserSupply($eventId, $userEmail, $needId, $supply): bool
+    public function updateUserSupply(int $eventId, string $userEmail, int $needId, int $supply): bool
     {
         try {
             $participant = $this->fluent->from('Participant part')
@@ -600,7 +600,7 @@ class EventDataHelper extends Data implements NewsProviderInterface
         }, $events);
     }
 
-    private function getEventMessagesCount($eventId, $from)
+    private function getEventMessagesCount(int $eventId, string $from)
     {
         $sql = 'SELECT COUNT(Id) FROM Message m WHERE m.EventId = :eventId AND m."From" = :from';
         $stmt = $this->pdo->prepare($sql);

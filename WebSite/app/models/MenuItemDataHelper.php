@@ -146,7 +146,7 @@ class MenuItemDataHelper extends Data
     public function updates(array $positions): void
     {
         foreach ($positions as $id => $position) {
-            $this->set('SidebarItem', ['Position' => $position], ['Id' => $id]);
+            $this->set('MenuItem', ['Position' => $position], ['Id' => $id]);
         }
     }
 

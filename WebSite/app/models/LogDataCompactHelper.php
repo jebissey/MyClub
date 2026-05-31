@@ -124,7 +124,7 @@ class LogDataCompactHelper extends Data
             ");
         }
         $countAfter = (int)$this->pdoForLog->query("SELECT COUNT(*) FROM Log")->fetchColumn();
-        if ($countAfter != $countBefore) {
+        if ($countAfter < $countBefore) {
             (new LogDataWriterHelper($this->application))->add((string)ApplicationError::Ok->value, "Compact log from $countBefore to $countAfter");
         }
     }

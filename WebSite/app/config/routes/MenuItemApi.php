@@ -21,7 +21,7 @@ class MenuItemApi implements RouteInterface
         $this->routes[] = new Route('POST /api/menuItem/delete/@id:[0-9]+', $menuItemApi, 'deleteMenuItem');
         $this->routes[] = new Route('GET  /api/menuItem/get/@id:[0-9]+', $menuItemApi, 'getMenuItem');
         $this->routes[] = new Route('POST /api/menuItem/save', $menuItemApi, 'saveMenuItem');
-        $this->routes[] = new Route('POST /api/menuItem/updatePositions', $menuItemApi, 'updateMenuPositions');
+        $this->routes[] = new Route('POST /api/menuItem/updatePositions', $menuItemApi, 'updatePositions');
 
         return $this->routes;
     }

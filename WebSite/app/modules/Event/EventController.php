@@ -49,7 +49,7 @@ class EventController extends AbstractController
             $offset = 0;
             $mode = EventSearchMode::Next->value;
         }
-        $filterByPreferences = (($input['filterByPreferences'] ?? null) === '1');
+        $filterByPreferences = (($input['filterByPreferences'] ?? null) === 1);
         $connectedUser = $this->application->getConnectedUser();
 
         $this->render('Event/views/nextEvents.latte', $this->getAllParams([

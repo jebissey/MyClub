@@ -101,7 +101,7 @@ export default class SupplyController {
                     throw new Error(data.message || 'Erreur serveur');
                 }
 
-                updateUI(needId, data.updatedNeed);
+                updateUI(needId, data.data?.updatedNeed);
                 input.dataset.originalValue = supply;
                 button.style.display = 'none';
 
