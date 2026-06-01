@@ -90,16 +90,17 @@
                     </thead>
                     <tbody>
                         {foreach $files as $file}
+                            {var $name = strtolower($file['name'])}
                         <tr>
                             <td>
-                            {if strpos($file['name'], '.jpg') !== false || strpos($file['name'], '.jpeg') !== false || strpos($file['name'], '.png') !== false || strpos($file['name'], '.gif') !== false}
+                            {if strpos($name, '.jpg') !== false || strpos($name, '.jpeg') !== false || strpos($name, '.png') !== false || strpos($name, '.gif') !== false}
                                 <img src="{$file['url']}" class="img-thumbnail" style="max-height: 50px; max-width: 100px;">
-                            {elseif strpos($file['name'], '.mp4') !== false || strpos($file['name'], '.webm') !== false || strpos($file['name'], '.ogg') !== false || strpos($file['name'], '.mov') !== false}
+                            {elseif strpos($name, '.mp4') !== false || strpos($name, '.webm') !== false || strpos($name, '.ogg') !== false || strpos($name, '.mov') !== false}
                                 <video controls preload="metadata" style="max-height: 60px; max-width: 100px; border-radius: 6px;">
-                                    <source src="{$file['url']}" type="video/{if strpos($file['name'], '.mp4') !== false}mp4{elseif strpos($file['name'], '.webm') !== false}webm{elseif strpos($file['name'], '.ogg') !== false}ogg{elseif strpos($file['name'], '.mov') !== false}quicktime{/if}">
+                                    <source src="{$file['url']}" type="video/{if strpos($name, '.mp4') !== false}mp4{elseif strpos($name, '.webm') !== false}webm{elseif strpos($name, '.ogg') !== false}ogg{elseif strpos($name, '.mov') !== false}quicktime{/if}">
                                     {='media.manager.video_unsupported'|translate}
                                 </video>
-                            {elseif strpos($file['name'], '.mp3') !== false || strpos($file['name'], '.wav') !== false || strpos($file['name'], '.ogg') !== false || strpos($file['name'], '.m4a') !== false || strpos($file['name'], '.flac') !== false}
+                            {elseif strpos($name, '.mp3') !== false || strpos($name, '.wav') !== false || strpos($name, '.ogg') !== false || strpos($name, '.m4a') !== false || strpos($name, '.flac') !== false}
                                 <i class="bi bi-music-note-beamed text-primary" style="font-size: 2rem;"></i>
                             {else}
                                 <i class="bi bi-file-earmark text-secondary" style="font-size: 2rem;"></i>
@@ -107,10 +108,10 @@
                             </td>
                             <td>
                                 {$file['name']}
-                                {if strpos($file['name'], '.mp3') !== false || strpos($file['name'], '.wav') !== false || strpos($file['name'], '.ogg') !== false || strpos($file['name'], '.m4a') !== false || strpos($file['name'], '.flac') !== false}
+                                {if strpos($name, '.mp3') !== false || strpos($name, '.wav') !== false || strpos($name, '.ogg') !== false || strpos($name, '.m4a') !== false || strpos($name, '.flac') !== false}
                                     <div class="mt-2">
                                         <audio controls preload="metadata" style="max-width: 100%; height: 32px;">
-                                            <source src="{$file['url']}" type="audio/{if strpos($file['name'], '.mp3') !== false}mpeg{elseif strpos($file['name'], '.ogg') !== false}ogg{elseif strpos($file['name'], '.wav') !== false}wav{elseif strpos($file['name'], '.m4a') !== false}mp4{elseif strpos($file['name'], '.flac') !== false}flac{/if}">
+                                            <source src="{$file['url']}" type="audio/{if strpos($name, '.mp3') !== false}mpeg{elseif strpos($name, '.ogg') !== false}ogg{elseif strpos($name, '.wav') !== false}wav{elseif strpos($name, '.m4a') !== false}mp4{elseif strpos($name, '.flac') !== false}flac{/if}">
                                             {='media.manager.audio_unsupported'|translate}
                                         </audio>
                                     </div>
@@ -123,7 +124,7 @@
                             <td>{if $file['shared']}{='media.manager.table.yes'|translate}{/if}</td>
                             <td>
                                 <div class="btn-group" role="group">
-                                {if strpos($file['name'], '.gpx') !== false}
+                                {if strpos($name, '.gpx') !== false}
                                     <a href="/media/gpxViewer?file={$file['url']}" target="_blank" class="btn btn-sm btn-success me-2" title="{='media.manager.action.view_map'|translate}">
                                         <i class="bi bi-map"></i>
                                     </a>
@@ -133,7 +134,7 @@
                                     </a>
                                 {/if}
                                     <button type="button" class="btn btn-sm btn-warning copy-url-btn me-2" 
-                                            data-url="{if strpos($file['name'], '.gpx') !== false}/media/gpxViewer?file={/if}{$file['url']}"
+                                            data-url="{if strpos($name, '.gpx') !== false}/media/gpxViewer?file={/if}{$file['url']}"
                                             title="{='media.manager.action.copy_url'|translate}">
                                         <i class="bi bi-clipboard"></i>
                                     </button>
@@ -149,7 +150,7 @@
                                             title="{='media.manager.action.delete'|translate}">
                                         <i class="bi bi-trash"></i>
                                     </button>
-                                    {if strpos($file['name'], '.jpg') !== false || strpos($file['name'], '.jpeg') !== false || strpos($file['name'], '.png') !== false || strpos($file['name'], '.gif') !== false}
+                                    {if strpos($name, '.jpg') !== false || strpos($name, '.jpeg') !== false || strpos($name, '.png') !== false || strpos($name, '.gif') !== false}
                                     <button type="button" class="btn btn-sm btn-secondary edit-image-btn me-2"
                                             data-url="{$file['url']}"
                                             data-path="{$file['path']}"
