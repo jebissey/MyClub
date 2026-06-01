@@ -6144,7 +6144,12 @@ INSERT INTO "Languages" VALUES (1022,'event.needs_validate','Validate','Valider'
 INSERT INTO "Languages" VALUES (1023,'event.needs_register_to_contribute','Register to contribute','Inscrivez-vous pour contribuer','Zapisz się, aby wnieść wkład');
 INSERT INTO "Languages" VALUES (1024,'event.participant_supplies','Participant contributions','Apports des participants','Wkłady uczestników');
 INSERT INTO "Languages" VALUES (1025,'event.show_supplies','Show contributions','Afficher les apports','Pokaż wkłady');
-INSERT INTO "Metadata" VALUES (1,'MyClub',72,0,1000000,NULL,10,36,6,NULL,0,NULL);
+INSERT INTO "Languages" VALUES (1026,'media.upload.title','Media file upload','Upload de fichiers médias','Przesyłanie plików multimedialnych');
+INSERT INTO "Languages" VALUES (1027,'media.upload.select_file','Select a file','Sélectionner un fichier','Wybierz plik');
+INSERT INTO "Languages" VALUES (1028,'media.upload.success_title','Files uploaded successfully','Fichiers uploadés avec succès','Pliki przesłane pomyślnie');
+INSERT INTO "Languages" VALUES (1029,'media.upload.col_name','Name','Nom','Nazwa');
+INSERT INTO "Languages" VALUES (1030,'media.upload.col_url','URL','URL','URL');
+INSERT INTO "Metadata" VALUES (1,'MyClub',73,0,1000000,NULL,10,36,6,NULL,0,NULL);
 INSERT INTO "Person" VALUES (1,'webmaster@myclub.foo','e427c26faca947919b18b797bc143a35100e4de48c34b70b26202d3a7d8e51f7','my first name','my last name','my nick name or nothing',NULL,'0',NULL,NULL,NULL,NULL,NULL,0,0,NULL,NULL,'2025-01-01',0,0,0,NULL,NULL,NULL,NULL,NULL,NULL,'');
 INSERT INTO "PersonGroup" VALUES (1,1,1);
 INSERT INTO "Settings" VALUES (1,'Title','title');

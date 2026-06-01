@@ -189,22 +189,31 @@ class MediaApi extends AbstractApi
                 $this->renderJson(['message' => 'Aucun fichier sélectionné'], false, ApplicationError::Ok->value);
                 return;
             }
-            $file = $_FILES['file'];
-            if ($file['error'] !== UPLOAD_ERR_OK) {
-                $response = ['message' => "Erreur lors de l'upload: " . $this->getUploadErrorMessage($file['error'])];
-                $this->renderJsonOk($response);
-                return;
+            $raw = $_FILES['file'];
+            if (is_array($raw['name'])) {
+                $files = array_map(fn($i) => [
+                    'name'     => $raw['name'][$i],
+                    'tmp_name' => $raw['tmp_name'][$i],
+                    'error'    => $raw['error'][$i],
+                    'size'     => $raw['size'][$i],
+                    'type'     => $raw['type'][$i],
+                ], array_keys($raw['name']));
+            } else {
+                $files = [$raw];
             }
+
+            foreach ($files as $file) {
+                if ($file['error'] !== UPLOAD_ERR_OK) {
+                    $this->renderJsonOk(['message' => "Erreur lors de l'upload: " . $this->getUploadErrorMessage($file['error'])]);
+                    return;
+                }
+            }
+
             try {
-                $data = $this->mediaManager->uploadFile($file);
-                $this->renderJsonOk($data, 'Fichier uploadé avec succès');
+                $uploaded = array_map(fn($file) => $this->mediaManager->uploadFile($file), $files);
+                $this->renderJsonOk(['files' => array_column($uploaded, 'file')], 'Fichier(s) uploadé(s) avec succès');
             } catch (Throwable $e) {
-                $this->renderJson(
-                    [],
-                    false,
-                    ApplicationError::Error->value,
-                    $e->getMessage()
-                );
+                $this->renderJson([], false, ApplicationError::Error->value, $e->getMessage());
             }
         }
     }
