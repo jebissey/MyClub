@@ -75,13 +75,11 @@ class WebmasterController extends AbstractController
     public function helpAdmin(): void
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isAdministrator(), __FILE__, __LINE__)) {
+            $lang = TranslationManager::getCurrentLanguage();
             $this->render('Common/views/info.latte', $this->getAllParams([
-                'content'          => ($this->t)('Help_Admin'),
-                'hasAuthorization' => $this->application->getConnectedUser()->isAdministrator(),
-                'currentVersion'   => Application::VERSION,
-                'timer'            => 0,
-                'previousPage'     => true,
-                'page'             => $this->application->getConnectedUser()->getPage()
+                'content' => $this->dataHelper->get('Languages', ['Name' => 'Help_Admin'], $lang)->$lang ?? '',
+                'timer' => 0,
+                'btn_HistoryBack' => true,
             ]));
         }
     }

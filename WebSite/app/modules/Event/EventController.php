@@ -35,6 +35,26 @@ class EventController extends AbstractController
         parent::__construct($application);
     }
 
+    public function nextEvents_help(): void
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+            return;
+        }
+        $lang = TranslationManager::getCurrentLanguage();
+        if ($this->application->getConnectedUser()->isEventManager() ?? false) {
+            $content = $this->dataHelper->get('Languages', ['Name' => 'Help_NextEvents_EventManager'], $lang)->$lang ?? '';
+        } else {
+            $content = $this->dataHelper->get('Languages', ['Name' => 'Help_NextEvents'], $lang)->$lang ?? '';
+        }
+
+        $this->render('Common/views/info.latte', $this->getAllParams([
+            'content' => $content,
+            'timer' => 0,
+            'btn_HistoryBack' => true,
+        ]));
+    }
+
     public function nextEvents(): void
     {
         $schema = [
@@ -53,7 +73,6 @@ class EventController extends AbstractController
         $connectedUser = $this->application->getConnectedUser();
 
         $this->render('Event/views/nextEvents.latte', $this->getAllParams([
-            'navItems' => $this->getNavItems($connectedUser->person ?? false),
             'events' => $this->eventDataHelper->getEvents($connectedUser->person, $mode, (int)$offset, $filterByPreferences),
             'person' => $connectedUser->person,
             'eventTypes' => $this->dataHelper->gets('EventType', ['Inactivated' => 0], 'Id, Name'),
@@ -62,7 +81,6 @@ class EventController extends AbstractController
             'offset' => $offset,
             'mode' => $mode,
             'filterByPreferences' => $filterByPreferences,
-            'layout' => $this->getLayout(),
             'page' => $connectedUser->getPage(),
             'duplicateModeToday' => Period::Today->value,
             'duplicateModeTomorrow' => Period::Tomorrow->value,
@@ -104,6 +122,7 @@ class EventController extends AbstractController
                 'title' => "Animateurs vs type d'événement",
                 'totalLabels' => ['événements', 'participants'],
                 'page' => $this->application->getConnectedUser()->getPage(1),
+                'btn_HistoryBack' => true,
             ]));
         }
     }
@@ -249,11 +268,8 @@ class EventController extends AbstractController
             $lang = TranslationManager::getCurrentLanguage();
             $this->render('Common/views/info.latte', $this->getAllParams([
                 'content' => $this->dataHelper->get('Languages', ['Name' => 'Help_EventManager'], $lang)->$lang ?? '',
-                'hasAuthorization' => $this->application->getConnectedUser()->hasAutorization() ?? false,
-                'currentVersion' => Application::VERSION,
                 'timer' => 0,
-                'previousPage' => true,
-                'page' => $this->application->getConnectedUser()->getPage(),
+                'btn_HistoryBack' => true,
             ]));
         }
     }

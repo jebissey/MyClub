@@ -50,7 +50,7 @@ class ErrorManager
         if ($result === '') {
             if ($displayCode) $result .= "<h1>{$code->value}</h1>";
             $result .= "<h2>$message</h2>";
-        } else $timeout = max($code === ApplicationError::Error ? 30000 : 5000, $timeout);
+        } else $timeout = max($code === ApplicationError::Error ? 10000 : 5000, $timeout);
         if ($code == ApplicationError::ServiceUnavailable && $isWebmaster) {
             $result = str_replace(
                 '<a href="/" class="btn btn-primary mt-3">Retourner à l’accueil maintenant</a>',
@@ -63,11 +63,9 @@ class ErrorManager
         $this->application->getFlight()->response()->status($code->value);
         $this->emptyController->render('Common/views/info.latte', [
             'content' => $result,
-            'hasAuthorization' => $this->application->getConnectedUser()->hasAutorization() ?? false,
-            'currentVersion' => Application::VERSION,
+            'btn_HistoryBack' => true,
+            'previousPage' => true,
             'timer' => $timeout,
-            'previousPage' => false,
-            'page' => $this->application->getConnectedUser()->getPage(),
             'navbarBgColor'   => $defaultColors['navbarBgColor'],
             'navbarInkColor'  => $defaultColors['navbarInkColor'],
             'navbarIconColor' => $defaultColors['navbarIconColor'],

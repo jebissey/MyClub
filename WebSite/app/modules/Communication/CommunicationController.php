@@ -49,15 +49,13 @@ class CommunicationController extends AbstractController
 
     public function helpCommunication(): void
     {
-        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
-            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
-            return;
+        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isCommunicationManager(), __FILE__, __LINE__)) {
+            $lang = TranslationManager::getCurrentLanguage();
+            $this->render('Common/views/info.latte', $this->getAllParams([
+                'content' => $this->dataHelper->get('Languages', ['Name' => 'Help_Communication'], $lang)->$lang ?? '',
+                'timer' => 0,
+                'btn_HistoryBack' => true,
+            ]));
         }
-        $lang = TranslationManager::getCurrentLanguage();
-        $this->render('Common/views/info.latte', $this->getAllParams([
-            'content' => $this->dataHelper->get('Languages', ['Name' => 'Help_Communication'], $lang)->$lang ?? '',
-            'timer' => 0,
-            'btn_HistoryBack' => true,
-        ]));
     }
 }

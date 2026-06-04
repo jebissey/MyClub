@@ -22,11 +22,8 @@ class DesignerController extends AbstractController
             $lang = TranslationManager::getCurrentLanguage();
             $this->render('Common/views/info.latte', $this->getAllParams([
                 'content' => $this->dataHelper->get('Languages', ['Name' => 'Help_Designer'], $lang)->$lang ?? '',
-                'hasAuthorization' => $this->application->getConnectedUser()->isDesigner() ?? false,
-                'currentVersion' => Application::VERSION,
                 'timer' => 0,
-                'previousPage' => true,
-                'page' => $this->application->getConnectedUser()->getPage()
+                'btn_HistoryBack' => true,
             ]));
         }
     }

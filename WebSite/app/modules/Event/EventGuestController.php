@@ -43,6 +43,7 @@ class EventGuestController extends AbstractController
             'messageType' => $type,
             'page' => $connectedUser->getPage(1),
             'navItems' => $this->getNavItems($connectedUser->person ?? false),
+            'btn_HistoryBack' => true,
         ]));
     }
 

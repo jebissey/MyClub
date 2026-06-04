@@ -274,7 +274,7 @@ class ArticleController extends TableController
             cc: $filteredEmails
         );
         if ($this->emailService->send($emailMessage)) {
-            MessageService::set(($this->t)('article.success.email_sent') . " ({count($filteredEmails)})");
+            MessageService::set(($this->t)('article.success.email_sent') . ' (' . count($filteredEmails) . ')');
         } else {
             MessageService::set(($this->t)('article.error.email_failed'), 'danger');
         }
@@ -284,36 +284,25 @@ class ArticleController extends TableController
 
     public function help(): void
     {
-        if (!($this->application->getConnectedUser()->isRedactor() ?? false)) {
-            $this->raiseForbidden(__FILE__, __LINE__);
-            return;
+        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isRedactor(), __FILE__, __LINE__)) {
+            $lang = TranslationManager::getCurrentLanguage();
+            $this->render('Common/views/info.latte', $this->getAllParams([
+                'content' => $this->dataHelper->get('Languages', ['Name' => 'Help_Redactor'], $lang)->$lang ?? '',
+                'timer' => 0,
+                'btn_HistoryBack' => true,
+            ]));
         }
-        $lang = TranslationManager::getCurrentLanguage();
-        $this->render('Common/views/info.latte', $this->getAllParams([
-            'content' => $this->dataHelper->get('Languages', ['Name' => 'Help_Redactor'], $lang)->$lang ?? '',
-            'hasAuthorization' => $this->application->getConnectedUser()->isRedactor() ?? false,
-            'currentVersion' => Application::VERSION,
-            'timer' => 0,
-            'previousPage' => true,
-            'page' => $this->application->getConnectedUser()->getPage(),
-        ]));
     }
 
     public function home(): void
     {
-        if (!($this->application->getConnectedUser()->isRedactor() ?? false)) {
-            $this->raiseForbidden(__FILE__, __LINE__);
-            return;
+        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isRedactor(), __FILE__, __LINE__)) {
+            $_SESSION['navbar'] = 'redactor';
+            $this->render('Article/views/redactor.latte', $this->getAllParams([
+                'page' => $this->application->getConnectedUser()->getPage(),
+                'content' => ($this->t)('Redactor')
+            ]));
         }
-        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
-            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
-        $_SESSION['navbar'] = 'redactor';
-        $this->render('Article/views/redactor.latte', $this->getAllParams([
-            'page' => $this->application->getConnectedUser()->getPage(),
-            'content' => ($this->t)('Redactor')
-        ]));
     }
 
     public function index(): void

@@ -29,6 +29,11 @@ class Event implements RouteInterface
         $this->routes[] = new Route('GET  /nextEvents', $eventController, 'nextEvents');
         $this->routes[] = new Route('GET  /weekEvents', $eventController, 'weekEvents');
 
+        $this->routes[] = new Route('GET  /nextEvents/help', $eventController, 'nextEvents_help');
+        $this->routes[] = new Route('GET  /events/events/guest/help', $eventController, 'events_guest_help');
+        $this->routes[] = new Route('GET  /emails/help', $eventController, 'emails_help');
+        $this->routes[] = new Route('GET  /events/events/crossTab/help', $eventController, 'events_crossTab_help');
+
         return $this->routes;
     }
 }

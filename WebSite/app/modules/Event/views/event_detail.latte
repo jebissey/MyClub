@@ -36,7 +36,11 @@
 {/block}
 
 {block navbar}
-    {include '../../Common/views/navbar/home.latte'}
+<div class="container-fluid d-flex align-items-center">
+    <div class="d-flex align-items-center">
+        {include '../../Common/views/navbar/_userLeft.latte'}
+    </div>
+</div>
 {/block}
 
 {block content}

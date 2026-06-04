@@ -1,6 +1,4 @@
-{extends $layout}
-
-{block title}Evénements{/block}
+{layout '../../Common/views/layout.latte'}
 
 {block head}
     <style>
@@ -21,6 +19,21 @@
             margin-bottom: 1rem;
         }
     </style>
+{/block}
+
+{block navbar}
+<div class="container-fluid d-flex align-items-center">
+    <div class="d-flex align-items-center">
+        {include '../../Common/views/navbar/_userLeft.latte'}
+    </div>
+    <div class="d-flex align-items-center gap-3 ms-auto">
+        <a href="/nextEvents/help"
+            data-bs-toggle="tooltip"
+            title="{='contextual_help'|translate}">
+            <i class="bi bi-question-circle-fill fs-2" style="color: {$navbarIconColor|noescape};"></i>
+        </a>
+    </div>
+</div>
 {/block}
 
 {block content}
