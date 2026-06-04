@@ -378,6 +378,45 @@ class WebmasterController extends AbstractController
         }
     }
 
+    public function helloassoCredentialsEdit(): void
+    {
+        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isWebmaster(), __FILE__, __LINE__)) {
+            $this->render('Webmaster/views/helloassoCredentials.latte', $this->getAllParams([
+                'navItems'               => $this->getNavItems($this->application->getConnectedUser()->person),
+                'page'                   => $this->application->getConnectedUser()->getPage(),
+
+                'helloassoClientId'     => $this->credentials->get('helloasso', 'client_id'),
+                'helloassoConfigured'   => !empty($this->credentials->get('helloasso', 'client_secret')),
+                'helloassoOrgSlug'      => $this->credentials->get('helloasso', 'org_slug'),
+
+                'btn_HistoryBack'        => true,
+                'btn_Parent'             => '/webmaster',
+            ]));
+        }
+    }
+
+    public function helloassoCredentialsSave(): void
+    {
+        if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isWebmaster(), __FILE__, __LINE__)) {
+            $schema = [
+                'helloassoClientId'     => FilterInputRule::Text->value,
+                'helloassoClientSecret' => FilterInputRule::Text->value,
+                'helloassoOrgSlug'      => FilterInputRule::Text->value,
+            ];
+            $input = WebApp::filterInput($schema, $this->flight->request()->data->getData());
+
+            $this->credentials->set('helloasso', 'client_id', $input['helloassoClientId'] ?? '');
+            if (!empty($input['helloassoClientSecret'])) {
+                $this->credentials->set('helloasso', 'client_secret', $input['helloassoClientSecret']);
+            }
+            if (!empty($input['helloassoOrgSlug'])) {
+                $this->credentials->set('helloasso', 'org_slug', $input['helloassoOrgSlug']);
+            }
+
+            $this->redirect('/webmaster');
+        }
+    }
+
     #region Private methods
     private function getLastVersion(): ?string
     {

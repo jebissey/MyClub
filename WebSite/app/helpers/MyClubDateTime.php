@@ -11,7 +11,7 @@ class MyClubDateTime
 {
     private const DISPLAY_TIMEZONE = 'Europe/Paris';
 
-    static function calculateMinutesAgo($dateTime): int
+    static function calculateMinutesAgo(string $dateTime): int
     {
         $datetime = new DateTime($dateTime, new DateTimeZone('UTC'));
         $datetime->setTimezone(new DateTimeZone(self::DISPLAY_TIMEZONE));
@@ -20,7 +20,7 @@ class MyClubDateTime
         return (int) ($interval->days * 24 * 60 + $interval->h * 60 + $interval->i);
     }
 
-    static function calculateTimeAgo($dateTime): string
+    static function calculateTimeAgo(string $dateTime): string
     {
         $datetime = new DateTime($dateTime, new DateTimeZone('UTC'));
         $datetime->setTimezone(new DateTimeZone(self::DISPLAY_TIMEZONE));
@@ -29,10 +29,10 @@ class MyClubDateTime
         if ($interval->days > 0)  return $interval->days . ' jour' . ($interval->days > 1 ? 's' : '');
         elseif ($interval->h > 0) return $interval->h . ' heure' . ($interval->h > 1 ? 's' : '');
         elseif ($interval->i > 0) return $interval->i . ' minute' . ($interval->i > 1 ? 's' : '');
-        else return 'À l\'instant';
+        else return "À l'instant";
     }
 
-    static function formatDateFromUTC($dateTime)
+    static function formatDateFromUTC(string $dateTime): string
     {
         $datetime = new DateTime($dateTime, new DateTimeZone('UTC'));
         $datetime->setTimezone(new DateTimeZone(self::DISPLAY_TIMEZONE));
@@ -52,5 +52,25 @@ class MyClubDateTime
         };
 
         return [$startDate, $endDate];
+    }
+
+    static function getSeasonRange(string $seasonStart, string $seasonEnd): array
+    {
+        if ($seasonStart === '' || $seasonEnd === '') {
+            $currentYear = date('Y');
+            $currentMonth = date('m');
+
+            if ($currentMonth < 9) {
+                $seasonStart = ($currentYear - 1) . '-09-01';
+                $seasonEnd = $currentYear . '-08-31';
+            } else {
+                $seasonStart = $currentYear . '-09-01';
+                $seasonEnd = ($currentYear + 1) . '-08-31';
+            }
+        }
+        return [
+            'start' => $seasonStart,
+            'end' => $seasonEnd
+        ];
     }
 }

@@ -7,6 +7,7 @@ namespace app\modules\PersonManager;
 use app\enums\FilterInputRule;
 use app\enums\PersonStatus;
 use app\helpers\Application;
+use app\helpers\MyClubDateTime;
 use app\helpers\TranslationManager;
 use app\helpers\WebApp;
 use app\models\PersonDataHelper;
@@ -250,5 +251,52 @@ class PersonController extends TableController
             'status' => $status,
             'extraParams' => $status !== PersonStatus::Active->value ? ['status' => $status] : [],
         ]));
+    }
+
+    public function membershipSettingsEdit(): void
+    {
+        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isPersonManager(), __FILE__, __LINE__)) {
+
+            $seasonStart = $this->dataHelper->getSetting('Membership_Season_Start', '');
+            $seasonEnd   = $this->dataHelper->getSetting('Membership_Season_End', '');
+            $season      = MyClubDateTime::getSeasonRange($seasonStart, $seasonEnd);
+
+            $settings = [
+                'amount'      => (int)$this->dataHelper->getSetting('Membership_Amount', '0') / 100,
+                'seasonStart' => $season['start'],
+                'seasonEnd'   => $season['end'],
+            ];
+
+            $this->render('PersonManager/views/membershipSettings.latte', $this->getAllParams([
+                'navItems'        => $this->getNavItems($this->application->getConnectedUser()->person),
+                'page'            => 'membershipSettings',
+                'settings'        => $settings,
+                'btn_HistoryBack' => true,
+                'btn_Parent'      => '/personManager',
+            ]));
+        }
+    }
+
+    public function membershipSettingsSave(): void
+    {
+        if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isPersonManager(), __FILE__, __LINE__)) {
+
+            $schema = [
+                'amount'      => FilterInputRule::Float->value,
+                'seasonStart' => FilterInputRule::Text->value,
+                'seasonEnd'   => FilterInputRule::Text->value,
+            ];
+
+            $input = WebApp::filterInput($schema, $this->flight->request()->data->getData());
+
+            $amountInCents = (int)round(($input['amount'] ?? 0) * 100);
+            $season        = MyClubDateTime::getSeasonRange($input['seasonStart'] ?? '', $input['seasonEnd'] ?? '');
+
+            $this->dataHelper->setSetting('Membership_Amount', (string)$amountInCents);
+            $this->dataHelper->setSetting('Membership_Season_Start', $season['start']);
+            $this->dataHelper->setSetting('Membership_Season_End', $season['end']);
+
+            $this->redirect('/personManager');
+        }
     }
 }

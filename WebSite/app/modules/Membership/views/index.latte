@@ -1,0 +1,169 @@
+{extends '../../User/views/user.latte'}
+
+{block content}
+
+<div class="container py-4" style="max-width:680px">
+
+	<h2 class="h4 mb-4">
+		<i class="bi bi-patch-check-fill text-primary me-2"></i>
+		{='membership.title'|translate}
+	</h2>
+
+	{* ── Payment feedback banner ────────────────────────────────────────── *}
+	{if $paymentFeedback === 'success'}
+		<div class="alert alert-success alert-dismissible fade show" role="alert">
+			<i class="bi bi-check-circle-fill me-2"></i>
+			{='membership.payment_success'|translate}
+			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+		</div>
+	{elseif $paymentFeedback === 'error'}
+		<div class="alert alert-danger alert-dismissible fade show" role="alert">
+			<i class="bi bi-exclamation-triangle-fill me-2"></i>
+			{='membership.payment_error'|translate}
+			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+		</div>
+	{/if}
+
+	{* ── Current season card ────────────────────────────────────────────── *}
+	<div class="card shadow-sm mb-4">
+		<div class="card-body">
+			<div class="d-flex justify-content-between align-items-center mb-3">
+				<span class="fw-semibold">
+					{='membership.season'|translate} : <strong>{$season}</strong>
+				</span>
+				<span class="text-muted small">
+					{='membership.amount'|translate} :
+					<strong>{=number_format($amountCents / 100, 2, ',', ' ')} €</strong>
+				</span>
+			</div>
+
+			{if $current}
+				{if $current->Status === 'paid'}
+					<div class="d-flex align-items-center gap-2 text-success">
+						<i class="bi bi-check-circle-fill fs-4"></i>
+						<span class="fw-semibold">{='membership.status.paid'|translate}</span>
+						<span class="text-muted small ms-auto">
+							{$current->PaidAt|shortDate}
+						</span>
+					</div>
+					<p class="text-muted small mt-2 mb-0">
+						{='membership.already_paid'|translate}
+					</p>
+				{elseif $current->Status === 'pending'}
+					<div class="d-flex align-items-center gap-2 text-warning mb-3">
+						<i class="bi bi-hourglass-split fs-4"></i>
+						<span class="fw-semibold">{='membership.status.pending'|translate}</span>
+					</div>
+					<button class="btn btn-primary" id="btnPay">
+						<span class="spinner-border spinner-border-sm d-none me-1" id="paySpinner"></span>
+						<i class="bi bi-credit-card me-1"></i>
+						{='membership.pay'|translate}
+					</button>
+				{else}
+					<div class="text-muted small mb-3">
+						{='membership.status.cancelled'|translate}
+					</div>
+					<button class="btn btn-primary" id="btnPay">
+						<span class="spinner-border spinner-border-sm d-none me-1" id="paySpinner"></span>
+						<i class="bi bi-credit-card me-1"></i>
+						{='membership.pay'|translate}
+					</button>
+				{/if}
+			{else}
+				<p class="text-muted small mb-3">{='membership.no_membership'|translate}</p>
+				<button class="btn btn-primary" id="btnPay">
+					<span class="spinner-border spinner-border-sm d-none me-1" id="paySpinner"></span>
+					<i class="bi bi-credit-card me-1"></i>
+					{='membership.pay'|translate}
+				</button>
+			{/if}
+
+			<div id="payAlert" class="alert d-none mt-3 mb-0" role="alert"></div>
+		</div>
+	</div>
+
+	{* ── HelloAsso widget (hidden until the user clicks "Pay") ──────────── *}
+	{if $widgetUrl !== null}
+		<div id="ha-widget-wrapper" class="card shadow-sm mb-4 d-none">
+			<div class="card-body p-2">
+				<div class="d-flex justify-content-between align-items-center mb-2 px-1">
+					<span class="small text-muted">
+						<i class="bi bi-lock-fill me-1"></i>Paiement sécurisé via HelloAsso
+					</span>
+					<button type="button"
+					        class="btn btn-sm btn-outline-secondary"
+					        id="btnCancelWidget">
+						<i class="bi bi-x-lg"></i>
+					</button>
+				</div>
+				<iframe
+					id="ha-widget"
+					src="{$widgetUrl|noescape}"
+					allow="payment"
+					scrolling="auto"
+					style="width:100%; min-height:750px; border:none; border-radius:.375rem;"
+				></iframe>
+			</div>
+		</div>
+	{/if}
+
+	{* ── History table ──────────────────────────────────────────────────── *}
+	{if count($history) > 0}
+		<div class="card shadow-sm">
+			<div class="card-body p-0">
+				<table class="table table-hover table-striped mb-0">
+					<thead class="table-dark">
+						<tr>
+							<th>{='membership.season'|translate}</th>
+							<th class="text-end">{='membership.amount'|translate}</th>
+							<th>{='membership.status'|translate}</th>
+							<th>PaidAt</th>
+						</tr>
+					</thead>
+					<tbody>
+						{foreach $history as $row}
+							<tr>
+								<td>{$row->Season}</td>
+								<td class="text-end">
+									{=number_format($row->Amount / 100, 2, ',', ' ')} €
+								</td>
+								<td>
+									{if $row->Status === 'paid'}
+										<span class="badge bg-success">
+											{='membership.status.paid'|translate}
+										</span>
+									{elseif $row->Status === 'pending'}
+										<span class="badge bg-warning text-dark">
+											{='membership.status.pending'|translate}
+										</span>
+									{else}
+										<span class="badge bg-secondary">
+											{='membership.status.cancelled'|translate}
+										</span>
+									{/if}
+								</td>
+								<td class="text-muted small">
+									{if $row->PaidAt}{$row->PaidAt|shortDate}{/if}
+								</td>
+							</tr>
+						{/foreach}
+					</tbody>
+				</table>
+			</div>
+		</div>
+	{/if}
+
+</div>
+
+{block scripts}
+<script>
+	window.i18n     = {=json_encode($translations)|noescape};
+	window.t        = k => window.i18n?.[k] ?? k;
+</script>
+<script n:syntax="off">
+	window.haWidget = {widgetUrl: {=$widgetUrl !== null ? json_encode($widgetUrl) : 'null'|noescape}};
+</script>
+<script type="module" src="/app/modules/Membership/js/membership.js"></script>
+{/block}
+
+{/block}

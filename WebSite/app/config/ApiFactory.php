@@ -21,6 +21,7 @@ use app\apis\KaraokeApi;
 use app\apis\LeapfrogApi;
 use app\apis\LoanApi;
 use app\apis\MediaApi;
+use app\apis\MembershipApi;
 use app\apis\MenuItemApi;
 use app\apis\MessageApi;
 use app\apis\NotificationApi;
@@ -47,6 +48,7 @@ use app\models\LanguagesDataHelper;
 use app\models\LoanDataHelper;
 use app\models\LogDataHelper;
 use app\models\LogDataWriterHelper;
+use app\models\MembershipDataHelper;
 use app\models\MenuItemDataHelper;
 use app\models\MessageDataHelper;
 use app\models\NeedDataHelper;
@@ -82,6 +84,7 @@ class ApiFactory
         private LogDataHelper $logDataHelper,
         private LogDataWriterHelper $logDataWriterHelper,
         private MediaManager $mediaManager,
+        private MembershipDataHelper $membershipDataHelper,
         private MenuItemDataHelper $menuItemDataHelper,
         private MessageDataHelper $messageDataHelper,
         private MessageRecipientService $messageRecipientService,
@@ -298,6 +301,18 @@ class ApiFactory
             $this->connectedUser,
             $this->dataHelper,
             $this->personDataHelper
+        );
+    }
+
+    public function makeMembershipApi(): MembershipApi
+    {
+        return new MembershipApi(
+            $this->application,
+            $this->connectedUser,
+            $this->dataHelper,
+            $this->personDataHelper,
+            $this->membershipDataHelper,
+            CredentialService::getInstance()
         );
     }
 

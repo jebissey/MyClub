@@ -64,11 +64,8 @@ class VisitorInsightsController extends TableController
 
         $this->render('Common/views/info.latte', $this->getAllParams([
             'content'          => $this->dataHelper->get('Languages', ['Name' => $languageKey], $lang)->$lang ?? '',
-            'hasAuthorization' => $this->application->getConnectedUser()->isVisitorInsights() ?? false,
-            'currentVersion'   => Application::VERSION,
-            'timer'            => 0,
-            'previousPage'     => true,
-            'page'             => $this->application->getConnectedUser()->getPage(),
+            'timer' => 0,
+            'btn_HistoryBack' => true,
         ]));
     }
 
@@ -138,7 +135,7 @@ class VisitorInsightsController extends TableController
             'membersAlerts' => $this->personDataHelper->getMembersAlerts(),
             'page'          => $this->application->getConnectedUser()->getPage(),
             'btn_HistoryBack' => true,
-            'btn_Parent'      => "/admin",            
+            'btn_Parent'      => "/admin",
         ]));
     }
 
@@ -174,7 +171,7 @@ class VisitorInsightsController extends TableController
             'rows'         => $this->logDataAnalyticsHelper->getReferentStats($period, $currentDate),
             'page'         => $this->application->getConnectedUser()->getPage(),
             'btn_HistoryBack' => true,
-            'btn_Parent'      => "/admin",            
+            'btn_Parent'      => "/admin",
         ]));
     }
 
@@ -210,7 +207,7 @@ class VisitorInsightsController extends TableController
                 'tooltipMin'     => ($this->t)('visitor_insights.statistics.tooltip.min_per_day'),
             ],
             'btn_HistoryBack' => true,
-            'btn_Parent'      => "/admin",            
+            'btn_Parent'      => "/admin",
         ]));
     }
 
@@ -236,7 +233,7 @@ class VisitorInsightsController extends TableController
                 'visits' => ($this->t)('visitor_insights.analytics.visits'),
             ],
             'btn_HistoryBack' => true,
-            'btn_Parent'      => "/admin",            
+            'btn_Parent'      => "/admin",
         ]));
     }
 
@@ -257,7 +254,7 @@ class VisitorInsightsController extends TableController
             'page'     => $this->application->getConnectedUser()->getPage(),
             'translations' => TranslationManager::getCreationTimeModalTranslations($this->languagesDataHelper),
             'btn_HistoryBack' => true,
-            'btn_Parent'      => "/admin",            
+            'btn_Parent'      => "/admin",
         ]));
     }
 
@@ -303,7 +300,7 @@ class VisitorInsightsController extends TableController
                 'tableShow' => ($this->t)('visitor_insights.cross_tab.table.show'),
             ],
             'btn_HistoryBack' => true,
-            'btn_Parent'      => "/admin",            
+            'btn_Parent'      => "/admin",
         ]));
     }
 
@@ -321,7 +318,7 @@ class VisitorInsightsController extends TableController
             'navItems'         => $this->getNavItems($this->application->getConnectedUser()->person),
             'page'             => $this->application->getConnectedUser()->getPage(),
             'btn_HistoryBack' => true,
-            'btn_Parent'      => "/admin",            
+            'btn_Parent'      => "/admin",
         ]));
     }
 

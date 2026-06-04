@@ -15,7 +15,7 @@ class PersonStatisticsDataHelper extends Data
         parent::__construct($application);
     }
 
-    public function getStats($person, $seasonStart, $seasonEnd, $isWebmaster)
+    public function getStats(object $person, string $seasonStart, string $seasonEnd)
     {
         $stats = [
             'person' => $person,
@@ -71,28 +71,8 @@ class PersonStatisticsDataHelper extends Data
         return $seasons;
     }
 
-    public function getSeasonRange(string $seasonStart, string $seasonEnd): array
-    {
-        if ($seasonStart === '' || $seasonEnd === '') {
-            $currentYear = date('Y');
-            $currentMonth = date('m');
-
-            if ($currentMonth < 9) {
-                $seasonStart = ($currentYear - 1) . '-09-01';
-                $seasonEnd = $currentYear . '-08-31';
-            } else {
-                $seasonStart = $currentYear . '-09-01';
-                $seasonEnd = ($currentYear + 1) . '-08-31';
-            }
-        }
-        return [
-            'start' => $seasonStart,
-            'end' => $seasonEnd
-        ];
-    }
-
     #region Private functions
-    private function getArticleStats($personId, $seasonStart, $seasonEnd)
+    private function getArticleStats(int $personId, string $seasonStart, string $seasonEnd): array
     {
         $userArticlesCount = $this->fluent
             ->from('Article')
@@ -117,7 +97,7 @@ class PersonStatisticsDataHelper extends Data
         ];
     }
 
-    private function getSurveyStats($personId, $seasonStart, $seasonEnd)
+    private function getSurveyStats(int $personId, string $seasonStart, string $seasonEnd): array
     {
         $query = "
             SELECT COUNT(s.Id) as count 
@@ -152,7 +132,7 @@ class PersonStatisticsDataHelper extends Data
         ];
     }
 
-    private function getSurveyRepliesStats($personId, $seasonStart, $seasonEnd)
+    private function getSurveyRepliesStats(int $personId, string $seasonStart, string $seasonEnd): array
     {
         $query = "
             SELECT COUNT(*) as count 
@@ -190,7 +170,7 @@ class PersonStatisticsDataHelper extends Data
         ];
     }
 
-    private function getDesignStats($personId, $seasonStart, $seasonEnd)
+    private function getDesignStats(int $personId, string $seasonStart, string $seasonEnd): array
     {
         $userDesignsCount = $this->fluent
             ->from('Design')
@@ -214,7 +194,7 @@ class PersonStatisticsDataHelper extends Data
         ];
     }
 
-    private function getDesignVoteStats($personId, $seasonStart, $seasonEnd)
+    private function getDesignVoteStats(int $personId, string $seasonStart, string $seasonEnd): array
     {
         $userVotesCount = $this->fluent
             ->from('DesignVote dv')
@@ -241,7 +221,7 @@ class PersonStatisticsDataHelper extends Data
         ];
     }
 
-    private function getEventStats($personId, $seasonStart, $seasonEnd)
+    private function getEventStats(int $personId, string $seasonStart, string $seasonEnd): array
     {
         $stats = [];
         $stmt = $this->pdo->prepare("
@@ -321,7 +301,7 @@ class PersonStatisticsDataHelper extends Data
         return $stats;
     }
 
-    private function getEventParticipationStats($personId, $seasonStart, $seasonEnd)
+    private function getEventParticipationStats(int $personId, string $seasonStart, string $seasonEnd): array
     {
         $stats = [];
 
@@ -380,7 +360,7 @@ class PersonStatisticsDataHelper extends Data
         return $stats;
     }
 
-    private function getParticipantSupplyStats($personId, $seasonStart, $seasonEnd)
+    private function getParticipantSupplyStats(int $personId, string $seasonStart, string $seasonEnd): array
     {
         $userSuppliesCount = $this->fluent
             ->from('ParticipantSupply ps')
@@ -408,7 +388,7 @@ class PersonStatisticsDataHelper extends Data
         ];
     }
 
-    private function getParticipantMessageStats($personId, $seasonStart, $seasonEnd)
+    private function getParticipantMessageStats(int $personId, string $seasonStart, string $seasonEnd): array
     {
         $userMessagesCount = $this->fluent
             ->from('Message m')

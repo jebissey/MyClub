@@ -56,10 +56,7 @@ class CommunicationController extends AbstractController
         $lang = TranslationManager::getCurrentLanguage();
         $this->render('Common/views/info.latte', $this->getAllParams([
             'content' => $this->dataHelper->get('Languages', ['Name' => 'Help_Communication'], $lang)->$lang ?? '',
-            'hasAuthorization' => $this->application->getConnectedUser()->hasAutorization() ?? false,
-            'currentVersion' => Application::VERSION,
             'timer' => 0,
-            'previousPage' => true,
             'btn_HistoryBack' => true,
         ]));
     }

@@ -8,6 +8,7 @@ use app\enums\ApplicationError;
 use app\enums\FilterInputRule;
 use app\helpers\Application;
 use app\helpers\DistributionCalculator;
+use app\helpers\MyClubDateTime;
 use app\helpers\WebApp;
 use app\models\LogDataHelper;
 use app\models\ParticipantDataHelper;
@@ -37,12 +38,7 @@ class UserStatisticsController extends AbstractController
         $season = $this->resolveSeason();
 
         $this->render('User/views/user_statistics.latte', $this->getAllParams([
-            'stats' => $this->personalStatisticsDataHelper->getStats(
-                $person,
-                $season['start'],
-                $season['end'],
-                $this->application->getConnectedUser()->isWebmaster()
-            ),
+            'stats' => $this->personalStatisticsDataHelper->getStats($person, $season['start'], $season['end']),
             'seasons'                => $this->personalStatisticsDataHelper->getAvailableSeasons(),
             'currentSeason'          => $season,
             'navItems'               => $this->getNavItems($person),
@@ -65,7 +61,7 @@ class UserStatisticsController extends AbstractController
         $schema = ['season' => FilterInputRule::DateInterval->value];
         $input  = WebApp::filterInput($schema, $this->flight->request()->query->getData());
         [$start, $end] = explode('|', $input['season'] ?? '|');
-        return $this->personalStatisticsDataHelper->getSeasonRange($start, $end);
+        return MyClubDateTime::getSeasonRange($start, $end);
     }
 
     private function getVisitCounts(array $season): array

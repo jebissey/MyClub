@@ -27,6 +27,7 @@ use app\models\LogDataHelper;
 use app\models\LogDataAnalyticsHelper;
 use app\models\LoanDataHelper;
 use app\models\LogDataStatisticsHelper;
+use app\models\MembershipDataHelper;
 use app\models\MessageDataHelper;
 use app\models\MetadataDataHelper;
 use app\models\NeedDataHelper;
@@ -62,6 +63,7 @@ use app\modules\Games\Leapfrog\LeapfrogController;
 use app\modules\Games\Solfege\SolfegeController;
 use app\modules\Kanban\KanbanController;
 use app\modules\Loan\LoanController;
+use app\modules\Membership\MembershipController;
 use app\modules\PersonManager\GroupController;
 use app\modules\PersonManager\ImportController;
 use app\modules\PersonManager\PersonController;
@@ -115,6 +117,7 @@ class ControllerFactory
         private KanbanDataHelper $kanbanDataHelper,
         private LoanDataHelper $loanDataHelper,
         private LogDataHelper $logDataHelper,
+        private MembershipDataHelper $membershipDataHelper,
         private MessageDataHelper $messageDataHelper,
         private MetadataDataHelper $metadataDataHelper,
         private NeedDataHelper $needDataHelper,
@@ -322,6 +325,14 @@ class ControllerFactory
             $this->personGroupDataHelper,
             $this->sharedFileDataHelper,
             $this->messageDataHelper,
+        );
+    }
+
+    public function makeMembershipController(): MembershipController
+    {
+        return new MembershipController(
+            $this->application,
+            $this->membershipDataHelper,
         );
     }
 

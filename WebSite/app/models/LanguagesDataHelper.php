@@ -32,15 +32,12 @@ class LanguagesDataHelper extends Data
             $lang = $this->defaultLanguage;
         }
         $escapedLang = $this->escapeColumn($lang);
-
         $stmt = $this->pdo->prepare(
             "SELECT $escapedLang FROM Languages WHERE Name = :key"
         );
 
         $stmt->execute([':key' => $key]);
-
         $result = $stmt->fetchColumn();
-
         return $result === false || $result === '' ? "-- $key --" : (string)$result;
     }
 

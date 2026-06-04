@@ -1,0 +1,65 @@
+{extends 'personManager.latte'}
+
+{block content}
+<div class="container mt-4">
+    <h2 class="mb-4"><strong>💳 {='personManager.membershipSettings.title'|translate}</strong></h2>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <p class="text-muted mb-0">
+                {='personManager.membershipSettings.description'|translate}
+            </p>
+        </div>
+    </div>
+
+    <form method="POST" action="/membership-settings/save">
+
+        <div class="mb-3">
+            <label class="form-label">
+                <strong>{='personManager.membershipSettings.amount'|translate}</strong>
+            </label>
+            <div class="input-group">
+                <input type="number"
+                       class="form-control"
+                       name="amount"
+                       value="{$settings['amount']}"
+                       min="0"
+                       step="0.01">
+                <span class="input-group-text">€</span>
+            </div>
+            <div class="form-text">{='personManager.membershipSettings.amountHint'|translate}</div>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">
+                <strong>{='personManager.membershipSettings.season'|translate}</strong>
+            </label>
+            <div class="row g-2">
+                <div class="col-md-6">
+                    <label class="form-text">{='personManager.membershipSettings.seasonStart'|translate}</label>
+                    <input type="date"
+                           class="form-control"
+                           name="seasonStart"
+                           value="{$settings['seasonStart']}">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-text">{='personManager.membershipSettings.seasonEnd'|translate}</label>
+                    <input type="date"
+                           class="form-control"
+                           name="seasonEnd"
+                           value="{$settings['seasonEnd']}">
+                </div>
+            </div>
+            <div class="form-text">{='personManager.membershipSettings.seasonHint'|translate}</div>
+        </div>
+
+        <div class="d-flex justify-content-end gap-2 mt-4">
+            <a href="/webmaster" class="btn btn-secondary">{='cancel'|translate}</a>
+            <button type="submit" class="btn btn-primary">
+                <i class="bi bi-floppy me-1"></i>{='save'|translate}
+            </button>
+        </div>
+
+    </form>
+</div>
+{/block}

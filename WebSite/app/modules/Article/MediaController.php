@@ -145,9 +145,9 @@ class MediaController extends AbstractController
             $this->render('Article/views/media_upload.latte', $this->getAllParams([
                 'page' => $this->application->getConnectedUser()->getPage(),
                 'translations' => [
-                    'uploadInProgress' => $this->languagesDataHelper->translate('common.msg.loading'),
+                    'uploadInProgress' => $this->languagesDataHelper->translate('loading'),
                     'uploadSuccess'    => $this->languagesDataHelper->translate('media.upload.success_title'),
-                    'uploadError'      => $this->languagesDataHelper->translate('common.msg.error'),
+                    'uploadError'      => $this->languagesDataHelper->translate('media.upload.error'),
                 ],
             ]));
         }

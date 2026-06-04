@@ -281,6 +281,20 @@ CREATE TABLE IF NOT EXISTS "LoanReservation" (
 	FOREIGN KEY("ItemId") REFERENCES "LoanItem"("Id"),
 	FOREIGN KEY("UserId") REFERENCES "Person"("Id")
 );
+CREATE TABLE IF NOT EXISTS "Membership" (
+	"Id"	INTEGER,
+	"PersonId"	INTEGER NOT NULL,
+	"Season"	TEXT NOT NULL,
+	"Amount"	INTEGER NOT NULL DEFAULT 0,
+	"Status"	TEXT NOT NULL DEFAULT 'pending' CHECK("Status" IN ('pending', 'paid', 'cancelled')),
+	"HelloAssoOrderId"	TEXT NOT NULL DEFAULT '',
+	"HelloAssoCheckoutIntentId"	TEXT NOT NULL DEFAULT '',
+	"PaidAt"	TEXT,
+	"CreatedAt"	TEXT NOT NULL DEFAULT (datetime('now')),
+	"UpdatedAt"	TEXT NOT NULL DEFAULT (datetime('now')),
+	PRIMARY KEY("Id" AUTOINCREMENT),
+	FOREIGN KEY("PersonId") REFERENCES "Person"("Id")
+);
 CREATE TABLE IF NOT EXISTS "MenuItem" (
 	"Id"	INTEGER,
 	"Type"	TEXT NOT NULL CHECK("Type" IN ('heading', 'link', 'divider', 'submenu')),
@@ -6149,7 +6163,49 @@ INSERT INTO "Languages" VALUES (1027,'media.upload.select_file','Select a file',
 INSERT INTO "Languages" VALUES (1028,'media.upload.success_title','Files uploaded successfully','Fichiers uploadés avec succès','Pliki przesłane pomyślnie');
 INSERT INTO "Languages" VALUES (1029,'media.upload.col_name','Name','Nom','Nazwa');
 INSERT INTO "Languages" VALUES (1030,'media.upload.col_url','URL','URL','URL');
-INSERT INTO "Metadata" VALUES (1,'MyClub',73,0,1000000,NULL,10,36,6,NULL,0,NULL);
+INSERT INTO "Languages" VALUES (1031,'membership.nav.my','My Membership','Mon adhésion','Moje członkostwo');
+INSERT INTO "Languages" VALUES (1032,'membership.title','Membership renewal','Renouvellement adhésion','Odnowienie członkostwa');
+INSERT INTO "Languages" VALUES (1033,'membership.season','Season','Saison','Sezon');
+INSERT INTO "Languages" VALUES (1034,'membership.status','Status','Statut','Status');
+INSERT INTO "Languages" VALUES (1035,'membership.amount','Amount','Montant','Kwota');
+INSERT INTO "Languages" VALUES (1036,'membership.pay','Pay now','Payer maintenant','Zapłać teraz');
+INSERT INTO "Languages" VALUES (1037,'membership.status.pending','Pending','En attente','Oczekujące');
+INSERT INTO "Languages" VALUES (1038,'membership.status.paid','Paid','Réglée','Opłacone');
+INSERT INTO "Languages" VALUES (1039,'membership.status.cancelled','Cancelled','Annulée','Anulowane');
+INSERT INTO "Languages" VALUES (1040,'membership.already_paid','Your membership for this season is already paid.','Votre adhésion pour cette saison est déjà réglée.','Twoje składki na ten sezon są już opłacone.');
+INSERT INTO "Languages" VALUES (1041,'membership.no_membership','No membership found for this season.','Aucune adhésion trouvée pour cette saison.','Nie znaleziono członkostwa na ten sezon.');
+INSERT INTO "Languages" VALUES (1042,'membership.payment_success','Payment confirmed. Welcome!','Paiement confirmé. Bienvenue !','Płatność potwierdzona. Witaj!');
+INSERT INTO "Languages" VALUES (1043,'membership.payment_error','Payment failed or cancelled.','Paiement échoué ou annulé.','Płatność nie powiodła się lub została anulowana.');
+INSERT INTO "Languages" VALUES (1044,'user.filter.info.label_signout','(last sign-out)','(dernière déconnexion)','(ostatnie wylogowanie)');
+INSERT INTO "Languages" VALUES (1045,'user.filter.info.label_signin','(last sign-in)','(dernière connexion)','(ostatnie logowanie)');
+INSERT INTO "Languages" VALUES (1046,'user.filter.info.label_week','(1 week)','(1 semaine)','(1 tydzień)');
+INSERT INTO "Languages" VALUES (1047,'user.filter.info.label_month','(1 month)','(1 mois)','(1 miesiąc)');
+INSERT INTO "Languages" VALUES (1048,'user.filter.info.label_quarter','(1 quarter)','(1 trimestre)','(1 kwartał)');
+INSERT INTO "Languages" VALUES (1049,'user.filter.info.label_year','(1 year)','(1 an)','(1 rok)');
+INSERT INTO "Languages" VALUES (1050,'helloasso.title','HelloAsso API credentials','Identifiants API HelloAsso','Dane API HelloAsso');
+INSERT INTO "Languages" VALUES (1051,'helloasso.alert.not_configured','HelloAsso is not configured yet','HelloAsso n''est pas encore configuré','HelloAsso nie jest jeszcze skonfigurowany');
+INSERT INTO "Languages" VALUES (1052,'helloasso.info.get_keys','Get your API keys from','Obtenez vos clés API depuis','Pobierz klucze API z');
+INSERT INTO "Languages" VALUES (1053,'helloasso.info.sandbox','Use sandbox credentials for testing','Utilisez les identifiants sandbox pour tester','Użyj danych sandbox do testów');
+INSERT INTO "Languages" VALUES (1054,'helloasso.field.client_id','Client ID','Client ID','Client ID');
+INSERT INTO "Languages" VALUES (1055,'helloasso.field.client_id.public','public','public','publiczny');
+INSERT INTO "Languages" VALUES (1056,'helloasso.field.client_id.hint','Your HelloAsso application client ID','L''identifiant client de votre application HelloAsso','Identyfikator klienta aplikacji HelloAsso');
+INSERT INTO "Languages" VALUES (1057,'helloasso.field.client_secret','Client Secret','Client Secret','Client Secret');
+INSERT INTO "Languages" VALUES (1058,'helloasso.field.client_secret.private','private','privé','prywatny');
+INSERT INTO "Languages" VALUES (1059,'helloasso.field.client_secret.hint','Leave blank to keep the current secret','Laisser vide pour conserver le secret actuel','Pozostaw puste, aby zachować obecny sekret');
+INSERT INTO "Languages" VALUES (1060,'helloasso.field.client_secret.not_configured','Not configured','Non configuré','Nieskonfigurowany');
+INSERT INTO "Languages" VALUES (1061,'personManager.membershipSettings.title','Membership Settings','Paramètres d''adhésion','Ustawienia członkostwa');
+INSERT INTO "Languages" VALUES (1062,'personManager.membershipSettings.description','Configure the membership fee and season.','Configurez le montant de l''adhésion et la saison sportive.','Skonfiguruj składkę członkowską i sezon sportowy.');
+INSERT INTO "Languages" VALUES (1063,'personManager.membershipSettings.amount','Membership Fee','Montant de l''adhésion','Składka członkowska');
+INSERT INTO "Languages" VALUES (1064,'personManager.membershipSettings.amountHint','Amount in euros, e.g. 12.50','Montant en euros, ex : 12,50','Kwota w euro, np. 12,50');
+INSERT INTO "Languages" VALUES (1065,'personManager.membershipSettings.season','Season','Saison','Sezon');
+INSERT INTO "Languages" VALUES (1066,'personManager.membershipSettings.seasonStart','Start date','Date de début','Data rozpoczęcia');
+INSERT INTO "Languages" VALUES (1067,'personManager.membershipSettings.seasonEnd','End date','Date de fin','Data zakończenia');
+INSERT INTO "Languages" VALUES (1068,'personManager.membershipSettings.seasonHint','Leave empty to use the current season automatically.','Laisser vide pour utiliser la saison en cours automatiquement.','Pozostaw puste, aby automatycznie użyć bieżącego sezonu.');
+INSERT INTO "Languages" VALUES (1069,'media.upload.error','Upload error','Erreur de téléversement','Błąd przesyłania pliku');
+INSERT INTO "Languages" VALUES (1070,'membership','Membership','Adhésion','Członkostwo');
+INSERT INTO "Languages" VALUES (1071,'navbar.person_manager.membershipSettings','Membership settings','Paramètres des adhésions','Ustawienia członkostwa');
+INSERT INTO "Languages" VALUES (1072,'navbar.webmaster.helloasso','HelloAsso','HelloAsso','HelloAsso');
+INSERT INTO "Metadata" VALUES (1,'MyClub',74,0,1000000,NULL,10,36,6,NULL,0,NULL);
 INSERT INTO "Person" VALUES (1,'webmaster@myclub.foo','e427c26faca947919b18b797bc143a35100e4de48c34b70b26202d3a7d8e51f7','my first name','my last name','my nick name or nothing',NULL,'0',NULL,NULL,NULL,NULL,NULL,0,0,NULL,NULL,'2025-01-01',0,0,0,NULL,NULL,NULL,NULL,NULL,NULL,'');
 INSERT INTO "PersonGroup" VALUES (1,1,1);
 INSERT INTO "Settings" VALUES (1,'Title','title');

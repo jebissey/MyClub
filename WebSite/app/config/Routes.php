@@ -48,6 +48,8 @@ use app\config\routes\LoanApi;
 use app\config\routes\Maintenance;
 use app\config\routes\Media;
 use app\config\routes\MediaApi;
+use app\config\routes\Membership;
+use app\config\routes\MembershipApi;
 use app\config\routes\MenuItem;
 use app\config\routes\MenuItemApi;
 use app\config\routes\MessageApi;
@@ -110,6 +112,7 @@ use app\models\LanguagesDataHelper;
 use app\models\LoanDataHelper;
 use app\models\LogDataHelper;
 use app\models\LogDataWriterHelper;
+use app\models\MembershipDataHelper;
 use app\models\MenuItemDataHelper;
 use app\models\MessageDataHelper;
 use app\models\MetadataDataHelper;
@@ -176,6 +179,7 @@ class Routes
         $loanDataHelper = new LoanDataHelper($application);
         $languagesDataHelper = new LanguagesDataHelper($application);
         $mediaManager = new MediaManager($dataHelper, $sharedFileDataHelper, $languagesDataHelper);
+        $membershipDataHelper = new MembershipDataHelper($application);
         $this->controllerFactory = new ControllerFactory(
             $application,
             new ArticleCrosstabDataHelper($application, $crosstabDataHelper),
@@ -197,6 +201,7 @@ class Routes
             new KanbanDataHelper($application),
             $loanDataHelper,
             $logDataHelper,
+            $membershipDataHelper,
             $messageDataHelper,
             new MetadataDataHelper($application),
             $needDataHelper,
@@ -233,6 +238,7 @@ class Routes
             $logDataHelper,
             new LogDataWriterHelper($application),
             $mediaManager,
+            $membershipDataHelper,
             new MenuItemDataHelper($application, $authorizationDataHelper),
             $messageDataHelper,
             new MessageRecipientService($dataHelper),
@@ -309,6 +315,8 @@ class Routes
         $this->routes = array_merge($this->routes, (new Maintenance($this->controllerFactory))->get());
         $this->routes = array_merge($this->routes, (new Media($this->controllerFactory))->get());
         $this->routes = array_merge($this->routes, (new MediaApi($this->apiFactory))->get());
+        $this->routes = array_merge($this->routes, (new Membership($this->controllerFactory))->get());
+        $this->routes = array_merge($this->routes, (new MembershipApi($this->apiFactory))->get());
         $this->routes = array_merge($this->routes, (new MenuItem($this->controllerFactory))->get());
         $this->routes = array_merge($this->routes, (new MenuItemApi($this->apiFactory))->get());
         $this->routes = array_merge($this->routes, (new MessageApi($this->apiFactory))->get());
