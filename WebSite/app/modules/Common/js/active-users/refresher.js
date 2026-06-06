@@ -17,11 +17,18 @@ async function refreshActiveUsers() {
         const container = document.getElementById('active-users-list');
         if (!container) return;
 
-        adapter.update(json.data);
+        const users = json.data.users;
+        const hasNewMessages = json.data.hasNewMessages;
 
-        container.innerHTML = json.data.length === 0
+        adapter.update(users);
+
+        container.innerHTML = users.length === 0
             ? '<span class="text-muted small">Aucun utilisateur actif</span>'
-            : buildActiveUsersGrid(json.data, currentMinutes);
+            : buildActiveUsersGrid(users, currentMinutes);
+
+        if (hasNewMessages) {
+            document.getElementById('new-messages-btn')?.classList.remove('d-none');
+        }
 
     } catch (e) {
         console.warn('active-users refresh failed', e);

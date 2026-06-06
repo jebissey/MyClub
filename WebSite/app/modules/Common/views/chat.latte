@@ -11,7 +11,13 @@
 
 {block navbar}
     {include 'navbar/_userLeft.latte'}
-    {include 'navbar/_userRight.latte'}
+    <div id="new-messages-btn" class="ms-auto me-2 {if !$newMessages}d-none{/if}">
+        <a class="btn fs-4"
+           href="/user/messages?from=signin"
+           style="background-color: {$navbarIconColor|noescape}; border-color: {$navbarIconColor|noescape};">
+            <i class="bi bi-chat-dots" style="color: {$navbarInkColor|noescape};"></i>
+        </a>
+    </div>
 {/block}
 
 {block content}

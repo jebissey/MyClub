@@ -6,6 +6,7 @@ namespace app\models;
 
 use PDO;
 use RuntimeException;
+use Throwable;
 
 use app\exceptions\UnauthorizedAccessException;
 use app\helpers\Application;
@@ -131,6 +132,20 @@ class MessageDataHelper extends Data implements NewsProviderInterface
         return $messages;
     }
 
+    public function getGroupedMessages(int $personId, string $searchFrom, GravatarHandler $gravatarHandler): array
+    {
+        $rows = $this->getGroupedMessages_($personId, $searchFrom);
+        return array_map(function (object $row) use ($gravatarHandler): array {
+            $userImg = WebApp::getUserImg($row, $gravatarHandler);
+
+            $result = (array) $row;
+            $result['UserImg'] = $userImg;
+            unset($result['Avatar'], $result['UseGravatar'], $result['Email']);
+
+            return $result;
+        }, $rows);
+    }
+
     public function getImageInfoFromMessage(int $messageId): array
     {
         $message = $this->get('Message', ['Id' => $messageId], 'ImagePath');
@@ -250,6 +265,26 @@ class MessageDataHelper extends Data implements NewsProviderInterface
         return $used; // ['data/media/2024/01/photo.jpg' => true, ...]
     }
 
+    public function hasNewMessages(int $personId, int $lastLogId): bool
+    {
+        try {
+            if (!$this->hasRecentMessageApiCall($lastLogId)) {
+                return false;
+            }
+            $searchFrom = $this->getLastCreatedAt($lastLogId) ?? '';
+            if (empty($searchFrom)) {
+                return false;
+            }
+            $hasNew = count($this->getGroupedMessages_($personId, $searchFrom)) > 0;
+            if ($hasNew) {
+                $_SESSION['has_new_messages'] = 1;
+            }
+            return $hasNew;
+        } catch (Throwable $e) {
+            return false;
+        }
+    }
+
     public function updateMessage(int $messageId, int $personId, string $text): true
     {
         $message = $this->get('Message', ['Id' => $messageId], 'PersonId');
@@ -260,7 +295,19 @@ class MessageDataHelper extends Data implements NewsProviderInterface
         return true;
     }
 
-    public function getGroupedMessages(int $personId, string $searchFrom, GravatarHandler $gravatarHandler): array
+    #region Private functions
+    private function addAvatarAndTimeAgoToMessages(array $messages): array
+    {
+        static $gravatarHandler = new GravatarHandler();
+
+        foreach ($messages as $message) {
+            $message->UserImg = WebApp::getUserImg($message, $gravatarHandler);
+            $message->TimeAgo = MyClubDateTime::calculateTimeAgo($message->LastUpdate);
+        }
+        return $messages;
+    }
+
+    private function getGroupedMessages_(int $personId, string $searchFrom): array
     {
         $params = [];
         $whereClause = $searchFrom ? "AND m.LastUpdate >= ?" : '';
@@ -392,27 +439,26 @@ class MessageDataHelper extends Data implements NewsProviderInterface
 
         $stmt = $this->pdo->prepare($query);
         $stmt->execute($params);
-        $rows = $stmt->fetchAll(PDO::FETCH_OBJ);
-        return array_map(function (object $row) use ($gravatarHandler): array {
-            $userImg = WebApp::getUserImg($row, $gravatarHandler);
-
-            $result = (array) $row;
-            $result['UserImg'] = $userImg;
-            unset($result['Avatar'], $result['UseGravatar'], $result['Email']);
-
-            return $result;
-        }, $rows);
+        return $stmt->fetchAll(PDO::FETCH_OBJ);
     }
 
-    #region Private functions
-    private function addAvatarAndTimeAgoToMessages(array $messages): array
+    private function getLastCreatedAt(int $lastLogId): ?string
     {
-        static $gravatarHandler = new GravatarHandler();
+        $stmt = $this->pdoForLog->prepare("SELECT CreatedAt FROM Log WHERE Id = ?");
+        $stmt->execute([$lastLogId]);
+        $result = $stmt->fetchColumn();
+        return $result !== false ? $result : null;
+    }
 
-        foreach ($messages as $message) {
-            $message->UserImg = WebApp::getUserImg($message, $gravatarHandler);
-            $message->TimeAgo = MyClubDateTime::calculateTimeAgo($message->LastUpdate);
-        }
-        return $messages;
+    private function hasRecentMessageApiCall(int $lastLogId): bool
+    {
+        $stmt = $this->pdoForLog->prepare("
+            SELECT COUNT(*)
+            FROM Log
+            WHERE Id > ?
+            AND (Uri = '/api/message/add (POST)' OR Uri = '/api/message/update (POST)')
+        ");
+        $stmt->execute([$lastLogId]);
+        return (int)$stmt->fetchColumn() > 0;
     }
 }

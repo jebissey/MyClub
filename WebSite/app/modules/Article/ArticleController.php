@@ -549,6 +549,7 @@ class ArticleController extends TableController
             'page' => $this->application->getConnectedUser()->getPage(),
             'btn_HistoryBack' => true,
             'btn_Parent'      => "/article/{$articleId}",
+            'newMessages' => $this->messageDataHelper->hasNewMessages($person->Id, (int)($_SESSION['last_log_id'] ?? 0)),
         ]));
     }
 

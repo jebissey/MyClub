@@ -13,6 +13,7 @@ use app\helpers\GravatarHandler;
 use app\helpers\WebApp;
 use app\models\DataHelper;
 use app\models\LogDataHelper;
+use app\models\MessageDataHelper;
 use app\models\PersonDataHelper;
 
 class ChatApi extends AbstractApi
@@ -20,12 +21,13 @@ class ChatApi extends AbstractApi
     private const ACTIVE_WINDOW_MINUTES = 15;
 
     public function __construct(
-        Application      $application,
-        ConnectedUser    $connectedUser,
-        DataHelper       $dataHelper,
+        Application $application,
+        protected ConnectedUser $connectedUser,
+        DataHelper $dataHelper,
         PersonDataHelper $personDataHelper,
-        private LogDataHelper  $logDataHelper,
-        private GravatarHandler  $gravatarHandler,
+        private LogDataHelper $logDataHelper,
+        private GravatarHandler $gravatarHandler,
+        private MessageDataHelper $messageDataHelper,
     ) {
         parent::__construct($application, $connectedUser, $dataHelper, $personDataHelper);
     }
@@ -36,6 +38,7 @@ class ChatApi extends AbstractApi
             $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
+        $previousLogId = (int)($_SESSION['last_log_id'] ?? 0);
         $minutes = (int) ($_GET['m'] ?? self::ACTIVE_WINDOW_MINUTES);
         $visits = $this->logDataHelper->getLastVisitPerActivePersonWithTimeAgo($this->dataHelper->gets('Person', ['Inactivated' => 0]));
         $cutoff = new DateTime("-{$minutes} minutes", new DateTimeZone('UTC'));
@@ -56,6 +59,10 @@ class ChatApi extends AbstractApi
                 'browser'       => $visit->Browser,
             ];
         }
-        $this->renderJsonOk($result);
+        $hasNew = $this->messageDataHelper->hasNewMessages($this->connectedUser->person->Id ?? 0, $previousLogId);
+        $this->renderJsonOk([
+            'users'          => $result,
+            'hasNewMessages' => $hasNew,
+        ]);
     }
 }

@@ -45,6 +45,7 @@ class LogDataWriterHelper extends Data
                 $message,
                 $duration,
             ]);
+            $_SESSION['last_log_id'] = (int)$this->pdoForLog->lastInsertId();
         } catch (Throwable $e) {
             throw new RuntimeException("Failed to write log entry: " . $e->getMessage());
         }

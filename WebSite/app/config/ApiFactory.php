@@ -127,7 +127,8 @@ class ApiFactory
             $this->dataHelper,
             $this->personDataHelper,
             $this->logDataHelper,
-            new GravatarHandler()
+            new GravatarHandler(),
+            $this->messageDataHelper
         );
     }
 
