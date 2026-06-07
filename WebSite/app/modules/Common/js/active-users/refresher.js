@@ -28,6 +28,7 @@ async function refreshActiveUsers() {
 
         if (hasNewMessages) {
             document.getElementById('new-messages-btn')?.classList.remove('d-none');
+            document.dispatchEvent(new CustomEvent('chat:newMessages'));
         }
 
     } catch (e) {

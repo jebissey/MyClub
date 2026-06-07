@@ -169,6 +169,39 @@ function showIosInstallBanner() {
     });
 }
 
+// ─── Audio ───────────────────────────────────────────────────────────
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+function unlockAudio() {
+    if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+    }
+
+    document.removeEventListener('click', unlockAudio);
+    document.removeEventListener('keydown', unlockAudio);
+    document.removeEventListener('touchstart', unlockAudio);
+}
+
+document.addEventListener('click', unlockAudio);
+document.addEventListener('keydown', unlockAudio);
+document.addEventListener('touchstart', unlockAudio);
+
+
+
+const notificationSound = new Audio('/app/sounds/chat-notification.mp3');
+
+function playNotificationSound() {
+    notificationSound.currentTime = 0; // rejouer même si déjà en cours
+
+    notificationSound.play().catch(err => {
+        console.warn('Impossible de jouer le son', err);
+    });
+}
+
+document.addEventListener('chat:newMessages', playNotificationSound);
+
+
+
 function syncNavbarHeight() {
     const h = document.querySelector('.navbar')?.offsetHeight ?? 56;
     document.documentElement.style.setProperty('--navbar-height', h + 'px');
