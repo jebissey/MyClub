@@ -32,6 +32,10 @@ AddDefaultCharset UTF-8
     # --- 2. CSS and JS → serve directly from disk (like fonts) ---
     RewriteRule \.(css|js)$ - [NC,L]
 
+    # --- 3. App static assets (no auth required) → serve directly ---
+    RewriteRule ^app/sounds/ - [NC,L]
+    RewriteRule ^app/images/ - [NC,L]
+
     # --- 3. Everything else → front controller ---
     RewriteRule ^ index.php [QSA,L]
 </IfModule>

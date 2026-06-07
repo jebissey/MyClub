@@ -403,31 +403,6 @@ class Routes
                 'serviceWorker' => true,
             ],
 
-            // --- Dynamic: app/images/* ---
-            ...(function () use ($rootDir) {
-                $alreadyRegistered = [
-                    'favicon.ico',
-                    'Feed-icon.svg',
-                    'icon-512.png',
-                    'my-club-120.png',
-                    'my-club-180.png',
-                ];
-
-                $imageFiles = array_filter(
-                    glob($rootDir . '/app/images/*') ?: [],
-                    fn($f) => is_file($f) && !in_array(basename($f), $alreadyRegistered)
-                );
-
-                return $imageFiles ? array_combine(
-                    array_map(fn($f) => '/app/images/' . basename($f), $imageFiles),
-                    array_map(fn($f) => [
-                        'dir'  => 'images',
-                        'file' => basename($f),
-                        'type' => mime_content_type($f),
-                    ], $imageFiles)
-                ) : [];
-            })(),
-
             // --- Dynamic: HTML files from data/statics/html/ ---
             ...(function () use ($rootDir) {
                 $htmlFiles = array_filter(
@@ -506,6 +481,7 @@ class Routes
             $filename = basename($config['file']);
             $baseDir = match ($config['dir']) {
                 'images' => $rootDir . '/app/images',
+                'sounds' => $rootDir . '/app/sounds',
                 'static_html' => $rootDir . '/data/statics/html',
                 'static_image' => $rootDir . '/data/statics/images',
                 'static_css' => $rootDir . '/data/statics/css',
