@@ -176,6 +176,22 @@ class MessageDataHelper extends Data implements NewsProviderInterface
         return [(int)$year, (int)$month, $filename];
     }
 
+    public function getMessages(array $season): array
+    {
+        $query = $this->pdo->prepare("
+            SELECT LOWER(p.Email) AS Email, COUNT(m.Id) AS MessageCount
+            FROM Message m
+            JOIN Person p ON p.Id = m.PersonId
+            WHERE m.LastUpdate BETWEEN :start AND :end
+            GROUP BY p.Email
+        ");
+        $query->execute([
+            ':start' => $season['start'],
+            ':end'   => $season['end'],
+        ]);
+        return $query->fetchAll(PDO::FETCH_KEY_PAIR);
+    }
+
     public function getMessageUses(string $path): array
     {
         $like = '%' . $path . '%';

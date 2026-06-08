@@ -11,6 +11,7 @@ use app\helpers\DistributionCalculator;
 use app\helpers\MyClubDateTime;
 use app\helpers\WebApp;
 use app\models\LogDataHelper;
+use app\models\MessageDataHelper;
 use app\models\ParticipantDataHelper;
 use app\models\PersonStatisticsDataHelper;
 use app\modules\Common\AbstractController;
@@ -23,6 +24,7 @@ class UserStatisticsController extends AbstractController
         private LogDataHelper $logDataHelper,
         private ParticipantDataHelper $participantDataHelper,
         private DistributionCalculator $distributionCalculator,
+        private MessageDataHelper $messageDataHelper,
     ) {
         parent::__construct($application);
     }
@@ -44,14 +46,17 @@ class UserStatisticsController extends AbstractController
             'navItems'               => $this->getNavItems($person),
             'chartData'              => $this->buildChartData($this->getVisitCounts($season), $person),
             'participationChartData' => $this->buildChartData($this->getParticipationCounts($season), $person),
+            'messageChartData'       => $this->buildChartData($this->getMessageCounts($season), $person),
             'page'                   => $this->application->getConnectedUser()->getPage(1),
             'btn_HistoryBack'        => true,
             'btn_Parent'             => "/user",
             'translations'           => [
-                'visitsYAxis'          => ($this->t)('user.statistics.chart.visits.y_axis'),
-                'visitsXAxis'          => ($this->t)('user.statistics.chart.visits.x_axis'),
-                'participationsYAxis'  => ($this->t)('user.statistics.chart.participations.y_axis'),
-                'participationsXAxis'  => ($this->t)('user.statistics.chart.participations.x_axis'),
+                'visitsYAxis' => ($this->t)('user.statistics.chart.visits.y_axis'),
+                'visitsXAxis' => ($this->t)('user.statistics.chart.visits.x_axis'),
+                'participationsYAxis' => ($this->t)('user.statistics.chart.participations.y_axis'),
+                'participationsXAxis' => ($this->t)('user.statistics.chart.participations.x_axis'),
+                'messagesYAxis' => ($this->t)('user.statistics.chart.messages.y_axis'),
+                'messagesXAxis' => ($this->t)('user.statistics.chart.messages.x_axis'),
             ],
         ]));
     }
@@ -76,6 +81,13 @@ class UserStatisticsController extends AbstractController
         $participations = $this->participantDataHelper->getParticipations($season);
         $members        = $this->dataHelper->gets('Person', ['Inactivated' => 0], 'Email');
         return $this->normalizeMemberCounts($members, $participations);
+    }
+
+    private function getMessageCounts(array $season): array
+    {
+        $messages = $this->messageDataHelper->getMessages($season);
+        $members  = $this->dataHelper->gets('Person', ['Inactivated' => 0], 'Email');
+        return $this->normalizeMemberCounts($members, $messages);
     }
 
     private function normalizeMemberCounts(array $members, array $rawCounts): array

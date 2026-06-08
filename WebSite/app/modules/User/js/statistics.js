@@ -1,6 +1,6 @@
 const COLORS = {
-    green:     { bg: 'rgba(40, 167, 69, 0.6)',  border: 'rgba(40, 167, 69, 1)'  },
-    teal:      { bg: 'rgba(75, 192, 192, 0.6)', border: 'rgba(75, 192, 192, 1)' },
+    green: { bg: 'rgba(40, 167, 69, 0.6)', border: 'rgba(40, 167, 69, 1)' },
+    teal: { bg: 'rgba(75, 192, 192, 0.6)', border: 'rgba(75, 192, 192, 1)' },
     highlight: 'rgba(255, 99, 132, 1)',
 };
 
@@ -46,14 +46,14 @@ function createDistributionChart(canvasId, rawData, palette, labels) {
         type: 'line',
         data: {
             datasets: [{
-                data:                 points,
-                backgroundColor:      palette.bg,
-                borderColor:          palette.border,
-                tension:              0.4,
-                showLine:             false,
+                data: points,
+                backgroundColor: palette.bg,
+                borderColor: palette.border,
+                tension: 0.4,
+                showLine: false,
                 pointBackgroundColor: pointColors(points, palette.border),
-                pointRadius:          points.map(p => p.radius),
-                pointHoverRadius:     POINT.hover,
+                pointRadius: points.map(p => p.radius),
+                pointHoverRadius: POINT.hover,
             }],
         },
         options: {
@@ -81,10 +81,20 @@ function init() {
     createDistributionChart(
         'participationChart',
         participationChartData,
-        COLORS.green,
+        COLORS.teal,
         {
             y: window.t('participationsYAxis'),
             x: window.t('participationsXAxis'),
+        },
+    );
+
+    createDistributionChart(
+        'messageChart',
+        messageChartData,
+        COLORS.teal,
+        {
+            y: window.t('messagesYAxis'),
+            x: window.t('messagesXAxis'),
         },
     );
 }

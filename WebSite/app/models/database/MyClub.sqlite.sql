@@ -7470,7 +7470,10 @@ INSERT INTO "Languages" VALUES (1076,'Help_NextEvents_EventManager','<div class=
         </div>
     </section>
 </div>');
-INSERT INTO "Metadata" VALUES (1,'MyClub',75,0,1000000,NULL,10,36,6,NULL,0,NULL);
+INSERT INTO "Languages" VALUES (1077,'user.statistics.message_distribution','Message distribution','Distribution des messages','Dystrybucja wiadomości');
+INSERT INTO "Languages" VALUES (1078,'user.statistics.chart.messages.y_axis','Messages','Messages','Wiadomości');
+INSERT INTO "Languages" VALUES (1079,'user.statistics.chart.messages.x_axis','Members','Membres','Członkowie');
+INSERT INTO "Metadata" VALUES (1,'MyClub',76,0,1000000,NULL,10,36,6,NULL,0,NULL);
 INSERT INTO "Person" VALUES (1,'webmaster@myclub.foo','e427c26faca947919b18b797bc143a35100e4de48c34b70b26202d3a7d8e51f7','my first name','my last name','my nick name or nothing',NULL,'0',NULL,NULL,NULL,NULL,NULL,0,0,NULL,NULL,'2025-01-01',0,0,0,NULL,NULL,NULL,NULL,NULL,NULL,'');
 INSERT INTO "PersonGroup" VALUES (1,1,1);
 INSERT INTO "Settings" VALUES (1,'Title','title');

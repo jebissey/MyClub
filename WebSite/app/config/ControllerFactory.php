@@ -506,6 +506,7 @@ class ControllerFactory
             $this->logDataHelper,
             $this->participantDataHelper,
             new DistributionCalculator(),
+            $this->messageDataHelper,
         );
     }
 
