@@ -108,7 +108,7 @@ class WebappSettingsController extends AbstractController
             'forcedLanguage'      => $this->metadataDataHelper->getForcedLanguage(),
             'btn_HistoryBack' => true,
             'btn_Parent'      => "/designer",
-            'translations' => [
+            'i18n' => [
                 'imageProcessing' => ($this->t)('designer.home_settings.image_processing'),
                 'imageToSave'     => ($this->t)('designer.home_settings.image_to_save'),
                 'imageReadError'  => ($this->t)('designer.home_settings.image_read_error'),

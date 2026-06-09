@@ -108,7 +108,7 @@ class MediaController extends AbstractController
                 'page'                 => $connectedUser->getPage(),
                 'groups'               => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
                 'isEditor'             => $connectedUser->isEditor(),
-                'translations' => [
+                'i18n' => [
                     // mediaShare.js
                     'urlCopied'     => ($this->t)('media.manager.share.url_copied'),
                     'linkCopied'    => ($this->t)('media.manager.share.link_copied'),
@@ -144,7 +144,7 @@ class MediaController extends AbstractController
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isRedactor(), __FILE__, __LINE__)) {
             $this->render('Article/views/media_upload.latte', $this->getAllParams([
                 'page' => $this->application->getConnectedUser()->getPage(),
-                'translations' => [
+                'i18n' => [
                     'uploadInProgress' => $this->languagesDataHelper->translate('loading'),
                     'uploadSuccess'    => $this->languagesDataHelper->translate('media.upload.success_title'),
                     'uploadError'      => $this->languagesDataHelper->translate('media.upload.error'),

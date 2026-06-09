@@ -66,7 +66,7 @@ class PersonController extends TableController
                 'isSelfEdit' => false,
                 'layout' => $this->getLayout(),
                 'page' => $this->application->getConnectedUser()->getPage(),
-                'translations' => [
+                'i18n' => [
                     'account.form.emoji.select_label'     => ($this->t)('account.form.emoji.select_label'),
                     'account.form.emoji.missing_elements' => ($this->t)('account.form.emoji.missing_elements'),
                     'account.form.emoji.none_detected'    => ($this->t)('account.form.emoji.none_detected'),

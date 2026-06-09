@@ -50,7 +50,7 @@ class UserStatisticsController extends AbstractController
             'page'                   => $this->application->getConnectedUser()->getPage(1),
             'btn_HistoryBack'        => true,
             'btn_Parent'             => "/user",
-            'translations'           => [
+            'i18n' => [
                 'visitsYAxis' => ($this->t)('user.statistics.chart.visits.y_axis'),
                 'visitsXAxis' => ($this->t)('user.statistics.chart.visits.x_axis'),
                 'participationsYAxis' => ($this->t)('user.statistics.chart.participations.y_axis'),

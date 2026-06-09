@@ -128,12 +128,10 @@
 {/block}
 
 {block scripts}
-<script>
-    window.i18n = {=json_encode($translations)|noescape};
-
-    window.t = function(key) {
-        return window.i18n?.[key] ?? key;
-    };
-</script>
-<script type="module" src="/app/modules/VisitorInsights/js/crossTab.js"></script>
+    <script>
+    {if isset($i18n)}
+        Object.assign(window.i18n, {=$i18n});
+    {/if}
+    </script>
+    <script type="module" src="/app/modules/VisitorInsights/js/crossTab.js"></script>
 {/block}

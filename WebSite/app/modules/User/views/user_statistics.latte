@@ -270,15 +270,14 @@
 {/block}
 
 {block scripts}
-<script>
-const chartData = {$chartData};
-const participationChartData = {$participationChartData};
-const messageChartData = {$messageChartData};
-window.i18n = {=json_encode($translations)|noescape};
-window.t = function(key) {
-    return window.i18n?.[key] ?? key;
-};
-</script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
-<script type="module" src="/app/modules/User/js/statistics.js"></script>
+    <script>
+        const chartData = {$chartData};
+        const participationChartData = {$participationChartData};
+        const messageChartData = {$messageChartData};
+    {if isset($i18n)}
+        Object.assign(window.i18n, {=$i18n});
+    {/if}
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <script type="module" src="/app/modules/User/js/statistics.js"></script>
 {/block}

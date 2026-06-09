@@ -46,7 +46,7 @@ function initSaveGuard() {
 
     window.addEventListener('beforeunload', e => {
         if (formModified) {
-            const message = window.layoutI18n?.unsavedWarning ?? 'Unsaved changes will be lost. Do you want to leave the page?';
+            const message = window.t('unsavedWarning');
             e.returnValue = message;
             return message;
         }
@@ -62,15 +62,15 @@ function initAlertHelper() {
 
 // ─── Sidebar toggle ───────────────────────────────────────────────────────────
 function initSidebar() {
-    const sidebar      = document.getElementById('sidebar');
+    const sidebar = document.getElementById('sidebar');
     const contentInner = document.getElementById('content-inner');
-    const toggleBtn    = document.getElementById('sidebarToggle');
-    const STORAGE_KEY  = 'myclub_sidebar_open';
+    const toggleBtn = document.getElementById('sidebarToggle');
+    const STORAGE_KEY = 'myclub_sidebar_open';
 
     if (!sidebar || !toggleBtn) return;
 
     const topNavCollapse = document.querySelector('.navbar-collapse');
-    const navbarToggler  = document.querySelector('.navbar-toggler');
+    const navbarToggler = document.querySelector('.navbar-toggler');
 
     const cssVar = name =>
         getComputedStyle(document.documentElement).getPropertyValue(name).trim();
@@ -137,8 +137,7 @@ function showIosInstallBanner() {
 
     if (!isIos || isStandalone || dismissed) return;
 
-    const installMessage = window.layoutI18n?.iosInstallMessage
-        ?? 'Install <strong>MyClub</strong> on your iPhone: tap <strong>⎋ Share</strong> then <strong>«Add to Home Screen»</strong>';
+    const installMessage = window.t('iosInstallMessage');
 
     const banner = document.createElement('div');
     banner.id = 'ios-install-banner';

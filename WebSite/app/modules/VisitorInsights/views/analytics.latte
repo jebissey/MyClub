@@ -60,19 +60,17 @@
 {/block}
 
 {block scripts}
-<script>
-    window.i18n = {=json_encode($translations)|noescape};
+    <script>
+        window.analyticsData = {=json_encode([
+            'os' => $osData,
+            'browser' => $browserData,
+            'resolution' => $screenResolutionData,
+            'type' => $typeData
+        ])|noescape};
 
-    window.analyticsData = {=json_encode([
-        'os' => $osData,
-        'browser' => $browserData,
-        'resolution' => $screenResolutionData,
-        'type' => $typeData
-    ])|noescape};
-
-    window.t = function(key) {
-        return window.i18n?.[key] ?? key;
-    };
-</script>
-<script type="module" src="/app/modules/VisitorInsights/js/analytics.js"></script>
+    {if isset($i18n)}
+        Object.assign(window.i18n, {=$i18n});
+    {/if}
+    </script>
+    <script type="module" src="/app/modules/VisitorInsights/js/analytics.js"></script>
 {/block}

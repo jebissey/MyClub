@@ -57,7 +57,7 @@ class RegistrationController extends TableController
                 'layout' => $this->getLayout(),
                 'navItems' => $this->getNavItems($connectedUser->person ?? false),
                 'page' => $this->application->getConnectedUser()->getPage(),
-                'translations' => [
+                'i18n' => [
                     'errorLoadGroups' => ($this->t)('person_manager.registration.error.load_groups'),
                     'errorGeneric'    => ($this->t)('person_manager.registration.error.generic'),
                 ],

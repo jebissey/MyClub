@@ -194,7 +194,7 @@ class VisitorInsightsController extends TableController
             'chartData'         => $this->logDataHelper->formatDataForChart($data),
             'periodLabel'       => $this->logDataAnalyticsHelper->getPeriodLabel($periodType),
             'page'              => $this->application->getConnectedUser()->getPage(),
-            'translations'      => [
+            'i18n' => [
                 'uniqueVisitors' => ($this->t)('visitor_insights.statistics.unique_visitors'),
                 'pageViews'      => ($this->t)('visitor_insights.statistics.page_views'),
                 's2xx'           => ($this->t)('visitor_insights.statistics.chart.2xx'),
@@ -229,7 +229,7 @@ class VisitorInsightsController extends TableController
             'control'              => new WebApp($this->application),
             'period'               => $period,
             'nav'                  => $this->logDataAnalyticsHelper->getReferentNavigation($period, $currentDate),
-            'translations' => [
+            'i18n' => [
                 'visits' => ($this->t)('visitor_insights.analytics.visits'),
             ],
             'btn_HistoryBack' => true,
@@ -295,7 +295,7 @@ class VisitorInsightsController extends TableController
             'emailFilter'  => $emailFilter,
             'groupFilter'  => $groupFilter,
             'page'         => $this->application->getConnectedUser()->getPage(),
-            'translations' => [
+            'i18n' => [
                 'tableHide' => ($this->t)('visitor_insights.cross_tab.table.hide'),
                 'tableShow' => ($this->t)('visitor_insights.cross_tab.table.show'),
             ],

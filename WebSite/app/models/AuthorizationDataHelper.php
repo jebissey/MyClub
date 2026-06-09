@@ -156,8 +156,7 @@ class AuthorizationDataHelper extends Data
         if (!$article) return false;
         if (($connectedUser->person ?? false) && ($article->CreatedBy === $connectedUser->person->Id || $connectedUser->isEditor())) return true;
         if ($article->PublishedBy === null) return false;
-        if ($connectedUser->person !== null) return $article->OnlyForMembers === 0 && ($article->IdGroup === null);
-        if ($article->OnlyForMembers === 1 && $article->IdGroup === null) return true;
+        if ($connectedUser->person !== null && $article->IdGroup === null) return true;
         return $article->IdGroup === null || !empty(array_intersect([$article->IdGroup], $this->getUserGroups($connectedUser->person?->Email ?? '')));
     }
 

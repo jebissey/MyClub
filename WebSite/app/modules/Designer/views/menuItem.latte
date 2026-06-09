@@ -189,9 +189,9 @@
         window.navbarItemsData = {$navbarItems};
         window.sidebarItemsData = {$sidebarItems};
 
-        window.t = function(key) {
-            return window.i18n?.[key] ?? key;
-        };
+    {if isset($i18n)}
+        Object.assign(window.i18n, {=$i18n});
+    {/if}
     </script>
     <script type="module" src="/app/modules/Designer/js/menuItem.js"></script>
 {/block}

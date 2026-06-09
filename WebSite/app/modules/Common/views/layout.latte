@@ -92,9 +92,12 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script type="module" src="/app/modules/Common/js/layout.js"></script>
     <script>
-        window.layoutI18n = {
+        window.i18n = {
             unsavedWarning:    {='layout.save_guard.unsaved_warning'|translate},
             iosInstallMessage: {='layout.pwa.ios_install.message'|translate}
+        };
+        window.t = function(key) {
+            return window.i18n?.[key] ?? key;
         };
     </script>
     {block scripts}{/block}

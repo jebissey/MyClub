@@ -29,7 +29,7 @@ class MenuItemController extends AbstractController
                 'groups'       => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
                 'page'         => $this->application->getConnectedUser()->getPage(),
                 'activeTab'    => $tab,
-                'translations' => [
+                'i18n' => [
                     'add_item'                => ($this->t)('menu.add_item'),
                     'edit_item'               => ($this->t)('menu.edit_item'),
                     'delete_confirm'          => ($this->t)('menu.delete_confirm'),

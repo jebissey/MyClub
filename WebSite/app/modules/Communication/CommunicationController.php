@@ -31,7 +31,7 @@ class CommunicationController extends AbstractController
                 'btn_HistoryBack' => true,
                 'smtpFrom'        => $this->emailService->getSmtpConfig()?->getSenderAddress($userEmail),
                 'userEmail'       => $userEmail,
-                'translations' => [
+                'i18n' => [
                     'subjectRequired'     => ($this->t)('communication.email.subject_required'),
                     'contentRequired'     => ($this->t)('communication.email.content_required'),
                     'confirmSend'         => ($this->t)('communication.email.confirm_send'),

@@ -229,10 +229,9 @@
         initTinyMCE('#tinymce-email', {  mode: 'normal' });
     </script>
     <script>
-        window.i18n = {=json_encode($translations)|noescape};
-        window.t = function(key) {
-            return window.i18n?.[key] ?? key;
-        };
+    {if isset($i18n)}
+        Object.assign(window.i18n, {=$i18n});
+    {/if}
         window.connectedPersonId = {$connectedPersonId};
     </script>
     <script type="module" src="/app/modules/Communication/js/main.js"></script>
