@@ -7473,7 +7473,381 @@ INSERT INTO "Languages" VALUES (1076,'Help_NextEvents_EventManager','<div class=
 INSERT INTO "Languages" VALUES (1077,'user.statistics.message_distribution','Message distribution','Distribution des messages','Dystrybucja wiadomości');
 INSERT INTO "Languages" VALUES (1078,'user.statistics.chart.messages.y_axis','Messages','Messages','Wiadomości');
 INSERT INTO "Languages" VALUES (1079,'user.statistics.chart.messages.x_axis','Members','Membres','Członkowie');
-INSERT INTO "Metadata" VALUES (1,'MyClub',76,0,1000000,NULL,10,36,6,NULL,0,NULL);
+INSERT INTO "Languages" VALUES (1080,'Help_Messages','<div class="container my-5">
+    <h1 class="display-5 fw-bold text-primary">💬 Messages</h1>
+    <p class="lead">View all conversations you are part of, grouped by type: articles, events and groups.</p>
+
+    <section class="mb-5">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h2 class="card-title h4 mb-4">How to post a message</h2>
+                <p class="text-muted">Messages are linked to an article, an event or a group. Browse to the relevant section to start or join a conversation.</p>
+                <div class="row g-4">
+
+                    <div class="col-md-4">
+                        <div class="d-flex align-items-start">
+                            <div class="me-3" style="font-size:1.75rem; line-height:1;">📰</div>
+                            <div>
+                                <strong>Article</strong>
+                                <ol class="text-muted small ps-3 mt-1">
+                                    <li>Go to the <a href="/articles">articles list</a></li>
+                                    <li>Click the green 👁 button to open the article</li>
+                                    <li>Click <strong>[Messages]</strong> in the top-right navigation bar</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="d-flex align-items-start">
+                            <div class="me-3" style="font-size:1.75rem; line-height:1;">📅</div>
+                            <div>
+                                <strong>Event</strong>
+                                <ol class="text-muted small ps-3 mt-1">
+                                    <li>Go to the <a href="/nextEvents">events list</a></li>
+                                    <li>Use the top-right buttons to browse past events if needed</li>
+                                    <li>Click the event row, then click <strong>[Messages]</strong></li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="d-flex align-items-start">
+                            <div class="me-3" style="font-size:1.75rem; line-height:1;">👥</div>
+                            <div>
+                                <strong>Group</strong>
+                                <ol class="text-muted small ps-3 mt-1">
+                                    <li>Go to the <a href="/user/directory">directory</a></li>
+                                    <li>Click on a group</li>
+                                    <li>If you are a member, a <strong>[Messages]</strong> button will appear</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="mb-5">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h2 class="card-title h4 mb-3">Reading your messages</h2>
+                <p class="text-muted small">
+                    The list shows all conversations with at least one message. Each row displays the title, the number of messages 💬, the date of the last activity and the avatar of the last contributor.
+                    Use the search filters at the top to narrow down the results by period.
+                    Click the green 👁 button on any row to open the conversation.
+                </p>
+            </div>
+        </div>
+    </section>
+</div>','<div class="container my-5">
+    <h1 class="display-5 fw-bold text-primary">💬 Messages</h1>
+    <p class="lead">Consultez toutes les conversations auxquelles vous participez, regroupées par type : articles, événements et groupes.</p>
+
+    <section class="mb-5">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h2 class="card-title h4 mb-4">Comment créer un message</h2>
+                <p class="text-muted">Les messages sont liés à un article, un événement ou un groupe. Rendez-vous dans la section concernée pour démarrer ou rejoindre une conversation.</p>
+                <div class="row g-4">
+
+                    <div class="col-md-4">
+                        <div class="d-flex align-items-start">
+                            <div class="me-3" style="font-size:1.75rem; line-height:1;">📰</div>
+                            <div>
+                                <strong>Article</strong>
+                                <ol class="text-muted small ps-3 mt-1">
+                                    <li>Rendez-vous dans la <a href="/articles">liste des articles</a></li>
+                                    <li>Cliquez sur le bouton vert 👁 pour ouvrir l''article</li>
+                                    <li>Cliquez sur <strong>[Messages]</strong> dans la barre de navigation en haut à droite</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="d-flex align-items-start">
+                            <div class="me-3" style="font-size:1.75rem; line-height:1;">📅</div>
+                            <div>
+                                <strong>Événement</strong>
+                                <ol class="text-muted small ps-3 mt-1">
+                                    <li>Rendez-vous dans la <a href="/nextEvents">liste des événements</a></li>
+                                    <li>Utilisez les boutons en haut à droite pour accéder aux événements passés si besoin</li>
+                                    <li>Cliquez sur la ligne de l''événement, puis sur <strong>[Messages]</strong></li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="d-flex align-items-start">
+                            <div class="me-3" style="font-size:1.75rem; line-height:1;">👥</div>
+                            <div>
+                                <strong>Groupe</strong>
+                                <ol class="text-muted small ps-3 mt-1">
+                                    <li>Rendez-vous dans le <a href="/user/directory">trombinoscope</a></li>
+                                    <li>Cliquez sur un groupe</li>
+                                    <li>Si vous faites partie du groupe, un bouton <strong>[Messages]</strong> apparaît</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="mb-5">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h2 class="card-title h4 mb-3">Lire vos messages</h2>
+                <p class="text-muted small">
+                    La liste affiche toutes les conversations ayant au moins un message. Chaque ligne indique le titre, le nombre de messages 💬, la date de la dernière activité et l''avatar du dernier contributeur.
+                    Utilisez les filtres de recherche en haut pour affiner les résultats par période.
+                    Cliquez sur le bouton vert 👁 d''une ligne pour ouvrir la conversation.
+                </p>
+            </div>
+        </div>
+    </section>
+</div>','<div class="container my-5">
+    <h1 class="display-5 fw-bold text-primary">💬 Wiadomości</h1>
+    <p class="lead">Przeglądaj wszystkie rozmowy, w których uczestniczysz, pogrupowane według typu: artykuły, wydarzenia i grupy.</p>
+
+    <section class="mb-5">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h2 class="card-title h4 mb-4">Jak dodać wiadomość</h2>
+                <p class="text-muted">Wiadomości są powiązane z artykułem, wydarzeniem lub grupą. Przejdź do odpowiedniej sekcji, aby rozpocząć lub dołączyć do rozmowy.</p>
+                <div class="row g-4">
+
+                    <div class="col-md-4">
+                        <div class="d-flex align-items-start">
+                            <div class="me-3" style="font-size:1.75rem; line-height:1;">📰</div>
+                            <div>
+                                <strong>Artykuł</strong>
+                                <ol class="text-muted small ps-3 mt-1">
+                                    <li>Przejdź do <a href="/articles">listy artykułów</a></li>
+                                    <li>Kliknij zielony przycisk 👁, aby otworzyć artykuł</li>
+                                    <li>Kliknij <strong>[Wiadomości]</strong> na pasku nawigacji w prawym górnym rogu</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="d-flex align-items-start">
+                            <div class="me-3" style="font-size:1.75rem; line-height:1;">📅</div>
+                            <div>
+                                <strong>Wydarzenie</strong>
+                                <ol class="text-muted small ps-3 mt-1">
+                                    <li>Przejdź do <a href="/nextEvents">listy wydarzeń</a></li>
+                                    <li>Użyj przycisków w prawym górnym rogu, aby przeglądać minione wydarzenia</li>
+                                    <li>Kliknij wiersz wydarzenia, a następnie <strong>[Wiadomości]</strong></li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="d-flex align-items-start">
+                            <div class="me-3" style="font-size:1.75rem; line-height:1;">👥</div>
+                            <div>
+                                <strong>Grupa</strong>
+                                <ol class="text-muted small ps-3 mt-1">
+                                    <li>Przejdź do <a href="/user/directory">katalogu</a></li>
+                                    <li>Kliknij na grupę</li>
+                                    <li>Jeśli jesteś członkiem grupy, pojawi się przycisk <strong>[Wiadomości]</strong></li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="mb-5">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h2 class="card-title h4 mb-3">Odczytywanie wiadomości</h2>
+                <p class="text-muted small">
+                    Lista wyświetla wszystkie rozmowy zawierające co najmniej jedną wiadomość. Każdy wiersz pokazuje tytuł, liczbę wiadomości 💬, datę ostatniej aktywności oraz awatar ostatniego uczestnika.
+                    Użyj filtrów wyszukiwania u góry, aby zawęzić wyniki według okresu.
+                    Kliknij zielony przycisk 👁 w dowolnym wierszu, aby otworzyć rozmowę.
+                </p>
+            </div>
+        </div>
+    </section>
+</div>');
+INSERT INTO "Languages" VALUES (1081,'Help_Messages','<div class="container my-5">
+    <section class="mb-5">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h2 class="card-title h4 mb-4">How to post a message</h2>
+                <p class="text-muted">Messages are linked to an article, an event or a group. Browse to the relevant section to start or join a conversation.</p>
+                <div class="row g-4">
+ 
+                    <div class="col-md-4">
+                        <div class="d-flex align-items-start">
+                            <div class="me-3" style="font-size:1.75rem; line-height:1;">📰</div>
+                            <div>
+                                <strong>Article</strong>
+                                <ol class="text-muted small ps-3 mt-1">
+                                    <li>Go to the <a href="/articles">articles list</a></li>
+                                    <li>Click the green <i class="bi bi-eye"></i> button to open the article</li>
+                                    <li>Click <button class="btn btn-warning btn-sm ms-2">Messages</button> in the top-right navigation bar</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+ 
+                    <div class="col-md-4">
+                        <div class="d-flex align-items-start">
+                            <div class="me-3" style="font-size:1.75rem; line-height:1;">📅</div>
+                            <div>
+                                <strong>Event</strong>
+                                <ol class="text-muted small ps-3 mt-1">
+                                    <li>Go to the <a href="/nextEvents">events list</a></li>
+                                    <li>Use the top-right buttons to browse past events if needed</li>
+                                    <li>Click the event row, then click <button class="btn btn-warning btn-sm ms-2">Messages</button></li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+ 
+                    <div class="col-md-4">
+                        <div class="d-flex align-items-start">
+                            <div class="me-3" style="font-size:1.75rem; line-height:1;">👥</div>
+                            <div>
+                                <strong>Group</strong>
+                                <ol class="text-muted small ps-3 mt-1">
+                                    <li>Go to the <a href="/user/directory">directory</a></li>
+                                    <li>Click on a group</li>
+                                    <li>If you are a member, a <button class="btn btn-warning btn-sm ms-2">Messages</button> button will appear</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+ 
+                </div>
+            </div>
+        </div>
+    </section>
+</div>','<div class="container my-5">
+    <section class="mb-5">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h2 class="card-title h4 mb-4">Comment créer un message</h2>
+                <p class="text-muted">Les messages sont liés à un article, un événement ou un groupe. Rendez-vous dans la section concernée pour démarrer ou rejoindre une conversation.</p>
+                <div class="row g-4">
+ 
+                    <div class="col-md-4">
+                        <div class="d-flex align-items-start">
+                            <div class="me-3" style="font-size:1.75rem; line-height:1;">📰</div>
+                            <div>
+                                <strong>Article</strong>
+                                <ol class="text-muted small ps-3 mt-1">
+                                    <li>Rendez-vous dans la <a href="/articles">liste des articles</a></li>
+                                    <li>Cliquez sur le bouton vert <i class="bi bi-eye"></i> pour ouvrir l''article</li>
+                                    <li>Cliquez sur <button class="btn btn-warning btn-sm ms-2">Messages</button> dans la barre de navigation en haut à droite</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+ 
+                    <div class="col-md-4">
+                        <div class="d-flex align-items-start">
+                            <div class="me-3" style="font-size:1.75rem; line-height:1;">📅</div>
+                            <div>
+                                <strong>Événement</strong>
+                                <ol class="text-muted small ps-3 mt-1">
+                                    <li>Rendez-vous dans la <a href="/nextEvents">liste des événements</a></li>
+                                    <li>Utilisez les boutons en haut à droite pour accéder aux événements passés si besoin</li>
+                                    <li>Cliquez sur la ligne de l''événement, puis sur <button class="btn btn-warning btn-sm ms-2">Messages</button></li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+ 
+                    <div class="col-md-4">
+                        <div class="d-flex align-items-start">
+                            <div class="me-3" style="font-size:1.75rem; line-height:1;">👥</div>
+                            <div>
+                                <strong>Groupe</strong>
+                                <ol class="text-muted small ps-3 mt-1">
+                                    <li>Rendez-vous dans le <a href="/user/directory">trombinoscope</a></li>
+                                    <li>Cliquez sur un groupe</li>
+                                    <li>Si vous faites partie du groupe, un bouton <button class="btn btn-warning btn-sm ms-2">Messages</button> apparaît</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+ 
+                </div>
+            </div>
+        </div>
+    </section>
+</div>','<div class="container my-5">
+    <section class="mb-5">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h2 class="card-title h4 mb-4">Jak dodać wiadomość</h2>
+                <p class="text-muted">Wiadomości są powiązane z artykułem, wydarzeniem lub grupą. Przejdź do odpowiedniej sekcji, aby rozpocząć lub dołączyć do rozmowy.</p>
+                <div class="row g-4">
+ 
+                    <div class="col-md-4">
+                        <div class="d-flex align-items-start">
+                            <div class="me-3" style="font-size:1.75rem; line-height:1;">📰</div>
+                            <div>
+                                <strong>Artykuł</strong>
+                                <ol class="text-muted small ps-3 mt-1">
+                                    <li>Przejdź do <a href="/articles">listy artykułów</a></li>
+                                    <li>Kliknij zielony przycisk <i class="bi bi-eye"></i>, aby otworzyć artykuł</li>
+                                    <li>Kliknij <button class="btn btn-warning btn-sm ms-2">Wiadomości</button> na pasku nawigacji w prawym górnym rogu</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+ 
+                    <div class="col-md-4">
+                        <div class="d-flex align-items-start">
+                            <div class="me-3" style="font-size:1.75rem; line-height:1;">📅</div>
+                            <div>
+                                <strong>Wydarzenie</strong>
+                                <ol class="text-muted small ps-3 mt-1">
+                                    <li>Przejdź do <a href="/nextEvents">listy wydarzeń</a></li>
+                                    <li>Użyj przycisków w prawym górnym rogu, aby przeglądać minione wydarzenia</li>
+                                    <li>Kliknij wiersz wydarzenia, a następnie <button class="btn btn-warning btn-sm ms-2">Wiadomości</button></li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+ 
+                    <div class="col-md-4">
+                        <div class="d-flex align-items-start">
+                            <div class="me-3" style="font-size:1.75rem; line-height:1;">👥</div>
+                            <div>
+                                <strong>Grupa</strong>
+                                <ol class="text-muted small ps-3 mt-1">
+                                    <li>Przejdź do <a href="/user/directory">katalogu</a></li>
+                                    <li>Kliknij na grupę</li>
+                                    <li>Jeśli jesteś członkiem grupy, pojawi się przycisk <button class="btn btn-warning btn-sm ms-2">Wiadomości</button></li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+ 
+                </div>
+            </div>
+        </div>
+    </section>
+</div>');
+INSERT INTO "Metadata" VALUES (1,'MyClub',77,0,1000000,NULL,10,36,6,NULL,0,NULL);
 INSERT INTO "Person" VALUES (1,'webmaster@myclub.foo','e427c26faca947919b18b797bc143a35100e4de48c34b70b26202d3a7d8e51f7','my first name','my last name','my nick name or nothing',NULL,'0',NULL,NULL,NULL,NULL,NULL,0,0,NULL,NULL,'2025-01-01',0,0,0,NULL,NULL,NULL,NULL,NULL,NULL,'');
 INSERT INTO "PersonGroup" VALUES (1,1,1);
 INSERT INTO "Settings" VALUES (1,'Title','title');
