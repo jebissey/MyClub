@@ -1,18 +1,19 @@
 import ApiClient from '../ApiClient.js';
 import { getCurrentPushEndpoint } from '../../../User/js/push-subscription.js';
+import ImageHelper from '../ImageHelper.js';
 
 const api = new ApiClient('');
 
 export function initMessageForm() {
-    const form                = document.getElementById('new-message-form');
-    const messageText         = document.getElementById('message-text');
-    const articleId           = document.getElementById('article-id').value;
-    const eventId             = document.getElementById('event-id').value;
-    const groupId             = document.getElementById('group-id').value;
-    const imageInput          = document.getElementById('message-image');
+    const form = document.getElementById('new-message-form');
+    const messageText = document.getElementById('message-text');
+    const articleId = document.getElementById('article-id').value;
+    const eventId = document.getElementById('event-id').value;
+    const groupId = document.getElementById('group-id').value;
+    const imageInput = document.getElementById('message-image');
     const imagePreviewWrapper = document.getElementById('image-preview-wrapper');
-    const imagePreview        = document.getElementById('image-preview');
-    const removeImageBtn      = document.getElementById('remove-image-btn');
+    const imagePreview = document.getElementById('image-preview');
+    const removeImageBtn = document.getElementById('remove-image-btn');
 
     // ── Prévisualisation ──────────────────────────────────────────────────────
     imageInput.addEventListener('change', () => {
@@ -37,7 +38,7 @@ export function initMessageForm() {
     function readAsBase64(file) {
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
-            reader.onload  = () => resolve(reader.result); // "data:image/jpeg;base64,..."
+            reader.onload = () => resolve(reader.result); // "data:image/jpeg;base64,..."
             reader.onerror = reject;
             reader.readAsDataURL(file);
         });
@@ -47,13 +48,13 @@ export function initMessageForm() {
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
 
-        const text  = messageText.value.trim();
-        const file  = imageInput.files[0] ?? null;
+        const text = messageText.value.trim();
+        const file = imageInput.files[0] ?? null;
 
         if (!text && !file) return;
 
         const senderEndpoint = await getCurrentPushEndpoint();
-        const imageBase64    = file ? await readAsBase64(file) : null;
+        const imageBase64 = file ? await ImageHelper.fileToDataUrl(file, 1200, 0.9) : null;
 
         const data = await api.post('/api/message/add', {
             articleId,

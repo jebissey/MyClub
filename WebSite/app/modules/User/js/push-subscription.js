@@ -18,13 +18,12 @@ export async function isSubscribed() {
 export async function subscribePush(vapidKey) {
     if (!hasPushSupport()) throw new Error("Push non supporté");
 
-    // 🔥 Edge-safe : DIRECT click → permission
     const permission = await Notification.requestPermission();
     if (permission !== "granted") {
         throw new Error("Autorisation refusée");
     }
 
-    const reg = await navigator.serviceWorker.register("/service-worker.js");
+    const reg = await navigator.serviceWorker.ready;
 
     const sub = await reg.pushManager.subscribe({
         userVisibleOnly: true,

@@ -1,4 +1,5 @@
 import ApiClient from '../../Common/js/ApiClient.js';
+import ImageHelper from '../../Common/js/ImageHelper.js';
 
 const api = new ApiClient();
 const t = (key) => window.t?.(key) ?? key;
@@ -22,22 +23,6 @@ function setEditStatus(message, type = 'info') {
 }
 function clearEditStatus() {
     editStatus.innerHTML = '';
-}
-
-/** Resize a canvas so neither dimension exceeds maxPx. Returns same canvas if already within bounds. */
-function resizeCanvas(canvas, maxPx) {
-    const { width, height } = canvas;
-    if (width <= maxPx && height <= maxPx) return canvas;
-
-    const ratio = Math.min(maxPx / width, maxPx / height);
-    const newW = Math.round(width * ratio);
-    const newH = Math.round(height * ratio);
-
-    const out = document.createElement('canvas');
-    out.width = newW;
-    out.height = newH;
-    out.getContext('2d').drawImage(canvas, 0, 0, newW, newH);
-    return out;
 }
 
 function updateDimensionHint() {
@@ -126,15 +111,13 @@ saveEditBtn.addEventListener('click', async () => {
     // 1. Get cropped canvas at natural resolution
     let canvas = cropper.getCroppedCanvas();
 
-    // 2. Resize if any dimension exceeds maxPx
-    canvas = resizeCanvas(canvas, maxPx);
+    // 2. Resize + convert via ImageHelper
+    canvas = ImageHelper.resizeCanvas(canvas, maxPx);
 
-    // 3. Determine output format from filename
     const ext = currentEditPath.split('.').pop().toLowerCase();
-    const mime = (ext === 'png') ? 'image/png' : 'image/jpeg';
-    const quality = (mime === 'image/jpeg') ? 0.92 : undefined;
+    const mime = ext === 'png' ? 'image/png' : 'image/jpeg';
+    const quality = mime === 'image/jpeg' ? 0.92 : undefined;
 
-    // 4. Convert to base64 and POST
     const imageData = canvas.toDataURL(mime, quality);
 
     saveEditBtn.disabled = true;

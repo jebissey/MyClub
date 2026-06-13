@@ -64,8 +64,9 @@ class ContactController extends AbstractController
         }
 
         $formLoadedAt = $_SESSION['contact_form_loaded'] ?? 0;
-        if (time() - $formLoadedAt < self::MIN_FILL_SECONDS) {
-            $this->silentFail('too fast for a human');
+        $duration = time() - $formLoadedAt;
+        if ($duration <= self::MIN_FILL_SECONDS) {
+            $this->silentFail("too fast for a human ({$duration}s)");
             return;
         }
         unset($_SESSION['contact_form_loaded']);
