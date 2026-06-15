@@ -20,7 +20,7 @@ use app\modules\Common\services\AuthenticationService;
 
 class Application
 {
-    public const VERSION = '0.86';
+    public const VERSION = '0.87';
     public const  EMOJI_LIST = [
         '😀', '😄', '😁', '😅', '😂', '🤣', '😊', '😇', '🤨', 
         '🙂', '🙃', '😉', '😌', '☹️', '😐', '🙄', '😯', '🥴', 

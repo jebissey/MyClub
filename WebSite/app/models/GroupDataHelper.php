@@ -88,7 +88,7 @@ class GroupDataHelper extends Data
             FROM `Group` g 
             LEFT JOIN PersonGroup pg ON pg.IdGroup = g.Id AND pg.IdPerson = ?
             WHERE g.Inactivated = 0 AND (g.SelfRegistration = 1 OR pg.Id IS NOT NULL)
-            ORDER BY g.Name');
+            ORDER BY g.SelfRegistration DESC, g.Name');
         $query->execute([$personId]);
         return $query->fetchAll(PDO::FETCH_OBJ);
     }
