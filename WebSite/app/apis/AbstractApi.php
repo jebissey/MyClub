@@ -138,4 +138,13 @@ abstract class AbstractApi
         }
         return true;
     }
+
+    protected function render(string $templateLatteName, object|array $params = []): void
+    {
+        $content = $this->latte->renderToString($templateLatteName, $params);
+        echo $content;
+        if (ob_get_level()) ob_end_flush();
+        flush();
+        Flight::stop();
+    }
 }

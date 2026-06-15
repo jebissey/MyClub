@@ -43,6 +43,7 @@ class CommunicationController extends AbstractController
                     'quotaAlmost'         => ($this->t)('communication.quota.almost_exceeded'),
                 ],
                 'connectedPersonId' => $connectedUser->person?->Id ?? null,
+                'contactEmail' => $this->dataHelper->get('Settings', ['Name' => 'contactEmail'], 'Value')->Value ?? '',
             ]));
         }
     }

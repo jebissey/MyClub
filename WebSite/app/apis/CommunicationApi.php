@@ -184,6 +184,23 @@ class CommunicationApi extends AbstractApi
         }
     }
 
+    public function updateContactEmail(): void
+    {
+        if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isCommunicationManager())) {
+            $body  = json_decode(file_get_contents('php://input'), true);
+            $value = trim($body['value'] ?? '');
+
+            // Validation
+            if ($value !== '' && !filter_var($value, FILTER_VALIDATE_EMAIL)) {
+                $this->renderJsonBadRequest('Invalid email address', __FILE__, __LINE__);
+                return;
+            }
+
+            $this->dataHelper->set('Settings', ['Name' => 'contactEmail', 'Value' => $value]);
+            $this->renderJsonOk();
+        }
+    }
+
     #region Private methods
     private function buildQuotaStats(): array
     {

@@ -161,9 +161,9 @@ class ContactController extends AbstractController
 
     private function sendContactMessage(array $input, ?int $eventId): void
     {
-        $adminEmail = $this->dataHelper->get('Settings', ['Name' => 'contactEmail'], 'Value')->Value ?? '';
-        if ($adminEmail === '') $adminEmail = $this->personDataHelper->getWebmasterEmail();
-        if (!filter_var($adminEmail, FILTER_VALIDATE_EMAIL)) {
+        $contactEmail = $this->dataHelper->get('Settings', ['Name' => 'contactEmail'], 'Value')->Value ?? '';
+        if ($contactEmail === '') $contactEmail = $this->personDataHelper->getWebmasterEmail();
+        if (!filter_var($contactEmail, FILTER_VALIDATE_EMAIL)) {
             $this->application->getErrorManager()->raise(ApplicationError::InvalidSetting, 'Invalid contactEmail', 3000, false);
             return;
         }
@@ -178,11 +178,11 @@ class ContactController extends AbstractController
                 $this->raiseBadRequest("Unknown event {$eventId}", __FILE__, __LINE__);
                 return;
             }
-            $emailSent = $this->personDataHelper->sendRegistrationLink($adminEmail, $name, $email, $event);
+            $emailSent = $this->personDataHelper->sendRegistrationLink($contactEmail, $name, $email, $event);
         } else {
             $emailMessage = new EmailMessage(
                 from: $email,
-                to: $adminEmail,
+                to: $contactEmail,
                 subject: "Message de contact de {$name} ({$email})",
                 body: $message,
                 isHtml: false

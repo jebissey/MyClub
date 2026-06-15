@@ -160,7 +160,7 @@ class HomeController extends AbstractController
         }
         $lang = TranslationManager::getCurrentLanguage();
 
-        $content = $this->latte->renderToString('Common/views/info.latte', $this->getAllParams([
+        $this->render('Common/views/info.latte', $this->getAllParams([
             'content' => $this->dataHelper->get('Languages', ['Name' => 'LegalNotices'], $lang)->$lang ?? '',
             'hasAuthorization' => $this->application->getConnectedUser()->hasAutorization() ?? false,
             'currentVersion' => Application::VERSION,
@@ -168,7 +168,6 @@ class HomeController extends AbstractController
             'timer' => 0,
             'btn_HistoryBack' => true,
         ]));
-        echo $content;
     }
 
     public function signpost(): void

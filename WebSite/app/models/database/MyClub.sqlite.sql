@@ -7849,7 +7849,8 @@ INSERT INTO "Languages" VALUES (1081,'Help_Messages','<div class="container my-5
 </div>');
 INSERT INTO "Languages" VALUES (1082,'user.groups.select_prompt','Select the groups you wish to join to access the associated resources:','Sélectionnez les groupes auxquels vous souhaitez appartenir pour accéder aux ressources associées :','Wybierz grupy, do których chcesz należeć, aby uzyskać dostęp do powiązanych zasobów:');
 INSERT INTO "Languages" VALUES (1083,'user.groups.managed_info','An administrator has added you to these groups. If you no longer wish to be a member, you must submit a request to them.','Un administrateur vous a inscrit dans ces groupes. Si vous ne souhaitez plus y figurer, vous devez lui en faire la demande.','Administrator zapisał Cię do tych grup. Jeśli nie chcesz już w nich figurować, musisz złożyć mu odpowiedni wniosek.');
-INSERT INTO "Metadata" VALUES (1,'MyClub',78,0,1000000,NULL,10,36,6,NULL,0,NULL);
+INSERT INTO "Languages" VALUES (1084,'communication.index.contact_email_tooltip','Email address where contact requests will be sent','Adresse e-mail où les demandes de contact seront envoyées','Adres e-mail, na który będą wysyłane prośby o kontakt');
+INSERT INTO "Metadata" VALUES (1,'MyClub',79,0,1000000,NULL,10,36,6,NULL,0,NULL);
 INSERT INTO "Person" VALUES (1,'webmaster@myclub.foo','e427c26faca947919b18b797bc143a35100e4de48c34b70b26202d3a7d8e51f7','my first name','my last name','my nick name or nothing',NULL,'0',NULL,NULL,NULL,NULL,NULL,0,0,NULL,NULL,'2025-01-01',0,0,0,NULL,NULL,NULL,NULL,NULL,NULL,'');
 INSERT INTO "PersonGroup" VALUES (1,1,1);
 INSERT INTO "Settings" VALUES (1,'Title','title');

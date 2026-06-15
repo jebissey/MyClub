@@ -1,10 +1,12 @@
-import QuotaManager  from './QuotaManager.js';
+import QuotaManager from './QuotaManager.js';
 import MemberManager from './MemberManager.js';
-import EmailForm     from './EmailForm.js';
+import EmailForm from './EmailForm.js';
+import ContactManager from './ContactManager.js';
 
-const quota   = new QuotaManager();
+const quota = new QuotaManager();
 const members = new MemberManager();
-const form    = new EmailForm(quota, members);
+const form = new EmailForm(quota, members);
+const contact = new ContactManager();
 
 // ── Synchronisation quota ↔ membres ─────────────────────────────────────────
 // Chaque changement de sélection déclenche un refresh quota avec le nouveau
@@ -25,3 +27,4 @@ quota.onChange(() => {
 members.bindEvents();
 form.bindEvents();
 quota.refresh();
+contact.bindEvents();

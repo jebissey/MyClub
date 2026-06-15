@@ -10,6 +10,22 @@
     <div class="container-fluid d-flex align-items-center gap-3">
         {include '../../Common/views/navbar/_userLeft.latte'}
 
+        <div class="d-flex align-items-center gap-2 ms-3">
+            <div class="input-group input-group-sm" style="min-width:200px;max-width:280px">
+                <span class="input-group-text px-2">
+                    <i class="bi bi-envelope-at fs-5"></i>
+                </span>
+                <input type="email"
+                    id="contact-email-input"
+                    class="form-control form-control-sm"
+                    value="{$contactEmail|noescape}"
+                    placeholder="contact@example.com"
+                    data-bs-toggle="tooltip"
+                    title="{='communication.index.contact_email_tooltip'|translate}">
+                <span id="contact-email-status" class="input-group-text px-2" style="width:28px"></span>
+            </div>
+        </div>
+
         <div class="ms-auto d-flex align-items-center gap-3 flex-wrap">
             <div class="d-flex flex-column gap-1 px-2 py-1 rounded bg-dark-subtle" style="min-width:180px">
                 <div class="d-flex align-items-center gap-2 small">
