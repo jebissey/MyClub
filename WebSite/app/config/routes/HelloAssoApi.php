@@ -8,7 +8,7 @@ use app\config\ApiFactory;
 use app\interfaces\RouteInterface;
 use app\valueObjects\Route;
 
-class MembershipApi implements RouteInterface
+class HelloAssoApi implements RouteInterface
 {
     private array $routes = [];
 
@@ -16,16 +16,16 @@ class MembershipApi implements RouteInterface
 
     public function get(): array
     {
-        $membershipApi = fn() => $this->apiFactory->makeMembershipApi();
+        $helloAssoApi = fn() => $this->apiFactory->makeHelloAssoApi();
 
         // Initiated by the member's browser
-        $this->routes[] = new Route('POST /api/membership/checkout', $membershipApi, 'checkout');
+        $this->routes[] = new Route('POST /api/helloAsso/checkout', $helloAssoApi, 'checkout');
 
         // Called by HelloAsso server (no user session)
-        $this->routes[] = new Route('POST /api/membership/webhook', $membershipApi, 'webhook');
+        $this->routes[] = new Route('POST /api/helloAsso/webhook', $helloAssoApi, 'webhook');
 
         // Browser redirect-back from HelloAsso
-        $this->routes[] = new Route('GET /api/membership/return', $membershipApi, 'paymentReturn');
+        $this->routes[] = new Route('GET /api/helloAsso/return', $helloAssoApi, 'paymentReturn');
 
         return $this->routes;
     }

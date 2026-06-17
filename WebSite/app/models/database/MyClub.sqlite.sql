@@ -297,6 +297,7 @@ CREATE TABLE IF NOT EXISTS "Membership" (
 );
 CREATE TABLE IF NOT EXISTS "MenuItem" (
 	"Id"	INTEGER,
+	"What"	TEXT NOT NULL CHECK("What" IN ('navbar', 'sidebar')),
 	"Type"	TEXT NOT NULL CHECK("Type" IN ('heading', 'link', 'divider', 'submenu')),
 	"Label"	TEXT,
 	"Icon"	TEXT,
@@ -1523,17 +1524,6 @@ INSERT INTO "Languages" VALUES (58,'Help_Redactor','Redactor help','Aide rédate
 INSERT INTO "Languages" VALUES (59,'Help_User','User help','Aide utilisateur','Pomoc użytkownika');
 INSERT INTO "Languages" VALUES (60,'Help_VisitorInsights','Visitor insights help','Aide statistiques visiteurs','Pomoc statystyk odwiedzających');
 INSERT INTO "Languages" VALUES (61,'Help_Webmaster','Webmater help','Aide webmaster','Pomoc webmastera');
-INSERT INTO "Languages" VALUES (62,'Home_Header','Home header','<div>
-<h4>Un lieu de partage, d’échange et d’entraide autour du monde apicole, dans un esprit de défense de protection de l’abeille et de l’environnement en respectant la biodiversité</h4>
-</div>','Nagłówek strony głównej');
-INSERT INTO "Languages" VALUES (63,'Home_Footer','Home footer','<div class="alert alert-info">
-<div class="container text-center">
-<p>Vous avez des ruches et vous voulez apprendre &agrave; mieux vous en occuper ? Vous &ecirc;tes professionnels, passionn&eacute;s ou curieux d&rsquo;en apprendre d&rsquo;avantage sur le monde apicole, participer &agrave; la pr&eacute;servation de l&rsquo;abeille en pr&eacute;servant environnement ?</p>
-<p class="fw-semibold d-inline-flex align-items-center gap-3">Suivez l&rsquo;association sur les r&eacute;seaux sociaux <a href="https://www.facebook.com/LesAmisDesAbeilles21" target="_blank" rel="noopener noreferrer" class="text-dark fs-4" aria-label="Facebook"> <i class="bi bi-facebook"></i> </a> <a href="https://www.instagram.com/lesamisdesabeilles21" target="_blank" rel="noopener noreferrer" class="text-dark fs-4" aria-label="Instagram"> <i class="bi bi-instagram"></i> </a></p>
-<p class="small text-muted mb-1">&copy; 2026 &ndash; Les Amis des Abeilles 21</p>
-<p class="small text-muted">Association apicole &ndash; Rucher &eacute;cole et sensibilisation &agrave; la protection des abeilles</p>
-</div>
-</div>','Stopka strony głównej');
 INSERT INTO "Languages" VALUES (64,'Error403','<div class="container text-center mt-5">
   <div class="card shadow-lg rounded-3 p-4">
     <h1 class="text-danger">🚫 Error 403 – Unauthorized Access</h1>
@@ -7850,6 +7840,20 @@ INSERT INTO "Languages" VALUES (1081,'Help_Messages','<div class="container my-5
 INSERT INTO "Languages" VALUES (1082,'user.groups.select_prompt','Select the groups you wish to join to access the associated resources:','Sélectionnez les groupes auxquels vous souhaitez appartenir pour accéder aux ressources associées :','Wybierz grupy, do których chcesz należeć, aby uzyskać dostęp do powiązanych zasobów:');
 INSERT INTO "Languages" VALUES (1083,'user.groups.managed_info','An administrator has added you to these groups. If you no longer wish to be a member, you must submit a request to them.','Un administrateur vous a inscrit dans ces groupes. Si vous ne souhaitez plus y figurer, vous devez lui en faire la demande.','Administrator zapisał Cię do tych grup. Jeśli nie chcesz już w nich figurować, musisz złożyć mu odpowiedni wniosek.');
 INSERT INTO "Languages" VALUES (1084,'communication.index.contact_email_tooltip','Email address where contact requests will be sent','Adresse e-mail où les demandes de contact seront envoyées','Adres e-mail, na który będą wysyłane prośby o kontakt');
+INSERT INTO "Languages" VALUES (1085,'Home_header','<h1 class="text-center">🚧🔧🛠️ Under Construction 🛠️🔧🚧</h1>','<h1 class="text-center">🚧🔧🛠️ En construction 🛠️🔧🚧</h1>','<h1 class="text-center">🚧🔧🛠️ W budowie 🛠️🔧🚧</h1>');
+INSERT INTO "Languages" VALUES (1086,'Home_footer','<div style="text-align:center; font-size:2.4em; line-height:1.4;">
+🚧👷‍♂️🔧👷‍♀️🚧<br>
+<b>WORK IN PROGRESS</b><br>
+🚧👷‍♀️🔧👷‍♂️🚧
+</div>','<div style="text-align:center; font-size:2.4em; line-height:1.4;">
+🚧👷‍♂️🔧👷‍♀️🚧<br>
+<b>TRAVAUX EN COURS</b><br>
+🚧👷‍♀️🔧👷‍♂️🚧
+</div>','<div style="text-align:center; font-size:2.4em; line-height:1.4;">
+🚧👷‍♂️🔧👷‍♀️🚧<br>
+<b>PRACE W TOKU</b><br>
+🚧👷‍♀️🔧👷‍♂️🚧
+</div>');
 INSERT INTO "Metadata" VALUES (1,'MyClub',79,0,1000000,NULL,10,36,6,NULL,0,NULL);
 INSERT INTO "Person" VALUES (1,'webmaster@myclub.foo','e427c26faca947919b18b797bc143a35100e4de48c34b70b26202d3a7d8e51f7','my first name','my last name','my nick name or nothing',NULL,'0',NULL,NULL,NULL,NULL,NULL,0,0,NULL,NULL,'2025-01-01',0,0,0,NULL,NULL,NULL,NULL,NULL,NULL,'');
 INSERT INTO "PersonGroup" VALUES (1,1,1);

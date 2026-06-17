@@ -46,6 +46,7 @@ function main(): int
     if (!CurrentWebSite::backup($dbWebSitePath)) throw new InvalidArgumentException("File $dbWebSitePath doesn't exist");
     if (!CurrentWebSite::remove($dbWebSitePath)) throw new InvalidArgumentException("File $dbWebSitePath doesn't removed");
     $stop = isset($options['stop']) ? true : false;
+    $totalTimeMs = 0;
     try {
         echo "Configuration:\n";
         echo "  Base URL: {$config->baseUrl}\n";
@@ -77,7 +78,7 @@ function main(): int
     return 0;
 }
 
-if (basename(__FILE__) === basename($_SERVER['SCRIPT_NAME'] ?? '')) exit(main($argv));
+if (basename(__FILE__) === basename($_SERVER['SCRIPT_NAME'] ?? '')) exit(main());
 
 function printHelp(): void
 {

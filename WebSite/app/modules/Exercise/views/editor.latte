@@ -115,8 +115,10 @@
 <script>
     window.articleId  = {$articleId};
     window.exercises  = {=json_encode($exercises)|noescape};
-    window.i18n = {=json_encode($translations)|noescape};
-    window.t = k => window.i18n?.[k] ?? k;
+    
+    {if isset($i18n)}
+        Object.assign(window.i18n, {=$i18n});
+    {/if}
 </script>
 <script type="module" src="/app/modules/Exercise/js/editor.js"></script>
 {/block}

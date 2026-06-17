@@ -25,7 +25,7 @@ class LoanController extends AbstractController
         }
 
         $this->render('Loan/views/calendar.latte', $this->getAllParams([
-            'translations' => $this->translations_(),
+            'i18n' => $this->translations_(),
             'page' => $this->application->getConnectedUser()->getPage(),
             'activeTab' => 'calendar',
             'btn_Parent' => "/user",
@@ -43,7 +43,7 @@ class LoanController extends AbstractController
 
         $this->render('Loan/views/designer.latte', $this->getAllParams([
             'items'        => $this->loanDataHelper->getAllItems(),
-            'translations' => $this->translations_(),
+            'i18n' => $this->translations_(),
             'page' => $this->application->getConnectedUser()->getPage(),
             'activeTab' => 'designer',
             'btn_Parent' => "/admin",
@@ -80,7 +80,7 @@ class LoanController extends AbstractController
             'loans'        => $this->loanDataHelper->getAllLoans(),
             'loanItems'    => $this->loanDataHelper->getActiveItems('loan'),
             'persons'      => $this->loanDataHelper->getAllPersons(),
-            'translations' => $this->translations_(),
+            'i18n' => $this->translations_(),
             'activeTab' => 'manager',
             'btn_Parent' => "/user",
             'btn_HistoryBack' => true,
@@ -102,7 +102,7 @@ class LoanController extends AbstractController
             'persons'           => $this->loanDataHelper->getAllPersons(),
             'isManager'         => $user->isLoanManager(),
             'currentUserId'     => $userId,
-            'translations'      => $this->translations_(),
+            'i18n' => $this->translations_(),
             'page' => $this->application->getConnectedUser()->getPage(),
             'activeTab' => 'user',
             'btn_Parent' => "/user",

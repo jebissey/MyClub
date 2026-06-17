@@ -2,7 +2,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="editModalTitle">{$translations['modal_title']}</h5>
+                <h5 class="modal-title" id="editModalTitle">{$i18n['modal_title']}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
@@ -10,30 +10,30 @@
                 <input type="hidden" id="itemWhat">
 
                 <div class="mb-3 field-sidebar">
-                    <label for="itemType" class="form-label">{$translations['field_type']}</label>
+                    <label for="itemType" class="form-label">{$i18n['field_type']}</label>
                     <select class="form-select" id="itemType">
-                        <option value="link">{$translations['type_link']}</option>
-                        <option value="heading">{$translations['type_heading']}</option>
-                        <option value="divider">{$translations['type_divider']}</option>
-                        <option value="submenu">{$translations['type_submenu']}</option>
+                        <option value="link">{$i18n['type_link']}</option>
+                        <option value="heading">{$i18n['type_heading']}</option>
+                        <option value="divider">{$i18n['type_divider']}</option>
+                        <option value="submenu">{$i18n['type_submenu']}</option>
                     </select>
                 </div>
 
                 <div class="mb-3 field-navbar field-sidebar field-hide-divider">
-                    <label for="itemLabel" class="form-label">{$translations['field_label']}</label>
+                    <label for="itemLabel" class="form-label">{$i18n['field_label']}</label>
                     <input type="text" class="form-control" id="itemLabel">
                 </div>
 
                 <div class="mb-3 field-navbar field-sidebar-link">
-                    <label for="itemUrl" class="form-label">{$translations['field_url']}</label>
+                    <label for="itemUrl" class="form-label">{$i18n['field_url']}</label>
                     <input type="text" class="form-control" id="itemUrl"
-                           placeholder="{$translations['field_url_placeholder']}">
+                           placeholder="{$i18n['field_url_placeholder']}">
                 </div>
 
                 <div class="mb-3">
-                    <label for="itemGroup" class="form-label">{$translations['field_group']}</label>
+                    <label for="itemGroup" class="form-label">{$i18n['field_group']}</label>
                     <select class="form-select" id="itemGroup">
-                        <option value="">{$translations['field_none']}</option>
+                        <option value="">{$i18n['field_none']}</option>
                         {foreach $groups as $group}
                         <option value="{$group->Id}">{$group->Name}</option>
                         {/foreach}
@@ -41,36 +41,36 @@
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label mb-1">{$translations['field_visible_for']}</label>
+                    <label class="form-label mb-1">{$i18n['field_visible_for']}</label>
                     <div class="form-check">
                         <input type="checkbox" class="form-check-input" id="forMembers">
-                        <label class="form-check-label" for="forMembers">{$translations['field_members']}</label>
+                        <label class="form-check-label" for="forMembers">{$i18n['field_members']}</label>
                     </div>
                     <div class="form-check">
                         <input type="checkbox" class="form-check-input" id="forContacts">
-                        <label class="form-check-label" for="forContacts">{$translations['field_contacts']}</label>
+                        <label class="form-check-label" for="forContacts">{$i18n['field_contacts']}</label>
                     </div>
                     <div class="form-check">
                         <input type="checkbox" class="form-check-input" id="forAnonymous">
-                        <label class="form-check-label" for="forAnonymous">{$translations['field_anonymous']}</label>
+                        <label class="form-check-label" for="forAnonymous">{$i18n['field_anonymous']}</label>
                     </div>
                 </div>
 
                 <div class="mb-3 field-sidebar field-hide-divider">
                     <label for="itemIcon" class="form-label">
-                        {$translations['field_icon']} <small class="text-muted">bi-*</small> :
+                        {$i18n['field_icon']} <small class="text-muted">bi-*</small> :
                     </label>
                     <div class="input-group">
                         <span class="input-group-text"><i id="iconPreview" class="bi"></i></span>
                         <input type="text" class="form-control" id="itemIcon"
-                               placeholder="{$translations['field_icon_placeholder']}">
+                               placeholder="{$i18n['field_icon_placeholder']}">
                     </div>
                 </div>
 
                 <div class="mb-3 field-sidebar field-hide-heading">
-                    <label for="itemParent" class="form-label">{$translations['field_parent']}</label>
+                    <label for="itemParent" class="form-label">{$i18n['field_parent']}</label>
                     <select class="form-select" id="itemParent">
-                        <option value="">{$translations['field_none']}</option>
+                        <option value="">{$i18n['field_none']}</option>
                         {foreach $sidebarItems as $parent}
                             {if $parent->Type === 'submenu'}
                         <option value="{$parent->Id}">{$parent->Label}</option>
@@ -81,9 +81,9 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary"
-                        data-bs-dismiss="modal">{$translations['btn_cancel']}</button>
+                        data-bs-dismiss="modal">{$i18n['btn_cancel']}</button>
                 <button type="button" class="btn btn-primary"
-                        id="saveChanges">{$translations['btn_save']}</button>
+                        id="saveChanges">{$i18n['btn_save']}</button>
             </div>
         </div>
     </div>

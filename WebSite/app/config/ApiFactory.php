@@ -15,13 +15,13 @@ use app\apis\EventNeedTypeApi;
 use app\apis\EventSupplyApi;
 use app\apis\ExerciseApi;
 use app\apis\GroupApi;
+use app\apis\HelloAssoApi;
 use app\apis\ImportApi;
 use app\apis\KanbanApi;
 use app\apis\KaraokeApi;
 use app\apis\LeapfrogApi;
 use app\apis\LoanApi;
 use app\apis\MediaApi;
-use app\apis\MembershipApi;
 use app\apis\MenuItemApi;
 use app\apis\MessageApi;
 use app\apis\NotificationApi;
@@ -229,6 +229,18 @@ class ApiFactory
         );
     }
 
+    public function makeHelloAssoApi(): HelloAssoApi
+    {
+        return new HelloAssoApi(
+            $this->application,
+            $this->connectedUser,
+            $this->dataHelper,
+            $this->personDataHelper,
+            $this->membershipDataHelper,
+            CredentialService::getInstance()
+        );
+    }
+
     public function makeImportApi(): ImportApi
     {
         return new ImportApi(
@@ -302,18 +314,6 @@ class ApiFactory
             $this->connectedUser,
             $this->dataHelper,
             $this->personDataHelper
-        );
-    }
-
-    public function makeMembershipApi(): MembershipApi
-    {
-        return new MembershipApi(
-            $this->application,
-            $this->connectedUser,
-            $this->dataHelper,
-            $this->personDataHelper,
-            $this->membershipDataHelper,
-            CredentialService::getInstance()
         );
     }
 

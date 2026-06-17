@@ -11,7 +11,7 @@ use app\models\MembershipDataHelper;
 use app\models\PersonDataHelper;
 use app\modules\HelloAsso\services\HelloAssoService;
 
-class MembershipApi extends AbstractApi
+class HelloAssoApi extends AbstractApi
 {
     public function __construct(
         Application $application,
@@ -23,7 +23,7 @@ class MembershipApi extends AbstractApi
         parent::__construct($application, $connectedUser, $dataHelper, $personDataHelper);
     }
 
-	// ─── POST /api/membership/checkout ───────────────────────────────────────
+	// ─── POST /api/helloAsso/checkout ───────────────────────────────────────
 
     /**
      * Initiates a HelloAsso checkout intent for the current season.
@@ -86,7 +86,7 @@ class MembershipApi extends AbstractApi
         }
     }
 
-	// ─── POST /api/membership/webhook ────────────────────────────────────────
+	// ─── POST /api/helloAsso/webhook ────────────────────────────────────────
 
     /**
      * HelloAsso webhook endpoint (no authentication: public URL).
@@ -124,7 +124,7 @@ class MembershipApi extends AbstractApi
         echo json_encode(['ok' => $ok]);
     }
 
-	// ─── GET /api/membership/return ──────────────────────────────────────────
+	// ─── GET /api/helloAsso/return ──────────────────────────────────────────
 
     /**
      * Return URL after HelloAsso payment page (redirect, not AJAX).

@@ -60,7 +60,7 @@ class TranslatorController extends AbstractController
             'navItems'      => $this->getNavItems($user->person),
             'title'         => 'Translations',
             'page'          => $user->getPage(),
-            'translations'  => $translations,
+            'i18n'  => $translations,
             'referenceLang' => $referenceLang,
             'targetLang'    => $targetLang,
             'missingOnly'   => $missingOnly,
