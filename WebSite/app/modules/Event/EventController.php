@@ -130,11 +130,24 @@ class EventController extends AbstractController
     public function show(int $eventId, string $message = '', string $messageType = ''): void
     {
         $person = $this->application->getConnectedUser()->person ?? false;
+        $token = WebApp::getFiltered('t', FilterInputRule::Token->value, $this->flight->request()->query->getData()) ?? false;
+        $event = $this->eventDataHelper->getEvent($eventId);
+
+        if ($person === false && !$token && ($event->Audience != 'All' || $event->Audience == 'Guest')) {
+            $result = $this->application->getAuthenticationService()->handleRememberMeLogin();
+            if ($result && $result->isSuccess()) {
+                $this->application->getConnectedUser()->get();
+                $this->redirect($_SERVER['REQUEST_URI'], ApplicationError::Ok, "Auto sign in succeeded for {$result->getUser()->Email}");
+                return;
+            }
+            $this->redirect('/user/sign/in?redirect=' . urlencode($_SERVER['REQUEST_URI']));
+        }
+
         $userEmail = $person->Email ?? '';
         if ($this->dataHelper->get('Event', ['Id' => $eventId], 'Id')) {
             $this->render('Event/views/event_detail.latte', $this->getAllParams([
                 'eventId' => $eventId,
-                'event' => $this->eventDataHelper->getEvent($eventId),
+                'event' => $event,
                 'attributes' => $this->eventDataHelper->getEventAttributes($eventId),
                 'participants' => $this->participantDataHelper->getEventParticipants($eventId),
                 'userEmail' => $userEmail,
@@ -147,7 +160,7 @@ class EventController extends AbstractController
                 'eventNeeds' => $this->eventDataHelper->getEventNeeds($eventId),
                 'participantSupplies' => $this->eventDataHelper->getParticipantSupplies($eventId),
                 'userSupplies' => $this->eventDataHelper->getUserSupplies($eventId, $userEmail),
-                'token' => WebApp::getFiltered('t', FilterInputRule::Token->value, $this->flight->request()->query->getData()) ?? false,
+                'token' => $token,
                 'message' => $message,
                 'messageType' => $messageType,
                 'page' => $this->application->getConnectedUser()->getPage(),

@@ -10,7 +10,9 @@
 
     <div class="ms-auto d-flex flex-wrap align-items-center justify-content-end row-gap-2">
     {if $isCreator}
+        {if $article->PublishedBy !== null}
         <a href="/emails/article/{$id}" class="btn btn-warning ms-2">{='article.show.notify_subscribers'|translate}</a>
+        {/if}
         <a href="/article/carousel/{$id}" class="btn btn-info ms-2">
             <i class="bi bi-images"></i> {='article.show.manage_gallery'|translate}
         </a>

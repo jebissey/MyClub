@@ -38,7 +38,7 @@
                         <div class="mb-3">
                             <h5>{='user.statistics.articles'|translate}</h5>
                             <div class="progress" style="height: 25px;">
-                                <div class="progress-bar" role="progressbar" style="width: {$stats['articles']['percentage']}%;"
+                                <div class="progress-bar" role="progressbar" style="width: {$stats['articles']['percentage']|noescape}%;"
                                     aria-valuenow="{$stats['articles']['percentage']}" aria-valuemin="0" aria-valuemax="100">
                                     {$stats['articles']['percentage']}%
                                 </div>
@@ -51,7 +51,7 @@
                         <div class="mb-3">
                             <h5>{='user.statistics.surveys'|translate}</h5>
                             <div class="progress" style="height: 25px;">
-                                <div class="progress-bar bg-info" role="progressbar" style="width: {$stats['surveys']['percentage']}%;"
+                                <div class="progress-bar bg-info" role="progressbar" style="width: {$stats['surveys']['percentage']|noescape}%;"
                                     aria-valuenow="{$stats['surveys']['percentage']}" aria-valuemin="0" aria-valuemax="100">
                                     {$stats['surveys']['percentage']}%
                                 </div>
@@ -65,7 +65,7 @@
                         <div class="mb-3">
                             <h5>{='user.statistics.survey_replies'|translate}</h5>
                             <div class="progress" style="height: 25px;">
-                                <div class="progress-bar bg-success" role="progressbar" style="width: {$stats['surveyReplies']['percentage']}%;"
+                                <div class="progress-bar bg-success" role="progressbar" style="width: {$stats['surveyReplies']['percentage']|noescape}%;"
                                     aria-valuenow="{$stats['surveyReplies']['percentage']}" aria-valuemin="0" aria-valuemax="100">
                                     {$stats['surveyReplies']['percentage']}%
                                 </div>
@@ -84,7 +84,7 @@
                         <div class="mb-3">
                             <h5>{='user.statistics.designs_created'|translate}</h5>
                             <div class="progress" style="height: 25px;">
-                                <div class="progress-bar bg-warning" role="progressbar" style="width: {$stats['designs']['percentage']}%;"
+                                <div class="progress-bar bg-warning" role="progressbar" style="width: {$stats['designs']['percentage']|noescape}%;"
                                     aria-valuenow="{$stats['designs']['percentage']}" aria-valuemin="0" aria-valuemax="100">
                                     {$stats['designs']['percentage']}%
                                 </div>
@@ -98,7 +98,7 @@
                         <div class="mb-3">
                             <h5>{='user.statistics.design_votes'|translate}</h5>
                             <div class="progress" style="height: 25px;">
-                                <div class="progress-bar bg-danger" role="progressbar" style="width: {$stats['designVotes']['percentage']}%;"
+                                <div class="progress-bar bg-danger" role="progressbar" style="width: {$stats['designVotes']['percentage']|noescape}%;"
                                     aria-valuenow="{$stats['designVotes']['percentage']}" aria-valuemin="0" aria-valuemax="100">
                                     {$stats['designVotes']['percentage']}%
                                 </div>
@@ -130,17 +130,30 @@
                                 {foreach $stats['events'] as $typeId => $eventStat}
                                     <tr {if $typeId === 'total'}class="table-active"{/if}>
                                         <td>{$eventStat['typeName']}</td>
-                                        <td>{$eventStat['user']}</td>
+                                        <td class="text-primary">{$eventStat['user']}</td>
                                         <td>{$eventStat['total']}</td>
                                         <td>
-                                            <div class="progress">
-                                                <div class="progress-bar bg-primary" role="progressbar"
-                                                    style="width: {$eventStat['percentage']}%;"
-                                                    aria-valuenow="{$eventStat['percentage']}"
-                                                    aria-valuemin="0" aria-valuemax="100">
-                                                    {$eventStat['percentage']}%
+                                            {if $eventStat['percentage'] > 15}
+                                                <div class="progress">
+                                                    <div class="progress-bar bg-primary" role="progressbar"
+                                                        style="width: {$eventStat['percentage']|noescape}%;"
+                                                        aria-valuenow="{$eventStat['percentage']}"
+                                                        aria-valuemin="0" aria-valuemax="100">
+                                                        {$eventStat['percentage']}%
+                                                    </div>
                                                 </div>
-                                            </div>
+                                            {else}
+                                                <div class="d-flex align-items-center gap-2">
+                                                    <div class="progress flex-grow-1">
+                                                        <div class="progress-bar bg-primary" role="progressbar"
+                                                            style="width: {$eventStat['percentage']|noescape}%;"
+                                                            aria-valuenow="{$eventStat['percentage']}"
+                                                            aria-valuemin="0" aria-valuemax="100">
+                                                        </div>
+                                                    </div>
+                                                    <span class="text-primary">{$eventStat['percentage']}%</span>
+                                                </div>
+                                            {/if}
                                         </td>
                                     </tr>
                                 {/foreach}
@@ -166,17 +179,30 @@
                                     <tr {if $typeId === 'total'}class="table-active"{/if}>
                                         <td>{$participationStat['typeName']}</td>
                                         <td class="text-center">{$participationStat['events']}</td>
-                                        <td class="text-center">{$participationStat['user']}</td>
+                                        <td class="text-center text-info">{$participationStat['user']}</td>
                                         <td class="text-center">{$participationStat['total']}</td>
                                         <td>
-                                            <div class="progress">
-                                                <div class="progress-bar bg-info" role="progressbar"
-                                                    style="width: {$participationStat['percentage']}%;"
-                                                    aria-valuenow="{$participationStat['percentage']}"
-                                                    aria-valuemin="0" aria-valuemax="100">
-                                                    {$participationStat['percentage']}%
+                                            {if $participationStat['percentage'] > 15}
+                                                <div class="progress">
+                                                    <div class="progress-bar bg-info" role="progressbar"
+                                                        style="width: {$participationStat['percentage']|noescape}%;"
+                                                        aria-valuenow="{$participationStat['percentage']}"
+                                                        aria-valuemin="0" aria-valuemax="100">
+                                                        {$participationStat['percentage']}%
+                                                    </div>
                                                 </div>
-                                            </div>
+                                            {else}
+                                                <div class="d-flex align-items-center gap-2">
+                                                    <div class="progress flex-grow-1">
+                                                        <div class="progress-bar bg-info" role="progressbar"
+                                                            style="width: {$participationStat['percentage']|noescape}%;"
+                                                            aria-valuenow="{$participationStat['percentage']}"
+                                                            aria-valuemin="0" aria-valuemax="100">
+                                                        </div>
+                                                    </div>
+                                                    <span class="text-info">{$participationStat['percentage']}%</span>
+                                                </div>
+                                            {/if}
                                         </td>
                                     </tr>
                                 {/foreach}
@@ -189,7 +215,7 @@
                         <div class="mb-3">
                             <div class="progress" style="height: 25px;">
                                 <div class="progress-bar bg-success" role="progressbar"
-                                    style="width: {$stats['participantSupplies']['percentage']}%;"
+                                    style="width: {$stats['participantSupplies']['percentage']|noescape}%;"
                                     aria-valuenow="{$stats['participantSupplies']['percentage']}"
                                     aria-valuemin="0" aria-valuemax="100">
                                     {$stats['participantSupplies']['percentage']}%
@@ -206,7 +232,7 @@
                         <div class="mb-3">
                             <div class="progress" style="height: 25px;">
                                 <div class="progress-bar bg-success" role="progressbar"
-                                    style="width: {$stats['participantMessages']['percentage']}%;"
+                                    style="width: {$stats['participantMessages']['percentage']|noescape}%;"
                                     aria-valuenow="{$stats['participantMessages']['percentage']}"
                                     aria-valuemin="0" aria-valuemax="100">
                                     {$stats['participantMessages']['percentage']}%
@@ -219,7 +245,7 @@
                         <div class="mb-3">
                             <div class="progress" style="height: 25px;">
                                 <div class="progress-bar bg-success" role="progressbar"
-                                    style="width: {$stats['participantMessages']['percentageWebapp']}%;"
+                                    style="width: {$stats['participantMessages']['percentageWebapp']|noescape}%;"
                                     aria-valuenow="{$stats['participantMessages']['percentageWebapp']}"
                                     aria-valuemin="0" aria-valuemax="100">
                                     {$stats['participantMessages']['percentageWebapp']}%
