@@ -572,7 +572,7 @@ class ArticleController extends TableController
             'period' => $period->value,
             'dateRange' => $dateRange,
             'availablePeriods' => Period::gets($this->languagesDataHelper),
-            'navbarTemplate' => '../../Webmaster/views/navbar/redactor.latte',
+            'navbarTemplate' => '../../Article/views/navbar/redactor.latte',
             'title' => 'Rédacteurs vs audience',
             'totalLabels' => ['articles', ''],
             'page' => $this->application->getConnectedUser()->getPage(1),
