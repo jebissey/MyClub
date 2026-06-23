@@ -133,27 +133,18 @@
                                         <td class="text-primary">{$eventStat['user']}</td>
                                         <td>{$eventStat['total']}</td>
                                         <td>
-                                            {if $eventStat['percentage'] > 15}
-                                                <div class="progress">
-                                                    <div class="progress-bar bg-primary" role="progressbar"
-                                                        style="width: {$eventStat['percentage']|noescape}%;"
-                                                        aria-valuenow="{$eventStat['percentage']}"
-                                                        aria-valuemin="0" aria-valuemax="100">
-                                                        {$eventStat['percentage']}%
-                                                    </div>
+                                            <div class="progress">
+                                                <div class="progress-bar bg-info" role="progressbar"
+                                                    style="width: {$eventStat['percentage']|number}%;"
+                                                    aria-valuenow="{$eventStat['percentage']|number}"
+                                                    aria-valuemin="0"
+                                                    aria-valuemax="100">
+                                                    {if $eventStat['percentage'] >= 15}{number_format($eventStat['percentage'])}%{/if}
                                                 </div>
-                                            {else}
-                                                <div class="d-flex align-items-center gap-2">
-                                                    <div class="progress flex-grow-1">
-                                                        <div class="progress-bar bg-primary" role="progressbar"
-                                                            style="width: {$eventStat['percentage']|noescape}%;"
-                                                            aria-valuenow="{$eventStat['percentage']}"
-                                                            aria-valuemin="0" aria-valuemax="100">
-                                                        </div>
-                                                    </div>
-                                                    <span class="text-primary">{$eventStat['percentage']}%</span>
-                                                </div>
-                                            {/if}
+                                                {if $eventStat['percentage'] < 15}
+                                                <span class="small text-dark ms-2">{number_format($eventStat['percentage'], 1)}%</span>
+                                                {/if}
+                                            </div>
                                         </td>
                                     </tr>
                                 {/foreach}
@@ -182,27 +173,18 @@
                                         <td class="text-center text-info">{$participationStat['user']}</td>
                                         <td class="text-center">{$participationStat['total']}</td>
                                         <td>
-                                            {if $participationStat['percentage'] > 15}
-                                                <div class="progress">
-                                                    <div class="progress-bar bg-info" role="progressbar"
-                                                        style="width: {$participationStat['percentage']|noescape}%;"
-                                                        aria-valuenow="{$participationStat['percentage']}"
-                                                        aria-valuemin="0" aria-valuemax="100">
-                                                        {$participationStat['percentage']}%
-                                                    </div>
+                                            <div class="progress">
+                                                <div class="progress-bar bg-info" role="progressbar"
+                                                    style="width: {$participationStat['percentage']|number}%;"
+                                                    aria-valuenow="{$participationStat['percentage']|number}"
+                                                    aria-valuemin="0"
+                                                    aria-valuemax="100">
+                                                    {if $participationStat['percentage'] >= 15}{number_format($participationStat['percentage'])}%{/if}
                                                 </div>
-                                            {else}
-                                                <div class="d-flex align-items-center gap-2">
-                                                    <div class="progress flex-grow-1">
-                                                        <div class="progress-bar bg-info" role="progressbar"
-                                                            style="width: {$participationStat['percentage']|noescape}%;"
-                                                            aria-valuenow="{$participationStat['percentage']}"
-                                                            aria-valuemin="0" aria-valuemax="100">
-                                                        </div>
-                                                    </div>
-                                                    <span class="text-info">{$participationStat['percentage']}%</span>
-                                                </div>
-                                            {/if}
+                                                {if $participationStat['percentage'] < 15}
+                                                <span class="small text-dark ms-2">{number_format($participationStat['percentage'], 1)}%</span>
+                                                {/if}
+                                            </div>
                                         </td>
                                     </tr>
                                 {/foreach}

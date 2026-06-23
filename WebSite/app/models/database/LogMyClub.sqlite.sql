@@ -1,5 +1,7 @@
+PRAGMA foreign_keys=OFF;
 BEGIN TRANSACTION;
-CREATE TABLE IF NOT EXISTS "Log" (
+
+CREATE TABLE "Log" (
 	"Id"	INTEGER,
 	"IpAddress"	TEXT,
 	"Referer"	TEXT,
@@ -13,10 +15,14 @@ CREATE TABLE IF NOT EXISTS "Log" (
 	"CreatedAt"	TEXT NOT NULL DEFAULT current_timestamp,
 	"Code"	TEXT,
 	"Message"	TEXT,
-	"Count"	INTEGER NOT NULL DEFAULT 1,
-	"Duration"	REAL,
+	"Count"	INTEGER NOT NULL DEFAULT 1, "Duration" REAL,
 	PRIMARY KEY("Id")
 );
+
+-- Log
+
+
+
 CREATE VIEW leapfrog_statistics AS
             WITH Parsed AS (
                 SELECT 
@@ -80,4 +86,5 @@ CREATE VIEW leapfrog_statistics AS
             FROM Ranked
             WHERE rn = 1
             ORDER BY Date DESC;
+
 COMMIT;

@@ -12,11 +12,13 @@ use app\enums\ApplicationError;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
 use app\models\DataHelper;
+use app\models\LogDataWriterHelper;
 use app\models\PersonDataHelper;
 
 abstract class AbstractApi
 {
     protected LatteEngine $latte;
+    private LogDataWriterHelper $logDataWriterHelper;
 
     public function __construct(
         protected Application $application,
@@ -25,6 +27,7 @@ abstract class AbstractApi
         protected PersonDataHelper $personDataHelper
     ) {
         $this->latte = $application->getLatte();
+        $this->logDataWriterHelper = new LogDataWriterHelper($application);
     }
 
     protected function getJsonInput(): array
@@ -56,6 +59,9 @@ abstract class AbstractApi
             ->header('Content-Type', 'application/json; charset=utf-8')
             ->write($json)
             ->send();
+
+        $this->logDataWriterHelper->add((string)$statusCode, $message);
+        exit;
     }
 
     protected function renderJsonBadRequest(string $message, string $file, int $line): void

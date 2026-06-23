@@ -75,24 +75,29 @@ Security is based on **groups**. There are three types:
 
 ### Available Authorizations  
 
-| Authorization       | Description                                                                  |
-| ------------------- | ---------------------------------------------------------------------------- |
-| **Webmaster**       | Full administrative access. Manage groups with authorizations                |
-| **PersonManager**   | Manage members and their groups without authorization (CRUD, import/export). |
-| **EventManager**    | Create, edit, and manage events (scheduling, location, participants).        |
-| **Editor**          | Can publish public articles.                                                 |
-| **Redactor**        | Write content and publish for restricted audiences (not public).             |
-| **EventDesigner**   | Define event types and their attributes, assign to groups.                   |
-| **HomeDesigner**    | Customize the homepage layout, and all other settings.                       |
-| **KanbanDesigner**  | Create/manage kanban projects.                                               |
-| **NavbarDesigner**  | Define navigation bars.                                                      |
-| **VisitorInsights** | Access visitor statistics and analytics.                                     |
+| Authorization           | Description                                                                  |
+| ----------------------- | ---------------------------------------------------------------------------- |
+| **CommunicationManager**| Manage sending emails                                                        |
+| **Editor**              | Can publish public articles.                                                 |
+| **EventDesigner**       | Define event types and their attributes, assign to groups.                   |
+| **EventManager**        | Create, edit, and manage events (scheduling, location, participants).        |
+| **ExerciseDesigner**    | Define exercises.                                                            |
+| **HomeDesigner**        | Customize the homepage layout, and all other settings.                       |
+| **KanbanDesigner**      | Create/manage kanban projects.                                               |
+| **LoanDesigner**        | Create loans.                                                                |
+| **LoanManager**         | Manage loans.                                                                |
+| **MenuDesigner**        | Define navigation bars and sidebars.                                         |
+| **PersonManager**       | Manage members and their groups without authorization (CRUD, import/export). |
+| **Redactor**            | Write content and publish for restricted audiences (not public).             |
+| **Translator**          | Manage translations.                                                         |
+| **VisitorInsights**     | Access visitor statistics and analytics.                                     |
+| **Webmaster**           | Higher administrative access. Manage groups with authorizations              |
 
 ---
 
 ## 🧪 Automated Route Testing  
 
-- **180+ routes** are automatically discovered and tested.
+- **290+ routes** are automatically discovered and tested.
 - **1900+ routes** are simuled to test each route with each authorization.
 - For routes with parameters (`@`), the **JsonGetParameters** column must exist in the test database.  
 - For **POST** routes, the **JsonPostParameters** column must be filled.  

@@ -54,10 +54,8 @@ class CurlHttpClient implements HttpClientInterface
             $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
             $bytesReceived = curl_getinfo($ch, CURLINFO_SIZE_DOWNLOAD);
             $totalTime = curl_getinfo($ch, CURLINFO_TOTAL_TIME);
-            curl_close($ch);
             $snippet = '';
             if (!empty($receivedData)) $snippet = substr($receivedData, 0, 10000);
-
             throw new RuntimeException(
                 "Erreur cURL ($errno): $error\n" .
                     "URL: $fullUrl\n" .

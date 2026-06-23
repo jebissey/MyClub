@@ -129,6 +129,10 @@ class EventController extends AbstractController
 
     public function show(int $eventId, string $message = '', string $messageType = ''): void
     {
+        if (!$this->dataHelper->get('Event', ['Id' => $eventId], 'Id')) {
+            $this->raiseBadRequest("Event {$eventId} doesn't exist", __FILE__, __LINE__);
+            return;
+        }
         $person = $this->application->getConnectedUser()->person ?? false;
         $token = WebApp::getFiltered('t', FilterInputRule::Token->value, $this->flight->request()->query->getData()) ?? false;
         $event = $this->eventDataHelper->getEvent($eventId);
@@ -144,30 +148,28 @@ class EventController extends AbstractController
         }
 
         $userEmail = $person->Email ?? '';
-        if ($this->dataHelper->get('Event', ['Id' => $eventId], 'Id')) {
-            $this->render('Event/views/event_detail.latte', $this->getAllParams([
-                'eventId' => $eventId,
-                'event' => $event,
-                'attributes' => $this->eventDataHelper->getEventAttributes($eventId),
-                'participants' => $this->participantDataHelper->getEventParticipants($eventId),
-                'userEmail' => $userEmail,
-                'isRegistered' => $this->eventDataHelper->isUserRegistered($eventId, $userEmail),
-                'navItems' => $this->getNavItems($person),
-                'countOfMessages' => count($this->dataHelper->gets('Message', [
-                    '"From"' => 'User',
-                    'EventId' => $eventId
-                ])),
-                'eventNeeds' => $this->eventDataHelper->getEventNeeds($eventId),
-                'participantSupplies' => $this->eventDataHelper->getParticipantSupplies($eventId),
-                'userSupplies' => $this->eventDataHelper->getUserSupplies($eventId, $userEmail),
-                'token' => $token,
-                'message' => $message,
-                'messageType' => $messageType,
-                'page' => $this->application->getConnectedUser()->getPage(),
-                'btn_HistoryBack' => true,
-                'btn_Parent' => "/nextEvents",
-            ]));
-        } else $this->raiseBadRequest("Event {$eventId} doesn't exist", __FILE__, __LINE__);
+        $this->render('Event/views/event_detail.latte', $this->getAllParams([
+            'eventId' => $eventId,
+            'event' => $event,
+            'attributes' => $this->eventDataHelper->getEventAttributes($eventId),
+            'participants' => $this->participantDataHelper->getEventParticipants($eventId),
+            'userEmail' => $userEmail,
+            'isRegistered' => $this->eventDataHelper->isUserRegistered($eventId, $userEmail),
+            'navItems' => $this->getNavItems($person),
+            'countOfMessages' => count($this->dataHelper->gets('Message', [
+                '"From"' => 'User',
+                'EventId' => $eventId
+            ])),
+            'eventNeeds' => $this->eventDataHelper->getEventNeeds($eventId),
+            'participantSupplies' => $this->eventDataHelper->getParticipantSupplies($eventId),
+            'userSupplies' => $this->eventDataHelper->getUserSupplies($eventId, $userEmail),
+            'token' => $token,
+            'message' => $message,
+            'messageType' => $messageType,
+            'page' => $this->application->getConnectedUser()->getPage(),
+            'btn_HistoryBack' => true,
+            'btn_Parent' => "/nextEvents",
+        ]));
     }
 
     public function registerSet(int $eventId, $token = null): void
