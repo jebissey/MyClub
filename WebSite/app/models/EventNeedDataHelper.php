@@ -1,10 +1,10 @@
 <?php
+
 declare(strict_types=1);
 
 namespace app\models;
 
 use PDO;
-
 use app\helpers\Application;
 
 class EventNeedDataHelper extends Data

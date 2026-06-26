@@ -6,7 +6,6 @@ namespace app\apis;
 
 use Exception;
 use Throwable;
-
 use app\enums\ApplicationError;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
@@ -109,7 +108,9 @@ class ArticleApi extends AbstractApi
         }
         try {
             $options = json_decode($order->Options);
-            if (json_last_error() !== JSON_ERROR_NONE) throw new Exception("JSON error: " . json_last_error_msg());
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                throw new Exception("JSON error: " . json_last_error_msg());
+            }
             $previousReply = $this->dataHelper->get('OrderReply', ['IdOrder' => $order->Id, 'IdPerson' => $person->Id]);
             $previousAnswers = $previousReply ? json_decode($previousReply->Answers, true) : null;
             $this->renderJsonOk([
@@ -143,7 +144,9 @@ class ArticleApi extends AbstractApi
         }
         try {
             $options = json_decode($survey->Options);
-            if (json_last_error() !== JSON_ERROR_NONE) throw new Exception("JSON error: " . json_last_error_msg());
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                throw new Exception("JSON error: " . json_last_error_msg());
+            }
             $previousReply = $this->dataHelper->get('Reply', ['IdSurvey' => $survey->Id, 'IdPerson' => $person->Id]);
             $previousAnswers = $previousReply ? json_decode($previousReply->Answers, true) : null;
             $this->renderJsonOk([

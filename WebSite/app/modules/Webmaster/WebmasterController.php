@@ -5,8 +5,7 @@ declare(strict_types=1);
 namespace app\modules\Webmaster;
 
 use DateTime;
-use \Minishlink\WebPush\VAPID;
-
+use Minishlink\WebPush\VAPID;
 use app\enums\FilterInputRule;
 use app\helpers\Application;
 use app\helpers\NotificationSender;
@@ -32,7 +31,6 @@ class WebmasterController extends AbstractController
     public function clubCustomizationEdit(): void
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isWebmaster(), __FILE__, __LINE__)) {
-
             $settings = [
                 'clubName'      => $this->dataHelper->getSetting('PWA_Name', 'MyClub'),
                 'clubShortName' => $this->dataHelper->getSetting('PWA_ShortName', 'MyClub'),
@@ -53,7 +51,6 @@ class WebmasterController extends AbstractController
     public function clubCustomizationSave(): void
     {
         if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isWebmaster(), __FILE__, __LINE__)) {
-
             $schema = [
                 'clubName'      => FilterInputRule::Text->value,
                 'clubShortName' => FilterInputRule::Text->value,
@@ -113,14 +110,20 @@ class WebmasterController extends AbstractController
                 || $connectedUser->isHomeDesigner()
                 || $connectedUser->isKanbanDesigner()
                 || $connectedUser->isMenuDesigner()
-            )   $this->redirect('/designer');
-            elseif ($connectedUser->isEventManager())  $this->redirect('/eventManager');
-            elseif ($connectedUser->isPersonManager()) $this->redirect('/personManager');
-            elseif ($connectedUser->isRedactor()) {
+            ) {
+                $this->redirect('/designer');
+            } elseif ($connectedUser->isEventManager()) {
+                $this->redirect('/eventManager');
+            } elseif ($connectedUser->isPersonManager()) {
+                $this->redirect('/personManager');
+            } elseif ($connectedUser->isRedactor()) {
                 $_SESSION['navbar'] = 'redactor';
                 $this->redirect('/articles');
-            } elseif ($connectedUser->isVisitorInsights()) $this->redirect('/visitorInsights');
-            elseif ($connectedUser->isWebmaster())         $this->redirect('/webmaster');
+            } elseif ($connectedUser->isVisitorInsights()) {
+                $this->redirect('/visitorInsights');
+            } elseif ($connectedUser->isWebmaster()) {
+                $this->redirect('/webmaster');
+            }
         } else {
             if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
                 $this->raiseMethodNotAllowed(__FILE__, __LINE__);
@@ -168,7 +171,7 @@ class WebmasterController extends AbstractController
 
             if (!$publicKey || !$privateKey) {
                 $newKeys = VAPID::createVapidKeys();
-                $this->credentials->set('vapid', 'publicKey',  $newKeys['publicKey']);
+                $this->credentials->set('vapid', 'publicKey', $newKeys['publicKey']);
                 $this->credentials->set('vapid', 'privateKey', $newKeys['privateKey']);
                 $message   = "✅ Les clés VAPID ont été générées et enregistrées avec succès.";
                 $publicKey = $newKeys['publicKey'];
@@ -252,19 +255,19 @@ class WebmasterController extends AbstractController
             $input  = WebApp::filterInput($schema, $this->flight->request()->data->getData());
             $method = $input['sendMethod'] ?? 'smtp';
 
-            $this->credentials->set('email', 'method',        $method);
-            $this->credentials->set('email', 'daily_limit',   (string)($input['dailyLimit']   ?? '0'));
+            $this->credentials->set('email', 'method', $method);
+            $this->credentials->set('email', 'daily_limit', (string)($input['dailyLimit']   ?? '0'));
             $this->credentials->set('email', 'monthly_limit', (string)($input['monthlyLimit'] ?? '0'));
 
             match ($method) {
                 'smtp' => (function () use ($input) {
-                    $this->credentials->set('smtp', 'username',   $input['smtpAccount']    ?? '');
+                    $this->credentials->set('smtp', 'username', $input['smtpAccount']    ?? '');
                     if (!empty($input['smtpPassword'])) {
                         $this->credentials->set('smtp', 'password', $input['smtpPassword']);
                     }
-                    $this->credentials->set('smtp', 'from',       $input['smtpFrom']       ?? '');
-                    $this->credentials->set('smtp', 'host',       $input['smtpHost']       ?? '');
-                    $this->credentials->set('smtp', 'port',       $input['smtpPort']       ?? '587');
+                    $this->credentials->set('smtp', 'from', $input['smtpFrom']       ?? '');
+                    $this->credentials->set('smtp', 'host', $input['smtpHost']       ?? '');
+                    $this->credentials->set('smtp', 'port', $input['smtpPort']       ?? '587');
                     $this->credentials->set('smtp', 'encryption', $input['smtpEncryption'] ?? 'tls');
                 })(),
 

@@ -7,7 +7,6 @@ namespace app\apis;
 use Minishlink\WebPush\Subscription;
 use Minishlink\WebPush\WebPush;
 use Throwable;
-
 use app\enums\ApplicationError;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace app\modules\Article;
 
 use DateTime;
-
 use app\enums\FilterInputRule;
 use app\enums\SurveyVisibility;
 use app\exceptions\IntegrityException;
@@ -78,8 +77,11 @@ class SurveyController extends AbstractController
             'Visibility' => $visibility
         ];
         $survey = $this->dataHelper->get('Survey', ['IdArticle' => $articleId], 'Id');
-        if ($survey) $this->dataHelper->set('Survey', $fields, ['Id' => $survey->Id]);
-        else         $this->dataHelper->set('Survey', $fields);
+        if ($survey) {
+            $this->dataHelper->set('Survey', $fields, ['Id' => $survey->Id]);
+        } else {
+            $this->dataHelper->set('Survey', $fields);
+        }
         $this->redirect('/article/' . $articleId);
     }
 
@@ -120,7 +122,9 @@ class SurveyController extends AbstractController
                     'answers' => $answers
                 ];
                 foreach ($answers as $answer) {
-                    if (isset($results[$answer])) $results[$answer]++;
+                    if (isset($results[$answer])) {
+                        $results[$answer]++;
+                    }
                 }
             }
 
@@ -135,6 +139,8 @@ class SurveyController extends AbstractController
                 'btn_HistoryBack' => true,
                 'btn_Parent'      => "/article/{$articleId}",
             ]));
-        } else $this->raiseForbidden(__FILE__, __LINE__);
+        } else {
+            $this->raiseForbidden(__FILE__, __LINE__);
+        }
     }
 }

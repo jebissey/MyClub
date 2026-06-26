@@ -7,7 +7,6 @@ namespace app\models;
 use DateTimeImmutable;
 use Envms\FluentPDO\Queries\Select;
 use PDO;
-
 use app\enums\Period;
 use app\helpers\Application;
 use app\helpers\MyClubDateTime;
@@ -324,11 +323,21 @@ class LogDataHelper extends Data
     {
         $time = time() - strtotime($datetime);
 
-        if ($time < 60)       return 'Il y a ' . $time . ' secondes';
-        if ($time < 3600)     return 'Il y a ' . round($time / 60) . ' minutes';
-        if ($time < 86400)    return 'Il y a ' . round($time / 3600) . ' heures';
-        if ($time < 2592000)  return 'Il y a ' . round($time / 86400) . ' jours';
-        if ($time < 31536000) return 'Il y a ' . round($time / 2592000) . ' mois';
+        if ($time < 60) {
+            return 'Il y a ' . $time . ' secondes';
+        }
+        if ($time < 3600) {
+            return 'Il y a ' . round($time / 60) . ' minutes';
+        }
+        if ($time < 86400) {
+            return 'Il y a ' . round($time / 3600) . ' heures';
+        }
+        if ($time < 2592000) {
+            return 'Il y a ' . round($time / 86400) . ' jours';
+        }
+        if ($time < 31536000) {
+            return 'Il y a ' . round($time / 2592000) . ' mois';
+        }
 
         return 'Il y a ' . round($time / 31536000) . ' ans';
     }

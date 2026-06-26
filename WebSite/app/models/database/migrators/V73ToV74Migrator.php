@@ -1,5 +1,7 @@
 <?php
+
 declare(strict_types=1);
+
 namespace app\models\database\migrators;
 
 use PDO;
@@ -7,10 +9,10 @@ use app\interfaces\DatabaseMigratorInterface;
 
 class V73ToV74Migrator implements DatabaseMigratorInterface
 {
-	public function upgrade(PDO $pdo, int $currentVersion): int
-	{
-		// Membership table: one row per person per season
-		$pdo->exec(<<<SQL
+    public function upgrade(PDO $pdo, int $currentVersion): int
+    {
+        // Membership table: one row per person per season
+        $pdo->exec(<<<SQL
 CREATE TABLE IF NOT EXISTS Membership (
 	Id            INTEGER PRIMARY KEY AUTOINCREMENT,
 	PersonId      INTEGER NOT NULL,
@@ -27,8 +29,8 @@ CREATE TABLE IF NOT EXISTS Membership (
 );
 SQL);
 
-		// Translations
-		$pdo->exec(<<<SQL
+        // Translations
+        $pdo->exec(<<<SQL
 INSERT OR IGNORE INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
 ('user.filter.info.label_signout',
  '(last sign-out)',
@@ -96,6 +98,6 @@ INSERT OR IGNORE INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
 ('navbar.webmaster.helloasso',               'HelloAsso',           'HelloAsso',                'HelloAsso');
 SQL);
 
-		return 74;
-	}
+        return 74;
+    }
 }

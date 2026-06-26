@@ -8,7 +8,6 @@ use DateTime;
 use DateTimeInterface;
 use IntlDateFormatter;
 use IntlDatePatternGenerator;
-
 use app\models\LanguagesDataHelper;
 use app\models\MetadataDataHelper;
 
@@ -71,7 +70,9 @@ class TranslationManager
 
     public static function getFlag(string $locale): string
     {
-        if (self::getForcedLanguage() != '') return '';
+        if (self::getForcedLanguage() != '') {
+            return '';
+        }
         return self::FLAGS[$locale] ?? '🏳️';
     }
 

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace app\modules\Games\Solfege;
 
 use Throwable;
-
 use app\helpers\Application;
 use app\modules\Common\AbstractController;
 

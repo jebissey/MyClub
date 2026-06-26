@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace app\modules\Pwa;
 
-
 use app\helpers\Application;
 use app\helpers\WebApp;
 use app\modules\Common\AbstractController;

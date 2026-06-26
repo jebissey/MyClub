@@ -7,7 +7,6 @@ namespace app\models;
 use PDO;
 use RuntimeException;
 use Throwable;
-
 use app\exceptions\UnauthorizedAccessException;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
@@ -27,10 +26,18 @@ class MessageDataHelper extends Data implements NewsProviderInterface
     public function addMessage(?int $articleId, ?int $eventId, ?int $groupId, int $personId, string $text, ?string $imagePath = null): int|false
     {
         $nonNullCount = ($articleId !== null) + ($eventId !== null) + ($groupId !== null);
-        if ($nonNullCount !== 1) return false;
-        if ($articleId !== null && $this->get('Article', ['Id' => $articleId]) === false) return false;
-        if ($eventId !== null && $this->get('Event', ['Id' => $eventId]) === false) return false;
-        if ($groupId !== null && $this->get('Group', ['Id' => $groupId]) === false) return false;
+        if ($nonNullCount !== 1) {
+            return false;
+        }
+        if ($articleId !== null && $this->get('Article', ['Id' => $articleId]) === false) {
+            return false;
+        }
+        if ($eventId !== null && $this->get('Event', ['Id' => $eventId]) === false) {
+            return false;
+        }
+        if ($groupId !== null && $this->get('Group', ['Id' => $groupId]) === false) {
+            return false;
+        }
 
         $messageId = $this->set('Message', [
             'ArticleId' => $articleId,
@@ -236,7 +243,9 @@ class MessageDataHelper extends Data implements NewsProviderInterface
     public function getNews(ConnectedUser $connectedUser, string $searchFrom): array
     {
         $news = [];
-        if (!($connectedUser->person ?? false)) return $news;
+        if (!($connectedUser->person ?? false)) {
+            return $news;
+        }
         $sql = "
             SELECT m.Id, m.Text, m.LastUpdate, m.EventId, p.FirstName, p.LastName, p.NickName, e.Summary, e.StartTime
             From Message m
@@ -264,7 +273,9 @@ class MessageDataHelper extends Data implements NewsProviderInterface
 
     public function getPathsUsedInMessages(array $paths): array
     {
-        if (empty($paths)) return [];
+        if (empty($paths)) {
+            return [];
+        }
 
         $stmt = $this->pdo->query("SELECT ImagePath FROM Message WHERE ImagePath IS NOT NULL");
         $imagePaths = $stmt->fetchAll(PDO::FETCH_COLUMN);
@@ -367,7 +378,9 @@ class MessageDataHelper extends Data implements NewsProviderInterface
         HAVING message_count > 0";
 
         $params[] = $personId;
-        if ($searchFrom) $params[] = $searchFrom;
+        if ($searchFrom) {
+            $params[] = $searchFrom;
+        }
 
         $articlesQuery = "
         SELECT 
@@ -409,7 +422,9 @@ class MessageDataHelper extends Data implements NewsProviderInterface
 
         $params[] = $personId;
         $params[] = $personId;
-        if ($searchFrom) $params[] = $searchFrom;
+        if ($searchFrom) {
+            $params[] = $searchFrom;
+        }
 
         $groupsQuery = "
         SELECT 
@@ -443,7 +458,9 @@ class MessageDataHelper extends Data implements NewsProviderInterface
         HAVING message_count > 0";
 
         $params[] = $personId;
-        if ($searchFrom) $params[] = $searchFrom;
+        if ($searchFrom) {
+            $params[] = $searchFrom;
+        }
 
         $query = "
         $eventsQuery

@@ -32,7 +32,9 @@ class ConnectedUser
         $this->authorizations = [];
         $this->person = null;
         $userEmail = $_SESSION['user'] ?? '';
-        if ($userEmail === '') return;
+        if ($userEmail === '') {
+            return;
+        }
 
         $person = $this->dataHelper->get('Person', ['Email' => $userEmail]);
         if (!$person) {
@@ -41,7 +43,9 @@ class ConnectedUser
             return;
         }
         $this->person = $person;
-        if ($this->person->Alert !== null) Params::setMemberAlert($this->person->Alert);
+        if ($this->person->Alert !== null) {
+            Params::setMemberAlert($this->person->Alert);
+        }
         $this->authorizations = $this->authorizationDataHelper->getsFor($this);
         $lang = TranslationManager::getCurrentLanguage();
         $defaultColors = $this->dataHelper->getDefaultColors();

@@ -7,7 +7,6 @@ namespace app\apis;
 use flight;
 use JsonException;
 use Latte\Engine as LatteEngine;
-
 use app\enums\ApplicationError;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
@@ -149,7 +148,9 @@ abstract class AbstractApi
     {
         $content = $this->latte->renderToString($templateLatteName, $params);
         echo $content;
-        if (ob_get_level()) ob_end_flush();
+        if (ob_get_level()) {
+            ob_end_flush();
+        }
         flush();
         Flight::stop();
     }

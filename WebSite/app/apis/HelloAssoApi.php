@@ -23,7 +23,7 @@ class HelloAssoApi extends AbstractApi
         parent::__construct($application, $connectedUser, $dataHelper, $personDataHelper);
     }
 
-	// ─── POST /api/helloAsso/checkout ───────────────────────────────────────
+    // ─── POST /api/helloAsso/checkout ───────────────────────────────────────
 
     /**
      * Initiates a HelloAsso checkout intent for the current season.
@@ -86,7 +86,7 @@ class HelloAssoApi extends AbstractApi
         }
     }
 
-	// ─── POST /api/helloAsso/webhook ────────────────────────────────────────
+    // ─── POST /api/helloAsso/webhook ────────────────────────────────────────
 
     /**
      * HelloAsso webhook endpoint (no authentication: public URL).
@@ -124,7 +124,7 @@ class HelloAssoApi extends AbstractApi
         echo json_encode(['ok' => $ok]);
     }
 
-	// ─── GET /api/helloAsso/return ──────────────────────────────────────────
+    // ─── GET /api/helloAsso/return ──────────────────────────────────────────
 
     /**
      * Return URL after HelloAsso payment page (redirect, not AJAX).

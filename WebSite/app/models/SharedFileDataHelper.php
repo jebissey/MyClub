@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace app\models;
 
 use PDO;
-
 use app\helpers\Application;
 
 class SharedFileDataHelper extends Data
@@ -17,7 +16,9 @@ class SharedFileDataHelper extends Data
 
     public function getPathsShared(array $paths): array
     {
-        if (empty($paths)) return [];
+        if (empty($paths)) {
+            return [];
+        }
 
         $stmt = $this->pdo->query("SELECT Item FROM SharedFile WHERE Token IS NOT NULL");
         $items = $stmt->fetchAll(PDO::FETCH_COLUMN);

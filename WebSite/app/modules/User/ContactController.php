@@ -40,7 +40,9 @@ class ContactController extends AbstractController
             $event = null;
             if ($eventId !== null) {
                 $event = $this->dataHelper->get('Event', ['Id' => $eventId], 'Id, Summary, StartTime, Audience');
-                if (!$event || $event->Audience != EventAudience::ForAll->value) $eventId = $event = null;
+                if (!$event || $event->Audience != EventAudience::ForAll->value) {
+                    $eventId = $event = null;
+                }
             }
             $this->render('Common/views/contact.latte', $this->getAllParams([
                 'navItems'          => $this->getNavItems($this->application->getConnectedUser()->person ?? false),
@@ -50,8 +52,11 @@ class ContactController extends AbstractController
                 'btn_HistoryBack' => true,
 
             ]));
-        } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') $this->handleContactForm();
-        else $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+        } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $this->handleContactForm();
+        } else {
+            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+        }
     }
 
     #region Private functions
@@ -97,19 +102,32 @@ class ContactController extends AbstractController
         $eventId = $input['eventId'] ?? null;
 
         $errors = [];
-        if (empty($name))                         $errors[] = 'Nom et prénom sont requis.';
-        if (empty($email))                        $errors[] = 'Un email valide est requis.';
-        if ($eventId === null && empty($message)) $errors[] = 'Le message est requis.';
+        if (empty($name)) {
+            $errors[] = 'Nom et prénom sont requis.';
+        }
+        if (empty($email)) {
+            $errors[] = 'Un email valide est requis.';
+        }
+        if ($eventId === null && empty($message)) {
+            $errors[] = 'Le message est requis.';
+        }
 
-        if (empty($errors)) $this->sendContactMessage($input, $eventId);
-        else $this->redirectWithErrors($errors, $name, $email, $message);
+        if (empty($errors)) {
+            $this->sendContactMessage($input, $eventId);
+        } else {
+            $this->redirectWithErrors($errors, $name, $email, $message);
+        }
     }
 
     private function verifyTurnstile(string $token, string $ip): bool
     {
         $secret = $this->credentials->get('turnstile', 'secret_key') ?? '';
-        if ($secret === '') return true;
-        if ($token === '') return false;
+        if ($secret === '') {
+            return true;
+        }
+        if ($token === '') {
+            return false;
+        }
 
         $payload = http_build_query([
             'secret'   => $secret,
@@ -126,7 +144,9 @@ class ContactController extends AbstractController
         ]);
 
         $result = @file_get_contents(self::TURNSTILE_VERIFY_URL, false, $ctx);
-        if ($result === false) return true;
+        if ($result === false) {
+            return true;
+        }
 
         $data = json_decode($result, true);
         return ($data['success'] ?? false) === true;
@@ -153,7 +173,9 @@ class ContactController extends AbstractController
             return true;
         }
 
-        if ($row->attempts >= self::RATE_LIMIT_MAX) return false;
+        if ($row->attempts >= self::RATE_LIMIT_MAX) {
+            return false;
+        }
 
         $this->dataHelper->set('ContactRateLimit', ['attempts' => $row->attempts + 1], ['ip_hash' => $hash]);
         return true;
@@ -162,7 +184,9 @@ class ContactController extends AbstractController
     private function sendContactMessage(array $input, ?int $eventId): void
     {
         $contactEmail = $this->dataHelper->get('Settings', ['Name' => 'contactEmail'], 'Value')->Value ?? '';
-        if ($contactEmail === '') $contactEmail = $this->personDataHelper->getWebmasterEmail();
+        if ($contactEmail === '') {
+            $contactEmail = $this->personDataHelper->getWebmasterEmail();
+        }
         if (!filter_var($contactEmail, FILTER_VALIDATE_EMAIL)) {
             $this->application->getErrorManager()->raise(ApplicationError::InvalidSetting, 'Invalid contactEmail', 3000, false);
             return;

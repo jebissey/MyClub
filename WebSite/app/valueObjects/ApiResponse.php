@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace app\valueObjects;
@@ -10,5 +11,6 @@ readonly class ApiResponse
         public int $responseCode,
         public array $data = [],
         public ?string $message = null
-    ) {}
+    ) {
+    }
 }

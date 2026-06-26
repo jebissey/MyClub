@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace app\modules\PersonManager;
 
 use Throwable;
-
 use app\enums\FilterInputRule;
 use app\helpers\Application;
 use app\helpers\WebApp;
@@ -70,7 +69,7 @@ class RegistrationController extends TableController
     public function getPersonGroups(int $personId)
     {
         $personId = (int)$personId;
-        
+
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isGroupManager(), __FILE__, __LINE__)) {
             [$availableGroups, $currentGroups] = $this->groupDataHelper->getAvailableGroups($this->application->getConnectedUser(), $personId);
 

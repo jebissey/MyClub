@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace app\models\database\migrators;
 
 use PDO;
-
 use app\interfaces\DatabaseMigratorInterface;
 
 class V5ToV6Migrator implements DatabaseMigratorInterface
@@ -22,8 +21,7 @@ class V5ToV6Migrator implements DatabaseMigratorInterface
                 "IdKanbanCardType"	INTEGER NOT NULL,
                 PRIMARY KEY("Id"),
                 FOREIGN KEY("IdKanbanCardType") REFERENCES "KanbanCardType"("Id")
-            )'
-        );
+            )');
         $pdo->exec('
             CREATE TABLE "KanbanCardStatus" (
                 "Id"	INTEGER,
@@ -33,8 +31,7 @@ class V5ToV6Migrator implements DatabaseMigratorInterface
                 "LastUpdate"	TEXT NOT NULL DEFAULT current_timestamp,
                 PRIMARY KEY("Id"),
                 FOREIGN KEY("IdKanbanCard") REFERENCES "KanbanCard"("Id")
-            )'
-        );
+            )');
         $pdo->exec('
             CREATE TABLE "KanbanCardType" (
                 "Id"	INTEGER,
@@ -43,8 +40,7 @@ class V5ToV6Migrator implements DatabaseMigratorInterface
                 "IdKanbanProject"	INTEGER NOT NULL,
                 PRIMARY KEY("Id"),
                 FOREIGN KEY("IdKanbanProject") REFERENCES "KanbanProject"("Id")
-            )'
-        );
+            )');
         $pdo->exec('
             CREATE TABLE "KanbanProject" (
                 "Id"	INTEGER,
@@ -53,8 +49,7 @@ class V5ToV6Migrator implements DatabaseMigratorInterface
                 "IdPerson"	INTEGER NOT NULL,
                 PRIMARY KEY("Id"),
                 FOREIGN KEY("IdPerson") REFERENCES "Person"("Id")
-            )'
-        );
+            )');
         $pdo->exec("INSERT INTO 'Authorization' VALUES (10,'KanbanDesigner')");
 
         return 6;

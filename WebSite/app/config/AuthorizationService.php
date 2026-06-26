@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace app\config;
@@ -8,8 +9,9 @@ use app\interfaces\AuthorizationServiceInterface;
 
 class AuthorizationService implements AuthorizationServiceInterface
 {
-
-    public function __construct(private ConnectedUser $connectedUser) {}
+    public function __construct(private ConnectedUser $connectedUser)
+    {
+    }
 
 
     public function isEventManager(): bool

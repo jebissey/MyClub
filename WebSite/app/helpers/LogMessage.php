@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace app\helpers;
@@ -21,10 +22,12 @@ class LogMessage
 
     public static function getInstance(?string $code, string $message = '', string $separator = " --- "): LogMessage
     {
-        if (self::$instance === null) self::$instance = new self($code, $message, $separator);
+        if (self::$instance === null) {
+            self::$instance = new self($code, $message, $separator);
+        }
         return self::$instance;
     }
-    
+
     public function getCode(): ?string
     {
         return $this->code;
@@ -46,5 +49,4 @@ class LogMessage
         $this->messages[] = $message;
         return $this;
     }
-
 }

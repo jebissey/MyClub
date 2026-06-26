@@ -132,7 +132,8 @@ class ControllerFactory
         private SurveyDataHelper $surveyDataHelper,
         private TableControllerDataHelper $tableControllerDataHelper,
         private WebApp $webapp,
-    ) {}
+    ) {
+    }
 
     public function makeArticleController(): ArticleController
     {

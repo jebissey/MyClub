@@ -6,7 +6,6 @@ namespace app\apis;
 
 use DateTime;
 use Throwable;
-
 use app\enums\ApplicationError;
 use app\enums\Period;
 use app\exceptions\EmailException;
@@ -132,7 +131,7 @@ class EventApi extends AbstractApi
             try {
                 $event = $this->eventDataHelper->getEvent((int)$eventId);
                 $apiResponse = $this->sendEventEmails($event, $data['Title'] ?? '', $data['Body'] ?? '', $data['Recipients'] ?? '');
-                $this->renderJson([$apiResponse->data], $apiResponse->success,  $apiResponse->responseCode, $apiResponse->message);
+                $this->renderJson([$apiResponse->data], $apiResponse->success, $apiResponse->responseCode, $apiResponse->message);
             } catch (QueryException $e) {
                 $this->renderJsonError($e->getMessage(), ApplicationError::BadRequest->value, $e->getFile(), $e->getLine());
             } catch (Throwable $e) {
@@ -145,24 +144,27 @@ class EventApi extends AbstractApi
     private function sendEventEmails(object $event, string $title, string $body, string $recipients): ApiResponse
     {
         $participants = null;
-        if ($recipients === 'registered') $participants = $this->participantDataHelper->getEventParticipants($event->Id);
-        else if ($recipients === 'unregistered') {
+        if ($recipients === 'registered') {
+            $participants = $this->participantDataHelper->getEventParticipants($event->Id);
+        } elseif ($recipients === 'unregistered') {
             //TODO
-        } else if ($recipients === 'all') {
+        } elseif ($recipients === 'all') {
             $participants = $this->personDataHelper->getInterestedPeople(
                 $this->eventDataHelper->getEventGroup($event->Id),
                 $event->IdEventType ?? null,
                 (new DateTime($event->StartTime))->format('N') - 1,
                 $this->personPreferences->getPeriodOfDay($event->StartTime)
             );
-        } else return new ApiResponse(false, ApplicationError::BadRequest->value, [], "Invalid recipients ($recipients)");
+        } else {
+            return new ApiResponse(false, ApplicationError::BadRequest->value, [], "Invalid recipients ($recipients)");
+        }
         if ($participants) {
             $root = Application::$root;
             $eventLink = $root . '/event/' . $event->Id;
             $unsubscribeLink = $root . '/user/preferences';
             $eventCreatorEmail = $this->dataHelper->get('Person', ['Id' => $event->CreatedBy], 'Email')->Email;
             if (!$eventCreatorEmail) {
-                return new ApiResponse(false, ApplicationError::BadRequest->value, [],  'Invalid Email in file ' + __FILE__ + ' at line ' + __LINE__);
+                return new ApiResponse(false, ApplicationError::BadRequest->value, [], 'Invalid Email in file ' + __FILE__ + ' at line ' + __LINE__);
             }
             $ccList = $this->messageDataHelper->addWebAppMessages($event->Id, $participants, $title . "\n\n" . $body);
             $htmlBody = nl2br(htmlspecialchars($body, ENT_QUOTES, 'UTF-8')) . "<br>" .

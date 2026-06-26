@@ -6,7 +6,6 @@ namespace app\modules\Common\services;
 
 use DateTimeImmutable;
 use PDO;
-
 use app\helpers\Application;
 
 class CredentialService
@@ -18,7 +17,9 @@ class CredentialService
     private static ?CredentialService $instance = null;
     private ?PDO $pdo = null;
 
-    private function __construct() {}
+    private function __construct()
+    {
+    }
 
     public static function getInstance(): self
     {
@@ -100,7 +101,7 @@ class CredentialService
         }
 
         $pdo = new PDO('sqlite:' . $dest);
-        $pdo->setAttribute(PDO::ATTR_ERRMODE,            PDO::ERRMODE_EXCEPTION);
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_OBJ);
 
         return $pdo;

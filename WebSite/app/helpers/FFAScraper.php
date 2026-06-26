@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace app\helpers;
@@ -11,7 +12,7 @@ use DOMXPath;
 class FFAScraper
 {
     private $baseUrl = 'https://bases.athle.fr/asp.net/liste.aspx';
-    private $client;
+    private Client $client;
 
     public function __construct()
     {
@@ -25,7 +26,7 @@ class FFAScraper
         ]);
     }
 
-    public function searchAthleteRank($firstName, $lastName, $year, $club)
+    public function searchAthleteRank(string $firstName, string $lastName, string $year, string $club)
     {
         $params = [
             'frmpostback' => 'true',
@@ -53,7 +54,7 @@ class FFAScraper
         }
     }
 
-    public function searchAthleteResults($firstName, $lastName, $year, $club)
+    public function searchAthleteResults(string $firstName, string $lastName, string $year, string $club)
     {
         $params = [
             'frmpostback' => 'true',
@@ -77,7 +78,7 @@ class FFAScraper
             return ['error' => 'Erreur lors de la récupération des données: ' . $e->getMessage()];
         }
     }
-    private function parseAthleteRank($html)
+    private function parseAthleteRank(string $html): ?array
     {
         $dom = new DOMDocument();
         @$dom->loadHTML($html);
@@ -99,7 +100,7 @@ class FFAScraper
         return null;
     }
 
-    private function parseAthleteResults($html)
+    private function parseAthleteResults(string $html): array
     {
         $dom = new DOMDocument();
         @$dom->loadHTML($html);
@@ -129,7 +130,7 @@ class FFAScraper
         return $results;
     }
 
-    private function extractFrm($html, $var)
+    private function extractFrm(string $html, string $var): string
     {
         $pattern = "/" . $var . "=(\d+)/";
 

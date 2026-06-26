@@ -26,7 +26,7 @@ class PersonPreferences
         return $filteredEvents;
     }
 
-    public function isPersonInterested(object $person, ?int $idEventType,  ?int $dayOfWeek, $timeOfDay): bool
+    public function isPersonInterested(object $person, ?int $idEventType, ?int $dayOfWeek, $timeOfDay): bool
     {
         if ($person->Preferences != '') {
             $preferences = json_decode($person->Preferences, true);
@@ -64,8 +64,12 @@ class PersonPreferences
         $date = new DateTime($dateString);
         $hour = (int)$date->format('H');
 
-        if ($hour < 12)     return 'morning';
-        elseif ($hour < 17) return 'afternoon';
-        else                return 'evening';
+        if ($hour < 12) {
+            return 'morning';
+        } elseif ($hour < 17) {
+            return 'afternoon';
+        } else {
+            return 'evening';
+        }
     }
 }

@@ -11,7 +11,7 @@ final class JsonEmailQuotaTracker implements EmailQuotaTrackerInterface
 {
     private string $today;
     private string $thisMonth;
-    private array  $data;
+    private array $data;
 
     public function __construct(private readonly string $filePath)
     {

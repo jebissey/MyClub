@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace app\models;
 
-use \Envms\FluentPDO\Queries\Select;
+use Envms\FluentPDO\Queries\Select;
 use PDO;
 use RuntimeException;
-
 use app\enums\FilterInputRule;
 use app\helpers\Application;
 
@@ -26,7 +25,9 @@ class DbBrowserDataHelper extends Data
         $columns = $this->getTableColumns($table);
         $data = [];
         foreach ($columns as $column) {
-            if (isset($_POST[$column])) $data[$column] = $_POST[$column];
+            if (isset($_POST[$column])) {
+                $data[$column] = $_POST[$column];
+            }
         }
         $columnsList = implode(', ', array_map([$this, 'quoteName'], array_keys($data)));
         $placeholders = implode(', ', array_map(function ($key) {
@@ -59,7 +60,9 @@ class DbBrowserDataHelper extends Data
         $stmt->execute();
 
         while ($row = $stmt->fetch()) {
-            if ($row->pk == 1) return $row->name;
+            if ($row->pk == 1) {
+                return $row->name;
+            }
         }
         $stmt = $this->pdo->prepare("PRAGMA table_info(" . $this->quoteName($table) . ")");
         $stmt->execute();
@@ -126,7 +129,9 @@ class DbBrowserDataHelper extends Data
         $stmt->bindValue(':id', $id);
         $stmt->execute();
         $record = $stmt->fetch();
-        if (!$record) throw new RuntimeException('Record not found in file ' + __FILE__ + ' at line ' + __LINE__);
+        if (!$record) {
+            throw new RuntimeException('Record not found in file ' + __FILE__ + ' at line ' + __LINE__);
+        }
         return [$this->getTableColumns($table), $record, $primaryKey, $this->getColumnTypes($table)];
     }
 
@@ -140,7 +145,9 @@ class DbBrowserDataHelper extends Data
         if (!empty($filters)) {
             $whereConditions = [];
             foreach ($filters as $column => $value) {
-                if ($value === '') continue;
+                if ($value === '') {
+                    continue;
+                }
                 $whereConditions[] = $this->quoteName($column) . " LIKE :filter_" . $column;
                 $params["filter_" . $column] = '%' . $value . '%';
             }
@@ -168,7 +175,9 @@ class DbBrowserDataHelper extends Data
         $rows = $stmt->fetchAll(PDO::FETCH_OBJ);
         foreach ($rows as &$row) {
             foreach ($row as $col => $val) {
-                if (!is_string($val)) continue;
+                if (!is_string($val)) {
+                    continue;
+                }
                 $imgPos = stripos($val, '<img');
                 if ($imgPos !== false) {
                     $val = mb_substr($val, 0, $imgPos, 'UTF-8') . '[image]';
@@ -193,7 +202,9 @@ class DbBrowserDataHelper extends Data
             $column = $columnsDetail['name'];
             if (isset($_POST[$column]) && $column != $primaryKey) {
                 $value = $_POST[$column];
-                if ($value === '' && $columnsDetail['notnull'] == 0) $value = null;
+                if ($value === '' && $columnsDetail['notnull'] == 0) {
+                    $value = null;
+                }
                 $data[$column] = $value;
             }
         }
@@ -217,7 +228,9 @@ class DbBrowserDataHelper extends Data
         $columns = $this->getTableColumns($table);
         $filters = [];
         foreach ($columns as $column) {
-            if (isset($query['filter_' . $column])) $filters[$column] = $query['filter_' . $column];
+            if (isset($query['filter_' . $column])) {
+                $filters[$column] = $query['filter_' . $column];
+            }
         }
         return $filters;
     }

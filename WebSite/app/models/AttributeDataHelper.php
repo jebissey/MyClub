@@ -1,11 +1,11 @@
 <?php
+
 declare(strict_types=1);
 
 namespace app\models;
 
 use PDO;
 use Throwable;
-
 use app\enums\ApplicationError;
 use app\helpers\Application;
 

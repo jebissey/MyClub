@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace app\models;
 
-use \Envms\FluentPDO\Queries\Select;
-
+use Envms\FluentPDO\Queries\Select;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
 
@@ -37,7 +36,9 @@ class ArticleTableDataHelper extends Data
                     AND (IdGroup IS NULL OR IdGroup IN (SELECT IdGroup FROM PersonGroup WHERE IdPerson = ' . $connectedUser->person->Id . '))
                 ))');
             }
-        } else $query = $query->where('(IdGroup IS NULL AND OnlyForMembers = 0 AND PublishedBy IS NOT NULL)');
+        } else {
+            $query = $query->where('(IdGroup IS NULL AND OnlyForMembers = 0 AND PublishedBy IS NOT NULL)');
+        }
 
         $query = $query->orderBy('LastUpdate DESC');
         return $query;

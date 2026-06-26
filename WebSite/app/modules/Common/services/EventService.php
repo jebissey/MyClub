@@ -11,7 +11,9 @@ use app\valueObjects\ApiResponse;
 
 class EventService implements EventServiceInterface
 {
-    public function __construct(private EventDataHelper $eventDataHelper) {}
+    public function __construct(private EventDataHelper $eventDataHelper)
+    {
+    }
 
     public function duplicateEvent(int $id, int $userId, Period $mode): ApiResponse
     {

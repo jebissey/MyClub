@@ -492,7 +492,7 @@ SQL);
         $pdo->exec("DELETE FROM Languages WHERE Name IN (
             'communication.index.cancel'
         )");
-        
+
         return 68;
     }
 }

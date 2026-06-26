@@ -8,6 +8,7 @@ use PDOException;
 use InvalidArgumentException;
 use Throwable;
 use finfo;
+
 use function imagecreatefromstring;
 use function imagesx;
 use function imagesy;
@@ -224,7 +225,9 @@ class MessageApi extends AbstractApi
         }
         try {
             $result = $this->dataHelper->delete('Message', ['Id' => $messageId]);
-            if ($result > 0) return new ApiResponse(true, ApplicationError::Ok->value, ['data' => ['messageId' => $messageId]], 'Message supprimé');
+            if ($result > 0) {
+                return new ApiResponse(true, ApplicationError::Ok->value, ['data' => ['messageId' => $messageId]], 'Message supprimé');
+            }
             return new ApiResponse(false, ApplicationError::BadRequest->value);
         } catch (PDOException $e) {
             return new ApiResponse(false, ApplicationError::BadRequest->value, [], $e->getMessage());

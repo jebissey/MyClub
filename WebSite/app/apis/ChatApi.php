@@ -6,7 +6,6 @@ namespace app\apis;
 
 use DateTime;
 use DateTimeZone;
-
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
 use app\helpers\GravatarHandler;
@@ -45,7 +44,9 @@ class ChatApi extends AbstractApi
         $result = [];
         foreach ($visits as $visit) {
             $visitDate = new DateTime($visit->LastActivity, new DateTimeZone('UTC'));
-            if ($visitDate < $cutoff) continue;
+            if ($visitDate < $cutoff) {
+                continue;
+            }
 
             $result[] = [
                 'personId'      => $visit->PersonId,

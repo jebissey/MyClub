@@ -13,7 +13,6 @@ use app\modules\Common\AbstractController;
 
 class KanbanController extends AbstractController
 {
-
     public function __construct(Application $application, private KanbanDataHelper $kanbanDataHelper)
     {
         parent::__construct($application);

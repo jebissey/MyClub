@@ -7,7 +7,6 @@ namespace app\models;
 use InvalidArgumentException;
 use PDO;
 use Throwable;
-
 use app\helpers\Application;
 
 class MenuItemDataHelper extends Data

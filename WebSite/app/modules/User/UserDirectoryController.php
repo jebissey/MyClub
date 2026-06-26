@@ -36,8 +36,9 @@ class UserDirectoryController extends AbstractController
         }
         $groupParam = $this->flight->request()->query['group'] ?? null;
         $selectedGroup = ($groupParam !== null && ctype_digit((string)$groupParam)) ? (int)$groupParam : null;
-        if ($selectedGroup) $persons = $this->personDataHelper->getPersonsInGroupForDirectory($selectedGroup);
-        else {
+        if ($selectedGroup) {
+            $persons = $this->personDataHelper->getPersonsInGroupForDirectory($selectedGroup);
+        } else {
             $persons = $this->dataHelper->gets('Person', [
                 'InPresentationDirectory' => 1,
                 'Inactivated' => 0

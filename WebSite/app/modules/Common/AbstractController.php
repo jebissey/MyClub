@@ -8,7 +8,6 @@ use flight;
 use flight\Engine;
 use Closure;
 use Latte\Engine as LatteEngine;
-
 use app\enums\ApplicationError;
 use app\enums\TimeOfDay;
 use app\helpers\Application;
@@ -228,8 +227,12 @@ abstract class AbstractController
 
     protected function redirect(string $url, ?ApplicationError $applicationError = null, ?string $message = null): void
     {
-        if ($applicationError !== null) $this->flight->setData('code', $applicationError->value);
-        if ($message !== null) $this->flight->setData('message', $message);
+        if ($applicationError !== null) {
+            $this->flight->setData('code', $applicationError->value);
+        }
+        if ($message !== null) {
+            $this->flight->setData('message', $message);
+        }
 
         $ua = $_SERVER['HTTP_USER_AGENT'] ?? '';
         if (stripos($ua, 'TestDevice') !== false) {
@@ -288,7 +291,9 @@ abstract class AbstractController
 #error_log("\n\n" . json_encode($templateLatteName, JSON_PRETTY_PRINT) . "\n");
         $content = $this->latte->renderToString($templateLatteName, $params);
         echo $content;
-        if (ob_get_level()) ob_end_flush();
+        if (ob_get_level()) {
+            ob_end_flush();
+        }
         flush();
         Flight::stop();
     }
@@ -321,10 +326,15 @@ abstract class AbstractController
         });
 
         $this->latte->addFilter('formatFileSize', function ($bytes) {
-            if ($bytes >= 1073741824)  return number_format($bytes / 1073741824, 2) . ' GB';
-            elseif ($bytes >= 1048576) return number_format($bytes / 1048576, 2) . ' MB';
-            elseif ($bytes >= 1024)    return number_format($bytes / 1024, 2) . ' KB';
-            else                       return $bytes . ' bytes';
+            if ($bytes >= 1073741824) {
+                return number_format($bytes / 1073741824, 2) . ' GB';
+            } elseif ($bytes >= 1048576) {
+                return number_format($bytes / 1048576, 2) . ' MB';
+            } elseif ($bytes >= 1024) {
+                return number_format($bytes / 1024, 2) . ' KB';
+            } else {
+                return $bytes . ' bytes';
+            }
         });
 
         $this->latte->addFilter('readableDuration', function ($duration) {

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace app\models;
 
 use PDO;
-
 use app\helpers\Application;
 
 class CarouselDataHelper extends Data
@@ -35,7 +34,9 @@ class CarouselDataHelper extends Data
 
     public function getPathsUsedInGalery(array $paths): array
     {
-        if (empty($paths)) return [];
+        if (empty($paths)) {
+            return [];
+        }
 
         $stmt = $this->pdo->query("SELECT Item FROM Carousel");
         $items = $stmt->fetchAll(PDO::FETCH_COLUMN);

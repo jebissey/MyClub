@@ -10,7 +10,6 @@ use Latte\Loaders\FileLoader;
 use LogicException;
 use PDO;
 use Throwable;
-
 use app\exceptions\DatabaseException;
 use app\models\Database;
 use app\models\DataHelper;
@@ -22,11 +21,11 @@ class Application
 {
     public const VERSION = '0.89.1';
     public const  EMOJI_LIST = [
-        '😀', '😄', '😁', '😅', '😂', '🤣', '😊', '😇', '🤨', 
-        '🙂', '🙃', '😉', '😌', '☹️', '😐', '🙄', '😯', '🥴', 
-        '🤩', '😍', '🥰', '😘', '😚', '🧐', '🤓', '😎', '🥸', 
-        '🫣', '🤗', '🫢', '🤭', '🤫', '🤔', '🫡', '🥱', '😴', 
-        '😋', '😛', '🤪', '🤮', '🤧', '😷', '🤒', '🤕', '🤐', 
+        '😀', '😄', '😁', '😅', '😂', '🤣', '😊', '😇', '🤨',
+        '🙂', '🙃', '😉', '😌', '☹️', '😐', '🙄', '😯', '🥴',
+        '🤩', '😍', '🥰', '😘', '😚', '🧐', '🤓', '😎', '🥸',
+        '🫣', '🤗', '🫢', '🤭', '🤫', '🤔', '🫡', '🥱', '😴',
+        '😋', '😛', '🤪', '🤮', '🤧', '😷', '🤒', '🤕', '🤐',
         '😥', '😭', '😤', '😠', '🥵', '🥶', '🤑', '🤠', '🥳',
         '🧑‍⚕️', '🧑‍⚖️', '🧑‍🍳', '🧑‍🏫', '🧑‍🌾', '🧑‍🔧', '🧑‍🏭', '🧑‍💼', '🧑‍🔬', '🧑‍💻', '🧑‍🎤', '🧑‍🎨', '🧑‍✈️', '🧑‍🚀', '🧑‍🚒', '🧑‍🎄', '🧑‍🎓',
         '🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐨', '🐯', '🦁',
@@ -122,9 +121,13 @@ class Application
     {
         $msg = "Unreachable code executed in file {$file} at line {$line}";
         if ($value !== null) {
-            if (is_object($value) && enum_exists($value::class)) $msg .= " (enum " . $value::class . "::" . $value->name . ")";
-            elseif (is_object($value))                           $msg .= " (object of type " . $value::class . ")";
-            else                                                 $msg .= " (value: " . var_export($value, true) . ")";
+            if (is_object($value) && enum_exists($value::class)) {
+                $msg .= " (enum " . $value::class . "::" . $value->name . ")";
+            } elseif (is_object($value)) {
+                $msg .= " (object of type " . $value::class . ")";
+            } else {
+                $msg .= " (value: " . var_export($value, true) . ")";
+            }
         }
         if ($log) {
             new logDataWriterHelper(self::init())->add('UNREACHABLE', $msg);
@@ -145,7 +148,7 @@ class Application
     #region Private functions
     private function setupLatteFilters(): void
     {
-        self::$latte->addExtension(new \Latte\Bridges\Tracy\TracyExtension);
+        self::$latte->addExtension(new \Latte\Bridges\Tracy\TracyExtension());
 
         self::$latte->addFilter('json', function ($value) {
             return json_encode($value, JSON_HEX_APOS | JSON_HEX_QUOT);

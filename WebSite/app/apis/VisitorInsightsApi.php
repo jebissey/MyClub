@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace app\apis;
 
 use DateTimeImmutable;
-
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
 use app\models\DataHelper;
@@ -15,9 +14,9 @@ use app\models\PersonDataHelper;
 class VisitorInsightsApi extends AbstractApi
 {
     public function __construct(
-        Application      $application,
-        ConnectedUser    $connectedUser,
-        DataHelper       $dataHelper,
+        Application $application,
+        ConnectedUser $connectedUser,
+        DataHelper $dataHelper,
         PersonDataHelper $personDataHelper,
         private LogDataHelper $logDataHelper,
     ) {

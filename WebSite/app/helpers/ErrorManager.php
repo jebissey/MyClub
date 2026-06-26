@@ -46,11 +46,17 @@ class ErrorManager
         }
         $translation = $this->languagesDataHelper->translate('Error' . $code->value);
         $result = '';
-        if ($translation != "-- Error{$code->value} --") $result = $translation;
+        if ($translation != "-- Error{$code->value} --") {
+            $result = $translation;
+        }
         if ($result === '') {
-            if ($displayCode) $result .= "<h1>{$code->value}</h1>";
+            if ($displayCode) {
+                $result .= "<h1>{$code->value}</h1>";
+            }
             $result .= "<h2>$message</h2>";
-        } else $timeout = max($code === ApplicationError::Error ? 10000 : 5000, $timeout);
+        } else {
+            $timeout = max($code === ApplicationError::Error ? 10000 : 5000, $timeout);
+        }
         if ($code == ApplicationError::ServiceUnavailable && $isWebmaster) {
             $result = str_replace(
                 '<a href="/" class="btn btn-primary mt-3">Retourner à l’accueil maintenant</a>',
@@ -70,7 +76,9 @@ class ErrorManager
             'navbarInkColor'  => $defaultColors['navbarInkColor'],
             'navbarIconColor' => $defaultColors['navbarIconColor'],
         ]);
-        if ($code != ApplicationError::Ok) exit;
+        if ($code != ApplicationError::Ok) {
+            exit;
+        }
         Application::unreachable("Ok isn't an error", __FILE__, __LINE__);
     }
 

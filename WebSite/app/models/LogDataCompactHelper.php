@@ -7,7 +7,6 @@ namespace app\models;
 use DateTime;
 use InvalidArgumentException;
 use Throwable;
-
 use app\enums\ApplicationError;
 use app\helpers\Application;
 
@@ -110,7 +109,9 @@ class LogDataCompactHelper extends Data
 
     private function enforceMaxRecordsAndLog(int $maxRecords, int $countBefore): void
     {
-        if ($maxRecords <= 0) return;
+        if ($maxRecords <= 0) {
+            return;
+        }
         $count = (int)$this->pdoForLog->query("SELECT COUNT(*) FROM Log")->fetchColumn();
         if ($count > $maxRecords) {
             $toDelete = $count - $maxRecords;

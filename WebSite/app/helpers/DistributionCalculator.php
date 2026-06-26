@@ -6,7 +6,6 @@ namespace app\helpers;
 
 use RuntimeException;
 
-
 class DistributionCalculator
 {
     private const SLICES = 20;

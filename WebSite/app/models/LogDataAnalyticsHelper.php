@@ -6,7 +6,6 @@ namespace app\models;
 
 use DateTime;
 use PDO;
-
 use app\helpers\Application;
 use app\helpers\MyClubDateTime;
 

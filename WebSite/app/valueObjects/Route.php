@@ -13,5 +13,6 @@ readonly class Route
         public Closure $controllerFactory,
         public string $function,
         public array $args = []
-    ) {}
+    ) {
+    }
 }

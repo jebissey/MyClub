@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace app\models;
 
 use PDO;
-
 use app\helpers\Application;
 
 class ParticipantDataHelper extends Data
@@ -100,7 +99,9 @@ class ParticipantDataHelper extends Data
                 $connection['EventList'] = implode(' • ', $events);
             }
         }
-        if (!$connections) return ['connections' => [], 'maxEvents' => 0];
+        if (!$connections) {
+            return ['connections' => [], 'maxEvents' => 0];
+        }
 
         $persons = $this->pdo->query("
         SELECT 

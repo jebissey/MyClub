@@ -4,9 +4,8 @@ declare(strict_types=1);
 
 namespace app\modules\Common;
 
-use \Envms\FluentPDO\Queries\Select;
+use Envms\FluentPDO\Queries\Select;
 use PDO;
-
 use app\helpers\Application;
 
 abstract class TableController extends AbstractController
@@ -22,8 +21,11 @@ abstract class TableController extends AbstractController
     protected function prepareTableData(Select $query, array $filters = [], bool $usePdoForLog = false): array
     {
         $pdo = null;
-        if ($usePdoForLog) $pdo = $this->application->getPdoForLog();
-        else               $pdo = $this->application->getPdo();
+        if ($usePdoForLog) {
+            $pdo = $this->application->getPdoForLog();
+        } else {
+            $pdo = $this->application->getPdo();
+        }
 
         $page = (int)($this->flight->request()->query['tablePage'] ?? 1);
         $values = [];
@@ -60,12 +62,14 @@ abstract class TableController extends AbstractController
     {
         $params = [];
         foreach ($filters as $key => $value) {
-            if (!empty($value)) $params[$key] = urlencode($value);
+            if (!empty($value)) {
+                $params[$key] = urlencode($value);
+            }
         }
         return $params;
     }
 
-    #region private functions  
+    #region private functions
     private function count(string $sql, PDO $pdo, array $values = []): int
     {
         $countSql = "SELECT COUNT(*) FROM ({$sql}) AS sub";

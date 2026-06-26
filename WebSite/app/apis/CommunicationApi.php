@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace app\apis;
 
 use Throwable;
-
 use app\enums\ApplicationError;
 use app\exceptions\EmailException;
 use app\helpers\Application;
@@ -25,7 +24,7 @@ class CommunicationApi extends AbstractApi
         DataHelper $dataHelper,
         PersonDataHelper $personDataHelper,
         private readonly EmailService $emailService,
-        private readonly ?EmailQuotaTrackerInterface  $quotaTracker,
+        private readonly ?EmailQuotaTrackerInterface $quotaTracker,
         private readonly LanguagesDataHelper $languagesDataHelper,
     ) {
         parent::__construct($application, $connectedUser, $dataHelper, $personDataHelper);
@@ -34,7 +33,6 @@ class CommunicationApi extends AbstractApi
     public function getQuota(): void
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isCommunicationManager())) {
-
             try {
                 $this->renderJsonOk($this->buildQuotaStats());
             } catch (Throwable $e) {
@@ -83,7 +81,6 @@ class CommunicationApi extends AbstractApi
     public function sendCommunication(): void
     {
         if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isCommunicationManager())) {
-
             try {
                 $input        = $this->getJsonInput();
                 $recipientIds = array_filter(array_map('intval', $input['recipient_ids'] ?? []));

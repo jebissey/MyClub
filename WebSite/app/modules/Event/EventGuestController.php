@@ -6,7 +6,6 @@ namespace app\modules\Event;
 
 use DateTime;
 use Throwable;
-
 use app\enums\FilterInputRule;
 use app\helpers\Application;
 use app\helpers\WebApp;
@@ -152,6 +151,8 @@ class EventGuestController extends AbstractController
             } catch (Throwable $e) {
                 $this->guest('Erreur lors de l\'envoi de l\'invitation. ' . $e->getMessage(), 'error');
             }
-        } else $this->guest();
+        } else {
+            $this->guest();
+        }
     }
 }

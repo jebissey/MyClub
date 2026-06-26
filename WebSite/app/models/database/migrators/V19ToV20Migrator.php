@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace app\models\database\migrators;
 
 use PDO;
-
 use app\interfaces\DatabaseMigratorInterface;
 
 class V19ToV20Migrator implements DatabaseMigratorInterface
@@ -26,7 +25,7 @@ class V19ToV20Migrator implements DatabaseMigratorInterface
             ALTER TABLE Person 
             ADD COLUMN MemberInfo TEXT DEFAULT ''
         ");
-        
+
         return 20;
     }
 }

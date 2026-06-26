@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace app\exceptions;
 
 use Exception;
-
 use app\enums\ApplicationError;
 
 class UnauthorizedAccessException extends Exception

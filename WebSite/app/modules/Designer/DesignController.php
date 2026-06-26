@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace app\modules\Designer;
 
 use RuntimeException;
-
 use app\enums\FilterInputRule;
 use app\helpers\Application;
 use app\helpers\TranslationManager;
@@ -15,7 +14,6 @@ use app\modules\Common\AbstractController;
 
 class DesignController extends AbstractController
 {
-
     public function __construct(
         Application $application,
         private DesignDataHelper $designDataHelper

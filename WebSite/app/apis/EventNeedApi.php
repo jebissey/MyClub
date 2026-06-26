@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace app\apis;
 
 use Throwable;
-
 use app\enums\ApplicationError;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
@@ -33,8 +32,11 @@ class EventNeedApi extends AbstractApi
         if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isEventDesigner())) {
             try {
                 $deletedRows = $this->dataHelper->delete('Need', ['Id' => $id]);
-                if ($deletedRows === 1) $this->renderJsonOk();
-                else  $this->renderJsonBadRequest('', __FILE__, __LINE__);
+                if ($deletedRows === 1) {
+                    $this->renderJsonOk();
+                } else {
+                    $this->renderJsonBadRequest('', __FILE__, __LINE__);
+                }
             } catch (Throwable $e) {
                 $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
             }
@@ -61,7 +63,6 @@ class EventNeedApi extends AbstractApi
     public function saveNeed(): void
     {
         if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isEventDesigner())) {
-
             $data = $this->getJsonInput();
             try {
                 $this->saveNeed_($data);
@@ -75,9 +76,15 @@ class EventNeedApi extends AbstractApi
     #region Private functions
     private function saveNeed_(array $data): ApiResponse
     {
-        if (empty($data['label']))          return new ApiResponse(false, ApplicationError::BadRequest->value, [], 'Missing parameter label');
-        if (empty($data['name']))           return new ApiResponse(false, ApplicationError::BadRequest->value, [], 'Missing parameter name');
-        if (!($data['idNeedType'] ?? null)) return new ApiResponse(false, ApplicationError::BadRequest->value, [], 'Missing parameter idNeedType');
+        if (empty($data['label'])) {
+            return new ApiResponse(false, ApplicationError::BadRequest->value, [], 'Missing parameter label');
+        }
+        if (empty($data['name'])) {
+            return new ApiResponse(false, ApplicationError::BadRequest->value, [], 'Missing parameter name');
+        }
+        if (!($data['idNeedType'] ?? null)) {
+            return new ApiResponse(false, ApplicationError::BadRequest->value, [], 'Missing parameter idNeedType');
+        }
         $needData = [
             'Label' => $data['label'],
             'Name' => $data['name'],

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace app\models;
 
 use Throwable;
-
 use app\helpers\Application;
 
 class KaraokeDataHelper extends Data

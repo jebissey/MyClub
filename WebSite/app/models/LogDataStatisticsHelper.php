@@ -6,9 +6,7 @@ namespace app\models;
 
 use DateTime;
 use PDO;
-
 use app\helpers\MyClubDateTime;
-
 
 class LogDataStatisticsHelper extends Data
 {
@@ -189,7 +187,9 @@ class LogDataStatisticsHelper extends Data
             }
         }
 
-        if (empty($widths) || empty($heights)) return 'Résolutions variées';
+        if (empty($widths) || empty($heights)) {
+            return 'Résolutions variées';
+        }
 
         $minWidth = min($widths);
         $maxWidth = max($widths);
@@ -223,14 +223,18 @@ class LogDataStatisticsHelper extends Data
 
     private function getScreenOrientation(?string $resolution): string
     {
-        if (!$resolution || strpos($resolution, 'x') === false) return 'Inconnu';
+        if (!$resolution || strpos($resolution, 'x') === false) {
+            return 'Inconnu';
+        }
         [$width, $height] = explode('x', $resolution);
         return ((int)$width < (int)$height) ? 'Portrait' : 'Paysage';
     }
 
     private function getResolutionType(?string $resolution): string
     {
-        if (!$resolution) return 'Inconnu';
+        if (!$resolution) {
+            return 'Inconnu';
+        }
         [$width, $height] = explode('x', $resolution) + [0, 0];
         $maxDimension = max((int)$width, (int)$height);
 

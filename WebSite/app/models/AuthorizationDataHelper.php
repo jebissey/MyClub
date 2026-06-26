@@ -6,7 +6,6 @@ namespace app\models;
 
 use DateTime;
 use PDO;
-
 use app\enums\EventAudience;
 use app\exceptions\QueryException;
 use app\helpers\Application;
@@ -88,46 +87,60 @@ class AuthorizationDataHelper extends Data
     public function canPersonReadOrderResults(object $article, ConnectedUser $connectedUser): bool
     {
         $order = $this->get('Order', ['IdArticle' => $article->Id], 'ClosingDate, Visibility, Id');
-        if (!$order || !($connectedUser->person ?? false)) return false;
+        if (!$order || !($connectedUser->person ?? false)) {
+            return false;
+        }
         $now = (new DateTime())->format('Y-m-d');
         $closingDate = $order->ClosingDate;
         if (
             $article->CreatedBy == ($connectedUser->person?->Id ?? 0)
             || $order->Visibility == 'all'
             || $order->Visibility == 'allAfterClosing' && $closingDate < $now
-        ) return true;
+        ) {
+            return true;
+        }
         $stmt = $this->pdo->prepare('SELECT COUNT(*) FROM OrderReply WHERE IdOrder = ? AND IdPerson = ?');
         $stmt->execute([$order->Id, $connectedUser->person?->Id ?? 0]);
         $hasOrdered = $stmt->fetchColumn() > 0;
-        if ($hasOrdered && ($order->Visibility == 'orderers' || ($order->Visibility == 'orderersAfterClosing' && $closingDate < $now)))
+        if ($hasOrdered && ($order->Visibility == 'orderers' || ($order->Visibility == 'orderersAfterClosing' && $closingDate < $now))) {
             return true;
+        }
         return false;
     }
 
     public function canPersonReadSurveyResults(object $article, ConnectedUser $connectedUser): bool
     {
         $survey = $this->get('Survey', ['IdArticle' => $article->Id], 'ClosingDate, Visibility, Id');
-        if (!$survey || !($connectedUser->person ?? false)) return false;
+        if (!$survey || !($connectedUser->person ?? false)) {
+            return false;
+        }
         $now = (new DateTime())->format('Y-m-d');
         $closingDate = $survey->ClosingDate;
         if (
             $article->CreatedBy == ($connectedUser->person?->Id ?? 0)
             || $survey->Visibility == 'all'
             || $survey->Visibility == 'allAfterClosing' && $closingDate < $now
-        ) return true;
+        ) {
+            return true;
+        }
         $stmt = $this->pdo->prepare('SELECT COUNT(*) FROM Reply WHERE IdSurvey = ? AND IdPerson = ?');
         $stmt->execute([$survey->Id, $connectedUser->person?->Id ?? 0]);
         $hasVoted = $stmt->fetchColumn() > 0;
-        if ($hasVoted && ($survey->Visibility == 'voters' || ($survey->Visibility == 'votersAfterClosing' && $closingDate < $now)))
+        if ($hasVoted && ($survey->Visibility == 'voters' || ($survey->Visibility == 'votersAfterClosing' && $closingDate < $now))) {
             return true;
+        }
         return false;
     }
 
     public function getArticle(int $id, ConnectedUser $connectedUser): object|false
     {
         $article = $this->get('Article', ['Id' => $id], 'CreatedBy, PublishedBy, OnlyForMembers, IdGroup');
-        if ($article === false) throw new QueryException("Article {$id} doesn't exist");
-        if (!$this->canReadArticle($article, $connectedUser)) return false;
+        if ($article === false) {
+            throw new QueryException("Article {$id} doesn't exist");
+        }
+        if (!$this->canReadArticle($article, $connectedUser)) {
+            return false;
+        }
         return $article;
     }
 
@@ -153,10 +166,18 @@ class AuthorizationDataHelper extends Data
     #region Private functions
     private function canReadArticle(object $article, ConnectedUser $connectedUser): bool
     {
-        if (!$article) return false;
-        if (($connectedUser->person ?? false) && ($article->CreatedBy === $connectedUser->person->Id || $connectedUser->isEditor())) return true;
-        if ($article->PublishedBy === null) return false;
-        if ($connectedUser->person !== null && $article->IdGroup === null) return true;
+        if (!$article) {
+            return false;
+        }
+        if (($connectedUser->person ?? false) && ($article->CreatedBy === $connectedUser->person->Id || $connectedUser->isEditor())) {
+            return true;
+        }
+        if ($article->PublishedBy === null) {
+            return false;
+        }
+        if ($connectedUser->person !== null && $article->IdGroup === null) {
+            return true;
+        }
         return $article->IdGroup === null || !empty(array_intersect([$article->IdGroup], $this->getUserGroups($connectedUser->person?->Email ?? '')));
     }
 
@@ -181,7 +202,9 @@ class AuthorizationDataHelper extends Data
         }
 
         if (!empty($message->GroupId)) {
-            if (!($connectedUser->person ?? false)) return false;
+            if (!($connectedUser->person ?? false)) {
+                return false;
+            }
             return in_array($message->GroupId, $this->getUserGroups($connectedUser->person->Email), true);
         }
 

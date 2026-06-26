@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace app\modules\Article;
 
 use DateTime;
-
 use app\enums\FilterInputRule;
 use app\enums\OrderVisibility;
 use app\exceptions\IntegrityException;
@@ -83,8 +82,11 @@ class OrderController extends AbstractController
         ];
 
         $order = $this->dataHelper->get('Order', ['IdArticle' => $articleId], 'Id');
-        if ($order) $this->dataHelper->set('Order', $fields, ['Id' => $order->Id]);
-        else        $this->dataHelper->set('Order', $fields);
+        if ($order) {
+            $this->dataHelper->set('Order', $fields, ['Id' => $order->Id]);
+        } else {
+            $this->dataHelper->set('Order', $fields);
+        }
 
         $this->redirect('/article/' . $articleId);
     }
@@ -131,7 +133,9 @@ class OrderController extends AbstractController
                 ];
 
                 foreach ($answers as $article => $quantity) {
-                    if (isset($results[$article])) $results[$article] += $quantity;
+                    if (isset($results[$article])) {
+                        $results[$article] += $quantity;
+                    }
                 }
             }
 
@@ -144,7 +148,7 @@ class OrderController extends AbstractController
                 'currentVersion' => Application::VERSION,
                 'page'           => $connectedUser->getPage(),
                 'btn_HistoryBack' => true,
-                'btn_Parent'      => "/article/{$articleId}",                
+                'btn_Parent'      => "/article/{$articleId}",
             ]));
         } else {
             $this->raiseForbidden(__FILE__, __LINE__);

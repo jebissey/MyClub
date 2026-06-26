@@ -17,7 +17,8 @@ final class DatabaseSmtpConfigProvider implements SmtpConfigProviderInterface
 
     public function __construct(
         private readonly CredentialService $credentials
-    ) {}
+    ) {
+    }
 
     public function get(): ?SmtpConfig
     {
@@ -41,7 +42,7 @@ final class DatabaseSmtpConfigProvider implements SmtpConfigProviderInterface
             $this->credentials->get('mailjet', 'api_secret') ?? '',
             $this->credentials->get('mailjet', 'sender') ?? '',
             $this->credentials->get('brevo', 'api_key') ?? '',
-            $this->credentials->get('brevo', 'sender') ?? '',            
+            $this->credentials->get('brevo', 'sender') ?? '',
             (int) ($this->credentials->get('email', 'daily_limit') ?? 0),
             (int) ($this->credentials->get('email', 'monthly_limit') ?? 0),
         );

@@ -8,7 +8,6 @@ use Envms\FluentPDO\Query;
 use InvalidArgumentException;
 use PDO;
 use PDOException;
-
 use app\enums\ApplicationError;
 use app\exceptions\SqliteTableException;
 use app\helpers\Application;
@@ -40,7 +39,9 @@ abstract class Data
         $tableDef->execute([$table]);
         $row = $tableDef->fetch(PDO::FETCH_ASSOC);
 
-        if (!$row) return [];
+        if (!$row) {
+            return [];
+        }
 
         $sqlText = $row['sql'];
         if (preg_match("/\"$column\"[^\n]*CHECK\s*\(\s*\"$column\"\s+IN\s*\(([^)]+)\)\)/i", $sqlText, $matches)) {
@@ -55,9 +56,15 @@ abstract class Data
 
     protected function validateTableName(string $table): void
     {
-        if (strlen($table) > 64)                      throw new SqliteTableException('Table name too long (max 64) in file ' . __FILE__ . ' at line ' . __LINE__);
-        if (!preg_match('/^[a-zA-Z0-9_]+$/', $table)) throw new SqliteTableException('Invalid table name in file ' . __FILE__ . ' at line ' . __LINE__);
-        if (!in_array($table, $this->tables))         throw new SqliteTableException("Table '$table' not found in file " . __FILE__ . ' at line ' . __LINE__);
+        if (strlen($table) > 64) {
+            throw new SqliteTableException('Table name too long (max 64) in file ' . __FILE__ . ' at line ' . __LINE__);
+        }
+        if (!preg_match('/^[a-zA-Z0-9_]+$/', $table)) {
+            throw new SqliteTableException('Invalid table name in file ' . __FILE__ . ' at line ' . __LINE__);
+        }
+        if (!in_array($table, $this->tables)) {
+            throw new SqliteTableException("Table '$table' not found in file " . __FILE__ . ' at line ' . __LINE__);
+        }
     }
 
     #region Public methods
@@ -65,7 +72,9 @@ abstract class Data
     {
         $this->validateTableName($table);
         try {
-            if (empty($where)) throw new PDOException("DELETE requires WHERE conditions");
+            if (empty($where)) {
+                throw new PDOException("DELETE requires WHERE conditions");
+            }
             $conditions = [];
             $params = [];
             foreach ($where as $field => $value) {
@@ -90,16 +99,22 @@ abstract class Data
     {
         $this->validateTableName($table);
         try {
-            if (is_array($fields)) $fieldsStr = implode(', ', $fields);
-            else                   $fieldsStr = $fields;
+            if (is_array($fields)) {
+                $fieldsStr = implode(', ', $fields);
+            } else {
+                $fieldsStr = $fields;
+            }
 
             $sql = "SELECT {$fieldsStr} FROM \"{$table}\"";
             $params = [];
             if (!empty($where)) {
                 $conditions = [];
                 foreach ($where as $field => $value) {
-                    if (strtolower($field) === 'email') $conditions[] = "{$field} COLLATE NOCASE = :{$field}";
-                    else                                $conditions[] = "{$field} = :{$field}";
+                    if (strtolower($field) === 'email') {
+                        $conditions[] = "{$field} COLLATE NOCASE = :{$field}";
+                    } else {
+                        $conditions[] = "{$field} = :{$field}";
+                    }
                     $params[":{$field}"] = $value;
                 }
                 $sql .= " WHERE " . implode(' AND ', $conditions);
@@ -117,8 +132,8 @@ abstract class Data
     public function getDefaultColors(): array
     {
         return [
-            'navbarBgColor'   => $this->get('Settings', ['Name' => 'Navbar_BgColor'],   'Value')->Value ?? '#212529',
-            'navbarInkColor'  => $this->get('Settings', ['Name' => 'Navbar_InkColor'],  'Value')->Value ?? '#ffffff',
+            'navbarBgColor'   => $this->get('Settings', ['Name' => 'Navbar_BgColor'], 'Value')->Value ?? '#212529',
+            'navbarInkColor'  => $this->get('Settings', ['Name' => 'Navbar_InkColor'], 'Value')->Value ?? '#ffffff',
             'navbarIconColor' => $this->get('Settings', ['Name' => 'Navbar_IconColor'], 'Value')->Value ?? '#ffc107',
         ];
     }
@@ -135,7 +150,9 @@ abstract class Data
         try {
             $firstField = null;
             if ($keyPair) {
-                if ($fields === '*') throw new InvalidArgumentException("Cannot use keyPair with fields='*'");
+                if ($fields === '*') {
+                    throw new InvalidArgumentException("Cannot use keyPair with fields='*'");
+                }
                 $fieldParts = array_map('trim', explode(',', $fields));
                 $firstField = $fieldParts[0];
             }
@@ -144,16 +161,22 @@ abstract class Data
             if (!empty($where)) {
                 $conditions = [];
                 foreach ($where as $field => $value) {
-                    if ($value === null)                    $conditions[] = "{$field}";
-                    else {
-                        if (strtolower($field) === 'email') $conditions[] = "{$field} COLLATE NOCASE = ?";
-                        else                                $conditions[] = "{$field} = ?";
+                    if ($value === null) {
+                        $conditions[] = "{$field}";
+                    } else {
+                        if (strtolower($field) === 'email') {
+                            $conditions[] = "{$field} COLLATE NOCASE = ?";
+                        } else {
+                            $conditions[] = "{$field} = ?";
+                        }
                         $params[] = $value;
                     }
                 }
                 $sql .= " WHERE " . implode(' AND ', $conditions);
             }
-            if ($orderBy !== '') $sql .= " ORDER BY " . $orderBy;
+            if ($orderBy !== '') {
+                $sql .= " ORDER BY " . $orderBy;
+            }
             $stmt = $this->pdo->prepare($sql);
             $stmt->execute($params);
             if ($keyPair) {
@@ -182,16 +205,22 @@ abstract class Data
     {
         $this->validateTableName($table);
         try {
-            if (is_array($fields)) $fieldsStr = implode(', ', $fields);
-            else                   $fieldsStr = $fields;
+            if (is_array($fields)) {
+                $fieldsStr = implode(', ', $fields);
+            } else {
+                $fieldsStr = $fields;
+            }
 
             $sql = "SELECT {$fieldsStr} FROM \"{$table}\"";
             $params = [];
             if (!empty($where)) {
                 $conditions = [];
                 foreach ($where as $field => $value) {
-                    if (strtolower($field) === 'email') $conditions[] = "{$field} COLLATE NOCASE = :{$field}";
-                    else                                $conditions[] = "{$field} = :{$field}";
+                    if (strtolower($field) === 'email') {
+                        $conditions[] = "{$field} COLLATE NOCASE = :{$field}";
+                    } else {
+                        $conditions[] = "{$field} = :{$field}";
+                    }
                     $params[":{$field}"] = $value;
                 }
                 $sql .= " WHERE " . implode(' AND ', $conditions);
@@ -211,7 +240,9 @@ abstract class Data
         try {
             $stmt = $this->pdo->prepare($sql);
             $result = $stmt->execute($parameters);
-            if (!$result) return false;
+            if (!$result) {
+                return false;
+            }
             $queryType = strtoupper(substr(trim($sql), 0, 6));
             switch ($queryType) {
                 case 'SELECT':

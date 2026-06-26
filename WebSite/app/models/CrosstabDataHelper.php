@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace app\models;
 
 use PDO;
-
 use app\enums\Period;
 use app\helpers\Application;
 

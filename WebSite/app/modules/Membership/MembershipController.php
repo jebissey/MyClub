@@ -18,7 +18,7 @@ class MembershipController extends AbstractController
         parent::__construct($application);
     }
 
-	// ─── Pages ────────────────────────────────────────────────────────────────
+    // ─── Pages ────────────────────────────────────────────────────────────────
 
     /**
      * GET /membership

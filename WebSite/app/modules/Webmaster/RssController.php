@@ -6,7 +6,6 @@ namespace app\modules\Webmaster;
 
 use DateInterval;
 use DateTime;
-
 use app\helpers\Application;
 use app\helpers\WebApp;
 use app\models\ArticleDataHelper;
@@ -80,7 +79,7 @@ class RssController extends AbstractController
     }
 
     private function generateArticlesRSS(
-        array  $articles,
+        array $articles,
         string $site_title,
         string $site_url,
         string $feed_url,
@@ -89,9 +88,9 @@ class RssController extends AbstractController
         $rss  = '<?xml version="1.0" encoding="UTF-8"?>';
         $rss .= '<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">';
         $rss .= '<channel>';
-        $rss .= '<title>'       . htmlspecialchars($site_title,       ENT_XML1, 'UTF-8') . '</title>';
-        $rss .= '<link>'        . htmlspecialchars($site_url,          ENT_XML1, 'UTF-8') . '</link>';
-        $rss .= '<description>' . htmlspecialchars($feed_description,  ENT_XML1, 'UTF-8') . '</description>';
+        $rss .= '<title>'       . htmlspecialchars($site_title, ENT_XML1, 'UTF-8') . '</title>';
+        $rss .= '<link>'        . htmlspecialchars($site_url, ENT_XML1, 'UTF-8') . '</link>';
+        $rss .= '<description>' . htmlspecialchars($feed_description, ENT_XML1, 'UTF-8') . '</description>';
         $rss .= '<language>fr-fr</language>';
         $rss .= '<lastBuildDate>' . date(DATE_RSS) . '</lastBuildDate>';
         $rss .= '<atom:link href="' . htmlspecialchars($feed_url, ENT_XML1, 'UTF-8') . '" rel="self" type="application/rss+xml" />';
@@ -104,7 +103,7 @@ class RssController extends AbstractController
 
             $rss .= '<item>';
             $rss .= '<title>'       . htmlspecialchars($article->Title, ENT_XML1, 'UTF-8') . '</title>';
-            $rss .= '<link>'        . htmlspecialchars($guid,           ENT_XML1, 'UTF-8') . '</link>';
+            $rss .= '<link>'        . htmlspecialchars($guid, ENT_XML1, 'UTF-8') . '</link>';
             $rss .= '<guid isPermaLink="false">' . htmlspecialchars($guid, ENT_XML1, 'UTF-8') . '</guid>';
             $rss .= '<pubDate>'     . $pubDate     . '</pubDate>';
             $rss .= '<atom:updated>' . $atomUpdated . '</atom:updated>';
@@ -179,7 +178,7 @@ class RssController extends AbstractController
     }
 
     private function generateEventsRSS(
-        array  $events,
+        array $events,
         string $site_title,
         string $site_url,
         string $feed_url,
@@ -188,9 +187,9 @@ class RssController extends AbstractController
         $rss  = '<?xml version="1.0" encoding="UTF-8"?>';
         $rss .= '<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:ev="http://purl.org/rss/1.0/modules/event/">';
         $rss .= '<channel>';
-        $rss .= '<title>'       . htmlspecialchars($site_title,       ENT_XML1, 'UTF-8') . '</title>';
-        $rss .= '<link>'        . htmlspecialchars($site_url,          ENT_XML1, 'UTF-8') . '</link>';
-        $rss .= '<description>' . htmlspecialchars($feed_description,  ENT_XML1, 'UTF-8') . '</description>';
+        $rss .= '<title>'       . htmlspecialchars($site_title, ENT_XML1, 'UTF-8') . '</title>';
+        $rss .= '<link>'        . htmlspecialchars($site_url, ENT_XML1, 'UTF-8') . '</link>';
+        $rss .= '<description>' . htmlspecialchars($feed_description, ENT_XML1, 'UTF-8') . '</description>';
         $rss .= '<language>fr-fr</language>';
         $rss .= '<lastBuildDate>' . date(DATE_RSS) . '</lastBuildDate>';
         $rss .= '<atom:link href="' . htmlspecialchars($feed_url, ENT_XML1, 'UTF-8') . '" rel="self" type="application/rss+xml" />';
@@ -201,7 +200,7 @@ class RssController extends AbstractController
 
             $rss .= '<item>';
             $rss .= '<title>'       . htmlspecialchars($event->summary, ENT_XML1, 'UTF-8') . '</title>';
-            $rss .= '<link>'        . htmlspecialchars($event_url,      ENT_XML1, 'UTF-8') . '</link>';
+            $rss .= '<link>'        . htmlspecialchars($event_url, ENT_XML1, 'UTF-8') . '</link>';
             $rss .= '<guid isPermaLink="true">' . htmlspecialchars($event_url, ENT_XML1, 'UTF-8') . '</guid>';
             $rss .= '<pubDate>'     . date(DATE_RSS, strtotime($event->fullDateTime)) . '</pubDate>';
             $rss .= '<description>' . htmlspecialchars($description, ENT_XML1, 'UTF-8') . '</description>';

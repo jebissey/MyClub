@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace app\models;
 
 use PDO;
-
 use app\exceptions\QueryException;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
@@ -37,7 +36,9 @@ class SurveyDataHelper extends Data implements NewsProviderInterface
     public function getWithCreator(int $articleId): object|bool
     {
         $article = $this->get('Article', ['Id' => $articleId], 'Id');
-        if ($article === false) throw new QueryException("Article {$articleId} doesn't exist");
+        if ($article === false) {
+            throw new QueryException("Article {$articleId} doesn't exist");
+        }
 
         $sql = "
             SELECT s.*, a.CreatedBy
@@ -79,10 +80,12 @@ class SurveyDataHelper extends Data implements NewsProviderInterface
         return $this->pdo->query($query)->fetchAll();
     }
 
-    public function getNews(ConnectedUser $connectedUser, $searchFrom): array
+    public function getNews(ConnectedUser $connectedUser, string $searchFrom): array
     {
         $news = [];
-        if (!($connectedUser->person ?? false)) return $news;
+        if (!($connectedUser->person ?? false)) {
+            return $news;
+        }
         $sql = "
             SELECT 
                 p.FirstName,

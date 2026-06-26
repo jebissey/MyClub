@@ -32,7 +32,7 @@ class UserAvailabilitiesController extends AbstractController
             'currentAvailabilities' => $currentAvailabilities,
             'page' => $this->application->getConnectedUser()->getPage(1),
             'btn_HistoryBack' => true,
-            'btn_Parent' => "/user",            
+            'btn_Parent' => "/user",
         ]));
     }
 
@@ -48,7 +48,9 @@ class UserAvailabilitiesController extends AbstractController
             return;
         }
         $availabilities = WebApp::getFiltered('availabilities', FilterInputRule::CheckboxMatrix->value, $this->flight->request()->data->getData()) ?? '';
-        if ($availabilities != '') $this->dataHelper->set('Person', ['Availabilities' => json_encode($availabilities)], ['Id' => $person->Id]);
+        if ($availabilities != '') {
+            $this->dataHelper->set('Person', ['Availabilities' => json_encode($availabilities)], ['Id' => $person->Id]);
+        }
         $this->redirect('/user');
     }
 }

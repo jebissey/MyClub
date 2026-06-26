@@ -6,7 +6,6 @@ namespace app\models;
 
 use PDO;
 use Throwable;
-
 use app\helpers\Application;
 
 class EventTypeDataHelper extends Data

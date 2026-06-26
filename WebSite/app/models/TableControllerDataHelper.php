@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace app\models;
 
-use \Envms\FluentPDO\Queries\Select;
-
+use Envms\FluentPDO\Queries\Select;
 use app\helpers\Application;
 
 class TableControllerDataHelper extends Data
@@ -46,7 +45,7 @@ class TableControllerDataHelper extends Data
             ->select(null)
             ->select('Id, FirstName, LastName, NickName, Email, Phone, Alert, MemberInfo')
             ->select("CASE WHEN Password IS NOT NULL THEN 'oui' ELSE 'non' END AS PasswordCreated")
-            ->select("CASE WHEN InPresentationDirectory = 1 THEN 'oui' ELSE 'non' END AS PresentInDirectory")            
+            ->select("CASE WHEN InPresentationDirectory = 1 THEN 'oui' ELSE 'non' END AS PresentInDirectory")
             ->orderBy('LastName')
             ->where('Inactivated = 1');
     }

@@ -29,7 +29,7 @@ class EventNeedController extends AbstractController
             'needs' => $this->needDataHelper->getNeedsAndTheirTypes(),
             'page' => $this->application->getConnectedUser()->getPage(),
             'btn_HistoryBack' => true,
-            'btn_Parent'      => "/designer",            
+            'btn_Parent'      => "/designer",
         ]));
     }
 }

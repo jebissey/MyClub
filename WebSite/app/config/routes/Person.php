@@ -12,7 +12,9 @@ class Person implements RouteInterface
 {
     private array $routes = [];
 
-    public function __construct(private ControllerFactory $controllerFactory) {}
+    public function __construct(private ControllerFactory $controllerFactory)
+    {
+    }
 
     public function get(): array
     {
@@ -29,7 +31,7 @@ class Person implements RouteInterface
 
         $this->routes[] = new Route('GET  /person/delete/@id:[0-9]+', $personController, 'delete');
 
-        $this->routes[] = new Route('GET  /membership-settings',      $personController, 'membershipSettingsEdit');
+        $this->routes[] = new Route('GET  /membership-settings', $personController, 'membershipSettingsEdit');
         $this->routes[] = new Route('POST /membership-settings/save', $personController, 'membershipSettingsSave');
 
         return $this->routes;

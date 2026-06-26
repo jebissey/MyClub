@@ -17,7 +17,6 @@ class MediaManager
         private DataHelper $dataHelper,
         private SharedFileDataHelper $sharedFileDataHelper,
         private LanguagesDataHelper $languagesDataHelper,
-
     ) {
         $this->ensureBaseDirectoryExists();
     }

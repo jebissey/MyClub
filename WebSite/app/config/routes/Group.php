@@ -12,7 +12,9 @@ class Group implements RouteInterface
 {
     private array $routes = [];
 
-    public function __construct(private ControllerFactory $controllerFactory) {}
+    public function __construct(private ControllerFactory $controllerFactory)
+    {
+    }
 
     public function get(): array
     {

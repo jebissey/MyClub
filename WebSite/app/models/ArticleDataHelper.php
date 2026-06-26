@@ -5,11 +5,9 @@ declare(strict_types=1);
 namespace app\models;
 
 use PDO;
-
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
 use app\interfaces\NewsProviderInterface;
-
 
 class ArticleDataHelper extends Data implements NewsProviderInterface
 {
@@ -162,7 +160,9 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
 
     public function getLatestArticle(array $articleIds): ?object
     {
-        if (empty($articleIds)) return null;
+        if (empty($articleIds)) {
+            return null;
+        }
         $placeholders = [];
         $params = [];
         foreach ($articleIds as $index => $id) {
@@ -234,7 +234,9 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
 
     public function getPathsUsedInArticles(array $paths): array
     {
-        if (empty($paths)) return [];
+        if (empty($paths)) {
+            return [];
+        }
 
         $stmt = $this->pdo->query("SELECT Content FROM Article");
         $contents = $stmt->fetchAll(PDO::FETCH_COLUMN);
@@ -254,7 +256,9 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
     public function getSpotlightArticle(): mixed
     {
         $spotlightArticleJson = $this->get('Settings', ['Name' => 'SpotlightArticle'], 'Value')->Value ?? '';
-        if ($spotlightArticleJson === null) return null;
+        if ($spotlightArticleJson === null) {
+            return null;
+        }
         return json_decode($spotlightArticleJson, true);
     }
 
@@ -320,19 +324,28 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
     private function getArticleIdsBasedOnAccess(?string $userEmail): array
     {
         $noGroupArticleIds = $this->getNoGroupArticleIds();
-        if (empty($userEmail)) return $noGroupArticleIds;
+        if (empty($userEmail)) {
+            return $noGroupArticleIds;
+        }
         $forMembersOnlyArticleIds = $this->getArticleIdsForMembers();
-        if (empty($forMembersOnlyArticleIds)) $articleIds = $noGroupArticleIds;
-        else $articleIds = array_merge($noGroupArticleIds, $forMembersOnlyArticleIds);
+        if (empty($forMembersOnlyArticleIds)) {
+            $articleIds = $noGroupArticleIds;
+        } else {
+            $articleIds = array_merge($noGroupArticleIds, $forMembersOnlyArticleIds);
+        }
         $userGroups = $this->authorizationDataHelper->getUserGroups($userEmail);
-        if (empty($userGroups)) return $articleIds;
+        if (empty($userGroups)) {
+            return $articleIds;
+        }
         $groupArticleIds = $this->getArticleIdsByGroups($userGroups);
         return array_unique(array_merge($articleIds, $groupArticleIds));
     }
 
     private function getArticleIdsByGroups(array $groupIds): array
     {
-        if (empty($groupIds)) return [];
+        if (empty($groupIds)) {
+            return [];
+        }
         $groups = implode(',', array_fill(0, count($groupIds), '?'));
         $query = $this->pdo->prepare("
             SELECT DISTINCT Article.Id FROM Article 
@@ -353,7 +366,9 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
 
     private function getLatestArticles_(array $articleIds, int $latestArticlesCount): array
     {
-        if (empty($articleIds)) return [];
+        if (empty($articleIds)) {
+            return [];
+        }
 
         $placeholders = [];
         $params = [];

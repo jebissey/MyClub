@@ -6,7 +6,6 @@ namespace app\apis;
 
 use InvalidArgumentException;
 use Throwable;
-
 use app\enums\ApplicationError;
 use app\enums\FilterInputRule;
 use app\helpers\Application;
@@ -50,7 +49,7 @@ class EventSupplyApi extends AbstractApi
                 (int)$input['needId'],
                 intval($input['supply'])
             );
-            $this->renderJson($apiResponse->data, $apiResponse->success,  $apiResponse->responseCode);
+            $this->renderJson($apiResponse->data, $apiResponse->success, $apiResponse->responseCode);
         } catch (QueryException $e) {
             $this->renderJsonBadRequest($e->getMessage(), $e->getFile(), $e->getLine());
         } catch (UnauthorizedAccessException $e) {
@@ -99,15 +98,21 @@ class EventSupplyApi extends AbstractApi
         $needId = $data['needId'] ?? null;
         $supply = intval($data['supply'] ?? 0);
 
-        if (!$eventId || !$needId || $supply < 0) throw new InvalidArgumentException("Invalid parameters");
+        if (!$eventId || !$needId || $supply < 0) {
+            throw new InvalidArgumentException("Invalid parameters");
+        }
     }
 
     private function updateSupply_(int $eventId, string $userEmail, int $needId, int $supply): ApiResponse
     {
-        if (!$this->eventDataHelper->isUserRegistered($eventId, $userEmail)) return new ApiResponse(false, ApplicationError::BadRequest->value);
+        if (!$this->eventDataHelper->isUserRegistered($eventId, $userEmail)) {
+            return new ApiResponse(false, ApplicationError::BadRequest->value);
+        }
 
         $success = $this->eventDataHelper->updateUserSupply($eventId, $userEmail, $needId, $supply);
-        if (!$success) return new ApiResponse(false, ApplicationError::BadRequest->value);
+        if (!$success) {
+            return new ApiResponse(false, ApplicationError::BadRequest->value);
+        }
 
         $eventNeeds = $this->eventDataHelper->getEventNeeds($eventId);
         $updatedNeed = $this->findUpdatedNeed($eventNeeds, $needId);

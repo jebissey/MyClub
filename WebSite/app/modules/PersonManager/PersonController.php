@@ -14,7 +14,6 @@ use app\models\PersonDataHelper;
 use app\models\TableControllerDataHelper;
 use app\modules\Common\TableController;
 
-
 class PersonController extends TableController
 {
     public function __construct(
@@ -256,7 +255,6 @@ class PersonController extends TableController
     public function membershipSettingsEdit(): void
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isPersonManager(), __FILE__, __LINE__)) {
-
             $seasonStart = $this->dataHelper->getSetting('Membership_Season_Start', '');
             $seasonEnd   = $this->dataHelper->getSetting('Membership_Season_End', '');
             $season      = MyClubDateTime::getSeasonRange($seasonStart, $seasonEnd);
@@ -280,7 +278,6 @@ class PersonController extends TableController
     public function membershipSettingsSave(): void
     {
         if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isPersonManager(), __FILE__, __LINE__)) {
-
             $schema = [
                 'amount'      => FilterInputRule::Float->value,
                 'seasonStart' => FilterInputRule::Text->value,

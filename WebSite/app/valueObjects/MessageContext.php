@@ -9,12 +9,11 @@ readonly class MessageContext
     public function __construct(
         public ?int $articleId = null,
         public ?int $articleAuthorId = null,
-
         public ?int $eventId = null,
         public ?int $eventCreatorId = null,
-
         public ?int $groupId = null
-    ) {}
+    ) {
+    }
 
     public function isArticle(): bool
     {

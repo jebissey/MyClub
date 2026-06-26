@@ -7,7 +7,6 @@ namespace app\helpers;
 use Minishlink\WebPush\WebPush;
 use Minishlink\WebPush\Subscription;
 use Throwable;
-
 use app\models\DataHelper;
 use app\Modules\Common\services\CredentialService;
 
@@ -61,14 +60,14 @@ class NotificationSender
                     $webPush->queueNotification($subscription, json_encode($notificationData));
                 }
             } catch (Throwable $e) {
-error_log("Error creating subscription: " . $e->getMessage());
+                error_log("Error creating subscription: " . $e->getMessage());
             }
         }
 
         foreach ($webPush->flush() as $report) {
             $endpoint = $report->getRequest()->getUri()->__toString();
             if (!$report->isSuccess()) {
-error_log("Notification failed for {$endpoint}: " . $report->getReason());
+                error_log("Notification failed for {$endpoint}: " . $report->getReason());
                 if ($report->isSubscriptionExpired()) {
                     $this->dataHelper->delete('PushSubscription', ['EndPoint' => $endpoint]);
                 }

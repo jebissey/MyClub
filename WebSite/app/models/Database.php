@@ -7,7 +7,6 @@ namespace app\models;
 use PDO;
 use RuntimeException;
 use Throwable;
-
 use app\enums\ApplicationError;
 use app\helpers\Application;
 use app\helpers\File;
@@ -28,12 +27,16 @@ class Database
 
     private function __construct()
     {
-        if (self::$pdo === null) self::check();
+        if (self::$pdo === null) {
+            self::check();
+        }
     }
 
     public static function getInstance(): Database
     {
-        if (self::$instance === null) self::$instance = new self();
+        if (self::$instance === null) {
+            self::$instance = new self();
+        }
         return self::$instance;
     }
 
@@ -51,13 +54,17 @@ class Database
     private function check(): void
     {
         $sqliteLogFile = self::SQLITE_DEST_PATH . self::SQLITE_LOG_FILE;
-        if (!is_file($sqliteLogFile)) File::copy(__DIR__ . '/database/' . self::SQLITE_LOG_FILE, self::SQLITE_DEST_PATH);
+        if (!is_file($sqliteLogFile)) {
+            File::copy(__DIR__ . '/database/' . self::SQLITE_LOG_FILE, self::SQLITE_DEST_PATH);
+        }
         self::$pdoForLog = new PDO('sqlite:' . $sqliteLogFile);
         self::$pdoForLog->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         self::$pdoForLog->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_OBJ);
 
         $sqliteFile = self::SQLITE_DEST_PATH . self::SQLITE_FILE;
-        if (!is_file($sqliteFile)) File::copy(__DIR__ . '/database/' . self::SQLITE_FILE, self::SQLITE_DEST_PATH);
+        if (!is_file($sqliteFile)) {
+            File::copy(__DIR__ . '/database/' . self::SQLITE_FILE, self::SQLITE_DEST_PATH);
+        }
         self::$pdo = new PDO('sqlite:' . $sqliteFile);
         self::$pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_OBJ);
         self::$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -68,12 +75,18 @@ class Database
         $stmt = null;
 
         if ($row) {
-            if ($row->ApplicationName != self::APPLICATION) Application::unreachable('Non-compliant database', __FILE__, __LINE__);
+            if ($row->ApplicationName != self::APPLICATION) {
+                Application::unreachable('Non-compliant database', __FILE__, __LINE__);
+            }
             if ($row->DatabaseVersion != self::DB_VERSION) {
-                if ($row->DatabaseVersion > self::DB_VERSION) Application::unreachable('The database requires a more recent version of the application', __FILE__, __LINE__);
+                if ($row->DatabaseVersion > self::DB_VERSION) {
+                    Application::unreachable('The database requires a more recent version of the application', __FILE__, __LINE__);
+                }
                 self::upgradeDatabase(self::$pdo, $row->DatabaseVersion, self::DB_VERSION);
             }
-        } else Application::unreachable('Empty Metadata table', __FILE__, __LINE__);
+        } else {
+            Application::unreachable('Empty Metadata table', __FILE__, __LINE__);
+        }
     }
 
     private function upgradeDatabase(PDO $pdo, int $from, int $to): void

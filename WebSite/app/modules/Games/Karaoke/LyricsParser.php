@@ -11,7 +11,9 @@ class LyricsParser
     private array $metadata = [];
     private array $lines = [];
 
-    public function __construct() {}
+    public function __construct()
+    {
+    }
 
     public function parse(string $filePath): void
     {

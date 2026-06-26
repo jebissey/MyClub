@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace app\apis;
 
 use Throwable;
-
 use app\enums\ApplicationError;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
@@ -16,7 +15,6 @@ use app\models\PersonDataHelper;
 
 class MediaApi extends AbstractApi
 {
-
     public function __construct(
         Application $application,
         ConnectedUser $connectedUser,
@@ -184,7 +182,6 @@ class MediaApi extends AbstractApi
     public function uploadFile(): void
     {
         if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isRedactor())) {
-
             if (empty($_FILES['file'])) {
                 $this->renderJson(['message' => 'Aucun fichier sélectionné'], false, ApplicationError::Ok->value);
                 return;

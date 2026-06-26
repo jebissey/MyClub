@@ -31,7 +31,7 @@ class LeapFrogApi extends AbstractApi
         }
         $data = json_decode(file_get_contents('php://input'), true);
         if (!is_array($data)) {
-            $this->renderJsonBadRequest('Invalid JSON',__FILE__, __LINE__);
+            $this->renderJsonBadRequest('Invalid JSON', __FILE__, __LINE__);
             return;
         }
         $this->logDataWriterHelper->add((string)ApplicationError::Ok->value, $data['message'] ?? '');

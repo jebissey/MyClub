@@ -6,7 +6,6 @@ namespace app\modules\Common\services;
 
 use DateTime;
 use Throwable;
-
 use app\enums\FilterInputRule;
 use app\exceptions\EmailException;
 use app\helpers\Application;
@@ -19,12 +18,16 @@ use app\valueObjects\EmailMessage;
 
 class AuthenticationService
 {
-    public function __construct(private DataHelper $dataHelper, private EmailService $emailService) {}
+    public function __construct(private DataHelper $dataHelper, private EmailService $emailService)
+    {
+    }
 
     public function handleForgotPassword(string $email): bool
     {
         $person = $this->findPersonByEmail($email);
-        if ($person === false) throw new EmailException();
+        if ($person === false) {
+            throw new EmailException();
+        }
 
         $token = bin2hex(random_bytes(32));
         $this->dataHelper->set(
@@ -56,7 +59,9 @@ class AuthenticationService
 
     public function handleRememberMeLogin(): ?AuthResult
     {
-        if (!isset($_COOKIE['rememberMe'])) return null;
+        if (!isset($_COOKIE['rememberMe'])) {
+            return null;
+        }
         $token = $_COOKIE['rememberMe'];
         $person = $this->dataHelper->get(
             'Person',
@@ -85,8 +90,12 @@ class AuthenticationService
             'rememberMe' => ['on'],
         ];
         $input = WebApp::filterInput($schema, $requestData);
-        if ($input['email'] == null)    return AuthResult::error('Invalid email address');
-        if ($input['password'] == null) return AuthResult::error('Password rules are not respected [6..30] characters');
+        if ($input['email'] == null) {
+            return AuthResult::error('Invalid email address');
+        }
+        if ($input['password'] == null) {
+            return AuthResult::error('Password rules are not respected [6..30] characters');
+        }
         return $this->authenticate(
             $input['email'],
             $input['password'],
@@ -97,7 +106,9 @@ class AuthenticationService
     public function resetPassword(string $token, string $newPassword): bool
     {
         $person = $this->dataHelper->get('Person', ['Token' => $token], 'Id, TokenCreatedAt');
-        if (!$person || $person->TokenCreatedAt === null || (new DateTime($person->TokenCreatedAt))->diff(new DateTime())->h >= 1) return false;
+        if (!$person || $person->TokenCreatedAt === null || (new DateTime($person->TokenCreatedAt))->diff(new DateTime())->h >= 1) {
+            return false;
+        }
         $this->dataHelper->set('Person', [
             'Password' => Password::signPassword($newPassword),
             'Token' => null,
@@ -125,9 +136,15 @@ class AuthenticationService
     {
         try {
             $person = $this->findPersonByEmail($email);
-            if ($person === false)                                       return AuthResult::error("Sign in failed: unknown email {$email}");
-            if ($person->Inactivated == 1)                               return AuthResult::error("Sign in failed: inactivated user {$email}");
-            if (!Password::verifyPassword($password, $person->Password ?? '')) return AuthResult::error("Sign in failed: wrong password for {$email}");
+            if ($person === false) {
+                return AuthResult::error("Sign in failed: unknown email {$email}");
+            }
+            if ($person->Inactivated == 1) {
+                return AuthResult::error("Sign in failed: inactivated user {$email}");
+            }
+            if (!Password::verifyPassword($password, $person->Password ?? '')) {
+                return AuthResult::error("Sign in failed: wrong password for {$email}");
+            }
             return $this->loginUser($person, $rememberMe);
         } catch (Throwable $e) {
             return AuthResult::error("Authentication error: {$e->getMessage()} in {$e->getFile()} at line {$e->getLine()}");
@@ -160,7 +177,9 @@ class AuthenticationService
             ['LastSignIn' => date('Y-m-d H:i:s')],
             ['Id' => $person->Id]
         );
-        if ($rememberMe) $this->setRememberMeToken((int)$person->Id);
+        if ($rememberMe) {
+            $this->setRememberMeToken((int)$person->Id);
+        }
         $_SESSION['user'] = $person->Email;
         $_SESSION['navbar'] = '';
         return AuthResult::success($person);

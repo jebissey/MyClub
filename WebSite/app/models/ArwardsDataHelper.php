@@ -1,10 +1,10 @@
 <?php
+
 declare(strict_types=1);
 
 namespace app\models;
 
 use PDO;
-
 use app\helpers\Application;
 
 class ArwardsDataHelper extends Data
@@ -39,7 +39,9 @@ class ArwardsDataHelper extends Data
                     'total' => $row->Total
                 ];
             }
-            if ($row->CounterName) $data[$personId]['counters'][$row->CounterName] = $row->CounterValue;
+            if ($row->CounterName) {
+                $data[$personId]['counters'][$row->CounterName] = $row->CounterValue;
+            }
         }
         return $data;
     }

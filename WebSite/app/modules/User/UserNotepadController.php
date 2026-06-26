@@ -33,7 +33,7 @@ class UserNotepadController extends AbstractController
             'navItems' => $this->getNavItems($person),
             'page' => $this->application->getConnectedUser()->getPage(1),
             'btn_HistoryBack' => true,
-            'btn_Parent' => "/user",                
+            'btn_Parent' => "/user",
         ]));
     }
 

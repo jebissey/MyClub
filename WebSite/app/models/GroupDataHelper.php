@@ -6,7 +6,6 @@ namespace app\models;
 
 use PDO;
 use Throwable;
-
 use app\enums\ApplicationError;
 use app\exceptions\QueryException;
 use app\helpers\Application;
@@ -196,7 +195,9 @@ class GroupDataHelper extends Data
 
     public function inactive(int $id): void
     {
-        if ($id === 1) throw new QueryException("Group (1) can't be inactivated", ApplicationError::BadRequest->value);
+        if ($id === 1) {
+            throw new QueryException("Group (1) can't be inactivated", ApplicationError::BadRequest->value);
+        }
 
         $this->pdo->beginTransaction();
         try {
@@ -214,7 +215,9 @@ class GroupDataHelper extends Data
 
     public function update(int $id, string $name, int $selfRegistration, array $selectedAuthorizations): void
     {
-        if ($id === 1) throw new QueryException('Group (1) can\'t be updated', ApplicationError::BadRequest->value);
+        if ($id === 1) {
+            throw new QueryException('Group (1) can\'t be updated', ApplicationError::BadRequest->value);
+        }
         $this->pdo->beginTransaction();
         try {
             $query = $this->pdo->prepare('UPDATE "Group" SET Name = ?, SelfRegistration = ? WHERE Id = ?');

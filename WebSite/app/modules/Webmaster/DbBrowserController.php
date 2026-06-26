@@ -81,7 +81,6 @@ class DbBrowserController extends TableController
     public function showTable(string $table): void
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isWebmaster(), __FILE__, __LINE__)) {
-
             $schema = $this->dbBrowserDataHelper->generateFilterSchema($table);
             $filterConfig = $this->dbBrowserDataHelper->generateFilterConfig($table);
             $columns = array_map(

@@ -14,7 +14,8 @@ class ArticleService
         private CarouselDataHelper $carouselDataHelper,
         private MediaManager $media,
         private DataHelper $dataHelper
-    ) {}
+    ) {
+    }
 
     public function createWithMedia(int $userId, ?array $files = null, string $title = '', string $content = ''): int
     {
@@ -26,8 +27,9 @@ class ArticleService
 
         if (!empty($files) && isset($files['tmp_name']) && is_array($files['tmp_name'])) {
             foreach ($files['tmp_name'] as $index => $tmpName) {
-
-                if ($files['error'][$index] !== UPLOAD_ERR_OK) continue;
+                if ($files['error'][$index] !== UPLOAD_ERR_OK) {
+                    continue;
+                }
 
                 $file = [
                     'name'     => $files['name'][$index],

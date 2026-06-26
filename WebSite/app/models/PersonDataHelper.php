@@ -8,7 +8,6 @@ use InvalidArgumentException;
 use PDO;
 use RuntimeException;
 use Throwable;
-
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
 use app\helpers\GravatarHandler;
@@ -68,7 +67,9 @@ class PersonDataHelper extends Data implements NewsProviderInterface
         $persons = $this->getPersonsInGroup($idGroup);
         $filteredPeople = [];
         foreach ($persons as $person) {
-            if ($this->personPreferences->isPersonInterested($person, $idEventType, $dayOfWeek, $timeOfDay)) $filteredPeople[] = $person;
+            if ($this->personPreferences->isPersonInterested($person, $idEventType, $dayOfWeek, $timeOfDay)) {
+                $filteredPeople[] = $person;
+            }
         }
         return $filteredPeople;
     }
@@ -108,7 +109,9 @@ class PersonDataHelper extends Data implements NewsProviderInterface
     public function getNews(ConnectedUser $connectedUser, string $searchFrom): array
     {
         $news = [];
-        if (!($connectedUser->person ?? false)) return $news;
+        if (!($connectedUser->person ?? false)) {
+            return $news;
+        }
         $sql = "
             SELECT Id, Email, FirstName, LastName, PresentationLastUpdate
             FROM Person
@@ -125,7 +128,9 @@ class PersonDataHelper extends Data implements NewsProviderInterface
         $presentations = $stmt->fetchAll(PDO::FETCH_OBJ);
         foreach ($presentations as $presentation) {
             $fullName = trim($presentation->FirstName . ' ' . $presentation->LastName);
-            if (empty($fullName)) $fullName = $presentation->Email;
+            if (empty($fullName)) {
+                $fullName = $presentation->Email;
+            }
             $news[] = [
                 'type' => 'presentation',
                 'id' => $presentation->Id,
@@ -138,10 +143,10 @@ class PersonDataHelper extends Data implements NewsProviderInterface
     }
 
     public function getPersonsForCommunication(
-        ?int  $groupId,
+        ?int $groupId,
         ?bool $presentation = null,
-        ?bool $password     = null,
-        ?bool $inPublicMap  = null,
+        ?bool $password = null,
+        ?bool $inPublicMap = null,
         ?bool $desactivated = null
     ): array {
         $joins  = '';
@@ -278,11 +283,13 @@ class PersonDataHelper extends Data implements NewsProviderInterface
 
     public function getPublisher(?int $idPerson): string|null
     {
-        if ($idPerson === null) return null;
+        if ($idPerson === null) {
+            return null;
+        }
         $person = $this->get('Person', ['Id' => $idPerson], 'FirstName, LastName');
         return "publié par " . $person->FirstName . " " . $person->LastName;
     }
-    
+
     public function getRedactors(): array
     {
         return $this->pdo->query("
@@ -326,9 +333,9 @@ class PersonDataHelper extends Data implements NewsProviderInterface
      */
     public function importFromCsvFile(
         string $filePath,
-        int    $headerRow,
-        array  $mapping,
-        array  $existingPersons
+        int $headerRow,
+        array $mapping,
+        array $existingPersons
     ): array {
 
         foreach (['email', 'firstName', 'lastName', 'phone'] as $key) {
@@ -459,7 +466,9 @@ class PersonDataHelper extends Data implements NewsProviderInterface
             );
             $contact->Token = $token;
         }
-        if (!$contact) $contact = $this->get('Contact', ['Id' => $contactId]);
+        if (!$contact) {
+            $contact = $this->get('Contact', ['Id' => $contactId]);
+        }
         $registrationLink = Webapp::getBaseUrl() . "event/{$event->Id}/{$contact->Token}";
         $subject = "Lien d'inscription pour " . $event->Summary;
         $body = $registrationLink;

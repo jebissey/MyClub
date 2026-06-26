@@ -16,7 +16,6 @@ use Mailjet\Client as MailjetClient;
 use Mailjet\Resources as MailjetResources;
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception as PHPMailerException;
-
 use app\interfaces\SmtpConfigProviderInterface;
 use app\interfaces\EmailQuotaTrackerInterface;
 use app\valueObjects\EmailMessage;
@@ -30,8 +29,9 @@ final class EmailService
 
     public function __construct(
         private readonly ?SmtpConfigProviderInterface $configProvider,
-        private readonly ?EmailQuotaTrackerInterface  $quotaTracker,
-    ) {}
+        private readonly ?EmailQuotaTrackerInterface $quotaTracker,
+    ) {
+    }
 
     public function getSmtpConfig(): ?SmtpConfig
     {
@@ -138,7 +138,7 @@ final class EmailService
 
             $mail->addAddress($message->to);
 
-            foreach ($message->cc  as $email) {
+            foreach ($message->cc as $email) {
                 $mail->addCC($email);
             }
             foreach ($message->bcc as $email) {

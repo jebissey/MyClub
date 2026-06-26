@@ -194,7 +194,7 @@ class ArticleController extends TableController
         if ($connectedUser->person === null) {
             $this->raiseForbidden(__FILE__, __LINE__);
             return;
-        } else if ($connectedUser->person->Id !== $article->CreatedBy) {
+        } elseif ($connectedUser->person->Id !== $article->CreatedBy) {
             if ($this->authorizationService->canRead($id, $connectedUser)) {
                 $this->show($id);
                 return;
@@ -439,14 +439,18 @@ class ArticleController extends TableController
             if ($result) {
                 $_SESSION['success'] = ($this->t)('article.success.updated');
                 $this->backup->save();
-            } else $_SESSION['error'] = ($this->t)('article.error.update_failed');
+            } else {
+                $_SESSION['error'] = ($this->t)('article.error.update_failed');
+            }
             $this->redirect('/article/' . $id);
-        } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+        } elseif ($_SERVER['REQUEST_METHOD'] === 'GET') {
             $this->render('User/views/publish.latte', $this->getAllParams([
                 'article' => $this->articleDataHelper->getWithAuthor($id),
                 'page' => $this->application->getConnectedUser()->getPage()
             ]));
-        } else $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+        } else {
+            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+        }
     }
 
     public function show(int $id): void
@@ -513,7 +517,7 @@ class ArticleController extends TableController
                 'btn_Parent'      => "/articles",
             ]));
         } catch (QueryException $e) {
-            $this->raiseBadRequest($e->getMessage(),  $e->getFile(), $e->getLine());
+            $this->raiseBadRequest($e->getMessage(), $e->getFile(), $e->getLine());
         }
     }
 
@@ -652,7 +656,9 @@ class ArticleController extends TableController
         if ($result) {
             $_SESSION['success'] = ($this->t)('article.success.updated');
             $this->backup->save();
-        } else $_SESSION['error'] = ($this->t)('article.error.update_failed');
+        } else {
+            $_SESSION['error'] = ($this->t)('article.error.update_failed');
+        }
         $this->redirect('/article/' . $id);
     }
 }

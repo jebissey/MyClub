@@ -36,7 +36,9 @@ class ImportApi extends AbstractApi
     #region Private functions
     private function getHeadersFromCSV_(int $headerRow)
     {
-        if (!isset($_FILES['csvFile']) || $_FILES['csvFile']['error'] != 0) return ['error' => 'Fichier non valide'];
+        if (!isset($_FILES['csvFile']) || $_FILES['csvFile']['error'] != 0) {
+            return ['error' => 'Fichier non valide'];
+        }
         $headers = [];
         $file = fopen($_FILES['csvFile']['tmp_name'], 'r');
         $currentRow = 0;

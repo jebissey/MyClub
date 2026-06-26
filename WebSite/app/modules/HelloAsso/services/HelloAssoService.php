@@ -5,10 +5,8 @@ declare(strict_types=1);
 namespace app\modules\HelloAsso\services;
 
 use RuntimeException;
-
 use app\models\DataHelper;
 use app\modules\Common\services\CredentialService;
-
 
 /**
  * Thin wrapper around the HelloAsso API.
@@ -40,7 +38,8 @@ class HelloAssoService
 
     private function __construct(
         private DataHelper $dataHelper,
-    ) {}
+    ) {
+    }
 
     /**
      * Returns the singleton instance.
@@ -86,11 +85,11 @@ class HelloAssoService
      * @throws RuntimeException on API error
      */
     public function createCheckoutIntent(
-        int    $amountCents,
+        int $amountCents,
         string $description,
         string $returnUrl,
         string $errorUrl,
-        array  $payer,
+        array $payer,
     ): array {
         $token = $this->getAccessToken();
 

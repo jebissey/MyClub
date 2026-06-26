@@ -12,7 +12,9 @@ class User implements RouteInterface
 {
     private array $routes = [];
 
-    public function __construct(private ControllerFactory $controllerFactory) {}
+    public function __construct(private ControllerFactory $controllerFactory)
+    {
+    }
 
     public function get(): array
     {
@@ -24,7 +26,7 @@ class User implements RouteInterface
         $this->routes[] = new Route('GET  /user/sign/in', $userController, 'signIn');
         $this->routes[] = new Route('POST /user/sign/in', $userController, 'signIn');
         $this->routes[] = new Route('GET  /user/sign/out', $userController, 'signOut');
-        
+
         return $this->routes;
     }
 }

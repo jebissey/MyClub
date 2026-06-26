@@ -21,7 +21,9 @@ class UserMessagesController extends AbstractShowController
     public function showMessages(): void
     {
         $connectedUser = $this->requireConnectedPerson();
-        if ($connectedUser === false) return;
+        if ($connectedUser === false) {
+            return;
+        }
 
         [$searchMode, $searchFrom] = $this->resolveSearchPeriod($connectedUser);
 

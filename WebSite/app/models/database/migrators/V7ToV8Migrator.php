@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace app\models\database\migrators;
 
 use PDO;
-
 use app\interfaces\DatabaseMigratorInterface;
 
 class V7ToV8Migrator implements DatabaseMigratorInterface
@@ -18,8 +17,8 @@ INSERT INTO Languages (Name, en_US, fr_FR)
 VALUES ('save','Save','Enregistrer'),
        ('cancel','Cancel','Annuler');
 SQL;
-        $pdo->exec($sql);        
-        
+        $pdo->exec($sql);
+
         return 8;
     }
 }

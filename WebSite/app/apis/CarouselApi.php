@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace app\apis;
 
 use Throwable;
-
 use app\enums\ApplicationError;
 use app\exceptions\QueryException;
 use app\helpers\Application;
@@ -93,7 +92,7 @@ class CarouselApi extends AbstractApi
             $message = $this->carouselDataHelper->set_($data, $item);
             $this->renderJsonOk(['message' => $message]);
         } catch (Throwable $e) {
-            $this->renderJsonError('error' . $e->getMessage(),  ApplicationError::Error->value, $e->getFile(), $e->getLine());
+            $this->renderJsonError('error' . $e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
         }
     }
 }

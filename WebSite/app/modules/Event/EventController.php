@@ -6,7 +6,6 @@ namespace app\modules\Event;
 
 use DateTime;
 use Throwable;
-
 use app\enums\ApplicationError;
 use app\enums\EventAudience;
 use app\enums\EventSearchMode;
@@ -191,7 +190,9 @@ class EventController extends AbstractController
             return;
         }
         try {
-            if ($token === null) $token = WebApp::getFiltered('t', FilterInputRule::Token->value, $this->flight->request()->query->getData());
+            if ($token === null) {
+                $token = WebApp::getFiltered('t', FilterInputRule::Token->value, $this->flight->request()->query->getData());
+            }
             if ($this->application->getConnectedUser()->person ?? false) {
                 $userId = $this->application->getConnectedUser()->person->Id;
                 if ($set) {
@@ -265,8 +266,11 @@ class EventController extends AbstractController
                 }
             } else {
                 $event = $this->dataHelper->get('Event', ['Id' => $eventId], 'Audience');
-                if ($event->Audience === EventAudience::ForAll->value) $this->redirect('/contact/event/' . $eventId);
-                else  $this->raiseForbidden(__FILE__, __LINE__);
+                if ($event->Audience === EventAudience::ForAll->value) {
+                    $this->redirect('/contact/event/' . $eventId);
+                } else {
+                    $this->raiseForbidden(__FILE__, __LINE__);
+                }
                 return;
             }
             $this->redirect('/event/' . $eventId);

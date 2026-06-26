@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace app\modules\Article;
 
 use Flight;
-
 use app\helpers\Application;
 use app\helpers\MediaManager;
 use app\helpers\WebApp;
@@ -136,7 +135,9 @@ class MediaController extends AbstractController
         $connectedUser = $this->application->getConnectedUser();
         if ($this->authorizationDataHelper->personCanReadMediaFile((int)$year, (int)$month, $filename, $connectedUser, $this->getNavItems($connectedUser->person ?? false))) {
             $this->viewFile((int)$year, (int)$month, $filename);
-        } else $this->raiseForbidden(__FILE__, __LINE__);
+        } else {
+            $this->raiseForbidden(__FILE__, __LINE__);
+        }
     }
 
     public function showUploadForm(): void
@@ -241,7 +242,9 @@ class MediaController extends AbstractController
                             foreach ($files as $file) {
                                 if (is_file($basePath . $year . DIRECTORY_SEPARATOR . $month . DIRECTORY_SEPARATOR . $file)) {
                                     $ext = pathinfo($file, PATHINFO_EXTENSION);
-                                    if ($ext !== '') $fileExtensions[] = strtolower($ext);
+                                    if ($ext !== '') {
+                                        $fileExtensions[] = strtolower($ext);
+                                    }
                                 }
                             }
                         }
@@ -265,8 +268,12 @@ class MediaController extends AbstractController
 
         $candidates = [];
         foreach (scandir($yearPath) as $month) {
-            if ($month === '.' || $month === '..' || !is_dir($yearPath . $month)) continue;
-            if ($monthFiltered !== '' && $monthFiltered !== $month) continue;
+            if ($month === '.' || $month === '..' || !is_dir($yearPath . $month)) {
+                continue;
+            }
+            if ($monthFiltered !== '' && $monthFiltered !== $month) {
+                continue;
+            }
 
             $monthPath = $yearPath . $month . '/';
             $fileExtension = strtolower($fileExtension);
@@ -278,7 +285,9 @@ class MediaController extends AbstractController
                     !is_file($testedFile)
                     || ($fileExtension !== '' && $ext !== $fileExtension)
                     || ($search !== '' && stripos($file, $search) === false)
-                ) continue;
+                ) {
+                    continue;
+                }
 
                 $path = $year . DIRECTORY_SEPARATOR . $month . DIRECTORY_SEPARATOR . $file;
                 $candidates[] = [
@@ -290,7 +299,9 @@ class MediaController extends AbstractController
             }
         }
 
-        if (empty($candidates)) return [];
+        if (empty($candidates)) {
+            return [];
+        }
 
         $allPaths  = array_column($candidates, 'path');
         $inArticle = $this->articleDataHelper->getPathsUsedInArticles($allPaths);
@@ -338,7 +349,9 @@ class MediaController extends AbstractController
             $dirs = scandir($basePath);
             foreach ($dirs as $year) {
                 if ($year !== '.' && $year !== '..' && is_dir($basePath . $year)) {
-                    if (!(is_numeric($year) && (int)$year === $yearRequested)) continue;
+                    if (!(is_numeric($year) && (int)$year === $yearRequested)) {
+                        continue;
+                    }
                     $months = scandir($basePath . $year);
                     foreach ($months as $month) {
                         if ($month !== '.' && $month !== '..' && is_dir($basePath . $year . DIRECTORY_SEPARATOR . $month)) {

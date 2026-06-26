@@ -20,5 +20,10 @@
         "allow-plugins": {
             "php-http/discovery": true
         }
+    },
+    "require-dev": {
+        "squizlabs/php_codesniffer": "^4.0",
+        "phpstan/phpstan": "^2.2",
+        "friendsofphp/php-cs-fixer": "^3.95"
     }
 }

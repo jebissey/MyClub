@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace app\helpers;
 
 use InvalidArgumentException;
-
 use app\helpers\Application;
 use app\helpers\TranslationManager;
 
@@ -29,15 +28,21 @@ class Params
     public static function setParams(array $params, ?string $prodSiteUrl, ?string $memberAlert)
     {
         self::$commonParams = $params;
-        if ($prodSiteUrl !== null) self::$commonParams['productionSiteUrl'] = $prodSiteUrl;
-        if ($memberAlert !== null) self::$commonParams['memberAlert'] = $memberAlert;
+        if ($prodSiteUrl !== null) {
+            self::$commonParams['productionSiteUrl'] = $prodSiteUrl;
+        }
+        if ($memberAlert !== null) {
+            self::$commonParams['memberAlert'] = $memberAlert;
+        }
     }
 
     #region Private functions
     private static function setDefaultParams(string $requestUri, ?string $prodSiteUrl, ?string $memberAlert, array $defaultColors): void
     {
         $path = parse_url($requestUri, PHP_URL_PATH);
-        if ($path === false || $path === null) throw new InvalidArgumentException('Invalid URI provided');
+        if ($path === false || $path === null) {
+            throw new InvalidArgumentException('Invalid URI provided');
+        }
         $segments = explode('/', trim($path, '/'));
         $page = $segments[0] ?? '';
         $lang = TranslationManager::getCurrentLanguage();
@@ -73,7 +78,11 @@ class Params
             'navbarInkColor'  => $defaultColors['navbarInkColor'],
             'navbarIconColor' => $defaultColors['navbarIconColor'],
         ];
-        if ($prodSiteUrl !== null) self::$commonParams['productionSiteUrl'] = $prodSiteUrl;
-        if ($memberAlert !== null) self::$commonParams['memberAlert'] = $memberAlert;
+        if ($prodSiteUrl !== null) {
+            self::$commonParams['productionSiteUrl'] = $prodSiteUrl;
+        }
+        if ($memberAlert !== null) {
+            self::$commonParams['memberAlert'] = $memberAlert;
+        }
     }
 }

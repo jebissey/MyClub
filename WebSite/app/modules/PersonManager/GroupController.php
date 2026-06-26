@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace app\modules\PersonManager;
 
 use Throwable;
-
 use app\enums\FilterInputRule;
 use app\exceptions\QueryException;
 use app\helpers\Application;
@@ -93,8 +92,9 @@ class GroupController extends AbstractController
         }
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isGroupManager(), __FILE__, __LINE__)) {
             $group = $this->dataHelper->get('Group', ['Id' => $id], 'Name, SelfRegistration');
-            if (!$group) $this->raiseBadRequest("Unknwon group $id", __FILE__, __LINE__);
-            else {
+            if (!$group) {
+                $this->raiseBadRequest("Unknwon group $id", __FILE__, __LINE__);
+            } else {
                 $this->render('PersonManager/views/group_edit.latte', $this->getAllParams([
                     'group' => $group,
                     'availableAuthorizations' => $this->dataHelper->gets('Authorization', ['Id <> 1' => null], '*', 'Name'),
@@ -132,7 +132,9 @@ class GroupController extends AbstractController
                     'layout' => $this->getLayout(),
                     'page' => $this->application->getConnectedUser()->getPage(),
                 ]));
-            } else $this->groupDataHelper->update($id, $name, $selfRegistration, $selectedAuthorizations);
+            } else {
+                $this->groupDataHelper->update($id, $name, $selfRegistration, $selectedAuthorizations);
+            }
         }
     }
 

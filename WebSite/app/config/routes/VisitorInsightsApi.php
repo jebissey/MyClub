@@ -12,14 +12,16 @@ class VisitorInsightsApi implements RouteInterface
 {
     private array $routes = [];
 
-    public function __construct(private ApiFactory $apiFactory) {}
+    public function __construct(private ApiFactory $apiFactory)
+    {
+    }
 
     public function get(): array
     {
         $api = fn() => $this->apiFactory->makeVisitorInsightsApi();
 
         $this->routes[] = new Route('GET /api/visitor-insights/creation-time-distribution', $api, 'getCreationTimeDistribution');
-        $this->routes[] = new Route('GET /api/visitor-insights/creation-time-trend',        $api, 'getCreationTimeTrend');
+        $this->routes[] = new Route('GET /api/visitor-insights/creation-time-trend', $api, 'getCreationTimeTrend');
 
         return $this->routes;
     }

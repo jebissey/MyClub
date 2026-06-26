@@ -67,8 +67,9 @@ class ArwardsController extends AbstractController
             || $value === null || $value < 0
             || $idPerson === null || $idPerson <= 0
             || $idGroup === null || $idGroup <= 0
-        ) $this->redirect('/arwards?error=invalid_data');
-        else {
+        ) {
+            $this->redirect('/arwards?error=invalid_data');
+        } else {
             $this->dataHelper->set('Counter', [
                 'Name' => $name,
                 'Detail' => $input['detail'],

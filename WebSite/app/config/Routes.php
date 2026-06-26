@@ -7,7 +7,6 @@ namespace app\config;
 use Closure;
 use flight;
 use flight\Engine;
-
 use app\config\routes\Article;
 use app\config\routes\ArticleApi;
 use app\config\routes\Arward;
@@ -140,7 +139,7 @@ class Routes
     private array $routes;
     private ControllerFactory $controllerFactory;
     private ApiFactory $apiFactory;
-    private JsonEmailQuotaTracker  $quotaTracker;
+    private JsonEmailQuotaTracker $quotaTracker;
 
     public function __construct(private Application $application, private Engine $flight)
     {

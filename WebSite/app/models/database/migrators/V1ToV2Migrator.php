@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace app\models\database\migrators;
 
 use PDO;
-
 use app\interfaces\DatabaseMigratorInterface;
 
 class V1ToV2Migrator implements DatabaseMigratorInterface

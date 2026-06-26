@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace app\apis;
 
 use Throwable;
-
 use app\enums\ApplicationError;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
@@ -87,8 +86,11 @@ class KanbanApi extends AbstractApi
         }
         try {
             $success = $this->kanbanDataHelper->deleteKanbanCard($id, $this->connectedUser->person->Id);
-            if ($success) $this->renderJsonOk([], 'Card deleted successfully');
-            else          $this->renderJsonBadRequest('Card not found or unauthorized', __FILE__, __LINE__);
+            if ($success) {
+                $this->renderJsonOk([], 'Card deleted successfully');
+            } else {
+                $this->renderJsonBadRequest('Card not found or unauthorized', __FILE__, __LINE__);
+            }
         } catch (Throwable $e) {
             $this->renderJsonError('Failed to delete card' .  $e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
         }
@@ -138,8 +140,11 @@ class KanbanApi extends AbstractApi
         }
 
         $success = $this->kanbanDataHelper->moveKanbanCard($id, $what, $remark);
-        if ($success) $this->renderJsonOk([], 'Card moved successfully');
-        else          $this->renderJsonBadRequest('Card not found', __FILE__, __LINE__);
+        if ($success) {
+            $this->renderJsonOk([], 'Card moved successfully');
+        } else {
+            $this->renderJsonBadRequest('Card not found', __FILE__, __LINE__);
+        }
     }
 
     public function updateCard(): void
@@ -174,8 +179,11 @@ class KanbanApi extends AbstractApi
         try {
             $success = $this->kanbanDataHelper->updateKanbanCard($id, $this->connectedUser->person->Id, $title, $detail);
 
-            if ($success) $this->renderJsonOk([], 'Card updated successfully');
-            else          $this->renderJsonBadRequest('Card not found or unauthorized', __FILE__, __LINE__);
+            if ($success) {
+                $this->renderJsonOk([], 'Card updated successfully');
+            } else {
+                $this->renderJsonBadRequest('Card not found or unauthorized', __FILE__, __LINE__);
+            }
         } catch (Throwable $e) {
             $this->renderJsonError('Failed to update card :' . $e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
         }
@@ -207,8 +215,11 @@ class KanbanApi extends AbstractApi
         try {
             $success = $this->kanbanDataHelper->updateKanbanCardStatus($id, $this->connectedUser->person->Id, $remark);
 
-            if ($success) $this->renderJsonOk([], 'Card status updated successfully');
-            else          $this->renderJsonBadRequest('Card status not found or unauthorized', __FILE__, __LINE__);
+            if ($success) {
+                $this->renderJsonOk([], 'Card status updated successfully');
+            } else {
+                $this->renderJsonBadRequest('Card status not found or unauthorized', __FILE__, __LINE__);
+            }
         } catch (Throwable $e) {
             $this->renderJsonError('Failed to update card status :' . $e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
         }
@@ -273,8 +284,11 @@ class KanbanApi extends AbstractApi
         }
         try {
             $success = $this->kanbanDataHelper->deleteKanbanProject((int)$id, $this->connectedUser->person->Id);
-            if ($success) $this->renderJsonOk();
-            else          $this->renderJsonBadRequest('Project not found or unauthorized', __FILE__, __LINE__);
+            if ($success) {
+                $this->renderJsonOk();
+            } else {
+                $this->renderJsonBadRequest('Project not found or unauthorized', __FILE__, __LINE__);
+            }
         } catch (Throwable $e) {
             $this->renderJsonError('Failed to delete project: ' . $e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
         }
@@ -331,10 +345,13 @@ class KanbanApi extends AbstractApi
         }
         try {
             $success = $this->kanbanDataHelper->updateKanbanProject($id, $title, $detail, $this->connectedUser->person->Id);
-            if ($success) $this->renderJsonOk([], 'Project updated successfully', ApplicationError::Ok->value);
-            else          $this->renderJsonBadRequest('Project not found or unauthorized', __FILE__, __LINE__);
+            if ($success) {
+                $this->renderJsonOk([], 'Project updated successfully', ApplicationError::Ok->value);
+            } else {
+                $this->renderJsonBadRequest('Project not found or unauthorized', __FILE__, __LINE__);
+            }
         } catch (Throwable $e) {
-            $this->renderJsonError('Failed to update project' . $e->getMessage(),  ApplicationError::Error->value, $e->getFile(), $e->getLine());
+            $this->renderJsonError('Failed to update project' . $e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
         }
     }
 

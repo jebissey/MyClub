@@ -14,8 +14,12 @@ class GravatarHandler
 
     public function getGravatar(string $email, bool $useGravatar): string
     {
-        if (!$useGravatar) return '';
-        if (!$this->hasRealGravatar($email)) return '';
+        if (!$useGravatar) {
+            return '';
+        }
+        if (!$this->hasRealGravatar($email)) {
+            return '';
+        }
         return $this->buildGravatarUrl($email);
     }
 
@@ -23,7 +27,9 @@ class GravatarHandler
     private function hasRealGravatar(string $email): bool
     {
         $email = strtolower(trim($email));
-        if (isset($this->existenceCache[$email])) return $this->existenceCache[$email];
+        if (isset($this->existenceCache[$email])) {
+            return $this->existenceCache[$email];
+        }
 
         $hash = md5($email);
         $url  = "https://www.gravatar.com/avatar/{$hash}?d=404&s={$this->size}";

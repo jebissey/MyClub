@@ -12,7 +12,9 @@ class EventSupplyApi implements RouteInterface
 {
     private array $routes = [];
 
-    public function __construct(private ApiFactory $apiFactory) {}
+    public function __construct(private ApiFactory $apiFactory)
+    {
+    }
 
     public function get(): array
     {

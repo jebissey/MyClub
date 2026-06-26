@@ -60,7 +60,6 @@ class LoanApi extends AbstractApi
     public function deleteItem(int $id): void
     {
         if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isLoanDesigner())) {
-
             $deleted = $this->loanDataHelper->deleteItem($id);
             if (!$deleted) {
                 $this->renderJsonBadRequest('Cannot delete: active loans or reservations exist for this item.', __FILE__, __LINE__);
@@ -74,7 +73,6 @@ class LoanApi extends AbstractApi
     public function getLoans(): void
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isLoanDesigner())) {
-
             $this->loanDataHelper->updateOverdueLoans();
             $status = $_GET['status'] ?? '';
             $this->renderJsonOk($this->loanDataHelper->getAllLoans($status));
@@ -84,7 +82,6 @@ class LoanApi extends AbstractApi
     public function getLoan(int $id): void
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isLoanDesigner())) {
-
             $loan = $this->loanDataHelper->getLoan($id);
             if (!$loan) {
                 $this->renderJsonBadRequest("Loan {$id} not found", __FILE__, __LINE__);
@@ -123,7 +120,6 @@ class LoanApi extends AbstractApi
     public function returnLoan(int $id): void
     {
         if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isLoanManager())) {
-
             $data        = $this->getJsonInput();
             $returnDate  = $data['returnDate'] ?? date('Y-m-d');
             $returnedTo  = (int)($data['returnedToId'] ?? 0);
@@ -145,7 +141,6 @@ class LoanApi extends AbstractApi
     public function cancelLoan(int $id): void
     {
         if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isLoanManager())) {
-
             $ok = $this->loanDataHelper->cancelLoan($id);
             if (!$ok) {
                 $this->renderJsonBadRequest("Loan {$id} not found", __FILE__, __LINE__);
@@ -162,7 +157,6 @@ class LoanApi extends AbstractApi
     public function getReservations(): void
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isLoan())) {
-
             $user = $this->application->getConnectedUser();
             // Un manager voit tout, un utilisateur ne voit que les siennes
             $userId = $user->isLoanManager() ? 0 : $user->person->Id;
@@ -185,7 +179,6 @@ class LoanApi extends AbstractApi
     public function saveReservation(): void
     {
         if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isConnected())) {
-
             $data = $this->getJsonInput();
 
             foreach (['itemId', 'reservationDate', 'startTime', 'endTime', 'quantity'] as $field) {
@@ -227,7 +220,6 @@ class LoanApi extends AbstractApi
     public function cancelReservation(int $id): void
     {
         if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isConnected())) {
-
             $user   = $this->application->getConnectedUser();
             $userId = $user->isLoanManager() ? 0 : $user->person->Id;
 
@@ -247,7 +239,6 @@ class LoanApi extends AbstractApi
     public function getCalendarEvents(): void
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isConnected())) {
-
             $start = $_GET['start'] ?? date('Y-m-01');
             $end   = $_GET['end']   ?? date('Y-m-t');
             $this->renderJsonOk(
@@ -259,7 +250,6 @@ class LoanApi extends AbstractApi
     public function getAvailability(int $itemId): void
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isLoanDesigner())) {
-
             $type  = $_GET['type'] ?? 'loan';
             $date  = $_GET['date'] ?? date('Y-m-d');
             $start = $_GET['start'] ?? '00:00';

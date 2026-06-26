@@ -94,7 +94,8 @@ class ApiFactory
         private ParticipantDataHelper $participantDataHelper,
         private PersonDataHelper $personDataHelper,
         private PersonPreferences $personPreferences,
-    ) {}
+    ) {
+    }
 
     public function makeArticleApi(): ArticleApi
     {
@@ -216,7 +217,7 @@ class ApiFactory
             $this->dataHelper,
             $this->personDataHelper,
             $this->articleDataHelper
-         );
+        );
     }
 
     public function makeGroupApi(): GroupApi
@@ -236,8 +237,7 @@ class ApiFactory
             $this->connectedUser,
             $this->dataHelper,
             $this->personDataHelper,
-            $this->membershipDataHelper,
-            CredentialService::getInstance()
+            $this->membershipDataHelper
         );
     }
 

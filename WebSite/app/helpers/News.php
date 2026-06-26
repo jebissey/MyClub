@@ -6,13 +6,17 @@ namespace app\helpers;
 
 class News
 {
-    public function __construct(private array $providers) {}
+    public function __construct(private array $providers)
+    {
+    }
 
     public function getNewsForPerson(ConnectedUser $connectedUser, string $searchFrom): array
     {
         $news = [];
         if ($connectedUser->person ?? false) {
-            foreach ($this->providers as $provider) $news = array_merge($news, $provider->getNews($connectedUser, $searchFrom));
+            foreach ($this->providers as $provider) {
+                $news = array_merge($news, $provider->getNews($connectedUser, $searchFrom));
+            }
         }
         return $news;
     }

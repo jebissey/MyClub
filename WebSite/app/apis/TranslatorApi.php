@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace app\apis;
 
 use Throwable;
-
 use app\enums\ApplicationError;
 use app\exceptions\QueryException;
 use app\helpers\Application;
@@ -72,7 +71,6 @@ class TranslatorApi extends AbstractApi
         }
 
         try {
-
             $success = $this->languagesDataHelper->updateTranslation($id, $lang, $value);
             if (!$success) {
                 $this->renderJsonError(
@@ -89,17 +87,13 @@ class TranslatorApi extends AbstractApi
                 'id' => $id,
                 'lang' => $lang
             ]);
-
         } catch (QueryException $e) {
-
             $this->renderJsonBadRequest(
                 $e->getMessage(),
                 $e->getFile(),
                 $e->getLine()
             );
-
         } catch (Throwable $e) {
-
             $this->renderJsonError(
                 'error ' . $e->getMessage(),
                 ApplicationError::Error->value,

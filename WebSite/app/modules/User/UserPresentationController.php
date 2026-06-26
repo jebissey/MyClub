@@ -33,7 +33,9 @@ class UserPresentationController extends AbstractController
                 'maxZoom' => 18,
                 'btn_HistoryBack' => true,
             ]));
-        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+        } else {
+            $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+        }
     }
 
     public function savePresentation()
@@ -63,8 +65,12 @@ class UserPresentationController extends AbstractController
                     'MyPublicDataInPresentationDirectory' => $input['myPublicDataInPresentationDirectory'] ?? '',
                 ], ['Id' => $person->Id]);
                 $this->redirect('/user/directory');
-            } else $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
-        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+            } else {
+                $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
+            }
+        } else {
+            $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+        }
     }
 
     public function showPresentation($personId)
@@ -76,7 +82,7 @@ class UserPresentationController extends AbstractController
                 'InPresentationDirectory' => 1
             ]);
             if (!$person) {
-                $this->raiseBadRequest("Unknown person {$personId}", __FILE__,  __LINE__);
+                $this->raiseBadRequest("Unknown person {$personId}", __FILE__, __LINE__);
                 return;
             }
 
@@ -90,6 +96,8 @@ class UserPresentationController extends AbstractController
                 'btn_Parent' => "/user/directory",
                 'maxZoom' => 12,
             ]));
-        } else $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+        } else {
+            $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+        }
     }
 }

@@ -9,7 +9,6 @@ use DateTime;
 use DateTimeImmutable;
 use PDO;
 use Throwable;
-
 use app\enums\ApplicationError;
 use app\enums\EventAudience;
 use app\enums\EventSearchMode;
@@ -203,7 +202,9 @@ class EventDataHelper extends Data implements NewsProviderInterface
             ':today'   => (new DateTime())->format('Y-m-d\TH:i:s'),
         ]);
         $result = $stmt->fetch();
-        if ($result === false) throw new QueryException("Event ({$eventId}) doesn't exist");
+        if ($result === false) {
+            throw new QueryException("Event ({$eventId}) doesn't exist");
+        }
         return $result;
     }
 
@@ -281,9 +282,13 @@ class EventDataHelper extends Data implements NewsProviderInterface
 
     public function getEvents(?object $person, string $mode, int $offset, bool $filterByPreferences = false): array
     {
-        if ($mode === EventSearchMode::Next->value) return $this->getNextEvents($person, $filterByPreferences);
-        elseif ($mode === EventSearchMode::Past->value) return $this->getPassedEvents($person, $offset);
-        else Application::unreachable("Invalide mode ({$mode})", __FILE__, __LINE__);
+        if ($mode === EventSearchMode::Next->value) {
+            return $this->getNextEvents($person, $filterByPreferences);
+        } elseif ($mode === EventSearchMode::Past->value) {
+            return $this->getPassedEvents($person, $offset);
+        } else {
+            Application::unreachable("Invalide mode ({$mode})", __FILE__, __LINE__);
+        }
     }
 
     public function getNextWeekEvents(): array
@@ -361,7 +366,9 @@ class EventDataHelper extends Data implements NewsProviderInterface
     public function getNews(ConnectedUser $connectedUser, string $searchFrom): array
     {
         $news = [];
-        if (!($connectedUser->person ?? false)) return $news;
+        if (!($connectedUser->person ?? false)) {
+            return $news;
+        }
         $sql = "
             SELECT e.Id, e.Summary, e.LastUpdate
             FROM Event e
@@ -478,11 +485,15 @@ class EventDataHelper extends Data implements NewsProviderInterface
                 $eventId = $this->set('Event', $values);
             } elseif ($data['formMode'] == 'update') {
                 $eventId = (int)$data['id'];
-                if (!$this->get('Event', ['Id' => $eventId], 'Id')) throw new QueryException("Event {$eventId} doesn't exist");
+                if (!$this->get('Event', ['Id' => $eventId], 'Id')) {
+                    throw new QueryException("Event {$eventId} doesn't exist");
+                }
                 $this->set('Event', $values, ['Id' => $data['id']]);
                 $this->delete('EventAttribute', ['IdEvent' => $eventId]);
                 $this->delete('EventNeed', ['IdEvent' => $eventId]);
-            } else Application::unreachable($data['formMode'], __FILE__, __LINE__);
+            } else {
+                Application::unreachable($data['formMode'], __FILE__, __LINE__);
+            }
             $this->insertEventAttributes($eventId, $data['attributes'] ?? []);
             $this->insertEventNeeds($eventId, $data['needs'] ?? []);
             $this->pdo->commit();
@@ -501,7 +512,9 @@ class EventDataHelper extends Data implements NewsProviderInterface
                 ->where('part.IdEvent', $eventId)
                 ->where('p.Email COLLATE NOCASE', $userEmail)
                 ->fetch();
-            if (!$participant) return false;
+            if (!$participant) {
+                return false;
+            }
 
             $existing = $this->fluent->from('ParticipantSupply')
                 ->select('Id')
@@ -519,7 +532,7 @@ class EventDataHelper extends Data implements NewsProviderInterface
                         ->where('Id', $existing->Id)
                         ->execute();
                 }
-            } else if ($supply > 0) {
+            } elseif ($supply > 0) {
                 $this->fluent->insertInto('ParticipantSupply')
                     ->values([
                         'IdParticipant' => $participant->Id,
@@ -747,7 +760,7 @@ class EventDataHelper extends Data implements NewsProviderInterface
             return '';
         }
 
-        $totalMinutes = intdiv($durationSeconds, 60); 
+        $totalMinutes = intdiv($durationSeconds, 60);
 
         if ($totalMinutes >= 60) {
             $hours   = intdiv($totalMinutes, 60);

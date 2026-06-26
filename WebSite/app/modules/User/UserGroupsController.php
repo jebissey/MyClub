@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace app\modules\User;
@@ -39,7 +40,7 @@ class UserGroupsController extends AbstractController
             'navItems' => $this->getNavItems($connectedUser->person ?? false),
             'page' => $this->application->getConnectedUser()->getPage(1),
             'btn_HistoryBack' => true,
-            'btn_Parent' => "/user",            
+            'btn_Parent' => "/user",
         ]));
     }
 

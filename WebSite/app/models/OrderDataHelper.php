@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace app\models;
 
 use PDO;
-
 use app\exceptions\QueryException;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
@@ -37,7 +36,9 @@ class OrderDataHelper extends Data implements NewsProviderInterface
     public function getWithCreator(int $articleId): object|bool
     {
         $article = $this->get('Article', ['Id' => $articleId], 'Id');
-        if ($article === false) throw new QueryException("Article {$articleId} doesn't exist");
+        if ($article === false) {
+            throw new QueryException("Article {$articleId} doesn't exist");
+        }
 
         $sql = "
             SELECT o.*, a.CreatedBy
@@ -82,7 +83,9 @@ class OrderDataHelper extends Data implements NewsProviderInterface
     public function getNews(ConnectedUser $connectedUser, $searchFrom): array
     {
         $news = [];
-        if (!($connectedUser->person ?? false)) return $news;
+        if (!($connectedUser->person ?? false)) {
+            return $news;
+        }
         $sql = "
             SELECT 
                 p.FirstName,

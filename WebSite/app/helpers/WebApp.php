@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace app\helpers;
 
 use InvalidArgumentException;
-
 use app\enums\FilterInputRule;
 
 class WebApp
@@ -36,7 +35,7 @@ class WebApp
      * @param array $source Input source (e.g. $_GET, $_POST, etc.)
      * @return array Filtered values, with null for invalid or missing inputs
      */
-    static public function filterInput(array $schema, array $source): array
+    public static function filterInput(array $schema, array $source): array
     {
         $filtered = [];
         foreach ($schema as $key => $rule) {
@@ -55,8 +54,12 @@ class WebApp
                             ? preg_match(FilterInputRule::Integer->value, (string)$v)
                             : is_string($v) && trim($v) !== ''
                     ));
-                    if (empty($filtered[$key])) $filtered[$key] = null;
-                } else $filtered[$key] = null;
+                    if (empty($filtered[$key])) {
+                        $filtered[$key] = null;
+                    }
+                } else {
+                    $filtered[$key] = null;
+                }
                 continue;
             }
             if ($rule === FilterInputRule::CheckboxMatrix->value) {
@@ -65,15 +68,23 @@ class WebApp
                     foreach ($arr as $key => $val) {
                         if (is_array($val)) {
                             $nested = $validateCheckboxMatrix($val);
-                            if (!empty($nested)) $result[$key] = $nested;
-                        } elseif ($val === 'on') $result[$key] = 'on';
+                            if (!empty($nested)) {
+                                $result[$key] = $nested;
+                            }
+                        } elseif ($val === 'on') {
+                            $result[$key] = 'on';
+                        }
                     }
                     return $result;
                 };
                 if (is_array($raw)) {
                     $filtered[$key] = $validateCheckboxMatrix($raw);
-                    if (empty($filtered[$key])) $filtered[$key] = null;
-                } else $filtered[$key] = null;
+                    if (empty($filtered[$key])) {
+                        $filtered[$key] = null;
+                    }
+                } else {
+                    $filtered[$key] = null;
+                }
                 continue;
             }
             if (is_array($raw)) {
@@ -87,30 +98,41 @@ class WebApp
                 ) ? $raw : null;
                 continue;
             }
-            if ($rule === FilterInputRule::Html->value) $value = trim($raw);
-            else                                        $value = trim(strip_tags($raw));
-            if (is_array($rule))                                     $filtered[$key] = in_array($value, $rule, true) ? $value : null;
-            elseif (is_string($rule) && str_starts_with($rule, '/')) $filtered[$key] = preg_match($rule, $value) ? $value : null;
-            elseif ($rule === FilterInputRule::Bool->value) {
+            if ($rule === FilterInputRule::Html->value) {
+                $value = trim($raw);
+            } else {
+                $value = trim(strip_tags($raw));
+            }
+            if (is_array($rule)) {
+                $filtered[$key] = in_array($value, $rule, true) ? $value : null;
+            } elseif (is_string($rule) && str_starts_with($rule, '/')) {
+                $filtered[$key] = preg_match($rule, $value) ? $value : null;
+            } elseif ($rule === FilterInputRule::Bool->value) {
                 if (is_array($raw)) {
                     $filtered[$key] = !empty($raw) ? 1 : 0;
                     continue;
                 }
-                if ($value === 'on' || $value === '1' || $value === 'true')                        $filtered[$key] = 1;
-                elseif ($value === 'off' || $value === '0' || $value === 'false' || $value === '') $filtered[$key] = 0;
-                else                                                                               $filtered[$key] = filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+                if ($value === 'on' || $value === '1' || $value === 'true') {
+                    $filtered[$key] = 1;
+                } elseif ($value === 'off' || $value === '0' || $value === 'false' || $value === '') {
+                    $filtered[$key] = 0;
+                } else {
+                    $filtered[$key] = filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+                }
             } elseif ($rule === FilterInputRule::Int->value) {
                 $val = filter_var($value, FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
                 $filtered[$key] = $val !== null ? (int) $val : null;
             } elseif ($rule === FilterInputRule::Float->value) {
                 $val = filter_var($value, FILTER_VALIDATE_FLOAT, FILTER_NULL_ON_FAILURE);
                 $filtered[$key] = $val !== null ? (float) $val : null;
-            } else $filtered[$key] = $value !== '' ? $value : null;
+            } else {
+                $filtered[$key] = $value !== '' ? $value : null;
+            }
         }
         return $filtered;
     }
 
-    static public function getBaseUrl(): string
+    public static function getBaseUrl(): string
     {
         $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https://' : 'http://';
         $host = $_SERVER['HTTP_HOST'];
@@ -119,7 +141,7 @@ class WebApp
         return $baseUrl;
     }
 
-    static public function getCompiledContent(string $content, array $params): string
+    public static function getCompiledContent(string $content, array $params): string
     {
         $tempFile = sys_get_temp_dir() . '/admin_' . uniqid('', true) . '.latte';
         file_put_contents($tempFile, $content);
@@ -140,29 +162,35 @@ class WebApp
         }
     }
 
-    static public function getFiltered(string $key, string|array $rule, array $source): mixed
+    public static function getFiltered(string $key, string|array $rule, array $source): mixed
     {
         $result = self::filterInput([$key => $rule], $source);
         return $result[$key] !== '' ? $result[$key] : false;
     }
 
-    static public function getUserImg(object $person, GravatarHandler $gravatarHandler): string
+    public static function getUserImg(object $person, GravatarHandler $gravatarHandler): string
     {
-        if ($person->UseGravatar === 'yes') return $gravatarHandler->getGravatar($person->Email, true);
-        else {
-            if (empty($person->Avatar)) return '🤔';
-            else return $person->Avatar;
+        if ($person->UseGravatar === 'yes') {
+            return $gravatarHandler->getGravatar($person->Email, true);
+        } else {
+            if (empty($person->Avatar)) {
+                return '🤔';
+            } else {
+                return $person->Avatar;
+            }
         }
     }
 
-    static public function isMyClubWebSite(): bool
+    public static function isMyClubWebSite(): bool
     {
         return self::getBaseUrl() === self::MYCLUB_WEBAPP;
     }
 
-    static public function nullableCast(mixed $value, string $type): mixed
+    public static function nullableCast(mixed $value, string $type): mixed
     {
-        if ($value === null || $value === '') return null;
+        if ($value === null || $value === '') {
+            return null;
+        }
         return match ($type) {
             'int'    => (int)$value,
             'float'  => (float)$value,
@@ -171,7 +199,7 @@ class WebApp
         };
     }
 
-    static public function sanitizeHtml($html)
+    public static function sanitizeHtml(string $html): string
     {
         $allowed_tags = '<div><span><p><br><strong><em><ul><ol><li><a><img>'
             . '<hr><h1><h2><h3><h4><h5><h6><blockquote><pre><code>'
@@ -186,11 +214,13 @@ class WebApp
         return $html;
     }
 
-    static public function sanitizeInput(string $data, array $possibleValues = [], string $defaultValue = ''): string
+    public static function sanitizeInput(string $data, array $possibleValues = [], string $defaultValue = ''): string
     {
         $data = trim($data ?? '');
         if (!empty($possibleValues)) {
-            if (!in_array($data, $possibleValues, true)) return $defaultValue;
+            if (!in_array($data, $possibleValues, true)) {
+                return $defaultValue;
+            }
         }
         return $data;
     }
