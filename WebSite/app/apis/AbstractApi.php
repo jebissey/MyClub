@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace app\apis;
 
-use flight;
+use Flight;
 use JsonException;
 use Latte\Engine as LatteEngine;
 use app\enums\ApplicationError;

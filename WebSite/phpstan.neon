@@ -1,0 +1,8 @@
+parameters:
+    level: 5
+    paths:
+        - app
+    excludePaths:
+        - app/migrations/*
+    ignoreErrors:
+        - '#Call to an undefined static method Flight::#'
