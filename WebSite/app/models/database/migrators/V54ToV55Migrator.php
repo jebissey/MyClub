@@ -31,7 +31,8 @@ VALUES
 
 ('common.creation_time_modal.info',
 'Each point represents a generation time slot. The median point is highlighted to give an idea of the typical creation time.',
-'Chaque point représente une tranche de temps de génération. Le point médian est mis en évidence pour donner une idée du temps de création typique.',
+'Chaque point représente une tranche de temps de génération. 
+Le point médian est mis en évidence pour donner une idée du temps de création typique.',
 'Każdy punkt reprezentuje przedział czasu generowania. Punkt mediany jest wyróżniony, aby dać wyobrażenie o typowym czasie tworzenia.'),
 
 ('common.creation_time_modal.y_axis_label',

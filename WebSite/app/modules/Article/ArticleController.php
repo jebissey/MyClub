@@ -212,7 +212,8 @@ class ArticleController extends TableController
             'id' => $id,
             'userConnected' => $connectedUser->person ?? false,
             'navItems' => $this->getNavItems($connectedUser->person ?? false),
-            'publishedBy' => $article->PublishedBy != $article->CreatedBy ? $this->personDataHelper->getPublisher($article->PublishedBy) : '',
+            'publishedBy' => $article->PublishedBy != $article->CreatedBy
+                ? $this->personDataHelper->getPublisher($article->PublishedBy) : '',
             'carouselItems' => $this->dataHelper->gets('Carousel', ['IdArticle' => $id]),
             'page' => $connectedUser->getPage(),
             'i18n' => [
@@ -348,7 +349,10 @@ class ArticleController extends TableController
             $columns[] = ['field' => 'Menu', 'label' => ($this->t)('article.label.menu')];
             $columns[] = ['field' => 'Published', 'label' => ($this->t)('article.label.published')];
         }
-        $query = $this->articleTableDataHelper->getQuery($connectedUser, (int)($this->articleDataHelper->getSpotlightArticle()['articleId'] ?? -1));
+        $query = $this->articleTableDataHelper->getQuery(
+            $connectedUser,
+            (int)($this->articleDataHelper->getSpotlightArticle()['articleId'] ?? -1)
+        );
         $data = $this->prepareTableData($query, $filterValues);
         $this->render('Article/views/articles_index.latte', $this->getAllParams([
             'articles' => $data['items'],
@@ -475,7 +479,11 @@ class ArticleController extends TableController
                 $result = $this->application->getAuthenticationService()->handleRememberMeLogin();
                 if ($result && $result->isSuccess()) {
                     $this->application->getConnectedUser()->get();
-                    $this->redirect($_SERVER['REQUEST_URI'], ApplicationError::Ok, "Auto sign in succeeded for {$result->getUser()->Email}");
+                    $this->redirect(
+                        $_SERVER['REQUEST_URI'],
+                        ApplicationError::Ok,
+                        "Auto sign in succeeded for {$result->getUser()->Email}"
+                    );
                     return;
                 }
                 $this->redirect('/user/sign/in?redirect=' . urlencode($_SERVER['REQUEST_URI']));
@@ -501,7 +509,8 @@ class ArticleController extends TableController
                 'id' => $id,
                 'userConnected' => $connectedUser->person ?? false,
                 'navItems' => $this->getNavItems($connectedUser->person ?? false),
-                'publishedBy' => $article->PublishedBy && $article->PublishedBy != $article->CreatedBy ? $this->personDataHelper->getPublisher($article->PublishedBy) : '',
+                'publishedBy' => $article->PublishedBy && $article->PublishedBy != $article->CreatedBy
+                    ? $this->personDataHelper->getPublisher($article->PublishedBy) : '',
                 'canReadPool' => $this->authorizationDataHelper->canPersonReadSurveyResults($article, $connectedUser),
                 'canReadOrder' => $this->authorizationDataHelper->canPersonReadOrderResults($article, $connectedUser),
                 'carouselItems' => $this->dataHelper->gets('Carousel', ['IdArticle' => $id]),
@@ -627,7 +636,10 @@ class ArticleController extends TableController
         }
         $article = $this->articleDataHelper->getLatestArticle([$id]);
         if (!$article || ($this->application->getConnectedUser()->person?->Id ?? 0) != $article->CreatedBy) {
-            $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+            $this->application->getErrorManager()->raise(
+                ApplicationError::Forbidden,
+                'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__
+            );
             return;
         }
         $schema = [

@@ -15,11 +15,11 @@ use app\interfaces\DatabaseMigratorInterface;
 
 class Database
 {
-    const SQLITE_DEST_PATH = __DIR__ . '/../../data/';
-    const SQLITE_FILE = 'MyClub.sqlite';
-    const SQLITE_LOG_FILE = 'LogMyClub.sqlite';
-    const APPLICATION = 'MyClub';
-    const DB_VERSION = 79;              //Don't forget to update here and in Metadata when database structure is modified
+    private const SQLITE_DEST_PATH = __DIR__ . '/../../data/';
+    private const SQLITE_FILE = 'MyClub.sqlite';
+    private const SQLITE_LOG_FILE = 'LogMyClub.sqlite';
+    private const APPLICATION = 'MyClub';
+    private const DB_VERSION = 79;              //Don't forget to update here and in Metadata when database structure is modified
 
     private static ?Database $instance = null;
     private static ?PDO $pdo = null;
@@ -157,7 +157,9 @@ class Database
                 );
                 $deleted = $pdo->exec($sql);
                 if ($deleted > 0) {
-                    $logMessage->setMessage("Orphans deleted in {$table}.{$fk['from']} referencing {$fk['table']}.{$fk['to']}: {$deleted} row(s)");
+                    $logMessage->setMessage(
+                        "Orphans deleted in {$table}.{$fk['from']} referencing {$fk['table']}.{$fk['to']}: {$deleted} row(s)"
+                    );
                 }
             }
         }

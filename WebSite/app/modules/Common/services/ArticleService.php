@@ -41,7 +41,7 @@ class ArticleService
 
                 $upload = $this->media->uploadFile($file);
 
-                $this->carouselDataHelper->set_([
+                $this->carouselDataHelper->addOrUpdate([
                     'idArticle' => $articleId
                 ], $upload['file']['url']);
             }

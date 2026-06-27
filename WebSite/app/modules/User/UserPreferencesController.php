@@ -57,7 +57,11 @@ class UserPreferencesController extends AbstractController
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
-        $preferences = WebApp::getFiltered('preferences', FilterInputRule::CheckboxMatrix->value, $this->flight->request()->data->getData()) ?? '';
+        $preferences = WebApp::getFiltered(
+            'preferences',
+            FilterInputRule::CheckboxMatrix->value,
+            $this->flight->request()->data->getData()
+        ) ?? '';
         $this->dataHelper->set('Person', ['preferences' =>  json_encode($preferences)], ['Id' => $person->Id]);
         $this->redirect('/user');
     }

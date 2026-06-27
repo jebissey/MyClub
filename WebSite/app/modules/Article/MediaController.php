@@ -133,7 +133,15 @@ class MediaController extends AbstractController
             return;
         }
         $connectedUser = $this->application->getConnectedUser();
-        if ($this->authorizationDataHelper->personCanReadMediaFile((int)$year, (int)$month, $filename, $connectedUser, $this->getNavItems($connectedUser->person ?? false))) {
+        if (
+            $this->authorizationDataHelper->personCanReadMediaFile(
+                (int)$year,
+                (int)$month,
+                $filename,
+                $connectedUser,
+                $this->getNavItems($connectedUser->person ?? false)
+            )
+        ) {
             $this->viewFile((int)$year, (int)$month, $filename);
         } else {
             $this->raiseForbidden(__FILE__, __LINE__);

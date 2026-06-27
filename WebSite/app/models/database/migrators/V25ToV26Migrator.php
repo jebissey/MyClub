@@ -119,7 +119,8 @@ UPDATE Languages SET pl_PL =
       👉 W takim przypadku jest to całkowicie normalne.
     </p>
     <p class="fw-bold">
-      💡 Wskazówka: Jeśli zaznaczysz opcję <em>„Zapamiętaj mnie"</em> podczas logowania, następnym razem zostaniesz automatycznie zalogowany/a i ta strona się nie pojawi.
+      💡 Wskazówka: Jeśli zaznaczysz opcję 
+      <em>„Zapamiętaj mnie"</em> podczas logowania, następnym razem zostaniesz automatycznie zalogowany/a i ta strona się nie pojawi.
     </p>
 
     <hr class="my-4">
@@ -127,8 +128,14 @@ UPDATE Languages SET pl_PL =
     <h5>ℹ️ Inne możliwe sytuacje:</h5>
     <ul class="text-start mx-auto d-inline-block">
       <li>➡️ Jeśli to aplikacja wywołała ten błąd: <strong>prosimy poinformować webmastera</strong>.</li>
-      <li>➡️ Jeśli próbowałeś/aś wpisać adres strony bezpośrednio w przeglądarce: niezły pomysł 😉 ale ta strona wymaga określonych uprawnień.</li>
-      <li>➡️ Jeśli udało Ci się wyświetlić chronione informacje <strong>bez pojawienia się tej strony</strong>: <strong>natychmiast poinformuj webmastera</strong>, aby to naprawił.</li>
+      <li>
+        ➡️ Jeśli próbowałeś/aś wpisać adres strony bezpośrednio w przeglądarce: 
+        niezły pomysł 😉 ale ta strona wymaga określonych uprawnień.
+    </li>
+      <li>
+        ➡️ Jeśli udało Ci się wyświetlić chronione informacje 
+        <strong>bez pojawienia się tej strony</strong>: <strong>natychmiast poinformuj webmastera</strong>, aby to naprawił.
+    </li>
     </ul>
 
     <a href="/" class="btn btn-primary mt-3">🏠 Powrót do strony głównej</a>
@@ -218,7 +225,10 @@ UPDATE Languages SET pl_PL =
     <hr class="my-4">
     <h5>ℹ️ Uwaga:</h5>
     <ul class="text-start mx-auto d-inline-block">
-      <li>➡️ Sprawdź folder <strong>spam</strong> lub <strong>niechciana poczta</strong>, jeśli nie widzisz wiadomości w skrzynce głównej.</li>
+      <li>
+        ➡️ Sprawdź folder <strong>spam</strong> lub <strong>niechciana poczta</strong>, 
+        jeśli nie widzisz wiadomości w skrzynce głównej.
+    </li>
       <li>➡️ Kliknij po prostu link w e-mailu, aby ustawić nowe hasło.</li>
     </ul>
     <a href="/" class="btn btn-primary mt-3">🏠 Powrót na stronę główną</a>
@@ -613,7 +623,8 @@ UPDATE Languages SET pl_PL =
             Ten obszar umożliwia zarządzanie stroną internetową, bazami danych, powiadomieniami i konserwacją.
         </p>
         <p class="mb-0">
-            🛠️ Skorzystaj z poniższych narzędzi, aby uzyskać dostęp do baz danych, zarządzać rejestracjami, wysyłać e-maile i przeprowadzać konserwację.
+            🛠️ Skorzystaj z poniższych narzędzi, aby uzyskać dostęp do baz danych, 
+            zarządzać rejestracjami, wysyłać e-maile i przeprowadzać konserwację.
         </p>
     </div>
     <div class="webmaster-links mt-3 mb-3">
@@ -652,7 +663,8 @@ UPDATE Languages SET pl_PL =
                                 <h3 class="h5 fw-bold mb-2">Dostęp i uprawnienia</h3>
                                 <ul class="list-unstyled text-muted small">
                                     <li class="mb-2">
-                                        <strong>Widoczność:</strong> Żółty klucz pojawia się na górnym pasku tylko dla członków z odpowiednimi uprawnieniami.
+                                        <strong>Widoczność:</strong> 
+                                        Żółty klucz pojawia się na górnym pasku tylko dla członków z odpowiednimi uprawnieniami.
                                     </li>
                                     <li>
                                         <strong>Inteligentna nawigacja:</strong>

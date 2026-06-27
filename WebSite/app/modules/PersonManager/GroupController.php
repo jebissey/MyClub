@@ -98,7 +98,10 @@ class GroupController extends AbstractController
                 $this->render('PersonManager/views/group_edit.latte', $this->getAllParams([
                     'group' => $group,
                     'availableAuthorizations' => $this->dataHelper->gets('Authorization', ['Id <> 1' => null], '*', 'Name'),
-                    'currentAuthorizations' => array_column($this->dataHelper->gets('GroupAuthorization', ['IdGroup' => $id], 'IdAuthorization'), 'IdAuthorization'),
+                    'currentAuthorizations' => array_column(
+                        $this->dataHelper->gets('GroupAuthorization', ['IdGroup' => $id], 'IdAuthorization'),
+                        'IdAuthorization'
+                    ),
                     'layout' => $this->getLayout(),
                     'page' => $this->application->getConnectedUser()->getPage(),
                 ]));

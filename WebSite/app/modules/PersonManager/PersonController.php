@@ -230,10 +230,20 @@ class PersonController extends TableController
             ['field' => 'MemberInfo', 'label' => 'Informations sur le membre'],
         ];
 
-        $status = WebApp::getFiltered('status', $this->application->enumToValues(PersonStatus::class), $this->flight->request()->query->getData()) ?: PersonStatus::Active->value;
+        $status = WebApp::getFiltered(
+            'status',
+            $this->application->enumToValues(PersonStatus::class),
+            $this->flight->request()->query->getData()
+        ) ?: PersonStatus::Active->value;
         $data = match ($status) {
-            PersonStatus::Active->value => $this->prepareTableData($this->tableControllerDataHelper->getActivePersonsQuery(), $filterValues),
-            PersonStatus::Desactivated->value => $this->prepareTableData($this->tableControllerDataHelper->getDesactivatedPersonsQuery(), $filterValues),
+            PersonStatus::Active->value => $this->prepareTableData(
+                $this->tableControllerDataHelper->getActivePersonsQuery(),
+                $filterValues
+            ),
+            PersonStatus::Desactivated->value => $this->prepareTableData(
+                $this->tableControllerDataHelper->getDesactivatedPersonsQuery(),
+                $filterValues
+            ),
 
             default => Application::unreachable("Unknown status {$status}", __FILE__, __LINE__)
         };

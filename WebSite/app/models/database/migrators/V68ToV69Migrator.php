@@ -18,7 +18,10 @@ INSERT INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
 ('media.manager.edit.reset_crop',  'Reset',        'Réinitialiser',     'Resetuj'),
 ('media.manager.edit.saving',      'Saving…',      'Enregistrement…',   'Zapisywanie…'),
 ('media.manager.edit.saved',       'Image saved',  'Image enregistrée', 'Obraz zapisany'),
-('media.manager.edit.error',       'Error while saving the image', "Erreur lors de l'enregistrement de l'image", 'Błąd podczas zapisywania obrazu');
+('media.manager.edit.error',       
+    'Error while saving the image', 
+    "Erreur lors de l'enregistrement de l'image", 
+    'Błąd podczas zapisywania obrazu');
 SQL);
 
         return 69;

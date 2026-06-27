@@ -69,21 +69,6 @@ class MenuItemDataHelper extends Data
         }
     }
 
-    public function gets_(): array
-    {
-        $sql = "
-            SELECT 
-                MenuItem.*,
-                \"Group\".Name AS GroupName
-            FROM MenuItem
-            LEFT JOIN \"Group\" ON MenuItem.IdGroup = \"Group\".Id
-            ORDER BY Position
-        ";
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_OBJ);
-    }
-
     public function insertOrUpdate(array $data): void
     {
         if (!in_array($data['what'], $this->getCheckValues('MenuItem', 'What'))) {

@@ -11,7 +11,7 @@ class MyClubDateTime
 {
     private const DISPLAY_TIMEZONE = 'Europe/Paris';
 
-    static function calculateMinutesAgo(string $dateTime): int
+    public static function calculateMinutesAgo(string $dateTime): int
     {
         $datetime = new DateTime($dateTime, new DateTimeZone('UTC'));
         $datetime->setTimezone(new DateTimeZone(self::DISPLAY_TIMEZONE));
@@ -20,7 +20,7 @@ class MyClubDateTime
         return (int) ($interval->days * 24 * 60 + $interval->h * 60 + $interval->i);
     }
 
-    static function calculateTimeAgo(string $dateTime): string
+    public static function calculateTimeAgo(string $dateTime): string
     {
         $datetime = new DateTime($dateTime, new DateTimeZone('UTC'));
         $datetime->setTimezone(new DateTimeZone(self::DISPLAY_TIMEZONE));
@@ -37,14 +37,14 @@ class MyClubDateTime
         }
     }
 
-    static function formatDateFromUTC(string $dateTime): string
+    public static function formatDateFromUTC(string $dateTime): string
     {
         $datetime = new DateTime($dateTime, new DateTimeZone('UTC'));
         $datetime->setTimezone(new DateTimeZone(self::DISPLAY_TIMEZONE));
         return $datetime->format('d/m/Y H:i');
     }
 
-    static function getPeriodStartEnd(string $period, DateTime $date): array
+    public static function getPeriodStartEnd(string $period, DateTime $date): array
     {
         $startDate = clone $date;
         $endDate = clone $date;
@@ -59,7 +59,7 @@ class MyClubDateTime
         return [$startDate, $endDate];
     }
 
-    static function getSeasonRange(string $seasonStart, string $seasonEnd): array
+    public static function getSeasonRange(string $seasonStart, string $seasonEnd): array
     {
         if ($seasonStart === '' || $seasonEnd === '') {
             $currentYear = date('Y');

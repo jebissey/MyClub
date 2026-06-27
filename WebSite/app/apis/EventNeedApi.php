@@ -52,7 +52,11 @@ class EventNeedApi extends AbstractApi
         }
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isEventDesigner())) {
             try {
-                $apiResponse = new ApiResponse(true, ApplicationError::Ok->value, ['needs' => $this->eventNeedDataHelper->needsForEvent($id)]);
+                $apiResponse = new ApiResponse(
+                    true,
+                    ApplicationError::Ok->value,
+                    ['needs' => $this->eventNeedDataHelper->needsForEvent($id)]
+                );
                 $this->renderJson($apiResponse->data, $apiResponse->success, $apiResponse->responseCode);
             } catch (Throwable $e) {
                 $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
@@ -65,7 +69,7 @@ class EventNeedApi extends AbstractApi
         if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isEventDesigner())) {
             $data = $this->getJsonInput();
             try {
-                $this->saveNeed_($data);
+                $this->doSaveNeed($data);
                 $this->renderJsonOk();
             } catch (Throwable $e) {
                 $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
@@ -74,7 +78,7 @@ class EventNeedApi extends AbstractApi
     }
 
     #region Private functions
-    private function saveNeed_(array $data): ApiResponse
+    private function doSaveNeed(array $data): ApiResponse
     {
         if (empty($data['label'])) {
             return new ApiResponse(false, ApplicationError::BadRequest->value, [], 'Missing parameter label');

@@ -13,11 +13,6 @@ class NeedTypeDataHelper extends Data
         parent::__construct($application);
     }
 
-    public function delete_(int $id): void
-    {
-        $this->delete('NeedType', ['Id' => $id]);
-    }
-
     public function insertOrUpdate(?int $id, string $name): int
     {
         if ($id === null) {

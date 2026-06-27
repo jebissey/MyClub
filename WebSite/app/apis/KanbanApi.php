@@ -60,7 +60,12 @@ class KanbanApi extends AbstractApi
                 'message' => 'Card created successfully'
             ]);
         } catch (Throwable $e) {
-            $this->renderJsonError('Failed to create card: ' . $e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
+            $this->renderJsonError(
+                'Failed to create card: ' . $e->getMessage(),
+                ApplicationError::Error->value,
+                $e->getFile(),
+                $e->getLine()
+            );
         }
     }
 
@@ -92,7 +97,12 @@ class KanbanApi extends AbstractApi
                 $this->renderJsonBadRequest('Card not found or unauthorized', __FILE__, __LINE__);
             }
         } catch (Throwable $e) {
-            $this->renderJsonError('Failed to delete card' .  $e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
+            $this->renderJsonError(
+                'Failed to delete card' .  $e->getMessage(),
+                ApplicationError::Error->value,
+                $e->getFile(),
+                $e->getLine()
+            );
         }
     }
 
@@ -185,7 +195,12 @@ class KanbanApi extends AbstractApi
                 $this->renderJsonBadRequest('Card not found or unauthorized', __FILE__, __LINE__);
             }
         } catch (Throwable $e) {
-            $this->renderJsonError('Failed to update card :' . $e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
+            $this->renderJsonError(
+                'Failed to update card :' . $e->getMessage(),
+                ApplicationError::Error->value,
+                $e->getFile(),
+                $e->getLine()
+            );
         }
     }
 
@@ -221,7 +236,12 @@ class KanbanApi extends AbstractApi
                 $this->renderJsonBadRequest('Card status not found or unauthorized', __FILE__, __LINE__);
             }
         } catch (Throwable $e) {
-            $this->renderJsonError('Failed to update card status :' . $e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
+            $this->renderJsonError(
+                'Failed to update card status :' . $e->getMessage(),
+                ApplicationError::Error->value,
+                $e->getFile(),
+                $e->getLine()
+            );
         }
     }
 
@@ -258,7 +278,12 @@ class KanbanApi extends AbstractApi
                 'message' => 'Project created successfully'
             ]);
         } catch (Throwable $e) {
-            $this->renderJsonError('Failed to create project: ' . $e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
+            $this->renderJsonError(
+                'Failed to create project: ' . $e->getMessage(),
+                ApplicationError::Error->value,
+                $e->getFile(),
+                $e->getLine()
+            );
         }
     }
 
@@ -290,7 +315,12 @@ class KanbanApi extends AbstractApi
                 $this->renderJsonBadRequest('Project not found or unauthorized', __FILE__, __LINE__);
             }
         } catch (Throwable $e) {
-            $this->renderJsonError('Failed to delete project: ' . $e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
+            $this->renderJsonError(
+                'Failed to delete project: ' . $e->getMessage(),
+                ApplicationError::Error->value,
+                $e->getFile(),
+                $e->getLine()
+            );
         }
     }
 
@@ -313,7 +343,12 @@ class KanbanApi extends AbstractApi
             }
             $this->renderJsonOk(['project' => $kanbanProject], 'Project loaded successfully');
         } catch (Throwable $e) {
-            $this->renderJsonError('Failed to get project : ' . $e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
+            $this->renderJsonError(
+                'Failed to get project : ' . $e->getMessage(),
+                ApplicationError::Error->value,
+                $e->getFile(),
+                $e->getLine()
+            );
         }
     }
 
@@ -346,12 +381,17 @@ class KanbanApi extends AbstractApi
         try {
             $success = $this->kanbanDataHelper->updateKanbanProject($id, $title, $detail, $this->connectedUser->person->Id);
             if ($success) {
-                $this->renderJsonOk([], 'Project updated successfully', ApplicationError::Ok->value);
+                $this->renderJsonOk([], 'Project updated successfully');
             } else {
                 $this->renderJsonBadRequest('Project not found or unauthorized', __FILE__, __LINE__);
             }
         } catch (Throwable $e) {
-            $this->renderJsonError('Failed to update project' . $e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
+            $this->renderJsonError(
+                'Failed to update project' . $e->getMessage(),
+                ApplicationError::Error->value,
+                $e->getFile(),
+                $e->getLine()
+            );
         }
     }
 
@@ -393,7 +433,12 @@ class KanbanApi extends AbstractApi
                 'message' => 'KabanCardType created successfully'
             ]);
         } catch (Throwable $e) {
-            $this->renderJsonError('Failed to create project' . $e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
+            $this->renderJsonError(
+                'Failed to create project' . $e->getMessage(),
+                ApplicationError::Error->value,
+                $e->getFile(),
+                $e->getLine()
+            );
         }
     }
 
@@ -427,7 +472,12 @@ class KanbanApi extends AbstractApi
                 'message' => 'KabanCardType deleted successfully'
             ]);
         } catch (Throwable $e) {
-            $this->renderJsonError('Failed to delete cardType' . $e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
+            $this->renderJsonError(
+                'Failed to delete cardType' . $e->getMessage(),
+                ApplicationError::Error->value,
+                $e->getFile(),
+                $e->getLine()
+            );
         }
     }
 
@@ -448,7 +498,12 @@ class KanbanApi extends AbstractApi
             $detail = $query['detail'] ?? null;
             $this->renderJsonOk(['cards' => $this->kanbanDataHelper->getProjectCards($id, $ct, $title, $detail)]);
         } catch (Throwable $e) {
-            $this->renderJsonError("Failed to get project's cards : " . $e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
+            $this->renderJsonError(
+                "Failed to get project's cards : " . $e->getMessage(),
+                ApplicationError::Error->value,
+                $e->getFile(),
+                $e->getLine()
+            );
         }
     }
 
@@ -466,7 +521,12 @@ class KanbanApi extends AbstractApi
         try {
             $this->renderJsonOk(['cardTypes' => $this->kanbanDataHelper->getProjectCardTypes($id)]);
         } catch (Throwable $e) {
-            $this->renderJsonError("Failed to get project's card types : " . $e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
+            $this->renderJsonError(
+                "Failed to get project's card types : " . $e->getMessage(),
+                ApplicationError::Error->value,
+                $e->getFile(),
+                $e->getLine()
+            );
         }
     }
 
@@ -507,7 +567,12 @@ class KanbanApi extends AbstractApi
                 'message' => 'KabanCardType updated successfully'
             ]);
         } catch (Throwable $e) {
-            $this->renderJsonError('Failed to update cardType' . $e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
+            $this->renderJsonError(
+                'Failed to update cardType' . $e->getMessage(),
+                ApplicationError::Error->value,
+                $e->getFile(),
+                $e->getLine()
+            );
         }
     }
 }

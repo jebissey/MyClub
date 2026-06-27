@@ -99,7 +99,10 @@ class MenuItemController extends AbstractController
                 'page'         => $this->application->getConnectedUser()->getPage(),
             ]));
         } else {
-            $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+            $this->application->getErrorManager()->raise(
+                ApplicationError::Forbidden,
+                'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__
+            );
         }
     }
 
@@ -115,7 +118,10 @@ class MenuItemController extends AbstractController
                 'btn_HistoryBack'  => true,
             ]));
         } else {
-            $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+            $this->application->getErrorManager()->raise(
+                ApplicationError::Forbidden,
+                'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__
+            );
         }
     }
 }

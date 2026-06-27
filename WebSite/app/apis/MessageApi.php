@@ -8,6 +8,19 @@ use PDOException;
 use InvalidArgumentException;
 use Throwable;
 use finfo;
+use app\enums\ApplicationError;
+use app\exceptions\UnauthorizedAccessException;
+use app\helpers\Application;
+use app\helpers\ConnectedUser;
+use app\helpers\MediaManager;
+use app\helpers\NotificationSender;
+use app\helpers\WebApp;
+use app\models\DataHelper;
+use app\models\MessageDataHelper;
+use app\models\PersonDataHelper;
+use app\modules\Common\services\MessageRecipientService;
+use app\valueObjects\ApiResponse;
+use app\valueObjects\MessageContext;
 
 use function imagecreatefromstring;
 use function imagesx;
@@ -23,24 +36,10 @@ use function imagepng;
 use function imagewebp;
 use function imagegif;
 
-use app\enums\ApplicationError;
-use app\exceptions\UnauthorizedAccessException;
-use app\helpers\Application;
-use app\helpers\ConnectedUser;
-use app\helpers\MediaManager;
-use app\helpers\NotificationSender;
-use app\helpers\WebApp;
-use app\models\DataHelper;
-use app\models\MessageDataHelper;
-use app\models\PersonDataHelper;
-use app\modules\Common\services\MessageRecipientService;
-use app\valueObjects\ApiResponse;
-use app\valueObjects\MessageContext;
-
 class MessageApi extends AbstractApi
 {
-    const ALLOWED_MIME = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
-    const MAX_BYTES    = 1 * 1024 * 1024;
+    private const ALLOWED_MIME = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+    private const MAX_BYTES    = 1 * 1024 * 1024;
 
     public function __construct(
         Application $application,
@@ -89,7 +88,7 @@ class MessageApi extends AbstractApi
                 }
             }
 
-            $apiResponse = $this->addMessage_(
+            $apiResponse = $this->doAddMessage(
                 $articleId,
                 $eventId,
                 $groupId,
@@ -125,7 +124,7 @@ class MessageApi extends AbstractApi
         }
         try {
             $data = $this->getJsonInput();
-            $apiResponse = $this->deleteMessage_((int)$data['messageId'] ?? 0, $this->application->getConnectedUser()->person->Id);
+            $apiResponse = $this->doDeleteMessage((int)$data['messageId'] ?? 0, $this->application->getConnectedUser()->person->Id);
             $this->renderJson($apiResponse->data, $apiResponse->success, $apiResponse->responseCode);
         } catch (Throwable $e) {
             $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
@@ -194,7 +193,11 @@ class MessageApi extends AbstractApi
         }
         try {
             $data = $this->getJsonInput();
-            $apiResponse = $this->updateMessage_((int)$data['messageId'], $this->application->getConnectedUser()->person->Id, $data['text']);
+            $apiResponse = $this->doUpdateMessage(
+                (int)$data['messageId'],
+                $this->application->getConnectedUser()->person->Id,
+                $data['text']
+            );
             $this->renderJson($apiResponse->data, $apiResponse->success, $apiResponse->responseCode);
         } catch (Throwable $e) {
             $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
@@ -202,11 +205,22 @@ class MessageApi extends AbstractApi
     }
 
     #region Private functions
-    private function addMessage_(?int $articleId, ?int $eventId, ?int $groupId, int $personId, string $text, ?string $imagePath = null): ApiResponse
-    {
+    private function doAddMessage(
+        ?int $articleId,
+        ?int $eventId,
+        ?int $groupId,
+        int $personId,
+        string $text,
+        ?string $imagePath = null
+    ): ApiResponse {
         try {
             $messageId = $this->messageDataHelper->addMessage($articleId, $eventId, $groupId, $personId, $text, $imagePath);
-            return new ApiResponse($messageId !== false, $messageId === false ? ApplicationError::BadRequest->value : ApplicationError::Ok->value, ['messageId' => $messageId], 'Message ajouté');
+            return new ApiResponse(
+                $messageId !== false,
+                $messageId === false ? ApplicationError::BadRequest->value : ApplicationError::Ok->value,
+                ['messageId' => $messageId],
+                'Message ajouté'
+            );
         } catch (PDOException $e) {
             return new ApiResponse(false, ApplicationError::BadRequest->value, [], $e->getMessage());
         } catch (Throwable $e) {
@@ -214,14 +228,19 @@ class MessageApi extends AbstractApi
         }
     }
 
-    private function deleteMessage_(int $messageId, int $personId): ApiResponse
+    private function doDeleteMessage(int $messageId, int $personId): ApiResponse
     {
         $message = $this->dataHelper->get('Message', ['Id' => $messageId], 'PersonId');
         if (!$message) {
             return new ApiResponse(false, ApplicationError::BadRequest->value, [], "Message {$messageId} doesn't exist");
         }
         if ($message->PersonId != $personId) {
-            return new ApiResponse(false, ApplicationError::Forbidden->value, [], "Person {$personId} isn't allowed to remove message {$messageId}");
+            return new ApiResponse(
+                false,
+                ApplicationError::Forbidden->value,
+                [],
+                "Person {$personId} isn't allowed to remove message {$messageId}"
+            );
         }
         try {
             $result = $this->dataHelper->delete('Message', ['Id' => $messageId]);
@@ -236,11 +255,16 @@ class MessageApi extends AbstractApi
         }
     }
 
-    private function updateMessage_(int $messageId, int $personId, string $text): ApiResponse
+    private function doUpdateMessage(int $messageId, int $personId, string $text): ApiResponse
     {
         try {
             $this->messageDataHelper->updateMessage($messageId, $personId, $text);
-            return new ApiResponse(true, ApplicationError::Ok->value, ['data' => ['messageId' => $messageId, 'text' => $text]], 'Message mis à jour');
+            return new ApiResponse(
+                true,
+                ApplicationError::Ok->value,
+                ['data' => ['messageId' => $messageId, 'text' => $text]],
+                'Message mis à jour'
+            );
         } catch (UnauthorizedAccessException $e) {
             return new ApiResponse(false, ApplicationError::Forbidden->value, [], $e->getMessage());
         } catch (PDOException $e) {

@@ -11,7 +11,7 @@ use app\helpers\MyClubDateTime;
 
 class LogDataAnalyticsHelper extends Data
 {
-    const PERIOD_TO_SHOW = 13;
+    private const PERIOD_TO_SHOW = 13;
 
     public function getStatisticsData(string $periodType, int $offset): array
     {
@@ -23,7 +23,8 @@ class LogDataAnalyticsHelper extends Data
                 SELECT 
                     COUNT(DISTINCT Token) as uniqueVisitors,
                     COALESCE(SUM(Count), 0) as pageViews,
-                    COALESCE(SUM(CASE WHEN CAST(Code AS INTEGER) BETWEEN 200 AND 299 OR Code IS NULL OR Code = '' THEN Count ELSE 0 END), 0) as views2xx,
+                    COALESCE(SUM(CASE WHEN CAST(Code AS INTEGER) BETWEEN 200 AND 299 
+                        OR Code IS NULL OR Code = '' THEN Count ELSE 0 END), 0) as views2xx,
                     COALESCE(SUM(CASE WHEN CAST(Code AS INTEGER) BETWEEN 300 AND 399 THEN Count ELSE 0 END), 0) as views3xx,
                     COALESCE(SUM(CASE WHEN CAST(Code AS INTEGER) BETWEEN 400 AND 499 THEN Count ELSE 0 END), 0) as views4xx,
                     COALESCE(SUM(CASE WHEN CAST(Code AS INTEGER) BETWEEN 500 AND 599 THEN Count ELSE 0 END), 0) as views5xx

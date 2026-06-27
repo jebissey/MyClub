@@ -142,7 +142,11 @@ class MediaApi extends AbstractApi
                 return;
             }
             $response = $this->mediaManager->removeFileShare($filePath);
-            $this->renderJson($response, $response['success'], $response['success'] ? ApplicationError::Ok->value : ApplicationError::BadRequest->value);
+            $this->renderJson(
+                $response,
+                $response['success'],
+                $response['success'] ? ApplicationError::Ok->value : ApplicationError::BadRequest->value
+            );
         }
     }
 

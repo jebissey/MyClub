@@ -23,8 +23,14 @@ class MessageDataHelper extends Data implements NewsProviderInterface
         parent::__construct($application);
     }
 
-    public function addMessage(?int $articleId, ?int $eventId, ?int $groupId, int $personId, string $text, ?string $imagePath = null): int|false
-    {
+    public function addMessage(
+        ?int $articleId,
+        ?int $eventId,
+        ?int $groupId,
+        int $personId,
+        string $text,
+        ?string $imagePath = null
+    ): int|false {
         $nonNullCount = ($articleId !== null) + ($eventId !== null) + ($groupId !== null);
         if ($nonNullCount !== 1) {
             return false;
@@ -141,7 +147,7 @@ class MessageDataHelper extends Data implements NewsProviderInterface
 
     public function getGroupedMessages(int $personId, string $searchFrom, GravatarHandler $gravatarHandler): array
     {
-        $rows = $this->getGroupedMessages_($personId, $searchFrom);
+        $rows = $this->doGetGroupedMessages($personId, $searchFrom);
         return array_map(function (object $row) use ($gravatarHandler): array {
             $userImg = WebApp::getUserImg($row, $gravatarHandler);
 
@@ -302,7 +308,7 @@ class MessageDataHelper extends Data implements NewsProviderInterface
             if (empty($searchFrom)) {
                 return false;
             }
-            $hasNew = count($this->getGroupedMessages_($personId, $searchFrom)) > 0;
+            $hasNew = count($this->doGetGroupedMessages($personId, $searchFrom)) > 0;
             if ($hasNew) {
                 $_SESSION['has_new_messages'] = 1;
             }
@@ -334,7 +340,7 @@ class MessageDataHelper extends Data implements NewsProviderInterface
         return $messages;
     }
 
-    private function getGroupedMessages_(int $personId, string $searchFrom): array
+    private function doGetGroupedMessages(int $personId, string $searchFrom): array
     {
         $params = [];
         $whereClause = $searchFrom ? "AND m.LastUpdate >= ?" : '';

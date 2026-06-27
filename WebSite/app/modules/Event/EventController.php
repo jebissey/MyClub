@@ -34,7 +34,7 @@ class EventController extends AbstractController
         parent::__construct($application);
     }
 
-    public function nextEvents_help(): void
+    public function nextEventsHelp(): void
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);

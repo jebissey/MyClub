@@ -13,8 +13,12 @@ use app\models\PersonDataHelper;
 
 class NotificationApi extends AbstractApi
 {
-    public function __construct(Application $application, ConnectedUser $connectedUser, DataHelper $dataHelper, PersonDataHelper $personDataHelper)
-    {
+    public function __construct(
+        Application $application,
+        ConnectedUser $connectedUser,
+        DataHelper $dataHelper,
+        PersonDataHelper $personDataHelper
+    ) {
         parent::__construct($application, $connectedUser, $dataHelper, $personDataHelper);
     }
 

@@ -31,7 +31,8 @@ UPDATE Languages SET en_US =
                                 <h3 class="h5 fw-bold mb-2">Access &amp; Permissions</h3>
                                 <ul class="list-unstyled text-muted small">
                                     <li class="mb-2">
-                                        <strong>Visibility:</strong> The yellow key only appears in the top bar for members with authorisations.
+                                        <strong>Visibility:</strong> 
+                                        The yellow key only appears in the top bar for members with authorisations.
                                     </li>
                                     <li>
                                         <strong>Smart navigation:</strong>
@@ -225,7 +226,8 @@ UPDATE Languages SET fr_FR =
                                 <h3 class="h5 fw-bold mb-2">Accès et Permissions</h3>
                                 <ul class="list-unstyled text-muted small">
                                     <li class="mb-2">
-                                        <strong>Visibilité :</strong> La clé jaune n''apparaît dans la barre supérieure que pour les membres ayant des autorisations.
+                                        <strong>Visibilité :</strong> 
+                                        La clé jaune n''apparaît dans la barre supérieure que pour les membres ayant des autorisations.
                                     </li>
                                     <li>
                                         <strong>Navigation intelligente :</strong>
@@ -246,7 +248,7 @@ UPDATE Languages SET fr_FR =
                             <div>
                                 <h3 class="h5 fw-bold mb-2">Optimisation Mobile</h3>
                                 <p class="text-muted small">
-                                    Les raccourcis apparaissent aussi directement ici — plus besoin d''ouvrir le menu ☰ sur les écrans étroits.
+                            Les raccourcis apparaissent aussi directement ici — plus besoin d''ouvrir le menu ☰ sur les écrans étroits.
                                 </p>
                             </div>
                         </div>
@@ -260,7 +262,8 @@ UPDATE Languages SET fr_FR =
             <div class="card-body p-3 p-md-5">
                 <h2 class="fw-bold text-primary">Les droits dans MyClub (aide rapide)</h2>
                 <p class="lead text-muted mb-4">
-                    Lors de l''installation de <strong>MyClub</strong>, un compte et un groupe <strong>Webmaster</strong> sont créés automatiquement.
+                    Lors de l''installation de <strong>MyClub</strong>, 
+                    un compte et un groupe <strong>Webmaster</strong> sont créés automatiquement.
                     Ce groupe est réservé à l''administration initiale : il ne peut pas être modifié et aucun membre ne peut y être ajouté.
                 </p>
                 <p class="text-muted mb-4">
@@ -338,7 +341,9 @@ UPDATE Languages SET fr_FR =
                                 <h3 class="h5 fw-bold mb-2">Communication</h3>
                                 <ul class="list-unstyled text-muted small">
                                     <li class="mb-1"><strong>CommunicationManager</strong> : envoyer des courriels aux membres</li>
-                                    <li>Certains messages peuvent être envoyés automatiquement (articles, événements, mot de passe, contact)</li>
+                                    <li>
+                                    Certains messages peuvent être envoyés automatiquement (articles, événements, mot de passe, contact)
+                                    </li>
                                 </ul>
                             </div>
                         </div>
@@ -419,7 +424,8 @@ UPDATE Languages SET pl_PL =
                                 <h3 class="h5 fw-bold mb-2">Dostęp i uprawnienia</h3>
                                 <ul class="list-unstyled text-muted small">
                                     <li class="mb-2">
-                                        <strong>Widoczność:</strong> Żółty klucz pojawia się na górnym pasku tylko dla członków posiadających uprawnienia.
+                                        <strong>Widoczność:</strong> 
+                                        Żółty klucz pojawia się na górnym pasku tylko dla członków posiadających uprawnienia.
                                     </li>
                                     <li>
                                         <strong>Inteligentna nawigacja:</strong>

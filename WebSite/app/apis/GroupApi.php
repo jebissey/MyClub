@@ -13,8 +13,12 @@ use app\models\PersonDataHelper;
 
 class GroupApi extends AbstractApi
 {
-    public function __construct(Application $application, ConnectedUser $connectedUser, DataHelper $dataHelper, PersonDataHelper $personDataHelper)
-    {
+    public function __construct(
+        Application $application,
+        ConnectedUser $connectedUser,
+        DataHelper $dataHelper,
+        PersonDataHelper $personDataHelper
+    ) {
         parent::__construct($application, $connectedUser, $dataHelper, $personDataHelper);
     }
 
@@ -71,7 +75,10 @@ class GroupApi extends AbstractApi
 
     public function removeFromGroup(int $personId, int $groupId): void
     {
-        if (!(($this->application->getConnectedUser()->isPersonManager() ?? false) || $this->application->getConnectedUser()->isWebmaster() ?? false)) {
+        if (
+            !(($this->application->getConnectedUser()->isPersonManager() ?? false)
+            || $this->application->getConnectedUser()->isWebmaster() ?? false)
+        ) {
             $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }

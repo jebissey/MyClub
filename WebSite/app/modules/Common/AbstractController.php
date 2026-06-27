@@ -217,12 +217,20 @@ abstract class AbstractController
 
     protected function raiseForbidden(string $file, int $line, int $timeout = 5000, bool $displayCode = false): void
     {
-        $this->application->getErrorManager()->raise(ApplicationError::Forbidden, "Access forbidden in file {$file} at line {$line}", $timeout, $displayCode);
+        $this->application->getErrorManager()->raise(
+            ApplicationError::Forbidden,
+            "Access forbidden in file {$file} at line {$line}",
+            $timeout,
+            $displayCode
+        );
     }
 
     protected function raiseMethodNotAllowed(string $file, int $line): void
     {
-        $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, "Method {$_SERVER['REQUEST_METHOD']} not allowed in file {$file} at line {$line}");
+        $this->application->getErrorManager()->raise(
+            ApplicationError::MethodNotAllowed,
+            "Method {$_SERVER['REQUEST_METHOD']} not allowed in file {$file} at line {$line}"
+        );
     }
 
     protected function redirect(string $url, ?ApplicationError $applicationError = null, ?string $message = null): void
@@ -288,7 +296,7 @@ abstract class AbstractController
     #region Public functions
     public function render(string $templateLatteName, object|array $params = []): void
     {
-#error_log("\n\n" . json_encode($templateLatteName, JSON_PRETTY_PRINT) . "\n");
+        #error_log("\n\n" . json_encode($templateLatteName, JSON_PRETTY_PRINT) . "\n");
         $content = $this->latte->renderToString($templateLatteName, $params);
         echo $content;
         if (ob_get_level()) {

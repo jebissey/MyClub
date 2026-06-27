@@ -14,7 +14,7 @@ class CarouselDataHelper extends Data
         parent::__construct($application);
     }
 
-    public function set_(array $data, string $item): string
+    public function addOrUpdate(array $data, string $item): string
     {
         if (!empty($data['id'])) {
             $this->set('Carousel', ['Item' => $item], [

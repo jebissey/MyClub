@@ -15,8 +15,13 @@ use app\models\PersonDataHelper;
 
 class MenuItemApi extends AbstractApi
 {
-    public function __construct(Application $application, private MenuItemDataHelper $menuItemDataHelper, ConnectedUser $connectedUser, DataHelper $dataHelper, PersonDataHelper $personDataHelper)
-    {
+    public function __construct(
+        Application $application,
+        private MenuItemDataHelper $menuItemDataHelper,
+        ConnectedUser $connectedUser,
+        DataHelper $dataHelper,
+        PersonDataHelper $personDataHelper
+    ) {
         parent::__construct($application, $connectedUser, $dataHelper, $personDataHelper);
     }
 
@@ -45,7 +50,11 @@ class MenuItemApi extends AbstractApi
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
-            $this->renderJson(['message' => 'Not allowed method: ' . $_SERVER['REQUEST_METHOD'] . ' in file ' . __FILE__ . ' at line ' . __LINE__], false, ApplicationError::MethodNotAllowed->value);
+            $this->renderJson(
+                ['message' => 'Not allowed method: ' . $_SERVER['REQUEST_METHOD'] . ' in file ' . __FILE__ . ' at line ' . __LINE__],
+                false,
+                ApplicationError::MethodNotAllowed->value
+            );
             return;
         }
         try {

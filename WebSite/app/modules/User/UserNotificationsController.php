@@ -71,7 +71,11 @@ class UserNotificationsController extends AbstractController
             return;
         }
 
-        $notifications = WebApp::getFiltered('notifications', FilterInputRule::CheckboxMatrix->value, $this->flight->request()->data->getData()) ?? [];
+        $notifications = WebApp::getFiltered(
+            'notifications',
+            FilterInputRule::CheckboxMatrix->value,
+            $this->flight->request()->data->getData()
+        ) ?? [];
         unset(
             $notifications['messageOnGroupSubscribed'],
             $notifications['messageOnGroupJoined']

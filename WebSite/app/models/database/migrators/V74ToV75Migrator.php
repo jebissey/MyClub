@@ -29,9 +29,15 @@ INSERT OR REPLACE INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
                             <div>
                                 <strong>Articles</strong>
                                 <p class="text-muted small">
-                                    Browse and manage your articles list. Create a new article via the <strong>+</strong> button, or edit / view an existing one.
+                                    Browse and manage your articles list. Create a new article via the 
+                                    <strong>+</strong> button, or edit / view an existing one.
                                     <span class="d-block mt-1 text-dark">
-                                        👉 <em><strong>Editor</strong> permission required to reassign an article to another writer or publish it for all visitors (the grey buttons).</em>
+                                        👉 
+                                        <em>
+                                            <strong>Editor</strong> 
+                                            permission required to reassign an article to another writer or publish it for all visitors
+                                            (the grey buttons).
+                                        </em>
                                     </span>
                                 </p>
                             </div>
@@ -39,7 +45,10 @@ INSERT OR REPLACE INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
                         <div class="d-flex align-items-start mb-3">
                             <div class="me-3" style="font-size:1.75rem; line-height:1;">⚖️</div>
                             <div>
-                                <strong>Public articles <span class="badge bg-warning text-dark ms-1" style="font-size:.65rem;">Editor</span></strong>
+                                <strong>
+                                    Public articles 
+                                    <span class="badge bg-warning text-dark ms-1" style="font-size:.65rem;">Editor</span>
+                                </strong>
                                 <p class="text-muted small">
                                     Editor-only view. Lists all articles visible to visitors (non-members), sorted by last update date.
                                 </p>
@@ -66,7 +75,8 @@ INSERT OR REPLACE INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
                             <div>
                                 <strong>Top 50 — most viewed articles</strong>
                                 <p class="text-muted small">
-                                    Rankings of articles by visit count over a selectable period. Shows title, author, URL, response time, visit count and percentage of total traffic.
+                                    Rankings of articles by visit count over a selectable period. 
+                                    Shows title, author, URL, response time, visit count and percentage of total traffic.
                                 </p>
                             </div>
                         </div>
@@ -75,7 +85,10 @@ INSERT OR REPLACE INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
                             <div>
                                 <strong>Pivot table</strong>
                                 <p class="text-muted small">
-                                    Crosses <strong>writers</strong> (columns) and <strong>audiences</strong> (rows) to visualise how many articles each writer has published for each audience. Select the desired period in the top right.
+                                    Crosses 
+                                    <strong>writers</strong> (columns) and 
+                                    <strong>audiences</strong> (rows) to visualise how many articles each writer 
+                                    has published for each audience. Select the desired period in the top right.
                                 </p>
                             </div>
                         </div>
@@ -93,11 +106,16 @@ INSERT OR REPLACE INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
         <div class="list-group">
             <div class="list-group-item d-flex align-items-center">
                 <i class="bi bi-arrow-left-circle fs-3 me-3"></i>
-                <span>The <strong>navigation arrows</strong> (up / back) allow you to return to the editorial space or the previous page.</span>
+                <span>
+                    The <strong>navigation arrows</strong> (up / back) allow you to return to the editorial space or the previous page.
+                </span>
             </div>
             <div class="list-group-item d-flex align-items-center">
                 <i class="bi bi-shield-check fs-3 text-warning me-3"></i>
-                <span><strong>«Editor» permission:</strong> certain features are reserved for publishing managers (public articles, reassignment, publishing, pivot table).</span>
+                <span>
+                    <strong>«Editor» permission:</strong> 
+                    certain features are reserved for publishing managers (public articles, reassignment, publishing, pivot table).
+                </span>
             </div>
             <div class="list-group-item d-flex align-items-center">
                 <i class="bi bi-plus-circle fs-3 me-3"></i>
@@ -126,9 +144,15 @@ INSERT OR REPLACE INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
                             <div>
                                 <strong>Articles</strong>
                                 <p class="text-muted small">
-                                    Consultez et gérez la liste de vos articles. Créez un nouvel article via le bouton <strong>+</strong>, ou modifiez / visualisez un article existant.
+                                    Consultez et gérez la liste de vos articles. 
+                                    Créez un nouvel article via le bouton <strong>+</strong>, ou modifiez / visualisez un article existant.
                                     <span class="d-block mt-1 text-dark">
-                                        👉 <em>Autorisation <strong>Éditeur</strong> requise pour réattribuer un article à un autre rédacteur ou le publier pour tous les visiteurs (les boutons gris).</em>
+                                        👉 
+                                        <em>
+                                            Autorisation 
+                                            <strong>Éditeur</strong> requise pour réattribuer un article à un autre rédacteur 
+                                            ou le publier pour tous les visiteurs (les boutons gris).
+                                        </em>
                                     </span>
                                 </p>
                             </div>
@@ -136,9 +160,13 @@ INSERT OR REPLACE INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
                         <div class="d-flex align-items-start mb-3">
                             <div class="me-3" style="font-size:1.75rem; line-height:1;">⚖️</div>
                             <div>
-                                <strong>Articles publics <span class="badge bg-warning text-dark ms-1" style="font-size:.65rem;">Editor</span></strong>
+                                <strong>
+                                    Articles publics <span class="badge bg-warning text-dark ms-1" style="font-size:.65rem;">Editor</span>
+                                </strong>
                                 <p class="text-muted small">
-                                    Vue réservée aux éditeurs. Affiche tous les articles visibles par les visiteurs (non membres), classés par date de dernière mise à jour.
+                                    Vue réservée aux éditeurs. 
+                                    Affiche tous les articles visibles par les visiteurs (non membres), 
+                                    classés par date de dernière mise à jour.
                                 </p>
                             </div>
                         </div>
@@ -163,7 +191,9 @@ INSERT OR REPLACE INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
                             <div>
                                 <strong>Top 50 — articles les plus consultés</strong>
                                 <p class="text-muted small">
-                                    Classement des articles par nombre de visites sur une période sélectionnable. Affiche le titre, l''auteur, l''URL, le temps de réponse, le nombre de visites et le pourcentage du trafic total.
+                                    Classement des articles par nombre de visites sur une période sélectionnable. 
+                                    Affiche le titre, l''auteur, l''URL, le temps de réponse, 
+                                    le nombre de visites et le pourcentage du trafic total.
                                 </p>
                             </div>
                         </div>
@@ -172,7 +202,10 @@ INSERT OR REPLACE INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
                             <div>
                                 <strong>Tableau croisé dynamique</strong>
                                 <p class="text-muted small">
-                                    Croise les <strong>rédacteurs</strong> (colonnes) et les <strong>audiences</strong> (lignes) pour visualiser combien d''articles chaque rédacteur a publié pour quel public. Sélectionnez la période souhaitée en haut à droite.
+                                    Croise les 
+                                    <strong>rédacteurs</strong> (colonnes) et les 
+                                    <strong>audiences</strong> (lignes) pour visualiser combien d''articles chaque rédacteur 
+                                    a publié pour quel public. Sélectionnez la période souhaitée en haut à droite.
                                 </p>
                             </div>
                         </div>
@@ -190,11 +223,19 @@ INSERT OR REPLACE INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
         <div class="list-group">
             <div class="list-group-item d-flex align-items-center">
                 <i class="bi bi-arrow-left-circle fs-3 me-3"></i>
-                <span>Les <strong>flèches de navigation</strong> (haut / retour) permettent de revenir à l''espace rédaction ou à la page précédente.</span>
+                <span>
+                    Les 
+                    <strong>flèches de navigation</strong> 
+                    (haut / retour) permettent de revenir à l''espace rédaction ou à la page précédente.
+                </span>
             </div>
             <div class="list-group-item d-flex align-items-center">
                 <i class="bi bi-shield-check fs-3 text-warning me-3"></i>
-                <span><strong>Autorisation « Éditeur » :</strong> certaines fonctions sont réservées aux responsables de publication (articles publics, réattribution, publication, tableau croisé).</span>
+                <span>
+                    <strong>Autorisation « Éditeur » :</strong> 
+                    certaines fonctions sont réservées aux responsables de publication (articles publics, 
+                    réattribution, publication, tableau croisé).
+                </span>
             </div>
             <div class="list-group-item d-flex align-items-center">
                 <i class="bi bi-plus-circle fs-3 me-3"></i>
@@ -202,7 +243,10 @@ INSERT OR REPLACE INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
             </div>
             <div class="list-group-item d-flex align-items-center bg-light">
                 <i class="bi bi-question-circle-fill fs-3 text-warning me-3"></i>
-                <span><strong>Aide :</strong> Ici vous trouverez toutes les informations nécessaires pour utiliser l''espace rédaction.</span>
+                <span>
+                    <strong>Aide :</strong> 
+                    Ici vous trouverez toutes les informations nécessaires pour utiliser l''espace rédaction.
+                </span>
             </div>
         </div>
     </section>
@@ -223,9 +267,17 @@ INSERT OR REPLACE INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
                             <div>
                                 <strong>Artykuły</strong>
                                 <p class="text-muted small">
-                                    Przeglądaj i zarządzaj listą swoich artykułów. Utwórz nowy artykuł za pomocą przycisku <strong>+</strong> lub edytuj / wyświetl istniejący.
+                                    Przeglądaj i zarządzaj listą swoich artykułów. 
+                                    Utwórz nowy artykuł za pomocą przycisku 
+                                    <strong>+</strong> lub edytuj / wyświetl istniejący.
                                     <span class="d-block mt-1 text-dark">
-                                        👉 <em>Uprawnienie <strong>Redaktora</strong> wymagane do przypisania artykułu innemu autorowi lub opublikowania go dla wszystkich odwiedzających (szare przyciski).</em>
+                                        👉 
+                                        <em>
+                                            Uprawnienie 
+                                            <strong>Redaktora</strong> 
+                                            wymagane do przypisania artykułu innemu autorowi lub opublikowania go 
+                                            dla wszystkich odwiedzających (szare przyciski).
+                                            </em>
                                     </span>
                                 </p>
                             </div>
@@ -233,9 +285,14 @@ INSERT OR REPLACE INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
                         <div class="d-flex align-items-start mb-3">
                             <div class="me-3" style="font-size:1.75rem; line-height:1;">⚖️</div>
                             <div>
-                                <strong>Artykuły publiczne <span class="badge bg-warning text-dark ms-1" style="font-size:.65rem;">Editor</span></strong>
+                                <strong>
+                                    Artykuły publiczne 
+                                    <span class="badge bg-warning text-dark ms-1" style="font-size:.65rem;">Editor</span>
+                                </strong>
                                 <p class="text-muted small">
-                                    Widok tylko dla redaktorów. Wyświetla wszystkie artykuły widoczne dla odwiedzających (niezalogowanych), posortowane według daty ostatniej aktualizacji.
+                                    Widok tylko dla redaktorów. 
+                                    Wyświetla wszystkie artykuły widoczne dla odwiedzających (niezalogowanych), 
+                                    posortowane według daty ostatniej aktualizacji.
                                 </p>
                             </div>
                         </div>
@@ -260,7 +317,8 @@ INSERT OR REPLACE INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
                             <div>
                                 <strong>Top 50 — najczęściej czytane artykuły</strong>
                                 <p class="text-muted small">
-                                    Ranking artykułów według liczby odwiedzin w wybranym okresie. Pokazuje tytuł, autora, URL, czas odpowiedzi, liczbę odwiedzin i procent całkowitego ruchu.
+                                    Ranking artykułów według liczby odwiedzin w wybranym okresie. 
+                                    Pokazuje tytuł, autora, URL, czas odpowiedzi, liczbę odwiedzin i procent całkowitego ruchu.
                                 </p>
                             </div>
                         </div>
@@ -269,7 +327,10 @@ INSERT OR REPLACE INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
                             <div>
                                 <strong>Tabela przestawna</strong>
                                 <p class="text-muted small">
-                                    Krzyżuje <strong>autorów</strong> (kolumny) i <strong>odbiorców</strong> (wiersze), aby pokazać ile artykułów każdy autor opublikował dla danej grupy odbiorców. Wybierz żądany okres w prawym górnym rogu.
+                                    Krzyżuje <strong>autorów</strong> (kolumny) i 
+                                    <strong>odbiorców</strong> 
+                                    (wiersze), aby pokazać ile artykułów każdy autor opublikował dla danej grupy odbiorców. 
+                                    Wybierz żądany okres w prawym górnym rogu.
                                 </p>
                             </div>
                         </div>
@@ -287,11 +348,19 @@ INSERT OR REPLACE INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
         <div class="list-group">
             <div class="list-group-item d-flex align-items-center">
                 <i class="bi bi-arrow-left-circle fs-3 me-3"></i>
-                <span><strong>Strzałki nawigacji</strong> (góra / wstecz) umożliwiają powrót do przestrzeni redakcyjnej lub poprzedniej strony.</span>
+                <span>
+                    <strong>
+                        Strzałki nawigacji</strong> 
+                        (góra / wstecz) umożliwiają powrót do przestrzeni redakcyjnej lub poprzedniej strony.
+                </span>
             </div>
             <div class="list-group-item d-flex align-items-center">
                 <i class="bi bi-shield-check fs-3 text-warning me-3"></i>
-                <span><strong>Uprawnienie «Redaktor»:</strong> niektóre funkcje są zarezerwowane dla menedżerów publikacji (artykuły publiczne, przypisanie, publikowanie, tabela przestawna).</span>
+                <span>
+                    <strong>Uprawnienie «Redaktor»:</strong> 
+                    niektóre funkcje są zarezerwowane dla menedżerów publikacji 
+                    (artykuły publiczne, przypisanie, publikowanie, tabela przestawna).
+                </span>
             </div>
             <div class="list-group-item d-flex align-items-center">
                 <i class="bi bi-plus-circle fs-3 me-3"></i>
@@ -299,7 +368,9 @@ INSERT OR REPLACE INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
             </div>
             <div class="list-group-item d-flex align-items-center bg-light">
                 <i class="bi bi-question-circle-fill fs-3 text-warning me-3"></i>
-                <span><strong>Pomoc:</strong> Tutaj znajdziesz wszystkie informacje potrzebne do korzystania z przestrzeni redakcyjnej.</span>
+                <span>
+                    <strong>Pomoc:</strong> Tutaj znajdziesz wszystkie informacje potrzebne do korzystania z przestrzeni redakcyjnej.
+                </span>
             </div>
         </div>
     </section>
@@ -320,29 +391,41 @@ INSERT OR REPLACE INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
                         <div class="d-flex align-items-start mb-3">
                             <div class="me-3" style="font-size:1.75rem; line-height:1;">🗓️</div>
                             <div>
-                                <strong>Event types<span class="badge bg-warning text-dark ms-1" style="font-size:.65rem;">EventDesigner</span></strong>
+                                <strong>
+                                    Event types
+                                    <span class="badge bg-warning text-dark ms-1" style="font-size:.65rem;">EventDesigner</span>
+                                </strong>
                                 <p class="text-muted small">
                                     Manage the types of events that can be created (Competition, Training, Meeting…).
-                                    Each type can be assigned a <strong>group</strong> and a list of <strong>attributes</strong> (tags used to qualify events).
-                                    The <strong>Attribute manager</strong> at the bottom of the page lets you create, colour and describe each attribute.
+                                    Each type can be assigned a 
+                                    <strong>group</strong> and a list of 
+                                    <strong>attributes</strong> (tags used to qualify events). The 
+                                    <strong>Attribute manager</strong> 
+                                    at the bottom of the page lets you create, colour and describe each attribute.
                                 </p>
                             </div>
                         </div>
                         <div class="d-flex align-items-start mb-3">
-                            <div class="me-3" style="font-size:1.75rem; line-height:1;">📋</div>
-                            <div>
-                                <strong>Needs<span class="badge bg-warning text-dark ms-1" style="font-size:.65rem;">EventDesigner</span></strong>
-                                <p class="text-muted small">
-                                    Define the resources an event may require: drinks, food, equipment, speakers, participants…
-                                    Needs are organised by <strong>type</strong> (left panel) and can be scaled to the number of participants.
-                                    Each need has a label (emoji), a name and a type.
-                                </p>
-                            </div>
+                          <div class="me-3" style="font-size:1.75rem; line-height:1;">📋</div>
+                          <div>
+                            <strong>
+                              Needs
+                              <span class="badge bg-warning text-dark ms-1" style="font-size:.65rem;">EventDesigner</span>
+                            </strong>
+                            <p class="text-muted small">
+                              Define the resources an event may require: drinks, food, equipment, speakers, participants…
+                              Needs are organised by <strong>type</strong> (left panel) and can be scaled to the number of participants.
+                              Each need has a label (emoji), a name and a type.
+                            </p>
+                          </div>
                         </div>
                         <div class="d-flex align-items-start mb-3">
                             <div class="me-3" style="font-size:1.75rem; line-height:1;">🏋️</div>
                             <div>
-                                <strong>Exercises<span class="badge bg-warning text-dark ms-1" style="font-size:.65rem;">ExerciseDesigner</span></strong>
+                                <strong>
+                                    Exercises
+                                    <span class="badge bg-warning text-dark ms-1" style="font-size:.65rem;">ExerciseDesigner</span>
+                                </strong>
                                 <p class="text-muted small">
                                     Build the exercise library used when composing training sessions.
                                 </p>
@@ -351,7 +434,10 @@ INSERT OR REPLACE INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
                         <div class="d-flex align-items-start">
                             <div class="me-3" style="font-size:1.75rem; line-height:1;">🔁</div>
                             <div>
-                                <strong>Equipment catalogue (Loan)<span class="badge bg-warning text-dark ms-1" style="font-size:.65rem;">LoanDesigner</span></strong>
+                                <strong>
+                                    Equipment catalogue (Loan)
+                                    <span class="badge bg-warning text-dark ms-1" style="font-size:.65rem;">LoanDesigner</span>
+                                </strong>
                                 <p class="text-muted small">
                                     Declare the equipment available for loan: name, description, type, total quantity and active status.
                                     Members can then consult the catalogue, make reservations and view the availability calendar.
@@ -363,7 +449,10 @@ INSERT OR REPLACE INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
                         <div class="d-flex align-items-start mb-3">
                             <div class="me-3" style="font-size:1.75rem; line-height:1;">🔧</div>
                             <div>
-                                <strong>Settings<span class="badge bg-warning text-dark ms-1" style="font-size:.65rem;">HomeDesigner</span></strong>
+                                <strong>
+                                    Settings
+                                    <span class="badge bg-warning text-dark ms-1" style="font-size:.65rem;">HomeDesigner</span>
+                                </strong>
                                 <p class="text-muted small">
                                     General application settings: site name, contact details, default language, etc.
                                 </p>
@@ -372,10 +461,14 @@ INSERT OR REPLACE INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
                         <div class="d-flex align-items-start mb-3">
                             <div class="me-3" style="font-size:1.75rem; line-height:1;">🧠</div>
                             <div>
-                                <strong>Homepage design<span class="badge bg-warning text-dark ms-1" style="font-size:.65rem;">HomeDesigner</span></strong>
+                                <strong>
+                                    Homepage design
+                                    <span class="badge bg-warning text-dark ms-1" style="font-size:.65rem;">HomeDesigner</span>
+                                </strong>
                                 <p class="text-muted small">
                                     Customise the homepage layout: header, main article, latest articles, footer, accordion.
-                                    Click a section in the preview to open its editor. You can force a specific language using the selector in the top bar.
+                                    Click a section in the preview to open its editor. 
+                                    You can force a specific language using the selector in the top bar.
                                 </p>
                             </div>
                         </div>
@@ -394,7 +487,10 @@ INSERT OR REPLACE INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
                                 <strong>Menu items</strong>
                                 <p class="text-muted small">
                                     Manage the navigation bar and sidebar links.
-                                    Each item has a name, a URL, an optional group restriction and three visibility flags: <strong>Members</strong>, <strong>Contacts</strong>, <strong>Anonymous</strong>.
+                                    Each item has a name, a URL, an optional group restriction and three visibility flags: 
+                                    <strong>Members</strong>, 
+                                    <strong>Contacts</strong>, 
+                                    <strong>Anonymous</strong>.
                                     The preview at the top lets you check the result for each audience.
                                 </p>
                             </div>
@@ -424,7 +520,9 @@ INSERT OR REPLACE INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
         <div class="list-group">
             <div class="list-group-item d-flex align-items-center">
                 <i class="bi bi-arrow-left-circle fs-3 me-3"></i>
-                <span>The <strong>navigation arrows</strong> (up / back) allow you to return to the design space or the previous page.</span>
+                <span>
+                    The <strong>navigation arrows</strong> (up / back) allow you to return to the design space or the previous page.
+                </span>
             </div>
             <div class="list-group-item d-flex align-items-center">
                 <i class="bi bi-eye fs-3 me-3"></i>
@@ -455,21 +553,32 @@ INSERT OR REPLACE INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
                         <div class="d-flex align-items-start mb-3">
                             <div class="me-3" style="font-size:1.75rem; line-height:1;">🗓️</div>
                             <div>
-                                <strong>Types d''événements<span class="badge bg-warning text-dark ms-1" style="font-size:.65rem;">EventDesigner</span></strong>
+                                <strong>
+                                    Types d''événements
+                                    <span class="badge bg-warning text-dark ms-1" style="font-size:.65rem;">EventDesigner</span>
+                                </strong>
                                 <p class="text-muted small">
                                     Gérez les types d''événements pouvant être créés (Compétition, Entraînement, Réunion…).
-                                    Chaque type peut se voir attribuer un <strong>groupe</strong> et une liste d''<strong>attributs</strong> (étiquettes servant à qualifier les événements).
-                                    Le <strong>Gestionnaire d''attributs</strong> en bas de page permet de créer, coloriser et décrire chaque attribut.
+                                    Chaque type peut se voir attribuer un <strong>groupe</strong> et une liste d''
+                                    <strong>attributs</strong> 
+                                    (étiquettes servant à qualifier les événements). Le 
+                                    <strong>Gestionnaire d''attributs</strong>
+                                    en bas de page permet de créer, coloriser et décrire chaque attribut.
                                 </p>
                             </div>
                         </div>
                         <div class="d-flex align-items-start mb-3">
                             <div class="me-3" style="font-size:1.75rem; line-height:1;">📋</div>
                             <div>
-                                <strong>Besoins<span class="badge bg-warning text-dark ms-1" style="font-size:.65rem;">EventDesigner</span></strong>
+                                <strong>
+                                    Besoins
+                                    <span class="badge bg-warning text-dark ms-1" style="font-size:.65rem;">EventDesigner</span>
+                                </strong>
                                 <p class="text-muted small">
-                                    Définissez les ressources qu''un événement peut nécessiter : boissons, nourriture, matériel, intervenants, participants…
-                                    Les besoins sont organisés par <strong>type</strong> (panneau gauche) et peuvent être proportionnels au nombre de participants.
+                                    Définissez les ressources qu''un événement peut nécessiter : 
+                                    boissons, nourriture, matériel, intervenants, participants…
+                                    Les besoins sont organisés par 
+                                    <strong>type</strong> (panneau gauche) et peuvent être proportionnels au nombre de participants.
                                     Chaque besoin dispose d''un label (emoji), d''un nom et d''un type.
                                 </p>
                             </div>
@@ -477,7 +586,10 @@ INSERT OR REPLACE INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
                         <div class="d-flex align-items-start mb-3">
                             <div class="me-3" style="font-size:1.75rem; line-height:1;">🏋️</div>
                             <div>
-                                <strong>Exercices<span class="badge bg-warning text-dark ms-1" style="font-size:.65rem;">ExerciseDesigner</span></strong>
+                                <strong>
+                                    Exercices
+                                    <span class="badge bg-warning text-dark ms-1" style="font-size:.65rem;">ExerciseDesigner</span>
+                                </strong>
                                 <p class="text-muted small">
                                     Constituez la bibliothèque d''exercices utilisée lors de la composition des séances d''entraînement.
                                 </p>
@@ -486,10 +598,14 @@ INSERT OR REPLACE INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
                         <div class="d-flex align-items-start">
                             <div class="me-3" style="font-size:1.75rem; line-height:1;">🔁</div>
                             <div>
-                                <strong>Catalogue du matériel (Prêts)<span class="badge bg-warning text-dark ms-1" style="font-size:.65rem;">LoanDesigner</span></strong>
+                                <strong>
+                                    Catalogue du matériel (Prêts)
+                                    <span class="badge bg-warning text-dark ms-1" style="font-size:.65rem;">LoanDesigner</span>
+                                </strong>
                                 <p class="text-muted small">
                                     Déclarez le matériel disponible au prêt : nom, description, type, quantité totale et statut actif.
-                                    Les membres peuvent ensuite consulter le catalogue, effectuer des réservations et visualiser le calendrier de disponibilité.
+                                    Les membres peuvent ensuite consulter le catalogue, 
+                                    effectuer des réservations et visualiser le calendrier de disponibilité.
                                 </p>
                             </div>
                         </div>
@@ -498,7 +614,9 @@ INSERT OR REPLACE INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
                         <div class="d-flex align-items-start mb-3">
                             <div class="me-3" style="font-size:1.75rem; line-height:1;">🔧</div>
                             <div>
-                                <strong>Paramètres<span class="badge bg-warning text-dark ms-1" style="font-size:.65rem;">HomeDesigner</span></strong>
+                                <strong>
+                                    Paramètres<span class="badge bg-warning text-dark ms-1" style="font-size:.65rem;">HomeDesigner</span>
+                                </strong>
                                 <p class="text-muted small">
                                     Paramètres généraux de l''application : nom du site, coordonnées, langue par défaut, etc.
                                 </p>
@@ -507,17 +625,25 @@ INSERT OR REPLACE INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
                         <div class="d-flex align-items-start mb-3">
                             <div class="me-3" style="font-size:1.75rem; line-height:1;">🧠</div>
                             <div>
-                                <strong>Design de la page d''accueil<span class="badge bg-warning text-dark ms-1" style="font-size:.65rem;">HomeDesigner</span></strong>
+                                <strong>
+                                    Design de la page d''accueil
+                                    <span class="badge bg-warning text-dark ms-1" style="font-size:.65rem;">HomeDesigner</span>
+                                </strong>
                                 <p class="text-muted small">
-                                    Personnalisez la mise en page de la page d''accueil : en-tête, article principal, derniers articles, pied de page, accordéon.
-                                    Cliquez sur une section dans l''aperçu pour ouvrir son éditeur. Vous pouvez forcer une langue spécifique via le sélecteur dans la barre supérieure.
+                                    Personnalisez la mise en page de la page d''accueil : en-tête, article principal, 
+                                    derniers articles, pied de page, accordéon.
+                                    Cliquez sur une section dans l''aperçu pour ouvrir son éditeur. 
+                                    Vous pouvez forcer une langue spécifique via le sélecteur dans la barre supérieure.
                                 </p>
                             </div>
                         </div>
                         <div class="d-flex align-items-start mb-3">
                             <div class="me-3" style="font-size:1.75rem; line-height:1;">🟨</div>
                             <div>
-                                <strong>Kanban<span class="badge bg-warning text-dark ms-1" style="font-size:.65rem;">KanbanDesigner</span></strong>
+                                <strong>
+                                    Kanban
+                                    <span class="badge bg-warning text-dark ms-1" style="font-size:.65rem;">KanbanDesigner</span>
+                                </strong>
                                 <p class="text-muted small">
                                     Configurez les colonnes et les étapes du tableau Kanban.
                                 </p>
@@ -526,10 +652,17 @@ INSERT OR REPLACE INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
                         <div class="d-flex align-items-start mb-3">
                             <div class="me-3" style="font-size:1.75rem; line-height:1;">📑</div>
                             <div>
-                                <strong>Éléments de menu<span class="badge bg-warning text-dark ms-1" style="font-size:.65rem;">MenuDesigner</span></strong>
+                                <strong>
+                                    Éléments de menu
+                                    <span class="badge bg-warning text-dark ms-1" style="font-size:.65rem;">MenuDesigner</span>
+                                </strong>
                                 <p class="text-muted small">
                                     Gérez les liens de la barre de navigation et de la sidebar.
-                                    Chaque élément possède un nom, une URL, une restriction de groupe optionnelle et trois indicateurs de visibilité : <strong>Membres</strong>, <strong>Contacts</strong>, <strong>Anonymes</strong>.
+                                    Chaque élément possède un nom, une URL, 
+                                    une restriction de groupe optionnelle et trois indicateurs de visibilité : 
+                                    <strong>Membres</strong>, 
+                                    <strong>Contacts</strong>, 
+                                    <strong>Anonymes</strong>.
                                     L''aperçu en haut de page permet de vérifier le rendu pour chaque audience.
                                 </p>
                             </div>
@@ -537,11 +670,18 @@ INSERT OR REPLACE INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
                         <div class="d-flex align-items-start">
                             <div class="me-3" style="font-size:1.75rem; line-height:1;">🌍</div>
                             <div>
-                                <strong>Gestionnaire de traductions<span class="badge bg-warning text-dark ms-1" style="font-size:.65rem;">Translator</span></strong>
+                                <strong>
+                                    Gestionnaire de traductions
+                                    <span class="badge bg-warning text-dark ms-1" style="font-size:.65rem;">Translator</span>
+                                </strong>
                                 <p class="text-muted small">
                                     Consultez et modifiez toutes les traductions de l''application côte à côte (fr_FR / pl_PL).
-                                    Utilisez le filtre <strong>Manquantes uniquement</strong> pour repérer rapidement les clés non traduites.
-                                    Chaque entrée propose un onglet <strong>Éditer</strong> (HTML brut) et un onglet <strong>Aperçu</strong>.
+                                    Utilisez le filtre 
+                                    <strong>Manquantes uniquement</strong>
+                                    pour repérer rapidement les clés non traduites.
+                                    Chaque entrée propose un onglet 
+                                    <strong>Éditer</strong> (HTML brut) et un onglet 
+                                    <strong>Aperçu</strong>.
                                 </p>
                             </div>
                         </div>
@@ -559,15 +699,25 @@ INSERT OR REPLACE INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
         <div class="list-group">
             <div class="list-group-item d-flex align-items-center">
                 <i class="bi bi-arrow-left-circle fs-3 me-3"></i>
-                <span>Les <strong>flèches de navigation</strong> (haut / retour) permettent de revenir à l''espace design ou à la page précédente.</span>
+                <span>
+                    Les 
+                    <strong>flèches de navigation</strong> 
+                    (haut / retour) permettent de revenir à l''espace design ou à la page précédente.
+                </span>
             </div>
             <div class="list-group-item d-flex align-items-center">
                 <i class="bi bi-eye fs-3 me-3"></i>
-                <span>De nombreuses pages disposent d''un <strong>aperçu en direct</strong> — utilisez-le pour vérifier le résultat avant d''enregistrer.</span>
+                <span>
+                    De nombreuses pages disposent d''un <strong>aperçu en direct</strong> — 
+                    utilisez-le pour vérifier le résultat avant d''enregistrer.
+                </span>
             </div>
             <div class="list-group-item d-flex align-items-center">
                 <i class="bi bi-plus-circle fs-3 me-3"></i>
-                <span>Le bouton <strong>+</strong> permet de créer un nouvel élément (type d''événement, attribut, besoin, élément de menu, matériel…).</span>
+                <span>
+                    Le bouton 
+                    <strong>+</strong> permet de créer un nouvel élément (type d''événement, attribut, besoin, élément de menu, matériel…).
+                </span>
             </div>
             <div class="list-group-item d-flex align-items-center bg-light">
                 <i class="bi bi-question-circle-fill fs-3 text-warning me-3"></i>
@@ -590,21 +740,31 @@ INSERT OR REPLACE INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
                         <div class="d-flex align-items-start mb-3">
                             <div class="me-3" style="font-size:1.75rem; line-height:1;">🗓️</div>
                             <div>
-                                <strong>Typy wydarzeń<span class="badge bg-warning text-dark ms-1" style="font-size:.65rem;">EventDesigner</span></strong>
+                                <strong>
+                                    Typy wydarzeń
+                                    <span class="badge bg-warning text-dark ms-1" style="font-size:.65rem;">EventDesigner</span>
+                                </strong>
                                 <p class="text-muted small">
                                     Zarządzaj typami wydarzeń, które można tworzyć (Zawody, Trening, Spotkanie…).
-                                    Każdy typ może mieć przypisaną <strong>grupę</strong> oraz listę <strong>atrybutów</strong> (etykiety służące do kwalifikowania wydarzeń).
-                                    <strong>Menedżer atrybutów</strong> na dole strony pozwala tworzyć, kolorować i opisywać każdy atrybut.
+                                    Każdy typ może mieć przypisaną 
+                                    <strong>grupę</strong> oraz listę 
+                                    <strong>atrybutów</strong> (etykiety służące do kwalifikowania wydarzeń).
+                                    <strong>Menedżer atrybutów</strong> 
+                                    na dole strony pozwala tworzyć, kolorować i opisywać każdy atrybut.
                                 </p>
                             </div>
                         </div>
                         <div class="d-flex align-items-start mb-3">
                             <div class="me-3" style="font-size:1.75rem; line-height:1;">📋</div>
                             <div>
-                                <strong>Potrzeby<span class="badge bg-warning text-dark ms-1" style="font-size:.65rem;">EventDesigner</span></strong>
+                                <strong>
+                                    Potrzeby
+                                    <span class="badge bg-warning text-dark ms-1" style="font-size:.65rem;">EventDesigner</span>
+                                </strong>
                                 <p class="text-muted small">
                                     Definiuj zasoby, których wydarzenie może wymagać: napoje, jedzenie, sprzęt, prelegenci, uczestnicy…
-                                    Potrzeby są pogrupowane według <strong>typu</strong> (lewy panel) i mogą być skalowane względem liczby uczestników.
+                                    Potrzeby są pogrupowane według 
+                                    <strong>typu</strong> (lewy panel) i mogą być skalowane względem liczby uczestników.
                                     Każda potrzeba ma etykietę (emoji), nazwę i typ.
                                 </p>
                             </div>
@@ -612,7 +772,10 @@ INSERT OR REPLACE INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
                         <div class="d-flex align-items-start mb-3">
                             <div class="me-3" style="font-size:1.75rem; line-height:1;">🏋️</div>
                             <div>
-                                <strong>Ćwiczenia<span class="badge bg-warning text-dark ms-1" style="font-size:.65rem;">ExerciseDesigner</span></strong>
+                                <strong>
+                                    Ćwiczenia
+                                    <span class="badge bg-warning text-dark ms-1" style="font-size:.65rem;">ExerciseDesigner</span>
+                                </strong>
                                 <p class="text-muted small">
                                     Twórz bibliotekę ćwiczeń wykorzystywaną przy układaniu planów treningowych.
                                 </p>
@@ -621,7 +784,10 @@ INSERT OR REPLACE INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
                         <div class="d-flex align-items-start">
                             <div class="me-3" style="font-size:1.75rem; line-height:1;">🔁</div>
                             <div>
-                                <strong>Katalog sprzętu (Wypożyczenia)<span class="badge bg-warning text-dark ms-1" style="font-size:.65rem;">LoanDesigner</span></strong>
+                                <strong>
+                                    Katalog sprzętu (Wypożyczenia)
+                                    <span class="badge bg-warning text-dark ms-1" style="font-size:.65rem;">LoanDesigner</span>
+                                </strong>
                                 <p class="text-muted small">
                                     Zadeklaruj sprzęt dostępny do wypożyczenia: nazwa, opis, typ, łączna ilość i status aktywności.
                                     Członkowie mogą następnie przeglądać katalog, składać rezerwacje i sprawdzać kalendarz dostępności.
@@ -633,7 +799,10 @@ INSERT OR REPLACE INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
                         <div class="d-flex align-items-start mb-3">
                             <div class="me-3" style="font-size:1.75rem; line-height:1;">🔧</div>
                             <div>
-                                <strong>Ustawienia<span class="badge bg-warning text-dark ms-1" style="font-size:.65rem;">HomeDesigner</span></strong>
+                                <strong>
+                                    Ustawienia
+                                    <span class="badge bg-warning text-dark ms-1" style="font-size:.65rem;">HomeDesigner</span>
+                                </strong>
                                 <p class="text-muted small">
                                     Ogólne ustawienia aplikacji: nazwa strony, dane kontaktowe, domyślny język itp.
                                 </p>
@@ -642,17 +811,24 @@ INSERT OR REPLACE INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
                         <div class="d-flex align-items-start mb-3">
                             <div class="me-3" style="font-size:1.75rem; line-height:1;">🧠</div>
                             <div>
-                                <strong>Projekt strony głównej<span class="badge bg-warning text-dark ms-1" style="font-size:.65rem;">HomeDesigner</span></strong>
+                                <strong>
+                                    Projekt strony głównej
+                                    <span class="badge bg-warning text-dark ms-1" style="font-size:.65rem;">HomeDesigner</span>
+                                </strong>
                                 <p class="text-muted small">
                                     Dostosuj układ strony głównej: nagłówek, główny artykuł, najnowsze artykuły, stopka, akordeon.
-                                    Kliknij sekcję w podglądzie, aby otworzyć jej edytor. Możesz wymusić konkretny język za pomocą selektora na górnym pasku.
+                                    Kliknij sekcję w podglądzie, aby otworzyć jej edytor. 
+                                    Możesz wymusić konkretny język za pomocą selektora na górnym pasku.
                                 </p>
                             </div>
                         </div>
                         <div class="d-flex align-items-start mb-3">
                             <div class="me-3" style="font-size:1.75rem; line-height:1;">🟨</div>
                             <div>
-                                <strong>Kanban<span class="badge bg-warning text-dark ms-1" style="font-size:.65rem;">KanbanDesigner</span></strong>
+                                <strong>
+                                    Kanban
+                                    <span class="badge bg-warning text-dark ms-1" style="font-size:.65rem;">KanbanDesigner</span>
+                                </strong>
                                 <p class="text-muted small">
                                     Konfiguruj kolumny i etapy tablicy Kanban.
                                 </p>
@@ -661,10 +837,16 @@ INSERT OR REPLACE INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
                         <div class="d-flex align-items-start mb-3">
                             <div class="me-3" style="font-size:1.75rem; line-height:1;">📑</div>
                             <div>
-                                <strong>Elementy menu<span class="badge bg-warning text-dark ms-1" style="font-size:.65rem;">MenuDesigner</span></strong>
+                                <strong>
+                                    Elementy menu
+                                    <span class="badge bg-warning text-dark ms-1" style="font-size:.65rem;">MenuDesigner</span>
+                                </strong>
                                 <p class="text-muted small">
                                     Zarządzaj linkami paska nawigacji i paska bocznego.
-                                    Każdy element ma nazwę, URL, opcjonalne ograniczenie grupy oraz trzy wskaźniki widoczności: <strong>Członkowie</strong>, <strong>Kontakty</strong>, <strong>Anonimowi</strong>.
+                                    Każdy element ma nazwę, URL, opcjonalne ograniczenie grupy oraz trzy wskaźniki widoczności: 
+                                    <strong>Członkowie</strong>, 
+                                    <strong>Kontakty</strong>, 
+                                    <strong>Anonimowi</strong>.
                                     Podgląd na górze strony pozwala sprawdzić wynik dla każdej grupy odbiorców.
                                 </p>
                             </div>
@@ -672,7 +854,9 @@ INSERT OR REPLACE INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
                         <div class="d-flex align-items-start">
                             <div class="me-3" style="font-size:1.75rem; line-height:1;">🌍</div>
                             <div>
-                                <strong>Menedżer tłumaczeń<span class="badge bg-warning text-dark ms-1" style="font-size:.65rem;">Translator</span></strong>
+                                <strong>Menedżer tłumaczeń
+                                    <span class="badge bg-warning text-dark ms-1" style="font-size:.65rem;">Translator</span>
+                                </strong>
                                 <p class="text-muted small">
                                     Przeglądaj i edytuj wszystkie tłumaczenia aplikacji obok siebie (fr_FR / pl_PL).
                                     Użyj filtra <strong>Tylko brakujące</strong>, aby szybko znaleźć nieprzetłumaczone klucze.
@@ -694,19 +878,30 @@ INSERT OR REPLACE INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
         <div class="list-group">
             <div class="list-group-item d-flex align-items-center">
                 <i class="bi bi-arrow-left-circle fs-3 me-3"></i>
-                <span><strong>Strzałki nawigacji</strong> (góra / wstecz) umożliwiają powrót do przestrzeni projektowania lub poprzedniej strony.</span>
+                <span>
+                    <strong>Strzałki nawigacji</strong> 
+                    (góra / wstecz) umożliwiają powrót do przestrzeni projektowania lub poprzedniej strony.
+                </span>
             </div>
             <div class="list-group-item d-flex align-items-center">
                 <i class="bi bi-eye fs-3 me-3"></i>
-                <span>Wiele stron posiada <strong>podgląd na żywo</strong> — używaj go, aby sprawdzić wynik przed zapisaniem.</span>
+                <span>
+                    Wiele stron posiada <strong>podgląd na żywo</strong> — używaj go, aby sprawdzić wynik przed zapisaniem.
+                </span>
             </div>
             <div class="list-group-item d-flex align-items-center">
                 <i class="bi bi-plus-circle fs-3 me-3"></i>
-                <span>Przycisk <strong>+</strong> tworzy nowy element (typ wydarzenia, atrybut, potrzeba, element menu, sprzęt…).</span>
+                <span>
+                    Przycisk 
+                    <strong>+</strong> tworzy nowy element (typ wydarzenia, atrybut, potrzeba, element menu, sprzęt…).
+                </span>
             </div>
             <div class="list-group-item d-flex align-items-center bg-light">
                 <i class="bi bi-question-circle-fill fs-3 text-warning me-3"></i>
-                <span><strong>Pomoc:</strong> Tutaj znajdziesz wszystkie informacje potrzebne do korzystania z przestrzeni projektowania.</span>
+                <span>
+                    <strong>Pomoc:</strong> 
+                    Tutaj znajdziesz wszystkie informacje potrzebne do korzystania z przestrzeni projektowania.
+                </span>
             </div>
         </div>
     </section>
@@ -731,7 +926,8 @@ INSERT OR REPLACE INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
                                 <p class="text-muted small">
                                     View all events over a rolling 3-week window, laid out day by day.
                                     Each event shows its start time, duration, summary and a coloured attribute badge.
-                                    A legend at the bottom explains each attribute colour and the visibility rules (members-only, group-restricted, etc.).
+                                    A legend at the bottom explains each attribute colour and the visibility rules 
+                                    (members-only, group-restricted, etc.).
                                 </p>
                             </div>
                         </div>
@@ -740,7 +936,8 @@ INSERT OR REPLACE INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
                             <div>
                                 <strong>Upcoming events</strong>
                                 <p class="text-muted small">
-                                    List of events grouped by week, with type, date, duration, attribute, summary, location, participant count, message count and audience.
+                                    List of events grouped by week, with type, date, duration, attribute, summary, location, 
+                                    participant count, message count and audience.
                                     Click a row to view the detail, register or unregister.
                                     Use the <strong>+</strong> button to create a new event.
                                     A checkbox lets you filter to events matching your personal preferences only.
@@ -752,7 +949,8 @@ INSERT OR REPLACE INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
                             <div>
                                 <strong>Send an invitation</strong>
                                 <p class="text-muted small">
-                                    Invite an external participant to a specific event by entering their e-mail address, an optional name and the target event.
+                                    Invite an external participant to a specific event by entering their e-mail address, 
+                                    an optional name and the target event.
                                     The guest receives a personalised invitation link.
                                 </p>
                             </div>
@@ -764,8 +962,14 @@ INSERT OR REPLACE INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
                             <div>
                                 <strong>Get emails</strong>
                                 <p class="text-muted small">
-                                    Extract e-mail addresses of members filtered by <strong>group</strong>, <strong>event type</strong>, <strong>day of the week</strong> and <strong>time of day</strong>.
-                                    Click <strong>Get emails</strong> to generate the list — useful for targeted communications or bulk invitations.
+                                    Extract e-mail addresses of members filtered by 
+                                    <strong>group</strong>, 
+                                    <strong>event type</strong>, 
+                                    <strong>day of the week</strong> and 
+                                    <strong>time of day</strong>.
+                                    Click 
+                                    <strong>Get emails</strong>
+                                    to generate the list — useful for targeted communications or bulk invitations.
                                 </p>
                             </div>
                         </div>
@@ -774,7 +978,9 @@ INSERT OR REPLACE INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
                             <div>
                                 <strong>Pivot table — Leaders vs event types</strong>
                                 <p class="text-muted small">
-                                    Crosses <strong>event leaders</strong> (columns) and <strong>event types</strong> (rows) for a selectable period (week / month / quarter / year).
+                                    Crosses 
+                                    <strong>event leaders</strong> (columns) and 
+                                    <strong>event types</strong> (rows) for a selectable period (week / month / quarter / year).
                                     Each cell shows the number of events and the total participants.
                                     Row and column totals are calculated automatically.
                                 </p>
@@ -798,7 +1004,10 @@ INSERT OR REPLACE INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
             </div>
             <div class="list-group-item d-flex align-items-center">
                 <i class="bi bi-square-fill fs-3 me-3" style="color:#6c757d;"></i>
-                <span><strong>Coloured badges</strong> on events indicate their attribute (level, type of outing…). Hover over them to read the detail.</span>
+                <span>
+                    <strong>Coloured badges</strong> 
+                    on events indicate their attribute (level, type of outing…). Hover over them to read the detail.
+                </span>
             </div>
             <div class="list-group-item d-flex align-items-center">
                 <i class="bi bi-plus-circle fs-3 me-3"></i>
@@ -829,28 +1038,31 @@ INSERT OR REPLACE INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
                                 <p class="text-muted small">
                                     Visualisez tous les événements sur une fenêtre glissante de 3 semaines, disposés jour par jour.
                                     Chaque événement affiche son heure de début, sa durée, son sommaire et un badge coloré d''attribut.
-                                    Une légende en bas de page explique chaque couleur d''attribut et les règles de visibilité (membres uniquement, groupe restreint, etc.).
+                                    Une légende en bas de page explique chaque couleur d''attribut et les règles de visibilité 
+                                    (membres uniquement, groupe restreint, etc.).
                                 </p>
                             </div>
                         </div>
                         <div class="d-flex align-items-start mb-3">
-                            <div class="me-3" style="font-size:1.75rem; line-height:1;">📆</div>
-                            <div>
-                                <strong>Prochains événements</strong>
-                                <p class="text-muted small">
-                                    Liste des événements regroupés par semaine, avec type, date, durée, attribut, sommaire, lieu, nombre de participants, nombre de messages et audience.
-                                    Cliquez sur une ligne pour voir le détail, s''inscrire ou se désinscrire.
-                                    Utilisez le bouton <strong>+</strong> pour créer un nouvel événement.
-                                    Une case à cocher permet de filtrer uniquement les événements correspondant à vos préférences personnelles.
-                                </p>
-                            </div>
+                          <div class="me-3" style="font-size:1.75rem; line-height:1;">📆</div>
+                          <div>
+                              <strong>Prochains événements</strong>
+                              <p class="text-muted small">
+                              Liste des événements regroupés par semaine, avec type, date, durée, attribut, sommaire, 
+                              lieu, nombre de participants, nombre de messages et audience.
+                              Cliquez sur une ligne pour voir le détail, s''inscrire ou se désinscrire.
+                              Utilisez le bouton <strong>+</strong> pour créer un nouvel événement.
+                              Une case à cocher permet de filtrer uniquement les événements correspondant à vos préférences personnelles.
+                              </p>
+                          </div>
                         </div>
                         <div class="d-flex align-items-start">
                             <div class="me-3" style="font-size:1.75rem; line-height:1;">✉️</div>
                             <div>
                                 <strong>Envoyer une invitation</strong>
                                 <p class="text-muted small">
-                                    Invitez un participant externe à un événement spécifique en saisissant son adresse e-mail, un nom optionnel et l''événement cible.
+                                    Invitez un participant externe à un événement spécifique en saisissant son adresse e-mail, 
+                                    un nom optionnel et l''événement cible.
                                     L''invité reçoit un lien d''invitation personnalisé.
                                 </p>
                             </div>
@@ -862,8 +1074,14 @@ INSERT OR REPLACE INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
                             <div>
                                 <strong>Get emails</strong>
                                 <p class="text-muted small">
-                                    Extrayez les adresses e-mail des membres filtrés par <strong>groupe</strong>, <strong>type d''événement</strong>, <strong>jour de la semaine</strong> et <strong>moment de la journée</strong>.
-                                    Cliquez sur <strong>Obtenir les emails</strong> pour générer la liste — utile pour des communications ciblées ou des invitations groupées.
+                                    Extrayez les adresses e-mail des membres filtrés par 
+                                    <strong>groupe</strong>, 
+                                    <strong>type d''événement</strong>, 
+                                    <strong>jour de la semaine</strong> et 
+                                    <strong>moment de la journée</strong>.
+                                    Cliquez sur 
+                                    <strong>Obtenir les emails</strong> 
+                                    pour générer la liste — utile pour des communications ciblées ou des invitations groupées.
                                 </p>
                             </div>
                         </div>
@@ -872,7 +1090,11 @@ INSERT OR REPLACE INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
                             <div>
                                 <strong>Tableau croisé dynamique — Animateurs vs types d''événement</strong>
                                 <p class="text-muted small">
-                                    Croise les <strong>animateurs</strong> (colonnes) et les <strong>types d''événements</strong> (lignes) sur une période sélectionnable (semaine / mois / trimestre / année).
+                                    Croise les 
+                                    <strong>animateurs</strong> 
+                                    (colonnes) et les 
+                                    <strong>types d''événements</strong> 
+                                    (lignes) sur une période sélectionnable (semaine / mois / trimestre / année).
                                     Chaque cellule affiche le nombre d''événements et le total de participants.
                                     Les totaux par ligne et par colonne sont calculés automatiquement.
                                 </p>
@@ -896,7 +1118,11 @@ INSERT OR REPLACE INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
             </div>
             <div class="list-group-item d-flex align-items-center">
                 <i class="bi bi-square-fill fs-3 me-3" style="color:#6c757d;"></i>
-                <span>Les <strong>badges colorés</strong> sur les événements indiquent leur attribut (niveau, type de sortie…). Survolez-les pour lire le détail.</span>
+                <span>
+                    Les 
+                    <strong>badges colorés</strong> 
+                    sur les événements indiquent leur attribut (niveau, type de sortie…). Survolez-les pour lire le détail.
+                </span>
             </div>
             <div class="list-group-item d-flex align-items-center">
                 <i class="bi bi-plus-circle fs-3 me-3"></i>
@@ -904,7 +1130,10 @@ INSERT OR REPLACE INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
             </div>
             <div class="list-group-item d-flex align-items-center bg-light">
                 <i class="bi bi-question-circle-fill fs-3 text-warning me-3"></i>
-                <span><strong>Aide :</strong> Ici vous trouverez toutes les informations nécessaires pour utiliser l''espace gestion des événements.</span>
+                <span>
+                    <strong>Aide :</strong> 
+                    Ici vous trouverez toutes les informations nécessaires pour utiliser l''espace gestion des événements.
+                </span>
             </div>
         </div>
     </section>
@@ -927,7 +1156,8 @@ INSERT OR REPLACE INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
                                 <p class="text-muted small">
                                     Przeglądaj wszystkie wydarzenia w ruchomym oknie 3 tygodni, ułożone dzień po dniu.
                                     Każde wydarzenie pokazuje godzinę rozpoczęcia, czas trwania, podsumowanie i kolorową odznakę atrybutu.
-                                    Legenda na dole strony wyjaśnia każdy kolor atrybutu oraz zasady widoczności (tylko dla członków, ograniczone do grupy itp.).
+                                    Legenda na dole strony wyjaśnia każdy kolor atrybutu oraz zasady widoczności 
+                                    (tylko dla członków, ograniczone do grupy itp.).
                                 </p>
                             </div>
                         </div>
@@ -936,7 +1166,8 @@ INSERT OR REPLACE INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
                             <div>
                                 <strong>Nadchodzące wydarzenia</strong>
                                 <p class="text-muted small">
-                                    Lista wydarzeń pogrupowanych według tygodnia, z typem, datą, czasem trwania, atrybutem, podsumowaniem, miejscem, liczbą uczestników, liczbą wiadomości i odbiorcami.
+                                    Lista wydarzeń pogrupowanych według tygodnia, z typem, datą, czasem trwania, atrybutem, 
+                                    podsumowaniem, miejscem, liczbą uczestników, liczbą wiadomości i odbiorcami.
                                     Kliknij wiersz, aby zobaczyć szczegóły, zapisać się lub wypisać.
                                     Użyj przycisku <strong>+</strong>, aby utworzyć nowe wydarzenie.
                                     Pole wyboru pozwala filtrować tylko wydarzenia odpowiadające Twoim preferencjom.
@@ -948,7 +1179,8 @@ INSERT OR REPLACE INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
                             <div>
                                 <strong>Wyślij zaproszenie</strong>
                                 <p class="text-muted small">
-                                    Zaproś zewnętrznego uczestnika na konkretne wydarzenie, podając jego adres e-mail, opcjonalną nazwę i docelowe wydarzenie.
+                                    Zaproś zewnętrznego uczestnika na konkretne wydarzenie, podając jego adres e-mail, 
+                                    opcjonalną nazwę i docelowe wydarzenie.
                                     Gość otrzymuje spersonalizowany link z zaproszeniem.
                                 </p>
                             </div>
@@ -960,8 +1192,11 @@ INSERT OR REPLACE INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
                             <div>
                                 <strong>Pobierz e-maile</strong>
                                 <p class="text-muted small">
-                                    Wyodrębnij adresy e-mail członków filtrowanych według <strong>grupy</strong>, <strong>typu wydarzenia</strong>, <strong>dnia tygodnia</strong> i <strong>pory dnia</strong>.
-                                    Kliknij <strong>Uzyskaj e-maile</strong>, aby wygenerować listę — przydatne do ukierunkowanej komunikacji lub zbiorowych zaproszeń.
+                                    Wyodrębnij adresy e-mail członków filtrowanych według <strong>grupy</strong>, 
+                                    <strong>typu wydarzenia</strong>, <strong>dnia tygodnia</strong> i <strong>pory dnia</strong>.
+                                    Kliknij 
+                                    <strong>Uzyskaj e-maile</strong>
+                                    , aby wygenerować listę — przydatne do ukierunkowanej komunikacji lub zbiorowych zaproszeń.
                                 </p>
                             </div>
                         </div>
@@ -970,7 +1205,8 @@ INSERT OR REPLACE INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
                             <div>
                                 <strong>Tabela przestawna — Animatorzy vs typy wydarzeń</strong>
                                 <p class="text-muted small">
-                                    Krzyżuje <strong>animatorów</strong> (kolumny) i <strong>typy wydarzeń</strong> (wiersze) w wybranym okresie (tydzień / miesiąc / kwartał / rok).
+                                    Krzyżuje <strong>animatorów</strong> (kolumny) i 
+                                    <strong>typy wydarzeń</strong> (wiersze) w wybranym okresie (tydzień / miesiąc / kwartał / rok).
                                     Każda komórka pokazuje liczbę wydarzeń i łączną liczbę uczestników.
                                     Sumy wierszy i kolumn są obliczane automatycznie.
                                 </p>
@@ -994,7 +1230,10 @@ INSERT OR REPLACE INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
             </div>
             <div class="list-group-item d-flex align-items-center">
                 <i class="bi bi-square-fill fs-3 me-3" style="color:#6c757d;"></i>
-                <span><strong>Kolorowe odznaki</strong> na wydarzeniach wskazują ich atrybut (poziom, typ wyjścia…). Najedź na nie kursorem, aby zobaczyć szczegóły.</span>
+                <span>
+                    <strong>Kolorowe odznaki</strong> 
+                    na wydarzeniach wskazują ich atrybut (poziom, typ wyjścia…). Najedź na nie kursorem, aby zobaczyć szczegóły.
+                </span>
             </div>
             <div class="list-group-item d-flex align-items-center">
                 <i class="bi bi-plus-circle fs-3 me-3"></i>
@@ -1002,7 +1241,10 @@ INSERT OR REPLACE INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
             </div>
             <div class="list-group-item d-flex align-items-center bg-light">
                 <i class="bi bi-question-circle-fill fs-3 text-warning me-3"></i>
-                <span><strong>Pomoc:</strong> Tutaj znajdziesz wszystkie informacje potrzebne do korzystania z przestrzeni zarządzania wydarzeniami.</span>
+                <span>
+                    <strong>Pomoc:</strong> 
+                    Tutaj znajdziesz wszystkie informacje potrzebne do korzystania z przestrzeni zarządzania wydarzeniami.
+                </span>
             </div>
         </div>
     </section>

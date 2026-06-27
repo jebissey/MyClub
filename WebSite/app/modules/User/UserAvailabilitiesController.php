@@ -47,7 +47,11 @@ class UserAvailabilitiesController extends AbstractController
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
-        $availabilities = WebApp::getFiltered('availabilities', FilterInputRule::CheckboxMatrix->value, $this->flight->request()->data->getData()) ?? '';
+        $availabilities = WebApp::getFiltered(
+            'availabilities',
+            FilterInputRule::CheckboxMatrix->value,
+            $this->flight->request()->data->getData()
+        ) ?? '';
         if ($availabilities != '') {
             $this->dataHelper->set('Person', ['Availabilities' => json_encode($availabilities)], ['Id' => $person->Id]);
         }

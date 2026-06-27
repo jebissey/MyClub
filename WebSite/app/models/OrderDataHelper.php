@@ -117,7 +117,10 @@ class OrderDataHelper extends Data implements NewsProviderInterface
         foreach ($orders as $order) {
             if (
                 $authorizationDataHelper->getArticle($order->IdArticle, $connectedUser)
-                && $authorizationDataHelper->canPersonReadOrderResults($this->articleDataHelper->getWithAuthor($order->IdArticle), $connectedUser)
+                && $authorizationDataHelper->canPersonReadOrderResults(
+                    $this->articleDataHelper->getWithAuthor($order->IdArticle),
+                    $connectedUser
+                )
             ) {
                 $news[] = [
                     'type'   => 'order',

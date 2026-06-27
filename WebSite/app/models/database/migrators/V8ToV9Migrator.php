@@ -40,7 +40,10 @@ SET
                                 <p class="text-muted small">
                                     Identification par e-mail.
                                     <span class="d-block mt-1 text-dark">
-                                        👉 <em>Première connexion ? Utilisez "Créer/modifier mon mot de passe" pour initialiser votre compte.</em>
+                                        👉 
+                                        <em>
+                                          Première connexion ? Utilisez "Créer/modifier mon mot de passe" pour initialiser votre compte.
+                                        </em>
                                     </span>
                                 </p>
                             </div>

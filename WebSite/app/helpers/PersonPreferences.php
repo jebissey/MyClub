@@ -19,7 +19,14 @@ class PersonPreferences
         }
         $filteredEvents = [];
         foreach ($events as $event) {
-            if ($this->isPersonInterested($person, $event['idEventType'], (new DateTime($event['startTime']))->format('N') - 1, $this->getPeriodOfDay($event['startTime']))) {
+            if (
+                $this->isPersonInterested(
+                    $person,
+                    $event['idEventType'],
+                    (new DateTime($event['startTime']))->format('N') - 1,
+                    $this->getPeriodOfDay($event['startTime'])
+                )
+            ) {
                 $filteredEvents[] = $event;
             }
         }

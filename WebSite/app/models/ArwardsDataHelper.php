@@ -17,7 +17,14 @@ class ArwardsDataHelper extends Data
     public function getData($counterNames)
     {
         $query = $this->pdo->query('
-            SELECT p.Id, p.FirstName, p.LastName, p.NickName, c.Name as CounterName, SUM(c.Value) as CounterValue, (SELECT SUM(Value) FROM Counter WHERE IdPerson = p.Id) as Total
+            SELECT 
+                p.Id, 
+                p.FirstName, 
+                p.LastName, 
+                p.NickName, 
+                c.Name as CounterName, 
+                SUM(c.Value) as CounterValue, 
+                (SELECT SUM(Value) FROM Counter WHERE IdPerson = p.Id) as Total
             FROM Person p
             LEFT JOIN Counter c ON p.Id = c.IdPerson
             GROUP BY p.Id, p.FirstName, p.LastName, p.NickName, c.Name

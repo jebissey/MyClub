@@ -13,7 +13,10 @@ class V78ToV79Migrator implements DatabaseMigratorInterface
     {
         $pdo->exec(<<<SQL
 INSERT OR REPLACE INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
-('communication.index.contact_email_tooltip', 'Email address where contact requests will be sent', 'Adresse e-mail où les demandes de contact seront envoyées', 'Adres e-mail, na który będą wysyłane prośby o kontakt');
+('communication.index.contact_email_tooltip', 
+    'Email address where contact requests will be sent', 
+    'Adresse e-mail où les demandes de contact seront envoyées', 
+    'Adres e-mail, na który będą wysyłane prośby o kontakt');
 SQL);
 
         return 79;

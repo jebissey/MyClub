@@ -39,7 +39,10 @@ class ConnectedUser
         $person = $this->dataHelper->get('Person', ['Email' => $userEmail]);
         if (!$person) {
             $_SESSION['user'] = '';
-            $this->application->getErrorManager()->raise(ApplicationError::BadRequest, "Unknown user with this email address {$userEmail} in file " . __FILE__ . ' at line ' . __LINE__);
+            $this->application->getErrorManager()->raise(
+                ApplicationError::BadRequest,
+                "Unknown user with this email address {$userEmail} in file " . __FILE__ . ' at line ' . __LINE__
+            );
             return;
         }
         $this->person = $person;
@@ -82,7 +85,8 @@ class ConnectedUser
                 'navbarInkColor'  => $defaultColors['navbarInkColor'],
                 'navbarIconColor' => $defaultColors['navbarIconColor'],
             ],
-            $this->metadataDataHelper->isTestSite() && !empty($prodSiteUrl = $this->metadataDataHelper->getProdSiteUrl()) ? $prodSiteUrl : null,
+            $this->metadataDataHelper->isTestSite()
+                && !empty($prodSiteUrl = $this->metadataDataHelper->getProdSiteUrl()) ? $prodSiteUrl : null,
             $person->Alert
         );
         return;
@@ -114,7 +118,12 @@ class ConnectedUser
 
     public function isDesigner(): bool
     {
-        return $this->isEventDesigner() || $this->isExerciseDesigner() || $this->isHomeDesigner() || $this->isKanbanDesigner() || $this->isLoanDesigner() || $this->isMenuDesigner();
+        return $this->isEventDesigner()
+            || $this->isExerciseDesigner()
+            || $this->isHomeDesigner()
+            || $this->isKanbanDesigner()
+            || $this->isLoanDesigner()
+            || $this->isMenuDesigner();
     }
 
     public function isEditor(): bool

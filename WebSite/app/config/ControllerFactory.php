@@ -359,7 +359,7 @@ class ControllerFactory
         );
     }
 
-    public function MakePwaController(): PwaController
+    public function makePwaController(): PwaController
     {
         return new PwaController(
             $this->application,

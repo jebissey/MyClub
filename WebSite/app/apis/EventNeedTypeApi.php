@@ -38,7 +38,7 @@ class EventNeedTypeApi extends AbstractApi
             return;
         }
         try {
-            $apiResponse = $this->deleteNeedType_($id);
+            $apiResponse = $this->doDeleteNeedType($id);
             $this->renderJson([], $apiResponse->success, $apiResponse->responseCode);
         } catch (Throwable $e) {
             $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
@@ -62,7 +62,10 @@ class EventNeedTypeApi extends AbstractApi
             return;
         }
         try {
-            $this->renderJson(['Id' => $this->needTypeDataHelper->insertOrUpdate((int)$data['id'], $name)], true, ApplicationError::Ok->value);
+            $this->renderJson(['Id' => $this->needTypeDataHelper->insertOrUpdate(
+                (int)$data['id'],
+                $name
+            )], true, ApplicationError::Ok->value);
         } catch (Throwable $e) {
             $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
         }
@@ -79,12 +82,18 @@ class EventNeedTypeApi extends AbstractApi
     }
 
     #region Private functions
-    private function deleteNeedType_(int $id): ApiResponse
+    private function doDeleteNeedType(int $id): ApiResponse
     {
         $countNeeds = $this->needDataHelper->countForNeedType($id);
         if ($countNeeds > 0) {
-            return new ApiResponse(false, ApplicationError::BadRequest->value, [], 'Ce type de besoin est associé à ' . $countNeeds . ' besoin(s) et ne peut pas être supprimé');
+            return new ApiResponse(
+                false,
+                ApplicationError::BadRequest->value,
+                [],
+                'Ce type de besoin est associé à ' . $countNeeds . ' besoin(s) et ne peut pas être supprimé'
+            );
         }
-        return new ApiResponse(true, ApplicationError::Ok->value, ['result' => $this->needTypeDataHelper->delete_($id)]);
+        $result =  $this->dataHelper->delete('NeedType', ['Id' => $id]);
+        return new ApiResponse(true, ApplicationError::Ok->value, ['result' => $result]);
     }
 }

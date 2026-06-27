@@ -8,13 +8,13 @@ use app\exceptions\FileException;
 
 class File
 {
-    static function sanitizeFilename(string $filename): string
+    public static function sanitizeFilename(string $filename): string
     {
         $filename = preg_replace('/[^\w\-\.]/', '_', $filename);
         return $filename;
     }
 
-    static function copy(string $sourceFile, string $destinationDir): bool
+    public static function copy(string $sourceFile, string $destinationDir): bool
     {
         $destinationFile = $destinationDir . basename($sourceFile);
         if (!is_dir($destinationDir)) {

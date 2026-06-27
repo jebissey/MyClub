@@ -83,7 +83,11 @@ class DesignController extends AbstractController
             'OnlyForMembers' => $filterValues['onlyForMembers'] ?? 1,
             'IdGroup' => $filterValues['idGroup']
         ];
-        $this->dataHelper->set('Design', $values, ['Id' => $filterValues['id'] ?? throw new RuntimeException('Missing Id in file ' . __FILE__ . ' at line ' . __LINE__)]);
+        $this->dataHelper->set(
+            'Design',
+            $values,
+            ['Id' => $filterValues['id'] ?? throw new RuntimeException('Missing Id in file ' . __FILE__ . ' at line ' . __LINE__)]
+        );
 
         $this->redirect('/designs');
     }

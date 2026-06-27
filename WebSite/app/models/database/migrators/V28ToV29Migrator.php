@@ -28,8 +28,12 @@ VALUES
           <div class="col-md-6">
             <div class="d-flex align-items-start">
               <span class="fs-4 me-3">💡</span>
-              <div><strong>Ideas / Backlog</strong>
-              <p class="text-muted small">All ideas to explore. No commitment to implement.</p></div>
+              <div>
+                <strong>Ideas / Backlog</strong>
+                <p class="text-muted small">
+                  All ideas to explore. No commitment to implement.
+                </p>
+              </div>
             </div>
           </div>
           <div class="col-md-6">
@@ -49,8 +53,12 @@ VALUES
           <div class="col-md-6">
             <div class="d-flex align-items-start">
               <span class="fs-4 me-3">🏁</span>
-              <div><strong>Done</strong>
-              <p class="text-muted small">Completed tasks, but also <strong>rejected ideas</strong> archived here for reference.</p></div>
+              <div>
+                <strong>Done</strong>
+                <p class="text-muted small">
+                  Completed tasks, but also <strong>rejected ideas</strong> archived here for reference.
+                </p>
+              </div>
             </div>
           </div>
         </div>
@@ -64,14 +72,25 @@ VALUES
         <div class="row g-4">
           <div class="col-md-6">
             <div class="d-flex align-items-start mb-3">
-              <div class="bg-primary text-white rounded p-2 me-3"><i class="bi bi-tags-fill"></i></div>
-              <div><strong>Customisable types</strong>
-              <p class="text-muted small">Each project defines its own card types (e.g. 🚀 Feature, 🐛 Bug…). Unlimited types.</p></div>
+              <div class="bg-primary text-white rounded p-2 me-3">
+                <i class="bi bi-tags-fill"></i>
+              </div>
+              <div>
+                <strong>Customisable types</strong>
+                <p class="text-muted small">
+                  Each project defines its own card types (e.g. 🚀 Feature, 🐛 Bug…). Unlimited types.
+                </p>
+              </div>
             </div>
             <div class="d-flex align-items-start">
               <div class="bg-primary text-white rounded p-2 me-3"><i class="bi bi-palette-fill"></i></div>
-              <div><strong>Bootstrap colours</strong>
-              <p class="text-muted small">All standard Bootstrap colours are available. 👉 <em>Colour meaning is specific to each project.</em></p></div>
+              <div>
+                <strong>Bootstrap colours</strong>
+                <p class="text-muted small">
+                  All standard Bootstrap colours are available. 
+                  👉 <em>Colour meaning is specific to each project.</em>
+                </p>
+              </div>
             </div>
           </div>
           <div class="col-md-6">
@@ -82,8 +101,14 @@ VALUES
             </div>
             <div class="d-flex align-items-start">
               <div class="bg-primary text-white rounded p-2 me-3"><i class="bi bi-clock-history"></i></div>
-              <div><strong>Movement history</strong>
-              <p class="text-muted small">Every move is recorded with date and time (e.g. 💡 → ✅). You can add a <strong>note</strong> to each step. 👉 <em>Available via the 👁️ View button.</em></p></div>
+              <div>
+                <strong>Movement history</strong>
+                <p class="text-muted small">
+                  Every move is recorded with date and time (e.g. 💡 → ✅). 
+                  You can add a <strong>note</strong> to each step. 
+                  👉 <em>Available via the 👁️ View button.</em>
+                </p>
+              </div>
             </div>
           </div>
         </div>
@@ -109,7 +134,11 @@ VALUES
       </div>
       <div class="list-group-item d-flex align-items-center bg-light">
         <i class="bi bi-shield-lock-fill fs-3 text-primary me-3"></i>
-        <span><strong>Permissions:</strong> Only members with the <strong>KanbanDesigner</strong> authorisation can access the Kanban Board. Only the <strong>project creator</strong> can modify or configure it.</span>
+        <span>
+          <strong>Permissions:</strong> 
+          Only members with the <strong>KanbanDesigner</strong> authorisation can access the Kanban Board. 
+          Only the <strong>project creator</strong> can modify or configure it.
+        </span>
       </div>
     </div>
   </section>
@@ -142,15 +171,23 @@ VALUES
           <div class="col-md-6">
             <div class="d-flex align-items-start">
               <span class="fs-4 me-3">🔧</span>
-              <div><strong>En cours</strong>
-              <p class="text-muted small">Travaux actuellement en développement ou en traitement.</p></div>
+              <div>
+                <strong>En cours</strong>
+                <p class="text-muted small">
+                  Travaux actuellement en développement ou en traitement.
+                </p>
+              </div>
             </div>
           </div>
           <div class="col-md-6">
             <div class="d-flex align-items-start">
               <span class="fs-4 me-3">🏁</span>
-              <div><strong>Terminé</strong>
-              <p class="text-muted small">Tâches finalisées, mais aussi les <strong>idées non retenues</strong> que l''on archive ici pour mémoire.</p></div>
+              <div>
+                <strong>Terminé</strong>
+                <p class="text-muted small">
+                  Tâches finalisées, mais aussi les <strong>idées non retenues</strong> que l''on archive ici pour mémoire.
+                </p>
+              </div>
             </div>
           </div>
         </div>
@@ -165,25 +202,48 @@ VALUES
           <div class="col-md-6">
             <div class="d-flex align-items-start mb-3">
               <div class="bg-primary text-white rounded p-2 me-3"><i class="bi bi-tags-fill"></i></div>
-              <div><strong>Types personnalisables</strong>
-              <p class="text-muted small">Chaque projet définit ses propres types de carte (ex. 🚀 Fonctionnalité, 🐛 Bug…). Le nombre de types est illimité.</p></div>
+              <div>
+                <strong>Types personnalisables</strong>
+                <p class="text-muted small">
+                  Chaque projet définit ses propres types de carte (ex. 🚀 Fonctionnalité, 🐛 Bug…). 
+                  Le nombre de types est illimité.
+                </p>
+              </div>
             </div>
             <div class="d-flex align-items-start">
               <div class="bg-primary text-white rounded p-2 me-3"><i class="bi bi-palette-fill"></i></div>
-              <div><strong>Couleurs Bootstrap</strong>
-              <p class="text-muted small">Toutes les couleurs standard Bootstrap sont disponibles. 👉 <em>La signification d''une couleur est propre à chaque projet.</em></p></div>
+              <div>
+                <strong>Couleurs Bootstrap</strong>
+                <p class="text-muted small">
+                  Toutes les couleurs standard Bootstrap sont disponibles. 
+                  👉 <em>La signification d''une couleur est propre à chaque projet.</em>
+                </p>
+              </div>
             </div>
           </div>
           <div class="col-md-6">
             <div class="d-flex align-items-start mb-3">
-              <div class="bg-primary text-white rounded p-2 me-3"><i class="bi bi-hand-index-thumb-fill"></i></div>
-              <div><strong>Déplacer une carte</strong>
-              <p class="text-muted small">Faites glisser une carte par <strong>drag &amp; drop</strong> vers la colonne de destination. Elle s''y positionne immédiatement.</p></div>
+              <div class="bg-primary text-white rounded p-2 me-3">
+                <i class="bi bi-hand-index-thumb-fill"></i>
+              </div>
+              <div>
+                <strong>Déplacer une carte</strong>
+                <p class="text-muted small">
+                  Faites glisser une carte par <strong>drag &amp; drop</strong> vers la colonne de destination. 
+                  Elle s''y positionne immédiatement.
+                </p>
+              </div>
             </div>
             <div class="d-flex align-items-start">
               <div class="bg-primary text-white rounded p-2 me-3"><i class="bi bi-clock-history"></i></div>
-              <div><strong>Historique des déplacements</strong>
-              <p class="text-muted small">Chaque déplacement est enregistré automatiquement avec sa date et heure (ex. 💡 → ✅). Vous pouvez ajouter une <strong>remarque</strong> à chaque étape. 👉 <em>Accessible via le bouton 👁️ Visualiser de la carte.</em></p></div>
+              <div>
+                <strong>Historique des déplacements</strong>
+                <p class="text-muted small">
+                  Chaque déplacement est enregistré automatiquement avec sa date et heure (ex. 💡 → ✅). 
+                  Vous pouvez ajouter une <strong>remarque</strong> à chaque étape. 
+                  👉 <em>Accessible via le bouton 👁️ Visualiser de la carte.</em>
+                </p>
+              </div>
             </div>
           </div>
         </div>
@@ -196,8 +256,13 @@ VALUES
     <p class="text-muted">Les trois boutons d''action présents sur chaque carte :</p>
     <div class="list-group">
       <div class="list-group-item d-flex align-items-center">
-        <span class="badge bg-success fs-6 me-3"><i class="bi bi-eye-fill"></i></span>
-        <span><strong>Visualiser :</strong> Affiche le détail complet de la carte et son <strong>historique</strong> de déplacements avec les remarques.</span>
+        <span class="badge bg-success fs-6 me-3">
+          <i class="bi bi-eye-fill"></i>
+        </span>
+        <span>
+          <strong>Visualiser :</strong> 
+          Affiche le détail complet de la carte et son <strong>historique</strong> de déplacements avec les remarques.
+        </span>
       </div>
       <div class="list-group-item d-flex align-items-center">
         <span class="badge bg-warning text-dark fs-6 me-3"><i class="bi bi-pencil-fill"></i></span>
@@ -209,7 +274,11 @@ VALUES
       </div>
       <div class="list-group-item d-flex align-items-center bg-light">
         <i class="bi bi-shield-lock-fill fs-3 text-primary me-3"></i>
-        <span><strong>Permissions :</strong> Seuls les membres avec l''autorisation <strong>KanbanDesigner</strong> accèdent au Kanban Board. Seul le <strong>créateur d''un projet</strong> peut le modifier ou le configurer.</span>
+        <span>
+          <strong>Permissions :</strong> 
+          Seuls les membres avec l''autorisation <strong>KanbanDesigner</strong> accèdent au Kanban Board. 
+          Seul le <strong>créateur d''un projet</strong> peut le modifier ou le configurer.
+        </span>
       </div>
     </div>
   </section>
@@ -249,8 +318,13 @@ VALUES
           <div class="col-md-6">
             <div class="d-flex align-items-start">
               <span class="fs-4 me-3">🏁</span>
-              <div><strong>Ukończone</strong>
-              <p class="text-muted small">Ukończone zadania, ale też <strong>odrzucone pomysły</strong> zarchiwizowane tutaj dla pamięci.</p></div>
+              <div>
+                <strong>Ukończone</strong>
+                <p class="text-muted small">
+                  Ukończone zadania, ale też <strong>
+                  odrzucone pomysły</strong> zarchiwizowane tutaj dla pamięci.
+                </p>
+              </div>
             </div>
           </div>
         </div>
@@ -265,25 +339,49 @@ VALUES
           <div class="col-md-6">
             <div class="d-flex align-items-start mb-3">
               <div class="bg-primary text-white rounded p-2 me-3"><i class="bi bi-tags-fill"></i></div>
-              <div><strong>Konfigurowalne typy</strong>
-              <p class="text-muted small">Każdy projekt definiuje własne typy kart (np. 🚀 Funkcja, 🐛 Błąd…). Liczba typów jest nieograniczona.</p></div>
+              <div>
+                <strong>Konfigurowalne typy</strong>
+                <p class="text-muted small">
+                  Każdy projekt definiuje własne typy kart (np. 🚀 Funkcja, 🐛 Błąd…). 
+                  Liczba typów jest nieograniczona.
+                </p>
+              </div>
             </div>
             <div class="d-flex align-items-start">
               <div class="bg-primary text-white rounded p-2 me-3"><i class="bi bi-palette-fill"></i></div>
-              <div><strong>Kolory Bootstrap</strong>
-              <p class="text-muted small">Dostępne są wszystkie standardowe kolory Bootstrap. 👉 <em>Znaczenie koloru jest specyficzne dla każdego projektu.</em></p></div>
+              <div>
+                <strong>Kolory Bootstrap</strong>
+                <p class="text-muted small">
+                  Dostępne są wszystkie standardowe kolory Bootstrap. 
+                  👉 <em>Znaczenie koloru jest specyficzne dla każdego projektu.</em>
+                </p>
+              </div>
             </div>
           </div>
           <div class="col-md-6">
             <div class="d-flex align-items-start mb-3">
               <div class="bg-primary text-white rounded p-2 me-3"><i class="bi bi-hand-index-thumb-fill"></i></div>
-              <div><strong>Przenoszenie karty</strong>
-              <p class="text-muted small">Przeciągnij kartę metodą <strong>drag &amp; drop</strong> do docelowej kolumny. Karta zostaje tam natychmiast.</p></div>
+              <div>
+                <strong>Przenoszenie karty</strong>
+                <p class="text-muted small">
+                  Przeciągnij kartę metodą <strong>drag &amp; drop</strong> do docelowej kolumny. 
+                  Karta zostaje tam natychmiast.
+                </p>
+              </div>
             </div>
             <div class="d-flex align-items-start">
-              <div class="bg-primary text-white rounded p-2 me-3"><i class="bi bi-clock-history"></i></div>
-              <div><strong>Historia przesunięć</strong>
-              <p class="text-muted small">Każde przesunięcie jest automatycznie rejestrowane z datą i godziną (np. 💡 → ✅). Do każdego kroku można dodać <strong>uwagę</strong>. 👉 <em>Dostępne przez przycisk 👁️ Podgląd karty.</em></p></div>
+              <div class="bg-primary text-white rounded p-2 me-3">
+                <i class="bi bi-clock-history"></i>
+              </div>
+              <div>
+                <strong>Historia przesunięć</strong>
+                <p class="text-muted small">
+                  Każde przesunięcie jest automatycznie rejestrowane z datą i godziną (np. 💡 → ✅). 
+                  Do każdego kroku można dodać 
+                  <strong>uwagę</strong>. 👉 
+                  <em>Dostępne przez przycisk 👁️ Podgląd karty.</em>
+                </p>
+              </div>
             </div>
           </div>
         </div>
@@ -309,7 +407,13 @@ VALUES
       </div>
       <div class="list-group-item d-flex align-items-center bg-light">
         <i class="bi bi-shield-lock-fill fs-3 text-primary me-3"></i>
-        <span><strong>Uprawnienia:</strong> Tylko członkowie z uprawnieniem <strong>KanbanDesigner</strong> mają dostęp do Kanban Board. Tylko <strong>twórca projektu</strong> może go modyfikować lub konfigurować.</span>
+        <span>
+          <strong>Uprawnienia:</strong> 
+          Tylko członkowie z uprawnieniem 
+          <strong>KanbanDesigner</strong> 
+          mają dostęp do Kanban Board. Tylko 
+          <strong>twórca projektu</strong> może go modyfikować lub konfigurować.
+        </span>
       </div>
     </div>
   </section>

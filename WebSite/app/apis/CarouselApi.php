@@ -89,7 +89,7 @@ class CarouselApi extends AbstractApi
         }
         $item = WebApp::sanitizeHtml($data['item']);
         try {
-            $message = $this->carouselDataHelper->set_($data, $item);
+            $message = $this->carouselDataHelper->addOrUpdate($data, $item);
             $this->renderJsonOk(['message' => $message]);
         } catch (Throwable $e) {
             $this->renderJsonError('error' . $e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());

@@ -13,16 +13,16 @@ use app\models\MetadataDataHelper;
 
 class TranslationManager
 {
-    const SUPPORTED_LANGUAGES = ['en_US', 'fr_FR', 'pl_PL'];
-    const FLAGS = [
+    private const SUPPORTED_LANGUAGES = ['en_US', 'fr_FR', 'pl_PL'];
+    private const FLAGS = [
         'en_US' => '🇺🇸',
         'fr_FR' => '🇫🇷',
         'pl_PL' => '🇵🇱',
     ];
-    const DEFAULT_LANGUAGE = 'fr_FR';
-    const COOKIE_NAME = 'user_language';
-    const COOKIE_EXPIRATION = 86400 * 30; // 30 days
-    const COOKIE_PATH = '/';
+    private const DEFAULT_LANGUAGE = 'fr_FR';
+    private const COOKIE_NAME = 'user_language';
+    private const COOKIE_EXPIRATION = 86400 * 30; // 30 days
+    private const COOKIE_PATH = '/';
 
     private static ?string $forcedLanguage = null;
     private static function getForcedLanguage(): ?string

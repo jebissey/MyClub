@@ -332,7 +332,8 @@ VALUES (
             This area allows you to manage the website, databases, notifications, and maintenance.
         </p>
         <p class="mb-0">
-            🛠️ Use the tools below to access databases, manage members, manage group registrations with permissions, handle notifications, configure the email server, and put the website into maintenance mode.
+            🛠️ Use the tools below to access databases, manage members, manage group registrations with permissions, handle notifications, 
+            configure the email server, and put the website into maintenance mode.
         </p>
     </div>
 
@@ -357,7 +358,8 @@ VALUES (
             Cette zone permet de gérer le site, les bases de données, les notifications et la maintenance.
         </p>
         <p class="mb-0">
-            🛠️ Utilisez les outils ci-dessous pour accéder aux bases de données, gérer les inscriptions, envoyer des emails et effectuer la maintenance.
+            🛠️ Utilisez les outils ci-dessous pour accéder aux bases de données, gérer les inscriptions, 
+            envoyer des emails et effectuer la maintenance.
         </p>
     </div>
 

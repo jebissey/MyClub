@@ -114,7 +114,12 @@ class OrderController extends AbstractController
             return;
         }
 
-        if ($this->authorizationDataHelper->canPersonReadOrderResults($this->dataHelper->get('Article', ['Id' => $order->IdArticle]), $connectedUser)) {
+        if (
+            $this->authorizationDataHelper->canPersonReadOrderResults($this->dataHelper->get(
+                'Article',
+                ['Id' => $order->IdArticle]
+            ), $connectedUser)
+        ) {
             $replies = $this->dataHelper->gets('OrderReply', ['IdOrder' => $order->Id]);
 
             $participants = [];

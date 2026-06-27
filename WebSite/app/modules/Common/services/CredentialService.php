@@ -10,9 +10,9 @@ use app\helpers\Application;
 
 class CredentialService
 {
-    const SQLITE_DEST_PATH  = __DIR__ . '/../../../../data/';
-    const SQLITE_FILE       = 'Credential.db';
-    const CREDENTIAL_TABLE  = 'Credential';
+    private const SQLITE_DEST_PATH  = __DIR__ . '/../../../../data/';
+    private const SQLITE_FILE       = 'Credential.db';
+    private const CREDENTIAL_TABLE  = 'Credential';
 
     private static ?CredentialService $instance = null;
     private ?PDO $pdo = null;

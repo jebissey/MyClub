@@ -143,7 +143,12 @@ class UserDirectoryController extends AbstractController
         $gravatarHandler = new GravatarHandler();
         $locationData = [];
         foreach ($members as $member) {
-            if (!empty($member->Location) && preg_match('/^[-+]?([1-8]?\d(\.\d+)?|90(\.0+)?),\s*[-+]?(180(\.0+)?|((1[0-7]\d)|([1-9]?\d))(\.\d+)?)$/', $member->Location)) {
+            if (
+                !empty($member->Location) && preg_match(
+                    '/^[-+]?([1-8]?\d(\.\d+)?|90(\.0+)?),\s*[-+]?(180(\.0+)?|((1[0-7]\d)|([1-9]?\d))(\.\d+)?)$/',
+                    $member->Location
+                )
+            ) {
                 list($lat, $lng) = explode(',', $member->Location);
                 $locationData[] = [
                     'id' => $member->Id,

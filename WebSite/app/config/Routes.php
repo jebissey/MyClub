@@ -250,7 +250,7 @@ class Routes
         );
     }
 
-    public function Add(ErrorManager $errorManager): void
+    public function add(ErrorManager $errorManager): void
     {
         foreach ($this->get() as $route) {
             $this->mapRoute(
@@ -352,8 +352,13 @@ class Routes
         return $this->routes;
     }
 
-    private function mapRoute(Engine $flight, string $methodAndPath, Closure $controllerFactory, string $function, array $extraArgs = []): void
-    {
+    private function mapRoute(
+        Engine $flight,
+        string $methodAndPath,
+        Closure $controllerFactory,
+        string $function,
+        array $extraArgs = []
+    ): void {
         preg_match_all('/@(\w+)(?::([^\/]+))?/', $methodAndPath, $matches, PREG_SET_ORDER);
         $paramTypes = [];
         foreach ($matches as $m) {

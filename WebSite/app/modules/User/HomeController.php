@@ -78,7 +78,8 @@ class HomeController extends AbstractController
                     'navbarInkColor'  => $defaultColors['navbarInkColor'],
                     'navbarIconColor' => $defaultColors['navbarIconColor'],
                 ],
-                $this->metadataDataHelper->isTestSite() && !empty($prodSiteUrl = $this->metadataDataHelper->getProdSiteUrl()) ? $prodSiteUrl : null,
+                $this->metadataDataHelper->isTestSite() && !empty($prodSiteUrl = $this->metadataDataHelper->getProdSiteUrl())
+                    ? $prodSiteUrl : null,
                 $connectedUser?->person?->Alert ?? null
             );
         }
@@ -128,8 +129,16 @@ class HomeController extends AbstractController
             'pendingDesigns'         => $userPendingDesigns,
             'news'                   => $news ?? false,
             'page'                   => $this->application->getConnectedUser()->getPage(),
-            'carouselItems'          => $latestArticle ? $this->dataHelper->gets('Carousel', ['IdArticle' => $latestArticle->Id], 'Item') : [],
-            'homeParagraphsCount'    => (int) ($this->dataHelper->get('Settings', ['Name' => 'Home_FeaturedArticleParagraphs'], 'Value')->Value ?? 1),
+            'carouselItems'          => $latestArticle ? $this->dataHelper->gets(
+                'Carousel',
+                ['IdArticle' => $latestArticle->Id],
+                'Item'
+            ) : [],
+            'homeParagraphsCount'    => (int) ($this->dataHelper->get(
+                'Settings',
+                ['Name' => 'Home_FeaturedArticleParagraphs'],
+                'Value'
+            )->Value ?? 1),
             'footerArticle'          => $footerArticle,
         ]));
     }

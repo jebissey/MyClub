@@ -55,8 +55,14 @@ SQL);
 
         $pdo->exec(<<<SQL
 INSERT INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
-('event.copy_emails.clipboard.success', 'Emails copied to clipboard.', 'Les emails ont été copiés dans le presse-papiers.', 'E-maile zostały skopiowane do schowka.'),
-('event.copy_emails.clipboard.error', 'Error copying to clipboard: ', 'Erreur lors de la copie dans le presse-papiers : ', 'Błąd podczas kopiowania do schowka: '),
+('event.copy_emails.clipboard.success', 
+    'Emails copied to clipboard.', 
+    'Les emails ont été copiés dans le presse-papiers.', 
+    'E-maile zostały skopiowane do schowka.'),
+('event.copy_emails.clipboard.error', 
+    'Error copying to clipboard: ', 
+    'Erreur lors de la copie dans le presse-papiers : ', 
+    'Błąd podczas kopiowania do schowka: '),
 ('event.copy_emails.title', 'List of email addresses', 'Liste des adresses email', 'Lista adresów email'),
 ('event.copy_emails.title.with', 'with', 'avec', 'z');
 SQL);

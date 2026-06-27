@@ -32,7 +32,8 @@ SET
                                 <h3 class="h5 fw-bold mb-2">Access and Permissions</h3>
                                 <ul class="list-unstyled text-muted small">
                                     <li class="mb-2">
-                                        <strong>Visibility:</strong> The yellow key only appears in the top bar for members with the appropriate permissions.
+                                        <strong>Visibility:</strong> 
+                                        The yellow key only appears in the top bar for members with the appropriate permissions.
                                     </li>
                                     <li>
                                         <strong>Smart navigation:</strong>
@@ -112,7 +113,8 @@ SET
                                 <h3 class="h5 fw-bold mb-2">Accès et Permissions</h3>
                                 <ul class="list-unstyled text-muted small">
                                     <li class="mb-2">
-                                        <strong>Visibilité :</strong> La clé jaune n’apparaît dans la barre supérieure que pour les membres ayant des autorisations.
+                                        <strong>Visibilité :</strong> 
+                                        La clé jaune n’apparaît dans la barre supérieure que pour les membres ayant des autorisations.
                                     </li>
                                     <li>
                                         <strong>Navigation intelligente :</strong>
@@ -133,7 +135,8 @@ SET
                             <div>
                                 <h3 class="h5 fw-bold mb-2">Optimisation Mobile</h3>
                                 <p class="text-muted small">
-                                    Les raccourcis apparaissent aussi directement ici — plus besoin d’ouvrir le menu ☰ sur les écrans étroits.
+                                    Les raccourcis apparaissent aussi directement ici — 
+                                    plus besoin d’ouvrir le menu ☰ sur les écrans étroits.
                                 </p>
                             </div>
                         </div>

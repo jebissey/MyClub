@@ -82,28 +82,47 @@ INSERT INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
 
     <div class="d-flex align-items-start mb-2">
       <div class="bg-primary text-white rounded p-2 me-3"><i class="bi bi-people-fill"></i></div>
-      <div><strong>Group</strong><p class="text-muted small mb-0">Restrict the list to a specific group, or choose <em>All members</em>.</p></div>
+      <div>
+        <strong>Group</strong>
+        <p class="text-muted small mb-0">Restrict the list to a specific group, or choose <em>All members</em>.</p>
+      </div>
     </div>
     <div class="d-flex align-items-start mb-2">
       <div class="bg-primary text-white rounded p-2 me-3"><i class="bi bi-key-fill"></i></div>
-      <div><strong>Password</strong><p class="text-muted small mb-0">Filter by whether the member has already activated their account (created a password).</p></div>
+      <div>
+        <strong>Password</strong>
+        <p class="text-muted small mb-0">Filter by whether the member has already activated their account (created a password).</p>
+      </div>
     </div>
     <div class="d-flex align-items-start mb-2">
       <div class="bg-primary text-white rounded p-2 me-3"><i class="bi bi-person-vcard-fill"></i></div>
-      <div><strong>Profile</strong><p class="text-muted small mb-0">Include only members with a complete or empty public profile.</p></div>
+      <div>
+        <strong>Profile</strong>
+        <p class="text-muted small mb-0">Include only members with a complete or empty public profile.</p>
+      </div>
     </div>
     <div class="d-flex align-items-start mb-2">
       <div class="bg-primary text-white rounded p-2 me-3"><i class="bi bi-geo-alt-fill"></i></div>
-      <div><strong>On public map</strong><p class="text-muted small mb-0">Filter members who opted in or out of the public map.</p></div>
+      <div>
+        <strong>On public map</strong>
+        <p class="text-muted small mb-0">Filter members who opted in or out of the public map.
+      </p>
+    </div>
     </div>
     <div class="d-flex align-items-start mb-4">
       <div class="bg-primary text-white rounded p-2 me-3"><i class="bi bi-person-dash-fill"></i></div>
-      <div><strong>Disabled accounts</strong><p class="text-muted small mb-0">Include or exclude members whose accounts have been deactivated.</p></div>
+      <div>
+        <strong>Disabled accounts</strong>
+        <p class="text-muted small mb-0">Include or exclude members whose accounts have been deactivated.</p>
+      </div>
     </div>
 
     <div class="alert alert-info d-flex align-items-start gap-2">
       <i class="bi bi-lightbulb-fill fs-5 mt-1"></i>
-      <div>Check individual names to pick specific recipients, or click <strong>Select all</strong> to target everyone returned by the current filters.</div>
+      <div>
+        Check individual names to pick specific recipients, or click 
+        <strong>Select all</strong> to target everyone returned by the current filters.
+      </div>
     </div>
   </section>
   <section class="mb-5">
@@ -114,7 +133,12 @@ INSERT INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
 
     <div class="d-flex align-items-start mb-2">
       <span class="badge bg-secondary me-3 mt-1 fs-6">N dest.</span>
-      <div><strong>Recipient counter</strong><p class="text-muted small mb-0">Shows how many members are currently selected. Updates in real time.</p></div>
+      <div>
+        <strong>Recipient counter</strong>
+        <p class="text-muted small mb-0">
+          Shows how many members are currently selected. Updates in real time.
+        </p>
+      </div>
     </div>
     <div class="d-flex align-items-start mb-2">
       <div class="bg-primary text-white rounded p-2 me-3"><i class="bi bi-arrow-return-left"></i></div>
@@ -129,13 +153,24 @@ INSERT INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
     </div>
     <div class="d-flex align-items-start mb-2">
       <div class="bg-info text-dark rounded p-2 me-3"><i class="bi bi-send"></i></div>
-      <div><strong>Blue test button</strong>
-        <p class="text-muted small mb-0">Sends a copy <strong>only to yourself</strong> so you can check the e-mail before the real send. The button displays your e-mail address.</p>
+      <div>
+        <strong>Blue test button</strong>
+        <p class="text-muted small mb-0">
+          Sends a copy <strong>only to yourself</strong> so you can check the e-mail before the real send. 
+          The button displays your e-mail address.
+        </p>
       </div>
     </div>
     <div class="d-flex align-items-start mb-2">
-      <div class="bg-success text-white rounded p-2 me-3"><i class="bi bi-send-fill"></i></div>
-      <div><strong>Send</strong><p class="text-muted small mb-0">Sends the e-mail to all selected recipients. A confirmation is required. This action cannot be undone.</p></div>
+      <div class="bg-success text-white rounded p-2 me-3">
+        <i class="bi bi-send-fill"></i>
+      </div>
+      <div>
+        <strong>Send</strong>
+        <p class="text-muted small mb-0">
+          Sends the e-mail to all selected recipients. A confirmation is required. This action cannot be undone.
+        </p>
+      </div>
     </div>
     <div class="d-flex align-items-start mb-2">
       <div class="bg-secondary text-white rounded p-2 me-3"><i class="bi bi-x-circle"></i></div>
@@ -158,7 +193,9 @@ INSERT INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
     </div>
     <div class="d-flex align-items-start mb-2">
       <i class="bi bi-check-circle-fill text-success me-3 mt-1"></i>
-      <span>Choose <em>No reply</em> only for purely informational messages; otherwise prefer <em>Sender</em> or <em>Contact address</em>.</span>
+      <span>
+        Choose <em>No reply</em> only for purely informational messages; otherwise prefer <em>Sender</em> or <em>Contact address</em>.
+      </span>
     </div>
     <div class="d-flex align-items-start mb-2">
       <i class="bi bi-check-circle-fill text-success me-3 mt-1"></i>
@@ -190,7 +227,9 @@ INSERT INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
               </div>
               <div>
                 <strong>Filtrer &amp; sélectionner les destinataires</strong>
-                <p class="text-muted small">Combinez les filtres groupe, mot de passe, présentation et carte pour cibler précisément les bons membres.</p>
+                <p class="text-muted small">
+                  Combinez les filtres groupe, mot de passe, présentation et carte pour cibler précisément les bons membres.
+                </p>
               </div>
             </div>
           </div>
@@ -201,7 +240,9 @@ INSERT INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
               </div>
               <div>
                 <strong>Éditeur de texte enrichi</strong>
-                <p class="text-muted small">Mettez en forme votre message avec du gras, des couleurs, des listes, des alignements et bien plus.</p>
+                <p class="text-muted small">
+                  Mettez en forme votre message avec du gras, des couleurs, des listes, des alignements et bien plus.
+                </p>
               </div>
             </div>
           </div>
@@ -212,7 +253,9 @@ INSERT INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
               </div>
               <div>
                 <strong>Tester avant d''envoyer</strong>
-                <p class="text-muted small">Envoyez-vous une copie de prévisualisation pour vérifier la mise en forme et le contenu.</p>
+                <p class="text-muted small">
+                  Envoyez-vous une copie de prévisualisation pour vérifier la mise en forme et le contenu.
+                </p>
               </div>
             </div>
           </div>
@@ -223,7 +266,9 @@ INSERT INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
               </div>
               <div>
                 <strong>Contrôle de l''adresse de réponse</strong>
-                <p class="text-muted small">Choisissez où arrivent les réponses des membres : pas de réponse, votre adresse ou le contact de l''organisation.</p>
+                <p class="text-muted small">
+                  Choisissez où arrivent les réponses des membres : pas de réponse, votre adresse ou le contact de l''organisation.
+                </p>
               </div>
             </div>
           </div>
@@ -235,32 +280,55 @@ INSERT INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
     <h2 class="h4 fw-semibold mb-3">
       <i class="bi bi-layout-sidebar me-2 text-success"></i>Panneau gauche – Sélectionner les destinataires
     </h2>
-    <p>Utilisez les filtres pour affiner la liste, puis cliquez sur <strong>Actualiser</strong>. Le compteur de la barre supérieure se met à jour instantanément.</p>
+    <p>
+      Utilisez les filtres pour affiner la liste, puis cliquez sur <strong>Actualiser</strong>. 
+      Le compteur de la barre supérieure se met à jour instantanément.
+    </p>
 
     <div class="d-flex align-items-start mb-2">
       <div class="bg-primary text-white rounded p-2 me-3"><i class="bi bi-people-fill"></i></div>
-      <div><strong>Groupe</strong><p class="text-muted small mb-0">Restreignez la liste à un groupe spécifique ou choisissez <em>Tous les membres</em>.</p></div>
+      <div>
+        <strong>Groupe</strong>
+        <p class="text-muted small mb-0">Restreignez la liste à un groupe spécifique ou choisissez <em>Tous les membres</em>.</p>
+      </div>
     </div>
     <div class="d-flex align-items-start mb-2">
       <div class="bg-primary text-white rounded p-2 me-3"><i class="bi bi-key-fill"></i></div>
-      <div><strong>Mot de passe</strong><p class="text-muted small mb-0">Filtrez selon que le membre a déjà activé son compte (mot de passe créé) ou non.</p></div>
+      <div>
+        <strong>Mot de passe</strong>
+        <p class="text-muted small mb-0">Filtrez selon que le membre a déjà activé son compte (mot de passe créé) ou non.</p>
+      </div>
     </div>
     <div class="d-flex align-items-start mb-2">
       <div class="bg-primary text-white rounded p-2 me-3"><i class="bi bi-person-vcard-fill"></i></div>
-      <div><strong>Présentation</strong><p class="text-muted small mb-0">N''incluez que les membres dont la présentation publique est complète ou vide.</p></div>
+      <div>
+        <strong>Présentation</strong>
+        <p class="text-muted small mb-0">
+          N''incluez que les membres dont la présentation publique est complète ou vide.
+        </p>
+      </div>
     </div>
     <div class="d-flex align-items-start mb-2">
       <div class="bg-primary text-white rounded p-2 me-3"><i class="bi bi-geo-alt-fill"></i></div>
-      <div><strong>Dans la carte publique</strong><p class="text-muted small mb-0">Filtrez les membres ayant choisi d''apparaître ou non sur la carte publique.</p></div>
+      <div>
+        <strong>Dans la carte publique</strong>
+        <p class="text-muted small mb-0">Filtrez les membres ayant choisi d''apparaître ou non sur la carte publique.</p>
+      </div>
     </div>
     <div class="d-flex align-items-start mb-4">
       <div class="bg-primary text-white rounded p-2 me-3"><i class="bi bi-person-dash-fill"></i></div>
-      <div><strong>Comptes désactivés</strong><p class="text-muted small mb-0">Incluez ou excluez les membres dont le compte a été désactivé.</p></div>
+      <div>
+        <strong>Comptes désactivés</strong>
+        <p class="text-muted small mb-0">Incluez ou excluez les membres dont le compte a été désactivé.</p>
+      </div>
     </div>
 
     <div class="alert alert-info d-flex align-items-start gap-2">
       <i class="bi bi-lightbulb-fill fs-5 mt-1"></i>
-      <div>Cochez les noms individuellement pour choisir des destinataires précis, ou cliquez sur <strong>Tout sél.</strong> pour cibler tous les membres retournés par les filtres en cours.</div>
+      <div>
+        Cochez les noms individuellement pour choisir des destinataires précis, ou cliquez sur 
+        <strong>Tout sél.</strong> pour cibler tous les membres retournés par les filtres en cours.
+      </div>
     </div>
   </section>
   <section class="mb-5">
@@ -271,11 +339,19 @@ INSERT INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
 
     <div class="d-flex align-items-start mb-2">
       <span class="badge bg-secondary me-3 mt-1 fs-6">N dest.</span>
-      <div><strong>Compteur de destinataires</strong><p class="text-muted small mb-0">Affiche le nombre de membres actuellement sélectionnés. Se met à jour en temps réel.</p></div>
+      <div>
+        <strong>Compteur de destinataires</strong>
+        <p class="text-muted small mb-0">
+          Affiche le nombre de membres actuellement sélectionnés. Se met à jour en temps réel.
+        </p>
+      </div>
     </div>
     <div class="d-flex align-items-start mb-2">
-      <div class="bg-primary text-white rounded p-2 me-3"><i class="bi bi-arrow-return-left"></i></div>
-      <div><strong>Répondre à</strong>
+      <div class="bg-primary text-white rounded p-2 me-3">
+        <i class="bi bi-arrow-return-left"></i>
+      </div>
+      <div>
+        <strong>Répondre à</strong>
         <p class="text-muted small mb-0">
           Définit où arrivent les réponses des membres :<br>
           <em>Pas de réponse</em> – les réponses sont ignorées &bull;
@@ -286,21 +362,36 @@ INSERT INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
     </div>
     <div class="d-flex align-items-start mb-2">
       <div class="bg-info text-dark rounded p-2 me-3"><i class="bi bi-send"></i></div>
-      <div><strong>Bouton bleu de test</strong>
-        <p class="text-muted small mb-0">Envoie une copie <strong>uniquement à vous-même</strong> pour vérifier le courriel avant l''envoi réel. Le bouton affiche votre adresse e-mail.</p>
+      <div>
+        <strong>Bouton bleu de test</strong>
+        <p class="text-muted small mb-0">
+          Envoie une copie <strong>uniquement à vous-même</strong> pour vérifier le courriel avant l''envoi réel. 
+          Le bouton affiche votre adresse e-mail.
+        </p>
       </div>
     </div>
     <div class="d-flex align-items-start mb-2">
       <div class="bg-success text-white rounded p-2 me-3"><i class="bi bi-send-fill"></i></div>
-      <div><strong>Envoyer</strong><p class="text-muted small mb-0">Envoie le courriel à tous les destinataires sélectionnés. Une confirmation est demandée. Cette action est irréversible.</p></div>
+      <div>
+        <strong>Envoyer</strong>
+        <p class="text-muted small mb-0">
+          Envoie le courriel à tous les destinataires sélectionnés. Une confirmation est demandée. Cette action est irréversible.
+        </p>
+      </div>
     </div>
     <div class="d-flex align-items-start mb-2">
       <div class="bg-secondary text-white rounded p-2 me-3"><i class="bi bi-x-circle"></i></div>
-      <div><strong>Annuler</strong><p class="text-muted small mb-0">Abandonne le brouillon et revient à l''écran précédent sans envoyer.</p></div>
+      <div>
+        <strong>Annuler</strong>
+        <p class="text-muted small mb-0">Abandonne le brouillon et revient à l''écran précédent sans envoyer.</p>
+      </div>
     </div>
     <div class="d-flex align-items-start mb-4">
       <div class="bg-warning text-dark rounded p-2 me-3"><i class="bi bi-question-circle"></i></div>
-      <div><strong>Aide</strong><p class="text-muted small mb-0">Ouvre cette page d''aide contextuelle.</p></div>
+      <div>
+        <strong>Aide</strong>
+        <p class="text-muted small mb-0">Ouvre cette page d''aide contextuelle.</p>
+      </div>
     </div>
   </section>
   <section class="mb-5">
@@ -315,7 +406,10 @@ INSERT INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
     </div>
     <div class="d-flex align-items-start mb-2">
       <i class="bi bi-check-circle-fill text-success me-3 mt-1"></i>
-      <span>Choisissez <em>Pas de réponse</em> uniquement pour des messages purement informatifs ; préférez sinon <em>L''émetteur</em> ou <em>L''adresse contact</em>.</span>
+      <span>
+        Choisissez <em>Pas de réponse</em> uniquement pour des messages purement informatifs ; préférez sinon 
+        <em>L''émetteur</em> ou <em>L''adresse contact</em>.
+      </span>
     </div>
     <div class="d-flex align-items-start mb-2">
       <i class="bi bi-check-circle-fill text-success me-3 mt-1"></i>
@@ -380,7 +474,9 @@ INSERT INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
               </div>
               <div>
                 <strong>Kontrola adresu odpowiedzi</strong>
-                <p class="text-muted small">Wybierz, gdzie trafiają odpowiedzi członków: brak odpowiedzi, Twój adres lub kontakt organizacji.</p>
+                <p class="text-muted small">
+                  Wybierz, gdzie trafiają odpowiedzi członków: brak odpowiedzi, Twój adres lub kontakt organizacji.
+                </p>
               </div>
             </div>
           </div>
@@ -392,32 +488,52 @@ INSERT INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
     <h2 class="h4 fw-semibold mb-3">
       <i class="bi bi-layout-sidebar me-2 text-success"></i>Panel lewy – Wybór odbiorców
     </h2>
-    <p>Użyj filtrów, aby zawęzić listę, a następnie kliknij <strong>Odśwież</strong>. Licznik na pasku górnym aktualizuje się natychmiast.</p>
+    <p>
+      Użyj filtrów, aby zawęzić listę, a następnie kliknij <strong>Odśwież</strong>. Licznik na pasku górnym aktualizuje się natychmiast.
+    </p>
 
     <div class="d-flex align-items-start mb-2">
       <div class="bg-primary text-white rounded p-2 me-3"><i class="bi bi-people-fill"></i></div>
-      <div><strong>Grupa</strong><p class="text-muted small mb-0">Ogranicz listę do określonej grupy lub wybierz <em>Wszyscy członkowie</em>.</p></div>
+      <div>
+        <strong>Grupa</strong>
+        <p class="text-muted small mb-0">Ogranicz listę do określonej grupy lub wybierz <em>Wszyscy członkowie</em>.</p>
+      </div>
     </div>
     <div class="d-flex align-items-start mb-2">
       <div class="bg-primary text-white rounded p-2 me-3"><i class="bi bi-key-fill"></i></div>
-      <div><strong>Hasło</strong><p class="text-muted small mb-0">Filtruj według tego, czy członek aktywował już konto (utworzone hasło).</p></div>
+      <div>
+        <strong>Hasło</strong>
+        <p class="text-muted small mb-0">Filtruj według tego, czy członek aktywował już konto (utworzone hasło).</p>
+      </div>
     </div>
     <div class="d-flex align-items-start mb-2">
       <div class="bg-primary text-white rounded p-2 me-3"><i class="bi bi-person-vcard-fill"></i></div>
-      <div><strong>Prezentacja</strong><p class="text-muted small mb-0">Uwzględnij tylko członków z kompletnym lub pustym profilem publicznym.</p></div>
+      <div>
+        <strong>Prezentacja</strong>
+        <p class="text-muted small mb-0">Uwzględnij tylko członków z kompletnym lub pustym profilem publicznym.</p>
+      </div>
     </div>
     <div class="d-flex align-items-start mb-2">
       <div class="bg-primary text-white rounded p-2 me-3"><i class="bi bi-geo-alt-fill"></i></div>
-      <div><strong>Na mapie publicznej</strong><p class="text-muted small mb-0">Filtruj członków, którzy zdecydowali się pojawiać lub nie na mapie publicznej.</p></div>
+      <div>
+        <strong>Na mapie publicznej</strong>
+        <p class="text-muted small mb-0">Filtruj członków, którzy zdecydowali się pojawiać lub nie na mapie publicznej.</p>
+      </div>
     </div>
     <div class="d-flex align-items-start mb-4">
       <div class="bg-primary text-white rounded p-2 me-3"><i class="bi bi-person-dash-fill"></i></div>
-      <div><strong>Dezaktywowane konta</strong><p class="text-muted small mb-0">Uwzględnij lub wyklucz członków z dezaktywowanymi kontami.</p></div>
+      <div>
+        <strong>Dezaktywowane konta</strong>
+        <p class="text-muted small mb-0">Uwzględnij lub wyklucz członków z dezaktywowanymi kontami.</p>
+      </div>
     </div>
 
     <div class="alert alert-info d-flex align-items-start gap-2">
       <i class="bi bi-lightbulb-fill fs-5 mt-1"></i>
-      <div>Zaznacz poszczególne nazwiska, aby wybrać konkretnych odbiorców, lub kliknij <strong>Zaznacz wszystkich</strong>, aby objąć wszystkich spełniających aktualne kryteria filtrów.</div>
+      <div>
+        Zaznacz poszczególne nazwiska, aby wybrać konkretnych odbiorców, lub kliknij 
+        <strong>Zaznacz wszystkich</strong>, aby objąć wszystkich spełniających aktualne kryteria filtrów.
+      </div>
     </div>
   </section>
   <section class="mb-5">
@@ -428,7 +544,12 @@ INSERT INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
 
     <div class="d-flex align-items-start mb-2">
       <span class="badge bg-secondary me-3 mt-1 fs-6">N odb.</span>
-      <div><strong>Licznik odbiorców</strong><p class="text-muted small mb-0">Pokazuje liczbę aktualnie zaznaczonych członków. Aktualizuje się na bieżąco.</p></div>
+      <div>
+        <strong>Licznik odbiorców</strong>
+        <p class="text-muted small mb-0">
+          Pokazuje liczbę aktualnie zaznaczonych członków. Aktualizuje się na bieżąco.
+        </p>
+      </div>
     </div>
     <div class="d-flex align-items-start mb-2">
       <div class="bg-primary text-white rounded p-2 me-3"><i class="bi bi-arrow-return-left"></i></div>
@@ -443,17 +564,30 @@ INSERT INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
     </div>
     <div class="d-flex align-items-start mb-2">
       <div class="bg-info text-dark rounded p-2 me-3"><i class="bi bi-send"></i></div>
-      <div><strong>Niebieski przycisk testowy</strong>
-        <p class="text-muted small mb-0">Wysyła kopię <strong>tylko do Ciebie</strong>, abyś mógł sprawdzić wiadomość przed właściwym wysłaniem. Etykieta przycisku wyświetla Twój adres e-mail.</p>
+      <div>
+        <strong>Niebieski przycisk testowy</strong>
+        <p class="text-muted small mb-0">
+          Wysyła kopię 
+          <strong>tylko do Ciebie</strong>, abyś mógł sprawdzić wiadomość przed właściwym wysłaniem. 
+          Etykieta przycisku wyświetla Twój adres e-mail.
+        </p>
       </div>
     </div>
     <div class="d-flex align-items-start mb-2">
       <div class="bg-success text-white rounded p-2 me-3"><i class="bi bi-send-fill"></i></div>
-      <div><strong>Wyślij</strong><p class="text-muted small mb-0">Wysyła wiadomość do wszystkich zaznaczonych odbiorców. Wymagane jest potwierdzenie. Tej akcji nie można cofnąć.</p></div>
+      <div>
+        <strong>Wyślij</strong>
+        <p class="text-muted small mb-0">
+          Wysyła wiadomość do wszystkich zaznaczonych odbiorców. Wymagane jest potwierdzenie. Tej akcji nie można cofnąć.
+        </p>
+      </div>
     </div>
     <div class="d-flex align-items-start mb-2">
       <div class="bg-secondary text-white rounded p-2 me-3"><i class="bi bi-x-circle"></i></div>
-      <div><strong>Anuluj</strong><p class="text-muted small mb-0">Odrzuca wersję roboczą i wraca do poprzedniego ekranu bez wysyłania.</p></div>
+      <div>
+        <strong>Anuluj</strong>
+        <p class="text-muted small mb-0">Odrzuca wersję roboczą i wraca do poprzedniego ekranu bez wysyłania.</p>
+      </div>
     </div>
     <div class="d-flex align-items-start mb-4">
       <div class="bg-warning text-dark rounded p-2 me-3"><i class="bi bi-question-circle"></i></div>
@@ -472,7 +606,11 @@ INSERT INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
     </div>
     <div class="d-flex align-items-start mb-2">
       <i class="bi bi-check-circle-fill text-success me-3 mt-1"></i>
-      <span>Wybieraj <em>Brak odpowiedzi</em> tylko dla wiadomości czysto informacyjnych; w pozostałych przypadkach preferuj <em>Nadawca</em> lub <em>Adres kontaktowy</em>.</span>
+      <span>
+        Wybieraj 
+        <em>Brak odpowiedzi</em> tylko dla wiadomości czysto informacyjnych; w pozostałych przypadkach preferuj 
+        <em>Nadawca</em> lub <em>Adres kontaktowy</em>.
+      </span>
     </div>
     <div class="d-flex align-items-start mb-2">
       <i class="bi bi-check-circle-fill text-success me-3 mt-1"></i>

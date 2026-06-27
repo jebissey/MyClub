@@ -51,7 +51,7 @@ class EventApi extends AbstractApi
         }
         if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isEventManager())) {
             try {
-                $this->eventDataHelper->delete_($id, $this->authService->getUserId());
+                $this->eventDataHelper->removeParticipant($id, $this->authService->getUserId());
                 $apiResponse = new ApiResponse(true, ApplicationError::Ok->value);
                 $this->renderJson([$apiResponse->data], $apiResponse->success, $apiResponse->responseCode);
             } catch (Throwable $e) {
@@ -164,11 +164,17 @@ class EventApi extends AbstractApi
             $unsubscribeLink = $root . '/user/preferences';
             $eventCreatorEmail = $this->dataHelper->get('Person', ['Id' => $event->CreatedBy], 'Email')->Email;
             if (!$eventCreatorEmail) {
-                return new ApiResponse(false, ApplicationError::BadRequest->value, [], 'Invalid Email in file ' + __FILE__ + ' at line ' + __LINE__);
+                return new ApiResponse(
+                    false,
+                    ApplicationError::BadRequest->value,
+                    [],
+                    'Invalid Email in file ' . __FILE__ . ' at line ' . __LINE__
+                );
             }
             $ccList = $this->messageDataHelper->addWebAppMessages($event->Id, $participants, $title . "\n\n" . $body);
+            $link = htmlspecialchars($eventLink, ENT_QUOTES, 'UTF-8');
             $htmlBody = nl2br(htmlspecialchars($body, ENT_QUOTES, 'UTF-8')) . "<br>" .
-                '<a href="' . htmlspecialchars($eventLink, ENT_QUOTES, 'UTF-8') . '">' . htmlspecialchars($eventLink, ENT_QUOTES, 'UTF-8') . '</a>' . "<br><br>" .
+                '<a href="' . $link . '">' . $link . '</a><br><br>' .
                 "Pour ne plus recevoir ce type de message vous pouvez mettre à jour vos préférences<br>" .
                 '<a href="' . htmlspecialchars($unsubscribeLink, ENT_QUOTES, 'UTF-8') . '">Se désinscrire</a>';
             try {
@@ -184,7 +190,12 @@ class EventApi extends AbstractApi
 
                 return new ApiResponse($result, $result ? ApplicationError::Ok->value : ApplicationError::Error->value);
             } catch (EmailException $e) {
-                return new ApiResponse(false, ApplicationError::BadRequest->value, [], "Error {$e->getCode()} in {$e->getFile()} at {$e->getLine()}: {$e->getMessage()}");
+                return new ApiResponse(
+                    false,
+                    ApplicationError::BadRequest->value,
+                    [],
+                    "Error {$e->getCode()} in {$e->getFile()} at {$e->getLine()}: {$e->getMessage()}"
+                );
             }
         }
         return new ApiResponse(false, ApplicationError::BadRequest->value, [], 'No participant');

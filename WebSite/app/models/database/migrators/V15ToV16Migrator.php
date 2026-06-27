@@ -103,7 +103,10 @@ class V15ToV16Migrator implements DatabaseMigratorInterface
         $languagesHelper->updateTranslation($designerId, 'fr_FR', $frenchContent);
 
         $pdo->exec("UPDATE 'Authorization' SET Name = 'MenuDesigner' WHERE Id = 9");
-        $pdo->exec("INSERT INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES ('article.error.email_failed', 'Failed to send email to subscribers', 'Échec de l''envoi du courriel aux abonnés', 'Nie można wysłać emaila do subskrybentów')");
+        $pdo->exec("INSERT INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES ('article.error.email_failed', 
+            'Failed to send email to subscribers', 
+            'Échec de l''envoi du courriel aux abonnés', 
+            'Nie można wysłać emaila do subskrybentów')");
 
         $sql = <<<SQL
 INSERT INTO Languages (Name, en_US, fr_FR, pl_PL)

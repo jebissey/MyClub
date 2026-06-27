@@ -70,8 +70,12 @@ class Application
         if (!isset(self::$instance)) {
             self::$instance = new self();
         }
-        $metadata = new DataHelper(self::$instance)->get('Metadata', ['Id' => 1], 'Compact_everyXdays, Compact_removeOlderThanXmonths, Compact_compactOlderThanXmonths');
-        new LogDataCompactHelper(self::$instance)->compactLog($metadata->Compact_removeOlderThanXmonths, $metadata->Compact_compactOlderThanXmonths);
+        $metadata = new DataHelper(
+            self::$instance
+        )->get('Metadata', ['Id' => 1], 'Compact_everyXdays, Compact_removeOlderThanXmonths, Compact_compactOlderThanXmonths');
+        new LogDataCompactHelper(
+            self::$instance
+        )->compactLog($metadata->Compact_removeOlderThanXmonths, $metadata->Compact_compactOlderThanXmonths);
         return self::$instance;
     }
 

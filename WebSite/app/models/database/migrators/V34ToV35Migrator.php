@@ -20,9 +20,12 @@ VALUES
  'Importowane konto'),
 
 ('account.form.imported.webmaster_message',
- 'The account information must be updated in the external system. In case of an email address change, update it here first before performing a new import.',
- 'Il faut mettre à jour les informations du compte dans le système externe. En cas de changement d''adresse courriel, il faut d''abord la mettre à jour ici avant de faire une nouvelle importation.',
- 'Informacje o koncie muszą zostać zaktualizowane w systemie zewnętrznym. W przypadku zmiany adresu e-mail należy najpierw zaktualizować go tutaj przed wykonaniem nowego importu.'),
+ 'The account information must be updated in the external system. 
+ In case of an email address change, update it here first before performing a new import.',
+ 'Il faut mettre à jour les informations du compte dans le système externe. 
+ En cas de changement d''adresse courriel, il faut d''abord la mettre à jour ici avant de faire une nouvelle importation.',
+ 'Informacje o koncie muszą zostać zaktualizowane w systemie zewnętrznym. 
+ W przypadku zmiany adresu e-mail należy najpierw zaktualizować go tutaj przed wykonaniem nowego importu.'),
 
 ('account.form.imported.readonly_message',
  'Greyed-out fields cannot be edited here. They are synchronised with the external system.',

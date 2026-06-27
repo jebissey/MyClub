@@ -119,9 +119,12 @@ VALUES
  'ID artykułu do wyróżnienia'),
 
 ('designer.home_settings.article_description',
- 'Enter the identifier of a specific article. Enter 0 to automatically display the first paragraph of the latest published article or the currently featured article.',
- 'Entrez l''identifiant d''un article spécifique. Saisissez 0 pour afficher automatiquement le premier paragraphe du dernier article publié ou de l''article actuellement mis en avant.',
- 'Wprowadź identyfikator konkretnego artykułu. Wpisz 0, aby automatycznie wyświetlić pierwszy akapit ostatniego opublikowanego artykułu lub aktualnie wyróżnionego artykułu.'),
+ 'Enter the identifier of a specific article. 
+ Enter 0 to automatically display the first paragraph of the latest published article or the currently featured article.',
+ 'Entrez l''identifiant d''un article spécifique. 
+ Saisissez 0 pour afficher automatiquement le premier paragraphe du dernier article publié ou de l''article actuellement mis en avant.',
+ 'Wprowadź identyfikator konkretnego artykułu. Wpisz 0, 
+ aby automatycznie wyświetlić pierwszy akapit ostatniego opublikowanego artykułu lub aktualnie wyróżnionego artykułu.'),
 
 ('designer.home_settings.article_zero_hint',
  '0 = latest article or featured article',
@@ -592,38 +595,38 @@ SET
 
                 <div class="row g-4">
                     <div class="col-md-6">
-                        <div class="d-flex align-items-start mb-3">
-                            <div class="bg-primary text-white rounded p-2 me-3">
-                                <i class="bi bi-shield-lock-fill"></i>
-                            </div>
-                            <div>
-                                <strong>Identification sécurisée</strong>
-                                <p class="text-muted small">
-                                    Identification par e-mail.
-                                    <span class="d-block mt-1 text-dark">
-                                        👉 <em>Première connexion ? Utilisez "Créer/modifier mon mot de passe" pour initialiser votre compte.</em>
-                                    </span>
-                                </p>
-                            </div>
+                      <div class="d-flex align-items-start mb-3">
+                        <div class="bg-primary text-white rounded p-2 me-3">
+                          <i class="bi bi-shield-lock-fill"></i>
                         </div>
-                        <div class="d-flex align-items-start mb-3">
-                            <div class="bg-primary text-white rounded p-2 me-3">
-                                <i class="bi bi-newspaper"></i>
-                            </div>
-                            <div>
-                                <strong>Visualisation des articles</strong>
-                                <p class="text-muted small">Lisez et partagez les actualités rédigées par la communauté.</p>
-                            </div>
+                        <div>
+                          <strong>Identification sécurisée</strong>
+                          <p class="text-muted small">
+                            Identification par e-mail.
+                            <span class="d-block mt-1 text-dark">
+                              👉 <em>Première connexion ? Utilisez "Créer/modifier mon mot de passe" pour initialiser votre compte.</em>
+                            </span>
+                          </p>
                         </div>
-                        <div class="d-flex align-items-start">
-                            <div class="bg-primary text-white rounded p-2 me-3">
-                                <i class="bi bi-calendar-check"></i>
-                            </div>
-                            <div>
-                                <strong>Gestion des activités</strong>
-                                <p class="text-muted small">Inscrivez-vous aux activités et synchronisez votre agenda personnel.</p>
-                            </div>
-                        </div>
+                      </div>
+                      <div class="d-flex align-items-start mb-3">
+                          <div class="bg-primary text-white rounded p-2 me-3">
+                              <i class="bi bi-newspaper"></i>
+                          </div>
+                          <div>
+                              <strong>Visualisation des articles</strong>
+                              <p class="text-muted small">Lisez et partagez les actualités rédigées par la communauté.</p>
+                          </div>
+                      </div>
+                      <div class="d-flex align-items-start">
+                          <div class="bg-primary text-white rounded p-2 me-3">
+                              <i class="bi bi-calendar-check"></i>
+                          </div>
+                          <div>
+                              <strong>Gestion des activités</strong>
+                              <p class="text-muted small">Inscrivez-vous aux activités et synchronisez votre agenda personnel.</p>
+                          </div>
+                      </div>
                     </div>
                     <div class="col-md-6">
                         <div class="d-flex align-items-start mb-3">
@@ -1016,8 +1019,21 @@ SQL);
             }
         }
         $pdo->exec("DELETE FROM Settings WHERE Name IN ('Home_header', 'Home_footer', 'LegalNotices')");
-        $pdo->exec("DELETE FROM Settings WHERE Name IN ('Help_Admin', 'Help_Designer', 'Help_EventManager', 'Help_Home', 'Help_PersonManager', 'Help_User', 'Help_VisitorInsights', 'Help_Webmaster')");
-        $pdo->exec("DELETE FROM Settings WHERE Name IN ('Message_UnknownUser', 'Message_PasswordReset', 'Message_AutoSignInSucceeded', 'Message_SignInSucceeded', 'Message_SignOutSucceeded')");
+        $pdo->exec("DELETE FROM Settings WHERE Name IN (
+            'Help_Admin', 
+            'Help_Designer', 
+            'Help_EventManager', 
+            'Help_Home', 
+            'Help_PersonManager', 
+            'Help_User', 
+            'Help_VisitorInsights', 
+            'Help_Webmaster')");
+        $pdo->exec("DELETE FROM Settings WHERE Name IN (
+            'Message_UnknownUser', 
+            'Message_PasswordReset', 
+            'Message_AutoSignInSucceeded', 
+            'Message_SignInSucceeded', 
+            'Message_SignOutSucceeded')");
         $pdo->exec("DELETE FROM Settings WHERE Name IN ('Error_403', 'Error_404', 'Error_500', 'Title')");
         $pdo->exec("
             INSERT INTO Settings (Name, Value) VALUES

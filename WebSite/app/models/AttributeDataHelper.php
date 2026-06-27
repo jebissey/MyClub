@@ -16,7 +16,7 @@ class AttributeDataHelper extends Data
         parent::__construct($application);
     }
 
-    public function delete_($id)
+    public function deleteAttribute($id)
     {
         try {
             $this->pdo->beginTransaction();

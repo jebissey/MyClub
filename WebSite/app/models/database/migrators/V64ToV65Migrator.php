@@ -20,10 +20,13 @@ INSERT INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
 ('filter',                                      'Filter',                'Filtrer',                            'Filtruj'),
 ('filters',                                     'Filters',               'Filtres',                            'Filtry'),
 ('media.uses.in_events',                        'Used in events',        'Utilisé dans des événements',        'Używane w wydarzeniach'),
-('media.uses.no_events',                        'Not used in any event', 'Non utilisé dans aucun événement',   'Nieużywane w żadnym wydarzeniu'),
+('media.uses.no_events', 'Not used in any event', 'Non utilisé dans aucun événement',   'Nieużywane w żadnym wydarzeniu'),
 ('navbar.designer.exercise',                    'Exercise',              'Exercice',                           'Ćwiczenie'),
 ('designer.home_settings.navbar_harmony_title', 'Color harmony',         'Harmonie des couleurs',              'Harmonia kolorów'),
-('designer.home_settings.navbar_harmony_hint',  'Automatically adjusts ink and background colors to ensure contrast and visual consistency.', "Ajuste automatiquement les couleurs d'encre et de fond pour garantir le contraste et la cohérence visuelle.", 'Automatycznie dostosowuje kolory tekstu i tła, aby zapewnić kontrast i spójność wizualną.');
+('designer.home_settings.navbar_harmony_hint',  
+    'Automatically adjusts ink and background colors to ensure contrast and visual consistency.', 
+    "Ajuste automatiquement les couleurs d'encre et de fond pour garantir le contraste et la cohérence visuelle.", 
+    'Automatycznie dostosowuje kolory tekstu i tła, aby zapewnić kontrast i spójność wizualną.');
 
 UPDATE Languages
 SET Name = 'reset'

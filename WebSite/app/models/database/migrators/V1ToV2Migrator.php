@@ -26,7 +26,9 @@ class V1ToV2Migrator implements DatabaseMigratorInterface
             ['😉', ['emojiWink.png']],
             ['🤪', ['emojiZanyFace.png']],
         ];
-        $stmt = $pdo->prepare("UPDATE Person SET Avatar = :emoji WHERE Avatar IN (" . implode(',', array_fill(0, count($avatarMap[0][1]), '?')) . ")");
+        $stmt = $pdo->prepare(
+            "UPDATE Person SET Avatar = :emoji WHERE Avatar IN (" . implode(',', array_fill(0, count($avatarMap[0][1]), '?')) . ")"
+        );
         foreach ($avatarMap as [$emoji, $filenames]) {
             $inClause = implode(',', array_fill(0, count($filenames), '?'));
             $sql = "UPDATE Person SET Avatar = ? WHERE Avatar IN ($inClause)";

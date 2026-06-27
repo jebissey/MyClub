@@ -124,7 +124,10 @@ abstract class Data
             $stmt->execute($params);
             return $stmt->fetch();
         } catch (PDOException $e) {
-            $this->application->getErrorManager()->raise(ApplicationError::Error, "Database error {$e->getMessage()} in {$e->getFile()}:{$e->getLine()} with query {$sql}");
+            $this->application->getErrorManager()->raise(
+                ApplicationError::Error,
+                "Database error {$e->getMessage()} in {$e->getFile()}:{$e->getLine()} with query {$sql}"
+            );
             throw $e;
         }
     }
@@ -190,7 +193,10 @@ abstract class Data
             }
             return $stmt->fetchAll(PDO::FETCH_OBJ);
         } catch (PDOException $e) {
-            $this->application->getErrorManager()->raise(ApplicationError::Error, 'Database error: ' . $e->getMessage() . ' in file ' . __FILE__ . ' at line ' . __LINE__);
+            $this->application->getErrorManager()->raise(
+                ApplicationError::Error,
+                'Database error: ' . $e->getMessage() . ' in file ' . __FILE__ . ' at line ' . __LINE__
+            );
             throw $e;
         }
     }
@@ -230,7 +236,10 @@ abstract class Data
             $stmt->execute($params);
             return $stmt->fetch();
         } catch (PDOException $e) {
-            $this->application->getErrorManager()->raise(ApplicationError::Error, "Database error {$e->getMessage()} in {$e->getFile()}:{$e->getLine()} with query {$sql}");
+            $this->application->getErrorManager()->raise(
+                ApplicationError::Error,
+                "Database error {$e->getMessage()} in {$e->getFile()}:{$e->getLine()} with query {$sql}"
+            );
             throw $e;
         }
     }
@@ -256,7 +265,10 @@ abstract class Data
                     return $result;
             }
         } catch (\PDOException $e) {
-            $this->application->getErrorManager()->raise(ApplicationError::Error, 'Database error: ' . $e->getMessage() . ' in file ' . __FILE__ . ' at line ' . __LINE__);
+            $this->application->getErrorManager()->raise(
+                ApplicationError::Error,
+                'Database error: ' . $e->getMessage() . ' in file ' . __FILE__ . ' at line ' . __LINE__
+            );
             return false;
         }
     }
@@ -328,7 +340,7 @@ abstract class Data
         }
     }
 
-    static function requireFields(array $data, array $fields): bool
+    public static function requireFields(array $data, array $fields): bool
     {
         foreach ($fields as $field) {
             if (!array_key_exists($field, $data)) {

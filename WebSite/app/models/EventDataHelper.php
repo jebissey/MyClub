@@ -23,7 +23,7 @@ use app\valueObjects\ApiResponse;
 
 class EventDataHelper extends Data implements NewsProviderInterface
 {
-    private $personPreferences;
+    private PersonPreferences $personPreferences;
 
     public function __construct(Application $application)
     {
@@ -31,7 +31,7 @@ class EventDataHelper extends Data implements NewsProviderInterface
         $this->personPreferences = new PersonPreferences($this->pdo);
     }
 
-    public function delete_($id, $personId)
+    public function removeParticipant(int $id, int $personId)
     {
         if (!$this->get('Event', ['Id' => $id, 'CreatedBy' => $personId])) {
             return [['success' => false, 'message' => 'User not allowed'], ApplicationError::Forbidden->value];
@@ -595,7 +595,10 @@ class EventDataHelper extends Data implements NewsProviderInterface
                 'id' => $event->Id,
                 'idEventType' => $event->IdEventType,
                 'eventTypeName' => $event->EventTypeName,
-                'groupName' => $event->EventTypeIdGroup ? $this->fluent->from("'Group'")->where('Id', $event->EventTypeIdGroup)->fetch('Name') : '',
+                'groupName' => $event->EventTypeIdGroup ? $this->fluent->from("'Group'")->where(
+                    'Id',
+                    $event->EventTypeIdGroup
+                )->fetch('Name') : '',
                 'summary' => $event->Summary,
                 'location' => $event->Location,
                 'startTime' => $event->StartTime,

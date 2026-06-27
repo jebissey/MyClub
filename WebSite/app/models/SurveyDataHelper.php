@@ -117,7 +117,10 @@ class SurveyDataHelper extends Data implements NewsProviderInterface
         foreach ($surveys as $survey) {
             if (
                 $authorizationDataHelper->getArticle($survey->IdArticle, $connectedUser)
-                && $authorizationDataHelper->canPersonReadSurveyResults($this->articleDataHelper->getWithAuthor($survey->IdArticle), $connectedUser)
+                && $authorizationDataHelper->canPersonReadSurveyResults(
+                    $this->articleDataHelper->getWithAuthor($survey->IdArticle),
+                    $connectedUser
+                )
             ) {
                 $news[] = [
                     'type'   => 'survey',
@@ -133,7 +136,7 @@ class SurveyDataHelper extends Data implements NewsProviderInterface
         return $news;
     }
 
-    public function GetRepliesForActivePersons(int $surveyId): array
+    public function getRepliesForActivePersons(int $surveyId): array
     {
         $sql = "
             SELECT r.*

@@ -56,8 +56,10 @@ VALUES
 
 ('layout.pwa.ios_install.message',
 'Install <strong>MyClub</strong> on your iPhone: tap <strong>⎋ Share</strong> then <strong>«Add to Home Screen»</strong>',
-'Installez <strong>MyClub</strong> sur votre iPhone : appuyez sur <strong>⎋ Partager</strong> puis <strong>« Sur l''écran d''accueil »</strong>',
-'Zainstaluj <strong>MyClub</strong> na swoim iPhonie: naciśnij <strong>⎋ Udostępnij</strong> a następnie <strong>«Na ekranie głównym»</strong>');
+'Installez <strong>MyClub</strong> sur votre iPhone : appuyez sur <strong>⎋ Partager</strong> puis 
+<strong>« Sur l''écran d''accueil »</strong>',
+'Zainstaluj <strong>MyClub</strong> na swoim iPhonie: naciśnij <strong>⎋ Udostępnij</strong> a następnie 
+<strong>«Na ekranie głównym»</strong>');
 
 SQL;
         $pdo->exec($sql);

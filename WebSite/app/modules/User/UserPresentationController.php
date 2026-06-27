@@ -34,7 +34,10 @@ class UserPresentationController extends AbstractController
                 'btn_HistoryBack' => true,
             ]));
         } else {
-            $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+            $this->application->getErrorManager()->raise(
+                ApplicationError::Forbidden,
+                'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__
+            );
         }
     }
 
@@ -66,14 +69,20 @@ class UserPresentationController extends AbstractController
                 ], ['Id' => $person->Id]);
                 $this->redirect('/user/directory');
             } else {
-                $this->application->getErrorManager()->raise(ApplicationError::MethodNotAllowed, 'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__);
+                $this->application->getErrorManager()->raise(
+                    ApplicationError::MethodNotAllowed,
+                    'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__
+                );
             }
         } else {
-            $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+            $this->application->getErrorManager()->raise(
+                ApplicationError::Forbidden,
+                'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__
+            );
         }
     }
 
-    public function showPresentation($personId)
+    public function showPresentation(int $personId)
     {
         if ($loggedPerson = $this->application->getConnectedUser()->person ?? false) {
             $person = $this->dataHelper->get('Person', [
@@ -97,7 +106,10 @@ class UserPresentationController extends AbstractController
                 'maxZoom' => 12,
             ]));
         } else {
-            $this->application->getErrorManager()->raise(ApplicationError::Forbidden, 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__);
+            $this->application->getErrorManager()->raise(
+                ApplicationError::Forbidden,
+                'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__
+            );
         }
     }
 }

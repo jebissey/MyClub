@@ -178,7 +178,10 @@ class AuthorizationDataHelper extends Data
         if ($connectedUser->person !== null && $article->IdGroup === null) {
             return true;
         }
-        return $article->IdGroup === null || !empty(array_intersect([$article->IdGroup], $this->getUserGroups($connectedUser->person?->Email ?? '')));
+        return $article->IdGroup === null || !empty(array_intersect(
+            [$article->IdGroup],
+            $this->getUserGroups($connectedUser->person?->Email ?? '')
+        ));
     }
 
     private function getGroups(string $groupsFilter): array

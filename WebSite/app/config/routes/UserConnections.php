@@ -20,7 +20,7 @@ class UserConnections implements RouteInterface
     {
         $userConnectionsController = fn() => $this->controllerFactory->makeUserConnectionsController();
 
-        $this->routes[] = new Route('GET /user/connections', $userConnectionsController, 'showConnections_');
+        $this->routes[] = new Route('GET /user/connections', $userConnectionsController, 'showConnectionsOfConnectedUser');
         $this->routes[] = new Route('GET /user/connections/@id:[0-9]+', $userConnectionsController, 'showConnections');
 
         return $this->routes;

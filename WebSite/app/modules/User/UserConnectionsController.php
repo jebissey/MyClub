@@ -17,7 +17,7 @@ class UserConnectionsController extends AbstractController
         parent::__construct($application);
     }
 
-    public function showConnections_(): void
+    public function showConnectionsOfConnectedUser(): void
     {
         $person = $this->application->getConnectedUser()->person;
         if ($person === null) {

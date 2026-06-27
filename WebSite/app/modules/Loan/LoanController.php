@@ -25,7 +25,7 @@ class LoanController extends AbstractController
         }
 
         $this->render('Loan/views/calendar.latte', $this->getAllParams([
-            'i18n' => $this->translations_(),
+            'i18n' => $this->doTranslations(),
             'page' => $this->application->getConnectedUser()->getPage(),
             'activeTab' => 'calendar',
             'btn_Parent' => "/user",
@@ -43,7 +43,7 @@ class LoanController extends AbstractController
 
         $this->render('Loan/views/designer.latte', $this->getAllParams([
             'items'        => $this->loanDataHelper->getAllItems(),
-            'i18n' => $this->translations_(),
+            'i18n' => $this->doTranslations(),
             'page' => $this->application->getConnectedUser()->getPage(),
             'activeTab' => 'designer',
             'btn_Parent' => "/admin",
@@ -80,7 +80,7 @@ class LoanController extends AbstractController
             'loans'        => $this->loanDataHelper->getAllLoans(),
             'loanItems'    => $this->loanDataHelper->getActiveItems('loan'),
             'persons'      => $this->loanDataHelper->getAllPersons(),
-            'i18n' => $this->translations_(),
+            'i18n' => $this->doTranslations(),
             'activeTab' => 'manager',
             'btn_Parent' => "/user",
             'btn_HistoryBack' => true,
@@ -102,7 +102,7 @@ class LoanController extends AbstractController
             'persons'           => $this->loanDataHelper->getAllPersons(),
             'isManager'         => $user->isLoanManager(),
             'currentUserId'     => $userId,
-            'i18n' => $this->translations_(),
+            'i18n' => $this->doTranslations(),
             'page' => $this->application->getConnectedUser()->getPage(),
             'activeTab' => 'user',
             'btn_Parent' => "/user",
@@ -111,7 +111,7 @@ class LoanController extends AbstractController
     }
 
     #region Private methods
-    private function translations_(): array
+    private function doTranslations(): array
     {
         $keys = [
             'nav.designer',

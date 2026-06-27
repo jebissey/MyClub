@@ -34,12 +34,22 @@ class LyricsParser
                 continue;
             }
 
-            // Parse metadata [ti:title], [ar:artist], etc.
-            if (preg_match('/^\[([a-z]+):(.+)\]$/i', $line, $matches)) {
+
+            if (
+                preg_match(
+                    '/^\[([a-z]+):(.+)\]$/i',
+                    $line,
+                    $matches
+                )
+            ) { // Parse metadata [ti:title], [ar:artist], etc.
                 $this->metadata[$matches[1]] = trim($matches[2]);
-            }
-            // Parse timed lyrics [00:00.00]text or with word timing
-            elseif (preg_match('/^\[(\d+):(\d+\.\d+)\](.*)$/', $line, $matches)) {
+            } elseif (
+                preg_match(
+                    '/^\[(\d+):(\d+\.\d+)\](.*)$/',
+                    $line,
+                    $matches
+                )
+            ) { // Parse timed lyrics [00:00.00]text or with word timing
                 $minutes = (int) $matches[1];
                 $seconds = (float) $matches[2];
                 $timeInSeconds = $minutes * 60 + $seconds;
@@ -66,10 +76,8 @@ class LyricsParser
                 ];
             }
         }
-
         usort($this->lines, fn($a, $b) => $a['time'] <=> $b['time']);
     }
-
 
     public function getMetadata(): array
     {

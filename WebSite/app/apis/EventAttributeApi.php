@@ -54,7 +54,7 @@ class EventAttributeApi extends AbstractApi
             return;
         }
         try {
-            [$response, $statusCode] = $this->attributeDataHelper->delete_($id);
+            [$response, $statusCode] = $this->attributeDataHelper->deleteAttribute($id);
             $this->renderJson($response, true, $statusCode);
         } catch (Throwable $e) {
             $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());

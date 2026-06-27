@@ -6,9 +6,9 @@ namespace app\helpers;
 
 class Backup
 {
-    const SQLITE_PATH = __DIR__ . '/../../data/';
-    const SQLITE_FILE = 'MyClub.sqlite';
-    const BACKUP_PATH = __DIR__ . '/../../backup';
+    private const SQLITE_PATH = __DIR__ . '/../../data/';
+    private const SQLITE_FILE = 'MyClub.sqlite';
+    private const BACKUP_PATH = __DIR__ . '/../../backup';
     private $backupRoot;
     private $sourceFile;
     private $monthFolders;

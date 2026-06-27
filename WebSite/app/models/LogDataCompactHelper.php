@@ -42,12 +42,11 @@ class LogDataCompactHelper extends Data
     {
         if ($removeOlderThanXmonths <= $compactOlderThanXmonths) {
             throw new InvalidArgumentException(
-                "removeOlderThanXmonths ($removeOlderThanXmonths) must be strictly greater than compactOlderThanXmonths ($compactOlderThanXmonths)"
+                "remove older ($removeOlderThanXmonths) must be strictly greater than compact older ($compactOlderThanXmonths)"
             );
         }
 
         $this->pdoForLog->beginTransaction();
-
         try {
             $emptyCondition = "IpAddress = '' AND Referer = '' AND Os = '' AND Browser = '' 
                           AND ScreenResolution = '' AND Type = '' AND Token = '' 
@@ -94,7 +93,10 @@ class LogDataCompactHelper extends Data
             $this->pdoForLog->commit();
             $this->pdoForLog->exec("VACUUM");
 
-            (new LogDataWriterHelper($this->application))->add((string)ApplicationError::Ok->value, "Compact log: {$deletedRows} old deleted, {$compactedInserted} compacted, {$compactedDeleted} compacted deleted");
+            (new LogDataWriterHelper($this->application))->add(
+                (string)ApplicationError::Ok->value,
+                "Compact log: {$deletedRows} old deleted, {$compactedInserted} compacted, {$compactedDeleted} compacted deleted"
+            );
         } catch (Throwable $e) {
             if ($this->pdoForLog->inTransaction()) {
                 $this->pdoForLog->rollBack();
@@ -126,7 +128,10 @@ class LogDataCompactHelper extends Data
         }
         $countAfter = (int)$this->pdoForLog->query("SELECT COUNT(*) FROM Log")->fetchColumn();
         if ($countAfter < $countBefore) {
-            (new LogDataWriterHelper($this->application))->add((string)ApplicationError::Ok->value, "Compact log from $countBefore to $countAfter");
+            (new LogDataWriterHelper($this->application))->add(
+                (string)ApplicationError::Ok->value,
+                "Compact log from $countBefore to $countAfter"
+            );
         }
     }
 }

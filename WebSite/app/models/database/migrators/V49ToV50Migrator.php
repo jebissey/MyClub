@@ -130,7 +130,10 @@ INSERT INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
 ('loan.msg.returned',       'Return registered.',    'Retour enregistré.',        'Zwrot zarejestrowany.'),
 ('loan.msg.cancelled',      'Cancelled.',            'Annulé.',                   'Anulowano.'),
 ('loan.msg.error',          'An error occurred.',    'Une erreur est survenue.',  'Wystąpił błąd.'),
-('loan.msg.qty_exceeded',   'Requested quantity exceeds available stock.', 'La quantité demandée dépasse le stock disponible.', 'Żądana ilość przekracza dostępne zapasy.'),
+('loan.msg.qty_exceeded',   
+  'Requested quantity exceeds available stock.', 
+  'La quantité demandée dépasse le stock disponible.', 
+  'Żądana ilość przekracza dostępne zapasy.'),
 
 ('Help_LoanDesigner',
 '<div class="container my-5">
@@ -148,21 +151,32 @@ INSERT INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
             <div class="d-flex align-items-start">
               <span class="fs-4 me-3">🎨</span>
               <div><strong>Designer</strong>
-              <p class="text-muted small">Creates and manages the material catalogue: name, description, type (loan / reservation / both) and total available quantity.</p></div>
+                <p class="text-muted small">
+Creates and manages the material catalogue: name, description, type (loan / reservation / both) and total available quantity.
+                </p>
+              </div>
             </div>
           </div>
           <div class="col-md-4">
             <div class="d-flex align-items-start">
               <span class="fs-4 me-3">📋</span>
-              <div><strong>Manager</strong>
-              <p class="text-muted small">Handles loans of items to take away: records who lends what to whom, for how long, and registers returns.</p></div>
+              <div>
+                <strong>Manager</strong>
+                <p class="text-muted small">
+Handles loans of items to take away: records who lends what to whom, for how long, and registers returns.
+                </p>
+              </div>
             </div>
           </div>
           <div class="col-md-4">
             <div class="d-flex align-items-start">
               <span class="fs-4 me-3">👤</span>
-              <div><strong>User</strong>
-              <p class="text-muted small">Books items for on-site use: chooses a date, a time slot and a quantity. No return step required.</p></div>
+              <div>
+                <strong>User</strong>
+                <p class="text-muted small">
+Books items for on-site use: chooses a date, a time slot and a quantity. No return step required.
+                </p>
+              </div>
             </div>
           </div>
         </div>
@@ -177,22 +191,35 @@ INSERT INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
           <div class="col-md-6">
             <div class="d-flex align-items-start mb-3">
               <div class="bg-primary text-white rounded p-2 me-3"><i class="bi bi-box-seam-fill"></i></div>
-              <div><strong>Item type</strong>
-              <p class="text-muted small">Each item is tagged <em>Loan (take away)</em>, <em>Reservation (on-site)</em> or <em>Both</em>. This controls where it appears in the Manager and User views.</p></div>
+              <div>
+                <strong>Item type</strong>
+                <p class="text-muted small">
+Each item is tagged <em>Loan (take away)</em>, <em>Reservation (on-site)</em> or <em>Both</em>. 
+This controls where it appears in the Manager and User views.
+                </p>
+              </div>
             </div>
           </div>
           <div class="col-md-6">
             <div class="d-flex align-items-start mb-3">
               <div class="bg-primary text-white rounded p-2 me-3"><i class="bi bi-123"></i></div>
-              <div><strong>Total quantity</strong>
-              <p class="text-muted small">Defines the maximum number of units available simultaneously. The system prevents overbooking automatically.</p></div>
+              <div>
+                <strong>Total quantity</strong>
+                <p class="text-muted small">
+Defines the maximum number of units available simultaneously. The system prevents overbooking automatically.
+                </p>
+              </div>
             </div>
           </div>
           <div class="col-md-6">
             <div class="d-flex align-items-start">
               <div class="bg-primary text-white rounded p-2 me-3"><i class="bi bi-toggle-on"></i></div>
-              <div><strong>Active / Inactive</strong>
-              <p class="text-muted small">An inactive item no longer appears in loan or reservation forms, but its history is preserved.</p></div>
+              <div>
+                <strong>Active / Inactive</strong>
+                <p class="text-muted small">
+An inactive item no longer appears in loan or reservation forms, but its history is preserved.
+                </p>
+              </div>
             </div>
           </div>
           <div class="col-md-6">
@@ -214,29 +241,48 @@ INSERT INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
           <div class="col-md-6">
             <div class="d-flex align-items-start mb-3">
               <div class="bg-success text-white rounded p-2 me-3"><i class="bi bi-arrow-right-circle-fill"></i></div>
-              <div><strong>Creating a loan</strong>
-              <p class="text-muted small">Record who lends (lender), who borrows (borrower), the loan date, the expected return date and the quantity. Real-time availability is shown before saving.</p></div>
+              <div>
+                <strong>Creating a loan</strong>
+                <p class="text-muted small">
+                  Record who lends (lender), who borrows (borrower), the loan date, the expected return date and the quantity. 
+                  Real-time availability is shown before saving.
+                </p>
+              </div>
             </div>
           </div>
           <div class="col-md-6">
             <div class="d-flex align-items-start mb-3">
               <div class="bg-success text-white rounded p-2 me-3"><i class="bi bi-check2-circle"></i></div>
-              <div><strong>Registering a return</strong>
-              <p class="text-muted small">Click <strong>Register return</strong> <i class="bi bi-check2-circle"></i> on an active loan. Enter the actual return date and the person who received the item.</p></div>
+              <div>
+                <strong>Registering a return</strong>
+                <p class="text-muted small">
+                  Click <strong>Register return</strong> <i class="bi bi-check2-circle"></i> on an active loan. 
+                  Enter the actual return date and the person who received the item.
+                </p>
+              </div>
             </div>
           </div>
           <div class="col-md-6">
             <div class="d-flex align-items-start">
               <div class="bg-danger text-white rounded p-2 me-3"><i class="bi bi-exclamation-circle-fill"></i></div>
-              <div><strong>Overdue loans</strong>
-              <p class="text-muted small">Loans past their due date are automatically flagged <em>Overdue</em> <i class="bi bi-exclamation-triangle-fill text-danger"></i>. They remain visible and can still be returned.</p></div>
+              <div>
+                <strong>Overdue loans</strong>
+                <p class="text-muted small">
+                  Loans past their due date are automatically flagged <em>Overdue</em> 
+                  <i class="bi bi-exclamation-triangle-fill text-danger"></i>. 
+                  They remain visible and can still be returned.</p>
+              </div>
             </div>
           </div>
           <div class="col-md-6">
             <div class="d-flex align-items-start">
               <div class="bg-secondary text-white rounded p-2 me-3"><i class="bi bi-funnel-fill"></i></div>
-              <div><strong>Status filter</strong>
-              <p class="text-muted small">Filter the list by status: <em>Active</em>, <em>Overdue</em>, <em>Returned</em> or <em>Cancelled</em>.</p></div>
+              <div>
+                <strong>Status filter</strong>
+                <p class="text-muted small">
+                  Filter the list by status: <em>Active</em>, <em>Overdue</em>, <em>Returned</em> or <em>Cancelled</em>.
+                </p>
+              </div>
             </div>
           </div>
         </div>
@@ -251,22 +297,35 @@ INSERT INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
           <div class="col-md-6">
             <div class="d-flex align-items-start mb-3">
               <div class="bg-warning text-dark rounded p-2 me-3"><i class="bi bi-calendar-plus-fill"></i></div>
-              <div><strong>Creating a reservation</strong>
-              <p class="text-muted small">Choose an item, a date, a start time, an end time and a quantity. The system checks availability in real time for the selected slot.</p></div>
+              <div>
+                <strong>Creating a reservation</strong>
+                <p class="text-muted small">
+                  Choose an item, a date, a start time, an end time and a quantity. 
+                  The system checks availability in real time for the selected slot.
+                </p>
+              </div>
             </div>
           </div>
           <div class="col-md-6">
             <div class="d-flex align-items-start mb-3">
               <div class="bg-warning text-dark rounded p-2 me-3"><i class="bi bi-clock-fill"></i></div>
-              <div><strong>No return required</strong>
-              <p class="text-muted small">On-site reservations have no return step. Simply cancel a reservation if it is no longer needed.</p></div>
+              <div>
+                <strong>No return required</strong>
+                <p class="text-muted small">
+                  On-site reservations have no return step. Simply cancel a reservation if it is no longer needed.
+                </p>
+              </div>
             </div>
           </div>
           <div class="col-md-6">
             <div class="d-flex align-items-start">
               <div class="bg-warning text-dark rounded p-2 me-3"><i class="bi bi-person-badge-fill"></i></div>
-              <div><strong>Manager view</strong>
-              <p class="text-muted small">Managers see all users'' reservations and can cancel any of them. Standard users only see their own.</p></div>
+              <div>
+                <strong>Manager view</strong>
+                <p class="text-muted small">
+                  Managers see all users'' reservations and can cancel any of them. Standard users only see their own.
+                </p>
+              </div>
             </div>
           </div>
         </div>
@@ -295,7 +354,12 @@ INSERT INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
       </div>
       <div class="list-group-item d-flex align-items-center bg-light">
         <i class="bi bi-shield-lock-fill fs-3 text-primary me-3"></i>
-        <span><strong>Permissions:</strong> <strong>LoanDesigner</strong> manages the catalogue. <strong>LoanManager</strong> manages loans and can view all reservations. Any connected member can book an on-site reservation and view the calendar.</span>
+        <span>
+          <strong>Permissions:</strong> 
+          <strong>LoanDesigner</strong> manages the catalogue. 
+          <strong>LoanManager</strong> manages loans and can view all reservations. 
+          Any connected member can book an on-site reservation and view the calendar.
+        </span>
       </div>
     </div>
   </section>
@@ -315,22 +379,35 @@ INSERT INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
           <div class="col-md-4">
             <div class="d-flex align-items-start">
               <span class="fs-4 me-3">🎨</span>
-              <div><strong>Designer</strong>
-              <p class="text-muted small">Crée et gère le catalogue du matériel : nom, description, type (prêt / réservation / les deux) et quantité totale disponible.</p></div>
+              <div>
+                <strong>Designer</strong>
+                <p class="text-muted small">
+Crée et gère le catalogue du matériel : nom, description, type (prêt / réservation / les deux) et quantité totale disponible.
+                </p>
+              </div>
             </div>
           </div>
           <div class="col-md-4">
             <div class="d-flex align-items-start">
               <span class="fs-4 me-3">📋</span>
-              <div><strong>Manager</strong>
-              <p class="text-muted small">Gère les prêts à emporter : enregistre qui prête quoi à qui, pour combien de temps, et gère les retours.</p></div>
+              <div>
+                <strong>Manager</strong>
+                <p class="text-muted small">
+                  Gère les prêts à emporter : enregistre qui prête quoi à qui, pour combien de temps, et gère les retours.
+                </p>
+              </div>
             </div>
           </div>
           <div class="col-md-4">
             <div class="d-flex align-items-start">
               <span class="fs-4 me-3">👤</span>
-              <div><strong>Utilisateur</strong>
-              <p class="text-muted small">Réserve du matériel pour une utilisation sur place : choisit une date, un créneau horaire et une quantité. Aucune remise à gérer.</p></div>
+              <div>
+                <strong>Utilisateur</strong>
+                <p class="text-muted small">
+                  Réserve du matériel pour une utilisation sur place : choisit une date, un créneau horaire et une quantité. 
+                  Aucune remise à gérer.
+                </p>
+              </div>
             </div>
           </div>
         </div>
@@ -346,29 +423,48 @@ INSERT INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
           <div class="col-md-6">
             <div class="d-flex align-items-start mb-3">
               <div class="bg-primary text-white rounded p-2 me-3"><i class="bi bi-box-seam-fill"></i></div>
-              <div><strong>Type de matériel</strong>
-              <p class="text-muted small">Chaque article est classé <em>Prêt (à emporter)</em>, <em>Réservation (sur place)</em> ou <em>Les deux</em>. Ce paramètre détermine où il apparaît dans les vues Manager et Utilisateur.</p></div>
+              <div>
+                <strong>Type de matériel</strong>
+                <p class="text-muted small">
+                  Chaque article est classé 
+                  <em>Prêt (à emporter)</em>, 
+                  <em>Réservation (sur place)</em> ou 
+                  <em>Les deux</em>. Ce paramètre détermine où il apparaît dans les vues Manager et Utilisateur.
+                </p>
+              </div>
             </div>
           </div>
           <div class="col-md-6">
             <div class="d-flex align-items-start mb-3">
               <div class="bg-primary text-white rounded p-2 me-3"><i class="bi bi-123"></i></div>
-              <div><strong>Quantité totale</strong>
-              <p class="text-muted small">Définit le nombre maximum d''unités disponibles simultanément. Le système empêche automatiquement le survol de stock.</p></div>
+              <div>
+                <strong>Quantité totale</strong>
+                <p class="text-muted small">
+                  Définit le nombre maximum d''unités disponibles simultanément. Le système empêche automatiquement le survol de stock.
+              </p>
+            </div>
             </div>
           </div>
           <div class="col-md-6">
             <div class="d-flex align-items-start">
               <div class="bg-primary text-white rounded p-2 me-3"><i class="bi bi-toggle-on"></i></div>
-              <div><strong>Actif / Inactif</strong>
-              <p class="text-muted small">Un article inactif n''apparaît plus dans les formulaires de prêt ou de réservation, mais son historique est conservé.</p></div>
+              <div>
+                <strong>Actif / Inactif</strong>
+                <p class="text-muted small">
+                  Un article inactif n''apparaît plus dans les formulaires de prêt ou de réservation, mais son historique est conservé.
+                </p>
+              </div>
             </div>
           </div>
           <div class="col-md-6">
             <div class="d-flex align-items-start">
               <div class="bg-warning text-dark rounded p-2 me-3"><i class="bi bi-exclamation-triangle-fill"></i></div>
-              <div><strong>Suppression</strong>
-              <p class="text-muted small">Un article ne peut pas être supprimé s''il possède des prêts ou réservations actifs. Désactivez-le à la place.</p></div>
+              <div>
+                <strong>Suppression</strong>
+                <p class="text-muted small">
+                  Un article ne peut pas être supprimé s''il possède des prêts ou réservations actifs. Désactivez-le à la place.
+                </p>
+              </div>
             </div>
           </div>
         </div>
@@ -383,30 +479,55 @@ INSERT INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
         <div class="row g-4">
           <div class="col-md-6">
             <div class="d-flex align-items-start mb-3">
-              <div class="bg-success text-white rounded p-2 me-3"><i class="bi bi-arrow-right-circle-fill"></i></div>
-              <div><strong>Créer un prêt</strong>
-              <p class="text-muted small">Enregistrez qui prête (prêteur), qui emprunte (emprunteur), la date de prêt, la date de retour prévue et la quantité. La disponibilité est vérifiée en temps réel avant l''enregistrement.</p></div>
+              <div class="bg-success text-white rounded p-2 me-3">
+                <i class="bi bi-arrow-right-circle-fill"></i>
+              </div>
+              <div>
+                <strong>Créer un prêt</strong>
+                <p class="text-muted small">
+                  Enregistrez qui prête (prêteur), qui emprunte (emprunteur), la date de prêt, la date de retour prévue et la quantité. 
+                  La disponibilité est vérifiée en temps réel avant l''enregistrement.
+                </p>
+              </div>
             </div>
           </div>
           <div class="col-md-6">
             <div class="d-flex align-items-start mb-3">
-              <div class="bg-success text-white rounded p-2 me-3"><i class="bi bi-check2-circle"></i></div>
-              <div><strong>Enregistrer un retour</strong>
-              <p class="text-muted small">Cliquez sur <strong>Enregistrer le retour</strong> <i class="bi bi-check2-circle"></i> sur un prêt actif. Saisissez la date de retour effective et la personne qui récupère le matériel.</p></div>
+              <div class="bg-success text-white rounded p-2 me-3">
+                <i class="bi bi-check2-circle"></i>
+              </div>
+              <div>
+                <strong>Enregistrer un retour</strong>
+              <p class="text-muted small">
+                Cliquez sur <strong>Enregistrer le retour</strong> 
+                <i class="bi bi-check2-circle"></i> sur un prêt actif. 
+                Saisissez la date de retour effective et la personne qui récupère le matériel.
+              </p>
+            </div>
             </div>
           </div>
           <div class="col-md-6">
             <div class="d-flex align-items-start">
               <div class="bg-danger text-white rounded p-2 me-3"><i class="bi bi-exclamation-circle-fill"></i></div>
-              <div><strong>Prêts en retard</strong>
-              <p class="text-muted small">Les prêts dont la date de retour prévue est dépassée passent automatiquement en statut <em>En retard</em> <i class="bi bi-exclamation-triangle-fill text-danger"></i>. Ils restent visibles et peuvent toujours être clôturés.</p></div>
+              <div>
+                <strong>Prêts en retard</strong>
+                <p class="text-muted small">
+                  Les prêts dont la date de retour prévue est dépassée passent automatiquement en statut 
+                  <em>En retard</em> <i class="bi bi-exclamation-triangle-fill text-danger"></i>. 
+                  Ils restent visibles et peuvent toujours être clôturés.
+                </p>
+              </div>
             </div>
           </div>
           <div class="col-md-6">
             <div class="d-flex align-items-start">
               <div class="bg-secondary text-white rounded p-2 me-3"><i class="bi bi-funnel-fill"></i></div>
-              <div><strong>Filtre par statut</strong>
-              <p class="text-muted small">Filtrez la liste par statut : <em>En cours</em>, <em>En retard</em>, <em>Rendu</em> ou <em>Annulé</em>.</p></div>
+              <div>
+                <strong>Filtre par statut</strong>
+                <p class="text-muted small">
+                  Filtrez la liste par statut : <em>En cours</em>, <em>En retard</em>, <em>Rendu</em> ou <em>Annulé</em>.
+                </p>
+              </div>
             </div>
           </div>
         </div>
@@ -421,23 +542,40 @@ INSERT INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
         <div class="row g-4">
           <div class="col-md-6">
             <div class="d-flex align-items-start mb-3">
-              <div class="bg-warning text-dark rounded p-2 me-3"><i class="bi bi-calendar-plus-fill"></i></div>
-              <div><strong>Créer une réservation</strong>
-              <p class="text-muted small">Choisissez un matériel, une date, une heure de début, une heure de fin et une quantité. La disponibilité est vérifiée en temps réel pour le créneau sélectionné.</p></div>
+              <div class="bg-warning text-dark rounded p-2 me-3">
+                <i class="bi bi-calendar-plus-fill"></i>
+              </div>
+              <div>
+                <strong>Créer une réservation</strong>
+                <p class="text-muted small">
+                  Choisissez un matériel, une date, une heure de début, une heure de fin et une quantité. 
+                  La disponibilité est vérifiée en temps réel pour le créneau sélectionné.
+                </p>
+              </div>
             </div>
           </div>
           <div class="col-md-6">
             <div class="d-flex align-items-start mb-3">
               <div class="bg-warning text-dark rounded p-2 me-3"><i class="bi bi-clock-fill"></i></div>
-              <div><strong>Pas de retour à gérer</strong>
-              <p class="text-muted small">Les réservations sur place n''ont pas d''étape de remise. Il suffit d''annuler une réservation si elle n''est plus nécessaire.</p></div>
+              <div>
+                <strong>Pas de retour à gérer</strong>
+                <p class="text-muted small">
+                  Les réservations sur place n''ont pas d''étape de remise. 
+                  Il suffit d''annuler une réservation si elle n''est plus nécessaire.
+                </p>
+              </div>
             </div>
           </div>
           <div class="col-md-6">
             <div class="d-flex align-items-start">
               <div class="bg-warning text-dark rounded p-2 me-3"><i class="bi bi-person-badge-fill"></i></div>
-              <div><strong>Vue Manager</strong>
-              <p class="text-muted small">Les managers voient les réservations de tous les utilisateurs et peuvent en annuler n''importe laquelle. Les utilisateurs simples ne voient que les leurs.</p></div>
+              <div>
+                <strong>Vue Manager</strong>
+                <p class="text-muted small">
+                  Les managers voient les réservations de tous les utilisateurs et peuvent en annuler n''importe laquelle. 
+                  Les utilisateurs simples ne voient que les leurs.
+                </p>
+              </div>
             </div>
           </div>
         </div>
@@ -468,7 +606,12 @@ INSERT INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
       </div>
       <div class="list-group-item d-flex align-items-center bg-light">
         <i class="bi bi-shield-lock-fill fs-3 text-primary me-3"></i>
-        <span><strong>Permissions :</strong> <strong>LoanDesigner</strong> gère le catalogue. <strong>LoanManager</strong> gère les prêts et peut consulter toutes les réservations. Tout membre connecté peut créer une réservation sur place et consulter le calendrier.</span>
+        <span>
+          <strong>Permissions :</strong> 
+          <strong>LoanDesigner</strong> gère le catalogue. 
+          <strong>LoanManager</strong> gère les prêts et peut consulter toutes les réservations. 
+          Tout membre connecté peut créer une réservation sur place et consulter le calendrier.
+        </span>
       </div>
     </div>
   </section>
@@ -488,22 +631,34 @@ INSERT INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
           <div class="col-md-4">
             <div class="d-flex align-items-start">
               <span class="fs-4 me-3">🎨</span>
-              <div><strong>Designer</strong>
-              <p class="text-muted small">Tworzy katalog sprzętu i nim zarządza: nazwa, opis, typ (pożyczka / rezerwacja / oba) oraz łączna dostępna ilość.</p></div>
+              <div>
+                <strong>Designer</strong>
+                <p class="text-muted small">
+                  Tworzy katalog sprzętu i nim zarządza: nazwa, opis, typ (pożyczka / rezerwacja / oba) oraz łączna dostępna ilość.
+                </p>
+              </div>
             </div>
           </div>
           <div class="col-md-4">
             <div class="d-flex align-items-start">
               <span class="fs-4 me-3">📋</span>
-              <div><strong>Manager</strong>
-              <p class="text-muted small">Zarządza pożyczkami sprzętu do zabrania: rejestruje kto pożycza co komu, na jak długo oraz obsługuje zwroty.</p></div>
+              <div>
+                <strong>Manager</strong>
+                <p class="text-muted small">
+                  Zarządza pożyczkami sprzętu do zabrania: rejestruje kto pożycza co komu, na jak długo oraz obsługuje zwroty.
+                </p>
+              </div>
             </div>
           </div>
           <div class="col-md-4">
             <div class="d-flex align-items-start">
               <span class="fs-4 me-3">👤</span>
-              <div><strong>Użytkownik</strong>
-              <p class="text-muted small">Rezerwuje sprzęt do użytku na miejscu: wybiera datę, przedział czasowy i ilość. Nie ma etapu zwrotu.</p></div>
+              <div>
+                <strong>Użytkownik</strong>
+                <p class="text-muted small">
+                  Rezerwuje sprzęt do użytku na miejscu: wybiera datę, przedział czasowy i ilość. Nie ma etapu zwrotu.
+                </p>
+              </div>
             </div>
           </div>
         </div>
@@ -519,29 +674,46 @@ INSERT INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
           <div class="col-md-6">
             <div class="d-flex align-items-start mb-3">
               <div class="bg-primary text-white rounded p-2 me-3"><i class="bi bi-box-seam-fill"></i></div>
-              <div><strong>Typ przedmiotu</strong>
-              <p class="text-muted small">Każdy przedmiot jest oznaczony jako <em>Pożyczka (do zabrania)</em>, <em>Rezerwacja (na miejscu)</em> lub <em>Oba</em>. Decyduje to o tym, gdzie pojawia się w widokach Managera i Użytkownika.</p></div>
+              <div>
+                <strong>Typ przedmiotu</strong>
+                <p class="text-muted small">
+                  Każdy przedmiot jest oznaczony jako <em>Pożyczka (do zabrania)</em>, <em>Rezerwacja (na miejscu)</em> lub <em>Oba</em>.
+                  Decyduje to o tym, gdzie pojawia się w widokach Managera i Użytkownika.
+                </p>
+              </div>
             </div>
           </div>
           <div class="col-md-6">
             <div class="d-flex align-items-start mb-3">
               <div class="bg-primary text-white rounded p-2 me-3"><i class="bi bi-123"></i></div>
-              <div><strong>Łączna ilość</strong>
-              <p class="text-muted small">Określa maksymalną liczbę jednostek dostępnych jednocześnie. System automatycznie zapobiega nadrezerwacji.</p></div>
+              <div>
+                <strong>Łączna ilość</strong>
+                <p class="text-muted small">
+                  Określa maksymalną liczbę jednostek dostępnych jednocześnie. System automatycznie zapobiega nadrezerwacji.
+                </p>
+              </div>
             </div>
           </div>
           <div class="col-md-6">
             <div class="d-flex align-items-start">
               <div class="bg-primary text-white rounded p-2 me-3"><i class="bi bi-toggle-on"></i></div>
-              <div><strong>Aktywny / Nieaktywny</strong>
-              <p class="text-muted small">Nieaktywny przedmiot nie pojawia się w formularzach pożyczek ani rezerwacji, ale jego historia jest zachowana.</p></div>
+              <div>
+                <strong>Aktywny / Nieaktywny</strong>
+                <p class="text-muted small">
+                  Nieaktywny przedmiot nie pojawia się w formularzach pożyczek ani rezerwacji, ale jego historia jest zachowana.
+                </p>
+              </div>
             </div>
           </div>
           <div class="col-md-6">
             <div class="d-flex align-items-start">
               <div class="bg-warning text-dark rounded p-2 me-3"><i class="bi bi-exclamation-triangle-fill"></i></div>
-              <div><strong>Usuwanie</strong>
-              <p class="text-muted small">Przedmiotu nie można usunąć, jeśli ma aktywne pożyczki lub rezerwacje. Zamiast tego należy go dezaktywować.</p></div>
+              <div>
+                <strong>Usuwanie</strong>
+                <p class="text-muted small">Przedmiotu nie można usunąć, jeśli ma aktywne pożyczki lub rezerwacje. 
+                  Zamiast tego należy go dezaktywować.
+                </p>
+              </div>
             </div>
           </div>
         </div>
@@ -557,29 +729,49 @@ INSERT INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
           <div class="col-md-6">
             <div class="d-flex align-items-start mb-3">
               <div class="bg-success text-white rounded p-2 me-3"><i class="bi bi-arrow-right-circle-fill"></i></div>
-              <div><strong>Tworzenie pożyczki</strong>
-              <p class="text-muted small">Zarejestruj kto pożycza (pożyczkodawca), kto bierze (pożyczkobiorca), datę pożyczki, planowany termin zwrotu i ilość. Dostępność jest sprawdzana w czasie rzeczywistym przed zapisem.</p></div>
+              <div>
+                <strong>Tworzenie pożyczki</strong>
+                <p class="text-muted small">
+                  Zarejestruj kto pożycza (pożyczkodawca), kto bierze (pożyczkobiorca), datę pożyczki, planowany termin zwrotu i ilość. 
+                  Dostępność jest sprawdzana w czasie rzeczywistym przed zapisem.
+                </p>
+              </div>
             </div>
           </div>
           <div class="col-md-6">
             <div class="d-flex align-items-start mb-3">
               <div class="bg-success text-white rounded p-2 me-3"><i class="bi bi-check2-circle"></i></div>
-              <div><strong>Rejestrowanie zwrotu</strong>
-              <p class="text-muted small">Kliknij <strong>Zarejestruj zwrot</strong> <i class="bi bi-check2-circle"></i> przy aktywnej pożyczce. Podaj faktyczną datę zwrotu i osobę, która odebrała sprzęt.</p></div>
+              <div>
+                <strong>Rejestrowanie zwrotu</strong>
+                <p class="text-muted small">
+                  Kliknij <strong>Zarejestruj zwrot</strong> <i class="bi bi-check2-circle"></i> przy aktywnej pożyczce. 
+                  Podaj faktyczną datę zwrotu i osobę, która odebrała sprzęt.
+                </p>
+              </div>
             </div>
           </div>
           <div class="col-md-6">
             <div class="d-flex align-items-start">
               <div class="bg-danger text-white rounded p-2 me-3"><i class="bi bi-exclamation-circle-fill"></i></div>
-              <div><strong>Pożyczki przeterminowane</strong>
-              <p class="text-muted small">Pożyczki po terminie zwrotu automatycznie zmieniają status na <em>Przeterminowane</em> <i class="bi bi-exclamation-triangle-fill text-danger"></i>. Pozostają widoczne i nadal można je zamknąć.</p></div>
+              <div>
+                <strong>Pożyczki przeterminowane</strong>
+                <p class="text-muted small">
+                  Pożyczki po terminie zwrotu automatycznie zmieniają status na 
+                  <em>Przeterminowane</em> <i class="bi bi-exclamation-triangle-fill text-danger"></i>. 
+                  Pozostają widoczne i nadal można je zamknąć.
+                </p>
+              </div>
             </div>
           </div>
           <div class="col-md-6">
             <div class="d-flex align-items-start">
               <div class="bg-secondary text-white rounded p-2 me-3"><i class="bi bi-funnel-fill"></i></div>
-              <div><strong>Filtr statusu</strong>
-              <p class="text-muted small">Filtruj listę według statusu: <em>Aktywna</em>, <em>Przeterminowana</em>, <em>Zwrócona</em> lub <em>Anulowana</em>.</p></div>
+              <div>
+                <strong>Filtr statusu</strong>
+                <p class="text-muted small">
+                  Filtruj listę według statusu: <em>Aktywna</em>, <em>Przeterminowana</em>, <em>Zwrócona</em> lub <em>Anulowana</em>.
+                </p>
+              </div>
             </div>
           </div>
         </div>
@@ -595,22 +787,37 @@ INSERT INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
           <div class="col-md-6">
             <div class="d-flex align-items-start mb-3">
               <div class="bg-warning text-dark rounded p-2 me-3"><i class="bi bi-calendar-plus-fill"></i></div>
-              <div><strong>Tworzenie rezerwacji</strong>
-              <p class="text-muted small">Wybierz przedmiot, datę, godzinę rozpoczęcia, godzinę zakończenia i ilość. System sprawdza dostępność w czasie rzeczywistym dla wybranego przedziału.</p></div>
+              <div>
+                <strong>Tworzenie rezerwacji</strong>
+                <p class="text-muted small">
+                  Wybierz przedmiot, datę, godzinę rozpoczęcia, godzinę zakończenia i ilość. 
+                  System sprawdza dostępność w czasie rzeczywistym dla wybranego przedziału.
+                </p>
+              </div>
             </div>
           </div>
           <div class="col-md-6">
             <div class="d-flex align-items-start mb-3">
               <div class="bg-warning text-dark rounded p-2 me-3"><i class="bi bi-clock-fill"></i></div>
-              <div><strong>Brak etapu zwrotu</strong>
-              <p class="text-muted small">Rezerwacje na miejscu nie wymagają zwrotu. Wystarczy anulować rezerwację, gdy nie jest już potrzebna.</p></div>
+              <div>
+                <strong>Brak etapu zwrotu</strong>
+                <p class="text-muted small">
+                  Rezerwacje na miejscu nie wymagają zwrotu. 
+                  Wystarczy anulować rezerwację, gdy nie jest już potrzebna.
+                </p>
+              </div>
             </div>
           </div>
           <div class="col-md-6">
             <div class="d-flex align-items-start">
               <div class="bg-warning text-dark rounded p-2 me-3"><i class="bi bi-person-badge-fill"></i></div>
-              <div><strong>Widok Managera</strong>
-              <p class="text-muted small">Managerowie widzą rezerwacje wszystkich użytkowników i mogą anulować dowolną z nich. Zwykli użytkownicy widzą tylko swoje.</p></div>
+              <div>
+                <strong>Widok Managera</strong>
+                <p class="text-muted small">
+                  Managerowie widzą rezerwacje wszystkich użytkowników i mogą anulować dowolną z nich. 
+                  Zwykli użytkownicy widzą tylko swoje.
+                </p>
+              </div>
             </div>
           </div>
         </div>
@@ -641,7 +848,12 @@ INSERT INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
       </div>
       <div class="list-group-item d-flex align-items-center bg-light">
         <i class="bi bi-shield-lock-fill fs-3 text-primary me-3"></i>
-        <span><strong>Uprawnienia:</strong> <strong>LoanDesigner</strong> zarządza katalogiem. <strong>LoanManager</strong> zarządza pożyczkami i może przeglądać wszystkie rezerwacje. Każdy zalogowany członek może tworzyć rezerwacje na miejscu i przeglądać kalendarz.</span>
+        <span>
+          <strong>Uprawnienia:</strong> 
+          <strong>LoanDesigner</strong> zarządza katalogiem. 
+          <strong>LoanManager</strong> zarządza pożyczkami i może przeglądać wszystkie rezerwacje. 
+          Każdy zalogowany członek może tworzyć rezerwacje na miejscu i przeglądać kalendarz.
+        </span>
       </div>
     </div>
   </section>

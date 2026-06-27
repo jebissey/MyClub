@@ -18,8 +18,6 @@ class LogDataHelper extends Data
         parent::__construct($application);
     }
 
-    const PERIOD_TO_SHOW = 13;
-
     public function formatDataForChart(array $data): array
     {
         $labels         = [];
@@ -185,7 +183,10 @@ class LogDataHelper extends Data
             WHERE (
                 (CleanUri LIKE "/article/%" AND CleanUri GLOB "/article/[0-9]*" AND CleanUri NOT LIKE "/article/%/%")
                 OR
-                (CleanUri LIKE "/menu/show/article/%" AND CleanUri GLOB "/menu/show/article/[0-9]*" AND CleanUri NOT LIKE "/menu/show/article/%/%")
+                (CleanUri LIKE "/menu/show/article/%" 
+                    AND CleanUri GLOB "/menu/show/article/[0-9]*" 
+                    AND CleanUri NOT LIKE "/menu/show/article/%/%"
+                )
             )
             GROUP BY CleanUri
             ORDER BY visits DESC
@@ -410,7 +411,7 @@ class LogDataHelper extends Data
         return $result;
     }
 
-    const CREATION_TIME_TREND_STEP_SIZE = 12;
+    private const CREATION_TIME_TREND_STEP_SIZE = 12;
     public function getCreationTimeTrend(string $uri, DateTimeImmutable $from, DateTimeImmutable $to): array
     {
         $sql = "

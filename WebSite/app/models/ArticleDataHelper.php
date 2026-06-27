@@ -200,7 +200,7 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
         }
         return [
             'latestArticle' => $this->getLatestArticle($articleIds),
-            'latestArticles' => $this->getLatestArticles_($articleIds, $latestArticlesCount)
+            'latestArticles' => $this->doGetLatestArticles($articleIds, $latestArticlesCount)
         ];
     }
 
@@ -364,7 +364,7 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
         return $query->fetchAll(PDO::FETCH_COLUMN);
     }
 
-    private function getLatestArticles_(array $articleIds, int $latestArticlesCount): array
+    private function doGetLatestArticles(array $articleIds, int $latestArticlesCount): array
     {
         if (empty($articleIds)) {
             return [];

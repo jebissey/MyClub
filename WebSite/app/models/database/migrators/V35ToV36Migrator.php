@@ -25,9 +25,12 @@ VALUES
 'Ochrona antyspamowa (Turnstile)'),
 
 ('turnstile.alert.not_configured',
-'No key configured — Turnstile verification is disabled. The contact form remains protected by the honeypot, timing check and rate limiting.',
-'Aucune clé configurée — la vérification Turnstile est désactivée. Le formulaire de contact reste protégé par le honeypot, le timing et le rate limiting.',
-'Brak skonfigurowanego klucza — weryfikacja Turnstile jest wyłączona. Formularz kontaktowy jest nadal chroniony przez honeypot, kontrolę czasu i rate limiting.'),
+'No key configured — Turnstile verification is disabled. 
+The contact form remains protected by the honeypot, timing check and rate limiting.',
+'Aucune clé configurée — la vérification Turnstile est désactivée. 
+Le formulaire de contact reste protégé par le honeypot, le timing et le rate limiting.',
+'Brak skonfigurowanego klucza — weryfikacja Turnstile jest wyłączona. 
+Formularz kontaktowy jest nadal chroniony przez honeypot, kontrolę czasu i rate limiting.'),
 
 ('turnstile.info.get_keys',
 'Get your free keys at Cloudflare Turnstile (up to 1 million verifications/month).',

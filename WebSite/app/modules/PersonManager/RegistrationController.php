@@ -71,7 +71,10 @@ class RegistrationController extends TableController
         $personId = (int)$personId;
 
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isGroupManager(), __FILE__, __LINE__)) {
-            [$availableGroups, $currentGroups] = $this->groupDataHelper->getAvailableGroups($this->application->getConnectedUser(), $personId);
+            [$availableGroups, $currentGroups] = $this->groupDataHelper->getAvailableGroups(
+                $this->application->getConnectedUser(),
+                $personId
+            );
 
             try {
                 $this->render('PersonManager/views/registration_user_groups_partial.latte', $this->getAllParams([

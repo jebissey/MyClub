@@ -42,7 +42,10 @@ class ArticleApi extends AbstractApi
             $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
-        $this->designDataHelper->insertOrUpdate(json_decode(file_get_contents('php://input'), true), $this->application->getConnectedUser()->person->Id);
+        $this->designDataHelper->insertOrUpdate(
+            json_decode(file_get_contents('php://input'), true),
+            $this->application->getConnectedUser()->person->Id
+        );
         $this->renderJsonOK();
     }
 
@@ -64,7 +67,11 @@ class ArticleApi extends AbstractApi
             $this->renderJsonBadRequest('Missing data', __FILE__, __LINE__);
             return;
         }
-        $this->orderReplyDataHelper->insertOrUpdate((int)$person->Id, (int)$orderId, isset($data['order_answers']) ? json_encode($data['order_answers']) : '[]');
+        $this->orderReplyDataHelper->insertOrUpdate(
+            (int)$person->Id,
+            (int)$orderId,
+            isset($data['order_answers']) ? json_encode($data['order_answers']) : '[]'
+        );
         $this->renderJsonOk();
     }
 
@@ -86,7 +93,11 @@ class ArticleApi extends AbstractApi
             $this->renderJsonBadRequest('Missing data', __FILE__, __LINE__);
             return;
         }
-        $this->replyDataHelper->insertOrUpdate($person->Id, (int)$surveyId, isset($data['survey_answers']) ? json_encode($data['survey_answers']) : '[]');
+        $this->replyDataHelper->insertOrUpdate(
+            $person->Id,
+            (int)$surveyId,
+            isset($data['survey_answers']) ? json_encode($data['survey_answers']) : '[]'
+        );
         $this->renderJsonOk();
     }
 
@@ -122,7 +133,12 @@ class ArticleApi extends AbstractApi
                 ]
             ]);
         } catch (Throwable $e) {
-            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
+            $this->renderJsonError(
+                $e->getMessage(),
+                ApplicationError::Error->value,
+                $e->getFile(),
+                $e->getLine()
+            );
         }
     }
 
@@ -158,7 +174,12 @@ class ArticleApi extends AbstractApi
                 ]
             ]);
         } catch (Throwable $e) {
-            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
+            $this->renderJsonError(
+                $e->getMessage(),
+                ApplicationError::Error->value,
+                $e->getFile(),
+                $e->getLine()
+            );
         }
     }
 }

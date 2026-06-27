@@ -59,7 +59,7 @@ class MembershipController extends AbstractController
             'history'         => $history,
             'amountCents'     => $this->membershipDataHelper->getAmountCents(),
             'paymentFeedback' => $paymentFeedback,
-            'translations'    => $this->translations_(),
+            'translations'    => $this->doTranslations(),
             'activeTab'       => 'membership',
             'btn_Parent'      => '/user',
             'btn_HistoryBack' => true,
@@ -70,7 +70,7 @@ class MembershipController extends AbstractController
 
     // ─── Private helpers ─────────────────────────────────────────────────────
 
-    private function translations_(): array
+    private function doTranslations(): array
     {
         $keys = [
             'nav.my',

@@ -106,7 +106,13 @@ class ImportController extends AbstractController
     #region Private functions
     private function loadSettings()
     {
-        if (!$this->importSettings = json_decode($this->dataHelper->get('Settings', ['Name' => 'ImportPersonParameters'], 'Value')->Value ?? '', true)) {
+        if (
+            !$this->importSettings = json_decode($this->dataHelper->get(
+                'Settings',
+                ['Name' => 'ImportPersonParameters'],
+                'Value'
+            )->Value ?? '', true)
+        ) {
             $this->importSettings = [
                 'headerRow' => 1,
                 'mapping' => [

@@ -43,7 +43,7 @@ class EventSupplyApi extends AbstractApi
         try {
             $input = $this->getJsonInput();
             $this->validateSupplyData($input);
-            $apiResponse = $this->updateSupply_(
+            $apiResponse = $this->doUpdateSupply(
                 (int)$input['eventId'],
                 $this->application->getConnectedUser()->person->Email,
                 (int)$input['needId'],
@@ -70,7 +70,11 @@ class EventSupplyApi extends AbstractApi
             $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
-        $eventId = WebApp::getFiltered('eventId', FilterInputRule::Int->value, $this->application->getFlight()->request()->query->getData());
+        $eventId = WebApp::getFiltered(
+            'eventId',
+            FilterInputRule::Int->value,
+            $this->application->getFlight()->request()->query->getData()
+        );
         if ($eventId === null || !is_numeric($eventId)) {
             $this->renderJsonBadRequest("Invalid parameters", __FILE__, __LINE__);
             return;
@@ -103,7 +107,7 @@ class EventSupplyApi extends AbstractApi
         }
     }
 
-    private function updateSupply_(int $eventId, string $userEmail, int $needId, int $supply): ApiResponse
+    private function doUpdateSupply(int $eventId, string $userEmail, int $needId, int $supply): ApiResponse
     {
         if (!$this->eventDataHelper->isUserRegistered($eventId, $userEmail)) {
             return new ApiResponse(false, ApplicationError::BadRequest->value);
