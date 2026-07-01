@@ -57,7 +57,7 @@ class MediaController extends AbstractController
 
     public function gpxViewer(): void
     {
-        if (!$this->application->getConnectedUser()->person ?? false) {
+        if ($this->application->getConnectedUser()->person === null) {
             $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
@@ -139,7 +139,7 @@ class MediaController extends AbstractController
                 (int)$month,
                 $filename,
                 $connectedUser,
-                $this->getNavItems($connectedUser->person ?? false)
+                $this->getNavItems($connectedUser->person)
             )
         ) {
             $this->viewFile((int)$year, (int)$month, $filename);

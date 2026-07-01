@@ -240,7 +240,6 @@ class ControllerFactory
             $this->application,
             $this->eventTypeDataHelper,
             $this->tableControllerDataHelper,
-            $this->errorManager,
         );
     }
 

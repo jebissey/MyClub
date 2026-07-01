@@ -19,14 +19,13 @@ class EventTypeController extends TableController
         Application $application,
         private EventTypeDataHelper $eventTypeDataHelper,
         private TableControllerDataHelper $tableControllerDataHelper,
-        private ErrorManager $errorManager,
     ) {
         parent::__construct($application);
     }
 
     public function create(): void
     {
-        if (!($this->application->getConnectedUser()->isEventDesigner() ?? false)) {
+        if (!$this->application->getConnectedUser()->isEventDesigner()) {
             $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
@@ -64,6 +63,14 @@ class EventTypeController extends TableController
             ) && $this->eventTypeExists($id)
         ) {
             $eventType = $this->dataHelper->get('EventType', ['Id' => $id], 'Name, IdGroup');
+            if ($eventType === false) {
+                $this->raiseBadRequest(
+                    "Invalid EventType {$id} in file " . __FILE__ . ' at line ' . __LINE__,
+                    __FILE__,
+                    __LINE__
+                );
+                return;
+            }
             $existingAttributes = $this->dataHelper->gets('EventTypeAttribute', ['IdEventType' => $id], 'IdAttribute');
 
             $this->render('Event/views/eventType_edit.latte', $this->getAllParams([
@@ -79,7 +86,7 @@ class EventTypeController extends TableController
 
     public function index(): void
     {
-        if (!($this->application->getConnectedUser()->isEventDesigner() ?? false)) {
+        if (!($this->application->getConnectedUser()->isEventDesigner())) {
             $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
@@ -137,9 +144,10 @@ class EventTypeController extends TableController
     {
         $eventType = $this->dataHelper->get('EventType', ['Id' => $eventTypeId], 'Id');
         if ($eventType === false) {
-            $this->errorManager->raise(
-                ApplicationError::InvalidSetting,
-                "Invalide EventType {$eventTypeId} in file " . __FILE__ . ' at line ' . __LINE__
+            $this->raiseBadRequest(
+                "Invalid EventType {$eventTypeId} in file " . __FILE__ . ' at line ' . __LINE__,
+                __FILE__,
+                __LINE__
             );
             return false;
         }

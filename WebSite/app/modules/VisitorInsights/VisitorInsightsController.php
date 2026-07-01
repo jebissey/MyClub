@@ -167,7 +167,7 @@ class VisitorInsightsController extends TableController
             'currentDate'  => $currentDate,
             'nav'          => $this->logDataAnalyticsHelper->getReferentNavigation($period, $currentDate),
             'externalRefs' => $this->logDataAnalyticsHelper->getExternalReferentStats($period, $currentDate),
-            'control'      => new WebApp($this->application),
+            'control'      => new WebApp(),
             'rows'         => $this->logDataAnalyticsHelper->getReferentStats($period, $currentDate),
             'page'         => $this->application->getConnectedUser()->getPage(),
             'btn_HistoryBack' => true,
@@ -226,7 +226,7 @@ class VisitorInsightsController extends TableController
             'typeData'             => $this->logDataStatisticsHelper->getTypeDistribution($period, $currentDate),
             'title'                => 'Synthèse des visiteurs',
             'page'                 => $this->application->getConnectedUser()->getPage(),
-            'control'              => new WebApp($this->application),
+            'control'              => new WebApp(),
             'period'               => $period,
             'nav'                  => $this->logDataAnalyticsHelper->getReferentNavigation($period, $currentDate),
             'i18n' => [

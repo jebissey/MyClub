@@ -45,7 +45,7 @@ class PersonStatisticsDataHelper extends Data
         ";
         $stmt = $this->pdo->prepare($query);
         $stmt->execute();
-        $firstDate = $stmt->fetch()->min_date;
+        $firstDate = $stmt->fetch(PDO::FETCH_OBJ)->min_date;
 
         if (!$firstDate) {
             $firstDate = date('Y-m-d');
@@ -71,21 +71,34 @@ class PersonStatisticsDataHelper extends Data
     }
 
     #region Private functions
+    private function getArticleCount(?int $personId, string $seasonStart, string $seasonEnd): int
+    {
+        $sql = "
+            SELECT COUNT(*)
+            FROM Article
+            WHERE LastUpdate BETWEEN :seasonStart AND :seasonEnd
+        ";
+
+        $params = [
+            ':seasonStart' => $seasonStart,
+            ':seasonEnd'   => $seasonEnd,
+        ];
+
+        if ($personId !== null) {
+            $sql .= ' AND CreatedBy = :personId';
+            $params[':personId'] = $personId;
+        }
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($params);
+
+        return (int) $stmt->fetchColumn();
+    }
+
     private function getArticleStats(int $personId, string $seasonStart, string $seasonEnd): array
     {
-        $userArticlesCount = $this->fluent
-            ->from('Article')
-            ->select(null)
-            ->select('COUNT(*) AS count')
-            ->where('CreatedBy', $personId)
-            ->where('LastUpdate BETWEEN ? AND ?', [$seasonStart, $seasonEnd])
-            ->fetch('count');
-        $totalArticlesCount = $this->fluent
-            ->from('Article')
-            ->select(null)
-            ->select('COUNT(*) AS count')
-            ->where('LastUpdate BETWEEN ? AND ?', [$seasonStart, $seasonEnd])
-            ->fetch('count');
+        $userArticlesCount = $this->getArticleCount($personId, $seasonStart, $seasonEnd);
+        $totalArticlesCount = $this->getArticleCount(null, $seasonStart, $seasonEnd);
 
         return [
             'user'       => $userArticlesCount,
@@ -111,7 +124,7 @@ class PersonStatisticsDataHelper extends Data
         ";
         $userSurveys = $this->pdo->prepare($query);
         $userSurveys->execute([$personId, $seasonStart, $seasonEnd]);
-        $userSurveysCount = $userSurveys->fetch()->count;
+        $userSurveysCount = $userSurveys->fetch(PDO::FETCH_OBJ)->count;
 
         $query = "
             SELECT COUNT(*) as count 
@@ -122,7 +135,7 @@ class PersonStatisticsDataHelper extends Data
         ";
         $totalSurveys = $this->pdo->prepare($query);
         $totalSurveys->execute([$seasonStart, $seasonEnd]);
-        $totalSurveysCount = $totalSurveys->fetch()->count;
+        $totalSurveysCount = $totalSurveys->fetch(PDO::FETCH_OBJ)->count;
 
         return [
             'user' => $userSurveysCount,
@@ -145,7 +158,7 @@ class PersonStatisticsDataHelper extends Data
             )";
         $userReplies = $this->pdo->prepare($query);
         $userReplies->execute([$personId, $seasonStart, $seasonEnd]);
-        $userRepliesCount = $userReplies->fetch()->count;
+        $userRepliesCount = $userReplies->fetch(PDO::FETCH_OBJ)->count;
 
         $query = "
             SELECT COUNT(*) as count 
@@ -158,7 +171,7 @@ class PersonStatisticsDataHelper extends Data
             )";
         $totalReplies = $this->pdo->prepare($query);
         $totalReplies->execute([$seasonStart, $seasonEnd]);
-        $totalRepliesCount = $totalReplies->fetch()->count;
+        $totalRepliesCount = $totalReplies->fetch(PDO::FETCH_OBJ)->count;
 
         return [
             'user'       => $userRepliesCount,
@@ -169,21 +182,35 @@ class PersonStatisticsDataHelper extends Data
         ];
     }
 
+    private function getDesignCount(?int $personId, string $seasonStart, string $seasonEnd): int
+    {
+        $sql = "
+            SELECT COUNT(*)
+            FROM Design
+            WHERE datetime(LastUpdate) BETWEEN datetime(:seasonStart) AND datetime(:seasonEnd)
+        ";
+
+        $params = [
+            ':seasonStart' => $seasonStart,
+            ':seasonEnd'   => $seasonEnd,
+        ];
+
+        if ($personId !== null) {
+            $sql .= ' AND IdPerson = :personId';
+            $params[':personId'] = $personId;
+        }
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($params);
+
+        return (int) $stmt->fetchColumn();
+    }
+
     private function getDesignStats(int $personId, string $seasonStart, string $seasonEnd): array
     {
-        $userDesignsCount = $this->fluent
-            ->from('Design')
-            ->select(null)
-            ->select('COUNT(*) AS count')
-            ->where('IdPerson', $personId)
-            ->where('datetime(LastUpdate) BETWEEN datetime(?) AND datetime(?)', [$seasonStart, $seasonEnd])
-            ->fetch('count');
-        $totalDesignsCount = $this->fluent
-            ->from('Design')
-            ->select(null)
-            ->select('COUNT(*) AS count')
-            ->where('datetime(LastUpdate) BETWEEN datetime(?) AND datetime(?)', [$seasonStart, $seasonEnd])
-            ->fetch('count');
+        $userDesignsCount = $this->getDesignCount($personId, $seasonStart, $seasonEnd);
+        $totalDesignsCount = $this->getDesignCount(null, $seasonStart, $seasonEnd);
+
         return [
             'user'       => $userDesignsCount,
             'total'      => $totalDesignsCount,
@@ -193,30 +220,42 @@ class PersonStatisticsDataHelper extends Data
         ];
     }
 
+    private function getDesignVoteCount(?int $personId, string $seasonStart, string $seasonEnd): int
+    {
+        $sql = "
+            SELECT COUNT(*)
+            FROM DesignVote dv
+            INNER JOIN Design d ON dv.IdDesign = d.Id
+            WHERE datetime(d.LastUpdate) BETWEEN datetime(:seasonStart) AND datetime(:seasonEnd)
+        ";
+
+        $params = [
+            ':seasonStart' => $seasonStart,
+            ':seasonEnd'   => $seasonEnd,
+        ];
+
+        if ($personId !== null) {
+            $sql .= ' AND dv.IdPerson = :personId';
+            $params[':personId'] = $personId;
+        }
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($params);
+
+        return (int) $stmt->fetchColumn();
+    }
+
     private function getDesignVoteStats(int $personId, string $seasonStart, string $seasonEnd): array
     {
-        $userVotesCount = $this->fluent
-            ->from('DesignVote dv')
-            ->select(null)
-            ->select('COUNT(*) AS count')
-            ->join('Design d ON dv.IdDesign = d.Id')
-            ->where('dv.IdPerson', $personId)
-            ->where('datetime(d.LastUpdate) BETWEEN datetime(?) AND datetime(?)', [$seasonStart, $seasonEnd])
-            ->fetch('count');
-        $totalVotesCount = $this->fluent
-            ->from('DesignVote dv')
-            ->select(null)
-            ->select('COUNT(*) AS count')
-            ->join('Design d ON dv.IdDesign = d.Id')
-            ->where('datetime(d.LastUpdate) BETWEEN datetime(?) AND datetime(?)', [$seasonStart, $seasonEnd])
-            ->fetch('count');
+        $userVotesCount = $this->getDesignVoteCount($personId, $seasonStart, $seasonEnd);
+        $totalVotesCount = $this->getDesignVoteCount(null, $seasonStart, $seasonEnd);
 
         return [
             'user'       => $userVotesCount,
             'total'      => $totalVotesCount,
             'percentage' => $totalVotesCount > 0
                 ? round(($userVotesCount / $totalVotesCount) * 100, 2)
-                : 0
+                : 0.0,
         ];
     }
 
@@ -259,7 +298,7 @@ class PersonStatisticsDataHelper extends Data
             WHERE datetime(StartTime) BETWEEN datetime(?) AND datetime(?)
         ");
         $stmt->execute([$personId, $seasonStart, $seasonEnd]);
-        $totals = $stmt->fetch();
+        $totals = $stmt->fetch(PDO::FETCH_OBJ);
 
         $userAllEventsCount = (int) $totals->user;
         $totalAllEventsCount = (int) $totals->total;
@@ -282,7 +321,7 @@ class PersonStatisticsDataHelper extends Data
             WHERE datetime(e.StartTime) BETWEEN datetime(?) AND datetime(?)
         ");
         $stmt->execute([$personId, $seasonStart, $seasonEnd]);
-        $invitations = $stmt->fetch();
+        $invitations = $stmt->fetch(PDO::FETCH_OBJ);
 
         $userInvitationCount = (int) $invitations->user;
         $totalInvitationCount = (int) $invitations->total;
@@ -359,25 +398,37 @@ class PersonStatisticsDataHelper extends Data
         return $stats;
     }
 
+    private function getParticipantSupplyCount(?int $personId, string $seasonStart, string $seasonEnd): int
+    {
+        $sql = "
+            SELECT COUNT(*)
+            FROM ParticipantSupply ps
+            INNER JOIN Participant p ON ps.IdParticipant = p.Id
+            INNER JOIN Event e ON p.IdEvent = e.Id
+            WHERE datetime(e.StartTime) BETWEEN datetime(:seasonStart) AND datetime(:seasonEnd)
+        ";
+
+        $params = [
+            ':seasonStart' => $seasonStart,
+            ':seasonEnd'   => $seasonEnd,
+        ];
+
+        if ($personId !== null) {
+            $sql .= ' AND p.IdPerson = :personId';
+            $params[':personId'] = $personId;
+        }
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($params);
+
+        return (int) $stmt->fetchColumn();
+    }
+
     private function getParticipantSupplyStats(int $personId, string $seasonStart, string $seasonEnd): array
     {
-        $userSuppliesCount = $this->fluent
-            ->from('ParticipantSupply ps')
-            ->select(null)
-            ->select('COUNT(*) AS count')
-            ->join('Participant p ON ps.IdParticipant = p.Id')
-            ->join('Event e ON p.IdEvent = e.Id')
-            ->where('p.IdPerson', $personId)
-            ->where('datetime(e.StartTime) BETWEEN datetime(?) AND datetime(?)', [$seasonStart, $seasonEnd])
-            ->fetch('count');
-        $totalSuppliesCount = $this->fluent
-            ->from('ParticipantSupply ps')
-            ->select(null)
-            ->select('COUNT(*) AS count')
-            ->join('Participant p ON ps.IdParticipant = p.Id')
-            ->join('Event e ON p.IdEvent = e.Id')
-            ->where('datetime(e.StartTime) BETWEEN datetime(?) AND datetime(?)', [$seasonStart, $seasonEnd])
-            ->fetch('count');
+        $userSuppliesCount = $this->getParticipantSupplyCount($personId, $seasonStart, $seasonEnd);
+        $totalSuppliesCount = $this->getParticipantSupplyCount(null, $seasonStart, $seasonEnd);
+
         return [
             'user'       => $userSuppliesCount,
             'total'      => $totalSuppliesCount,
@@ -387,42 +438,40 @@ class PersonStatisticsDataHelper extends Data
         ];
     }
 
+    private function getParticipantMessageCount(?int $personId, string $seasonStart, string $seasonEnd, string $from): int
+    {
+        $sql = "
+            SELECT COUNT(*)
+            FROM Message m
+            INNER JOIN Event e ON m.EventId = e.Id
+            WHERE datetime(e.StartTime) BETWEEN datetime(:seasonStart) AND datetime(:seasonEnd)
+            AND \"From\" = :from
+        ";
+
+        $params = [
+            ':seasonStart' => $seasonStart,
+            ':seasonEnd'   => $seasonEnd,
+            ':from'        => $from,
+        ];
+
+        if ($personId !== null) {
+            $sql .= ' AND m.PersonId = :personId';
+            $params[':personId'] = $personId;
+        }
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($params);
+
+        return (int) $stmt->fetchColumn();
+    }
+
     private function getParticipantMessageStats(int $personId, string $seasonStart, string $seasonEnd): array
     {
-        $userMessagesCount = $this->fluent
-            ->from('Message m')
-            ->select(null)
-            ->select('COUNT(*) AS count')
-            ->join('Event e ON m.EventId = e.Id')
-            ->where('m.PersonId', $personId)
-            ->where('datetime(e.StartTime) BETWEEN datetime(?) AND datetime(?)', [$seasonStart, $seasonEnd])
-            ->where('"From"', 'User')
-            ->fetch('count');
-        $totalUsersMessagesCount = $this->fluent
-            ->from('Message m')
-            ->select(null)
-            ->select('COUNT(*) AS count')
-            ->join('Event e ON m.EventId = e.Id')
-            ->where('datetime(e.StartTime) BETWEEN datetime(?) AND datetime(?)', [$seasonStart, $seasonEnd])
-            ->where('"From"', 'User')
-            ->fetch('count');
-        $webappMessagesCount = $this->fluent
-            ->from('Message m')
-            ->select(null)
-            ->select('COUNT(*) AS count')
-            ->join('Event e ON m.EventId = e.Id')
-            ->where('m.PersonId', $personId)
-            ->where('datetime(e.StartTime) BETWEEN datetime(?) AND datetime(?)', [$seasonStart, $seasonEnd])
-            ->where('"From"', 'Webapp')
-            ->fetch('count');
-        $totalWebappMessagesCount = $this->fluent
-            ->from('Message m')
-            ->select(null)
-            ->select('COUNT(*) AS count')
-            ->join('Event e ON m.EventId = e.Id')
-            ->where('datetime(e.StartTime) BETWEEN datetime(?) AND datetime(?)', [$seasonStart, $seasonEnd])
-            ->where('"From"', 'Webapp')
-            ->fetch('count');
+        $userMessagesCount = $this->getParticipantMessageCount($personId, $seasonStart, $seasonEnd, 'User');
+        $totalUsersMessagesCount = $this->getParticipantMessageCount(null, $seasonStart, $seasonEnd, 'User');
+        $webappMessagesCount = $this->getParticipantMessageCount($personId, $seasonStart, $seasonEnd, 'Webapp');
+        $totalWebappMessagesCount = $this->getParticipantMessageCount(null, $seasonStart, $seasonEnd, 'Webapp');
+
         return [
             'user'       => $userMessagesCount,
             'totalUsers'      => $totalUsersMessagesCount,

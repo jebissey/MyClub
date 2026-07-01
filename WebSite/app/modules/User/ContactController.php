@@ -45,7 +45,7 @@ class ContactController extends AbstractController
                 }
             }
             $this->render('Common/views/contact.latte', $this->getAllParams([
-                'navItems'          => $this->getNavItems($this->application->getConnectedUser()->person ?? false),
+                'navItems'          => $this->getNavItems($this->application->getConnectedUser()->person),
                 'event'             => $event,
                 'page'              => $this->application->getConnectedUser()->getPage(),
                 'turnstileSiteKey'  => $this->credentials->get('turnstile', 'site_key') ?? '',

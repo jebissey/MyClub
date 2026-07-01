@@ -9,7 +9,7 @@ use app\enums\ApplicationError;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
 use app\models\DataHelper;
-use app\models\kanbanDataHelper;
+use app\models\KanbanDataHelper;
 use app\models\PersonDataHelper;
 
 class KanbanApi extends AbstractApi
@@ -337,7 +337,7 @@ class KanbanApi extends AbstractApi
 
         try {
             $kanbanProject = $this->kanbanDataHelper->getKanbanProject($id);
-            if (!$kanbanProject) {
+            if ($kanbanProject === false) {
                 $this->renderJsonBadRequest("Project {$id} not found", __FILE__, __LINE__);
                 return;
             }

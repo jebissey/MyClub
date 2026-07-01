@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace app\config;
 
 use Closure;
-use flight;
+use Flight;
 use flight\Engine;
 use app\config\routes\Article;
 use app\config\routes\ArticleApi;
@@ -162,7 +162,7 @@ class Routes
         $notificationSender = new NotificationSender($dataHelper, CredentialService::getInstance());
         $orderDataHelper = new OrderDataHelper($application, $articleDataHelper);
         $participantDataHelper = new ParticipantDataHelper($application);
-        $personPreferences = new PersonPreferences($application);
+        $personPreferences = new PersonPreferences();
         $personDataHelper = new PersonDataHelper($application, $personPreferences, $emailService);
         $surveyDataHelper = new SurveyDataHelper($application, $articleDataHelper);
         $newsProviders = [
@@ -218,7 +218,6 @@ class Routes
         );
         $this->apiFactory = new ApiFactory(
             $application,
-            new ArticleDataHelper($application, $authorizationDataHelper),
             new AttributeDataHelper($application),
             $authorizationDataHelper,
             new CarouselDataHelper($application),

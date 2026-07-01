@@ -38,7 +38,7 @@ class TranslatorApi extends AbstractApi
             return;
         }
         $connectedUser = $this->application->getConnectedUser();
-        if (!($connectedUser->isTranslator() ?? false)) {
+        if (!($connectedUser->isTranslator())) {
             $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }

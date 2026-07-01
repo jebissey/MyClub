@@ -185,11 +185,11 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
         ";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute($params);
-        $article = $stmt->fetch();
+        $article = $stmt->fetch(PDO::FETCH_OBJ);
         return $article ?: null;
     }
 
-    public function getLatestArticles(?string $userEmail = null, int $latestArticlesCount): array
+    public function getLatestArticles(?string $userEmail, int $latestArticlesCount): array
     {
         $articleIds = $this->getArticleIdsBasedOnAccess($userEmail);
         if (empty($articleIds)) {
@@ -256,7 +256,7 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
     public function getSpotlightArticle(): mixed
     {
         $spotlightArticleJson = $this->get('Settings', ['Name' => 'SpotlightArticle'], 'Value')->Value ?? '';
-        if ($spotlightArticleJson === null) {
+        if ($spotlightArticleJson === false) {
             return null;
         }
         return json_decode($spotlightArticleJson, true);
@@ -273,7 +273,7 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
         ";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':id' => $id]);
-        return $stmt->fetch();
+        return $stmt->fetch(PDO::FETCH_OBJ);
     }
 
     public function inArticles(string $path): array

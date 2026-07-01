@@ -123,7 +123,6 @@ class MediaApi extends AbstractApi
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isRedactor())) {
             $filePath = trim($_GET['path']  ?? '');
-            $data['path'] ?? null;
             if (!$filePath) {
                 $this->renderJsonBadRequest('Fichier manquant', __FILE__, __LINE__);
                 return;

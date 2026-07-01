@@ -41,7 +41,7 @@ class EventController extends AbstractController
             return;
         }
         $lang = TranslationManager::getCurrentLanguage();
-        if ($this->application->getConnectedUser()->isEventManager() ?? false) {
+        if ($this->application->getConnectedUser()->isEventManager()) {
             $content = $this->dataHelper->get('Languages', ['Name' => 'Help_NextEvents_EventManager'], $lang)->$lang ?? '';
         } else {
             $content = $this->dataHelper->get('Languages', ['Name' => 'Help_NextEvents'], $lang)->$lang ?? '';
@@ -99,7 +99,7 @@ class EventController extends AbstractController
             'eventTypes' => $this->dataHelper->gets('EventType', ['Inactivated' => 0], 'Id, Name'),
             'eventAttributes' => $this->dataHelper->gets('Attribute', [], 'Id, Name, Detail, Color'),
             'attributes' => $this->eventDataHelper->getAttributesForNextWeekEvents(),
-            'navItems' => $this->getNavItems($this->application->getConnectedUser()->person ?? false),
+            'navItems' => $this->getNavItems($this->application->getConnectedUser()->person),
             'layout' => $this->getLayout(),
             'page' => $this->application->getConnectedUser()->getPage(),
             'btn_HistoryBack' => true,
@@ -193,8 +193,9 @@ class EventController extends AbstractController
             if ($token === null) {
                 $token = WebApp::getFiltered('t', FilterInputRule::Token->value, $this->flight->request()->query->getData());
             }
-            if ($this->application->getConnectedUser()->person ?? false) {
-                $userId = $this->application->getConnectedUser()->person->Id;
+            $person = $this->application->getConnectedUser()->person;
+            if ($person !== null) {
+                $userId = $person->Id;
                 if ($set) {
                     if ($eventId > 0 && !$this->eventDataHelper->isUserRegistered($eventId, $person->Email ?? '')) {
                         $this->dataHelper->set('Participant', [
@@ -250,23 +251,21 @@ class EventController extends AbstractController
                         return;
                     }
                 }
-                if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-                    $this->dataHelper->set('Participant', [
-                        'IdEvent' => $event->Id,
-                        'IdPerson' => null,
-                        'IdContact' => $contact->Id
-                    ]);
+                $this->dataHelper->set('Participant', [
+                    'IdEvent' => $event->Id,
+                    'IdPerson' => null,
+                    'IdContact' => $contact->Id
+                ]);
 
-                    $this->render('Common/views/registration_success.latte', $this->getAllParams([
-                        'event' => $event,
-                        'contact' => $contact,
-                        'navItems' => $this->getNavItems($this->application->getConnectedUser()->person),
-                        'page' => $this->application->getConnectedUser()->getPage()
-                    ]));
-                }
+                $this->render('Common/views/registration_success.latte', $this->getAllParams([
+                    'event' => $event,
+                    'contact' => $contact,
+                    'navItems' => $this->getNavItems($this->application->getConnectedUser()->person),
+                    'page' => $this->application->getConnectedUser()->getPage()
+                ]));
             } else {
                 $event = $this->dataHelper->get('Event', ['Id' => $eventId], 'Audience');
-                if ($event->Audience === EventAudience::ForAll->value) {
+                if ($event !== false && $event->Audience === EventAudience::ForAll->value) {
                     $this->redirect('/contact/event/' . $eventId);
                 } else {
                     $this->raiseForbidden(__FILE__, __LINE__);

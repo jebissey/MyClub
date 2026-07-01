@@ -124,7 +124,7 @@ class MessageApi extends AbstractApi
         }
         try {
             $data = $this->getJsonInput();
-            $apiResponse = $this->doDeleteMessage((int)$data['messageId'] ?? 0, $this->application->getConnectedUser()->person->Id);
+            $apiResponse = $this->doDeleteMessage((int)$data['messageId'], $this->application->getConnectedUser()->person->Id);
             $this->renderJson($apiResponse->data, $apiResponse->success, $apiResponse->responseCode);
         } catch (Throwable $e) {
             $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
@@ -280,14 +280,35 @@ class MessageApi extends AbstractApi
         $eventCreatorId = null;
         if ($articleId !== null) {
             $article = $this->dataHelper->get('Article', ['Id' => $articleId], 'CreatedBy, Title');
-            $articleAuthorId = $article?->CreatedBy;
+            if ($article === false) {
+                $this->application->getErrorManager()->raise(
+                    ApplicationError::Error,
+                    "Article {$articleId} not found when notifying message recipients for message {$messageId}"
+                );
+                return;
+            }
+            $articleAuthorId =  $article->CreatedBy;
         }
         if ($eventId !== null) {
             $event = $this->dataHelper->get('Event', ['Id' => $eventId], 'CreatedBy, Summary');
-            $eventCreatorId = $event?->CreatedBy;
+            if ($event === false) {
+                $this->application->getErrorManager()->raise(
+                    ApplicationError::Error,
+                    "Event {$eventId} not found when notifying message recipients for message {$messageId}"
+                );
+                return;
+            }
+            $eventCreatorId =  $event->CreatedBy;
         }
         if ($groupId !== null) {
             $group = $this->dataHelper->get('Group', ['Id' => $groupId], 'Name');
+            if ($group === false) {
+                $this->application->getErrorManager()->raise(
+                    ApplicationError::Error,
+                    "Group {$groupId} not found when notifying message recipients for message {$messageId}"
+                );
+                return;
+            }
         }
 
         $context = new MessageContext(
@@ -412,6 +433,7 @@ class MessageApi extends AbstractApi
             'image/png'  => imagepng($dst, null, 6),
             'image/webp' => imagewebp($dst, null, 85),
             'image/gif'  => imagegif($dst),
+            default => ob_end_clean() && null,
         };
         $resized = ob_get_clean();
 

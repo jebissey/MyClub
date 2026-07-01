@@ -23,7 +23,7 @@ class EventEmailController extends AbstractController
 
     public function fetchEmails(): void
     {
-        if (!($this->application->getConnectedUser()->isEventManager() ?? false)) {
+        if (!$this->application->getConnectedUser()->isEventManager()) {
             $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
@@ -42,7 +42,7 @@ class EventEmailController extends AbstractController
 
     public function copyEmails(): void
     {
-        if (!($this->application->getConnectedUser()->isEventManager() ?? false)) {
+        if (!$this->application->getConnectedUser()->isEventManager()) {
             $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
@@ -63,7 +63,7 @@ class EventEmailController extends AbstractController
         $timeOfDay = $input['timeOfDay'] ?? '';
         $filteredEmails = $this->personDataHelper->getEmailsOfInterestedPeople($idGroup, $idEventType, $dayOfWeek, $timeOfDay);
         $groupName = $idGroup != null ? $this->dataHelper->get('Group', ['Id' => $idGroup], 'Name')->Name ?? '' : '';
-        $eventTypeName = $idEventType !== null ? $this->dataHelper->get('EventType', ['Id' => $idEventType], 'Name')->Name : '';
+        $eventTypeName = $idEventType !== null ? $this->dataHelper->get('EventType', ['Id' => $idEventType], 'Name')->Name ?? '' : '';
         $dayOfWeekName = $dayOfWeek !== null ? TranslationManager::getWeekdayNames()[$dayOfWeek] : '';
         $translatedTimeOfDay = ($this->t)($timeOfDay);
 

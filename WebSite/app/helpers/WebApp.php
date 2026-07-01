@@ -39,95 +39,7 @@ class WebApp
     {
         $filtered = [];
         foreach ($schema as $key => $rule) {
-            $raw = $source[$key] ?? null;
-            $maxLen = ($rule === FilterInputRule::DataUrl->value) ? 5 * 1024 * 1024 : 1024 * 1024;
-            if (!isset($raw) || (is_string($raw) && strlen($raw) > $maxLen)) {
-                $filtered[$key] = null;
-                continue;
-            }
-            if ($rule === FilterInputRule::ArrayInt->value || $rule === FilterInputRule::ArrayString->value) {
-                if (is_array($raw)) {
-                    $filtered[$key] = array_values(array_filter(
-                        $raw,
-                        fn($v) =>
-                        $rule === FilterInputRule::ArrayInt
-                            ? preg_match(FilterInputRule::Integer->value, (string)$v)
-                            : is_string($v) && trim($v) !== ''
-                    ));
-                    if (empty($filtered[$key])) {
-                        $filtered[$key] = null;
-                    }
-                } else {
-                    $filtered[$key] = null;
-                }
-                continue;
-            }
-            if ($rule === FilterInputRule::CheckboxMatrix->value) {
-                $validateCheckboxMatrix = function (array $arr) use (&$validateCheckboxMatrix) {
-                    $result = [];
-                    foreach ($arr as $key => $val) {
-                        if (is_array($val)) {
-                            $nested = $validateCheckboxMatrix($val);
-                            if (!empty($nested)) {
-                                $result[$key] = $nested;
-                            }
-                        } elseif ($val === 'on') {
-                            $result[$key] = 'on';
-                        }
-                    }
-                    return $result;
-                };
-                if (is_array($raw)) {
-                    $filtered[$key] = $validateCheckboxMatrix($raw);
-                    if (empty($filtered[$key])) {
-                        $filtered[$key] = null;
-                    }
-                } else {
-                    $filtered[$key] = null;
-                }
-                continue;
-            }
-            if (is_array($raw)) {
-                $filtered[$key] = null;
-                continue;
-            }
-            if ($rule === FilterInputRule::DataUrl->value) {
-                $filtered[$key] = (
-                    is_string($raw) &&
-                    preg_match('/^data:image\/(png|jpeg|gif|webp);base64,[A-Za-z0-9+\/]+=*$/', $raw)
-                ) ? $raw : null;
-                continue;
-            }
-            if ($rule === FilterInputRule::Html->value) {
-                $value = trim($raw);
-            } else {
-                $value = trim(strip_tags($raw));
-            }
-            if (is_array($rule)) {
-                $filtered[$key] = in_array($value, $rule, true) ? $value : null;
-            } elseif (is_string($rule) && str_starts_with($rule, '/')) {
-                $filtered[$key] = preg_match($rule, $value) ? $value : null;
-            } elseif ($rule === FilterInputRule::Bool->value) {
-                if (is_array($raw)) {
-                    $filtered[$key] = !empty($raw) ? 1 : 0;
-                    continue;
-                }
-                if ($value === 'on' || $value === '1' || $value === 'true') {
-                    $filtered[$key] = 1;
-                } elseif ($value === 'off' || $value === '0' || $value === 'false' || $value === '') {
-                    $filtered[$key] = 0;
-                } else {
-                    $filtered[$key] = filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
-                }
-            } elseif ($rule === FilterInputRule::Int->value) {
-                $val = filter_var($value, FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
-                $filtered[$key] = $val !== null ? (int) $val : null;
-            } elseif ($rule === FilterInputRule::Float->value) {
-                $val = filter_var($value, FILTER_VALIDATE_FLOAT, FILTER_NULL_ON_FAILURE);
-                $filtered[$key] = $val !== null ? (float) $val : null;
-            } else {
-                $filtered[$key] = $value !== '' ? $value : null;
-            }
+            $filtered[$key] = self::filterSingleInput($rule, $source[$key] ?? null);
         }
         return $filtered;
     }
@@ -216,12 +128,123 @@ class WebApp
 
     public static function sanitizeInput(string $data, array $possibleValues = [], string $defaultValue = ''): string
     {
-        $data = trim($data ?? '');
+        $data = trim($data);
         if (!empty($possibleValues)) {
             if (!in_array($data, $possibleValues, true)) {
                 return $defaultValue;
             }
         }
         return $data;
+    }
+
+    #region Private functions
+    private static function filterSingleInput(string|array $rule, mixed $raw): mixed
+    {
+        $maxLen = ($rule === FilterInputRule::DataUrl->value) ? 5 * 1024 * 1024 : 1024 * 1024;
+        if (!isset($raw) || (is_string($raw) && strlen($raw) > $maxLen)) {
+            return null;
+        }
+
+        if ($rule === FilterInputRule::ArrayInt->value || $rule === FilterInputRule::ArrayString->value) {
+            return self::filterArrayInput($rule, $raw);
+        }
+        if ($rule === FilterInputRule::CheckboxMatrix->value) {
+            if (!is_array($raw)) {
+                return null;
+            }
+            $result = self::filterCheckboxMatrix($raw);
+            return empty($result) ? null : $result;
+        }
+        if (is_array($raw)) {
+            return null;
+        }
+
+        if ($rule === FilterInputRule::DataUrl->value) {
+            return self::filterDataUrl($raw);
+        }
+        $value = $rule === FilterInputRule::Html->value ? trim($raw) : trim(strip_tags($raw));
+
+        if (is_array($rule)) {
+            return in_array($value, $rule, true) ? $value : null;
+        }
+
+        if (str_starts_with($rule, '/')) {
+            return preg_match($rule, $value) ? $value : null;
+        }
+
+        return match ($rule) {
+            FilterInputRule::Bool->value => self::filterBool($value),
+            FilterInputRule::Int->value => self::filterInt($value),
+            FilterInputRule::Float->value => self::filterFloat($value),
+            default => $value !== '' ? $value : null,
+        };
+    }
+
+    /**
+     * @return array<int, int|string>|null
+     */
+    private static function filterArrayInput(string $rule, mixed $raw): ?array
+    {
+        if (!is_array($raw)) {
+            return null;
+        }
+
+        $result = array_values(array_filter(
+            $raw,
+            fn($v) => $rule === FilterInputRule::ArrayInt->value
+                ? preg_match(FilterInputRule::Integer->value, (string)$v)
+                : (is_string($v) && trim($v) !== '')
+        ));
+
+        return empty($result) ? null : $result;
+    }
+
+    /**
+     * @param array<array-key, mixed> $arr
+     * @return array<array-key, mixed>
+     */
+    private static function filterCheckboxMatrix(array $arr): array
+    {
+        $result = [];
+        foreach ($arr as $itemKey => $val) {
+            if (is_array($val)) {
+                $nested = self::filterCheckboxMatrix($val);
+                if (!empty($nested)) {
+                    $result[$itemKey] = $nested;
+                }
+            } elseif ($val === 'on') {
+                $result[$itemKey] = 'on';
+            }
+        }
+        return $result;
+    }
+
+    private static function filterDataUrl(mixed $raw): ?string
+    {
+        if (!is_string($raw)) {
+            return null;
+        }
+        return preg_match('/^data:image\/(png|jpeg|gif|webp);base64,[A-Za-z0-9+\/]+=*$/', $raw) ? $raw : null;
+    }
+
+    private static function filterBool(string $value): int|null
+    {
+        return match (true) {
+            $value === 'on', $value === '1', $value === 'true' => 1,
+            $value === 'off', $value === '0', $value === 'false', $value === '' => 0,
+            default => filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE),
+        };
+    }
+
+    private static function filterInt(string $value): ?int
+    {
+        $val = filter_var($value, FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
+        return $val !== null ? (int)$val : null;
+    }
+
+    private static function filterFloat(string $value): ?float
+    {
+        $val = filter_var($value, FILTER_VALIDATE_FLOAT, FILTER_NULL_ON_FAILURE);
+        return $val !== null ? (float)$val : null;
     }
 }

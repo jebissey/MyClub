@@ -16,7 +16,7 @@ class DesignDataHelper extends Data
 
     public function insertOrUpdate($data, $personId)
     {
-        $designId = (int)$data['designId'] ?? 0;
+        $designId = (int)($data['designId'] ?? 0);
         $userId = $personId;
         $voteValue = $data['vote'] ?? 'voteNeutral';
 

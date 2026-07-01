@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace app\modules\User;
 
+use Flight;
 use InvalidArgumentException;
 use app\enums\ApplicationError;
 use app\enums\FilterInputRule;
@@ -32,12 +33,12 @@ class UserController extends AbstractController
         try {
             $success = $this->authService->handleForgotPassword($email);
         } catch (EmailException $e) {
-            $this->flight->setData('message', "Error {$e->getMessage()} with email {$email}");
-            $this->flight->setData('code', ApplicationError::BadRequest->value);
+            Flight::set('message', "Error {$e->getMessage()} with email {$email}");
+            Flight::set('code', ApplicationError::BadRequest->value);
             $content = ($this->t)('message_email_unknown');
             $this->render('Common/views/info.latte', $this->getAllParams([
                 'content' => $content,
-                'hasAuthorization' => $this->application->getConnectedUser()->hasAutorization() ?? false,
+                'hasAuthorization' => $this->application->getConnectedUser()->hasAutorization(),
                 'currentVersion' => Application::VERSION,
                 'timer' => 10000,
                 'previousPage' => false,
@@ -48,24 +49,24 @@ class UserController extends AbstractController
             $this->raiseBadRequest($e->getMessage(), $e->getFile(), $e->getLine());
         }
         if ($success) {
-            $this->flight->setData('message', "Password reset email sent to {$email}");
-            $this->flight->setData('code', ApplicationError::Ok->value);
+            Flight::set('message', "Password reset email sent to {$email}");
+            Flight::set('code', ApplicationError::Ok->value);
             $content = ($this->t)('message_password_reset_sent');
             $this->render('Common/views/info.latte', $this->getAllParams([
                 'content' => $content,
-                'hasAuthorization' => $this->application->getConnectedUser()->hasAutorization() ?? false,
+                'hasAuthorization' => $this->application->getConnectedUser()->hasAutorization(),
                 'currentVersion' => Application::VERSION,
                 'timer' => 10000,
                 'previousPage' => false,
                 'page' => $this->application->getConnectedUser()->getPage(),
             ]));
         } else {
-            $this->flight->setData('message', "Unable to send password reset email to {$email}");
+            Flight::set('message', "Unable to send password reset email to {$email}");
             $content = ($this->t)('message_password_reset_failed');
-            $this->flight->setData('code', ApplicationError::Error->value);
+            Flight::set('code', ApplicationError::Error->value);
             $this->render('Common/views/info.latte', $this->getAllParams([
                 'content' => $content,
-                'hasAuthorization' => $this->application->getConnectedUser()->hasAutorization() ?? false,
+                'hasAuthorization' => $this->application->getConnectedUser()->hasAutorization(),
                 'currentVersion' => Application::VERSION,
                 'timer' => 30000,
                 'previousPage' => false,

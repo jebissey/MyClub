@@ -8,9 +8,9 @@ use DateTime;
 
 class PersonPreferences
 {
-    public function filterEventsByPreferences(array $events, $person): array
+    public function filterEventsByPreferences(array $events, ?object $person): array
     {
-        if (!$person || empty($person->Preferences)) {
+        if ($person === null || empty($person->Preferences)) {
             return $events;
         }
         $preferences = json_decode($person->Preferences, true);
@@ -33,32 +33,32 @@ class PersonPreferences
         return $filteredEvents;
     }
 
-    public function isPersonInterested(object $person, ?int $idEventType, ?int $dayOfWeek, $timeOfDay): bool
+    public function isPersonInterested(object $person, ?int $idEventType, ?int $dayOfWeek, string $timeOfDay): bool
     {
-        if ($person->Preferences != '') {
+        if ($person->Preferences !== '') {
             $preferences = json_decode($person->Preferences, true);
-            if (isset($preferences['noAlerts']) && $preferences['noAlerts'] == 'on') {
+            if (isset($preferences['noAlerts']) && $preferences['noAlerts'] === 'on') {
                 return false;
             }
         }
         if ($idEventType !== null) {
-            if ($person->Preferences != '') {
+            if ($person->Preferences !== '') {
                 $preferences = json_decode($person->Preferences, true);
-                if ($preferences != '' && (!isset($preferences['eventTypes'][$idEventType]))) {
+                if ($preferences !== '' && (!isset($preferences['eventTypes'][$idEventType]))) {
                     return false;
                 }
                 if (
-                    $preferences != '' && (isset($preferences['eventTypes'][$idEventType]))
+                    $preferences !== '' && (isset($preferences['eventTypes'][$idEventType]))
                     && !isset($preferences['eventTypes'][$idEventType]["available"])
                 ) {
                     return true;
                 }
             }
         }
-        if ($dayOfWeek !== null && $timeOfDay != '') {
-            if ($person->Availabilities != '') {
+        if ($dayOfWeek !== null && $timeOfDay !== '') {
+            if ($person->Availabilities !== '') {
                 $availabilities = json_decode($person->Availabilities, true);
-                if (isset($availabilities[$dayOfWeek][$timeOfDay]) != 'on') {
+                if ($availabilities[$dayOfWeek][$timeOfDay] !== 'on') {
                     return false;
                 }
             }
@@ -66,7 +66,7 @@ class PersonPreferences
         return true;
     }
 
-    public function getPeriodOfDay($dateString)
+    public function getPeriodOfDay(string $dateString): string
     {
         $date = new DateTime($dateString);
         $hour = (int)$date->format('H');

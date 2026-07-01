@@ -22,7 +22,7 @@ class SurveyController extends AbstractController
 
     public function add(int $articleId): void
     {
-        if (!($this->application->getConnectedUser()->isRedactor() ?? false)) {
+        if (!$this->application->getConnectedUser()->isRedactor()) {
             $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
@@ -44,7 +44,7 @@ class SurveyController extends AbstractController
 
     public function createOrUpdate(): void
     {
-        if (!($this->application->getConnectedUser()->isRedactor() ?? false)) {
+        if (!$this->application->getConnectedUser()->isRedactor()) {
             $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
@@ -101,7 +101,7 @@ class SurveyController extends AbstractController
             return;
         }
         $survey = $this->surveyDataHelper->getWithCreator($articleId);
-        if (!$survey) {
+        if ($survey === false) {
             $this->raiseBadRequest("No survey for article {$articleId}", __FILE__, __LINE__);
             $this->redirect('/article/' . $articleId);
             return;
@@ -123,7 +123,7 @@ class SurveyController extends AbstractController
                 $answers = json_decode($reply->Answers);
                 $person = $this->dataHelper->get('Person', ['Id' => $reply->IdPerson], 'FirstName, LastName');
                 $participants[] = [
-                    'name' => $person->FirstName . ' ' . $person->LastName,
+                    'name' => $name = $person === false ? '???' : $person->FirstName  . ' ' . $person->LastName,
                     'answers' => $answers
                 ];
                 foreach ($answers as $answer) {

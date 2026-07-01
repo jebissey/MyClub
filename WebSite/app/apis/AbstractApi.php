@@ -85,8 +85,8 @@ abstract class AbstractApi
 
     protected function renderJsonError(string $message, int $statusCode, string $file, int $line): void
     {
-        $this->application->getFlight()->setData('code', $statusCode);
-        $this->application->getFlight()->setData('message', $message);
+        Flight::set('code', $statusCode);
+        Flight::set('message', $message);
         $this->renderJson(
             [],
             false,
@@ -132,8 +132,8 @@ abstract class AbstractApi
 
     protected function userIsAllowedAndMethodIsGood(string $method, callable $permissionCheck): bool
     {
-        $user = $this->application->getConnectedUser();
-        if (!$user || !$permissionCheck($user)) {
+        $user = $this->application->getConnectedUser()->person;
+        if ($user === null || !$permissionCheck($user)) {
             $this->renderJsonForbidden(__FILE__, __LINE__);
             return false;
         }

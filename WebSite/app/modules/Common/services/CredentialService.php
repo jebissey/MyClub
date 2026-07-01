@@ -46,7 +46,7 @@ class CredentialService
              LIMIT 1'
         );
         $stmt->execute([':service' => $service, ':name' => $name]);
-        $row = $stmt->fetch();
+        $row = $stmt->fetch(PDO::FETCH_OBJ);
 
         return $row ? $row->Value : null;
     }

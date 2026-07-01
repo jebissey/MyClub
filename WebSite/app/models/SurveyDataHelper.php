@@ -29,11 +29,11 @@ class SurveyDataHelper extends Data implements NewsProviderInterface
         ";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':articleId' => $articleId]);
-        $survey = $stmt->fetch();
+        $survey = $stmt->fetch(PDO::FETCH_OBJ);
         return $survey;
     }
 
-    public function getWithCreator(int $articleId): object|bool
+    public function getWithCreator(int $articleId): object|false
     {
         $article = $this->get('Article', ['Id' => $articleId], 'Id');
         if ($article === false) {
@@ -48,7 +48,7 @@ class SurveyDataHelper extends Data implements NewsProviderInterface
         ";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':articleId' => $articleId]);
-        return $stmt->fetch();
+        return $stmt->fetch(PDO::FETCH_OBJ);
     }
 
     public function getPendingSurveyResponses(): array
@@ -77,7 +77,7 @@ class SurveyDataHelper extends Data implements NewsProviderInterface
             )
             AND r.Id IS NULL
         ORDER BY s.ClosingDate, p.LastName, p.FirstName";
-        return $this->pdo->query($query)->fetchAll();
+        return $this->pdo->query($query)->fetchAll(PDO::FETCH_OBJ);
     }
 
     public function getNews(ConnectedUser $connectedUser, string $searchFrom): array

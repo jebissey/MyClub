@@ -78,14 +78,14 @@ class MenuItemDataHelper extends Data
             throw new InvalidArgumentException("Invalid 'Type' value: {$data['type']}");
         }
         if (!empty($data['parentId'])) {
-            $parent = $this->fluent->from('MenuItem')->where('Id = ?', $data['parentId'])->fetch();
-            if (!$parent) {
+            $parent = $this->get('MenuItem', ['Id' => $data['parentId']]);
+            if ($parent === false) {
                 throw new InvalidArgumentException("ParentId {$data['parentId']} does not exist.");
             }
         }
         if (!empty($data['idGroup'])) {
-            $group = $this->fluent->from('"Group"')->where('Id = ?', $data['idGroup'])->fetch();
-            if (!$group) {
+            $group = $this->get('Group', ['Id' => $data['idGroup']]);
+            if ($group === false) {
                 throw new InvalidArgumentException("IdGroup {$data['idGroup']} does not exist.");
             }
         }
@@ -103,7 +103,7 @@ class MenuItemDataHelper extends Data
         ];
 
         if (empty($data['id'])) {
-            if (!empty($menuItem['ParentId'])) {
+            if (isset($parent)) {
                 $maxPos = $this->fluent
                     ->from('MenuItem')
                     ->where('ParentId = ?', $menuItem['ParentId'])
@@ -118,7 +118,10 @@ class MenuItemDataHelper extends Data
             $this->set('MenuItem', $menuItem);
         } else {
             if (!empty($menuItem['ParentId'])) {
-                $parent = $this->fluent->from('MenuItem')->where('Id = ?', $menuItem['ParentId'])->fetch();
+                $parent = $this->get('MenuItem', ['Id' => $menuItem['ParentId']], 'Position');
+                if ($parent === false) {
+                    throw new InvalidArgumentException("ParentId {$menuItem['ParentId']} does not exist.");
+                }
                 if ($data['position'] <= $parent->Position) {
                     throw new InvalidArgumentException("Child position must be greater than parent position.");
                 }

@@ -44,7 +44,7 @@ class Params
             throw new InvalidArgumentException('Invalid URI provided');
         }
         $segments = explode('/', trim($path, '/'));
-        $page = $segments[0] ?? '';
+        $page = $segments[0];
         $lang = TranslationManager::getCurrentLanguage();
 
         self::$commonParams = [

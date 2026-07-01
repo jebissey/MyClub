@@ -17,7 +17,6 @@ class ExerciseApi extends AbstractApi
         ConnectedUser $connectedUser,
         DataHelper $dataHelper,
         PersonDataHelper $personDataHelper,
-        private ArticleDataHelper $articleDataHelper,
     ) {
         parent::__construct($application, $connectedUser, $dataHelper, $personDataHelper);
     }
@@ -68,7 +67,7 @@ class ExerciseApi extends AbstractApi
             return;
         }
 
-        $exercises = json_decode($article->Content ?? '[]', true) ?? [];
+        $exercises = json_decode($exercise->Content ?? '[]', true);
         if ($index < 0 || $index >= count($exercises)) {
             $this->renderJsonBadRequest("Index {$index} out of range", __FILE__, __LINE__);
             return;

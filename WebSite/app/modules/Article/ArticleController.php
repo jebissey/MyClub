@@ -49,7 +49,6 @@ class ArticleController extends TableController
         parent::__construct($application);
         $this->authorizationService = new ArticleAuthorizationService(
             $this->dataHelper,
-            new AuthenticationService($this->dataHelper, $this->emailService),
             new AuthorizationDataHelper($this->application)
         );
     }
@@ -85,7 +84,7 @@ class ArticleController extends TableController
 
     public function changeOwner(int $id): void
     {
-        if (!($this->application->getConnectedUser()->isEditor() ?? false)) {
+        if (!$this->application->getConnectedUser()->isEditor()) {
             $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
@@ -127,7 +126,7 @@ class ArticleController extends TableController
 
     public function create(): void
     {
-        if (!($this->application->getConnectedUser()->isRedactor() ?? false)) {
+        if (!$this->application->getConnectedUser()->isRedactor()) {
             $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
@@ -146,7 +145,7 @@ class ArticleController extends TableController
 
     public function delete(int $id): void
     {
-        if (!($this->application->getConnectedUser()->isRedactor() || false)) {
+        if (!$this->application->getConnectedUser()->isRedactor()) {
             $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
@@ -211,7 +210,7 @@ class ArticleController extends TableController
             'hasOrder' => $this->dataHelper->get('Order', ['IdArticle' => $id], 'ClosingDate'),
             'id' => $id,
             'userConnected' => $connectedUser->person ?? false,
-            'navItems' => $this->getNavItems($connectedUser->person ?? false),
+            'navItems' => $this->getNavItems($connectedUser->person),
             'publishedBy' => $article->PublishedBy != $article->CreatedBy
                 ? $this->personDataHelper->getPublisher($article->PublishedBy) : '',
             'carouselItems' => $this->dataHelper->gets('Carousel', ['IdArticle' => $id]),
@@ -226,7 +225,7 @@ class ArticleController extends TableController
 
     public function fetchEmailsForArticle(int $idArticle): void
     {
-        if (!($this->application->getConnectedUser()->isRedactor() ?? false)) {
+        if (!$this->application->getConnectedUser()->isRedactor()) {
             $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
@@ -239,8 +238,8 @@ class ArticleController extends TableController
             $this->raiseBadRequest("Article {$idArticle} doesn't exist", __FILE__, __LINE__);
             return;
         }
-        $articleCreatorEmail = $this->dataHelper->get('Person', ['Id' => $article->CreatedBy], 'Email')->Email;
-        if (!$articleCreatorEmail) {
+        $articleCreator = $this->dataHelper->get('Person', ['Id' => $article->CreatedBy], 'Email');
+        if ($articleCreator === false) {
             $msg = str_replace(
                 '{id}',
                 (string)$idArticle,
@@ -267,8 +266,8 @@ class ArticleController extends TableController
             $unsubscribeLink;
 
         $emailMessage = new EmailMessage(
-            from: $articleCreatorEmail,
-            to: $articleCreatorEmail,
+            from: $articleCreator->Email,
+            to: $articleCreator->Email,
             subject: $title,
             body: $message,
             isHtml: false,
@@ -331,7 +330,7 @@ class ArticleController extends TableController
             ['name' => 'Content', 'label' => ($this->t)('article.label.content')],
             ['name' => 'Id', 'label' => 'ID'],
         ];
-        if ($connectedUser->isEditor() || false) {
+        if ($connectedUser->isEditor()) {
             $filterConfig[] = ['name' => 'published', 'label' => 'Publié'];
             $filterConfig[] = ['name' => 'menu', 'label' => 'Menu'];
         }
@@ -363,7 +362,7 @@ class ArticleController extends TableController
             'columns' => $columns,
             'resetUrl' => '/articles',
             'userConnected' => $connectedUser->person ?? false,
-            'navItems' => $this->getNavItems($connectedUser->person ?? false),
+            'navItems' => $this->getNavItems($connectedUser->person),
             'page' => $connectedUser->getPage(),
             'btn_HistoryBack' => true,
             'btn_Parent'      => "/",
@@ -403,7 +402,7 @@ class ArticleController extends TableController
             'columns' => $columns,
             'resetUrl' => '/articles',
             'userConnected' => $connectedUser->person ?? false,
-            'navItems' => $this->getNavItems($connectedUser->person ?? false),
+            'navItems' => $this->getNavItems($connectedUser->person),
             'page' => $connectedUser->getPage(),
             'btn_HistoryBack' => true,
             'btn_Parent'      => "/",
@@ -412,7 +411,7 @@ class ArticleController extends TableController
 
     public function publish(int $id): void
     {
-        if (!($this->application->getConnectedUser()->isRedactor() ?? false)) {
+        if (!$this->application->getConnectedUser()->isRedactor()) {
             $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
@@ -437,7 +436,7 @@ class ArticleController extends TableController
                 $this->articleDataHelper->setSpotlightArticle($id, $spotlightedUntil);
             }
             $result = $this->dataHelper->set('Article', [
-                'PublishedBy'    => $input['published'] ?? 0  == 1 ? $this->application->getConnectedUser()->person->Id : null,
+                'PublishedBy'    => ($input['published'] ?? 0) === 1 ? $this->application->getConnectedUser()->person->Id ?? null : null,
                 'LastUpdate'     => date('Y-m-d H:i:s')
             ], ['Id' => $id]);
             if ($result) {
@@ -494,7 +493,7 @@ class ArticleController extends TableController
         }
         try {
             $article = $this->authorizationDataHelper->getArticle($id, $connectedUser);
-            if (!$article) {
+            if ($article === false) {
                 $this->raiseForbidden(__FILE__, __LINE__);
                 return;
             }
@@ -508,7 +507,7 @@ class ArticleController extends TableController
                 'hasOrder' => $this->dataHelper->get('Order', ['IdArticle' => $id], 'ClosingDate'),
                 'id' => $id,
                 'userConnected' => $connectedUser->person ?? false,
-                'navItems' => $this->getNavItems($connectedUser->person ?? false),
+                'navItems' => $this->getNavItems($connectedUser->person),
                 'publishedBy' => $article->PublishedBy && $article->PublishedBy != $article->CreatedBy
                     ? $this->personDataHelper->getPublisher($article->PublishedBy) : '',
                 'canReadPool' => $this->authorizationDataHelper->canPersonReadSurveyResults($article, $connectedUser),
@@ -519,7 +518,7 @@ class ArticleController extends TableController
                     '"From"' => 'User',
                     'ArticleId' => $id
                 ])),
-                'isCreator' => $connectedUser !== null && $connectedUser?->person?->Id === $article->CreatedBy,
+                'isCreator' => $connectedUser->person !== null && $connectedUser->person->Id === $article->CreatedBy,
                 'message' => $message ?? '',
                 'messageType' => $messageType ?? '',
                 'btn_HistoryBack' => true,
@@ -568,7 +567,7 @@ class ArticleController extends TableController
 
     public function showArticleCrosstab(): void
     {
-        if (!($this->application->getConnectedUser()->isRedactor() || false)) {
+        if (!$this->application->getConnectedUser()->isRedactor()) {
             $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
@@ -626,7 +625,7 @@ class ArticleController extends TableController
 
     public function update(int $id): void
     {
-        if (!($this->application->getConnectedUser()->isRedactor() || false)) {
+        if (!$this->application->getConnectedUser()->isRedactor()) {
             $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
@@ -635,7 +634,7 @@ class ArticleController extends TableController
             return;
         }
         $article = $this->articleDataHelper->getLatestArticle([$id]);
-        if (!$article || ($this->application->getConnectedUser()->person?->Id ?? 0) != $article->CreatedBy) {
+        if (!$article || ($this->application->getConnectedUser()->person->Id ?? 0) != $article->CreatedBy) {
             $this->application->getErrorManager()->raise(
                 ApplicationError::Forbidden,
                 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__

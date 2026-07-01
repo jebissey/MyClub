@@ -19,7 +19,7 @@ use app\apis\HelloAssoApi;
 use app\apis\ImportApi;
 use app\apis\KanbanApi;
 use app\apis\KaraokeApi;
-use app\apis\LeapfrogApi;
+use app\apis\LeapFrogApi;
 use app\apis\LoanApi;
 use app\apis\MediaApi;
 use app\apis\MenuItemApi;
@@ -32,7 +32,7 @@ use app\helpers\Application;
 use app\helpers\ConnectedUser;
 use app\helpers\GravatarHandler;
 use app\helpers\MediaManager;
-use App\Helpers\NotificationSender;
+use app\helpers\NotificationSender;
 use app\helpers\PersonPreferences;
 use app\models\ArticleDataHelper;
 use app\models\AttributeDataHelper;
@@ -65,7 +65,6 @@ class ApiFactory
 {
     public function __construct(
         private Application $application,
-        private ArticleDataHelper $articleDataHelper,
         private AttributeDataHelper $attributeDataHelper,
         private AuthorizationDataHelper $authorizationDataHelper,
         private CarouselDataHelper $carouselDataHelper,
@@ -216,7 +215,6 @@ class ApiFactory
             $this->connectedUser,
             $this->dataHelper,
             $this->personDataHelper,
-            $this->articleDataHelper
         );
     }
 
@@ -273,9 +271,9 @@ class ApiFactory
         );
     }
 
-    public function makeLeapfrogApi(): LeapfrogApi
+    public function makeLeapfrogApi(): LeapFrogApi
     {
-        return new LeapfrogApi(
+        return new LeapFrogApi(
             $this->application,
             $this->connectedUser,
             $this->dataHelper,

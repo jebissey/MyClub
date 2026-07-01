@@ -80,7 +80,7 @@ class HomeController extends AbstractController
                 ],
                 $this->metadataDataHelper->isTestSite() && !empty($prodSiteUrl = $this->metadataDataHelper->getProdSiteUrl())
                     ? $prodSiteUrl : null,
-                $connectedUser?->person?->Alert ?? null
+                $connectedUser->person?->Alert
             );
         }
         $latestArticlesCount = (int) ($this->dataHelper->get('Settings', ['Name' => 'Home_LatestArticlesCount'], 'Value')->Value ?? 10);
@@ -92,7 +92,7 @@ class HomeController extends AbstractController
         if ($featuredArticleId > 0) {
             if ($this->articleDataHelper->isUserAllowedToReadArticle($userEmail, $featuredArticleId)) {
                 $featured = $this->articleDataHelper->getWithAuthor($featuredArticleId);
-                if ($featured !== null) {
+                if ($featured != null) {
                     $latestArticle = $featured;
                 }
             }
@@ -119,8 +119,8 @@ class HomeController extends AbstractController
             'latestArticlesCount'    => $latestArticlesCount,
             'homeHeader'             => $homeHeader,
             'homeFooter'             => $homeFooter,
-            'navItems'               => $this->getNavItems($connectedUser->person ?? false),
-            'sidebarMenu'            => $this->getSidebarMenuItems($connectedUser->person ?? false),
+            'navItems'               => $this->getNavItems($connectedUser->person),
+            'sidebarMenu'            => $this->getSidebarMenuItems($connectedUser->person),
             'publishedBy'            => $articles['latestArticle']
                 && $articles['latestArticle']->PublishedBy != $articles['latestArticle']->CreatedBy
                 ? $this->personDataHelper->getPublisher($articles['latestArticle']->PublishedBy) : '',
@@ -152,7 +152,7 @@ class HomeController extends AbstractController
         $lang = TranslationManager::getCurrentLanguage();
         $this->render('Common/views/info.latte', $this->getAllParams([
             'content' => $this->dataHelper->get('Languages', ['Name' => 'Help_Home'], $lang)->$lang ?? '',
-            'hasAuthorization' => $this->application->getConnectedUser()->hasAutorization() ?? false,
+            'hasAuthorization' => $this->application->getConnectedUser()->hasAutorization(),
             'currentVersion' => Application::VERSION,
             'timer' => 0,
             'previousPage' => true,
@@ -171,7 +171,7 @@ class HomeController extends AbstractController
 
         $this->render('Common/views/info.latte', $this->getAllParams([
             'content' => $this->dataHelper->get('Languages', ['Name' => 'LegalNotices'], $lang)->$lang ?? '',
-            'hasAuthorization' => $this->application->getConnectedUser()->hasAutorization() ?? false,
+            'hasAuthorization' => $this->application->getConnectedUser()->hasAutorization(),
             'currentVersion' => Application::VERSION,
             'page' => $this->application->getConnectedUser()->getPage(),
             'timer' => 0,

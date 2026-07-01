@@ -27,7 +27,7 @@ class EventGuestController extends AbstractController
 
     public function guest(string $message = '', string $type = ''): void
     {
-        if (!($this->application->getConnectedUser()->isEventManager() ?? false)) {
+        if (!$this->application->getConnectedUser()->isEventManager()) {
             $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
@@ -41,14 +41,14 @@ class EventGuestController extends AbstractController
             'message' => $message,
             'messageType' => $type,
             'page' => $connectedUser->getPage(1),
-            'navItems' => $this->getNavItems($connectedUser->person ?? false),
+            'navItems' => $this->getNavItems($connectedUser->person),
             'btn_HistoryBack' => true,
         ]));
     }
 
     public function guestInvite()
     {
-        if (!($this->application->getConnectedUser()->isEventManager() ?? false)) {
+        if (!$this->application->getConnectedUser()->isEventManager()) {
             $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
@@ -70,7 +70,7 @@ class EventGuestController extends AbstractController
                 return;
             }
             $event = $this->eventDataHelper->getEventExternal((int)$eventId);
-            if (!$event) {
+            if ($event === null) {
                 $this->guest('Événement non trouvé ou non accessible', 'error');
                 return;
             }

@@ -250,7 +250,7 @@ class GroupDataHelper extends Data
         if ($isWebmaster && !$isPersonManager) {
             return 'HAVING COUNT(a.Id) > 0';
         }
-        if ($isPersonManager && !$isWebmaster) {
+        if (!$isWebmaster) {
             return 'HAVING COUNT(a.Id) = 0';
         }
         return '';

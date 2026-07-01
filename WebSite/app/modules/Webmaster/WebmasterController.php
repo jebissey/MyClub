@@ -87,7 +87,7 @@ class WebmasterController extends AbstractController
             $lang = TranslationManager::getCurrentLanguage();
             $this->render('Common/views/info.latte', $this->getAllParams([
                 'content'          => $this->dataHelper->get('Languages', ['Name' => 'Help_Webmaster'], $lang)->$lang ?? '',
-                'hasAuthorization' => $this->application->getConnectedUser()->isWebmaster() ?? false,
+                'hasAuthorization' => $this->application->getConnectedUser()->isWebmaster(),
                 'currentVersion'   => Application::VERSION,
                 'timer'            => 0,
                 'previousPage'     => true,
@@ -99,7 +99,7 @@ class WebmasterController extends AbstractController
     public function homeAdmin(): void
     {
         $connectedUser = $this->application->getConnectedUser();
-        if (!($connectedUser->isAdministrator() ?? false)) {
+        if (!$connectedUser->isAdministrator()) {
             $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
@@ -428,7 +428,7 @@ class WebmasterController extends AbstractController
             CURLOPT_USERAGENT      => "PHP/" . PHP_VERSION,
             CURLOPT_HTTPHEADER     => ["Accept: application/json"],
             CURLOPT_SSL_VERIFYPEER => false,
-            CURLOPT_SSL_VERIFYHOST => false,
+            CURLOPT_SSL_VERIFYHOST => 0,
             CURLOPT_CONNECTTIMEOUT => 1,
             CURLOPT_TIMEOUT        => 2,
             CURLOPT_HTTP_VERSION   => CURL_HTTP_VERSION_1_1,

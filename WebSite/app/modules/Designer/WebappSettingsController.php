@@ -211,7 +211,7 @@ class WebappSettingsController extends AbstractController
 
     public function saveLanguage()
     {
-        if (!($this->application->getConnectedUser()->isHomeDesigner() ?? false)) {
+        if (!$this->application->getConnectedUser()->isHomeDesigner()) {
             $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }

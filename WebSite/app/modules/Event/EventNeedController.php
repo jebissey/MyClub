@@ -19,7 +19,7 @@ class EventNeedController extends AbstractController
 
     public function needs(): void
     {
-        if (!($this->application->getConnectedUser()->isEventDesigner() ?? false)) {
+        if (!$this->application->getConnectedUser()->isEventDesigner()) {
             $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }

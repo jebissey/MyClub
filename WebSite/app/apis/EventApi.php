@@ -162,8 +162,13 @@ class EventApi extends AbstractApi
             $root = Application::$root;
             $eventLink = $root . '/event/' . $event->Id;
             $unsubscribeLink = $root . '/user/preferences';
-            $eventCreatorEmail = $this->dataHelper->get('Person', ['Id' => $event->CreatedBy], 'Email')->Email;
-            if (!$eventCreatorEmail) {
+            $eventCreator = $this->dataHelper->get('Person', ['Id' => $event->CreatedBy], 'Email');
+            if ($eventCreator !== false) {
+                $eventCreatorEmail = $eventCreator->Email;
+            } else {
+                $eventCreatorEmail = null;
+            }
+            if ($eventCreatorEmail === null) {
                 return new ApiResponse(
                     false,
                     ApplicationError::BadRequest->value,

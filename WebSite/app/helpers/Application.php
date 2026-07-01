@@ -73,6 +73,9 @@ class Application
         $metadata = new DataHelper(
             self::$instance
         )->get('Metadata', ['Id' => 1], 'Compact_everyXdays, Compact_removeOlderThanXmonths, Compact_compactOlderThanXmonths');
+        if ($metadata === false) {
+            Application::unreachable("Missing metadata", __FILE__, __LINE__);
+        }
         new LogDataCompactHelper(
             self::$instance
         )->compactLog($metadata->Compact_removeOlderThanXmonths, $metadata->Compact_compactOlderThanXmonths);

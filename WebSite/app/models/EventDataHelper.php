@@ -28,7 +28,7 @@ class EventDataHelper extends Data implements NewsProviderInterface
     public function __construct(Application $application)
     {
         parent::__construct($application);
-        $this->personPreferences = new PersonPreferences($this->pdo);
+        $this->personPreferences = new PersonPreferences();
     }
 
     public function removeParticipant(int $id, int $personId)
@@ -100,7 +100,7 @@ class EventDataHelper extends Data implements NewsProviderInterface
         $sql = "SELECT Id FROM Event WHERE Id = :eventId";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':eventId' => $eventId]);
-        return $stmt->fetch() !== false;
+        return $stmt->fetch(PDO::FETCH_OBJ) !== false;
     }
 
     public function getAttributesForNextWeekEvents(): array
@@ -160,7 +160,7 @@ class EventDataHelper extends Data implements NewsProviderInterface
             ";
             $stmt = $this->pdo->prepare($sql);
             $stmt->execute([':eventId' => $eventId]);
-            return $stmt->fetch() ?: throw new QueryException("Event type doesn't exist for event ({$eventId})");
+            return $stmt->fetch(PDO::FETCH_OBJ) ?: throw new QueryException("Event type doesn't exist for event ({$eventId})");
         }
         throw new QueryException("Event ({$eventId}) doesn't exist");
     }
@@ -186,7 +186,7 @@ class EventDataHelper extends Data implements NewsProviderInterface
         throw new QueryException("Event ({$eventId}) doesn't exist");
     }
 
-    public function getEventExternal(int $eventId): object
+    public function getEventExternal(int $eventId): ?object
     {
         $sql = "
             SELECT *
@@ -201,9 +201,9 @@ class EventDataHelper extends Data implements NewsProviderInterface
             ':eventId' => $eventId,
             ':today'   => (new DateTime())->format('Y-m-d\TH:i:s'),
         ]);
-        $result = $stmt->fetch();
+        $result = $stmt->fetch(PDO::FETCH_OBJ);
         if ($result === false) {
-            throw new QueryException("Event ({$eventId}) doesn't exist");
+            return null;
         }
         return $result;
     }
@@ -243,7 +243,7 @@ class EventDataHelper extends Data implements NewsProviderInterface
             ";
             $stmt = $this->pdo->prepare($sql);
             $stmt->execute([':eventId' => $eventId]);
-            $result = $stmt->fetch();
+            $result = $stmt->fetch(PDO::FETCH_OBJ);
             return $result->IdGroup ?? null;
         }
         throw new QueryException("Event ({$eventId}) doesn't exist");
@@ -366,7 +366,7 @@ class EventDataHelper extends Data implements NewsProviderInterface
     public function getNews(ConnectedUser $connectedUser, string $searchFrom): array
     {
         $news = [];
-        if (!($connectedUser->person ?? false)) {
+        if ($connectedUser->person === null) {
             return $news;
         }
         $sql = "
@@ -385,7 +385,7 @@ class EventDataHelper extends Data implements NewsProviderInterface
         ";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([
-            ':personId'   => $connectedUser->person?->Id ?? 0,
+            ':personId'   => $connectedUser->person->Id,
             ':searchFrom' => $searchFrom
         ]);
         $events = $stmt->fetchAll(PDO::FETCH_OBJ);
@@ -459,7 +459,7 @@ class EventDataHelper extends Data implements NewsProviderInterface
                 ':eventId' => $eventId,
                 ':userEmail' => $userEmail
             ]);
-            $result = $stmt->fetch();
+            $result = $stmt->fetch(PDO::FETCH_OBJ);
             return $result !== false;
         }
         throw new QueryException("Event ({$eventId}) doesn't exist");
@@ -629,7 +629,7 @@ class EventDataHelper extends Data implements NewsProviderInterface
 
     private function getNextEvents(?object $person, bool $filterByPreferences = false)
     {
-        $params = [':personId' => $person?->Id ?? 0,];
+        $params = [':personId' => $person->Id ?? 0,];
         $sql = "
             SELECT 
                 e.*,
@@ -693,7 +693,7 @@ class EventDataHelper extends Data implements NewsProviderInterface
         ";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([
-            ':idperson' => $person?->Id ?? 0,
+            ':idperson' => $person->Id ?? 0,
             ':now'      => date('Y-m-d H:i:s'),
             ':limit'    => 10,
             ':offset'   => $offset

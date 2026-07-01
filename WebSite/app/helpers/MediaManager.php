@@ -128,7 +128,7 @@ class MediaManager
 
     public function removeFileShare(string $filePath): array
     {
-        if ($filePath === null) {
+        if (empty($filePath)) {
             return $this->error($this->languagesDataHelper->translate('media_manager.file_not_exists'));
         }
 

@@ -59,14 +59,14 @@ class DbBrowserDataHelper extends Data
         $stmt = $this->pdo->prepare("PRAGMA table_info(" . $this->quoteName($table) . ")");
         $stmt->execute();
 
-        while ($row = $stmt->fetch()) {
+        while ($row = $stmt->fetch(PDO::FETCH_OBJ)) {
             if ($row->pk == 1) {
                 return $row->name;
             }
         }
         $stmt = $this->pdo->prepare("PRAGMA table_info(" . $this->quoteName($table) . ")");
         $stmt->execute();
-        $row = $stmt->fetch();
+        $row = $stmt->fetch(PDO::FETCH_OBJ);
         return $row->name;
     }
 
@@ -76,7 +76,7 @@ class DbBrowserDataHelper extends Data
         $stmt = $this->pdo->prepare("PRAGMA table_info(" . $this->quoteName($table) . ")");
         $stmt->execute();
         $columns = [];
-        while ($row = $stmt->fetch()) {
+        while ($row = $stmt->fetch(PDO::FETCH_OBJ)) {
             $columns[] = $row->name;
         }
         return $columns;
@@ -88,7 +88,7 @@ class DbBrowserDataHelper extends Data
         $stmt = $this->pdo->prepare("PRAGMA table_info(" . $this->quoteName($table) . ")");
         $stmt->execute();
         $columns = [];
-        while ($row = $stmt->fetch()) {
+        while ($row = $stmt->fetch(PDO::FETCH_OBJ)) {
             $columns[] = [
                 'name' => $row->name,
                 'notnull' => $row->notnull
@@ -103,7 +103,7 @@ class DbBrowserDataHelper extends Data
         $stmt = $this->pdo->prepare("PRAGMA table_info(" . $this->quoteName($table) . ")");
         $stmt->execute();
         $columnTypes = [];
-        while ($row = $stmt->fetch()) {
+        while ($row = $stmt->fetch(PDO::FETCH_OBJ)) {
             $columnTypes[$row->name] = [
                 'type' => $row->type,
                 'notnull' => $row->notnull,
@@ -128,9 +128,9 @@ class DbBrowserDataHelper extends Data
         $stmt = $this->pdo->prepare($query);
         $stmt->bindValue(':id', $id);
         $stmt->execute();
-        $record = $stmt->fetch();
+        $record = $stmt->fetch(PDO::FETCH_OBJ);
         if (!$record) {
-            throw new RuntimeException('Record not found in file ' + __FILE__ + ' at line ' + __LINE__);
+            throw new RuntimeException('Record not found in file ' . __FILE__ . ' at line ' . __LINE__);
         }
         return [$this->getTableColumns($table), $record, $primaryKey, $this->getColumnTypes($table)];
     }
@@ -289,36 +289,28 @@ class DbBrowserDataHelper extends Data
         );
         $stmt->execute([':table' => $table]);
         $sql = (string) $stmt->fetchColumn();
-
         if ($sql === '') {
             return [];
         }
-
         $constraints = [];
-
         preg_match_all(
             '/CHECK\s*\(\s*"?(\w+)"?\s+IN\s*\(([^)]+)\)\s*\)/i',
             $sql,
             $matches,
             PREG_SET_ORDER
         );
-
         foreach ($matches as $match) {
             $colName    = $match[1];
             $rawValues  = $match[2];
-
             preg_match_all("/'([^']+)'|(\d+)/", $rawValues, $valMatches, PREG_SET_ORDER);
-
             $values = array_map(
-                fn($v) => $v[1] !== '' ? $v[1] : (int) $v[2],
+                fn($v) => !empty($v[1]) ? $v[1] : (int) $v[2],
                 $valMatches
             );
-
             if (!empty($values)) {
                 $constraints[$colName] = $values;
             }
         }
-
         return $constraints;
     }
 

@@ -14,7 +14,11 @@ class ArticleCrosstabDataHelper extends Data
         parent::__construct($application);
     }
 
-    public function getItems($dateRange)
+/**
+ * @param array{start: string, end: string} $dateRange
+ * @return array<mixed>
+ */
+    public function getItems(array $dateRange): array
     {
         $sql = "
             SELECT 
@@ -42,6 +46,5 @@ class ArticleCrosstabDataHelper extends Data
             'Audience',
             'Rédacteurs',
         );
-        return $crosstabData;
     }
 }

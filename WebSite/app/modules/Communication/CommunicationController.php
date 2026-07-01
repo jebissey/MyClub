@@ -22,11 +22,11 @@ class CommunicationController extends AbstractController
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isCommunicationManager(), __FILE__, __LINE__)) {
             $connectedUser = $this->application->getConnectedUser();
-            $userEmail = $connectedUser->person?->Email ?? '';
+            $userEmail = $connectedUser->person->Email ?? '';
 
             $this->render('Communication/views/communication_edit.latte', $this->getAllParams([
                 'groups'          => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
-                'navItems'        => $this->getNavItems($connectedUser->person ?? false),
+                'navItems'        => $this->getNavItems($connectedUser->person),
                 'page'            => $connectedUser->getPage(),
                 'btn_HistoryBack' => true,
                 'smtpFrom'        => $this->emailService->getSmtpConfig()?->getSenderAddress($userEmail),
@@ -42,7 +42,7 @@ class CommunicationController extends AbstractController
                     'quotaMonthlyReached' => ($this->t)('communication.quota.monthly_reached'),
                     'quotaAlmost'         => ($this->t)('communication.quota.almost_exceeded'),
                 ],
-                'connectedPersonId' => $connectedUser->person?->Id ?? null,
+                'connectedPersonId' => $connectedUser->person->Id ?? null,
                 'contactEmail' => $this->dataHelper->get('Settings', ['Name' => 'contactEmail'], 'Value')->Value ?? '',
             ]));
         }

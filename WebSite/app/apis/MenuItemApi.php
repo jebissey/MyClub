@@ -27,7 +27,7 @@ class MenuItemApi extends AbstractApi
 
     public function deleteItem(int $id)
     {
-        if (!($this->application->getConnectedUser()->isMenuDesigner() ?? false)) {
+        if (!$this->application->getConnectedUser()->isMenuDesigner()) {
             $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }
@@ -45,7 +45,7 @@ class MenuItemApi extends AbstractApi
 
     public function getMenuItem(int $id): void
     {
-        if (!($this->application->getConnectedUser()->isMenuDesigner() ?? false)) {
+        if (!$this->application->getConnectedUser()->isMenuDesigner()) {
             $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }
@@ -66,7 +66,7 @@ class MenuItemApi extends AbstractApi
 
     public function saveMenuItem(): void
     {
-        if (!($this->application->getConnectedUser()->isMenuDesigner() ?? false)) {
+        if (!$this->application->getConnectedUser()->isMenuDesigner()) {
             $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }
@@ -89,7 +89,7 @@ class MenuItemApi extends AbstractApi
 
     public function updatePositions()
     {
-        if (!($this->application->getConnectedUser()->isMenuDesigner() ?? false)) {
+        if (!$this->application->getConnectedUser()->isMenuDesigner()) {
             $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }

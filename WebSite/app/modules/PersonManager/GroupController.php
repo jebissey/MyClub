@@ -33,7 +33,7 @@ class GroupController extends AbstractController
             $this->render('PersonManager/views/group_create.latte', $this->getAllParams([
                 'availableAuthorizations' => $availableAuthorizations,
                 'layout' => $this->getLayout(),
-                'navItems' => $this->getNavItems($connectedUser->person ?? false),
+                'navItems' => $this->getNavItems($this->application->getConnectedUser()->person),
                 'page' => $this->application->getConnectedUser()->getPage(),
             ]));
         }
@@ -56,7 +56,7 @@ class GroupController extends AbstractController
                     'availableAuthorizations' => $availableAuthorizations,
                     'error' => 'Le nom du groupe est requis',
                     'layout' => $this->getLayout(),
-                    'navItems' => $this->getNavItems($connectedUser->person ?? false),
+                    'navItems' => $this->getNavItems($this->application->getConnectedUser()->person),
                     'page' => $this->application->getConnectedUser()->getPage(),
                 ]));
                 return;
@@ -144,11 +144,12 @@ class GroupController extends AbstractController
     public function groupIndex(): void
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isGroupManager(), __FILE__, __LINE__)) {
+            $connectedUser = $this->application->getConnectedUser();
             $this->render('PersonManager/views/groups_index.latte', $this->getAllParams([
-                'groups' => $this->groupDataHelper->getGroupsWithAuthorizations($this->application->getConnectedUser()),
+                'groups' => $this->groupDataHelper->getGroupsWithAuthorizations($connectedUser),
                 'layout' => $this->getLayout(),
-                'navItems' => $this->getNavItems($connectedUser->person ?? false),
-                'page' => $this->application->getConnectedUser()->getPage(),
+                'navItems' => $this->getNavItems($connectedUser->person),
+                'page' => $connectedUser->getPage(),
                 'btn_HistoryBack' => true,
                 'btn_Parent' => '/webmaster',
             ]));

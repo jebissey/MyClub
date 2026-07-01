@@ -70,7 +70,7 @@ class KanbanDataHelper extends Data
         }
     }
 
-    public function getKanbanProject(int $id): object
+    public function getKanbanProject(int $id): object|false
     {
         $sql = "
             SELECT 
@@ -81,7 +81,7 @@ class KanbanDataHelper extends Data
             WHERE Id = :id";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':id' => $id]);
-        return $stmt->fetch();
+        return $stmt->fetch(PDO::FETCH_OBJ);
     }
 
     public function getKanbanProjects(): array
@@ -290,7 +290,7 @@ class KanbanDataHelper extends Data
             ':idProject' => $idProject,
             ':idPerson' => $idPerson
         ]);
-        $row = $stmt->fetch();
+        $row = $stmt->fetch(PDO::FETCH_OBJ);
         return ((int)$row->Count) > 0;
     }
 

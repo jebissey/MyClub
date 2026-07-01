@@ -38,13 +38,17 @@ class UserConnectionsController extends AbstractController
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
-        $data = $this->participantDataHelper->getConnections($idPerson);
         $user = $this->dataHelper->get('Person', ['Id' => $idPerson], 'FirstName, LastName, NickName');
+        if ($user === false) {
+            $this->raiseBadRequest("User ({$idPerson}) not found", __FILE__, __LINE__);
+            return;
+        }
+        $data = $this->participantDataHelper->getConnections($idPerson);
         $this->render('User/views/user_connections.latte', $this->getAllParams([
             'connections' => $data['connections'],
             'maxEvents'   => $data['maxEvents'],
             'layout' => $this->getLayout(),
-            'navItems' => $this->getNavItems($connectedUser->person ?? false),
+            'navItems' => $this->getNavItems($person),
             'page' => $this->application->getConnectedUser()->getPage(1),
             'user' => $user->FirstName . ' ' . $user->LastName . ($user->NickName != '' ? ' (' . $user->NickName . ')' : ''),
             'btn_HistoryBack' => true,

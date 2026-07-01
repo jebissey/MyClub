@@ -6,13 +6,11 @@ namespace app\modules\Article\services;
 
 use app\models\AuthorizationDataHelper;
 use app\models\DataHelper;
-use app\modules\Common\services\AuthenticationService;
 
 class ArticleAuthorizationService
 {
     public function __construct(
         private DataHelper $dataHelper,
-        private AuthenticationService $authService,
         private AuthorizationDataHelper $authorizationDataHelper
     ) {
     }

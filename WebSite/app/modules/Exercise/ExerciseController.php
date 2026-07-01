@@ -8,7 +8,7 @@ use app\enums\ApplicationError;
 use app\enums\FilterInputRule;
 use app\helpers\Application;
 use app\helpers\WebApp;
-use app\models\exerciseTableDataHelper;
+use app\models\ExerciseTableDataHelper;
 use app\modules\Common\TableController;
 
 class ExerciseController extends TableController
@@ -96,7 +96,7 @@ class ExerciseController extends TableController
             'resetUrl' => '/articles',
             'userConnected' => $connectedUser->person ?? false,
             'layout' => $this->getLayout(),
-            'navItems' => $this->getNavItems($connectedUser->person ?? false),
+            'navItems' => $this->getNavItems($connectedUser->person),
             'page' => $connectedUser->getPage(),
             'btn_HistoryBack' => true,
             'btn_Parent'      => "/designer",
@@ -110,7 +110,7 @@ class ExerciseController extends TableController
         }
 
         $exercise = $this->dataHelper->get('Exercise', ['Id' => $id], 'Content, Title, CreatedBy');
-        if (!$exercise || ($this->application->getConnectedUser()->person?->Id ?? 0) != $exercise->CreatedBy) {
+        if (!$exercise || ($this->application->getConnectedUser()->person->Id ?? 0) != $exercise->CreatedBy) {
             $this->application->getErrorManager()->raise(
                 ApplicationError::Forbidden,
                 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__

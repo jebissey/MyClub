@@ -27,7 +27,7 @@ class AuthorizationDataHelper extends Data
             INNER JOIN GroupAuthorization on `Group`.Id = GroupAuthorization.IdGroup
             INNER JOIN Authorization on GroupAuthorization.IdAuthorization = Authorization.Id 
             WHERE Person.Id = ?");
-        $query->execute([$connectedUser->person?->Id ?? 0]);
+        $query->execute([$connectedUser->person->Id ?? 0]);
         return array_column($query->fetchAll(), 'Name');
     }
 
@@ -93,14 +93,14 @@ class AuthorizationDataHelper extends Data
         $now = (new DateTime())->format('Y-m-d');
         $closingDate = $order->ClosingDate;
         if (
-            $article->CreatedBy == ($connectedUser->person?->Id ?? 0)
+            $article->CreatedBy == ($connectedUser->person->Id ?? 0)
             || $order->Visibility == 'all'
             || $order->Visibility == 'allAfterClosing' && $closingDate < $now
         ) {
             return true;
         }
         $stmt = $this->pdo->prepare('SELECT COUNT(*) FROM OrderReply WHERE IdOrder = ? AND IdPerson = ?');
-        $stmt->execute([$order->Id, $connectedUser->person?->Id ?? 0]);
+        $stmt->execute([$order->Id, $connectedUser->person->Id ?? 0]);
         $hasOrdered = $stmt->fetchColumn() > 0;
         if ($hasOrdered && ($order->Visibility == 'orderers' || ($order->Visibility == 'orderersAfterClosing' && $closingDate < $now))) {
             return true;
@@ -117,14 +117,14 @@ class AuthorizationDataHelper extends Data
         $now = (new DateTime())->format('Y-m-d');
         $closingDate = $survey->ClosingDate;
         if (
-            $article->CreatedBy == ($connectedUser->person?->Id ?? 0)
+            $article->CreatedBy == ($connectedUser->person->Id ?? 0)
             || $survey->Visibility == 'all'
             || $survey->Visibility == 'allAfterClosing' && $closingDate < $now
         ) {
             return true;
         }
         $stmt = $this->pdo->prepare('SELECT COUNT(*) FROM Reply WHERE IdSurvey = ? AND IdPerson = ?');
-        $stmt->execute([$survey->Id, $connectedUser->person?->Id ?? 0]);
+        $stmt->execute([$survey->Id, $connectedUser->person->Id ?? 0]);
         $hasVoted = $stmt->fetchColumn() > 0;
         if ($hasVoted && ($survey->Visibility == 'voters' || ($survey->Visibility == 'votersAfterClosing' && $closingDate < $now))) {
             return true;
@@ -166,9 +166,6 @@ class AuthorizationDataHelper extends Data
     #region Private functions
     private function canReadArticle(object $article, ConnectedUser $connectedUser): bool
     {
-        if (!$article) {
-            return false;
-        }
         if (($connectedUser->person ?? false) && ($article->CreatedBy === $connectedUser->person->Id || $connectedUser->isEditor())) {
             return true;
         }
@@ -180,7 +177,7 @@ class AuthorizationDataHelper extends Data
         }
         return $article->IdGroup === null || !empty(array_intersect(
             [$article->IdGroup],
-            $this->getUserGroups($connectedUser->person?->Email ?? '')
+            $this->getUserGroups($connectedUser->person->Email ?? '')
         ));
     }
 
@@ -247,6 +244,6 @@ class AuthorizationDataHelper extends Data
                 ':personId' => $connectedUser->person->Id,
             ]);
         }
-        return (bool) $stmt->fetch();
+        return (bool) $stmt->fetch(PDO::FETCH_OBJ);
     }
 }

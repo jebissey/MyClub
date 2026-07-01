@@ -440,6 +440,7 @@ class LogDataHelper extends Data
         $toTs       = $to->getTimestamp();
         $bucketSize = ($toTs - $fromTs) / self::CREATION_TIME_TREND_STEP_SIZE;
 
+        /** @var array<int, array{total: int, count: int}> $buckets */
         $buckets = array_fill(0, self::CREATION_TIME_TREND_STEP_SIZE, ['total' => 0, 'count' => 0]);
 
         foreach ($rows as $row) {
@@ -457,10 +458,10 @@ class LogDataHelper extends Data
             $label = $sameDay
                 ? $sliceFrom->format('d/m H\h') . '–' . $sliceTo->format('H\h')
                 : $sliceFrom->format('d/m') . '–' . $sliceTo->format('d/m');
-            $count = $buckets[$i]['count'];
+            $count = (int)$buckets[$i]['count'];
             $result[] = [
                 'label'       => $label,
-                'avgDuration' => $count > 0 ? (int) round($buckets[$i]['total'] / $count) : null,
+                'avgDuration' => $count > 0 ? (int)(round($buckets[$i]['total'] / $count)) : null,
                 'count'       => $count,
             ];
         }

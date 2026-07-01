@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace app\models;
 
+use PDO;
 use Throwable;
 use app\helpers\Application;
 
@@ -57,7 +58,7 @@ class KaraokeDataHelper extends Data
     {
         $stmt = $this->pdo->prepare('SELECT "Id" FROM "KaraokeSession" WHERE "SessionId" = ?');
         $stmt->execute([$sessionId]);
-        $session = $stmt->fetch();
+        $session = $stmt->fetch(PDO::FETCH_OBJ);
         if ($session) {
             return (int)$session->Id;
         }
@@ -74,7 +75,7 @@ class KaraokeDataHelper extends Data
     {
         $stmt = $this->pdo->prepare('SELECT * FROM "KaraokeSession" WHERE "Id" = ?');
         $stmt->execute([$id]);
-        $result = $stmt->fetch();
+        $result = $stmt->fetch(PDO::FETCH_OBJ);
 
         return $result ?: null;
     }
@@ -83,7 +84,7 @@ class KaraokeDataHelper extends Data
     {
         $stmt = $this->pdo->prepare('SELECT * FROM "KaraokeSession" WHERE "SessionId" = ?');
         $stmt->execute([$sessionId]);
-        $result = $stmt->fetch();
+        $result = $stmt->fetch(PDO::FETCH_OBJ);
 
         return $result ?: null;
     }
@@ -95,7 +96,7 @@ class KaraokeDataHelper extends Data
             WHERE "ClientId" = ? AND "IdKaraokeSession" = ?
         ');
         $stmt->execute([$clientId, $idSession]);
-        $client = $stmt->fetch();
+        $client = $stmt->fetch(PDO::FETCH_OBJ);
 
         return $client && $client->IsHost == 1;
     }

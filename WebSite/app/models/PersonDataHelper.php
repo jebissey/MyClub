@@ -31,7 +31,7 @@ class PersonDataHelper extends Data implements NewsProviderInterface
     {
         $query = $this->pdo->prepare("SELECT Id FROM Person WHERE Email = ''");
         $query->execute();
-        $id = $query->fetch()->Id ?? null;
+        $id = $query->fetch(PDO::FETCH_OBJ)->Id ?? null;
         if ($id == null) {
             $query = $this->pdo->prepare("
                 INSERT INTO Person (Email, FirstName, LastName, Imported) 
@@ -287,7 +287,8 @@ class PersonDataHelper extends Data implements NewsProviderInterface
             return null;
         }
         $person = $this->get('Person', ['Id' => $idPerson], 'FirstName, LastName');
-        return "publié par " . $person->FirstName . " " . $person->LastName;
+        $name = $person !== false ? $person->FirstName . ' ' . $person->LastName : "?";
+        return "publié par " . $name;
     }
 
     public function getRedactors(): array
@@ -443,7 +444,7 @@ class PersonDataHelper extends Data implements NewsProviderInterface
         return $results;
     }
 
-    public function sendRegistrationLink($adminEmail, $name, $emailContact, $event): bool
+    public function sendRegistrationLink(string $adminEmail, string $name, string $emailContact, object $event): bool
     {
         $contact = $this->get('Contact', ['Email' => $emailContact]);
         if (!$contact) {
@@ -466,8 +467,11 @@ class PersonDataHelper extends Data implements NewsProviderInterface
             );
             $contact->Token = $token;
         }
-        if (!$contact) {
+        if (isset($contactId) && $contactId !== false) {
             $contact = $this->get('Contact', ['Id' => $contactId]);
+        }
+        if ($contact === false) {
+            Application::unreachable("contact must exist", __FILE__, __LINE__);
         }
         $registrationLink = Webapp::getBaseUrl() . "event/{$event->Id}/{$contact->Token}";
         $subject = "Lien d'inscription pour " . $event->Summary;

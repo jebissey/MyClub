@@ -98,6 +98,7 @@ abstract class Data
     public function get(string $table, array $where = [], $fields = '*'): object|false
     {
         $this->validateTableName($table);
+        $sql = "";
         try {
             if (is_array($fields)) {
                 $fieldsStr = implode(', ', $fields);
@@ -122,7 +123,7 @@ abstract class Data
             }
             $stmt = $this->pdo->prepare($sql);
             $stmt->execute($params);
-            return $stmt->fetch();
+            return $stmt->fetch(PDO::FETCH_OBJ);
         } catch (PDOException $e) {
             $this->application->getErrorManager()->raise(
                 ApplicationError::Error,
@@ -210,13 +211,13 @@ abstract class Data
     public function last(string $table, array $where = [], $fields = '*'): object|false
     {
         $this->validateTableName($table);
+        $sql = "";
         try {
             if (is_array($fields)) {
                 $fieldsStr = implode(', ', $fields);
             } else {
                 $fieldsStr = $fields;
             }
-
             $sql = "SELECT {$fieldsStr} FROM \"{$table}\"";
             $params = [];
             if (!empty($where)) {
@@ -234,7 +235,7 @@ abstract class Data
             $sql .= " ORDER BY Id DESC LIMIT 1";
             $stmt = $this->pdo->prepare($sql);
             $stmt->execute($params);
-            return $stmt->fetch();
+            return $stmt->fetch(PDO::FETCH_OBJ);
         } catch (PDOException $e) {
             $this->application->getErrorManager()->raise(
                 ApplicationError::Error,

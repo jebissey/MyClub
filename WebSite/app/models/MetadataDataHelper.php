@@ -15,7 +15,8 @@ class MetadataDataHelper extends Data
 
     public function isTestSite(): bool
     {
-        return $this->get('Metadata', ['Id' => 1], 'ThisIsTestSite')->ThisIsTestSite == 1;
+        $meta = $this->get('Metadata', ['Id' => 1], 'ThisIsTestSite');
+        return ($meta !== false && $meta->ThisIsTestSite == 1);
     }
 
     public function getForcedLanguage(): string
@@ -25,7 +26,7 @@ class MetadataDataHelper extends Data
 
     public function getProdSiteUrl(): string
     {
-        return $this->get('Metadata', ['Id' => 1], 'ThisIsProdSiteUrl')->ThisIsProdSiteUrl;
+        return $this->get('Metadata', ['Id' => 1], 'ThisIsProdSiteUrl')->ThisIsProdSiteUrl ?? '';
     }
 
     public function setForcedLanguage(?string $language): void

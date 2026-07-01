@@ -42,11 +42,11 @@ class KaraokeController extends AbstractController
 
             $this->render('Common/views/info.latte', $this->getAllParams([
                 'content' => $content,
-                'hasAuthorization' => $this->application->getConnectedUser()?->hasAutorization() ?? false,
+                'hasAuthorization' => $this->application->getConnectedUser()->hasAutorization(),
                 'currentVersion' => Application::VERSION,
                 'timer' => 10000,
                 'previousPage' => false,
-                'page' => $this->application->getConnectedUser()?->getPage(),
+                'page' => $this->application->getConnectedUser()->getPage(),
             ]));
         }
     }

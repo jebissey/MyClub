@@ -43,11 +43,11 @@ abstract class TableController extends AbstractController
 
         //var_dump($filters);
         //var_dump($query->getQuery());
-        //var_dump($values ?? null);
+        //var_dump($values);
         //die();
 
         $stmt = $pdo->prepare($query->getQuery());
-        $stmt->execute($values ?? null);
+        $stmt->execute($values);
         $items = $stmt->fetchAll(PDO::FETCH_OBJ);
 
         return [

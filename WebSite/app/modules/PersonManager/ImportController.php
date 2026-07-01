@@ -12,9 +12,8 @@ use app\modules\Common\AbstractController;
 
 class ImportController extends AbstractController
 {
-    private $importSettings;
-    private $results;
-    private array $foundEmails = [];
+    private array $importSettings;
+    private array $results;
 
     public function __construct(
         Application $application,

@@ -20,7 +20,7 @@ class KanbanController extends AbstractController
 
     public function board(): void
     {
-        if (!($this->application->getConnectedUser()->isKanbanDesigner() ?? false)) {
+        if (!$this->application->getConnectedUser()->isKanbanDesigner()) {
             $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
@@ -65,14 +65,14 @@ class KanbanController extends AbstractController
 
     public function help(): void
     {
-        if (!($this->application->getConnectedUser()->isKanbanDesigner() ?? false)) {
+        if (!$this->application->getConnectedUser()->isKanbanDesigner()) {
             $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
         $lang = TranslationManager::getCurrentLanguage();
         $this->render('Common/views/info.latte', $this->getAllParams([
             'content' => $this->dataHelper->get('Languages', ['Name' => 'Help_KanbanDesigner'], $lang)->$lang ?? '',
-            'hasAuthorization' => $this->application->getConnectedUser()->isRedactor() ?? false,
+            'hasAuthorization' => $this->application->getConnectedUser()->isRedactor(),
             'currentVersion' => Application::VERSION,
             'timer' => 0,
             'previousPage' => true,

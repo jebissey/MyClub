@@ -22,7 +22,7 @@ class TranslatorController extends AbstractController
     {
         $user = $this->application->getConnectedUser();
 
-        if (!($user->isTranslator() ?? false)) {
+        if (!$user->isTranslator()) {
             $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
@@ -46,7 +46,7 @@ class TranslatorController extends AbstractController
 
         $targetLang = in_array($filters['lang'] ?? '', $languages, true)
             ? $filters['lang']
-            : 'pl_PL';
+            : TranslationManager::DEFAULT_LANGUAGE;
 
         $missingOnly = (int)($filters['missing'] ?? 0);
 

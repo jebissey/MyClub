@@ -27,8 +27,8 @@ class MaintenanceController extends AbstractController
             return;
         }
 
-        $siteUnderMaintenance = $this->dataHelper->get('Metadata', ['Id' => 1], 'SiteUnderMaintenance')->SiteUnderMaintenance;
-        if ($siteUnderMaintenance == 0) {
+        $siteUnderMaintenance = $this->dataHelper->get('Metadata', ['Id' => 1], 'SiteUnderMaintenance');
+        if ($siteUnderMaintenance === false || $siteUnderMaintenance->SiteUnderMaintenance == 0) {
             return;
         }
 
@@ -37,7 +37,7 @@ class MaintenanceController extends AbstractController
             "Maintenance",
             30000,
             false,
-            $this->application->getConnectedUser()->isWebmaster() ?? false
+            $this->application->getConnectedUser()->isWebmaster()
         );
     }
 

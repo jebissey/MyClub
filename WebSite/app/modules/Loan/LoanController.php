@@ -53,14 +53,14 @@ class LoanController extends AbstractController
 
     public function designerHelp(): void
     {
-        if (!($this->application->getConnectedUser()->isLoanDesigner() ?? false)) {
+        if (!$this->application->getConnectedUser()->isLoanDesigner()) {
             $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
         $lang = TranslationManager::getCurrentLanguage();
         $this->render('Common/views/info.latte', $this->getAllParams([
             'content' => $this->dataHelper->get('Languages', ['Name' => 'Help_LoanDesigner'], $lang)->$lang ?? '',
-            'hasAuthorization' => $this->application->getConnectedUser()->isRedactor() ?? false,
+            'hasAuthorization' => $this->application->getConnectedUser()->isRedactor(),
             'currentVersion' => Application::VERSION,
             'timer' => 0,
             'previousPage' => true,

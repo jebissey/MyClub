@@ -29,11 +29,11 @@ class OrderDataHelper extends Data implements NewsProviderInterface
         ";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':articleId' => $articleId]);
-        $order = $stmt->fetch();
+        $order = $stmt->fetch(PDO::FETCH_OBJ);
         return $order;
     }
 
-    public function getWithCreator(int $articleId): object|bool
+    public function getWithCreator(int $articleId): object|false
     {
         $article = $this->get('Article', ['Id' => $articleId], 'Id');
         if ($article === false) {
@@ -48,7 +48,7 @@ class OrderDataHelper extends Data implements NewsProviderInterface
         ";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':articleId' => $article->Id]);
-        return $stmt->fetch();
+        return $stmt->fetch(PDO::FETCH_OBJ);
     }
 
     public function getPendingOrderResponses(): array

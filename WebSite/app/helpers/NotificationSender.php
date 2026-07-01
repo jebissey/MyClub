@@ -8,7 +8,7 @@ use Minishlink\WebPush\WebPush;
 use Minishlink\WebPush\Subscription;
 use Throwable;
 use app\models\DataHelper;
-use app\Modules\Common\services\CredentialService;
+use app\modules\Common\services\CredentialService;
 
 class NotificationSender
 {

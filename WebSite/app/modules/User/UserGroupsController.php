@@ -37,7 +37,7 @@ class UserGroupsController extends AbstractController
         $this->render('User/views/user_groups.latte', $this->getAllParams([
             'groups' => $currentGroups,
             'layout' => $this->getLayout(),
-            'navItems' => $this->getNavItems($connectedUser->person ?? false),
+            'navItems' => $this->getNavItems($person),
             'page' => $this->application->getConnectedUser()->getPage(1),
             'btn_HistoryBack' => true,
             'btn_Parent' => "/user",

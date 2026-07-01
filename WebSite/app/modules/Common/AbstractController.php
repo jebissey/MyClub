@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace app\modules\Common;
 
-use flight;
+use Flight;
 use flight\Engine;
 use Closure;
 use Latte\Engine as LatteEngine;
@@ -29,7 +29,6 @@ abstract class AbstractController
     protected AuthorizationDataHelper $authorizationDataHelper;
     private MetadataDataHelper $metadataDataHelper;
     private ?string $prodSiteUrl;
-    private ?string $memberAlert = null;
     protected Closure $t;
 
     public function __construct(protected Application $application)
@@ -60,7 +59,7 @@ abstract class AbstractController
 
     protected function getAllParams(array $specificParams): array
     {
-        return Params::getAll($specificParams, $this->prodSiteUrl, $this->memberAlert, $this->dataHelper->getDefaultColors());
+        return Params::getAll($specificParams, $this->prodSiteUrl, null, $this->dataHelper->getDefaultColors());
     }
 
     protected function getLayout(): string
@@ -80,17 +79,10 @@ abstract class AbstractController
         };
     }
 
-    /**
-     * Retrieves navigation items filtered according to the current user and their groups.
-     *
-     * @param object|false|null $person The current user object, false for anonymous.
-     * @param bool $all If true, returns all items without filtering.
-     * @return array<int, object> Array of navigation item objects.
-     */
-    protected function getNavItems(object|false|null $person, bool $all = false): array
+    protected function getNavItems(?object $person, bool $all = false): array
     {
         $userGroups = [];
-        if ($person && $person !== false) {
+        if ($person != null) {
             $userGroups = $this->authorizationDataHelper->getUserGroups($person->Email);
         }
         $filter = !$all ? ['What' => 'navbar'] : [];
@@ -105,8 +97,8 @@ abstract class AbstractController
         $filteredNavItems = [];
         foreach ($navItems as $navItem) {
             if (
-                ($person === false && $navItem->ForAnonymous == 1) ||
-                ($person && $navItem->ForMembers == 1 &&
+                ($person === null && $navItem->ForAnonymous == 1) ||
+                ($person !== null && $navItem->ForMembers == 1 &&
                     (
                         $navItem->IdGroup === null ||
                         (!empty($userGroups) && in_array($navItem->IdGroup, $userGroups, true))
@@ -133,18 +125,10 @@ abstract class AbstractController
         return $filteredNavItems;
     }
 
-    /**
-     * Retrieves sidebar menu items filtered according to the current user and their groups,
-     * structured as a nested array matching the expected sidebar format.
-     *
-     * @param object|false|null $person The current user object, false for anonymous.
-     * @param bool $all If true, returns all items without filtering.
-     * @return array<int, array> Structured sidebar menu array.
-     */
-    protected function getSidebarMenuItems(object|false|null $person, bool $all = false): array
+    protected function getSidebarMenuItems(?object $person, bool $all = false): array
     {
         $userGroups = [];
-        if ($person && $person !== false) {
+        if ($person !== null) {
             $userGroups = $this->authorizationDataHelper->getUserGroups($person->Email);
         }
 
@@ -158,8 +142,8 @@ abstract class AbstractController
         $filteredNavItems = [];
         foreach ($navItems as $navItem) {
             if (
-                ($person === false && $navItem->ForAnonymous == 1) ||
-                ($person && $navItem->ForMembers == 1 &&
+                ($person === null && $navItem->ForAnonymous == 1) ||
+                ($person !== null && $navItem->ForMembers == 1 &&
                     (
                         $navItem->IdGroup === null ||
                         (!empty($userGroups) && in_array($navItem->IdGroup, $userGroups, true))
@@ -197,6 +181,7 @@ abstract class AbstractController
                         )
                     ),
                 ],
+                default => Application::unreachable("Fatal error in file with navItemType={$navItem->Type}", __FILE__, __LINE__),
             };
 
             $sidebarMenu[] = $entry;
@@ -236,17 +221,17 @@ abstract class AbstractController
     protected function redirect(string $url, ?ApplicationError $applicationError = null, ?string $message = null): void
     {
         if ($applicationError !== null) {
-            $this->flight->setData('code', $applicationError->value);
+            Flight::set('code', $applicationError->value);
         }
         if ($message !== null) {
-            $this->flight->setData('message', $message);
+            Flight::set('message', $message);
         }
 
         $ua = $_SERVER['HTTP_USER_AGENT'] ?? '';
         if (stripos($ua, 'TestDevice') !== false) {
-            $statusCode = $applicationError?->value ?? ApplicationError::Ok->value;
-            $this->application->getFlight()->response()->status($statusCode);
-            $this->application->getFlight()->response()->write((string)($message ?? ''));
+            $statusCode = $applicationError->value ?? ApplicationError::Ok->value;
+            Flight::response()->status($statusCode);
+            Flight::response()->write((string)($message ?? ''));
         } else {
             $this->application->getFlight()->redirect($url);
         }
@@ -274,20 +259,20 @@ abstract class AbstractController
 
     protected function userIsAllowedAndMethodIsGood(string $method, callable $permissionCheck, string $file, int $line): bool
     {
-        $user = $this->application->getConnectedUser();
-        if ($user->person === null) {
+        if ($_SERVER['REQUEST_METHOD'] !== $method) {
+            $this->raiseMethodNotAllowed($file, $line);
+            return false;
+        }
+        $connectedUser = $this->application->getConnectedUser();
+        if ($connectedUser->person === null) {
             $result = $this->application->getAuthenticationService()->handleRememberMeLogin();
             if ($result && $result->isSuccess()) {
                 $this->redirect($_SERVER['REQUEST_URI'], ApplicationError::Ok, "Auto sign in succeeded for {$result->getUser()->Email}");
                 return true;
             }
         }
-        if (!$user || !$permissionCheck($user)) {
+        if ($connectedUser->person === null || !$permissionCheck($connectedUser)) {
             $this->raiseForbidden($file, $line);
-            return false;
-        }
-        if ($_SERVER['REQUEST_METHOD'] !== $method) {
-            $this->raiseMethodNotAllowed($file, $line);
             return false;
         }
         return true;

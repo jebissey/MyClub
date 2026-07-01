@@ -17,14 +17,14 @@ class Client
     public function __construct()
     {
         try {
-            if ($_SERVER['HTTP_USER_AGENT'] ?? '' != '') {
+            if (($_SERVER['HTTP_USER_AGENT'] ?? '') !== '') {
                 $parser = Parser::create();
                 $result = $parser->parse($_SERVER['HTTP_USER_AGENT']);
 
-                $this->browser = $result->ua->family ?? 'Unknown';
+                $this->browser = $result->ua->family;
                 $this->version = $result->ua->major ?? '';
-                $this->os = $result->os->family ?? 'Unknown';
-                $this->device = $result->device->family ?? 'Unknown';
+                $this->os = $result->os->family;
+                $this->device = $result->device->family;
             }
         } catch (Throwable $e) {
             throw $e;

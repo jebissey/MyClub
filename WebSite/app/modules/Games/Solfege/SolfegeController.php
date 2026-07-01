@@ -17,7 +17,7 @@ class SolfegeController extends AbstractController
 
     public function learn(): void
     {
-        if (!($this->application->getConnectedUser()->isEventDesigner() ?? false)) {
+        if (!$this->application->getConnectedUser()->isEventDesigner()) {
             $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
@@ -31,7 +31,7 @@ class SolfegeController extends AbstractController
 
     public function saveScore(): void
     {
-        if (!($this->application->getConnectedUser()->isEventDesigner() ?? false)) {
+        if (!$this->application->getConnectedUser()->isEventDesigner()) {
             $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
@@ -53,14 +53,14 @@ class SolfegeController extends AbstractController
         //   ]
         // }
 
-        try {
+        //try {
             // Sauvegarde en base (à adapter selon votre structure)
             // $this->dataHelper->saveUserScores($this->application->getConnectedUser()->get()->getId(), $input['scores']);
 
             echo json_encode(['success' => true, 'message' => 'Scores sauvegardés avec succès']);
-        } catch (Throwable $e) {
+        /*} catch (Throwable $e) {
             http_response_code(500);
             echo json_encode(['error' => 'Erreur lors de la sauvegarde']);
-        }
+        }*/
     }
 }

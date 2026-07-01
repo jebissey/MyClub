@@ -22,7 +22,7 @@ class OrderController extends AbstractController
 
     public function add(int $articleId): void
     {
-        if (!($this->application->getConnectedUser()->isRedactor() ?? false)) {
+        if (!($this->application->getConnectedUser()->isRedactor())) {
             $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
@@ -44,7 +44,7 @@ class OrderController extends AbstractController
 
     public function createOrUpdate(): void
     {
-        if (!($this->application->getConnectedUser()->isRedactor() ?? false)) {
+        if (!($this->application->getConnectedUser()->isRedactor())) {
             $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
@@ -133,7 +133,7 @@ class OrderController extends AbstractController
                 $person  = $this->dataHelper->get('Person', ['Id' => $reply->IdPerson], 'FirstName, LastName');
 
                 $participants[] = [
-                    'name'    => $person->FirstName . ' ' . $person->LastName,
+                    'name'    => $person === false ? '???' : $person->FirstName  . ' ' . $person->LastName,
                     'answers' => $answers,
                 ];
 

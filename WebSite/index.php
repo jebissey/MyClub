@@ -51,12 +51,6 @@ $flight->before('start', function () use ($maintenanceController, $connectedUser
     $connectedUser->get();
     $maintenanceController->checkIfSiteIsUnderMaintenance();
 });
-$flight->map('setData', function ($key, $value) {
-    Flight::set($key, $value);
-});
-$flight->map('getData', function ($key) {
-    return Flight::get($key);
-});
 
 $webapp = new WebApp();
 new Routes($application, $flight)->add($errorManager);
@@ -97,15 +91,15 @@ $flight->map('error', function (Throwable $ex) use ($logWriterDataHelper, $error
 });
 
 $flight->after('start', function () use ($logWriterDataHelper, $flight, $startTime) {
-    if ($flight->getData('_error_already_logged')) return;
+    if (Flight::get('_error_already_logged')) return;
 
     $duration = round((microtime(true) - $startTime) * 1000, 2);
     $logMessage = LogMessage::getInstance(null);
     $logWriterDataHelper->add(
-        $logMessage->getCode() ?? (string)$flight->getData('code') ?? '',
+        $logMessage->getCode() ?? (string)Flight::get('code') ?? '',
         $logMessage->getCode() !== null
             ? $logMessage->getMessage()
-            : ($flight->getData('message') ?? ''),
+            : (Flight::get('message') ?? ''),
         $duration
     );
 });

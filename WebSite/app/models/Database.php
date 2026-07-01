@@ -71,7 +71,7 @@ class Database
 
         $query = "SELECT ApplicationName, DatabaseVersion FROM Metadata LIMIT 1";
         $stmt = self::$pdo->query($query);
-        $row = $stmt->fetch();
+        $row = $stmt->fetch(PDO::FETCH_OBJ);
         $stmt = null;
 
         if ($row) {

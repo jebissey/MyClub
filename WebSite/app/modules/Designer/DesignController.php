@@ -23,7 +23,7 @@ class DesignController extends AbstractController
 
     public function index()
     {
-        if (!($this->application->getConnectedUser()->isHomeDesigner() ?? false)) {
+        if (!$this->application->getConnectedUser()->isHomeDesigner()) {
             $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
@@ -41,7 +41,7 @@ class DesignController extends AbstractController
 
     public function create()
     {
-        if (!($this->application->getConnectedUser()->isHomeDesigner() ?? false)) {
+        if (!$this->application->getConnectedUser()->isHomeDesigner()) {
             $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
@@ -57,7 +57,7 @@ class DesignController extends AbstractController
 
     public function save()
     {
-        if (!($this->application->getConnectedUser()->isHomeDesigner() ?? false)) {
+        if (!$this->application->getConnectedUser()->isHomeDesigner()) {
             $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
@@ -98,7 +98,7 @@ class DesignController extends AbstractController
             $lang = TranslationManager::getCurrentLanguage();
             $this->render('Common/views/info.latte', $this->getAllParams([
                 'content' => $this->dataHelper->get('Languages', ['Name' => 'Help_Designer'], $lang)->$lang ?? '',
-                'hasAuthorization' => $this->application->getConnectedUser()->isDesigner() ?? false,
+                'hasAuthorization' => $this->application->getConnectedUser()->isDesigner(),
                 'currentVersion' => Application::VERSION,
                 'timer' => 0,
                 'previousPage' => true,

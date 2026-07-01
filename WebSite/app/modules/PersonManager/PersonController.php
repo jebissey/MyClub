@@ -110,7 +110,7 @@ class PersonController extends TableController
                 $person->Imported == 0
             );
             $isDuplicate = $isNewRecord
-                ? $existing !== null
+                ? $existing != null
                 : ($existing && $existing->Id !== $person->Id);
 
             if ($isDuplicate) {
@@ -126,7 +126,7 @@ class PersonController extends TableController
 
                 $this->render('Common/views/info.latte', $this->getAllParams([
                     'content' => $message,
-                    'hasAuthorization' => $this->application->getConnectedUser()->hasAutorization() ?? false,
+                    'hasAuthorization' => $this->application->getConnectedUser()->hasAutorization(),
                     'currentVersion' => Application::VERSION,
                     'timer' => 10000,
                     'previousPage' => true,

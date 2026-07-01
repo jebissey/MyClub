@@ -39,7 +39,7 @@ class UserAccountController extends AbstractController
             'emojis' => Application::EMOJI_LIST,
             'isSelfEdit' => true,
             'layout' => $this->getLayout(),
-            'navItems' => $this->getNavItems($connectedUser->person ?? false),
+            'navItems' => $this->getNavItems($person),
             'page' => $this->application->getConnectedUser()->getPage(1),
             'btn_HistoryBack' => true,
             'btn_Parent' => "/user",

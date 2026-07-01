@@ -35,7 +35,7 @@ class LogDataAnalyticsHelper extends Data
                 ':startDate' => $period['start'],
                 ':endDate'   => $period['end'],
             ]);
-            $data = $query->fetch();
+            $data = $query->fetch(PDO::FETCH_OBJ);
 
             $item = [
                 'label'          => $this->formatPeriodLabel($period, $periodType),
@@ -87,10 +87,11 @@ class LogDataAnalyticsHelper extends Data
             'week'  => [$prev->modify('-1 week'),  $next->modify('+1 week')],
             'month' => [$prev->modify('-1 month'), $next->modify('+1 month')],
             'year'  => [$prev->modify('-1 year'),  $next->modify('+1 year')],
+            default => [$prev, $next],
         };
 
         $query = $this->pdoForLog->query('SELECT MIN(CreatedAt) as first, MAX(CreatedAt) as last FROM Log');
-        $range = $query->fetch();
+        $range = $query->fetch(PDO::FETCH_OBJ);
 
         return [
             'first'   => (new DateTime($range->first))->format('Y-m-d'),

@@ -34,7 +34,7 @@ class ArticleApi extends AbstractApi
 
     public function designVote(): void
     {
-        if (!($this->application->getConnectedUser()->isRedactor() ?? false)) {
+        if (!$this->application->getConnectedUser()->isRedactor()) {
             $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }

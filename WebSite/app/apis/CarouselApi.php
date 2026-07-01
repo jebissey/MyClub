@@ -34,7 +34,7 @@ class CarouselApi extends AbstractApi
             $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
-        if (!($this->application->getConnectedUser()->isRedactor() ?? false)) {
+        if (!$this->application->getConnectedUser()->isRedactor()) {
             $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }

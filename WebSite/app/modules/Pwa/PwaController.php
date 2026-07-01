@@ -66,7 +66,7 @@ class PwaController extends AbstractController
     {
         $user = $this->application->getConnectedUser();
 
-        if (!($user->isRedactor() ?? false)) {
+        if (!$user->isRedactor()) {
             $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
