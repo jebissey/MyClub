@@ -21,7 +21,7 @@ class DesignController extends AbstractController
         parent::__construct($application);
     }
 
-    public function index()
+    public function index(): void
     {
         if (!$this->application->getConnectedUser()->isHomeDesigner()) {
             $this->raiseForbidden(__FILE__, __LINE__);
@@ -39,7 +39,7 @@ class DesignController extends AbstractController
         ]));
     }
 
-    public function create()
+    public function create(): void
     {
         if (!$this->application->getConnectedUser()->isHomeDesigner()) {
             $this->raiseForbidden(__FILE__, __LINE__);
@@ -55,7 +55,7 @@ class DesignController extends AbstractController
         ]));
     }
 
-    public function save()
+    public function save(): void
     {
         if (!$this->application->getConnectedUser()->isHomeDesigner()) {
             $this->raiseForbidden(__FILE__, __LINE__);

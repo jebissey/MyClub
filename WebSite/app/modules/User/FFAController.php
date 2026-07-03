@@ -18,7 +18,7 @@ class FFAController extends AbstractController
         parent::__construct($application);
     }
 
-    public function searchMember()
+    public function searchMember(): void
     {
         if ($this->application->getConnectedUser()->person === null) {
             $this->raiseForbidden(__FILE__, __LINE__);

@@ -12,6 +12,49 @@ use app\models\ArticleDataHelper;
 use app\models\EventDataHelper;
 use app\modules\Common\AbstractController;
 
+/**
+ * @phpstan-type ArticleRow object{
+ *     Id: int,
+ *     Title: string,
+ *     Content: string|null,
+ *     LastUpdate: string,
+ *     CreationDate: string
+ * }
+ * @phpstan-type EventAttribute array{
+ *     name: string,
+ *     detail: string|null
+ * }
+ * @phpstan-type EventData array{
+ *     id: int|string,
+ *     summary: string,
+ *     description: string|null,
+ *     fullDateTime: string,
+ *     duration: string|null,
+ *     location: string|null,
+ *     eventType: string|null,
+ *     groupName: string|null,
+ *     audience: string|null,
+ *     attributes: EventAttribute[]
+ * }
+ * @phpstan-type RssEvent object{
+ *     id: int|string,
+ *     summary: string,
+ *     description: string|null,
+ *     fullDateTime: string,
+ *     duration: string|null,
+ *     location: string|null,
+ *     eventType: string|null,
+ *     groupName: string|null,
+ *     audience: string|null,
+ *     attributes: EventAttribute[]
+ * }
+ * @phpstan-type WeekData array{
+ *     weekStart: string,
+ *     weekEnd: string,
+ *     weekStartFull: string,
+ *     days: array<int, array<int, EventData>>
+ * }
+ */
 class RssController extends AbstractController
 {
     public function __construct(
@@ -78,6 +121,9 @@ class RssController extends AbstractController
         return htmlspecialchars($text, ENT_XML1 | ENT_QUOTES, 'UTF-8');
     }
 
+    /**
+     * @param ArticleRow[] $articles
+     */
     private function generateArticlesRSS(
         array $articles,
         string $site_title,
@@ -117,6 +163,10 @@ class RssController extends AbstractController
         return $rss;
     }
 
+    /**
+     * @param array<string, WeekData> $weeklyEvents
+     * @return RssEvent[]
+     */
     private function flattenWeeklyEvents(array $weeklyEvents): array
     {
         $events = [];
@@ -131,6 +181,9 @@ class RssController extends AbstractController
         return $events;
     }
 
+    /**
+     * @param RssEvent $event
+     */
     private function formatEventDescription(object $event): string
     {
         $parts = [];
@@ -177,6 +230,9 @@ class RssController extends AbstractController
         return implode("\n\n", $parts);
     }
 
+    /**
+     * @param RssEvent[] $events
+     */
     private function generateEventsRSS(
         array $events,
         string $site_title,

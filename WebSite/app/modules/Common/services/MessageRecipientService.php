@@ -25,6 +25,9 @@ class MessageRecipientService
         ];
     }
 
+    /**
+     * @return array<int, int>
+     */
     public function getRecipientsForContext(MessageContext $context): array
     {
         $persons = $this->dataHelper->gets(

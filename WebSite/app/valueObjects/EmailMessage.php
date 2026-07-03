@@ -8,6 +8,10 @@ use InvalidArgumentException;
 
 readonly class EmailMessage
 {
+    /**
+     * @param array<int, string> $cc
+     * @param array<int, string> $bcc
+     */
     public function __construct(
         public ?string $from,
         public string $to,

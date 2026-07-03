@@ -12,7 +12,10 @@ use app\modules\Common\AbstractController;
 
 class ImportController extends AbstractController
 {
+    /** @var array{headerRow: int, mapping: array{email: string|null, firstName: string|null, lastName: string|null, phone: string|null}} */
     private array $importSettings;
+
+    /** @var array{errors: int, messages: array<int, string>, inactivated: int} */
     private array $results;
 
     public function __construct(
@@ -103,7 +106,7 @@ class ImportController extends AbstractController
     }
 
     #region Private functions
-    private function loadSettings()
+    private function loadSettings(): void
     {
         if (
             !$this->importSettings = json_decode($this->dataHelper->get(

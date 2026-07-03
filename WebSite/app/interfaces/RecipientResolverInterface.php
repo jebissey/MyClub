@@ -10,6 +10,9 @@ interface RecipientResolverInterface
 {
     public function supports(MessageContext $context): bool;
 
+    /**
+     * @param array<string, mixed> $preferences
+     */
     public function shouldNotify(
         MessageContext $context,
         int $personId,

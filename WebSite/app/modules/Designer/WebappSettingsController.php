@@ -14,10 +14,23 @@ use app\modules\Common\AbstractController;
 class WebappSettingsController extends AbstractController
 {
     private MetadataDataHelper $metadataDataHelper;
+
+    /**
+     * @var array<string, string>
+     */
     private array $htmlSettingsKeys = [
         'Home_Header' => 'En-tête de la page d\'accueil',
         'Home_Footer' => 'Pied de page de la page d\'accueil',
     ];
+
+    /**
+     * @var array<string, array{
+     *     label?: string,
+     *     default: int,
+     *     min?: int,
+     *     max?: int|null
+     * }>
+     */
     private array $numericSettingsKeys = [
         'Home_LatestArticlesCount' => [
             'label'   => 'Nombre de derniers articles à afficher',
@@ -39,11 +52,24 @@ class WebappSettingsController extends AbstractController
         ],
         'Home_FooterArticleId' => ['default' => 0],
     ];
+
+    /**
+     * @var array<string, array{
+     *     path: string,
+     *     mime: list<string>
+     * }>
+     */
     private array $imageTargets = [
         'img_home'   => ['path' => 'app/images/home.png',           'mime' => ['image/png']],
         'img_logo'   => ['path' => 'app/images/logo.png',           'mime' => ['image/png']],
         'img_banner' => ['path' => 'app/images/header-banner.jpg',  'mime' => ['image/jpeg']],
     ];
+
+    /**
+     * @var array<string, array{
+     *     default: string
+     * }>
+     */
     private array $colorSettingsKeys = [
         'Navbar_BgColor'   => ['default' => '#212529'],
         'Navbar_InkColor'  => ['default' => '#ffffff'],
@@ -176,6 +202,9 @@ class WebappSettingsController extends AbstractController
         $this->redirect('/designer');
     }
 
+    /**
+     * @param list<string> $allowed
+     */
     private function saveImageFromDataUrl(string $dataUrl, string $path, array $allowed): void
     {
         if (!str_starts_with($dataUrl, 'data:')) {
@@ -209,7 +238,7 @@ class WebappSettingsController extends AbstractController
         file_put_contents($path, $bytes);
     }
 
-    public function saveLanguage()
+    public function saveLanguage(): void
     {
         if (!$this->application->getConnectedUser()->isHomeDesigner()) {
             $this->raiseForbidden(__FILE__, __LINE__);

@@ -8,6 +8,9 @@ use Closure;
 
 readonly class Route
 {
+    /**
+     * @param array<int, mixed> $args
+     */
     public function __construct(
         public string $methodAndPath,
         public Closure $controllerFactory,

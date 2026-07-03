@@ -37,7 +37,7 @@ class UserNotepadController extends AbstractController
         ]));
     }
 
-    public function saveNotepad()
+    public function saveNotepad(): void
     {
         $person = $this->application->getConnectedUser()->person;
         if ($person === null) {

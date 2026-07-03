@@ -323,6 +323,9 @@ class VisitorInsightsController extends TableController
     }
 
     #region Private functions
+    /**
+     * @return array{0: string, 1: string}
+     */
     private function getPeriodAndDate(): array
     {
         $params      = $this->flight->request()->query->getData();

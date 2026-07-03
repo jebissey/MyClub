@@ -46,7 +46,7 @@ class EventGuestController extends AbstractController
         ]));
     }
 
-    public function guestInvite()
+    public function guestInvite(): void
     {
         if (!$this->application->getConnectedUser()->isEventManager()) {
             $this->raiseForbidden(__FILE__, __LINE__);

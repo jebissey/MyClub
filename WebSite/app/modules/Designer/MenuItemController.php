@@ -17,7 +17,7 @@ class MenuItemController extends AbstractController
         parent::__construct($application);
     }
 
-    public function index()
+    public function index(): void
     {
         $menuItems = $this->getNavItems($this->application->getConnectedUser()->person, true);
         $tab = MenuItemTab::tryFrom($this->flight->request()->query->tab ?? '') ?? MenuItemTab::Navbar;
@@ -84,7 +84,7 @@ class MenuItemController extends AbstractController
         }
     }
 
-    public function showArwards()
+    public function showArwards(): void
     {
         $person = $this->application->getConnectedUser()->person ?? false;
         if ($person && $this->menuItemDataHelper->authorizedUser('/menuitem/show/arwards', $person)) {
@@ -106,7 +106,7 @@ class MenuItemController extends AbstractController
         }
     }
 
-    public function showArticle(int $id)
+    public function showArticle(int $id): void
     {
         $person = $this->application->getConnectedUser()->person ?? false;
         if ($this->menuItemDataHelper->authorizedUser("/menu/show/article/$id", $person)) {

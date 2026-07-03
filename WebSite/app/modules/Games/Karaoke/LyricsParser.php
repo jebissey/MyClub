@@ -8,7 +8,16 @@ use app\exceptions\LyricsParserException;
 
 class LyricsParser
 {
+    /** @var array<string, string> */
     private array $metadata = [];
+
+    /**
+     * @var array<int, array{
+     *     time: float,
+     *     text: string,
+     *     words: array<int, array{time: float, text: string}>
+     * }>
+     */
     private array $lines = [];
 
     public function __construct()
@@ -79,11 +88,21 @@ class LyricsParser
         usort($this->lines, fn($a, $b) => $a['time'] <=> $b['time']);
     }
 
+    /**
+     * @return array<string, string>
+     */
     public function getMetadata(): array
     {
         return $this->metadata;
     }
 
+    /**
+     * @return array<int, array{
+     *     time: float,
+     *     text: string,
+     *     words: array<int, array{time: float, text: string}>
+     * }>
+     */
     public function getLines(): array
     {
         return $this->lines;

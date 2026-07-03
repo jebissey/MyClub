@@ -14,33 +14,32 @@ class DesignDataHelper extends Data
         parent::__construct($application);
     }
 
-    public function insertOrUpdate($data, $personId)
+    public function insertOrUpdate($data, int $personId): void
     {
         $designId = (int)($data['designId'] ?? 0);
         $userId = $personId;
         $voteValue = $data['vote'] ?? 'voteNeutral';
 
-        $existingVote = $this->fluent->from('DesignVote')
-            ->where('IdDesign', $designId)
-            ->where('IdPerson', $userId)
-            ->fetch();
-        if ($existingVote) {
-            $this->fluent->update('DesignVote')
-                ->set(['Vote' => $voteValue])
-                ->where('Id', $existingVote->Id)
-                ->execute();
+        $existingVote = $this->get('DesignVote', ['IdDesign' => $designId, 'IdPerson' => $userId], 'Id');
+        if ($existingVote !== false) {
+            $this->set(
+                'DesignVote',
+                ['Vote' => $voteValue],
+                ['Id' => $existingVote->Id]
+            );
         } else {
-            $this->fluent->insertInto('DesignVote')
-                ->values([
+            $this->set(
+                'DesignVote',
+                [
                     'IdDesign' => $designId,
                     'IdPerson' => $userId,
                     'Vote' => $voteValue
-                ])
-                ->execute();
+                ]
+            );
         }
     }
 
-    public function getUsersVotes($personId)
+    public function getUsersVotes(int $personId)
     {
         $query = "SELECT d.Id, d.Name, d.Detail, d.NavBar, d.Status, d.OnlyForMembers, d.IdGroup, 
             p.FirstName || ' ' || p.LastName || CASE WHEN p.NickName IS NOT NULL AND p.NickName != '' 

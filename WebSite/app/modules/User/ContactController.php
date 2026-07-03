@@ -32,7 +32,7 @@ class ContactController extends AbstractController
         parent::__construct($application);
     }
 
-    public function contact($eventId = null): void
+    public function contact(?int $eventId = null): void
     {
         if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             $_SESSION['contact_form_loaded'] = time();
@@ -181,6 +181,9 @@ class ContactController extends AbstractController
         return true;
     }
 
+    /**
+     * @param array{name?: string, email?: string, message?: string, eventId?: int|null} $input
+     */
     private function sendContactMessage(array $input, ?int $eventId): void
     {
         $contactEmail = $this->dataHelper->get('Settings', ['Name' => 'contactEmail'], 'Value')->Value ?? '';
@@ -231,6 +234,9 @@ class ContactController extends AbstractController
         }
     }
 
+    /**
+     * @param array<int, string> $errors
+     */
     private function redirectWithErrors(array $errors, string $name, string $email, string $message): void
     {
         $params = [

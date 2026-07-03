@@ -60,11 +60,14 @@ class MyClubDateTime
         return [$startDate, $endDate];
     }
 
+    /**
+     * @return array{start: string, end: string}
+     */
     public static function getSeasonRange(string $seasonStart, string $seasonEnd): array
     {
         if ($seasonStart === '' || $seasonEnd === '') {
-            $currentYear = date('Y');
-            $currentMonth = date('m');
+            $currentYear = (int)date('Y');
+            $currentMonth = (int)date('m');
 
             if ($currentMonth < 9) {
                 $seasonStart = ($currentYear - 1) . '-09-01';

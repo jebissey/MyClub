@@ -23,7 +23,7 @@ class UserDirectoryController extends AbstractController
         parent::__construct($application);
     }
 
-    public function showDirectory()
+    public function showDirectory(): void
     {
         $person = $this->application->getConnectedUser()->person;
         if ($person === null) {
@@ -79,7 +79,7 @@ class UserDirectoryController extends AbstractController
         ]));
     }
 
-    public function showMap()
+    public function showMap(): void
     {
         $person = $this->application->getConnectedUser()->person;
         if ($person === null) {
@@ -109,7 +109,7 @@ class UserDirectoryController extends AbstractController
         ]));
     }
 
-    public function showPublicMap()
+    public function showPublicMap(): void
     {
         $person = $this->application->getConnectedUser()->person;
 
@@ -138,6 +138,21 @@ class UserDirectoryController extends AbstractController
     }
 
     #region Private functions
+    /**
+     * @param  array<int, \stdClass> $members
+     * @return array<int, array{
+     *     id: int,
+     *     name: string,
+     *     nickname: ?string,
+     *     avatar: ?string,
+     *     useGravatar: bool,
+     *     email: string,
+     *     lat: string,
+     *     lng: string,
+     *     userImg: string,
+     *     myPublicData: string
+     * }>
+     */
     private function getLocationData(array $members): array
     {
         $gravatarHandler = new GravatarHandler();

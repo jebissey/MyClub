@@ -11,8 +11,12 @@ class DistributionCalculator
     private const SLICES = 20;
 
     /**
-     * @param array<string, int> $memberCounts  email => count
-     * @return array{tranches: array, distribution: array, memberCounts: array}
+     * @param  array<string, int> $memberCounts  email => count
+     * @return array{
+     *     tranches: array<int, array{start: int, end: int, label: string}>,
+     *     distribution: array<int, int>,
+     *     memberCounts: array<string, int>
+     * }
      */
     public function compute(array $memberCounts): array
     {
@@ -38,6 +42,10 @@ class DistributionCalculator
         ];
     }
 
+    /**
+     * @param  array<int, array{start: int, end: int, label: string}> $tranches
+     * @param  array<string, int> $memberCounts
+     */
     public function findUserSlice(array $tranches, array $memberCounts, string $email): int
     {
         if (!array_key_exists($email, $memberCounts)) {
@@ -56,6 +64,10 @@ class DistributionCalculator
     }
 
     #region Private functions
+
+    /**
+     * @return array<int, array{start: int, end: int, label: string}>
+     */
     private function buildTranches(int $min, int $max, int $sliceSize): array
     {
         $tranches = [];
@@ -67,6 +79,11 @@ class DistributionCalculator
         return $tranches;
     }
 
+    /**
+     * @param  array<string, int> $memberCounts
+     * @param  array<int, array{start: int, end: int, label: string}> $tranches
+     * @return array<int, int>
+     */
     private function buildDistribution(array $memberCounts, array $tranches, int $min, int $sliceSize): array
     {
         $distribution = array_fill(0, count($tranches), 0);
@@ -78,6 +95,14 @@ class DistributionCalculator
         return $distribution;
     }
 
+    /**
+     * @param  array<int, array{start: int, end: int, label: string}> $tranches
+     * @param  array<int, int> $distribution
+     * @return array{
+     *     0: array<int, array{start: int, end: int, label: string}>,
+     *     1: array<int, int>
+     * }
+     */
     private function mergeEmptySlices(array $tranches, array $distribution): array
     {
         $mergedTranches     = [];

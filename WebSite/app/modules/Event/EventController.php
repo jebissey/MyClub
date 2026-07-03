@@ -106,7 +106,7 @@ class EventController extends AbstractController
         ]));
     }
 
-    public function showEventCrosstab()
+    public function showEventCrosstab(): void
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isEventManager(), __FILE__, __LINE__)) {
             $period = Period::from($this->flight->request()->query->period ?? 'month');
@@ -171,15 +171,15 @@ class EventController extends AbstractController
         ]));
     }
 
-    public function registerSet(int $eventId, $token = null): void
+    public function registerSet(int $eventId, ?string $token = null): void
     {
         $this->register($eventId, true, $token);
     }
-    public function registerUnset(int $eventId, $token = null): void
+    public function registerUnset(int $eventId, ?string $token = null): void
     {
         $this->register($eventId, false, $token);
     }
-    private function register(int $eventId, bool $set, $token = null): void
+    private function register(int $eventId, bool $set, ?string $token = null): void
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);

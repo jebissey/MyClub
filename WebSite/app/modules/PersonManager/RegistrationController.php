@@ -22,7 +22,7 @@ class RegistrationController extends TableController
         parent::__construct($application);
     }
 
-    public function index()
+    public function index(): void
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isGroupManager(), __FILE__, __LINE__)) {
             $schema = [
@@ -66,7 +66,7 @@ class RegistrationController extends TableController
         }
     }
 
-    public function getPersonGroups(int $personId)
+    public function getPersonGroups(int $personId): void
     {
         $personId = (int)$personId;
 

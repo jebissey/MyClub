@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace app\modules\User;
 
+use stdClass;
 use app\enums\ApplicationError;
 use app\enums\FilterInputRule;
 use app\helpers\Application;
@@ -61,6 +62,9 @@ class UserStatisticsController extends AbstractController
         ]));
     }
 
+    /**
+     * @return array{start: string, end: string}
+     */
     private function resolveSeason(): array
     {
         $schema = ['season' => FilterInputRule::DateInterval->value];
@@ -69,6 +73,10 @@ class UserStatisticsController extends AbstractController
         return MyClubDateTime::getSeasonRange($start, $end);
     }
 
+    /**
+     * @param  array{start: string, end: string} $season
+     * @return array<string, int>
+     */
     private function getVisitCounts(array $season): array
     {
         $visits  = $this->logDataHelper->getVisits($season);
@@ -76,6 +84,10 @@ class UserStatisticsController extends AbstractController
         return $this->normalizeMemberCounts($members, $visits);
     }
 
+    /**
+     * @param  array{start: string, end: string} $season
+     * @return array<string, int>
+     */
     private function getParticipationCounts(array $season): array
     {
         $participations = $this->participantDataHelper->getParticipations($season);
@@ -83,6 +95,10 @@ class UserStatisticsController extends AbstractController
         return $this->normalizeMemberCounts($members, $participations);
     }
 
+    /**
+     * @param  array{start: string, end: string} $season
+     * @return array<string, int>
+     */
     private function getMessageCounts(array $season): array
     {
         $messages = $this->messageDataHelper->getMessages($season);
@@ -90,6 +106,11 @@ class UserStatisticsController extends AbstractController
         return $this->normalizeMemberCounts($members, $messages);
     }
 
+    /**
+     * @param  array<int, stdClass>  $members
+     * @param  array<string, int|string> $rawCounts
+     * @return array<string, int>
+     */
     private function normalizeMemberCounts(array $members, array $rawCounts): array
     {
         $result = [];
@@ -99,6 +120,10 @@ class UserStatisticsController extends AbstractController
         return $result;
     }
 
+    /**
+     * @param  array<string, int> $memberCounts
+     * @return array<int, array{tranche: string, count: int, isHighlighted: bool}>
+     */
     private function buildChartData(array $memberCounts, object $person): array
     {
         $dist             = $this->distributionCalculator->compute($memberCounts);
@@ -109,7 +134,7 @@ class UserStatisticsController extends AbstractController
         );
 
         return array_map(
-            fn($i, $tranche) => [
+            fn(int $i, array $tranche) => [
                 'tranche'       => $tranche['label'],
                 'count'         => $dist['distribution'][$i],
                 'isHighlighted' => ($i === $currentUserSlice),

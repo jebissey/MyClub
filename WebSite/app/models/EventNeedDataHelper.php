@@ -14,6 +14,9 @@ class EventNeedDataHelper extends Data
         parent::__construct($application);
     }
 
+    /**
+     * @return array<int, \stdClass>
+     */
     public function needsForEvent(int $eventId): array
     {
         $sql = "

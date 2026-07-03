@@ -21,7 +21,9 @@ use app\models\MetadataDataHelper;
 
 abstract class AbstractController
 {
+    /** @var Engine<object> */
     protected Engine $flight;
+
     protected LatteEngine $latte;
     public DataHelper $dataHelper;
     protected LanguagesDataHelper $languagesDataHelper;
@@ -46,6 +48,12 @@ abstract class AbstractController
     }
 
     #region Protected fucntions
+    /**
+     * @return list<array{
+     *     value:string,
+     *     label:string
+     * }>
+     */
     protected function getAllLabels(): array
     {
         return array_map(
@@ -57,6 +65,10 @@ abstract class AbstractController
         );
     }
 
+    /**
+     * @param array<string,mixed> $specificParams
+     * @return array<string,mixed>
+     */
     protected function getAllParams(array $specificParams): array
     {
         return Params::getAll($specificParams, $this->prodSiteUrl, null, $this->dataHelper->getDefaultColors());
@@ -79,6 +91,9 @@ abstract class AbstractController
         };
     }
 
+    /**
+     * @return list<object>
+     */
     protected function getNavItems(?object $person, bool $all = false): array
     {
         $userGroups = [];
@@ -125,6 +140,18 @@ abstract class AbstractController
         return $filteredNavItems;
     }
 
+    /**
+     * @return list<array{
+     *     type:string,
+     *     label?:string,
+     *     icon?:string|null,
+     *     url?:string|null,
+     *     children?:list<array{
+     *         label:string,
+     *         url:string|null
+     *     }>
+     * }>
+     */
     protected function getSidebarMenuItems(?object $person, bool $all = false): array
     {
         $userGroups = [];
@@ -248,6 +275,10 @@ abstract class AbstractController
         readfile($filePath);
     }
 
+    /**
+     * @param list<string> $keys
+     * @return array<string,string>
+     */
     protected function translations(array $keys, string $prefix): array
     {
         $trans = [];
@@ -279,6 +310,9 @@ abstract class AbstractController
     }
 
     #region Public functions
+    /**
+     * @param object|array<string,mixed> $params
+     */
     public function render(string $templateLatteName, object|array $params = []): void
     {
         #error_log("\n\n" . json_encode($templateLatteName, JSON_PRETTY_PRINT) . "\n");

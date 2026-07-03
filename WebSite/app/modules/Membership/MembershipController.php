@@ -69,7 +69,9 @@ class MembershipController extends AbstractController
     }
 
     // ─── Private helpers ─────────────────────────────────────────────────────
-
+    /**
+     * @return array<string, string>
+     */
     private function doTranslations(): array
     {
         $keys = [

@@ -41,7 +41,7 @@ class UserPresentationController extends AbstractController
         }
     }
 
-    public function savePresentation()
+    public function savePresentation(): void
     {
         if ($person = $this->application->getConnectedUser()->person ?? false) {
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -82,7 +82,7 @@ class UserPresentationController extends AbstractController
         }
     }
 
-    public function showPresentation(int $personId)
+    public function showPresentation(int $personId): void
     {
         if ($loggedPerson = $this->application->getConnectedUser()->person ?? false) {
             $person = $this->dataHelper->get('Person', [

@@ -79,7 +79,7 @@ class HelloAssoService
      * @param string $description  Label shown on the HelloAsso payment page
      * @param string $returnUrl    URL to redirect the user after payment
      * @param string $errorUrl     URL to redirect the user on error / cancel
-     * @param array  $payer        ['firstName'=>..., 'lastName'=>..., 'email'=>...]
+     * @param array{firstName?: string, lastName?: string, email?: string} $payer
      *
      * @return array{checkoutIntentId: string, redirectUrl: string}
      * @throws RuntimeException on API error
@@ -128,7 +128,7 @@ class HelloAssoService
      *
      * @param string $formType  'adhesions' | 'evenements' | 'dons' | ...
      * @param string $formSlug  Slug of the form (e.g. 'saison-2026-2027')
-     * @param array  $options   Optional: 'firstName', 'lastName', 'email', 'accentColor'
+     * @param array{firstName?: string, lastName?: string, email?: string, accentColor?: string} $options
      */
     public function getWidgetUrl(string $formType, string $formSlug, array $options = []): string
     {
@@ -212,6 +212,10 @@ class HelloAssoService
         return $this->accessToken;
     }
 
+    /**
+     * @param  array<string, mixed> $body
+     * @return array<string, mixed>
+     */
     private function request(string $method, string $url, array $body = [], ?string $token = null): array
     {
         $headers = ['Content-Type: application/json', 'Accept: application/json'];
@@ -233,7 +237,6 @@ class HelloAssoService
 
         $response = curl_exec($ch);
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        curl_close($ch);
 
         if ($response === false) {
             throw new RuntimeException("HelloAsso cURL error for {$url}");
@@ -246,6 +249,6 @@ class HelloAssoService
             throw new RuntimeException("HelloAsso API error {$httpCode}: {$msg}");
         }
 
-        return $decoded ?? [];
+        return is_array($decoded) ? $decoded : [];
     }
 }

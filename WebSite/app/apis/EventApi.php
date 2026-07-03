@@ -60,7 +60,7 @@ class EventApi extends AbstractApi
         }
     }
 
-    public function duplicateEvent($id): void
+    public function duplicateEvent(int $id): void
     {
         if (!$this->eventDataHelper->eventExists($id)) {
             $this->renderJsonBadRequest("Event ({$id}) doesn't exist", __FILE__, __LINE__);
