@@ -32,7 +32,7 @@ class CommunicationApi extends AbstractApi
 
     public function getQuota(): void
     {
-        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isCommunicationManager())) {
+        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isCommunicationManager(), __FILE__, __LINE__)) {
             try {
                 $this->renderJsonOk($this->buildQuotaStats());
             } catch (Throwable $e) {
@@ -80,7 +80,7 @@ class CommunicationApi extends AbstractApi
 
     public function sendCommunication(): void
     {
-        if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isCommunicationManager())) {
+        if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isCommunicationManager(), __FILE__, __LINE__)) {
             try {
                 $input        = $this->getJsonInput();
                 $recipientIds = array_filter(array_map('intval', $input['recipient_ids'] ?? []));
@@ -183,7 +183,7 @@ class CommunicationApi extends AbstractApi
 
     public function updateContactEmail(): void
     {
-        if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isCommunicationManager())) {
+        if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isCommunicationManager(), __FILE__, __LINE__)) {
             $body  = json_decode(file_get_contents('php://input'), true);
             $value = trim($body['value'] ?? '');
 

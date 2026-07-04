@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace app\modules\User;
 
+use stdClass;
 use app\helpers\Application;
 use app\helpers\GravatarHandler;
 use app\helpers\WebApp;
@@ -139,7 +140,7 @@ class UserDirectoryController extends AbstractController
 
     #region Private functions
     /**
-     * @param  array<int, \stdClass> $members
+     * @param  array<int, stdClass> $members
      * @return array<int, array{
      *     id: int,
      *     name: string,

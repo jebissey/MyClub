@@ -31,7 +31,7 @@ class HelloAssoApi extends AbstractApi
      */
     public function checkout(): void
     {
-        if (!$this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isConnected())) {
+        if (!$this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isConnected(), __FILE__, __LINE__)) {
             return;
         }
 

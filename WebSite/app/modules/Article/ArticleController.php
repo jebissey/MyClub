@@ -311,7 +311,6 @@ class ArticleController extends TableController
         $schema = [
             'PersonName' => FilterInputRule::PersonName->value,
             'title'      => FilterInputRule::Content->value,
-            'timestamp'  => FilterInputRule::DateTime->value,
             'lastUpdate' => FilterInputRule::DateTime->value,
             'published'  => ['oui', 'non'],
             'pool'       => ['oui', 'non'],

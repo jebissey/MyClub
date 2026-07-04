@@ -240,9 +240,14 @@
 
 {block scripts}
     <script src="/app/modules/Common/js/tinymce/tinymce.min.js"></script>
+    <script src="/app/modules/Communication/js/tinymceInsertButtonPlugin.js"></script>
     <script type="module">
         import { initTinyMCE } from '/app/modules/Common/js/tinymce-config.js';
-        initTinyMCE('#tinymce-email', {  mode: 'normal' });
+        initTinyMCE('#tinymce-email', {
+            mode: 'normal',
+            extraPlugins: ['insertbutton'],
+            extraToolbar: 'insertbutton',
+        });
     </script>
     <script>
     {if isset($i18n)}

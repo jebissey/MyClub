@@ -14,9 +14,13 @@ const NORMAL_SECURITY = {
         'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
         'ul', 'ol', 'li',
         'blockquote', 'pre', 'code',
-        'a[href|target|rel|title]',
+        'a[href|target|rel|title|data-link-no-tracking|style]',
         'img[class|src|alt|title|width|height|style]',
-        'table', 'thead', 'tbody', 'tfoot', 'tr', 'th[colspan|rowspan|style]', 'td[colspan|rowspan|style]',
+        'table[role|cellspacing|cellpadding|border|align|style]',
+        'thead', 'tbody', 'tfoot',
+        'tr[style]',
+        'th[colspan|rowspan|style]',
+        'td[colspan|rowspan|align|bgcolor|style]',
         'div[class|style]', 'span[class|style]',
         'figure', 'figcaption',
         'hr', 'sub', 'sup',
@@ -31,6 +35,22 @@ const PERMISSIVE_SECURITY = {
     extended_valid_elements: 'img[class|src|border=0|alt|title|hspace|vspace|width|height|align|onmouseover|onmouseout|name|style]',
     valid_classes: '',
 };
+
+/** Base plugins/toolbar shared by every editor instance (extendable via extraPlugins/extraToolbar) */
+const BASE_PLUGINS = [
+    'advlist', 'autolink', 'lists', 'link', 'image', 'charmap',
+    'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+    'insertdatetime', 'media', 'table', 'help', 'wordcount',
+];
+
+const BASE_TOOLBAR =
+    'undo redo | blocks fontsize | '
+    + 'bold italic underline strikethrough | '
+    + 'alignleft aligncenter alignright alignjustify | '
+    + 'bullist numlist outdent indent | '
+    + 'forecolor backcolor | '
+    + 'link image media table | '
+    + 'code removeformat fullscreen help';
 
 /**
  * Builds the TinyMCE upload handler with automatic compression.
@@ -112,20 +132,11 @@ export function initTinyMCE(selector, options = {}) {
 
         height: options.height ?? '100%',
 
-        plugins: [
-            'advlist', 'autolink', 'lists', 'link', 'image', 'charmap',
-            'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
-            'insertdatetime', 'media', 'table', 'help', 'wordcount',
-        ],
+        plugins: [...BASE_PLUGINS, ...(options.extraPlugins ?? [])],
 
-        toolbar:
-            'undo redo | blocks fontsize | '
-            + 'bold italic underline strikethrough | '
-            + 'alignleft aligncenter alignright alignjustify | '
-            + 'bullist numlist outdent indent | '
-            + 'forecolor backcolor | '
-            + 'link image media table | '
-            + 'code removeformat fullscreen help',
+        toolbar: options.extraToolbar
+            ? `${BASE_TOOLBAR} | ${options.extraToolbar}`
+            : BASE_TOOLBAR,
 
         // ── Image ──────────────────────────────────────────────────────────
         image_advtab: true,
@@ -189,6 +200,7 @@ export function initTinyMCE(selector, options = {}) {
         'selector', 'mode', 'setup',
         'valid_elements', 'extended_valid_elements', 'valid_classes',
         'images_upload_handler',
+        'plugins', 'toolbar', 'extraPlugins', 'extraToolbar',
     ]);
 
     for (const [key, value] of Object.entries(options)) {

@@ -29,7 +29,7 @@ class ArticleTableDataHelper extends Data
                     END
                 END AS Published');
 
-        if ($connectedUser->person ?? false) {
+        if ($connectedUser->person !== null) {
             if (!$connectedUser->isEditor()) {
                 $query = $query->where('(CreatedBy = ' . $connectedUser->person->Id . '
                 OR (PublishedBy IS NOT NULL 

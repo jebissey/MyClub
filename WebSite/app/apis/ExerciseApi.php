@@ -23,7 +23,7 @@ class ExerciseApi extends AbstractApi
 
     public function get(int $id): void
     {
-        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isConnected())) {
+        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isConnected(), __FILE__, __LINE__)) {
             return;
         }
         $exercise = $this->dataHelper->get('Exercise', ['Id' =>  $id]);
@@ -37,7 +37,7 @@ class ExerciseApi extends AbstractApi
 
     public function save(int $id): void
     {
-        if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isExerciseDesigner())) {
+        if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isExerciseDesigner(), __FILE__, __LINE__)) {
             $data = $this->getJsonInput();
             if (!isset($data['exercises']) || !is_array($data['exercises'])) {
                 $this->renderJsonBadRequest('Invalid exercises payload', __FILE__, __LINE__);
@@ -55,7 +55,7 @@ class ExerciseApi extends AbstractApi
 
     public function delete(int $id): void
     {
-        if (!$this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isExerciseDesigner())) {
+        if (!$this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isExerciseDesigner(), __FILE__, __LINE__)) {
             return;
         }
         $data = $this->getJsonInput();

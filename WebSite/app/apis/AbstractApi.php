@@ -130,15 +130,15 @@ abstract class AbstractApi
         $this->latte->render($template, $params);
     }
 
-    protected function userIsAllowedAndMethodIsGood(string $method, callable $permissionCheck): bool
+    protected function userIsAllowedAndMethodIsGood(string $method, callable $permissionCheck, string $file, int $line): bool
     {
-        $user = $this->application->getConnectedUser()->person;
-        if ($user === null || !$permissionCheck($user)) {
-            $this->renderJsonForbidden(__FILE__, __LINE__);
+        $user = $this->application->getConnectedUser();
+        if ($user->person === null || !$permissionCheck($user)) {
+            $this->renderJsonForbidden($file, $line);
             return false;
         }
         if ($_SERVER['REQUEST_METHOD'] !== $method) {
-            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
+            $this->renderJsonMethodNotAllowed($file, $line);
             return false;
         }
         return true;

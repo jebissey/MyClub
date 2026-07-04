@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace app\models;
 
+use stdClass;
+
 use PDO;
 use app\helpers\Application;
 
@@ -15,7 +17,7 @@ class EventNeedDataHelper extends Data
     }
 
     /**
-     * @return array<int, \stdClass>
+     * @return array<int, stdClass>
      */
     public function needsForEvent(int $eventId): array
     {

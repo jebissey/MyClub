@@ -27,7 +27,7 @@ class MediaApi extends AbstractApi
 
     public function deleteFile(int $year, int $month, string $filename): void
     {
-        if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isRedactor())) {
+        if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isRedactor(), __FILE__, __LINE__)) {
             $result = $this->mediaManager->deleteFile($year, $month, $filename);
 
             if ($result['success']) {
@@ -45,7 +45,7 @@ class MediaApi extends AbstractApi
 
     public function editImage(): void
     {
-        if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isRedactor())) {
+        if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isRedactor(), __FILE__, __LINE__)) {
             $data = $this->getJsonInput();
             $path      = $data['path']      ?? '';
             $imageData = $data['imageData'] ?? '';  // data:image/jpeg;base64,...
@@ -121,7 +121,7 @@ class MediaApi extends AbstractApi
 
     public function isShared(): void
     {
-        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isRedactor())) {
+        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isRedactor(), __FILE__, __LINE__)) {
             $filePath = trim($_GET['path']  ?? '');
             if (!$filePath) {
                 $this->renderJsonBadRequest('Fichier manquant', __FILE__, __LINE__);
@@ -133,7 +133,7 @@ class MediaApi extends AbstractApi
 
     public function removeFileShare(): void
     {
-        if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isRedactor())) {
+        if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isRedactor(), __FILE__, __LINE__)) {
             $data = $this->getJsonInput();
             $filePath = trim($data['path'] ?? '');
             if (!$filePath) {
@@ -151,7 +151,7 @@ class MediaApi extends AbstractApi
 
     public function shareFile(): void
     {
-        if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isRedactor())) {
+        if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isRedactor(), __FILE__, __LINE__)) {
             $data = $this->getJsonInput();
 
             $path = $data['path'] ?? null;
@@ -184,7 +184,7 @@ class MediaApi extends AbstractApi
 
     public function uploadFile(): void
     {
-        if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isRedactor())) {
+        if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isRedactor(), __FILE__, __LINE__)) {
             if (empty($_FILES['file'])) {
                 $this->renderJson(['message' => 'Aucun fichier sélectionné'], false, ApplicationError::Ok->value);
                 return;

@@ -29,7 +29,7 @@ class EventNeedApi extends AbstractApi
 
     public function deleteNeed(int $id): void
     {
-        if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isEventDesigner())) {
+        if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isEventDesigner(), __FILE__, __LINE__)) {
             try {
                 $deletedRows = $this->dataHelper->delete('Need', ['Id' => $id]);
                 if ($deletedRows === 1) {
@@ -50,7 +50,7 @@ class EventNeedApi extends AbstractApi
             $this->renderJsonBadRequest("Event ({$id}) doesn't exist", __FILE__, __LINE__);
             return;
         }
-        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isEventDesigner())) {
+        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isEventDesigner(), __FILE__, __LINE__)) {
             try {
                 $apiResponse = new ApiResponse(
                     true,
@@ -66,7 +66,7 @@ class EventNeedApi extends AbstractApi
 
     public function saveNeed(): void
     {
-        if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isEventDesigner())) {
+        if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isEventDesigner(), __FILE__, __LINE__)) {
             $data = $this->getJsonInput();
             try {
                 $this->doSaveNeed($data);

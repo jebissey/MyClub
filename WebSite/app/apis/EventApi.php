@@ -49,7 +49,7 @@ class EventApi extends AbstractApi
             $this->renderJsonBadRequest("Event ({$id}) doesn't exist", __FILE__, __LINE__);
             return;
         }
-        if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isEventManager())) {
+        if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isEventManager(), __FILE__, __LINE__)) {
             try {
                 $this->eventDataHelper->removeParticipant($id, $this->authService->getUserId());
                 $apiResponse = new ApiResponse(true, ApplicationError::Ok->value);
@@ -66,7 +66,7 @@ class EventApi extends AbstractApi
             $this->renderJsonBadRequest("Event ({$id}) doesn't exist", __FILE__, __LINE__);
             return;
         }
-        if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isEventManager())) {
+        if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isEventManager(), __FILE__, __LINE__)) {
             try {
                 $modeString = WebApp::getFiltered(
                     'mode',
@@ -91,7 +91,7 @@ class EventApi extends AbstractApi
             $this->renderJsonBadRequest("Event ({$id}) doesn't exist", __FILE__, __LINE__);
             return;
         }
-        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isEventManager())) {
+        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isEventManager(), __FILE__, __LINE__)) {
             try {
                 $apiResponse = new ApiResponse(true, ApplicationError::Ok->value, [
                     'event' => $this->eventDataHelper->getEvent($id),
@@ -106,7 +106,7 @@ class EventApi extends AbstractApi
 
     public function saveEvent(): void
     {
-        if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isEventManager())) {
+        if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isEventManager(), __FILE__, __LINE__)) {
             try {
                 $data = $this->getJsonInput();
                 $this->eventDataHelper->update($data, $this->authService->getUserId());
@@ -121,7 +121,7 @@ class EventApi extends AbstractApi
 
     public function sendEmails()
     {
-        if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isEventManager())) {
+        if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isEventManager(), __FILE__, __LINE__)) {
             $data = $this->getJsonInput();
             $eventId = $data['EventId'] ?? 0;
             if ($eventId === 0) {
