@@ -16,7 +16,7 @@ class MenuItemDataHelper extends Data
         parent::__construct($application);
     }
 
-    public function authorizedUser(string $url, object|false $person): bool
+    public function authorizedUser(string $url, ?object $person): bool
     {
         $sql = '
             SELECT 
@@ -40,14 +40,14 @@ class MenuItemDataHelper extends Data
 
         if (!$pageData->IdGroup) {
             if (
-                (!$person && $pageData->ForAnonymous) ||
-                ($person && $pageData->ForMembers)
+                ($person === null && $pageData->ForAnonymous) ||
+                ($person !== null && $pageData->ForMembers)
             ) {
                 return true;
             }
             return false;
         }
-        if (!$person) {
+        if ($person === null) {
             return false;
         }
         $userGroups = $this->authorizationDataHelper->getUserGroups($person->Email);

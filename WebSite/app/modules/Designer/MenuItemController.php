@@ -108,7 +108,7 @@ class MenuItemController extends AbstractController
 
     public function showArticle(int $id): void
     {
-        $person = $this->application->getConnectedUser()->person ?? false;
+        $person = $this->application->getConnectedUser()->person;
         if ($this->menuItemDataHelper->authorizedUser("/menu/show/article/$id", $person)) {
             $this->render('Article/views/showArticle.latte', $this->getAllParams([
                 'navItems'         => $this->getNavItems($person),

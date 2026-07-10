@@ -32,7 +32,7 @@ class LoanApi extends AbstractApi
 
     public function getItem(int $id): void
     {
-        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isLoanDesigner(), __FILE__, __LINE__   )) {
+        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isLoanDesigner(), __FILE__, __LINE__)) {
             $item = $this->loanDataHelper->getItem($id);
             if (!$item) {
                 $this->renderJsonBadRequest("Item {$id} not found", __FILE__, __LINE__);
@@ -140,7 +140,7 @@ class LoanApi extends AbstractApi
 
     public function cancelLoan(int $id): void
     {
-        if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isLoanManager(), __FILE__, __LINE__  )) {
+        if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isLoanManager(), __FILE__, __LINE__)) {
             $ok = $this->loanDataHelper->cancelLoan($id);
             if (!$ok) {
                 $this->renderJsonBadRequest("Loan {$id} not found", __FILE__, __LINE__);

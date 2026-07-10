@@ -46,8 +46,6 @@ maxSizeInput.addEventListener('change', () => {
 
 resetCropBtn.addEventListener('click', () => cropper?.reset());
 
-// Remplacer le bloc document.querySelectorAll('.edit-image-btn') entier
-
 let imageLoaded = false;
 let modalShown = false;
 

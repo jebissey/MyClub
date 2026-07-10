@@ -24,7 +24,6 @@ use app\models\PersonDataHelper;
 use app\modules\Article\services\ArticleAuthorizationService;
 use app\modules\Common\TableController;
 use app\modules\Common\services\ArticleService;
-use app\modules\Common\services\AuthenticationService;
 use app\modules\Common\services\EmailService;
 use app\modules\Common\services\MessageService;
 use app\valueObjects\EmailMessage;

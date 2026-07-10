@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace app\modules\Article;
 
-use Flight;
 use app\helpers\Application;
 use app\helpers\MediaManager;
+use app\helpers\TranslationManager;
 use app\helpers\WebApp;
 use app\models\ArticleDataHelper;
 use app\models\CarouselDataHelper;
@@ -68,6 +68,18 @@ class MediaController extends AbstractController
         $this->render('Article/views/media_gpxViewer.latte', $this->getAllParams([
             'page' => $this->application->getConnectedUser()->getPage(),
         ]));
+    }
+
+    public function help(): void
+    {
+        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isRedactor(), __FILE__, __LINE__)) {
+            $lang = TranslationManager::getCurrentLanguage();
+            $this->render('Common/views/info.latte', $this->getAllParams([
+                'content' => $this->dataHelper->get('Languages', ['Name' => 'Help_Media_list'], $lang)->$lang ?? '',
+                'timer' => 0,
+                'btn_HistoryBack' => true,
+            ]));
+        }
     }
 
     public function listFiles(): void
