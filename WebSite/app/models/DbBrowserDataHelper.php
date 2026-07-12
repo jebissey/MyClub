@@ -7,6 +7,7 @@ namespace app\models;
 use Envms\FluentPDO\Queries\Select;
 use PDO;
 use RuntimeException;
+use stdClass;
 use app\enums\FilterInputRule;
 use app\helpers\Application;
 
@@ -70,6 +71,7 @@ class DbBrowserDataHelper extends Data
         return $row->name;
     }
 
+    /** @return array<int, string> */
     public function getTableColumns(string $table): array
     {
         $this->validateTableName($table);
@@ -82,6 +84,7 @@ class DbBrowserDataHelper extends Data
         return $columns;
     }
 
+    /** @return array<int, array{name: string, notnull: int}> */
     public function getTableColumnsDetails(string $table): array
     {
         $this->validateTableName($table);
@@ -97,6 +100,7 @@ class DbBrowserDataHelper extends Data
         return $columns;
     }
 
+    /** @return array<string, array{type: string, notnull: int, dflt_value: mixed, pk: int}> */
     public function getColumnTypes(string $table): array
     {
         $this->validateTableName($table);
@@ -114,12 +118,14 @@ class DbBrowserDataHelper extends Data
         return $columnTypes;
     }
 
+    /** @return array{0: array<int, string>, 1: array<string, array{type: string, notnull: int, dflt_value: mixed, pk: int}>} */
     public function showCreateForm(string $table): array
     {
         $this->validateTableName($table);
         return [$this->getTableColumns($table), $this->getColumnTypes($table)];
     }
 
+    /** @return array{0: array<int, string>, 1: stdClass, 2: string, 3: array<string, array{type: string, notnull: int, dflt_value: mixed, pk: int}>} */
     public function showEditForm(string $table, int $id): array
     {
         $this->validateTableName($table);
@@ -135,6 +141,10 @@ class DbBrowserDataHelper extends Data
         return [$this->getTableColumns($table), $record, $primaryKey, $this->getColumnTypes($table)];
     }
 
+    /**
+     * @param array<string, string> $filters
+     * @return array{0: array<int, stdClass>, 1: array<int, string>, 2: int, 3: int, 4: array<string, string>}
+     */
     public function showTable(string $table, int $itemsPerPage, array $filters, int $dbbPage): array
     {
         $this->validateTableName($table);
@@ -223,20 +233,7 @@ class DbBrowserDataHelper extends Data
         $stmt->execute();
     }
 
-    public function getColumnFilters($table, $query): array
-    {
-        $columns = $this->getTableColumns($table);
-        $filters = [];
-        foreach ($columns as $column) {
-            if (isset($query['filter_' . $column])) {
-                $filters[$column] = $query['filter_' . $column];
-            }
-        }
-        return $filters;
-    }
-
-
-
+    /** @return array<int, array{name: string, label: string}> */
     public function generateFilterConfig(string $table): array
     {
         $this->validateTableName($table);
@@ -250,6 +247,7 @@ class DbBrowserDataHelper extends Data
         );
     }
 
+    /** @return array<string, mixed> */
     public function generateFilterSchema(string $table): array
     {
         $this->validateTableName($table);
@@ -282,6 +280,7 @@ class DbBrowserDataHelper extends Data
     }
 
     #region Private functions
+    /** @return array<string, array<int, int|string>> */
     private function extractCheckInConstraints(string $table): array
     {
         $stmt = $this->pdo->prepare(

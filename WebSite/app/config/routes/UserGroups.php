@@ -10,12 +10,18 @@ use app\valueObjects\Route;
 
 class UserGroups implements RouteInterface
 {
+    /**
+     * @var array<int, Route>
+     */
     private array $routes = [];
 
     public function __construct(private ControllerFactory $controllerFactory)
     {
     }
 
+    /**
+     * @return array<int, Route>
+     */
     public function get(): array
     {
         $userGroupsController = fn() => $this->controllerFactory->makeUserGroupsController();

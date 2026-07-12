@@ -232,6 +232,9 @@ class MediaController extends AbstractController
         readfile($realPath);
     }
 
+    /**
+     * @return array<int, string>
+     */
     private function getAvailableYears(): array
     {
         $years = [];
@@ -247,6 +250,9 @@ class MediaController extends AbstractController
         return $years;
     }
 
+    /**
+     * @return array<int, string>
+     */
     private function getFileExtensions(): array
     {
         $fileExtensions = [];
@@ -278,6 +284,21 @@ class MediaController extends AbstractController
         return $fileExtensions;
     }
 
+    /**
+     * @return array<int, array{
+     *     name: string,
+     *     path: string,
+     *     url: string,
+     *     urlRedactor: string,
+     *     size: int,
+     *     date: string,
+     *     month: string,
+     *     inGalery: bool,
+     *     inArticle: bool,
+     *     shared: bool,
+     *     inMessage: bool
+     * }>
+     */
     private function getFiles(int $year, string $monthFiltered, string $fileExtension, string $search = '', bool $unusedOnly = false): array
     {
         $yearPath = MediaManager::GetMediaPath() . $year . '/';
@@ -361,6 +382,9 @@ class MediaController extends AbstractController
         return $files;
     }
 
+    /**
+     * @return array<int, string>
+     */
     private function getMonths(int $yearRequested): array
     {
         $foundMonths = [];

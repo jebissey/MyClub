@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\models;
 
 use PDO;
+use stdClass;
 use app\helpers\Application;
 
 class NeedDataHelper extends Data
@@ -14,6 +15,9 @@ class NeedDataHelper extends Data
         parent::__construct($application);
     }
 
+    /**
+     * @return stdClass[]
+     */
     public function getNeedsAndTheirTypes(): array
     {
         $sql = "
@@ -26,6 +30,9 @@ class NeedDataHelper extends Data
         return $stmt->fetchAll(PDO::FETCH_OBJ);
     }
 
+    /**
+     * @return stdClass[]
+     */
     public function needsforNeedType(int $needTypeId): array
     {
         $sql = "

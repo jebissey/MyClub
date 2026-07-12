@@ -10,12 +10,18 @@ use app\valueObjects\Route;
 
 class UserStatistics implements RouteInterface
 {
+    /**
+     * @var array<int, Route>
+     */
     private array $routes = [];
 
     public function __construct(private ControllerFactory $controllerFactory)
     {
     }
 
+    /**
+     * @return array<int, Route>
+     */
     public function get(): array
     {
         $userStatisticsController = fn() => $this->controllerFactory->makeUserStatisticsController();

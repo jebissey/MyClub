@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\models;
 
 use PDO;
+use stdClass;
 use Throwable;
 use app\enums\ApplicationError;
 use app\exceptions\QueryException;
@@ -18,6 +19,7 @@ class GroupDataHelper extends Data
         parent::__construct($application);
     }
 
+    /** @return array{0: array<int, stdClass>, 1: array<int, stdClass>} */
     public function getAvailableGroups(ConnectedUser $connectedUser, int $personId): array
     {
         $having = $this->getAuthorizationHavingClause($connectedUser);
@@ -78,6 +80,7 @@ class GroupDataHelper extends Data
         ];
     }
 
+    /** @return array<int, stdClass> */
     public function getCurrentGroups(int $personId): array
     {
         $query = $this->pdo->prepare('
@@ -92,6 +95,7 @@ class GroupDataHelper extends Data
         return $query->fetchAll(PDO::FETCH_OBJ);
     }
 
+    /** @return array<int, stdClass>|false */
     public function getGroupsWithAuthorizations(ConnectedUser $connectedUser): array|false
     {
         $having = $this->getAuthorizationHavingClause($connectedUser);
@@ -127,6 +131,7 @@ class GroupDataHelper extends Data
         return $this->query($sql);
     }
 
+    /** @return array<int, stdClass>|false */
     public function getGroupsWithType(int $idPerson): array|false
     {
         $query = $this->pdo->prepare("
@@ -149,6 +154,7 @@ class GroupDataHelper extends Data
         return $query->fetchAll(PDO::FETCH_OBJ);
     }
 
+    /** @return array<int, array{name: string, total: int, withPresentation: int}> */
     public function getGroupCount(): array
     {
         $groupCounts = [];
@@ -175,6 +181,7 @@ class GroupDataHelper extends Data
         return $groupCounts;
     }
 
+    /** @param array<int, int> $selectedAuthorizations */
     public function insert(string $name, int $selfRegistration, array $selectedAuthorizations): void
     {
         $this->pdo->beginTransaction();
@@ -213,6 +220,7 @@ class GroupDataHelper extends Data
         }
     }
 
+    /** @param array<int, int> $selectedAuthorizations */
     public function update(int $id, string $name, int $selfRegistration, array $selectedAuthorizations): void
     {
         if ($id === 1) {

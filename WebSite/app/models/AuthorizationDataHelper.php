@@ -18,6 +18,9 @@ class AuthorizationDataHelper extends Data
         parent::__construct($application);
     }
 
+    /**
+     * @return array<int, string>
+     */
     public function getsFor(ConnectedUser $connectedUser): array
     {
         $query = $this->pdo->prepare("
@@ -31,6 +34,9 @@ class AuthorizationDataHelper extends Data
         return array_column($query->fetchAll(), 'Name');
     }
 
+    /**
+     * @param array<int, object{Url?: string}> $navItems
+     */
     public function personCanReadMediaFile(int $year, int $month, string $filename, ConnectedUser $connectedUser, array $navItems): bool
     {
         $path = sprintf('%04d/%02d/%s', $year, $month, $filename);
@@ -144,6 +150,9 @@ class AuthorizationDataHelper extends Data
         return $article;
     }
 
+    /**
+     * @return array<int, int>
+     */
     public function getUserGroups(string $userEmail): array
     {
         $sql = '
@@ -181,36 +190,6 @@ class AuthorizationDataHelper extends Data
         ));
     }
 
-    private function getGroups(string $groupsFilter): array
-    {
-        $groupsFilter = preg_replace('/[^\p{L}]/u', '', $groupsFilter);
-        $rows = $this->gets('Group', ['Name LIKE "%' . $groupsFilter . '%"' => null]);
-        return array_column($rows, 'Id');
-    }
-
-
-
-    private function canReadMessageParent(object $message, ConnectedUser $connectedUser): bool
-    {
-        if (!empty($message->ArticleId)) {
-            $article = $this->get('Article', ['Id' => $message->ArticleId], 'CreatedBy, PublishedBy, OnlyForMembers, IdGroup');
-            return $article && $this->canReadArticle($article, $connectedUser);
-        }
-
-        if (!empty($message->EventId)) {
-            return $this->canReadEventById($message->EventId, $connectedUser);
-        }
-
-        if (!empty($message->GroupId)) {
-            if (!($connectedUser->person ?? false)) {
-                return false;
-            }
-            return in_array($message->GroupId, $this->getUserGroups($connectedUser->person->Email), true);
-        }
-
-        return false;
-    }
-
     private function canReadEventById(int $eventId, ConnectedUser $connectedUser): bool
     {
         if (!($connectedUser->person ?? false)) {
@@ -245,5 +224,36 @@ class AuthorizationDataHelper extends Data
             ]);
         }
         return (bool) $stmt->fetch(PDO::FETCH_OBJ);
+    }
+
+    private function canReadMessageParent(object $message, ConnectedUser $connectedUser): bool
+    {
+        if (!empty($message->ArticleId)) {
+            $article = $this->get('Article', ['Id' => $message->ArticleId], 'CreatedBy, PublishedBy, OnlyForMembers, IdGroup');
+            return $article && $this->canReadArticle($article, $connectedUser);
+        }
+
+        if (!empty($message->EventId)) {
+            return $this->canReadEventById($message->EventId, $connectedUser);
+        }
+
+        if (!empty($message->GroupId)) {
+            if (!($connectedUser->person ?? false)) {
+                return false;
+            }
+            return in_array($message->GroupId, $this->getUserGroups($connectedUser->person->Email), true);
+        }
+
+        return false;
+    }
+
+    /**
+     * @return array<int, int>
+     */
+    private function getGroups(string $groupsFilter): array
+    {
+        $groupsFilter = preg_replace('/[^\p{L}]/u', '', $groupsFilter);
+        $rows = $this->gets('Group', ['Name LIKE "%' . $groupsFilter . '%"' => null]);
+        return array_column($rows, 'Id');
     }
 }

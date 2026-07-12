@@ -8,6 +8,15 @@ use PDO;
 use app\enums\Period;
 use app\helpers\Application;
 
+/**
+ * @phpstan-type CrosstabCell array{count: int, count2: int}
+ * @phpstan-type CrosstabResult array{
+ *     rowsTitle: string,
+ *     columnsTitle: string,
+ *     columns: array<int, string>,
+ *     rows: array<string, array<string, CrosstabCell>>
+ * }
+ */
 class CrosstabDataHelper extends Data
 {
     public function __construct(Application $application, private AuthorizationDataHelper $authorizationDataHelper)
@@ -15,6 +24,10 @@ class CrosstabDataHelper extends Data
         parent::__construct($application);
     }
 
+    /**
+     * @param array<string, mixed> $params
+     * @return CrosstabResult
+     */
     public function generateCrosstab(
         string $sql,
         array $params = [],
@@ -24,16 +37,19 @@ class CrosstabDataHelper extends Data
     ): array {
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute($params);
+        /** @var array<int, array<string, mixed>> $data */
         $data = $stmt->fetchAll($fetchMode);
 
+        /** @var array<string, array<string, CrosstabCell>> $rows */
         $rows = [];
+        /** @var array<string, true> $columns */
         $columns = [];
 
         foreach ($data as $item) {
-            $row    = $item['rowForCrosstab'];
-            $column = $item['columnForCrosstab'];
-            $count  = $item['countForCrosstab'];
-            $count2 = $item['count2ForCrosstab'] ?? null;
+            $row    = (string) $item['rowForCrosstab'];
+            $column = (string) $item['columnForCrosstab'];
+            $count  = (int) $item['countForCrosstab'];
+            $count2 = (int) ($item['count2ForCrosstab'] ?? 0);
 
             if (!isset($rows[$row])) {
                 $rows[$row] = [];
@@ -48,17 +64,21 @@ class CrosstabDataHelper extends Data
         }
 
         ksort($columns);
-        $columns = array_keys($columns);
+        /** @var array<int, string> $columnKeys */
+        $columnKeys = array_keys($columns);
         ksort($rows);
 
         return [
             'rowsTitle'    => $rowsTitle,
             'columnsTitle' => $columnsTitle,
-            'columns'      => $columns,
+            'columns'      => $columnKeys,
             'rows'         => $rows,
         ];
     }
 
+    /**
+     * @return array{0: array{start: string, end: string}, 1: CrosstabResult}
+     */
     public function getEvents(Period $period): array
     {
         $sql = "
@@ -80,6 +100,7 @@ class CrosstabDataHelper extends Data
             ORDER BY p.LastName, p.FirstName
         ";
 
+        /** @var array{start: string, end: string} $dateRange */
         $dateRange    = $period->dateRange();
         $crosstabData = $this->generateCrosstab(
             $sql,
@@ -91,6 +112,13 @@ class CrosstabDataHelper extends Data
         return [$dateRange, $crosstabData];
     }
 
+    /**
+     * @return array{
+     *     0: array<string, array{visits: array<string, int>, total: int}>,
+     *     1: array<int, string>,
+     *     2: array<string, int>
+     * }
+     */
     public function getPersons(
         string $dateCondition,
         ?string $uriFilter = null,
@@ -106,6 +134,7 @@ class CrosstabDataHelper extends Data
             WHERE ' . $dateCondition . '
         ';
 
+        /** @var array<string, string> $params */
         $params = [];
 
         if (!empty($uriFilter)) {
@@ -120,6 +149,7 @@ class CrosstabDataHelper extends Data
         $sql .= ' GROUP BY Uri, LOWER(Who)';
         $stmt = $this->pdoForLog->prepare($sql);
         $stmt->execute($params);
+        /** @var array<int, object{Uri: string, Who: string, count: int|string}> $crossTabData */
         $crossTabData = $stmt->fetchAll(PDO::FETCH_OBJ);
 
         $filteredPersons = array_values(array_filter(
@@ -127,7 +157,9 @@ class CrosstabDataHelper extends Data
             fn(string $email): bool => (bool) filter_var($email, FILTER_VALIDATE_EMAIL)
         ));
 
+        /** @var array<string, array{visits: array<string, int>, total: int}> $sortedCrossTabData */
         $sortedCrossTabData = [];
+        /** @var array<string, int> $columnTotals */
         $columnTotals       = [];
 
         foreach ($crossTabData as $row) {

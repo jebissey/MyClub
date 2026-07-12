@@ -11,8 +11,12 @@ class WebApp
 {
     public const MYCLUB_WEBAPP = "https://myclub.ovh/";
 
+    /**
+     * @param array<string, scalar|null> $newParams
+     */
     public function buildUrl(array $newParams): string
     {
+        /** @var array<string, scalar|null> $params */
         $params = array_merge($_GET, $newParams);
         return '?' . http_build_query($params);
     }
@@ -31,9 +35,9 @@ class WebApp
      * ];
      * $input = WebApp::filterInput($schema, $this->flight->request()->data->getData());
      *
-     * @param array $schema Associative array [key => rule]
-     * @param array $source Input source (e.g. $_GET, $_POST, etc.)
-     * @return array Filtered values, with null for invalid or missing inputs
+     * @param array<string, string|list<string>> $schema
+     * @param array<string, mixed> $source
+     * @return array<string, mixed>
      */
     public static function filterInput(array $schema, array $source): array
     {
@@ -53,6 +57,9 @@ class WebApp
         return $baseUrl;
     }
 
+    /**
+     * @param array<string, mixed> $params
+     */
     public static function getCompiledContent(string $content, array $params): string
     {
         $tempFile = sys_get_temp_dir() . '/admin_' . uniqid('', true) . '.latte';
@@ -74,6 +81,10 @@ class WebApp
         }
     }
 
+    /**
+     * @param string|list<string> $rule
+     * @param array<string, mixed> $source
+     */
     public static function getFiltered(string $key, string|array $rule, array $source): mixed
     {
         $result = self::filterInput([$key => $rule], $source);
@@ -126,6 +137,9 @@ class WebApp
         return $html;
     }
 
+    /**
+     * @param list<string> $possibleValues
+     */
     public static function sanitizeInput(string $data, array $possibleValues = [], string $defaultValue = ''): string
     {
         $data = trim($data);
@@ -138,6 +152,9 @@ class WebApp
     }
 
     #region Private functions
+    /**
+     * @param string|list<string> $rule
+     */
     private static function filterSingleInput(string|array $rule, mixed $raw): mixed
     {
         $maxLen = ($rule === FilterInputRule::DataUrl->value) ? 5 * 1024 * 1024 : 1024 * 1024;

@@ -8,6 +8,7 @@ use DateInterval;
 use DateTime;
 use DateTimeImmutable;
 use PDO;
+use stdClass;
 use Throwable;
 use app\enums\ApplicationError;
 use app\enums\EventAudience;
@@ -31,7 +32,8 @@ class EventDataHelper extends Data implements NewsProviderInterface
         $this->personPreferences = new PersonPreferences();
     }
 
-    public function removeParticipant(int $id, int $personId)
+    /** @return array<int, mixed> */
+    public function removeParticipant(int $id, int $personId): array
     {
         if (!$this->get('Event', ['Id' => $id, 'CreatedBy' => $personId])) {
             return [['success' => false, 'message' => 'User not allowed'], ApplicationError::Forbidden->value];
@@ -103,6 +105,7 @@ class EventDataHelper extends Data implements NewsProviderInterface
         return $stmt->fetch(PDO::FETCH_OBJ) !== false;
     }
 
+    /** @return array<int, stdClass> */
     public function getAttributesForNextWeekEvents(): array
     {
         [$startOfCurrentWeek, $endOfThirdWeek] = $this->getDatesOfThreeWeeks();
@@ -129,6 +132,7 @@ class EventDataHelper extends Data implements NewsProviderInterface
         return $stmt->fetchAll(PDO::FETCH_OBJ);
     }
 
+    /** @return array<int, stdClass> */
     public function getEventsForDay(string $date, string $userEmail): array
     {
         $query = $this->pdo->prepare("
@@ -165,6 +169,7 @@ class EventDataHelper extends Data implements NewsProviderInterface
         throw new QueryException("Event ({$eventId}) doesn't exist");
     }
 
+    /** @return array<int, stdClass> */
     public function getEventAttributes(int $eventId): array
     {
         if ($this->eventExists($eventId)) {
@@ -208,6 +213,7 @@ class EventDataHelper extends Data implements NewsProviderInterface
         return $result;
     }
 
+    /** @return array<int, stdClass> */
     public function getEventsForAllOrGuest(): array
     {
         $sql = "
@@ -249,7 +255,8 @@ class EventDataHelper extends Data implements NewsProviderInterface
         throw new QueryException("Event ({$eventId}) doesn't exist");
     }
 
-    public function getEventNeeds($eventId): array
+    /** @return array<int, stdClass> */
+    public function getEventNeeds(int $eventId): array
     {
         $sql = "
             SELECT 
@@ -280,6 +287,7 @@ class EventDataHelper extends Data implements NewsProviderInterface
         return $stmt->fetchAll(PDO::FETCH_OBJ);
     }
 
+    /** @return array<int, array<string, mixed>> */
     public function getEvents(?object $person, string $mode, int $offset, bool $filterByPreferences = false): array
     {
         if ($mode === EventSearchMode::Next->value) {
@@ -291,6 +299,7 @@ class EventDataHelper extends Data implements NewsProviderInterface
         }
     }
 
+    /** @return array<string, array{weekStart: string, weekEnd: string, weekStartFull: string, days: array<int, array<int, array<string, mixed>>>}> */
     public function getNextWeekEvents(): array
     {
         [$startOfCurrentWeek, $endOfThirdWeek] = $this->getDatesOfThreeWeeks();
@@ -363,6 +372,7 @@ class EventDataHelper extends Data implements NewsProviderInterface
         return $weeklyEvents;
     }
 
+    /** @return array<int, array{type: string, id: int, title: string, date: string, url: string}> */
     public function getNews(ConnectedUser $connectedUser, string $searchFrom): array
     {
         $news = [];
@@ -401,6 +411,7 @@ class EventDataHelper extends Data implements NewsProviderInterface
         return $news;
     }
 
+    /** @return array<int, stdClass> */
     public function getParticipantSupplies(int $eventId): array
     {
         $sql = "
@@ -424,6 +435,7 @@ class EventDataHelper extends Data implements NewsProviderInterface
         return $stmt->fetchAll(PDO::FETCH_OBJ);
     }
 
+    /** @return array<int, stdClass> */
     public function getUserSupplies(int $eventId, string $userEmail): array
     {
         $sql = "
@@ -465,6 +477,7 @@ class EventDataHelper extends Data implements NewsProviderInterface
         throw new QueryException("Event ({$eventId}) doesn't exist");
     }
 
+    /** @param array<string, mixed> $data */
     public function update(array $data, int $personId): void
     {
         $values = [
@@ -559,7 +572,11 @@ class EventDataHelper extends Data implements NewsProviderInterface
         return $mode->next($from)->format('Y-m-d H:i:s');
     }
 
-    private function events($events): array
+    /**
+     * @param array<int, stdClass> $events
+     * @return array<int, array<string, mixed>>
+     */
+    private function events(array $events): array
     {
         $eventIds = array_column($events, 'Id');
         $attributes = [];
@@ -616,7 +633,7 @@ class EventDataHelper extends Data implements NewsProviderInterface
         }, $events);
     }
 
-    private function getEventMessagesCount(int $eventId, string $from)
+    private function getEventMessagesCount(int $eventId, string $from): int|false
     {
         $sql = 'SELECT COUNT(Id) FROM Message m WHERE m.EventId = :eventId AND m."From" = :from';
         $stmt = $this->pdo->prepare($sql);
@@ -627,7 +644,8 @@ class EventDataHelper extends Data implements NewsProviderInterface
         return $stmt->fetchColumn();
     }
 
-    private function getNextEvents(?object $person, bool $filterByPreferences = false)
+    /** @return array<int, array<string, mixed>> */
+    private function getNextEvents(?object $person, bool $filterByPreferences = false): array
     {
         $params = [':personId' => $person->Id ?? 0,];
         $sql = "
@@ -669,6 +687,7 @@ class EventDataHelper extends Data implements NewsProviderInterface
         return $events;
     }
 
+    /** @return array<int, array<string, mixed>> */
     private function getPassedEvents(?object $person, int $offset): array
     {
         $sql = "
@@ -698,9 +717,10 @@ class EventDataHelper extends Data implements NewsProviderInterface
             ':limit'    => 10,
             ':offset'   => $offset
         ]);
-        return $this->events($stmt->fetchAll());
+        return $this->events($stmt->fetchAll(PDO::FETCH_OBJ));
     }
 
+    /** @return array{0: DateTime, 1: DateTime} */
     private function getDatesOfThreeWeeks(): array
     {
         $today = new DateTime();
@@ -714,6 +734,7 @@ class EventDataHelper extends Data implements NewsProviderInterface
         return [$startOfCurrentWeek, $endOfThirdWeek];
     }
 
+    /** @param array<int, int> $attributes */
     private function insertEventAttributes(int $eventId, array $attributes): void
     {
         if (!empty($attributes)) {
@@ -726,6 +747,7 @@ class EventDataHelper extends Data implements NewsProviderInterface
         }
     }
 
+    /** @param array<int, array{id: int, counter: int}> $needs */
     private function insertEventNeeds(int $eventId, array $needs): void
     {
         if (!empty($needs)) {
@@ -739,6 +761,7 @@ class EventDataHelper extends Data implements NewsProviderInterface
         }
     }
 
+    /** @return array<string, mixed> */
     private function buildEventArray(object $event, DateTime $startTime): array
     {
         return [
@@ -776,6 +799,7 @@ class EventDataHelper extends Data implements NewsProviderInterface
         return $totalMinutes . 'min';
     }
 
+    /** @return array<int, array{id: string, name: string, detail: string, color: string}> */
     private function parseAttributes(object $event): array
     {
         if (empty($event->AttributeIds)) {

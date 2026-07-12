@@ -162,6 +162,9 @@ class ExerciseController extends TableController
     }
 
     #region Private functions
+    /**
+     * @return array<string, string>
+     */
     private function doTranslations(): array
     {
         $keys = [

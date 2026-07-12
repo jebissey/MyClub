@@ -11,7 +11,7 @@ use DOMXPath;
 
 class FFAScraper
 {
-    private $baseUrl = 'https://bases.athle.fr/asp.net/liste.aspx';
+    private string $baseUrl = 'https://bases.athle.fr/asp.net/liste.aspx';
     private Client $client;
 
     public function __construct()
@@ -20,14 +20,17 @@ class FFAScraper
             'timeout' => 5,
             'headers' => [
                 'User-Agent' =>
-                    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+                'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
                 'Accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
                 'Accept-Language' => 'fr,fr-FR;q=0.8,en-US;q=0.5,en;q=0.3'
             ]
         ]);
     }
 
-    public function searchAthleteRank(string $firstName, string $lastName, string $year, string $club)
+    /**
+     * @return array{rank: string, event: string, name: string, club: string, points: string}|array{error: string}|null
+     */
+    public function searchAthleteRank(string $firstName, string $lastName, string $year, string $club): ?array
     {
         $params = [
             'frmpostback' => 'true',
@@ -55,7 +58,13 @@ class FFAScraper
         }
     }
 
-    public function searchAthleteResults(string $firstName, string $lastName, string $year, string $club)
+    /**
+     * @return array<int, array{
+     *     date: string, name: string, competition: string, place: string,
+     *     time: string, category: string, round: string, location: string
+     * }>|array{error: string}
+     */
+    public function searchAthleteResults(string $firstName, string $lastName, string $year, string $club): array
     {
         $params = [
             'frmpostback' => 'true',
@@ -79,6 +88,10 @@ class FFAScraper
             return ['error' => 'Erreur lors de la récupération des données: ' . $e->getMessage()];
         }
     }
+
+    /**
+     * @return array{rank: string, event: string, name: string, club: string, points: string}|null
+     */
     private function parseAthleteRank(string $html): ?array
     {
         $dom = new DOMDocument();
@@ -101,12 +114,17 @@ class FFAScraper
         return null;
     }
 
+    /**
+     * @return array<int, array{
+     *     date: string, name: string, competition: string, place: string,
+     *     time: string, category: string, round: string, location: string
+     * }>
+     */
     private function parseAthleteResults(string $html): array
     {
         $dom = new DOMDocument();
         @$dom->loadHTML($html);
         $xpath = new DOMXPath($dom);
-        $frmcompetition = $this->extractFrm($html, 'frmcompetition');
         $results = [];
         $rows = $xpath->query("//table[@id='ctnResultats']//tr[td[contains(@class, 'datas0') or contains(@class, 'datas1')]]");
         foreach ($rows as $row) {
@@ -129,15 +147,5 @@ class FFAScraper
         }
 
         return $results;
-    }
-
-    private function extractFrm(string $html, string $var): string
-    {
-        $pattern = "/" . $var . "=(\d+)/";
-
-        if (preg_match($pattern, $html, $matches)) {
-            return $matches[1];
-        }
-        return '';
     }
 }

@@ -69,6 +69,22 @@ class MenuItemDataHelper extends Data
         }
     }
 
+    /**
+     * @param array{
+     *     what: string,
+     *     type: string,
+     *     label?: string|null,
+     *     icon?: string|null,
+     *     url?: string|null,
+     *     idGroup?: int|null,
+     *     parentId?: int|null,
+     *     forMembers?: bool,
+     *     forContacts?: bool,
+     *     forAnonymous?: bool,
+     *     id?: int,
+     *     position?: int
+     * } $data
+     */
     public function insertOrUpdate(array $data): void
     {
         if (!in_array($data['what'], $this->getCheckValues('MenuItem', 'What'))) {
@@ -130,6 +146,9 @@ class MenuItemDataHelper extends Data
         }
     }
 
+    /**
+     * @param array<int, int> $positions
+     */
     public function updates(array $positions): void
     {
         foreach ($positions as $id => $position) {

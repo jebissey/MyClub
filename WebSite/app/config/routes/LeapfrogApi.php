@@ -10,12 +10,18 @@ use app\valueObjects\Route;
 
 class LeapfrogApi implements RouteInterface
 {
+    /**
+     * @var array<int, Route>
+     */
     private array $routes = [];
 
     public function __construct(private ApiFactory $apiFactory)
     {
     }
 
+    /**
+     * @return array<int, Route>
+     */
     public function get(): array
     {
         $leapfrogApi = fn() => $this->apiFactory->makeLeapfrogApi();

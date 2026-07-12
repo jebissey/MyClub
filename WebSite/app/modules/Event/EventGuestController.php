@@ -89,7 +89,7 @@ class EventGuestController extends AbstractController
                     $contactId = $contact->Id;
                     $token = $contact->Token;
                     if (!empty($nickname) && $nickname !== $contact->NickName) {
-                        $this->dataHelper->set('Contact', ['NickName' => $nickname], ['Id', $contactId]);
+                        $this->dataHelper->set('Contact', ['NickName' => $nickname], ['Id' => $contactId]);
                     }
                     if (
                         empty($token) ||
@@ -102,7 +102,7 @@ class EventGuestController extends AbstractController
                                 'Token' => $token,
                                 'TokenCreatedAt' => (new DateTime())->format('Y-m-d H:i:s')
                             ],
-                            ['Id', $contactId]
+                            ['Id' => $contactId]
                         );
                     }
                 }

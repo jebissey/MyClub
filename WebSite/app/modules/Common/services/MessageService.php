@@ -12,6 +12,9 @@ final class MessageService
         $_SESSION['flash_type'] = $type;
     }
 
+    /**
+     * @return array{0: string, 1: string}
+     */
     public static function get(): array
     {
         $message = $_SESSION['flash_message'] ?? '';

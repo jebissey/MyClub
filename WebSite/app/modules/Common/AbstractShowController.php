@@ -23,6 +23,9 @@ abstract class AbstractShowController extends AbstractController
         return $connectedUser;
     }
 
+    /**
+     * @return array{0: string, 1: string}
+     */
     protected function resolveSearchPeriod(object $connectedUser, string $default = ''): array
     {
         $searchMode = WebApp::getFiltered(
@@ -44,6 +47,9 @@ abstract class AbstractShowController extends AbstractController
         return [$searchMode, $searchFrom];
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     protected function baseParams(object $connectedUser, string $parentUrl, string $searchMode, string $searchFrom): array
     {
         return $this->getAllParams([

@@ -10,12 +10,18 @@ use app\valueObjects\Route;
 
 class GroupApi implements RouteInterface
 {
+    /**
+     * @var array<int, Route>
+     */
     private array $routes = [];
 
     public function __construct(private ApiFactory $apiFactory)
     {
     }
 
+    /**
+     * @return array<int, Route>
+     */
     public function get(): array
     {
         $groupApi = fn() => $this->apiFactory->makeGroupApi();

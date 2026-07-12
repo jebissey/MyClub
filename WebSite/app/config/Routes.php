@@ -133,14 +133,21 @@ use app\modules\Common\services\EmailService;
 use app\modules\Common\services\EventService;
 use app\modules\Common\services\JsonEmailQuotaTracker;
 use app\modules\Common\services\MessageRecipientService;
+use app\valueObjects\Route;
 
 class Routes
 {
+    /**
+     * @var array<int, Route>
+     */
     private array $routes;
     private ControllerFactory $controllerFactory;
     private ApiFactory $apiFactory;
     private JsonEmailQuotaTracker $quotaTracker;
 
+    /**
+     * @param Engine<object> $flight
+     */
     public function __construct(private Application $application, private Engine $flight)
     {
         $this->quotaTracker = new JsonEmailQuotaTracker(__DIR__ . '/../../data/email_quota.json');
@@ -269,6 +276,9 @@ class Routes
     }
 
     #region Private methods
+    /**
+     * @return array<int, Route>
+     */
     private function get(): array
     {
         $this->routes = [];
@@ -351,6 +361,10 @@ class Routes
         return $this->routes;
     }
 
+    /**
+     * @param Engine<object> $flight
+     * @param array<int, mixed> $extraArgs
+     */
     private function mapRoute(
         Engine $flight,
         string $methodAndPath,
@@ -463,6 +477,16 @@ class Routes
         }
     }
 
+    /**
+     * @param array{
+     *     dir: string|null,
+     *     file: string,
+     *     type: string,
+     *     noCache?: bool,
+     *     serviceWorker?: bool,
+     *     fullPath?: bool
+     * } $config
+     */
     private function serveStaticFile(ErrorManager $errorManager, array $config): void
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'GET') {

@@ -6,6 +6,7 @@ namespace app\models;
 
 use DateTime;
 use PDO;
+use stdClass;
 use app\helpers\Application;
 use app\helpers\MyClubDateTime;
 
@@ -13,6 +14,7 @@ class LogDataAnalyticsHelper extends Data
 {
     private const PERIOD_TO_SHOW = 13;
 
+    /** @return array<int, array<string, mixed>> */
     public function getStatisticsData(string $periodType, int $offset): array
     {
         $periods = $this->generatePeriods($periodType, $offset);
@@ -76,6 +78,7 @@ class LogDataAnalyticsHelper extends Data
         };
     }
 
+    /** @return array{first: string, prev: string, current: string, next: string, last: string} */
     public function getReferentNavigation(string $period, string $currentDate): array
     {
         $date = new DateTime($currentDate);
@@ -102,6 +105,7 @@ class LogDataAnalyticsHelper extends Data
         ];
     }
 
+    /** @return array<int, stdClass> */
     public function getReferentStats(string $period, string $currentDate): array
     {
         $date = new DateTime($currentDate);
@@ -137,6 +141,7 @@ class LogDataAnalyticsHelper extends Data
         return $query->fetchAll(PDO::FETCH_OBJ);
     }
 
+    /** @return array<int, stdClass> */
     public function getExternalReferentStats(string $period, string $currentDate): array
     {
         $date = new DateTime($currentDate);
@@ -166,6 +171,8 @@ class LogDataAnalyticsHelper extends Data
     /**
      * Retourne le nombre de visiteurs uniques par jour entre $startDate et $endDate.
      * Renvoie un tableau d'entiers, un par jour de la période.
+     *
+     * @return array<int, int>
      */
     private function getDailyVisitorCounts(string $startDate, string $endDate): array
     {
@@ -188,6 +195,7 @@ class LogDataAnalyticsHelper extends Data
         return array_map(static fn($row) => (int)$row->uniqueVisitors, $rows);
     }
 
+    /** @return array<int, array{start: string, end: string, dateObj: DateTime}> */
     private function generatePeriods(string $periodType, int $offset): array
     {
         $today   = new DateTime();
@@ -252,6 +260,7 @@ class LogDataAnalyticsHelper extends Data
         return $periods;
     }
 
+    /** @param array{start: string, end: string, dateObj: DateTime} $period */
     private function formatPeriodLabel(array $period, string $periodType): string
     {
         $date = $period['dateObj'];

@@ -10,6 +10,26 @@ use app\helpers\Application;
 use app\helpers\ConnectedUser;
 use app\interfaces\NewsProviderInterface;
 
+/**
+ * @phpstan-type PendingOrderResponse object{
+ *     PersonId: int,
+ *     Email: string,
+ *     ArticleId: int,
+ *     ArticleTitle: string,
+ *     OrderId: int,
+ *     OrderQuestion: string,
+ *     ClosingDate: string
+ * }
+ * @phpstan-type NewsItem array{
+ *     type: string,
+ *     id: int,
+ *     title: string,
+ *     detail: string,
+ *     from: string,
+ *     date: string,
+ *     url: string
+ * }
+ */
 class OrderDataHelper extends Data implements NewsProviderInterface
 {
     public function __construct(Application $application, private ArticleDataHelper $articleDataHelper)
@@ -51,6 +71,9 @@ class OrderDataHelper extends Data implements NewsProviderInterface
         return $stmt->fetch(PDO::FETCH_OBJ);
     }
 
+    /**
+     * @return array<int, PendingOrderResponse>
+     */
     public function getPendingOrderResponses(): array
     {
         $query = "
@@ -77,10 +100,15 @@ class OrderDataHelper extends Data implements NewsProviderInterface
             )
             AND r.Id IS NULL
         ORDER BY o.ClosingDate, p.LastName, p.FirstName";
-        return $this->pdo->query($query)->fetchAll(PDO::FETCH_OBJ);
+        /** @var array<int, PendingOrderResponse> $result */
+        $result = $this->pdo->query($query)->fetchAll(PDO::FETCH_OBJ);
+        return $result;
     }
 
-    public function getNews(ConnectedUser $connectedUser, $searchFrom): array
+    /**
+     * @return array<int, NewsItem>
+     */
+    public function getNews(ConnectedUser $connectedUser, string $searchFrom): array
     {
         $news = [];
         if (!($connectedUser->person ?? false)) {
@@ -111,6 +139,7 @@ class OrderDataHelper extends Data implements NewsProviderInterface
         ";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':searchFrom' => $searchFrom]);
+        /** @var array<int, object{FirstName: string, LastName: string, Question: string, ClosingDate: string, Visibility: mixed, IdArticle: int, LastActivity: string, Orderers: string}> $orders */
         $orders = $stmt->fetchAll(PDO::FETCH_OBJ);
         $news = [];
         $authorizationDataHelper = new AuthorizationDataHelper($this->application);

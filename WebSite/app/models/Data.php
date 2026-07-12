@@ -8,6 +8,7 @@ use Envms\FluentPDO\Query;
 use InvalidArgumentException;
 use PDO;
 use PDOException;
+use stdClass;
 use app\enums\ApplicationError;
 use app\exceptions\SqliteTableException;
 use app\helpers\Application;
@@ -18,7 +19,11 @@ abstract class Data
     protected PDO $pdoForLog;
     protected Query $fluent;
     protected Query $fluentForLog;
+
+    /** @var array<int, string> */
     private array $tables;
+
+    /** @var array<int, string>|null */
     private static ?array $cachedTables = null;
 
     public function __construct(protected Application $application)
@@ -32,6 +37,7 @@ abstract class Data
     }
 
     #region Protected methods
+    /** @return array<int, string> */
     protected function getCheckValues(string $table, string $column): array
     {
         $sql = "SELECT sql FROM sqlite_master WHERE type='table' AND name=?";
@@ -68,6 +74,7 @@ abstract class Data
     }
 
     #region Public methods
+    /** @param array<string, mixed> $where */
     public function delete(string $table, array $where): int
     {
         $this->validateTableName($table);
@@ -95,7 +102,11 @@ abstract class Data
         }
     }
 
-    public function get(string $table, array $where = [], $fields = '*'): object|false
+    /**
+     * @param array<string, mixed> $where
+     * @param string|array<int, string> $fields
+     */
+    public function get(string $table, array $where = [], string|array $fields = '*'): object|false
     {
         $this->validateTableName($table);
         $sql = "";
@@ -133,6 +144,7 @@ abstract class Data
         }
     }
 
+    /** @return array{navbarBgColor: string, navbarInkColor: string, navbarIconColor: string} */
     public function getDefaultColors(): array
     {
         return [
@@ -148,6 +160,10 @@ abstract class Data
         return $row !== false ? $row->Value : $default;
     }
 
+    /**
+     * @param array<string, mixed> $where
+     * @return array<int|string, stdClass>
+     */
     public function gets(string $table, array $where = [], string $fields = '*', string $orderBy = '', bool $keyPair = false): array
     {
         $this->validateTableName($table);
@@ -202,13 +218,18 @@ abstract class Data
         }
     }
 
+    /** @return array<int, string> */
     public function getTables(): array
     {
         $stmt = $this->pdo->query("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' ORDER BY name");
         return $stmt->fetchAll(PDO::FETCH_COLUMN);
     }
 
-    public function last(string $table, array $where = [], $fields = '*'): object|false
+    /**
+     * @param array<string, mixed> $where
+     * @param string|array<int, string> $fields
+     */
+    public function last(string $table, array $where = [], string|array $fields = '*'): object|false
     {
         $this->validateTableName($table);
         $sql = "";
@@ -245,6 +266,7 @@ abstract class Data
         }
     }
 
+    /** @param array<int|string, mixed> $parameters */
     public function query(string $sql, array $parameters = []): mixed
     {
         try {
@@ -274,6 +296,10 @@ abstract class Data
         }
     }
 
+    /**
+     * @param array<string, mixed> $fields
+     * @param array<string, mixed> $where
+     */
     public function set(string $table, array $fields, array $where = []): int|bool
     {
         $this->validateTableName($table);
@@ -341,6 +367,10 @@ abstract class Data
         }
     }
 
+    /**
+     * @param array<string, mixed> $data
+     * @param array<int, string> $fields
+     */
     public static function requireFields(array $data, array $fields): bool
     {
         foreach ($fields as $field) {

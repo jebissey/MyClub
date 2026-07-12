@@ -8,6 +8,12 @@ use RuntimeException;
 use app\models\DataHelper;
 use app\models\LanguagesDataHelper;
 use app\models\SharedFileDataHelper;
+use app\valueObjects\MediaOperationResult;
+use app\valueObjects\ShareFileInfo;
+use app\valueObjects\ShareStatus;
+use app\valueObjects\UploadedFileInput;
+use app\valueObjects\UploadedMedia;
+use app\valueObjects\UploadMediaResult;
 
 class MediaManager
 {
@@ -23,14 +29,15 @@ class MediaManager
 
     /* ===================== PUBLIC API ===================== */
 
-    public function deleteFile(int $year, int $month, string $filename): array
+    public function deleteFile(int $year, int $month, string $filename): MediaOperationResult
     {
         $filePath = $this->buildFilePath($year, $month, $filename);
         if ($filePath === null) {
-            return $this->error(
-                $this->languagesDataHelper->translate('media_manager.file_not_found'),
-                __FILE__,
-                __LINE__
+            return new MediaOperationResult(
+                success: false,
+                message: $this->languagesDataHelper->translate('media_manager.file_not_found'),
+                file: __FILE__,
+                line: __LINE__
             );
         }
 
@@ -38,49 +45,57 @@ class MediaManager
 
         if (!@unlink($filePath)) {
             $err = error_get_last();
-            return $this->error(
-                $this->languagesDataHelper->translate('media_manager.file_delete_error')
+            return new MediaOperationResult(
+                success: false,
+                message: $this->languagesDataHelper->translate('media_manager.file_delete_error')
                     . ' (' . ($err['message'] ?? 'unknown error') . ')',
-                __FILE__,
-                __LINE__
+                file: __FILE__,
+                line: __LINE__
             );
         }
 
         $this->cleanupEmptyDirectories($year, $month);
-        return $this->success($this->languagesDataHelper->translate('media_manager.file_deleted_success'));
+        return new MediaOperationResult(
+            success: true,
+            message: $this->languagesDataHelper->translate('media_manager.file_deleted_success'),
+        );
     }
 
-    public function uploadFile(array $file): array
+    public function uploadFile(UploadedFileInput $file): UploadMediaResult
     {
         $year = (int)date('Y');
         $month = (int)date('m');
 
         $targetDir = $this->getOrCreateDirectory($year, $month);
 
-        $safeName = $this->generateSafeFilename($file['name']);
+        $safeName = $this->generateSafeFilename($file->name);
         $targetFile = $this->resolveDuplicate($targetDir, $safeName);
 
-        if (!copy($file['tmp_name'], $targetFile)) {
+        if (!copy($file->tmpName, $targetFile)) {
             throw new RuntimeException($this->languagesDataHelper->translate('media_manager.file_upload_error'));
         }
 
-        return [
-            'file' => [
-                'name' => basename($targetFile),
-                'path' => $this->toRelativePath($targetFile),
-                'url'  => WebApp::getBaseUrl() . $this->toRelativePath($targetFile),
-                'size' => (int)$file['size'],
-                'type' => (string)$file['type']
-            ]
-        ];
+        return new UploadMediaResult(
+            file: new UploadedMedia(
+                name: basename($targetFile),
+                path: $this->toRelativePath($targetFile),
+                url: WebApp::getBaseUrl() . $this->toRelativePath($targetFile),
+                size: $file->size,
+                type: $file->type
+            )
+        );
     }
 
-    public function getShareFile(int $year, int $month, string $filename): array
+    public function getShareFile(int $year, int $month, string $filename): ShareFileInfo
     {
         $filePath = $this->buildFilePath($year, $month, $filename);
 
         if ($filePath === null) {
-            return $this->error($this->languagesDataHelper->translate('media_manager.file_not_exists'));
+            return new ShareFileInfo(
+                success: false,
+                data: false,
+                message: $this->languagesDataHelper->translate('media_manager.file_not_exists')
+            );
         }
 
         $sharedFile = $this->dataHelper->get(
@@ -89,17 +104,20 @@ class MediaManager
             'IdGroup, OnlyForMembers'
         );
 
-        return [
-            'success' => $sharedFile !== false,
-            'data' => $sharedFile
-        ];
+        return new ShareFileInfo(
+            success: $sharedFile !== false,
+            data: $sharedFile
+        );
     }
 
-    public function shareFile(int $year, int $month, string $filename, ?int $idGroup, int $onlyForMembers): array
+    public function shareFile(int $year, int $month, string $filename, ?int $idGroup, int $onlyForMembers): MediaOperationResult|ShareStatus
     {
         $filePath = $this->buildFilePath($year, $month, $filename);
         if ($filePath === null) {
-            return $this->error($this->languagesDataHelper->translate('media_manager.file_not_exists'));
+            return new MediaOperationResult(
+                success: false,
+                message: $this->languagesDataHelper->translate('media_manager.file_not_exists'),
+            );
         }
 
         $sharedFile = $this->dataHelper->get(
@@ -126,31 +144,32 @@ class MediaManager
         return $this->isShared($filePath);
     }
 
-    public function removeFileShare(string $filePath): array
+    public function removeFileShare(string $filePath): MediaOperationResult
     {
         if (empty($filePath)) {
-            return $this->error($this->languagesDataHelper->translate('media_manager.file_not_exists'));
+            return new MediaOperationResult(
+                success: false,
+                message: $this->languagesDataHelper->translate('media_manager.file_not_exists'),
+            );
         }
 
         $this->sharedFileDataHelper->removeShareFile($filePath);
 
-        return $this->success();
+        return new MediaOperationResult(success: true, message: '');
     }
 
-    public function isShared(string $filePath): array
+    public function isShared(string $filePath): ShareStatus
     {
         $sharedFile = $this->sharedFileDataHelper->getSharedFile($filePath);
         if ($sharedFile === false || empty($sharedFile->Token)) {
-            return [
-                'shared' => false
-            ];
+            return new ShareStatus(shared: false);
         }
-        return [
-            'shared' => true,
-            'idGroup' => $sharedFile->idGroup,
-            'membersOnly' => $sharedFile->membersOnly === 1,
-            'link' => WebApp::getBaseUrl() . 'media/sharedFile/' . $sharedFile->Token
-        ];
+        return new ShareStatus(
+            shared: true,
+            idGroup: $sharedFile->idGroup,
+            membersOnly: $sharedFile->membersOnly === 1,
+            link: WebApp::getBaseUrl() . 'media/sharedFile/' . $sharedFile->Token
+        );
     }
 
     public static function getMediaPath(): string
@@ -180,16 +199,6 @@ class MediaManager
             mkdir($dir, 0755, true);
         }
         return $dir;
-    }
-
-    private function error(string $message, string $file = '', int $line = 0): array
-    {
-        return [
-            'success' => false,
-            'message' => $message,
-            'file'    => $file,
-            'line'    => $line,
-        ];
     }
 
     private function generateSafeFilename(string $originalName): string
@@ -245,13 +254,5 @@ class MediaManager
     private function toRelativePath(string $absolutePath): string
     {
         return str_replace(__DIR__ . '/../../', '', $absolutePath);
-    }
-
-    private function success(?string $message = null): array
-    {
-        return [
-            'success' => true,
-            'message' => $message
-        ];
     }
 }

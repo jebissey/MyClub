@@ -82,6 +82,9 @@ class AuthenticationService
         return AuthResult::success($person);
     }
 
+    /**
+     * @param array<string, mixed> $requestData
+     */
     public function handleSignIn(array $requestData): AuthResult
     {
         $schema = [

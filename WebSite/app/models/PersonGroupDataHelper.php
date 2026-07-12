@@ -19,13 +19,16 @@ class PersonGroupDataHelper extends Data
         return $personGroup !== false;
     }
 
+    /**
+     * @param array<int, int> $groups
+     */
     public function update(int $personId, array $groups): void
     {
         $query = $this->pdo->prepare("
             DELETE FROM PersonGroup 
-            WHERE IdPerson = $personId 
+            WHERE IdPerson = :personId 
             AND IdGroup IN (SELECT Id FROM `Group` WHERE SelfRegistration = 1)");
-        $query->execute();
+        $query->execute([':personId' => $personId]);
         $query = $this->pdo->prepare('INSERT INTO PersonGroup (IdPerson, IdGroup) VALUES (?, ?)');
         foreach ($groups as $groupId) {
             $query->execute([$personId, $groupId]);

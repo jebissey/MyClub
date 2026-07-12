@@ -10,6 +10,7 @@ use app\helpers\MyClubDateTime;
 
 class LogDataStatisticsHelper extends Data
 {
+    /** @return array{labels: array<int, string>, data: array<int, int>} */
     public function getOsDistribution(string $period, string $currentDate): array
     {
         $date = new DateTime($currentDate);
@@ -37,6 +38,7 @@ class LogDataStatisticsHelper extends Data
         return ['labels' => $labels, 'data' => $data];
     }
 
+    /** @return array{labels: array<int, string>, data: array<int, int>} */
     public function getBrowserDistribution(string $period, string $currentDate): array
     {
         $date = new DateTime($currentDate);
@@ -92,6 +94,7 @@ class LogDataStatisticsHelper extends Data
         return ['labels' => $labels, 'data' => $data];
     }
 
+    /** @return array{labels: array<int, string>, data: array<int, int>} */
     public function getScreenResolutionDistribution(string $period, string $currentDate): array
     {
         $date = new DateTime($currentDate);
@@ -146,6 +149,7 @@ class LogDataStatisticsHelper extends Data
         return ['labels' => $labels, 'data' => $data];
     }
 
+    /** @return array{labels: array<int, string>, data: array<int, int>} */
     public function getTypeDistribution(string $period, string $currentDate): array
     {
         $date = new DateTime($currentDate);
@@ -174,6 +178,7 @@ class LogDataStatisticsHelper extends Data
     }
 
     #region Private helper methods
+    /** @param array<int, string> $resolutions */
     private function getResolutionRange(array $resolutions): string
     {
         $widths = [];

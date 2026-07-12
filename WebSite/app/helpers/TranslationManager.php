@@ -14,41 +14,66 @@ use app\models\MetadataDataHelper;
 class TranslationManager
 {
     public const DEFAULT_LANGUAGE = 'fr_FR';
-    private const SUPPORTED_LANGUAGES = ['en_US', 'fr_FR', 'pl_PL'];
+
+    /** @var list<string> */
+    private const SUPPORTED_LANGUAGES = [
+        'en_US',
+        'fr_FR',
+        'pl_PL',
+    ];
+
+    /** @var array<string, string> */
     private const FLAGS = [
         'en_US' => '🇺🇸',
         'fr_FR' => '🇫🇷',
         'pl_PL' => '🇵🇱',
     ];
+
     private const COOKIE_NAME = 'user_language';
     private const COOKIE_EXPIRATION = 86400 * 30; // 30 days
     private const COOKIE_PATH = '/';
 
     private static ?string $forcedLanguage = null;
+
     private static function getForcedLanguage(): string
     {
         if (self::$forcedLanguage === null) {
             self::$forcedLanguage = (new MetadataDataHelper(Application::init()))
                 ->getForcedLanguage();
         }
+
         return self::$forcedLanguage;
     }
 
-    public static function setLanguage(string $language)
+    public static function setLanguage(string $language): void
     {
-        $language = in_array($language, self::SUPPORTED_LANGUAGES) ? $language : self::DEFAULT_LANGUAGE;
+        $language = in_array($language, self::SUPPORTED_LANGUAGES, true)
+            ? $language
+            : self::DEFAULT_LANGUAGE;
 
-        setcookie(self::COOKIE_NAME, $language, time() + (self::COOKIE_EXPIRATION), self::COOKIE_PATH);
+        setcookie(
+            self::COOKIE_NAME,
+            $language,
+            time() + self::COOKIE_EXPIRATION,
+            self::COOKIE_PATH
+        );
+
         $_COOKIE[self::COOKIE_NAME] = $language;
+
         header('Location: ' . $_SERVER['PHP_SELF']);
     }
 
     public static function getCurrentLanguage(): string
     {
         $forcedLanguage = self::getForcedLanguage();
-        if ($forcedLanguage !== '' && in_array($forcedLanguage, self::SUPPORTED_LANGUAGES, true)) {
+
+        if (
+            $forcedLanguage !== ''
+            && in_array($forcedLanguage, self::SUPPORTED_LANGUAGES, true)
+        ) {
             return $forcedLanguage;
         }
+
         return $_COOKIE[self::COOKIE_NAME] ?? self::DEFAULT_LANGUAGE;
     }
 
@@ -59,46 +84,74 @@ class TranslationManager
             IntlDateFormatter::FULL,
             IntlDateFormatter::NONE
         );
+
         $formatter->setPattern('EEEE'); // Full name (ex: lundi, Monday)
+
         return $formatter->format($date) ?: '';
     }
 
-    public static function getSupportedLanguages()
+    /**
+     * @return list<string>
+     */
+    public static function getSupportedLanguages(): array
     {
         return self::SUPPORTED_LANGUAGES;
     }
 
     public static function getFlag(string $locale): string
     {
-        if (self::getForcedLanguage() != '') {
+        if (self::getForcedLanguage() !== '') {
             return '';
         }
+
         return self::FLAGS[$locale] ?? '🏳️';
     }
 
-    public static function getLongDate($date)
+    public static function getLongDate(string|DateTimeInterface $date): string
     {
-        $formatter = new IntlDateFormatter(self::getCurrentLanguage(), IntlDateFormatter::FULL, IntlDateFormatter::NONE);
-        return $formatter->format(new DateTime($date));
+        $formatter = new IntlDateFormatter(
+            self::getCurrentLanguage(),
+            IntlDateFormatter::FULL,
+            IntlDateFormatter::NONE
+        );
+
+        return $formatter->format(
+            $date instanceof DateTimeInterface ? $date : new DateTime($date)
+        ) ?: '';
     }
 
-    public static function getShortDate($date)
+    public static function getShortDate(string|DateTimeInterface $date): string
     {
-        $formatter = new IntlDateFormatter(self::getCurrentLanguage(), IntlDateFormatter::SHORT, IntlDateFormatter::NONE);
-        return $formatter->format(new DateTime($date));
+        $formatter = new IntlDateFormatter(
+            self::getCurrentLanguage(),
+            IntlDateFormatter::SHORT,
+            IntlDateFormatter::NONE
+        );
+
+        return $formatter->format(
+            $date instanceof DateTimeInterface ? $date : new DateTime($date)
+        ) ?: '';
     }
 
-    public static function getLongDateTime($date)
+    public static function getLongDateTime(string|DateTimeInterface $date): string
     {
-        $formatter = new IntlDateFormatter(self::getCurrentLanguage(), IntlDateFormatter::FULL, IntlDateFormatter::SHORT);
-        return $formatter->format(new DateTime($date));
+        $formatter = new IntlDateFormatter(
+            self::getCurrentLanguage(),
+            IntlDateFormatter::FULL,
+            IntlDateFormatter::SHORT
+        );
+
+        return $formatter->format(
+            $date instanceof DateTimeInterface ? $date : new DateTime($date)
+        ) ?: '';
     }
 
-    public static function getShortDateTime($date)
+    public static function getShortDateTime(string|DateTimeInterface $date): string
     {
         $locale = self::getCurrentLanguage();
-        $gen = new IntlDatePatternGenerator($locale);
-        $pattern = $gen->getBestPattern("EEEddMMMHHmm");
+
+        $generator = new IntlDatePatternGenerator($locale);
+        $pattern = $generator->getBestPattern('EEEddMMMHHmm');
 
         $formatter = new IntlDateFormatter(
             $locale,
@@ -108,30 +161,45 @@ class TranslationManager
             null,
             $pattern
         );
-        return $formatter->format(new DateTime($date));
+
+        return $formatter->format(
+            $date instanceof DateTimeInterface ? $date : new DateTime($date)
+        ) ?: '';
     }
 
-    public static function getReadableDuration($duration)
+    public static function getReadableDuration(int $duration): string
     {
-        $durationHours = floor($duration / 3600);
-        $durationMinutes = floor(($duration % 3600) / 60);
-        return ($durationHours > 0 ? "$durationHours h " : '') . ($durationMinutes > 0 ? "$durationMinutes min" : '');
+        $hours = intdiv($duration, 3600);
+        $minutes = intdiv($duration % 3600, 60);
+
+        return ($hours > 0 ? "{$hours} h " : '')
+            . ($minutes > 0 ? "{$minutes} min" : '');
     }
 
+    /**
+     * @return list<string>
+     */
     public static function getWeekdayNames(): array
     {
         $days = [];
+
         $monday = new DateTime('monday this week');
+
         for ($i = 0; $i < 7; $i++) {
-            $date = (clone $monday)->modify("+$i days");
+            $date = (clone $monday)->modify("+{$i} days");
             $days[] = self::getDayName($date);
         }
+
         return $days;
     }
 
-    public static function getCreationTimeModalTranslations(LanguagesDataHelper $languagesDataHelper): array
-    {
-        $t = fn(string $key) => $languagesDataHelper->translate($key);
+    /**
+     * @return array<string, string>
+     */
+    public static function getCreationTimeModalTranslations(
+        LanguagesDataHelper $languagesDataHelper
+    ): array {
+        $t = fn(string $key): string => $languagesDataHelper->translate($key);
 
         return [
             'yAxisLabel'   => $t('common.creation_time_modal.y_axis_label'),

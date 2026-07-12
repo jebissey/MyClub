@@ -6,6 +6,7 @@ namespace app\models;
 
 use PDO;
 use RuntimeException;
+use stdClass;
 use Throwable;
 use app\exceptions\UnauthorizedAccessException;
 use app\helpers\Application;
@@ -57,6 +58,10 @@ class MessageDataHelper extends Data implements NewsProviderInterface
         return $messageId;
     }
 
+    /**
+     * @param array<int, stdClass> $participants
+     * @return array<int, string>
+     */
     public function addWebAppMessages(int $eventId, array $participants, string $text): array
     {
         $bccList = [];
@@ -72,6 +77,7 @@ class MessageDataHelper extends Data implements NewsProviderInterface
         return $bccList;
     }
 
+    /** @return array<int, stdClass> */
     public function getArticleMessages(int $articleId): array
     {
         $sql = "
@@ -95,6 +101,7 @@ class MessageDataHelper extends Data implements NewsProviderInterface
         return $messages;
     }
 
+    /** @return array<int, stdClass> */
     public function getEventMessages(int $eventId): array
     {
         $sql = "
@@ -118,6 +125,7 @@ class MessageDataHelper extends Data implements NewsProviderInterface
         return $messages;
     }
 
+    /** @return array<int, stdClass> */
     public function getGroupMessages(int $groupId): array
     {
         $sql = "
@@ -145,6 +153,7 @@ class MessageDataHelper extends Data implements NewsProviderInterface
         return $messages;
     }
 
+    /** @return array<int, array<string, mixed>> */
     public function getGroupedMessages(int $personId, string $searchFrom, GravatarHandler $gravatarHandler): array
     {
         $rows = $this->doGetGroupedMessages($personId, $searchFrom);
@@ -159,6 +168,7 @@ class MessageDataHelper extends Data implements NewsProviderInterface
         }, $rows);
     }
 
+    /** @return array{0: int, 1: int, 2: string} */
     public function getImageInfoFromMessage(int $messageId): array
     {
         $message = $this->get('Message', ['Id' => $messageId], 'ImagePath');
@@ -189,6 +199,10 @@ class MessageDataHelper extends Data implements NewsProviderInterface
         return [(int)$year, (int)$month, $filename];
     }
 
+    /**
+     * @param array{start: string, end: string} $season
+     * @return array<string, int>
+     */
     public function getMessages(array $season): array
     {
         $query = $this->pdo->prepare("
@@ -205,6 +219,13 @@ class MessageDataHelper extends Data implements NewsProviderInterface
         return $query->fetchAll(PDO::FETCH_KEY_PAIR);
     }
 
+    /**
+     * @return array{
+     *     events: array<int, stdClass>,
+     *     articles: array<int, stdClass>,
+     *     groups: array<int, stdClass>
+     * }
+     */
     public function getMessageUses(string $path): array
     {
         $like = '%' . $path . '%';
@@ -246,6 +267,16 @@ class MessageDataHelper extends Data implements NewsProviderInterface
         ];
     }
 
+    /**
+     * @return array<int, array{
+     *     type: string,
+     *     id: int,
+     *     title: string,
+     *     from: string,
+     *     date: string,
+     *     url: string
+     * }>
+     */
     public function getNews(ConnectedUser $connectedUser, string $searchFrom): array
     {
         $news = [];
@@ -277,6 +308,10 @@ class MessageDataHelper extends Data implements NewsProviderInterface
         return $news;
     }
 
+    /**
+     * @param array<int, string> $paths
+     * @return array<string, bool>
+     */
     public function getPathsUsedInMessages(array $paths): array
     {
         if (empty($paths)) {
@@ -329,6 +364,10 @@ class MessageDataHelper extends Data implements NewsProviderInterface
     }
 
     #region Private functions
+    /**
+     * @param array<int, stdClass> $messages
+     * @return array<int, stdClass>
+     */
     private function addAvatarAndTimeAgoToMessages(array $messages): array
     {
         static $gravatarHandler = new GravatarHandler();
@@ -340,6 +379,7 @@ class MessageDataHelper extends Data implements NewsProviderInterface
         return $messages;
     }
 
+    /** @return array<int, stdClass> */
     private function doGetGroupedMessages(int $personId, string $searchFrom): array
     {
         $params = [];

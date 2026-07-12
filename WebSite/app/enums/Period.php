@@ -28,6 +28,9 @@ enum Period: string
     case Signout = 'signout';
 
 
+    /**
+     * @return array{start: string, end: string}
+     */
     public function dateRange(): array
     {
         $end = date('Y-m-d H:i:s');

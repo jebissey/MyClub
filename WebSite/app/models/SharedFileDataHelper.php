@@ -14,6 +14,10 @@ class SharedFileDataHelper extends Data
         parent::__construct($application);
     }
 
+    /**
+     * @param array<int, string> $paths
+     * @return array<string, true>
+     */
     public function getPathsShared(array $paths): array
     {
         if (empty($paths)) {
@@ -21,6 +25,7 @@ class SharedFileDataHelper extends Data
         }
 
         $stmt = $this->pdo->query("SELECT Item FROM SharedFile WHERE Token IS NOT NULL");
+        /** @var array<int, string> $items */
         $items = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
         $used = [];

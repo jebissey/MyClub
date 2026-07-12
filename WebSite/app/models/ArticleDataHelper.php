@@ -16,6 +16,18 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
         parent::__construct($application);
     }
 
+    /**
+     * @param array{
+     *     authors:list<object>,
+     *     audiences:list<array{id:int}>,
+     *     data:array<int, array<int, int>>
+     * } $crosstabData
+     *
+     * @return array{
+     *     byAuthor: array<int,int>,
+     *     byAudience: array<int,int>
+     * }
+     */
     public function calculateTotals(array $crosstabData): array
     {
         $totals = [
@@ -53,6 +65,9 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
         return $totals;
     }
 
+    /**
+     * @return list<object>
+     */
     public function getArticlesForAll(): array
     {
         $sql = "
@@ -105,6 +120,9 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
         return $stmt->fetchAll(PDO::FETCH_OBJ);
     }
 
+    /**
+     * @return list<object>
+     */
     public function getArticlesForRss(): array
     {
         $sql = "
@@ -124,6 +142,11 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
         return $stmt->fetchAll(PDO::FETCH_OBJ);
     }
 
+    /**
+     * @param list<int> $articleIds
+     *
+     * @return array<int, object>
+     */
     public function getAuthorsByArticleIds(array $articleIds): array
     {
         if (empty($articleIds)) {
@@ -158,6 +181,9 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
         return $indexed;
     }
 
+    /**
+     * @param list<int> $articleIds
+     */
     public function getLatestArticle(array $articleIds): ?object
     {
         if (empty($articleIds)) {
@@ -189,6 +215,12 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
         return $article ?: null;
     }
 
+    /**
+     * @return array{
+     *     latestArticle: object|null,
+     *     latestArticles: list<object>
+     * }
+     */
     public function getLatestArticles(?string $userEmail, int $latestArticlesCount): array
     {
         $articleIds = $this->getArticleIdsBasedOnAccess($userEmail);
@@ -204,6 +236,15 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
         ];
     }
 
+    /**
+     * @return list<array{
+     *     type:string,
+     *     id:int,
+     *     title:string,
+     *     date:string,
+     *     url:string
+     * }>
+     */
     public function getNews(ConnectedUser $connectedUser, string $searchFrom): array
     {
         $sql = "
@@ -232,6 +273,11 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
         return $news;
     }
 
+    /**
+     * @param list<string> $paths
+     *
+     * @return array<string,bool>
+     */
     public function getPathsUsedInArticles(array $paths): array
     {
         if (empty($paths)) {
@@ -253,6 +299,9 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
         return $used; // ['data/media/2024/01/photo.jpg' => true, ...]
     }
 
+    /**
+     * @return array<string,mixed>|null
+     */
     public function getSpotlightArticle(): mixed
     {
         $spotlightArticleJson = $this->get('Settings', ['Name' => 'SpotlightArticle'], 'Value')->Value ?? '';
@@ -276,6 +325,9 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
         return $stmt->fetch(PDO::FETCH_OBJ);
     }
 
+    /**
+     * @return list<object>
+     */
     public function inArticles(string $path): array
     {
         $sql = "
@@ -306,7 +358,7 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
         return strtotime($now) < strtotime($spotlightUntil);
     }
 
-    public function isUserAllowedToReadArticle(string $userEmail, $id)
+    public function isUserAllowedToReadArticle(string $userEmail, int $id): bool
     {
         return in_array($id, $this->getArticleIdsBasedOnAccess($userEmail));
     }
@@ -321,6 +373,11 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
     }
 
     #region Private funcions
+    /**
+     * @param string|null $userEmail
+     *
+     * @return list<int>
+     */
     private function getArticleIdsBasedOnAccess(?string $userEmail): array
     {
         $noGroupArticleIds = $this->getNoGroupArticleIds();
@@ -341,6 +398,11 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
         return array_unique(array_merge($articleIds, $groupArticleIds));
     }
 
+    /**
+     * @param list<int> $groupIds
+     *
+     * @return list<int>
+     */
     private function getArticleIdsByGroups(array $groupIds): array
     {
         if (empty($groupIds)) {
@@ -355,6 +417,9 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
         return $query->fetchAll(PDO::FETCH_COLUMN);
     }
 
+    /**
+     * @return list<int>
+     */
     private function getArticleIdsForMembers(): array
     {
         $query = $this->pdo->prepare("
@@ -364,6 +429,11 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
         return $query->fetchAll(PDO::FETCH_COLUMN);
     }
 
+    /**
+     * @param list<int> $articleIds
+     *
+     * @return list<object>
+     */
     private function doGetLatestArticles(array $articleIds, int $latestArticlesCount): array
     {
         if (empty($articleIds)) {
@@ -389,6 +459,9 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
         return $stmt->fetchAll() ?: [];
     }
 
+    /**
+     * @return list<int>
+     */
     private function getNoGroupArticleIds(): array
     {
         $query = $this->pdo->prepare("

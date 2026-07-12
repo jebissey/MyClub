@@ -10,12 +10,18 @@ use app\valueObjects\Route;
 
 class EventNeed implements RouteInterface
 {
+    /**
+     * @var array<int, Route>
+     */
     private array $routes = [];
 
     public function __construct(private ControllerFactory $controllerFactory)
     {
     }
 
+    /**
+     * @return array<int, Route>
+     */
     public function get(): array
     {
         $eventNeedController = fn() => $this->controllerFactory->makeEventNeedController();

@@ -7,6 +7,7 @@ namespace app\models;
 use InvalidArgumentException;
 use PDO;
 use RuntimeException;
+use stdClass;
 use Throwable;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
@@ -43,6 +44,9 @@ class PersonDataHelper extends Data implements NewsProviderInterface
         return (int)$id;
     }
 
+    /**
+     * @return array<string, int>
+     */
     public function getAllPersons(): array
     {
         $rows = $this->pdo
@@ -52,6 +56,9 @@ class PersonDataHelper extends Data implements NewsProviderInterface
         return array_column($rows, 'Id', 'EmailKey');
     }
 
+    /**
+     * @return string[]
+     */
     public function getEmailsOfInterestedPeople(?int $idGroup, ?int $idEventType, ?int $dayOfWeek, string $timeOfDay): array
     {
         $persons = $this->getInterestedPeople($idGroup, $idEventType, $dayOfWeek, $timeOfDay);
@@ -62,6 +69,9 @@ class PersonDataHelper extends Data implements NewsProviderInterface
         return $filteredEmails;
     }
 
+    /**
+     * @return stdClass[]
+     */
     public function getInterestedPeople(?int $idGroup, ?int $idEventType, ?int $dayOfWeek, string $timeOfDay): array
     {
         $persons = $this->getPersonsInGroup($idGroup);
@@ -73,7 +83,9 @@ class PersonDataHelper extends Data implements NewsProviderInterface
         }
         return $filteredPeople;
     }
-
+    /**
+     * @return stdClass[]
+     */
     public function getMembersAlerts(): array
     {
         $query = "
@@ -106,6 +118,9 @@ class PersonDataHelper extends Data implements NewsProviderInterface
         return $stmt->fetchAll(PDO::FETCH_OBJ);
     }
 
+    /**
+     * @return array<int, array{type: string, id: int, title: string, date: string, url: string}>
+     */
     public function getNews(ConnectedUser $connectedUser, string $searchFrom): array
     {
         $news = [];
@@ -125,6 +140,7 @@ class PersonDataHelper extends Data implements NewsProviderInterface
             ':searchFrom' => $searchFrom,
             ':email' => $connectedUser->person->Email
         ]);
+        /** @var array<int, object{Id: int, Email: string, FirstName: string, LastName: string, PresentationLastUpdate: string}> $presentations */
         $presentations = $stmt->fetchAll(PDO::FETCH_OBJ);
         foreach ($presentations as $presentation) {
             $fullName = trim($presentation->FirstName . ' ' . $presentation->LastName);
@@ -142,6 +158,9 @@ class PersonDataHelper extends Data implements NewsProviderInterface
         return $news;
     }
 
+    /**
+     * @return stdClass[]
+     */
     public function getPersonsForCommunication(
         ?int $groupId,
         ?bool $presentation = null,
@@ -196,6 +215,9 @@ class PersonDataHelper extends Data implements NewsProviderInterface
         return $stmt->fetchAll(PDO::FETCH_OBJ);
     }
 
+    /**
+     * @return stdClass[]
+     */
     public function getPersonsInGroup(?int $idGroup): array
     {
         $innerJoin = $and = '';
@@ -212,6 +234,9 @@ class PersonDataHelper extends Data implements NewsProviderInterface
         ")->fetchAll(PDO::FETCH_OBJ);
     }
 
+    /**
+     * @return stdClass[]
+     */
     public function getPersonsInGroupForDirectory(int $groupId): array
     {
         $stmt = $this->pdo->prepare("
@@ -231,6 +256,9 @@ class PersonDataHelper extends Data implements NewsProviderInterface
         return $persons;
     }
 
+    /**
+     * @return string[]
+     */
     public function getPersonWantedToBeAlerted(int $idArticle): array
     {
         $idGroup = null;
@@ -290,7 +318,9 @@ class PersonDataHelper extends Data implements NewsProviderInterface
         $name = $person !== false ? $person->FirstName . ' ' . $person->LastName : "?";
         return "publié par " . $name;
     }
-
+    /**
+     * @return stdClass[]
+     */
     public function getRedactors(): array
     {
         return $this->pdo->query("
@@ -324,7 +354,7 @@ class PersonDataHelper extends Data implements NewsProviderInterface
      *
      * @param  string               $filePath        Absolute path to the CSV file (validated upstream by the controller)
      * @param  int                  $headerRow       Last header line number (lines <= this value are skipped)
-     * @param  array                $mapping         Column mapping : ['email' => 0, 'firstName' => 1, ...]
+     * @param  array<string,int>    $mapping         Column mapping : ['email' => 0, 'firstName' => 1, ...]
      * @param  array<string,int>    $existingPersons Existing persons map : ['lowercase_email' => id, ...]
      *
      * @return array{created: int, updated: int, deactivated: int, errors: int, processedEmails: string[], messages: string[]}

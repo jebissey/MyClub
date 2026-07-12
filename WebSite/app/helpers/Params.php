@@ -5,18 +5,39 @@ declare(strict_types=1);
 namespace app\helpers;
 
 use InvalidArgumentException;
-use app\helpers\Application;
-use app\helpers\TranslationManager;
 
 class Params
 {
+    /**
+     * @var array<string, mixed>
+     */
     private static array $commonParams = [];
 
-    public static function getAll(array $specificParams, ?string $prodSiteUrl, ?string $memberAlert, array $defaultColors): array
-    {
+    /**
+     * @param array<string, mixed> $specificParams
+     * @param array{
+     *     navbarBgColor:string,
+     *     navbarInkColor:string,
+     *     navbarIconColor:string
+     * } $defaultColors
+     *
+     * @return array<string, mixed>
+     */
+    public static function getAll(
+        array $specificParams,
+        ?string $prodSiteUrl,
+        ?string $memberAlert,
+        array $defaultColors
+    ): array {
         if (self::$commonParams === []) {
-            self::setDefaultParams($_SERVER['REQUEST_URI'], $prodSiteUrl, $memberAlert, $defaultColors);
+            self::setDefaultParams(
+                $_SERVER['REQUEST_URI'],
+                $prodSiteUrl,
+                $memberAlert,
+                $defaultColors
+            );
         }
+
         return array_merge(self::$commonParams, $specificParams);
     }
 
@@ -25,24 +46,44 @@ class Params
         self::$commonParams['memberAlert'] = $memberAlert;
     }
 
-    public static function setParams(array $params, ?string $prodSiteUrl, ?string $memberAlert)
-    {
+    /**
+     * @param array<string, mixed> $params
+     */
+    public static function setParams(
+        array $params,
+        ?string $prodSiteUrl,
+        ?string $memberAlert
+    ): void {
         self::$commonParams = $params;
+
         if ($prodSiteUrl !== null) {
             self::$commonParams['productionSiteUrl'] = $prodSiteUrl;
         }
+
         if ($memberAlert !== null) {
             self::$commonParams['memberAlert'] = $memberAlert;
         }
     }
 
-    #region Private functions
-    private static function setDefaultParams(string $requestUri, ?string $prodSiteUrl, ?string $memberAlert, array $defaultColors): void
-    {
+    /**
+     * @param array{
+     *     navbarBgColor:string,
+     *     navbarInkColor:string,
+     *     navbarIconColor:string
+     * } $defaultColors
+     */
+    private static function setDefaultParams(
+        string $requestUri,
+        ?string $prodSiteUrl,
+        ?string $memberAlert,
+        array $defaultColors
+    ): void {
         $path = parse_url($requestUri, PHP_URL_PATH);
+
         if ($path === false || $path === null) {
             throw new InvalidArgumentException('Invalid URI provided');
         }
+
         $segments = explode('/', trim($path, '/'));
         $page = $segments[0];
         $lang = TranslationManager::getCurrentLanguage();
@@ -78,9 +119,11 @@ class Params
             'navbarInkColor'  => $defaultColors['navbarInkColor'],
             'navbarIconColor' => $defaultColors['navbarIconColor'],
         ];
+
         if ($prodSiteUrl !== null) {
             self::$commonParams['productionSiteUrl'] = $prodSiteUrl;
         }
+
         if ($memberAlert !== null) {
             self::$commonParams['memberAlert'] = $memberAlert;
         }

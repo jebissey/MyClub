@@ -10,12 +10,18 @@ use app\valueObjects\Route;
 
 class MediaApi implements RouteInterface
 {
+    /**
+     * @var array<int, Route>
+     */
     private array $routes = [];
 
     public function __construct(private ApiFactory $apiFactory)
     {
     }
 
+    /**
+     * @return array<int, Route>
+     */
     public function get(): array
     {
         $mediaApi = fn() => $this->apiFactory->makeMediaApi();

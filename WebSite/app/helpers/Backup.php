@@ -9,13 +9,16 @@ class Backup
     private const SQLITE_PATH = __DIR__ . '/../../data/';
     private const SQLITE_FILE = 'MyClub.sqlite';
     private const BACKUP_PATH = __DIR__ . '/../../backup';
-    private $backupRoot;
-    private $sourceFile;
-    private $monthFolders;
-    private $weekDays;
-    private static $lastBackupFolder;
 
-    public function __construct($backupRoot = self::BACKUP_PATH, $sourceFile = self::SQLITE_PATH . self::SQLITE_FILE)
+    private string $backupRoot;
+    private string $sourceFile;
+    /** @var array<int, string> */
+    private array $monthFolders;
+    /** @var array<int, string> */
+    private array $weekDays;
+    private static ?string $lastBackupFolder = null;
+
+    public function __construct(string $backupRoot = self::BACKUP_PATH, string $sourceFile = self::SQLITE_PATH . self::SQLITE_FILE)
     {
         $this->backupRoot = rtrim($backupRoot, '/');
         $this->sourceFile = $sourceFile;
@@ -25,7 +28,7 @@ class Backup
         $this->initializeStructure();
     }
 
-    public function save()
+    public function save(): bool
     {
         $currentYear = date('Y');
         $currentMonth = date('m');
@@ -41,7 +44,6 @@ class Backup
 
         $monthPath = "$yearPath/$currentMonth";
         $monthFile = $monthPath . '/' . basename($this->sourceFile);
-        $this->cleanupOldFiles($monthPath);
         if (!file_exists($monthFile)) {
             self::$lastBackupFolder = $monthFile;
             return copy($this->sourceFile, $monthFile);
@@ -56,26 +58,13 @@ class Backup
         return copy($this->sourceFile, $dayFile);
     }
 
-    public function getLastBackupFolder()
+    public function getLastBackupFolder(): ?string
     {
         return self::$lastBackupFolder;
     }
 
-
-    private function cleanupOldFiles($path)
-    {
-        $currentYear = date('Y');
-
-        $files = glob("$path/{$this->sourceFile}");
-        foreach ($files as $file) {
-            $fileYear = date('Y', filemtime($file));
-            if ($fileYear != $currentYear) {
-                unlink($file);
-            }
-        }
-    }
-
-    private function initializeStructure()
+    #region Private functions
+    private function initializeStructure(): void
     {
         if (!is_dir($this->backupRoot)) {
             mkdir($this->backupRoot, 0755, true);

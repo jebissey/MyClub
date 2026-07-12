@@ -517,8 +517,8 @@ class ArticleController extends TableController
                     'ArticleId' => $id
                 ])),
                 'isCreator' => $connectedUser->person !== null && $connectedUser->person->Id === $article->CreatedBy,
-                'message' => $message ?? '',
-                'messageType' => $messageType ?? '',
+                'message' => $message,
+                'messageType' => $messageType,
                 'btn_HistoryBack' => true,
                 'btn_Parent'      => "/articles",
             ]));

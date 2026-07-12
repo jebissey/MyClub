@@ -38,7 +38,7 @@ abstract class TableController extends AbstractController
         $values = [];
 
         foreach ($filters as $key => $value) {
-            if ($value !== null && $value !== '') {
+            if ($value !== '') {
                 $query = $query->where("$key LIKE ?");
                 $values[] = "%$value%";
             }

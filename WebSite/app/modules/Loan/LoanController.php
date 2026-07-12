@@ -111,6 +111,9 @@ class LoanController extends AbstractController
     }
 
     #region Private methods
+    /**
+     * @return array<string, string>
+     */
     private function doTranslations(): array
     {
         $keys = [

@@ -9,10 +9,10 @@ use Throwable;
 
 class Client
 {
-    private $browser = 'Unknown';
-    private $version = '';
-    private $os = 'Unknown';
-    private $device = 'Unknown';
+    private string $browser = 'Unknown';
+    private string $version = '';
+    private string $os = 'Unknown';
+    private string $device = 'Unknown';
 
     public function __construct()
     {

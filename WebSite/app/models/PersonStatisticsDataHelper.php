@@ -14,7 +14,26 @@ class PersonStatisticsDataHelper extends Data
         parent::__construct($application);
     }
 
-    public function getStats(object $person, string $seasonStart, string $seasonEnd)
+    /**
+     * @return array{
+     *     person: object,
+     *     seasonStart: string,
+     *     seasonEnd: string,
+     *     articles: array{user: int, total: int, percentage: int|float},
+     *     surveys: array{user: int, total: int, percentage: int|float},
+     *     surveyReplies: array{user: int, total: int, percentage: int|float},
+     *     designs: array{user: int, total: int, percentage: int|float},
+     *     designVotes: array{user: int, total: int, percentage: int|float},
+     *     events: array<int|string, array{typeName: string, user: int, total: int, percentage: int|float}>,
+     *     eventParticipations: array<int|string, array{typeName: string, events: int, user: int, total: int, percentage: int|float}>,
+     *     participantSupplies: array{user: int, total: int, percentage: int|float},
+     *     participantMessages: array{
+     *         user: int, totalUsers: int, percentage: int|float,
+     *         webapp: int, totalWebapp: int, percentageWebapp: int|float
+     *     }
+     * }
+     */
+    public function getStats(object $person, string $seasonStart, string $seasonEnd): array
     {
         $stats = [
             'person' => $person,
@@ -34,7 +53,10 @@ class PersonStatisticsDataHelper extends Data
         return $stats;
     }
 
-    public function getAvailableSeasons()
+    /**
+     * @return list<array{label: string, start: string, end: string}>
+     */
+    public function getAvailableSeasons(): array
     {
         $query = "
             SELECT MIN(LastUpdate) as min_date FROM (
@@ -51,8 +73,8 @@ class PersonStatisticsDataHelper extends Data
             $firstDate = date('Y-m-d');
         }
 
-        $firstYear = date('Y', strtotime($firstDate));
-        $currentYear = date('Y');
+        $firstYear = (int) date('Y', strtotime($firstDate));
+        $currentYear = (int) date('Y');
 
         $seasons = [];
 
@@ -95,6 +117,9 @@ class PersonStatisticsDataHelper extends Data
         return (int) $stmt->fetchColumn();
     }
 
+    /**
+     * @return array{user: int, total: int, percentage: int|float}
+     */
     private function getArticleStats(int $personId, string $seasonStart, string $seasonEnd): array
     {
         $userArticlesCount = $this->getArticleCount($personId, $seasonStart, $seasonEnd);
@@ -109,6 +134,9 @@ class PersonStatisticsDataHelper extends Data
         ];
     }
 
+    /**
+     * @return array{user: int, total: int, percentage: int|float}
+     */
     private function getSurveyStats(int $personId, string $seasonStart, string $seasonEnd): array
     {
         $query = "
@@ -124,7 +152,7 @@ class PersonStatisticsDataHelper extends Data
         ";
         $userSurveys = $this->pdo->prepare($query);
         $userSurveys->execute([$personId, $seasonStart, $seasonEnd]);
-        $userSurveysCount = $userSurveys->fetch(PDO::FETCH_OBJ)->count;
+        $userSurveysCount = (int)$userSurveys->fetch(PDO::FETCH_OBJ)->count;
 
         $query = "
             SELECT COUNT(*) as count 
@@ -135,7 +163,7 @@ class PersonStatisticsDataHelper extends Data
         ";
         $totalSurveys = $this->pdo->prepare($query);
         $totalSurveys->execute([$seasonStart, $seasonEnd]);
-        $totalSurveysCount = $totalSurveys->fetch(PDO::FETCH_OBJ)->count;
+        $totalSurveysCount = (int)$totalSurveys->fetch(PDO::FETCH_OBJ)->count;
 
         return [
             'user' => $userSurveysCount,
@@ -144,6 +172,9 @@ class PersonStatisticsDataHelper extends Data
         ];
     }
 
+    /**
+     * @return array{user: int, total: int, percentage: int|float}
+     */
     private function getSurveyRepliesStats(int $personId, string $seasonStart, string $seasonEnd): array
     {
         $query = "
@@ -158,7 +189,7 @@ class PersonStatisticsDataHelper extends Data
             )";
         $userReplies = $this->pdo->prepare($query);
         $userReplies->execute([$personId, $seasonStart, $seasonEnd]);
-        $userRepliesCount = $userReplies->fetch(PDO::FETCH_OBJ)->count;
+        $userRepliesCount = (int)$userReplies->fetch(PDO::FETCH_OBJ)->count;
 
         $query = "
             SELECT COUNT(*) as count 
@@ -171,7 +202,7 @@ class PersonStatisticsDataHelper extends Data
             )";
         $totalReplies = $this->pdo->prepare($query);
         $totalReplies->execute([$seasonStart, $seasonEnd]);
-        $totalRepliesCount = $totalReplies->fetch(PDO::FETCH_OBJ)->count;
+        $totalRepliesCount = (int)$totalReplies->fetch(PDO::FETCH_OBJ)->count;
 
         return [
             'user'       => $userRepliesCount,
@@ -206,6 +237,9 @@ class PersonStatisticsDataHelper extends Data
         return (int) $stmt->fetchColumn();
     }
 
+    /**
+     * @return array{user: int, total: int, percentage: int|float}
+     */
     private function getDesignStats(int $personId, string $seasonStart, string $seasonEnd): array
     {
         $userDesignsCount = $this->getDesignCount($personId, $seasonStart, $seasonEnd);
@@ -245,6 +279,9 @@ class PersonStatisticsDataHelper extends Data
         return (int) $stmt->fetchColumn();
     }
 
+    /**
+     * @return array{user: int, total: int, percentage: int|float}
+     */
     private function getDesignVoteStats(int $personId, string $seasonStart, string $seasonEnd): array
     {
         $userVotesCount = $this->getDesignVoteCount($personId, $seasonStart, $seasonEnd);
@@ -259,6 +296,9 @@ class PersonStatisticsDataHelper extends Data
         ];
     }
 
+    /**
+     * @return array<int|string, array{typeName: string, user: int, total: int, percentage: int|float}>
+     */
     private function getEventStats(int $personId, string $seasonStart, string $seasonEnd): array
     {
         $stats = [];
@@ -339,6 +379,9 @@ class PersonStatisticsDataHelper extends Data
         return $stats;
     }
 
+    /**
+     * @return array<int|string, array{typeName: string, events: int, user: int, total: int, percentage: int|float}>
+     */
     private function getEventParticipationStats(int $personId, string $seasonStart, string $seasonEnd): array
     {
         $stats = [];
@@ -424,6 +467,9 @@ class PersonStatisticsDataHelper extends Data
         return (int) $stmt->fetchColumn();
     }
 
+    /**
+     * @return array{user: int, total: int, percentage: int|float}
+     */
     private function getParticipantSupplyStats(int $personId, string $seasonStart, string $seasonEnd): array
     {
         $userSuppliesCount = $this->getParticipantSupplyCount($personId, $seasonStart, $seasonEnd);
@@ -465,6 +511,12 @@ class PersonStatisticsDataHelper extends Data
         return (int) $stmt->fetchColumn();
     }
 
+    /**
+     * @return array{
+     *     user: int, totalUsers: int, percentage: int|float,
+     *     webapp: int, totalWebapp: int, percentageWebapp: int|float
+     * }
+     */
     private function getParticipantMessageStats(int $personId, string $seasonStart, string $seasonEnd): array
     {
         $userMessagesCount = $this->getParticipantMessageCount($personId, $seasonStart, $seasonEnd, 'User');

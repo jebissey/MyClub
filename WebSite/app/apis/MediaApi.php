@@ -12,6 +12,7 @@ use app\helpers\MediaManager;
 use app\helpers\WebApp;
 use app\models\DataHelper;
 use app\models\PersonDataHelper;
+use app\valueObjects\UploadedFileInput;
 
 class MediaApi extends AbstractApi
 {
@@ -30,14 +31,14 @@ class MediaApi extends AbstractApi
         if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isRedactor(), __FILE__, __LINE__)) {
             $result = $this->mediaManager->deleteFile($year, $month, $filename);
 
-            if ($result['success']) {
-                $this->renderJsonOk($result);
+            if ($result->success) {
+                $this->renderJsonOk(['message' => $result->message]);
             } else {
                 $this->renderJsonError(
-                    $result['message'],
+                    $result->message,
                     ApplicationError::Error->value,
-                    $result['file'],
-                    $result['line']
+                    $result->file,
+                    $result->line
                 );
             }
         }
@@ -127,7 +128,7 @@ class MediaApi extends AbstractApi
                 $this->renderJsonBadRequest('Fichier manquant', __FILE__, __LINE__);
                 return;
             }
-            $this->renderJsonOk($this->mediaManager->isShared($filePath));
+            $this->renderJsonOk($this->mediaManager->isShared($filePath)->toArray());
         }
     }
 
@@ -142,9 +143,9 @@ class MediaApi extends AbstractApi
             }
             $response = $this->mediaManager->removeFileShare($filePath);
             $this->renderJson(
-                $response,
-                $response['success'],
-                $response['success'] ? ApplicationError::Ok->value : ApplicationError::BadRequest->value
+                ['message' => $response->message],
+                $response->success,
+                $response->success ? ApplicationError::Ok->value : ApplicationError::BadRequest->value
             );
         }
     }
@@ -175,7 +176,7 @@ class MediaApi extends AbstractApi
             );
 
             $this->renderJson(
-                $response,
+                $response->toArray(),
                 true,
                 ApplicationError::Ok->value
             );
@@ -210,7 +211,10 @@ class MediaApi extends AbstractApi
             }
 
             try {
-                $uploaded = array_map(fn($file) => $this->mediaManager->uploadFile($file), $files);
+                $uploaded = array_map(
+                    fn($file) => $this->mediaManager->uploadFile(UploadedFileInput::fromArray($file)),
+                    $files
+                );
                 $this->renderJsonOk(['files' => array_column($uploaded, 'file')], 'Fichier(s) uploadé(s) avec succès');
             } catch (Throwable $e) {
                 $this->renderJson([], false, ApplicationError::Error->value, $e->getMessage());
@@ -219,7 +223,7 @@ class MediaApi extends AbstractApi
     }
 
     #region private methods
-    private function getUploadErrorMessage(int $error)
+    private function getUploadErrorMessage(int $error): string
     {
         switch ($error) {
             case UPLOAD_ERR_INI_SIZE:

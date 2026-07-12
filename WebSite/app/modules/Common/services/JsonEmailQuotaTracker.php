@@ -11,6 +11,7 @@ final class JsonEmailQuotaTracker implements EmailQuotaTrackerInterface
 {
     private string $today;
     private string $thisMonth;
+    /** @var array{day: string, month: string, daily: int, monthly: int} */
     private array $data;
 
     public function __construct(private readonly string $filePath)
@@ -38,6 +39,9 @@ final class JsonEmailQuotaTracker implements EmailQuotaTrackerInterface
     }
 
     # Private functions
+    /**
+     * @return array{day: string, month: string, daily: int, monthly: int}
+     */
     private function load(): array
     {
         $defaults = [

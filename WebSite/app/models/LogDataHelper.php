@@ -7,6 +7,7 @@ namespace app\models;
 use DateTimeImmutable;
 use Envms\FluentPDO\Queries\Select;
 use PDO;
+use stdClass;
 use app\enums\Period;
 use app\helpers\Application;
 use app\helpers\MyClubDateTime;
@@ -18,6 +19,21 @@ class LogDataHelper extends Data
         parent::__construct($application);
     }
 
+    /**
+     * @param array<int, array<string, mixed>> $data
+     * @return array{
+     *     labels: array<int, mixed>,
+     *     uniqueVisitors: array<int, mixed>,
+     *     views2xx: array<int, mixed>,
+     *     views3xx: array<int, mixed>,
+     *     views4xx: array<int, mixed>,
+     *     views5xx: array<int, mixed>,
+     *     showMinMaxAvg: bool,
+     *     minVisitors: array<int, mixed>,
+     *     avgVisitors: array<int, mixed>,
+     *     maxVisitors: array<int, mixed>
+     * }
+     */
     public function formatDataForChart(array $data): array
     {
         $labels         = [];
@@ -66,6 +82,10 @@ class LogDataHelper extends Data
     }
 
     #region Last visits
+    /**
+     * @param array<int, stdClass> $activePersons
+     * @return array<int, stdClass>
+     */
     public function getLastVisitPerActivePersonWithTimeAgo(array $activePersons): array
     {
         $visits = $this->getLastVisitPerActivePerson($activePersons);
@@ -81,6 +101,10 @@ class LogDataHelper extends Data
         return $visits;
     }
 
+    /**
+     * @param array<int, stdClass> $activePersons
+     * @return array<int, stdClass>
+     */
     private function getLastVisitPerActivePerson(array $activePersons): array
     {
         if (empty($activePersons)) {
@@ -143,6 +167,10 @@ class LogDataHelper extends Data
             ->orderBy('CreatedAt DESC');
     }
 
+    /**
+     * @param array<int, string> $filteredPersonEmails
+     * @return array<int, stdClass>
+     */
     public function getPersons(array $filteredPersonEmails): array
     {
         $emails = array_filter(array_map('trim', array_values($filteredPersonEmails)));
@@ -158,6 +186,7 @@ class LogDataHelper extends Data
         return $stmt->fetchAll(PDO::FETCH_OBJ);
     }
 
+    /** @return array<int, stdClass> */
     public function getTopArticles(string $dateCondition, int $top): array
     {
         $sql = '
@@ -197,6 +226,7 @@ class LogDataHelper extends Data
         return $stmt->fetchAll(PDO::FETCH_OBJ);
     }
 
+    /** @return array<int, stdClass> */
     public function getTopPages(Period $period, int $top): array
     {
         $dateCondition = $period->dateConditions('CreatedAt');
@@ -228,6 +258,10 @@ class LogDataHelper extends Data
         return $stmt->fetchAll(PDO::FETCH_OBJ);
     }
 
+    /**
+     * @param array{start: string, end: string} $season
+     * @return array<string, int>
+     */
     public function getVisits(array $season): array
     {
         $query = $this->pdoForLog->prepare("
@@ -244,6 +278,7 @@ class LogDataHelper extends Data
     }
 
     #region Installations
+    /** @return array<int, stdClass> */
     public function getInstallationsData(): array
     {
         $query = "
@@ -412,6 +447,8 @@ class LogDataHelper extends Data
     }
 
     private const CREATION_TIME_TREND_STEP_SIZE = 12;
+
+    /** @return array<int, array{label: string, avgDuration: int|null, count: int}> */
     public function getCreationTimeTrend(string $uri, DateTimeImmutable $from, DateTimeImmutable $to): array
     {
         $sql = "

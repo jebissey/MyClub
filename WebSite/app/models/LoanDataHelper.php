@@ -18,6 +18,7 @@ class LoanDataHelper extends Data
     // MATÉRIELS
     // ══════════════════════════════════════════════════════════════════════════
 
+    /** @return array<int, array<string, mixed>> */
     public function getAllItems(): array
     {
         $stmt = $this->pdo->query(
@@ -26,7 +27,10 @@ class LoanDataHelper extends Data
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    /** @param string|null $type 'loan' | 'reservation' | 'both' | null (tous actifs) */
+    /**
+     * @param string|null $type 'loan' | 'reservation' | 'both' | null (tous actifs)
+     * @return array<int, array<string, mixed>>
+     */
     public function getActiveItems(?string $type = null): array
     {
         if ($type === null) {
@@ -43,6 +47,7 @@ class LoanDataHelper extends Data
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    /** @return array<string, mixed>|null */
     public function getItem(int $id): ?array
     {
         $stmt = $this->pdo->prepare("SELECT * FROM LoanItem WHERE Id = :id");
@@ -51,7 +56,10 @@ class LoanDataHelper extends Data
         return $row ?: null;
     }
 
-    /** Crée ou met à jour un matériel. Retourne l'Id. */
+    /**
+     * Crée ou met à jour un matériel. Retourne l'Id.
+     * @param array<string, mixed> $data
+     */
     public function saveItem(array $data): int
     {
         $id          = (int)($data['id'] ?? 0);
@@ -139,6 +147,7 @@ class LoanDataHelper extends Data
 				LEFT JOIN Person  rt ON rt.Id = lr.ReturnedToId";
     }
 
+    /** @return array<int, array<string, mixed>> */
     public function getAllLoans(string $status = ''): array
     {
         $base = $this->loanSelectBase();
@@ -155,6 +164,7 @@ class LoanDataHelper extends Data
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    /** @return array<string, mixed>|null */
     public function getLoan(int $id): ?array
     {
         $base = $this->loanSelectBase();
@@ -202,7 +212,10 @@ class LoanDataHelper extends Data
         return max(0, (int)$item['Quantity'] - $used);
     }
 
-    /** Crée ou met à jour un prêt. Retourne l'Id. */
+    /**
+     * Crée ou met à jour un prêt. Retourne l'Id.
+     * @param array<string, mixed> $data
+     */
     public function saveLoan(array $data): int
     {
         $id         = (int)($data['id'] ?? 0);
@@ -302,6 +315,7 @@ class LoanDataHelper extends Data
 				JOIN   Person   p  ON p.Id  = res.UserId";
     }
 
+    /** @return array<int, array<string, mixed>> */
     public function getAllReservations(int $userId = 0): array
     {
         $base = $this->reservationSelectBase();
@@ -318,6 +332,7 @@ class LoanDataHelper extends Data
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    /** @return array<string, mixed>|null */
     public function getReservation(int $id): ?array
     {
         $base = $this->reservationSelectBase();
@@ -368,7 +383,10 @@ class LoanDataHelper extends Data
         return max(0, (int)$item['Quantity'] - $used);
     }
 
-    /** Crée ou met à jour une réservation. Retourne l'Id. */
+    /**
+     * Crée ou met à jour une réservation. Retourne l'Id.
+     * @param array<string, mixed> $data
+     */
     public function saveReservation(array $data): int
     {
         $id     = (int)($data['id'] ?? 0);
@@ -437,7 +455,10 @@ class LoanDataHelper extends Data
     // CALENDRIER
     // ══════════════════════════════════════════════════════════════════════════
 
-    /** Retourne les événements FullCalendar pour la période [start, end]. */
+    /**
+     * Retourne les événements FullCalendar pour la période [start, end].
+     * @return array<int, array<string, mixed>>
+     */
     public function getCalendarEvents(string $start, string $end): array
     {
         $events = [];
@@ -513,7 +534,10 @@ class LoanDataHelper extends Data
     // UTILITAIRES
     // ══════════════════════════════════════════════════════════════════════════
 
-    /** Retourne toutes les personnes (pour les selects borrower/lender/user). */
+    /**
+     * Retourne toutes les personnes (pour les selects borrower/lender/user).
+     * @return array<int, array<string, mixed>>
+     */
     public function getAllPersons(): array
     {
         $stmt = $this->pdo->query(

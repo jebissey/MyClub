@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\models;
 
 use PDO;
+use stdClass;
 use app\exceptions\QueryException;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
@@ -51,6 +52,9 @@ class SurveyDataHelper extends Data implements NewsProviderInterface
         return $stmt->fetch(PDO::FETCH_OBJ);
     }
 
+    /**
+     * @return array<int, stdClass>
+     */
     public function getPendingSurveyResponses(): array
     {
         $query = "
@@ -80,6 +84,17 @@ class SurveyDataHelper extends Data implements NewsProviderInterface
         return $this->pdo->query($query)->fetchAll(PDO::FETCH_OBJ);
     }
 
+    /**
+     * @return array<int, array{
+     *     type: string,
+     *     id: int,
+     *     title: string,
+     *     detail: string,
+     *     from: string,
+     *     date: string,
+     *     url: string
+     * }>
+     */
     public function getNews(ConnectedUser $connectedUser, string $searchFrom): array
     {
         $news = [];
@@ -136,6 +151,9 @@ class SurveyDataHelper extends Data implements NewsProviderInterface
         return $news;
     }
 
+    /**
+     * @return array<int, stdClass>
+     */
     public function getRepliesForActivePersons(int $surveyId): array
     {
         $sql = "

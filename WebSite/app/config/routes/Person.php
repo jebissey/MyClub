@@ -10,12 +10,18 @@ use app\valueObjects\Route;
 
 class Person implements RouteInterface
 {
+    /**
+     * @var array<int, Route>
+     */
     private array $routes = [];
 
     public function __construct(private ControllerFactory $controllerFactory)
     {
     }
 
+    /**
+     * @return array<int, Route>
+     */
     public function get(): array
     {
         $personController = fn() => $this->controllerFactory->makePersonController();

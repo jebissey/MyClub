@@ -10,6 +10,7 @@ use app\helpers\TranslationManager;
 
 class LanguagesDataHelper extends Data
 {
+    /** @var array<int, string> */
     private array $allowedLanguages = [];
     private string $defaultLanguage = 'fr_FR';
 
@@ -44,11 +45,17 @@ class LanguagesDataHelper extends Data
 
     #region Public - Translator screen
 
+    /**
+     * @return array<int, string>
+     */
     public function getAllowedLanguages(): array
     {
         return $this->allowedLanguages;
     }
 
+    /**
+     * @return array<int, object{Id: int, Name: string, ref_value: string|null, target_value: string|null}>
+     */
     public function getTranslations(
         string $referenceLang,
         string $targetLang,
@@ -124,6 +131,7 @@ class LanguagesDataHelper extends Data
     private function initializeLanguages(): void
     {
         $stmt = $this->pdo->query("PRAGMA table_info(Languages)");
+        /** @var array<int, array{name: string}> $columns */
         $columns = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         $this->allowedLanguages = [];

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\models;
 
 use PDO;
+use stdClass;
 use app\helpers\Application;
 
 class ParticipantDataHelper extends Data
@@ -14,6 +15,7 @@ class ParticipantDataHelper extends Data
         parent::__construct($application);
     }
 
+    /** @return array<int, stdClass> */
     public function getEventParticipants(int $eventId): array
     {
         $sql = "
@@ -38,6 +40,10 @@ class ParticipantDataHelper extends Data
         return $stmt->fetchAll(PDO::FETCH_OBJ);
     }
 
+    /**
+     * @param array{start: string, end: string} $season
+     * @return array<string, int>
+     */
     public function getParticipations(array $season): array
     {
         $query = $this->pdo->prepare("
@@ -57,6 +63,7 @@ class ParticipantDataHelper extends Data
         return $query->fetchAll(PDO::FETCH_KEY_PAIR);
     }
 
+    /** @return array{connections: array<int, array<string, mixed>>, maxEvents: int} */
     public function getConnections(int $idPerson): array
     {
         $stmt = $this->pdo->prepare("

@@ -10,12 +10,18 @@ use app\valueObjects\Route;
 
 class CarouselApi implements RouteInterface
 {
+    /**
+     * @var array<int, Route>
+     */
     private array $routes = [];
 
     public function __construct(private ApiFactory $apiFactory)
     {
     }
 
+    /**
+     * @return array<int, Route>
+     */
     public function get(): array
     {
         $carouselApi = fn() => $this->apiFactory->makeCarouselApi();

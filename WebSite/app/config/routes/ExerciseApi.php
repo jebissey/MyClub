@@ -10,12 +10,18 @@ use app\valueObjects\Route;
 
 class ExerciseApi implements RouteInterface
 {
+    /**
+     * @var array<int, Route>
+     */
     private array $routes = [];
 
     public function __construct(private ApiFactory $apiFactory)
     {
     }
 
+    /**
+     * @return array<int, Route>
+     */
     public function get(): array
     {
         $api = fn() => $this->apiFactory->makeExerciseApi();
