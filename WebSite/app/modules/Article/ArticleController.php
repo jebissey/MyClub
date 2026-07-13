@@ -22,6 +22,7 @@ use app\models\LogDataHelper;
 use app\models\MessageDataHelper;
 use app\models\PersonDataHelper;
 use app\modules\Article\services\ArticleAuthorizationService;
+use app\modules\Article\viewModels\ArticleShowViewModel;
 use app\modules\Common\TableController;
 use app\modules\Common\services\ArticleService;
 use app\modules\Common\services\EmailService;
@@ -498,30 +499,47 @@ class ArticleController extends TableController
             $article = $this->articleDataHelper->getLatestArticle([$id]);
             [$message, $messageType] = MessageService::get();
 
-            $this->render('Article/views/article_show.latte', $this->getAllParams([
-                'article' => $article,
-                'groups' => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
-                'hasSurvey' => $this->dataHelper->get('Survey', ['IdArticle' => $id], 'ClosingDate'),
-                'hasOrder' => $this->dataHelper->get('Order', ['IdArticle' => $id], 'ClosingDate'),
-                'id' => $id,
-                'userConnected' => $connectedUser->person ?? false,
-                'navItems' => $this->getNavItems($connectedUser->person),
-                'publishedBy' => $article->PublishedBy && $article->PublishedBy != $article->CreatedBy
+            // 1. Grab everything generated globally by the framework infrastructure
+            $dynamicContext = $this->getAllParams([]);
+
+            // 2. Map explicitly to our object model
+            $viewModel = new ArticleShowViewModel(
+                // View specific
+                id: $id,
+                article: $article,
+                groups: $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
+                hasSurvey: $this->dataHelper->get('Survey', ['IdArticle' => $id], 'ClosingDate') ?: null,
+                hasOrder: $this->dataHelper->get('Order', ['IdArticle' => $id], 'ClosingDate') ?: null,
+                userConnected: $connectedUser->person !== null,
+                userEmail: $context['userEmail'] ?? null,
+                navItems: $this->getNavItems($connectedUser->person),
+                publishedBy: $article->PublishedBy && $article->PublishedBy != $article->CreatedBy
                     ? $this->personDataHelper->getPublisher($article->PublishedBy) : '',
-                'canReadPool' => $this->authorizationDataHelper->canPersonReadSurveyResults($article, $connectedUser),
-                'canReadOrder' => $this->authorizationDataHelper->canPersonReadOrderResults($article, $connectedUser),
-                'carouselItems' => $this->dataHelper->gets('Carousel', ['IdArticle' => $id]),
-                'page' => $connectedUser->getPage(),
-                'countOfMessages' => count($this->dataHelper->gets('Message', [
-                    '"From"' => 'User',
-                    'ArticleId' => $id
-                ])),
-                'isCreator' => $connectedUser->person !== null && $connectedUser->person->Id === $article->CreatedBy,
-                'message' => $message,
-                'messageType' => $messageType,
-                'btn_HistoryBack' => true,
-                'btn_Parent'      => "/articles",
-            ]));
+                canReadPool: $this->authorizationDataHelper->canPersonReadSurveyResults($article, $connectedUser),
+                canReadOrder: $this->authorizationDataHelper->canPersonReadOrderResults($article, $connectedUser),
+                carouselItems: $this->dataHelper->gets('Carousel', ['IdArticle' => $id]),
+                page: $connectedUser->getPage(),
+                countOfMessages: count($this->dataHelper->gets('Message', ['"From"' => 'User', 'ArticleId' => $id])),
+                isCreator: $connectedUser->person !== null && $connectedUser->person->Id === $article->CreatedBy,
+                isMember: $connectedUser->person !== null,
+                isEditor: $connectedUser->isEditor(),
+                message: $message,
+                messageType: $messageType,
+
+                // Layout properties mapped safely from framework state
+                navbarInkColor: $dynamicContext['navbarInkColor'] ?? '#ffffff',
+                navbarIconColor: $dynamicContext['navbarIconColor'] ?? '#000000',
+                navbarBgColor: $dynamicContext['navbarBgColor'] ?? '#343a40',
+                productionSiteUrl: $dynamicContext['productionSiteUrl'] ?? null,
+                memberAlert: $dynamicContext['memberAlert'] ?? null,
+                btn_HistoryBack: true,
+                btn_Parent: '/articles',
+
+                // Retain anything else just in case
+                //allParams: $dynamicContext
+            );
+
+            $this->render('Article/views/article_show.latte', $viewModel->toArray());
         } catch (QueryException $e) {
             $this->raiseBadRequest($e->getMessage(), $e->getFile(), $e->getLine());
         }
