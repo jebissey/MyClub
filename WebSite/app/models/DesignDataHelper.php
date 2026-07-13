@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\models;
 
 use PDO;
+use stdClass;
 use app\helpers\Application;
 
 class DesignDataHelper extends Data
@@ -14,7 +15,10 @@ class DesignDataHelper extends Data
         parent::__construct($application);
     }
 
-    public function insertOrUpdate($data, int $personId): void
+    /**
+     * @param array{designId?: int|string, vote?: string} $data
+     */
+    public function insertOrUpdate(array $data, int $personId): void
     {
         $designId = (int)($data['designId'] ?? 0);
         $userId = $personId;
@@ -39,7 +43,10 @@ class DesignDataHelper extends Data
         }
     }
 
-    public function getUsersVotes(int $personId)
+    /**
+     * @return array{0: array<int, stdClass>, 1: array<int, string>}
+     */
+    public function getUsersVotes(int $personId): array
     {
         $query = "SELECT d.Id, d.Name, d.Detail, d.NavBar, d.Status, d.OnlyForMembers, d.IdGroup, 
             p.FirstName || ' ' || p.LastName || CASE WHEN p.NickName IS NOT NULL AND p.NickName != '' 
@@ -72,7 +79,10 @@ class DesignDataHelper extends Data
         return [$designs, $userVotes];
     }
 
-    public function getPendingDesignResponses()
+    /**
+     * @return array<int, stdClass>
+     */
+    public function getPendingDesignResponses(): array
     {
         $query = "
         SELECT 

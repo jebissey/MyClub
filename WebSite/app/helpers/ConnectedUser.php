@@ -14,6 +14,7 @@ use app\models\MetadataDataHelper;
 
 class ConnectedUser
 {
+    /** @var array<int, string> */
     private array $authorizations;
     private DataHelper $dataHelper;
     private AuthorizationDataHelper $authorizationDataHelper;

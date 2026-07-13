@@ -4,12 +4,20 @@ declare(strict_types=1);
 
 namespace app\helpers;
 
+use app\interfaces\NewsProviderInterface;
+
 class News
 {
+    /**
+     * @param array<int, NewsProviderInterface> $providers
+     */
     public function __construct(private array $providers)
     {
     }
 
+    /**
+     * @return array<int, mixed>
+     */
     public function getNewsForPerson(ConnectedUser $connectedUser, string $searchFrom): array
     {
         $news = [];

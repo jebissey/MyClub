@@ -10,6 +10,7 @@ class GravatarHandler
     private int $size = 48;
     private string $rating = 'g';
 
+    /** @var array<string, bool> */
     private array $existenceCache = [];
 
     public function getGravatar(string $email, bool $useGravatar): string

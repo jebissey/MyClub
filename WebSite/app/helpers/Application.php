@@ -35,7 +35,10 @@ class Application
     ];
 
     private static self $instance;
+
+    /** @var Engine<object> */
     private static Engine $flight;
+
     private static LatteEngine $latte;
     public static string $root;
 
@@ -87,6 +90,9 @@ class Application
         return $this->connectedUser;
     }
 
+    /**
+     * @return Engine<object>
+     */
     public function getFlight(): Engine
     {
         return self::$flight;
@@ -112,6 +118,10 @@ class Application
         return $this->errorManager;
     }
 
+    /**
+     * @param class-string $enumClass
+     * @return array<int, int|string>
+     */
     public function enumToValues(string $enumClass): array
     {
         return array_map(fn($case) => $case->value, $enumClass::cases());

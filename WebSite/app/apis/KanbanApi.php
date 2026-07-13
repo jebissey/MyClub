@@ -507,7 +507,7 @@ class KanbanApi extends AbstractApi
         }
     }
 
-    public function getProjectCardTypes(int $id)
+    public function getProjectCardTypes(int $id): void
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
             $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);

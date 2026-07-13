@@ -15,7 +15,10 @@ class EventTypeDataHelper extends Data
         parent::__construct($application);
     }
 
-    public function getsFor($personId): array
+    /**
+     * @return list<object>
+     */
+    public function getsFor(int $personId): array
     {
         $query = $this->pdo->prepare("
             SELECT et.*
@@ -35,6 +38,9 @@ class EventTypeDataHelper extends Data
         return $query->fetchAll(PDO::FETCH_OBJ);
     }
 
+    /**
+     * @param list<int> $attributes
+     */
     public function update(int $id, string $name, ?int $idGroup, array $attributes): void
     {
         $this->pdo->beginTransaction();

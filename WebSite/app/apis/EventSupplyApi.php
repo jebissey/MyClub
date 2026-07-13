@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\apis;
 
 use InvalidArgumentException;
+use stdClass;
 use Throwable;
 use app\enums\ApplicationError;
 use app\enums\FilterInputRule;
@@ -28,35 +29,6 @@ class EventSupplyApi extends AbstractApi
         PersonDataHelper $personDataHelper
     ) {
         parent::__construct($application, $connectedUser, $dataHelper, $personDataHelper);
-    }
-
-    public function updateSupply(): void
-    {
-        if ($this->application->getConnectedUser()->person === null) {
-            $this->renderJsonForbidden(__FILE__, __LINE__);
-            return;
-        }
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
-        try {
-            $input = $this->getJsonInput();
-            $this->validateSupplyData($input);
-            $apiResponse = $this->doUpdateSupply(
-                (int)$input['eventId'],
-                $this->application->getConnectedUser()->person->Email,
-                (int)$input['needId'],
-                intval($input['supply'])
-            );
-            $this->renderJson($apiResponse->data, $apiResponse->success, $apiResponse->responseCode);
-        } catch (QueryException $e) {
-            $this->renderJsonBadRequest($e->getMessage(), $e->getFile(), $e->getLine());
-        } catch (UnauthorizedAccessException $e) {
-            $this->renderJsonForbidden($e->getFile(), $e->getLine());
-        } catch (Throwable $e) {
-            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
-        }
     }
 
     public function participantsSupplies(): void
@@ -95,17 +67,36 @@ class EventSupplyApi extends AbstractApi
         }
     }
 
-    #region Private functions
-    private function validateSupplyData(array $data): void
+    public function updateSupply(): void
     {
-        $eventId = $data['eventId'] ?? null;
-        $needId = $data['needId'] ?? null;
-        $supply = intval($data['supply'] ?? 0);
-
-        if (!$eventId || !$needId || $supply < 0) {
-            throw new InvalidArgumentException("Invalid parameters");
+        if ($this->application->getConnectedUser()->person === null) {
+            $this->renderJsonForbidden(__FILE__, __LINE__);
+            return;
+        }
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
+            return;
+        }
+        try {
+            $input = $this->getJsonInput();
+            $this->validateSupplyData($input);
+            $apiResponse = $this->doUpdateSupply(
+                (int)$input['eventId'],
+                $this->application->getConnectedUser()->person->Email,
+                (int)$input['needId'],
+                intval($input['supply'])
+            );
+            $this->renderJson($apiResponse->data, $apiResponse->success, $apiResponse->responseCode);
+        } catch (QueryException $e) {
+            $this->renderJsonBadRequest($e->getMessage(), $e->getFile(), $e->getLine());
+        } catch (UnauthorizedAccessException $e) {
+            $this->renderJsonForbidden($e->getFile(), $e->getLine());
+        } catch (Throwable $e) {
+            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
         }
     }
+
+    #region Private functions
 
     private function doUpdateSupply(int $eventId, string $userEmail, int $needId, int $supply): ApiResponse
     {
@@ -123,6 +114,10 @@ class EventSupplyApi extends AbstractApi
         return new ApiResponse(true, ApplicationError::Ok->value, ['updatedNeed' => $updatedNeed], 'Apport mis à jour avec succès');
     }
 
+    /**
+     * @param array<int, stdClass> $eventNeeds
+     * @return array{id: int, providedQuantity: int|float, requiredQuantity: int|float, percentage: int|float}|null
+     */
     private function findUpdatedNeed(array $eventNeeds, int $needId): ?array
     {
         foreach ($eventNeeds as $need) {
@@ -138,5 +133,19 @@ class EventSupplyApi extends AbstractApi
             }
         }
         return null;
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    private function validateSupplyData(array $data): void
+    {
+        $eventId = $data['eventId'] ?? null;
+        $needId = $data['needId'] ?? null;
+        $supply = intval($data['supply'] ?? 0);
+
+        if (!$eventId || !$needId || $supply < 0) {
+            throw new InvalidArgumentException("Invalid parameters");
+        }
     }
 }

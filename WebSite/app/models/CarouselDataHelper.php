@@ -14,6 +14,9 @@ class CarouselDataHelper extends Data
         parent::__construct($application);
     }
 
+    /**
+     * @param array{id?: int|string, idArticle: int|string} $data
+     */
     public function addOrUpdate(array $data, string $item): string
     {
         if (!empty($data['id'])) {
@@ -31,7 +34,10 @@ class CarouselDataHelper extends Data
         }
     }
 
-
+    /**
+     * @param array<int, string> $paths
+     * @return array<string, bool>
+     */
     public function getPathsUsedInGalery(array $paths): array
     {
         if (empty($paths)) {

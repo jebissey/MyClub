@@ -29,18 +29,28 @@ abstract class AbstractApi
         $this->logDataWriterHelper = new LogDataWriterHelper($application);
     }
 
+    /**
+     * @return array<string, mixed>
+     *
+     * @throws JsonException
+     */
     protected function getJsonInput(): array
     {
         $json = file_get_contents('php://input');
-        return json_decode($json, true) ?? [];
+
+        /** @var array<string, mixed> */
+        return json_decode($json, true, 512, JSON_THROW_ON_ERROR);
     }
 
+    /**
+     * @param array<string, mixed> $data
+     */
     protected function renderJson(array $data, bool $success, int $statusCode, string $message = ''): void
     {
         $response = [
             'success' => $success,
             'message' => $message,
-            'data'    => $data,
+            'data' => $data,
         ];
 
         try {
@@ -49,7 +59,7 @@ abstract class AbstractApi
             $json = json_encode([
                 'success' => false,
                 'message' => 'JSON encoding error: ' . $e->getMessage(),
-                'data'    => [],
+                'data' => [],
             ], JSON_THROW_ON_ERROR);
         }
 
@@ -59,7 +69,7 @@ abstract class AbstractApi
             ->write($json)
             ->send();
 
-        $this->logDataWriterHelper->add((string)$statusCode, $message);
+        $this->logDataWriterHelper->add((string) $statusCode, $message);
         exit;
     }
 
@@ -73,6 +83,9 @@ abstract class AbstractApi
         );
     }
 
+    /**
+     * @param array<string, mixed> $data
+     */
     protected function renderJsonCreated(array $data = [], string $message = 'Created'): void
     {
         $this->renderJson(
@@ -87,6 +100,7 @@ abstract class AbstractApi
     {
         Flight::set('code', $statusCode);
         Flight::set('message', $message);
+
         $this->renderJson(
             [],
             false,
@@ -115,6 +129,9 @@ abstract class AbstractApi
         );
     }
 
+    /**
+     * @param array<string, mixed>|array<int, array<string, mixed>>|array<int, mixed> $data
+     */
     protected function renderJsonOk(array $data = [], string $message = 'OK'): void
     {
         $this->renderJson(
@@ -125,32 +142,48 @@ abstract class AbstractApi
         );
     }
 
+    /**
+     * @param array<string, mixed> $params
+     */
     protected function renderPartial(string $template, array $params = []): void
     {
         $this->latte->render($template, $params);
     }
 
-    protected function userIsAllowedAndMethodIsGood(string $method, callable $permissionCheck, string $file, int $line): bool
-    {
+    protected function userIsAllowedAndMethodIsGood(
+        string $method,
+        callable $permissionCheck,
+        string $file,
+        int $line
+    ): bool {
         $user = $this->application->getConnectedUser();
+
         if ($user->person === null || !$permissionCheck($user)) {
             $this->renderJsonForbidden($file, $line);
             return false;
         }
+
         if ($_SERVER['REQUEST_METHOD'] !== $method) {
             $this->renderJsonMethodNotAllowed($file, $line);
             return false;
         }
+
         return true;
     }
 
+    /**
+     * @param object|array<string, mixed> $params
+     */
     protected function render(string $templateLatteName, object|array $params = []): void
     {
         $content = $this->latte->renderToString($templateLatteName, $params);
+
         echo $content;
-        if (ob_get_level()) {
+
+        if (ob_get_level() > 0) {
             ob_end_flush();
         }
+
         flush();
         Flight::stop();
     }

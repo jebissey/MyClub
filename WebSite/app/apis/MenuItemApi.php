@@ -25,7 +25,7 @@ class MenuItemApi extends AbstractApi
         parent::__construct($application, $connectedUser, $dataHelper, $personDataHelper);
     }
 
-    public function deleteItem(int $id)
+    public function deleteItem(int $id): void
     {
         if (!$this->application->getConnectedUser()->isMenuDesigner()) {
             $this->renderJsonForbidden(__FILE__, __LINE__);
@@ -87,7 +87,7 @@ class MenuItemApi extends AbstractApi
         }
     }
 
-    public function updatePositions()
+    public function updatePositions(): void
     {
         if (!$this->application->getConnectedUser()->isMenuDesigner()) {
             $this->renderJsonForbidden(__FILE__, __LINE__);

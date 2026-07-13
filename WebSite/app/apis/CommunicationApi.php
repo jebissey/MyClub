@@ -199,6 +199,16 @@ class CommunicationApi extends AbstractApi
     }
 
     #region Private methods
+    /**
+     * @return array{
+     *     dailySent: int,
+     *     dailyLimit: ?int,
+     *     dailyRemaining: ?int,
+     *     monthlySent: int,
+     *     monthlyLimit: ?int,
+     *     monthlyRemaining: ?int
+     * }
+     */
     private function buildQuotaStats(): array
     {
         $dailySent   = $this->quotaTracker?->getDailySent() ?? 0;

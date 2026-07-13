@@ -20,7 +20,7 @@ class ImportApi extends AbstractApi
         parent::__construct($application, $connectedUser, $dataHelper, $personDataHelper);
     }
 
-    public function getHeadersFromCSV()
+    public function getHeadersFromCSV(): void
     {
         if (!$this->application->getConnectedUser()->isPersonManager()) {
             $this->renderJsonForbidden(__FILE__, __LINE__);
@@ -34,7 +34,10 @@ class ImportApi extends AbstractApi
     }
 
     #region Private functions
-    private function doGetHeadersFromCSV(int $headerRow)
+    /**
+     * @return array{error: string}|array{headers: array<int, string|null>}
+     */
+    private function doGetHeadersFromCSV(int $headerRow): array
     {
         if (!isset($_FILES['csvFile']) || $_FILES['csvFile']['error'] != 0) {
             return ['error' => 'Fichier non valide'];

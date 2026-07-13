@@ -53,7 +53,7 @@ class EventApi extends AbstractApi
             try {
                 $this->eventDataHelper->removeParticipant($id, $this->authService->getUserId());
                 $apiResponse = new ApiResponse(true, ApplicationError::Ok->value);
-                $this->renderJson([$apiResponse->data], $apiResponse->success, $apiResponse->responseCode);
+                $this->renderJson($apiResponse->data, $apiResponse->success, $apiResponse->responseCode);
             } catch (Throwable $e) {
                 $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
             }
@@ -119,7 +119,7 @@ class EventApi extends AbstractApi
         }
     }
 
-    public function sendEmails()
+    public function sendEmails(): void
     {
         if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isEventManager(), __FILE__, __LINE__)) {
             $data = $this->getJsonInput();
@@ -131,7 +131,7 @@ class EventApi extends AbstractApi
             try {
                 $event = $this->eventDataHelper->getEvent((int)$eventId);
                 $apiResponse = $this->sendEventEmails($event, $data['Title'] ?? '', $data['Body'] ?? '', $data['Recipients'] ?? '');
-                $this->renderJson([$apiResponse->data], $apiResponse->success, $apiResponse->responseCode, $apiResponse->message);
+                $this->renderJson($apiResponse->data, $apiResponse->success, $apiResponse->responseCode, $apiResponse->message);
             } catch (QueryException $e) {
                 $this->renderJsonError($e->getMessage(), ApplicationError::BadRequest->value, $e->getFile(), $e->getLine());
             } catch (Throwable $e) {

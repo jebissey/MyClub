@@ -19,6 +19,7 @@ class WebmasterApi extends AbstractApi
 {
     private const SERVICE = 'vapid';
 
+    /** @var array{subject: string, publicKey: string, privateKey: string} */
     private array $vapid;
 
     public function __construct(

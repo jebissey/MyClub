@@ -6,8 +6,10 @@ namespace app\helpers;
 
 class LogMessage
 {
-    private static $instance = null;
+    private static ?self $instance = null;
     private ?string $code;
+
+    /** @var array<int, string> */
     private array $messages = [];
     private string $separator;
 

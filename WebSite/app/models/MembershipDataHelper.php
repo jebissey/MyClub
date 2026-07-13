@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\models;
 
 use app\helpers\Application;
+use stdClass;
 
 class MembershipDataHelper extends Data
 {
@@ -43,7 +44,11 @@ class MembershipDataHelper extends Data
         ]);
     }
 
-    /** Returns all memberships for a person, most recent first. */
+    /**
+     * Returns all memberships for a person, most recent first.
+     *
+     * @return array<int, stdClass>
+     */
     public function getAllForPerson(int $personId): array
     {
         return $this->query(
@@ -133,6 +138,9 @@ class MembershipDataHelper extends Data
         return (int)$this->getSetting('Membership_Amount', '1234567');
     }
 
+    /**
+     * @return array{orgSlug: string, formSlug: string}
+     */
     public function getHelloAssoConfig(): array
     {
         return [

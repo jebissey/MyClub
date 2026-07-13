@@ -21,6 +21,7 @@ use app\models\PersonDataHelper;
 use app\modules\Common\services\MessageRecipientService;
 use app\valueObjects\ApiResponse;
 use app\valueObjects\MessageContext;
+use app\valueObjects\UploadedFileInput;
 
 use function imagecreatefromstring;
 use function imagesx;
@@ -157,9 +158,9 @@ class MessageApi extends AbstractApi
 
             $this->renderJson(
                 [],
-                $result['success'],
-                $result['success'] ? 200 : 400,
-                $result['message']
+                $result->success,
+                $result->success ? 200 : 400,
+                $result->message
             );
         } catch (Throwable $e) {
             $this->renderJsonError(
@@ -380,17 +381,17 @@ class MessageApi extends AbstractApi
         };
         $filename = ($originalName !== '' ? pathinfo($originalName, PATHINFO_FILENAME) : bin2hex(random_bytes(8)))
             . '.' . $extension;
-        $fakeFile = [
-            'name'     => $filename,
-            'type'     => $mime,
-            'tmp_name' => $tmpPath,
-            'error'    => UPLOAD_ERR_OK,
-            'size'     => strlen($binary),
-        ];
+
+        $uploadedFile = new UploadedFileInput(
+            name: $filename,
+            tmpName: $tmpPath,
+            size: strlen($binary),
+            type: $mime,
+        );
 
         try {
-            $result = $this->mediaManager->uploadFile($fakeFile);
-            return $result['file']['path'] ?? $result['file']['url'] ?? null;
+            $result = $this->mediaManager->uploadFile($uploadedFile);
+            return $result->file->path;
         } finally {
             if (file_exists($tmpPath)) {
                 unlink($tmpPath);

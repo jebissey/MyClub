@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\models;
 
 use PDO;
+use stdClass;
 use app\helpers\Application;
 
 class ArwardsDataHelper extends Data
@@ -14,7 +15,11 @@ class ArwardsDataHelper extends Data
         parent::__construct($application);
     }
 
-    public function getData($counterNames)
+    /**
+     * @param array<int, string> $counterNames
+     * @return array<int, array{name: string, counters: array<string, int|float>, total: int|float}>
+     */
+    public function getData(array $counterNames): array
     {
         $query = $this->pdo->query('
             SELECT 
@@ -30,7 +35,8 @@ class ArwardsDataHelper extends Data
             GROUP BY p.Id, p.FirstName, p.LastName, p.NickName, c.Name
             HAVING Total > 0
             ORDER BY Total DESC');
-        $results =  $query->fetchAll(PDO::FETCH_OBJ);
+        /** @var array<int, stdClass> $results */
+        $results = $query->fetchAll(PDO::FETCH_OBJ);
         $data = [];
         foreach ($results as $row) {
             $personId = $row->Id;
@@ -53,9 +59,13 @@ class ArwardsDataHelper extends Data
         return $data;
     }
 
-    public function getCounterNames()
+    /**
+     * @return array<int, string>
+     */
+    public function getCounterNames(): array
     {
         $query = $this->pdo->query('SELECT DISTINCT Name FROM Counter ORDER BY Name');
-        return array_column($query->fetchAll(), 'Name');
+        /** @var array<int, string> */
+        return array_column($query->fetchAll(PDO::FETCH_ASSOC), 'Name');
     }
 }

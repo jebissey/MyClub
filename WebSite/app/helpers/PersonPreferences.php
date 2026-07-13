@@ -8,6 +8,10 @@ use DateTime;
 
 class PersonPreferences
 {
+    /**
+     * @param array<int, array<string, mixed>> $events
+     * @return array<int, array<string, mixed>>
+     */
     public function filterEventsByPreferences(array $events, ?object $person): array
     {
         if ($person === null || empty($person->Preferences)) {

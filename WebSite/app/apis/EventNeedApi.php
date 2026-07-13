@@ -78,6 +78,15 @@ class EventNeedApi extends AbstractApi
     }
 
     #region Private functions
+    /**
+     * @param array{
+     *     id: int|null,
+     *     label?: string,
+     *     name?: string,
+     *     idNeedType?: int,
+     *     participantDependent?: int|numeric-string
+     * } $data
+     */
     private function doSaveNeed(array $data): ApiResponse
     {
         if (empty($data['label'])) {

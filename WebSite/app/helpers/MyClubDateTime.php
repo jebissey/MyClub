@@ -44,6 +44,9 @@ class MyClubDateTime
         return $datetime->format('d/m/Y H:i');
     }
 
+    /**
+     * @return array{0: DateTime, 1: DateTime}
+     */
     public static function getPeriodStartEnd(string $period, DateTime $date): array
     {
         $startDate = clone $date;

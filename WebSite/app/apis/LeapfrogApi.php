@@ -23,7 +23,7 @@ class LeapFrogApi extends AbstractApi
         parent::__construct($application, $connectedUser, $dataHelper, $personDataHelper);
     }
 
-    public function logMovement()
+    public function logMovement(): void
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);

@@ -25,6 +25,10 @@ class NotificationSender
         $this->vapidPrivateKey = $credentials->get(self::SERVICE, 'privateKey');
     }
 
+    /**
+     * @param array<int, int> $recipients
+     * @param array<string, mixed> $notificationData
+     */
     public function sendToRecipients(array $recipients, array $notificationData, ?string $excludeEndpoint = null): void
     {
         if (!$this->vapidPublicKey || !$this->vapidPrivateKey) {
