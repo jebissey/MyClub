@@ -21,12 +21,14 @@ abstract readonly class LayoutViewModel
         public bool $btn_HistoryBack = true,
         public string $btn_Parent = '/articles',
         public array $allParams = []
-    ) {}
+    ) {
+    }
 
     /**
      * Merges structured properties with dynamic context parameters.
      * This ensures Latte receives 100% of the data without breaking layouts.
-     * * @return array<string, mixed>
+     *
+     * @return array<string, mixed>
      */
     public function toArray(): array
     {
@@ -34,7 +36,7 @@ abstract readonly class LayoutViewModel
         $output = $this->allParams;
 
         // Overlay all defined properties from this object and its children
-        foreach ((array)$this as $key => $value) {
+        foreach ((array) $this as $key => $value) {
             if ($key !== 'allParams') {
                 $output[$key] = $value;
             }

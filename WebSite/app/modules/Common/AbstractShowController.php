@@ -6,11 +6,12 @@ namespace app\modules\Common;
 
 use app\enums\ApplicationError;
 use app\enums\Period;
+use app\helpers\ConnectedUser;
 use app\helpers\WebApp;
 
 abstract class AbstractShowController extends AbstractController
 {
-    protected function requireConnectedPerson(): object|false
+    protected function requireConnectedPerson(): ConnectedUser|false
     {
         $connectedUser = $this->application->getConnectedUser();
         if (!($connectedUser->person ?? false)) {

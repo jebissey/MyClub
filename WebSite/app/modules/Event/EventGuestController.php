@@ -12,6 +12,7 @@ use app\helpers\WebApp;
 use app\models\EventDataHelper;
 use app\modules\Common\AbstractController;
 use app\modules\Common\services\EmailService;
+use app\valueObjects\ContactRow;
 use app\valueObjects\EmailMessage;
 
 class EventGuestController extends AbstractController
@@ -76,7 +77,8 @@ class EventGuestController extends AbstractController
             }
             $nickname = $input['nickname'] ?? '???';
             try {
-                $contact = $this->dataHelper->get('Contact', ['Email' => $email], 'Id, Token, NickName, TokenCreatedAt');
+                $contactData = $this->dataHelper->get('Contact', ['Email' => $email], 'Id, Token, NickName, TokenCreatedAt');
+                $contact = $contactData ? ContactRow::fromStdClass($contactData) : null;
                 if (!$contact) {
                     $token = bin2hex(random_bytes(32));
                     $contactId = $this->dataHelper->set('Contact', [

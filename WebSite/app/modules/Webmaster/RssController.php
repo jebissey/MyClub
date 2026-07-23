@@ -11,49 +11,11 @@ use app\helpers\WebApp;
 use app\models\ArticleDataHelper;
 use app\models\EventDataHelper;
 use app\modules\Common\AbstractController;
+use app\valueObjects\ArticleRow;
+use app\valueObjects\EventRow;
 
 /**
- * @phpstan-type ArticleRow object{
- *     Id: int,
- *     Title: string,
- *     Content: string|null,
- *     LastUpdate: string,
- *     CreationDate: string
- * }
- * @phpstan-type EventAttribute array{
- *     name: string,
- *     detail: string|null
- * }
- * @phpstan-type EventData array{
- *     id: int|string,
- *     summary: string,
- *     description: string|null,
- *     fullDateTime: string,
- *     duration: string|null,
- *     location: string|null,
- *     eventType: string|null,
- *     groupName: string|null,
- *     audience: string|null,
- *     attributes: EventAttribute[]
- * }
- * @phpstan-type RssEvent object{
- *     id: int|string,
- *     summary: string,
- *     description: string|null,
- *     fullDateTime: string,
- *     duration: string|null,
- *     location: string|null,
- *     eventType: string|null,
- *     groupName: string|null,
- *     audience: string|null,
- *     attributes: EventAttribute[]
- * }
- * @phpstan-type WeekData array{
- *     weekStart: string,
- *     weekEnd: string,
- *     weekStartFull: string,
- *     days: array<int, array<int, EventData>>
- * }
+ * @phpstan-import-type WeekData from EventDataHelper
  */
 class RssController extends AbstractController
 {
@@ -122,7 +84,7 @@ class RssController extends AbstractController
     }
 
     /**
-     * @param ArticleRow[] $articles
+     * @param list<ArticleRow> $articles
      */
     private function generateArticlesRSS(
         array $articles,
@@ -142,9 +104,13 @@ class RssController extends AbstractController
         $rss .= '<atom:link href="' . htmlspecialchars($feed_url, ENT_XML1, 'UTF-8') . '" rel="self" type="application/rss+xml" />';
 
         foreach ($articles as $article) {
-            $guid        = $site_url . 'article/' . $article->Id . '?v=' . strtotime($article->LastUpdate);
-            $description = $this->getFirstElement($article->Content ?? '');
-            $pubDate     = date(DATE_RSS, strtotime($article->LastUpdate));
+            $lastUpdateTimestamp = strtotime($article->LastUpdate);
+            if ($lastUpdateTimestamp === false) {
+                $lastUpdateTimestamp = time();
+            }
+            $guid        = $site_url . 'article/' . $article->Id . '?v=' . $lastUpdateTimestamp;
+            $description = $this->getFirstElement($article->Content);
+            $pubDate     = date(DATE_RSS, $lastUpdateTimestamp);
             $atomUpdated = (new DateTime($article->LastUpdate))->format(DateTime::ATOM);
 
             $rss .= '<item>';
@@ -165,26 +131,30 @@ class RssController extends AbstractController
 
     /**
      * @param array<string, WeekData> $weeklyEvents
-     * @return RssEvent[]
+     * @return list<EventRow>
      */
     private function flattenWeeklyEvents(array $weeklyEvents): array
     {
         $events = [];
+
         foreach ($weeklyEvents as $week) {
             foreach ($week['days'] as $day) {
                 foreach ($day as $event) {
-                    $events[] = (object)$event;
+                    $events[] = EventRow::fromArray($event);
                 }
             }
         }
-        usort($events, fn($a, $b) => strtotime($a->fullDateTime) - strtotime($b->fullDateTime));
+
+        usort(
+            $events,
+            static fn(EventRow $a, EventRow $b): int =>
+            strtotime($a->fullDateTime) <=> strtotime($b->fullDateTime)
+        );
+
         return $events;
     }
 
-    /**
-     * @param RssEvent $event
-     */
-    private function formatEventDescription(object $event): string
+    private function formatEventDescription(EventRow $event): string
     {
         $parts = [];
 
@@ -218,9 +188,9 @@ class RssController extends AbstractController
         if (!empty($event->attributes)) {
             $attrLines = ["🏷️ Informations complémentaires :"];
             foreach ($event->attributes as $attribute) {
-                $attrLine = "• " . $attribute['name'];
-                if (!empty($attribute['detail'])) {
-                    $attrLine .= " : " . $attribute['detail'];
+                $attrLine = "• " . $attribute->name;
+                if (!empty($attribute->detail)) {
+                    $attrLine .= " : " . $attribute->detail;
                 }
                 $attrLines[] = $attrLine;
             }
@@ -231,7 +201,7 @@ class RssController extends AbstractController
     }
 
     /**
-     * @param RssEvent[] $events
+     * @param list<EventRow> $events
      */
     private function generateEventsRSS(
         array $events,
@@ -243,37 +213,42 @@ class RssController extends AbstractController
         $rss  = '<?xml version="1.0" encoding="UTF-8"?>';
         $rss .= '<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:ev="http://purl.org/rss/1.0/modules/event/">';
         $rss .= '<channel>';
-        $rss .= '<title>'       . htmlspecialchars($site_title, ENT_XML1, 'UTF-8') . '</title>';
-        $rss .= '<link>'        . htmlspecialchars($site_url, ENT_XML1, 'UTF-8') . '</link>';
+        $rss .= '<title>' . htmlspecialchars($site_title, ENT_XML1, 'UTF-8') . '</title>';
+        $rss .= '<link>' . htmlspecialchars($site_url, ENT_XML1, 'UTF-8') . '</link>';
         $rss .= '<description>' . htmlspecialchars($feed_description, ENT_XML1, 'UTF-8') . '</description>';
         $rss .= '<language>fr-fr</language>';
         $rss .= '<lastBuildDate>' . date(DATE_RSS) . '</lastBuildDate>';
         $rss .= '<atom:link href="' . htmlspecialchars($feed_url, ENT_XML1, 'UTF-8') . '" rel="self" type="application/rss+xml" />';
 
         foreach ($events as $event) {
-            $event_url  = $site_url . 'contact/event/' . $event->id;
-            $description = $this->formatEventDescription($event);
+            $eventUrl = $site_url . 'contact/event/' . $event->id;
 
             $rss .= '<item>';
-            $rss .= '<title>'       . htmlspecialchars($event->summary, ENT_XML1, 'UTF-8') . '</title>';
-            $rss .= '<link>'        . htmlspecialchars($event_url, ENT_XML1, 'UTF-8') . '</link>';
-            $rss .= '<guid isPermaLink="true">' . htmlspecialchars($event_url, ENT_XML1, 'UTF-8') . '</guid>';
-            $rss .= '<pubDate>'     . date(DATE_RSS, strtotime($event->fullDateTime)) . '</pubDate>';
-            $rss .= '<description>' . htmlspecialchars($description, ENT_XML1, 'UTF-8') . '</description>';
+            $rss .= '<title>' . htmlspecialchars($event->summary, ENT_XML1, 'UTF-8') . '</title>';
+            $rss .= '<link>' . htmlspecialchars($eventUrl, ENT_XML1, 'UTF-8') . '</link>';
+            $rss .= '<guid isPermaLink="true">' . htmlspecialchars($eventUrl, ENT_XML1, 'UTF-8') . '</guid>';
+            $rss .= '<pubDate>' . (new DateTime($event->fullDateTime))->format(DATE_RSS) . '</pubDate>';
+            $rss .= '<description>' . htmlspecialchars(
+                $this->formatEventDescription($event),
+                ENT_XML1,
+                'UTF-8'
+            ) . '</description>';
 
-            if (!empty($event->eventType)) {
+            if ($event->eventType !== null && $event->eventType !== '') {
                 $rss .= '<category>' . htmlspecialchars($event->eventType, ENT_XML1, 'UTF-8') . '</category>';
             }
-            if (!empty($event->fullDateTime)) {
-                $rss .= '<ev:startdate>' . date('c', strtotime($event->fullDateTime)) . '</ev:startdate>';
-            }
-            if (!empty($event->fullDateTime) && !empty($event->duration)) {
+
+            $rss .= '<ev:startdate>' . (new DateTime($event->fullDateTime))->format('c') . '</ev:startdate>';
+
+            if ($event->duration !== null && $event->duration !== '') {
                 $endDateTime = $this->computeEndDateTime($event->fullDateTime, $event->duration);
+
                 if ($endDateTime !== null) {
                     $rss .= '<ev:enddate>' . $endDateTime->format('c') . '</ev:enddate>';
                 }
             }
-            if (!empty($event->location)) {
+
+            if ($event->location !== null && $event->location !== '') {
                 $rss .= '<ev:location>' . htmlspecialchars($event->location, ENT_XML1, 'UTF-8') . '</ev:location>';
             }
 

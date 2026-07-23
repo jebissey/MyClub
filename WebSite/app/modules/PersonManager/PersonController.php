@@ -13,7 +13,11 @@ use app\helpers\WebApp;
 use app\models\PersonDataHelper;
 use app\models\TableControllerDataHelper;
 use app\modules\Common\TableController;
+use app\valueObjects\Person;
 
+/**
+ * @phpstan-import-type PersonRow from Person
+ */
 class PersonController extends TableController
 {
     public function __construct(
@@ -50,16 +54,19 @@ class PersonController extends TableController
     public function edit(int $id): void
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isPersonManager(), __FILE__, __LINE__)) {
-            $person = $this->dataHelper->get('Person', ['Id' => $id], 'Id, Imported, Email, FirstName, LastName, Alert, MemberInfo');
-            if (!$person) {
+            $row = $this->dataHelper->get('Person', ['Id' => $id], 'Id, Imported, Email, FirstName, LastName, Alert, MemberInfo');
+            if (!$row) {
                 $this->raiseBadRequest("Unknown person {$id}", __FILE__, __LINE__);
                 return;
             }
+            /** @var PersonRow $row */
+            $person = Person::fromRow($row);
+
             $this->render('User/views/user_account.latte', $this->getAllParams([
-                'readOnly' => $person->Imported == 1 ? true : false,
-                'email' => $person->Email,
-                'firstName' => $person->FirstName,
-                'lastName' => $person->LastName,
+                'readOnly' => $person->Imported,
+                'email' => $person->Email ?? '',
+                'firstName' => $person->FirstName ?? '',
+                'lastName' => $person->LastName ?? '',
                 'alert' => $person->Alert ?? '',
                 'memberInfo' => $person->MemberInfo ?? '',
                 'isSelfEdit' => false,
@@ -78,11 +85,14 @@ class PersonController extends TableController
     public function editSave(int $id): void
     {
         if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isPersonManager(), __FILE__, __LINE__)) {
-            $person = $this->dataHelper->get('Person', ['Id' => $id], 'Id, Imported, Email, FirstName, LastName');
-            if (!$person) {
+            $row = $this->dataHelper->get('Person', ['Id' => $id], 'Id, Imported, Email, FirstName, LastName');
+            if (!$row) {
                 $this->raiseBadRequest("Unknown person {$id}", __FILE__, __LINE__);
                 return;
             }
+            /** @var PersonRow $row */
+            $person = Person::fromRow($row);
+
             $schema = [
                 'email'      => FilterInputRule::Email->value,
                 'firstName'  => FilterInputRule::PersonName->value,
@@ -97,26 +107,35 @@ class PersonController extends TableController
                 $this->raiseBadRequest("Missing email", __FILE__, __LINE__);
                 return;
             }
-            $existing = $this->dataHelper->get(
+            $existingRow = $this->dataHelper->get(
                 'Person',
                 ['Email' => $email],
                 'Id, FirstName, LastName, Inactivated'
             );
-            $isNewRecord = (
-                $existing !== false &&
-                $person->Email === '' &&
-                $person->FirstName === '' &&
-                $person->LastName === '' &&
-                $person->Imported == 0
-            );
-            $isDuplicate = $isNewRecord
-                ? $existing != null
-                : ($existing && $existing->Id !== $person->Id);
+
+            $isDuplicate = false;
+            $fullName = '';
+            $status = '';
+
+            if ($existingRow) {
+                /** @var PersonRow $existingRow */
+                $existing = Person::fromRow($existingRow);
+
+                $isNewRecord = (
+                    ($person->Email ?? '') === '' &&
+                    ($person->FirstName ?? '') === '' &&
+                    ($person->LastName ?? '') === '' &&
+                    !$person->Imported
+                );
+                $isDuplicate = $isNewRecord ? true : ($existing->Id !== $person->Id);
+
+                if ($isDuplicate) {
+                    $fullName = trim(($existing->FirstName ?? '') . ' ' . ($existing->LastName ?? ''));
+                    $status = $existing->Inactivated ? 'Disabled' : 'Active';
+                }
+            }
 
             if ($isDuplicate) {
-                $fullName = trim(($existing->FirstName ?? '') . ' ' . ($existing->LastName ?? ''));
-                $status = ($existing->Inactivated ?? 1) ? 'Disabled' : 'Active';
-
                 $message = ($this->t)('person.add.emailAlreadyExistsDetailed');
                 $message = str_replace(
                     ['{name}', '{status}', '{email}'],
@@ -146,7 +165,7 @@ class PersonController extends TableController
             );
 
             // Email is the sync key for imported records — never update it
-            if ($person->Imported == 0) {
+            if (!$person->Imported) {
                 $this->dataHelper->set('Person', ['Email' => $email], ['Id' => $person->Id]);
             }
 
@@ -230,9 +249,12 @@ class PersonController extends TableController
             ['field' => 'MemberInfo', 'label' => 'Informations sur le membre'],
         ];
 
+        /** @var list<string> $statusValues */
+        $statusValues = $this->application->enumToValues(PersonStatus::class);
+
         $status = WebApp::getFiltered(
             'status',
-            $this->application->enumToValues(PersonStatus::class),
+            $statusValues,
             $this->flight->request()->query->getData()
         ) ?: PersonStatus::Active->value;
         $data = match ($status) {

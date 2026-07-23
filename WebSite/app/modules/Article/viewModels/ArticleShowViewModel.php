@@ -6,6 +6,7 @@ namespace app\modules\Article\viewModels;
 
 use stdClass;
 use app\modules\Common\viewModels\LayoutViewModel;
+use app\valueObjects\ArticleRow;
 
 /**
  * Specific ViewModel for article_show.latte, extending the layout requirements.
@@ -13,21 +14,21 @@ use app\modules\Common\viewModels\LayoutViewModel;
 final readonly class ArticleShowViewModel extends LayoutViewModel
 {
     /**
-     * @param stdClass $article
-     * @param array<int, stdClass> $groups
-     * @param stdClass|null $hasSurvey
-     * @param stdClass|null $hasOrder
-     * @param array<int, stdClass> $carouselItems
-     * @param array<string, mixed> $navItems
+     * @param ArticleRow $article
+     * @param list<stdClass> $groups
+     * @param object|null $hasSurvey
+     * @param object|null $hasOrder
+     * @param list<stdClass> $carouselItems
+     * @param list<object> $navItems
      * @param array<string, mixed> $allParams
      */
     public function __construct(
         // 1. Core View Specific Properties
         public int $id,
-        public stdClass $article,
+        public ArticleRow $article,
         public array $groups,
-        public ?stdClass $hasSurvey,
-        public ?stdClass $hasOrder,
+        public ?object $hasSurvey,
+        public ?object $hasOrder,
         public bool $userConnected,
         public ?string $userEmail,
         public array $navItems,
@@ -42,7 +43,6 @@ final readonly class ArticleShowViewModel extends LayoutViewModel
         public bool $isEditor,
         public ?string $message,
         public ?string $messageType,
-
         // 2. Parent Layout Requirements (Forwarded to parent)
         string $navbarInkColor,
         string $navbarIconColor,

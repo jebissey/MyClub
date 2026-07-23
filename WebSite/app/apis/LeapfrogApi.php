@@ -11,7 +11,7 @@ use app\models\DataHelper;
 use app\models\LogDataWriterHelper;
 use app\models\PersonDataHelper;
 
-class LeapFrogApi extends AbstractApi
+class LeapfrogApi extends AbstractApi
 {
     public function __construct(
         Application $application,

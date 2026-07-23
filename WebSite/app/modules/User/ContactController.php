@@ -40,7 +40,8 @@ class ContactController extends AbstractController
             $event = null;
             if ($eventId !== null) {
                 $event = $this->dataHelper->get('Event', ['Id' => $eventId], 'Id, Summary, StartTime, Audience');
-                if (!$event || $event->Audience != EventAudience::ForAll->value) {
+                /** @var object{Id: int, Summary: string, StartTime: string, Audience: string}|false $event */
+                if (!$event || $event->Audience !== EventAudience::ForAll->value) {
                     $eventId = $event = null;
                 }
             }
@@ -113,7 +114,7 @@ class ContactController extends AbstractController
         }
 
         if (empty($errors)) {
-            $this->sendContactMessage($input, $eventId);
+            $this->sendContactMessage($name, $email, $message, $eventId);
         } else {
             $this->redirectWithErrors($errors, $name, $email, $message);
         }
@@ -163,6 +164,7 @@ class ContactController extends AbstractController
         $hash = md5($ip);
         $now  = time();
         $row  = $this->dataHelper->get('ContactRateLimit', ['ip_hash' => $hash], 'attempts, since');
+        /** @var object{attempts: int, since: int}|false $row */
 
         if (!$row || $now - $row->since > self::RATE_LIMIT_WINDOW) {
             $this->dataHelper->set('ContactRateLimit', [
@@ -181,10 +183,7 @@ class ContactController extends AbstractController
         return true;
     }
 
-    /**
-     * @param array{name?: string, email?: string, message?: string, eventId?: int|null} $input
-     */
-    private function sendContactMessage(array $input, ?int $eventId): void
+    private function sendContactMessage(string $name, string $email, string $message, ?int $eventId): void
     {
         $contactEmail = $this->dataHelper->get('Settings', ['Name' => 'contactEmail'], 'Value')->Value ?? '';
         if ($contactEmail === '') {
@@ -195,12 +194,9 @@ class ContactController extends AbstractController
             return;
         }
 
-        $name    = $input['name'];
-        $email   = $input['email'];
-        $message = $input['message'];
-
         if ($eventId !== null) {
             $event = $this->dataHelper->get('Event', ['Id' => $eventId], 'Id, Summary');
+            /** @var object{Id: int, Summary: string}|false $event */
             if (!$event) {
                 $this->raiseBadRequest("Unknown event {$eventId}", __FILE__, __LINE__);
                 return;

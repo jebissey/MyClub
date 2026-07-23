@@ -119,12 +119,16 @@ class Application
     }
 
     /**
-     * @param class-string $enumClass
-     * @return array<int, int|string>
+     * @template T of \BackedEnum
+     * @param class-string<T> $enumClass
+     * @return list<string>
      */
     public function enumToValues(string $enumClass): array
     {
-        return array_map(fn($case) => $case->value, $enumClass::cases());
+        return array_values(array_map(
+            static fn(\BackedEnum $case): string => (string) $case->value,
+            $enumClass::cases()
+        ));
     }
 
     /**

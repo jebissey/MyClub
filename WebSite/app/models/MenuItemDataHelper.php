@@ -8,6 +8,7 @@ use InvalidArgumentException;
 use PDO;
 use Throwable;
 use app\helpers\Application;
+use app\valueObjects\Person;
 
 class MenuItemDataHelper extends Data
 {
@@ -16,7 +17,7 @@ class MenuItemDataHelper extends Data
         parent::__construct($application);
     }
 
-    public function authorizedUser(string $url, ?object $person): bool
+    public function authorizedUser(string $url, ?Person $person): bool
     {
         $sql = '
             SELECT 

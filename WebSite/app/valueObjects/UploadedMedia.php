@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace app\valueObjects;
 
-readonly class UploadedMedia
+final readonly class UploadedMedia
 {
     public function __construct(
         public string $name,

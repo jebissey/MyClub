@@ -6,7 +6,7 @@ namespace app\valueObjects;
 
 use Closure;
 
-readonly class Route
+final readonly class Route
 {
     /**
      * @param array<int, mixed> $args

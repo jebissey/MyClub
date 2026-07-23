@@ -12,6 +12,9 @@ use app\helpers\Application;
 use app\helpers\WebApp;
 use app\models\SurveyDataHelper;
 use app\modules\Common\AbstractController;
+use app\valueObjects\ArticleTitleRow;
+use app\valueObjects\IdRow;
+use app\valueObjects\PersonNameRow;
 
 class SurveyController extends AbstractController
 {
@@ -30,11 +33,13 @@ class SurveyController extends AbstractController
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
-        $article = $this->dataHelper->get('Article', ['Id' => $articleId], 'Title, Id');
-        if (!$article) {
+        $articleData = $this->dataHelper->get('Article', ['Id' => $articleId], 'Title, Id');
+        if (!$articleData) {
             $this->redirect('/articles');
             return;
         }
+        /** @var object{Id: int|string, Title: string} $articleData */
+        $article = ArticleTitleRow::fromStdClass($articleData);
         $this->render('Article/views/survey_add.latte', $this->getAllParams([
             'article' => $article,
             'survey' => $this->dataHelper->get('Survey', ['IdArticle' => $article->Id], 'Question, Options, ClosingDate, Visibility'),
@@ -76,8 +81,10 @@ class SurveyController extends AbstractController
             'IdArticle' => $articleId,
             'Visibility' => $visibility
         ];
-        $survey = $this->dataHelper->get('Survey', ['IdArticle' => $articleId], 'Id');
-        if ($survey) {
+        $surveyData = $this->dataHelper->get('Survey', ['IdArticle' => $articleId], 'Id');
+        if ($surveyData) {
+            /** @var object{Id: int|string} $surveyData */
+            $survey = IdRow::fromStdClass($surveyData);
             $this->dataHelper->set('Survey', $fields, ['Id' => $survey->Id]);
         } else {
             $this->dataHelper->set('Survey', $fields);
@@ -106,12 +113,12 @@ class SurveyController extends AbstractController
             $this->redirect('/article/' . $articleId);
             return;
         }
-        if (
-            $this->authorizationDataHelper->canPersonReadSurveyResults($this->dataHelper->get(
-                'Article',
-                ['Id' => $survey->IdArticle]
-            ), $connectedUser)
-        ) {
+        $articleForAuth = $this->dataHelper->get('Article', ['Id' => $survey->IdArticle]);
+        if ($articleForAuth === false) {
+            $this->raiseBadRequest("Article {$survey->IdArticle} doesn't exist", __FILE__, __LINE__);
+            return;
+        }
+        if ($this->authorizationDataHelper->canPersonReadSurveyResults($articleForAuth, $connectedUser)) {
             $replies = $this->surveyDataHelper->getRepliesForActivePersons($survey->Id);
             $participants = [];
             $results = [];
@@ -121,9 +128,11 @@ class SurveyController extends AbstractController
             }
             foreach ($replies as $reply) {
                 $answers = json_decode($reply->Answers);
-                $person = $this->dataHelper->get('Person', ['Id' => $reply->IdPerson], 'FirstName, LastName');
+                $personData = $this->dataHelper->get('Person', ['Id' => $reply->IdPerson], 'FirstName, LastName');
+                /** @var object{FirstName: string, LastName: string}|false $personData */
+                $person = $personData ? PersonNameRow::fromStdClass($personData) : null;
                 $participants[] = [
-                    'name' => $name = $person === false ? '???' : $person->FirstName  . ' ' . $person->LastName,
+                    'name' => $person === null ? '???' : $person->FirstName . ' ' . $person->LastName,
                     'answers' => $answers
                 ];
                 foreach ($answers as $answer) {

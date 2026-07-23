@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\helpers;
 
 use DateTime;
+use app\valueObjects\Person;
 
 class PersonPreferences
 {
@@ -12,7 +13,7 @@ class PersonPreferences
      * @param array<int, array<string, mixed>> $events
      * @return array<int, array<string, mixed>>
      */
-    public function filterEventsByPreferences(array $events, ?object $person): array
+    public function filterEventsByPreferences(array $events, ?Person $person): array
     {
         if ($person === null || empty($person->Preferences)) {
             return $events;
@@ -37,7 +38,7 @@ class PersonPreferences
         return $filteredEvents;
     }
 
-    public function isPersonInterested(object $person, ?int $idEventType, ?int $dayOfWeek, string $timeOfDay): bool
+    public function isPersonInterested(Person $person, ?int $idEventType, ?int $dayOfWeek, string $timeOfDay): bool
     {
         if ($person->Preferences !== '') {
             $preferences = json_decode($person->Preferences, true);

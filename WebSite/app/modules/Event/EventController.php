@@ -13,7 +13,6 @@ use app\enums\FilterInputRule;
 use app\enums\Period;
 use app\exceptions\QueryException;
 use app\helpers\Application;
-use app\helpers\GravatarHandler;
 use app\helpers\TranslationManager;
 use app\helpers\WebApp;
 use app\models\CrosstabDataHelper;
@@ -21,6 +20,9 @@ use app\models\EventDataHelper;
 use app\models\ParticipantDataHelper;
 use app\models\MessageDataHelper;
 use app\modules\Common\AbstractController;
+use app\valueObjects\ContactTokenRow;
+use app\valueObjects\EventAudienceRow;
+use app\valueObjects\IdRow;
 
 class EventController extends AbstractController
 {
@@ -136,7 +138,7 @@ class EventController extends AbstractController
         $token = WebApp::getFiltered('t', FilterInputRule::Token->value, $this->flight->request()->query->getData()) ?? false;
         $event = $this->eventDataHelper->getEvent($eventId);
 
-        if ($person === false && !$token && ($event->Audience != 'All' || $event->Audience == 'Guest')) {
+        if ($person === false && !$token && $event->Audience !== EventAudience::ForAll) {
             $result = $this->application->getAuthenticationService()->handleRememberMeLogin();
             if ($result && $result->isSuccess()) {
                 $this->application->getConnectedUser()->get();
@@ -154,7 +156,7 @@ class EventController extends AbstractController
             'participants' => $this->participantDataHelper->getEventParticipants($eventId),
             'userEmail' => $userEmail,
             'isRegistered' => $this->eventDataHelper->isUserRegistered($eventId, $userEmail),
-            'navItems' => $this->getNavItems($person),
+            'navItems' => $this->getNavItems($person ?: null),
             'countOfMessages' => count($this->dataHelper->gets('Message', [
                 '"From"' => 'User',
                 'EventId' => $eventId
@@ -179,6 +181,7 @@ class EventController extends AbstractController
     {
         $this->register($eventId, false, $token);
     }
+    
     private function register(int $eventId, bool $set, ?string $token = null): void
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
@@ -205,27 +208,34 @@ class EventController extends AbstractController
                         ]);
                     }
                 } else {
-                    $result = $this->dataHelper->get('Participant', [
+                    $resultData = $this->dataHelper->get('Participant', [
                         'IdEvent' => $eventId,
                         'IdPerson' => $userId
                     ], 'Id');
-                    if ($result) {
-                        $idParticipant = (int)$result->Id;
-                        $this->dataHelper->delete('ParticipantSupply', ['IdParticipant' => $idParticipant]);
-                        $this->dataHelper->delete('Participant', ['Id' => $idParticipant]);
+                    if ($resultData) {
+                        /** @var object{Id: int|string} $resultData */
+                        $result = IdRow::fromStdClass($resultData);
+                        $this->dataHelper->delete('ParticipantSupply', ['IdParticipant' => $result->Id]);
+                        $this->dataHelper->delete('Participant', ['Id' => $result->Id]);
                     }
                 }
             } elseif ($token != null) {
-                $event = $this->dataHelper->get('Event', ['Id' => $eventId], 'Id, Audience');
-                if (!$event) {
+                $eventData = $this->dataHelper->get('Event', ['Id' => $eventId], 'Id, Audience');
+                if (!$eventData) {
                     $this->show($eventId, 'Evénement inconnu', 'error');
                     return;
                 }
-                $contact = $this->dataHelper->get('Contact', ['Token' => $token], 'Id, TokenCreatedAt');
-                if (!$contact) {
+                /** @var object{Id: int|string, Audience: string} $eventData */
+                $event = EventAudienceRow::fromStdClass($eventData);
+
+                $contactData = $this->dataHelper->get('Contact', ['Token' => $token], 'Id, TokenCreatedAt');
+                if (!$contactData) {
                     $this->show($eventId, 'Token inconnu', 'error');
                     return;
                 }
+                /** @var object{Id: int|string, TokenCreatedAt: string} $contactData */
+                $contact = ContactTokenRow::fromStdClass($contactData);
+
                 $tokenCreatedAt = new DateTime($contact->TokenCreatedAt);
                 $now = new DateTime();
                 $interval = $now->diff($tokenCreatedAt);
@@ -241,7 +251,7 @@ class EventController extends AbstractController
                     $this->show($eventId, 'Participant déjà enregistré', 'error');
                     return;
                 }
-                if ($event->Audience === 'Guest') {
+                if ($event->Audience === EventAudience::ForGuest) {
                     $invitation = $this->dataHelper->get('Guest', [
                         'IdEvent' => $event->Id,
                         'IdContact' => $contact->Id
@@ -264,9 +274,15 @@ class EventController extends AbstractController
                     'page' => $this->application->getConnectedUser()->getPage()
                 ]));
             } else {
-                $event = $this->dataHelper->get('Event', ['Id' => $eventId], 'Audience');
-                if ($event !== false && $event->Audience === EventAudience::ForAll->value) {
-                    $this->redirect('/contact/event/' . $eventId);
+                $eventData = $this->dataHelper->get('Event', ['Id' => $eventId], 'Id, Audience');
+                if ($eventData !== false) {
+                    /** @var object{Id: int|string, Audience: string} $eventData */
+                    $event = EventAudienceRow::fromStdClass($eventData);
+                    if ($event->Audience === EventAudience::ForAll) {
+                        $this->redirect('/contact/event/' . $eventId);
+                    } else {
+                        $this->raiseForbidden(__FILE__, __LINE__);
+                    }
                 } else {
                     $this->raiseForbidden(__FILE__, __LINE__);
                 }
@@ -322,7 +338,6 @@ class EventController extends AbstractController
             return;
         }
         $person = $this->application->getConnectedUser()->person;
-        $person->UserImg = WebApp::getUserImg($person, new GravatarHandler());
         $this->render('Common/views/chat.latte', $this->getAllParams([
             'article' => null,
             'event' => $event,

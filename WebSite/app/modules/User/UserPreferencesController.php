@@ -33,8 +33,9 @@ class UserPreferencesController extends AbstractController
         $eventTypesWithAttributes = [];
         $attributeDataHelper = new AttributeDataHelper($this->application);
         foreach ($eventTypes as $eventType) {
-            $eventType->Attributes = $attributeDataHelper->getAttributesOf($eventType->Id);
-            $eventTypesWithAttributes[] = $eventType;
+            $eventTypesWithAttributes[] = $eventType->withAttributes(
+                $attributeDataHelper->getAttributesOf($eventType->Id)
+            );
         }
 
         $this->render('User/views/user_preferences.latte', $this->getAllParams([

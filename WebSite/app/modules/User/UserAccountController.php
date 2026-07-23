@@ -35,7 +35,7 @@ class UserAccountController extends AbstractController
             'lastName' => WebApp::sanitizeInput($person->LastName),
             'nickName' => WebApp::sanitizeInput($person->NickName ?? ''),
             'avatar' => WebApp::sanitizeInput($person->Avatar ?? ''),
-            'useGravatar' => WebApp::sanitizeInput($person->UseGravatar, $this->application->enumToValues(YesNo::class), YesNo::No->value),
+            'useGravatar' => WebApp::sanitizeInput($person->UseGravatar ? YesNo::Yes->value : YesNo::No->value, $this->application->enumToValues(YesNo::class), YesNo::No->value),
             'emojis' => Application::EMOJI_LIST,
             'isSelfEdit' => true,
             'layout' => $this->getLayout(),

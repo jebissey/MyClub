@@ -9,6 +9,7 @@ use app\exceptions\QueryException;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
 use app\interfaces\NewsProviderInterface;
+use app\valueObjects\OrderWithCreatorRow;
 
 /**
  * @phpstan-type PendingOrderResponse object{
@@ -53,7 +54,7 @@ class OrderDataHelper extends Data implements NewsProviderInterface
         return $order;
     }
 
-    public function getWithCreator(int $articleId): object|false
+    public function getWithCreator(int $articleId): OrderWithCreatorRow|false
     {
         $article = $this->get('Article', ['Id' => $articleId], 'Id');
         if ($article === false) {
@@ -61,14 +62,18 @@ class OrderDataHelper extends Data implements NewsProviderInterface
         }
 
         $sql = "
-            SELECT o.*, a.CreatedBy
+            SELECT o.Id, o.Question, o.Options, o.IdArticle, o.ClosingDate, o.Visibility, a.CreatedBy
             FROM \"Order\" o
             INNER JOIN Article a ON o.IdArticle = a.Id
             WHERE o.IdArticle = :articleId
         ";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':articleId' => $article->Id]);
-        return $stmt->fetch(PDO::FETCH_OBJ);
+        $result = $stmt->fetch(PDO::FETCH_OBJ);
+        if ($result === false) {
+            return false;
+        }
+        return OrderWithCreatorRow::fromStdClass($result);
     }
 
     /**

@@ -12,7 +12,11 @@ use app\models\GroupDataHelper;
 use app\models\PersonDataHelper;
 use app\models\PersonGroupDataHelper;
 use app\modules\Common\AbstractController;
+use app\valueObjects\Person;
 
+/**
+ * @phpstan-import-type PersonRow from Person
+ */
 class UserDirectoryController extends AbstractController
 {
     public function __construct(
@@ -43,10 +47,12 @@ class UserDirectoryController extends AbstractController
             $persons = $this->dataHelper->gets('Person', [
                 'InPresentationDirectory' => 1,
                 'Inactivated' => 0
-            ], 'Id, LastName, FirstName, NickName, UseGravatar, Avatar, Email, InPresentationDirectory, Location', 'FirstName, LastName');
+            ], 'Id, LastName, FirstName, NickName, UseGravatar, Avatar, Email, InPresentationDirectory, ShowPhoneInPresentationDirectory, ShowEmailInPresentationDirectory, Location', 'FirstName, LastName');
             $gravatarHandler = new GravatarHandler();
             foreach ($persons as $person_) {
-                $person_->UserImg = WebApp::getUserImg($person_, $gravatarHandler);
+                /** @var PersonRow $personRow */
+                $personRow = $person_;
+                $person_->UserImg = WebApp::getUserImg(Person::fromRow($personRow), $gravatarHandler);
             }
         }
         $this->render('User/views/users_directory.latte', $this->getAllParams([
@@ -91,11 +97,13 @@ class UserDirectoryController extends AbstractController
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
-        $members = $this->dataHelper->gets('Person', [
+        /** @var array<int|string, PersonRow> $rows */
+        $rows = $this->dataHelper->gets('Person', [
             'InPresentationDirectory' => 1,
             'Location IS NOT NULL' => null,
             'Inactivated' => 0
-        ], 'Id, FirstName, LastName, NickName, Avatar, UseGravatar, Email, Location, MyPublicDataInPresentationDirectory');
+        ], 'Id, FirstName, LastName, NickName, Avatar, UseGravatar, Email, Location, MyPublicDataInPresentationDirectory, InPresentationDirectory, ShowPhoneInPresentationDirectory, ShowEmailInPresentationDirectory');
+        $members = array_values(array_map(Person::fromRow(...), $rows));
         $locationData = $this->getLocationData($members);
 
         $this->render('User/views/users_map.latte', $this->getAllParams([
@@ -118,12 +126,14 @@ class UserDirectoryController extends AbstractController
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
-        $members = $this->dataHelper->gets('Person', [
+        /** @var array<int|string, PersonRow> $rows */
+        $rows = $this->dataHelper->gets('Person', [
             'InPresentationDirectory' => 1,
             'Location IS NOT NULL' => null,
             'Inactivated' => 0,
             'MyPublicDataInPresentationDirectory IS NOT NULL AND MyPublicDataInPresentationDirectory != ""' => null
-        ], 'Id, FirstName, LastName, NickName, Avatar, UseGravatar, Email, Location, MyPublicDataInPresentationDirectory');
+        ], 'Id, FirstName, LastName, NickName, Avatar, UseGravatar, Email, Location, MyPublicDataInPresentationDirectory, InPresentationDirectory, ShowPhoneInPresentationDirectory, ShowEmailInPresentationDirectory');
+        $members = array_values(array_map(Person::fromRow(...), $rows));
         $locationData = $this->getLocationData($members);
 
         $this->render('User/views/users_map.latte', $this->getAllParams([
@@ -140,7 +150,7 @@ class UserDirectoryController extends AbstractController
 
     #region Private functions
     /**
-     * @param  array<int, stdClass> $members
+     * @param  list<Person> $members
      * @return array<int, array{
      *     id: int,
      *     name: string,

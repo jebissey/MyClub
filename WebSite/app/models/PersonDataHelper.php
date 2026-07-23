@@ -17,6 +17,7 @@ use app\helpers\WebApp;
 use app\interfaces\NewsProviderInterface;
 use app\modules\Common\services\EmailService;
 use app\valueObjects\EmailMessage;
+use app\valueObjects\Person;
 
 class PersonDataHelper extends Data implements NewsProviderInterface
 {
@@ -49,9 +50,16 @@ class PersonDataHelper extends Data implements NewsProviderInterface
      */
     public function getAllPersons(): array
     {
-        $rows = $this->pdo
-            ->query("SELECT Id, LOWER(Email) AS EmailKey FROM Person")
-            ->fetchAll(PDO::FETCH_OBJ);
+        $query = $this->pdo->query(
+            "SELECT Id, LOWER(Email) AS EmailKey FROM Person"
+        );
+
+        if ($query === false) {
+            Application::unreachable("Query failed", __FILE__, __LINE__);
+        }
+
+        /** @var list<object{Id:int, EmailKey:string}> $rows */
+        $rows = $query->fetchAll(PDO::FETCH_OBJ);
 
         return array_column($rows, 'Id', 'EmailKey');
     }
@@ -77,7 +85,7 @@ class PersonDataHelper extends Data implements NewsProviderInterface
         $persons = $this->getPersonsInGroup($idGroup);
         $filteredPeople = [];
         foreach ($persons as $person) {
-            if ($this->personPreferences->isPersonInterested($person, $idEventType, $dayOfWeek, $timeOfDay)) {
+            if ($this->personPreferences->isPersonInterested(Person::fromRow($person), $idEventType, $dayOfWeek, $timeOfDay)) {
                 $filteredPeople[] = $person;
             }
         }
@@ -251,7 +259,7 @@ class PersonDataHelper extends Data implements NewsProviderInterface
 
         $gravatarHandler = new GravatarHandler();
         foreach ($persons as $person) {
-            $person->UserImg = WebApp::getUserImg($person, $gravatarHandler);
+            $person->UserImg = WebApp::computeUserImg($person->UseGravatar ?? false, $person->Email ?? null, $person->Avatar ?? null, $gravatarHandler);
         }
         return $persons;
     }

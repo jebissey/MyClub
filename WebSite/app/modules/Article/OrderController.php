@@ -12,6 +12,10 @@ use app\helpers\Application;
 use app\helpers\WebApp;
 use app\models\OrderDataHelper;
 use app\modules\Common\AbstractController;
+use app\valueObjects\ArticleTitleRow;
+use app\valueObjects\IdRow;
+use app\valueObjects\OrderReplyRow;
+use app\valueObjects\PersonNameRow;
 
 class OrderController extends AbstractController
 {
@@ -30,11 +34,13 @@ class OrderController extends AbstractController
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
-        $article = $this->dataHelper->get('Article', ['Id' => $articleId], 'Title, Id');
-        if (!$article) {
+        $articleData = $this->dataHelper->get('Article', ['Id' => $articleId], 'Title, Id');
+        if (!$articleData) {
             $this->redirect('/articles');
             return;
         }
+        /** @var object{Id: int|string, Title: string} $articleData */
+        $article = ArticleTitleRow::fromStdClass($articleData);
         $this->render('Article/views/order_add.latte', $this->getAllParams([
             'article'  => $article,
             'order'    => $this->dataHelper->get('Order', ['IdArticle' => $article->Id], 'Question, Options, ClosingDate, Visibility'),
@@ -81,8 +87,10 @@ class OrderController extends AbstractController
             'Visibility'  => $visibility,
         ];
 
-        $order = $this->dataHelper->get('Order', ['IdArticle' => $articleId], 'Id');
-        if ($order) {
+        $orderData = $this->dataHelper->get('Order', ['IdArticle' => $articleId], 'Id');
+        if ($orderData) {
+            /** @var object{Id: int|string} $orderData */
+            $order = IdRow::fromStdClass($orderData);
             $this->dataHelper->set('Order', $fields, ['Id' => $order->Id]);
         } else {
             $this->dataHelper->set('Order', $fields);
@@ -114,13 +122,18 @@ class OrderController extends AbstractController
             return;
         }
 
-        if (
-            $this->authorizationDataHelper->canPersonReadOrderResults($this->dataHelper->get(
-                'Article',
-                ['Id' => $order->IdArticle]
-            ), $connectedUser)
-        ) {
-            $replies = $this->dataHelper->gets('OrderReply', ['IdOrder' => $order->Id]);
+        $articleForAuth = $this->dataHelper->get('Article', ['Id' => $order->IdArticle]);
+        if ($articleForAuth === false) {
+            $this->raiseBadRequest("Article {$order->IdArticle} doesn't exist", __FILE__, __LINE__);
+            return;
+        }
+
+        if ($this->authorizationDataHelper->canPersonReadOrderResults($articleForAuth, $connectedUser)) {
+            $repliesData = $this->dataHelper->gets('OrderReply', ['IdOrder' => $order->Id]);
+            $replies = array_map(function ($row) {
+                /** @var object{Id: int|string, IdPerson: int|string, IdOrder: int|string, Answers: string, LastUpdate: string} $row */
+                return OrderReplyRow::fromStdClass($row);
+            }, $repliesData);
 
             $participants = [];
             $results      = [];
@@ -130,10 +143,12 @@ class OrderController extends AbstractController
             }
             foreach ($replies as $reply) {
                 $answers = json_decode($reply->Answers);
-                $person  = $this->dataHelper->get('Person', ['Id' => $reply->IdPerson], 'FirstName, LastName');
+                $personData = $this->dataHelper->get('Person', ['Id' => $reply->IdPerson], 'FirstName, LastName');
+                /** @var object{FirstName: string, LastName: string}|false $personData */
+                $person = $personData ? PersonNameRow::fromStdClass($personData) : null;
 
                 $participants[] = [
-                    'name'    => $person === false ? '???' : $person->FirstName  . ' ' . $person->LastName,
+                    'name'    => $person === null ? '???' : $person->FirstName . ' ' . $person->LastName,
                     'answers' => $answers,
                 ];
 

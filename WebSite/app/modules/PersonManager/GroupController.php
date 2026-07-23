@@ -177,7 +177,6 @@ class GroupController extends AbstractController
             return;
         }
         $person = $connectedUser->person;
-        $person->UserImg = WebApp::getUserImg($person, new GravatarHandler());
         $this->render('Common/views/chat.latte', $this->getAllParams([
             'article' => null,
             'event' => null,

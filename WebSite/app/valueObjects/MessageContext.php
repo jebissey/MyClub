@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace app\valueObjects;
 
-readonly class MessageContext
+final readonly class MessageContext
 {
     public function __construct(
         public ?int $articleId = null,

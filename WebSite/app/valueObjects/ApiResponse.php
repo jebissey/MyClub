@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace app\valueObjects;
 
-readonly class ApiResponse
+final readonly class ApiResponse
 {
     /**
      * @param array<string, mixed> $data

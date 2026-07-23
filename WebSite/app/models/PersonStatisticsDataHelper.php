@@ -6,6 +6,7 @@ namespace app\models;
 
 use PDO;
 use app\helpers\Application;
+use app\valueObjects\Person;
 
 class PersonStatisticsDataHelper extends Data
 {
@@ -33,7 +34,7 @@ class PersonStatisticsDataHelper extends Data
      *     }
      * }
      */
-    public function getStats(object $person, string $seasonStart, string $seasonEnd): array
+    public function getStats(Person $person, string $seasonStart, string $seasonEnd): array
     {
         $stats = [
             'person' => $person,

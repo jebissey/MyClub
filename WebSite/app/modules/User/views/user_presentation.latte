@@ -26,7 +26,7 @@
         <div class="col-md-3">
             <div class="card">
                 <div class="card-body text-center">                    
-                    {if $person->UseGravatar == 'yes' && $person->Email}
+                    {if $person->UseGravatar && $person->Email}
                     <img src="{$userImg_}" class="rounded-circle"
                         alt="User gravatar" 
                         data-bs-toggle="tooltip" 
@@ -58,7 +58,7 @@
                 </div>
             </div>
             
-            {if $person->Location}
+            {if $person->Location !== null && $person->Location !== '' }
                 <div class="card mt-3">
                     <div class="card-header">
                         <h5 class="card-title mb-0">Quartier</h5>
@@ -95,7 +95,7 @@
                     <h5 class="card-title mb-0">Présentation</h5>
                 </div>
                 <div class="card-body">
-                    {if $person->Presentation}
+                    {if $person->Presentation !== null && $person->Presentation !== ''}
                         <div class="presentation-content">
                             {$person->Presentation|noescape}
                         </div>

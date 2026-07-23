@@ -6,6 +6,7 @@ namespace app\helpers;
 
 use InvalidArgumentException;
 use app\enums\FilterInputRule;
+use app\valueObjects\Person;
 
 class WebApp
 {
@@ -91,17 +92,17 @@ class WebApp
         return $result[$key] !== '' ? $result[$key] : false;
     }
 
-    public static function getUserImg(object $person, GravatarHandler $gravatarHandler): string
+    public static function getUserImg(Person $person, GravatarHandler $gravatarHandler): string
     {
-        if ($person->UseGravatar === 'yes') {
-            return $gravatarHandler->getGravatar($person->Email, true);
-        } else {
-            if (empty($person->Avatar)) {
-                return '🤔';
-            } else {
-                return $person->Avatar;
-            }
+        return self::computeUserImg($person->UseGravatar, $person->Email, $person->Avatar, $gravatarHandler);
+    }
+
+    public static function computeUserImg(bool $useGravatar, ?string $email, ?string $avatar, GravatarHandler $gravatarHandler): string
+    {
+        if ($useGravatar) {
+            return $gravatarHandler->getGravatar($email, true);
         }
+        return empty($avatar) ? '🤔' : $avatar;
     }
 
     public static function isMyClubWebSite(): bool

@@ -7,6 +7,7 @@ namespace app\models;
 use PDO;
 use Throwable;
 use app\helpers\Application;
+use app\valueObjects\EventType;
 
 class EventTypeDataHelper extends Data
 {
@@ -16,12 +17,12 @@ class EventTypeDataHelper extends Data
     }
 
     /**
-     * @return list<object>
+     * @return list<EventType>
      */
     public function getsFor(int $personId): array
     {
         $query = $this->pdo->prepare("
-            SELECT et.*
+            SELECT et.Id, et.Name, et.Inactivated, et.IdGroup
             FROM EventType et
             LEFT JOIN `Group` g ON et.IdGroup = g.Id
             WHERE et.Inactivated = 0 
@@ -35,7 +36,11 @@ class EventTypeDataHelper extends Data
             ORDER BY et.Name
         ");
         $query->execute([$personId]);
-        return $query->fetchAll(PDO::FETCH_OBJ);
+
+        return array_map(
+            EventType::fromStdClass(...),
+            $query->fetchAll(PDO::FETCH_OBJ)
+        );
     }
 
     /**

@@ -22,6 +22,7 @@ use app\models\LogDataHelper;
 use app\models\MessageDataHelper;
 use app\models\PersonDataHelper;
 use app\modules\Article\services\ArticleAuthorizationService;
+use app\modules\Article\viewModels\ArticleCarouselViewModel;
 use app\modules\Article\viewModels\ArticleShowViewModel;
 use app\modules\Common\TableController;
 use app\modules\Common\services\ArticleService;
@@ -59,6 +60,7 @@ class ArticleController extends TableController
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
+
         $article = $this->dataHelper->get('Article', ['Id' => $id], 'CreatedBy');
         if (!$article) {
             $msg = str_replace(
@@ -69,17 +71,43 @@ class ArticleController extends TableController
             $this->raiseBadRequest($msg, __FILE__, __LINE__);
             return;
         }
+
         $connectedUser = $this->application->getConnectedUser();
+
         $article = $this->articleDataHelper->getLatestArticle([$id]);
-        if ($this->authorizationService->canEdit($id, $connectedUser)) {
-            $this->render('Article/views/article_carousel.latte', $this->getAllParams([
-                'article' => $article,
-                'carouselItems' => $this->dataHelper->gets('Carousel', ['IdArticle' => $id]),
-                'page' => $connectedUser->getPage(),
-            ]));
-        } else {
-            $this->raiseForbidden(__FILE__, __LINE__);
+        if ($article === null) {
+            $msg = str_replace(
+                '{id}',
+                (string)$id,
+                ($this->t)('article.error.not_found')
+            );
+            $this->raiseBadRequest($msg, __FILE__, __LINE__);
+            return;
         }
+
+        if (!$this->authorizationService->canEdit($id, $connectedUser)) {
+            $this->raiseForbidden(__FILE__, __LINE__);
+            return;
+        }
+
+        // 1. Grab everything generated globally by the framework infrastructure
+        $dynamicContext = $this->getAllParams([]);
+
+        // 2. Map explicitly to our object model
+        $viewModel = new ArticleCarouselViewModel(
+            article: $article,
+            carouselItems: array_values($this->dataHelper->gets('Carousel', ['IdArticle' => $id])),
+            page: $connectedUser->getPage(),
+            navbarInkColor: $dynamicContext['navbarInkColor'] ?? '#ffffff',
+            navbarIconColor: $dynamicContext['navbarIconColor'] ?? '#000000',
+            navbarBgColor: $dynamicContext['navbarBgColor'] ?? '#343a40',
+            productionSiteUrl: $dynamicContext['productionSiteUrl'] ?? null,
+            memberAlert: $dynamicContext['memberAlert'] ?? null,
+            btn_HistoryBack: true,
+            btn_Parent: '/articles',
+        );
+
+        $this->render('Article/views/article_carousel.latte', $viewModel->toArray());
     }
 
     public function changeOwner(int $id): void
@@ -115,8 +143,13 @@ class ArticleController extends TableController
             }
             $this->redirect('/article/' . $id);
         } elseif ($_SERVER['REQUEST_METHOD'] === 'GET') {
+            $article = $this->articleDataHelper->getWithAuthor($id);
+            if ($article === false) {
+                $this->raiseBadRequest("Article {$id} doesn't exist", __FILE__, __LINE__);
+                return;
+            }
             $this->render('User/views/changeOwner.latte', $this->getAllParams([
-                'article' => $this->articleDataHelper->getWithAuthor($id),
+                'article' => $article,
                 'redactors' => $this->personDataHelper->getRedactors(),
             ]));
         } else {
@@ -189,6 +222,15 @@ class ArticleController extends TableController
         }
         $connectedUser = $this->application->getConnectedUser();
         $article = $this->articleDataHelper->getLatestArticle([$id]);
+        if ($article === null) {
+            $msg = str_replace(
+                '{id}',
+                (string)$id,
+                ($this->t)('article.error.not_found')
+            );
+            $this->raiseBadRequest($msg, __FILE__, __LINE__);
+            return;
+        }
 
         if ($connectedUser->person === null) {
             $this->raiseForbidden(__FILE__, __LINE__);
@@ -238,7 +280,9 @@ class ArticleController extends TableController
             $this->raiseBadRequest("Article {$idArticle} doesn't exist", __FILE__, __LINE__);
             return;
         }
+        /** @var object{CreatedBy: int} $article */
         $articleCreator = $this->dataHelper->get('Person', ['Id' => $article->CreatedBy], 'Email');
+        /** @var object{Email: string}|false $articleCreator */
         if ($articleCreator === false) {
             $msg = str_replace(
                 '{id}',
@@ -286,8 +330,13 @@ class ArticleController extends TableController
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isRedactor(), __FILE__, __LINE__)) {
             $lang = TranslationManager::getCurrentLanguage();
+            $helpRow = $this->dataHelper->get('Languages', ['Name' => 'Help_Redactor'], $lang);
+            // TODO: accès dynamique $helpRow->$lang - PHPStan ne peut pas valider une propriété
+            // dont le nom est une variable. Nécessitera soit un tableau associatif en retour
+            // de Data::get(), soit un accès via {$helpRow->{$lang}} documenté comme mixed.
+            $content = ($helpRow !== false && isset($helpRow->$lang)) ? $helpRow->$lang : '';
             $this->render('Common/views/info.latte', $this->getAllParams([
-                'content' => $this->dataHelper->get('Languages', ['Name' => 'Help_Redactor'], $lang)->$lang ?? '',
+                'content' => $content,
                 'timer' => 0,
                 'btn_HistoryBack' => true,
             ]));
@@ -446,8 +495,13 @@ class ArticleController extends TableController
             }
             $this->redirect('/article/' . $id);
         } elseif ($_SERVER['REQUEST_METHOD'] === 'GET') {
+            $article = $this->articleDataHelper->getWithAuthor($id);
+            if ($article === false) {
+                $this->raiseBadRequest("Article {$id} doesn't exist", __FILE__, __LINE__);
+                return;
+            }
             $this->render('User/views/publish.latte', $this->getAllParams([
-                'article' => $this->articleDataHelper->getWithAuthor($id),
+                'article' => $article,
                 'page' => $this->application->getConnectedUser()->getPage()
             ]));
         } else {
@@ -497,27 +551,37 @@ class ArticleController extends TableController
                 return;
             }
             $article = $this->articleDataHelper->getLatestArticle([$id]);
+            if ($article === null) {
+                $this->raiseForbidden(__FILE__, __LINE__);
+                return;
+            }
             [$message, $messageType] = MessageService::get();
 
             // 1. Grab everything generated globally by the framework infrastructure
             $dynamicContext = $this->getAllParams([]);
 
-            // 2. Map explicitly to our object model
+            // 2. Résolution des données annexes en variables locales typées
+            $groups = array_values($this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'));
+            $carouselItems = array_values($this->dataHelper->gets('Carousel', ['IdArticle' => $id]));
+            $hasSurvey = $this->dataHelper->get('Survey', ['IdArticle' => $id], 'ClosingDate') ?: null;
+            $hasOrder = $this->dataHelper->get('Order', ['IdArticle' => $id], 'ClosingDate') ?: null;
+
+            // 3. Map explicitly to our object model
             $viewModel = new ArticleShowViewModel(
                 // View specific
                 id: $id,
                 article: $article,
-                groups: $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
-                hasSurvey: $this->dataHelper->get('Survey', ['IdArticle' => $id], 'ClosingDate') ?: null,
-                hasOrder: $this->dataHelper->get('Order', ['IdArticle' => $id], 'ClosingDate') ?: null,
+                groups: $groups,
+                hasSurvey: $hasSurvey,
+                hasOrder: $hasOrder,
                 userConnected: $connectedUser->person !== null,
-                userEmail: $context['userEmail'] ?? null,
+                userEmail: $dynamicContext['userEmail'] ?? null,
                 navItems: $this->getNavItems($connectedUser->person),
                 publishedBy: $article->PublishedBy && $article->PublishedBy != $article->CreatedBy
                     ? $this->personDataHelper->getPublisher($article->PublishedBy) : '',
                 canReadPool: $this->authorizationDataHelper->canPersonReadSurveyResults($article, $connectedUser),
                 canReadOrder: $this->authorizationDataHelper->canPersonReadOrderResults($article, $connectedUser),
-                carouselItems: $this->dataHelper->gets('Carousel', ['IdArticle' => $id]),
+                carouselItems: $carouselItems,
                 page: $connectedUser->getPage(),
                 countOfMessages: count($this->dataHelper->gets('Message', ['"From"' => 'User', 'ArticleId' => $id])),
                 isCreator: $connectedUser->person !== null && $connectedUser->person->Id === $article->CreatedBy,
@@ -525,7 +589,6 @@ class ArticleController extends TableController
                 isEditor: $connectedUser->isEditor(),
                 message: $message,
                 messageType: $messageType,
-
                 // Layout properties mapped safely from framework state
                 navbarInkColor: $dynamicContext['navbarInkColor'] ?? '#ffffff',
                 navbarIconColor: $dynamicContext['navbarIconColor'] ?? '#000000',
@@ -534,7 +597,6 @@ class ArticleController extends TableController
                 memberAlert: $dynamicContext['memberAlert'] ?? null,
                 btn_HistoryBack: true,
                 btn_Parent: '/articles',
-
                 // Retain anything else just in case
                 //allParams: $dynamicContext
             );
@@ -566,13 +628,18 @@ class ArticleController extends TableController
             return;
         }
         $person = $connectedUser->person;
-        $person->UserImg = WebApp::getUserImg($person, new GravatarHandler());
+        // TODO: ne mute plus $person->UserImg (propriété non déclarée sur la classe Person),
+        // la valeur est maintenant passée séparément au template sous 'userImg'.
+        // Si article_show.latte / chat.latte lit {$person->UserImg}, il faut l'ajuster
+        // pour lire {$userImg} à la place - à confirmer avec le template.
+        $userImg = WebApp::getUserImg($person, new GravatarHandler());
         $this->render('Common/views/chat.latte', $this->getAllParams([
             'article' => $article,
             'event' => null,
             'group' => null,
             'messages' => $this->messageDataHelper->getArticleMessages($articleId),
             'person' => $person,
+            'userImg' => $userImg,
             'navItems' => $this->getNavItems($this->application->getConnectedUser()->person),
             'page' => $this->application->getConnectedUser()->getPage(),
             'btn_HistoryBack' => true,

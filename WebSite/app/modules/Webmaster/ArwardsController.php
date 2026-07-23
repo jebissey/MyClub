@@ -19,7 +19,7 @@ class ArwardsController extends AbstractController
 
     public function seeArwards(): void
     {
-        $person = $this->application->getConnectedUser()->person ?? false;
+        $person = $this->application->getConnectedUser()->person;
         if (!$this->application->getConnectedUser()->isHomeDesigner()) {
             $this->raiseForbidden(__FILE__, __LINE__);
             return;

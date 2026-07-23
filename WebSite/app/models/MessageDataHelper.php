@@ -373,7 +373,7 @@ class MessageDataHelper extends Data implements NewsProviderInterface
         static $gravatarHandler = new GravatarHandler();
 
         foreach ($messages as $message) {
-            $message->UserImg = WebApp::getUserImg($message, $gravatarHandler);
+            $message->UserImg = WebApp::computeUserImg($message->UseGravatar ?? false, $message->Email ?? null, $message->Avatar ?? null, $gravatarHandler);
             $message->TimeAgo = MyClubDateTime::calculateTimeAgo($message->LastUpdate);
         }
         return $messages;

@@ -11,14 +11,18 @@ use app\helpers\TranslationManager;
 use app\models\AuthorizationDataHelper;
 use app\models\DataHelper;
 use app\models\MetadataDataHelper;
+use app\valueObjects\Person;
 
+/**
+ * @phpstan-import-type PersonRow from Person
+ */
 class ConnectedUser
 {
     /** @var array<int, string> */
     private array $authorizations;
     private DataHelper $dataHelper;
     private AuthorizationDataHelper $authorizationDataHelper;
-    public ?object $person;
+    public ?Person $person = null;
     private MetadataDataHelper $metadataDataHelper;
 
     public function __construct(private Application $application)
@@ -37,8 +41,12 @@ class ConnectedUser
             return;
         }
 
-        $person = $this->dataHelper->get('Person', ['Email' => $userEmail]);
-        if (!$person) {
+        $personRow = $this->dataHelper->get(
+            'Person',
+            ['Email' => $userEmail],
+            'Id, Email, Alert, FirstName, LastName, UseGravatar, Avatar'
+        );
+        if (!$personRow) {
             $_SESSION['user'] = '';
             $this->application->getErrorManager()->raise(
                 ApplicationError::BadRequest,
@@ -46,7 +54,7 @@ class ConnectedUser
             );
             return;
         }
-        $this->person = $person;
+        $this->person = Person::fromRow($personRow);
         if ($this->person->Alert !== null) {
             Params::setMemberAlert($this->person->Alert);
         }
@@ -56,7 +64,7 @@ class ConnectedUser
         Params::setParams(
             [
                 'href' => $this->getHref($this->person->Email),
-                'userImg' => WebApp::getUserImg($this->person, new GravatarHandler()),
+                'userImg' => WebApp::computeUserImg($this->person->UseGravatar ?? false, $this->person->Email ?? null, $this->person->Avatar ?? null, new GravatarHandler()),
                 'userEmail' => $this->person->Email,
                 'isAdmin' => $this->isAdministrator(),
                 'isCommunicationManager' => $this->isCommunicationManager(),
@@ -88,7 +96,7 @@ class ConnectedUser
             ],
             $this->metadataDataHelper->isTestSite()
                 && !empty($prodSiteUrl = $this->metadataDataHelper->getProdSiteUrl()) ? $prodSiteUrl : null,
-            $person->Alert
+            $personRow->Alert
         );
         return;
     }

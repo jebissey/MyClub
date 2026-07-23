@@ -28,7 +28,12 @@ class MaintenanceController extends AbstractController
         }
 
         $siteUnderMaintenance = $this->dataHelper->get('Metadata', ['Id' => 1], 'SiteUnderMaintenance');
-        if ($siteUnderMaintenance === false || $siteUnderMaintenance->SiteUnderMaintenance == 0) {
+        if ($siteUnderMaintenance === false) {
+            return;
+        }
+
+        /** @var object{SiteUnderMaintenance: int} $siteUnderMaintenance */
+        if ($siteUnderMaintenance->SiteUnderMaintenance == 0) {
             return;
         }
 

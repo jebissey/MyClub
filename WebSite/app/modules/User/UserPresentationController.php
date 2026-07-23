@@ -10,7 +10,11 @@ use app\helpers\Application;
 use app\helpers\GravatarHandler;
 use app\helpers\WebApp;
 use app\modules\Common\AbstractController;
+use app\valueObjects\Person;
 
+/**
+ * @phpstan-import-type PersonRow from Person
+ */
 class UserPresentationController extends AbstractController
 {
     public function __construct(Application $application)
@@ -84,32 +88,44 @@ class UserPresentationController extends AbstractController
 
     public function showPresentation(int $personId): void
     {
-        if ($loggedPerson = $this->application->getConnectedUser()->person ?? false) {
-            $person = $this->dataHelper->get('Person', [
-                'Id' => $personId,
-                'Inactivated' => 0,
-                'InPresentationDirectory' => 1
-            ]);
-            if (!$person) {
-                $this->raiseBadRequest("Unknown person {$personId}", __FILE__, __LINE__);
-                return;
-            }
+        if (!$loggedPerson = $this->application->getConnectedUser()->person) {
+            $this->application->getErrorManager()->raise(
+                ApplicationError::Forbidden,
+                'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__
+            );
+            return;
+        }
 
-            $this->render('User/views/user_presentation.latte', $this->getAllParams([
+        /** @var PersonRow|false $row */
+        $row = $this->dataHelper->get('Person', [
+            'Id' => $personId,
+            'Inactivated' => 0,
+            'InPresentationDirectory' => 1,
+        ]);
+
+        $person = $row ? Person::fromRow($row) : null;
+
+        if (
+            $person === null
+            || $person->Inactivated
+            || !$person->InPresentationDirectory
+        ) {
+            $this->raiseBadRequest("Unknown person {$personId}", __FILE__, __LINE__);
+            return;
+        }
+
+        $this->render(
+            'User/views/user_presentation.latte',
+            $this->getAllParams([
                 'person' => $person,
                 'loggedPerson' => $loggedPerson,
                 'navItems' => $this->getNavItems($person),
                 'page' => $this->application->getConnectedUser()->getPage(),
                 'userImg_' => WebApp::getUserImg($person, new GravatarHandler()),
                 'btn_HistoryBack' => true,
-                'btn_Parent' => "/user/directory",
+                'btn_Parent' => '/user/directory',
                 'maxZoom' => 12,
-            ]));
-        } else {
-            $this->application->getErrorManager()->raise(
-                ApplicationError::Forbidden,
-                'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__
-            );
-        }
+            ])
+        );
     }
 }

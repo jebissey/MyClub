@@ -14,6 +14,7 @@ use app\models\DataHelper;
 use app\models\LogDataHelper;
 use app\models\MessageDataHelper;
 use app\models\PersonDataHelper;
+use app\valueObjects\Person;
 
 class ChatApi extends AbstractApi
 {
@@ -39,7 +40,14 @@ class ChatApi extends AbstractApi
         }
         $previousLogId = (int)($_SESSION['last_log_id'] ?? 0);
         $minutes = (int) ($_GET['m'] ?? self::ACTIVE_WINDOW_MINUTES);
-        $visits = $this->logDataHelper->getLastVisitPerActivePersonWithTimeAgo($this->dataHelper->gets('Person', ['Inactivated' => 0]));
+
+        $activePersons = $this->dataHelper->gets(
+            'Person',
+            ['Inactivated' => 0],
+            'Id, NickName, FirstName, LastName, UseGravatar, Email, Avatar'
+        );
+        $visits = $this->logDataHelper->getLastVisitPerActivePersonWithTimeAgo($activePersons);
+
         $cutoff = new DateTime("-{$minutes} minutes", new DateTimeZone('UTC'));
         $result = [];
         foreach ($visits as $visit) {
@@ -48,6 +56,13 @@ class ChatApi extends AbstractApi
                 continue;
             }
 
+            $visitPerson = new Person(
+                Id: (int)$visit->PersonId,
+                Email: $visit->Email ?? null,
+                UseGravatar: $visit->UseGravatar ?? null,
+                Avatar: $visit->Avatar ?? null,
+            );
+
             $result[] = [
                 'personId'      => $visit->PersonId,
                 'displayName'   => $visit->NickName ?? $visit->FullName,
@@ -55,7 +70,7 @@ class ChatApi extends AbstractApi
                 'minutesAgo'    => $visit->MinutesAgo,
                 'formattedDate' => $visit->FormattedDate,
                 'useGravatar'   => $visit->UseGravatar,
-                'userImg'       => WebApp::getUserImg($visit, $this->gravatarHandler),
+                'userImg'       => WebApp::getUserImg($visitPerson, $this->gravatarHandler),
                 'os'            => $visit->Os,
                 'browser'       => $visit->Browser,
             ];

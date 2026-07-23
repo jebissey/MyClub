@@ -7,7 +7,11 @@ namespace app\modules\User;
 use app\helpers\Application;
 use app\models\ParticipantDataHelper;
 use app\modules\Common\AbstractController;
+use app\valueObjects\Person;
 
+/**
+ * @phpstan-import-type PersonRow from Person
+ */
 class UserConnectionsController extends AbstractController
 {
     public function __construct(
@@ -38,11 +42,14 @@ class UserConnectionsController extends AbstractController
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
-        $user = $this->dataHelper->get('Person', ['Id' => $idPerson], 'FirstName, LastName, NickName');
+        $user = $this->dataHelper->get('Person', ['Id' => $idPerson], 'FirstName, LastName, NickName, Id, InPresentationDirectory, ShowPhoneInPresentationDirectory, ShowEmailInPresentationDirectory');
         if ($user === false) {
             $this->raiseBadRequest("User ({$idPerson}) not found", __FILE__, __LINE__);
             return;
         }
+        /** @var PersonRow $userRow */
+        $userRow = $user;
+        $person = Person::fromRow($userRow);
         $data = $this->participantDataHelper->getConnections($idPerson);
         $this->render('User/views/user_connections.latte', $this->getAllParams([
             'connections' => $data['connections'],
@@ -50,7 +57,7 @@ class UserConnectionsController extends AbstractController
             'layout' => $this->getLayout(),
             'navItems' => $this->getNavItems($person),
             'page' => $this->application->getConnectedUser()->getPage(1),
-            'user' => $user->FirstName . ' ' . $user->LastName . ($user->NickName != '' ? ' (' . $user->NickName . ')' : ''),
+            'user' => $person->FirstName . ' ' . $person->LastName . ($person->NickName != '' ? ' (' . $person->NickName . ')' : ''),
             'btn_HistoryBack' => true,
             'btn_Parent' => "/user",
         ]));

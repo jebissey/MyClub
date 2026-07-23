@@ -16,6 +16,7 @@ use app\models\MessageDataHelper;
 use app\models\ParticipantDataHelper;
 use app\models\PersonStatisticsDataHelper;
 use app\modules\Common\AbstractController;
+use app\valueObjects\Person;
 
 class UserStatisticsController extends AbstractController
 {
@@ -107,7 +108,7 @@ class UserStatisticsController extends AbstractController
     }
 
     /**
-     * @param  array<int, stdClass>  $members
+     * @param  array<int|string, stdClass>  $members
      * @param  array<string, int|string> $rawCounts
      * @return array<string, int>
      */
@@ -124,7 +125,7 @@ class UserStatisticsController extends AbstractController
      * @param  array<string, int> $memberCounts
      * @return array<int, array{tranche: string, count: int, isHighlighted: bool}>
      */
-    private function buildChartData(array $memberCounts, object $person): array
+    private function buildChartData(array $memberCounts, Person $person): array
     {
         $dist             = $this->distributionCalculator->compute($memberCounts);
         $currentUserSlice = $this->distributionCalculator->findUserSlice(

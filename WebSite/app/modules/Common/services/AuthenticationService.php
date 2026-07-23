@@ -15,7 +15,11 @@ use app\models\AuthResult;
 use app\models\DataHelper;
 use app\modules\Common\services\EmailService;
 use app\valueObjects\EmailMessage;
+use app\valueObjects\Person;
 
+/**
+ * @phpstan-import-type PersonRow from Person
+ */
 class AuthenticationService
 {
     public function __construct(private DataHelper $dataHelper, private EmailService $emailService)
@@ -63,15 +67,17 @@ class AuthenticationService
             return null;
         }
         $token = $_COOKIE['rememberMe'];
-        $person = $this->dataHelper->get(
+        $personRow = $this->dataHelper->get(
             'Person',
             ['Token' => $token],
             'Id, Inactivated, Email'
         );
-        if (!$person || $person->Inactivated == 1) {
+        if (!$personRow || $personRow->Inactivated == 1) {
             $this->clearRememberMeCookie();
             return null;
         }
+        /** @var PersonRow $personRow */
+        $person = Person::fromRow($personRow);
         $this->dataHelper->set(
             'Person',
             ['LastSignIn' => date('Y-m-d H:i:s')],
@@ -108,8 +114,13 @@ class AuthenticationService
 
     public function resetPassword(string $token, string $newPassword): bool
     {
-        $person = $this->dataHelper->get('Person', ['Token' => $token], 'Id, TokenCreatedAt');
-        if (!$person || $person->TokenCreatedAt === null || (new DateTime($person->TokenCreatedAt))->diff(new DateTime())->h >= 1) {
+        $personRow = $this->dataHelper->get('Person', ['Token' => $token], 'Id, TokenCreatedAt');
+        if (!$personRow) {
+            return false;
+        }
+        /** @var PersonRow $personRow */
+        $person = Person::fromRow($personRow);
+        if ($person->TokenCreatedAt === null || (new DateTime($person->TokenCreatedAt))->diff(new DateTime())->h >= 1) {
             return false;
         }
         $this->dataHelper->set('Person', [
@@ -142,7 +153,7 @@ class AuthenticationService
             if ($person === false) {
                 return AuthResult::error("Sign in failed: unknown email {$email}");
             }
-            if ($person->Inactivated == 1) {
+            if ($person->Inactivated) {
                 return AuthResult::error("Sign in failed: inactivated user {$email}");
             }
             if (!Password::verifyPassword($password, $person->Password ?? '')) {
@@ -159,13 +170,14 @@ class AuthenticationService
         setcookie('rememberMe', '', time() - 3600, '/');
     }
 
-    private function findPersonByEmail(string $email): object|false
+    private function findPersonByEmail(string $email): Person|false
     {
-        return $this->dataHelper->get(
+        $row = $this->dataHelper->get(
             'Person',
             ['Email' => $email],
             'Id, Email, Password, Inactivated, LastSignIn, LastSignOut'
         );
+        return $row ? Person::fromRow($row) : false;
     }
 
     private function generateRememberMeToken(): string
@@ -173,7 +185,7 @@ class AuthenticationService
         return bin2hex(random_bytes(32));
     }
 
-    private function loginUser(object $person, bool $rememberMe): AuthResult
+    private function loginUser(Person $person, bool $rememberMe): AuthResult
     {
         $this->dataHelper->set(
             'Person',
@@ -181,7 +193,7 @@ class AuthenticationService
             ['Id' => $person->Id]
         );
         if ($rememberMe) {
-            $this->setRememberMeToken((int)$person->Id);
+            $this->setRememberMeToken($person->Id);
         }
         $_SESSION['user'] = $person->Email;
         $_SESSION['navbar'] = '';

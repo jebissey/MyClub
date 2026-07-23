@@ -4,14 +4,13 @@ declare(strict_types=1);
 
 namespace app\modules\Event;
 
-use app\enums\ApplicationError;
 use app\enums\FilterInputRule;
 use app\helpers\Application;
-use app\helpers\ErrorManager;
 use app\helpers\WebApp;
 use app\models\EventTypeDataHelper;
 use app\models\TableControllerDataHelper;
 use app\modules\Common\TableController;
+use app\valueObjects\EventTypeNameGroupRow;
 
 class EventTypeController extends TableController
 {
@@ -62,8 +61,8 @@ class EventTypeController extends TableController
                 __LINE__
             ) && $this->eventTypeExists($id)
         ) {
-            $eventType = $this->dataHelper->get('EventType', ['Id' => $id], 'Name, IdGroup');
-            if ($eventType === false) {
+            $eventTypeData = $this->dataHelper->get('EventType', ['Id' => $id], 'Name, IdGroup');
+            if ($eventTypeData === false) {
                 $this->raiseBadRequest(
                     "Invalid EventType {$id} in file " . __FILE__ . ' at line ' . __LINE__,
                     __FILE__,
@@ -71,6 +70,8 @@ class EventTypeController extends TableController
                 );
                 return;
             }
+            /** @var object{Name: string, IdGroup: int|string|null} $eventTypeData */
+            $eventType = EventTypeNameGroupRow::fromStdClass($eventTypeData);
             $existingAttributes = $this->dataHelper->gets('EventTypeAttribute', ['IdEventType' => $id], 'IdAttribute');
 
             $this->render('Event/views/eventType_edit.latte', $this->getAllParams([

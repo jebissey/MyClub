@@ -77,9 +77,9 @@
                                                     {foreach $event['attributes'] as $attribute}
                                                         <span 
                                                             class="d-inline-block me-1 border rounded"
-                                                            style="width:20px; height:20px; background-color: {$attribute['color']|noescape};"
+                                                            style="width:20px; height:20px; background-color: {$attribute->color|noescape};"
                                                             data-bs-toggle="tooltip"
-                                                            title="{$attribute['name']} : {$attribute['detail']}"
+                                                            title="{$attribute->name} : {$attribute->detail}"
                                                         ></span>
                                                     {/foreach}
                                                 {else}

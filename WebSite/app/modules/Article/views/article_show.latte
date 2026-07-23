@@ -80,7 +80,7 @@
                 <div>
                     <h2 class="card-title" id="article-title-display">{$article->Title}</h2>
                     <small class="text-muted">
-                        {='article.show.created_by'|translate} {$article->FirstName} {$article->LastName}
+                        {='article.show.created_by'|translate} {$article->Author?->FirstName} {$article->Author?->LastName}
                         {='article.show.on_date'|translate} {date('d/m/Y', strtotime($article->Timestamp))}
                         {$publishedBy}
                         {if date('Y-m-d', strtotime($article->Timestamp)) !== date('Y-m-d', strtotime($article->LastUpdate))}
@@ -91,8 +91,8 @@
                         {else}
                             <span class="badge bg-secondary">{='article.show.not_published'|translate}</span>
                         {/if}
-                        {if isset($article->GroupName) && $article->GroupName}
-                            <span class="badge bg-info">{='article.show.group_label'|translate} {$article->GroupName}</span>
+                        {if $article->Group !== null && $article->Group->Name}
+                            <span class="badge bg-info">{='article.show.group_label'|translate} {$article->Group->Name}</span>
                         {/if}
                     </small>
                 </div>

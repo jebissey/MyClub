@@ -6,7 +6,7 @@ namespace app\valueObjects;
 
 use InvalidArgumentException;
 
-readonly class EmailMessage
+final readonly class EmailMessage
 {
     /**
      * @param array<int, string> $cc

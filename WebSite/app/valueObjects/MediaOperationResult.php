@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace app\valueObjects;
 
-readonly class MediaOperationResult
+final readonly class MediaOperationResult
 {
     public function __construct(
         public bool $success,

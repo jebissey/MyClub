@@ -8,6 +8,10 @@ use PDO;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
 use app\interfaces\NewsProviderInterface;
+use app\valueObjects\ArticleAuthorRow;
+use app\valueObjects\ArticleRow;
+use app\valueObjects\ArticleSitemapRow;
+use app\valueObjects\ArticleSummaryRow;
 
 class ArticleDataHelper extends Data implements NewsProviderInterface
 {
@@ -66,7 +70,7 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
     }
 
     /**
-     * @return list<object>
+     * @return list<ArticleSitemapRow>
      */
     public function getArticlesForAll(): array
     {
@@ -117,11 +121,18 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
             ORDER BY LastUpdate DESC;
         ";
         $stmt = $this->pdo->query($sql);
-        return $stmt->fetchAll(PDO::FETCH_OBJ);
+        if ($stmt === false) {
+            return [];
+        }
+
+        return array_map(
+            ArticleSitemapRow::fromStdClass(...),
+            $stmt->fetchAll(PDO::FETCH_OBJ)
+        );
     }
 
     /**
-     * @return list<object>
+     * @return list<ArticleRow>
      */
     public function getArticlesForRss(): array
     {
@@ -145,7 +156,7 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
     /**
      * @param list<int> $articleIds
      *
-     * @return array<int, object>
+     * @return array<int, ArticleAuthorRow>
      */
     public function getAuthorsByArticleIds(array $articleIds): array
     {
@@ -175,7 +186,8 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
 
         $indexed = [];
         foreach ($results as $row) {
-            $indexed[$row->Id] = $row;
+            $authorRow = ArticleAuthorRow::fromStdClass($row);
+            $indexed[$authorRow->Id] = $authorRow;
         }
 
         return $indexed;
@@ -183,6 +195,8 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
 
     /**
      * @param list<int> $articleIds
+     *
+     * @return ArticleRow|null
      */
     public function getLatestArticle(array $articleIds): ?object
     {
@@ -212,13 +226,13 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute($params);
         $article = $stmt->fetch(PDO::FETCH_OBJ);
-        return $article ?: null;
+        return $article ? ArticleRow::fromStdClass($article) : null;
     }
 
     /**
      * @return array{
-     *     latestArticle: object|null,
-     *     latestArticles: list<object>
+     *     latestArticle: ArticleRow|null,
+     *     latestArticles: list<ArticleSummaryRow>
      * }
      */
     public function getLatestArticles(?string $userEmail, int $latestArticlesCount): array
@@ -304,13 +318,17 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
      */
     public function getSpotlightArticle(): mixed
     {
-        $spotlightArticleJson = $this->get('Settings', ['Name' => 'SpotlightArticle'], 'Value')->Value ?? '';
-        if ($spotlightArticleJson === false) {
+        $settingsRow = $this->get('Settings', ['Name' => 'SpotlightArticle'], 'Value');
+        if ($settingsRow === false) {
             return null;
         }
+        $spotlightArticleJson = $settingsRow->Value ?? '';
         return json_decode($spotlightArticleJson, true);
     }
 
+    /**
+     * @return ArticleRow|false
+     */
     public function getWithAuthor(int $id): object|false
     {
         $sql = "
@@ -322,7 +340,8 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
         ";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':id' => $id]);
-        return $stmt->fetch(PDO::FETCH_OBJ);
+        $row = $stmt->fetch(PDO::FETCH_OBJ);
+        return $row ? ArticleRow::fromStdClass($row) : false;
     }
 
     /**
@@ -432,7 +451,7 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
     /**
      * @param list<int> $articleIds
      *
-     * @return list<object>
+     * @return list<ArticleSummaryRow>
      */
     private function doGetLatestArticles(array $articleIds, int $latestArticlesCount): array
     {
@@ -456,7 +475,8 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
             LIMIT " . $latestArticlesCount;
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute($params);
-        return $stmt->fetchAll() ?: [];
+        $rows = $stmt->fetchAll(PDO::FETCH_OBJ) ?: [];
+        return array_map(ArticleSummaryRow::fromStdClass(...), $rows);
     }
 
     /**

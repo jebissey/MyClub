@@ -19,7 +19,7 @@ use app\apis\HelloAssoApi;
 use app\apis\ImportApi;
 use app\apis\KanbanApi;
 use app\apis\KaraokeApi;
-use app\apis\LeapFrogApi;
+use app\apis\LeapfrogApi;
 use app\apis\LoanApi;
 use app\apis\MediaApi;
 use app\apis\MenuItemApi;
@@ -271,9 +271,9 @@ class ApiFactory
         );
     }
 
-    public function makeLeapfrogApi(): LeapFrogApi
+    public function makeLeapfrogApi(): LeapfrogApi
     {
-        return new LeapFrogApi(
+        return new LeapfrogApi(
             $this->application,
             $this->connectedUser,
             $this->dataHelper,

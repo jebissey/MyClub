@@ -434,7 +434,7 @@ class WebmasterController extends AbstractController
             CURLOPT_HTTP_VERSION   => CURL_HTTP_VERSION_1_1,
         ]);
         $response = curl_exec($ch);
-        if ($response === false) {
+        if (!is_string($response)) {
             $error = curl_error($ch);
             unset($ch);
             return "Test for MyClub new version error : Erreur cURL ($error)";

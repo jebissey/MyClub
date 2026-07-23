@@ -18,6 +18,7 @@ use app\models\DataHelper;
 use app\models\LanguagesDataHelper;
 use app\models\MenuItemDataHelper;
 use app\models\MetadataDataHelper;
+use app\valueObjects\Person;
 
 abstract class AbstractController
 {
@@ -94,7 +95,7 @@ abstract class AbstractController
     /**
      * @return list<object>
      */
-    protected function getNavItems(?object $person, bool $all = false): array
+    protected function getNavItems(?Person $person, bool $all = false): array
     {
         $userGroups = [];
         if ($person != null) {
@@ -152,7 +153,7 @@ abstract class AbstractController
      *     }>
      * }>
      */
-    protected function getSidebarMenuItems(?object $person, bool $all = false): array
+    protected function getSidebarMenuItems(?Person $person, bool $all = false): array
     {
         $userGroups = [];
         if ($person !== null) {
