@@ -183,23 +183,28 @@ class HelloAssoService
             return $this->accessToken;
         }
 
+        $postFields = http_build_query([
+            'grant_type'    => 'client_credentials',
+            'client_id'     => $this->resolveClientId(),
+            'client_secret' => $this->resolveClientSecret(),
+        ]);
+        if ($postFields === '') {
+            throw new RuntimeException('HelloAsso: unable to build OAuth2 request body.');
+        }
+        /** @var non-empty-string $postFields */
+
         $ch = curl_init(self::TOKEN_URL);
         curl_setopt_array($ch, [
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_POST           => true,
-            CURLOPT_POSTFIELDS     => http_build_query([
-                'grant_type'    => 'client_credentials',
-                'client_id'     => $this->resolveClientId(),
-                'client_secret' => $this->resolveClientSecret(),
-            ]),
-            CURLOPT_HTTPHEADER => ['Content-Type: application/x-www-form-urlencoded'],
+            CURLOPT_POSTFIELDS     => $postFields,
+            CURLOPT_HTTPHEADER     => ['Content-Type: application/x-www-form-urlencoded'],
         ]);
 
         $body = curl_exec($ch);
         $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        curl_close($ch);
 
-        if ($code !== 200 || $body === false) {
+        if ($code !== 200 || !is_string($body)) {
             throw new RuntimeException("HelloAsso OAuth2 failed (HTTP {$code})");
         }
 
@@ -213,6 +218,7 @@ class HelloAssoService
     }
 
     /**
+     * @param 'GET'|'POST'|'PUT'|'DELETE'|'PATCH' $method
      * @param  array<string, mixed> $body
      * @return array<string, mixed>
      */
@@ -230,7 +236,11 @@ class HelloAssoService
         ]);
 
         if ($method === 'POST' && !empty($body)) {
-            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($body));
+            $encoded = json_encode($body);
+            if ($encoded === false) {
+                throw new RuntimeException("HelloAsso: failed to encode request body for {$url}");
+            }
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $encoded);
         }
 
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
@@ -238,7 +248,7 @@ class HelloAssoService
         $response = curl_exec($ch);
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
-        if ($response === false) {
+        if (!is_string($response)) {
             throw new RuntimeException("HelloAsso cURL error for {$url}");
         }
 

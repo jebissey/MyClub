@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\models;
 
 use PDO;
+use PDOStatement;
 use RuntimeException;
 use Throwable;
 use app\enums\ApplicationError;
@@ -71,6 +72,9 @@ class Database
 
         $query = "SELECT ApplicationName, DatabaseVersion FROM Metadata LIMIT 1";
         $stmt = self::$pdo->query($query);
+        if (!$stmt instanceof PDOStatement) {
+            Application::unreachable('Failed to query Metadata table', __FILE__, __LINE__);
+        }
         $row = $stmt->fetch(PDO::FETCH_OBJ);
         $stmt = null;
 
@@ -137,14 +141,18 @@ class Database
 
     private function deleteOrphans(PDO $pdo, LogMessage $logMessage): void
     {
-        $tables = $pdo
-            ->query("SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%'")
-            ->fetchAll(PDO::FETCH_COLUMN);
+        $stmtTables = $pdo->query("SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%'");
+        if (!$stmtTables instanceof PDOStatement) {
+            return;
+        }
+        $tables = $stmtTables->fetchAll(PDO::FETCH_COLUMN);
 
         foreach ($tables as $table) {
-            $foreignKeys = $pdo
-                ->query("PRAGMA foreign_key_list(" . $pdo->quote($table) . ")")
-                ->fetchAll(PDO::FETCH_ASSOC);
+            $stmtFk = $pdo->query("PRAGMA foreign_key_list(" . $pdo->quote((string)$table) . ")");
+            if (!$stmtFk instanceof PDOStatement) {
+                continue;
+            }
+            $foreignKeys = $stmtFk->fetchAll(PDO::FETCH_ASSOC);
 
             foreach ($foreignKeys as $fk) {
                 $sql = sprintf(
@@ -156,7 +164,7 @@ class Database
                     $fk['table']
                 );
                 $deleted = $pdo->exec($sql);
-                if ($deleted > 0) {
+                if ($deleted !== false && $deleted > 0) {
                     $logMessage->setMessage(
                         "Orphans deleted in {$table}.{$fk['from']} referencing {$fk['table']}.{$fk['to']}: {$deleted} row(s)"
                     );
@@ -167,7 +175,11 @@ class Database
 
     private function checkOrphans(PDO $pdo): void
     {
-        $violations = $pdo->query('PRAGMA foreign_key_check')->fetchAll(PDO::FETCH_ASSOC);
+        $stmt = $pdo->query('PRAGMA foreign_key_check');
+        if (!$stmt instanceof PDOStatement) {
+            return;
+        }
+        $violations = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         if (!empty($violations)) {
             $details = implode('; ', array_map(

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\helpers;
 
 use RuntimeException;
+use stdClass;
 use app\models\DataHelper;
 use app\models\LanguagesDataHelper;
 use app\models\SharedFileDataHelper;
@@ -103,6 +104,7 @@ class MediaManager
             ['Item' => $filePath],
             'IdGroup, OnlyForMembers'
         );
+        assert($sharedFile === false || $sharedFile instanceof stdClass);
 
         return new ShareFileInfo(
             success: $sharedFile !== false,
@@ -125,6 +127,7 @@ class MediaManager
             ['Item' => $filePath],
             'Id, Token'
         );
+        assert($sharedFile === false || $sharedFile instanceof stdClass);
 
         $token = $sharedFile !== false && $sharedFile->Token !== null
             ? $sharedFile->Token
@@ -161,6 +164,8 @@ class MediaManager
     public function isShared(string $filePath): ShareStatus
     {
         $sharedFile = $this->sharedFileDataHelper->getSharedFile($filePath);
+        assert($sharedFile === false || $sharedFile instanceof stdClass);
+
         if ($sharedFile === false || empty($sharedFile->Token)) {
             return new ShareStatus(shared: false);
         }
@@ -189,7 +194,9 @@ class MediaManager
     private function buildFilePath(int $year, int $month, string $filename): ?string
     {
         $path = sprintf('%04d', $year) . DIRECTORY_SEPARATOR . sprintf('%02d', $month) . DIRECTORY_SEPARATOR . basename($filename);
-        return file_exists(realpath(self::MEDIA_PATH . $path)) ? $path : null;
+
+        $realPath = realpath(self::MEDIA_PATH . $path);
+        return $realPath !== false && file_exists($realPath) ? $path : null;
     }
 
     private function getOrCreateDirectory(int $year, int $month): string
@@ -215,15 +222,16 @@ class MediaManager
     {
         $path = $dir . $filename;
 
+        $extension = pathinfo($filename, PATHINFO_EXTENSION);
+        $base = pathinfo($filename, PATHINFO_FILENAME);
+
         $counter = 1;
 
         while (file_exists($path)) {
-            $info = pathinfo($filename);
-
             $path = $dir
-                . $info['filename']
+                . $base
                 . "_$counter."
-                . $info['extension'];
+                . $extension;
 
             $counter++;
         }
@@ -248,7 +256,12 @@ class MediaManager
 
     private function isDirectoryEmpty(string $dir): bool
     {
-        return is_dir($dir) && count(glob("$dir/*")) === 0;
+        if (!is_dir($dir)) {
+            return false;
+        }
+
+        $files = glob("$dir/*");
+        return $files !== false && count($files) === 0;
     }
 
     private function toRelativePath(string $absolutePath): string

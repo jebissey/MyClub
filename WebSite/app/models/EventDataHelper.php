@@ -24,11 +24,11 @@ use app\valueObjects\ApiResponse;
 use app\valueObjects\EventAttributeRow;
 use app\valueObjects\EventDetailRow;
 use app\valueObjects\EventExternalRow;
-use app\valueObjects\EventRow;
+use app\valueObjects\EventFullRow;
 use app\valueObjects\Person;
 
 /**
- * @phpstan-import-type EventArrayShape from EventRow
+ * @phpstan-import-type EventArrayShape from \app\valueObjects\EventRow
  * @phpstan-type WeekData array{
  *     weekStart: string,
  *     weekEnd: string,
@@ -77,23 +77,34 @@ class EventDataHelper extends Data implements NewsProviderInterface
     {
         try {
             $this->pdo->beginTransaction();
-
-            $event = $this->get('Event', ['Id' => $id]);
-            if (!$event) {
+            $sql = "
+                SELECT
+                    Id, Summary, Description, Location, StartTime, Duration,
+                    IdEventType, CreatedBy, MaxParticipants, Audience
+                FROM Event
+                WHERE Id = :id
+                LIMIT 1
+            ";
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute([':id' => $id]);
+            $event = $stmt->fetch(PDO::FETCH_OBJ);
+            if ($event === false) {
                 $this->pdo->rollBack();
                 return new ApiResponse(false, ApplicationError::BadRequest->value, [], 'Unknown event');
             }
-            $newStartTime = $this->calculateNewStartTime($event->StartTime, $mode);
+            $eventRow = EventFullRow::fromStdClass($event);
+
+            $newStartTime = $this->calculateNewStartTime($eventRow->StartTime, $mode);
             $newEvent = [
-                'Summary' => $event->Summary,
-                'Description' => $event->Description,
-                'Location' => $event->Location,
+                'Summary' => $eventRow->Summary,
+                'Description' => $eventRow->Description,
+                'Location' => $eventRow->Location,
                 'StartTime' => $newStartTime,
-                'Duration' => $event->Duration,
-                'IdEventType' => $event->IdEventType,
+                'Duration' => $eventRow->Duration,
+                'IdEventType' => $eventRow->IdEventType,
                 'CreatedBy' => $personId,
-                'MaxParticipants' => $event->MaxParticipants,
-                'Audience' => $event->Audience
+                'MaxParticipants' => $eventRow->MaxParticipants,
+                'Audience' => $eventRow->Audience
             ];
             $newEventId = $this->set('Event', $newEvent);
             $attributes = $this->gets('EventAttribute', ['IdEvent' => $id]);
@@ -516,7 +527,11 @@ class EventDataHelper extends Data implements NewsProviderInterface
         $this->pdo->beginTransaction();
         try {
             if ($data['formMode'] == 'create') {
-                $eventId = $this->set('Event', $values);
+                $newId = $this->set('Event', $values);
+                if (!is_int($newId)) {
+                    throw new QueryException('Failed to create event');
+                }
+                $eventId = $newId;
             } elseif ($data['formMode'] == 'update') {
                 $eventId = (int)$data['id'];
                 if (!$this->get('Event', ['Id' => $eventId], 'Id')) {
@@ -662,7 +677,8 @@ class EventDataHelper extends Data implements NewsProviderInterface
             ':eventId' => $eventId,
             ':from'    => $from
         ]);
-        return $stmt->fetchColumn();
+        $result = $stmt->fetchColumn();
+        return $result === false ? false : (int)$result;
     }
 
     /** @return array<int, array<string, mixed>> */
@@ -783,7 +799,7 @@ class EventDataHelper extends Data implements NewsProviderInterface
     }
 
     /** @return EventArrayShape */
-    private function buildEventArray(object $event, DateTime $startTime): array
+    private function buildEventArray(stdClass $event, DateTime $startTime): array
     {
         return [
             'id'          => $event->Id,
@@ -824,7 +840,7 @@ class EventDataHelper extends Data implements NewsProviderInterface
     /**
      * @return list<EventAttributeRow>
      */
-    private function parseAttributes(object $event): array
+    private function parseAttributes(stdClass $event): array
     {
         if (empty($event->AttributeIds)) {
             return [];

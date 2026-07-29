@@ -55,11 +55,11 @@ class MessageDataHelper extends Data implements NewsProviderInterface
             'From'      => 'User',
             'ImagePath' => $imagePath
         ]);
-        return $messageId;
+        return is_int($messageId) ? $messageId : false;
     }
 
     /**
-     * @param array<int, stdClass> $participants
+     * @param array<int, object{PersonId: int, Email: string}> $participants
      * @return array<int, string>
      */
     public function addWebAppMessages(int $eventId, array $participants, string $text): array
@@ -157,8 +157,13 @@ class MessageDataHelper extends Data implements NewsProviderInterface
     public function getGroupedMessages(int $personId, string $searchFrom, GravatarHandler $gravatarHandler): array
     {
         $rows = $this->doGetGroupedMessages($personId, $searchFrom);
-        return array_map(function (object $row) use ($gravatarHandler): array {
-            $userImg = WebApp::getUserImg($row, $gravatarHandler);
+        return array_map(function (stdClass $row) use ($gravatarHandler): array {
+            $userImg = WebApp::computeUserImg(
+                (bool)($row->UseGravatar ?? false),
+                $row->Email ?? null,
+                $row->Avatar ?? null,
+                $gravatarHandler
+            );
 
             $result = (array) $row;
             $result['UserImg'] = $userImg;
@@ -319,6 +324,9 @@ class MessageDataHelper extends Data implements NewsProviderInterface
         }
 
         $stmt = $this->pdo->query("SELECT ImagePath FROM Message WHERE ImagePath IS NOT NULL");
+        if ($stmt === false) {
+            return [];
+        }
         $imagePaths = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
         $used = [];
@@ -373,7 +381,12 @@ class MessageDataHelper extends Data implements NewsProviderInterface
         static $gravatarHandler = new GravatarHandler();
 
         foreach ($messages as $message) {
-            $message->UserImg = WebApp::computeUserImg($message->UseGravatar ?? false, $message->Email ?? null, $message->Avatar ?? null, $gravatarHandler);
+            $message->UserImg = WebApp::computeUserImg(
+                (bool)($message->UseGravatar ?? false),
+                $message->Email ?? null,
+                $message->Avatar ?? null,
+                $gravatarHandler
+            );
             $message->TimeAgo = MyClubDateTime::calculateTimeAgo($message->LastUpdate);
         }
         return $messages;
@@ -526,7 +539,7 @@ class MessageDataHelper extends Data implements NewsProviderInterface
         $stmt = $this->pdoForLog->prepare("SELECT CreatedAt FROM Log WHERE Id = ?");
         $stmt->execute([$lastLogId]);
         $result = $stmt->fetchColumn();
-        return $result !== false ? $result : null;
+        return $result !== false ? (string)$result : null;
     }
 
     private function hasRecentMessageApiCall(int $lastLogId): bool

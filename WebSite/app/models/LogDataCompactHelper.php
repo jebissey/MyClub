@@ -25,7 +25,7 @@ class LogDataCompactHelper extends Data
             $last = new DateTime($metadata->Compact_lastDate);
             $now  = new DateTime();
             $daysSinceLast = (int)$last->diff($now)->format('%a');
-            $countBefore = (int)$this->pdoForLog->query("SELECT COUNT(*) FROM Log")->fetchColumn();
+            $countBefore = (int)$this->fetchColumnOrFail($this->pdoForLog->query("SELECT COUNT(*) FROM Log"));
             if ($daysSinceLast >= (int)$metadata->Compact_everyXdays) {
                 $this->compactRows($removeOlderThanXmonths, $compactOlderThanXmonths);
                 $this->set('Metadata', ['Compact_lastDate' => (new DateTime())->format('Y-m-d H:i:s')], ['Id' => 1]);
@@ -114,7 +114,7 @@ class LogDataCompactHelper extends Data
         if ($maxRecords <= 0) {
             return;
         }
-        $count = (int)$this->pdoForLog->query("SELECT COUNT(*) FROM Log")->fetchColumn();
+        $count = (int)$this->fetchColumnOrFail($this->pdoForLog->query("SELECT COUNT(*) FROM Log"));
         if ($count > $maxRecords) {
             $toDelete = $count - $maxRecords;
             $this->pdoForLog->exec("
@@ -126,7 +126,7 @@ class LogDataCompactHelper extends Data
                 )
             ");
         }
-        $countAfter = (int)$this->pdoForLog->query("SELECT COUNT(*) FROM Log")->fetchColumn();
+        $countAfter = (int)$this->fetchColumnOrFail($this->pdoForLog->query("SELECT COUNT(*) FROM Log"));
         if ($countAfter < $countBefore) {
             (new LogDataWriterHelper($this->application))->add(
                 (string)ApplicationError::Ok->value,

@@ -7,6 +7,7 @@ namespace app\models;
 use PDO;
 use Throwable;
 use app\helpers\Application;
+use app\valueObjects\KaraokeSession;
 
 class KaraokeDataHelper extends Data
 {
@@ -71,22 +72,22 @@ class KaraokeDataHelper extends Data
         return (int)$this->pdo->lastInsertId();
     }
 
-    public function getSessionById(int $id): ?object
+    public function getSessionById(int $id): ?KaraokeSession
     {
         $stmt = $this->pdo->prepare('SELECT * FROM "KaraokeSession" WHERE "Id" = ?');
         $stmt->execute([$id]);
         $result = $stmt->fetch(PDO::FETCH_OBJ);
 
-        return $result ?: null;
+        return $result !== false ? KaraokeSession::fromStdClass($result) : null;
     }
 
-    public function getSessionBySessionId(string $sessionId): ?object
+    public function getSessionBySessionId(string $sessionId): ?KaraokeSession
     {
         $stmt = $this->pdo->prepare('SELECT * FROM "KaraokeSession" WHERE "SessionId" = ?');
         $stmt->execute([$sessionId]);
         $result = $stmt->fetch(PDO::FETCH_OBJ);
 
-        return $result ?: null;
+        return $result !== false ? KaraokeSession::fromStdClass($result) : null;
     }
 
     public function isClientHost(string $clientId, int $idSession): bool

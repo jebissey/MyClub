@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace app\apis;
 
+use JsonException;
 use Throwable;
 use app\enums\ApplicationError;
 use app\helpers\Application;
@@ -35,8 +36,9 @@ class KanbanApi extends AbstractApi
             $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }
-        $data = json_decode(file_get_contents('php://input'), true);
-        if (!is_array($data)) {
+        try {
+            $data = $this->getJsonInput();
+        } catch (JsonException $e) {
             $this->renderJsonBadRequest('Invalid JSON', __FILE__, __LINE__);
             return;
         }
@@ -79,8 +81,9 @@ class KanbanApi extends AbstractApi
             $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }
-        $data = json_decode(file_get_contents('php://input'), true);
-        if (!is_array($data)) {
+        try {
+            $data = $this->getJsonInput();
+        } catch (JsonException $e) {
             $this->renderJsonBadRequest('Invalid JSON', __FILE__, __LINE__);
             return;
         }
@@ -132,8 +135,9 @@ class KanbanApi extends AbstractApi
             return;
         }
 
-        $data = json_decode(file_get_contents('php://input'), true);
-        if (!is_array($data)) {
+        try {
+            $data = $this->getJsonInput();
+        } catch (JsonException $e) {
             $this->renderJsonBadRequest('Invalid JSON', __FILE__, __LINE__);
             return;
         }
@@ -168,8 +172,9 @@ class KanbanApi extends AbstractApi
             return;
         }
 
-        $data = json_decode(file_get_contents('php://input'), true);
-        if (!is_array($data)) {
+        try {
+            $data = $this->getJsonInput();
+        } catch (JsonException $e) {
             $this->renderJsonBadRequest('Invalid JSON', __FILE__, __LINE__);
             return;
         }
@@ -215,8 +220,9 @@ class KanbanApi extends AbstractApi
             return;
         }
 
-        $data = json_decode(file_get_contents('php://input'), true);
-        if (!is_array($data)) {
+        try {
+            $data = $this->getJsonInput();
+        } catch (JsonException $e) {
             $this->renderJsonBadRequest('Invalid JSON', __FILE__, __LINE__);
             return;
         }
@@ -256,8 +262,9 @@ class KanbanApi extends AbstractApi
             $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }
-        $data = json_decode(file_get_contents('php://input'), true);
-        if (!is_array($data)) {
+        try {
+            $data = $this->getJsonInput();
+        } catch (JsonException $e) {
             $this->renderJsonBadRequest('Invalid JSON', __FILE__, __LINE__);
             return;
         }
@@ -297,8 +304,9 @@ class KanbanApi extends AbstractApi
             $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }
-        $data = json_decode(file_get_contents('php://input'), true);
-        if (!is_array($data)) {
+        try {
+            $data = $this->getJsonInput();
+        } catch (JsonException $e) {
             $this->renderJsonBadRequest('Invalid JSON', __FILE__, __LINE__);
             return;
         }
@@ -362,8 +370,9 @@ class KanbanApi extends AbstractApi
             $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }
-        $data = json_decode(file_get_contents('php://input'), true);
-        if (!is_array($data)) {
+        try {
+            $data = $this->getJsonInput();
+        } catch (JsonException $e) {
             $this->renderJsonBadRequest('Invalid JSON', __FILE__, __LINE__);
             return;
         }
@@ -406,8 +415,9 @@ class KanbanApi extends AbstractApi
             $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }
-        $data = json_decode(file_get_contents('php://input'), true);
-        if (!is_array($data)) {
+        try {
+            $data = $this->getJsonInput();
+        } catch (JsonException $e) {
             $this->renderJsonBadRequest('Invalid JSON', __FILE__, __LINE__);
             return;
         }
@@ -452,8 +462,9 @@ class KanbanApi extends AbstractApi
             $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }
-        $data = json_decode(file_get_contents('php://input'), true);
-        if (!is_array($data)) {
+        try {
+            $data = $this->getJsonInput();
+        } catch (JsonException $e) {
             $this->renderJsonBadRequest('Invalid JSON', __FILE__, __LINE__);
             return;
         }
@@ -540,8 +551,9 @@ class KanbanApi extends AbstractApi
             $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }
-        $data = json_decode(file_get_contents('php://input'), true);
-        if (!is_array($data)) {
+        try {
+            $data = $this->getJsonInput();
+        } catch (JsonException $e) {
             $this->renderJsonBadRequest('Invalid JSON', __FILE__, __LINE__);
             return;
         }

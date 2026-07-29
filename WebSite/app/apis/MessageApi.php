@@ -20,7 +20,11 @@ use app\models\MessageDataHelper;
 use app\models\PersonDataHelper;
 use app\modules\Common\services\MessageRecipientService;
 use app\valueObjects\ApiResponse;
+use app\valueObjects\ArticleCreatorTitleRow;
+use app\valueObjects\EventCreatorSummaryRow;
+use app\valueObjects\GroupNameRow;
 use app\valueObjects\MessageContext;
+use app\valueObjects\MessageOwnerRow;
 use app\valueObjects\UploadedFileInput;
 
 use function imagecreatefromstring;
@@ -231,11 +235,12 @@ class MessageApi extends AbstractApi
 
     private function doDeleteMessage(int $messageId, int $personId): ApiResponse
     {
-        $message = $this->dataHelper->get('Message', ['Id' => $messageId], 'PersonId');
-        if (!$message) {
+        $row = $this->dataHelper->get('Message', ['Id' => $messageId], 'PersonId');
+        if ($row === false) {
             return new ApiResponse(false, ApplicationError::BadRequest->value, [], "Message {$messageId} doesn't exist");
         }
-        if ($message->PersonId != $personId) {
+        $message = MessageOwnerRow::fromStdClass($row);
+        if ($message->PersonId !== $personId) {
             return new ApiResponse(
                 false,
                 ApplicationError::Forbidden->value,
@@ -279,37 +284,44 @@ class MessageApi extends AbstractApi
     {
         $articleAuthorId = null;
         $eventCreatorId = null;
+        $article = null;
+        $event = null;
+        $group = null;
+
         if ($articleId !== null) {
-            $article = $this->dataHelper->get('Article', ['Id' => $articleId], 'CreatedBy, Title');
-            if ($article === false) {
+            $row = $this->dataHelper->get('Article', ['Id' => $articleId], 'CreatedBy, Title');
+            if ($row === false) {
                 $this->application->getErrorManager()->raise(
                     ApplicationError::Error,
                     "Article {$articleId} not found when notifying message recipients for message {$messageId}"
                 );
                 return;
             }
-            $articleAuthorId =  $article->CreatedBy;
+            $article = ArticleCreatorTitleRow::fromStdClass($row);
+            $articleAuthorId = $article->CreatedBy;
         }
         if ($eventId !== null) {
-            $event = $this->dataHelper->get('Event', ['Id' => $eventId], 'CreatedBy, Summary');
-            if ($event === false) {
+            $row = $this->dataHelper->get('Event', ['Id' => $eventId], 'CreatedBy, Summary');
+            if ($row === false) {
                 $this->application->getErrorManager()->raise(
                     ApplicationError::Error,
                     "Event {$eventId} not found when notifying message recipients for message {$messageId}"
                 );
                 return;
             }
-            $eventCreatorId =  $event->CreatedBy;
+            $event = EventCreatorSummaryRow::fromStdClass($row);
+            $eventCreatorId = $event->CreatedBy;
         }
         if ($groupId !== null) {
-            $group = $this->dataHelper->get('Group', ['Id' => $groupId], 'Name');
-            if ($group === false) {
+            $row = $this->dataHelper->get('Group', ['Id' => $groupId], 'Name');
+            if ($row === false) {
                 $this->application->getErrorManager()->raise(
                     ApplicationError::Error,
                     "Group {$groupId} not found when notifying message recipients for message {$messageId}"
                 );
                 return;
             }
+            $group = GroupNameRow::fromStdClass($row);
         }
 
         $context = new MessageContext(
@@ -414,16 +426,21 @@ class MessageApi extends AbstractApi
         }
 
         $ratio = min($maxDim / $w, $maxDim / $h);
-        $newW  = (int)round($w * $ratio);
-        $newH  = (int)round($h * $ratio);
+        $newW  = max(1, (int)round($w * $ratio));
+        $newH  = max(1, (int)round($h * $ratio));
 
         $dst = imagecreatetruecolor($newW, $newH);
+        if ($dst === false) {
+            return null;
+        }
 
         if (in_array($mime, ['image/png', 'image/webp'], true)) {
             imagealphablending($dst, false);
             imagesavealpha($dst, true);
             $transparent = imagecolorallocatealpha($dst, 0, 0, 0, 127);
-            imagefilledrectangle($dst, 0, 0, $newW, $newH, $transparent);
+            if ($transparent !== false) {
+                imagefilledrectangle($dst, 0, 0, $newW, $newH, $transparent);
+            }
         }
 
         imagecopyresampled($dst, $src, 0, 0, 0, 0, $newW, $newH, $w, $h);

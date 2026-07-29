@@ -8,6 +8,8 @@ use Envms\FluentPDO\Query;
 use InvalidArgumentException;
 use PDO;
 use PDOException;
+use PDOStatement;
+use RuntimeException;
 use stdClass;
 use app\enums\ApplicationError;
 use app\exceptions\SqliteTableException;
@@ -379,5 +381,30 @@ abstract class Data
             }
         }
         return true;
+    }
+
+    /**
+     * Récupère toutes les lignes d'un PDOStatement, en levant une exception
+     * si la requête a échoué (PDO::query() est typé PDOStatement|false).
+     * @return array<int, array<string, mixed>>
+     */
+    protected function fetchAllOrFail(PDOStatement|false $stmt): array
+    {
+        if ($stmt === false) {
+            throw new RuntimeException('La requête SQL a échoué.');
+        }
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Récupère la première colonne de la première ligne d'un PDOStatement, 
+     * en levant une exception si la requête a échoué.
+     */
+    protected function fetchColumnOrFail(PDOStatement|false $stmt, int $column = 0): mixed
+    {
+        if ($stmt === false) {
+            throw new RuntimeException('La requête SQL a échoué.');
+        }
+        return $stmt->fetchColumn($column);
     }
 }

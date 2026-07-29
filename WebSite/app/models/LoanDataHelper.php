@@ -6,6 +6,7 @@ namespace app\models;
 
 use app\helpers\Application;
 use PDO;
+use RuntimeException;
 
 class LoanDataHelper extends Data
 {
@@ -24,7 +25,7 @@ class LoanDataHelper extends Data
         $stmt = $this->pdo->query(
             "SELECT * FROM LoanItem ORDER BY IsActive DESC, Name ASC"
         );
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $this->fetchAllOrFail($stmt);
     }
 
     /**
@@ -44,7 +45,7 @@ class LoanDataHelper extends Data
             );
             $stmt->execute([':type' => $type]);
         }
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $this->fetchAllOrFail($stmt);
     }
 
     /** @return array<string, mixed>|null */
@@ -161,7 +162,7 @@ class LoanDataHelper extends Data
                 "$base ORDER BY lr.LoanDate DESC"
             );
         }
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $this->fetchAllOrFail($stmt);
     }
 
     /** @return array<string, mixed>|null */
@@ -329,7 +330,7 @@ class LoanDataHelper extends Data
                 "$base ORDER BY res.ReservationDate DESC, res.StartTime ASC"
             );
         }
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $this->fetchAllOrFail($stmt);
     }
 
     /** @return array<string, mixed>|null */
@@ -484,7 +485,11 @@ class LoanDataHelper extends Data
             };
             $endDate = $row['ReturnDate'] ?? $row['DueDate'];
             // FullCalendar : end est exclusif, on ajoute 1 jour pour les all-day events
-            $endDateExclusive = date('Y-m-d', strtotime($endDate . ' +1 day'));
+            $endTimestamp = strtotime($endDate . ' +1 day');
+            if ($endTimestamp === false) {
+                throw new RuntimeException("Date invalide pour le prêt #{$row['Id']} : {$endDate}");
+            }
+            $endDateExclusive = date('Y-m-d', $endTimestamp);
             $events[] = [
                 'id'              => 'loan-' . $row['Id'],
                 'title'           => $row['ItemName'] . ' → ' . $row['BorrowerName'],
@@ -544,6 +549,6 @@ class LoanDataHelper extends Data
             "SELECT Id, FirstName || ' ' || LastName AS FullName
 			 FROM Person ORDER BY LastName ASC, FirstName ASC"
         );
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $this->fetchAllOrFail($stmt);
     }
 }

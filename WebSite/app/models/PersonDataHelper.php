@@ -17,8 +17,23 @@ use app\helpers\WebApp;
 use app\interfaces\NewsProviderInterface;
 use app\modules\Common\services\EmailService;
 use app\valueObjects\EmailMessage;
+use app\valueObjects\EventRegistrationRow;
 use app\valueObjects\Person;
 
+/**
+ * @phpstan-type PersonGroupRow object{
+ *     PersonId: int,
+ *     Id: int,
+ *     FirstName: string|null,
+ *     LastName: string|null,
+ *     Email: string|null,
+ *     Preferences: string|null,
+ *     Availabilities: string|null,
+ *     InPresentationDirectory: int,
+ *     ShowPhoneInPresentationDirectory: int|string,
+ *     ShowEmailInPresentationDirectory: int|string
+ * }
+ */
 class PersonDataHelper extends Data implements NewsProviderInterface
 {
     public function __construct(
@@ -78,7 +93,7 @@ class PersonDataHelper extends Data implements NewsProviderInterface
     }
 
     /**
-     * @return stdClass[]
+     * @return list<PersonGroupRow>
      */
     public function getInterestedPeople(?int $idGroup, ?int $idEventType, ?int $dayOfWeek, string $timeOfDay): array
     {
@@ -91,6 +106,7 @@ class PersonDataHelper extends Data implements NewsProviderInterface
         }
         return $filteredPeople;
     }
+
     /**
      * @return stdClass[]
      */
@@ -123,6 +139,9 @@ class PersonDataHelper extends Data implements NewsProviderInterface
             ORDER BY clubMember
         ";
         $stmt = $this->pdo->query($query);
+        if ($stmt === false) {
+            Application::unreachable("Query failed", __FILE__, __LINE__);
+        }
         return $stmt->fetchAll(PDO::FETCH_OBJ);
     }
 
@@ -224,7 +243,7 @@ class PersonDataHelper extends Data implements NewsProviderInterface
     }
 
     /**
-     * @return stdClass[]
+     * @return list<PersonGroupRow>
      */
     public function getPersonsInGroup(?int $idGroup): array
     {
@@ -233,13 +252,18 @@ class PersonDataHelper extends Data implements NewsProviderInterface
             $innerJoin = 'INNER JOIN PersonGroup on PersonGroup.IdPerson = Person.Id';
             $and = 'AND PersonGroup.IdGroup = ' . $idGroup;
         }
-        return $this->pdo->query("
-            SELECT Person.Id as PersonId, FirstName, LastName, Email, Preferences, Availabilities
+        $query = $this->pdo->query("
+            SELECT Person.Id AS PersonId, Person.Id AS Id, FirstName, LastName, Email, Preferences, Availabilities,
+                   InPresentationDirectory, ShowPhoneInPresentationDirectory, ShowEmailInPresentationDirectory
             FROM Person
             $innerJoin
             WHERE Person.Inactivated = 0 $and
             ORDER BY FirstName, LastName
-        ")->fetchAll(PDO::FETCH_OBJ);
+        ");
+        if ($query === false) {
+            Application::unreachable("Query failed", __FILE__, __LINE__);
+        }
+        return $query->fetchAll(PDO::FETCH_OBJ);
     }
 
     /**
@@ -270,17 +294,26 @@ class PersonDataHelper extends Data implements NewsProviderInterface
     public function getPersonWantedToBeAlerted(int $idArticle): array
     {
         $idGroup = null;
-        if ($group = $this->get('Article', ['Id' => $idArticle], 'IdGroup')) {
+        $group = $this->get('Article', ['Id' => $idArticle], 'IdGroup');
+        if ($group !== false) {
+            /** @var object{IdGroup: int} $group */
             $idGroup = $group->IdGroup;
         }
+
         $idSurvey = null;
-        if ($survey = $this->get('Survey', ['IdArticle' => $idArticle], 'Id')) {
+        $survey = $this->get('Survey', ['IdArticle' => $idArticle], 'Id');
+        if ($survey !== false) {
+            /** @var object{Id: int} $survey */
             $idSurvey = $survey->Id;
         }
+
         $idOrder = null;
-        if ($order = $this->get('Order', ['IdArticle' => $idArticle], 'Id')) {
+        $order = $this->get('Order', ['IdArticle' => $idArticle], 'Id');
+        if ($order !== false) {
+            /** @var object{Id: int} $order */
             $idOrder = $order->Id;
         }
+
         $persons = $this->getPersonsInGroup($idGroup);
         $filteredEmails = [];
         foreach ($persons as $person) {
@@ -323,15 +356,20 @@ class PersonDataHelper extends Data implements NewsProviderInterface
             return null;
         }
         $person = $this->get('Person', ['Id' => $idPerson], 'FirstName, LastName');
-        $name = $person !== false ? $person->FirstName . ' ' . $person->LastName : "?";
+        if ($person === false) {
+            return "publié par ?";
+        }
+        /** @var object{FirstName: string|null, LastName: string|null} $person */
+        $name = trim($person->FirstName . ' ' . $person->LastName);
         return "publié par " . $name;
     }
+
     /**
      * @return stdClass[]
      */
     public function getRedactors(): array
     {
-        return $this->pdo->query("
+        $query = $this->pdo->query("
             SELECT Person.Id AS PersonId, FirstName, LastName, NickName, Email
             FROM Person
             INNER JOIN PersonGroup        ON PersonGroup.IdPerson        = Person.Id
@@ -340,7 +378,11 @@ class PersonDataHelper extends Data implements NewsProviderInterface
             AND GroupAuthorization.IdAuthorization = 4
             GROUP BY Person.Id
             ORDER BY FirstName, LastName
-        ")->fetchAll(PDO::FETCH_OBJ);
+        ");
+        if ($query === false) {
+            Application::unreachable("Query failed", __FILE__, __LINE__);
+        }
+        return $query->fetchAll(PDO::FETCH_OBJ);
     }
 
     public function getWebmasterEmail(): string
@@ -354,7 +396,14 @@ class PersonDataHelper extends Data implements NewsProviderInterface
             INNER JOIN Authorization on GroupAuthorization.IdAuthorization = Authorization.Id
             WHERE Authorization.Name = "Webmaster"'
         );
-        return $query->fetchColumn();
+        if ($query === false) {
+            Application::unreachable("Query failed", __FILE__, __LINE__);
+        }
+        $email = $query->fetchColumn();
+        if (!is_string($email)) {
+            Application::unreachable("Webmaster email not found", __FILE__, __LINE__);
+        }
+        return $email;
     }
 
     /**
@@ -482,10 +531,15 @@ class PersonDataHelper extends Data implements NewsProviderInterface
         return $results;
     }
 
-    public function sendRegistrationLink(string $adminEmail, string $name, string $emailContact, object $event): bool
-    {
+    public function sendRegistrationLink(
+        string $adminEmail,
+        string $name,
+        string $emailContact,
+        EventRegistrationRow $event
+    ): bool {
+        /** @var object{Id: int}|false $contact */
         $contact = $this->get('Contact', ['Email' => $emailContact]);
-        if (!$contact) {
+        if ($contact === false) {
             $contactData = [
                 'Email' => $emailContact,
                 'NickName' => $name,
@@ -503,15 +557,20 @@ class PersonDataHelper extends Data implements NewsProviderInterface
                 ],
                 ['Id' => $contact->Id]
             );
-            $contact->Token = $token;
+            $contactId = $contact->Id;
         }
-        if (isset($contactId) && $contactId !== false) {
-            $contact = $this->get('Contact', ['Id' => $contactId]);
-        }
-        if ($contact === false) {
+
+        if ($contactId === false) {
             Application::unreachable("contact must exist", __FILE__, __LINE__);
         }
-        $registrationLink = Webapp::getBaseUrl() . "event/{$event->Id}/{$contact->Token}";
+
+        /** @var object{Token: string}|false $refreshedContact */
+        $refreshedContact = $this->get('Contact', ['Id' => $contactId]);
+        if ($refreshedContact === false) {
+            Application::unreachable("contact must exist", __FILE__, __LINE__);
+        }
+
+        $registrationLink = Webapp::getBaseUrl() . "event/{$event->Id}/{$refreshedContact->Token}";
         $subject = "Lien d'inscription pour " . $event->Summary;
         $body = $registrationLink;
 

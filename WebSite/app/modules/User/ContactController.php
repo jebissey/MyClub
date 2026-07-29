@@ -14,6 +14,7 @@ use app\modules\Common\AbstractController;
 use app\modules\Common\services\CredentialService;
 use app\modules\Common\services\EmailService;
 use app\valueObjects\EmailMessage;
+use app\valueObjects\EventRegistrationRow;
 
 class ContactController extends AbstractController
 {
@@ -201,7 +202,7 @@ class ContactController extends AbstractController
                 $this->raiseBadRequest("Unknown event {$eventId}", __FILE__, __LINE__);
                 return;
             }
-            $emailSent = $this->personDataHelper->sendRegistrationLink($contactEmail, $name, $email, $event);
+            $emailSent = $this->personDataHelper->sendRegistrationLink($contactEmail, $name, $email, new EventRegistrationRow($event->Id, $event->Summary));
         } else {
             $emailMessage = new EmailMessage(
                 from: $email,

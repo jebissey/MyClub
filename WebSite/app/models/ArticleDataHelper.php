@@ -22,7 +22,7 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
 
     /**
      * @param array{
-     *     authors:list<object>,
+     *     authors:list<object{Id:int}>,
      *     audiences:list<array{id:int}>,
      *     data:array<int, array<int, int>>
      * } $crosstabData
@@ -125,10 +125,10 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
             return [];
         }
 
-        return array_map(
+        return array_values(array_map(
             ArticleSitemapRow::fromStdClass(...),
             $stmt->fetchAll(PDO::FETCH_OBJ)
-        );
+        ));
     }
 
     /**
@@ -150,7 +150,11 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
         ";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_OBJ);
+
+        return array_values(array_map(
+            ArticleRow::fromStdClass(...),
+            $stmt->fetchAll(PDO::FETCH_OBJ)
+        ));
     }
 
     /**
@@ -299,6 +303,9 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
         }
 
         $stmt = $this->pdo->query("SELECT Content FROM Article");
+        if ($stmt === false) {
+            return [];
+        }
         $contents = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
         $used = [];
@@ -363,7 +370,7 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
         ";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':path' => '%' . $path . '%']);
-        return $stmt->fetchAll(PDO::FETCH_OBJ);
+        return array_values($stmt->fetchAll(PDO::FETCH_OBJ));
     }
 
     public function isSpotlightActive(): bool
@@ -409,12 +416,12 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
         } else {
             $articleIds = array_merge($noGroupArticleIds, $forMembersOnlyArticleIds);
         }
-        $userGroups = $this->authorizationDataHelper->getUserGroups($userEmail);
+        $userGroups = array_values($this->authorizationDataHelper->getUserGroups($userEmail));
         if (empty($userGroups)) {
             return $articleIds;
         }
         $groupArticleIds = $this->getArticleIdsByGroups($userGroups);
-        return array_unique(array_merge($articleIds, $groupArticleIds));
+        return array_values(array_unique(array_merge($articleIds, $groupArticleIds)));
     }
 
     /**
@@ -433,7 +440,7 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
             WHERE Article.publishedBy IS NOT NULL
             AND Article.IdGroup IN ($groups)");
         $query->execute($groupIds);
-        return $query->fetchAll(PDO::FETCH_COLUMN);
+        return array_values($query->fetchAll(PDO::FETCH_COLUMN));
     }
 
     /**
@@ -445,7 +452,7 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
             SELECT Article.Id FROM Article 
             WHERE Article.publishedBy IS NOT NULL AND Article.IdGroup IS NULL AND Article.OnlyForMembers = 1");
         $query->execute();
-        return $query->fetchAll(PDO::FETCH_COLUMN);
+        return array_values($query->fetchAll(PDO::FETCH_COLUMN));
     }
 
     /**
@@ -476,7 +483,7 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute($params);
         $rows = $stmt->fetchAll(PDO::FETCH_OBJ) ?: [];
-        return array_map(ArticleSummaryRow::fromStdClass(...), $rows);
+        return array_values(array_map(ArticleSummaryRow::fromStdClass(...), $rows));
     }
 
     /**
@@ -488,6 +495,6 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
             SELECT Article.Id FROM Article 
             WHERE Article.publishedBy IS NOT NULL AND Article.IdGroup IS NULL AND Article.OnlyForMembers = 0");
         $query->execute();
-        return $query->fetchAll(PDO::FETCH_COLUMN);
+        return array_values($query->fetchAll(PDO::FETCH_COLUMN));
     }
 }

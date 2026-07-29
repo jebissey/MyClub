@@ -7,6 +7,8 @@ namespace app\helpers;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use DOMDocument;
+use DOMNameSpaceNode;
+use DOMNode;
 use DOMXPath;
 
 class FFAScraper
@@ -98,16 +100,25 @@ class FFAScraper
         @$dom->loadHTML($html);
         $xpath = new DOMXPath($dom);
         $rows = $xpath->query("//table[@id='ctnCoupe']//tr[td[@class='datas0']]");
+        if ($rows === false) {
+            return null;
+        }
 
         foreach ($rows as $row) {
+            if (!$row instanceof DOMNode) {
+                continue;
+            }
             $dataCells = $xpath->query(".//td[@class='datas0']", $row);
+            if ($dataCells === false) {
+                continue;
+            }
             if ($dataCells->length >= 5) {
                 return [
-                    'rank' => trim($dataCells->item(0)->textContent),
-                    'event' => trim($dataCells->item(1)->textContent),
-                    'name' => trim($dataCells->item(2)->textContent),
-                    'club' => trim($dataCells->item(3)->textContent),
-                    'points' => trim($dataCells->item(4)->textContent)
+                    'rank' => $this->cellText($dataCells->item(0)),
+                    'event' => $this->cellText($dataCells->item(1)),
+                    'name' => $this->cellText($dataCells->item(2)),
+                    'club' => $this->cellText($dataCells->item(3)),
+                    'points' => $this->cellText($dataCells->item(4))
                 ];
             }
         }
@@ -127,25 +138,39 @@ class FFAScraper
         $xpath = new DOMXPath($dom);
         $results = [];
         $rows = $xpath->query("//table[@id='ctnResultats']//tr[td[contains(@class, 'datas0') or contains(@class, 'datas1')]]");
+        if ($rows === false) {
+            return $results;
+        }
         foreach ($rows as $row) {
+            if (!$row instanceof DOMNode) {
+                continue;
+            }
             $isDatas0 = ($xpath->evaluate("count(.//td[@class='datas0'])", $row) > 0);
             $cellClass = $isDatas0 ? 'datas0' : 'datas1';
             $cells = $xpath->query(".//td[@class='$cellClass']", $row);
+            if ($cells === false) {
+                continue;
+            }
             if ($cells->length >= 10) {
-                $code = trim($cells->item(7)->textContent);
+                $code = $this->cellText($cells->item(7));
                 $results[] = [
-                    'date' => trim($cells->item(0)->textContent),
-                    'name' => trim($cells->item(1)->textContent),
-                    'competition' => trim($cells->item(2)->textContent),
-                    'place' => trim($cells->item(4)->textContent),
-                    'time' => trim($cells->item(5)->textContent),
+                    'date' => $this->cellText($cells->item(0)),
+                    'name' => $this->cellText($cells->item(1)),
+                    'competition' => $this->cellText($cells->item(2)),
+                    'place' => $this->cellText($cells->item(4)),
+                    'time' => $this->cellText($cells->item(5)),
                     'category' => $code,
-                    'round' => trim($cells->item(8)->textContent),
-                    'location' => trim($cells->item(9)->textContent),
+                    'round' => $this->cellText($cells->item(8)),
+                    'location' => $this->cellText($cells->item(9)),
                 ];
             }
         }
 
         return $results;
+    }
+
+    private function cellText(DOMNameSpaceNode|DOMNode|null $node): string
+    {
+        return $node instanceof DOMNode ? trim($node->textContent) : '';
     }
 }

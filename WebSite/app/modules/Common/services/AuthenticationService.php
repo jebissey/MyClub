@@ -22,9 +22,7 @@ use app\valueObjects\Person;
  */
 class AuthenticationService
 {
-    public function __construct(private DataHelper $dataHelper, private EmailService $emailService)
-    {
-    }
+    public function __construct(private DataHelper $dataHelper, private EmailService $emailService) {}
 
     public function handleForgotPassword(string $email): bool
     {
@@ -72,11 +70,11 @@ class AuthenticationService
             ['Token' => $token],
             'Id, Inactivated, Email'
         );
-        if (!$personRow || $personRow->Inactivated == 1) {
+        /** @var PersonRow|false $personRow */
+        if (!$personRow || ($personRow->Inactivated ?? 0) == 1) {
             $this->clearRememberMeCookie();
             return null;
         }
-        /** @var PersonRow $personRow */
         $person = Person::fromRow($personRow);
         $this->dataHelper->set(
             'Person',
@@ -177,7 +175,11 @@ class AuthenticationService
             ['Email' => $email],
             'Id, Email, Password, Inactivated, LastSignIn, LastSignOut'
         );
-        return $row ? Person::fromRow($row) : false;
+        if (!$row) {
+            return false;
+        }
+        /** @var PersonRow $row */
+        return Person::fromRow($row);
     }
 
     private function generateRememberMeToken(): string

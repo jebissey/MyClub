@@ -35,7 +35,15 @@ class MembershipDataHelper extends Data
 
     // ─── Read ─────────────────────────────────────────────────────────────────
 
-    /** Returns the membership row for a given person and season, or false. */
+    /**
+     * @return object{
+     *     Id:int,
+     *     PersonId:int,
+     *     Season:string,
+     *     Status:string,
+     *     AmountCents:int
+     * }|false
+     */
     public function getForPersonAndSeason(int $personId, string $season): object|false
     {
         return $this->get('Membership', [

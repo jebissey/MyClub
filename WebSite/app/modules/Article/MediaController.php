@@ -14,6 +14,7 @@ use app\models\MessageDataHelper;
 use app\models\PersonGroupDataHelper;
 use app\models\SharedFileDataHelper;
 use app\modules\Common\AbstractController;
+use app\valueObjects\SharedFileRow;
 
 class MediaController extends AbstractController
 {
@@ -34,11 +35,13 @@ class MediaController extends AbstractController
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
-        $sharedFile = $this->dataHelper->get('SharedFile', ['Token' => $token], 'Id, IdGroup, OnlyForMembers, Item');
-        if (!$sharedFile) {
+        $row = $this->dataHelper->get('SharedFile', ['Token' => $token], 'Id, IdGroup, OnlyForMembers, Item');
+        if (!$row) {
             $this->raiseBadRequest("Token unknown", __FILE__, __LINE__);
             return;
         }
+        $sharedFile = SharedFileRow::fromStdClass($row);
+
         $connectedUser = $this->application->getConnectedUser();
         if ($sharedFile->OnlyForMembers !== 0) {
             if ($connectedUser->person === null) {
@@ -362,19 +365,26 @@ class MediaController extends AbstractController
                 continue;
             }
 
-            $fullPath  = $c['monthPath'] . $c['name'];
+            $fullPath = $c['monthPath'] . $c['name'];
+
+            $size = filesize($fullPath);
+            $size = $size !== false ? $size : 0;
+
+            $mtime = filemtime($fullPath);
+            $mtime = $mtime !== false ? $mtime : time();
+
             $files[] = [
-                'name'      => $c['name'],
-                'path'      => $path,
-                'url'       => WebApp::getBaseUrl() . 'data/media/' . $path,
+                'name'        => $c['name'],
+                'path'        => $path,
+                'url'         => WebApp::getBaseUrl() . 'data/media/' . $path,
                 'urlRedactor' => WebApp::getBaseUrl() . 'media/' . $path,
-                'size'      => filesize($fullPath),
-                'date'      => date('Y-m-d H:i:s', filemtime($fullPath)),
-                'month'     => $c['month'],
-                'inGalery'  => $usedInGal,
-                'inArticle' => $usedInArt,
-                'shared'    => $isShared,
-                'inMessage' => $usedInMsg,
+                'size'        => $size,
+                'date'        => date('Y-m-d H:i:s', $mtime),
+                'month'       => $c['month'],
+                'inGalery'    => $usedInGal,
+                'inArticle'   => $usedInArt,
+                'shared'      => $isShared,
+                'inMessage'   => $usedInMsg,
             ];
         }
 

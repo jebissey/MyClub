@@ -8,6 +8,7 @@ use app\helpers\MediaManager;
 use app\models\CarouselDataHelper;
 use app\models\DataHelper;
 use app\valueObjects\UploadedFileInput;
+use RuntimeException;
 
 class ArticleService
 {
@@ -21,19 +22,24 @@ class ArticleService
     /**
      * @param array{
      *     tmp_name?: array<int, string>,
-     *     error?: array<int, int>,
-     *     name?: array<int, string>,
-     *     type?: array<int, string>,
-     *     size?: array<int, int>
+     *     error: array<int, int>,
+     *     name: array<int, string>,
+     *     type: array<int, string>,
+     *     size: array<int, int>
      * }|null $files
      */
     public function createWithMedia(int $userId, ?array $files = null, string $title = '', string $content = ''): int
     {
-        $articleId = $this->dataHelper->set('Article', [
+        $result = $this->dataHelper->set('Article', [
             'Title'     => $title,
             'Content'   => $content,
             'CreatedBy' => $userId
         ]);
+
+        if (!is_int($result)) {
+            throw new RuntimeException('Failed to create article');
+        }
+        $articleId = $result;
 
         if (!empty($files) && isset($files['tmp_name'])) {
             foreach ($files['tmp_name'] as $index => $tmpName) {
