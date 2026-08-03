@@ -79,32 +79,41 @@ class EventNeedApi extends AbstractApi
 
     #region Private functions
     /**
-     * @param array{
-     *     id: int|null,
-     *     label?: string,
-     *     name?: string,
-     *     idNeedType?: int,
-     *     participantDependent?: int|numeric-string
-     * } $data
+     * @param array<string, mixed> $data Raw decoded JSON body; shape is validated at runtime below,
+     *                                    not by PHPStan, since it comes from getJsonInput().
      */
     private function doSaveNeed(array $data): ApiResponse
     {
-        if (empty($data['label'])) {
+        $label = $data['label'] ?? null;
+        $name = $data['name'] ?? null;
+        $idNeedType = $data['idNeedType'] ?? null;
+        $id = $data['id'] ?? null;
+
+        if (!is_string($label) || $label === '') {
             return new ApiResponse(false, ApplicationError::BadRequest->value, [], 'Missing parameter label');
         }
-        if (empty($data['name'])) {
+        if (!is_string($name) || $name === '') {
             return new ApiResponse(false, ApplicationError::BadRequest->value, [], 'Missing parameter name');
         }
-        if (!($data['idNeedType'] ?? null)) {
+        if (!is_int($idNeedType) && !(is_string($idNeedType) && ctype_digit($idNeedType))) {
             return new ApiResponse(false, ApplicationError::BadRequest->value, [], 'Missing parameter idNeedType');
         }
+        if ($id !== null && !is_int($id) && !(is_string($id) && ctype_digit($id))) {
+            return new ApiResponse(false, ApplicationError::BadRequest->value, [], 'Invalid parameter id');
+        }
+
+        $participantDependent = $data['participantDependent'] ?? 0;
+        if (!is_int($participantDependent) && !(is_string($participantDependent) && is_numeric($participantDependent))) {
+            $participantDependent = 0;
+        }
+
         $needData = [
-            'Label' => $data['label'],
-            'Name' => $data['name'],
-            'ParticipantDependent' => intval($data['participantDependent'] ?? 0),
-            'IdNeedType' => $data['idNeedType']
+            'Label' => $label,
+            'Name' => $name,
+            'ParticipantDependent' => intval($participantDependent),
+            'IdNeedType' => intval($idNeedType)
         ];
-        $result = $this->dataHelper->set('Need', $needData, $data['id'] == null ? [] : ['Id' => $data['id']]);
+        $result = $this->dataHelper->set('Need', $needData, $id === null ? [] : ['Id' => intval($id)]);
         $success = is_bool($result) ? $result : ($result > 0 ? true : Application::unreachable($result, __FILE__, __LINE__));
         return new ApiResponse($success, $success ? ApplicationError::Ok->value : ApplicationError::Error->value);
     }

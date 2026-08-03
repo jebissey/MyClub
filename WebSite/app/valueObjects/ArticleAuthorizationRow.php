@@ -37,4 +37,15 @@ final readonly class ArticleAuthorizationRow
             OnlyForMembers: (bool) ($row->OnlyForMembers ?? false),
         );
     }
+
+    public static function fromArticleRow(ArticleRow $row): self
+    {
+        return new self(
+            Id: $row->Id,
+            CreatedBy: $row->CreatedBy,
+            PublishedBy: $row->PublishedBy,
+            IdGroup: $row->IdGroup,
+            OnlyForMembers: $row->OnlyForMembers,
+        );
+    }
 }

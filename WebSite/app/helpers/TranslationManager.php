@@ -159,7 +159,7 @@ class TranslationManager
             IntlDateFormatter::NONE,
             null,
             null,
-            $pattern
+            $pattern ?: null
         );
 
         return $formatter->format(

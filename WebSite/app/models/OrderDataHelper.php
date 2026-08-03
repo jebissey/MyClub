@@ -9,6 +9,7 @@ use app\exceptions\QueryException;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
 use app\interfaces\NewsProviderInterface;
+use app\valueObjects\ArticleAuthorizationRow;
 use app\valueObjects\OrderWithCreatorRow;
 
 /**
@@ -68,7 +69,7 @@ class OrderDataHelper extends Data implements NewsProviderInterface
             WHERE o.IdArticle = :articleId
         ";
         $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([':articleId' => $article->Id]);
+        $stmt->execute([':articleId' => $articleId]);
         $result = $stmt->fetch(PDO::FETCH_OBJ);
         if ($result === false) {
             return false;
@@ -105,8 +106,12 @@ class OrderDataHelper extends Data implements NewsProviderInterface
             )
             AND r.Id IS NULL
         ORDER BY o.ClosingDate, p.LastName, p.FirstName";
+        $stmt = $this->pdo->query($query);
+        if ($stmt === false) {
+            throw new QueryException("Failed to execute query in getPendingOrderResponses");
+        }
         /** @var array<int, PendingOrderResponse> $result */
-        $result = $this->pdo->query($query)->fetchAll(PDO::FETCH_OBJ);
+        $result = $stmt->fetchAll(PDO::FETCH_OBJ);
         return $result;
     }
 
@@ -149,10 +154,14 @@ class OrderDataHelper extends Data implements NewsProviderInterface
         $news = [];
         $authorizationDataHelper = new AuthorizationDataHelper($this->application);
         foreach ($orders as $order) {
+            $articleRow = $this->articleDataHelper->getWithAuthor($order->IdArticle);
+            if ($articleRow === false) {
+                continue;
+            }
             if (
                 $authorizationDataHelper->getArticle($order->IdArticle, $connectedUser)
                 && $authorizationDataHelper->canPersonReadOrderResults(
-                    $this->articleDataHelper->getWithAuthor($order->IdArticle),
+                    ArticleAuthorizationRow::fromArticleRow($articleRow),
                     $connectedUser
                 )
             ) {

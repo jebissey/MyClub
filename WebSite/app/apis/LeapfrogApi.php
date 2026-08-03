@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace app\apis;
 
+use JsonException;
 use app\enums\ApplicationError;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
@@ -29,9 +30,10 @@ class LeapfrogApi extends AbstractApi
             $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
-        $data = json_decode(file_get_contents('php://input'), true);
-        if (!is_array($data)) {
-            $this->renderJsonBadRequest('Invalid JSON', __FILE__, __LINE__);
+        try {
+            $data = $this->getJsonInput();
+        } catch (JsonException $e) {
+            $this->renderJsonBadRequest("Données invalides", __FILE__, __LINE__);
             return;
         }
         $this->logDataWriterHelper->add((string)ApplicationError::Ok->value, $data['message'] ?? '');

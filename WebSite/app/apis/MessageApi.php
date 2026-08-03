@@ -164,7 +164,7 @@ class MessageApi extends AbstractApi
                 [],
                 $result->success,
                 $result->success ? 200 : 400,
-                $result->message
+                $result->message ?? ''
             );
         } catch (Throwable $e) {
             $this->renderJsonError(
@@ -239,6 +239,7 @@ class MessageApi extends AbstractApi
         if ($row === false) {
             return new ApiResponse(false, ApplicationError::BadRequest->value, [], "Message {$messageId} doesn't exist");
         }
+        /** @var object{PersonId: int|string} $row */
         $message = MessageOwnerRow::fromStdClass($row);
         if ($message->PersonId !== $personId) {
             return new ApiResponse(
@@ -297,6 +298,7 @@ class MessageApi extends AbstractApi
                 );
                 return;
             }
+            /** @var object{CreatedBy: int|string, Title: string} $row */
             $article = ArticleCreatorTitleRow::fromStdClass($row);
             $articleAuthorId = $article->CreatedBy;
         }
@@ -309,6 +311,7 @@ class MessageApi extends AbstractApi
                 );
                 return;
             }
+            /** @var object{CreatedBy: int|string, Summary: string} $row */
             $event = EventCreatorSummaryRow::fromStdClass($row);
             $eventCreatorId = $event->CreatedBy;
         }
@@ -321,6 +324,7 @@ class MessageApi extends AbstractApi
                 );
                 return;
             }
+            /** @var object{Name: string} $row */
             $group = GroupNameRow::fromStdClass($row);
         }
 

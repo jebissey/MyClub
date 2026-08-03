@@ -29,6 +29,7 @@ class SolfegeController extends AbstractController
         ]));
     }
 
+
     public function saveScore(): void
     {
         if (!$this->application->getConnectedUser()->isEventDesigner()) {
@@ -36,9 +37,17 @@ class SolfegeController extends AbstractController
             return;
         }
 
-        $input = json_decode(file_get_contents('php://input'), true);
+        $json = file_get_contents('php://input');
 
-        if (!$input || !isset($input['scores'])) {
+        if ($json === false) {
+            http_response_code(400);
+            echo json_encode(['error' => 'Unable to read input']);
+            return;
+        }
+
+        $input = json_decode($json, true);
+
+        if (!is_array($input) || !isset($input['scores'])) {
             http_response_code(400);
             echo json_encode(['error' => 'Invalid data']);
             return;
@@ -53,14 +62,9 @@ class SolfegeController extends AbstractController
         //   ]
         // }
 
-        //try {
-            // Sauvegarde en base (à adapter selon votre structure)
-            // $this->dataHelper->saveUserScores($this->application->getConnectedUser()->get()->getId(), $input['scores']);
-
-            echo json_encode(['success' => true, 'message' => 'Scores sauvegardés avec succès']);
-        /*} catch (Throwable $e) {
-            http_response_code(500);
-            echo json_encode(['error' => 'Erreur lors de la sauvegarde']);
-        }*/
+        echo json_encode([
+            'success' => true,
+            'message' => 'Scores sauvegardés avec succès',
+        ]);
     }
 }

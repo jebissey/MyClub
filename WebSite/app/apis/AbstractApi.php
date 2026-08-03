@@ -7,6 +7,7 @@ namespace app\apis;
 use Flight;
 use JsonException;
 use Latte\Engine as LatteEngine;
+use flight\net\Response;
 use app\enums\ApplicationError;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
@@ -36,14 +37,17 @@ abstract class AbstractApi
      */
     protected function getJsonInput(): array
     {
-        $json = file_get_contents('php://input');
+        $raw = file_get_contents('php://input');
+        if ($raw === false) {
+            $raw = '';
+        }
 
         /** @var array<string, mixed> */
-        return json_decode($json, true, 512, JSON_THROW_ON_ERROR);
+        return json_decode($raw, true, 512, JSON_THROW_ON_ERROR);
     }
 
     /**
-     * @param array<string, mixed> $data
+     * @param array<int|string, mixed> $data
      */
     protected function renderJson(array $data, bool $success, int $statusCode, string $message = ''): void
     {
@@ -63,11 +67,13 @@ abstract class AbstractApi
             ], JSON_THROW_ON_ERROR);
         }
 
-        Flight::response()
-            ->status($statusCode)
-            ->header('Content-Type', 'application/json; charset=utf-8')
-            ->write($json)
-            ->send();
+        /** @var Response $flightResponse */
+        $flightResponse = Flight::response();
+
+        $flightResponse->status($statusCode);
+        $flightResponse->header('Content-Type', 'application/json; charset=utf-8');
+        $flightResponse->write($json);
+        $flightResponse->send();
 
         $this->logDataWriterHelper->add((string) $statusCode, $message);
         exit;

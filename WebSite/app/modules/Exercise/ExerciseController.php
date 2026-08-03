@@ -27,7 +27,7 @@ class ExerciseController extends TableController
                 'Title' => '',
                 'Detail' => '',
                 'Content' => '[]',
-                'CreatedBy' => $this->application->getConnectedUser()->person->Id,
+                'CreatedBy' => $this->application->getConnectedUser()->person->Id ?? 0,
             ]);
             $this->redirect('/exercise/edit/' . $exerciseId);
         }
@@ -109,6 +109,7 @@ class ExerciseController extends TableController
             return;
         }
 
+        /** @var object{Content: string, Title: string, CreatedBy: int}|false $exercise */
         $exercise = $this->dataHelper->get('Exercise', ['Id' => $id], 'Content, Title, CreatedBy');
         if (!$exercise || ($this->application->getConnectedUser()->person->Id ?? 0) != $exercise->CreatedBy) {
             $this->application->getErrorManager()->raise(

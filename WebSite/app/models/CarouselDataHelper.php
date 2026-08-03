@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\models;
 
 use PDO;
+use RuntimeException;
 use app\helpers\Application;
 
 class CarouselDataHelper extends Data
@@ -45,6 +46,9 @@ class CarouselDataHelper extends Data
         }
 
         $stmt = $this->pdo->query("SELECT Item FROM Carousel");
+        if ($stmt === false) {
+            throw new RuntimeException('Échec de la requête SELECT Item FROM Carousel');
+        }
         $items = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
         $used = [];

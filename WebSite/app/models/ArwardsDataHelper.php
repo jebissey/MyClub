@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\models;
 
 use PDO;
+use PDOException;
 use stdClass;
 use app\helpers\Application;
 
@@ -35,6 +36,10 @@ class ArwardsDataHelper extends Data
             GROUP BY p.Id, p.FirstName, p.LastName, p.NickName, c.Name
             HAVING Total > 0
             ORDER BY Total DESC');
+        if ($query === false) {
+            throw new PDOException('getData query failed');
+        }
+
         /** @var array<int, stdClass> $results */
         $results = $query->fetchAll(PDO::FETCH_OBJ);
         $data = [];
@@ -65,6 +70,10 @@ class ArwardsDataHelper extends Data
     public function getCounterNames(): array
     {
         $query = $this->pdo->query('SELECT DISTINCT Name FROM Counter ORDER BY Name');
+        if ($query === false) {
+            throw new PDOException('getCounterNames query failed');
+        }
+
         /** @var array<int, string> */
         return array_column($query->fetchAll(PDO::FETCH_ASSOC), 'Name');
     }

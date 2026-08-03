@@ -11,6 +11,7 @@ final class JsonEmailQuotaTracker implements EmailQuotaTrackerInterface
 {
     private string $today;
     private string $thisMonth;
+
     /** @var array{day: string, month: string, daily: int, monthly: int} */
     private array $data;
 
@@ -38,7 +39,6 @@ final class JsonEmailQuotaTracker implements EmailQuotaTrackerInterface
         $this->save();
     }
 
-    # Private functions
     /**
      * @return array{day: string, month: string, daily: int, monthly: int}
      */
@@ -54,24 +54,51 @@ final class JsonEmailQuotaTracker implements EmailQuotaTrackerInterface
         if (!file_exists($this->filePath)) {
             return $defaults;
         }
+
         $raw = file_get_contents($this->filePath);
+
         if ($raw === false) {
-            throw new RuntimeException("Cannot read quota file: {$this->filePath}");
+            throw new RuntimeException(
+                "Cannot read quota file: {$this->filePath}"
+            );
         }
+
         $stored = json_decode($raw, true);
+
         if (!is_array($stored)) {
             return $defaults;
         }
-        if (($stored['day'] ?? '') !== $this->today) {
-            $stored['daily'] = 0;
-            $stored['day']   = $this->today;
-        }
-        if (($stored['month'] ?? '') !== $this->thisMonth) {
-            $stored['monthly'] = 0;
-            $stored['month']   = $this->thisMonth;
+
+        $day = $stored['day'] ?? null;
+        $month = $stored['month'] ?? null;
+        $daily = $stored['daily'] ?? null;
+        $monthly = $stored['monthly'] ?? null;
+
+        if (
+            !is_string($day)
+            || !is_string($month)
+            || !is_int($daily)
+            || !is_int($monthly)
+        ) {
+            return $defaults;
         }
 
-        return $stored;
+        if ($day !== $this->today) {
+            $daily = 0;
+            $day = $this->today;
+        }
+
+        if ($month !== $this->thisMonth) {
+            $monthly = 0;
+            $month = $this->thisMonth;
+        }
+
+        return [
+            'day'     => $day,
+            'month'   => $month,
+            'daily'   => $daily,
+            'monthly' => $monthly,
+        ];
     }
 
     private function save(): void
@@ -79,7 +106,9 @@ final class JsonEmailQuotaTracker implements EmailQuotaTrackerInterface
         $dir = dirname($this->filePath);
 
         if (!is_dir($dir) && !mkdir($dir, 0750, true)) {
-            throw new RuntimeException("Cannot create quota directory: {$dir}");
+            throw new RuntimeException(
+                "Cannot create quota directory: {$dir}"
+            );
         }
 
         $result = file_put_contents(
@@ -89,7 +118,9 @@ final class JsonEmailQuotaTracker implements EmailQuotaTrackerInterface
         );
 
         if ($result === false) {
-            throw new RuntimeException("Cannot write quota file: {$this->filePath}");
+            throw new RuntimeException(
+                "Cannot write quota file: {$this->filePath}"
+            );
         }
     }
 }

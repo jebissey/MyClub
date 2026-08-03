@@ -15,18 +15,27 @@ class ReplyDataHelper extends Data
 
     public function insertOrUpdate(int $personId, int $surveyId, string $answers): void
     {
-        $existingReply = $this->get('Reply', ['IdPerson' => $personId, 'IdSurvey' => $surveyId], 'Id');
+        $existingReply = $this->get(
+            'Reply',
+            ['IdPerson' => $personId, 'IdSurvey' => $surveyId],
+            'Id'
+        );
+
         if ($existingReply) {
+            $replyData = get_object_vars($existingReply);
+
             $this->set('Reply', [
                 'Answers' => $answers,
-                'LastUpdate' => date('Y-m-d H:i:s')
-            ], ['Id' => $existingReply->Id]);
+                'LastUpdate' => date('Y-m-d H:i:s'),
+            ], [
+                'Id' => (int) $replyData['Id'],
+            ]);
         } else {
             $this->set('Reply', [
-                'IdPerson'   => $personId,
-                'IdSurvey'   => $surveyId,
+                'IdPerson' => $personId,
+                'IdSurvey' => $surveyId,
                 'Answers' => $answers,
-                'LastUpdate' => date('Y-m-d H:i:s')
+                'LastUpdate' => date('Y-m-d H:i:s'),
             ]);
         }
     }

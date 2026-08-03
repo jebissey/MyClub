@@ -16,7 +16,7 @@ use app\valueObjects\AbstractValueObject;
  *
  * @phpstan-type PersonRow object{
  *    Id: int|string,
- *    Email?: string|null,
+ *    Email: string,
  *    Alert?: string|null,
  *    FirstName?: string|null,
  *    LastName?: string|null,
@@ -45,7 +45,7 @@ final readonly class Person extends AbstractValueObject
 {
     public function __construct(
         public int $Id,
-        public ?string $Email = null,
+        public string $Email,
         public ?string $Alert = null,
         public ?string $FirstName = null,
         public ?string $LastName = null,
@@ -79,7 +79,7 @@ final readonly class Person extends AbstractValueObject
     {
         return new self(
             Id: (int)$row->Id,
-            Email: $row->Email ?? null,
+            Email: $row->Email,
             Alert: $row->Alert ?? null,
             FirstName: $row->FirstName ?? null,
             LastName: $row->LastName ?? null,

@@ -15,18 +15,24 @@ class OrderReplyDataHelper extends Data
 
     public function insertOrUpdate(int $personId, int $orderId, string $answers): void
     {
-        $existingReply = $this->get('OrderReply', ['IdPerson' => $personId, 'IdOrder' => $orderId], 'Id');
-        if ($existingReply) {
+        /** @var object{Id: int}|false $existingReply */
+        $existingReply = $this->get(
+            'OrderReply',
+            ['IdPerson' => $personId, 'IdOrder' => $orderId],
+            'Id'
+        );
+
+        if ($existingReply !== false) {
             $this->set('OrderReply', [
                 'Answers' => $answers,
-                'LastUpdate' => date('Y-m-d H:i:s')
+                'LastUpdate' => date('Y-m-d H:i:s'),
             ], ['Id' => $existingReply->Id]);
         } else {
             $this->set('OrderReply', [
-                'IdPerson'   => $personId,
-                'IdOrder'   => $orderId,
+                'IdPerson' => $personId,
+                'IdOrder' => $orderId,
                 'Answers' => $answers,
-                'LastUpdate' => date('Y-m-d H:i:s')
+                'LastUpdate' => date('Y-m-d H:i:s'),
             ]);
         }
     }

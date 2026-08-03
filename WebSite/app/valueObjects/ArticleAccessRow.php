@@ -23,4 +23,3 @@ final readonly class ArticleAccessRow extends AbstractValueObject
         );
     }
 }
-

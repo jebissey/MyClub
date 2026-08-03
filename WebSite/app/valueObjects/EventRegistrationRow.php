@@ -11,4 +11,12 @@ final readonly class EventRegistrationRow
         public string $Summary,
     ) {
     }
+
+    public static function fromStdClass(\stdClass $row): self
+    {
+        return new self(
+            Id: (int) $row->Id,
+            Summary: (string) $row->Summary,
+        );
+    }
 }

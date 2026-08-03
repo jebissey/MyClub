@@ -9,6 +9,7 @@ use app\helpers\ConnectedUser;
 use app\models\ArticleDataHelper;
 use app\models\DataHelper;
 use app\models\PersonDataHelper;
+use app\valueObjects\ExerciseRow;
 
 class ExerciseApi extends AbstractApi
 {
@@ -26,12 +27,14 @@ class ExerciseApi extends AbstractApi
         if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isConnected(), __FILE__, __LINE__)) {
             return;
         }
-        $exercise = $this->dataHelper->get('Exercise', ['Id' =>  $id]);
-        if (!$exercise) {
+        $row = $this->dataHelper->get('Exercise', ['Id' =>  $id]);
+        if (!$row) {
             $this->renderJsonBadRequest("Exercise {$id} not found", __FILE__, __LINE__);
             return;
         }
-        $exercises = json_decode($exercise->Content ?? '[]', true) ?? [];
+        /** @var object{Id: int|string, Content: string, Title: string, LastUpdate: string} $row */
+        $exercise = ExerciseRow::fromStdClass($row);
+        $exercises = json_decode($exercise->Content, true) ?? [];
         $this->renderJsonOk(['exercises' => $exercises, 'title' => $exercise->Title]);
     }
 
@@ -61,13 +64,15 @@ class ExerciseApi extends AbstractApi
         $data = $this->getJsonInput();
         $index = (int)($data['index'] ?? -1);
 
-        $exercise = $this->dataHelper->get('Exercise', ['Id' => $id]);
-        if (!$exercise) {
+        $row = $this->dataHelper->get('Exercise', ['Id' => $id]);
+        if (!$row) {
             $this->renderJsonBadRequest("Exercise {$id} not found", __FILE__, __LINE__);
             return;
         }
+        /** @var object{Id: int|string, Content: string, Title: string, LastUpdate: string} $row */
+        $exercise = ExerciseRow::fromStdClass($row);
 
-        $exercises = json_decode($exercise->Content ?? '[]', true);
+        $exercises = json_decode($exercise->Content, true);
         if ($index < 0 || $index >= count($exercises)) {
             $this->renderJsonBadRequest("Index {$index} out of range", __FILE__, __LINE__);
             return;

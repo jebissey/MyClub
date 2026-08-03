@@ -14,6 +14,8 @@ use app\models\DesignDataHelper;
 use app\models\OrderReplyDataHelper;
 use app\models\PersonDataHelper;
 use app\models\ReplyDataHelper;
+use app\valueObjects\AnswersRow;
+use app\valueObjects\QuestionRow;
 
 class ArticleApi extends AbstractApi
 {
@@ -42,9 +44,14 @@ class ArticleApi extends AbstractApi
             $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
+        $json = file_get_contents('php://input');
+        if ($json === false) {
+            $this->renderJsonBadRequest('Corps de requête invalide', __FILE__, __LINE__);
+            return;
+        }
         $this->designDataHelper->insertOrUpdate(
-            json_decode(file_get_contents('php://input'), true),
-            $this->application->getConnectedUser()->person->Id
+            json_decode($json, true),
+            $this->application->getConnectedUser()->person->Id ?? 0
         );
         $this->renderJsonOK();
     }
@@ -61,16 +68,28 @@ class ArticleApi extends AbstractApi
             return;
         }
         $json = file_get_contents('php://input');
+        if ($json === false) {
+            $this->renderJsonBadRequest('Corps de requête invalide', __FILE__, __LINE__);
+            return;
+        }
         $data = json_decode($json, true);
         $orderId = $data['order_id'] ?? null;
         if (!$orderId) {
             $this->renderJsonBadRequest('Missing data', __FILE__, __LINE__);
             return;
         }
+        try {
+            $orderAnswers = isset($data['order_answers'])
+                ? json_encode($data['order_answers'], JSON_THROW_ON_ERROR)
+                : '[]';
+        } catch (Throwable $e) {
+            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, __FILE__, __LINE__);
+            return;
+        }
         $this->orderReplyDataHelper->insertOrUpdate(
             (int)$person->Id,
             (int)$orderId,
-            isset($data['order_answers']) ? json_encode($data['order_answers']) : '[]'
+            $orderAnswers
         );
         $this->renderJsonOk();
     }
@@ -87,16 +106,28 @@ class ArticleApi extends AbstractApi
             return;
         }
         $json = file_get_contents('php://input');
+        if ($json === false) {
+            $this->renderJsonBadRequest('Corps de requête invalide', __FILE__, __LINE__);
+            return;
+        }
         $data = json_decode($json, true);
         $surveyId = $data['survey_id'] ?? null;
         if (!$surveyId) {
             $this->renderJsonBadRequest('Missing data', __FILE__, __LINE__);
             return;
         }
+        try {
+            $surveyAnswers = isset($data['survey_answers'])
+                ? json_encode($data['survey_answers'], JSON_THROW_ON_ERROR)
+                : '[]';
+        } catch (Throwable $e) {
+            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, __FILE__, __LINE__);
+            return;
+        }
         $this->replyDataHelper->insertOrUpdate(
             $person->Id,
             (int)$surveyId,
-            isset($data['survey_answers']) ? json_encode($data['survey_answers']) : '[]'
+            $surveyAnswers
         );
         $this->renderJsonOk();
     }
@@ -112,18 +143,24 @@ class ArticleApi extends AbstractApi
             $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
-        $order = $this->dataHelper->get('Order', ['IdArticle' => $articleId], 'Id, Question, Options');
-        if (!$order) {
+        $orderData = $this->dataHelper->get('Order', ['IdArticle' => $articleId], 'Id, Question, Options');
+        if (!$orderData) {
             $this->renderJsonBadRequest("Aucune commande trouvée pour l'article {$articleId}", __FILE__, __LINE__);
             return;
         }
+        /** @var object{Id: int|string, Question: string, Options: string} $orderData */
+        $order = QuestionRow::fromStdClass($orderData);
         try {
             $options = json_decode($order->Options);
             if (json_last_error() !== JSON_ERROR_NONE) {
                 throw new Exception("JSON error: " . json_last_error_msg());
             }
-            $previousReply = $this->dataHelper->get('OrderReply', ['IdOrder' => $order->Id, 'IdPerson' => $person->Id]);
-            $previousAnswers = $previousReply ? json_decode($previousReply->Answers, true) : null;
+            $previousReplyData = $this->dataHelper->get('OrderReply', ['IdOrder' => $order->Id, 'IdPerson' => $person->Id]);
+            $previousAnswers = null;
+            if ($previousReplyData) {
+                /** @var object{Answers: string} $previousReplyData */
+                $previousAnswers = json_decode(AnswersRow::fromStdClass($previousReplyData)->Answers, true);
+            }
             $this->renderJsonOk([
                 'order' => [
                     'id' => $order->Id,
@@ -153,18 +190,24 @@ class ArticleApi extends AbstractApi
             $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
-        $survey = $this->dataHelper->get('Survey', ['IdArticle' => $articleId], 'Id, Question, Options');
-        if (!$survey) {
+        $surveyData = $this->dataHelper->get('Survey', ['IdArticle' => $articleId], 'Id, Question, Options');
+        if (!$surveyData) {
             $this->renderJsonBadRequest("Aucun sondage trouvé pour l'article {$articleId}", __FILE__, __LINE__);
             return;
         }
+        /** @var object{Id: int|string, Question: string, Options: string} $surveyData */
+        $survey = QuestionRow::fromStdClass($surveyData);
         try {
             $options = json_decode($survey->Options);
             if (json_last_error() !== JSON_ERROR_NONE) {
                 throw new Exception("JSON error: " . json_last_error_msg());
             }
-            $previousReply = $this->dataHelper->get('Reply', ['IdSurvey' => $survey->Id, 'IdPerson' => $person->Id]);
-            $previousAnswers = $previousReply ? json_decode($previousReply->Answers, true) : null;
+            $previousReplyData = $this->dataHelper->get('Reply', ['IdSurvey' => $survey->Id, 'IdPerson' => $person->Id]);
+            $previousAnswers = null;
+            if ($previousReplyData) {
+                /** @var object{Answers: string} $previousReplyData */
+                $previousAnswers = json_decode(AnswersRow::fromStdClass($previousReplyData)->Answers, true);
+            }
             $this->renderJsonOk([
                 'survey' => [
                     'id' => $survey->Id,

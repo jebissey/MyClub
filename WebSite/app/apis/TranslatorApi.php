@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace app\apis;
 
+use JsonException;
 use Throwable;
 use app\enums\ApplicationError;
 use app\exceptions\QueryException;
@@ -43,7 +44,12 @@ class TranslatorApi extends AbstractApi
             return;
         }
 
-        $data = json_decode(file_get_contents('php://input'), true);
+        try {
+            $data = $this->getJsonInput();
+        } catch (JsonException $e) {
+            $this->renderJsonBadRequest("Données invalides", __FILE__, __LINE__);
+            return;
+        }
         if (
             !$data ||
             !isset($data['id']) ||

@@ -534,7 +534,7 @@ class ArticleController extends TableController
                     $this->redirect(
                         $_SERVER['REQUEST_URI'],
                         ApplicationError::Ok,
-                        "Auto sign in succeeded for {$result->getUser()->Email}"
+                        "Auto sign in succeeded for {$result->getUser()?->Email}"
                     );
                     return;
                 }
@@ -545,30 +545,43 @@ class ArticleController extends TableController
             return;
         }
         try {
-            $article = $this->authorizationDataHelper->getArticle($id, $connectedUser);
-            if ($article === false) {
+            $articleAuthorization = $this->authorizationDataHelper->getArticle($id, $connectedUser);
+            if ($articleAuthorization === false) {
                 $this->raiseForbidden(__FILE__, __LINE__);
                 return;
             }
+
             $article = $this->articleDataHelper->getLatestArticle([$id]);
             if ($article === null) {
                 $this->raiseForbidden(__FILE__, __LINE__);
                 return;
             }
+
             [$message, $messageType] = MessageService::get();
 
             // 1. Grab everything generated globally by the framework infrastructure
             $dynamicContext = $this->getAllParams([]);
 
             // 2. Résolution des données annexes en variables locales typées
-            $groups = array_values($this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'));
-            $carouselItems = array_values($this->dataHelper->gets('Carousel', ['IdArticle' => $id]));
-            $hasSurvey = $this->dataHelper->get('Survey', ['IdArticle' => $id], 'ClosingDate') ?: null;
-            $hasOrder = $this->dataHelper->get('Order', ['IdArticle' => $id], 'ClosingDate') ?: null;
+            $groups = array_values(
+                $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name')
+            );
+            $carouselItems = array_values(
+                $this->dataHelper->gets('Carousel', ['IdArticle' => $id])
+            );
+            $hasSurvey = $this->dataHelper->get(
+                'Survey',
+                ['IdArticle' => $id],
+                'ClosingDate'
+            ) ?: null;
+            $hasOrder = $this->dataHelper->get(
+                'Order',
+                ['IdArticle' => $id],
+                'ClosingDate'
+            ) ?: null;
 
             // 3. Map explicitly to our object model
             $viewModel = new ArticleShowViewModel(
-                // View specific
                 id: $id,
                 article: $article,
                 groups: $groups,
@@ -578,18 +591,30 @@ class ArticleController extends TableController
                 userEmail: $dynamicContext['userEmail'] ?? null,
                 navItems: $this->getNavItems($connectedUser->person),
                 publishedBy: $article->PublishedBy && $article->PublishedBy != $article->CreatedBy
-                    ? $this->personDataHelper->getPublisher($article->PublishedBy) : '',
-                canReadPool: $this->authorizationDataHelper->canPersonReadSurveyResults($article, $connectedUser),
-                canReadOrder: $this->authorizationDataHelper->canPersonReadOrderResults($article, $connectedUser),
+                    ? $this->personDataHelper->getPublisher($article->PublishedBy) ?? ''
+                    : '',
+                canReadPool: $this->authorizationDataHelper->canPersonReadSurveyResults(
+                    $articleAuthorization,
+                    $connectedUser
+                ),
+                canReadOrder: $this->authorizationDataHelper->canPersonReadOrderResults(
+                    $articleAuthorization,
+                    $connectedUser
+                ),
                 carouselItems: $carouselItems,
                 page: $connectedUser->getPage(),
-                countOfMessages: count($this->dataHelper->gets('Message', ['"From"' => 'User', 'ArticleId' => $id])),
-                isCreator: $connectedUser->person !== null && $connectedUser->person->Id === $article->CreatedBy,
+                countOfMessages: count(
+                    $this->dataHelper->gets(
+                        'Message',
+                        ['"From"' => 'User', 'ArticleId' => $id]
+                    )
+                ),
+                isCreator: $connectedUser->person !== null
+                    && $connectedUser->person->Id === $article->CreatedBy,
                 isMember: $connectedUser->person !== null,
                 isEditor: $connectedUser->isEditor(),
                 message: $message,
                 messageType: $messageType,
-                // Layout properties mapped safely from framework state
                 navbarInkColor: $dynamicContext['navbarInkColor'] ?? '#ffffff',
                 navbarIconColor: $dynamicContext['navbarIconColor'] ?? '#000000',
                 navbarBgColor: $dynamicContext['navbarBgColor'] ?? '#343a40',
@@ -597,11 +622,12 @@ class ArticleController extends TableController
                 memberAlert: $dynamicContext['memberAlert'] ?? null,
                 btn_HistoryBack: true,
                 btn_Parent: '/articles',
-                // Retain anything else just in case
-                //allParams: $dynamicContext
             );
 
-            $this->render('Article/views/article_show.latte', $viewModel->toArray());
+            $this->render(
+                'Article/views/article_show.latte',
+                $viewModel->toArray()
+            );
         } catch (QueryException $e) {
             $this->raiseBadRequest($e->getMessage(), $e->getFile(), $e->getLine());
         }
@@ -627,11 +653,7 @@ class ArticleController extends TableController
             $this->raiseBadRequest(($this->t)('article.error.login_required'), __FILE__, __LINE__);
             return;
         }
-        $person = $connectedUser->person;
-        // TODO: ne mute plus $person->UserImg (propriété non déclarée sur la classe Person),
-        // la valeur est maintenant passée séparément au template sous 'userImg'.
-        // Si article_show.latte / chat.latte lit {$person->UserImg}, il faut l'ajuster
-        // pour lire {$userImg} à la place - à confirmer avec le template.
+        $person = $connectedUser->person ?? throw new IntegrityException('Fatal error in file ' . __FILE__ . ' at line ' . __LINE__);
         $userImg = WebApp::getUserImg($person, new GravatarHandler());
         $this->render('Common/views/chat.latte', $this->getAllParams([
             'article' => $article,
@@ -742,7 +764,7 @@ class ArticleController extends TableController
         $result = $this->dataHelper->set('Article', [
             'Title'          => $title,
             'Content'        => $content,
-            'PublishedBy'    => $input['published'] == 1 ? $this->application->getConnectedUser()->person->Id : null,
+            'PublishedBy'    => $input['published'] == 1 ? $this->application->getConnectedUser()->person->Id ?? throw new IntegrityException('Fatal error in file ' . __FILE__ . ' at line ' . __LINE__) : null,
             'IdGroup'        => $input['idGroup'],
             'OnlyForMembers' => $input['membersOnly'] ?? 0,
             'LastUpdate'     => date('Y-m-d H:i:s')

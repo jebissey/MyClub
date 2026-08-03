@@ -41,14 +41,14 @@ class PersonPreferences
     public function isPersonInterested(Person $person, ?int $idEventType, ?int $dayOfWeek, string $timeOfDay): bool
     {
         if ($person->Preferences !== '') {
-            $preferences = json_decode($person->Preferences, true);
+            $preferences = json_decode($person->Preferences ?? '', true);
             if (isset($preferences['noAlerts']) && $preferences['noAlerts'] === 'on') {
                 return false;
             }
         }
         if ($idEventType !== null) {
             if ($person->Preferences !== '') {
-                $preferences = json_decode($person->Preferences, true);
+                $preferences = json_decode($person->Preferences ?? '', true);
                 if ($preferences !== '' && (!isset($preferences['eventTypes'][$idEventType]))) {
                     return false;
                 }
@@ -62,7 +62,7 @@ class PersonPreferences
         }
         if ($dayOfWeek !== null && $timeOfDay !== '') {
             if ($person->Availabilities !== '') {
-                $availabilities = json_decode($person->Availabilities, true);
+                $availabilities = json_decode($person->Availabilities ?? '', true);
                 if ($availabilities[$dayOfWeek][$timeOfDay] !== 'on') {
                     return false;
                 }

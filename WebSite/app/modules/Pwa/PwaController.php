@@ -80,7 +80,7 @@ class PwaController extends AbstractController
         $text  = $_POST['text'] ?? '';
 
         $articleId = $this->articleService->createWithMedia(
-            $user->person->Id,
+            $user->person->Id ?? 0,
             $_FILES['files'] ?? null,
             $title,
             $text

@@ -66,7 +66,7 @@ class RssController extends AbstractController
 
     private function getFirstElement(string $html): string
     {
-        $htmlSansImages = preg_replace('/<img[^>]*>/i', '', $html);
+        $htmlSansImages = preg_replace('/<img[^>]*>/i', '', $html) ?? $html;
 
         if (preg_match('/<p[^>]*>(.*?)<\/p>/is', $htmlSansImages, $matches)) {
             $text = strip_tags($matches[1]);

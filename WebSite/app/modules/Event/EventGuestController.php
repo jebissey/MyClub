@@ -77,7 +77,7 @@ class EventGuestController extends AbstractController
             }
             $nickname = $input['nickname'] ?? '???';
             try {
-                $contactData = $this->dataHelper->get('Contact', ['Email' => $email], 'Id, Token, NickName, TokenCreatedAt');
+                /** @var object{Id: int|string, Token: string, NickName: string, TokenCreatedAt: string}|false $contactData */$contactData = $this->dataHelper->get('Contact', ['Email' => $email], 'Id, Token, NickName, TokenCreatedAt');
                 $contact = $contactData ? ContactRow::fromStdClass($contactData) : null;
                 if (!$contact) {
                     $token = bin2hex(random_bytes(32));
@@ -121,7 +121,7 @@ class EventGuestController extends AbstractController
                     [
                         'IdContact' => $contactId,
                         'IdEvent' => $eventId,
-                        'InvitedBy' => $this->application->getConnectedUser()->person->Id
+                        'InvitedBy' => $this->application->getConnectedUser()->person->Id ?? 0
                     ]
                 );
 
@@ -139,7 +139,7 @@ class EventGuestController extends AbstractController
                 $body .= "Cordialement,\nL'équipe des animateurs";
 
                 $emailMessage = new EmailMessage(
-                    from: $this->application->getConnectedUser()->person->Email,
+                    from: $this->application->getConnectedUser()->person->Email ?? '',
                     to: $email,
                     subject: $subject,
                     body: $body,

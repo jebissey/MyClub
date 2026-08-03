@@ -15,22 +15,46 @@ class MetadataDataHelper extends Data
 
     public function isTestSite(): bool
     {
+        /** @var object{ThisIsTestSite: int}|false $meta */
         $meta = $this->get('Metadata', ['Id' => 1], 'ThisIsTestSite');
-        return ($meta !== false && $meta->ThisIsTestSite == 1);
+
+        return $meta !== false && $meta->ThisIsTestSite === 1;
     }
 
     public function getForcedLanguage(): string
     {
-        return $this->get('Metadata', ['Id' => 1], 'ThisIsForcedLanguage')->ThisIsForcedLanguage ?? '';
+        /** @var object{ThisIsForcedLanguage: string|null}|false $meta */
+        $meta = $this->get(
+            'Metadata',
+            ['Id' => 1],
+            'ThisIsForcedLanguage'
+        );
+
+        return $meta !== false
+            ? ($meta->ThisIsForcedLanguage ?? '')
+            : '';
     }
 
     public function getProdSiteUrl(): string
     {
-        return $this->get('Metadata', ['Id' => 1], 'ThisIsProdSiteUrl')->ThisIsProdSiteUrl ?? '';
+        /** @var object{ThisIsProdSiteUrl: string|null}|false $meta */
+        $meta = $this->get(
+            'Metadata',
+            ['Id' => 1],
+            'ThisIsProdSiteUrl'
+        );
+
+        return $meta !== false
+            ? ($meta->ThisIsProdSiteUrl ?? '')
+            : '';
     }
 
     public function setForcedLanguage(?string $language): void
     {
-        $this->set('Metadata', ['ThisIsForcedLanguage' => $language], ['Id' => 1]);
+        $this->set(
+            'Metadata',
+            ['ThisIsForcedLanguage' => $language],
+            ['Id' => 1]
+        );
     }
 }

@@ -26,7 +26,7 @@ class DesignController extends AbstractController
             $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
-        [$designs, $userVotes] = $this->designDataHelper->getUsersVotes($this->application->getConnectedUser()->person->Id);
+        [$designs, $userVotes] = $this->designDataHelper->getUsersVotes($this->application->getConnectedUser()->person->Id ?? 0);
 
         $this->render('Article/views/designs_index.latte', $this->getAllParams([
             'designs' => $designs,
@@ -72,7 +72,7 @@ class DesignController extends AbstractController
         ];
         $filterValues = WebApp::filterInput($schema, $this->flight->request()->data->getData());
         $values = [
-            'IdPerson' => $this->application->getConnectedUser()->person->Id,
+            'IdPerson' => $this->application->getConnectedUser()->person->Id ?? 0,
             'Name' => $filterValues['name'] ?? '',
             'Detail' => $filterValues['detail'] ?? '',
             'NavBar' => $filterValues['navbar'] ?? '',

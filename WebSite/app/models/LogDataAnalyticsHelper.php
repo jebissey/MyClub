@@ -33,10 +33,12 @@ class LogDataAnalyticsHelper extends Data
                 FROM Log
                 WHERE CreatedAt BETWEEN :startDate AND :endDate
             ");
+
             $query->execute([
                 ':startDate' => $period['start'],
                 ':endDate'   => $period['end'],
             ]);
+
             $data = $query->fetch(PDO::FETCH_OBJ);
 
             $item = [
@@ -52,10 +54,19 @@ class LogDataAnalyticsHelper extends Data
             ];
 
             if ($periodType !== 'day') {
-                $dailyCounts = $this->getDailyVisitorCounts($period['start'], $period['end']);
+                $dailyCounts = $this->getDailyVisitorCounts(
+                    $period['start'],
+                    $period['end']
+                );
 
-                $item['minDailyVisitors'] = count($dailyCounts) > 0 ? min($dailyCounts) : 0;
-                $item['maxDailyVisitors'] = count($dailyCounts) > 0 ? max($dailyCounts) : 0;
+                $item['minDailyVisitors'] = count($dailyCounts) > 0
+                    ? min($dailyCounts)
+                    : 0;
+
+                $item['maxDailyVisitors'] = count($dailyCounts) > 0
+                    ? max($dailyCounts)
+                    : 0;
+
                 $item['avgDailyVisitors'] = count($dailyCounts) > 0
                     ? array_sum($dailyCounts) / count($dailyCounts)
                     : 0;
@@ -86,22 +97,33 @@ class LogDataAnalyticsHelper extends Data
         $next = clone $date;
 
         match ($period) {
-            'day'   => [$prev->modify('-1 day'),   $next->modify('+1 day')],
-            'week'  => [$prev->modify('-1 week'),  $next->modify('+1 week')],
+            'day'   => [$prev->modify('-1 day'), $next->modify('+1 day')],
+            'week'  => [$prev->modify('-1 week'), $next->modify('+1 week')],
             'month' => [$prev->modify('-1 month'), $next->modify('+1 month')],
-            'year'  => [$prev->modify('-1 year'),  $next->modify('+1 year')],
+            'year'  => [$prev->modify('-1 year'), $next->modify('+1 year')],
             default => [$prev, $next],
         };
 
-        $query = $this->pdoForLog->query('SELECT MIN(CreatedAt) as first, MAX(CreatedAt) as last FROM Log');
+        $query = $this->pdoForLog->query(
+            'SELECT MIN(CreatedAt) as first, MAX(CreatedAt) as last FROM Log'
+        );
+
+        if ($query === false) {
+            throw new \RuntimeException('Impossible d\'exécuter la requête des statistiques de navigation.');
+        }
+
         $range = $query->fetch(PDO::FETCH_OBJ);
 
+        if ($range === false || $range->first === null || $range->last === null) {
+            throw new \RuntimeException('Aucune donnée disponible dans le journal.');
+        }
+
         return [
-            'first'   => (new DateTime($range->first))->format('Y-m-d'),
+            'first'   => (new DateTime((string) $range->first))->format('Y-m-d'),
             'prev'    => $prev->format('Y-m-d'),
             'current' => $date->format('Y-m-d'),
             'next'    => $next->format('Y-m-d'),
-            'last'    => (new DateTime($range->last))->format('Y-m-d'),
+            'last'    => (new DateTime((string) $range->last))->format('Y-m-d'),
         ];
     }
 
@@ -132,6 +154,7 @@ class LogDataAnalyticsHelper extends Data
                     ELSE 3
                 END
         ");
+
         $query->execute([
             ':start_date' => $startDate->format('Y-m-d H:i:s'),
             ':end_date'   => $endDate->format('Y-m-d H:i:s'),
@@ -157,6 +180,7 @@ class LogDataAnalyticsHelper extends Data
             GROUP BY Referer
             ORDER BY count DESC
         ");
+
         $query->execute([
             ':start_date' => $startDate->format('Y-m-d H:i:s'),
             ':end_date'   => $endDate->format('Y-m-d H:i:s'),
@@ -185,6 +209,7 @@ class LogDataAnalyticsHelper extends Data
             GROUP BY DATE(CreatedAt)
             ORDER BY day
         ");
+
         $query->execute([
             ':startDate' => $startDate,
             ':endDate'   => $endDate,
@@ -192,7 +217,10 @@ class LogDataAnalyticsHelper extends Data
 
         $rows = $query->fetchAll(PDO::FETCH_OBJ);
 
-        return array_map(static fn($row) => (int)$row->uniqueVisitors, $rows);
+        return array_map(
+            static fn($row): int => (int) $row->uniqueVisitors,
+            $rows
+        );
     }
 
     /** @return array<int, array{start: string, end: string, dateObj: DateTime}> */
@@ -204,8 +232,12 @@ class LogDataAnalyticsHelper extends Data
         switch ($periodType) {
             case 'day':
                 $startPoint = (clone $today)->modify(sprintf('-%d days', $offset));
+
                 for ($i = 0; $i < self::PERIOD_TO_SHOW; $i++) {
-                    $currentDate = (clone $startPoint)->modify(sprintf('-%d days', self::PERIOD_TO_SHOW - $i - 1));
+                    $currentDate = (clone $startPoint)->modify(
+                        sprintf('-%d days', self::PERIOD_TO_SHOW - $i - 1)
+                    );
+
                     $periods[] = [
                         'start'   => (clone $currentDate)->setTime(0, 0, 0)->format('Y-m-d H:i:s'),
                         'end'     => (clone $currentDate)->setTime(23, 59, 59)->format('Y-m-d H:i:s'),
@@ -217,9 +249,14 @@ class LogDataAnalyticsHelper extends Data
             case 'week':
                 $currentMonday = (clone $today)->modify('monday this week');
                 $startPoint    = (clone $currentMonday)->modify(sprintf('-%d weeks', $offset));
+
                 for ($i = 0; $i < self::PERIOD_TO_SHOW; $i++) {
-                    $weekStart = (clone $startPoint)->modify(sprintf('-%d weeks', self::PERIOD_TO_SHOW - $i - 1));
-                    $weekEnd   = (clone $weekStart)->modify('+6 days');
+                    $weekStart = (clone $startPoint)->modify(
+                        sprintf('-%d weeks', self::PERIOD_TO_SHOW - $i - 1)
+                    );
+
+                    $weekEnd = (clone $weekStart)->modify('+6 days');
+
                     $periods[] = [
                         'start'   => $weekStart->setTime(0, 0, 0)->format('Y-m-d H:i:s'),
                         'end'     => $weekEnd->setTime(23, 59, 59)->format('Y-m-d H:i:s'),
@@ -230,10 +267,17 @@ class LogDataAnalyticsHelper extends Data
 
             case 'month':
                 $firstDayCurrentMonth = (clone $today)->modify('first day of this month');
-                $startPoint           = (clone $firstDayCurrentMonth)->modify(sprintf('-%d months', $offset));
+                $startPoint           = (clone $firstDayCurrentMonth)->modify(
+                    sprintf('-%d months', $offset)
+                );
+
                 for ($i = 0; $i < self::PERIOD_TO_SHOW; $i++) {
-                    $monthStart = (clone $startPoint)->modify(sprintf('-%d months', self::PERIOD_TO_SHOW - $i - 1));
-                    $monthEnd   = (clone $monthStart)->modify('last day of this month');
+                    $monthStart = (clone $startPoint)->modify(
+                        sprintf('-%d months', self::PERIOD_TO_SHOW - $i - 1)
+                    );
+
+                    $monthEnd = (clone $monthStart)->modify('last day of this month');
+
                     $periods[] = [
                         'start'   => $monthStart->setTime(0, 0, 0)->format('Y-m-d H:i:s'),
                         'end'     => $monthEnd->setTime(23, 59, 59)->format('Y-m-d H:i:s'),
@@ -244,10 +288,17 @@ class LogDataAnalyticsHelper extends Data
 
             case 'year':
                 $firstDayCurrentYear = (clone $today)->modify('first day of January this year');
-                $startPoint          = (clone $firstDayCurrentYear)->modify(sprintf('-%d years', $offset));
+                $startPoint          = (clone $firstDayCurrentYear)->modify(
+                    sprintf('-%d years', $offset)
+                );
+
                 for ($i = 0; $i < self::PERIOD_TO_SHOW; $i++) {
-                    $yearStart = (clone $startPoint)->modify(sprintf('-%d years', self::PERIOD_TO_SHOW - $i - 1));
-                    $yearEnd   = (clone $yearStart)->modify('last day of December this year');
+                    $yearStart = (clone $startPoint)->modify(
+                        sprintf('-%d years', self::PERIOD_TO_SHOW - $i - 1)
+                    );
+
+                    $yearEnd = (clone $yearStart)->modify('last day of December this year');
+
                     $periods[] = [
                         'start'   => $yearStart->setTime(0, 0, 0)->format('Y-m-d H:i:s'),
                         'end'     => $yearEnd->setTime(23, 59, 59)->format('Y-m-d H:i:s'),

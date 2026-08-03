@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\apis;
 
 use DateTime;
+use stdClass;
 use Throwable;
 use app\enums\ApplicationError;
 use app\enums\Period;
@@ -24,7 +25,13 @@ use app\modules\Common\services\EmailService;
 use app\helpers\PersonPreferences;
 use app\valueObjects\ApiResponse;
 use app\valueObjects\EmailMessage;
+use app\valueObjects\EventDetailRow;
+use app\valueObjects\EventParticipant;
+use app\valueObjects\PersonEmailRow;
 
+/**
+ * @phpstan-import-type EventParticipantShape from EventParticipant
+ */
 class EventApi extends AbstractApi
 {
     public function __construct(
@@ -75,7 +82,7 @@ class EventApi extends AbstractApi
                 ) ?: Period::Today->value;
                 $apiResponse = $this->eventService->duplicateEvent(
                     $id,
-                    $this->application->getConnectedUser()->person->Id,
+                    $this->application->getConnectedUser()->person->Id ?? 0,
                     Period::from($modeString)
                 );
                 $this->renderJson($apiResponse->data, $apiResponse->success, $apiResponse->responseCode);
@@ -131,7 +138,7 @@ class EventApi extends AbstractApi
             try {
                 $event = $this->eventDataHelper->getEvent((int)$eventId);
                 $apiResponse = $this->sendEventEmails($event, $data['Title'] ?? '', $data['Body'] ?? '', $data['Recipients'] ?? '');
-                $this->renderJson($apiResponse->data, $apiResponse->success, $apiResponse->responseCode, $apiResponse->message);
+                $this->renderJson($apiResponse->data, $apiResponse->success, $apiResponse->responseCode, $apiResponse->message ?? '');
             } catch (QueryException $e) {
                 $this->renderJsonError($e->getMessage(), ApplicationError::BadRequest->value, $e->getFile(), $e->getLine());
             } catch (Throwable $e) {
@@ -141,34 +148,39 @@ class EventApi extends AbstractApi
     }
 
     #region Private functions
-    private function sendEventEmails(object $event, string $title, string $body, string $recipients): ApiResponse
+    private function sendEventEmails(EventDetailRow $event, string $title, string $body, string $recipients): ApiResponse
     {
-        $participants = null;
         if ($recipients === 'registered') {
-            $participants = $this->participantDataHelper->getEventParticipants($event->Id);
+            /** @var list<EventParticipantShape> $rows */
+            $rows = $this->participantDataHelper->getEventParticipants($event->Id);
+            $participants = $this->toEmailParticipants($rows);
         } elseif ($recipients === 'unregistered') {
-            //TODO
+            $participants = []; //TODO
         } elseif ($recipients === 'all') {
-            $participants = $this->personDataHelper->getInterestedPeople(
+            /** @var list<object{PersonId: int|string, Email: string|null}> $rows */
+            $rows = $this->personDataHelper->getInterestedPeople(
                 $this->eventDataHelper->getEventGroup($event->Id),
-                $event->IdEventType ?? null,
+                $event->IdEventType,
                 (new DateTime($event->StartTime))->format('N') - 1,
                 $this->personPreferences->getPeriodOfDay($event->StartTime)
             );
+            $participants = $this->toEmailParticipants($rows);
         } else {
             return new ApiResponse(false, ApplicationError::BadRequest->value, [], "Invalid recipients ($recipients)");
         }
+
         if ($participants) {
             $root = Application::$root;
             $eventLink = $root . '/event/' . $event->Id;
             $unsubscribeLink = $root . '/user/preferences';
-            $eventCreator = $this->dataHelper->get('Person', ['Id' => $event->CreatedBy], 'Email');
-            if ($eventCreator !== false) {
-                $eventCreatorEmail = $eventCreator->Email;
-            } else {
-                $eventCreatorEmail = null;
-            }
-            if ($eventCreatorEmail === null) {
+
+            /** @var object{Email: string|null}|false $eventCreatorRow */
+            $eventCreatorRow = $this->dataHelper->get('Person', ['Id' => $event->CreatedBy], 'Email');
+            $eventCreatorEmail = ($eventCreatorRow !== false)
+                ? PersonEmailRow::fromStdClass($eventCreatorRow)->Email
+                : null;
+
+            if ($eventCreatorEmail === null || $eventCreatorEmail === '') {
                 return new ApiResponse(
                     false,
                     ApplicationError::BadRequest->value,
@@ -205,4 +217,21 @@ class EventApi extends AbstractApi
         }
         return new ApiResponse(false, ApplicationError::BadRequest->value, [], 'No participant');
     }
+
+    /**
+     * @param list<EventParticipantShape> $rows
+     * @return list<EventParticipant>
+     */
+    private function toEmailParticipants(array $rows): array
+    {
+        $participants = [];
+        foreach ($rows as $row) {
+            $participant = EventParticipant::fromStdClass($row);
+            if ($participant !== null) {
+                $participants[] = $participant;
+            }
+        }
+        return $participants;
+    }
+    #endregion
 }

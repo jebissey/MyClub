@@ -94,7 +94,7 @@ class LoanController extends AbstractController
         }
 
         $user   = $this->application->getConnectedUser();
-        $userId = $user->isLoanManager() ? 0 : $user->person->Id;
+        $userId = $user->isLoanManager() ? 0 : $user->person->Id ?? 0;
 
         $this->render('Loan/views/user.latte', $this->getAllParams([
             'reservations'      => $this->loanDataHelper->getAllReservations($userId),

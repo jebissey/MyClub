@@ -35,13 +35,25 @@ class MediaController extends AbstractController
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
-        $row = $this->dataHelper->get('SharedFile', ['Token' => $token], 'Id, IdGroup, OnlyForMembers, Item');
+        /**
+         * @var object{
+         *     Id: int|string,
+         *     IdGroup: int|string|null,
+         *     OnlyForMembers: int|string,
+         *     Item: string
+         * }|false $row
+         */
+        $row = $this->dataHelper->get(
+            'SharedFile',
+            ['Token' => $token],
+            'Id, IdGroup, OnlyForMembers, Item'
+        );
+
         if (!$row) {
             $this->raiseBadRequest("Token unknown", __FILE__, __LINE__);
             return;
         }
         $sharedFile = SharedFileRow::fromStdClass($row);
-
         $connectedUser = $this->application->getConnectedUser();
         if ($sharedFile->OnlyForMembers !== 0) {
             if ($connectedUser->person === null) {
@@ -50,7 +62,7 @@ class MediaController extends AbstractController
             }
         }
         if ($sharedFile->IdGroup !== null) {
-            if (!$this->personGroupDataHelper->isPersonInGroup($connectedUser->person->Id, $sharedFile->IdGroup)) {
+            if (!$this->personGroupDataHelper->isPersonInGroup($connectedUser->person->Id ?? 0, $sharedFile->IdGroup)) {
                 $this->raiseForbidden(__FILE__, __LINE__);
                 return;
             }

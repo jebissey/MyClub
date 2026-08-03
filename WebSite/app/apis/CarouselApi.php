@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace app\apis;
 
+use JsonException;
 use Throwable;
 use app\enums\ApplicationError;
 use app\exceptions\QueryException;
@@ -38,6 +39,7 @@ class CarouselApi extends AbstractApi
             $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }
+        /** @var object{IdArticle: int}|false $item */
         $item = $this->dataHelper->get('Carousel', ['Id' => $id], 'IdArticle');
         if (!$item) {
             $this->renderJsonBadRequest("Item {$id} not found", __FILE__, __LINE__);
@@ -78,7 +80,12 @@ class CarouselApi extends AbstractApi
             $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }
-        $data = json_decode(file_get_contents('php://input'), true);
+        try {
+            $data = $this->getJsonInput();
+        } catch (JsonException $e) {
+            $this->renderJsonBadRequest("Données invalides", __FILE__, __LINE__);
+            return;
+        }
         if (!$data || !isset($data['idArticle']) || !isset($data['item'])) {
             $this->renderJsonBadRequest("Données invalides", __FILE__, __LINE__);
             return;

@@ -41,11 +41,11 @@ class ChatApi extends AbstractApi
         $previousLogId = (int)($_SESSION['last_log_id'] ?? 0);
         $minutes = (int) ($_GET['m'] ?? self::ACTIVE_WINDOW_MINUTES);
 
-        $activePersons = $this->dataHelper->gets(
+        $activePersons = array_values($this->dataHelper->gets(
             'Person',
             ['Inactivated' => 0],
             'Id, NickName, FirstName, LastName, UseGravatar, Email, Avatar'
-        );
+        ));
         $visits = $this->logDataHelper->getLastVisitPerActivePersonWithTimeAgo($activePersons);
 
         $cutoff = new DateTime("-{$minutes} minutes", new DateTimeZone('UTC'));

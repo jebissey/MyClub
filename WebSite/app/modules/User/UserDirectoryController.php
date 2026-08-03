@@ -161,7 +161,7 @@ class UserDirectoryController extends AbstractController
      *     lat: string,
      *     lng: string,
      *     userImg: string,
-     *     myPublicData: string
+     *     myPublicData: ?string
      * }>
      */
     private function getLocationData(array $members): array

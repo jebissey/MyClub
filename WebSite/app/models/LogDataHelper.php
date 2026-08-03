@@ -7,6 +7,7 @@ namespace app\models;
 use DateTimeImmutable;
 use Envms\FluentPDO\Queries\Select;
 use PDO;
+use RuntimeException;
 use stdClass;
 use app\enums\Period;
 use app\helpers\Application;
@@ -50,10 +51,10 @@ class LogDataHelper extends Data
         foreach ($data as $item) {
             $labels[]         = $item['label'];
             $uniqueVisitors[] = $item['uniqueVisitors'];
-            $views2xx[]       = $item['views2xx']  ?? 0;
-            $views3xx[]       = $item['views3xx']  ?? 0;
-            $views4xx[]       = $item['views4xx']  ?? 0;
-            $views5xx[]       = $item['views5xx']  ?? 0;
+            $views2xx[]       = $item['views2xx'] ?? 0;
+            $views3xx[]       = $item['views3xx'] ?? 0;
+            $views4xx[]       = $item['views4xx'] ?? 0;
+            $views5xx[]       = $item['views5xx'] ?? 0;
 
             if (isset($item['minDailyVisitors'])) {
                 $showMinMaxAvg = true;
@@ -82,6 +83,7 @@ class LogDataHelper extends Data
     }
 
     #region Last visits
+
     /**
      * @param array<int, stdClass> $activePersons
      * @return array<int, stdClass>
@@ -89,15 +91,22 @@ class LogDataHelper extends Data
     public function getLastVisitPerActivePersonWithTimeAgo(array $activePersons): array
     {
         $visits = $this->getLastVisitPerActivePerson($activePersons);
+
         foreach ($visits as &$visit) {
             $visit->TimeAgo       = MyClubDateTime::calculateTimeAgo($visit->LastActivity);
             $visit->MinutesAgo    = MyClubDateTime::calculateMinutesAgo($visit->LastActivity);
             $visit->FormattedDate = MyClubDateTime::formatDateFromUTC($visit->LastActivity);
 
-            $person = $this->dataHelper->get('Person', ['Email' => $visit->Email], 'Email, UseGravatar, Avatar');
+            $person = $this->dataHelper->get(
+                'Person',
+                ['Email' => $visit->Email],
+                'Email, UseGravatar, Avatar'
+            );
+
             $visit->UseGravatar = $person->UseGravatar ?? 'no';
-            $visit->Avatar      = $person->Avatar      ?? '';
+            $visit->Avatar      = $person->Avatar ?? '';
         }
+
         return $visits;
     }
 
@@ -113,12 +122,15 @@ class LogDataHelper extends Data
 
         $placeholders = [];
         $params       = [];
+
         foreach ($activePersons as $i => $person) {
-            $key              = ':e' . $i;
-            $placeholders[]   = $key;
-            $params[$key]     = strtolower($person->Email);
+            $key            = ':e' . $i;
+            $placeholders[] = $key;
+            $params[$key]   = strtolower($person->Email);
         }
+
         $in = implode(', ', $placeholders);
+
         $sql = "
             SELECT l.Who, l.CreatedAt, l.Os, l.Browser
             FROM Log l
@@ -129,23 +141,28 @@ class LogDataHelper extends Data
                 GROUP BY LOWER(Who)
             ) latest
                 ON LOWER(l.Who) = latest.Who
-            AND l.CreatedAt  = latest.MaxCreatedAt
+            AND l.CreatedAt = latest.MaxCreatedAt
         ";
+
         $stmt = $this->pdoForLog->prepare($sql);
         $stmt->execute($params);
         $logs = $stmt->fetchAll(PDO::FETCH_OBJ);
 
         $logByEmail = [];
+
         foreach ($logs as $log) {
             $logByEmail[strtolower($log->Who)] = $log;
         }
 
         $result = [];
+
         foreach ($activePersons as $person) {
             $email = strtolower($person->Email);
+
             if (isset($logByEmail[$email])) {
-                $log      = $logByEmail[$email];
-                $result[] = (object)[
+                $log = $logByEmail[$email];
+
+                $result[] = (object) [
                     'PersonId'     => $person->Id,
                     'FullName'     => $person->FirstName . ' ' . $person->LastName,
                     'Email'        => $person->Email,
@@ -155,7 +172,12 @@ class LogDataHelper extends Data
                 ];
             }
         }
-        usort($result, fn($a, $b) => strcmp($b->LastActivity, $a->LastActivity));
+
+        usort(
+            $result,
+            fn($a, $b) => strcmp($b->LastActivity, $a->LastActivity)
+        );
+
         return $result;
     }
 
@@ -173,20 +195,32 @@ class LogDataHelper extends Data
      */
     public function getPersons(array $filteredPersonEmails): array
     {
-        $emails = array_filter(array_map('trim', array_values($filteredPersonEmails)));
+        $emails = array_filter(
+            array_map('trim', array_values($filteredPersonEmails))
+        );
+
         $sql = "SELECT LOWER(Email) AS Email, FirstName, LastName FROM Person";
         $params = [];
+
         if (!empty($emails)) {
-            $placeholders = implode(',', array_fill(0, count($emails), '?'));
+            $placeholders = implode(
+                ',',
+                array_fill(0, count($emails), '?')
+            );
+
             $sql .= " WHERE LOWER(Email) IN ($placeholders)";
             $params = array_map('strtolower', $emails);
         }
+
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute($params);
+
         return $stmt->fetchAll(PDO::FETCH_OBJ);
     }
 
-    /** @return array<int, stdClass> */
+    /**
+     * @return array<int, stdClass>
+     */
     public function getTopArticles(string $dateCondition, int $top): array
     {
         $sql = '
@@ -212,8 +246,8 @@ class LogDataHelper extends Data
             WHERE (
                 (CleanUri LIKE "/article/%" AND CleanUri GLOB "/article/[0-9]*" AND CleanUri NOT LIKE "/article/%/%")
                 OR
-                (CleanUri LIKE "/menu/show/article/%" 
-                    AND CleanUri GLOB "/menu/show/article/[0-9]*" 
+                (CleanUri LIKE "/menu/show/article/%"
+                    AND CleanUri GLOB "/menu/show/article/[0-9]*"
                     AND CleanUri NOT LIKE "/menu/show/article/%/%"
                 )
             )
@@ -221,19 +255,23 @@ class LogDataHelper extends Data
             ORDER BY visits DESC
             LIMIT :top
         ';
+
         $stmt = $this->pdoForLog->prepare($sql);
         $stmt->execute([':top' => $top]);
+
         return $stmt->fetchAll(PDO::FETCH_OBJ);
     }
 
-    /** @return array<int, stdClass> */
+    /**
+     * @return array<int, stdClass>
+     */
     public function getTopPages(Period $period, int $top): array
     {
         $dateCondition = $period->dateConditions('CreatedAt');
 
         $sql = "
-            SELECT 
-                CleanUri AS Uri, 
+            SELECT
+                CleanUri AS Uri,
                 COUNT(*) AS visits,
                 ROUND(AVG(CASE WHEN Duration IS NOT NULL THEN Duration END), 2) AS avg_duration
             FROM (
@@ -266,26 +304,31 @@ class LogDataHelper extends Data
     {
         $query = $this->pdoForLog->prepare("
             SELECT Who, SUM(Count) as VisitCount
-            FROM Log 
+            FROM Log
             WHERE CreatedAt BETWEEN :start AND :end
             GROUP BY Who
         ");
+
         $query->execute([
             ':start' => $season['start'],
             ':end'   => $season['end'],
         ]);
+
         return $query->fetchAll(PDO::FETCH_KEY_PAIR);
     }
 
     #region Installations
-    /** @return array<int, stdClass> */
+
+    /**
+     * @return array<int, stdClass>
+     */
     public function getInstallationsData(): array
     {
         $query = "
             SELECT
                 IpAddress,
                 COALESCE(
-                    (SELECT 
+                    (SELECT
                         CASE
                             WHEN INSTR(Uri,'url=') > 0 THEN
                                 CASE
@@ -298,8 +341,8 @@ class LogDataHelper extends Data
                                     ELSE SUBSTR(Uri, INSTR(Uri,'url=')+4)
                                 END
                         END
-                     FROM Log l2 
-                     WHERE l2.IpAddress = Log.IpAddress 
+                     FROM Log l2
+                     WHERE l2.IpAddress = Log.IpAddress
                        AND l2.Uri LIKE '/api/lastVersion%'
                        AND INSTR(l2.Uri,'url=') > 0
                      LIMIT 1),
@@ -322,24 +365,37 @@ class LogDataHelper extends Data
                     END
                 ) as webappVersions,
                 GROUP_CONCAT(DISTINCT Message) as phpVersions
-            FROM Log 
+            FROM Log
             WHERE Uri LIKE '/api/lastVersion%'
             GROUP BY IpAddress
             ORDER BY MAX(CreatedAt) DESC
         ";
-        $results = $this->pdoForLog->query($query)->fetchAll(PDO::FETCH_OBJ);
+
+        $stmt = $this->pdoForLog->query($query);
+
+        if ($stmt === false) {
+            throw new RuntimeException(
+                'Unable to execute installations query.'
+            );
+        }
+
+        $results = $stmt->fetchAll(PDO::FETCH_OBJ);
 
         $dnsCache = [];
+
         foreach ($results as &$installation) {
             $installation->timeAgo = $this->getTimeAgo($installation->lastCheck);
             $host = $installation->Host;
+
             if (strpos($host, '%') !== false) {
                 $decoded = urldecode($host);
                 $parsedHost = parse_url($decoded, PHP_URL_HOST);
                 $installation->Host = $parsedHost ?: $decoded;
                 continue;
             }
+
             $hostname = null;
+
             if (filter_var($host, FILTER_VALIDATE_IP)) {
                 if (isset($dnsCache[$host])) {
                     $hostname = $dnsCache[$host];
@@ -347,11 +403,13 @@ class LogDataHelper extends Data
                     $hostname = @gethostbyaddr($host);
                     $dnsCache[$host] = $hostname;
                 }
+
                 if ($hostname && $hostname !== $host) {
                     $installation->Host = $hostname;
                 }
             }
         }
+
         return $results;
     }
 
@@ -362,15 +420,19 @@ class LogDataHelper extends Data
         if ($time < 60) {
             return 'Il y a ' . $time . ' secondes';
         }
+
         if ($time < 3600) {
             return 'Il y a ' . round($time / 60) . ' minutes';
         }
+
         if ($time < 86400) {
             return 'Il y a ' . round($time / 3600) . ' heures';
         }
+
         if ($time < 2592000) {
             return 'Il y a ' . round($time / 86400) . ' jours';
         }
+
         if ($time < 31536000) {
             return 'Il y a ' . round($time / 2592000) . ' mois';
         }
@@ -379,6 +441,7 @@ class LogDataHelper extends Data
     }
 
     #region Creation time distribution
+
     /**
      * Retourne la répartition des temps de génération (Duration) pour une URI donnée,
      * regroupés par tranches dynamiques selon la plage observée.
@@ -392,38 +455,46 @@ class LogDataHelper extends Data
      *
      * @return array<int, array{tranche: string, count: int, isHighlighted: bool}>
      */
-
-    public function getCreationTimeDistribution(string $uri, DateTimeImmutable $from, DateTimeImmutable $to): array
-    {
+    public function getCreationTimeDistribution(
+        string $uri,
+        DateTimeImmutable $from,
+        DateTimeImmutable $to
+    ): array {
         $sql = "
             SELECT CAST(Duration AS INTEGER) AS duration
-            FROM   Log
-            WHERE  Uri      LIKE :uri_pattern
-            AND    Duration IS NOT NULL
-            AND    Duration > 0
-            AND    CreatedAt BETWEEN :from AND :to
-            ORDER  BY duration ASC
+            FROM Log
+            WHERE Uri LIKE :uri_pattern
+            AND Duration IS NOT NULL
+            AND Duration > 0
+            AND CreatedAt BETWEEN :from AND :to
+            ORDER BY duration ASC
         ";
+
         $stmt = $this->pdoForLog->prepare($sql);
+
         $stmt->execute([
             ':uri_pattern' => $uri . ' (%',
             ':from'        => $from->format('Y-m-d 00:00:00'),
             ':to'          => $to->format('Y-m-d 23:59:59'),
         ]);
+
         $durations = $stmt->fetchAll(PDO::FETCH_COLUMN);
+
         if (empty($durations)) {
             return [];
         }
 
-        $min       = (int) $durations[0];
-        $max       = (int) $durations[count($durations) - 1];
-        $stepSize  = $this->computeStepSize($min, $max);
+        $min      = (int) $durations[0];
+        $max      = (int) $durations[count($durations) - 1];
+        $stepSize = $this->computeStepSize($min, $max);
 
         $buckets = [];
+
         foreach ($durations as $d) {
-            $bucketIndex         = (int) floor($d / $stepSize);
+            $bucketIndex = (int) floor($d / $stepSize);
             $buckets[$bucketIndex] = ($buckets[$bucketIndex] ?? 0) + 1;
         }
+
         ksort($buckets);
 
         $medianIndex  = (int) floor(count($durations) / 2);
@@ -431,6 +502,7 @@ class LogDataHelper extends Data
         $medianBucket = (int) floor($medianValue / $stepSize);
 
         $result = [];
+
         foreach ($buckets as $index => $count) {
             $from    = $index * $stepSize;
             $to      = $from + $stepSize - 1;
@@ -448,26 +520,34 @@ class LogDataHelper extends Data
 
     private const CREATION_TIME_TREND_STEP_SIZE = 12;
 
-    /** @return array<int, array{label: string, avgDuration: int|null, count: int}> */
-    public function getCreationTimeTrend(string $uri, DateTimeImmutable $from, DateTimeImmutable $to): array
-    {
+    /**
+     * @return array<int, array{label: string, avgDuration: int|null, count: int}>
+     */
+    public function getCreationTimeTrend(
+        string $uri,
+        DateTimeImmutable $from,
+        DateTimeImmutable $to
+    ): array {
         $sql = "
             SELECT CAST(Duration AS INTEGER) AS duration,
                 CreatedAt
-            FROM   Log
-            WHERE  Uri      LIKE :uri
-            AND    Duration IS NOT NULL
-            AND    Duration > 0
-            AND    CreatedAt BETWEEN :from AND :to
-            ORDER  BY CreatedAt ASC
+            FROM Log
+            WHERE Uri LIKE :uri
+            AND Duration IS NOT NULL
+            AND Duration > 0
+            AND CreatedAt BETWEEN :from AND :to
+            ORDER BY CreatedAt ASC
         ";
+
         $stmt = $this->pdoForLog->prepare($sql);
+
         $stmt->execute([
             ':uri'  => $uri . ' (%',
             ':from' => $from->format('Y-m-d 00:00:00'),
             ':to'   => $to->format('Y-m-d 23:59:59'),
         ]);
-        $rows = $stmt->fetchAll(\PDO::FETCH_OBJ);
+
+        $rows = $stmt->fetchAll(PDO::FETCH_OBJ);
 
         if (empty($rows)) {
             return [];
@@ -477,28 +557,62 @@ class LogDataHelper extends Data
         $toTs       = $to->getTimestamp();
         $bucketSize = ($toTs - $fromTs) / self::CREATION_TIME_TREND_STEP_SIZE;
 
-        /** @var array<int, array{total: int, count: int}> $buckets */
-        $buckets = array_fill(0, self::CREATION_TIME_TREND_STEP_SIZE, ['total' => 0, 'count' => 0]);
+        /**
+         * @var array<int, array{total: int, count: int}> $buckets
+         */
+        $buckets = [];
+
+        for ($i = 0; $i < self::CREATION_TIME_TREND_STEP_SIZE; $i++) {
+            $buckets[$i] = [
+                'total' => 0,
+                'count' => 0,
+            ];
+        }
 
         foreach ($rows as $row) {
-            $ts    = strtotime($row->CreatedAt);
-            $index = min(self::CREATION_TIME_TREND_STEP_SIZE - 1, (int) floor(($ts - $fromTs) / $bucketSize));
-            $buckets[$index]['total'] += (int) $row->duration;
-            $buckets[$index]['count']++;
+            $ts = strtotime($row->CreatedAt);
+
+            $index = min(
+                self::CREATION_TIME_TREND_STEP_SIZE - 1,
+                (int) floor(($ts - $fromTs) / $bucketSize)
+            );
+
+            /** @var array{total: int, count: int} $bucket */
+            $bucket = $buckets[$index];
+
+            $bucket['total'] += (int) $row->duration;
+            $bucket['count']++;
+
+            $buckets[$index] = $bucket;
         }
 
         $result = [];
+
         for ($i = 0; $i < self::CREATION_TIME_TREND_STEP_SIZE; $i++) {
-            $sliceFrom = (new DateTimeImmutable())->setTimestamp((int) ($fromTs + $i * $bucketSize));
-            $sliceTo   = (new DateTimeImmutable())->setTimestamp((int) ($fromTs + ($i + 1) * $bucketSize - 1));
+            $sliceFrom = (new DateTimeImmutable())->setTimestamp(
+                (int) ($fromTs + $i * $bucketSize)
+            );
+
+            $sliceTo = (new DateTimeImmutable())->setTimestamp(
+                (int) ($fromTs + ($i + 1) * $bucketSize - 1)
+            );
+
             $sameDay = $sliceFrom->format('Ymd') === $sliceTo->format('Ymd');
+
             $label = $sameDay
                 ? $sliceFrom->format('d/m H\h') . '–' . $sliceTo->format('H\h')
                 : $sliceFrom->format('d/m') . '–' . $sliceTo->format('d/m');
-            $count = (int)$buckets[$i]['count'];
+
+            /** @var array{total: int, count: int} $bucket */
+            $bucket = $buckets[$i];
+
+            $count = $bucket['count'];
+
             $result[] = [
                 'label'       => $label,
-                'avgDuration' => $count > 0 ? (int)(round($buckets[$i]['total'] / $count)) : null,
+                'avgDuration' => $count > 0
+                    ? (int) round($bucket['total'] / $count)
+                    : null,
                 'count'       => $count,
             ];
         }
@@ -508,10 +622,11 @@ class LogDataHelper extends Data
 
     private function computeStepSize(int $min, int $max): int
     {
-        $range = max(1, $max - $min);
-        $rawStep = $range / 10;
-        $magnitude = pow(10, floor(log10($rawStep)));
+        $range      = max(1, $max - $min);
+        $rawStep    = $range / 10;
+        $magnitude  = pow(10, floor(log10($rawStep)));
         $normalized = $rawStep / $magnitude;
+
         $niceStep = match (true) {
             $normalized < 1.5 => 1,
             $normalized < 3.5 => 2,

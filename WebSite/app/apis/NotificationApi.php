@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace app\apis;
 
+use stdClass;
 use Throwable;
 use app\enums\ApplicationError;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
 use app\models\DataHelper;
 use app\models\PersonDataHelper;
+use app\valueObjects\PushSubscriptionRow;
 
 class NotificationApi extends AbstractApi
 {
@@ -39,11 +41,12 @@ class NotificationApi extends AbstractApi
         }
         $personId = $this->application->getConnectedUser()->person->Id;
         try {
-            $existing = $this->dataHelper->get(
+            $existingRow = $this->dataHelper->get(
                 'PushSubscription',
                 ['EndPoint' => $input['endpoint']]
             );
-            if ($existing) {
+            if ($existingRow instanceof \stdClass) {
+                $existing = PushSubscriptionRow::fromStdClass($existingRow);
                 $this->dataHelper->set(
                     'PushSubscription',
                     [
@@ -86,12 +89,13 @@ class NotificationApi extends AbstractApi
             return;
         }
         try {
-            $existing = $this->dataHelper->get(
+            $existingRow = $this->dataHelper->get(
                 'PushSubscription',
                 ['EndPoint' => $input['endpoint']]
             );
 
-            if ($existing) {
+            if ($existingRow instanceof stdClass) {
+                $existing = PushSubscriptionRow::fromStdClass($existingRow);
                 $this->dataHelper->delete('PushSubscription', ['Id' => $existing->Id]);
             }
             $this->renderJsonOk();

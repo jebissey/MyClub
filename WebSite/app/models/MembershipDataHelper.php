@@ -30,6 +30,7 @@ class MembershipDataHelper extends Data
         if ($month >= $startMonth) {
             return $year . '-' . ($year + 1);
         }
+
         return ($year - 1) . '-' . $year;
     }
 
@@ -46,10 +47,20 @@ class MembershipDataHelper extends Data
      */
     public function getForPersonAndSeason(int $personId, string $season): object|false
     {
-        return $this->get('Membership', [
+        /** @var object{
+         *     Id:int,
+         *     PersonId:int,
+         *     Season:string,
+         *     Status:string,
+         *     AmountCents:int
+         * }|false $membership
+         */
+        $membership = $this->get('Membership', [
             'PersonId' => $personId,
             'Season'   => $season,
         ]);
+
+        return $membership;
     }
 
     /**
@@ -113,10 +124,10 @@ class MembershipDataHelper extends Data
         $this->set(
             'Membership',
             [
-                'Status'              => 'paid',
-                'HelloAssoOrderId'    => $orderId,
-                'PaidAt'              => date('Y-m-d H:i:s'),
-                'UpdatedAt'           => date('Y-m-d H:i:s'),
+                'Status'           => 'paid',
+                'HelloAssoOrderId' => $orderId,
+                'PaidAt'           => date('Y-m-d H:i:s'),
+                'UpdatedAt'        => date('Y-m-d H:i:s'),
             ],
             ['Id' => (int)$row[0]->Id]
         );

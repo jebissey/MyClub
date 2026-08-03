@@ -142,7 +142,7 @@ class EventController extends AbstractController
             $result = $this->application->getAuthenticationService()->handleRememberMeLogin();
             if ($result && $result->isSuccess()) {
                 $this->application->getConnectedUser()->get();
-                $this->redirect($_SERVER['REQUEST_URI'], ApplicationError::Ok, "Auto sign in succeeded for {$result->getUser()->Email}");
+                $this->redirect($_SERVER['REQUEST_URI'], ApplicationError::Ok, "Auto sign in succeeded for {$result->getUser()?->Email}");
                 return;
             }
             $this->redirect('/user/sign/in?redirect=' . urlencode($_SERVER['REQUEST_URI']));
@@ -181,7 +181,7 @@ class EventController extends AbstractController
     {
         $this->register($eventId, false, $token);
     }
-    
+
     private function register(int $eventId, bool $set, ?string $token = null): void
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
@@ -200,7 +200,7 @@ class EventController extends AbstractController
             if ($person !== null) {
                 $userId = $person->Id;
                 if ($set) {
-                    if ($eventId > 0 && !$this->eventDataHelper->isUserRegistered($eventId, $person->Email ?? '')) {
+                    if ($eventId > 0 && !$this->eventDataHelper->isUserRegistered($eventId, $person->Email)) {
                         $this->dataHelper->set('Participant', [
                             'IdEvent'  => $eventId,
                             'IdPerson' => $userId,

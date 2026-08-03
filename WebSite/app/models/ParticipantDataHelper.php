@@ -7,7 +7,19 @@ namespace app\models;
 use PDO;
 use stdClass;
 use app\helpers\Application;
+use app\valueObjects\EventParticipant;
 
+/**
+ * @phpstan-type EventParticipantRow object{
+ *     Email: string|null,
+ *     NickName: string|null,
+ *     FirstName: string|null,
+ *     LastName: string|null,
+ *     PersonId: int|null,
+ *     InPresentationDirectory: int|null,
+ *     ContactId: int|null
+ * }
+ */
 class ParticipantDataHelper extends Data
 {
     public function __construct(Application $application)
@@ -15,7 +27,7 @@ class ParticipantDataHelper extends Data
         parent::__construct($application);
     }
 
-    /** @return array<int, stdClass> */
+    /** @return list<EventParticipantRow> */
     public function getEventParticipants(int $eventId): array
     {
         $sql = "
@@ -35,9 +47,13 @@ class ParticipantDataHelper extends Data
                 AND e.Canceled = 0
             ORDER BY pe.FirstName, pe.LastName, c.NickName
         ";
+
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':eventId' => $eventId]);
-        return $stmt->fetchAll(PDO::FETCH_OBJ);
+
+        /** @var list<EventParticipantRow> $rows */
+        $rows = array_values($stmt->fetchAll(PDO::FETCH_OBJ));
+        return $rows;
     }
 
     /**
@@ -56,10 +72,12 @@ class ParticipantDataHelper extends Data
             AND pa.IdPerson IS NOT NULL
             GROUP BY p.Email
         ");
+
         $query->execute([
             ':start' => $season['start'],
             ':end'   => $season['end']
         ]);
+
         return $query->fetchAll(PDO::FETCH_KEY_PAIR);
     }
 
@@ -92,38 +110,55 @@ class ParticipantDataHelper extends Data
             GROUP BY common.IdPerson
             ORDER BY CommonEvents DESC;
         ");
+
         $stmt->execute(['idPerson' => $idPerson]);
         $connections = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         foreach ($connections as &$connection) {
             if (!empty($connection['EventList'])) {
                 $events = explode(' • ', $connection['EventList']);
+
                 usort($events, function ($a, $b) {
                     $partsA = explode('|', $a);
                     $partsB = explode('|', $b);
-                    return strcmp($partsB[1], $partsA[1]); // tri DESC sur StartTime
+
+                    return strcmp($partsB[1], $partsA[1]);
                 });
+
                 $connection['EventList'] = implode(' • ', $events);
             }
         }
+
         if (!$connections) {
             return ['connections' => [], 'maxEvents' => 0];
         }
 
-        $persons = $this->pdo->query("
-        SELECT 
-            Id,     
-            FirstName || ' ' || LastName || 
-                CASE 
-                    WHEN NickName != '' THEN ' (' || NickName || ')' 
-                    ELSE '' 
-                END AS Name
-        FROM Person")->fetchAll(PDO::FETCH_KEY_PAIR);
-        $maxEvents = max(array_column($connections, 'CommonEvents'));
+        $personsStmt = $this->pdo->query("
+            SELECT 
+                Id,     
+                FirstName || ' ' || LastName || 
+                    CASE 
+                        WHEN NickName != '' THEN ' (' || NickName || ')' 
+                        ELSE '' 
+                    END AS Name
+            FROM Person
+        ");
+
+        if ($personsStmt === false) {
+            return [
+                'connections' => $connections,
+                'maxEvents' => (int) max(array_column($connections, 'CommonEvents')),
+            ];
+        }
+
+        $persons = $personsStmt->fetchAll(PDO::FETCH_KEY_PAIR);
+        $maxEvents = (int) max(array_column($connections, 'CommonEvents'));
 
         foreach ($connections as &$c) {
             $c['Name'] = $persons[$c['OtherPerson']] ?? 'Inconnu';
-            $c['Percent'] = $maxEvents ? round(($c['CommonEvents'] / $maxEvents) * 100) : 0;
+            $c['Percent'] = $maxEvents
+                ? round(($c['CommonEvents'] / $maxEvents) * 100)
+                : 0;
 
             if ($c['Percent'] >= 70) {
                 $c['Level'] = ['label' => 'Très forte', 'color' => 'success'];

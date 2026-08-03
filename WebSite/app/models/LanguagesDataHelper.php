@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\models;
 
 use PDO;
+use RuntimeException;
 use app\helpers\Application;
 use app\helpers\TranslationManager;
 
@@ -80,9 +81,12 @@ class LanguagesDataHelper extends Data
 
         $sql .= " ORDER BY Name";
 
-        return $this->pdo
-            ->query($sql)
-            ->fetchAll(PDO::FETCH_OBJ);
+        $stmt = $this->pdo->query($sql);
+        if ($stmt === false) {
+            throw new RuntimeException('Failed to query Languages table');
+        }
+
+        return $stmt->fetchAll(PDO::FETCH_OBJ);
     }
 
     public function countMissingTranslations(string $targetLang): int
@@ -90,15 +94,15 @@ class LanguagesDataHelper extends Data
         if (!in_array($targetLang, $this->allowedLanguages, true)) {
             return 0;
         }
-
         $target = $this->escapeColumn($targetLang);
-
         $stmt = $this->pdo->query(
             "SELECT COUNT(*) 
-             FROM Languages 
-             WHERE $target = '' OR $target IS NULL"
+            FROM Languages 
+            WHERE $target = '' OR $target IS NULL"
         );
-
+        if ($stmt === false) {
+            return 0;
+        }
         return (int)$stmt->fetchColumn();
     }
 
@@ -131,11 +135,12 @@ class LanguagesDataHelper extends Data
     private function initializeLanguages(): void
     {
         $stmt = $this->pdo->query("PRAGMA table_info(Languages)");
+        if ($stmt === false) {
+            throw new \RuntimeException('Failed to query Languages table schema');
+        }
         /** @var array<int, array{name: string}> $columns */
         $columns = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
         $this->allowedLanguages = [];
-
         foreach ($columns as $col) {
             if (!in_array($col['name'], ['Id', 'Name'], true)) {
                 $this->allowedLanguages[] = $col['name'];

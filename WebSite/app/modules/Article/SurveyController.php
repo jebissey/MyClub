@@ -12,6 +12,7 @@ use app\helpers\Application;
 use app\helpers\WebApp;
 use app\models\SurveyDataHelper;
 use app\modules\Common\AbstractController;
+use app\valueObjects\ArticleAuthorizationRow;
 use app\valueObjects\ArticleTitleRow;
 use app\valueObjects\IdRow;
 use app\valueObjects\PersonNameRow;
@@ -98,43 +99,75 @@ class SurveyController extends AbstractController
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
+
         if ($this->dataHelper->get('Article', ['Id' => $articleId], 'Id') === false) {
             $this->raiseBadRequest("Article {$articleId} doesn't exist", __FILE__, __LINE__);
             return;
         }
+
         $connectedUser = $this->application->getConnectedUser();
+
         if ($connectedUser->person === null) {
             $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
+
         $survey = $this->surveyDataHelper->getWithCreator($articleId);
+
         if ($survey === false) {
             $this->raiseBadRequest("No survey for article {$articleId}", __FILE__, __LINE__);
             $this->redirect('/article/' . $articleId);
             return;
         }
-        $articleForAuth = $this->dataHelper->get('Article', ['Id' => $survey->IdArticle]);
+
+        $articleForAuth = $this->dataHelper->get(
+            'Article',
+            ['Id' => $survey->IdArticle],
+            'Id, CreatedBy, PublishedBy, IdGroup, OnlyForMembers'
+        );
+
         if ($articleForAuth === false) {
             $this->raiseBadRequest("Article {$survey->IdArticle} doesn't exist", __FILE__, __LINE__);
             return;
         }
-        if ($this->authorizationDataHelper->canPersonReadSurveyResults($articleForAuth, $connectedUser)) {
+
+        /** @var object{
+        * Id: int|string,
+        * CreatedBy: int|string,
+        * PublishedBy?: int|string|null,
+        * IdGroup?: int|string|null,
+        * OnlyForMembers?: bool|int|null
+        * } $articleForAuth */
+        $article = ArticleAuthorizationRow::fromStdClass($articleForAuth);
+
+        if ($this->authorizationDataHelper->canPersonReadSurveyResults($article, $connectedUser)) {
             $replies = $this->surveyDataHelper->getRepliesForActivePersons($survey->Id);
             $participants = [];
             $results = [];
+
             $options = json_decode($survey->Options);
+
             foreach ($options as $option) {
                 $results[$option] = 0;
             }
+
             foreach ($replies as $reply) {
                 $answers = json_decode($reply->Answers);
-                $personData = $this->dataHelper->get('Person', ['Id' => $reply->IdPerson], 'FirstName, LastName');
+
+                $personData = $this->dataHelper->get(
+                    'Person',
+                    ['Id' => $reply->IdPerson],
+                    'FirstName, LastName'
+                );
+
                 /** @var object{FirstName: string, LastName: string}|false $personData */
                 $person = $personData ? PersonNameRow::fromStdClass($personData) : null;
+
                 $participants[] = [
                     'name' => $person === null ? '???' : $person->FirstName . ' ' . $person->LastName,
                     'answers' => $answers
                 ];
+
                 foreach ($answers as $answer) {
                     if (isset($results[$answer])) {
                         $results[$answer]++;
@@ -151,7 +184,7 @@ class SurveyController extends AbstractController
                 'currentVersion' => Application::VERSION,
                 'page' => $connectedUser->getPage(),
                 'btn_HistoryBack' => true,
-                'btn_Parent'      => "/article/{$articleId}",
+                'btn_Parent' => "/article/{$articleId}",
             ]));
         } else {
             $this->raiseForbidden(__FILE__, __LINE__);

@@ -31,7 +31,7 @@ class MembershipController extends AbstractController
         }
 
         $user     = $this->application->getConnectedUser();
-        $personId = (int)$user->person->Id;
+        $personId = (int)($user->person->Id ?? 0);
         $season   = $this->membershipDataHelper->currentSeason();
 
         $current  = $this->membershipDataHelper->getForPersonAndSeason($personId, $season);

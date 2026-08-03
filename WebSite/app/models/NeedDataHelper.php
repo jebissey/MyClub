@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\models;
 
 use PDO;
+use RuntimeException;
 use stdClass;
 use app\helpers\Application;
 
@@ -26,7 +27,13 @@ class NeedDataHelper extends Data
             LEFT JOIN NeedType ON Need.IdNeedType = NeedType.Id
             ORDER BY NeedType.Name, Need.Name
         ";
+
         $stmt = $this->pdo->query($sql);
+
+        if ($stmt === false) {
+            throw new RuntimeException('Unable to execute query.');
+        }
+
         return $stmt->fetchAll(PDO::FETCH_OBJ);
     }
 
@@ -41,8 +48,10 @@ class NeedDataHelper extends Data
             JOIN NeedType ON Need.IdNeedType = NeedType.Id
             WHERE Need.IdNeedType = :needTypeId
         ";
+
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':needTypeId' => $needTypeId]);
+
         return $stmt->fetchAll(PDO::FETCH_OBJ);
     }
 

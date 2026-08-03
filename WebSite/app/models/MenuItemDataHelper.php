@@ -99,6 +99,7 @@ class MenuItemDataHelper extends Data
             if ($parent === false) {
                 throw new InvalidArgumentException("ParentId {$data['parentId']} does not exist.");
             }
+            /** @var object{Position: int} $parent */
         }
         if (!empty($data['idGroup'])) {
             $group = $this->get('Group', ['Id' => $data['idGroup']]);
@@ -134,11 +135,15 @@ class MenuItemDataHelper extends Data
 
             $this->set('MenuItem', $menuItem);
         } else {
+            if (!array_key_exists('position', $data)) {
+                throw new InvalidArgumentException("Position is required when updating a menu item.");
+            }
             if (!empty($menuItem['ParentId'])) {
                 $parent = $this->get('MenuItem', ['Id' => $menuItem['ParentId']], 'Position');
                 if ($parent === false) {
                     throw new InvalidArgumentException("ParentId {$menuItem['ParentId']} does not exist.");
                 }
+                /** @var object{Position: int} $parent */
                 if ($data['position'] <= $parent->Position) {
                     throw new InvalidArgumentException("Child position must be greater than parent position.");
                 }

@@ -64,7 +64,7 @@ class PersonController extends TableController
 
             $this->render('User/views/user_account.latte', $this->getAllParams([
                 'readOnly' => $person->Imported,
-                'email' => $person->Email ?? '',
+                'email' => $person->Email,
                 'firstName' => $person->FirstName ?? '',
                 'lastName' => $person->LastName ?? '',
                 'alert' => $person->Alert ?? '',
@@ -122,7 +122,7 @@ class PersonController extends TableController
                 $existing = Person::fromRow($existingRow);
 
                 $isNewRecord = (
-                    ($person->Email ?? '') === '' &&
+                    ($person->Email) === '' &&
                     ($person->FirstName ?? '') === '' &&
                     ($person->LastName ?? '') === '' &&
                     !$person->Imported

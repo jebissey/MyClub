@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\models;
 
 use PDO;
+use PDOException;
 use stdClass;
 use app\helpers\Application;
 
@@ -25,7 +26,7 @@ class DesignDataHelper extends Data
         $voteValue = $data['vote'] ?? 'voteNeutral';
 
         $existingVote = $this->get('DesignVote', ['IdDesign' => $designId, 'IdPerson' => $userId], 'Id');
-        if ($existingVote !== false) {
+        if ($existingVote instanceof stdClass) {
             $this->set(
                 'DesignVote',
                 ['Vote' => $voteValue],
@@ -69,7 +70,11 @@ class DesignDataHelper extends Data
             LEFT JOIN DesignVote dv ON d.Id = dv.IdDesign
             JOIN Person p ON d.IdPerson = p.Id
             GROUP BY d.Id";
-        $designs = $this->pdo->query($query)->fetchAll(PDO::FETCH_OBJ);
+        $stmt = $this->pdo->query($query);
+        if ($stmt === false) {
+            throw new PDOException('Échec de la requête getUsersVotes');
+        }
+        $designs = $stmt->fetchAll(PDO::FETCH_OBJ);
 
         $userVotes = [];
         $votes = $this->gets('DesignVote', ['IdPerson' => $personId]);
@@ -99,6 +104,10 @@ class DesignDataHelper extends Data
             AND dv.Id IS NULL
         ORDER BY d.LastUpdate";
 
-        return $this->pdo->query($query)->fetchAll(PDO::FETCH_OBJ);
+        $stmt = $this->pdo->query($query);
+        if ($stmt === false) {
+            throw new PDOException('Échec de la requête getPendingDesignResponses');
+        }
+        return $stmt->fetchAll(PDO::FETCH_OBJ);
     }
 }

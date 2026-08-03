@@ -240,6 +240,9 @@ class DbBrowserDataHelper extends Data
         $stmt = $this->pdo->query(
             "PRAGMA table_info(" . $this->quoteName($table) . ")"
         );
+        if ($stmt === false) {
+            throw new RuntimeException('Query failed in file ' . __FILE__ . ' at line ' . __LINE__);
+        }
 
         return array_map(
             fn($col) => ['name' => $col->name, 'label' => $col->name],
@@ -255,6 +258,9 @@ class DbBrowserDataHelper extends Data
         $stmt = $this->pdo->query(
             "PRAGMA table_info(" . $this->quoteName($table) . ")"
         );
+        if ($stmt === false) {
+            throw new RuntimeException('Query failed in file ' . __FILE__ . ' at line ' . __LINE__);
+        }
 
         $schema = [];
         foreach ($stmt->fetchAll(PDO::FETCH_OBJ) as $col) {
@@ -303,7 +309,7 @@ class DbBrowserDataHelper extends Data
             $rawValues  = $match[2];
             preg_match_all("/'([^']+)'|(\d+)/", $rawValues, $valMatches, PREG_SET_ORDER);
             $values = array_map(
-                fn($v) => !empty($v[1]) ? $v[1] : (int) $v[2],
+                fn($v) => isset($v[1]) ? $v[1] : (int) ($v[2] ?? 0),
                 $valMatches
             );
             if (!empty($values)) {

@@ -100,7 +100,7 @@ class WebApp
     public static function computeUserImg(bool $useGravatar, ?string $email, ?string $avatar, GravatarHandler $gravatarHandler): string
     {
         if ($useGravatar) {
-            return $gravatarHandler->getGravatar($email, true);
+            return $gravatarHandler->getGravatar($email ?? '', true);
         }
         return empty($avatar) ? '🤔' : $avatar;
     }
@@ -133,9 +133,9 @@ class WebApp
         $html = strip_tags($html, $allowed_tags);
 
         $html = preg_replace('/<(.*?)[\s|>]on[a-z]+=[\'"].*?[\'"]>(.*?)<\/\\1>/i', '<$1>$2</$1>', $html);
-        $html = preg_replace('/javascript:.*?[\'"]/i', '', $html);
+        $html = preg_replace('/javascript:.*?[\'"]/i', '', $html ?? '');
 
-        return $html;
+        return $html ?? '';
     }
 
     /**
@@ -209,8 +209,8 @@ class WebApp
 
         $result = array_values(array_filter(
             $raw,
-            fn($v) => $rule === FilterInputRule::ArrayInt->value
-                ? preg_match(FilterInputRule::Integer->value, (string)$v)
+            fn($v): bool => $rule === FilterInputRule::ArrayInt->value
+                ? preg_match(FilterInputRule::Integer->value, (string)$v) === 1
                 : (is_string($v) && trim($v) !== '')
         ));
 
@@ -250,8 +250,13 @@ class WebApp
         return match (true) {
             $value === 'on', $value === '1', $value === 'true' => 1,
             $value === 'off', $value === '0', $value === 'false', $value === '' => 0,
-            default => filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE),
+            default => self::boolToIntOrNull(filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE)),
         };
+    }
+
+    private static function boolToIntOrNull(?bool $value): ?int
+    {
+        return $value === null ? null : (int)$value;
     }
 
     private static function filterInt(string $value): ?int

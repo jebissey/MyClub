@@ -158,8 +158,9 @@ abstract class Data
 
     public function getSetting(string $name, string $default): string
     {
+        /** @var object{Value?: string}|false $row */
         $row = $this->get('Settings', ['Name' => $name], 'Value');
-        return $row !== false ? $row->Value : $default;
+        return $row !== false ? ($row->Value ?? $default) : $default;
     }
 
     /**
@@ -224,6 +225,9 @@ abstract class Data
     public function getTables(): array
     {
         $stmt = $this->pdo->query("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' ORDER BY name");
+        if ($stmt === false) {
+            throw new RuntimeException('La requête SQL a échoué.');
+        }
         return $stmt->fetchAll(PDO::FETCH_COLUMN);
     }
 
@@ -397,7 +401,7 @@ abstract class Data
     }
 
     /**
-     * Récupère la première colonne de la première ligne d'un PDOStatement, 
+     * Récupère la première colonne de la première ligne d'un PDOStatement,
      * en levant une exception si la requête a échoué.
      */
     protected function fetchColumnOrFail(PDOStatement|false $stmt, int $column = 0): mixed

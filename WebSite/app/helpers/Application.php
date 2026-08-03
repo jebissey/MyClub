@@ -7,8 +7,10 @@ namespace app\helpers;
 use flight\Engine;
 use Latte\Engine as LatteEngine;
 use Latte\Loaders\FileLoader;
+use BackedEnum;
 use LogicException;
 use PDO;
+use stdClass;
 use Throwable;
 use app\exceptions\DatabaseException;
 use app\models\Database;
@@ -16,6 +18,7 @@ use app\models\DataHelper;
 use app\models\LogDataCompactHelper;
 use app\models\LogDataWriterHelper;
 use app\modules\Common\services\AuthenticationService;
+use app\valueObjects\CompactSettingsRow;
 
 class Application
 {
@@ -73,12 +76,14 @@ class Application
         if (!isset(self::$instance)) {
             self::$instance = new self();
         }
-        $metadata = new DataHelper(
+        $row = new DataHelper(
             self::$instance
         )->get('Metadata', ['Id' => 1], 'Compact_everyXdays, Compact_removeOlderThanXmonths, Compact_compactOlderThanXmonths');
-        if ($metadata === false) {
+        if ($row === false) {
             Application::unreachable("Missing metadata", __FILE__, __LINE__);
         }
+        /** @var stdClass $row */
+        $metadata = CompactSettingsRow::fromStdClass($row);
         new LogDataCompactHelper(
             self::$instance
         )->compactLog($metadata->Compact_removeOlderThanXmonths, $metadata->Compact_compactOlderThanXmonths);
@@ -125,10 +130,10 @@ class Application
      */
     public function enumToValues(string $enumClass): array
     {
-        return array_values(array_map(
-            static fn(\BackedEnum $case): string => (string) $case->value,
+        return array_map(
+            static fn(BackedEnum $case): string => (string) $case->value,
             $enumClass::cases()
-        ));
+        );
     }
 
     /**
@@ -142,7 +147,7 @@ class Application
     {
         $msg = "Unreachable code executed in file {$file} at line {$line}";
         if ($value !== null) {
-            if (is_object($value) && enum_exists($value::class)) {
+            if ($value instanceof \UnitEnum) {
                 $msg .= " (enum " . $value::class . "::" . $value->name . ")";
             } elseif (is_object($value)) {
                 $msg .= " (object of type " . $value::class . ")";

@@ -38,7 +38,7 @@ abstract class TableController extends AbstractController
         $values = [];
 
         foreach ($filters as $key => $value) {
-            if ($value !== null && $value !== '') {
+            if ($value !== '') {
                 $query = $query->where("$key LIKE ?");
                 $values[] = "%$value%";
             }
@@ -73,11 +73,13 @@ abstract class TableController extends AbstractController
     protected function buildPaginationParams(array $filters): array
     {
         $params = [];
+
         foreach ($filters as $key => $value) {
             if ($value !== '') {
                 $params[$key] = urlencode($value);
             }
         }
+
         return $params;
     }
 
@@ -89,6 +91,7 @@ abstract class TableController extends AbstractController
         $countSql = "SELECT COUNT(*) FROM ({$sql}) AS sub";
         $stmt = $pdo->prepare($countSql);
         $stmt->execute($values);
+
         return (int)$stmt->fetchColumn();
     }
 }

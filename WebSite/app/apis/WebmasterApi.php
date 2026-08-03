@@ -72,12 +72,13 @@ class WebmasterApi extends AbstractApi
                     'publicKey' => $subData->P256dh,
                     'authToken' => $subData->Auth,
                 ]);
-                $payload = json_encode([
+                $encoded = json_encode([
                     'title' => $title,
                     'body'  => $body,
                     'url'   => '/user/messages',
                 ]);
-                $report   = $webPush->sendOneNotification($subscription, $payload);
+                $payload = $encoded !== false ? $encoded : null;
+                $report  = $webPush->sendOneNotification($subscription, $payload);
                 $response = $report->getResponse();
                 if ($response && $response->getStatusCode() === ApplicationError::Gone->value) {
                     $this->dataHelper->delete('PushSubscription', ['EndPoint' => $subData->EndPoint]);
@@ -104,7 +105,7 @@ class WebmasterApi extends AbstractApi
         $endpoint = trim($data['endpoint'] ?? '');
         $p256dh   = trim($data['p256dh']   ?? '');
         $auth     = trim($data['auth']     ?? '');
-        $idPerson = $this->connectedUser->person?->Id();
+        $idPerson = $this->connectedUser->person?->Id;
 
         if ($endpoint === '' || $p256dh === '' || $auth === '') {
             $this->renderJsonBadRequest('Requête incomplète.', __FILE__, __LINE__);

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace app\apis;
 
+use JsonException;
 use Throwable;
 use app\enums\ApplicationError;
 use app\exceptions\EmailException;
@@ -117,6 +118,15 @@ class CommunicationApi extends AbstractApi
                 }
 
                 $config = $this->emailService->getSmtpConfig();
+                if ($config === null) {
+                    $this->renderJsonError(
+                        $this->languagesDataHelper->translate('communication.api.smtp_not_configured'),
+                        ApplicationError::Error->value,
+                        __FILE__,
+                        __LINE__
+                    );
+                    return;
+                }
                 $count  = count($bcc);
 
                 if ($config->dailyLimit !== null && ($this->quotaTracker?->getDailySent() ?? 0) + $count > $config->dailyLimit) {
@@ -136,8 +146,8 @@ class CommunicationApi extends AbstractApi
                     return;
                 }
 
-                $from    = $config->getSenderAddress($this->connectedUser->person->Email);
-                $replyTo = $this->resolveReplyTo($replyToMode, $config->from ?? '', $this->connectedUser->person->Email ?? '');
+                $from    = $config->getSenderAddress($this->connectedUser->person->Email ?? '');
+                $replyTo = $this->resolveReplyTo($replyToMode, $config->from, $this->connectedUser->person->Email ?? '');
 
                 $emailMessage = new EmailMessage(
                     from: $from,
@@ -184,7 +194,12 @@ class CommunicationApi extends AbstractApi
     public function updateContactEmail(): void
     {
         if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isCommunicationManager(), __FILE__, __LINE__)) {
-            $body  = json_decode(file_get_contents('php://input'), true);
+            try {
+                $body = $this->getJsonInput();
+            } catch (JsonException $e) {
+                $this->renderJsonBadRequest("Données invalides", __FILE__, __LINE__);
+                return;
+            }
             $value = trim($body['value'] ?? '');
 
             // Validation
@@ -215,13 +230,16 @@ class CommunicationApi extends AbstractApi
         $monthlySent = $this->quotaTracker?->getMonthlySent() ?? 0;
         $config      = $this->emailService->getSmtpConfig();
 
+        $dailyLimit   = $config?->dailyLimit;
+        $monthlyLimit = $config?->monthlyLimit;
+
         return [
             'dailySent'        => $dailySent,
-            'dailyLimit'       => $config->dailyLimit,
-            'dailyRemaining'   => $config->dailyLimit   !== null ? max(0, $config->dailyLimit   - $dailySent)   : null,
+            'dailyLimit'       => $dailyLimit,
+            'dailyRemaining'   => $dailyLimit   !== null ? max(0, $dailyLimit   - $dailySent)   : null,
             'monthlySent'      => $monthlySent,
-            'monthlyLimit'     => $config->monthlyLimit,
-            'monthlyRemaining' => $config->monthlyLimit !== null ? max(0, $config->monthlyLimit - $monthlySent) : null,
+            'monthlyLimit'     => $monthlyLimit,
+            'monthlyRemaining' => $monthlyLimit !== null ? max(0, $monthlyLimit - $monthlySent) : null,
         ];
     }
 

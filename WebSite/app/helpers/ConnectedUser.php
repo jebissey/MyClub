@@ -54,6 +54,7 @@ class ConnectedUser
             );
             return;
         }
+        /** @var PersonRow $personRow */
         $this->person = Person::fromRow($personRow);
         if ($this->person->Alert !== null) {
             Params::setMemberAlert($this->person->Alert);
@@ -96,7 +97,7 @@ class ConnectedUser
             ],
             $this->metadataDataHelper->isTestSite()
                 && !empty($prodSiteUrl = $this->metadataDataHelper->getProdSiteUrl()) ? $prodSiteUrl : null,
-            $personRow->Alert
+            $this->person->Alert
         );
         return;
     }

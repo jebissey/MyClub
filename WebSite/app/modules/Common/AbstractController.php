@@ -8,6 +8,7 @@ use Flight;
 use flight\Engine;
 use Closure;
 use Latte\Engine as LatteEngine;
+use RuntimeException;
 use app\enums\ApplicationError;
 use app\enums\TimeOfDay;
 use app\helpers\Application;
@@ -18,6 +19,7 @@ use app\models\DataHelper;
 use app\models\LanguagesDataHelper;
 use app\models\MenuItemDataHelper;
 use app\models\MetadataDataHelper;
+use app\valueObjects\MenuItemRow;
 use app\valueObjects\Person;
 
 abstract class AbstractController
@@ -93,7 +95,7 @@ abstract class AbstractController
     }
 
     /**
-     * @return list<object>
+     * @return list<MenuItemRow>
      */
     protected function getNavItems(?Person $person, bool $all = false): array
     {
@@ -103,18 +105,21 @@ abstract class AbstractController
         }
         $filter = !$all ? ['What' => 'navbar'] : [];
 
-        $navItems = $this->dataHelper->gets(
-            'MenuItem',
-            $filter,
-            'Id, Label AS Name, Url AS Route, IdGroup, ForMembers, ForContacts, ForAnonymous, What, Type, Label, Icon, Url',
-            'Position'
+        $navItems = array_map(
+            fn(object $row): MenuItemRow => MenuItemRow::fromStdClass($row),
+            $this->dataHelper->gets(
+                'MenuItem',
+                $filter,
+                'Id, Label AS Name, Url AS Route, IdGroup, ForMembers, ForContacts, ForAnonymous, What, Type, Label, Icon, Url',
+                'Position'
+            )
         );
 
         $filteredNavItems = [];
         foreach ($navItems as $navItem) {
             if (
-                ($person === null && $navItem->ForAnonymous == 1) ||
-                ($person !== null && $navItem->ForMembers == 1 &&
+                ($person === null && $navItem->ForAnonymous === 1) ||
+                ($person !== null && $navItem->ForMembers === 1 &&
                     (
                         $navItem->IdGroup === null ||
                         (!empty($userGroups) && in_array($navItem->IdGroup, $userGroups, true))
@@ -129,16 +134,17 @@ abstract class AbstractController
         $groups = $this->dataHelper->gets('Group', ['Inactivated' => 0]);
         $groupsById = [];
         foreach ($groups as $group) {
-            $groupsById[$group->Id] = $group->Name;
+            $groupsById[$group->Id] = (string) $group->Name;
         }
 
-        foreach ($filteredNavItems as $navItem) {
-            $navItem->GroupName = $navItem->IdGroup !== null && isset($groupsById[$navItem->IdGroup])
-                ? $groupsById[$navItem->IdGroup]
-                : null;
-        }
-
-        return $filteredNavItems;
+        return array_map(
+            fn(MenuItemRow $navItem): MenuItemRow => $navItem->withGroupName(
+                $navItem->IdGroup !== null && isset($groupsById[$navItem->IdGroup])
+                    ? $groupsById[$navItem->IdGroup]
+                    : null
+            ),
+            $filteredNavItems
+        );
     }
 
     /**
@@ -268,11 +274,25 @@ abstract class AbstractController
     protected function streamFile(string $filePath, string $filename): void
     {
         $finfo = finfo_open(FILEINFO_MIME_TYPE);
-        $mime  = finfo_file($finfo, $filePath);
+        if ($finfo === false) {
+            throw new RuntimeException('Unable to initialize fileinfo.');
+        }
+
+        $mime = finfo_file($finfo, $filePath);
+
+        if ($mime === false) {
+            throw new RuntimeException("Unable to determine MIME type for {$filePath}.");
+        }
+
+        $size = filesize($filePath);
+        if ($size === false) {
+            throw new RuntimeException("Unable to determine file size for {$filePath}.");
+        }
 
         header('Content-Type: ' . $mime);
-        header('Content-Length: ' . filesize($filePath));
+        header('Content-Length: ' . $size);
         header('Content-Disposition: inline; filename="' . $filename . '"');
+
         readfile($filePath);
     }
 
@@ -299,7 +319,7 @@ abstract class AbstractController
         if ($connectedUser->person === null) {
             $result = $this->application->getAuthenticationService()->handleRememberMeLogin();
             if ($result && $result->isSuccess()) {
-                $this->redirect($_SERVER['REQUEST_URI'], ApplicationError::Ok, "Auto sign in succeeded for {$result->getUser()->Email}");
+                $this->redirect($_SERVER['REQUEST_URI'], ApplicationError::Ok, "Auto sign in succeeded for {$result->getUser()?->Email}");
                 return true;
             }
         }

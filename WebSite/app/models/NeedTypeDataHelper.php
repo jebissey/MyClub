@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace app\models;
 
+use RuntimeException;
 use app\helpers\Application;
 
 class NeedTypeDataHelper extends Data
@@ -16,10 +17,28 @@ class NeedTypeDataHelper extends Data
     public function insertOrUpdate(?int $id, string $name): int
     {
         if ($id === null) {
-            $this->set('NeedType', ['Name' => $name], ['Id' => $id]);
-        } else {
-            $id = $this->set('NeedType', ['Name' => $name]);
+            $result = $this->set(
+                'NeedType',
+                ['Name' => $name]
+            );
+
+            if (!is_int($result)) {
+                throw new RuntimeException('Impossible de récupérer l\'ID du NeedType créé.');
+            }
+
+            return $result;
         }
-        return  $id;
+
+        $result = $this->set(
+            'NeedType',
+            ['Name' => $name],
+            ['Id' => $id]
+        );
+
+        if (!is_int($result)) {
+            throw new RuntimeException('Impossible de mettre à jour le NeedType.');
+        }
+
+        return $result;
     }
 }

@@ -35,10 +35,10 @@ class MediaApi extends AbstractApi
                 $this->renderJsonOk(['message' => $result->message]);
             } else {
                 $this->renderJsonError(
-                    $result->message,
+                    $result->message ?? '',
                     ApplicationError::Error->value,
-                    $result->file,
-                    $result->line
+                    $result->file ?? '',
+                    $result->line ?? 0
                 );
             }
         }
@@ -99,8 +99,8 @@ class MediaApi extends AbstractApi
             $h = imagesy($img);
             if ($w > $maxSize || $h > $maxSize) {
                 $ratio  = min($maxSize / $w, $maxSize / $h);
-                $newW   = (int)round($w * $ratio);
-                $newH   = (int)round($h * $ratio);
+                $newW   = max(1, (int)round($w * $ratio));
+                $newH   = max(1, (int)round($h * $ratio));
                 $resized = imagecreatetruecolor($newW, $newH);
                 imagecopyresampled($resized, $img, 0, 0, 0, 0, $newW, $newH, $w, $h);
                 unset($img);

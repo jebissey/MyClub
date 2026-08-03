@@ -44,6 +44,9 @@ class ImportApi extends AbstractApi
         }
         $headers = [];
         $file = fopen($_FILES['csvFile']['tmp_name'], 'r');
+        if ($file === false) {
+            return ['error' => 'Impossible d\'ouvrir le fichier'];
+        }
         $currentRow = 0;
         while (($data = fgetcsv($file, 0, ",", "\"", "\\")) !== false && $currentRow <= $headerRow) {
             $currentRow++;

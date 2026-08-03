@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace app\apis;
 
+use JsonException;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
 use app\models\DataHelper;
@@ -40,7 +41,7 @@ class HelloAssoApi extends AbstractApi
         $season = $this->membershipDataHelper->currentSeason();
 
         // Guard: already paid this season
-        $existing = $this->membershipDataHelper->getForPersonAndSeason((int)$person->Id, $season);
+        $existing = $this->membershipDataHelper->getForPersonAndSeason((int)$person?->Id, $season);
         if ($existing && $existing->Status === 'paid') {
             $this->renderJsonBadRequest('Membership already paid for this season.', __FILE__, __LINE__);
             return;
@@ -53,7 +54,7 @@ class HelloAssoApi extends AbstractApi
 
         $amountCents  = $this->membershipDataHelper->getAmountCents();
         $membershipId = $this->membershipDataHelper->createPending(
-            (int)$person->Id,
+            (int)$person?->Id,
             $season,
             $amountCents
         );
@@ -104,8 +105,12 @@ class HelloAssoApi extends AbstractApi
             return;
         }
 
-        $raw  = file_get_contents('php://input');
-        $data = json_decode($raw, true);
+        try {
+            $data = $this->getJsonInput();
+        } catch (JsonException $e) {
+            $this->renderJsonBadRequest("Données invalides", __FILE__, __LINE__);
+            return;
+        }
 
         $eventType = $data['eventType'] ?? '';
         $orderId   = (string)($data['data']['order']['id'] ?? '');

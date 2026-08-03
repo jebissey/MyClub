@@ -24,7 +24,7 @@ class KanbanController extends AbstractController
             $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
-        $personId = $this->application->getConnectedUser()->person->Id;
+        $personId = $this->application->getConnectedUser()->person->Id ?? 0;
         $selectedProjectId = $this->flight->request()->query->getData()["p"] ?? null;
         $isOwner = null;
         if ($selectedProjectId !== null) {

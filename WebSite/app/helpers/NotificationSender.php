@@ -61,7 +61,7 @@ class NotificationSender
                             'p256dh' => $sub->P256dh ?? '',
                         ],
                     ]);
-                    $webPush->queueNotification($subscription, json_encode($notificationData));
+                    $webPush->queueNotification($subscription, json_encode($notificationData) ?: '');
                 }
             } catch (Throwable $e) {
                 error_log("Error creating subscription: " . $e->getMessage());

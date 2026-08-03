@@ -24,7 +24,14 @@ class SharedFileDataHelper extends Data
             return [];
         }
 
-        $stmt = $this->pdo->query("SELECT Item FROM SharedFile WHERE Token IS NOT NULL");
+        $stmt = $this->pdo->query(
+            'SELECT Item FROM SharedFile WHERE Token IS NOT NULL'
+        );
+
+        if ($stmt === false) {
+            throw new \RuntimeException('Unable to query shared files.');
+        }
+
         /** @var array<int, string> $items */
         $items = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
@@ -37,10 +44,11 @@ class SharedFileDataHelper extends Data
                 }
             }
         }
+
         return $used;
     }
 
-    public function getSharedFile(string $path): object | false
+    public function getSharedFile(string $path): object|false
     {
         $sql = "SELECT 
                     IdGroup AS idGroup,
@@ -61,6 +69,7 @@ class SharedFileDataHelper extends Data
         $sql = "UPDATE SharedFile 
                 SET Token = null
                 WHERE Item = :path";
+
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':path' => $path]);
     }

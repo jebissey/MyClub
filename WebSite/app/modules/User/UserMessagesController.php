@@ -29,7 +29,7 @@ class UserMessagesController extends AbstractShowController
 
         $this->render('User/views/messages.latte', $this->baseParams($connectedUser, '/user', $searchMode, $searchFrom) + [
             'messages' => $this->messageDataHelper->getGroupedMessages(
-                $connectedUser->person->Id,
+                $connectedUser->person->Id ?? 0,
                 $searchFrom,
                 new GravatarHandler()
             ),

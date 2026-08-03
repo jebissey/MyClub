@@ -93,7 +93,7 @@ class KanbanApi extends AbstractApi
             return;
         }
         try {
-            $success = $this->kanbanDataHelper->deleteKanbanCard($id, $this->connectedUser->person->Id);
+            $success = $this->kanbanDataHelper->deleteKanbanCard($id, $this->connectedUser->person->Id ?? 0);
             if ($success) {
                 $this->renderJsonOk([], 'Card deleted successfully');
             } else {
@@ -192,7 +192,7 @@ class KanbanApi extends AbstractApi
         }
 
         try {
-            $success = $this->kanbanDataHelper->updateKanbanCard($id, $this->connectedUser->person->Id, $title, $detail);
+            $success = $this->kanbanDataHelper->updateKanbanCard($id, $this->connectedUser->person->Id ?? 0, $title, $detail);
 
             if ($success) {
                 $this->renderJsonOk([], 'Card updated successfully');
@@ -234,7 +234,7 @@ class KanbanApi extends AbstractApi
         }
 
         try {
-            $success = $this->kanbanDataHelper->updateKanbanCardStatus($id, $this->connectedUser->person->Id, $remark);
+            $success = $this->kanbanDataHelper->updateKanbanCardStatus($id, $this->connectedUser->person->Id ?? 0, $remark);
 
             if ($success) {
                 $this->renderJsonOk([], 'Card status updated successfully');
@@ -278,7 +278,7 @@ class KanbanApi extends AbstractApi
         }
 
         try {
-            $kanbanProjectId = $this->kanbanDataHelper->createKanbanProject($this->connectedUser->person->Id, $title, $detail);
+            $kanbanProjectId = $this->kanbanDataHelper->createKanbanProject($this->connectedUser->person->Id ?? 0, $title, $detail);
 
             $this->renderJsonOk([
                 'id' => $kanbanProjectId,
@@ -316,7 +316,7 @@ class KanbanApi extends AbstractApi
             return;
         }
         try {
-            $success = $this->kanbanDataHelper->deleteKanbanProject((int)$id, $this->connectedUser->person->Id);
+            $success = $this->kanbanDataHelper->deleteKanbanProject((int)$id, $this->connectedUser->person->Id ?? 0);
             if ($success) {
                 $this->renderJsonOk();
             } else {
@@ -388,7 +388,7 @@ class KanbanApi extends AbstractApi
             return;
         }
         try {
-            $success = $this->kanbanDataHelper->updateKanbanProject($id, $title, $detail, $this->connectedUser->person->Id);
+            $success = $this->kanbanDataHelper->updateKanbanProject($id, $title, $detail, $this->connectedUser->person->Id ?? 0);
             if ($success) {
                 $this->renderJsonOk([], 'Project updated successfully');
             } else {

@@ -12,6 +12,7 @@ use app\helpers\Application;
 use app\helpers\WebApp;
 use app\models\OrderDataHelper;
 use app\modules\Common\AbstractController;
+use app\valueObjects\ArticleAuthorizationRow;
 use app\valueObjects\ArticleTitleRow;
 use app\valueObjects\IdRow;
 use app\valueObjects\OrderReplyRow;
@@ -34,17 +35,24 @@ class OrderController extends AbstractController
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
+
         $articleData = $this->dataHelper->get('Article', ['Id' => $articleId], 'Title, Id');
         if (!$articleData) {
             $this->redirect('/articles');
             return;
         }
+
         /** @var object{Id: int|string, Title: string} $articleData */
         $article = ArticleTitleRow::fromStdClass($articleData);
+
         $this->render('Article/views/order_add.latte', $this->getAllParams([
-            'article'  => $article,
-            'order'    => $this->dataHelper->get('Order', ['IdArticle' => $article->Id], 'Question, Options, ClosingDate, Visibility'),
-            'page'     => $this->application->getConnectedUser()->getPage(),
+            'article' => $article,
+            'order'   => $this->dataHelper->get(
+                'Order',
+                ['IdArticle' => $article->Id],
+                'Question, Options, ClosingDate, Visibility'
+            ),
+            'page' => $this->application->getConnectedUser()->getPage(),
         ]));
     }
 
@@ -105,10 +113,12 @@ class OrderController extends AbstractController
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
+
         if ($this->dataHelper->get('Article', ['Id' => $articleId], 'Id') === false) {
             $this->raiseBadRequest("Article {$articleId} doesn't exist", __FILE__, __LINE__);
             return;
         }
+
         $connectedUser = $this->application->getConnectedUser();
         if ($connectedUser->person === null) {
             $this->raiseForbidden(__FILE__, __LINE__);
@@ -122,33 +132,71 @@ class OrderController extends AbstractController
             return;
         }
 
-        $articleForAuth = $this->dataHelper->get('Article', ['Id' => $order->IdArticle]);
+        $articleForAuth = $this->dataHelper->get(
+            'Article',
+            ['Id' => $order->IdArticle],
+            'Id, CreatedBy, PublishedBy, IdGroup, OnlyForMembers'
+        );
+
         if ($articleForAuth === false) {
             $this->raiseBadRequest("Article {$order->IdArticle} doesn't exist", __FILE__, __LINE__);
             return;
         }
 
-        if ($this->authorizationDataHelper->canPersonReadOrderResults($articleForAuth, $connectedUser)) {
+        /** @var object{
+         *     Id: int|string,
+         *     CreatedBy: int|string,
+         *     PublishedBy?: int|string|null,
+         *     IdGroup?: int|string|null,
+         *     OnlyForMembers?: bool|int|null
+         * } $articleForAuth
+         */
+        $articleAuthorization = ArticleAuthorizationRow::fromStdClass($articleForAuth);
+
+        if (
+            $this->authorizationDataHelper->canPersonReadOrderResults(
+                $articleAuthorization,
+                $connectedUser
+            )
+        ) {
             $repliesData = $this->dataHelper->gets('OrderReply', ['IdOrder' => $order->Id]);
+
             $replies = array_map(function ($row) {
-                /** @var object{Id: int|string, IdPerson: int|string, IdOrder: int|string, Answers: string, LastUpdate: string} $row */
+                /** @var object{
+                 *     Id: int|string,
+                 *     IdPerson: int|string,
+                 *     IdOrder: int|string,
+                 *     Answers: string,
+                 *     LastUpdate: string
+                 * } $row
+                 */
                 return OrderReplyRow::fromStdClass($row);
             }, $repliesData);
 
             $participants = [];
-            $results      = [];
-            $options      = json_decode($order->Options);
+            $results = [];
+
+            $options = json_decode($order->Options);
             foreach ($options as $option) {
                 $results[$option] = 0;
             }
+
             foreach ($replies as $reply) {
                 $answers = json_decode($reply->Answers);
-                $personData = $this->dataHelper->get('Person', ['Id' => $reply->IdPerson], 'FirstName, LastName');
+
+                $personData = $this->dataHelper->get(
+                    'Person',
+                    ['Id' => $reply->IdPerson],
+                    'FirstName, LastName'
+                );
+
                 /** @var object{FirstName: string, LastName: string}|false $personData */
                 $person = $personData ? PersonNameRow::fromStdClass($personData) : null;
 
                 $participants[] = [
-                    'name'    => $person === null ? '???' : $person->FirstName . ' ' . $person->LastName,
+                    'name' => $person === null
+                        ? '???'
+                        : $person->FirstName . ' ' . $person->LastName,
                     'answers' => $answers,
                 ];
 

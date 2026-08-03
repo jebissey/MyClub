@@ -154,8 +154,8 @@ class KaraokeApi extends AbstractApi
 
         $this->renderJsonOk([
             'serverTime' => time(),
-            'countdownStart' => $updatedSession->CountdownStart,
-            'playStartTime' => $updatedSession->PlayStartTime
+            'countdownStart' => $updatedSession?->CountdownStart,
+            'playStartTime' => $updatedSession?->PlayStartTime
         ]);
     }
 

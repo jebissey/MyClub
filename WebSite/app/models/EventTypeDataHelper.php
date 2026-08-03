@@ -37,10 +37,10 @@ class EventTypeDataHelper extends Data
         ");
         $query->execute([$personId]);
 
-        return array_map(
+        return array_values(array_map(
             EventType::fromStdClass(...),
             $query->fetchAll(PDO::FETCH_OBJ)
-        );
+        ));
     }
 
     /**

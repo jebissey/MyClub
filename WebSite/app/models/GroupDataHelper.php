@@ -158,7 +158,7 @@ class GroupDataHelper extends Data
     public function getGroupCount(): array
     {
         $groupCounts = [];
-        $groupCountResult = $this->pdo->query("
+        $statement = $this->pdo->query("
             SELECT 
                 g.Id, 
                 g.Name,
@@ -169,7 +169,11 @@ class GroupDataHelper extends Data
             JOIN Person p ON pg.IdPerson = p.Id
             WHERE p.Inactivated = 0
             GROUP BY g.Id, g.Name
-        ")->fetchAll(PDO::FETCH_OBJ);
+        ");
+        if ($statement === false) {
+            throw new QueryException('getGroupCount query failed', ApplicationError::Error->value);
+        }
+        $groupCountResult = $statement->fetchAll(PDO::FETCH_OBJ);
 
         foreach ($groupCountResult as $row) {
             $groupCounts[$row->Id] = [

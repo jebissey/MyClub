@@ -16,6 +16,7 @@ use app\helpers\MyClubDateTime;
 use app\helpers\TranslationManager;
 use app\helpers\WebApp;
 use app\interfaces\NewsProviderInterface;
+use app\valueObjects\EventParticipant;
 
 class MessageDataHelper extends Data implements NewsProviderInterface
 {
@@ -59,7 +60,7 @@ class MessageDataHelper extends Data implements NewsProviderInterface
     }
 
     /**
-     * @param array<int, object{PersonId: int, Email: string}> $participants
+     * @param list<EventParticipant> $participants
      * @return array<int, string>
      */
     public function addWebAppMessages(int $eventId, array $participants, string $text): array
@@ -363,6 +364,7 @@ class MessageDataHelper extends Data implements NewsProviderInterface
 
     public function updateMessage(int $messageId, int $personId, string $text): true
     {
+        /** @var object{PersonId: int}|false $message */
         $message = $this->get('Message', ['Id' => $messageId], 'PersonId');
         if (!$message || $message->PersonId != $personId) {
             throw new UnauthorizedAccessException("Vous n'êtes pas autorisé à modifier ce message");

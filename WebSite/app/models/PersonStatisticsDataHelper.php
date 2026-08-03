@@ -387,38 +387,43 @@ class PersonStatisticsDataHelper extends Data
     {
         $stats = [];
 
-        $stmt = $this->pdo->query('SELECT * FROM EventType');
-        $eventTypes = $stmt->fetchAll(PDO::FETCH_OBJ);
+        $stmt = $this->pdo->query(
+            'SELECT Id, Name FROM EventType'
+        );
+        $eventTypes = $this->fetchAllOrFail($stmt);
 
         $sql = "SELECT 
-                e.IdEventType,
-                et.Name as typeName,
-                COUNT(CASE WHEN p.IdPerson = ? THEN 1 END) as user_count,
-                COUNT(*) as total_users_count,
-                COUNT(DISTINCT e.Id) as event_count
-            FROM Participant p
-            INNER JOIN Event e ON p.IdEvent = e.Id
-            INNER JOIN EventType et ON e.IdEventType = et.Id
-            WHERE datetime(e.StartTime) BETWEEN datetime(?) AND datetime(?)
-            GROUP BY e.IdEventType, et.Name";
+            e.IdEventType,
+            et.Name AS typeName,
+            COUNT(CASE WHEN p.IdPerson = ? THEN 1 END) AS user_count,
+            COUNT(*) AS total_users_count,
+            COUNT(DISTINCT e.Id) AS event_count
+        FROM Participant p
+        INNER JOIN Event e ON p.IdEvent = e.Id
+        INNER JOIN EventType et ON e.IdEventType = et.Id
+        WHERE datetime(e.StartTime) BETWEEN datetime(?) AND datetime(?)
+        GROUP BY e.IdEventType, et.Name";
+
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([$personId, $seasonStart, $seasonEnd]);
         $results = $stmt->fetchAll(PDO::FETCH_OBJ);
+
         foreach ($results as $result) {
             $stats[$result->IdEventType] = [
                 'typeName'   => $result->typeName,
-                'events'     => (int)$result->event_count,
-                'user'       => (int)$result->user_count,
-                'total'      => (int)$result->total_users_count,
+                'events'     => (int) $result->event_count,
+                'user'       => (int) $result->user_count,
+                'total'      => (int) $result->total_users_count,
                 'percentage' => $result->total_users_count > 0
                     ? round(($result->user_count / $result->total_users_count) * 100, 2)
                     : 0
             ];
         }
+
         foreach ($eventTypes as $eventType) {
-            if (!isset($stats[$eventType->Id])) {
-                $stats[$eventType->Id] = [
-                    'typeName'   => $eventType->Name,
+            if (!isset($stats[$eventType['Id']])) {
+                $stats[$eventType['Id']] = [
+                    'typeName'   => $eventType['Name'],
                     'events'     => 0,
                     'user'       => 0,
                     'total'      => 0,
@@ -426,9 +431,11 @@ class PersonStatisticsDataHelper extends Data
                 ];
             }
         }
+
         $totalEvents = array_sum(array_column($stats, 'events'));
         $totalUser = array_sum(array_column($stats, 'user'));
         $totalParticipation = array_sum(array_column($stats, 'total'));
+
         $stats['total'] = [
             'typeName'   => 'Total',
             'events'     => $totalEvents,
@@ -441,6 +448,7 @@ class PersonStatisticsDataHelper extends Data
 
         return $stats;
     }
+
 
     private function getParticipantSupplyCount(?int $personId, string $seasonStart, string $seasonEnd): int
     {

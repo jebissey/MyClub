@@ -31,8 +31,8 @@ class UserAccountController extends AbstractController
         $this->render('User/views/user_account.latte', $this->getAllParams([
             'readOnly' => $person->Imported == 1 ? true : false,
             'email' => filter_var($person->Email, FILTER_VALIDATE_EMAIL) ?: '',
-            'firstName' => WebApp::sanitizeInput($person->FirstName),
-            'lastName' => WebApp::sanitizeInput($person->LastName),
+            'firstName' => WebApp::sanitizeInput($person->FirstName ?? ''),
+            'lastName' => WebApp::sanitizeInput($person->LastName ?? ''),
             'nickName' => WebApp::sanitizeInput($person->NickName ?? ''),
             'avatar' => WebApp::sanitizeInput($person->Avatar ?? ''),
             'useGravatar' => WebApp::sanitizeInput($person->UseGravatar ? YesNo::Yes->value : YesNo::No->value, $this->application->enumToValues(YesNo::class), YesNo::No->value),

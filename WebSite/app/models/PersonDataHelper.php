@@ -87,7 +87,9 @@ class PersonDataHelper extends Data implements NewsProviderInterface
         $persons = $this->getInterestedPeople($idGroup, $idEventType, $dayOfWeek, $timeOfDay);
         $filteredEmails = [];
         foreach ($persons as $person) {
-            $filteredEmails[] = $person->Email;
+            if ($person->Email !== null) {
+                $filteredEmails[] = $person->Email;
+            }
         }
         return $filteredEmails;
     }
@@ -100,6 +102,23 @@ class PersonDataHelper extends Data implements NewsProviderInterface
         $persons = $this->getPersonsInGroup($idGroup);
         $filteredPeople = [];
         foreach ($persons as $person) {
+            if ($person->Email === null) {
+                continue;
+            }
+            /**
+             * @var object{
+             *     PersonId: int,
+             *     Id: int,
+             *     FirstName: string|null,
+             *     LastName: string|null,
+             *     Email: string,
+             *     Preferences: string|null,
+             *     Availabilities: string|null,
+             *     InPresentationDirectory: int,
+             *     ShowPhoneInPresentationDirectory: int|string,
+             *     ShowEmailInPresentationDirectory: int|string
+             * } $person
+             */
             if ($this->personPreferences->isPersonInterested(Person::fromRow($person), $idEventType, $dayOfWeek, $timeOfDay)) {
                 $filteredPeople[] = $person;
             }
@@ -248,22 +267,38 @@ class PersonDataHelper extends Data implements NewsProviderInterface
     public function getPersonsInGroup(?int $idGroup): array
     {
         $innerJoin = $and = '';
+
         if ($idGroup !== null) {
-            $innerJoin = 'INNER JOIN PersonGroup on PersonGroup.IdPerson = Person.Id';
+            $innerJoin = 'INNER JOIN PersonGroup ON PersonGroup.IdPerson = Person.Id';
             $and = 'AND PersonGroup.IdGroup = ' . $idGroup;
         }
+
         $query = $this->pdo->query("
-            SELECT Person.Id AS PersonId, Person.Id AS Id, FirstName, LastName, Email, Preferences, Availabilities,
-                   InPresentationDirectory, ShowPhoneInPresentationDirectory, ShowEmailInPresentationDirectory
+            SELECT
+                Person.Id AS PersonId,
+                Person.Id AS Id,
+                FirstName,
+                LastName,
+                Email,
+                Preferences,
+                Availabilities,
+                InPresentationDirectory,
+                ShowPhoneInPresentationDirectory,
+                ShowEmailInPresentationDirectory
             FROM Person
             $innerJoin
             WHERE Person.Inactivated = 0 $and
             ORDER BY FirstName, LastName
         ");
+
         if ($query === false) {
             Application::unreachable("Query failed", __FILE__, __LINE__);
         }
-        return $query->fetchAll(PDO::FETCH_OBJ);
+
+        /** @var list<PersonGroupRow> $persons */
+        $persons = $query->fetchAll(PDO::FETCH_OBJ);
+
+        return $persons;
     }
 
     /**
@@ -337,7 +372,7 @@ class PersonDataHelper extends Data implements NewsProviderInterface
                 $include = true;
             }
 
-            if ($include) {
+            if ($include && $person->Email !== null) {
                 $filteredEmails[] = $person->Email;
                 $this->set('Message', [
                     'EventId'  => null,
@@ -475,11 +510,12 @@ class PersonDataHelper extends Data implements NewsProviderInterface
                     $results['messages'][] = "Ligne $currentRow : adresse email invalide {$data[$mapping['email']]}.";
                     continue;
                 }
+                $phone = preg_replace('/[^\d\s+\-()\.]/', '', $data[$mapping['phone']] ?? '');
                 $personData = [
                     'email'     => $email,
                     'firstName' => mb_substr(trim($data[$mapping['firstName']] ?? ''), 0, 100),
                     'lastName'  => mb_substr(trim($data[$mapping['lastName']] ?? ''), 0, 100),
-                    'phone'     => mb_substr(preg_replace('/[^\d\s+\-()\.]/', '', $data[$mapping['phone']] ?? ''), 0, 20),
+                    'phone'     => mb_substr(is_string($phone) ? $phone : '', 0, 20),
                 ];
 
                 $emailKey   = strtolower($personData['email']);

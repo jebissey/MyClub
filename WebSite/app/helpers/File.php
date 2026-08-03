@@ -11,7 +11,7 @@ class File
     public static function sanitizeFilename(string $filename): string
     {
         $filename = preg_replace('/[^\w\-\.]/', '_', $filename);
-        return $filename;
+        return $filename ?? '';
     }
 
     public static function copy(string $sourceFile, string $destinationDir): bool

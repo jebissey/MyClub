@@ -22,7 +22,9 @@ use app\valueObjects\Person;
  */
 class AuthenticationService
 {
-    public function __construct(private DataHelper $dataHelper, private EmailService $emailService) {}
+    public function __construct(private DataHelper $dataHelper, private EmailService $emailService)
+    {
+    }
 
     public function handleForgotPassword(string $email): bool
     {

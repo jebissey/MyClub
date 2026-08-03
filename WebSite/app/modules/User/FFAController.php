@@ -35,7 +35,7 @@ class FFAController extends AbstractController
             'question' => FilterInputRule::HtmlSafeName->value,
             'year' => FilterInputRule::Int->value,
             'club' => FilterInputRule::HtmlSafeName->value,
-            'page' => $this->application->getConnectedUser()->getPage(),
+            'page' => $this->application->getConnectedUser()->getPage() ?? '',
         ];
         $input = WebApp::filterInput($schema, $this->flight->request()->query->getData());
         $firstName = $input['firstName'] ?? $person->FirstName ?? '???';

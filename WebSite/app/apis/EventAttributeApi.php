@@ -106,7 +106,16 @@ class EventAttributeApi extends AbstractApi
             return;
         }
         try {
-            $data = $this->getJsonInput();
+            $raw = $this->getJsonInput();
+
+            /** @var array{id: int, name: string, detail: string, color: string} $data */
+            $data = [
+                'id' => (int) ($raw['id'] ?? 0),
+                'name' => (string) ($raw['name'] ?? ''),
+                'detail' => (string) ($raw['detail'] ?? ''),
+                'color' => (string) ($raw['color'] ?? ''),
+            ];
+
             $this->attributeDataHelper->update($data);
             $this->renderJsonOk();
         } catch (Throwable $e) {

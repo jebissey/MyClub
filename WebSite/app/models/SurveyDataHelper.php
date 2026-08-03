@@ -15,7 +15,7 @@ use app\valueObjects\SurveyWithCreatorRow;
 
 class SurveyDataHelper extends Data implements NewsProviderInterface
 {
-    public function __construct(Application $application, private ArticleDataHelper $articleDataHelper)
+    public function __construct(Application $application)
     {
         parent::__construct($application);
     }
@@ -81,30 +81,35 @@ class SurveyDataHelper extends Data implements NewsProviderInterface
     public function getPendingSurveyResponses(): array
     {
         $query = "
-        SELECT 
-            p.Id AS PersonId, 
-            p.Email, 
-            a.Id AS ArticleId, 
-            a.Title AS ArticleTitle, 
-            s.Id AS SurveyId, 
-            s.Question AS SurveyQuestion, 
-            s.ClosingDate
-        FROM Person p
-        CROSS JOIN Survey s
-        JOIN Article a ON s.IdArticle = a.Id
-        LEFT JOIN Reply r ON r.IdSurvey = s.Id AND r.IdPerson = p.Id
-        LEFT JOIN PersonGroup pg ON pg.IdPerson = p.Id AND pg.IdGroup = a.IdGroup
-        WHERE 
-            a.PublishedBy IS NOT NULL
-            AND p.Inactivated = 0
-            AND s.ClosingDate > date('now')
-            AND (
-                a.IdGroup IS NULL
-                OR pg.IdGroup IS NOT NULL 
-            )
-            AND r.Id IS NULL
-        ORDER BY s.ClosingDate, p.LastName, p.FirstName";
-        return $this->pdo->query($query)->fetchAll(PDO::FETCH_OBJ);
+            SELECT 
+                p.Id AS PersonId, 
+                p.Email, 
+                a.Id AS ArticleId, 
+                a.Title AS ArticleTitle, 
+                s.Id AS SurveyId, 
+                s.Question AS SurveyQuestion, 
+                s.ClosingDate
+            FROM Person p
+            CROSS JOIN Survey s
+            JOIN Article a ON s.IdArticle = a.Id
+            LEFT JOIN Reply r ON r.IdSurvey = s.Id AND r.IdPerson = p.Id
+            LEFT JOIN PersonGroup pg ON pg.IdPerson = p.Id AND pg.IdGroup = a.IdGroup
+            WHERE 
+                a.PublishedBy IS NOT NULL
+                AND p.Inactivated = 0
+                AND s.ClosingDate > date('now')
+                AND (
+                    a.IdGroup IS NULL
+                    OR pg.IdGroup IS NOT NULL 
+                )
+                AND r.Id IS NULL
+            ORDER BY s.ClosingDate, p.LastName, p.FirstName";
+
+        $stmt = $this->pdo->query($query);
+        if ($stmt === false) {
+            throw new QueryException('getPendingSurveyResponses query failed');
+        }
+        return $stmt->fetchAll(PDO::FETCH_OBJ);
     }
 
     /**
@@ -153,12 +158,10 @@ class SurveyDataHelper extends Data implements NewsProviderInterface
         $news = [];
         $authorizationDataHelper = new AuthorizationDataHelper($this->application);
         foreach ($surveys as $survey) {
+            $article = $authorizationDataHelper->getArticle($survey->IdArticle, $connectedUser);
             if (
-                $authorizationDataHelper->getArticle($survey->IdArticle, $connectedUser)
-                && $authorizationDataHelper->canPersonReadSurveyResults(
-                    $this->articleDataHelper->getWithAuthor($survey->IdArticle),
-                    $connectedUser
-                )
+                $article !== false
+                && $authorizationDataHelper->canPersonReadSurveyResults($article, $connectedUser)
             ) {
                 $news[] = [
                     'type'   => 'survey',

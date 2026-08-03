@@ -171,7 +171,7 @@ class Routes
         $participantDataHelper = new ParticipantDataHelper($application);
         $personPreferences = new PersonPreferences();
         $personDataHelper = new PersonDataHelper($application, $personPreferences, $emailService);
-        $surveyDataHelper = new SurveyDataHelper($application, $articleDataHelper);
+        $surveyDataHelper = new SurveyDataHelper($application);
         $newsProviders = [
             $articleDataHelper,
             $eventDataHelper,
@@ -447,7 +447,7 @@ class Routes
                     array_map(fn($f) => [
                         'dir'  => 'static_image',
                         'file' => basename($f),
-                        'type' => mime_content_type($f),
+                        'type' => mime_content_type($f) ?: 'application/octet-stream',
                     ], $imageFiles)
                 ) : [];
             })(),
@@ -540,7 +540,11 @@ class Routes
         $response = Flight::response();
         $response->header('Content-Type', $config['type']);
         $response->header('Content-Length', (string)filesize($filePath));
-        $response->header('Last-Modified', gmdate('D, d M Y H:i:s', filemtime($filePath)) . ' GMT');
+
+        $mtime = filemtime($filePath);
+        $mtime = $mtime !== false ? $mtime : time();
+        $response->header('Last-Modified', gmdate('D, d M Y H:i:s', $mtime) . ' GMT');
+
         $response->header('Cache-Control', "public, max-age=$cacheMaxAge, immutable");
         $response->header('Expires', gmdate('D, d M Y H:i:s', time() + $cacheMaxAge) . ' GMT');
         if (!empty($config['serviceWorker'])) {
