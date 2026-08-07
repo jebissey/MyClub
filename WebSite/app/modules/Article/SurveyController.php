@@ -13,6 +13,7 @@ use app\helpers\WebApp;
 use app\models\SurveyDataHelper;
 use app\modules\Common\AbstractController;
 use app\valueObjects\ArticleAuthorizationRow;
+use app\valueObjects\ArticleRow;
 use app\valueObjects\ArticleTitleRow;
 use app\valueObjects\IdRow;
 use app\valueObjects\PersonNameRow;
@@ -66,12 +67,15 @@ class SurveyController extends AbstractController
             'options' => FilterInputRule::ArrayString->value,
         ];
         $input = WebApp::filterInput($schema, $this->flight->request()->data->getData());
+        /** @var int $articleId */
         $articleId = $input['article_id'] ?? throw new IntegrityException('Fatal error in file ' . __FILE__ . ' at line ' . __LINE__);
         $question = $input['question'] ?? '???';
         $closingDate = $input['closingDate'] ?? new DateTime('+7 days');
         $visibility = $input['visibility'] ?? SurveyVisibility::Redactor->value;
+        /** @var array<string> $rawOptions */
+        $rawOptions = $input['options'] ?? [];
         $options = [];
-        foreach ($input['options'] ?? [] as $option) {
+        foreach ($rawOptions as $option) {
             $options[] = str_replace('"', "''", $option);
         }
         $optionsJson = json_encode($options);
@@ -123,7 +127,7 @@ class SurveyController extends AbstractController
         $articleForAuth = $this->dataHelper->get(
             'Article',
             ['Id' => $survey->IdArticle],
-            'Id, CreatedBy, PublishedBy, IdGroup, OnlyForMembers'
+            'Id, Title, Content, CreatedBy, PublishedBy, IdGroup, OnlyForMembers, LastUpdate'
         );
 
         if ($articleForAuth === false) {
@@ -133,26 +137,32 @@ class SurveyController extends AbstractController
 
         /** @var object{
         * Id: int|string,
+        * Title: string,
+        * Content: string,
         * CreatedBy: int|string,
         * PublishedBy?: int|string|null,
         * IdGroup?: int|string|null,
-        * OnlyForMembers?: bool|int|null
+        * OnlyForMembers?: bool|int|null,
+        * LastUpdate: string
         * } $articleForAuth */
-        $article = ArticleAuthorizationRow::fromStdClass($articleForAuth);
+        $article = ArticleAuthorizationRow::fromStdClass(ArticleRow::fromStdClass($articleForAuth));
 
         if ($this->authorizationDataHelper->canPersonReadSurveyResults($article, $connectedUser)) {
             $replies = $this->surveyDataHelper->getRepliesForActivePersons($survey->Id);
             $participants = [];
+            /** @var array<string, int> $results */
             $results = [];
 
-            $options = json_decode($survey->Options);
+            /** @var array<string> $options */
+            $options = json_decode($survey->Options) ?? [];
 
             foreach ($options as $option) {
                 $results[$option] = 0;
             }
 
             foreach ($replies as $reply) {
-                $answers = json_decode($reply->Answers);
+                /** @var array<string> $answers */
+                $answers = json_decode($reply->Answers) ?? [];
 
                 $personData = $this->dataHelper->get(
                     'Person',

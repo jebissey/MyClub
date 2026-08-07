@@ -8,7 +8,6 @@ use Throwable;
 use app\enums\FilterInputRule;
 use app\exceptions\QueryException;
 use app\helpers\Application;
-use app\helpers\GravatarHandler;
 use app\helpers\WebApp;
 use app\models\GroupDataHelper;
 use app\models\MessageDataHelper;
@@ -49,6 +48,7 @@ class GroupController extends AbstractController
                 'authorizations' => FilterInputRule::ArrayInt->value,
             ];
             $input = WebApp::filterInput($schema, $this->flight->request()->data->getData());
+            /** @var array{name?: string, selfRegistration?: int, authorizations?: array<int, int>} $input */
             $name = $input['name'] ?? '???';
             $selfRegistration = $input['selfRegistration'] ?? 0;
             if ($name === '???') {
@@ -124,6 +124,7 @@ class GroupController extends AbstractController
                 'authorizations' => FilterInputRule::ArrayInt->value,
             ];
             $input = WebApp::filterInput($schema, $this->flight->request()->data->getData());
+            /** @var array{name?: string, selfRegistration?: int, authorizations?: array<int, int>} $input */
             $name = $input['name'] ?? '???';
             $selfRegistration = $input['selfRegistration'] ?? 0;
             $selectedAuthorizations = $input['authorizations'] ?? [];
@@ -177,6 +178,9 @@ class GroupController extends AbstractController
             return;
         }
         $person = $connectedUser->person;
+        $lastLogId = $_SESSION['last_log_id'] ?? 0;
+        $lastLogId = is_numeric($lastLogId) ? (int)$lastLogId : 0;
+
         $this->render('Common/views/chat.latte', $this->getAllParams([
             'article' => null,
             'event' => null,
@@ -187,7 +191,7 @@ class GroupController extends AbstractController
             'page' => $this->application->getConnectedUser()->getPage(),
             'btn_HistoryBack' => true,
             'btn_Parent'      => "/user/directory?group={$groupId}",
-            'newMessages' => $this->messageDataHelper->hasNewMessages($person->Id, (int)($_SESSION['last_log_id'] ?? 0)),
+            'newMessages' => $this->messageDataHelper->hasNewMessages($person->Id, $lastLogId),
         ]));
     }
 }

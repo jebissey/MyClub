@@ -11,6 +11,7 @@ use app\exceptions\QueryException;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
 use app\valueObjects\ArticleAuthorizationRow;
+use app\valueObjects\ArticleRow;
 use app\valueObjects\ClosingVisibilityRow;
 
 /**
@@ -155,12 +156,11 @@ class AuthorizationDataHelper extends Data
 
     public function getArticle(int $id, ConnectedUser $connectedUser): ArticleAuthorizationRow|false
     {
-        $row = $this->get('Article', ['Id' => $id], 'CreatedBy, PublishedBy, OnlyForMembers, IdGroup');
+        $row = $this->get('Article', ['Id' => $id], 'Id, CreatedBy, PublishedBy, OnlyForMembers, IdGroup, Title, Content, LastUpdate, Timestamp');
         if ($row === false) {
             throw new QueryException("Article {$id} doesn't exist");
         }
-        /** @var ArticleAuthorizationRowShape $row */
-        $article = ArticleAuthorizationRow::fromStdClass($row);
+        $article = ArticleAuthorizationRow::fromStdClass(ArticleRow::fromStdClass($row));
         if (!$this->canReadArticle($article, $connectedUser)) {
             return false;
         }

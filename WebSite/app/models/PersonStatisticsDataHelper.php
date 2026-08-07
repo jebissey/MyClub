@@ -68,13 +68,16 @@ class PersonStatisticsDataHelper extends Data
         ";
         $stmt = $this->pdo->prepare($query);
         $stmt->execute();
-        $firstDate = $stmt->fetch(PDO::FETCH_OBJ)->min_date;
+        /** @var object{min_date: ?string} $row */
+        $row = $stmt->fetch(PDO::FETCH_OBJ);
+        $firstDate = $row->min_date;
 
         if (!$firstDate) {
             $firstDate = date('Y-m-d');
         }
 
-        $firstYear = (int) date('Y', strtotime($firstDate));
+        $firstDateTimestamp = strtotime($firstDate);
+        $firstYear = (int) date('Y', $firstDateTimestamp !== false ? $firstDateTimestamp : null);
         $currentYear = (int) date('Y');
 
         $seasons = [];
@@ -153,7 +156,9 @@ class PersonStatisticsDataHelper extends Data
         ";
         $userSurveys = $this->pdo->prepare($query);
         $userSurveys->execute([$personId, $seasonStart, $seasonEnd]);
-        $userSurveysCount = (int)$userSurveys->fetch(PDO::FETCH_OBJ)->count;
+        /** @var object{count: int} $userSurveysRow */
+        $userSurveysRow = $userSurveys->fetch(PDO::FETCH_OBJ);
+        $userSurveysCount = (int) $userSurveysRow->count;
 
         $query = "
             SELECT COUNT(*) as count 
@@ -164,7 +169,9 @@ class PersonStatisticsDataHelper extends Data
         ";
         $totalSurveys = $this->pdo->prepare($query);
         $totalSurveys->execute([$seasonStart, $seasonEnd]);
-        $totalSurveysCount = (int)$totalSurveys->fetch(PDO::FETCH_OBJ)->count;
+        /** @var object{count: int} $totalSurveysRow */
+        $totalSurveysRow = $totalSurveys->fetch(PDO::FETCH_OBJ);
+        $totalSurveysCount = (int) $totalSurveysRow->count;
 
         return [
             'user' => $userSurveysCount,
@@ -190,7 +197,9 @@ class PersonStatisticsDataHelper extends Data
             )";
         $userReplies = $this->pdo->prepare($query);
         $userReplies->execute([$personId, $seasonStart, $seasonEnd]);
-        $userRepliesCount = (int)$userReplies->fetch(PDO::FETCH_OBJ)->count;
+        /** @var object{count: int} $userRepliesRow */
+        $userRepliesRow = $userReplies->fetch(PDO::FETCH_OBJ);
+        $userRepliesCount = (int) $userRepliesRow->count;
 
         $query = "
             SELECT COUNT(*) as count 
@@ -203,7 +212,9 @@ class PersonStatisticsDataHelper extends Data
             )";
         $totalReplies = $this->pdo->prepare($query);
         $totalReplies->execute([$seasonStart, $seasonEnd]);
-        $totalRepliesCount = (int)$totalReplies->fetch(PDO::FETCH_OBJ)->count;
+        /** @var object{count: int} $totalRepliesRow */
+        $totalRepliesRow = $totalReplies->fetch(PDO::FETCH_OBJ);
+        $totalRepliesCount = (int) $totalRepliesRow->count;
 
         return [
             'user'       => $userRepliesCount,
@@ -315,6 +326,7 @@ class PersonStatisticsDataHelper extends Data
             GROUP BY et.Id, et.Name
         ");
         $stmt->execute([$personId, $seasonStart, $seasonEnd]);
+        /** @var list<object{Id: int|string, Name: string, total: int|string, user: int|string|null}> $eventTypes */
         $eventTypes = $stmt->fetchAll(PDO::FETCH_OBJ);
 
         foreach ($eventTypes as $eventType) {
@@ -339,6 +351,7 @@ class PersonStatisticsDataHelper extends Data
             WHERE datetime(StartTime) BETWEEN datetime(?) AND datetime(?)
         ");
         $stmt->execute([$personId, $seasonStart, $seasonEnd]);
+        /** @var object{total: int|string, user: int|string|null} $totals */
         $totals = $stmt->fetch(PDO::FETCH_OBJ);
 
         $userAllEventsCount = (int) $totals->user;
@@ -362,6 +375,7 @@ class PersonStatisticsDataHelper extends Data
             WHERE datetime(e.StartTime) BETWEEN datetime(?) AND datetime(?)
         ");
         $stmt->execute([$personId, $seasonStart, $seasonEnd]);
+        /** @var object{total: int|string, user: int|string|null} $invitations */
         $invitations = $stmt->fetch(PDO::FETCH_OBJ);
 
         $userInvitationCount = (int) $invitations->user;
@@ -390,6 +404,7 @@ class PersonStatisticsDataHelper extends Data
         $stmt = $this->pdo->query(
             'SELECT Id, Name FROM EventType'
         );
+        /** @var list<array{Id: int, Name: string}> $eventTypes */
         $eventTypes = $this->fetchAllOrFail($stmt);
 
         $sql = "SELECT 
@@ -406,6 +421,7 @@ class PersonStatisticsDataHelper extends Data
 
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([$personId, $seasonStart, $seasonEnd]);
+        /** @var list<object{IdEventType: int|string, typeName: string, user_count: int|string, total_users_count: int|string, event_count: int|string}> $results */
         $results = $stmt->fetchAll(PDO::FETCH_OBJ);
 
         foreach ($results as $result) {
@@ -415,7 +431,7 @@ class PersonStatisticsDataHelper extends Data
                 'user'       => (int) $result->user_count,
                 'total'      => (int) $result->total_users_count,
                 'percentage' => $result->total_users_count > 0
-                    ? round(($result->user_count / $result->total_users_count) * 100, 2)
+                    ? round(((int) $result->user_count / (int) $result->total_users_count) * 100, 2)
                     : 0
             ];
         }

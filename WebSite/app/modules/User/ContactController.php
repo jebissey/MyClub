@@ -64,13 +64,13 @@ class ContactController extends AbstractController
     #region Private functions
     private function handleContactForm(): void
     {
-        $honeypot = $_POST['website'] ?? '';
+        $honeypot = self::toStr($_POST['website'] ?? '');
         if ($honeypot !== '') {
             $this->silentFail("honey pot field filling with {$honeypot}");
             return;
         }
 
-        $formLoadedAt = $_SESSION['contact_form_loaded'] ?? 0;
+        $formLoadedAt = self::toInt($_SESSION['contact_form_loaded'] ?? 0);
         $duration = time() - $formLoadedAt;
         if ($duration <= self::MIN_FILL_SECONDS) {
             $this->silentFail("too fast for a human ({$duration}s)");
@@ -78,13 +78,13 @@ class ContactController extends AbstractController
         }
         unset($_SESSION['contact_form_loaded']);
 
-        $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+        $ip = self::toStr($_SERVER['REMOTE_ADDR'] ?? 'unknown');
         if (!$this->checkRateLimit($ip)) {
             $this->silentFail('too many attempts');
             return;
         }
 
-        $turnstileToken = $_POST['cf-turnstile-response'] ?? '';
+        $turnstileToken = self::toStr($_POST['cf-turnstile-response'] ?? '');
         if (!$this->verifyTurnstile($turnstileToken, $ip)) {
             $this->silentFail('turnstile challenge failed');
             return;
@@ -98,10 +98,11 @@ class ContactController extends AbstractController
         ];
 
         $input   = WebApp::filterInput($schema, $this->flight->request()->data->getData());
-        $name    = $input['name']    ?? '';
-        $email   = $input['email']   ?? '';
-        $message = $input['message'] ?? '';
-        $eventId = $input['eventId'] ?? null;
+        $name    = self::toStr($input['name']    ?? '');
+        $email   = self::toStr($input['email']   ?? '');
+        $message = self::toStr($input['message'] ?? '');
+        $eventIdRaw = $input['eventId'] ?? null;
+        $eventId = $eventIdRaw !== null ? self::toInt($eventIdRaw) : null;
 
         $errors = [];
         if (empty($name)) {
@@ -151,6 +152,9 @@ class ContactController extends AbstractController
         }
 
         $data = json_decode($result, true);
+        if (!is_array($data)) {
+            return false;
+        }
         return ($data['success'] ?? false) === true;
     }
 

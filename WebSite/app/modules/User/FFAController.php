@@ -38,9 +38,13 @@ class FFAController extends AbstractController
             'page' => $this->application->getConnectedUser()->getPage() ?? '',
         ];
         $input = WebApp::filterInput($schema, $this->flight->request()->query->getData());
+
+        /** @var string $firstName */
         $firstName = $input['firstName'] ?? $person->FirstName ?? '???';
+        /** @var string $lastName */
         $lastName = $input['lastName'] ?? $person->LastName ?? '???';
         $question = $input['question'] ?? 'rank';
+        /** @var string $year */
         $year = $input['year'] ?? date('Y');
         $club = $input['club'] ?? $this->dataHelper->get('Settings', ['Name' => 'FFA_club'], 'Value')->Value ?? '???';
         $results = [];

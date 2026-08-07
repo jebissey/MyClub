@@ -86,6 +86,7 @@ class VisitorInsightsController extends TableController
             'Message'   => FilterInputRule::Content->value,
         ];
         $filterValues = WebApp::filterInput($schema, $this->flight->request()->query->getData());
+        /** @var array<string, string> $filterValues */
 
         $filterConfig = [
             ['name' => 'Type',    'label' => 'Type'],
@@ -270,7 +271,8 @@ class VisitorInsightsController extends TableController
             'group'  => FilterInputRule::HtmlSafeName->value,
             'period' => $this->application->enumToValues(Period::class),
         ];
-        $input       = WebApp::filterInput($schema, $this->flight->request()->query->getData());
+        $input = WebApp::filterInput($schema, $this->flight->request()->query->getData());
+        /** @var array<string, string> $input */
         $uriFilter   = $input['uri'];
         $emailFilter = $input['email'];
         $groupFilter = $input['group'];
@@ -328,9 +330,13 @@ class VisitorInsightsController extends TableController
      */
     private function getPeriodAndDate(): array
     {
-        $params      = $this->flight->request()->query->getData();
-        $period      = $params['period'] ?? 'day';
-        $currentDate = $params['date'] ?? date('Y-m-d');
+        $params = $this->flight->request()->query->getData();
+
+        $periodRaw = $params['period'] ?? 'day';
+        $period    = is_string($periodRaw) ? $periodRaw : 'day';
+
+        $dateRaw     = $params['date'] ?? date('Y-m-d');
+        $currentDate = is_string($dateRaw) ? $dateRaw : date('Y-m-d');
 
         if (!strtotime($currentDate)) {
             $currentDate = date('Y-m-d');

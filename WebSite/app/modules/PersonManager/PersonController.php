@@ -100,6 +100,7 @@ class PersonController extends TableController
                 'alert'      => FilterInputRule::Content->value,
                 'memberInfo' => FilterInputRule::Content->value,
             ];
+            /** @var array{email?: string, firstName?: string, lastName?: string, alert?: string, memberInfo?: string} $input */
             $input = WebApp::filterInput($schema, $this->flight->request()->data->getData());
 
             $email = strtolower(trim($input['email'] ?? ''));
@@ -173,8 +174,8 @@ class PersonController extends TableController
                 $this->dataHelper->set(
                     'Person',
                     [
-                        'Alert' => $input['alert'],
-                        'MemberInfo' => $input['memberInfo']
+                        'Alert' => $input['alert'] ?? '',
+                        'MemberInfo' => $input['memberInfo'] ?? ''
                     ],
                     ['Id' => $person->Id]
                 );
@@ -227,6 +228,7 @@ class PersonController extends TableController
             'presentInDirectory' => ['oui', 'non'],
             'memberInfo' => FilterInputRule::Text->value,
         ];
+        /** @var array<string, string> $filterValues */
         $filterValues = WebApp::filterInput($schema, $this->flight->request()->query->getData());
         $filterConfig = [
             ['name' => 'firstName', 'label' => 'Prénom'],
@@ -252,6 +254,7 @@ class PersonController extends TableController
         /** @var list<string> $statusValues */
         $statusValues = $this->application->enumToValues(PersonStatus::class);
 
+        /** @var string $status */
         $status = WebApp::getFiltered(
             'status',
             $statusValues,
@@ -316,6 +319,7 @@ class PersonController extends TableController
                 'seasonEnd'   => FilterInputRule::Text->value,
             ];
 
+            /** @var array{amount?: float, seasonStart?: string, seasonEnd?: string} $input */
             $input = WebApp::filterInput($schema, $this->flight->request()->data->getData());
 
             $amountInCents = (int)round(($input['amount'] ?? 0) * 100);

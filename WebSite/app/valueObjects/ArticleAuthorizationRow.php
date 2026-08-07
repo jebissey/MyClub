@@ -4,15 +4,6 @@ declare(strict_types=1);
 
 namespace app\valueObjects;
 
-/**
- * @phpstan-type ArticleAuthorizationRowShape object{
- *     Id: int|string,
- *     CreatedBy: int|string,
- *     PublishedBy?: int|string|null,
- *     IdGroup?: int|string|null,
- *     OnlyForMembers?: int|bool|null,
- * }
- */
 final readonly class ArticleAuthorizationRow
 {
     public function __construct(
@@ -24,17 +15,14 @@ final readonly class ArticleAuthorizationRow
     ) {
     }
 
-    /**
-     * @param ArticleAuthorizationRowShape $row
-     */
-    public static function fromStdClass(object $row): self
+    public static function fromStdClass(ArticleRow $row): self
     {
         return new self(
             Id: (int) $row->Id,
             CreatedBy: (int) $row->CreatedBy,
             PublishedBy: isset($row->PublishedBy) ? (int) $row->PublishedBy : null,
             IdGroup: isset($row->IdGroup) ? (int) $row->IdGroup : null,
-            OnlyForMembers: (bool) ($row->OnlyForMembers ?? false),
+            OnlyForMembers: (bool) ($row->OnlyForMembers),
         );
     }
 

@@ -38,7 +38,7 @@ class HomeController extends AbstractController
         }
         $_SESSION['navbar'] = '';
         $userPendingSurveys = $userPendingDesigns = [];
-        $userEmail = $_SESSION['user'] ?? '';
+        $userEmail = is_string($_SESSION['user'] ?? null) ? $_SESSION['user'] : '';
 
         $lang = TranslationManager::getCurrentLanguage();
         $connectedUser = $this->application->getConnectedUser();
@@ -72,7 +72,7 @@ class HomeController extends AbstractController
                     'flag'               => TranslationManager::getFlag($lang),
                     'isRedactor'         => false,
                     'page'               => $connectedUser->getPage(),
-                    'currentPath'        => parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH),
+                    'currentPath'        => parse_url(is_string($_SERVER['REQUEST_URI'] ?? null) ? $_SERVER['REQUEST_URI'] : '', PHP_URL_PATH),
                     'isMyclubWebSite'    => WebApp::isMyClubWebSite(),
                     'navbarBgColor'   => $defaultColors['navbarBgColor'],
                     'navbarInkColor'  => $defaultColors['navbarInkColor'],
@@ -99,6 +99,7 @@ class HomeController extends AbstractController
         } else {
             $spotlight = $this->articleDataHelper->getSpotlightArticle();
             if ($spotlight !== null) {
+                /** @var array{articleId: int, spotlightUntil: string} $spotlight */
                 $articleId = $spotlight['articleId'];
                 if ($this->articleDataHelper->isUserAllowedToReadArticle($userEmail, $articleId)) {
                     if (strtotime($spotlight['spotlightUntil']) >= strtotime(date('Y-m-d'))) {

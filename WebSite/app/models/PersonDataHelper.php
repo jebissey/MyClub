@@ -33,6 +33,17 @@ use app\valueObjects\Person;
  *     ShowPhoneInPresentationDirectory: int|string,
  *     ShowEmailInPresentationDirectory: int|string
  * }
+ * @phpstan-type NewArticlePrefs array{
+ *     enabled?: bool,
+ *     pollOnly?: bool,
+ *     orderOnly?: bool,
+ *     poll_or_order?: bool
+ * }
+ * @phpstan-type PersonPreferencesShape array{
+ *     eventTypes?: array{
+ *         newArticle?: NewArticlePrefs
+ *     }
+ * }
  */
 class PersonDataHelper extends Data implements NewsProviderInterface
 {
@@ -48,7 +59,9 @@ class PersonDataHelper extends Data implements NewsProviderInterface
     {
         $query = $this->pdo->prepare("SELECT Id FROM Person WHERE Email = ''");
         $query->execute();
-        $id = $query->fetch(PDO::FETCH_OBJ)->Id ?? null;
+        /** @var object{Id: int}|false $row */
+        $row = $query->fetch(PDO::FETCH_OBJ);
+        $id = $row !== false ? $row->Id : null;
         if ($id == null) {
             $query = $this->pdo->prepare("
                 INSERT INTO Person (Email, FirstName, LastName, Imported) 
@@ -355,8 +368,9 @@ class PersonDataHelper extends Data implements NewsProviderInterface
             if (empty($person->Preferences)) {
                 continue;
             }
+            /** @var PersonPreferencesShape|null $preferences */
             $preferences = json_decode($person->Preferences, true);
-            if (!$preferences || empty($preferences['eventTypes']['newArticle']['enabled'])) {
+            if (!is_array($preferences) || empty($preferences['eventTypes']['newArticle']['enabled'])) {
                 continue;
             }
             $articlePrefs = $preferences['eventTypes']['newArticle'];

@@ -19,7 +19,7 @@ abstract readonly class LayoutViewModel
         public ?string $productionSiteUrl = null,
         public ?string $memberAlert = null,
         public bool $btn_HistoryBack = true,
-        public string $btn_Parent = '/articles',
+        public string $btn_Parent = '/',
         public array $allParams = []
     ) {
     }

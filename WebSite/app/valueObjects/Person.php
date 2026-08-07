@@ -6,13 +6,9 @@ namespace app\valueObjects;
 
 use app\helpers\GravatarHandler;
 use app\helpers\WebApp;
-use app\valueObjects\AbstractValueObject;
 
 /**
  * Objet d'identité pour l'utilisateur (ConnectedUser::$person, AuthResult::getUser()).
- * Seuls les champs effectivement consommés dans le code sont déclarés ;
- * PHPStan signalera tout accès à un champ non déclaré au fil des corrections
- * de niveaux 7/8/9 — c'est volontaire, pas un oubli.
  *
  * @phpstan-type PersonRow object{
  *    Id: int|string,
@@ -28,11 +24,11 @@ use app\valueObjects\AbstractValueObject;
  *    TokenCreatedAt?: string|null,
  *    Imported?: bool|int|string|null,
  *    MemberInfo?: string|null,
- *    UseGravatar?: bool|null,
+ *    UseGravatar?: bool|int|string|null,
  *    Avatar?: string|null,
- *    InPresentationDirectory: int,
- *    ShowPhoneInPresentationDirectory: int|string,
- *    ShowEmailInPresentationDirectory: int|string,
+ *    InPresentationDirectory?: bool|int|string|null,
+ *    ShowPhoneInPresentationDirectory?: bool|int|string|null,
+ *    ShowEmailInPresentationDirectory?: bool|int|string|null,
  *    MyPublicDataInPresentationDirectory?: string|null,
  *    Preferences?: string|null,
  *    Availabilities?: string|null,
@@ -77,32 +73,48 @@ final readonly class Person extends AbstractValueObject
      */
     public static function fromRow(object $row): self
     {
+        $inactivated = (bool)($row->Inactivated ?? false);
+        $imported = (bool)($row->Imported ?? false);
+        $useGravatar = (bool)($row->UseGravatar ?? false);
+
+        $inPresentationDirectory = (bool)($row->InPresentationDirectory ?? false);
+        $showPhone = (bool)($row->ShowPhoneInPresentationDirectory ?? false);
+        $showEmail = (bool)($row->ShowEmailInPresentationDirectory ?? false);
+
+        $avatar = $row->Avatar ?? null;
+        $email = $row->Email;
+
         return new self(
             Id: (int)$row->Id,
-            Email: $row->Email,
+            Email: $email,
             Alert: $row->Alert ?? null,
             FirstName: $row->FirstName ?? null,
             LastName: $row->LastName ?? null,
             NickName: $row->NickName ?? null,
             Password: $row->Password ?? null,
-            Inactivated: (bool)($row->Inactivated ?? false),
+            Inactivated: $inactivated,
             LastSignIn: $row->LastSignIn ?? null,
             LastSignOut: $row->LastSignOut ?? null,
             TokenCreatedAt: $row->TokenCreatedAt ?? null,
-            Imported: (bool)($row->Imported ?? false),
+            Imported: $imported,
             MemberInfo: $row->MemberInfo ?? null,
-            UseGravatar: (bool)($row->UseGravatar ?? false),
-            Avatar: $row->Avatar ?? null,
-            InPresentationDirectory: (bool)($row->InPresentationDirectory == 1),
-            ShowPhoneInPresentationDirectory: (bool)($row->ShowPhoneInPresentationDirectory == 1),
-            ShowEmailInPresentationDirectory: (bool)($row->ShowEmailInPresentationDirectory == 1),
+            UseGravatar: $useGravatar,
+            Avatar: $avatar,
+            InPresentationDirectory: $inPresentationDirectory,
+            ShowPhoneInPresentationDirectory: $showPhone,
+            ShowEmailInPresentationDirectory: $showEmail,
             MyPublicDataInPresentationDirectory: $row->MyPublicDataInPresentationDirectory ?? null,
             Preferences: $row->Preferences ?? null,
             Availabilities: $row->Availabilities ?? null,
             Notifications: $row->Notifications ?? null,
             Notepad: $row->Notepad ?? null,
             Location: $row->Location ?? null,
-            UserImg: WebApp::computeUserImg($row->UseGravatar ?? false, $row->Email ?? null, $row->Avatar ?? null, new GravatarHandler()),
+            UserImg: WebApp::computeUserImg(
+                $useGravatar,
+                $email,
+                $avatar,
+                new GravatarHandler()
+            ),
         );
     }
 }

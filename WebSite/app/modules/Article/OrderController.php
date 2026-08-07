@@ -13,6 +13,7 @@ use app\helpers\WebApp;
 use app\models\OrderDataHelper;
 use app\modules\Common\AbstractController;
 use app\valueObjects\ArticleAuthorizationRow;
+use app\valueObjects\ArticleRow;
 use app\valueObjects\ArticleTitleRow;
 use app\valueObjects\IdRow;
 use app\valueObjects\OrderReplyRow;
@@ -76,13 +77,16 @@ class OrderController extends AbstractController
         ];
 
         $input       = WebApp::filterInput($schema, $this->flight->request()->data->getData());
+        /** @var int $articleId */
         $articleId   = $input['article_id']  ?? throw new IntegrityException('Fatal error in file ' . __FILE__ . ' at line ' . __LINE__);
         $question    = $input['question']    ?? '???';
         $closingDate = $input['closingDate'] ?? new DateTime('+7 days');
         $visibility  = $input['visibility']  ?? OrderVisibility::Redactor->value;
 
+        /** @var array<string> $rawOptions */
+        $rawOptions = $input['options'] ?? [];
         $options = [];
-        foreach ($input['options'] ?? [] as $option) {
+        foreach ($rawOptions as $option) {
             $options[] = str_replace('"', "''", $option);
         }
         $optionsJson = json_encode($options);
@@ -135,7 +139,7 @@ class OrderController extends AbstractController
         $articleForAuth = $this->dataHelper->get(
             'Article',
             ['Id' => $order->IdArticle],
-            'Id, CreatedBy, PublishedBy, IdGroup, OnlyForMembers'
+            'Id, Title, Content, CreatedBy, PublishedBy, IdGroup, OnlyForMembers, LastUpdate'
         );
 
         if ($articleForAuth === false) {
@@ -145,13 +149,16 @@ class OrderController extends AbstractController
 
         /** @var object{
          *     Id: int|string,
+         *     Title: string,
+         *     Content: string,
          *     CreatedBy: int|string,
          *     PublishedBy?: int|string|null,
          *     IdGroup?: int|string|null,
-         *     OnlyForMembers?: bool|int|null
+         *     OnlyForMembers?: bool|int|null,
+         *     LastUpdate: string
          * } $articleForAuth
          */
-        $articleAuthorization = ArticleAuthorizationRow::fromStdClass($articleForAuth);
+        $articleAuthorization = ArticleAuthorizationRow::fromStdClass(ArticleRow::fromStdClass($articleForAuth));
 
         if (
             $this->authorizationDataHelper->canPersonReadOrderResults(
@@ -174,15 +181,18 @@ class OrderController extends AbstractController
             }, $repliesData);
 
             $participants = [];
+            /** @var array<string, float|int> $results */
             $results = [];
 
-            $options = json_decode($order->Options);
+            /** @var array<string> $options */
+            $options = json_decode($order->Options) ?? [];
             foreach ($options as $option) {
                 $results[$option] = 0;
             }
 
             foreach ($replies as $reply) {
-                $answers = json_decode($reply->Answers);
+                /** @var array<string, float|int> $answers */
+                $answers = json_decode($reply->Answers) ?? [];
 
                 $personData = $this->dataHelper->get(
                     'Person',

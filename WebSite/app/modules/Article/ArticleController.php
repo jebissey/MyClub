@@ -54,6 +54,24 @@ class ArticleController extends TableController
         );
     }
 
+    /**
+     * @param array<string, mixed> $context
+     */
+    private function getStringParam(array $context, string $key, string $default): string
+    {
+        $value = $context[$key] ?? $default;
+        return is_string($value) ? $value : $default;
+    }
+
+    /**
+     * @param array<string, mixed> $context
+     */
+    private function getNullableStringParam(array $context, string $key): ?string
+    {
+        $value = $context[$key] ?? null;
+        return is_string($value) ? $value : null;
+    }
+
     public function carousel(int $id): void
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
@@ -98,11 +116,11 @@ class ArticleController extends TableController
             article: $article,
             carouselItems: array_values($this->dataHelper->gets('Carousel', ['IdArticle' => $id])),
             page: $connectedUser->getPage(),
-            navbarInkColor: $dynamicContext['navbarInkColor'] ?? '#ffffff',
-            navbarIconColor: $dynamicContext['navbarIconColor'] ?? '#000000',
-            navbarBgColor: $dynamicContext['navbarBgColor'] ?? '#343a40',
-            productionSiteUrl: $dynamicContext['productionSiteUrl'] ?? null,
-            memberAlert: $dynamicContext['memberAlert'] ?? null,
+            navbarInkColor: $this->getStringParam($dynamicContext, 'navbarInkColor', '#ffffff'),
+            navbarIconColor: $this->getStringParam($dynamicContext, 'navbarIconColor', '#000000'),
+            navbarBgColor: $this->getStringParam($dynamicContext, 'navbarBgColor', '#343a40'),
+            productionSiteUrl: $this->getNullableStringParam($dynamicContext, 'productionSiteUrl'),
+            memberAlert: $this->getNullableStringParam($dynamicContext, 'memberAlert'),
             btn_HistoryBack: true,
             btn_Parent: '/articles',
         );
@@ -369,6 +387,7 @@ class ArticleController extends TableController
             'Id'         => FilterInputRule::Int->value,
         ];
         $filterValues = WebApp::filterInput($schema, $this->flight->request()->query->getData());
+        /** @var array<string, string> $filterValues */
         $filterConfig = [
             ['name' => 'PersonName', 'label' => ($this->t)('article.label.created_by')],
             ['name' => 'title', 'label' => ($this->t)('article.label.title')],
@@ -396,9 +415,13 @@ class ArticleController extends TableController
             $columns[] = ['field' => 'Menu', 'label' => ($this->t)('article.label.menu')];
             $columns[] = ['field' => 'Published', 'label' => ($this->t)('article.label.published')];
         }
+        $spotlight = $this->articleDataHelper->getSpotlightArticle();
+        $spotlightArticleId = isset($spotlight['articleId']) && is_numeric($spotlight['articleId'])
+            ? (int)$spotlight['articleId']
+            : -1;
         $query = $this->articleTableDataHelper->getQuery(
             $connectedUser,
-            (int)($this->articleDataHelper->getSpotlightArticle()['articleId'] ?? -1)
+            $spotlightArticleId
         );
         $data = $this->prepareTableData($query, $filterValues);
         $this->render('Article/views/articles_index.latte', $this->getAllParams([
@@ -429,6 +452,7 @@ class ArticleController extends TableController
             'Id'         => FilterInputRule::Int->value,
         ];
         $filterValues = WebApp::filterInput($schema, $this->flight->request()->query->getData());
+        /** @var array<string, string> $filterValues */
         $filterConfig = [
             ['name' => 'title', 'label' => ($this->t)('article.label.title')],
             ['name' => 'lastUpdate', 'label' => ($this->t)('article.label.last_update')],
@@ -481,6 +505,9 @@ class ArticleController extends TableController
             $isSpotlightActive = $input['isSpotlightActive'] ?? false;
             if ($isSpotlightActive) {
                 $spotlightedUntil = $input['spotlightedUntil'] ?? date('Y-m-d H:i:s', strtotime('+1 week'));
+                if (!is_string($spotlightedUntil)) {
+                    $spotlightedUntil = date('Y-m-d H:i:s', strtotime('+1 week'));
+                }
                 $this->articleDataHelper->setSpotlightArticle($id, $spotlightedUntil);
             }
             $result = $this->dataHelper->set('Article', [
@@ -528,17 +555,18 @@ class ArticleController extends TableController
         $connectedUser = $this->application->getConnectedUser();
         if (!$this->authorizationService->canRead($id, $connectedUser)) {
             if ($connectedUser->person === null) {
+                $requestUri = is_string($_SERVER['REQUEST_URI'] ?? null) ? $_SERVER['REQUEST_URI'] : '/';
                 $result = $this->application->getAuthenticationService()->handleRememberMeLogin();
                 if ($result && $result->isSuccess()) {
                     $this->application->getConnectedUser()->get();
                     $this->redirect(
-                        $_SERVER['REQUEST_URI'],
+                        $requestUri,
                         ApplicationError::Ok,
                         "Auto sign in succeeded for {$result->getUser()?->Email}"
                     );
                     return;
                 }
-                $this->redirect('/user/sign/in?redirect=' . urlencode($_SERVER['REQUEST_URI']));
+                $this->redirect('/user/sign/in?redirect=' . urlencode($requestUri));
             } else {
                 $this->raiseForbidden(__FILE__, __LINE__, 10000, false);
             }
@@ -588,7 +616,7 @@ class ArticleController extends TableController
                 hasSurvey: $hasSurvey,
                 hasOrder: $hasOrder,
                 userConnected: $connectedUser->person !== null,
-                userEmail: $dynamicContext['userEmail'] ?? null,
+                userEmail: $this->getNullableStringParam($dynamicContext, 'userEmail'),
                 navItems: $this->getNavItems($connectedUser->person),
                 publishedBy: $article->PublishedBy && $article->PublishedBy != $article->CreatedBy
                     ? $this->personDataHelper->getPublisher($article->PublishedBy) ?? ''
@@ -615,11 +643,11 @@ class ArticleController extends TableController
                 isEditor: $connectedUser->isEditor(),
                 message: $message,
                 messageType: $messageType,
-                navbarInkColor: $dynamicContext['navbarInkColor'] ?? '#ffffff',
-                navbarIconColor: $dynamicContext['navbarIconColor'] ?? '#000000',
-                navbarBgColor: $dynamicContext['navbarBgColor'] ?? '#343a40',
-                productionSiteUrl: $dynamicContext['productionSiteUrl'] ?? null,
-                memberAlert: $dynamicContext['memberAlert'] ?? null,
+                navbarInkColor: $this->getStringParam($dynamicContext, 'navbarInkColor', '#ffffff'),
+                navbarIconColor: $this->getStringParam($dynamicContext, 'navbarIconColor', '#000000'),
+                navbarBgColor: $this->getStringParam($dynamicContext, 'navbarBgColor', '#343a40'),
+                productionSiteUrl: $this->getNullableStringParam($dynamicContext, 'productionSiteUrl'),
+                memberAlert: $this->getNullableStringParam($dynamicContext, 'memberAlert'),
                 btn_HistoryBack: true,
                 btn_Parent: '/articles',
             );
@@ -655,6 +683,9 @@ class ArticleController extends TableController
         }
         $person = $connectedUser->person ?? throw new IntegrityException('Fatal error in file ' . __FILE__ . ' at line ' . __LINE__);
         $userImg = WebApp::getUserImg($person, new GravatarHandler());
+        $lastLogId = isset($_SESSION['last_log_id']) && is_numeric($_SESSION['last_log_id'])
+            ? (int)$_SESSION['last_log_id']
+            : 0;
         $this->render('Common/views/chat.latte', $this->getAllParams([
             'article' => $article,
             'event' => null,
@@ -666,7 +697,7 @@ class ArticleController extends TableController
             'page' => $this->application->getConnectedUser()->getPage(),
             'btn_HistoryBack' => true,
             'btn_Parent'      => "/article/{$articleId}",
-            'newMessages' => $this->messageDataHelper->hasNewMessages($person->Id, (int)($_SESSION['last_log_id'] ?? 0)),
+            'newMessages' => $this->messageDataHelper->hasNewMessages($person->Id, $lastLogId),
         ]));
     }
 

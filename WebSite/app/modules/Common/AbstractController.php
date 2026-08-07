@@ -330,6 +330,16 @@ abstract class AbstractController
         return true;
     }
 
+    protected static function toInt(mixed $value, int $default = 0): int
+    {
+        return is_int($value) ? $value : (is_numeric($value) ? (int) $value : $default);
+    }
+
+    protected static function toStr(mixed $value, string $default = ''): string
+    {
+        return is_scalar($value) ? (string)$value : $default;
+    }
+
     #region Public functions
     /**
      * @param object|array<string,mixed> $params

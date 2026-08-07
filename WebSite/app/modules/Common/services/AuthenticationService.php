@@ -114,7 +114,7 @@ class AuthenticationService
 
     public function resetPassword(string $token, string $newPassword): bool
     {
-        $personRow = $this->dataHelper->get('Person', ['Token' => $token], 'Id, TokenCreatedAt');
+        $personRow = $this->dataHelper->get('Person', ['Token' => $token], 'Id, TokenCreatedAt, Email');
         if (!$personRow) {
             return false;
         }
