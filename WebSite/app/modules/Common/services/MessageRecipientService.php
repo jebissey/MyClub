@@ -37,10 +37,11 @@ class MessageRecipientService
         );
         $recipients = [];
         foreach ($persons as $person) {
+            /** @var array<string, mixed> $preferences */
             $preferences = json_decode(
                 $person->Notifications ?? '{}',
                 true
-            );
+            ) ?? [];
             if ($preferences === []) {
                 continue;
             }

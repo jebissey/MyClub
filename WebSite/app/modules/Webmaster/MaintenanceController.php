@@ -23,7 +23,9 @@ class MaintenanceController extends AbstractController
     public function checkIfSiteIsUnderMaintenance(): void
     {
         error_log("\n\n" . json_encode('---###---', JSON_PRETTY_PRINT) . "\n");
-        if (strpos($_SERVER['REQUEST_URI'] ?? '', self::MAINTENANCE_UNSET) !== false) {
+        $requestUri = $_SERVER['REQUEST_URI'] ?? '';
+
+        if (is_string($requestUri) && strpos($requestUri, self::MAINTENANCE_UNSET) !== false) {
             return;
         }
 

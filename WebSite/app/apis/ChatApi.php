@@ -34,7 +34,7 @@ class ChatApi extends AbstractApi
 
     public function getActiveUsers(): void
     {
-        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+        if (WebApp::getRequestMethod() !== 'GET') {
             $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
             return;
         }

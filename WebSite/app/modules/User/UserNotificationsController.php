@@ -30,7 +30,7 @@ class UserNotificationsController extends AbstractController
             $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
-        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+        if (WebApp::getRequestMethod() !== 'GET') {
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
@@ -66,16 +66,18 @@ class UserNotificationsController extends AbstractController
             $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        if (WebApp::getRequestMethod() !== 'POST') {
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
-
         $notifications = WebApp::getFiltered(
             'notifications',
             FilterInputRule::CheckboxMatrix->value,
             $this->flight->request()->data->getData()
-        ) ?? [];
+        );
+        if (!is_array($notifications)) {
+            $notifications = [];
+        }
         unset(
             $notifications['messageOnGroupSubscribed'],
             $notifications['messageOnGroupJoined']

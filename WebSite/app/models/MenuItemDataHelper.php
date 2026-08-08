@@ -8,6 +8,8 @@ use InvalidArgumentException;
 use PDO;
 use Throwable;
 use app\helpers\Application;
+use app\valueObjects\MaxPositionRow;
+use app\valueObjects\MenuItemAuthorizationRow;
 use app\valueObjects\Person;
 
 class MenuItemDataHelper extends Data
@@ -33,11 +35,13 @@ class MenuItemDataHelper extends Data
 
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':route' => $url]);
-        $pageData = $stmt->fetch(PDO::FETCH_OBJ);
+        /** @var object|false $raw */
+        $raw = $stmt->fetch(PDO::FETCH_OBJ);
 
-        if (!$pageData) {
+        if ($raw === false) {
             return false;
         }
+        $pageData = MenuItemAuthorizationRow::fromStdClass($raw);
 
         if (!$pageData->IdGroup) {
             if (
@@ -122,15 +126,19 @@ class MenuItemDataHelper extends Data
 
         if (empty($data['id'])) {
             if (isset($parent)) {
-                $maxPos = $this->fluent
+                /** @var object|false $maxPosRaw */
+                $maxPosRaw = $this->fluent
                     ->from('MenuItem')
                     ->where('ParentId = ?', $menuItem['ParentId'])
                     ->select('MAX(Position) AS MaxPos')
                     ->fetch();
+                $maxPos = $maxPosRaw !== false ? MaxPositionRow::fromStdClass($maxPosRaw) : null;
                 $menuItem['Position'] = max($parent->Position + 1, ($maxPos->MaxPos ?? 0) + 1);
             } else {
-                $maxPos = $this->fluent->from('MenuItem')->select('MAX(Position) AS MaxPos')->fetch();
-                $menuItem['Position'] = ($maxPos && $maxPos->MaxPos) ? $maxPos->MaxPos + 1 : 1;
+                /** @var object|false $maxPosRaw */
+                $maxPosRaw = $this->fluent->from('MenuItem')->select('MAX(Position) AS MaxPos')->fetch();
+                $maxPos = $maxPosRaw !== false ? MaxPositionRow::fromStdClass($maxPosRaw) : null;
+                $menuItem['Position'] = $maxPos?->MaxPos !== null ? $maxPos->MaxPos + 1 : 1;
             }
 
             $this->set('MenuItem', $menuItem);

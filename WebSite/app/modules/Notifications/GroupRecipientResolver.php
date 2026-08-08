@@ -14,6 +14,18 @@ class GroupRecipientResolver implements RecipientResolverInterface
         return $context->isGroup();
     }
 
+    /**
+     * @param array{
+     *     newArticle?: string,
+     *     updatedArticle?: string,
+     *     newPollVote?: string,
+     *     messageOnArticle?: string,
+     *     messageOnEvent?: string,
+     *     groupsSubscribed?: array<int, string>,
+     *     groupsJoined?: array<int, string>,
+     *     messageOnGroupNotJoined?: string
+     * } $prefs
+     */
     public function shouldNotify(MessageContext $context, int $personId, array $prefs): bool
     {
         $groupId = $context->groupId;

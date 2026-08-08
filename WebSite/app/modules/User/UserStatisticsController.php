@@ -69,8 +69,20 @@ class UserStatisticsController extends AbstractController
     private function resolveSeason(): array
     {
         $schema = ['season' => FilterInputRule::DateInterval->value];
-        $input  = WebApp::filterInput($schema, $this->flight->request()->query->getData());
-        [$start, $end] = explode('|', $input['season'] ?? '|');
+
+        $input = WebApp::filterInput(
+            $schema,
+            $this->flight->request()->query->getData()
+        );
+
+        $season = $input['season'] ?? '';
+
+        if (!is_string($season)) {
+            $season = '';
+        }
+
+        [$start, $end] = explode('|', $season . '|', 2);
+
         return MyClubDateTime::getSeasonRange($start, $end);
     }
 

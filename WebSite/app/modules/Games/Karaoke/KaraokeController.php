@@ -6,6 +6,7 @@ namespace app\modules\Games\Karaoke;
 
 use app\exceptions\LyricsParserException;
 use app\helpers\Application;
+use app\helpers\WebApp;
 use app\modules\Common\AbstractController;
 
 class KaraokeController extends AbstractController
@@ -19,7 +20,7 @@ class KaraokeController extends AbstractController
 
     public function play(string $song): void
     {
-        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+        if (WebApp::getRequestMethod() !== 'GET') {
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
@@ -53,7 +54,7 @@ class KaraokeController extends AbstractController
 
     public function files(string $name): void
     {
-        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+        if (WebApp::getRequestMethod() !== 'GET') {
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }

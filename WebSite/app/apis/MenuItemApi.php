@@ -8,6 +8,7 @@ use Throwable;
 use app\enums\ApplicationError;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
+use app\helpers\WebApp;
 use app\models\Data;
 use app\models\DataHelper;
 use app\models\MenuItemDataHelper;
@@ -31,7 +32,7 @@ class MenuItemApi extends AbstractApi
             $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        if (WebApp::getRequestMethod() !== 'POST') {
             $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
@@ -49,9 +50,9 @@ class MenuItemApi extends AbstractApi
             $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }
-        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+        if (WebApp::getRequestMethod() !== 'GET') {
             $this->renderJson(
-                ['message' => 'Not allowed method: ' . $_SERVER['REQUEST_METHOD'] . ' in file ' . __FILE__ . ' at line ' . __LINE__],
+                ['message' => 'Not allowed method: ' . WebApp::getRequestMethod() . ' in file ' . __FILE__ . ' at line ' . __LINE__],
                 false,
                 ApplicationError::MethodNotAllowed->value
             );
@@ -70,7 +71,7 @@ class MenuItemApi extends AbstractApi
             $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        if (WebApp::getRequestMethod() !== 'POST') {
             $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
@@ -98,22 +99,22 @@ class MenuItemApi extends AbstractApi
              * } $menuItemData
              */
             $menuItemData = [
-                'what' => (string) $data['what'],
-                'type' => (string) $data['type'],
-                'label' => isset($data['label']) ? (string) $data['label'] : null,
-                'icon' => isset($data['icon']) ? (string) $data['icon'] : null,
-                'url' => isset($data['url']) ? (string) $data['url'] : null,
-                'idGroup' => isset($data['idGroup']) ? (int) $data['idGroup'] : null,
-                'parentId' => isset($data['parentId']) ? (int) $data['parentId'] : null,
+                'what' => WebApp::toStr($data['what']),
+                'type' => WebApp::toStr($data['type']),
+                'label' => isset($data['label']) ? WebApp::toStr($data['label']) : null,
+                'icon' => isset($data['icon']) ? WebApp::toStr($data['icon']) : null,
+                'url' => isset($data['url']) ? WebApp::toStr($data['url']) : null,
+                'idGroup' => isset($data['idGroup']) ? WebApp::toInt($data['idGroup']) : null,
+                'parentId' => isset($data['parentId']) ? WebApp::toInt($data['parentId']) : null,
                 'forMembers' => (bool) ($data['forMembers'] ?? false),
                 'forContacts' => (bool) ($data['forContacts'] ?? false),
                 'forAnonymous' => (bool) ($data['forAnonymous'] ?? false),
             ];
             if (isset($data['id'])) {
-                $menuItemData['id'] = (int) $data['id'];
+                $menuItemData['id'] = WebApp::toInt($data['id']);
             }
             if (isset($data['position'])) {
-                $menuItemData['position'] = (int) $data['position'];
+                $menuItemData['position'] = WebApp::toInt($data['position']);
             }
 
             $this->menuItemDataHelper->insertOrUpdate($menuItemData);
@@ -129,13 +130,24 @@ class MenuItemApi extends AbstractApi
             $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        if (WebApp::getRequestMethod() !== 'POST') {
             $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
         try {
             $data = $this->getJsonInput();
-            $this->menuItemDataHelper->updates($data['positions']);
+            if (!isset($data['positions']) || !is_array($data['positions'])) {
+                $this->renderJsonBadRequest('Missing or invalid positions field', __FILE__, __LINE__);
+                return;
+            }
+
+            /** @var array<int, int> $positions */
+            $positions = array_values(array_map(
+                static fn(mixed $v): int => WebApp::toInt($v),
+                $data['positions']
+            ));
+
+            $this->menuItemDataHelper->updates($positions);
             $this->renderJsonOk();
         } catch (Throwable $e) {
             $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());

@@ -32,7 +32,7 @@ class HomeController extends AbstractController
 
     public function home(): void
     {
-        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+        if (WebApp::getRequestMethod() !== 'GET') {
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
@@ -146,7 +146,7 @@ class HomeController extends AbstractController
 
     public function helpHome(): void
     {
-        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+        if (WebApp::getRequestMethod() !== 'GET') {
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
@@ -164,7 +164,7 @@ class HomeController extends AbstractController
 
     public function legalNotice(): void
     {
-        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+        if (WebApp::getRequestMethod() !== 'GET') {
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }

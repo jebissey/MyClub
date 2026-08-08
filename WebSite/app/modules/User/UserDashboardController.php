@@ -6,6 +6,7 @@ namespace app\modules\User;
 
 use app\helpers\Application;
 use app\helpers\TranslationManager;
+use app\helpers\WebApp;
 use app\modules\Common\AbstractController;
 
 class UserDashboardController extends AbstractController
@@ -21,7 +22,7 @@ class UserDashboardController extends AbstractController
             $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
-        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+        if (WebApp::getRequestMethod() !== 'GET') {
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
@@ -42,7 +43,7 @@ class UserDashboardController extends AbstractController
             $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
-        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+        if (WebApp::getRequestMethod() !== 'GET') {
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }

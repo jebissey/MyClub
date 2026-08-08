@@ -40,15 +40,17 @@ class TranslatorController extends AbstractController
             $this->flight->request()->query->getData()
         );
 
-        $referenceLang = in_array($filters['ref'] ?? '', $languages, true)
-            ? $filters['ref']
+        $referenceLang = WebApp::toStr($filters['ref'] ?? '');
+        $referenceLang = in_array($referenceLang, $languages, true)
+            ? $referenceLang
             : TranslationManager::DEFAULT_LANGUAGE;
 
-        $targetLang = in_array($filters['lang'] ?? '', $languages, true)
-            ? $filters['lang']
+        $targetLang = WebApp::toStr($filters['lang'] ?? '');
+        $targetLang = in_array($targetLang, $languages, true)
+            ? $targetLang
             : TranslationManager::DEFAULT_LANGUAGE;
 
-        $missingOnly = (int)($filters['missing'] ?? 0);
+        $missingOnly = WebApp::toInt($filters['missing'] ?? 0);
 
         $translations = $this->languagesDataHelper->getTranslations(
             $referenceLang,

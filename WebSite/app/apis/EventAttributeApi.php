@@ -8,6 +8,7 @@ use Throwable;
 use app\enums\ApplicationError;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
+use app\helpers\WebApp;
 use app\models\AttributeDataHelper;
 use app\models\DataHelper;
 use app\models\PersonDataHelper;
@@ -30,7 +31,7 @@ class EventAttributeApi extends AbstractApi
             $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        if (WebApp::getRequestMethod() !== 'POST') {
             $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
@@ -49,7 +50,7 @@ class EventAttributeApi extends AbstractApi
             $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        if (WebApp::getRequestMethod() !== 'POST') {
             $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
@@ -63,7 +64,7 @@ class EventAttributeApi extends AbstractApi
 
     public function getAttributes(): void
     {
-        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+        if (WebApp::getRequestMethod() !== 'GET') {
             $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
@@ -80,7 +81,7 @@ class EventAttributeApi extends AbstractApi
 
     public function getAttributesByEventType(int $eventTypeId): void
     {
-        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+        if (WebApp::getRequestMethod() !== 'GET') {
             $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
@@ -101,7 +102,7 @@ class EventAttributeApi extends AbstractApi
             $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        if (WebApp::getRequestMethod() !== 'POST') {
             $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
             return;
         }

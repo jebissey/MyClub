@@ -10,6 +10,7 @@ use app\enums\ApplicationError;
 use app\exceptions\EmailException;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
+use app\helpers\WebApp;
 use app\interfaces\EmailQuotaTrackerInterface;
 use app\models\DataHelper;
 use app\models\LanguagesDataHelper;
@@ -48,7 +49,7 @@ class CommunicationApi extends AbstractApi
             $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        if (WebApp::getRequestMethod() !== 'POST') {
             $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
             return;
         }

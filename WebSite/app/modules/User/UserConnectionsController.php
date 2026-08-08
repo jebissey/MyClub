@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\modules\User;
 
 use app\helpers\Application;
+use app\helpers\WebApp;
 use app\models\ParticipantDataHelper;
 use app\modules\Common\AbstractController;
 use app\valueObjects\Person;
@@ -38,7 +39,7 @@ class UserConnectionsController extends AbstractController
             $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
-        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+        if (WebApp::getRequestMethod() !== 'GET') {
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }

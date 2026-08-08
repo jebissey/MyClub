@@ -71,17 +71,36 @@ class PwaController extends AbstractController
             return;
         }
 
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        if (WebApp::getRequestMethod() !== 'POST') {
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
 
-        $title = $_POST['title'] ?? '';
-        $text  = $_POST['text'] ?? '';
+        $title = isset($_POST['title']) && is_string($_POST['title'])
+            ? $_POST['title']
+            : '';
+
+        $text = isset($_POST['text']) && is_string($_POST['text'])
+            ? $_POST['text']
+            : '';
+
+        $files = null;
+
+        if (isset($_FILES['files']) && is_array($_FILES['files'])) {
+            /** @var array{
+             *     tmp_name?: array<int, string>,
+             *     error: array<int, int>,
+             *     name: array<int, string>,
+             *     type: array<int, string>,
+             *     size: array<int, int>
+             * } $files
+             */
+            $files = $_FILES['files'];
+        }
 
         $articleId = $this->articleService->createWithMedia(
             $user->person->Id ?? 0,
-            $_FILES['files'] ?? null,
+            $files,
             $title,
             $text
         );

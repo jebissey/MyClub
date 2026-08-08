@@ -6,6 +6,7 @@ namespace app\apis;
 
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
+use app\helpers\WebApp;
 use app\models\DataHelper;
 use app\models\LoanDataHelper;
 use app\models\PersonDataHelper;
@@ -46,7 +47,7 @@ class LoanApi extends AbstractApi
     {
         if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isLoanDesigner(), __FILE__, __LINE__)) {
             $data = $this->getJsonInput();
-            $name = trim($data['name'] ?? '');
+            $name = trim(WebApp::toStr($data['name'] ?? ''));
             if ($name === '') {
                 $this->renderJsonBadRequest("Name is required", __FILE__, __LINE__);
                 return;
@@ -74,7 +75,7 @@ class LoanApi extends AbstractApi
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isLoanDesigner(), __FILE__, __LINE__)) {
             $this->loanDataHelper->updateOverdueLoans();
-            $status = $_GET['status'] ?? '';
+            $status = WebApp::toStr($_GET['status'] ?? '');
             $this->renderJsonOk($this->loanDataHelper->getAllLoans($status));
         }
     }
@@ -102,12 +103,12 @@ class LoanApi extends AbstractApi
                 }
             }
             $available = $this->loanDataHelper->getAvailableQtyForLoan(
-                (int)$data['itemId'],
-                $data['loanDate'],
-                $data['dueDate'],
-                empty($data['id']) ? null : (int)$data['id']
+                WebApp::toInt($data['itemId']),
+                WebApp::toStr($data['loanDate']),
+                WebApp::toStr($data['dueDate']),
+                empty($data['id']) ? null : WebApp::toInt($data['id'])
             );
-            if ($available < (int)$data['quantity']) {
+            if ($available < WebApp::toInt($data['quantity'])) {
                 $this->renderJsonBadRequest('Requested quantity exceeds available stock.', __FILE__, __LINE__);
                 return;
             }
@@ -121,8 +122,8 @@ class LoanApi extends AbstractApi
     {
         if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isLoanManager(), __FILE__, __LINE__)) {
             $data        = $this->getJsonInput();
-            $returnDate  = $data['returnDate'] ?? date('Y-m-d');
-            $returnedTo  = (int)($data['returnedToId'] ?? 0);
+            $returnDate  = WebApp::toStr($data['returnDate'] ?? date('Y-m-d'));
+            $returnedTo  = WebApp::toInt($data['returnedToId'] ?? 0);
 
             if ($returnedTo === 0) {
                 $this->renderJsonBadRequest("Invalid returnedToId", __FILE__, __LINE__);
@@ -196,13 +197,13 @@ class LoanApi extends AbstractApi
 
             // Contrôle disponibilité
             $available = $this->loanDataHelper->getAvailableQtyForReservation(
-                (int)$data['itemId'],
-                $data['reservationDate'],
-                $data['startTime'],
-                $data['endTime'],
-                empty($data['id']) ? null : (int)$data['id']
+                WebApp::toInt($data['itemId']),
+                WebApp::toStr($data['reservationDate']),
+                WebApp::toStr($data['startTime']),
+                WebApp::toStr($data['endTime']),
+                empty($data['id']) ? null : WebApp::toInt($data['id'])
             );
-            if ($available < (int)$data['quantity']) {
+            if ($available < WebApp::toInt($data['quantity'])) {
                 $this->renderJsonError(
                     'Requested quantity exceeds available stock.',
                     409,
@@ -239,8 +240,8 @@ class LoanApi extends AbstractApi
     public function getCalendarEvents(): void
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isConnected(), __FILE__, __LINE__)) {
-            $start = $_GET['start'] ?? date('Y-m-01');
-            $end   = $_GET['end']   ?? date('Y-m-t');
+            $start = WebApp::toStr($_GET['start'] ?? date('Y-m-01'));
+            $end   = WebApp::toStr($_GET['end']   ?? date('Y-m-t'));
             $this->renderJsonOk(
                 $this->loanDataHelper->getCalendarEvents($start, $end)
             );
@@ -250,13 +251,13 @@ class LoanApi extends AbstractApi
     public function getAvailability(int $itemId): void
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isLoanDesigner(), __FILE__, __LINE__)) {
-            $type  = $_GET['type'] ?? 'loan';
-            $date  = $_GET['date'] ?? date('Y-m-d');
-            $start = $_GET['start'] ?? '00:00';
-            $end   = $_GET['end']   ?? '23:59';
+            $type  = WebApp::toStr($_GET['type'] ?? 'loan');
+            $date  = WebApp::toStr($_GET['date'] ?? date('Y-m-d'));
+            $start = WebApp::toStr($_GET['start'] ?? '00:00');
+            $end   = WebApp::toStr($_GET['end']   ?? '23:59');
 
             if ($type === 'loan') {
-                $due  = $_GET['dueDate'] ?? $date;
+                $due  = WebApp::toStr($_GET['dueDate'] ?? $date);
                 $qty  = $this->loanDataHelper->getAvailableQtyForLoan($itemId, $date, $due);
             } else {
                 $qty  = $this->loanDataHelper->getAvailableQtyForReservation($itemId, $date, $start, $end);

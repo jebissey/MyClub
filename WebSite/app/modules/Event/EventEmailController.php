@@ -27,7 +27,7 @@ class EventEmailController extends AbstractController
             $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
-        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+        if (WebApp::getRequestMethod() !== 'GET') {
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
@@ -46,7 +46,7 @@ class EventEmailController extends AbstractController
             $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        if (WebApp::getRequestMethod() !== 'POST') {
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
@@ -56,10 +56,20 @@ class EventEmailController extends AbstractController
             'idGroup' => FilterInputRule::Int->value,
             'idEventType' => FilterInputRule::Int->value,
         ];
-        $input = WebApp::filterInput($schema, $this->flight->request()->data->getData());
-        $idGroup = isset($input['idGroup']) ? (int) $input['idGroup'] : null;
-        $idEventType = isset($input['idEventType']) ? (int) $input['idEventType'] : null;
-        $dayOfWeek = isset($input['dayOfWeek']) ? (int) $input['dayOfWeek'] : null;
+        /** @var array{
+         *     dayOfWeek?: int,
+         *     timeOfDay?: string,
+         *     idGroup?: int,
+         *     idEventType?: int
+         * } $input */
+        $input = WebApp::filterInput(
+            $schema,
+            $this->flight->request()->data->getData()
+        );
+
+        $idGroup = $input['idGroup'] ?? null;
+        $idEventType = $input['idEventType'] ?? null;
+        $dayOfWeek = $input['dayOfWeek'] ?? null;
         $timeOfDay = $input['timeOfDay'] ?? '';
         $filteredEmails = $this->personDataHelper->getEmailsOfInterestedPeople($idGroup, $idEventType, $dayOfWeek, $timeOfDay);
         $groupName = $idGroup != null ? $this->dataHelper->get('Group', ['Id' => $idGroup], 'Name')->Name ?? '' : '';

@@ -35,12 +35,15 @@ class UserDirectoryController extends AbstractController
             $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
-        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+        if (WebApp::getRequestMethod() !== 'GET') {
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
         $groupParam = $this->flight->request()->query['group'] ?? null;
-        $selectedGroup = ($groupParam !== null && ctype_digit((string)$groupParam)) ? (int)$groupParam : null;
+        $selectedGroup = null;
+        if (is_string($groupParam) && ctype_digit($groupParam)) {
+            $selectedGroup = (int) $groupParam;
+        }
         if ($selectedGroup) {
             $persons = $this->personDataHelper->getPersonsInGroupForDirectory($selectedGroup);
         } else {
@@ -93,7 +96,7 @@ class UserDirectoryController extends AbstractController
             $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
-        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+        if (WebApp::getRequestMethod() !== 'GET') {
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
@@ -122,7 +125,7 @@ class UserDirectoryController extends AbstractController
     {
         $person = $this->application->getConnectedUser()->person;
 
-        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+        if (WebApp::getRequestMethod() !== 'GET') {
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }

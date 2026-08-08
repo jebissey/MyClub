@@ -65,7 +65,7 @@ class MessageApi extends AbstractApi
             $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        if (WebApp::getRequestMethod() !== 'POST') {
             $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
@@ -80,13 +80,16 @@ class MessageApi extends AbstractApi
         }
 
         try {
-            $articleId = isset($data['articleId']) && $data['articleId'] !== '' ? (int)$data['articleId'] : null;
-            $eventId   = isset($data['eventId'])   && $data['eventId']   !== '' ? (int)$data['eventId']   : null;
-            $groupId   = isset($data['groupId'])   && $data['groupId']   !== '' ? (int)$data['groupId']   : null;
+            $articleId = isset($data['articleId']) && $data['articleId'] !== '' ? WebApp::toInt($data['articleId']) : null;
+            $eventId   = isset($data['eventId'])   && $data['eventId']   !== '' ? WebApp::toInt($data['eventId'])   : null;
+            $groupId   = isset($data['groupId'])   && $data['groupId']   !== '' ? WebApp::toInt($data['groupId'])   : null;
 
             $imagePath = null;
             if (!empty($data['imageBase64'])) {
-                $imagePath = $this->handleMessageImageBase64((string)$data['imageBase64'], (string)($data['imageName'] ?? ''));
+                $imagePath = $this->handleMessageImageBase64(
+                    WebApp::toStr($data['imageBase64']),
+                    WebApp::toStr($data['imageName'] ?? '')
+                );
                 if ($imagePath === null) {
                     $this->renderJsonBadRequest('Image invalide ou trop volumineuse', __FILE__, __LINE__);
                     return;
@@ -98,13 +101,13 @@ class MessageApi extends AbstractApi
                 $eventId,
                 $groupId,
                 $this->application->getConnectedUser()->person->Id,
-                (string)$data['text'],
-                $imagePath !== null ? Webapp::getBaseUrl() . $imagePath : null,
+                WebApp::toStr($data['text']),
+                $imagePath !== null ? WebApp::getBaseUrl() . $imagePath : null,
             );
 
             if ($apiResponse->success === true && isset($apiResponse->data['messageId'])) {
                 $this->notifyMessageRecipients(
-                    (int)$apiResponse->data['messageId'],
+                    WebApp::toInt($apiResponse->data['messageId']),
                     $articleId,
                     $eventId,
                     $groupId
@@ -123,13 +126,13 @@ class MessageApi extends AbstractApi
             $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        if (WebApp::getRequestMethod() !== 'POST') {
             $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
         try {
             $data = $this->getJsonInput();
-            $apiResponse = $this->doDeleteMessage((int)$data['messageId'], $this->application->getConnectedUser()->person->Id);
+            $apiResponse = $this->doDeleteMessage(WebApp::toInt($data['messageId']), $this->application->getConnectedUser()->person->Id);
             $this->renderJson($apiResponse->data, $apiResponse->success, $apiResponse->responseCode);
         } catch (Throwable $e) {
             $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
@@ -143,7 +146,7 @@ class MessageApi extends AbstractApi
             return;
         }
 
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        if (WebApp::getRequestMethod() !== 'POST') {
             $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
@@ -151,7 +154,7 @@ class MessageApi extends AbstractApi
         try {
             $data = $this->getJsonInput();
 
-            $messageId = (int)($data['messageId'] ?? 0);
+            $messageId = WebApp::toInt($data['messageId'] ?? 0);
             if ($messageId <= 0) {
                 throw new InvalidArgumentException("messageId invalide");
             }
@@ -182,7 +185,7 @@ class MessageApi extends AbstractApi
             $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        if (WebApp::getRequestMethod() !== 'POST') {
             $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
@@ -191,7 +194,7 @@ class MessageApi extends AbstractApi
             $this->renderJsonBadRequest('Données manquantes', __FILE__, __LINE__);
             return;
         }
-        $message = $this->dataHelper->get('Message', ['Id' => (int)$data['messageId']], 'Id');
+        $message = $this->dataHelper->get('Message', ['Id' => WebApp::toInt($data['messageId'])], 'Id');
         if (!$message) {
             $this->renderJsonBadRequest('Message introuvable', __FILE__, __LINE__);
             return;
@@ -199,9 +202,9 @@ class MessageApi extends AbstractApi
         try {
             $data = $this->getJsonInput();
             $apiResponse = $this->doUpdateMessage(
-                (int)$data['messageId'],
+                WebApp::toInt($data['messageId']),
                 $this->application->getConnectedUser()->person->Id,
-                $data['text']
+                WebApp::toStr($data['text'])
             );
             $this->renderJson($apiResponse->data, $apiResponse->success, $apiResponse->responseCode);
         } catch (Throwable $e) {

@@ -38,8 +38,8 @@ class LogDataAnalyticsHelper extends Data
                 ':startDate' => $period['start'],
                 ':endDate'   => $period['end'],
             ]);
-
             $data = $query->fetch(PDO::FETCH_OBJ);
+            /** @var object{uniqueVisitors: int, pageViews: int, views2xx: int, views3xx: int, views4xx: int, views5xx: int} $data */
 
             $item = [
                 'label'          => $this->formatPeriodLabel($period, $periodType),
@@ -113,6 +113,7 @@ class LogDataAnalyticsHelper extends Data
         }
 
         $range = $query->fetch(PDO::FETCH_OBJ);
+        /** @var object{first: string|null, last: string|null}|false $range */
 
         if ($range === false || $range->first === null || $range->last === null) {
             throw new \RuntimeException('Aucune donnée disponible dans le journal.');

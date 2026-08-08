@@ -38,7 +38,7 @@ class EventController extends AbstractController
 
     public function nextEventsHelp(): void
     {
-        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+        if (WebApp::getRequestMethod() !== 'GET') {
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
@@ -64,8 +64,12 @@ class EventController extends AbstractController
             'filterByPreferences' => FilterInputRule::Int->value,
         ];
         $input = WebApp::filterInput($schema, $this->flight->request()->query->getData());
-        $offset = $input['offset'] ?? 0;
-        $mode = $input['mode'] ?? EventSearchMode::Next->value;
+        $offset = isset($input['offset']) && is_int($input['offset'])
+            ? $input['offset']
+            : 0;
+        $mode = isset($input['mode']) && is_string($input['mode'])
+            ? $input['mode']
+            : EventSearchMode::Next->value;
         if ($offset < 0) {
             $offset = 0;
             $mode = EventSearchMode::Next->value;
@@ -74,7 +78,7 @@ class EventController extends AbstractController
         $connectedUser = $this->application->getConnectedUser();
 
         $this->render('Event/views/nextEvents.latte', $this->getAllParams([
-            'events' => $this->eventDataHelper->getEvents($connectedUser->person, $mode, (int)$offset, $filterByPreferences),
+            'events' => $this->eventDataHelper->getEvents($connectedUser->person, $mode, $offset, $filterByPreferences),
             'person' => $connectedUser->person,
             'eventTypes' => $this->dataHelper->gets('EventType', ['Inactivated' => 0], 'Id, Name'),
             'needTypes' => $this->dataHelper->gets('NeedType', [], 'Id, Name'),
@@ -92,7 +96,7 @@ class EventController extends AbstractController
 
     public function weekEvents(): void
     {
-        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+        if (WebApp::getRequestMethod() !== 'GET') {
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
@@ -142,10 +146,10 @@ class EventController extends AbstractController
             $result = $this->application->getAuthenticationService()->handleRememberMeLogin();
             if ($result && $result->isSuccess()) {
                 $this->application->getConnectedUser()->get();
-                $this->redirect($_SERVER['REQUEST_URI'], ApplicationError::Ok, "Auto sign in succeeded for {$result->getUser()?->Email}");
+                $this->redirect(WebApp::toStr($_SERVER['REQUEST_URI']), ApplicationError::Ok, "Auto sign in succeeded for {$result->getUser()?->Email}");
                 return;
             }
-            $this->redirect('/user/sign/in?redirect=' . urlencode($_SERVER['REQUEST_URI']));
+            $this->redirect('/user/sign/in?redirect=' . urlencode(WebApp::toStr($_SERVER['REQUEST_URI'])));
         }
 
         $userEmail = $person->Email ?? '';
@@ -184,7 +188,7 @@ class EventController extends AbstractController
 
     private function register(int $eventId, bool $set, ?string $token = null): void
     {
-        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+        if (WebApp::getRequestMethod() !== 'GET') {
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
@@ -328,7 +332,7 @@ class EventController extends AbstractController
             $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
-        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+        if (WebApp::getRequestMethod() !== 'GET') {
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
@@ -338,6 +342,9 @@ class EventController extends AbstractController
             return;
         }
         $person = $this->application->getConnectedUser()->person;
+        $lastLogId = isset($_SESSION['last_log_id']) && is_int($_SESSION['last_log_id'])
+            ? $_SESSION['last_log_id']
+            : 0;
         $this->render('Common/views/chat.latte', $this->getAllParams([
             'article' => null,
             'event' => $event,
@@ -348,7 +355,7 @@ class EventController extends AbstractController
             'page' => $this->application->getConnectedUser()->getPage(),
             'btn_HistoryBack' => true,
             'btn_Parent'      => "/event/{$eventId}",
-            'newMessages' => $this->messageDataHelper->hasNewMessages($person->Id, (int)($_SESSION['last_log_id'] ?? 0)),
+            'newMessages' => $this->messageDataHelper->hasNewMessages($person->Id, $lastLogId),
         ]));
     }
 }

@@ -24,7 +24,7 @@ class UserController extends AbstractController
 
     public function forgotPassword(string $encodedEmail): void
     {
-        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+        if (WebApp::getRequestMethod() !== 'GET') {
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
@@ -77,19 +77,19 @@ class UserController extends AbstractController
 
     public function setPassword(string $token): void
     {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        if (WebApp::getRequestMethod() === 'POST') {
             $newPassword = WebApp::getFiltered('password', FilterInputRule::Password->value, $this->flight->request()->data->getData());
-            if (!$newPassword) {
+            if (!is_string($newPassword) || $newPassword === '') {
                 $this->raiseBadRequest('Invalid password format', __FILE__, __LINE__);
             } elseif ($this->authService->resetPassword($token, $newPassword)) {
                 $this->redirect('/', ApplicationError::Ok, 'Votre mot de passe est réinitialisé');
             } else {
                 $this->raiseBadRequest('Invalid or expired token', __FILE__, __LINE__);
             }
-        } elseif ($_SERVER['REQUEST_METHOD'] === 'GET') {
+        } elseif (WebApp::getRequestMethod() === 'GET') {
             $this->render('User/views/user_set_password.latte', $this->getAllParams([
-            'token' => $token,
-            'page' => $this->application->getConnectedUser()->getPage()
+                'token' => $token,
+                'page' => $this->application->getConnectedUser()->getPage()
             ]));
         } else {
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
@@ -98,8 +98,9 @@ class UserController extends AbstractController
 
     public function signIn(): void
     {
-        $redirect = $this->flight->request()->query->getData()['redirect'] ?? '/';
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $redirectRaw = $this->flight->request()->query->getData()['redirect'] ?? '/';
+        $redirect = is_string($redirectRaw) ? $redirectRaw : '/';
+        if (WebApp::getRequestMethod() === 'POST') {
             $result = $this->authService->handleSignIn($this->flight->request()->data->getData());
             if ($result->isSuccess()) {
                 $this->application->getConnectedUser()->get();
@@ -107,7 +108,7 @@ class UserController extends AbstractController
             } else {
                 $this->raiseBadRequest($result->getError(), __FILE__, __LINE__);
             }
-        } elseif ($_SERVER['REQUEST_METHOD'] === 'GET') {
+        } elseif (WebApp::getRequestMethod() === 'GET') {
             $rememberMeResult = $this->authService->handleRememberMeLogin();
             if ($rememberMeResult && $rememberMeResult->isSuccess()) {
                 $this->redirect($redirect, ApplicationError::Ok, "Auto sign in succeeded for {$rememberMeResult->getUser()?->Email}");
@@ -140,11 +141,12 @@ class UserController extends AbstractController
             $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
-        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+        if (WebApp::getRequestMethod() !== 'GET') {
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
-        $userEmail = $_SESSION['user'] ?? '';
+        $userEmailRaw = $_SESSION['user'] ?? '';
+        $userEmail = is_string($userEmailRaw) ? $userEmailRaw : '';
         $this->authService->signOut();
         $this->application->getConnectedUser()->get();
         $this->redirect('/', ApplicationError::Ok, "Sign out succeeded for {$userEmail}");

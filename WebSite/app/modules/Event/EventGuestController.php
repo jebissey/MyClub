@@ -53,31 +53,31 @@ class EventGuestController extends AbstractController
             $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        if (WebApp::getRequestMethod() === 'POST') {
             $schema = [
                 'email' => FilterInputRule::Email->value,
                 'nickname' => FilterInputRule::PersonName->value,
                 'eventId' => FilterInputRule::Int->value,
             ];
             $input = WebApp::filterInput($schema, $this->flight->request()->data->getData());
-            $email = $input['email'] ?? '';
+            $email = WebApp::toStr($input['email'] ?? '');
             if (empty($email)) {
                 $this->guest('Adresse e-mail invalide', 'error');
                 return;
             }
-            $eventId = $input['eventId'] ?? 0;
+            $eventId = WebApp::toInt($input['eventId'] ?? 0);
             if ($eventId <= 0) {
                 $this->guest('Veuillez sélectionner un événement', 'error');
                 return;
             }
-            $event = $this->eventDataHelper->getEventExternal((int)$eventId);
+            $event = $this->eventDataHelper->getEventExternal($eventId);
             if ($event === null) {
                 $this->guest('Événement non trouvé ou non accessible', 'error');
                 return;
             }
-            $nickname = $input['nickname'] ?? '???';
+            $nickname = WebApp::toStr($input['nickname'] ?? '???');
             try {
-                /** @var object{Id: int|string, Token: string, NickName: string, TokenCreatedAt: string}|false $contactData */$contactData = $this->dataHelper->get('Contact', ['Email' => $email], 'Id, Token, NickName, TokenCreatedAt');
+                /** @var object{Id: int|string, Token: string, NickName: string, TokenCreatedAt: string}|false $contactData */ $contactData = $this->dataHelper->get('Contact', ['Email' => $email], 'Id, Token, NickName, TokenCreatedAt');
                 $contact = $contactData ? ContactRow::fromStdClass($contactData) : null;
                 if (!$contact) {
                     $token = bin2hex(random_bytes(32));

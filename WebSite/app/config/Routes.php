@@ -489,10 +489,10 @@ class Routes
      */
     private function serveStaticFile(ErrorManager $errorManager, array $config): void
     {
-        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+        if (WebApp::getRequestMethod() !== 'GET') {
             $errorManager->raise(
                 ApplicationError::MethodNotAllowed,
-                'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__
+                'Method ' . WebApp::getRequestMethod() . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__
             );
             return;
         }

@@ -31,7 +31,7 @@ class CarouselApi extends AbstractApi
 
     public function deleteItem(int $id): void
     {
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        if (WebApp::getRequestMethod() !== 'POST') {
             $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
             return;
         }

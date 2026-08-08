@@ -13,6 +13,7 @@ use app\enums\ApplicationError;
 use app\enums\TimeOfDay;
 use app\helpers\Application;
 use app\helpers\Params;
+use app\helpers\WebApp;
 use app\helpers\TranslationManager;
 use app\models\AuthorizationDataHelper;
 use app\models\DataHelper;
@@ -248,7 +249,7 @@ abstract class AbstractController
     {
         $this->application->getErrorManager()->raise(
             ApplicationError::MethodNotAllowed,
-            "Method {$_SERVER['REQUEST_METHOD']} not allowed in file {$file} at line {$line}"
+            "Method {WebApp::getRequestMethod()} not allowed in file {$file} at line {$line}"
         );
     }
 
@@ -311,7 +312,7 @@ abstract class AbstractController
 
     protected function userIsAllowedAndMethodIsGood(string $method, callable $permissionCheck, string $file, int $line): bool
     {
-        if ($_SERVER['REQUEST_METHOD'] !== $method) {
+        if (WebApp::getRequestMethod() !== $method) {
             $this->raiseMethodNotAllowed($file, $line);
             return false;
         }
@@ -328,16 +329,6 @@ abstract class AbstractController
             return false;
         }
         return true;
-    }
-
-    protected static function toInt(mixed $value, int $default = 0): int
-    {
-        return is_int($value) ? $value : (is_numeric($value) ? (int) $value : $default);
-    }
-
-    protected static function toStr(mixed $value, string $default = ''): string
-    {
-        return is_scalar($value) ? (string)$value : $default;
     }
 
     #region Public functions

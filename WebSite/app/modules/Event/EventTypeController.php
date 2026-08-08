@@ -28,7 +28,7 @@ class EventTypeController extends TableController
             $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
-        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+        if (WebApp::getRequestMethod() !== 'GET') {
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
@@ -130,11 +130,23 @@ class EventTypeController extends TableController
                 'attributes' => FilterInputRule::ArrayInt->value
             ];
             $input = WebApp::filterInput($schema, $this->flight->request()->data->getData());
+
+            $name = WebApp::toStr($input['name'] ?? '???');
+
+            $idGroup = isset($input['idGroup'])
+                ? WebApp::toInt($input['idGroup'])
+                : null;
+
+            $rawAttributes = $input['attributes'] ?? [];
+            $attributes = is_array($rawAttributes)
+                ? array_values(array_map(static fn($a): int => WebApp::toInt($a), $rawAttributes))
+                : [];
+
             $this->eventTypeDataHelper->update(
                 $id,
-                $input['name'] ?? '???',
-                $input['idGroup'] === null ? null : (int)$input['idGroup'],
-                $input['attributes'] ?? []
+                $name,
+                $idGroup,
+                $attributes
             );
             $this->redirect('/EventTypes');
         }

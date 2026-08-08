@@ -48,9 +48,9 @@ class MediaApi extends AbstractApi
     {
         if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isRedactor(), __FILE__, __LINE__)) {
             $data = $this->getJsonInput();
-            $path      = $data['path']      ?? '';
-            $imageData = $data['imageData'] ?? '';  // data:image/jpeg;base64,...
-            $maxSize   = min((int)($data['maxSize'] ?? 1200), 1200);
+            $path      = WebApp::toStr($data['path'] ?? '');
+            $imageData = WebApp::toStr($data['imageData'] ?? '');  // data:image/jpeg;base64,...
+            $maxSize   = min(WebApp::toInt($data['maxSize'] ?? 1200), 1200);
 
             if (!preg_match('#^[\w/-]+\.(jpg|jpeg|png|gif)$#i', $path)) {
                 $this->renderJsonError(
@@ -82,7 +82,7 @@ class MediaApi extends AbstractApi
                 );
                 return;
             }
-            $binary = base64_decode(preg_replace('#^data:image/\w+;base64,#', '', $imageData));
+            $binary = base64_decode(preg_replace('#^data:image/\w+;base64,#', '', $imageData) ?? '');
             $img    = imagecreatefromstring($binary);
             if (!$img) {
                 $this->renderJsonError(
@@ -123,7 +123,7 @@ class MediaApi extends AbstractApi
     public function isShared(): void
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isRedactor(), __FILE__, __LINE__)) {
-            $filePath = trim($_GET['path']  ?? '');
+            $filePath = trim(WebApp::toStr($_GET['path'] ?? ''));
             if (!$filePath) {
                 $this->renderJsonBadRequest('Fichier manquant', __FILE__, __LINE__);
                 return;
@@ -136,7 +136,7 @@ class MediaApi extends AbstractApi
     {
         if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isRedactor(), __FILE__, __LINE__)) {
             $data = $this->getJsonInput();
-            $filePath = trim($data['path'] ?? '');
+            $filePath = trim(WebApp::toStr($data['path'] ?? ''));
             if (!$filePath) {
                 $this->renderJsonBadRequest('Missing path', __FILE__, __LINE__);
                 return;
@@ -155,8 +155,8 @@ class MediaApi extends AbstractApi
         if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isRedactor(), __FILE__, __LINE__)) {
             $data = $this->getJsonInput();
 
-            $path = $data['path'] ?? null;
-            if (!$path) {
+            $path = WebApp::toStr($data['path'] ?? '');
+            if ($path === '') {
                 $this->renderJsonBadRequest('Missing path', __FILE__, __LINE__);
                 return;
             }
@@ -167,12 +167,15 @@ class MediaApi extends AbstractApi
             }
             [$year, $month, $filename] = $parts;
 
+            $idGroupRaw = $data['idGroup'] ?? null;
+            $idGroup    = is_scalar($idGroupRaw) ? (int)$idGroupRaw : null;
+
             $response = $this->mediaManager->sharefile(
                 (int)$year,
                 (int)$month,
                 $filename,
-                WebApp::nullableCast($data['idGroup'] ?? null, 'int'),
-                $data['membersOnly']
+                $idGroup,
+                WebApp::toInt($data['membersOnly'] ?? 0)
             );
 
             $this->renderJson(
@@ -186,21 +189,39 @@ class MediaApi extends AbstractApi
     public function uploadFile(): void
     {
         if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isRedactor(), __FILE__, __LINE__)) {
-            if (empty($_FILES['file'])) {
+            if (empty($_FILES['file']) || !is_array($_FILES['file'])) {
                 $this->renderJson(['message' => 'Aucun fichier sélectionné'], false, ApplicationError::Ok->value);
                 return;
             }
+
+            /** @var array{name: mixed, tmp_name: mixed, error: mixed, size: mixed, type: mixed} $raw */
             $raw = $_FILES['file'];
+
             if (is_array($raw['name'])) {
-                $files = array_map(fn($i) => [
-                    'name'     => $raw['name'][$i],
-                    'tmp_name' => $raw['tmp_name'][$i],
-                    'error'    => $raw['error'][$i],
-                    'size'     => $raw['size'][$i],
-                    'type'     => $raw['type'][$i],
-                ], array_keys($raw['name']));
+                $names    = $raw['name'];
+                $tmpNames = is_array($raw['tmp_name']) ? $raw['tmp_name'] : [];
+                $errors   = is_array($raw['error']) ? $raw['error'] : [];
+                $sizes    = is_array($raw['size']) ? $raw['size'] : [];
+                $types    = is_array($raw['type']) ? $raw['type'] : [];
+
+                $files = array_map(
+                    fn($i) => [
+                        'name'     => WebApp::toStr($names[$i] ?? ''),
+                        'tmp_name' => WebApp::toStr($tmpNames[$i] ?? ''),
+                        'error'    => WebApp::toInt($errors[$i] ?? UPLOAD_ERR_NO_FILE),
+                        'size'     => WebApp::toInt($sizes[$i] ?? 0),
+                        'type'     => WebApp::toStr($types[$i] ?? ''),
+                    ],
+                    array_keys($names)
+                );
             } else {
-                $files = [$raw];
+                $files = [[
+                    'name'     => WebApp::toStr($raw['name'] ?? ''),
+                    'tmp_name' => WebApp::toStr($raw['tmp_name'] ?? ''),
+                    'error'    => WebApp::toInt($raw['error'] ?? UPLOAD_ERR_NO_FILE),
+                    'size'     => WebApp::toInt($raw['size'] ?? 0),
+                    'type'     => WebApp::toStr($raw['type'] ?? ''),
+                ]];
             }
 
             foreach ($files as $file) {

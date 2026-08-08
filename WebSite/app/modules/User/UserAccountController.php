@@ -23,7 +23,7 @@ class UserAccountController extends AbstractController
             $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
-        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+        if (WebApp::getRequestMethod() !== 'GET') {
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
@@ -59,7 +59,7 @@ class UserAccountController extends AbstractController
             $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        if (WebApp::getRequestMethod() !== 'POST') {
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
@@ -80,7 +80,8 @@ class UserAccountController extends AbstractController
             'useGravatar' => $input['useGravatar'] ?? YesNo::No->value,
         ], ['Id' => $person->Id]);
         if ($person->Imported == 0) {
-            $email = urldecode($input['email'] ?? '');
+            $emailInput = $input['email'] ?? '';
+            $email = is_string($emailInput) ? urldecode($emailInput) : '';
             $this->dataHelper->set('Person', ['Email' => $email], ['Id' => $person->Id]);
             $_SESSION['user'] = $email;
         }

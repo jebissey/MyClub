@@ -152,6 +152,22 @@ class WebApp
         return $data;
     }
 
+    public static function toInt(mixed $value, int $default = 0): int
+    {
+        return is_int($value) ? $value : (is_numeric($value) ? (int) $value : $default);
+    }
+
+    public static function toStr(mixed $value, string $default = ''): string
+    {
+        return is_scalar($value) ? (string)$value : $default;
+    }
+
+    public static function getRequestMethod(): string
+    {
+        $method = $_SERVER['REQUEST_METHOD'] ?? null;
+        return is_string($method) ? $method : 'UNKNOWN';
+    }
+
     #region Private functions
     /**
      * @param string|list<string> $rule

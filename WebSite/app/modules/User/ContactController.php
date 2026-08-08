@@ -35,7 +35,7 @@ class ContactController extends AbstractController
 
     public function contact(?int $eventId = null): void
     {
-        if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+        if (WebApp::getRequestMethod() === 'GET') {
             $_SESSION['contact_form_loaded'] = time();
 
             $event = null;
@@ -54,7 +54,7 @@ class ContactController extends AbstractController
                 'btn_HistoryBack' => true,
 
             ]));
-        } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        } elseif (WebApp::getRequestMethod() === 'POST') {
             $this->handleContactForm();
         } else {
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
@@ -64,13 +64,13 @@ class ContactController extends AbstractController
     #region Private functions
     private function handleContactForm(): void
     {
-        $honeypot = self::toStr($_POST['website'] ?? '');
+        $honeypot = WebApp::toStr($_POST['website'] ?? '');
         if ($honeypot !== '') {
             $this->silentFail("honey pot field filling with {$honeypot}");
             return;
         }
 
-        $formLoadedAt = self::toInt($_SESSION['contact_form_loaded'] ?? 0);
+        $formLoadedAt = WebApp::toInt($_SESSION['contact_form_loaded'] ?? 0);
         $duration = time() - $formLoadedAt;
         if ($duration <= self::MIN_FILL_SECONDS) {
             $this->silentFail("too fast for a human ({$duration}s)");
@@ -78,13 +78,13 @@ class ContactController extends AbstractController
         }
         unset($_SESSION['contact_form_loaded']);
 
-        $ip = self::toStr($_SERVER['REMOTE_ADDR'] ?? 'unknown');
+        $ip = WebApp::toStr($_SERVER['REMOTE_ADDR'] ?? 'unknown');
         if (!$this->checkRateLimit($ip)) {
             $this->silentFail('too many attempts');
             return;
         }
 
-        $turnstileToken = self::toStr($_POST['cf-turnstile-response'] ?? '');
+        $turnstileToken = WebApp::toStr($_POST['cf-turnstile-response'] ?? '');
         if (!$this->verifyTurnstile($turnstileToken, $ip)) {
             $this->silentFail('turnstile challenge failed');
             return;
@@ -98,11 +98,11 @@ class ContactController extends AbstractController
         ];
 
         $input   = WebApp::filterInput($schema, $this->flight->request()->data->getData());
-        $name    = self::toStr($input['name']    ?? '');
-        $email   = self::toStr($input['email']   ?? '');
-        $message = self::toStr($input['message'] ?? '');
+        $name    = WebApp::toStr($input['name']    ?? '');
+        $email   = WebApp::toStr($input['email']   ?? '');
+        $message = WebApp::toStr($input['message'] ?? '');
         $eventIdRaw = $input['eventId'] ?? null;
-        $eventId = $eventIdRaw !== null ? self::toInt($eventIdRaw) : null;
+        $eventId = $eventIdRaw !== null ? WebApp::toInt($eventIdRaw) : null;
 
         $errors = [];
         if (empty($name)) {

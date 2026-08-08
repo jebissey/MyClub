@@ -85,7 +85,9 @@ class ExerciseController extends TableController
             ['field' => 'ForMembers', 'label' => 'Club'],
         ];
         $query = $this->exerciseTableDataHelper->getQuery($connectedUser);
-        $data = $this->prepareTableData($query, $filterValues);
+        /** @var array<string, string> $stringFilterValues */
+        $stringFilterValues = array_map(static fn(mixed $v): string => WebApp::toStr($v), $filterValues);
+        $data = $this->prepareTableData($query, $stringFilterValues);
         $this->render('Exercise/views/exercises_index.latte', $this->getAllParams([
             'exercises' => $data['items'],
             'currentPage' => $data['currentPage'],
@@ -120,6 +122,7 @@ class ExerciseController extends TableController
         }
 
         $rawJson = $this->flight->request()->data->getData()['exercises'] ?? '[]';
+        $rawJson = is_string($rawJson) ? $rawJson : '[]';
         $exercises = json_decode($rawJson, true);
 
         if (!is_array($exercises)) {
@@ -128,7 +131,8 @@ class ExerciseController extends TableController
             return;
         }
 
-        $title = trim($this->flight->request()->data->getData()['title'] ?? '');
+        $titleRaw = $this->flight->request()->data->getData()['title'] ?? '';
+        $title = trim(WebApp::toStr($titleRaw));
 
         $this->dataHelper->set('Exercise', [
             'Title'      => $title ?: 'Exercices',

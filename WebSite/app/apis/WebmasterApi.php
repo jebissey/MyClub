@@ -10,6 +10,7 @@ use Throwable;
 use app\enums\ApplicationError;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
+use app\helpers\WebApp;
 use app\models\DataHelper;
 use app\models\LogDataWriterHelper;
 use app\models\PersonDataHelper;
@@ -41,7 +42,7 @@ class WebmasterApi extends AbstractApi
 
     public function lastVersion(): void
     {
-        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+        if (WebApp::getRequestMethod() !== 'GET') {
             $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
@@ -97,7 +98,7 @@ class WebmasterApi extends AbstractApi
 
     public function subscribePush(): void
     {
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        if (WebApp::getRequestMethod() !== 'POST') {
             $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
             return;
         }

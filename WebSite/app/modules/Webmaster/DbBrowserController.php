@@ -82,6 +82,7 @@ class DbBrowserController extends TableController
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isWebmaster(), __FILE__, __LINE__)) {
             $schema = $this->dbBrowserDataHelper->generateFilterSchema($table);
+            /** @var array<string, list<string>|string> $schema */
             $filterConfig = $this->dbBrowserDataHelper->generateFilterConfig($table);
             $columns = array_map(
                 fn($col) => [
@@ -91,6 +92,7 @@ class DbBrowserController extends TableController
                 $filterConfig
             );
             $filterValues = WebApp::filterInput($schema, $this->flight->request()->query->getData());
+            /** @var array<string, string> $filterValues */
             $data = $this->prepareTableData($this->dbBrowserDataHelper->getQuery($table), $filterValues);
 
             $this->render('Webmaster/views/dbbrowser/table.latte', $this->getAllParams([

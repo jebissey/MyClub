@@ -21,7 +21,7 @@ class LeapfrogController extends TableController
 
     public function play(): void
     {
-        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+        if (WebApp::getRequestMethod() !== 'GET') {
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
@@ -48,7 +48,7 @@ class LeapfrogController extends TableController
 
     public function statistics(): void
     {
-        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+        if (WebApp::getRequestMethod() !== 'GET') {
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
@@ -59,7 +59,10 @@ class LeapfrogController extends TableController
             'movementCount' => FilterInputRule::Content->value,
             'gameResult' => FilterInputRule::Content->value,
         ];
-        $filterValues = WebApp::filterInput($schema, $this->flight->request()->query->getData());
+        $filterValues = array_map(
+            static fn(mixed $value): string => is_string($value) ? $value : '',
+            WebApp::filterInput($schema, $this->flight->request()->query->getData())
+        );
         $filterConfig = [
             ['name' => 'date', 'label' => 'Date'],
             ['name' => 'who', 'label' => 'Qui'],

@@ -17,9 +17,7 @@ class CredentialService
     private static ?CredentialService $instance = null;
     private ?PDO $pdo = null;
 
-    private function __construct()
-    {
-    }
+    private function __construct() {}
 
     public static function getInstance(): self
     {
@@ -46,9 +44,10 @@ class CredentialService
              LIMIT 1'
         );
         $stmt->execute([':service' => $service, ':name' => $name]);
+        /** @var object{Value:string}|false $row */
         $row = $stmt->fetch(PDO::FETCH_OBJ);
 
-        return $row ? $row->Value : null;
+        return $row === false ? null : $row->Value;
     }
 
     /**

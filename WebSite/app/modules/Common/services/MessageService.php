@@ -19,7 +19,12 @@ final class MessageService
     {
         $message = $_SESSION['flash_message'] ?? '';
         $type = $_SESSION['flash_type'] ?? '';
+
         unset($_SESSION['flash_message'], $_SESSION['flash_type']);
-        return [$message, $type];
+
+        return [
+            is_string($message) ? $message : '',
+            is_string($type) ? $type : '',
+        ];
     }
 }

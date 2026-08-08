@@ -61,6 +61,7 @@ class DbBrowserDataHelper extends Data
         $stmt->execute();
 
         while ($row = $stmt->fetch(PDO::FETCH_OBJ)) {
+            /** @var object{pk: int, name: string} $row */
             if ($row->pk == 1) {
                 return $row->name;
             }
@@ -68,6 +69,10 @@ class DbBrowserDataHelper extends Data
         $stmt = $this->pdo->prepare("PRAGMA table_info(" . $this->quoteName($table) . ")");
         $stmt->execute();
         $row = $stmt->fetch(PDO::FETCH_OBJ);
+        if ($row === false) {
+            throw new RuntimeException('No columns found in file ' . __FILE__ . ' at line ' . __LINE__);
+        }
+        /** @var object{pk: int, name: string} $row */
         return $row->name;
     }
 
@@ -79,6 +84,7 @@ class DbBrowserDataHelper extends Data
         $stmt->execute();
         $columns = [];
         while ($row = $stmt->fetch(PDO::FETCH_OBJ)) {
+            /** @var object{name: string} $row */
             $columns[] = $row->name;
         }
         return $columns;
@@ -92,6 +98,7 @@ class DbBrowserDataHelper extends Data
         $stmt->execute();
         $columns = [];
         while ($row = $stmt->fetch(PDO::FETCH_OBJ)) {
+            /** @var object{name: string, notnull: int} $row */
             $columns[] = [
                 'name' => $row->name,
                 'notnull' => $row->notnull
@@ -108,6 +115,7 @@ class DbBrowserDataHelper extends Data
         $stmt->execute();
         $columnTypes = [];
         while ($row = $stmt->fetch(PDO::FETCH_OBJ)) {
+            /** @var object{name: string, type: string, notnull: int, dflt_value: mixed, pk: int} $row */
             $columnTypes[$row->name] = [
                 'type' => $row->type,
                 'notnull' => $row->notnull,
@@ -138,6 +146,7 @@ class DbBrowserDataHelper extends Data
         if (!$record) {
             throw new RuntimeException('Record not found in file ' . __FILE__ . ' at line ' . __LINE__);
         }
+        /** @var stdClass $record */
         return [$this->getTableColumns($table), $record, $primaryKey, $this->getColumnTypes($table)];
     }
 

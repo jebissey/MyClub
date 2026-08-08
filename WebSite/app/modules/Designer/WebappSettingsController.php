@@ -176,15 +176,16 @@ class WebappSettingsController extends AbstractController
         foreach ($this->numericSettingsKeys as $key => $config) {
             $value    = $input[$key] ?? $config['default'];
             $existing = $this->dataHelper->get('Settings', ['Name' => $key], 'Value');
+            $valueStr = WebApp::toStr($value);
             if ($existing === false) {
-                $this->dataHelper->set('Settings', ['Name' => $key, 'Value' => (string) $value]);
+                $this->dataHelper->set('Settings', ['Name' => $key, 'Value' => $valueStr]);
             } else {
-                $this->dataHelper->set('Settings', ['Value' => (string) $value], ['Name' => $key]);
+                $this->dataHelper->set('Settings', ['Value' => $valueStr], ['Name' => $key]);
             }
         }
         foreach ($this->colorSettingsKeys as $key => $config) {
             $raw   = $input[$key] ?? $config['default'];
-            $value = preg_match('/^#[0-9a-fA-F]{6}$/', $raw) ? $raw : $config['default'];
+            $value = (is_string($raw) && preg_match('/^#[0-9a-fA-F]{6}$/', $raw)) ? $raw : $config['default'];
             $existing = $this->dataHelper->get('Settings', ['Name' => $key], 'Value');
             if ($existing === false) {
                 $this->dataHelper->set('Settings', ['Name' => $key, 'Value' => $value]);
@@ -193,7 +194,7 @@ class WebappSettingsController extends AbstractController
             }
         }
         foreach ($this->imageTargets as $field => $target) {
-            $dataUrl = trim($input[$field] ?? '');
+            $dataUrl = trim(WebApp::toStr($input[$field] ?? ''));
             if ($dataUrl !== '') {
                 $this->saveImageFromDataUrl($dataUrl, $target['path'], $target['mime']);
             }
@@ -244,7 +245,7 @@ class WebappSettingsController extends AbstractController
             $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
-        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+        if (WebApp::getRequestMethod() !== 'GET') {
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
@@ -253,7 +254,7 @@ class WebappSettingsController extends AbstractController
             'use_language' => FilterInputRule::String->value,
         ];
         $requestParam = WebApp::filterInput($schema, $this->application->getFlight()->request()->query->getData());
-        $language     = $requestParam['lang'] ?? '';
+        $language     = WebApp::toStr($requestParam['lang'] ?? '');
         $action       = $requestParam['use_language'] ?? null;
         if ($action === null || $action == 0 || $language === '') {
             $language = null;

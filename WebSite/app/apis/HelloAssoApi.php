@@ -7,6 +7,7 @@ namespace app\apis;
 use JsonException;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
+use app\helpers\WebApp;
 use app\models\DataHelper;
 use app\models\MembershipDataHelper;
 use app\models\PersonDataHelper;
@@ -99,7 +100,7 @@ class HelloAssoApi extends AbstractApi
     public function webhook(): void
     {
         // Webhook is called by HelloAsso, not by a browser – skip user auth
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        if (WebApp::getRequestMethod() !== 'POST') {
             http_response_code(405);
             echo json_encode(['error' => 'Method not allowed']);
             return;

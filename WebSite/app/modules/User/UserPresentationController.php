@@ -25,7 +25,7 @@ class UserPresentationController extends AbstractController
     public function editPresentation(): void
     {
         if ($person = $this->application->getConnectedUser()->person ?? false) {
-            if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+            if (WebApp::getRequestMethod() !== 'GET') {
                 $this->raiseMethodNotAllowed(__FILE__, __LINE__);
                 return;
             }
@@ -48,7 +48,7 @@ class UserPresentationController extends AbstractController
     public function savePresentation(): void
     {
         if ($person = $this->application->getConnectedUser()->person ?? false) {
-            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            if (WebApp::getRequestMethod() === 'POST') {
                 $schema = [
                     'content' => FilterInputRule::Html->value,
                     'location' => FilterInputRule::Location->value,
@@ -75,7 +75,7 @@ class UserPresentationController extends AbstractController
             } else {
                 $this->application->getErrorManager()->raise(
                     ApplicationError::MethodNotAllowed,
-                    'Method ' . $_SERVER['REQUEST_METHOD'] . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__
+                    'Method ' . WebApp::getRequestMethod() . ' is invalid in file ' . __FILE__ . ' at line ' . __LINE__
                 );
             }
         } else {

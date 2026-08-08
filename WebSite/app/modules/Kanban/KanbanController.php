@@ -25,7 +25,14 @@ class KanbanController extends AbstractController
             return;
         }
         $personId = $this->application->getConnectedUser()->person->Id ?? 0;
-        $selectedProjectId = $this->flight->request()->query->getData()["p"] ?? null;
+        $query = $this->flight->request()->query->getData();
+        $selectedProjectId = null;
+        if (isset($query['p'])) {
+            $value = $query['p'];
+            if (is_scalar($value)) {
+                $selectedProjectId = (int) $value;
+            }
+        }
         $isOwner = null;
         if ($selectedProjectId !== null) {
             $selectedProjectId = (int) $selectedProjectId;

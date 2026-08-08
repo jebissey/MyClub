@@ -54,7 +54,11 @@ class LoanDataHelper extends Data
         $stmt = $this->pdo->prepare("SELECT * FROM LoanItem WHERE Id = :id");
         $stmt->execute([':id' => $id]);
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $row ?: null;
+        if ($row === false) {
+            return null;
+        }
+        /** @var array<string, mixed> $row */
+        return $row;
     }
 
     /**
@@ -63,13 +67,23 @@ class LoanDataHelper extends Data
      */
     public function saveItem(array $data): int
     {
-        $id          = (int)($data['id'] ?? 0);
-        $name        = trim($data['name'] ?? '');
-        $description = trim($data['description'] ?? '');
-        $type        = in_array($data['type'] ?? '', ['loan', 'reservation', 'both'], true)
-            ? $data['type'] : 'both';
-        $quantity    = max(1, (int)($data['quantity'] ?? 1));
-        $isActive    = isset($data['isActive']) ? (int)(bool)$data['isActive'] : 1;
+        $idRaw          = $data['id'] ?? 0;
+        $id             = is_scalar($idRaw) ? (int)$idRaw : 0;
+
+        $nameRaw        = $data['name'] ?? '';
+        $name           = trim(is_string($nameRaw) ? $nameRaw : '');
+
+        $descriptionRaw = $data['description'] ?? '';
+        $description    = trim(is_string($descriptionRaw) ? $descriptionRaw : '');
+
+        $typeRaw        = $data['type'] ?? '';
+        $type           = is_string($typeRaw) && in_array($typeRaw, ['loan', 'reservation', 'both'], true)
+            ? $typeRaw : 'both';
+
+        $quantityRaw    = $data['quantity'] ?? 1;
+        $quantity       = max(1, is_scalar($quantityRaw) ? (int)$quantityRaw : 1);
+
+        $isActive       = isset($data['isActive']) ? (int)(bool)$data['isActive'] : 1;
 
         if ($id > 0) {
             $stmt = $this->pdo->prepare(
@@ -172,7 +186,11 @@ class LoanDataHelper extends Data
         $stmt = $this->pdo->prepare("$base WHERE lr.Id = :id");
         $stmt->execute([':id' => $id]);
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $row ?: null;
+        if ($row === false) {
+            return null;
+        }
+        /** @var array<string, mixed> $row */
+        return $row;
     }
 
     /**
@@ -210,7 +228,11 @@ class LoanDataHelper extends Data
         }
         $stmt->execute($params);
         $used = (int)$stmt->fetchColumn();
-        return max(0, (int)$item['Quantity'] - $used);
+
+        $totalQtyRaw = $item['Quantity'] ?? 0;
+        $totalQty    = is_scalar($totalQtyRaw) ? (int)$totalQtyRaw : 0;
+
+        return max(0, $totalQty - $used);
     }
 
     /**
@@ -219,14 +241,26 @@ class LoanDataHelper extends Data
      */
     public function saveLoan(array $data): int
     {
-        $id         = (int)($data['id'] ?? 0);
-        $itemId     = (int)($data['itemId'] ?? 0);
-        $borrowerId = (int)($data['borrowerId'] ?? 0);
-        $lenderId   = (int)($data['lenderId'] ?? 0);
-        $loanDate   = $data['loanDate'] ?? '';
-        $dueDate    = $data['dueDate'] ?? '';
-        $qty        = max(1, (int)($data['quantity'] ?? 1));
-        $notes      = trim($data['notes'] ?? '');
+        $idRaw         = $data['id'] ?? 0;
+        $id            = is_scalar($idRaw) ? (int)$idRaw : 0;
+
+        $itemIdRaw     = $data['itemId'] ?? 0;
+        $itemId        = is_scalar($itemIdRaw) ? (int)$itemIdRaw : 0;
+
+        $borrowerIdRaw = $data['borrowerId'] ?? 0;
+        $borrowerId    = is_scalar($borrowerIdRaw) ? (int)$borrowerIdRaw : 0;
+
+        $lenderIdRaw   = $data['lenderId'] ?? 0;
+        $lenderId      = is_scalar($lenderIdRaw) ? (int)$lenderIdRaw : 0;
+
+        $loanDate      = $data['loanDate'] ?? '';
+        $dueDate       = $data['dueDate'] ?? '';
+
+        $qtyRaw        = $data['quantity'] ?? 1;
+        $qty           = max(1, is_scalar($qtyRaw) ? (int)$qtyRaw : 1);
+
+        $notesRaw      = $data['notes'] ?? '';
+        $notes         = trim(is_string($notesRaw) ? $notesRaw : '');
 
         if ($id > 0) {
             $stmt = $this->pdo->prepare(
@@ -340,7 +374,11 @@ class LoanDataHelper extends Data
         $stmt = $this->pdo->prepare("$base WHERE res.Id = :id");
         $stmt->execute([':id' => $id]);
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $row ?: null;
+        if ($row === false) {
+            return null;
+        }
+        /** @var array<string, mixed> $row */
+        return $row;
     }
 
     /**
@@ -381,7 +419,11 @@ class LoanDataHelper extends Data
         }
         $stmt->execute($params);
         $used = (int)$stmt->fetchColumn();
-        return max(0, (int)$item['Quantity'] - $used);
+
+        $totalQtyRaw = $item['Quantity'] ?? 0;
+        $totalQty    = is_scalar($totalQtyRaw) ? (int)$totalQtyRaw : 0;
+
+        return max(0, $totalQty - $used);
     }
 
     /**
@@ -390,14 +432,24 @@ class LoanDataHelper extends Data
      */
     public function saveReservation(array $data): int
     {
-        $id     = (int)($data['id'] ?? 0);
-        $itemId = (int)($data['itemId'] ?? 0);
-        $userId = (int)($data['userId'] ?? 0);
-        $date   = $data['reservationDate'] ?? '';
-        $start  = $data['startTime'] ?? '';
-        $end    = $data['endTime'] ?? '';
-        $qty    = max(1, (int)($data['quantity'] ?? 1));
-        $notes  = trim($data['notes'] ?? '');
+        $idRaw     = $data['id'] ?? 0;
+        $id        = is_scalar($idRaw) ? (int)$idRaw : 0;
+
+        $itemIdRaw = $data['itemId'] ?? 0;
+        $itemId    = is_scalar($itemIdRaw) ? (int)$itemIdRaw : 0;
+
+        $userIdRaw = $data['userId'] ?? 0;
+        $userId    = is_scalar($userIdRaw) ? (int)$userIdRaw : 0;
+
+        $date      = $data['reservationDate'] ?? '';
+        $start     = $data['startTime'] ?? '';
+        $end       = $data['endTime'] ?? '';
+
+        $qtyRaw    = $data['quantity'] ?? 1;
+        $qty       = max(1, is_scalar($qtyRaw) ? (int)$qtyRaw : 1);
+
+        $notesRaw  = $data['notes'] ?? '';
+        $notes     = trim(is_string($notesRaw) ? $notesRaw : '');
 
         if ($id > 0) {
             $stmt = $this->pdo->prepare(

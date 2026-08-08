@@ -32,7 +32,8 @@ abstract class TableController extends AbstractController
             ? $this->application->getPdoForLog()
             : $this->application->getPdo();
 
-        $page = (int)($this->flight->request()->query['tablePage'] ?? 1);
+        $tablePage = $this->flight->request()->query['tablePage'] ?? null;
+        $page = is_numeric($tablePage) ? (int) $tablePage : 1;
 
         /** @var array<int,string> $values */
         $values = [];

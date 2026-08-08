@@ -9,6 +9,7 @@ use Throwable;
 use app\enums\ApplicationError;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
+use app\helpers\WebApp;
 use app\models\DataHelper;
 use app\models\KanbanDataHelper;
 use app\models\PersonDataHelper;
@@ -28,7 +29,7 @@ class KanbanApi extends AbstractApi
     #region Card
     public function createCard(): void
     {
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        if (WebApp::getRequestMethod() !== 'POST') {
             $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
@@ -43,9 +44,9 @@ class KanbanApi extends AbstractApi
             return;
         }
 
-        $kanbanCardId = (int)trim($data['cardType'] ?? '');
-        $title = trim($data['title'] ?? '');
-        $detail = trim($data['detail'] ?? '');
+        $kanbanCardId = (int)trim(WebApp::toStr($data['cardType'] ?? ''));
+        $title = trim(WebApp::toStr($data['title'] ?? ''));
+        $detail = trim(WebApp::toStr($data['detail'] ?? ''));
         if (empty($kanbanCardId)) {
             $this->renderJsonBadRequest('CardType Id is required', __FILE__, __LINE__);
             return;
@@ -73,7 +74,7 @@ class KanbanApi extends AbstractApi
 
     public function deleteCard(): void
     {
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        if (WebApp::getRequestMethod() !== 'POST') {
             $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
@@ -87,7 +88,7 @@ class KanbanApi extends AbstractApi
             $this->renderJsonBadRequest('Invalid JSON', __FILE__, __LINE__);
             return;
         }
-        $id = (int)($data['id'] ?? 0);
+        $id = WebApp::toInt($data['id'] ?? 0);
         if ($id <= 0) {
             $this->renderJsonBadRequest('Invalid card ID', __FILE__, __LINE__);
             return;
@@ -111,7 +112,7 @@ class KanbanApi extends AbstractApi
 
     public function getHistory(int $id): void
     {
-        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+        if (WebApp::getRequestMethod() !== 'GET') {
             $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
@@ -126,7 +127,7 @@ class KanbanApi extends AbstractApi
 
     public function moveCard(): void
     {
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        if (WebApp::getRequestMethod() !== 'POST') {
             $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
@@ -141,9 +142,9 @@ class KanbanApi extends AbstractApi
             $this->renderJsonBadRequest('Invalid JSON', __FILE__, __LINE__);
             return;
         }
-        $id = (int)($data['idKanbanCard'] ?? 0);
-        $what = $data['what'] ?? '';
-        $remark = $data['remark'] ?? '';
+        $id = WebApp::toInt($data['idKanbanCard'] ?? 0);
+        $what = WebApp::toStr($data['what'] ?? '');
+        $remark = WebApp::toStr($data['remark'] ?? '');
         if ($id <= 0) {
             $this->renderJsonBadRequest('Invalid card ID', __FILE__, __LINE__);
             return;
@@ -163,7 +164,7 @@ class KanbanApi extends AbstractApi
 
     public function updateCard(): void
     {
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        if (WebApp::getRequestMethod() !== 'POST') {
             $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
@@ -178,9 +179,9 @@ class KanbanApi extends AbstractApi
             $this->renderJsonBadRequest('Invalid JSON', __FILE__, __LINE__);
             return;
         }
-        $id = (int)($data['id'] ?? 0);
-        $title = trim($data['title'] ?? '');
-        $detail = trim($data['detail'] ?? '');
+        $id = WebApp::toInt($data['id'] ?? 0);
+        $title = trim(WebApp::toStr($data['title'] ?? ''));
+        $detail = trim(WebApp::toStr($data['detail'] ?? ''));
 
         if ($id <= 0) {
             $this->renderJsonBadRequest('Invalid card ID', __FILE__, __LINE__);
@@ -211,7 +212,7 @@ class KanbanApi extends AbstractApi
 
     public function updateCardStatus(): void
     {
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        if (WebApp::getRequestMethod() !== 'POST') {
             $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
@@ -226,8 +227,8 @@ class KanbanApi extends AbstractApi
             $this->renderJsonBadRequest('Invalid JSON', __FILE__, __LINE__);
             return;
         }
-        $id = (int)($data['idKanbanCardStatus'] ?? 0);
-        $remark = trim($data['remark'] ?? '');
+        $id = WebApp::toInt($data['idKanbanCardStatus'] ?? 0);
+        $remark = trim(WebApp::toStr($data['remark'] ?? ''));
         if ($id <= 0) {
             $this->renderJsonBadRequest('Invalid card status Id', __FILE__, __LINE__);
             return;
@@ -254,7 +255,7 @@ class KanbanApi extends AbstractApi
     #region Project
     public function createProject(): void
     {
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        if (WebApp::getRequestMethod() !== 'POST') {
             $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
@@ -269,8 +270,8 @@ class KanbanApi extends AbstractApi
             return;
         }
 
-        $title = trim($data['title'] ?? '');
-        $detail = trim($data['detail'] ?? '');
+        $title = trim(WebApp::toStr($data['title'] ?? ''));
+        $detail = trim(WebApp::toStr($data['detail'] ?? ''));
 
         if (empty($title)) {
             $this->renderJsonBadRequest('Title is required', __FILE__, __LINE__);
@@ -296,7 +297,7 @@ class KanbanApi extends AbstractApi
 
     public function deleteProject(): void
     {
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        if (WebApp::getRequestMethod() !== 'POST') {
             $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
@@ -310,7 +311,7 @@ class KanbanApi extends AbstractApi
             $this->renderJsonBadRequest('Invalid JSON', __FILE__, __LINE__);
             return;
         }
-        $id = trim($data['id'] ?? '');
+        $id = trim(WebApp::toStr($data['id'] ?? ''));
         if (empty($id)) {
             $this->renderJsonBadRequest('Id is required', __FILE__, __LINE__);
             return;
@@ -334,7 +335,7 @@ class KanbanApi extends AbstractApi
 
     public function getProject(int $id): void
     {
-        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+        if (WebApp::getRequestMethod() !== 'GET') {
             $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
@@ -362,7 +363,7 @@ class KanbanApi extends AbstractApi
 
     public function updateProject(): void
     {
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        if (WebApp::getRequestMethod() !== 'POST') {
             $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
@@ -376,9 +377,9 @@ class KanbanApi extends AbstractApi
             $this->renderJsonBadRequest('Invalid JSON', __FILE__, __LINE__);
             return;
         }
-        $id = (int)($data['id'] ?? 0);
-        $title = trim($data['title'] ?? '');
-        $detail = trim($data['detail'] ?? '');
+        $id = WebApp::toInt($data['id'] ?? 0);
+        $title = trim(WebApp::toStr($data['title'] ?? ''));
+        $detail = trim(WebApp::toStr($data['detail'] ?? ''));
         if ($id <= 0) {
             $this->renderJsonBadRequest('Invalid project ID', __FILE__, __LINE__);
             return;
@@ -407,7 +408,7 @@ class KanbanApi extends AbstractApi
     #region CardType
     public function createCardType(): void
     {
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        if (WebApp::getRequestMethod() !== 'POST') {
             $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
@@ -422,10 +423,10 @@ class KanbanApi extends AbstractApi
             return;
         }
 
-        $label = trim($data['label'] ?? '');
-        $detail = trim($data['detail'] ?? '');
-        $color = trim($data['color'] ?? '');
-        $projectId = (int)($data['projectId'] ?? '');
+        $label = trim(WebApp::toStr($data['label'] ?? ''));
+        $detail = trim(WebApp::toStr($data['detail'] ?? ''));
+        $color = trim(WebApp::toStr($data['color'] ?? ''));
+        $projectId = WebApp::toInt($data['projectId'] ?? 0);
 
         if (empty($label)) {
             $this->renderJsonBadRequest('Label is required', __FILE__, __LINE__);
@@ -454,7 +455,7 @@ class KanbanApi extends AbstractApi
 
     public function deleteCardType(): void
     {
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        if (WebApp::getRequestMethod() !== 'POST') {
             $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
@@ -469,7 +470,7 @@ class KanbanApi extends AbstractApi
             return;
         }
 
-        $id = (int)($data['id'] ?? '');
+        $id = WebApp::toInt($data['id'] ?? 0);
 
         if (empty($id)) {
             $this->renderJsonBadRequest('Id is required', __FILE__, __LINE__);
@@ -494,7 +495,7 @@ class KanbanApi extends AbstractApi
 
     public function getProjectCards(int $id): void
     {
-        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+        if (WebApp::getRequestMethod() !== 'GET') {
             $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
@@ -505,8 +506,8 @@ class KanbanApi extends AbstractApi
         try {
             $query = $this->application->getFlight()->request()->query;
             $ct = filter_var($query['ct'] ?? null, FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
-            $title  = $query['title']  ?? null;
-            $detail = $query['detail'] ?? null;
+            $title  = isset($query['title']) && is_string($query['title']) ? $query['title'] : null;
+            $detail = isset($query['detail']) && is_string($query['detail']) ? $query['detail'] : null;
             $this->renderJsonOk(['cards' => $this->kanbanDataHelper->getProjectCards($id, $ct, $title, $detail)]);
         } catch (Throwable $e) {
             $this->renderJsonError(
@@ -520,7 +521,7 @@ class KanbanApi extends AbstractApi
 
     public function getProjectCardTypes(int $id): void
     {
-        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+        if (WebApp::getRequestMethod() !== 'GET') {
             $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
@@ -543,7 +544,7 @@ class KanbanApi extends AbstractApi
 
     public function updateCardType(): void
     {
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        if (WebApp::getRequestMethod() !== 'POST') {
             $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
@@ -558,10 +559,10 @@ class KanbanApi extends AbstractApi
             return;
         }
 
-        $label = trim($data['label'] ?? '');
-        $detail = trim($data['detail'] ?? '');
-        $color = trim($data['color'] ?? '');
-        $id = (int)($data['id'] ?? '');
+        $label = trim(WebApp::toStr($data['label'] ?? ''));
+        $detail = trim(WebApp::toStr($data['detail'] ?? ''));
+        $color = trim(WebApp::toStr($data['color'] ?? ''));
+        $id = WebApp::toInt($data['id'] ?? 0);
 
         if (empty($label)) {
             $this->renderJsonBadRequest('Label is required', __FILE__, __LINE__);

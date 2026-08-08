@@ -74,7 +74,7 @@ class ArticleController extends TableController
 
     public function carousel(int $id): void
     {
-        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+        if (WebApp::getRequestMethod() !== 'GET') {
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
@@ -138,7 +138,7 @@ class ArticleController extends TableController
             $this->raiseBadRequest("Article {$id} doesn't exist", __FILE__, __LINE__);
             return;
         }
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        if (WebApp::getRequestMethod() === 'POST') {
             $schema = [
                 'newOwnerId' => FilterInputRule::Int->value,
             ];
@@ -160,7 +160,7 @@ class ArticleController extends TableController
                 $_SESSION['error'] = ($this->t)('article.error.update_failed');
             }
             $this->redirect('/article/' . $id);
-        } elseif ($_SERVER['REQUEST_METHOD'] === 'GET') {
+        } elseif (WebApp::getRequestMethod() === 'GET') {
             $article = $this->articleDataHelper->getWithAuthor($id);
             if ($article === false) {
                 $this->raiseBadRequest("Article {$id} doesn't exist", __FILE__, __LINE__);
@@ -181,7 +181,7 @@ class ArticleController extends TableController
             $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
-        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+        if (WebApp::getRequestMethod() !== 'GET') {
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
@@ -200,7 +200,7 @@ class ArticleController extends TableController
             $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        if (WebApp::getRequestMethod() !== 'POST') {
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
@@ -224,7 +224,7 @@ class ArticleController extends TableController
 
     public function edit(int $id): void
     {
-        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+        if (WebApp::getRequestMethod() !== 'GET') {
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
@@ -289,7 +289,7 @@ class ArticleController extends TableController
             $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
-        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+        if (WebApp::getRequestMethod() !== 'GET') {
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
@@ -491,7 +491,7 @@ class ArticleController extends TableController
             $this->raiseBadRequest("Article {$id} doesn't exist", __FILE__, __LINE__);
             return;
         }
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        if (WebApp::getRequestMethod() === 'POST') {
             if (!$this->authorizationService->canPublish($id, $this->application->getConnectedUser())) {
                 $this->raiseForbidden(__FILE__, __LINE__);
                 return;
@@ -521,7 +521,7 @@ class ArticleController extends TableController
                 $_SESSION['error'] = ($this->t)('article.error.update_failed');
             }
             $this->redirect('/article/' . $id);
-        } elseif ($_SERVER['REQUEST_METHOD'] === 'GET') {
+        } elseif (WebApp::getRequestMethod() === 'GET') {
             $article = $this->articleDataHelper->getWithAuthor($id);
             if ($article === false) {
                 $this->raiseBadRequest("Article {$id} doesn't exist", __FILE__, __LINE__);
@@ -538,7 +538,7 @@ class ArticleController extends TableController
 
     public function show(int $id): void
     {
-        if (!in_array($_SERVER['REQUEST_METHOD'], ['GET', 'HEAD'])) {
+        if (!in_array(WebApp::getRequestMethod(), ['GET', 'HEAD'])) {
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
@@ -667,7 +667,7 @@ class ArticleController extends TableController
             $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
-        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+        if (WebApp::getRequestMethod() !== 'GET') {
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
@@ -707,7 +707,7 @@ class ArticleController extends TableController
             $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
-        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+        if (WebApp::getRequestMethod() !== 'GET') {
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
@@ -765,7 +765,7 @@ class ArticleController extends TableController
             $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        if (WebApp::getRequestMethod() !== 'POST') {
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }

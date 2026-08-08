@@ -19,17 +19,30 @@ class PersonPreferences
             return $events;
         }
         $preferences = json_decode($person->Preferences, true);
-        if (!$preferences) {
+        if (!is_array($preferences)) {
             return $events;
         }
+
         $filteredEvents = [];
         foreach ($events as $event) {
+            $idEventType = $event['idEventType'] ?? null;
+            $idEventType = is_int($idEventType)
+                ? $idEventType
+                : (is_numeric($idEventType) ? (int)$idEventType : null);
+
+            $startTime = $event['startTime'] ?? null;
+            if (!is_string($startTime) || $startTime === '') {
+                continue;
+            }
+
+            $dayOfWeek = (int)(new DateTime($startTime))->format('N') - 1;
+
             if (
                 $this->isPersonInterested(
                     $person,
-                    $event['idEventType'],
-                    (new DateTime($event['startTime']))->format('N') - 1,
-                    $this->getPeriodOfDay($event['startTime'])
+                    $idEventType,
+                    $dayOfWeek,
+                    $this->getPeriodOfDay($startTime)
                 )
             ) {
                 $filteredEvents[] = $event;
@@ -41,33 +54,38 @@ class PersonPreferences
     public function isPersonInterested(Person $person, ?int $idEventType, ?int $dayOfWeek, string $timeOfDay): bool
     {
         if ($person->Preferences !== '') {
-            $preferences = json_decode($person->Preferences ?? '', true);
-            if (isset($preferences['noAlerts']) && $preferences['noAlerts'] === 'on') {
+            $preferences = $this->decodePreferences($person->Preferences);
+            if ($preferences !== null && isset($preferences['noAlerts']) && $preferences['noAlerts'] === 'on') {
                 return false;
             }
         }
-        if ($idEventType !== null) {
-            if ($person->Preferences !== '') {
-                $preferences = json_decode($person->Preferences ?? '', true);
-                if ($preferences !== '' && (!isset($preferences['eventTypes'][$idEventType]))) {
-                    return false;
-                }
-                if (
-                    $preferences !== '' && (isset($preferences['eventTypes'][$idEventType]))
-                    && !isset($preferences['eventTypes'][$idEventType]["available"])
-                ) {
-                    return true;
-                }
-            }
-        }
-        if ($dayOfWeek !== null && $timeOfDay !== '') {
-            if ($person->Availabilities !== '') {
-                $availabilities = json_decode($person->Availabilities ?? '', true);
-                if ($availabilities[$dayOfWeek][$timeOfDay] !== 'on') {
-                    return false;
+
+        if ($idEventType !== null && $person->Preferences !== '') {
+            $preferences = $this->decodePreferences($person->Preferences);
+            if ($preferences !== null) {
+                $eventTypes = is_array($preferences['eventTypes'] ?? null) ? $preferences['eventTypes'] : null;
+                if ($eventTypes !== null) {
+                    if (!isset($eventTypes[$idEventType])) {
+                        return false;
+                    }
+                    $eventTypePref = $eventTypes[$idEventType];
+                    if (is_array($eventTypePref) && !isset($eventTypePref['available'])) {
+                        return true;
+                    }
                 }
             }
         }
+
+        if ($dayOfWeek !== null && $timeOfDay !== '' && $person->Availabilities !== '') {
+            $availabilities = $this->decodePreferences($person->Availabilities);
+            if ($availabilities !== null) {
+                $dayPrefs = is_array($availabilities[$dayOfWeek] ?? null) ? $availabilities[$dayOfWeek] : null;
+                if ($dayPrefs !== null && ($dayPrefs[$timeOfDay] ?? null) !== 'on') {
+                    return false;
+                }
+            }
+        }
+
         return true;
     }
 
@@ -83,5 +101,17 @@ class PersonPreferences
         } else {
             return 'evening';
         }
+    }
+
+    /**
+     * @return array<int|string, mixed>|null
+     */
+    private function decodePreferences(?string $json): ?array
+    {
+        if ($json === null || $json === '') {
+            return null;
+        }
+        $decoded = json_decode($json, true);
+        return is_array($decoded) ? $decoded : null;
     }
 }

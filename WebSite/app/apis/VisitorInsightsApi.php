@@ -7,6 +7,7 @@ namespace app\apis;
 use DateTimeImmutable;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
+use app\helpers\WebApp;
 use app\models\DataHelper;
 use app\models\LogDataHelper;
 use app\models\PersonDataHelper;
@@ -25,7 +26,7 @@ class VisitorInsightsApi extends AbstractApi
 
     public function getCreationTimeDistribution(): void
     {
-        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+        if (WebApp::getRequestMethod() !== 'GET') {
             $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
@@ -53,7 +54,7 @@ class VisitorInsightsApi extends AbstractApi
 
     public function getCreationTimeTrend(): void
     {
-        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+        if (WebApp::getRequestMethod() !== 'GET') {
             $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
             return;
         }

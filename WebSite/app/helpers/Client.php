@@ -56,7 +56,7 @@ class Client
 
     public function getMethod(): string
     {
-        return $_SERVER['REQUEST_METHOD'] ?? 'CLI';
+        return WebApp::getRequestMethod() ?? 'CLI';
     }
 
     public function getReferer(): string
@@ -77,7 +77,7 @@ class Client
     public function getUri(): string
     {
         $uri = $_SERVER['REQUEST_URI'] ?? '';
-        $method = $_SERVER['REQUEST_METHOD'] ?? '';
+        $method = WebApp::getRequestMethod() ?? '';
 
         return $uri . ' (' . $method . ')';
     }

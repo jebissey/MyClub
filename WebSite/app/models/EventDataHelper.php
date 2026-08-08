@@ -19,6 +19,7 @@ use app\helpers\Application;
 use app\helpers\ConnectedUser;
 use app\helpers\PersonPreferences;
 use app\helpers\TranslationManager;
+use app\helpers\WebApp;
 use app\interfaces\NewsProviderInterface;
 use app\valueObjects\ApiResponse;
 use app\valueObjects\EventAttributeRow;
@@ -87,6 +88,7 @@ class EventDataHelper extends Data implements NewsProviderInterface
             ";
             $stmt = $this->pdo->prepare($sql);
             $stmt->execute([':id' => $id]);
+            /** @var object{Id: int|string, Summary: string, Description?: string|null, Location?: string|null, StartTime: string, Duration: int|string, IdEventType: int|string, CreatedBy: int|string, MaxParticipants?: int|string|null, Audience: string}|false $event */
             $event = $stmt->fetch(PDO::FETCH_OBJ);
             if ($event === false) {
                 $this->pdo->rollBack();
@@ -192,6 +194,7 @@ class EventDataHelper extends Data implements NewsProviderInterface
             ";
             $stmt = $this->pdo->prepare($sql);
             $stmt->execute([':eventId' => $eventId]);
+            /** @var object{Id: int|string, Summary: string, Description: string, Location: string, StartTime: string, Duration: int|string, IdEventType: int|string, CreatedBy: int|string, MaxParticipants: int|string, Audience: string, LastUpdate: string, Canceled: int|string, EventTypeName: string}|false $result */
             $result = $stmt->fetch(PDO::FETCH_OBJ);
             if ($result === false) {
                 throw new QueryException("Event type doesn't exist for event ({$eventId})");
@@ -238,6 +241,7 @@ class EventDataHelper extends Data implements NewsProviderInterface
             ':eventId' => $eventId,
             ':today'   => (new DateTime())->format('Y-m-d\TH:i:s'),
         ]);
+        /** @var object{Id: int|string, Summary: string, Description: string|null, Location: string|null, StartTime: string, Audience: string|null}|false $result */
         $result = $stmt->fetch(PDO::FETCH_OBJ);
         if ($result === false) {
             return null;
@@ -281,8 +285,12 @@ class EventDataHelper extends Data implements NewsProviderInterface
             ";
             $stmt = $this->pdo->prepare($sql);
             $stmt->execute([':eventId' => $eventId]);
+            /** @var object{IdGroup: int|string|null}|false $result */
             $result = $stmt->fetch(PDO::FETCH_OBJ);
-            return $result->IdGroup ?? null;
+            if ($result === false || $result->IdGroup === null) {
+                return null;
+            }
+            return (int)$result->IdGroup;
         }
         throw new QueryException("Event ({$eventId}) doesn't exist");
     }
@@ -533,7 +541,7 @@ class EventDataHelper extends Data implements NewsProviderInterface
                 }
                 $eventId = $newId;
             } elseif ($data['formMode'] == 'update') {
-                $eventId = (int)$data['id'];
+                $eventId = WebApp::toInt($data['id'] ?? null);
                 if (!$this->get('Event', ['Id' => $eventId], 'Id')) {
                     throw new QueryException("Event {$eventId} doesn't exist");
                 }
@@ -543,8 +551,8 @@ class EventDataHelper extends Data implements NewsProviderInterface
             } else {
                 Application::unreachable($data['formMode'], __FILE__, __LINE__);
             }
-            $this->insertEventAttributes($eventId, $data['attributes'] ?? []);
-            $this->insertEventNeeds($eventId, $data['needs'] ?? []);
+            $this->insertEventAttributes($eventId, $this->normalizeAttributeIds($data['attributes'] ?? null));
+            $this->insertEventNeeds($eventId, $this->normalizeNeeds($data['needs'] ?? null));
             $this->pdo->commit();
         } catch (Throwable $e) {
             $this->pdo->rollBack();
@@ -564,7 +572,9 @@ class EventDataHelper extends Data implements NewsProviderInterface
             if (!$participant) {
                 return false;
             }
+            /** @var object{Id: int|string} $participant */
 
+            /** @var object{Id: int|string}|false $existing */
             $existing = $this->fluent->from('ParticipantSupply')
                 ->select('Id')
                 ->where('IdParticipant', $participant->Id)
@@ -796,6 +806,41 @@ class EventDataHelper extends Data implements NewsProviderInterface
                 ]);
             }
         }
+    }
+
+    /** @return array<int, int> */
+    private function normalizeAttributeIds(mixed $attributes): array
+    {
+        if (!is_array($attributes)) {
+            return [];
+        }
+        $result = [];
+        foreach ($attributes as $attributeId) {
+            if (is_scalar($attributeId)) {
+                $result[] = (int)$attributeId;
+            }
+        }
+        return $result;
+    }
+
+    /** @return array<int, array{id: int, counter: int}> */
+    private function normalizeNeeds(mixed $needs): array
+    {
+        if (!is_array($needs)) {
+            return [];
+        }
+        $result = [];
+        foreach ($needs as $need) {
+            if (
+                is_array($need)
+                && isset($need['id'], $need['counter'])
+                && is_scalar($need['id'])
+                && is_scalar($need['counter'])
+            ) {
+                $result[] = ['id' => (int)$need['id'], 'counter' => (int)$need['counter']];
+            }
+        }
+        return $result;
     }
 
     /** @return EventArrayShape */

@@ -28,7 +28,7 @@ class UserGroupsController extends AbstractController
             $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
-        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+        if (WebApp::getRequestMethod() !== 'GET') {
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
@@ -51,12 +51,18 @@ class UserGroupsController extends AbstractController
             $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        if (WebApp::getRequestMethod() !== 'POST') {
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
-        $groups = WebApp::getFiltered('groups', FilterInputRule::ArrayInt->value, $this->flight->request()->data->getData());
-        $this->personGroupDataHelper->update($person->Id, $groups ?? []);
+        /** @var array<int, int> $groups */
+        $groups = WebApp::getFiltered(
+            'groups',
+            FilterInputRule::ArrayInt->value,
+            $this->flight->request()->data->getData()
+        ) ?? [];
+
+        $this->personGroupDataHelper->update($person->Id, $groups);
         $this->redirect('/user');
     }
 }

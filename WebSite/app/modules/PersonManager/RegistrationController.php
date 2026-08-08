@@ -31,7 +31,10 @@ class RegistrationController extends TableController
                 'nickName' => FilterInputRule::PersonName->value,
                 'email' => FilterInputRule::Email->value,
             ];
-            $filterValues = WebApp::filterInput($schema, $this->flight->request()->query->getData());
+            $filterValues = array_map(
+                static fn(mixed $value): string => WebApp::toStr($value),
+                WebApp::filterInput($schema, $this->flight->request()->query->getData())
+            );
             $filterConfig = [
                 ['name' => 'lastName', 'label' => 'Nom'],
                 ['name' => 'firstName', 'label' => 'Prénom'],

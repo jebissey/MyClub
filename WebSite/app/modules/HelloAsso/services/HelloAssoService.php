@@ -38,8 +38,7 @@ class HelloAssoService
 
     private function __construct(
         private DataHelper $dataHelper,
-    ) {
-    }
+    ) {}
 
     /**
      * Returns the singleton instance.
@@ -117,9 +116,18 @@ class HelloAssoService
             );
         }
 
+        $id          = $response['id'];
+        $redirectUrl = $response['redirectUrl'];
+
+        if (!is_scalar($id) || !is_scalar($redirectUrl)) {
+            throw new RuntimeException(
+                'HelloAsso: unexpected checkout intent response: ' . json_encode($response)
+            );
+        }
+
         return [
-            'checkoutIntentId' => (string)$response['id'],
-            'redirectUrl'      => (string)$response['redirectUrl'],
+            'checkoutIntentId' => (string)$id,
+            'redirectUrl'      => (string)$redirectUrl,
         ];
     }
 
@@ -209,7 +217,7 @@ class HelloAssoService
         }
 
         $data = json_decode($body, true);
-        if (empty($data['access_token'])) {
+        if (!is_array($data) || !isset($data['access_token']) || !is_string($data['access_token'])) {
             throw new RuntimeException('HelloAsso OAuth2: no access_token in response');
         }
 
@@ -255,7 +263,10 @@ class HelloAssoService
         $decoded = json_decode($response, true);
 
         if ($httpCode >= 400) {
-            $msg = $decoded['message'] ?? $response;
+            $msg = $response;
+            if (is_array($decoded) && isset($decoded['message']) && is_scalar($decoded['message'])) {
+                $msg = (string)$decoded['message'];
+            }
             throw new RuntimeException("HelloAsso API error {$httpCode}: {$msg}");
         }
 

@@ -11,6 +11,7 @@ use flight\net\Response;
 use app\enums\ApplicationError;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
+use app\helpers\WebApp;
 use app\models\DataHelper;
 use app\models\LogDataWriterHelper;
 use app\models\PersonDataHelper;
@@ -131,7 +132,7 @@ abstract class AbstractApi
             [],
             false,
             ApplicationError::MethodNotAllowed->value,
-            "Method {$_SERVER['REQUEST_METHOD']} not allowed in file {$file} at line {$line}"
+            "Method {WebApp::getRequestMethod()} not allowed in file {$file} at line {$line}"
         );
     }
 
@@ -169,7 +170,7 @@ abstract class AbstractApi
             return false;
         }
 
-        if ($_SERVER['REQUEST_METHOD'] !== $method) {
+        if (WebApp::getRequestMethod() !== $method) {
             $this->renderJsonMethodNotAllowed($file, $line);
             return false;
         }
