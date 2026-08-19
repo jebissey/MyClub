@@ -10,6 +10,7 @@ use app\enums\FilterInputRule;
 use app\exceptions\EmailException;
 use app\helpers\Application;
 use app\helpers\Password;
+use app\helpers\To;
 use app\helpers\WebApp;
 use app\models\AuthResult;
 use app\models\DataHelper;
@@ -106,8 +107,8 @@ class AuthenticationService
             return AuthResult::error('Password rules are not respected [6..30] characters');
         }
         return $this->authenticate(
-            $input['email'],
-            $input['password'],
+            To::str($input['email']),
+            To::str($input['password']),
             ($input['rememberMe'] ?? '') === 'on'
         );
     }

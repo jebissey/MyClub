@@ -6,6 +6,7 @@ namespace app\apis;
 
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
+use app\helpers\To;
 use app\helpers\WebApp;
 use app\models\DataHelper;
 use app\models\PersonDataHelper;
@@ -31,7 +32,7 @@ class ImportApi extends AbstractApi
             $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
-        $this->renderJsonOk($this->doGetHeadersFromCSV(intval($_POST['headerRow'] ?? 1)));
+        $this->renderJsonOk($this->doGetHeadersFromCSV(To::int($_POST['headerRow'] ?? 1)));
     }
 
     #region Private functions
@@ -40,11 +41,13 @@ class ImportApi extends AbstractApi
      */
     private function doGetHeadersFromCSV(int $headerRow): array
     {
-        if (!isset($_FILES['csvFile']) || $_FILES['csvFile']['error'] != 0) {
+        /** @var array{name: string, type: string, tmp_name: string, error: int, size: int}|null $csvFile */
+        $csvFile = $_FILES['csvFile'] ?? null;
+        if ($csvFile === null || $csvFile['error'] != 0) {
             return ['error' => 'Fichier non valide'];
         }
         $headers = [];
-        $file = fopen($_FILES['csvFile']['tmp_name'], 'r');
+        $file = fopen($csvFile['tmp_name'], 'r');
         if ($file === false) {
             return ['error' => 'Impossible d\'ouvrir le fichier'];
         }
@@ -59,4 +62,5 @@ class ImportApi extends AbstractApi
         fclose($file);
         return ['headers' => $headers];
     }
+    #endregion
 }

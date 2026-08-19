@@ -10,6 +10,7 @@ use app\enums\ApplicationError;
 use app\exceptions\QueryException;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
+use app\helpers\To;
 use app\helpers\WebApp;
 use app\models\AuthorizationDataHelper;
 use app\models\CarouselDataHelper;
@@ -90,13 +91,22 @@ class CarouselApi extends AbstractApi
             $this->renderJsonBadRequest("Données invalides", __FILE__, __LINE__);
             return;
         }
-        if (!$this->authorizationDataHelper->getArticle($data['idArticle'], $connectedUser)) {
+
+        $idArticle = To::int($data['idArticle']);
+
+        if (!$this->authorizationDataHelper->getArticle($idArticle, $connectedUser)) {
             $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }
-        $item = WebApp::sanitizeHtml($data['item']);
+        $item = WebApp::sanitizeHtml(To::str($data['item']));
         try {
-            $message = $this->carouselDataHelper->addOrUpdate($data, $item);
+            /** @var array{id?: int|string, idArticle: int|string} $payload */
+            $payload = ['idArticle' => $idArticle];
+            if (isset($data['id'])) {
+                $payload['id'] = To::int($data['id']);
+            }
+
+            $message = $this->carouselDataHelper->addOrUpdate($payload, $item);
             $this->renderJsonOk(['message' => $message]);
         } catch (Throwable $e) {
             $this->renderJsonError('error' . $e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());

@@ -75,6 +75,7 @@ class Database
         if (!$stmt instanceof PDOStatement) {
             Application::unreachable('Failed to query Metadata table', __FILE__, __LINE__);
         }
+        /** @var object{ApplicationName: string, DatabaseVersion: int}|false $row */
         $row = $stmt->fetch(PDO::FETCH_OBJ);
         $stmt = null;
 

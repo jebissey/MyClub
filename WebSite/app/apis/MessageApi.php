@@ -14,6 +14,7 @@ use app\helpers\Application;
 use app\helpers\ConnectedUser;
 use app\helpers\MediaManager;
 use app\helpers\NotificationSender;
+use app\helpers\To;
 use app\helpers\WebApp;
 use app\models\DataHelper;
 use app\models\MessageDataHelper;
@@ -80,15 +81,15 @@ class MessageApi extends AbstractApi
         }
 
         try {
-            $articleId = isset($data['articleId']) && $data['articleId'] !== '' ? WebApp::toInt($data['articleId']) : null;
-            $eventId   = isset($data['eventId'])   && $data['eventId']   !== '' ? WebApp::toInt($data['eventId'])   : null;
-            $groupId   = isset($data['groupId'])   && $data['groupId']   !== '' ? WebApp::toInt($data['groupId'])   : null;
+            $articleId = isset($data['articleId']) && $data['articleId'] !== '' ? To::int($data['articleId']) : null;
+            $eventId   = isset($data['eventId'])   && $data['eventId']   !== '' ? To::int($data['eventId'])   : null;
+            $groupId   = isset($data['groupId'])   && $data['groupId']   !== '' ? To::int($data['groupId'])   : null;
 
             $imagePath = null;
             if (!empty($data['imageBase64'])) {
                 $imagePath = $this->handleMessageImageBase64(
-                    WebApp::toStr($data['imageBase64']),
-                    WebApp::toStr($data['imageName'] ?? '')
+                    To::str($data['imageBase64']),
+                    To::str($data['imageName'] ?? '')
                 );
                 if ($imagePath === null) {
                     $this->renderJsonBadRequest('Image invalide ou trop volumineuse', __FILE__, __LINE__);
@@ -101,13 +102,13 @@ class MessageApi extends AbstractApi
                 $eventId,
                 $groupId,
                 $this->application->getConnectedUser()->person->Id,
-                WebApp::toStr($data['text']),
+                To::str($data['text']),
                 $imagePath !== null ? WebApp::getBaseUrl() . $imagePath : null,
             );
 
             if ($apiResponse->success === true && isset($apiResponse->data['messageId'])) {
                 $this->notifyMessageRecipients(
-                    WebApp::toInt($apiResponse->data['messageId']),
+                    To::int($apiResponse->data['messageId']),
                     $articleId,
                     $eventId,
                     $groupId
@@ -132,7 +133,7 @@ class MessageApi extends AbstractApi
         }
         try {
             $data = $this->getJsonInput();
-            $apiResponse = $this->doDeleteMessage(WebApp::toInt($data['messageId']), $this->application->getConnectedUser()->person->Id);
+            $apiResponse = $this->doDeleteMessage(To::int($data['messageId']), $this->application->getConnectedUser()->person->Id);
             $this->renderJson($apiResponse->data, $apiResponse->success, $apiResponse->responseCode);
         } catch (Throwable $e) {
             $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
@@ -154,7 +155,7 @@ class MessageApi extends AbstractApi
         try {
             $data = $this->getJsonInput();
 
-            $messageId = WebApp::toInt($data['messageId'] ?? 0);
+            $messageId = To::int($data['messageId'] ?? 0);
             if ($messageId <= 0) {
                 throw new InvalidArgumentException("messageId invalide");
             }
@@ -194,7 +195,7 @@ class MessageApi extends AbstractApi
             $this->renderJsonBadRequest('Données manquantes', __FILE__, __LINE__);
             return;
         }
-        $message = $this->dataHelper->get('Message', ['Id' => WebApp::toInt($data['messageId'])], 'Id');
+        $message = $this->dataHelper->get('Message', ['Id' => To::int($data['messageId'])], 'Id');
         if (!$message) {
             $this->renderJsonBadRequest('Message introuvable', __FILE__, __LINE__);
             return;
@@ -202,9 +203,9 @@ class MessageApi extends AbstractApi
         try {
             $data = $this->getJsonInput();
             $apiResponse = $this->doUpdateMessage(
-                WebApp::toInt($data['messageId']),
+                To::int($data['messageId']),
                 $this->application->getConnectedUser()->person->Id,
-                WebApp::toStr($data['text'])
+                To::str($data['text'])
             );
             $this->renderJson($apiResponse->data, $apiResponse->success, $apiResponse->responseCode);
         } catch (Throwable $e) {

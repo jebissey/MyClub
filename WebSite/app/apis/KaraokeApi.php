@@ -9,6 +9,7 @@ use app\enums\FilterInputRule;
 use app\enums\Karaoke;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
+use app\helpers\To;
 use app\helpers\WebApp;
 use app\models\DataHelper;
 use app\models\PersonDataHelper;
@@ -36,9 +37,9 @@ class KaraokeApi extends AbstractApi
             'clientId' => FilterInputRule::String->value,
         ];
         $requestParam = WebApp::filterInput($schema, $this->application->getFlight()->request()->query->getData());
-        $songId = $requestParam['songId'] ?? '';
-        $action = $requestParam['action'] ?? '';
-        $clientId = $requestParam['clientId'] ?? '';
+        $songId = To::str($requestParam['songId'] ?? '');
+        $action = To::str($requestParam['action'] ?? '');
+        $clientId = To::str($requestParam['clientId'] ?? '');
 
         if (empty($songId)) {
             $this->renderJsonError('Song ID required', ApplicationError::BadRequest->value, __FILE__, __LINE__);

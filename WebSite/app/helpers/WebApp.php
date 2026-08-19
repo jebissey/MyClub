@@ -52,10 +52,8 @@ class WebApp
     public static function getBaseUrl(): string
     {
         $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https://' : 'http://';
-        $host = $_SERVER['HTTP_HOST'];
-        $baseUrl = $protocol . $host . '/';
-
-        return $baseUrl;
+        $host = To::str($_SERVER['HTTP_HOST'] ?? null);
+        return $protocol . $host . '/';
     }
 
     /**
@@ -110,11 +108,16 @@ class WebApp
         return self::getBaseUrl() === self::MYCLUB_WEBAPP;
     }
 
-    public static function nullableCast(mixed $value, string $type): mixed
+    public static function nullableCast(mixed $value, string $type): int|float|bool|null
     {
         if ($value === null || $value === '') {
             return null;
         }
+
+        if (!is_scalar($value)) {
+            throw new InvalidArgumentException('Value must be scalar to cast.');
+        }
+
         return match ($type) {
             'int'    => (int)$value,
             'float'  => (float)$value,
@@ -152,16 +155,6 @@ class WebApp
         return $data;
     }
 
-    public static function toInt(mixed $value, int $default = 0): int
-    {
-        return is_int($value) ? $value : (is_numeric($value) ? (int) $value : $default);
-    }
-
-    public static function toStr(mixed $value, string $default = ''): string
-    {
-        return is_scalar($value) ? (string)$value : $default;
-    }
-
     public static function getRequestMethod(): string
     {
         $method = $_SERVER['REQUEST_METHOD'] ?? null;
@@ -196,7 +189,9 @@ class WebApp
         if ($rule === FilterInputRule::DataUrl->value) {
             return self::filterDataUrl($raw);
         }
-        $value = $rule === FilterInputRule::Html->value ? trim($raw) : trim(strip_tags($raw));
+
+        $rawStr = To::str($raw);
+        $value = $rule === FilterInputRule::Html->value ? trim($rawStr) : trim(strip_tags($rawStr));
 
         if (is_array($rule)) {
             return in_array($value, $rule, true) ? $value : null;
@@ -223,11 +218,21 @@ class WebApp
             return null;
         }
 
-        $result = array_values(array_filter(
+        $isArrayInt = $rule === FilterInputRule::ArrayInt->value;
+
+        $filtered = array_filter(
             $raw,
-            fn($v): bool => $rule === FilterInputRule::ArrayInt->value
-                ? preg_match(FilterInputRule::Integer->value, (string)$v) === 1
-                : (is_string($v) && trim($v) !== '')
+            static function ($v) use ($isArrayInt): bool {
+                $str = To::str($v);
+                return $isArrayInt
+                    ? preg_match(FilterInputRule::Integer->value, $str) === 1
+                    : trim($str) !== '';
+            }
+        );
+
+        $result = array_values(array_map(
+            static fn($v): int|string => $isArrayInt ? To::int($v) : trim(To::str($v)),
+            $filtered
         ));
 
         return empty($result) ? null : $result;

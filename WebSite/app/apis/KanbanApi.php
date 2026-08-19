@@ -9,6 +9,7 @@ use Throwable;
 use app\enums\ApplicationError;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
+use app\helpers\To;
 use app\helpers\WebApp;
 use app\models\DataHelper;
 use app\models\KanbanDataHelper;
@@ -44,9 +45,9 @@ class KanbanApi extends AbstractApi
             return;
         }
 
-        $kanbanCardId = (int)trim(WebApp::toStr($data['cardType'] ?? ''));
-        $title = trim(WebApp::toStr($data['title'] ?? ''));
-        $detail = trim(WebApp::toStr($data['detail'] ?? ''));
+        $kanbanCardId = (int)trim(To::str($data['cardType'] ?? ''));
+        $title = trim(To::str($data['title'] ?? ''));
+        $detail = trim(To::str($data['detail'] ?? ''));
         if (empty($kanbanCardId)) {
             $this->renderJsonBadRequest('CardType Id is required', __FILE__, __LINE__);
             return;
@@ -88,7 +89,7 @@ class KanbanApi extends AbstractApi
             $this->renderJsonBadRequest('Invalid JSON', __FILE__, __LINE__);
             return;
         }
-        $id = WebApp::toInt($data['id'] ?? 0);
+        $id = To::int($data['id'] ?? 0);
         if ($id <= 0) {
             $this->renderJsonBadRequest('Invalid card ID', __FILE__, __LINE__);
             return;
@@ -142,9 +143,9 @@ class KanbanApi extends AbstractApi
             $this->renderJsonBadRequest('Invalid JSON', __FILE__, __LINE__);
             return;
         }
-        $id = WebApp::toInt($data['idKanbanCard'] ?? 0);
-        $what = WebApp::toStr($data['what'] ?? '');
-        $remark = WebApp::toStr($data['remark'] ?? '');
+        $id = To::int($data['idKanbanCard'] ?? 0);
+        $what = To::str($data['what'] ?? '');
+        $remark = To::str($data['remark'] ?? '');
         if ($id <= 0) {
             $this->renderJsonBadRequest('Invalid card ID', __FILE__, __LINE__);
             return;
@@ -179,9 +180,9 @@ class KanbanApi extends AbstractApi
             $this->renderJsonBadRequest('Invalid JSON', __FILE__, __LINE__);
             return;
         }
-        $id = WebApp::toInt($data['id'] ?? 0);
-        $title = trim(WebApp::toStr($data['title'] ?? ''));
-        $detail = trim(WebApp::toStr($data['detail'] ?? ''));
+        $id = To::int($data['id'] ?? 0);
+        $title = trim(To::str($data['title'] ?? ''));
+        $detail = trim(To::str($data['detail'] ?? ''));
 
         if ($id <= 0) {
             $this->renderJsonBadRequest('Invalid card ID', __FILE__, __LINE__);
@@ -227,8 +228,8 @@ class KanbanApi extends AbstractApi
             $this->renderJsonBadRequest('Invalid JSON', __FILE__, __LINE__);
             return;
         }
-        $id = WebApp::toInt($data['idKanbanCardStatus'] ?? 0);
-        $remark = trim(WebApp::toStr($data['remark'] ?? ''));
+        $id = To::int($data['idKanbanCardStatus'] ?? 0);
+        $remark = trim(To::str($data['remark'] ?? ''));
         if ($id <= 0) {
             $this->renderJsonBadRequest('Invalid card status Id', __FILE__, __LINE__);
             return;
@@ -270,8 +271,8 @@ class KanbanApi extends AbstractApi
             return;
         }
 
-        $title = trim(WebApp::toStr($data['title'] ?? ''));
-        $detail = trim(WebApp::toStr($data['detail'] ?? ''));
+        $title = trim(To::str($data['title'] ?? ''));
+        $detail = trim(To::str($data['detail'] ?? ''));
 
         if (empty($title)) {
             $this->renderJsonBadRequest('Title is required', __FILE__, __LINE__);
@@ -311,7 +312,7 @@ class KanbanApi extends AbstractApi
             $this->renderJsonBadRequest('Invalid JSON', __FILE__, __LINE__);
             return;
         }
-        $id = trim(WebApp::toStr($data['id'] ?? ''));
+        $id = trim(To::str($data['id'] ?? ''));
         if (empty($id)) {
             $this->renderJsonBadRequest('Id is required', __FILE__, __LINE__);
             return;
@@ -377,9 +378,9 @@ class KanbanApi extends AbstractApi
             $this->renderJsonBadRequest('Invalid JSON', __FILE__, __LINE__);
             return;
         }
-        $id = WebApp::toInt($data['id'] ?? 0);
-        $title = trim(WebApp::toStr($data['title'] ?? ''));
-        $detail = trim(WebApp::toStr($data['detail'] ?? ''));
+        $id = To::int($data['id'] ?? 0);
+        $title = trim(To::str($data['title'] ?? ''));
+        $detail = trim(To::str($data['detail'] ?? ''));
         if ($id <= 0) {
             $this->renderJsonBadRequest('Invalid project ID', __FILE__, __LINE__);
             return;
@@ -423,10 +424,10 @@ class KanbanApi extends AbstractApi
             return;
         }
 
-        $label = trim(WebApp::toStr($data['label'] ?? ''));
-        $detail = trim(WebApp::toStr($data['detail'] ?? ''));
-        $color = trim(WebApp::toStr($data['color'] ?? ''));
-        $projectId = WebApp::toInt($data['projectId'] ?? 0);
+        $label = trim(To::str($data['label'] ?? ''));
+        $detail = trim(To::str($data['detail'] ?? ''));
+        $color = trim(To::str($data['color'] ?? ''));
+        $projectId = To::int($data['projectId'] ?? 0);
 
         if (empty($label)) {
             $this->renderJsonBadRequest('Label is required', __FILE__, __LINE__);
@@ -470,7 +471,7 @@ class KanbanApi extends AbstractApi
             return;
         }
 
-        $id = WebApp::toInt($data['id'] ?? 0);
+        $id = To::int($data['id'] ?? 0);
 
         if (empty($id)) {
             $this->renderJsonBadRequest('Id is required', __FILE__, __LINE__);
@@ -559,10 +560,10 @@ class KanbanApi extends AbstractApi
             return;
         }
 
-        $label = trim(WebApp::toStr($data['label'] ?? ''));
-        $detail = trim(WebApp::toStr($data['detail'] ?? ''));
-        $color = trim(WebApp::toStr($data['color'] ?? ''));
-        $id = WebApp::toInt($data['id'] ?? 0);
+        $label = trim(To::str($data['label'] ?? ''));
+        $detail = trim(To::str($data['detail'] ?? ''));
+        $color = trim(To::str($data['color'] ?? ''));
+        $id = To::int($data['id'] ?? 0);
 
         if (empty($label)) {
             $this->renderJsonBadRequest('Label is required', __FILE__, __LINE__);

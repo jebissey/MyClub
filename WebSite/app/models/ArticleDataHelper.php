@@ -7,12 +7,16 @@ namespace app\models;
 use PDO;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
+use app\helpers\To;
 use app\interfaces\NewsProviderInterface;
 use app\valueObjects\ArticleAuthorRow;
 use app\valueObjects\ArticleRow;
 use app\valueObjects\ArticleSitemapRow;
 use app\valueObjects\ArticleSummaryRow;
 
+/**
+ * @phpstan-import-type ArticleRowShape from ArticleRow
+ */
 class ArticleDataHelper extends Data implements NewsProviderInterface
 {
     public function __construct(Application $application, private AuthorizationDataHelper $authorizationDataHelper)
@@ -229,6 +233,7 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
         ";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute($params);
+        /** @var ArticleRowShape|false $article */
         $article = $stmt->fetch(PDO::FETCH_OBJ);
         return $article ? ArticleRow::fromStdClass($article) : null;
     }
@@ -329,8 +334,10 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
         if ($settingsRow === false) {
             return null;
         }
-        $spotlightArticleJson = $settingsRow->Value ?? '';
-        return json_decode($spotlightArticleJson, true);
+        $spotlightArticleJson = To::str($settingsRow->Value ?? '');
+        /** @var array<string,mixed>|null $decoded */
+        $decoded = json_decode($spotlightArticleJson, true);
+        return $decoded;
     }
 
     /**
@@ -347,6 +354,7 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
         ";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':id' => $id]);
+        /** @var ArticleRowShape|false $row */
         $row = $stmt->fetch(PDO::FETCH_OBJ);
         return $row ? ArticleRow::fromStdClass($row) : false;
     }
@@ -380,7 +388,7 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
             return false;
         }
         $now = date('Y-m-d H:i:s');
-        $spotlightUntil = $spotlight['spotlightUntil'];
+        $spotlightUntil = To::str($spotlight['spotlightUntil'] ?? '');
         return strtotime($now) < strtotime($spotlightUntil);
     }
 

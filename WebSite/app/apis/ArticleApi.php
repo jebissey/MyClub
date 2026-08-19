@@ -9,6 +9,7 @@ use Throwable;
 use app\enums\ApplicationError;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
+use app\helpers\To;
 use app\helpers\WebApp;
 use app\models\DataHelper;
 use app\models\DesignDataHelper;
@@ -50,8 +51,23 @@ class ArticleApi extends AbstractApi
             $this->renderJsonBadRequest('Corps de requête invalide', __FILE__, __LINE__);
             return;
         }
+        $raw = json_decode($json, true);
+        if (!is_array($raw)) {
+            $this->renderJsonBadRequest('Corps de requête invalide', __FILE__, __LINE__);
+            return;
+        }
+
+        /** @var array{designId?: int|string, vote?: string} $data */
+        $data = [];
+        if (isset($raw['designId'])) {
+            $data['designId'] = To::int($raw['designId']);
+        }
+        if (isset($raw['vote'])) {
+            $data['vote'] = To::str($raw['vote']);
+        }
+
         $this->designDataHelper->insertOrUpdate(
-            json_decode($json, true),
+            $data,
             $this->application->getConnectedUser()->person->Id ?? 0
         );
         $this->renderJsonOK();
@@ -74,6 +90,10 @@ class ArticleApi extends AbstractApi
             return;
         }
         $data = json_decode($json, true);
+        if (!is_array($data)) {
+            $this->renderJsonBadRequest('Corps de requête invalide', __FILE__, __LINE__);
+            return;
+        }
         $orderId = $data['order_id'] ?? null;
         if (!$orderId) {
             $this->renderJsonBadRequest('Missing data', __FILE__, __LINE__);
@@ -88,8 +108,8 @@ class ArticleApi extends AbstractApi
             return;
         }
         $this->orderReplyDataHelper->insertOrUpdate(
-            (int)$person->Id,
-            (int)$orderId,
+            To::int($person->Id),
+            To::int($orderId),
             $orderAnswers
         );
         $this->renderJsonOk();
@@ -112,6 +132,10 @@ class ArticleApi extends AbstractApi
             return;
         }
         $data = json_decode($json, true);
+        if (!is_array($data)) {
+            $this->renderJsonBadRequest('Corps de requête invalide', __FILE__, __LINE__);
+            return;
+        }
         $surveyId = $data['survey_id'] ?? null;
         if (!$surveyId) {
             $this->renderJsonBadRequest('Missing data', __FILE__, __LINE__);
@@ -127,7 +151,7 @@ class ArticleApi extends AbstractApi
         }
         $this->replyDataHelper->insertOrUpdate(
             $person->Id,
-            (int)$surveyId,
+            To::int($surveyId),
             $surveyAnswers
         );
         $this->renderJsonOk();

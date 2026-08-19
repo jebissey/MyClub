@@ -17,9 +17,11 @@ class Client
     public function __construct()
     {
         try {
-            if (($_SERVER['HTTP_USER_AGENT'] ?? '') !== '') {
+            $userAgent = To::str($_SERVER['HTTP_USER_AGENT'] ?? '');
+
+            if ($userAgent !== '') {
                 $parser = Parser::create();
-                $result = $parser->parse($_SERVER['HTTP_USER_AGENT']);
+                $result = $parser->parse($userAgent);
 
                 $this->browser = $result->ua->family;
                 $this->version = $result->ua->major ?? '';
@@ -48,36 +50,38 @@ class Client
 
     public function getIp(): string
     {
-        return $_SERVER['HTTP_CLIENT_IP']
+        return To::str(
+            $_SERVER['HTTP_CLIENT_IP']
             ?? $_SERVER['HTTP_X_FORWARDED_FOR']
             ?? $_SERVER['REMOTE_ADDR']
-            ?? '0.0.0.0';
+            ?? '0.0.0.0'
+        );
     }
 
     public function getMethod(): string
     {
-        return WebApp::getRequestMethod() ?? 'CLI';
+        return WebApp::getRequestMethod();
     }
 
     public function getReferer(): string
     {
-        return $_SERVER['HTTP_REFERER'] ?? '';
+        return To::str($_SERVER['HTTP_REFERER'] ?? '');
     }
 
     public function getScreenResolution(): string
     {
-        return $_COOKIE['screen_resolution'] ?? '';
+        return To::str($_COOKIE['screen_resolution'] ?? '');
     }
 
     public function getToken(): string
     {
-        return $_SESSION['token'] ?? '';
+        return To::str($_SESSION['token'] ?? '');
     }
 
     public function getUri(): string
     {
-        $uri = $_SERVER['REQUEST_URI'] ?? '';
-        $method = WebApp::getRequestMethod() ?? '';
+        $uri = To::str($_SERVER['REQUEST_URI'] ?? '');
+        $method = WebApp::getRequestMethod();
 
         return $uri . ' (' . $method . ')';
     }

@@ -7,6 +7,7 @@ namespace app\modules\Exercise;
 use app\enums\ApplicationError;
 use app\enums\FilterInputRule;
 use app\helpers\Application;
+use app\helpers\To;
 use app\helpers\WebApp;
 use app\models\ExerciseTableDataHelper;
 use app\modules\Common\TableController;
@@ -86,7 +87,7 @@ class ExerciseController extends TableController
         ];
         $query = $this->exerciseTableDataHelper->getQuery($connectedUser);
         /** @var array<string, string> $stringFilterValues */
-        $stringFilterValues = array_map(static fn(mixed $v): string => WebApp::toStr($v), $filterValues);
+        $stringFilterValues = array_map(static fn(mixed $v): string => To::str($v), $filterValues);
         $data = $this->prepareTableData($query, $stringFilterValues);
         $this->render('Exercise/views/exercises_index.latte', $this->getAllParams([
             'exercises' => $data['items'],
@@ -132,7 +133,7 @@ class ExerciseController extends TableController
         }
 
         $titleRaw = $this->flight->request()->data->getData()['title'] ?? '';
-        $title = trim(WebApp::toStr($titleRaw));
+        $title = trim(To::str($titleRaw));
 
         $this->dataHelper->set('Exercise', [
             'Title'      => $title ?: 'Exercices',

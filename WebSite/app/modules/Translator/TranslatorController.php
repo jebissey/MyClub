@@ -7,6 +7,7 @@ namespace app\modules\Translator;
 use app\enums\FilterInputRule;
 use app\helpers\Application;
 use app\helpers\TranslationManager;
+use app\helpers\To;
 use app\helpers\WebApp;
 use app\modules\Common\AbstractController;
 
@@ -40,17 +41,17 @@ class TranslatorController extends AbstractController
             $this->flight->request()->query->getData()
         );
 
-        $referenceLang = WebApp::toStr($filters['ref'] ?? '');
+        $referenceLang = To::str($filters['ref'] ?? '');
         $referenceLang = in_array($referenceLang, $languages, true)
             ? $referenceLang
             : TranslationManager::DEFAULT_LANGUAGE;
 
-        $targetLang = WebApp::toStr($filters['lang'] ?? '');
+        $targetLang = To::str($filters['lang'] ?? '');
         $targetLang = in_array($targetLang, $languages, true)
             ? $targetLang
             : TranslationManager::DEFAULT_LANGUAGE;
 
-        $missingOnly = WebApp::toInt($filters['missing'] ?? 0);
+        $missingOnly = To::int($filters['missing'] ?? 0);
 
         $translations = $this->languagesDataHelper->getTranslations(
             $referenceLang,

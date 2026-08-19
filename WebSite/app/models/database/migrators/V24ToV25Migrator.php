@@ -1012,6 +1012,7 @@ SQL);
         $update = $pdo->prepare("UPDATE Languages SET \"$lang\" = :val WHERE Name = :name");
         foreach ($homeKeys as $settingsKey => $langKey) {
             $select->execute([':name' => $settingsKey]);
+            /** @var array{Value: mixed}|false $row */
             $row = $select->fetch(PDO::FETCH_ASSOC);
             if ($row) {
                 $insert->execute([':name' => $langKey]);

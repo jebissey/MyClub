@@ -10,6 +10,7 @@ use app\enums\ApplicationError;
 use app\exceptions\QueryException;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
+use app\helpers\To;
 use app\helpers\WebApp;
 use app\models\DataHelper;
 use app\models\PersonDataHelper;
@@ -60,9 +61,9 @@ class TranslatorApi extends AbstractApi
             return;
         }
 
-        $id   = (int)$data['id'];
-        $lang = (string)$data['lang'];
-        $value = WebApp::sanitizeHtml((string)$data['value']);
+        $id   = To::int($data['id']);
+        $lang = To::str($data['lang']);
+        $value = WebApp::sanitizeHtml(To::str($data['value']));
 
         if ($id <= 0) {
             $this->renderJsonBadRequest("Id invalide", __FILE__, __LINE__);

@@ -52,7 +52,7 @@ class OrderDataHelper extends Data implements NewsProviderInterface
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':articleId' => $articleId]);
         $order = $stmt->fetch(PDO::FETCH_OBJ);
-        return $order;
+        return is_object($order) ? $order : false;
     }
 
     public function getWithCreator(int $articleId): OrderWithCreatorRow|false
@@ -70,6 +70,7 @@ class OrderDataHelper extends Data implements NewsProviderInterface
         ";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':articleId' => $articleId]);
+        /** @var object{Id: int|string, Question: string, Options: string, IdArticle: int|string, ClosingDate: string, Visibility: string, CreatedBy: int|string}|false $result */
         $result = $stmt->fetch(PDO::FETCH_OBJ);
         if ($result === false) {
             return false;

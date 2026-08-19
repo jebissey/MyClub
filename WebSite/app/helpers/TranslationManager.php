@@ -60,7 +60,9 @@ class TranslationManager
 
         $_COOKIE[self::COOKIE_NAME] = $language;
 
-        header('Location: ' . $_SERVER['PHP_SELF']);
+        $phpSelf = $_SERVER['PHP_SELF'] ?? '';
+
+        header('Location: ' . (is_string($phpSelf) ? $phpSelf : ''));
     }
 
     public static function getCurrentLanguage(): string
@@ -74,7 +76,9 @@ class TranslationManager
             return $forcedLanguage;
         }
 
-        return $_COOKIE[self::COOKIE_NAME] ?? self::DEFAULT_LANGUAGE;
+        $cookieValue = $_COOKIE[self::COOKIE_NAME] ?? null;
+
+        return is_string($cookieValue) ? $cookieValue : self::DEFAULT_LANGUAGE;
     }
 
     public static function getDayName(DateTimeInterface $date): string

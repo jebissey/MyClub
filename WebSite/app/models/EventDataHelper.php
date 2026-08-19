@@ -19,7 +19,7 @@ use app\helpers\Application;
 use app\helpers\ConnectedUser;
 use app\helpers\PersonPreferences;
 use app\helpers\TranslationManager;
-use app\helpers\WebApp;
+use app\helpers\To;
 use app\interfaces\NewsProviderInterface;
 use app\valueObjects\ApiResponse;
 use app\valueObjects\EventAttributeRow;
@@ -541,7 +541,7 @@ class EventDataHelper extends Data implements NewsProviderInterface
                 }
                 $eventId = $newId;
             } elseif ($data['formMode'] == 'update') {
-                $eventId = WebApp::toInt($data['id'] ?? null);
+                $eventId = To::int($data['id'] ?? null);
                 if (!$this->get('Event', ['Id' => $eventId], 'Id')) {
                     throw new QueryException("Event {$eventId} doesn't exist");
                 }

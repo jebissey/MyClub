@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\models;
 
 use PDO;
+use stdClass;
 use Throwable;
 use app\helpers\Application;
 use app\valueObjects\KaraokeSession;
@@ -60,7 +61,7 @@ class KaraokeDataHelper extends Data
         $stmt = $this->pdo->prepare('SELECT "Id" FROM "KaraokeSession" WHERE "SessionId" = ?');
         $stmt->execute([$sessionId]);
         $session = $stmt->fetch(PDO::FETCH_OBJ);
-        if ($session) {
+        if ($session instanceof stdClass) {
             return (int)$session->Id;
         }
 
@@ -78,7 +79,7 @@ class KaraokeDataHelper extends Data
         $stmt->execute([$id]);
         $result = $stmt->fetch(PDO::FETCH_OBJ);
 
-        return $result !== false ? KaraokeSession::fromStdClass($result) : null;
+        return $result instanceof stdClass ? KaraokeSession::fromStdClass($result) : null;
     }
 
     public function getSessionBySessionId(string $sessionId): ?KaraokeSession
@@ -87,7 +88,7 @@ class KaraokeDataHelper extends Data
         $stmt->execute([$sessionId]);
         $result = $stmt->fetch(PDO::FETCH_OBJ);
 
-        return $result !== false ? KaraokeSession::fromStdClass($result) : null;
+        return $result instanceof stdClass ? KaraokeSession::fromStdClass($result) : null;
     }
 
     public function isClientHost(string $clientId, int $idSession): bool
@@ -99,7 +100,7 @@ class KaraokeDataHelper extends Data
         $stmt->execute([$clientId, $idSession]);
         $client = $stmt->fetch(PDO::FETCH_OBJ);
 
-        return $client && $client->IsHost == 1;
+        return $client instanceof stdClass && $client->IsHost == 1;
     }
 
     public function registerClient(string $clientId, int $idSession, bool $isHost): bool

@@ -7,6 +7,7 @@ namespace app\modules\PersonManager;
 use Throwable;
 use app\enums\FilterInputRule;
 use app\helpers\Application;
+use app\helpers\To;
 use app\helpers\WebApp;
 use app\models\GroupDataHelper;
 use app\models\TableControllerDataHelper;
@@ -32,7 +33,7 @@ class RegistrationController extends TableController
                 'email' => FilterInputRule::Email->value,
             ];
             $filterValues = array_map(
-                static fn(mixed $value): string => WebApp::toStr($value),
+                static fn(mixed $value): string => To::str($value),
                 WebApp::filterInput($schema, $this->flight->request()->query->getData())
             );
             $filterConfig = [

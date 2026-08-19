@@ -6,7 +6,7 @@ namespace app\apis;
 
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
-use app\models\ArticleDataHelper;
+use app\helpers\To;
 use app\models\DataHelper;
 use app\models\PersonDataHelper;
 use app\valueObjects\ExerciseRow;
@@ -62,7 +62,7 @@ class ExerciseApi extends AbstractApi
             return;
         }
         $data = $this->getJsonInput();
-        $index = (int)($data['index'] ?? -1);
+        $index = To::int($data['index'] ?? -1, -1);
 
         $row = $this->dataHelper->get('Exercise', ['Id' => $id]);
         if (!$row) {
@@ -72,7 +72,8 @@ class ExerciseApi extends AbstractApi
         /** @var object{Id: int|string, Content: string, Title: string, LastUpdate: string} $row */
         $exercise = ExerciseRow::fromStdClass($row);
 
-        $exercises = json_decode($exercise->Content, true);
+        /** @var array<mixed> $exercises */
+        $exercises = json_decode($exercise->Content, true) ?? [];
         if ($index < 0 || $index >= count($exercises)) {
             $this->renderJsonBadRequest("Index {$index} out of range", __FILE__, __LINE__);
             return;

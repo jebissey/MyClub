@@ -10,6 +10,7 @@ use app\enums\ApplicationError;
 use app\exceptions\EmailException;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
+use app\helpers\To;
 use app\helpers\WebApp;
 use app\interfaces\EmailQuotaTrackerInterface;
 use app\models\DataHelper;
@@ -61,7 +62,7 @@ class CommunicationApi extends AbstractApi
             $desactivated = isset($data['desactivated']) ? (bool)$data['desactivated'] : null;
 
             $members = $this->personDataHelper->getPersonsForCommunication(
-                groupId: isset($data['groupId']) ? (int)$data['groupId'] : null,
+                groupId: isset($data['groupId']) ? To::int($data['groupId']) : null,
                 presentation: $presentation,
                 password: $password,
                 inPublicMap: $inPublicMap,
@@ -84,11 +85,18 @@ class CommunicationApi extends AbstractApi
     {
         if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isCommunicationManager(), __FILE__, __LINE__)) {
             try {
-                $input        = $this->getJsonInput();
-                $recipientIds = array_filter(array_map('intval', $input['recipient_ids'] ?? []));
-                $subject      = trim($input['subject'] ?? '');
-                $content      = trim($input['content'] ?? '');
-                $replyToMode  = $input['reply_to'] ?? null;
+                $input = $this->getJsonInput();
+
+                $rawRecipientIds = $input['recipient_ids'] ?? [];
+                $recipientIds = is_array($rawRecipientIds)
+                    ? array_filter(array_map(static fn(mixed $v): int => To::int($v), $rawRecipientIds))
+                    : [];
+
+                $subject = trim(To::str($input['subject'] ?? null));
+                $content = trim(To::str($input['content'] ?? null));
+
+                $rawReplyTo  = $input['reply_to'] ?? null;
+                $replyToMode = is_string($rawReplyTo) ? $rawReplyTo : null;
 
                 if (empty($recipientIds) || $subject === '' || $content === '') {
                     $this->renderJsonBadRequest(
@@ -201,7 +209,7 @@ class CommunicationApi extends AbstractApi
                 $this->renderJsonBadRequest("Données invalides", __FILE__, __LINE__);
                 return;
             }
-            $value = trim($body['value'] ?? '');
+            $value = trim(To::str($body['value'] ?? null));
 
             // Validation
             if ($value !== '' && !filter_var($value, FILTER_VALIDATE_EMAIL)) {

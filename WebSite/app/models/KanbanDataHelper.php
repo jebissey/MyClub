@@ -81,7 +81,10 @@ class KanbanDataHelper extends Data
             WHERE Id = :id";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':id' => $id]);
-        return $stmt->fetch(PDO::FETCH_OBJ);
+
+        /** @var object{Id: int, Title: string, Detail: string}|false $result */
+        $result = $stmt->fetch(PDO::FETCH_OBJ);
+        return $result;
     }
 
     /**
@@ -299,8 +302,10 @@ class KanbanDataHelper extends Data
             ':idProject' => $idProject,
             ':idPerson' => $idPerson
         ]);
+
+        /** @var object{Count: int} $row */
         $row = $stmt->fetch(PDO::FETCH_OBJ);
-        return ((int)$row->Count) > 0;
+        return $row->Count > 0;
     }
 
     #region CardType

@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace app\models;
 
-use app\helpers\Application;
 use stdClass;
+use app\helpers\Application;
+use app\helpers\To;
 
 class MembershipDataHelper extends Data
 {
@@ -70,10 +71,23 @@ class MembershipDataHelper extends Data
      */
     public function getAllForPerson(int $personId): array
     {
-        return $this->query(
+        $rows = $this->query(
             "SELECT * FROM Membership WHERE PersonId = ? ORDER BY Season DESC",
             [$personId]
-        ) ?: [];
+        );
+
+        if (!is_array($rows)) {
+            return [];
+        }
+
+        $result = [];
+        foreach ($rows as $row) {
+            if ($row instanceof stdClass) {
+                $result[] = $row;
+            }
+        }
+
+        return $result;
     }
 
     // ─── Write ────────────────────────────────────────────────────────────────
@@ -112,14 +126,16 @@ class MembershipDataHelper extends Data
      */
     public function markPaidByIntentId(string $intentId, string $orderId): bool
     {
-        $row = $this->query(
+        $rows = $this->query(
             "SELECT Id FROM Membership WHERE HelloAssoCheckoutIntentId = ? AND Status = 'pending' LIMIT 1",
             [$intentId]
         );
 
-        if (empty($row)) {
+        if (!is_array($rows) || !isset($rows[0]) || !($rows[0] instanceof stdClass) || !isset($rows[0]->Id)) {
             return false;
         }
+
+        $membershipId = To::int($rows[0]->Id);
 
         $this->set(
             'Membership',
@@ -129,7 +145,7 @@ class MembershipDataHelper extends Data
                 'PaidAt'           => date('Y-m-d H:i:s'),
                 'UpdatedAt'        => date('Y-m-d H:i:s'),
             ],
-            ['Id' => (int)$row[0]->Id]
+            ['Id' => $membershipId]
         );
 
         return true;

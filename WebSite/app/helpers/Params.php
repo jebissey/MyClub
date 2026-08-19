@@ -30,8 +30,14 @@ class Params
         array $defaultColors
     ): array {
         if (self::$commonParams === []) {
+            $requestUri = $_SERVER['REQUEST_URI'] ?? '';
+
+            if (!is_string($requestUri)) {
+                throw new InvalidArgumentException('REQUEST_URI must be a string');
+            }
+
             self::setDefaultParams(
-                $_SERVER['REQUEST_URI'],
+                $requestUri,
                 $prodSiteUrl,
                 $memberAlert,
                 $defaultColors
@@ -113,7 +119,7 @@ class Params
             'currentLanguage' => $lang,
             'supportedLanguages' => TranslationManager::getSupportedLanguages(),
             'flag' => TranslationManager::getFlag($lang),
-            'currentPath' => parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH),
+            'currentPath' => $path,
             'isMyclubWebSite' => WebApp::isMyClubWebSite(),
             'navbarBgColor'   => $defaultColors['navbarBgColor'],
             'navbarInkColor'  => $defaultColors['navbarInkColor'],

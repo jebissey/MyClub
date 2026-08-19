@@ -9,7 +9,7 @@ use app\enums\ApplicationError;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
 use app\helpers\MediaManager;
-use app\helpers\WebApp;
+use app\helpers\To;
 use app\models\DataHelper;
 use app\models\PersonDataHelper;
 use app\valueObjects\UploadedFileInput;
@@ -48,9 +48,9 @@ class MediaApi extends AbstractApi
     {
         if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isRedactor(), __FILE__, __LINE__)) {
             $data = $this->getJsonInput();
-            $path      = WebApp::toStr($data['path'] ?? '');
-            $imageData = WebApp::toStr($data['imageData'] ?? '');  // data:image/jpeg;base64,...
-            $maxSize   = min(WebApp::toInt($data['maxSize'] ?? 1200), 1200);
+            $path      = To::str($data['path'] ?? '');
+            $imageData = To::str($data['imageData'] ?? '');  // data:image/jpeg;base64,...
+            $maxSize   = min(To::int($data['maxSize'] ?? 1200), 1200);
 
             if (!preg_match('#^[\w/-]+\.(jpg|jpeg|png|gif)$#i', $path)) {
                 $this->renderJsonError(
@@ -123,7 +123,7 @@ class MediaApi extends AbstractApi
     public function isShared(): void
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isRedactor(), __FILE__, __LINE__)) {
-            $filePath = trim(WebApp::toStr($_GET['path'] ?? ''));
+            $filePath = trim(To::str($_GET['path'] ?? ''));
             if (!$filePath) {
                 $this->renderJsonBadRequest('Fichier manquant', __FILE__, __LINE__);
                 return;
@@ -136,7 +136,7 @@ class MediaApi extends AbstractApi
     {
         if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isRedactor(), __FILE__, __LINE__)) {
             $data = $this->getJsonInput();
-            $filePath = trim(WebApp::toStr($data['path'] ?? ''));
+            $filePath = trim(To::str($data['path'] ?? ''));
             if (!$filePath) {
                 $this->renderJsonBadRequest('Missing path', __FILE__, __LINE__);
                 return;
@@ -155,7 +155,7 @@ class MediaApi extends AbstractApi
         if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isRedactor(), __FILE__, __LINE__)) {
             $data = $this->getJsonInput();
 
-            $path = WebApp::toStr($data['path'] ?? '');
+            $path = To::str($data['path'] ?? '');
             if ($path === '') {
                 $this->renderJsonBadRequest('Missing path', __FILE__, __LINE__);
                 return;
@@ -175,7 +175,7 @@ class MediaApi extends AbstractApi
                 (int)$month,
                 $filename,
                 $idGroup,
-                WebApp::toInt($data['membersOnly'] ?? 0)
+                To::int($data['membersOnly'] ?? 0)
             );
 
             $this->renderJson(
@@ -206,21 +206,21 @@ class MediaApi extends AbstractApi
 
                 $files = array_map(
                     fn($i) => [
-                        'name'     => WebApp::toStr($names[$i] ?? ''),
-                        'tmp_name' => WebApp::toStr($tmpNames[$i] ?? ''),
-                        'error'    => WebApp::toInt($errors[$i] ?? UPLOAD_ERR_NO_FILE),
-                        'size'     => WebApp::toInt($sizes[$i] ?? 0),
-                        'type'     => WebApp::toStr($types[$i] ?? ''),
+                        'name'     => To::str($names[$i] ?? ''),
+                        'tmp_name' => To::str($tmpNames[$i] ?? ''),
+                        'error'    => To::int($errors[$i] ?? UPLOAD_ERR_NO_FILE),
+                        'size'     => To::int($sizes[$i] ?? 0),
+                        'type'     => To::str($types[$i] ?? ''),
                     ],
                     array_keys($names)
                 );
             } else {
                 $files = [[
-                    'name'     => WebApp::toStr($raw['name'] ?? ''),
-                    'tmp_name' => WebApp::toStr($raw['tmp_name'] ?? ''),
-                    'error'    => WebApp::toInt($raw['error'] ?? UPLOAD_ERR_NO_FILE),
-                    'size'     => WebApp::toInt($raw['size'] ?? 0),
-                    'type'     => WebApp::toStr($raw['type'] ?? ''),
+                    'name'     => To::str($raw['name'] ?? ''),
+                    'tmp_name' => To::str($raw['tmp_name'] ?? ''),
+                    'error'    => To::int($raw['error'] ?? UPLOAD_ERR_NO_FILE),
+                    'size'     => To::int($raw['size'] ?? 0),
+                    'type'     => To::str($raw['type'] ?? ''),
                 ]];
             }
 

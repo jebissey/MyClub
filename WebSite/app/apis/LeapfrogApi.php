@@ -8,6 +8,7 @@ use JsonException;
 use app\enums\ApplicationError;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
+use app\helpers\To;
 use app\helpers\WebApp;
 use app\models\DataHelper;
 use app\models\LogDataWriterHelper;
@@ -37,7 +38,7 @@ class LeapfrogApi extends AbstractApi
             $this->renderJsonBadRequest("Données invalides", __FILE__, __LINE__);
             return;
         }
-        $this->logDataWriterHelper->add((string)ApplicationError::Ok->value, $data['message'] ?? '');
+        $this->logDataWriterHelper->add((string)ApplicationError::Ok->value, To::str($data['message'] ?? ''));
         $this->renderJsonOk();
     }
 }

@@ -13,6 +13,7 @@ use app\enums\ApplicationError;
 use app\enums\TimeOfDay;
 use app\helpers\Application;
 use app\helpers\Params;
+use app\helpers\To;
 use app\helpers\WebApp;
 use app\helpers\TranslationManager;
 use app\models\AuthorizationDataHelper;
@@ -80,7 +81,7 @@ abstract class AbstractController
 
     protected function getLayout(): string
     {
-        $navbar = $_SESSION['navbar'] ?? '';
+        $navbar = To::str($_SESSION['navbar'] ?? '');
 
         return match ($navbar) {
             'designer'          => '../../Designer/views/designer.latte',
@@ -262,7 +263,7 @@ abstract class AbstractController
             Flight::set('message', $message);
         }
 
-        $ua = $_SERVER['HTTP_USER_AGENT'] ?? '';
+        $ua = To::str($_SERVER['HTTP_USER_AGENT'] ?? '');
         if (stripos($ua, 'TestDevice') !== false) {
             $statusCode = $applicationError->value ?? ApplicationError::Ok->value;
             Flight::response()->status($statusCode);
@@ -320,7 +321,7 @@ abstract class AbstractController
         if ($connectedUser->person === null) {
             $result = $this->application->getAuthenticationService()->handleRememberMeLogin();
             if ($result && $result->isSuccess()) {
-                $this->redirect($_SERVER['REQUEST_URI'], ApplicationError::Ok, "Auto sign in succeeded for {$result->getUser()?->Email}");
+                $this->redirect(To::str($_SERVER['REQUEST_URI'] ?? ''), ApplicationError::Ok, "Auto sign in succeeded for {$result->getUser()?->Email}");
                 return true;
             }
         }

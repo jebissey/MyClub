@@ -8,6 +8,7 @@ use Throwable;
 use app\enums\ApplicationError;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
+use app\helpers\To;
 use app\helpers\WebApp;
 use app\models\Data;
 use app\models\DataHelper;
@@ -99,22 +100,22 @@ class MenuItemApi extends AbstractApi
              * } $menuItemData
              */
             $menuItemData = [
-                'what' => WebApp::toStr($data['what']),
-                'type' => WebApp::toStr($data['type']),
-                'label' => isset($data['label']) ? WebApp::toStr($data['label']) : null,
-                'icon' => isset($data['icon']) ? WebApp::toStr($data['icon']) : null,
-                'url' => isset($data['url']) ? WebApp::toStr($data['url']) : null,
-                'idGroup' => isset($data['idGroup']) ? WebApp::toInt($data['idGroup']) : null,
-                'parentId' => isset($data['parentId']) ? WebApp::toInt($data['parentId']) : null,
+                'what' => To::str($data['what']),
+                'type' => To::str($data['type']),
+                'label' => isset($data['label']) ? To::str($data['label']) : null,
+                'icon' => isset($data['icon']) ? To::str($data['icon']) : null,
+                'url' => isset($data['url']) ? To::str($data['url']) : null,
+                'idGroup' => isset($data['idGroup']) ? To::int($data['idGroup']) : null,
+                'parentId' => isset($data['parentId']) ? To::int($data['parentId']) : null,
                 'forMembers' => (bool) ($data['forMembers'] ?? false),
                 'forContacts' => (bool) ($data['forContacts'] ?? false),
                 'forAnonymous' => (bool) ($data['forAnonymous'] ?? false),
             ];
             if (isset($data['id'])) {
-                $menuItemData['id'] = WebApp::toInt($data['id']);
+                $menuItemData['id'] = To::int($data['id']);
             }
             if (isset($data['position'])) {
-                $menuItemData['position'] = WebApp::toInt($data['position']);
+                $menuItemData['position'] = To::int($data['position']);
             }
 
             $this->menuItemDataHelper->insertOrUpdate($menuItemData);
@@ -143,7 +144,7 @@ class MenuItemApi extends AbstractApi
 
             /** @var array<int, int> $positions */
             $positions = array_values(array_map(
-                static fn(mixed $v): int => WebApp::toInt($v),
+                static fn(mixed $v): int => To::int($v),
                 $data['positions']
             ));
 

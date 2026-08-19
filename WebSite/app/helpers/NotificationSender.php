@@ -69,6 +69,7 @@ class NotificationSender
         }
 
         foreach ($webPush->flush() as $report) {
+            /** @var \Minishlink\WebPush\MessageSentReport $report */
             $endpoint = $report->getRequest()->getUri()->__toString();
             if (!$report->isSuccess()) {
                 error_log("Notification failed for {$endpoint}: " . $report->getReason());

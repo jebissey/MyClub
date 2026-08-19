@@ -9,6 +9,7 @@ use DateTimeZone;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
 use app\helpers\GravatarHandler;
+use app\helpers\To;
 use app\helpers\WebApp;
 use app\models\DataHelper;
 use app\models\LogDataHelper;
@@ -38,8 +39,8 @@ class ChatApi extends AbstractApi
             $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
-        $previousLogId = (int)($_SESSION['last_log_id'] ?? 0);
-        $minutes = (int) ($_GET['m'] ?? self::ACTIVE_WINDOW_MINUTES);
+        $previousLogId = To::int($_SESSION['last_log_id'] ?? null);
+        $minutes = To::int($_GET['m'] ?? null, self::ACTIVE_WINDOW_MINUTES);
 
         $activePersons = array_values($this->dataHelper->gets(
             'Person',

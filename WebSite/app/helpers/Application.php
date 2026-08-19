@@ -53,7 +53,8 @@ class Application
 
     private function __construct()
     {
-        self::$root = 'https://' . ($_SERVER['HTTP_HOST'] ?? 'localhost');
+        $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+        self::$root = 'https://' . (is_string($host) ? $host : 'localhost');
         self::$flight = new Engine();
         self::$latte = new LatteEngine();
         self::$latte->setLoader(new FileLoader(__DIR__ . '/../../app/modules'));

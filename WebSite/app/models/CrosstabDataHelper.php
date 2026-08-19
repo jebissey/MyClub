@@ -7,6 +7,7 @@ namespace app\models;
 use PDO;
 use app\enums\Period;
 use app\helpers\Application;
+use app\helpers\To;
 
 /**
  * @phpstan-type CrosstabCell array{count: int, count2: int}
@@ -46,10 +47,10 @@ class CrosstabDataHelper extends Data
         $columns = [];
 
         foreach ($data as $item) {
-            $row    = (string) $item['rowForCrosstab'];
-            $column = (string) $item['columnForCrosstab'];
-            $count  = (int) $item['countForCrosstab'];
-            $count2 = (int) ($item['count2ForCrosstab'] ?? 0);
+            $row    = To::str($item['rowForCrosstab'] ?? null);
+            $column = To::str($item['columnForCrosstab'] ?? null);
+            $count  = To::int($item['countForCrosstab'] ?? null);
+            $count2 = To::int($item['count2ForCrosstab'] ?? null);
 
             if (!isset($rows[$row])) {
                 $rows[$row] = [];

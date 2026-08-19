@@ -12,11 +12,11 @@ namespace app\valueObjects;
  *     CreatedBy: int|string,
  *     PublishedBy?: int|string|null,
  *     IdGroup?: int|string|null,
- *     OnlyForMembers?: int|bool|null,
+ *     OnlyForMembers?: bool|int|null,
  *     LastUpdate: string,
  *     Timestamp?: string|null,
  *     Author?: AuthorInfo,
- *     Group?: GroupInfo,
+ *     Group?: GroupInfo
  * }
  */
 final readonly class ArticleRow

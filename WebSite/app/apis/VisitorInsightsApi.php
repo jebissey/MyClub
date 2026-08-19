@@ -7,6 +7,7 @@ namespace app\apis;
 use DateTimeImmutable;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
+use app\helpers\To;
 use app\helpers\WebApp;
 use app\models\DataHelper;
 use app\models\LogDataHelper;
@@ -31,9 +32,9 @@ class VisitorInsightsApi extends AbstractApi
             return;
         }
 
-        $uri  = trim($_GET['uri']  ?? '');
-        $from = trim($_GET['from'] ?? '');
-        $to   = trim($_GET['to']   ?? '');
+        $uri  = trim(To::str($_GET['uri']  ?? ''));
+        $from = trim(To::str($_GET['from'] ?? ''));
+        $to   = trim(To::str($_GET['to']   ?? ''));
 
         if ($uri === '' || $from === '' || $to === '') {
             $this->renderJsonBadRequest('Missing required parameters: uri, from, to', __FILE__, __LINE__);
@@ -59,9 +60,9 @@ class VisitorInsightsApi extends AbstractApi
             return;
         }
 
-        $uri  = trim($_GET['uri']  ?? '');
-        $from = trim($_GET['from'] ?? '');
-        $to   = trim($_GET['to']   ?? '');
+        $uri  = trim(To::str($_GET['uri']  ?? ''));
+        $from = trim(To::str($_GET['from'] ?? ''));
+        $to   = trim(To::str($_GET['to']   ?? ''));
 
         if ($uri === '' || $from === '' || $to === '') {
             $this->renderJsonBadRequest('Missing required parameters: uri, from, to', __FILE__, __LINE__);

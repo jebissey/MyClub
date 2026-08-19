@@ -8,6 +8,7 @@ use DateTime;
 use Throwable;
 use app\enums\FilterInputRule;
 use app\helpers\Application;
+use app\helpers\To;
 use app\helpers\WebApp;
 use app\models\EventDataHelper;
 use app\modules\Common\AbstractController;
@@ -60,12 +61,12 @@ class EventGuestController extends AbstractController
                 'eventId' => FilterInputRule::Int->value,
             ];
             $input = WebApp::filterInput($schema, $this->flight->request()->data->getData());
-            $email = WebApp::toStr($input['email'] ?? '');
+            $email = To::str($input['email'] ?? '');
             if (empty($email)) {
                 $this->guest('Adresse e-mail invalide', 'error');
                 return;
             }
-            $eventId = WebApp::toInt($input['eventId'] ?? 0);
+            $eventId = To::int($input['eventId'] ?? 0);
             if ($eventId <= 0) {
                 $this->guest('Veuillez sélectionner un événement', 'error');
                 return;
@@ -75,7 +76,7 @@ class EventGuestController extends AbstractController
                 $this->guest('Événement non trouvé ou non accessible', 'error');
                 return;
             }
-            $nickname = WebApp::toStr($input['nickname'] ?? '???');
+            $nickname = To::str($input['nickname'] ?? '???');
             try {
                 /** @var object{Id: int|string, Token: string, NickName: string, TokenCreatedAt: string}|false $contactData */ $contactData = $this->dataHelper->get('Contact', ['Email' => $email], 'Id, Token, NickName, TokenCreatedAt');
                 $contact = $contactData ? ContactRow::fromStdClass($contactData) : null;

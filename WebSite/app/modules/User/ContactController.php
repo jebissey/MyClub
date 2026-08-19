@@ -8,6 +8,7 @@ use app\enums\ApplicationError;
 use app\enums\EventAudience;
 use app\enums\FilterInputRule;
 use app\helpers\Application;
+use app\helpers\To;
 use app\helpers\WebApp;
 use app\models\PersonDataHelper;
 use app\modules\Common\AbstractController;
@@ -64,13 +65,13 @@ class ContactController extends AbstractController
     #region Private functions
     private function handleContactForm(): void
     {
-        $honeypot = WebApp::toStr($_POST['website'] ?? '');
+        $honeypot = To::str($_POST['website'] ?? '');
         if ($honeypot !== '') {
             $this->silentFail("honey pot field filling with {$honeypot}");
             return;
         }
 
-        $formLoadedAt = WebApp::toInt($_SESSION['contact_form_loaded'] ?? 0);
+        $formLoadedAt = To::int($_SESSION['contact_form_loaded'] ?? 0);
         $duration = time() - $formLoadedAt;
         if ($duration <= self::MIN_FILL_SECONDS) {
             $this->silentFail("too fast for a human ({$duration}s)");
@@ -78,13 +79,13 @@ class ContactController extends AbstractController
         }
         unset($_SESSION['contact_form_loaded']);
 
-        $ip = WebApp::toStr($_SERVER['REMOTE_ADDR'] ?? 'unknown');
+        $ip = To::str($_SERVER['REMOTE_ADDR'] ?? 'unknown');
         if (!$this->checkRateLimit($ip)) {
             $this->silentFail('too many attempts');
             return;
         }
 
-        $turnstileToken = WebApp::toStr($_POST['cf-turnstile-response'] ?? '');
+        $turnstileToken = To::str($_POST['cf-turnstile-response'] ?? '');
         if (!$this->verifyTurnstile($turnstileToken, $ip)) {
             $this->silentFail('turnstile challenge failed');
             return;
@@ -98,11 +99,11 @@ class ContactController extends AbstractController
         ];
 
         $input   = WebApp::filterInput($schema, $this->flight->request()->data->getData());
-        $name    = WebApp::toStr($input['name']    ?? '');
-        $email   = WebApp::toStr($input['email']   ?? '');
-        $message = WebApp::toStr($input['message'] ?? '');
+        $name    = To::str($input['name']    ?? '');
+        $email   = To::str($input['email']   ?? '');
+        $message = To::str($input['message'] ?? '');
         $eventIdRaw = $input['eventId'] ?? null;
-        $eventId = $eventIdRaw !== null ? WebApp::toInt($eventIdRaw) : null;
+        $eventId = $eventIdRaw !== null ? To::int($eventIdRaw) : null;
 
         $errors = [];
         if (empty($name)) {

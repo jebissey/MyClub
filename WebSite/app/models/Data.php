@@ -45,13 +45,17 @@ abstract class Data
         $sql = "SELECT sql FROM sqlite_master WHERE type='table' AND name=?";
         $tableDef = $this->pdo->prepare($sql);
         $tableDef->execute([$table]);
+        /** @var array{sql?: mixed}|false $row */
         $row = $tableDef->fetch(PDO::FETCH_ASSOC);
 
         if (!$row) {
             return [];
         }
 
-        $sqlText = $row['sql'];
+        $sqlText = $row['sql'] ?? null;
+        if (!is_string($sqlText)) {
+            return [];
+        }
         if (preg_match("/\"$column\"[^\n]*CHECK\s*\(\s*\"$column\"\s+IN\s*\(([^)]+)\)\)/i", $sqlText, $matches)) {
             $values = explode(',', $matches[1]);
             $values = array_map(function ($v) {
@@ -136,7 +140,8 @@ abstract class Data
             }
             $stmt = $this->pdo->prepare($sql);
             $stmt->execute($params);
-            return $stmt->fetch(PDO::FETCH_OBJ);
+            $result = $stmt->fetch(PDO::FETCH_OBJ);
+            return is_object($result) ? $result : false;
         } catch (PDOException $e) {
             $this->application->getErrorManager()->raise(
                 ApplicationError::Error,
@@ -262,7 +267,8 @@ abstract class Data
             $sql .= " ORDER BY Id DESC LIMIT 1";
             $stmt = $this->pdo->prepare($sql);
             $stmt->execute($params);
-            return $stmt->fetch(PDO::FETCH_OBJ);
+            $result = $stmt->fetch(PDO::FETCH_OBJ);
+            return is_object($result) ? $result : false;
         } catch (PDOException $e) {
             $this->application->getErrorManager()->raise(
                 ApplicationError::Error,

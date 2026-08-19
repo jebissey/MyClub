@@ -128,7 +128,11 @@ class GroupDataHelper extends Data
             $having
             ORDER BY g.Name
         ";
-        return $this->query($sql);
+        $statement = $this->pdo->query($sql);
+        if ($statement === false) {
+            return false;
+        }
+        return $statement->fetchAll(PDO::FETCH_OBJ);
     }
 
     /** @return array<int, stdClass>|false */

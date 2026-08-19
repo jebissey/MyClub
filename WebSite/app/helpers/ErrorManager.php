@@ -44,6 +44,7 @@ class ErrorManager
         }
         // for test with curl
         $ua = $_SERVER['HTTP_USER_AGENT'] ?? '';
+        $ua = is_string($ua) ? $ua : '';
         if (stripos($ua, 'TestDevice') !== false) {
             $this->application->getFlight()->response()->status($code->value);
             $this->application->getFlight()->response()->write($message);
@@ -90,6 +91,7 @@ class ErrorManager
     private function isJsonExpected(): bool
     {
         $accept = $_SERVER['HTTP_ACCEPT'] ?? '';
+        $accept = is_string($accept) ? $accept : '';
         return str_contains($accept, 'application/json');
     }
 }

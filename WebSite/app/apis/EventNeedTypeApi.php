@@ -8,6 +8,7 @@ use Throwable;
 use app\enums\ApplicationError;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
+use app\helpers\To;
 use app\helpers\WebApp;
 use app\models\DataHelper;
 use app\models\NeedDataHelper;
@@ -57,14 +58,14 @@ class EventNeedTypeApi extends AbstractApi
             return;
         }
         $data = $this->getJsonInput();
-        $name = $data['name'] ?? '';
+        $name = To::str($data['name'] ?? null);
         if ($name === '') {
             $this->renderJsonError('Missing parameter name', ApplicationError::BadRequest->value, __FILE__, __LINE__);
             return;
         }
         try {
             $this->renderJson(['Id' => $this->needTypeDataHelper->insertOrUpdate(
-                (int)$data['id'],
+                To::int($data['id'] ?? null),
                 $name
             )], true, ApplicationError::Ok->value);
         } catch (Throwable $e) {

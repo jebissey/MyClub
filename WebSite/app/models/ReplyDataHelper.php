@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\models;
 
 use app\helpers\Application;
+use app\helpers\To;
 
 class ReplyDataHelper extends Data
 {
@@ -15,6 +16,7 @@ class ReplyDataHelper extends Data
 
     public function insertOrUpdate(int $personId, int $surveyId, string $answers): void
     {
+        /** @var object{Id: int|string}|false $existingReply */
         $existingReply = $this->get(
             'Reply',
             ['IdPerson' => $personId, 'IdSurvey' => $surveyId],
@@ -22,13 +24,11 @@ class ReplyDataHelper extends Data
         );
 
         if ($existingReply) {
-            $replyData = get_object_vars($existingReply);
-
             $this->set('Reply', [
                 'Answers' => $answers,
                 'LastUpdate' => date('Y-m-d H:i:s'),
             ], [
-                'Id' => (int) $replyData['Id'],
+                'Id' => To::int($existingReply->Id),
             ]);
         } else {
             $this->set('Reply', [

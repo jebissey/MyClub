@@ -32,6 +32,7 @@ class SurveyDataHelper extends Data implements NewsProviderInterface
         ";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':articleId' => $articleId]);
+        /** @var object|false $survey */
         $survey = $stmt->fetch(PDO::FETCH_OBJ);
         return $survey;
     }
@@ -51,6 +52,7 @@ class SurveyDataHelper extends Data implements NewsProviderInterface
         ";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':articleId' => $articleId]);
+        /** @var object{Id: int|string, Question: string, Options: string, IdArticle: int|string, ClosingDate: string, Visibility: string, CreatedBy: int|string}|false $result */
         $result = $stmt->fetch(PDO::FETCH_OBJ);
         if ($result === false) {
             return false;

@@ -6,6 +6,7 @@ namespace app\modules\Event;
 
 use app\enums\FilterInputRule;
 use app\helpers\Application;
+use app\helpers\To;
 use app\helpers\WebApp;
 use app\models\EventTypeDataHelper;
 use app\models\TableControllerDataHelper;
@@ -131,15 +132,15 @@ class EventTypeController extends TableController
             ];
             $input = WebApp::filterInput($schema, $this->flight->request()->data->getData());
 
-            $name = WebApp::toStr($input['name'] ?? '???');
+            $name = To::str($input['name'] ?? '???');
 
             $idGroup = isset($input['idGroup'])
-                ? WebApp::toInt($input['idGroup'])
+                ? To::int($input['idGroup'])
                 : null;
 
             $rawAttributes = $input['attributes'] ?? [];
             $attributes = is_array($rawAttributes)
-                ? array_values(array_map(static fn($a): int => WebApp::toInt($a), $rawAttributes))
+                ? array_values(array_map(static fn($a): int => To::int($a), $rawAttributes))
                 : [];
 
             $this->eventTypeDataHelper->update(

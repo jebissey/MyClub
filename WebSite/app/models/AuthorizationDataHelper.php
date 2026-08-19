@@ -16,6 +16,7 @@ use app\valueObjects\ClosingVisibilityRow;
 
 /**
  * @phpstan-import-type ArticleAuthorizationRowShape from ArticleAuthorizationRow
+ * @phpstan-import-type ArticleRowShape from ArticleRow
  * @phpstan-import-type ClosingVisibilityRowShape from ClosingVisibilityRow
  */
 class AuthorizationDataHelper extends Data
@@ -160,7 +161,8 @@ class AuthorizationDataHelper extends Data
         if ($row === false) {
             throw new QueryException("Article {$id} doesn't exist");
         }
-        $article = ArticleAuthorizationRow::fromStdClass(ArticleRow::fromStdClass($row));
+        /** @var ArticleRowShape $row */
+        $article = ArticleAuthorizationRow::fromArticleRow(ArticleRow::fromStdClass($row));
         if (!$this->canReadArticle($article, $connectedUser)) {
             return false;
         }

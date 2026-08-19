@@ -11,6 +11,7 @@ use app\enums\ApplicationError;
 use app\enums\FilterInputRule;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
+use app\helpers\To;
 use app\helpers\WebApp;
 use app\exceptions\QueryException;
 use app\exceptions\UnauthorizedAccessException;
@@ -81,10 +82,10 @@ class EventSupplyApi extends AbstractApi
             $input = $this->getJsonInput();
             $this->validateSupplyData($input);
             $apiResponse = $this->doUpdateSupply(
-                (int)$input['eventId'],
+                To::int($input['eventId'] ?? null),
                 $this->application->getConnectedUser()->person->Email ?? '',
-                (int)$input['needId'],
-                intval($input['supply'])
+                To::int($input['needId'] ?? null),
+                To::int($input['supply'] ?? null)
             );
             $this->renderJson($apiResponse->data, $apiResponse->success, $apiResponse->responseCode);
         } catch (QueryException $e) {
@@ -142,7 +143,7 @@ class EventSupplyApi extends AbstractApi
     {
         $eventId = $data['eventId'] ?? null;
         $needId = $data['needId'] ?? null;
-        $supply = intval($data['supply'] ?? 0);
+        $supply = To::int($data['supply'] ?? 0);
 
         if (!$eventId || !$needId || $supply < 0) {
             throw new InvalidArgumentException("Invalid parameters");

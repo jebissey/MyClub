@@ -38,7 +38,8 @@ class HelloAssoService
 
     private function __construct(
         private DataHelper $dataHelper,
-    ) {}
+    ) {
+    }
 
     /**
      * Returns the singleton instance.

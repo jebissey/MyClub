@@ -36,7 +36,8 @@ class ConnectedUser
     {
         $this->authorizations = [];
         $this->person = null;
-        $userEmail = $_SESSION['user'] ?? '';
+        $sessionUser = $_SESSION['user'] ?? '';
+        $userEmail = is_string($sessionUser) ? $sessionUser : '';
         if ($userEmail === '') {
             return;
         }
@@ -62,6 +63,8 @@ class ConnectedUser
         $this->authorizations = $this->authorizationDataHelper->getsFor($this);
         $lang = TranslationManager::getCurrentLanguage();
         $defaultColors = $this->dataHelper->getDefaultColors();
+        $requestUri = $_SERVER['REQUEST_URI'] ?? '';
+        $requestUri = is_string($requestUri) ? $requestUri : '';
         Params::setParams(
             [
                 'href' => $this->getHref($this->person->Email),
@@ -89,7 +92,7 @@ class ConnectedUser
                 'currentLanguage' => $lang,
                 'supportedLanguages' => TranslationManager::getSupportedLanguages(),
                 'flag' => TranslationManager::getFlag($lang),
-                'currentPath' => parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH),
+                'currentPath' => parse_url($requestUri, PHP_URL_PATH),
                 'isMyclubWebSite' => WebApp::isMyClubWebSite(),
                 'navbarBgColor'   => $defaultColors['navbarBgColor'],
                 'navbarInkColor'  => $defaultColors['navbarInkColor'],
@@ -104,7 +107,9 @@ class ConnectedUser
 
     public function getPage(int $segment = 0): ?string
     {
-        $path = trim((string) (parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH) ?: ''), '/');
+        $requestUri = $_SERVER['REQUEST_URI'] ?? '';
+        $requestUri = is_string($requestUri) ? $requestUri : '';
+        $path = trim((string) (parse_url($requestUri, PHP_URL_PATH) ?: ''), '/');
         $segments = explode('/', $path);
 
         return $segments[$segment] ?? null;

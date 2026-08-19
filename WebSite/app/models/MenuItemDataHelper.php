@@ -35,7 +35,7 @@ class MenuItemDataHelper extends Data
 
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':route' => $url]);
-        /** @var object|false $raw */
+        /** @var object{IdGroup: int|string|null, ForMembers: int|string, ForAnonymous: int|string, groupId: int|string|null}|false $raw */
         $raw = $stmt->fetch(PDO::FETCH_OBJ);
 
         if ($raw === false) {
@@ -126,7 +126,7 @@ class MenuItemDataHelper extends Data
 
         if (empty($data['id'])) {
             if (isset($parent)) {
-                /** @var object|false $maxPosRaw */
+                /** @var object{MaxPos: int|string|null}|false $maxPosRaw */
                 $maxPosRaw = $this->fluent
                     ->from('MenuItem')
                     ->where('ParentId = ?', $menuItem['ParentId'])
@@ -135,7 +135,7 @@ class MenuItemDataHelper extends Data
                 $maxPos = $maxPosRaw !== false ? MaxPositionRow::fromStdClass($maxPosRaw) : null;
                 $menuItem['Position'] = max($parent->Position + 1, ($maxPos->MaxPos ?? 0) + 1);
             } else {
-                /** @var object|false $maxPosRaw */
+                /** @var object{MaxPos: int|string|null}|false $maxPosRaw */
                 $maxPosRaw = $this->fluent->from('MenuItem')->select('MAX(Position) AS MaxPos')->fetch();
                 $maxPos = $maxPosRaw !== false ? MaxPositionRow::fromStdClass($maxPosRaw) : null;
                 $menuItem['Position'] = $maxPos?->MaxPos !== null ? $maxPos->MaxPos + 1 : 1;

@@ -10,6 +10,7 @@ use app\enums\FilterInputRule;
 use app\helpers\Application;
 use app\helpers\NotificationSender;
 use app\helpers\TranslationManager;
+use app\helpers\To;
 use app\helpers\WebApp;
 use app\models\ArticleDataHelper;
 use app\models\LogDataHelper;
@@ -60,10 +61,10 @@ class WebmasterController extends AbstractController
 
             $input = WebApp::filterInput($schema, $this->flight->request()->data->getData());
 
-            $this->dataHelper->setSetting('PWA_Name', WebApp::toStr($input['clubName'] ?? null, 'MyClub'));
-            $this->dataHelper->setSetting('PWA_ShortName', WebApp::toStr($input['clubShortName'] ?? null, 'MyClub'));
-            $this->dataHelper->setSetting('PWA_ThemeColor', WebApp::toStr($input['themeColor'] ?? null, '#0d6efd'));
-            $this->dataHelper->setSetting('PWA_BackgroundColor', WebApp::toStr($input['background'] ?? null, '#ffffff'));
+            $this->dataHelper->setSetting('PWA_Name', To::str($input['clubName'] ?? null, 'MyClub'));
+            $this->dataHelper->setSetting('PWA_ShortName', To::str($input['clubShortName'] ?? null, 'MyClub'));
+            $this->dataHelper->setSetting('PWA_ThemeColor', To::str($input['themeColor'] ?? null, '#0d6efd'));
+            $this->dataHelper->setSetting('PWA_BackgroundColor', To::str($input['background'] ?? null, '#ffffff'));
             $this->redirect('/webmaster');
         }
     }
@@ -252,37 +253,37 @@ class WebmasterController extends AbstractController
                 'monthlyLimit'     => FilterInputRule::Integer->value,
             ];
             $input  = WebApp::filterInput($schema, $this->flight->request()->data->getData());
-            $method = WebApp::toStr($input['sendMethod'] ?? null, 'smtp');
+            $method = To::str($input['sendMethod'] ?? null, 'smtp');
 
             $this->credentials->set('email', 'method', $method);
-            $this->credentials->set('email', 'daily_limit', WebApp::toStr($input['dailyLimit'] ?? null, '0'));
-            $this->credentials->set('email', 'monthly_limit', WebApp::toStr($input['monthlyLimit'] ?? null, '0'));
+            $this->credentials->set('email', 'daily_limit', To::str($input['dailyLimit'] ?? null, '0'));
+            $this->credentials->set('email', 'monthly_limit', To::str($input['monthlyLimit'] ?? null, '0'));
 
             match ($method) {
                 'smtp' => (function () use ($input) {
-                    $this->credentials->set('smtp', 'username', WebApp::toStr($input['smtpAccount'] ?? null, ''));
+                    $this->credentials->set('smtp', 'username', To::str($input['smtpAccount'] ?? null, ''));
                     if (!empty($input['smtpPassword'])) {
-                        $this->credentials->set('smtp', 'password', WebApp::toStr($input['smtpPassword'], ''));
+                        $this->credentials->set('smtp', 'password', To::str($input['smtpPassword'], ''));
                     }
-                    $this->credentials->set('smtp', 'from', WebApp::toStr($input['smtpFrom'] ?? null, ''));
-                    $this->credentials->set('smtp', 'host', WebApp::toStr($input['smtpHost'] ?? null, ''));
-                    $this->credentials->set('smtp', 'port', WebApp::toStr($input['smtpPort'] ?? null, '587'));
-                    $this->credentials->set('smtp', 'encryption', WebApp::toStr($input['smtpEncryption'] ?? null, 'tls'));
+                    $this->credentials->set('smtp', 'from', To::str($input['smtpFrom'] ?? null, ''));
+                    $this->credentials->set('smtp', 'host', To::str($input['smtpHost'] ?? null, ''));
+                    $this->credentials->set('smtp', 'port', To::str($input['smtpPort'] ?? null, '587'));
+                    $this->credentials->set('smtp', 'encryption', To::str($input['smtpEncryption'] ?? null, 'tls'));
                 })(),
 
                 'mailjet' => (function () use ($input) {
-                    $this->credentials->set('mailjet', 'api_key', WebApp::toStr($input['mailjetApiKey'] ?? null, ''));
+                    $this->credentials->set('mailjet', 'api_key', To::str($input['mailjetApiKey'] ?? null, ''));
                     if (!empty($input['mailjetApiSecret'])) {
-                        $this->credentials->set('mailjet', 'api_secret', WebApp::toStr($input['mailjetApiSecret'], ''));
+                        $this->credentials->set('mailjet', 'api_secret', To::str($input['mailjetApiSecret'], ''));
                     }
-                    $this->credentials->set('mailjet', 'sender', WebApp::toStr($input['mailjetSender'] ?? null, ''));
+                    $this->credentials->set('mailjet', 'sender', To::str($input['mailjetSender'] ?? null, ''));
                 })(),
 
                 'brevo' => (function () use ($input) {
                     if (!empty($input['brevoApiKey'])) {
-                        $this->credentials->set('brevo', 'api_key', WebApp::toStr($input['brevoApiKey'], ''));
+                        $this->credentials->set('brevo', 'api_key', To::str($input['brevoApiKey'], ''));
                     }
-                    $this->credentials->set('brevo', 'sender', WebApp::toStr($input['brevoSender'] ?? null, ''));
+                    $this->credentials->set('brevo', 'sender', To::str($input['brevoSender'] ?? null, ''));
                 })(),
 
                 default => null,
@@ -369,9 +370,9 @@ class WebmasterController extends AbstractController
             ];
             $input = WebApp::filterInput($schema, $this->flight->request()->data->getData());
 
-            $this->credentials->set('turnstile', 'site_key', WebApp::toStr($input['turnstileSiteKey'] ?? null, ''));
+            $this->credentials->set('turnstile', 'site_key', To::str($input['turnstileSiteKey'] ?? null, ''));
             if (!empty($input['turnstileSecretKey'])) {
-                $this->credentials->set('turnstile', 'secret_key', WebApp::toStr($input['turnstileSecretKey'], ''));
+                $this->credentials->set('turnstile', 'secret_key', To::str($input['turnstileSecretKey'], ''));
             }
 
             $this->redirect('/webmaster');
@@ -405,12 +406,12 @@ class WebmasterController extends AbstractController
             ];
             $input = WebApp::filterInput($schema, $this->flight->request()->data->getData());
 
-            $this->credentials->set('helloasso', 'client_id', WebApp::toStr($input['helloassoClientId'] ?? null, ''));
+            $this->credentials->set('helloasso', 'client_id', To::str($input['helloassoClientId'] ?? null, ''));
             if (!empty($input['helloassoClientSecret'])) {
-                $this->credentials->set('helloasso', 'client_secret', WebApp::toStr($input['helloassoClientSecret'], ''));
+                $this->credentials->set('helloasso', 'client_secret', To::str($input['helloassoClientSecret'], ''));
             }
             if (!empty($input['helloassoOrgSlug'])) {
-                $this->credentials->set('helloasso', 'org_slug', WebApp::toStr($input['helloassoOrgSlug'], ''));
+                $this->credentials->set('helloasso', 'org_slug', To::str($input['helloassoOrgSlug'], ''));
             }
 
             $this->redirect('/webmaster');

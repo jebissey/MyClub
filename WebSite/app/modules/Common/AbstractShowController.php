@@ -7,6 +7,7 @@ namespace app\modules\Common;
 use app\enums\ApplicationError;
 use app\enums\Period;
 use app\helpers\ConnectedUser;
+use app\helpers\To;
 use app\helpers\WebApp;
 
 abstract class AbstractShowController extends AbstractController
@@ -29,11 +30,11 @@ abstract class AbstractShowController extends AbstractController
      */
     protected function resolveSearchPeriod(ConnectedUser $connectedUser, string $default = ''): array
     {
-        $searchMode = WebApp::getFiltered(
+        $searchMode = To::str(WebApp::getFiltered(
             'from',
             $this->application->enumToValues(\app\enums\Period::class),
             $this->flight->request()->query->getData()
-        ) ?: Period::Signout->value;
+        ) ?: Period::Signout->value);
 
         $searchFrom = match ($searchMode) {
             Period::Signin->value   => $connectedUser->person->LastSignIn  ?? '',

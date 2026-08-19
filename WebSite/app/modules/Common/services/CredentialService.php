@@ -17,7 +17,9 @@ class CredentialService
     private static ?CredentialService $instance = null;
     private ?PDO $pdo = null;
 
-    private function __construct() {}
+    private function __construct()
+    {
+    }
 
     public static function getInstance(): self
     {

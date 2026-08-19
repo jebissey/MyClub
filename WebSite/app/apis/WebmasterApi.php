@@ -46,7 +46,9 @@ class WebmasterApi extends AbstractApi
             $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
-        $this->logDataWriterHelper->add((string)ApplicationError::Ok->value, $_SERVER['HTTP_USER_AGENT'] ?? 'HTTP_USER_AGENT not defined');
+        $userAgentRaw = $_SERVER['HTTP_USER_AGENT'] ?? null;
+        $userAgent = is_string($userAgentRaw) ? $userAgentRaw : 'HTTP_USER_AGENT not defined';
+        $this->logDataWriterHelper->add((string)ApplicationError::Ok->value, $userAgent);
         $this->renderJsonOk(['lastVersion' => Application::VERSION]);
     }
 
@@ -102,10 +104,14 @@ class WebmasterApi extends AbstractApi
             $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
-        $data     = $this->getJsonInput();
-        $endpoint = trim($data['endpoint'] ?? '');
-        $p256dh   = trim($data['p256dh']   ?? '');
-        $auth     = trim($data['auth']     ?? '');
+        $data        = $this->getJsonInput();
+        $endpointRaw = $data['endpoint'] ?? null;
+        $p256dhRaw   = $data['p256dh']   ?? null;
+        $authRaw     = $data['auth']     ?? null;
+
+        $endpoint = is_string($endpointRaw) ? trim($endpointRaw) : '';
+        $p256dh   = is_string($p256dhRaw)   ? trim($p256dhRaw)   : '';
+        $auth     = is_string($authRaw)     ? trim($authRaw)     : '';
         $idPerson = $this->connectedUser->person?->Id;
 
         if ($endpoint === '' || $p256dh === '' || $auth === '') {

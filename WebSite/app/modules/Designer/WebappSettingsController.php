@@ -7,6 +7,7 @@ namespace app\modules\Designer;
 use app\enums\FilterInputRule;
 use app\helpers\Application;
 use app\helpers\TranslationManager;
+use app\helpers\To;
 use app\helpers\WebApp;
 use app\models\MetadataDataHelper;
 use app\modules\Common\AbstractController;
@@ -176,7 +177,7 @@ class WebappSettingsController extends AbstractController
         foreach ($this->numericSettingsKeys as $key => $config) {
             $value    = $input[$key] ?? $config['default'];
             $existing = $this->dataHelper->get('Settings', ['Name' => $key], 'Value');
-            $valueStr = WebApp::toStr($value);
+            $valueStr = To::str($value);
             if ($existing === false) {
                 $this->dataHelper->set('Settings', ['Name' => $key, 'Value' => $valueStr]);
             } else {
@@ -194,7 +195,7 @@ class WebappSettingsController extends AbstractController
             }
         }
         foreach ($this->imageTargets as $field => $target) {
-            $dataUrl = trim(WebApp::toStr($input[$field] ?? ''));
+            $dataUrl = trim(To::str($input[$field] ?? ''));
             if ($dataUrl !== '') {
                 $this->saveImageFromDataUrl($dataUrl, $target['path'], $target['mime']);
             }
@@ -254,7 +255,7 @@ class WebappSettingsController extends AbstractController
             'use_language' => FilterInputRule::String->value,
         ];
         $requestParam = WebApp::filterInput($schema, $this->application->getFlight()->request()->query->getData());
-        $language     = WebApp::toStr($requestParam['lang'] ?? '');
+        $language     = To::str($requestParam['lang'] ?? '');
         $action       = $requestParam['use_language'] ?? null;
         if ($action === null || $action == 0 || $language === '') {
             $language = null;

@@ -14,6 +14,7 @@ use app\enums\Period;
 use app\exceptions\QueryException;
 use app\helpers\Application;
 use app\helpers\TranslationManager;
+use app\helpers\To;
 use app\helpers\WebApp;
 use app\models\CrosstabDataHelper;
 use app\models\EventDataHelper;
@@ -146,10 +147,10 @@ class EventController extends AbstractController
             $result = $this->application->getAuthenticationService()->handleRememberMeLogin();
             if ($result && $result->isSuccess()) {
                 $this->application->getConnectedUser()->get();
-                $this->redirect(WebApp::toStr($_SERVER['REQUEST_URI']), ApplicationError::Ok, "Auto sign in succeeded for {$result->getUser()?->Email}");
+                $this->redirect(To::str($_SERVER['REQUEST_URI']), ApplicationError::Ok, "Auto sign in succeeded for {$result->getUser()?->Email}");
                 return;
             }
-            $this->redirect('/user/sign/in?redirect=' . urlencode(WebApp::toStr($_SERVER['REQUEST_URI'])));
+            $this->redirect('/user/sign/in?redirect=' . urlencode(To::str($_SERVER['REQUEST_URI'])));
         }
 
         $userEmail = $person->Email ?? '';

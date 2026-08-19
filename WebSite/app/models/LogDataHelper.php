@@ -12,6 +12,7 @@ use stdClass;
 use app\enums\Period;
 use app\helpers\Application;
 use app\helpers\MyClubDateTime;
+use app\helpers\To;
 
 class LogDataHelper extends Data
 {
@@ -59,7 +60,7 @@ class LogDataHelper extends Data
             if (isset($item['minDailyVisitors'])) {
                 $showMinMaxAvg = true;
                 $minVisitors[] = $item['minDailyVisitors'];
-                $avgVisitors[] = round($item['avgDailyVisitors'], 1);
+                $avgVisitors[] = round(To::float($item['avgDailyVisitors']), 1);
                 $maxVisitors[] = $item['maxDailyVisitors'];
             } else {
                 $minVisitors[] = null;

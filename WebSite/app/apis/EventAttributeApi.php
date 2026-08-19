@@ -8,6 +8,7 @@ use Throwable;
 use app\enums\ApplicationError;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
+use app\helpers\To;
 use app\helpers\WebApp;
 use app\models\AttributeDataHelper;
 use app\models\DataHelper;
@@ -36,7 +37,15 @@ class EventAttributeApi extends AbstractApi
             return;
         }
         try {
-            $data = $this->getJsonInput();
+            $raw = $this->getJsonInput();
+
+            /** @var array{name?: string, detail?: string, color?: string} $data */
+            $data = [
+                'name' => To::str($raw['name'] ?? null),
+                'detail' => To::str($raw['detail'] ?? null),
+                'color' => To::str($raw['color'] ?? null),
+            ];
+
             [$response, $statusCode] = $this->attributeDataHelper->insert($data);
             $this->renderJson($response, true, $statusCode);
         } catch (Throwable $e) {
@@ -111,10 +120,10 @@ class EventAttributeApi extends AbstractApi
 
             /** @var array{id: int, name: string, detail: string, color: string} $data */
             $data = [
-                'id' => (int) ($raw['id'] ?? 0),
-                'name' => (string) ($raw['name'] ?? ''),
-                'detail' => (string) ($raw['detail'] ?? ''),
-                'color' => (string) ($raw['color'] ?? ''),
+                'id' => To::int($raw['id'] ?? null),
+                'name' => To::str($raw['name'] ?? null),
+                'detail' => To::str($raw['detail'] ?? null),
+                'color' => To::str($raw['color'] ?? null),
             ];
 
             $this->attributeDataHelper->update($data);

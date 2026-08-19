@@ -57,11 +57,11 @@ class SharedFileDataHelper extends Data
                 FROM SharedFile
                 WHERE Item = :path
                 LIMIT 1";
-
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':path' => $path]);
+        $result = $stmt->fetch(PDO::FETCH_OBJ);
 
-        return $stmt->fetch(PDO::FETCH_OBJ);
+        return is_object($result) ? $result : false;
     }
 
     public function removeShareFile(string $path): void

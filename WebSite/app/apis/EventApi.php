@@ -13,6 +13,7 @@ use app\exceptions\EmailException;
 use app\exceptions\QueryException;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
+use app\helpers\To;
 use app\helpers\WebApp;
 use app\interfaces\AuthorizationServiceInterface;
 use app\interfaces\EventServiceInterface;
@@ -75,11 +76,10 @@ class EventApi extends AbstractApi
         }
         if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isEventManager(), __FILE__, __LINE__)) {
             try {
-                $modeString = WebApp::getFiltered(
-                    'mode',
-                    array_column(Period::cases(), 'value'),
-                    $_GET
-                ) ?: Period::Today->value;
+                $modeString = To::str(
+                    WebApp::getFiltered('mode', array_column(Period::cases(), 'value'), $_GET),
+                    Period::Today->value
+                );
                 $apiResponse = $this->eventService->duplicateEvent(
                     $id,
                     $this->application->getConnectedUser()->person->Id ?? 0,
@@ -130,14 +130,19 @@ class EventApi extends AbstractApi
     {
         if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isEventManager(), __FILE__, __LINE__)) {
             $data = $this->getJsonInput();
-            $eventId = $data['EventId'] ?? 0;
+            $eventId = To::int($data['EventId'] ?? null);
             if ($eventId === 0) {
                 $this->renderJsonError("Missing EvendId data", ApplicationError::BadRequest->value, __FILE__, __LINE__);
                 return;
             }
             try {
-                $event = $this->eventDataHelper->getEvent((int)$eventId);
-                $apiResponse = $this->sendEventEmails($event, $data['Title'] ?? '', $data['Body'] ?? '', $data['Recipients'] ?? '');
+                $event = $this->eventDataHelper->getEvent($eventId);
+                $apiResponse = $this->sendEventEmails(
+                    $event,
+                    To::str($data['Title'] ?? null),
+                    To::str($data['Body'] ?? null),
+                    To::str($data['Recipients'] ?? null)
+                );
                 $this->renderJson($apiResponse->data, $apiResponse->success, $apiResponse->responseCode, $apiResponse->message ?? '');
             } catch (QueryException $e) {
                 $this->renderJsonError($e->getMessage(), ApplicationError::BadRequest->value, $e->getFile(), $e->getLine());

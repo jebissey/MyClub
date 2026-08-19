@@ -7,6 +7,7 @@ namespace app\apis;
 use JsonException;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
+use app\helpers\To;
 use app\helpers\WebApp;
 use app\models\DataHelper;
 use app\models\MembershipDataHelper;
@@ -113,9 +114,10 @@ class HelloAssoApi extends AbstractApi
             return;
         }
 
-        $eventType = $data['eventType'] ?? '';
-        $orderId   = (string)($data['data']['order']['id'] ?? '');
-        $intentId  = (string)($data['data']['checkoutIntentId'] ?? '');
+        /** @var array{eventType?: mixed, data?: array{order?: array{id?: mixed}, checkoutIntentId?: mixed}} $data */
+        $eventType = To::str($data['eventType'] ?? '');
+        $orderId   = To::str($data['data']['order']['id'] ?? '');
+        $intentId  = To::str($data['data']['checkoutIntentId'] ?? '');
 
         if ($eventType !== 'Payment' || $intentId === '') {
             // Not an event we handle – acknowledge silently
