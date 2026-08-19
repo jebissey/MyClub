@@ -150,7 +150,7 @@ class Routes
      */
     public function __construct(private Application $application, private Engine $flight)
     {
-        $this->quotaTracker = new JsonEmailQuotaTracker(__DIR__ . '/../../data/email_quota.json');
+        $this->quotaTracker = new JsonEmailQuotaTracker(dirname(__DIR__, 2) . '/data/email_quota.json');
         $dataHelper = new DataHelper($application);
 
         $authorizationDataHelper = new AuthorizationDataHelper($application);
@@ -392,7 +392,7 @@ class Routes
 
     private function registerStaticRoutes(ErrorManager $errorManager): void
     {
-        $rootDir = realpath(__DIR__ . '/../..');
+        $rootDir = dirname(__DIR__, 2);
 
         $staticFiles = [
             // --- Manifest ---
@@ -501,7 +501,7 @@ class Routes
             Flight::stop();
             return;
         }
-        $rootDir = realpath(__DIR__ . '/../..');
+        $rootDir = dirname(__DIR__, 2);
         if (!empty($config['fullPath'])) {
             $filePath = $config['file'];
         } else {

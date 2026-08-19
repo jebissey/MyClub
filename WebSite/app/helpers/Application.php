@@ -57,8 +57,8 @@ class Application
         self::$root = 'https://' . (is_string($host) ? $host : 'localhost');
         self::$flight = new Engine();
         self::$latte = new LatteEngine();
-        self::$latte->setLoader(new FileLoader(__DIR__ . '/../../app/modules'));
-        self::$latte->setCacheDirectory(__DIR__ . '/../../var/latte/temp');
+        self::$latte->setLoader(new FileLoader(dirname(__DIR__, 2) . '/app/modules'));
+        self::$latte->setCacheDirectory(dirname(__DIR__, 2) . '/var/latte/temp');
         $this->setupLatteFilters();
 
         try {

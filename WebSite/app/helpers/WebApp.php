@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace app\helpers;
 
 use InvalidArgumentException;
+use Latte\Engine as LatteEngine;
+use Latte\Loaders\StringLoader;
 use app\enums\FilterInputRule;
 use app\valueObjects\Person;
 
@@ -61,23 +63,17 @@ class WebApp
      */
     public static function getCompiledContent(string $content, array $params): string
     {
-        $tempFile = sys_get_temp_dir() . '/admin_' . uniqid('', true) . '.latte';
-        file_put_contents($tempFile, $content);
-
-        $tempCacheDir = sys_get_temp_dir() . '/latte_cache_admin_runtime';
-        if (!is_dir($tempCacheDir)) {
-            mkdir($tempCacheDir, 0777, true);
+        $cacheDir = dirname(__DIR__, 2) . '/var/latte/admin_runtime';
+        if (!is_dir($cacheDir)) {
+            mkdir($cacheDir, 0775, true);
         }
 
-        try {
-            $latte = new \Latte\Engine();
-            $latte->setTempDirectory($tempCacheDir);
-            $latte->setAutoRefresh(true);
-            $latte->setStrictTypes(true);
-            return $latte->renderToString($tempFile, $params);
-        } finally {
-            @unlink($tempFile);
-        }
+        $latte = new LatteEngine();
+        $latte->setLoader(new StringLoader(['main' => $content]));
+        $latte->setCacheDirectory($cacheDir);
+        $latte->setAutoRefresh(true);
+
+        return $latte->renderToString('main', $params);
     }
 
     /**
