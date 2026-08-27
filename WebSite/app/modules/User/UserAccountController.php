@@ -19,7 +19,8 @@ class UserAccountController extends AbstractController
 
     public function account(): void
     {
-        if ($this->application->getConnectedUser()->person === null) {
+        $connectedUser = $this->application->getConnectedUser();
+        if ($connectedUser->person === null) {
             $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
@@ -27,7 +28,7 @@ class UserAccountController extends AbstractController
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
-        $person = $this->application->getConnectedUser()->person;
+        $person = $connectedUser->person;
         $this->render('User/views/user_account.latte', $this->getAllParams([
             'readOnly' => $person->Imported == 1 ? true : false,
             'email' => filter_var($person->Email, FILTER_VALIDATE_EMAIL) ?: '',
@@ -40,7 +41,7 @@ class UserAccountController extends AbstractController
             'isSelfEdit' => true,
             'layout' => $this->getLayout(),
             'navItems' => $this->getNavItems($person),
-            'page' => $this->application->getConnectedUser()->getPage(1),
+            'page' => $connectedUser->getPage(1),
             'btn_HistoryBack' => true,
             'btn_Parent' => "/user",
             'i18n' => [

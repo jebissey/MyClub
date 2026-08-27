@@ -45,7 +45,7 @@ class ConnectedUser
         $personRow = $this->dataHelper->get(
             'Person',
             ['Email' => $userEmail],
-            'Id, Email, Alert, FirstName, LastName, UseGravatar, Avatar'
+            'Id, Email, Alert, FirstName, LastName, NickName, UseGravatar, Avatar'
         );
         if (!$personRow) {
             $_SESSION['user'] = '';
