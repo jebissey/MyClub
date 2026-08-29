@@ -4,15 +4,7 @@ declare(strict_types=1);
 
 namespace app\valueObjects;
 
-/**
- * @phpstan-type EventTypeRow object{
- *     Id: int,
- *     Name: string,
- *     Inactivated: int,
- *     IdGroup: int|null
- * }
- */
-final class EventType
+final class EventTypeRow
 {
     /**
      * @param list<object> $Attributes

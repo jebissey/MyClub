@@ -320,7 +320,14 @@ class PersonDataHelper extends Data implements NewsProviderInterface
     public function getPersonsInGroupForDirectory(int $groupId): array
     {
         $stmt = $this->pdo->prepare("
-            SELECT DISTINCT p.* 
+            SELECT DISTINCT 
+                p.Id,
+                P.UseGravatar, 
+                p.Email,
+                p.Avatar,
+                p.FirstName,
+                p.LastName,
+                p.NickName
             FROM Person p
             JOIN PersonGroup pg ON p.Id = pg.IdPerson
             WHERE pg.IdGroup = ? AND p.InPresentationDirectory = 1 AND p.Inactivated = 0
@@ -331,7 +338,7 @@ class PersonDataHelper extends Data implements NewsProviderInterface
 
         $gravatarHandler = new GravatarHandler();
         foreach ($persons as $person) {
-            $person->UserImg = WebApp::computeUserImg($person->UseGravatar ?? false, $person->Email ?? null, $person->Avatar ?? null, $gravatarHandler);
+            $person->UserImg = WebApp::computeUserImg($person->UseGravatar === 'yes', $person->Email ?? null, $person->Avatar ?? null, $gravatarHandler);
         }
         return $persons;
     }

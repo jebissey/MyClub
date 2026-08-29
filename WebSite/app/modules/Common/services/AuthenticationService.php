@@ -176,7 +176,7 @@ class AuthenticationService
         $row = $this->dataHelper->get(
             'Person',
             ['Email' => $email],
-            'Id, Email, Password, Inactivated, LastSignIn, LastSignOut'
+            'Id, Email, Password, Inactivated, LastSignIn, LastSignOut, UseGravatar'
         );
         if (!$row) {
             return false;

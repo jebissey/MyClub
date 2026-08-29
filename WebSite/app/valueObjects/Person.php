@@ -34,7 +34,9 @@ use app\helpers\WebApp;
  *    Availabilities?: string|null,
  *    Notifications?: string|null,
  *    Notepad?: string|null,
- *    Location?: string|null
+ *    Location?: string|null,
+ *    Phone?: string|null,
+ *    Presentation?: string|null,
  * }
  */
 final readonly class Person extends AbstractValueObject
@@ -65,6 +67,8 @@ final readonly class Person extends AbstractValueObject
         public ?string $Notepad = null,
         public ?string $Location = null,
         public ?string $UserImg = null,
+        public ?string $Phone = null,
+        public ?string $Presentation = null,
     ) {
     }
 
@@ -73,20 +77,23 @@ final readonly class Person extends AbstractValueObject
      */
     public static function fromRow(object $row): self
     {
-        $inactivated = (bool)($row->Inactivated ?? false);
-        $imported = (bool)($row->Imported ?? false);
-        $useGravatar = (bool)($row->UseGravatar ?? false);
+        $inactivated = (bool) ($row->Inactivated ?? false);
+        $imported = (bool) ($row->Imported ?? false);
 
-        $inPresentationDirectory = (bool)($row->InPresentationDirectory ?? false);
-        $showPhone = (bool)($row->ShowPhoneInPresentationDirectory ?? false);
-        $showEmail = (bool)($row->ShowEmailInPresentationDirectory ?? false);
+        $useGravatar = isset($row->UseGravatar)
+            && $row->UseGravatar === 'yes';
+
+        $inPresentationDirectory = (bool) ($row->InPresentationDirectory ?? false);
+        $showPhone = (bool) ($row->ShowPhoneInPresentationDirectory ?? false);
+        $showEmail = (bool) ($row->ShowEmailInPresentationDirectory ?? false);
 
         $avatar = $row->Avatar ?? null;
         $email = $row->Email;
 
         return new self(
-            Id: (int)$row->Id,
+            Id: (int) $row->Id,
             Email: $email,
+            Phone: $row->Phone ?? null,
             Alert: $row->Alert ?? null,
             FirstName: $row->FirstName ?? null,
             LastName: $row->LastName ?? null,
@@ -113,8 +120,9 @@ final readonly class Person extends AbstractValueObject
                 $useGravatar,
                 $email,
                 $avatar,
-                new GravatarHandler()
+                new GravatarHandler(),
             ),
+            Presentation: $row->Presentation ?? null,
         );
     }
 }

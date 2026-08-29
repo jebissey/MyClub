@@ -7,7 +7,7 @@ namespace app\models;
 use PDO;
 use Throwable;
 use app\helpers\Application;
-use app\valueObjects\EventType;
+use app\valueObjects\EventTypeRow;
 
 class EventTypeDataHelper extends Data
 {
@@ -17,7 +17,7 @@ class EventTypeDataHelper extends Data
     }
 
     /**
-     * @return list<EventType>
+     * @return list<EventTypeRow>
      */
     public function getsFor(int $personId): array
     {
@@ -38,7 +38,7 @@ class EventTypeDataHelper extends Data
         $query->execute([$personId]);
 
         return array_values(array_map(
-            EventType::fromStdClass(...),
+            EventTypeRow::fromStdClass(...),
             $query->fetchAll(PDO::FETCH_OBJ)
         ));
     }
