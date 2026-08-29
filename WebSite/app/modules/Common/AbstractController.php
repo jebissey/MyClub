@@ -332,6 +332,25 @@ abstract class AbstractController
         return true;
     }
 
+
+    /**
+     * @param array<string, mixed> $context
+     */
+    protected function getStringParam(array $context, string $key, string $default): string
+    {
+        $value = $context[$key] ?? $default;
+        return is_string($value) ? $value : $default;
+    }
+
+    /**
+     * @param array<string, mixed> $context
+     */
+    protected function getNullableStringParam(array $context, string $key): ?string
+    {
+        $value = $context[$key] ?? null;
+        return is_string($value) ? $value : null;
+    }
+
     #region Public functions
     /**
      * @param object|array<string,mixed> $params

@@ -21,6 +21,7 @@ use app\helpers\PersonPreferences;
 use app\helpers\TranslationManager;
 use app\helpers\To;
 use app\interfaces\NewsProviderInterface;
+use app\models\DataHelper;
 use app\valueObjects\ApiResponse;
 use app\valueObjects\EventAttributeRow;
 use app\valueObjects\EventDetailRow;
@@ -41,10 +42,10 @@ class EventDataHelper extends Data implements NewsProviderInterface
 {
     private PersonPreferences $personPreferences;
 
-    public function __construct(Application $application)
+    public function __construct(Application $application, DataHelper $dataHelper)
     {
         parent::__construct($application);
-        $this->personPreferences = new PersonPreferences();
+        $this->personPreferences = new PersonPreferences($dataHelper);
     }
 
     /** @return array<int, mixed> */

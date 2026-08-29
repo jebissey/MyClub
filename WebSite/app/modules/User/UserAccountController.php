@@ -9,6 +9,7 @@ use app\enums\YesNo;
 use app\helpers\Application;
 use app\helpers\WebApp;
 use app\modules\Common\AbstractController;
+use app\modules\User\viewModels\UserAccountViewModel;
 
 class UserAccountController extends AbstractController
 {
@@ -29,28 +30,35 @@ class UserAccountController extends AbstractController
             return;
         }
         $person = $connectedUser->person;
-        $this->render('User/views/user_account.latte', $this->getAllParams([
-            'readOnly' => $person->Imported == 1 ? true : false,
-            'email' => filter_var($person->Email, FILTER_VALIDATE_EMAIL) ?: '',
-            'firstName' => WebApp::sanitizeInput($person->FirstName ?? ''),
-            'lastName' => WebApp::sanitizeInput($person->LastName ?? ''),
-            'nickName' => WebApp::sanitizeInput($person->NickName ?? ''),
-            'avatar' => WebApp::sanitizeInput($person->Avatar ?? ''),
-            'useGravatar' => WebApp::sanitizeInput($person->UseGravatar ? YesNo::Yes->value : YesNo::No->value, $this->application->enumToValues(YesNo::class), YesNo::No->value),
-            'emojis' => Application::EMOJI_LIST,
-            'isSelfEdit' => true,
-            'layout' => $this->getLayout(),
-            'navItems' => $this->getNavItems($person),
-            'page' => $connectedUser->getPage(1),
-            'btn_HistoryBack' => true,
-            'btn_Parent' => "/user",
-            'i18n' => [
+
+        $imported = $this->dataHelper->get('Person', ['Id' => $person->Id], 'Imported');
+        $readOnly = $imported !== false && (bool)($imported->Imported ?? false);
+
+        $viewModel = new UserAccountViewModel(
+            readOnly: $readOnly,
+            email: filter_var($person->Email, FILTER_VALIDATE_EMAIL) ?: '',
+            firstName: WebApp::sanitizeInput($person->FirstName ?? ''),
+            lastName: WebApp::sanitizeInput($person->LastName ?? ''),
+            nickName: WebApp::sanitizeInput($person->NickName ?? ''),
+            avatar: WebApp::sanitizeInput($person->Avatar ?? ''),
+            useGravatar: WebApp::sanitizeInput(
+                $person->UseGravatar ? YesNo::Yes->value : YesNo::No->value,
+                $this->application->enumToValues(YesNo::class),
+                YesNo::No->value
+            ),
+            emojis: Application::EMOJI_LIST,
+            isSelfEdit: true,
+            i18n: [
                 'account.form.emoji.select_label'     => ($this->t)('account.form.emoji.select_label'),
                 'account.form.emoji.missing_elements' => ($this->t)('account.form.emoji.missing_elements'),
                 'account.form.emoji.none_detected'    => ($this->t)('account.form.emoji.none_detected'),
                 'account.form.emoji.selected'         => ($this->t)('account.form.emoji.selected'),
             ],
-        ]));
+            layout: $this->getLayout(),
+            layoutParams: $this->getAllParams([]),
+        );
+
+        $this->render('User/views/user_account.latte', $viewModel->toArray());
     }
 
     public function accountSave(): void
@@ -64,6 +72,9 @@ class UserAccountController extends AbstractController
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
+        $imported = $this->dataHelper->get('Person', ['Id' => $person->Id], 'Imported');
+        $isImported = $imported !== false && (bool)($imported->Imported ?? false);
+
         $schema = [
             'email' => FilterInputRule::Email->value,
             'firstName' => FilterInputRule::PersonName->value,
@@ -80,7 +91,7 @@ class UserAccountController extends AbstractController
             'Avatar' => ($input['useGravatar'] ?? YesNo::No->value) == YesNo::Yes->value ? '' : $input['avatar'] ?? '🤔',
             'useGravatar' => $input['useGravatar'] ?? YesNo::No->value,
         ], ['Id' => $person->Id]);
-        if ($person->Imported == 0) {
+        if (!$isImported) {
             $emailInput = $input['email'] ?? '';
             $email = is_string($emailInput) ? urldecode($emailInput) : '';
             $this->dataHelper->set('Person', ['Email' => $email], ['Id' => $person->Id]);

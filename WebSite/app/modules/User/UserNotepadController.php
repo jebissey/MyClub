@@ -27,9 +27,12 @@ class UserNotepadController extends AbstractController
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
+        $row = $this->dataHelper->get('Person', ['Id' => $person->Id], 'Notepad');
+        /** @var object{Notepad: string|null}|false $row */
+        $notepad = $row !== false ? ($row->Notepad ?? '') : '';
 
         $this->render('User/views/user_notepad.latte', $this->getAllParams([
-            'notepad' => $person->Notepad,
+            'notepad' => $notepad,
             'navItems' => $this->getNavItems($person),
             'page' => $this->application->getConnectedUser()->getPage(1),
             'btn_HistoryBack' => true,

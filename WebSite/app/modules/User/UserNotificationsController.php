@@ -48,8 +48,12 @@ class UserNotificationsController extends AbstractController
             $notification = "🚀 Notification de test envoyée à l'utilisateur #{$person->Id}.";
         }
 
+        $row = $this->dataHelper->get('Person', ['Id' => $person->Id], 'Notifications');
+        /** @var object{Notifications: string|null}|false $row */
+        $notificationsJson = $row !== false ? ($row->Notifications ?? '{}') : '{}';
+
         $this->render('User/views/user_notifications.latte', $this->getAllParams([
-            'currentNotifications' => json_decode($person->Notifications ?? '{}', true) ?? [],
+            'currentNotifications' => json_decode($notificationsJson, true) ?? [],
             'groups'               => $this->groupDataHelper->getGroupsWithType($person->Id),
             'page'                 => $this->application->getConnectedUser()->getPage(1),
             'vapidPubliKey'        => $this->credentials->get('vapid', 'publicKey') ?? '',

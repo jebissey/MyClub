@@ -5,21 +5,34 @@ declare(strict_types=1);
 namespace app\helpers;
 
 use DateTime;
+use app\models\DataHelper;
 use app\valueObjects\Person;
 
 class PersonPreferences
 {
+    public function __construct(private DataHelper $dataHelper)
+    {
+    }
+
     /**
      * @param array<int, array<string, mixed>> $events
      * @return array<int, array<string, mixed>>
      */
     public function filterEventsByPreferences(array $events, ?Person $person): array
     {
-        if ($person === null || empty($person->Preferences)) {
+        if ($person === null) {
             return $events;
         }
-        $preferences = json_decode($person->Preferences, true);
-        if (!is_array($preferences)) {
+
+        $row = $this->dataHelper->get('Person', ['Id' => $person->Id], 'Preferences, Availabilities');
+        /** @var object{Preferences: string|null, Availabilities: string|null}|false $row */
+        if ($row === false) {
+            return $events;
+        }
+        $preferencesJson = $row->Preferences ?? '';
+        $availabilitiesJson = $row->Availabilities ?? '';
+
+        if (empty($preferencesJson) && empty($availabilitiesJson)) {
             return $events;
         }
 
@@ -39,7 +52,8 @@ class PersonPreferences
 
             if (
                 $this->isPersonInterested(
-                    $person,
+                    $preferencesJson,
+                    $availabilitiesJson,
                     $idEventType,
                     $dayOfWeek,
                     $this->getPeriodOfDay($startTime)
@@ -51,17 +65,22 @@ class PersonPreferences
         return $filteredEvents;
     }
 
-    public function isPersonInterested(Person $person, ?int $idEventType, ?int $dayOfWeek, string $timeOfDay): bool
-    {
-        if ($person->Preferences !== '') {
-            $preferences = $this->decodePreferences($person->Preferences);
+    public function isPersonInterested(
+        ?string $preferencesJson,
+        ?string $availabilitiesJson,
+        ?int $idEventType,
+        ?int $dayOfWeek,
+        string $timeOfDay
+    ): bool {
+        if (!empty($preferencesJson)) {
+            $preferences = $this->decodePreferences($preferencesJson);
             if ($preferences !== null && isset($preferences['noAlerts']) && $preferences['noAlerts'] === 'on') {
                 return false;
             }
         }
 
-        if ($idEventType !== null && $person->Preferences !== '') {
-            $preferences = $this->decodePreferences($person->Preferences);
+        if ($idEventType !== null && !empty($preferencesJson)) {
+            $preferences = $this->decodePreferences($preferencesJson);
             if ($preferences !== null) {
                 $eventTypes = is_array($preferences['eventTypes'] ?? null) ? $preferences['eventTypes'] : null;
                 if ($eventTypes !== null) {
@@ -76,8 +95,8 @@ class PersonPreferences
             }
         }
 
-        if ($dayOfWeek !== null && $timeOfDay !== '' && $person->Availabilities !== '') {
-            $availabilities = $this->decodePreferences($person->Availabilities);
+        if ($dayOfWeek !== null && $timeOfDay !== '' && !empty($availabilitiesJson)) {
+            $availabilities = $this->decodePreferences($availabilitiesJson);
             if ($availabilities !== null) {
                 $dayPrefs = is_array($availabilities[$dayOfWeek] ?? null) ? $availabilities[$dayOfWeek] : null;
                 if ($dayPrefs !== null && ($dayPrefs[$timeOfDay] ?? null) !== 'on') {

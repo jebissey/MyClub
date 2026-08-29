@@ -37,8 +37,8 @@ abstract class AbstractShowController extends AbstractController
         ) ?: Period::Signout->value);
 
         $searchFrom = match ($searchMode) {
-            Period::Signin->value   => $connectedUser->person->LastSignIn  ?? '',
-            Period::Signout->value  => $connectedUser->person->LastSignOut ?? '',
+            Period::Signin->value   => $connectedUser->getLastSignIn()  ?? '',
+            Period::Signout->value  => $connectedUser->getLastSignOut() ?? '',
             Period::Week->value     => date('Y-m-d H:i:s', strtotime('-1 week')),
             Period::Month->value    => date('Y-m-d H:i:s', strtotime('-1 month')),
             Period::Quarter->value  => date('Y-m-d H:i:s', strtotime('-3 months')),

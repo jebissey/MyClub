@@ -118,21 +118,15 @@ class PersonDataHelper extends Data implements NewsProviderInterface
             if ($person->Email === null) {
                 continue;
             }
-            /**
-             * @var object{
-             *     PersonId: int,
-             *     Id: int,
-             *     FirstName: string|null,
-             *     LastName: string|null,
-             *     Email: string,
-             *     Preferences: string|null,
-             *     Availabilities: string|null,
-             *     InPresentationDirectory: int,
-             *     ShowPhoneInPresentationDirectory: int|string,
-             *     ShowEmailInPresentationDirectory: int|string
-             * } $person
-             */
-            if ($this->personPreferences->isPersonInterested(Person::fromRow($person), $idEventType, $dayOfWeek, $timeOfDay)) {
+            if (
+                $this->personPreferences->isPersonInterested(
+                    $person->Preferences,
+                    $person->Availabilities,
+                    $idEventType,
+                    $dayOfWeek,
+                    $timeOfDay
+                )
+            ) {
                 $filteredPeople[] = $person;
             }
         }

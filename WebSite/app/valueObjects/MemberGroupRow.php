@@ -51,17 +51,4 @@ final readonly class MemberGroupRow
             ShowEmailInPresentationDirectory: (int) $row->ShowEmailInPresentationDirectory,
         );
     }
-
-    /**
-     * Pont temporaire pour les consommateurs qui attendent encore un stdClass
-     * (ex: Person::fromRow via un cast PersonRow).
-     */
-    public function toStdClass(): stdClass
-    {
-        $obj = new stdClass();
-        foreach (get_object_vars($this) as $key => $value) {
-            $obj->$key = $value;
-        }
-        return $obj;
-    }
 }

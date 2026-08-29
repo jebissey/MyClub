@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace app\config;
+namespace app\modules\Event\services;
 
 use app\helpers\ConnectedUser;
 use app\interfaces\AuthorizationServiceInterface;
@@ -11,12 +11,6 @@ class AuthorizationService implements AuthorizationServiceInterface
 {
     public function __construct(private ConnectedUser $connectedUser)
     {
-    }
-
-
-    public function isEventManager(): bool
-    {
-        return $this->connectedUser->isEventManager();
     }
 
     public function getUserId(): int

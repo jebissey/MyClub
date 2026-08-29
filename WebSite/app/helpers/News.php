@@ -31,7 +31,7 @@ class News
 
     public function anyNews(ConnectedUser $connectedUser): bool
     {
-        $news = $this->getNewsForPerson($connectedUser, $connectedUser->person->LastSignIn ?? '');
+        $news = $this->getNewsForPerson($connectedUser, $connectedUser->getLastSignIn() ?? '');
         return count($news) > 0;
     }
 }

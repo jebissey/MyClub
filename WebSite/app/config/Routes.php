@@ -144,6 +144,7 @@ class Routes
     private ControllerFactory $controllerFactory;
     private ApiFactory $apiFactory;
     private JsonEmailQuotaTracker $quotaTracker;
+    private DataHelper $dataHelper;
 
     /**
      * @param Engine<object> $flight
@@ -151,109 +152,11 @@ class Routes
     public function __construct(private Application $application, private Engine $flight)
     {
         $this->quotaTracker = new JsonEmailQuotaTracker(dirname(__DIR__, 2) . '/data/email_quota.json');
-        $dataHelper = new DataHelper($application);
+        $this->dataHelper = new DataHelper($application);
 
-        $authorizationDataHelper = new AuthorizationDataHelper($application);
-        $articleDataHelper = new ArticleDataHelper($application, $authorizationDataHelper);
-        $crosstabDataHelper = new CrosstabDataHelper($application, $authorizationDataHelper);
-        $designDataHelper = new DesignDataHelper($application);
-        $emailService = new EmailService(
-            new DatabaseSmtpConfigProvider(CredentialService::getInstance()),
-            $this->quotaTracker
-        );
-        $eventDataHelper = new EventDataHelper($application);
-        $groupDataHelper = new GroupDataHelper($application);
-        $logDataHelper = new LogDataHelper($application, $dataHelper);
-        $messageDataHelper = new MessageDataHelper($application, new LanguagesDataHelper($application));
-        $needDataHelper = new NeedDataHelper($application);
-        $notificationSender = new NotificationSender($dataHelper, CredentialService::getInstance());
-        $orderDataHelper = new OrderDataHelper($application, $articleDataHelper);
-        $participantDataHelper = new ParticipantDataHelper($application);
-        $personPreferences = new PersonPreferences();
-        $personDataHelper = new PersonDataHelper($application, $personPreferences, $emailService);
-        $surveyDataHelper = new SurveyDataHelper($application);
-        $newsProviders = [
-            $articleDataHelper,
-            $eventDataHelper,
-            $messageDataHelper,
-            $personDataHelper,
-            $surveyDataHelper,
-        ];
-        $sharedFileDataHelper = new SharedFileDataHelper($application);
-        $authenticationService = new AuthenticationService($dataHelper, $emailService);
-        $application->setAuthenticationService($authenticationService);
-        $loanDataHelper = new LoanDataHelper($application);
-        $languagesDataHelper = new LanguagesDataHelper($application);
-        $mediaManager = new MediaManager($dataHelper, $sharedFileDataHelper, $languagesDataHelper);
-        $membershipDataHelper = new MembershipDataHelper($application);
-        $this->controllerFactory = new ControllerFactory(
-            $application,
-            new ArticleCrosstabDataHelper($application, $crosstabDataHelper),
-            $articleDataHelper,
-            new ArticleService(new CarouselDataHelper($application), $mediaManager, $dataHelper),
-            new ArticleTableDataHelper($application),
-            $authenticationService,
-            new Backup(),
-            new CarouselDataHelper($application),
-            new CrosstabDataHelper($application, $authorizationDataHelper),
-            new DbBrowserDataHelper($application),
-            $designDataHelper,
-            $emailService,
-            new ErrorManager($application),
-            $eventDataHelper,
-            new EventTypeDataHelper($application),
-            new ExerciseTableDataHelper($application),
-            $groupDataHelper,
-            new KanbanDataHelper($application),
-            $loanDataHelper,
-            $logDataHelper,
-            $membershipDataHelper,
-            $messageDataHelper,
-            new MetadataDataHelper($application),
-            $needDataHelper,
-            new News($newsProviders),
-            $notificationSender,
-            $orderDataHelper,
-            $participantDataHelper,
-            $personDataHelper,
-            new PersonGroupDataHelper($application),
-            new PersonStatisticsDataHelper($application),
-            $sharedFileDataHelper,
-            $surveyDataHelper,
-            new TableControllerDataHelper($application),
-            new WebApp(),
-        );
-        $this->apiFactory = new ApiFactory(
-            $application,
-            new AttributeDataHelper($application),
-            $authorizationDataHelper,
-            new CarouselDataHelper($application),
-            $application->getConnectedUser(),
-            $dataHelper,
-            $designDataHelper,
-            $emailService,
-            $eventDataHelper,
-            new EventNeedDataHelper($application),
-            new EventService($eventDataHelper),
-            $this->quotaTracker,
-            new KanbanDataHelper($application),
-            new KaraokeDataHelper($application),
-            $languagesDataHelper,
-            $loanDataHelper,
-            $logDataHelper,
-            new LogDataWriterHelper($application),
-            $mediaManager,
-            $membershipDataHelper,
-            new MenuItemDataHelper($application, $authorizationDataHelper),
-            $messageDataHelper,
-            new MessageRecipientService($dataHelper),
-            $needDataHelper,
-            new NeedTypeDataHelper($application),
-            $notificationSender,
-            $participantDataHelper,
-            $personDataHelper,
-            $personPreferences,
-        );
+        $dataHelpers = $this->buildDataHelpers();
+        $services = $this->buildServices($dataHelpers);
+        $this->buildFactories($dataHelpers, $services);
     }
 
     public function add(ErrorManager $errorManager): void
@@ -555,5 +458,219 @@ class Routes
         }
         readfile($filePath);
         Flight::stop();
+    }
+
+    /**
+     * @return array{
+     *     authorizationDataHelper: AuthorizationDataHelper,
+     *     articleDataHelper: ArticleDataHelper,
+     *     crosstabDataHelper: CrosstabDataHelper,
+     *     designDataHelper: DesignDataHelper,
+     *     eventDataHelper: EventDataHelper,
+     *     groupDataHelper: GroupDataHelper,
+     *     logDataHelper: LogDataHelper,
+     *     messageDataHelper: MessageDataHelper,
+     *     needDataHelper: NeedDataHelper,
+     *     orderDataHelper: OrderDataHelper,
+     *     participantDataHelper: ParticipantDataHelper,
+     *     surveyDataHelper: SurveyDataHelper,
+     *     sharedFileDataHelper: SharedFileDataHelper,
+     *     loanDataHelper: LoanDataHelper,
+     *     languagesDataHelper: LanguagesDataHelper,
+     *     membershipDataHelper: MembershipDataHelper,
+     * }
+     */
+    private function buildDataHelpers(): array
+    {
+        $authorizationDataHelper = new AuthorizationDataHelper($this->application);
+        $articleDataHelper = new ArticleDataHelper($this->application, $authorizationDataHelper);
+
+        return [
+            'authorizationDataHelper' => $authorizationDataHelper,
+            'articleDataHelper' => $articleDataHelper,
+            'crosstabDataHelper' => new CrosstabDataHelper($this->application, $authorizationDataHelper),
+            'designDataHelper' => new DesignDataHelper($this->application),
+            'eventDataHelper' => new EventDataHelper($this->application, $this->dataHelper),
+            'groupDataHelper' => new GroupDataHelper($this->application),
+            'logDataHelper' => new LogDataHelper($this->application, $this->dataHelper),
+            'messageDataHelper' => new MessageDataHelper($this->application, new LanguagesDataHelper($this->application)),
+            'needDataHelper' => new NeedDataHelper($this->application),
+            'orderDataHelper' => new OrderDataHelper($this->application, $articleDataHelper),
+            'participantDataHelper' => new ParticipantDataHelper($this->application),
+            'surveyDataHelper' => new SurveyDataHelper($this->application),
+            'sharedFileDataHelper' => new SharedFileDataHelper($this->application),
+            'loanDataHelper' => new LoanDataHelper($this->application),
+            'languagesDataHelper' => new LanguagesDataHelper($this->application),
+            'membershipDataHelper' => new MembershipDataHelper($this->application),
+        ];
+    }
+
+    /**
+     * @param array{
+     *     authorizationDataHelper: AuthorizationDataHelper,
+     *     articleDataHelper: ArticleDataHelper,
+     *     crosstabDataHelper: CrosstabDataHelper,
+     *     designDataHelper: DesignDataHelper,
+     *     eventDataHelper: EventDataHelper,
+     *     groupDataHelper: GroupDataHelper,
+     *     logDataHelper: LogDataHelper,
+     *     messageDataHelper: MessageDataHelper,
+     *     needDataHelper: NeedDataHelper,
+     *     orderDataHelper: OrderDataHelper,
+     *     participantDataHelper: ParticipantDataHelper,
+     *     surveyDataHelper: SurveyDataHelper,
+     *     sharedFileDataHelper: SharedFileDataHelper,
+     *     loanDataHelper: LoanDataHelper,
+     *     languagesDataHelper: LanguagesDataHelper,
+     *     membershipDataHelper: MembershipDataHelper,
+     * } $dataHelpers
+     * @return array{
+     *     emailService: EmailService,
+     *     personPreferences: PersonPreferences,
+     *     personDataHelper: PersonDataHelper,
+     *     authenticationService: AuthenticationService,
+     *     notificationSender: NotificationSender,
+     *     mediaManager: MediaManager,
+     *     news: News,
+     * }
+     */
+    private function buildServices(array $dataHelpers): array
+    {
+        $emailService = new EmailService(
+            new DatabaseSmtpConfigProvider(CredentialService::getInstance()),
+            $this->quotaTracker
+        );
+        $personPreferences = new PersonPreferences($this->dataHelper);
+        $personDataHelper = new PersonDataHelper($this->application, $personPreferences, $emailService);
+
+        $newsProviders = [
+            $dataHelpers['articleDataHelper'],
+            $dataHelpers['eventDataHelper'],
+            $dataHelpers['messageDataHelper'],
+            $personDataHelper,
+            $dataHelpers['surveyDataHelper'],
+        ];
+
+        $authenticationService = new AuthenticationService($this->dataHelper, $emailService);
+        $this->application->setAuthenticationService($authenticationService);
+
+        $notificationSender = new NotificationSender($this->dataHelper, CredentialService::getInstance());
+        $mediaManager = new MediaManager(
+            $this->dataHelper,
+            $dataHelpers['sharedFileDataHelper'],
+            $dataHelpers['languagesDataHelper']
+        );
+
+        return [
+            'emailService' => $emailService,
+            'personPreferences' => $personPreferences,
+            'personDataHelper' => $personDataHelper,
+            'authenticationService' => $authenticationService,
+            'notificationSender' => $notificationSender,
+            'mediaManager' => $mediaManager,
+            'news' => new News($newsProviders),
+        ];
+    }
+
+    /**
+     * @param array{
+     *     authorizationDataHelper: AuthorizationDataHelper,
+     *     articleDataHelper: ArticleDataHelper,
+     *     crosstabDataHelper: CrosstabDataHelper,
+     *     designDataHelper: DesignDataHelper,
+     *     eventDataHelper: EventDataHelper,
+     *     groupDataHelper: GroupDataHelper,
+     *     logDataHelper: LogDataHelper,
+     *     messageDataHelper: MessageDataHelper,
+     *     needDataHelper: NeedDataHelper,
+     *     orderDataHelper: OrderDataHelper,
+     *     participantDataHelper: ParticipantDataHelper,
+     *     surveyDataHelper: SurveyDataHelper,
+     *     sharedFileDataHelper: SharedFileDataHelper,
+     *     loanDataHelper: LoanDataHelper,
+     *     languagesDataHelper: LanguagesDataHelper,
+     *     membershipDataHelper: MembershipDataHelper,
+     * } $dataHelpers
+     * @param array{
+     *     emailService: EmailService,
+     *     personPreferences: PersonPreferences,
+     *     personDataHelper: PersonDataHelper,
+     *     authenticationService: AuthenticationService,
+     *     notificationSender: NotificationSender,
+     *     mediaManager: MediaManager,
+     *     news: News,
+     * } $services
+     */
+    private function buildFactories(array $dataHelpers, array $services): void
+    {
+        $this->controllerFactory = new ControllerFactory(
+            $this->application,
+            new ArticleCrosstabDataHelper($this->application, $dataHelpers['crosstabDataHelper']),
+            $dataHelpers['articleDataHelper'],
+            new ArticleService(new CarouselDataHelper($this->application), $services['mediaManager'], $this->dataHelper),
+            new ArticleTableDataHelper($this->application),
+            $services['authenticationService'],
+            new Backup(),
+            new CarouselDataHelper($this->application),
+            new CrosstabDataHelper($this->application, $dataHelpers['authorizationDataHelper']),
+            new DbBrowserDataHelper($this->application),
+            $dataHelpers['designDataHelper'],
+            $services['emailService'],
+            new ErrorManager($this->application),
+            $dataHelpers['eventDataHelper'],
+            new EventTypeDataHelper($this->application),
+            new ExerciseTableDataHelper($this->application),
+            $dataHelpers['groupDataHelper'],
+            new KanbanDataHelper($this->application),
+            $dataHelpers['loanDataHelper'],
+            $dataHelpers['logDataHelper'],
+            $dataHelpers['membershipDataHelper'],
+            $dataHelpers['messageDataHelper'],
+            new MetadataDataHelper($this->application),
+            $dataHelpers['needDataHelper'],
+            $services['news'],
+            $services['notificationSender'],
+            $dataHelpers['orderDataHelper'],
+            $dataHelpers['participantDataHelper'],
+            $services['personDataHelper'],
+            new PersonGroupDataHelper($this->application),
+            new PersonStatisticsDataHelper($this->application),
+            $dataHelpers['sharedFileDataHelper'],
+            $dataHelpers['surveyDataHelper'],
+            new TableControllerDataHelper($this->application),
+            new WebApp(),
+        );
+
+        $this->apiFactory = new ApiFactory(
+            $this->application,
+            new AttributeDataHelper($this->application),
+            $dataHelpers['authorizationDataHelper'],
+            new CarouselDataHelper($this->application),
+            $this->application->getConnectedUser(),
+            $this->dataHelper,
+            $dataHelpers['designDataHelper'],
+            $services['emailService'],
+            $dataHelpers['eventDataHelper'],
+            new EventNeedDataHelper($this->application),
+            new EventService($dataHelpers['eventDataHelper']),
+            $this->quotaTracker,
+            new KanbanDataHelper($this->application),
+            new KaraokeDataHelper($this->application),
+            $dataHelpers['languagesDataHelper'],
+            $dataHelpers['loanDataHelper'],
+            $dataHelpers['logDataHelper'],
+            new LogDataWriterHelper($this->application),
+            $services['mediaManager'],
+            $dataHelpers['membershipDataHelper'],
+            new MenuItemDataHelper($this->application, $dataHelpers['authorizationDataHelper']),
+            $dataHelpers['messageDataHelper'],
+            new MessageRecipientService($this->dataHelper),
+            $dataHelpers['needDataHelper'],
+            new NeedTypeDataHelper($this->application),
+            $services['notificationSender'],
+            $dataHelpers['participantDataHelper'],
+            $services['personDataHelper'],
+            $services['personPreferences'],
+        );
     }
 }

@@ -45,7 +45,7 @@ class ConnectedUser
         $personRow = $this->dataHelper->get(
             'Person',
             ['Email' => $userEmail],
-            'Id, Email, Alert, FirstName, LastName, NickName, UseGravatar, Avatar, Availabilities, Preferences, Notifications'
+            'Id, Email, Alert, FirstName, LastName, NickName, UseGravatar, Avatar'
         );
         if (!$personRow) {
             $_SESSION['user'] = '';
@@ -103,6 +103,24 @@ class ConnectedUser
             $this->person->Alert
         );
         return;
+    }
+
+    public function getLastSignIn(): ?string
+    {
+        if ($this->person === null) {
+            return null;
+        }
+        $row = $this->dataHelper->get('Person', ['Id' => $this->person->Id], 'LastSignIn');
+        return $row !== false ? ($row->LastSignIn ?? null) : null;
+    }
+
+    public function getLastSignOut(): ?string
+    {
+        if ($this->person === null) {
+            return null;
+        }
+        $row = $this->dataHelper->get('Person', ['Id' => $this->person->Id], 'LastSignOut');
+        return $row !== false ? ($row->LastSignOut ?? null) : null;
     }
 
     public function getPage(int $segment = 0): ?string

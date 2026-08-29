@@ -23,6 +23,7 @@ use app\models\MessageDataHelper;
 use app\models\PersonDataHelper;
 use app\modules\Article\services\ArticleAuthorizationService;
 use app\modules\Article\viewModels\ArticleCarouselViewModel;
+use app\modules\Article\viewModels\ArticleEditViewModel;
 use app\modules\Article\viewModels\ArticleShowViewModel;
 use app\modules\Common\TableController;
 use app\modules\Common\services\ArticleService;
@@ -52,24 +53,6 @@ class ArticleController extends TableController
             $this->dataHelper,
             new AuthorizationDataHelper($this->application)
         );
-    }
-
-    /**
-     * @param array<string, mixed> $context
-     */
-    private function getStringParam(array $context, string $key, string $default): string
-    {
-        $value = $context[$key] ?? $default;
-        return is_string($value) ? $value : $default;
-    }
-
-    /**
-     * @param array<string, mixed> $context
-     */
-    private function getNullableStringParam(array $context, string $key): ?string
-    {
-        $value = $context[$key] ?? null;
-        return is_string($value) ? $value : null;
     }
 
     public function carousel(int $id): void
@@ -115,14 +98,6 @@ class ArticleController extends TableController
         $viewModel = new ArticleCarouselViewModel(
             article: $article,
             carouselItems: array_values($this->dataHelper->gets('Carousel', ['IdArticle' => $id])),
-            page: $connectedUser->getPage(),
-            navbarInkColor: $this->getStringParam($dynamicContext, 'navbarInkColor', '#ffffff'),
-            navbarIconColor: $this->getStringParam($dynamicContext, 'navbarIconColor', '#000000'),
-            navbarBgColor: $this->getStringParam($dynamicContext, 'navbarBgColor', '#343a40'),
-            productionSiteUrl: $this->getNullableStringParam($dynamicContext, 'productionSiteUrl'),
-            memberAlert: $this->getNullableStringParam($dynamicContext, 'memberAlert'),
-            btn_HistoryBack: true,
-            btn_Parent: '/articles',
         );
 
         $this->render('Article/views/article_carousel.latte', $viewModel->toArray());
@@ -263,24 +238,30 @@ class ArticleController extends TableController
             }
         }
 
-        $this->render('Article/views/article_edit.latte', $this->getAllParams([
-            'article' => $article,
-            'groups' => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
-            'hasSurvey' => $this->dataHelper->get('Survey', ['IdArticle' => $id], 'ClosingDate'),
-            'hasOrder' => $this->dataHelper->get('Order', ['IdArticle' => $id], 'ClosingDate'),
-            'id' => $id,
-            'userConnected' => $connectedUser->person ?? false,
-            'navItems' => $this->getNavItems($connectedUser->person),
-            'publishedBy' => $article->PublishedBy != $article->CreatedBy
+        $viewModel = new ArticleEditViewModel(
+            id: $id,
+            article: $article,
+            groups: array_values(
+                $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name')
+            ),
+            hasSurvey: $this->dataHelper->get('Survey', ['IdArticle' => $id], 'ClosingDate') ?: null,
+            hasOrder: $this->dataHelper->get('Order', ['IdArticle' => $id], 'ClosingDate') ?: null,
+            userConnected: $connectedUser->person ?? false,
+            navItems: $this->getNavItems($connectedUser->person),
+            publishedBy: $article->PublishedBy != $article->CreatedBy
                 ? $this->personDataHelper->getPublisher($article->PublishedBy) : '',
-            'carouselItems' => $this->dataHelper->gets('Carousel', ['IdArticle' => $id]),
-            'page' => $connectedUser->getPage(),
-            'i18n' => [
+            carouselItems: array_values(
+                $this->dataHelper->gets('Carousel', ['IdArticle' => $id])
+            ),
+            i18n: [
                 'editorNotReady' => ($this->t)('article.edit.error.editor_not_ready'),
                 'titleRequired' => ($this->t)('article.edit.error.title_required'),
                 'contentRequired' => ($this->t)('article.edit.error.content_required'),
             ],
-        ]));
+            layoutParams: $this->getAllParams([]),
+        );
+
+        $this->render('Article/views/article_edit.latte', $viewModel->toArray());
     }
 
     public function fetchEmailsForArticle(int $idArticle): void
@@ -588,7 +569,7 @@ class ArticleController extends TableController
             [$message, $messageType] = MessageService::get();
 
             // 1. Grab everything generated globally by the framework infrastructure
-            $dynamicContext = $this->getAllParams([]);
+            $layoutParams = $this->getAllParams([]);
 
             // 2. Résolution des données annexes en variables locales typées
             $groups = array_values(
@@ -616,7 +597,6 @@ class ArticleController extends TableController
                 hasSurvey: $hasSurvey,
                 hasOrder: $hasOrder,
                 userConnected: $connectedUser->person !== null,
-                userEmail: $this->getNullableStringParam($dynamicContext, 'userEmail'),
                 navItems: $this->getNavItems($connectedUser->person),
                 publishedBy: $article->PublishedBy && $article->PublishedBy != $article->CreatedBy
                     ? $this->personDataHelper->getPublisher($article->PublishedBy) ?? ''
@@ -630,7 +610,6 @@ class ArticleController extends TableController
                     $connectedUser
                 ),
                 carouselItems: $carouselItems,
-                page: $connectedUser->getPage(),
                 countOfMessages: count(
                     $this->dataHelper->gets(
                         'Message',
@@ -639,17 +618,9 @@ class ArticleController extends TableController
                 ),
                 isCreator: $connectedUser->person !== null
                     && $connectedUser->person->Id === $article->CreatedBy,
-                isMember: $connectedUser->person !== null,
-                isEditor: $connectedUser->isEditor(),
                 message: $message,
                 messageType: $messageType,
-                navbarInkColor: $this->getStringParam($dynamicContext, 'navbarInkColor', '#ffffff'),
-                navbarIconColor: $this->getStringParam($dynamicContext, 'navbarIconColor', '#000000'),
-                navbarBgColor: $this->getStringParam($dynamicContext, 'navbarBgColor', '#343a40'),
-                productionSiteUrl: $this->getNullableStringParam($dynamicContext, 'productionSiteUrl'),
-                memberAlert: $this->getNullableStringParam($dynamicContext, 'memberAlert'),
-                btn_HistoryBack: true,
-                btn_Parent: '/articles',
+                layoutParams: $layoutParams,
             );
 
             $this->render(

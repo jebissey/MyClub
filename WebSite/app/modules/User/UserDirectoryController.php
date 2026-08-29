@@ -16,6 +16,20 @@ use app\valueObjects\Person;
 
 /**
  * @phpstan-import-type PersonRow from Person
+ * @phpstan-type DirectoryMapRow object{
+ *     Id: int|string,
+ *     FirstName: string|null,
+ *     LastName: string|null,
+ *     NickName: string|null,
+ *     Avatar: string|null,
+ *     UseGravatar: bool|int|string|null,
+ *     Email: string,
+ *     Location: string|null,
+ *     MyPublicDataInPresentationDirectory: string|null,
+ *     InPresentationDirectory: int|string,
+ *     ShowPhoneInPresentationDirectory: int|string,
+ *     ShowEmailInPresentationDirectory: int|string
+ * }
  */
 class UserDirectoryController extends AbstractController
 {
@@ -100,14 +114,13 @@ class UserDirectoryController extends AbstractController
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
-        /** @var array<int|string, PersonRow> $rows */
+        /** @var array<int|string, DirectoryMapRow> $rows */
         $rows = $this->dataHelper->gets('Person', [
             'InPresentationDirectory' => 1,
             'Location IS NOT NULL' => null,
             'Inactivated' => 0
         ], 'Id, FirstName, LastName, NickName, Avatar, UseGravatar, Email, Location, MyPublicDataInPresentationDirectory, InPresentationDirectory, ShowPhoneInPresentationDirectory, ShowEmailInPresentationDirectory');
-        $members = array_values(array_map(Person::fromRow(...), $rows));
-        $locationData = $this->getLocationData($members);
+        $locationData = $this->getLocationData(array_values($rows));
 
         $this->render('User/views/users_map.latte', $this->getAllParams([
             'locationData' => $locationData,
@@ -129,15 +142,14 @@ class UserDirectoryController extends AbstractController
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
-        /** @var array<int|string, PersonRow> $rows */
+        /** @var array<int|string, DirectoryMapRow> $rows */
         $rows = $this->dataHelper->gets('Person', [
             'InPresentationDirectory' => 1,
             'Location IS NOT NULL' => null,
             'Inactivated' => 0,
             'MyPublicDataInPresentationDirectory IS NOT NULL AND MyPublicDataInPresentationDirectory != ""' => null
         ], 'Id, FirstName, LastName, NickName, Avatar, UseGravatar, Email, Location, MyPublicDataInPresentationDirectory, InPresentationDirectory, ShowPhoneInPresentationDirectory, ShowEmailInPresentationDirectory');
-        $members = array_values(array_map(Person::fromRow(...), $rows));
-        $locationData = $this->getLocationData($members);
+        $locationData = $this->getLocationData(array_values($rows));
 
         $this->render('User/views/users_map.latte', $this->getAllParams([
             'locationData' => $locationData,
@@ -153,7 +165,7 @@ class UserDirectoryController extends AbstractController
 
     #region Private functions
     /**
-     * @param  list<Person> $members
+     * @param  list<DirectoryMapRow> $members
      * @return array<int, array{
      *     id: int,
      *     name: string,
@@ -180,15 +192,15 @@ class UserDirectoryController extends AbstractController
             ) {
                 list($lat, $lng) = explode(',', $member->Location);
                 $locationData[] = [
-                    'id' => $member->Id,
+                    'id' => (int) $member->Id,
                     'name' => $member->FirstName . ' ' . $member->LastName,
                     'nickname' => $member->NickName,
                     'avatar' => $member->Avatar,
-                    'useGravatar' => $member->UseGravatar,
+                    'useGravatar' => (bool) $member->UseGravatar,
                     'email' => $member->Email,
                     'lat' => trim($lat),
                     'lng' => trim($lng),
-                    'userImg' => WebApp::getUserImg($member, $gravatarHandler),
+                    'userImg' => WebApp::getUserImg(Person::fromRow($member), $gravatarHandler),
                     'myPublicData' => $member->MyPublicDataInPresentationDirectory
                 ];
             }

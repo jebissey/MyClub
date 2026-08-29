@@ -73,11 +73,16 @@ class AuthenticationService
             ['Token' => $token],
             'Id, Inactivated, Email'
         );
-        /** @var PersonRow|false $personRow */
-        if (!$personRow || ($personRow->Inactivated ?? 0) == 1) {
+        if (!$personRow) {
             $this->clearRememberMeCookie();
             return null;
         }
+        /** @var object{Id: int|string, Email: string, Inactivated: bool|int|string|null} $personRow */
+        if ((bool)($personRow->Inactivated ?? false)) {
+            $this->clearRememberMeCookie();
+            return null;
+        }
+        /** @var PersonRow $personRow */
         $person = Person::fromRow($personRow);
         $this->dataHelper->set(
             'Person',
@@ -119,16 +124,16 @@ class AuthenticationService
         if (!$personRow) {
             return false;
         }
-        /** @var PersonRow $personRow */
-        $person = Person::fromRow($personRow);
-        if ($person->TokenCreatedAt === null || (new DateTime($person->TokenCreatedAt))->diff(new DateTime())->h >= 1) {
+        /** @var object{Id: int|string, Email: string, TokenCreatedAt: string|null} $personRow */
+        $tokenCreatedAt = $personRow->TokenCreatedAt;
+        if ($tokenCreatedAt === null || (new DateTime($tokenCreatedAt))->diff(new DateTime())->h >= 1) {
             return false;
         }
         $this->dataHelper->set('Person', [
             'Password' => Password::signPassword($newPassword),
             'Token' => null,
             'TokenCreatedAt' => null
-        ], ['Id' => $person->Id]);
+        ], ['Id' => (int)$personRow->Id]);
         return true;
     }
 
@@ -150,16 +155,23 @@ class AuthenticationService
     private function authenticate(string $email, string $password, bool $rememberMe): AuthResult
     {
         try {
-            $person = $this->findPersonByEmail($email);
-            if ($person === false) {
+            $row = $this->dataHelper->get(
+                'Person',
+                ['Email' => $email],
+                'Id, Email, Password, Inactivated, UseGravatar'
+            );
+            if (!$row) {
                 return AuthResult::error("Sign in failed: unknown email {$email}");
             }
-            if ($person->Inactivated) {
+            /** @var object{Id: int|string, Email: string, Password: string|null, Inactivated: bool|int|string|null, UseGravatar?: bool|int|string|null} $row */
+            if ((bool)($row->Inactivated ?? false)) {
                 return AuthResult::error("Sign in failed: inactivated user {$email}");
             }
-            if (!Password::verifyPassword($password, $person->Password ?? '')) {
+            if (!Password::verifyPassword($password, $row->Password ?? '')) {
                 return AuthResult::error("Sign in failed: wrong password for {$email}");
             }
+            /** @var PersonRow $row */
+            $person = Person::fromRow($row);
             return $this->loginUser($person, $rememberMe);
         } catch (Throwable $e) {
             return AuthResult::error("Authentication error: {$e->getMessage()} in {$e->getFile()} at line {$e->getLine()}");
@@ -176,7 +188,7 @@ class AuthenticationService
         $row = $this->dataHelper->get(
             'Person',
             ['Email' => $email],
-            'Id, Email, Password, Inactivated, LastSignIn, LastSignOut, UseGravatar'
+            'Id, Email, UseGravatar'
         );
         if (!$row) {
             return false;

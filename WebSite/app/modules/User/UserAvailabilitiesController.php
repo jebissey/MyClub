@@ -27,7 +27,11 @@ class UserAvailabilitiesController extends AbstractController
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
-        $currentAvailabilities = json_decode($person->Availabilities ?? '', true);
+        $row = $this->dataHelper->get('Person', ['Id' => $person->Id], 'Availabilities');
+        /** @var object{Availabilities: string|null}|false $row */
+        $availabilitiesJson = $row !== false ? ($row->Availabilities ?? '') : '';
+
+        $currentAvailabilities = json_decode($availabilitiesJson, true);
         $this->render('User/views/user_availabilities.latte', $this->getAllParams([
             'currentAvailabilities' => $currentAvailabilities,
             'page' => $this->application->getConnectedUser()->getPage(1),

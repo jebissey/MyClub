@@ -29,8 +29,13 @@ class UserPresentationController extends AbstractController
                 $this->raiseMethodNotAllowed(__FILE__, __LINE__);
                 return;
             }
+            $row = $this->dataHelper->get('Person', ['Id' => $person->Id]);
+            if ($row === false) {
+                $this->raiseBadRequest("Unknown person {$person->Id}", __FILE__, __LINE__);
+                return;
+            }
             $this->render('User/views/user_edit_presentation.latte', $this->getAllParams([
-                'person' => $person,
+                'person' => $row,
                 'navItems' => $this->getNavItems($person),
                 'page' => $this->application->getConnectedUser()->getPage(),
                 'validationMsg' => ($this->t)('presentation.edit.validation.noContent'),
@@ -96,28 +101,23 @@ class UserPresentationController extends AbstractController
             return;
         }
 
-        /** @var PersonRow|false $row */
         $row = $this->dataHelper->get('Person', [
             'Id' => $personId,
             'Inactivated' => 0,
             'InPresentationDirectory' => 1,
         ]);
 
-        $person = $row ? Person::fromRow($row) : null;
-
-        if (
-            $person === null
-            || $person->Inactivated
-            || !$person->InPresentationDirectory
-        ) {
+        if ($row === false) {
             $this->raiseBadRequest("Unknown person {$personId}", __FILE__, __LINE__);
             return;
         }
+        /** @var PersonRow $row */
+        $person = Person::fromRow($row);
 
         $this->render(
             'User/views/user_presentation.latte',
             $this->getAllParams([
-                'person' => $person,
+                'person' => $row,
                 'loggedPerson' => $loggedPerson,
                 'navItems' => $this->getNavItems($person),
                 'page' => $this->application->getConnectedUser()->getPage(),

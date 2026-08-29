@@ -15,9 +15,6 @@ use app\models\TableControllerDataHelper;
 use app\modules\Common\TableController;
 use app\valueObjects\Person;
 
-/**
- * @phpstan-import-type PersonRow from Person
- */
 class PersonController extends TableController
 {
     public function __construct(
@@ -59,16 +56,15 @@ class PersonController extends TableController
                 $this->raiseBadRequest("Unknown person {$id}", __FILE__, __LINE__);
                 return;
             }
-            /** @var PersonRow $row */
-            $person = Person::fromRow($row);
+            /** @var object{Id: int|string, Imported: bool|int|string|null, Email: string, FirstName: string|null, LastName: string|null, Alert: string|null, MemberInfo: string|null} $row */
 
             $this->render('User/views/user_account.latte', $this->getAllParams([
-                'readOnly' => $person->Imported,
-                'email' => $person->Email,
-                'firstName' => $person->FirstName ?? '',
-                'lastName' => $person->LastName ?? '',
-                'alert' => $person->Alert ?? '',
-                'memberInfo' => $person->MemberInfo ?? '',
+                'readOnly' => (bool)($row->Imported ?? false),
+                'email' => $row->Email,
+                'firstName' => $row->FirstName ?? '',
+                'lastName' => $row->LastName ?? '',
+                'alert' => $row->Alert ?? '',
+                'memberInfo' => $row->MemberInfo ?? '',
                 'isSelfEdit' => false,
                 'layout' => $this->getLayout(),
                 'page' => $this->application->getConnectedUser()->getPage(),
@@ -90,8 +86,12 @@ class PersonController extends TableController
                 $this->raiseBadRequest("Unknown person {$id}", __FILE__, __LINE__);
                 return;
             }
-            /** @var PersonRow $row */
-            $person = Person::fromRow($row);
+            /** @var object{Id: int|string, Imported: bool|int|string|null, Email: string, FirstName: string|null, LastName: string|null} $row */
+            $personId = (int)$row->Id;
+            $personEmail = $row->Email;
+            $personFirstName = $row->FirstName;
+            $personLastName = $row->LastName;
+            $personImported = (bool)($row->Imported ?? false);
 
             $schema = [
                 'email'      => FilterInputRule::Email->value,
@@ -119,20 +119,21 @@ class PersonController extends TableController
             $status = '';
 
             if ($existingRow) {
-                /** @var PersonRow $existingRow */
-                $existing = Person::fromRow($existingRow);
+                /** @var object{Id: int|string, FirstName: string|null, LastName: string|null, Inactivated: bool|int|string|null} $existingRow */
+                $existingId = (int)$existingRow->Id;
+                $existingInactivated = (bool)($existingRow->Inactivated ?? false);
 
                 $isNewRecord = (
-                    ($person->Email) === '' &&
-                    ($person->FirstName ?? '') === '' &&
-                    ($person->LastName ?? '') === '' &&
-                    !$person->Imported
+                    $personEmail === '' &&
+                    ($personFirstName ?? '') === '' &&
+                    ($personLastName ?? '') === '' &&
+                    !$personImported
                 );
-                $isDuplicate = $isNewRecord ? true : ($existing->Id !== $person->Id);
+                $isDuplicate = $isNewRecord ? true : ($existingId !== $personId);
 
                 if ($isDuplicate) {
-                    $fullName = trim(($existing->FirstName ?? '') . ' ' . ($existing->LastName ?? ''));
-                    $status = $existing->Inactivated ? 'Disabled' : 'Active';
+                    $fullName = trim(($existingRow->FirstName ?? '') . ' ' . ($existingRow->LastName ?? ''));
+                    $status = $existingInactivated ? 'Disabled' : 'Active';
                 }
             }
 
@@ -162,12 +163,12 @@ class PersonController extends TableController
                     'FirstName' => $input['firstName'] ?? '???',
                     'LastName'  => $input['lastName'] ?? '???',
                 ],
-                ['Id' => $person->Id]
+                ['Id' => $personId]
             );
 
             // Email is the sync key for imported records — never update it
-            if (!$person->Imported) {
-                $this->dataHelper->set('Person', ['Email' => $email], ['Id' => $person->Id]);
+            if (!$personImported) {
+                $this->dataHelper->set('Person', ['Email' => $email], ['Id' => $personId]);
             }
 
             if ($this->application->getConnectedUser()->isPersonManager()) {
@@ -177,7 +178,7 @@ class PersonController extends TableController
                         'Alert' => $input['alert'] ?? '',
                         'MemberInfo' => $input['memberInfo'] ?? ''
                     ],
-                    ['Id' => $person->Id]
+                    ['Id' => $personId]
                 );
             }
 

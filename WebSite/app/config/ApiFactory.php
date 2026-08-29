@@ -34,7 +34,6 @@ use app\helpers\GravatarHandler;
 use app\helpers\MediaManager;
 use app\helpers\NotificationSender;
 use app\helpers\PersonPreferences;
-use app\models\ArticleDataHelper;
 use app\models\AttributeDataHelper;
 use app\models\AuthorizationDataHelper;
 use app\models\CarouselDataHelper;
@@ -60,6 +59,7 @@ use app\modules\Common\services\EmailService;
 use app\modules\Common\services\EventService;
 use app\modules\Common\services\JsonEmailQuotaTracker;
 use app\modules\Common\services\MessageRecipientService;
+use app\modules\Event\services\AuthorizationService;
 
 class ApiFactory
 {

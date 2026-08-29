@@ -38,8 +38,12 @@ class UserPreferencesController extends AbstractController
             );
         }
 
+        $row = $this->dataHelper->get('Person', ['Id' => $person->Id], 'Preferences');
+        /** @var object{Preferences: string|null}|false $row */
+        $preferencesJson = $row !== false ? ($row->Preferences ?? '') : '';
+
         $this->render('User/views/user_preferences.latte', $this->getAllParams([
-            'currentPreferences' => json_decode($person->Preferences ?? '', true),
+            'currentPreferences' => json_decode($preferencesJson, true),
             'eventTypes' => $eventTypesWithAttributes,
             'page' => $this->application->getConnectedUser()->getPage(1),
             'btn_HistoryBack' => true,
