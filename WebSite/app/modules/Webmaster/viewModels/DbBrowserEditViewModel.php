@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace app\modules\Webmaster\viewModels;
 
 use app\modules\Common\viewModels\LayoutViewModel;
-
 use stdClass;
 
 final readonly class DbBrowserEditViewModel extends LayoutViewModel

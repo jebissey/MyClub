@@ -7,6 +7,7 @@ namespace app\modules\VisitorInsights;
 use app\enums\Period;
 use app\enums\FilterInputRule;
 use app\helpers\Application;
+use app\helpers\To;
 use app\helpers\TranslationManager;
 use app\helpers\WebApp;
 use app\models\CrosstabDataHelper;
@@ -15,6 +16,16 @@ use app\models\LogDataAnalyticsHelper;
 use app\models\LogDataStatisticsHelper;
 use app\models\PersonDataHelper;
 use app\modules\Common\TableController;
+use app\modules\Common\viewModels\InfoViewModel;
+use app\modules\VisitorInsights\viewModels\AnalyticsViewModel;
+use app\modules\VisitorInsights\viewModels\CrossTabViewModel;
+use app\modules\VisitorInsights\viewModels\LastVisitsViewModel;
+use app\modules\VisitorInsights\viewModels\MembersAlertsViewModel;
+use app\modules\VisitorInsights\viewModels\ReferentsViewModel;
+use app\modules\VisitorInsights\viewModels\TopPagesViewModel;
+use app\modules\VisitorInsights\viewModels\VisitorInsightsHomeViewModel;
+use app\modules\VisitorInsights\viewModels\VisitorLogsViewModel;
+use app\modules\VisitorInsights\viewModels\VisitorsGrafViewModel;
 
 class VisitorInsightsController extends TableController
 {
@@ -61,12 +72,15 @@ class VisitorInsightsController extends TableController
         }
 
         $lang = TranslationManager::getCurrentLanguage();
+        $helpRow = $this->dataHelper->get('Languages', ['Name' => $languageKey], $lang);
+        $content = ($helpRow !== false && isset($helpRow->$lang)) ? $helpRow->$lang : '';
 
-        $this->render('Common/views/info.latte', $this->getAllParams([
-            'content'          => $this->dataHelper->get('Languages', ['Name' => $languageKey], $lang)->$lang ?? '',
-            'timer' => 0,
-            'btn_HistoryBack' => true,
-        ]));
+        $viewModel = new InfoViewModel(
+            content: $content,
+            timer: 0,
+            layoutParams: $this->getAllParams([]),
+        );
+        $this->render('Common/views/info.latte', $viewModel->toArray());
     }
 
     public function index(): void
@@ -112,18 +126,18 @@ class VisitorInsightsController extends TableController
         $query = $this->logDataHelper->getVisitedPages();
         $data  = $this->prepareTableData($query, $filterValues, true);
 
-        $this->render('VisitorInsights/views/visitor.latte', $this->getAllParams([
-            'logs'         => $data['items'],
-            'currentPage'  => $data['currentPage'],
-            'totalPages'   => $data['totalPages'],
-            'filterValues' => $filterValues,
-            'filters'      => $filterConfig,
-            'columns'      => $columns,
-            'page'         => $this->application->getConnectedUser()->getPage(),
-            'resetUrl'     => '/logs',
-            'btn_HistoryBack' => true,
-            'btn_Parent'      => "/admin",
-        ]));
+        $viewModel = new VisitorLogsViewModel(
+            logs: array_values($data['items']),
+            currentPage: $data['currentPage'],
+            totalPages: $data['totalPages'],
+            filterValues: $filterValues,
+            filters: $filterConfig,
+            columns: $columns,
+            resetUrl: '/logs',
+            layoutParams: $this->getAllParams([]),
+        );
+
+        $this->render('VisitorInsights/views/visitor.latte', $viewModel->toArray());
     }
 
     public function membersAlerts(): void
@@ -132,12 +146,12 @@ class VisitorInsightsController extends TableController
             return;
         }
 
-        $this->render('VisitorInsights/views/membersAlerts.latte', $this->getAllParams([
-            'membersAlerts' => $this->personDataHelper->getMembersAlerts(),
-            'page'          => $this->application->getConnectedUser()->getPage(),
-            'btn_HistoryBack' => true,
-            'btn_Parent'      => "/admin",
-        ]));
+        $viewModel = new MembersAlertsViewModel(
+            membersAlerts: array_values($this->personDataHelper->getMembersAlerts()),
+            layoutParams: $this->getAllParams([]),
+        );
+
+        $this->render('VisitorInsights/views/membersAlerts.latte', $viewModel->toArray());
     }
 
     public function visitorInsights(): void
@@ -147,12 +161,13 @@ class VisitorInsightsController extends TableController
         }
 
         $_SESSION['navbar'] = 'visitorInsights';
-        $this->render('VisitorInsights/views/visitorInsights.latte', $this->getAllParams([
-            'page'    => $this->application->getConnectedUser()->getPage(),
-            'content' => ($this->t)('VisitorInsights'),
-            'btn_HistoryBack' => true,
-            'btn_Parent'      => "/admin",
-        ]));
+
+        $viewModel = new VisitorInsightsHomeViewModel(
+            content: ($this->t)('VisitorInsights'),
+            layoutParams: $this->getAllParams([]),
+        );
+
+        $this->render('VisitorInsights/views/visitorInsights.latte', $viewModel->toArray());
     }
 
     public function referents(): void
@@ -163,17 +178,17 @@ class VisitorInsightsController extends TableController
 
         [$period, $currentDate] = $this->getPeriodAndDate();
 
-        $this->render('VisitorInsights/views/referent.latte', $this->getAllParams([
-            'period'       => $period,
-            'currentDate'  => $currentDate,
-            'nav'          => $this->logDataAnalyticsHelper->getReferentNavigation($period, $currentDate),
-            'externalRefs' => $this->logDataAnalyticsHelper->getExternalReferentStats($period, $currentDate),
-            'control'      => new WebApp(),
-            'rows'         => $this->logDataAnalyticsHelper->getReferentStats($period, $currentDate),
-            'page'         => $this->application->getConnectedUser()->getPage(),
-            'btn_HistoryBack' => true,
-            'btn_Parent'      => "/admin",
-        ]));
+        $viewModel = new ReferentsViewModel(
+            period: $period,
+            currentDate: $currentDate,
+            nav: $this->logDataAnalyticsHelper->getReferentNavigation($period, $currentDate),
+            externalRefs: $this->logDataAnalyticsHelper->getExternalReferentStats($period, $currentDate),
+            control: new WebApp(),
+            rows: $this->logDataAnalyticsHelper->getReferentStats($period, $currentDate),
+            layoutParams: $this->getAllParams([]),
+        );
+
+        $this->render('VisitorInsights/views/referent.latte', $viewModel->toArray());
     }
 
     public function visitorsGraf(): void
@@ -187,15 +202,14 @@ class VisitorInsightsController extends TableController
         $offset     = (int)($this->flight->request()->query->offset ?? 0);
         $data       = $this->logDataAnalyticsHelper->getStatisticsData($periodType, $offset);
 
-        $this->render('VisitorInsights/views/statistics.latte', $this->getAllParams([
-            'periodTypes'       => self::PERIOD_TYPES,
-            'currentPeriodType' => $periodType,
-            'currentOffset'     => $offset,
-            'data'              => $data,
-            'chartData'         => $this->logDataHelper->formatDataForChart($data),
-            'periodLabel'       => $this->logDataAnalyticsHelper->getPeriodLabel($periodType),
-            'page'              => $this->application->getConnectedUser()->getPage(),
-            'i18n' => [
+        $viewModel = new VisitorsGrafViewModel(
+            periodTypes: self::PERIOD_TYPES,
+            currentPeriodType: $periodType,
+            currentOffset: $offset,
+            data: $data,
+            chartData: $this->logDataHelper->formatDataForChart($data),
+            periodLabel: $this->logDataAnalyticsHelper->getPeriodLabel($periodType),
+            i18n: [
                 'uniqueVisitors' => ($this->t)('visitor_insights.statistics.unique_visitors'),
                 'pageViews'      => ($this->t)('visitor_insights.statistics.page_views'),
                 's2xx'           => ($this->t)('visitor_insights.statistics.chart.2xx'),
@@ -207,9 +221,10 @@ class VisitorInsightsController extends TableController
                 'tooltipAvg'     => ($this->t)('visitor_insights.statistics.tooltip.avg_per_day'),
                 'tooltipMin'     => ($this->t)('visitor_insights.statistics.tooltip.min_per_day'),
             ],
-            'btn_HistoryBack' => true,
-            'btn_Parent'      => "/admin",
-        ]));
+            layoutParams: $this->getAllParams([]),
+        );
+
+        $this->render('VisitorInsights/views/statistics.latte', $viewModel->toArray());
     }
 
     public function analytics(): void
@@ -220,22 +235,22 @@ class VisitorInsightsController extends TableController
 
         [$period, $currentDate] = $this->getPeriodAndDate();
 
-        $this->render('VisitorInsights/views/analytics.latte', $this->getAllParams([
-            'osData'               => $this->logDataStatisticsHelper->getOsDistribution($period, $currentDate),
-            'browserData'          => $this->logDataStatisticsHelper->getBrowserDistribution($period, $currentDate),
-            'screenResolutionData' => $this->logDataStatisticsHelper->getScreenResolutionDistribution($period, $currentDate),
-            'typeData'             => $this->logDataStatisticsHelper->getTypeDistribution($period, $currentDate),
-            'title'                => 'Synthèse des visiteurs',
-            'page'                 => $this->application->getConnectedUser()->getPage(),
-            'control'              => new WebApp(),
-            'period'               => $period,
-            'nav'                  => $this->logDataAnalyticsHelper->getReferentNavigation($period, $currentDate),
-            'i18n' => [
+        $viewModel = new AnalyticsViewModel(
+            osData: $this->logDataStatisticsHelper->getOsDistribution($period, $currentDate),
+            browserData: $this->logDataStatisticsHelper->getBrowserDistribution($period, $currentDate),
+            screenResolutionData: $this->logDataStatisticsHelper->getScreenResolutionDistribution($period, $currentDate),
+            typeData: $this->logDataStatisticsHelper->getTypeDistribution($period, $currentDate),
+            title: 'Synthèse des visiteurs',
+            control: new WebApp(),
+            period: $period,
+            nav: $this->logDataAnalyticsHelper->getReferentNavigation($period, $currentDate),
+            i18n: [
                 'visits' => ($this->t)('visitor_insights.analytics.visits'),
             ],
-            'btn_HistoryBack' => true,
-            'btn_Parent'      => "/admin",
-        ]));
+            layoutParams: $this->getAllParams([]),
+        );
+
+        $this->render('VisitorInsights/views/analytics.latte', $viewModel->toArray());
     }
 
     public function topPagesByPeriod(): void
@@ -246,17 +261,17 @@ class VisitorInsightsController extends TableController
 
         $period = $this->getValidPeriod();
 
-        $this->render('VisitorInsights/views/topPages.latte', $this->getAllParams([
-            'title'    => ($this->t)('visitor_insights.top_pages.card_title'),
-            'period'   => $period->value,
-            'periodFrom'  => $period->getStart()->format('Y-m-d H:i:s'),
-            'periodTo'    => $period->getEnd()->format('Y-m-d H:i:s'),
-            'topPages' => $this->logDataHelper->getTopPages($period, self::TOP),
-            'page'     => $this->application->getConnectedUser()->getPage(),
-            'translations' => TranslationManager::getCreationTimeModalTranslations($this->languagesDataHelper),
-            'btn_HistoryBack' => true,
-            'btn_Parent'      => "/admin",
-        ]));
+        $viewModel = new TopPagesViewModel(
+            title: ($this->t)('visitor_insights.top_pages.card_title'),
+            period: $period->value,
+            periodFrom: $period->getStart()->format('Y-m-d H:i:s'),
+            periodTo: $period->getEnd()->format('Y-m-d H:i:s'),
+            topPages: array_values($this->logDataHelper->getTopPages($period, self::TOP)),
+            translations: TranslationManager::getCreationTimeModalTranslations($this->languagesDataHelper),
+            layoutParams: $this->getAllParams([]),
+        );
+
+        $this->render('VisitorInsights/views/topPages.latte', $viewModel->toArray());
     }
 
     public function crossTab(): void
@@ -273,9 +288,9 @@ class VisitorInsightsController extends TableController
         ];
         $input = WebApp::filterInput($schema, $this->flight->request()->query->getData());
         /** @var array<string, string> $input */
-        $uriFilter   = $input['uri'];
-        $emailFilter = $input['email'];
-        $groupFilter = $input['group'];
+        $uriFilter   = To::str($input['uri'] ?? null);
+        $emailFilter = To::str($input['email'] ?? null);
+        $groupFilter = To::str($input['group'] ?? null);
         $period      = Period::tryFrom($input['period'] ?? '') ?? Period::Today;
 
         [$sortedCrossTabData, $filteredPersons, $columnTotals] = $this->crosstabDataHelper->getPersons(
@@ -285,25 +300,25 @@ class VisitorInsightsController extends TableController
             $groupFilter
         );
 
-        $this->render('VisitorInsights/views/crossTab.latte', $this->getAllParams([
-            'title'        => ($this->t)('visitor_insights.cross_tab.title'),
-            'period'       => $period->value,
-            'uris'         => $sortedCrossTabData,
-            'persons'      => $this->logDataHelper->getPersons($filteredPersons),
-            'columnTotals' => $columnTotals,
-            'grandTotal'   => array_sum(array_filter($columnTotals, fn($v, $k) => !empty($k), ARRAY_FILTER_USE_BOTH)),
-            'groups'       => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
-            'uriFilter'    => $uriFilter,
-            'emailFilter'  => $emailFilter,
-            'groupFilter'  => $groupFilter,
-            'page'         => $this->application->getConnectedUser()->getPage(),
-            'i18n' => [
+        $viewModel = new CrossTabViewModel(
+            title: ($this->t)('visitor_insights.cross_tab.title'),
+            period: $period->value,
+            uris: $sortedCrossTabData,
+            persons: array_values($this->logDataHelper->getPersons($filteredPersons)),
+            columnTotals: $columnTotals,
+            grandTotal: array_sum(array_filter($columnTotals, fn($v, $k) => !empty($k), ARRAY_FILTER_USE_BOTH)),
+            groups: array_values($this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name')),
+            uriFilter: $uriFilter,
+            emailFilter: $emailFilter,
+            groupFilter: $groupFilter,
+            i18n: [
                 'tableHide' => ($this->t)('visitor_insights.cross_tab.table.hide'),
                 'tableShow' => ($this->t)('visitor_insights.cross_tab.table.show'),
             ],
-            'btn_HistoryBack' => true,
-            'btn_Parent'      => "/admin",
-        ]));
+            layoutParams: $this->getAllParams([]),
+        );
+
+        $this->render('VisitorInsights/views/crossTab.latte', $viewModel->toArray());
     }
 
     public function showLastVisits(): void
@@ -314,14 +329,14 @@ class VisitorInsightsController extends TableController
 
         $activePersons = array_values($this->dataHelper->gets('Person', ['Inactivated' => 0]));
 
-        $this->render('VisitorInsights/views/lastVisits.latte', $this->getAllParams([
-            'lastVisits'       => $this->logDataHelper->getLastVisitPerActivePersonWithTimeAgo($activePersons),
-            'totalActiveUsers' => count($activePersons),
-            'navItems'         => $this->getNavItems($this->application->getConnectedUser()->person),
-            'page'             => $this->application->getConnectedUser()->getPage(),
-            'btn_HistoryBack' => true,
-            'btn_Parent'      => "/admin",
-        ]));
+        $viewModel = new LastVisitsViewModel(
+            lastVisits: $this->logDataHelper->getLastVisitPerActivePersonWithTimeAgo($activePersons),
+            totalActiveUsers: count($activePersons),
+            navItems: $this->getNavItems($this->application->getConnectedUser()->person),
+            layoutParams: $this->getAllParams([]),
+        );
+
+        $this->render('VisitorInsights/views/lastVisits.latte', $viewModel->toArray());
     }
 
     #region Private functions
