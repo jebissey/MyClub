@@ -9,6 +9,7 @@ use app\helpers\Application;
 use app\helpers\WebApp;
 use app\models\ArwardsDataHelper;
 use app\modules\Common\AbstractController;
+use app\modules\Webmaster\viewModels\ArwardsViewModel;
 
 class ArwardsController extends AbstractController
 {
@@ -29,14 +30,18 @@ class ArwardsController extends AbstractController
             return;
         }
         $arwardsDataHelper = new ArwardsDataHelper($this->application);
-        $this->render('Webmaster/views/arwards.latte', $this->getAllParams([
-            'counterNames' => $counterNames = $arwardsDataHelper->getCounterNames(),
-            'data' => $arwardsDataHelper->getData($counterNames),
-            'groups' => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
-            'layout' => $this->getLayout(),
-            'navItems' => $this->getNavItems($person),
-            'page' => $this->application->getConnectedUser()->getPage(),
-        ]));
+        $counterNames = $arwardsDataHelper->getCounterNames();
+
+        $viewModel = new ArwardsViewModel(
+            counterNames: array_values($counterNames),
+            data: $arwardsDataHelper->getData($counterNames),
+            groups: array_values($this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name')),
+            layout: $this->getLayout(),
+            navItems: $this->getNavItems($person),
+            layoutParams: $this->getAllParams([]),
+        );
+
+        $this->render('Webmaster/views/arwards.latte', $viewModel->toArray());
     }
 
     public function setArward(): void

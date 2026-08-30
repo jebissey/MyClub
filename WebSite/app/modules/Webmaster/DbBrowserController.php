@@ -8,6 +8,10 @@ use app\helpers\Application;
 use app\helpers\WebApp;
 use app\models\DbBrowserDataHelper;
 use app\modules\Common\TableController;
+use app\modules\Webmaster\viewModels\DbBrowserCreateViewModel;
+use app\modules\Webmaster\viewModels\DbBrowserEditViewModel;
+use app\modules\Webmaster\viewModels\DbBrowserIndexViewModel;
+use app\modules\Webmaster\viewModels\DbBrowserTableViewModel;
 
 class DbBrowserController extends TableController
 {
@@ -37,12 +41,12 @@ class DbBrowserController extends TableController
     public function index(): void
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isWebmaster(), __FILE__, __LINE__)) {
-            $this->render('Webmaster/views/dbbrowser/index.latte', $this->getAllParams([
-                'tables' => $this->dbBrowserDataHelper->getTables(),
-                'page' => $this->application->getConnectedUser()->getPage(),
-                'btn_HistoryBack' => true,
-                'btn_Parent' => '/webmaster',
-            ]));
+            $viewModel = new DbBrowserIndexViewModel(
+                tables: array_values($this->dbBrowserDataHelper->getTables()),
+                layoutParams: $this->getAllParams([]),
+            );
+
+            $this->render('Webmaster/views/dbbrowser/index.latte', $viewModel->toArray());
         }
     }
 
@@ -51,13 +55,14 @@ class DbBrowserController extends TableController
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isWebmaster(), __FILE__, __LINE__)) {
             [$columns, $columnTypes] = $this->dbBrowserDataHelper->showCreateForm($table);
 
-            $this->render('Webmaster/views/dbbrowser/create.latte', $this->getAllParams([
-                'table' => $table,
-                'columns' => $columns,
-                'columnTypes' => $columnTypes,
-                'page' => $this->application->getConnectedUser()->getPage(),
-                'btn_HistoryBack' => true,
-            ]));
+            $viewModel = new DbBrowserCreateViewModel(
+                table: $table,
+                columns: array_values($columns),
+                columnTypes: $columnTypes,
+                layoutParams: $this->getAllParams([]),
+            );
+
+            $this->render('Webmaster/views/dbbrowser/create.latte', $viewModel->toArray());
         }
     }
 
@@ -66,15 +71,16 @@ class DbBrowserController extends TableController
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isWebmaster(), __FILE__, __LINE__)) {
             [$columns, $record, $primaryKey, $columnTypes] = $this->dbBrowserDataHelper->showEditForm($table, $id);
 
-            $this->render('Webmaster/views/dbbrowser/edit.latte', $this->getAllParams([
-                'table' => $table,
-                'columns' => $columns,
-                'record' => $record,
-                'primaryKey' => $primaryKey,
-                'columnTypes' => $columnTypes,
-                'page' => $this->application->getConnectedUser()->getPage(),
-                'btn_HistoryBack' => true,
-            ]));
+            $viewModel = new DbBrowserEditViewModel(
+                table: $table,
+                columns: array_values($columns),
+                record: $record,
+                primaryKey: $primaryKey,
+                columnTypes: $columnTypes,
+                layoutParams: $this->getAllParams([]),
+            );
+
+            $this->render('Webmaster/views/dbbrowser/edit.latte', $viewModel->toArray());
         }
     }
 
@@ -95,21 +101,21 @@ class DbBrowserController extends TableController
             /** @var array<string, string> $filterValues */
             $data = $this->prepareTableData($this->dbBrowserDataHelper->getQuery($table), $filterValues);
 
-            $this->render('Webmaster/views/dbbrowser/table.latte', $this->getAllParams([
-                'records' => $data['items'],
-                'currentPage' => $data['currentPage'],
-                'totalPages' => $data['totalPages'],
-                'filterValues' => $filterValues,
-                'filters' => $filterConfig,
-                'columns' => $columns,
-                'table' => $table,
-                'page' => $this->application->getConnectedUser()->getPage(),
-                'btn_HistoryBack' => true,
-                'btn_Parent' => "/dbbrowser",
-                'btn_Plus' => "/dbbrowser/{$table}/create",
-                'resetUrl' => '/dbbrowser',
-                'confirmDeleteMessage' => ($this->t)('dbbrowser.delete.confirm'),
-            ]));
+            $viewModel = new DbBrowserTableViewModel(
+                records: array_values($data['items']),
+                currentPage: $data['currentPage'],
+                totalPages: $data['totalPages'],
+                filterValues: $filterValues,
+                filters: array_values($filterConfig),
+                columns: array_values($columns),
+                table: $table,
+                btnPlus: "/dbbrowser/{$table}/create",
+                resetUrl: '/dbbrowser',
+                confirmDeleteMessage: ($this->t)('dbbrowser.delete.confirm'),
+                layoutParams: $this->getAllParams([]),
+            );
+
+            $this->render('Webmaster/views/dbbrowser/table.latte', $viewModel->toArray());
         }
     }
 

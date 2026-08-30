@@ -8,6 +8,7 @@ use app\enums\ApplicationError;
 use app\helpers\Application;
 use app\helpers\ErrorManager;
 use app\modules\Common\AbstractController;
+use app\modules\Webmaster\viewModels\MaintenanceViewModel;
 
 class MaintenanceController extends AbstractController
 {
@@ -51,11 +52,11 @@ class MaintenanceController extends AbstractController
     public function maintenance(): void
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isWebmaster(), __FILE__, __LINE__)) {
-            $this->render('Webmaster/views/maintenance.latte', $this->getAllParams([
-                'page' => $this->application->getConnectedUser()->getPage(),
-                'btn_HistoryBack' => true,
-                'btn_Parent' => '/webmaster',
-            ]));
+            $viewModel = new MaintenanceViewModel(
+                layoutParams: $this->getAllParams([]),
+            );
+
+            $this->render('Webmaster/views/maintenance.latte', $viewModel->toArray());
         }
     }
 

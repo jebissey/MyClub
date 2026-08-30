@@ -16,6 +16,15 @@ use app\models\ArticleDataHelper;
 use app\models\LogDataHelper;
 use app\modules\Common\AbstractController;
 use app\modules\Common\services\CredentialService;
+use app\modules\Common\viewModels\InfoViewModel;
+use app\modules\Webmaster\viewModels\AdminHomeViewModel;
+use app\modules\Webmaster\viewModels\ClubCustomizationViewModel;
+use app\modules\Webmaster\viewModels\EmailCredentialsViewModel;
+use app\modules\Webmaster\viewModels\HelloAssoCredentialsViewModel;
+use app\modules\Webmaster\viewModels\TurnstileCredentialsViewModel;
+use app\modules\Webmaster\viewModels\WebmasterHomeViewModel;
+use app\modules\Webmaster\viewModels\WebmasterInstallationsViewModel;
+use app\modules\Webmaster\viewModels\WebmasterNotificationsViewModel;
 
 class WebmasterController extends AbstractController
 {
@@ -32,20 +41,18 @@ class WebmasterController extends AbstractController
     public function clubCustomizationEdit(): void
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isWebmaster(), __FILE__, __LINE__)) {
-            $settings = [
-                'clubName'      => $this->dataHelper->getSetting('PWA_Name', 'MyClub'),
-                'clubShortName' => $this->dataHelper->getSetting('PWA_ShortName', 'MyClub'),
-                'themeColor'    => $this->dataHelper->getSetting('PWA_ThemeColor', '#0d6efd'),
-                'background'    => $this->dataHelper->getSetting('PWA_BackgroundColor', '#ffffff'),
-            ];
+            $viewModel = new ClubCustomizationViewModel(
+                navItems: $this->getNavItems($this->application->getConnectedUser()->person),
+                settings: [
+                    'clubName'      => $this->dataHelper->getSetting('PWA_Name', 'MyClub'),
+                    'clubShortName' => $this->dataHelper->getSetting('PWA_ShortName', 'MyClub'),
+                    'themeColor'    => $this->dataHelper->getSetting('PWA_ThemeColor', '#0d6efd'),
+                    'background'    => $this->dataHelper->getSetting('PWA_BackgroundColor', '#ffffff'),
+                ],
+                layoutParams: $this->getAllParams([]),
+            );
 
-            $this->render('Webmaster/views/clubCustomization.latte', $this->getAllParams([
-                'navItems' => $this->getNavItems($this->application->getConnectedUser()->person),
-                'page'     => 'clubCustomization',
-                'settings' => $settings,
-                'btn_HistoryBack' => true,
-                'btn_Parent' => '/webmaster',
-            ]));
+            $this->render('Webmaster/views/clubCustomization.latte', $viewModel->toArray());
         }
     }
 
@@ -73,11 +80,15 @@ class WebmasterController extends AbstractController
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isAdministrator(), __FILE__, __LINE__)) {
             $lang = TranslationManager::getCurrentLanguage();
-            $this->render('Common/views/info.latte', $this->getAllParams([
-                'content' => $this->dataHelper->get('Languages', ['Name' => 'Help_Admin'], $lang)->$lang ?? '',
-                'timer' => 0,
-                'btn_HistoryBack' => true,
-            ]));
+            $helpRow = $this->dataHelper->get('Languages', ['Name' => 'Help_Admin'], $lang);
+            $content = ($helpRow !== false && isset($helpRow->$lang)) ? $helpRow->$lang : '';
+
+            $viewModel = new InfoViewModel(
+                content: $content,
+                timer: 0,
+                layoutParams: $this->getAllParams([]),
+            );
+            $this->render('Common/views/info.latte', $viewModel->toArray());
         }
     }
 
@@ -85,14 +96,17 @@ class WebmasterController extends AbstractController
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isWebmaster(), __FILE__, __LINE__)) {
             $lang = TranslationManager::getCurrentLanguage();
-            $this->render('Common/views/info.latte', $this->getAllParams([
-                'content'          => $this->dataHelper->get('Languages', ['Name' => 'Help_Webmaster'], $lang)->$lang ?? '',
-                'hasAuthorization' => $this->application->getConnectedUser()->isWebmaster(),
-                'currentVersion'   => Application::VERSION,
-                'timer'            => 0,
-                'previousPage'     => true,
-                'page'             => $this->application->getConnectedUser()->getPage()
-            ]));
+            $helpRow = $this->dataHelper->get('Languages', ['Name' => 'Help_Webmaster'], $lang);
+            $content = ($helpRow !== false && isset($helpRow->$lang)) ? $helpRow->$lang : '';
+
+            $viewModel = new InfoViewModel(
+                content: $content,
+                timer: 0,
+                hasAuthorization: $this->application->getConnectedUser()->isWebmaster(),
+                previousPage: true,
+                layoutParams: $this->getAllParams([]),
+            );
+            $this->render('Common/views/info.latte', $viewModel->toArray());
         }
     }
 
@@ -138,10 +152,12 @@ class WebmasterController extends AbstractController
                 'isVisitorInsights' => $connectedUser->isVisitorInsights(),
                 'isWebmaster'       => $connectedUser->isWebmaster(),
             ];
-            $this->render('Webmaster/views/admin.latte', $this->getAllParams([
-                'page'    => $connectedUser->getPage(),
-                'content' => WebApp::getcompiledContent($content, $params),
-            ]));
+
+            $viewModel = new AdminHomeViewModel(
+                content: WebApp::getcompiledContent($content, $params),
+                layoutParams: $this->getAllParams([]),
+            );
+            $this->render('Webmaster/views/admin.latte', $viewModel->toArray());
         }
     }
 
@@ -152,14 +168,13 @@ class WebmasterController extends AbstractController
             $content = ($this->t)('Webmaster');
             $params  = ['isMyclubWebSite' => WebApp::isMyClubWebSite()];
 
-            $this->render('Webmaster/views/webmaster.latte', $this->getAllParams([
-                'newVersion'   => $this->getLastVersion(),
-                'page'         => $this->application->getConnectedUser()->getPage(),
-                'content'      => WebApp::getcompiledContent($content, $params),
-                'previousPage' => true,
-                'btn_HistoryBack' => true,
-                'btn_Parent' => '/admin',
-            ]));
+            $viewModel = new WebmasterHomeViewModel(
+                newVersion: $this->getLastVersion(),
+                content: WebApp::getcompiledContent($content, $params),
+                previousPage: true,
+                layoutParams: $this->getAllParams([]),
+            );
+            $this->render('Webmaster/views/webmaster.latte', $viewModel->toArray());
         }
     }
 
@@ -192,44 +207,43 @@ class WebmasterController extends AbstractController
                 $notification = "🚀 Notification de test envoyée à l'utilisateur #1.";
             }
 
-            $this->render('Webmaster/views/notifications.latte', $this->getAllParams([
-                'message'         => $message,
-                'notification'    => $notification,
-                'publicKey'       => $publicKey,
-                'phpExtensions'   => [
+            $viewModel = new WebmasterNotificationsViewModel(
+                message: $message,
+                notification: $notification,
+                publicKey: $publicKey,
+                phpExtensions: [
                     'gmp'      => extension_loaded('gmp'),
                     'mbstring' => extension_loaded('mbstring'),
                 ],
-                'navItems'        => $this->getNavItems($this->application->getConnectedUser()->person),
-                'page'            => $this->application->getConnectedUser()->getPage(),
-                'currentVersion'  => Application::VERSION,
-                'btn_HistoryBack' => true,
-                'btn_Parent' => '/webmaster',
-            ]));
+                navItems: $this->getNavItems($this->application->getConnectedUser()->person),
+                layoutParams: $this->getAllParams([]),
+            );
+
+            $this->render('Webmaster/views/notifications.latte', $viewModel->toArray());
         }
     }
 
     public function sendEmailCredentialsEdit(): void
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isWebmaster(), __FILE__, __LINE__)) {
-            $this->render('Webmaster/views/emailCredentials.latte', $this->getAllParams([
-                'navItems' => $this->getNavItems($this->application->getConnectedUser()->person),
-                'page'     => $this->application->getConnectedUser()->getPage(),
-                'sendMethod'          => $this->credentials->get('email', 'method'),
-                'smtpAccount'         => $this->credentials->get('smtp', 'username'),
-                'smtpFrom'            => $this->credentials->get('smtp', 'from'),
-                'smtpHost'            => $this->credentials->get('smtp', 'host'),
-                'smtpPort'            => $this->credentials->get('smtp', 'port'),
-                'smtpEncryption'      => $this->credentials->get('smtp', 'encryption'),
-                'mailjetApiKey'       => $this->credentials->get('mailjet', 'api_key'),
-                'mailjetSender'       => $this->credentials->get('mailjet', 'sender'),
-                'brevoApiKey'         => $this->credentials->get('brevo', 'api_key'),
-                'brevoSender'         => $this->credentials->get('brevo', 'sender'),
-                'dailyLimit'          => $this->credentials->get('email', 'daily_limit'),
-                'monthlyLimit'        => $this->credentials->get('email', 'monthly_limit'),
-                'btn_HistoryBack' => true,
-                'btn_Parent' => '/webmaster',
-            ]));
+            $viewModel = new EmailCredentialsViewModel(
+                navItems: $this->getNavItems($this->application->getConnectedUser()->person),
+                sendMethod: $this->credentials->get('email', 'method'),
+                smtpAccount: $this->credentials->get('smtp', 'username'),
+                smtpFrom: $this->credentials->get('smtp', 'from'),
+                smtpHost: $this->credentials->get('smtp', 'host'),
+                smtpPort: $this->credentials->get('smtp', 'port'),
+                smtpEncryption: $this->credentials->get('smtp', 'encryption'),
+                mailjetApiKey: $this->credentials->get('mailjet', 'api_key'),
+                mailjetSender: $this->credentials->get('mailjet', 'sender'),
+                brevoApiKey: $this->credentials->get('brevo', 'api_key'),
+                brevoSender: $this->credentials->get('brevo', 'sender'),
+                dailyLimit: $this->credentials->get('email', 'daily_limit'),
+                monthlyLimit: $this->credentials->get('email', 'monthly_limit'),
+                layoutParams: $this->getAllParams([]),
+            );
+
+            $this->render('Webmaster/views/emailCredentials.latte', $viewModel->toArray());
         }
     }
 
@@ -298,12 +312,14 @@ class WebmasterController extends AbstractController
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isWebmaster(), __FILE__, __LINE__)) {
             $installations = $this->logDataHelper->getInstallationsData();
 
-            $this->render('Webmaster/views/installations.latte', $this->getAllParams([
-                'installations'      => $installations,
-                'totalInstallations' => count($installations),
-                'navItems'           => $this->getNavItems($this->application->getConnectedUser()->person),
-                'page'               => $this->application->getConnectedUser()->getPage(),
-            ]));
+            $viewModel = new WebmasterInstallationsViewModel(
+                installations: array_values($installations),
+                totalInstallations: count($installations),
+                navItems: $this->getNavItems($this->application->getConnectedUser()->person),
+                layoutParams: $this->getAllParams([]),
+            );
+
+            $this->render('Webmaster/views/installations.latte', $viewModel->toArray());
         }
     }
 
@@ -350,14 +366,14 @@ class WebmasterController extends AbstractController
     public function turnstileCredentialsEdit(): void
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isWebmaster(), __FILE__, __LINE__)) {
-            $this->render('Webmaster/views/turnstileCredentials.latte', $this->getAllParams([
-                'navItems'           => $this->getNavItems($this->application->getConnectedUser()->person),
-                'page'               => $this->application->getConnectedUser()->getPage(),
-                'turnstileSiteKey'   => $this->credentials->get('turnstile', 'site_key'),
-                'turnstileConfigured' => !empty($this->credentials->get('turnstile', 'secret_key')),
-                'btn_HistoryBack' => true,
-                'btn_Parent' => '/webmaster',
-            ]));
+            $viewModel = new TurnstileCredentialsViewModel(
+                navItems: $this->getNavItems($this->application->getConnectedUser()->person),
+                turnstileSiteKey: $this->credentials->get('turnstile', 'site_key'),
+                turnstileConfigured: !empty($this->credentials->get('turnstile', 'secret_key')),
+                layoutParams: $this->getAllParams([]),
+            );
+
+            $this->render('Webmaster/views/turnstileCredentials.latte', $viewModel->toArray());
         }
     }
 
@@ -382,17 +398,15 @@ class WebmasterController extends AbstractController
     public function helloassoCredentialsEdit(): void
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isWebmaster(), __FILE__, __LINE__)) {
-            $this->render('Webmaster/views/helloassoCredentials.latte', $this->getAllParams([
-                'navItems'               => $this->getNavItems($this->application->getConnectedUser()->person),
-                'page'                   => $this->application->getConnectedUser()->getPage(),
+            $viewModel = new HelloAssoCredentialsViewModel(
+                navItems: $this->getNavItems($this->application->getConnectedUser()->person),
+                helloassoClientId: $this->credentials->get('helloasso', 'client_id'),
+                helloassoConfigured: !empty($this->credentials->get('helloasso', 'client_secret')),
+                helloassoOrgSlug: $this->credentials->get('helloasso', 'org_slug'),
+                layoutParams: $this->getAllParams([]),
+            );
 
-                'helloassoClientId'     => $this->credentials->get('helloasso', 'client_id'),
-                'helloassoConfigured'   => !empty($this->credentials->get('helloasso', 'client_secret')),
-                'helloassoOrgSlug'      => $this->credentials->get('helloasso', 'org_slug'),
-
-                'btn_HistoryBack'        => true,
-                'btn_Parent'             => '/webmaster',
-            ]));
+            $this->render('Webmaster/views/helloassoCredentials.latte', $viewModel->toArray());
         }
     }
 

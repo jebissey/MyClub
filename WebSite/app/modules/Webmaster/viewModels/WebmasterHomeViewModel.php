@@ -2,22 +2,25 @@
 
 declare(strict_types=1);
 
-namespace app\modules\Common\viewModels;
+namespace app\modules\Webmaster\viewModels;
 
-final readonly class InfoViewModel extends LayoutViewModel
+use app\modules\Common\viewModels\LayoutViewModel;
+
+final readonly class WebmasterHomeViewModel extends LayoutViewModel
 {
     /**
      * @param array<string, mixed> $layoutParams Full output of Params::getAll().
      */
     public function __construct(
+        public ?string $newVersion,
         public string $content,
-        public int $timer,
-        public bool $hasAuthorization = false,
-        public bool $previousPage = false,
+        public bool $previousPage,
         array $layoutParams = []
     ) {
         parent::__construct(
             ...self::baseArgsFrom($layoutParams),
+            btn_HistoryBack: true,
+            btn_Parent: '/admin',
         );
     }
 }
