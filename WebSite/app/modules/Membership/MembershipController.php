@@ -8,6 +8,7 @@ use app\helpers\Application;
 use app\models\MembershipDataHelper;
 use app\modules\Common\AbstractController;
 use app\modules\HelloAsso\services\HelloAssoService;
+use app\modules\Membership\viewModels\MembershipIndexViewModel;
 
 class MembershipController extends AbstractController
 {
@@ -37,7 +38,8 @@ class MembershipController extends AbstractController
         $current  = $this->membershipDataHelper->getForPersonAndSeason($personId, $season);
         $history  = $this->membershipDataHelper->getAllForPerson($personId);
 
-        $paymentFeedback = $_GET['payment'] ?? null; // 'success' | 'error' | null
+        $paymentFeedbackRaw = $_GET['payment'] ?? null;
+        $paymentFeedback = is_string($paymentFeedbackRaw) ? $paymentFeedbackRaw : null;
 
         // ── HelloAsso widget URL ──────────────────────────────────────────────
         $widgetUrl = null;
@@ -53,19 +55,19 @@ class MembershipController extends AbstractController
             );
         }
 
-        $this->render('Membership/views/index.latte', $this->getAllParams([
-            'season'          => $season,
-            'current'         => $current,
-            'history'         => $history,
-            'amountCents'     => $this->membershipDataHelper->getAmountCents(),
-            'paymentFeedback' => $paymentFeedback,
-            'translations'    => $this->doTranslations(),
-            'activeTab'       => 'membership',
-            'btn_Parent'      => '/user',
-            'btn_HistoryBack' => true,
-            'page'            => $this->application->getConnectedUser()->getPage(1),
-            'widgetUrl'       => $widgetUrl,
-        ]));
+        $viewModel = new MembershipIndexViewModel(
+            season: $season,
+            current: $current,
+            history: array_values($history),
+            amountCents: $this->membershipDataHelper->getAmountCents(),
+            paymentFeedback: $paymentFeedback,
+            translations: $this->doTranslations(),
+            activeTab: 'membership',
+            widgetUrl: $widgetUrl,
+            layoutParams: $this->getAllParams([]),
+        );
+
+        $this->render('Membership/views/index.latte', $viewModel->toArray());
     }
 
     // ─── Private helpers ─────────────────────────────────────────────────────
