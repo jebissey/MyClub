@@ -12,6 +12,8 @@ use app\helpers\WebApp;
 use app\models\GroupDataHelper;
 use app\models\TableControllerDataHelper;
 use app\modules\Common\TableController;
+use app\modules\PersonManager\viewModels\RegistrationIndexViewModel;
+use app\modules\PersonManager\viewModels\RegistrationUserGroupsViewModel;
 
 class RegistrationController extends TableController
 {
@@ -49,24 +51,25 @@ class RegistrationController extends TableController
                 ['field' => 'Email', 'label' => 'Email'],
             ];
             $data = $this->prepareTableData($this->tableControllerDataHelper->getActivePersonsQuery(), $filterValues);
-            $this->render('PersonManager/views/registration_groups_index.latte', $this->getAllParams([
-                'persons' => $data['items'],
-                'currentPage' => $data['currentPage'],
-                'totalPages' => $data['totalPages'],
-                'filterValues' => $filterValues,
-                'filters' => $filterConfig,
-                'columns' => $columns,
-                'resetUrl' => '/registration',
-                'layout' => $this->getLayout(),
-                'navItems' => $this->getNavItems($this->application->getConnectedUser()->person),
-                'page' => $this->application->getConnectedUser()->getPage(),
-                'i18n' => [
+
+            $viewModel = new RegistrationIndexViewModel(
+                persons: array_values($data['items']),
+                currentPage: $data['currentPage'],
+                totalPages: $data['totalPages'],
+                filterValues: $filterValues,
+                filters: $filterConfig,
+                columns: $columns,
+                resetUrl: '/registration',
+                layout: $this->getLayout(),
+                navItems: $this->getNavItems($this->application->getConnectedUser()->person),
+                i18n: [
                     'errorLoadGroups' => ($this->t)('person_manager.registration.error.load_groups'),
                     'errorGeneric'    => ($this->t)('person_manager.registration.error.generic'),
                 ],
-                'btn_HistoryBack' => true,
-                'btn_Parent' => '/webmaster',
-            ]));
+                layoutParams: $this->getAllParams([]),
+            );
+
+            $this->render('PersonManager/views/registration_groups_index.latte', $viewModel->toArray());
         }
     }
 
@@ -81,12 +84,14 @@ class RegistrationController extends TableController
             );
 
             try {
-                $this->render('PersonManager/views/registration_user_groups_partial.latte', $this->getAllParams([
-                    'currentGroups' => $currentGroups,
-                    'availableGroups' => $availableGroups,
-                    'personId' => $personId,
-                    'page' => $this->application->getConnectedUser()->getPage()
-                ]));
+                $viewModel = new RegistrationUserGroupsViewModel(
+                    currentGroups: $currentGroups,
+                    availableGroups: $availableGroups,
+                    personId: $personId,
+                    layoutParams: $this->getAllParams([]),
+                );
+
+                $this->render('PersonManager/views/registration_user_groups_partial.latte', $viewModel->toArray());
             } catch (Throwable $e) {
                 http_response_code(500);
                 echo "<div class='alert alert-danger'>Erreur : " . htmlspecialchars($e->getMessage()) . "</div>";

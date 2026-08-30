@@ -13,6 +13,10 @@ use app\models\GroupDataHelper;
 use app\models\MessageDataHelper;
 use app\models\PersonGroupDataHelper;
 use app\modules\Common\AbstractController;
+use app\modules\PersonManager\viewModels\GroupChatViewModel;
+use app\modules\PersonManager\viewModels\GroupCreateViewModel;
+use app\modules\PersonManager\viewModels\GroupEditViewModel;
+use app\modules\PersonManager\viewModels\GroupIndexViewModel;
 
 class GroupController extends AbstractController
 {
@@ -28,13 +32,14 @@ class GroupController extends AbstractController
     public function groupCreate(): void
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isGroupManager(), __FILE__, __LINE__)) {
-            $availableAuthorizations = $this->dataHelper->gets('Authorization', ['Id <> 1' => null], '*', 'Name');
-            $this->render('PersonManager/views/group_create.latte', $this->getAllParams([
-                'availableAuthorizations' => $availableAuthorizations,
-                'layout' => $this->getLayout(),
-                'navItems' => $this->getNavItems($this->application->getConnectedUser()->person),
-                'page' => $this->application->getConnectedUser()->getPage(),
-            ]));
+            $viewModel = new GroupCreateViewModel(
+                availableAuthorizations: array_values($this->dataHelper->gets('Authorization', ['Id <> 1' => null], '*', 'Name')),
+                layout: $this->getLayout(),
+                navItems: $this->getNavItems($this->application->getConnectedUser()->person),
+                layoutParams: $this->getAllParams([]),
+            );
+
+            $this->render('PersonManager/views/group_create.latte', $viewModel->toArray());
         }
     }
 
@@ -52,13 +57,15 @@ class GroupController extends AbstractController
             $name = $input['name'] ?? '???';
             $selfRegistration = $input['selfRegistration'] ?? 0;
             if ($name === '???') {
-                $this->render('PersonManager/views/group_create.latte', $this->getAllParams([
-                    'availableAuthorizations' => $availableAuthorizations,
-                    'error' => 'Le nom du groupe est requis',
-                    'layout' => $this->getLayout(),
-                    'navItems' => $this->getNavItems($this->application->getConnectedUser()->person),
-                    'page' => $this->application->getConnectedUser()->getPage(),
-                ]));
+                $viewModel = new GroupCreateViewModel(
+                    availableAuthorizations: array_values($availableAuthorizations),
+                    layout: $this->getLayout(),
+                    navItems: $this->getNavItems($this->application->getConnectedUser()->person),
+                    error: 'Le nom du groupe est requis',
+                    layoutParams: $this->getAllParams([]),
+                );
+
+                $this->render('PersonManager/views/group_create.latte', $viewModel->toArray());
                 return;
             }
             $selectedAuthorizations = $input['authorizations'] ?? [];
@@ -95,16 +102,18 @@ class GroupController extends AbstractController
             if (!$group) {
                 $this->raiseBadRequest("Unknwon group $id", __FILE__, __LINE__);
             } else {
-                $this->render('PersonManager/views/group_edit.latte', $this->getAllParams([
-                    'group' => $group,
-                    'availableAuthorizations' => $this->dataHelper->gets('Authorization', ['Id <> 1' => null], '*', 'Name'),
-                    'currentAuthorizations' => array_column(
+                $viewModel = new GroupEditViewModel(
+                    group: $group,
+                    availableAuthorizations: array_values($this->dataHelper->gets('Authorization', ['Id <> 1' => null], '*', 'Name')),
+                    currentAuthorizations: array_column(
                         $this->dataHelper->gets('GroupAuthorization', ['IdGroup' => $id], 'IdAuthorization'),
                         'IdAuthorization'
                     ),
-                    'layout' => $this->getLayout(),
-                    'page' => $this->application->getConnectedUser()->getPage(),
-                ]));
+                    layout: $this->getLayout(),
+                    layoutParams: $this->getAllParams([]),
+                );
+
+                $this->render('PersonManager/views/group_edit.latte', $viewModel->toArray());
             }
         }
     }
@@ -129,13 +138,23 @@ class GroupController extends AbstractController
             $selfRegistration = $input['selfRegistration'] ?? 0;
             $selectedAuthorizations = $input['authorizations'] ?? [];
             if (empty($name)) {
-                $this->render('PersonManager/views/group_edit.latte', $this->getAllParams([
-                    'group' => $group,
-                    'availableAuthorizations' => $availableAuthorizations,
-                    'error' => 'Le nom du groupe est requis',
-                    'layout' => $this->getLayout(),
-                    'page' => $this->application->getConnectedUser()->getPage(),
-                ]));
+                if ($group === false) {
+                    $this->raiseBadRequest("Unknwon group $id", __FILE__, __LINE__);
+                    return;
+                }
+                $viewModel = new GroupEditViewModel(
+                    group: $group,
+                    availableAuthorizations: array_values($availableAuthorizations),
+                    currentAuthorizations: array_column(
+                        $this->dataHelper->gets('GroupAuthorization', ['IdGroup' => $id], 'IdAuthorization'),
+                        'IdAuthorization'
+                    ),
+                    layout: $this->getLayout(),
+                    error: 'Le nom du groupe est requis',
+                    layoutParams: $this->getAllParams([]),
+                );
+
+                $this->render('PersonManager/views/group_edit.latte', $viewModel->toArray());
             } else {
                 $this->groupDataHelper->update($id, $name, $selfRegistration, $selectedAuthorizations);
             }
@@ -146,14 +165,15 @@ class GroupController extends AbstractController
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isGroupManager(), __FILE__, __LINE__)) {
             $connectedUser = $this->application->getConnectedUser();
-            $this->render('PersonManager/views/groups_index.latte', $this->getAllParams([
-                'groups' => $this->groupDataHelper->getGroupsWithAuthorizations($connectedUser),
-                'layout' => $this->getLayout(),
-                'navItems' => $this->getNavItems($connectedUser->person),
-                'page' => $connectedUser->getPage(),
-                'btn_HistoryBack' => true,
-                'btn_Parent' => '/webmaster',
-            ]));
+
+            $viewModel = new GroupIndexViewModel(
+                groups: $this->groupDataHelper->getGroupsWithAuthorizations($connectedUser),
+                layout: $this->getLayout(),
+                navItems: $this->getNavItems($connectedUser->person),
+                layoutParams: $this->getAllParams([]),
+            );
+
+            $this->render('PersonManager/views/groups_index.latte', $viewModel->toArray());
         }
     }
 
@@ -181,17 +201,18 @@ class GroupController extends AbstractController
         $lastLogId = $_SESSION['last_log_id'] ?? 0;
         $lastLogId = is_numeric($lastLogId) ? (int)$lastLogId : 0;
 
-        $this->render('Common/views/chat.latte', $this->getAllParams([
-            'article' => null,
-            'event' => null,
-            'group' => $group,
-            'messages' => $this->messageDataHelper->getGroupMessages($groupId),
-            'person' => $person,
-            'navItems' => $this->getNavItems($this->application->getConnectedUser()->person),
-            'page' => $this->application->getConnectedUser()->getPage(),
-            'btn_HistoryBack' => true,
-            'btn_Parent'      => "/user/directory?group={$groupId}",
-            'newMessages' => $this->messageDataHelper->hasNewMessages($person->Id, $lastLogId),
-        ]));
+        $viewModel = new GroupChatViewModel(
+            article: null,
+            event: null,
+            group: $group,
+            messages: $this->messageDataHelper->getGroupMessages($groupId),
+            person: $person,
+            navItems: $this->getNavItems($this->application->getConnectedUser()->person),
+            btnParent: "/user/directory?group={$groupId}",
+            newMessages: $this->messageDataHelper->hasNewMessages($person->Id, $lastLogId),
+            layoutParams: $this->getAllParams([]),
+        );
+
+        $this->render('Common/views/chat.latte', $viewModel->toArray());
     }
 }

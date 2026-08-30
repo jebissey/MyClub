@@ -9,6 +9,7 @@ use app\helpers\Application;
 use app\helpers\WebApp;
 use app\models\PersonDataHelper;
 use app\modules\Common\AbstractController;
+use app\modules\PersonManager\viewModels\UsersImportViewModel;
 
 class ImportController extends AbstractController
 {
@@ -29,12 +30,15 @@ class ImportController extends AbstractController
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isPersonManager(), __FILE__, __LINE__)) {
             $this->loadSettings();
-            $this->render('PersonManager/views/users_import.latte', $this->getAllParams([
-                'importSettings' => $this->importSettings,
-                'results' => $this->results,
-                'page' => $this->application->getConnectedUser()->getPage(),
-                'layout' => $this->getLayout(),
-            ]));
+
+            $viewModel = new UsersImportViewModel(
+                importSettings: $this->importSettings,
+                results: $this->results ?? null,
+                layout: $this->getLayout(),
+                layoutParams: $this->getAllParams([]),
+            );
+
+            $this->render('PersonManager/views/users_import.latte', $viewModel->toArray());
         }
     }
 
@@ -54,12 +58,14 @@ class ImportController extends AbstractController
             $this->results['errors']++;
             $this->results['messages'][] = 'Veuillez sélectionner un fichier CSV valide';
 
-            $this->render('PersonManager/views/users_import.latte', $this->getAllParams([
-                'importSettings' => $this->importSettings,
-                'results' => $this->results,
-                'page' => $this->application->getConnectedUser()->getPage(),
-                'layout' => $this->getLayout(),
-            ]));
+            $viewModel = new UsersImportViewModel(
+                importSettings: $this->importSettings,
+                results: $this->results,
+                layout: $this->getLayout(),
+                layoutParams: $this->getAllParams([]),
+            );
+
+            $this->render('PersonManager/views/users_import.latte', $viewModel->toArray());
             return;
         }
 
@@ -90,21 +96,25 @@ class ImportController extends AbstractController
         if (!is_string($path) || $path === '') {
             $this->results['messages'][] = 'Veuillez sélectionner un fichier CSV valide';
 
-            $this->render('PersonManager/views/users_import.latte', $this->getAllParams([
-                'importSettings' => $this->importSettings,
-                'results' => $this->results,
-                'page' => $this->application->getConnectedUser()->getPage(),
-                'layout' => $this->getLayout(),
-            ]));
+            $viewModel = new UsersImportViewModel(
+                importSettings: $this->importSettings,
+                results: $this->results,
+                layout: $this->getLayout(),
+                layoutParams: $this->getAllParams([]),
+            );
+
+            $this->render('PersonManager/views/users_import.latte', $viewModel->toArray());
             return;
         }
 
-        $this->render('PersonManager/views/users_import.latte', $this->getAllParams([
-            'importSettings' => $this->importSettings,
-            'results' => $this->personDataHelper->importFromCsvFile($path, $headerRow, $mapping, $this->personDataHelper->getAllPersons()),
-            'page' => $this->application->getConnectedUser()->getPage(),
-            'layout' => $this->getLayout(),
-        ]));
+        $viewModel = new UsersImportViewModel(
+            importSettings: $this->importSettings,
+            results: $this->personDataHelper->importFromCsvFile($path, $headerRow, $mapping, $this->personDataHelper->getAllPersons()),
+            layout: $this->getLayout(),
+            layoutParams: $this->getAllParams([]),
+        );
+
+        $this->render('PersonManager/views/users_import.latte', $viewModel->toArray());
     }
 
     #region Private functions

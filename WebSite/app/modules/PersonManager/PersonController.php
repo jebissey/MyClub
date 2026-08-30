@@ -13,7 +13,11 @@ use app\helpers\WebApp;
 use app\models\PersonDataHelper;
 use app\models\TableControllerDataHelper;
 use app\modules\Common\TableController;
-use app\valueObjects\Person;
+use app\modules\Common\viewModels\InfoViewModel;
+use app\modules\PersonManager\viewModels\MembershipSettingsViewModel;
+use app\modules\PersonManager\viewModels\PersonManagerHomeViewModel;
+use app\modules\PersonManager\viewModels\PersonsIndexViewModel;
+use app\modules\User\viewModels\UserAccountViewModel;
 
 class PersonController extends TableController
 {
@@ -58,23 +62,29 @@ class PersonController extends TableController
             }
             /** @var object{Id: int|string, Imported: bool|int|string|null, Email: string, FirstName: string|null, LastName: string|null, Alert: string|null, MemberInfo: string|null} $row */
 
-            $this->render('User/views/user_account.latte', $this->getAllParams([
-                'readOnly' => (bool)($row->Imported ?? false),
-                'email' => $row->Email,
-                'firstName' => $row->FirstName ?? '',
-                'lastName' => $row->LastName ?? '',
-                'alert' => $row->Alert ?? '',
-                'memberInfo' => $row->MemberInfo ?? '',
-                'isSelfEdit' => false,
-                'layout' => $this->getLayout(),
-                'page' => $this->application->getConnectedUser()->getPage(),
-                'i18n' => [
+            $viewModel = new UserAccountViewModel(
+                readOnly: (bool)($row->Imported ?? false),
+                email: $row->Email,
+                firstName: $row->FirstName ?? '',
+                lastName: $row->LastName ?? '',
+                nickName: '',
+                avatar: '',
+                useGravatar: '',
+                emojis: [],
+                isSelfEdit: false,
+                i18n: [
                     'account.form.emoji.select_label'     => ($this->t)('account.form.emoji.select_label'),
                     'account.form.emoji.missing_elements' => ($this->t)('account.form.emoji.missing_elements'),
                     'account.form.emoji.none_detected'    => ($this->t)('account.form.emoji.none_detected'),
                     'account.form.emoji.selected'         => ($this->t)('account.form.emoji.selected'),
                 ],
-            ]));
+                layout: $this->getLayout(),
+                alert: $row->Alert ?? '',
+                memberInfo: $row->MemberInfo ?? '',
+                layoutParams: $this->getAllParams([]),
+            );
+
+            $this->render('User/views/user_account.latte', $viewModel->toArray());
         }
     }
 
@@ -145,14 +155,15 @@ class PersonController extends TableController
                     $message
                 );
 
-                $this->render('Common/views/info.latte', $this->getAllParams([
-                    'content' => $message,
-                    'hasAuthorization' => $this->application->getConnectedUser()->hasAutorization(),
-                    'currentVersion' => Application::VERSION,
-                    'timer' => 10000,
-                    'previousPage' => true,
-                    'page' => $this->application->getConnectedUser()->getPage(),
-                ]));
+                $viewModel = new InfoViewModel(
+                    content: $message,
+                    timer: 10000,
+                    hasAuthorization: $this->application->getConnectedUser()->hasAutorization(),
+                    previousPage: true,
+                    layoutParams: $this->getAllParams([]),
+                );
+
+                $this->render('Common/views/info.latte', $viewModel->toArray());
 
                 return;
             }
@@ -190,14 +201,18 @@ class PersonController extends TableController
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isPersonManager(), __FILE__, __LINE__)) {
             $lang = TranslationManager::getCurrentLanguage();
-            $this->render('Common/views/info.latte', $this->getAllParams([
-                'content' => $this->dataHelper->get('Languages', ['Name' => 'Help_PersonManager'], $lang)->$lang ?? '',
-                'hasAuthorization' => $this->application->getConnectedUser()->hasAutorization(),
-                'currentVersion' => Application::VERSION,
-                'timer' => 0,
-                'previousPage' => true,
-                'page' => $this->application->getConnectedUser()->getPage(),
-            ]));
+            $helpRow = $this->dataHelper->get('Languages', ['Name' => 'Help_PersonManager'], $lang);
+            $content = ($helpRow !== false && isset($helpRow->$lang)) ? $helpRow->$lang : '';
+
+            $viewModel = new InfoViewModel(
+                content: $content,
+                timer: 0,
+                hasAuthorization: $this->application->getConnectedUser()->hasAutorization(),
+                previousPage: true,
+                layoutParams: $this->getAllParams([]),
+            );
+
+            $this->render('Common/views/info.latte', $viewModel->toArray());
         }
     }
 
@@ -206,10 +221,12 @@ class PersonController extends TableController
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isPersonManager(), __FILE__, __LINE__)) {
             $_SESSION['navbar'] = 'personManager';
 
-            $this->render('PersonManager/views/personManager.latte', $this->getAllParams([
-                'page' => $this->application->getConnectedUser()->getPage(),
-                'content' => ($this->t)('PersonManager')
-            ]));
+            $viewModel = new PersonManagerHomeViewModel(
+                content: ($this->t)('PersonManager'),
+                layoutParams: $this->getAllParams([]),
+            );
+
+            $this->render('PersonManager/views/personManager.latte', $viewModel->toArray());
         }
     }
 
@@ -274,18 +291,20 @@ class PersonController extends TableController
             default => Application::unreachable("Unknown status {$status}", __FILE__, __LINE__)
         };
 
-        $this->render('PersonManager/views/users_index.latte', $this->getAllParams([
-            'persons' => $data['items'],
-            'currentPage' => $data['currentPage'],
-            'totalPages' => $data['totalPages'],
-            'filterValues' => $filterValues,
-            'filters' => $filterConfig,
-            'columns' => $columns,
-            'resetUrl' => '/persons',
-            'page' => $this->application->getConnectedUser()->getPage(),
-            'status' => $status,
-            'extraParams' => $status !== PersonStatus::Active->value ? ['status' => $status] : [],
-        ]));
+        $viewModel = new PersonsIndexViewModel(
+            persons: array_values($data['items']),
+            currentPage: $data['currentPage'],
+            totalPages: $data['totalPages'],
+            filterValues: $filterValues,
+            filters: $filterConfig,
+            columns: $columns,
+            resetUrl: '/persons',
+            status: $status,
+            extraParams: $status !== PersonStatus::Active->value ? ['status' => $status] : [],
+            layoutParams: $this->getAllParams([]),
+        );
+
+        $this->render('PersonManager/views/users_index.latte', $viewModel->toArray());
     }
 
     public function membershipSettingsEdit(): void
@@ -295,19 +314,17 @@ class PersonController extends TableController
             $seasonEnd   = $this->dataHelper->getSetting('Membership_Season_End', '');
             $season      = MyClubDateTime::getSeasonRange($seasonStart, $seasonEnd);
 
-            $settings = [
-                'amount'      => (int)$this->dataHelper->getSetting('Membership_Amount', '0') / 100,
-                'seasonStart' => $season['start'],
-                'seasonEnd'   => $season['end'],
-            ];
+            $viewModel = new MembershipSettingsViewModel(
+                navItems: $this->getNavItems($this->application->getConnectedUser()->person),
+                settings: [
+                    'amount'      => (int)$this->dataHelper->getSetting('Membership_Amount', '0') / 100,
+                    'seasonStart' => $season['start'],
+                    'seasonEnd'   => $season['end'],
+                ],
+                layoutParams: $this->getAllParams([]),
+            );
 
-            $this->render('PersonManager/views/membershipSettings.latte', $this->getAllParams([
-                'navItems'        => $this->getNavItems($this->application->getConnectedUser()->person),
-                'page'            => 'membershipSettings',
-                'settings'        => $settings,
-                'btn_HistoryBack' => true,
-                'btn_Parent'      => '/personManager',
-            ]));
+            $this->render('PersonManager/views/membershipSettings.latte', $viewModel->toArray());
         }
     }
 
