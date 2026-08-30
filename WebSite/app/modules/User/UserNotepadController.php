@@ -8,6 +8,7 @@ use app\enums\FilterInputRule;
 use app\helpers\Application;
 use app\helpers\WebApp;
 use app\modules\Common\AbstractController;
+use app\modules\User\viewModels\UserNotepadViewModel;
 
 class UserNotepadController extends AbstractController
 {
@@ -31,13 +32,13 @@ class UserNotepadController extends AbstractController
         /** @var object{Notepad: string|null}|false $row */
         $notepad = $row !== false ? ($row->Notepad ?? '') : '';
 
-        $this->render('User/views/user_notepad.latte', $this->getAllParams([
-            'notepad' => $notepad,
-            'navItems' => $this->getNavItems($person),
-            'page' => $this->application->getConnectedUser()->getPage(1),
-            'btn_HistoryBack' => true,
-            'btn_Parent' => "/user",
-        ]));
+        $viewModel = new UserNotepadViewModel(
+            notepad: $notepad,
+            navItems: $this->getNavItems($person),
+            layoutParams: $this->getAllParams([]),
+        );
+
+        $this->render('User/views/user_notepad.latte', $viewModel->toArray());
     }
 
     public function saveNotepad(): void

@@ -10,6 +10,8 @@ use app\helpers\Application;
 use app\helpers\GravatarHandler;
 use app\helpers\WebApp;
 use app\modules\Common\AbstractController;
+use app\modules\User\viewModels\UserEditPresentationViewModel;
+use app\modules\User\viewModels\UserPresentationViewModel;
 use app\valueObjects\Person;
 
 /**
@@ -34,14 +36,16 @@ class UserPresentationController extends AbstractController
                 $this->raiseBadRequest("Unknown person {$person->Id}", __FILE__, __LINE__);
                 return;
             }
-            $this->render('User/views/user_edit_presentation.latte', $this->getAllParams([
-                'person' => $row,
-                'navItems' => $this->getNavItems($person),
-                'page' => $this->application->getConnectedUser()->getPage(),
-                'validationMsg' => ($this->t)('presentation.edit.validation.noContent'),
-                'maxZoom' => 18,
-                'btn_HistoryBack' => true,
-            ]));
+
+            $viewModel = new UserEditPresentationViewModel(
+                person: $row,
+                navItems: $this->getNavItems($person),
+                validationMsg: ($this->t)('presentation.edit.validation.noContent'),
+                maxZoom: 18,
+                layoutParams: $this->getAllParams([]),
+            );
+
+            $this->render('User/views/user_edit_presentation.latte', $viewModel->toArray());
         } else {
             $this->application->getErrorManager()->raise(
                 ApplicationError::Forbidden,
@@ -114,18 +118,15 @@ class UserPresentationController extends AbstractController
         /** @var PersonRow $row */
         $person = Person::fromRow($row);
 
-        $this->render(
-            'User/views/user_presentation.latte',
-            $this->getAllParams([
-                'person' => $row,
-                'loggedPerson' => $loggedPerson,
-                'navItems' => $this->getNavItems($person),
-                'page' => $this->application->getConnectedUser()->getPage(),
-                'userImg_' => WebApp::getUserImg($person, new GravatarHandler()),
-                'btn_HistoryBack' => true,
-                'btn_Parent' => '/user/directory',
-                'maxZoom' => 12,
-            ])
+        $viewModel = new UserPresentationViewModel(
+            person: $row,
+            loggedPerson: $loggedPerson,
+            navItems: $this->getNavItems($person),
+            userImg_: WebApp::getUserImg($person, new GravatarHandler()),
+            maxZoom: 12,
+            layoutParams: $this->getAllParams([]),
         );
+
+        $this->render('User/views/user_presentation.latte', $viewModel->toArray());
     }
 }

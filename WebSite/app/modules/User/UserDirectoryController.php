@@ -12,6 +12,8 @@ use app\models\GroupDataHelper;
 use app\models\PersonDataHelper;
 use app\models\PersonGroupDataHelper;
 use app\modules\Common\AbstractController;
+use app\modules\User\viewModels\UserDirectoryViewModel;
+use app\modules\User\viewModels\UsersMapViewModel;
 use app\valueObjects\Person;
 
 /**
@@ -72,35 +74,42 @@ class UserDirectoryController extends AbstractController
                 $person_->UserImg = WebApp::getUserImg(Person::fromRow($personRow), $gravatarHandler);
             }
         }
-        $this->render('User/views/users_directory.latte', $this->getAllParams([
-            'persons' => $persons,
-            'navItems' => $this->getNavItems($person),
-            'loggedPerson' => $person,
-            'groups' => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
-            'groupCounts' => $this->groupDataHelper->getGroupCount(),
-            'selectedGroup' => $selectedGroup,
-            'page' => $this->application->getConnectedUser()->getPage(1),
-            'countOfMessages' => count($this->dataHelper->gets('Message', [
+
+        $loggedPersonRow = $this->dataHelper->get('Person', ['Id' => $person->Id], 'InPresentationDirectory');
+        /** @var object{InPresentationDirectory: bool|int|string|null}|false $loggedPersonRow */
+        $loggedPersonInPresentationDirectory = $loggedPersonRow !== false
+            ? (bool)($loggedPersonRow->InPresentationDirectory ?? false)
+            : false;
+
+        $viewModel = new UserDirectoryViewModel(
+            persons: array_values($persons),
+            navItems: $this->getNavItems($person),
+            loggedPersonInPresentationDirectory: $loggedPersonInPresentationDirectory,
+            groups: array_values($this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name')),
+            groupCounts: $this->groupDataHelper->getGroupCount(),
+            selectedGroup: $selectedGroup,
+            countOfMessages: count($this->dataHelper->gets('Message', [
                 '"From"' => 'User',
                 'GroupId' => $selectedGroup
             ])),
-            'userIsInGroup' => $this->personGroupDataHelper->isPersonInGroup($person->Id, $selectedGroup ?? 0),
-            'countOfLocatedMembers' => count($persons),
-            'numberOfPublicMembers' => count($this->dataHelper->gets('Person', [
+            userIsInGroup: $this->personGroupDataHelper->isPersonInGroup($person->Id, $selectedGroup ?? 0),
+            countOfLocatedMembers: count($persons),
+            numberOfPublicMembers: count($this->dataHelper->gets('Person', [
                 'InPresentationDirectory' => 1,
                 'Inactivated' => 0,
                 'MyPublicDataInPresentationDirectory IS NOT NULL AND MyPublicDataInPresentationDirectory != ""' => null
             ], 'Id')),
-            'btn_HistoryBack' => true,
-            'btn_Parent' => "/user",
-            'totalWithPresentation' => count($this->dataHelper->gets('Person', [
+            totalWithPresentation: count($this->dataHelper->gets('Person', [
                 'InPresentationDirectory' => 1,
                 'Inactivated' => 0
             ], 'Id')),
-            'totalPersons' => count($this->dataHelper->gets('Person', [
+            totalPersons: count($this->dataHelper->gets('Person', [
                 'Inactivated' => 0
             ], 'Id')),
-        ]));
+            layoutParams: $this->getAllParams([]),
+        );
+
+        $this->render('User/views/users_directory.latte', $viewModel->toArray());
     }
 
     public function showMap(): void
@@ -122,16 +131,17 @@ class UserDirectoryController extends AbstractController
         ], 'Id, FirstName, LastName, NickName, Avatar, UseGravatar, Email, Location, MyPublicDataInPresentationDirectory, InPresentationDirectory, ShowPhoneInPresentationDirectory, ShowEmailInPresentationDirectory');
         $locationData = $this->getLocationData(array_values($rows));
 
-        $this->render('User/views/users_map.latte', $this->getAllParams([
-            'locationData' => $locationData,
-            'membersCount' => count($locationData),
-            'navItems' => $this->getNavItems($person),
-            'page' => $this->application->getConnectedUser()->getPage(),
-            'btn_HistoryBack' => true,
-            'title' => 'Carte des membres',
-            'isPublic' => false,
-            'maxZoom' => 12,
-        ]));
+        $viewModel = new UsersMapViewModel(
+            locationData: $locationData,
+            membersCount: count($locationData),
+            navItems: $this->getNavItems($person),
+            title: 'Carte des membres',
+            isPublic: false,
+            maxZoom: 12,
+            layoutParams: $this->getAllParams([]),
+        );
+
+        $this->render('User/views/users_map.latte', $viewModel->toArray());
     }
 
     public function showPublicMap(): void
@@ -151,16 +161,17 @@ class UserDirectoryController extends AbstractController
         ], 'Id, FirstName, LastName, NickName, Avatar, UseGravatar, Email, Location, MyPublicDataInPresentationDirectory, InPresentationDirectory, ShowPhoneInPresentationDirectory, ShowEmailInPresentationDirectory');
         $locationData = $this->getLocationData(array_values($rows));
 
-        $this->render('User/views/users_map.latte', $this->getAllParams([
-            'locationData' => $locationData,
-            'membersCount' => count($locationData),
-            'navItems' => $this->getNavItems($person),
-            'page' => $this->application->getConnectedUser()->getPage(),
-            'btn_HistoryBack' => true,
-            'title' => "Carte des membres publics",
-            'isPublic' => true,
-            'maxZoom' => 11,
-        ]));
+        $viewModel = new UsersMapViewModel(
+            locationData: $locationData,
+            membersCount: count($locationData),
+            navItems: $this->getNavItems($person),
+            title: 'Carte des membres publics',
+            isPublic: true,
+            maxZoom: 11,
+            layoutParams: $this->getAllParams([]),
+        );
+
+        $this->render('User/views/users_map.latte', $viewModel->toArray());
     }
 
     #region Private functions

@@ -8,6 +8,7 @@ use app\enums\FilterInputRule;
 use app\helpers\Application;
 use app\helpers\WebApp;
 use app\modules\Common\AbstractController;
+use app\modules\User\viewModels\UserAvailabilitiesViewModel;
 
 class UserAvailabilitiesController extends AbstractController
 {
@@ -31,13 +32,15 @@ class UserAvailabilitiesController extends AbstractController
         /** @var object{Availabilities: string|null}|false $row */
         $availabilitiesJson = $row !== false ? ($row->Availabilities ?? '') : '';
 
+        /** @var array<int, array<string, mixed>>|null $currentAvailabilities */
         $currentAvailabilities = json_decode($availabilitiesJson, true);
-        $this->render('User/views/user_availabilities.latte', $this->getAllParams([
-            'currentAvailabilities' => $currentAvailabilities,
-            'page' => $this->application->getConnectedUser()->getPage(1),
-            'btn_HistoryBack' => true,
-            'btn_Parent' => "/user",
-        ]));
+
+        $viewModel = new UserAvailabilitiesViewModel(
+            currentAvailabilities: is_array($currentAvailabilities) ? $currentAvailabilities : null,
+            layoutParams: $this->getAllParams([]),
+        );
+
+        $this->render('User/views/user_availabilities.latte', $viewModel->toArray());
     }
 
     public function availabilitiesSave(): void

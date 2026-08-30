@@ -8,6 +8,8 @@ use app\helpers\Application;
 use app\helpers\TranslationManager;
 use app\helpers\WebApp;
 use app\modules\Common\AbstractController;
+use app\modules\Common\viewModels\InfoViewModel;
+use app\modules\User\viewModels\UserDashboardViewModel;
 
 class UserDashboardController extends AbstractController
 {
@@ -27,14 +29,17 @@ class UserDashboardController extends AbstractController
             return;
         }
         $lang = TranslationManager::getCurrentLanguage();
-        $this->render('Common/views/info.latte', $this->getAllParams([
-            'content' => $this->dataHelper->get('Languages', ['Name' => 'Help_User'], $lang)->$lang ?? '',
-            'hasAuthorization' => $this->application->getConnectedUser()->hasAutorization(),
-            'currentVersion' => Application::VERSION,
-            'timer' => 0,
-            'previousPage' => true,
-            'page' => $this->application->getConnectedUser()->getPage(),
-        ]));
+        $helpRow = $this->dataHelper->get('Languages', ['Name' => 'Help_User'], $lang);
+        $content = ($helpRow !== false && isset($helpRow->$lang)) ? $helpRow->$lang : '';
+
+        $viewModel = new InfoViewModel(
+            content: $content,
+            hasAuthorization: $this->application->getConnectedUser()->hasAutorization(),
+            timer: 0,
+            previousPage: true,
+            layoutParams: $this->getAllParams([]),
+        );
+        $this->render('Common/views/info.latte', $viewModel->toArray());
     }
 
     public function user(): void
@@ -48,9 +53,11 @@ class UserDashboardController extends AbstractController
             return;
         }
         $_SESSION['navbar'] = 'user';
-        $this->render('User/views/user.latte', $this->getAllParams([
-            'page' => '',
-            'content' => ($this->t)('User')
-        ]));
+
+        $viewModel = new UserDashboardViewModel(
+            content: ($this->t)('User'),
+            layoutParams: $this->getAllParams([]),
+        );
+        $this->render('User/views/user.latte', $viewModel->toArray());
     }
 }

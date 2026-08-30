@@ -10,10 +10,12 @@ use app\enums\ApplicationError;
 use app\enums\FilterInputRule;
 use app\exceptions\EmailException;
 use app\helpers\Application;
-use app\helpers\TranslationManager;
 use app\helpers\WebApp;
 use app\modules\Common\AbstractController;
 use app\modules\Common\services\AuthenticationService;
+use app\modules\Common\viewModels\InfoViewModel;
+use app\modules\User\viewModels\UserSetPasswordViewModel;
+use app\modules\User\viewModels\UserSignInViewModel;
 
 class UserController extends AbstractController
 {
@@ -35,15 +37,14 @@ class UserController extends AbstractController
         } catch (EmailException $e) {
             Flight::set('message', "Error {$e->getMessage()} with email {$email}");
             Flight::set('code', ApplicationError::BadRequest->value);
-            $content = ($this->t)('message_email_unknown');
-            $this->render('Common/views/info.latte', $this->getAllParams([
-                'content' => $content,
-                'hasAuthorization' => $this->application->getConnectedUser()->hasAutorization(),
-                'currentVersion' => Application::VERSION,
-                'timer' => 10000,
-                'previousPage' => false,
-                'page' => $this->application->getConnectedUser()->getPage(),
-            ]));
+            $viewModel = new InfoViewModel(
+                content: ($this->t)('message_email_unknown'),
+                hasAuthorization: $this->application->getConnectedUser()->hasAutorization(),
+                timer: 10000,
+                previousPage: false,
+                layoutParams: $this->getAllParams([]),
+            );
+            $this->render('Common/views/info.latte', $viewModel->toArray());
             return;
         } catch (InvalidArgumentException $e) {
             $this->raiseBadRequest($e->getMessage(), $e->getFile(), $e->getLine());
@@ -51,27 +52,25 @@ class UserController extends AbstractController
         if ($success) {
             Flight::set('message', "Password reset email sent to {$email}");
             Flight::set('code', ApplicationError::Ok->value);
-            $content = ($this->t)('message_password_reset_sent');
-            $this->render('Common/views/info.latte', $this->getAllParams([
-                'content' => $content,
-                'hasAuthorization' => $this->application->getConnectedUser()->hasAutorization(),
-                'currentVersion' => Application::VERSION,
-                'timer' => 10000,
-                'previousPage' => false,
-                'page' => $this->application->getConnectedUser()->getPage(),
-            ]));
+            $viewModel = new InfoViewModel(
+                content: ($this->t)('message_email_unknown'),
+                hasAuthorization: $this->application->getConnectedUser()->hasAutorization(),
+                timer: 10000,
+                previousPage: false,
+                layoutParams: $this->getAllParams([]),
+            );
+            $this->render('Common/views/info.latte', $viewModel->toArray());
         } else {
             Flight::set('message', "Unable to send password reset email to {$email}");
-            $content = ($this->t)('message_password_reset_failed');
             Flight::set('code', ApplicationError::Error->value);
-            $this->render('Common/views/info.latte', $this->getAllParams([
-                'content' => $content,
-                'hasAuthorization' => $this->application->getConnectedUser()->hasAutorization(),
-                'currentVersion' => Application::VERSION,
-                'timer' => 30000,
-                'previousPage' => false,
-                'page' => $this->application->getConnectedUser()->getPage(),
-            ]));
+            $viewModel = new InfoViewModel(
+                content: ($this->t)('message_password_reset_failed'),
+                hasAuthorization: $this->application->getConnectedUser()->hasAutorization(),
+                timer: 30000,
+                previousPage: false,
+                layoutParams: $this->getAllParams([]),
+            );
+            $this->render('Common/views/info.latte', $viewModel->toArray());
         }
     }
 
@@ -87,10 +86,11 @@ class UserController extends AbstractController
                 $this->raiseBadRequest('Invalid or expired token', __FILE__, __LINE__);
             }
         } elseif (WebApp::getRequestMethod() === 'GET') {
-            $this->render('User/views/user_set_password.latte', $this->getAllParams([
-                'token' => $token,
-                'page' => $this->application->getConnectedUser()->getPage()
-            ]));
+            $viewModel = new UserSetPasswordViewModel(
+                token: $token,
+                layoutParams: $this->getAllParams([]),
+            );
+            $this->render('User/views/user_set_password.latte', $viewModel->toArray());
         } else {
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
         }
@@ -114,22 +114,11 @@ class UserController extends AbstractController
                 $this->redirect($redirect, ApplicationError::Ok, "Auto sign in succeeded for {$rememberMeResult->getUser()?->Email}");
                 return;
             }
-            $lang = TranslationManager::getCurrentLanguage();
-            $defaultColors = $this->dataHelper->getDefaultColors();
-            $this->render('User/views/user_sign_in.latte', $this->getAllParams([
-                'href' => '/user/sign/in',
-                'userImg' => '👻',
-                'userEmail' => '',
-                'isAdmin' => false,
-                'currentVersion' => Application::VERSION,
-                'page' => $this->application->getConnectedUser()->getPage(),
-                'flag' => TranslationManager::getFlag($lang),
-                'navbarBgColor'   => $defaultColors['navbarBgColor'],
-                'navbarInkColor'  => $defaultColors['navbarInkColor'],
-                'navbarIconColor' => $defaultColors['navbarIconColor'],
-                'btn_HistoryBack' => true,
-                'redirect' => $redirect,
-            ]));
+            $viewModel = new UserSignInViewModel(
+                redirect: $redirect,
+                layoutParams: $this->getAllParams([]),
+            );
+            $this->render('User/views/user_sign_in.latte', $viewModel->toArray());
         } else {
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
         }

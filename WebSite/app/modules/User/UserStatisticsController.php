@@ -16,6 +16,7 @@ use app\models\MessageDataHelper;
 use app\models\ParticipantDataHelper;
 use app\models\PersonStatisticsDataHelper;
 use app\modules\Common\AbstractController;
+use app\modules\User\viewModels\UserStatisticsViewModel;
 use app\valueObjects\Person;
 
 class UserStatisticsController extends AbstractController
@@ -41,18 +42,15 @@ class UserStatisticsController extends AbstractController
 
         $season = $this->resolveSeason();
 
-        $this->render('User/views/user_statistics.latte', $this->getAllParams([
-            'stats' => $this->personalStatisticsDataHelper->getStats($person, $season['start'], $season['end']),
-            'seasons'                => $this->personalStatisticsDataHelper->getAvailableSeasons(),
-            'currentSeason'          => $season,
-            'navItems'               => $this->getNavItems($person),
-            'chartData'              => $this->buildChartData($this->getVisitCounts($season), $person),
-            'participationChartData' => $this->buildChartData($this->getParticipationCounts($season), $person),
-            'messageChartData'       => $this->buildChartData($this->getMessageCounts($season), $person),
-            'page'                   => $this->application->getConnectedUser()->getPage(1),
-            'btn_HistoryBack'        => true,
-            'btn_Parent'             => "/user",
-            'i18n' => [
+        $viewModel = new UserStatisticsViewModel(
+            stats: $this->personalStatisticsDataHelper->getStats($person, $season['start'], $season['end']),
+            seasons: $this->personalStatisticsDataHelper->getAvailableSeasons(),
+            currentSeason: $season,
+            navItems: $this->getNavItems($person),
+            chartData: $this->buildChartData($this->getVisitCounts($season), $person),
+            participationChartData: $this->buildChartData($this->getParticipationCounts($season), $person),
+            messageChartData: $this->buildChartData($this->getMessageCounts($season), $person),
+            i18n: [
                 'visitsYAxis' => ($this->t)('user.statistics.chart.visits.y_axis'),
                 'visitsXAxis' => ($this->t)('user.statistics.chart.visits.x_axis'),
                 'participationsYAxis' => ($this->t)('user.statistics.chart.participations.y_axis'),
@@ -60,7 +58,10 @@ class UserStatisticsController extends AbstractController
                 'messagesYAxis' => ($this->t)('user.statistics.chart.messages.y_axis'),
                 'messagesXAxis' => ($this->t)('user.statistics.chart.messages.x_axis'),
             ],
-        ]));
+            layoutParams: $this->getAllParams([]),
+        );
+
+        $this->render('User/views/user_statistics.latte', $viewModel->toArray());
     }
 
     /**

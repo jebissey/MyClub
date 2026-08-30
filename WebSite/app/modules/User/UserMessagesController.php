@@ -8,6 +8,7 @@ use app\helpers\Application;
 use app\helpers\GravatarHandler;
 use app\models\MessageDataHelper;
 use app\modules\Common\AbstractShowController;
+use app\modules\User\viewModels\UserMessagesViewModel;
 
 class UserMessagesController extends AbstractShowController
 {
@@ -27,12 +28,20 @@ class UserMessagesController extends AbstractShowController
 
         [$searchMode, $searchFrom] = $this->resolveSearchPeriod($connectedUser);
 
-        $this->render('User/views/messages.latte', $this->baseParams($connectedUser, '/user', $searchMode, $searchFrom) + [
-            'messages' => $this->messageDataHelper->getGroupedMessages(
+        $viewModel = new UserMessagesViewModel(
+            searchFrom: $searchFrom,
+            searchMode: $searchMode,
+            navItems: $this->getNavItems($connectedUser->person),
+            person: $connectedUser->person,
+            messages: $this->messageDataHelper->getGroupedMessages(
                 $connectedUser->person->Id ?? 0,
                 $searchFrom,
                 new GravatarHandler()
             ),
-        ]);
+            btnParent: '/user',
+            layoutParams: $this->getAllParams([]),
+        );
+
+        $this->render('User/views/messages.latte', $viewModel->toArray());
     }
 }

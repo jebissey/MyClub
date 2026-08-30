@@ -11,6 +11,7 @@ use app\helpers\WebApp;
 use app\models\GroupDataHelper;
 use app\modules\Common\AbstractController;
 use app\modules\Common\services\CredentialService;
+use app\modules\User\viewModels\UserNotificationsViewModel;
 
 class UserNotificationsController extends AbstractController
 {
@@ -52,15 +53,20 @@ class UserNotificationsController extends AbstractController
         /** @var object{Notifications: string|null}|false $row */
         $notificationsJson = $row !== false ? ($row->Notifications ?? '{}') : '{}';
 
-        $this->render('User/views/user_notifications.latte', $this->getAllParams([
-            'currentNotifications' => json_decode($notificationsJson, true) ?? [],
-            'groups'               => $this->groupDataHelper->getGroupsWithType($person->Id),
-            'page'                 => $this->application->getConnectedUser()->getPage(1),
-            'vapidPubliKey'        => $this->credentials->get('vapid', 'publicKey') ?? '',
-            'notification'         => $notification,
-            'btn_HistoryBack' => true,
-            'btn_Parent' => "/user",
-        ]));
+        /** @var array<string, mixed>|null $decodedNotifications */
+        $decodedNotifications = json_decode($notificationsJson, true);
+
+        $groupsWithType = $this->groupDataHelper->getGroupsWithType($person->Id);
+
+        $viewModel = new UserNotificationsViewModel(
+            currentNotifications: is_array($decodedNotifications) ? $decodedNotifications : [],
+            groups: $groupsWithType !== false ? array_values($groupsWithType) : [],
+            vapidPubliKey: $this->credentials->get('vapid', 'publicKey') ?? '',
+            notification: $notification,
+            layoutParams: $this->getAllParams([]),
+        );
+
+        $this->render('User/views/user_notifications.latte', $viewModel->toArray());
     }
 
     public function notificationsSave(): void

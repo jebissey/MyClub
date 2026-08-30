@@ -8,6 +8,7 @@ use app\helpers\Application;
 use app\helpers\WebApp;
 use app\models\ParticipantDataHelper;
 use app\modules\Common\AbstractController;
+use app\modules\User\viewModels\UserConnectionsViewModel;
 use app\valueObjects\Person;
 
 /**
@@ -43,7 +44,7 @@ class UserConnectionsController extends AbstractController
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
-        $user = $this->dataHelper->get('Person', ['Id' => $idPerson], 'FirstName, LastName, NickName, Id, InPresentationDirectory, ShowPhoneInPresentationDirectory, ShowEmailInPresentationDirectory');
+        $user = $this->dataHelper->get('Person', ['Id' => $idPerson], 'FirstName, LastName, NickName, Id, Email, InPresentationDirectory, ShowPhoneInPresentationDirectory, ShowEmailInPresentationDirectory');
         if ($user === false) {
             $this->raiseBadRequest("User ({$idPerson}) not found", __FILE__, __LINE__);
             return;
@@ -52,15 +53,16 @@ class UserConnectionsController extends AbstractController
         $userRow = $user;
         $person = Person::fromRow($userRow);
         $data = $this->participantDataHelper->getConnections($idPerson);
-        $this->render('User/views/user_connections.latte', $this->getAllParams([
-            'connections' => $data['connections'],
-            'maxEvents'   => $data['maxEvents'],
-            'layout' => $this->getLayout(),
-            'navItems' => $this->getNavItems($person),
-            'page' => $this->application->getConnectedUser()->getPage(1),
-            'user' => $person->FirstName . ' ' . $person->LastName . ($person->NickName != '' ? ' (' . $person->NickName . ')' : ''),
-            'btn_HistoryBack' => true,
-            'btn_Parent' => "/user",
-        ]));
+
+        $viewModel = new UserConnectionsViewModel(
+            connections: $data['connections'],
+            maxEvents: $data['maxEvents'],
+            layout: $this->getLayout(),
+            navItems: $this->getNavItems($person),
+            user: $person->FirstName . ' ' . $person->LastName . ($person->NickName != '' ? ' (' . $person->NickName . ')' : ''),
+            layoutParams: $this->getAllParams([]),
+        );
+
+        $this->render('User/views/user_connections.latte', $viewModel->toArray());
     }
 }

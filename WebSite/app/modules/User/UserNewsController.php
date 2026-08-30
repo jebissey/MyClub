@@ -7,6 +7,7 @@ namespace app\modules\User;
 use app\helpers\Application;
 use app\helpers\News;
 use app\modules\Common\AbstractShowController;
+use app\modules\User\viewModels\UserNewsViewModel;
 
 class UserNewsController extends AbstractShowController
 {
@@ -29,8 +30,16 @@ class UserNewsController extends AbstractShowController
             default: date('Y-m-d H:i:s', strtotime('-1 day'))
         );
 
-        $this->render('User/views/news.latte', $this->baseParams($connectedUser, '/user', $searchMode, $searchFrom) + [
-            'news' => $this->news->getNewsForPerson($connectedUser, $searchFrom),
-        ]);
+        $viewModel = new UserNewsViewModel(
+            searchFrom: $searchFrom,
+            searchMode: $searchMode,
+            navItems: $this->getNavItems($connectedUser->person),
+            person: $connectedUser->person,
+            news: $this->news->getNewsForPerson($connectedUser, $searchFrom),
+            btnParent: '/user',
+            layoutParams: $this->getAllParams([]),
+        );
+
+        $this->render('User/views/news.latte', $viewModel->toArray());
     }
 }

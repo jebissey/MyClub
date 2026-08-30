@@ -10,6 +10,7 @@ use app\helpers\WebApp;
 use app\models\AttributeDataHelper;
 use app\models\EventTypeDataHelper;
 use app\modules\Common\AbstractController;
+use app\modules\User\viewModels\UserPreferencesViewModel;
 
 class UserPreferencesController extends AbstractController
 {
@@ -42,13 +43,13 @@ class UserPreferencesController extends AbstractController
         /** @var object{Preferences: string|null}|false $row */
         $preferencesJson = $row !== false ? ($row->Preferences ?? '') : '';
 
-        $this->render('User/views/user_preferences.latte', $this->getAllParams([
-            'currentPreferences' => json_decode($preferencesJson, true),
-            'eventTypes' => $eventTypesWithAttributes,
-            'page' => $this->application->getConnectedUser()->getPage(1),
-            'btn_HistoryBack' => true,
-            'btn_Parent' => "/user",
-        ]));
+        $viewModel = new UserPreferencesViewModel(
+            currentPreferences: json_decode($preferencesJson, true),
+            eventTypes: $eventTypesWithAttributes,
+            layoutParams: $this->getAllParams([]),
+        );
+
+        $this->render('User/views/user_preferences.latte', $viewModel->toArray());
     }
 
     public function preferencesSave(): void

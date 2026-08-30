@@ -10,6 +10,7 @@ use app\helpers\WebApp;
 use app\models\GroupDataHelper;
 use app\models\PersonGroupDataHelper;
 use app\modules\Common\AbstractController;
+use app\modules\User\viewModels\UserGroupsViewModel;
 
 class UserGroupsController extends AbstractController
 {
@@ -34,14 +35,14 @@ class UserGroupsController extends AbstractController
         }
         $currentGroups = $this->groupDataHelper->getCurrentGroups($person->Id);
 
-        $this->render('User/views/user_groups.latte', $this->getAllParams([
-            'groups' => $currentGroups,
-            'layout' => $this->getLayout(),
-            'navItems' => $this->getNavItems($person),
-            'page' => $this->application->getConnectedUser()->getPage(1),
-            'btn_HistoryBack' => true,
-            'btn_Parent' => "/user",
-        ]));
+        $viewModel = new UserGroupsViewModel(
+            groups: array_values($currentGroups),
+            layout: $this->getLayout(),
+            navItems: $this->getNavItems($person),
+            layoutParams: $this->getAllParams([]),
+        );
+
+        $this->render('User/views/user_groups.latte', $viewModel->toArray());
     }
 
     public function groupsSave(): void
