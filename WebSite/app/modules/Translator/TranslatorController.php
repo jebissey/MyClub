@@ -10,6 +10,7 @@ use app\helpers\TranslationManager;
 use app\helpers\To;
 use app\helpers\WebApp;
 use app\modules\Common\AbstractController;
+use app\modules\Translator\viewModels\TranslatorViewModel;
 
 class TranslatorController extends AbstractController
 {
@@ -59,18 +60,18 @@ class TranslatorController extends AbstractController
             $missingOnly === 1
         );
 
-        $this->render('Translator/views/translator.latte', $this->getAllParams([
-            'navItems'      => $this->getNavItems($user->person),
-            'title'         => 'Translations',
-            'page'          => $user->getPage(),
-            'i18n'  => $translations,
-            'referenceLang' => $referenceLang,
-            'targetLang'    => $targetLang,
-            'missingOnly'   => $missingOnly,
-            'missingCount'  => $this->languagesDataHelper->countMissingTranslations($targetLang),
-            'languages'     => $languages,
-            'btn_HistoryBack' => true,
-            'btn_Parent'      => "/designer",
-        ]));
+        $viewModel = new TranslatorViewModel(
+            navItems: $this->getNavItems($user->person),
+            title: 'Translations',
+            i18n: array_values($translations),
+            referenceLang: $referenceLang,
+            targetLang: $targetLang,
+            missingOnly: $missingOnly,
+            missingCount: $this->languagesDataHelper->countMissingTranslations($targetLang),
+            languages: $languages,
+            layoutParams: $this->getAllParams([]),
+        );
+
+        $this->render('Translator/views/translator.latte', $viewModel->toArray());
     }
 }
