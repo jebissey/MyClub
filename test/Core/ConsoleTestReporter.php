@@ -40,11 +40,13 @@ class ConsoleTestReporter implements TestReporterInterface
 
     public function validationErrors(array $errors): array
     {
-        $errors = [];
+        $formattedErrors = [];
+
         foreach ($errors as $err) {
-            $errors[] =  $this->error($err);
+            $formattedErrors[] = $this->error((string) $err);
         }
-        return $errors;
+
+        return $formattedErrors;
     }
 
     public function diplayTest(int $testNumber, int $totalTests, string $method, string $path): void
@@ -100,12 +102,22 @@ class ConsoleTestReporter implements TestReporterInterface
 
     private function displayErrorSection(string $title, array $errors): void
     {
-        if (!empty($errors)) {
-            echo str_repeat('=', 80);
-            echo "\n$title:\n";
-            echo str_repeat('=', 80) . "\n";
-            foreach ($errors as $error) {
-                echo "  • $error\n";
+        if ($errors === []) {
+            return;
+        }
+
+        echo str_repeat('=', 80);
+        echo "\n$title:\n";
+        echo str_repeat('=', 80) . "\n";
+
+        foreach ($errors as $error) {
+            if (is_array($error)) {
+                echo '  • ' . json_encode(
+                    $error,
+                    JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES
+                ) . "\n";
+            } else {
+                echo "  • {$error}\n";
             }
         }
     }

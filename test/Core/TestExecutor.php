@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace test\Core;
 
+use test\Core\ValueObjects\HttpResponse;
 use test\Core\ValueObjects\Route;
 use test\Core\ValueObjects\Simulation;
 use test\Core\ValueObjects\TestConfiguration;
@@ -14,6 +15,7 @@ use test\Interfaces\MyclubDataRepositoryInterface;
 use test\Interfaces\ResponseValidatorInterface;
 use test\Interfaces\TestDataRepositoryInterface;
 use test\Interfaces\TestReporterInterface;
+
 
 class TestExecutor
 {
@@ -99,7 +101,10 @@ class TestExecutor
         } else $testData[] = $simulation->toArray();
         $errors = $this->validator->validate($route, $routeNumber, $testData);
         if ($errors) {
-            $this->responseErrors[] = $this->reporter->validationErrors($errors);
+            foreach ($errors as $error) {
+                $this->responseErrors[] = $this->reporter->error("Validation error-> {$error}\n");
+            }
+
             return [];
         }
         $results = [];
@@ -144,7 +149,7 @@ class TestExecutor
         return true;
     }
 
-    private function validateResponse(int $routeNumber, array $test, $response, bool $stop): void
+    private function validateResponse(int $routeNumber, array $test, HttpResponse $response, bool $stop): void
     {
         $result = $this->responseValidator->validate($response->httpCode, (int)$test['ExpectedResponseCode']);
         if (!$result->isValid) {
