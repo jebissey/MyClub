@@ -8,6 +8,11 @@ use app\helpers\Application;
 use app\helpers\TranslationManager;
 use app\models\LoanDataHelper;
 use app\modules\Common\AbstractController;
+use app\modules\Common\viewModels\InfoViewModel;
+use app\modules\Loan\viewModels\LoanCalendarViewModel;
+use app\modules\Loan\viewModels\LoanDesignerViewModel;
+use app\modules\Loan\viewModels\LoanManagerViewModel;
+use app\modules\Loan\viewModels\LoanUserViewModel;
 
 class LoanController extends AbstractController
 {
@@ -24,13 +29,13 @@ class LoanController extends AbstractController
             return;
         }
 
-        $this->render('Loan/views/calendar.latte', $this->getAllParams([
-            'i18n' => $this->doTranslations(),
-            'page' => $this->application->getConnectedUser()->getPage(),
-            'activeTab' => 'calendar',
-            'btn_Parent' => "/user",
-            'btn_HistoryBack' => true,
-        ]));
+        $viewModel = new LoanCalendarViewModel(
+            i18n: $this->doTranslations(),
+            activeTab: 'calendar',
+            layoutParams: $this->getAllParams([]),
+        );
+
+        $this->render('Loan/views/calendar.latte', $viewModel->toArray());
     }
 
     public function designer(): void
@@ -41,14 +46,14 @@ class LoanController extends AbstractController
 
         $this->loanDataHelper->updateOverdueLoans();
 
-        $this->render('Loan/views/designer.latte', $this->getAllParams([
-            'items'        => $this->loanDataHelper->getAllItems(),
-            'i18n' => $this->doTranslations(),
-            'page' => $this->application->getConnectedUser()->getPage(),
-            'activeTab' => 'designer',
-            'btn_Parent' => "/admin",
-            'btn_HistoryBack' => true,
-        ]));
+        $viewModel = new LoanDesignerViewModel(
+            items: array_values($this->loanDataHelper->getAllItems()),
+            i18n: $this->doTranslations(),
+            activeTab: 'designer',
+            layoutParams: $this->getAllParams([]),
+        );
+
+        $this->render('Loan/views/designer.latte', $viewModel->toArray());
     }
 
     public function designerHelp(): void
@@ -58,14 +63,18 @@ class LoanController extends AbstractController
             return;
         }
         $lang = TranslationManager::getCurrentLanguage();
-        $this->render('Common/views/info.latte', $this->getAllParams([
-            'content' => $this->dataHelper->get('Languages', ['Name' => 'Help_LoanDesigner'], $lang)->$lang ?? '',
-            'hasAuthorization' => $this->application->getConnectedUser()->isRedactor(),
-            'currentVersion' => Application::VERSION,
-            'timer' => 0,
-            'previousPage' => true,
-            'page' => $this->application->getConnectedUser()->getPage(),
-        ]));
+        $helpRow = $this->dataHelper->get('Languages', ['Name' => 'Help_LoanDesigner'], $lang);
+        $content = ($helpRow !== false && isset($helpRow->$lang)) ? $helpRow->$lang : '';
+
+        $viewModel = new InfoViewModel(
+            content: $content,
+            timer: 0,
+            hasAuthorization: $this->application->getConnectedUser()->isRedactor(),
+            previousPage: true,
+            layoutParams: $this->getAllParams([]),
+        );
+
+        $this->render('Common/views/info.latte', $viewModel->toArray());
     }
 
     public function manager(): void
@@ -76,15 +85,16 @@ class LoanController extends AbstractController
 
         $this->loanDataHelper->updateOverdueLoans();
 
-        $this->render('Loan/views/manager.latte', $this->getAllParams([
-            'loans'        => $this->loanDataHelper->getAllLoans(),
-            'loanItems'    => $this->loanDataHelper->getActiveItems('loan'),
-            'persons'      => $this->loanDataHelper->getAllPersons(),
-            'i18n' => $this->doTranslations(),
-            'activeTab' => 'manager',
-            'btn_Parent' => "/user",
-            'btn_HistoryBack' => true,
-        ]));
+        $viewModel = new LoanManagerViewModel(
+            loans: array_values($this->loanDataHelper->getAllLoans()),
+            loanItems: array_values($this->loanDataHelper->getActiveItems('loan')),
+            persons: array_values($this->loanDataHelper->getAllPersons()),
+            i18n: $this->doTranslations(),
+            activeTab: 'manager',
+            layoutParams: $this->getAllParams([]),
+        );
+
+        $this->render('Loan/views/manager.latte', $viewModel->toArray());
     }
 
     public function reservations(): void
@@ -96,18 +106,18 @@ class LoanController extends AbstractController
         $user   = $this->application->getConnectedUser();
         $userId = $user->isLoanManager() ? 0 : $user->person->Id ?? 0;
 
-        $this->render('Loan/views/user.latte', $this->getAllParams([
-            'reservations'      => $this->loanDataHelper->getAllReservations($userId),
-            'reservationItems'  => $this->loanDataHelper->getActiveItems('reservation'),
-            'persons'           => $this->loanDataHelper->getAllPersons(),
-            'isManager'         => $user->isLoanManager(),
-            'currentUserId'     => $userId,
-            'i18n' => $this->doTranslations(),
-            'page' => $this->application->getConnectedUser()->getPage(),
-            'activeTab' => 'user',
-            'btn_Parent' => "/user",
-            'btn_HistoryBack' => true,
-        ]));
+        $viewModel = new LoanUserViewModel(
+            reservations: array_values($this->loanDataHelper->getAllReservations($userId)),
+            reservationItems: array_values($this->loanDataHelper->getActiveItems('reservation')),
+            persons: array_values($this->loanDataHelper->getAllPersons()),
+            isManager: $user->isLoanManager(),
+            currentUserId: $userId,
+            i18n: $this->doTranslations(),
+            activeTab: 'user',
+            layoutParams: $this->getAllParams([]),
+        );
+
+        $this->render('Loan/views/user.latte', $viewModel->toArray());
     }
 
     #region Private methods

@@ -10,64 +10,61 @@ use app\helpers\TranslationManager;
 use app\helpers\WebApp;
 use app\models\KanbanDataHelper;
 use app\modules\Common\AbstractController;
+use app\modules\Common\viewModels\InfoViewModel;
+use app\modules\Kanban\viewModels\KanbanBoardViewModel;
 
 class KanbanController extends AbstractController
 {
-    public function __construct(Application $application, private KanbanDataHelper $kanbanDataHelper)
-    {
+    public function __construct(
+        Application $application,
+        private KanbanDataHelper $kanbanDataHelper,
+    ) {
         parent::__construct($application);
     }
 
     public function board(): void
     {
-        if (!$this->application->getConnectedUser()->isKanbanDesigner()) {
-            $this->raiseForbidden(__FILE__, __LINE__);
+        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isKanbanDesigner(), __FILE__, __LINE__)) {
             return;
         }
+
         $personId = $this->application->getConnectedUser()->person->Id ?? 0;
-        $query = $this->flight->request()->query->getData();
+        $query    = $this->flight->request()->query->getData();
+
         $selectedProjectId = null;
-        if (isset($query['p'])) {
-            $value = $query['p'];
-            if (is_scalar($value)) {
-                $selectedProjectId = (int) $value;
-            }
+        if (isset($query['p']) && is_scalar($query['p'])) {
+            $selectedProjectId = (int) $query['p'];
         }
+
         $isOwner = null;
         if ($selectedProjectId !== null) {
-            $selectedProjectId = (int) $selectedProjectId;
-            if (!$this->kanbanDataHelper->userHasAccessToProject($personId, $selectedProjectId)) {
-                $isOwner = false;
-            } else {
-                $isOwner = true;
-            }
+            $isOwner = $this->kanbanDataHelper->userHasAccessToProject($personId, $selectedProjectId);
         }
+
         $schema = [
-            'ct' => FilterInputRule::Int->value,
-            'title' => FilterInputRule::Content->value,
+            'ct'     => FilterInputRule::Int->value,
+            'title'  => FilterInputRule::Content->value,
             'detail' => FilterInputRule::Content->value,
         ];
         $filters = WebApp::filterInput($schema, $this->flight->request()->query->getData());
 
-        $this->render('Kanban/views/kanban.latte', $this->getAllParams([
-            'navItems' => $this->getNavItems($this->application->getConnectedUser()->person),
-            'title' => 'Kanban Board',
-            'page' => $this->application->getConnectedUser()->getPage(),
-            'personId' => $personId,
-            'projects' => $this->kanbanDataHelper->getKanbanProjects(),
-            'columns' => [
+        $viewModel = new KanbanBoardViewModel(
+            personId: $personId,
+            projects: array_values($this->kanbanDataHelper->getKanbanProjects()),
+            columns: [
                 ['icon' => '💡', 'label' => 'Backlog'],
                 ['icon' => '☑️', 'label' => 'Selected'],
                 ['icon' => '🔧', 'label' => 'In Progress'],
-                ['icon' => '🏁', 'label' => 'Done']
+                ['icon' => '🏁', 'label' => 'Done'],
             ],
-            'selectedProjectId' => $selectedProjectId,
-            'cardTypes' => $this->kanbanDataHelper->getProjectCardTypes($selectedProjectId),
-            'filters' => $filters,
-            'isOwner' => $isOwner,
-            'btn_HistoryBack' => true,
-            'btn_Parent'      => "/designer",
-        ]));
+            selectedProjectId: $selectedProjectId,
+            cardTypes: array_values($this->kanbanDataHelper->getProjectCardTypes($selectedProjectId)),
+            filters: $filters,
+            isOwner: $isOwner,
+            layoutParams: $this->getAllParams([]),
+        );
+
+        $this->render('Kanban/views/kanban.latte', $viewModel->toArray());
     }
 
     public function help(): void
@@ -76,14 +73,19 @@ class KanbanController extends AbstractController
             $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
-        $lang = TranslationManager::getCurrentLanguage();
-        $this->render('Common/views/info.latte', $this->getAllParams([
-            'content' => $this->dataHelper->get('Languages', ['Name' => 'Help_KanbanDesigner'], $lang)->$lang ?? '',
-            'hasAuthorization' => $this->application->getConnectedUser()->isRedactor(),
-            'currentVersion' => Application::VERSION,
-            'timer' => 0,
-            'previousPage' => true,
-            'page' => $this->application->getConnectedUser()->getPage(),
-        ]));
+
+        $lang    = TranslationManager::getCurrentLanguage();
+        $helpRow = $this->dataHelper->get('Languages', ['Name' => 'Help_KanbanDesigner'], $lang);
+        $content = ($helpRow !== false && isset($helpRow->$lang)) ? $helpRow->$lang : '';
+
+        $viewModel = new InfoViewModel(
+            content: $content,
+            timer: 0,
+            hasAuthorization: $this->application->getConnectedUser()->isRedactor(),
+            previousPage: true,
+            layoutParams: $this->getAllParams([]),
+        );
+
+        $this->render('Common/views/info.latte', $viewModel->toArray());
     }
 }
