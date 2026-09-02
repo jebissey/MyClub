@@ -75,6 +75,10 @@ function main(): int
         echo sprintf("  Temps total: %.2f s (%.2f min)\n", $totalTimeMs / 1000, $totalTimeMs / (1000 * 60));
         echo str_repeat('=', 60) . "\n";
     }
+
+    if ($orchestrator->hasFailures()) {
+        return 1;
+    }
     return 0;
 }
 

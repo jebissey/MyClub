@@ -16,6 +16,8 @@ use test\Interfaces\TestReporterInterface;
 
 class RouteTestOrchestrator
 {
+    private ?TestSummary $lastSummary = null;
+
     public function __construct(
         private RouteExtractorInterface $routeExtractor,
         private SimulationExtractor $simulationExtractor,
@@ -51,8 +53,26 @@ class RouteTestOrchestrator
         } catch (Throwable $e) {
             echo "❌ Unexpected error: " . $e->getMessage() . ' in ' . $e->getFile() . ' at ' . $e->getLine() . "\n";
         }
-        $this->reporter->displaySummary($this->summaryGenerator($results));
+        $summary = $this->summaryGenerator($results);
+        $this->reporter->displaySummary($summary);
+        $this->lastSummary = $summary;
         return $results;
+    }
+
+    /**
+     * @return bool true si l'exécution a produit au moins une erreur
+     * (erreurs 5xx, erreurs de paramètres, erreurs de réponse, ou erreurs de test).
+     */
+    public function hasFailures(): bool
+    {
+        if ($this->lastSummary === null) {
+            return false;
+        }
+
+        return $this->lastSummary->errors > 0
+            || count($this->lastSummary->parameterErrors) > 0
+            || count($this->lastSummary->responseErrors) > 0
+            || count($this->lastSummary->testErrors) > 0;
     }
 
     #region Private methods
