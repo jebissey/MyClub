@@ -68,7 +68,12 @@ class ConnectedUser
         Params::setParams(
             [
                 'href' => $this->getHref($this->person->Email),
-                'userImg' => WebApp::computeUserImg($this->person->UseGravatar ?? false, $this->person->Email ?? null, $this->person->Avatar ?? null, new GravatarHandler()),
+                'userImg' => WebApp::computeUserImg(
+                    $this->person->UseGravatar ?? false,
+                    $this->person->Email ?? null,
+                    $this->person->Avatar ?? null,
+                    new GravatarHandler()
+                ),
                 'userEmail' => $this->person->Email,
                 'isAdmin' => $this->isAdministrator(),
                 'isCommunicationManager' => $this->isCommunicationManager(),

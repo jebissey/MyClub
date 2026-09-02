@@ -78,7 +78,8 @@ class EventGuestController extends AbstractController
             }
             $nickname = To::str($input['nickname'] ?? '???');
             try {
-                /** @var object{Id: int|string, Token: string, NickName: string, TokenCreatedAt: string}|false $contactData */ $contactData = $this->dataHelper->get('Contact', ['Email' => $email], 'Id, Token, NickName, TokenCreatedAt');
+                /** @var object{Id: int|string, Token: string, NickName: string, TokenCreatedAt: string}|false $contactData */
+                $contactData = $this->dataHelper->get('Contact', ['Email' => $email], 'Id, Token, NickName, TokenCreatedAt');
                 $contact = $contactData ? ContactRow::fromStdClass($contactData) : null;
                 if (!$contact) {
                     $token = bin2hex(random_bytes(32));

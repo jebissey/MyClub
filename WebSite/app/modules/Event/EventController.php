@@ -183,7 +183,11 @@ class EventController extends AbstractController
             $result = $this->application->getAuthenticationService()->handleRememberMeLogin();
             if ($result && $result->isSuccess()) {
                 $this->application->getConnectedUser()->get();
-                $this->redirect(To::str($_SERVER['REQUEST_URI']), ApplicationError::Ok, "Auto sign in succeeded for {$result->getUser()?->Email}");
+                $this->redirect(
+                    To::str($_SERVER['REQUEST_URI']),
+                    ApplicationError::Ok,
+                    "Auto sign in succeeded for {$result->getUser()?->Email}"
+                );
                 return;
             }
             $this->redirect('/user/sign/in?redirect=' . urlencode(To::str($_SERVER['REQUEST_URI'])));

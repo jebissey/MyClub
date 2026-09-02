@@ -321,7 +321,11 @@ abstract class AbstractController
         if ($connectedUser->person === null) {
             $result = $this->application->getAuthenticationService()->handleRememberMeLogin();
             if ($result && $result->isSuccess()) {
-                $this->redirect(To::str($_SERVER['REQUEST_URI'] ?? ''), ApplicationError::Ok, "Auto sign in succeeded for {$result->getUser()?->Email}");
+                $this->redirect(
+                    To::str($_SERVER['REQUEST_URI'] ?? ''),
+                    ApplicationError::Ok,
+                    "Auto sign in succeeded for {$result->getUser()?->Email}"
+                );
                 return true;
             }
         }

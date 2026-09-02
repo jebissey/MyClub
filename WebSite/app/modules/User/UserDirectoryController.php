@@ -63,10 +63,16 @@ class UserDirectoryController extends AbstractController
         if ($selectedGroup) {
             $persons = $this->personDataHelper->getPersonsInGroupForDirectory($selectedGroup);
         } else {
-            $persons = $this->dataHelper->gets('Person', [
-                'InPresentationDirectory' => 1,
-                'Inactivated' => 0
-            ], 'Id, LastName, FirstName, NickName, UseGravatar, Avatar, Email, InPresentationDirectory, ShowPhoneInPresentationDirectory, ShowEmailInPresentationDirectory, Location', 'FirstName, LastName');
+            $persons = $this->dataHelper->gets(
+                'Person',
+                [
+                    'InPresentationDirectory' => 1,
+                    'Inactivated' => 0
+                ],
+                'Id, LastName, FirstName, NickName, UseGravatar, Avatar, Email, '
+                    . 'InPresentationDirectory, ShowPhoneInPresentationDirectory, ShowEmailInPresentationDirectory, Location',
+                'FirstName, LastName'
+            );
             $gravatarHandler = new GravatarHandler();
             foreach ($persons as $person_) {
                 /** @var PersonRow $personRow */
@@ -128,7 +134,9 @@ class UserDirectoryController extends AbstractController
             'InPresentationDirectory' => 1,
             'Location IS NOT NULL' => null,
             'Inactivated' => 0
-        ], 'Id, FirstName, LastName, NickName, Avatar, UseGravatar, Email, Location, MyPublicDataInPresentationDirectory, InPresentationDirectory, ShowPhoneInPresentationDirectory, ShowEmailInPresentationDirectory');
+        ], 'Id, FirstName, LastName, NickName, Avatar, UseGravatar, Email, Location, '
+            . 'MyPublicDataInPresentationDirectory, InPresentationDirectory, '
+            . 'ShowPhoneInPresentationDirectory, ShowEmailInPresentationDirectory');
         $locationData = $this->getLocationData(array_values($rows));
 
         $viewModel = new UsersMapViewModel(
@@ -158,7 +166,8 @@ class UserDirectoryController extends AbstractController
             'Location IS NOT NULL' => null,
             'Inactivated' => 0,
             'MyPublicDataInPresentationDirectory IS NOT NULL AND MyPublicDataInPresentationDirectory != ""' => null
-        ], 'Id, FirstName, LastName, NickName, Avatar, UseGravatar, Email, Location, MyPublicDataInPresentationDirectory, InPresentationDirectory, ShowPhoneInPresentationDirectory, ShowEmailInPresentationDirectory');
+        ], 'Id, FirstName, LastName, NickName, Avatar, UseGravatar, Email, Location, MyPublicDataInPresentationDirectory, '
+            . 'InPresentationDirectory, ShowPhoneInPresentationDirectory, ShowEmailInPresentationDirectory');
         $locationData = $this->getLocationData(array_values($rows));
 
         $viewModel = new UsersMapViewModel(

@@ -763,14 +763,24 @@ class ArticleController extends TableController
             $this->redirect('/article/' . $id);
             return;
         }
-        $result = $this->dataHelper->set('Article', [
-            'Title'          => $title,
-            'Content'        => $content,
-            'PublishedBy'    => $input['published'] == 1 ? $this->application->getConnectedUser()->person->Id ?? throw new IntegrityException('Fatal error in file ' . __FILE__ . ' at line ' . __LINE__) : null,
-            'IdGroup'        => $input['idGroup'],
-            'OnlyForMembers' => $input['membersOnly'] ?? 0,
-            'LastUpdate'     => date('Y-m-d H:i:s')
-        ], ['Id' => $id]);
+        $result = $this->dataHelper->set(
+            'Article',
+            [
+                'Title'       => $title,
+                'Content'     => $content,
+                'PublishedBy' => $input['published'] == 1
+                    ? $this->application
+                    ->getConnectedUser()
+                    ->person->Id ?? throw new IntegrityException(
+                        'Fatal error in file ' . __FILE__ . ' at line ' . __LINE__
+                    )
+                    : null,
+                'IdGroup'        => $input['idGroup'],
+                'OnlyForMembers' => $input['membersOnly'] ?? 0,
+                'LastUpdate'     => date('Y-m-d H:i:s')
+            ],
+            ['Id' => $id]
+        );
         if ($result) {
             $_SESSION['success'] = ($this->t)('article.success.updated');
             $this->backup->save();

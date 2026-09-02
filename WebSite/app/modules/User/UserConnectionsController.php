@@ -44,7 +44,12 @@ class UserConnectionsController extends AbstractController
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
-        $user = $this->dataHelper->get('Person', ['Id' => $idPerson], 'FirstName, LastName, NickName, Id, Email, InPresentationDirectory, ShowPhoneInPresentationDirectory, ShowEmailInPresentationDirectory');
+        $user = $this->dataHelper->get(
+            'Person',
+            ['Id' => $idPerson],
+            'FirstName, LastName, NickName, Id, Email, InPresentationDirectory, '
+                . 'ShowPhoneInPresentationDirectory, ShowEmailInPresentationDirectory'
+        );
         if ($user === false) {
             $this->raiseBadRequest("User ({$idPerson}) not found", __FILE__, __LINE__);
             return;

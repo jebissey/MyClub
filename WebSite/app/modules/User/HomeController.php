@@ -72,7 +72,10 @@ class HomeController extends AbstractController
                     'flag'               => TranslationManager::getFlag($lang),
                     'isRedactor'         => false,
                     'page'               => $connectedUser->getPage(),
-                    'currentPath'        => parse_url(is_string($_SERVER['REQUEST_URI'] ?? null) ? $_SERVER['REQUEST_URI'] : '', PHP_URL_PATH),
+                    'currentPath'        => parse_url(
+                        is_string($_SERVER['REQUEST_URI'] ?? null) ? $_SERVER['REQUEST_URI'] : '',
+                        PHP_URL_PATH
+                    ),
                     'isMyclubWebSite'    => WebApp::isMyClubWebSite(),
                     'navbarBgColor'   => $defaultColors['navbarBgColor'],
                     'navbarInkColor'  => $defaultColors['navbarInkColor'],

@@ -207,7 +207,12 @@ class ContactController extends AbstractController
                 $this->raiseBadRequest("Unknown event {$eventId}", __FILE__, __LINE__);
                 return;
             }
-            $emailSent = $this->personDataHelper->sendRegistrationLink($contactEmail, $name, $email, new EventRegistrationRow($event->Id, $event->Summary));
+            $emailSent = $this->personDataHelper->sendRegistrationLink(
+                $contactEmail,
+                $name,
+                $email,
+                new EventRegistrationRow($event->Id, $event->Summary)
+            );
         } else {
             $emailMessage = new EmailMessage(
                 from: $email,

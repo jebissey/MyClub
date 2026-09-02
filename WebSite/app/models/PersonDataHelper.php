@@ -332,7 +332,12 @@ class PersonDataHelper extends Data implements NewsProviderInterface
 
         $gravatarHandler = new GravatarHandler();
         foreach ($persons as $person) {
-            $person->UserImg = WebApp::computeUserImg($person->UseGravatar === 'yes', $person->Email ?? null, $person->Avatar ?? null, $gravatarHandler);
+            $person->UserImg = WebApp::computeUserImg(
+                $person->UseGravatar === 'yes',
+                $person->Email ?? null,
+                $person->Avatar ?? null,
+                $gravatarHandler
+            );
         }
         return $persons;
     }

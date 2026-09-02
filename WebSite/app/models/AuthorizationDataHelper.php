@@ -66,7 +66,7 @@ class AuthorizationDataHelper extends Data
         /** @var list<ArticleAuthorizationRowShape> $rows */
         $rows = $stmt->fetchAll(PDO::FETCH_OBJ);
         $articles = array_map(
-            fn (object $row): ArticleAuthorizationRow => ArticleAuthorizationRow::fromStdClass($row),
+            fn(object $row): ArticleAuthorizationRow => ArticleAuthorizationRow::fromStdClass($row),
             $rows
         );
 
@@ -157,7 +157,11 @@ class AuthorizationDataHelper extends Data
 
     public function getArticle(int $id, ConnectedUser $connectedUser): ArticleAuthorizationRow|false
     {
-        $row = $this->get('Article', ['Id' => $id], 'Id, CreatedBy, PublishedBy, OnlyForMembers, IdGroup, Title, Content, LastUpdate, Timestamp');
+        $row = $this->get(
+            'Article',
+            ['Id' => $id],
+            'Id, CreatedBy, PublishedBy, OnlyForMembers, IdGroup, Title, Content, LastUpdate, Timestamp'
+        );
         if ($row === false) {
             throw new QueryException("Article {$id} doesn't exist");
         }
